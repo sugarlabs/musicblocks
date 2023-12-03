@@ -876,6 +876,16 @@
                     count = 0;
                 }
             }
+            document.addEventListener('fullscreenchange', handleFullscreenChange);
+            document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+            document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+            document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+            function handleFullscreenChange() {
+                var iconCode = document.querySelector('#FullScrIcon');
+                count = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement ? 1 : 0;
+                iconCode.textContent = count ? '\ue5d1' : '\ue5d0';
+            }
           </script>
         </div>
         </div>
