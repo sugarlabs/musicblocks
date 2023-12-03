@@ -1173,8 +1173,8 @@ class Painter {
             if (this.turtle.skinChanged) {
                 let artwork = TURTLESVG;
                 artwork = artwork
-                    .replace(/fill_color/g, FILLCOLORS[i])
-                    .replace(/stroke_color/g, STROKECOLORS[i]);
+                    .replace(/fill_color/g, FILLCOLORS.at(i))
+                    .replace(/stroke_color/g, STROKECOLORS.at(i));
 
                 this.turtle.doTurtleShell(
                     55,
