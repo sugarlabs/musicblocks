@@ -2000,47 +2000,47 @@ msgstr "ब्लॉक सहायता सहेजें"
 
 #: js/activity.js:2315
 msgid "Jumping to the bottom of the page."
-msgstr ""
+msgstr "पृष्ठ के नीचे जाना।"
 
 #: js/activity.js:2321
 msgid "Scrolling up."
-msgstr ""
+msgstr "ऊपर स्क्रोल कर रहा है।"
 
 #: js/activity.js:2326
 msgid "Scrolling down."
-msgstr ""
+msgstr "नीचे स्क्रोल कर रहा है।"
 
 #: js/activity.js:2331
 msgid "Extracting block"
-msgstr ""
+msgstr "ब्लॉक निकाल रहा है"
 
 #: js/activity.js:2339
 msgid "Moving block up."
-msgstr ""
+msgstr "ब्लॉक को ऊपर मोव कर रहा है।"
 
 #: js/activity.js:2360
 msgid "Moving block down."
-msgstr ""
+msgstr "ब्लॉक को नीचे मोव कर रहा है।"
 
 #: js/activity.js:2381
 msgid "Moving block left."
-msgstr ""
+msgstr "ब्लॉक को बाएँ मोव कर रहा है।"
 
 #: js/activity.js:2398
 msgid "Moving block right."
-msgstr ""
+msgstr "ब्लॉक को दाएँ मोव कर रहा है।"
 
 #: js/activity.js:2413
 msgid "Jump to home position."
-msgstr ""
+msgstr "होम स्थिति पर जाएँ।"
 
 #: js/activity.js:2440
 msgid "Hide blocks"
-msgstr ""
+msgstr "ब्लॉक छुपाएँ"
 
 #: js/activity.js:3314
 msgid "Click the run button to run the project."
-msgstr ""
+msgstr "परियोजना चलाने के लिए रन बटन पर क्लिक करें।"
 
 #: js/activity.js:3381
 #: js/SaveInterface.js:101
@@ -2053,82 +2053,82 @@ msgstr ""
 #: js/GlobalPlanet.js:486
 #.TRANS: default project title when saving as Lilypond
 msgid "My Project"
-msgstr ""
+msgstr "मेरा परियोजना"
 
 #: js/activity.js:4196
 msgid "Show/hide block"
-msgstr ""
+msgstr "ब्लॉक दिखाएँ/छुपाएँ"
 
 #: js/activity.js:4208
 msgid "Expand/collapse blocks"
-msgstr ""
+msgstr "ब्लॉक विस्तार करें/संकुचित करें"
 
 #: js/activity.js:4353
 msgid "Could not parse JSON input."
-msgstr ""
+msgstr "JSON इनपुट को पार्स नहीं कर सका।"
 
 #: js/activity.js:4656
 #: js/activity.js:4743
 #: js/activity.js:4793
 msgid "Cannot load project from the file. Please check the file type."
-msgstr ""
+msgstr "फ़ाइल से परियोजना लोड नहीं कर सकता है। कृपया फ़ाइल का प्रकार जांचें।"
 
 #: js/activity.js:5023
 msgid "Invalid parameters"
-msgstr ""
+msgstr "अमान्य पैरामीटर्स"
 
 #: js/turtle-singer.js:1334
 #.TRANS: partials are weighted components in a harmonic series
 msgid "You must have at least one Partial block inside of a Weighted-partial block"
-msgstr ""
+msgstr "आपके पास एक से अधिक पांचिक ब्लॉक के अंदर कम से कम एक आंशिक ब्लॉक होना चाहिए"
 
 #: js/turtle-singer.js:2048
 msgid "synth cannot play chords."
-msgstr ""
+msgstr "सिंथ कोड नहीं बजा सकता है।"
 
 #: js/lilypond.js:614
 msgid "brown rat"
-msgstr ""
+msgstr "भूरा चूहा"
 
 #: js/lilypond.js:615
 msgid "mole"
-msgstr ""
+msgstr "मौज"
 
 #: js/lilypond.js:616
 msgid "chipmunk"
-msgstr ""
+msgstr "चिपमंक"
 
 #: js/lilypond.js:617
 msgid "red squirrel"
-msgstr ""
+msgstr "लाल गिलहरी"
 
 #: js/lilypond.js:618
 msgid "guinea pig"
-msgstr ""
+msgstr "गिनीपिग"
 
 #: js/lilypond.js:619
 msgid "capybara"
-msgstr ""
+msgstr "कैपीबारा"
 
 #: js/lilypond.js:620
 msgid "coypu"
-msgstr ""
+msgstr "कोयपू"
 
 #: js/lilypond.js:621
 msgid "black rat"
-msgstr ""
+msgstr "काला चूहा"
 
 #: js/lilypond.js:622
 msgid "grey squirrel"
-msgstr ""
+msgstr "स्लेटी गिलहरी"
 
 #: js/lilypond.js:623
 msgid "flying squirrel"
-msgstr ""
+msgstr "उड़ती गिलहरी"
 
 #: js/lilypond.js:624
 msgid "bat"
-msgstr ""
+msgstr "बैट"
 
 #: js/lilypond.js:757
 #: js/lilypond.js:921
@@ -2136,89 +2136,89 @@ msgstr ""
 #: js/ActionBlocks.js:732
 #: js/ExtrasBlocks.js:367
 msgid "start drum"
-msgstr ""
+msgstr "ड्रम चालू करें"
 
 #: js/SaveInterface.js:35
 #: js/SaveInterface.js:37
 #: js/SaveInterface.js:69
 msgid "Music Blocks Project"
-msgstr ""
+msgstr "संगीत ब्लॉक्स परियोजना"
 
 #: js/SaveInterface.js:39
 msgid "This project was created in Music Blocks"
-msgstr ""
+msgstr "यह परियोजना म्यूज़िक ब्लॉक्स में बनाई गई थी"
 
 #: js/SaveInterface.js:43
 msgid "Music Blocks is a Free/Libre Software application."
-msgstr ""
+msgstr "म्यूज़िक ब्लॉक्स एक मुक्त/स्वतंत्र सॉफ़्टवेयर अनुप्रयोग है।"
 
 #: js/SaveInterface.js:45
 msgid "The source code can be accessed at"
-msgstr ""
+msgstr "स्रोत कोड को इस पर पहुँचा जा सकता है"
 
 #: js/SaveInterface.js:48
 msgid "For more information, please consult the"
-msgstr ""
+msgstr "अधिक जानकारी के लिए कृपया संपर्क करें"
 
 #: js/SaveInterface.js:59
 msgid "Alternatively, open the file in Music Blocks using the Load project button."
-msgstr ""
+msgstr "विकल्प के रूप में, फ़ाइल को लोड परियोजना बटन का उपयोग करके म्यूज़िक ब्लॉक्स में खोलें।"
 
 #: js/SaveInterface.js:61
 msgid "Project Code"
-msgstr ""
+msgstr "परियोजना कोड"
 
 #: js/SaveInterface.js:63
 msgid "This code stores data about the blocks in a project."
-msgstr ""
+msgstr "यह कोड परियोजना में ब्लॉक्स के बारे में डेटा स्टोर करता है।"
 
 #: js/SaveInterface.js:65
 msgid "Show"
-msgstr ""
+msgstr "दिखाएँ"
 
 #: js/SaveInterface.js:67
 msgid "Hide"
-msgstr ""
+msgstr "छुपाएँ"
 
 #: js/SaveInterface.js:149
 #: js/SaveInterface.js:58
 msgid "No description provided"
-msgstr ""
+msgstr "कोई विवरण उपलब्ध नहीं है"
 
 #: js/SaveInterface.js:226
 msgid "Your recording is in progress."
-msgstr ""
+msgstr "आपका रिकॉर्डिंग प्रगति में है।"
 
 #: js/SaveInterface.js:263
 #.TRANS: File name prompt for save as Lilypond
 msgid "File name"
-msgstr ""
+msgstr "फ़ाइल का नाम"
 
 #: js/SaveInterface.js:265
 #: js/StringHelper.js:39
 #.TRANS: Project title prompt for save as Lilypond
 msgid "Project title"
-msgstr ""
+msgstr "परियोजना का शीर्षक"
 
 #: js/SaveInterface.js:267
 #.TRANS: Project title prompt for save as Lilypond
 msgid "Project author"
-msgstr ""
+msgstr "परियोजना का लेखक"
 
 #: js/SaveInterface.js:269
 #.TRANS: MIDI prompt for save as Lilypond
 msgid "Include MIDI output?"
-msgstr ""
+msgstr "MIDI आउटपुट शामिल करें?"
 
 #: js/SaveInterface.js:271
 #.TRANS: Guitar prompt for save as Lilypond
 msgid "Include guitar tablature output?"
-msgstr ""
+msgstr "गिटार टैब्लेचर आउटपुट शामिल करें?"
 
 #: js/SaveInterface.js:273
 #.TRANS: Lilypond is a scripting language for generating sheet music
 msgid "Save as Lilypond"
-msgstr ""
+msgstr "लिलीपॉंड के रूप में सहेजें"
 
 #: js/SaveInterface.js:288
 #: js/EnsembleBlocks.js:75
@@ -2240,18 +2240,18 @@ msgstr ""
 #: js/EnsembleBlocks.js:1280
 #.TRANS: default project author when saving as Lilypond
 msgid "Mr. Mouse"
-msgstr ""
+msgstr "श्री माउस"
 
 #: js/SaveInterface.js:401
 msgid "The Lilypond code is copied to clipboard. You can paste it here: "
-msgstr ""
+msgstr "लिलीपॉंड कोड को क्लिपबोर्ड पर कॉपी किया गया है। आप इसे यहाँ पेस्ट कर सकते हैं:"
 
 #: js/RhythmBlockPaletteBlocks.js:38
 #: js/RhythmBlockPaletteBlocks.js:171
 #.TRANS: rhythm block
 #.TRANS: translate "rhythm1" as rhythm
 msgid "rhythm1"
-msgstr ""
+msgstr "ताल1"
 
 #: js/RhythmBlockPaletteBlocks.js:43
 #: js/RhythmBlockPaletteBlocks.js:175
@@ -2259,138 +2259,138 @@ msgstr ""
 #: js/RhythmBlockPaletteBlocks.js:360
 #: js/RhythmBlockPaletteBlocks.js:610
 msgid "number of notes"
-msgstr ""
+msgstr "नोटों की संख्या"
 
 #: js/RhythmBlockPaletteBlocks.js:85
 msgid "polyphonic rhythm"
-msgstr ""
+msgstr "बहुस्वर ताल"
 
 #: js/RhythmBlockPaletteBlocks.js:161
 msgid "The Rhythm block is used to generate rhythm patterns."
-msgstr ""
+msgstr "रिद्धम ब्लॉक का उपयोग ताल पैटर्न बनाने के लिए किया जाता है।"
 
 #: js/RhythmBlockPaletteBlocks.js:191
 msgid "1/64 note"
-msgstr ""
+msgstr "1/64 नोट"
 
 #: js/RhythmBlockPaletteBlocks.js:207
 msgid "1/32 note"
-msgstr ""
+msgstr "1/32 नोट"
 
 #: js/RhythmBlockPaletteBlocks.js:223
 msgid "1/16 note"
-msgstr ""
+msgstr "1/16 नोट"
 
 #: js/RhythmBlockPaletteBlocks.js:239
 msgid "eighth note"
-msgstr ""
+msgstr "आठवीं नोट"
 
 #: js/RhythmBlockPaletteBlocks.js:255
 msgid "quarter note"
-msgstr ""
+msgstr "क्वॉर्टर नोट"
 
 #: js/RhythmBlockPaletteBlocks.js:271
 msgid "half note"
-msgstr ""
+msgstr "हाफ नोट"
 
 #: js/RhythmBlockPaletteBlocks.js:287
 msgid "whole note"
-msgstr ""
+msgstr "पूरा नोट"
 
 #: js/RhythmBlockPaletteBlocks.js:308
 #: js/RhythmBlockPaletteBlocks.js:357
 #: js/RhythmBlockPaletteBlocks.js:393
 #.TRANS: A tuplet is a note value divided into irregular time values.
 msgid "tuplet"
-msgstr ""
+msgstr "टुपलेट"
 
 #: js/RhythmBlockPaletteBlocks.js:386
 msgid "The Tuplet block is used to generate a group of notes played in a condensed amount of time."
-msgstr ""
+msgstr "टुपलेट ब्लॉक का उपयोग संक्षेपित समय में बजाए जाने वाले नोट्स के समूह बनाने के लिए किया जाता है।"
 
 #: js/RhythmBlockPaletteBlocks.js:543
 #.TRANS: A tuplet divided into 7 time values.
 msgid "septuplet"
-msgstr ""
+msgstr "सेप्टुप्लेट"
 
 #: js/RhythmBlockPaletteBlocks.js:560
 #.TRANS: A tuplet divided into 5 time values.
 msgid "quintuplet"
-msgstr ""
+msgstr "क्विंटुप्लेट"
 
 #: js/RhythmBlockPaletteBlocks.js:577
 #.TRANS: A tuplet divided into 3 time values.
 msgid "triplet"
-msgstr ""
+msgstr "त्रैपलेट"
 
 #: js/RhythmBlockPaletteBlocks.js:593
 msgid "simple tuplet"
-msgstr ""
+msgstr "साधा टुपलेट"
 
 #: js/RhythmBlockPaletteBlocks.js:599
 msgid "Tuplets are a collection of notes that get scaled to a specific duration."
-msgstr ""
+msgstr "टुपलेट्स एक ऐसे समय की निर्दिष्ट अवधि के लिए स्केल करने वाले नोट्स का संग्रह होते हैं।"
 
 #: js/RhythmBlockPaletteBlocks.js:601
 msgid "Using tuplets makes it easy to create groups of notes that are not based on a power of 2."
-msgstr ""
+msgstr "टुपलेट्स का उपयोग करके वे नोट्स के समूह बनाना आसान होता है जो 2 के गुणनक पर आधारित नहीं हैं।"
 
 #: js/WidgetBlocks.js:71
 #.TRANS: sound envelope (ADSR)
 msgid "envelope"
-msgstr ""
+msgstr "एनवेलोप"
 
 #: js/WidgetBlocks.js:79
 #.TRANS: Attack time is the time taken for initial run-up of level from nil to peak, beginning when the key is first pressed.
 msgid "attack"
-msgstr ""
+msgstr "आक्रमण"
 
 #: js/WidgetBlocks.js:81
 #.TRANS: Decay time is the time taken for the subsequent run down from the attack level to the designated sustain level.
 msgid "decay"
-msgstr ""
+msgstr "क्षय"
 
 #: js/WidgetBlocks.js:83
 #.TRANS: Sustain level is the level during the main sequence of the sound's duration, until the key is released.
 msgid "sustain"
-msgstr ""
+msgstr "सस्टेन"
 
 #: js/WidgetBlocks.js:85
 #.TRANS: Release time is the time taken for the level to decay from the sustain level to zero after the key is released.
 msgid "release"
-msgstr ""
+msgstr "रिलीज"
 
 #: js/WidgetBlocks.js:96
 msgid "Attack value should be from 0 to 100."
-msgstr ""
+msgstr "आक्रमण मूल्य 0 से 100 के बीच होना चाहिए।"
 
 #: js/WidgetBlocks.js:99
 msgid "Decay value should be from 0 to 100."
-msgstr ""
+msgstr "क्षय मूल्य 0 से 100 के बीच होना चाहिए।"
 
 #: js/WidgetBlocks.js:102
 msgid "Sustain value should be from 0 to 100."
-msgstr ""
+msgstr "सस्टेन मूल्य 0 से 100 के बीच होना चाहिए।"
 
 #: js/WidgetBlocks.js:105
 msgid "Release value should be from 0-100."
-msgstr ""
+msgstr "रिलीज मूल्य 0 से 100 के बीच होना चाहिए।"
 
 #: js/WidgetBlocks.js:121
 msgid "You are adding multiple envelope blocks."
-msgstr ""
+msgstr "आप कई एनवेलोप ब्लॉक जोड़ रहे हैं।"
 
 #: js/WidgetBlocks.js:144
 #.TRANS: a filter removes some unwanted components from a signal
 msgid "filter"
-msgstr ""
+msgstr "फ़िल्टर"
 
 #: js/WidgetBlocks.js:149
 #: js/musicutils.js:707
 #: js/musicutils.js:1106
 #.TRANS: highpass filter
 msgid "highpass"
-msgstr ""
+msgstr "हाईपास"
 
 #: js/WidgetBlocks.js:152
 #: js/ToneBlocks.js:33
@@ -2399,13 +2399,13 @@ msgstr ""
 #.TRANS: type of filter, e.g., lowpass, highpass, etc.
 #.TRANS: there are different types (sine, triangle, square...) of oscillators.
 msgid "type"
-msgstr ""
+msgstr "प्रकार"
 
 #: js/WidgetBlocks.js:154
 #: js/timbre.js:1818
 #.TRANS: rolloff is the steepness of a change in frequency.
 msgid "rolloff"
-msgstr ""
+msgstr "रोलऑफ"
 
 #: js/WidgetBlocks.js:155
 #: js/MediaBlocks.js:407
@@ -2416,26 +2416,26 @@ msgstr ""
 #: js/temperament.js:1343
 #: js/timbre.js:1842
 msgid "frequency"
-msgstr ""
+msgstr "आवृत्ति"
 
 #: js/WidgetBlocks.js:179
 #.TRANS: rolloff is the steepness of a change in frequency.
 msgid "Rolloff value should be either -12, -24, -48, or -96 decibels/octave."
-msgstr ""
+msgstr "रोलऑफ मूल्य -12, -24, -48, या -96 डेसिबल्स/ऑक्टेव होना चाहिए।"
 
 #: js/WidgetBlocks.js:211
 msgid "The Temperament tool is used to define custom tuning."
-msgstr ""
+msgstr "टेम्पेरमेंट टूल का उपयोग कस्टम ट्यूनिंग को निर्धारित करने के लिए किया जाता है।"
 
 #: js/WidgetBlocks.js:277
 #: js/sampler.js:329
 msgid "Upload a sample and adjust its pitch center."
-msgstr ""
+msgstr "एक सैंपल अपलोड करें और इसके पिच केंद्र को समायोजित करें।"
 
 #: js/WidgetBlocks.js:284
 #.TRANS: the speed at music is should be played.
 msgid "sampler"
-msgstr ""
+msgstr "सैम्पलर"
 
 #: js/WidgetBlocks.js:329
 #: js/WidgetBlocks.js:334
@@ -2452,124 +2452,124 @@ msgstr ""
 #: js/modewidget.js:919
 #.TRANS: customize voice
 msgid "custom"
-msgstr ""
+msgstr "अनुकूलित"
 
 #: js/WidgetBlocks.js:432
 msgid "The Meter block opens a tool to select strong beats for the meter."
-msgstr ""
+msgstr "मीटर ब्लॉक एक टूल
 
 #: js/WidgetBlocks.js:473
 msgid "The oscilloscope block opens a tool to visualize waveforms."
-msgstr ""
+msgstr "ऑसिलोस्कोप ब्लॉक एक उपकरण खोलता है जिससे तरंगरूप दृष्टिकोण को दृष्टिगत किया जा सकता है।"
 
 #: js/WidgetBlocks.js:478
 msgid "oscilloscope"
-msgstr ""
+msgstr "ऑसिलोस्कोप"
 
 #: js/WidgetBlocks.js:530
 msgid "The Custom mode block opens a tool to explore musical mode (the spacing of the notes in a scale)."
-msgstr ""
+msgstr "कस्टम मोड ब्लॉक एक उपकरण खोलता है जिससे संगीतिक मोड (स्केल में नोट्स की जगह) का अन्वेषण किया जा सकता है।"
 
 #: js/WidgetBlocks.js:536
 #.TRANS: musical mode is the pattern of half-steps in an octave, e.g., Major or Minor modes
 msgid "custom mode"
-msgstr ""
+msgstr "कस्टम मोड"
 
 #: js/WidgetBlocks.js:570
 msgid "The Tempo block opens a metronome to visualize the beat."
-msgstr ""
+msgstr "टेम्पो ब्लॉक एक मेट्रोनोम खोलता है जिससे बीट को दृष्टिगत किया जा सकता है।"
 
 #: js/WidgetBlocks.js:617
 msgid "The Arpeggio Widget is used to compose chord sequences."
-msgstr ""
+msgstr "आरपेजियो विजेट का उपयोग एकॉर्ड सीक्वेंस कंपोज करने के लिए किया जाता है।"
 
 #: js/WidgetBlocks.js:623
 #: js/IntervalsBlocks.js:531
 msgid "arpeggio"
-msgstr ""
+msgstr "आरपेजियो"
 
 #: js/WidgetBlocks.js:677
 msgid "The Pitch drum matrix is used to map pitches to drum sounds."
-msgstr ""
+msgstr "पिच ड्रम मैट्रिक्स का उपयोग पिच को ड्रम साउंड्स से मैप करने के लिए किया जाता है।"
 
 #: js/WidgetBlocks.js:682
 #.TRANS: makes a mapping between pitches and drum sounds
 msgid "pitch-drum mapper"
-msgstr ""
+msgstr "पिच-ड्रम मैपर"
 
 #: js/WidgetBlocks.js:724
 msgid "You must have at least one pitch block and one drum block in the matrix."
-msgstr ""
+msgstr "मैट्रिक्स में कम से कम एक पिच ब्लॉक और एक ड्रम ब्लॉक होना चाहिए।"
 
 #: js/WidgetBlocks.js:746
-msgid "The Pitch slider tool to is used to generate pitches at selected frequencies."
-msgstr ""
+msgid "The Pitch slider tool is used to generate pitches at selected frequencies."
+msgstr "पिच स्लाइडर टूल का उपयोग चयनित फ़्रीक्वेंसी पर पिच उत्पन्न करने के लिए किया जाता है।"
 
 #: js/WidgetBlocks.js:751
 #.TRANS: widget to generate pitches using a slider
 msgid "pitch slider"
-msgstr ""
+msgstr "पिच स्लाइडर"
 
 #: js/WidgetBlocks.js:788
 msgid "chromatic keyboard"
-msgstr ""
+msgstr "क्रोमेटिक कीबोर्ड"
 
 #: js/WidgetBlocks.js:815
 #: js/WidgetBlocks.js:874
 #.TRANS: widget to generate pitches using a slider
 msgid "music keyboard"
-msgstr ""
+msgstr "संगीत कीबोर्ड"
 
 #: js/WidgetBlocks.js:859
 #: js/WidgetBlocks.js:866
 msgid "The Music keyboard block opens a piano keyboard that can be used to create notes."
-msgstr ""
+msgstr "संगीत कीबोर्ड ब्लॉक एक पियानो कीबोर्ड खोलता है जिससे नोट बनाने के लिए उपयोग किया जा सकता है।"
 
 #: js/WidgetBlocks.js:910
-msgid "The Pitch staircase tool to is used to generate pitches from a given ratio."
-msgstr ""
+msgid "The Pitch staircase tool is used to generate pitches from a given ratio."
+msgstr "पिच स्टेयरकेस टूल का उपयोग एक दिए गए अनुपात से पिच उत्पन्न करने के लिए किया जाता है।"
 
 #: js/WidgetBlocks.js:917
 #.TRANS: generate a progressive sequence of pitches
 msgid "pitch staircase"
-msgstr ""
+msgstr "पिच स्टेयरकेस"
 
 #: js/WidgetBlocks.js:982
 msgid "The Rhythm Maker block opens a tool to create drum machines."
-msgstr ""
+msgstr "रिदम मेकर ब्लॉक एक उपकरण खोलता है जिससे ड्रम मशीन बनाई जा सकती है।"
 
 #: js/WidgetBlocks.js:1036
 msgid "G major scale"
-msgstr ""
+msgstr "जी मेजर स्केल"
 
 #: js/WidgetBlocks.js:1064
 msgid "C major scale"
-msgstr ""
+msgstr "सी मेजर स्केल"
 
 #: js/WidgetBlocks.js:1097
 msgid "The Phrase Maker block opens a tool to create musical phrases."
-msgstr ""
+msgstr "फ्रेज मेकर ब्लॉक एक उपकरण खोलता है जिससे संगीतिक वाक्य बनाए जा सकते हैं।"
 
 #: js/WidgetBlocks.js:1104
 #.TRANS: assigns pitch to a sequence of beats to generate a melody
 msgid "phrase maker"
-msgstr ""
+msgstr "वाक्य निर्माता"
 
 #: js/WidgetBlocks.js:1168
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
-msgstr ""
+msgstr "मैट्रिक्स में कम से कम एक पिच ब्लॉक और एक रिदम ब्लॉक होना चाहिए।"
 
 #: js/WidgetBlocks.js:1220
 msgid "The Status block opens a tool for inspecting the status of Music Blocks as it is running."
-msgstr ""
+msgstr "स्थिति ब्लॉक एक उपकरण खोलता है जिससे चल रहे संगीत ब्लॉक्स की स्थिति की जाँच की जा सकती है।"
 
 #: js/IntervalsBlocks.js:38
 msgid "set temperament"
-msgstr ""
+msgstr "ताम्बुल सेट करें"
 
 #: js/IntervalsBlocks.js:43
 msgid "The Set temperament block is used to choose the tuning system used by Music Blocks."
-msgstr ""
+msgstr "सेट ताम्बुल ब्लॉक का उपयोग संगीत ब्लॉक्स द्वारा उपयोग किए जाने वाले सुर सिस्टम को चुनने के लिए किया जाता है।"
 
 #: js/IntervalsBlocks.js:50
 #: js/MediaBlocks.js:444
@@ -2584,166 +2584,166 @@ msgstr ""
 #: js/ToneBlocks.js:724
 #.TRANS: adjusts the shift up or down by one octave (twelve half-steps in the interval between two notes, one having twice or half the frequency in Hz of the other.)
 msgid "octave"
-msgstr ""
+msgstr "ऑक्टेव"
 
 #: js/IntervalsBlocks.js:70
 msgid "The Temperament name block is used to select a tuning method."
-msgstr ""
+msgstr "ताम्बुल नाम ब्लॉक का उपयोग एक सुर की विधि का चयन करने के लिए किया जाता है।"
 
 #: js/IntervalsBlocks.js:105
 msgid "doubly"
-msgstr ""
+msgstr "दोगुना"
 
 #: js/IntervalsBlocks.js:108
 msgid "The Doubly block will double the size of an interval."
-msgstr ""
+msgstr "डबली ब्लॉक एक इंटरवल का आकार दोगुना करेगा।"
 
 #: js/IntervalsBlocks.js:173
 msgid "interval number"
-msgstr ""
+msgstr "इंटरवल संख्या"
 
 #: js/IntervalsBlocks.js:175
 msgid "The Interval number block returns the number of scalar steps in the current interval."
-msgstr ""
+msgstr "इंटरवल नंबर ब्लॉक वर्तमान इंटरवल में स्केलर कदमों की संख्या लौटाता है।"
 
 #: js/IntervalsBlocks.js:203
 msgid "The Semi-tone interval block measures the distance between two notes in semi-tones."
-msgstr ""
+msgstr "सेमी-टोन इंटरवल ब्लॉक दो नोट्स के बीच की दूरी को सेमी-टोन में मापता है।"
 
 #: js/IntervalsBlocks.js:209
 #.TRANS: measure the distance between two pitches in semi-tones
 msgid "semi-tone interval measure"
-msgstr ""
+msgstr "सेमी-टोन इंटरवल माप"
 
 #: js/IntervalsBlocks.js:264
 #: js/IntervalsBlocks.js:366
 msgid "You must use two pitch blocks when measuring an interval."
-msgstr ""
+msgstr "आपको एक इंटरवल को मापते समय दो पिच ब्लॉक्स का उपयोग करना होगा।"
 
 #: js/IntervalsBlocks.js:299
 msgid "The Scalar interval block measures the distance between two notes in the current key and mode."
-msgstr ""
+msgstr "स्केलर इंटरवल ब्लॉक वर्तमान कुंजी और मोड में दो नोट्स के बीच की दूरी को मापता है।"
 
 #: js/IntervalsBlocks.js:305
-#.TRANS: measure the distance between two pitches in steps of musical scale
+#.TRANS: संगीतीय स्केल के कदमों में दो स्वरों के बीच की दूरी को मापें
 msgid "scalar interval measure"
-msgstr ""
+msgstr "स्केलर इंटरवल माप"
 
 #: js/IntervalsBlocks.js:444
 #: js/musicutils.js:638
 #: js/musicutils.js:909
-#.TRANS: perfect is a music term related to intervals
+#.TRANS: परफेक्ट एक इंटरवल से संबंधित संगीत शब्द है
 msgid "perfect"
-msgstr ""
+msgstr "पूर्ण"
 
 #: js/IntervalsBlocks.js:484
 msgid "The Semi-tone interval block calculates a relative interval based on half steps."
-msgstr ""
+msgstr "सेमी-टोन इंटरवल ब्लॉक आधारित है जो आधे कदमों पर आधारित है।"
 
 #: js/IntervalsBlocks.js:486
 msgid "In the figure, we add sol# to sol."
-msgstr ""
+msgstr "चित्र में, हम sol# को sol में जोड़ते हैं।"
 
 #: js/IntervalsBlocks.js:492
 #: js/OrnamentBlocks.js:93
-#.TRANS: calculate a relative step between notes based on semi-tones
+#.TRANS: सेमी-टोन्स पर आधारित नोटों के बीच एक सापेक्ष चरण की गणना करें
 msgid "semi-tone interval"
-msgstr ""
+msgstr "सेमी-टोन इंटरवल"
 
 #: js/IntervalsBlocks.js:522
 msgid "The Arpeggio block will run each note block multiple times, adding a transposition based on the specified chord."
-msgstr ""
+msgstr "आर्पेजियो ब्लॉक हर नोट ब्लॉक को कई बार चलाएगा, जिसमें निर्दिष्ट किए गए स्वर के आधार पर एक ट्रांसपोज़िशन जोड़ा जाएगा।"
 
 #: js/IntervalsBlocks.js:524
 msgid "The output of the example is: do, mi, sol, sol, ti, mi"
-msgstr ""
+msgstr "उदाहरण का आउटपुट है: do, mi, sol, sol, ti, mi"
 
 #: js/IntervalsBlocks.js:706
 msgid "The Chord block calculates common chords."
-msgstr ""
+msgstr "कॉर्ड ब्लॉक सामान्य कॉर्ड की गणना करता है।"
 
 #: js/IntervalsBlocks.js:708
 msgid "In the figure, we generate a C-major chord."
-msgstr ""
+msgstr "चित्र में, हम C मेजर कॉर्ड बनाते हैं।"
 
 #: js/IntervalsBlocks.js:713
 msgid "chord"
-msgstr ""
+msgstr "कॉर्ड"
 
 #: js/IntervalsBlocks.js:753
 msgid "The Ratio Interval block calculates an interval based on a ratio."
-msgstr ""
+msgstr "अनुपात इंटरवल ब्लॉक एक अनुपात पर आधारित इंटरवल की गणना करता है।"
 
 #: js/IntervalsBlocks.js:758
 msgid "ratio interval"
-msgstr ""
+msgstr "अनुपात इंटरवल"
 
 #: js/IntervalsBlocks.js:811
 msgid "The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode."
-msgstr ""
+msgstr "स्केलर इंटरवल ब्लॉक मौजूदा मोड पर आधारित एक सापेक्ष इंटरवल की गणना करता है, जो मोड के बाहर के सभी स्वरों को छोड़ता है।"
 
 #: js/IntervalsBlocks.js:813
 msgid "In the figure, we add la to sol."
-msgstr ""
+msgstr "चित्र में, हम la को sol में जोड़ते हैं।"
 
 #: js/IntervalsBlocks.js:845
-msgid "The Define mode block allows you define a custom mode by specifiying pitch numbers."
-msgstr ""
+msgid "The Define mode block allows you to define a custom mode by specifying pitch numbers."
+msgstr "डिफ़ाइन मोड ब्लॉक आपको पिच नंबर की विशेषण करके एक कस्टम मोड को निर्धारित करने की अनुमति देता है।"
 
 #: js/IntervalsBlocks.js:852
-#.TRANS: define a custom mode
+#.TRANS: एक कस्टम मोड को परिभाषित करें
 msgid "define mode"
-msgstr ""
+msgstr "मोड परिभाषित करें"
 
 #: js/IntervalsBlocks.js:890
 msgid "movable Do"
-msgstr ""
+msgstr "मूवेबल डो"
 
 #: js/IntervalsBlocks.js:894
-msgid "When Movable do is false, the solfege note names are always tied to specific pitches,"
-msgstr ""
+msgid "When Movable Do is false, the solfege note names are always tied to specific pitches,"
+msgstr "जब मूवेबल डो गलत है, तो सोल्फेज नोट नामें हमेशा विशिष्ट पिच के साथ जुड़े होते हैं,"
 
 #: js/IntervalsBlocks.js:896
-msgid "eg \"do\" is always \"C-natural\" when Movable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
-msgstr ""
+msgid "e.g., \"do\" is always \"C-natural\" when Movable Do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
+msgstr "उदाहरण के लिए, \"do\" हमेशा \"C-natural\" होता है जब मूवेबल डो सही है, सोल्फेज नोट नामें स्केल डिग्रीज को आवंटित की जाती हैं, \"do\" हमेशा मेजर स्केल के पहले डिग्री होता है।"
 
 #: js/IntervalsBlocks.js:922
-#.TRANS:  mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
+#.TRANS: मोड की लंबाई स्केल में स्वरों की संख्या है, उदाहरण के लिए 7 मेजर और माइनर स्केल्स के लिए; 12 क्रोमैटिक स्केल्स के लिए
 msgid "mode length"
-msgstr ""
+msgstr "मोड लंबाई"
 
 #: js/IntervalsBlocks.js:927
 msgid "The Mode length block is the number of notes in the current scale."
-msgstr ""
+msgstr "मोड लंबाई ब्लॉक मौजूदा स्केल में स्वरों की संख्या है।"
 
 #: js/IntervalsBlocks.js:929
 msgid "Most Western scales have 7 notes."
-msgstr ""
+msgstr "अधिकांश पश्चिमी स्केल में 7 स्वर होते हैं।"
 
 #: js/IntervalsBlocks.js:954
-#.TRANS: the mode in music is 'major', 'minor', etc.
+#.TRANS: संगीत में मोड है 'मेजर', 'माइनर', आदि
 msgid "current mode"
-msgstr ""
+msgstr "वर्तमान मोड"
 
 #: js/IntervalsBlocks.js:979
-#.TRANS: the key is a group of pitches with which a music composition is created
+#.TRANS: कुंजी एक समूह है जिसके साथ संगीत रचना बनाई जाती है
 msgid "current key"
-msgstr ""
+msgstr "वर्तमान कुंजी"
 
 #: js/IntervalsBlocks.js:1003
 #: js/IntervalsBlocks.js:1027
-#.TRANS: set the key and mode, e.g. C Major
+#.TRANS: कुंजी और मोड को सेट करें, उदाहरण के लिए C मेजर
 msgid "set key"
-msgstr ""
+msgstr "कुंजी सेट करें"
 
 #: js/IntervalsBlocks.js:1033
 #: js/IntervalsBlocks.js:1039
 msgid "The Set key block is used to set the key and mode,"
-msgstr ""
+msgstr "सेट कुंजी ब्लॉक का उपयोग कुंजी और मोड सेट करने के लिए किया जाता है,"
 
 #: js/IntervalsBlocks.js:1039
-msgid "eg C Major"
-msgstr ""
+msgid "e.g., C Major"
+msgstr "उदाहरण के लिए, C मेजर"
 
 #: js/IntervalsBlocks.js:1051
 #: js/DictBlocks.js:103
@@ -2755,37 +2755,37 @@ msgstr ""
 #: js/DictBlocks.js:208
 #.TRANS: key, e.g., C in C Major
 msgid "key"
-msgstr ""
+msgstr "कुंजी"
 
 #: js/ActionBlocks.js:27
 msgid "The Return block will return a value from an action."
-msgstr ""
+msgstr "रिटर्न ब्लॉक एक क्रिया से मूल्य लौटाएगा।"
 
 #: js/ActionBlocks.js:32
 msgid "return"
-msgstr ""
+msgstr "लौटाएं"
 
 #: js/ActionBlocks.js:51
 msgid "The Return to URL block will return a value to a webpage."
-msgstr ""
+msgstr "रिटर्न टू यूआरएल ब्लॉक एक मूल्य को एक वेबपेज को लौटाएगा।"
 
 #: js/ActionBlocks.js:58
 #.TRANS: return value from a function to a URL
 msgid "return to URL"
-msgstr ""
+msgstr "यूआरएल पर लौटाएं"
 
 #: js/ActionBlocks.js:108
 #: js/ActionBlocks.js:156
 #: js/ActionBlocks.js:285
 #: js/ActionBlocks.js:406
 msgid "The Calculate block returns a value calculated by an action."
-msgstr ""
+msgstr "कैलक्यूलेट ब्लॉक एक क्रिया द्वारा गणना किए गए मूल्य को लौटाता है।"
 
 #: js/ActionBlocks.js:114
 #: js/ActionBlocks.js:291
 #: js/ActionBlocks.js:412
 msgid "calculate"
-msgstr ""
+msgstr "गणना"
 
 #: js/ActionBlocks.js:196
 #: js/ActionBlocks.js:345
@@ -2793,7 +2793,7 @@ msgstr ""
 #: js/ActionBlocks.js:795
 #.TRANS: do is the do something or take an action.
 msgid "The Do block is used to initiate an action."
-msgstr ""
+msgstr "डू ब्लॉक का उपयोग क्रिया आरंभ करने के लिए किया जाता है।"
 
 #: js/ActionBlocks.js:203
 #: js/ActionBlocks.js:351
@@ -2818,92 +2818,92 @@ msgstr "करें"
 #: js/ActionBlocks.js:474
 #: js/ActionBlocks.js:514
 msgid "The Arg block contains the value of an argument passed to an action."
-msgstr ""
+msgstr "आर्ग ब्लॉक में एक क्रिया को पारित किए गए एक तर्क का मूल्य होता है।"
 
 #: js/ActionBlocks.js:480
 #: js/ActionBlocks.js:520
 msgid "arg"
-msgstr ""
+msgstr "तर्क"
 
 #: js/ActionBlocks.js:500
 #: js/ActionBlocks.js:534
 #: js/ActionBlocks.js:542
 msgid "Invalid argument"
-msgstr ""
+msgstr "अवैध तर्क"
 
 #: js/ActionBlocks.js:601
 #: js/ActionBlocks.js:608
 msgid "The Listen block is used to listen for an event such as a mouse click."
-msgstr ""
+msgstr "लिसन ब्लॉक का उपयोग एक घटना के लिए सुनने के लिए किया जाता है, जैसे कि माउस क्लिक।"
 
 #: js/ActionBlocks.js:610
 msgid "When the event happens, an action is taken."
-msgstr ""
+msgstr "जब घटना होती है, तो क्रिया की जाती है।"
 
 #: js/ActionBlocks.js:619
 #.TRANS: an event, such as user actions (mouse clicks, key presses)
 msgid "on"
-msgstr ""
+msgstr "पर"
 
 #: js/ActionBlocks.js:624
 #: js/ActionBlocks.js:627
 #: js/ActionBlocks.js:685
 #.TRANS: do1 is do (take) an action (JAPANESE ONLY)
 msgid "event"
-msgstr ""
+msgstr "घटना"
 
 #: js/ActionBlocks.js:675
 msgid "The Broadcast block is used to trigger an event."
-msgstr ""
+msgstr "ब्रॉडकास्ट ब्लॉक एक घटना को ट्रिगर करने के लिए किया जाता है।"
 
 #: js/ActionBlocks.js:683
 #.TRANS: dispatch an event to trigger a listener
 msgid "broadcast"
-msgstr ""
+msgstr "प्रसारण"
 
 #: js/ActionBlocks.js:710
 msgid "Each Start block is a separate voice."
-msgstr ""
+msgstr "प्रत्येक स्टार्ट ब्लॉक एक अलग आवाज है।"
 
 #: js/ActionBlocks.js:750
 msgid "The Action block is used to group together blocks so that they can be used more than once."
-msgstr ""
+msgstr "एक्शन ब्लॉक ब्लॉक्स को समूह में जोड़ने के लिए किया जाता है ताकि उन्हें एक से अधिक बार उपयोग किया जा सके।"
 
 #: js/ActionBlocks.js:752
 msgid "It is often used for storing a phrase of music that is repeated."
-msgstr ""
+msgstr "इसे अक्सर एक बार फिराया जाने वाले संगीत के वाक्य को स्टोर करने के लिए उपयोग किया जाता है।"
 
 #: js/ActionBlocks.js:856
 msgid "define temperament"
-msgstr ""
+msgstr "ताम्बुल निर्धारित करें"
 
 #: js/EnsembleBlocks.js:66
 msgid "mouse index heap"
-msgstr ""
+msgstr "माउस सूची भंडार"
 
 #: js/EnsembleBlocks.js:68
 msgid "The Mouse index heap block returns a value in the heap at a specified location for a specified mouse."
-msgstr ""
+msgstr "माउस इंडेक्स हीप ब्लॉक एक निर्दिष्ट स्थान पर एक निर्दिष्ट माउस के लिए हीप में एक मूल्य लौटाता है।"
 
 #: js/EnsembleBlocks.js:77
 #: js/EnsembleBlocks.js:1080
 msgid "mouse name"
-msgstr ""
+msgstr "माउस नाम"
 
 #: js/EnsembleBlocks.js:77
 #: js/EnsembleBlocks.js:92
 #: js/HeapBlocks.js:261
 #.TRANS: value1 is a numeric value (JAPANESE ONLY)
 msgid "index"
-msgstr ""
+msgstr "सूची"
 
 #: js/EnsembleBlocks.js:80
 msgid "turtle index heap"
-msgstr ""
+msgstr "टर्टल सूची भंडार"
 
 #: js/EnsembleBlocks.js:82
 msgid "The Turtle index heap block returns a value in the heap at a specified location for a specified turtle."
-msgstr ""
+msgstr "टर्टल इंडेक्स हीप ब्लॉक एक निर्दिष्ट स्थान पर एक निर्दिष्ट कछुआ के लिए हीप में एक मूल्य लौटाता है।"
 
 #: js/EnsembleBlocks.js:90
 #: js/EnsembleBlocks.js:167
@@ -2924,7 +2924,7 @@ msgstr ""
 #: js/EnsembleBlocks.js:1293
 #.TRANS: Yertle is the name of a turtle.
 msgid "Yertle"
-msgstr ""
+msgstr "यर्टल"
 
 #: js/EnsembleBlocks.js:92
 #: js/EnsembleBlocks.js:1089
@@ -2936,29 +2936,29 @@ msgstr "कछुआ नाम"
 #: js/HeapBlocks.js:222
 #: js/HeapBlocks.js:284
 msgid "Index must be > 0."
-msgstr ""
+msgstr "सूची 0 से अधिक होनी चाहिए।"
 
 #: js/EnsembleBlocks.js:127
 #: js/HeapBlocks.js:227
 #: js/HeapBlocks.js:289
 msgid "Maximum heap size is 1000."
-msgstr ""
+msgstr "अधिकतम हीप आकार 1000 है।"
 
 #: js/EnsembleBlocks.js:145
 msgid "stop mouse"
-msgstr ""
+msgstr "माउस रोकें"
 
 #: js/EnsembleBlocks.js:147
 msgid "The Stop mouse block stops the specified mouse."
-msgstr ""
+msgstr "स्पष्ट किए गए माउस को रोक देता है।"
 
 #: js/EnsembleBlocks.js:158
 msgid "stop turtle"
-msgstr "टर्टल बंद करे"
+msgstr "टर्टल रोकें"
 
 #: js/EnsembleBlocks.js:160
 msgid "The Stop turtle block stops the specified turtle."
-msgstr ""
+msgstr "स्पष्ट किए गए कछुए को रोक देता है।"
 
 #: js/EnsembleBlocks.js:184
 #: js/EnsembleBlocks.js:247
@@ -2970,7 +2970,7 @@ msgstr ""
 #: js/EnsembleBlocks.js:1190
 #: js/EnsembleBlocks.js:1253
 msgid "Cannot find mouse"
-msgstr ""
+msgstr "माउस नहीं मिल सकता"
 
 #: js/EnsembleBlocks.js:186
 #: js/EnsembleBlocks.js:249
@@ -2982,84 +2982,84 @@ msgstr ""
 #: js/EnsembleBlocks.js:1192
 #: js/EnsembleBlocks.js:1255
 msgid "Cannot find turtle"
-msgstr ""
+msgstr "कछुआ नहीं मिल सकता"
 
 #: js/EnsembleBlocks.js:206
 msgid "start mouse"
-msgstr ""
+msgstr "माउस शुरू करें"
 
 #: js/EnsembleBlocks.js:209
 msgid "The Start mouse block starts the specified mouse."
-msgstr ""
+msgstr "स्पष्ट किए गए माउस को शुरू करता है।"
 
 #: js/EnsembleBlocks.js:220
 msgid "start turtle"
-msgstr "टरटल चालू करे"
+msgstr "टरटल चालू करें"
 
 #: js/EnsembleBlocks.js:223
 msgid "The Start turtle block starts the specified turtle."
-msgstr ""
+msgstr "स्टार्ट टरटल ब्लॉक निर्दिष्ट की गई कछुआ को शुरू करता है।"
 
 #: js/EnsembleBlocks.js:256
 msgid "Mouse is already running."
-msgstr ""
+msgstr "माउस पहले से ही चल रहा है।"
 
 #: js/EnsembleBlocks.js:258
 msgid "Turtle is already running."
-msgstr ""
+msgstr "टरटल पहले से ही चल रहा है।"
 
 #: js/EnsembleBlocks.js:282
 msgid "Cannot find start block"
-msgstr ""
+msgstr "स्टार्ट ब्लॉक नहीं मिल सकता"
 
 #: js/EnsembleBlocks.js:292
-#.TRANS: pen color for this mouse
+#.TRANS: इस माउस के लिए पेन कलर
 msgid "mouse color"
-msgstr ""
+msgstr "माउस कलर"
 
 #: js/EnsembleBlocks.js:294
 msgid "The Mouse color block returns the pen color of the specified mouse."
-msgstr ""
+msgstr "माउस कलर ब्लॉक निर्दिष्ट माउस का पेन कलर वापस करता है।"
 
 #: js/EnsembleBlocks.js:306
-#.TRANS: pen color for this turtle
+#.TRANS: इस कछुए के लिए पेन कलर
 msgid "turtle color"
-msgstr ""
+msgstr "कछुआ कलर"
 
 #: js/EnsembleBlocks.js:308
 msgid "The Turtle color block returns the pen color of the specified turtle."
-msgstr ""
+msgstr "कछुआ कलर ब्लॉक निर्दिष्ट कछुए का पेन कलर वापस करता है।"
 
 #: js/EnsembleBlocks.js:338
-#.TRANS: heading (compass direction) for this mouse
+#.TRANS: इस माउस के लिए हेडिंग (कंपास दिशा)
 msgid "mouse heading"
-msgstr ""
+msgstr "माउस हेडिंग"
 
 #: js/EnsembleBlocks.js:340
 msgid "The Mouse heading block returns the heading of the specified mouse."
-msgstr ""
+msgstr "माउस हेडिंग ब्लॉक निर्दिष्ट माउस की हेडिंग वापस करता है।"
 
 #: js/EnsembleBlocks.js:352
 #.TRANS: heading (compass direction) for this turtle
 msgid "turtle heading"
-msgstr ""
+msgstr "कछुआ हेडिंग"
 
 #: js/EnsembleBlocks.js:354
 msgid "The Turtle heading block returns the heading of the specified turtle."
-msgstr ""
+msgstr "कछुआ हेडिंग ब्लॉक निर्दिष्ट कछुए की हेडिंग वापस करता है।"
 
 #: js/EnsembleBlocks.js:384
 #: js/EnsembleBlocks.js:439
-#.TRANS: set xy position for this mouse
+#.TRANS: इस माउस के लिए एक्सवाई स्थिति सेट करें
 msgid "set mouse"
-msgstr ""
+msgstr "माउस सेट करें"
 
 #: js/EnsembleBlocks.js:391
 #: js/EnsembleBlocks.js:402
 #: js/BoxesBlocks.js:307
-#.TRANS: name1 is name as in name of box, value1 is value as in the numeric value stored in a box (JAPANESE ONLY)
+#.TRANS: name1 बॉक्स के नाम के रूप में, value1 एक्स में भंडारित संख्यात्मक मूल्य के रूप में है (केवल जापानी)
 msgid "name1"
-msgstr ""
+msgstr "नाम1"
 
 #: js/EnsembleBlocks.js:391
 #: js/EnsembleBlocks.js:402
@@ -3087,211 +3087,211 @@ msgstr "वाई"
 
 #: js/EnsembleBlocks.js:395
 #: js/EnsembleBlocks.js:452
-#.TRANS: set xy position for this turtle
+#.TRANS: इस कछुए के लिए एक्सवाई स्थिति सेट करें
 msgid "set turtle"
-msgstr ""
+msgstr "कछुआ सेट करें"
 
 #: js/EnsembleBlocks.js:433
 msgid "The Set mouse block sends a stack of blocks to be run by the specified mouse."
-msgstr ""
+msgstr "सेट माउस ब्लॉक एक स्टैक ब्लॉक को निर्दिष्ट माउस द्वारा चलाए जाने के लिए भेजता है।"
 
 #: js/EnsembleBlocks.js:446
 msgid "The Set turtle block sends a stack of blocks to be run by the specified turtle."
-msgstr ""
+msgstr "सेट कछुआ ब्लॉक एक स्टैक ब्लॉक को निर्दिष्ट कछुआ द्वारा चलाए जाने के लिए भेजता है।"
 
 #: js/EnsembleBlocks.js:480
-#.TRANS: y position for this mouse
+#.TRANS: इस माउस के लिए वाई स्थिति
 msgid "mouse y"
-msgstr "माउस y"
+msgstr "माउस वाई"
 
 #: js/EnsembleBlocks.js:482
 msgid "The Y mouse block returns the Y position of the specified mouse."
-msgstr ""
+msgstr "Y माउस ब्लॉक निर्दिष्ट माउस की Y स्थिति वापस करता है।"
 
 #: js/EnsembleBlocks.js:494
-#.TRANS: y position for this turtle
+#.TRANS: इस कछुए के लिए वाई स्थिति
 msgid "turtle y"
-msgstr "कछुआ y"
+msgstr "कछुआ वाई"
 
 #: js/EnsembleBlocks.js:496
 msgid "The Y turtle block returns the Y position of the specified turtle."
-msgstr ""
+msgstr "Y कछुआ ब्लॉक निर्दिष्ट कछुए की Y स्थिति वापस करता है।"
 
 #: js/EnsembleBlocks.js:526
-#.TRANS: x position for this mouse
+#.TRANS: इस माउस के लिए एक्स स्थिति
 msgid "mouse x"
 msgstr "माउस एक्स"
 
 #: js/EnsembleBlocks.js:528
 msgid "The X mouse block returns the X position of the specified mouse."
-msgstr ""
+msgstr "X माउस ब्लॉक निर्दिष्ट माउस की X स्थिति वापस करता है।"
 
 #: js/EnsembleBlocks.js:540
-#.TRANS: x position for this turtle
+#.TRANS: इस कछुए के लिए एक्स स्थिति
 msgid "turtle x"
-msgstr "कछुआ x"
+msgstr "कछुआ एक्स"
 
 #: js/EnsembleBlocks.js:542
 msgid "The X turtle block returns the X position of the specified turtle."
-msgstr ""
+msgstr "X कछुआ ब्लॉक निर्दिष्ट कछुए की X स्थिति वापस करता है।"
 
 #: js/EnsembleBlocks.js:573
-#.TRANS: notes played by this mouse
+#.TRANS: इस माउस द्वारा बजाए गए स्वर
 msgid "mouse notes played"
-msgstr ""
+msgstr "माउस बजाए गए स्वर"
 
 #: js/EnsembleBlocks.js:575
 msgid "The Mouse elapse notes block returns the number of notes played by the specified mouse."
-msgstr ""
+msgstr "माउस इलैप्स स्वर ब्लॉक निर्दिष्ट माउस द्वारा बजाए गए स्वरों की संख्या वापस करता है।"
 
 #: js/EnsembleBlocks.js:587
-#.TRANS: notes played by this turtle
+#.TRANS: इस कछुए द्वारा बजाए गए स्वर
 msgid "turtle notes played"
-msgstr ""
+msgstr "कछुआ बजाए गए स्वर"
 
 #: js/EnsembleBlocks.js:589
 msgid "The Turtle elapse notes block returns the number of notes played by the specified turtle."
-msgstr ""
+msgstr "कछुआ इलैप्स स्वर ब्लॉक निर्दिष्ट कछुए द्वारा बजाए गए स्वरों की संख्या वापस करता है।"
 
 #: js/EnsembleBlocks.js:627
-#.TRANS: convert current note for this turtle to piano key (1-88)
+#.TRANS: इस माउस के लिए वर्तमान स्वर को पियानो कुंजी (1-88) में बदलें
 msgid "mouse pitch number"
-msgstr ""
+msgstr "माउस पिच नंबर"
 
 #: js/EnsembleBlocks.js:629
 msgid "The Mouse pitch block returns the current pitch number being played by the specified mouse."
-msgstr ""
+msgstr "माउस पिच ब्लॉक विशिष्ट माउस द्वारा बजाए जा रहे वर्तमान पिच नंबर को वापस करता है।"
 
 #: js/EnsembleBlocks.js:641
 #.TRANS: convert current note for this turtle to piano key (1-88)
 msgid "turtle pitch number"
-msgstr ""
+msgstr "कछुआ पिच नंबर"
 
 #: js/EnsembleBlocks.js:643
-msgid "The Turrle pitch block returns the current pitch number being played by the specified turtle."
-msgstr ""
+msgid "The Turtle pitch block returns the current pitch number being played by the specified turtle."
+msgstr "टर्टल पिच ब्लॉक विशिष्ट कछुआ द्वारा बजाए जा रहे वर्तमान पिच नंबर को वापस करता है।"
 
 #: js/EnsembleBlocks.js:747
 #: js/EnsembleBlocks.js:819
 #.TRANS: note value is the duration of the note played by this mouse
 msgid "mouse note value"
-msgstr ""
+msgstr "माउस नोट मूल्य"
 
 #: js/EnsembleBlocks.js:757
 #.TRANS: note value is the duration of the note played by this turtle
 msgid "turtle note value"
-msgstr ""
+msgstr "कछुआ नोट मूल्य"
 
 #: js/EnsembleBlocks.js:830
 #.TRANS: sync is short for synchronization
 msgid "mouse sync"
-msgstr ""
+msgstr "माउस सिंक"
 
 #: js/EnsembleBlocks.js:832
 msgid "The Mouse sync block aligns the beat count between mice."
-msgstr ""
+msgstr "माउस सिंक ब्लॉक माउस के बीट गिनती को समरेखित करता है।"
 
 #: js/EnsembleBlocks.js:844
 #.TRANS: sync is short for synchronization
 msgid "turtle sync"
-msgstr ""
+msgstr "कछुआ सिंक"
 
 #: js/EnsembleBlocks.js:846
 msgid "The Turtle sync block aligns the beat count between turtles."
-msgstr ""
+msgstr "टर्टल सिंक ब्लॉक कछुओं के बीट गिनती को समरेखित करता है।"
 
 #: js/EnsembleBlocks.js:887
 msgid "The Found mouse block will return true if the specified mouse can be found."
-msgstr ""
+msgstr "फाउंड माउस ब्लॉक विशिष्ट माउस को पहचाना जा सकता है तो सत्य वापस करेगा।"
 
 #: js/EnsembleBlocks.js:893
 msgid "found mouse"
-msgstr ""
+msgstr "मिला हुआ माउस"
 
 #: js/EnsembleBlocks.js:903
 msgid "The Found turtle block will return true if the specified turtle can be found."
-msgstr ""
+msgstr "फाउंड टर्टल ब्लॉक विशिष्ट कछुआ को पहचाना जा सकता है तो सत्य वापस करेगा।"
 
 #: js/EnsembleBlocks.js:909
 msgid "found turtle"
-msgstr ""
+msgstr "मिला हुआ कछुआ"
 
 #: js/EnsembleBlocks.js:932
 msgid "new mouse"
-msgstr ""
+msgstr "नया माउस"
 
 #: js/EnsembleBlocks.js:934
 msgid "The New mouse block will create a new mouse."
-msgstr ""
+msgstr "नया माउस ब्लॉक नया माउस बनाएगा।"
 
 #: js/EnsembleBlocks.js:945
 msgid "new turtle"
-msgstr ""
+msgstr "नया कछुआ"
 
 #: js/EnsembleBlocks.js:947
 msgid "The New turtle block will create a new turtle."
-msgstr ""
+msgstr "नया टर्टल ब्लॉक नया कछुआ बनाएगा।"
 
 #: js/EnsembleBlocks.js:1011
 msgid "set mouse color"
-msgstr ""
+msgstr "माउस का रंग सेट करें"
 
 #: js/EnsembleBlocks.js:1014
 msgid "The Set-mouse-color block is used to set the color of a mouse."
-msgstr ""
+msgstr "सेट-माउस-कलर ब्लॉक का उपयोग माउस के रंग को सेट करने के लिए किया जाता है।"
 
 #: js/EnsembleBlocks.js:1020
 msgid "set turtle color"
-msgstr ""
+msgstr "कछुआ का रंग सेट करें"
 
 #: js/EnsembleBlocks.js:1023
 msgid "The Set-turtle-color block is used to set the color of a turtle."
-msgstr ""
+msgstr "सेट-टर्टल-कलर ब्लॉक का उपयोग कछुआ के रंग को सेट करने के लिए किया जाता है।"
 
 #: js/EnsembleBlocks.js:1083
 msgid "The Mouse-name block returns the name of a mouse."
-msgstr ""
+msgstr "माउस-नेम ब्लॉक एक माउस का नाम वापस करता है।"
 
 #: js/EnsembleBlocks.js:1092
 msgid "The Turtle-name block returns the name of a turtle."
-msgstr ""
+msgstr "टर्टल-नेम ब्लॉक एक कछुआ का नाम वापस करता है।"
 
 #: js/EnsembleBlocks.js:1115
 msgid "mouse count"
-msgstr ""
+msgstr "माउस गणना"
 
 #: js/EnsembleBlocks.js:1118
 msgid "The Mouse-count block returns the number of mice."
-msgstr ""
+msgstr "माउस-काउंट ब्लॉक माउस की संख्या वापस करता है।"
 
 #: js/EnsembleBlocks.js:1124
 msgid "turtle count"
-msgstr ""
+msgstr "कछुआ गणना"
 
 #: js/EnsembleBlocks.js:1127
 msgid "The Turtle-count block returns the number of turtles."
-msgstr ""
+msgstr "टर्टल-काउंट ब्लॉक कछुओं की संख्या वापस करता है।"
 
 #: js/EnsembleBlocks.js:1149
 msgid "nth mouse name"
-msgstr ""
+msgstr "एनथ माउस नाम"
 
 #: js/EnsembleBlocks.js:1152
 msgid "The Nth-Mouse name block returns the name of the nth mouse."
-msgstr ""
+msgstr "एनथ-माउस-नेम ब्लॉक एनथ माउस का नाम वापस करता है।"
 
 #: js/EnsembleBlocks.js:1158
 msgid "nth turtle name"
-msgstr ""
+msgstr "एनथ कछुआ नाम"
 
 #: js/EnsembleBlocks.js:1161
 msgid "The Nth-Turtle name block returns the name of the nth turtle."
-msgstr ""
+msgstr "एनथ-टर्टल-नेम ब्लॉक एनथ कछुआ का नाम वापस करता है।"
 
 #: js/EnsembleBlocks.js:1205
 #: js/EnsembleBlocks.js:1265
 msgid "set name"
-msgstr ""
+msgstr "नाम सेट करें"
 
 #: js/EnsembleBlocks.js:1214
 #: js/EnsembleBlocks.js:1221
@@ -3305,15 +3305,15 @@ msgstr "लक्ष्य"
 
 #: js/EnsembleBlocks.js:1271
 msgid "The Set-name block is used to name a mouse."
-msgstr ""
+msgstr "सेट-नेम ब्लॉक का उपयोग माउस का नाम रखने के लिए किया जाता है।"
 
 #: js/EnsembleBlocks.js:1284
 msgid "The Set-name block is used to name a turtle."
-msgstr ""
+msgstr "सेट-नेम ब्लॉक का उपयोग कछुआ का नाम रखने के लिए किया जाता है।"
 
 #: js/BooleanBlocks.js:26
 msgid "The Not block is the logical not operator."
-msgstr ""
+msgstr "नॉट ब्लॉक तार्किक नॉट ऑपरेटर है।"
 
 #: js/BooleanBlocks.js:32
 msgid "not"
@@ -3321,7 +3321,7 @@ msgstr "नहीं"
 
 #: js/BooleanBlocks.js:69
 msgid "The And block is the logical and operator."
-msgstr ""
+msgstr "एंड ब्लॉक तार्किक एंड ऑपरेटर है।"
 
 #: js/BooleanBlocks.js:75
 msgid "and"
@@ -3337,120 +3337,120 @@ msgstr "या"
 
 #: js/BooleanBlocks.js:147
 msgid "The XOR block is the logical XOR operator."
-msgstr ""
+msgstr "XOR ब्लॉक तार्किक XOR ऑपरेटर है।"
 
 #: js/BooleanBlocks.js:153
 msgid "xor"
-msgstr ""
+msgstr "एक्सओआर"
 
 #: js/BooleanBlocks.js:188
 msgid "The Greater-than block returns True if the top number is greater than the bottom number."
-msgstr ""
+msgstr "ग्रेटर-थैन ब्लॉक टॉप नंबर बॉटम नंबर से अधिक है तो True लौटाता है।"
 
 #: js/BooleanBlocks.js:237
 msgid "The Less-than block returns True if the top number is less than the bottom number."
-msgstr ""
+msgstr "लेस-थैन ब्लॉक टॉप नंबर बॉटम नंबर से कम है तो True लौटाता है।"
 
 #: js/BooleanBlocks.js:285
 msgid "The Equal block returns True if the two numbers are equal."
-msgstr ""
+msgstr "इक्वल ब्लॉक यदि दो नंबर समान हैं तो True लौटाता है।"
 
 #: js/BooleanBlocks.js:331
 msgid "The Boolean block is used to specify true or false."
-msgstr ""
+msgstr "बूलियन ब्लॉक सच या झूठ को निर्दिष्ट करने के लिए उपयोग होता है।"
 
 #: js/MediaBlocks.js:26
 #.TRANS: right side of the screen
 msgid "right (screen)"
-msgstr ""
+msgstr "दाएं (स्क्रीन)"
 
 #: js/MediaBlocks.js:32
 #: js/MediaBlocks.js:41
 msgid "The Right block returns the position of the right of the canvas."
-msgstr ""
+msgstr "राइट ब्लॉक कैनवास के दाएं की स्थिति लौटाता है।"
 
 #: js/MediaBlocks.js:34
 #: js/MediaBlocks.js:72
 msgid "In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
-msgstr ""
+msgstr "इस उदाहरण में, माउस दाएं जाता है जब तक यह कैनवास के दाएं किनारे तक पहुंचता है; फिर यह कैनवास के बाएं में पुनः प्रकट होता है।"
 
 #: js/MediaBlocks.js:43
 #: js/MediaBlocks.js:81
 msgid "In this example, the turtle moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
-msgstr ""
+msgstr "इस उदाहरण में, कछुआ दाएं जाता है जब तक यह कैनवास के दाएं किनारे तक पहुंचता है; फिर यह कैनवास के बाएं में पुनः प्रकट होता है।"
 
 #: js/MediaBlocks.js:64
 #.TRANS: left side of the screen
 msgid "left (screen)"
-msgstr ""
+msgstr "बाएं (स्क्रीन)"
 
 #: js/MediaBlocks.js:70
 #: js/MediaBlocks.js:79
 msgid "The Left block returns the position of the left of the canvas."
-msgstr ""
+msgstr "लेफ्ट ब्लॉक कैनवास के बाएं की स्थिति लौटाता है।"
 
 #: js/MediaBlocks.js:104
 msgid "top (screen)"
-msgstr ""
+msgstr "शीर्ष (स्क्रीन)"
 
 #: js/MediaBlocks.js:110
 #: js/MediaBlocks.js:119
 msgid "The Top block returns the position of the top of the canvas."
-msgstr ""
+msgstr "टॉप ब्लॉक कैनवास के शीर्ष की स्थिति लौटाता है।"
 
 #: js/MediaBlocks.js:112
 #: js/MediaBlocks.js:150
 msgid "In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
-msgstr ""
+msgstr "इस उदाहरण में, माउस ऊपर जाता है जब तक यह कैनवास के शीर्ष किनारे तक पहुंचता है; फिर यह कैनवास के नीचे पुनः प्रकट होता है।"
 
 #: js/MediaBlocks.js:121
 #: js/MediaBlocks.js:159
 msgid "In this example, the turtle moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
-msgstr ""
+msgstr "इस उदाहरण में, कछुआ ऊपर जाता है जब तक यह कैनवास के शीर्ष किनारे तक पहुंचता है; फिर यह कैनवास के नीचे पुनः प्रकट होता है।"
 
 #: js/MediaBlocks.js:142
 msgid "bottom (screen)"
-msgstr ""
+msgstr "नीचे (स्क्रीन)"
 
 #: js/MediaBlocks.js:148
 #: js/MediaBlocks.js:157
 msgid "The Bottom block returns the position of the bottom of the canvas."
-msgstr ""
+msgstr "बॉटम ब्लॉक कैनवास के नीचे की स्थिति लौटाता है।"
 
 #: js/MediaBlocks.js:182
 msgid "width"
-msgstr ""
+msgstr "चौड़ाई"
 
 #: js/MediaBlocks.js:187
 msgid "The Width block returns the width of the canvas."
-msgstr ""
+msgstr "विड्थ ब्लॉक कैनवास की चौड़ाई लौटाता है।"
 
 #: js/MediaBlocks.js:204
 msgid "height"
-msgstr ""
+msgstr "ऊचाई"
 
 #: js/MediaBlocks.js:209
 msgid "The Height block returns the height of the canvas."
-msgstr ""
+msgstr "हाइट ब्लॉक कैनवास की ऊचाई लौटाता है।"
 
 #: js/MediaBlocks.js:227
 #.TRANS: stops playback of an audio recording
 msgid "stop play"
-msgstr "रोकिये"
+msgstr "रुको प्ले"
 
 #: js/MediaBlocks.js:245
 #.TRANS: Erases the images and text
 msgid "erase media"
-msgstr ""
+msgstr "मीडिया मिटाओ"
 
 #: js/MediaBlocks.js:248
 msgid "The Erase Media block erases text and images."
-msgstr ""
+msgstr "इरेस मीडिया ब्लॉक टेक्स्ट और छवियाँ मिटाता है।"
 
 #: js/MediaBlocks.js:263
 #.TRANS: play an audio recording
 msgid "play back"
-msgstr "दोबारा चलाऐं"
+msgstr "प्ले बैक"
 
 #: js/MediaBlocks.js:292
 msgid "speak"
@@ -3458,11 +3458,11 @@ msgstr "बोलो"
 
 #: js/MediaBlocks.js:297
 msgid "The Speak block outputs to the text-to-speech synthesizer"
-msgstr ""
+msgstr "स्पीक ब्लॉक टेक्स्ट-टू-स्पीच सिंथेसाइज़र को आउटपुट करता है।"
 
 #: js/MediaBlocks.js:330
 msgid "camera"
-msgstr ""
+msgstr "कैमरा"
 
 #: js/MediaBlocks.js:333
 msgid "The Camera block connects a webcam to the Show block."
