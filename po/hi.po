@@ -3904,78 +3904,78 @@ msgstr ""
 
 #: js/RhythmBlocks.js:381
 msgid "The Tie block works on pairs of notes, combining them into one note."
-msgstr ""
+msgstr "टाई ब्लॉक नोट्स के जोड़ों पर काम करता है, उन्हें एक नोट में मिलाकर।"
 
 #: js/RhythmBlocks.js:389
 #.TRANS: tie notes together into one longer note
 msgid "tie"
-msgstr ""
+msgstr "टाई"
 
 #: js/RhythmBlocks.js:415
 #: js/RhythmBlocks.js:478
 #.TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
 msgid "dot"
-msgstr ""
+msgstr "डॉट"
 
 #: js/RhythmBlocks.js:435
 #: js/RhythmActions.js:221
 msgid "An argument of -1 results in a note value of 0."
-msgstr ""
+msgstr "-1 का एक तर्क एक नोट मूल्य का परिणाम होता है।"
 
 #: js/RhythmBlocks.js:468
 msgid "The Dot block extends the duration of a note by 50%."
-msgstr ""
+msgstr "डॉट ब्लॉक एक नोट की अवधि को 50% बढ़ाता है।"
 
 #: js/RhythmBlocks.js:470
 msgid "Eg a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat."
-msgstr ""
+msgstr "उदा, एक डॉटेड क्वार्टर नोट 3/8 (1/4 + 1/8) बीट के लिए बजेगा।"
 
 #: js/RhythmBlocks.js:506
 msgid "A rest of the specified note value duration can be constructed using a Silence block."
-msgstr ""
+msgstr "निर्दिष्ट नोट मूल्य अवधि की शांति ब्लॉक का उपयोग करके बना सकते हैं।"
 
 #: js/RhythmBlocks.js:538
 #.TRANS: Japanese only: note value block for drum
 msgid "note value drum"
-msgstr ""
+msgstr "नोट मूल्य ड्रम"
 
 #: js/RhythmBlocks.js:576
 msgid "392 hertz"
-msgstr ""
+msgstr "392 हर्ट्ज"
 
 #: js/RhythmBlocks.js:765
 msgid "The Note block is a container for one or more Pitch blocks."
-msgstr ""
+msgstr "नोट ब्लॉक एक या एक से अधिक पिच ब्लॉक के लिए एक कंटेनर है।"
 
 #: js/RhythmBlocks.js:767
 msgid "The Note block specifies the duration (note value) of its contents."
-msgstr ""
+msgstr "नोट ब्लॉक अपने सामग्री की अवधि (नोट मूल्य) को निर्दिष्ट करता है।"
 
 #: js/RhythmBlocks.js:776
 msgid "value2"
-msgstr ""
+msgstr "मूल्य2"
 
 #: js/RhythmBlocks.js:829
 msgid "define frequency"
-msgstr ""
+msgstr "फ़्रीक्वेंसी को परिभाषित करें"
 
 #: js/RhythmBlocks.js:838
 #: js/temperament.js:650
 #: js/temperament.js:1416
 msgid "octave space"
-msgstr ""
+msgstr "ऑक्टेव स्थान"
 
 #: js/NumberBlocks.js:28
 msgid "The Int block returns an integer."
-msgstr ""
+msgstr "इंट ब्लॉक एक पूर्णांक वापस करता है।"
 
 #: js/NumberBlocks.js:34
 msgid "int"
-msgstr ""
+msgstr "पूर्णांक"
 
 #: js/NumberBlocks.js:73
 msgid "The Mod block returns the remainder from a division."
-msgstr ""
+msgstr "मॉड ब्लॉक विभाजन से शेष प्राप्त करता है।"
 
 #: js/NumberBlocks.js:79
 msgid "mod"
@@ -3983,11 +3983,11 @@ msgstr "मॉड"
 
 #: js/NumberBlocks.js:123
 msgid "The Power block calculates a power function."
-msgstr ""
+msgstr "पावर ब्लॉक एक शक्ति समीकरण की गणना करता है।"
 
 #: js/NumberBlocks.js:178
 msgid "The Sqrt block returns the square root."
-msgstr ""
+msgstr "स्क्वायर रूट ब्लॉक वर्गमूल लौटाता है।"
 
 #: js/NumberBlocks.js:184
 msgid "sqrt"
@@ -3995,56 +3995,56 @@ msgstr "वर्गमूल"
 
 #: js/NumberBlocks.js:230
 msgid "The Abs block returns the absolute value."
-msgstr ""
+msgstr "एब्स ब्लॉक पूर्णांक मान लौटाता है।"
 
 #: js/NumberBlocks.js:236
 msgid "abs"
-msgstr ""
+msgstr "एब्स"
 
 #: js/NumberBlocks.js:277
 msgid "The Distance block returns the distance between two points. For example, between the mouse and the center of the screen."
-msgstr ""
+msgstr "डिस्टेंस ब्लॉक दो बिंदुओं के बीच की दूरी लौटाता है। उदाहरण के लिए, माउस और स्क्रीन के केंद्र के बीच।"
 
 #: js/NumberBlocks.js:283
 #: plugins/rodi.rtp:310
 msgid "distance"
-msgstr ""
+msgstr "दूरी"
 
 #: js/NumberBlocks.js:343
 msgid "The Divide block is used to divide."
-msgstr ""
+msgstr "डिवाइड ब्लॉक का उपयोग विभाजन के लिए किया जाता है।"
 
 #: js/NumberBlocks.js:411
 msgid "The Multiply block is used to multiply."
-msgstr ""
+msgstr "मल्टिप्लाई ब्लॉक का उपयोग गुणा करने के लिए किया जाता है।"
 
 #: js/NumberBlocks.js:554
 msgid "The Minus block is used to subtract."
-msgstr ""
+msgstr "माइनस ब्लॉक का उपयोग घटना के लिए किया जाता है।"
 
 #: js/NumberBlocks.js:647
 msgid "The Plus block is used to add."
-msgstr ""
+msgstr "प्लस ब्लॉक का उपयोग जोड़ने के लिए किया जाता है।"
 
 #: js/NumberBlocks.js:773
 msgid "The One-of block returns one of two choices."
-msgstr ""
+msgstr "वन-ऑफ़ ब्लॉक दो विकल्पों में से एक वापस करता है।"
 
 #: js/NumberBlocks.js:780
 msgid "one of"
-msgstr ""
+msgstr "में से एक"
 
 #: js/NumberBlocks.js:782
 msgid "this"
-msgstr ""
+msgstr "यह"
 
 #: js/NumberBlocks.js:782
 msgid "that"
-msgstr ""
+msgstr "वह"
 
 #: js/NumberBlocks.js:837
 msgid "The Random block returns a random number."
-msgstr ""
+msgstr "रैंडम ब्लॉक एक यादृच्छिक संख्या वापस करता है।"
 
 #: js/NumberBlocks.js:844
 msgid "random"
@@ -4060,20 +4060,20 @@ msgstr "अधि."
 
 #: js/NumberBlocks.js:910
 msgid "The Number block holds a number."
-msgstr ""
+msgstr "नंबर ब्लॉक एक संख्या को धारित करता है।"
 
 #: js/BoxesBlocks.js:30
 #: js/BoxesBlocks.js:36
 msgid "The Add-to block is used to add to the value stored in a box."
-msgstr ""
+msgstr "एड-टू ब्लॉक का उपयोग बॉक में संग्रहित मूल्य में जोड़ने के लिए किया जाता है।"
 
 #: js/BoxesBlocks.js:38
 msgid "It can also be used with other blocks such as Color and Pen size."
-msgstr ""
+msgstr "इसे कलर और पेन साइज़ जैसे अन्य ब्लॉक्स के साथ भी उपयोग किया जा सकता है।"
 
 #: js/BoxesBlocks.js:45
 msgid "add"
-msgstr "जोडें"
+msgstr "जोड़ें"
 
 #: js/BoxesBlocks.js:48
 #: js/temperament.js:716
@@ -4084,128 +4084,128 @@ msgstr "को"
 #: js/BoxesBlocks.js:307
 #: js/HeapBlocks.js:262
 msgid "value1"
-msgstr ""
+msgstr "मूल्य1"
 
 #: js/BoxesBlocks.js:86
 msgid "Block does not support incrementing."
-msgstr ""
+msgstr "ब्लॉक इक्रीमेंट को समर्थन नहीं करता है।"
 
 #: js/BoxesBlocks.js:99
 msgid "The Add-1-to block adds one to the value stored in a box."
-msgstr ""
+msgstr "एड-1-टू ब्लॉक बॉक में संग्रहित मूल्य में एक जोड़ता है।"
 
 #: js/BoxesBlocks.js:105
 msgid "add 1 to"
-msgstr "में 1 जोड़ें"
+msgstr "में 1 जोड़ें"
 
 #: js/BoxesBlocks.js:125
 msgid "The Subtract-1-from block subtracts one from the value stored in a box."
-msgstr ""
+msgstr "घटक में संग्रहित मूल्य से एक कम करने के लिए Subtract-1-from ब्लॉक।"
 
 #: js/BoxesBlocks.js:131
 msgid "subtract 1 from"
-msgstr ""
+msgstr "से 1 कम करें"
 
 #: js/BoxesBlocks.js:150
 #: js/BoxesBlocks.js:211
 msgid "The Box block returns the value stored in a box."
-msgstr ""
+msgstr "बॉक्स ब्लॉक में संग्रहित मूल्य लौटाता है।"
 
 #: js/BoxesBlocks.js:267
 #: js/BoxesBlocks.js:293
 msgid "The Store in block will store a value in a box."
-msgstr ""
+msgstr "Store in ब्लॉक एक मूल्य को एक बॉक्स में संग्रहित करेगा।"
 
 #: js/BoxesBlocks.js:325
 msgid "The Box2 block returns the value stored in Box2."
-msgstr ""
+msgstr "Box2 ब्लॉक में संग्रहित मूल्य लौटाता है।"
 
 #: js/BoxesBlocks.js:345
 msgid "The Store in Box2 block is used to store a value in Box2."
-msgstr ""
+msgstr "Store in Box2 ब्लॉक का उपयोग Box2 में मूल्य संग्रहित करने के लिए किया जाता है।"
 
 #: js/BoxesBlocks.js:352
 msgid "store in box2"
-msgstr ""
+msgstr "बॉक्स2 में संग्रहित करें"
 
 #: js/BoxesBlocks.js:370
 msgid "The Box1 block returns the value stored in Box1."
-msgstr ""
+msgstr "Box1 ब्लॉक में संग्रहित मूल्य लौटाता है।"
 
 #: js/BoxesBlocks.js:390
 msgid "The Store in Box1 block is used to store a value in Box1."
-msgstr ""
+msgstr "Store in Box1 ब्लॉक का उपयोग Box1 में मूल्य संग्रहित करने के लिए किया जाता है।"
 
 #: js/BoxesBlocks.js:397
 msgid "store in box1"
-msgstr ""
+msgstr "बॉक्स1 में संग्रहित करें"
 
 #: js/HeapBlocks.js:29
 msgid "The Heap block returns the heap."
-msgstr ""
+msgstr "हीप ब्लॉक हीप लौटाता है।"
 
 #: js/HeapBlocks.js:60
 msgid "The Show-heap block displays the contents of the heap at the top of the screen."
-msgstr ""
+msgstr "Show-heap ब्लॉक हीप की सामग्री को स्क्रीन के शीर्ष पर प्रदर्शित करता है।"
 
 #: js/HeapBlocks.js:67
 #.TRANS: Display the heap contents
 msgid "show heap"
-msgstr "ढेर दिखाएँ"
+msgstr "हीप दिखाएँ"
 
 #: js/HeapBlocks.js:86
 msgid "The Heap-length block returns the length of the heap."
-msgstr ""
+msgstr "हीप-लेंथ ब्लॉक हीप की लंबाई लौटाता है।"
 
 #: js/HeapBlocks.js:93
 #.TRANS: How many entries are in the heap?
 msgid "heap length"
-msgstr ""
+msgstr "हीप लंबाई"
 
 #: js/HeapBlocks.js:120
 msgid "The Heap-empty? block returns true if the heap is empty."
-msgstr ""
+msgstr "हीप-खाली? ब्लॉक हीप खाली है तो true लौटाता है।"
 
 #: js/HeapBlocks.js:127
 #.TRANS: Is the heap empty?
 msgid "heap empty?"
-msgstr "खाली ढेर"
+msgstr "हीप खाली है?"
 
 #: js/HeapBlocks.js:146
 msgid "The Empty-heap block empties the heap."
-msgstr ""
+msgstr "खाली-हीप ब्लॉक हीप को खाली करता है।"
 
 #: js/HeapBlocks.js:153
 #: js/HeapBlocks.js:327
 #.TRANS: empty the heap
 msgid "empty heap"
-msgstr "रिक्त ढेर"
+msgstr "खाली हीप"
 
 #: js/HeapBlocks.js:169
 msgid "The Reverse-heap block reverses the order of the heap."
-msgstr ""
+msgstr "रिवर्स-हीप ब्लॉक हीप का क्रम उलटा करता है।"
 
 #: js/HeapBlocks.js:176
 #.TRANS: reverse the order of the heap
 msgid "reverse heap"
-msgstr ""
+msgstr "हीप उलटें"
 
 #: js/HeapBlocks.js:192
 msgid "The Index-heap block returns a value in the heap at a specified location."
-msgstr ""
+msgstr "इंडेक्स-हीप ब्लॉक निर्दिष्ट स्थान पर हीप में एक मूल्य लौटाता है।"
 
 #: js/HeapBlocks.js:199
 #.TRANS: retrieve a value from the heap at index position in the heap
 msgid "index heap"
-msgstr ""
+msgstr "हीप में स्थिति में से मूल्य प्राप्त करें"
 
 #: js/HeapBlocks.js:249
 msgid "The Set-heap entry block sets a value in he heap at the specified location."
-msgstr ""
+msgstr "सेट-हीप एंट्री ब्लॉक निर्दिष्ट स्थान पर हीप में मूल्य सेट करता है।"
 
 #: js/HeapBlocks.js:309
 msgid "The Pop block removes the value at the top of the heap."
-msgstr ""
+msgstr "पॉप ब्लॉक हीप के शीर्ष पर मूल्य को हटा देता है।"
 
 #: js/HeapBlocks.js:316
 #.TRANS: pop a value off the top of the heap
@@ -4214,7 +4214,7 @@ msgstr "पॉप"
 
 #: js/HeapBlocks.js:339
 msgid "The Push block adds a value to the top of the heap."
-msgstr ""
+msgstr "पुश ब्लॉक हीप के शीर्ष पर मूल्य जोड़ता है।"
 
 #: js/HeapBlocks.js:346
 #.TRANS: push a value onto the top of the heap
@@ -4223,60 +4223,60 @@ msgstr "दबाएँ"
 
 #: js/FlowBlocks.js:29
 msgid "The Backward block runs code in reverse order (Musical retrograde)."
-msgstr ""
+msgstr "बैकवर्ड ब्लॉक कोड को उल्टे क्रम में चलाता है (संगीत रेट्रोग्रेड)।"
 
 #: js/FlowBlocks.js:35
 msgid "backward"
-msgstr ""
+msgstr "विपरीतक्रम"
 
 #: js/FlowBlocks.js:79
 msgid "The Duplicate block will run each block multiple times."
-msgstr ""
+msgstr "डुप्लीकेट ब्लॉक प्रत्येक ब्लॉक को कई बार चलाएगा।"
 
 #: js/FlowBlocks.js:81
 msgid "The output of the example is: Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol."
-msgstr ""
+msgstr "उदाहरण का आउटपुट है: सोल, सोल, सोल, सोल, रे, रे, रे, रे, सोल, सोल, सोल, सोल।"
 
 #: js/FlowBlocks.js:88
 msgid "duplicate"
-msgstr ""
+msgstr "डुप्लीकेट"
 
 #: js/FlowBlocks.js:273
 msgid "The Default block is used inside of a Switch to define the default action."
-msgstr ""
+msgstr "डिफ़ॉल्ट ब्लॉक स्विच के भीतर डिफ़ॉल्ट क्रिया को परिभाषित करने के लिए उपयोग किया जाता है।"
 
 #: js/FlowBlocks.js:280
 msgid "default"
-msgstr ""
+msgstr "डिफ़ॉल्ट"
 
 #: js/FlowBlocks.js:291
 #: js/FlowBlocks.js:329
 msgid "The Case Block must be used inside of a Switch Block."
-msgstr ""
+msgstr "केस ब्लॉक स्विच ब्लॉक के भीतर ही उपयोग किया जाना चाहिए।"
 
 #: js/FlowBlocks.js:309
 msgid "The Case block is used inside of a Switch to define matches."
-msgstr ""
+msgstr "केस ब्लॉक स्विच के भीतर मैच को परिभाषित करने के लिए उपयोग किया जाता है।"
 
 #: js/FlowBlocks.js:316
 msgid "case"
-msgstr ""
+msgstr "केस"
 
 #: js/FlowBlocks.js:347
 msgid "The Switch block will run the code in the matching Case."
-msgstr ""
+msgstr "स्विच ब्लॉक मैचिंग केस में कोड चलाएगा।"
 
 #: js/FlowBlocks.js:354
 msgid "switch"
-msgstr ""
+msgstr "स्विच"
 
 #: js/FlowBlocks.js:453
 msgid "The Stop block will stop a loop"
-msgstr ""
+msgstr "स्टॉप ब्लॉक एक लूप को रोक देगा"
 
 #: js/FlowBlocks.js:455
 msgid "Forever, Repeat, While, or Until."
-msgstr ""
+msgstr "हमेशा, दोहराएँ, जब तक, या जब तक नहीं।"
 
 #: js/FlowBlocks.js:459
 #: js/FlowBlocks.js:465
@@ -4293,7 +4293,7 @@ msgstr "रोकें"
 
 #: js/FlowBlocks.js:493
 msgid "The Waitfor block will wait until the condition is true."
-msgstr ""
+msgstr "वेटफॉर ब्लॉक स्थिति सत्य होने तक प्रतीक्षा करेगा।"
 
 #: js/FlowBlocks.js:500
 msgid "wait for"
@@ -4301,7 +4301,7 @@ msgstr "अज्ञात"
 
 #: js/FlowBlocks.js:552
 msgid "The Until block will repeat until the condition is true."
-msgstr ""
+msgstr "अंत तक स्थिति सत्य होने तक दोहराएगा।"
 
 #: js/FlowBlocks.js:559
 msgid "until"
@@ -4311,11 +4311,11 @@ msgstr "जब तक"
 #: js/FlowBlocks.js:620
 #: js/DictBlocks.js:97
 msgid "do2"
-msgstr ""
+msgstr "करें2"
 
 #: js/FlowBlocks.js:611
 msgid "The While block will repeat while the condition is true."
-msgstr ""
+msgstr "जब तक शर्त सत्य है, तब तक व्हाइल ब्लॉक दोहराएगा।"
 
 #: js/FlowBlocks.js:618
 msgid "while"
@@ -4326,17 +4326,17 @@ msgstr "जबकि"
 #: js/FlowBlocks.js:722
 #: js/FlowBlocks.js:731
 msgid "Conditionals lets your program take different actions depending on the condition."
-msgstr ""
+msgstr "शर्ताओं से आपका प्रोग्राम शर्त के आधार पर विभिन्न क्रियाएँ कर सकता है।"
 
 #: js/FlowBlocks.js:681
 #: js/FlowBlocks.js:724
 #: js/FlowBlocks.js:733
 msgid "In this example if the mouse button is pressed a snare drum will play."
-msgstr ""
+msgstr "इस उदाहरण में यदि माउस बटन दबाया जाता है तो एक स्नेयर ड्रम बजेगा।"
 
 #: js/FlowBlocks.js:690
 msgid "In this example if the mouse button is pressed a snare drum will play, else a kick drum will play."
-msgstr ""
+msgstr "इस उदाहरण में यदि माउस बटन दबाया जाता है तो एक स्नेयर ड्रम बजेगा, अन्यथा एक किक ड्रम बजेगा।"
 
 #: js/FlowBlocks.js:698
 #: js/FlowBlocks.js:741
@@ -4354,11 +4354,11 @@ msgstr "अन्यथा"
 
 #: js/FlowBlocks.js:762
 msgid "The Forever block will repeat the contained blocks forever."
-msgstr ""
+msgstr "हमेशा के लिए फॉरएवर ब्लॉक निहित ब्लॉक्स को हमेशा के लिए दोहराएगा।"
 
 #: js/FlowBlocks.js:764
-msgid "In this example of a simple drum machine a kick drum will play 1/4 notes forever."
-msgstr ""
+msgid "In this example of a simple drum machine, a kick drum will play 1/4 notes forever."
+msgstr "इस साधारित ड्रम मशीन के उदाहरण में, एक किक ड्रम हमेशा के लिए 1/4 नोट बजेगा।"
 
 #: js/FlowBlocks.js:771
 msgid "forever"
@@ -4366,11 +4366,11 @@ msgstr "हमेशा के लिए"
 
 #: js/FlowBlocks.js:789
 msgid "The Repeat block will repeat the contained blocks."
-msgstr ""
+msgstr "रीपीट ब्लॉक निहित ब्लॉक्स को दोहराएगा।"
 
 #: js/FlowBlocks.js:791
-msgid "In this example the note will be played 4 times."
-msgstr ""
+msgid "In this example, the note will be played 4 times."
+msgstr "इस उदाहरण में, नोट को 4 बार बजाया जाएगा।"
 
 #: js/FlowBlocks.js:798
 msgid "repeat"
@@ -4379,7 +4379,7 @@ msgstr "दोहराएँ"
 #: js/FlowBlocks.js:828
 #.TRANS: factor used in determining how many duplications to make
 msgid "duplicate factor"
-msgstr ""
+msgstr "प्रतिलिपि कारक"
 
 #: js/PitchBlocks.js:39
 #: js/musicutils.js:723
@@ -4387,7 +4387,7 @@ msgstr ""
 #: js/synthutils.js:112
 #.TRANS: square wave
 msgid "square"
-msgstr ""
+msgstr "वर्ग"
 
 #: js/PitchBlocks.js:62
 #: js/ToneBlocks.js:30
@@ -4396,7 +4396,7 @@ msgstr ""
 #: js/synthutils.js:116
 #.TRANS: triangle wave
 msgid "triangle"
-msgstr ""
+msgstr "त्रिकोण"
 
 #: js/PitchBlocks.js:85
 #: js/musicutils.js:722
@@ -4404,7 +4404,7 @@ msgstr ""
 #: js/synthutils.js:110
 #.TRANS: sine wave
 msgid "sine"
-msgstr ""
+msgstr "साइन"
 
 #: js/PitchBlocks.js:108
 #: js/musicutils.js:725
@@ -4412,44 +4412,44 @@ msgstr ""
 #: js/synthutils.js:114
 #.TRANS: sawtooth wave
 msgid "sawtooth"
-msgstr ""
+msgstr "सॉटूथ"
 
 #: js/PitchBlocks.js:141
 #.TRANS: musical transposition (adjustment of pitch up or down)
 msgid "transposition"
-msgstr ""
+msgstr "स्वर स्थानांतरण"
 
 #: js/PitchBlocks.js:168
-#.TRANS: step down one note in current musical scale
+#.TRANS: step down one note in the current musical scale
 msgid "scalar step down"
-msgstr ""
+msgstr "स्केलर स्टेप डाउन"
 
 #: js/PitchBlocks.js:172
 msgid "The Scalar step down block returns the number of semi-tones down to the previous note in the current key and mode."
-msgstr ""
+msgstr "स्केलर स्टेप डाउन ब्लॉक वर्तमान कुंजी और मोड में पिछले नोट तक की सेमी-टोन की संख्या लौटाता है।"
 
 #: js/PitchBlocks.js:190
-#.TRANS: step up one note in current musical scale
+#.TRANS: step up one note in the current musical scale
 msgid "scalar step up"
-msgstr ""
+msgstr "स्केलर स्टेप अप"
 
 #: js/PitchBlocks.js:194
 msgid "The Scalar step up block returns the number of semi-tones up to the next note in the current key and mode."
-msgstr ""
+msgstr "स्केलर स्टेप अप ब्लॉक वर्तमान कुंजी और मोड में अगले नोट तक की सेमी-टोन की संख्या लौटाता है।"
 
 #: js/PitchBlocks.js:212
 #.TRANS: the change measured in half-steps between the current pitch and the previous pitch
 msgid "change in pitch"
-msgstr ""
+msgstr "स्वर में परिवर्तन"
 
 #: js/PitchBlocks.js:216
 msgid "The Change in pitch block is the difference (in half steps) between the current pitch being played and the previous pitch played."
-msgstr ""
+msgstr "चेंज इन पिच ब्लॉक वह अंतर है (हैफ स्टेप में) जो वर्तमान पिच बजा रहा है और पिछले पिच बजा रहा है।"
 
 #: js/PitchBlocks.js:243
 #.TRANS: the change measured in scale-steps between the current pitch and the previous pitch
 msgid "scalar change in pitch"
-msgstr ""
+msgstr "स्केलर स्वर में परिवर्तन"
 
 #: js/PitchBlocks.js:250
 #: js/PitchBlocks.js:432
@@ -4461,81 +4461,81 @@ msgstr ""
 #.TRANS: convert current note to piano key (1-88)
 #.TRANS: a mapping of pitch to the 88 piano keys
 msgid "pitch number"
-msgstr ""
+msgstr "स्वर संख्या"
 
 #: js/PitchBlocks.js:256
 msgid "The Pitch number block is the value of the pitch of the note currently being played."
-msgstr ""
+msgstr "पिच नंबर ब्लॉक वह मूल्य है जो वर्तमान में बजा रहे नोट के स्वर का है।"
 
 #: js/PitchBlocks.js:329
 #: js/PitchBlocks.js:433
 #.TRANS: the current pitch expressed in Hertz
 msgid "pitch in hertz"
-msgstr ""
+msgstr "हर्ट्ज में स्वर"
 
 #: js/PitchBlocks.js:334
 msgid "The Pitch in Hertz block is the value in Hertz of the pitch of the note currently being played."
-msgstr ""
+msgstr "पिच इन हर्ट्ज ब्लॉक वर्तमान में बज रहे नोट के स्वर का हर्ट्ज में मूल्य है।"
 
 #: js/PitchBlocks.js:367
 #: js/DictActions.js:87
 msgid "current pitch"
-msgstr ""
+msgstr "वर्तमान स्वर"
 
 #: js/PitchBlocks.js:373
-msgid "The Current Pitch block is used with the Pitch Converter block. In the example above, current pitch, sol 4, is displayed as 392 hertz."
-msgstr ""
+msgid "The Current Pitch block is used with the Pitch Converter block. In the example above, the current pitch, sol 4, is displayed as 392 hertz."
+msgstr "करंट पिच ब्लॉक पिच कनवर्टर ब्लॉक के साथ उपयोग किया जाता है। उपरोक्त उदाहरण में, वर्तमान पिच, सॉल 4, 392 हर्ट्ज के रूप में प्रदर्शित है।"
 
 #: js/PitchBlocks.js:410
 msgid "This block converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al."
-msgstr ""
+msgstr "यह ब्लॉक बजाए गए आखिरी नोट के स्वर मूल्य को हर्ट्ज, अक्षर नाम, स्वर संख्या, आदि के रूप में परिवर्तित करता है।"
 
 #: js/PitchBlocks.js:434
 msgid "alphabet"
-msgstr ""
+msgstr "वर्णमाला"
 
 #: js/PitchBlocks.js:436
 #.TRANS: Translate as "alphabet class"
 msgid "letter class"
-msgstr ""
+msgstr "अक्षर वर्ग"
 
 #: js/PitchBlocks.js:437
 msgid "solfege class"
-msgstr ""
+msgstr "सोलफेज वर्ग"
 
 #: js/PitchBlocks.js:438
 msgid "staff y"
-msgstr ""
+msgstr "स्टाफ वाई"
 
 #: js/PitchBlocks.js:439
 msgid "solfege syllable"
-msgstr ""
+msgstr "सोलफेज सिलेबल"
 
 #: js/PitchBlocks.js:440
 msgid "pitch class"
-msgstr ""
+msgstr "स्वर वर्ग"
 
 #: js/PitchBlocks.js:441
 msgid "scalar class"
-msgstr ""
+msgstr "स्केलर वर्ग"
 
 #: js/PitchBlocks.js:443
 msgid "nth degree"
-msgstr ""
+msgstr "एनथ डिग्री"
 
 #: js/PitchBlocks.js:444
 msgid "pitch to shade"
-msgstr ""
+msgstr "स्वर को छाया में"
 
 #: js/PitchBlocks.js:445
 msgid "pitch to color"
-msgstr ""
+msgstr "स्वर को रंग में"
 
 #: js/PitchBlocks.js:617
 #: js/musickeyboard.js:564
 #.TRANS: MIDI is a technical standard for electronic music
 msgid "MIDI"
-msgstr ""
+msgstr "मिडी"
 
 #: js/PitchBlocks.js:630
 #.TRANS: set an offset associated with the numeric piano keyboard mapping
