@@ -1812,8 +1812,23 @@ class Logo {
 
         const tur = this.activity.turtles.ithTurtle(turtle);
 
-        if (tur.singer.embeddedGraphics === {}) return;
+        if(Object.keys) {
+            if(Object.keys(tur.singer.embeddedGraphics).length === 0) return;
 
+        } else{
+            const isEmpty = true;
+            for(const key in tur.singer.embeddedGraphics) {
+                if(tur.singer.embeddedGraphics.hasOwnProperty(key)){
+                    isEmpty = false;
+                    break;
+                }
+            }
+
+            if(isEmpty) return;
+
+        }
+
+        
         if (!(blk in tur.singer.embeddedGraphics)) return;
 
         if (tur.singer.embeddedGraphics[blk].length === 0) return;
