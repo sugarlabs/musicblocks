@@ -4538,252 +4538,252 @@ msgid "MIDI"
 msgstr "मिडी"
 
 #: js/PitchBlocks.js:630
-#.TRANS: set an offset associated with the numeric piano keyboard mapping
+#.TRANS: संख्यात्मक पियानो कीबोर्ड मैपिंग के साथ एक स्थानांतर सेट करें
 msgid "set pitch number offset"
-msgstr ""
+msgstr "पिच नंबर ऑफसेट सेट करें"
 
 #: js/PitchBlocks.js:633
 msgid "The Set pitch number offset block is used to set the offset for mapping pitch numbers to pitch and octave."
-msgstr ""
+msgstr "सेट पिच नंबर ऑफसेट ब्लॉक का उपयोग पिच और ऑक्टेव के मैपिंग के लिए ऑफसेट सेट करने के लिए किया जाता है।"
 
 #: js/PitchBlocks.js:667
-#.TRANS: convert piano key number (1-88) to pitch
+#.TRANS: पियानो कुंजी संख्या (1-88) को पिच में परिवर्तित करें
 msgid "number to pitch"
-msgstr ""
+msgstr "संख्या से पिच"
 
 #: js/PitchBlocks.js:670
-msgid "The Number to pitch block will convert a pitch number to a pich name."
-msgstr ""
+msgid "The Number to pitch block will convert a pitch number to a pitch name."
+msgstr "नंबर टू पिच ब्लॉक एक पिच नंबर को पिच नाम में परिवर्तित करेगा।"
 
 #: js/PitchBlocks.js:703
-#.TRANS: convert piano key number (1-88) to octave
+#.TRANS: पियानो कुंजी संख्या (1-88) को ऑक्टेव में परिवर्तित करें
 msgid "number to octave"
-msgstr ""
+msgstr "संख्या से ऑक्टेव"
 
 #: js/PitchBlocks.js:705
 msgid "The Number to octave block will convert a pitch number to an octave."
-msgstr ""
+msgstr "नंबर टू ऑक्टेव ब्लॉक एक पिच नंबर को एक ऑक्टेव में परिवर्तित करेगा।"
 
 #: js/PitchBlocks.js:714
 msgid "y to pitch"
-msgstr ""
+msgstr "वाय को पिच"
 
 #: js/PitchBlocks.js:717
 msgid "Y to pitch block will convert a staff y position to corresponding pitch notation."
-msgstr ""
+msgstr "वाय टू पिच ब्लॉक एक स्टाफ वाय स्थिति को संबंधित पिच संकेत में परिवर्तित करेगा।"
 
 #: js/PitchBlocks.js:829
 msgid "accidental selector"
-msgstr ""
+msgstr "अक्सीडेंटल सिलेक्टर"
 
 #: js/PitchBlocks.js:832
 msgid "The Accidental selector block is used to choose between double-sharp, sharp, natural, flat, and double-flat."
-msgstr ""
+msgstr "एक्सीडेंटल सिलेक्टर ब्लॉक का उपयोग डबल-शार्प, शार्प, नैचुरल, फ्लैट, और डबल-फ्लैट के बीच चयन करने के लिए किया जाता है।"
 
 #: js/PitchBlocks.js:846
 msgid "Pitch can be specified in terms of ni dha pa ma ga re sa."
-msgstr ""
+msgstr "पिच को नी धा पा मा ग रे सा के रूप में निर्दिष्ट किया जा सकता है।"
 
 #: js/PitchBlocks.js:860
 msgid "Pitch can be specified in terms of C D E F G A B."
-msgstr ""
+msgstr "पिच को सी डी ई एफ जी ए बी के रूप में निर्दिष्ट किया जा सकता है।"
 
 #: js/PitchBlocks.js:871
 msgid "solfege"
-msgstr ""
+msgstr "सोल्फेज"
 
 #: js/PitchBlocks.js:874
 msgid "Pitch can be specified in terms of do re mi fa sol la ti."
-msgstr ""
+msgstr "पिच को डो रे मि फा सोल ला टी के रूप में निर्दिष्ट किया जा सकता है।"
 
 #: js/PitchBlocks.js:908
 msgid "The Invert block rotates any contained notes around a target note."
-msgstr ""
+msgstr "इनवर्ट ब्लॉक एक लक्ष्य नोट के चारों ओर शामिल नोट को घुमाता है।"
 
 #: js/PitchBlocks.js:915
-#.TRANS: pitch inversion rotates a pitch around another pitch
+#.TRANS: पिच इनवर्शन एक अन्य पिच के चारों ओर पिच घुमाता है
 msgid "invert"
-msgstr ""
+msgstr "इनवर्ट"
 
 #: js/PitchBlocks.js:917
 #: js/PitchBlocks.js:923
 #: js/PitchActions.js:727
 #: js/musicutils.js:727
 #: js/musicutils.js:903
-#.TRANS: invert based on even or odd number or musical scale
-#.TRANS: even numbers
+#.TRANS: समान या विषम संख्या या संगीत स्केल के आधार पर इनवर्ट करें
+#.TRANS: समान संख्याएँ
 msgid "even"
-msgstr ""
+msgstr "सम"
 
 #: js/PitchBlocks.js:923
 #: js/PitchActions.js:729
 #: js/musicutils.js:729
 #: js/musicutils.js:904
-#.TRANS: odd numbers
+#.TRANS: विषम संख्याएँ
 msgid "odd"
-msgstr ""
+msgstr "विषम"
 
 #: js/PitchBlocks.js:923
 #: js/PitchActions.js:731
 #: js/musicutils.js:730
 #: js/musicutils.js:905
 msgid "scalar"
-msgstr ""
+msgstr "स्कैलर"
 
 #: js/PitchBlocks.js:954
-#.TRANS: pitch inversion rotates a pitch around another pitch (odd number)
+#.TRANS: पिच इनवर्शन एक अन्य पिच के चारों ओर पिच घुमाता है (विषम संख्या)
 msgid "invert (odd)"
-msgstr ""
+msgstr "इनवर्ट (विषम)"
 
 #: js/PitchBlocks.js:987
-#.TRANS: pitch inversion rotates a pitch around another pitch (even number)
+#.TRANS: पिच इनवर्शन एक अन्य पिच के चारों ओर पिच घुमाता है (सम संख्या)
 msgid "invert (even)"
-msgstr ""
+msgstr "इनवर्ट (सम)"
 
 #: js/PitchBlocks.js:1008
-#.TRANS: register is the octave of the current pitch
+#.TRANS: रजिस्टर वर्तमान पिच का ऑक्टेव है
 msgid "register"
-msgstr ""
+msgstr "रजिस्टर"
 
 #: js/PitchBlocks.js:1012
 msgid "The Register block provides an easy way to modify the register (octave) of the notes that follow it."
-msgstr ""
+msgstr "रजिस्टर ब्लॉक निर्दिष्ट किए गए नोट के रजिस्टर (ऑक्टेव) को संशोधित करने का एक आसान तरीका प्रदान करता है।"
 
 #: js/PitchBlocks.js:1062
 msgid "The Semi-tone transposition block will shift the pitches contained inside Note blocks up (or down) by half steps."
-msgstr ""
+msgstr "सेमी-टोन स्थानांतरण ब्लॉक नोट ब्लॉक्स में शामिल पिच को आधे कदम से ऊपर (या नीचे) करेगा।"
 
 #: js/PitchBlocks.js:1064
 msgid "In the example shown above, sol is shifted up to sol#."
-msgstr ""
+msgstr "ऊपर दिखाए गए उदाहरण में, सोल को सोल# की ओर स्थानांतरित किया गया है।"
 
 #: js/PitchBlocks.js:1070
-#.TRANS: adjust the amount of shift (up or down) of a pitch
+#.TRANS: स्थानांतरण (ऊपर या नीचे) के लिए पिच की मात्रा को समायोजित करें
 msgid "semi-tone transpose"
-msgstr ""
+msgstr "सेमी-टोन स्थानांतरण"
 
 #: js/PitchBlocks.js:1103
 msgid "The Transpose by Ratio block will shift the pitches contained inside Note blocks up (or down) by a ratio"
-msgstr ""
+msgstr "ट्रांसपोज़ बाय रेशियो ब्लॉक नोट ब्लॉक्स में शामिल पिच को एक अनुपात से ऊपर (या नीचे) करेगा"
 
 #: js/PitchBlocks.js:1109
-#.TRANS: adjust the amount of shift (up or down) of a pitch
+#.TRANS: पिच की मात्रा को समायोजित करें (ऊपर या नीचे)
 msgid "transpose by ratio"
-msgstr ""
+msgstr "मात्रा के अनुसार समायोजित करें"
 
 #: js/PitchBlocks.js:1192
-#.TRANS: down sixth means the note is five scale degrees below current note
+#.TRANS: डाउन सिक्सवा मतलब नोट वर्तमान नोट से पाँच स्केल डिग्री नीचे है
 msgid "down sixth"
-msgstr ""
+msgstr "डाउन सिक्स्थ"
 
 #: js/PitchBlocks.js:1211
-#.TRANS: down third means the note is two scale degrees below current note
+#.TRANS: डाउन थर्ड मतलब नोट वर्तमान नोट से दो स्केल डिग्री नीचे है
 msgid "down third"
-msgstr ""
+msgstr "डाउन थर्ड"
 
 #: js/PitchBlocks.js:1230
-#.TRANS: seventh means the note is the six scale degrees above current note
+#.TRANS: सेवेंथ मतलब नोट वर्तमान नोट से छह स्केल डिग्री ऊपर है
 msgid "seventh"
-msgstr ""
+msgstr "सेवेंथ"
 
 #: js/PitchBlocks.js:1249
-#.TRANS: sixth means the note is the five scale degrees above current note
+#.TRANS: सिक्सथ मतलब नोट वर्तमान नोट से पाँच स्केल डिग्री ऊपर है
 msgid "sixth"
-msgstr ""
+msgstr "सिक्सथ"
 
 #: js/PitchBlocks.js:1268
-#.TRANS: fifth means the note is the four scale degrees above current note
+#.TRANS: फिफ्थ मतलब नोट वर्तमान नोट से चार स्केल डिग्री ऊपर है
 msgid "fifth"
-msgstr ""
+msgstr "फिफ्थ"
 
 #: js/PitchBlocks.js:1288
-#.TRANS: fourth means the note is three scale degrees above current note
+#.TRANS: फोर्थ मतलब नोट वर्तमान नोट से तीन स्केल डिग्री ऊपर है
 msgid "fourth"
-msgstr ""
+msgstr "फोर्थ"
 
 #: js/PitchBlocks.js:1307
-#.TRANS: third means the note is two scale degrees above current note
+#.TRANS: थर्ड मतलब नोट वर्तमान नोट से दो स्केल डिग्री ऊपर है
 msgid "third"
-msgstr ""
+msgstr "थर्ड"
 
 #: js/PitchBlocks.js:1326
-#.TRANS: second means the note is one scale degree above current note
+#.TRANS: सेकंड मतलब नोट वर्तमान नोट से एक स्केल डिग्री ऊपर है
 msgid "second"
-msgstr ""
+msgstr "सेकंड"
 
 #: js/PitchBlocks.js:1367
 msgid "The Scalar transposition block will shift the pitches contained inside Note blocks up (or down) the scale."
-msgstr ""
+msgstr "स्केलर स्थानांतरण ब्लॉक नोट ब्लॉक्स में शामिल पिच को स्केल के अनुसार ऊपर (या नीचे) करेगा।"
 
 #: js/PitchBlocks.js:1369
 msgid "In the example shown above, sol is shifted up to la."
-msgstr ""
+msgstr "ऊपर दिखाए गए उदाहरण में, सोल को सोल# की ओर स्थानांतरित किया गया है।"
 
 #: js/PitchBlocks.js:1376
-#.TRANS: adjust the amount of shift (up or down) of a pitch by musical scale (scalar) steps
+#.TRANS: पिच की मात्रा को समायोजित करें (ऊपर या नीचे) संगीत स्केल (स्केलर) कदमों के द्वारा
 msgid "scalar transpose"
-msgstr ""
+msgstr "स्केलर स्थानांतरण"
 
 #: js/PitchBlocks.js:1411
 msgid "The Accidental block is used to create sharps and flats"
-msgstr ""
+msgstr "अक्सीडेंटल ब्लॉक का उपयोग शार्प और फ्लैट बनाने के लिए किया जाता है"
 
 #: js/PitchBlocks.js:1418
-#.TRANS: An accidental is a modification to a pitch, e.g., sharp or flat.
+#.TRANS: एक अक्सीडेंटल एक पिच के लिए संशोधन है, उदाहरण के लिए शार्प या फ्लैट
 msgid "accidental override"
-msgstr ""
+msgstr "एक्सीडेंटल ओवरराइड"
 
 #: js/PitchBlocks.js:1531
 msgid "The Hertz block (in combination with a Number block) will play a sound at the specified frequency."
-msgstr ""
+msgstr "हर्ट्ज ब्लॉक (नंबर ब्लॉक के साथ मेल करके) निर्दिष्ट ताक़त पर ध्वनि बजाएगा।"
 
 #: js/PitchBlocks.js:1621
 msgid "The Pitch Number block will play a pitch associated by its number, e.g. 0 for C and 7 for G."
-msgstr ""
+msgstr "पिच नंबर ब्लॉक उसकी संख्या से जुड़े एक पिच को बजाएगा, उदाहरण के लिए सी के लिए 0 और जी के लिए 7।"
 
 #: js/PitchBlocks.js:1653
 #: js/PitchBlocks.js:1695
-#.TRANS: a numeric mapping of the notes in an octave based on the musical mode
-#.TRANS: a numeric mapping of the notes in an octave based on the musical mode
+#.TRANS: संगीतिक मोड के आधार पर एक ऑक्टेव में नोट्स का संख्यात्मक मैपिंग
+#.TRANS: संगीतिक मोड के आधार पर एक ऑक्टेव में नोट्स का संख्यात्मक मैपिंग
 msgid "nth modal pitch"
-msgstr ""
+msgstr "एनथ मोडल पिच"
 
 #: js/PitchBlocks.js:1656
 msgid "n^th Modal Pitch takes the pattern of pitches in semitones for a mode and makes each point a degree of the mode,"
-msgstr ""
+msgstr "एनथ मोडल पिच एक मोड के लिए सेमिटोन्स में पिच का पैटर्न लेता है और हर बिंदु को मोड का डिग्री बनाता है,"
 
 #: js/PitchBlocks.js:1658
 msgid "starting from 1 and regardless of tonal framework (i.e. not always 8 notes in the octave)"
-msgstr ""
+msgstr "1 से शुरू होकर और स्वर संरचना की परवाह किए बिना (अर्थात हमेशा ऑक्टेव में 8 नोट्स नहीं होतीं)"
 
 #: js/PitchBlocks.js:1699
 msgid "N^th Modal Pitch takes a number as an input as the n^th degree for the given mode. 0 is the first position, 1 is the second, -1 is the note before the first etc."
-msgstr ""
+msgstr "एनथ मोडल पिच एक दिए गए मोड के लिए एनथ डिग्री के रूप में एक संख्या लेता है। 0 पहली पोज़िशन है, 1 दूसरी है, -1 पहले से पहले का नोट है इत्यादि।"
 
 #: js/PitchBlocks.js:1701
 msgid "The pitches change according to the mode specified without any need for respellings."
-msgstr ""
+msgstr "नोट्स दुबारा लिखने की आवश्यकता के बिना जिस प्रकार के मोड ने निर्दिष्ट किया है, उसके अनुसार बदल जाते हैं।"
 
 #: js/PitchBlocks.js:1740
 msgid "Scale Degree is a common convention in music. Scale Degree offers seven possible positions in the scale (1-7) and can be modified via accidentals."
-msgstr ""
+msgstr "स्केल डिग्री संगीत में एक सामान्य सम्मिलन है। स्केल डिग्री स्केल में सात संभावित स्थान (1-7) प्रदान करती है और एक्सीडेंटल्स के माध्यम से संशोधित की जा सकती है।"
 
 #: js/PitchBlocks.js:1742
 msgid "Scale Degree 1 is always the first pitch in a given scale, regardless of octave."
-msgstr ""
+msgstr "स्केल डिग्री 1 हमेशा एक दिए गए स्केल में पहला पिच है, ऑक्टेव की परवाह किए बिना।"
 
 #: js/PitchBlocks.js:1764
-#.TRANS: step some number of notes in current musical scale
+#.TRANS: मौसिकी दर में कुछ संख्या नोट्स को कदमों में स्थानांतरित करें
 msgid "scalar step"
-msgstr ""
+msgstr "स्केलर स्टेप"
 
 #: js/PitchBlocks.js:1769
 msgid "The Scalar Step block (in combination with a Number block) will play the next pitch in a scale,"
-msgstr ""
+msgstr "स्केलर स्टेप ब्लॉक (नंबर ब्लॉक के साथ मेल करके) स्केल में अगला पिच बजाएगा,"
 
 #: js/PitchBlocks.js:1771
 msgid "eg if the last note played was sol, Scalar Step 1 will play la."
-msgstr ""
+msgstr "उदाहरण के लिए अगर आखिरी बजाए गए नोट सोल
 
 #: js/PitchBlocks.js:1806
 msgid "The Pitch block specifies the pitch name and octave of a note that together determine the frequency of the note."
@@ -5027,67 +5027,67 @@ msgstr ""
 #: js/OrnamentBlocks.js:25
 #.TRANS: the duration of a note played as staccato
 msgid "staccato factor"
-msgstr ""
+msgstr "स्टाकेटो कारक"
 
 #: js/OrnamentBlocks.js:55
 #.TRANS: the degree of overlap of notes played as legato
 msgid "slur factor"
-msgstr ""
+msgstr "स्लर कारक"
 
 #: js/OrnamentBlocks.js:90
 #: js/OrnamentBlocks.js:133
 #.TRANS: the neighbor refers to a neighboring note, e.g., D is a neighbor of C
 msgid "neighbor"
-msgstr ""
+msgstr "पड़ोसी"
 
 #: js/OrnamentBlocks.js:126
 msgid "The Neighbor block rapidly switches between neighboring pitches."
-msgstr ""
+msgstr "नेबर ब्लॉक तेजी से पड़ोसी स्वरों के बीच स्विच करता है।"
 
 #: js/OrnamentBlocks.js:157
 #.TRANS: glide (glissando) is a blended overlap successive notes
 msgid "glide"
-msgstr ""
+msgstr "ग्लाइड"
 
 #: js/OrnamentBlocks.js:227
 #: js/OrnamentBlocks.js:302
 #.TRANS: slur or legato is an overlap successive notes
 msgid "slur"
-msgstr ""
+msgstr "स्लर"
 
 #: js/OrnamentBlocks.js:261
 #: js/OrnamentBlocks.js:332
 #.TRANS: play each note sharply detached from the others
 msgid "staccato"
-msgstr ""
+msgstr "स्टाकेटो"
 
 #: js/OrnamentBlocks.js:295
 msgid "The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes."
-msgstr ""
+msgstr "स्लर ब्लॉक नोट्स के सस्तेन को बढ़ाता है जबकि नोट्स के निर्दिष्ट ताल मूल्य को बनाए रखता है।"
 
 #: js/OrnamentBlocks.js:324
 msgid "The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes."
-msgstr ""
+msgstr "स्टाकेटो ब्लॉक वास्तविक नोट की लंबाई को कम करता है जबकि सुनिश्चित करता है कि नोट्स का निर्दिष्ट तालमूल्य बना रहता है।"
 
 #: js/PenBlocks.js:24
 msgid "purple"
-msgstr ""
+msgstr "बैंगनी"
 
 #: js/PenBlocks.js:37
 #: js/SensorsBlocks.js:341
 #: plugins/rodi.rtp:219
 msgid "blue"
-msgstr ""
+msgstr "नीला"
 
 #: js/PenBlocks.js:50
 #: js/SensorsBlocks.js:374
 #: plugins/rodi.rtp:218
 msgid "green"
-msgstr ""
+msgstr "हरा"
 
 #: js/PenBlocks.js:63
 msgid "yellow"
-msgstr ""
+msgstr "पीला"
 
 #: js/PenBlocks.js:76
 #: plugins/nutrition.rtp:164
@@ -5098,15 +5098,15 @@ msgstr "नारंगी"
 #: js/SensorsBlocks.js:407
 #: plugins/rodi.rtp:217
 msgid "red"
-msgstr ""
+msgstr "लाल"
 
 #: js/PenBlocks.js:102
 msgid "white"
-msgstr ""
+msgstr "सफेद"
 
 #: js/PenBlocks.js:115
 msgid "black"
-msgstr ""
+msgstr "काला"
 
 #: js/PenBlocks.js:128
 msgid "begin fill"
@@ -5131,7 +5131,7 @@ msgstr "ग्रे"
 
 #: js/PenBlocks.js:210
 msgid "The Grey block returns the current pen grey value."
-msgstr ""
+msgstr "ग्रे ब्लॉक वर्तमान पेन का ग्रे मूल्य लौटाता है।"
 
 #: js/PenBlocks.js:243
 #: js/DictActions.js:69
@@ -5142,7 +5142,7 @@ msgstr "छाया"
 
 #: js/PenBlocks.js:247
 msgid "The Shade block returns the current pen shade value."
-msgstr ""
+msgstr "छाया ब्लॉक वर्तमान पेन का छाया मूल्य लौटाता है।"
 
 #: js/PenBlocks.js:280
 #: js/DictActions.js:67
@@ -5153,7 +5153,7 @@ msgstr "रंग"
 
 #: js/PenBlocks.js:285
 msgid "The Color block returns the current pen color."
-msgstr ""
+msgstr "रंग ब्लॉक वर्तमान पेन का रंग लौटाता है।"
 
 #: js/PenBlocks.js:318
 #: js/DictActions.js:73
@@ -5164,37 +5164,37 @@ msgstr "पेन आकार"
 
 #: js/PenBlocks.js:322
 msgid "The Pen size block returns the current pen size value."
-msgstr ""
+msgstr "पेन साइज ब्लॉक वर्तमान पेन का आकार मूल्य लौटाता है।"
 
 #: js/PenBlocks.js:355
 msgid "set font"
-msgstr ""
+msgstr "फॉन्ट सेट करें"
 
 #: js/PenBlocks.js:358
 msgid "The Set font block sets the font used by the Show block."
-msgstr ""
+msgstr "सेट फॉन्ट ब्लॉक शो ब्लॉक द्वारा उपयोग किए जाने वाले फॉन्ट को सेट करता है।"
 
 #: js/PenBlocks.js:391
 msgid "The Background block sets the window background color."
-msgstr ""
+msgstr "बैकग्राउंड ब्लॉक विंडो के पृष्ठभूमि का रंग सेट करता है।"
 
 #: js/PenBlocks.js:408
 msgid "The Hollow line block creates a line with a hollow center."
-msgstr ""
+msgstr "होलो लाइन ब्लॉक एक होलो केंद्र के साथ एक रेखा बनाता है।"
 
 #: js/PenBlocks.js:415
 #.TRANS: draw a line logo has a hollow space down its center
 msgid "hollow line"
-msgstr ""
+msgstr "होलो रेखा"
 
 #: js/PenBlocks.js:462
 msgid "The Fill block fills in a shape with a color."
-msgstr ""
+msgstr "फिल ब्लॉक एक रंग के साथ एक आकृति को भरता है।"
 
 #: js/PenBlocks.js:470
 #.TRANS: fill in as a solid color
 msgid "fill"
-msgstr ""
+msgstr "भरें"
 
 #: js/PenBlocks.js:527
 #.TRANS: raise up the pen so logo it does not draw when it is moved
@@ -5203,7 +5203,7 @@ msgstr "पेन ऊपर"
 
 #: js/PenBlocks.js:532
 msgid "The Pen-up block raises the pen so that it does not draw."
-msgstr ""
+msgstr "पेन-अप ब्लॉक पेन को उठाता है ताकि यह ड्रा न करे।"
 
 #: js/PenBlocks.js:552
 #.TRANS: put down the pen so logo it draws when it is moved
@@ -5212,7 +5212,7 @@ msgstr "पेन नीचे"
 
 #: js/PenBlocks.js:557
 msgid "The Pen-down block lowers the pen so that it draws."
-msgstr ""
+msgstr "पेन-डाउन ब्लॉक पेन को नीचे ले जाता है ताकि यह ड्रा करे।"
 
 #: js/PenBlocks.js:577
 #.TRANS: set the width of the line drawn by the pen
@@ -5221,16 +5221,16 @@ msgstr "पेन आकार सेट करें"
 
 #: js/PenBlocks.js:583
 msgid "The Set-pen-size block changes the size of the pen."
-msgstr ""
+msgstr "सेट-पेन-साइज ब्लॉक पेन के आकार को बदलता है।"
 
 #: js/PenBlocks.js:623
 #.TRANS: set degree of translucence of the pen color
 msgid "set translucency"
-msgstr ""
+msgstr "पारदर्शिता सेट करें"
 
 #: js/PenBlocks.js:627
 msgid "The Set translucency block changes the opacity of the pen."
-msgstr ""
+msgstr "सेट ट्रांसलूसेंसी ब्लॉक पेन की अपारदर्शिता को बदलता है।"
 
 #: js/PenBlocks.js:668
 msgid "set hue"
@@ -5238,7 +5238,7 @@ msgstr "रंग सेट करें"
 
 #: js/PenBlocks.js:672
 msgid "The Set hue block changes the color of the pen."
-msgstr ""
+msgstr "सेट ह्यू ब्लॉक पेन का रंग बदलता है।"
 
 #: js/PenBlocks.js:711
 msgid "set shade"
@@ -5246,7 +5246,7 @@ msgstr "छाया सेट करें"
 
 #: js/PenBlocks.js:717
 msgid "The Set-shade block changes the pen color from dark to light."
-msgstr ""
+msgstr "सेट-शेड ब्लॉक पेन का रंग काले से लाइट में बदलता है।"
 
 #: js/PenBlocks.js:757
 #.TRANS: set the level of vividness of the pen color
@@ -5255,7 +5255,7 @@ msgstr "ग्रे सेट करें"
 
 #: js/PenBlocks.js:761
 msgid "The Set grey block changes the vividness of the pen color."
-msgstr ""
+msgstr "सेट ग्रे ब्लॉक पेन के रंग की चमक को बदलता है।"
 
 #: js/PenBlocks.js:800
 msgid "set color"
@@ -5263,242 +5263,242 @@ msgstr "रंग सेट करें"
 
 #: js/PenBlocks.js:806
 msgid "The Set-color block changes the pen color."
-msgstr ""
+msgstr "सेट-कलर ब्लॉक पेन का रंग बदलता है।"
 
 #: js/VolumeBlocks.js:26
 #.TRANS: the volume for this synth
 msgid "synth volume"
-msgstr ""
+msgstr "सिंथ वॉल्यूम"
 
 #: js/VolumeBlocks.js:30
 msgid "The Synth volume block returns the current volume of the current synthesizer."
-msgstr ""
+msgstr "सिंथ वॉल्यूम ब्लॉक वर्तमान सिंथाइज़र की वॉल्यूम लौटाता है।"
 
 #: js/VolumeBlocks.js:38
 #: js/musicutils.js:731
 #: js/synthutils.js:56
 #.TRANS: musical instrument
 msgid "piano"
-msgstr ""
+msgstr "पियानो"
 
 #: js/VolumeBlocks.js:71
 #.TRANS: the volume at which notes are played
 msgid "master volume"
-msgstr ""
+msgstr "मास्टर वॉल्यूम"
 
 #: js/VolumeBlocks.js:75
 msgid "The Master volume block returns the master volume."
-msgstr ""
+msgstr "मास्टर वॉल्यूम ब्लॉक मास्टर वॉल्यूम लौटाता है।"
 
 #: js/VolumeBlocks.js:219
 #: js/VolumeBlocks.js:360
 msgid "set synth volume"
-msgstr ""
+msgstr "सिंथ वॉल्यूम सेट करें"
 
 #: js/VolumeBlocks.js:226
 #: js/VolumeBlocks.js:381
 msgid "synth"
-msgstr ""
+msgstr "सिंथ"
 
 #: js/VolumeBlocks.js:259
 #: js/VolumeBlocks.js:405
 #: js/VolumeBlocks.js:515
 #: js/VolumeActions.js:173
 msgid "Setting volume to 0."
-msgstr ""
+msgstr "वॉल्यूम को 0 पर सेट करना।"
 
 #: js/VolumeBlocks.js:296
 msgid "Synth not found"
-msgstr ""
+msgstr "सिंथ नहीं मिला"
 
 #: js/VolumeBlocks.js:340
 #.TRANS: set the loudness level
 msgid "set drum volume"
-msgstr ""
+msgstr "ड्रम वॉल्यूम सेट करें"
 
 #: js/VolumeBlocks.js:366
 msgid "The Set synth volume block will change the volume of a particular synth,"
-msgstr ""
+msgstr "सेट सिंथ वॉल्यूम ब्लॉक एक विशिष्ट सिंथ की वॉल्यूम बदलेगा,"
 
 #: js/VolumeBlocks.js:368
 msgid "eg guitar violin snare drum etc."
-msgstr ""
+msgstr "जैसे गिटार वायलिन स्नेयर ड्रम आदि।"
 
 #: js/VolumeBlocks.js:370
 msgid "The default volume is 50."
-msgstr ""
+msgstr "डिफ़ॉल्ट वॉल्यूम 50 है।"
 
 #: js/VolumeBlocks.js:372
 msgid "The range is 0 for silence to 100 for full volume."
-msgstr ""
+msgstr "स्नेहिलता के लिए 0 से पूर्ण वॉल्यूम के लिए 100।"
 
 #: js/VolumeBlocks.js:416
 #.TRANS: set the distribution of volume
 msgid "set panning"
-msgstr ""
+msgstr "पैनिंग सेट करें"
 
 #: js/VolumeBlocks.js:422
 msgid "The Set Panning block sets the panning for all synthesizers."
-msgstr ""
+msgstr "सेट पैनिंग ब्लॉक सभी सिंथाइज़र्स के लिए पैनिंग सेट करता है।"
 
 #: js/VolumeBlocks.js:436
 msgid "Warning: Sound is coming out from only the left or right side."
-msgstr ""
+msgstr "चेतावनी: ध्वनि केवल बाएं या दाएं ओर से आ रही है।"
 
 #: js/VolumeBlocks.js:447
 #: js/VolumeBlocks.js:479
 #.TRANS: set the loudness level
 #.TRANS: set the loudness level
 msgid "set master volume"
-msgstr ""
+msgstr "मास्टर वॉल्यूम सेट करें"
 
 #: js/VolumeBlocks.js:453
 msgid "The Set master volume block sets the volume for all synthesizers."
-msgstr ""
+msgstr "सेट मास्टर वॉल्यूम ब्लॉक सभी सिंथाइज़र्स के लिए वॉल्यूम सेट करता है।"
 
 #: js/VolumeBlocks.js:550
 msgid "The Set relative volume block changes the volume of the contained notes."
-msgstr ""
+msgstr "सेट रिलेटिव वॉल्यूम ब्लॉक शामिल नोट्स की वॉल्यूम को बदलता है।"
 
 #: js/VolumeBlocks.js:557
 #.TRANS: set an articulation (change in volume)
 msgid "set relative volume"
-msgstr ""
+msgstr "रिलेटिव वॉल्यूम सेट करें"
 
 #: js/VolumeBlocks.js:592
 msgid "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
-msgstr ""
+msgstr "डेक्रेसेंडो ब्लॉक नोट्स की वॉल्यूम को प्रति बजी हुई नोट के लिए एक निर्दिष्ट मात्रा से कम करेगा।"
 
 #: js/VolumeBlocks.js:594
 msgid "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
-msgstr ""
+msgstr "उदाहरण के लिए, यदि आपके पास एक डेक्रेसेंडो ब्लॉक में 5 की मान के साथ एक क्रम में 7 नोट्स हैं, तो अंतिम नोट प्रारंभ वॉल्यूम से 35% कम होगा।"
 
 #: js/VolumeBlocks.js:602
 #.TRANS: a gradual increase in loudness
 msgid "decrescendo"
-msgstr ""
+msgstr "डेक्रेसेंडो"
 
 #: js/VolumeBlocks.js:632
 msgid "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
-msgstr ""
+msgstr "क्रेशेंडो ब्लॉक हर बजी हुई नोट के लिए एक निर्दिष्ट मात्रा से नोट्स की वॉल्यूम बढ़ाएगा।"
 
 #: js/VolumeBlocks.js:634
 msgid "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
-msgstr ""
+msgstr "उदाहरण के लिए, यदि आपके पास 7 नोट्स के साथ एक क्रम में 5 की मान के साथ क्रेशेंडो ब्लॉक है, तो अंतिम नोट प्रारंभ वॉल्यूम से 35% ज्यादा होगा।"
 
 #: js/VolumeBlocks.js:642
 #.TRANS: a gradual increase in loudness
 msgid "crescendo"
-msgstr ""
+msgstr "क्रेशेंडो"
 
 #: js/ToneBlocks.js:25
 msgid "oscillator"
-msgstr ""
+msgstr "ऑस्किलेटर"
 
 #: js/ToneBlocks.js:35
 #: js/timbre.js:1562
 #.TRANS: Partials refers to the number of sine waves combined into the sound.
 msgid "partials"
-msgstr ""
+msgstr "अंश"
 
 #: js/ToneBlocks.js:61
 msgid "You are adding multiple oscillator blocks."
-msgstr ""
+msgstr "आप कई ऑस्किलेटर ब्लॉक जोड़ रहे हैं।"
 
 #: js/ToneBlocks.js:103
 #: js/timbre.js:1225
 #.TRANS: a duo synthesizer combines a synth with a sequencer
 msgid "duo synth"
-msgstr ""
+msgstr "ड्यूओ सिंथ"
 
 #: js/ToneBlocks.js:108
 msgid "The Duo synth block is a duo-frequency modulator used to define a timbre."
-msgstr ""
+msgstr "ड्यूओ सिंथ ब्लॉक एक ड्यूओ-फ़्रीक्वेंसी मॉड्युलेटर है जिसे एक टिम्बर को परिभाषित करने के लिए उपयोग किया जाता है।"
 
 #: js/ToneBlocks.js:116
 #: js/timbre.js:1476
 msgid "vibrato rate"
-msgstr ""
+msgstr "विब्रेटो दर"
 
 #: js/ToneBlocks.js:116
 msgid "vibrato intensity"
-msgstr ""
+msgstr "विब्रेटो तीव्रता"
 
 #: js/ToneBlocks.js:128
 #: js/timbre.js:1221
 #.TRANS: AM (amplitude modulation) synthesizer
 msgid "AM synth"
-msgstr ""
+msgstr "ए.एम. सिंथ"
 
 #: js/ToneBlocks.js:132
 msgid "The AM synth block is an amplitude modulator used to define a timbre."
-msgstr ""
+msgstr "ए.एम. सिंथ ब्लॉक एक एम्प्लीट्यूड मॉड्युलेटर है जिसे एक टिम्बर को परिभाषित करने के लिए उपयोग किया जाता है।"
 
 #: js/ToneBlocks.js:151
 #: js/timbre.js:1223
 #.TRANS: FM (frequency modulation) synthesizer
 msgid "FM synth"
-msgstr ""
+msgstr "एफ.एम. सिंथ"
 
 #: js/ToneBlocks.js:155
 msgid "The FM synth block is a frequency modulator used to define a timbre."
-msgstr ""
+msgstr "एफ.एम. सिंथ ब्लॉक एक फ़्रीक्वेंसी मॉड्युलेटर है जिसे एक टिम्बर को परिभाषित करने के लिए उपयोग किया जाता है।"
 
 #: js/ToneBlocks.js:173
 msgid "partial"
-msgstr ""
+msgstr "आंशिक"
 
 #: js/ToneBlocks.js:176
 msgid "The Partial block is used to specify a weight for a specific partical harmonic."
-msgstr ""
+msgstr "पार्शियल ब्लॉक का उपयोग विशिष्ट आंशिक सद्वाद के लिए एक वजन निर्दिष्ट करने के लिए किया जाता है।"
 
 #: js/ToneBlocks.js:189
 #.TRANS: partials are weighted components in a harmonic series
 msgid "Partial weight must be between 0 and 1."
-msgstr ""
+msgstr "पार्शियल वजन 0 और 1 के बीच होना चाहिए।"
 
 #: js/ToneBlocks.js:202
 #.TRANS: partials are weighted components in a harmonic series
 msgid "Partial block should be used inside of a Weighted-partials block."
-msgstr ""
+msgstr "पार्शियल ब्लॉक को एक वेटेड-पार्शियल्स ब्लॉक के अंदर उपयोग किया जाना चाहिए।"
 
 #: js/ToneBlocks.js:213
 msgid "The Weighted partials block is used to specify the partials associated with a timbre."
-msgstr ""
+msgstr "वेटेड-पार्शियल्स ब्लॉक एक टिम्बर के साथ संबंधित पार्शियल्स को निर्दिष्ट करने के लिए उपयोग किया जाता है।"
 
 #: js/ToneBlocks.js:219
 #.TRANS: partials are weighted components in a harmonic series
 msgid "weighted partials"
-msgstr ""
+msgstr "वेटेड पार्शियल्स"
 
 #: js/ToneBlocks.js:260
 msgid "The Harmonic block will add harmonics to the contained notes."
-msgstr ""
+msgstr "हारमोनिक ब्लॉक नोट्स में हारमोनिक जोड़ेगा।"
 
 #: js/ToneBlocks.js:267
 #.TRANS: A harmonic is a overtone.
 msgid "harmonic"
-msgstr ""
+msgstr "हारमोनिक"
 
 #: js/ToneBlocks.js:291
 msgid "The Distortion block adds distortion to the pitch."
-msgstr ""
+msgstr "डिस्टोर्शन ब्लॉक ध्वनि में विकृति जोड़ता है।"
 
 #: js/ToneBlocks.js:298
 #: js/timbre.js:2100
 #.TRANS: distortion is an alteration in the sound
 msgid "distortion"
-msgstr ""
+msgstr "विकृति"
 
 #: js/ToneBlocks.js:330
 msgid "The Tremolo block adds a wavering effect."
-msgstr ""
+msgstr "ट्रेमोलो ब्लॉक एक हिलने के प्रभाव को जोड़ता है।"
 
 #: js/ToneBlocks.js:338
 #: js/timbre.js:2092
 #.TRANS: a wavering effect in a musical tone
 msgid "tremolo"
-msgstr ""
+msgstr "ट्रेमोलो"
 
 #: js/ToneBlocks.js:343
 #: js/ToneBlocks.js:395
@@ -5510,7 +5510,7 @@ msgstr ""
 #: js/timbre.js:2419
 #.TRANS: rate at which tremolo wavers
 msgid "rate"
-msgstr ""
+msgstr "दर"
 
 #: js/ToneBlocks.js:345
 #: js/ToneBlocks.js:440
@@ -5518,277 +5518,277 @@ msgstr ""
 #: js/timbre.js:2328
 #.TRANS: amplitude of tremolo waver
 msgid "depth"
-msgstr ""
+msgstr "गहराई"
 
 #: js/ToneBlocks.js:385
 msgid "The Phaser block adds a sweeping sound."
-msgstr ""
+msgstr "फेजर ब्लॉक एक स्वीपिंग साउंड जोड़ता है।"
 
 #: js/ToneBlocks.js:392
 #: js/timbre.js:2098
 #.TRANS: alter the phase of the sound
 msgid "phaser"
-msgstr ""
+msgstr "फेजर"
 
 #: js/ToneBlocks.js:395
 #: js/timbre.js:2422
 msgid "octaves"
-msgstr ""
+msgstr "ऑक्टेव्स"
 
 #: js/ToneBlocks.js:395
 #: js/timbre.js:2425
 msgid "base frequency"
-msgstr ""
+msgstr "मौलिक तड़ंत"
 
 #: js/ToneBlocks.js:429
 msgid "The Chorus block adds a chorus effect."
-msgstr ""
+msgstr "कोरस ब्लॉक कोरस प्रभाव जोड़ता है।"
 
 #: js/ToneBlocks.js:437
 #: js/timbre.js:2096
 #.TRANS: musical effect to simulate a choral sound
 msgid "chorus"
-msgstr ""
+msgstr "कोरस"
 
 #: js/ToneBlocks.js:440
 msgid "delay"
-msgstr ""
+msgstr "विलंब"
 
 #: js/ToneBlocks.js:471
 msgid "The Vibrato block adds a rapid, slight variation in pitch."
-msgstr ""
+msgstr "विब्रेटो ब्लॉक ध्वनि में तेज, स्लाइट वेरिएशन जोड़ता है।"
 
 #: js/ToneBlocks.js:479
 #: js/timbre.js:2094
 #.TRANS: a rapid, slight variation in pitch
 msgid "vibrato"
-msgstr ""
+msgstr "विब्रेटो"
 
 #: js/ToneBlocks.js:482
 #: js/timbre.js:2221
 msgid "intensity"
-msgstr ""
+msgstr "तीव्रता"
 
 #: js/ToneBlocks.js:509
 #.TRANS: select synthesizer
 msgid "set synth"
-msgstr ""
+msgstr "सिंथ सेट करें"
 
 #: js/ToneBlocks.js:564
 msgid "synth name"
-msgstr ""
+msgstr "सिंथ का नाम"
 
 #: js/ToneBlocks.js:585
 msgid "set default instrument"
-msgstr ""
+msgstr "डिफ़ॉल्ट इंस्ट्रुमेंट सेट करें"
 
 #: js/ToneBlocks.js:588
 msgid "The set default instrument block changes the default instrument from electronic synth to the instrument of your choice."
-msgstr ""
+msgstr "सेट डिफ़ॉल्ट इंस्ट्रुमेंट ब्लॉक डिफ़ॉल्ट इलेक्ट्रॉनिक सिंथ से आपके चयन के इंस्ट्रुमेंट पर बदलता है।"
 
 #: js/ToneBlocks.js:620
 #: js/ToneBlocks.js:659
 #.TRANS: set the characteristics of a custom instrument
 msgid "set instrument"
-msgstr ""
+msgstr "इंस्ट्रुमेंट सेट करें"
 
 #: js/ToneBlocks.js:623
 #: js/ToneBlocks.js:642
 #: js/ToneBlocks.js:648
 msgid "The Set instrument block selects a voice for the synthesizer,"
-msgstr ""
+msgstr "सेट इंस्ट्रुमेंट ब्लॉक सिंथ के लिए एक आवाज चुनता है,"
 
 #: js/ToneBlocks.js:625
 #: js/ToneBlocks.js:650
 msgid "eg guitar piano violin or cello."
-msgstr ""
+msgstr "जैसे गिटार पियानो वायलिन या चेलो।"
 
 #: js/ToneBlocks.js:714
 msgid "Import a sound file to use as an instrument and set its pitch center."
-msgstr ""
+msgstr "एक इंस्ट्रुमेंट के रूप में उपयोग के लिए एक साउंड फ़ाइल आयात करें और इसके पिच केंद्र सेट करें।"
 
 #: js/ToneBlocks.js:785
 msgid "Upload a sound file to connect with the sample block."
-msgstr ""
+msgstr "सैंपल ब्लॉक से जुड़ने के लिए एक साउंड फ़ाइल अपलोड करें।"
 
 #: js/MeterBlocks.js:25
 #.TRANS: musical meter (time signature), e.g., 4:4
 msgid "current meter"
-msgstr ""
+msgstr "वर्तमान मीटर"
 
 #: js/MeterBlocks.js:50
 #.TRANS: number of beats per minute
 msgid "beat factor"
-msgstr ""
+msgstr "बीट कारक"
 
 #: js/MeterBlocks.js:54
 msgid "The Beat factor block returns the ratio of the note value to meter note value."
-msgstr ""
+msgstr "बीट कारक ब्लॉक नोट मूल्य के सापेक्ष मीटर नोट मूल्य का अनुपात लौटाता है।"
 
 #: js/MeterBlocks.js:87
 msgid "The Beats per minute block returns the current beats per minute."
-msgstr ""
+msgstr "बीट्स पर मिनट ब्लॉक वर्तमान मिनट प्रति बीट लौटाता है।"
 
 #: js/MeterBlocks.js:96
 #: js/status.js:152
 #.TRANS: number of beats played per minute
 msgid "beats per minute2"
-msgstr ""
+msgstr "मिनट प्रति बीट"
 
 #: js/MeterBlocks.js:97
 #: js/MeterBlocks.js:607
 #: js/MeterBlocks.js:660
 #: js/MeterBlocks.js:720
-#.TRANS: sets tempo by defniing a beat and beats per minute
+#.TRANS: sets tempo by defining a beat and beats per minute
 msgid "beats per minute"
-msgstr ""
+msgstr "मिनट प्रति बीट"
 
 #: js/MeterBlocks.js:131
-#.TRANS: count of current musical measure in meter
+#.TRANS: count of the current musical measure in meter
 msgid "measure count"
-msgstr ""
+msgstr "माप की गणना"
 
 #: js/MeterBlocks.js:135
 msgid "The Measure count block returns the current measure."
-msgstr ""
+msgstr "मेजर काउंट ब्लॉक वर्तमान माप को लौटाता है।"
 
 #: js/MeterBlocks.js:160
-#.TRANS: count of current beat in the meter
+#.TRANS: count of the current beat in the meter
 msgid "beat count"
-msgstr ""
+msgstr "बीट काउंट"
 
 #: js/MeterBlocks.js:166
 #: js/MeterBlocks.js:175
 msgid "The Beat count block is the number of the current beat,"
-msgstr ""
+msgstr "बीट काउंट ब्लॉक वर्तमान बीट की संख्या है,"
 
 #: js/MeterBlocks.js:168
 #: js/MeterBlocks.js:179
 msgid "In the figure, it is used to take an action on the first beat of each measure."
-msgstr ""
+msgstr "चित्र में, इसे प्रत्येक माप के पहले बीट पर क्रिया करने के लिए उपयोग किया जाता है।"
 
 #: js/MeterBlocks.js:177
 msgid "eg 1, 2, 3, or 4."
-msgstr ""
+msgstr "उदाहरण के लिए 1, 2, 3, या 4।"
 
 #: js/MeterBlocks.js:206
 #.TRANS: count the number of notes
 msgid "sum note values"
-msgstr ""
+msgstr "नोट मूल्यों की गणना"
 
 #: js/MeterBlocks.js:210
 #: js/MeterBlocks.js:245
 msgid "The Note counter block can be used to count the number of contained notes."
-msgstr ""
+msgstr "नोट काउंटर ब्लॉक का उपयोग शामिल नोट्स की संख्या को गिनने के लिए किया जा सकता है।"
 
 #: js/MeterBlocks.js:241
 #.TRANS: count the number of notes
 msgid "note counter"
-msgstr ""
+msgstr "नोट काउंटर"
 
 #: js/MeterBlocks.js:276
 #.TRANS: number of whole notes that have been played
 msgid "whole notes played"
-msgstr ""
+msgstr "पूरे नोट बजे"
 
 #: js/MeterBlocks.js:309
 #: js/DictActions.js:83
 #.TRANS: number of notes that have been played
 msgid "notes played"
-msgstr ""
+msgstr "नोट्स बजे"
 
 #: js/MeterBlocks.js:317
 msgid "(By default, it counts quarter notes.)"
-msgstr ""
+msgstr "(डिफ़ॉल्ट रूप से, यह क्वॉर्टर नोट्स की गिनती करता है।)"
 
 #: js/MeterBlocks.js:366
 #.TRANS: don't lock notes to master clock
 msgid "no clock"
-msgstr ""
+msgstr "कोई घड़ी नहीं"
 
 #: js/MeterBlocks.js:387
 msgid "on weak beat do"
-msgstr ""
+msgstr "कमजोर बीट पर करें"
 
 #: js/MeterBlocks.js:416
 msgid "on strong beat"
-msgstr ""
+msgstr "मजबूत बीट पर"
 
 #: js/MeterBlocks.js:431
 msgid "beat"
-msgstr ""
+msgstr "बीट"
 
 #: js/MeterBlocks.js:450
 msgid "on every beat do"
-msgstr ""
+msgstr "प्रत्येक बीट पर करें"
 
 #: js/MeterBlocks.js:489
 msgid "on every note do"
-msgstr ""
+msgstr "प्रत्येक नोट पर करें"
 
 #: js/MeterBlocks.js:522
 #: js/MeterBlocks.js:571
-#.TRANS: sets tempo by defniing a beat and beats per minute
+#.TRANS: sets tempo by defining a beat and beats per minute
 msgid "master beats per minute"
-msgstr ""
+msgstr "मास्टर बीट्स प्रति मिनट"
 
 #: js/MeterBlocks.js:540
 #: js/MeterBlocks.js:625
 #: js/MeterBlocks.js:662
 msgid "bpm"
-msgstr ""
+msgstr "बीपीएम"
 
 #: js/MeterBlocks.js:540
 #: js/MeterBlocks.js:625
 #: js/MeterBlocks.js:662
 msgid "beat value"
-msgstr ""
+msgstr "बीट मूल्य"
 
 #: js/MeterBlocks.js:584
 #: js/MeterBlocks.js:687
 #: js/MeterBlocks.js:738
 msgid "Beats per minute must be > 30."
-msgstr ""
+msgstr "मिनट प्रति बीट 30 से अधिक होना चाहिए।"
 
 #: js/MeterBlocks.js:587
 #: js/MeterBlocks.js:690
 #: js/MeterBlocks.js:741
 msgid "Maximum beats per minute is 1000."
-msgstr ""
+msgstr "अधिकतम मिनट प्रति बीट 1000 है।"
 
 #: js/MeterBlocks.js:767
 #.TRANS: anacrusis
 msgid "pickup"
-msgstr ""
+msgstr "पिकअप"
 
 #: js/MeterBlocks.js:823
 msgid "number of beats"
-msgstr ""
+msgstr "बीट्स की संख्या"
 
 #: js/DictBlocks.js:29
 msgid "The Show-dictionary block displays the contents of the dictionary at the top of the screen."
-msgstr ""
+msgstr "शो-डिक्शनरी ब्लॉक डिक्शनरी की सामग्री को स्क्रीन के शीर्ष पर प्रदर्शित करता है।"
 
 #: js/DictBlocks.js:36
 #.TRANS: Display the dictionary contents
 msgid "show dictionary"
-msgstr ""
+msgstr "डिक्शनरी दिखाएं"
 
 #: js/DictBlocks.js:60
 msgid "The Dictionary block returns a dictionary."
-msgstr ""
+msgstr "डिक्शनरी ब्लॉक एक डिक्शनरी लौटाता है।"
 
 #: js/DictBlocks.js:92
 #: js/DictBlocks.js:162
 msgid "The Get-dict block returns a value in the dictionary for a specified key."
-msgstr ""
+msgstr "गेट-डिक्ट ब्लॉक एक निर्दिष्ट कुंजी के लिए डिक्शनरी में एक मूल्य लौटाता है।"
 
 #: js/DictBlocks.js:100
 #: js/DictBlocks.js:169
 #.TRANS: retrieve a value from the dictionary with a given key
 #.TRANS: retrieve a value from the dictionary with a given key
 msgid "get value"
-msgstr ""
+msgstr "मूल्य प्राप्त करें"
 
 #: js/DictBlocks.js:103
 #: js/DictBlocks.js:104
@@ -5798,31 +5798,31 @@ msgstr ""
 #: js/DictBlocks.js:207
 #: js/DictBlocks.js:208
 msgid "key2"
-msgstr ""
+msgstr "कुंजी2"
 
 #: js/DictBlocks.js:130
 #: js/DictBlocks.js:197
 msgid "The Set-dict block sets a value in the dictionary for a specified key."
-msgstr ""
+msgstr "सेट-डिक्ट ब्लॉक निर्दिष्ट कुंजी के लिए डिक्शनरी में एक मूल्य सेट करता है।"
 
 #: js/DictBlocks.js:137
 #: js/DictBlocks.js:204
 #.TRANS: set a value in the dictionary for a given key
 #.TRANS: set a value in the dictionary for a given key
 msgid "set value"
-msgstr ""
+msgstr "मूल्य सेट करें"
 
 #: js/ExtrasBlocks.js:24
 msgid "fraction"
-msgstr ""
+msgstr "अंश"
 
 #: js/ExtrasBlocks.js:27
 msgid "Convert a float to a fraction"
-msgstr ""
+msgstr "एक फ़्लोट को एक अंश में परिवर्तित करें"
 
 #: js/ExtrasBlocks.js:67
 msgid "save as ABC"
-msgstr ""
+msgstr "ABC के रूप में सहेजें"
 
 #: js/ExtrasBlocks.js:70
 #: js/ExtrasBlocks.js:93
@@ -5832,19 +5832,19 @@ msgstr "शीर्षक"
 
 #: js/ExtrasBlocks.js:90
 msgid "save as Lilypond"
-msgstr ""
+msgstr "Lilypond के रूप में सहेजें"
 
 #: js/ExtrasBlocks.js:113
 msgid "save as SVG"
-msgstr ""
+msgstr "SVG के रूप में सहेजें"
 
 #: js/ExtrasBlocks.js:148
 msgid "no background"
-msgstr ""
+msgstr "कोई पृष्ठभूमि नहीं"
 
 #: js/ExtrasBlocks.js:151
 msgid "The No background block eliminates the background from the saved SVG output."
-msgstr ""
+msgstr "नो बैकग्राउंड ब्लॉक निर्बाध एसवीजी आउटपुट से पृष्ठभूमि को हटा देता है।"
 
 #: js/ExtrasBlocks.js:165
 msgid "show blocks"
@@ -5852,7 +5852,7 @@ msgstr "पिण्ड दिखाएँ"
 
 #: js/ExtrasBlocks.js:167
 msgid "The Show blocks block shows the blocks."
-msgstr ""
+msgstr "शो ब्लॉक्स ब्लॉक ब्लॉक्स दिखाता है।"
 
 #: js/ExtrasBlocks.js:178
 msgid "hide blocks"
@@ -5860,12 +5860,12 @@ msgstr "खण्ड छुपाएँ"
 
 #: js/ExtrasBlocks.js:180
 msgid "The Hide blocks block hides the blocks."
-msgstr ""
+msgstr "हाइड ब्लॉक्स ब्लॉक ब्लॉक्स छुपा देता है।"
 
 #: js/ExtrasBlocks.js:195
 #: js/ExtrasBlocks.js:213
 msgid "The Space block is used to add space between blocks."
-msgstr ""
+msgstr "स्थान ब्लॉक ब्लॉक्स के बीच स्थान जोड़ने के लिए उपयोग किया जाता है।"
 
 #: js/ExtrasBlocks.js:234
 msgid "wait"
@@ -5873,11 +5873,11 @@ msgstr "इंतजार करें"
 
 #: js/ExtrasBlocks.js:237
 msgid "The Wait block pauses the program for a specified number of seconds."
-msgstr ""
+msgstr "वेट ब्लॉक निर्दिष्ट सेकंड के लिए कार्यक्रम को रोक देता है।"
 
 #: js/ExtrasBlocks.js:268
 msgid "The Comment block prints a comment at the top of the screen when the program is running in slow mode."
-msgstr ""
+msgstr "कमेंट ब्लॉक कार्यक्रम धीमे मोड में चल रहा है जब स्क्रीन के शीर्ष पर एक कमेंट प्रिंट करता है।"
 
 #: js/ExtrasBlocks.js:274
 #: plugins/facebook.rtp:30
@@ -5890,15 +5890,15 @@ msgstr "छापें"
 
 #: js/ExtrasBlocks.js:302
 msgid "The Print block displays text at the top of the screen."
-msgstr ""
+msgstr "प्रिंट ब्लॉक स्क्रीन के शीर्ष पर पाठ दिखाता है।"
 
 #: js/ExtrasBlocks.js:379
 msgid "display grid"
-msgstr ""
+msgstr "ग्रिड दिखाएँ"
 
 #: js/ExtrasBlocks.js:384
 msgid "The Display Grid Block changes the grid type"
-msgstr ""
+msgstr "डिस्प्ले ग्रिड ब्लॉक ग्रिड प्रकार बदलता है"
 
 #: js/ExtrasBlocks.js:464
 #: js/ExtrasBlocks.js:474
@@ -5909,27 +5909,27 @@ msgstr ""
 #: js/ExtrasBlocks.js:531
 #: js/ExtrasBlocks.js:541
 msgid "unknown"
-msgstr "अंजान"
+msgstr "अज्ञात"
 
 #: js/SensorsBlocks.js:29
 msgid "The Input block prompts for keyboard input."
-msgstr ""
+msgstr "इनपुट ब्लॉक कुंजीपटल इनपुट के लिए प्रॉम्प्ट करता है।"
 
 #: js/SensorsBlocks.js:35
 msgid "input"
-msgstr ""
+msgstr "इनपुट"
 
 #: js/SensorsBlocks.js:38
 msgid "Input a value"
-msgstr ""
+msgstr "एक मूल्य इनपुट करें"
 
 #: js/SensorsBlocks.js:86
 msgid "input value"
-msgstr ""
+msgstr "इनपुट मूल्य"
 
 #: js/SensorsBlocks.js:91
 msgid "The Input-value block stores the input."
-msgstr ""
+msgstr "इनपुट-मूल्य ब्लॉक इनपुट को संग्रहित करता है।"
 
 #: js/SensorsBlocks.js:158
 msgid "loudness"
@@ -5937,91 +5937,91 @@ msgstr "आवाज़ की उंचाई"
 
 #: js/SensorsBlocks.js:165
 msgid "The Loudness block returns the volume detected by the microphone."
-msgstr ""
+msgstr "ध्वनि माइक्रोफ़ोन द्वारा पहचाने गए आवाज़ को लौडनेस ब्लॉक द्वारा लौटाता है।"
 
 #: js/SensorsBlocks.js:201
 msgid "click"
-msgstr ""
+msgstr "क्लिक"
 
 #: js/SensorsBlocks.js:207
 msgid "The Click block triggers an event if a mouse has been clicked."
-msgstr ""
+msgstr "क्लिक ब्लॉक एक घटना को ट्रिगर करता है अगर माउस पर क्लिक किया गया है।"
 
 #: js/SensorsBlocks.js:214
 msgid "The Click block triggers an event if a turtle has been clicked."
-msgstr ""
+msgstr "क्लिक ब्लॉक एक घटना को ट्रिगर करता है अगर कछुआ पर क्लिक किया गया है।"
 
 #: js/SensorsBlocks.js:230
 msgid "cursor over"
-msgstr ""
+msgstr "कर्सर ओवर"
 
 #: js/SensorsBlocks.js:235
 msgid "The Cursor over block triggers an event when the cursor is moved over a mouse."
-msgstr ""
+msgstr "कर्सर ओवर ब्लॉक जब कर्सर माउस पर चलाया जाता है तो एक घटना को ट्रिगर करता है।"
 
 #: js/SensorsBlocks.js:242
 msgid "The Cursor over block triggers an event when the cursor is moved over a turtle."
-msgstr ""
+msgstr "कर्सर ओवर ब्लॉक जब कर्सर कछुआ पर चलाया जाता है तो एक घटना को ट्रिगर करता है।"
 
 #: js/SensorsBlocks.js:258
 msgid "cursor out"
-msgstr ""
+msgstr "कर्सर आउट"
 
 #: js/SensorsBlocks.js:264
 msgid "The Cursor out block triggers an event when the cursor is moved off of a mouse."
-msgstr ""
+msgstr "कर्सर आउट ब्लॉक जब कर्सर माउस से हटाया जाता है तो एक घटना को ट्रिगर करता है।"
 
 #: js/SensorsBlocks.js:272
 msgid "The Cursor out block triggers an event when the cursor is moved off of a turtle."
-msgstr ""
+msgstr "कर्सर आउट ब्लॉक जब कर्सर कछुआ से हटाया जाता है तो एक घटना को ट्रिगर करता है।"
 
 #: js/SensorsBlocks.js:287
 msgid "cursor button down"
-msgstr ""
+msgstr "कर्सर बटन नीचे"
 
 #: js/SensorsBlocks.js:292
 msgid "The Cursor button down block triggers an event when the curson button is press on a mouse."
-msgstr ""
+msgstr "कर्सर बटन डाउन ब्लॉक जब माउस पर बटन दबाया जाता है तो एक घटना को ट्रिगर करता है।"
 
 #: js/SensorsBlocks.js:299
 msgid "The Cursor button down block triggers an event when the curson button is press on a turtle."
-msgstr ""
+msgstr "कर्सर बटन डाउन ब्लॉक जब कछुआ पर बटन दबाया जाता है तो एक घटना को ट्रिगर करता है।"
 
 #: js/SensorsBlocks.js:314
 msgid "cursor button up"
-msgstr ""
+msgstr "कर्सर बटन ऊपर"
 
 #: js/SensorsBlocks.js:319
 msgid "The Cursor button up block triggers an event when the cursor button is released while over a mouse."
-msgstr ""
+msgstr "कर्सर बटन अप ब्लॉक जब माउस पर होकर बटन रिलीज़ होता है तो एक घटना को ट्रिगर करता है।"
 
 #: js/SensorsBlocks.js:326
 msgid "The Cursor button up block triggers an event when the cursor button is released while over a turtle."
-msgstr ""
+msgstr "कर्सर बटन अप ब्लॉक" एक घटना को ट्रिगर करता है जब कर्सर बटन टर्टिल के ऊपर होते हुए रिलीज़ होता है"
 
 #: js/SensorsBlocks.js:346
 msgid "The Get blue block returns the blue component of the pixel under the mouse."
-msgstr ""
+msgstr "गेट ब्लू ब्लॉक माउस के नीचे पिक्सेल का नीला घटक वापस करता है।"
 
 #: js/SensorsBlocks.js:352
 msgid "The Get blue block returns the blue component of the pixel under the turtle."
-msgstr ""
+msgstr "गेट ब्लू ब्लॉक कछुआ के नीचे पिक्सेल का नीला घटक वापस करता है।"
 
 #: js/SensorsBlocks.js:379
 msgid "The Get green block returns the green component of the pixel under the mouse."
-msgstr ""
+msgstr "गेट ग्रीन ब्लॉक माउस के नीचे पिक्सेल का हरित घटक वापस करता है।"
 
 #: js/SensorsBlocks.js:385
 msgid "The Get green block returns the green component of the pixel under the turtle."
-msgstr ""
+msgstr "गेट ग्रीन ब्लॉक कछुआ के नीचे पिक्सेल का हरित घटक वापस करता है।"
 
 #: js/SensorsBlocks.js:412
 msgid "The Get red block returns the red component of the pixel under the mouse."
-msgstr ""
+msgstr "गेट रेड ब्लॉक माउस के नीचे पिक्सेल का लाल घटक वापस करता है।"
 
 #: js/SensorsBlocks.js:418
 msgid "The Get red block returns the red component of the pixel under the turtle."
-msgstr ""
+msgstr "गेट रेड ब्लॉक कछुआ के नीचे पिक्सेल का लाल घटक वापस करता है।"
 
 #: js/SensorsBlocks.js:440
 #: plugins/rodi.rtp:216
@@ -6030,11 +6030,11 @@ msgstr "पिक्सेल का रंग"
 
 #: js/SensorsBlocks.js:445
 msgid "The Get pixel block returns the color of the pixel under the mouse."
-msgstr ""
+msgstr "गेट पिक्सेल ब्लॉक माउस के नीचे पिक्सेल का रंग वापस करता है।"
 
 #: js/SensorsBlocks.js:451
 msgid "The Get pixel block returns the color of the pixel under the turtle."
-msgstr ""
+msgstr "गेट पिक्सेल ब्लॉक कछुआ के नीचे पिक्सेल का रंग वापस करता है।"
 
 #: js/SensorsBlocks.js:493
 msgid "time"
@@ -6042,491 +6042,491 @@ msgstr "समय"
 
 #: js/SensorsBlocks.js:500
 msgid "The Time block returns the number of seconds that the program has been running."
-msgstr ""
+msgstr "टाइम ब्लॉक प्रोग्राम के चलने के समय की सेकंड्स की संख्या वापस करता है।"
 
 #: js/SensorsBlocks.js:518
 msgid "cursor y"
-msgstr ""
+msgstr "कर्सर वाई"
 
 #: js/SensorsBlocks.js:523
 msgid "The Cursor Y block returns the vertical position of the mouse."
-msgstr ""
+msgstr "कर्सर वाई ब्लॉक माउस का उदाहरण दिखाता है।"
 
 #: js/SensorsBlocks.js:541
 msgid "cursor x"
-msgstr ""
+msgstr "कर्सर एक्स"
 
 #: js/SensorsBlocks.js:546
 msgid "The Cursor X block returns the horizontal position of the mouse."
-msgstr ""
+msgstr "कर्सर एक्स ब्लॉक माउस का क्षैतिज स्थान वापस करता है।"
 
 #: js/SensorsBlocks.js:564
 msgid "mouse button"
-msgstr "माउस का बटन"
+msgstr "माउस बटन"
 
 #: js/SensorsBlocks.js:566
 msgid "The Mouse-button block returns True if the mouse button is pressed."
-msgstr ""
+msgstr "माउस-बटन ब्लॉक तब सच है जब माउस बटन दबाया गया है।"
 
 #: js/SensorsBlocks.js:594
 msgid "to ASCII"
-msgstr ""
+msgstr "एस्की में"
 
 #: js/SensorsBlocks.js:598
 msgid "The To ASCII block converts numbers to letters."
-msgstr ""
+msgstr "टू एस्की ब्लॉक संख्याओं को अक्षर में बदलता है।"
 
 #: js/SensorsBlocks.js:643
 msgid "The Keyboard block returns computer keyboard input."
-msgstr ""
+msgstr "कीबोर्ड ब्लॉक कंप्यूटर कीबोर्ड इनपुट वापस करता है।"
 
 #: js/IntervalsActions.js:193
 msgid "Adding missing pitch number 0."
-msgstr ""
+msgstr "गायन संख्या 0 जोड़ी जा रही है।"
 
 #: js/IntervalsActions.js:201
 msgid "Ignoring pitch numbers less than zero or greater than eleven."
-msgstr ""
+msgstr "0 से कम या 11 से अधिक स्वर संख्याओं को अनदेखा कर रहा है।"
 
 #: js/IntervalsActions.js:207
 msgid "Ignoring duplicate pitch numbers."
-msgstr ""
+msgstr "डुप्लिकेट स्वर संख्याओं को अनदेखा कर रहा है।"
 
 #: js/PitchActions.js:88
 msgid "The Scalar Step Block must be used inside of a Note Block."
-msgstr ""
+msgstr "स्केलर स्टेप ब्लॉक को एक नोट ब्लॉक के अंदर उपयोग करना चाहिए।"
 
 #: js/PitchActions.js:107
 msgid "The Scalar Step Block must be preceded by a Pitch Block."
-msgstr ""
+msgstr "स्केलर स्टेप ब्लॉक को पिच ब्लॉक से पहले आना चाहिए।"
 
 #: js/DrumActions.js:231
 msgid "Noise Block: Did you mean to use a Note block?"
-msgstr ""
+msgstr "नॉइज ब्लॉक: क्या आपने एक नोट ब्लॉक का इस्तेमाल करने का इरादा किया है?"
 
 #: js/MeterActions.js:101
 #: js/MeterActions.js:139
 msgid "beats per minute must be greater than"
-msgstr ""
+msgstr "प्रति मिनट बीट 30 से अधिक होना चाहिए"
 
 #: js/MeterActions.js:111
 #: js/MeterActions.js:149
 msgid "maximum"
-msgstr ""
+msgstr "अधिकतम"
 
 #: js/MeterActions.js:117
 #: js/MeterActions.js:155
 msgid "beats per minute is"
-msgstr ""
+msgstr "प्रति मिनट बीट"
 
 #: js/ToneActions.js:134
 msgid "Vibrato intensity must be between 1 and 100."
-msgstr ""
+msgstr "विब्राटो तीव्रता 1 और 100 के बीच होनी चाहिए।"
 
 #: js/ToneActions.js:139
 msgid "Vibrato rate must be greater than 0."
-msgstr ""
+msgstr "विब्राटो दर 0 से अधिक होनी चाहिए।"
 
 #: js/ToneActions.js:192
 #: js/ToneActions.js:265
-#.TRANS: Depth is the intesity of the tremolo or chorus effect.
+#.TRANS: Depth is the intensity of the tremolo or chorus effect.
 msgid "Depth is out of range."
-msgstr ""
+msgstr "गहराई सीमा से बाहर है।"
 
 #: js/ToneActions.js:301
 msgid "Distortion must be from 0 to 100."
-msgstr ""
+msgstr "विरुपण 0 से 100 के बीच होना चाहिए।"
 
 #: js/ToneActions.js:332
 #.TRANS: partials components in a harmonic series
 msgid "Partial must be greater than or equal to 0."
-msgstr ""
+msgstr "आंश 0 से अधिक या इसके बराबर होना चाहिए।"
 
 #: js/ToneActions.js:378
 #: js/ToneActions.js:417
 #: js/ToneActions.js:456
 #: js/timbre.js:782
 msgid "Unable to use synth due to existing oscillator"
-msgstr ""
+msgstr "मौजूदा ऑस्किलेटर के कारण सिंथ का उपयोग नहीं किया जा सकता"
 
 #: js/ToneActions.js:388
 #: js/ToneActions.js:427
 msgid "The input cannot be negative."
-msgstr ""
+msgstr "इनपुट नकारात्मक नहीं हो सकता।"
 
 #: js/DictActions.js:75
 #: js/DictActions.js:153
 #: js/DictActions.js:188
 msgid "font"
-msgstr ""
+msgstr "फ़ॉन्ट"
 
 #: js/musicutils.js:363
 #: js/musicutils.js:471
 #: js/pitchdrummatrix.js:151
 #: js/musickeyboard.js:2564
 msgid "rest"
-msgstr ""
+msgstr "आराम"
 
 #: js/musicutils.js:565
 #.TRANS: ordinal number. Please keep exactly one space between each number.
 msgid "1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th"
-msgstr ""
+msgstr "1वा 2वा 3वा 4वा 5वा 6वा 7वा 8वा 9वा 10वा 11वा 12वा"
 
 #: js/musicutils.js:630
 #: js/musicutils.js:813
 #: js/musicutils.js:912
 #.TRANS: augmented is a music term related to intervals
 msgid "augmented"
-msgstr ""
+msgstr "बढ़ाया हुआ"
 
 #: js/musicutils.js:632
 #: js/musicutils.js:814
 #: js/musicutils.js:911
 #.TRANS: diminished is a music term related to intervals and mode
 msgid "diminished"
-msgstr ""
+msgstr "कम"
 
 #: js/musicutils.js:640
 #.TRANS: twelve semi-tone scale for music
 msgid "chromatic"
-msgstr ""
+msgstr "क्रोमैटिक"
 
 #: js/musicutils.js:641
 msgid "algerian"
-msgstr ""
+msgstr "अल्जीरियन"
 
 #: js/musicutils.js:642
 msgid "spanish"
-msgstr ""
+msgstr "स्पेनिश"
 
 #: js/musicutils.js:644
 #.TRANS: modal scale in music
 msgid "octatonic"
-msgstr ""
+msgstr "ऑक्टाटॉनिक"
 
 #: js/musicutils.js:646
 #.TRANS: harmonic major scale in music
 msgid "harmonic major"
-msgstr ""
+msgstr "हार्मोनिक मेजर"
 
 #: js/musicutils.js:648
 #.TRANS: natural minor scales in music
 msgid "natural minor"
-msgstr ""
+msgstr "नैचुरल माइनर"
 
 #: js/musicutils.js:650
 #.TRANS: harmonic minor scale in music
 msgid "harmonic minor"
-msgstr ""
+msgstr "हार्मोनिक माइनर"
 
 #: js/musicutils.js:652
 #.TRANS: melodic minor scale in music
 msgid "melodic minor"
-msgstr ""
+msgstr "मेलोडिक माइनर"
 
 #: js/musicutils.js:656
 #.TRANS: modal scale for music
 msgid "dorian"
-msgstr ""
+msgstr "डोरियन"
 
 #: js/musicutils.js:658
 #.TRANS: modal scale for music
 msgid "phrygian"
-msgstr ""
+msgstr "फ्रिजियन"
 
 #: js/musicutils.js:660
 #.TRANS: modal scale for music
 msgid "lydian"
-msgstr ""
+msgstr "लिडियन"
 
 #: js/musicutils.js:662
 #.TRANS: modal scale for music
 msgid "mixolydian"
-msgstr ""
+msgstr "मिक्सोलिडियन"
 
 #: js/musicutils.js:666
 #.TRANS: modal scale for music
 msgid "locrian"
-msgstr ""
+msgstr "लोक्रियन"
 
 #: js/musicutils.js:668
 #.TRANS: minor jazz scale for music
 msgid "jazz minor"
-msgstr ""
+msgstr "जैज माइनर"
 
 #: js/musicutils.js:670
 #.TRANS: bebop scale for music
 msgid "bebop"
-msgstr ""
+msgstr "बीबॉप"
 
 #: js/musicutils.js:671
 msgid "arabic"
-msgstr ""
+msgstr "अरबी"
 
 #: js/musicutils.js:672
 msgid "byzantine"
-msgstr ""
+msgstr "बाइज़ंटाइन"
 
 #: js/musicutils.js:674
 #.TRANS: musical scale for music by Verdi
 msgid "enigmatic"
-msgstr ""
+msgstr "एनिगमैटिक"
 
 #: js/musicutils.js:675
 msgid "ethiopian"
-msgstr ""
+msgstr "इथियोपियन"
 
 #: js/musicutils.js:677
 #.TRANS: Ethiopic scale for music
 msgid "geez"
-msgstr ""
+msgstr "गीज़"
 
 #: js/musicutils.js:678
 msgid "hindu"
-msgstr ""
+msgstr "हिन्दू"
 
 #: js/musicutils.js:679
 msgid "hungarian"
-msgstr ""
+msgstr "हंगेरियन"
 
 #: js/musicutils.js:681
 #.TRANS: minor Romanian scale for music
 msgid "romanian minor"
-msgstr ""
+msgstr "रोमानियन माइनर"
 
 #: js/musicutils.js:682
 msgid "spanish gypsy"
-msgstr ""
+msgstr "स्पैनिश जिप्सी"
 
 #: js/musicutils.js:684
 #.TRANS: musical scale for Mid-Eastern music
 msgid "maqam"
-msgstr ""
+msgstr "मकाम"
 
 #: js/musicutils.js:686
 #.TRANS: minor blues scale for music
 msgid "minor blues"
-msgstr ""
+msgstr "माइनर ब्लूज"
 
 #: js/musicutils.js:688
 #.TRANS: major blues scale for music
 msgid "major blues"
-msgstr ""
+msgstr "मेजर ब्लूज"
 
 #: js/musicutils.js:689
 msgid "whole tone"
-msgstr ""
+msgstr "होल टोन"
 
 #: js/musicutils.js:691
-#.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "minor pentatonic"
+#.TRANS: pentatonic is a general term that means "five-note scale". This scale is typically known as "minor pentatonic"
 msgid "minor pentatonic"
-msgstr ""
+msgstr "माइनर पेंटाटॉनिक"
 
 #: js/musicutils.js:693
-#.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "major pentatonic"
+#.TRANS: pentatonic is a general term that means "five-note scale". This scale is typically known as "major pentatonic"
 msgid "major pentatonic"
-msgstr ""
+msgstr "मेजर पेंटाटॉनिक"
 
 #: js/musicutils.js:694
 msgid "chinese"
-msgstr ""
+msgstr "चाइनीज़"
 
 #: js/musicutils.js:695
 msgid "egyptian"
-msgstr ""
+msgstr "इज़िप्शियन"
 
 #: js/musicutils.js:697
 #.TRANS: https://en.wikipedia.org/wiki/Hirajoshi_scale NOTE: There are three different versions of this scale
 msgid "hirajoshi"
-msgstr ""
+msgstr "हिराजोशी"
 
 #: js/musicutils.js:698
 msgid "Japan"
-msgstr ""
+msgstr "जापान"
 
 #: js/musicutils.js:700
-#.TRANS: https://en.wikipedia.org/wiki/In_scale and https://en.wikipedia.org/wiki/Sakura_Sakura
-msgid "in"
-msgstr ""
+#.TRANS: https://en.wikipedia.org/wiki/In_scale and https://en.wikipedia.org/wiki/Sakura_Sakura	
+msgid "in"	
+msgstr ""	
 
 #: js/musicutils.js:702
 #.TRANS: https://en.wikipedia.org/wiki/Miny%C5%8D_scale
 msgid "minyo"
-msgstr ""
+msgstr "मिन्यो"
 
-#: js/musicutils.js:704
+#: js/musicutils.js:702
 #.TRANS: Italian mathematician
 msgid "fibonacci"
-msgstr ""
+msgstr "फिबोनाची"
 
 #: js/musicutils.js:709
 #: js/musicutils.js:1107
 #.TRANS: lowpass filter
 msgid "lowpass"
-msgstr ""
+msgstr "लोपास"
 
 #: js/musicutils.js:711
 #: js/musicutils.js:1108
 #.TRANS: bandpass filter
 msgid "bandpass"
-msgstr ""
+msgstr "बैंडपास"
 
 #: js/musicutils.js:713
 #: js/musicutils.js:1109
 #.TRANS: high-shelf filter
 msgid "highshelf"
-msgstr ""
+msgstr "हाईशेल्फ"
 
 #: js/musicutils.js:715
 #: js/musicutils.js:1110
 #.TRANS: low-shelf filter
 msgid "lowshelf"
-msgstr ""
+msgstr "लोशेल्फ"
 
 #: js/musicutils.js:717
 #: js/musicutils.js:1111
 #.TRANS: notch-shelf filter
 msgid "notch"
-msgstr ""
+msgstr "नॉच"
 
 #: js/musicutils.js:719
 #: js/musicutils.js:1112
 #.TRANS: all-pass filter
 msgid "allpass"
-msgstr ""
+msgstr "ऑलपास"
 
 #: js/musicutils.js:721
 #: js/musicutils.js:1113
 #.TRANS: peaking filter
 msgid "peaking"
-msgstr ""
+msgstr "पीकिंग"
 
 #: js/musicutils.js:732
 #: js/synthutils.js:58
 #.TRANS: musical instrument
 msgid "violin"
-msgstr ""
+msgstr "वायलिन"
 
 #: js/musicutils.js:733
 #: js/synthutils.js:60
 #.TRANS: viola musical instrument
 msgid "viola"
-msgstr ""
+msgstr "वायोला"
 
 #: js/musicutils.js:734
 #: js/synthutils.js:98
 #.TRANS: xylophone musical instrument
 msgid "xylophone"
-msgstr ""
+msgstr "क्सीलोफ़ोन"
 
 #: js/musicutils.js:735
 #: js/synthutils.js:120
 #.TRANS: vibraphone musical instrument
 msgid "vibraphone"
-msgstr ""
+msgstr "वाइब्राफ़ोन"
 
 #: js/musicutils.js:736
 #: js/synthutils.js:62
 #.TRANS: musical instrument
 msgid "cello"
-msgstr ""
+msgstr "चेलो"
 
 #: js/musicutils.js:738
 #: js/synthutils.js:66
 #.TRANS: viola musical instrument
 msgid "double bass"
-msgstr ""
+msgstr "डबल बास"
 
 #: js/musicutils.js:739
 #: js/synthutils.js:68
 #: js/rhythmruler.js:2116
 #.TRANS: musical instrument
 msgid "guitar"
-msgstr ""
+msgstr "गिटार"
 
 #: js/musicutils.js:740
 #: js/synthutils.js:70
 #.TRANS: musical instrument
 msgid "acoustic guitar"
-msgstr ""
+msgstr "एकॉस्टिक गिटार"
 
 #: js/musicutils.js:741
 #: js/synthutils.js:72
 #.TRANS: musical instrument
 msgid "flute"
-msgstr ""
+msgstr "बांसुरी"
 
 #: js/musicutils.js:742
 #: js/synthutils.js:74
 #.TRANS: musical instrument
 msgid "clarinet"
-msgstr ""
+msgstr "क्लैरिनेट"
 
 #: js/musicutils.js:743
 #: js/synthutils.js:76
 #.TRANS: musical instrument
 msgid "saxophone"
-msgstr ""
+msgstr "सैक्सोफोन"
 
 #: js/musicutils.js:744
 #: js/synthutils.js:78
 #.TRANS: musical instrument
 msgid "tuba"
-msgstr ""
+msgstr "ट्यूबा"
 
 #: js/musicutils.js:745
 #: js/synthutils.js:80
 #.TRANS: musical instrument
 msgid "trumpet"
-msgstr ""
+msgstr "ट्रंपेट"
 
 #: js/musicutils.js:746
 #: js/synthutils.js:82
 #.TRANS: musical instrument
 msgid "oboe"
-msgstr ""
+msgstr "ओबो"
 
 #: js/musicutils.js:747
 #: js/synthutils.js:84
 #.TRANS: musical instrument
 msgid "trombone"
-msgstr ""
+msgstr "ट्रॉम्बोन"
 
 #: js/musicutils.js:748
 #: js/synthutils.js:100
 #.TRANS: polytone synthesizer
 msgid "electronic synth"
-msgstr ""
+msgstr "इलेक्ट्रॉनिक सिंथ"
 
 #: js/musicutils.js:749
 #: js/synthutils.js:102
 #.TRANS: simple monotone synthesizer
 msgid "simple 1"
-msgstr ""
+msgstr "सिम्पल 1"
 
 #: js/musicutils.js:750
 msgid "simple 2"
-msgstr ""
+msgstr "सिम्पल 2"
 
 #: js/musicutils.js:751
 msgid "simple 3"
-msgstr ""
+msgstr "सिम्पल 3"
 
 #: js/musicutils.js:752
 msgid "simple 4"
-msgstr ""
+msgstr "सिम्पल 4"
 
 #: js/musicutils.js:754
 #: js/synthutils.js:49
 #.TRANS: brown noise synthesizer
 msgid "brown noise"
-msgstr ""
+msgstr "ब्राउन नॉइज़"
 
 #: js/musicutils.js:755
 #: js/synthutils.js:51
 #.TRANS: pink noise synthesizer
 msgid "pink noise"
-msgstr ""
+msgstr "पिंक नॉइज़"
 
 #: js/musicutils.js:757
 #: js/synthutils.js:127
@@ -6534,197 +6534,197 @@ msgstr ""
 #: js/rhythmruler.js:1925
 #.TRANS: musical instrument
 msgid "snare drum"
-msgstr ""
+msgstr "स्नेयर ड्रम"
 
 #: js/musicutils.js:758
 #: js/synthutils.js:129
 #.TRANS: musical instrument
 msgid "kick drum"
-msgstr ""
+msgstr "किक ड्रम"
 
 #: js/musicutils.js:759
 #: js/synthutils.js:131
 #.TRANS: musical instrument
 msgid "tom tom"
-msgstr ""
+msgstr "टॉम टॉम"
 
 #: js/musicutils.js:760
 #: js/synthutils.js:133
 #.TRANS: musical instrument
 msgid "floor tom"
-msgstr ""
+msgstr "फ्लोर टॉम"
 
 #: js/musicutils.js:761
 #: js/synthutils.js:135
 #.TRANS: musical instrument
 msgid "bass drum"
-msgstr ""
+msgstr "बेस ड्रम"
 
 #: js/musicutils.js:762
 #: js/synthutils.js:137
 #.TRANS: a drum made from an inverted cup
 msgid "cup drum"
-msgstr ""
+msgstr "कप ड्रम"
 
 #: js/musicutils.js:763
 #: js/synthutils.js:139
 #.TRANS: musical instrument
 msgid "darbuka drum"
-msgstr ""
+msgstr "दरबूका ड्रम"
 
 #: js/musicutils.js:764
 #: js/synthutils.js:143
 #.TRANS: musical instrument
 msgid "hi hat"
-msgstr ""
+msgstr "हाई हैट"
 
 #: js/musicutils.js:765
 #: js/synthutils.js:145
 #.TRANS: a small metal bell
 msgid "ride bell"
-msgstr ""
+msgstr "राइड बेल"
 
 #: js/musicutils.js:766
 #: js/synthutils.js:147
 #.TRANS: musical instrument
 msgid "cow bell"
-msgstr ""
+msgstr "काउ बेल"
 
 #: js/musicutils.js:767
 msgid "japanese drum"
-msgstr ""
+msgstr "जापानी ड्रम"
 
 #: js/musicutils.js:768
 #: js/synthutils.js:153
 #.TRANS: musical instrument
 msgid "japanese bell"
-msgstr ""
+msgstr "जापानी बेल"
 
 #: js/musicutils.js:769
 #: js/synthutils.js:149
 #.TRANS: musical instrument
 msgid "triangle bell"
-msgstr ""
+msgstr "त्रिकोण बेल"
 
 #: js/musicutils.js:770
 #: js/synthutils.js:151
 #.TRANS: musical instrument
 msgid "finger cymbals"
-msgstr ""
+msgstr "फिंगर सिम्बल्स"
 
 #: js/musicutils.js:771
 #: js/synthutils.js:155
 #.TRANS: a musically tuned set of bells
 msgid "chime"
-msgstr ""
+msgstr "चाइम"
 
 #: js/musicutils.js:772
 #: js/synthutils.js:157
 #.TRANS: a musical instrument
 msgid "gong"
-msgstr ""
+msgstr "गॉंग"
 
 #: js/musicutils.js:773
 #: js/synthutils.js:159
 #.TRANS: sound effect
 msgid "clang"
-msgstr ""
+msgstr "क्लैंग"
 
 #: js/musicutils.js:774
 #: js/synthutils.js:161
 #.TRANS: sound effect
 msgid "crash"
-msgstr ""
+msgstr "क्रैश"
 
 #: js/musicutils.js:775
 #: js/synthutils.js:163
 #.TRANS: sound effect
 msgid "bottle"
-msgstr ""
+msgstr "बॉटल"
 
 #: js/musicutils.js:776
 #: js/synthutils.js:165
 #.TRANS: sound effect
 msgid "clap"
-msgstr ""
+msgstr "क्लैप"
 
 #: js/musicutils.js:777
 #: js/synthutils.js:167
 #.TRANS: sound effect
 msgid "slap"
-msgstr ""
+msgstr "स्लैप"
 
 #: js/musicutils.js:778
 #: js/synthutils.js:169
 #.TRANS: sound effect
 msgid "splash"
-msgstr ""
+msgstr "स्प्लैश"
 
 #: js/musicutils.js:779
 #: js/synthutils.js:171
 #.TRANS: sound effect
 msgid "bubbles"
-msgstr ""
+msgstr "बबल्स"
 
 #: js/musicutils.js:780
 #: js/synthutils.js:173
 #.TRANS: sound effect
 msgid "raindrop"
-msgstr ""
+msgstr "रेनड्रॉप"
 
 #: js/musicutils.js:781
 #: js/synthutils.js:175
 #.TRANS: animal sound effect
 msgid "cat"
-msgstr ""
+msgstr "बिल्ली"
 
 #: js/musicutils.js:782
 #: js/synthutils.js:177
 #.TRANS: animal sound effect
 msgid "cricket"
-msgstr ""
+msgstr "क्रिकेट"
 
 #: js/musicutils.js:783
 #: js/synthutils.js:179
 #.TRANS: animal sound effect
 msgid "dog"
-msgstr ""
+msgstr "कुत्ता"
 
 #: js/musicutils.js:785
 #: js/synthutils.js:86
 #.TRANS: musical instrument
 msgid "banjo"
-msgstr ""
+msgstr "बैंजो"
 
 #: js/musicutils.js:786
 #: js/synthutils.js:88
 #.TRANS: musical instrument
 msgid "koto"
-msgstr ""
+msgstr "कोतो"
 
 #: js/musicutils.js:787
 #: js/synthutils.js:90
 #.TRANS: musical instrument
 msgid "dulcimer"
-msgstr ""
+msgstr "डल्सिमर"
 
 #: js/musicutils.js:788
 #: js/synthutils.js:92
 #.TRANS: musical instrument
 msgid "electric guitar"
-msgstr ""
+msgstr "इलेक्ट्रिक गिटार"
 
 #: js/musicutils.js:789
 #: js/synthutils.js:94
 #.TRANS: musical instrument
 msgid "bassoon"
-msgstr ""
+msgstr "बैसून"
 
 #: js/musicutils.js:790
 #: js/synthutils.js:96
 #.TRANS: musical instrument
 msgid "celeste"
-msgstr ""
+msgstr "सेलेस्ट"
 
 #: js/musicutils.js:792
 #: js/musicutils.js:1124
@@ -6732,21 +6732,21 @@ msgstr ""
 #: js/temperament.js:650
 #.TRANS: musical temperament
 msgid "equal"
-msgstr ""
+msgstr "इक्वल"
 
 #: js/musicutils.js:794
 #: js/musicutils.js:1126
 #: js/musicutils.js:1134
 #.TRANS: musical temperament
 msgid "Pythagorean"
-msgstr ""
+msgstr "पिथागोरियन"
 
 #: js/musicutils.js:796
 #: js/musicutils.js:1125
 #: js/musicutils.js:1133
 #.TRANS: musical temperament
 msgid "just intonation"
-msgstr ""
+msgstr "जस्ट इंटोनेशन"
 
 #: js/musicutils.js:798
 #: js/musicutils.js:1127
@@ -6755,66 +6755,66 @@ msgstr ""
 #: js/musicutils.js:1136
 #.TRANS: musical temperament
 msgid "meantone"
-msgstr ""
+msgstr "मींटोन"
 
 #: js/musicutils.js:815
 msgid "major 7th"
-msgstr ""
+msgstr "मेजर 7वां"
 
 #: js/musicutils.js:816
 msgid "minor 7th"
-msgstr ""
+msgstr "माइनर 7वां"
 
 #: js/musicutils.js:817
 msgid "dominant 7th"
-msgstr ""
+msgstr "डॉमिनेंट 7वां"
 
 #: js/musicutils.js:818
 msgid "minor-major 7th"
-msgstr ""
+msgstr "माइनर-मेजर 7वां"
 
 #: js/musicutils.js:819
 msgid "fully-diminished 7th"
-msgstr ""
+msgstr "फुली-डिमिनिश 7वां"
 
 #: js/musicutils.js:820
 msgid "half-diminished 7th"
-msgstr ""
+msgstr "हाफ-डिमिनिश 7वां"
 
 #: js/musicutils.js:4380
 #: js/musicutils.js:4417
 msgid "current"
-msgstr ""
+msgstr "वर्तमान"
 
 #: js/musicutils.js:4383
 #: js/musicutils.js:4408
 msgid "next"
-msgstr ""
+msgstr "अगला"
 
 #: js/musicutils.js:4386
 #: js/musicutils.js:4413
 msgid "previous"
-msgstr ""
+msgstr "पिछला"
 
 #: js/synthutils.js:104
 #.TRANS: simple monotone synthesizer
 msgid "simple-2"
-msgstr ""
+msgstr "सिंपल-2"
 
 #: js/synthutils.js:106
 #.TRANS: simple monotone synthesizer
 msgid "simple-3"
-msgstr ""
+msgstr "सिंपल-3"
 
 #: js/synthutils.js:108
 #.TRANS: simple monotone synthesizer
 msgid "simple-4"
-msgstr ""
+msgstr "सिंपल-4"
 
 #: js/synthutils.js:141
 #.TRANS: musical instrument
 msgid "taiko"
-msgstr ""
+msgstr "ताइको"
 
 #: js/modewidget.js:86
 #: js/modewidget.js:88
@@ -6826,12 +6826,12 @@ msgstr ""
 #: js/rhythmruler.js:186
 #: js/rhythmruler.js:1407
 #: js/rhythmruler.js:1409
-#: js/rhythmruler.js:1432
+#: js/rhythmruler.js:1432	
 #: js/rhythmruler.js:1434
 #: js/meterwidget.js:89
 #: js/meterwidget.js:91
 msgid "Play all"
-msgstr ""
+msgstr "सभी बजाएं"
 
 #: js/modewidget.js:115
 #: js/pitchstaircase.js:643
@@ -6844,7 +6844,7 @@ msgstr ""
 #: js/meterwidget.js:124
 #: js/arpeggio.js:103
 msgid "Save"
-msgstr ""
+msgstr "सहेजें"
 
 #: js/modewidget.js:121
 #: js/pitchstaircase.js:688
@@ -6855,19 +6855,19 @@ msgstr ""
 #: js/arpeggio.js:118
 #.TRANS: clear all subdivisions from the ruler.
 msgid "Clear"
-msgstr ""
+msgstr "हटाएं"
 
 #: js/modewidget.js:127
 msgid "Rotate counter clockwise"
-msgstr ""
+msgstr "घड़ी की उल्टी दिशा में घुमाएं"
 
 #: js/modewidget.js:133
 msgid "Rotate clockwise"
-msgstr ""
+msgstr "घड़ी की दिशा में घुमाएं"
 
 #: js/modewidget.js:139
 msgid "Invert"
-msgstr ""
+msgstr "उलटाएं"
 
 #: js/modewidget.js:145
 #: js/pitchstaircase.js:680
@@ -6879,7 +6879,7 @@ msgstr "पूर्ववत् करें"
 #: js/modewidget.js:163
 #.TRANS: A circle of notes represents the musical mode.
 msgid "Click in the circle to select notes for the mode."
-msgstr ""
+msgstr "संगीतिक मोड के लिए नोट्स का चयन करने के लिए वृत्त में क्लिक करें."
 
 #: js/modewidget.js:1017
 #: js/pitchstaircase.js:582
@@ -6890,85 +6890,85 @@ msgstr ""
 #: js/rhythmruler.js:2078
 #: js/tempo.js:407
 msgid "New action block generated!"
-msgstr ""
+msgstr "नया क्रिया ब्लॉक उत्पन्न हुआ!"
 
 #: js/oscilloscope.js:79
 msgid "Zoom In"
-msgstr ""
+msgstr "ज़ूम इन"
 
 #: js/oscilloscope.js:88
 msgid "Zoom Out"
-msgstr ""
+msgstr "ज़ूम आउट"
 
 #: js/pitchstaircase.js:626
 msgid "Play chord"
-msgstr ""
+msgstr "कॉर्ड बजाएं"
 
 #: js/pitchstaircase.js:634
 msgid "Play scale"
-msgstr ""
+msgstr "स्केल बजाएं"
 
 #: js/pitchstaircase.js:698
 msgid "Click on a note to create a new step."
-msgstr ""
+msgstr "नए स्टेप बनाने के लिए नोट पर क्लिक करें."
 
 #: js/phrasemaker.js:363
 msgid "Export"
-msgstr ""
+msgstr "निर्यात करें"
 
 #: js/phrasemaker.js:370
 msgid "Sort"
-msgstr ""
+msgstr "क्रमबद्ध करें"
 
 #: js/phrasemaker.js:373
 #: js/musickeyboard.js:558
 msgid "Add note"
-msgstr ""
+msgstr "नोट जोड़ें"
 
 #: js/phrasemaker.js:764
 msgid "Click on the table to add notes."
-msgstr ""
+msgstr "नोट्स जोड़ने के लिए तालिका पर क्लिक करें."
 
 #: js/phrasemaker.js:2418
 #: js/phrasemaker.js:2547
 msgid "tuplet value"
-msgstr ""
+msgstr "ट्यूपलेट मूल्य"
 
 #: js/help.js:95
 msgid "Take a tour"
-msgstr ""
+msgstr "एक यात्रा करें"
 
 #: js/pitchdrummatrix.js:270
 #: js/pitchdrummatrix.js:639
 msgid "Click in the grid to map notes to drums."
-msgstr ""
+msgstr "ग्रिड में नोट्स को ड्रम्स से मैप करने के लिए क्लिक करें."
 
 #: js/pitchslider.js:103
 msgid "Move up"
-msgstr ""
+msgstr "ऊपर जाएं"
 
 #: js/pitchslider.js:114
 msgid "Move down"
-msgstr ""
+msgstr "नीचे जाएं"
 
 #: js/pitchslider.js:136
 msgid "Click on the slider to create a note block."
-msgstr ""
+msgstr "नोट ब्लॉक बनाने के लिए स्लाइडर पर क्लिक करें."
 
 #: js/temperament.js:215
 msgid "back to 2:1 octave space"
-msgstr ""
+msgstr "2:1 ऑक्टेव स्थान पर वापस जाएं"
 
 #: js/temperament.js:323
 msgid "edit"
-msgstr ""
+msgstr "संपादित करें"
 
 #: js/temperament.js:330
 #: js/temperament.js:332
 #: js/temperament.js:1331
 #: js/temperament.js:1333
 msgid "close"
-msgstr ""
+msgstr "बंद करें"
 
 #: js/temperament.js:423
 #: js/temperament.js:736
@@ -6981,33 +6981,33 @@ msgstr ""
 #: js/temperament.js:1349
 #: js/temperament.js:1425
 msgid "done"
-msgstr ""
+msgstr "किया हुआ"
 
 #: js/temperament.js:477
 #: js/temperament.js:482
 #: js/temperament.js:913
 msgid "ratio"
-msgstr ""
+msgstr "अनुपात"
 
 #: js/temperament.js:483
 msgid "interval"
-msgstr ""
+msgstr "अंतराल"
 
 #: js/temperament.js:611
 msgid "non scalar"
-msgstr ""
+msgstr "गैर स्केलर"
 
 #: js/temperament.js:650
 msgid "ratios"
-msgstr ""
+msgstr "अनुपात"
 
 #: js/temperament.js:650
 msgid "arbitrary"
-msgstr ""
+msgstr "मनमाना"
 
 #: js/temperament.js:719
 msgid "number of divisions"
-msgstr ""
+msgstr "विभाजनों की संख्या"
 
 #: js/temperament.js:741
 #: js/temperament.js:853
