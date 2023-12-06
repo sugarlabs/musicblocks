@@ -7014,27 +7014,27 @@ msgstr "विभाजनों की संख्या"
 #: js/temperament.js:935
 #: js/temperament.js:1028
 msgid "preview"
-msgstr ""
+msgstr "पूर्वावलोकन"
 
 #: js/temperament.js:916
 msgid "recursion"
-msgstr ""
+msgstr "पुनरावर्तन"
 
 #: js/temperament.js:1445
 msgid "The octave ratio has changed. This changes temperament significantly."
-msgstr ""
+msgstr "ऑक्टेव अनुपात बदल गया है। यह स्वभाव को काफी बदल देता है।"
 
 #: js/temperament.js:2082
 msgid "Table"
-msgstr ""
+msgstr "तालिका"
 
 #: js/temperament.js:2180
 msgid "Add pitches"
-msgstr ""
+msgstr "स्वर जोड़ें"
 
 #: js/musickeyboard.js:569
 msgid "Metronome"
-msgstr ""
+msgstr "मेट्रोनोम"
 
 #: js/musickeyboard.js:1295
 #: plugins/rodi.rtp:193
@@ -7044,28 +7044,28 @@ msgstr "अवधि"
 #: js/musickeyboard.js:2964
 #: js/musickeyboard.js:2972
 msgid "MIDI device present."
-msgstr ""
+msgstr "MIDI उपकरण मौजूद है।"
 
 #: js/musickeyboard.js:2975
 msgid "No MIDI device found."
-msgstr ""
+msgstr "कोई MIDI उपकरण नहीं मिला।"
 
 #: js/musickeyboard.js:2980
 msgid "Failed to get MIDI access in browser."
-msgstr ""
+msgstr "ब्राउज़र में MIDI पहुँचने में विफल।"
 
 #: js/rhythmruler.js:199
 msgid "Save rhythms"
-msgstr ""
+msgstr "तालें सहेजें"
 
 #: js/rhythmruler.js:219
 msgid "Save drum machine"
-msgstr ""
+msgstr "ड्रम मशीन सहेजें"
 
 #: js/rhythmruler.js:260
 #.TRANS: user can tap out a rhythm by clicking on a ruler.
 msgid "Tap a rhythm"
-msgstr ""
+msgstr "एक ताल पर टैप करें"
 
 #: js/rhythmruler.js:339
 #: js/rhythmruler.js:341
@@ -7077,11 +7077,11 @@ msgstr ""
 #: js/tempo.js:97
 #: js/tempo.js:99
 msgid "Pause"
-msgstr ""
+msgstr "रुकें"
 
 #: js/rhythmruler.js:475
 msgid "Click on the ruler to divide it."
-msgstr ""
+msgstr "इसे विभाजित करने के लिए रुलर पर क्लिक करें।"
 
 #: js/rhythmruler.js:600
 #: js/rhythmruler.js:602
@@ -7090,299 +7090,299 @@ msgstr ""
 #: js/rhythmruler.js:1383
 #: js/rhythmruler.js:1385
 msgid "tap a rhythm"
-msgstr ""
+msgstr "एक ताल टैप करें"
 
 #: js/rhythmruler.js:1081
 msgid "Maximum value of 256 has been exceeded."
-msgstr ""
+msgstr "256 का अधिकतम मूल्य पार कर गया है।"
 
 #: js/sampler.js:137
 msgid "Warning: Sample is bigger than 1MB."
-msgstr ""
+msgstr "चेतावनी: सैंपल 1MB से बड़ा है।"
 
 #: js/sampler.js:142
 msgid "Upload failed: Sample is not a .wav file."
-msgstr ""
+msgstr "अपलोड विफल: सैंपल .wav फ़ाइल नहीं है।"
 
 #: js/sampler.js:164
 msgid "A new sample block was generated."
-msgstr ""
+msgstr "एक नया सैंपल ब्लॉक उत्पन्न हुआ था।"
 
 #: js/sampler.js:255
 msgid "Upload sample"
-msgstr ""
+msgstr "सैंपल अपलोड करें"
 
 #: js/sampler.js:306
 msgid "Save sample"
-msgstr ""
+msgstr "सैंपल सहेजें"
 
 #: js/sampler.js:697
 #.TRANS: The reference tone is a sound used for comparison.
 msgid "reference tone"
-msgstr ""
+msgstr "संदर्भ स्वर"
 
 #: js/tempo.js:113
 msgid "Save tempo"
-msgstr ""
+msgstr "ताल सहेजें"
 
 #: js/tempo.js:144
 msgid "speed up"
-msgstr ""
+msgstr "तेजी से बढ़ाएं"
 
 #: js/tempo.js:150
 msgid "slow down"
-msgstr ""
+msgstr "धीमे से बढ़ाएं"
 
 #: js/tempo.js:194
 msgid "Adjust the tempo with the buttons."
-msgstr ""
+msgstr "बटन के साथ ताल को समायोजित करें।"
 
 #: js/tempo.js:261
 #: js/tempo.js:264
 msgid "The beats per minute must be between 30 and 1000."
-msgstr ""
+msgstr "प्रति मिनट बीट 30 और 1000 के बीच होना चाहिए।"
 
 #: js/tempo.js:280
 msgid "The beats per minute must be below 1000."
-msgstr ""
+msgstr "प्रति मिनट बीट 1000 के नीचे होना चाहिए।"
 
 #: js/tempo.js:296
 msgid "The beats per minute must be above 30"
-msgstr ""
+msgstr "प्रति मिनट बीट 30 के ऊपर होना चाहिए"
 
 #: js/timbre.js:766
 msgid "Synthesizer"
-msgstr ""
+msgstr "सिंथेसाइज़र"
 
 #: js/timbre.js:789
 msgid "Oscillator"
-msgstr ""
+msgstr "ऑस्सिलेटर"
 
 #: js/timbre.js:840
 msgid "Envelope"
-msgstr ""
+msgstr "एनवेलप"
 
 #: js/timbre.js:886
 #: js/GlobalTag.js:50
 #.TRANS: On the Planet, we use labels to tag projects.
 msgid "Effects"
-msgstr ""
+msgstr "प्रभाव"
 
 #: js/timbre.js:904
 msgid "Filter"
-msgstr ""
+msgstr "फ़िल्टर"
 
 #: js/timbre.js:946
 msgid "Add filter"
-msgstr ""
+msgstr "फ़िल्टर जोड़ें"
 
 #: js/timbre.js:987
 msgid "Click on buttons to open the timbre design tools."
-msgstr ""
+msgstr "टिम्बर डिज़ाइन टूल्स खोलने के लिए बटन पर क्लिक करें।"
 
 #: js/timbre.js:1273
 msgid "harmonicity"
-msgstr ""
+msgstr "सवारी"
 
 #: js/timbre.js:1340
 #: js/timbre.js:1406
 msgid "modulation index"
-msgstr ""
+msgstr "मॉड्यूलेशन सूची"
 
 #: js/timbre.js:1484
 msgid "vibrato amount"
-msgstr ""
+msgstr "वाइब्रेटो मात्रा"
 
 #: js/timbre.js:1919
 msgid "Filter already present."
-msgstr ""
+msgstr "फ़िल्टर पहले से मौजूद है।"
 
 #: js/timbre.js:2322
 msgid "delay (MS)"
-msgstr ""
+msgstr "देरी (मि.से.)"
 
 #: js/timbre.js:2507
 msgid "distortion amount"
-msgstr ""
+msgstr "विकृति मात्रा"
 
 #: js/meterwidget.js:170
 msgid "Reset"
-msgstr ""
+msgstr "रीसेट"
 
 #: js/meterwidget.js:196
 msgid "Click in the circle to select strong beats for the meter."
-msgstr ""
+msgstr "मीटर के लिए मजबूत बीट्स का चयन करने के लिए वृत्त में क्लिक करें।"
 
 #: js/arpeggio.js:239
 msgid "Click in the grid to add steps to the arpeggio."
-msgstr ""
+msgstr "आर्पेजियो में कदम जोड़ने के लिए ग्रिड में क्लिक करें।"
 
 #: js/ProjectStorage.js:243
 msgid "anonymous"
-msgstr ""
+msgstr "अनामक"
 
 #: js/GlobalCard.js:48
 msgid "More Details"
-msgstr ""
+msgstr "अधिक विवरण"
 
 #: js/GlobalCard.js:49
 #: js/SaveInterface.js:34
 msgid "Open in Music Blocks"
-msgstr ""
+msgstr "म्यूजिक ब्लॉक्स में खोलें"
 
 #: js/GlobalCard.js:54
 msgid "Share project"
-msgstr ""
+msgstr "परियोजना साझा करें"
 
 #: js/GlobalCard.js:58
 msgid "Share"
-msgstr ""
+msgstr "साझा करें"
 
 #: js/GlobalCard.js:60
 msgid "Copy link to clipboard"
-msgstr ""
+msgstr "क्लिपबोर्ड पर लिंक कॉपी करें"
 
 #: js/GlobalCard.js:62
 msgid "Flags"
-msgstr ""
+msgstr "फ़्लैग्स"
 
 #: js/GlobalCard.js:63
 msgid "Run project on startup."
-msgstr ""
+msgstr "स्टार्टअप पर परियोजना चलाएं।"
 
 #: js/GlobalCard.js:64
 msgid "Show code blocks on startup."
-msgstr ""
+msgstr "स्टार्टअप पर कोड ब्लॉक्स दिखाएं।"
 
 #: js/GlobalCard.js:65
 msgid "Collapse code blocks on startup."
-msgstr ""
+msgstr "स्टार्टअप पर कोड ब्लॉक्स को संक्षेपित करें।"
 
 #: js/GlobalCard.js:70
 msgid "Advanced Options"
-msgstr ""
+msgstr "उन्नत विकल्प"
 
 #: js/LocalCard.js:36
 msgid "View published project"
-msgstr ""
+msgstr "प्रकाशित परियोजना देखें"
 
 #: js/LocalCard.js:42
 msgid "Publish project"
-msgstr ""
+msgstr "परियोजना प्रकाशित करें"
 
 #: js/LocalCard.js:51
 msgid "Edit project"
-msgstr ""
+msgstr "परियोजना संपादित करें"
 
 #: js/LocalCard.js:52
 msgid "Delete project"
-msgstr ""
+msgstr "परियोजना हटाएं"
 
 #: js/LocalCard.js:53
 msgid "Download project"
-msgstr ""
+msgstr "परियोजना डाउनलोड करें"
 
 #: js/LocalCard.js:55
 msgid "Duplicate project"
-msgstr ""
+msgstr "परियोजना की प्रतिलिपि बनाएं"
 
 #: js/GlobalTag.js:28
 #.TRANS: On the Planet, we use labels to tag projects.
 msgid "All Projects"
-msgstr ""
+msgstr "सभी परियोजनाएं"
 
 #: js/GlobalTag.js:30
 #: js/StringHelper.js:37
 #.TRANS: On the Planet, we use labels to tag projects.
 msgid "My Projects"
-msgstr ""
+msgstr "मेरी परियोजनाएं"
 
 #: js/GlobalTag.js:32
 #.TRANS: On the Planet, we use labels to tag projects.
 msgid "Examples"
-msgstr ""
+msgstr "उदाहरण"
 
 #: js/GlobalTag.js:34
 #.TRANS: On the Planet, we use labels to tag projects.
 msgid "Music"
-msgstr ""
+msgstr "संगीत"
 
 #: js/GlobalTag.js:36
 #.TRANS: On the Planet, we use labels to tag projects.
 msgid "Art"
-msgstr ""
+msgstr "कला"
 
 #: js/GlobalTag.js:38
 #.TRANS: On the Planet, we use labels to tag projects.
 msgid "Math"
-msgstr ""
+msgstr "गणित"
 
 #: js/GlobalTag.js:40
 #.TRANS: On the Planet, we use labels to tag projects.
 msgid "Interactive"
-msgstr ""
+msgstr "इंटरएक्टिव"
 
 #: js/GlobalTag.js:42
 #.TRANS: On the Planet, we use labels to tag projects.
 msgid "Design"
-msgstr ""
+msgstr "डिज़ाइन"
 
 #: js/GlobalTag.js:44
 #.TRANS: On the Planet, we use labels to tag projects.
 msgid "Game"
-msgstr ""
+msgstr "खेल"
 
 #: js/GlobalTag.js:46
 #.TRANS: On the Planet, we use labels to tag projects.
 msgid "Media"
-msgstr ""
+msgstr "मीडिया"
 
 #: js/GlobalTag.js:48
 #.TRANS: On the Planet, we use labels to tag projects.
 msgid "Sensors"
-msgstr ""
+msgstr "सेंसर्स"
 
 #: js/GlobalTag.js:52
 #.TRANS: On the Planet, we use labels to tag projects.
 msgid "Code Snippet"
-msgstr ""
+msgstr "कोड स्निपेट"
 
 #: js/helper.js:149
 #: js/StringHelper.js:49
 msgid "Show more tags"
-msgstr ""
+msgstr "और टैग दिखाएं"
 
 #: js/helper.js:150
 msgid "Show fewer tags"
-msgstr ""
+msgstr "कम टैग दिखाएं"
 
 #: js/ProjectViewer.js:30
 msgid "Error: Report could not be submitted. Try again later."
-msgstr ""
+msgstr "त्रुटि: रिपोर्ट सबमिट नहीं की जा सकी। बाद में पुन: प्रयास करें।"
 
 #: js/ProjectViewer.js:31
 msgid "Thank you for reporting this project. A moderator will review the project shortly, to verify violation of the Sugar Labs Code of Conduct."
-msgstr ""
+msgstr "इस परियोजना की रिपोर्ट करने के लिए धन्यवाद। एक मॉडरेटर जल्दी ही परियोजना की समीक्षा करेगा, ताकि यह सुगर लैब्स कोड ऑफ कंडक्ट का उल्लंघन सत्यापित किया जा सके।"
 
 #: js/ProjectViewer.js:32
 #: js/StringHelper.js:62
 #: js/StringHelper.js:64
 #: js/StringHelper.js:68
 msgid "Report Project"
-msgstr ""
+msgstr "परियोजना की रिपोर्ट करें"
 
 #: js/ProjectViewer.js:33
 #: js/StringHelper.js:63
 msgid "Project Reported"
-msgstr ""
+msgstr "परियोजना की रिपोर्ट की गई"
 
 #: js/ProjectViewer.js:34
 msgid "Report description required"
-msgstr ""
+msgstr "रिपोर्ट विवरण आवश्यक है"
 
 #: js/ProjectViewer.js:35
 msgid "Report description too long"
-msgstr ""
+msgstr "रिपोर्ट विवरण बहुत लंबा है"
 
 #: js/StringHelper.js:30
 msgid "Planet"
@@ -7390,54 +7390,54 @@ msgstr "ग्रह"
 
 #: js/StringHelper.js:31
 msgid "Close Planet"
-msgstr ""
+msgstr "प्लैनेट बंद करें"
 
 #: js/StringHelper.js:32
 msgid "Open project from file"
-msgstr ""
+msgstr "फ़ाइल से परियोजना खोलें"
 
 #: js/StringHelper.js:34
 msgid "Local"
-msgstr ""
+msgstr "स्थानीय"
 
 #: js/StringHelper.js:35
 msgid "Global"
-msgstr ""
+msgstr "वैश्विक"
 
 #: js/StringHelper.js:36
 msgid "Search for a project"
-msgstr ""
+msgstr "परियोजना के लिए खोजें"
 
 #: js/StringHelper.js:38
 msgid "Publish Project"
-msgstr ""
+msgstr "परियोजना प्रकाशित करें"
 
 #: js/StringHelper.js:40
 msgid "Tags (max 5)"
-msgstr ""
+msgstr "टैग (अधिकतम 5)"
 
 #: js/StringHelper.js:41
 #: js/StringHelper.js:61
 msgid "Description"
-msgstr ""
+msgstr "विवरण"
 
 #: js/StringHelper.js:42
 #: js/StringHelper.js:67
 msgid "Submit"
-msgstr ""
+msgstr "सबमिट"
 
 #: js/StringHelper.js:43
 #: js/StringHelper.js:47
 msgid "Cancel"
-msgstr ""
+msgstr "रद्द करें"
 
 #: js/StringHelper.js:44
 msgid "Delete \\"<span id=\\"deleter-title\\"></span>\\"?"
-msgstr ""
+msgstr "\\<span id=\\"deleter-title\\"></span> को हटाएं?"
 
 #: js/StringHelper.js:45
 msgid "Permanently delete project \\"<span id=\\"deleter-name\\"></span>\\"?"
-msgstr ""
+msgstr "क्या आप \\<span id=\\"deleter-name\\"></span> परियोजना को स्थायी रूप से हटाना चाहते हैं?"
 
 #: js/StringHelper.js:46
 msgid "Delete"
@@ -7445,27 +7445,27 @@ msgstr "हटाएं"
 
 #: js/StringHelper.js:48
 msgid "Explore Projects"
-msgstr ""
+msgstr "परियोजनाएं अन्वेषण करें"
 
 #: js/StringHelper.js:50
 msgid "Most recent"
-msgstr ""
+msgstr "सबसे हाल का"
 
 #: js/StringHelper.js:51
 msgid "Most liked"
-msgstr ""
+msgstr "सबसे अधिक पसंद किया गया"
 
 #: js/StringHelper.js:52
 msgid "Most downloaded"
-msgstr ""
+msgstr "सबसे अधिक डाउनलोड किया गया"
 
 #: js/StringHelper.js:53
 msgid "A-Z"
-msgstr ""
+msgstr "A-Z"
 
 #: js/StringHelper.js:54
 msgid "Sort by"
-msgstr ""
+msgstr "क्रमबद्ध करें"
 
 #: js/StringHelper.js:55
 msgid "Load More Projects"
@@ -8035,84 +8035,84 @@ msgstr "'z'दिशा में गतिवान"
 #: plugins/heap.rtp:85
 
 #~msgid "You need to select a file."
-#~msgstr ""
+#~msgstr "आपको एक फ़ाइल का चयन करना होगा."
 
 #: js/activity.js:1618
 
 #~msgid "show treble"
-#~msgstr ""
+#~msgstr "त्रेबल दिखाएं"
 
 #: js/activity.js:1621
 
 #~msgid "hide Polar"
-#~msgstr ""
+#~msgstr "पोलार छुपाएं"
 
 #: js/activity.js:1628
 
 #: js/activity.js:1652
 
 #~msgid "show bass"
-#~msgstr ""
+#~msgstr "बास दिखाएं"
 
 #: js/activity.js:1637
 
 #~msgid "show mezzo-soprano"
-#~msgstr ""
+#~msgstr "मेज़्ज़ो-सोप्रान दिखाएं"
 
 #: js/activity.js:1642
 
 #~msgid "show alto"
-#~msgstr ""
+#~msgstr "आल्टो दिखाएं"
 
 #: js/activity.js:1647
 
 #~msgid "show tenor"
-#~msgstr ""
+#~msgstr "टेनर दिखाएं"
 
 #: js/activity.js:1657
 
 #~msgid "hide bass"
-#~msgstr ""
+#~msgstr "बास छुपाएं"
 
 #: js/activity.js:1664
 
 #~msgid "show Polar"
-#~msgstr ""
+#~msgstr "पोलार दिखाएं"
 
 #: js/activity.js:1668
 
 #~msgid "hide Cartesian"
-#~msgstr ""
+#~msgstr "कार्टीशियन छुपाएं"
 
 #: js/notation.js:296
 
 #~msgid "Lilypond cannot process tempo of "
-#~msgstr ""
+#~msgstr "लिलीपॉंड ताल को प्रोसेस कर नहीं सकता"
 
 #: js/SaveInterface.js:283
 
 #~msgid "Save as PDF"
-#~msgstr ""
+#~msgstr "पीडीएफ में सहेजें"
 
 #: js/lilypond.js:263
 
 #~msgid "Lilypond ignoring mode"
-#~msgstr ""
+#~msgstr "लिलीपॉंड मोड को नज़रअंदाज़ कर रहा है"
 
 #: js/oscilloscope.js:49
 
 #~msgid "ZOOM IN"
-#~msgstr ""
+#~msgstr "ज़ूम इन"
 
 #: js/oscilloscope.js:61
 
 #~msgid "ZOOM OUT"
-#~msgstr ""
+#~msgstr "ज़ूम आउट"
 
 #: js/palette.js:1188
 
 #~msgid "Click to select a block."
-#~msgstr ""
+#~msgstr "ब्लॉक का चयन करने के लिए क्लिक करें।"
 
 #: js/palette.js:1205
 
@@ -8123,14 +8123,14 @@ msgstr "'z'दिशा में गतिवान"
 #: js/palette.js:1239
 
 #~msgid "hide"
-#~msgstr ""
+#~msgstr "छुपाएं"
 
 #: js/palette.js:1214
 
 #: js/palette.js:1217
 
 #~msgid "show2"
-#~msgstr ""
+#~msgstr "दिखाएं"
 
 #: js/palette.js:1222
 
@@ -8141,22 +8141,22 @@ msgstr "'z'दिशा में गतिवान"
 #: js/palette.js:1253
 
 #~msgid "popout"
-#~msgstr ""
+#~msgstr "पॉपआउट"
 
 #: js/palette.js:2423
 
 #~msgid "myblocks"
-#~msgstr ""
+#~msgstr "मेरे ब्लॉक्स"
 
 #: js/SaveInterface.js:504
 
 #~msgid "Do you want to save your project?"
-#~msgstr ""
+#~msgstr "क्या आप अपनी परियोजना को सहेजना चाहते हैं?"
 
 #: js/DrumBlocks.js:416
 
 #~msgid "Drum Block: Did you mean to use a Note block?"
-#~msgstr ""
+#~msgstr "ड्रम ब्लॉक: क्या आपने नोट ब्लॉक का इस्तेमाल करने का इरादा किया है?"
 
 #: js/pitchtracker.js:181
 
@@ -8167,7 +8167,7 @@ msgstr "'z'दिशा में गतिवान"
 #: js/pitchtracker.js:210
 
 #~msgid "Start Recording"
-#~msgstr ""
+#~msgstr "रिकॉर्डिंग शुरू करें"
 
 #: js/pitchtracker.js:188
 
@@ -8176,22 +8176,22 @@ msgstr "'z'दिशा में गतिवान"
 #: js/pitchtracker.js:224
 
 #~msgid "Stop Recording"
-#~msgstr ""
+#~msgstr "रिकॉर्डिंग बंद करें"
 
 #: js/pitchtracker.js:312
 
 #~msgid "save rhythms"
-#~msgstr ""
+#~msgstr "लयें सहेजें"
 
 #: js/pitchtracker.js:475
 
 #~msgid "drag"
-#~msgstr ""
+#~msgstr "खींचें"
 
 #: js/PitchBlocks.js:934
 
 #~msgid "Pitch Block: Did you mean to use a Note block?"
-#~msgstr ""
+#~msgstr "पिच ब्लॉक: क्या आपने नोट ब्लॉक का इस्तेमाल करने का इरादा किया है?"
 
 #: js/EnsembleBlocks.js:295
 
@@ -8201,225 +8201,225 @@ msgstr "'z'दिशा में गतिवान"
 #: js/SensorsBlocks.js:195
 
 #~msgid "The Click block returns True if a mouse has been clicked."
-#~msgstr ""
+#~msgstr "क्लिक ब्लॉक एक माउस को क्लिक किया गया है तो सत्य लौटाता है।"
 
 #: js/BoxesBlocks.js:318
 
 #~msgid "The box2 block returns the value stored in box2."
-#~msgstr ""
+#~msgstr "बॉक्स2 ब्लॉक बॉक्स2 में स्टोर किए गए मूल्य को लौटाता है।"
 
 #: js/BoxesBlocks.js:365
 
 #~msgid "The box1 block returns the value stored in box1."
-#~msgstr ""
+#~msgstr "बॉक्स1 ब्लॉक उस वैल्यू को लौटाता है जो बॉक्स1 में स्टोर किया गया है।"
 
 #: js/activity.js:2054
 
 #~msgid "Hide blocks."
-#~msgstr ""
+#~msgstr "ब्लॉक छुपाएं।"
 
 #: js/activity.js:3319
 
 #~msgid "Cannot be further decreased"
-#~msgstr ""
+#~msgstr "और भी कम किया जा सकता है नहीं"
 
 #: js/activity.js:3327
 
 #~msgid "Cannot be further increased"
-#~msgstr ""
+#~msgstr "और भी बढ़ाया जा सकता है नहीं"
 
 #: js/activity.js:4263
 
 #~msgid "Error: Unable to save because you ran out of local storage. Try deleting some saved projects."
-#~msgstr ""
+#~msgstr "त्रुटि: सहेजने में असमर्थ क्योंकि आपके स्थानीय संग्रहण से बाहर हो गए हैं। कुछ सहेजी गई परियोजनाओं को हटाने का प्रयास करें।"
 
 #: js/logo.js:386
 
 #~msgid "Turning off mouse blink; setting FPS to 10."
-#~msgstr ""
+#~msgstr "माउस ब्लिंक बंद; FPS को 10 पर सेट कर रहा है।"
 
 #: js/logo.js:391
 
 #~msgid "Turning on mouse blink; setting FPS to 30."
-#~msgstr ""
+#~msgstr "माउस ब्लिंक शुरू; FPS को 30 पर सेट कर रहा है।"
 
 #: js/logo.js:4764
 
 #~msgid "Scalar transpositions are equal to Semitone transpositions for custom temperament."
-#~msgstr ""
+#~msgstr "स्केलर ट्रांसपोजिशन्स कस्टम टेम्परमेंट के लिए सीमिटोन ट्रांसपोजिशन्स के बराबर हैं।"
 
 #: js/logo.js:8405
 
 #~msgid "You can only tie notes of the same pitch. Did you mean to use slur?"
-#~msgstr ""
+#~msgstr "आप सिर्फ एक ही पिच के नोट्स को बांध सकते हैं। क्या आपने स्लर का उपयोग करने का इरादा किया है?"
 
 #: js/logo.js:8794
 
 #~msgid "Warning: Note value is greater than 2."
-#~msgstr ""
+#~msgstr "चेतावनी: नोट मूल्य 2 से अधिक है।"
 
 #: js/logo.js:11589
 
 #~msgid "Note name must be one of A, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ or A♭."
-#~msgstr ""
+#~msgstr "नोट नाम A, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ या A♭ में से एक होना चाहिए।"
 
 #: js/palette.js:2009
 
 #: js/palette.js:2066
 
 #~msgid "Do you want to remove all the stacks from your \"%s\" palette?"
-#~msgstr ""
+#~msgstr "\"%s\" पैलेट से सभी स्टैक्स को हटाना चाहते हैं?"
 
 #: js/turtledefs.js:204
 
 #~msgid "This button opens a viewer for sharing projects and for finding example projects."
-#~msgstr ""
+#~msgstr "यह बटन परियोजनाओं को साझा करने और उदाहरण परियोजनाएं खोजने के लिए एक दर्शक खोलता है।"
 
 #: js/turtledefs.js:257
 
 #~msgid "Click this button to expand or collapse the auxiliary toolbar."
-#~msgstr ""
+#~msgstr "सहायक टूलबार को विस्तारित या संकुचित करने के लिए इस बटन पर क्लिक करें।"
 
 #: js/turtledefs.js:286
 
 #~msgid "The beat of the music is determined by the Meter block (by default, 4 1/4 notes per measure)."
-#~msgstr ""
+#~msgstr "संगीत की ताल मीटर ब्लॉक द्वारा निर्धारित की जाती है (डिफ़ॉल्ट रूप से, प्रति माप में 4 1/4 नोट्स)
 
 #: js/turtledefs.js:287
 
 #~msgid "The Master beats per minute block sets the number of 1/4 notes per minute for every voice."
-#~msgstr ""
+#~msgstr "मास्टर प्रति मिनट बीट्स ब्लॉक हर आवाज के लिए प्रति मिनट 1/4 नोट्स की संख्या सेट करता है।"
 
 #: js/turtledefs.js:288
 
 #~msgid "The Beats per minute block sets the number of 1/4 notes per minute."
-#~msgstr ""
+#~msgstr "प्रति मिनट 1/4 नोट्स की संख्या सेट करने के लिए बीट्स प्रति मिनट ब्लॉक।"
 
 #: js/turtledefs.js:289
 
 #~msgid "The On-every-note block let you specify actions to take on every note."
-#~msgstr ""
+#~msgstr "हर नोट पर क्रियाएँ निर्दिष्ट करने के लिए हर-नोट ब्लॉक का उपयोग करें।"
 
 #: js/turtledefs.js:291
 
 #~msgid "The Notes played block is the number of notes that have been played."
-#~msgstr ""
+#~msgstr "प्लेयर्ड नोट्स ब्लॉक में वह नोट्स की संख्या है जो बजा चुके हैं।"
 
 #: js/turtledefs.js:296
 
 #~msgid "The Pitch Number block will play a pitch associated by its number eg 0 for C and 7 for G."
-#~msgstr ""
+#~msgstr "पिच नंबर ब्लॉक एक नंबर से संबंधित पिच बजाएगा, जैसे कि 0 से C और 7 से G।"
 
 #: js/turtledefs.js:328
 
 #~msgid "The Pitch-slider block opens a tool to generate arbitray pitches."
-#~msgstr ""
+#~msgstr "पिच-स्लाइडर ब्लॉक एक उपकरण खोलता है जिससे विविध पिच उत्पन्न किए जा सकते हैं।"
 
 #: js/turtledefs.js:343
 
 #~msgid "All of the Start blocks run at the same time when the Play button is pressed."
-#~msgstr ""
+#~msgstr "सभी स्टार्ट ब्लॉक्स एक साथ चलते हैं जब प्ले बटन दबाया जाता है।"
 
 #: js/turtledefs.js:346
 
 #~msgid "In the example, it is used with the One of block to choose a random phase."
-#~msgstr ""
+#~msgstr "उदाहरण में, यह वन ऑफ ब्लॉक के साथ एक यादृच्छिक चरण चयन करने के लिए उपयोग किया गया है।"
 
 #: js/turtledefs.js:348
 
 #~msgid "The Store in box1 block is used to store a value in box1."
-#~msgstr ""
+#~msgstr "बॉक्स1 में मूल्य स्टोर करने के लिए स्टोर इन बॉक्स1 ब्लॉक का उपयोग किया जाता है।"
 
 #: js/turtledefs.js:350
 
 #~msgid "The Store in box2 block is used to store a value in box2."
-#~msgstr ""
+#~msgstr "बॉक्स2 में मूल्य स्टोर करने के लिए स्टोर इन बॉक्स2 ब्लॉक का उपयोग किया जाता है।"
 
 #: js/turtledefs.js:389
 
 #~msgid "The Shell block is used to change the appearance of the mouse."
-#~msgstr ""
+#~msgstr "शैल ब्लॉक का उपयोग माउस के रूप को बदलने के लिए किया जाता है।"
 
 #: js/turtledefs.js:414
 
 #~msgid "The Pickup block is used to accommodate any notes that come in before the beat."
-#~msgstr ""
+#~msgstr "पिकअप ब्लॉक उसी बीट से पहले आने वाली किसी भी नोट्स को समर्थित करने के लिए किया जाता है।"
 
 #: js/turtledefs.js:415
 
 #~msgid "The Beats per minute block changes the beats per minute of any contained notes."
-#~msgstr ""
+#~msgstr "बीट्स प्रति मिनट ब्लॉक निहित किए गए किसी भी नोट्स की प्रति मिनट बीट्स को बदलता है।"
 
 #: js/turtledefs.js:416
 
 #~msgid "The On-strong-beat block let you specify actions to take on specified beats."
-#~msgstr ""
+#~msgstr "ओन-स्ट्रॉन्ग-बीट ब्लॉक आपको निर्दिष्ट बीट्स पर कार्रवाईयाँ निर्दिष्ट करने की अनुमति देता है।"
 
 #: js/turtledefs.js:417
 
 #~msgid "The On-weak-beat block let you specify actions to take on weak (off) beats."
-#~msgstr ""
+#~msgstr "ओन-वीक-बीट ब्लॉक आपको कमजोर (बंद) बीट्स पर कार्रवाईयाँ निर्दिष्ट करने की अनुमति देता है।"
 
 #: js/turtledefs.js:418
 
 #~msgid "The No clock block decouples the notes from the master clock."
-#~msgstr ""
+#~msgstr "नो क्लॉक ब्लॉक नोट्स को मास्टर क्लॉक से अलग करता है।"
 
 #: js/turtledefs.js:419
 
 #~msgid "The Whole notes played block returns the total number of whole notes played."
-#~msgstr ""
+#~msgstr "व्होल नोट्स प्लेड ब्लॉक प्लेड हुई संपूर्ण नोट्स की कुल संख्या लौटाता है।"
 
 #: js/turtledefs.js:439
 
 #~msgid "eg \"do\" is always \"C-natural\"); when Movable do is true, the solfege note names are assigned to scale degrees (\"do\" is always the first degree of the major scale)."
-#~msgstr ""
+#~msgstr " "
 
 #: js/turtledefs.js:459
 
 #~msgid "The Note volume block returns the current volume of the current synthesizer."
-#~msgstr ""
+#~msgstr "नोट वॉल्यूम ब्लॉक वर्तमान सिंथाइज़र की वर्तमान आवाज़ को लौटाता है।"
 
 #: js/turtledefs.js:479
 
 #~msgid "The Default block is used inside of a Switch to define a default action."
-#~msgstr ""
+#~msgstr "डिफ़ॉल्ट ब्लॉक एक स्विच के अंदर एक डिफ़ॉल्ट क्रिया को परिभाषित करने के लिए उपयोग किया जाता है।"
 
 #: js/turtledefs.js:573
 
 #~msgid "The Mouse note block returns the current note value being played by the specified mouse."
-#~msgstr ""
+#~msgstr "माउस नोट ब्लॉक निर्दिष्ट माउस द्वारा बजाए जा रहे होते हुए वर्तमान नोट मूल्य को लौटाता है।"
 
 #: js/basicblocks.js:2352
 
 #: js/basicblocks.js:2363
 
 #~msgid "down minor"
-#~msgstr ""
+#~msgstr "माइनर के लिए नीचे"
 
 #: js/basicblocks.js:2418
 
 #: js/basicblocks.js:2429
 
 #~msgid "down major"
-#~msgstr ""
+#~msgstr "मेजर के लिए नीचे"
 
 #: js/basicblocks.js:3713
 
 #~msgid "eval"
-#~msgstr ""
+#~msgstr "मूल्यांकन"
 
 #: js/basicblocks.js:4057
 
 #~msgid "100"
-#~msgstr ""
+#~msgstr "100"
 
 #: js/basicblocks.js:5143
 
 #: js/basicblocks.js:5159
 
 #~msgid "Music Blocks"
-#~msgstr ""
+#~msgstr "संगीत ब्लॉक्स"
 
 #: js/playback.js:87
 
@@ -8436,7 +8436,7 @@ msgstr "'z'दिशा में गतिवान"
 #: js/modewidget.js:132
 
 #~msgid "Drag"
-#~msgstr ""
+#~msgstr "खींचें"
 
 #: js/playbackbox.js:83
 
@@ -8560,24 +8560,24 @@ msgstr "'z'दिशा में गतिवान"
 #: js/turtledefs.js:132
 
 #~msgid "Initialise a new project."
-#~msgstr ""
+#~msgstr "नई परियोजना को प्रारंभ करें।"
 
 #: js/turtledefs.js:29
 
 #: js/musicutils.js:339
 
 #~msgid "japanese"
-#~msgstr ""
+#~msgstr "जापानी"
 
 #: js/block.js:1312
 
 #~msgid "7th"
-#~msgstr ""
+#~msgstr "7वा"
 
 #: js/basicblocks.js:2440
 
 #~msgid "chord' + ' ' + 'V"
-#~msgstr ""
+#~msgstr "कॉर्ड' + ' ' + 'V"
 
 #: js/musicutils.js:345
 
@@ -8586,7 +8586,7 @@ msgstr "'z'दिशा में गतिवान"
 #: js/macros.js:38
 
 #~msgid "chine"
-#~msgstr ""
+#~msgstr "चीन"
 
 #: js/timbre.js:743
 
@@ -8597,86 +8597,86 @@ msgstr "'z'दिशा में गतिवान"
 #: js/pitchstaircase.js:534
 
 #~msgid "undo"
-#~msgstr ""
+#~msgstr "पूर्ववत"
 
 #: js/basicblocks.js:2464
 
 #~msgid "chord' + ' ' + 'I"
-#~msgstr ""
+#~msgstr "कॉर्ड' + ' ' + 'I"
 
 #: js/StringHelper.js:22
 
 #~msgid "placeholder"
-#~msgstr ""
+#~msgstr "प्लेसहोल्डर"
 
 #: js/turtledefs.js:436
 
 #~msgid "The <em>Move block</em> block moves a block."
-#~msgstr ""
+#~msgstr "<em>मूव ब्लॉक</em> ब्लॉक एक ब्लॉक को मूव करता है।"
 
 #: js/turtledefs.js:327
 
 #: js/turtledefs.js:329
 
 #~msgid "The <em>Accidental</em> block is used to create <em>sharps</em> and <em>flats</em>"
-#~msgstr ""
+#~msgstr "<em>एक्सीडेंटल</em> ब्लॉक का उपयोग <em>शार्प्स</em> और <em>फ्लैट्स</em> बनाने के लिए किया जाता "
 
 #: js/turtledefs.js:430
 
 #~msgid "The <em>Hide blocks</em> block hides the blocks."
-#~msgstr ""
+#~msgstr "<em>ब्लॉक छुपाएं</em> ब्लॉक छुपाता है।"
 
 #: js/turtledefs.js:378
 
 #~msgid "The <em>Waitfor</em> block will wait until the condition is true."
-#~msgstr ""
+#~msgstr "<em>वेटफॉर</em> ब्लॉक तब तक प्रतीति सत्य नहीं हो जाती है जब तक प्रतीति सत्य नहीं होती है।"
 
 #: js/basicblocks.js:3142
 
 #: js/basicblocks.js:3151
 
 #~msgid "set volume"
-#~msgstr ""
+#~msgstr "आवाज़ सेट करें"
 
 #: js/turtledefs.js:366
 
 #~msgid "The <em>Play noise</em> block will generate white, pink, or brown noise."
-#~msgstr ""
+#~msgstr "<em>प्ले नॉयज़</em> ब्लॉक सफेद, पिंक, या भूरा शोर उत्पन्न करेगा।"
 
 #: js/turtledefs.js:441
 
 #~msgid "The <em>Bezier</em> block draws a Bezier curve."
-#~msgstr ""
+#~msgstr "<em>बेज़ियर</em> ब्लॉक एक बेज़ियर कर्व ड्रॉ करता है।"
 
 #: plugins/impact.rtp:32
 
 #~msgid "hours ago"
-#~msgstr ""
+#~msgstr "घंटे पहले"
 
 #: js/musicutils.js:243
 
 #~msgid "Major Blues"
-#~msgstr ""
+#~msgstr "मेजर ब्लूज़"
 
 #: js/turtledefs.js:273
 
 #~msgid "The <em>Back</em> block moves the mouse backward."
-#~msgstr ""
+#~msgstr "<em>बैक</em> ब्लॉक माउस को पीछे की ओर मूव करता है।"
 
 #: js/turtledefs.js:307
 
 #~msgid "The <em>Set-name</em> block is used to name a mouse."
-#~msgstr ""
+#~msgstr "<em>सेट-नाम</em> ब्लॉक का उपयोग माउस का नाम रखने के लिए किया जाता है।"
 
 #: js/turtledefs.js:231
 
 #~msgid "The <em>Status</em> block opens a tool for inspecting the status of Music Blocks as it is running."
-#~msgstr ""
+#~msgstr "<em>स्टेटस</em> ब्लॉक संगीत ब्लॉक्स के स्थिति की जाँच करने के लिए एक उपकरण खोलता है जब यह चलरहा"
 
 #: js/pitchstaircase.js:480
 
 #~msgid "play scale"
-#~msgstr ""
+#~msgstr "स्केल बजाएं"
 
 #~msgid "This toolbar contains the palette buttons Matrix, Note, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
 #~msgstr ""
@@ -8684,7 +8684,7 @@ msgstr "'z'दिशा में गतिवान"
 #: js/turtledefs.js:326
 
 #~msgid "The <em>Beats per minute</em> block returns the current beats per minute."
-#~msgstr ""
+#~msgstr "<em>प्रति मिनट बीट्स</em> ब्लॉक वर्तमान प्रति मिनट बीट्स को लौटाता है।"
 
 #: js/turtledefs.js:222
 
@@ -8699,24 +8699,24 @@ msgstr "'z'दिशा में गतिवान"
 #: js/musicutils.js:229
 
 #~msgid "Enigmatic"
-#~msgstr ""
+#~msgstr "एनिग्मेटिक"
 
 #: js/basicblocks.js:612
 
 #~msgid "fifths"
-#~msgstr ""
+#~msgstr "पाँचवा"
 
 #: js/lilypond.js:21
 
 #~msgid "ml"
-#~msgstr ""
+#~msgstr "एमएल"
 
 #: js/palette.js:1771
 
 #: js/palette.js:1796
 
 #~msgid "mi"
-#~msgstr ""
+#~msgstr "मी"
 
 #: js/turtledefs.js:251
 
@@ -8725,39 +8725,39 @@ msgstr "'z'दिशा में गतिवान"
 #: js/turtledefs.js:390
 
 #~msgid "The <em>Do</em> block is used to initiate an action."
-#~msgstr ""
+#~msgstr "<em>डू</em> ब्लॉक का उपयोग क्रिया प्रारंभ करने के लिए किया जाता है।"
 
 #: js/turtledefs.js:422
 
 #~msgid "The Indexheap block returns a value in the heap at a specified location."
-#~msgstr ""
+#~msgstr "इंडेक्सहीप ब्लॉक निर्दिष्ट स्थान पर हीप में एक मूल्य लौटाता है।"
 
 #: js/turtledefs.js:284
 
 #~msgid "The <em>Pen-up</em> block raises the pen so that it does not draw."
-#~msgstr ""
+#~msgstr "<em>पेन-अप</em> ब्लॉक पेन को उठाता है ताकि यह चित्रित नहीं करता है।"
 
 #: js/turtledefs.js:473
 
 #~msgid "The <em>New mouse</em> block will create a new mouse."
-#~msgstr ""
+#~msgstr "<em>न्यू माउस</em> ब्लॉक एक नया माउस बनाएगा।"
 
 #: js/activity.js:4353
 
 #~msgid "playback"
-#~msgstr ""
+#~msgstr "प्लेबैक"
 
 #: js/activity.js:4435
 
 #: js/activity.js:4470
 
 #~msgid "Merge project from file"
-#~msgstr ""
+#~msgstr "फ़ाइल से परियोजना को मर्ज करें"
 
 #: js/turtledefs.js:299
 
 #~msgid "The <em>Left</em> block returns the position of the left of the canvas."
-#~msgstr ""
+#~msgstr "<em>बाएं</em> ब्लॉक कैनवास के बाएं की स्थिति को लौटाता है।"
 
 #~msgid "eatme"
 #~msgstr "मुझे खाओ"
@@ -8765,7 +8765,7 @@ msgstr "'z'दिशा में गतिवान"
 #: js/turtledefs.js:323
 
 #~msgid "The <em>Whole notes played</em> block returns the total number of whole notes played."
-#~msgstr ""
+#~msgstr "<em>प्लेड हुई पूरी नोट्स</em> ब्लॉक पूरी बजी हुई नोट्स की कुल संख्या लौटाता है।"
 
 #: js/basicblocks.js:1946
 
@@ -9171,160 +9171,160 @@ msgstr "'z'दिशा में गतिवान"
 #: js/basicblocks.js:505
 
 #~msgid "pitchslider"
-#~msgstr ""
+#~msgstr "पिच स्लाइडर"
 
 #: js/StringHelper.js:35
 
 #~msgid "View More"
-#~msgstr ""
+#~msgstr "और देखें"
 
 #: js/pitchtimematrix.js:305
 
 #: js/rhythmruler.js:1625
 
 #~msgid "collpase"
-#~msgstr ""
+#~msgstr "संक्षेपित"
 
 #: js/turtledefs.js:498
 
 #~msgid "The Heap-empty? block returns true if the heap is emptry."
-#~msgstr ""
+#~msgstr "हीप-खाली? ब्लॉक हाँ लाएगा अगर हीप खाली है।"
 
 #: js/musicutils.js:253
 
 #~msgid "Fibonacci"
-#~msgstr ""
+#~msgstr "फाइबोनाची"
 
 #: js/activity.js:4425
 
 #~msgid "Run music slowly"
-#~msgstr ""
+#~msgstr "धीरे से संगीत चलाएं"
 
 #: js/turtledefs.js:447
 
 #~msgid "The <em>Set translucency</em> block changes the opacity of the pen."
-#~msgstr ""
+#~msgstr "ट्रांसलूसेंसी सेट करने वाले ब्लॉक पेन की अपारदर्शिता को बदलता है।"
 
 #: js/turtledefs.js:200
 
 #~msgid "The <em>Pitch</em> block specifies the pitch name and pitch octave of a note that determine the frequency of the note."
-#~msgstr ""
+#~msgstr "<em>पिच</em> ब्लॉक नोट की आवृत्ति तथा आवृत्ति के ऑक्टेव को निर्धारित करता है जो नोट की आवृत्ति को निर्धारित करता है।"
 
 #: js/turtledefs.js:218
 
 #~msgid "The <em>Staccato</em> block shortens the length of the actual note—making them tighter bursts—while maintaining the specified rhythmic value of the notes."
-#~msgstr ""
+#~msgstr "<em>स्टेकाटो</em> ब्लॉक वास्तविक नोट की लंबाई को कम करता है—इससे वे जोरदार बर्स्ट बनते हैं—जबकि नोट की निर्धारित ताल मूल्य को बनाए रखता है।"
 
 #: js/pitchslider.js:402
 
 #~msgid "Use the slider to change the pitch."
-#~msgstr ""
+#~msgstr "पिच बदलने के लिए स्लाइडर का उपयोग करें।"
 
 #: js/turtledefs.js:300
 
 #~msgid "The <em>Right</em> block returns the position of the right of the canvas."
-#~msgstr ""
+#~msgstr "<em>राइट</em> ब्लॉक कैनवास के दाएं हिस्से की स्थिति लौटाता है।"
 
 #: js/turtledefs.js:226
 
 #~msgid "The <em>Set synth volume</em> block will change the volume of a particular synth, e.g., guitar, violin, snare drum, etc. The default volume is 50; the range is 0 (silence) to 100 (full volume)."
-#~msgstr ""
+#~msgstr "<em>सेट सिंथ वॉल्यूम</em> ब्लॉक किसी विशिष्ट सिंथ के वॉल्यूम को बदलेगा, जैसे कि गिटार, वायलिन, स्नेयर ड्रम, आदि। डिफ़ॉल्ट वॉल्यूम 50 है; सीमा 0 (शांति) से 100 (पूर्ण वॉल्यूम) है।"
 
 #: js/turtledefs.js:224
 
 #~msgid "The <em>Crescendo</em> block will increase the volume of the contained notes by a specified amount for every note played. For example, if you have 7 notes in sequence contained in a <em>Crescendo</em> block with a value of 5, the final note will be at 35% more than the starting volume."
-#~msgstr ""
+#~msgstr "<em>क्रेशेंडो</em> ब्लॉक हर बजाए गए हर नोट के लिए निर्धारित मात्रा से आवृत्ति बढ़ाएगा। उदाहरण के लिए, यदि आपके पास एक <em>क्रेशेंडो</em> ब्लॉक के साथ 5 के मूल्य के साथ एक क्रम में 7 नोट हैं, तो अंतिम नोट प्रारंभ वॉल्यूम से 35% अधिक होगा।"
 
 #: js/basicblocks.js:3078
 
 #~msgid "note volume"
-#~msgstr ""
+#~msgstr "नोट वॉल्यूम"
 
 #: js/synthutils.js:92
 
 #~msgid "finger-cymbals"
-#~msgstr ""
+#~msgstr "उँगली झनझनी"
 
 #: js/basicblocks.js:489
 
 #~msgid "pitch-drum matrix"
-#~msgstr ""
+#~msgstr "पिच-ड्रम मैट्रिक्स"
 
 #: js/logo.js:6101
 
 #: js/logo.js:6125
 
 #~msgid "Tuplet Block: Did you mean to use a Matrix block?"
-#~msgstr ""
+#~msgstr "टुपलेट ब्लॉक: क्या आपने मैट्रिक्स ब्लॉक का उपयोग करना चाहा था?"
 
 #~msgid "set beats per minute"
-#~msgstr ""
+#~msgstr "मिनट प्रति बीट सेट करें"
 
 #: js/activity.js:3887
 
 #~msgid "Delete all"
-#~msgstr "सब मिटाइए"
+#~msgstr "सभी मिटाएं"
 
 #: js/turtledefs.js:29
 
 #: js/synthutils.js:48
 
 #~msgid "pink-noise"
-#~msgstr ""
+#~msgstr "गुलाबी शोर"
 
 #: plugins/impact.rtp:32
 
 #~msgid "UID"
-#~msgstr ""
+#~msgstr "यूआईडी"
 
 #: js/musicutils.js:197
 
 #~msgid "Chromatic"
-#~msgstr ""
+#~msgstr "क्रोमैटिक"
 
 #: js/modewidget.js:83
 
 #~msgid "rotate clockwise"
-#~msgstr ""
+#~msgstr "घड़ी की दिशा में घूमाएं"
 
 #: js/turtledefs.js:29
 
 #: js/musicutils.js:334
 
 #~msgid "hirajoshi (Japan)"
-#~msgstr ""
+#~msgstr "हिराजोशी (जापान)"
 
 #: js/logo.js:5040
 
 #: js/logo.js:5061
 
 #~msgid "Input to Minor Block must be 2, 3, 6, or 7"
-#~msgstr ""
+#~msgstr "माइनर ब्लॉक के लिए इनपुट 2, 3, 6, या 7 होना चाहिए"
 
 #: js/basicblocks.js:4432
 
 #~msgid "bottom"
-#~msgstr ""
+#~msgstr "नीचे"
 
 #: js/turtledefs.js:213
 
 #~msgid "The <em>Set key</em> block is used to set the key and mode, e.g., <em>C Major</em>"
-#~msgstr ""
+#~msgstr "<em>सेट की</em> ब्लॉक का उपयोग कुंजी और मोड़ सेट करने के लिए किया जाता है, उदाहरण के लिए,"
 
 #: js/turtledefs.js:313
 
 #~msgid "The <em>Multiply note value</em> block changes the duration of notes by changing their note values."
-#~msgstr ""
+#~msgstr "<em>नोट मूल्य को गुणा करें</em> ब्लॉक नोट के मूल्य को बदलकर नोट की अवधि को बदलता है।"
 
 #: js/turtledefs.js:280
 
 #~msgid "The <em>Y</em> block returns the vertical position of the mouse."
-#~msgstr ""
+#~msgstr "<em>वाई</em> ब्लॉक माउस की ऊर्ध्वाधिक स्थिति लौटाता है।"
 
 #: js/basicblocks.js:831
 
 #~msgid "numerator"
-#~msgstr ""
+#~msgstr "नुमरेटर"
 
 #: js/synthutils.js:80
 
@@ -9390,114 +9390,114 @@ msgstr "'z'दिशा में गतिवान"
 #: js/turtledefs.js:28
 
 #~msgid "Music Blocks is a collection of manipulative tools for exploring fundamental musical concepts in an integrative and fun way."
-#~msgstr ""
+#~msgstr "म्यूज़िक ब्लॉक्स एक मनिपुलेटिव टूल का संग्रह है जो सुंदर और मजेदार तरीके से मौसिकी के मौलिक अवधारणाओं की खोज करने के लिए बनाया गया है।"
 
 #: js/palette.js:1682
 
 #~msgid "la"
-#~msgstr ""
+#~msgstr "ला"
 
 #: plugins/rodi.rtp:203
 
 #~msgid "see distance"
-#~msgstr ""
+#~msgstr "दूरी देखें"
 
 #: js/turtledefs.js:374
 
 #~msgid "The <em>Tuplet</em> block is used to generate a group of notes played in a condensed amount of time."
-#~msgstr ""
+#~msgstr "<em>टुप्लेट</em> ब्लॉक का उपयोग संक्षेपित समय में बजाए जाने वाले नोट्स के समूह को उत्पन्न करने के लिए किया जाता है।"
 
 #: js/turtledefs.js:459
 
 #~msgid "The Switch block will run the code in the matchin Case."
-#~msgstr ""
+#~msgstr "स्विच ब्लॉक में कोड को मैचिंग केस में चलाया जाएगा।"
 
 #: js/basicblocks.js:1457
 
 #~msgid "relative interval"
-#~msgstr ""
+#~msgstr "सांगतिक अंतर"
 
 #: js/turtledefs.js:199
 
 #~msgid "The <em>Beats per minute</em> block sets the number of 1/4 notes per minute."
-#~msgstr ""
+#~msgstr "<em>मिनट प्रति बीट</em> ब्लॉक मिनट में 1/4 नोट्स की संख्या सेट करता है।"
 
 #: js/turtledefs.js:296
 
 #~msgid "The <em>Width</em> block returns the width of the canvas."
-#~msgstr ""
+#~msgstr "<em>विड्थ</em> ब्लॉक कैनवास की चौड़ाई लौटाता है।"
 
 #: js/turtledefs.js:110
 
 #: js/turtledefs.js:148
 
 #~msgid "Stop the music (and the turtles)."
-#~msgstr ""
+#~msgstr "संगीत को रोकें (और कछुए भी)।"
 
 #: js/synthutils.js:78
 
 #~msgid "floor-tom-tom"
-#~msgstr ""
+#~msgstr "फ्लोर टॉम-टॉम"
 
 #: js/turtledefs.js:312
 
 #~msgid "The <em>Tie</em> block works on pairs of notes, combining them into one note."
-#~msgstr ""
+#~msgstr "<em>टाई</em> ब्लॉक नोट्स के जोड़ों पर काम करता है, उन्हें एक नोट में मिलाकर।"
 
 #: js/turtledefs.js:205
 
 #~msgid "Pitch can be specified in terms of <em>do re mi fa sol la ti<em>."
-#~msgstr ""
+#~msgstr "पिच <em>दो रे मि फा सोल ला टी</em> की शर्तों में निर्दिष्ट की जा सकती है।"
 
 #: js/turtledefs.js:292
 
 #~msgid "The <em>Show</em> block is used to display text or images on the canvas."
-#~msgstr ""
+#~msgstr "<em>शो</em> ब्लॉक का उपयोग कैनवास पर टेक्स्ट या छवियां प्रदर्शित करने के लिए किया जाता है।"
 
 #: js/turtledefs.js:450
 
 #~msgid "The <em>Background</em> block sets the background color."
-#~msgstr ""
+#~msgstr "<em>बैकग्राउंड</em> ब्लॉक बैकग्राउंड का रंग सेट करता है।"
 
 #: js/basicblocks.js:298
 
 #~msgid "turtle note"
-#~msgstr ""
+#~msgstr "कछुआ नोट"
 
 #: js/turtledefs.js:79
 
 #~msgid "This toolbar contains the palette buttons, including Rhythm Pitch Tone Turtle and more."
-#~msgstr ""
+#~msgstr "इस टूलबार में पैलेट बटन्स शामिल हैं, जिनमें रिदम पिच टोन कछुआ और अधिक शामिल हैं।"
 
 #: js/turtledefs.js:376
 
 #~msgid "The <em>While</em> block will repeat while the condition is true."
-#~msgstr ""
+#~msgstr "<em>व्हाइल</em> ब्लॉक यदि स्थिति सत्य है तो दोहराएगा।"
 
 #: js/turtledefs.js:264
 
 #~msgid "The <em>Minus</em> block is used to subtract."
-#~msgstr ""
+#~msgstr "<em>माइनस</em> ब्लॉक का उपयोग घटाने के लिए किया जाता है।"
 
 #: js/savebox.js:159
 
 #~msgid "block artwork"
-#~msgstr ""
+#~msgstr "ब्लॉक कला"
 
 #: js/turtledefs.js:222
 
 #~msgid "The <em>Neighbor</em> block rapidly switches between neighboring pitches."
-#~msgstr ""
+#~msgstr "<em>नेबर</em> ब्लॉक बड़े तेजी से पड़ोसी पिचेज़ के बीच स्विच करता है।"
 
 #: js/turtledefs.js:353
 
 #~msgid "The <em>Distortion</em> block adds distortion to the pitch."
-#~msgstr ""
+#~msgstr "<em>डिस्टोर्शन</em> ब्लॉक पिच में डिस्टोर्शन जोड़ता है।"
 
 #: js/lilypond.js:21
 
-#~msgid "br"
-#~msgstr ""
+#~msgid "br" 
+#~msgstr "ब्र"
 
 #: js/block.js:1306
 
@@ -9692,19 +9692,19 @@ msgstr "'z'दिशा में गतिवान"
 #: js/musicutils.js:335
 
 #~msgid "in (Japan)"
-#~msgstr ""
+#~msgstr "में (जापान)"
 
 #: js/turtledefs.js:165
 
 #~msgid "Alternatively, you can hit the ENTER or RETURN key."
-#~msgstr ""
+#~msgstr "वैकल्पिक रूप से, आप ENTER या RETURN कुंजी दबा सकते हैं।"
 
 #: js/turtledefs.js:218
 
 #: js/turtledefs.js:350
 
 #~msgid "The <em>Set timbre</em> block selects a voice for the synthesizer, e.g., guitar, piano, violin, or cello."
-#~msgstr ""
+#~msgstr "<em>सेट टिम्बर</em> ब्लॉक संथेसाइज़र के लिए एक आवाज़ का चयन करता है, जैसे कि गिटार, पियानो, वायलिन, या चेलो।"
 
 #: js/turtledefs.js:21
 
@@ -9716,94 +9716,94 @@ msgstr "'z'दिशा में गतिवान"
 #: js/turtledefs.js:480
 
 #~msgid "The <em>Y mouse</em> block returns the Y position of the specified mouse."
-#~msgstr ""
+#~msgstr "<em>Y माउस</em> ब्लॉक निर्दिष्ट माउस की Y स्थिति लौटाता है।"
 
 #: js/turtledefs.js:29
 
 #: js/musicutils.js:336
 
 #~msgid "minyo (Japan)"
-#~msgstr ""
+#~msgstr "मिन्यो (जापान)"
 
 #: plugins/impact.rtp:124
 
 #~msgid "Impact Time not found."
-#~msgstr ""
+#~msgstr "प्रभाव समय नहीं मिला।"
 
 #: js/turtledefs.js:319
 
 #~msgid "The <em>Beats per minute</em> block changes the beats per minute of any contained notes."
-#~msgstr ""
+#~msgstr "<em>मिनट प्रति बीट</em> ब्लॉक किसी भी शामिल नोट्स की मिनट प्रति बीट बदलता है।"
 
 #: js/turtledefs.js:485
 
 #~msgid "The <em>Stop mouse</em> block stops the specified mouse."
-#~msgstr ""
+#~msgstr "<em>माउस को रोकें</em> ब्लॉक निर्दिष्ट माउस को रोकता है।"
 
 #: js/block.js:1308
 
 #~msgid "3rd"
-#~msgstr ""
+#~msgstr "तीसरा"
 
 #: js/turtledefs.js:383
 
 #~msgid "The <em>Duplicate</em> block will run each block multiple times. The output of the example is: Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol."
-#~msgstr ""
+#~msgstr "<em>डुप्लीकेट</em> ब्लॉक प्रत्येक ब्लॉक को कई बार चलाएगा। उदाहरण का आउटपुट है: सोल, सोल, सोल, सोल, रे, रे, रे, रे, सोल, सोल, सोल, सोल।"
 
 #: js/turtledefs.js:348
 
 #~msgid "The <em>Doubly</em> block will double the size of an interval."
-#~msgstr ""
+#~msgstr "<em>डबली</em> ब्लॉक किसी अंतराल का आकार दोगुना करेगा।"
 
 #: js/turtledefs.js:435
 
 #~msgid "The <em>Run block</em> block runs a block."
-#~msgstr ""
+#~msgstr "<em>रन ब्लॉक</em> ब्लॉक चलाता है।"
 
 #: js/basicblocks.js:510
 
 #~msgid "play forward"
-#~msgstr ""
+#~msgstr "आगे बजाएं"
 
 #: js/musicutils.js:308
 
 #~msgid "basse"
-#~msgstr ""
+#~msgstr "बैस"
 
 #: js/turtledefs.js:208
 
 #~msgid "The <em>Hertz</em> block (in combination with a <em>Number</em> block) will play a sound at the specified frequency."
-#~msgstr ""
+#~msgstr "<em>हर्ट्ज़</em> ब्लॉक (नंबर ब्लॉक के साथ मेलजोल करके) निर्दिष्ट ताक़त पर एक ध्वनि बजाएगा।"
 
 #: js/turtledefs.js:219
 
 #~msgid "The <em>Staccato</em> block shortens the length of the actual note while maintaining the specified rhythmic value of the notes."
-#~msgstr ""
+#~msgstr "<em>स्टाकाटो</em> ब्लॉक वास्तविक नोट की लंबाई को कम करता है जबकि नोट्स की निर्दिष्ट रैद्ऱीमिक मूल्य को बनाए रखता है।"
 
 #: js/turtledefs.js:465
 
 #~msgid "The <em>To ASCII</em> block converts numbers to letters."
-#~msgstr ""
+#~msgstr "<em>टू एसीआई</em> ब्लॉक नंबर्स को अक्षरों में बदलता है।"
 
 #: js/turtledefs.js:214
 
 #~msgid "The <em>Mode length</em> block is the number of notes in the current scale. Most <em>Western</em> scales have 7 notes."
-#~msgstr ""
+#~msgstr "<em>मोड लंबाई</em> ब्लॉक मौजूदा स्केल में नोट्स की संख्या है। अधिकांश <em>पश्चिमी</em> स्केल्स में 7 नोट्स होते हैं।"
 
 #: js/turtledefs.js:258
 
 #~msgid "The <em>Add-1-to<em> block adds one to the value stored in a box."
-#~msgstr ""
+#~msgstr "<em>1 जोड़ने के लिए</em> ब्लॉक एक बॉक्स में संग्रहित मूल्य में एक जोड़ता है।"
 
 #: js/basicblocks.js:579
 
 #~msgid "440 hertz"
-#~msgstr ""
+#~msgstr "440 हर्ट्ज़"
 
 #: js/turtledefs.js:277
 
 #~msgid "The <em>Set XY</em> block moves the mouse to a specific position on the screen."
-#~msgstr ""
+#~msgstr "<em>सेट एक्स वाई</em> ब्लॉक माउस को स्क्रीन पर एक विशिष्ट स्थान पर मूव करता है।"
 
 #: js/utilitybox.js:153
 
@@ -9849,74 +9849,74 @@ msgstr "'z'दिशा में गतिवान"
 #: js/turtledefs.js:23
 
 #~msgid "Music Blocks is a collection of tools for exploring musical concepts."
-#~msgstr ""
+#~msgstr "म्यूज़िक ब्लॉक्स एक संगीत संदर्भों का अन्वेषण करने के लिए उपकरणों का संग्रह है।"
 
 #: js/logo-test.js:9708
 
 #~msgid "Cannot read pixel color"
-#~msgstr ""
+#~msgstr "पिक्सेल रंग पढ़ा नहीं जा सकता"
 
 #: js/turtledefs.js:235
 
 #~msgid "The <em>Rhythm Ruler</em> block opens a tool to create drum machines."
-#~msgstr ""
+#~msgstr "<em>रिदम रूलर</em> ब्लॉक एक उपकरण खोलता है जिससे ड्रम मशीन बनाई जा सकती है।"
 
 #: js/turtledefs.js:401
 
 #~msgid "The <em>Sqrt</em> block returns the square root."
-#~msgstr ""
+#~msgstr "<em>वर्गमूल</em> ब्लॉक वर्गमूल लौटाता है।"
 
 #: js/turtledefs.js:324
 
 #~msgid "The <em>Note counter</em> block can be used to count the number of contained notes."
-#~msgstr ""
+#~msgstr "<em>नोट काउंटर</em> ब्लॉक का उपयोग शामिल नोट्स की संख्या को गिनने के लिए किया जा सकता है।"
 
 #: js/turtledefs.js:419
 
 #~msgid "The <em>Heap empty?</em> block returns true if the heap is emptry."
-#~msgstr ""
+#~msgstr "<em>हीप खाली है?</em> ब्लॉक सच है लौटाता है अगर हीप खाली है।"
 
 #: js/musicutils.js:213
 
 #~msgid "Lydian"
-#~msgstr ""
+#~msgstr "लिडियन"
 
 #: js/turtledefs.js:368
 
 #~msgid "The <em>Noise name</em> block is used to select a noise synthesizer."
-#~msgstr ""
+#~msgstr "<em>नॉइज़ नाम</em> ब्लॉक एक शोर सिंथेसाइज़र का चयन करने के लिए उपयोग होता है।"
 
 #: js/turtledefs.js:371
 
 #~msgid "The <em>Pitch drum matrix</em> is used to map pitches to drum sounds."
-#~msgstr ""
+#~msgstr "<em>पिच ड्रम मैट्रिक्स</em> पिच को ड्रम साउंड्स से मैप करने के लिए उपयोग होता है।"
 
 #: js/turtledefs.js:311
 
 #~msgid "The <em>Dot</em> block extends the duration of a note by 50%. E.g., a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat."
-#~msgstr ""
+#~msgstr "<em>डॉट</em> ब्लॉक एक नोट की अवधि को 50% बढ़ाता है। उदाहरण के लिए, डॉटेड क्वार्टर नोट 3/8 (1/4 + 1/8) बीट के लिए बजेगा।"
 
 #: js/turtledefs.js:256
 
 #~msgid "The <em>box2</em> returns the value stored on <em>box2</em>."
-#~msgstr ""
+#~msgstr "<em>बॉक्स2</em> में संग्रहित मूल्य को लौटाता है।"
 
 #: js/turtledefs.js:213
 
 #~msgid "The Pitch Number block will play a pitch associated by its number, e.g, 1 for C, 7 for G."
-#~msgstr ""
+#~msgstr "पिच नंबर ब्लॉक एक पिच को इसके नंबर से जोड़ता है, उदाहरण के लिए, C के लिए 1, G के लिए 7।"
 
 #: js/turtledefs.js:29
 
 #: js/musicutils.js:285
 
 #~msgid "harmonic-major"
-#~msgstr ""
+#~msgstr "हारमोनिक-मेजर"
 
 #: js/activity.js:4385
 
 #~msgid "Auxillary menu"
-#~msgstr ""
+#~msgstr "सहायक मेन्यू"
 
 #: js/samplesviewer.js:75
 
@@ -9928,22 +9928,22 @@ msgstr "'z'दिशा में गतिवान"
 #: js/activity.js:3327
 
 #~msgid "Turtle Blocks"
-#~msgstr ""
+#~msgstr "टर्टल ब्लॉक्स"
 
 #: js/turtledefs.js:411
 
 #~msgid "The <em>Push</em> block adds a value to the top of the heap."
-#~msgstr ""
+#~msgstr "<em>पुश</em> ब्लॉक हीप के शीर्ष पर एक मूल्य जोड़ता है।"
 
 #: js/musicutils.js:236
 
 #~msgid "Romanian Minor"
-#~msgstr ""
+#~msgstr "रोमानियन माइनर"
 
 #: js/turtledefs.js:251
 
 #~msgid "In the example, it is used with the <em>One of</em> block to choose a random phase."
-#~msgstr ""
+#~msgstr "उदाहरण में, इसका उपयोग <em>वन ऑफ</em> ब्लॉक के साथ एक यादृच्छिक चरण का चयन करने के लिए किया जाता है।"
 
 #: js/activity.js:2433
 
@@ -9952,7 +9952,7 @@ msgstr "'z'दिशा में गतिवान"
 #: js/activity.js:2459
 
 #~msgid "untitled"
-#~msgstr ""
+#~msgstr "अभिनामक"
 
 #: js/samplesviewer.js:700
 
@@ -9962,41 +9962,41 @@ msgstr "'z'दिशा में गतिवान"
 #: js/turtledefs.js:320
 
 #~msgid "E.g., a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat."
-#~msgstr ""
+#~msgstr "उदाहरण के लिए, डॉटेड क्वार्टर नोट 3/8 (1/4 + 1/8) बीट के लिए बजेगा।"
 
 #: js/activity.js:3743
 
 #: js/activity.js:3759
 
 #~msgid "long press to run slowly"
-#~msgstr ""
+#~msgstr "धीरे चलाने के लिए लंबा दबाएं"
 
 #: js/turtledefs.js:430
 
 #~msgid "The Save heap to app block saves the heap to a web page."
-#~msgstr ""
+#~msgstr "सेव हीप टू एप ब्लॉक हीप को एक वेब पेज पर सहेजता है।"
 
 #: js/basicblocks.js:1370
 
 #~msgid "pluck"
-#~msgstr ""
+#~msgstr "चुटकुला"
 
 #: js/turtledefs.js:476
 
 #~msgid "The <em>Mouse note</em> block returns the current note value being played by the specified mouse."
-#~msgstr ""
+#~msgstr "<em>माउस नोट</em> ब्लॉक निर्दिष्ट माउस द्वारा बजाए जा रहे वर्तमान नोट मूल्य लौटाता है।"
 
 #: js/turtledefs.js:219
 
 #~msgid "The <em>Slur</em> block lengthens the sustain of notes—running longer than the noted duration and blending it into the next note—while maintaining the specified rhythmic value of the notes."
-#~msgstr ""
+#~msgstr "<em>स्लर</em> ब्लॉक नोट्स के सस्टेन को बढ़ाता है—उचित अवधि से लंबा चलता है और इसे अगले नोट में मिश्रित करता है—जबकि नोट्स के निर्दिष्ट तालमय मूल्य को बनाए रखता है।"
 
 #: js/basicblocks.js:1545
 
 #: js/basicblocks.js:1550
 
 #~msgid "on weak beat"
-#~msgstr ""
+#~msgstr "कमजोर बीट पर"
 
 #: js/turtledefs.js:322
 
@@ -10183,165 +10183,165 @@ msgstr "'z'दिशा में गतिवान"
 #: js/musicutils.js:289
 
 #~msgid "harmonic-minor"
-#~msgstr ""
+#~msgstr "हार्मोनिक-माइनर"
 
 #: js/turtledefs.js:241
 
 #~msgid "For example, if you have 7 notes in sequence contained in a Decrescendo block with a value of 5, the final note will be at 35% less than the starting volume."
-#~msgstr ""
+#~msgstr "उदाहरण के लिए, यदि आपके पास 5 के मूल्य के साथ एक डेक्रेसेंडो ब्लॉक में शामिल 7 सिरे में नोट हैं, तो अंतिम नोट प्रारंभ ध्वनि से 35% कम होगा।"
 
 #: js/turtledefs.js:268
 
 #~msgid "The <em>Greater-than</em> block returns <em>True</em> if the top number is greater than the bottom number."
-#~msgstr ""
+#~msgstr "<em>ग्रेटर-थैन</em> ब्लॉक लौटाता है <em>सत्य</em> अगर शीर्ष संख्या निचली संख्या से अधिक है।"
 
 #: js/turtledefs.js:257
 
 #~msgid "The <em>Add-to</em> block is used to add to the value stored in a box. It can also be used with other blocks, such as <em>Color</em>, <em>Pen-size</em>. etc."
-#~msgstr ""
+#~msgstr "<em>एड-टू</em> ब्लॉक का उपयोग बॉक्स में संग्रहित मूल्य में जोड़ने के लिए किया जाता है। इसे <em>कलर</em>, <em>पेन-साइज</em> आदि के साथ भी उपयोग किया जा सकता है।"
 
 #: js/turtledefs.js:423
 
 #~msgid "The Reverseheap block reverses the order of the heap."
-#~msgstr ""
+#~msgstr "रिवर्सहीप ब्लॉक हीप के क्रम को उलटा देता है।"
 
 #: js/turtledefs.js:262
 
 #~msgid "The <em>One-of</em> block returns one of two choices."
-#~msgstr ""
+#~msgstr "<em>वन ऑफ</em> ब्लॉक दो विकल्पों में से एक लौटाता है।"
 
 #: js/musicutils.js:221
 
 #~msgid "Locrian"
-#~msgstr ""
+#~msgstr "लोक्रियन"
 
 #: js/turtledefs.js:445
 
 #~msgid "The <em>Set hue</em> block changes the color of the pen."
-#~msgstr ""
+#~msgstr "<em>सेट ह्यू</em> ब्लॉक पेन के रंग को बदलता है।"
 
 #: js/turtledefs.js:396
 
 #: js/turtledefs.js:397
 
 #~msgid "The <em>Store in</em> block will store a value in a box."
-#~msgstr ""
+#~msgstr "<em>स्टोर इन</em> ब्लॉक एक बॉक्स में मूल्य संग्रहित करेगा।"
 
 #: js/activity.js:3524
 
 #~msgid "Save as .svg"
-#~msgstr ""
+#~msgstr ".svg के रूप में सहेजें"
 
 #: js/musicutils.js:241
 
 #~msgid "Blues"
-#~msgstr ""
+#~msgstr "ब्लूज़"
 
 #: js/turtledefs.js:152
 
 #: js/turtledefs.js:198
 
 #~msgid "You can type \"d\" to create a \"do\" block, \"r\" to create a \"re\" block, etc."
-#~msgstr ""
+#~msgstr "आप टाइप कर सकते हैं \"d\" और \"do\" ब्लॉक बनाने के लिए, \"r\" और \"re\" ब्लॉक बनाने के लिए, आदि।"
 
 #: plugins/impact.rtp:69
 
 #~msgid "Cannot parse Impact data."
-#~msgstr ""
+#~msgstr "इम्पैक्ट डेटा को पार्स नहीं किया जा सकता।"
 
 #: js/turtledefs.js:233
 
 #~msgid "e.g., guitar, violin, snare drum, etc."
-#~msgstr ""
+#~msgstr "उदाहरण के लिए, गिटार, वायलिन, स्नेयर ड्रम, आदि।"
 
 #: js/turtledefs.js:238
 
 #~msgid "The <em>Tempo</em> block opens a metronome to visualize the beat."
-#~msgstr ""
+#~msgstr "<em>टेम्पो</em> ब्लॉक एक मेट्रोनोम को खोलता है ताकत को दृष्टिगत करने के लिए।"
 
 #: js/turtledefs.js:332
 
 #~msgid "The <em>Invert</em> block rotates any contained notes around a target note."
-#~msgstr ""
+#~msgstr "<em>इनवर्ट</em> ब्लॉक किसी भी शामिल नोट्स को एक लक्ष्य नोट के चारों ओर घुमाता है।"
 
 #: plugins/impact.rtp:32
 
 #~msgid "field"
-#~msgstr ""
+#~msgstr "क्षेत्र"
 
 #: js/lilypond.js:21
 
 #~msgid "m"
-#~msgstr ""
+#~msgstr "मी"
 
 #: js/turtledefs.js:200
 
 #~msgid "The <em>On-every-beat</em> block let you specify actions to take on every beat."
-#~msgstr ""
+#~msgstr "<em>ऑन-एवरी-बीट</em> ब्लॉक आपको प्रत्येक बीट पर करने के लिए क्रियाएं निर्दिष्ट करने की अनुमति देता है।"
 
 #: js/SaveInterface.js:24
 
 #~msgid "For more information, please consult the <a href=\"https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md\" target=\"_blank\">Music Blocks guide</a>."
-#~msgstr ""
+#~msgstr "और अधिक जानकारी के लिए, कृपया <a href=\"https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md\" target=\"_blank\">Music Blocks गाइड</a> की सलाह लें।"
 
 #: js/lilypond.js:21
 
 #~msgid "rs"
-#~msgstr ""
+#~msgstr "रे"
 
 #: js/turtledefs.js:305
 
 #~msgid "The <em>Click</em> block returns <em>True</em> if a mouse has been clicked."
-#~msgstr ""
+#~msgstr "<em>क्लिक</em> ब्लॉक एक माउस क्लिक किया गया है तो <em>सत्य</em> लौटाता है।"
 
 #: plugins/impact.rtp:100
 
 #: plugins/impact.rtp:114
 
 #~msgid "Impact field not found."
-#~msgstr ""
+#~msgstr "इम्पैक्ट फील्ड नहीं मिला।"
 
 #: js/lilypond.js:21
 
 #~msgid "gs"
-#~msgstr ""
+#~msgstr "जी"
 
 #: js/musicutils.js:217
 
 #~msgid "Minor"
-#~msgstr ""
+#~msgstr "माइनर"
 
 #: js/utilitybox.js:172
 
 #~msgid " "
-#~msgstr ""
+#~msgstr " "
 
 #: js/musicutils.js:227
 
 #~msgid "Byzantine"
-#~msgstr ""
+#~msgstr "बिजंटाइन"
 
 #: js/musicutils.js:223
 
 #~msgid "Jazz Minor"
-#~msgstr ""
+#~msgstr "जैज़ माइनर"
 
 #: js/turtledefs.js:251
 
 #~msgid "The <em>Do</em> block is used to initiate an action. In the example, it is used with the <em>One of</em> block to choose a random phase."
-#~msgstr ""
+#~msgstr "<em>डू</em> ब्लॉक का उपयोग क्रिया की शुरुआत के लिए किया जाता है। उदाहरण में, इसका उपयोग <em>वन ऑफ</em> ब्लॉक के साथ एक यादृच्छिक चरण का चयन करने के लिए किया जाता है।"
 
 #: js/toolbar.js:372
 
 #: js/toolbar.js:420
 
 #~msgid "Save as HTML"
-#~msgstr ""
+#~msgstr "HTML के रूप में सहेजें"
 
 #: js/basicblocks.js:1156
 
 #~msgid "on beat"
-#~msgstr ""
+#~msgstr "बीट पर"
 
 #: js/activity.js:3857
 
@@ -10354,7 +10354,7 @@ msgstr "'z'दिशा में गतिवान"
 #: js/turtledefs.js:156
 
 #~msgid "Load project from files"
-#~msgstr ""
+#~msgstr "फ़ाइल से परियोजना लोड करें"
 
 #: js/turtledefs.js:216
 
@@ -10742,137 +10742,137 @@ msgstr "'z'दिशा में गतिवान"
 #: js/logo.js:3384
 
 #~msgid "Note value must be greater than 0"
-#~msgstr ""
+#~msgstr "नोट मूल्य 0 से अधिक होना चाहिए"
 
 #: js/turtledefs.js:236
 
 #~msgid "<em>Tuplets</em> are a collection of notes that get scaled to a specific duration. Using tuplets makes it easy to create groups of notes that are not based on a power of 2."
-#~msgstr ""
+#~msgstr "<em>टुपलेट्स</em> विशिष्ट अवधि के लिए मापित होने वाले नोट का संग्रह हैं। टुपलेट्स का उपयोग करके 2 की शक्ति पर आधारित नहीं होने वाले नोटों के समूह बनाना आसान होता है।"
 
 #: js/basicblocks.js:1398
 
 #~msgid "pitch-time matrix"
-#~msgstr ""
+#~msgstr "पिच-टाइम मैट्रिक्स"
 
 #: js/turtledefs.js:233
 
 #~msgid "eg guitar, violin, snare drum, etc."
-#~msgstr ""
+#~msgstr "उदा., गिटार, वायलिन, स्नेयर ड्रम, आदि."
 
 #: js/turtledefs.js:347
 
 #~msgid "The <em>Scalar interval</em> block measures the distance between two notes in semi-tones."
-#~msgstr ""
+#~msgstr "<em>स्कैलर इंटरवल</em> ब्लॉक दो नोट्स के बीच की दूरी को सेमी-टोन में मापता है।"
 
 #: js/turtledefs.js:144
 
 #~msgid "Long press the run button to run the project in slow mode."
-#~msgstr ""
+#~msgstr "प्रोजेक्ट को धीमे मोड में चलाने के लिए रन बटन को लंबे समय तक दबाएं।"
 
 #: js/turtledefs.js:339
 
 #~msgid "The <em>Set pitch number offset</em> block is used to set the offset for mapping pitch numbers to pitch and octave."
-#~msgstr ""
+#~msgstr "<em>पिच नंबर ऑफसेट सेट करें</em> ब्लॉक का उपयोग पिच और ऑक्टेव को मैप करने के लिए ऑफसेट सेट करने के लिए किया जाता है।"
 
 #: js/turtledefs.js:188
 
 #~msgid "Show or hide a polar-coordinate grid."
-#~msgstr "ध्रुवीय समन्वय ग्रिड दिखाएँ या छिपाएं"
+#~msgstr "एक पोलर-संयोजन ग्रिड दिखाएं या छिपाएं।"
 
 #: js/turtledefs.js:344
 
 #~msgid "It can also be used with other blocks, such as Color, Pen-size."
-#~msgstr ""
+#~msgstr "इसे कलर, पेन-साइज आदि के साथ भी उपयोग किया जा सकता है।"
 
 #: js/samplesviewer.js:80
 
 #~msgid "Copy this link to share your project."
-#~msgstr ""
+#~msgstr "अपनी परियोजना साझा करने के लिए इस लिंक को कॉपी करें।"
 
 #: js/turtledefs.js:111
 
 #: js/turtledefs.js:149
 
 #~msgid "Clear the screen and return the turtles to their initial positions."
-#~msgstr "स्क्रीन साफ़ करके टर्टल को प्रारम्भिक स्थान पर लौटाएं"
+#~msgstr "स्क्रीन को साफ करें और कछुओं को उनके प्रारंभिक स्थानों पर लौटाएं।"
 
 #: js/turtledefs.js:254
 
 #~msgid "The <em>box1</em> returns the value stored on <em>box1</em>."
-#~msgstr ""
+#~msgstr "<em>बॉक्स1</em> वह मूल्य लौटाता है जो <em>बॉक्स1</em> पर संग्रहित है।"
 
 #: js/logo.js:3705
 
 #~msgid "The Step Pitch Block must be used inside of a Note Block."
-#~msgstr ""
+#~msgstr "स्टेप पिच ब्लॉक का उपयोग नोट ब्लॉक के अंदर करना चाहिए।"
 
 #: plugins/rodi.rtp:30
 
 #~msgid "blink (ms)"
-#~msgstr ""
+#~msgstr "ब्लिंक (मि.से.)"
 
 #: js/turtledefs.js:360
 
 #~msgid "The <em>Duo synth</em> block is a duo-frequency modulator used to define a timbre."
-#~msgstr ""
+#~msgstr "<em>ड्यूओ सिंथ</em> ब्लॉक एक ड्यूओ-फ्रीक्वेंसी मॉड्युलेटर है जिसका उपयोग एक टिम्बर को परिभाषित करने के लिए किया जाता है।"
 
 #~msgid "begin hollow line"
-#~msgstr ""
+#~msgstr "शुरू करें होलो रेखा"
 
 #: js/musicutils.js:232
 
 #~msgid "Geez"
-#~msgstr ""
+#~msgstr "गीज"
 
 #~msgid "Rhythm Block: Did you mean to use a Note block?"
-#~msgstr ""
+#~msgstr "रिदम ब्लॉक: क्या आपने एक नोट ब्लॉक का उपयोग करने का इरादा किया है?"
 
 #: js/turtledefs.js:260
 
 #: js/turtledefs.js:261
 
 #~msgid "In this example, if the mouse button is pressed, a snare drum will play."
-#~msgstr ""
+#~msgstr "इस उदाहरण में, अगर माउस बटन दबाया जाता है, तो एक स्नेयर ड्रम बजेगा।"
 
 #: js/turtledefs.js:77
 
 #~msgid "This toolbar contains the palette buttons Matrix, Notes, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-#~msgstr ""
+#~msgstr "इस टूलबार में मैट्रिक्स, नोट्स, टोन, टर्टल, और अन्य के पैलेट बटन होते हैं। ब्लॉक के पैलेट दिखाने के लिए क्लिक करें और कैनवास पर ब्लॉक खींचें ताकि आप उन्हें उपयोग कर सकें।"
 
 #: js/turtledefs.js:434
 
 #~msgid "The <em>Dock block</em> block connections two blocks."
-#~msgstr ""
+#~msgstr "<em>डॉक ब्लॉक</em> ब्लॉक दो ब्लॉक्स कनेक्ट करता है।"
 
 #: js/turtledefs.js:203
 
 #~msgid "The <em>Step pitch</em> block (in combination with a <em>Number</em> block) will play the next pitch in a scale, e.g., if the last note played was <em>sol</em>, <em>Step pitch 1</em> will play <em>la</em>."
-#~msgstr ""
+#~msgstr "<em>स्टेप पिच</em> ब्लॉक (एक <em>नंबर</em> ब्लॉक के साथ संयोजन करके) एक स्केल में अगले पिच को बजाएगा, उदाहरण के लिए, यदि आखिरी नोट जो बजाई गई थी <em>सोल</em> थी, तो <em>स्टेप पिच 1</em> <em>ला</em> बजाएगा।"
 
 #: js/turtledefs.js:245
 
 #~msgid "The <em>Backward</em> block runs code in reverse order (Musical retrograde)."
-#~msgstr ""
+#~msgstr "<em>बैकवर्ड</em> ब्लॉक कोड को उल्टी क्रम में चलाता है (संगीत रेट्रोग्रेड)।"
 
 #: js/basicblocks.js:583
 
 #~msgid "deprecated note value"
-#~msgstr ""
+#~msgstr "पुराना नोट मूल्य"
 
 #: js/musicutils.js:226
 
 #~msgid "Arabic"
-#~msgstr ""
+#~msgstr "अरबी"
 
 #: js/turtledefs.js:259
 
 #~msgid "In this example, a simple drum machine, a kick drum will play 1/4 notes forever."
-#~msgstr ""
+#~msgstr "इस उदाहरण में, एक साधारित ड्रम मशीन, एक किक ड्रम हमेशा के लिए 1/4 नोट बजाएगी।"
 
 #: js/logo.js:6824
 
 #~msgid "Hertz Block: Did you mean to use a Note block3?"
-#~msgstr ""
+#~msgstr "हर्ट्ज ब्लॉक: क्या आपने एक नोट ब्लॉक का उपयोग करने का इरादा किया है?"
 
 #: js/turtledefs.js:29
 
@@ -11186,12 +11186,12 @@ msgstr "'z'दिशा में गतिवान"
 #: js/musicutils.js:247
 
 #~msgid "Chinese"
-#~msgstr ""
+#~msgstr "चीनी"
 
 #: js/turtledefs.js:165
 
 #~msgid "Play music"
-#~msgstr ""
+#~msgstr "संगीत बजाएं"
 
 #: js/samplesviewer.js:91
 
@@ -11207,7 +11207,7 @@ msgstr "'z'दिशा में गतिवान"
 #: js/synthutils.js:82
 
 #~msgid "darbuka-drum"
-#~msgstr ""
+#~msgstr "दरबूका ड्रम"
 
 #: js/turtledefs.js:345
 
@@ -11230,7 +11230,7 @@ msgstr "'z'दिशा में गतिवान"
 #~msgstr ""
 
 #~msgid "cloud"
-#~msgstr ""
+#~msgstr "बादल"
 
 #: js/turtledefs.js:298
 
@@ -11242,7 +11242,7 @@ msgstr "'z'दिशा में गतिवान"
 #: js/toolbar.js:386
 
 #~msgid "Save as svg"
-#~msgstr ""
+#~msgstr "SVG के रूप में सहेजें"
 
 #: plugins/impact.rtp:122
 
@@ -11257,7 +11257,7 @@ msgstr "'z'दिशा में गतिवान"
 #: js/timbre.js:727
 
 #~msgid "add filter"
-#~msgstr ""
+#~msgstr "फ़िल्टर जोड़ें"
 
 #: js/logo.js:2688
 
@@ -11272,7 +11272,7 @@ msgstr "'z'दिशा में गतिवान"
 #: js/activity.js:3523
 
 #~msgid "Show/hide palettes"
-#~msgstr "पैलेट दिखाएँ /छुपाएं"
+#~msgstr "पैलेट दिखाएँ / छुपाएँ"
 
 #: js/activity.js:3066
 
@@ -11381,22 +11381,22 @@ msgstr "'z'दिशा में गतिवान"
 #: js/logo.js:5014
 
 #~msgid "Input to Major Block must be 2, 3, 6, or 7"
-#~msgstr ""
+#~msgstr "मेजर ब्लॉक के लिए इनपुट 2, 3, 6, या 7 होना चाहिए"
 
 #: js/turtledefs.js:289
 
 #~msgid "The <em>Print</em> block displays text at the top of the screen."
-#~msgstr ""
+#~msgstr "<em>प्रिंट</em> ब्लॉक स्क्रीन के शीर्ष पर पाठ दिखाता है।"
 
 #: js/turtledefs.js:356
 
 #~msgid "The <em>Weighted partials</em> block is used to specify the partials associated with a timbre."
-#~msgstr ""
+#~msgstr "<em>वेटेड पार्शियल्स</em> ब्लॉक एक टिम्बर से जुड़े पार्शियल्स को निर्दिष्ट करने के लिए उपयोग होता है।"
 
 #: js/basicblocks.js:712
 
 #~msgid "articulation"
-#~msgstr ""
+#~msgstr "संवाद"
 
 #: js/turtledefs.js:387
 
@@ -11407,29 +11407,29 @@ msgstr "'z'दिशा में गतिवान"
 #: js/turtledefs.js:392
 
 #~msgid "The <em>Calculate</em> block returns a value calculated by an action."
-#~msgstr ""
+#~msgstr "<em>कैलकुलेट</em> ब्लॉक एक क्रिया द्वारा गणित किए गए मूल्य को लौटाता है।"
 
 #: js/samplesviewer.js:81
 
 #: js/samplesviewer.js:84
 
 #~msgid "Advanced options"
-#~msgstr ""
+#~msgstr "उन्नत विकल्प"
 
 #: js/turtledefs.js:394
 
 #~msgid "The <em>Return</em> block will return a value from an action."
-#~msgstr ""
+#~msgstr "<em>रिटर्न</em> ब्लॉक एक क्रिया से मूल्य लौटाएगा।"
 
 #: js/turtledefs.js:247
 
 #~msgid "The <em>Action</em> block is used to group together blocks so that they can be used more than once. It is often used for storing a phrase of music that is repeated."
-#~msgstr ""
+#~msgstr "<em>एक्शन</em> ब्लॉक ब्लॉक्स को एक साथ समृद्ध करने के लिए उपयोग होता है ताकि इसे एक से अधिक बार उपयोग किया जा सके। यह अक्सर उस संगीत वाक्य को संग्रहित करने के लिए उपयोग होता है जो बार-बार होता है।"
 
 #: js/turtledefs.js:470
 
 #~msgid "The <em>Get blue</em> block returns the blue component of the pixel under the mouse."
-#~msgstr ""
+#~msgstr "<em>गेट ब्लू</em> ब्लॉक माउस के नीचे पिक्सेल का नीला घटक लौटाता है।"
 
 #: js/turtledefs.js:187
 
@@ -11438,54 +11438,54 @@ msgstr "'z'दिशा में गतिवान"
 #: js/toolbar.js:425
 
 #~msgid "Save sheet music"
-#~msgstr ""
+#~msgstr "शीट संगीत सहेजें"
 
 #: js/turtledefs.js:29
 
 #: js/musicutils.js:320
 
 #~msgid "romanian-minor"
-#~msgstr ""
+#~msgstr "रोमानियाई माइनर"
 
 #: js/block.js:1309
 
 #~msgid "4th"
-#~msgstr ""
+#~msgstr "4थ"
 
 #: js/turtledefs.js:362
 
 #~msgid "The <em>Set relative volume</em> block changes the volume of the contained notes."
-#~msgstr ""
+#~msgstr "<em>सेट रिलेटिव वॉल्यूम</em> ब्लॉक संग्रहित नोट्स की वॉल्यूम को बदलता है।"
 
 #: js/turtledefs.js:380
 
 #~msgid "The <em>Switch</em> block will run the code in the matchin <em>Case</em>."
-#~msgstr ""
+#~msgstr "<em>स्विच</em> ब्लॉक समान <em>केस</em> में कोड चलाएगा।"
 
 #: js/basicblocks.js:282
 
 #~msgid "adjust transposition"
-#~msgstr ""
+#~msgstr "स्थानांतरण समायोजित करें"
 
 #: js/turtledefs.js:80
 
 #~msgid "Click to run the project in fast mode."
-#~msgstr "प्रोजेक्ट को तेज़ी से चलाने के लिए क्लिक करें"
+#~msgstr "तेज़ी से प्रोजेक्ट चलाने के लिए क्लिक करें।"
 
 #: js/turtledefs.js:170
 
 #~msgid "Run note by note"
-#~msgstr ""
+#~msgstr "नोट द्वारा नोट चलाएं"
 
 #: js/logo.js:5092
 
 #~msgid "Partial block should be used inside of a Weighted-partisls block."
-#~msgstr ""
+#~msgstr "पार्शियल ब्लॉक को वेटेड-पार्शियल्स ब्लॉक के अंदर उपयोग किया जाना चाहिए।"
 
 #: js/turtledefs.js:428
 
 #~msgid "The Heap length block returns the length of the heap."
-#~msgstr ""
+#~msgstr "हीप लेंथ ब्लॉक हीप की लंबाई लौटाता है।"
 
 #: js/basicblocks.js:4324
 
@@ -11495,54 +11495,54 @@ msgstr "'z'दिशा में गतिवान"
 #: js/StringHelper.js:17
 
 #~msgid "Close Planet\","
-#~msgstr ""
+#~msgstr "प्लैनेट बंद करें\","
 
 #: js/help.js:72
 
 #~msgid "Next page"
-#~msgstr ""
+#~msgstr "अगला पृष्ठ"
 
 #: js/activity.js:3859
 
 #: js/activity.js:3870
 
 #~msgid "Long press on blocks to copy."
-#~msgstr ""
+#~msgstr "ब्लॉक पर लंबा दबाएं करें कॉपी के लिए।"
 
 #: js/turtledefs.js:351
 
 #~msgid "The <em>Chorus</em> block adds a chorus effect."
-#~msgstr ""
+#~msgstr "<em>कोरस</em> ब्लॉक एक कोरस प्रभाव जोड़ता है।"
 
 #: js/turtledefs.js:239
 
 #~msgid "The <em>Custom mode</em> block opens a tool to explore musical mode (the spacing of the notes in a scale)."
-#~msgstr ""
+#~msgstr "<em>कस्टम मोड</em> ब्लॉक संगीत मोड (स्केल में नोट्स की जगह) का अन्वेषण करने के लिए एक टूल खोलता है।"
 
 #: js/logo.js:2317
 
 #~msgid "Please close the current matrix before opening a new one."
-#~msgstr ""
+#~msgstr "कृपया नए एक को खोलने से पहले वर्तमान मैट्रिक्स को बंद करें।"
 
 #: js/turtledefs.js:426
 
 #~msgid "The <em>Wait</em> block pauses the program for a specified number of seconds."
-#~msgstr ""
+#~msgstr "<em>वेट</em> ब्लॉक प्रोग्राम को निर्दिष्ट समय के लिए रोकता है।"
 
 #: js/turtledefs.js:229
 
 #~msgid "The <em>Set drum</em> block will select a drum sound to replace the pitch of any contained notes. In the example above, a <em>kick drum</em> sound will be played instead of <em>sol</em>."
-#~msgstr ""
+#~msgstr "<em>सेट ड्रम</em> ब्लॉक किसी भी संग्रहित नोट्स के पिच को बदलने के लिए एक ड्रम साउंड का चयन करेगा। उपर्युक्त उदाहरण में, <em>किक ड्रम</em> साउंड <em>सोल</em> की जगह बजाया जाएगा।"
 
 #: js/turtledefs.js:420
 
 #~msgid "The <em>Heap length</em> block returns the length of the heap."
-#~msgstr ""
+#~msgstr "<em>हीप लेंथ</em> ब्लॉक हीप की लंबाई लौटाता है।"
 
 #: js/basicblocks.js:1146
 
 #~msgid "on offbeat do"
-#~msgstr ""
+#~msgstr "ऑन ऑफबीट करें"
 
 #: js/StringHelper.js:17
 
@@ -11632,94 +11632,94 @@ msgstr "'z'दिशा में गतिवान"
 #: js/musicutils.js:230
 
 #~msgid "Ethiopian"
-#~msgstr ""
+#~msgstr "इथियोपियन"
 
 #: js/turtledefs.js:99
 
 #~msgid "It appears after a long press on a stack."
-#~msgstr ""
+#~msgstr "यह एक स्टैक पर एक लम्बी दबाई के बाद प्रकट होता है।"
 
 #: js/logo.js:4851
 
 #: js/logo.js:4872
 
 #~msgid "Input to Perfect Block must be 1, 4, 5, or 8"
-#~msgstr ""
+#~msgstr "परफेक्ट ब्लॉक के लिए इनपुट 1, 4, 5, या 8 होना चाहिए"
 
 #: js/temperament.js:1621
 
 #~msgid "table"
-#~msgstr ""
+#~msgstr "टेबल"
 
 #: js/savebox.js:116
 
 #~msgid "Save as .tb"
-#~msgstr ""
+#~msgstr ".tb के रूप में सहेजें"
 
 #: js/lilypond.js:21
 
 #~msgid "cp"
-#~msgstr ""
+#~msgstr "सीपी"
 
 #: js/turtledefs.js:321
 
 #~msgid "The <em>On-weak-beat</em> block let you specify actions to take on weak (off) beats."
-#~msgstr ""
+#~msgstr "<em>ऑन-वीक-बीट</em> ब्लॉक आपको कमजोर (ऑफ) बीट्स पर क्रियाएँ निर्दिष्ट करने की अनुमति देता है।"
 
 #: plugins/rodi.rtp:130
 
 #~msgid "sense right"
-#~msgstr ""
+#~msgstr "दाहिने की अनुभूति"
 
 #: js/turtledefs.js:423
 
 #~msgid "The <em>Load heap from app</em> block loads the heap from a web page."
-#~msgstr ""
+#~msgstr "<em>एप से हीप लोड करें</em> ब्लॉक हीप को एक वेब पेज से लोड करता है।"
 
 #~msgid "vspace"
-#~msgstr ""
+#~msgstr "व्यास"
 
 #: js/turtledefs.js:29
 
 #: js/musicutils.js:321
 
 #~msgid "spanish-gypsy"
-#~msgstr ""
+#~msgstr "स्पैनिश-जिप्सी"
 
 #: js/turtledefs.js:286
 
 #~msgid "The <em>Color</em> block returns the current pen color."
-#~msgstr ""
+#~msgstr "<em>रंग</em> ब्लॉक वर्तमान पेन का रंग लौटाता है।"
 
 #: js/musicutils.js:225
 
 #~msgid "Bebop"
-#~msgstr ""
+#~msgstr "बेबॉप"
 
 #: js/turtledefs.js:185
 
 #~msgid "The Paste Button will highlight."
-#~msgstr ""
+#~msgstr "पेस्ट बटन हाइलाइट करेगा।"
 
 #: js/turtledefs.js:431
 
 #~msgid "The Load heap from app block loads the heap from a web page."
-#~msgstr ""
+#~msgstr "एप से हीप लोड करें ब्लॉक हीप को एक वेब पेज से लोड करता है।"
 
 #: js/logo.js:1982
 
 #~msgid "The Step Pitch Block must be used insdie of a Note Block."
-#~msgstr ""
+#~msgstr "स्टेप पिच ब्लॉक को नोट ब्लॉक के अंदर उपयोग करना चाहिए।"
 
 #: js/turtledefs.js:118
 
 #~msgid "Remove all content on the canvas, including the blocks."
-#~msgstr "कैनवास के ऊपर से सब साफ़ करें, ब्लॉक्स के साथ"
+#~msgstr "कैनवास पर सभी सामग्री को हटाएं, ब्लॉक्स सहित"
 
 #: js/basicblocks.js:4883
 
 #~msgid "save svg"
-#~msgstr "svg सेव करें"
+#~msgstr "SVG सहेजें"
 
 #: js/samplesviewer.js:699
 
@@ -11729,29 +11729,29 @@ msgstr "'z'दिशा में गतिवान"
 #: js/turtledefs.js:432
 
 #~msgid "The <em>No background</em> block eliminates the background from the saved SVG output."
-#~msgstr ""
+#~msgstr "<em>कोई पृष्ठभूमि नहीं</em> ब्लॉक सहेजे गए SVG आउटपुट से पृष्ठभूमि को हटा देता है।"
 
 #: js/activity.js:2527
 
 #~msgid "My Music Blocks Creation"
-#~msgstr ""
+#~msgstr "मेरा संगीत ब्लॉक्स निर्माण"
 
 #: js/turtledefs.js:438
 
 #~msgid "The <em>Open palette</em> block opens a palette."
-#~msgstr ""
+#~msgstr "<em>पैलेट खोलें</em> ब्लॉक एक पैलेट खोलता है।"
 
 #: js/turtledefs.js:242
 
 #~msgid "The <em>Forever</em> block will repeat the contained blocks forever. In this example, a simple drum machine, a kick drum will play 1/4 notes forever."
-#~msgstr ""
+#~msgstr "<em>फॉरएवर</em> ब्लॉक निर्धारित ब्लॉक्स को हमेशा के लिए दोहराएगा। इस उदाहरण में, एक साधारित ड्रम मशीन, एक किक ड्रम हमेशा 1/4 नोट्स बजाएगा।"
 
 #: js/logo.js:4898
 
 #: js/logo.js:4919
 
 #~msgid "Input to Diminished Block must be 1, 2, 3, 4, 5, 6, 7, or 8"
-#~msgstr ""
+#~msgstr "डिमिनिश ब्लॉक के लिए इनपुट 1, 2, 3, 4, 5, 6, 7, या 8 होना चाहिए"
 
 #: js/turtledefs.js:168
 
@@ -11805,32 +11805,32 @@ msgstr "'z'दिशा में गतिवान"
 #: js/turtledefs.js:402
 
 #~msgid "The <em>Power</em> block calculates a power function."
-#~msgstr ""
+#~msgstr " <em>पॉवर</em> ब्लॉक एक पॉवर फ़ंक्शन की गणना करता है।"
 
 #: js/turtledefs.js:440
 
 #~msgid "The <em>Set heading</em> block sets the heading of the mouse."
-#~msgstr ""
+#~msgstr "<em>सेट हेडिंग</em> ब्लॉक माउस की हेडिंग सेट करता है।"
 
 #: js/turtledefs.js:193
 
 #~msgid "The <em>Note</em> block is a container for one or more <em>Pitch</em> blocks. The <em>Note</em> block specifies the duration (note value) of its contents."
-#~msgstr ""
+#~msgstr "<em>नोट</em> ब्लॉक एक या एक से अधिक <em>पिच</em> ब्लॉक्स के लिए एक संग्रहक है। <em>नोट</em> ब्लॉक इसके सामग्री की अवधि (नोट मूल्य) को निर्दिष्ट करता है।"
 
 #: js/turtledefs.js:269
 
 #~msgid "The <em>Less-than</em> block returns <em>True</em> if the top number is less than the bottom number."
-#~msgstr ""
+#~msgstr "<em>लेस थैन</em> ब्लॉक टॉप नंबर बॉटम नंबर से कम है तो <em>ट्रू</em> लौटाता है।"
 
 #: js/turtledefs.js:201
 
 #~msgid "The <em>Beat count</em> block is the number of the current beat, e.g., 1, 2, 3, or 4.\n In the figure, it is used to take an action on the first beat of each measure."
-#~msgstr ""
+#~msgstr "<em>बीट काउंट</em> ब्लॉक वर्तमान बीट की संख्या है, जैसे 1, 2, 3, या 4।\n चित्र में, इसका उपयोग प्रत्येक माप के पहले बीट पर क्रिया करने के लिए किया जाता है।"
 
 #: js/turtledefs.js:483
 
 #~msgid "The <em>Mouse color</em> block returns the pen color of the specified mouse."
-#~msgstr ""
+#~msgstr "<em>माउस रंग</em> ब्लॉक निर्दिष्ट माउस का पेन रंग लौटाता है।"
 
 #: js/turtledefs.js:187
 
@@ -11839,12 +11839,12 @@ msgstr "'z'दिशा में गतिवान"
 #: js/toolbar.js:424
 
 #~msgid "Save as ABC"
-#~msgstr ""
+#~msgstr "ABC के रूप में सहेजें"
 
 #: js/timbre.js:591
 
 #~msgid "synthesizer"
-#~msgstr ""
+#~msgstr "सिंथेसाइज़र"
 
 #: js/logo.js:630
 
@@ -11853,85 +11853,85 @@ msgstr "'z'दिशा में गतिवान"
 #: js/musicutils.js:205
 
 #~msgid "Major"
-#~msgstr ""
+#~msgstr "मेजर"
 
 #: js/turtledefs.js:425
 
 #~msgid "The Saveheap block saves the heap to a file."
-#~msgstr ""
+#~msgstr "सेवहीप ब्लॉक हीप को एक फ़ाइल में सहेजता है।"
 
 #: js/turtledefs.js:363
 
 #~msgid "The <em>Set master volume</em> block sets the volume for all synthesizers."
-#~msgstr ""
+#~msgstr "<em>सेट मास्टर वॉल्यूम</em> ब्लॉक सभी सिंथेसाइज़र्स के लिए वॉल्यूम सेट करता है।"
 
 #: js/basicblocks.js:883
 
 #~msgid "duplicate notes"
-#~msgstr ""
+#~msgstr "डुप्लीकेट नोट्स"
 
 #: js/turtledefs.js:421
 
-#~msgid "The Setheapentry block sets a value in he heap at the specified location."
-#~msgstr ""
+#~msgid "The Setheapentry block sets a value in the heap at the specified location."
+#~msgstr "<em>सेटहीपएंट्री</em> ब्लॉक निर्दिष्ट स्थान पर हीप में एक मूल्य सेट करता है।"
 
 #: js/utilitybox.js:281
 
 #~msgid "Disable scrolling"
-#~msgstr ""
+#~msgstr "स्क्रोलिंग अक्षम करें"
 
 #: js/turtledefs.js:425
 
 #~msgid "The Scalar interval block measures the distance between two notes in semi-tones."
-#~msgstr ""
+#~msgstr "स्केलर इंटरवल ब्लॉक दो नोट्स के बीच की दूरी को सेमी-टोन में मापता है।"
 
 #: js/logo.js:4259
 
 #~msgid "Rhythm Block: Did you mean to use a Matrix block?"
-#~msgstr ""
+#~msgstr "रिदम ब्लॉक: क्या आपने मैट्रिक्स ब्लॉक का उपयोग करने का इरादा किया है?"
 
 #: js/turtledefs.js:202
 
 #~msgid "The <em>Notes played</em> block is the number of notes that have been played. (By default, it counts quarter notes.)"
-#~msgstr ""
+#~msgstr "<em>नोट्स प्लेड</em> ब्लॉक उन नोट्स की संख्या है जो बजाए गए हैं। (डिफ़ॉल्ट रूप से, यह क्वार्टर नोट्स की गिनती करता है।)"
 
 #: js/turtledefs.js:242
 
 #~msgid "The default volume is 50; the range is 0 (silence) to 100 (full volume)."
-#~msgstr ""
+#~msgstr "डिफ़ॉल्ट वॉल्यूम 50 है; सीमा 0 (शांति) से 100 (पूर्ण वॉल्यूम) तक है।"
 
 #: js/turtledefs.js:248
 
 #~msgid "Each <em>Start</em> block is a separate voice. All of the <em>Start</em> blocks run at the same time when the <em>Play</em> button is pressed."
-#~msgstr ""
+#~msgstr "प्रत्येक <em>स्टार्ट</em> ब्लॉक एक अलग आवाज़ है। <em>प्ले</em> बटन दबाया जाता है तो सभी <em>स्टार्ट</em> ब्लॉक्स एक साथ चलते हैं।"
 
 #: js/turtledefs.js:352
 
 #~msgid "e.g. \"do\" is always \"C-natural\"); when Movable do is true, the solfege note names are assigned to scale degrees (\"do\" is always the first degree of the major scale)."
-#~msgstr ""
+#~msgstr "जैसे, \"डो\" हमेशा \"सी-नैचुरल\" होता है); जब Movable do सच है, तो सोलफेज़ नोट नामों को स्केल के डिग्री में सौंपा जाता है (\"डो\" हमेशा मेजर स्केल के पहले डिग्री होता है)।"
 
 #: js/basicblocks.js:83
 
 #~msgid "current pitch octave"
-#~msgstr ""
+#~msgstr "वर्तमान पिच ऑक्टेव"
 
 #: js/turtledefs.js:415
 
 #~msgid "The <em>Reverseheap</em> block reverses the order of the heap."
-#~msgstr ""
+#~msgstr "<em>रिवर्सहीप</em> ब्लॉक हीप के क्रम को उल्टा करता है।"
 
 #: js/musicutils.js:250
 
 #~msgid "Hirajoshi"
-#~msgstr ""
+#~msgstr "हिराजोशी"
 
 #: js/turtledefs.js:433
 
 #~msgid "The <em>Make block</em> block creates a new block."
-#~msgstr ""
+#~msgstr "<em>मेक ब्लॉक</em> ब्लॉक एक नया ब्लॉक बनाता है।"
 
 #: js/musicutils.js:201
 
 #~msgid "Spanish"
-#~msgstr ""
+#~msgstr "स्पैनिश"
 
