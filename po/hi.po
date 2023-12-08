@@ -1644,7 +1644,7 @@ msgstr "ब्लॉक और पैलेट्स के पैलेट्�
 
 #: js/turtledefs.js:603
 msgid "Cartesian/Polar"
-msgstr "कार्टेसिय
+msgstr "कार्टेसिय"
 
 #: js/turtledefs.js:604
 msgid "Show or hide a coordinate grid."
