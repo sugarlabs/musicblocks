@@ -15,7 +15,10 @@
    _, BooleanBlock, NOINPUTERRORMSG
 */
 
-/* exported setupBooleanBlocks */
+/**  
+ * exported setupBooleanBlocks 
+ * @constructor
+*/
 
 function setupBooleanBlocks(activity) {
     class NotBlock extends BooleanBlock {

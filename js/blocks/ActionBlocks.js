@@ -16,7 +16,10 @@
    Queue, NOACTIONERRORMSG, NOINPUTERRORMSG
 */
 
-/* exported setupActionBlocks */
+/**  
+ * exported setupActionBlocks 
+ * @constructor
+ */
 
 function setupActionBlocks(activity) {
     class ReturnBlock extends FlowBlock {

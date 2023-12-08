@@ -17,7 +17,7 @@
    NOTATIONSTACCATO, toFraction
 */
 
-/* exported saveAbcOutput */
+/** exported saveAbcOutput */
 
 // This header is prepended to the Abc output.
 const ABCHEADER = "X:1\nT:Music Blocks composition\nC:Mr. Mouse\nL:1/16\nM:C\n";
