@@ -295,7 +295,7 @@ class Toolbar {
                     elem.innerHTML = obj[1];
 		}
             } else {
-                if (elem !== undefined) {
+                if (elem !== undefined and elem !== null) {
                     elem.setAttribute("data-tooltip", trans);
                 }
             }
