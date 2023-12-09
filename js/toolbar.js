@@ -1,4 +1,4 @@
-// Copyright (c) 2018,19 Austin George
+// COPYRIGHT (c) 2018,19 Austin George
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -291,9 +291,11 @@ class Toolbar {
             const trans = strings_[i];
             const elem = docById(obj[0]);
             if (strings[i].length === 3) {
-                elem.innerHTML = obj[1];
+                if (elem !== undefined) {
+                    elem.innerHTML = obj[1];
+		}
             } else {
-                if (elem !== null) {
+                if (elem !== undefined) {
                     elem.setAttribute("data-tooltip", trans);
                 }
             }

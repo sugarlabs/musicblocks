@@ -138,14 +138,13 @@
                     console.debug(
                         "The browser is set to " + navigator.language
                     );
+                    let lang = navigator.language;
                     if (localStorage.languagePreference) {
                         console.debug(
                             "Music Blocks is set to " +
                                 localStorage.languagePreference
                         );
-                        let lang = localStorage.languagePreference;
-                    } else {
-                        let lang = navigator.language;
+                        lang = localStorage.languagePreference;
                     }
 
                     console.debug("Using " + lang);
