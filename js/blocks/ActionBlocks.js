@@ -18,16 +18,59 @@
 
 /* exported setupActionBlocks */
 
+/**
+ * Sets up action blocks for a given activity.
+ *
+ * @param {string} activity - The activity associated with the action blocks.
+ */
 function setupActionBlocks(activity) {
+    /**
+     * Represents a Return block that returns a value from an action.
+     *
+     * @class
+     * @extends FlowBlock
+     */
     class ReturnBlock extends FlowBlock {
+        /**
+         * Constructor for the ReturnBlock class.
+         */
         constructor() {
             super("return");
+
+            /**
+             * Sets the palette and help string for the Return block.
+             *
+             * @memberof ReturnBlock
+             * @method
+             * @param {string} palette - The palette to set for the block.
+             * @param {string} activity - The activity associated with the block.
+             */
             this.setPalette("action", activity);
+
+            /**
+             * Sets the help string for the Return block.
+             *
+             * @memberof ReturnBlock
+             * @method
+             * @param {Array} helpString - The help string to set for the block.
+             */
             this.setHelpString([
                 _("The Return block will return a value from an action."),
                 "documentation",
                 ""
             ]);
+
+            /**
+             * Forms the block with specific details.
+             *
+             * @memberof ReturnBlock
+             * @method
+             * @param {Object} options - The options for forming the block.
+             * @param {string} options.name - The name of the block.
+             * @param {number} options.args - The number of arguments for the block.
+             * @param {Array} options.defaults - The default values for arguments.
+             * @param {Array} options.argTypes - The types of arguments.
+             */
             this.formBlock({
                 name: _("return"),
                 args: 1,
@@ -36,12 +79,23 @@ function setupActionBlocks(activity) {
             });
         }
 
+        /**
+         * Handles the flow of the Return block.
+         *
+         * @memberof ReturnBlock
+         * @method
+         * @param {Array} args - The arguments for the flow.
+         * @param {Object} logo - The logo object.
+         * @param {string} turtle - The turtle associated with the flow.
+         */
         flow(args, logo, turtle) {
             if (args.length === 1) {
                 logo.returns[turtle].push(args[0]);
             }
         }
     }
+
+
 
     class ReturnToURLBlock extends FlowBlock {
         constructor() {
