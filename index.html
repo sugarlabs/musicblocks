@@ -148,6 +148,10 @@
                     }
 
                     console.debug("Using " + lang);
+		    if (lang === undefined) {
+			lang = "enUS";
+			console.debug("Reverting to " + lang);
+		    }
 
                     if (lang === "ja") {
                         document.getElementById(
