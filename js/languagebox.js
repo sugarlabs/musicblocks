@@ -145,6 +145,14 @@ class LanguageBox {
         this._language = "he";
         this.hide();
     }
+    /**
+     * @public
+     * @returns {void}
+     */
+    te_onclick() {
+        this._language = "te";
+        this.hide();
+    }
 
     /**
      * @public

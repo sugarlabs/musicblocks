@@ -97,6 +97,7 @@ class Toolbar {
                 ["hi", _("हिंदी"), "innerHTML"],
                 ["ibo", _("igbo"), "innerHTML"],
                 ["ar", _("عربى"), "innerHTML"],
+		["te", _("తెలుగు"), "innerHTML"],
                 ["he", _("עִברִית"), "innerHTML"]
             ];
 
@@ -191,6 +192,7 @@ class Toolbar {
                 ["hi", _("हिंदी"), "innerHTML"],
                 ["ibo", _("igbo"), "innerHTML"],
                 ["ar", _("عربى"), "innerHTML"],
+		["te", _("తెలుగు"), "innerHTML"],
                 ["he", _("עִברִית"), "innerHTML"]
             ];
 
@@ -891,6 +893,12 @@ class Toolbar {
 
             ar.onclick = () => {
                 languageBox.ar_onclick(this.activity);
+            };
+
+            const te = docById("te");
+
+            te.onclick = () => {
+                languageBox.te_onclick(this.activity);
             };
 
             const he = docById("he");
