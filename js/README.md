@@ -627,3 +627,19 @@ blocks. Everything else is calculated for you.)
 
 In the figure about and in the code example above, the `divide` block
 connection 0 connects to the `newnote` block connection 1, etc.
+
+----
+
+Checkbox regarding adding new languages to the Language pulldown menu.
+
+You must update three files: ```index.html```, ```js/toolbox.js``` and ```js/languagebox.js```
+
+[ ] In ```index.html```, add an element for the language you are adding to ```"languagedropdown"```
+
+[ ] In ```toolbox.js```, add to the strings for both MUSIC BLOCKS and TURTLE ART
+
+[ ] and add a click event to ```renderLanguageSelectIcon```
+
+[ ] In ```languagebox.js```, add an event handler,
+
+[ ] and add a dictionary entry for "Refresh your browser to change your language preference."

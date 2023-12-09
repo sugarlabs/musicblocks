@@ -139,7 +139,31 @@ class Toolbar {
                 _("Save sheet music as Lilypond"),
                 _("Save block artwork as SVG"),
                 _("Confirm"),
-                _("Select language")
+                _("Select language"),
+                _("Save project as HTML"),
+                _("Save turtle artwork as PNG"),
+                _("Save project as HTML"),
+                _("Save turtle artwork as SVG"),
+                _("Save turtle artwork as PNG"),
+                _("Save block artwork as SVG"),
+                _("Confirm"),
+                _("English (United States)"),
+                _("English (United Kingdom)"),
+                _("日本語"),
+                _("한국인"),
+                _("español"),
+                _("português"),
+                _("にほんご"),
+                _("中文"),
+                _("ภาษาไทย"),
+                _("aymara"),
+                _("quechua"),
+                _("guarani"),
+                _("हिंदी"),
+		_("తెలుగు"),
+                _("igbo"),
+                _("عربى"),
+                _("עִברִית")
             ];
         } else {
             strings = [
@@ -245,6 +269,7 @@ class Toolbar {
                 _("quechua"),
                 _("guarani"),
                 _("हिंदी"),
+		_("తెలుగు"),
                 _("igbo"),
                 _("عربى"),
                 _("עִברִית")
