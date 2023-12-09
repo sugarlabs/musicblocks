@@ -291,7 +291,7 @@ class Toolbar {
             const trans = strings_[i];
             const elem = docById(obj[0]);
             if (strings[i].length === 3) {
-                if (elem !== undefined) {
+                if (elem !== undefined && elem !== null) {
                     elem.innerHTML = obj[1];
 		}
             } else {
