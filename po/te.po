@@ -3034,95 +3034,95 @@ msgstr "నిర్ధారించండి"
 #: js/toolbar.js:179
 #: js/toolbar.js:233
 msgid "English (United States)"
-msgstr "ఆంగ్లం (ఐక్యరాజ్యాలు)"
+msgstr ""
 
 #: js/toolbar.js:86
 #: js/toolbar.js:180
 #: js/toolbar.js:234
 msgid "English (United Kingdom)"
-msgstr "ఆంగ్లం (యునైటెడ్ కింగ్డమ్)"
+msgstr ""
 
 #: js/toolbar.js:87
 #: js/toolbar.js:181
 #: js/toolbar.js:235
 msgid "日本語"
-msgstr "జపనీస్"
+msgstr ""
 
 #: js/toolbar.js:88
 msgid "한국어"
-msgstr "కొరియన్"
+msgstr ""
 
 #: js/toolbar.js:89
 #: js/toolbar.js:183
 #: js/toolbar.js:237
 msgid "español"
-msgstr "స్పానిష్"
+msgstr ""
 
 #: js/toolbar.js:90
 #: js/toolbar.js:184
 #: js/toolbar.js:238
 msgid "português"
-msgstr "పోర్చుగీస్"
+msgstr ""
 
 #: js/toolbar.js:91
 #: js/toolbar.js:185
 #: js/toolbar.js:239
 msgid "にほんご"
-msgstr "జాపనీస్"
+msgstr ""
 
 #: js/toolbar.js:92
 #: js/toolbar.js:186
 #: js/toolbar.js:240
 msgid "中文"
-msgstr "చైనీస్"
+msgstr ""
 
 #: js/toolbar.js:93
 #: js/toolbar.js:187
 #: js/toolbar.js:241
 msgid "ภาษาไทย"
-msgstr "థాయ్"
+msgstr ""
 
 #: js/toolbar.js:94
 #: js/toolbar.js:188
 #: js/toolbar.js:242
 msgid "aymara"
-msgstr "ఆయ్మారా"
+msgstr "
 
 #: js/toolbar.js:95
 #: js/toolbar.js:189
 #: js/toolbar.js:243
 msgid "quechua"
-msgstr "క్వెచువా"
+msgstr ""
 
 #: js/toolbar.js:96
 #: js/toolbar.js:190
 #: js/toolbar.js:244
 msgid "guarani"
-msgstr "గ్వారానీ"
+msgstr ""
 
 #: js/toolbar.js:97
 #: js/toolbar.js:191
 #: js/toolbar.js:245
 msgid "हिंदी"
-msgstr "హిందీ"
+msgstr ""
 
 #: js/toolbar.js:98
 #: js/toolbar.js:192
 #: js/toolbar.js:246
 msgid "igbo"
-msgstr "ఇబో"
+msgstr ""
 
 #: js/toolbar.js:99
 #: js/toolbar.js:193
 #: js/toolbar.js:247
 msgid "عربى"
-msgstr "అరబిక్"
+msgstr ""
 
 #: js/toolbar.js:100
 #: js/toolbar.js:194
 #: js/toolbar.js:248
 msgid "עִברִית"
-msgstr "హబ్రూ"
+msgstr ""
 
 #: js/toolbar.js:109
 #: js/toolbar.js:149

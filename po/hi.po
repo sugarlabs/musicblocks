@@ -1071,83 +1071,83 @@ msgstr "पुष्टि करें"
 #: js/toolbar.js:179
 #: js/toolbar.js:233
 msgid "English (United States)"
-msgstr "अंग्रेज़ी (संयुक्त राज्य)"
+msgstr ""
 
 #: js/toolbar.js:86
 #: js/toolbar.js:180
 #: js/toolbar.js:234
 msgid "English (United Kingdom)"
-msgstr "अंग्रेज़ी (संयुक्त राज्य)"
+msgstr ""
 
 #: js/toolbar.js:87
 #: js/toolbar.js:181
 #: js/toolbar.js:235
 msgid "日本語"
-msgstr "जापानी"
+msgstr ""
 
 #: js/toolbar.js:88
 msgid "한국어"
-msgstr "कोरियाई"
+msgstr ""
 
 #: js/toolbar.js:89
 #: js/toolbar.js:183
 #: js/toolbar.js:237
 msgid "español"
-msgstr "स्पैनिश"
+msgstr ""
 
 #: js/toolbar.js:90
 #: js/toolbar.js:184
 #: js/toolbar.js:238
 msgid "português"
-msgstr "पुर्तगालीज़"
+msgstr ""
 
 #: js/toolbar.js:91
 #: js/toolbar.js:185
 #: js/toolbar.js:239
 msgid "にほんご"
-msgstr "जापानी"
+msgstr ""
 
 #: js/toolbar.js:92
 #: js/toolbar.js:186
 #: js/toolbar.js:240
 msgid "中文"
-msgstr "चीनी"
+msgstr ""
 
 #: js/toolbar.js:93
 #: js/toolbar.js:187
 #: js/toolbar.js:241
 msgid "ภาษาไทย"
-msgstr "थाई"
+msgstr ""
 
 #: js/toolbar.js:94
 #: js/toolbar.js:188
 #: js/toolbar.js:242
 msgid "aymara"
-msgstr "आयमारा"
+msgstr ""
 
 #: js/toolbar.js:95
 #: js/toolbar.js:189
 #: js/toolbar.js:243
 msgid "quechua"
-msgstr "केचुआ"
+msgstr ""
 
 #: js/toolbar.js:96
 #: js/toolbar.js:190
 #: js/toolbar.js:244
 msgid "guarani"
-msgstr "गुआरानी"
+msgstr ""
 
 #: js/toolbar.js:97
 #: js/toolbar.js:191
 #: js/toolbar.js:245
 msgid "हिंदी"
-msgstr "हिन्दी"
+msgstr ""
 
 #: js/toolbar.js:98
 #: js/toolbar.js:192
 #: js/toolbar.js:246
 msgid "igbo"
-msgstr "इग्बो"
+msgstr ""
 
 #: js/toolbar.js:99
 #: js/toolbar.js:193
