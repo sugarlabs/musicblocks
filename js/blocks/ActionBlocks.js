@@ -10,10 +10,10 @@
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 /*
-   global
+global
 
-   _, FlowBlock, LeftBlock, FlowClampBlock, StackClampBlock, ValueBlock,
-   Queue, NOACTIONERRORMSG, NOINPUTERRORMSG
+_, FlowBlock, LeftBlock, FlowClampBlock, StackClampBlock, ValueBlock,
+Queue, NOACTIONERRORMSG, NOINPUTERRORMSG
 */
 
 /* exported setupActionBlocks */
@@ -94,20 +94,53 @@ function setupActionBlocks(activity) {
             }
         }
     }
-
-
-
+    /**
+     * Represents a Return to URL block that returns a value to a webpage.
+     *
+     * @class
+     * @extends FlowBlock
+     */
     class ReturnToURLBlock extends FlowBlock {
+        /**
+         * Constructor for the ReturnToURLBlock class.
+         */
         constructor() {
             super("returnToUrl");
+
+            /**
+             * Sets the palette and help string for the Return to URL block.
+             *
+             * @memberof ReturnToURLBlock
+             * @method
+             * @param {string} palette - The palette to set for the block.
+             * @param {string} activity - The activity associated with the block.
+             */
             this.setPalette("action", activity);
+
+            /**
+             * Sets the help string for the Return to URL block.
+             *
+             * @memberof ReturnToURLBlock
+             * @method
+             * @param {Array} helpString - The help string to set for the block.
+             */
             this.setHelpString([
                 _("The Return to URL block will return a value to a webpage."),
                 "documentation",
                 ""
             ]);
 
-            //.TRANS: return value from a function to a URL
+            /**
+             * Forms the block with specific details.
+             *
+             * @memberof ReturnToURLBlock
+             * @method
+             * @param {Object} options - The options for forming the block.
+             * @param {string} options.name - The name of the block.
+             * @param {number} options.args - The number of arguments for the block.
+             * @param {Array} options.defaults - The default values for arguments.
+             * @param {Array} options.argTypes - The types of arguments.
+             */
             this.formBlock({
                 name: _("return to URL"),
                 args: 1,
@@ -116,14 +149,23 @@ function setupActionBlocks(activity) {
             });
         }
 
+        /**
+         * Handles the flow of the Return to URL block.
+         *
+         * @memberof ReturnToURLBlock
+         * @method
+         * @param {Array} args - The arguments for the flow.
+         */
         flow(args) {
             const URL = window.location.href;
             let urlParts;
             let outurl;
+
             if (URL.indexOf("?") > 0) {
                 urlParts = URL.split("?");
                 if (urlParts[1].indexOf("&") > 0) {
                     const newUrlParts = urlParts[1].split("&");
+
                     for (let i = 0; i < newUrlParts.length; i++) {
                         if (newUrlParts[i].indexOf("=") > 0) {
                             const tempargs = newUrlParts[i].split("=");
@@ -136,12 +178,15 @@ function setupActionBlocks(activity) {
                     }
                 }
             }
+
             if (args.length === 1) {
                 const jsonRet = {};
                 jsonRet["result"] = args[0];
                 const json = JSON.stringify(jsonRet);
                 const xmlHttp = new XMLHttpRequest();
+
                 xmlHttp.open("POST", outurl, true);
+
                 // Call a function when the state changes.
                 xmlHttp.onreadystatechange = () => {
                     if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
@@ -154,16 +199,54 @@ function setupActionBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a Calculate block that returns a value calculated by an action.
+     *
+     * @class
+     * @extends LeftBlock
+     */
     class CalcBlock extends LeftBlock {
+        /**
+         * Constructor for the CalcBlock class.
+         */
         constructor() {
             super("calc");
+
+            /**
+             * Sets the palette and help string for the Calculate block.
+             *
+             * @memberof CalcBlock
+             * @method
+             * @param {string} palette - The palette to set for the block.
+             * @param {string} activity - The activity associated with the block.
+             */
             this.setPalette("action", activity);
+
+            /**
+             * Sets the help string for the Calculate block.
+             *
+             * @memberof CalcBlock
+             * @method
+             * @param {Array} helpString - The help string to set for the block.
+             */
             this.setHelpString([
                 _("The Calculate block returns a value calculated by an action."),
                 "documentation",
                 ""
             ]);
 
+            /**
+             * Forms the block with specific details.
+             *
+             * @memberof CalcBlock
+             * @method
+             * @param {Object} options - The options for forming the block.
+             * @param {string} options.name - The name of the block.
+             * @param {string} options.outType - The output type of the block.
+             * @param {number} options.args - The number of arguments for the block.
+             * @param {Array} options.defaults - The default values for arguments.
+             * @param {Array} options.argTypes - The types of arguments.
+             */
             this.formBlock({
                 name: _("calculate"),
                 outType: "anyout",
@@ -172,58 +255,76 @@ function setupActionBlocks(activity) {
                 argTypes: ["anyin"]
             });
         }
-
-        arg(logo, turtle, blk, receivedArg) {
-            let actionArgs = [];
-            const cblk = activity.blocks.blockList[blk].connections[1];
-            if (cblk === null) {
-                activity.errorMsg(NOINPUTERRORMSG, blk);
-                return 0;
-            } else {
-                const name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-                actionArgs = receivedArg;
-                // logo.getBlockAtStartOfArg(blk);
-                if (name in logo.actions) {
-                    activity.turtles.turtleList[turtle].running = true;
-                    logo.runFromBlockNow(
-                        logo,
-                        turtle,
-                        logo.actions[name],
-                        true,
-                        actionArgs,
-                        activity.turtles.turtleList[turtle].queue.length
-                    );
-                    return logo.returns[turtle].shift();
-                } else {
-                    activity.errorMsg(NOACTIONERRORMSG, blk, name);
-                    return 0;
-                }
-            }
-        }
     }
-
+    /**
+     * Represents a Named Calculate block that returns a value calculated by an action.
+     *
+     * @class
+     * @extends ValueBlock
+     */
     class NamedCalcBlock extends ValueBlock {
+        /**
+         * Constructor for the NamedCalcBlock class.
+         */
         constructor() {
             super("namedcalc");
+
+            /**
+             * Sets the palette and help string for the Named Calculate block.
+             *
+             * @memberof NamedCalcBlock
+             * @method
+             * @param {string} palette - The palette to set for the block.
+             * @param {string} activity - The activity associated with the block.
+             */
             this.setPalette("action", activity);
+
+            /**
+             * Sets the help string for the Named Calculate block.
+             *
+             * @memberof NamedCalcBlock
+             * @method
+             * @param {Array} helpString - The help string to set for the block.
+             */
             this.setHelpString([
                 _("The Calculate block returns a value calculated by an action."),
                 "documentation",
                 ""
             ]);
 
+            // Additional width for the block
             this.extraWidth = 20;
+
+            /**
+             * Forms the block with specific details.
+             *
+             * @memberof NamedCalcBlock
+             * @method
+             * @param {Object} options - The options for forming the block.
+             * @param {string} options.name - The name of the block.
+             */
             this.formBlock({
                 name: _("action")
             });
         }
 
+        /**
+         * Handles the argument logic for the Named Calculate block.
+         *
+         * @memberof NamedCalcBlock
+         * @method
+         * @param {Object} logo - The logo object.
+         * @param {string} turtle - The turtle associated with the block.
+         * @param {number} blk - The block ID.
+         * @param {Array} receivedArg - The received arguments.
+         * @returns {number} The result of the calculation.
+         */
         arg(logo, turtle, blk, receivedArg) {
             const name = activity.blocks.blockList[blk].privateData;
             let actionArgs = [];
 
             actionArgs = receivedArg;
-            // logo.getBlockAtStartOfArg(blk);
+
             if (name in logo.actions) {
                 activity.turtles.turtleList[turtle].running = true;
                 logo.runFromBlockNow(
@@ -241,18 +342,50 @@ function setupActionBlocks(activity) {
             }
         }
     }
-
+    /**
+     * Represents a Named Do Argument block used to initiate an action with arguments.
+     *
+     * @class
+     * @extends FlowClampBlock
+     */
     class NamedDoArgBlock extends FlowClampBlock {
+        /**
+         * Constructor for the NamedDoArgBlock class.
+         */
         constructor() {
             super("nameddoArg");
+
+            /**
+             * Sets the palette and help string for the Named Do Argument block.
+             *
+             * @memberof NamedDoArgBlock
+             * @method
+             * @param {string} palette - The palette to set for the block.
+             * @param {string} activity - The activity associated with the block.
+             */
             this.setPalette("action", activity);
+
+            /**
+             * Sets the help string for the Named Do Argument block.
+             *
+             * @memberof NamedDoArgBlock
+             * @method
+             * @param {Array} helpString - The help string to set for the block.
+             */
             this.setHelpString([
                 _("The Do block is used to initiate an action."),
                 "documentation",
                 ""
             ]);
 
-            //.TRANS: translate do1 the same as do (take an action) (JAPANESE ONLY)
+            /**
+             * Forms the block with specific details.
+             *
+             * @memberof NamedDoArgBlock
+             * @method
+             * @param {Object} options - The options for forming the block.
+             * @param {string} options.name - The name of the block.
+             */
             this.formBlock({
                 name: this.lang === "ja" ? _("do1") : _("do"),
                 flows: {
@@ -262,18 +395,28 @@ function setupActionBlocks(activity) {
             });
         }
 
+        /**
+         * Handles the flow logic for the Named Do Argument block.
+         *
+         * @memberof NamedDoArgBlock
+         * @method
+         * @param {Array} args - The arguments for the flow.
+         * @param {Object} logo - The logo object.
+         * @param {string} turtle - The turtle associated with the block.
+         * @param {number} blk - The block ID.
+         * @param {Array} receivedArg - The received arguments.
+         * @param {Array} actionArgs - The arguments for the action.
+         * @returns {Array} An array containing the child flow and a value (1).
+         */
         flow(args, logo, turtle, blk, receivedArg, actionArgs) {
             const name = activity.blocks.blockList[blk].privateData;
+
             while (actionArgs.length > 0) {
                 actionArgs.pop();
             }
 
             if (activity.blocks.blockList[blk].argClampSlots.length > 0) {
-                for (
-                    let i = 0;
-                    i < activity.blocks.blockList[blk].argClampSlots.length;
-                    i++
-                ) {
+                for (let i = 0; i < activity.blocks.blockList[blk].argClampSlots.length; i++) {
                     if (activity.blocks.blockList[blk].connections[i + 1] != null) {
                         const t = logo.parseArg(
                             logo,
@@ -297,6 +440,7 @@ function setupActionBlocks(activity) {
                 }
 
                 let childFlow;
+
                 if (tur.singer.backward.length > 0) {
                     childFlow = activity.blocks.findBottomBlock(logo.actions[name]);
                     const actionBlk = activity.blocks.findTopBlock(logo.actions[name]);
@@ -306,6 +450,7 @@ function setupActionBlocks(activity) {
                     logo.setDispatchBlock(blk, turtle, listenerName);
 
                     const nextBlock = activity.blocks.blockList[actionBlk].connections[2];
+
                     if (nextBlock === null) {
                         tur.singer.backward.pop();
                     } else {
@@ -317,7 +462,7 @@ function setupActionBlocks(activity) {
                     }
 
                     // eslint-disable-next-line no-unused-vars
-                    const __listener = event => tur.singer.backward.pop();
+                    const __listener = (event) => tur.singer.backward.pop();
 
                     logo.setTurtleListener(turtle, listenerName, __listener);
                 } else {
@@ -330,17 +475,44 @@ function setupActionBlocks(activity) {
             }
         }
     }
-
+    /**
+     * Represents a block for named calculations.
+     * @extends {LeftBlock}
+     */
     class NamedCalcArgBlock extends LeftBlock {
+        /**
+         * Constructs a NamedCalcArgBlock.
+         */
         constructor() {
             super("namedcalcArg");
+
+            /**
+             * Sets the palette for the block.
+             * @param {string} "action" - The palette category.
+             * @param {Activity} activity - The activity associated with the block.
+             */
             this.setPalette("action", activity);
+
+            /**
+             * Sets the help string for the block.
+             * @type {string[]}
+             */
             this.setHelpString([
                 _("The Calculate block returns a value calculated by an action."),
                 "documentation",
                 ""
             ]);
 
+            /**
+             * Forms the block with specified configuration.
+             * @param {Object} config - The configuration object.
+             * @param {string} config.name - The name of the block.
+             * @param {Object} config.flows - The flow configuration.
+             * @param {string} config.flows.type - The type of flow.
+             * @param {string[]} config.flows.types - The allowed flow types.
+             * @param {string[]} config.flows.labels - The flow labels.
+             * @param {string} config.outType - The output type.
+             */
             this.formBlock({
                 name: _("calculate"),
                 flows: {
@@ -352,16 +524,20 @@ function setupActionBlocks(activity) {
             });
         }
 
+        /**
+         * Handles the argument for the block.
+         * @param {Logo} logo - The logo instance.
+         * @param {string} turtle - The turtle identifier.
+         * @param {string} blk - The block identifier.
+         * @param {any} receivedArg - The received argument.
+         * @returns {any} - The result of the argument handling.
+         */
         arg(logo, turtle, blk, receivedArg) {
             const name = activity.blocks.blockList[blk].privateData;
             const actionArgs = [];
-            // logo.getBlockAtStartOfArg(blk);
+
             if (activity.blocks.blockList[blk].argClampSlots.length > 0) {
-                for (
-                    let i = 0;
-                    i < activity.blocks.blockList[blk].argClampSlots.length;
-                    i++
-                ) {
+                for (let i = 0; i < activity.blocks.blockList[blk].argClampSlots.length; i++) {
                     const t = logo.parseArg(
                         logo,
                         turtle,
@@ -372,6 +548,7 @@ function setupActionBlocks(activity) {
                     actionArgs.push(t);
                 }
             }
+
             if (name in logo.actions) {
                 // Just run the stack.
                 activity.turtles.turtleList[turtle].running = true;
@@ -390,17 +567,45 @@ function setupActionBlocks(activity) {
             }
         }
     }
-
+    /**
+     * Represents a block for initiating an action with arguments.
+     * @extends {FlowClampBlock}
+     */
     class DoArgBlock extends FlowClampBlock {
+        /**
+         * Constructs a DoArgBlock.
+         */
         constructor() {
             super("doArg");
+
+            /**
+             * Sets the palette for the block.
+             * @param {string} "action" - The palette category.
+             * @param {Activity} activity - The activity associated with the block.
+             */
             this.setPalette("action", activity);
+
+            /**
+             * Sets the help string for the block.
+             * @type {string[]}
+             */
             this.setHelpString([
                 _("The Do block is used to initiate an action."),
                 "documentation",
                 ""
             ]);
 
+            /**
+             * Forms the block with specified configuration.
+             * @param {Object} config - The configuration object.
+             * @param {string} config.name - The name of the block.
+             * @param {Object} config.flows - The flow configuration.
+             * @param {string} config.flows.type - The type of flow.
+             * @param {string[]} config.flows.types - The allowed flow types.
+             * @param {number} config.args - The number of arguments.
+             * @param {string[]} config.argTypes - The allowed argument types.
+             * @param {string[]} config.defaults - The default values for arguments.
+             */
             this.formBlock({
                 name: this.lang === "ja" ? _("do1") : _("do"),
                 flows: {
@@ -413,17 +618,23 @@ function setupActionBlocks(activity) {
             });
         }
 
+        /**
+         * Handles the flow of the block.
+         * @param {string[]} args - The arguments for the block.
+         * @param {Logo} logo - The logo instance.
+         * @param {string} turtle - The turtle identifier.
+         * @param {string} blk - The block identifier.
+         * @param {any} receivedArg - The received argument.
+         * @param {any[]} actionArgs - The action arguments.
+         * @returns {Array} - The result of the flow handling.
+         */
         flow(args, logo, turtle, blk, receivedArg, actionArgs) {
             while (actionArgs.length > 0) {
                 actionArgs.pop();
             }
 
             if (activity.blocks.blockList[blk].argClampSlots.length > 0) {
-                for (
-                    let i = 0;
-                    i < activity.blocks.blockList[blk].argClampSlots.length;
-                    i++
-                ) {
+                for (let i = 0; i < activity.blocks.blockList[blk].argClampSlots.length; i++) {
                     if (activity.blocks.blockList[blk].connections[i + 2] != null) {
                         const t = logo.parseArg(
                             logo,
@@ -451,17 +662,47 @@ function setupActionBlocks(activity) {
             }
         }
     }
-
+    /**
+     * Represents a block for calculating a value based on an action with arguments.
+     * @extends {LeftBlock}
+     */
     class CalcArgBlock extends LeftBlock {
+        /**
+         * Constructs a CalcArgBlock.
+         */
         constructor() {
             super("calcArg");
+
+            /**
+             * Sets the palette for the block.
+             * @param {string} "action" - The palette category.
+             * @param {Activity} activity - The activity associated with the block.
+             */
             this.setPalette("action", activity);
+
+            /**
+             * Sets the help string for the block.
+             * @type {string[]}
+             */
             this.setHelpString([
                 _("The Calculate block returns a value calculated by an action."),
                 "documentation",
                 ""
             ]);
 
+            /**
+             * Forms the block with specified configuration.
+             * @param {Object} config - The configuration object.
+             * @param {string} config.name - The name of the block.
+             * @param {string} config.outType - The output type.
+             * @param {Object} config.flows - The flow configuration.
+             * @param {string} config.flows.type - The type of flow.
+             * @param {string[]} config.flows.types - The allowed flow types.
+             * @param {string[]} config.flows.labels - The flow labels.
+             * @param {number} config.args - The number of arguments.
+             * @param {string[]} config.argTypes - The allowed argument types.
+             * @param {string[]} config.defaults - The default values for arguments.
+             */
             this.formBlock({
                 name: _("calculate"),
                 outType: "anyout",
@@ -476,15 +717,19 @@ function setupActionBlocks(activity) {
             });
         }
 
+        /**
+         * Handles the argument for the block.
+         * @param {Logo} logo - The logo instance.
+         * @param {string} turtle - The turtle identifier.
+         * @param {string} blk - The block identifier.
+         * @param {any} receivedArg - The received argument.
+         * @returns {any} - The result of the argument handling.
+         */
         arg(logo, turtle, blk, receivedArg) {
             const actionArgs = [];
-            // logo.getBlockAtStartOfArg(blk);
+
             if (activity.blocks.blockList[blk].argClampSlots.length > 0) {
-                for (
-                    let i = 0;
-                    i < activity.blocks.blockList[blk].argClampSlots.length;
-                    i++
-                ) {
+                for (let i = 0; i < activity.blocks.blockList[blk].argClampSlots.length; i++) {
                     const t = logo.parseArg(
                         logo,
                         turtle,
@@ -495,6 +740,7 @@ function setupActionBlocks(activity) {
                     actionArgs.push(t);
                 }
             }
+
             const cblk = activity.blocks.blockList[blk].connections[1];
             if (cblk === null) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
@@ -519,17 +765,43 @@ function setupActionBlocks(activity) {
             }
         }
     }
-
+    /**
+     * Represents a block for accessing the value of an argument passed to an action.
+     * @extends {LeftBlock}
+     */
     class ArgBlock extends LeftBlock {
+        /**
+         * Constructs an ArgBlock.
+         */
         constructor() {
             super("arg");
+
+            /**
+             * Sets the palette for the block.
+             * @param {string} "action" - The palette category.
+             * @param {Activity} activity - The activity associated with the block.
+             */
             this.setPalette("action", activity);
+
+            /**
+             * Sets the help string for the block.
+             * @type {string[]}
+             */
             this.setHelpString([
                 _("The Arg block contains the value of an argument passed to an action."),
                 "documentation",
                 ""
             ]);
 
+            /**
+             * Forms the block with specified configuration.
+             * @param {Object} config - The configuration object.
+             * @param {string} config.name - The name of the block.
+             * @param {string} config.outType - The output type.
+             * @param {number} config.args - The number of arguments.
+             * @param {string[]} config.defaults - The default values for arguments.
+             * @param {string[]} config.argTypes - The allowed argument types.
+             */
             this.formBlock({
                 name: _("arg"),
                 outType: "anyout",
@@ -539,37 +811,69 @@ function setupActionBlocks(activity) {
             });
         }
 
+        /**
+         * Handles the argument for the block.
+         * @param {Logo} logo - The logo instance.
+         * @param {string} turtle - The turtle identifier.
+         * @param {string} blk - The block identifier.
+         * @param {any} receivedArg - The received argument.
+         * @returns {number} - The value of the specified argument.
+         */
         arg(logo, turtle, blk, receivedArg) {
             const cblk = activity.blocks.blockList[blk].connections[1];
+
             if (cblk === null) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return 0;
             } else {
                 const name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
-                const action_args = receivedArg;
-                if (action_args && action_args.length >= Number(name)) {
-                    const value = action_args[Number(name) - 1];
+                const actionArgs = receivedArg;
+
+                if (actionArgs && actionArgs.length >= Number(name)) {
+                    const value = actionArgs[Number(name) - 1];
                     return value;
                 } else {
                     activity.errorMsg(_("Invalid argument"), blk);
                     return 0;
                 }
             }
-
-            // return [0, 0, activity.blocks.blockList[blk].value];
         }
     }
-
+    /**
+     * Represents a block for accessing the value of a named argument passed to an action.
+     * @extends {LeftBlock}
+     */
     class NamedArgBlock extends LeftBlock {
+        /**
+         * Constructs a NamedArgBlock.
+         */
         constructor() {
             super("namedarg");
+
+            /**
+             * Sets the palette for the block.
+             * @param {string} "action" - The palette category.
+             * @param {Activity} activity - The activity associated with the block.
+             */
             this.setPalette("action", activity);
+
+            /**
+             * Sets the help string for the block.
+             * @type {string[]}
+             */
             this.setHelpString([
                 _("The Arg block contains the value of an argument passed to an action."),
                 "documentation",
                 ""
             ]);
 
+            /**
+             * Forms the block with specified configuration.
+             * @param {Object} config - The configuration object.
+             * @param {string} config.name - The name of the block.
+             * @param {Object} config.flows - The flow configuration.
+             * @param {string} config.flows.type - The type of flow.
+             */
             this.formBlock({
                 name: _("arg") + 1,
                 flows: {
@@ -578,6 +882,14 @@ function setupActionBlocks(activity) {
             });
         }
 
+        /**
+         * Handles the argument for the block.
+         * @param {Logo} logo - The logo instance.
+         * @param {string} turtle - The turtle identifier.
+         * @param {string} blk - The block identifier.
+         * @param {any} receivedArg - The received argument.
+         * @returns {number} - The value of the specified named argument.
+         */
         arg(logo, turtle, blk, receivedArg) {
             const name = activity.blocks.blockList[blk].privateData;
             const actionArgs = receivedArg;
@@ -596,28 +908,53 @@ function setupActionBlocks(activity) {
                 activity.errorMsg(_("Invalid argument"), blk);
                 return 0;
             }
-            // return activity.blocks.blockList[blk].value;
         }
     }
-
+    /**
+     * Represents a block for initiating an action.
+     * @extends {FlowBlock}
+     */
     class DoBlock extends FlowBlock {
+        /**
+         * Constructs a DoBlock.
+         */
         constructor() {
             //.TRANS: do is the do something or take an action.
             super("do");
+
+            /**
+             * Sets the palette for the block.
+             * @param {string} "action" - The palette category.
+             * @param {Activity} activity - The activity associated with the block.
+             */
             this.setPalette("action", activity);
+
+            /**
+             * Specifies if the block is for beginners.
+             */
             this.beginnerBlock(true);
 
+            /**
+             * Sets the help string for the block.
+             * @type {string[]}
+             */
             this.setHelpString([
                 _("The Do block is used to initiate an action.") +
                     " " +
-                    _(
-                        "In the example, it is used with the One of block to choose a random phase."
-                    ),
+                    _("In the example, it is used with the One of block to choose a random phase."),
                 "documentation",
                 null,
                 "dohelp"
             ]);
 
+            /**
+             * Forms the block with specified configuration.
+             * @param {Object} config - The configuration object.
+             * @param {string} config.name - The name of the block.
+             * @param {number} config.args - The number of arguments.
+             * @param {string[]} config.defaults - The default values for arguments.
+             * @param {string[]} config.argTypes - The allowed argument types.
+             */
             this.formBlock({
                 name: this.lang === "ja" ? _("do1") : _("do"),
                 args: 1,
@@ -626,6 +963,14 @@ function setupActionBlocks(activity) {
             });
         }
 
+        /**
+         * Handles the flow of the block.
+         * @param {string[]} args - The arguments for the block.
+         * @param {Logo} logo - The logo instance.
+         * @param {string} turtle - The turtle identifier.
+         * @param {string} blk - The block identifier.
+         * @returns {Array} - The result of the flow handling.
+         */
         flow(args, logo, turtle, blk) {
             if (args.length === 0) return;
 
@@ -642,13 +987,32 @@ function setupActionBlocks(activity) {
             activity.errorMsg(NOACTIONERRORMSG, blk, args[0]);
         }
     }
-
+    /**
+     * Represents a block for listening to an event and triggering an action.
+     * @extends {FlowBlock}
+     */
     class ListenBlock extends FlowBlock {
+        /**
+         * Constructs a ListenBlock.
+         */
         constructor() {
             super("listen");
+
+            /**
+             * Sets the palette for the block.
+             * @param {string} "action" - The palette category.
+             * @param {Activity} activity - The activity associated with the block.
+             */
             this.setPalette("action", activity);
+
+            /**
+             * Specifies if the block is for beginners.
+             */
             this.beginnerBlock(true);
 
+            /**
+             * Adjusts the width of the block for the Japanese language.
+             */
             if (this.lang === "ja") {
                 this.extraWidth = 15;
                 this.setHelpString([
@@ -668,20 +1032,32 @@ function setupActionBlocks(activity) {
                 ]);
             }
 
+            /**
+             * Forms the block with specified configuration.
+             * @param {Object} config - The configuration object.
+             * @param {string} config.name - The name of the block.
+             * @param {number} config.args - The number of arguments.
+             * @param {string[]} config.argTypes - The allowed argument types.
+             * @param {string[]} config.argLabels - The labels for arguments.
+             * @param {string[]} config.defaults - The default values for arguments.
+             */
             this.formBlock({
-                //.TRANS: an event, such as user actions (mouse clicks, key presses)
                 name: _("on"),
                 args: 2,
                 argTypes: ["anyin", "anyin"],
-                //.TRANS: do1 is do (take) an action (JAPANESE ONLY)
-                argLabels: [
-                    _("event"),
-                    this.lang === "ja" ? _("do1") : _("do")
-                ],
+                argLabels: [_("event"), this.lang === "ja" ? _("do1") : _("do")],
                 defaults: [_("event"), _("action")]
             });
         }
 
+        /**
+         * Handles the flow of the block.
+         * @param {string[]} args - The arguments for the block.
+         * @param {Logo} logo - The logo instance.
+         * @param {string} turtle - The turtle identifier.
+         * @param {string} blk - The block identifier.
+         * @param {any} receivedArg - The received argument.
+         */
         flow(args, logo, turtle, blk, receivedArg) {
             if (args.length !== 2) return;
 
@@ -691,7 +1067,7 @@ function setupActionBlocks(activity) {
                 const tur = activity.turtles.ithTurtle(turtle);
 
                 // eslint-disable-next-line no-unused-vars
-                const __listener = event => {
+                const __listener = (event) => {
                     if (tur.running) {
                         const queueBlock = new Queue(logo.actions[args[1]], 1, blk);
                         tur.parentFlowQueue.push(blk);
@@ -702,13 +1078,16 @@ function setupActionBlocks(activity) {
                         tur.singer.runningFromEvent = true;
                         // First, we need to reset the turtle's
                         // elapsed time since it has been falling behind.
-                        const elapsedTime = (
-                            new Date().getTime() - activity.logo.firstNoteTime
-                        ) / 1000;
+                        const elapsedTime =
+                            (new Date().getTime() - activity.logo.firstNoteTime) / 1000;
                         tur.singer.turtleTime = elapsedTime;
 
                         logo.runFromBlockNow(
-                            logo, turtle, logo.actions[args[1]], false, receivedArg
+                            logo,
+                            turtle,
+                            logo.actions[args[1]],
+                            false,
+                            receivedArg
                         );
                     }
                 };
@@ -719,12 +1098,37 @@ function setupActionBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a Dispatch Block used to trigger an event.
+     *
+     * @class
+     * @extends FlowBlock
+     */
     class DispatchBlock extends FlowBlock {
+        /**
+         * Constructor for the DispatchBlock class.
+         */
         constructor() {
             super("dispatch");
+
+            /**
+             * Sets the palette and marks the block as a beginner block.
+             *
+             * @memberof DispatchBlock
+             * @method
+             * @param {string} palette - The palette to set for the block.
+             * @param {string} activity - The activity associated with the block.
+             */
             this.setPalette("action", activity);
             this.beginnerBlock(true);
 
+            /**
+             * Sets the help string for the Dispatch block.
+             *
+             * @memberof DispatchBlock
+             * @method
+             * @param {Array} helpString - The help string to set for the block.
+             */
             this.setHelpString([
                 _("The Broadcast block is used to trigger an event."),
                 "documentation",
@@ -732,7 +1136,17 @@ function setupActionBlocks(activity) {
                 "broadcasthelp"
             ]);
 
-            //.TRANS: dispatch an event to trigger a listener
+            /**
+             * Forms the block with specific details.
+             *
+             * @memberof DispatchBlock
+             * @method
+             * @param {Object} options - The options for forming the block.
+             * @param {string} options.name - The name of the block.
+             * @param {number} options.args - The number of arguments for the block.
+             * @param {Array} options.defaults - The default values for arguments.
+             * @param {Array} options.argTypes - The types of arguments.
+             */
             this.formBlock({
                 name: _("broadcast"),
                 args: 1,
@@ -741,6 +1155,14 @@ function setupActionBlocks(activity) {
             });
         }
 
+        /**
+         * Handles the flow logic for the Dispatch block.
+         *
+         * @memberof DispatchBlock
+         * @method
+         * @param {Array} args - The arguments for the flow.
+         * @param {Object} logo - The logo object.
+         */
         flow(args, logo) {
             // Dispatch an event.
             if (args.length !== 1) return;
@@ -750,16 +1172,38 @@ function setupActionBlocks(activity) {
                 const event = new Event(args[0]);
                 logo.eventList[args[0]] = event;
             }
+
+            // Trigger the event on the activity's stage.
             activity.stage.dispatchEvent(args[0]);
         }
     }
-
+    /**
+     * Represents a block for starting a voice.
+     * @extends {StackClampBlock}
+     */
     class StartBlock extends StackClampBlock {
+        /**
+         * Constructs a StartBlock.
+         */
         constructor() {
             super("start");
+
+            /**
+             * Sets the palette for the block.
+             * @param {string} "action" - The palette category.
+             * @param {Activity} activity - The activity associated with the block.
+             */
             this.setPalette("action", activity);
+
+            /**
+             * Specifies if the block is for beginners.
+             */
             this.beginnerBlock(true);
 
+            /**
+             * Sets the help string for the block.
+             * @type {string[]}
+             */
             this.setHelpString([
                 _("Each Start block is a separate voice.") +
                     " " +
@@ -770,21 +1214,53 @@ function setupActionBlocks(activity) {
                 ""
             ]);
 
+            /**
+             * Forms the block with specified configuration.
+             * @param {Object} config - The configuration object.
+             * @param {string} config.name - The name of the block.
+             * @param {boolean} config.canCollapse - Indicates if the block can be collapsed.
+             */
             this.formBlock({ name: _("start"), canCollapse: true });
         }
 
+        /**
+         * Handles the flow of the block.
+         * @param {string[]} args - The arguments for the block.
+         * @returns {Array} - The result of the flow handling.
+         */
         flow(args) {
             if (args.length === 1) return [args[0], 1];
         }
     }
-
+    /**
+     * Represents a block for starting a drum voice.
+     * @extends {StartBlock}
+     */
     class StartDrumBlock extends StartBlock {
+        /**
+         * Constructs a StartDrumBlock.
+         */
         constructor() {
             super();
+
+            /**
+             * Changes the name of the block to "startdrum".
+             */
             this.changeName("startdrum");
 
+            /**
+             * Forms the block with specified configuration.
+             * @param {Object} config - The configuration object.
+             * @param {string} config.name - The name of the block.
+             */
             this.formBlock({ name: _("start drum") });
 
+            /**
+             * Creates a macro for the block.
+             * @param {number} x - The x-coordinate.
+             * @param {number} y - The y-coordinate.
+             * @returns {Array} - The macro generated by the block.
+             */
             this.makeMacro((x, y) => [
                 [0, "start", x, y, [null, 1, null]],
                 [1, "setdrum", 0, 0, [0, 2, null, 3]],
@@ -793,15 +1269,37 @@ function setupActionBlocks(activity) {
             ]);
         }
     }
-
+    /**
+     * Represents a block for grouping together blocks to be used more than once.
+     * @extends {StackClampBlock}
+     */
     class ActionBlock extends StackClampBlock {
+        /**
+         * Constructs an ActionBlock.
+         */
         constructor() {
             super("action");
+
+            /**
+             * Sets the palette for the block.
+             * @param {string} "action" - The palette category.
+             * @param {Activity} activity - The activity associated with the block.
+             */
             this.setPalette("action", activity);
+
+            /**
+             * Specifies if the block is for beginners.
+             */
             this.beginnerBlock(true);
 
+            /**
+             * Sets the help string for the block.
+             * @type {string[]}
+             */
             this.setHelpString([
-                _("The Action block is used to group together blocks so that they can be used more than once.") +
+                _(
+                    "The Action block is used to group together blocks so that they can be used more than once."
+                ) +
                     " " +
                     _("It is often used for storing a phrase of music that is repeated."),
                 "documentation",
@@ -809,6 +1307,16 @@ function setupActionBlocks(activity) {
                 "actionhelp"
             ]);
 
+            /**
+             * Forms the block with specified configuration.
+             * @param {Object} config - The configuration object.
+             * @param {boolean} config.canCollapse - Indicates if the block can be collapsed.
+             * @param {string} config.name - The name of the block.
+             * @param {number} config.args - The number of arguments.
+             * @param {string[]} config.argLabels - The labels for arguments.
+             * @param {string[]} config.defaults - The default values for arguments.
+             * @param {string[]} config.argTypes - The allowed argument types.
+             */
             this.formBlock({
                 canCollapse: true,
                 name: _("action"),
@@ -817,6 +1325,13 @@ function setupActionBlocks(activity) {
                 defaults: [_("action")],
                 argTypes: ["anyin"]
             });
+
+            /**
+             * Creates a macro for the block.
+             * @param {number} x - The x-coordinate.
+             * @param {number} y - The y-coordinate.
+             * @returns {Array} - The macro generated by the block.
+             */
             this.makeMacro((x, y) => [
                 [0, "action", x, y, [null, 1, 2, null]],
                 [1, ["text", { value: _("action") }], 0, 0, [0]],
@@ -824,6 +1339,14 @@ function setupActionBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of the block.
+         * @param {string[]} args - The arguments for the block.
+         * @param {Logo} logo - The logo instance.
+         * @param {string} turtle - The turtle identifier.
+         * @param {string} blk - The block identifier.
+         * @returns {Array} - The result of the flow handling.
+         */
         flow(args, logo, turtle, blk) {
             if (args.length === 0) return;
 
@@ -840,24 +1363,63 @@ function setupActionBlocks(activity) {
             activity.errorMsg(NOACTIONERRORMSG, blk, args[0]);
         }
     }
-
+    /**
+     * Represents a block for initiating an action with a specified name.
+     * @extends {FlowBlock}
+     */
     class NamedDoBlock extends FlowBlock {
+        /**
+         * Constructs a NamedDoBlock.
+         */
         constructor() {
             super("nameddo");
+
+            /**
+             * Sets the palette for the block.
+             * @param {string} "action" - The palette category.
+             * @param {Activity} activity - The activity associated with the block.
+             */
             this.setPalette("action", activity);
+
+            /**
+             * Sets the help string for the block.
+             * @type {string[]}
+             */
             this.setHelpString([
                 _("The Do block is used to initiate an action."),
                 "documentation",
                 ""
             ]);
 
+            /**
+             * Adjusts the width of the block.
+             */
             this.extraWidth = 30;
+
+            /**
+             * Forms the block with specified configuration.
+             * @param {Object} config - The configuration object.
+             * @param {string} config.name - The name of the block.
+             */
             this.formBlock({ name: _("action") });
+
+            /**
+             * Indicates whether the block is hidden.
+             */
             this.hidden = true;
         }
 
+        /**
+         * Handles the flow of the block.
+         * @param {string[]} args - The arguments for the block.
+         * @param {Logo} logo - The logo instance.
+         * @param {string} turtle - The turtle identifier.
+         * @param {string} blk - The block identifier.
+         * @returns {Array} - The result of the flow handling.
+         */
         flow(args, logo, turtle, blk) {
             const name = activity.blocks.blockList[blk].privateData;
+
             if (!(name in logo.actions)) {
                 activity.errorMsg(NOACTIONERRORMSG, blk, name);
             }
@@ -869,6 +1431,7 @@ function setupActionBlocks(activity) {
             }
 
             let childFlow;
+
             if (tur.singer.backward.length > 0) {
                 childFlow = activity.blocks.findBottomBlock(logo.actions[name]);
                 const actionBlk = activity.blocks.findTopBlock(logo.actions[name]);
@@ -878,6 +1441,7 @@ function setupActionBlocks(activity) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
                 const nextBlock = activity.blocks.blockList[actionBlk].connections[2];
+
                 if (nextBlock === null) {
                     tur.singer.backward.pop();
                 } else {
@@ -889,7 +1453,7 @@ function setupActionBlocks(activity) {
                 }
 
                 // eslint-disable-next-line no-unused-vars
-                const __listener = event => tur.singer.backward.pop();
+                const __listener = (event) => tur.singer.backward.pop();
 
                 logo.setTurtleListener(turtle, listenerName, __listener);
             } else {
@@ -899,13 +1463,34 @@ function setupActionBlocks(activity) {
             return [childFlow, 1];
         }
     }
-
+    /**
+     * Represents a block for defining a custom temperament.
+     * @extends {StackClampBlock}
+     */
     class Temperament1Block extends StackClampBlock {
+        /**
+         * Constructs a Temperament1Block.
+         */
         constructor() {
             super("temperament1");
-            this.setPalette("action", activity);
-            this.setHelpString();
 
+            /**
+             * Sets the palette for the block.
+             * @param {string} "action" - The palette category.
+             * @param {Activity} activity - The activity associated with the block.
+             */
+            this.setPalette("action", activity);
+
+            /**
+             * Forms the block with specified configuration.
+             * @param {Object} config - The configuration object.
+             * @param {string} config.name - The name of the block.
+             * @param {number} config.args - The number of arguments.
+             * @param {boolean} config.canCollapse - Indicates if the block can be collapsed.
+             * @param {string[]} config.argLabels - The labels for arguments.
+             * @param {string[]} config.defaults - The default values for arguments.
+             * @param {string[]} config.argTypes - The allowed argument types.
+             */
             this.formBlock({
                 name: _("define temperament"),
                 args: 1,
@@ -914,14 +1499,28 @@ function setupActionBlocks(activity) {
                 defaults: ["custom"],
                 argTypes: ["text"]
             });
+
+            /**
+             * Creates a macro for the block.
+             * @param {number} x - The x-coordinate.
+             * @param {number} y - The y-coordinate.
+             * @returns {Array} - The macro generated by the block.
+             */
             this.makeMacro((x, y) => [
                 [0, "temperament1", x, y, [null, 1, 2, null]],
                 [1, ["text", { value: "custom" }], 0, 0, [0]],
                 [2, "hidden", 0, 0, [0, null]]
             ]);
+
+            /**
+             * Indicates whether the block is hidden.
+             */
             this.hidden = true;
         }
 
+        /**
+         * Handles the flow of the block.
+         */
         flow() {}
     }
 
