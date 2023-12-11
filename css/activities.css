@@ -390,6 +390,10 @@ nav ul li {
     left: 0;
 }
 
+iframe,canvas{
+overflow: clip !important;
+}
+
 .projectname {
     word-wrap: break-word;
 }
