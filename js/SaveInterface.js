@@ -17,19 +17,43 @@
    saveLilypondOutput, saveMxmlOutput
  */
 
-/*
-  exported
-
-  SaveInterface
+/**
+ * Class representing the SaveInterface.
+ * @class
  */
-
 class SaveInterface {
+    /**
+     * Creates an instance of SaveInterface.
+     * @constructor
+     * @param {*} activity - The main activity object.
+     */
     constructor(activity) {
+        /**
+         * The main activity object.
+         * @member {object}
+         */
         this.activity = activity;
+        /**
+         * The file name of the saved project
+         * @member {string}
+         */
         this.filename = null;
+        /**
+         * The notation conversion type
+         * @member {object}
+         */
         this.notationConvert = "";
+        /**
+         * The timestamp of the last save
+         * @member {number}
+         */
         this.timeLastSaved = -100;
-
+        
+        /**
+         * HTML template for saving projects.
+         * @member {string}
+         * @private
+         */
         this.htmlSaveTemplate =
             '<!DOCTYPE html><html lang="en"><head> <meta charset="utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="description" content="{{ project_description }}"> <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"> <title>{{ project_name }}</title> <meta property="og:site_name" content="Music Blocks"/> <meta property="og:type" content="website"/> <meta property="og:title" content="' +
             _("Music Blocks Project") +
@@ -93,6 +117,13 @@ class SaveInterface {
         });
     }
 
+    /**
+    * Download a file to the user's computer.
+    * @param {string} extension - The file extension (including the dot).
+    * @param {string} dataurl - The base64 data url of the file.
+    * @param {string} defaultfilename - The default filename to be used.
+    * @returns {void}
+    */
     download(extension, dataurl, defaultfilename) {
         let filename = null;
         if (defaultfilename === undefined || defaultfilename === null) {
@@ -133,6 +164,13 @@ class SaveInterface {
         this.downloadURL(filename, dataurl);
     }
 
+    /**
+     * Saves the provided data as a file.
+     * @param {string} filename - The name of the file to save.
+     * @param {string} dataurl - The data to save in the file.
+     * @returns {void}
+     * @memberof SaveInterface
+     */
     downloadURL(filename, dataurl) {
         const a = document.createElement("a");
         a.setAttribute("href", dataurl);
@@ -142,7 +180,18 @@ class SaveInterface {
         document.body.removeChild(a);
     }
 
-    // Save Functions - n.b. include filename parameter - can be left blank / undefined
+
+    /**
+     * Prepare HTML content for export.
+     *
+     * This method generates HTML content for export, including project details, description, name,
+     * data, and project image. It uses a template and replaces placeholders with actual values.
+     *
+     * @returns {string} The HTML content prepared for export.
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
     prepareHTML() {
         let file = this.htmlSaveTemplate;
         let description = _("No description provided");
@@ -171,12 +220,35 @@ class SaveInterface {
         return file;
     }
 
+    /**
+     * Save HTML representation of an activity.
+     *
+     * This method generates and downloads the HTML representation of the provided activity.
+     *
+     * @param {SaveInterface} activity - The activity object to save.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
     saveHTML(activity) {
         const html =
             "data:text/plain;charset=utf-8," + encodeURIComponent(activity.save.prepareHTML());
         activity.save.download("html", html, null);
     }
 
+    /**
+     * Save HTML representation of an activity without prompting the user.
+     *
+     * This method generates and downloads the HTML representation of the provided activity without
+     * prompting the user. It uses a setTimeout to delay the execution by 500 milliseconds.
+     *
+     * @param {SaveInterface} activity - The activity object to save.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
     saveHTMLNoPrompt(activity) {
         setTimeout(() => {
             const html =
@@ -192,6 +264,14 @@ class SaveInterface {
         }, 500);
     }
 
+    /**
+     * This method is to save SVG representation of an activity
+     * 
+     * @param {SaveInterface} activity -The activity object to save
+     * @returns {void}
+     * @method
+     * @instance
+     */
     saveSVG(activity) {
         const svg =
             "data:image/svg+xml;utf8," +
@@ -206,16 +286,43 @@ class SaveInterface {
         activity.save.download("svg", svg, null);
     }
 
+    /**
+     * This method is to save PNG representation of an activity
+     * 
+     * @param {SaveInterface} activity -The activity object to save
+     * @returns {void}
+     * @method
+     * @instance
+     */
     savePNG(activity) {
         const png = docById("overlayCanvas").toDataURL("image/png");
         activity.save.download("png", png, null);
     }
 
+    /**
+     * This method is to save BlockArtwork and download the SVG representation of block artwork from the provided activity.
+     * 
+     * @param {SaveInterface} activity - The activity object containing block artwork to save.
+     * @returns {void}
+     * @method
+     * @instance
+     */   
     saveBlockArtwork(activity) {
         const svg = "data:image/svg+xml;utf8," + activity.printBlockSVG();
         activity.save.download("svg", svg, null);
     }
 
+    /**
+    * Save audio recording in WAV format.
+    *
+    * This method initiates the process of recording audio in WAV format within the provided activity.
+    *
+    * @param {SaveInterface} activity - The activity object for which audio recording is to be saved.
+    * @returns {void}
+    * @memberof SaveInterface
+    * @method
+    * @instance
+    */
     saveWAV(activity) {
         document.body.style.cursor = "wait";
         activity.logo.recording = true;
@@ -225,6 +332,17 @@ class SaveInterface {
         activity.textMsg(_("Your recording is in progress."));
     }
 
+    /**
+     * Save ABC notation representation of an activity.
+     *
+     * This method generates and prepares ABC notation output for the provided activity.
+     *
+     * @param {SaveInterface} activity - The activity object to save as ABC notation.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
     saveAbc(activity) {
         document.body.style.cursor = "wait";
         //Suppress music and turtle output when generating
@@ -240,11 +358,32 @@ class SaveInterface {
         activity.logo.runLogoCommands();
     }
 
+    /**
+     * Perform actions after saving an ABC notation file.
+     *
+     * This method handles the post-processing steps after saving ABC notation.
+     *
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
     afterSaveAbc() {
         const abc = encodeURIComponent(saveAbcOutput(this.activity));
         this.activity.save.download("abc", "data:text;utf8," + abc, null);
     }
 
+    /**
+     * Save Lilypond representation of an activity.
+     *
+     * This method initiates the process of saving Lilypond representation of the provided activity.
+     *
+     * @param {SaveInterface} activity - The activity object to save as Lilypond.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
     saveLilypond(activity) {
         const lyext = "ly";
         let filename = _("My Project");
@@ -301,7 +440,17 @@ class SaveInterface {
             docById("lilypondModal").style.display = "none";
         };
     }
-
+    /**
+     * Save Lilypond file with optional PDF conversion.
+     *
+     * This method handles the saving of Lilypond files with optional PDF conversion based on user preferences.
+     *
+     * @param {boolean} [isPDF=false] - Flag indicating whether to generate a PDF along with the Lilypond file.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
     saveLYFile(isPDF) {
         if (isPDF === undefined) {
             isPDF = false;
@@ -372,6 +521,17 @@ class SaveInterface {
         docById("lilypondModal").style.display = "none";
     }
 
+    /** 
+    * Perform actions after saving a Lilypond file.
+    *
+    * This method handles post-processing steps after saving a Lilypond file, such as handling PDF conversion.
+    *
+    * @param {string} filename - The name of the Lilypond file.
+    * @returns {void}
+    * @memberof SaveInterface
+    * @method
+    * @instance
+    */
     afterSaveLilypond(filename) {
         const ly = saveLilypondOutput(this.activity);
         switch (this.notationConvert) {
@@ -384,6 +544,19 @@ class SaveInterface {
         }
         this.notationConvert = "";
     }
+
+    /**
+     * Perform actions after saving a Lilypond file in LY format.
+     *
+     * This method handles post-processing steps specific to saving a Lilypond file in LY format.
+     *
+     * @param {string} lydata - The Lilypond data.
+     * @param {string} filename - The name of the Lilypond file.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
 
     afterSaveLilypondLY(lydata, filename) {
         if (platform.FF) {
@@ -407,6 +580,19 @@ class SaveInterface {
         this.download("ly", "data:text;utf8," + encodeURIComponent(lydata), filename);
     }
 
+
+    /**
+     * Perform actions after saving a Lilypond file in PDF format.
+     *
+     * This method handles post-processing steps specific to saving a Lilypond file in PDF format.
+     *
+     * @param {string} lydata - The Lilypond data.
+     * @param {string} filename - The name of the Lilypond file.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
     afterSaveLilypondPDF(lydata, filename) {
         document.body.style.cursor = "wait";
         window.Converter.ly2pdf(lydata, (success, dataurl) => {
@@ -421,6 +607,19 @@ class SaveInterface {
         });
     }
 
+    /**
+    * 
+    * Save MXML file.
+    *
+    * This method initiates the process of saving an MXML file.
+    *
+    * @param {string} filename - The name of the MXML file.
+    * @returns {void}
+    * @memberof SaveInterface
+    * @method
+    * @instance
+    *
+    */
     // eslint-disable-next-line no-unused-vars
     saveMxml(filename) {
         this.activity.logo.runningMxml = true;
@@ -433,6 +632,18 @@ class SaveInterface {
         this.activity.logo.runLogoCommands();
     }
 
+    /** 
+    * Perform actions after saving an MXML file.
+    *
+    * This method handles post-processing steps after saving an MXML file.
+    *
+    * @param {string} filename - The name of the MXML file.
+    * @returns {void}
+    * @memberof SaveInterface
+    * @method
+    * @instance
+    *
+    */
     afterSaveMxml(filename) {
         const data = saveMxmlOutput(this.activity.logo);
         this.download("xml", "data:text;utf8," + encodeURIComponent(data), filename);
