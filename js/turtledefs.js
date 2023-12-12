@@ -519,6 +519,12 @@ const createHelpContent = (activity) => {
         "data:image/svg+xml;base64," +
             window.btoa(unescape(encodeURIComponent(LOADBUTTON)))
     ]);
+    HELPCONTENT.push([
+        _("Delete"),
+        _("To delete a block, just double-click on it, then you will be able to see the delete option"),
+        "data:image/svg+xml;base64," +
+            window.btoa(unescape(encodeURIComponent(EMPTYTRASHCONFIRMBUTTON)))
+    ]);
     if (activity.beginnerMode) {
         HELPCONTENT.push([
             _("Save project"),
