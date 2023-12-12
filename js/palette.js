@@ -403,6 +403,7 @@ class Palettes {
                 document.body.style.cursor = "text";
             } else {
                 document.body.style.cursor = "pointer";
+                this.showPalette(name);
             }
         };
 
