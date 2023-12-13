@@ -18,8 +18,14 @@
 /* exported setupProgramBlocks */
 
 function setupProgramBlocks(activity) {
-
+    /**
+     * Represents a block that loads the heap from a web page in the logo programming language.
+     * @extends {FlowBlock}
+     */
     class LoadHeapFromAppBlock extends FlowBlock {
+        /**
+         * Constructs a new LoadHeapFromAppBlock instance.
+         */
         constructor() {
             super("loadHeapFromApp");
             this.setPalette("program", activity);
@@ -30,14 +36,39 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
-                //.TRANS: load the heap contents from a URL
+                /**
+                 * The name of the block.
+                 * @type {string}
+                 */
                 name: _("load heap from App"),
+
+                /**
+                 * The number of arguments expected by the block.
+                 * @type {number}
+                 */
                 args: 2,
+
+                /**
+                 * The types of arguments expected by the block.
+                 * @type {string[]}
+                 */
                 argTypes: ["textin", "textin"],
+
+                /**
+                 * The default values for arguments.
+                 * @type {string[]}
+                 */
                 defaults: ["appName", "localhost"]
             });
         }
 
+        /**
+         * Executes the flow of the LoadHeapFromAppBlock.
+         * @param {string[]} args - The arguments passed to the block.
+         * @param {Object} logo - The logo object.
+         * @param {Object} turtle - The turtle object.
+         * @param {Object} blk - The block object.
+         */
         flow(args, logo, turtle, blk) {
             if (args[0] === null || args[1] === null) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
@@ -51,6 +82,7 @@ function setupProgramBlocks(activity) {
             let oldHeap = [];
             xmlHttp.open("GET", url, false);
             xmlHttp.send();
+
             if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
                 // eslint-disable-next-line no-console
                 console.debug(xmlHttp.responseText);
@@ -70,9 +102,11 @@ function setupProgramBlocks(activity) {
                 activity.errorMsg("xmlHttp.readyState: " + xmlHttp.readyState);
                 return;
             }
+
             if (name in logo.turtleHeaps) {
                 oldHeap = logo.turtleHeaps[turtle];
             }
+
             try {
                 logo.turtleHeaps[name] = data;
             } catch (e) {
@@ -83,7 +117,14 @@ function setupProgramBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block that saves the heap to a web page in the logo programming language.
+     * @extends {FlowBlock}
+     */
     class SaveHeapToAppBlock extends FlowBlock {
+        /**
+         * Constructs a new SaveHeapToAppBlock instance.
+         */
         constructor() {
             super("saveHeapToApp");
             this.setPalette("program", activity);
@@ -94,14 +135,39 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
-                //.TRANS: save the heap contents to a URL
+                /**
+                 * The name of the block.
+                 * @type {string}
+                 */
                 name: _("save heap to App"),
+
+                /**
+                 * The number of arguments expected by the block.
+                 * @type {number}
+                 */
                 args: 2,
+
+                /**
+                 * The types of arguments expected by the block.
+                 * @type {string[]}
+                 */
                 argTypes: ["textin", "textin"],
+
+                /**
+                 * The default values for arguments.
+                 * @type {string[]}
+                 */
                 defaults: ["appName", "localhost"]
             });
         }
 
+        /**
+         * Executes the flow of the SaveHeapToAppBlock.
+         * @param {string[]} args - The arguments passed to the block.
+         * @param {Object} logo - The logo object.
+         * @param {Object} turtle - The turtle object.
+         * @param {Object} blk - The block object.
+         */
         flow(args, logo, turtle, blk) {
             if (args[0] === null || args[1] === null) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
@@ -110,14 +176,12 @@ function setupProgramBlocks(activity) {
 
             const name = args[0];
             const url = args[1];
+
             if (name in logo.turtleHeaps) {
                 const data = JSON.stringify(logo.turtleHeaps[name]);
                 const xmlHttp = new XMLHttpRequest();
                 xmlHttp.open("POST", url, true);
-                xmlHttp.setRequestHeader(
-                    "Content-Type",
-                    "application/json;charset=UTF-8"
-                );
+                xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
                 xmlHttp.send(data);
             } else {
                 activity.errorMsg(_("Cannot find a valid heap for") + " " + name);
@@ -125,7 +189,14 @@ function setupProgramBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block that loads the heap from a file in the logo programming language.
+     * @extends {FlowBlock}
+     */
     class LoadHeapBlock extends FlowBlock {
+        /**
+         * Constructs a new LoadHeapBlock instance.
+         */
         constructor() {
             super("loadHeap");
             this.setPalette("program", activity);
@@ -136,14 +207,39 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
-                //.TRANS: load the heap from a file
+                /**
+                 * The name of the block.
+                 * @type {string}
+                 */
                 name: _("load heap"),
+
+                /**
+                 * The number of arguments expected by the block.
+                 * @type {number}
+                 */
                 args: 1,
+
+                /**
+                 * The types of arguments expected by the block.
+                 * @type {string[]}
+                 */
                 argTypes: ["filein"],
+
+                /**
+                 * The default values for arguments.
+                 * @type {Array.<Array<null|null>>}
+                 */
                 defaults: [[null, null]]
             });
         }
 
+        /**
+         * Executes the flow of the LoadHeapBlock.
+         * @param {Array} args - The arguments passed to the block.
+         * @param {Object} logo - The logo object.
+         * @param {Object} turtle - The turtle object.
+         * @param {number} blk - The block identifier.
+         */
         flow(args, logo, turtle, blk) {
             const block = activity.blocks.blockList[blk];
             let oldHeap;
@@ -178,24 +274,47 @@ function setupProgramBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block that loads the heap from a JSON encoding in the logo programming language.
+     * @extends {FlowBlock}
+     */
     class SetHeapBlock extends FlowBlock {
+        /**
+         * Constructs a new SetHeapBlock instance.
+         */
         constructor() {
             super("setHeap");
             this.setPalette("program", activity);
-            this.setHelpString([
-                _("The Set-heap block loads the heap."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Set-heap block loads the heap."), "documentation", ""]);
 
             this.formBlock({
-                //.TRANS: load the heap from a JSON encoding
+                /**
+                 * The name of the block.
+                 * @type {string}
+                 */
                 name: _("set heap"),
+
+                /**
+                 * The number of arguments expected by the block.
+                 * @type {number}
+                 */
                 args: 1,
+
+                /**
+                 * The types of arguments expected by the block.
+                 * @type {string[]}
+                 */
                 argTypes: ["anyin"]
             });
         }
 
+        /**
+         * Executes the flow of the SetHeapBlock.
+         * @param {Array} args - The arguments passed to the block.
+         * @param {Object} logo - The logo object.
+         * @param {Object} turtle - The turtle object.
+         * @param {number} blk - The block identifier.
+         */
         flow(args, logo, turtle, blk) {
             const block = activity.blocks.blockList[blk];
             let oldHeap;
@@ -208,17 +327,13 @@ function setupProgramBlocks(activity) {
             const c = block.connections[1];
             if (c !== null) {
                 try {
-                    logo.turtleHeaps[turtle] = JSON.parse(
-                        activity.blocks.blockList[c].value
-                    );
+                    logo.turtleHeaps[turtle] = JSON.parse(activity.blocks.blockList[c].value);
                     if (!Array.isArray(logo.turtleHeaps[turtle])) {
                         throw "is not array";
                     }
                 } catch (e) {
                     logo.turtleHeaps[turtle] = oldHeap;
-                    activity.errorMsg(
-                        _("The block you selected does not contain a valid heap.")
-                    );
+                    activity.errorMsg(_("The block you selected does not contain a valid heap."));
                 }
             } else {
                 activity.errorMsg(_("The Set heap block needs a heap."));
@@ -226,7 +341,14 @@ function setupProgramBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block that loads a dictionary from a file in the logo programming language.
+     * @extends {FlowBlock}
+     */
     class LoadDictBlock extends FlowBlock {
+        /**
+         * Constructs a new LoadDictBlock instance.
+         */
         constructor() {
             super("loadDict");
             this.setPalette("program", activity);
@@ -237,15 +359,45 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
-                //.TRANS: load a dictionary from a file
+                /**
+                 * The name of the block.
+                 * @type {string}
+                 */
                 name: _("load dictionary"),
+
+                /**
+                 * The number of arguments expected by the block.
+                 * @type {number}
+                 */
                 args: 2,
+
+                /**
+                 * The types of arguments expected by the block.
+                 * @type {string[]}
+                 */
                 argTypes: ["textin", "filein"],
+
+                /**
+                 * The labels for the arguments.
+                 * @type {string[]}
+                 */
                 argLabels: [_("name"), _("file")],
+
+                /**
+                 * The default values for arguments.
+                 * @type {Array}
+                 */
                 defaults: [_("My Dictionary"), [null, null]]
             });
         }
 
+        /**
+         * Executes the flow of the LoadDictBlock.
+         * @param {Array} args - The arguments passed to the block.
+         * @param {Object} logo - The logo object.
+         * @param {Object} turtle - The turtle object.
+         * @param {number} blk - The block identifier.
+         */
         flow(args, logo, turtle, blk) {
             const block = activity.blocks.blockList[blk];
             if (args[0] === null) {
@@ -275,7 +427,7 @@ function setupProgramBlocks(activity) {
                         if (target !== null) {
                             // Copy any internal entries now.
                             const k = Object.keys(d);
-                            for (let i=0; i < k.length; i++) {
+                            for (let i = 0; i < k.length; i++) {
                                 Turtle.DictActions.setDictValue(target, turtle, k[i], d[k[i]]);
                             }
                         } else if (!(a in logo.turtleDicts[turtle])) {
@@ -293,7 +445,14 @@ function setupProgramBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block that loads a dictionary from a JSON encoding in the logo programming language.
+     * @extends {FlowBlock}
+     */
     class SetDictBlock extends FlowBlock {
+        /**
+         * Constructs a new SetDictBlock instance.
+         */
         constructor() {
             super("setDictionary");
             this.setPalette("program", activity);
@@ -304,15 +463,45 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
-                //.TRANS: load a dictionary from a JSON encoding
+                /**
+                 * The name of the block.
+                 * @type {string}
+                 */
                 name: _("set dictionary"),
+
+                /**
+                 * The number of arguments expected by the block.
+                 * @type {number}
+                 */
                 args: 2,
+
+                /**
+                 * The types of arguments expected by the block.
+                 * @type {string[]}
+                 */
                 argTypes: ["textin", "anyin"],
+
+                /**
+                 * The labels for the arguments.
+                 * @type {string[]}
+                 */
                 argLabels: [_("name"), _("dictionary")],
+
+                /**
+                 * The default values for arguments.
+                 * @type {Array}
+                 */
                 defaults: [_("My Dictionary")]
             });
         }
 
+        /**
+         * Executes the flow of the SetDictBlock.
+         * @param {Array} args - The arguments passed to the block.
+         * @param {Object} logo - The logo object.
+         * @param {Object} turtle - The turtle object.
+         * @param {number} blk - The block identifier.
+         */
         flow(args, logo, turtle, blk) {
             const block = activity.blocks.blockList[blk];
             if (args[0] === null) {
@@ -339,7 +528,7 @@ function setupProgramBlocks(activity) {
                     if (target !== null) {
                         // Copy any internal entries now.
                         const k = Object.keys(d);
-                        for (let i=0; i < k.length; i++) {
+                        for (let i = 0; i < k.length; i++) {
                             Turtle.DictActions.setDictValue(target, turtle, k[i], d[k[i]]);
                         }
                     } else if (!(a in logo.turtleDicts[turtle])) {
@@ -356,7 +545,14 @@ function setupProgramBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block that saves the heap to a file in the logo programming language.
+     * @extends {FlowBlock}
+     */
     class SaveHeapBlock extends FlowBlock {
+        /**
+         * Constructs a new SaveHeapBlock instance.
+         */
         constructor() {
             super("saveHeap");
             this.setPalette("program", activity);
@@ -367,27 +563,57 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
-                //.TRANS: save the heap to a file
+                /**
+                 * The name of the block.
+                 * @type {string}
+                 */
                 name: _("save heap"),
+
+                /**
+                 * The number of arguments expected by the block.
+                 * @type {number}
+                 */
                 args: 1,
+
+                /**
+                 * The types of arguments expected by the block.
+                 * @type {string[]}
+                 */
                 argTypes: ["textin"],
+
+                /**
+                 * The default values for arguments.
+                 * @type {string[]}
+                 */
                 defaults: ["heap.json"]
             });
         }
 
+        /**
+         * Executes the flow of the SaveHeapBlock.
+         * @param {Array} args - The arguments passed to the block.
+         * @param {Object} logo - The logo object.
+         * @param {Object} turtle - The turtle object.
+         */
         flow(args, logo, turtle) {
             if (args[0] !== null && turtle in logo.turtleHeaps) {
                 activity.save.download(
                     "json",
-                    "data:text/json;charset-utf-8," +
-                        JSON.stringify(logo.turtleHeaps[turtle]),
+                    "data:text/json;charset-utf-8," + JSON.stringify(logo.turtleHeaps[turtle]),
                     args[0]
                 );
             }
         }
     }
 
+    /**
+     * Represents a block that saves a dictionary to a file in the logo programming language.
+     * @extends {FlowBlock}
+     */
     class SaveDictBlock extends FlowBlock {
+        /**
+         * Constructs a new SaveDictBlock instance.
+         */
         constructor() {
             super("saveDict");
             this.setPalette("program", activity);
@@ -398,15 +624,45 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
-                //.TRANS: save a dictionary to a file
+                /**
+                 * The name of the block.
+                 * @type {string}
+                 */
                 name: _("save dictionary"),
+
+                /**
+                 * The number of arguments expected by the block.
+                 * @type {number}
+                 */
                 args: 2,
+
+                /**
+                 * The types of arguments expected by the block.
+                 * @type {string[]}
+                 */
                 argTypes: ["textin", "textin"],
+
+                /**
+                 * The labels for the arguments.
+                 * @type {string[]}
+                 */
                 argLabels: [_("name"), _("file")],
+
+                /**
+                 * The default values for arguments.
+                 * @type {Array}
+                 */
                 defaults: [_("My Dictionary"), "dictionary.json"]
             });
         }
 
+        /**
+         * Executes the flow of the SaveDictBlock.
+         * @param {Array} args - The arguments passed to the block.
+         * @param {Object} logo - The logo object.
+         * @param {Object} turtle - The turtle object.
+         * @param {number} blk - The block identifier.
+         */
         flow(args, logo, turtle, blk) {
             if (args[0] === null) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
@@ -427,8 +683,7 @@ function setupProgramBlocks(activity) {
             if (target === null) {
                 activity.save.download(
                     "json",
-                    "data:text/json;charset-utf-8," +
-                        JSON.stringify(logo.turtleDicts[turtle][a]),
+                    "data:text/json;charset-utf-8," + JSON.stringify(logo.turtleDicts[turtle][a]),
                     args[1]
                 );
             } else {
@@ -442,24 +697,53 @@ function setupProgramBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block that opens a palette in the logo programming language.
+     * @extends {FlowBlock}
+     */
     class OpenPaletteBlock extends FlowBlock {
+        /**
+         * Constructs a new OpenPaletteBlock instance.
+         */
         constructor() {
             super("openpalette");
             this.setPalette("program", activity);
-            this.setHelpString([
-                _("The Open palette block opens a palette."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Open palette block opens a palette."), "documentation", ""]);
 
             this.formBlock({
+                /**
+                 * The name of the block.
+                 * @type {string}
+                 */
                 name: _("open palette"),
+
+                /**
+                 * The number of arguments expected by the block.
+                 * @type {number}
+                 */
                 args: 1,
+
+                /**
+                 * The types of arguments expected by the block.
+                 * @type {string[]}
+                 */
                 argTypes: ["textin"],
+
+                /**
+                 * The default values for arguments.
+                 * @type {string[]}
+                 */
                 defaults: [_("rhythm")]
             });
         }
 
+        /**
+         * Executes the flow of the OpenPaletteBlock.
+         * @param {Array} args - The arguments passed to the block.
+         * @param {Object} logo - The logo object.
+         * @param {Object} turtle - The turtle object.
+         * @param {number} blk - The block identifier.
+         */
         flow(args, logo, turtle, blk) {
             if (args.length < 1) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
@@ -467,10 +751,7 @@ function setupProgramBlocks(activity) {
             }
 
             for (const p in activity.blocks.palettes.dict) {
-                if (
-                    _(activity.blocks.palettes.dict[p].name) ===
-                    args[0].toLowerCase()
-                ) {
+                if (_(activity.blocks.palettes.dict[p].name) === args[0].toLowerCase()) {
                     activity.blocks.palettes.hide();
                     activity.blocks.palettes.dict[p].show();
                     activity.blocks.palettes.show();
@@ -480,7 +761,14 @@ function setupProgramBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block that removes a block in the logo programming language.
+     * @extends {FlowBlock}
+     */
     class DeleteBlockBlock extends FlowBlock {
+        /**
+         * Constructs a new DeleteBlockBlock instance.
+         */
         constructor() {
             super("deleteblock");
             this.setPalette("program", activity);
@@ -492,12 +780,27 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
-                //.TRANS: Move this block to the trash.
+                /**
+                 * The name of the block.
+                 * @type {string}
+                 */
                 name: _("delete block"),
+
+                /**
+                 * The number of arguments expected by the block.
+                 * @type {number}
+                 */
                 args: 1
             });
         }
 
+        /**
+         * Executes the flow of the DeleteBlockBlock.
+         * @param {Array} args - The arguments passed to the block.
+         * @param {Object} logo - The logo object.
+         * @param {Object} turtle - The turtle object.
+         * @param {number} blk - The block identifier.
+         */
         flow(args, logo, turtle, blk) {
             if (args.length < 1) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
@@ -519,11 +822,7 @@ function setupProgramBlocks(activity) {
             const c = activity.blocks.blockList[args[0]].connections[0];
             activity.blocks.blockList[args[0]].connections[0] = null;
             if (c !== null) {
-                for (
-                    let i = 0;
-                    i < activity.blocks.blockList[c].connections.length;
-                    i++
-                ) {
+                for (let i = 0; i < activity.blocks.blockList[c].connections.length; i++) {
                     if (activity.blocks.blockList[c].connections[i] === args[0]) {
                         activity.blocks.blockList[c].connections[i] = null;
                     }
@@ -538,24 +837,47 @@ function setupProgramBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block that moves a block's position on the screen in the logo programming language.
+     * @extends {FlowBlock}
+     */
     class MoveBlockBlock extends FlowBlock {
+        /**
+         * Constructs a new MoveBlockBlock instance.
+         */
         constructor() {
             super("moveblock");
             this.setPalette("program", activity);
-            this.setHelpString([
-                _("The Move block block moves a block."),
-                "documentation",
-                ""
-            ]);
+            this.setHelpString([_("The Move block block moves a block."), "documentation", ""]);
 
             this.formBlock({
-                //.TRANS: Move the position of a block on the screen.
+                /**
+                 * The name of the block.
+                 * @type {string}
+                 */
                 name: _("move block"),
+
+                /**
+                 * The number of arguments expected by the block.
+                 * @type {number}
+                 */
                 args: 3,
+
+                /**
+                 * The labels for the arguments.
+                 * @type {string[]}
+                 */
                 argLabels: [_("block number"), _("x"), _("y")]
             });
         }
 
+        /**
+         * Executes the flow of the MoveBlockBlock.
+         * @param {Array} args - The arguments passed to the block.
+         * @param {Object} logo - The logo object.
+         * @param {Object} turtle - The turtle object.
+         * @param {number} blk - The block identifier.
+         */
         flow(args, logo, turtle, blk) {
             if (args.length < 3) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
@@ -573,25 +895,62 @@ function setupProgramBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block that runs a block in the logo programming language.
+     * It accepts two types of arguments: block number or block name.
+     * @extends {FlowBlock}
+     */
     class RunBlockBlock extends FlowBlock {
+        /**
+         * Constructs a new RunBlockBlock instance.
+         */
         constructor() {
             super("runblock");
             this.setPalette("program", activity);
             this.setHelpString([
-                _("The Run block block runs a block. It accepts two types of arguments: block number or block name."),
+                _(
+                    "The Run block block runs a block. It accepts two types of arguments: block number or block name."
+                ),
                 "documentation",
                 ""
             ]);
 
             this.formBlock({
-                //.TRANS: Run program beginning at this block.
+                /**
+                 * The name of the block.
+                 * @type {string}
+                 */
                 name: _("run block"),
+
+                /**
+                 * The number of arguments expected by the block.
+                 * @type {number}
+                 */
                 args: 1,
+
+                /**
+                 * The types of arguments expected by the block.
+                 * @type {string[]}
+                 */
                 argTypes: ["anyin"],
+
+                /**
+                 * The default values for arguments.
+                 * @type {number[]}
+                 */
                 defaults: [0]
             });
         }
 
+        /**
+         * Executes the flow of the RunBlockBlock.
+         * @param {Array} args - The arguments passed to the block.
+         * @param {Object} logo - The logo object.
+         * @param {Object} turtle - The turtle object.
+         * @param {number} blk - The block identifier.
+         * @param {any} receivedArg - The received argument.
+         * @returns {Array|undefined} - Returns an array or undefined based on the execution.
+         */
         flow(args, logo, turtle, blk, receivedArg) {
             if (args.length < 1) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
@@ -602,10 +961,8 @@ function setupProgramBlocks(activity) {
                 // Look for a block with logo name
                 for (let i = 0; i < activity.blocks.blockList.length; i++) {
                     if (
-                        activity.blocks.blockList[i].protoblock.staticLabels
-                            .length > 0 &&
-                        activity.blocks.blockList[i].protoblock.staticLabels[0] ===
-                            args[0]
+                        activity.blocks.blockList[i].protoblock.staticLabels.length > 0 &&
+                        activity.blocks.blockList[i].protoblock.staticLabels[0] === args[0]
                     ) {
                         args[0] = i;
                         return;
@@ -641,7 +998,14 @@ function setupProgramBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block that connects two blocks in the logo programming language.
+     * @extends {FlowBlock}
+     */
     class DockBlockBlock extends FlowBlock {
+        /**
+         * Constructs a new DockBlockBlock instance.
+         */
         constructor() {
             super("dockblock");
             this.setPalette("program", activity);
@@ -652,17 +1016,33 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
-                //.TRANS: We can connect a block to another block.
+                /**
+                 * The name of the block.
+                 * @type {string}
+                 */
                 name: _("connect blocks"),
+
+                /**
+                 * The number of arguments expected by the block.
+                 * @type {number}
+                 */
                 args: 3,
-                argLabels: [
-                    _("target block"),
-                    _("connection number"),
-                    _("block number")
-                ]
+
+                /**
+                 * The labels for the arguments.
+                 * @type {string[]}
+                 */
+                argLabels: [_("target block"), _("connection number"), _("block number")]
             });
         }
 
+        /**
+         * Executes the flow of the DockBlockBlock.
+         * @param {Array} args - The arguments passed to the block.
+         * @param {Object} logo - The logo object.
+         * @param {Object} turtle - The turtle object.
+         * @param {number} blk - The block identifier.
+         */
         flow(args, logo, turtle, blk) {
             if (args.length < 3) {
                 // eslint-disable-next-line no-console
@@ -673,9 +1053,7 @@ function setupProgramBlocks(activity) {
 
             if (args[0] < 0 || args[0] > activity.blocks.blockList.length - 1) {
                 // eslint-disable-next-line no-console
-                console.debug(
-                    args[0] + " > " + activity.blocks.blockList.length - 1
-                );
+                console.debug(args[0] + " > " + activity.blocks.blockList.length - 1);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
@@ -689,9 +1067,7 @@ function setupProgramBlocks(activity) {
 
             if (args[2] < 0 || args[2] > activity.blocks.blockList.length - 1) {
                 // eslint-disable-next-line no-console
-                console.debug(
-                    args[2] + " > " + activity.blocks.blockList.length - 1
-                );
+                console.debug(args[2] + " > " + activity.blocks.blockList.length - 1);
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }
@@ -717,15 +1093,9 @@ function setupProgramBlocks(activity) {
                     args[0] = c;
                     args[1] = 1;
                 } else {
-                    // Or disconnection the old connection.
-                    for (
-                        let i = 0;
-                        i < activity.blocks.blockList[c].connections.length;
-                        i++
-                    ) {
-                        if (
-                            activity.blocks.blockList[c].connections[i] === args[0]
-                        ) {
+                    // Or disconnect the old connection.
+                    for (let i = 0; i < activity.blocks.blockList[c].connections.length; i++) {
+                        if (activity.blocks.blockList[c].connections[i] === args[0]) {
                             activity.blocks.blockList[c].connections[i] = null;
                             return;
                         }
@@ -742,7 +1112,14 @@ function setupProgramBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block that creates a new block in the logo programming language.
+     * @extends {LeftBlock}
+     */
     class MakeBlockBlock extends LeftBlock {
+        /**
+         * Constructs a new MakeBlockBlock instance.
+         */
         constructor() {
             super("makeblock");
             this.setPalette("program", activity);
@@ -754,29 +1131,61 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
-                //.TRANS: Create a new block programmatically.
+                /**
+                 * The name of the block.
+                 * @type {string}
+                 */
                 name: _("make block"),
+
+                /**
+                 * The number of arguments expected by the block.
+                 * @type {number}
+                 */
                 args: 1,
+
+                /**
+                 * The type of the argument.
+                 * @type {string}
+                 */
                 argTypes: ["anyin"],
+
+                /**
+                 * The output type of the block.
+                 * @type {string}
+                 */
                 outType: "numberout",
+
+                /**
+                 * Flows for the block.
+                 * @type {Object}
+                 */
                 flows: {
                     type: "arg",
                     types: ["anyin"],
                     labels: [""]
                 },
+
+                /**
+                 * The default values for the arguments.
+                 * @type {Array}
+                 */
                 defaults: [_("note")]
             });
         }
 
+        /**
+         * Handles the arguments for the MakeBlockBlock.
+         * @param {Object} logo - The logo object.
+         * @param {Object} turtle - The turtle object.
+         * @param {number} blk - The block identifier.
+         * @param {Object} receivedArg - The received argument.
+         * @returns {number} The block number.
+         */
         arg(logo, turtle, blk, receivedArg) {
-            activity.blocks.showBlocks();   // Force blocks to be visible.
+            activity.blocks.showBlocks(); // Force blocks to be visible.
             const blockArgs = [null];
             if (activity.blocks.blockList[blk].argClampSlots.length > 0) {
-                for (
-                    let i = 0;
-                    i < activity.blocks.blockList[blk].argClampSlots.length;
-                    i++
-                ) {
+                for (let i = 0; i < activity.blocks.blockList[blk].argClampSlots.length; i++) {
                     const t = logo.parseArg(
                         logo,
                         turtle,
@@ -867,8 +1276,7 @@ function setupProgramBlocks(activity) {
                     const newBlock = [[0, protoName, x, y, [null]]];
                     for (
                         let i = 1;
-                        i <
-                        activity.blocks.protoBlockDict[protoblk].dockTypes.length;
+                        i < activity.blocks.protoBlockDict[protoblk].dockTypes.length;
                         i++
                     ) {
                         // FIXME: type check args
@@ -876,39 +1284,21 @@ function setupProgramBlocks(activity) {
                             if (typeof blockArgs[i] === "number") {
                                 if (
                                     ["anyin", "numberin"].indexOf(
-                                        activity.blocks.protoBlockDict[protoblk]
-                                            .dockTypes[i]
+                                        activity.blocks.protoBlockDict[protoblk].dockTypes[i]
                                     ) === -1
                                 ) {
-                                    activity.errorMsg(
-                                        _("Warning: block argument type mismatch")
-                                    );
+                                    activity.errorMsg(_("Warning: block argument type mismatch"));
                                 }
-                                newBlock.push([
-                                    i,
-                                    ["number", { value: blockArgs[i] }],
-                                    0,
-                                    0,
-                                    [0]
-                                ]);
+                                newBlock.push([i, ["number", { value: blockArgs[i] }], 0, 0, [0]]);
                             } else if (typeof blockArgs[i] === "string") {
                                 if (
                                     ["anyin", "textin"].indexOf(
-                                        activity.blocks.protoBlockDict[protoblk]
-                                            .dockTypes[i]
+                                        activity.blocks.protoBlockDict[protoblk].dockTypes[i]
                                     ) === -1
                                 ) {
-                                    activity.errorMsg(
-                                        _("Warning: block argument type mismatch")
-                                    );
+                                    activity.errorMsg(_("Warning: block argument type mismatch"));
                                 }
-                                newBlock.push([
-                                    i,
-                                    ["string", { value: blockArgs[i] }],
-                                    0,
-                                    0,
-                                    [0]
-                                ]);
+                                newBlock.push([i, ["string", { value: blockArgs[i] }], 0, 0, [0]]);
                             } else {
                                 newBlock[0][4].push(null);
                             }
@@ -928,7 +1318,14 @@ function setupProgramBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block that is used to open a project from a web page in the logo programming language.
+     * @extends {FlowBlock}
+     */
     class OpenProjectBlock extends FlowBlock {
+        /**
+         * Constructs a new OpenProjectBlock instance.
+         */
         constructor() {
             super("openProject");
             this.setPalette("program", activity);
@@ -939,13 +1336,39 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
+                /**
+                 * The name of the block.
+                 * @type {string}
+                 */
                 name: _("open project"),
+
+                /**
+                 * The number of arguments expected by the block.
+                 * @type {number}
+                 */
                 args: 1,
+
+                /**
+                 * The type of the argument.
+                 * @type {string}
+                 */
                 argTypes: ["textin"],
+
+                /**
+                 * The default values for the arguments.
+                 * @type {Array}
+                 */
                 defaults: ["url"]
             });
         }
 
+        /**
+         * Handles the flow of the OpenProjectBlock.
+         * @param {Array} args - The arguments provided to the block.
+         * @param {Object} logo - The logo object.
+         * @param {Object} turtle - The turtle object.
+         * @param {number} blk - The block identifier.
+         */
         flow(args, logo, turtle, blk) {
             if (args[0] === null) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
@@ -954,13 +1377,18 @@ function setupProgramBlocks(activity) {
 
             const url = args[0];
 
+            /**
+             * Checks if a given string is a valid URL.
+             * @param {string} str - The string to be checked.
+             * @returns {boolean} True if the string is a valid URL, false otherwise.
+             */
             function ValidURL(str) {
                 const pattern = new RegExp(
                     "^(https?:\\/\\/)?" + // protocol
-                    "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
-                    "((\\d{1,3}\\.) {3}\\d{1,3}))" + // OR ip (v4) address
-                    "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
-                    "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+                        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+                        "((\\d{1,3}\\.) {3}\\d{1,3}))" + // OR ip (v4) address
+                        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+                        "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
                         "(\\#[-a-z\\d_]*)?$",
                     "i"
                 ); // fragment locator
@@ -978,7 +1406,7 @@ function setupProgramBlocks(activity) {
                     // Browser has allowed it to be opened.
                     win.focus();
                 } else {
-                    // Broswer has blocked it.
+                    // Browser has blocked it.
                     alert("Please allow popups for this site");
                 }
             }
