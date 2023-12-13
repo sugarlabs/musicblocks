@@ -519,6 +519,24 @@ const createHelpContent = (activity) => {
         "data:image/svg+xml;base64," +
             window.btoa(unescape(encodeURIComponent(LOADBUTTON)))
     ]);
+    HELPCONTENT.push([
+        _("Delete"),
+        _("To delete a block, just right-click on it, then you will be able to see the delete option"),
+        "data:image/svg+xml;base64," +
+            window.btoa(unescape(encodeURIComponent(EMPTYTRASHCONFIRMBUTTON)))
+    ]);
+    HELPCONTENT.push([
+        _("Copy"),
+        _("To copy a block, just right-click on it, then you will be able to see the copy option"),
+        "data:image/svg+xml;base64," +
+            window.btoa(unescape(encodeURIComponent(COPYBUTTON)))
+    ]);
+    HELPCONTENT.push([
+        _("Extract"),
+        _("To extract a block, just right-click on it, then you will be able to see the extract option"),
+        "data:image/svg+xml;base64," +
+            window.btoa(unescape(encodeURIComponent(EXTRACTBUTTON)))
+    ]);
     if (activity.beginnerMode) {
         HELPCONTENT.push([
             _("Save project"),
