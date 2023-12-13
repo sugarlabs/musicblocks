@@ -206,8 +206,10 @@ class MusicBlocks {
         // Remove any listeners that might be still active
         for (const mouse of Mouse.MouseList) {
             for (const listener in mouse.turtle.listeners) {
-                globalActivity.logo.stage.removeEventListener(
+                if (globalActivity.logo.stage && mouse.turtle.listeners.hasOwnProperty(listener)) {
+                    globalActivity.logo.stage.removeEventListener(
                     listener, mouse.turtle.listeners[listener], false);
+                }
             }
             mouse.turtle.listeners = {};
         }
