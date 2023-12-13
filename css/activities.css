@@ -1529,6 +1529,7 @@ input.timbreName {
     background: #f2f2f2;
     font-family: sans-serif;
     text-align: center;
+    margin-left: 24px;
 }
 
 .radioBtn {
