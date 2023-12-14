@@ -16,7 +16,7 @@ testing, revising, etc.*&mdash;Cynthia Solomon
 perpetuating, sometimes procedures must be constructed to deal with
 the phenomena caused by their appearance, and sometimes the bugs and
 their side effects need to be removed. But in this pursuit, children
-become creative researchers studying behavior, making up theories,
+become creative researchers studying behaviour, making up theories,
 trying out ideas, etc.*&mdash;Cynthia Solomon
 
 *6 Stages of Debugging*&mdash;Anonymous
