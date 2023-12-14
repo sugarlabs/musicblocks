@@ -28,7 +28,7 @@ Just like a piano has inherent complexity, yet we find ways to teach young child
 
 ### Is there a way to be able to “transcribe” larger musical works into basic block notation?
 
-Yes, if the user does it. I suppose one could transcribe an entire orchestra if they really wanted to. What is not yet possible is to analyze a score and generate music blocks code from it (although I do not see this kind of feature to be particularly useful from a pedagogical perspective, so it is not a priority to me.)
+Yes, if the user does it. I suppose one could transcribe an entire orchestra if they really wanted to. What is not yet possible is to analyse a score and generate music blocks code from it (although I do not see this kind of feature to be particularly useful from a pedagogical perspective, so it is not a priority to me.)
 
 ### Do you believe this can replace conventional music learning or should it complement it?
 
@@ -60,7 +60,7 @@ I would hope that conservatory students might use Music Blocks to a) explore mus
 
 ### How does this block concept work at different levels to link with conventional methods and material for music learning?
 
-There are some concepts that are readily available in a computer programing language that I see to be authentic to the way one thinks about music (and that are hard to express in standard notation). MB does not replace any of the other authentic ways to think about music, but adds one more possibility. I think that the jazz in twelve keys is exemplary to a computational method that is also authentic to the way we think about music (i.e. it has the simple structure [“ii, V, i” and the formula to go through all the keys] that a performer uses to extrapolate the notes)
+There are some concepts that are readily available in a computer programming language that I see to be authentic to the way one thinks about music (and that are hard to express in standard notation). MB does not replace any of the other authentic ways to think about music, but adds one more possibility. I think that the jazz in twelve keys is exemplary to a computational method that is also authentic to the way we think about music (i.e. it has the simple structure [“ii, V, i” and the formula to go through all the keys] that a performer uses to extrapolate the notes)
 
 ### Can MusicBlocks be used to replace some training that young musicians endure as they are first beginning to learn?
 
@@ -70,7 +70,7 @@ As for “replacing training”, I have found that it is helpful to use MB in th
 
 ### What opportunities does Music Blocks provide for social aspects of learning?
 
-Most software that you are probably familiar with is created in a way that discourages participation. However, “software libre” is made in a way that invites participation. Anyone who uses Music Blocks is free to modify, share, and study the program and its source code. Therefore, users a) get one more level of representation of musical ideas (i.e. the code representation of the musical concepts), and b) they may participate in social activities (i.e. sharing) that are otherwise forboden in the world of proprietary software. As for the social aspects of creating Music Blocks projects themselves—well students are always welcome to share their projects with each other, either in-person or online. Lastly, I hope that at the college and above level, graduates of both computer science degrees and music degrees can collaborate to use MB as a teaching tool at schools (i.e. “Artist-Teacher-Scholar” for both CS majors and Music majors.
+Most software that you are probably familiar with is created in a way that discourages participation. However, “software libre” is made in a way that invites participation. Anyone who uses Music Blocks is free to modify, share, and study the program and its source code. Therefore, users a) get one more level of representation of musical ideas (i.e. the code representation of the musical concepts), and b) they may participate in social activities (i.e. sharing) that are otherwise forbidden in the world of proprietary software. As for the social aspects of creating Music Blocks projects themselves—well students are always welcome to share their projects with each other, either in-person or online. Lastly, I hope that at the college and above level, graduates of both computer science degrees and music degrees can collaborate to use MB as a teaching tool at schools (i.e. “Artist-Teacher-Scholar” for both CS majors and Music majors.
 
 ### Since you’ve allowed for the program to be open source, what sort of variations have you seen? Is there a way to teach students how to alter the code so that they can see how it affects the music/ program?
 
