@@ -127,7 +127,7 @@ distros, or equivalent on others.)
 (http://127.0.0.1:3000/) ...` since the HTTP Server is set to start
 listening on port 3000.
 
-6. Open your favorite browser and visit `localhost:3000` or `127.0.0.1:3000`.
+6. Open your favourite browser and visit `localhost:3000` or `127.0.0.1:3000`.
 
 **NOTE:** _Use `ctrl + c` or `cmd + c` to quit the HTTP Server to avoid
 `socket.error:[Errno 48]`_.
@@ -236,7 +236,7 @@ no sense in merging broken code. If a PR is a _work in progress
 ready for merging.
 
 8. Read and revise the concepts about programming constructs you're
-dealing with. You must be clear about the behavior of the language or
+dealing with. You must be clear about the behaviour of the language or
 compiler/transpiler. See [JavaScript
 docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript).
 
@@ -306,7 +306,7 @@ inspired by the music education ideas, representations and practices
 (e.g. aspects of matrix, musical cups) developed and published by
 [_Larry Scripp_](http://www.larryscripp.net/) with whom _Devin_
 studied at New England Conservatory and for whom he worked at Affron
-Scripp & Associates, LLC, [Center for Music and the Arts in Education
+Scripp & Associates, LLC, [Centre for Music and the Arts in Education
 (CMAIE)](http://centerformie.org/), and [Music in
 Education](http://music-in-education.org/). Some of the initial
 graphics were contributed by [_Chie
