@@ -362,7 +362,7 @@ modes).
 ![sharp and flat](./transform1.svg "Using Sharp and Flat blocks")
 
 The *Accidental* block can be wrapped around *Pitch* blocks, *Note
-value* blocks, or chuncks of notes inside of [*Action*](#31-actions)
+value* blocks, or chunks of notes inside of [*Action*](#31-actions)
 blocks. A sharp will raise the pitch by one half step. A flat will
 lower by one half step. In the example, on the left, just the *Pitch*
 block `Mi` is lowered by one half step; on the right, both *Pitch*
@@ -679,7 +679,7 @@ Degree*, *nth Modal Pitch* starts at `0`, allows for negative
 numbers, and is not restricted to a seven-pitch tonal framework. `0`
 is the first pitch of the mode, `1` is the next pitch, `2` is the
 pitch above that, etc. `-1` is the pitch before the first pitch of
-the mode. This tool is expecially helpful for expressing a musical
+the mode. This tool is especially helpful for expressing a musical
 idea that requires computation as you can run computations directly
 on the number value. It is also helpful if you are, for example,
 creating music in a whole tone (six note) pitch space. In the case of
@@ -726,7 +726,7 @@ by default). Please see [this
 code](https://rawgithub.com/sugarlabs/musicblocks/master/examples/2-spelling-systems-for-Scale-Degree.html)
 as an example.
 
-The following chart describes the behavior of different blocks
+The following chart describes the behaviour of different blocks
 depending on whether or not a *Movable Do* block is present.
 
 | Block(s) | Fixed or Movable? (Do or La?) | Set Key Transformation? |
@@ -801,7 +801,7 @@ number of half-steps between two pitches.
 
 Another way to think about intervals is in terms of ratios. For
 example, a ratio of 2:1 would be an octave shift up; 1:2 would be an
-octave shift dowm; 3/2 would be a fifth.
+octave shift down; 3/2 would be a fifth.
 
 ![ratio interval](../documentation/ratiointerval_block.svg "Ratio Interval example")
 
@@ -944,7 +944,7 @@ Generalized shape of a converter is:
 
 where the right argument is converted accordingly, and output is received on the left side.
 
-**Note:** Before an introduction of the different types of converters, a little intoduction on Y staff in Music Blocks. Staff is a set of horizontal lines and spaces and different positions along Y axis represents different notes. [C, D, E, F, G, A, B]
+**Note:** Before an introduction of the different types of converters, a little introduction on Y staff in Music Blocks. Staff is a set of horizontal lines and spaces and different positions along Y axis represents different notes. [C, D, E, F, G, A, B]
 
 ![staff](treble.svg "Treble clef staff")
 
@@ -970,7 +970,7 @@ All these options are provided in the form of a pie-menu which can be accessed s
 Below explained is the utility of every conversion option:
 
 #### **0. Alphabet:**
-Prints the alphabet data of the note being played e.g A, B, C, D, E, F, G, inlcuding accidentals.
+Prints the alphabet data of the note being played e.g A, B, C, D, E, F, G, including accidentals.
 
 #### **1. Alphabet class:**
 Prints the alphabet data of the note being played e.g A, B, C, D, E, F, G. It doesn't print any info regarding accidentals.
@@ -1216,7 +1216,7 @@ You can also override the default using the *Set default instrument*
 block. In the example above, the default instrument is set to piano,
 so any note that is not inside of a *Set instrument* block will be
 played using the piano synthesizer. The first note in this example is
-piano; the second note is guitar; and the thrid is piano.
+piano; the second note is guitar; and the third is piano.
 
 #### <a name= "SETTINGKEY"></a>3.4.3 Setting Key and Mode
 
@@ -1283,7 +1283,7 @@ the multiple voices are synced to the same master clock.
 ![drum](./drum3.svg "usage of kick drum")
 
 A special *Start drum* version of the *Start* block is available for
-laying down a drum track. Any *Pitch* blocks encounted while starting
+laying down a drum track. Any *Pitch* blocks encountered while starting
 from a drum will be played as `C2` with the default drum sample. In
 the example above, all of the notes in `chunk` will be played with a
 kick drum.
@@ -1383,7 +1383,7 @@ actions over the specified rhythm.
 ![tree](./tree-example.svg "another example of the No-clock block")
 
 Another example of embedding graphics into notes: in case, a recursive
-tree drawing, where the pitch goes up as the branches assend.
+tree drawing, where the pitch goes up as the branches ascend.
 
 ![tree](./tree.svg "tree graphic")
 
@@ -1789,7 +1789,7 @@ with the *Phrase maker* block.
 The *Save drum machine* button will export *Start* stacks that will
 play the rhythms as drum machines.
 
-Another feature of the *Rhythm Maker* wigdet is the ability to tap out
+Another feature of the *Rhythm Maker* widget is the ability to tap out
 a rhythm. By clicking on the *Tap* button and then clicking on a cell
 inside one of the rhythm rulers, you will be prompted (by four tones)
 to begin tapping the mouse button to divide the cell into
@@ -1802,7 +1802,7 @@ use the *Undo* button and try again.
 
 Musical modes are used to specify the relationship between
 [intervals](#327-intervals) (or steps) in a scale. Since
-Western music is based on 12 half-steps per octave, modes speficy how
+Western music is based on 12 half-steps per octave, modes specify how
 many half steps there are between each note in a scale.
 
 By default, Music Blocks uses the *Major* mode, which, in the
@@ -1832,8 +1832,8 @@ widget launches.
 
 In the above example, the widget has been launched with *Major* mode
 (the default). Note that the notes included in the mode are indicated
-by the protuding sectors with 'X's, which are arrayed in a circular
-pattern of tweleve half-steps to complete the octave.
+by the protruding sectors with 'X's, which are arrayed in a circular
+pattern of twelve half-steps to complete the octave.
 
 Since the intervals in the *Major* mode are `2, 2, 1, 2, 2, 2, 1`, the
 notes are `0`, `2`, `4`, `5`, `7`, `9`,`11`, and `12` (one octave
@@ -1915,8 +1915,8 @@ The *Save* button will export *On strong beat do* blocks for each strong beat.
 
 The *Set Drum* block is used to map the enclosed pitches into drum
 sounds. Drum sounds are played in a monopitch using the specified drum
-sample. In the example above, a `kick drum` will be substitued for
-each occurance of a `Re` `4`.
+sample. In the example above, a `kick drum` will be substituted for
+each occurrence of a `Re` `4`.
 
 ![widget](./drum5a.svg "pitch-drum matrix 1")
 
@@ -1977,7 +1977,7 @@ the rows in the matrix.
 
 ![widget](./pitchstaircase5.svg "Pitch Stair block")
 
-### <a name="slider">4.8 Generating Arbritary Pitches</a>
+### <a name="slider">4.8 Generating Arbitrary Pitches</a>
 
 The *Pitch Slider* block is used to launch a widget that is used to
 generate arbitrary pitches. It differs from the *Pitch Staircase*
@@ -1985,7 +1985,7 @@ widget in that it is used to create frequencies that vary continuously
 within the range of a specified octave.
 
 Each *Sine* block contained within the clamp of the *Pitch Slider* block defines the initial pitch
-for an ocatve.
+for an octave.
 
 ![widget](./pitchslider0.svg "Pitch Slider")
 
@@ -2003,7 +2003,7 @@ be used to move up and down, or between columns.
 
 ![widget](./pitchslider2.svg "Pitch Slider-Two Column")
 
-Clicking in a column will extact the corresponding *Note* blocks, for example:
+Clicking in a column will extract the corresponding *Note* blocks, for example:
 
 ![widget](./pitchslider3.svg "Pitch Slider-Two Columns Adjusting")
 
@@ -2047,7 +2047,7 @@ The *Timbre* block can be used to launch the *Timbre* widget, which
 lets you add synthesizers, oscillators, effects, and filters to create
 a custom timbre, which can be used in your Music Blocks programs.
 
-The name of the custom timbre is defined by the argment passed to the
+The name of the custom timbre is defined by the argument passed to the
 block (by default, `custom`). This name is passed to the *Set timbre*
 block in order to use your custom timbre.
 
@@ -2231,7 +2231,7 @@ The *Close* button will close the widget.
 
 ###  <a name="oscilloscope">4.13 The Oscilloscope</a>
 
-Music Blocks has an Oscillosope Widget to visualize the music as it plays.
+Music Blocks has an Oscilloscope Widget to visualize the music as it plays.
 
 ![widget](./oscilloscope1.svg "Oscilloscope")
 
@@ -2244,7 +2244,7 @@ A separate wave will be displayed for each mouse.
 ![widget](../documentation/sampler_block.svg "Sampler")
  
 You can import sound samples (.WAV files) and use them with the *Set
-Instrument" block. The *Sampler* widget lets you set the center pitch
+Instrument" block. The *Sampler* widget lets you set the centre pitch
 of your sample so that it can be tuned.
 
 ![widget](./sampler1.svg "Sampler Widget")
@@ -2477,7 +2477,7 @@ Looking for a block? The tables below (one for beginner mode and one for advance
 | | tremolo | | | | | **Ensemble** | set name |
 | **Ornament** | staccato | | | | | | mouse name |
 | | slur | | | | 
-| | neighbor (+/-) | | | | 
+| | neighbour (+/-) | | | | 
 | **Volume** | crescendo | | | | 
 | | decrescendo | | | | 
 | | set master volume | | | | 
@@ -2528,7 +2528,7 @@ Looking for a block? The tables below (one for beginner mode and one for advance
 | | accidental | | | do | | | pen down |
 | | unison | | | calculate | | | pen up |
 | | second | | | do | | | fill |
-| | thirth | | | action | | | hollow line |
+| | third | | | action | | | hollow line |
 | | sixth | | | calculate | | | background |
 | | seventh | | | return to URL | | | set font |
 | | down third | | | return | | | pen size |
@@ -2566,7 +2566,7 @@ Looking for a block? The tables below (one for beginner mode and one for advance
 | | chorus | | | pop | | | red |
 | | phaser | | | set heap | | | green |
 | | tremolo | | | index heap | | | blue |
-| | distrotion | | | reverse heap | | | click |
+| | distortion | | | reverse heap | | | click |
 | | harmonic | | | empty heap | | | loudness |
 | | weighted partials | | | heap empty? | | **Ensemble** | set name |
 | | partial | | | heap length | | | mouse name |
