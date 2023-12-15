@@ -766,7 +766,7 @@ function setupGraphicsBlocks(activity) {
         flow(args, logo, turtle, blk) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
-            if (args.length === 1) {
+            if (args.length === 1 && args[0].toString().length < 6) {
                 if (typeof args[0] === "string") {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else if (logo.inMatrix) {

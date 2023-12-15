@@ -3674,6 +3674,23 @@ class Block {
                     '" />';
                 labelElem.classList.add("hasKeyboard");
                 this.label = docById("numberLabel");
+                this.label.addEventListener("input", function () {
+                    let input = this.value;
+                    input = parseFloat(input).toString();
+                    console.log("lenght is " + input.length);
+                    if (input % 1 === 0 && input.length >= 6) {
+                        if (input > 0) {
+                            activity.errorMsg(_("Warning: Forward block value should be less than 6 digits long."), blk);
+                            this.value = input.slice(0, 5);
+                        } else if (input < 0){
+                            activity.errorMsg(_("Warning: Forward block value should be less than 6 digits long."), blk);
+                            this.value = input.slice(0, 6);
+                        }
+                    } else if (input % 1 !== 0 && input >= 10000){
+                        activity.errorMsg(_("Warning: Forward block value should be less than 6 digits long."), blk);
+                        this.value = Math.floor(input).toString().slice(0, 5);
+                    }
+                })  
             }
         }
 
