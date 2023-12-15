@@ -172,9 +172,10 @@ function setupIntervalsBlocks(activity) {
         constructor() {
             super("intervalnumber", _("interval number"));
             this.setPalette("intervals", activity);
-            this.setHelpString(_("The Interval number block returns the number of scalar steps in the current interval.") , 
-                               
-            );
+            this.setHelpString([_("The Interval number block returns the number of scalar steps in the current interval.") , 
+                                  "" ,
+                                  "" 
+                                ]);
             this.beginnerBlock(true);
             this.hidden = true;
             this.formBlock({ outType: "numberout" });
