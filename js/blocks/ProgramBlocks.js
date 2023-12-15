@@ -36,6 +36,7 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
+                //.TRANS: load the heap contents from a URL
                 /**
                  * The name of the block.
                  * @type {string}
@@ -135,6 +136,7 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
+                //.TRANS: save the heap contents to a URL
                 /**
                  * The name of the block.
                  * @type {string}
@@ -207,6 +209,7 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
+                //.TRANS: load the heap from a file
                 /**
                  * The name of the block.
                  * @type {string}
@@ -288,6 +291,7 @@ function setupProgramBlocks(activity) {
             this.setHelpString([_("The Set-heap block loads the heap."), "documentation", ""]);
 
             this.formBlock({
+                //.TRANS: load the heap from a JSON encoding
                 /**
                  * The name of the block.
                  * @type {string}
@@ -359,6 +363,7 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
+            //.TRANS: load a dictionary from a file
                 /**
                  * The name of the block.
                  * @type {string}
@@ -463,6 +468,7 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
+            //.TRANS: load a dictionary from a JSON
                 /**
                  * The name of the block.
                  * @type {string}
@@ -563,6 +569,7 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
+            //.TRANS: save the heap to a file
                 /**
                  * The name of the block.
                  * @type {string}
@@ -624,6 +631,7 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
+            //.TRANS: save a dictionary to a file
                 /**
                  * The name of the block.
                  * @type {string}
@@ -780,6 +788,7 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
+            //.TRANS: Move this block to the trash.
                 /**
                  * The name of the block.
                  * @type {string}
@@ -851,6 +860,7 @@ function setupProgramBlocks(activity) {
             this.setHelpString([_("The Move block block moves a block."), "documentation", ""]);
 
             this.formBlock({
+            //.TRANS: Move the position of a block on the screen.
                 /**
                  * The name of the block.
                  * @type {string}
@@ -916,6 +926,7 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
+            //.TRANS: Run program beginning at this block.
                 /**
                  * The name of the block.
                  * @type {string}
@@ -1016,6 +1027,7 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
+            //.TRANS: We can connect a block to another block.
                 /**
                  * The name of the block.
                  * @type {string}
@@ -1131,6 +1143,7 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
+            //.TRANS: Create a new block
                 /**
                  * The name of the block.
                  * @type {string}
