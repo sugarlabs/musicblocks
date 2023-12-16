@@ -570,7 +570,7 @@ function setupEnsembleBlocks(activity) {
         constructor() {
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 //.TRANS: notes played by this mouse
-                super("turtlelapsednotes", _("mouse notes played"));
+                super("turtleelapsednotes", _("mouse notes played"));
                 this.setHelpString([
                     _("The Mouse elapse notes block returns the number of notes played by the specified mouse."),
                     "documentation",
