@@ -173,7 +173,7 @@ function setupIntervalsBlocks(activity) {
             super("intervalnumber", _("interval number"));
             this.setPalette("intervals", activity);
             this.setHelpString([_("The Interval number block returns the number of scalar steps in the current interval.") , 
-                                  "" ,
+                                  "documentation" ,
                                   "" 
                                 ]);
             this.beginnerBlock(true);
