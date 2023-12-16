@@ -28,7 +28,7 @@ Just like a piano has inherent complexity, yet we find ways to teach young child
 
 ### Is there a way to be able to “transcribe” larger musical works into basic block notation?
 
-Yes, if the user does it. I suppose one could transcribe an entire orchestra if they really wanted to. What is not yet possible is to analyse a score and generate music blocks code from it (although I do not see this kind of feature to be particularly useful from a pedagogical perspective, so it is not a priority to me.)
+Yes, if the user does it. I suppose one could transcribe an entire orchestra if they really wanted to. What is not yet possible is to analyze a score and generate music blocks code from it (although I do not see this kind of feature to be particularly useful from a pedagogical perspective, so it is not a priority to me.)
 
 ### Do you believe this can replace conventional music learning or should it complement it?
 
