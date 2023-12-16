@@ -406,11 +406,11 @@
 
 | Example | Description |
 | --- | --- |
-| mouse-trap.html | Interactive game: Catch the mice by following the musical apattern. |
+| mouse-trap.html | Interactive game: Catch the mice by following the musical pattern. |
 
 | Example | Description |
 | --- | --- |
-| spiralaterals.html | Interacive game: Match the pattern of intervals as the mouse creates patterns |
+| spiralaterals.html | Interactive game: Match the pattern of intervals as the mouse creates patterns |
 
 | Example | Description |
 | --- | --- |
@@ -444,7 +444,7 @@
 
 | Example | Description |
 | --- | --- |
-| nautilus.html | Recursive implemention of Fibonacci nautilus graphic and tone progression |
+| nautilus.html | Recursive implementation of Fibonacci nautilus graphic and tone progression |
 
 | Example | Description |
 | --- | --- |

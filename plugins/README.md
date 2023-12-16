@@ -56,11 +56,11 @@ Prerequisites
   how to program in JavaScript. The blocks are defined in a dictionary
   element. (See [Guide for Adding Blocks](https://github.com/sugarlabs/musicblocks/blob/master/js/guide_addingblocks.md) for more details.)
 
-* We provide a tool to help you compile psuedo-code into JSON (see the
+* We provide a tool to help you compile pseudo-code into JSON (see the
   section on Pluginify below). But you may also want to at least
   familiarize yourself with [JSON](http://en.wikipedia.org/wiki/JSON)
 
-* You may also want to familarize yourself with the Python plugin
+* You may also want to familiarize yourself with the Python plugin
   library [plugins in Turtle
   Art](http://wiki.sugarlabs.org/go/Activities/Turtle_Art/Plugins)
 

@@ -49,7 +49,7 @@ Download the `.exe` file and run it to launch the installation process.
  <img src="\images\ly_mac_5.png"></img>
 
 ## Generating LilyPond files from Music Blocks
-<img src='https://rawgit.com/Daksh/guides/master/lywithmb//images/save_as_ly_bt.svg'</img>
+<img src='https://rawgit.com/Daksh/guides/master/lywithmb//images/save_as_ly_bt.svg'></img>
 
 *save as lilypond block*
 
@@ -88,7 +88,7 @@ Do Re Do Mi Fa
 Mi Fa
 ```
 
-**Hint:** Everytime the save button gets pressed, the `.ly` file gets downloaded
+**Hint:** Every time the save button gets pressed, the `.ly` file gets downloaded
 <img src="\images\ly_from_mb_download.png"></img>
 
 
@@ -211,7 +211,7 @@ More customization details are found in the .ly file. Further references include
 * [Lilypond output in a web browser](https://www.tunefl.com/)
 
 ## Example: Making a `.ly` file from Music Blocks and Output
-<img src='https://rawgit.com/Daksh/guides/master/lywithmb//images/example.svg'</img>
+<img src='https://rawgit.com/Daksh/guides/master/lywithmb//images/example.svg'></img>
 
 The `save as lilypond` block will transcribe your composition. The
 output of the program above is saved to `~/Downloads/hotdog.ly.`
@@ -236,7 +236,7 @@ e'4 e'4 d'8 d'8 d'8 d'8 d'4 d'4 c'8 c'8 c'8 c'8 c'4 c'4
 }
 ```
 
-<img src='\images\sheetmusic.png'</img>
+<img src='\images\sheetmusic.png'></img>
 
 ## Example: Blank `.ly` file
 ```
