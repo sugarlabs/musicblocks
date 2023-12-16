@@ -306,7 +306,7 @@ inspired by the music education ideas, representations and practices
 (e.g. aspects of matrix, musical cups) developed and published by
 [_Larry Scripp_](http://www.larryscripp.net/) with whom _Devin_
 studied at New England Conservatory and for whom he worked at Affron
-Scripp & Associates, LLC, [Centre for Music and the Arts in Education
+Scripp & Associates, LLC, [Center for Music and the Arts in Education
 (CMAIE)](http://centerformie.org/), and [Music in
 Education](http://music-in-education.org/). Some of the initial
 graphics were contributed by [_Chie
