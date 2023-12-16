@@ -236,7 +236,7 @@ no sense in merging broken code. If a PR is a _work in progress
 ready for merging.
 
 8. Read and revise the concepts about programming constructs you're
-dealing with. You must be clear about the behaviour of the language or
+dealing with. You must be clear about the behavior of the language or
 compiler/transpiler. See [JavaScript
 docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript).
 
