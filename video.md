@@ -40,7 +40,7 @@ Animated GIFs have three key traits that a video needs to replicate:
 -They loop continuously (usually, but it is possible to prevent looping).
 -They're silent.
 
-Luckily, you can recreate these behaviours using the <video> element.
+Luckily, you can recreate these behaviors using the <video> element.
 
   
 ```
