@@ -582,7 +582,7 @@ function setupToneBlocks(activity) {
 
     class SetDefaultVoiceBlock extends FlowBlock {
         constructor() {
-            super("setdefaultvoice", _("set default instrument"));
+            super("setdefaultinstrument", _("set default instrument"));
             this.setPalette("tone", activity);
             this.setHelpString([
                 _("The set default instrument block changes the default instrument from electronic synth to the instrument of your choice."),

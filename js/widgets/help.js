@@ -101,27 +101,32 @@ class HelpWidget {
             leftArrow.classList.add("hover");
 
             let cell = docById("left-arrow");
-
+            if(page===0){
+                leftArrow.classList.add('disabled');
+            }
             cell.onclick = () => {
-                page = page - 1;
-                if (page < 0) {
-                    page = HELPCONTENT.length - 1;
-                }
-
-                this._showPage(page);
+                    if(page>0){
+                        page = page - 1;
+                        leftArrow.classList.remove('disabled');
+                        this._showPage(page);
+                    }
+                    if(page===0){
+                        leftArrow.classList.add('disabled');
+                    }
             };
 
             cell = docById("right-arrow");
 
             cell.onclick = () => {
                 page = page + 1;
+                leftArrow.classList.remove('disabled');
                 if (page === HELPCONTENT.length) {
                     page = 0;
                 }
 
                 this._showPage(page);
             };
-        } else {
+        }  else {
             if (this.activity.blocks.activeBlock.name !== null) {
                 const label = this.activity.blocks.blockList[this.activity.blocks.activeBlock]
                     .protoblock.staticLabels[0];
