@@ -726,7 +726,7 @@ by default). Please see [this
 code](https://rawgithub.com/sugarlabs/musicblocks/master/examples/2-spelling-systems-for-Scale-Degree.html)
 as an example.
 
-The following chart describes the behaviour of different blocks
+The following chart describes the behavior of different blocks
 depending on whether or not a *Movable Do* block is present.
 
 | Block(s) | Fixed or Movable? (Do or La?) | Set Key Transformation? |
@@ -2244,7 +2244,7 @@ A separate wave will be displayed for each mouse.
 ![widget](../documentation/sampler_block.svg "Sampler")
  
 You can import sound samples (.WAV files) and use them with the *Set
-Instrument" block. The *Sampler* widget lets you set the centre pitch
+Instrument" block. The *Sampler* widget lets you set the center pitch
 of your sample so that it can be tuned.
 
 ![widget](./sampler1.svg "Sampler Widget")
@@ -2477,7 +2477,7 @@ Looking for a block? The tables below (one for beginner mode and one for advance
 | | tremolo | | | | | **Ensemble** | set name |
 | **Ornament** | staccato | | | | | | mouse name |
 | | slur | | | | 
-| | neighbour (+/-) | | | | 
+| | neighbor (+/-) | | | | 
 | **Volume** | crescendo | | | | 
 | | decrescendo | | | | 
 | | set master volume | | | | 
