@@ -123,8 +123,7 @@ class WidgetWindow {
 
         const closeButton = this._create("div", "wftButton close", this._drag);
         closeButton.onclick = (e) => {
-            this.destroy();
-
+            this.onclose() ; 
             e.preventDefault();
             e.stopPropagation();
         };
