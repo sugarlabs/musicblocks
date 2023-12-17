@@ -156,7 +156,7 @@ class JSEditor {
         styleBtn.style.borderRadius = "50%";
         styleBtn.style.padding = ".25rem";
         styleBtn.style.marginRight = ".75rem";
-        styleBtn.style.fontSize = "1.5rem";
+        styleBtn.style.fontSize = "2rem";
         styleBtn.style.background = "#2196f3";
         styleBtn.style.cursor = "pointer";
         styleBtn.innerHTML = "invert_colors";
