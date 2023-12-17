@@ -37,6 +37,10 @@ self.addEventListener("activate", function (event) {
 });
 
 function updateCache(request, response) {
+    if (response.status === 206) {
+        console.log("Partial response is unsupported for caching.");
+        return Promise.resolve();
+    }
     return caches.open(CACHE).then(function (cache) {
         return cache.put(request, response);
     });
@@ -72,7 +76,9 @@ self.addEventListener("fetch", function (event) {
                 // version of the file to use the next time we show view
                 event.waitUntil(
                     fetch(event.request).then(function (response) {
-                        return updateCache(event.request, response);
+                        if (response.ok) {
+                            return updateCache(event.request, response);
+                        }
                     })
                 );
 
@@ -84,7 +90,9 @@ self.addEventListener("fetch", function (event) {
                 return fetch(event.request)
                     .then(function (response) {
                         // If request was success, add or update it in the cache
-                        event.waitUntil(updateCache(event.request, response.clone()));
+                        if (response.ok) {
+                            event.waitUntil(updateCache(event.request, response.clone()));
+                        }
                         return response;
                     })
                     .catch(function (error) {
