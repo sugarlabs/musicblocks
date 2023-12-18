@@ -99,6 +99,56 @@ class JSEditor {
         menubar.style.background = "#1e88e5";
         menubar.style.color = "white";
 
+        function createTooltip(targetElement, tooltipText, tip_position = "bottom") {
+            const tooltipContainer = document.createElement("div");
+          
+            tooltipContainer.innerHTML = `
+              <div style="
+                position: absolute;
+                visibility: hidden;
+                background: #333;
+                color: #fff;
+                padding: 0.5rem;
+                border-radius: 4px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                z-index: 999999;
+                font-size: 0.8rem;
+                white-space: nowrap;
+                opacity: 0;
+                transition: opacity 0.3s ease-in-out;
+              ">
+                ${tooltipText}
+              </div>
+            `;
+          
+            targetElement.addEventListener("mouseover", () => {
+              const rect = targetElement.getBoundingClientRect();
+              const tooltip = tooltipContainer.firstElementChild;
+          
+              if (tip_position !== "bottom") {
+                tooltip.style.top = `${rect.bottom + window.scrollY - 30}px`;
+                tooltip.style.left = `${rect.left + window.scrollX - 100}px`;
+              } else {
+                tooltip.style.top = `${rect.bottom + window.scrollY + 20}px`;
+                tooltip.style.left = `${rect.left + window.scrollX}px`;
+              }
+              tooltip.style.visibility = "visible";
+              tooltip.style.opacity = 1;
+            });
+          
+            targetElement.addEventListener("mouseout", () => {
+              const tooltip = tooltipContainer.firstElementChild;
+              tooltip.style.opacity = 0;
+              setTimeout(() => {
+                tooltip.style.visibility = "hidden";
+              }, 300);
+            });
+          
+            document.body.appendChild(tooltipContainer);
+          }
+          
+
+
         const menuLeft = document.createElement("div");
         menuLeft.style.height = "3rem";
         menuLeft.style.display = "flex";
@@ -118,6 +168,7 @@ class JSEditor {
         helpBtn.innerHTML = "help_outline";
         helpBtn.onclick = this._toggleHelp.bind(this);
         menuLeft.appendChild(helpBtn);
+        createTooltip(helpBtn, "Help");
 
         const generateBtn = document.createElement("span");
         generateBtn.classList.add("material-icons");
@@ -130,6 +181,7 @@ class JSEditor {
         generateBtn.innerHTML = "autorenew";
         generateBtn.onclick = this._generateCode.bind(this);
         menuLeft.appendChild(generateBtn);
+        createTooltip(generateBtn, "Generate Code");
 
         const runBtn = document.createElement("span");
         runBtn.classList.add("material-icons");
@@ -143,6 +195,7 @@ class JSEditor {
         runBtn.onclick = this._runCode.bind(this);
         menuLeft.appendChild(runBtn);
         menubar.appendChild(menuLeft);
+        createTooltip(runBtn, "Run Code");
 
         const menuRight = document.createElement("div");
         menuRight.style.height = "3rem";
@@ -164,6 +217,8 @@ class JSEditor {
         menuRight.appendChild(styleBtn);
         menubar.appendChild(menuRight);
         this._editor.appendChild(menubar);
+        createTooltip(styleBtn, "Change Style", "left");
+
 
         const editorContainer = document.createElement("div");
         editorContainer.style.width = "100%";
