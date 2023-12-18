@@ -81,8 +81,8 @@ projects* button.
 screen. There you will find the *Home* button, buttons for show/hide
 blocks, expand/collapse blocks and decrease/increase block size.
 
-(3) The *Auxilary* toolbar below the *main* toolbar. It appears when
-*auxilary menu* button is clicked. There you will find the buttons *Run
+(3) The *Auxiliary* toolbar below the *main* toolbar. It appears when
+*auxiliary menu* button is clicked. There you will find the buttons *Run
 slowly*, *Run step by step*, *Display Statistics*, *beginner/advanced mode*,
 etc. and also the button for selecting language.
 
@@ -337,7 +337,7 @@ Many of the blocks on this palette are used to create a matrix of
 for generating short musical gestures, which can be regenerated as a
 "chunk of notes" that can be played back programmatically. Musicians
 may find it helpful to think of the pitches within the pitch-time
-matrix as being akin to a bellset in which notes may be added and
+matrix as being akin to a bell set in which notes may be added and
 removed as desired. The "note value" representation acts as a
 "rhythmic tablature" that should be readable by both those familiar
 with the concepts of rhythm in music and those unfamiliar (but
@@ -401,7 +401,7 @@ marked from the previous matrix. If you modify the *Pitch* and
 try to make a corresponding change in the matrix.
 
 Note: You can construct a matrix from a chuck of blocks by including
-the chunk in the clamp of the *Pitch-time Marix* block.
+the chunk in the clamp of the *Pitch-time Matrix* block.
 
 More details about all of the widgets are available in the
 [Music Blocks Programming Guide](../guide/README.md).

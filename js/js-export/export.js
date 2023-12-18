@@ -245,7 +245,8 @@ class MusicBlocks {
                 cname = cname === "Painter" ? this.turtle.painter : eval(cname);
 
                 returnVal =
-                    args === undefined || args === [] ? cname[command]() : cname[command](...args);
+                 args === undefined || (Array.isArray(args) && args.length === 0) ? cname[command]() : cname[command](...args);
+
             }
 
             const delay = this.turtle.waitTime;

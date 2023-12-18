@@ -828,6 +828,11 @@ table {
     background: url('../header-icons/left-arrow.png');
 }
 
+#left-arrow.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 #right-arrow, #left-arrow {
     position: absolute;
     background-size: 40px;
