@@ -144,6 +144,9 @@ class RhythmRuler {
             // docById('wheelDiv').style.display = 'none';
             // docById('contextWheelDiv').style.display = 'none';
 
+            if (this._playing) {
+                this.__pause();
+            }
             // Save the new dissect history.
             const dissectHistory = [];
             const drums = [];
@@ -484,8 +487,8 @@ class RhythmRuler {
     _noteWidth(noteValue) {
         const ans = Math.floor(
             EIGHTHNOTEWIDTH *
-                (8 / Math.abs(noteValue)) *
-                (this.widgetWindow.isMaximized() ? this._fullscreenScaleFactor : 3)
+            (8 / Math.abs(noteValue)) *
+            (this.widgetWindow.isMaximized() ? this._fullscreenScaleFactor : 3)
         );
         return ans;
     }
@@ -500,7 +503,7 @@ class RhythmRuler {
                 Array.prototype.forEach.call(ruler.children, (child) => {
                     child.style.width =
                         Number(child.style.width.slice(0, child.style.width.indexOf("px"))) *
-                            (this._fullscreenScaleFactor / 3) +
+                        (this._fullscreenScaleFactor / 3) +
                         "px";
                     child.style.minWidth = child.style.width;
                 });
@@ -509,7 +512,7 @@ class RhythmRuler {
                     child.style.width =
                         Math.floor(
                             Number(child.style.width.slice(0, child.style.width.indexOf("px"))) /
-                                Math.floor(this._fullscreenScaleFactor / 3)
+                            Math.floor(this._fullscreenScaleFactor / 3)
                         ) + "px";
                     child.style.minWidth = child.style.width;
                 });
