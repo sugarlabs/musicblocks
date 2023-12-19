@@ -304,6 +304,8 @@ class RhythmRuler {
                 drumcell.style.cursor = "pointer";
                 drumcell.onclick = ((id) => {
                     return () => {
+
+
                         if (this._playing) {
                             if (this._rulerPlaying === id) {
                                 drumcell.innerHTML =
@@ -1450,7 +1452,7 @@ class RhythmRuler {
     /**
      * @public
      * @returns {void}
-     */
+    //  */
     playAll() {
         // External call from run button.
         if (this._playing) {
