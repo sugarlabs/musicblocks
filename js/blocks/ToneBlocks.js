@@ -20,7 +20,16 @@
 /* exported setupToneBlocks */
 
 function setupToneBlocks(activity) {
+    /**
+     * Represents an Oscillator block.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class OscillatorBlock extends FlowBlock {
+        /**
+         * Creates an instance of OscillatorBlock.
+         */
         constructor() {
             super("oscillator", _("oscillator"));
             this.setPalette("tone", activity);
@@ -39,6 +48,13 @@ function setupToneBlocks(activity) {
             this.hidden = true;
         }
 
+        /**
+         * Handles the flow of the Oscillator block.
+         * @param {Array} args - The arguments provided to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         * @param {FlowBlock} blk - The block itself.
+         */
         flow(args, logo, turtle, blk) {
             let oscillatorType = DEFAULTOSCILLATORTYPE;
             let partials = 0;
@@ -57,9 +73,7 @@ function setupToneBlocks(activity) {
 
             if (logo.inTimbre) {
                 if (logo.timbre.osc.length != 0) {
-                    activity.errorMsg(
-                        _("You are adding multiple oscillator blocks.")
-                    );
+                    activity.errorMsg(_("You are adding multiple oscillator blocks."));
                 } else {
                     logo.timbre.oscParams = [];
                     logo.synth.createSynth(
@@ -77,7 +91,16 @@ function setupToneBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a FillerType block.
+     * Extends ValueBlock.
+     * @class
+     * @extends ValueBlock
+     */
     class FillerTypeBlock extends ValueBlock {
+        /**
+         * Creates an instance of FillerTypeBlock.
+         */
         constructor() {
             super("filtertype");
             this.setPalette("tone", activity);
@@ -87,7 +110,16 @@ function setupToneBlocks(activity) {
         }
     }
 
+    /**
+     * Represents an OscillatorType block.
+     * Extends ValueBlock.
+     * @class
+     * @extends ValueBlock
+     */
     class OscillatorTypeBlock extends ValueBlock {
+        /**
+         * Creates an instance of OscillatorTypeBlock.
+         */
         constructor() {
             super("oscillatortype");
             this.setPalette("tone", activity);
@@ -97,7 +129,16 @@ function setupToneBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a DuoSynth block.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class DuoSynthBlock extends FlowBlock {
+        /**
+         * Creates an instance of DuoSynthBlock.
+         */
         constructor() {
             //.TRANS: a duo synthesizer combines a synth with a sequencer
             super("duosynth", _("duo synth"));
@@ -117,12 +158,28 @@ function setupToneBlocks(activity) {
             });
         }
 
+        /**
+         * Handles the flow of the DuoSynth block.
+         * @param {Array} args - The arguments provided to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         * @param {FlowBlock} blk - The block itself.
+         */
         flow(args, logo, turtle, blk) {
             Singer.ToneActions.defDuoSynth(args[0], args[1], turtle, blk);
         }
     }
 
+    /**
+     * Represents an AM (Amplitude Modulation) Synth block.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class AMSynth extends FlowBlock {
+        /**
+         * Creates an instance of AMSynth.
+         */
         constructor() {
             //.TRANS: AM (amplitude modulation) synthesizer
             super("amsynth", _("AM synth"));
@@ -140,12 +197,28 @@ function setupToneBlocks(activity) {
             });
         }
 
+        /**
+         * Handles the flow of the AMSynth block.
+         * @param {Array} args - The arguments provided to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         * @param {FlowBlock} blk - The block itself.
+         */
         flow(args, logo, turtle, blk) {
             Singer.ToneActions.defAMSynth(args[0], turtle, blk);
         }
     }
 
+    /**
+     * Represents an FM (Frequency Modulation) Synth block.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class FMSynth extends FlowBlock {
+        /**
+         * Creates an instance of FMSynth.
+         */
         constructor() {
             //.TRANS: FM (frequency modulation) synthesizer
             super("fmsynth", _("FM synth"));
@@ -163,17 +236,33 @@ function setupToneBlocks(activity) {
             });
         }
 
+        /**
+         * Handles the flow of the FMSynth block.
+         * @param {Array} args - The arguments provided to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         * @param {FlowBlock} blk - The block itself.
+         */
         flow(args, logo, turtle, blk) {
             Singer.ToneActions.defFMSynth(args[0], turtle, blk);
         }
     }
 
+    /**
+     * Represents a Partial block.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class PartialBlock extends FlowBlock {
+        /**
+         * Creates an instance of PartialBlock.
+         */
         constructor() {
             super("partial", _("partial"));
             this.setPalette("tone", activity);
             this.setHelpString([
-                _("The Partial block is used to specify a weight for a specific partical harmonic."),
+                _("The Partial block is used to specify a weight for a specific partial harmonic."),
                 "documentation",
                 ""
             ]);
@@ -183,6 +272,12 @@ function setupToneBlocks(activity) {
             });
         }
 
+        /**
+         * Handles the flow of the PartialBlock.
+         * @param {Array} args - The arguments provided to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         */
         flow(args, logo, turtle) {
             if (typeof args[0] !== "number" || args[0] > 1 || args[0] < 0) {
                 //.TRANS: partials are weighted components in a harmonic series
@@ -205,12 +300,23 @@ function setupToneBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a Weighted Partials block.
+     * Extends FlowClampBlock.
+     * @class
+     * @extends FlowClampBlock
+     */
     class HarmonicBlock extends FlowClampBlock {
+        /**
+         * Creates an instance of HarmonicBlock.
+         */
         constructor() {
             super("harmonic");
             this.setPalette("tone", activity);
             this.setHelpString([
-                _("The Weighted partials block is used to specify the partials associated with a timbre."),
+                _(
+                    "The Weighted partials block is used to specify the partials associated with a timbre."
+                ),
                 "documentation",
                 ""
             ]);
@@ -230,6 +336,14 @@ function setupToneBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of the HarmonicBlock.
+         * @param {Array} args - The arguments provided to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         * @param {number} blk - The block identifier.
+         * @returns {Array} - The flow result.
+         */
         flow(args, logo, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
@@ -240,7 +354,7 @@ function setupToneBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = event => {
+            const __listener = (event) => {
                 tur.singer.inHarmonic.pop();
                 tur.singer.partials.pop();
             };
@@ -251,7 +365,16 @@ function setupToneBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a Harmonic block.
+     * Extends FlowClampBlock.
+     * @class
+     * @extends FlowClampBlock
+     */
     class Harmonic2Block extends FlowClampBlock {
+        /**
+         * Creates an instance of Harmonic2Block.
+         */
         constructor() {
             super("harmonic2");
             this.piemenuValuesC1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
@@ -263,7 +386,7 @@ function setupToneBlocks(activity) {
                 "harmonichelp"
             ]);
             this.formBlock({
-                //.TRANS: A harmonic is a overtone.
+                //.TRANS: A harmonic is an overtone.
                 name: _("harmonic"),
                 args: 1,
                 defaults: [1]
@@ -275,6 +398,14 @@ function setupToneBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of the Harmonic2Block.
+         * @param {Array} args - The arguments provided to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         * @param {number} blk - The block identifier.
+         * @returns {Array} - The flow result.
+         */
         flow(args, logo, turtle, blk) {
             Singer.ToneActions.doHarmonic(args[0], turtle, blk);
 
@@ -282,7 +413,16 @@ function setupToneBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a Distortion block.
+     * Extends FlowClampBlock.
+     * @class
+     * @extends FlowClampBlock
+     */
     class DisBlock extends FlowClampBlock {
+        /**
+         * Creates an instance of DisBlock.
+         */
         constructor() {
             super("dis");
             this.setPalette("tone", activity);
@@ -301,6 +441,14 @@ function setupToneBlocks(activity) {
             });
         }
 
+        /**
+         * Handles the flow of the DisBlock.
+         * @param {Array} args - The arguments provided to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         * @param {Block} blk - The block instance.
+         * @returns {Array} - An array containing the result of the flow.
+         */
         flow(args, logo, turtle, blk) {
             Singer.ToneActions.doDistortion(args[0], turtle, blk);
 
@@ -318,7 +466,16 @@ function setupToneBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a Tremolo block.
+     * Extends FlowClampBlock.
+     * @class
+     * @extends FlowClampBlock
+     */
     class TremoloBlock extends FlowClampBlock {
+        /**
+         * Creates an instance of TremoloBlock.
+         */
         constructor() {
             super("tremolo");
             this.setPalette("tone", activity);
@@ -353,11 +510,19 @@ function setupToneBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of the TremoloBlock.
+         * @param {Array} args - The arguments provided to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         * @param {Block} blk - The block instance.
+         * @returns {Array} - An array containing the result of the flow.
+         */
         flow(args, logo, turtle, blk) {
             Singer.ToneActions.doTremolo(args[0], args[1], turtle, blk);
 
             const tur = activity.turtles.ithTurtle(turtle);
-    
+
             if (logo.inTimbre) {
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["tremoloActive"] = true;
                 logo.timbre.tremoloEffect.push(blk);
@@ -372,15 +537,24 @@ function setupToneBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a Phaser block.
+     * Extends FlowClampBlock.
+     * @class
+     * @extends FlowClampBlock
+     */
     class PhaserBlock extends FlowClampBlock {
+        /**
+         * Creates an instance of PhaserBlock.
+         */
         constructor() {
             super("phaser");
             this.setPalette("tone", activity);
-            this.piemenuValuesC1 = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5,
-                10, 20];
+            this.piemenuValuesC1 = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 20];
             this.piemenuValuesC2 = [1, 2, 3];
-            this.piemenuValuesC3 = [220, 247, 262, 294, 330, 349, 392, 440,
-                494, 523, 587, 659, 698, 783, 880];
+            this.piemenuValuesC3 = [
+                220, 247, 262, 294, 330, 349, 392, 440, 494, 523, 587, 659, 698, 783, 880
+            ];
             this.setHelpString([
                 _("The Phaser block adds a sweeping sound."),
                 "documentation",
@@ -396,6 +570,14 @@ function setupToneBlocks(activity) {
             });
         }
 
+        /**
+         * Handles the flow of the PhaserBlock.
+         * @param {Array} args - The arguments provided to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         * @param {Block} blk - The block instance.
+         * @returns {Array} - An array containing the result of the flow.
+         */
         flow(args, logo, turtle, blk) {
             Singer.ToneActions.doPhaser(args[0], args[1], args[2], turtle, blk);
             const tur = activity.turtles.ithTurtle(turtle);
@@ -408,15 +590,23 @@ function setupToneBlocks(activity) {
                 logo.timbre.phaserParams.push(last(tur.singer.octaves));
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["octaves"] = args[1];
                 logo.timbre.phaserParams.push(last(tur.signer.baseFrequency));
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["baseFrequency"] =
-                    args[2];
+                instrumentsEffects[turtle][logo.timbre.instrumentName]["baseFrequency"] = args[2];
             }
 
             return [args[3], 1];
         }
     }
 
+    /**
+     * Represents a Chorus block.
+     * Extends FlowClampBlock.
+     * @class
+     * @extends FlowClampBlock
+     */
     class ChorusBlock extends FlowClampBlock {
+        /**
+         * Creates an instance of ChorusBlock.
+         */
         constructor() {
             super("chorus");
             this.setPalette("tone", activity);
@@ -441,6 +631,14 @@ function setupToneBlocks(activity) {
             });
         }
 
+        /**
+         * Handles the flow of the ChorusBlock.
+         * @param {Array} args - The arguments provided to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         * @param {Block} blk - The block instance.
+         * @returns {Array} - An array containing the result of the flow.
+         */
         flow(args, logo, turtle, blk) {
             Singer.ToneActions.doChorus(args[0], args[1], args[2], turtle, blk);
             const tur = activity.turtles.ithTurtle(turtle);
@@ -460,7 +658,16 @@ function setupToneBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a Vibrato block.
+     * Extends FlowClampBlock.
+     * @class
+     * @extends FlowClampBlock
+     */
     class VibratoBlock extends FlowClampBlock {
+        /**
+         * Creates an instance of VibratoBlock.
+         */
         constructor() {
             super("vibrato");
             this.setPalette("tone", activity);
@@ -492,6 +699,14 @@ function setupToneBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of the VibratoBlock.
+         * @param {Array} args - The arguments provided to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         * @param {Block} blk - The block instance.
+         * @returns {Array} - An array containing the result of the flow.
+         */
         flow(args, logo, turtle, blk) {
             Singer.ToneActions.doVibrato(args[0], args[1], turtle, blk);
 
@@ -499,7 +714,16 @@ function setupToneBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a SetVoice block.
+     * Extends FlowClampBlock.
+     * @class
+     * @extends FlowClampBlock
+     */
     class SetVoiceBlock extends FlowClampBlock {
+        /**
+         * Creates an instance of SetVoiceBlock.
+         */
         constructor() {
             super("setvoice");
             this.setPalette("tone", activity);
@@ -519,6 +743,14 @@ function setupToneBlocks(activity) {
             this.hidden = this.deprecated = true;
         }
 
+        /**
+         * Handles the flow of the SetVoiceBlock.
+         * @param {Array} args - The arguments provided to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         * @param {Block} blk - The block instance.
+         * @returns {Array} - An array containing the result of the flow.
+         */
         flow(args, logo, turtle, blk) {
             let voicename = null;
             for (const voice in VOICENAMES) {
@@ -529,7 +761,6 @@ function setupToneBlocks(activity) {
                 }
             }
 
-            // Maybe it is a drum?
             if (voicename === null) {
                 for (const drum in DRUMNAMES) {
                     if (DRUMNAMES[drum][0] === args[0]) {
@@ -550,7 +781,7 @@ function setupToneBlocks(activity) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
                 // eslint-disable-next-line no-unused-vars
-                const __listener = event => tur.singer.voices.pop();
+                const __listener = (event) => tur.singer.voices.pop();
 
                 logo.setTurtleListener(turtle, listenerName, __listener);
             }
@@ -559,7 +790,16 @@ function setupToneBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a SynthName block.
+     * Extends ValueBlock.
+     * @class
+     * @extends ValueBlock
+     */
     class SynthNameBlock extends ValueBlock {
+        /**
+         * Creates an instance of SynthNameBlock.
+         */
         constructor() {
             super("synthname", _("synth name"));
             this.setPalette("tone", activity);
@@ -568,10 +808,18 @@ function setupToneBlocks(activity) {
             this.hidden = this.deprecated = true;
         }
 
+        /**
+         * Handles the argument of the SynthNameBlock.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         * @param {Block} blk - The block instance.
+         * @returns {*} - The result of the argument.
+         */
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "synthname"]);
             } else {
@@ -580,12 +828,23 @@ function setupToneBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a SetDefaultVoiceBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class SetDefaultVoiceBlock extends FlowBlock {
+        /**
+         * Creates an instance of SetDefaultVoiceBlock.
+         */
         constructor() {
             super("setdefaultinstrument", _("set default instrument"));
             this.setPalette("tone", activity);
             this.setHelpString([
-                _("The set default instrument block changes the default instrument from electronic synth to the instrument of your choice."),
+                _(
+                    "The set default instrument block changes the default instrument from electronic synth to the instrument of your choice."
+                ),
                 "documentation",
                 ""
             ]);
@@ -601,6 +860,13 @@ function setupToneBlocks(activity) {
             });
         }
 
+        /**
+         * Handles the flow of the SetDefaultVoiceBlock.
+         * @param {Array} args - The arguments of the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         * @param {Block} blk - The block instance.
+         */
         flow(args, logo, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
             if (args[0] === null) {
@@ -615,7 +881,16 @@ function setupToneBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a VoiceNameBlock.
+     * Extends ValueBlock.
+     * @class
+     * @extends ValueBlock
+     */
     class VoiceNameBlock extends ValueBlock {
+        /**
+         * Creates an instance of VoiceNameBlock.
+         */
         constructor() {
             super("voicename", _("set instrument"));
             this.setPalette("tone", activity);
@@ -631,7 +906,16 @@ function setupToneBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a SetTimbreBlock.
+     * Extends FlowClampBlock.
+     * @class
+     * @extends FlowClampBlock
+     */
     class SetTimbreBlock extends FlowClampBlock {
+        /**
+         * Creates an instance of SetTimbreBlock.
+         */
         constructor() {
             super("settimbre");
             this.setPalette("tone", activity);
@@ -668,6 +952,14 @@ function setupToneBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of the SetTimbreBlock.
+         * @param {Array} args - The arguments of the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         * @param {Block} blk - The block instance.
+         * @returns {Array} - The next block and the number of ticks to wait.
+         */
         flow(args, logo, turtle, blk) {
             if (args[0] === null) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
@@ -704,7 +996,16 @@ function setupToneBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a CustomSampleBlock.
+     * Extends LeftBlock.
+     * @class
+     * @extends LeftBlock
+     */
     class CustomSampleBlock extends LeftBlock {
+        /**
+         * Creates an instance of CustomSampleBlock.
+         */
         constructor() {
             super("customsample", _("sample"));
             this.setPalette("tone", activity);
@@ -726,21 +1027,36 @@ function setupToneBlocks(activity) {
             this.parameter = true;
 
             this.makeMacro((x, y) => [
-                [0, ["customsample", {value: ["", "", "do", 4]}], x, y, [null, 1, 2, 3]],
-                [1, ["audiofile", {value: null}], 0 ,0, [0]],
-                [2, ["solfege", {value: "do"}], 0, 0, [0]],
-                [3, ["number", {value: 4}], 0, 0, [0]],
+                [0, ["customsample", { value: ["", "", "do", 4] }], x, y, [null, 1, 2, 3]],
+                [1, ["audiofile", { value: null }], 0, 0, [0]],
+                [2, ["solfege", { value: "do" }], 0, 0, [0]],
+                [3, ["number", { value: 4 }], 0, 0, [0]]
             ]);
         }
 
+        /**
+         * Updates the parameter of the CustomSampleBlock.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         * @param {Block} blk - The block instance.
+         * @returns {Array} - The updated parameter value.
+         */
         updateParameter(logo, turtle, blk) {
             return activity.blocks.blockList[blk].value;
         }
 
+        /**
+         * Retrieves the argument values of the CustomSampleBlock.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         * @param {Block} blk - The block instance.
+         * @returns {Array} - The argument values.
+         */
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "customsample"]);
             } else {
@@ -771,7 +1087,16 @@ function setupToneBlocks(activity) {
         }
     }
 
+    /**
+     * Represents an AudioFileBlock.
+     * Extends ValueBlock.
+     * @class
+     * @extends ValueBlock
+     */
     class AudioFileBlock extends ValueBlock {
+        /**
+         * Creates an instance of AudioFileBlock.
+         */
         constructor() {
             // The block name is replaced by a pathname.
             super("audiofile", "");
@@ -792,6 +1117,13 @@ function setupToneBlocks(activity) {
             });
         }
 
+        /**
+         * Updates the parameter of the AudioFileBlock.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         * @param {Block} blk - The block instance.
+         * @returns {Array} - The updated parameter value.
+         */
         updateParameter(logo, turtle, blk) {
             activity.blocks.updateBlockText(blk);
             return activity.blocks.blockList[blk].value;
