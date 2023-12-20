@@ -426,7 +426,7 @@ function setupGraphicsBlocks(activity) {
 
             if (args.length === 2) {
                 if (args[0] > 5000 || args[1] > 5000) {
-                    activity.errorMsg("Arc block values should be less than 5000.", blk);
+                    activity.errorMsg(_("Value should not exceed 5000."), blk);
                 } else {
                     if (typeof args[0] === "string" || typeof args[1] === "string") {
                         activity.errorMsg(NANERRORMSG, blk);
@@ -539,7 +539,7 @@ function setupGraphicsBlocks(activity) {
 
             if (args.length === 2) {
                 if (args[0] > 5000 || args[1] > 5000) {
-                    activity.errorMsg("XY block values should be less than 5000.", blk);
+                    activity.errorMsg(_("Value should not exceed 5000."), blk);
                 } else {
                     if (typeof args[0] === "string" || typeof args[1] === "string") {
                         activity.errorMsg(NANERRORMSG, blk);
@@ -718,7 +718,7 @@ function setupGraphicsBlocks(activity) {
 
             if (args.length === 1) {
                 if (args[0] > 5000) {
-                    activity.errorMsg("Back block value should be less than 5000.", blk);
+                    activity.errorMsg(_("Value should not exceed 5000."), blk);
                 } else {
                     if (typeof args[0] === "string") {
                         activity.errorMsg(NANERRORMSG, blk);
@@ -780,7 +780,7 @@ function setupGraphicsBlocks(activity) {
 
             if (args.length === 1) {
                 if (args[0] > 5000) {
-                   activity.errorMsg("Forward block value should be less than 5000.", blk); 
+                   activity.errorMsg(_("Value should not exceed 5000."), blk); 
                 } else {
                     if (typeof args[0] === "string") {
                         activity.errorMsg(NANERRORMSG, blk);
