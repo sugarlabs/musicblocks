@@ -425,25 +425,29 @@ function setupGraphicsBlocks(activity) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
-                if (typeof args[0] === "string" || typeof args[1] === "string") {
-                    activity.errorMsg(NANERRORMSG, blk);
-                } else if (logo.inMatrix) {
-                    logo.phraseMaker.addRowBlock(blk);
-                    if (logo.pitchBlocks.indexOf(blk) === -1) {
-                        logo.pitchBlocks.push(blk);
-                    }
-                    logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
-                    logo.phraseMaker.rowArgs.push([args[0], args[1]]);
-                } else if (tur.singer.inNoteBlock.length > 0) {
-                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
+                if (args[0] > 5000 || args[1] > 5000) {
+                    activity.errorMsg("Arc block values should be less than 5000.", blk);
                 } else {
-                    if (tur.singer.suppressOutput) {
-                        const savedPenState = tur.painter.penState;
-                        tur.painter.penState = false;
-                        tur.painter.doArc(args[0], args[1]);
-                        tur.painter.penState = savedPenState;
+                    if (typeof args[0] === "string" || typeof args[1] === "string") {
+                        activity.errorMsg(NANERRORMSG, blk);
+                    } else if (logo.inMatrix) {
+                        logo.phraseMaker.addRowBlock(blk);
+                        if (logo.pitchBlocks.indexOf(blk) === -1) {
+                            logo.pitchBlocks.push(blk);
+                        }
+                        logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+                        logo.phraseMaker.rowArgs.push([args[0], args[1]]);
+                    } else if (tur.singer.inNoteBlock.length > 0) {
+                        tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                     } else {
-                        tur.painter.doArc(args[0], args[1]);
+                        if (tur.singer.suppressOutput) {
+                            const savedPenState = tur.painter.penState;
+                            tur.painter.penState = false;
+                            tur.painter.doArc(args[0], args[1]);
+                            tur.painter.penState = savedPenState;
+                        } else {
+                            tur.painter.doArc(args[0], args[1]);
+                        }
                     }
                 }
             }
@@ -534,25 +538,29 @@ function setupGraphicsBlocks(activity) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (args.length === 2) {
-                if (typeof args[0] === "string" || typeof args[1] === "string") {
-                    activity.errorMsg(NANERRORMSG, blk);
-                } else if (logo.inMatrix) {
-                    logo.phraseMaker.addRowBlock(blk);
-                    if (logo.pitchBlocks.indexOf(blk) === -1) {
-                        logo.pitchBlocks.push(blk);
-                    }
-                    logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
-                    logo.phraseMaker.rowArgs.push([args[0], args[1]]);
-                } else if (tur.singer.inNoteBlock.length > 0) {
-                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
+                if (args[0] > 5000 || args[1] > 5000) {
+                    activity.errorMsg("XY block values should be less than 5000.", blk);
                 } else {
-                    if (tur.singer.suppressOutput) {
-                        const savedPenState = tur.painter.penState;
-                        tur.painter.penState = false;
-                        tur.painter.doSetXY(args[0], args[1]);
-                        tur.painter.penState = savedPenState;
+                    if (typeof args[0] === "string" || typeof args[1] === "string") {
+                        activity.errorMsg(NANERRORMSG, blk);
+                    } else if (logo.inMatrix) {
+                        logo.phraseMaker.addRowBlock(blk);
+                        if (logo.pitchBlocks.indexOf(blk) === -1) {
+                            logo.pitchBlocks.push(blk);
+                        }
+                        logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+                        logo.phraseMaker.rowArgs.push([args[0], args[1]]);
+                    } else if (tur.singer.inNoteBlock.length > 0) {
+                        tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                     } else {
-                        tur.painter.doSetXY(args[0], args[1]);
+                        if (tur.singer.suppressOutput) {
+                            const savedPenState = tur.painter.penState;
+                            tur.painter.penState = false;
+                            tur.painter.doSetXY(args[0], args[1]);
+                            tur.painter.penState = savedPenState;
+                        } else {
+                            tur.painter.doSetXY(args[0], args[1]);
+                        }
                     }
                 }
             }
@@ -709,27 +717,31 @@ function setupGraphicsBlocks(activity) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
             if (args.length === 1) {
-                if (typeof args[0] === "string") {
-                    activity.errorMsg(NANERRORMSG, blk);
-                } else if (logo.inMatrix) {
-                    logo.phraseMaker.addRowBlock(blk);
-                    if (logo.pitchBlocks.indexOf(blk) === -1) {
-                        logo.pitchBlocks.push(blk);
-                    }
-                    logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
-                    logo.phraseMaker.rowArgs.push(args[0]);
-                } else if (tur.singer.inNoteBlock.length > 0) {
-                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
+                if (args[0] > 5000) {
+                    activity.errorMsg("Back block value should be less than 5000.", blk);
                 } else {
-                    if (tur.singer.suppressOutput) {
-                        const savedPenState = tur.painter.penState;
-                        tur.painter.penState = false;
-                        tur.painter.doForward(-args[0]);
-                        tur.painter.penState = savedPenState;
+                    if (typeof args[0] === "string") {
+                        activity.errorMsg(NANERRORMSG, blk);
+                    } else if (logo.inMatrix) {
+                        logo.phraseMaker.addRowBlock(blk);
+                        if (logo.pitchBlocks.indexOf(blk) === -1) {
+                            logo.pitchBlocks.push(blk);
+                        }
+                        logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+                        logo.phraseMaker.rowArgs.push(args[0]);
+                    } else if (tur.singer.inNoteBlock.length > 0) {
+                        tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                     } else {
-                        tur.painter.doForward(-args[0]);
+                        if (tur.singer.suppressOutput) {
+                            const savedPenState = tur.painter.penState;
+                            tur.painter.penState = false;
+                            tur.painter.doForward(-args[0]);
+                            tur.painter.penState = savedPenState;
+                        } else {
+                            tur.painter.doForward(-args[0]);
+                        }
                     }
-                }
+                } 
             }
         }
     }
@@ -766,26 +778,30 @@ function setupGraphicsBlocks(activity) {
         flow(args, logo, turtle, blk) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
-            if (args.length === 1 && args[0].toString().length < 6) {
-                if (typeof args[0] === "string") {
-                    activity.errorMsg(NANERRORMSG, blk);
-                } else if (logo.inMatrix) {
-                    logo.phraseMaker.addRowBlock(blk);
-                    if (logo.pitchBlocks.indexOf(blk) === -1) {
-                        logo.pitchBlocks.push(blk);
-                    }
-                    logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
-                    logo.phraseMaker.rowArgs.push(args[0]);
-                } else if (tur.singer.inNoteBlock.length > 0) {
-                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
+            if (args.length === 1) {
+                if (args[0] > 5000) {
+                   activity.errorMsg("Forward block value should be less than 5000.", blk); 
                 } else {
-                    if (tur.singer.suppressOutput) {
-                        const savedPenState = tur.painter.penState;
-                        tur.painter.penState = false;
-                        tur.painter.doForward(args[0]);
-                        tur.painter.penState = savedPenState;
+                    if (typeof args[0] === "string") {
+                        activity.errorMsg(NANERRORMSG, blk);
+                    } else if (logo.inMatrix) {
+                        logo.phraseMaker.addRowBlock(blk);
+                        if (logo.pitchBlocks.indexOf(blk) === -1) {
+                            logo.pitchBlocks.push(blk);
+                        }
+                        logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+                        logo.phraseMaker.rowArgs.push(args[0]);
+                    } else if (tur.singer.inNoteBlock.length > 0) {
+                        tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                     } else {
-                        tur.painter.doForward(args[0]);
+                        if (tur.singer.suppressOutput) {
+                            const savedPenState = tur.painter.penState;
+                            tur.painter.penState = false;
+                            tur.painter.doForward(args[0]);
+                            tur.painter.penState = savedPenState;
+                        } else {
+                            tur.painter.doForward(args[0]);
+                        }
                     }
                 }
             }
