@@ -267,9 +267,6 @@ class PhraseMaker {
         const w = window.innerWidth;
         this._cellScale = Math.max(1, w / 1200);
         const iconSize = PhraseMaker.ICONSIZE * this._cellScale;
-
-        
-
         const widgetWindow = window.widgetWindows.windowFor(this, "phrase maker");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
@@ -284,8 +281,6 @@ class PhraseMaker {
         // Add the buttons to the top row.
 
         widgetWindow.onclose = () => {
-          
-        
             // Resetting other states and performing cleanup actions
             this._rowOffset = [];
             for (let i = 0; i < this._rowMap.length; i++) {
@@ -296,8 +291,7 @@ class PhraseMaker {
             this.activity.logo.synth.stop();
             this._stopOrCloseClicked = true;
             this.activity.hideMsgs();
-            docById("wheelDivptm").style.display = "none";
-        
+            docById("wheelDivptm").style.display = "none"; 
             // Destroy the widget window
             widgetWindow.destroy();
         };
