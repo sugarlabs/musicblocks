@@ -31,7 +31,7 @@ class GlobalCard {
         
         this.renderData = `
             <div class="col no-margin-left s12 m6 l4"> 
-                <div class="card"> 
+                <div class="card" style="height:95%;"> 
                 
                     <div class="card-image"> 
                         <img class="project-image project-card-image" id="global-project-image-{ID}" src="images/planetgraphic.png"> 
