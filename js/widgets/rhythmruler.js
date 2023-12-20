@@ -1450,7 +1450,7 @@ class RhythmRuler {
     /**
      * @public
      * @returns {void}
-      */
+     */
     playAll() {
         // External call from run button.
         if (this._playing) {

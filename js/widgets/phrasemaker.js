@@ -267,6 +267,7 @@ class PhraseMaker {
         const w = window.innerWidth;
         this._cellScale = Math.max(1, w / 1200);
         const iconSize = PhraseMaker.ICONSIZE * this._cellScale;
+        
         const widgetWindow = window.widgetWindows.windowFor(this, "phrase maker");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
@@ -285,8 +286,7 @@ class PhraseMaker {
             this._rowOffset = [];
             for (let i = 0; i < this._rowMap.length; i++) {
                 this._rowMap[i] = i;
-            }
-        
+            }  
             this.activity.logo.synth.stopSound(0, this._instrumentName);
             this.activity.logo.synth.stop();
             this._stopOrCloseClicked = true;
