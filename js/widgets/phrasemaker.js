@@ -267,7 +267,7 @@ class PhraseMaker {
         const w = window.innerWidth;
         this._cellScale = Math.max(1, w / 1200);
         const iconSize = PhraseMaker.ICONSIZE * this._cellScale;
-
+        
         const widgetWindow = window.widgetWindows.windowFor(this, "phrase maker");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
@@ -282,19 +282,20 @@ class PhraseMaker {
         // Add the buttons to the top row.
 
         widgetWindow.onclose = () => {
+            // Resetting other states and performing cleanup actions
             this._rowOffset = [];
             for (let i = 0; i < this._rowMap.length; i++) {
                 this._rowMap[i] = i;
-            }
-
+            }  
             this.activity.logo.synth.stopSound(0, this._instrumentName);
             this.activity.logo.synth.stop();
             this._stopOrCloseClicked = true;
             this.activity.hideMsgs();
-            docById("wheelDivptm").style.display = "none";
-
+            docById("wheelDivptm").style.display = "none"; 
+            // Destroy the widget window
             widgetWindow.destroy();
         };
+        
 
         this._playButton = widgetWindow.addButton(
             "play-button.svg",
@@ -306,29 +307,7 @@ class PhraseMaker {
             this.activity.logo.turtleDelay = 0;
 
             this.activity.logo.resetSynth(0);
-            if (this.playingNow) {
-                this._playButton.innerHTML =
-                    '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
-                    _("Play") +
-                    '" alt="' +
-                    _("Play") +
-                    '" height="' +
-                    PhraseMaker.ICONSIZE +
-                    '" width="' +
-                    PhraseMaker.ICONSIZE +
-                    '" vertical-align="middle">&nbsp;&nbsp;';
-            } else {
-                this._playButton.innerHTML =
-                    '&nbsp;&nbsp;<img src="header-icons/stop-button.svg" title="' +
-                    _("Stop") +
-                    '" alt="' +
-                    _("Stop") +
-                    '" height="' +
-                    PhraseMaker.ICONSIZE +
-                    '" width="' +
-                    PhraseMaker.ICONSIZE +
-                    '" vertical-align="middle">&nbsp;&nbsp;';
-            }
+  
             this.playAll();
         };
 
@@ -3800,7 +3779,18 @@ class PhraseMaker {
         this.playingNow = !this.playingNow;
 
         if (this.playingNow) {
-            this.widgetWindow.modifyButton(0, "stop-button.svg", PhraseMaker.ICONSIZE, _("stop"));
+            this._playButton.innerHTML =
+            '&nbsp;&nbsp;<img src="header-icons/stop-button.svg" title="' +
+            _("Stop") +
+            '" alt="' +
+            _("Stop") +
+            '" height="' +
+            PhraseMaker.ICONSIZE +
+            '" width="' +
+            PhraseMaker.ICONSIZE +
+            '" vertical-align="middle">&nbsp;&nbsp;';
+        
+      
 
             this.activity.logo.synth.stop();
 
@@ -3902,7 +3892,16 @@ class PhraseMaker {
             this.__playNote(0, 0);
         } else {
             this._stopOrCloseClicked = true;
-            this.widgetWindow.modifyButton(0, "play-button.svg", PhraseMaker.ICONSIZE, _("Play"));
+            this._playButton.innerHTML =
+            '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
+            _("Play") +
+            '" alt="' +
+            _("Play") +
+            '" height="' +
+            PhraseMaker.ICONSIZE +
+            '" width="' +
+            PhraseMaker.ICONSIZE +
+            '" vertical-align="middle">&nbsp;&nbsp;';
         }
     }
 

@@ -336,7 +336,6 @@ class Activity {
             // Show and populate the printText div.
             this.printText = docById("printText");
             this.printTextContent = docById("printTextContent");
-
             // Are we running off of a server?
             this.server = true;
             this.turtleBlocksScale = 1;
@@ -1133,7 +1132,7 @@ class Activity {
         this._doSwitchMode = () => {
             this.blocks.activeBlock = null;
             const mode = this.storage.beginnerMode;
-
+            
             const MSGPrefix =
                 "<a href='#' " +
                 "onClick='window.location.reload()'" +
