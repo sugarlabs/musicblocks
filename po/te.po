@@ -3086,7 +3086,7 @@ msgstr ""
 #: js/toolbar.js:188
 #: js/toolbar.js:242
 msgid "aymara"
-msgstr "
+msgstr ""
 
 #: js/toolbar.js:95
 #: js/toolbar.js:189
