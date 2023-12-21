@@ -2210,7 +2210,7 @@ msgstr "ప్లేబ్యాక్ సిద్ధం"
 #: js/rhythmruler.js:2116
 #: js/rhythmruler.js:2123
 msgid "action"
-msgstr "చర్య""
+msgstr "చర్య"
 
 #: js/blocks.js:1205
 #: js/blocks.js:3380
@@ -2286,7 +2286,7 @@ msgstr "నిజమైన"
 #: js/BooleanBlocks.js:302
 #: js/SensorsBlocks.js:583
 msgid "false"
-msgstr "అసత్యం""
+msgstr "అసత్యం"
 
 #: js/blocks.js:3183
 #: js/palette.js:572
