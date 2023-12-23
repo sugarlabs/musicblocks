@@ -2,7 +2,7 @@
 name: 💡 Feature request
 about: Suggest an enhancement
 title: ""
-labels: "kind/enhancement"
+labels: "Issue-Enhancement"
 assignees: ""
 ---
 
