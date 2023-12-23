@@ -20,9 +20,18 @@
 /* exported setupVolumeBlocks */
 
 function setupVolumeBlocks(activity) {
+    /**
+     * Represents a SynthVolumeBlock.
+     * Extends LeftBlock.
+     * @class
+     * @extends LeftBlock
+     */
     class SynthVolumeBlock extends LeftBlock {
+        /**
+         * Creates an instance of SynthVolumeBlock.
+         */
         constructor() {
-            //.TRANS: the volume for this synth
+            // The volume for this synth
             super("synthvolumefactor", _("synth volume"));
             this.setPalette("volume", activity);
             this.parameter = true;
@@ -44,14 +53,30 @@ function setupVolumeBlocks(activity) {
             ]);
         }
 
+        /**
+         * Updates the parameter of the block.
+         * @param {object} logo - Logo object.
+         * @param {number} turtle - Turtle index.
+         * @param {string} blk - Block ID.
+         * @returns {object} The updated parameter.
+         */
         updateParameter(logo, turtle, blk) {
             return activity.blocks.blockList[blk].value;
         }
 
+        /**
+         * Handles the arguments of the block.
+         * @param {object} logo - Logo object.
+         * @param {number} turtle - Turtle index.
+         * @param {string} blk - Block ID.
+         * @param {object} receivedArg - Received argument.
+         * @returns {number} The synth volume.
+         */
         arg(logo, turtle, blk, receivedArg) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "synth volume"]);
             } else {
@@ -65,9 +90,18 @@ function setupVolumeBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a MasterVolumeBlock.
+     * Extends ValueBlock.
+     * @class
+     * @extends ValueBlock
+     */
     class MasterVolumeBlock extends ValueBlock {
+        /**
+         * Creates an instance of MasterVolumeBlock.
+         */
         constructor() {
-            //.TRANS: the volume at which notes are played
+            // The volume at which notes are played
             super("notevolumefactor", _("master volume"));
             this.setPalette("volume", activity);
             this.parameter = true;
@@ -78,6 +112,12 @@ function setupVolumeBlocks(activity) {
             ]);
         }
 
+        /**
+         * Sets the master volume.
+         * @param {object} logo - Logo object.
+         * @param {number} value - Volume value.
+         * @param {number} turtle - Turtle index.
+         */
         setter(logo, value, turtle) {
             const len = Singer.masterVolume.length;
             Singer.masterVolume[len - 1] = value;
@@ -86,14 +126,29 @@ function setupVolumeBlocks(activity) {
             }
         }
 
+        /**
+         * Updates the parameter of the block.
+         * @param {object} logo - Logo object.
+         * @param {number} turtle - Turtle index.
+         * @param {string} blk - Block ID.
+         * @returns {object} The updated parameter.
+         */
         updateParameter(logo, turtle, blk) {
             return activity.blocks.blockList[blk].value;
         }
 
+        /**
+         * Handles the arguments of the block.
+         * @param {object} logo - Logo object.
+         * @param {number} turtle - Turtle index.
+         * @param {string} blk - Block ID.
+         * @returns {number} The master volume.
+         */
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "volume"]);
             } else {
@@ -102,7 +157,16 @@ function setupVolumeBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a PPPBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class PPPBlock extends FlowBlock {
+        /**
+         * Creates an instance of PPPBlock.
+         */
         constructor() {
             super("ppp", "ppp");
             this.setPalette("volume", activity);
@@ -116,7 +180,16 @@ function setupVolumeBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a PPBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class PPBlock extends FlowBlock {
+        /**
+         * Creates an instance of PPBlock.
+         */
         constructor() {
             super("pp", "pp");
             this.setPalette("volume", activity);
@@ -130,7 +203,16 @@ function setupVolumeBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a PBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class PBlock extends FlowBlock {
+        /**
+         * Creates an instance of PBlock.
+         */
         constructor() {
             super("p", "p");
             this.setPalette("volume", activity);
@@ -144,7 +226,16 @@ function setupVolumeBlocks(activity) {
         }
     }
 
+    /**
+     * Represents an MPBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class MPBlock extends FlowBlock {
+        /**
+         * Creates an instance of MPBlock.
+         */
         constructor() {
             super("mp", "mp");
             this.setPalette("volume", activity);
@@ -158,7 +249,16 @@ function setupVolumeBlocks(activity) {
         }
     }
 
+    /**
+     * Represents an MFBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class MFBlock extends FlowBlock {
+        /**
+         * Creates an instance of MFBlock.
+         */
         constructor() {
             super("mf", "mf");
             this.setPalette("volume", activity);
@@ -172,7 +272,16 @@ function setupVolumeBlocks(activity) {
         }
     }
 
+    /**
+     * Represents an FBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class FBlock extends FlowBlock {
+        /**
+         * Creates an instance of FBlock.
+         */
         constructor() {
             super("f", "f");
             this.setPalette("volume", activity);
@@ -186,7 +295,16 @@ function setupVolumeBlocks(activity) {
         }
     }
 
+    /**
+     * Represents an FFBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class FFBlock extends FlowBlock {
+        /**
+         * Creates an instance of FFBlock.
+         */
         constructor() {
             super("ff", "ff");
             this.setPalette("volume", activity);
@@ -200,7 +318,16 @@ function setupVolumeBlocks(activity) {
         }
     }
 
+    /**
+     * Represents an FFFBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class FFFBlock extends FlowBlock {
+        /**
+         * Creates an instance of FFFBlock.
+         */
         constructor() {
             super("fff", "fff");
             this.setPalette("volume", activity);
@@ -214,7 +341,16 @@ function setupVolumeBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a SetSynthVolume2Block.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class SetSynthVolume2Block extends FlowBlock {
+        /**
+         * Creates an instance of SetSynthVolume2Block.
+         */
         constructor() {
             super("setsynthvolume2", _("set synth volume"));
             this.setPalette("volume", activity);
@@ -228,6 +364,14 @@ function setupVolumeBlocks(activity) {
             this.hidden = true;
         }
 
+        /**
+         * Handles the flow of the block.
+         * @param {Array} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {number} turtle - The turtle index.
+         * @param {number} blk - The block index.
+         * @returns {Array} - An array containing the result and a flag indicating a successful flow.
+         */
         flow(args, logo, turtle, blk) {
             // set synth volume in clamp form
             if (args[2] === undefined) {
@@ -318,11 +462,12 @@ function setupVolumeBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = event => {
+            const __listener = (event) => {
                 tur.singer.synthVolume[synth].pop();
                 // Restore previous volume
                 if (
-                    tur.singer.justCounting.length === 0 && tur.singer.synthVolume[synth].length > 0
+                    tur.singer.justCounting.length === 0 &&
+                    tur.singer.synthVolume[synth].length > 0
                 ) {
                     Singer.setSynthVolume(logo, turtle, synth, last(tur.singer.synthVolume[synth]));
                 }
@@ -334,9 +479,18 @@ function setupVolumeBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a SetDrumVolumeBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class SetDrumVolumeBlock extends FlowBlock {
+        /**
+         * Creates an instance of SetDrumVolumeBlock.
+         */
         constructor() {
-            //.TRANS: set the loudness level
+            // .TRANS: set the loudness level
             super("setdrumvolume", _("set drum volume"));
             this.setPalette("volume", activity);
             this.beginnerBlock(true);
@@ -347,6 +501,7 @@ function setupVolumeBlocks(activity) {
                 argTypes: ["textin", "numberin"],
                 argLabels: [_("drum"), _("volume")]
             });
+
             this.makeMacro((x, y) => [
                 [0, "setsynthvolume", x, y, [null, 1, 2, null]],
                 [1, ["drumname", { value: DEFAULTDRUM }], 0, 0, [0]],
@@ -355,7 +510,16 @@ function setupVolumeBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a SetSynthVolumeBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class SetSynthVolumeBlock extends FlowBlock {
+        /**
+         * Creates an instance of SetSynthVolumeBlock.
+         */
         constructor() {
             super("setsynthvolume", _("set synth volume"));
             this.setPalette("volume", activity);
@@ -380,6 +544,7 @@ function setupVolumeBlocks(activity) {
                 argTypes: ["textin", "numberin"],
                 argLabels: [_("synth"), _("volume")]
             });
+
             this.makeMacro((x, y) => [
                 [0, "setsynthvolume", x, y, [null, 1, 2, null]],
                 [1, ["voicename", { value: DEFAULTVOICE }], 0, 0, [0]],
@@ -387,6 +552,13 @@ function setupVolumeBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of the SetSynthVolumeBlock.
+         * @param {Array} args - The arguments for the block.
+         * @param {Logo} logo - The logo instance.
+         * @param {number} turtle - The turtle index.
+         * @param {number} blk - The block index.
+         */
         flow(args, logo, turtle, blk) {
             let arg0 = args[0];
             if (arg0 === null || typeof arg0 !== "string") {
@@ -410,9 +582,18 @@ function setupVolumeBlocks(activity) {
         }
     }
 
-    class setPanBlock extends FlowBlock {
+    /**
+     * Represents a SetPanBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
+    class SetPanBlock extends FlowBlock {
+        /**
+         * Creates an instance of SetPanBlock.
+         */
         constructor() {
-            //.TRANS: set the distribution of volume
+            // .TRANS: set the distribution of volume
             super("setpanning", _("set panning"));
             this.setPalette("volume", activity);
             this.piemenuValuesC1 = [100, 80, 60, 40, 20, 0, -20, -40, -60, -80, -100];
@@ -427,13 +608,23 @@ function setupVolumeBlocks(activity) {
             this.formBlock({ args: 1, defaults: [0] });
         }
 
+        /**
+         * Handles the flow of the SetPanBlock.
+         * @param {Array} args - The arguments for the block.
+         * @param {Logo} logo - The logo instance.
+         * @param {number} turtle - The turtle index.
+         * @param {number} blk - The block index.
+         */
         flow(args, logo, turtle, blk) {
             if (args.length === 1) {
                 if (typeof args[0] !== "number") {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else {
                     if (args[0] === 100 || args[0] === -100) {
-                        activity.errorMsg(_("Warning: Sound is coming out from only the left or right side."), blk);
+                        activity.errorMsg(
+                            _("Warning: Sound is coming out from only the left or right side."),
+                            blk
+                        );
                     }
                     Singer.VolumeActions.setPanning(args[0], turtle);
                 }
@@ -441,9 +632,18 @@ function setupVolumeBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a SetNoteVolumeBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class SetNoteVolumeBlock extends FlowBlock {
+        /**
+         * Creates an instance of SetNoteVolumeBlock.
+         */
         constructor() {
-            //.TRANS: set the loudness level
+            // .TRANS: set the loudness level
             super("setnotevolume", _("set master volume"));
             this.setPalette("volume", activity);
             this.piemenuValuesC1 = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
@@ -458,6 +658,13 @@ function setupVolumeBlocks(activity) {
             this.formBlock({ args: 1, defaults: [50] });
         }
 
+        /**
+         * Handles the flow of the SetNoteVolumeBlock.
+         * @param {Array} args - The arguments for the block.
+         * @param {Logo} logo - The logo instance.
+         * @param {number} turtle - The turtle index.
+         * @param {number} blk - The block index.
+         */
         flow(args, logo, turtle, blk) {
             if (args.length === 1) {
                 if (typeof args[0] !== "number") {
@@ -469,27 +676,45 @@ function setupVolumeBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a SetNoteVolume2Block.
+     * Extends FlowClampBlock.
+     * @class
+     * @extends FlowClampBlock
+     */
     class SetNoteVolume2Block extends FlowClampBlock {
+        /**
+         * Creates an instance of SetNoteVolume2Block.
+         */
         constructor() {
             super("setnotevolume2");
             this.setPalette("volume", activity);
             this.setHelpString();
             this.formBlock({
-                //.TRANS: set the loudness level
+                // .TRANS: set the loudness level
                 name: _("set master volume"),
                 args: 1,
                 defaults: [50]
             });
+
             this.makeMacro((x, y) => [
                 [0, "setsynthvolume2", x, y, [null, 1, 2, null, 3]],
                 [1, ["voicename", { value: DEFAULTVOICE }], 0, 0, [0]],
                 [2, ["number", { value: 50 }], 0, 0, [0]],
                 [3, "hidden", 0, 0, [0, null]]
             ]);
+
             this.hidden = true;
             this.deprecated = true;
         }
 
+        /**
+         * Handles the flow of the SetNoteVolume2Block.
+         * @param {Array} args - The arguments for the block.
+         * @param {Logo} logo - The logo instance.
+         * @param {number} turtle - The turtle index.
+         * @param {number} blk - The block index.
+         */
         flow(args, logo, turtle, blk) {
             // master volume in clamp form
             // Used by fff ff f p pp ppp blocks
@@ -527,7 +752,7 @@ function setupVolumeBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = event => {
+            const __listener = (event) => {
                 Singer.masterVolume.pop();
                 // Restore previous volume
                 if (tur.singer.justCounting.length === 0 && Singer.masterVolume.length > 0) {
@@ -541,7 +766,16 @@ function setupVolumeBlocks(activity) {
         }
     }
 
+    /**
+     * Represents an ArticulationBlock.
+     * Extends FlowClampBlock.
+     * @class
+     * @extends FlowClampBlock
+     */
     class ArticulationBlock extends FlowClampBlock {
+        /**
+         * Creates an instance of ArticulationBlock.
+         */
         constructor() {
             super("articulation");
             this.setPalette("volume", activity);
@@ -553,7 +787,7 @@ function setupVolumeBlocks(activity) {
                 "articulationhelp"
             ]);
             this.formBlock({
-                //.TRANS: set an articulation (change in volume)
+                // .TRANS: set an articulation (change in volume)
                 name: _("set relative volume"),
                 args: 1,
                 defaults: [50]
@@ -565,9 +799,16 @@ function setupVolumeBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of the ArticulationBlock.
+         * @param {Array} args - The arguments for the block.
+         * @param {Logo} logo - The logo instance.
+         * @param {number} turtle - The turtle index.
+         * @param {number} blk - The block index.
+         * @returns {Array} - The result of the flow.
+         */
         flow(args, logo, turtle, blk) {
-            if (args[1] === undefined)
-                return;
+            if (args[1] === undefined) return;
 
             let arg = args[0];
             if (arg === null || typeof arg !== "number") {
@@ -581,7 +822,17 @@ function setupVolumeBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a DecrescendoBlock.
+     * Extends FlowClampBlock.
+     * @class
+     * @extends FlowClampBlock
+     */
     class DecrescendoBlock extends FlowClampBlock {
+        /**
+         * Creates an instance of DecrescendoBlock.
+         * @param {string} [name] - The name of the block.
+         */
         constructor(name) {
             super(name || "decrescendo");
             this.setPalette("volume", activity);
@@ -589,16 +840,20 @@ function setupVolumeBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played.") +
+                _(
+                    "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
+                ) +
                     " " +
-                    _("For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."),
+                    _(
+                        "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
+                    ),
                 "documentation",
                 null,
                 "crescendohelp"
             ]);
 
             this.formBlock({
-                //.TRANS: a gradual increase in loudness
+                // .TRANS: a gradual increase in loudness
                 name: _("decrescendo"),
                 args: 1,
                 defaults: [5]
@@ -610,10 +865,21 @@ function setupVolumeBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of the DecrescendoBlock.
+         * @param {Array} args - The arguments for the block.
+         * @param {Logo} logo - The logo instance.
+         * @param {number} turtle - The turtle index.
+         * @param {number} blk - The block index.
+         * @returns {Array} - The result of the flow.
+         */
         flow(args, logo, turtle, blk) {
             if (args.length > 1 && args[0] !== 0) {
                 Singer.VolumeActions.doCrescendo(
-                    activity.blocks.blockList[blk].name, args[0], turtle, blk
+                    activity.blocks.blockList[blk].name,
+                    args[0],
+                    turtle,
+                    blk
                 );
 
                 return [args[1], 1];
@@ -621,7 +887,16 @@ function setupVolumeBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a CrescendoBlock.
+     * Extends DecrescendoBlock.
+     * @class
+     * @extends DecrescendoBlock
+     */
     class CrescendoBlock extends DecrescendoBlock {
+        /**
+         * Creates an instance of CrescendoBlock.
+         */
         constructor() {
             super("crescendo");
             this.setPalette("volume", activity);
@@ -629,16 +904,20 @@ function setupVolumeBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Crescendo block will increase the volume of the contained notes by a specified amount for every note played.") +
+                _(
+                    "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
+                ) +
                     " " +
-                    _("For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."),
+                    _(
+                        "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
+                    ),
                 "documentation",
                 null,
                 "crescendohelp"
             ]);
 
             this.formBlock({
-                //.TRANS: a gradual increase in loudness
+                // .TRANS: a gradual increase in loudness
                 name: _("crescendo"),
                 args: 1,
                 defaults: [5]
