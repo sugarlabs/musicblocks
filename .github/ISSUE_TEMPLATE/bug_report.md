@@ -18,6 +18,10 @@ assignees: ""
 
 <!-- Add screenshots, if applicable, to help explain your problem. -->
 
+### Console log Errors:
+
+<!-- Upload console log screenshots to help explain your problem in much better fashion -->
+
 ### Environment:
 
 -   Operating System: [e.g., Windows, macOS, Linux]
