@@ -145,10 +145,15 @@ class Trashcan {
      * @returns {void}
      */
     updateContainerPosition() {
-        const offsetFromBottom = 75;
-        const offsetFromRight = 97;
+        const offsetPercentageFromBottom = 0.1; // 10% from the bottom
+        const offsetPercentageFromRight = 0.07; // 7% from the right
+
+        const offsetFromBottom = window.innerHeight * offsetPercentageFromBottom;
+        const offsetFromRight = window.innerWidth * offsetPercentageFromRight;
+
         this._container.x = window.innerWidth / this._scale - Trashcan.TRASHWIDTH - offsetFromRight;
-        this._container.y = window.innerHeight / this._scale - Trashcan.TRASHHEIGHT - offsetFromBottom;
+        this._container.y =
+            window.innerHeight / this._scale - Trashcan.TRASHHEIGHT - offsetFromBottom;
     }
 
     shouldResize(newWidth, newHeight) {
