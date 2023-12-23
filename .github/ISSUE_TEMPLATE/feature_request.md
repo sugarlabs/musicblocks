@@ -1,6 +1,6 @@
 ---
 name: 💡 Feature request
-about: Suggest an enhancement to the Layer5 website
+about: Suggest an enhancement
 title: ""
 labels: "kind/enhancement"
 assignees: ""
