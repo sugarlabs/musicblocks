@@ -146,7 +146,7 @@ class Trashcan {
      */
     updateContainerPosition() {
         const offsetPercentageFromBottom = 0.1; // 10% from the bottom
-        const offsetPercentageFromRight = 0.07; // 7% from the right
+        const offsetPercentageFromRight = 0.065; // 6.5% from the right
 
         const offsetFromBottom = window.innerHeight * offsetPercentageFromBottom;
         const offsetFromRight = window.innerWidth * offsetPercentageFromRight;
