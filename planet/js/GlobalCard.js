@@ -200,9 +200,30 @@ class GlobalCard {
         (!data.success && data.error === "ERROR_ACTION_NOT_PERMITTED") ?
             this.setLike(like) : this.setLike(like) ;
     };
+ setLike(like) {
 
-    setLike(like) {
-        this.Planet.ProjectStorage.like(this.id,like);
+        function debounce(func, wait) {
+            let timeout;
+            return function () {
+                const context = this;
+                const args = arguments;
+                const later = function () {
+                    timeout = null;
+                    func.apply(context, args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Debounce the setLike function to limit the rapid clicks
+        if (!this.debouncedSetLike) {
+            this.debouncedSetLike = debounce(() => {
+                this.Planet.ProjectStorage.like(this.id, like);
+            }, 500);
+        }
+
+        this.Planet.ProjectStorage.like(this.id, like);
         let incr = 1;
         let text = "favorite";
 
@@ -214,7 +235,10 @@ class GlobalCard {
         const l = document.getElementById(`global-project-likes-${this.id}`);
         l.textContent = (parseInt(l.textContent) + incr).toString();
         document.getElementById(`global-like-icon-${this.id}`).textContent = text;
-    };
+
+        this.debouncedSetLike();
+    }
+
 
     init(id) {
         this.id = id;
