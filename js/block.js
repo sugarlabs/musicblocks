@@ -3673,7 +3673,7 @@ class Block {
                     labelValue +
                     '" />';
                 labelElem.classList.add("hasKeyboard");
-                this.label = docById("numberLabel");  
+                this.label = docById("numberLabel");
             }
         }
 
