@@ -423,9 +423,10 @@ function setupGraphicsBlocks(activity) {
 
         flow(args, logo, turtle, blk) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
+            const isWrap = activity.turtles.ithTurtle(turtle).painter.wrap;
 
             if (args.length === 2) {
-                if (args[1] > 5000 || args[1] < -5000) {
+                if ((args[1] > 5000 || args[1] < -5000) && (isWrap == true || isWrap == null)) {
                     activity.errorMsg(_("Value must be within the range of -5000 to 5000."), blk);
                 } else {
                     if (typeof args[0] === "string" || typeof args[1] === "string") {
@@ -536,9 +537,10 @@ function setupGraphicsBlocks(activity) {
 
         flow(args, logo, turtle, blk) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
+            const isWrap = activity.turtles.ithTurtle(turtle).painter.wrap;
 
             if (args.length === 2) {
-                if (args[0] > 5000 || args[1] > 5000 || args[0] < -5000 || args[1] < -5000) {
+                if ((args[0] > 5000 || args[1] > 5000 || args[0] < -5000 || args[1] < -5000) && (isWrap == true || isWrap == null)) {
                     activity.errorMsg(_("Value must be within the range of -5000 to 5000."), blk);
                 } else {
                     if (typeof args[0] === "string" || typeof args[1] === "string") {
@@ -715,9 +717,10 @@ function setupGraphicsBlocks(activity) {
 
         flow(args, logo, turtle, blk) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
+            const isWrap = activity.turtles.ithTurtle(turtle).painter.wrap;
 
             if (args.length === 1) {
-                if (args[0] > 5000 || args[0] < -5000) {
+                if ((args[0] > 5000 || args[0] < -5000) && (isWrap ==  true || isWrap == null)) {
                     activity.errorMsg(_("Value must be within the range of -5000 to 5000."), blk);
                 } else {
                     if (typeof args[0] === "string") {
@@ -777,9 +780,10 @@ function setupGraphicsBlocks(activity) {
 
         flow(args, logo, turtle, blk) {
             const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
+            const isWrap = activity.turtles.ithTurtle(turtle).painter.wrap;
 
             if (args.length === 1) {
-                if (args[0] > 5000 || args[0] < -5000) {
+                if ((args[0] > 5000 || args[0] < -5000) && (isWrap ==  true || isWrap == null)) {
                    activity.errorMsg(_("Value must be within the range of -5000 to 5000."), blk); 
                 } else {
                     if (typeof args[0] === "string") {
@@ -844,7 +848,7 @@ function setupGraphicsBlocks(activity) {
         flow(args, logo, turtle, blk) {
             if (args[1] === undefined) return;
             if (args[0] === null) activity.errorMsg(NOINPUTERRORMSG, blk);
-
+            
             const arg0 = args[0] === null ? "on" : args[0];
             const tur = activity.turtles.ithTurtle(turtle);
             const listenerName = "_wrap_" + turtle;
