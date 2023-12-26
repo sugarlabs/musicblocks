@@ -26,9 +26,9 @@ class GlobalCard {
         this.Planet = Planet ;
         this.ProjectData = null;
         this.id = null;
+        this.likeTimeout = null;
         this.PlaceholderMBImage = "images/mbgraphic.png";
         this.PlaceholderTBImage = "images/tbgraphic.png";
-        
         this.renderData = `
             <div class="col no-margin-left s12 m6 l4"> 
                 <div class="card" style="height:95%;"> 
@@ -179,24 +179,32 @@ class GlobalCard {
         frag.getElementById(`global-like-icon-${this.id}`).addEventListener("click", (evt) => {
             this.like();
         });
+       
 
         document.getElementById("global-projects").appendChild(frag);
         updateCheckboxes(`global-sharebox-${this.id}`);
     };
+    
 
     like() {
         const Planet = this.Planet ;
+        clearTimeout(this.likeTimeout);
 
         let like = true;
         if (Planet.ProjectStorage.isLiked(this.id))
             like = false;
 
-        Planet.ServerInterface.likeProject(this.id, like, function(data) {
+        this.likeTimeout=setTimeout(()=>{
+            Planet.ServerInterface.likeProject(this.id, like, (data)=> {
             this.afterLike(data,like);
-        }.bind(this));
-    };
+        });
+    },500);
+}
+
 
     afterLike(data, like) {
+        console.log("After Like:", data, like);
+
         (!data.success && data.error === "ERROR_ACTION_NOT_PERMITTED") ?
             this.setLike(like) : this.setLike(like) ;
     };
@@ -215,7 +223,7 @@ class GlobalCard {
         l.textContent = (parseInt(l.textContent) + incr).toString();
         document.getElementById(`global-like-icon-${this.id}`).textContent = text;
     };
-
+    
     init(id) {
         this.id = id;
         this.ProjectData = this.Planet.GlobalPlanet.cache[id];
