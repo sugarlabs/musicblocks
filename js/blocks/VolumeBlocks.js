@@ -943,7 +943,7 @@ function setupVolumeBlocks(activity) {
     new SetSynthVolume2Block().setup(activity);
     new SetDrumVolumeBlock().setup(activity);
     new SetSynthVolumeBlock().setup(activity);
-    new setPanBlock().setup(activity);
+    new SetPanBlock().setup(activity);
     new SetNoteVolumeBlock().setup(activity);
     new SetNoteVolume2Block().setup(activity);
     new ArticulationBlock().setup(activity);
