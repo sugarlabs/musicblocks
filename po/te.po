@@ -2496,7 +2496,7 @@ msgstr "క్షుద్ర"
 #: js/musicutils.js:664
 #.TRANS: modal scale for music
 msgid "aeolian"
-msgstr "ఏఓలియన్""
+msgstr "ఏఓలియన్"
 
 #: js/piemenus.js:3394
 msgid "Duplicate"
@@ -3086,7 +3086,7 @@ msgstr ""
 #: js/toolbar.js:188
 #: js/toolbar.js:242
 msgid "aymara"
-msgstr "
+msgstr ""
 
 #: js/toolbar.js:95
 #: js/toolbar.js:189
@@ -6730,7 +6730,7 @@ msgstr "స్కేల్ డిగ్రీ సంగీతంలో సామ
 
 #: js/PitchBlocks.js:1742
 msgid "Scale Degree 1 is always the first pitch in a given scale, regardless of octave."
-msgstr "స్కేల్ డిగ్రీ 1 సదాగా ఒక ఇచ్చిన స్కేల్ లో మొదటి పిచ్ గా, ఆక్టేవ
+msgstr "స్కేల్ డిగ్రీ 1 సదాగా ఒక ఇచ్చిన స్కేల్ లో మొదటి పిచ్ గా, ఆక్టేవ"
 
 #: js/PitchBlocks.js:1764
 #.TRANS: step some number of notes in current musical scale
@@ -7939,7 +7939,7 @@ msgstr "కర్సర్ బటన్ అప్"
 
 #: js/SensorsBlocks.js:319
 msgid "The Cursor button up block triggers an event when the cursor button is released while over a mouse."
-msgstr "కర్సర్ బటన్ అప్ బ్లాక్ మౌస్ పై కర్సర్ బటన్ విడుపివేసిందా ఒక ఈవెంట్‌ను తెరిచిపెట్టుత
+msgstr "కర్సర్ బటన్ అప్ బ్లాక్ మౌస్ పై కర్సర్ బటన్ విడుపివేసిందా ఒక ఈవెంట్ను తెరిచిపెట్టుత"
 
 #: js/SensorsBlocks.js:326
 msgid "The Cursor button up block triggers an event when the cursor button is released while over a turtle."

@@ -400,6 +400,11 @@ class HelpWidget {
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
         this.widgetWindow.sendToCenter();
         let cell = docById("right-arrow");
+        let rightArrow = docById("right-arrow");
+        if(this.index == this.appendedBlockList.length - 1)
+        {
+           rightArrow.classList.add("disabled") ;       
+        }
         cell.onclick = () => {
             if (this.index !== this.appendedBlockList.length - 1) {
                 this.index += 1;

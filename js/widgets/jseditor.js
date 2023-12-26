@@ -106,6 +106,49 @@ class JSEditor {
         menuLeft.style.justifyContent = "end";
         menuLeft.style.alignItems = "center";
 
+        function generateTooltip(targetButton, tooltipText, positionOfTooltip = "bottom") {
+            const tooltipBox = document.createElement("div");
+            const tooltip = document.createElement("div");
+
+            tooltipBox.appendChild(tooltip);
+
+            document.body.appendChild(tooltipBox);
+
+            targetButton.addEventListener("mouseover", () => {
+                const rect = targetButton.getBoundingClientRect();
+
+                tooltip.style.position = "absolute";
+                tooltip.style.visibility = "visible";
+                tooltip.style.opacity = "1";
+                tooltip.style.transition = "opacity 0.2s ease-in-out";
+                tooltip.style.marginTop = "-10px";
+                tooltip.style.background = "#333";
+                tooltip.style.color = "#fff";
+                tooltip.style.padding = "0.5rem";
+                tooltip.style.borderRadius = "10px";
+                tooltip.style.zIndex = "99999";
+                tooltip.style.fontSize = "1rem";
+                tooltip.style.whiteSpace = "nowrap";
+                tooltip.textContent = tooltipText;
+
+                tooltip.style.top = `${
+                    rect.bottom + window.scrollY + (positionOfTooltip !== "bottom" ? -30 : 20)
+                }px`;
+                tooltip.style.left = `${
+                    rect.left + window.scrollX + (positionOfTooltip !== "bottom" ? -135 : 0)
+                }px`;
+            });
+
+            targetButton.addEventListener("mouseout", () => {
+                tooltip.style.opacity = "0";
+                setTimeout(() => {
+                    tooltip.style.visibility = "hidden";
+                }, 250);
+            });
+
+            return tooltip;
+        }
+
         const helpBtn = document.createElement("span");
         helpBtn.id = "js_editor_help_btn";
         helpBtn.classList.add("material-icons");
@@ -118,6 +161,7 @@ class JSEditor {
         helpBtn.innerHTML = "help_outline";
         helpBtn.onclick = this._toggleHelp.bind(this);
         menuLeft.appendChild(helpBtn);
+        generateTooltip(helpBtn, "Help");
 
         const generateBtn = document.createElement("span");
         generateBtn.classList.add("material-icons");
@@ -130,6 +174,7 @@ class JSEditor {
         generateBtn.innerHTML = "autorenew";
         generateBtn.onclick = this._generateCode.bind(this);
         menuLeft.appendChild(generateBtn);
+        generateTooltip(generateBtn, "Reset Code");
 
         const runBtn = document.createElement("span");
         runBtn.classList.add("material-icons");
@@ -143,6 +188,7 @@ class JSEditor {
         runBtn.onclick = this._runCode.bind(this);
         menuLeft.appendChild(runBtn);
         menubar.appendChild(menuLeft);
+        generateTooltip(runBtn, "Play");
 
         const menuRight = document.createElement("div");
         menuRight.style.height = "3rem";
@@ -156,7 +202,7 @@ class JSEditor {
         styleBtn.style.borderRadius = "50%";
         styleBtn.style.padding = ".25rem";
         styleBtn.style.marginRight = ".75rem";
-        styleBtn.style.fontSize = "1.5rem";
+        styleBtn.style.fontSize = "2rem";
         styleBtn.style.background = "#2196f3";
         styleBtn.style.cursor = "pointer";
         styleBtn.innerHTML = "invert_colors";
@@ -164,6 +210,7 @@ class JSEditor {
         menuRight.appendChild(styleBtn);
         menubar.appendChild(menuRight);
         this._editor.appendChild(menubar);
+        generateTooltip(styleBtn, "Change Theme", "left");
 
         const editorContainer = document.createElement("div");
         editorContainer.style.width = "100%";
