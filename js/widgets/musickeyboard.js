@@ -120,6 +120,7 @@ function MusicKeyboard(activity) {
         ];
 
         let j = 0;
+
         for (let i = 1; i < this._notesPlayed.length; i++) {
             while (
                 i < this._notesPlayed.length &&
@@ -2581,15 +2582,14 @@ function MusicKeyboard(activity) {
 
         this.addKeyboardShortcuts();
     };
+   
 
     this._save = function () {
         this.processSelected();
-        const newStack = [
-            [0, ["action", { collapsed: false }], 100, 100, [null, 1, 2, null]],
-            [1, ["text", { value: _("action") }], 0, 0, [0]],
-            [2, "hidden", 0, 0, [0, selectedNotes.length == 0 ? null : 3]]
-        ];
 
+       
+
+        
         // This function organizes notes into groups with same voices.
         // We need to cluster adjacent notes with same voice to wrap
         // "settimbre" block .  eg, piano-do piano-re piano-mi
@@ -2638,187 +2638,200 @@ function MusicKeyboard(activity) {
             }
             return ans;
         };
+        const actionGroupInterval = 50;
+        const actionGroups = parseInt(selectedNotes/actionGroupInterval)+1;
+        for (let actionGroup = 0;actionGroup<actionGroups;actionGroup++){
+            let currentSelectedNotes = selectedNotes.slice(actionGroup*actionGroupInterval,(actionGroup+1)*actionGroupInterval);
+        
+            const newNotes = this._clusterNotes(currentSelectedNotes);
+            const newStack = [
+                [0, ["action", { collapsed: false }], 100, 100, [null, 1, 2, null]],
+                [1, ["text", { value: _("action") }], 0, 0, [0]],
+                [2, "hidden", 0, 0, [0, selectedNotes.length == 0 ? null : 3]]
+            ];
 
-        const newNotes = this._clusterNotes(selectedNotes);
+            let prevId = 2;
+            let endOfStackIdx, id;  
+            
 
-        let prevId = 2;
-        let endOfStackIdx, id;
-
-        for (let noteGrp = 0; noteGrp < newNotes.length; noteGrp++) {
-            const selectedNotesGrp = newNotes[noteGrp];
-            const isLast = noteGrp == newNotes.length - 1;
-            id = newStack.length;
-            let voice = selectedNotes[selectedNotesGrp[0]].voice[0] || DEFAULTVOICE;
-            // Don't use a drum name with set timbre.
-            if (selectedNotes[selectedNotesGrp[0]].noteOctave[0] === "drumnull") {
-                voice = DEFAULTVOICE;
-            }
-            const next = isLast ? null : id + 3 + this.findLen(selectedNotesGrp, selectedNotes);
-
-            newStack.push(
-                [id, "settimbre", 0, 0, [prevId, id + 1, id + 3, id + 2]],
-                [id + 1, ["voicename", { value: voice }], 0, 0, [id]],
-                [id + 2, "hidden", 0, 0, [id, next]]
-            );
-
-            prevId = id + 2;
-            endOfStackIdx = id;
-
-            for (let i = 0; i < selectedNotesGrp.length; i++) {
-                const note = selectedNotes[selectedNotesGrp[i]];
-
-                // Add the Note block and its value
-                const idx = newStack.length;
-                newStack.push([idx, "newnote", 0, 0, [endOfStackIdx, idx + 2, idx + 1, null]]);
-                const n = newStack[idx][4].length;
-                if (i === 0) {
-                    // the action block
-                    newStack[endOfStackIdx][4][n - 2] = idx;
-                } else {
-                    // the previous note block
-                    newStack[endOfStackIdx][4][n - 1] = idx;
+            for (let noteGrp = 0; noteGrp < newNotes.length; noteGrp++) {
+                const selectedNotesGrp = newNotes[noteGrp];
+                const isLast = noteGrp == newNotes.length - 1;
+                id = newStack.length;
+                let voice = selectedNotes[selectedNotesGrp[0]].voice[0] || DEFAULTVOICE;
+                // Don't use a drum name with set timbre.
+                if (selectedNotes[selectedNotesGrp[0]].noteOctave[0] === "drumnull") {
+                    voice = DEFAULTVOICE;
                 }
+                const next = isLast ? null : id + 3 + this.findLen(selectedNotesGrp, selectedNotes);
 
-                endOfStackIdx = idx;
+                newStack.push(
+                    [id, "settimbre", 0, 0, [prevId, id + 1, id + 3, id + 2]],
+                    [id + 1, ["voicename", { value: voice }], 0, 0, [id]],
+                    [id + 2, "hidden", 0, 0, [id, next]]
+                );
 
-                const delta = 5;
+                prevId = id + 2;
+                endOfStackIdx = id;
 
-                // Add a vspace to prevent divide block from obscuring the pitch block.
-                newStack.push([idx + 1, "vspace", 0, 0, [idx, idx + delta]]);
+                for (let i = 0; i < selectedNotesGrp.length; i++) {
+                    const note = selectedNotes[selectedNotesGrp[i]];
 
-                // note value is saved as a fraction
-                newStack.push([idx + 2, "divide", 0, 0, [idx, idx + 3, idx + 4]]);
-                const maxWidth = Math.max.apply(Math, note.duration);
+                    // Add the Note block and its value
+                    const idx = newStack.length;
+                    newStack.push([idx, "newnote", 0, 0, [endOfStackIdx, idx + 2, idx + 1, null]]);
+                    const n = newStack[idx][4].length;
+                    if (i === 0) {
+                        // the action block
+                        newStack[endOfStackIdx][4][n - 2] = idx;
+                    } else {
+                        // the previous note block
+                        newStack[endOfStackIdx][4][n - 1] = idx;
+                    }
 
-                const obj = toFraction(maxWidth);
-                newStack.push([idx + 3, ["number", { value: obj[0] }], 0, 0, [idx + 2]]);
-                newStack.push([idx + 4, ["number", { value: obj[1] }], 0, 0, [idx + 2]]);
+                    endOfStackIdx = idx;
 
-                let thisBlock = idx + delta;
+                    const delta = 5;
 
-                // We need to point to the previous note or pitch block.
-                let previousBlock = idx + 1; // Note block
+                    // Add a vspace to prevent divide block from obscuring the pitch block.
+                    newStack.push([idx + 1, "vspace", 0, 0, [idx, idx + delta]]);
 
-                // The last connection in last pitch block is null.
-                const lastConnection = null;
+                    // note value is saved as a fraction
+                    newStack.push([idx + 2, "divide", 0, 0, [idx, idx + 3, idx + 4]]);
+                    const maxWidth = Math.max.apply(Math, note.duration);
 
-                if (note.noteOctave[0] === "R") {
-                    newStack.push([thisBlock + 1, "rest2", 0, 0, [previousBlock, lastConnection]]);
-                } else if (note.noteOctave[0] === "drumnull") {
-                    newStack.push([
-                        thisBlock,
-                        "playdrum",
-                        0,
-                        0,
-                        [previousBlock, thisBlock + 1, lastConnection]
-                    ]);
-                    newStack.push([
-                        thisBlock + 1,
-                        [
-                            "drumname",
-                            {
-                                value: note.voice[0]
+                    const obj = toFraction(maxWidth);
+                    newStack.push([idx + 3, ["number", { value: obj[0] }], 0, 0, [idx + 2]]);
+                    newStack.push([idx + 4, ["number", { value: obj[1] }], 0, 0, [idx + 2]]);
+
+                    let thisBlock = idx + delta;
+
+                    // We need to point to the previous note or pitch block.
+                    let previousBlock = idx + 1; // Note block
+
+                    // The last connection in last pitch block is null.
+                    const lastConnection = null;
+
+                    if (note.noteOctave[0] === "R") {
+                        newStack.push([thisBlock + 1, "rest2", 0, 0, [previousBlock, lastConnection]]);
+                    } else if (note.noteOctave[0] === "drumnull") {
+                        newStack.push([
+                            thisBlock,
+                            "playdrum",
+                            0,
+                            0,
+                            [previousBlock, thisBlock + 1, lastConnection]
+                        ]);
+                        newStack.push([
+                            thisBlock + 1,
+                            [
+                                "drumname",
+                                {
+                                    value: note.voice[0]
+                                }
+                            ],
+                            0,
+                            0,
+                            [thisBlock]
+                        ]);
+                    } else {
+                        for (let j = 0; j < note.noteOctave.length; j++) {
+                            if (j > 0) {
+                                if (typeof note.noteOctave[j - 1] === "string") {
+                                    thisBlock = previousBlock + 3;
+                                } else {
+                                    thisBlock = previousBlock + 2;
+                                }
+                                const n = newStack[previousBlock][4].length;
+                                newStack[previousBlock][4][n - 1] = thisBlock;
                             }
-                        ],
-                        0,
-                        0,
-                        [thisBlock]
-                    ]);
-                } else {
-                    for (let j = 0; j < note.noteOctave.length; j++) {
-                        if (j > 0) {
-                            if (typeof note.noteOctave[j - 1] === "string") {
-                                thisBlock = previousBlock + 3;
+                            if (typeof note.noteOctave[j] === "string") {
+                                newStack.push([
+                                    thisBlock,
+                                    "pitch",
+                                    0,
+                                    0,
+                                    [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]
+                                ]);
+                                if (["#", "b", "♯", "♭"].indexOf(note.noteOctave[j][1]) !== -1) {
+                                    newStack.push([
+                                        thisBlock + 1,
+                                        [
+                                            "solfege",
+                                            {
+                                                value:
+                                                    SOLFEGECONVERSIONTABLE[note.noteOctave[j][0]] +
+                                                    note.noteOctave[j][1]
+                                            }
+                                        ],
+                                        0,
+                                        0,
+                                        [thisBlock]
+                                    ]);
+                                    newStack.push([
+                                        thisBlock + 2,
+                                        [
+                                            "number",
+                                            {
+                                                value: note.noteOctave[j][note.noteOctave[j].length - 1]
+                                            }
+                                        ],
+                                        0,
+                                        0,
+                                        [thisBlock]
+                                    ]);
+                                } else {
+                                    newStack.push([
+                                        thisBlock + 1,
+                                        [
+                                            "solfege",
+                                            {
+                                                value: SOLFEGECONVERSIONTABLE[note.noteOctave[j][0]]
+                                            }
+                                        ],
+                                        0,
+                                        0,
+                                        [thisBlock]
+                                    ]);
+                                    newStack.push([
+                                        thisBlock + 2,
+                                        [
+                                            "number",
+                                            {
+                                                value: note.noteOctave[j][note.noteOctave[j].length - 1]
+                                            }
+                                        ],
+                                        0,
+                                        0,
+                                        [thisBlock]
+                                    ]);
+                                }
                             } else {
-                                thisBlock = previousBlock + 2;
-                            }
-                            const n = newStack[previousBlock][4].length;
-                            newStack[previousBlock][4][n - 1] = thisBlock;
-                        }
-                        if (typeof note.noteOctave[j] === "string") {
-                            newStack.push([
-                                thisBlock,
-                                "pitch",
-                                0,
-                                0,
-                                [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]
-                            ]);
-                            if (["#", "b", "♯", "♭"].indexOf(note.noteOctave[j][1]) !== -1) {
+                                newStack.push([
+                                    thisBlock,
+                                    "hertz",
+                                    0,
+                                    0,
+                                    [previousBlock, thisBlock + 1, lastConnection]
+                                ]);
                                 newStack.push([
                                     thisBlock + 1,
-                                    [
-                                        "solfege",
-                                        {
-                                            value:
-                                                SOLFEGECONVERSIONTABLE[note.noteOctave[j][0]] +
-                                                note.noteOctave[j][1]
-                                        }
-                                    ],
-                                    0,
-                                    0,
-                                    [thisBlock]
-                                ]);
-                                newStack.push([
-                                    thisBlock + 2,
-                                    [
-                                        "number",
-                                        {
-                                            value: note.noteOctave[j][note.noteOctave[j].length - 1]
-                                        }
-                                    ],
-                                    0,
-                                    0,
-                                    [thisBlock]
-                                ]);
-                            } else {
-                                newStack.push([
-                                    thisBlock + 1,
-                                    [
-                                        "solfege",
-                                        {
-                                            value: SOLFEGECONVERSIONTABLE[note.noteOctave[j][0]]
-                                        }
-                                    ],
-                                    0,
-                                    0,
-                                    [thisBlock]
-                                ]);
-                                newStack.push([
-                                    thisBlock + 2,
-                                    [
-                                        "number",
-                                        {
-                                            value: note.noteOctave[j][note.noteOctave[j].length - 1]
-                                        }
-                                    ],
+                                    ["number", { value: note.noteOctave[j] }],
                                     0,
                                     0,
                                     [thisBlock]
                                 ]);
                             }
-                        } else {
-                            newStack.push([
-                                thisBlock,
-                                "hertz",
-                                0,
-                                0,
-                                [previousBlock, thisBlock + 1, lastConnection]
-                            ]);
-                            newStack.push([
-                                thisBlock + 1,
-                                ["number", { value: note.noteOctave[j] }],
-                                0,
-                                0,
-                                [thisBlock]
-                            ]);
+                            previousBlock = thisBlock;
                         }
-                        previousBlock = thisBlock;
                     }
                 }
             }
-        }
-        this.activity.blocks.loadNewBlocks(newStack);
-        this.activity.textMsg(_("New action block generated!"));
+            this.activity.blocks.loadNewBlocks(newStack);
+    }
+        
+        
+        this.activity.textMsg(_("New action blocks generated!"));
     };
 
     this.clearBlocks = function () {
