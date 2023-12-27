@@ -28,6 +28,7 @@ class GlobalCard {
         this.id = null;
         this.PlaceholderMBImage = "images/mbgraphic.png";
         this.PlaceholderTBImage = "images/tbgraphic.png";
+        this.OperationInProcess ; 
         
         this.renderData = `
             <div class="col no-margin-left s12 m6 l4"> 
@@ -81,6 +82,7 @@ class GlobalCard {
 
     render() {
         const Planet = this.Planet ;
+        this.OperationInProcess = false ; 
 
         //TODO: Have a TB placeholder image specific to TB projects
         const html = this.renderData.replace(new RegExp("{ID}", "g"), this.id);
@@ -185,6 +187,11 @@ class GlobalCard {
     };
 
     like() {
+        if(this.OperationInProcess)
+        {
+            return ; 
+        }
+        this.OperationInProcess = true ;
         const Planet = this.Planet ;
 
         let like = true;
@@ -193,6 +200,7 @@ class GlobalCard {
 
         Planet.ServerInterface.likeProject(this.id, like, function(data) {
             this.afterLike(data,like);
+            this.OperationInProcess = false;
         }.bind(this));
     };
 
