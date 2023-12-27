@@ -750,7 +750,7 @@ function setupGraphicsBlocks(activity) {
                             tur.painter.doForward(-args[0]);
                         }
                     }
-                } 
+                }
             }
         }
     }
@@ -856,7 +856,7 @@ function setupGraphicsBlocks(activity) {
         flow(args, logo, turtle, blk) {
             if (args[1] === undefined) return;
             if (args[0] === null) activity.errorMsg(NOINPUTERRORMSG, blk);
-            
+
             const arg0 = args[0] === null ? "on" : args[0];
             const tur = activity.turtles.ithTurtle(turtle);
             const listenerName = "_wrap_" + turtle;
