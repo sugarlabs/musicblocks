@@ -76,10 +76,8 @@ class MathUtility {
             const o2 = n1 > n2 ? octave + 1 : octave;
 
             let n11, n22;
-            for (let i = 0; i < broadScale.length; i++) {
-                n11 = broadScale.indexOf(a1 + " " + o1);
-                n22 = broadScale.indexOf(a2 + " " + o2);
-            }
+            n11 = broadScale.indexOf(a1 + " " + o1);
+            n22 = broadScale.indexOf(a2 + " " + o2);
 
             return broadScale[GetRandom(n11, n22)].split(" ");
         };

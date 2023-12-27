@@ -28,9 +28,10 @@ class GlobalCard {
         this.likeTimeout = null;
         this.PlaceholderMBImage = "images/mbgraphic.png";
         this.PlaceholderTBImage = "images/tbgraphic.png";
+
         this.renderData = `
             <div class="col no-margin-left s12 m6 l4"> 
-                <div class="card"> 
+                <div class="card" style="height:95%;"> 
                 
                     <div class="card-image"> 
                         <img class="project-image project-card-image" id="global-project-image-{ID}" src="images/planetgraphic.png"> 
@@ -100,7 +101,6 @@ class GlobalCard {
 
     render() {
         const Planet = this.Planet;
-
         //TODO: Have a TB placeholder image specific to TB projects
         const html = this.renderData.replace(new RegExp("{ID}", "g"), this.id);
         const frag = document.createRange().createContextualFragment(html);
@@ -216,10 +216,8 @@ class GlobalCard {
     like() {
         const Planet = this.Planet;
         clearTimeout(this.likeTimeout);
-
         let like = true;
         if (Planet.ProjectStorage.isLiked(this.id)) like = false;
-
         this.likeTimeout = setTimeout(() => {
             Planet.ServerInterface.likeProject(this.id, like, (data) => {
                 this.afterLike(data, like);

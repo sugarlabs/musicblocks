@@ -26,26 +26,67 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
 }
 
 function setupRhythmBlockPaletteBlocks(activity) {
+    /**
+     * Represents a block for handling rhythms.
+     * @extends {FlowBlock}
+     */
     class RhythmBlock extends FlowBlock {
+        /**
+         * Constructs a RhythmBlock.
+         * @param {string} name - The name of the block.
+         */
         constructor(name) {
             super(name || "rhythm");
             this.setPalette(rhythmBlockPalette, activity);
             this.setHelpString();
             this.formBlock({
+                /**
+                 * @type {string}
+                 * @description Block name.
+                 */
                 name:
                     this.lang === "ja"
                         ? //.TRANS: rhythm block
-                        _("rhythm1")
+                          _("rhythm1")
                         : //.TRANS: an arrangement of notes based on duration
-                        _("rhythm"),
+                          _("rhythm"),
+
+                /**
+                 * @type {number}
+                 * @description Number of arguments.
+                 */
                 args: 2,
+
+                /**
+                 * @type {Array}
+                 * @description Default values for arguments.
+                 */
                 defaults: [3, 4],
+
+                /**
+                 * @type {Array}
+                 * @description Argument labels.
+                 */
                 argLabels: [_("number of notes"), _("note value")],
+
+                /**
+                 * @type {Array}
+                 * @description Argument types.
+                 */
                 argTypes: ["anyin", "anyin"]
             });
             this.hidden = this.deprecated = true;
         }
 
+        /**
+         * Handles the flow of the block.
+         *
+         * @param {Array} args - Arguments for the block.
+         * @param {object} logo - Logo object.
+         * @param {string} turtle - Turtle identifier.
+         * @param {string} blk - Block identifier.
+         * @returns {Array} - Array containing the result of the flow.
+         */
         flow(args, logo, turtle, blk) {
             let noteBeatValue, arg0, arg1;
             if (args[0] === null || typeof args[0] !== "number" || args[0] < 1) {
@@ -85,7 +126,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                     activity.textMsg(_("polyphonic rhythm"));
                 }
 
-                // Since there maybe more than one instance of the
+                // Since there may be more than one instance of the
                 // same drum, e.g., if a repeat is used, we look from
                 // end of the list instead of the beginning of the
                 // list.
@@ -125,6 +166,15 @@ function setupRhythmBlockPaletteBlocks(activity) {
 
                 const beatValue = bpmFactor / noteBeatValue;
 
+                /**
+                 * Plays a note in the rhythm.
+                 *
+                 * @param {number} thisBeat - Beat value for the note.
+                 * @param {string} blk - Block identifier.
+                 * @param {string} turtle - Turtle identifier.
+                 * @param {Function} callback - Callback function.
+                 * @param {number} timeout - Timeout value.
+                 */
                 const __rhythmPlayNote = (thisBeat, blk, turtle, callback, timeout) => {
                     setTimeout(
                         () => Singer.processNote(activity, thisBeat, false, blk, turtle, callback),
@@ -151,7 +201,14 @@ function setupRhythmBlockPaletteBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for generating rhythm patterns.
+     * @extends {RhythmBlock}
+     */
     class Rhythm2Block extends RhythmBlock {
+        /**
+         * Constructs a Rhythm2Block.
+         */
         constructor() {
             super("rhythm2");
             this.setPalette(rhythmBlockPalette, activity);
@@ -165,14 +222,38 @@ function setupRhythmBlockPaletteBlocks(activity) {
             ]);
             this.extraWidth = 10;
             this.formBlock({
+                /**
+                 * @type {string}
+                 * @description Block name.
+                 */
                 name:
                     this.lang === "ja"
                         ? //.TRANS: translate "rhythm1" as rhythm
-                        _("rhythm1")
+                          _("rhythm1")
                         : _("rhythm"),
+
+                /**
+                 * @type {number}
+                 * @description Number of arguments.
+                 */
                 args: 2,
+
+                /**
+                 * @type {Array}
+                 * @description Default values for arguments.
+                 */
                 defaults: [3, 4],
+
+                /**
+                 * @type {Array}
+                 * @description Argument labels.
+                 */
                 argLabels: [_("number of notes"), _("note value")],
+
+                /**
+                 * @type {Array}
+                 * @description Argument types.
+                 */
                 argTypes: ["anyin", "anyin"]
             });
             this.makeMacro((x, y) => [
@@ -186,7 +267,14 @@ function setupRhythmBlockPaletteBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for handling sixty-fourth note rhythms.
+     * @extends {FlowBlock}
+     */
     class SixtyFourthNoteBlock extends FlowBlock {
+        /**
+         * Constructs a SixtyFourthNoteBlock.
+         */
         constructor() {
             super("sixtyfourthNote", _("1/64 note") + " 𝅘𝅥𝅱");
             this.setPalette(rhythmBlockPalette, activity);
@@ -202,11 +290,23 @@ function setupRhythmBlockPaletteBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for a 1/32 note in a musical flow.
+     * @extends {FlowBlock}
+     */
     class ThirtySecondNoteBlock extends FlowBlock {
+        /**
+         * Constructs a ThirtySecondNoteBlock instance.
+         */
         constructor() {
+            // TRANS: Do not modify the following line
             super("thirtysecondNote", _("1/32 note") + " 𝅘𝅥𝅰");
+
+            // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
+            // Set the help string for the block
             this.setHelpString();
+            // Define the macro for creating the block
             this.makeMacro((x, y) => [
                 [0, "rhythm2", x, y, [null, 1, 2, 5]],
                 [1, ["number", { value: 1 }], 0, 0, [0]],
@@ -218,11 +318,23 @@ function setupRhythmBlockPaletteBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for a 1/16 note in a musical flow.
+     * @extends {FlowBlock}
+     */
     class SixteenthNoteBlock extends FlowBlock {
+        /**
+         * Constructs a SixteenthNoteBlock instance.
+         */
         constructor() {
+            // TRANS: Do not modify the following line
             super("sixteenthNote", _("1/16 note") + " 𝅘𝅥𝅯");
+
+            // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
+            // Set the help string for the block
             this.setHelpString();
+            // Define the macro for creating the block
             this.makeMacro((x, y) => [
                 [0, "rhythm2", x, y, [null, 1, 2, 5]],
                 [1, ["number", { value: 1 }], 0, 0, [0]],
@@ -234,11 +346,23 @@ function setupRhythmBlockPaletteBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for an eighth note in a musical flow.
+     * @extends {FlowBlock}
+     */
     class EighthNoteBlock extends FlowBlock {
+        /**
+         * Constructs an EighthNoteBlock instance.
+         */
         constructor() {
+            // TRANS: Do not modify the following line
             super("eighthNote", _("eighth note") + " ♪");
+
+            // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
+            // Set the help string for the block
             this.setHelpString();
+            // Define the macro for creating the block
             this.makeMacro((x, y) => [
                 [0, "rhythm2", x, y, [null, 1, 2, 5]],
                 [1, ["number", { value: 1 }], 0, 0, [0]],
@@ -250,11 +374,23 @@ function setupRhythmBlockPaletteBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for a quarter note in a musical flow.
+     * @extends {FlowBlock}
+     */
     class QuarterNoteBlock extends FlowBlock {
+        /**
+         * Constructs a QuarterNoteBlock instance.
+         */
         constructor() {
+            // TRANS: Do not modify the following line
             super("quarterNote", _("quarter note") + " ♩");
+
+            // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
+            // Set the help string for the block
             this.setHelpString();
+            // Define the macro for creating the block
             this.makeMacro((x, y) => [
                 [0, "rhythm2", x, y, [null, 1, 2, 5]],
                 [1, ["number", { value: 1 }], 0, 0, [0]],
@@ -266,11 +402,23 @@ function setupRhythmBlockPaletteBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for a half note in a musical flow.
+     * @extends {FlowBlock}
+     */
     class HalfNoteBlock extends FlowBlock {
+        /**
+         * Constructs a HalfNoteBlock instance.
+         */
         constructor() {
+            // TRANS: Do not modify the following line
             super("halfNote", _("half note") + " 𝅗𝅥");
+
+            // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
+            // Set the help string for the block
             this.setHelpString();
+            // Define the macro for creating the block
             this.makeMacro((x, y) => [
                 [0, "rhythm2", x, y, [null, 1, 2, 5]],
                 [1, ["number", { value: 1 }], 0, 0, [0]],
@@ -282,11 +430,23 @@ function setupRhythmBlockPaletteBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for a whole note in a musical flow.
+     * @extends {FlowBlock}
+     */
     class WholeNoteBlock extends FlowBlock {
+        /**
+         * Constructs a WholeNoteBlock instance.
+         */
         constructor() {
+            // TRANS: Do not modify the following line
             super("wholeNote", _("whole note") + " 𝅝");
+
+            // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
+            // Set the help string for the block
             this.setHelpString();
+            // Define the macro for creating the block
             this.makeMacro((x, y) => [
                 [0, "rhythm2", x, y, [null, 1, 2, 5]],
                 [1, ["number", { value: 1 }], 0, 0, [0]],
@@ -298,11 +458,24 @@ function setupRhythmBlockPaletteBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for a tuplet with 2 notes in a musical flow.
+     * @extends {FlowClampBlock}
+     */
     class Tuplet2Block extends FlowClampBlock {
+        /**
+         * Constructs a Tuplet2Block instance.
+         * @param {string} name - The name of the block.
+         */
         constructor(name) {
+            // TRANS: Do not modify the following line
             super(name || "tuplet2");
+
+            // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
+            // Set the help string for the block
             this.setHelpString();
+            // Form the block with specific parameters
             this.formBlock({
                 //.TRANS: A tuplet is a note value divided into irregular time values.
                 name: _("tuplet"),
@@ -313,6 +486,14 @@ function setupRhythmBlockPaletteBlocks(activity) {
             this.hidden = true;
         }
 
+        /**
+         * Handles the flow of the block.
+         * @param {Array} args - The arguments for the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {number} blk - The block number.
+         * @returns {Array} - An array representing the flow.
+         */
         flow(args, logo, turtle, blk) {
             if (logo.inMatrix) {
                 if (activity.blocks.blockList[blk].name === "tuplet3") {
@@ -335,7 +516,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
             logo.setDispatchBlock(blk, turtle, listenerName);
 
             // eslint-disable-next-line no-unused-vars
-            const __listener = event => {
+            const __listener = (event) => {
                 if (logo.inMatrix) {
                     logo.tuplet = false;
                     logo.addingNotesToTuplet = false;
@@ -348,17 +529,30 @@ function setupRhythmBlockPaletteBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for a tuplet with 3 notes in a musical flow.
+     * @extends {Tuplet2Block}
+     */
     class Tuplet3Block extends Tuplet2Block {
+        /**
+         * Constructs a Tuplet3Block instance.
+         */
         constructor() {
+            // TRANS: Do not modify the following line
             super("tuplet3");
+
+            // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
+            // Set the help string for the block
             this.setHelpString();
+            // Form the block with specific parameters
             this.formBlock({
                 name: _("tuplet"),
                 args: 2,
                 defaults: [1, 4],
                 argLabels: [_("number of notes"), _("note value")]
             });
+            // Define the macro for creating the block
             this.makeMacro((x, y) => [
                 [0, "tuplet3", x, y, [null, 1, 10, 9, 7]],
                 [1, ["number", { value: 1 }], 0, 0, [0]],
@@ -377,24 +571,39 @@ function setupRhythmBlockPaletteBlocks(activity) {
             this.hidden = true;
         }
     }
-
+    /**
+     * Represents a block for a tuplet with 4 notes in a musical flow.
+     * @extends {FlowClampBlock}
+     */
     class Tuplet4Block extends FlowClampBlock {
+        /**
+         * Constructs a Tuplet4Block instance.
+         */
         constructor() {
+            // TRANS: Do not modify the following line
             super("tuplet4");
+
+            // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
+            // Set the help string for the block
             this.setHelpString([
-                _("The Tuplet block is used to generate a group of notes played in a condensed amount of time."),
+                _(
+                    "The Tuplet block is used to generate a group of notes played in a condensed amount of time."
+                ),
                 "documentation",
                 null,
                 "tuplet4"
             ]);
+            // Set extra width for the block
             this.extraWidth = 30;
+            // Form the block with specific parameters
             this.formBlock({
                 name: _("tuplet"),
                 args: 1,
                 defaults: [1 / 4],
                 argLabels: [_("note value")]
             });
+            // Define the macro for creating the block
             this.makeMacro((x, y) => [
                 [0, "tuplet4", x, y, [null, 1, 4, 17]],
                 [1, "divide", 0, 0, [0, 2, 3]],
@@ -418,6 +627,14 @@ function setupRhythmBlockPaletteBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of the block.
+         * @param {Array} args - The arguments for the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {number} blk - The block number.
+         * @returns {Array} - An array representing the flow.
+         */
         flow(args, logo, turtle, blk) {
             if (args[1] === undefined) {
                 // nothing to do
@@ -537,12 +754,23 @@ function setupRhythmBlockPaletteBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for a septuplet note in a musical flow.
+     * @extends {FlowBlock}
+     */
     class SeptupletBlock extends FlowBlock {
+        /**
+         * Constructs a SeptupletBlock instance.
+         */
         constructor() {
-            //.TRANS: A tuplet divided into 7 time values.
+            // TRANS: Do not modify the following line
             super("stuplet7", _("septuplet"));
+
+            // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
+            // Set the help string for the block
             this.setHelpString();
+            // Define the macro for creating the block
             this.makeMacro((x, y) => [
                 [0, "stuplet", x, y, [null, 1, 2, 5]],
                 [1, ["number", { value: 7 }], 0, 0, [0]],
@@ -554,12 +782,23 @@ function setupRhythmBlockPaletteBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for a quintuplet note in a musical flow.
+     * @extends {FlowBlock}
+     */
     class QuintupletBlock extends FlowBlock {
+        /**
+         * Constructs a QuintupletBlock instance.
+         */
         constructor() {
-            //.TRANS: A tuplet divided into 5 time values.
+            // TRANS: Do not modify the following line
             super("stuplet5", _("quintuplet"));
+
+            // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
+            // Set the help string for the block
             this.setHelpString();
+            // Define the macro for creating the block
             this.makeMacro((x, y) => [
                 [0, "stuplet", x, y, [null, 1, 2, 5]],
                 [1, ["number", { value: 5 }], 0, 0, [0]],
@@ -571,12 +810,23 @@ function setupRhythmBlockPaletteBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for a triplet note in a musical flow.
+     * @extends {FlowBlock}
+     */
     class TripletBlock extends FlowBlock {
+        /**
+         * Constructs a TripletBlock instance.
+         */
         constructor() {
-            //.TRANS: A tuplet divided into 3 time values.
+            // TRANS: A tuplet divided into 3 time values.
             super("stuplet3", _("triplet"));
+
+            // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
+            // Set the help string for the block
             this.setHelpString();
+            // Define the macro for creating the block
             this.makeMacro((x, y) => [
                 [0, "stuplet", x, y, [null, 1, 2, 5]],
                 [1, ["number", { value: 3 }], 0, 0, [0]],
@@ -588,27 +838,43 @@ function setupRhythmBlockPaletteBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for a simple tuplet note in a musical flow.
+     * @extends {FlowBlock}
+     */
     class STupletBlock extends FlowBlock {
+        /**
+         * Constructs a STupletBlock instance.
+         */
         constructor() {
             super("stuplet", _("simple tuplet"));
-            this.setPalette(rhythmBlockPalette, activity);
-            this.piemenuValuesC1 = [3, 5, 7, 11];
-            this.beginnerBlock(_THIS_IS_MUSIC_BLOCKS_);
 
+            // Set the palette and activity for the block
+            this.setPalette(rhythmBlockPalette, activity);
+            // Set piemenu values for C1
+            this.piemenuValuesC1 = [3, 5, 7, 11];
+            // Set beginner block for music blocks
+            this.beginnerBlock(_THIS_IS_MUSIC_BLOCKS_);
+            // Set the help string for the block
             this.setHelpString([
                 _("Tuplets are a collection of notes that get scaled to a specific duration.") +
                     " " +
-                    _("Using tuplets makes it easy to create groups of notes that are not based on a power of 2."),
+                    _(
+                        "Using tuplets makes it easy to create groups of notes that are not based on a power of 2."
+                    ),
                 "documentation",
                 null,
                 "matrix"
             ]);
 
+            // Form the block with specific parameters
             this.formBlock({
                 args: 2,
                 defaults: [3, 1 / 2],
                 argLabels: [_("number of notes"), _("note value")]
             });
+
+            // Define the macro for creating the block
             this.makeMacro((x, y) => [
                 [0, "stuplet", x, y, [null, 1, 2, 5]],
                 [1, ["number", { value: 3 }], 0, 0, [0]],
@@ -619,6 +885,13 @@ function setupRhythmBlockPaletteBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of the block.
+         * @param {Array} args - The arguments for the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {number} blk - The block number.
+         */
         flow(args, logo, turtle, blk) {
             let arg0, arg1;
             if (args[0] === null || typeof args[0] !== "number" || args[0] <= 0) {

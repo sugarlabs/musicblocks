@@ -3581,7 +3581,7 @@ const piemenuKey = (activity) => {
     docById("chooseKeyDiv").style.display = "block";
     docById("movable").style.display = "block";
 
-    const keyNameWheel = new wheelnav("chooseKeyDiv", null, 1200, 1200);
+    const keyNameWheel = new wheelnav("chooseKeyDiv", null, 1700, 1700);
     const keyNameWheel2 = new wheelnav("keyNameWheel2", keyNameWheel.raphael);
     const keys = ["C", "G", "D", "A", "E", "B/C♭", "F♯/G♭", "C♯/D♭", "G♯/A♭", "D♯/E♭", "A♯/B♭", "F"];
 

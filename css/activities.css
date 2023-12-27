@@ -390,6 +390,10 @@ nav ul li {
     left: 0;
 }
 
+iframe,canvas{
+overflow: clip !important;
+}
+
 .projectname {
     word-wrap: break-word;
 }
@@ -822,6 +826,16 @@ table {
 #left-arrow {
     left: 5px;
     background: url('../header-icons/left-arrow.png');
+}
+
+#left-arrow.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#right-arrow.disabled{
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 #right-arrow, #left-arrow {
@@ -1525,6 +1539,7 @@ input.timbreName {
     background: #f2f2f2;
     font-family: sans-serif;
     text-align: center;
+    margin-left: 24px;
 }
 
 .radioBtn {

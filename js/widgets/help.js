@@ -101,20 +101,25 @@ class HelpWidget {
             leftArrow.classList.add("hover");
 
             let cell = docById("left-arrow");
-
+            if (page === 0){
+                leftArrow.classList.add('disabled');
+            }
             cell.onclick = () => {
-                page = page - 1;
-                if (page < 0) {
-                    page = HELPCONTENT.length - 1;
-                }
-
-                this._showPage(page);
+                    if (page > 0){
+                        page = page - 1;
+                        leftArrow.classList.remove('disabled');
+                        this._showPage(page);
+                    }
+                    if (page === 0){
+                        leftArrow.classList.add('disabled');
+                    }
             };
 
             cell = docById("right-arrow");
 
             cell.onclick = () => {
                 page = page + 1;
+                leftArrow.classList.remove('disabled');
                 if (page === HELPCONTENT.length) {
                     page = 0;
                 }
@@ -395,6 +400,11 @@ class HelpWidget {
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
         this.widgetWindow.sendToCenter();
         let cell = docById("right-arrow");
+        let rightArrow = docById("right-arrow");
+        if(this.index == this.appendedBlockList.length - 1)
+        {
+           rightArrow.classList.add("disabled") ;       
+        }
         cell.onclick = () => {
             if (this.index !== this.appendedBlockList.length - 1) {
                 this.index += 1;
