@@ -203,7 +203,7 @@ class GlobalCard {
 
 
     afterLike(data, like) {
-        console.log("After Like:", data, like);
+        // console.log("After Like:", data, like);
 
         (!data.success && data.error === "ERROR_ACTION_NOT_PERMITTED") ?
             this.setLike(like) : this.setLike(like) ;
