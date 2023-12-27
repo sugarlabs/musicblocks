@@ -30,7 +30,7 @@ class GlobalCard {
         this.PlaceholderTBImage = "images/tbgraphic.png";
         this.renderData = `
             <div class="col no-margin-left s12 m6 l4"> 
-                <div class="card" > 
+                <div class="card"> 
                 
                     <div class="card-image"> 
                         <img class="project-image project-card-image" id="global-project-image-{ID}" src="images/planetgraphic.png"> 
