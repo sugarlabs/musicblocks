@@ -426,8 +426,10 @@ function setupGraphicsBlocks(activity) {
             const isWrap = activity.turtles.ithTurtle(turtle).painter.wrap;
 
             if (args.length === 2) {
-                if ((args[1] > 5000 || args[1] < -5000) && (isWrap == true || isWrap == null)) {
-                    activity.errorMsg(_("Value must be within the range of -5000 to 5000."), blk);
+                if ((args[1] > 5000 || args[1] < -5000) && (isWrap == false || isWrap == null)) {
+                    activity.errorMsg(_("Value must be within -5000 to 5000 when Wrap Mode is off."), blk);
+                } else if ((args[1] > 20000 || args[1] < -20000) && isWrap == true) {
+                    activity.errorMsg(_("Value must be within -20000 to 20000 when Wrap Mode is on."), blk);
                 } else {
                     if (typeof args[0] === "string" || typeof args[1] === "string") {
                         activity.errorMsg(NANERRORMSG, blk);
@@ -540,8 +542,10 @@ function setupGraphicsBlocks(activity) {
             const isWrap = activity.turtles.ithTurtle(turtle).painter.wrap;
 
             if (args.length === 2) {
-                if ((args[0] > 5000 || args[1] > 5000 || args[0] < -5000 || args[1] < -5000) && (isWrap == true || isWrap == null)) {
-                    activity.errorMsg(_("Value must be within the range of -5000 to 5000."), blk);
+                if ((args[0] > 5000 || args[1] > 5000 || args[0] < -5000 || args[1] < -5000) && (isWrap == false || isWrap == null)) {
+                    activity.errorMsg(_("Value must be within -5000 to 5000 when Wrap Mode is off."), blk);
+                } else if ((args[0] > 20000 || args[1] > 20000 || args[0] < -20000 || args[1] < -20000) && isWrap == true) {
+                    activity.errorMsg(_("Value must be within -20000 to 20000 when Wrap Mode is on."), blk);
                 } else {
                     if (typeof args[0] === "string" || typeof args[1] === "string") {
                         activity.errorMsg(NANERRORMSG, blk);
@@ -720,8 +724,10 @@ function setupGraphicsBlocks(activity) {
             const isWrap = activity.turtles.ithTurtle(turtle).painter.wrap;
 
             if (args.length === 1) {
-                if ((args[0] > 5000 || args[0] < -5000) && (isWrap ==  true || isWrap == null)) {
-                    activity.errorMsg(_("Value must be within the range of -5000 to 5000."), blk);
+                if ((args[0] > 5000 || args[0] < -5000) && (isWrap ==  false || isWrap == null)) {
+                    activity.errorMsg(_("Value must be within -5000 to 5000 when Wrap Mode is off."), blk);
+                } else if ((args[0] > 20000 || args[0] < -20000) && isWrap ==  true) {
+                    activity.errorMsg(_("Value must be within -20000 to 20000 when Wrap Mode is on."), blk);
                 } else {
                     if (typeof args[0] === "string") {
                         activity.errorMsg(NANERRORMSG, blk);
@@ -783,8 +789,10 @@ function setupGraphicsBlocks(activity) {
             const isWrap = activity.turtles.ithTurtle(turtle).painter.wrap;
 
             if (args.length === 1) {
-                if ((args[0] > 5000 || args[0] < -5000) && (isWrap ==  true || isWrap == null)) {
-                   activity.errorMsg(_("Value must be within the range of -5000 to 5000."), blk); 
+                if ((args[0] > 5000 || args[0] < -5000) && (isWrap ==  false || isWrap == null)) {
+                   activity.errorMsg(_("Value must be within -5000 to 5000 when Wrap Mode is off."), blk); 
+                } else if ((args[0] > 20000 || args[0] < -20000) && isWrap ==  true) {
+                    activity.errorMsg(_("Value must be within -20000 to 20000 when Wrap Mode is on."), blk);
                 } else {
                     if (typeof args[0] === "string") {
                         activity.errorMsg(NANERRORMSG, blk);
