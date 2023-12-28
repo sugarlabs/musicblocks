@@ -2639,14 +2639,17 @@ function MusicKeyboard(activity) {
             return ans;
         };
         const actionGroupInterval = 50;
-        const actionGroups = parseInt(selectedNotes/actionGroupInterval)+1;
+        var actionGroups = parseInt((selectedNotes.length)/actionGroupInterval)+1;
+        console.log(actionGroups);
+        console.log(selectedNotes.length);
+
         for (let actionGroup = 0;actionGroup<actionGroups;actionGroup++){
             let currentSelectedNotes = selectedNotes.slice(actionGroup*actionGroupInterval,(actionGroup+1)*actionGroupInterval);
         
             const newNotes = this._clusterNotes(currentSelectedNotes);
             const newStack = [
                 [0, ["action", { collapsed: false }], 100, 100, [null, 1, 2, null]],
-                [1, ["text", { value: _("action") }], 0, 0, [0]],
+                [1, ["text", { value: _("action")+""+actionGroup }], 0, 0, [0]],
                 [2, "hidden", 0, 0, [0, selectedNotes.length == 0 ? null : 3]]
             ];
 
@@ -2828,11 +2831,12 @@ function MusicKeyboard(activity) {
                 }
             }
             this.activity.blocks.loadNewBlocks(newStack);
-            console.log('new action generated');
     }
         
-        
+        if (actionGroups>1)
         this.activity.textMsg(_("New action blocks generated!"));
+        else
+        this.activity.textMsg(_("New action block generated"));
     };
 
     this.clearBlocks = function () {
