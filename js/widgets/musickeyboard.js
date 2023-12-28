@@ -2828,6 +2828,7 @@ function MusicKeyboard(activity) {
                 }
             }
             this.activity.blocks.loadNewBlocks(newStack);
+            console.log('new action generated');
     }
         
         
