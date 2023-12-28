@@ -2640,9 +2640,7 @@ function MusicKeyboard(activity) {
         };
         const actionGroupInterval = 50;
         var actionGroups = parseInt((selectedNotes.length)/actionGroupInterval)+1;
-        console.log(actionGroups);
-        console.log(selectedNotes.length);
-
+        
         for (let actionGroup = 0;actionGroup<actionGroups;actionGroup++){
             let currentSelectedNotes = selectedNotes.slice(actionGroup*actionGroupInterval,(actionGroup+1)*actionGroupInterval);
         
