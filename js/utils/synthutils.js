@@ -366,7 +366,7 @@ function Synth() {
 
     Tone.Buffer.onload = () => {
         // eslint-disable-next-line no-console
-        console.debug("sample loaded");
+        console.debug("sample loaded");   
     };
 
     this.samples = null;
@@ -1406,8 +1406,11 @@ function Synth() {
                             synth.voices[i].setNote(notes);
                         }
                     }
-                } else {
-                    synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
+                } else {  
+                    Tone.ToneAudioBuffer.loaded().then(() => {                   
+                        synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
+                    })
+
                 }
             }
 
