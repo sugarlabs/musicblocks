@@ -145,8 +145,32 @@ class Trashcan {
      * @returns {void}
      */
     updateContainerPosition() {
-        this._container.x = (window.innerWidth / this._scale - Trashcan.TRASHWIDTH) / 2;
-        this._container.y = window.innerHeight / this._scale - Trashcan.TRASHHEIGHT;
+        const expandCollapseBtn = document.getElementById("Expand/collapse blocks");
+        if (expandCollapseBtn) {
+            const expandCollapseBlocksPosition = expandCollapseBtn.getBoundingClientRect();
+            const offsetPercentageFromBottom =
+                1 - expandCollapseBlocksPosition.top / window.innerHeight;
+            const offsetPercentageFromRight =
+                1 - expandCollapseBlocksPosition.left / window.innerWidth;
+            const offsetFromBottom = window.innerHeight * offsetPercentageFromBottom;
+            const offsetFromRight = window.innerWidth * offsetPercentageFromRight;
+
+            this._container.x =
+                window.innerWidth / this._scale -
+                Trashcan.TRASHWIDTH -
+                (offsetFromRight -
+                    expandCollapseBtn.offsetWidth -
+                    (Trashcan.TRASHHEIGHT - expandCollapseBtn.offsetWidth) / 2);
+            this._container.y =
+                window.innerHeight / this._scale -
+                Trashcan.TRASHHEIGHT -
+                offsetFromBottom -
+                (expandCollapseBtn.nextElementSibling.offsetLeft -
+                    (expandCollapseBtn.previousElementSibling.offsetLeft +
+                        expandCollapseBtn.previousElementSibling.offsetWidth)) /
+                    (expandCollapseBtn.parentNode.childElementCount);
+            clearInterval(this._animationInterval);
+        }
     }
 
     shouldResize(newWidth, newHeight) {
