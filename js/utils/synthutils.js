@@ -1407,11 +1407,13 @@ function Synth() {
                         }
                     }
                 } else {  
-                    Tone.ToneAudioBuffer.loaded().then(() => {                   
+                    Tone.ToneAudioBuffer.loaded().then(() => {
                         synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
+                    }).catch((e) => {
+                    console.debug(e);
                     })
 
-                }
+                }   
             }
 
             setTimeout(() => {
