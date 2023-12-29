@@ -1486,18 +1486,16 @@ function MusicKeyboard(activity) {
         this._menuWheel.navItems[3].navigateFunction = () => {
             if (!flag) {
                 for (let i = 12; i < 19; i++) {
-                    docById(
-                        "wheelnav-wheelDivptm-title-3"
-                    ).children[0].textContent = this.newNoteValue;
+                    docById("wheelnav-wheelDivptm-title-3").children[0].textContent =
+                        this.newNoteValue;
                     this._tabsWheel.navItems[i].navItem.show();
                 }
 
                 flag = 1;
             } else {
                 for (let i = 12; i < 19; i++) {
-                    docById(
-                        "wheelnav-wheelDivptm-title-3"
-                    ).children[0].textContent = this.newNoteValue;
+                    docById("wheelnav-wheelDivptm-title-3").children[0].textContent =
+                        this.newNoteValue;
                     this._tabsWheel.navItems[i].navItem.hide();
                 }
 
@@ -2078,14 +2076,14 @@ function MusicKeyboard(activity) {
         index = this.layout.length - index - 1;
         const block = this.layout[index].blockNumber;
 
-        let noteValue = this.activity.blocks.blockList[
-            this.activity.blocks.blockList[block].connections[1]
-        ].value;
+        let noteValue =
+            this.activity.blocks.blockList[this.activity.blocks.blockList[block].connections[1]]
+                .value;
 
         if (condition === "pitchblocks") {
-            const octaveValue = this.activity.blocks.blockList[
-                this.activity.blocks.blockList[block].connections[2]
-            ].value;
+            const octaveValue =
+                this.activity.blocks.blockList[this.activity.blocks.blockList[block].connections[2]]
+                    .value;
             let accidentalsValue = 2;
 
             for (let i = 0; i < accidentals.length; i++) {
@@ -2113,8 +2111,8 @@ function MusicKeyboard(activity) {
         };
 
         const __hertzSelectionChanged = () => {
-            const blockValue = this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex]
-                .title;
+            const blockValue =
+                this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
             const argBlock = this.activity.blocks.blockList[block].connections[1];
             this.activity.blocks.blockList[argBlock].text.text = blockValue;
             this.activity.blocks.blockList[argBlock].value = parseInt(blockValue);
@@ -2149,8 +2147,9 @@ function MusicKeyboard(activity) {
             if (condition === "pitchblocks") {
                 i = noteLabelsI18n.indexOf(label);
                 labelValue = noteLabels[i];
-                attr = this._accidentalsWheel.navItems[this._accidentalsWheel.selectedNavItemIndex]
-                    .title;
+                attr =
+                    this._accidentalsWheel.navItems[this._accidentalsWheel.selectedNavItemIndex]
+                        .title;
                 if (attr !== "♮") {
                     label += attr;
                 }
@@ -2206,9 +2205,8 @@ function MusicKeyboard(activity) {
             const i = noteLabelsI18n.indexOf(label);
             let labelValue = noteLabels[i];
 
-            const attr = this._accidentalsWheel.navItems[
-                this._accidentalsWheel.selectedNavItemIndex
-            ].title;
+            const attr =
+                this._accidentalsWheel.navItems[this._accidentalsWheel.selectedNavItemIndex].title;
             if (attr !== "♮") {
                 labelValue += attr;
             }
@@ -2582,14 +2580,10 @@ function MusicKeyboard(activity) {
 
         this.addKeyboardShortcuts();
     };
-   
 
     this._save = function () {
         this.processSelected();
 
-       
-
-        
         // This function organizes notes into groups with same voices.
         // We need to cluster adjacent notes with same voice to wrap
         // "settimbre" block .  eg, piano-do piano-re piano-mi
@@ -2639,21 +2633,23 @@ function MusicKeyboard(activity) {
             return ans;
         };
         const actionGroupInterval = 50;
-        var actionGroups = parseInt((selectedNotes.length)/actionGroupInterval)+1;
-        
-        for (let actionGroup = 0;actionGroup<actionGroups;actionGroup++){
-            let currentSelectedNotes = selectedNotes.slice(actionGroup*actionGroupInterval,(actionGroup+1)*actionGroupInterval);
-        
+        var actionGroups = parseInt(selectedNotes.length / actionGroupInterval) + 1;
+
+        for (let actionGroup = 0; actionGroup < actionGroups; actionGroup++) {
+            let currentSelectedNotes = selectedNotes.slice(
+                actionGroup * actionGroupInterval,
+                (actionGroup + 1) * actionGroupInterval
+            );
+
             const newNotes = this._clusterNotes(currentSelectedNotes);
             const newStack = [
                 [0, ["action", { collapsed: false }], 100, 100, [null, 1, 2, null]],
-                [1, ["text", { value: _("action")+""+actionGroup }], 0, 0, [0]],
+                [1, ["text", { value: _("action") + "" + actionGroup }], 0, 0, [0]],
                 [2, "hidden", 0, 0, [0, selectedNotes.length == 0 ? null : 3]]
             ];
 
             let prevId = 2;
-            let endOfStackIdx, id;  
-            
+            let endOfStackIdx, id;
 
             for (let noteGrp = 0; noteGrp < newNotes.length; noteGrp++) {
                 const selectedNotesGrp = newNotes[noteGrp];
@@ -2714,7 +2710,13 @@ function MusicKeyboard(activity) {
                     const lastConnection = null;
 
                     if (note.noteOctave[0] === "R") {
-                        newStack.push([thisBlock + 1, "rest2", 0, 0, [previousBlock, lastConnection]]);
+                        newStack.push([
+                            thisBlock + 1,
+                            "rest2",
+                            0,
+                            0,
+                            [previousBlock, lastConnection]
+                        ]);
                     } else if (note.noteOctave[0] === "drumnull") {
                         newStack.push([
                             thisBlock,
@@ -2774,7 +2776,9 @@ function MusicKeyboard(activity) {
                                         [
                                             "number",
                                             {
-                                                value: note.noteOctave[j][note.noteOctave[j].length - 1]
+                                                value: note.noteOctave[j][
+                                                    note.noteOctave[j].length - 1
+                                                ]
                                             }
                                         ],
                                         0,
@@ -2799,7 +2803,9 @@ function MusicKeyboard(activity) {
                                         [
                                             "number",
                                             {
-                                                value: note.noteOctave[j][note.noteOctave[j].length - 1]
+                                                value: note.noteOctave[j][
+                                                    note.noteOctave[j].length - 1
+                                                ]
                                             }
                                         ],
                                         0,
@@ -2829,12 +2835,10 @@ function MusicKeyboard(activity) {
                 }
             }
             this.activity.blocks.loadNewBlocks(newStack);
-    }
-        
-        if (actionGroups>1)
-        this.activity.textMsg(_("New action blocks generated!"));
-        else
-        this.activity.textMsg(_("New action block generated"));
+        }
+
+        if (actionGroups > 1) this.activity.textMsg(_("New action blocks generated!"));
+        else this.activity.textMsg(_("New action block generated"));
     };
 
     this.clearBlocks = function () {
