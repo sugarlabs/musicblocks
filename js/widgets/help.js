@@ -122,7 +122,6 @@ class HelpWidget {
                     if (page === 0){
                         leftArrow.classList.add('disabled');
                     }
-
             };
 
             cell = docById("right-arrow");
@@ -432,7 +431,6 @@ class HelpWidget {
             this._blockHelp(
                 this.activity.blocks.protoBlockDict[this.appendedBlockList[this.index]]
             );
-
         };
 
         cell = docById("left-arrow");
