@@ -428,305 +428,174 @@ function setupIntervalsBlocks(activity) {
     }
 
     /**
-     * Class representing a block for measuring scalar intervals between two pitches.
-     * @extends FlowClampBlock
+     * Represents a block for measuring the distance between two notes in scalat steps in Music Blocks.
+     * @extends {LeftBlock}
      */
-    class SemitoneIntervalBlock extends FlowClampBlock {
-        /**
-         * Constructor for SemitoneIntervalBlock.
-         */
+    class MeasureIntervalScalarBlock extends LeftBlock {
         constructor() {
-            super("semitoneinterval");
+            // Call the constructor of the parent class
+            super("measureintervalscalar");
+            // Set the palette, activity, help string, and form the block with specific parameters
             this.setPalette("intervals", activity);
-            this.piemenuValuesC1 = [
-                -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-                11, 12
-            ];
             this.setHelpString([
-                _(
-                    "The Semi-tone interval block calculates a relative interval based on half steps."
-                ) +
-                    " " +
-                    _("In the figure, we add sol# to sol."),
+                _("The Scalar interval block measures the distance between two notes in the current key and mode."),
                 "documentation",
                 ""
             ]);
             this.formBlock({
-                //.TRANS: calculate a relative step between notes based on semi-tones
-                name: _("semi-tone interval") + " (+/–)",
+                //.TRANS: measure the distance between two pitches in steps of musical scale
+                name: _("scalar interval measure"),
+                flows: { labels: [""], type: "flow" }
+            });
+        }
+
+        /**
+         * Retrieves the argument for the MeasureIntervalSemitones block.
+         * @param {object} logo - The logo object.
+         * @param {number} turtle - The turtle number.
+         * @param {number} blk - The block number.
+         * @returns {number} - The distance between two notes in scalar steps.
+         */
+        arg(logo, turtle, blk) {
+            const cblk = activity.blocks.blockList[blk].connections[1];
+            if (cblk === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return 0;
+            }
+            const tur = activity.turtles.ithTurtle(turtle);
+
+            const saveSuppressStatus = tur.singer.suppressOutput;
+
+            // We need to save the state of the boxes, dicts, and heap
+            // although there is a potential of a boxes
+            // collision with other turtles.
+            const saveBoxes = JSON.stringify(logo.boxes);
+            const saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
+            const saveTurtleDicts = JSON.stringify(logo.turtleDicts[turtle]);
+            // And the turtle state
+            const saveX = tur.x;
+            const saveY = tur.y;
+            const saveColor = tur.painter.color;
+            const saveValue = tur.painter.value;
+            const saveChroma = tur.painter.chroma;
+            const saveStroke = tur.painter.stroke;
+            const saveCanvasAlpha = tur.painter.canvasAlpha;
+            const saveOrientation = tur.orientation;
+            const savePenState = tur.painter.penState;
+
+            tur.singer.suppressOutput = true;
+
+            tur.singer.justCounting.push(true);
+            tur.singer.justMeasuring.push(true);
+
+            for (const b in tur.endOfClampSignals) {
+                tur.butNotThese[b] = [];
+                for (const i in tur.endOfClampSignals[b]) {
+                    tur.butNotThese[b].push(i);
+                }
+            }
+
+            const actionArgs = [];
+            const saveNoteCount = tur.singer.notesPlayed;
+            tur.running = true;
+            let distance = 0;
+            logo.runFromBlockNow(logo, turtle, cblk, true, actionArgs, tur.queue.length);
+
+            if (tur.singer.firstPitch.length > 0 && tur.singer.lastPitch.length > 0) {
+                distance = Singer.scalarDistance(
+                    logo,
+                    turtle,
+                    last(tur.singer.firstPitch),
+                    last(tur.singer.lastPitch)
+                );
+                tur.singer.firstPitch.pop();
+                tur.singer.lastPitch.pop();
+            } else {
+                distance = 0;
+                activity.errorMsg(_("You must use two pitch blocks when measuring an interval."));
+            }
+
+            tur.singer.notesPlayed = saveNoteCount;
+
+            // Restore previous state
+            logo.boxes = JSON.parse(saveBoxes);
+            logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
+            logo.turtleDicts[turtle] = JSON.parse(saveTurtleDicts);
+
+            tur.painter.doPenUp();
+            tur.painter.doSetXY(saveX, saveY);
+            tur.painter.color = saveColor;
+            tur.painter.value = saveValue;
+            tur.painter.chroma = saveChroma;
+            tur.painter.stroke = saveStroke;
+            tur.painter.canvasAlpha = saveCanvasAlpha;
+            tur.painter.doSetHeading(saveOrientation);
+            tur.painter.penState = savePenState;
+
+            tur.singer.justCounting.pop();
+            tur.singer.justMeasuring.pop();
+            tur.singer.suppressOutput = saveSuppressStatus;
+
+            // FIXME: we need to handle cascading.
+            tur.butNotThese = {};
+            return distance;
+        }
+    }
+
+    /**
+     * Function to create macro blocks for common semi-tone intervals
+     */
+    function makeSemitoneIntervalMacroBlocks() {
+        /**
+         * Represents macro blocks that calculate common semi-tone intervals
+         * @extends {FlowBlock}
+         */
+        class SemitoneIntervalMacroBlock extends FlowBlock {
+            /**
+             * Constructs a new macro.
+             */
+            constructor(type, value, isDown) {
+                super(
+                    (isDown ? "down" : "") + type + value,
+                    _((isDown ? "down " : "") + type) + " " + value
+                );
+                this.setPalette("intervals", activity);
+                this.setHelpString();
+                this.makeMacro((x, y) => [
+                    [0, "semitoneinterval", x, y, [null, 1, 6, 7]],
+                    ...[isDown ? [1, "minus", 0, 0, [0, 8, 3]] : [1, "plus", 0, 0, [0, 2, 3]]],
+                    [2, ["intervalname", { value: type + " " + value }], 0, 0, [1]],
+                    [3, "multiply", 0, 0, [1, 4, 5]],
+                    [4, ["number", { value: 0 }], 0, 0, [3]],
+                    [5, ["number", { value: 12 }], 0, 0, [3]],
+                    [6, "vspace", 0, 0, [0, null]],
+                    [7, "hidden", 0, 0, [0, null]],
+                    ...(isDown ? [[8, "neg", 0, 0, [1, 2]]] : [])
+                ]);
+            }
+        }
+
+        new SemitoneIntervalMacroBlock("major", 3, false).setup(activity);
+    }
+
+    /**
+     * Represents a block that calculates a perfect interval
+     * @extends {FlowClampBlock}
+     */
+    class PerfectBlock extends FlowClampBlock {
+        /**
+         * Constructs a new PerfectBlock.
+         */
+        constructor() {
+            super("perfect");
+            this.setPalette("intervals", activity);
+            this.setHelpString();
+            this.formBlock({
+                name: _("perfect"),
                 args: 1,
                 defaults: [5]
             });
-            this.makeMacro((x, y) => [
-                [0, "semitoneinterval", x, y, [null, 1, 6, 7]],
-                [1, "plus", 0, 0, [0, 2, 3]],
-                [2, ["number", { value: 5 }], 0, 0, [1]],
-                [3, "multiply", 0, 0, [1, 4, 5]],
-                [4, ["number", { value: 0 }], 0, 0, [3]],
-                [5, ["number", { value: 12 }], 0, 0, [3]],
-                [6, "vspace", 0, 0, [0, null]],
-                [7, "hidden", 0, 0, [0, null]]
-            ]);
-        }
-
-        /**
-         * Handle the flow of the semitone interval block.
-         * @param {Array} args - The arguments for the block.
-         * @param {object} logo - The logo object.
-         * @param {object} turtle - The turtle object.
-         * @param {number} blk - The block ID.
-         * @returns {Array} - The result of the flow.
-         */
-        flow(args, logo, turtle, blk) {
-            if (args[1] === undefined) return;
-
-            Singer.IntervalsActions.setSemitoneInterval(args[0], turtle, blk);
-
-            return [args[1], 1];
-        }
-    }
-
-    /**
-     * Class representing a block for creating arpeggios.
-     * @extends FlowClampBlock
-     */
-    class ArpeggioBlock extends FlowClampBlock {
-        /**
-         * Constructor for ArpeggioBlock.
-         */
-        constructor() {
-            super("arpeggio");
-            this.setPalette("intervals", activity);
-            this.setHelpString([
-                _(
-                    "The Arpeggio block will run each note block multiple times, adding a transposition based on the specified chord."
-                ) +
-                    " " +
-                    _("The output of the example is: do, mi, sol, sol, ti, mi"),
-                "documentation",
-                null,
-                ""
-            ]);
-
-            this.formBlock({
-                name: _("arpeggio"),
-                argTypes: ["textin"],
-                args: 1,
-                defaults: [DEFAULTCHORD]
-            });
-            this.makeMacro((x, y) => [
-                [0, "arpeggio", x, y, [null, 1, null, 2]],
-                [1, ["chordname", { value: DEFAULTCHORD }], 0, 0, [0]],
-                [2, "hidden", 0, 0, [0, null]]
-            ]);
-        }
-
-        /**
-         * Handle the flow of the arpeggio block.
-         * @param {Array} args - The arguments for the block.
-         * @param {object} logo - The logo object.
-         * @param {object} turtle - The turtle object.
-         * @param {number} blk - The block ID.
-         * @param {number} receivedArg - The received argument.
-         */
-        flow(args, logo, turtle, blk, receivedArg) {
-            if (args[1] === undefined) return;
-
-            let i = CHORDNAMES.indexOf(args[0]);
-            if (i === -1) {
-                i = CHORDNAMES.indexOf(DEFAULTCHORD);
-            }
-            const factor = Math.floor(CHORDVALUES[i].length);
-            const tur = activity.turtles.ithTurtle(turtle);
-
-            tur.singer.duplicateFactor *= factor;
-            tur.singer.arpeggio = [];
-            for (let ii = 0; ii < CHORDVALUES[i].length; ii++) {
-                tur.singer.arpeggio.push(CHORDVALUES[i][ii]);
-            }
-
-            // Queue each block in the clamp.
-            const listenerName = "_duplicate_" + turtle;
-            logo.setDispatchBlock(blk, turtle, listenerName);
-
-            const __lookForOtherTurtles = (blk, turtle) => {
-                for (const t in logo.connectionStore) {
-                    if (t !== turtle.toString()) {
-                        for (const b in logo.connectionStore[t]) {
-                            if (b === blk.toString()) {
-                                return t;
-                            }
-                        }
-                    }
-                }
-
-                return null;
-            };
-
-            tur.singer.inDuplicate = true;
-
-            // eslint-disable-next-line no-unused-vars
-            const __listener = (event) => {
-                tur.singer.inDuplicate = false;
-                tur.singer.duplicateFactor /= factor;
-                tur.singer.arpeggio = [];
-                // Check for a race condition.
-                // FIXME: Do something about the race condition.
-                if (logo.connectionStoreLock) {
-                    // eslint-disable-next-line no-console
-                    console.debug("LOCKED");
-                }
-
-                logo.connectionStoreLock = true;
-
-                // The last turtle should restore the broken connections.
-                if (__lookForOtherTurtles(blk, turtle) === null) {
-                    const n = logo.connectionStore[turtle][blk].length;
-                    for (let i = 0; i < n; i++) {
-                        const obj = logo.connectionStore[turtle][blk].pop();
-                        activity.blocks.blockList[obj[0]].connections[obj[1]] = obj[2];
-                        if (obj[2] != null) {
-                            activity.blocks.blockList[obj[2]].connections[0] = obj[0];
-                        }
-                    }
-                } else {
-                    delete logo.connectionStore[turtle][blk];
-                }
-                logo.connectionStoreLock = false;
-            };
-
-            logo.setTurtleListener(turtle, listenerName, __listener);
-
-            // Test for race condition.
-            // FIXME: Do something about the race condition.
-            if (logo.connectionStoreLock) {
-                // eslint-disable-next-line no-console
-                console.debug("LOCKED");
-            }
-
-            logo.connectionStoreLock = true;
-
-            // Check to see if another turtle has already disconnected these blocks
-            const otherTurtle = __lookForOtherTurtles(blk, turtle);
-            if (otherTurtle != null) {
-                // Copy the connections and queue the blocks.
-                logo.connectionStore[turtle][blk] = [];
-                for (let i = logo.connectionStore[otherTurtle][blk].length; i > 0; i--) {
-                    const obj = [
-                        logo.connectionStore[otherTurtle][blk][i - 1][0],
-                        logo.connectionStore[otherTurtle][blk][i - 1][1],
-                        logo.connectionStore[otherTurtle][blk][i - 1][2]
-                    ];
-                    logo.connectionStore[turtle][blk].push(obj);
-                    let child = obj[0];
-                    if (activity.blocks.blockList[child].name === "hidden") {
-                        child = activity.blocks.blockList[child].connections[0];
-                    }
-
-                    const queueBlock = new Queue(child, factor, blk, receivedArg);
-                    tur.parentFlowQueue.push(blk);
-                    tur.queue.push(queueBlock);
-                }
-            } else {
-                let child = activity.blocks.findBottomBlock(args[1]);
-                while (child != blk) {
-                    if (activity.blocks.blockList[child].name !== "hidden") {
-                        const queueBlock = new Queue(child, factor, blk, receivedArg);
-                        tur.parentFlowQueue.push(blk);
-                        tur.queue.push(queueBlock);
-                    }
-                    child = activity.blocks.blockList[child].connections[0];
-                }
-
-                // Break the connections between blocks in the clamp so
-                // that when we run the queues, only the individual blocks,
-                // each inserted into a semitoneinterval block, run.
-                logo.connectionStore[turtle][blk] = [];
-                child = args[1];
-                while (child != null) {
-                    const lastConnection = activity.blocks.blockList[child].connections.length - 1;
-                    const nextBlk = activity.blocks.blockList[child].connections[lastConnection];
-                    // Don't disconnect a hidden block from its parent.
-                    if (nextBlk != null && activity.blocks.blockList[nextBlk].name === "hidden") {
-                        logo.connectionStore[turtle][blk].push([
-                            nextBlk,
-                            1,
-                            activity.blocks.blockList[nextBlk].connections[1]
-                        ]);
-                        child = activity.blocks.blockList[nextBlk].connections[1];
-                        activity.blocks.blockList[nextBlk].connections[1] = null;
-                    } else {
-                        logo.connectionStore[turtle][blk].push([child, lastConnection, nextBlk]);
-                        activity.blocks.blockList[child].connections[lastConnection] = null;
-                        child = nextBlk;
-                    }
-
-                    if (child != null) {
-                        activity.blocks.blockList[child].connections[0] = null;
-                    }
-                }
-            }
-
-            logo.connectionStoreLock = false;
-        }
-    }
-
-    /**
-     * Class representing a block for calculating chord intervals.
-     * @extends FlowClampBlock
-     */
-    class ChordIntervalBlock extends FlowClampBlock {
-        /**
-         * Constructor for ChordIntervalBlock.
-         */
-        constructor() {
-            super("chordinterval");
-            this.setPalette("intervals", activity);
-            this.setHelpString([
-                _("The Chord block calculates common chords.") +
-                    " " +
-                    _("In the figure, we generate a C-major chord."),
-                "documentation",
-                ""
-            ]);
-            this.formBlock({
-                name: _("chord"),
-                args: 1,
-                argTypes: ["textin"],
-                defaults: [DEFAULTCHORD]
-            });
-            this.makeMacro((x, y) => [
-                [0, "chordinterval", x, y, [null, 1, null, 2]],
-                [1, ["chordname", { value: DEFAULTCHORD }], 0, 0, [0]],
-                [2, "hidden", 0, 0, [0, null]]
-            ]);
-        }
-
-        /**
-         * Handle the flow of the chord interval block.
-         * @param {Array} args - The arguments for the block.
-         * @param {object} logo - The logo object.
-         * @param {object} turtle - The turtle object.
-         * @param {number} blk - The block ID.
-         * @returns {Array} - The result of the flow.
-         */
-        flow(args, logo, turtle, blk) {
-            if (args[1] === undefined) return;
-
-            let i = CHORDNAMES.indexOf(args[0]);
-            if (i == -1) {
-                i = CHORDNAMES.indexOf(DEFAULTCHORD);
-            }
-            for (let ii = 0; ii < CHORDVALUES[i].length; ii++) {
-                if (isNaN(CHORDVALUES[i][ii][0])) {
-                    continue;
-                }
-                if (CHORDVALUES[i][ii][0] === 0 && CHORDVALUES[i][ii][1] === 0) {
-                    continue;
-                }
-                Singer.IntervalsActions.setChordInterval(CHORDVALUES[i][ii], turtle, blk);
-            }
-            return [args[1], 1];
+            this.hidden = true;
         }
     }
 
