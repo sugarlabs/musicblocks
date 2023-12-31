@@ -1406,9 +1406,14 @@ function Synth() {
                             synth.voices[i].setNote(notes);
                         }
                     }
-                } else {
-                    synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
-                }
+                } else {  
+                    Tone.ToneAudioBuffer.loaded().then(() => {
+                        synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
+                    }).catch((e) => {
+                    console.debug(e);
+                    })
+
+                }   
             }
 
             setTimeout(() => {
