@@ -34,7 +34,7 @@ Export utilities
 
 Other utilities
 * `rubrics.js` -- analyse blocks in project
-* `background.js` -- extenstion utilities
+* `background.js` -- extension utilities
 * `boundary.js` -- boundary box for home screen
 * `loader.js` -- loader for require
 * `sugarizer-compatibility.js` -- datastore utilities used by sugarizer
@@ -376,7 +376,7 @@ class StartDrumBlock extends StartBlock {
 }
   ```
 
-### A macro definiton:
+### A macro definition:
 
   ```
     this.makeMacro((x, y) => [
@@ -616,7 +616,7 @@ The block names are the internal names, not the labels shown in the
 interface. Hence *Note blocks* are `newnote` blocks.  Note that the
 `newnote` block has 4 connections, two of which are null, since there
 is no block connected above or below.  Also note that the only x, y
-poaition that is relevant is that of the `newnote` block, since the
+position that is relevant is that of the `newnote` block, since the
 other blocks will be positioned by where they connect. (Typically, you
 only need to worry about the position of the first block in a stack of
 blocks. Everything else is calculated for you.)
@@ -627,3 +627,19 @@ blocks. Everything else is calculated for you.)
 
 In the figure about and in the code example above, the `divide` block
 connection 0 connects to the `newnote` block connection 1, etc.
+
+----
+
+Checkbox regarding adding new languages to the Language pulldown menu.
+
+You must update three files: ```index.html```, ```js/toolbox.js``` and ```js/languagebox.js```
+
+[ ] In ```index.html```, add an element for the language you are adding to ```"languagedropdown"```
+
+[ ] In ```toolbox.js```, add to the strings for both MUSIC BLOCKS and TURTLE ART
+
+[ ] and add a click event to ```renderLanguageSelectIcon```
+
+[ ] In ```languagebox.js```, add an event handler,
+
+[ ] and add a dictionary entry for "Refresh your browser to change your language preference."

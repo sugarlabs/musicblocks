@@ -403,6 +403,7 @@ class Palettes {
                 document.body.style.cursor = "text";
             } else {
                 document.body.style.cursor = "pointer";
+                this.showPalette(name);
             }
         };
 
@@ -990,7 +991,7 @@ class Palette {
 
         // eslint-disable-next-line no-unused-vars
         const mouseUpGrab = (event) => {
-            paletteList.onmousemove = null;
+            // paletteList.onmousemove = null;
             document.body.style.cursor = "default";
         };
 

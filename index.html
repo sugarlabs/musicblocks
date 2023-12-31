@@ -3,8 +3,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <title>
-            Music Blocks is a collection of tools for exploring musical
-            concepts.
+           Music Blocks
         </title>
 
 	    <meta name="description" content="Learn to code through music with Music Blocks. Arrange colorful blocks to create everything from simple melodies to interactive games.">
@@ -117,7 +116,7 @@
     </div>
     <div id="movable" tabindex="-1">
         <p>Solfege Pitch Preview</p>
-        <input class="radioBtn" type="radio" name="movable" value="true">
+        <input class="radioBtn" type="radio" name="movable" value="true" id="movabledo">
             <label for="movabledo">Movable Do</label>
         <input class="radioBtn" type="radio" name="movable" id="fixed" checked="checked" value="false">
             <label for="fixed">Fixed</label>
@@ -138,17 +137,20 @@
                     console.debug(
                         "The browser is set to " + navigator.language
                     );
+                    let lang = navigator.language;
                     if (localStorage.languagePreference) {
                         console.debug(
                             "Music Blocks is set to " +
                                 localStorage.languagePreference
                         );
-                        let lang = localStorage.languagePreference;
-                    } else {
-                        let lang = navigator.language;
+                        lang = localStorage.languagePreference;
                     }
 
                     console.debug("Using " + lang);
+		    if (lang === undefined) {
+			lang = "enUS";
+			console.debug("Reverting to " + lang);
+		    }
 
                     if (lang === "ja") {
                         document.getElementById(
@@ -823,6 +825,7 @@
 		    <li><a id="quz"></a></li>
                     <li><a id="gug"></a></li>
                     <li><a id="hi"></a></li>
+                    <li><a id="te"></a></li>
                     <li><a id="ibo"></a></li>
                     <li><a id="ar"></a></li>
                     <li><a id="he"></a></li>

@@ -1,13 +1,13 @@
-// Copyright (c) 2019 Bottersnike	
-//	
-// This program is free software; you can redistribute it and/or	
-// modify it under the terms of the The GNU Affero General Public	
-// License as published by the Free Software Foundation; either	
-// version 3 of the License, or (at your option) any later version.	
-//	
-// You should have received a copy of the GNU Affero General Public	
-// License along with this library; if not, write to the Free Software	
-// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA	
+// Copyright (c) 2019 Bottersnike
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 /*
    global
@@ -19,7 +19,16 @@
 /* exported setupExtrasBlocks */
 
 function setupExtrasBlocks(activity) {
+    /**
+     * Represents a FloatToStringBlock.
+     * Extends LeftBlock.
+     * @class
+     * @extends LeftBlock
+     */
     class FloatToStringBlock extends LeftBlock {
+        /**
+         * Creates an instance of FloatToStringBlock.
+         */
         constructor() {
             super("float2string", _("fraction"));
             this.setPalette("extras", activity);
@@ -37,6 +46,14 @@ function setupExtrasBlocks(activity) {
             });
         }
 
+        /**
+         * Retrieves the argument values of the FloatToStringBlock.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         * @param {Block} blk - The block instance.
+         * @param {Object} receivedArg - The received argument.
+         * @returns {string} - The string representation of the converted float.
+         */
         arg(logo, turtle, blk, receivedArg) {
             const cblk = activity.blocks.blockList[blk].connections[1];
             if (cblk === null) {
@@ -57,7 +74,16 @@ function setupExtrasBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a SaveABCBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class SaveABCBlock extends FlowBlock {
+        /**
+         * Creates an instance of SaveABCBlock.
+         */
         constructor() {
             super("saveabc");
             this.setPalette("extras", activity);
@@ -73,6 +99,10 @@ function setupExtrasBlocks(activity) {
             this.deprecated = true;
         }
 
+        /**
+         * Handles the flow of the SaveABCBlock.
+         * @param {Array} args - The arguments passed to the block.
+         */
         flow(args) {
             if (args.length === 1) {
                 activity.save.afterSaveAbc(args[0]);
@@ -80,7 +110,16 @@ function setupExtrasBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a SaveLilypondBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class SaveLilypondBlock extends FlowBlock {
+        /**
+         * Creates an instance of SaveLilypondBlock.
+         */
         constructor() {
             super("savelilypond");
             this.setPalette("extras", activity);
@@ -96,6 +135,10 @@ function setupExtrasBlocks(activity) {
             this.deprecated = true;
         }
 
+        /**
+         * Handles the flow of the SaveLilypondBlock.
+         * @param {Array} args - The arguments passed to the block.
+         */
         flow(args) {
             if (args.length === 1) {
                 activity.save.afterSaveLilypond(args[0]);
@@ -103,7 +146,16 @@ function setupExtrasBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a SaveSVGBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class SaveSVGBlock extends FlowBlock {
+        /**
+         * Creates an instance of SaveSVGBlock.
+         */
         constructor() {
             super("savesvg");
             this.setPalette("extras", activity);
@@ -119,6 +171,13 @@ function setupExtrasBlocks(activity) {
             this.deprecated = true;
         }
 
+        /**
+         * Handles the flow of the SaveSVGBlock.
+         * @param {Array} args - The arguments passed to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         * @param {Block} blk - The block instance.
+         */
         flow(args, logo, turtle, blk) {
             if (args[0] === null) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
@@ -143,7 +202,16 @@ function setupExtrasBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a NoBackgroundBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class NoBackgroundBlock extends FlowBlock {
+        /**
+         * Creates an instance of NoBackgroundBlock.
+         */
         constructor() {
             super("nobackground", _("no background"));
             this.setPalette("extras", activity);
@@ -155,31 +223,64 @@ function setupExtrasBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of the NoBackgroundBlock.
+         * @param {Array} args - The arguments passed to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         */
         flow(args, logo) {
             logo.svgBackground = false;
         }
     }
 
+    /**
+     * Represents a ShowBlocksBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class ShowBlocksBlock extends FlowBlock {
+        /**
+         * Creates an instance of ShowBlocksBlock.
+         */
         constructor() {
             super("showblocks", _("show blocks"));
             this.setPalette("extras", activity);
             this.setHelpString([_("The Show blocks block shows the blocks."), "documentation", ""]);
         }
 
+        /**
+         * Handles the flow of the ShowBlocksBlock.
+         * @param {Array} args - The arguments passed to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         */
         flow(args, logo) {
             activity.blocks.showBlocks();
             logo.turtleDelay = DEFAULTDELAY;
         }
     }
 
+    /**
+     * Represents a HideBlocksBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class HideBlocksBlock extends FlowBlock {
+        /**
+         * Creates an instance of HideBlocksBlock.
+         */
         constructor() {
             super("hideblocks", _("hide blocks"));
             this.setPalette("extras", activity);
             this.setHelpString([_("The Hide blocks block hides the blocks."), "documentation", ""]);
         }
 
+        /**
+         * Handles the flow of the HideBlocksBlock.
+         * @param {Array} args - The arguments passed to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         */
         flow(args, logo) {
             activity.blocks.hideBlocks();
             logo.showBlocksAfterRun = false;
@@ -187,7 +288,16 @@ function setupExtrasBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a VSpaceBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class VSpaceBlock extends FlowBlock {
+        /**
+         * Creates an instance of VSpaceBlock.
+         */
         constructor() {
             super("vspace", "↓");
             this.setPalette("extras", activity);
@@ -200,12 +310,24 @@ function setupExtrasBlocks(activity) {
             this.extraWidth = -10;
         }
 
+        /**
+         * Handles the flow of the VSpaceBlock.
+         */
         flow() {
-            //
+            // No specific logic for flow in VSpaceBlock
         }
     }
 
+    /**
+     * Represents an HSpaceBlock.
+     * Extends LeftBlock.
+     * @class
+     * @extends LeftBlock
+     */
     class HSpaceBlock extends LeftBlock {
+        /**
+         * Creates an instance of HSpaceBlock.
+         */
         constructor() {
             super("hspace", "←");
             this.setPalette("extras", activity);
@@ -223,13 +345,30 @@ function setupExtrasBlocks(activity) {
             });
         }
 
+        /**
+         * Gets the argument value for HSpaceBlock.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         * @param {Block} blk - The block instance.
+         * @param {Object} receivedArg - The received argument.
+         * @returns {Object} - The parsed argument.
+         */
         arg(logo, turtle, blk, receivedArg) {
             const cblk = activity.blocks.blockList[blk].connections[1];
             return logo.parseArg(logo, turtle, cblk, blk, receivedArg);
         }
     }
 
+    /**
+     * Represents a WaitBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class WaitBlock extends FlowBlock {
+        /**
+         * Creates an instance of WaitBlock.
+         */
         constructor() {
             super("wait", _("wait"));
             this.setPalette("extras", activity);
@@ -245,6 +384,12 @@ function setupExtrasBlocks(activity) {
             });
         }
 
+        /**
+         * Handles the flow of the WaitBlock.
+         * @param {Array} args - The arguments passed to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         */
         flow(args, logo, turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
 
@@ -260,12 +405,23 @@ function setupExtrasBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a CommentBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class CommentBlock extends FlowBlock {
+        /**
+         * Creates an instance of CommentBlock.
+         */
         constructor() {
             super("comment");
             this.setPalette("extras", activity);
             this.setHelpString([
-                _("The Comment block prints a comment at the top of the screen when the program is running in slow mode."),
+                _(
+                    "The Comment block prints a comment at the top of the screen when the program is running in slow mode."
+                ),
                 "documentation",
                 ""
             ]);
@@ -278,6 +434,12 @@ function setupExtrasBlocks(activity) {
             });
         }
 
+        /**
+         * Handles the flow of the CommentBlock.
+         * @param {Array} args - The arguments passed to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         */
         flow(args, logo, turtle) {
             if (args[0] !== null) {
                 if (
@@ -290,7 +452,16 @@ function setupExtrasBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a PrintBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class PrintBlock extends FlowBlock {
+        /**
+         * Creates an instance of PrintBlock.
+         */
         constructor() {
             super("print", _("print"));
             if (activity.beginnerMode) this.setPalette("media", activity);
@@ -311,22 +482,29 @@ function setupExtrasBlocks(activity) {
             });
         }
 
+        /**
+         * Handles the flow of the PrintBlock.
+         * @param {Array} args - The arguments passed to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         * @param {Block} blk - The block instance.
+         */
         flow(args, logo, turtle, blk) {
             const cblk = activity.blocks.blockList[blk].connections[1];
             if (logo.inOscilloscope && cblk !== null) {
                 const name = activity.blocks.blockList[cblk].value;
-                let turtle = -1;
+                let turtleIndex = -1;
                 for (let i = 0; i < activity.turtles.turtleList.length; i++) {
                     if (!activity.turtles.turtleList[i].inTrash) {
                         const turtleName = activity.turtles.turtleList[i].name;
-                        if (turtleName === name) turtle = i;
+                        if (turtleName === name) turtleIndex = i;
                     }
                 }
                 if (
-                    turtle > -1 &&
-                    logo.oscilloscopeTurtles.indexOf(activity.turtles.turtleList[turtle]) < 0
+                    turtleIndex > -1 &&
+                    logo.oscilloscopeTurtles.indexOf(activity.turtles.turtleList[turtleIndex]) < 0
                 )
-                    logo.oscilloscopeTurtles.push(activity.turtles.turtleList[turtle]);
+                    logo.oscilloscopeTurtles.push(activity.turtles.turtleList[turtleIndex]);
             } else if (!logo.inStatusMatrix) {
                 if (args.length === 1) {
                     if (args[0] !== null) {
@@ -338,11 +516,10 @@ function setupExtrasBlocks(activity) {
                                 const temp = new DisplayGridBlock();
                                 temp.flow(args, logo, turtle, blk);
                             } else {
-                                const tur = activity.turtles.ithTurtle(turtle);
                                 if (tur.singer.inNoteBlock.length > 0) {
-                                    tur.singer.embeddedGraphics[
-                                        last(tur.singer.inNoteBlock)
-                                    ].push(blk);
+                                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(
+                                        blk
+                                    );
                                 } else {
                                     activity.textMsg(args[0].toString());
                                 }
@@ -358,7 +535,16 @@ function setupExtrasBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a DrumBlock.
+     * Extends StackClampBlock.
+     * @class
+     * @extends StackClampBlock
+     */
     class DrumBlock extends StackClampBlock {
+        /**
+         * Creates an instance of DrumBlock.
+         */
         constructor() {
             super("drum");
             this.setPalette("extras", activity);
@@ -368,13 +554,27 @@ function setupExtrasBlocks(activity) {
             this.hidden = this.deprecated = true;
         }
 
+        /**
+         * Handles the flow of the DrumBlock.
+         * @param {Array} args - The arguments passed to the block.
+         * @returns {Array} - The result of the flow.
+         */
         flow(args) {
             if (args.length === 1) return [args[0], 1];
         }
     }
 
     // DEPRECATED grid: now used with print block.
+    /**
+     * Represents a DisplayGridBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class DisplayGridBlock extends FlowBlock {
+        /**
+         * Creates an instance of DisplayGridBlock.
+         */
         constructor() {
             super("displaygrid", _("display grid"));
             this.setPalette("extras", activity);
@@ -398,6 +598,10 @@ function setupExtrasBlocks(activity) {
             this.hidden = this.deprecated = true;
         }
 
+        /**
+         * Handles the flow of the DisplayGridBlock.
+         * @param {Array} args - The arguments passed to the block.
+         */
         flow(args) {
             if (!args || !args[0]) {
                 args = ["Cartesian"];
@@ -449,7 +653,16 @@ function setupExtrasBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a GridBlock.
+     * Extends ValueBlock.
+     * @class
+     * @extends ValueBlock
+     */
     class GridBlock extends ValueBlock {
+        /**
+         * Creates an instance of GridBlock.
+         */
         constructor() {
             super("grid");
             this.setPalette("extras", activity);
@@ -459,7 +672,16 @@ function setupExtrasBlocks(activity) {
     }
 
     // NOP blocks (used as placeholders when loaded blocks not found)
+    /**
+     * Represents a NOPValueBlock.
+     * Extends ValueBlock.
+     * @class
+     * @extends ValueBlock
+     */
     class NOPValueBlock extends ValueBlock {
+        /**
+         * Creates an instance of NOPValueBlock.
+         */
         constructor() {
             super("nopValueBlock", _("unknown"));
             this.setPalette("extras", activity);
@@ -469,7 +691,16 @@ function setupExtrasBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a NOPOneArgMathBlock.
+     * Extends LeftBlock.
+     * @class
+     * @extends LeftBlock
+     */
     class NOPOneArgMathBlock extends LeftBlock {
+        /**
+         * Creates an instance of NOPOneArgMathBlock.
+         */
         constructor() {
             super("nopOneArgMathBlock", _("unknown"));
             this.setPalette("extras", activity);
@@ -483,7 +714,16 @@ function setupExtrasBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a NOPTwoArgMathBlock.
+     * Extends LeftBlock.
+     * @class
+     * @extends LeftBlock
+     */
     class NOPTwoArgMathBlock extends LeftBlock {
+        /**
+         * Creates an instance of NOPTwoArgMathBlock.
+         */
         constructor() {
             super("nopOneArgMathBlock", _("unknown"));
             this.setPalette("extras", activity);
@@ -497,7 +737,16 @@ function setupExtrasBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a NOPZeroArgBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class NOPZeroArgBlock extends FlowBlock {
+        /**
+         * Creates an instance of NOPZeroArgBlock.
+         */
         constructor() {
             super("nopZeroArgBlock", _("unknown"));
             this.setPalette("extras", activity);
@@ -506,7 +755,16 @@ function setupExtrasBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a NOPOneArgBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class NOPOneArgBlock extends FlowBlock {
+        /**
+         * Creates an instance of NOPOneArgBlock.
+         */
         constructor() {
             super("nopOneArgBlock", _("unknown"));
             this.setPalette("extras", activity);
@@ -516,7 +774,16 @@ function setupExtrasBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a NOPTwoArgBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class NOPTwoArgBlock extends FlowBlock {
+        /**
+         * Creates an instance of NOPTwoArgBlock.
+         */
         constructor() {
             super("nopTwoArgBlock", _("unknown"));
             this.setPalette("extras", activity);
@@ -526,7 +793,16 @@ function setupExtrasBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a NOPThreeArgBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class NOPThreeArgBlock extends FlowBlock {
+        /**
+         * Creates an instance of NOPThreeArgBlock.
+         */
         constructor() {
             super("nopThreeArgBlock", _("unknown"));
             this.setPalette("extras", activity);
@@ -536,7 +812,16 @@ function setupExtrasBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a NOPFourArgBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
     class NOPFourArgBlock extends FlowBlock {
+        /**
+         * Creates an instance of NOPFourArgBlock.
+         */
         constructor() {
             super("nopFourArgBlock", _("unknown"));
             this.setPalette("extras", activity);

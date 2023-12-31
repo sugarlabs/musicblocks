@@ -348,138 +348,49 @@
 | Example | Description |
 | --- | --- |
 | Minuet-in-Reverse | From Haydn's Symphony 47 |
-
-| Example | Description |
-| --- | --- |
 | In-C.html | In C is a musical piece composed by Terry Riley in 1964 for an indefinite number of performers. |
-
-| Example | Description |
-| --- | --- |
 | One-of-This-That-Total-Freestyle.html | How many different ways can we utilize "One of This, One of That" for Music? This project explores many possibilities |
-
-| Example | Description |
-| --- | --- |
 | 5-Limit-Lattice.html | An initial attempt to make an interactive version of https://en.wikipedia.org/wiki/Five-limit_tuning -- It demonstrates how certain chords are tuned to different versions of the (nearly) same pitch. |
-
-| Example | Description |
-| --- | --- |
 | harmonics-single-string.html | A fun demo of the different harmonics of a stringed instrument. |
-
-| Example | Description |
-| --- | --- |
 | tonality-square.html | An interactive recreation of https://en.wikipedia.org/wiki/Tonality_diamond |
-
-| Example | Description |
-| --- | --- |
 | virtual-whiteboard.html | An interactive musical staff "whiteboard" that shows pitch names. With a few tweaks it can show solfege or even frets on the guitar. |
-
-| Example | Description |
-| --- | --- |
 | harmonic-series.html | A demonstration of the harmonic series that uses the entire screen and maps the nodes to their proper places on a physical instrument (i.e. half, third, forth, fifth, etc.) |
-
 
 # Games
 
 | Example | Description |
 | --- | --- |
 | coin-flip.html | Animated (and musical) coin flip |
-
-| Example | Description |
-| --- | --- |
 | musical-dimensions.html | Interactive game: Test your listening skills by finding cards that match in (or differ by) instrument, pitch and note value. |
-
-| Example | Description |
-| --- | --- |
 | hide-and-seek.html | Find the mouse. The beats per minute increases as you get "warmer". |
-
-| Example | Description |
-| --- | --- |
 | Racko.html | Put the pitches into ascending order |
-
-| Example | Description |
-| --- | --- |
 | worm-game.html | Use the mouse button to steer away from the line. |
-
-| Example | Description |
-| --- | --- |
 | deducto.html | Interactive game: Determine the hidden musical pattern. |
-
-| Example | Description |
-| --- | --- |
-| mouse-trap.html | Interactive game: Catch the mice by following the musical apattern. |
-
-| Example | Description |
-| --- | --- |
-| spiralaterals.html | Interacive game: Match the pattern of intervals as the mouse creates patterns |
-
-| Example | Description |
-| --- | --- |
+| mouse-trap.html | Interactive game: Catch the mice by following the musical pattern. |
+| spiralaterals.html | Interactive game: Match the pattern of intervals as the mouse creates patterns |
 | snoopy-invaders.html | Interactive game: Charlie Brown throws a ball to the invading Snoopys, each of whom plays a different drum sound when they catch the ball. |
-
-| Example | Description |
-| --- | --- |
 | musical-mastermind.html | Interactive game: Similar to the class game Mastermind, discover the notes in a short musical phrase. |
+| rock-paper-scissors.html | classic intransitive hand game |
+| quiz-game.html | answer the questions with musical letters |
 
 # Misc.
 
 | Example | Description |
 | --- | --- |
 | Music-Blocks-demo.html | An interactive tour of Music Blocks written in Music Blocks. (This is an example of self-modifying code.) |
-
-| Example | Description |
-| --- | --- |
 | hilbert-recursive.html | A recursive implementation of Hilbert Space with a musical overlay. |
-
-| Example | Description |
-| --- | --- |
 | musical-tree.html | A recursive binary tree with a musical overlay. |
-
-| Example | Description |
-| --- | --- |
 | random-jazz-flute.html | A jazz progression that proceeds randomly |
-
-| Example | Description |
-| --- | --- |
 | polygons.html | Regular polygons with embedded notes |
-
-| Example | Description |
-| --- | --- |
-| nautilus.html | Recursive implemention of Fibonacci nautilus graphic and tone progression |
-
-| Example | Description |
-| --- | --- |
+| nautilus.html | Recursive implementation of Fibonacci nautilus graphic and tone progression |
 | harmony-in-C.html | Two-part harmony |
-
-| Example | Description |
-| --- | --- |
 | scales-with-fifths.html | Cycle through scales and fifths |
-
-| Example | Description |
-| --- | --- |
 | intervals-with-events.html | generate random intervals by clicking on the mouse |
-
-| Example | Description |
-| --- | --- |
 | equal-temperament-calculation.html | Calculate an octave tuned to equal temperament by using 2^(1/12) |
-
-| Example | Description |
-| --- | --- |
 | Twinkle-Twinkle-with-Pythagorean-tuning.html | Listen to the difference tuning makes |
-
-| Example | Description |
-| --- | --- |
 | el.html | Experimentation with the *One of this or that* block.
-
-| Example | Description |
-| --- | --- |
 | Galton-music.html | Modeled after a Galton box, a Gaussian distribution of tones is generated. |
-
-| Example | Description |
-| --- | --- |
 | record-player.html | Record and playback a sequence of notes on a "vinyl". |
-
-| Example | Description |
-| --- | --- |
 | stocks.html | Generated from a Python script, this project is a musical representation of the price of a stock over time |
 
 # Utilities

@@ -7,6 +7,7 @@
     box-sizing: border-box;
 }
 #floatingWindows > .windowFrame {
+    overflow: hidden;
     border-radius: 8px;
     border: 2px solid #666;
     background-color: #ccc;
