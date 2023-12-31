@@ -49,9 +49,10 @@ class HelpWidget {
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
-        widgetWindow.onClose = () => {
+        widgetWindow.onclose = () => {
             this.isOpen = false;
-            this.destroy();
+            document.onkeydown = activity.__keyPressed ; 
+            widgetWindow.destroy();
         };
         // Position the widget and make it visible.
         this._helpDiv = document.createElement("div");
@@ -99,6 +100,14 @@ class HelpWidget {
             leftArrow = document.getElementById("left-arrow");
             leftArrow.style.display = "block";
             leftArrow.classList.add("hover");
+            
+            document.onkeydown = function handleArrowKeys(event) {
+                if (event.key === 'ArrowLeft') {
+                    leftArrow.click(); 
+                } else if (event.key === 'ArrowRight') {
+                    rightArrow.click(); 
+                }
+            } ;
 
             let cell = docById("left-arrow");
             if (page === 0){
@@ -401,6 +410,16 @@ class HelpWidget {
         this.widgetWindow.sendToCenter();
         let cell = docById("right-arrow");
         let rightArrow = docById("right-arrow");
+        let leftArrow = docById("left-arrow");
+
+        document.onkeydown = function handleArrowKeys(event) {
+            if (event.key === 'ArrowLeft') {
+                leftArrow.click(); 
+            } else if (event.key === 'ArrowRight') {
+                rightArrow.click(); 
+            }
+        } ; 
+
         if(this.index == this.appendedBlockList.length - 1)
         {
            rightArrow.classList.add("disabled") ;       
