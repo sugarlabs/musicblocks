@@ -64,9 +64,9 @@ class PlanetInterface {
 
         this.showPlanet = () => {
             const png = docById("overlayCanvas").toDataURL("image/png");
-            this.planet.open(png);  // this.mainCanvas.toDataURL("image/png"));
+            this.planet.open(png); // this.mainCanvas.toDataURL("image/png"));
             this.iframe.style.display = "block";
-            this.iframe.style.zIndex = "9999" ;
+            this.iframe.style.zIndex = "9999";
             try {
                 this.iframe.contentWindow.document.getElementById("local-tab").click();
             } catch (e) {
@@ -175,7 +175,10 @@ class PlanetInterface {
                         const bitmap = new createjs.Bitmap(img);
                         const bounds = bitmap.getBounds();
                         bitmap.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-                        t.planet.ProjectStorage.saveLocally(data, bitmap.bitmapCache.getCacheDataURL());
+                        t.planet.ProjectStorage.saveLocally(
+                            data,
+                            bitmap.bitmapCache.getCacheDataURL()
+                        );
                     };
                     img.src =
                         "data:image/svg+xml;base64," +

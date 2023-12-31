@@ -181,39 +181,46 @@
 }
 
 #searchicon {
-	top: -4px;
+	top: -7px;
 	color: #fff !important;
+	left: 7px;
 }
 
-#tagscontainer .container { 
-	padding: 0.5rem 0 ;  
-	display: flex ; 
-	flex-direction: column ; 
-	align-items: center ;
-	gap: 0.5rem ; 
+.input-field {
+	margin-top: 2px;
+
+
 }
 
-#tagscontainer #primarychips, 
-#tagscontainer .open#morechips { 
-	display: flex ; 
-	flex-wrap: wrap ;
-	justify-content: center ;
-	gap: 0.5rem ; 
+#tagscontainer .container {
+	padding: 0.5rem 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+#tagscontainer #primarychips,
+#tagscontainer .open#morechips {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 0.5rem;
 }
 
 #tagscontainer #view-more-chips {
-	left: 0 ; 
-	transform: translateX(0) ; 
+	left: 0;
+	transform: translateX(0);
 }
 
-.global-tags-container {  
-	min-height: 30px ; 
-	display: flex ; 
+.global-tags-container {
+	min-height: 30px;
+	display: flex;
 	flex-direction: row;
-	justify-content: flex-start; 
-	align-items: center ;
-	gap: 0.5rem ; 
-	flex-wrap: wrap ;
+	justify-content: flex-start;
+	align-items: center;
+	gap: 0.5rem;
+	flex-wrap: wrap;
 }
 
 .chipselect {
@@ -226,7 +233,7 @@
 	padding: 0 12px;
 	border-radius: 16px;
 	background-color: #e4e4e4;
-	margin: auto 5px auto 0 ; 
+	margin: auto 5px auto 0;
 }
 
 .chipselect.selected {
@@ -243,12 +250,12 @@
 	cursor: pointer;
 }
 
-div.select-wrapper * {  
-	cursor: pointer ;
+div.select-wrapper * {
+	cursor: pointer;
 }
 
-.select-wrapper ul.dropdown-content { 
-	top: 100% !important ;
+.select-wrapper ul.dropdown-content {
+	top: 100% !important;
 }
 
 .centre-button {
@@ -303,13 +310,13 @@ div.select-wrapper * {
 		font-size: 0;
 	}
 
-	#globalcontents .row:first-child  { 
-		display: flex ; 
-		justify-content: center ;
+	#globalcontents .row:first-child {
+		display: flex;
+		justify-content: center;
 	}
 
-	#globalcontents .input-field { 
-		margin-left: 0 !important ;
+	#globalcontents .input-field {
+		margin-left: 0 !important;
 	}
 }
 
@@ -344,34 +351,46 @@ a {
 	cursor: pointer;
 }
 
-#projectviewer-report-project, #projectviewer-report-project-disabled {
+#projectviewer-report-project,
+#projectviewer-report-project-disabled {
 	padding-top: 10px;
 	padding-right: 5px;
 }
 
-#projectviewer-download-file, #projectviewer-open-mb {
+#projectviewer-download-file,
+#projectviewer-open-mb {
 	margin-left: -1%;
 }
 
 @media only screen and (max-width: 1100px) {
-	#projectviewer-download-file, #projectviewer-open-mb, #projectviewer-merge-mb {
+
+	#projectviewer-download-file,
+	#projectviewer-open-mb,
+	#projectviewer-merge-mb {
 		margin-left: -25px !important;
 	}
 
-	#projectviewer-report-project, #projectviewer-report-project-disabled {
+	#projectviewer-report-project,
+	#projectviewer-report-project-disabled {
 		padding-left: 0px;
 		padding-right: 0px;
 	}
 }
 
 @media only screen and (max-width: 650px) {
-	#projectviewer-download-file, #projectviewer-open-mb, #projectviewer-merge-mb {
+
+	#projectviewer-download-file,
+	#projectviewer-open-mb,
+	#projectviewer-merge-mb {
 		font-size: 70%;
 	}
 }
 
 @media only screen and (max-width: 550px) {
-	#projectviewer-download-file, #projectviewer-open-mb, #projectviewer-merge-mb {
+
+	#projectviewer-download-file,
+	#projectviewer-open-mb,
+	#projectviewer-merge-mb {
 		font-size: 60%;
 	}
 }
@@ -416,14 +435,14 @@ a {
 .inactiveLink {
 	pointer-events: none;
 	cursor: default;
- }
- #globalcontents .col.m6 {
-    margin-top: 2em;
+}
+
+#globalcontents .col.m6 {
+	margin-top: 2em;
 }
 
 #globalcontents .card {
 	display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+	flex-direction: column;
+	justify-content: space-between;
 }
-
