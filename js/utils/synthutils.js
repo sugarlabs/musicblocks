@@ -366,7 +366,7 @@ function Synth() {
 
     Tone.Buffer.onload = () => {
         // eslint-disable-next-line no-console
-        console.debug("sample loaded");   
+        console.debug("sample loaded");
     };
 
     this.samples = null;
