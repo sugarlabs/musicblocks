@@ -2,20 +2,18 @@
 <html>
     <head>
         <title>Music Blocks is a collection of tools for exploring musical
-            concepts.</title>
+            concepts.
+        </title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <!--Import Google Icon Font-->
         <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
         <!--Import materialize.css-->
         <link type="text/css" rel="stylesheet" href="libs/materialize.min.css"
             media="screen,projection"/>
-
         <!-- Import clipboard.js -->
         <script src="libs/clipboard.min.js"></script>
-
         <!--Import style.css-->
         <link type="text/css" rel="stylesheet" href="css/style.css"/>
-
         <!--Let browser know website is optimized for mobile-->
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <!--Import jQuery before materialize.js-->
@@ -31,56 +29,46 @@
         <script type="text/javascript" src="js/LocalCard.js"></script>
         <script type="text/javascript" src="js/Publisher.js"></script>
         <script type="text/javascript" src="js/LocalPlanet.js"></script>
-
         <script type="text/javascript" src="js/GlobalTag.js"></script>
         <script type="text/javascript" src="js/GlobalCard.js"></script>
         <script type="text/javascript" src="js/ProjectViewer.js"></script>
         <script type="text/javascript" src="js/GlobalPlanet.js"></script>
         <script type="text/javascript" src="js/Planet.js"></script>
         <script type="text/javascript" src="js/main.js"></script>
-        <style>
-            .transparent-bg {
-              background-color: transparent !important;
-            }
-          </style>
         <script defer>
-            document.addEventListener("scroll", function () {
-              var navbar = document.querySelector(".nav-extended");
-          
-              if (document.body.scrollTop > 210 || document.documentElement.scrollTop >210) {
-                // navbar.classList.remove("lighten-1");
-                navbar.classList.remove("lighten-1");
-              }
-              else{
-                navbar.classList.add("lighten-1");
-
-
-
-              }
-            });
-          </script>
+         document.addEventListener("scroll", function () {
+           var navbar = document.querySelector(".nav-extended");
+           if (document.body.scrollTop > 210 || document.documentElement.scrollTop > 210) {
+             navbar.classList.remove("lighten-1");
+           }
+           else{
+             navbar.classList.add("lighten-1");
+           }
+         });
+      </script>
     </head>
-
     <body>
-        <nav class="nav-extended light-green lighten-1 " style="position:
-            sticky;
-            top: 0;
-            z-index: 100;
-            " role="navigation">
+        <nav class="nav-extended light-green lighten-1 " role="navigation">
             <div class="nav-wrapper container">
                 <a id="logo-container" class="brand-logo inactiveLink"><i
                         class="material-icons" id="planeticon">public</i></a>
-                <ul class="right"><li><a id="close-planet" class="tooltipped"
+                <ul class="right">
+                    <li><a id="close-planet" class="tooltipped"
                             data-position="bottom" data-delay="50"
-                            data-tooltip=""><i class="material-icons">close</i></a></li></ul>
-                <ul class="right"><li><a id="planet-open-file"
+                            data-tooltip=""><i class="material-icons">close</i></a></li>
+                </ul>
+                <ul class="right">
+                    <li><a id="planet-open-file"
                             class="tooltipped" data-position="bottom"
                             data-delay="50" data-tooltip=""><i
-                                class="material-icons">folder_open</i></a></li></ul>
-                <ul class="right"><li><a id="planet-new-project"
+                                class="material-icons">folder_open</i></a></li>
+                </ul>
+                <ul class="right">
+                    <li><a id="planet-new-project"
                             class="tooltipped" data-position="bottom"
                             data-delay="50" data-tooltip=""><i
-                                class="material-icons">note_add</i></a></li></ul>
+                                class="material-icons">note_add</i></a></li>
+                </ul>
                 <ul class="right tabs tabs-transparent" id="localglobal">
                     <li class="tab"><a class="active" id="local-tab"
                             href="#local"></a></li>
@@ -101,13 +89,8 @@
                         </div>
                     </li>
                 </ul>
-
-
             </div>
-
-
         </nav>
-
         <div id="local">
             <div class="section no-pad-bot">
                 <div class="container">
@@ -248,39 +231,44 @@
                                 <div class="spinner-layer spinner-blue">
                                     <div class="circle-clipper left">
                                         <div class="circle"></div>
-                                    </div><div class="gap-patch">
+                                    </div>
+                                    <div class="gap-patch">
                                         <div class="circle"></div>
-                                    </div><div class="circle-clipper right">
+                                    </div>
+                                    <div class="circle-clipper right">
                                         <div class="circle"></div>
                                     </div>
                                 </div>
-
                                 <div class="spinner-layer spinner-red">
                                     <div class="circle-clipper left">
                                         <div class="circle"></div>
-                                    </div><div class="gap-patch">
+                                    </div>
+                                    <div class="gap-patch">
                                         <div class="circle"></div>
-                                    </div><div class="circle-clipper right">
+                                    </div>
+                                    <div class="circle-clipper right">
                                         <div class="circle"></div>
                                     </div>
                                 </div>
-
                                 <div class="spinner-layer spinner-yellow">
                                     <div class="circle-clipper left">
                                         <div class="circle"></div>
-                                    </div><div class="gap-patch">
+                                    </div>
+                                    <div class="gap-patch">
                                         <div class="circle"></div>
-                                    </div><div class="circle-clipper right">
+                                    </div>
+                                    <div class="circle-clipper right">
                                         <div class="circle"></div>
                                     </div>
                                 </div>
-
                                 <div class="spinner-layer spinner-green">
                                     <div class="circle-clipper left">
                                         <div class="circle"></div>
-                                    </div><div class="gap-patch">
+                                    </div>
+                                    <div class="gap-patch">
                                         <div class="circle"></div>
-                                    </div><div class="circle-clipper right">
+                                    </div>
+                                    <div class="circle-clipper right">
                                         <div class="circle"></div>
                                     </div>
                                 </div>
@@ -300,27 +288,32 @@
                                 <div class="row no-margin-bottom">
                                     <p>
                                         <div class="subheading"
-                                            id="projectviewer-last-updated-heading"></div><div
+                                            id="projectviewer-last-updated-heading"></div>
+                                        <div
                                             id="projectviewer-last-updated"></div>
                                     </p>
                                     <p>
                                         <div class="subheading"
-                                            id="projectviewer-date-heading"></div><div
+                                            id="projectviewer-date-heading"></div>
+                                        <div
                                             id="projectviewer-date"></div>
                                     </p>
                                     <p>
                                         <div class="subheading"
-                                            id="projectviewer-downloads-heading"></div><div
+                                            id="projectviewer-downloads-heading"></div>
+                                        <div
                                             id="projectviewer-downloads"></div>
                                     </p>
                                     <p>
                                         <div class="subheading"
-                                            id="projectviewer-likes-heading"></div><div
+                                            id="projectviewer-likes-heading"></div>
+                                        <div
                                             id="projectviewer-likes"></div>
                                     </p>
                                     <p>
                                         <div class="subheading"
-                                            id="projectviewer-tags-heading"></div><div
+                                            id="projectviewer-tags-heading"></div>
+                                        <div
                                             id="projectviewer-tags"></div>
                                     </p>
                                 </div>
