@@ -2202,23 +2202,23 @@ class PhraseMaker {
         let sortedList = sortableList.sort((a, b) => {
             return a[0] - b[0];
         });
-        let sorted = [];
+
+        //creates a list without any duplicate pitches
         const removeDuplicate = () => {
+            let sortedWithoutDuplicates = [];
             for (let i = 0; i < sortedList.length; i++) {
                 if (i == 0) {
-                    sorted.push(sortedList[i]);
+                    sortedWithoutDuplicates.push(sortedList[i]);
                 } else if (sortedList[i][4] !== sortedList[i - 1][4]) {
-                    sorted.push(sortedList[i]);
+                    sortedWithoutDuplicates.push(sortedList[i]);
                 }
             }
+            return sortedWithoutDuplicates;
         };
-        removeDuplicate();
-        sortedList = sorted;
+        sortedList = removeDuplicate();
 
         // Reverse since we start from the top of the table.
         sortedList = sortedList.reverse();
-        console.log(sortedList);
-        console.log(sortedList[1][3]);
         this.rowLabels = [];
         this.rowArgs = [];
         this._sortedRowMap = [];
@@ -2235,41 +2235,33 @@ class PhraseMaker {
         }
 
         this.columnBlocksMap = newColumnBlockMap;
-        console.log(this.columnBlocksMap);
         let lastObj = 0;
         let obj;
         for (let i = 0; i < sortedList.length; i++) {
             obj = sortedList[i];
-            console.log(last(this.rowLabels));
             this._rowMap[obj[3]] = i;
             this._noteStored[i] = obj[4];
 
             if (i === 0) {
                 this._sortedRowMap.push(0);
             } else if (i > 0 && obj[1] !== "hertz" && obj[1] === last(this.rowLabels)) {
-                console.log(obj[4]);
-                console.log(sortedList[i - 1][4]);
                 //eslint-disable-next-line no-console
                 console.debug("skipping " + obj[1] + " " + last(this.rowLabels));
                 this._sortedRowMap.push(last(this._sortedRowMap));
-                console.log(this._sortedRowMap);
                 if (oldColumnBlockMap[sortedList[lastObj][3]] != undefined) {
                     setTimeout(
                         this._removePitchBlock(oldColumnBlockMap[sortedList[lastObj][3]][0]),
                         500
                     );
-                    console.log(oldColumnBlockMap);
                     this.columnBlocksMap = this.columnBlocksMap.filter((ele) => {
                         return ele[0] !== oldColumnBlockMap[sortedList[lastObj][3]][0];
                     });
                     lastObj = i;
                 }
                 // skip duplicates
-                console.log(this._rowMap);
                 for (let j = this._rowMap[i]; j < this._rowMap.length; j++) {
                     this._rowOffset[j] -= 1;
                 }
-                console.log(this._rowOffset);
                 this._rowMap[i] = this._rowMap[i - 1];
                 continue;
             } else {
