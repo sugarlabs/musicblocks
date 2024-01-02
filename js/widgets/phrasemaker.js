@@ -2128,7 +2128,8 @@ class PhraseMaker {
             }
             this._markedColsInRow.push(thisRow);
         }
-
+        // create a 'Set' object that contains only unique values
+        const uniqueFrequencies = new Set();
         const sortableList = [];
         let drumName;
         // Make a list to sort, skipping drums and graphics.
@@ -2148,26 +2149,21 @@ class PhraseMaker {
             }
 
             // We want to sort based on frequency, so we convert all notes to frequency.
-            if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
-                // Deprecated
+            const frequencyKey = noteToFrequency(
+                this.rowLabels[i] + this.rowArgs[i],
+                this.activity.turtles.ithTurtle(0).singer.keySignature
+            );
+
+            if (!uniqueFrequencies.has(frequencyKey)) {
                 sortableList.push([
-                    this.rowArgs[i],
+                    frequencyKey,
                     this.rowLabels[i],
                     this.rowArgs[i],
                     i,
                     this._noteStored[i]
                 ]);
-            } else {
-                sortableList.push([
-                    noteToFrequency(
-                        this.rowLabels[i] + this.rowArgs[i],
-                        this.activity.turtles.ithTurtle(0).singer.keySignature
-                    ),
-                    this.rowLabels[i],
-                    this.rowArgs[i],
-                    i,
-                    this._noteStored[i]
-                ]);
+
+                uniqueFrequencies.add(frequencyKey);
             }
         }
 
