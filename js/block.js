@@ -1343,7 +1343,7 @@ class Block {
      */
     _generateCollapseArtwork(postProcess) {
         const thisBlock = this.blocks.blockList.indexOf(this);
-
+        
         /**
          * Run the postprocess function after the artwork is loaded.
          * @private
