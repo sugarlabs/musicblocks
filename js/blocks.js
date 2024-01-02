@@ -445,11 +445,8 @@ class Blocks {
                 return;
             }
 
-            const that = this;  
+            const that = this; 
             const obj = this.clampBlocksToCheck.pop();
-            console.debug("JASLEEN");
-            console.debug(obj[0]);
-            console.debug(obj[1]);
             const blk = obj[0];
             const clamp = obj[1];
 
