@@ -424,6 +424,11 @@ class HelpWidget {
         {
            rightArrow.classList.add("disabled") ;       
         }
+        if(this.index == 0)
+        {
+           leftArrow.classList.add("disabled") ;       
+        }
+        
         cell.onclick = () => {
             if (this.index !== this.appendedBlockList.length - 1) {
                 this.index += 1;
