@@ -224,7 +224,7 @@ class Blocks {
             }
 
             /** Force a refresh. */
-            await delayExecution(500);
+            await delayExecution(100);
             this.activity.refreshCanvas();
         };
 
