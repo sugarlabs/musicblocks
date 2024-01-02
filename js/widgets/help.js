@@ -424,7 +424,7 @@ class HelpWidget {
         {
            rightArrow.classList.add("disabled") ;       
         }
-        if(this.index == 0)
+        if(this.index === 0)
         {
            leftArrow.classList.add("disabled") ;       
         }
