@@ -41,6 +41,17 @@
         <script type="text/javascript" src="js/Planet.js"></script>
         <script type="text/javascript" src="js/main.js"></script>
     </head>
+    <script>
+        document.addEventListener("scroll", function () {
+            var navbar = document.querySelector(".nav-extended");
+            if (document.body.scrollTop > 210 || document.documentElement.scrollTop > 210) {
+            navbar.classList.remove("lighten-1");
+            }
+            else{
+            navbar.classList.add("lighten-1");
+            }
+        });
+   </script>
 
     <body>
         <nav class="nav-extended light-green lighten-1" role="navigation">
@@ -52,14 +63,25 @@
                 <ul class="right tabs tabs-transparent" id="localglobal">
                     <li class="tab"><a class="active" id="local-tab" href="#local"></a></li>
                     <li class="tab"><a id="global-tab" href="#global"></a></li>
+                    <li>
+                        <li>
+                            <div class="nav-content" id="searchcontainer"
+                                style="display: none;">
+                                <div class="container">
+                                    <div class="input-field search">
+                                        <i class="material-icons prefix "
+                                            id="searchicon">search</i><input
+                                            placeholder="" id="global-search"
+                                            type="text"><span><i
+                                                class="material-icons"
+                                                id="search-close">clear</i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </li>
                 </ul>
             </div>
-            <div class="nav-content" id="searchcontainer" style="display: none;">
-                <div class="container">
-                    <div class="input-field search">
-                        <i class="material-icons prefix" id="searchicon">search</i><input placeholder="" id="global-search" type="text"><span><i class="material-icons" id="search-close">clear</i></span>
-                    </div>
-                </div>
             </div>
         </nav>
 

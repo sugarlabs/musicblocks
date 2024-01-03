@@ -427,3 +427,9 @@ a {
     justify-content: space-between;
 }
 
+.nav-extended {
+	position: sticky;
+	top: 0;
+	z-index: 100;
+}
+
