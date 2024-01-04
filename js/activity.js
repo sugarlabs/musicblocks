@@ -1268,7 +1268,6 @@ class Activity {
 
             this.setSmallerLargerStatus();
             if(typeof(this.activity)!="undefined"){
-                console.log(typeof(this.activity));
                 this.activity.refreshCanvas();
             }
             document.getElementById("hideContents").click();
