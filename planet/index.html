@@ -44,12 +44,14 @@
     <script>
         document.addEventListener("scroll", function () {
             var navbar = document.querySelector(".nav-extended");
-            if (document.body.scrollTop > 210 || document.documentElement.scrollTop > 210) {
-            navbar.classList.remove("lighten-1");
-            }
-            else{
-            navbar.classList.add("lighten-1");
-            }
+            if (navbar){
+                if (document.body.scrollTop > 210 || document.documentElement.scrollTop > 210) {
+                navbar.classList.remove("lighten-1");
+                }
+                else{
+                navbar.classList.add("lighten-1");
+                }
+        }
         });
    </script>
 
@@ -65,13 +67,12 @@
                     <li class="tab"><a id="global-tab" href="#global"></a></li>
                     <li>
                         <li>
-                            <div class="nav-content" id="searchcontainer"
-                                style="display: none;">
+                            <div class="nav-content" id="searchcontainer">
                                 <div class="container">
                                     <div class="input-field search">
                                         <i class="material-icons prefix "
                                             id="searchicon">search</i><input
-                                            placeholder="" id="global-search"
+                                            placeholder="Search here" id="global-search"
                                             type="text"><span><i
                                                 class="material-icons"
                                                 id="search-close">clear</i></span>

@@ -433,3 +433,6 @@ a {
 	z-index: 100;
 }
 
+.nav-content {
+	display: none;
+}
