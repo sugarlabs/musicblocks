@@ -1235,6 +1235,9 @@ class Activity {
 
                 this.setSmallerLargerStatus();
             }
+            if(typeof(this.activity)!=undefined){
+                this.activity.refreshCanvas();
+            }
             document.getElementById("hideContents").click();
         };
 
@@ -1260,6 +1263,9 @@ class Activity {
             }
 
             this.setSmallerLargerStatus();
+            if(typeof(this.activity)!=undefined){
+                this.activity.refreshCanvas();
+            }
             document.getElementById("hideContents").click();
         };
 
