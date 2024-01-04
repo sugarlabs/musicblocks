@@ -1230,12 +1230,14 @@ class Activity {
                     this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
 
                     const that = this;
-                    that.resizeDebounce = false;
+                    setTimeout(() => {
+                        that.resizeDebounce = false;
+                    }, 500);
                 }
 
                 this.setSmallerLargerStatus();
             }
-            if(typeof(this.activity)!=undefined){
+            if(typeof(this.activity)!="undefined"){
                 this.activity.refreshCanvas();
             }
             document.getElementById("hideContents").click();
@@ -1263,7 +1265,8 @@ class Activity {
             }
 
             this.setSmallerLargerStatus();
-            if(typeof(this.activity)!=undefined){
+            if(typeof(this.activity)!="undefined"){
+                console.log(typeof(this.activity));
                 this.activity.refreshCanvas();
             }
             document.getElementById("hideContents").click();
