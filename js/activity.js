@@ -1261,7 +1261,9 @@ class Activity {
                 }
 
                 const that = this;
-                that.resizeDebounce = false;
+                setTimeout(() => {
+                    that.resizeDebounce = false;
+                }, 500);
             }
 
             this.setSmallerLargerStatus();
