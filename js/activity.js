@@ -1230,14 +1230,11 @@ class Activity {
                     this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
 
                     const that = this;
-                    setTimeout(() => {
-                        that.resizeDebounce = false;
-                    }, 3000);
+                    that.resizeDebounce = false;
                 }
 
                 this.setSmallerLargerStatus();
             }
-            this.activity.refreshCanvas();
             document.getElementById("hideContents").click();
         };
 
@@ -1259,13 +1256,10 @@ class Activity {
                 }
 
                 const that = this;
-                setTimeout(() => {
-                    that.resizeDebounce = false;
-                }, 3000);
+                that.resizeDebounce = false;
             }
 
             this.setSmallerLargerStatus();
-            this.activity.refreshCanvas();
             document.getElementById("hideContents").click();
         };
 
