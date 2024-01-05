@@ -2400,7 +2400,7 @@ msgstr ""
 
 #: js/languagebox.js:188
 msgid "Music Blocks is already set to this language."
-msgstr "Music Blocks כבר מוגדר לשפה זו."
+msgstr "Music Blocks כבר מוגדר לשפה זו"
 
 
 msgid "Refresh your browser to change your language preference."
