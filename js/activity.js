@@ -1234,7 +1234,7 @@ class Activity {
                 await this.setSmallerLargerStatus();
             }
             if(typeof(this.activity)!="undefined"){
-              this.activity.refreshCanvas();
+              await this.activity.refreshCanvas();
             }
             document.getElementById("hideContents").click();
         };
@@ -1259,12 +1259,11 @@ class Activity {
 
                 const that = this;
                 that.resizeDebounce = false;
-            }
-
+          
             await this.setSmallerLargerStatus();
             if(typeof(this.activity)!="undefined"){
-                this.activity.refreshCanvas();
-               }
+               await this.activity.refreshCanvas();
+            }
             document.getElementById("hideContents").click();
         };
 
