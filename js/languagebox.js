@@ -195,27 +195,6 @@ class LanguageBox {
             "onMouseOver='this.style.opacity = 0.5'" +
             "onMouseOut='this.style.opacity = 1'>";
         const MSGSuffix = "</a>";
-        const SetLanguage={
-            default: _("Music Blocks is already set to this language."),
-            enUS: "Music Blocks is already set to this language.",
-            enUK: "Music Blocks is already set to this language.",
-            ja: "Music Blocksは既にこの言語に設定されています。",
-            kana: "ミュージック ブロックス イズ オールレディ セット トゥ ディス ランゲージ。",
-            ko: "뮤직 블록스는 이미 이 언어로 설정되어 있습니다.",
-            es:"Music Blocks ya está configurado en este idioma.",
-            pt:"O Music Blocks já está configurado para este idioma.",
-            zhCN: "音乐积木已设置为该语言。",
-            th:"Music Blocks ได้รับการตั้งค่าเป็นภาษานี้แล้ว",
-            hi: "म्यूजिक ब्लॉक्स पहले से ही इस भाषा पर सेट है।",
-	    te: "మ్యూజిక్ బ్లాక్స్ ఇప్పటికే ఈ భాషకు సెట్ అయింది.",
-            ibo: "Music Blocks dị ọhụrụ bụla n'ụzọ asụsụ a.",
-            ar: "تم تعيين كتل الموسيقى بالفعل على هذه اللغة.",
-            he: "Music Blocks כבר מוגדר לשפה זו.",
-            ayc: "Music Blocks ya está configurado en este idioma.",
-            quz:"Music Blocks ya está configurado en este idioma.",
-            gug:"Music Blocks ya está configurado en este idioma."
-
-        }
         const MSG = {
             default: _("Refresh your browser to change your language preference."),
             enUS: "Refresh your browser to change your language preference.",
@@ -237,7 +216,7 @@ class LanguageBox {
             gug: "Actualice su navegador para cambiar su preferencia de idioma."
         };
         if (localStorage.getItem("languagePreference") === this._language) {
-            this.activity.textMsg( SetLanguage[this._language] );
+            this.activity.textMsg(_("Music Blocks is already set to this language."));
         }
         else{
             if (this._language === "ja" && this.activity.storage.kanaPreference === "kana") {
