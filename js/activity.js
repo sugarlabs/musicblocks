@@ -4345,9 +4345,11 @@ class Activity {
 
             const that = this;
             // eslint-disable-next-line no-unused-vars
+           const originalBackgroundColour = container.style.backgroundColor;
             container.onmouseover = (event) => {
                 if (!that.loading) {
                     document.body.style.cursor = "pointer";
+                    container.style.backgroundColor = "#eb9249";
                 }
             };
 
@@ -4355,6 +4357,7 @@ class Activity {
             container.onmouseout = (event) => {
                 if (!that.loading) {
                     document.body.style.cursor = "default";
+                    container.style.backgroundColor = originalBackgroundColour;
                 }
             };
 
