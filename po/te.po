@@ -2399,6 +2399,9 @@ msgid "Expand"
 msgstr "విస్తరించు"
 
 #: js/languagebox.js:188
+msgid "Music Blocks is already set to this language."
+msgstr "మ్యూజిక్ బ్లాక్స్ ఇప్పటికే ఈ భాషకు సెట్ అయింది."
+
 msgid "Refresh your browser to change your language preference."
 msgstr "మీ భాషా ఇచ్చేందుకు మీ బ్రౌజర్‌ను రిఫ్రెష్ చేయండి"
 

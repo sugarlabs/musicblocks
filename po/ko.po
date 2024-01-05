@@ -685,6 +685,9 @@ msgid "Expand"
 msgstr ""
 
 #: js/languagebox.js:188
+msgid "Music Blocks is already set to this language."
+msgstr "뮤직 블록스는 이미 이 언어로 설정되어 있습니다."
+
 msgid "Refresh your browser to change your language preference."
 msgstr ""
 

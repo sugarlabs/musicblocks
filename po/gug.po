@@ -2276,6 +2276,10 @@ msgstr ""
 
 #: js/languagebox.js:188
 #.TRANS: Actualice su navegador para cambiar su preferencia de idioma.
+msgid "Music Blocks is already set to this language."
+msgstr "Music Blocks ya está configurado en este idioma."
+
+
 msgid "Refresh your browser to change your language preference."
 msgstr ""
 
