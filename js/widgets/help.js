@@ -357,6 +357,7 @@ class HelpWidget {
      * @returns {void}
      */
     _prepareBlockList() {
+        console.log("prepare block list");
         for (const key in this.activity.blocks.protoBlockDict) {
             if (
                 this.activity.blocks.protoBlockDict[key].beginnerModeBlock === true &&
@@ -393,6 +394,7 @@ class HelpWidget {
      * @returns {void}
      */
     _blockHelp(block) {
+        console.log("block_help");
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
@@ -411,6 +413,10 @@ class HelpWidget {
         let cell = docById("right-arrow");
         let rightArrow = docById("right-arrow");
         let leftArrow = docById("left-arrow");
+        
+        if(this.index==0){
+          leftArrow.classList.add("disabled");
+        }
 
         document.onkeydown = function handleArrowKeys(event) {
             if (event.key === 'ArrowLeft') {
@@ -418,15 +424,18 @@ class HelpWidget {
             } else if (event.key === 'ArrowRight') {
                 rightArrow.click(); 
             }
-        } ; 
+        };
 
         if(this.index == this.appendedBlockList.length - 1)
         {
-           rightArrow.classList.add("disabled") ;       
-        }
+           rightArrow.classList.add("disabled") ;
+        }
         cell.onclick = () => {
             if (this.index !== this.appendedBlockList.length - 1) {
                 this.index += 1;
+            }
+            if(this.index==1){
+                leftArrow.classList.remove("disabled");
             }
             this._blockHelp(
                 this.activity.blocks.protoBlockDict[this.appendedBlockList[this.index]]
@@ -438,6 +447,9 @@ class HelpWidget {
         cell.onclick = () => {
             if (this.index !== 0) {
                 this.index -= 1;
+            }
+            if(this.index==0){
+                leftArrow.classList.add("disabled");
             }
 
             this._blockHelp(

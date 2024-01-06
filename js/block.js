@@ -603,6 +603,7 @@ class Block {
         this.clampCount[clamp] += plusMinus;
         this._newArtwork(plusMinus);
         this.regenerateArtwork(false);
+        console.log("replace_new_new");
     }
 
     /**
@@ -908,6 +909,7 @@ class Block {
         // Get the block labels from the protoblock.
         const that = this;
         const thisBlock = this.blocks.blockList.indexOf(this);
+        console.log(thisBlock);
         let block_label = "";
 
         // Create the highlight bitmap for the block.
@@ -946,6 +948,7 @@ class Block {
                     that._finishImageLoad();
                 } else {
                     if (that.isCollapsible()) {
+                        console.log(thisBlock);
                         that._ensureDecorationOnTop();
                     }
 
@@ -959,6 +962,7 @@ class Block {
                         that.bitmap.visible = !that.collapsed;
                         that.highlightBitmap.visible = false;
                         that.updateCache();
+                        console.log(thisBlock);
                     }
 
                     if (that.postProcess != null) {
