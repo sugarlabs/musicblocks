@@ -2292,6 +2292,7 @@
     html input[type="button"],
     input[type="reset"],
     input[type="submit"] {
+        appearance: button;
         -webkit-appearance: button;
         cursor: pointer
     }
@@ -2324,6 +2325,7 @@
     }
 
     input[type="search"] {
+        appearance: textfield;
         -webkit-appearance: textfield;
         -webkit-box-sizing: content-box;
         box-sizing: content-box
@@ -5668,6 +5670,7 @@
     .waves-circle {
         -webkit-transform: translateZ(0);
         transform: translateZ(0);
+        mask-image: -webkit-radial-gradient(circle, white 100%, black 100%);
         -webkit-mask-image: -webkit-radial-gradient(circle, white 100%, black 100%)
     }
 
@@ -5689,6 +5692,7 @@
         height: 2.5em;
         line-height: 2.5em;
         border-radius: 50%;
+        mask-image: none;
         -webkit-mask-image: none
     }
 
@@ -5993,6 +5997,7 @@
         position: relative;
         -webkit-transition: opacity .4s;
         transition: opacity .4s;
+        backface-visibility: hidden;
         -webkit-backface-visibility: hidden
     }
 
@@ -7276,6 +7281,7 @@
     }
 
     input[type=range] {
+        appearance: none;
         -webkit-appearance: none
     }
 
@@ -8577,6 +8583,7 @@
         position: fixed;
         -webkit-transition: background 0.15s ease-out, top 0s 0.15s;
         transition: background 0.15s ease-out, top 0s 0.15s;
+        backface-visibility: hidden;
         -webkit-backface-visibility: hidden
     }
 
@@ -8642,6 +8649,7 @@
     .picker--opened .picker__holder {
         top: 0;
         background: transparent;
+        filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#1E000000,endColorstr=#1E000000)";
         -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#1E000000,endColorstr=#1E000000)";
         zoom: 1;
         background: rgba(0, 0, 0, 0.32);
@@ -9365,3 +9373,4 @@
         stroke-width: 4;
         stroke-linecap: round
     }
+}
