@@ -1753,6 +1753,7 @@
 .materialize-iso html input[type="button"],
 .materialize-iso input[type="reset"],
 .materialize-iso input[type="submit"] {
+  appearance: button;
   -webkit-appearance: button;
   cursor: pointer;
 }
@@ -1779,6 +1780,7 @@
   height: auto;
 }
 .materialize-iso input[type="search"] {
+  appearance: textfield;
   -webkit-appearance: textfield;
   -webkit-box-sizing: content-box;
   box-sizing: content-box;
@@ -4648,6 +4650,7 @@ i.left {
 .materialize-iso .waves-circle {
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
+  mask-image: -webkit-radial-gradient(circle, white 100%, black 100%);
   -webkit-mask-image: -webkit-radial-gradient(circle, white 100%, black 100%);
 }
 .materialize-iso .waves-input-wrapper {
@@ -4666,6 +4669,7 @@ i.left {
   height: 2.5em;
   line-height: 2.5em;
   border-radius: 50%;
+  mask-image: none;
   -webkit-mask-image: none;
 }
 .materialize-iso .waves-block {
@@ -4929,6 +4933,7 @@ i.left {
   position: relative;
   -webkit-transition: opacity 0.4s;
   transition: opacity 0.4s;
+  backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 .materialize-iso .materialboxed:hover:not(.active) {
@@ -6063,6 +6068,7 @@ i.left {
   font-size: 10px;
 }
 .materialize-iso input[type=range] {
+  appearance: none;
   -webkit-appearance: none;
 }
 .materialize-iso input[type=range]::-webkit-slider-runnable-track {
@@ -7132,6 +7138,7 @@ i.left {
   position: fixed;
   -webkit-transition: background 0.15s ease-out, top 0s 0.15s;
   transition: background 0.15s ease-out, top 0s 0.15s;
+  backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 .materialize-iso .picker__frame {
@@ -7189,6 +7196,8 @@ i.left {
 .materialize-iso .picker--opened .picker__holder {
   top: 0;
   background: transparent;
+  filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#1E000000,endColorstr=#1E000000)";
+  zoom: 1;
   -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#1E000000,endColorstr=#1E000000)";
   zoom: 1;
   background: rgba(0, 0, 0, 0.32);
