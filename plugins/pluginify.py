@@ -16,6 +16,7 @@
 import re
 import sys
 import json
+import imghdr
 
 HELP = '''Usage:
     python pluginify.py (file)
@@ -170,9 +171,9 @@ def pluginify(data):
             outp[type_][name] = value
 
         if type_ == 'image':
-            # TODO: Detect if its png
-            # Assume for now it is SVG.
-            IMAGES[name] = value  # 'data:image/svg+xml;utf8,' + value
+             image_format = imghdr.what(None, h=value)
+        if image_format:
+                IMAGES[name] = f'data:image/{image_format};base64,{value}'  
 
     if IMAGES:
         outp['IMAGES'] = IMAGES
