@@ -608,7 +608,12 @@ class PitchStaircase {
         const w = window.innerWidth;
         this._cellScale = w / 1200;
 
-        const widgetWindow = window.widgetWindows.windowFor(this, "pitch staircase", "pitch staircase", false);
+        const widgetWindow = window.widgetWindows.windowFor(
+            this,
+            "pitch staircase",
+            "pitch staircase",
+            true
+        );
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -620,37 +625,28 @@ class PitchStaircase {
 
         this.closed = false;
 
-        widgetWindow.addButton(
-            "play-chord.svg",
-            PitchStaircase.ICONSIZE,
-            _("Play chord")
-        ).onclick = () => {
-            this._playAll();
-        };
+        widgetWindow.addButton("play-chord.svg", PitchStaircase.ICONSIZE, _("Play chord")).onclick =
+            () => {
+                this._playAll();
+            };
 
-        widgetWindow.addButton(
-            "play-scale.svg",
-            PitchStaircase.ICONSIZE,
-            _("Play scale")
-        ).onclick = () => {
-            this.playUpAndDown();
-        };
+        widgetWindow.addButton("play-scale.svg", PitchStaircase.ICONSIZE, _("Play scale")).onclick =
+            () => {
+                this.playUpAndDown();
+            };
 
         this._save_lock = false;
-        widgetWindow.addButton(
-            "export-chunk.svg",
-            PitchStaircase.ICONSIZE,
-            _("Save")
-        ).onclick = () => {
-            // Debounce button
-            if (!this._get_save_lock()) {
-                this._save_lock = true;
-                this._save();
-                setTimeout(() => {
-                    this._save_lock = false;
-                }, 1000);
-            }
-        };
+        widgetWindow.addButton("export-chunk.svg", PitchStaircase.ICONSIZE, _("Save")).onclick =
+            () => {
+                // Debounce button
+                if (!this._get_save_lock()) {
+                    this._save_lock = true;
+                    this._save();
+                    setTimeout(() => {
+                        this._save_lock = false;
+                    }, 1000);
+                }
+            };
         document.getElementsByClassName("wfbWidget")[0].style.maxHeight =
             10 * PitchStaircase.BUTTONSIZE + "px";
         document.getElementsByClassName("wfbWidget")[0].style.overflowY = "scroll";
@@ -674,21 +670,15 @@ class PitchStaircase {
         docById('musicratio2').classList.add('hasKeyboard');
         */
 
-        widgetWindow.addButton(
-            "restore-button.svg",
-            PitchStaircase.ICONSIZE,
-            _("Undo")
-        ).onclick = () => {
-            this._undo();
-        };
+        widgetWindow.addButton("restore-button.svg", PitchStaircase.ICONSIZE, _("Undo")).onclick =
+            () => {
+                this._undo();
+            };
 
-        widgetWindow.addButton(
-            "erase-button.svg",
-            PitchStaircase.ICONSIZE,
-            _("Clear")
-        ).onclick = () => {
-            while (this._undo());
-        };
+        widgetWindow.addButton("erase-button.svg", PitchStaircase.ICONSIZE, _("Clear")).onclick =
+            () => {
+                while (this._undo());
+            };
 
         // The pitch-staircase (psc) table
         this._pscTable = document.createElement("table");
