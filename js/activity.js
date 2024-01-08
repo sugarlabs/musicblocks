@@ -3209,7 +3209,7 @@ class Activity {
          * @param env {specifies environment}
          */
         this.runProject = (env) => {
-            document.removeEventListener("finishedLoading", this.runProject);x
+            document.removeEventListener("finishedLoading", this.runProject);
 
             const that = this;
             setTimeout(() => {
