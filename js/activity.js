@@ -2281,7 +2281,10 @@ class Activity {
                         break;
                     case 82: // 'R'
                         this.textMsg("Alt-R " + _("Play"));
-                        document.getElementById("stop").style.color = "#ea174c";
+                        const stopButton = document.getElementById("stop");
+                        if (stopButton) {
+                            stopButton.style.color = "#ea174c";
+                        }
                         this._doFastButton();
                         break;
                     case 83: // 'S'
