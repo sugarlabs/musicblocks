@@ -4096,11 +4096,11 @@ class Block {
 
         if (
             WIDENAMES.indexOf(this.name) === -1 &&
-            getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH
+            label.length > 10
         ) {
             let slen = label.length - 5;
             let nlabel = "" + label.substr(0, slen) + "...";
-            while (getTextWidth(nlabel, "bold 20pt Sans") > TEXTWIDTH) {
+            while (nlabel.length > 10) {
                 slen -= 1;
                 nlabel = "" + label.substr(0, slen) + "...";
                 // const foo = getTextWidth(nlabel, "bold 20pt Sans");
