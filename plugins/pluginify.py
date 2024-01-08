@@ -16,6 +16,8 @@
 import re
 import sys
 import json
+import imghdr
+
 
 HELP = '''Usage:
     python pluginify.py (file)
@@ -169,10 +171,22 @@ def pluginify(data):
                 outp[type_] = {}
             outp[type_][name] = value
 
-        if type_ == 'image':
-            # TODO: Detect if its png
-            # Assume for now it is SVG.
-            IMAGES[name] = value  # 'data:image/svg+xml;utf8,' + value
+        
+if type_ == 'image':
+
+    # Try to detect image type using imghdr 
+    image_type = imghdr.what('', h=value)
+
+    if image_type == 'png':
+        # PNG image
+        outp['IMAGES'][name] = value  
+    elif image_type == 'svg':
+        # SVG image
+        outp['IMAGES'][name] = 'data:image/svg+xml;utf8,' + value
+    elif image_type is None:
+        raise ValueError('Could not determine image type')
+    else:
+        raise ValueError('Unsupported image type ' + image_type)
 
     if IMAGES:
         outp['IMAGES'] = IMAGES
