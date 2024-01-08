@@ -16,6 +16,8 @@
 import re
 import sys
 import json
+import imghdr
+import base64
 
 HELP = '''Usage:
     python pluginify.py (file)
@@ -127,14 +129,21 @@ def clear():
     JS_TYPES = ('flow', 'arg', 'block', 'macro', 'parameter', 'setter', 'onload', 'onstart', 'onstop')
     # 'blkName': 'imageData',
     IMAGES = {}
-
-
+    
+def detect_image_format(data):
+    try:
+        return imghdr.what(None, h=data)
+    except Exception as e:
+        print(f"Error detecting image format: {e}")
+        return None
+    
 def pluginify(data):
     clear()
     sections_list = data.split('//*')
     sections_pairs = []
     specific_globals = {x: '' for x in JS_TYPES}
     globals_ = None
+    errors=[]
     for section in sections_list:
         match = re.match('(.*)\*\/\/([^\0]*)', section.strip())
         if match:
@@ -170,13 +179,21 @@ def pluginify(data):
             outp[type_][name] = value
 
         if type_ == 'image':
-            # TODO: Detect if its png
-            # Assume for now it is SVG.
-            IMAGES[name] = value  # 'data:image/svg+xml;utf8,' + value
+            format_detected = detect_image_format(base64.b64decode(value))
+            if format_detected:
+                if format_detected == 'png':
+                    IMAGES[name] = 'data:image/png;base64,' + value
+                elif format_detected == 'svg':
+                    IMAGES[name] = 'data:image/svg+xml;utf8,' + value
+                else:
+                    IMAGES[name] = 'data:image/' + format_detected + ';base64,' + value
+            else:
+                errors.append(f"Invalid image format detected for {name}")
 
     if IMAGES:
         outp['IMAGES'] = IMAGES
-
+    if errors:
+        outp['ERRORS'] = errors
     return json.dumps(outp, indent=4)
 
 if __name__ == '__main__':
