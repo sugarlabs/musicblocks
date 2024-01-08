@@ -2280,6 +2280,10 @@ class Activity {
                     case 82: // 'R'
                         this.textMsg("Alt-R " + _("Play"));
                         this._doFastButton();
+                        const stopButton = document.getElementById("stop");
+                        if (stopButton) {
+                            stopButton.style.color = "#ea174c";
+                        }
                         break;
                     case 83: // 'S'
                         this.textMsg("Alt-S " + _("Stop"));
