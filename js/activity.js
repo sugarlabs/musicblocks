@@ -2280,6 +2280,9 @@ class Activity {
                     case 82: // 'R'
                         this.textMsg("Alt-R " + _("Play"));
                         this._doFastButton();
+                        if (stopButton) {
+                            stopButton.style.color = "#ea174c";
+                               }
                         break;
                     case 83: // 'S'
                         this.textMsg("Alt-S " + _("Stop"));
@@ -3206,7 +3209,7 @@ class Activity {
          * @param env {specifies environment}
          */
         this.runProject = (env) => {
-            document.removeEventListener("finishedLoading", this.runProject);
+            document.removeEventListener("finishedLoading", this.runProject);x
 
             const that = this;
             setTimeout(() => {
