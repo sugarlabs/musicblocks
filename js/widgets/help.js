@@ -380,6 +380,25 @@ class HelpWidget {
                 }
                 this._showPage(page);
             };
+            if (page === 0){
+                leftArrow.classList.add('disabled');
+            }
+            leftArrow.onclick = () => {
+                    if (page > 0){
+                        page = page - 1;
+                        leftArrow.classList.remove('disabled');
+                        if (page == 0) {
+                            this.widgetWindow.updateTitle("TAKE A TOUR");
+                        }
+                        else {
+                            this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
+                        }
+                        this._showPage(page);
+                    }
+                    if (page === 0){
+                        leftArrow.classList.add('disabled');
+                    }
+            };
         }
 
         helpBody.style.color = "#505050";
