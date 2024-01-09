@@ -79,10 +79,12 @@ class StringHelper {
             const obj = this.strings[i];
             const elem = document.getElementById(obj[0]);
 
-            if (this.strings[i].length==3)
-                elem.setAttribute(obj[2],obj[1]) ;
-                
-            else elem.innerHTML+=obj[1] ;
+            if(elem){
+                if (this.strings[i].length==3)
+                    elem.setAttribute(obj[2],obj[1]) ;
+
+                else elem.innerHTML+=obj[1] ;
+            }
         }
     };
 
