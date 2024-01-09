@@ -75,7 +75,7 @@
 /* exported Block, $ */
 
 // Length of a long touch
-const TEXTWIDTH = 240; // 90
+const TEXTWIDTH = 90; // 90
 const STRINGLEN = 9;
 const LONGPRESSTIME = 1500;
 const INLINECOLLAPSIBLES = ["newnote", "interval", "osctime", "definemode"];
