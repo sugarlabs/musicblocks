@@ -63,7 +63,7 @@ class Tempo {
             clearInterval(this._intervalID);
         }
 
-        const widgetWindow = window.widgetWindows.windowFor(this, "tempo", "tempo", false);
+        const widgetWindow = window.widgetWindows.windowFor(this, "tempo", "tempo", true);
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
