@@ -18,6 +18,10 @@ assignees: ""
 
 <!-- Add screenshots, if applicable, to help explain your problem. -->
 
+### How to Reproduce
+
+<!-- Add specific steps to reproduce that issue -->
+
 ### Console log Errors:
 
 <!-- Upload console log screenshots to help explain your problem in much better fashion -->
