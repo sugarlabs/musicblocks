@@ -364,6 +364,26 @@ class HelpWidget {
             };
         }
         else{
+            let leftarrow = docById("left-arrow");
+            if (page === 0){
+                leftarrow.classList.add('disabled');
+            }
+            leftarrow.onclick = () => {
+                    if (page > 0){
+                        page = page - 1;
+                        leftarrow.classList.remove('disabled');
+                        if (page == 0) {
+                            this.widgetWindow.updateTitle("TAKE A TOUR");
+                        }
+                        else {
+                            this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
+                        }
+                        this._showPage(page);
+                    }
+                    if (page === 0){
+                        leftarrow.classList.add('disabled');
+                    }
+            };
             const cell = docById("right-arrow");
             let leftArrow = docById("left-arrow");
             cell.onclick = () => {
