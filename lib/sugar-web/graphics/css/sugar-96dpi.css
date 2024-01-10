@@ -11,6 +11,7 @@ body {
   background-color: #c0c0c0;
 }
 .unselectable {
+  user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
 }
@@ -27,6 +28,7 @@ a {
   padding: 0 57px;
   color: white;
   background-color: #282828;
+  user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
 }
@@ -98,6 +100,7 @@ button {
   background-color: #808080;
   border: 2px solid transparent;
   border-radius: 22px;
+  user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
 }
@@ -232,6 +235,7 @@ input[type='range'] {
   cursor: pointer;
   background-color: #808080;
   border-radius: 22px;
+  appearance: none;
   -webkit-appearance: none !important;
 }
 input[type='range']::-webkit-slider-thumb {
@@ -251,6 +255,7 @@ input[type='range']::-webkit-slider-thumb:hover {
 }
 /* Label */
 label {
+  user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
 }
@@ -305,6 +310,7 @@ label {
   margin: 0 5.5px;
   font-weight: bold;
   line-height: 51px;
+  user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
 }

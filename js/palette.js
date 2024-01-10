@@ -410,6 +410,7 @@ class Palettes {
         // eslint-disable-next-line no-unused-vars
         row.onclick = (event) => {
             if (name == "search") {
+                this._hideMenus();
                 this.activity.showSearchWidget();
             } else {
                 this.showPalette(name);

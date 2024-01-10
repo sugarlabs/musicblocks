@@ -1216,56 +1216,57 @@ class Activity {
         /*
          * Increases block size
          */
-        const doLargerBlocks = (activity) => {
-            activity._doLargerBlocks();
+        const doLargerBlocks = async(activity) => {
+            await activity._doLargerBlocks();
         };
 
-        this._doLargerBlocks = () => {
+        this._doLargerBlocks = async() => {
             this.blocks.activeBlock = null;
 
             if (!this.resizeDebounce) {
                 if (this.blockscale < BLOCKSCALES.length - 1) {
                     this.resizeDebounce = true;
                     this.blockscale += 1;
-                    this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
-
-                    const that = this;
-                    setTimeout(() => {
-                        that.resizeDebounce = false;
-                    }, 3000);
+                    await this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
                 }
 
-                this.setSmallerLargerStatus();
+                const that = this;
+                that.resizeDebounce = false;
+                await this.setSmallerLargerStatus();
+
             }
-            this.activity.refreshCanvas();
+            if(typeof(this.activity)!="undefined"){
+                 await this.activity.refreshCanvas();
+               }
             document.getElementById("hideContents").click();
         };
 
         /*
          * Decreases block size
          */
-        const doSmallerBlocks = (activity) => {
-            activity._doSmallerBlocks();
+        const doSmallerBlocks = async(activity) => {
+            await activity._doSmallerBlocks();
         };
 
-        this._doSmallerBlocks = () => {
+        this._doSmallerBlocks = async() => {
             this.blocks.activeBlock = null;
 
             if (!this.resizeDebounce) {
                 if (this.blockscale > 0) {
                     this.resizeDebounce = true;
                     this.blockscale -= 1;
-                    this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
+                    await this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
                 }
 
                 const that = this;
-                setTimeout(() => {
-                    that.resizeDebounce = false;
-                }, 3000);
+                that.resizeDebounce = false;
+
             }
 
-            this.setSmallerLargerStatus();
-            this.activity.refreshCanvas();
+            await this.setSmallerLargerStatus();
+            if(typeof(this.activity)!="undefined"){
+                await this.activity.refreshCanvas();
+            }
             document.getElementById("hideContents").click();
         };
 
@@ -1273,19 +1274,20 @@ class Activity {
          * If either the block size has reached its minimum or maximum,
          * then the icons to make them smaller/bigger will be hidden.
          */
-        this.setSmallerLargerStatus = () => {
+        this.setSmallerLargerStatus = async() => {
             if (BLOCKSCALES[this.blockscale] < DEFAULTBLOCKSCALE) {
-                changeImage(this.smallerContainer.children[0], SMALLERBUTTON, SMALLERDISABLEBUTTON);
+                await changeImage(this.smallerContainer.children[0], SMALLERBUTTON, SMALLERDISABLEBUTTON);
             } else {
-                changeImage(this.smallerContainer.children[0], SMALLERDISABLEBUTTON, SMALLERBUTTON);
+                await changeImage(this.smallerContainer.children[0], SMALLERDISABLEBUTTON, SMALLERBUTTON);
             }
 
             if (BLOCKSCALES[this.blockscale] === 4) {
-                changeImage(this.largerContainer.children[0], BIGGERBUTTON, BIGGERDISABLEBUTTON);
+                await changeImage(this.largerContainer.children[0], BIGGERBUTTON, BIGGERDISABLEBUTTON);
             } else {
-                changeImage(this.largerContainer.children[0], BIGGERDISABLEBUTTON, BIGGERBUTTON);
+                await changeImage(this.largerContainer.children[0], BIGGERDISABLEBUTTON, BIGGERBUTTON);
             }
         };
+
 
         /*
          * Based on the active palette, remove a plugin palette from local storage.
