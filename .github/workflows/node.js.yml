@@ -30,3 +30,23 @@ jobs:
 
     - run: npm ci
     - run: npm run build --if-present
+  mac-build:
+      runs-on: macos-latest
+
+      strategy:
+        matrix:
+          node-version: [12.x, 14.x]
+
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v2
+          with:
+            fetch-depth: 0
+
+        - name: Use Node.js ${{ matrix.node-version }}
+          uses: actions/setup-node@v1
+          with:
+            node-version: ${{ matrix.node-version }}
+
+        - run: npm ci
+        - run: npm run build --if-present
