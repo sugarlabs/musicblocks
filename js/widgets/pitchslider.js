@@ -51,7 +51,7 @@ class PitchSlider {
         }
 
         this._cellScale = 1.0;
-        this.widgetWindow = window.widgetWindows.windowFor(this, "pitch slider", "slider", false);
+        this.widgetWindow = window.widgetWindows.windowFor(this, "pitch slider", "slider", true);
         this.widgetWindow.onclose = () => {
             for (const osc of oscillators) osc.triggerRelease();
             this.widgetWindow.destroy();
