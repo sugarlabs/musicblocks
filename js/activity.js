@@ -2283,7 +2283,7 @@ class Activity {
                         this.textMsg("Alt-R " + _("Play"));
                         const stopButton = document.getElementById("stop");
                         if (stopButton) {
-                            stopButton.style.color = "#ea174c";
+                            stopButton.style.color = this.toolbar.stopIconColorWhenPlaying;
                         }
                         this._doFastButton();
                         break;
