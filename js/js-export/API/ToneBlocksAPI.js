@@ -27,6 +27,53 @@
  * @classdesc methods are imported by a importMethod function call from MusicBlocks class.
  */
 class ToneBlocksAPI {
+
+    async handleNoteValueButtonClick() {
+        const setInstrumentSidebar = document.getElementById('setInstrumentSidebar');
+        const startSidebar = document.getElementById('startSidebar'); 
+        if (!setInstrumentSidebar.classList.contains('expanded')) {
+            expandSetInstrumentSidebar(setInstrumentSidebar);
+        } else {
+            contractSetInstrumentSidebar(setInstrumentSidebar);
+        }
+        if (!startSidebar.classList.contains('expanded')) {
+            expandStartSidebar(startSidebar);
+        } else {
+            contractStartSidebar(startSidebar);
+        }
+    }
+
+    async expandSetInstrumentSidebar(sidebar) {
+        sidebar.style.width = '300px'; // Set the desired width
+        sidebar.classList.add('expanded');
+        console.log('Expanding setInstrument sidebar');
+    }
+
+    async contractSetInstrumentSidebar(sidebar) {
+        sidebar.style.width = '0';
+        sidebar.classList.remove('expanded');
+        console.log('Contracting setInstrument sidebar');
+    }
+
+    async expandStartSidebar(sidebar) {
+        sidebar.style.width = '250px'; // Set the desired width
+        sidebar.classList.add('expanded');
+        console.log('Expanding start sidebar');
+    }
+
+    async contractStartSidebar(sidebar) {
+        sidebar.style.width = '0';
+        sidebar.classList.remove('expanded');
+        console.log('Contracting start sidebar');
+    }
+
+    addNoteValueButtonEventListener() {
+        const noteValueButton = document.getElementById('noteValueButton'); // Replace with your actual button ID
+        noteValueButton.addEventListener('click', () => {
+            this.handleNoteValueButtonClick();
+        });
+    }
+
     async setInstrument(instrument, flow) {
         const args = JSInterface.validateArgs("setInstrument", [instrument, flow]);
         await this.runCommand("setTimbre", [args[0], this.turIndex]);
