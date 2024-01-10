@@ -380,7 +380,7 @@ class JSEditor {
         const helpBtn = docById("js_editor_help_btn");
         if(helpBtn)
         helpBtn.style.color = "white"; 
-        this._showingHelp = !this._showingHelp;
+        this._showingHelp = false;
     }
 
     /**
