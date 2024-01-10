@@ -377,6 +377,10 @@ class JSEditor {
         this._code = JSGenerate.code;
         this._jar.updateCode(this._code);
         this._setLinesCount(this._code);
+        const helpBtn = docById("js_editor_help_btn");
+        if(helpBtn)
+        helpBtn.style.color = "white"; 
+        this._showingHelp = !this._showingHelp;
     }
 
     /**
