@@ -248,21 +248,27 @@ class Activity {
         this.storage = localStorage;
 
         this.beginnerMode = true;
+
         try {
-            if (this.storage.beginnerMode === undefined) {
-                this.firstTimeUser = true;
-            } else if (this.storage.beginnerMode !== null) {
-                this.beginnerMode = this.storage.beginnerMode;
-                if (typeof this.beginnerMode === "string") {
-                    if (this.beginnerMode === "false") {
-                        this.beginnerMode = false;
+            if (typeof Storage !== "undefined" && localStorage !== null) {
+
+                if (this.storage.beginnerMode === undefined) {
+                    this.firstTimeUser = true;
+                } else if (this.storage.beginnerMode !== null) {
+                    this.beginnerMode = this.storage.beginnerMode;
+                    if (typeof this.beginnerMode === "string") {
+                        if (this.beginnerMode === "false") {
+                            this.beginnerMode = false;
+                        }
                     }
                 }
+            } else {
+                console.warn("LocalStorage is not available. Defaulting to beginnerMode=true.");
             }
         } catch (e) {
-            // eslint-disable-next-line no-console
-            console.error(e);
+            console.error("Error while initializing beginnerMode:", e);
         }
+
 
         try {
             let lang = "en";
