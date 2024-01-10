@@ -31,7 +31,7 @@
     js/logo.js
         NOINPUTERRORMSG
     js/utils/musicutils.js
-        MUSICALMODES, MODE_PIE_MENUS, getNote, getModeLength
+        MUSICALMODES, MODE_PIE_MENUS, getNote, getModeLength, NOTESTEP
     js/turtle-singer.js
         Singer
     js/js-export/export.js
@@ -71,11 +71,34 @@ function setupIntervalsActions(activity) {
          * @returns {String}
          */
         static GetIntervalNumber(turtle) {
-            const intervals = activity.turtles.ithTurtle(turtle).singer.intervals;
-            let totalIntervals = 0;
-            for (let i = 0; i < intervals.length; i++) {
-                totalIntervals += intervals[i];
+            const tur = activity.turtles.ithTurtle(turtle);
+            const noteStatus = tur.singer.noteStatus;
+            const notePitches = tur.singer.notePitches;
+            let a='C', b='C', octave=0;
+            
+            
+            if (noteStatus && noteStatus[0])
+            {
+                if (!noteStatus[0][1]) return 0;   
+                    a = noteStatus[0][0].substring(0, noteStatus[0][0].length - 1);
+            b = noteStatus[0][1].substring(0, noteStatus[0][1].length - 1);
+            const octavea = parseInt(noteStatus[0][0].substring(noteStatus[0][0].length - 1));
+            const octaveb = parseInt(noteStatus[0][1].substring(noteStatus[0][1].length - 1));
+            octave = octaveb - octavea;
+            } else if (notePitches) {
+                const pitchBlk = notePitches[last(tur.singer.inNoteBlock)];
+                a = pitchBlk[0];
+                b = pitchBlk[pitchBlk.length - 1];
             }
+            
+            
+            let totalIntervals = Math.abs(NOTESTEP[a]-NOTESTEP[b]);
+            
+            while (octave) {
+                totalIntervals += 12;
+                octave--;
+            }
+            
             return totalIntervals;
         }
 
@@ -384,8 +407,8 @@ function setupIntervalsActions(activity) {
             const len = activity.logo.temperamentSelected.length;
 
             if (
-                activity.logo.temperamentSelected[len - 1]
-                    !== activity.logo.temperamentSelected[len - 2]
+                activity.logo.temperamentSelected[len - 1] !==
+                activity.logo.temperamentSelected[len - 2]
             ) {
                 activity.logo.synth.changeInTemperament = true;
             }
