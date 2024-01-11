@@ -464,6 +464,7 @@ class HelpWidget {
         this._helpDiv.insertAdjacentHTML("afterbegin", helpDivHTML) ;
 
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
+        
         if (keepCenter){
             this.widgetWindow.sendToCenter();
         }
