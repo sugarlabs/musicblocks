@@ -2234,6 +2234,7 @@ class Activity {
             const KEYCODE_DOWN = 40;
             const DEL = 46;
             const V = 86;
+            const ENTER = 13;
 
             // Shortcuts for creating new notes
             const KEYCODE_D = 68; // do
@@ -2260,7 +2261,7 @@ class Activity {
                 }
             }
 
-            if (event.altKey && !disableKeys) {
+            if ((event.altKey && !disableKeys) || (event.keyCode == 13) ) {
                 switch (event.keyCode) {
                     case 66: // 'B'
                         this.textMsg("Alt-B " + _("Saving block artwork"));
@@ -2277,8 +2278,20 @@ class Activity {
                         this.textMsg("Alt-E " + _("Erase"));
                         this._allClear(false);
                         break;
-                    case 82: // 'R'
+                    case 82: // 'R or ENTER'
                         this.textMsg("Alt-R " + _("Play"));
+                        let stopbtn = document.getElementById("stop");
+                        if (stopbtn) {
+                            stopbtn.style.color = platformColor.stopIconcolor;
+                        }
+                        this._doFastButton();
+                        break;
+                    case 13: // 'R or ENTER'
+                        this.textMsg("ENter " + _("Play"));
+                        let stopbt = document.getElementById("stop");
+                        if (stopbt) {
+                            stopbt.style.color = platformColor.stopIconcolor;
+                        }
                         this._doFastButton();
                         break;
                     case 83: // 'S'
