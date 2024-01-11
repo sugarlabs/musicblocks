@@ -439,7 +439,7 @@ class HelpWidget {
         this.appendedBlockList.push(...this.beginnerBlocks);
         this.appendedBlockList.push(...this.advancedBlocks);
 
-        this._blockHelp(this.activity.blocks.protoBlockDict[this.appendedBlockList[0]]);
+        this._blockHelp(this.activity.blocks.protoBlockDict[this.appendedBlockList[0]], true);
     }
 
     /**
@@ -449,7 +449,7 @@ class HelpWidget {
      * @param {ProtoBlock} block
      * @returns {void}
      */
-    _blockHelp(block) {
+    _blockHelp(block, keepCenter=false) {
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
@@ -464,7 +464,7 @@ class HelpWidget {
         this._helpDiv.insertAdjacentHTML("afterbegin", helpDivHTML) ;
 
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
-        if (block.name === "rhythm2"){ // Temporary Fix need a better solution
+        if (keepCenter){
             this.widgetWindow.sendToCenter();
         }
         let cell = docById("right-arrow");
