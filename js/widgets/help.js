@@ -43,9 +43,9 @@ class HelpWidget {
         this.isOpen = true;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help", false);
-        widgetWindow.getWidgetBody().style.overflowY = "auto";
+       //widgetWindow.getWidgetBody().style.overflowY = "auto";
         // const canvasHeight = docById("myCanvas").getBoundingClientRect().height;
-        widgetWindow.getWidgetBody().style.maxHeight = "500px";
+        widgetWindow.getWidgetBody().style.maxHeight = "70vh";
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -214,7 +214,7 @@ class HelpWidget {
 
                 if (message) {
                     const helpBody = docById("helpBodyDiv");
-                    helpBody.style.height = "";
+                    helpBody.style.height = "70vh";
 
                     let body = "";
                     if (message.length > 1) {
@@ -456,7 +456,7 @@ class HelpWidget {
         this._helpDiv = document.createElement("div");
 
         //this._helpDiv.style.width = "500px";
-        this._helpDiv.style.height = "500px";
+        this._helpDiv.style.height = "70vh";
         this._helpDiv.style.backgroundColor = "#e8e8e8";
         
         const helpDivHTML =
@@ -546,7 +546,7 @@ class HelpWidget {
             const message = block.helpString;
 
             const helpBody = docById("helpBodyDiv");
-            helpBody.style.height = "500px";
+            helpBody.style.height = "70vh";
             helpBody.style.backgroundColor = "#e8e8e8";
             if (message) {
                 let body = "";

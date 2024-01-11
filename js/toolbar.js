@@ -11,7 +11,7 @@
 
 /*
   global _, jQuery, _THIS_IS_MUSIC_BLOCKS_, docById, doSVG, fnBrowserDetect,
-  RECORDBUTTON
+  RECORDBUTTON, platformColor
  */
 
 /* exported Toolbar */
@@ -24,7 +24,7 @@ class Toolbar {
      * @constructor
      */
     constructor() {
-        this.stopIconColorWhenPlaying = "#ea174c";
+        this.stopIconColorWhenPlaying = window.platformColor.stopIconcolor;
         this.language = localStorage.languagePreference;
         if (this.language === undefined) {
             this.language = navigator.language;
