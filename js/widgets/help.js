@@ -41,6 +41,7 @@ class HelpWidget {
         this.appendedBlockList = [];
         this.index = 0;
         this.isOpen = true;
+        this.is_dragging=false;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help", false);
         widgetWindow.getWidgetBody().style.overflowY = "auto";
@@ -56,12 +57,39 @@ class HelpWidget {
         };
         // Position the widget and make it visible.
         this._helpDiv = document.createElement("div");
-
+        function startDragging(e) {
+            console.log(e.target.id);
+            if (e.target.id === 'help') {
+                const help = document.getElementById('help');
+        
+                this.isDragging = true;
+                offsetX = e.clientX - e.target.getBoundingClientRect().left;
+                offsetY = e.clientY - e.target.getBoundingClientRect().top;
+        
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', stopDragging);
+            }
+        }
+        
+        function handleMouseMove(e) {
+            if (this.isDragging) {
+                const help = document.getElementById('help');
+                help.style.left = e.clientX - offsetX + 'px';
+                help.style.top = e.clientY - offsetY + 'px';
+            }
+        }
+        
+        function stopDragging() {
+            this.isDragging = false;
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', stopDragging);
+        }
         // Give the DOM time to create the div.
         setTimeout(() => this._setup(useActiveBlock, 0), 0);
 
         // Position center
         setTimeout(this.widgetWindow.sendToCenter, 50);
+        this._helpDiv.addEventListener('dblclick', startDragging);
     }
 
     /**
@@ -450,10 +478,12 @@ class HelpWidget {
      * @returns {void}
      */
     _blockHelp(block) {
+        let old_left=this._helpDiv.style.left;
+        let old_top=this._helpDiv.top;
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
-        this._helpDiv = document.createElement("div");
+        this._helpDiv = document.createElement("div");        
 
         //this._helpDiv.style.width = "500px";
         this._helpDiv.style.height = "500px";
@@ -462,9 +492,36 @@ class HelpWidget {
         const helpDivHTML =
             '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpBodyDiv" tabindex="-1"></div>';
         this._helpDiv.insertAdjacentHTML("afterbegin", helpDivHTML) ;
+        this._helpDiv.style.left=old_left;
+        this._helpDiv.style.top=old_top;
+        function startDragging(e) {
+            console.log(e.target.id);
+            if (e.target.id === 'help') {
+                this.isDragging = true;
+                offsetX = e.clientX - e.target.getBoundingClientRect().left;
+                offsetY = e.clientY - e.target.getBoundingClientRect().top;
+        
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', stopDragging);
+            }
+        }
+        function handleMouseMove(e) {
+            if (this.isDragging) {
+                const help = document.getElementById('help');
+                help.style.left = e.clientX - offsetX + 'px';
+                help.style.top = e.clientY - offsetY + 'px';
+            }
+        }
+        
+        function stopDragging() {
+            this.isDragging = false;
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', stopDragging);
+        }
+        
+        this._helpDiv.addEventListener('dblclick', startDragging);
 
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
-        this.widgetWindow.sendToCenter();
         let cell = docById("right-arrow");
         let rightArrow = docById("right-arrow");
         let leftArrow = docById("left-arrow");
