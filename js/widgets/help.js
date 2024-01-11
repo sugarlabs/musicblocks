@@ -41,7 +41,7 @@ class HelpWidget {
         this.appendedBlockList = [];
         this.index = 0;
         this.isOpen = true;
-        this.is_dragging=false;
+        this.is_dragging = false;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help", false);
        //widgetWindow.getWidgetBody().style.overflowY = "auto";
@@ -58,7 +58,6 @@ class HelpWidget {
 
         // Position the widget and make it visible.
         function startDragging(e) {
-            console.log(e.target.id);
             if (e.target.id === 'help') {
                 const help = document.getElementById('help');
         
@@ -478,8 +477,8 @@ class HelpWidget {
      * @returns {void}
      */
     _blockHelp(block) {
-        let old_left=this._helpDiv.style.left;
-        let old_top=this._helpDiv.top;
+        let old_left = this._helpDiv.style.left;
+        let old_top = this._helpDiv.top;
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
@@ -492,10 +491,9 @@ class HelpWidget {
         const helpDivHTML =
             '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpBodyDiv" tabindex="-1"></div>';
         this._helpDiv.insertAdjacentHTML("afterbegin", helpDivHTML) ;
-        this._helpDiv.style.left=old_left;
-        this._helpDiv.style.top=old_top;
+        this._helpDiv.style.left = old_left;
+        this._helpDiv.style.top = old_top;
         function startDragging(e) {
-            console.log(e.target.id);
             if (e.target.id === 'help') {
                 this.isDragging = true;
                 offsetX = e.clientX - e.target.getBoundingClientRect().left;
