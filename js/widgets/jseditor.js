@@ -377,8 +377,18 @@ class JSEditor {
         this._code = JSGenerate.code;
         this._jar.updateCode(this._code);
         this._setLinesCount(this._code);
-    }
 
+        this._resetHelpButtonColor();
+    }
+    _resetHelpButtonColor() {
+        const helpBtn = docById("js_editor_help_btn");
+        if (helpBtn) {
+            // Always set the help button color to white when generating code
+            helpBtn.style.color = "white";
+        } else {
+            console.warn("Help button not found in the DOM.");
+        }
+    }
     /**
      * Refreshes the line numbers by the code in the editor.
      *
@@ -403,21 +413,29 @@ class JSEditor {
      * @returns {void}
      */
     _toggleHelp() {
-        this._showingHelp = !this._showingHelp;
         const helpBtn = docById("js_editor_help_btn");
-
-        if (this._showingHelp) {
-            helpBtn.style.color = "gold";
-            this._codeBck = this._code;
-            this._jar.updateCode(JS_API);
-            this._setLinesCount(JS_API);
+    
+        if (helpBtn) {
+            
+            helpBtn.style.color = (helpBtn.style.color === "gold") ? "white" : "gold";
+            this._showingHelp = (helpBtn.style.color === "gold");
+    
+            if (this._showingHelp) {
+                
+                this._codeBck = this._code;
+                this._jar.updateCode(JS_API);
+                this._setLinesCount(JS_API);
+            } else {
+                
+                this._jar.updateCode(this._codeBck);
+                this._setLinesCount(this._codeBck);
+                this._code = this._codeBck;
+            }
         } else {
-            helpBtn.style.color = "white";
-            this._jar.updateCode(this._codeBck);
-            this._setLinesCount(this._codeBck);
-            this._code = this._codeBck;
+            console.warn("Help button not found in the DOM.");
         }
     }
+    
 
     /**
      * Triggered when the "change-style" button is pressed.
