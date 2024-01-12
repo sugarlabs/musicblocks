@@ -1831,11 +1831,15 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         if (
             that.value < 1 &&
             (that.blocks.blockList[cblk1].name === "newnote" ||
-                (cblk2 && that.blocks.blockList[cblk2].name == "newnote") ||
-                that.blocks.blockList[cblk1].name === "pitch")
+                (cblk2 && that.blocks.blockList[cblk2].name == "newnote"))
         ) {
             that.value = 0;
-        } else {
+        } else if (that.value < 2 &&
+            that.blocks.blockList[cblk1].name === "pitch"
+        ) {
+            that.value = 1;
+        }
+        else {
             that.value -= 1;
         }
 
