@@ -185,10 +185,13 @@ class LanguageBox {
      * @public
      * @returns {void}
      */
+    OnClick() {
+        this.activity.storage.languagePreference = this._language;
+        window.location.reload();    
+    }
     hide() {
         const MSGPrefix =
-            "<a href='#' " +
-            "onClick='window.location.reload()'" +
+        "<a href='#' class='language-link' " +
             "onMouseOver='this.style.opacity = 0.5'" +
             "onMouseOut='this.style.opacity = 1'>";
         const MSGSuffix = "</a>";
@@ -212,13 +215,20 @@ class LanguageBox {
             quz: "Actualice su navegador para cambiar su preferencia de idioma.",
             gug: "Actualice su navegador para cambiar su preferencia de idioma."
         };
-
-        this.activity.storage.languagePreference = this._language;
-
-        if (this._language === "ja" && this.activity.storage.kanaPreference === "kana") {
-            this.activity.textMsg(MSGPrefix + MSG["kana"] + MSGSuffix);
-        } else {
-            this.activity.textMsg(MSGPrefix + MSG[this._language] + MSGSuffix);
+        if (localStorage.getItem("languagePreference") === this._language) {
+            this.activity.textMsg(_("Music Blocks is already set to this language."));
         }
+        else{
+            if (this._language === "ja" && this.activity.storage.kanaPreference === "kana") {
+                this.activity.textMsg(MSGPrefix + MSG["kana"] + MSGSuffix);
+            } else {
+                this.activity.textMsg(MSGPrefix + MSG[this._language] + MSGSuffix);
+            }
+        }
+
+         const languageLinks = document.querySelectorAll('.language-link');
+         languageLinks.forEach(link => {
+             link.addEventListener('click', () => this.OnClick());
+         });
     }
 }

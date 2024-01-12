@@ -284,6 +284,9 @@ msgid "Expand"
 msgstr "カンバスをかくだい"
 
 #: js/languagebox.js:188
+msgid "Music Blocks is already set to this language."
+msgstr " Music Blocksは既にこの言語に設定されています。"
+
 msgid "Refresh your browser to change your language preference."
 msgstr "言語を変えるには、ブラウザをこうしんしてください。"
 

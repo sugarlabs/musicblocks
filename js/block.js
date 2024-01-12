@@ -4064,6 +4064,22 @@ class Block {
                 this.activity.refreshCanvas();
                 this.value = oldValue;
             }
+            
+            if(this.blocks.blockList[cblk1].name === "pitch" && (this.value > 10 || this.value < 1)) {
+                const thisBlock = this.blocks.blockList.indexOf(this);
+                this.activity.errorMsg(_("Octave value must be between 1 and 10."), thisBlock);
+                this.activity.refreshCanvas();
+                this.label.value = oldValue;
+                this.value = oldValue;
+            }
+
+            if(String(this.value).length > 12) {
+                const thisBlock = this.blocks.blockList.indexOf(this);
+                this.activity.errorMsg(_("Numbers can have at most 12 digits."), thisBlock);
+                this.activity.refreshCanvas();
+                this.label.value = oldValue;
+                this.value = oldValue;
+            }
         } else {
             this.value = newValue;
         }

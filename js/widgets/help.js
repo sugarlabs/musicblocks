@@ -43,9 +43,9 @@ class HelpWidget {
         this.isOpen = true;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help", false);
-        widgetWindow.getWidgetBody().style.overflowY = "auto";
+       //widgetWindow.getWidgetBody().style.overflowY = "auto";
         // const canvasHeight = docById("myCanvas").getBoundingClientRect().height;
-        widgetWindow.getWidgetBody().style.maxHeight = "500px";
+        widgetWindow.getWidgetBody().style.maxHeight = "70vh";
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -58,7 +58,7 @@ class HelpWidget {
         this._helpDiv = document.createElement("div");
 
         // Give the DOM time to create the div.
-        setTimeout(() => this._setup(useActiveBlock), 0);
+        setTimeout(() => this._setup(useActiveBlock, 0), 0);
 
         // Position center
         setTimeout(this.widgetWindow.sendToCenter, 50);
@@ -69,9 +69,8 @@ class HelpWidget {
      * @param {useActiveBlock} Show help for the active block.
      * @returns {void}
      */
-    _setup(useActiveBlock) {
+    _setup(useActiveBlock, page) {
         // Which help page are we on?
-        let page = 0;
 
         this._helpDiv.style.width = 100 +"%";
         this._helpDiv.style.backgroundColor = "#e8e8e8";
@@ -92,7 +91,12 @@ class HelpWidget {
 
         let leftArrow, rightArrow;
         if (!useActiveBlock) {
-            this.widgetWindow.updateTitle(_("Take a tour"));
+            if (page == 0) {
+                this.widgetWindow.updateTitle("TAKE A TOUR");
+            }
+            else {
+                this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
+            }
             rightArrow = document.getElementById("right-arrow");
             rightArrow.style.display = "block";
             rightArrow.classList.add("hover");
@@ -117,6 +121,12 @@ class HelpWidget {
                     if (page > 0){
                         page = page - 1;
                         leftArrow.classList.remove('disabled');
+                        if (page == 0) {
+                            this.widgetWindow.updateTitle("TAKE A TOUR");
+                        }
+                        else {
+                            this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
+                        }
                         this._showPage(page);
                     }
                     if (page === 0){
@@ -132,14 +142,24 @@ class HelpWidget {
                 if (page === HELPCONTENT.length) {
                     page = 0;
                 }
-
+                if (page == 0) {
+                    this.widgetWindow.updateTitle("TAKE A TOUR");
+                }
+                else {
+                    this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
+                }
                 this._showPage(page);
             };
         } else {
             if (this.activity.blocks.activeBlock.name !== null) {
                 const label = this.activity.blocks.blockList[this.activity.blocks.activeBlock]
                     .protoblock.staticLabels[0];
-                this.widgetWindow.updateTitle(_(label));
+                    if (page == 0) {
+                        this.widgetWindow.updateTitle("TAKE A TOUR");
+                    }
+                    else {
+                        this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
+                    }
             }
 
             rightArrow = document.getElementById("right-arrow");
@@ -155,7 +175,7 @@ class HelpWidget {
             // display help menu
             docById("helpBodyDiv").style.height = "325px";
             docById("helpBodyDiv").style.width = "345px";
-            this._showPage(0);
+            this._showPage(page);
         } else {
             // display help for this block
             if (this.activity.blocks.activeBlock.name !== null) {
@@ -194,7 +214,7 @@ class HelpWidget {
 
                 if (message) {
                     const helpBody = docById("helpBodyDiv");
-                    helpBody.style.height = "";
+                    helpBody.style.height = "70vh";
 
                     let body = "";
                     if (message.length > 1) {
@@ -343,6 +363,43 @@ class HelpWidget {
                 this._prepareBlockList();
             };
         }
+        else{
+            const cell = docById("right-arrow");
+            let leftArrow = docById("left-arrow");
+            cell.onclick = () => {
+                page = page + 1;
+                leftArrow.classList.remove('disabled');
+                if (page === HELPCONTENT.length) {
+                    page = 0;
+                }
+                if (page == 0) {
+                    this.widgetWindow.updateTitle("TAKE A TOUR");
+                }
+                else {
+                    this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
+                }
+                this._showPage(page);
+            };
+            if (page === 0){
+                leftArrow.classList.add('disabled');
+            }
+            leftArrow.onclick = () => {
+                    if (page > 0){
+                        page = page - 1;
+                        leftArrow.classList.remove('disabled');
+                        if (page == 0) {
+                            this.widgetWindow.updateTitle("TAKE A TOUR");
+                        }
+                        else {
+                            this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
+                        }
+                        this._showPage(page);
+                    }
+                    if (page === 0){
+                        leftArrow.classList.add('disabled');
+                    }
+            };
+        }
 
         helpBody.style.color = "#505050";
         helpBody.insertAdjacentHTML("afterbegin", body) ;
@@ -399,7 +456,7 @@ class HelpWidget {
         this._helpDiv = document.createElement("div");
 
         //this._helpDiv.style.width = "500px";
-        this._helpDiv.style.height = "500px";
+        this._helpDiv.style.height = "70vh";
         this._helpDiv.style.backgroundColor = "#e8e8e8";
         
         const helpDivHTML =
@@ -407,7 +464,6 @@ class HelpWidget {
         this._helpDiv.insertAdjacentHTML("afterbegin", helpDivHTML) ;
 
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
-        this.widgetWindow.sendToCenter();
         let cell = docById("right-arrow");
         let rightArrow = docById("right-arrow");
         let leftArrow = docById("left-arrow");
@@ -418,12 +474,12 @@ class HelpWidget {
             } else if (event.key === 'ArrowRight') {
                 rightArrow.click(); 
             }
-        } ; 
+        };
 
         if(this.index == this.appendedBlockList.length - 1)
         {
-           rightArrow.classList.add("disabled") ;       
-        }
+           rightArrow.classList.add("disabled");
+        }
         cell.onclick = () => {
             if (this.index !== this.appendedBlockList.length - 1) {
                 this.index += 1;
@@ -436,13 +492,19 @@ class HelpWidget {
         cell = docById("left-arrow");
 
         cell.onclick = () => {
-            if (this.index !== 0) {
-                this.index -= 1;
+            if (this.index == 0) {
+                const widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
+                this.widgetWindow = widgetWindow;
+                widgetWindow.clear();
+                this._helpDiv = document.createElement("div");
+                this._setup(false, HELPCONTENT.length-1);
             }
-
-            this._blockHelp(
+            else {
+             this.index -= 1;
+             this._blockHelp (
                 this.activity.blocks.protoBlockDict[this.appendedBlockList[this.index]]
-            );
+             );
+            }
         };
         if (block.name !== null) {
             const label = block.staticLabels[0];
@@ -481,7 +543,7 @@ class HelpWidget {
             const message = block.helpString;
 
             const helpBody = docById("helpBodyDiv");
-            helpBody.style.height = "500px";
+            helpBody.style.height = "70vh";
             helpBody.style.backgroundColor = "#e8e8e8";
             if (message) {
                 let body = "";
