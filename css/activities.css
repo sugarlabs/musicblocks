@@ -284,25 +284,12 @@ nav .nav-container {
     padding: 0 0px;
 }
 
-/* nav .logo {
-    padding-left: 12px;
-} */
 
 nav h1 {
     font-size: 32px;
     position: relative;
     top: -12px;
     display: inline;
-}
-
-nav img {
-    height: 70%;
-    /* width: 48px; */
-    margin-top: 8px;
-    transition: background-color 0.3s ease;
-}
-nav #mb-logo:hover {
-    background-color: rgba(0, 0, 0, 0.1);
 }
 
 nav imghover {
