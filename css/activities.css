@@ -284,9 +284,9 @@ nav .nav-container {
     padding: 0 0px;
 }
 
-nav .logo {
+/* nav .logo {
     padding-left: 12px;
-}
+} */
 
 nav h1 {
     font-size: 32px;
@@ -296,10 +296,13 @@ nav h1 {
 }
 
 nav img {
-    height: 48px;
-    width: 48px;
-    margin-top: 6px;
-    border-radius: 100%;
+    height: 70%;
+    /* width: 48px; */
+    margin-top: 8px;
+    transition: background-color 0.3s ease;
+}
+nav #mb-logo:hover {
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 nav imghover {
