@@ -1179,7 +1179,7 @@ class Painter {
                 this.turtle.doTurtleShell(
                     55,
                     "data:image/svg+xml;base64," +
-                        window.btoa(unescape(encodeURIComponent(artwork)))
+                        window.btoa(decodeURI(encodeURIComponent(artwork)))
                 );
                 this.turtle.skinChanged = false;
             }
