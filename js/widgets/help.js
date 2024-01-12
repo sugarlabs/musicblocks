@@ -464,7 +464,6 @@ class HelpWidget {
         this._helpDiv.insertAdjacentHTML("afterbegin", helpDivHTML) ;
 
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
-        this.widgetWindow.sendToCenter();
         let cell = docById("right-arrow");
         let rightArrow = docById("right-arrow");
         let leftArrow = docById("left-arrow");
