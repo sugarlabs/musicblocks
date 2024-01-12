@@ -284,22 +284,12 @@ nav .nav-container {
     padding: 0 0px;
 }
 
-nav .logo {
-    padding-left: 12px;
-}
 
 nav h1 {
     font-size: 32px;
     position: relative;
     top: -12px;
     display: inline;
-}
-
-nav img {
-    height: 48px;
-    width: 48px;
-    margin-top: 6px;
-    border-radius: 100%;
 }
 
 nav imghover {
