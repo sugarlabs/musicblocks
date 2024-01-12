@@ -920,6 +920,6 @@ Turtle.TurtleView = class {
             activity.refreshCanvas();
         };
 
-        img.src = "data:image/svg+xml;base64," + window.btoa(decodeURI(encodeURIComponent(data)));
+        img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(data)));
     }
 };

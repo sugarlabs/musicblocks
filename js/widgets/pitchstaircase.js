@@ -145,7 +145,7 @@ class PitchStaircase {
             const svgData =
                 "data:image/svg+xml;base64," +
                 window.btoa(
-                    decodeURI(
+                    unescape(
                         encodeURIComponent(
                             SYNTHSVG.replace(/SVGWIDTH/g, svgWidth)
                                 .replace(/XSCALE/g, svgScale)

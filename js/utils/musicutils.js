@@ -598,19 +598,19 @@ const MATRIXBUTTONHEIGHT2 = 66;
 const MATRIXSOLFEHEIGHT = 30;
 
 const wholeNoteImg =
-    "data:image/svg+xml;base64," + window.btoa(decodeURI(encodeURIComponent(WHOLENOTE)));
+    "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(WHOLENOTE)));
 const halfNoteImg =
-    "data:image/svg+xml;base64," + window.btoa(decodeURI(encodeURIComponent(HALFNOTE)));
+    "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(HALFNOTE)));
 const quarterNoteImg =
-    "data:image/svg+xml;base64," + window.btoa(decodeURI(encodeURIComponent(QUARTERNOTE)));
+    "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(QUARTERNOTE)));
 const eighthNoteImg =
-    "data:image/svg+xml;base64," + window.btoa(decodeURI(encodeURIComponent(EIGHTHNOTE)));
+    "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(EIGHTHNOTE)));
 const sixteenthNoteImg =
-    "data:image/svg+xml;base64," + window.btoa(decodeURI(encodeURIComponent(SIXTEENTHNOTE)));
+    "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(SIXTEENTHNOTE)));
 const thirtysecondNoteImg =
-    "data:image/svg+xml;base64," + window.btoa(decodeURI(encodeURIComponent(THIRTYSECONDNOTE)));
+    "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(THIRTYSECONDNOTE)));
 const sixtyfourthNoteImg =
-    "data:image/svg+xml;base64," + window.btoa(decodeURI(encodeURIComponent(SIXTYFOURTHNOTE)));
+    "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(SIXTYFOURTHNOTE)));
 
 const NOTESYMBOLS = {
     1: wholeNoteImg,

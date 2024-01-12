@@ -84,7 +84,7 @@ class Trashcan {
         img.src =
             "data:image/svg+xml;base64," +
             window.btoa(
-                decodeURI(encodeURIComponent(BORDER.replace("stroke_color", highlightString)))
+                unescape(encodeURIComponent(BORDER.replace("stroke_color", highlightString)))
             );
     }
 
@@ -106,7 +106,7 @@ class Trashcan {
         img.src =
             "data:image/svg+xml;base64," +
             window.btoa(
-                decodeURI(
+                unescape(
                     encodeURIComponent(BORDER.replace("stroke_color", platformColor.trashBorder))
                 )
             );
@@ -133,7 +133,7 @@ class Trashcan {
         img.src =
             "data:image/svg+xml;base64," +
             window.btoa(
-                decodeURI(
+                unescape(
                     encodeURIComponent(TRASHICON.replace(/fill_color/g, platformColor.trashBorder))
                 )
             );
