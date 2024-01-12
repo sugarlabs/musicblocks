@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-// The trashcan is an area at the bottom of the screen where stacks of
+// The trashcan is an area at the bottom-right of the screen where stacks of
 // blocks can be dragged. Once in the trash area, they are marked as
 // trash and hidden. There is a menu button that can be used to
 // restore trash.
@@ -145,32 +145,10 @@ class Trashcan {
      * @returns {void}
      */
     updateContainerPosition() {
-        const expandCollapseBtn = document.getElementById("Expand/collapse blocks");
-        if (expandCollapseBtn) {
-            const expandCollapseBlocksPosition = expandCollapseBtn.getBoundingClientRect();
-            const offsetPercentageFromBottom =
-                1 - expandCollapseBlocksPosition.top / window.innerHeight;
-            const offsetPercentageFromRight =
-                1 - expandCollapseBlocksPosition.left / window.innerWidth;
-            const offsetFromBottom = window.innerHeight * offsetPercentageFromBottom;
-            const offsetFromRight = window.innerWidth * offsetPercentageFromRight;
-
-            this._container.x =
-                window.innerWidth / this._scale -
-                Trashcan.TRASHWIDTH -
-                (offsetFromRight -
-                    expandCollapseBtn.offsetWidth -
-                    (Trashcan.TRASHHEIGHT - expandCollapseBtn.offsetWidth) / 2);
-            this._container.y =
-                window.innerHeight / this._scale -
-                Trashcan.TRASHHEIGHT -
-                offsetFromBottom -
-                (expandCollapseBtn.nextElementSibling.offsetLeft -
-                    (expandCollapseBtn.previousElementSibling.offsetLeft +
-                        expandCollapseBtn.previousElementSibling.offsetWidth)) /
-                    (expandCollapseBtn.parentNode.childElementCount);
-            clearInterval(this._animationInterval);
-        }
+        this._container.x =
+            window.innerWidth / this._scale - Trashcan.TRASHWIDTH - 2 * this._iconsize;
+        this._container.y =
+            window.innerHeight / this._scale - Trashcan.TRASHHEIGHT - (5 / 4) * this._iconsize;
     }
 
     shouldResize(newWidth, newHeight) {
