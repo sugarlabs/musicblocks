@@ -270,8 +270,6 @@ function setupIntervalsBlocks(activity) {
                 "documentation",
                 ""
             ]);
-            this.beginnerBlock(true);
-            this.hidden = true;
             this.formBlock({ outType: "numberout" });
         }
 
