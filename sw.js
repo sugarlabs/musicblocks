@@ -84,7 +84,7 @@ self.addEventListener("fetch", function (event) {
 
                 return response;
             },
-            function () {
+           async function () {
                 // The response was not found in the cache so we look
                 // for it on the server
                 return fetch(event.request)

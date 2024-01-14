@@ -16,7 +16,7 @@
    NOINPUTERRORMSG, NANERRORMSG, INVALIDPITCH, getNote, pitchToNumber,
    TURTLESVG, _THIS_IS_MUSIC_BLOCKS_, getMunsellColor
 */
-import { base64Encode } from "../base64Utils";
+
 /* exported setupEnsembleBlocks, getTargetTurtle */
 
 /**

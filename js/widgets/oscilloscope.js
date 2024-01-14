@@ -32,7 +32,7 @@
          
 */
 /* exported Oscilloscope */
-import { base64Encode } from "../base64Utils";
+
 /**
  * @class
  * @classdesc pertains to setting up all features of the Oscilloscope Widget.
