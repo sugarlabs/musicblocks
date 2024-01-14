@@ -1746,7 +1746,7 @@ class Activity {
                 that.msgText = text;
             };
 
-            img.src = "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(svgData)));
+            img.src = "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(svgData)))));
         };
 
         /*
@@ -4370,7 +4370,7 @@ class Activity {
             };
 
             const img = new Image();
-            img.src = "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(name)));
+            img.src = "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(name)))));
 
             container.appendChild(img);
             container.setAttribute(
@@ -4512,7 +4512,7 @@ class Activity {
                 }
             };
 
-            img.src = "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(svgData)));
+            img.src = "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(svgData)))));
         };
 
         /*
@@ -4945,28 +4945,28 @@ class Activity {
             this.stage.enableMouseOver(10); // default is 20
 
             this.cartesianBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(CARTESIAN)))
+                "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(CARTESIAN)))))
             );
             this.polarBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(POLAR)))
+                "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(POLAR)))))
             );
             this.trebleBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(TREBLE)))
+                "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(TREBLE)))))
             );
             this.grandBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(GRAND)))
+                "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(GRAND)))))
             );
             this.sopranoBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(SOPRANO)))
+                "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(SOPRANO)))))
             );
             this.altoBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(ALTO)))
+                "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(ALTO)))))
             );
             this.tenorBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(TENOR)))
+                "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(TENOR)))))
             );
             this.bassBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(BASS)))
+                "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(BASS)))))
             );
 
             // We use G (one sharp) and F (one flat) as prototypes for all
@@ -4975,40 +4975,40 @@ class Activity {
             // horizonally so as not to overlap.
             for (let i = 0; i < 7; i++) {
                 this.grandSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(GRAND_G)))
+                    "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(GRAND_G)))))
                 );
                 this.grandFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(GRAND_F)))
+                    "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(GRAND_F)))))
                 );
                 this.trebleSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(TREBLE_G)))
+                    "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(TREBLE_G)))))
                 );
                 this.trebleFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(TREBLE_F)))
+                    "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(TREBLE_F)))))
                 );
                 this.sopranoSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(TREBLE_G)))
+                    "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(TREBLE_G)))))
                 );
                 this.sopranoFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(TREBLE_F)))
+                    "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(TREBLE_F)))))
                 );
                 this.altoSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(TREBLE_G)))
+                    "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(TREBLE_G)))))
                 );
                 this.altoFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(TREBLE_F)))
+                    "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(TREBLE_F)))))
                 );
                 this.tenorSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(TREBLE_G)))
+                    "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(TREBLE_G)))))
                 );
                 this.tenorFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(TREBLE_F)))
+                    "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(TREBLE_F)))))
                 );
                 this.bassSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(TREBLE_G)))
+                    "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(TREBLE_G)))))
                 );
                 this.bassFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(TREBLE_F)))
+                    "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(TREBLE_F)))))
                 );
             }
 

@@ -172,7 +172,7 @@ const _blockMakeBitmap = (data, callback, args) => {
         callback(bitmap, args);
     };
 
-    img.src = "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(data)));
+    img.src = "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(data)))));
 };
 
 // Define block instance objects and any methods that are intra-block.
@@ -856,7 +856,7 @@ class Block {
         if (this.image.search("xmlns") !== -1) {
             image.src =
                 "data:image/svg+xml;base64," +
-                window.btoa(decodeURIComponent(encodeURIComponent(this.image)));
+                window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(this.image)))));
         } else {
             image.src = this.image;
         }
@@ -1392,7 +1392,7 @@ class Block {
 
             image.src =
                 "data:image/svg+xml;base64," +
-                window.btoa(decodeURIComponent(encodeURIComponent(COLLAPSEBUTTON)));
+                window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(COLLAPSEBUTTON)))));
         };
 
         /**
@@ -1425,7 +1425,7 @@ class Block {
 
             image.src =
                 "data:image/svg+xml;base64," +
-                window.btoa(decodeURIComponent(encodeURIComponent(EXPANDBUTTON)));
+                window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(EXPANDBUTTON)))));
         };
 
         /**

@@ -798,7 +798,7 @@ Turtles.TurtlesView = class {
                 }
             };
             const img = new Image();
-            img.src = "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(svg)));
+            img.src = "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(svg)))));
 
             container.appendChild(img);
             container.setAttribute(

@@ -146,6 +146,6 @@ class PasteBox {
             callback(this, name, bitmap, extras);
         };
 
-        img.src = "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(data)));
+        img.src = "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(data)))));
     }
 }

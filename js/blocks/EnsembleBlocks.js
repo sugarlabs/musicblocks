@@ -1064,7 +1064,7 @@ function setupEnsembleBlocks(activity) {
                 .replace(/fill_color/g, fillColor)
                 .replace(/stroke_color/g, strokeColor);
 
-            tur.doTurtleShell(55, "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(artwork))));
+            tur.doTurtleShell(55, "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(artwork))))));
 
             // Restore the heading.
             if (heading != 0) {

@@ -47,7 +47,7 @@ const paletteBlockButtonPush = (blocks, name, arg) => {
 
 const makePaletteIcons = (data, width, height) => {
     const img = new Image();
-    img.src = "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(data)));
+    img.src = "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(data)))));
     if (width) img.width = width;
     if (height) img.height = height;
     return img;
@@ -748,7 +748,7 @@ class PaletteModel {
             label,
             artwork,
             artwork64:
-                "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(artwork))),
+                "data:image/svg+xml;base64," + window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(artwork))))),
             docks,
             image: block.image,
             scale: block.scale,
