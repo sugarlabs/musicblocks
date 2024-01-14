@@ -378,7 +378,7 @@ class JSEditor {
         this._jar.updateCode(this._code);
         this._setLinesCount(this._code);
         const helpBtn = docById("js_editor_help_btn");
-        if(helpBtn) {
+        if (helpBtn) {
             helpBtn.style.color = "white"; 
         }
         this._showingHelp = false;
