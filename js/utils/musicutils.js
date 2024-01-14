@@ -596,7 +596,6 @@ const EIGHTHNOTEWIDTH = 24;
 const MATRIXBUTTONHEIGHT = 40;
 const MATRIXBUTTONHEIGHT2 = 66;
 const MATRIXSOLFEHEIGHT = 30;
-import { base64Encode } from "../base64Utils";
 const wholeNoteImg =
     "data:image/svg+xml;base64," + window.btoa(base64Encode(WHOLENOTE));
 const halfNoteImg =
