@@ -258,7 +258,7 @@ class Tempo {
         const input = this.BPMInputs[i].value;
 
         if (isNaN(input)) {
-            this.activity.errorMsg(_("Invalid input. Please enter a valid number."));
+            this.activity.errorMsg(_("Please enter a number between 30 and 1000"));
             return;
         }
         
