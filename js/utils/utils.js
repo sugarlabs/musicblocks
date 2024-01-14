@@ -43,8 +43,8 @@
 */
 
 const changeImage = (imgElement, from, to) => {
-    const oldSrc = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(from)));
-    const newSrc = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(to)));
+    const oldSrc = "data:image/svg+xml;base64," + window.btoa(base64Encode(from));
+    const newSrc = "data:image/svg+xml;base64," + window.btoa(base64Encode(to));
     if (imgElement.src === oldSrc) {
         imgElement.src = newSrc;
     }
