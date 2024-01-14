@@ -1425,7 +1425,7 @@ class Block {
 
             image.src =
                 "data:image/svg+xml;base64," +
-                window.btoa(base64Encode(EXPANDUTTON));
+                window.btoa(base64Encode(EXPANDBUTTON));
         };
 
         /**
