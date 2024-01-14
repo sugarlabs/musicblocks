@@ -46,7 +46,7 @@
    Activity, LEADING, _THIS_IS_MUSIC_BLOCKS_, _THIS_IS_TURTLE_BLOCKS_,
    globalActivity, hideArrows, doAnalyzeProject
  */
-import { base64Encode } from "./base64Utils";
+
 const LEADING = 0;
 const BLOCKSCALES = [1, 1.5, 2, 3, 4];
 const _THIS_IS_MUSIC_BLOCKS_ = true;

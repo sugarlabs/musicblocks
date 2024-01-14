@@ -15,7 +15,7 @@
 // restore trash.
 
 /* global createjs, platformColor, BORDER, TRASHICON, last */
-import { base64Encode } from "./base64Utils";
+
 /* exported Trashcan */
 
 class Trashcan {

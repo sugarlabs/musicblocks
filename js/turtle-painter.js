@@ -60,7 +60,7 @@ const DEFAULTFONT = "sans-serif"; // also used in PenBlocks.js
  * Unused methods' names begin with double underscore '__'.
  * Internal functions' names are in PascalCase.
  */
-import { base64Encode } from "./base64Utils";
+
 /*exported Painter*/
 
 class Painter {

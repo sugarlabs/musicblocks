@@ -24,7 +24,7 @@
    jQuery, docById, LEADING, CARTESIANBUTTON, piemenuGrid, CLEARBUTTON, COLLAPSEBUTTON,
    EXPANDBUTTON, MBOUNDARY
  */
-import { base64Encode } from "./base64Utils";
+
 /* exported Turtles */
 
 // What is the scale factor when stage is shrunk?

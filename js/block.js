@@ -73,7 +73,7 @@
  */
 
 /* exported Block, $ */
-import { base64Encode } from "./base64Utils";
+
 // Length of a long touch
 const TEXTWIDTH = 240; // 90
 const STRINGLEN = 9;

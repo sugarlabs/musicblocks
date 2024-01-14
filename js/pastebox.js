@@ -23,7 +23,7 @@ const PASTEBOX =
     js/activity.js
         createjs
 */
-import { base64Encode } from "./base64Utils";
+
 /* exported PasteBox */
 class PasteBox {
     /**

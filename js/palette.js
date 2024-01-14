@@ -20,7 +20,7 @@
    STANDARDBLOCKHEIGHT, CLOSEICON, BUILTINPALETTES,
    safeSVG, blockIsMacro, getMacroExpansion
 */
-import { base64Encode } from "./base64Utils";
+
 /* exported Palettes, initPalettes */
 
 // All things related to palettes

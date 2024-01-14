@@ -20,7 +20,7 @@
 /*
    exported PlanetInterface
  */
-import { base64Encode } from "./base64Utils";
+
 class PlanetInterface {
     constructor(activity) {
         this.planet = null;
