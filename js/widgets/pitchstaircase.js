@@ -144,13 +144,15 @@ class PitchStaircase {
             const svgStrokeWidth = ((3 * 55) / cellWidth).toString();
             const svgData =
                 "data:image/svg+xml;base64," +
-                window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(
+                window.btoa(
+                    decodeURIComponent(
+                        encodeURIComponent(
                             SYNTHSVG.replace(/SVGWIDTH/g, svgWidth)
                                 .replace(/XSCALE/g, svgScale)
                                 .replace(/STOKEWIDTH/g, svgStrokeWidth)
                         )
                     )
-                )));
+                );
             stepCell.style.backgroundImage = "url(" + svgData + ")";
             stepCell.style.backgroundRepeat = "no-repeat";
             stepCell.style.backgroundPosition = "center center";
