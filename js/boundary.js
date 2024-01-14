@@ -91,8 +91,7 @@ class Boundary {
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
-                    decodeURIComponent(
-                        encodeURIComponent(
+                    base64Encode(
                             BOUNDARY.replace("HEIGHT", this.h)
                                 .replace("WIDTH", this.w)
                                 .replace("Y", this.y)
@@ -101,8 +100,7 @@ class Boundary {
                                 .replace("DX", this.dx)
                                 .replace("stroke_color", "#e08080")
                         )
-                    )
-                );
+                    );
         };
 
         __makeBoundary();

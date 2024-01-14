@@ -14,4 +14,4 @@ function base64Decode(str) {
     return decoder.decode(uint8Array);
 }
 
-module.exports = { base64Encode, base64Decode };
+export default { base64Encode, base64Decode };
