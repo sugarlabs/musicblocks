@@ -576,6 +576,222 @@ function setupBooleanBlocks(activity) {
      * Represents a block for the equality comparison.
      * @extends {BooleanBlock}
      */
+
+    class LessThanOrEqualToBlock extends BooleanBlock {
+        /**
+         * Constructs a LessThanOrEqualToBlock.
+         */
+        constructor() {
+            super("less_than_or_equal_to");
+
+            /**
+             * Sets the palette for the block.
+             * @param {string} "boolean" - The palette category.
+             * @param {Activity} activity - The activity associated with the block.
+             */
+            this.setPalette("boolean", activity);
+
+            /**
+             * Sets the beginner status for the block.
+             * @param {boolean} true - The beginner status.
+             */
+            this.beginnerBlock(true);
+
+            /**
+             * Sets the help string for the block.
+             * @type {string[]}
+             */
+            this.setHelpString([
+                _(
+                    "The Less-than-or-equal-to block returns True if the top number is less than or equal to the bottom number."
+                ),
+                "documentation",
+                ""
+            ]);
+
+            /**
+             * Sets the font size for the block.
+             * @type {number}
+             */
+            this.fontsize = 14;
+
+            /**
+             * Specifies the parameter of the block.
+             */
+            this.parameter = true;
+
+            /**
+             * Forms the block with specified configuration.
+             * @param {Object} config - The configuration object.
+             * @param {string} config.name - The name of the block.
+             * @param {number} config.args - The number of arguments.
+             * @param {string[]} config.argTypes - The allowed argument types.
+             */
+            this.formBlock({
+                name: "≤",
+                args: 2,
+                argTypes: ["numberin", "numberin"]
+            });
+        }
+
+        /**
+         * Updates the parameter of the block.
+         * @param {Logo} logo - The logo instance.
+         * @param {string} turtle - The turtle identifier.
+         * @param {string} blk - The block identifier.
+         * @returns {string} - The updated parameter value.
+         */
+        updateParameter(logo, turtle, blk) {
+            if (activity.blocks.blockList[blk].value) {
+                return _("true");
+            } else {
+                return _("false");
+            }
+        }
+
+        /**
+         * Handles the argument of the block.
+         * @param {Logo} logo - The logo instance.
+         * @param {string} turtle - The turtle identifier.
+         * @param {string} blk - The block identifier.
+         * @param {number} receivedArg - The received argument.
+         * @returns {boolean} - The result of the argument handling.
+         */
+        arg(logo, turtle, blk, receivedArg) {
+            const cblk1 = activity.blocks.blockList[blk].connections[1];
+            const cblk2 = activity.blocks.blockList[blk].connections[2];
+
+            if (cblk1 === null || cblk2 === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            }
+
+            const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+
+            try {
+                return Number(a) <= Number(b);
+            } catch (e) {
+                // eslint-disable-next-line no-console
+                console.debug(e);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            }
+        }
+    }
+    /**
+     * Represents a block for the equality comparison.
+     * @extends {BooleanBlock}
+     */
+
+    class GreaterThanOrEqualToBlock extends BooleanBlock {
+        /**
+         * Constructs a GreaterThanOrEqualToBlock.
+         */
+        constructor() {
+            super("greater_than_or_equal_to");
+
+            /**
+             * Sets the palette for the block.
+             * @param {string} "boolean" - The palette category.
+             * @param {Activity} activity - The activity associated with the block.
+             */
+            this.setPalette("boolean", activity);
+
+            /**
+             * Sets the beginner status for the block.
+             * @param {boolean} true - The beginner status.
+             */
+            this.beginnerBlock(true);
+
+            /**
+             * Sets the help string for the block.
+             * @type {string[]}
+             */
+            this.setHelpString([
+                _(
+                    "The Greater-than-or-equal-to block returns True if the top number is greater than or equal to the bottom number."
+                ),
+                "documentation",
+                ""
+            ]);
+
+            /**
+             * Sets the font size for the block.
+             * @type {number}
+             */
+            this.fontsize = 14;
+
+            /**
+             * Specifies the parameter of the block.
+             */
+            this.parameter = true;
+
+            /**
+             * Forms the block with specified configuration.
+             * @param {Object} config - The configuration object.
+             * @param {string} config.name - The name of the block.
+             * @param {number} config.args - The number of arguments.
+             * @param {string[]} config.argTypes - The allowed argument types.
+             */
+            this.formBlock({
+                name: "≥",
+                args: 2,
+                argTypes: ["numberin", "numberin"]
+            });
+        }
+
+        /**
+         * Updates the parameter of the block.
+         * @param {Logo} logo - The logo instance.
+         * @param {string} turtle - The turtle identifier.
+         * @param {string} blk - The block identifier.
+         * @returns {string} - The updated parameter value.
+         */
+        updateParameter(logo, turtle, blk) {
+            if (activity.blocks.blockList[blk].value) {
+                return _("true");
+            } else {
+                return _("false");
+            }
+        }
+
+        /**
+         * Handles the argument of the block.
+         * @param {Logo} logo - The logo instance.
+         * @param {string} turtle - The turtle identifier.
+         * @param {string} blk - The block identifier.
+         * @param {number} receivedArg - The received argument.
+         * @returns {boolean} - The result of the argument handling.
+         */
+        arg(logo, turtle, blk, receivedArg) {
+            const cblk1 = activity.blocks.blockList[blk].connections[1];
+            const cblk2 = activity.blocks.blockList[blk].connections[2];
+
+            if (cblk1 === null || cblk2 === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            }
+
+            const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+
+            try {
+                return Number(a) >= Number(b);
+            } catch (e) {
+                // eslint-disable-next-line no-console
+                console.debug(e);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            }
+        }
+    }
+    /**
+     * Represents a block for the equality comparison.
+     * @extends {BooleanBlock}
+     */
+
+
     class EqualBlock extends BooleanBlock {
         /**
          * Constructs an EqualBlock.
@@ -676,6 +892,114 @@ function setupBooleanBlocks(activity) {
             }
         }
     }
+
+    /**
+     * Represents a block for the equality comparison.
+     * @extends {BooleanBlock}
+     */
+
+
+    class NotEqualToBlock extends BooleanBlock {
+        /**
+         * Constructs an NotEqualToBlock.
+         */
+        constructor() {
+            super("not_equal_to");
+
+            /**
+             * Sets the palette for the block.
+             * @param {string} "boolean" - The palette category.
+             * @param {Activity} activity - The activity associated with the block.
+             */
+            this.setPalette("boolean", activity);
+
+            /**
+             * Sets the beginner status for the block.
+             * @param {boolean} true - The beginner status.
+             */
+            this.beginnerBlock(true);
+
+            /**
+             * Sets the help string for the block.
+             * @type {string[]}
+             */
+            this.setHelpString([
+                _("The Not-equal-to block returns True if the two numbers are not equal to each other."),
+                "documentation",
+                ""
+            ]);
+
+            /**
+             * Sets the font size for the block.
+             * @type {number}
+             */
+            this.fontsize = 14;
+
+            /**
+             * Specifies the parameter of the block.
+             */
+            this.parameter = true;
+
+            /**
+             * Forms the block with specified configuration.
+             * @param {Object} config - The configuration object.
+             * @param {string} config.name - The name of the block.
+             * @param {number} config.args - The number of arguments.
+             * @param {string[]} config.argTypes - The allowed argument types.
+             */
+            this.formBlock({
+                name: "!=",
+                args: 2,
+                argTypes: ["anyin", "anyin"]
+            });
+        }
+
+        /**
+         * Updates the parameter of the block.
+         * @param {Logo} logo - The logo instance.
+         * @param {string} turtle - The turtle identifier.
+         * @param {string} blk - The block identifier.
+         * @returns {string} - The updated parameter value.
+         */
+        updateParameter(logo, turtle, blk) {
+            if (activity.blocks.blockList[blk].value) {
+                return _("true");
+            } else {
+                return _("false");
+            }
+        }
+
+        /**
+         * Handles the argument of the block.
+         * @param {Logo} logo - The logo instance.
+         * @param {string} turtle - The turtle identifier.
+         * @param {string} blk - The block identifier.
+         * @param {number} receivedArg - The received argument.
+         * @returns {boolean} - The result of the argument handling.
+         */
+        arg(logo, turtle, blk, receivedArg) {
+            const cblk1 = activity.blocks.blockList[blk].connections[1];
+            const cblk2 = activity.blocks.blockList[blk].connections[2];
+
+            if (cblk1 === null || cblk2 === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            }
+
+            const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+
+            try {
+                return a !== b;
+            } catch (e) {
+                // eslint-disable-next-line no-console
+                console.debug(e);
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return false;
+            }
+        }
+    }
+
     /**
      * Represents a static boolean block.
      * @extends {BooleanBlock}
@@ -736,8 +1060,11 @@ function setupBooleanBlocks(activity) {
     new XorBlock().setup(activity);
     new AndBlock().setup(activity);
     new OrBlock().setup(activity);
+    new GreaterThanOrEqualToBlock().setup(activity);
+    new LessThanOrEqualToBlock().setup(activity);
     new GreaterBlock().setup(activity);
     new LessBlock().setup(activity);
+    new NotEqualToBlock().setup(activity);
     new EqualBlock().setup(activity);
     new StaticBooleanBlock().setup(activity);
 }
