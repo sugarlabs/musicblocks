@@ -1392,7 +1392,7 @@ class Block {
 
             image.src =
                 "data:image/svg+xml;base64," +
-                window.btoa(base64Encode(COLLAPEBUTTON));
+                window.btoa(base64Encode(COLLAPSEBUTTON));
         };
 
         /**
