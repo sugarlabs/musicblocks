@@ -1060,9 +1060,7 @@ Turtles.TurtlesView = class {
             const dy = this._h - 55 - LEADING;
             img.src =
                 "data:image/svg+xml;base64," +
-                window.btoa(
-                    decodeURIComponent(
-                        encodeURIComponent(
+                window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(
                             MBOUNDARY.replace("HEIGHT", this._h)
                                 .replace("WIDTH", this._w)
                                 .replace("Y", 10)
@@ -1074,7 +1072,8 @@ Turtles.TurtlesView = class {
                                 .replace("STROKE", 20)
                         )
                     )
-                );
+                )
+                ));
             __makeAllButtons();
         };
         // Call the __makeBoundary2 function once the document is loaded
@@ -1101,9 +1100,7 @@ Turtles.TurtlesView = class {
             const dy = this._h - 55 - LEADING;
             img.src =
                 "data:image/svg+xml;base64," +
-                window.btoa(
-                    decodeURIComponent(
-                        encodeURIComponent(
+                window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(
                             MBOUNDARY.replace("HEIGHT", this._h)
                                 .replace("WIDTH", this._w)
                                 .replace("Y", 10 / CONTAINERSCALEFACTOR)
@@ -1115,7 +1112,8 @@ Turtles.TurtlesView = class {
                                 .replace("STROKE", 20 / CONTAINERSCALEFACTOR)
                         )
                     )
-                );
+                )
+                ));
         };
 
         if (!this._locked) {

@@ -698,15 +698,15 @@ const createHelpContent = (activity) => {
             _("Delete a selected plugin."),
             "data:image/svg+xml;base64," +
                 window.btoa(
-                    decodeURIComponent(encodeURIComponent(PLUGINSDELETEBUTTON))
-                )
+                    String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(PLUGINSDELETEBUTTON))
+                )))
         ]);
         HELPCONTENT.push([
             _("Enable scrolling"),
             _("You can scroll the blocks on the canvas."),
             "data:image/svg+xml;base64," +
                 window.btoa(
-                    decodeURIComponent(encodeURIComponent(SCROLLUNLOCKBUTTON))
+                    String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(SCROLLUNLOCKBUTTON))))
                 )
         ]);
     }
