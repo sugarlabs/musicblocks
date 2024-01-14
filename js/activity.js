@@ -2261,7 +2261,7 @@ class Activity {
                 }
             }
 
-            if ((event.altKey && !disableKeys) || (event.keyCode == 13) ) {
+            if ((event.altKey && !disableKeys) || (event.keyCode == 13) || (event.key == '/') || (event.key == '\\') ) {
                 switch (event.keyCode) {
                     case 66: // 'B'
                         this.textMsg("Alt-B " + _("Saving block artwork"));
@@ -2306,6 +2306,17 @@ class Activity {
                         this.textMsg("Alt-H " + _("Save block help"));
                         this._saveHelpBlocks();
                         break;
+                    case 191:
+                        if(event.key=='/' && (!this.beginnerMode) && (disableHorizScrollIcon.style.display == "block")) {
+                           this.blocksContainer.x += this.canvas.width / 10;
+                           this.stage.update();
+                        }
+                    case 220:
+                        if(event.key=='\\' && (!this.beginnerMode) && (disableHorizScrollIcon.style.display == "block")) {
+                            this.blocksContainer.x -= this.canvas.width / 10;
+                            this.stage.update();
+                        }
+    
                 }
             } else if (event.ctrlKey) {
                 switch (event.keyCode) {
