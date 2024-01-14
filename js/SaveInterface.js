@@ -97,24 +97,31 @@ class SaveInterface {
             "'" +
             ').content=title; document.title=name; document.getElementById("title").textContent=title; document.getElementsByClassName("code")[0].style.display = "none";</script></body></html>';
 
-        this.timeLastSaved = -100;
-        const $j = jQuery.noConflict();
-        $j(window).on("beforeunload", (event) => {
-            let saveButton = "#saveButtonAdvanced";
-            if (this.activity.beginnerMode) {
-                saveButton = "#saveButton";
-            }
+this.timeLastSaved = -100;
+const $j = jQuery.noConflict();
+$j(window).on("beforeunload", (event) => {
+    let saveButton = "#saveButtonAdvanced";
+    if (this.activity.beginnerMode) {
+        saveButton = "#saveButton";
+    }
 
-            if (
-                this.PlanetInterface.getTimeLastSaved() !== this.timeLastSaved &&
-                this.PlanetInterface !== undefined
-            ) {
-                event.preventDefault();
-                // Will trigger when exit/reload cancelled.
-                $j(saveButton).trigger("mouseenter");
-                return "";
-            }
-        });
+    if (this.PlanetInterface && this.PlanetInterface.getTimeLastSaved() !== this.timeLastSaved) {
+        event.preventDefault();
+        // Will trigger when exit/reload is cancelled.
+        $j(saveButton).trigger("mouseenter");
+        return "";
+    } else if (this.PlanetInterface !== undefined) {
+        if (
+            this.PlanetInterface.getTimeLastSaved() !== this.timeLastSaved
+        ) {
+            event.preventDefault();
+            // Will trigger when exit/reload is cancelled.
+            $j(saveButton).trigger("mouseenter");
+            return "";
+        }
+    }
+});
+
     }
 
     /**
