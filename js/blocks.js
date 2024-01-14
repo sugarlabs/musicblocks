@@ -199,17 +199,17 @@ class Blocks {
 
             let palette;
             /** Regenerate all of the artwork at the new scale. */
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 this.blockList[blk].resize(scale);
             }
 
             this.findStacks();
-            for (let stack = 0; stack < this.stackList.length; stack++) {
+            for (const stack in this.stackList) {
                 this.adjustDocks(this.stackList[stack], true);
             }
 
             /** Make sure trash is still hidden. */
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].trash) {
                     this.blockList[blk].hide();
                 }
@@ -218,13 +218,13 @@ class Blocks {
             /** We reset the protoblock scale on the palettes, but don't */
             /** modify the palettes themselves. */
             for (palette in this.activity.palettes.dict) {
-                for (let blk = 0; blk < this.activity.palettes.dict[palette].protoList.length; blk++) {
+                for (const blk in this.activity.palettes.dict[palette].protoList) {
                     this.activity.palettes.dict[palette].protoList[blk].scale = scale;
                 }
             }
 
             /** Force a refresh. */
-            await delayExecution(500);
+            await delayExecution(100);
             this.activity.refreshCanvas();
         };
 
@@ -2243,7 +2243,7 @@ class Blocks {
          * @returns {void}
          */
         this.updateBlockPositions = () => {
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 this._moveBlock(blk, this.blockList[blk].container.x, this.blockList[blk].container.y);
             }
         };
@@ -2278,7 +2278,7 @@ class Blocks {
          */
         this.checkBounds = () => {
             let onScreen = true;
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].connections[0] == null) {
                     if (this.blockList[blk].offScreen(this.boundary)) {
                         this.activity.setHomeContainers(true);
@@ -2821,7 +2821,7 @@ class Blocks {
          * @returns{void}
          */
         this._searchForArgFlow = () => {
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].isArgFlowClampBlock()) {
                     this._searchCounter = 0;
                     this._searchForExpandables(blk);
@@ -3656,7 +3656,7 @@ class Blocks {
 
             /** Make sure we don't make two actions with the same name. */
             const actionNames = [];
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (
                     (this.blockList[blk].name === "text" || this.blockList[blk].name === "string") &&
                     !this.blockList[blk].trash
@@ -3688,7 +3688,7 @@ class Blocks {
          */
         this.findUniqueCustomName = (name) => {
             const noteNames = [];
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "text" && !this.blockList[blk].trash) {
                     const c = this.blockList[blk].connections[0];
                     if (c != null && this.blockList[c].name === "pitch" && !this.blockList[c].trash) {
@@ -3714,7 +3714,7 @@ class Blocks {
          */
         this.findUniqueTemperamentName = (name) => {
             const temperamentNames = [];
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "text" && !this.blockList[blk].trash) {
                     const c = this.blockList[blk].connections[0];
                     if (
@@ -3742,7 +3742,7 @@ class Blocks {
          * @returns {void}
          */
         this._findDrumURLs = () => {
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "text" || this.blockList[blk].name === "string") {
                     const c = this.blockList[blk].connections[0];
                     if (
@@ -3771,7 +3771,7 @@ class Blocks {
                 return;
             }
 
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "text") {
                     const c = this.blockList[blk].connections[0];
                     if (c != null && this.blockList[c].name === "box") {
@@ -3802,7 +3802,7 @@ class Blocks {
                 return;
             }
 
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "text") {
                     const c = this.blockList[blk].connections[0];
                     if (c != null && this.blockList[c].name === "storein") {
@@ -3851,7 +3851,7 @@ class Blocks {
                 return;
             }
 
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "storein2") {
                     if (this.blockList[blk].privateData === oldName) {
                         this.blockList[blk].privateData = newName;
@@ -3886,7 +3886,7 @@ class Blocks {
                 return;
             }
 
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "namedbox") {
                     if (this.blockList[blk].privateData === oldName) {
                         this.blockList[blk].privateData = newName;
@@ -3924,7 +3924,7 @@ class Blocks {
 
             /** Update the blocks, do->oldName should be do->newName */
             /** Named dos are modified in a separate function below. */
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (blk === skipBlock) {
                     continue;
                 }
@@ -3983,7 +3983,7 @@ class Blocks {
             }
 
             /** Update the blocks, do->oldName should be do->newName */
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (
                     ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(
                         this.blockList[blk].name
@@ -4423,7 +4423,7 @@ class Blocks {
          */
         this.findBlockInstance = (blkName) => {
             /** Returns true if block of name blkName is loaded. */
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].name === blkName && !this.blockList[blk].trash) {
                     return true;
                 }
@@ -5126,7 +5126,7 @@ class Blocks {
          * @returns boolean
          */
         this.findBlockInstance = (blkName) => {
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].name === blkName && !this.blockList[blk].trash) {
                     return true;
                 }
@@ -6467,7 +6467,7 @@ class Blocks {
 
             /** Do a final check on the action and boxes palettes. */
             let updatePalettes = false;
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (!this.blockList[blk].trash && this.blockList[blk].name === "action") {
                     const myBlock = this.blockList[blk];
                     const c = myBlock.connections[1];
@@ -6490,7 +6490,7 @@ class Blocks {
             }
 
             updatePalettes = false;
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (!this.blockList[blk].trash && this.blockList[blk].name === "storein") {
                     const myBlock = this.blockList[blk];
                     const c = myBlock.connections[1];
@@ -6635,7 +6635,7 @@ class Blocks {
             if (actionArg) {
                 const actionName = actionArg.value;
                 /** Look for any "orphan" action blocks. */
-                for (let blk = 0; blk < this.blockList.length; blk++) {
+                for (const blk in this.blockList) {
                     const thisBlock = this.blockList[blk];
 
                     /** We are only interested in do and nameddo blocks. */
@@ -6834,7 +6834,7 @@ class Blocks {
          * @returnss {void}
          */
         this.clearParameterBlocks = () => {
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].protoblock.parameter && this.blockList[blk].text !== null) {
                     /** The audiofile block label is handled in block.js */
                     if (this.blockList[blk].name === "audiofile") {

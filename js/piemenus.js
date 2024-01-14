@@ -1834,7 +1834,12 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
                 (cblk2 && that.blocks.blockList[cblk2].name == "newnote"))
         ) {
             that.value = 0;
-        } else {
+        } else if (that.value < 2 &&
+            that.blocks.blockList[cblk1].name === "pitch"
+        ) {
+            that.value = 1;
+        }
+        else {
             that.value -= 1;
         }
 
@@ -1848,7 +1853,15 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     };
 
     block._exitWheel.navItems[2].navigateFunction = () => {
-        that.value += 1;
+        const cblk = that.connections[0];
+        if (
+            that.value > 9 &&
+            (that.blocks.blockList[cblk].name === "pitch")
+        ) {
+            that.value = 10;
+        } else {
+            that.value += 1;
+        }
         that.text.text = that.value.toString();
 
         // Make sure text is on top.

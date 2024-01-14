@@ -53,7 +53,7 @@
   addTemperamentToList, getTemperament, deleteTemperamentFromList,
   addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
   DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
-  INTERVALVALUES, getIntervalRatio, frequencyToPitch
+  INTERVALVALUES, getIntervalRatio, frequencyToPitch, NOTESTEP
 */
 
 // Scalable sinewave graphic
