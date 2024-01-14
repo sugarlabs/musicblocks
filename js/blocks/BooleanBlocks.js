@@ -579,7 +579,7 @@ function setupBooleanBlocks(activity) {
 
     class LessThanOrEqualToBlock extends BooleanBlock {
         /**
-         * Constructs a LessBlock.
+         * Constructs a LessThanOrEqualToBlock.
          */
         constructor() {
             super("less_than_or_equal_to");
@@ -686,7 +686,7 @@ function setupBooleanBlocks(activity) {
 
     class GreaterThanOrEqualToBlock extends BooleanBlock {
         /**
-         * Constructs a LessBlock.
+         * Constructs a GreaterThanOrEqualToBlock.
          */
         constructor() {
             super("greater_than_or_equal_to");
@@ -901,7 +901,7 @@ function setupBooleanBlocks(activity) {
 
     class NotEqualToBlock extends BooleanBlock {
         /**
-         * Constructs an EqualBlock.
+         * Constructs an NotEqualToBlock.
          */
         constructor() {
             super("not_equal_to");
