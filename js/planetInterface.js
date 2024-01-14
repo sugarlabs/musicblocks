@@ -179,7 +179,7 @@ class PlanetInterface {
                     };
                     img.src =
                         "data:image/svg+xml;base64," +
-                        window.btoa(String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(svgData)))));
+                        window.btoa(decodeURIComponent(encodeURIComponent(svgData)));
                 }
             } catch (e) {
                 if (

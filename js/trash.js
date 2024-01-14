@@ -84,7 +84,7 @@ class Trashcan {
         img.src =
             "data:image/svg+xml;base64," +
             window.btoa(
-                (String.fromCodePoint(...(decodeURIComponent(encodeURIComponent(BORDER.replace("stroke_color", highlightString))))))
+                decodeURIComponent(encodeURIComponent(BORDER.replace("stroke_color", highlightString)))
             );
     }
 
