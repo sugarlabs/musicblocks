@@ -32,7 +32,7 @@
          
 */
 /* exported Oscilloscope */
-
+import { base64Encode } from "../base64Utils";
 /**
  * @class
  * @classdesc pertains to setting up all features of the Oscilloscope Widget.
@@ -82,7 +82,7 @@ class Oscilloscope {
             this.zoomFactor *= step;
         };
         zoomInButton.children[0].src = `data:image/svg+xml;base64,${window.btoa(
-            decodeURIComponent(encodeURIComponent(BIGGERBUTTON))
+            base64Encode(BIGGERBUTTON)
         )}`;
 
         const zoomOutButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, _("Zoom Out"));
@@ -95,7 +95,7 @@ class Oscilloscope {
         };
 
         zoomOutButton.children[0].src = `data:image/svg+xml;base64,${window.btoa(
-            decodeURIComponent(encodeURIComponent(SMALLERBUTTON))
+            base64Encode(SMALLERBUTTON)
         )}`;
 
         widgetWindow.sendToCenter();

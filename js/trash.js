@@ -15,7 +15,7 @@
 // restore trash.
 
 /* global createjs, platformColor, BORDER, TRASHICON, last */
-
+import { base64Encode } from "./base64Utils";
 /* exported Trashcan */
 
 class Trashcan {
@@ -84,7 +84,7 @@ class Trashcan {
         img.src =
             "data:image/svg+xml;base64," +
             window.btoa(
-                decodeURIComponent(encodeURIComponent(BORDER.replace("stroke_color", highlightString)))
+                base64Encode(BORDER.replace("stroke_color", highlightString))
             );
     }
 

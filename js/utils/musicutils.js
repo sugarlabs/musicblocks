@@ -55,7 +55,7 @@
   DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
   INTERVALVALUES, getIntervalRatio, frequencyToPitch, NOTESTEP
 */
-
+import { base64Encode } from "../base64Utils";
 // Scalable sinewave graphic
 const SYNTHSVG =
     '<?xml version="1.0" encoding="UTF-8" standalone="no"?> <svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" y="0px" xml:space="preserve" x="0px" width="SVGWIDTHpx" viewBox="0 0 SVGWIDTH 55" version="1.1" height="55px" enable-background="new 0 0 SVGWIDTH 55"><g transform="scale(XSCALE,1)"><path d="m 1.5,27.5 c 0,0 2.2,-17.5 6.875,-17.5 4.7,0.0 6.25,11.75 6.875,17.5 0.75,6.67 2.3,17.5 6.875,17.5 4.1,0.0 6.25,-13.6 6.875,-17.5 C 29.875,22.65 31.1,10 35.875,10 c 4.1,0.0 5.97,13.0 6.875,17.5 1.15,5.7 1.75,17.5 6.875,17.5 4.65,0.0 6.875,-17.5 6.875,-17.5" style="stroke:#90c100;fill-opacity:1;fill:none;stroke-width:STROKEWIDTHpx;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" /></g></svg>';
@@ -598,19 +598,19 @@ const MATRIXBUTTONHEIGHT2 = 66;
 const MATRIXSOLFEHEIGHT = 30;
 
 const wholeNoteImg =
-    "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(WHOLENOTE)));
+    "data:image/svg+xml;base64," + window.btoa(base64Encode(WHOLENOTE));
 const halfNoteImg =
-    "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(HALFNOTE)));
+    "data:image/svg+xml;base64," + window.btoa(base64Encode(HALFNOTE));
 const quarterNoteImg =
-    "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(QUARTERNOTE)));
+    "data:image/svg+xml;base64," + window.btoa(base64Encode(QUARTERNOTE));
 const eighthNoteImg =
-    "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(EIGHTHNOTE)));
+    "data:image/svg+xml;base64," + window.btoa(base64Encode(EIGHTHNOTE));
 const sixteenthNoteImg =
-    "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(SIXTEENTHNOTE)));
+    "data:image/svg+xml;base64," + window.btoa(base64Encode(SIXTEENTHNOTE));
 const thirtysecondNoteImg =
-    "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(THIRTYSECONDNOTE)));
+    "data:image/svg+xml;base64," + window.btoa(base64Encode(THIRTYSECONDNOTE));
 const sixtyfourthNoteImg =
-    "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(SIXTYFOURTHNOTE)));
+    "data:image/svg+xml;base64," + window.btoa(base64Encode(SIXTYFOURTHNOTE));
 
 const NOTESYMBOLS = {
     1: wholeNoteImg,

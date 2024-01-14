@@ -60,7 +60,7 @@ const DEFAULTFONT = "sans-serif"; // also used in PenBlocks.js
  * Unused methods' names begin with double underscore '__'.
  * Internal functions' names are in PascalCase.
  */
-
+import { base64Encode } from "./base64Utils";
 /*exported Painter*/
 
 class Painter {
@@ -1179,7 +1179,7 @@ class Painter {
                 this.turtle.doTurtleShell(
                     55,
                     "data:image/svg+xml;base64," +
-                        window.btoa(decodeURIComponent(encodeURIComponent(artwork)))
+                        window.btoa(base64Encode(artwork))
                 );
                 this.turtle.skinChanged = false;
             }

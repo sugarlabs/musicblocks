@@ -73,7 +73,7 @@
  */
 
 /* exported Block, $ */
-
+import { base64Encode } from "./base64Utils";
 // Length of a long touch
 const TEXTWIDTH = 240; // 90
 const STRINGLEN = 9;
@@ -172,7 +172,7 @@ const _blockMakeBitmap = (data, callback, args) => {
         callback(bitmap, args);
     };
 
-    img.src = "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(data)));
+    img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
 };
 
 // Define block instance objects and any methods that are intra-block.
@@ -856,7 +856,7 @@ class Block {
         if (this.image.search("xmlns") !== -1) {
             image.src =
                 "data:image/svg+xml;base64," +
-                window.btoa(decodeURIComponent(encodeURIComponent(this.image)));
+                window.btoa(base64Encode(this.iage));
         } else {
             image.src = this.image;
         }
@@ -1392,7 +1392,7 @@ class Block {
 
             image.src =
                 "data:image/svg+xml;base64," +
-                window.btoa(decodeURIComponent(encodeURIComponent(COLLAPSEBUTTON)));
+                window.btoa(base64Encode(COLLAPEBUTTON));
         };
 
         /**
@@ -1425,7 +1425,7 @@ class Block {
 
             image.src =
                 "data:image/svg+xml;base64," +
-                window.btoa(decodeURIComponent(encodeURIComponent(EXPANDBUTTON)));
+                window.btoa(base64Encode(EXPANDUTTON));
         };
 
         /**

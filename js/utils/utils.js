@@ -41,10 +41,10 @@
    safeSVG, toFixed2, toTitleCase, windowHeight, windowWidth,
    fnBrowserDetect
 */
-
+import { base64Encode } from "../base64Utils";
 const changeImage = (imgElement, from, to) => {
-    const oldSrc = "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(from)));
-    const newSrc = "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(to)));
+    const oldSrc = "data:image/svg+xml;base64," + window.btoa(base64Encode(from));
+    const newSrc = "data:image/svg+xml;base64," + window.btoa(base64Encode(to));
     if (imgElement.src === oldSrc) {
         imgElement.src = newSrc;
     }

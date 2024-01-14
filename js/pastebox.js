@@ -23,7 +23,7 @@ const PASTEBOX =
     js/activity.js
         createjs
 */
-
+import { base64Encode } from "./base64Utils";
 /* exported PasteBox */
 class PasteBox {
     /**
@@ -146,6 +146,6 @@ class PasteBox {
             callback(this, name, bitmap, extras);
         };
 
-        img.src = "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(data)));
+        img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
     }
 }

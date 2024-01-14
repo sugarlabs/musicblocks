@@ -16,7 +16,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA.
  */
-
+import { base64Encode } from "./base64Utils";
 /*
    globals
 
@@ -920,6 +920,6 @@ Turtle.TurtleView = class {
             activity.refreshCanvas();
         };
 
-        img.src = "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(data)));
+        img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
     }
 };

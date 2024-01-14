@@ -20,7 +20,7 @@
 /*
    exported PlanetInterface
  */
-
+import { base64Encode } from "./base64Utils";
 class PlanetInterface {
     constructor(activity) {
         this.planet = null;
@@ -179,7 +179,7 @@ class PlanetInterface {
                     };
                     img.src =
                         "data:image/svg+xml;base64," +
-                        window.btoa(decodeURIComponent(encodeURIComponent(svgData)));
+                        window.btoa(base64Encode(svgData));
                 }
             } catch (e) {
                 if (

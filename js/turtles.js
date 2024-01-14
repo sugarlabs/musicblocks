@@ -24,7 +24,7 @@
    jQuery, docById, LEADING, CARTESIANBUTTON, piemenuGrid, CLEARBUTTON, COLLAPSEBUTTON,
    EXPANDBUTTON, MBOUNDARY
  */
-
+import { base64Encode } from "./base64Utils";
 /* exported Turtles */
 
 // What is the scale factor when stage is shrunk?
@@ -798,7 +798,7 @@ Turtles.TurtlesView = class {
                 }
             };
             const img = new Image();
-            img.src = "data:image/svg+xml;base64," + window.btoa(decodeURIComponent(encodeURIComponent(svg)));
+            img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svg));
 
             container.appendChild(img);
             container.setAttribute(
