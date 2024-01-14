@@ -856,7 +856,7 @@ class Block {
         if (this.image.search("xmlns") !== -1) {
             image.src =
                 "data:image/svg+xml;base64," +
-                window.btoa(base64Encode(this.iage));
+                window.btoa(base64Encode(this.image));
         } else {
             image.src = this.image;
         }
