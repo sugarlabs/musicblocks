@@ -877,7 +877,9 @@ class Palette {
     _showMenuItems() {
         this.model.update();
         const paletteList = docById("PaletteBody_items");
-
+        paletteList.onmouseleave=()=>{
+            this.hideMenu(0);
+        }
         this.setupGrabScroll(paletteList);
 
         const blocks = this.model.blocks;
