@@ -221,7 +221,7 @@ class HelpWidget {
                         let path = message[1];
                         // We need to add a case here whenever we add
                         // help artwort support for a new language.
-                        // e.g., documentation-es
+                        // e.g., Docs/documentation-es
                         let language = localStorage.languagePreference;
                         if (language === undefined) {
                             language = navigator.language;
@@ -552,7 +552,7 @@ class HelpWidget {
                     let path = message[1];
                     // We need to add a case here whenever we add
                     // help artwort support for a new language.
-                    // e.g., documentation-es
+                    // e.g., Docs/documentation-es
                     let language = localStorage.languagePreference;
                     if (language === undefined) {
                         language = navigator.language;
