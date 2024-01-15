@@ -4220,88 +4220,41 @@ class Activity {
          * These menu items are on the canvas, not the toolbar.
          */
         this._setupPaletteMenu = () => {
-            let removed = false;
-            if (docById("buttoncontainerBOTTOM")) {
-                removed = true;
-                docById("buttoncontainerBOTTOM").parentNode.removeChild(
-                    docById("buttoncontainerBOTTOM")
-                );
-            }
             const btnSize = this.cellSize;
-            // Lower right
+            const createButton = (icon, label, action) => {
+                const button = this._makeButton(icon, label, x, y, btnSize, 0);
+                this._loadButtonDragHandler(button, action, this);
+                x += btnSize;
+                return button;
+            };
+
             let x = window.innerWidth - 4 * btnSize - 27.5;
             const y = window.innerHeight - 57.5;
-            const dx = btnSize;
+
+            const removeButtonContainer = docById("buttoncontainerBOTTOM");
+            if (removeButtonContainer) {
+                removeButtonContainer.parentNode.removeChild(removeButtonContainer);
+            }
 
             const ButtonHolder = document.createElement("div");
             ButtonHolder.setAttribute("id", "buttoncontainerBOTTOM");
-            if (!removed) {
-                ButtonHolder.style.display = "none"; //  if firsttime: make visible later.
-            }
+            ButtonHolder.style.display = removeButtonContainer ? "none" : "block";
             document.body.appendChild(ButtonHolder);
 
-            this.homeButtonContainer = this._makeButton(
-                GOHOMEFADEDBUTTON,
+            this.homeButtonContainer = createButton(GOHOMEFADEDBUTTON,
                 _("Home") + " [" + _("Home").toUpperCase() + "]",
-                x,
-                y,
-                btnSize,
-                0
+                findBlocks
             );
-
-            this._loadButtonDragHandler(this.homeButtonContainer, findBlocks, this);
-
             this.boundary.hide();
 
-            x += dx;
-
-            this.hideBlocksContainer = this._makeButton(
-                SHOWBLOCKSBUTTON,
-                _("Show/hide block"),
-                x,
-                y,
-                btnSize,
-                0
-            );
-            this._loadButtonDragHandler(this.hideBlocksContainer, changeBlockVisibility, this);
-
-            x += dx;
-
-            this.collapseBlocksContainer = this._makeButton(
-                COLLAPSEBLOCKSBUTTON,
-                _("Expand/collapse blocks"),
-                x,
-                y,
-                btnSize,
-                0
-            );
-            this._loadButtonDragHandler(
-                this.collapseBlocksContainer, toggleCollapsibleStacks, this
-            );
-
-            x += dx;
-
-            this.smallerContainer = this._makeButton(
-                SMALLERBUTTON,
-                _("Decrease block size"),
-                x,
-                y,
-                btnSize,
-                0
-            );
-            this._loadButtonDragHandler(this.smallerContainer, doSmallerBlocks, this);
-
-            x += dx;
-
-            this.largerContainer = this._makeButton(
-                BIGGERBUTTON,
-                _("Increase block size"),
-                x,
-                y,
-                btnSize,
-                0
-            );
-            that._loadButtonDragHandler(this.largerContainer, doLargerBlocks, this);
+            this.hideBlocksContainer = createButton(SHOWBLOCKSBUTTON, _("Show/hide block"),
+                changeBlockVisibility);
+            this.collapseBlocksContainer = createButton(COLLAPSEBLOCKSBUTTON, _("Expand/collapse blocks"),
+                toggleCollapsibleStacks);
+            this.smallerContainer = createButton(SMALLERBUTTON, _("Decrease block size"),
+                doSmallerBlocks);
+            this.largerContainer = createButton(BIGGERBUTTON, _("Increase block size"),
+                doLargerBlocks);
         };
 
         /**
