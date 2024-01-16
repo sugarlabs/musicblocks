@@ -343,7 +343,7 @@ class Painter {
         } else if (this._penDown) {
             const capAngleRadians = (this.turtle.orientation * Math.PI) / 180.0;
 
-            if(linePart){
+            if (linePart) {
                 this.turtle.ctx.lineCap = "butt";
                 if(linePart === "first"){
                     this.turtle.ctx.beginPath();
@@ -361,6 +361,8 @@ class Painter {
                     this.turtle.ctx.arc(nx, ny, (this.stroke/2), capAngleRadians, Math.PI + capAngleRadians, true);
                     this.turtle.ctx.fill();
                 }
+            } else {
+                this.turtle.ctx.lineTo(nx, ny);
             }
             
             if (!this._svgPath) {
