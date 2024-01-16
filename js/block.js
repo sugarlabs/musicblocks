@@ -4073,9 +4073,9 @@ class Block {
                 this.value = oldValue;
             }
 
-            if(String(this.value).length > 12) {
+            if(String(this.value).length > 10) {
                 const thisBlock = this.blocks.blockList.indexOf(this);
-                this.activity.errorMsg(_("Numbers can have at most 12 digits."), thisBlock);
+                this.activity.errorMsg(_("Numbers can have at most 10 digits."), thisBlock);
                 this.activity.refreshCanvas();
                 this.label.value = oldValue;
                 this.value = oldValue;
