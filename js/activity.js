@@ -284,7 +284,6 @@ class Activity {
         try {
             if (this.storage.KeySignatureEnv !== undefined) {
                 // eslint-disable-next-line no-console
-                console.log(this.storage.KeySignatureEnv);
                 this.KeySignatureEnv = this.storage.KeySignatureEnv.split(",");
                 this.KeySignatureEnv[2] = (this.KeySignatureEnv[2] === "true");
             }
