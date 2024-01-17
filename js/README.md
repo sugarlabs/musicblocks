@@ -22,12 +22,6 @@ Palette-related code
 * `artwork.js` -- the palette buttons and colors are defined here
 * `palette.js` -- the blocks palettes
 
-Button boxes
-* `clearbox.js` -- confirm delete
-* `playbackbox.js` -- compile and playback
-* `savebox.js` -- save options
-* `utilitybox.js` -- settings
-
 Export utilities
 * `abc.js` -- save in ABC format
 * `lilypond.js` -- save in Lilypond format
