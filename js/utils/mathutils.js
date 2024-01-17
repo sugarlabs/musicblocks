@@ -38,21 +38,23 @@
  * NumberBlocks.js
  */
 class MathUtility {
-    /**
+   /**
      * Returns a random integer in a range.
      *
      * @static
-     * @param a - preferably the minimum
-     * @param b - preferably the maximum
-     * @param c - octave (for case when a and b are solfeges)
-     * @returns {Number}
-     * @throws {String} NAN error
+     * @param {number|string} a - Preferably the minimum. If a string, it should be a valid solfege name.
+     * @param {number|string} b - Preferably the maximum. If a string, it should be a valid solfege name.
+     * @param {number} [c] - Octave (for cases when a and b are solfeges).
+     * @returns {number|array} - A random number between a and b (both inclusive) or a random solfege array.
+     * @throws {string} NAN error if the arguments are not valid.
      */
     static doRandom(a, b, c) {
         /**
-         * @param {Number} n1
-         * @param {Number} n2
-         * @returns {Number} a random number between n1 and n2 (both inclusive)
+         * Returns a random number between n1 and n2 (both inclusive).
+         *
+         * @param {number} n1
+         * @param {number} n2
+         * @returns {number}
          */
         const GetRandom = (n1, n2) => {
             // n1 should be <= n2
@@ -60,6 +62,14 @@ class MathUtility {
             return Math.floor(Math.random() * (Number(n2) - Number(n1) + 1) + Number(n1));
         };
 
+        /**
+         * Returns a random solfege array between a1 and a2 with the given octave.
+         *
+         * @param {string} a1
+         * @param {string} a2
+         * @param {number} [octave=4]
+         * @returns {array} - A random solfege array.
+         */
         const GetRandomSolfege = (a1, a2, octave) => {
             octave = octave === undefined ? 4 : octave;
 
@@ -100,9 +110,9 @@ class MathUtility {
      * Randomly returns either a or b.
      *
      * @static
-     * @param a
-     * @param b
-     * @returns {*}
+     * @param {*} a
+     * @param {*} b
+     * @returns {*} - Either a or b.
      */
     static doOneOf(a, b) {
         return Math.random() < 0.5 ? a : b;
@@ -112,10 +122,10 @@ class MathUtility {
      * Returns a modulo b.
      *
      * @static
-     * @param a
-     * @param b
-     * @returns {Number}
-     * @throws {String} NAN error
+     * @param {number} a
+     * @param {number} b
+     * @returns {number} - Result of a modulo b.
+     * @throws {string} NAN error if the arguments are not valid.
      */
     static doMod(a, b) {
         if (typeof a === "number" && typeof b === "number") {
@@ -129,9 +139,9 @@ class MathUtility {
      * Square-roots a number.
      *
      * @static
-     * @param a
-     * @returns {Number}
-     * @throws {String} No square root error, NAN error
+     * @param {number} a
+     * @returns {number} - Square root of a.
+     * @throws {string} No square root error, NAN error if the arguments are not valid.
      */
     static doSqrt(a) {
         if (typeof a === "number") {
@@ -149,9 +159,9 @@ class MathUtility {
      * Adds a and b.
      *
      * @static
-     * @param a
-     * @param b
-     * @returns {Number|String}
+     * @param {*} a
+     * @param {*} b
+     * @returns {number|string} - Sum of a and b. If either a or b is a string, it concatenates them.
      */
     static doPlus(a, b) {
         if (typeof a === "string" || typeof b === "string") {
@@ -168,10 +178,10 @@ class MathUtility {
      * Subtracts b from a.
      *
      * @static
-     * @param a
-     * @param b
-     * @returns {Number}
-     * @throws {String} NAN error
+     * @param {number} a
+     * @param {number} b
+     * @returns {number} - Result of a minus b.
+     * @throws {string} NAN error if the arguments are not valid.
      */
     static doMinus(a, b) {
         if (typeof a === "string" || typeof b === "string") {
@@ -185,10 +195,10 @@ class MathUtility {
      * Multiplies a by b.
      *
      * @static
-     * @param a
-     * @param b
-     * @returns {Number}
-     * @throws {String} NAN error
+     * @param {*} a
+     * @param {*} b
+     * @returns {number} - Result of a multiplied by b.
+     * @throws {string} NAN error if the arguments are not valid.
      */
     static doMultiply(a, b) {
         if (typeof a === "string" || typeof b === "string") {
@@ -202,10 +212,10 @@ class MathUtility {
      * Divides a by b.
      *
      * @static
-     * @param a
-     * @param b
-     * @returns {Number}
-     * @throws {String} Divide by Zero error, NAN error
+     * @param {number} a
+     * @param {number} b
+     * @returns {number} - Result of a divided by b.
+     * @throws {string} Divide by Zero error, NAN error if the arguments are not valid.
      */
     static doDivide(a, b) {
         if (typeof a === "number" && typeof b === "number") {
@@ -219,16 +229,16 @@ class MathUtility {
         }
     }
 
-    /**
-     * Calculates euclidean distance between (cursor x, cursor y) and (mouse 'x' and mouse 'y').
+     /**
+     * Calculates Euclidean distance between (cursor x, cursor y) and (mouse 'x' and mouse 'y').
      *
      * @static
-     * @param a
-     * @param b
-     * @param c
-     * @param d
-     * @returns {Number}
-     * @throws {String} NAN error
+     * @param {number} x1
+     * @param {number} y1
+     * @param {number} x2
+     * @param {number} y2
+     * @returns {number} - Euclidean distance between two points.
+     * @throws {string} NAN error if the arguments are not valid.
      */
     static doCalculateDistance(x1, y1, x2, y2) {
         if (
@@ -247,14 +257,14 @@ class MathUtility {
         }
     }
 
-    /**
+   /**
      * Returns a to the power of b.
      *
      * @static
-     * @param a
-     * @param b
-     * @returns {Number}
-     * @throws {String} NAN error
+     * @param {number} a
+     * @param {number} b
+     * @returns {number} - Result of a raised to the power of b.
+     * @throws {string} NAN error if the arguments are not valid.
      */
     static doPower(a, b) {
         if (typeof a === "number" && typeof b === "number") {
@@ -268,9 +278,9 @@ class MathUtility {
      * Returns absolute value.
      *
      * @static
-     * @param a
-     * @returns {Number}
-     * @throws {String} NAN error
+     * @param {number} a
+     * @returns {number} - Absolute value of a.
+     * @throws {string} NAN error if the argument is not valid.
      */
     static doAbs(a) {
         if (typeof a === "number") {
@@ -280,13 +290,13 @@ class MathUtility {
         }
     }
 
-    /**
+   /**
      * Returns negative value (if number) or string in reverse (if string).
      *
      * @static
      * @param {*} a
-     * @returns {Number|String}
-     * @throws {String} No Negation error
+     * @returns {number|string} - Negative value of a (if number) or string in reverse (if string).
+     * @throws {string} No Negation error if the argument is not valid.
      */
     static doNegate(a) {
         if (typeof a === "number") {
@@ -304,8 +314,8 @@ class MathUtility {
      *
      * @static
      * @param {*} a
-     * @returns {Number}
-     * @throws {String} NAN error
+     * @returns {number} - Integer value of a.
+     * @throws {string} NAN error if the argument is not valid.
      */
     static doInt(a) {
         try {
