@@ -864,18 +864,20 @@
                 }
                 }               
                 var count=0;    
-                function setIcon() {
-                var property = document.getElementById(FullScreen);
+               function setIcon() {
                 var iconCode = document.querySelector('#FullScrIcon');
+                var property = document.querySelector('.FullScreen.tooltipped.dropdown-trigger');
                 //Calling full Screen
                 if (count == 0) {
                     openFullscreen();
+                    property.setAttribute("data-tooltip", "Exit FullScreen");
                     iconCode.textContent='\ue5d1';
                     count = 1;        
                 }
                 //Closing full Screen
                 else {
                     closeFullscreen();
+                    property.setAttribute("data-tooltip", "FullScreen");
                     iconCode.textContent='\ue5d0';
                     count = 0;
                 }
