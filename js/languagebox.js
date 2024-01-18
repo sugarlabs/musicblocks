@@ -186,7 +186,6 @@ class LanguageBox {
      * @returns {void}
      */
     OnClick() {
-        this.activity.storage.languagePreference = this._language;
         window.location.reload();    
     }
     hide() {
