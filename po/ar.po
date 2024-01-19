@@ -3137,7 +3137,10 @@ msgstr ""
 #: js/toolbar.js:110
 #: js/toolbar.js:204
 msgid "FullScreen"
-msgstr ""
+msgstr "ملء الشاشة"
+
+msgid "Exit FullScreen"
+msgstr "الخروج من ملء الشاشة"
 
 #: js/toolbar.js:145
 #: js/toolbar.js:199

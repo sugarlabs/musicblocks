@@ -1422,7 +1422,11 @@ msgstr ""
 #: js/toolbar.js:110
 #: js/toolbar.js:204
 msgid "FullScreen"
-msgstr ""
+msgstr "전체 화면"
+
+msgid "Exit FullScreen"
+msgstr "전체 화면 종료"
+
 
 #: js/toolbar.js:145
 #: js/toolbar.js:199

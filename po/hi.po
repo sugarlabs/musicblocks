@@ -1176,6 +1176,9 @@ msgstr "पूर्ण स्क्रीन"
 msgid "FullScreen"
 msgstr "पूर्ण स्क्रीन"
 
+msgid "Exit FullScreen"
+msgstr "पूर्ण स्क्रीन से बाहर निकलें"
+
 #: js/toolbar.js:145
 #: js/toolbar.js:199
 msgid "About Turtle Blocks"

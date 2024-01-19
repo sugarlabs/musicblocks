@@ -1431,7 +1431,10 @@ msgstr ""
 #: js/toolbar.js:110
 #: js/toolbar.js:204
 msgid "FullScreen"
-msgstr ""
+msgstr "Tela cheia"
+
+msgid "Exit FullScreen"
+msgstr "Sair da tela cheia"
 
 #: js/toolbar.js:145
 #: js/toolbar.js:199

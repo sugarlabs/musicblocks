@@ -1547,7 +1547,10 @@ msgstr ""
 #: js/toolbar.js:110
 #: js/toolbar.js:204
 msgid "FullScreen"
-msgstr ""
+msgstr "Pantalla Completa"
+
+msgid "Exit FullScreen"
+msgstr "Salir de Pantalla Completa"
 
 #: js/toolbar.js:145
 #: js/toolbar.js:199

@@ -1417,7 +1417,11 @@ msgstr ""
 #: js/toolbar.js:110
 #: js/toolbar.js:204
 msgid "FullScreen"
-msgstr ""
+msgstr "全屏"
+
+msgid "Exit FullScreen"
+msgstr "退出全屏"
+
 
 #: js/toolbar.js:145
 #: js/toolbar.js:199

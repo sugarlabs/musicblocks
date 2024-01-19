@@ -1018,7 +1018,10 @@ msgstr ""
 #: js/toolbar.js:110
 #: js/toolbar.js:204
 msgid "FullScreen"
-msgstr ""
+msgstr "フルスクリーン"
+
+msgid "Exit FullScreen"
+msgstr "フルスクリーンを終了"
 
 #: js/toolbar.js:145
 #: js/toolbar.js:199

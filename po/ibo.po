@@ -3138,7 +3138,11 @@ msgstr ""
 #: js/toolbar.js:110
 #: js/toolbar.js:204
 msgid "FullScreen"
-msgstr ""
+msgstr "N'ime Nnyocha"
+
+msgid "Exit FullScreen"
+msgstr "Weta N'ime Nnyocha"
+
 
 #: js/toolbar.js:145
 #: js/toolbar.js:199
