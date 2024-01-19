@@ -3142,7 +3142,6 @@ msgstr "పూర్తి స్క్రీన్"
 msgid "Exit FullScreen"
 msgstr ""పూర్తి స్క్రీన్ నుండి బయటకి"
 
-
 #: js/toolbar.js:145
 #: js/toolbar.js:199
 msgid "About Turtle Blocks"
