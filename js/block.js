@@ -3122,6 +3122,11 @@ class Block {
                 '" />';
             labelElem.classList.add("hasKeyboard");
             this.label = docById("textLabel");
+
+            // set the position of cursor to the end (for text value)
+            const valueLength = this.label.value.length;
+            this.label.setSelectionRange(valueLength,valueLength);
+
         } else if (this.name === "solfege") {
             obj = splitSolfege(this.value);
             // solfnotes_ is used in the interface for internationalization.
@@ -3674,6 +3679,13 @@ class Block {
                     '" />';
                 labelElem.classList.add("hasKeyboard");
                 this.label = docById("numberLabel");
+
+                // set the position of cursor to the end (for number value)
+                const valueLength = this.label.value.length;
+                const originalType = this.label.type;
+                this.label.type = "text";
+                this.label.setSelectionRange(valueLength,valueLength);
+                this.label.type = originalType;
             }
         }
 
