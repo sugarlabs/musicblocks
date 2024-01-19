@@ -1622,6 +1622,12 @@ input.timbreName {
     width: 28px;
     height: 28px;
     filter: invert(100%);
+    transition: background-color 0.3s, filter 0.3s;
+  }
+
+  .msgCloseIcon:hover {
+    background-color: #fd0707;
+    filter: invert(0%);
   }
 
   .disable_highlighting {
