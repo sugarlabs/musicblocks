@@ -11,7 +11,7 @@
 
 /*
   global _, jQuery, _THIS_IS_MUSIC_BLOCKS_, docById, doSVG, fnBrowserDetect,
-  RECORDBUTTON, platformColor
+  RECORDBUTTON
  */
 
 /* exported Toolbar */
@@ -97,7 +97,7 @@ class Toolbar {
                 ["hi", _("हिंदी"), "innerHTML"],
                 ["ibo", _("igbo"), "innerHTML"],
                 ["ar", _("عربى"), "innerHTML"],
-		["te", _("తెలుగు"), "innerHTML"],
+                ["te", _("తెలుగు"), "innerHTML"],
                 ["he", _("עִברִית"), "innerHTML"]
             ];
 
@@ -160,7 +160,7 @@ class Toolbar {
                 _("quechua"),
                 _("guarani"),
                 _("हिंदी"),
-		_("తెలుగు"),
+                _("తెలుగు"),
                 _("igbo"),
                 _("عربى"),
                 _("עִברִית")
@@ -216,7 +216,7 @@ class Toolbar {
                 ["hi", _("हिंदी"), "innerHTML"],
                 ["ibo", _("igbo"), "innerHTML"],
                 ["ar", _("عربى"), "innerHTML"],
-		["te", _("తెలుగు"), "innerHTML"],
+                ["te", _("తెలుగు"), "innerHTML"],
                 ["he", _("עִברִית"), "innerHTML"]
             ];
 
@@ -269,7 +269,7 @@ class Toolbar {
                 _("quechua"),
                 _("guarani"),
                 _("हिंदी"),
-		_("తెలుగు"),
+                _("తెలుగు"),
                 _("igbo"),
                 _("عربى"),
                 _("עִברִית")
@@ -293,7 +293,7 @@ class Toolbar {
             if (strings[i].length === 3) {
                 if (elem !== undefined && elem !== null) {
                     elem.innerHTML = obj[1];
-		}
+                }
             } else {
                 if (elem !== undefined && elem !== null) {
                     elem.setAttribute("data-tooltip", trans);
@@ -734,6 +734,7 @@ class Toolbar {
         const delPluginIcon = docById("delPluginIcon");
         const enableHorizScrollIcon = docById("enableHorizScrollIcon");
         const disableHorizScrollIcon = docById("disableHorizScrollIcon");
+        const toggleJavaScriptIcon = docById("toggleJavaScriptIcon");
         const browser = fnBrowserDetect();
         const btn = document.getElementById("record");
         const hideIn = ["firefox", "safari"];
@@ -771,6 +772,7 @@ class Toolbar {
             loadPluginIcon.style.display = "none";
             delPluginIcon.style.display = "none";
             enableHorizScrollIcon.style.display = "none";
+            toggleJavaScriptIcon.style.display = "none";
         }
     }
 

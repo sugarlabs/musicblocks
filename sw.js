@@ -84,21 +84,20 @@ self.addEventListener("fetch", function (event) {
 
                 return response;
             },
-            function () {
+            async function () {
                 // The response was not found in the cache so we look
                 // for it on the server
-                return fetch(event.request)
-                    .then(function (response) {
-                        // If request was success, add or update it in the cache
-                        if (response.ok) {
-                            event.waitUntil(updateCache(event.request, response.clone()));
-                        }
-                        return response;
-                    })
-                    .catch(function (error) {
-                        // eslint-disable-next-line no-console
-                        console.log("[PWA Builder] Network request failed and no cache." + error);
-                    });
+                try {
+                    const response = await fetch(event.request);
+                    // If request was success, add or update it in the cache
+                    if (response.ok) {
+                        event.waitUntil(updateCache(event.request, response.clone()));
+                    }
+                    return response;
+                } catch (error) {
+                    // eslint-disable-next-line no-console
+                    console.log("[PWA Builder] Network request failed and no cache." + error);
+                }
             }
         )
     );

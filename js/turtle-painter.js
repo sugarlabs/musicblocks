@@ -243,7 +243,7 @@ class Painter {
      * @param y - on screen y coordinate
      * @param invert - boolean value regarding whether coordinates are inverted or not
      */
-    _move(ox, oy, x, y, invert) {
+    _move(ox, oy, x, y, invert, linePart) {
         const turtles = this.turtles;
         const turtlesScale = turtles.scale;
 
@@ -341,7 +341,30 @@ class Painter {
             this.turtle.ctx.lineCap = "round";
             this.turtle.ctx.moveTo(nx, ny);
         } else if (this._penDown) {
-            this.turtle.ctx.lineTo(nx, ny);
+            const capAngleRadians = (this.turtle.orientation * Math.PI) / 180.0;
+
+            if (linePart) {
+                this.turtle.ctx.lineCap = "butt";
+                if(linePart === "first"){
+                    this.turtle.ctx.beginPath();
+                    this.turtle.ctx.arc(ox, oy, (this.stroke/2), capAngleRadians, Math.PI + capAngleRadians, false);
+                    this.turtle.ctx.fill();
+                }
+                
+                this.turtle.ctx.beginPath();
+                this.turtle.ctx.moveTo(ox, oy);
+                this.turtle.ctx.lineTo(nx, ny);
+                this.turtle.ctx.stroke();
+            
+                if(linePart === "last"){
+                    this.turtle.ctx.beginPath();
+                    this.turtle.ctx.arc(nx, ny, (this.stroke/2), capAngleRadians, Math.PI + capAngleRadians, true);
+                    this.turtle.ctx.fill();
+                }
+            } else {
+                this.turtle.ctx.lineTo(nx, ny);
+            }
+            
             if (!this._svgPath) {
                 this._svgPath = true;
                 const oxScaled = ox * turtlesScale;
@@ -351,7 +374,7 @@ class Painter {
             const nxScaled = nx * turtlesScale;
             const nyScaled = ny * turtlesScale;
             this._svgOutput += nxScaled + "," + nyScaled + " ";
-            this.turtle.ctx.stroke();
+            if(!linePart) this.turtle.ctx.stroke();
             if (!this._fillState) {
                 this.turtle.ctx.closePath();
             }
@@ -691,7 +714,7 @@ class Painter {
      *
      * @param steps - the number of steps the turtle goes forward by
      */
-    doForward(steps) {
+    doForward(steps, linePart) {
         this._processColor();
 
         if (!this._fillState) {
@@ -726,7 +749,7 @@ class Painter {
         const wrap = this.wrap !== null ? this.wrap : WRAP;
 
         if (this._fillState || !wrap || !out) {
-            this._move(ox, oy, nx, ny, true);
+            this._move(ox, oy, nx, ny, true, linePart);
             this.activity.refreshCanvas();
         } else {
             const stepUnit = 5;
@@ -1179,7 +1202,7 @@ class Painter {
                 this.turtle.doTurtleShell(
                     55,
                     "data:image/svg+xml;base64," +
-                        window.btoa(unescape(encodeURIComponent(artwork)))
+                        window.btoa(base64Encode(artwork))
                 );
                 this.turtle.skinChanged = false;
             }

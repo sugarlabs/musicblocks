@@ -172,7 +172,7 @@ const _blockMakeBitmap = (data, callback, args) => {
         callback(bitmap, args);
     };
 
-    img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(data)));
+    img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
 };
 
 // Define block instance objects and any methods that are intra-block.
@@ -856,7 +856,7 @@ class Block {
         if (this.image.search("xmlns") !== -1) {
             image.src =
                 "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(this.image)));
+                window.btoa(base64Encode(this.image));
         } else {
             image.src = this.image;
         }
@@ -1392,7 +1392,7 @@ class Block {
 
             image.src =
                 "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON)));
+                window.btoa(base64Encode(COLLAPSEBUTTON));
         };
 
         /**
@@ -1425,7 +1425,7 @@ class Block {
 
             image.src =
                 "data:image/svg+xml;base64," +
-                window.btoa(unescape(encodeURIComponent(EXPANDBUTTON)));
+                window.btoa(base64Encode(EXPANDBUTTON));
         };
 
         /**
@@ -2442,7 +2442,7 @@ class Block {
         // Some special cases
         if (SPECIALINPUTS.indexOf(this.name) !== -1) {
             this.text.textAlign = "center";
-            this.text.x = Math.floor((VALUETEXTX * blockScale) / 2 + 0.5);
+            this.text.x = Math.floor((VALUETEXTX * blockScale) / 2 + 10.0);
             if (EXTRAWIDENAMES.indexOf(this.name) !== -1) {
                 this.text.x *= 3.0;
             } else if (WIDENAMES.indexOf(this.name) !== -1) {
@@ -4073,9 +4073,9 @@ class Block {
                 this.value = oldValue;
             }
 
-            if(String(this.value).length > 12) {
+            if(String(this.value).length > 10) {
                 const thisBlock = this.blocks.blockList.indexOf(this);
-                this.activity.errorMsg(_("Numbers can have at most 12 digits."), thisBlock);
+                this.activity.errorMsg(_("Numbers can have at most 10 digits."), thisBlock);
                 this.activity.refreshCanvas();
                 this.label.value = oldValue;
                 this.value = oldValue;

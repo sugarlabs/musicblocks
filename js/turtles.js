@@ -798,7 +798,7 @@ Turtles.TurtlesView = class {
                 }
             };
             const img = new Image();
-            img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(svg)));
+            img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svg));
 
             container.appendChild(img);
             container.setAttribute(
@@ -1061,8 +1061,7 @@ Turtles.TurtlesView = class {
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
-                    unescape(
-                        encodeURIComponent(
+                    base64Encode(
                             MBOUNDARY.replace("HEIGHT", this._h)
                                 .replace("WIDTH", this._w)
                                 .replace("Y", 10)
@@ -1073,8 +1072,7 @@ Turtles.TurtlesView = class {
                                 .replace("fill_color", this._backgroundColor)
                                 .replace("STROKE", 20)
                         )
-                    )
-                );
+                    );
             __makeAllButtons();
         };
         // Call the __makeBoundary2 function once the document is loaded
@@ -1102,8 +1100,7 @@ Turtles.TurtlesView = class {
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
-                    unescape(
-                        encodeURIComponent(
+                    base64Encode(
                             MBOUNDARY.replace("HEIGHT", this._h)
                                 .replace("WIDTH", this._w)
                                 .replace("Y", 10 / CONTAINERSCALEFACTOR)
@@ -1114,7 +1111,6 @@ Turtles.TurtlesView = class {
                                 .replace("fill_color", this._backgroundColor)
                                 .replace("STROKE", 20 / CONTAINERSCALEFACTOR)
                         )
-                    )
                 );
         };
 

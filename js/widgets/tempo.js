@@ -255,6 +255,13 @@ class Tempo {
      * @returns {void}
      */
     _useBPM(i) {
+        const input = this.BPMInputs[i].value;
+
+        if (isNaN(input)) {
+            this.activity.errorMsg(_("Please enter a number between 30 and 1000"));
+            return;
+        }
+        
         this.BPMs[i] = this.BPMInputs[i].value;
         if (this.BPMs[i] > 1000) {
             this.BPMs[i] = 1000;

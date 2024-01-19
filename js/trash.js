@@ -84,7 +84,7 @@ class Trashcan {
         img.src =
             "data:image/svg+xml;base64," +
             window.btoa(
-                unescape(encodeURIComponent(BORDER.replace("stroke_color", highlightString)))
+                base64Encode(BORDER.replace("stroke_color", highlightString))
             );
     }
 
@@ -106,10 +106,8 @@ class Trashcan {
         img.src =
             "data:image/svg+xml;base64," +
             window.btoa(
-                unescape(
-                    encodeURIComponent(BORDER.replace("stroke_color", platformColor.trashBorder))
-                )
-            );
+                base64Encode(BORDER.replace("stroke_color", platformColor.trashBorder))
+                );
     }
 
     /**
@@ -133,10 +131,8 @@ class Trashcan {
         img.src =
             "data:image/svg+xml;base64," +
             window.btoa(
-                unescape(
-                    encodeURIComponent(TRASHICON.replace(/fill_color/g, platformColor.trashBorder))
-                )
-            );
+                base64Encode(TRASHICON.replace(/fill_color/g, platformColor.trashBorder))
+                );
     }
 
     /**

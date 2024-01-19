@@ -82,7 +82,7 @@ class Oscilloscope {
             this.zoomFactor *= step;
         };
         zoomInButton.children[0].src = `data:image/svg+xml;base64,${window.btoa(
-            unescape(encodeURIComponent(BIGGERBUTTON))
+            base64Encode(BIGGERBUTTON)
         )}`;
 
         const zoomOutButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, _("Zoom Out"));
@@ -95,7 +95,7 @@ class Oscilloscope {
         };
 
         zoomOutButton.children[0].src = `data:image/svg+xml;base64,${window.btoa(
-            unescape(encodeURIComponent(SMALLERBUTTON))
+            base64Encode(SMALLERBUTTON)
         )}`;
 
         widgetWindow.sendToCenter();
