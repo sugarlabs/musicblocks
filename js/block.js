@@ -3125,7 +3125,7 @@ class Block {
 
             // set the position of cursor to the end (for text value)
             const valueLength = this.label.value.length;
-            this.label.setSelectionRange(valueLength,valueLength);
+            this.label.setSelectionRange(valueLength, valueLength);
 
         } else if (this.name === "solfege") {
             obj = splitSolfege(this.value);
@@ -3684,7 +3684,7 @@ class Block {
                 const valueLength = this.label.value.length;
                 const originalType = this.label.type;
                 this.label.type = "text";
-                this.label.setSelectionRange(valueLength,valueLength);
+                this.label.setSelectionRange(valueLength, valueLength);
                 this.label.type = originalType;
             }
         }
