@@ -782,7 +782,12 @@ function TemperamentWidget() {
         this.tempRatios = [];
 
         divAppend.addEventListener("click", function (event) {
-            that.performEqualEdit(event);
+            try{
+                that.performEqualEdit(event);
+            } catch{
+                alert("Number of divisions cannot exceed 20")
+            }
+
         });
 
         this.performEqualEdit = function (event) {
@@ -790,6 +795,15 @@ function TemperamentWidget() {
             pitchNumber2 = Number(docById("octaveOut").value);
             divisions = Number(docById("divisions").value);
             this.tempRatios = this.ratios.slice();
+
+            if(pitchNumber1 > 999 || pitchNumber2 > 999){
+                this.activity.errorMsg("Pitch numbers are too large");
+            }
+
+            if(divisions > 999){
+                this.activity.errorMsg("Too many divisions.");
+            }
+
             if (pitchNumber1 === pitchNumber2) {
                 for (let i = 0; i < divisions; i++) {
                     ratio[i] = Math.pow(this.powerBase, i / divisions);
