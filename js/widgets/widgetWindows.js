@@ -105,8 +105,19 @@ class WidgetWindow {
                 e.stopImmediatePropagation();
             };
         }
+        const closeButton = this._create("div", "wftButton close", this._drag);
+        closeButton.onclick = (e) => {
+            this.onclose();
+            e.preventDefault();
+            e.stopPropagation();
+        };
 
-        this._drag.onmousedown = (e) => {
+        const titleEl = this._create("div", "wftTitle", this._drag);
+        titleEl.innerHTML = "" ;
+        titleEl.insertAdjacentHTML("afterbegin", _(this._title));
+        titleEl.id = `${this._key}WidgetID` ;
+
+        titleEl.onmousedown = (e) => {
             this._dragging = true;
             if (this._maximized) {
                 // Perform special repositioning to make the drag feel right when
@@ -130,18 +141,24 @@ class WidgetWindow {
             e.preventDefault();
         };
 
-        const closeButton = this._create("div", "wftButton close", this._drag);
-        closeButton.onclick = (e) => {
-            this.onclose();
-            e.preventDefault();
-            e.stopPropagation();
-        };
-
         const rollButton = this._create("div", "wftButton rollup", this._drag);
         rollButton.onclick = (e) => {
-            if (this._rolled) {
-                this.unroll();
+            if (this._maximized) {
+                this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
+                this._maximized = false;
+                let left = (window.innerWidth / 2) - 100 ;
+                  let top= (window.innerHeight / 2) ;
+                this.setPosition(
+                   left,
+                   top
+                );
+                this._rollup();
                 this._toggleClass(rollButton, "plus");
+            }
+
+           else if (this._rolled) {
+                this.unroll();
+                this._toggleClass(rollButton, "plus");      
             }
             else {
                 this._rollup();
@@ -155,10 +172,7 @@ class WidgetWindow {
             e.stopPropagation();
         };
 
-        const titleEl = this._create("div", "wftTitle", this._drag);
-        titleEl.innerHTML = "" ;
-        titleEl.insertAdjacentHTML("afterbegin", _(this._title));
-        titleEl.id = `${this._key}WidgetID` ;
+      
 
         if (this._fullscreenEnabled) {
             const maxminButton = this._create("div", "wftButton wftMaxmin", this._drag);
@@ -566,9 +580,19 @@ class WidgetWindow {
      * @returns {WidgetWindow} this
      */
     setPosition(x, y) {
-        this._frame.style.left = `${x}px` ;
-        this._frame.style.top = `${Math.max(y, 64)}px`;
-        window.widgetWindows._posCache[this._key] = [x, Math.max(y, 64)];
+             const minHeight = 64; // Minimum top position
+      
+        const maxWidth = window.innerWidth - this._frame.clientWidth;
+        const maxHeight = window.innerHeight - this._frame.clientHeight;
+        // Constrain the x and y values within the specified range
+        const constrainedX = Math.max(0, Math.min(x, maxWidth));
+        const constrainedY = Math.max(minHeight, Math.min(y, maxHeight));
+      
+        // Set the left property based on constrainedX
+        this._frame.style.left = `${constrainedX}px`;
+        this._frame.style.top = `${constrainedY}px`;
+      
+        window.widgetWindows._posCache[this._key] = [constrainedX, constrainedY];
         return this;
     }
 
