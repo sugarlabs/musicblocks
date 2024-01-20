@@ -1626,7 +1626,6 @@ input.timbreName {
   }
 
   .msgCloseIcon:hover {
-    background-color: #fd0707;
     filter: invert(0%);
   }
 
