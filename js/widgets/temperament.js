@@ -712,12 +712,12 @@ function TemperamentWidget() {
         equalEdit.innerHTML =
             "<br>" +
             _("pitch number") +
-            '&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="octaveIn" value="0"></input> &nbsp;&nbsp; ' +
+            '&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="octaveIn" maxlength="3" value="0"></input> &nbsp;&nbsp; ' +
             _("to") +
-            ' &nbsp;&nbsp; <input type="text" id="octaveOut" value="0"></input><br><br>';
+            ' &nbsp;&nbsp; <input type="text" id="octaveOut" maxlength="3" value="0"></input><br><br>';
         equalEdit.innerHTML +=
             _("number of divisions") +
-            ' &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="divisions" value="' +
+            ' &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="divisions" maxlength="2" value="' +
             this.pitchNumber +
             '"></input>';
         equalEdit.style.paddingLeft = "80px";
