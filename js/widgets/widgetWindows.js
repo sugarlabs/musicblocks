@@ -76,6 +76,15 @@ class WidgetWindow {
         if (parent) parent.append(el);
         return el;
     }
+    
+    /**
+     * @private
+     * @param {HTMLElement} element
+     * @param {string} className
+     */
+    _toggleClass(element,className) {
+        element.classList.toggle(className);
+    }
 
     /**
      * @private
@@ -130,8 +139,14 @@ class WidgetWindow {
 
         const rollButton = this._create("div", "wftButton rollup", this._drag);
         rollButton.onclick = (e) => {
-            if (this._rolled) this.unroll();
-            else this._rollup();
+            if (this._rolled) {
+                this.unroll();
+                this._toggleClass(rollButton, "plus");
+            }
+            else {
+                this._rollup();
+                this._toggleClass(rollButton, "plus");
+            }
             this.takeFocus();
             this._frame.style.width = "auto";
             this._frame.style.height = "auto";
