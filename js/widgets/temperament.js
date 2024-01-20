@@ -785,7 +785,7 @@ function TemperamentWidget() {
             try{
                 that.performEqualEdit(event);
             } catch{
-                this.activity.errorMsg(_("Number of divisions is too large."))
+                this.activity.errorMsg(_("Number of divisions is too large."));
             }
 
         });
@@ -797,11 +797,11 @@ function TemperamentWidget() {
             this.tempRatios = this.ratios.slice();
 
             if(pitchNumber1 > 999 || pitchNumber2 > 999){
-                this.activity.errorMsg("Pitch numbers are too large");
+                this.activity.errorMsg(_("Pitch numbers are too large"));
             }
 
             if(divisions > 999){
-                this.activity.errorMsg("Too many divisions.");
+                this.activity.errorMsg(_("Too many divisions."));
             }
 
             if (pitchNumber1 === pitchNumber2) {
