@@ -368,6 +368,24 @@ class Activity {
             this.searchWidget.style.visibility = "hidden";
             this.searchWidget.placeholder = _("Search for blocks");
 
+            this.helpfulSearchWidget = document.createElement("input");
+            this.helpfulSearchWidget.setAttribute("id", "helpfulSearch");
+            this.helpfulSearchWidget.style.visibility = "hidden";
+            this.helpfulSearchWidget.placeholder = _("Search for blocks");
+            this.helpfulSearchWidget.classList.add("ui-autocomplete");
+            this.helpfulSearchWidget.style.cssText = `
+                padding: 2px;
+                border: 2px solid grey;
+                width: 220px;
+                height: 20px;
+                font-size: large;
+            `;
+            this.createHelpfulRestoreIcon();
+            this.createHelpfulWrapIcon();
+            this.createEnableHorizScrollIcon();
+            this.createDisableHorizScrollIcon();
+            this.createHelpfulChooseKeyIcon();
+
             this.progressBar = docById("myProgress");
             this.progressBar.style.visibility = "hidden";
 
@@ -376,7 +394,297 @@ class Activity {
             this.paste.style.visibility = "hidden";
 
             this.toolbarHeight = document.getElementById("toolbars").offsetHeight;
+
+            this.setHelpfulMenu();
         };
+
+        this.createHelpfulRestoreIcon = () => {
+            const iTag = document.createElement('i');
+            const aTag = document.createElement('a');
+
+            iTag.textContent = 'restore_from_trash';
+            iTag.className = 'material-icons md-48';
+            iTag.style.cssText = `
+                font-size: 42px;
+                color: white;
+            `
+
+            aTag.appendChild(iTag);
+            aTag.style.cssText = `
+                padding: 1px;
+                width: 43px;
+                height: 42px;
+                margin: 3px;
+                border-radius: 5px;
+                background-color: #a0a0a0;
+            `
+            const para = document.createElement('p');
+            para.textContent = _('Restore');
+
+            this.helpfulRestoreIcon = document.createElement('div');
+            this.helpfulRestoreIcon.setAttribute("id", "helpfulRestoreIcon");
+            this.helpfulRestoreIcon.appendChild(aTag);
+            this.helpfulRestoreIcon.appendChild(para);
+
+            this.helpfulRestoreIcon.style.cssText = `
+                display: flex;
+                width: 100%;
+                cursor: default;
+            `
+            this.helpfulRestoreIcon.onmouseenter = () => {
+                this.helpfulRestoreIcon.style.cursor = 'pointer';
+            }
+            this.helpfulRestoreIcon.onmouseleave = () => {
+                this.helpfulRestoreIcon.style.cursor = 'default';
+            }
+        }
+
+        this.createHelpfulWrapIcon = () => {
+            const iTag = document.createElement('i');
+            const aTag = document.createElement('a');
+
+            iTag.textContent = 'wrap_text';
+            iTag.className = 'material-icons md-48';
+            iTag.style.cssText = `
+                font-size: 42px;
+                color: white;
+            `
+
+            aTag.appendChild(iTag);
+            aTag.style.cssText = `
+                padding: 1px;
+                width: 43px;
+                height: 42px;
+                margin: 3px;
+                border-radius: 5px;
+                background-color: #a0a0a0;
+            `
+            const para = document.createElement('p');
+            para.setAttribute("id", "helpfulWrapTurtleData");
+            para.textContent = _('Turtle Wrap Off');
+
+            this.helpfulWrapIcon = document.createElement('div');
+            this.helpfulWrapIcon.setAttribute("id", "helpfulWrapTurtle");
+            this.helpfulWrapIcon.appendChild(aTag);
+            this.helpfulWrapIcon.appendChild(para);
+
+            this.helpfulWrapIcon.style.cssText = `
+                display: flex;
+                width: 100%;
+                cursor: default;
+            `
+            this.helpfulWrapIcon.onmouseenter = () => {
+                this.helpfulWrapIcon.style.cursor = 'pointer';
+            }
+            this.helpfulWrapIcon.onmouseleave = () => {
+                this.helpfulWrapIcon.style.cursor = 'default';
+            }
+        }
+
+        this.createEnableHorizScrollIcon = () => {
+            const iTag = document.createElement('i');
+            const aTag = document.createElement('a');
+
+            iTag.textContent = 'compare_arrows';
+            iTag.className = 'material-icons md-48';
+            iTag.style.cssText = `
+                font-size: 42px;
+                color: white;
+            `
+
+            aTag.appendChild(iTag);
+            aTag.style.cssText = `
+                padding: 1px;
+                width: 43px;
+                height: 42px;
+                margin: 3px;
+                border-radius: 5px;
+                background-color: #a0a0a0;
+            `
+            const para = document.createElement('p');
+            para.textContent = _('Enable horizontal scrolling');
+
+            this.enableHelpfulHorizScrollIcon = document.createElement('div');
+            this.enableHelpfulHorizScrollIcon.setAttribute("id", "enableHelpfulHorizScrollIcon");
+            this.enableHelpfulHorizScrollIcon.appendChild(aTag);
+            this.enableHelpfulHorizScrollIcon.appendChild(para);
+
+            this.enableHelpfulHorizScrollIcon.style.cssText = `
+                display: flex;
+                width: 100%;
+                cursor: default;
+                align-items: center;
+                height: 50px;
+            `
+            this.enableHelpfulHorizScrollIcon.onmouseenter = () => {
+                this.enableHelpfulHorizScrollIcon.style.cursor = 'pointer';
+            }
+            this.enableHelpfulHorizScrollIcon.onmouseleave = () => {
+                this.enableHelpfulHorizScrollIcon.style.cursor = 'default';
+            }
+        }
+
+        this.createDisableHorizScrollIcon = () => {
+            const iTag = document.createElement('i');
+            const aTag = document.createElement('a');
+
+            iTag.textContent = 'lock';
+            iTag.className = 'material-icons md-48';
+            iTag.style.cssText = `
+                font-size: 42px;
+                color: white;
+            `
+
+            aTag.appendChild(iTag);
+            aTag.style.cssText = `
+                padding: 1px;
+                width: 43px;
+                height: 42px;
+                margin: 3px;
+                border-radius: 5px;
+                background-color: #a0a0a0;
+            `
+            const para = document.createElement('p');
+            para.textContent = _('Disable horizontal scrolling');
+
+            this.disableHelpfulHorizScrollIcon = document.createElement('div');
+            this.disableHelpfulHorizScrollIcon.setAttribute("id", "disableHelpfulHorizScrollIcon");
+            this.disableHelpfulHorizScrollIcon.appendChild(aTag);
+            this.disableHelpfulHorizScrollIcon.appendChild(para);
+
+            this.disableHelpfulHorizScrollIcon.style.cssText = `
+                display: none;
+                width: 100%;
+                cursor: default;
+                align-items: center;
+                height: 50px;
+            `
+            this.disableHelpfulHorizScrollIcon.onmouseenter = () => {
+                this.disableHelpfulHorizScrollIcon.style.cursor = 'pointer';
+            }
+            this.disableHelpfulHorizScrollIcon.onmouseleave = () => {
+                this.disableHelpfulHorizScrollIcon.style.cursor = 'default';
+            }
+        }
+
+        this.createHelpfulChooseKeyIcon = () => {
+            const iTag = document.createElement('i');
+            const aTag = document.createElement('a');
+
+            iTag.textContent = 'music_note';
+            iTag.className = 'material-icons md-48';
+            iTag.style.cssText = `
+                font-size: 42px;
+                color: white;
+            `
+
+            aTag.appendChild(iTag);
+            aTag.style.cssText = `
+                padding: 1px;
+                width: 43px;
+                height: 42px;
+                margin: 3px;
+                border-radius: 5px;
+                background-color: #a0a0a0;
+            `
+            const para = document.createElement('p');
+            para.textContent = _('Set Pitch Preview');
+
+            this.helpfulChooseKeyIcon = document.createElement('div');
+            this.helpfulChooseKeyIcon.setAttribute("id", "helpfulChooseKeyIcon");
+            this.helpfulChooseKeyIcon.appendChild(aTag);
+            this.helpfulChooseKeyIcon.appendChild(para);
+
+            this.helpfulChooseKeyIcon.style.cssText = `
+                display: flex;
+                width: 100%;
+                cursor: default;
+            `
+            this.helpfulChooseKeyIcon.onmouseenter = () => {
+                this.helpfulChooseKeyIcon.style.cursor = 'pointer';
+            }
+            this.helpfulChooseKeyIcon.onmouseleave = () => {
+                this.helpfulChooseKeyIcon.style.cursor = 'default';
+            }
+        }
+        /*
+         * Sets up context menu
+         * (if canvas is right clicked)
+         */
+        this.setHelpfulMenu = () => {
+            if (docById("helpfulMenu")) {
+                docById("helpfulMenu").parentNode.removeChild(
+                    docById("helpfulMenu")
+                );
+            }
+            this.canvasMenu = document.createElement("div");
+            this.canvasMenu.setAttribute("id", "helpfulMenu");
+            this.canvasMenu.style.cssText = `
+                position: absolute;
+                background-color: #f0f0f0;
+                padding: 5px;
+                border: 1px solid #ccc;
+                width: 230px;
+                display: none;
+                z-index: 1;
+            `;
+
+            document.body.appendChild(this.canvasMenu);
+
+            this._setHelpfulSearch();
+
+            this.helpfulHomeButtonContainer = this._makeHelpfulButton(
+                GOHOMEFADEDBUTTON,
+                _("Home") + " [" + _("Home").toUpperCase() + "]",
+            );
+            this._loadButtonDragHandler(this.helpfulHomeButtonContainer, findBlocks, this);
+        
+            this.helpufulHideBlocksContainer = this._makeHelpfulButton(
+                SHOWBLOCKSBUTTON,
+                _("Show/hide block"),
+            );
+            this._loadButtonDragHandler(this.helpufulHideBlocksContainer, changeBlockVisibility, this);
+        
+            this.helpfulCollapseBlocksContainer = this._makeHelpfulButton(
+                COLLAPSEBLOCKSBUTTON,
+                _("Expand/collapse blocks"),
+            );
+            this._loadButtonDragHandler(
+                this.helpfulCollapseBlocksContainer, toggleCollapsibleStacks, this
+            );
+        
+            this.helpfulSmallerContainer = this._makeHelpfulButton(
+                SMALLERBUTTON,
+                _("Decrease block size"),
+            );
+            this._loadButtonDragHandler(this.helpfulSmallerContainer, doSmallerBlocks, this);
+
+
+            this.helpfulLargerContainer = this._makeHelpfulButton(
+                BIGGERBUTTON,
+                _("Increase block size"),
+            );
+            this._loadButtonDragHandler(this.helpfulLargerContainer, doLargerBlocks, this);
+
+            this.canvasMenu.appendChild(this.helpfulRestoreIcon);
+            this.canvasMenu.appendChild(this.helpfulWrapIcon);
+            this.canvasMenu.appendChild(this.enableHelpfulHorizScrollIcon);
+            this.canvasMenu.appendChild(this.disableHelpfulHorizScrollIcon);
+            this.canvasMenu.appendChild(this.helpfulChooseKeyIcon);
+            
+        }
+
+        /*
+         * Sets up seaarching functionality on context menus
+         */
+        this._setHelpfulSearch = () => {
+            if (docById("helpfulSearch")) {
+                docById("helpfulSearch").parentNode.removeChild(
+                    docById("helpfulSearch")
+                );
+            }
+            this.canvasMenu.appendChild(this.helpfulSearchWidget);
+        }
 
         /*
          * Sets up right click functionality opening the context menus
@@ -388,10 +696,36 @@ class Activity {
                 (event) => {
                     event.preventDefault();
                     event.stopPropagation();
+                    if(event.target.localName === "canvas") {
+                        this._displayHelpfulMenu(event);
+                    }
                 },
                 false
             );
         };
+
+        /*
+         * displays helpfulMenu on canvas on right click
+         */
+        this._displayHelpfulMenu = (event) => {
+            this.canvasMenu.style.left = event.clientX + "px";
+            this.canvasMenu.style.top = event.clientY + "px";
+
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            this.canvasMenu.style.display = "block";
+            const menuWidth = this.canvasMenu.offsetWidth;
+            const menuHeight = this.canvasMenu.offsetHeight;
+
+            if (this.canvasMenu.offsetLeft + menuWidth > windowWidth) {
+                this.canvasMenu.style.left = (windowWidth - menuWidth) + "px";
+            }
+            if (this.canvasMenu.offsetTop + menuHeight > windowHeight) {
+                this.canvasMenu.style.top = (windowHeight - menuHeight) + "px";
+            }
+
+            this.showHelpfulSearchWidget();
+        }
 
         /*
          * Sets up plugin and palette boiler plate
@@ -1168,12 +1502,18 @@ class Activity {
             this.scrollBlockContainer = !this.scrollBlockContainer;
             const enableHorizScrollIcon = docById("enableHorizScrollIcon");
             const disableHorizScrollIcon = docById("disableHorizScrollIcon");
+            const enableHelpfulHorizScrollIcon = docById("enableHelpfulHorizScrollIcon");
+            const disableHelpfulHorizScrollIcon = docById("disableHelpfulHorizScrollIcon");
             if (this.scrollBlockContainer && !this.beginnerMode) {
                 enableHorizScrollIcon.style.display = "none";
                 disableHorizScrollIcon.style.display = "block";
+                enableHelpfulHorizScrollIcon.style.display = "none";
+                disableHelpfulHorizScrollIcon.style.display = "flex";
             } else {
                 enableHorizScrollIcon.style.display = "block";
                 disableHorizScrollIcon.style.display = "none";
+                enableHelpfulHorizScrollIcon.style.display = "flex";
+                disableHelpfulHorizScrollIcon.style.display = "none";
             }
         };
 
@@ -1936,12 +2276,31 @@ class Activity {
         };
 
         /*
+        * Hides search widget on helpfulMenu
+        */
+        this.hideHelpfulSearchWidget = () => {
+            // Hide the jQuery search results widget.
+            const obj = docByClass("ui-menu");
+            if (obj.length > 0) {
+                obj[0].style.visibility = "hidden";
+            }
+
+            this.helpfulSearchWidget.idInput_custom = "";
+        };
+
+        /*
          * Shows search widget
          */
         this.showSearchWidget = () => {
             // Bring widget to top.
             this.searchWidget.style.zIndex = 1001;
             this.searchWidget.style.border = "2px solid blue";
+            const $j = jQuery.noConflict();
+            if($j("#search")) {
+                try {
+                    $j("#search").autocomplete("destroy");
+                } catch {}
+            }
             if (this.searchWidget.style.visibility === "visible") {
                 this.hideSearchWidget();
             } else {
@@ -1968,13 +2327,13 @@ class Activity {
                     ) {
                         //do nothing when clicked in the input field
                     } else if (
-                        docById("ui-id-1").style.display === "block" &&
+                        docById("ui-id-1") && docById("ui-id-1").style.display === "block" &&
                         (e.target === docById("ui-id-1") || docById("ui-id-1").contains(e.target))
                     ) {
                         //do nothing when clicked on the menu
                     } else if (document.getElementsByTagName("tr")[2].contains(e.target)) {
                         //do nothing when clicked on the search row
-                    } else {
+                    } else if (e.target.id === "myCanvas") {
                         that.hideSearchWidget();
                         document.removeEventListener("mousedown", closeListener);
                     }
@@ -2059,6 +2418,117 @@ class Activity {
             }
 
             this.searchWidget.value = "";
+            this.update = true;
+        };
+
+        /*
+         * Shows search widget on helpfulMenu
+         */
+        this.showHelpfulSearchWidget = () => {
+            // Bring widget to top.
+            const $j = jQuery.noConflict();
+            if($j("#helpfulSearch")) {
+                try {
+                    $j("#helpfulSearch").autocomplete("destroy");
+                } catch (error) {
+                    error;
+                }
+            }
+            this.helpfulSearchWidget.style.zIndex = 1001;
+            // this.helpfulSearchWidget.style.border = "2px solid blue";
+            this.helpfulSearchWidget.idInput_custom = "";
+            if(this.canvasMenu.style.display === "block") {
+
+                this.helpfulSearchWidget.value = null;
+                this.helpfulSearchWidget.style.visibility = "visible";
+
+                this.searchBlockPosition = [100, 100];
+                this.prepSearchWidget();
+
+                const that = this;
+                const closeListener = (e) => {
+                    if(e.target.id === "myCanvas"){
+                        that.hideSearchWidget();
+                        document.removeEventListener("mousedown", closeListener);
+                    }
+                };
+                document.addEventListener("mousedown", closeListener);
+                setTimeout(() => {
+                    that.helpfulSearchWidget.focus();
+                    that.doHelpfulSearch();
+                }, 500);
+            }
+        };
+
+        /*
+         * Uses JQuery to add autocompleted search suggestions
+         */
+        this.doHelpfulSearch = () => {
+            const $j = jQuery.noConflict();
+
+            const that = this;
+            $j("#helpfulSearch").autocomplete({
+                source: that.searchSuggestions,
+                select: (event, ui) => {
+                    event.preventDefault();
+                    that.helpfulSearchWidget.value = ui.item.label;
+                    that.helpfulSearchWidget.idInput_custom = ui.item.value;
+                    that.helpfulSearchWidget.protoblk = ui.item.specialDict;
+                    that.doHelpfulSearch();
+                },
+                focus: (event, ui) => {
+                    event.preventDefault();
+                    that.helpfulSearchWidget.value = ui.item.label;
+                }
+            });
+
+            $j("#helpfulSearch").autocomplete("widget").addClass("scrollSearch");
+
+            $j("#helpfulSearch").autocomplete("instance")._renderItem = (ul, item) => {
+                return $j("<li></li>")
+                    .data("item.autocomplete", item)
+                    .append(
+                        '<img src="' +
+                            item.artwork +
+                            '" height = "20px">' +
+                            "<a>" +
+                            " " +
+                            item.label +
+                            "</a>"
+                    )
+                    .appendTo(ul.css("z-index", 9999));
+            };
+            const searchInput = this.helpfulSearchWidget.idInput_custom;
+            if (!searchInput || searchInput.length <= 0) return;
+
+            const protoblk = this.helpfulSearchWidget.protoblk;
+            const paletteName = protoblk.palette.name;
+            const protoName = protoblk.name;
+
+            // eslint-disable-next-line no-prototype-builtins
+            if (this.blocks.protoBlockDict.hasOwnProperty(protoName)) {
+                this.palettes.dict[paletteName].makeBlockFromSearch(
+                    protoblk,
+                    protoName,
+                    (newBlock) => {
+                        that.blocks.moveBlock(
+                            newBlock,
+                            100 + that.searchBlockPosition[0] - that.blocksContainer.x,
+                            that.searchBlockPosition[1] - that.blocksContainer.y
+                        );
+                    }
+                );
+
+                // Move the position of the next newly created block.
+                this.searchBlockPosition[0] += STANDARDBLOCKHEIGHT;
+                this.searchBlockPosition[1] += STANDARDBLOCKHEIGHT;
+            } else if (this.deprecatedBlockNames.indexOf(searchInput) > -1) {
+                this.errorMsg(_("This block is deprecated."));
+            } else {
+                this.errorMsg(_("Block cannot be found."));
+            }
+
+            this.helpfulSearchWidget.value = "";
             this.update = true;
         };
 
@@ -2247,6 +2717,7 @@ class Activity {
             const disableKeys =
                 docById("lilypondModal").style.display === "block" ||
                 this.searchWidget.style.visibility === "visible" ||
+                this.helpfulSearchWidget.style.visibility === "visible" ||
                 docById("planet-iframe").style.display === "" ||
                 docById("paste").style.visibility === "visible" ||
                 docById("wheelDiv").style.display === "" ||
@@ -4348,6 +4819,51 @@ class Activity {
             return container;
         };
 
+        /*
+         * Makes non-toolbar buttons for helpfulMenu on canvas, e.g., the palette menu buttons
+         */
+        this._makeHelpfulButton = (name, label) => {
+            if (docById("helpful" + label)) {
+                docById("helpful" + label).parentNode.removeChild(
+                    docById("helpful" + label)
+                );
+            }
+            const container = document.createElement("div");
+            container.setAttribute("id", "" + "helpful" + label);
+
+            const that = this;
+            // eslint-disable-next-line no-unused-vars
+            container.onmouseover = (event) => {
+                if (!that.loading) {
+                    document.body.style.cursor = "pointer";
+                }
+            };
+
+            // eslint-disable-next-line no-unused-vars
+            container.onmouseout = (event) => {
+                if (!that.loading) {
+                    document.body.style.cursor = "default";
+                }
+            };
+
+            const img = new Image();
+            img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(name)));
+            img.style = " padding: 4px"
+
+            const para = document.createElement("p");
+            para.textContent = "" + label;
+
+            container.appendChild(img);
+            container.appendChild(para);
+            container.setAttribute(
+                "style",
+                "display: flex"
+            );
+
+            this.canvasMenu.appendChild(container);
+            return container;
+        };
+
         /**
          * Handles button dragging, long hovering and prevents multiple button presses.
          * @param container longAction
@@ -4524,7 +5040,10 @@ class Activity {
                 }
             });
 
-            document.addEventListener("click", () => {
+            document.addEventListener("click", (e) => {
+                if (this.canvasMenu.style.display !== "none" && e.target.id !== "helpfulSearch") {
+                    this.canvasMenu.style.display = "none";
+                }
                 that.__tick();
             });
 

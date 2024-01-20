@@ -426,6 +426,9 @@ class Toolbar {
         const wrapIcon = docById("wrapTurtle");
         let wrapButtonTooltipData = _("Turtle Wrap Off");
 
+        const helpfulWrapIcon = docById("helpfulWrapTurtle");
+        const helpfulWrapData = docById("helpfulWrapTurtleData");
+
         wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
         $j(".tooltipped").tooltip({
             html: true,
@@ -436,8 +439,27 @@ class Toolbar {
             WRAP = !WRAP;
             if (WRAP) {
                 wrapButtonTooltipData = _("Turtle Wrap Off");
+                helpfulWrapData.textContent = _("Turtle Wrap Off");
             } else {
                 wrapButtonTooltipData = _("Turtle Wrap On");
+                helpfulWrapData.textContent = _("Turtle Wrap On");
+            }
+
+            wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
+            $j(".tooltipped").tooltip({
+                html: true,
+                delay: 100
+            });
+        };
+
+        helpfulWrapIcon.onclick = () => {
+            WRAP = !WRAP;
+            if (WRAP) {
+                wrapButtonTooltipData = _("Turtle Wrap Off");
+                helpfulWrapData.textContent = _("Turtle Wrap Off");
+            } else {
+                wrapButtonTooltipData = _("Turtle Wrap On");
+                helpfulWrapData.textContent = _("Turtle Wrap On");
             }
 
             wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
@@ -734,6 +756,8 @@ class Toolbar {
         const delPluginIcon = docById("delPluginIcon");
         const enableHorizScrollIcon = docById("enableHorizScrollIcon");
         const disableHorizScrollIcon = docById("disableHorizScrollIcon");
+        const enableHelpfulHorizScrollIcon = docById("enableHelpfulHorizScrollIcon");
+        const disableHelpfulHorizScrollIcon = docById("disableHelpfulHorizScrollIcon");
         const toggleJavaScriptIcon = docById("toggleJavaScriptIcon");
         const browser = fnBrowserDetect();
         const btn = document.getElementById("record");
@@ -767,12 +791,21 @@ class Toolbar {
             disableHorizScrollIcon.onclick = () => {
                 setScroller(this.activity);
             };
+
+            enableHelpfulHorizScrollIcon.onclick = () => {
+                setScroller(this.activity);
+            };
+
+            disableHelpfulHorizScrollIcon.onclick = () => {
+                setScroller(this.activity);
+            };
         } else {
             displayStatsIcon.style.display = "none";
             loadPluginIcon.style.display = "none";
             delPluginIcon.style.display = "none";
             enableHorizScrollIcon.style.display = "none";
             toggleJavaScriptIcon.style.display = "none";
+            enableHelpfulHorizScrollIcon.style.display = "none";
         }
     }
 
@@ -796,8 +829,13 @@ class Toolbar {
      */
     renderRestoreIcon(onclick) {
         const restoreIcon = docById("restoreIcon");
+        const helpfulRestoreIcon = docById("helpfulRestoreIcon");
 
         restoreIcon.onclick = () => {
+            onclick(this.activity);
+        };
+
+        helpfulRestoreIcon.onclick = () => {
             onclick(this.activity);
         };
     }
@@ -812,6 +850,11 @@ class Toolbar {
             const chooseKeyIcon = docById("chooseKeyIcon");
             docById("chooseKeyDiv").style.display = "none";
             chooseKeyIcon.onclick = () => {
+                onclick(this.activity);
+            };
+            
+            const helpfulChooseKeyIcon = docById("helpfulChooseKeyIcon");
+            helpfulChooseKeyIcon.onclick = () => {
                 onclick(this.activity);
             };
         }

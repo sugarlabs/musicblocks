@@ -813,6 +813,47 @@ Turtles.TurtlesView = class {
             return container;
         };
 
+        const _makeHelpfulButton = (svg, label) => {
+            if (docById("helpful" + label)) {
+                docById("helpful" + label).parentNode.removeChild(
+                    docById("helpful" + label)
+                );
+            }
+            const container = document.createElement("div");
+            container.setAttribute("id", "helpful" + label);
+
+            container.onmouseover = () => {
+                if (!activity.loading) {
+                    document.body.style.cursor = "pointer";
+                }
+            };
+
+            container.onmouseout = () => {
+                if (!activity.loading) {
+                    document.body.style.cursor = "default";
+                }
+            };
+            const img = new Image();
+            img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(svg)));
+
+            const para = document.createElement("p");
+            para.textContent = "" + label;
+
+            container.appendChild(img);
+            container.appendChild(para);
+            container.setAttribute(
+                "style",
+                `display: flex;
+                    padding-left: 4px;
+                    column-gap: 3.5px;
+                `
+            );
+
+            this.activity.canvasMenu.appendChild(container);
+            return container;
+        };
+
+
         /**
          * Setup dragging of smaller canvas .
          */
@@ -882,6 +923,21 @@ Turtles.TurtlesView = class {
         };
 
         /**
+         * Makes 'cartesian' button on helpfulMenu by initailising 'CARTESIANBUTTON' SVG.
+         * Assigns click listener function to doGrid() method.
+         */
+        const __makeHelpfulGridButton = () => {
+            this.helpfulGridButton = _makeHelpfulButton(
+                CARTESIANBUTTON,
+                _("Grid"),
+            );
+            const that = this;
+            this.helpfulGridButton.onclick  = () => {
+                piemenuGrid(that.activity);
+            };
+        };
+
+        /**
          * Makes clear button by initailising 'CLEARBUTTON' SVG.
          * Assigns click listener function to call allClear() method.
          */
@@ -894,6 +950,25 @@ Turtles.TurtlesView = class {
             );
 
             this._clearButton.onclick = () => {
+                this.activity._allClear();
+            };
+            
+            if (doCollapse) {
+                __collapse();
+            }
+        };
+
+        /**
+         * Makes clear button on helpfulMenu by initailising 'CLEARBUTTON' SVG.
+         * Assigns click listener function to call allClear() method.
+         */
+        const __makeHelpfulClearButton = () => {
+            this._helpfulClearButton = _makeHelpfulButton(
+                CLEARBUTTON,
+                _("Clean")
+            );
+
+            this._helpfulClearButton.onclick = () => {
                 this.activity._allClear();
             };
             
@@ -924,8 +999,40 @@ Turtles.TurtlesView = class {
                     docById("toggleAuxBtn").className -= "blue darken-1";
                 }
                 this._expandButton.style.visibility = "visible";
+                this._helpfulExpandButton.style.display = "flex";
                 this._collapseButton.style.visibility = "hidden";
+                this._helpfulCollapseButton.style.display = "none";
                 this.gridButton.style.visibility = "hidden";
+                this.helpfulGridButton.style.display = "none";
+                __collapse();
+            };
+        };
+
+        /**
+         * Makes collapse button on helpfulMenu by initailising 'EXPANDBUTTON' SVG.
+         * Assigns click listener function to call __collapse() method.
+         */
+        const __makeHelpfulCollapseButton = () => {
+            this._helpfulCollapseButton = _makeHelpfulButton(
+                COLLAPSEBUTTON,
+                _("Collapse")
+            );
+
+            this._helpfulCollapseButton.onclick = () => {
+                // If the aux toolbar is open, close it.
+                const auxToolbar = docById("aux-toolbar");
+                if (auxToolbar.style.display === "block") {
+                    const menuIcon = docById("menu");
+                    auxToolbar.style.display = "none";
+                    menuIcon.innerHTML = "menu";
+                    docById("toggleAuxBtn").className -= "blue darken-1";
+                }
+                this._expandButton.style.visibility = "visible";
+                this._helpfulExpandButton.style.display = "flex";
+                this._collapseButton.style.visibility = "hidden";
+                this._helpfulCollapseButton.style.display = "none";
+                this.gridButton.style.visibility = "hidden";
+                this.helpfulGridButton.style.display = "none";
                 __collapse();
             };
         };
@@ -958,9 +1065,76 @@ Turtles.TurtlesView = class {
                 this.setStageScale(1.0);
                 this._expandedBoundary.visible = true;
                 this.gridButton.style.visibility = "visible";
+                this.helpfulGridButton.style.display = "flex";
                 this._collapseButton.style.visibility = "visible";
+                this._helpfulCollapseButton.style.display = "flex";
                 this._expandButton.style.visibility = "hidden";
+                this._helpfulExpandButton.style.display = "none";
                 this._collapsedBoundary.visible = false;
+                turtlesStage.removeAllEventListeners("pressmove");
+                turtlesStage.removeAllEventListeners("mousedown");
+
+                turtlesStage.x = 0;
+                turtlesStage.y = 0;
+                this._isShrunk = false;
+
+                for (let i = 0; i < this.turtleList.length; i++) {
+                    this.turtleList[i].container.scaleX = 1;
+                    this.turtleList[i].container.scaleY = 1;
+                    this.turtleList[i].container.scale = 1;
+                }
+
+                this._clearButton.scaleX = 1;
+                this._clearButton.scaleY = 1;
+                this._clearButton.scale = 1;
+                this._clearButton.x = this._w - 5 - 2 * 55;
+
+                if (this.gridButton !== null) {
+                    this.gridButton.scaleX = 1;
+                    this.gridButton.scaleY = 1;
+                    this.gridButton.scale = 1;
+                    this.gridButton.x = this._w - 10 - 3 * 55;
+                    this.gridButton.visible = true;
+                }
+
+                // remove the stage and add it back in position 0
+                this.masterStage.removeChild(turtlesStage);
+                this.masterStage.addChildAt(turtlesStage, 0);
+            };
+        };
+
+        /**
+         * Makes expand button on helpfulMenu by initailising 'EXPANDBUTTON' SVG.
+         * Assigns click listener function to remove stage and add it at posiion 0.
+         */
+        const __makeHelpfulExpandButton = () => {
+            this._helpfulExpandButton = _makeHelpfulButton(
+                EXPANDBUTTON,
+                _("Expand")
+            );
+            if (this._helpfulExpandButton !== null) {
+                this._helpfulExpandButton.style.display = "none";
+            }
+
+            this._helpfulExpandButton.onclick = () => {
+                // If the aux toolbar is open, close it.
+                const auxToolbar = docById("aux-toolbar");
+                if (auxToolbar.style.display === "block") {
+                    const menuIcon = docById("menu");
+                    auxToolbar.style.display = "none";
+                    menuIcon.innerHTML = "menu";
+                    docById("toggleAuxBtn").className -= "blue darken-1";
+                }
+                this.hideMenu();
+                this.setStageScale(1.0);
+                this._expandedBoundary.visible = true;
+                this.gridButton.style.visibility = "visible";
+                this.helpfulGridButton.style.display = "flex";
+                this._collapseButton.style.visibility = "visible";
+                this._helpfulCollapseButton.style.display = "flex";
+                this._expandButton.style.visibility = "hidden";
+                this._helpfulExpandButton.style.display = "none";
+                this._collapsedBoundary.flex = false;
                 turtlesStage.removeAllEventListeners("pressmove");
                 turtlesStage.removeAllEventListeners("mousedown");
 
@@ -1013,6 +1187,10 @@ Turtles.TurtlesView = class {
             __makeExpandButton();
             __makeClearButton();
             __makeGridButton();
+            __makeHelpfulGridButton();
+            __makeHelpfulClearButton();
+            __makeHelpfulCollapseButton();
+            __makeHelpfulExpandButton();
             jQuery.noConflict()(".tooltipped").each(function(){
                 jQuery.noConflict()(this).tooltip(
                     {

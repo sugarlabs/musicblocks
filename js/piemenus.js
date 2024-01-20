@@ -3670,6 +3670,29 @@ const piemenuKey = (activity) => {
     docById("movable").style.left = x - 110 + "px";
     docById("movable").style.top = y + 400 + "px";
 
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    const chooseKeyDivWidth = 350;
+    const chooseKeyDivHeight = 350;
+
+    const movableWidth = 180;
+    const movableHeight = 75;
+
+    if ((x - 175) + chooseKeyDivWidth > windowWidth) {
+        docById("chooseKeyDiv").style.left = (windowWidth - chooseKeyDivWidth) + "px";
+    }
+    if ((y + 50 + 100) + chooseKeyDivHeight > windowHeight) {
+        docById("chooseKeyDiv").style.top = (windowHeight - chooseKeyDivHeight - 100) + "px";
+    }
+
+    if ((x - 110) + movableWidth > windowWidth) {
+        docById("movable").style.left = (windowWidth - movableWidth - 65) + "px";
+    }
+    if ((y + 400) + movableHeight > windowHeight) {
+        docById("movable").style.top = (windowHeight - movableHeight - 25) + "px";
+    }
+
     const __generateSetKeyBlocks = () => {
         // Find all setkey blocks in the code.
         let isSetKeyBlockPresent = false;
