@@ -785,7 +785,7 @@ function TemperamentWidget() {
             try{
                 that.performEqualEdit(event);
             } catch{
-                alert("Number of divisions cannot exceed 20")
+                alert("Number of divisions cannot exceed 999")
             }
 
         });
