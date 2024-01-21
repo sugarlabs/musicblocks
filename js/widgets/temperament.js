@@ -785,7 +785,7 @@ function TemperamentWidget() {
             try{
                 that.performEqualEdit(event);
             } catch{
-                this.activity.errorMsg(_("Number of divisions is too large."));
+                this.activity.errorMsg(_("The Number of divisions is too large."));
             }
 
         });
