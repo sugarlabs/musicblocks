@@ -157,6 +157,11 @@
 	box-shadow: 0 1px 0 0 #fff !important;
 }
 
+#searchcontainer
+{
+	width: 20vw ; ;
+}
+
 /* icon prefix focus color */
 #global-search .prefix.active {
 	color: #fff !important;
