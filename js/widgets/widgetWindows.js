@@ -139,7 +139,11 @@ class WidgetWindow {
 
         const rollButton = this._create("div", "wftButton rollup", this._drag);
         rollButton.onclick = (e) => {
-            if (this._rolled) {
+            if (this._maximized) {             
+                this._toggleClass(rollButton, "plus");
+                this._maximized = false;
+            }
+            else if (this._rolled) {
                 this.unroll();
                 this._toggleClass(rollButton, "plus");
             }
