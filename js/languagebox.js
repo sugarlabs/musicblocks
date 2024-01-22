@@ -186,7 +186,6 @@ class LanguageBox {
      * @returns {void}
      */
     OnClick() {
-        this.activity.storage.languagePreference = this._language;
         window.location.reload();    
     }
     hide() {
@@ -219,6 +218,7 @@ class LanguageBox {
             this.activity.textMsg(_("Music Blocks is already set to this language."));
         }
         else{
+            this.activity.storage.languagePreference = this._language;
             if (this._language === "ja" && this.activity.storage.kanaPreference === "kana") {
                 this.activity.textMsg(MSGPrefix + MSG["kana"] + MSGSuffix);
             } else {
