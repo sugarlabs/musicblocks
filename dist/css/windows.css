@@ -136,7 +136,7 @@
 #floatingWindows > .windowFrame > .wfWinBody > .wfbWidget {
     flex-grow: 1;
     overflow: hidden;
-    position: relative;
+    position: absolute;
 }
 #floatingWindows td {
     padding: 0;
