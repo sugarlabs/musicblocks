@@ -47,7 +47,9 @@ Globals location
 */
 
 /* exported PhraseMaker */
-
+document.addEventListener('DOMContentLoaded', function() {
+    stylePhraseMaker();
+});
 const MATRIXGRAPHICS = [
     "forward",
     "back",
@@ -149,30 +151,46 @@ class PhraseMaker {
         this._blockMapHelper = [];
         this.columnBlocksMap = [];
     }
-
-    stylePhraseMaker(){
-
+ 
+    stylePhraseMaker() {
         var floatingWindowsDiv = document.getElementById("floatingWindows");
         var windowFrameElements = floatingWindowsDiv.querySelectorAll(".windowFrame");
     
         for (var i = 0; i < windowFrameElements.length; i++) {
             var windowFrame = windowFrameElements[i];
-            var wfWinBody = document.querySelector(".wfWinBody");
-            var wfbWidget = document.querySelector(".wfbWidget");
-            wfbWidget.style.overflow = "auto";
-            wfbWidget.style.width = "-webkit-fill-available";
-            wfbWidget.style.height = "-webkit-fill-available";
+            var wfWinBody = windowFrame.querySelector(".wfWinBody");
+            var wfbWidget = windowFrame.querySelector(".wfbWidget");
+    
+            if (wfbWidget) {
+                // Adjust overflow and sizing properties
+                wfbWidget.style.overflow = "hidden";  // or "visible" based on your preference
+                wfbWidget.style.width = "100%";
+                wfbWidget.style.height = "100%";
+            }
+    
+            // Set the size and overflow for the windowFrame
             windowFrame.style.height = "405px";
             windowFrame.style.width = "685px";
-            wfWinBody.style.position = "absolute";
-            wfWinBody.style.overflow = "auto";
-            wfWinBody.style.width = "-webkit-fill-available";
-            wfWinBody.style.height = "-webkit-fill-available";
-            wfWinBody.style.background = "#cccccc";
-            wfbWidget.style.position = "absolute";
-            wfbWidget.style.left = "55px";
+    
+            if (wfWinBody) {
+                // Adjust position, overflow, and sizing properties
+                wfWinBody.style.position = "relative";  // or "static" based on your layout
+                wfWinBody.style.overflow = "hidden";  // or "visible" based on your preference
+                wfWinBody.style.width = "100%";
+                wfWinBody.style.height = "100%";
+                wfWinBody.style.background = "#cccccc";
+            }
+    
+            if (wfbWidget) {
+                // Set the position for wfbWidget
+                wfbWidget.style.position = "absolute";
+                wfbWidget.style.left = "55px";
+            }
         }
     }
+    
+    
+    
 
     clearBlocks() {
         // When creating a new matrix, we want to clear out any old
