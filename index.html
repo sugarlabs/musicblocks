@@ -145,19 +145,26 @@
                     );
                     lang = localStorage.languagePreference;
                 }
-    
+
                 console.debug("Using " + lang);
-                if (lang === undefined) {
-                    lang = "enUS";
-                    console.debug("Reverting to " + lang);
+        if (lang === undefined) {
+        lang = "enUS";
+        console.debug("Reverting to " + lang);
+        }
+
+                if (lang === "ja") {
+                    document.getElementById(
+                        "loading-image-container"
+                    ).innerHTML =
+                        '<img src="loading-animation-ja.svg" style="width: 100%; margin: auto; display: block; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);" />';
+                } else {
+                    document.getElementById(
+                        "loading-image-container"
+                    ).innerHTML =
+                        '<video autoplay muted playsinline style="width: 100%; height:500px; margin-top:30px; overflow: hidden;"><source src="loading-animation.webm" type="video/webm"><source src="loading-animation.mp4" type="video/mp4"></video>';
                 }
-    
-                document.getElementById(
-                    "loading-image-container"
-                ).innerHTML =
-                    '<video autoplay muted playsinline style="width: 100%; height:500px; margin-top:30px; overflow: hidden;"><source src="loading-animation.mp4" type="video/mp4"></video>';
             };
-    
+
             loadL10nSplashScreen();
         </script>
     </div>
