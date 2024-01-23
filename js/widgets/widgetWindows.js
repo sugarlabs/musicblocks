@@ -95,6 +95,10 @@ class WidgetWindow {
         this._frame = this._create("div", "windowFrame", windows);
         this._overlayframe = this._create("div", "windowFrame", windows);
         this._drag = this._create("div", "wfTopBar", this._frame);
+        this._drag.style.display = "flex";
+        this._drag.style.justifyContent = "space-between";
+        
+   
        
         if (this._fullscreenEnabled) {
             this._drag.ondblclick = (e) => {
@@ -105,8 +109,24 @@ class WidgetWindow {
                 e.stopImmediatePropagation();
             };
         }
+        const closeButton = this._create("div", "wftButton close", this._drag);
+        closeButton.onclick = (e) => {
+            this.onclose();
+            e.preventDefault();
+            e.stopPropagation();
+        };
 
-        this._drag.onmousedown = (e) => {
+        this._nonclose=this._create("div","nonclose",this._drag);
+        this._nonclose.style.display="flex";
+        this._nonclose.justifyContent = "space-between";
+        this._nonclose.style.width="100%";
+        
+        const titleEl = this._create("div", "wftTitle", this._nonclose);
+        titleEl.innerHTML = "" ;
+        titleEl.insertAdjacentHTML("afterbegin", _(this._title));
+        titleEl.id = `${this._key}WidgetID` ;
+
+        this._nonclose.onmousedown = (e) => {
             this._dragging = true;
             if (this._maximized) {
                 // Perform special repositioning to make the drag feel right when
@@ -130,14 +150,10 @@ class WidgetWindow {
             e.preventDefault();
         };
 
-        const closeButton = this._create("div", "wftButton close", this._drag);
-        closeButton.onclick = (e) => {
-            this.onclose();
-            e.preventDefault();
-            e.stopPropagation();
-        };
-
-        const rollButton = this._create("div", "wftButton rollup", this._drag);
+      
+        this._nonclosebuttons=this._create("div","nonclosebuttons",this._nonclose);
+        this._nonclosebuttons.style.display="flex";
+        const rollButton = this._create("div", "wftButton rollup", this._nonclosebuttons);
         rollButton.onclick = (e) => {
             if (this._rolled) {
                 this.unroll();
@@ -155,13 +171,8 @@ class WidgetWindow {
             e.stopPropagation();
         };
 
-        const titleEl = this._create("div", "wftTitle", this._drag);
-        titleEl.innerHTML = "" ;
-        titleEl.insertAdjacentHTML("afterbegin", _(this._title));
-        titleEl.id = `${this._key}WidgetID` ;
-
         if (this._fullscreenEnabled) {
-            const maxminButton = this._create("div", "wftButton wftMaxmin", this._drag);
+            const maxminButton = this._create("div", "wftButton wftMaxmin", this._nonclosebuttons);
             maxminButton.onclick = maxminButton.onmousedown = (e) => {
                 if (this._maximized) {
                     this._restore();
