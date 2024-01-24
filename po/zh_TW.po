@@ -13,6 +13,13 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: ini-to-pot script\n"
 
+#js/toolbar.js:111
+#js/toolbar.js:230
+#js/turtledefs.js:504
+#js/turtledefs.js:505
+msgid: "Toggle Fullscreen"
+msgstr: "切换全屏"
+
 #: js/activity.js:443
 #: js/activity.js:443
 #: js/activity.js:445

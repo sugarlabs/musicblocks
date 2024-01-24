@@ -13,6 +13,13 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.0.5\n"
 
+#js/toolbar.js:111
+#js/toolbar.js:230
+#js/turtledefs.js:504
+#js/turtledefs.js:505
+msgid: "Toggle Fullscreen"
+msgstr: "पूर्ण स्क्रीन टॉगल करें"
+
 #: js/activity.js:445
 #: js/rhythmruler.js:1919
 #: js/block.js:1414

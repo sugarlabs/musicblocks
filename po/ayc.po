@@ -13,6 +13,13 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: ini-to-pot script\n"
 
+#js/toolbar.js:111
+#js/toolbar.js:230
+#js/turtledefs.js:504
+#js/turtledefs.js:505
+msgid: "Toggle Fullscreen"
+msgstr: "Ajarka pantalla sarnaqapxana"
+
 #: js/RhythmBlockPaletteBlocks.js:14
 #: js/RhythmBlockPaletteBlocks.js:177
 #: js/RhythmBlockPaletteBlocks.js:14

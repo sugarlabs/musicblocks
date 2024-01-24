@@ -11,6 +11,13 @@ msgstr ""
 "Language: es\n"
 "X-Generator: Poedit 1.7.4\n"
 
+#js/toolbar.js:111
+#js/toolbar.js:230
+#js/turtledefs.js:504
+#js/turtledefs.js:505
+msgid: "Toggle Fullscreen"
+msgstr: "Alternar pantalla completa"
+
 #: js/planetInterface.js:104
 #: js/planetInterface.js:104
 msgid "project undefined"
