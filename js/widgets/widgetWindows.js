@@ -188,6 +188,10 @@ class WidgetWindow {
             this._maxminIcon = this._create("img", undefined, maxminButton);
             this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
         }
+        setTimeout(() => {
+            this.width = this._frame.offsetWidth;
+        this.height = this._frame.offsetHeight;
+        }, 1500);
 
         this._body = this._create("div", "wfWinBody", this._frame);
         this._toolbar = this._create("div", "wfbToolbar", this._body);
@@ -479,10 +483,8 @@ class WidgetWindow {
             this._savedPos = null;
         }
         this._overlay(false);
-        this._frame.style.width = "auto";
-        this._frame.style.height = "auto";
-        this._frame.style.minHeight = "420px";
-        this._frame.style.minWidth = "470px";
+        this._frame.style.width = this.width+"px";
+     this._frame.style.height = this.height+"px";
     }
 
     /**
