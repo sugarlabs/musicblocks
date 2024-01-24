@@ -146,9 +146,15 @@ $(document).ready(() => {
     });
     // eslint-disable-next-line no-unused-vars
     document.getElementById("view-more-chips").addEventListener("click", (evt) => {
-        const showMore = _("Show more tags ▼");
-        const showLess = _("Show fewer tags ▲");
+        const showMore = _("Show more tags");
+        const showLess = _("Show fewer tags");
         toggleExpandable("morechips", "flexchips");
         toggleText("view-more-chips", showMore, showLess);
+        const arrowIcon = document.getElementById("view-more-chips-arrow");
+        if (arrowIcon.innerHTML === '▼') {
+            arrowIcon.innerHTML = '▲';
+        } else {
+            arrowIcon.innerHTML = '▼';
+        }
     });
 });
