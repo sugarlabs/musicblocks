@@ -34,6 +34,7 @@ class WidgetWindow {
         this._visible = true;
         this._rolled = false;
         this._savedPos = null;
+        this._savedDimensions = null;
         this._maximized = false;
         this._fullscreenEnabled = fullscreen;
 
@@ -478,11 +479,22 @@ class WidgetWindow {
             this._frame.style.top = this._savedPos[1];
             this._savedPos = null;
         }
-        this._overlay(false);
-        this._frame.style.width = "auto";
-        this._frame.style.height = "auto";
-        this._frame.style.minHeight = "420px";
-        this._frame.style.minWidth = "470px";
+
+        this._overlay(false)
+
+        if(this._savedDimensions)
+        {
+            this._frame.style.height = this._savedDimensions[0];
+            this._frame.style.width = this._savedDimensions[1];
+        }else
+        {
+            this._frame.style.width = "auto";
+            this._frame.style.height = "auto";
+            this._frame.style.minHeight = "420px";
+            this._frame.style.minWidth = "470px";
+        }
+        ;
+        
     }
 
     /**
@@ -496,6 +508,7 @@ class WidgetWindow {
         this.takeFocus();
 
         this._savedPos = [this._frame.style.left, this._frame.style.top];
+        this._savedDimensions = [this._frame.style.height , this._frame.style.width];
         this._frame.style.width = "100vw";
         this._frame.style.height = "calc(100vh - 64px)";
         this._frame.style.left = "0";
