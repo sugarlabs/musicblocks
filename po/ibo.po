@@ -13,6 +13,13 @@
 "X-POOTLE-MTIME: 1423841876.000000\n"
 "Language-Team: \n"
 
+#js/toolbar.js:111
+#js/toolbar.js:230
+#js/turtledefs.js:504
+#js/turtledefs.js:505
+msgid: "Toggle Fullscreen"
+msgstr: "Gbanwee ihuenyo zuru oke"
+
 #: js/activity.js:443
 #: js/activity.js:443
 #: js/activity.js:445

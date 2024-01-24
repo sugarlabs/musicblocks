@@ -16,6 +16,13 @@
 "X-Generator: Pootle 2.5.1.1\n"
 "X-POOTLE-MTIME: 1480121257.000000\n"
 
+#js/toolbar.js:111
+#js/toolbar.js:230
+#js/turtledefs.js:504
+#js/turtledefs.js:505
+msgid: "Toggle Fullscreen"
+msgstr: "Tekove pantalla oî"
+
 #: js/block.js:632
 #: js/pitchdrummatrix.js:178
 #: js/musicutils.js:37
