@@ -697,6 +697,9 @@ msgstr "Grabar"
 msgid "Full screen"
 msgstr "Pantalla completa"
 
+msgid "Toggle Fullscreen"
+msgstr "Alternar pantalla completa"
+
 #: js/toolbar.js:52
 #: js/toolbar.js:111
 #: js/toolbar.js:151
@@ -1014,12 +1017,12 @@ msgstr ""
 #: js/toolbar.js:150
 #: js/toolbar.js:203
 msgid "Full Screen"
-msgstr ""
+msgstr "Pantalla completa"
 
 #: js/toolbar.js:110
 #: js/toolbar.js:204
 msgid "FullScreen"
-msgstr ""
+msgstr "Pantalla completa"
 
 #: js/toolbar.js:145
 #: js/toolbar.js:199
@@ -1421,7 +1424,7 @@ msgid "Record your project as video."
 msgstr "Grabe su proyecto como video."
 
 #: js/turtledefs.js:506
-msgid "Toggle full screen mode."
+msgid "Toggle Fullscreen mode."
 msgstr "Alternar el modo de pantalla completa"
 
 #: js/turtledefs.js:512
