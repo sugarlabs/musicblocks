@@ -11,6 +11,13 @@
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 1.2.1\n"
 
+#js/toolbar.js:111
+#js/toolbar.js:230
+#js/turtledefs.js:504
+#js/turtledefs.js:505
+msgid: "Toggle Fullscreen"
+msgstr: "전체 화면 전환"
+
 #: js/RhythmBlockPaletteBlocks.js:177
 #: js/RhythmBlockPaletteBlocks.js:14
 #: js/RhythmBlockPaletteBlocks.js:177

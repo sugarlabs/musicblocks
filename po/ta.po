@@ -10,6 +10,13 @@
 "Language: ta\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#js/toolbar.js:111
+#js/toolbar.js:230
+#js/turtledefs.js:504
+#js/turtledefs.js:505
+msgid: "Toggle Fullscreen"
+msgstr: "தமிழ்"
+
 #: js/activity.js:443
 #: js/activity.js:443
 #: js/activity.js:445
