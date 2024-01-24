@@ -1563,7 +1563,6 @@ class Activity {
                
                 //Ctrl+MouseWheel Zoom functionality
                 if (event.ctrlKey) {
-                    // alert("Hello!");
                     event.preventDefault(); // Prevent default scrolling behavior
                    
                     if(delY < 0 && doLargerBlocks(this));//Zoom IN
