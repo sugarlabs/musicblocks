@@ -501,8 +501,8 @@ const createHelpContent = (activity) => {
             window.btoa(base64Encode(RECORDBUTTON))
     ]);
     HELPCONTENT.push([
-        _("Full screen"),
-        _("Toggle full screen mode."),
+        _("Toggle Fullscreen"),
+        _("Toggle Fullscreen mode."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(FULLSCREENBUTTON))
     ]);
