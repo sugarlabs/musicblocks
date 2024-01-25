@@ -109,6 +109,7 @@ class Toolbar {
                 _("Stop"),
                 _("Record"),
                 _("Full Screen"),
+                _("Full Screen"),
                 _("Toggle Fullscreen"),
                 _("New project"),
                 _("Load project from file"),
@@ -229,6 +230,7 @@ class Toolbar {
                 _("Stop"),
                 _("Record"),
                 _("Full Screen"),
+                _("Full Screen"),
                 _("Toggle Fullscreen"),
                 _("New project"),
                 _("Load project from file"),
@@ -298,8 +300,7 @@ class Toolbar {
                 }
             } else {
                 if (elem !== undefined && elem !== null) {
-                    elem.setAttribute("data-tooltip", trans);
-                }
+                    elem.setAttribute("data-tooltip", trans);                }
             }
         }
 
