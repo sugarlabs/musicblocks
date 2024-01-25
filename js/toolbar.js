@@ -300,8 +300,8 @@ class Toolbar {
                 }
             } else {
                 if (elem !== undefined && elem !== null) {
-                    elem.setAttribute("data-tooltip", trans);           
-                }
+                    elem.setAttribute("data-tooltip", trans);
+                 }
             }
         }
 
