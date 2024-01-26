@@ -2262,7 +2262,6 @@ class PhraseMaker {
                 console.debug("pushing " + obj[1] + " " + last(this.rowLabels));
                 this._sortedRowMap.push(last(this._sortedRowMap) + 1);
                 lastObj = i;
-                this.stylePhraseMaker();
             }
 
             this.rowLabels.push(obj[1]);
