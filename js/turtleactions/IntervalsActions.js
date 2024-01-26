@@ -105,11 +105,18 @@ function setupIntervalsActions(activity) {
             let totalIntervals = this.GetIntervalNumber(turtle);
             const numberToStringMap = ['an', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
             const plural = (Math.abs(octave) > 1) ? 'octaves' : 'octave';
-            const os = numberToStringMap[Math.abs(octave) - 1] || Math.abs(octave);
+            let os = numberToStringMap[Math.abs(octave) - 1] || Math.abs(octave);
 
             if (totalIntervals % 12 === 0 && letterGap === 0) {
-               if(octave<0)  return `${os} ${plural} below`;
-               if(octave>1) return `${os} ${plural} above`;
+                if (octave < 0) {
+                    if(octave===-1)os = 'a'
+                    const a = `${os} perfect ${plural} below`;
+                    return a.charAt(0).toUpperCase() + a.slice(1);
+                }
+                if (octave > 1) {
+                    const a = `${os} perfect ${plural} above`;
+                    return a.charAt(0).toUpperCase() + a.slice(1);
+                }
             }
             
             if (totalIntervals > 21) {
