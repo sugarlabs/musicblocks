@@ -3496,6 +3496,9 @@ const GetNotesForInterval = (tur) => {
             return { firstNote, secondNote: firstNote, octave };
         }
         secondNote = noteStatus[0][1].replace(/\d/g,"");
+        const octavea = parseInt(noteStatus[0][0].replace(/[^0-9]/g, ""));
+        const octaveb = parseInt(noteStatus[0][1].replace(/[^0-9]/g, ""));
+        octave = octaveb - octavea;
     } else if (notePitches) {
         const pitchBlk = notePitches[last(tur.singer.inNoteBlock)];
         firstNote = pitchBlk[0];

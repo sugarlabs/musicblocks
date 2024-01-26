@@ -74,10 +74,10 @@ function setupIntervalsActions(activity) {
         static GetIntervalNumber(turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
             let { firstNote, secondNote, octave } = GetNotesForInterval(tur);
-            octave = Math.abs(octave);
             let totalIntervals = Math.abs(ALLNOTESTEP[firstNote] - ALLNOTESTEP[secondNote]);
-            if (ALLNOTESTEP[secondNote] < ALLNOTESTEP[firstNote])
-                totalIntervals = 12 - totalIntervals;
+            if (ALLNOTESTEP[secondNote] < ALLNOTESTEP[firstNote]) totalIntervals = 12 - totalIntervals;
+            if (octave<0&&totalIntervals!==0&&totalIntervals!==12)  totalIntervals = 12 - totalIntervals;
+            if(octave<-1||totalIntervals===0)octave = Math.abs(octave);
             while (octave > 0) {
                 totalIntervals += 12;
                 octave--;
@@ -103,26 +103,29 @@ function setupIntervalsActions(activity) {
             if (index1 > index2) letterGap = NOTENAMES.length - letterGap;
 
             let totalIntervals = this.GetIntervalNumber(turtle);
-            const numberToStringMap = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight','nine']
+            const numberToStringMap = ['an', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
+            const plural = (Math.abs(octave) > 1) ? 'octaves' : 'octave';
+            const os = numberToStringMap[Math.abs(octave) - 1] || Math.abs(octave);
 
-            if (totalIntervals > 21) {
-                const os = numberToStringMap[octave - 1] ? numberToStringMap[octave - 1] : octave;
-                lastWord = `, plus ${os} octave`;
-                if (totalIntervals % 12 === 0 && letterGap === 0&&octave>1) {
-                    return  `${os} octave above `;
-                }
-                while (totalIntervals > 12) totalIntervals -= 12;
-            }
-
-            if (octave < 0) {
-                const os = numberToStringMap[Math.abs(octave)-1]?numberToStringMap[Math.abs(octave)-1] :Math.abs(octave);
-                lastWord = `,  ${os} octave below`;
-                if (totalIntervals % 12 === 0 && letterGap === 0&&octave<0) {
-                    return  `${os} octave below `;
-                }
+            if (totalIntervals % 12 === 0 && letterGap === 0) {
+               if(octave<0)  return `${os} ${plural} below`;
+               if(octave>1) return `${os} ${plural} above`;
             }
             
-        let interval = (totalIntervals % 12 === 0 && letterGap === 0) ? SEMITONETOINTERVALMAP[totalIntervals][letterGap] : SEMITONETOINTERVALMAP[totalIntervals][letterGap] + lastWord;
+            if (totalIntervals > 21) {
+                if (octave >=1) {
+                    lastWord = `, plus ${os} ${plural}`;
+                }    
+                while (totalIntervals > 12) totalIntervals -= 12;
+            }
+            
+            if (octave < 0) {
+                letterGap = (letterGap !== 0) ? NOTENAMES.length - letterGap : letterGap;
+                if (octave < -1) lastWord = `,  ${os} ${plural}`;
+                lastWord+=' below'
+            }
+            
+            let interval = (totalIntervals % 12 === 0 && letterGap === 0) ? SEMITONETOINTERVALMAP[totalIntervals][letterGap] : SEMITONETOINTERVALMAP[totalIntervals][letterGap] + lastWord;
 
             return interval;
         }
