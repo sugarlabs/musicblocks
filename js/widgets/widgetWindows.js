@@ -482,8 +482,8 @@ class WidgetWindow {
         this._overlay(false);
 
         if(this._savedDim){
-            this._frame.style.width = this._savedDim[0];
-            this._frame.style.height = this._savedDim[1];
+            this._frame.style.width = this._savedDim[0]+"px";
+            this._frame.style.height = this._savedDim[1]+"px";
         } else {
             this._frame.style.width = "auto";
             this._frame.style.height = "auto";
@@ -498,12 +498,12 @@ class WidgetWindow {
      * @returns {void}
      */
     _maximize() {
+        const frameRect = this._frame.getBoundingClientRect();
         this._maxminIcon.setAttribute("src", "header-icons/icon-contract.svg");
         this._maximized = true;
         this.unroll();
         this.takeFocus();
-
-        this._savedDim = [this._frame.style.width, this._frame.style.height];
+        this._savedDim = [frameRect.width, frameRect.height];
         this._savedPos = [this._frame.style.left, this._frame.style.top];
         this._frame.style.width = "100vw";
         this._frame.style.height = "calc(100vh - 64px)";
