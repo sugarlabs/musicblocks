@@ -494,3 +494,18 @@ a {
 .nav-content {
 	display: none;
 }
+
+
+#backToTopBtn {
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+	background-color: #007BFF;
+	color: #fff;
+	border: none;
+	padding: 10px 15px;
+	border-radius: 5px;
+	cursor: pointer;
+	font-size: 16px;
+	outline: none;
+}
