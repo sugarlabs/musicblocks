@@ -53,6 +53,13 @@
                 }
         }
         });
+        // Function to scroll to the top of the page
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }   
    </script>
 
     <body>
@@ -66,8 +73,8 @@
                     <li class="tab"><a class="active" id="local-tab" href="#local"></a></li>
                     <li class="tab"><a id="global-tab" href="#global"></a></li>
                     <li>
-                        <li>
-                            <div class="nav-content" id="searchcontainer">
+                        <li id="s_one">
+                            <div class="nav-content" id="searchcontainer-one">
                                 <div class="container">
                                     <div class="input-field search">
                                         <i class="material-icons prefix "
@@ -85,7 +92,19 @@
             </div>
             </div>
         </nav>
-
+        <nav class="nav-extended light-green lighten-1" id="two_header" role="navigation">
+            <div id="searchcontainer" class="nav-content">
+                <div class="input-field-2 search">
+                    <i class="material-icons prefix "
+                    id="searchicon">search</i><input
+                    placeholder="Search here for project" id="global-search-2"
+                    type="text"><span><i
+                    class="material-icons"
+                    id="search-close-2">clear</i></span>
+                </div>
+            </div>
+        </nav>
+        <button id="backToTopBtn" class="light-green lighten-1" onclick="scrollToTop()"><i class="material-icons">arrow_upward</i></button>
         <div id="local">
             <div class="section no-pad-bot">
                 <div class="container">
@@ -169,9 +188,7 @@
                         </div>
                         <div class="flexchips" id="morechips">
                         </div>
-                        <a class="waves-effect btn-flat centre-button" id="view-more-chips">
-                            <i id="view-more-chips-arrow">▼</i>
-                        </a>
+                        <a class="waves-effect btn-flat centre-button" id="view-more-chips"></a>
                     </div>
                 </div>
                 <div class="container">
