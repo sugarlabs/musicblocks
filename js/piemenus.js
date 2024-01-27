@@ -3588,6 +3588,10 @@ const piemenuGrid = (activity) => {
         activity.turtles.gridWheel.removeWheel();
         activity.turtles._exitWheel.removeWheel();
     };
+
+    if (docById("helpfulWheelDiv").style.display !== "none") {
+        docById("helpfulWheelDiv").style.display = "none";
+    }
 };
 
 const piemenuKey = (activity) => {

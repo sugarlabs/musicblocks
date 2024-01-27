@@ -440,8 +440,22 @@ class Toolbar {
             WRAP = !WRAP;
             if (WRAP) {
                 wrapButtonTooltipData = _("Turtle Wrap Off");
+                this.activity.helpfulWheelItems.forEach(ele => {
+                    if (ele.label === "Turtle Wrap Off") {
+                        ele.display = true;
+                    } else if (ele.label === "Turtle Wrap On") {
+                        ele.display = false;
+                    }
+                })
             } else {
                 wrapButtonTooltipData = _("Turtle Wrap On");
+                this.activity.helpfulWheelItems.forEach(ele => {
+                    if (ele.label === "Turtle Wrap Off") {
+                        ele.display = false;
+                    } else if (ele.label === "Turtle Wrap On") {
+                        ele.display = true;
+                    }
+                })
             }
 
             wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
@@ -450,6 +464,46 @@ class Toolbar {
                 delay: 100
             });
         };
+    }
+
+    /**
+     * @public
+     * @returns {void}
+     */
+    changeWrap(activity) {
+        const wrapIcon = docById("wrapTurtle");
+        let wrapButtonTooltipData = "";
+
+        WRAP = !WRAP;
+        if (WRAP) {
+            wrapButtonTooltipData = _("Turtle Wrap Off");
+            activity.helpfulWheelItems.forEach(ele => {
+                if (ele.label === "Turtle Wrap Off") {
+                    ele.display = true;
+                } else if (ele.label === "Turtle Wrap On") {
+                    ele.display = false;
+                }
+            })
+        } else {
+            wrapButtonTooltipData = _("Turtle Wrap On");
+            activity.helpfulWheelItems.forEach(ele => {
+                if (ele.label === "Turtle Wrap Off") {
+                    ele.display = false;
+                } else if (ele.label === "Turtle Wrap On") {
+                    ele.display = true;
+                }
+            })
+        }
+
+        wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
+        $j(".tooltipped").tooltip({
+            html: true,
+            delay: 100
+        });
+
+        if (docById("helpfulWheelDiv").style.display !== "none") {
+            docById("helpfulWheelDiv").style.display = "none";
+        }
     }
 
     /**
