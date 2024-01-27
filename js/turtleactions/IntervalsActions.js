@@ -75,13 +75,18 @@ function setupIntervalsActions(activity) {
             const tur = activity.turtles.ithTurtle(turtle);
             let { firstNote, secondNote, octave } = GetNotesForInterval(tur);
             let totalIntervals = Math.abs(ALLNOTESTEP[firstNote] - ALLNOTESTEP[secondNote]);
+
             if (ALLNOTESTEP[secondNote] < ALLNOTESTEP[firstNote]) totalIntervals = 12 - totalIntervals;
-            if (octave<0&&totalIntervals!==0&&totalIntervals!==12)  totalIntervals = 12 - totalIntervals;
-            if(octave<-1||totalIntervals===0)octave = Math.abs(octave);
+
+            if (octave < 0 && totalIntervals !== 0 && totalIntervals !== 12) totalIntervals = 12 - totalIntervals;
+            
+            if (octave < -1 || totalIntervals === 0) octave = Math.abs(octave);
+            
             while (octave > 0) {
                 totalIntervals += 12;
                 octave--;
             }
+            
             return totalIntervals;
         }
 
@@ -100,28 +105,30 @@ function setupIntervalsActions(activity) {
             const index2 = NOTENAMES.indexOf(secondNote.substring(0, 1));
             let lastWord = "";
             let letterGap = Math.abs(index2 - index1);
+            
             if (index1 > index2) letterGap = NOTENAMES.length - letterGap;
 
             let totalIntervals = this.GetIntervalNumber(turtle);
-            const numberToStringMap = ['an', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
-            const plural = (Math.abs(octave) > 1) ? 'octaves' : 'octave';
+            
+            const numberToStringMap = [_('one'), _('two'), _('three'), _('four'), _('five'), _('six'), _('seven'), _('eight'), _('nine')]
+            const plural = (Math.abs(octave) > 1) ? _('octaves') : _('octave');
+            
             let os = numberToStringMap[Math.abs(octave) - 1] || Math.abs(octave);
-
             if (totalIntervals % 12 === 0 && letterGap === 0) {
                 if (octave < 0) {
-                    if(octave===-1)os = 'a'
-                    const a = `${os} perfect ${plural} below`;
+                    if(octave===-1)os = _('a')
+                    const a = os + " " + _('perfect') + " "+ plural + " " + _("below");
                     return a.charAt(0).toUpperCase() + a.slice(1);
                 }
                 if (octave > 1) {
-                    const a = `${os} perfect ${plural} above`;
+                    const a = os + " " + _('perfect') + " " + plural + " " + _("above");
                     return a.charAt(0).toUpperCase() + a.slice(1);
                 }
             }
             
             if (totalIntervals > 21) {
                 if (octave >=1) {
-                    lastWord = `, plus ${os} ${plural}`;
+                    lastWord = ", " + _('plus') + " " + os + " " +plural;
                 }    
                 while (totalIntervals > 12) totalIntervals -= 12;
             }
@@ -129,7 +136,7 @@ function setupIntervalsActions(activity) {
             if (octave < 0) {
                 letterGap = (letterGap !== 0) ? NOTENAMES.length - letterGap : letterGap;
                 if (octave < -1) lastWord = `,  ${os} ${plural}`;
-                lastWord+=' below'
+                lastWord += _(' below')
             }
             
             let interval = (totalIntervals % 12 === 0 && letterGap === 0) ? SEMITONETOINTERVALMAP[totalIntervals][letterGap] : SEMITONETOINTERVALMAP[totalIntervals][letterGap] + lastWord;
