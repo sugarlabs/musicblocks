@@ -246,10 +246,14 @@ class RhythmRuler {
                 );
             }
             if (event.keyCode === RhythmRuler.BACK) {
-                this._dissectNumber.value = this._dissectNumber.value.substring(
-                    0,
-                    this._dissectNumber.value.length
-                );
+                if (this._dissectNumber.value.length == 1) {
+                    this._dissectNumber.value = "";
+                } else {
+                    this._dissectNumber.value = this._dissectNumber.value.substring(
+                        0,
+                        this._dissectNumber.value.length
+                    );
+                }   
             }
         };
 
