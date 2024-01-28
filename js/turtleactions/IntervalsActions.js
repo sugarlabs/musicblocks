@@ -76,7 +76,7 @@ function setupIntervalsActions(activity) {
             let { firstNote, secondNote, octave } = GetNotesForInterval(tur);
             let totalIntervals = Math.abs(ALLNOTESTEP[firstNote] - ALLNOTESTEP[secondNote]);
 
-            if (ALLNOTESTEP[secondNote] < ALLNOTESTEP[firstNote]) totalIntervals = 12 - totalIntervals;
+            if (ALLNOTESTEP[secondNote] < ALLNOTESTEP[firstNote] && octave !== 0) totalIntervals = 12 - totalIntervals;
 
             if (octave < 0 && totalIntervals !== 0 && totalIntervals !== 12) totalIntervals = 12 - totalIntervals;
             
@@ -106,7 +106,7 @@ function setupIntervalsActions(activity) {
             let lastWord = "";
             let letterGap = Math.abs(index2 - index1);
             
-            if (index1 > index2) letterGap = NOTENAMES.length - letterGap;
+            if (index1 > index2 && octave !== 0) letterGap = NOTENAMES.length - letterGap;
 
             let totalIntervals = this.GetIntervalNumber(turtle);
             
@@ -128,7 +128,7 @@ function setupIntervalsActions(activity) {
             
             if (totalIntervals > 21) {
                 if (octave >=1) {
-                    lastWord = ", " + _('plus') + " " + os + " " +plural;
+                    lastWord = ", " + _('plus') + " " + os + " " + plural;
                 }    
                 while (totalIntervals > 12) totalIntervals -= 12;
             }
@@ -140,7 +140,6 @@ function setupIntervalsActions(activity) {
             }
             
             let interval = (totalIntervals % 12 === 0 && letterGap === 0) ? SEMITONETOINTERVALMAP[totalIntervals][letterGap] : SEMITONETOINTERVALMAP[totalIntervals][letterGap] + lastWord;
-
             return interval;
         }
         
