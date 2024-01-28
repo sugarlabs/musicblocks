@@ -367,6 +367,9 @@ class Toolbar {
         }
 
         var tempClick = playIcon.onclick = () => {
+            const hideMsgs = () => {
+                this.activity.hideMsgs();
+            };
             isPlayIconRunning = false;
             onclick(this.activity);
             handleClick();
@@ -377,6 +380,7 @@ class Toolbar {
             stopIcon.addEventListener("click", function(){
                 clearTimeout(play_button_debounce_timeout);
                 isPlayIconRunning = true;
+                hideMsgs();
                 handleClick();
             });
         };
