@@ -53,7 +53,8 @@
   addTemperamentToList, getTemperament, deleteTemperamentFromList,
   addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
   DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
-  INTERVALVALUES, getIntervalRatio, frequencyToPitch, NOTESTEP
+  INTERVALVALUES, getIntervalRatio, frequencyToPitch, NOTESTEP,
+  GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP
 */
 
 /**
@@ -647,6 +648,66 @@ const FIXEDSOLFEGE1 = {
  * @constant {Object.<string, number>}
  */
 const NOTESTEP = { C: 1, D: 3, E: 5, F: 6, G: 8, A: 10, B: 12 };
+
+
+/**
+ * Maps from note names to their corresponding step numbers.
+ * @constant {Object.<number, string>}
+ */
+const ALLNOTESTEP = {
+    "Cb": 0,
+    "C": 1,
+    "C#": 2,
+    "Db": 2,
+    "D": 3,
+    "D#": 4,
+    "Eb": 4,
+    "E": 5,
+    "E#": 6,
+    "Fb": 5,
+    "F": 6,
+    "F#": 7,
+    "Gb": 7,
+    "G": 8,
+    "G#": 9,
+    "Ab": 9,
+    "A": 10,
+    "A#": 11,
+    "Bb": 11,
+    "B": 12,
+    "B#": 0
+};
+
+
+/**
+ * semitone/intervalnumber --> lettergap/notenamesgap -->intervalnames
+ * @constant {Object.<number, Object.<number,string>}
+ */
+
+const SEMITONETOINTERVALMAP = {
+     0: { 0: _("Perfect unison"), 1: _("Diminished second") },
+     1: { 1: _("Minor second"), 0: _("Augmented unison") },
+     2: { 1: _("Major second"), 2: _("Diminished third") },
+     3: { 2: _("Minor third"), 1: _("Augmented second") },
+     4: { 2: _("Major third"), 3: _("Diminished fourth") },
+     5: { 3: _("Perfect fourth"), 2: _("Augmented third") },
+     6: { 4: _("Diminished fifth"), 3: _("Augmented fourth") },
+     7: { 4: _("Perfect fifth"), 5: _("Diminished sixth") },
+     8: { 5: _("Minor sixth"), 4: _("Augmented fifth") },
+     9: { 5: _("Major sixth"), 6: _("Diminished seventh") },
+     10: { 6: _("Minor seventh"), 5: _("Augmented sixth") },
+     11: { 6: _("Major seventh"), 0: _("Diminished octave") },
+     12: { 0: _("Perfect octave"), 6: _("Augmented seventh") },
+     13: { 1: _("Minor ninth"), 0: _("Augmented octave") },
+     14: { 1: _("Major ninth"), 2: _("Diminished tenth") },
+     15: { 2: _("Minor tenth"), 1: _("Augmented ninth") },
+     16: { 2: _("Major tenth"), 3: _("Diminished eleventh") },
+     17: { 3: _("Perfect eleventh"), 2: _("Augmented tenth") },
+     18: { 4: _("Diminished twelfth"), 3: _("Augmented eleventh") },
+     19: { 4: _("Perfect twelfth"), 5: _("Diminished thirteenth") },
+     20: { 5: _("Minor thirteenth"), 4: _("Augmented fifth, plus an octave") },
+     21: { 5: _("Major thirteenth"), 6: _("Diminished seventh, plus an octave") },
+ };
 
 /**
  * Array containing preferences for keys with sharps.
@@ -3414,6 +3475,52 @@ const numberToPitch = (i, temperament, startPitch, offset) => {
         return getNoteFromInterval(startPitch, interval);
     }
 };
+
+/**
+ * 
+ * @param {object} tur 
+ * @returns 
+ */
+
+const GetNotesForInterval = (tur) => {
+    const noteStatus = tur.singer.noteStatus;
+    const notePitches = tur.singer.notePitches;
+    const intervals = tur.singer.intervals;
+    const noteOctave = tur.singer.noteOctaves;
+    let firstNote = "C",
+        secondNote = "C",
+        octave = 0;
+    if (noteStatus && noteStatus[0]) {
+        firstNote = noteStatus[0][0].replace(/\d/g,"");//removing all numbers like '1'
+        if (!noteStatus[0][1]) {
+            return { firstNote, secondNote: firstNote, octave };
+        }
+        secondNote = noteStatus[0][1].replace(/\d/g,"");
+        const octavea = parseInt(noteStatus[0][0].replace(/[^0-9]/g, ""));
+        const octaveb = parseInt(noteStatus[0][1].replace(/[^0-9]/g, ""));
+        octave = octaveb - octavea;
+    } else if (notePitches) {
+        const pitchBlk = notePitches[last(tur.singer.inNoteBlock)];
+        firstNote = pitchBlk[0];
+        secondNote = pitchBlk[pitchBlk.length - 1];
+    }
+
+    if (intervals && intervals.length) {
+        octave=Math.floor(intervals[0]/7);
+
+    } else if (noteOctave&&noteOctave[last(tur.singer.inNoteBlock)]) {
+        const octaveblk = noteOctave[last(tur.singer.inNoteBlock)];
+        octave = octaveblk[octaveblk.length - 1] - octaveblk[0];
+    }
+
+    firstNote = firstNote.replace("♭", "b");
+    secondNote = secondNote.replace("♭", "b");
+    firstNote = firstNote.replace("♯", "#");
+    secondNote = secondNote.replace("♯", "#");
+
+    return { firstNote, secondNote, octave };
+};
+
 
 /**
  * Get the note based on various parameters.
