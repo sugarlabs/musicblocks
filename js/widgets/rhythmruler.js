@@ -53,6 +53,7 @@ class RhythmRuler {
     static BUTTONSIZE = 51;
     static ICONSIZE = 32;
     static DEL = 46;
+    static BACK = 8;
 
     /**
      * @constructor
@@ -242,6 +243,12 @@ class RhythmRuler {
                 this._dissectNumber.value = this._dissectNumber.value.substring(
                     0,
                     this._dissectNumber.value.length - 1
+                );
+            }
+            if (event.keyCode === RhythmRuler.BACK) {
+                this._dissectNumber.value = this._dissectNumber.value.substring(
+                    0,
+                    this._dissectNumber.value.length
                 );
             }
         };
