@@ -33,9 +33,16 @@ class WidgetWindow {
         this._title = title;
         this._visible = true;
         this._rolled = false;
+        this._savedDim = null;
         this._savedPos = null;
         this._maximized = false;
         this._fullscreenEnabled = fullscreen;
+        // For testing purposes only
+        this.isExecuted = false;
+        this.widthBeforeRestore = null;
+        this.widthAfterRestore = null;
+        this.heightBeforeRestore = null;
+        this.heightAfterRestore = null;
 
         // Drag offset for correct positioning
         this._dx = this._dy = 0;
@@ -176,6 +183,16 @@ class WidgetWindow {
             maxminButton.onclick = maxminButton.onmousedown = (e) => {
                 if (this._maximized) {
                     this._restore();
+                    // TESTS
+                    if (this.isExecuted) {
+                        this.heightAfterRestore = this._frame.offsetHeight;
+                        this.widthAfterRestore = this._frame.offsetWidth;
+                        console.log(this.heightBeforeRestore, this.heightAfterRestore);
+                        console.log(this.widthBeforeRestore, this.widthAfterRestore);
+                        // compares the height and width of the widget before first maximize and after first minimize
+                        console.log(this.heightAfterRestore === this.heightBeforeRestore);
+                        console.log(this.widthAfterRestore === this.widthBeforeRestore);
+                    }
                     this.sendToCenter();
                 } else {
                     this._maximize();
@@ -194,8 +211,8 @@ class WidgetWindow {
 
         const disableScroll = () => {
             // Get the current page scroll position
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
             // if any scroll is attempted,
             // set this to the previous value
             window.onscroll = () => {
@@ -472,17 +489,23 @@ class WidgetWindow {
     _restore() {
         this._maxminIcon.setAttribute("src", "header-icons/icon-expand.svg");
         this._maximized = false;
-
+        this.isExecuted = true;
         if (this._savedPos) {
             this._frame.style.left = this._savedPos[0];
             this._frame.style.top = this._savedPos[1];
             this._savedPos = null;
         }
         this._overlay(false);
-        this._frame.style.width = "auto";
-        this._frame.style.height = "auto";
-        this._frame.style.minHeight = "420px";
-        this._frame.style.minWidth = "470px";
+
+        if (this._savedDim) {
+            this._frame.style.width = this._savedDim[0] + "px";
+            this._frame.style.height = this._savedDim[1] + "px";
+        } else {
+            this._frame.style.width = "auto";
+            this._frame.style.height = "auto";
+            this._frame.style.minHeight = "420px";
+            this._frame.style.minWidth = "470px";
+        }
     }
 
     /**
@@ -490,11 +513,14 @@ class WidgetWindow {
      * @returns {void}
      */
     _maximize() {
+        const frameRect = this._frame.getBoundingClientRect();
         this._maxminIcon.setAttribute("src", "header-icons/icon-contract.svg");
         this._maximized = true;
         this.unroll();
         this.takeFocus();
-
+        this._savedDim = [frameRect.width, frameRect.height];
+        this.widthBeforeRestore = frameRect.width;
+        this.heightBeforeRestore = frameRect.height;
         this._savedPos = [this._frame.style.left, this._frame.style.top];
         this._frame.style.width = "100vw";
         this._frame.style.height = "calc(100vh - 64px)";
