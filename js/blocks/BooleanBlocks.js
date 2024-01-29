@@ -592,12 +592,6 @@ function setupBooleanBlocks(activity) {
             this.setPalette("boolean", activity);
 
             /**
-             * Sets the beginner status for the block.
-             * @param {boolean} true - The beginner status.
-             */
-            this.beginnerBlock(true);
-
-            /**
              * Sets the help string for the block.
              * @type {string[]}
              */
@@ -697,12 +691,6 @@ function setupBooleanBlocks(activity) {
              * @param {Activity} activity - The activity associated with the block.
              */
             this.setPalette("boolean", activity);
-
-            /**
-             * Sets the beginner status for the block.
-             * @param {boolean} true - The beginner status.
-             */
-            this.beginnerBlock(true);
 
             /**
              * Sets the help string for the block.
@@ -912,12 +900,6 @@ function setupBooleanBlocks(activity) {
              * @param {Activity} activity - The activity associated with the block.
              */
             this.setPalette("boolean", activity);
-
-            /**
-             * Sets the beginner status for the block.
-             * @param {boolean} true - The beginner status.
-             */
-            this.beginnerBlock(true);
 
             /**
              * Sets the help string for the block.

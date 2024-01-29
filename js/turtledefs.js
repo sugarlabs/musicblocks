@@ -32,7 +32,7 @@
    getAuxToolbarButtonNames, TITLESTRING
  */
 
-const VERSION = "3.5.8";
+const VERSION = "3.5.9";
 let LOGODEFAULT;
 let LOGOJA1 = LOGODEFAULT;
 let LOGOJA = LOGODEFAULT;
@@ -501,8 +501,8 @@ const createHelpContent = (activity) => {
             window.btoa(base64Encode(RECORDBUTTON))
     ]);
     HELPCONTENT.push([
-        _("Full screen"),
-        _("Toggle full screen mode."),
+        _("Toggle Fullscreen"),
+        _("Toggle Fullscreen mode."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(FULLSCREENBUTTON))
     ]);

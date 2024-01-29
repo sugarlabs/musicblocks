@@ -549,6 +549,11 @@ class GlobalPlanet {
                 debouncedfunction();
             });
 
+            document.getElementById("global-search-2").addEventListener("input",  (evt) => {
+                this.searchString = document.getElementById("global-search-2").value;
+                debouncedfunction();
+            });
+
             // eslint-disable-next-line no-unused-vars
             document.getElementById("search-close").addEventListener("click",  (evt) => {
                 document.getElementById("global-search").value = "";
@@ -556,6 +561,22 @@ class GlobalPlanet {
                 document.getElementById("search-close").style.display = "none";
                 debouncedfunction();
             });
+
+            document.getElementById("search-close-2").addEventListener("click",  (evt) => {
+                document.getElementById("global-search-2").value = "";
+                this.searchString = "";
+                document.getElementById("search-close-2").style.display = "none";
+                debouncedfunction();
+            });
+
+            document.getElementById("global-tab").addEventListener("click", (evt) => {
+                document.getElementById("searchcontainer-one").style.display = "block";
+            })
+
+            document.getElementById("local-tab").addEventListener("click", (evt) => {
+                document.getElementById("searchcontainer-one").style.display = "none";
+                // document.getElementById("two_header").style.display = "none";
+            })
             
             document.body.onscroll = () => {
                 const currentUserScrollPos = window.pageYOffset ||

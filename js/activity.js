@@ -1560,6 +1560,14 @@ class Activity {
                 const data = normalizeWheel(event); // normalize over different browsers
                 const delY = data.pixelY;
                 const delX = data.pixelX;
+               
+                //Ctrl+MouseWheel Zoom functionality
+                if (event.ctrlKey) {
+                    event.preventDefault(); // Prevent default scrolling behavior
+                   
+                    if(delY < 0 && doLargerBlocks(this));//Zoom IN
+                    if(delY >= 0 && doSmallerBlocks(this));//Zoom Out
+                }
                 if (delY !== 0 && event.axis === event.VERTICAL_AXIS) {
                     closeAnyOpenMenusAndLabels(); // closes all wheelnavs when scrolling .
                     that.blocksContainer.y -= delY;

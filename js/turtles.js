@@ -894,7 +894,20 @@ Turtles.TurtlesView = class {
             );
 
             this._clearButton.onclick = () => {
-                this.activity._allClear();
+                let clearBox = document.getElementById("ClearButton");
+                let clearContent = document.getElementById("ClearContent");
+                clearContent.innerHTML = _("Confirm");
+                clearBox.style.visibility="visible";
+                let func = this.activity._allClear;
+                clearBox.addEventListener('click', function(event) {
+                    if(event.target.id == "clearClose"){
+                        this.style.visibility = "hidden";
+                    }
+                    else{
+                       func();
+                       clearBox.style.visibility = "hidden";
+                    }
+                });            
             };
             
             if (doCollapse) {

@@ -46,7 +46,7 @@ class StringHelper {
             ["deleter-button",_("Delete")],
             ["deleter-cancel",_("Cancel")],
             ["globaltitle",_("Explore Projects")],
-            ["view-more-chips",_("Show more tags")],
+            ["view-more-chips",_("Show more tags") +" ▼"],
             ["option-recent",_("Most recent")],
             ["option-liked",_("Most liked")],
             ["option-downloaded",_("Most downloaded")],

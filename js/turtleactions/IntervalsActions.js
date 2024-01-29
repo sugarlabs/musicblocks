@@ -31,7 +31,8 @@
     js/logo.js
         NOINPUTERRORMSG
     js/utils/musicutils.js
-        MUSICALMODES, MODE_PIE_MENUS, getNote, getModeLength, NOTESTEP
+        MUSICALMODES, MODE_PIE_MENUS, getNote, getModeLength, NOTESTEP,
+        GetNotesForInterval,ALLNOTESTEP,NOTENAMES,SEMITONETOINTERVALMAP
     js/turtle-singer.js
         Singer
     js/js-export/export.js
@@ -72,29 +73,16 @@ function setupIntervalsActions(activity) {
          */
         static GetIntervalNumber(turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
-            const noteStatus = tur.singer.noteStatus;
-            const notePitches = tur.singer.notePitches;
-            let a='C', b='C', octave=0;
+            let { firstNote, secondNote, octave } = GetNotesForInterval(tur);
+            let totalIntervals = Math.abs(ALLNOTESTEP[firstNote] - ALLNOTESTEP[secondNote]);
+
+            if (ALLNOTESTEP[secondNote] < ALLNOTESTEP[firstNote] && octave !== 0) totalIntervals = 12 - totalIntervals;
+
+            if (octave < 0 && totalIntervals !== 0 && totalIntervals !== 12) totalIntervals = 12 - totalIntervals;
             
+            if (octave < -1 || totalIntervals === 0) octave = Math.abs(octave);
             
-            if (noteStatus && noteStatus[0])
-            {
-                if (!noteStatus[0][1]) return 0;   
-                    a = noteStatus[0][0].substring(0, noteStatus[0][0].length - 1);
-            b = noteStatus[0][1].substring(0, noteStatus[0][1].length - 1);
-            const octavea = parseInt(noteStatus[0][0].substring(noteStatus[0][0].length - 1));
-            const octaveb = parseInt(noteStatus[0][1].substring(noteStatus[0][1].length - 1));
-            octave = octaveb - octavea;
-            } else if (notePitches) {
-                const pitchBlk = notePitches[last(tur.singer.inNoteBlock)];
-                a = pitchBlk[0];
-                b = pitchBlk[pitchBlk.length - 1];
-            }
-            
-            
-            let totalIntervals = Math.abs(NOTESTEP[a]-NOTESTEP[b]);
-            
-            while (octave) {
+            while (octave > 0) {
                 totalIntervals += 12;
                 octave--;
             }
@@ -102,6 +90,59 @@ function setupIntervalsActions(activity) {
             return totalIntervals;
         }
 
+         /**
+         * @static
+         * @param {number} turtle
+         * @returns {String}
+         */
+
+        static GetCurrentInterval(turtle) {
+            const tur = activity.turtles.ithTurtle(turtle);
+
+            const { firstNote, secondNote, octave } = GetNotesForInterval(tur);
+
+            const index1 = NOTENAMES.indexOf(firstNote.substring(0, 1));
+            const index2 = NOTENAMES.indexOf(secondNote.substring(0, 1));
+            let lastWord = "";
+            let letterGap = Math.abs(index2 - index1);
+            
+            if (index1 > index2 && octave !== 0) letterGap = NOTENAMES.length - letterGap;
+
+            let totalIntervals = this.GetIntervalNumber(turtle);
+            
+            const numberToStringMap = [_('one'), _('two'), _('three'), _('four'), _('five'), _('six'), _('seven'), _('eight'), _('nine')]
+            const plural = (Math.abs(octave) > 1) ? _('octaves') : _('octave');
+            
+            let os = numberToStringMap[Math.abs(octave) - 1] || Math.abs(octave);
+            if (totalIntervals % 12 === 0 && letterGap === 0) {
+                if (octave < 0) {
+                    if(octave===-1)os = _('a')
+                    const a = os + " " + _('perfect') + " "+ plural + " " + _("below");
+                    return a.charAt(0).toUpperCase() + a.slice(1);
+                }
+                if (octave > 1) {
+                    const a = os + " " + _('perfect') + " " + plural + " " + _("above");
+                    return a.charAt(0).toUpperCase() + a.slice(1);
+                }
+            }
+            
+            if (totalIntervals > 21) {
+                if (octave >=1) {
+                    lastWord = ", " + _('plus') + " " + os + " " + plural;
+                }    
+                while (totalIntervals > 12) totalIntervals -= 12;
+            }
+            
+            if (octave < 0) {
+                letterGap = (letterGap !== 0) ? NOTENAMES.length - letterGap : letterGap;
+                if (octave < -1) lastWord = `,  ${os} ${plural}`;
+                lastWord += _(' below')
+            }
+            
+            let interval = (totalIntervals % 12 === 0 && letterGap === 0) ? SEMITONETOINTERVALMAP[totalIntervals][letterGap] : SEMITONETOINTERVALMAP[totalIntervals][letterGap] + lastWord;
+            return interval;
+        }
+        
         /**
          * "set key" block.
          * Sets the key and mode.

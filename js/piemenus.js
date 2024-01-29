@@ -3691,7 +3691,7 @@ const piemenuKey = (activity) => {
             let connectionsSetKey;
             let movable;
             for (const i in stacks) {
-                if (activity.logo.blocks.blockList[stacks[i]].name === "start") {
+                if (activity.blocks.blockList[stacks[i]].name === "start") {
                     const bottomBlock = activity.blocks.blockList[stacks[i]].connections[1];
                     if (activity.KeySignatureEnv[2]) {
                         activity.blocks._makeNewBlockWithConnections(
