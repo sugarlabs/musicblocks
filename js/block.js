@@ -2558,6 +2558,9 @@ class Block {
         let getInput = window.hasMouse;
 
         this.container.on("click", (event) => {
+            if(docById("helpfulWheelDiv") && docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+            }
             // We might be able to check which button was clicked.
             if ("nativeEvent" in event) {
                 if ("button" in event.nativeEvent && event.nativeEvent.button == 2) {
