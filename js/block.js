@@ -4077,7 +4077,7 @@ class Block {
                 this.value = oldValue;
             }
             
-            if(this.blocks.blockList[cblk1].name === "pitch" && (this.value > 10 || this.value < 1)) {
+            if(typeof(this.blocks.blockList[cblk1]) != 'undefined' && this.blocks.blockList[cblk1].name === "pitch" && (this.value > 10 || this.value < 1)) {
                 const thisBlock = this.blocks.blockList.indexOf(this);
                 this.activity.errorMsg(_("Octave value must be between 1 and 10."), thisBlock);
                 this.activity.refreshCanvas();
