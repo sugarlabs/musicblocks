@@ -259,10 +259,10 @@ class RhythmRuler {
                 } else if (cursorPosition > 0) {
                     // If there is no selection and the cursor is not at the beginning, delete the character before the cursor
                     const newValue = this._dissectNumber.value.substring(0, cursorPosition) + this._dissectNumber.value.substring(cursorPosition, this._dissectNumber.value);
-                    this._dissectNumber.value = newValue;            
-                } 
+                    this._dissectNumber.value = newValue;
+                }
                 // If the cursor is at the beginning, do nothing
-            }            
+            }
         };
 
         this._dissectNumber.oninput = () => {
