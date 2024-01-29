@@ -649,9 +649,8 @@ const FIXEDSOLFEGE1 = {
  */
 const NOTESTEP = { C: 1, D: 3, E: 5, F: 6, G: 8, A: 10, B: 12 };
 
-
 /**
- * Maps from note names to their corresponding step numbers.
+ * Maps note names to their corresponding step numbers, including enharmonic equivalents.
  * @constant {Object.<number, string>}
  */
 const ALLNOTESTEP = {
@@ -3477,9 +3476,9 @@ const numberToPitch = (i, temperament, startPitch, offset) => {
 };
 
 /**
- * 
- * @param {object} tur 
- * @returns 
+ * Get notes based on the provided tuning object.
+ * @param {Object} tur - The tuning object containing singer information.
+ * @returns {Object} - An object containing the firstNote, secondNote, and octave.
  */
 
 const GetNotesForInterval = (tur) => {
