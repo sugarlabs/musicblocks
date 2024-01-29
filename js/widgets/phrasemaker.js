@@ -174,7 +174,7 @@ class PhraseMaker {
                 wfbWidget.style.left = "55px";
             }
         }
-        setTimeout(styleElements,4000);
+        setTimeout(styleElements,500);
     }
 
     clearBlocks() {
