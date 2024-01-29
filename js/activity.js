@@ -458,7 +458,7 @@ class Activity {
                 (event) => {
                     event.preventDefault();
                     event.stopPropagation();
-                    if(event.target.localName === "canvas") {
+                    if(event.target.id === "myCanvas") {
                         this._displayHelpfulWheel(event);
                     }
                 },
