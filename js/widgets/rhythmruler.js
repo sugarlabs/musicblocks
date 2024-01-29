@@ -246,15 +246,23 @@ class RhythmRuler {
                 );
             }
             if (event.keyCode === RhythmRuler.BACK) {
-                if (this._dissectNumber.value.length == 1) {
+                // Get the cursor position
+                const cursorPosition = this._dissectNumber.selectionStart;
+                // If there is a selection, delete the selected text
+                if (this._dissectNumber.selectionStart !== this._dissectNumber.selectionEnd) {
+                    const start = this._dissectNumber.selectionStart;
+                    const end = this._dissectNumber.selectionEnd;
+                    this._dissectNumber.value = this._dissectNumber.value.substring(0, start) + this._dissectNumber.value.substring(start, end + 1);
+                } else if (this._dissectNumber.value.length == 1 && cursorPosition == 1) {
+                    // If there is only a single digit in the input then replace it with an empty string
                     this._dissectNumber.value = "";
-                } else {
-                    this._dissectNumber.value = this._dissectNumber.value.substring(
-                        0,
-                        this._dissectNumber.value.length
-                    );
-                }   
-            }
+                } else if (cursorPosition > 0) {
+                    // If there is no selection and the cursor is not at the beginning, delete the character before the cursor
+                    const newValue = this._dissectNumber.value.substring(0, cursorPosition) + this._dissectNumber.value.substring(cursorPosition, this._dissectNumber.value);
+                    this._dissectNumber.value = newValue;            
+                } 
+                // If the cursor is at the beginning, do nothing
+            }            
         };
 
         this._dissectNumber.oninput = () => {
