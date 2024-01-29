@@ -4502,6 +4502,10 @@ class Activity {
         
             if(!this.helpfulWheelItems.find(ele => ele.label === "Search for Blocks")) 
                 this.helpfulWheelItems.push({label: "Search for Blocks", icon: "imgsrc:header-icons/search-button.svg", display: true, fn: this._displayHelpfulSearchDiv});
+        
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Paste previous stack")) 
+                this.helpfulWheelItems.push({label: "Paste previous stack", icon: "imgsrc:header-icons/copy-button.svg", display: false, fn: this.turtles.expand});
+        
         };
 
         /*
