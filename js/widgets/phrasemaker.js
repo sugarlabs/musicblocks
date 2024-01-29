@@ -155,23 +155,26 @@ class PhraseMaker {
         var floatingWindowsDiv = document.getElementById("floatingWindows");
         var windowFrameElements = floatingWindowsDiv.querySelectorAll(".windowFrame");
     
-        for (var i = 0; i < windowFrameElements.length; i++) {
-            var windowFrame = windowFrameElements[i];
-            var wfWinBody = document.querySelector(".wfWinBody");
-            var wfbWidget = document.querySelector(".wfbWidget");
-            wfbWidget.style.overflow = "auto";
-            wfbWidget.style.width = "-webkit-fill-available";
-            wfbWidget.style.height = "-webkit-fill-available";
-            windowFrame.style.height = "405px";
-            windowFrame.style.width = "685px";
-            wfWinBody.style.position = "absolute";
-            wfWinBody.style.overflow = "auto";
-            wfWinBody.style.width = "-webkit-fill-available";
-            wfWinBody.style.height = "-webkit-fill-available";
-            wfWinBody.style.background = "#cccccc";
-            wfbWidget.style.position = "absolute";
-            wfbWidget.style.left = "55px";
+        function styleElements(){
+            for (var i = 0; i < windowFrameElements.length; i++) {
+                var windowFrame = windowFrameElements[i];
+                var wfWinBody = document.querySelector(".wfWinBody");
+                var wfbWidget = document.querySelector(".wfbWidget");
+                wfbWidget.style.overflow = "auto";
+                wfbWidget.style.width = "-webkit-fill-available";
+                wfbWidget.style.height = "-webkit-fill-available";
+                windowFrame.style.height = "405px";
+                windowFrame.style.width = "685px";
+                wfWinBody.style.position = "absolute";
+                wfWinBody.style.overflow = "auto";
+                wfWinBody.style.width = "-webkit-fill-available";
+                wfWinBody.style.height = "-webkit-fill-available";
+                wfWinBody.style.background = "#cccccc";
+                wfbWidget.style.position = "absolute";
+                wfbWidget.style.left = "55px";
+            }
         }
+        setTimeout(styleElements,4000);
     }
 
     clearBlocks() {
