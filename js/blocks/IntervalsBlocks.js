@@ -304,6 +304,63 @@ function setupIntervalsBlocks(activity) {
         }
     }
 
+      /**
+     * Represents a block for retrieving the current interval in Music Blocks.
+     * @extends {ValueBlock}
+     */
+    class CurrentIntervalBlock extends ValueBlock {
+        /**
+         * Constructs an CurrentIntervalBlock instance.
+         */
+        constructor() {
+            // Call the constructor of the parent class
+            super("currentinterval", _("current interval"));
+
+            // Set the palette, activity, help string, beginner block, hidden status, and form the block with specific parameters
+            this.setPalette("intervals", activity);
+            this.setHelpString([
+                _(
+                    "The Current interval block returns the name of scalar steps in the current interval."
+                ),
+                "documentation",
+                ""
+            ]);
+            this.formBlock({ outType: "numberout" });
+        }
+
+        /**
+         * Updates the parameter for the CurrentInterval block.
+         * @param {object} logo - The logo object.
+         * @param {number} turtle - The turtle number.
+         * @param {number} blk - The block number.
+         * @returns {*} - The updated parameter value.
+         */
+        updateParameter(logo, turtle, blk) {
+            return activity.blocks.blockList[blk].value;
+        }
+
+        /**
+         * Retrieves the argument for the CurrentInterval block.
+         * @param {object} logo - The logo object.
+         * @param {number} turtle - The turtle number.
+         * @param {number} blk - The block number.
+         * @returns {*} - The argument for the CurrentInterval block.
+         */
+        arg(logo, turtle, blk) {
+            if (
+                logo.inStatusMatrix &&
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
+            ) {
+                logo.statusFields.push([blk, "currentinterval"]);
+            } else {
+                return Singer.IntervalsActions.GetCurrentInterval(turtle);
+            }
+        }
+    }
+
+    
+    
     /**
      * Represents a block for measuring the distance between two notes in semi-tones in Music Blocks.
      * @extends {LeftBlock}
@@ -1310,6 +1367,7 @@ function setupIntervalsBlocks(activity) {
     new DoublyBlock().setup(activity);
     new IntervalNameBlock().setup(activity);
     new IntervalNumberBlock().setup(activity);
+    new CurrentIntervalBlock().setup(activity);
     new MeasureIntervalSemitonesBlock().setup(activity);
     new MeasureIntervalScalarBlock().setup(activity);
     makeSemitoneIntervalMacroBlocks();

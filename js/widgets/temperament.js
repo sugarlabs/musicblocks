@@ -782,7 +782,12 @@ function TemperamentWidget() {
         this.tempRatios = [];
 
         divAppend.addEventListener("click", function (event) {
-            that.performEqualEdit(event);
+            try{
+                that.performEqualEdit(event);
+            } catch{
+                this.activity.errorMsg(_("The Number of divisions is too large."));
+            }
+
         });
 
         this.performEqualEdit = function (event) {

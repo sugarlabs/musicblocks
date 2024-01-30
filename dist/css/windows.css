@@ -54,7 +54,8 @@
 #floatingWindows > .windowFrame > .wfTopBar .wftButton.rollup {
     order: 2 ; 
 }
-#floatingWindows > .windowFrame > .wfTopBar .wftButton.rollup::before {
+#floatingWindows > .windowFrame > .wfTopBar .wftButton.rollup::before,
+#floatingWindows > .windowFrame > .wfTopBar .wftButton.rollup::after {
     content: "";
     display: block;
     height: 2px;
@@ -64,6 +65,12 @@
     position: absolute;
     background-color: #fff;
     transform: translate(-50%, -50%);
+}
+#floatingWindows > .windowFrame > .wfTopBar .wftButton.rollup.plus::before {
+    transform: translate(-50%, -50%) rotate(90deg);
+}
+#floatingWindows > .windowFrame > .wfTopBar .wftButton.rollup::before {
+    transform: translate(-50%, -50%) rotate(0deg);
 }
 #floatingWindows > .windowFrame > .wfTopBar .wftButton.close::before,
 #floatingWindows > .windowFrame > .wfTopBar .wftButton.close::after {

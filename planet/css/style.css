@@ -298,6 +298,10 @@ div.select-wrapper * {
 	transform: initial !important;
 }
 
+#two_header {
+	display: none;
+}
+
 @media only screen and (max-width: 655px) {
 	#logo-container {
 		font-size: 0;
@@ -370,9 +374,60 @@ a {
 	}
 }
 
-@media only screen and (max-width: 550px) {
+@media only screen and (max-width: 900px) {
 	#projectviewer-download-file, #projectviewer-open-mb, #projectviewer-merge-mb {
 		font-size: 60%;
+	}
+	#searchcontainer {
+		display: flex;
+		width: 100%;
+		padding-top: 0px ;
+		margin-top: 0px;
+	}
+	#s_one{
+        display: none;
+	}
+	#searchcontainer.nav-content{
+		height: 56px;
+		position: absolute;
+		z-index: -1;
+	}
+	/* #searchicon,#search-close-2{
+		flex: 1;
+	} */
+	#two_header {
+		display: block;
+		height: 56px;
+		position: -webkit-sticky;
+        position: sticky;
+        top: 56px;
+	}
+	.input-field-2 {
+       display: flex;
+	}
+	#two-header.nav-extended.light-green.lighten-1{
+		position: relative;
+	}
+	.input-field-2.search{
+		position: absolute;
+		z-index: 2;
+		width: 90%;
+		margin-left: 5%;
+		margin-right: 5%;
+	}
+	#global-search-2{
+		flex:1;
+	}
+	.input-field {
+		display: none;
+	}
+	#global-search {
+		flex: 1;
+	}
+}
+@media only screen and (max-width: 978px) {
+	#two_header {
+		visibility: visible;
 	}
 }
 
@@ -433,6 +488,24 @@ a {
 	z-index: 100;
 }
 
+#searchcontainer-one {
+	width: 250px;
+}
 .nav-content {
 	display: none;
+}
+
+
+#backToTopBtn {
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+	background-color: #007BFF;
+	color: #fff;
+	border: none;
+	padding: 10px 15px;
+	border-radius: 5px;
+	cursor: pointer;
+	font-size: 16px;
+	outline: none;
 }
