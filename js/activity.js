@@ -3015,11 +3015,15 @@ class Activity {
         window.addEventListener("orientationchange",  handleResize);
 
         const that = this;
-        const screenWidth = window.innerWidth;
-        const  resizeCanvas_ = () => {
-            if (screenWidth !== window.innerWidth) {
-                that._onResize(false);
-            }
+        // removed "const screenWidth" as it isn't need anymore.
+        const  resizeCanvas_ = () => {            
+            that._onResize(false);
+            /* 
+            Removed an extra if condition which was added for the resizing issue when the download toolbar used to appear
+            at the bottom of chrome.
+            Google Chrome has completely removed this feature and This feature can't be brought back even using chrome://flags/#download-bubble
+            as it was an experimental flag which google further removed.
+            */
             document.getElementById("hideContents").click();
         };
         
