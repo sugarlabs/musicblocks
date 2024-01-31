@@ -308,6 +308,8 @@ function setupExtrasBlocks(activity) {
             ]);
 
             this.extraWidth = -10;
+            // Update the dock value for vspace
+            this.updateDockValue(0, "vspace");
         }
 
         /**
