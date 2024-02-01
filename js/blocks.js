@@ -1655,7 +1655,6 @@ class Blocks {
                     }
 
                     /** Look for available connections. */
-                    console.log(this.blockList);
                     if (this._testConnectionType(blkType, this.blockList[b].docks[i][2])) {
                         const x2 = this.blockList[b].container.x + this.blockList[b].docks[i][0];
                         const y2 = this.blockList[b].container.y + this.blockList[b].docks[i][1];
