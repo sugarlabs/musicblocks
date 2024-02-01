@@ -2128,6 +2128,18 @@ class Blocks {
             if (type1 === "out" && type2 === "in") {
                 return true;
             }
+            if (type1 === "in" && type2 === "vspaceout") {
+                return true;
+            }
+            if (type1 === "vspaceout" && type2 === "in") {
+                return true;
+            }
+            if (type1 === "out" && type2 === "vspacein") {
+                return true;
+            }
+            if (type1 === "vspacein" && type2 === "out") {
+                return true;
+            }
             if (type1 === "numberin" && ["numberout", "anyout"].indexOf(type2) !== -1) {
                 return true;
             }
@@ -2168,6 +2180,18 @@ class Blocks {
                 return true;
             }
             if (type1 === "caseout" && type2 === "casein") {
+                return true;
+            }
+            if (type1 === "vspaceout" && type2 === "casein") {
+                return true;
+            }
+            if (type1 === "casein" && type2 === "vspaceout") {
+                return true;
+            }
+            if (type1 === "vspacein" && type2 === "caseout") {
+                return true;
+            }
+            if (type1 === "caseout" && type2 === "vspacein") {
                 return true;
             }
             if (
