@@ -243,7 +243,6 @@ class JSEditor {
         editorContainer.appendChild(codeLines);
 
         const codebox = document.createElement("div");
-        codebox.id = "editorCodebox";
         codebox.classList.add("editor");
         codebox.classList.add("language-js");
         codebox.style.width = "100%";
@@ -288,7 +287,7 @@ class JSEditor {
         this._editor.appendChild(consolelabel);
 
         const editorconsole = document.createElement("div");
-        editorconsole.id = "editor_console";
+        editorconsole.id = "editorConsole";
         editorconsole.style.width = "100%";
         editorconsole.style.height = "8.25rem";
         editorconsole.style.overflow = "auto";
@@ -464,7 +463,7 @@ class JSEditor {
      * @returns {void}
      */
     _toggleConsole() {
-        const consoleContainer = docById("editor_console");
+        const consoleContainer = docById("editorConsole");
         const consoleLabel = docById("console_label");
         const editorContainer = docById("editor_container");
         const arrowBtn = docById("editor_console_btn");
