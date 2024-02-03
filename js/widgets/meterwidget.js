@@ -33,10 +33,25 @@
          PREVIEWVOLUME, TONEBPM
 */
 
-/**
- * MeterWidget class represents a meter widget used to show the meter and strong beats.
+ /**
+ * MeterWidget class for creating and managing a pie menu meter for strong beats.
  *
  * @class
+ * @classdesc Represents a MeterWidget that utilizes pie menu for strong beat selection.
+ * @memberof global
+ * @requires Singer
+ * @requires _
+ * @requires last
+ * @requires platformColor
+ * @requires docById
+ * @requires wheelnav
+ * @requires slicePath
+ * @requires PREVIEWVOLUME
+ * @requires TONEBPM
+ * @exports MeterWidget
+ * @exports {number} BUTTONDIVWIDTH - Represents the button width for the MeterWidget class.
+ * @exports {number} BUTTONSIZE - Represents the button size for the MeterWidget class.
+ * @exports {number} ICONSIZE - Represents the icon size for the MeterWidget class.
  */
 class MeterWidget {
     // A pie menu is used to show the meter and strong beats
