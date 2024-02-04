@@ -33,27 +33,120 @@
          PREVIEWVOLUME, TONEBPM
 */
 
-/*exported MeterWidget*/
+ /**
+ * MeterWidget class for creating and managing a pie menu meter for strong beats.
+ *
+ * @class
+ * @classdesc Represents a MeterWidget that utilizes pie menu for strong beat selection.
+ * @memberof global
+ * @requires Singer
+ * @requires _
+ * @requires last
+ * @requires platformColor
+ * @requires docById
+ * @requires wheelnav
+ * @requires slicePath
+ * @requires PREVIEWVOLUME
+ * @requires TONEBPM
+ * @exports MeterWidget
+ * @exports {number} BUTTONDIVWIDTH - Represents the button width for the MeterWidget class.
+ * @exports {number} BUTTONSIZE - Represents the button size for the MeterWidget class.
+ * @exports {number} ICONSIZE - Represents the icon size for the MeterWidget class.
+ */
 class MeterWidget {
     // A pie menu is used to show the meter and strong beats
+    /**
+     * Width of the button div.
+     *
+     * @type {number}
+     * @static
+     */
     static BUTTONDIVWIDTH = 535;
+
+    /**
+     * Size of the button.
+     *
+     * @type {number}
+     * @static
+     */
     static BUTTONSIZE = 53;
+
+    /**
+     * Size of the icon.
+     *
+     * @type {number}
+     * @static
+     */
     static ICONSIZE = 32;
 
     /**
-     * @param {number} widgetBlock
+     * Creates an instance of MeterWidget.
+     *
+     * @param {object} activity - The activity object.
+     * @param {number} widgetBlock - The widget block number.
      */
     constructor(activity, widgetBlock) {
+        /**
+         * The activity object.
+         *
+         * @type {object}
+         */
         this.activity = activity;
-        this._meterBlock = this.activity.logo._meterBlock;
-        this._strongBeats = [];
-        this._playing = false;
-        this._click_lock = false;
-        this._beatValue = 1 / 4;
 
+        /**
+         * The meter block.
+         *
+         * @type {number}
+         * @private
+         */
+        this._meterBlock = this.activity.logo._meterBlock;
+
+        /**
+         * Array to store strong beats.
+         *
+         * @type {Array}
+         * @private
+         */
+        this._strongBeats = [];
+
+        /**
+         * Flag indicating if the widget is currently playing.
+         *
+         * @type {boolean}
+         * @private
+         */
+        this._playing = false;
+
+        /**
+         * Flag indicating if the widget is locked for clicks.
+         *
+         * @type {boolean}
+         * @private
+         */
+        this._click_lock = false;
+
+        /**
+         * The beat value.
+         *
+         * @type {number}
+         * @private
+         */
+        this._beatValue = 1 / 4;
+        
+        /**
+         * The cell scale.
+         *
+         * @type {number}
+         * @private
+         */
         const w = window.innerWidth;
         this._cellScale = w / 1200;
-
+        
+        /**
+         * The widget window.
+         *
+         * @type {object}
+         */
         const widgetWindow = window.widgetWindows.windowFor(this, "meter");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
@@ -67,16 +160,31 @@ class MeterWidget {
         // For the button callbacks
         this.meterDiv = document.createElement("table");
         widgetWindow.getWidgetBody().append(this.meterDiv);
-
+        
+        /**
+         * Callback for the widget window close event.
+         *
+         * @private
+         */
         widgetWindow.onclose = () => {
             this._playing = false;
             this.activity.hideMsgs();
             widgetWindow.destroy();
         };
-
+        
+        /**
+         * Callback for the widget window maximize event.
+         *
+         * @private
+         */
         widgetWindow.onmaximize = this._scale;
 
         this._click_lock = false;
+        /**
+         * Callback for the play button click event.
+         *
+         * @private
+         */
         const playBtn = widgetWindow.addButton("play-button.svg", MeterWidget.ICONSIZE, _("Play"));
         playBtn.onclick = () => {
             if (this._get_click_lock()) {
@@ -197,7 +305,13 @@ class MeterWidget {
         widgetWindow.sendToCenter();
         this._scale.call(this.widgetWindow);
     }
-
+    
+    /**
+     * Private method to scale the widget.
+     *
+     * @private
+     * @returns {void}
+     */
     _scale() {
         const windowHeight =
             this.getWidgetFrame().offsetHeight - this.getDragElement().offsetHeight;
@@ -212,8 +326,10 @@ class MeterWidget {
     }
 
     /**
+     * Private method to get the click lock status.
+     *
      * @private
-     * @returns {boolean}
+     * @returns {boolean} - The click lock status.
      */
     _get_click_lock() {
         return this._click_lock;
@@ -229,8 +345,10 @@ class MeterWidget {
     }
 
     /**
+     * Private method to get the playing status.
+     *
      * @private
-     * @returns {boolean}
+     * @returns {boolean} - The playing status.
      */
     __getPlayingStatus() {
         return this._playing;
@@ -278,6 +396,8 @@ class MeterWidget {
     }
 
     /**
+     * Private method to play the beat.
+     *
      * @private
      * @returns {void}
      */
@@ -294,7 +414,14 @@ class MeterWidget {
     }
 
     /**
+     * Deprecated method to add a button to the widget row.
+     *
      * @deprecated
+     * @param {object} row - The row to which the button is added.
+     * @param {string} icon - The icon file name.
+     * @param {number} iconSize - The size of the icon.
+     * @param {string} label - The label for the button.
+     * @returns {object} - The cell containing the button.
      */
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
@@ -330,6 +457,8 @@ class MeterWidget {
     }
 
     /**
+     * Private method to save the widget state.
+     *
      * @private
      * @returns {void}
      */
@@ -376,9 +505,11 @@ class MeterWidget {
     }
 
     /**
+     * Private method to create and initialize the pie menu for strong beat selection.
+     *
      * @private
-     * @param {number} numberOfBeats
-     * @param {number} beatValue
+     * @param {number} numberOfBeats - The number of beats to be displayed.
+     * @param {number} beatValue - The value of each beat.
      * @returns {void}
      */
     _piemenuMeter(numberOfBeats, beatValue) {
@@ -510,9 +641,11 @@ class MeterWidget {
     }
 
     /**
+     * Private method to set up default strong and weak beats based on the beat value and number of beats.
+     *
      * @private
-     * @param {number} numberOfBeats
-     * @param {number} beatValue
+     * @param {number} numberOfBeats - The number of beats to be displayed.
+     * @param {number} beatValue - The value of each beat.
      * @returns {void}
      */
     _setupDefaultStrongWeakBeats(numberOfBeats, beatValue) {
