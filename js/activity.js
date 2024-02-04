@@ -3013,7 +3013,6 @@ class Activity {
             }, 100);
         });
         window.addEventListener("orientationchange",  handleResize);
-
         const that = this;        
         const  resizeCanvas_ = () => {            
             that._onResize(false);
