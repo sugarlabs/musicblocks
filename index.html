@@ -260,34 +260,35 @@
 
         <!--hidden at the beginning whilst everything loads-->
         <div id="hideContents" style="display: none;" tabindex="-1">
-            <div class="canvasHolder" id="canvasHolder">
+            <div class="canvasHolder" id="canvasHolder">     
                 <div
                     class="popupMsg"
                     id="printText"
-                    onclick="hidePrintText()"
                     tabindex="-1"
                 >
+                <div class="contentWrapper">
                     <span id="printTextContent"></span>
                     <img
                         class="msgCloseIcon"
+                        onclick="hidePrintText()"
                         src="images/close.svg"
                         alt="Close"
                     />
                 </div>
-
+            </div>
                 <div
                     class="popupMsg"
                     id="errorText"
-                    onclick="hideErrorText()"
                     tabindex="-1"
                 >
                     <span id="errorTextContent"></span>
                     <img
                         class="msgCloseIcon"
+                        onclick="hideErrorText()"
                         src="images/close.svg"
                         alt="Close"
                     />
-                </div>
+                </div>     
 
                 <div
                     class="clearPop"
