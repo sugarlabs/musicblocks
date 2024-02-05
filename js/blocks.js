@@ -1331,7 +1331,7 @@ class Blocks {
                   this.blockList[thisBlockobj.connections[0]].name === "vspace")
               ) {
                 return;
-              }              
+            }       
 
             thisBlockobj = this.blockList[thisBlock];
             if (thisBlockobj.name === "rest2") {
