@@ -1323,12 +1323,15 @@ class Blocks {
 
             // Do not remove the silence block if only a vspace block is added before the silence block.
             if (
-                thisBlockobj.name === "vspace" &&
-                this.blockList[thisBlockobj.connections[1]].name === "vspace" &&
-                this.blockList[thisBlockobj.connections[0]].name === "newnote"
+                (thisBlockobj.name === "vspace" &&
+                  this.blockList[thisBlockobj.connections[1]].name === "vspace" &&
+                  this.blockList[thisBlockobj.connections[0]].name === "newnote") ||
+                (thisBlockobj.name === "vspace" &&
+                  this.blockList[thisBlockobj.connections[1]].name === "vspace" &&
+                  this.blockList[thisBlockobj.connections[0]].name === "vspace")
               ) {
                 return;
-              }
+              }              
 
             thisBlockobj = this.blockList[thisBlock];
             if (thisBlockobj.name === "rest2") {
