@@ -1330,6 +1330,10 @@ class Blocks {
                   this.blockList[thisBlockobj.connections[1]].name === "vspace" &&
                   this.blockList[thisBlockobj.connections[0]].name === "vspace")
               ) {
+                console.log("getting returned");
+                console.log(this.blockList[thisBlockobj.connections[1]].name);
+                console.log(this.blockList[thisBlockobj.connections[0]].name);
+                console.log(thisBlockobj.name);
                 return;
               }              
 
