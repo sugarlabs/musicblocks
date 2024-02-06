@@ -2722,7 +2722,7 @@ class Block {
             let block = that.blocks.blockList[that.connections[1]];
             while (block != undefined) {
                 if (block?.name === "rest2") {
-                    this.activity.errorMsg(_("Silence block cannot be dragged out of a note clamp"), block);
+                    this.activity.errorMsg(_("Silence block cannot be removed."), block);
                     return;
                 }
                 block = block?.blocks.blockList[block.connections[1]];
