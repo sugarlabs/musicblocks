@@ -576,6 +576,8 @@ Turtles.TurtlesView = class {
         this._collapseButton = null; // used by add method
         this._clearButton = null; // used by add method
         this.gridButton = null; // used by add method
+        this.collapse = null;
+        this.expand = null;
 
         // canvas background color
         this._backgroundColor = platformColor.background;
@@ -894,7 +896,20 @@ Turtles.TurtlesView = class {
             );
 
             this._clearButton.onclick = () => {
-                this.activity._allClear();
+                let clearBox = document.getElementById("ClearButton");
+                let clearContent = document.getElementById("ClearContent");
+                clearContent.innerHTML = _("Confirm");
+                clearBox.style.visibility="visible";
+                let func = this.activity._allClear;
+                clearBox.addEventListener('click', function(event) {
+                    if(event.target.id == "clearClose"){
+                        this.style.visibility = "hidden";
+                    }
+                    else{
+                       func();
+                       clearBox.style.visibility = "hidden";
+                    }
+                });            
             };
             
             if (doCollapse) {
@@ -903,7 +918,7 @@ Turtles.TurtlesView = class {
         };
 
         /**
-         * Makes collapse button by initailising 'EXPANDBUTTON' SVG.
+         * Makes collapse button by initailising 'COLLAPSEBUTTON' SVG.
          * Assigns click listener function to call __collapse() method.
          */
         const __makeCollapseButton = () => {
@@ -926,9 +941,47 @@ Turtles.TurtlesView = class {
                 this._expandButton.style.visibility = "visible";
                 this._collapseButton.style.visibility = "hidden";
                 this.gridButton.style.visibility = "hidden";
+                this.activity.helpfulWheelItems.forEach(ele => {
+                    if (ele.label === "Expand") {
+                        ele.display = true;
+                    } else if (ele.label === "Collapse") {
+                        ele.display = false;
+                    } else if (ele.label === "Grid") {
+                        ele.display = false;
+                    }
+                })
                 __collapse();
             };
         };
+
+        
+        this.collapse = () => {
+            const auxToolbar = docById("aux-toolbar");
+            if (auxToolbar.style.display === "block") {
+                const menuIcon = docById("menu");
+                auxToolbar.style.display = "none";
+                menuIcon.innerHTML = "menu";
+                docById("toggleAuxBtn").className -= "blue darken-1";
+            }
+            this._expandButton.style.visibility = "visible";
+            this._collapseButton.style.visibility = "hidden";
+            this.gridButton.style.visibility = "hidden";
+            this.activity.helpfulWheelItems.forEach(ele => {
+                if (ele.label === "Expand") {
+                    ele.display = true;
+                } else if (ele.label === "Collapse") {
+                    ele.display = false;
+                } else if (ele.label === "Grid") {
+                    ele.display = false;
+                }
+            })
+            __collapse();
+
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+                this.activity.__tick();
+            }
+        }
 
         /**
          * Makes expand button by initailising 'EXPANDBUTTON' SVG.
@@ -960,6 +1013,15 @@ Turtles.TurtlesView = class {
                 this.gridButton.style.visibility = "visible";
                 this._collapseButton.style.visibility = "visible";
                 this._expandButton.style.visibility = "hidden";
+                this.activity.helpfulWheelItems.forEach(ele => {
+                    if (ele.label === "Expand") {
+                        ele.display = false;
+                    } else if (ele.label === "Collapse") {
+                        ele.display = true;
+                    } else if (ele.label === "Grid") {
+                        ele.display = true;
+                    }
+                })
                 this._collapsedBoundary.visible = false;
                 turtlesStage.removeAllEventListeners("pressmove");
                 turtlesStage.removeAllEventListeners("mousedown");
@@ -992,6 +1054,68 @@ Turtles.TurtlesView = class {
                 this.masterStage.addChildAt(turtlesStage, 0);
             };
         };
+
+
+        this.expand = () => {
+            // If the aux toolbar is open, close it.
+            const auxToolbar = docById("aux-toolbar");
+            if (auxToolbar.style.display === "block") {
+                const menuIcon = docById("menu");
+                auxToolbar.style.display = "none";
+                menuIcon.innerHTML = "menu";
+                docById("toggleAuxBtn").className -= "blue darken-1";
+            }
+            this.hideMenu();
+            this.setStageScale(1.0);
+            this._expandedBoundary.visible = true;
+            this.gridButton.style.visibility = "visible";
+            this._collapseButton.style.visibility = "visible";
+            this._expandButton.style.visibility = "hidden";
+            this.activity.helpfulWheelItems.forEach(ele => {
+                if (ele.label === "Expand") {
+                    ele.display = false;
+                } else if (ele.label === "Collapse") {
+                    ele.display = true;
+                } else if (ele.label === "Grid") {
+                    ele.display = true;
+                }
+            })
+            this._collapsedBoundary.visible = false;
+            turtlesStage.removeAllEventListeners("pressmove");
+            turtlesStage.removeAllEventListeners("mousedown");
+
+            turtlesStage.x = 0;
+            turtlesStage.y = 0;
+            this._isShrunk = false;
+
+            for (let i = 0; i < this.turtleList.length; i++) {
+                this.turtleList[i].container.scaleX = 1;
+                this.turtleList[i].container.scaleY = 1;
+                this.turtleList[i].container.scale = 1;
+            }
+
+            this._clearButton.scaleX = 1;
+            this._clearButton.scaleY = 1;
+            this._clearButton.scale = 1;
+            this._clearButton.x = this._w - 5 - 2 * 55;
+
+            if (this.gridButton !== null) {
+                this.gridButton.scaleX = 1;
+                this.gridButton.scaleY = 1;
+                this.gridButton.scale = 1;
+                this.gridButton.x = this._w - 10 - 3 * 55;
+                this.gridButton.visible = true;
+            }
+
+            // remove the stage and add it back in position 0
+            this.masterStage.removeChild(turtlesStage);
+            this.masterStage.addChildAt(turtlesStage, 0);
+
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+                this.activity.__tick();
+            }
+        }
 
         /**
          * initializes all Buttons.

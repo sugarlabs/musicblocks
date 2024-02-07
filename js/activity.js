@@ -368,6 +368,18 @@ class Activity {
             this.searchWidget.style.visibility = "hidden";
             this.searchWidget.placeholder = _("Search for blocks");
 
+            this.helpfulSearchWidget = document.createElement("input");
+            this.helpfulSearchWidget.setAttribute("id", "helpfulSearch");
+            this.helpfulSearchWidget.style.visibility = "hidden";
+            this.helpfulSearchWidget.placeholder = _("Search for blocks");
+            this.helpfulSearchWidget.classList.add("ui-autocomplete");
+            this.helpfulSearchWidget.style.cssText = `
+                padding: 2px;
+                border: 2px solid grey;
+                width: 220px;
+                height: 20px;
+                font-size: large;
+            `;
             this.progressBar = docById("myProgress");
             this.progressBar.style.visibility = "hidden";
 
@@ -376,7 +388,65 @@ class Activity {
             this.paste.style.visibility = "hidden";
 
             this.toolbarHeight = document.getElementById("toolbars").offsetHeight;
+
+            this.helpfulWheelItems = [];
+
+            this.setHelpfulSearchDiv();
         };
+
+        /*
+         * creates helpfulSearchDiv for search
+         */
+        this.setHelpfulSearchDiv = () => {
+            if (docById("helpfulSearchDiv")) {
+                docById("helpfulSearchDiv").parentNode.removeChild(
+                    docById("helpfulSearchDiv")
+                );
+            }
+            this.helpfulSearchDiv = document.createElement("div");
+            this.helpfulSearchDiv.setAttribute("id", "helpfulSearchDiv");
+            this.helpfulSearchDiv.style.cssText = `
+                position: absolute;
+                background-color: #f0f0f0;
+                padding: 5px;
+                border: 1px solid #ccc;
+                width: 230px;
+                display: none;
+                z-index: 1;
+            `;
+
+            document.body.appendChild(this.helpfulSearchDiv);
+
+            if (docById("helpfulSearch")) {
+                docById("helpfulSearch").parentNode.removeChild(
+                    docById("helpfulSearch")
+                );
+            }
+            this.helpfulSearchDiv.appendChild(this.helpfulSearchWidget);
+        }
+
+        /*
+         * displays helpfulSearchDiv on canvas
+         */
+        this._displayHelpfulSearchDiv = () => {
+            this.helpfulSearchDiv.style.left = docById("helpfulWheelDiv").offsetLeft + 80 * this.getStageScale() + "px";
+            this.helpfulSearchDiv.style.top = docById("helpfulWheelDiv").offsetTop + 110 * this.getStageScale() + "px";
+
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            this.helpfulSearchDiv.style.display = "block";
+            const menuWidth = this.helpfulSearchDiv.offsetWidth;
+            const menuHeight = this.helpfulSearchDiv.offsetHeight;
+
+            if (this.helpfulSearchDiv.offsetLeft + menuWidth > windowWidth) {
+                this.helpfulSearchDiv.style.left = (windowWidth - menuWidth) + "px";
+            }
+            if (this.helpfulSearchDiv.offsetTop + menuHeight > windowHeight) {
+                this.helpfulSearchDiv.style.top = (windowHeight - menuHeight) + "px";
+            }
+
+            this.showHelpfulSearchWidget();
+        }
 
         /*
          * Sets up right click functionality opening the context menus
@@ -388,10 +458,65 @@ class Activity {
                 (event) => {
                     event.preventDefault();
                     event.stopPropagation();
+                    if(event.target.id === "myCanvas") {
+                        this._displayHelpfulWheel(event);
+                    }
                 },
                 false
             );
         };
+
+        /*
+         * displays helpfulWheel on canvas on right click
+         */
+        this._displayHelpfulWheel = (event) => {
+            docById("helpfulWheelDiv").style.position = "absolute";
+
+            const x = event.clientX;
+            const y = event.clientY;
+        
+            const canvasLeft = this.canvas.offsetLeft + 28 * this.getStageScale();
+            const canvasTop = this.canvas.offsetTop + 6 * this.getStageScale();
+        
+            const helpfulWheelLeft = Math.max(Math.round(x * this.getStageScale() + canvasLeft) - 150, canvasLeft);
+            const helpfulWheelTop = Math.max(Math.round(y * this.getStageScale() + canvasTop) - 150, canvasTop);
+
+            docById("helpfulWheelDiv").style.left = helpfulWheelLeft + "px";
+           
+            docById("helpfulWheelDiv").style.top = helpfulWheelTop + "px";
+            
+            const windowWidth = window.innerWidth - 20;
+            const windowHeight = window.innerHeight - 20;
+            
+            if (helpfulWheelLeft + 350 > windowWidth) {
+                docById("helpfulWheelDiv").style.left = (windowWidth - 350) + "px";
+            }
+            if (helpfulWheelTop + 350 > windowHeight) {
+                docById("helpfulWheelDiv").style.top = (windowHeight - 350) + "px";
+            }
+
+            docById("helpfulWheelDiv").style.display = "";
+
+            const wheel = new wheelnav("helpfulWheelDiv", null, 300, 300);
+            wheel.colors = platformColor.wheelcolors;
+            wheel.slicePathFunction = slicePath().DonutSlice;
+            wheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            wheel.slicePathCustom.minRadiusPercent = 0.45;
+            wheel.slicePathCustom.maxRadiusPercent = 1.0;
+            wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
+            wheel.sliceInitPathCustom = wheel.slicePathCustom;
+            wheel.clickModeRotate = false;
+            const wheelItems = this.helpfulWheelItems.filter(ele => ele.display);
+            wheel.initWheel(wheelItems.map(ele => ele.icon));
+            wheel.createWheel();
+
+            wheel.navItems[0].selected = false;
+
+            wheelItems.forEach((ele, i) => {
+                wheel.navItems[i].setTooltip(_(ele.label));
+                wheel.navItems[i].navigateFunction = () => ele.fn(this);
+            })
+        }
 
         /*
          * Sets up plugin and palette boiler plate
@@ -458,6 +583,10 @@ class Activity {
          */
         const findBlocks = (activity) => {
             activity._findBlocks();
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+                activity.__tick();
+            }
         };
 
         this._findBlocks = () => {
@@ -847,6 +976,11 @@ class Activity {
             if (table !== null) {
                 table.remove();
             }
+
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+                this.__tick();
+            }
         };
 
         /**
@@ -1161,6 +1295,9 @@ class Activity {
         const setScroller = (activity) => {
             activity._setScroller();
             activity._setupBlocksContainerEvents();
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+            }
         };
 
         this._setScroller = () => {
@@ -1171,9 +1308,23 @@ class Activity {
             if (this.scrollBlockContainer && !this.beginnerMode) {
                 enableHorizScrollIcon.style.display = "none";
                 disableHorizScrollIcon.style.display = "block";
+
+                this.helpfulWheelItems.forEach(ele => {
+                    if (ele.label === "Enable horizontal scrolling")
+                        ele.display = false;
+                    else if (ele.label === "Disable horizontal scrolling")
+                        ele.display = true;
+                })
             } else {
                 enableHorizScrollIcon.style.display = "block";
                 disableHorizScrollIcon.style.display = "none";
+
+                this.helpfulWheelItems.forEach(ele => {
+                    if (ele.label === "Enable horizontal scrolling")
+                        ele.display = true;
+                    else if (ele.label === "Disable horizontal scrolling")
+                        ele.display = false;
+                })
             }
         };
 
@@ -1217,6 +1368,10 @@ class Activity {
          */
         const doLargerBlocks = async(activity) => {
             await activity._doLargerBlocks();
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+                activity.__tick();
+            }
         };
 
         this._doLargerBlocks = async() => {
@@ -1245,6 +1400,10 @@ class Activity {
          */
         const doSmallerBlocks = async(activity) => {
             await activity._doSmallerBlocks();
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+                activity.__tick();
+            }
         };
 
         this._doSmallerBlocks = async() => {
@@ -1456,6 +1615,8 @@ class Activity {
                 if (docById("wheelDiv") !== null) docById("wheelDiv").style.display = "none";
                 if (docById("contextWheelDiv") !== null)
                     docById("contextWheelDiv").style.display = "none";
+                if (docById("helpfulWheelDiv") !== null)
+                    docById("helpfulWheelDiv").style.display = "none";
                 if (docById("textLabel") !== null) docById("textLabel").style.display = "none";
                 if (docById("numberLabel") !== null) docById("numberLabel").style.display = "none";
             };
@@ -1560,6 +1721,14 @@ class Activity {
                 const data = normalizeWheel(event); // normalize over different browsers
                 const delY = data.pixelY;
                 const delX = data.pixelX;
+               
+                //Ctrl+MouseWheel Zoom functionality
+                if (event.ctrlKey) {
+                    event.preventDefault(); // Prevent default scrolling behavior
+                   
+                    if(delY < 0 && doLargerBlocks(this));//Zoom IN
+                    if(delY >= 0 && doSmallerBlocks(this));//Zoom Out
+                }
                 if (delY !== 0 && event.axis === event.VERTICAL_AXIS) {
                     closeAnyOpenMenusAndLabels(); // closes all wheelnavs when scrolling .
                     that.blocksContainer.y -= delY;
@@ -1968,13 +2137,13 @@ class Activity {
                     ) {
                         //do nothing when clicked in the input field
                     } else if (
-                        docById("ui-id-1").style.display === "block" &&
+                        docById("ui-id-1") && docById("ui-id-1").style.display === "block" &&
                         (e.target === docById("ui-id-1") || docById("ui-id-1").contains(e.target))
                     ) {
                         //do nothing when clicked on the menu
                     } else if (document.getElementsByTagName("tr")[2].contains(e.target)) {
                         //do nothing when clicked on the search row
-                    } else {
+                    } else if(e.target.id === "myCanvas") {
                         that.hideSearchWidget();
                         document.removeEventListener("mousedown", closeListener);
                     }
@@ -2247,6 +2416,7 @@ class Activity {
             const disableKeys =
                 docById("lilypondModal").style.display === "block" ||
                 this.searchWidget.style.visibility === "visible" ||
+                this.helpfulSearchWidget.style.visibility === "visible" ||
                 docById("planet-iframe").style.display === "" ||
                 docById("paste").style.visibility === "visible" ||
                 docById("wheelDiv").style.display === "" ||
@@ -2843,18 +3013,19 @@ class Activity {
             }, 100);
         });
         window.addEventListener("orientationchange",  handleResize);
-
-        const that = this;
-        const screenWidth = window.innerWidth;
-        const  resizeCanvas_ = () => {
-            if (screenWidth !== window.innerWidth) {
+        const that = this;        
+        const resizeCanvas_ = () => {
+            try {
                 that._onResize(false);
+                document.getElementById("hideContents").click();
+            } catch (error) {
+                console.error("An error occurred in resizeCanvas_:", error);
             }
-            document.getElementById("hideContents").click();
         };
         
         resizeCanvas_();
-        window.addEventListener("orientationchange", resizeCanvas_ );
+        window.addEventListener("orientationchange", resizeCanvas_);
+        
         /*
          * Restore last stack pushed to trashStack back onto canvas.
          * Hides palettes before update
@@ -2862,6 +3033,10 @@ class Activity {
          */
         const restoreTrash = (activity) => {
             activity._restoreTrash();
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+                activity.__tick();
+            }
         };
 
         this._restoreTrash = () => {
@@ -3084,6 +3259,10 @@ class Activity {
          */
         const changeBlockVisibility = (activity) => {
             activity._changeBlockVisibility();
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+                activity.__tick();
+            }
         };
 
         this._changeBlockVisibility = () => {
@@ -3114,6 +3293,10 @@ class Activity {
          */
         const toggleCollapsibleStacks = (activity) => {
             activity._toggleCollapsibleStacks();
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+                activity.__tick();
+            }
         };
 
         this._toggleCollapsibleStacks = () => {
@@ -3197,6 +3380,9 @@ class Activity {
          */
         const chooseKeyMenu = (that) => {
             piemenuKey(that);
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+            }
         };
 
         /*
@@ -4258,14 +4444,172 @@ class Activity {
             );
             this.boundary.hide();
 
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Home [HOME]")) 
+                this.helpfulWheelItems.push({label: "Home [HOME]", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GOHOMEFADEDBUTTON))), display: true, fn: findBlocks});
+
             this.hideBlocksContainer = createButton(SHOWBLOCKSBUTTON, _("Show/hide block"),
                 changeBlockVisibility);
+
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Show/hide block")) 
+                this.helpfulWheelItems.push({label: "Show/hide block", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(SHOWBLOCKSBUTTON))), display: true, fn: changeBlockVisibility});
+            
             this.collapseBlocksContainer = createButton(COLLAPSEBLOCKSBUTTON, _("Expand/collapse blocks"),
                 toggleCollapsibleStacks);
+
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Expand/collapse blocks")) 
+                this.helpfulWheelItems.push({label: "Expand/collapse blocks", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(COLLAPSEBLOCKSBUTTON))), display: true, fn: toggleCollapsibleStacks});
+            
             this.smallerContainer = createButton(SMALLERBUTTON, _("Decrease block size"),
                 doSmallerBlocks);
+            
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Decrease block size")) 
+                this.helpfulWheelItems.push({label: "Decrease block size", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(SMALLERBUTTON))), display: true, fn: doSmallerBlocks});
+            
             this.largerContainer = createButton(BIGGERBUTTON, _("Increase block size"),
                 doLargerBlocks);
+            
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Increase block size")) 
+                this.helpfulWheelItems.push({label: "Increase block size", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(BIGGERBUTTON))), display: true, fn: doLargerBlocks});
+
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Restore")) 
+                this.helpfulWheelItems.push({label: "Restore", icon: "imgsrc:header-icons/restore-from-trash.svg", display: true, fn: restoreTrash});
+            
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap Off"))
+                this.helpfulWheelItems.push({label: "Turtle Wrap Off", icon: "imgsrc:header-icons/wrap-text.svg", display: true, fn: this.toolbar.changeWrap});
+
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap On"))
+                this.helpfulWheelItems.push({label: "Turtle Wrap On", icon: "imgsrc:header-icons/wrap-text.svg", display: false, fn: this.toolbar.changeWrap});
+
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Enable horizontal scrolling")) 
+                this.helpfulWheelItems.push({label: "Enable horizontal scrolling", icon: "imgsrc:header-icons/compare-arrows.svg", display: this.beginnerMode ? false: true, fn: setScroller});
+            
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Disable horizontal scrolling")) 
+                this.helpfulWheelItems.push({label: "Disable horizontal scrolling", icon: "imgsrc:header-icons/lock.svg", display: false, fn: setScroller});
+            
+            if(_THIS_IS_MUSIC_BLOCKS_ && !this.helpfulWheelItems.find(ele => ele.label === "Set Pitch Preview")) 
+                this.helpfulWheelItems.push({label: "Set Pitch Preview", icon: "imgsrc:header-icons/music-note.svg", display: true, fn: chooseKeyMenu});
+        
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Grid")) 
+                this.helpfulWheelItems.push({label: "Grid", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(CARTESIANBUTTON))), display: true, fn: piemenuGrid});
+        
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Clean")) 
+                this.helpfulWheelItems.push({label: "Clean", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(CLEARBUTTON))), display: true, fn: () => this._allClear(false)});
+            
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Collapse")) 
+                this.helpfulWheelItems.push({label: "Collapse", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON))), display: true, fn: this.turtles.collapse});
+        
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Expand")) 
+                this.helpfulWheelItems.push({label: "Expand", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(EXPANDBUTTON))), display: false, fn: this.turtles.expand});
+        
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Search for Blocks")) 
+                this.helpfulWheelItems.push({label: "Search for Blocks", icon: "imgsrc:header-icons/search-button.svg", display: true, fn: this._displayHelpfulSearchDiv});
+        
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Paste previous stack")) 
+                this.helpfulWheelItems.push({label: "Paste previous stack", icon: "imgsrc:header-icons/copy-button.svg", display: false, fn: this.turtles.expand});
+        
+        };
+
+        /*
+         * Shows search widget on helpfulSearchDiv
+         */
+        this.showHelpfulSearchWidget = () => {
+            // Bring widget to top.
+            const $j = jQuery.noConflict();
+            if($j("#helpfulSearch")) {
+                try {
+                    $j("#helpfulSearch").autocomplete("destroy");
+                } catch {}
+            }
+            this.helpfulSearchWidget.style.zIndex = 1001;
+            this.helpfulSearchWidget.idInput_custom = "";
+            if(this.helpfulSearchDiv.style.display === "block") {
+
+                this.helpfulSearchWidget.value = null;
+                this.helpfulSearchWidget.style.visibility = "visible";
+
+                this.searchBlockPosition = [100, 100];
+                this.prepSearchWidget();
+
+                const that = this;
+                setTimeout(() => {
+                    that.helpfulSearchWidget.focus();
+                    that.doHelpfulSearch();
+                }, 500);
+
+                docById("helpfulWheelDiv").style.display = "none";
+            }
+        };
+
+        /*
+         * Uses JQuery to add autocompleted search suggestions
+         */
+        this.doHelpfulSearch = () => {
+            const $j = jQuery.noConflict();
+
+            const that = this;
+            $j("#helpfulSearch").autocomplete({
+                source: that.searchSuggestions,
+                select: (event, ui) => {
+                    event.preventDefault();
+                    that.helpfulSearchWidget.value = ui.item.label;
+                    that.helpfulSearchWidget.idInput_custom = ui.item.value;
+                    that.helpfulSearchWidget.protoblk = ui.item.specialDict;
+                    that.doHelpfulSearch();
+                },
+                focus: (event, ui) => {
+                    event.preventDefault();
+                    that.helpfulSearchWidget.value = ui.item.label;
+                }
+            });
+
+            $j("#helpfulSearch").autocomplete("widget").addClass("scrollSearch");
+
+            $j("#helpfulSearch").autocomplete("instance")._renderItem = (ul, item) => {
+                return $j("<li></li>")
+                    .data("item.autocomplete", item)
+                    .append(
+                        '<img src="' +
+                            item.artwork +
+                            '" height = "20px">' +
+                            "<a>" +
+                            " " +
+                            item.label +
+                            "</a>"
+                    )
+                    .appendTo(ul.css("z-index", 9999));
+            };
+            const searchInput = this.helpfulSearchWidget.idInput_custom;
+            if (!searchInput || searchInput.length <= 0) return;
+
+            const protoblk = this.helpfulSearchWidget.protoblk;
+            const paletteName = protoblk.palette.name;
+            const protoName = protoblk.name;
+
+            // eslint-disable-next-line no-prototype-builtins
+            if (this.blocks.protoBlockDict.hasOwnProperty(protoName)) {
+                this.palettes.dict[paletteName].makeBlockFromSearch(
+                    protoblk,
+                    protoName,
+                    (newBlock) => {
+                        that.blocks.moveBlock(
+                            newBlock,
+                            100 + that.searchBlockPosition[0] - that.blocksContainer.x,
+                            that.searchBlockPosition[1] - that.blocksContainer.y
+                        );
+                    }
+                );
+
+                // Move the position of the next newly created block.
+                this.searchBlockPosition[0] += STANDARDBLOCKHEIGHT;
+                this.searchBlockPosition[1] += STANDARDBLOCKHEIGHT;
+            } else if (this.deprecatedBlockNames.indexOf(searchInput) > -1) {
+                this.errorMsg(_("This block is deprecated."));
+            } else {
+                this.errorMsg(_("Block cannot be found."));
+            }
+
+            this.helpfulSearchWidget.value = "";
+            this.update = true;
         };
 
         /**
@@ -4524,7 +4868,13 @@ class Activity {
                 }
             });
 
-            document.addEventListener("click", () => {
+            document.addEventListener("click", (e) => {
+                if (docById("helpfulWheelDiv").style.display !== "none") {
+                    docById("helpfulWheelDiv").style.display = "none";
+                }
+                if (docById("helpfulSearchDiv").style.display !== "none" && e.target.id !== "helpfulSearch") {
+                    docById("helpfulSearchDiv").style.display = "none";
+                }
                 that.__tick();
             });
 

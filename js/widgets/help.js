@@ -92,7 +92,7 @@ class HelpWidget {
         let leftArrow, rightArrow;
         if (!useActiveBlock) {
             if (page == 0) {
-                this.widgetWindow.updateTitle("TAKE A TOUR");
+                this.widgetWindow.updateTitle(_("Take a tour"));
             }
             else {
                 this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
@@ -122,7 +122,7 @@ class HelpWidget {
                         page = page - 1;
                         leftArrow.classList.remove('disabled');
                         if (page == 0) {
-                            this.widgetWindow.updateTitle("TAKE A TOUR");
+                            this.widgetWindow.updateTitle(_("Take a tour"));
                         }
                         else {
                             this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
@@ -143,7 +143,7 @@ class HelpWidget {
                     page = 0;
                 }
                 if (page == 0) {
-                    this.widgetWindow.updateTitle("TAKE A TOUR");
+                    this.widgetWindow.updateTitle(_("Take a tour"));
                 }
                 else {
                     this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
@@ -155,7 +155,7 @@ class HelpWidget {
                 const label = this.activity.blocks.blockList[this.activity.blocks.activeBlock]
                     .protoblock.staticLabels[0];
                     if (page == 0) {
-                        this.widgetWindow.updateTitle("TAKE A TOUR");
+                        this.widgetWindow.updateTitle(_("Take a tour"));
                     }
                     else {
                         this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
@@ -373,7 +373,7 @@ class HelpWidget {
                     page = 0;
                 }
                 if (page == 0) {
-                    this.widgetWindow.updateTitle("TAKE A TOUR");
+                    this.widgetWindow.updateTitle(_("Take a tour"));
                 }
                 else {
                     this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
@@ -388,7 +388,7 @@ class HelpWidget {
                         page = page - 1;
                         leftArrow.classList.remove('disabled');
                         if (page == 0) {
-                            this.widgetWindow.updateTitle("TAKE A TOUR");
+                            this.widgetWindow.updateTitle(_("Take a tour"));
                         }
                         else {
                             this.widgetWindow.updateTitle(HELPCONTENT[page][0]);

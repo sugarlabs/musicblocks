@@ -117,7 +117,10 @@
 
 .scrollSearch {
     max-height: 215px;
+    width: 380px;
+    padding-left: 10px;
     margin-bottom: 10px;
+    box-sizing: border-box;
     overflow-x: auto;
     overflow-y: auto;
 }
@@ -1566,8 +1569,9 @@ input.timbreName {
  }
 
  .popupMsg {
-    width: 50%;
-    height: 3%;
+    min-width: 50%;
+    max-width: 55%;
+    height: auto;
     position: absolute;
     top: 130px;
     left: 33%;
@@ -1601,6 +1605,10 @@ input.timbreName {
  #printText {
     border: 2px solid rgb(150, 150, 150);
     z-index: 100;
+    width: auto;
+    word-wrap: break-word;
+    overflow: auto;
+    max-height: 60vh;
   }
 
   #errorText {
@@ -1608,14 +1616,20 @@ input.timbreName {
     background-color: pink;
   }
 
+  .contentWrapper {
+    display: flex;
+    align-items: flex-start; 
+    gap: 10px;
+    padding: 10px;
+}
+
   #printText.show, #errorText.show {
     visibility: visible;
   }
 
  #printTextContent, #errorTextContent {
-    display: inline-block;
-    width: calc(100% - 60px);
-    vertical-align: 7px;
+    flex-grow: 1;
+    white-space: pre-wrap;
   }
 
   .msgCloseIcon {

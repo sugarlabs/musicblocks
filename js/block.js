@@ -2558,6 +2558,9 @@ class Block {
         let getInput = window.hasMouse;
 
         this.container.on("click", (event) => {
+            if(docById("helpfulWheelDiv") && docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+            }
             // We might be able to check which button was clicked.
             if ("nativeEvent" in event) {
                 if ("button" in event.nativeEvent && event.nativeEvent.button == 2) {
@@ -2705,6 +2708,24 @@ class Block {
             // Don't allow silence block to be dragged out of a note.
             if (that.name === "rest2") {
                 return;
+            }
+
+            // Do not allow a vspace block attached to a silence block to be dragged out of a note.
+            if (
+                that?.name === "vspace" &&
+                that.blocks.blockList[that.connections[1]]?.name === "rest2"
+              ) {
+                return;
+              }
+
+            // Do not allow a stack of blocks to be dragged if the stack contains a silence block.
+            let block = that.blocks.blockList[that.connections[1]];
+            while (block != undefined) {
+                if (block?.name === "rest2") {
+                    this.activity.errorMsg(_("Silence block cannot be removed."), block);
+                    return;
+                }
+                block = block?.blocks.blockList[block.connections[1]];
             }
 
             if (window.hasMouse) {
@@ -4077,7 +4098,7 @@ class Block {
                 this.value = oldValue;
             }
             
-            if(this.blocks.blockList[cblk1].name === "pitch" && (this.value > 10 || this.value < 1)) {
+            if(cblk1 != null && this.blocks.blockList[cblk1].name === "pitch" && (this.value > 10 || this.value < 1)) {
                 const thisBlock = this.blocks.blockList.indexOf(this);
                 this.activity.errorMsg(_("Octave value must be between 1 and 10."), thisBlock);
                 this.activity.refreshCanvas();

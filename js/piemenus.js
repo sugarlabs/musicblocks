@@ -3422,7 +3422,7 @@ const piemenuBlockContext = (block) => {
 
     wheel.navItems[0].selected = false;
 
-    wheel.navItems[0].navigateFunction = () => {
+    const stackPasting = function() {
         that.blocks.activeBlock = blockBlock;
         that.blocks.prepareStackForCopy();
         that.blocks.pasteDx = pasteDx;
@@ -3430,7 +3430,16 @@ const piemenuBlockContext = (block) => {
         that.blocks.pasteStack();
         pasteDx += 21;
         pasteDy += 21;
+
+        that.activity.helpfulWheelItems.forEach(ele => {
+            if (ele.label === "Paste previous stack") {
+                ele.display = true;
+                ele.fn = stackPasting.bind(that);
+            }
+        })
     };
+
+    wheel.navItems[0].navigateFunction = stackPasting;
 
     wheel.navItems[1].navigateFunction = () => {
         that.blocks.activeBlock = blockBlock;
@@ -3588,6 +3597,10 @@ const piemenuGrid = (activity) => {
         activity.turtles.gridWheel.removeWheel();
         activity.turtles._exitWheel.removeWheel();
     };
+
+    if (docById("helpfulWheelDiv").style.display !== "none") {
+        docById("helpfulWheelDiv").style.display = "none";
+    }
 };
 
 const piemenuKey = (activity) => {
@@ -3691,7 +3704,7 @@ const piemenuKey = (activity) => {
             let connectionsSetKey;
             let movable;
             for (const i in stacks) {
-                if (activity.logo.blocks.blockList[stacks[i]].name === "start") {
+                if (activity.blocks.blockList[stacks[i]].name === "start") {
                     const bottomBlock = activity.blocks.blockList[stacks[i]].connections[1];
                     if (activity.KeySignatureEnv[2]) {
                         activity.blocks._makeNewBlockWithConnections(
