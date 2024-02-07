@@ -1321,16 +1321,26 @@ class Blocks {
 
             let thisBlockobj = this.blockList[thisBlock];
 
-            // Do not remove the silence block if only a vspace block is added before the silence block.
+            // Do not remove the silence block if the user places a block just over it.
             if (
-                (thisBlockobj.name === "vspace" &&
-                  this.blockList[thisBlockobj.connections[1]].name === "vspace" &&
-                  this.blockList[thisBlockobj.connections[0]].name === "newnote") ||
-                (thisBlockobj.name === "vspace" &&
-                  this.blockList[thisBlockobj.connections[1]].name === "vspace" &&
-                  this.blockList[thisBlockobj.connections[0]].name === "vspace")
-              ) {
+                thisBlockobj?.name === "vspace" &&
+                this.blockList[thisBlockobj.connections[1]]?.name === "rest2" &&
+                this.blockList[thisBlockobj.connections[0]]?.name === "vspace"
+            ) {
                 return;
+            }
+
+            // Do not remove the silence block if only vspace blocks are added before the silence block.
+
+            let block = thisBlockobj;
+            while (block?.name == "vspace") {
+                if (block?.name != "vspace") {
+                    break;
+                }
+                block = this.blockList[block.connections[0]];
+                if (block?.name == "newnote") {
+                    return;
+                }
             }
 
             thisBlockobj = this.blockList[thisBlock];
@@ -2207,6 +2217,12 @@ class Blocks {
                 return true;
             }
             if (type1 === "caseout" && type2 === "vspacein") {
+                return true;
+            }
+            if (type1 === "vspacein" && type2 === "vspaceout") {
+                return true;
+            }
+            if (type1 === "vspaceout" && type2 === "vspacein") {
                 return true;
             }
             if (
