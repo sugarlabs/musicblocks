@@ -2174,6 +2174,7 @@ class Activity {
                     that.searchWidget.idInput_custom = ui.item.value;
                     that.searchWidget.protoblk = ui.item.specialDict;
                     that.doSearch();
+                    if(event.keyCode===13) this.searchWidget.style.visibility = 'visible'
                 },
                 focus: (event, ui) => {
                     event.preventDefault();
@@ -2429,7 +2430,12 @@ class Activity {
                     break;
                 }
             }
-
+  
+            if (event.keyCode === ENTER && this.searchWidget.style.visibility === 'visible') {
+                this.searchWidget.style.visibility = 'hidden'
+                return;
+            }
+            
             if ((event.altKey && !disableKeys) || (event.keyCode == 13) || (event.key == '/') || (event.key == '\\') ) {
                 switch (event.keyCode) {
                     case 66: // 'B'
@@ -2456,7 +2462,7 @@ class Activity {
                         this._doFastButton();
                         break;
                     case 13: // 'R or ENTER'
-                        this.textMsg("ENter " + _("Play"));
+                        this.textMsg("Enter " + _("Play"));
                         let stopbt = document.getElementById("stop");
                         if (stopbt) {
                             stopbt.style.color = platformColor.stopIconcolor;
