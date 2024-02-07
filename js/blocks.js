@@ -2137,6 +2137,13 @@ class Blocks {
          */
         this._testConnectionType = (type1, type2) => {
             /** Can these two blocks dock? */
+            if (type1 === "vspaceout" && type2 === "vspacein") {
+                return true;
+            }
+            if (type1 === "vspacein" && type2 === "vspaceout") {
+                return true;
+            }
+            
             if (type1 === "in" && type2 === "out") {
                 return true;
             }
