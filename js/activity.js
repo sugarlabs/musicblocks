@@ -2456,13 +2456,15 @@ class Activity {
                         this._doFastButton();
                         break;
                     case 13: // 'R or ENTER'
-                        this.textMsg("ENter " + _("Play"));
-                        let stopbt = document.getElementById("stop");
-                        if (stopbt) {
-                            stopbt.style.color = platformColor.stopIconcolor;
-                        }
-                        this._doFastButton();
-                        break;
+                        if(this.searchWidget.style.visibility == "hidden"){
+                            this.textMsg("ENter " + _("Play"));
+                             let stopbt = document.getElementById("stop");
+                             if (stopbt) {
+                               stopbt.style.color = platformColor.stopIconcolor;
+                              }
+                             this._doFastButton();
+                         }
+                         break;
                     case 83: // 'S'
                         this.textMsg("Alt-S " + _("Stop"));
                         this.logo.doStopTurtles();
