@@ -3169,6 +3169,18 @@ class Activity {
         this._showHideAuxMenu = (resize) => {
             const cellsize = 55;
             let dy;
+
+            // function to increase or decrease the "top" property of the top-right corner buttons
+
+            const topRightButtons = document.querySelectorAll("#buttoncontainerTOP .tooltipped");
+            const btnY = document.getElementById("Grid").getBoundingClientRect().top;
+
+            this.changeTopButtonsPosition = (value) => {
+                topRightButtons.forEach((child) => {
+                    child.style.top = `${btnY + value}px`;
+                });
+            };
+            
             if (!resize && this.toolbarHeight === 0) {
                 dy = cellsize + LEADING + 5;
                 this.toolbarHeight = dy;
@@ -3177,6 +3189,7 @@ class Activity {
                 this.turtles.deltaY(dy);
 
                 this.blocksContainer.y += dy;
+                this.changeTopButtonsPosition(dy);
                 this.blocks.checkBounds();
             } else {
                 dy = this.toolbarHeight;
@@ -3186,6 +3199,7 @@ class Activity {
                 this.turtles.deltaY(-dy);
 
                 this.blocksContainer.y -= dy;
+                this.changeTopButtonsPosition(-dy);
             }
 
             this.refreshCanvas();
