@@ -3043,7 +3043,7 @@ class Activity {
             for (const name in this.palettes.dict) {
                 this.palettes.dict[name].hideMenu(true);
             }
-            console.log('x')
+            
             this.blocks.activeBlock = null;
             this.refreshCanvas();
 
