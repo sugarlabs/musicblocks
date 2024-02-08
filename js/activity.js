@@ -3043,7 +3043,7 @@ class Activity {
             for (const name in this.palettes.dict) {
                 this.palettes.dict[name].hideMenu(true);
             }
-
+            
             this.blocks.activeBlock = null;
             this.refreshCanvas();
 
@@ -3134,6 +3134,18 @@ class Activity {
 
             this.refreshCanvas();
         };
+
+        this.handleKeyDown = (event) => {
+            
+            if (event.ctrlKey && event.key === "z") {
+                this._restoreTrash(activity);
+                activity.__tick();
+                event.preventDefault();
+            }
+        };
+
+        // Attach keydown event listener to document
+        document.addEventListener("keydown", this.handleKeyDown);
 
         /*
          * Open aux menu
