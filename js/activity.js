@@ -2174,6 +2174,7 @@ class Activity {
                     that.searchWidget.idInput_custom = ui.item.value;
                     that.searchWidget.protoblk = ui.item.specialDict;
                     that.doSearch();
+                    if (event.keyCode === 13) this.searchWidget.style.visibility = "visible";
                 },
                 focus: (event, ui) => {
                     event.preventDefault();
@@ -2402,7 +2403,6 @@ class Activity {
             const KEYCODE_DOWN = 40;
             const DEL = 46;
             const V = 86;
-            const ENTER = 13;
 
             // Shortcuts for creating new notes
             const KEYCODE_D = 68; // do
@@ -2456,7 +2456,10 @@ class Activity {
                         this._doFastButton();
                         break;
                     case 13: // 'R or ENTER'
-                        this.textMsg("ENter " + _("Play"));
+                        if (this.searchWidget.style.visibility === 'visible') {
+                            return;
+                        }
+                        this.textMsg("Enter " + _("Play"));
                         let stopbt = document.getElementById("stop");
                         if (stopbt) {
                             stopbt.style.color = platformColor.stopIconcolor;
