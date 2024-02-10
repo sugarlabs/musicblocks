@@ -65,7 +65,6 @@
 /* exported setupWidgetBlocks */
 
 /**
- * Sets up blocks related to sound envelope (ADSR) for the given activity.
  * @param {string} activity - The activity for which blocks are being set up.
  */
 function setupWidgetBlocks(activity) {
@@ -159,7 +158,14 @@ function setupWidgetBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for applying filters to sound.
+     * @extends FlowBlock
+     */
     class FilterBlock extends FlowBlock {
+        /**
+         * Creates a FilterBlock instance.
+         */
         constructor() {
             //.TRANS: a filter removes some unwanted components from a signal
             super("filter", _("filter"));
@@ -180,6 +186,13 @@ function setupWidgetBlocks(activity) {
             this.hidden = true;
         }
 
+        /**
+         * Handles the flow of data for the filter block.
+         * @param {any[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         */
         flow(args, logo, turtle, blk) {
             let filtertype = DEFAULTFILTERTYPE;
             let freq;
@@ -224,7 +237,14 @@ function setupWidgetBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for defining custom tuning (temperament).
+     * @extends StackClampBlock
+     */
     class TemperamentBlock extends StackClampBlock {
+        /**
+         * Creates a TemperamentBlock instance.
+         */
         constructor() {
             super("temperament");
             this.setPalette("widgets", activity);
@@ -252,6 +272,13 @@ function setupWidgetBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of data for the temperament block.
+         * @param {any[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         */
         flow(args, logo, turtle, blk) {
             if (logo.temperament === null) {
                 logo.temperament = new TemperamentWidget();
@@ -287,7 +314,14 @@ function setupWidgetBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for sampling audio.
+     * @extends StackClampBlock
+     */
     class SamplerBlock extends StackClampBlock {
+        /**
+         * Creates a SamplerBlock instance.
+         */
         constructor() {
             super("sampler");
             this.setPalette("widgets", activity);
@@ -316,6 +350,14 @@ function setupWidgetBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of data for the sampler block.
+         * @param {any[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         * @returns {number[]} - The output values.
+         */
         flow(args, logo, turtle, blk) {
             if (logo.sample === null) {
                 logo.sample = new SampleWidget();
@@ -337,7 +379,14 @@ function setupWidgetBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for defining timbre (sound character).
+     * @extends StackClampBlock
+     */
     class TimbreBlock extends StackClampBlock {
+        /**
+         * Creates a TimbreBlock instance.
+         */
         constructor() {
             super("timbre");
             this.setPalette("widgets", activity);
@@ -384,6 +433,14 @@ function setupWidgetBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of data for the timbre block.
+         * @param {any[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         * @returns {number[]} - The output values.
+         */
         flow(args, logo, turtle, blk) {
             if (logo.timbre === null) {
                 logo.timbre = new TimbreWidget();
