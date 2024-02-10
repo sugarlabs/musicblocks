@@ -127,11 +127,7 @@ class WidgetWindow {
         titleEl.id = `${this._key}WidgetID` ;
 
         this._nonclose.onmousedown = (e) => {
-            this._dragging = true;
-            if (this._maximized) {
-               this._dragging = false;
-            }
-
+            this._dragging = !this._maximized;
             this.takeFocus();
 
             this._dx = e.clientX - this._drag.getBoundingClientRect().left;
