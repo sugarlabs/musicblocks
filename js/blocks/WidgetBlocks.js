@@ -65,7 +65,6 @@
 /* exported setupWidgetBlocks */
 
 /**
- * Sets up blocks related to sound envelope (ADSR) for the given activity.
  * @param {string} activity - The activity for which blocks are being set up.
  */
 function setupWidgetBlocks(activity) {
