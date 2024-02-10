@@ -64,8 +64,19 @@
 
 /* exported setupWidgetBlocks */
 
+/**
+ * Sets up blocks related to sound envelope (ADSR) for the given activity.
+ * @param {string} activity - The activity for which blocks are being set up.
+ */
 function setupWidgetBlocks(activity) {
+    /**
+     * Represents a block for controlling sound envelope (ADSR).
+     * @extends FlowBlock
+     */
     class EnvelopeBlock extends FlowBlock {
+        /**
+         * Creates an EnvelopeBlock instance.
+         */
         constructor() {
             //.TRANS: sound envelope (ADSR)
             super("envelope", _("envelope"));
@@ -88,6 +99,13 @@ function setupWidgetBlocks(activity) {
             this.hidden = true;
         }
 
+        /**
+         * Handles the flow of data for the sound envelope block.
+         * @param {number[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         */
         flow(args, logo, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
@@ -105,6 +123,7 @@ function setupWidgetBlocks(activity) {
                     activity.errorMsg(_("Release value should be from 0-100."));
                 }
 
+                // Push envelope values to corresponding arrays
                 tur.singer.attack.push(args[0] / 100);
                 tur.singer.decay.push(args[1] / 100);
                 tur.singer.sustain.push(args[2] / 100);
@@ -112,6 +131,7 @@ function setupWidgetBlocks(activity) {
             }
 
             if (logo.inTimbre) {
+                // Update timbre object with envelope values
                 logo.timbre.synthVals["envelope"]["attack"] = last(tur.singer.attack);
                 logo.timbre.synthVals["envelope"]["decay"] = last(tur.singer.decay);
                 logo.timbre.synthVals["envelope"]["sustain"] = last(tur.singer.sustain);
@@ -129,6 +149,7 @@ function setupWidgetBlocks(activity) {
                     );
                 }
 
+                // Push envelope block and values to timbre object
                 logo.timbre.env.push(blk);
                 logo.timbre.ENVs.push(Math.round(last(tur.singer.attack) * 100));
                 logo.timbre.ENVs.push(Math.round(last(tur.singer.decay) * 100));
