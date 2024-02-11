@@ -1569,12 +1569,12 @@ input.timbreName {
  }
 
  .popupMsg {
-    width: 50%;
-    height: 3%;
+    min-width: 50%;
+    max-width: 55%;
+    height: auto;
     position: absolute;
     top: 130px;
     left: 33%;
-    padding-top: 8px;
     border-radius: 8px;
     background-color: #8CC6FF;
     font-family: "Roboto", sans-serif;
@@ -1604,6 +1604,10 @@ input.timbreName {
  #printText {
     border: 2px solid rgb(150, 150, 150);
     z-index: 100;
+    width: auto;
+    word-wrap: break-word;
+    overflow: auto;
+    max-height: 60vh;
   }
 
   #errorText {
@@ -1611,14 +1615,20 @@ input.timbreName {
     background-color: pink;
   }
 
+  .contentWrapper {
+    display: flex;
+    align-items: flex-start; 
+    gap: 10px;
+    padding: 10px;
+}
+
   #printText.show, #errorText.show {
     visibility: visible;
   }
 
  #printTextContent, #errorTextContent {
-    display: inline-block;
-    width: calc(100% - 60px);
-    vertical-align: 7px;
+    flex-grow: 1;
+    white-space: pre-wrap;
   }
 
   .msgCloseIcon {
@@ -1626,6 +1636,7 @@ input.timbreName {
     height: 28px;
     filter: invert(100%);
     transition: background-color 0.3s, filter 0.3s;
+    margin-bottom: auto;
   }
 
   .msgCloseIcon:hover {

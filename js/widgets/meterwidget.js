@@ -49,9 +49,6 @@
  * @requires PREVIEWVOLUME
  * @requires TONEBPM
  * @exports MeterWidget
- * @exports {number} BUTTONDIVWIDTH - Represents the button width for the MeterWidget class.
- * @exports {number} BUTTONSIZE - Represents the button size for the MeterWidget class.
- * @exports {number} ICONSIZE - Represents the icon size for the MeterWidget class.
  */
 class MeterWidget {
     // A pie menu is used to show the meter and strong beats

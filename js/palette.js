@@ -878,8 +878,6 @@ class Palette {
         this.model.update();
         const paletteList = docById("PaletteBody_items");
 
-        this.setupGrabScroll(paletteList);
-
         const blocks = this.model.blocks;
         blocks.reverse();
         const protoListScope = [...this.protoList];
