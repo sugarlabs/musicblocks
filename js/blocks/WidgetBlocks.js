@@ -502,7 +502,14 @@ function setupWidgetBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for setting up Meter Widget in the workspace.
+     * @extends StackClampBlock
+     */
     class MeterWidgetBlock extends StackClampBlock {
+        /**
+         * Creates a MeterWidgetBlock instance.
+         */
         constructor() {
             super("meterwidget");
             this.setPalette("widgets", activity);
@@ -525,6 +532,14 @@ function setupWidgetBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of data for the MeterWidgetBlock.
+         * @param {any[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         * @returns {number[]} - The processed arguments.
+         */
         flow(args, logo, turtle, blk) {
             logo.insideMeterWidget = true;
 
@@ -543,7 +558,14 @@ function setupWidgetBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for setting up Oscilloscope Widget in the workspace.
+     * @extends StackClampBlock
+     */
     class oscilloscopeWidgetBlock extends StackClampBlock {
+        /**
+         * Creates an OscilloscopeWidgetBlock instance.
+         */
         constructor() {
             super("oscilloscope");
             this.setPalette("widgets", activity);
@@ -580,6 +602,14 @@ function setupWidgetBlocks(activity) {
             });
         }
 
+        /**
+         * Handles the flow of data for the OscilloscopeWidgetBlock.
+         * @param {any[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         * @returns {number[]} - The processed arguments.
+         */
         flow(args, logo, turtle, blk) {
             logo.oscilloscopeTurtles = [];
             logo.inOscilloscope = true;
@@ -598,7 +628,14 @@ function setupWidgetBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for selecting a custom musical mode.
+     * @extends StackClampBlock
+     */
     class ModeWidgetBlock extends StackClampBlock {
+        /**
+         * Creates a ModeWidgetBlock instance.
+         */
         constructor() {
             super("modewidget");
             this.setPalette("widgets", activity);
@@ -621,6 +658,14 @@ function setupWidgetBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of data for the ModeWidget block.
+         * @param {number[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         * @returns {number[]} - The output values.
+         */
         flow(args, logo, turtle, blk) {
             logo.insideModeWidget = true;
 
@@ -638,7 +683,14 @@ function setupWidgetBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for setting the tempo.
+     * @extends StackClampBlock
+     */
     class TempoBlock extends StackClampBlock {
+        /**
+         * Creates a TempoBlock instance.
+         */
         constructor() {
             super("tempo");
             this.setPalette("widgets", activity);
@@ -665,6 +717,14 @@ function setupWidgetBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of data for the Tempo block.
+         * @param {number[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         * @returns {number[]} - The output values.
+         */
         flow(args, logo, turtle, blk) {
             if (logo.tempo === null) {
                 logo.tempo = new Tempo();
@@ -687,7 +747,14 @@ function setupWidgetBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for composing chord sequences using the Arpeggio Widget.
+     * @extends StackClampBlock
+     */
     class ArpeggioMatrixBlock extends StackClampBlock {
+        /**
+         * Creates an ArpeggioMatrixBlock instance.
+         */
         constructor() {
             super("arpeggiomatrix");
             this.setPalette("widgets", activity);
@@ -719,6 +786,14 @@ function setupWidgetBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of data for the ArpeggioMatrix block.
+         * @param {number[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         * @returns {number[]} - The output values.
+         */
         flow(args, logo, turtle, blk) {
             if (logo.arpeggio === null) {
                 logo.arpeggio = new Arpeggio();
