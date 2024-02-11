@@ -1652,6 +1652,7 @@
 .materialize-iso section,
 .materialize-iso summary {
   display: block;
+  z-index: 1001;
 }
 .materialize-iso audio,
 .materialize-iso canvas,
