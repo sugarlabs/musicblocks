@@ -822,7 +822,14 @@ function setupWidgetBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for mapping pitches to drum sounds using a matrix.
+     * @extends StackClampBlock
+     */
     class PitchDrumMatrixBlock extends StackClampBlock {
+        /**
+         * Creates a PitchDrumMatrixBlock instance.
+         */
         constructor() {
             super("pitchdrummatrix");
             this.setPalette("widgets", activity);
@@ -854,6 +861,13 @@ function setupWidgetBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of data for the pitch drum matrix block.
+         * @param {array} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         */
         flow(args, logo, turtle, blk) {
             if (logo.pitchDrumMatrix === null) {
                 logo.pitchDrumMatrix = new PitchDrumMatrix();
@@ -890,7 +904,14 @@ function setupWidgetBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for generating pitches at selected frequencies using a slider.
+     * @extends StackClampBlock
+     */
     class PitchSliderBlock extends StackClampBlock {
+        /**
+         * Creates a PitchSliderBlock instance.
+         */
         constructor() {
             super("pitchslider");
             this.setPalette("widgets", activity);
@@ -910,6 +931,14 @@ function setupWidgetBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of data for the pitch slider block.
+         * @param {array} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         * @returns {array} - The output array.
+         */
         flow(args, logo, turtle, blk) {
             if (logo.pitchSlider === null) {
                 logo.pitchSlider = new PitchSlider();
@@ -932,7 +961,14 @@ function setupWidgetBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for controlling a chromatic keyboard.
+     * @extends StackClampBlock
+     */
     class ChromaticBlock extends StackClampBlock {
+        /**
+         * Creates a ChromaticBlock instance.
+         */
         constructor() {
             super("chromatic");
             this.setPalette("widgets", activity);
@@ -960,7 +996,14 @@ function setupWidgetBlocks(activity) {
         flow() {}
     }
 
+    /**
+     * Represents a block for controlling a music keyboard.
+     * @extends StackClampBlock
+     */
     class MusicKeyboard2Block extends StackClampBlock {
+        /**
+         * Creates a MusicKeyboard2Block instance.
+         */
         constructor() {
             super("musickeyboard2");
             this.setPalette("widgets", activity);
