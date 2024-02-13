@@ -1044,7 +1044,14 @@ function setupWidgetBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for creating a music keyboard.
+     * @extends StackClampBlock
+     */
     class MusicKeyboardBlock extends StackClampBlock {
+        /**
+         * Creates a MusicKeyboardBlock instance.
+         */
         constructor() {
             super("musickeyboard");
             this.setPalette("widgets", activity);
@@ -1071,6 +1078,14 @@ function setupWidgetBlocks(activity) {
             this.hidden = true;
         }
 
+        /**
+         * Handles the flow of data for the music keyboard block.
+         * @param {any[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         * @returns {any[]} - Returns an array of arguments.
+         */
         flow(args, logo, turtle, blk) {
             if (logo.musicKeyboard === null) {
                 logo.musicKeyboard = new MusicKeyboard(activity);
@@ -1096,7 +1111,14 @@ function setupWidgetBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for generating pitches using a staircase pattern.
+     * @extends StackClampBlock
+     */
     class PitchStaircaseBlock extends StackClampBlock {
+        /**
+         * Creates a PitchStaircaseBlock instance.
+         */
         constructor() {
             super("pitchstaircase");
             this.setPalette("widgets", activity);
@@ -1120,6 +1142,14 @@ function setupWidgetBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of data for the pitch staircase block.
+         * @param {any[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         * @returns {any[]} - Returns an array of arguments.
+         */
         flow(args, logo, turtle, blk) {
             if (logo.pitchStaircase === null) {
                 logo.pitchStaircase = new PitchStaircase();
@@ -1144,7 +1174,14 @@ function setupWidgetBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for subdividing a measure into distinct rhythmic elements.
+     * @extends StackClampBlock
+     */
     class RhythmRuler3Block extends StackClampBlock {
+        /**
+         * Creates a RhythmRuler3Block instance.
+         */
         constructor() {
             super("rhythmruler3");
             this.setPalette("widgets", activity);
@@ -1169,7 +1206,14 @@ function setupWidgetBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for creating drum machines.
+     * @extends StackClampBlock
+     */
     class RhythmRuler2Block extends StackClampBlock {
+        /**
+         * Creates a RhythmRuler2Block instance.
+         */
         constructor() {
             super("rhythmruler2");
             this.setPalette("widgets", activity);
@@ -1205,6 +1249,14 @@ function setupWidgetBlocks(activity) {
             this.hidden = activity.beginnerMode;
         }
 
+        /**
+         * Handles the flow of data for the rhythm ruler block.
+         * @param {any[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         * @returns {any[]} - Returns an array of arguments.
+         */
         flow(args, logo, turtle, blk) {
             if (logo.rhythmRuler == null) {
                 logo.rhythmRuler = new RhythmRuler();
@@ -1227,7 +1279,14 @@ function setupWidgetBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for generating a G major scale matrix.
+     * @extends FlowBlock
+     */
     class MatrixGMajorBlock extends FlowBlock {
+        /**
+         * Creates a MatrixGMajorBlock instance.
+         */
         constructor() {
             super("matrixgmajor", _("G major scale"));
             this.setPalette("widgets", activity);
@@ -1255,7 +1314,14 @@ function setupWidgetBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for generating the C major scale matrix.
+     * @extends FlowBlock
+     */
     class MatrixCMajorBlock extends FlowBlock {
+        /**
+         * Creates a MatrixCMajorBlock instance.
+         */
         constructor() {
             super("matrixcmajor", _("C major scale"));
             this.setPalette("widgets", activity);
@@ -1283,7 +1349,14 @@ function setupWidgetBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for generating a musical phrase matrix.
+     * @extends StackClampBlock
+     */
     class MatrixBlock extends StackClampBlock {
+        /**
+         * Creates a MatrixBlock instance.
+         */
         constructor() {
             super("matrix");
             this.setPalette("widgets", activity);
@@ -1336,6 +1409,13 @@ function setupWidgetBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of data for the matrix block.
+         * @param {any[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         */
         flow(args, logo, turtle, blk) {
             logo.inMatrix = true;
 
@@ -1406,7 +1486,14 @@ function setupWidgetBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block for inspecting the status of Music Blocks during execution.
+     * @extends StackClampBlock
+     */
     class StatusBlock extends StackClampBlock {
+        /**
+         * Creates a StatusBlock instance.
+         */
         constructor() {
             super("status");
             this.setPalette("widgets", activity);
@@ -1438,6 +1525,13 @@ function setupWidgetBlocks(activity) {
             ]);
         }
 
+        /**
+         * Handles the flow of data for the status block.
+         * @param {any[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         */
         flow(args, logo, turtle, blk) {
             if (logo.statusMatrix === null) {
                 logo.statusMatrix = new StatusMatrix();
@@ -1462,6 +1556,7 @@ function setupWidgetBlocks(activity) {
         }
     }
 
+    // Set up blocks if this is Music Blocks environment
     if (_THIS_IS_MUSIC_BLOCKS_) {
         new EnvelopeBlock().setup(activity);
         new FilterBlock().setup(activity);
@@ -1485,5 +1580,6 @@ function setupWidgetBlocks(activity) {
         new MatrixCMajorBlock().setup(activity);
         new MatrixBlock().setup(activity);
     }
+    // Instantiate and set up the StatusBlock
     new StatusBlock().setup(activity);
 }
