@@ -14,6 +14,9 @@
     position: absolute;
     top: 0;
     left: 0;
+    overflow-y: auto;
+    max-height:600px;
+    max-width: 830px
 }
 
 #floatingWindows > .windowFrame > .wfTopBar {
@@ -135,7 +138,7 @@
 }
 #floatingWindows > .windowFrame > .wfWinBody > .wfbWidget {
     flex-grow: 1;
-    overflow: hidden;
+    overflow-x: auto;
     position: relative;
 }
 #floatingWindows td {
