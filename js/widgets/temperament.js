@@ -29,11 +29,20 @@
 
 /* exported TemperamentWidget */
 
+/**
+ * Represents a widget for managing temperament settings.
+ * @constructor
+ */
 function TemperamentWidget() {
+    // Constants for button and icon sizes
     const BUTTONDIVWIDTH = 430;
     const BUTTONSIZE = 53;
     const ICONSIZE = 32;
+
+    // DOM elements
     const temperamentTableDiv = document.createElement("div");
+
+    // Properties
     let temperamentCell = null;
     this.inTemperament = null;
     this.lastTriggered = null;
@@ -48,6 +57,15 @@ function TemperamentWidget() {
     this.circleIsVisible = true;
     this.playbackForward = true;
 
+    /**
+     * Adds a button to the widget.
+     * @private
+     * @param {HTMLTableRowElement} row - The table row to which the button will be added.
+     * @param {string} icon - The icon file name.
+     * @param {number} iconSize - The size of the icon.
+     * @param {string} label - The label for the button.
+     * @returns {HTMLTableCellElement} - The created table cell.
+     */
     this._addButton = function (row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
         cell.innerHTML =
@@ -81,6 +99,10 @@ function TemperamentWidget() {
         return cell;
     };
 
+    /**
+     * Renders the circle of notes.
+     * @private
+     */
     this._circleOfNotes = function () {
         this.circleIsVisible = false;
         this.toggleNotesButton();
@@ -129,6 +151,12 @@ function TemperamentWidget() {
         docById("wheelDiv2").style.display = "";
         docById("wheelDiv2").style.background = "none";
 
+        /**
+         * Initializes the main wheel for the circle of notes.
+         * @private
+         * @param {number[]} [ratios] - The ratios for the notes.
+         * @param {number} [pitchNumber] - The number of pitches.
+         */
         this.createMainWheel = function (ratios, pitchNumber) {
             if (ratios === undefined) {
                 ratios = this.ratios;

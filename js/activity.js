@@ -180,11 +180,21 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
 // blocks, logo, palettes, and turtles for plugins and js-export.
 let globalActivity;
 
+/**
+ * Performs analysis on the project using the global activity.
+ * @returns {object} - The analysis result.
+ */
 const doAnalyzeProject = function() {
     return analyzeProject(globalActivity);
 };
 
+/**
+ * Represents an activity in the application.
+ */
 class Activity {
+    /**
+     * Creates an Activity instance.
+     */
     constructor() {
         globalActivity = this;
 
@@ -295,6 +305,7 @@ class Activity {
 
         /**
          * Initialises major variables and renders default stack.
+         * Sets up the initial state and dependencies of the activity.
          */
         this.setupDependencies = () => {
             createDefaultStack();
