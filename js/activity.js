@@ -600,16 +600,26 @@ class Activity {
             }
         };
 
+        /**
+         * Finds and organizes blocks within the workspace.
+         * Blocks are positioned based on their connections and availability within the canvas area.
+         */
         this._findBlocks = () => {
+            // Ensure visibility of blocks
             if (!this.blocks.visible) {
                 this._changeBlockVisibility();
             }
+
+            // Reset active block and hide DOM label
             this.blocks.activeBlock = null;
             hideDOMLabel();
+
+            // Show blocks and set initial container position
             this.blocks.showBlocks();
             this.blocksContainer.x = 0;
             this.blocksContainer.y = 0;
 
+            // Calculate top and left positions for block placement
             let toppos;
             if (this.auxToolbar.style.display === "block") {
                 toppos = 90 + this.toolbarHeight;
@@ -618,12 +628,13 @@ class Activity {
             }
             const leftpos = Math.floor(this.canvas.width / 4);
 
+            // Update palettes and calculate initial block position
             this.palettes.updatePalettes();
             let x = Math.floor(leftpos * this.turtleBlocksScale);
             let y = Math.floor(toppos * this.turtleBlocksScale);
             let even = true;
 
-            // First the start blocks...
+            // Position start blocks first
             for (const blk in this.blocks.blockList) {
                 if (!this.blocks.blockList[blk].trash) {
                     const myBlock = this.blocks.blockList[blk];
@@ -631,6 +642,7 @@ class Activity {
                         continue;
                     }
 
+                    // Move block and its connected group
                     if (myBlock.connections[0] === null) {
                         const dx = x - myBlock.container.x;
                         const dy = y - myBlock.container.y;
@@ -645,6 +657,7 @@ class Activity {
                             }
                         }
 
+                        // Update x and y positions for next block placement
                         x += Math.floor(150 * this.turtleBlocksScale);
                         if (x > (this.canvas.width * 7) / 8 / this.turtleBlocksScale) {
                             even = !even;
@@ -660,7 +673,7 @@ class Activity {
                 }
             }
 
-            // ...then everything else.
+            // Position other blocks
             for (const blk in this.blocks.blockList) {
                 if (!this.blocks.blockList[blk].trash) {
                     const myBlock = this.blocks.blockList[blk];
@@ -668,6 +681,7 @@ class Activity {
                         continue;
                     }
 
+                    // Move block and its connected group
                     if (myBlock.connections[0] === null) {
                         const dx = x - myBlock.container.x;
                         const dy = y - myBlock.container.y;
@@ -681,6 +695,8 @@ class Activity {
                                 }
                             }
                         }
+
+                        // Update x and y positions for next block placement
                         x += 150 * this.turtleBlocksScale;
                         if (x > (this.canvas.width * 7) / 8 / this.turtleBlocksScale) {
                             even = !even;
@@ -701,6 +717,7 @@ class Activity {
             this.boundary.hide();
 
             // Return mice to the center of the screen.
+            // Reset turtles' positions to center of the screen
             for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
                 const savedPenState = this.turtles.turtleList[turtle].painter.penState;
                 this.turtles.turtleList[turtle].painter.penState = false;
@@ -1048,7 +1065,14 @@ class Activity {
 
         let isExecuting = false; // Flag variable to track execution status
 
+        /**
+         * Sets up a record button functionality for the given activity.
+         * @param {object} activity - The activity context.
+         */
         const doRecordButton = (activity) => {
+            /**
+             * Executes the record button functionality if execution is not already in progress.
+             */
             if (isExecuting) {
                 return; // Exit the function if execution is already in progress
             }
@@ -1057,6 +1081,10 @@ class Activity {
             activity._doRecordButton();
         };
 
+        /**
+         * Functionality for the record button.
+         * @private
+         */
         this._doRecordButton = () => {
             const start = document.getElementById("record"),
                 recInside = document.getElementById("rec_inside");
@@ -1064,6 +1092,10 @@ class Activity {
             var clickEvent = new Event("click");
             let flag = 0;
 
+            /**
+             * Records the screen using the browser's media devices API.
+             * @returns {Promise<MediaStream>} A promise resolving to the recorded media stream.
+             */
             async function recordScreen() {
                 flag = 1;
                 return await navigator.mediaDevices.getDisplayMedia(
@@ -1085,6 +1117,10 @@ class Activity {
 
             const that = this;
 
+            /**
+             * Saves the recorded chunks as a video file.
+             * @param {Blob[]} recordedChunks - The recorded video chunks.
+             */
             function saveFile(recordedChunks) {
                 flag = 1;
                 recInside.classList.remove("blink");
@@ -1110,6 +1146,9 @@ class Activity {
                 doRecordButton();
                 that.textMsg("click on stop sharing");
             }
+            /**
+             * Stops the recording process.
+             */
             function stopRec() {
                 flag = 0;
                 mediaRecorder.stop();
@@ -1118,7 +1157,12 @@ class Activity {
                 document.body.appendChild(node);
             }
 
-            // eslint-disable-next-line no-unused-vars
+            /**
+             * Creates a media recorder instance.
+             * @param {MediaStream} stream - The media stream to be recorded.
+             * @param {string} mimeType - The MIME type of the recording.
+             * @returns {MediaRecorder} The created media recorder instance.
+             */
             function createRecorder (stream, mimeType) {
                 flag = 1;
                 recInside.classList.add("blink");
@@ -1153,6 +1197,9 @@ class Activity {
                 return mediaRecorder;
             }
 
+            /**
+             * Handles the recording process.
+             */
             function recording() {
                 start.addEventListener(
                     "click",
@@ -1171,12 +1218,14 @@ class Activity {
                 );
             }
 
+            // Start recording process if not already executing
             if (flag == 0 && isExecuting) {
                 recording();
                 start.dispatchEvent(clickEvent);
                 flag = 1;
             };
 
+            // Stop recording if already executing
             if(flag == 1 && isExecuting){
                 start.addEventListener("click", stopRec);
                 flag = 0;
