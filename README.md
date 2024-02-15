@@ -133,9 +133,9 @@ listening on port 3000.
 `socket.error:[Errno 48]`_.
 Certainly! Here's a Markdown version of the documentation for setting up Music Blocks using Docker:
 
----
 
-## Setting up Music Blocks with Docker
+
+## Local Setup with Docker
 
 ## Prerequisites
 
@@ -160,7 +160,6 @@ Before you begin, ensure you have Docker installed on your machine. You can down
    ```bash
    docker build -t musicblocks .
    ```
-
 ## Running Music Blocks
 
 1. Run the Docker container using the built image:
