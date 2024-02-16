@@ -1240,6 +1240,11 @@ class Activity {
             activity._doSlowButton();
         };
 
+        /**
+         * Executes slow button functionality.
+         * Resets active block, hides DOM labels, adjusts turtle delay, resumes synth, and runs or steps logo commands.
+         * @private
+         */
         this._doSlowButton = () => {
             this.blocks.activeBlock = null;
             hideDOMLabel();
@@ -1261,6 +1266,11 @@ class Activity {
             activity._doStepButton();
         };
 
+        /**
+         * Executes step button functionality.
+         * Resets active block, hides DOM labels, adjusts turtle delay, resumes synth, and runs or steps logo commands.
+         * @private
+         */
         this._doStepButton = () => {
             this.blocks.activeBlock = null;
             hideDOMLabel();
@@ -1291,6 +1301,11 @@ class Activity {
             activity._doHardStopButton(onblur);
         };
 
+        /**
+         * Stops running of music blocks and stops all mid-way synths.
+         * @param {boolean} onblur - Indicates if the function is triggered by loss of focus.
+         * @private
+         */
         this._doHardStopButton = (onblur) => {
             this.blocks.activeBlock = null;
             hideDOMLabel();
@@ -1323,6 +1338,11 @@ class Activity {
             activity._doSwitchMode();
         };
 
+        /**
+         * Switches between beginner and advanced modes.
+         * Displays a message prompting browser refresh to apply mode change.
+         * @private
+         */
         this._doSwitchMode = () => {
             this.blocks.activeBlock = null;
             const mode = this.storage.beginnerMode;
@@ -1360,6 +1380,11 @@ class Activity {
             }
         };
 
+        /**
+         * Initializes the functionality of the horizontal scroll icon.
+         * Toggles horizontal scrolling and updates corresponding UI elements.
+         * @private
+         */
         this._setScroller = () => {
             this.blocks.activeBlock = null;
             this.scrollBlockContainer = !this.scrollBlockContainer;
@@ -1388,7 +1413,10 @@ class Activity {
             }
         };
 
-        // Load animation handler.
+        /**
+         * Displays loading animation with random messages.
+         * @private
+         */
         this.doLoadAnimation = () => {
             const messages = {
                 load_messages: [
@@ -1423,8 +1451,9 @@ class Activity {
             setInterval(changeText, 2000);
         };
 
-        /*
-         * Increases block size
+        /**
+         * Increases the size of blocks in the activity.
+         * @param {object} activity - The activity object.
          */
         const doLargerBlocks = async(activity) => {
             await activity._doLargerBlocks();
@@ -1455,8 +1484,9 @@ class Activity {
             document.getElementById("hideContents").click();
         };
 
-        /*
-         * Decreases block size
+        /**
+         * Decreases the size of blocks in the activity.
+         * @param {object} activity - The activity object.
          */
         const doSmallerBlocks = async(activity) => {
             await activity._doSmallerBlocks();
@@ -1466,6 +1496,10 @@ class Activity {
             }
         };
 
+        
+        /**
+         * Manages the resizing of blocks to handle larger size.
+         */
         this._doSmallerBlocks = async() => {
             this.blocks.activeBlock = null;
 
@@ -1491,6 +1525,7 @@ class Activity {
         /*
          * If either the block size has reached its minimum or maximum,
          * then the icons to make them smaller/bigger will be hidden.
+         * Sets the status of the smaller and larger block icons based on the current block size.
          */
         this.setSmallerLargerStatus = async() => {
             if (BLOCKSCALES[this.blockscale] < DEFAULTBLOCKSCALE) {
@@ -1507,13 +1542,17 @@ class Activity {
         };
 
 
-        /*
-         * Based on the active palette, remove a plugin palette from local storage.
+        /**
+         * Deletes a plugin palette from local storage based on the active palette.
+         * @param {object} activity - The activity object.
          */
         const deletePlugin = (activity) => {
             activity._deletePlugin();
         };
 
+        /**
+         * Deletes a plugin palette from local storage.
+         */
         this._deletePlugin = () => {
             if (this.palettes.activePalette !== null) {
                 const obj = JSON.parse(this.storage.plugins);
