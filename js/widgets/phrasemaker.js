@@ -2298,6 +2298,7 @@ class PhraseMaker {
         }
 
         this.makeClickable();
+        this.stylePhraseMaker();
     }
 
     _export() {
