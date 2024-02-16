@@ -15,8 +15,8 @@ p {
 }
 
 img {
-    max-width: 100%; /* Ensures images don't exceed their container */
-    height: auto; /* Ensures images maintain aspect ratio */
-    display: block; /* Removes any extra space below images */
-    margin: 0 auto; /* Centers images horizontally */
+    max-width: 100%; 
+    height: auto;
+    display: block; 
+    margin: 0 auto;
 }
