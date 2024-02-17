@@ -1710,6 +1710,9 @@ class Activity {
 
             const that = this;
 
+            /**
+             * Closes any open menus and labels.
+             */
             const closeAnyOpenMenusAndLabels = () => {
                 if (docById("wheelDiv") !== null) docById("wheelDiv").style.display = "none";
                 if (docById("contextWheelDiv") !== null)
@@ -1720,6 +1723,11 @@ class Activity {
                 if (docById("numberLabel") !== null) docById("numberLabel").style.display = "none";
             };
 
+            /**
+             * Normalizes wheel event data across different browsers.
+             * @param {WheelEvent} event - The wheel event object.
+             * @returns {Object} - Normalized pixelX and pixelY values.
+             */
             const normalizeWheel = (event) => {
                 const PIXEL_STEP = 10;
                 const LINE_HEIGHT = 40;
@@ -1730,12 +1738,14 @@ class Activity {
                     pX = 0,
                     pY = 0; // pixelX, pixelY
 
+                // Determine scroll values based on different event properties
                 if ("detail" in event) sY = event.detail;
                 if ("wheelDelta" in event) sY = -event.wheelDelta / 120;
                 if ("wheelDeltaY" in event) sY = -event.wheelDeltaY / 120;
                 if ("wheelDeltaX" in event) sX = -event.wheelDeltaX / 120;
 
                 // side scrolling on FF with DOMMouseScroll
+                // Handle horizontal scrolling on Firefox
                 if ("axis" in event && event.axis === event.HORIZONTAL_AXIS) {
                     sX = sY;
                     sY = 0;
@@ -1744,9 +1754,11 @@ class Activity {
                 pX = sX * PIXEL_STEP;
                 pY = sY * PIXEL_STEP;
 
+                // Determine delta values based on deltaMode
                 if ("deltaY" in event) pY = event.deltaY;
                 if ("deltaX" in event) pX = event.deltaX;
 
+                // Adjust pixel values based on deltaMode
                 if ((pX || pY) && event.deltaMode) {
                     if (event.deltaMode === 1) {
                         // ff uses deltamode = 1
@@ -1771,6 +1783,10 @@ class Activity {
             const myCanvas = document.getElementById("myCanvas");
             const initialTouches = [[null, null], [null, null]]; // Array to track two fingers (Y and X coordinates)
 
+            /**
+             * Handles touch start event on the canvas.
+             * @param {TouchEvent} event - The touch event object.
+             */
             myCanvas.addEventListener("touchstart", (event) => {
                 if (event.touches.length === 2) {
                     for (let i = 0; i < 2; i++) {
@@ -1780,6 +1796,10 @@ class Activity {
                 }
             });
 
+            /**
+             * Handles touch move event on the canvas.
+             * @param {TouchEvent} event - The touch event object.
+             */
             myCanvas.addEventListener("touchmove", (event) => {
                 if (event.touches.length === 2) {
                     for (let i = 0; i < 2; i++) {
@@ -1809,6 +1829,9 @@ class Activity {
                 }
             });
 
+            /**
+             * Handles touch end event on the canvas.
+             */
             myCanvas.addEventListener("touchend", () => {
                 for (let i = 0; i < 2; i++) {
                     initialTouches[i][0] = null;
@@ -1816,6 +1839,10 @@ class Activity {
                 }
             });
 
+            /**
+             * Handles wheel event on the canvas.
+             * @param {WheelEvent} event - The wheel event object.
+             */
             const __wheelHandler = (event) => {
                 const data = normalizeWheel(event); // normalize over different browsers
                 const delY = data.pixelY;
@@ -1846,6 +1873,10 @@ class Activity {
 
             docById("myCanvas").addEventListener("wheel", __wheelHandler, false);
 
+            /**
+             * Handles stage mouse up event.
+             * @param {MouseEvent} event - The mouse event object.
+             */
             const __stageMouseUpHandler = (event) => {
                 that.stageMouseDown = false;
                 that.moving = false;
