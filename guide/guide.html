@@ -267,8 +267,23 @@
             src="../charts/NotationRestChart.svg"
             title="A chart of note values and their corresponding note value blocks"
             alt="Rest Chart"
+            onclick="toggleImageSize(this)"
+            style="max-width: 500px; max-height: 500px; cursor: pointer"
           />
         </p>
+
+        <script>
+          function toggleImageSize(img) {
+            if (img.style.maxWidth === "none") {
+              img.style.maxWidth = "500px";
+              img.style.maxHeight = "500px";
+            } else {
+              img.style.maxWidth = "none";
+              img.style.maxHeight = "none";
+            }
+          }
+        </script>
+
         <p>Please refer to the above picture for a visual representation of note values.</p>
         <h3 id="22-pitch-blocks"><a name="PITCH">2.2 Pitch Blocks</a></h3>
         <p>
@@ -351,15 +366,45 @@
             src="../charts/KeyboardChart.svg"
             title="Note layout chart for keyboard"
             alt="Note Chart"
+            onclick="toggleImageSize(this)"
+            style="max-width: 500px; max-height: 500px; cursor: pointer"
           />
         </p>
+
+        <script>
+          function toggleImageSize(img) {
+            if (img.style.maxWidth === "none") {
+              img.style.maxWidth = "500px";
+              img.style.maxHeight = "500px";
+            } else {
+              img.style.maxWidth = "none";
+              img.style.maxHeight = "none";
+            }
+          }
+        </script>
+
         <p>
           <img
             src="../charts/MalletChart.svg"
             title="Note layout chart for mallet"
             alt="Mallet Chart"
+            onclick="toggleImageSize(this)"
+            style="max-width: 500px; max-height: 500px; cursor: pointer"
           />
         </p>
+
+        <script>
+          function toggleImageSize(img) {
+            if (img.style.maxWidth === "none") {
+              img.style.maxWidth = "500px";
+              img.style.maxHeight = "500px";
+            } else {
+              img.style.maxWidth = "none";
+              img.style.maxHeight = "none";
+            }
+          }
+        </script>
+
         <p>
           Please refer to the above charts for a visual representation of where notes are located on
           a keyboard or staff.
