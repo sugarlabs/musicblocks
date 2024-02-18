@@ -150,30 +150,38 @@ class PhraseMaker {
         this.columnBlocksMap = [];
     }
 
-    stylePhraseMaker(){
+    stylePhraseMaker() {
+        var screenWidth = window.innerWidth;
+        var screenHeight = window.innerHeight;
 
         var floatingWindowsDiv = document.getElementById("floatingWindows");
         var windowFrameElements = floatingWindowsDiv.querySelectorAll(".windowFrame");
     
         for (var i = 0; i < windowFrameElements.length; i++) {
             var windowFrame = windowFrameElements[i];
-            var wfWinBody = document.querySelector(".wfWinBody");
-            var wfbWidget = document.querySelector(".wfbWidget");
-            wfbWidget.style.overflow = "auto";
-            wfbWidget.style.width = "-webkit-fill-available";
-            wfbWidget.style.height = "-webkit-fill-available";
-            windowFrame.style.height = "405px";
-            windowFrame.style.width = "685px";
-            wfWinBody.style.position = "absolute";
-            wfWinBody.style.overflow = "auto";
-            wfWinBody.style.width = "-webkit-fill-available";
-            wfWinBody.style.height = "-webkit-fill-available";
-            wfWinBody.style.background = "#cccccc";
-            wfbWidget.style.position = "absolute";
-            wfbWidget.style.left = "55px";
+            var wfWinBody = windowFrame.querySelector(".wfWinBody");
+            var wfbWidget = windowFrame.querySelector(".wfbWidget");
+
+            var totalWidth = parseFloat(window.getComputedStyle(windowFrame).width);
+            var totalHeight = parseFloat(window.getComputedStyle(windowFrame).height);
+    
+            if (totalWidth > screenWidth || totalHeight > screenHeight) {
+                wfbWidget.style.overflow = "auto";
+                wfbWidget.style.width = "-webkit-fill-available";
+                wfbWidget.style.height = "-webkit-fill-available";
+                windowFrame.style.height = "405px";
+                windowFrame.style.width = "685px";
+                wfWinBody.style.position = "absolute";
+                wfWinBody.style.overflow = "auto";
+                wfWinBody.style.width = "-webkit-fill-available";
+                wfWinBody.style.height = "-webkit-fill-available";
+                wfWinBody.style.background = "#cccccc";
+                wfbWidget.style.position = "absolute";
+                wfbWidget.style.left = "55px";
+            }
         }
     }
-
+    
     clearBlocks() {
         // When creating a new matrix, we want to clear out any old
         // block references.
@@ -2262,6 +2270,7 @@ class PhraseMaker {
                 console.debug("pushing " + obj[1] + " " + last(this.rowLabels));
                 this._sortedRowMap.push(last(this._sortedRowMap) + 1);
                 lastObj = i;
+                this.stylePhraseMaker();
             }
 
             this.rowLabels.push(obj[1]);
@@ -2298,7 +2307,7 @@ class PhraseMaker {
         }
 
         this.makeClickable();
-        this.stylePhraseMaker();
+
     }
 
     _export() {
