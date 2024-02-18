@@ -169,8 +169,8 @@ class PhraseMaker {
                 wfbWidget.style.overflow = "auto";
                 wfbWidget.style.width = "-webkit-fill-available";
                 wfbWidget.style.height = "-webkit-fill-available";
-                windowFrame.style.height = "405px";
-                windowFrame.style.width = "685px";
+                windowFrame.style.height = "577px";
+                windowFrame.style.width = "773px";
                 wfWinBody.style.position = "absolute";
                 wfWinBody.style.overflow = "auto";
                 wfWinBody.style.width = "-webkit-fill-available";
