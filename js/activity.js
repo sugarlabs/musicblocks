@@ -1887,11 +1887,19 @@ class Activity {
                 }
             };
 
+            /**
+             * Handles mouse movement on the stage.
+             * @param {object} event - The mouse event object.
+             */
             this.stage.on("stagemousemove", (event) => {
                 that.stageX = event.stageX;
                 that.stageY = event.stageY;
             });
 
+            /**
+             * Handles mouse down event on the stage.
+             * @param {object} event - The mouse event object.
+             */
             this.stage.on("stagemousedown", (event) => {
                 that.stageMouseDown = true;
                 if ((that.stage.getObjectUnderPoint() !== null) | that.turtles.running()) {
@@ -1919,6 +1927,7 @@ class Activity {
                     }
 
                     // if we are moving the block container, deselect the active block.
+                    // Deselect active block if moving the block container
                     that.blocks.activeBlock = null;
 
                     // eslint-disable-next-line max-len
@@ -1943,30 +1952,45 @@ class Activity {
             });
         };
 
-        /*
+        /**
          * Sets up scrolling functionality in palette and across canvas
+         * Retrieves the scale of the stage.
+         * @returns {number} - The scale of the stage.
          */
         this.getStageScale = () => {
             return this.turtleBlocksScale;
         };
 
+        /**
+         * Retrieves the X coordinate of the stage.
+         * @returns {number} - The X coordinate of the stage.
+         */
         this.getStageX = () => {
             return this.turtles.screenX2turtleX(this.stageX / this.turtleBlocksScale);
         };
 
+        /**
+         * Retrieves the Y coordinate of the stage.
+         * @returns {number} - The Y coordinate of the stage.
+         */
         this.getStageY = () => {
             return this.turtles.screenY2turtleY(
                 (this.stageY - this.toolbarHeight) / this.turtleBlocksScale
             );
         };
 
+        /**
+         * Retrieves the mouse down state of the stage.
+         * @returns {boolean} - The mouse down state of the stage.
+         */
         this.getStageMouseDown = () => {
             return this.stageMouseDown;
         };
 
         /**
-         * Renders grid.
-         * @param imagePath {path of grid to be rendered}
+         * Creates and renders a grid on the stage.
+         * @param {string} imagePath - The path of the grid image.
+         * @returns {object} - The created grid object.
          */
         this._createGrid = (imagePath) => {
             const img = new Image();
@@ -1988,11 +2012,11 @@ class Activity {
         };
 
         /**
-         * @param  fillColor   {inner color of message}
-         * @param  strokeColor {border of message}
-         * @param  callback    {callback function assigned to particular message}
-         * @param  y           {position on canvas}
-         * @returns {description}
+         * Creates and renders a message container.
+         * @param {string} fillColor - The fill color of the message container.
+         * @param {string} strokeColor - The stroke color of the message container.
+         * @param {function} callback - The callback function assigned to the message container.
+         * @param {number} y - The position on the canvas.
          */
         this._createMsgContainer = (fillColor, strokeColor, callback, y) => {
             const container = new createjs.Container();
@@ -2048,6 +2072,7 @@ class Activity {
         };
 
         /*
+         * Creates and renders error message containers with appropriate artwork.
          * Some error messages have special artwork.
          */
         this._createErrorContainers = () => {
@@ -2058,8 +2083,8 @@ class Activity {
         };
 
         /**
-         * Renders error message with appropriate artwork
-         * @param  name {specifies svg to be rendered}
+         * Renders an error message with appropriate artwork.
+         * @param {string} name - The name specifying the SVG to be rendered.
          */
         this._makeErrorArtwork = (name) => {
             const container = new createjs.Container();
