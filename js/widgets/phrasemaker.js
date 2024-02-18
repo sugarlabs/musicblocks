@@ -166,18 +166,18 @@ class PhraseMaker {
             var totalHeight = parseFloat(window.getComputedStyle(windowFrame).height);
     
             if (totalWidth > screenWidth || totalHeight > screenHeight) {
+                windowFrame.style.height = screenHeight * 0.7 + "px";
+                windowFrame.style.width = screenWidth * 0.9 + "px";
                 wfbWidget.style.overflow = "auto";
                 wfbWidget.style.width = "-webkit-fill-available";
                 wfbWidget.style.height = "-webkit-fill-available";
-                windowFrame.style.height = "577px";
-                windowFrame.style.width = "773px";
+                wfbWidget.style.position = "absolute";
+                wfbWidget.style.left = "55px";
                 wfWinBody.style.position = "absolute";
                 wfWinBody.style.overflow = "auto";
                 wfWinBody.style.width = "-webkit-fill-available";
                 wfWinBody.style.height = "-webkit-fill-available";
                 wfWinBody.style.background = "#cccccc";
-                wfbWidget.style.position = "absolute";
-                wfbWidget.style.left = "55px";
             }
         }
     }
