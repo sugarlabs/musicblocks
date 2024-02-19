@@ -171,13 +171,15 @@ class PhraseMaker {
             if (totalWidth > screenWidth || totalHeight > screenHeight) {
                 windowFrame.style.height = Math.min(totalHeight, maxHeight) + "px";
                 windowFrame.style.width = Math.min(totalWidth, maxWidth) + "px";
-                wfbWidget.style.overflow = "auto";
+                wfbWidget.style.overflowY = totalHeight > maxHeight ? "auto" : "hidden";
+                wfbWidget.style.overflowX = totalWidth > maxWidth ? "auto" : "hidden";
                 wfbWidget.style.width = "-webkit-fill-available";
                 wfbWidget.style.height = "-webkit-fill-available";
                 wfbWidget.style.position = "absolute";
                 wfbWidget.style.left = "55px";
                 wfWinBody.style.position = "absolute";
-                wfWinBody.style.overflow = "auto";
+                wfWinBody.style.overflowY = totalHeight > maxHeight ? "auto" : "hidden";
+                wfWinBody.style.overflowX = totalWidth > maxWidth ? "auto" : "hidden";
                 wfWinBody.style.width = "-webkit-fill-available";
                 wfWinBody.style.height = "-webkit-fill-available";
                 wfWinBody.style.background = "#cccccc";
