@@ -164,10 +164,13 @@ class PhraseMaker {
 
             var totalWidth = parseFloat(window.getComputedStyle(windowFrame).width);
             var totalHeight = parseFloat(window.getComputedStyle(windowFrame).height);
+
+            var maxWidth = screenWidth * 0.8;
+            var maxHeight = screenHeight * 0.8;
     
             if (totalWidth > screenWidth || totalHeight > screenHeight) {
-                windowFrame.style.height = screenHeight * 0.7 + "px";
-                windowFrame.style.width = screenWidth * 0.9 + "px";
+                windowFrame.style.height = Math.min(totalHeight, maxHeight) + "px";
+                windowFrame.style.width = Math.min(totalWidth, maxWidth) + "px";
                 wfbWidget.style.overflow = "auto";
                 wfbWidget.style.width = "-webkit-fill-available";
                 wfbWidget.style.height = "-webkit-fill-available";
