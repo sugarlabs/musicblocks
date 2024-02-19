@@ -167,12 +167,24 @@
 
                 loadL10nSplashScreen();
             </script>
-            <div class="loading-animation" >
-                <div style="background: orange;  animation: lds-ellipsis1 0.6s infinite; left: 8px;"></div>
-                <div style="background: green;  animation: lds-ellipsis2 0.6s infinite; left: 8px;" ></div>
-                <div style="background:  blue;  animation: lds-ellipsis2 0.6s infinite; left: 32px;"></div>
-                <div style="background: pink;  animation: lds-ellipsis3 0.6s infinite; left: 56px;"></div>
-            </div>
+            <div class="loading-text" id="loadingText" style="margin-top:1.5rem;"></div>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    setTimeout(function() {
+                      const loadingText = document.getElementById("loadingText");
+                      const texts = ["Do, Re, Mi, Fa, Sol, La, Ti, Do", "Loading Music Blocks...", "Reading Music..."];
+              
+                      let index = 0;
+                      setInterval(function() {
+                        loadingText.textContent = texts[index];
+                        index = (index + 1) % texts.length;
+                      }, 2000); // Change 2000 to adjust cycle duration (in milliseconds)
+              
+                      // Show the loading text after 6 seconds
+                      loadingText.style.opacity = 1;
+                    }, 4000); // Change 6000 to adjust the delay (in milliseconds)
+                  });
+              </script>
         </div>
 
         <script>
