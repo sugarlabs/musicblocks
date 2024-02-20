@@ -16,7 +16,7 @@
         <link rel="stylesheet" href="dist/css/style.css" />
         <link rel="stylesheet" href="dist/css/keyboard.css" />
         <link rel="stylesheet" href="dist/css/windows.css" />
-
+        
         <noscript>
             JavaScript is required to view this page.
         </noscript>
@@ -130,7 +130,7 @@
      >
         <div
             id="loading-image-container"
-            style="position: absolute; width: 100%; height: 100%;cursor: wait;"
+            style="position: absolute; width: 100%; height: 100%;cursor: wait; text-align: center;"
         >
             <script>
                 let loadL10nSplashScreen = function() {
@@ -163,12 +163,30 @@
                         document.getElementById(
                             "loading-image-container"
                         ).innerHTML =
-                            '<video autoplay muted playsinline style="width: 100%; height:500px; margin-top:30px; overflow: hidden;"><source src="loading-animation.webm" type="video/webm"><source src="loading-animation.mp4" type="video/mp4"></video>';
+                            '<video loop autoplay muted playsinline style="width: 100%; height:500px; margin-top:30px; overflow: hidden;"><source src="loading-animation.webm" type="video/webm"><source src="loading-animation.mp4" type="video/mp4"></video>';
                     }
                 };
 
                 loadL10nSplashScreen();
             </script>
+            <div class="loading-text" id="loadingText" style="margin-top:1.5rem;"></div>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    setTimeout(function() {
+                      const loadingText = document.getElementById("loadingText");
+                      const texts = ["Do, Re, Mi, Fa, Sol, La, Ti, Do", "Loading Music Blocks...", "Reading Music..."];
+              
+                      let index = 0;
+                      setInterval(function() {
+                        loadingText.textContent = texts[index];
+                        index = (index + 1) % texts.length;
+                      }, 2000); // Change 2000 to adjust cycle duration (in milliseconds)
+              
+                      // Show the loading text after 6 seconds
+                      loadingText.style.opacity = 1;
+                    }, 4000); // Change 6000 to adjust the delay (in milliseconds)
+                  });
+              </script>
         </div>
 
         <script>
