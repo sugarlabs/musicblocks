@@ -1,13 +1,22 @@
 h1 {
-    font: 32px sans;
-    weight: bold;
+    font-size: 32px;
+    font-weight: bold;
 }
 
 h2 {
-    font: 24px sans;
-    weight: bold;
+    font-size: 24px;
+    font-weight: bold;
 }
 
 p {
-    font: 14px sans;
+    font-size: 20px;
+    font-family: sans-serif;
+    margin: 0; /* Added to remove default margins */
+}
+
+img {
+    max-width: 100%; 
+    height: auto;
+    display: block; 
+    margin: 0 auto;
 }
