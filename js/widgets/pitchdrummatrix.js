@@ -191,12 +191,12 @@ class PitchDrumMatrix {
         this.pitchDrumDiv = document.createElement("div");
         widgetWindow.getWidgetBody().append(this.pitchDrumDiv);
         widgetWindow.getWidgetBody().style.height = "400px";
-        widgetWindow.getWidgetBody().style.width = "400px";
+        widgetWindow.getWidgetBody().style.width = "500px";
 
         // The pdm table
         const pdmTableDiv = this.pitchDrumDiv;
-        pdmTableDiv.style.display = "inline";
-        pdmTableDiv.style.visibility = "visible";
+        pdmTableDiv.style.position = "relative";
+        pdmTableDiv.style.visibility = "invisible";
         pdmTableDiv.style.border = "0px";
         pdmTableDiv.innerHTML = "";
 
@@ -251,7 +251,11 @@ class PitchDrumMatrix {
             labelCell.style.maxWidth = 0;
             labelCell.className = "headcol";
             labelCell.innerHTML = this.rowLabels[j] + this.rowArgs[j].toString().sub();
-
+            labelCell.style.position = "sticky";
+            labelCell.style.left = "0"; 
+            labelCell.style.top = "0"; 
+            labelCell.style.zIndex = "5";
+           
             pdmCell = pdmTableRow.insertCell();
             // Create tables to store individual notes.
             pdmCell.innerHTML =
@@ -276,12 +280,18 @@ class PitchDrumMatrix {
         labelCell.style.maxWidth = labelCell.style.minWidth;
         labelCell.className = "headcol";
         labelCell.innerHTML = "";
+        labelCell.style.position = "sticky";
+        labelCell.style.left = "0"; 
+        labelCell.style.top = "0"; 
+        labelCell.style.bottom = "0";
+        labelCell.style.zIndex = "20";
 
         const n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 8);
         const outerDiv = docById("pdmOuterDiv");
+        outerDiv.style.height = widgetWindow.getWidgetBody().style.height;
+        outerDiv.style.width = widgetWindow.getWidgetBody().style.width;
         let ow;
         if (pdmTable.rows.length + 2 > n) {
-            outerDiv.style.height = widgetWindow.getWidgetBody().style.height;
             ow = Math.max(
                 Math.min(
                     widgetWindow.getWidgetBody().style.width,
@@ -293,8 +303,6 @@ class PitchDrumMatrix {
                 PitchDrumMatrix.BUTTONDIVWIDTH
             ); // Add room for the vertical slider.
         } else {
-            outerDiv.style.height =
-                this._cellScale * MATRIXSOLFEHEIGHT * (pdmTable.rows.length + 3) + "px";
             ow = Math.max(
                 Math.min(
                     window.innerWidth / 2,
@@ -305,8 +313,6 @@ class PitchDrumMatrix {
             );
         }
 
-        outerDiv.style.width = ow + "px";
-
         const innerDiv = docById("pdmInnerDiv");
         innerDiv.style.height = widgetWindow.getWidgetBody().style.height;
         innerDiv.style.width = widgetWindow.getWidgetBody().style.width;
@@ -315,6 +321,9 @@ class PitchDrumMatrix {
         pdmCell = pdmTableRow.insertCell();
         // Create table to store drum names.
         pdmCell.innerHTML = '<table cellpadding="0px" id="pdmDrumTable"><tr></tr></table>';
+        pdmCell.style.position = "sticky";
+        pdmCell.style.bottom = "0";
+        pdmCell.style.zIndex = "10";
 
         // Add any drum blocks here.
         for (let i = 0; i < this.drums.length; i++) {
@@ -326,18 +335,18 @@ class PitchDrumMatrix {
         widgetWindow.onmaximize = () => {
             if (widgetWindow._maximized) {
                 widgetWindow.getWidgetBody().style.position = "absolute";
-                widgetWindow.getWidgetBody().style.height = "calc(100vh - 80px)";
-                widgetWindow.getWidgetBody().style.width = "200vh";
-                docById("pdmOuterDiv").style.height = "calc(100vh - 80px)";
-                docById("pdmOuterDiv").style.width = "calc(200vh - 64px)";
-                docById("pdmInnerDiv").style.width = "calc(200vh - 64px)";
-                docById("pdmInnerDiv").style.height = "calc(100vh - 80px)";
-                widgetWindow.getWidgetBody().style.left = "70px";
+                widgetWindow.getWidgetBody().style.height = "calc(-95px + 100vh)";
+                widgetWindow.getWidgetBody().style.width = "calc(-55px + 100vw)";
+                widgetWindow.getWidgetBody().style.left = "55px";
+                outerDiv.style.height = widgetWindow.getWidgetBody().style.height;
+                outerDiv.style.width = widgetWindow.getWidgetBody().style.width;
+                innerDiv.style.height = widgetWindow.getWidgetBody().style.height;
+                innerDiv.style.width = widgetWindow.getWidgetBody().style.width;
             } else {
                 widgetWindow.getWidgetBody().style.position = "relative";
                 widgetWindow.getWidgetBody().style.left = "0px";
                 widgetWindow.getWidgetBody().style.height = "400px";
-                widgetWindow.getWidgetBody().style.width = "400px";
+                widgetWindow.getWidgetBody().style.width = "500px";
                 const innerDiv = docById("pdmInnerDiv");
                 innerDiv.style.height = widgetWindow.getWidgetBody().style.height;
                 innerDiv.style.width = widgetWindow.getWidgetBody().style.width;
