@@ -252,11 +252,11 @@ function setupDictActions(activity) {
          */
         static getValue(dict, key, turtle, blk) {
               if( ! (dict in activity.logo.turtleDicts[turtle]) ){
-                var msg="Dictionary with this name does not exist";
+                var msg=_("Dictionary with this name does not exist");
                 return msg;
               }
               else if(! (key in activity.logo.turtleDicts[turtle][dict])){
-                var msg="Key with this name does not exist in "+dict;
+                var msg=_("Key with this name does not exist in "+dict);
                 return msg;
               }
 
