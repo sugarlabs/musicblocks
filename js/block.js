@@ -75,10 +75,30 @@
 /* exported Block, $ */
 
 // Length of a long touch
+
+/**
+ * Width of text in pixels.
+ * @type {number}
+ */
 const TEXTWIDTH = 240; // 90
+
+/**
+ * Length of a string.
+ * @type {number}
+ */
+
 const STRINGLEN = 9;
+/**
+ * Length of a long touch in milliseconds.
+ * @type {number}
+ */
 const LONGPRESSTIME = 1500;
 const INLINECOLLAPSIBLES = ["newnote", "interval", "osctime", "definemode"];
+
+/**
+ * List of block types that are collapsible inline.
+ * @type {string[]}
+ */
 const COLLAPSIBLES = [
     "drum",
     "start",
@@ -99,7 +119,17 @@ const COLLAPSIBLES = [
     "interval",
     "osctime"
 ];
+
+/**
+ * List of block types that should not trigger any event.
+ * @type {string[]}
+ */
 const NOHIT = ["hidden", "hiddennoflow"];
+
+/**
+ * List of special input types.
+ * @type {string[]}
+ */
 const SPECIALINPUTS = [
     "text",
     "number",
@@ -125,6 +155,11 @@ const SPECIALINPUTS = [
     "outputtools",
     "wrapmode"
 ];
+
+/**
+ * List of block types whose names should be widened.
+ * @type {string[]}
+ */
 const WIDENAMES = [
     "intervalname",
     "accidentalname",
@@ -137,7 +172,17 @@ const WIDENAMES = [
     "noisename",
     "outputtools"
 ];
+
+/**
+ * List of additional block types whose names should be widened.
+ * @type {string[]}
+ */
 const EXTRAWIDENAMES = [];
+
+/**
+ * List of block types with pie menus.
+ * @type {string[]}
+ */
 const PIEMENUS = [
     "solfege",
     "eastindiansolfege",
@@ -162,6 +207,13 @@ const PIEMENUS = [
     "wrapmode"
 ];
 
+/**
+ * Async function to create bitmap from SVG data.
+ * @param {string} data - SVG data.
+ * @param {Function} callback - Callback function.
+ * @param {any[]} args - Additional arguments for the callback.
+ * @private
+ */
 const _blockMakeBitmap = (data, callback, args) => {
     // Async creation of bitmap from SVG data.
     // Works with Chrome, Safari, Firefox (untested on IE).
@@ -175,8 +227,18 @@ const _blockMakeBitmap = (data, callback, args) => {
     img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
 };
 
-// Define block instance objects and any methods that are intra-block.
+/**
+ * Define block instance objects and any methods that are intra-block.
+ * Represents a block instance with associated methods.
+ * @class
+ */
 class Block {
+    /**
+     * Creates an instance of Block.
+     * @param {object} protoblock - The protoblock object.
+     * @param {object} blocks - The blocks object.
+     * @param {string} overrideName - The overridden name (if any).
+     */
     constructor(protoblock, blocks, overrideName) {
         if (protoblock === null) {
             // console.debug("null protoblock sent to Block");
