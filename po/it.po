@@ -3500,7 +3500,7 @@ msgstr "extras"
 #.TRANS: program as in computer program
 #.TRANS: program as in computer program
 msgid "program"
-msgstr ""
+msgstr "programma"
 
 #: js/turtledefs.js:143
 #: js/turtledefs.js:245
@@ -3560,7 +3560,7 @@ msgstr "Benvenuto su Music Blocks"
 #: js/turtledefs.js:472
 #: js/help.js:334
 msgid "Meet Mr. Mouse!"
-msgstr ""
+msgstr "Conosci Mr. Mouse!"
 
 #: js/turtledefs.js:473
 msgid "Mr Mouse is our Music Blocks conductor."
@@ -3681,7 +3681,7 @@ msgstr ""
 
 #: js/turtledefs.js:621
 msgid "Show or hide a coordinate grid."
-msgstr ""
+msgstr "Mostra o nascondi la griglia di coordinate"
 
 #: js/turtledefs.js:627
 msgid "Clear the screen and return the mice to their initial positions."
@@ -3703,7 +3703,7 @@ msgstr ""
 
 #: js/turtledefs.js:644
 msgid "Show/hide blocks"
-msgstr "Mostrare/Nascondire blocchi"
+msgstr "Mostra/Nascondi blocchi"
 
 #: js/turtledefs.js:645
 msgid "Hide or show the blocks and the palettes."
@@ -3968,15 +3968,15 @@ msgstr ""
 
 #: js/activity.js:1863
 msgid "chord name"
-msgstr ""
+msgstr "nome dell'accordo"
 
 #: js/activity.js:1869
 msgid "filter type"
-msgstr ""
+msgstr "tipo di filtro"
 
 #: js/activity.js:1872
 msgid "oscillator type"
-msgstr ""
+msgstr "tipo di oscillatore"
 
 #: js/activity.js:1878
 #: js/DrumBlocks.js:32
@@ -4011,7 +4011,7 @@ msgstr ""
 
 #: js/activity.js:2266
 msgid "Saving block artwork"
-msgstr ""
+msgstr "Salva l'illustrazione del blocco"
 
 #: js/activity.js:2277
 msgid "Erase"
@@ -4044,19 +4044,19 @@ msgstr ""
 
 #: js/activity.js:2414
 msgid "Moving block up."
-msgstr ""
+msgstr "Sposta il blocco su"
 
 #: js/activity.js:2435
 msgid "Moving block down."
-msgstr ""
+msgstr "Sposta il blocco giù"
 
 #: js/activity.js:2456
 msgid "Moving block left."
-msgstr ""
+msgstr "Sposta il blocco a sinistra"
 
 #: js/activity.js:2473
 msgid "Moving block right."
-msgstr ""
+msgstr "Sposta il blocco a destra"
 
 #: js/activity.js:2488
 msgid "Jump to home position."
@@ -4064,7 +4064,7 @@ msgstr ""
 
 #: js/activity.js:2515
 msgid "Hide blocks"
-msgstr ""
+msgstr "Nascondi blocchi"
 
 #: js/activity.js:3389
 msgid "Click the run button to run the project."
@@ -4082,29 +4082,29 @@ msgstr ""
 #: js/GlobalPlanet.js:495
 #.TRANS: default project title when saving as Lilypond
 msgid "My Project"
-msgstr ""
+msgstr "Mio Progetto"
 
 #: js/activity.js:4261
 msgid "Show/hide block"
-msgstr ""
+msgstr "Mostra/nascondi blocco"
 
 #: js/activity.js:4263
 msgid "Expand/collapse blocks"
-msgstr ""
+msgstr "Espandi/collassa blocchi"
 
 #: js/activity.js:4381
 msgid "Could not parse JSON input."
-msgstr ""
+msgstr "Non è stato possibile analizzare il JSON in input"
 
 #: js/activity.js:4684
 #: js/activity.js:4771
 #: js/activity.js:4821
 msgid "Cannot load project from the file. Please check the file type."
-msgstr ""
+msgstr "Impossibile caricare il progetto dal file. Controlla il tipo del file."
 
 #: js/activity.js:5051
 msgid "Invalid parameters"
-msgstr ""
+msgstr "Parametri non validi"
 
 #: js/turtle-singer.js:1334
 #.TRANS: partials are weighted components in a harmonic series
@@ -4113,7 +4113,7 @@ msgstr ""
 
 #: js/turtle-singer.js:2048
 msgid "synth cannot play chords."
-msgstr ""
+msgstr "il synth non può suonare accordi"
 
 #: js/lilypond.js:614
 msgid "brown rat"
@@ -4171,11 +4171,11 @@ msgstr ""
 #: js/SaveInterface.js:61
 #: js/SaveInterface.js:93
 msgid "Music Blocks Project"
-msgstr ""
+msgstr "Progetto Music Blocks"
 
 #: js/SaveInterface.js:63
 msgid "This project was created in Music Blocks"
-msgstr ""
+msgstr "Questo progetto è stato creato con Music Blocks"
 
 #: js/SaveInterface.js:67
 msgid "Music Blocks is a Free/Libre Software application."
@@ -4183,11 +4183,11 @@ msgstr ""
 
 #: js/SaveInterface.js:69
 msgid "The source code can be accessed at"
-msgstr ""
+msgstr "Il codice sorgente è accessibile a"
 
 #: js/SaveInterface.js:72
 msgid "For more information, please consult the"
-msgstr ""
+msgstr "Per altre informazioni, consulta il"
 
 #: js/SaveInterface.js:83
 msgid "Alternatively, open the file in Music Blocks using the Load project button."
@@ -4203,36 +4203,36 @@ msgstr ""
 
 #: js/SaveInterface.js:89
 msgid "Show"
-msgstr ""
+msgstr "Mostra"
 
 #: js/SaveInterface.js:91
 msgid "Hide"
-msgstr ""
+msgstr "Nascondi"
 
 #: js/SaveInterface.js:197
 #: js/SaveInterface.js:58
 msgid "No description provided"
-msgstr ""
+msgstr "Nessuna descrizione fornita"
 
 #: js/SaveInterface.js:332
 msgid "Your recording is in progress."
-msgstr ""
+msgstr "La registrazione è in corso"
 
 #: js/SaveInterface.js:401
 #.TRANS: File name prompt for save as Lilypond
 msgid "File name"
-msgstr ""
+msgstr "Nome del file"
 
 #: js/SaveInterface.js:403
 #: js/StringHelper.js:39
 #.TRANS: Project title prompt for save as Lilypond
 msgid "Project title"
-msgstr ""
+msgstr "Titolo del progetto"
 
 #: js/SaveInterface.js:405
 #.TRANS: Project title prompt for save as Lilypond
 msgid "Project author"
-msgstr ""
+msgstr "Autore del progetto"
 
 #: js/SaveInterface.js:407
 #.TRANS: MIDI prompt for save as Lilypond
@@ -4247,7 +4247,7 @@ msgstr ""
 #: js/SaveInterface.js:411
 #.TRANS: Lilypond is a scripting language for generating sheet music
 msgid "Save as Lilypond"
-msgstr ""
+msgstr "Salva come Lilypond"
 
 #: js/SaveInterface.js:426
 #: js/EnsembleBlocks.js:75
@@ -4269,11 +4269,11 @@ msgstr ""
 #: js/EnsembleBlocks.js:1280
 #.TRANS: default project author when saving as Lilypond
 msgid "Mr. Mouse"
-msgstr ""
+msgstr "Mr. Mouse"
 
 #: js/SaveInterface.js:573
 msgid "The Lilypond code is copied to clipboard. You can paste it here: "
-msgstr ""
+msgstr "Il codice Lilypond è stato copiato negli appunti. Puoi copiarlo qui: "
 
 #: js/RhythmBlockPaletteBlocks.js:50
 #: js/RhythmBlockPaletteBlocks.js:232
@@ -4300,31 +4300,31 @@ msgstr ""
 
 #: js/RhythmBlockPaletteBlocks.js:279
 msgid "1/64 note"
-msgstr ""
+msgstr "1/64 nota"
 
 #: js/RhythmBlockPaletteBlocks.js:303
 msgid "1/32 note"
-msgstr ""
+msgstr "1/32 nota"
 
 #: js/RhythmBlockPaletteBlocks.js:331
 msgid "1/16 note"
-msgstr ""
+msgstr "1/16 nota"
 
 #: js/RhythmBlockPaletteBlocks.js:359
 msgid "eighth note"
-msgstr ""
+msgstr "un ottavo di nota"
 
 #: js/RhythmBlockPaletteBlocks.js:387
 msgid "quarter note"
-msgstr ""
+msgstr "un quarto di nota"
 
 #: js/RhythmBlockPaletteBlocks.js:415
 msgid "half note"
-msgstr ""
+msgstr "mezza nota"
 
 #: js/RhythmBlockPaletteBlocks.js:443
 msgid "whole note"
-msgstr ""
+msgstr "nota intera"
 
 #: js/RhythmBlockPaletteBlocks.js:481
 #: js/RhythmBlockPaletteBlocks.js:550
@@ -4401,14 +4401,14 @@ msgstr ""
 #: js/WidgetBlocks.js:144
 #.TRANS: a filter removes some unwanted components from a signal
 msgid "filter"
-msgstr ""
+msgstr "filter"
 
 #: js/WidgetBlocks.js:149
 #: js/musicutils.js:706
 #: js/musicutils.js:1105
 #.TRANS: highpass filter
 msgid "highpass"
-msgstr ""
+msgstr "passa alto"
 
 #: js/WidgetBlocks.js:152
 #: js/ToneBlocks.js:42
@@ -4417,7 +4417,7 @@ msgstr ""
 #.TRANS: type of filter, e.g., lowpass, highpass, etc.
 #.TRANS: there are different types (sine, triangle, square...) of oscillators.
 msgid "type"
-msgstr ""
+msgstr "tipo"
 
 #: js/WidgetBlocks.js:154
 #: js/timbre.js:1818
@@ -4434,7 +4434,7 @@ msgstr ""
 #: js/temperament.js:1348
 #: js/timbre.js:1842
 msgid "frequency"
-msgstr ""
+msgstr "frequenza"
 
 #: js/WidgetBlocks.js:179
 #.TRANS: rolloff is the steepness of a change in frequency.
@@ -4453,7 +4453,7 @@ msgstr ""
 #: js/WidgetBlocks.js:284
 #.TRANS: the speed at music is should be played.
 msgid "sampler"
-msgstr ""
+msgstr "campionatore"
 
 #: js/WidgetBlocks.js:329
 #: js/WidgetBlocks.js:334
@@ -5316,7 +5316,7 @@ msgstr ""
 
 #: js/BooleanBlocks.js:320
 msgid "xor"
-msgstr ""
+msgstr "o esclusivo"
 
 #: js/BooleanBlocks.js:808
 msgid "The Equal block returns True if the two numbers are equal."
@@ -5328,12 +5328,12 @@ msgstr ""
 
 #: js/BooleanBlocks.js:1008
 msgid "The Boolean block is used to specify true or false."
-msgstr ""
+msgstr "Il blocco Booleano é usato per indicare vero o falso"
 
 #: js/MediaBlocks.js:35
 #.TRANS: right side of the screen
 msgid "right (screen)"
-msgstr ""
+msgstr "destra (schermo)"
 
 #: js/MediaBlocks.js:45
 #: js/MediaBlocks.js:56
@@ -5343,7 +5343,7 @@ msgstr ""
 #: js/MediaBlocks.js:97
 #.TRANS: left side of the screen
 msgid "left (screen)"
-msgstr ""
+msgstr "sinistra (schermo)"
 
 #: js/MediaBlocks.js:107
 #: js/MediaBlocks.js:118
@@ -5370,7 +5370,7 @@ msgstr ""
 
 #: js/MediaBlocks.js:282
 msgid "width"
-msgstr ""
+msgstr "larghezza"
 
 #: js/MediaBlocks.js:291
 msgid "The Width block returns the width of the canvas."
@@ -5378,7 +5378,7 @@ msgstr ""
 
 #: js/MediaBlocks.js:325
 msgid "height"
-msgstr ""
+msgstr "altezza"
 
 #: js/MediaBlocks.js:334
 msgid "The Height block returns the height of the canvas."
@@ -5421,7 +5421,7 @@ msgstr ""
 
 #: js/MediaBlocks.js:574
 msgid "video"
-msgstr ""
+msgstr "video"
 
 #: js/MediaBlocks.js:579
 msgid "The Video block selects video for use with the Show block."
@@ -5449,7 +5449,7 @@ msgstr ""
 
 #: js/MediaBlocks.js:692
 msgid "duration (ms)"
-msgstr ""
+msgstr "durata (ms)"
 
 #: js/MediaBlocks.js:728
 #.TRANS: translate a note into hertz, e.g., A4 -> 440HZ
@@ -5522,7 +5522,7 @@ msgstr ""
 
 #: js/ProgramBlocks.js:100
 msgid "404: Page not found"
-msgstr ""
+msgstr "404: Pagina non trovata"
 
 #: js/ProgramBlocks.js:133
 msgid "The Save-heap-to-app block saves the heap to a web page."
@@ -5579,13 +5579,13 @@ msgstr ""
 #: js/ProgramBlocks.js:372
 #.TRANS: load a dictionary from a file
 msgid "load dictionary"
-msgstr ""
+msgstr "carica dizionario"
 
 #: js/ProgramBlocks.js:390
 #: js/ProgramBlocks.js:658
 #: js/ToneBlocks.js:1025
 msgid "file"
-msgstr ""
+msgstr "file"
 
 #: js/ProgramBlocks.js:396
 #: js/ProgramBlocks.js:501
@@ -5595,7 +5595,7 @@ msgstr ""
 #: js/DictBlocks.js:216
 #: js/DictBlocks.js:290
 msgid "My Dictionary"
-msgstr ""
+msgstr "Mio Dizionario"
 
 #: js/ProgramBlocks.js:444
 msgid "The file you selected does not contain a valid dictionary."
@@ -5612,7 +5612,7 @@ msgstr ""
 #: js/ProgramBlocks.js:477
 #.TRANS: load a dictionary from a JSON
 msgid "set dictionary"
-msgstr ""
+msgstr "imposta dizionario"
 
 #: js/ProgramBlocks.js:546
 msgid "The block you selected does not contain a valid dictionary."
@@ -5646,7 +5646,7 @@ msgstr ""
 
 #: js/ProgramBlocks.js:727
 msgid "open palette"
-msgstr ""
+msgstr "apri tavolozza"
 
 #: js/ProgramBlocks.js:785
 msgid "The Delete block block removes a block."
@@ -7699,7 +7699,7 @@ msgstr ""
 
 #: js/ExtrasBlocks.js:274
 msgid "hide blocks"
-msgstr "nascondire blocchi"
+msgstr "nascondi blocchi"
 
 #: js/ExtrasBlocks.js:276
 msgid "The Hide blocks block hides the blocks."
@@ -10361,7 +10361,7 @@ msgstr "movimento in z"
 #: js/activity.js:2054
 
 #~msgid "Hide blocks."
-#~msgstr ""
+#~msgstr "Nascondi blocchi."
 
 #: js/activity.js:3319
 
