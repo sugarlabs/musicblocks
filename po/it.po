@@ -4504,7 +4504,7 @@ msgstr ""
 #: js/WidgetBlocks.js:623
 #: js/IntervalsBlocks.js:683
 msgid "arpeggio"
-msgstr ""
+msgstr "arpeggio"
 
 #: js/WidgetBlocks.js:677
 msgid "The Pitch drum matrix is used to map pitches to drum sounds."
@@ -10227,7 +10227,7 @@ msgstr "movimento in z"
 #: js/activity.js:1668
 
 #~msgid "hide Cartesian"
-#~msgstr ""
+#~msgstr "nascondi Cartesiano"
 
 #: js/notation.js:296
 
