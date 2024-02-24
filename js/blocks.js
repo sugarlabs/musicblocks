@@ -2185,6 +2185,9 @@ class Blocks {
             if (["textout", "anyout"].indexOf(type1) !== -1 && type2 === "textin") {
                 return true;
             }
+            if(type1 === "textout" &&type2==="numberin"){
+                return true;
+            }
             if (type1 === "booleanout" && type2 === "booleanin") {
                 return true;
             }
