@@ -319,8 +319,14 @@ class Block {
         this.offset = { x: 0, y: 0 };
     }
 
-    // Internal function for creating cache.
-    // Includes workaround for a race condition.
+    /**
+     * Internal function for creating cache with workaround for a race condition.
+     * @private
+     * @param {Function} callback - The callback function to execute after creating the cache.
+     * @param {Array} args - The arguments to pass to the callback function.
+     * @returns {Promise} - A promise that resolves when the cache is created successfully.
+     * @throws {Error} - Throws an error if cache creation fails after multiple attempts.
+     */
     _createCache(callback, args) {
         const that = this;
         return new Promise((resolve, reject) => {
@@ -359,8 +365,12 @@ class Block {
         });
     }
 
-    // Internal function for updating the cache.
-    // Includes workaround for a race condition.
+    /**
+     * Internal function for updating the cache with workaround for a race condition.
+     * @private
+     * @returns {Promise} - A promise that resolves when the cache is updated successfully.
+     * @throws {Error} - Throws an error if cache update fails after multiple attempts.
+     */
     updateCache() {
         const that = this;
         return new Promise((resolve, reject) => {
@@ -392,6 +402,10 @@ class Block {
         });
     }
 
+    /**
+     * Checks if the block should be ignored for certain operations.
+     * @returns {boolean} - Returns true if the block should be ignored, otherwise false.
+     */
     ignore() {
         if (this.bitmap === null) {
             return true;
@@ -445,22 +459,43 @@ class Block {
         return false;
     }
 
+    /**
+     * Checks if the block is off-screen based on the provided boundary.
+     * @param {object} boundary - The boundary object representing the canvas dimensions.
+     * @returns {boolean} - Returns true if the block is off-screen, otherwise false.
+     */
     offScreen(boundary) {
         return !this.trash && boundary.offScreen(this.container.x, this.container.y);
     }
 
+    /**
+     * Copies the size from the protoblock to the current block.
+     * @returns {void}
+     */
     copySize() {
         this.size = this.protoblock.size;
     }
 
+    /**
+     * Retrieves information about the block.
+     * @returns {string} - Information about the block.
+     */
     getInfo() {
         return this.name + " block";
     }
 
+    /**
+     * Checks if the block is collapsible.
+     * @returns {boolean} - Returns true if the block is collapsible, otherwise false.
+     */
     isCollapsible() {
         return COLLAPSIBLES.indexOf(this.name) !== -1;
     }
 
+    /**
+     * Checks if the block is inline collapsible.
+     * @returns {boolean} - Returns true if the block is inline collapsible, otherwise false.
+     */
     isInlineCollapsible() {
         return INLINECOLLAPSIBLES.indexOf(this.name) !== -1;
     }
