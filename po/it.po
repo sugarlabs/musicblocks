@@ -2273,7 +2273,7 @@ msgstr ""
 #: js/BooleanBlocks.js:1033
 #: js/SensorsBlocks.js:910
 msgid "true"
-msgstr ""
+msgstr "vero"
 
 #: js/blocks.js:2545
 #: js/blocks.js:3156
@@ -2290,7 +2290,7 @@ msgstr ""
 #: js/BooleanBlocks.js:950
 #: js/SensorsBlocks.js:912
 msgid "false"
-msgstr ""
+msgstr "falso"
 
 #: js/blocks.js:3183
 #: js/palette.js:574
@@ -2363,7 +2363,7 @@ msgstr "valore"
 
 #: js/blocks.js:4907
 msgid "There is no block selected."
-msgstr ""
+msgstr "Nessun blocco selezionato"
 
 #: js/blocks.js:5002
 #: js/MediaBlocks.js:888
@@ -2381,7 +2381,7 @@ msgstr ""
 #: js/sampler.js:693
 #.TRANS: The sound sample that the user uploads.
 msgid "sample"
-msgstr ""
+msgstr "Campione"
 
 #: js/turtles.js:874
 msgid "Grid"
@@ -2395,19 +2395,19 @@ msgstr "Pulire"
 #: js/turtles.js:912
 #: js/turtledefs.js:632
 msgid "Collapse"
-msgstr ""
+msgstr "Collassa"
 
 #: js/turtles.js:940
 msgid "Expand"
-msgstr ""
+msgstr "Espandi"
 
 #: js/languagebox.js:198
 msgid "Refresh your browser to change your language preference."
-msgstr ""
+msgstr "Ricarica il tuo browser per cambiare le preferenze di lingua."
 
 #: js/languagebox.js:218
 msgid "Music Blocks is already set to this language."
-msgstr ""
+msgstr "Music Blocks è già impostato su questa lingua."
 
 #: js/piemenus.js:200
 #: js/musicutils.js:808
@@ -2417,7 +2417,7 @@ msgstr ""
 #: js/sampler.js:544
 #.TRANS: double sharp is a music term related to pitch
 msgid "double sharp"
-msgstr ""
+msgstr "doppio diesis"
 
 #: js/piemenus.js:201
 #: js/PitchBlocks.js:1510
@@ -2430,7 +2430,7 @@ msgstr ""
 #.TRANS: sharp is a half-step up in pitch
 #.TRANS: sharp is a music term related to pitch
 msgid "sharp"
-msgstr ""
+msgstr "diesis"
 
 #: js/piemenus.js:202
 #: js/musicutils.js:804
@@ -2440,7 +2440,7 @@ msgstr ""
 #: js/sampler.js:546
 #.TRANS: natural is a music term related to pitch
 msgid "natural"
-msgstr ""
+msgstr "naturale"
 
 #: js/piemenus.js:203
 #: js/PitchBlocks.js:1469
@@ -2453,7 +2453,7 @@ msgstr ""
 #.TRANS: flat is a half-step down in pitch
 #.TRANS: flat is a music term related to pitch
 msgid "flat"
-msgstr ""
+msgstr "bemolle"
 
 #: js/piemenus.js:204
 #: js/musicutils.js:800
@@ -2463,7 +2463,7 @@ msgstr ""
 #: js/sampler.js:548
 #.TRANS: double flat is a music term related to pitch
 msgid "double flat"
-msgstr ""
+msgstr "doppio bemolle"
 
 #: js/piemenus.js:2861
 #: js/PitchBlocks.js:1357
@@ -2480,14 +2480,14 @@ msgstr ""
 #: js/musicutils.js:912
 #.TRANS: major is a music term related to intervals and mode
 msgid "major"
-msgstr ""
+msgstr "maggiore"
 
 #: js/piemenus.js:3015
 #: js/piemenus.js:3088
 #: js/musicutils.js:653
 #.TRANS: modal scale for music
 msgid "ionian"
-msgstr ""
+msgstr "ionica"
 
 #: js/piemenus.js:3017
 #: js/piemenus.js:3092
@@ -2496,37 +2496,37 @@ msgstr ""
 #: js/musicutils.js:909
 #.TRANS: minor is a music term related to intervals and mode
 msgid "minor"
-msgstr ""
+msgstr "minore"
 
 #: js/piemenus.js:3017
 #: js/piemenus.js:3092
 #: js/musicutils.js:663
 #.TRANS: modal scale for music
 msgid "aeolian"
-msgstr ""
+msgstr "eolica"
 
 #: js/piemenus.js:3407
 msgid "Duplicate"
-msgstr ""
+msgstr "Duplica"
 
 #: js/piemenus.js:3408
 #: js/turtledefs.js:534
 msgid "Extract"
-msgstr ""
+msgstr "Estrai"
 
 #: js/piemenus.js:3409
 msgid "Move to trash"
-msgstr ""
+msgstr "Sposta nel cestino"
 
 #: js/piemenus.js:3410
 #: js/timbre.js:968
 #: js/StringHelper.js:69
 msgid "Close"
-msgstr ""
+msgstr "Chiudi"
 
 #: js/piemenus.js:3416
 msgid "Save stack"
-msgstr ""
+msgstr "Salva pila"
 
 #: js/piemenus.js:3420
 #: js/toolbar.js:60
@@ -2562,15 +2562,15 @@ msgstr "Griglia"
 #: js/VolumeBlocks.js:502
 #: js/phrasemaker.js:823
 msgid "drum"
-msgstr ""
+msgstr "batteria"
 
 #: js/palette.js:580
 msgid "effect"
-msgstr ""
+msgstr "effetto"
 
 #: js/palette.js:586
 msgid "sargam"
-msgstr ""
+msgstr "sargam"
 
 #: js/palette.js:589
 #: js/activity.js:1833
@@ -2621,7 +2621,7 @@ msgstr ""
 #: js/palette.js:633
 #: js/PitchBlocks.js:405
 msgid "pitch converter"
-msgstr ""
+msgstr "convertitore di tonalità"
 
 #: js/rubrics.js:522
 #: js/turtledefs.js:119
@@ -2636,7 +2636,7 @@ msgstr ""
 #: js/rhythmruler.js:1830
 #.TRANS: an arrangement of notes based on duration
 msgid "rhythm"
-msgstr ""
+msgstr "ritmo"
 
 #: js/rubrics.js:523
 #: js/block.js:2339
@@ -2657,7 +2657,7 @@ msgstr ""
 #: js/turtledefs.js:123
 #: js/turtledefs.js:225
 msgid "tone"
-msgstr ""
+msgstr "tono"
 
 #: js/rubrics.js:525
 #: js/lilypond.js:613
@@ -2704,7 +2704,7 @@ msgstr "mezzi"
 
 #: js/rubrics.js:532
 msgid "mice"
-msgstr ""
+msgstr "topi"
 
 #: js/macros.js:711
 #: js/musicutils.js:783
@@ -2716,7 +2716,7 @@ msgstr ""
 #: js/toolbar.js:46
 #: js/toolbar.js:107
 msgid "About Music Blocks"
-msgstr ""
+msgstr "Informazioni su Music Blocks"
 
 #: js/toolbar.js:47
 #: js/toolbar.js:108
@@ -2782,7 +2782,7 @@ msgstr ""
 #: js/arpeggio.js:644
 #: js/arpeggio.js:646
 msgid "Play"
-msgstr ""
+msgstr "Suona"
 
 #: js/toolbar.js:48
 #: js/toolbar.js:109
@@ -2812,12 +2812,12 @@ msgstr "Interrompere"
 #: js/toolbar.js:230
 #: js/turtledefs.js:498
 msgid "Record"
-msgstr ""
+msgstr "Registra"
 
 #: js/toolbar.js:50
 #: js/toolbar.js:51
 msgid "Full screen"
-msgstr ""
+msgstr "Schermo intero"
 
 #: js/toolbar.js:52
 #: js/toolbar.js:112
@@ -2825,7 +2825,7 @@ msgstr ""
 #: js/toolbar.js:232
 #: js/turtledefs.js:504
 msgid "Toggle Fullscreen"
-msgstr ""
+msgstr "Attiva/Disattiva schermo intero"
 
 #: js/toolbar.js:53
 #: js/toolbar.js:113
@@ -2834,7 +2834,7 @@ msgstr ""
 #: js/turtledefs.js:510
 #: js/StringHelper.js:33
 msgid "New project"
-msgstr ""
+msgstr "Nuovo progetto"
 
 #: js/toolbar.js:54
 #: js/toolbar.js:114
@@ -2868,35 +2868,35 @@ msgstr "Salvare il progetto"
 #: js/toolbar.js:254
 #: js/toolbar.js:256
 msgid "Save project as HTML"
-msgstr ""
+msgstr "Salva progetto come HTML"
 
 #: js/toolbar.js:57
 #: js/toolbar.js:117
 #: js/toolbar.js:182
 #: js/toolbar.js:237
 msgid "Find and share projects"
-msgstr ""
+msgstr "Trova e condividi progetti"
 
 #: js/toolbar.js:58
 #: js/toolbar.js:118
 #: js/toolbar.js:183
 #: js/toolbar.js:238
 msgid "Offline. Sharing is unavailable"
-msgstr ""
+msgstr "Offline. La condivisione non è disponibile."
 
 #: js/toolbar.js:59
 #: js/toolbar.js:119
 #: js/toolbar.js:184
 #: js/toolbar.js:239
 msgid "Auxiliary menu"
-msgstr ""
+msgstr "Menu ausiliario"
 
 #: js/toolbar.js:61
 #: js/toolbar.js:121
 #: js/toolbar.js:186
 #: js/toolbar.js:241
 msgid "Run slowly"
-msgstr ""
+msgstr "Riproduzione lenta"
 
 #: js/toolbar.js:62
 #: js/toolbar.js:122
@@ -2912,14 +2912,14 @@ msgstr "Correre paso per paso"
 #: js/toolbar.js:243
 #: js/turtledefs.js:689
 msgid "Display statistics"
-msgstr ""
+msgstr "Mostra statistiche"
 
 #: js/toolbar.js:64
 #: js/toolbar.js:124
 #: js/toolbar.js:189
 #: js/toolbar.js:244
 msgid "Load plugin"
-msgstr ""
+msgstr "Carica plugin"
 
 #: js/toolbar.js:65
 #: js/toolbar.js:125
@@ -2927,21 +2927,21 @@ msgstr ""
 #: js/toolbar.js:245
 #: js/turtledefs.js:696
 msgid "Delete plugin"
-msgstr ""
+msgstr "Elimina plugin"
 
 #: js/toolbar.js:66
 #: js/toolbar.js:126
 #: js/toolbar.js:191
 #: js/toolbar.js:246
 msgid "Enable horizontal scrolling"
-msgstr ""
+msgstr "Abilita lo scrolling orizzontale"
 
 #: js/toolbar.js:67
 #: js/toolbar.js:127
 #: js/toolbar.js:192
 #: js/toolbar.js:247
 msgid "Disable horizontal scrolling"
-msgstr ""
+msgstr "Disabilita lo scrolling orizzontale"
 
 #: js/toolbar.js:68
 #: js/toolbar.js:128
@@ -2950,19 +2950,19 @@ msgstr ""
 #: js/LocalCard.js:54
 #: js/StringHelper.js:71
 msgid "Merge with current project"
-msgstr ""
+msgstr "Unisci con il progetto attuale"
 
 #: js/toolbar.js:69
 #: js/toolbar.js:129
 msgid "Set Pitch Preview"
-msgstr ""
+msgstr "Imposta anteprima tonalità"
 
 #: js/toolbar.js:70
 #: js/toolbar.js:130
 #: js/toolbar.js:194
 #: js/toolbar.js:249
 msgid "Toggle JavaScript Editor"
-msgstr ""
+msgstr "Abilita/disabilita Javascript Editor"
 
 #: js/toolbar.js:71
 #: js/toolbar.js:131
@@ -2970,21 +2970,21 @@ msgstr ""
 #: js/toolbar.js:250
 #: js/turtledefs.js:724
 msgid "Restore"
-msgstr ""
+msgstr "Ripristina"
 
 #: js/toolbar.js:72
 #: js/toolbar.js:132
 #: js/toolbar.js:196
 #: js/toolbar.js:251
 msgid "Switch to beginner mode"
-msgstr ""
+msgstr "Cambia alla modalità principiante"
 
 #: js/toolbar.js:73
 #: js/toolbar.js:133
 #: js/toolbar.js:197
 #: js/toolbar.js:252
 msgid "Switch to advanced mode"
-msgstr ""
+msgstr "Cambia alla modalità avanzata"
 
 #: js/toolbar.js:74
 #: js/toolbar.js:134
@@ -2993,42 +2993,42 @@ msgstr ""
 #: js/toolbar.js:253
 #: js/turtledefs.js:738
 msgid "Select language"
-msgstr ""
+msgstr "Seleziona lingua"
 
 #: js/toolbar.js:76
 #: js/toolbar.js:79
 #: js/toolbar.js:137
 #: js/turtledefs.js:579
 msgid "Save mouse artwork as PNG"
-msgstr ""
+msgstr "Salva l'illustrazione del topo come PNG"
 
 #: js/toolbar.js:78
 #: js/toolbar.js:136
 #: js/turtledefs.js:575
 msgid "Save mouse artwork as SVG"
-msgstr ""
+msgstr "Salva l'illustrazione del topo come SVG"
 
 #: js/toolbar.js:80
 #: js/toolbar.js:138
 #: js/turtledefs.js:583
 msgid "Save music as WAV"
-msgstr ""
+msgstr "Salva musica come WAV"
 
 #: js/toolbar.js:81
 #: js/toolbar.js:139
 #: js/turtledefs.js:587
 msgid "Save sheet music as ABC"
-msgstr ""
+msgstr "Salva la partitura come ABC"
 
 #: js/toolbar.js:82
 #: js/toolbar.js:140
 #: js/turtledefs.js:591
 msgid "Save sheet music as Lilypond"
-msgstr ""
+msgstr "Salva la partitura come Lilypond"
 
 #: js/toolbar.js:83
 msgid "Save sheet music as MusicXML"
-msgstr ""
+msgstr "Salva la partitura come MusicXML"
 
 #: js/toolbar.js:84
 #: js/toolbar.js:141
@@ -3038,7 +3038,7 @@ msgstr ""
 #: js/turtledefs.js:562
 #: js/turtledefs.js:595
 msgid "Save block artwork as SVG"
-msgstr ""
+msgstr "Salva l'illustrazione del blocco come SVG"
 
 #: js/toolbar.js:85
 #: js/toolbar.js:142
@@ -3046,130 +3046,130 @@ msgstr ""
 #: js/toolbar.js:205
 #: js/toolbar.js:260
 msgid "Confirm"
-msgstr ""
+msgstr "Conferma"
 
 #: js/toolbar.js:86
 #: js/toolbar.js:151
 #: js/toolbar.js:206
 #: js/toolbar.js:261
 msgid "English (United States)"
-msgstr ""
+msgstr "Inglese (Stati Uniti)"
 
 #: js/toolbar.js:87
 #: js/toolbar.js:152
 #: js/toolbar.js:207
 #: js/toolbar.js:262
 msgid "English (United Kingdom)"
-msgstr ""
+msgstr "Inglese (Regno Unito)"
 
 #: js/toolbar.js:88
 #: js/toolbar.js:153
 #: js/toolbar.js:208
 #: js/toolbar.js:263
 msgid "日本語"
-msgstr ""
+msgstr "Giapponese"
 
 #: js/toolbar.js:89
 msgid "한국어"
-msgstr ""
+msgstr "Coreano"
 
 #: js/toolbar.js:90
 #: js/toolbar.js:155
 #: js/toolbar.js:210
 #: js/toolbar.js:265
 msgid "español"
-msgstr ""
+msgstr "Spagnolo"
 
 #: js/toolbar.js:91
 #: js/toolbar.js:156
 #: js/toolbar.js:211
 #: js/toolbar.js:266
 msgid "português"
-msgstr ""
+msgstr "Portoghese"
 
 #: js/toolbar.js:92
 #: js/toolbar.js:157
 #: js/toolbar.js:212
 #: js/toolbar.js:267
 msgid "にほんご"
-msgstr ""
+msgstr "Giapponese"
 
 #: js/toolbar.js:93
 #: js/toolbar.js:158
 #: js/toolbar.js:213
 #: js/toolbar.js:268
 msgid "中文"
-msgstr ""
+msgstr "Cinese"
 
 #: js/toolbar.js:94
 #: js/toolbar.js:159
 #: js/toolbar.js:214
 #: js/toolbar.js:269
 msgid "ภาษาไทย"
-msgstr ""
+msgstr "Tailandese"
 
 #: js/toolbar.js:95
 #: js/toolbar.js:160
 #: js/toolbar.js:215
 #: js/toolbar.js:270
 msgid "aymara"
-msgstr ""
+msgstr "Aymara"
 
 #: js/toolbar.js:96
 #: js/toolbar.js:161
 #: js/toolbar.js:216
 #: js/toolbar.js:271
 msgid "quechua"
-msgstr ""
+msgstr "Quechua"
 
 #: js/toolbar.js:97
 #: js/toolbar.js:162
 #: js/toolbar.js:217
 #: js/toolbar.js:272
 msgid "guarani"
-msgstr ""
+msgstr "Guaraní"
 
 #: js/toolbar.js:98
 #: js/toolbar.js:163
 #: js/toolbar.js:218
 #: js/toolbar.js:273
 msgid "हिंदी"
-msgstr ""
+msgstr "Hindi"
 
 #: js/toolbar.js:99
 #: js/toolbar.js:165
 #: js/toolbar.js:219
 #: js/toolbar.js:275
 msgid "igbo"
-msgstr ""
+msgstr "Igbo"
 
 #: js/toolbar.js:100
 #: js/toolbar.js:166
 #: js/toolbar.js:220
 #: js/toolbar.js:276
 msgid "عربى"
-msgstr ""
+msgstr "Arabo"
 
 #: js/toolbar.js:101
 #: js/toolbar.js:164
 #: js/toolbar.js:221
 #: js/toolbar.js:274
 msgid "తెలుగు"
-msgstr ""
+msgstr "Telugu"
 
 #: js/toolbar.js:102
 #: js/toolbar.js:167
 #: js/toolbar.js:222
 #: js/toolbar.js:277
 msgid "עִברִית"
-msgstr ""
+msgstr "Ebraico"
 
 #: js/toolbar.js:111
 #: js/toolbar.js:175
 #: js/toolbar.js:176
 #: js/toolbar.js:231
 msgid "Full Screen"
-msgstr ""
+msgstr "Schermo Intero"
 
 #: js/toolbar.js:145
 #: js/toolbar.js:148
@@ -3179,25 +3179,25 @@ msgstr ""
 #: js/toolbar.js:258
 #: js/turtledefs.js:558
 msgid "Save turtle artwork as PNG"
-msgstr ""
+msgstr "Salva l'illustrazione della tartaruga come PNG"
 
 #: js/toolbar.js:147
 #: js/toolbar.js:202
 #: js/toolbar.js:257
 #: js/turtledefs.js:554
 msgid "Save turtle artwork as SVG"
-msgstr ""
+msgstr "Salva l'illustrazione della tartaruga come SVG"
 
 #: js/toolbar.js:154
 #: js/toolbar.js:209
 #: js/toolbar.js:264
 msgid "한국인"
-msgstr ""
+msgstr "coreano"
 
 #: js/toolbar.js:171
 #: js/toolbar.js:227
 msgid "About Turtle Blocks"
-msgstr ""
+msgstr "Informazioni su Turtle Blocks"
 
 #: js/toolbar.js:429
 #: js/toolbar.js:440
@@ -3216,7 +3216,7 @@ msgstr ""
 #: js/WidgetBlocks.js:1226
 #: plugins/rodi.rtp:324
 msgid "status"
-msgstr ""
+msgstr "stato"
 
 #: js/block.js:1484
 msgid "drum mapper"
@@ -3224,34 +3224,34 @@ msgstr ""
 
 #: js/block.js:1491
 msgid "ruler"
-msgstr ""
+msgstr "righello"
 
 #: js/block.js:1498
 #: js/WidgetBlocks.js:327
 #.TRANS: timbre is the character or quality of a musical sound
 msgid "timbre"
-msgstr ""
+msgstr "timbro"
 
 #: js/block.js:1505
 msgid "stair"
-msgstr ""
+msgstr "scala"
 
 #: js/block.js:1512
 #: js/WidgetBlocks.js:577
 #.TRANS: the speed at music is should be played.
 msgid "tempo"
-msgstr ""
+msgstr "tempo"
 
 #: js/block.js:1519
 #: js/block.js:1582
 #: js/IntervalsBlocks.js:1268
 #.TRANS: mode, e.g., Major in C Major
 msgid "mode"
-msgstr ""
+msgstr "modo"
 
 #: js/block.js:1526
 msgid "slider"
-msgstr ""
+msgstr "slider"
 
 #: js/block.js:1533
 #: js/SensorsBlocks.js:1001
@@ -3302,7 +3302,7 @@ msgstr ""
 #: js/block.js:1568
 #: js/RhythmBlocks.js:148
 msgid "milliseconds"
-msgstr ""
+msgstr "Millisecondi"
 
 #: js/block.js:2180
 #: js/block.js:2184
@@ -3313,7 +3313,7 @@ msgstr ""
 #: js/rhythmruler.js:834
 #: js/rhythmruler.js:961
 msgid "silence"
-msgstr ""
+msgstr "Silenzio"
 
 #: js/block.js:2265
 #: js/block.js:3134
@@ -3325,16 +3325,16 @@ msgstr ""
 #.TRANS: the note names must be separated by single spaces
 #.TRANS: the note names must be separated by single spaces
 msgid "ti la sol fa mi re do"
-msgstr ""
+msgstr "si la sol fa mi re do"
 
 #: js/block.js:2333
 #.TRANS: scalar step
 msgid "down"
-msgstr ""
+msgstr "giu"
 
 #: js/block.js:2334
 msgid "up"
-msgstr ""
+msgstr "su"
 
 #: js/block.js:3477
 #: js/block.js:3490
@@ -3373,17 +3373,17 @@ msgstr ""
 #: js/block.js:3495
 #: js/ExtrasBlocks.js:633
 msgid "mezzo-soprano"
-msgstr ""
+msgstr "mezzo-soprano"
 
 #: js/block.js:3496
 #: js/ExtrasBlocks.js:637
 msgid "alto"
-msgstr ""
+msgstr "alto"
 
 #: js/block.js:3497
 #: js/ExtrasBlocks.js:641
 msgid "tenor"
-msgstr ""
+msgstr "tenore"
 
 #: js/block.js:3498
 #: js/ExtrasBlocks.js:645
@@ -3391,19 +3391,19 @@ msgstr ""
 #: js/synthutils.js:64
 #.TRANS: musical instrument
 msgid "bass"
-msgstr ""
+msgstr "basso"
 
 #: js/block.js:4075
 msgid "Not a number"
-msgstr ""
+msgstr "Non un numero"
 
 #: js/block.js:4082
 msgid "Octave value must be between 1 and 10."
-msgstr ""
+msgstr "Il valore dell'ottava deve essere compreso tra 1 e 10"
 
 #: js/block.js:4090
 msgid "Numbers can have at most 10 digits."
-msgstr ""
+msgstr "I numeri possono avere al massimo 10 cifre"
 
 #: js/notation.js:353
 msgid "Lilypond cannot process pickup of "
@@ -3422,7 +3422,7 @@ msgstr ""
 #: js/turtledefs.js:118
 #: js/turtledefs.js:220
 msgid "search"
-msgstr ""
+msgstr "Cerca"
 
 #: js/turtledefs.js:120
 #: js/turtledefs.js:222
@@ -3435,7 +3435,7 @@ msgstr ""
 #: js/turtledefs.js:122
 #: js/turtledefs.js:224
 msgid "intervals"
-msgstr ""
+msgstr "intervalli"
 
 #: js/turtledefs.js:124
 #: js/turtledefs.js:226
@@ -3448,7 +3448,7 @@ msgstr ""
 #: js/VolumeBlocks.js:502
 #: js/VolumeBlocks.js:545
 msgid "volume"
-msgstr ""
+msgstr "volume"
 
 #: js/turtledefs.js:129
 #: js/turtledefs.js:231
@@ -3483,7 +3483,7 @@ msgstr ""
 #: js/ProgramBlocks.js:495
 #: js/DictBlocks.js:142
 msgid "dictionary"
-msgstr ""
+msgstr "dizionario"
 
 #: js/turtledefs.js:139
 #: js/turtledefs.js:241
@@ -3510,7 +3510,7 @@ msgstr ""
 #: js/turtledefs.js:185
 #: js/turtledefs.js:281
 msgid "artwork"
-msgstr ""
+msgstr "illustrazione"
 
 #: js/turtledefs.js:185
 #: js/turtledefs.js:281
@@ -3520,42 +3520,42 @@ msgstr "logica"
 #: js/turtledefs.js:185
 #: js/turtledefs.js:281
 msgid "music"
-msgstr ""
+msgstr "musica"
 
 #: js/turtledefs.js:187
 #: js/turtledefs.js:463
 msgid "Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way."
-msgstr ""
+msgstr "Music Blocks è una raccolta di strumenti per esplorare in modo divertente concetti musicali fondamentali."
 
 #: js/turtledefs.js:436
 msgid "Welcome to Turtle Blocks"
-msgstr ""
+msgstr "Benvenuto su Turtle Blocks"
 
 #: js/turtledefs.js:438
 #: js/turtledefs.js:465
 #: js/turtledefs.js:774
 #: js/turtledefs.js:805
 msgid "The current version is"
-msgstr ""
+msgstr "La versione attuale è:"
 
 #: js/turtledefs.js:446
 #: js/turtledefs.js:483
 msgid "Click the run button to run the project in fast mode."
-msgstr ""
+msgstr "Clicca sul pulsante di esecuzione per avviare il progetto in modalità veloce."
 
 #: js/turtledefs.js:452
 msgid "Stop the turtle."
-msgstr ""
+msgstr "Ferma la tartaruga."
 
 #: js/turtledefs.js:454
 #: js/turtledefs.js:491
 msgid "You can also type Alt-S to stop."
-msgstr ""
+msgstr "Puoi digitare Alt-S per interrompere"
 
 #: js/turtledefs.js:462
 #: js/help.js:333
 msgid "Welcome to Music Blocks"
-msgstr ""
+msgstr "Benvenuto su Music Blocks"
 
 #: js/turtledefs.js:472
 #: js/help.js:334
@@ -3564,50 +3564,50 @@ msgstr ""
 
 #: js/turtledefs.js:473
 msgid "Mr Mouse is our Music Blocks conductor."
-msgstr ""
+msgstr "Mr Mouse é il nostro conduttore di Music Blocks."
 
 #: js/turtledefs.js:475
 msgid "Mr Mouse encourages you to explore Music Blocks."
-msgstr ""
+msgstr "Mr Mouse ti incoraggia a esplorare Music Blocks"
 
 #: js/turtledefs.js:477
 msgid "Let us start our tour!"
-msgstr ""
+msgstr "Iniziamo il tour!"
 
 #: js/turtledefs.js:489
 msgid "Stop the music (and the mice)."
-msgstr ""
+msgstr "Ferma la musica (e i topi)"
 
 #: js/turtledefs.js:499
 msgid "Record your project as video."
-msgstr ""
+msgstr "Registra il tuo progetto come video."
 
 #: js/turtledefs.js:505
 msgid "Toggle Fullscreen mode."
-msgstr ""
+msgstr "Attiva/Disattiva modalità schermo intero."
 
 #: js/turtledefs.js:511
 msgid "Initialize a new project."
-msgstr ""
+msgstr "Inizializza un nuovo progetto"
 
 #: js/turtledefs.js:517
 msgid "You can also load projects from the file system."
-msgstr "Anche tu puoi aprire progetti dal filesystem."
+msgstr "Puoi anche aprire progetti dal filesystem."
 
 #: js/turtledefs.js:522
 #: js/StringHelper.js:46
 msgid "Delete"
-msgstr ""
+msgstr "Elimina"
 
 #: js/turtledefs.js:523
 msgid "To delete a block, just right-click on it, then you will be able to see the delete option"
-msgstr ""
+msgstr "Per eliminare un blocco, fai clic destro su di esso e quindi vedrai l'opzione di eliminazione."
 
 #: js/turtledefs.js:528
 #: js/activity.js:2270
 #: js/LocalCard.js:31
 msgid "Copy"
-msgstr ""
+msgstr "Copia"
 
 #: js/turtledefs.js:529
 msgid "To copy a block, just right-click on it, then you will be able to see the copy option"
@@ -3621,39 +3621,39 @@ msgstr ""
 #: js/turtledefs.js:552
 #: js/turtledefs.js:573
 msgid "Save your project to a file."
-msgstr ""
+msgstr "Salva il tuo progetto su un file."
 
 #: js/turtledefs.js:549
 #: js/turtledefs.js:570
 msgid "save"
-msgstr ""
+msgstr "salva"
 
 #: js/turtledefs.js:556
 #: js/turtledefs.js:577
 msgid "Save graphics from your project to as SVG."
-msgstr ""
+msgstr "Salva le grafiche del tuo progetto come file SVG."
 
 #: js/turtledefs.js:560
 #: js/turtledefs.js:581
 msgid "Save graphics from your project as PNG."
-msgstr ""
+msgstr "Salva le grafiche del tuo progetto come file PNG."
 
 #: js/turtledefs.js:564
 #: js/turtledefs.js:597
 msgid "Save block artwork as an SVG file."
-msgstr ""
+msgstr "Salva l'illustrazione dei blocchi come file SVG."
 
 #: js/turtledefs.js:585
 msgid "Save audio from your project as WAV."
-msgstr ""
+msgstr "Salva l'audio del tuo progetto come file WAV."
 
 #: js/turtledefs.js:589
 msgid "Save your project to as an ABC file."
-msgstr ""
+msgstr "Salva il tuo progetto come file ABC."
 
 #: js/turtledefs.js:593
 msgid "Save your project to as a Lilypond file."
-msgstr ""
+msgstr "Salva il tuo progetto come file Lilypond."
 
 #: js/turtledefs.js:604
 msgid "Load samples from server"
@@ -3720,20 +3720,20 @@ msgstr ""
 #: js/turtledefs.js:658
 #: js/activity.js:4265
 msgid "Decrease block size"
-msgstr ""
+msgstr "Diminuisci la dimensione del blocco"
 
 #: js/turtledefs.js:659
 msgid "Decrease the size of the blocks."
-msgstr ""
+msgstr "Diminuisci la dimensione dei blocchi"
 
 #: js/turtledefs.js:664
 #: js/activity.js:4267
 msgid "Increase block size"
-msgstr ""
+msgstr "Aumenta la dimensione del blocco"
 
 #: js/turtledefs.js:665
 msgid "Increase the size of the blocks."
-msgstr ""
+msgstr "Aumenta la dimensione dei blocchi"
 
 #: js/turtledefs.js:670
 msgid "Expand/collapse option toolbar"
@@ -3761,11 +3761,11 @@ msgstr ""
 
 #: js/turtledefs.js:697
 msgid "Delete a selected plugin."
-msgstr ""
+msgstr "Elimina un plugin selezionato"
 
 #: js/turtledefs.js:704
 msgid "Enable scrolling"
-msgstr ""
+msgstr "Abilita lo scrolling"
 
 #: js/turtledefs.js:705
 msgid "You can scroll the blocks on the canvas."
@@ -3793,15 +3793,15 @@ msgstr ""
 
 #: js/turtledefs.js:739
 msgid "Select your language preference."
-msgstr ""
+msgstr "Seleziona la lingua"
 
 #: js/turtledefs.js:745
 msgid "Keyboard shortcuts"
-msgstr ""
+msgstr "Scorciatoie da tastiera"
 
 #: js/turtledefs.js:746
 msgid "You can type d to create a do block and r to create a re block etc."
-msgstr ""
+msgstr "Puoi premere d per creare un blocco 'do' e premere r per creare un blocco 're' ecc..."
 
 #: js/turtledefs.js:753
 msgid "Show these messages."
@@ -3811,7 +3811,7 @@ msgstr "Mostrare questi messagi."
 #: js/turtledefs.js:790
 #: js/help.js:335
 msgid "Guide"
-msgstr ""
+msgstr "Guide"
 
 #: js/turtledefs.js:760
 msgid "A detailed guide to Turtle Blocks is available."
@@ -3819,85 +3819,85 @@ msgstr ""
 
 #: js/turtledefs.js:764
 msgid "Turtle Blocks Guide"
-msgstr ""
+msgstr "Turtle Blocks Guida"
 
 #: js/turtledefs.js:767
 #: js/turtledefs.js:798
 #: js/help.js:336
 msgid "About"
-msgstr ""
+msgstr "Informazioni"
 
 #: js/turtledefs.js:768
 msgid "Turtle Blocks is an open source collection of tools for exploring musical concepts."
-msgstr ""
+msgstr "Turtle Blocks è una raccolta di strumenti open source per esplorare concetti musicali."
 
 #: js/turtledefs.js:770
 msgid "A full list of contributors can be found in the Turtle Blocks GitHub repository."
-msgstr ""
+msgstr "Un elenco completo dei contributori può essere trovato nel repository di Turtle Blocks su GitHub."
 
 #: js/turtledefs.js:772
 msgid "Turtle Blocks is licensed under the AGPL."
-msgstr ""
+msgstr "Turtle Blocks è distribuito con licenza AGPL."
 
 #: js/turtledefs.js:780
 msgid "Turtle Blocks GitHub repository"
-msgstr ""
+msgstr "Repository GitHub di Turtle Blocks"
 
 #: js/turtledefs.js:783
 #: js/turtledefs.js:814
 #: js/help.js:337
 #: js/help.js:359
 msgid "Congratulations."
-msgstr "Felicitazioni."
+msgstr "Congratulazioni."
 
 #: js/turtledefs.js:784
 msgid "You have finished the tour. Please enjoy Turtle Blocks!"
-msgstr ""
+msgstr "Hai completato il tour. Ti auguro un buon divertimento con Turtle Blocks!"
 
 #: js/turtledefs.js:791
 msgid "A detailed guide to Music Blocks is available."
-msgstr ""
+msgstr "È disponibile una guida dettagliata su Music Blocks."
 
 #: js/turtledefs.js:795
 #: js/SaveInterface.js:76
 msgid "Music Blocks Guide"
-msgstr ""
+msgstr "Music Blocks Guida"
 
 #: js/turtledefs.js:799
 msgid "Music Blocks is an open source collection of tools for exploring musical concepts."
-msgstr ""
+msgstr "Music Blocks è una raccolta di strumenti open source per esplorare concetti musicali."
 
 #: js/turtledefs.js:801
 msgid "A full list of contributors can be found in the Music Blocks GitHub repository."
-msgstr ""
+msgstr "Un elenco completo dei contributori è disponibile nel repository di Music Blocks su GitHub."
 
 #: js/turtledefs.js:803
 msgid "Music Blocks is licensed under the AGPL."
-msgstr ""
+msgstr "Music Blocks è distribuito con licenza AGPL."
 
 #: js/turtledefs.js:811
 msgid "Music Blocks GitHub repository"
-msgstr ""
+msgstr "Repository GitHub di Music Blocks"
 
 #: js/turtledefs.js:815
 msgid "You have finished the tour. Please enjoy Music Blocks!"
-msgstr ""
+msgstr "Hai completato il tour. Ti auguro un buon divertimento con Music Blocks!"
 
 #: js/activity.js:369
 msgid "Search for blocks"
-msgstr ""
+msgstr "Cerca i blocchi"
 
 #: js/activity.js:1145
 msgid "Refresh your browser to change to advanced mode."
-msgstr ""
+msgstr "Aggiorna il tuo browser per passare alla modalità avanzata."
 
 #: js/activity.js:1150
 msgid "Refresh your browser to change to beginner mode."
-msgstr ""
+msgstr "Aggiorna il tuo browser per passare alla modalità principiante."
 
 #: js/activity.js:1184
 msgid "Catching mice"
-msgstr ""
+msgstr "Catturando topi"
 
 #: js/activity.js:1185
 msgid "Cleaning the instruments"
@@ -3913,7 +3913,7 @@ msgstr ""
 
 #: js/activity.js:1188
 msgid "Combining math and music"
-msgstr ""
+msgstr "Unendo matematica e musica"
 
 #: js/activity.js:1189
 msgid "Generating more blocks"
@@ -3921,7 +3921,7 @@ msgstr ""
 
 #: js/activity.js:1190
 msgid "Do Re Mi Fa Sol La Ti Do"
-msgstr ""
+msgstr "Do Re Mi Fa Sol La Si Do"
 
 #: js/activity.js:1191
 msgid "Tuning string instruments"
@@ -3929,11 +3929,11 @@ msgstr ""
 
 #: js/activity.js:1192
 msgid "Pressing random keys"
-msgstr ""
+msgstr "Premendo tasti a caso"
 
 #: js/activity.js:1351
 msgid "plugins will be removed upon restart."
-msgstr ""
+msgstr "I plugin verranno rimossi al riavvio."
 
 #: js/activity.js:1360
 msgid "show Cartesian"
@@ -4558,11 +4558,11 @@ msgstr ""
 
 #: js/WidgetBlocks.js:1036
 msgid "G major scale"
-msgstr ""
+msgstr "scala di Sol maggiore"
 
 #: js/WidgetBlocks.js:1064
 msgid "C major scale"
-msgstr ""
+msgstr "scala di Do maggiore"
 
 #: js/WidgetBlocks.js:1097
 msgid "The Phrase Maker block opens a tool to create musical phrases."
@@ -4598,7 +4598,7 @@ msgstr ""
 #: js/ToneBlocks.js:1025
 #.TRANS: adjusts the shift up or down by one octave (twelve half-steps in the interval between two notes, one having twice or half the frequency in Hz of the other.)
 msgid "octave"
-msgstr ""
+msgstr "ottava"
 
 #: js/IntervalsBlocks.js:99
 msgid "The Temperament name block is used to select a tuning method."
@@ -4644,7 +4644,7 @@ msgstr ""
 
 #: js/IntervalsBlocks.js:621
 msgid "In the figure, we add sol# to sol."
-msgstr ""
+msgstr "Nella figura, aggiungiamo sol# al sol"
 
 #: js/IntervalsBlocks.js:627
 #: js/OrnamentBlocks.js:220
@@ -4662,11 +4662,11 @@ msgstr ""
 
 #: js/IntervalsBlocks.js:737
 msgid "In the figure, we generate a C-major chord."
-msgstr ""
+msgstr "Nella figura, stiamo generando un accordo di Do-Maggiore"
 
 #: js/IntervalsBlocks.js:742
 msgid "chord"
-msgstr ""
+msgstr "accordo"
 
 #: js/IntervalsBlocks.js:794
 msgid "The Ratio Interval block calculates an interval based on a ratio."
@@ -4986,7 +4986,7 @@ msgstr ""
 
 #: js/EnsembleBlocks.js:282
 msgid "Cannot find start block"
-msgstr ""
+msgstr "Impossibile trovare il blocco iniziale"
 
 #: js/EnsembleBlocks.js:292
 #.TRANS: pen color for this mouse
@@ -9542,7 +9542,7 @@ msgstr "movimento in z"
 #: js/toolbar.js:204
 
 #~msgid "FullScreen"
-#~msgstr ""
+#~msgstr "Schermo intero"
 
 #: js/turtledefs.js:506
 
@@ -9885,17 +9885,17 @@ msgstr "movimento in z"
 #: js/GlobalCard.js:48
 
 #~msgid "More Details"
-#~msgstr ""
+#~msgstr "Più dettagli"
 
 #: js/GlobalCard.js:54
 
 #~msgid "Share project"
-#~msgstr ""
+#~msgstr "Condividi progetto"
 
 #: js/GlobalCard.js:60
 
 #~msgid "Copy link to clipboard"
-#~msgstr ""
+#~msgstr "Copia il link negli appunti"
 
 #: js/GlobalCard.js:63
 
@@ -9915,7 +9915,7 @@ msgstr "movimento in z"
 #: js/GlobalCard.js:70
 
 #~msgid "Advanced Options"
-#~msgstr ""
+#~msgstr "Opzioni Avanzate"
 
 #: js/PitchBlocks.js:1540
 
@@ -10021,17 +10021,17 @@ msgstr "movimento in z"
 #: js/toolbar.js:197
 
 #~msgid "Auxilary menu"
-#~msgstr ""
+#~msgstr "Menu ausiliario"
 
 #: js/SaveInterface.js:47
 
 #~msgid "To run this project, open Music Blocks in a web browser and drag and drop this file into the browser window."
-#~msgstr ""
+#~msgstr "Per eseguire questo progetto, apri Music Blocks in un browser web e trascina e rilascia questo file nella finestra del browser."
 
 #: js/blocks.js:6143
 
 #~msgid "You must always have at least one start block."
-#~msgstr ""
+#~msgstr "Devi sempre avere almeno un blocco di inizio."
 
 #: js/sampler.js:406
 
@@ -10056,12 +10056,12 @@ msgstr "movimento in z"
 #: js/sampler.js:441
 
 #~msgid "octave up"
-#~msgstr ""
+#~msgstr "ottava su"
 
 #: js/sampler.js:451
 
 #~msgid "octave down"
-#~msgstr ""
+#~msgstr "ottava giú"
 
 #: plugins/finance.rtp:28
 
@@ -10121,7 +10121,7 @@ msgstr "movimento in z"
 #: plugins/gmap.rtp:107
 
 #~msgid "Coordinate data not available."
-#~msgstr ""
+#~msgstr "Coordinate non disponibili"
 
 #: plugins/gmap.rtp:116
 
@@ -10180,7 +10180,7 @@ msgstr "movimento in z"
 #: plugins/heap.rtp:85
 
 #~msgid "You need to select a file."
-#~msgstr ""
+#~msgstr "Devi selezionare un file."
 
 #: js/activity.js:1618
 
@@ -10197,7 +10197,7 @@ msgstr "movimento in z"
 #: js/activity.js:1652
 
 #~msgid "show bass"
-#~msgstr ""
+#~msgstr "mostra basso"
 
 #: js/activity.js:1637
 
@@ -10212,12 +10212,12 @@ msgstr "movimento in z"
 #: js/activity.js:1647
 
 #~msgid "show tenor"
-#~msgstr ""
+#~msgstr "mostra tenote"
 
 #: js/activity.js:1657
 
 #~msgid "hide bass"
-#~msgstr ""
+#~msgstr "nascondi basso"
 
 #: js/activity.js:1664
 
@@ -10423,7 +10423,7 @@ msgstr "movimento in z"
 #: js/turtledefs.js:257
 
 #~msgid "Click this button to expand or collapse the auxiliary toolbar."
-#~msgstr ""
+#~msgstr "Clicca su questo pulsante per espandere o comprimere la barra degli strumenti ausiliari."
 
 #: js/turtledefs.js:286
 
@@ -10537,14 +10537,14 @@ msgstr "movimento in z"
 #: js/basicblocks.js:4057
 
 #~msgid "100"
-#~msgstr ""
+#~msgstr "100"
 
 #: js/basicblocks.js:5143
 
 #: js/basicblocks.js:5159
 
 #~msgid "Music Blocks"
-#~msgstr ""
+#~msgstr "Music Blocks"
 
 #: js/playback.js:87
 
@@ -10561,7 +10561,7 @@ msgstr "movimento in z"
 #: js/modewidget.js:132
 
 #~msgid "Drag"
-#~msgstr ""
+#~msgstr "Trascina"
 
 #: js/playbackbox.js:83
 
@@ -10634,7 +10634,7 @@ msgstr "movimento in z"
 #: js/rhythmruler.js:1711
 
 #~msgid "expand"
-#~msgstr ""
+#~msgstr "espandi"
 
 #: js/pitchtimematrix.js:338
 
@@ -10685,7 +10685,7 @@ msgstr "movimento in z"
 #: js/turtledefs.js:132
 
 #~msgid "Initialise a new project."
-#~msgstr ""
+#~msgstr "Inizializza un nuovo progetto"
 
 #: js/turtledefs.js:29
 
@@ -10722,7 +10722,7 @@ msgstr "movimento in z"
 #: js/pitchstaircase.js:534
 
 #~msgid "undo"
-#~msgstr ""
+#~msgstr "annulla"
 
 #: js/basicblocks.js:2464
 
@@ -10761,7 +10761,7 @@ msgstr "movimento in z"
 #: js/basicblocks.js:3151
 
 #~msgid "set volume"
-#~msgstr ""
+#~msgstr "imposta volume"
 
 #: js/turtledefs.js:366
 
@@ -10829,7 +10829,7 @@ msgstr "movimento in z"
 #: js/basicblocks.js:612
 
 #~msgid "fifths"
-#~msgstr ""
+#~msgstr "quinte"
 
 #: js/lilypond.js:21
 
@@ -10841,7 +10841,7 @@ msgstr "movimento in z"
 #: js/palette.js:1796
 
 #~msgid "mi"
-#~msgstr ""
+#~msgstr "mi"
 
 #: js/turtledefs.js:251
 
@@ -10885,7 +10885,7 @@ msgstr "movimento in z"
 #~msgstr ""
 
 #~msgid "eatme"
-#~msgstr "mangiame"
+#~msgstr "mangiami"
 
 #: js/turtledefs.js:323
 
@@ -10895,7 +10895,7 @@ msgstr "movimento in z"
 #: js/basicblocks.js:1946
 
 #~msgid "movable"
-#~msgstr ""
+#~msgstr "mobile"
 
 #: js/turtledefs.js:29
 
@@ -10907,7 +10907,7 @@ msgstr "movimento in z"
 #: js/musicutils.js:251
 
 #~msgid "Japanese"
-#~msgstr ""
+#~msgstr "Giapponese"
 
 #: js/synthutils.js:90
 
@@ -10917,7 +10917,7 @@ msgstr "movimento in z"
 #: js/activity.js:1216
 
 #~msgid "Hide grid"
-#~msgstr ""
+#~msgstr "Nascondi griglia"
 
 #: js/turtledefs.js:358
 
@@ -10947,7 +10947,7 @@ msgstr "movimento in z"
 #: js/help.js:53
 
 #~msgid "Previous page"
-#~msgstr ""
+#~msgstr "Pagina Precedente"
 
 #: js/turtledefs.js:458
 
@@ -10967,7 +10967,7 @@ msgstr "movimento in z"
 #: js/timbre.js:682
 
 #~msgid "effects"
-#~msgstr ""
+#~msgstr "effetti"
 
 #: js/turtledefs.js:29
 
@@ -10982,7 +10982,7 @@ msgstr "movimento in z"
 #: js/savebox.js:129
 
 #~msgid "Share on Facebook"
-#~msgstr ""
+#~msgstr "Condividi su Facebook"
 
 #: js/turtledefs.js:452
 
@@ -10997,7 +10997,7 @@ msgstr "movimento in z"
 #: js/turtledefs.js:76
 
 #~msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore Music Blocks. Let us start our tour!"
-#~msgstr ""
+#~msgstr "Il Signor Mouse è il nostro direttore di Music Blocks. Il Signor Mouse ti incoraggia ad esplorare Music Blocks. Iniziamo il nostro tour!"
 
 #: js/palette.js:1771
 
@@ -11019,12 +11019,12 @@ msgstr "movimento in z"
 #: js/turtledefs.js:220
 
 #~msgid "e.g., C Major"
-#~msgstr ""
+#~msgstr "per esempio, C Maggiore"
 
 #: js/activity.js:3743
 
 #~msgid "extra-long press to run music slowly"
-#~msgstr ""
+#~msgstr "Tieni premuto per eseguire la musica lentamente."
 
 #: js/rhythmruler.js:1442
 
@@ -11049,7 +11049,7 @@ msgstr "movimento in z"
 #: js/turtledefs.js:185
 
 #~msgid "To copy a stack to the clipboard, right-click on the stack."
-#~msgstr ""
+#~msgstr "Per copiare una pila negli appunti, fai clic destro sulla pila."
 
 #: js/turtledefs.js:462
 
@@ -11061,7 +11061,7 @@ msgstr "movimento in z"
 #: js/toolbar.js:390
 
 #~msgid "Save as abc"
-#~msgstr ""
+#~msgstr "Salva come abc"
 
 #: js/turtledefs.js:456
 
@@ -11078,7 +11078,7 @@ msgstr "movimento in z"
 #: js/turtledefs.js:189
 
 #~msgid "Open a panel for configuring Music Blocks."
-#~msgstr ""
+#~msgstr "Apri un pannello per configurare Music Blocks"
 
 #: js/turtledefs.js:407
 
@@ -11088,7 +11088,7 @@ msgstr "movimento in z"
 #: js/activity.js:3533
 
 #~msgid "Save as .wav"
-#~msgstr ""
+#~msgstr "Salva come .wav"
 
 #: js/savebox.js:113
 
@@ -11133,12 +11133,12 @@ msgstr "movimento in z"
 #: js/musicutils.js:248
 
 #~msgid "Egyptian"
-#~msgstr ""
+#~msgstr "Egiziano"
 
 #: js/turtledefs.js:186
 
 #~msgid "The paste button is enabled when there are blocks copied onto the clipboard."
-#~msgstr ""
+#~msgstr "Il pulsante di incolla è abilitato quando ci sono blocchi copiati negli appunti."
 
 #: js/musicutils.js:198
 
@@ -11148,7 +11148,7 @@ msgstr "movimento in z"
 #: js/basicblocks.js:831
 
 #~msgid "denominator"
-#~msgstr ""
+#~msgstr "denominatore"
 
 #: js/turtledefs.js:426
 
@@ -11217,7 +11217,7 @@ msgstr "movimento in z"
 #: js/turtledefs.js:180
 
 #~msgid "New Project"
-#~msgstr ""
+#~msgstr "Nuovo Progetto"
 
 #: js/activity.js:4395
 
@@ -11234,7 +11234,7 @@ msgstr "movimento in z"
 #: js/turtledefs.js:189
 
 #~msgid "Settings"
-#~msgstr ""
+#~msgstr "Impostazioni"
 
 #: js/turtledefs.js:409
 
@@ -11261,7 +11261,7 @@ msgstr "movimento in z"
 #: js/pitchslider.js:394
 
 #~msgid "move down"
-#~msgstr ""
+#~msgstr "muovi giú"
 
 #: js/basicblocks.js:153
 
@@ -11318,12 +11318,12 @@ msgstr "movimento in z"
 #: js/musicutils.js:253
 
 #~msgid "Fibonacci"
-#~msgstr ""
+#~msgstr "Fibonacci"
 
 #: js/activity.js:4425
 
 #~msgid "Run music slowly"
-#~msgstr ""
+#~msgstr "Suona musica lentamente"
 
 #: js/turtledefs.js:447
 
@@ -11572,7 +11572,7 @@ msgstr "movimento in z"
 #: js/turtledefs.js:205
 
 #~msgid "Pitch can be specified in terms of <em>do re mi fa sol la ti<em>."
-#~msgstr ""
+#~msgstr "La tonalità può essere specificata in termini di <em>do re mi fa sol la si</em>."
 
 #: js/turtledefs.js:292
 
@@ -11657,7 +11657,7 @@ msgstr "movimento in z"
 #: js/pitchstaircase.js:475
 
 #~msgid "play chord"
-#~msgstr ""
+#~msgstr "Suona accordo"
 
 #: js/utilitybox.js:154
 
@@ -11688,7 +11688,7 @@ msgstr "movimento in z"
 #: js/turtledefs.js:200
 
 #~msgid "Music Blocks is an open source collection of tools for exploring musical concepts. A full list of contributors can be found in the Music Blocks GitHub repository. Music Blocks is licensed under the AGPL. The current version is:"
-#~msgstr ""
+#~msgstr "Music Blocks è una raccolta di strumenti open source per esplorare concetti musicali. Un elenco completo dei contributori è disponibile nel repository di Music Blocks su GitHub. Music Blocks è distribuito con licenza AGPL. La versione attuale è:"
 
 #: js/basicblocks.js:596
 
@@ -12242,7 +12242,7 @@ msgstr "movimento in z"
 #: js/turtledefs.js:200
 
 #~msgid "Music Blocks is an open source collection of tools for exploring musical concepts. A full list of contributors can be found in the Music Blocks GitHub repository. Music Blocks is licensed under the AGPL. The current version is:' + ' ' + VERSION), 'images/logo.svg', 'https://github.com/sugarlabs/musicblocks', "
-#~msgstr ""
+#~msgstr "Music Blocks è una raccolta di strumenti open source per esplorare concetti musicali. Un elenco completo dei contributori è disponibile nel repository di Music Blocks su GitHub. Music Blocks è distribuito con licenza AGPL. La versione attuale è:' + ' ' + VERSION), 'images/logo.svg', 'https://github.com/sugarlabs/musicblocks', "
 
 #: js/lilypond.js:21
 
@@ -13281,7 +13281,7 @@ msgstr "movimento in z"
 #: js/activity.js:3541
 
 #~msgid "Save as .abc"
-#~msgstr ""
+#~msgstr "Salva come .abc"
 
 #: js/logo.js:10269
 
@@ -13311,7 +13311,7 @@ msgstr "movimento in z"
 #: js/musicutils.js:247
 
 #~msgid "Chinese"
-#~msgstr ""
+#~msgstr "Cinese"
 
 #: js/turtledefs.js:165
 
@@ -13327,7 +13327,7 @@ msgstr "movimento in z"
 #: js/samplesviewer.js:115
 
 #~msgid "Download"
-#~msgstr ""
+#~msgstr "Scarica"
 
 #: js/synthutils.js:82
 
@@ -13367,7 +13367,7 @@ msgstr "movimento in z"
 #: js/toolbar.js:386
 
 #~msgid "Save as svg"
-#~msgstr ""
+#~msgstr "Salva come svg"
 
 #: plugins/impact.rtp:122
 
@@ -13382,7 +13382,7 @@ msgstr "movimento in z"
 #: js/timbre.js:727
 
 #~msgid "add filter"
-#~msgstr ""
+#~msgstr "aggiungi filtro"
 
 #: js/logo.js:2688
 
@@ -13392,12 +13392,12 @@ msgstr "movimento in z"
 #: js/turtledefs.js:98
 
 #~msgid "You can also use Alt+C to copy a stack of blocks. "
-#~msgstr ""
+#~msgstr "Puoi anche utilizzare Alt+C per copiare una pila di blocchi."
 
 #: js/activity.js:3523
 
 #~msgid "Show/hide palettes"
-#~msgstr "Mostrare/nascondire tavolozze"
+#~msgstr "Mostrare/nascondere tavolozze"
 
 #: js/activity.js:3066
 
@@ -13435,7 +13435,7 @@ msgstr "movimento in z"
 #: js/turtledefs.js:99
 
 #~msgid "You can also use Alt+P to paste a stack of blocks. "
-#~msgstr ""
+#~msgstr "Puoi anche usare Alt+P per incollare una pila di blocchi."
 
 #: js/musicutils.js:291
 
@@ -13494,7 +13494,7 @@ msgstr "movimento in z"
 #: js/musicutils.js:246
 
 #~msgid "Pentatonic"
-#~msgstr ""
+#~msgstr "Pentatonica"
 
 #: js/turtledefs.js:372
 
@@ -13539,7 +13539,7 @@ msgstr "movimento in z"
 #: js/samplesviewer.js:84
 
 #~msgid "Advanced options"
-#~msgstr ""
+#~msgstr "Opzioni avanzate"
 
 #: js/turtledefs.js:394
 
@@ -13563,7 +13563,7 @@ msgstr "movimento in z"
 #: js/toolbar.js:425
 
 #~msgid "Save sheet music"
-#~msgstr ""
+#~msgstr "Salva la partitura."
 
 #: js/turtledefs.js:29
 
@@ -13625,14 +13625,14 @@ msgstr "movimento in z"
 #: js/help.js:72
 
 #~msgid "Next page"
-#~msgstr ""
+#~msgstr "Pagina successiva"
 
 #: js/activity.js:3859
 
 #: js/activity.js:3870
 
 #~msgid "Long press on blocks to copy."
-#~msgstr ""
+#~msgstr "Tieni premuto sui blocchi per copiarli."
 
 #: js/turtledefs.js:351
 
@@ -13725,21 +13725,21 @@ msgstr "movimento in z"
 #: js/turtledefs.js:185
 
 #~msgid "You can also use Alt+C to copy a stack of blocks."
-#~msgstr ""
+#~msgstr "Puoi anche utilizzare Alt+C per copiare una pila di blocchi."
 
 #: js/turtledefs.js:29
 
 #: js/musicutils.js:287
 
 #~msgid "natural-minor"
-#~msgstr ""
+#~msgstr "minore naturale"
 
 #: js/activity.js:4437
 
 #: js/activity.js:4472
 
 #~msgid "Click here to paste"
-#~msgstr ""
+#~msgstr "Clicca qui per incollare"
 
 #~msgid "This button opens and closes the primary toolbar."
 #~msgstr "Questo pulsante apre e chiude la barra di strumenti principali."
@@ -13774,12 +13774,12 @@ msgstr "movimento in z"
 #: js/temperament.js:1621
 
 #~msgid "table"
-#~msgstr ""
+#~msgstr "tabella"
 
 #: js/savebox.js:116
 
 #~msgid "Save as .tb"
-#~msgstr ""
+#~msgstr "Salva come .tb"
 
 #: js/lilypond.js:21
 
@@ -13849,7 +13849,7 @@ msgstr "movimento in z"
 #: js/samplesviewer.js:699
 
 #~msgid "On my device"
-#~msgstr ""
+#~msgstr "Sul mio dispositivo"
 
 #: js/turtledefs.js:432
 
@@ -13893,7 +13893,7 @@ msgstr "movimento in z"
 #: js/turtledefs.js:359
 
 #~msgid "eg guitar, piano, violin, or cello."
-#~msgstr ""
+#~msgstr "per esempio chitarra, piano, violino o violoncello"
 
 #: js/turtledefs.js:29
 
@@ -13925,7 +13925,7 @@ msgstr "movimento in z"
 #: js/pitchtimematrix.js:198
 
 #~msgid "export"
-#~msgstr ""
+#~msgstr "esporta"
 
 #: js/turtledefs.js:402
 
@@ -13964,12 +13964,12 @@ msgstr "movimento in z"
 #: js/toolbar.js:424
 
 #~msgid "Save as ABC"
-#~msgstr ""
+#~msgstr "Salva come ABC"
 
 #: js/timbre.js:591
 
 #~msgid "synthesizer"
-#~msgstr ""
+#~msgstr "sintetizzatore"
 
 #: js/logo.js:630
 
@@ -13978,7 +13978,7 @@ msgstr "movimento in z"
 #: js/musicutils.js:205
 
 #~msgid "Major"
-#~msgstr ""
+#~msgstr "Maggiore"
 
 #: js/turtledefs.js:425
 
@@ -14003,7 +14003,7 @@ msgstr "movimento in z"
 #: js/utilitybox.js:281
 
 #~msgid "Disable scrolling"
-#~msgstr ""
+#~msgstr "Disabilita lo scrolling"
 
 #: js/turtledefs.js:425
 
@@ -14058,5 +14058,5 @@ msgstr "movimento in z"
 #: js/musicutils.js:201
 
 #~msgid "Spanish"
-#~msgstr ""
+#~msgstr "Spagnolo"
 
