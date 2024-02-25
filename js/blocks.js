@@ -2176,16 +2176,13 @@ class Blocks {
             if (type1 === "numberin" && ["numberout", "anyout"].indexOf(type2) !== -1) {
                 return true;
             }
-            if (["numberout", "anyout","textout"].indexOf(type1) !== -1 && type2 === "numberin") {
+            if (["numberout", "anyout"].indexOf(type1) !== -1 && type2 === "numberin") {
                 return true;
             }
             if (type1 === "textin" && ["textout", "anyout"].indexOf(type2) !== -1) {
                 return true;
             }
             if (["textout", "anyout"].indexOf(type1) !== -1 && type2 === "textin") {
-                return true;
-            }
-            if(type1 === "textout" &&type2==="numberin"){
                 return true;
             }
             if (type1 === "booleanout" && type2 === "booleanin") {
