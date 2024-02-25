@@ -1007,7 +1007,11 @@ class Block {
         const thisBlock = this.blocks.blockList.indexOf(this);
         let block_label = "";
 
-        // Create the highlight bitmap for the block.
+        /**
+         * Processes and creates various bitmaps for the block.
+         * @param {PIXI.Bitmap} bitmap - The bitmap to process.
+         * @param {object} that - Reference to the current object.
+         */
         const __processHighlightBitmap = (bitmap, that) => {
             if (that.highlightBitmap != null) {
                 that.container.removeChild(that.highlightBitmap);
@@ -1068,7 +1072,11 @@ class Block {
             that._createCache(__callback, firstTime);
         };
 
-        // Create the disconnect highlight bitmap for the block.
+        /**
+         * Processes and creates the disconnect highlight bitmap for the block.
+         * @param {PIXI.Bitmap} bitmap - The bitmap to process.
+         * @param {object} that - Reference to the current object.
+         */
         const __processDisconnectedHighlightBitmap = (bitmap, that) => {
             if (that.disconnectedHighlightBitmap != null) {
                 that.container.removeChild(that.disconnectedHighlightBitmap);
@@ -1104,7 +1112,11 @@ class Block {
             _blockMakeBitmap(artwork, __processHighlightBitmap, that);
         };
 
-        // Create the disconnect bitmap for the block.
+        /**
+         * Processes and creates the disconnect bitmap for the block.
+         * @param {PIXI.Bitmap} bitmap - The bitmap to process.
+         * @param {object} that - Reference to the current object.
+         */
         const __processDisconnectedBitmap = (bitmap, that) => {
             if (that.disconnectedBitmap != null) {
                 that.container.removeChild(that.disconnectedBitmap);
@@ -1143,7 +1155,11 @@ class Block {
             _blockMakeBitmap(artwork, __processDisconnectedHighlightBitmap, that);
         };
 
-        // Create the bitmap for the block.
+        /**
+         * Processes and creates the bitmap for the block.
+         * @param {PIXI.Bitmap} bitmap - The bitmap to process.
+         * @param {object} that - Reference to the current object.
+         */
         const __processBitmap = (bitmap, that) => {
             if (that.bitmap != null) {
                 that.container.removeChild(that.bitmap);
@@ -1874,27 +1890,50 @@ class Block {
         }
     }
 
-    // Utility functions
+    /**
+     * Checks if the block is a value block.
+     * @returns {boolean} - True if the block is a value block, false otherwise.
+     */
     isValueBlock() {
         return this.protoblock.style === "value";
     }
 
+    /**
+     * Checks if the block is a no-hit block.
+     * @returns {boolean} - True if the block is a no-hit block, false otherwise.
+     */
     isNoHitBlock() {
         return NOHIT.indexOf(this.name) !== -1;
     }
 
+    /**
+     * Checks if the block is an argument block.
+     * @returns {boolean} - True if the block is an argument block, false otherwise.
+     */
     isArgBlock() {
         return this.protoblock.style === "value" || this.protoblock.style === "arg";
     }
 
+    /**
+     * Checks if the block is a two-argument block.
+     * @returns {boolean} - True if the block is a two-argument block, false otherwise.
+     */
     isTwoArgBlock() {
         return this.protoblock.style === "twoarg";
     }
 
+    /**
+     * Checks if the block is a two-argument boolean block.
+     * @returns {boolean} - True if the block is a two-argument boolean block, false otherwise.
+     */
     isTwoArgBooleanBlock() {
         return ["equal", "greater", "less"].indexOf(this.name) !== -1;
     }
 
+    /**
+     * Checks if the block is a clamp block.
+     * @returns {boolean} - True if the block is a clamp block, false otherwise.
+     */
     isClampBlock() {
         return (
             this.protoblock.style === "clamp" ||
@@ -1903,36 +1942,68 @@ class Block {
         );
     }
 
+    /**
+     * Checks if the block is an argument flow clamp block.
+     * @returns {boolean} - True if the block is an argument flow clamp block, false otherwise.
+     */
     isArgFlowClampBlock() {
         return this.protoblock.style === "argflowclamp";
     }
 
+    /**
+     * Checks if the block is a left clamp block.
+     * @returns {boolean} - True if the block is a left clamp block, false otherwise.
+     */
     isLeftClampBlock() {
         return this.protoblock.isLeftClamp;
     }
 
+    /**
+     * Checks if the block is a double clamp block.
+     * @returns {boolean} - True if the block is a double clamp block, false otherwise.
+     */
     isDoubleClampBlock() {
         return this.protoblock.style === "doubleclamp";
     }
 
+    /**
+     * Checks if the block is a no-run block.
+     * @returns {boolean} - True if the block is a no-run block, false otherwise.
+     */
     isNoRunBlock() {
         return this.name === "action";
     }
 
+    /**
+     * Checks if the block is an argument clamp block.
+     * @returns {boolean} - True if the block is an argument clamp block, false otherwise.
+     */
     isArgClamp() {
         return this.protoblock.style === "argclamp" || this.protoblock.style === "argclamparg";
     }
 
+    /**
+     * Checks if the block is an expandable block.
+     * @returns {boolean} - True if the block is an expandable block, false otherwise.
+     */
     isExpandableBlock() {
         return this.protoblock.expandable;
     }
 
+    /**
+     * Gets the unique identifier for the block.
+     * @returns {string} - The unique identifier for the block.
+     */
     getBlockId() {
         // Generate a UID based on the block index into the blockList.
         const number = blockBlocks.blockList.indexOf(this);
         return "_" + number.toString();
     }
 
+    /**
+     * Removes the child bitmap with the specified name from the block container.
+     * @param {string} name - The name of the child bitmap to remove.
+     */
     removeChildBitmap(name) {
         for (let child = 0; child < this.container.children.length; child++) {
             if (this.container.children[child].name === name) {
@@ -1942,6 +2013,10 @@ class Block {
         }
     }
 
+    /**
+     * Loads a thumbnail image onto the block.
+     * @param {string} imagePath - The path to the image to load as a thumbnail.
+     */
     loadThumbnail(imagePath) {
         // Load an image thumbnail onto block.
         const thisBlock = this.blocks.blockList.indexOf(this);
