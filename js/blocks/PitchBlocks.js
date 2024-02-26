@@ -845,7 +845,7 @@ function setupPitchBlocks(activity) {
                 "documentation",
                 ""
             ]);
-            this.formBlock({ outType: "textout" });
+            this.formBlock({ outType: "anyout" });
             this.extraWidth = 50;
         }
     }

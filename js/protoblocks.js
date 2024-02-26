@@ -1495,7 +1495,7 @@ class BaseBlock extends ProtoBlock {
             );
         if (typeof this._style.args === "number")
             for (let i = 0; i < this._style.args; i++) {
-                this.dockTypes.push(this._style.argTypes[i] || "anyin");
+                this.dockTypes.push(this._style.argTypes[i] || "numberin");
                 if (i < this._style.defaults.length)
                     this.defaults.push(this._style.defaults[i]);
             }
