@@ -2073,6 +2073,10 @@ class Block {
         }
     }
 
+    /**
+     * Opens media for the block.
+     * @param {number} thisBlock - Index of the current block.
+     */
     _doOpenMedia(thisBlock) {
         const fileChooser = docById("myOpenAll");
         const that = this;
@@ -2108,12 +2112,19 @@ class Block {
         window.scroll(0, 0);
     }
 
+    /**
+     * Sets the block to a collapsed state.
+     */
     setCollapsedState() {
         // Mark it as in a collapsed block and hide it.
         this.inCollapsed = true;
         this.hide();
     }
 
+    /**
+     * Sets the block to an uncollapsed state.
+     * @param {number|null} nblk - Index of the block, or null.
+     */
     setUncollapsedState(nblk) {
         // It could be a block inside a note block, which may or may
         // not be hidden depending on the collapsed state of the
@@ -2130,6 +2141,9 @@ class Block {
         }
     }
 
+    /**
+     * Toggles the collapse state of the block.
+     */
     collapseToggle() {
         // Find the blocks to collapse/expand inside of a collapable
         // block.
@@ -2226,6 +2240,9 @@ class Block {
         this.activity.refreshCanvas();
     }
 
+    /**
+     * Labels the collapsed interval block.
+     */
     _intervalLabel() {
         // Find pitch and value to display on the collapsed interval
         // block.
