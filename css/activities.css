@@ -404,7 +404,8 @@ img.icon:hover {
 }
 
 body {
-  background-color: #92b5c8 !important; /*  2.5B 7/4 */
+  background-color: #92b5c8 !important;
+  /*  2.5B 7/4 */
   padding: 0;
   margin: 0;
   font-family: sans-serif;
@@ -452,7 +453,8 @@ input.text {
 }
 
 input.boolean {
-  background-color: #c96df3 !important; /* */
+  background-color: #c96df3 !important;
+  /* */
   text-align: center;
   font-weight: bold !important;
   resize: none !important;
@@ -462,7 +464,8 @@ input.boolean {
 }
 
 input.number {
-  background-color: #ff5293 !important; /* 0RP 8/10 */
+  background-color: #ff5293 !important;
+  /* 0RP 8/10 */
   text-align: center;
   font-weight: bold !important;
   resize: none !important;
@@ -790,6 +793,7 @@ table {
   right: 5em;
   background: rgba(255, 255, 255, 0.85);
 }
+
 #mkbInnerDiv {
   overflow-x: auto;
   margin-left: 0px;
@@ -844,6 +848,7 @@ table {
 .hover:hover {
   cursor: pointer;
 }
+
 @media (max-width: 600px) {
   #right-arrow,
   #left-arrow {
@@ -992,6 +997,7 @@ table {
     transform: scale(1.1);
   }
 }
+
 @media (max-width: 450px) {
   #helpBodyDiv {
     width: 240px;
@@ -1175,6 +1181,7 @@ input.timbreName {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -1184,6 +1191,7 @@ input.timbreName {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -1412,6 +1420,7 @@ input.timbreName {
   padding: 5px 10px;
   margin-left: 8px;
 }
+
 .rangeslidervalue:after {
   position: absolute;
   top: 8px;
@@ -1716,6 +1725,7 @@ table {
 .disable_highlighting {
   user-select: none;
 }
+
 @media (max-width: 390px) {
   #right-arrow,
   #left-arrow {
@@ -1723,7 +1733,8 @@ table {
     top: auto;
     left: auto;
     margin-top: 10px;
-    margin-left: auto; /* Center the arrows horizontally */
+    margin-left: auto;
+    /* Center the arrows horizontally */
     margin-right: auto;
     display: block;
     clear: both;
