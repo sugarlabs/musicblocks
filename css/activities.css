@@ -13,116 +13,115 @@
 */
 
 *:focus {
-    outline: none;
+  outline: none;
 }
 
 .modal {
-   display: none;
-   position: fixed;
-   z-index: 1;
-   left: 0;
-   top: 0;
-   width: 100%;
-   height: 100%;
-   overflow: auto;
-   background-color: rgba(0,0,0,0.4);
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
 .modal-content {
-   background-color: #fefefe;
-   margin: 15% auto;
-   padding: 20px;
-   border: 1px solid #888;
-   width: 50%;
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%;
 }
 
 .close {
-   color: #aaa;
-   float: right;
-   font-size: 28px;
-   font-weight: bold;
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
 }
 
 .close:hover,
 .close:focus {
-   color: black;
-   text-decoration: none;
-   cursor: pointer;
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
 }
 
-#search[type=text] {
-    width: 400px;
-    box-sizing: border-box;
-    position: absolute;
-    background-color: white;
-    background-repeat: no-repeat;
-    padding: 6px 10px 6px 20px;
-    -webkit-transition: width 0.4s ease-in-out;
-    transition: width 0.4s ease-in-out;
-    font-size: 24px;
-    color: black;
+#search[type="text"] {
+  width: 400px;
+  box-sizing: border-box;
+  position: absolute;
+  background-color: white;
+  background-repeat: no-repeat;
+  padding: 6px 10px 6px 20px;
+  -webkit-transition: width 0.4s ease-in-out;
+  transition: width 0.4s ease-in-out;
+  font-size: 24px;
+  color: black;
 }
 
 #search:focus {
-    border: 2px solid #87CEFA;
+  border: 2px solid #87cefa;
 }
 
 #search.open {
-    margin-top: 60px;
+  margin-top: 60px;
 }
 
 .ui-menu {
-    position: relative;
-    background-color: rgba(255,255,255,1.0);
-    max-width: 396px;
-    font-size: 18px;
-    border: 2px solid #87CEFA;
-    list-style-type: none;
+  position: relative;
+  background-color: rgba(255, 255, 255, 1);
+  max-width: 396px;
+  font-size: 18px;
+  border: 2px solid #87cefa;
+  list-style-type: none;
 }
-  
 
 #ui-id-1 {
-	margin: 0;
-	padding: 0;
-	-webkit-margin-before: 0;
-	-webkit-margin-after: 0;
-	-webkit-margin-start: 0;
-	-webkit-margin-end: 0;
-	-webkit-padding-start: 0;
-	list-style-type: none;
+  margin: 0;
+  padding: 0;
+  -webkit-margin-before: 0;
+  -webkit-margin-after: 0;
+  -webkit-margin-start: 0;
+  -webkit-margin-end: 0;
+  -webkit-padding-start: 0;
+  list-style-type: none;
 }
 
-#ui-id-1 li{
-    padding-top: 5px;
+#ui-id-1 li {
+  padding-top: 5px;
 }
 
-#ui-id-1 li img{
-    margin-left: 10px;
+#ui-id-1 li img {
+  margin-left: 10px;
 }
 
 #ui-id-1 li:before {
-    margin-right: 5px;
-    font-size: 20px;
-    font-weight: bold;
-    margin-left: 4px;
+  margin-right: 5px;
+  font-size: 20px;
+  font-weight: bold;
+  margin-left: 4px;
 }
 
 #ui-id-1 li:hover:before {
-    background-color: #D0D3D4;
+  background-color: #d0d3d4;
 }
 
 .ui-state-focus {
-    background-color: #D0D3D4;
+  background-color: #d0d3d4;
 }
 
 .scrollSearch {
-    max-height: 215px;
-    width: 380px;
-    padding-left: 10px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-    overflow-x: auto;
-    overflow-y: auto;
+  max-height: 215px;
+  width: 380px;
+  padding-left: 10px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  overflow-x: auto;
+  overflow-y: auto;
 }
 
 #myProgress {
@@ -139,1186 +138,1233 @@
 }
 
 .blink {
-    animation: blink-animation 1.5s infinite;
-  }
+  animation: blink-animation 1.5s infinite;
+}
 
-  @keyframes blink-animation {
-    50% {
-      opacity: 0;
-    }
+@keyframes blink-animation {
+  50% {
+    opacity: 0;
   }
+}
 
 /*CSS for load animation*/
 #load-container {
-   width: 100%;
-   height: 100%;
-   top: 0;
-   left: 0;
-   position: fixed;
-   display: block;
-   background-color: #fff;
-   opacity: 0.7;
-   z-index: 99;
-   text-align: center;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  position: fixed;
+  display: block;
+  background-color: #fff;
+  opacity: 0.7;
+  z-index: 99;
+  text-align: center;
 }
 
-#messageText{
+#messageText {
   margin-top: 200px;
   font-size: 30px;
   z-index: 100;
 }
 
-
-#loading-image{
+#loading-image {
   z-index: 100;
 }
 
 #popdown-palette {
-    display: none;
-    position: absolute;
-    z-index: 9999;
-    top: 0;
-    left: 0;
-    width: 60%;
-    max-height: 100%;
-    overflow-y: scroll;
-    background: rgba(255, 255, 255, 0.85);
+  display: none;
+  position: absolute;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  width: 60%;
+  max-height: 100%;
+  overflow-y: scroll;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #popdown-palette:last-child {
-    margin-bottom: 2.5em;
+  margin-bottom: 2.5em;
 }
 
 #popdown-palette.show {
-    display: block;
+  display: block;
 }
 
 #popdown-palette.show ~ .canvasHolder {
-    filter: blur(10px);
-    -webkit-filter: blur(10px);
+  filter: blur(10px);
+  -webkit-filter: blur(10px);
 }
 
 #popdown-palette ul {
-    display: none;
+  display: none;
 }
 
 #popdown-palette .palette.show ul {
-    display: block;
+  display: block;
 }
 
 #popdown-palette li {
-    list-style: none;
+  list-style: none;
 }
 
 #popdown-palette h3 {
-    border-bottom: 1px solid #444;
-    width: 50%;
-    padding: 0 10%;
+  border-bottom: 1px solid #444;
+  width: 50%;
+  padding: 0 10%;
 }
 
 #popdown-palette h2 span {
-    vertical-align: 50%;
+  vertical-align: 50%;
 }
 
 #popdown-palette h2 img {
-    display: block;
-    float: right;
+  display: block;
+  float: right;
 }
 
 #popdown-palette .palette.show .show-button {
-    display: none;
+  display: none;
 }
 
-#popdown-palette .palette:not(.show) .hide-button  {
-    display: none;
+#popdown-palette .palette:not(.show) .hide-button {
+  display: none;
 }
 
 #popdown-palette .palette:not(.show) .popout-button {
-    display: none;
+  display: none;
 }
 
 div.back {
-    display: block;
-    position: fixed;
-    height: 2.5em;
-    width: 100%;
-    top: calc(100% - 2.5em);
-    background-color: #4682B4;
+  display: block;
+  position: fixed;
+  height: 2.5em;
+  width: 100%;
+  top: calc(100% - 2.5em);
+  background-color: #4682b4;
 }
 
 div.back h2 {
-    margin-top: 0.25em;
-    border-bottom: none !important;
-    color: white;
+  margin-top: 0.25em;
+  border-bottom: none !important;
+  color: white;
 }
 
 div.back:active {
-    background-color: black;
+  background-color: black;
 }
 
 .canvasHolder {
-    transition: 0.75s ease all;
-    transform-origin: 0 0;
-    position: absolute;
-    top: 0;
-    left: 0;
+  transition: 0.75s ease all;
+  transform-origin: 0 0;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .canvasHolder.hide {
-    display: none;
+  display: none;
 }
 
 nav {
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    z-index: 100;
-    background-color: #8bc34a;
-    height: 64px;
-    width: 100%;
-    box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.16), 0px 2px 10px 0px rgba(0, 0, 0, 0.12);
-    font: 32px sans;
-    vertical-align: middle;
-    line-height: 64px;
-    color: white;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  z-index: 100;
+  background-color: #8bc34a;
+  height: 64px;
+  width: 100%;
+  box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.16), 0px 2px 10px 0px rgba(0, 0, 0, 0.12);
+  font: 32px sans;
+  vertical-align: middle;
+  line-height: 64px;
+  color: white;
 }
 
 nav .nav-container {
-    padding: 0 0px;
+  padding: 0 0px;
 }
 
-
 nav h1 {
-    font-size: 32px;
-    position: relative;
-    top: -12px;
-    display: inline;
+  font-size: 32px;
+  position: relative;
+  top: -12px;
+  display: inline;
 }
 
 nav imghover {
-    background-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 nav imgactive {
-    background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.8);
 }
 
 nav ul {
-    list-style: none;
-    text-align: right;
-    display: inline;
+  list-style: none;
+  text-align: right;
+  display: inline;
 }
 
 nav ul li {
-    display: inline;
-    padding-right: 12px;
- /*   float: right; */
+  display: inline;
+  padding-right: 12px;
+  /*   float: right; */
 }
 
 .nav-spacer {
-    height: 96px;
+  height: 96px;
 }
 
 .content {
-    padding: 0px;
-    margin: 0px;
-    display: flex;
-    flex-wrap: wrap;
+  padding: 0px;
+  margin: 0px;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .content li {
-    display: block;
-    list-style: none;
-    width: 23.75%;
-    float: left;
-    padding-left: 1%;
+  display: block;
+  list-style: none;
+  width: 23.75%;
+  float: left;
+  padding-left: 1%;
 }
 
-.content li[current=true] img.thumbnail {
-    opacity: 0;
+.content li[current="true"] img.thumbnail {
+  opacity: 0;
 }
 
 @media (max-width: 500px) {
-    .content li {
+  .content li {
     width: 48.5%;
     padding-left: 1%;
-    }
+  }
 
-    .canvasHolder.hide {
+  .canvasHolder.hide {
     transform: scale(0.485);
-    }
+  }
 
-    nav h1 {
+  nav h1 {
     display: none;
-    }
+  }
 }
 
 @media (max-width: 800px) and (min-width: 501px) {
-    .content li {
+  .content li {
     width: 32%;
     padding-left: 1%;
-    }
+  }
 
-    .canvasHolder.hide {
+  .canvasHolder.hide {
     transform: scale(0.32);
-    }
+  }
 }
 
 .content li img.thumbnail {
-    background: #96D3F3;
-    width: 100%;
-    padding: 0;
+  background: #96d3f3;
+  width: 100%;
+  padding: 0;
 }
 
-.content li .options, .content li .options input {
-    text-align: center;
+.content li .options,
+.content li .options input {
+  text-align: center;
 }
 
 #planet-iframe {
-    width:100vw;
-    height:100vh;
-    background-color: #fff;
-    position: absolute;
-    top: 0;
-    left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #fff;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
-iframe,canvas{
-overflow: clip !important;
+iframe,
+canvas {
+  overflow: clip !important;
 }
 
 .projectname {
-    word-wrap: break-word;
+  word-wrap: break-word;
 }
 
 img.icon {
-    border-radius: 100%;
-    width: 30px;
+  border-radius: 100%;
+  width: 30px;
 }
 
 img.icon:hover {
-    background-color: rgba(139, 195, 74, 0.8);
+  background-color: rgba(139, 195, 74, 0.8);
 }
 
 #loading-image-container {
-    z-index: 99999;
+  z-index: 99999;
 }
 
 body {
-    background-color: #92b5c8 !important; /*  2.5B 7/4 */
-    padding: 0;
-    margin: 0;
-    font-family: sans-serif;
-    overflow: hidden;
+  background-color: #92b5c8 !important; /*  2.5B 7/4 */
+  padding: 0;
+  margin: 0;
+  font-family: sans-serif;
+  overflow: hidden;
 }
 
 body.noScroll {
-    overflow: hidden;
+  overflow: hidden;
 }
 
 body.samples-shown {
-    overflow-y: scroll;
-    background: white !important;
+  overflow-y: scroll;
+  background: white !important;
 }
 
 select {
-    background-color: #88e20a;
-    text-align: center;
-    font-weight: bold !important;
-    resize: none !important;
-    padding: 0 !important;
-    border: 0 !important;
-    width: 20px;
+  background-color: #88e20a;
+  text-align: center;
+  font-weight: bold !important;
+  resize: none !important;
+  padding: 0 !important;
+  border: 0 !important;
+  width: 20px;
 }
 
 input.input {
-    background-color: #FFF !important;
-    text-align: center;
-    font-weight: bold !important;
-    font-size: 24px !important;
-    resize: none !important;
-    padding: 0px !important;
-    border: 1px !important;
-    width: 200px;
+  background-color: #fff !important;
+  text-align: center;
+  font-weight: bold !important;
+  font-size: 24px !important;
+  resize: none !important;
+  padding: 0px !important;
+  border: 1px !important;
+  width: 200px;
 }
 
 input.text {
-    background-color: #FF5942 !important;
-    text-align: center;
-    font-weight: bold !important;
-    resize: none !important;
-    padding: 0 !important;
-    border: 0 !important;
-    width: 100px;
+  background-color: #ff5942 !important;
+  text-align: center;
+  font-weight: bold !important;
+  resize: none !important;
+  padding: 0 !important;
+  border: 0 !important;
+  width: 100px;
 }
 
 input.boolean {
-    background-color: #C96DF3 !important; /* */
-    text-align: center;
-    font-weight: bold !important;
-    resize: none !important;
-    padding: 0 !important;
-    border: 0 !important;
-    width: 100px;
+  background-color: #c96df3 !important; /* */
+  text-align: center;
+  font-weight: bold !important;
+  resize: none !important;
+  padding: 0 !important;
+  border: 0 !important;
+  width: 100px;
 }
 
 input.number {
-    background-color: #FF5293 !important; /* 0RP 8/10 */
-    text-align: center;
-    font-weight: bold !important;
-    resize: none !important;
-    padding: 0 !important;
-    border: 0 !important;
-    width: 100px;
+  background-color: #ff5293 !important; /* 0RP 8/10 */
+  text-align: center;
+  font-weight: bold !important;
+  resize: none !important;
+  padding: 0 !important;
+  border: 0 !important;
+  width: 100px;
 }
 
-input.musicratio1, input.musicratio2   {
-    background-color: #8CC6FF !important;
-    text-align: center;
-    font-size: 24px;
-    font-weight: bold !important;
-    resize: none !important;
-    padding: 0 !important;
-    border: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
+input.musicratio1,
+input.musicratio2 {
+  background-color: #8cc6ff !important;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold !important;
+  resize: none !important;
+  padding: 0 !important;
+  border: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 input.BPMInput {
-    background-color: #8CC6FF !important;
-    text-align: center;
-    font-size: 24px;
-    font-weight: bold !important;
-    resize: none !important;
-    padding: 0 !important;
-    border: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
+  background-color: #8cc6ff !important;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold !important;
+  resize: none !important;
+  padding: 0 !important;
+  border: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 table {
-    border-collapse: separate;
-    border-spacing: 1px 1px;
+  border-collapse: separate;
+  border-spacing: 1px 1px;
 }
 
 #canvas {
-    overflow-y: visible;
+  overflow-y: visible;
 }
 
 #statusDiv {
-    position: absolute;
-    top: 20%;
-    left: 20%;
-    background: rgba(255, 255, 255, 0.85) !important;
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  background: rgba(255, 255, 255, 0.85) !important;
 }
 
 #statusTableDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85) !important;
-    width: 680px;
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  width: 680px;
 }
 
 #statusButtonsDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #statusOuterDiv {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    right: 5em;
-    overflow-y: auto;
-    overflow-x: none;
-    background: rgba(255, 255, 255, 0.85);
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 5em;
+  overflow-y: auto;
+  overflow-x: none;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #statusInnerDiv {
-    overflow-x:auto;
-    margin-left: 53px;
+  overflow-x: auto;
+  margin-left: 53px;
 }
 
 #playbackDiv {
-    position: absolute;
-    top: 20%;
-    left: 20%;
-    background: rgba(255, 255, 255, 0.85) !important;
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  background: rgba(255, 255, 255, 0.85) !important;
 }
 
 #playbackTableDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85) !important;
-    width: 680px;
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  width: 680px;
 }
 
 #playbackButtonsDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #playbackOuterDiv {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    right: 5em;
-    overflow-y: auto;
-    overflow-x: none;
-    background: rgba(255, 255, 255, 0.85);
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 5em;
+  overflow-y: auto;
+  overflow-x: none;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #playbackInnerDiv {
-    overflow-x:auto;
-    margin-left: 53px;
+  overflow-x: auto;
+  margin-left: 53px;
 }
 
 #ptmDiv {
-    position: absolute;
-    top: 20%;
-    left: 20%;
-    background: rgba(255, 255, 255, 0.85) !important;
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  background: rgba(255, 255, 255, 0.85) !important;
 }
 
 #ptmTableDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 1 !important;
-    background: rgba(255, 255, 255, 0.85) !important;
-    width: 680px;
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 1 !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  width: 680px;
 }
 
 #ptmButtonsDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #ptmOuterDiv {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    right: 5em;
-    overflow-y: auto;
-    overflow-x: none;
-    background: rgba(255, 255, 255, 0.85);
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 5em;
+  overflow-y: auto;
+  overflow-x: none;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #ptmInnerDiv {
-    overflow-x:auto;
-    margin-left: 53px;
+  overflow-x: auto;
+  margin-left: 53px;
 }
 
 #arpeggioDiv {
-    position: absolute;
-    top: 20%;
-    left: 20%;
-    background: rgba(255, 255, 255, 0.85) !important;
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  background: rgba(255, 255, 255, 0.85) !important;
 }
 
 #arpeggioTableDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 1 !important;
-    background: rgba(255, 255, 255, 0.85) !important;
-    width: 680px;
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 1 !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  width: 680px;
 }
 
 #arpeggioButtonsDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #arpeggioOuterDiv {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    right: 5em;
-    overflow-y: auto;
-    overflow-x: none;
-    background: rgba(255, 255, 255, 0.85);
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 5em;
+  overflow-y: auto;
+  overflow-x: none;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #arpeggioInnerDiv {
-    overflow-x:auto;
-    margin-left: 53px;
+  overflow-x: auto;
+  margin-left: 53px;
 }
 
 #modeDiv {
-    position: absolute;
-    top: 20%;
-    left: 20%;
-    background: rgba(255, 255, 255, 0.85) !important;
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  background: rgba(255, 255, 255, 0.85) !important;
 }
 
 #modeTableDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85) !important;
-    width: 680px;
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  width: 680px;
 }
 
 #modeButtonsDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #meterDiv {
-    position: absolute;
-    top: 20%;
-    left: 20%;
-    background: rgba(255, 255, 255, 0.85) !important;
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  background: rgba(255, 255, 255, 0.85) !important;
 }
 
 #meterTableDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85) !important;
-    width: 680px;
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  width: 680px;
 }
 
 #meterButtonsDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #pdmDiv {
-    position: absolute;
-    top: 20%;
-    left: 20%;
-    background: rgba(255, 255, 255, 0.85) !important;
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  background: rgba(255, 255, 255, 0.85) !important;
 }
 
 #pdmTableDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85) !important;
-    width: 680px;
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  width: 680px;
 }
 
 #pdmButtonsDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #pdmOuterDiv {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    right: 5em;
-    background: rgba(255, 255, 255, 0.85);
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 5em;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #pdmInnerDiv {
-    overflow-x:auto;
-    overflow-y: auto;
+  overflow-x: auto;
+  overflow-y: auto;
 }
 
 #mkbDiv {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    background: rgba(255, 255, 255, 0.85) !important;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  background: rgba(255, 255, 255, 0.85) !important;
 }
 
 #mkbKeyboardDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85) !important;
-    width: 1020px;
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  width: 1020px;
 }
 
 #mkbTableDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85) !important;
-    width: 1020px;
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  width: 1020px;
 }
 
 #mkbButtonsDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #mkbOuterDiv {
-    position: absolute;
-    max-height: 400px;
-    overflow-y: scroll;
-    width: 100% !important;
-    display: flex;
-    left: 0px;
-    top: 140px;
-    right: 5em;
-    background: rgba(255, 255, 255, 0.85);
+  position: absolute;
+  max-height: 400px;
+  overflow-y: scroll;
+  width: 100% !important;
+  display: flex;
+  left: 0px;
+  top: 140px;
+  right: 5em;
+  background: rgba(255, 255, 255, 0.85);
 }
 #mkbInnerDiv {
-    overflow-x:auto;
-    margin-left: 0px;
+  overflow-x: auto;
+  margin-left: 0px;
 }
 
 #tempoDiv {
-    position: absolute;
-    top: 20%;
-    left: 20%;
-    background: rgba(255, 255, 255, 0.85) !important;
-    user-select: none;
-    -webkit-user-select: none;
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  background: rgba(255, 255, 255, 0.85) !important;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 #tempoButtonsDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #right-arrow {
-    left: 385px;
-    background: url('../header-icons/right-arrow.png');
+  left: 385px;
+  background: url("../header-icons/right-arrow.png");
 }
 
 #left-arrow {
-    left: 5px;
-    background: url('../header-icons/left-arrow.png');
+  left: 5px;
+  background: url("../header-icons/left-arrow.png");
 }
 
 #left-arrow.disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-#right-arrow.disabled{
-    opacity: 0.5;
-    cursor: not-allowed;
+#right-arrow.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-#right-arrow, #left-arrow {
-    position: absolute;
-    background-size: 40px;
-    top: 195px;
-    height: 40px;
-    width: 40px;
+#right-arrow,
+#left-arrow {
+  position: absolute;
+  background-size: 40px;
+  top: 195px;
+  height: 40px;
+  width: 40px;
 }
 
 .hover:hover {
-    cursor: pointer;
+  cursor: pointer;
+}
+@media (max-width: 600px) {
+  #right-arrow,
+  #left-arrow {
+    height: 30px;
+    width: 30px;
+    background-size: 30px;
+  }
+}
+
+@media (max-width: 450px) {
+  #right-arrow,
+  #left-arrow {
+    height: 25px;
+    width: 25px;
+    background-size: 25px;
+  }
+}
+
+@media (max-width: 320px) {
+  #right-arrow,
+  #left-arrow {
+    height: 20px;
+    width: 20px;
+    background-size: 20px;
+  }
 }
 
 .top-wrapper {
-    width: 100%;
-    position: absolute;
-    top: 0;
-    background: #2196F3;
-    font-family: sans-serif;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    color: #fff;
-    font-size: 1.1em;
-    text-align: center;
-    height: 55px;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  background: #2196f3;
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.1em;
+  text-align: center;
+  height: 55px;
 }
 
 .close-button {
-    position: absolute;
-    font-size: 1em;
-    right: 410px;
-    width:18px;
-    height: 18px;
-    background: url('../header-icons/close.png');
-    background-size: 18px;
-    cursor: pointer;
+  position: absolute;
+  font-size: 1em;
+  right: 410px;
+  width: 18px;
+  height: 18px;
+  background: url("../header-icons/close.png");
+  background-size: 18px;
+  cursor: pointer;
 }
 
 .drag-button {
-    position: absolute;
-    right: 20px;
-    background: url('../header-icons/move.png');
-    background-size: 22px;
-    height: 22px;
-    width: 22px;
-    cursor: move;
+  position: absolute;
+  right: 20px;
+  background: url("../header-icons/move.png");
+  background-size: 22px;
+  height: 22px;
+  width: 22px;
+  cursor: move;
 }
 
 #helpDiv h1 {
-    text-align: left;
-    padding-left: 30px;
-    font-size: 1.5em;
+  text-align: left;
+  padding-left: 30px;
+  font-size: 1.5em;
 }
 
 #helpDiv p:first-child {
-    padding-left: -10px;
+  padding-left: -10px;
 }
 
 #helpDiv p:not(:first-child) {
-    text-align: left;
-    padding-left: 30px;
-    font-size: 0.9em;
-    line-height: 20px;
+  text-align: left;
+  padding-left: 30px;
+  font-size: 0.9em;
+  line-height: 20px;
 }
 
 #helpButtonsDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
 }
 
 #helpBodyDiv {
-    position: relative;
-    left: 45px;
-    border: 0 !important;
-    overflow-x: hidden;
-    overflow-y: auto;
-    width: 350px;
-    background: #e8e8e8 !important;
-    padding: 1rem 1rem 0 0  ; 
-    display: flex ; 
-    flex-direction: column ; 
-    justify-content: center ;
-    align-items: center ;
+  position: relative;
+  left: 45px;
+  border: 0 !important;
+  overflow-x: hidden;
+  overflow-y: auto;
+  width: 350px;
+  background: #e8e8e8 !important;
+  padding: 1rem 1rem 0 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-#helpBodyDiv .heading, 
-#helpBodyDiv .description, 
-#helpBodyDiv .message { 
-    text-align: center ; 
-    line-height: 1.2 ; 
+#helpBodyDiv .heading,
+#helpBodyDiv .description,
+#helpBodyDiv .message {
+  text-align: center;
+  line-height: 1.2;
 }
 
-#helpBodyDiv .icon-container { 
-    width: 30% ; 
-    margin-top: 1.5rem ;
-    padding: 1px 1.2px ; 
-    display: flex ; 
-    justify-content: space-between ; 
-    align-items:center ; 
+#helpBodyDiv .icon-container {
+  width: 30%;
+  margin-top: 1.5rem;
+  padding: 1px 1.2px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.icon-container #findIcon, 
+.icon-container #findIcon,
 .icon-container #loadButton,
 .icon-container #advIconText {
-    transform: scale(1.2) ; 
+  transform: scale(1.2);
 }
 
-#helpBodyDiv .blockImage-wrapper { 
-    height: 90% ; 
-    width: 100%;
+#helpBodyDiv .blockImage-wrapper {
+  height: 90%;
+  width: 100%;
 }
 
-#helpBodyDiv .blockImage { 
-    padding-top: 2rem ;
-    object-fit: contain;
-    width: 100%;
-    height: 100%;
+#helpBodyDiv .blockImage {
+  padding-top: 2rem;
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
 }
 
 @media (max-width: 600px) {
-    #helpBodyDiv .icon-container { 
-        margin-top: 0 ; 
-        padding-top: 0 ;  
-    }
+  #helpBodyDiv .icon-container {
+    margin-top: 0;
+    padding-top: 0;
+  }
 
-    .icon-container #findIcon, 
-    .icon-container #loadButton,
-    .icon-container #advIconText {
-        transform: scale(1.1) ; 
-    }
+  .icon-container #findIcon,
+  .icon-container #loadButton,
+  .icon-container #advIconText {
+    transform: scale(1.1);
+  }
+}
+@media (max-width: 450px) {
+  #helpBodyDiv {
+    width: 240px;
+  }
+}
+
+@media (max-width: 320px) {
+  #helpBodyDiv {
+    width: 200px;
+  }
 }
 
 #pscDiv {
-    position: absolute;
-    top: 20%;
-    left: 20%;
-    background: rgba(255, 255, 255, 0.85) !important;
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  background: rgba(255, 255, 255, 0.85) !important;
 }
 
 #pscTableDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85) !important;
-    width: 680px;
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  width: 680px;
 }
 
 #pscButtonsDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #pscOuterDiv {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    right: 5em;
-    overflow-y: auto;
-    overflow-x: none;
-    background: rgba(255, 255, 255, 0.85);
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 5em;
+  overflow-y: auto;
+  overflow-x: none;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #pscInnerDiv {
-    overflow-x:auto;
-    margin-left: 53px;
+  overflow-x: auto;
+  margin-left: 53px;
 }
 
 #timbreDiv {
-    position: absolute;
-    top: 20%;
-    left: 20%;
-    background: rgba(255, 255, 255, 0.85) !important;
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  background: rgba(255, 255, 255, 0.85) !important;
 }
 
 #timbreTableDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85) !important;
-    width: 590px;
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  width: 590px;
 }
 
 #timbreButtonsDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #timbreOuterDiv {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    right: 5em;
-    overflow-y: auto;
-    overflow-x: none;
-    background: rgba(255, 255, 255, 0.85);
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 5em;
+  overflow-y: auto;
+  overflow-x: none;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #timbreInnerDiv {
-    overflow-x:auto;
-    margin-left: 53px;
+  overflow-x: auto;
+  margin-left: 53px;
 }
 
 input.timbreName {
-    background-color: #8CC6FF !important;
-    text-align: center;
-    font-size: 24px;
-    resize: none !important;
-    padding: 0 !important;
-    border: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
+  background-color: #8cc6ff !important;
+  text-align: center;
+  font-size: 24px;
+  resize: none !important;
+  padding: 0 !important;
+  border: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 #temperamentDiv {
-    position: absolute;
-    top: 20%;
-    left: 20%;
-    background: rgba(255, 255, 255, 0.85) !important;
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  background: rgba(255, 255, 255, 0.85) !important;
 }
 
 #temperamentTableDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(204, 0, 102, 0) !important;
-    width: 560px;
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(204, 0, 102, 0) !important;
+  width: 560px;
 }
 
 #temperamentButtonsDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #temperamentOuterDiv {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    right: 5em;
-    overflow-y: auto;
-    overflow-x: none;
-    background: rgba(255, 255, 255, 0.85);
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 5em;
+  overflow-y: auto;
+  overflow-x: none;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #temperamentInnerDiv {
-    overflow-x:auto;
-    margin-left: 53px;
+  overflow-x: auto;
+  margin-left: 53px;
 }
 
 #graph {
-    overflow-y: scroll;
-    height: 340px;
+  overflow-y: scroll;
+  height: 340px;
 }
 
 #userEdit input {
-    height: 40px;
-    width: 40px;
-    background: #8CC6FF;
-    border: 1px solid black;
-    text-align: center;
+  height: 40px;
+  width: 40px;
+  background: #8cc6ff;
+  border: 1px solid black;
+  text-align: center;
 }
 
 .popup {
-    position: absolute;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    background-color: white;
-    height: 68px;
-    width: 160px;
-    border: 1px solid black;
+  position: absolute;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-color: white;
+  height: 68px;
+  width: 160px;
+  border: 1px solid black;
 }
 
 .popup .popuptext {
-    color: white;
-    text-align: center;
-    border-radius: 6px;
-    position: absolute;
-    z-index: 1;
+  color: white;
+  text-align: center;
+  border-radius: 6px;
+  position: absolute;
+  z-index: 1;
 }
 
 .popup .show {
-    visibility: visible;
-    -webkit-animation: fadeIn 1s;
-    animation: fadeIn 1s;
+  visibility: visible;
+  -webkit-animation: fadeIn 1s;
+  animation: fadeIn 1s;
 }
 
 @-webkit-keyframes fadeIn {
-    from {opacity: 0;}
-    to {opacity: 1;}
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeIn {
-    from {opacity: 0;}
-    to {opacity:1 ;}
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 #download {
-    position: absolute;
-    top :100px;
-    left: 200px;
+  position: absolute;
+  top: 100px;
+  left: 200px;
 }
 
 #rulerDiv {
-    position: absolute;
-    top: 20%;
-    left: 30%;
-    background: rgba(255, 255, 255, 0.85) !important;
+  position: absolute;
+  top: 20%;
+  left: 30%;
+  background: rgba(255, 255, 255, 0.85) !important;
 }
 
 #rulerTableDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85) !important;
-    width: 680px;
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  width: 680px;
 }
 
 #rulerButtonsDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #rulerOuterDiv {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    right: 5em;
-    overflow-y: auto;
-    overflow-x: none;
-    background: rgba(255, 255, 255, 0.85);
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 5em;
+  overflow-y: auto;
+  overflow-x: none;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #rulerInnerDiv {
-    overflow-x: auto !important;
-    margin-left: 53px;
+  overflow-x: auto !important;
+  margin-left: 53px;
 }
 
 #sliderDiv {
-    position: absolute;
-    top: 20%;
-    left: 30%;
-    background: rgba(255, 255, 255, 0.85) !important;
+  position: absolute;
+  top: 20%;
+  left: 30%;
+  background: rgba(255, 255, 255, 0.85) !important;
 }
 
 #sliderTableDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85) !important;
-    width: 680px;
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  width: 680px;
 }
 
 #sliderButtonsDiv {
-    position: relative;
-    left: 0px;
-    top: 0px;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
+  position: relative;
+  left: 0px;
+  top: 0px;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #sliderOuterDiv {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    right: 5em;
-    overflow-y: auto;
-    overflow-x: none;
-    background: rgba(255, 255, 255, 0.85);
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 5em;
+  overflow-y: auto;
+  overflow-x: none;
+  background: rgba(255, 255, 255, 0.85);
 }
 
 #sliderInnerDiv {
-    overflow-x:auto;
+  overflow-x: auto;
 }
 
 .pitchSlider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    box-shadow: 1px 1px 1px #000031;
-    border: 1px solid #00001E;
-    height: 45px;
-    width: 15px;
-    border-radius: 1px;
-    background: blue;
-    cursor: pointer;
-    margin-top: -8px;
+  -webkit-appearance: none;
+  box-shadow: 1px 1px 1px #000031;
+  border: 1px solid #00001e;
+  height: 45px;
+  width: 15px;
+  border-radius: 1px;
+  background: blue;
+  cursor: pointer;
+  margin-top: -8px;
 }
 
 .pitchSlider::-moz-range-thumb {
-    box-shadow: 1px 1px 1px #000031;
-    border: 1px solid #00001E;
-    height: 45px;
-    width: 15px;
-    border-radius: 1px;
-    background: blue;
-    cursor: pointer;
+  box-shadow: 1px 1px 1px #000031;
+  border: 1px solid #00001e;
+  height: 45px;
+  width: 15px;
+  border-radius: 1px;
+  background: blue;
+  cursor: pointer;
 }
 
 .headcol {
-    user-select: none;
-    text-align: center;
-    vertical-align: middle;
+  user-select: none;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .labelcol {
-    user-select: none;
-    text-align: center;
-    vertical-align: middle;
+  user-select: none;
+  text-align: center;
+  vertical-align: middle;
 }
 
 #pitchstaircase {
-    position: absolute;
-    top: 20%;
-    left: 30%;
-    border-style: solid;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
-    user-select: none;
-    -webkit-user-select: none;
-    overflow-y: scroll !important;
+  position: absolute;
+  top: 20%;
+  left: 30%;
+  border-style: solid;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85);
+  user-select: none;
+  -webkit-user-select: none;
+  overflow-y: scroll !important;
 }
 
 #playPitch {
-    position: absolute;
-    direction: rtl;
-    top: 20%;
-    left: 25%;
-    border-style: solid;
-    border: 0 !important;
-    background: rgba(255, 255, 255, 0.85);
-    user-select: none;
-    -webkit-user-select: none;
-    overflow-y: scroll !important;
+  position: absolute;
+  direction: rtl;
+  top: 20%;
+  left: 25%;
+  border-style: solid;
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.85);
+  user-select: none;
+  -webkit-user-select: none;
+  overflow-y: scroll !important;
 }
 
 .progressBar {
   width: 1%;
   height: 70px;
-  background-color: #4CAF50;
+  background-color: #4caf50;
 }
 
 .insideDivEnv {
   margin-top: 10px;
-  height:50px;
-  margin-left:40px;
+  height: 50px;
+  margin-left: 40px;
 }
 
 .insideDivFilter {
   margin-top: -30px;
-  height:50px;
-  margin-left:40px;
+  height: 50px;
+  margin-left: 40px;
 }
 
 .insideDivOsc {
   margin-top: -30px;
-  height:50px;
-  margin-left:40px;
+  height: 50px;
+  margin-left: 40px;
 }
 
 .insideDivEffects {
   margin-top: -30px;
-  height:50px;
-  margin-left:200px;
+  height: 50px;
+  margin-left: 200px;
 }
 
 .insideDivSynth {
   margin-top: -30px;
-  height:50px;
-  margin-left:200px;
+  height: 50px;
+  margin-left: 200px;
 }
 
 .btn {
@@ -1345,8 +1391,11 @@ input.timbreName {
   border: 4px solid green;
 }
 
-#wrapperEnv0, #wrapperEnv1, #wrapperEnv2, #wrapperEnv3 {
-  height:50px;
+#wrapperEnv0,
+#wrapperEnv1,
+#wrapperEnv2,
+#wrapperEnv3 {
+  height: 50px;
   margin-left: 30px;
 }
 
@@ -1355,31 +1404,31 @@ input.timbreName {
   position: relative;
   /* width: $range-label-width; */
   color: blue;
-  background-color: #c8C8C8;
+  background-color: #c8c8c8;
   line-height: 20px;
   text-align: center;
   border-radius: 10px;
-  border-color:green;
+  border-color: green;
   padding: 5px 10px;
   margin-left: 8px;
 }
 .rangeslidervalue:after {
-    position: absolute;
-    top: 8px;
-    left: -7px;
-    width: 0;
-    height: 0;
-    border-top: 7px solid transparent;
-    border-bottom: 7px solid transparent;
-    content: '';
-  }
-
+  position: absolute;
+  top: 8px;
+  left: -7px;
+  width: 0;
+  height: 0;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  content: "";
+}
 
 .filterselector {
   margin-top: -50px;
 }
 
-#selector0, #selector1 {
+#selector0,
+#selector1 {
   margin-top: -50px;
 }
 
@@ -1390,7 +1439,8 @@ input.timbreName {
   margin-top: 20px;
 }
 
-#sel0, #sel1 {
+#sel0,
+#sel1 {
   height: 35px;
   width: 150px;
   margin-left: 50px;
@@ -1402,7 +1452,12 @@ input.timbreName {
   height: 50px;
 }
 
-#wrapper0, #wrapper1, #wrapper2, #wrapper3, #wrapper4, #wrapper5 {
+#wrapper0,
+#wrapper1,
+#wrapper2,
+#wrapper3,
+#wrapper4,
+#wrapper5 {
   margin-left: 170px;
   height: 50px;
 }
@@ -1416,7 +1471,12 @@ input.timbreName {
   margin-left: -100px;
 }
 
-#s0, #s1, #s2, #s3, #s4, #s5 {
+#s0,
+#s1,
+#s2,
+#s3,
+#s4,
+#s5 {
   color: #222;
   text-shadow: 0px 2px 3px #555;
   font-weight: bold;
@@ -1429,7 +1489,8 @@ input.timbreName {
   margin-top: 30px;
 }
 
-#sOsc0, #sOsc1{
+#sOsc0,
+#sOsc1 {
   color: #222;
   text-shadow: 0px 2px 3px #555;
   font-weight: bold;
@@ -1442,7 +1503,8 @@ input.timbreName {
   margin-top: 30px;
 }
 
-#wrapperOsc0, #wrapperOsc1 {
+#wrapperOsc0,
+#wrapperOsc1 {
   margin-left: 170px;
   height: 50px;
 }
@@ -1458,7 +1520,9 @@ input.timbreName {
   margin-top: 20px;
 }
 
-#sFx0, #sFx1, #sFx2{
+#sFx0,
+#sFx1,
+#sFx2 {
   color: #222;
   text-shadow: 0px 2px 3px #555;
   font-weight: bold;
@@ -1466,10 +1530,10 @@ input.timbreName {
   text-align: center;
   margin-left: 60px;
   margin-top: 20px;
-
 }
 
-#sS0, #sS1{
+#sS0,
+#sS1 {
   color: #222;
   text-shadow: 0px 2px 3px #555;
   font-weight: bold;
@@ -1496,153 +1560,172 @@ input.timbreName {
 }
 
 .wheelNav {
-    height: 350px;
-    width: 350px;
-    margin: auto;
-    -moz-transition: ease 1s;
-    -o-transition: ease 1s;
-    -webkit-transition: ease 1s;
-    transition: ease 1s;
-    z-index: 10000;
+  height: 350px;
+  width: 350px;
+  margin: auto;
+  -moz-transition: ease 1s;
+  -o-transition: ease 1s;
+  -webkit-transition: ease 1s;
+  transition: ease 1s;
+  z-index: 10000;
 }
 
 .wheelNav > svg {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 #chooseKeyDiv {
-    height: 350px;
-    width: 350px;
-    margin: auto;
-    z-index: 10;
-    background: #f2f2f2;
-    border-radius: 50%;
-    position: fixed;
+  height: 350px;
+  width: 350px;
+  margin: auto;
+  z-index: 10;
+  background: #f2f2f2;
+  border-radius: 50%;
+  position: fixed;
 }
 
 #chooseKeyDiv > svg {
-    width: 100%;
-    height: 100%;
-    transition: width 2s linear 1s;
+  width: 100%;
+  height: 100%;
+  transition: width 2s linear 1s;
 }
 
 #movable {
-    margin: auto;
-    z-index: 10;
-    position: fixed;
-    display: none;
-    background: #f2f2f2;
-    font-family: sans-serif;
-    text-align: center;
-    margin-left: 24px;
+  margin: auto;
+  z-index: 10;
+  position: fixed;
+  display: none;
+  background: #f2f2f2;
+  font-family: sans-serif;
+  text-align: center;
+  margin-left: 24px;
 }
 
 .radioBtn {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 @media (max-width: 880px) {
-    .wheelNav {
-        height: 330px;
-        width: 330px;
-    }
+  .wheelNav {
+    height: 330px;
+    width: 330px;
+  }
 }
 
 @media (max-width: 680px) {
-    .wheelNav {
-        height: 310px;
-        width: 310px;
-    }
+  .wheelNav {
+    height: 310px;
+    width: 310px;
+  }
 }
 
 @media (max-width: 480px) {
-    .wheelNav {
-        height: 290px;
-        width: 290px;
-    }
+  .wheelNav {
+    height: 290px;
+    width: 290px;
+  }
 }
 
 .inactiveLink {
-    pointer-events: none !important;
-    cursor: default !important;
- }
-
- .popupMsg {
-    min-width: 50%;
-    max-width: 55%;
-    height: auto;
-    position: absolute;
-    top: 130px;
-    left: 33%;
-    border-radius: 8px;
-    background-color: #8CC6FF;
-    font-family: "Roboto", sans-serif;
-    font-size: 19px;
-    text-align: center;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    cursor: pointer;
-    visibility: hidden;
+  pointer-events: none !important;
+  cursor: default !important;
 }
 
- .popupMsg a {
-    color: black;
- }
-
-#palette td ,thead ,tr ,table {
-    border-collapse: collapse;
-    padding: 0;
-    margin: 0;
-    border:0;
- }
-
- #palette th:hover, #palette tr:hover {
-    background-color: rgba(211, 211, 211, 0.7);
-  }
-
- #printText {
-    border: 2px solid rgb(150, 150, 150);
-    z-index: 100;
-    width: auto;
-    word-wrap: break-word;
-    overflow: auto;
-    max-height: 60vh;
-  }
-
-  #errorText {
-    border: 2px solid red;
-    background-color: pink;
-  }
-
-  .contentWrapper {
-    display: flex;
-    align-items: flex-start; 
-    gap: 10px;
-    padding: 10px;
+.popupMsg {
+  min-width: 50%;
+  max-width: 55%;
+  height: auto;
+  position: absolute;
+  top: 130px;
+  left: 33%;
+  border-radius: 8px;
+  background-color: #8cc6ff;
+  font-family: "Roboto", sans-serif;
+  font-size: 19px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  visibility: hidden;
 }
 
-  #printText.show, #errorText.show {
-    visibility: visible;
-  }
+.popupMsg a {
+  color: black;
+}
 
- #printTextContent, #errorTextContent {
-    flex-grow: 1;
-    white-space: pre-wrap;
-  }
+#palette td,
+thead,
+tr,
+table {
+  border-collapse: collapse;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
 
-  .msgCloseIcon {
-    width: 28px;
-    height: 28px;
-    filter: invert(100%);
-    transition: background-color 0.3s, filter 0.3s;
-    margin-bottom: auto;
-  }
+#palette th:hover,
+#palette tr:hover {
+  background-color: rgba(211, 211, 211, 0.7);
+}
 
-  .msgCloseIcon:hover {
-    filter: invert(0%);
-  }
+#printText {
+  border: 2px solid rgb(150, 150, 150);
+  z-index: 100;
+  width: auto;
+  word-wrap: break-word;
+  overflow: auto;
+  max-height: 60vh;
+}
 
-  .disable_highlighting {
-    user-select: none;
+#errorText {
+  border: 2px solid red;
+  background-color: pink;
+}
+
+.contentWrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px;
+}
+
+#printText.show,
+#errorText.show {
+  visibility: visible;
+}
+
+#printTextContent,
+#errorTextContent {
+  flex-grow: 1;
+  white-space: pre-wrap;
+}
+
+.msgCloseIcon {
+  width: 28px;
+  height: 28px;
+  filter: invert(100%);
+  transition: background-color 0.3s, filter 0.3s;
+  margin-bottom: auto;
+}
+
+.msgCloseIcon:hover {
+  filter: invert(0%);
+}
+
+.disable_highlighting {
+  user-select: none;
+}
+@media (max-width: 390px) {
+  #right-arrow,
+  #left-arrow {
+    position: relative;
+    top: auto;
+    left: auto;
+    margin-top: 10px;
+    margin-left: auto; /* Center the arrows horizontally */
+    margin-right: auto;
+    display: block;
+    clear: both;
   }
+}
