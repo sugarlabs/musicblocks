@@ -2333,6 +2333,9 @@ class Block {
         }
     }
 
+    /**
+     * Generates a new label for the collapsed note value block based on its connections.
+     */
     _newNoteLabel() {
         // Find pitch and value to display on the collapsed note value
         // block.
@@ -2389,6 +2392,9 @@ class Block {
         }
     }
 
+    /**
+     * Generates a label for the collapsed block displaying time in milliseconds.
+     */
     _oscTimeLabel() {
         // Find Hertz and value to display on the collapsed note value
         // block.
@@ -2439,6 +2445,11 @@ class Block {
         }
     }
 
+    /**
+     * Retrieves the pitch value based on the given connection.
+     * @param {number} c - The connection index.
+     * @returns {string} - The pitch value.
+     */
     _getPitch(c) {
         if (c === null) {
             return "";
@@ -2537,6 +2548,11 @@ class Block {
         }
     }
 
+    /**
+     * Toggles the collapsed state of blocks inside a note (or interval) block and repositions any blocks below it. Also resizes any surrounding clamps.
+     * @param {number} thisBlock - The index of the current block.
+     * @param {boolean} collapse - The collapse state (true for collapsed, false for expanded).
+     */
     _toggle_inline(thisBlock, collapse) {
         // Toggle the collapsed state of blocks inside of a note (or
         // interval) block and reposition any blocks below
