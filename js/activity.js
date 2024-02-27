@@ -3160,6 +3160,7 @@ class Activity {
                 canvasHolder.height = canvas.height;
             }
             document.getElementById("hideContents").click();
+            that.refreshCanvas();
         }
 
         let resizeTimeout;
