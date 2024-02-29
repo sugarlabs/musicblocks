@@ -2762,6 +2762,10 @@ class Block {
         let locked = false;
         let getInput = window.hasMouse;
 
+        /**
+         * Handles the click event on the block container.
+         * @param {Event} event - The click event.
+         */
         this.container.on("click", (event) => {
             if(docById("helpfulWheelDiv") && docById("helpfulWheelDiv").style.display !== "none") {
                 docById("helpfulWheelDiv").style.display = "none";
@@ -2868,6 +2872,10 @@ class Block {
             }
         });
 
+        /**
+         * Handles the mousedown event on the block container.
+         * @param {Event} event - The mousedown event.
+         */
         this.container.on("mousedown", (event) =>{
             docById("contextWheelDiv").style.display = "none";
 
@@ -2906,6 +2914,10 @@ class Block {
             };
         });
 
+        /**
+         * Handles the pressmove event on the block container.
+         * @param {Event} event - The pressmove event.
+         */
         this.container.on("pressmove", (event) =>{
             // FIXME: More voodoo
             event.nativeEvent.preventDefault();
