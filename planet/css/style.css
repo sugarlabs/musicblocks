@@ -419,7 +419,7 @@ a {
 		flex:1;
 	}
 	.input-field {
-		display: none;
+		display: block;
 	}
 	#global-search {
 		flex: 1;
