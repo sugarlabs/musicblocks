@@ -1156,7 +1156,6 @@ class Activity {
                 node.textContent = "Stopped recording";
                 document.body.appendChild(node);
             }
-            // eslint-disable-next-line no-unused-vars
 
             /**
              * Creates a media recorder instance.
@@ -3161,6 +3160,7 @@ class Activity {
                 canvasHolder.height = canvas.height;
             }
             document.getElementById("hideContents").click();
+            that.refreshCanvas();
         }
 
         let resizeTimeout;
@@ -4630,31 +4630,31 @@ class Activity {
             this.boundary.hide();
 
             if(!this.helpfulWheelItems.find(ele => ele.label === "Home [HOME]")) 
-                this.helpfulWheelItems.push({label: "Home [HOME]", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GOHOMEFADEDBUTTON))), display: true, fn: findBlocks});
+                this.helpfulWheelItems.push({label: "Home [HOME]", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(GOHOMEFADEDBUTTON)), display: true, fn: findBlocks});
 
             this.hideBlocksContainer = createButton(SHOWBLOCKSBUTTON, _("Show/hide block"),
                 changeBlockVisibility);
 
             if(!this.helpfulWheelItems.find(ele => ele.label === "Show/hide block")) 
-                this.helpfulWheelItems.push({label: "Show/hide block", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(SHOWBLOCKSBUTTON))), display: true, fn: changeBlockVisibility});
+                this.helpfulWheelItems.push({label: "Show/hide block", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SHOWBLOCKSBUTTON)), display: true, fn: changeBlockVisibility});
             
             this.collapseBlocksContainer = createButton(COLLAPSEBLOCKSBUTTON, _("Expand/collapse blocks"),
                 toggleCollapsibleStacks);
 
             if(!this.helpfulWheelItems.find(ele => ele.label === "Expand/collapse blocks")) 
-                this.helpfulWheelItems.push({label: "Expand/collapse blocks", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(COLLAPSEBLOCKSBUTTON))), display: true, fn: toggleCollapsibleStacks});
+                this.helpfulWheelItems.push({label: "Expand/collapse blocks", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBLOCKSBUTTON)), display: true, fn: toggleCollapsibleStacks});
             
             this.smallerContainer = createButton(SMALLERBUTTON, _("Decrease block size"),
                 doSmallerBlocks);
             
             if(!this.helpfulWheelItems.find(ele => ele.label === "Decrease block size")) 
-                this.helpfulWheelItems.push({label: "Decrease block size", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(SMALLERBUTTON))), display: true, fn: doSmallerBlocks});
+                this.helpfulWheelItems.push({label: "Decrease block size", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SMALLERBUTTON)), display: true, fn: doSmallerBlocks});
             
             this.largerContainer = createButton(BIGGERBUTTON, _("Increase block size"),
                 doLargerBlocks);
             
             if(!this.helpfulWheelItems.find(ele => ele.label === "Increase block size")) 
-                this.helpfulWheelItems.push({label: "Increase block size", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(BIGGERBUTTON))), display: true, fn: doLargerBlocks});
+                this.helpfulWheelItems.push({label: "Increase block size", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(BIGGERBUTTON)), display: true, fn: doLargerBlocks});
 
             if(!this.helpfulWheelItems.find(ele => ele.label === "Restore")) 
                 this.helpfulWheelItems.push({label: "Restore", icon: "imgsrc:header-icons/restore-from-trash.svg", display: true, fn: restoreTrash});
@@ -4675,16 +4675,16 @@ class Activity {
                 this.helpfulWheelItems.push({label: "Set Pitch Preview", icon: "imgsrc:header-icons/music-note.svg", display: true, fn: chooseKeyMenu});
         
             if(!this.helpfulWheelItems.find(ele => ele.label === "Grid")) 
-                this.helpfulWheelItems.push({label: "Grid", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(CARTESIANBUTTON))), display: true, fn: piemenuGrid});
+                this.helpfulWheelItems.push({label: "Grid", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CARTESIANBUTTON)), display: true, fn: piemenuGrid});
         
             if(!this.helpfulWheelItems.find(ele => ele.label === "Clean")) 
-                this.helpfulWheelItems.push({label: "Clean", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(CLEARBUTTON))), display: true, fn: () => this._allClear(false)});
+                this.helpfulWheelItems.push({label: "Clean", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CLEARBUTTON)), display: true, fn: () => this._allClear(false)});
             
             if(!this.helpfulWheelItems.find(ele => ele.label === "Collapse")) 
-                this.helpfulWheelItems.push({label: "Collapse", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON))), display: true, fn: this.turtles.collapse});
+                this.helpfulWheelItems.push({label: "Collapse", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBUTTON)), display: true, fn: this.turtles.collapse});
         
             if(!this.helpfulWheelItems.find(ele => ele.label === "Expand")) 
-                this.helpfulWheelItems.push({label: "Expand", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(EXPANDBUTTON))), display: false, fn: this.turtles.expand});
+                this.helpfulWheelItems.push({label: "Expand", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(EXPANDBUTTON)), display: false, fn: this.turtles.expand});
         
             if(!this.helpfulWheelItems.find(ele => ele.label === "Search for Blocks")) 
                 this.helpfulWheelItems.push({label: "Search for Blocks", icon: "imgsrc:header-icons/search-button.svg", display: true, fn: this._displayHelpfulSearchDiv});

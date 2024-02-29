@@ -65,7 +65,7 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
 
     if (GUIDEURL === "guide url" || GUIDEURL === "") {
         GUIDEURL =
-            "https://github.com/sugarlabs/musicblocks/tree/master/guide/README.md";
+            "../guide/guide.html";
     }
 
     NUMBERBLOCKDEFAULT = 4;
