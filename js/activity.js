@@ -1156,6 +1156,7 @@ class Activity {
                 node.textContent = "Stopped recording";
                 document.body.appendChild(node);
             }
+            // eslint-disable-next-line no-unused-vars
 
             /**
              * Creates a media recorder instance.
