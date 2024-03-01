@@ -3027,6 +3027,13 @@ class Block {
             that.activity.refreshCanvas();
         });
 
+        /**
+         * Defines the event handler for mouseout event on the container.
+         * If a long press is not detected, triggers the mouseout callback.
+         * Otherwise, clears the long press status and timeout.
+         * Unhighlights the block and resets the active block.
+         * @param {Event} event - The mouseout event object.
+         */
         this.container.on("mouseout", (event) =>{
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false);
@@ -3042,6 +3049,13 @@ class Block {
             moved = false;
         });
 
+        /**
+         * Defines the event handler for pressup event on the container.
+         * If a long press is not detected, triggers the mouseout callback.
+         * Otherwise, clears the long press status and timeout.
+         * Unhighlights the block and resets the active block.
+         * @param {Event} event - The pressup event object.
+         */
         this.container.on("pressup", (event) =>{
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false);
@@ -3059,13 +3073,13 @@ class Block {
     }
 
     /**
-     * Common code for processing events.
+     * Handles mouseout events and processes related actions.
      * @private
-     * @param event - mouse
-     * @param moved - cursor moved
-     * @param haveClick - when clickd
-     * @param hideDOM - hide mouse
-     * Set cursor style to default.
+     * @param {Event} event - The mouse event.
+     * @param {boolean} moved - Indicates if the cursor moved.
+     * @param {boolean} haveClick - Indicates if a click event occurred.
+     * @param {boolean} hideDOM - Indicates whether to hide DOM elements.
+     * Sets cursor style to default.
      * @returns {void}
      */
     _mouseoutCallback(event, moved, haveClick, hideDOM) {
@@ -3149,6 +3163,11 @@ class Block {
         }
     }
 
+    /**
+     * Checks if a pie menu should be used for this block.
+     * @private
+     * @returns {boolean} - Indicates whether a pie menu should be used.
+     */
     _usePiemenu() {
         // Check on all the special cases were we want to use a pie menu.
         this._check_meter_block = null;
@@ -3196,6 +3215,11 @@ class Block {
         return false;
     }
 
+    /**
+     * Checks if a pie menu should be used for this block based on Connection 1.
+     * @private
+     * @returns {boolean} - Indicates whether a pie menu should be used.
+     */
     _usePieNumberC1() {
         // Return true if this number block plugs into Connection 1 of
         // a block that uses a pie menu. Add block names to the list
@@ -3214,6 +3238,10 @@ class Block {
         return this.blocks.blockList[cblk].connections[1] === this.blocks.blockList.indexOf(this);
     }
 
+    /**
+     * Determines if this number block plugs into Connection 2 of a block that uses a pie menu.
+     * @returns {boolean} - True if the block plugs into Connection 2 of a pie menu block, false otherwise.
+     */
     _usePieNumberC2() {
         // Return true if this number block plugs into Connection 2 of
         // a block that uses a pie menu. Add block names to the list
@@ -3232,6 +3260,10 @@ class Block {
         return this.blocks.blockList[cblk].connections[2] === this.blocks.blockList.indexOf(this);
     }
 
+    /**
+     * Determines if this number block plugs into Connection 3 of a block that uses a pie menu.
+     * @returns {boolean} - True if the block plugs into Connection 3 of a pie menu block, false otherwise.
+     */
     _usePieNumberC3() {
         // Return true if this number block plugs into Connection 3 of
         // a block that uses a pie menu. Add block names to the list
@@ -3250,6 +3282,9 @@ class Block {
         return this.blocks.blockList[cblk].connections[3] === this.blocks.blockList.indexOf(this);
     }
 
+    /**
+     * Ensures that the decoration is on top of the block.
+     */
     _ensureDecorationOnTop() {
         // Find the turtle decoration and move it to the top.
         for (let child = 0; child < this.container.children.length; child++) {
