@@ -319,8 +319,14 @@ class Block {
         this.offset = { x: 0, y: 0 };
     }
 
-    // Internal function for creating cache.
-    // Includes workaround for a race condition.
+    /**
+     * Internal function for creating cache with workaround for a race condition.
+     * @private
+     * @param {Function} callback - The callback function to execute after creating the cache.
+     * @param {Array} args - The arguments to pass to the callback function.
+     * @returns {Promise} - A promise that resolves when the cache is created successfully.
+     * @throws {Error} - Throws an error if cache creation fails after multiple attempts.
+     */
     _createCache(callback, args) {
         const that = this;
         return new Promise((resolve, reject) => {
@@ -359,8 +365,12 @@ class Block {
         });
     }
 
-    // Internal function for updating the cache.
-    // Includes workaround for a race condition.
+    /**
+     * Internal function for updating the cache with workaround for a race condition.
+     * @private
+     * @returns {Promise} - A promise that resolves when the cache is updated successfully.
+     * @throws {Error} - Throws an error if cache update fails after multiple attempts.
+     */
     updateCache() {
         const that = this;
         return new Promise((resolve, reject) => {
@@ -392,6 +402,10 @@ class Block {
         });
     }
 
+    /**
+     * Checks if the block should be ignored for certain operations.
+     * @returns {boolean} - Returns true if the block should be ignored, otherwise false.
+     */
     ignore() {
         if (this.bitmap === null) {
             return true;
@@ -445,22 +459,43 @@ class Block {
         return false;
     }
 
+    /**
+     * Checks if the block is off-screen based on the provided boundary.
+     * @param {object} boundary - The boundary object representing the canvas dimensions.
+     * @returns {boolean} - Returns true if the block is off-screen, otherwise false.
+     */
     offScreen(boundary) {
         return !this.trash && boundary.offScreen(this.container.x, this.container.y);
     }
 
+    /**
+     * Copies the size from the protoblock to the current block.
+     * @returns {void}
+     */
     copySize() {
         this.size = this.protoblock.size;
     }
 
+    /**
+     * Retrieves information about the block.
+     * @returns {string} - Information about the block.
+     */
     getInfo() {
         return this.name + " block";
     }
 
+    /**
+     * Checks if the block is collapsible.
+     * @returns {boolean} - Returns true if the block is collapsible, otherwise false.
+     */
     isCollapsible() {
         return COLLAPSIBLES.indexOf(this.name) !== -1;
     }
 
+    /**
+     * Checks if the block is inline collapsible.
+     * @returns {boolean} - Returns true if the block is inline collapsible, otherwise false.
+     */
     isInlineCollapsible() {
         return INLINECOLLAPSIBLES.indexOf(this.name) !== -1;
     }
@@ -972,7 +1007,11 @@ class Block {
         const thisBlock = this.blocks.blockList.indexOf(this);
         let block_label = "";
 
-        // Create the highlight bitmap for the block.
+        /**
+         * Processes and creates various bitmaps for the block.
+         * @param {PIXI.Bitmap} bitmap - The bitmap to process.
+         * @param {object} that - Reference to the current object.
+         */
         const __processHighlightBitmap = (bitmap, that) => {
             if (that.highlightBitmap != null) {
                 that.container.removeChild(that.highlightBitmap);
@@ -1033,7 +1072,11 @@ class Block {
             that._createCache(__callback, firstTime);
         };
 
-        // Create the disconnect highlight bitmap for the block.
+        /**
+         * Processes and creates the disconnect highlight bitmap for the block.
+         * @param {PIXI.Bitmap} bitmap - The bitmap to process.
+         * @param {object} that - Reference to the current object.
+         */
         const __processDisconnectedHighlightBitmap = (bitmap, that) => {
             if (that.disconnectedHighlightBitmap != null) {
                 that.container.removeChild(that.disconnectedHighlightBitmap);
@@ -1069,7 +1112,11 @@ class Block {
             _blockMakeBitmap(artwork, __processHighlightBitmap, that);
         };
 
-        // Create the disconnect bitmap for the block.
+        /**
+         * Processes and creates the disconnect bitmap for the block.
+         * @param {PIXI.Bitmap} bitmap - The bitmap to process.
+         * @param {object} that - Reference to the current object.
+         */
         const __processDisconnectedBitmap = (bitmap, that) => {
             if (that.disconnectedBitmap != null) {
                 that.container.removeChild(that.disconnectedBitmap);
@@ -1108,7 +1155,11 @@ class Block {
             _blockMakeBitmap(artwork, __processDisconnectedHighlightBitmap, that);
         };
 
-        // Create the bitmap for the block.
+        /**
+         * Processes and creates the bitmap for the block.
+         * @param {PIXI.Bitmap} bitmap - The bitmap to process.
+         * @param {object} that - Reference to the current object.
+         */
         const __processBitmap = (bitmap, that) => {
             if (that.bitmap != null) {
                 that.container.removeChild(that.bitmap);
@@ -1839,27 +1890,50 @@ class Block {
         }
     }
 
-    // Utility functions
+    /**
+     * Checks if the block is a value block.
+     * @returns {boolean} - True if the block is a value block, false otherwise.
+     */
     isValueBlock() {
         return this.protoblock.style === "value";
     }
 
+    /**
+     * Checks if the block is a no-hit block.
+     * @returns {boolean} - True if the block is a no-hit block, false otherwise.
+     */
     isNoHitBlock() {
         return NOHIT.indexOf(this.name) !== -1;
     }
 
+    /**
+     * Checks if the block is an argument block.
+     * @returns {boolean} - True if the block is an argument block, false otherwise.
+     */
     isArgBlock() {
         return this.protoblock.style === "value" || this.protoblock.style === "arg";
     }
 
+    /**
+     * Checks if the block is a two-argument block.
+     * @returns {boolean} - True if the block is a two-argument block, false otherwise.
+     */
     isTwoArgBlock() {
         return this.protoblock.style === "twoarg";
     }
 
+    /**
+     * Checks if the block is a two-argument boolean block.
+     * @returns {boolean} - True if the block is a two-argument boolean block, false otherwise.
+     */
     isTwoArgBooleanBlock() {
         return ["equal", "greater", "less"].indexOf(this.name) !== -1;
     }
 
+    /**
+     * Checks if the block is a clamp block.
+     * @returns {boolean} - True if the block is a clamp block, false otherwise.
+     */
     isClampBlock() {
         return (
             this.protoblock.style === "clamp" ||
@@ -1868,36 +1942,68 @@ class Block {
         );
     }
 
+    /**
+     * Checks if the block is an argument flow clamp block.
+     * @returns {boolean} - True if the block is an argument flow clamp block, false otherwise.
+     */
     isArgFlowClampBlock() {
         return this.protoblock.style === "argflowclamp";
     }
 
+    /**
+     * Checks if the block is a left clamp block.
+     * @returns {boolean} - True if the block is a left clamp block, false otherwise.
+     */
     isLeftClampBlock() {
         return this.protoblock.isLeftClamp;
     }
 
+    /**
+     * Checks if the block is a double clamp block.
+     * @returns {boolean} - True if the block is a double clamp block, false otherwise.
+     */
     isDoubleClampBlock() {
         return this.protoblock.style === "doubleclamp";
     }
 
+    /**
+     * Checks if the block is a no-run block.
+     * @returns {boolean} - True if the block is a no-run block, false otherwise.
+     */
     isNoRunBlock() {
         return this.name === "action";
     }
 
+    /**
+     * Checks if the block is an argument clamp block.
+     * @returns {boolean} - True if the block is an argument clamp block, false otherwise.
+     */
     isArgClamp() {
         return this.protoblock.style === "argclamp" || this.protoblock.style === "argclamparg";
     }
 
+    /**
+     * Checks if the block is an expandable block.
+     * @returns {boolean} - True if the block is an expandable block, false otherwise.
+     */
     isExpandableBlock() {
         return this.protoblock.expandable;
     }
 
+    /**
+     * Gets the unique identifier for the block.
+     * @returns {string} - The unique identifier for the block.
+     */
     getBlockId() {
         // Generate a UID based on the block index into the blockList.
         const number = blockBlocks.blockList.indexOf(this);
         return "_" + number.toString();
     }
 
+    /**
+     * Removes the child bitmap with the specified name from the block container.
+     * @param {string} name - The name of the child bitmap to remove.
+     */
     removeChildBitmap(name) {
         for (let child = 0; child < this.container.children.length; child++) {
             if (this.container.children[child].name === name) {
@@ -1907,6 +2013,10 @@ class Block {
         }
     }
 
+    /**
+     * Loads a thumbnail image onto the block.
+     * @param {string} imagePath - The path to the image to load as a thumbnail.
+     */
     loadThumbnail(imagePath) {
         // Load an image thumbnail onto block.
         const thisBlock = this.blocks.blockList.indexOf(this);
@@ -1963,6 +2073,10 @@ class Block {
         }
     }
 
+    /**
+     * Opens media for the block.
+     * @param {number} thisBlock - Index of the current block.
+     */
     _doOpenMedia(thisBlock) {
         const fileChooser = docById("myOpenAll");
         const that = this;
@@ -1998,12 +2112,19 @@ class Block {
         window.scroll(0, 0);
     }
 
+    /**
+     * Sets the block to a collapsed state.
+     */
     setCollapsedState() {
         // Mark it as in a collapsed block and hide it.
         this.inCollapsed = true;
         this.hide();
     }
 
+    /**
+     * Sets the block to an uncollapsed state.
+     * @param {number|null} nblk - Index of the block, or null.
+     */
     setUncollapsedState(nblk) {
         // It could be a block inside a note block, which may or may
         // not be hidden depending on the collapsed state of the
@@ -2020,6 +2141,9 @@ class Block {
         }
     }
 
+    /**
+     * Toggles the collapse state of the block.
+     */
     collapseToggle() {
         // Find the blocks to collapse/expand inside of a collapable
         // block.
@@ -2116,6 +2240,9 @@ class Block {
         this.activity.refreshCanvas();
     }
 
+    /**
+     * Labels the collapsed interval block.
+     */
     _intervalLabel() {
         // Find pitch and value to display on the collapsed interval
         // block.
@@ -2206,6 +2333,9 @@ class Block {
         }
     }
 
+    /**
+     * Generates a new label for the collapsed note value block based on its connections.
+     */
     _newNoteLabel() {
         // Find pitch and value to display on the collapsed note value
         // block.
@@ -2262,6 +2392,9 @@ class Block {
         }
     }
 
+    /**
+     * Generates a label for the collapsed block displaying time in milliseconds.
+     */
     _oscTimeLabel() {
         // Find Hertz and value to display on the collapsed note value
         // block.
@@ -2312,6 +2445,11 @@ class Block {
         }
     }
 
+    /**
+     * Retrieves the pitch value based on the given connection.
+     * @param {number} c - The connection index.
+     * @returns {string} - The pitch value.
+     */
     _getPitch(c) {
         if (c === null) {
             return "";
@@ -2410,6 +2548,11 @@ class Block {
         }
     }
 
+    /**
+     * Toggles the collapsed state of blocks inside a note (or interval) block and repositions any blocks below it. Also resizes any surrounding clamps.
+     * @param {number} thisBlock - The index of the current block.
+     * @param {boolean} collapse - The collapse state (true for collapsed, false for expanded).
+     */
     _toggle_inline(thisBlock, collapse) {
         // Toggle the collapsed state of blocks inside of a note (or
         // interval) block and reposition any blocks below
@@ -2619,6 +2762,10 @@ class Block {
         let locked = false;
         let getInput = window.hasMouse;
 
+        /**
+         * Handles the click event on the block container.
+         * @param {Event} event - The click event.
+         */
         this.container.on("click", (event) => {
             if(docById("helpfulWheelDiv") && docById("helpfulWheelDiv").style.display !== "none") {
                 docById("helpfulWheelDiv").style.display = "none";
@@ -2725,6 +2872,10 @@ class Block {
             }
         });
 
+        /**
+         * Handles the mousedown event on the block container.
+         * @param {Event} event - The mousedown event.
+         */
         this.container.on("mousedown", (event) =>{
             docById("contextWheelDiv").style.display = "none";
 
@@ -2763,6 +2914,10 @@ class Block {
             };
         });
 
+        /**
+         * Handles the pressmove event on the block container.
+         * @param {Event} event - The pressmove event.
+         */
         this.container.on("pressmove", (event) =>{
             // FIXME: More voodoo
             event.nativeEvent.preventDefault();
