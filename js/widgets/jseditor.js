@@ -236,9 +236,8 @@ class JSEditor {
         codeLines.style.fontWeight = "400";
         codeLines.style.letterSpacing = "normal";
         codeLines.style.lineHeight = "20px";
-        codeLines.style.background = "rgba(255, 255, 255, 0.1)";
-        codeLines.style.color = "white";
-        codeLines.style.setProperty("mix-blend-mode", "difference");
+        codeLines.style.background = "rgba(255, 255, 255, 0.075)";
+        codeLines.style.color = "rgba(255, 255, 255, 0.7)";
         codeLines.style.textAlign = "right";
         editorContainer.appendChild(codeLines);
 
