@@ -3329,7 +3329,7 @@ class Activity {
             // function to increase or decrease the "top" property of the top-right corner buttons
 
             const topRightButtons = document.querySelectorAll("#buttoncontainerTOP .tooltipped");
-            const btnY = document.getElementById("Grid").getBoundingClientRect().top;
+            const btnY = document.getElementById(_("Grid")).getBoundingClientRect().top;
 
             this.changeTopButtonsPosition = (value) => {
                 topRightButtons.forEach((child) => {
