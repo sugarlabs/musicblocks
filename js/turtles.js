@@ -779,9 +779,9 @@ Turtles.TurtlesView = class {
 
         const _makeButton = (svg, label, x, y) => {
             const container = document.createElement("div");
-            container.setAttribute("id", "" + label);
+            container.setAttribute("id", "" + label[0]);
             container.setAttribute("class", "tooltipped");
-            container.setAttribute("data-tooltip", label);
+            container.setAttribute("data-tooltip", label[1]);
             container.setAttribute("data-position", "bottom");
             jQuery.noConflict()(".tooltipped").tooltip({
                 html: true,
@@ -873,7 +873,7 @@ Turtles.TurtlesView = class {
         const __makeGridButton = () => {
             this.gridButton = _makeButton(
                 CARTESIANBUTTON,
-                ("Grid"),
+               [("Grid"),_("Grid")],
                 this._w - 10 - 3 * 55,
                 70 + LEADING + 6
             );
@@ -890,7 +890,7 @@ Turtles.TurtlesView = class {
         const __makeClearButton = () => {
             this._clearButton = _makeButton(
                 CLEARBUTTON,
-                _("Clean"),
+                ["Clean",_("Clean")],
                 this._w - 5 - 2 * 55,
                 70 + LEADING + 6
             );
@@ -924,7 +924,7 @@ Turtles.TurtlesView = class {
         const __makeCollapseButton = () => {
             this._collapseButton = _makeButton(
                 COLLAPSEBUTTON,
-                _("Collapse"),
+                ["Collapse",_("Collapse")],
                 this._w - 55,
                 70 + LEADING + 6
             );
