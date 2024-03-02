@@ -873,7 +873,7 @@ Turtles.TurtlesView = class {
         const __makeGridButton = () => {
             this.gridButton = _makeButton(
                 CARTESIANBUTTON,
-                _("Grid"),
+                ("Grid"),
                 this._w - 10 - 3 * 55,
                 70 + LEADING + 6
             );
