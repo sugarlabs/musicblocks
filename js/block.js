@@ -3966,6 +3966,12 @@ class Block {
         if (!this._usePiemenu()) {
             let focused = false;
 
+            /**
+             * Handles blur event for input elements.
+             * @private
+             * @param {Event} event - The blur event object.
+             * @returns {void}
+             */
             const __blur = (event) =>{
                 // Not sure why the change in the input is not available
                 // immediately in FireFox. We need a workaround if hardware
@@ -3990,6 +3996,11 @@ class Block {
                 }
             };
 
+            /**
+             * Handles input event for input elements.
+             * @private
+             * @returns {void}
+             */
             const __input = () => {
                 that._labelChanged(false, true);
             };
@@ -3999,6 +4010,12 @@ class Block {
                 this.label.addEventListener("input", __input);
             }
 
+            /**
+             * Keypress handler for exit key (Tab and Enter).
+             * @private
+             * @param {Event} event - The keypress event object.
+             * @returns {void}
+             */
             let __keypress = (event) =>{
                 if ([13, 10, 9].indexOf(event.keyCode) !== -1) {
                     __blur(event);
@@ -4057,9 +4074,9 @@ class Block {
     }
 
     /**
-     * Check if pie menu is ok to launch.
+     * Checks if pie menu is okay to launch.
      * @public
-     * @returns {void}
+     * @returns {boolean} - True if pie menu is okay to launch, false otherwise.
      */
     piemenuOKtoLaunch() {
         if (this._piemenuExitTime === null) {
@@ -4069,6 +4086,12 @@ class Block {
         return new Date().getTime() - this._piemenuExitTime > 200;
     }
 
+    /**
+     * Checks if the block's input is a number value.
+     * @private
+     * @param {number} c - The index of the connection.
+     * @returns {boolean} - True if the input is a number value, false otherwise.
+     */
     _noteValueNumber(c) {
         // Is this a number block being used as a note value
         // denominator argument?
@@ -4117,6 +4140,11 @@ class Block {
         return false;
     }
 
+    /**
+     * Gets the value of the number block being used as a note value.
+     * @private
+     * @returns {number} - The value of the number block being used as a note value.
+     */
     _noteValueValue() {
         // Return the number block value being used as a note value
         // denominator argument.
@@ -4168,6 +4196,10 @@ class Block {
         return 1;
     }
 
+    /**
+     * Checks and reinitializes widget windows if their labels are changed.
+     * @param {boolean} closeInput - Flag indicating whether to close input.
+     */
     _checkWidgets(closeInput) {
         // Detect if label is changed, then reinit widget windows
         // if they are open.
@@ -4207,6 +4239,11 @@ class Block {
         }
     }
 
+    /**
+     * Updates block values as they change in the DOM label.
+     * @param {boolean} closeInput - Flag indicating whether to close input.
+     * @param {boolean} [notPieMenu] - Flag indicating whether to close pie menu.
+     */
     _labelChanged(closeInput, notPieMenu) {
         // Update the block values as they change in the DOM label.
 
@@ -4538,9 +4575,9 @@ class Block {
 }
 
 /**
- * Set elements to a array; if element is string, then set element's id to element
+ * Set elements to an array; if element is string, then set element's id to element.
  * @public
- * @returns {void}
+ * @returns {Array|HTMLElement} - An array of elements or a single element.
  */
 const $ = () => {
     const elements = new Array();
@@ -4561,6 +4598,7 @@ const $ = () => {
     return elements;
 };
 
+// Track mouse presence
 window.hasMouse = false;
 // Mousemove is not emulated for touch
 document.addEventListener("mousemove", () => {
