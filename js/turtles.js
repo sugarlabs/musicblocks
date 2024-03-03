@@ -781,7 +781,7 @@ Turtles.TurtlesView = class {
             const container = document.createElement("div");
             container.setAttribute("id", "" + object.name);
             container.setAttribute("class", "tooltipped");
-            container.setAttribute("data-tooltip",object.label);
+            container.setAttribute("data-tooltip", object.label);
             container.setAttribute("data-position", "bottom");
             jQuery.noConflict()(".tooltipped").tooltip({
                 html: true,
