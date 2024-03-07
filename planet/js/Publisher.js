@@ -116,7 +116,7 @@ class Publisher {
             this.setTagInput(arr);
         });
 
-        jQuery(".chips").on("chip.add", (e, chip) => {
+        jQuery(".chips").on("chip.delete", (e, chip) => {
             let arr = jQuery(".chips-initial").material_chip("data");
 
             if (!(chip.tag in this.ChipTags))
