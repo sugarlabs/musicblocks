@@ -1,0 +1,19 @@
+name: 'Close stale pull requests'
+
+on:
+  schedule:
+    - cron: '30 19 * * *' # Schedule for 7:30 PM every day
+  workflow_dispatch:
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v3
+        with:
+          stale-pr-message: 'This pull request has been open for more than 60 days without any activity. It will be closed in 3 days unless the `stale` label is removed or commented on.'
+          close-pr-message: 'Closed pull request due to inactivity for more than 63 days.'
+          days-before-pr-stale: 60 # Number of days before a PR is considered stale
+          days-before-pr-close: 3 # Number of days after a stale PR before it is closed
+          days-before-issue-stale: -1 # Not managing stale issues
+          days-before-issue-close: -1 # Not managing stale issues
