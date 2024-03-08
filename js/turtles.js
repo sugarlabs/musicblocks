@@ -902,10 +902,16 @@ Turtles.TurtlesView = class {
             );
 
             this._clearButton.onclick = () => {
+                const auxToolbar = docById("aux-toolbar");
                 let clearBox = document.getElementById("ClearButton");
                 let clearContent = document.getElementById("ClearContent");
                 clearContent.innerHTML = _("Confirm");
                 clearBox.style.visibility="visible";
+                if (auxToolbar.style.display === "block") {
+                    clearBox.style.top = "180px";
+                } else {
+                    clearBox.style.top = "125px";
+                }
                 let func = this.activity._allClear;
                 clearBox.addEventListener('click', function(event) {
                     if(event.target.id == "clearClose"){
@@ -914,6 +920,14 @@ Turtles.TurtlesView = class {
                     else{
                        func();
                        clearBox.style.visibility = "hidden";
+                       if (auxToolbar.style.display === "block") {
+                        setTimeout(() => {
+                            docById("Grid").style.top = "136px";
+                            docById("Expand").style.top = "136px";
+                            docById("Collapse").style.top = "136px";
+                            docById("Clean").style.top = "136px";
+                        }, 0);
+                     }
                     }
                 });            
             };
