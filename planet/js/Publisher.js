@@ -99,19 +99,11 @@ class Publisher {
             if (tags[keys[i]].IsTagUserAddable === "1")
                 this.ChipTags[tags[keys[i]].TagName] = null;
 
-        jQuery("#tagsadd").material_chip({
-            autocompleteOptions: {
-                data: this.ChipTags,
-                limit: Infinity,
-                minLength: 1
-            }
-        });
-
         const maxLength = 5;
 
-        jQuery("#tagsadd").on("chip.add", (e, chip) => {
+        jQuery(".chips").on("chip.add", (e, chip) => {
             // you have the added chip here
-            let arr = jQuery("#tagsadd").material_chip("data");
+            let arr = jQuery(".chips-initial").material_chip("data");
 
             if (!(chip.tag in this.ChipTags))
                 arr.splice(arr.length - 1, 1);
@@ -122,12 +114,22 @@ class Publisher {
                 arr=arr.slice(0,maxLength);
     
             this.setTagInput(arr);
-            jQuery("#tagsadd :input").focus();
+        });
+
+        jQuery(".chips").on("chip.delete", (e, chip) => {
+            let arr = jQuery(".chips-initial").material_chip("data");
+
+            if (!(chip.tag in this.ChipTags))
+                arr.splice(arr.length - 1, 1);
+
+            else chip.id = this.findTagWithName(chip.tag);
+
+            this.setTagInput(arr);
         });
     };
 
     setTagInput(arr) {
-        jQuery("#tagsadd").material_chip({
+        jQuery(".chips-initial").material_chip({
             data: arr,
             autocompleteOptions: {
                 data: this.ChipTags,
@@ -150,7 +152,7 @@ class Publisher {
     };
 
     getTags() {
-        const t = jQuery("#tagsadd").material_chip("data");
+        const t = jQuery(".chips-initial").material_chip("data");
         const a = [];
 
         for (let i = 0; i < t.length; i++)
