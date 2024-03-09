@@ -392,7 +392,7 @@ function TemperamentWidget() {
                             this.ratiosNotesPair[index][1] +
                             "(- " +
                             centsDiff1[index].toFixed(2) +
-                            "%)" +
+                            "¢)" +
                             "</div>";
                     } else {
                         docById("noteInfo").innerHTML +=
@@ -402,7 +402,7 @@ function TemperamentWidget() {
                             this.ratiosNotesPair[index][1] +
                             "(+ " +
                             centsDiff1[index].toFixed(2) +
-                            "%)" +
+                            "¢)" +
                             "</div>";
                     }
                 }
@@ -1572,7 +1572,7 @@ function TemperamentWidget() {
                         addOctave +
                         "(" +
                         newCents.toFixed(0) +
-                        "%)" +
+                        "¢)" +
                         newOctave;
                 } else {
                     if (newCents > 30) {
@@ -1586,7 +1586,7 @@ function TemperamentWidget() {
                         addOctave +
                         "(+" +
                         newCents.toFixed(0) +
-                        "%)" +
+                        "¢)" +
                         newOctave;
                 }
             }
