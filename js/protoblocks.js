@@ -31,6 +31,10 @@
 // Protoblock contain generic information about blocks and some
 // methods common to all blocks.
 class ProtoBlock {
+    /**
+     * Creates an instance of ProtoBlock.
+     * @param {string} name - The name of the block.
+     */
     constructor(name) {
         // Name is used run-dictionary index, and palette label.
         this.name = name;
@@ -79,6 +83,9 @@ class ProtoBlock {
         this.beginnerModeBlock = false;
     }
 
+    /**
+     * Adjusts the block width based on the label size.
+     */
     adjustWidthToLabel() {
         if (this.staticLabels.length === 0) {
             return;
@@ -104,6 +111,9 @@ class ProtoBlock {
     // only extend their hit area to the top of the clamp.)
 
     // E.g., penup, pendown
+    /**
+     * Initializes a zero-argument block.
+     */
     zeroArgBlock() {
         this.args = 0;
         this.dockTypes.push("out");
@@ -111,6 +121,10 @@ class ProtoBlock {
         this.generator = this.zeroArgBlockGenerator;
     }
 
+    /**
+     * Generates SVG artwork for a zero-argument block.
+     * @returns {array} - An array containing SVG artwork, dock positions, width, height, and hit area height.
+     */
     zeroArgBlockGenerator() {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -130,6 +144,10 @@ class ProtoBlock {
     }
 
     // E.g., hidden (used at end of clamp)
+    /**
+     * Sets up a hidden block with flow.
+     * Used at the end of a clamp.
+     */
     hiddenBlockFlow() {
         this.args = 0;
         this.size = 0;
@@ -139,6 +157,10 @@ class ProtoBlock {
     }
 
     // E.g., hidden (used at end of no flow clamp)
+    /**
+     * Sets up a hidden block with no flow.
+     * Used at the end of a no flow clamp.
+     */
     hiddenBlockNoFlow() {
         this.args = 0;
         this.size = 0;
@@ -147,6 +169,10 @@ class ProtoBlock {
         this.generator = this.hiddenBlockFlowGenerator;
     }
 
+    /**
+     * Generates SVG artwork and docks for a hidden block with flow.
+     * @returns {array} - Array containing SVG artwork, docks, width, height, and hitHeight.
+     */
     hiddenBlockFlowGenerator() {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -166,6 +192,10 @@ class ProtoBlock {
     }
 
     // E.g., break
+    /**
+     * Sets up a basic block with no flow.
+     * Used for breaks.
+     */
     basicBlockNoFlow() {
         this.args = 0;
         this.dockTypes.push("out");
@@ -173,6 +203,10 @@ class ProtoBlock {
         this.generator = this.basicBlockNoFlowGenerator;
     }
 
+    /**
+     * Generates SVG artwork and docks for a basic block with no flow.
+     * @returns {array} - Array containing SVG artwork, docks, width, height, and hitHeight.
+     */
     basicBlockNoFlowGenerator() {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -194,6 +228,9 @@ class ProtoBlock {
     }
 
     // E.g., collapsed
+    /**
+     * Sets up a collapsed basic block.
+     */
     basicBlockCollapsed() {
         this.args = 0;
         this.dockTypes.push("unavailable");
@@ -201,6 +238,10 @@ class ProtoBlock {
         this.generator = this.basicBlockCollapsedGenerator;
     }
 
+    /**
+     * Generates SVG artwork and docks for a collapsed basic block.
+     * @returns {array} - Array containing SVG artwork, docks, width, height, and hitHeight.
+     */
     basicBlockCollapsedGenerator() {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -222,6 +263,10 @@ class ProtoBlock {
     }
 
     // E.g., forward, right
+    /**
+     * Sets up a one-argument block.
+     * E.g., forward, right.
+     */
     oneArgBlock() {
         this.args = 1;
         this.dockTypes.push("out");
@@ -230,6 +275,10 @@ class ProtoBlock {
         this.generator = this.oneArgBlockGenerator;
     }
 
+    /**
+     * Generates SVG artwork and docks for a one-argument block.
+     * @returns {array} - Array containing SVG artwork, docks, width, height, and hitHeight.
+     */
     oneArgBlockGenerator() {
         const svg = new SVG();
         svg.setScale(this.scale);
