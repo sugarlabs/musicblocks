@@ -236,9 +236,8 @@ class JSEditor {
         codeLines.style.fontWeight = "400";
         codeLines.style.letterSpacing = "normal";
         codeLines.style.lineHeight = "20px";
-        codeLines.style.background = "rgba(255, 255, 255, 0.1)";
-        codeLines.style.color = "white";
-        codeLines.style.setProperty("mix-blend-mode", "difference");
+        codeLines.style.background = "rgba(255, 255, 255, 0.075)";
+        codeLines.style.color = "rgba(255, 255, 255, 0.7)";
         codeLines.style.textAlign = "right";
         editorContainer.appendChild(codeLines);
 
@@ -454,6 +453,30 @@ class JSEditor {
         this._styles[this._currentStyle].setAttribute("disabled", "true");
         this._currentStyle = (this._currentStyle + 1) % this._styles.length;
         this._styles[this._currentStyle].removeAttribute("disabled");
+
+        const editorLines = docById("editorLines");
+        switch (this._styles[this._currentStyle].href.split("/").pop().split(".")[0]) {
+            case "dracula":
+                editorLines.style.color = "#ffffff";
+                editorLines.style.background = "#5a5a5a";
+                break;
+            case "github":
+                editorLines.style.color = "#000000";
+                editorLines.style.background = "#eaeaea";
+                break;
+            case "railscasts":
+                editorLines.style.color = "#ffffff";
+                editorLines.style.background = "#2b2b2b";
+                break;
+            case "vs":
+                editorLines.style.color = "#000000";
+                editorLines.style.background = "#f2f2f2";
+                break;
+            default:
+                editorLines.style.color = "#ffffff";
+                editorLines.style.background = "#000000";
+                break;
+        }
     }
 
     /**

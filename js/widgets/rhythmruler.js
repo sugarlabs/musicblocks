@@ -40,81 +40,305 @@
 /* exported RhythmRuler */
 
 /**
+ * Represents a RhythmRuler widget for creating rhythms that can be imported into the pitch-time matrix.
  * @abstract
- * This widget enable us to create a rhythms which can be imported into the pitch-time matrix and
- * hence used to create chunks of notes.
- *
- * @description
- * - `rulerButtonsDiv` is for the widget buttons
- * - `rulerTableDiv` is for the drum buttons (fixed first col) and the ruler cells
+ * @class
+ * @memberof global
+ * @requires TONEBPM
+ * @requires Singer
+ * @requires _
+ * @requires docById
+ * @requires delayExecution
+ * @requires last
+ * @requires nearestBeat
+ * @requires rationalToFraction
+ * @requires calcNoteValueToDisplay
+ * @requires platformColor
+ * @requires EIGHTHNOTEWIDTH
+ * @requires DRUMNAMES
+ * @requires VOICENAMES
+ * @requires EFFECTSNAMES
  */
 class RhythmRuler {
+    /**
+     * Height of the RhythmRuler widget.
+     * @type {number}
+     */
     static RULERHEIGHT = 70;
+
+    /**
+     * Size of the buttons in the RhythmRuler widget.
+     * @type {number}
+     */
     static BUTTONSIZE = 51;
+
+    /**
+     * Size of the icons in the RhythmRuler widget.
+     * @type {number}
+     */
     static ICONSIZE = 32;
+
+    /**
+     * ASCII code for the DELETE key.
+     * @type {number}
+     */
     static DEL = 46;
+
+    /**
+     * ASCII code for the BACKSPACE key.
+     * @type {number}
+     */
     static BACK = 8;
 
     /**
+     * Creates an instance of RhythmRuler.
      * @constructor
      */
     constructor() {
-        // There is one ruler per drum.
+        
+        /**
+         * Array containing the drums for the rhythm ruler.
+         * @type {Array}
+         */
         this.Drums = [];
-        // Rulers, one per drum, contain the subdivisions defined by rhythm blocks.
+        
+        /**
+         * Array containing the rulers, one per drum, which contain the subdivisions defined by rhythm blocks.
+         * @type {Array}
+         */
         this.Rulers = [];
-        // Save the history of divisions so as to be able to restore them.
+        
+        /**
+         * Array to save the history of divisions so they can be restored.
+         * @type {Array}
+         * @private
+         */
         this._dissectHistory = [];
+
+        /**
+         * Array representing the list of undo operations.
+         * @type {Array}
+         * @private
+         */
         this._undoList = [];
 
+        /**
+         * Flag indicating whether the ruler is currently playing.
+         * @type {boolean}
+         * @private
+         */
         this._playing = false;
+
+        /**
+         * Flag indicating whether the ruler is playing a single note.
+         * @type {boolean}
+         * @private
+         */
         this._playingOne = false;
+
+        /**
+         * Flag indicating whether the ruler is playing all notes.
+         * @type {boolean}
+         * @private
+         */
         this._playingAll = false;
+
+        /**
+         * Counter for the cells in the ruler.
+         * @type {number}
+         * @private
+         */
         this._cellCounter = 0;
 
         // Keep a elapsed time for each ruler to maintain sync.
+        /**
+         * Array to store elapsed time for each ruler to maintain synchronization.
+         * @type {number[]}
+         * @private
+         */
         this._elapsedTimes = [];
+
         // Starting time from which we measure for sync.
+        /**
+         * Starting time from which synchronization is measured.
+         * @type {number | null}
+         * @private
+         */
         this._startingTime = null;
 
+        /**
+         * Array to store offsets for each ruler.
+         * @type {number[]}
+         * @private
+         */
         this._offsets = [];
+
+        /**
+         * Index of the currently selected ruler.
+         * @type {number}
+         * @private
+         */
         this._rulerSelected = 0;
+
+        /**
+         * Index of the ruler currently playing.
+         * @type {number}
+         * @private
+         */
         this._rulerPlaying = -1;
 
+        /**
+         * Flag indicating whether tap mode is active.
+         * @type {boolean}
+         * @private
+         */
         this._tapMode = false;
+
+        /**
+         * Array to store tap times.
+         * @type {number[]}
+         * @private
+         */
         this._tapTimes = [];
+
+        /**
+         * Index of the cell tapped.
+         * @type {number | null}
+         * @private
+         */        
         this._tapCell = null;
+
+        /**
+         * Time when tap ended.
+         * @type {number | null}
+         * @private
+         */
         this._tapEndTime = null;
 
+        /**
+         * Time when long press started.
+         * @type {number | null}
+         * @private
+         */
         this._longPressStartTime = null;
+
+        /**
+         * Flag indicating whether in long press state.
+         * @type {boolean}
+         * @private
+         */
         this._inLongPress = false;
 
+        /**
+         * Index of the cell where mouse was pressed.
+         * @type {number | null}
+         * @private
+         */
         this._mouseDownCell = null;
+
+        /**
+         * Index of the cell where mouse was released.
+         * @type {number | null}
+         * @private
+         */
         this._mouseUpCell = null;
 
+        /**
+         * Reference to the wheel element.
+         * @type {HTMLElement | null}
+         * @private
+         */
         this._wheel = null;
 
         // Element references
+        /**
+         * Reference to the dissect number element.
+         * @type {HTMLElement | null}
+         * @private
+         */
         this._dissectNumber = null;
+
+        /**
+         * Reference to the progress bar element.
+         * @type {HTMLElement | null}
+         * @private
+         */
         this._progressBar = null;
+
+        /**
+         * Array to store references to ruler elements.
+         * @type {HTMLElement[]}
+         * @private
+         */
         this._rulers = [];
+        
+        /**
+         * Scale factor for fullscreen mode.
+         * @type {number}
+         * @private
+         */
         this._fullscreenScaleFactor = 3;
     }
 
     /**
-     * Initialises the temperament widget.
+     * Initializes the temperament widget.
+     * @param {Activity} activity The activity instance associated with the widget.
      * @returns {void}
      */
     init(activity) {
+        /**
+         * The activity instance associated with the widget.
+         * @type {Activity}
+         */
         this.activity = activity;
 
+        /**
+         * Factor used in BPM calculations.
+         * @type {number}
+         * @private
+         */
         this._bpmFactor = (1000 * TONEBPM) / Singer.masterBPM;
 
+        /**
+         * Flag indicating whether the widget is currently playing.
+         * @type {boolean}
+         * @private
+         */
         this._playing = false;
+
+        /**
+         * Flag indicating whether the widget is playing a single rhythm.
+         * @type {boolean}
+         * @private
+         */
         this._playingOne = false;
+
+        /**
+         * Flag indicating whether the widget is playing all rhythms.
+         * @type {boolean}
+         * @private
+         */
         this._playingAll = false;
+
+        /**
+         * Index of the ruler currently playing.
+         * @type {number}
+         * @private
+         */
         this._rulerPlaying = -1;
+
+        /**
+         * Starting time from which to measure for synchronization.
+         * @type {number|null}
+         * @private
+         */
         this._startingTime = null;
+
+        /**
+         * Flag indicating whether the widget is expanded.
+         * @type {boolean}
+         * @private
+         */    
         this._expanded = false;
 
         // If there are no drums, add one.
@@ -123,23 +347,57 @@ class RhythmRuler {
             this.Rulers.push([[1], []]);
         }
 
+        /**
+         * Array to store elapsed times for synchronization.
+         * @type {number[]}
+         * @private
+         */
         this._elapsedTimes = [];
+
+        /**
+         * Array to store offsets for synchronization.
+         * @type {number[]}
+         * @private
+         */
         this._offsets = [];
         for (let i = 0; i < this.Rulers.length; i++) {
             this._elapsedTimes.push(0);
             this._offsets.push(0);
         }
-
+        /**
+         * Scale factor for the cells.
+         * @type {number}
+         * @private
+         */
         this._cellScale = 1.0;
+
+        /**
+         * Size of the icons.
+         * @type {number}
+         * @const
+         */        
         const iconSize = RhythmRuler.ICONSIZE;
 
+        /**
+         * Reference to the widget window.
+         * @type {WidgetWindow}
+         */
         const widgetWindow = window.widgetWindows.windowFor(this, "rhythm maker");
+        /**
+         * The widget window associated with the rhythm maker.
+         * @type {WidgetWindow}
+         * @private
+         */        
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
 
         // For the button callbacks
-
+        /**
+         * Callback function for the close event of the widget window.
+         * @type {function}
+         * @private
+         */        
         widgetWindow.onclose = () => {
             // If the piemenu was open, close it.
             // docById('wheelDiv').style.display = 'none';
@@ -185,9 +443,23 @@ class RhythmRuler {
             this.widgetWindow.destroy();
         };
 
+        /**
+         * Handles the maximize event of the widget window, scaling the widget.
+         * @private
+         * @returns {void}
+         */        
         this.widgetWindow.onmaximize = this._scale.bind(this);
-
+        /**
+         * Represents the play all button.
+         * @private
+         * @type {HTMLElement}
+         */
         this._playAllCell = widgetWindow.addButton("play-button.svg", iconSize, _("Play all"));
+        /**
+         * Callback function for the click event of the play all button.
+         * @private
+         * @returns {void}
+         */        
         this._playAllCell.onclick = () => {
             if (this._playing) {
                 this.__pause();
@@ -196,7 +468,18 @@ class RhythmRuler {
             }
         };
 
+        /**
+         * Represents the flag indicating whether saving is locked to prevent multiple save attempts.
+         * @private
+         * @type {boolean}
+         */
         this._save_lock = false;
+        /**
+         * Event handler for the click event of the save rhythms button.
+         * Saves a merged version of the rulers.
+         * @private
+         * @returns {void}
+         */
         widgetWindow.addButton(
             "export-chunk.svg",
             iconSize,
@@ -217,6 +500,12 @@ class RhythmRuler {
             }
         };
 
+        /**
+         * Event handler for the click event of the save drum machine button.
+         * Saves the drum machine.
+         * @private
+         * @returns {void}
+         */
         widgetWindow.addButton(
             "export-drums.svg",
             iconSize,
@@ -265,6 +554,12 @@ class RhythmRuler {
             }
         };
 
+        /**
+         * Event handler for the input event of the dissect number input.
+         * Limits the dissect number value to the range 2 to 128.
+         * @private
+         * @returns {void}
+         */
         this._dissectNumber.oninput = () => {
             // Put a limit on the size (2 <--> 128).
             this._dissectNumber.onmouseout = () => {
@@ -274,26 +569,51 @@ class RhythmRuler {
             this._dissectNumber.value = Math.max(Math.min(this._dissectNumber.value, 128), 2);
         };
 
+        /**
+         * Event handler for the click event of the undo button.
+         * Undoes the last action.
+         * @private
+         * @returns {void}
+         */
         widgetWindow.addButton("restore-button.svg", iconSize, _("Undo")).onclick = () => {
             this._undo();
         };
 
         //.TRANS: user can tap out a rhythm by clicking on a ruler.
+        /**
+         * Event handler for the click event of the tap rhythm button.
+         * Calls the _tap method to allow users to tap out a rhythm by clicking on a ruler.
+         * @private
+         * @returns {void}
+         */
         this._tapButton = widgetWindow.addButton("tap-button.svg", iconSize, _("Tap a rhythm"));
         this._tapButton.onclick = () => {
             this._tap();
         };
 
         //.TRANS: clear all subdivisions from the ruler.
+        /**
+         * Event handler for the click event of the clear button.
+         * Calls the _clear method to clear all subdivisions from the ruler.
+         * @private
+         * @returns {void}
+         */
         widgetWindow.addButton("erase-button.svg", iconSize, _("Clear")).onclick = () => {
             this._clear();
         };
 
-        // We use an outer div to scroll vertically and an inner div to
-        // scroll horizontally.
+        /**
+         * Represents the table containing the rhythm rulers.
+         * The table has an outer div for vertical scrolling and an inner div for horizontal scrolling.
+         * @type {HTMLTableElement}
+         */
         const rhythmRulerTable = document.createElement("table");
         widgetWindow.getWidgetBody().append(rhythmRulerTable);
 
+        /**
+         * The maximum width of the rhythm ruler table.
+         * @type {number}
+         */
         let wMax = 0;
         // Each row in the ruler table contains a play button in the
         // first column and a ruler table in the second column.
@@ -499,9 +819,10 @@ class RhythmRuler {
     }
 
     /**
+     * Calculates the width of a note cell based on the note value.
      * @private
-     * @param {number} noteValue
-     * @returns {void}
+     * @param {number} noteValue - The value of the note.
+     * @returns {number} The width of the note cell.
      */
     _noteWidth(noteValue) {
         const ans = Math.floor(
@@ -512,6 +833,11 @@ class RhythmRuler {
         return ans;
     }
 
+    /**
+     * Scales the width of the note cells based on the window size.
+     * @private
+     * @returns {void}
+     */
     _scale() {
         if (this.widgetWindow.isMaximized()) {
             const width = this.widgetWindow.getWidgetBody().getBoundingClientRect().width;
@@ -540,8 +866,9 @@ class RhythmRuler {
     }
 
     /**
+     * Calculates and applies zebra stripes to the ruler cells for visual differentiation.
      * @private
-     * @param {number} rulerno
+     * @param {number} rulerno - The index of the ruler.
      * @returns {void}
      */
     _calculateZebraStripes(rulerno) {
@@ -576,9 +903,10 @@ class RhythmRuler {
     }
 
     /**
+     * Dissects a ruler cell based on the input number or tapping mode.
      * @private
-     * @param {string} ruler
      * @param {Event} event - The triggering event.
+     * @param {string} ruler - The index of the ruler.
      * @returns {void}
      */
     _dissectRuler(event, ruler) {
@@ -684,10 +1012,10 @@ class RhythmRuler {
     }
 
     /**
+     * Starts the tapping process.
      * @private
-     * @param {number} noteValues
+     * @param {number} interval - The interval between taps.
      * @param {Event} event - The triggering event.
-     * @param {number} interval
      * @returns {void}
      */
     __startTapping(interval, event) {
@@ -721,6 +1049,7 @@ class RhythmRuler {
     }
 
     /**
+     * Ends the tapping process and calculates the rhythm based on the tapped intervals.
      * @private
      * @param {Event} event - The triggering event.
      * @returns {void}
@@ -831,10 +1160,11 @@ class RhythmRuler {
     }
 
     /**
+     * Adds event handlers for mouse interactions with a rhythm cell.
      * @private
-     * @param {HTMLElement} cell  - The HTML element target
-     * @param {number} cellWidth
-     * @param {number} noteValue
+     * @param {HTMLElement} cell - The HTML element representing the rhythm cell.
+     * @param {number} cellWidth - The width of the rhythm cell.
+     * @param {number} noteValue - The value representing the note in the rhythm cell.
      * @returns {void}
      */
     __addCellEventHandlers(cell, cellWidth, noteValue) {
@@ -885,7 +1215,13 @@ class RhythmRuler {
                 }
             }, 1500);
         };
-
+        
+        /**
+         * Handles the mouseup event on a rhythm cell, determining actions based on the interaction.
+         * @private
+         * @param {Event} event - The mouseup event.
+         * @returns {void}
+         */
         const __mouseUpHandler = (event) => {
             clearTimeout(this._longPressBeep);
             const cell = event.target;
@@ -906,6 +1242,12 @@ class RhythmRuler {
             this._longPressStartTime = null;
         };
 
+        /**
+         * Handles the click event on a rhythm cell, triggering the dissecting action.
+         * @private
+         * @param {Event} event - The click event.
+         * @returns {void}
+         */
         const __clickHandler = (event) => {
             if (event == undefined) return;
             if (!this.__getLongPressStatus()) {
@@ -945,17 +1287,19 @@ class RhythmRuler {
     }
 
     /**
+     * Gets the current status of the long press.
      * @private
-     * @returns {void}
+     * @returns {boolean} - The status of the long press.
      */
     __getLongPressStatus() {
         return this._inLongPress;
     }
 
     /**
+     * Toggles the rest state of a rhythm cell.
      * @private
-     * @param {number} cellWidth
-     * @param {boolean} addToUndoList
+     * @param {HTMLElement} cell - The HTML element representing the rhythm cell.
+     * @param {boolean} addToUndoList - Indicates whether to add the action to the undo list.
      * @returns {void}
      */
     __toggleRestState(cell, addToUndoList) {
@@ -964,6 +1308,11 @@ class RhythmRuler {
             const noteValues = this.Rulers[this._rulerSelected][0];
             const noteValue = noteValues[cell.cellIndex];
 
+        /**
+         * Handles the mouseover event for the rhythm cell.
+         * @param {Event} event - The mouseover event.
+         * @returns {void}
+         */
             const __mouseOverHandler = (event) => {
                 const cell = event.target;
                 if (cell === null) {
@@ -984,6 +1333,11 @@ class RhythmRuler {
                 }
             };
 
+            /**
+             * Handles the mouseout event for the rhythm cell.
+             * @param {Event} event - The mouseout event.
+             * @returns {void}
+             */
             const __mouseOutHandler = (event) => {
                 const cell = event.target;
                 cell.innerHTML = "";
@@ -1021,10 +1375,11 @@ class RhythmRuler {
     }
 
     /**
+     * Divides a rhythm cell into multiple cells based on a list of new note values.
      * @private
-     * @param {HTMLElement} cell  - The HTML element target
-     * @param {number} newNoteValues
-     * @param {boolean} addToUndoList
+     * @param {HTMLElement} cell - The HTML element representing the rhythm cell to be divided.
+     * @param {number[]} newNoteValues - An array containing the new note values to divide the cell into.
+     * @param {boolean} addToUndoList - Indicates whether to add the action to the undo list.
      * @returns {void}
      */
     __divideFromList(cell, newNoteValues, addToUndoList) {
@@ -1077,10 +1432,11 @@ class RhythmRuler {
     }
 
     /**
+     * Dissects a rhythm cell by dividing it into a specified number of sub-cells.
      * @private
-     * @param {HTMLElement} cell  - The HTML element target
-     * @param {number} inputNum
-     * @param {boolean} addToUndoList
+     * @param {HTMLElement} cell - The HTML element representing the rhythm cell to be dissected.
+     * @param {number} inputNum - The number of sub-cells to divide the rhythm cell into.
+     * @param {boolean} addToUndoList - Indicates whether to add the action to the undo list.
      * @returns {void}
      */
     __dissectByNumber(cell, inputNum, addToUndoList) {
@@ -1147,9 +1503,10 @@ class RhythmRuler {
     }
 
     /**
+     * Ties together adjacent rhythm cells.
      * @private
      * @param {Event} event - The triggering event.
-     * @param {string} ruler
+     * @param {string} ruler - The ruler identifier.
      * @returns {void}
      */
     _tieRuler(event, ruler) {
@@ -1173,8 +1530,9 @@ class RhythmRuler {
     }
 
     /**
+     * Handles tying together adjacent rhythm cells.
      * @private
-     * @param {boolean} addToUndoList
+     * @param {boolean} addToUndoList - Indicates whether to add the action to the undo list.
      * @returns {void}
      */
     __tie(addToUndoList) {
@@ -1257,6 +1615,7 @@ class RhythmRuler {
     }
 
     /**
+     * Undoes the last action performed on the rhythm ruler.
      * @private
      * @returns {void}
      */
@@ -1394,6 +1753,7 @@ class RhythmRuler {
     }
 
     /**
+     * Activates the tap mode for tapping rhythms.
      * @private
      * @returns {void}
      */
@@ -1413,6 +1773,7 @@ class RhythmRuler {
     }
 
     /**
+     * Clears the rhythm ruler, stopping any playing and resetting all values.
      * @private
      * @returns {void}
      */
@@ -1445,6 +1806,7 @@ class RhythmRuler {
     }
 
     /**
+     * Pauses the rhythm playing.
      * @private
      * @returns {void}
      */
@@ -1470,6 +1832,7 @@ class RhythmRuler {
     }
 
     /**
+     * Initiates the playback of all rhythms.
      * @public
      * @returns {void}
      */
@@ -1491,6 +1854,7 @@ class RhythmRuler {
     }
 
     /**
+     * Resumes playback of all rhythms.
      * @private
      * @returns {void}
      */
@@ -1520,6 +1884,7 @@ class RhythmRuler {
     }
 
     /**
+     * Starts the playback of all rhythms.
      * @private
      * @returns {void}
      */
@@ -1541,6 +1906,7 @@ class RhythmRuler {
     }
 
     /**
+     * Starts the playback of a single rhythm.
      * @private
      * @returns {void}
      */
@@ -1559,10 +1925,11 @@ class RhythmRuler {
     }
 
     /**
+     * Executes a loop iteration for playback.
      * @private
-     * @param {number} noteTime
-     * @param {number} rulerNo
-     * @param {number} colIndex
+     * @param {number} noteTime - The duration of the note in milliseconds.
+     * @param {number} rulerNo - The index of the ruler.
+     * @param {number} colIndex - The index of the column in the ruler.
      * @returns {void}
      */
     __loop(noteTime, rulerNo, colIndex) {
@@ -1665,9 +2032,10 @@ class RhythmRuler {
     }
 
     /**
-     * @deprecated
+     * Saves the current state of the widget.
+     * @deprecated This function is deprecated and replaced by the save tuplets code.
      * @private
-     * @param {number} selectedRuler
+     * @param {number} selectedRuler - The index of the selected ruler.
      * @returns {void}
      */
     _save(selectedRuler) {
@@ -1745,8 +2113,9 @@ class RhythmRuler {
     }
 
     /**
+     * Saves the tuplets for the specified ruler and recursively for the subsequent rulers.
      * @private
-     * @param {number} selectedRuler
+     * @param {number} selectedRuler - The index of the selected ruler.
      * @returns {void}
      */
     _saveTuplets(selectedRuler) {
@@ -1835,8 +2204,9 @@ class RhythmRuler {
     }
 
     /**
+     * Generates and saves a new action block for representing rhythms based on the provided note values.
      * @private
-     * @param {number} selectedRuler
+     * @param {number[]} noteValues - An array of note values representing the rhythm.
      * @returns {void}
      */
     _saveTupletsMerged(noteValues) {
@@ -1885,8 +2255,9 @@ class RhythmRuler {
     }
 
     /**
+     * Saves either a drum machine or a voice machine based on the selected ruler.
      * @private
-     * @param {number} selectedRuler
+     * @param {number} selectedRuler - The index of the selected ruler.
      * @returns {void}
      */
     _saveMachine(selectedRuler) {
@@ -1921,10 +2292,11 @@ class RhythmRuler {
     }
 
     /**
+     * Saves a drum machine action based on the selected ruler, drum, and effect status.
      * @private
-     * @param {number} selectedRuler
-     * @param {string} drum
-     * @param {boolean} effect
+     * @param {number} selectedRuler - The index of the selected ruler.
+     * @param {string} drum - The drum instrument name.
+     * @param {boolean} effect - Indicates if the drum has an effect applied.
      * @returns {void}
      */
     _saveDrumMachine(selectedRuler, drum, effect) {
@@ -2107,9 +2479,10 @@ class RhythmRuler {
     }
 
     /**
+     * Saves a voice machine action based on the selected ruler and voice.
      * @private
-     * @param {number} selectedRuler
-     * @param {string} voice
+     * @param {number} selectedRuler - The index of the selected ruler.
+     * @param {string} voice - The voice instrument name.
      * @returns {void}
      */
     _saveVoiceMachine(selectedRuler, voice) {
@@ -2325,8 +2698,9 @@ class RhythmRuler {
     }
 
     /**
+     * Merges the rulers into one set of rhythms.
      * @private
-     * @returns {array}
+     * @returns {number[]} An array containing the merged rhythm values.
      */
     _mergeRulers() {
         // Merge the rulers into one set of rhythms.
@@ -2361,14 +2735,16 @@ class RhythmRuler {
     }
 
     /**
+     * Gets the save lock status.
      * @private
-     * @returns {boolean}
+     * @returns {boolean} The current status of the save lock.
      */
     _get_save_lock() {
         return this._save_lock;
     }
 
     /**
+     * Saves the dissect history.
      * @public
      * @returns {void}
      */
@@ -2456,6 +2832,7 @@ class RhythmRuler {
     }
 
     /**
+     * Positions the wheel widget.
      * @private
      * @returns {void}
      */

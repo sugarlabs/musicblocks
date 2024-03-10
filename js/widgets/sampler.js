@@ -18,7 +18,10 @@
 */
 
 /* exported SampleWidget */
-
+/**
+ * Represents a Sample Widget.
+ * @constructor
+ */
 function SampleWidget() {
     const ICONSIZE = 32;
     const SAMPLEWIDTH = 800;
@@ -38,19 +41,78 @@ function SampleWidget() {
     // Oscilloscope constants
     const SAMPLEANALYSERSIZE = 8192;
     const SAMPLEOSCCOLORS = ["#3030FF", "#FF3050"];
-
+    
+    /**
+     * Reference to the timbre block.
+     * @type {number | null}
+     */
     this.timbreBlock;
+
+    /**
+     * Array to store sample-related data.
+     * @type {Array}
+     */
     this.sampleArray;
+
+    /**
+     * String representing sample data.
+     * @type {string}
+     */
     this.sampleData = "";
+
+    /**
+     * Name of the sample.
+     * @type {string}
+     */
     this.sampleName = DEFAULTSAMPLE;
+
+    /**
+     * Pitch of the sample.
+     * @type {string}
+     */
     this.samplePitch = "sol";
+
+    /**
+     * Octave of the sample.
+     * @type {string}
+     */
     this.sampleOctave = "4";
+
+    /**
+     * Pitch center.
+     * @type {number}
+     */
     this.pitchCenter = 9;
+
+    /**
+     * Accidental center.
+     * @type {number}
+     */
     this.accidentalCenter = 2;
+
+    /**
+     * Octave center.
+     * @type {number}
+     */
     this.octaveCenter = 4;
+
+     /**
+     * Sample length.
+     * @type {number}
+     */
     this.sampleLength = 1000;
+
+    /**
+     * Pitch analyzers.
+     * @type {object}
+     */
     this.pitchAnalysers = {};
 
+    /**
+     * Updates the blocks related to the sample.
+     * @private
+     * @returns {void}
+     */
     this._updateBlocks = function () {
         let mainSampleBlock;
         let audiofileBlock;
@@ -89,7 +151,11 @@ function SampleWidget() {
             }
         }
     };
-
+    
+    /**
+     * Pauses the sample playback.
+     * @returns {void}
+     */
     this.pause = function () {
         this.playBtn.innerHTML =
             '<img src="header-icons/play-button.svg" title="' +
@@ -104,6 +170,10 @@ function SampleWidget() {
         this.isMoving = false;
     };
 
+    /**
+     * Resumes the sample playback.
+     * @returns {void}
+     */
     this.resume = function () {
         this.playBtn.innerHTML =
             '<img src="header-icons/pause-button.svg" title="' +
@@ -118,30 +188,58 @@ function SampleWidget() {
         this.isMoving = true;
     };
 
+    /**
+     * Sets the pitch center for the sample.
+     * @param {string} p - The pitch to set as the center.
+     * @returns {void}
+     */
     this._usePitch = function (p) {
         const number = SOLFEGENAMES.indexOf(p);
         this.pitchCenter = number == -1 ? 0 : number;
     };
 
+    /**
+     * Sets the accidental center for the sample.
+     * @param {string} a - The accidental to set as the center.
+     * @returns {void}
+     */
     this._useAccidental = function (a) {
         const number = ACCIDENTALNAMES.indexOf(a);
         this.accidentalCenter = number === -1 ? 2 : number;
     };
 
+    /**
+     * Sets the octave center for the sample.
+     * @param {string} o - The octave to set as the center.
+     * @returns {void}
+     */
     this._useOctave = function (o) {
         this.octaveCenter = parseInt(o);
     };
 
+    /**
+     * Gets the length of the sample and displays a warning if it exceeds 1MB.
+     * @returns {void}
+     */
     this.getSampleLength = function () {
         if (this.sampleData.length > 1333333) {
             this.activity.errorMsg(_("Warning: Sample is bigger than 1MB."), this.timbreBlock);
         }
     };
 
+    /**
+     * Displays an error message when the uploaded sample is not a .wav file.
+     * @returns {void}
+     */
     this.showSampleTypeError = function () {
         this.activity.errorMsg(_("Upload failed: Sample is not a .wav file."), this.timbreBlock);
     };
 
+    /**
+     * Saves the sample and generates a new sample block with the provided data.
+     * @private
+     * @returns {void}
+     */
     this.__save = function () {
         var that = this;
         setTimeout(function () {
@@ -165,14 +263,29 @@ function SampleWidget() {
         }, 1000);
     };
 
+    /**
+     * Saves the sample.
+     * @private
+     * @returns {void}
+     */
     this._saveSample = function () {
         this.__save();
     };
 
+    /**
+     * Gets the status of the save lock.
+     * @private
+     * @returns {boolean} The status of the save lock.
+     */
     this._get_save_lock = function () {
         return this._save_lock;
     };
 
+    /**
+     * Initializes the Sample Widget.
+     * @param {object} activity - The activity object.
+     * @returns {void}
+     */
     this.init = function (activity) {
         this.activity = activity;
         this._directions = [];
@@ -332,6 +445,10 @@ function SampleWidget() {
         widgetWindow.sendToCenter();
     };
 
+    /**
+     * Adds the current sample to the list of custom samples.
+     * @returns {void}
+     */
     this._addSample = function () {
         for (let i = 0; i < CUSTOMSAMPLES.length; i++) {
             if (CUSTOMSAMPLES[i][0] == this.sampleName) {
@@ -341,6 +458,10 @@ function SampleWidget() {
         CUSTOMSAMPLES.push([this.sampleName, this.sampleData]);
     };
 
+    /**
+     * Parses the sample pitch and sets the pitch, accidental, and octave centers accordingly.
+     * @returns {void}
+     */
     this._parseSamplePitch = function () {
         const first_part = this.samplePitch.substring(0, 2);
         if (first_part === "so") {
@@ -367,12 +488,20 @@ function SampleWidget() {
         this.octaveCenter = this.sampleOctave;
     };
 
+    /**
+     * Updates the sample pitch value based on the pitch, accidental, and octave centers.
+     * @returns {void}
+     */
     this._updateSamplePitchValues = function () {
         this.samplePitch =
             SOLFEGENAMES[this.pitchCenter] + EXPORTACCIDENTALNAMES[this.accidentalCenter];
         this.sampleOctave = this.octaveCenter.toString();
     };
 
+    /**
+     * Sets the timbre based on the current sample.
+     * @returns {void}
+     */
     this.setTimbre = function () {
         if (this.sampleName != null && this.sampleName != "") {
             this.originalSampleName = this.sampleName + "_original";
@@ -381,6 +510,10 @@ function SampleWidget() {
         }
     };
 
+    /**
+     * Plays the reference pitch based on the current sample's pitch, accidental, and octave.
+     * @returns {void}
+     */
     this._playReferencePitch = function () {
         this._updateSamplePitchValues();
         this._updateBlocks();
@@ -408,6 +541,10 @@ function SampleWidget() {
         this._playDelayedSample();
     };
 
+    /**
+     * Plays the current sample.
+     * @returns {void}
+     */
     this._playSample = function () {
         if (this.sampleName != null && this.sampleName != "") {
             this.reconnectSynthsToAnalyser();
@@ -424,6 +561,10 @@ function SampleWidget() {
         }
     };
 
+    /**
+     * Waits for a specified time and then plays the sample.
+     * @returns {Promise<string>} A promise that resolves once the sample is played.
+     */
     this._waitAndPlaySample = function () {
         return new Promise((resolve) => {
             setTimeout(() => {
@@ -434,10 +575,18 @@ function SampleWidget() {
         });
     };
 
+    /**
+     * Asynchronously plays the sample after a delay.
+     * @returns {Promise<void>} A promise that resolves once the sample is played.
+     */
     this._playDelayedSample = async function () {
         await this._waitAndPlaySample();
     };
 
+    /**
+     * Waits for the sample to finish playing.
+     * @returns {Promise<string>} A promise that resolves once the sample playback ends.
+     */
     this._waitAndEndPlaying = function () {
         return new Promise((resolve) => {
             setTimeout(() => {
@@ -447,10 +596,18 @@ function SampleWidget() {
         });
     };
 
+    /**
+     * Asynchronously ends the sample playback after waiting for its duration.
+     * @returns {Promise<void>} A promise that resolves once the sample playback ends.
+     */
     this._endPlaying = async function () {
         await this._waitAndEndPlaying();
     };
 
+    /**
+     * Reconnects synths to the analyser for pitch analysis.
+     * @returns {void}
+     */
     this.reconnectSynthsToAnalyser = function () {
         // Make two pitchAnalysers for the ref tone and the sample.
         for (const instrument in [0, 1]) {
@@ -476,6 +633,10 @@ function SampleWidget() {
         }
     };
 
+    /**
+     * Creates and initializes the pie menu for selecting pitch, accidentals, and octaves.
+     * @returns {void}
+     */
     this._createPieMenu = function () {
         docById("wheelDivptm").style.display = "";
 
@@ -641,6 +802,10 @@ function SampleWidget() {
         }
     };
 
+    /**
+     * Retrieves the name of the current pitch.
+     * @returns {void}
+     */
     this.getPitchName = function () {
         let name = "";
         name = PITCHNAMES[this.pitchCenter];
@@ -651,6 +816,10 @@ function SampleWidget() {
         this.pitchBtn.value = this.pitchName;
     };
 
+     /**
+     * Scales the widget window and canvas based on the window's state.
+     * @returns {void}
+     */
     this._scale = function () {
         let width, height;
         const canvas = document.getElementsByClassName("samplerCanvas");
@@ -669,6 +838,14 @@ function SampleWidget() {
         this.reconnectSynthsToAnalyser();
     };
 
+    /**
+     * Creates a canvas element and draws visual representations of sample data and reference tones.
+     * @param {number} width - The width of the canvas.
+     * @param {number} height - The height of the canvas.
+     * @param {number} turtleIdx - The index of the canvas.
+     * @param {boolean} resized - Indicates if the canvas is resized.
+     * @returns {void}
+     */
     this.makeCanvas = function (width, height, turtleIdx, resized) {
         const canvas = document.createElement("canvas");
         canvas.height = height;

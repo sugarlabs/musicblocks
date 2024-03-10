@@ -21,6 +21,10 @@
    exported PlanetInterface
  */
 
+/**
+ * Represents an interface for interacting with a planet.
+ * @param {object} activity - The activity object associated with the interface.
+ */
 class PlanetInterface {
     constructor(activity) {
         this.planet = null;
@@ -28,6 +32,9 @@ class PlanetInterface {
         this.mainCanvas = null;
         this.activity = activity;
 
+        /**
+        * Hides music blocks and related elements.
+        */
         this.hideMusicBlocks = () => {
             this.activity.hideSearchWidget();
             window.widgetWindows.hideAllWindows();
@@ -45,6 +52,9 @@ class PlanetInterface {
             window.scroll(0, 0);
         };
 
+        /**
+         * Shows music blocks and related elements.
+         */
         this.showMusicBlocks = () => {
             document.title = this.activity.planet.getCurrentProjectName();
             document.getElementById("toolbars").style.display = "block";
@@ -62,6 +72,9 @@ class PlanetInterface {
             docById("buttoncontainerTOP").style.display = "block";
         };
 
+        /**
+         * Shows the planet interface.
+         */
         this.showPlanet = () => {
             const png = docById("overlayCanvas").toDataURL("image/png");
             this.planet.open(png);  // this.mainCanvas.toDataURL("image/png"));
@@ -75,21 +88,35 @@ class PlanetInterface {
             }
         };
 
+        /**
+         * Hides the planet interface.
+         */
         this.hidePlanet = () => {
             this.iframe.style.display = "none";
         };
 
+        /**
+         * Opens the planet interface.
+         */
         this.openPlanet = () => {
             this.saveLocally();
             this.hideMusicBlocks();
             this.showPlanet();
         };
 
+        /**
+         * Closes the planet interface.
+         */
         this.closePlanet = () => {
             this.hidePlanet();
             this.showMusicBlocks();
         };
 
+        /**
+         * Loads a project from data.
+         * @param {string} data - The project data to load.
+         * @param {boolean} [merge=false] - Whether to merge with existing project data.
+         */
         this.loadProjectFromData = (data, merge) => {
             if (merge === undefined) {
                 merge = false;
@@ -134,12 +161,21 @@ class PlanetInterface {
             document.body.style.cursor = "default";
         };
 
+        /**
+         * Function to trigger loading a project from a file.
+         * Focuses on the file input element and clicks it to trigger file selection.
+         * Scrolls the window to the top.
+         */
         this.loadProjectFromFile = () => {
             document.querySelector("#myOpenFile").focus();
             document.querySelector("#myOpenFile").click();
             window.scroll(0, 0);
         };
 
+        /**
+         * Function to create a new project.
+         * Closes the current project if open, initializes a new project, loads the start page, and saves the project locally.
+         */
         this.newProject = () => {
             this.closePlanet();
             this.initialiseNewProject();
@@ -147,6 +183,11 @@ class PlanetInterface {
             this.saveLocally();
         };
 
+        /**
+         * Initializes a new project with the provided name or a default name.
+         * Clears the canvas, resets project data, and refreshes the canvas.
+         * @param {string} [name] - The name of the new project.
+         */
         this.initialiseNewProject = (name) => {
             this.planet.ProjectStorage.initialiseNewProject(name);
             this.activity.sendAllToTrash();
@@ -154,6 +195,10 @@ class PlanetInterface {
             this.activity.blocks.trashStacks = [];
         };
 
+        /**
+         * Function to save the current project locally.
+         * Prepares project data for export, generates SVG data, and saves the project data locally.
+         */
         this.saveLocally = () => {
             this.activity.stage.update(event);
             const data = this.activity.prepareExport();
@@ -199,34 +244,67 @@ class PlanetInterface {
             }
         };
 
+        /**
+         * Function to asynchronously open the current project.
+         * @returns {Promise} - A promise that resolves with the current project data.
+         */
         this.openCurrentProject = async () => {
             return await this.planet.ProjectStorage.getCurrentProjectData();
         };
 
+        /**
+         * Opens a project from the Planet by its ID.
+         * @param {string} id - The ID of the project to open.
+         * @param {string} [error] - Error message if project opening fails.
+         */
         this.openProjectFromPlanet = (id, error) => {
             this.planet.openProjectFromPlanet(id, error);
         };
 
+        /**
+         * Function to execute when the converter is loaded.
+         * Sets the Converter object in the window context.
+         */
         this.onConverterLoad = () => {
             window.Converter = this.planet.Converter;
         };
 
+        /**
+         * Retrieves the name of the current project.
+         * @returns {string} - The name of the current project.
+         */
         this.getCurrentProjectName = () => {
             return this.planet.ProjectStorage.getCurrentProjectName();
         };
 
+        /**
+         * Retrieves the description of the current project.
+         * @returns {string} - The description of the current project.
+         */
         this.getCurrentProjectDescription = () => {
             return this.planet.ProjectStorage.getCurrentProjectDescription();
         };
 
+        /**
+         * Retrieves the image associated with the current project.
+         * @returns {string} - The URL of the image associated with the current project.
+         */
         this.getCurrentProjectImage = () => {
             return this.planet.ProjectStorage.getCurrentProjectImage();
         };
 
+        /**
+         * Retrieves the timestamp of the last time the project was saved.
+         * @returns {Date} - The timestamp of the last save operation.
+         */
         this.getTimeLastSaved = () => {
             return this.planet.ProjectStorage.TimeLastSaved;
         };
 
+        /**
+         * Initializes the Planet iframe and sets up communication between the main window and the iframe.
+         * Sets up event handlers and initializes Converter.
+         */
         this.init = async () => {
             this.iframe = document.getElementById("planet-iframe");
             try {

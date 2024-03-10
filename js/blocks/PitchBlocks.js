@@ -1428,7 +1428,8 @@ function setupPitchBlocks(activity) {
             this.formBlock({
                 //.TRANS: An accidental is a modification to a pitch, e.g., sharp or flat.
                 name: _("accidental override"),
-                args: 1
+                args: 1,
+                argTypes:["anyin"]
             });
             this.makeMacro((x, y) => [
                 [0, "accidental", x, y, [null, 11, 1, 10]],
