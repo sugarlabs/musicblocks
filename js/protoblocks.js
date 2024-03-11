@@ -301,6 +301,9 @@ class ProtoBlock {
     }
 
     // E.g., wait for
+    /**
+     * Sets up a block with one boolean argument.
+     */
     oneBooleanArgBlock() {
         this.args = 1;
         this.size = 1;
@@ -310,6 +313,10 @@ class ProtoBlock {
         this.generator = this.oneBooleanArgBlockGenerator;
     }
 
+    /**
+     * Generates a block with one boolean argument.
+     * @returns {array} - An array containing SVG representation, docks, width, and height of the block.
+     */
     oneBooleanArgBlockGenerator() {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -333,6 +340,9 @@ class ProtoBlock {
     }
 
     // E.g., setxy. These are expandable.
+    /**
+     * Sets up an expandable block with two arguments.
+     */
     twoArgBlock() {
         this.expandable = true;
         this.style = "twoarg";
@@ -345,6 +355,11 @@ class ProtoBlock {
         this.generator = this.twoArgBlockGenerator;
     }
 
+    /**
+     * Generates an expandable block with two arguments.
+     * @param {number} expandY - The expansion along the Y-axis.
+     * @returns {array} - An array containing SVG representation, docks, width, and height of the block.
+     */
     twoArgBlockGenerator(expandY) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -374,6 +389,9 @@ class ProtoBlock {
     }
 
     // E.g., ??? These are expandable.
+    /**
+     * Sets up an expandable block with three arguments.
+     */
     threeArgBlock() {
         this.expandable = true;
         this.style = "twoarg";
@@ -387,6 +405,11 @@ class ProtoBlock {
         this.generator = this.threeArgBlockGenerator;
     }
 
+    /**
+     * Generates an expandable block with three arguments.
+     * @param {number} expandY - The expansion along the Y-axis.
+     * @returns {array} - An array containing SVG representation, docks, width, and height of the block.
+     */
     threeArgBlockGenerator(expandY) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -415,6 +438,10 @@ class ProtoBlock {
         ];
     }
 
+    /**
+     * Sets up a block with four arguments.
+     * This block is expandable and follows the 'twoarg' style.
+     */
     fourArgBlock() {
         this.expandable = true;
         this.style = "twoarg";
@@ -429,6 +456,11 @@ class ProtoBlock {
         this.generator = this.fourArgBlockGenerator;
     }
 
+    /**
+     * Generates a block with four arguments.
+     * @param {number} expandY - Expansion factor for the Y dimension (optional).
+     * @returns {array} - An array containing block SVG, docks, width, and height.
+     */
     fourArgBlockGenerator(expandY) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -458,6 +490,10 @@ class ProtoBlock {
     }
 
     // E.g., sqrt, box
+    /**
+     * Sets up a block with one argument for mathematical operations.
+     * This block follows the 'arg' style and has a single argument.
+     */
     oneArgMathBlock() {
         this.style = "arg";
         this.size = 1;
@@ -468,6 +504,10 @@ class ProtoBlock {
         this.generator = this.oneArgMathBlockGenerator;
     }
 
+    /**
+     * Generates a block with one argument for mathematical operations.
+     * @returns {array} - An array containing block SVG, docks, width, and height.
+     */
     oneArgMathBlockGenerator() {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -491,6 +531,10 @@ class ProtoBlock {
     }
 
     // E.g., plus, minus, multiply, divide, power,distance. These are also expandable.
+    /**
+     * Sets up a block with two arguments for mathematical operations.
+     * This block is expandable, follows the 'arg' style, and has two arguments.
+     */
     twoArgMathBlock() {
         this.expandable = true;
         this.style = "arg";
@@ -503,6 +547,11 @@ class ProtoBlock {
         this.generator = this.twoArgMathBlockGenerator;
     }
 
+    /**
+     * Generates a block with two arguments for mathematical operations.
+     * @param {number} expandY - Expansion factor for the Y dimension (optional).
+     * @returns {array} - An array containing block SVG, docks, width, and height.
+     */
     twoArgMathBlockGenerator(expandY) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -532,7 +581,9 @@ class ProtoBlock {
         ];
     }
 
-    //
+    /**
+     * Configures a three-argument math block.
+     */
     threeArgMathBlock() {
         this.expandable = true;
         this.style = "arg";
@@ -546,6 +597,11 @@ class ProtoBlock {
         this.generator = this.threeArgMathBlockGenerator;
     }
 
+    /**
+     * Generates SVG for a three-argument math block.
+     * @param {number} expandY - The expansion factor for Y-axis.
+     * @returns {array} - Array containing SVG elements and dimensions.
+     */
     threeArgMathBlockGenerator(expandY) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -576,6 +632,9 @@ class ProtoBlock {
     }
     // E.g., distance . Distance block will calculate geometrical distance between two pointa
     // by default (cursor x ,cursor y ) and x and y
+    /**
+     * Configures a four-argument math block.
+     */
     fourArgMathBlock() {
         this.expandable = true;
         this.style = "arg";
@@ -590,6 +649,11 @@ class ProtoBlock {
         this.generator = this.fourArgMathBlockGenerator;
     }
 
+    /**
+     * Generates SVG for a four-argument math block.
+     * @param {number} expandY - The expansion factor for Y-axis.
+     * @returns {array} - Array containing SVG elements and dimensions.
+     */
     fourArgMathBlockGenerator(expandY) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -621,6 +685,9 @@ class ProtoBlock {
 
     // E.g., number, string. Value blocks get DOM textareas associated
     // with them so their values can be edited by the user.
+    /**
+     * Configures a value block.
+     */
     valueBlock() {
         this.style = "value";
         this.size = 1;
@@ -629,6 +696,10 @@ class ProtoBlock {
         this.generator = this.valueBlockGenerator;
     }
 
+    /**
+     * Generates SVG for a value block.
+     * @returns {array} - Array containing SVG elements and dimensions.
+     */
     valueBlockGenerator() {
         const svg = new SVG();
         svg.setScale(this.scale);
