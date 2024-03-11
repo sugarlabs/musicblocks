@@ -429,6 +429,78 @@ function SampleWidget() {
             }
         };
 
+        let can_record = false;
+        let is_recording = false;
+        let recorder = null;
+        let chunks = [];
+        let audioURL = null; 
+        
+        function setUpAudio() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                console.log("getUserMedia supported");
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(stream => {
+                        recorder = new MediaRecorder(stream);
+                        recorder.ondataavailable = e => {
+                            chunks.push(e.data);
+                        };
+                        recorder.onstop = e => {
+                            let blob = new Blob(chunks, { type: 'audio/webm' });
+                            chunks = [];
+                            audioURL = URL.createObjectURL(blob);
+                            console.log("Recording complete.");
+                        };
+                        can_record = true;
+                    })
+                    .catch(err => {
+                        console.log("The following error occurred: " + err);
+                    });
+            }
+        }
+        
+        function ToggleMic() {
+            if (!can_record) return;
+        
+            is_recording = !is_recording;
+            if (is_recording) {
+                recorder.start();
+                console.log("recording started");
+            } else {
+                recorder.stop();
+            }
+        }
+        
+        function playAudio() {
+            if (audioURL) {
+                const audio = new Audio(audioURL);
+                audio.play();
+                console.log("audio played");
+            } else {
+                console.error("No recorded audio available.");
+            }
+        }
+        
+     
+        setUpAudio();
+        
+        widgetWindow.addButton(
+            "record.svg",
+            ICONSIZE,
+            _("Toggle Mic"),
+            ""
+        ).onclick = function () {
+            ToggleMic();
+        };
+        
+        widgetWindow.addButton(
+            "playback.svg",
+            ICONSIZE,
+            _("Playback"),
+            ""
+        ).onclick = function () {
+            playAudio();
+        };
+
         widgetWindow.sendToCenter();
         this.widgetWindow = widgetWindow;
 
