@@ -227,6 +227,24 @@ function SampleWidget() {
         }
     };
 
+
+     /**
+     * Displays a message indicating that recording has started.
+     * @returns {void}
+     */
+    function displayRecordingStartMessage() {
+        this.activity.textMsg(_("Recording started..."));
+    }
+
+    /**
+     * Displays a message indicating that recording has stopped.
+     * @returns {void}
+     */
+    function displayRecordingStopMessage() {
+        this.activity.textMsg(_("Recording complete..."));
+    }
+
+
     /**
      * Displays an error message when the uploaded sample is not a .wav file.
      * @returns {void}
@@ -437,7 +455,6 @@ function SampleWidget() {
         
         function setUpAudio() {
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                console.log("getUserMedia supported");
                 navigator.mediaDevices.getUserMedia({ audio: true })
                     .then(stream => {
                         recorder = new MediaRecorder(stream);
@@ -448,7 +465,7 @@ function SampleWidget() {
                             let blob = new Blob(chunks, { type: 'audio/webm' });
                             chunks = [];
                             audioURL = URL.createObjectURL(blob);
-                            console.log("Recording complete.");
+                            displayRecordingStopMessage.call(that);
                         };
                         can_record = true;
                     })
@@ -457,32 +474,29 @@ function SampleWidget() {
                     });
             }
         }
-        
         function ToggleMic() {
             if (!can_record) return;
         
             is_recording = !is_recording;
             if (is_recording) {
                 recorder.start();
-                console.log("recording started");
+                displayRecordingStartMessage.call(that);
             } else {
                 recorder.stop();
             }
         }
-        
+
         function playAudio() {
             if (audioURL) {
                 const audio = new Audio(audioURL);
                 audio.play();
-                console.log("audio played");
             } else {
                 console.error("No recorded audio available.");
             }
         }
         
-     
         setUpAudio();
-        
+
         widgetWindow.addButton(
             "record.svg",
             ICONSIZE,
@@ -492,12 +506,19 @@ function SampleWidget() {
             ToggleMic();
         };
         
-        widgetWindow.addButton(
+      
+        this._playbackBtn= widgetWindow.addButton(
             "playback.svg",
             ICONSIZE,
             _("Playback"),
-            ""
-        ).onclick = function () {
+            "");
+
+        this._playbackBtn.onclick = () => {
+            if(!audioURL)
+            {
+                this._playbackBtn.disabled = true;
+            }
+            else
             playAudio();
         };
 
