@@ -106,7 +106,12 @@
 
         <script type="text/javascript">
             $(document).ready(function() {
-                doSearch();
+                try{
+                    doSearch();
+                }
+                catch(e){
+                    console.log("DoSearch not implemented yet.");
+                }
             });
         </script>
     </head>
