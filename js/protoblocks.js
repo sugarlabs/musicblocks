@@ -720,9 +720,10 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., media. Media blocks invoke a chooser and a thumbnail
-    // image is overlayed to represent the data associated with the
-    // block.
+    /**
+     * Sets up a media block. Media blocks invoke a chooser and a thumbnail
+     * image is overlayed to represent the data associated with the block.
+     */
     mediaBlock() {
         this.style = "value";
         this.size = 2;
@@ -731,6 +732,10 @@ class ProtoBlock {
         this.generator = this.mediaBlockGenerator;
     }
 
+    /**
+     * Generates SVG for a media block.
+     * @returns {Array} - An array containing SVG components.
+     */
     mediaBlockGenerator() {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -753,6 +758,11 @@ class ProtoBlock {
 
     // E.g., start. A "child" flow is docked in an expandable clamp.
     // There are no additional arguments and no flow above or below.
+    /**
+     * Sets up a stack clamp block with zero arguments. A "child" flow is docked
+     * in an expandable clamp. There are no additional arguments and no flow
+     * above or below.
+     */
     stackClampZeroArgBlock() {
         this.style = "clamp";
         this.expandable = true;
@@ -764,6 +774,11 @@ class ProtoBlock {
         this.generator = this.stackClampZeroArgBlockGenerator;
     }
 
+    /**
+     * Generates SVG for a stack clamp block with zero arguments.
+     * @param {number} [slots] - Number of available slots (optional).
+     * @returns {Array} - An array containing SVG components.
+     */
     stackClampZeroArgBlockGenerator(slots) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -792,6 +807,9 @@ class ProtoBlock {
     }
 
     // E.g., emptyclamp. Unlike start, there is a flow above and below.
+    /**
+     * Sets up a flow clamp block. Unlike start, there is a flow above and below.
+     */
     flowClampBlock() {
         this.style = "clamp";
         this.expandable = true;
@@ -803,6 +821,11 @@ class ProtoBlock {
         this.generator = this.flowClampBlockGenerator;
     }
 
+    /**
+     * Generates SVG for a flow clamp block.
+     * @param {number} [slots] - Number of available slots (optional).
+     * @returns {Array} - An array containing SVG components.
+     */
     flowClampBlockGenerator(slots) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -831,6 +854,9 @@ class ProtoBlock {
     }
 
     // E.g., repeat. Unlike action, there is a flow above and below.
+    /**
+     * Sets up a flow clamp block with one argument.
+     */
     flowClampOneArgBlock() {
         this.style = "clamp";
         this.expandable = true;
@@ -843,6 +869,11 @@ class ProtoBlock {
         this.generator = this.flowClampOneArgBlockGenerator;
     }
 
+    /**
+     * Generates SVG for a flow clamp block with one argument.
+     * @param {number} slots - The number of slots.
+     * @returns {Array} - Array containing SVG, docks, width, height, and input y-coordinate.
+     */
     flowClampOneArgBlockGenerator(slots) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -873,6 +904,9 @@ class ProtoBlock {
 
     // E.g., tuplet, which takes two args plus an interior flow.
     // There is a flow above and below.
+    /**
+     * Sets up a flow clamp block with two arguments.
+     */
     flowClampTwoArgBlock() {
         this.style = "clamp";
         this.expandable = true;
@@ -886,6 +920,11 @@ class ProtoBlock {
         this.generator = this.flowClampTwoArgBlockGenerator;
     }
 
+    /**
+     * Generates SVG for a flow clamp block with two arguments.
+     * @param {number} slots - The number of slots.
+     * @returns {Array} - Array containing SVG, docks, width, height, and input y-coordinate.
+     */
     flowClampTwoArgBlockGenerator(slots) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -913,6 +952,9 @@ class ProtoBlock {
         ];
     }
 
+    /**
+     * Sets up a flow clamp block with three arguments.
+     */
     flowClampThreeArgBlock() {
         this.style = "clamp";
         this.expandable = true;
@@ -927,6 +969,11 @@ class ProtoBlock {
         this.generator = this.flowClampThreeArgBlockGenerator;
     }
 
+    /**
+     * Generates a basic clamp block with three argument slots.
+     * @param {number} slots - The number of slots for clamping (optional, defaults to 1 if not provided).
+     * @returns {Array} - An array containing SVG representation, docks, width, height, and hit area.
+     */
     flowClampThreeArgBlockGenerator(slots) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -955,6 +1002,9 @@ class ProtoBlock {
     }
 
     // E.g., do with args: innies instead of interior slots.
+    /**
+     * Sets up a clamp block with one argument slot.
+     */
     argClampOneArgBlock() {
         this.style = "argclamp";
         this.expandable = true;
@@ -967,6 +1017,11 @@ class ProtoBlock {
         this.generator = this.argClampOneArgBlockGenerator;
     }
 
+    /**
+     * Generates a clamp block with one argument slot.
+     * @param {number} slots - The number of slots for clamping (optional, defaults to 1 if not provided).
+     * @returns {Array} - An array containing SVG representation, docks, width, height, and hit area.
+     */
     argClampOneArgBlockGenerator(slots) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -997,6 +1052,9 @@ class ProtoBlock {
     }
 
     // E.g., calculate with args: innies instead of interior slots.
+    /**
+     * Sets up a clamp block with one argument slot for mathematical operations.
+     */
     argClampOneArgMathBlock() {
         this.style = "argclamparg";
         this.expandable = true;
@@ -1008,6 +1066,11 @@ class ProtoBlock {
         this.generator = this.argClampOneArgMathBlockGenerator;
     }
 
+    /**
+     * Generates a clamp block with one argument slot for mathematical operations.
+     * @param {number} slots - The number of slots for clamping (optional, defaults to 1 if not provided).
+     * @returns {Array} - An array containing SVG representation, docks, width, height, and hit area.
+     */
     argClampOneArgMathBlockGenerator(slots) {
         const svg = new SVG();
         svg.setScale(this.scale);
