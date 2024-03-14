@@ -3626,7 +3626,7 @@ class Blocks {
          */
         this._calculateDragGroup = (blk) => {
             this.dragLoopCounter += 1;
-            if (this.dragLoopCount > this.blockList.length) {
+            if (this.dragLoopCounter > this.blockList.length) {
                 // eslint-disable-next-line no-console
                 console.debug(
                     "Maximum loop counter exceeded in calculateDragGroup... this is bad. " + blk
