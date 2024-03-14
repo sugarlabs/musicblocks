@@ -447,6 +447,37 @@ function SampleWidget() {
             }
         };
 
+        this._recordBtn= widgetWindow.addButton(
+            "mic.svg",
+            ICONSIZE,
+            _("Toggle Mic"),
+            ""
+        );
+        this._recordBtn.onclick = function() {
+            ToggleMic(this);
+        }.bind(this._recordBtn);
+      
+        this._playbackBtn= widgetWindow.addButton(
+            "playback.svg",
+            ICONSIZE,
+            _("Playback"),
+            "");
+        this._playbackBtn.id="playbackBtn"
+        this._playbackBtn.classList.add("disabled");
+
+
+        const togglePlaybackButtonState = () => { 
+            if (!audioURL) {
+                this._playbackBtn.classList.add("disabled");
+            } else {
+                this._playbackBtn.classList.remove("disabled");
+            }
+        };
+
+        this._playbackBtn.onclick = () => {
+            playAudio();
+        };
+
         let can_record = false;
         let is_recording = false;
         let recorder = null;
@@ -466,6 +497,7 @@ function SampleWidget() {
                             chunks = [];
                             audioURL = URL.createObjectURL(blob);
                             displayRecordingStopMessage.call(that);
+                            togglePlaybackButtonState();
                         };
                         can_record = true;
                     })
@@ -474,54 +506,32 @@ function SampleWidget() {
                     });
             }
         }
-        function ToggleMic() {
+        function ToggleMic(buttonElement) {
             if (!can_record) return;
-        
+            
             is_recording = !is_recording;
             if (is_recording) {
-                recorder.start();
+                recorder.start();   
+                buttonElement.getElementsByTagName('img')[0].src = "header-icons/record.svg"; 
                 displayRecordingStartMessage.call(that);
             } else {
                 recorder.stop();
+                buttonElement.getElementsByTagName('img')[0].src = "header-icons/mic.svg"; 
             }
         }
-
+        
         function playAudio() {
             if (audioURL) {
                 const audio = new Audio(audioURL);
                 audio.play();
+                console.log("Playing audio.");
             } else {
                 console.error("No recorded audio available.");
             }
         }
         
         setUpAudio();
-
-        widgetWindow.addButton(
-            "record.svg",
-            ICONSIZE,
-            _("Toggle Mic"),
-            ""
-        ).onclick = function () {
-            ToggleMic();
-        };
-        
-      
-        this._playbackBtn= widgetWindow.addButton(
-            "playback.svg",
-            ICONSIZE,
-            _("Playback"),
-            "");
-
-        this._playbackBtn.onclick = () => {
-            if(!audioURL)
-            {
-                this._playbackBtn.disabled = true;
-            }
-            else
-            playAudio();
-        };
-
+ 
         widgetWindow.sendToCenter();
         this.widgetWindow = widgetWindow;
 

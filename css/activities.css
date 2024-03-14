@@ -836,6 +836,11 @@ table {
   cursor: not-allowed;
 }
 
+#playbackBtn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 #right-arrow,
 #left-arrow {
   position: absolute;
