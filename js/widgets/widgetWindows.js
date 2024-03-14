@@ -173,7 +173,7 @@ class WidgetWindow {
 
         if (this._fullscreenEnabled) {
             const maxminButton = this._create("div", "wftButton wftMaxmin", this._nonclosebuttons);
-            maxminButton.onclick = maxminButton.onmousedown = (e) => {
+            maxminButton.onclick = (e) => {
                 if (this._maximized) {
                     this._restore();
                     this.sendToCenter();
