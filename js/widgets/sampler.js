@@ -498,6 +498,11 @@ function SampleWidget() {
                             audioURL = URL.createObjectURL(blob);
                             displayRecordingStopMessage.call(that);
                             togglePlaybackButtonState();
+
+                            const audioData = e.target.result;
+                            that.sampleData = audioData;
+                            that.sampleName = `Recorded Audio ${audioURL}`;
+                            that._addSample();
                         };
                         can_record = true;
                     })
