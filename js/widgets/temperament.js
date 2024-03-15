@@ -1834,9 +1834,7 @@ function TemperamentWidget() {
 
     this.playAll = function () {
         let p = 0;
-        this.playbackForward = true;
         this._playing = !this._playing;
-
         this._logo.resetSynth(0);
 
         const cell = this.playButton;
@@ -1893,6 +1891,7 @@ function TemperamentWidget() {
             pitchNumber = this.tempRatios1.length - 1;
         }
 
+        const currentTime = new Date().getTime();
         const __playLoop = function (i) {
             if (i === pitchNumber) {
                 that.playbackForward = false;
@@ -1913,12 +1912,12 @@ function TemperamentWidget() {
             }
 
             if (that.circleIsVisible == false && docById("wheelDiv4") == null) {
-                if (i === pitchNumber) {
+                if (i === pitchNumber && that._playing) {
                     that.notesCircle.navItems[0].fillAttr = "#808080";
                     that.notesCircle.navItems[0].sliceHoverAttr.fill = "#808080";
                     that.notesCircle.navItems[0].slicePathAttr.fill = "#808080";
                     that.notesCircle.navItems[0].sliceSelectedAttr.fill = "#808080";
-                } else {
+                } else if(that._playing) {
                     that.notesCircle.navItems[i].fillAttr = "#808080";
                     that.notesCircle.navItems[i].sliceHoverAttr.fill = "#808080";
                     that.notesCircle.navItems[i].slicePathAttr.fill = "#808080";
@@ -2004,48 +2003,19 @@ function TemperamentWidget() {
 
             if (i <= pitchNumber && i >= 0 && that._playing && p < 2) {
                 setTimeout(function () {
+                    console.log("Called"+i)
                     __playLoop(i);
                 }, Singer.defaultBPMFactor * 1000 * duration);
             } else {
-                cell.innerHTML =
-                    '&nbsp;&nbsp;<img src="header-icons/' +
-                    "play-button.svg" +
-                    '" title="' +
-                    _("Play") +
-                    '" alt="' +
-                    _("Play") +
-                    '" height="' +
-                    ICONSIZE +
-                    '" width="' +
-                    ICONSIZE +
-                    '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-                if (i !== -1) {
-                    setTimeout(function () {
-                        if (that.circleIsVisible == false && docById("wheelDiv4") == null) {
-                            that.notesCircle.navItems[i - 1].fillAttr = "#c8C8C8";
-                            that.notesCircle.navItems[i - 1].sliceHoverAttr.fill = "#c8C8C8";
-                            that.notesCircle.navItems[i - 1].slicePathAttr.fill = "#c8C8C8";
-                            that.notesCircle.navItems[i - 1].sliceSelectedAttr.fill = "#c8C8C8";
-                            that.notesCircle.refreshWheel();
-                        } else if (that.circleIsVisible == true && docById("wheelDiv4") == null) {
-                            const j = i - 1;
-                            docById("pitchNumber_" + j).style.background =
-                                platformColor.selectorBackground;
-                        } else if (docById("wheelDiv4") !== null) {
-                            that.wheel1.navItems[i - 1].fillAttr = "#e0e0e0";
-                            that.wheel1.navItems[i - 1].sliceHoverAttr.fill = "#e0e0e0";
-                            that.wheel1.navItems[i - 1].slicePathAttr.fill = "#e0e0e0";
-                            that.wheel1.navItems[i - 1].sliceSelectedAttr.fill = "#e0e0e0";
-                            that.wheel1.refreshWheel();
-                        }
-                    }, Singer.defaultBPMFactor * 1000 * duration);
-                }
-                that._playing = false;
+                that.inbetween=true;
             }
         };
-        if (this._playing) {
+        if((this._playing && currentTime - this.lastClickTime > Singer.defaultBPMFactor * 1000 * duration)||(this.inbetween)){
+            that.playbackForward = true;
+            this.inbetween=false;
             __playLoop(0);
         }
+        this.lastClickTime = currentTime;
     };
 
     this.init = function (activity) {
@@ -2104,6 +2074,9 @@ function TemperamentWidget() {
         temperamentCell.style.backgroundColor = platformColor.selectorBackground;
 
         this.playButton = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play all"));
+        this.lastClickTime = 0;
+        this.playbackForward = true;
+        this.inbetween=false;
         this.playButton.onclick = function () {
             that.playAll();
         };
