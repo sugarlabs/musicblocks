@@ -1917,7 +1917,7 @@ function TemperamentWidget() {
                     that.notesCircle.navItems[0].sliceHoverAttr.fill = "#808080";
                     that.notesCircle.navItems[0].slicePathAttr.fill = "#808080";
                     that.notesCircle.navItems[0].sliceSelectedAttr.fill = "#808080";
-                } else if(that._playing) {
+                } else if (that._playing) {
                     that.notesCircle.navItems[i].fillAttr = "#808080";
                     that.notesCircle.navItems[i].sliceHoverAttr.fill = "#808080";
                     that.notesCircle.navItems[i].slicePathAttr.fill = "#808080";
@@ -2003,16 +2003,15 @@ function TemperamentWidget() {
 
             if (i <= pitchNumber && i >= 0 && that._playing && p < 2) {
                 setTimeout(function () {
-                    console.log("Called"+i)
                     __playLoop(i);
                 }, Singer.defaultBPMFactor * 1000 * duration);
             } else {
-                that.inbetween=true;
+                that.inbetween = true;
             }
         };
-        if((this._playing && currentTime - this.lastClickTime > Singer.defaultBPMFactor * 1000 * duration)||(this.inbetween)){
+        if ((this._playing && currentTime - this.lastClickTime > Singer.defaultBPMFactor * 1000 * duration) || (this.inbetween)) {
             that.playbackForward = true;
-            this.inbetween=false;
+            this.inbetween = false;
             __playLoop(0);
         }
         this.lastClickTime = currentTime;
@@ -2076,7 +2075,7 @@ function TemperamentWidget() {
         this.playButton = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play all"));
         this.lastClickTime = 0;
         this.playbackForward = true;
-        this.inbetween=false;
+        this.inbetween = false;
         this.playButton.onclick = function () {
             that.playAll();
         };
