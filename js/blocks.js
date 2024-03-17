@@ -4455,7 +4455,7 @@ class Blocks {
                 if (this.blockList[cblk].isExpandableBlock()) {
                     if (this.blockList[blk].name === "forever") {
                         if (this._isConnectedToNoteValue(cblk)) {
-                            this.activity.errorMsg(_("Forever loop detected inside a note value block. Results will be unexpected."));
+                            this.activity.errorMsg(_("Forever loop detected inside a note value block. Unexpected things may happen."));
                             return null; 
                         }
                     }
