@@ -4453,6 +4453,12 @@ class Blocks {
             } else {
                 const cblk = this.blockList[blk].connections[0];
                 if (this.blockList[cblk].isExpandableBlock()) {
+                    if (this.blockList[blk].name === "forever") {
+                        if (this._isConnectedToNoteValue(cblk)) {
+                            this.activity.errorMsg(_("Forever loop detected inside a note value block. Results will be unexpected."));
+                            return null; 
+                        }
+                    }
                     /** If it is the last connection, keep searching. */
                     if (blk === last(this.blockList[cblk].connections)) {
                         return this._insideNoteBlock(cblk);
@@ -4469,6 +4475,17 @@ class Blocks {
                 } else {
                     return this._insideNoteBlock(cblk);
                 }
+            }
+        };
+
+        this._isConnectedToNoteValue = (blk) => {
+            if (NOTEBLOCKS.indexOf(this.blockList[blk].name) !== -1) {
+                return true;
+            } else if (this.blockList[blk].connections[0] == null) {
+                return false;
+            } else {
+                const cblk = this.blockList[blk].connections[0];
+                return this._isConnectedToNoteValue(cblk);
             }
         };
 
