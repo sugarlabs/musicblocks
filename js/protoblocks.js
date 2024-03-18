@@ -1102,6 +1102,9 @@ class ProtoBlock {
     }
 
     // E.g., named do with args: innies instead of interior slots.
+    /**
+     * Sets up an argument clamp block.
+     */
     argClampBlock() {
         this.style = "argclamp";
         this.expandable = true;
@@ -1113,6 +1116,11 @@ class ProtoBlock {
         this.generator = this.argClampBlockGenerator;
     }
 
+    /**
+     * Generates SVG for an argument clamp block.
+     * @param {number[]} slots - Array of slots for clamping.
+     * @returns {Array} - Array containing SVG, docks, width, height, and hitHeight.
+     */
     argClampBlockGenerator(slots) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1139,6 +1147,9 @@ class ProtoBlock {
     }
 
     // E.g., named calculate with args: innies instead of interior slots.
+    /**
+     * Sets up an argument clamp math block.
+     */
     argClampMathBlock() {
         this.style = "argclamparg";
         this.expandable = true;
@@ -1149,6 +1160,11 @@ class ProtoBlock {
         this.generator = this.argClampMathBlockGenerator;
     }
 
+    /**
+     * Generates SVG for an argument clamp math block.
+     * @param {number[]} slots - Array of slots for clamping.
+     * @returns {Array} - Array containing SVG, docks, width, height, and hitHeight.
+     */
     argClampMathBlockGenerator(slots) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1178,6 +1194,9 @@ class ProtoBlock {
 
     // E.g., if.  A "child" flow is docked in an expandable clamp. The
     // additional argument is a boolean. There is flow above and below.
+    /**
+     * Sets up a flow clamp boolean argument block.
+     */
     flowClampBooleanArgBlock() {
         this.style = "clamp";
         this.expandable = true;
@@ -1190,6 +1209,11 @@ class ProtoBlock {
         this.generator = this.flowClampBooleanArgBlockGenerator;
     }
 
+    /**
+     * Generates SVG for a flow clamp boolean argument block.
+     * @param {number} slots - Number of slots for clamping.
+     * @returns {Array} - Array containing SVG, docks, width, height, and hitHeight.
+     */
     flowClampBooleanArgBlockGenerator(slots) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1220,6 +1244,10 @@ class ProtoBlock {
     // E.g., if then else.  Two "child" flows are docked in expandable
     // clamps. The additional argument is a boolean. There is flow
     // above and below.
+    /**
+     * Represents a block with two "child" flows docked in expandable clamps, with an additional boolean argument.
+     * @constructor
+     */
     doubleFlowClampBooleanArgBlock() {
         this.style = "doubleclamp";
         this.expandable = true;
@@ -1233,6 +1261,12 @@ class ProtoBlock {
         this.generator = this.doubleFlowClampBooleanArgBlockGenerator;
     }
 
+    /**
+     * Generates the block for doubleFlowClampBooleanArgBlock.
+     * @param {number} bottomSlots - The number of bottom slots.
+     * @param {number} topSlots - The number of top slots.
+     * @returns {Array} - Array containing SVG elements and block dimensions.
+     */
     doubleFlowClampBooleanArgBlockGenerator(bottomSlots,topSlots) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1269,6 +1303,10 @@ class ProtoBlock {
     }
 
     // E.g., forever. Unlike start, there is flow above and below.
+    /**
+     * Represents a block with flow above and below, e.g., forever.
+     * @constructor
+     */
     flowClampZeroArgBlock() {
         this.style = "clamp";
         this.expandable = true;
@@ -1280,6 +1318,11 @@ class ProtoBlock {
         this.generator = this.flowClampZeroArgBlockGenerator;
     }
 
+    /**
+     * Generates the block for flowClampZeroArgBlock.
+     * @param {number} slots - The number of slots.
+     * @returns {Array} - Array containing SVG elements and block dimensions.
+     */
     flowClampZeroArgBlockGenerator(slots) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1307,6 +1350,10 @@ class ProtoBlock {
     }
 
     // E.g., count clamp: math block with interior slots
+    /**
+     * Represents a block like count clamp: math block with interior slots.
+     * @constructor
+     */
     argFlowClampBlock() {
         this.style = "argflowclamp";
         this.expandable = true;
@@ -1317,6 +1364,11 @@ class ProtoBlock {
         this.generator = this.argFlowClampGenerator;
     }
 
+    /**
+     * Generates the block for argFlowClampBlock.
+     * @param {number} slots - The number of slots.
+     * @returns {Array} - Array containing SVG elements and block dimensions.
+     */
     argFlowClampGenerator(slots) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1345,6 +1397,10 @@ class ProtoBlock {
 
     // E.g., action. A "child" flow is docked in an expandable clamp.
     // The additional argument is a name. Again, no flow above or below.
+    /**
+     * Represents a block with a "child" flow docked in an expandable clamp, with an additional argument as a name.
+     * @constructor
+     */
     stackClampOneArgBlock() {
         this.style = "clamp";
         this.expandable = true;
