@@ -6515,6 +6515,47 @@ class Blocks {
             if (this._loadCounter > 0) {
                 return;
             }
+            /**
+             * Check if a block is a forever block.
+             * @param {Block} block - The block to check.
+             * @returns {boolean} - True if the block is a forever block, false otherwise.
+             */
+            function isForeverBlock(block) {
+                return block.name === "forever"; // Adjust based on actual block structure
+            }
+
+            /**
+             * Check if a block is a note block.
+             * @param {Block} block - The block to check.
+             * @returns {boolean} - True if the block is a note block, false otherwise.
+             */
+            function isNoteBlock(block) {
+                return block.name === NOTEBLOCKS; // Adjust based on actual block structure
+            }
+
+            // Loop through all blocks to check for forever blocks inside note blocks
+            for (const blk in this.blockList) {
+                const block = this.blockList[blk];
+
+                
+
+                if (isNoteBlock(block)) {
+                    
+                    // Find the top block in the stack
+                    const topBlock = this.findTopBlock(parseInt(blk));
+
+                    // Check if there's a forever block inside the note block stack
+                    
+                    if (this._blockInStack(topBlock, ["forever"])) {
+                        
+                        // Display warning message to the user
+                        activity.errorMsg(_("Forever loop detected inside a note value block. Results will be unexpected."));
+                    }
+                }
+            }
+
+           
+            
 
             this._findDrumURLs();
 
