@@ -396,7 +396,7 @@ class Palettes {
         return this;
     }
 
-    // Search for key using SEARCHINDEX
+    // Search for key using SEARCH INDEX
     searchBlock(){
         const search = docById("search");
         let result = [];
