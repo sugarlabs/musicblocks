@@ -331,7 +331,8 @@ class Palettes {
             return;
         }
 
-        this.activity.hideSearchWidget(true);
+        // show palette when search is on
+        // this.activity.hideSearchWidget(true);
         this.dict[name].showMenu(true);
         this.activePalette = name; // used to delete plugins
     }
@@ -395,6 +396,20 @@ class Palettes {
         return this;
     }
 
+    // Search for key using SEARCHINDEX
+    searchBlock(){
+        const search = docById("search");
+        let result = [];
+        search.addEventListener("input", e => {
+            Object.keys(SEARCHINDEX).forEach(key => {
+                if (e.target.value.toLowerCase() === key.slice(0, e.target.value.length)){
+                    result[0]= SEARCHINDEX[key];
+                }
+            });
+            this.showPalette(result[0]);
+        });
+    }
+
     // Palette Button event handlers
     _loadPaletteButtonHandler(name, row) {
         // eslint-disable-next-line no-unused-vars
@@ -410,8 +425,10 @@ class Palettes {
         // eslint-disable-next-line no-unused-vars
         row.onclick = (event) => {
             if (name == "search") {
-                this._hideMenus();
+                // show the palette box while search is on
+                // this._hideMenus();
                 this.activity.showSearchWidget();
+                this.searchBlock();
             } else {
                 this.showPalette(name);
             }
