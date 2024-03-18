@@ -51,20 +51,22 @@
 }
 
 #search[type="text"] {
-  width: 400px;
+  width: 80px;
   box-sizing: border-box;
   position: absolute;
   background-color: white;
   background-repeat: no-repeat;
-  padding: 6px 10px 6px 20px;
+  padding: 6px 10px 6px 10px;
   -webkit-transition: width 0.4s ease-in-out;
   transition: width 0.4s ease-in-out;
-  font-size: 24px;
+  font-size: 16px;
+  margin-top: 4px;
   color: black;
 }
 
 #search:focus {
-  border: 2px solid #87cefa;
+  border: 1px solid #87cefa;
+  border-radius: 1px;
 }
 
 #search.open {
