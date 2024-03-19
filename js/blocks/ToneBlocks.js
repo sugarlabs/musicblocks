@@ -1099,7 +1099,7 @@ function setupToneBlocks(activity) {
          */
         constructor() {
             // The block name is replaced by a pathname.
-            super("audiofile", "");
+            super("audiofile", "AUDIO FILE");
             this.parameter = true;
             this.extraWidth = 20;
             this.setPalette("tone", activity);
