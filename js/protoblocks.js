@@ -1413,6 +1413,11 @@ class ProtoBlock {
         this.generator = this.stackClampOneArgBlockGenerator;
     }
 
+    /**
+     * Generates a stack clamp block with one argument.
+     * @param {number} [slots=1] - The number of slots for clamping (optional, default is 1).
+     * @returns {Array} - An array containing SVG representation of the block, docks, width, height, and hit height.
+     */
     stackClampOneArgBlockGenerator(slots) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1442,6 +1447,9 @@ class ProtoBlock {
     }
 
     // E.g., mouse button.
+    /**
+     * Generates a boolean zero-argument block.
+     */
     booleanZeroArgBlock() {
         this.style = "arg";
         this.size = 1;
@@ -1450,6 +1458,10 @@ class ProtoBlock {
         this.generator = this.booleanZeroArgBlockGenerator;
     }
 
+    /**
+     * Generates SVG representation of a boolean zero-argument block.
+     * @returns {Array} - An array containing SVG representation of the block, docks, width, height, and hit height.
+     */
     booleanZeroArgBlockGenerator() {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1469,6 +1481,9 @@ class ProtoBlock {
     }
 
     // E.g., named sensor blocks
+    /**
+     * Generates a boolean one-argument block.
+     */
     booleanOneArgBlock() {
         this.style = "arg";
         this.size = 2;
@@ -1479,6 +1494,10 @@ class ProtoBlock {
         this.generator = this.booleanOneArgBlockGenerator;
     }
 
+    /**
+     * Generates SVG representation of a boolean one-argument block.
+     * @returns {Array} - An array containing SVG representation of the block, docks, width, height, and hit height.
+     */
     booleanOneArgBlockGenerator() {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1499,6 +1518,9 @@ class ProtoBlock {
     }
 
     // E.g., not
+    /**
+     * Generates a boolean one-argument block with a boolean input.
+     */
     booleanOneBooleanArgBlock() {
         this.style = "arg";
         this.size = 2;
@@ -1509,6 +1531,10 @@ class ProtoBlock {
         this.generator = this.booleanOneBooleanArgBlockGenerator;
     }
 
+    /**
+     * Generates SVG representation of a boolean one-argument block with a boolean input.
+     * @returns {Array} - An array containing SVG representation of the block, docks, width, height, and hit height.
+     */
     booleanOneBooleanArgBlockGenerator() {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1528,6 +1554,9 @@ class ProtoBlock {
     }
 
     // E.g., and, or
+    /**
+     * Generates a boolean two-argument block with boolean inputs.
+     */
     booleanTwoBooleanArgBlock() {
         this.style = "arg";
         this.size = 3;
@@ -1539,6 +1568,10 @@ class ProtoBlock {
         this.generator = this.booleanTwoBooleanArgBlockGenerator;
     }
 
+    /**
+     * Generates SVG representation of a boolean two-argument block with boolean inputs.
+     * @returns {Array} - An array containing SVG representation of the block, docks, width, height, and hit height.
+     */
     booleanTwoBooleanArgBlockGenerator() {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1558,6 +1591,9 @@ class ProtoBlock {
     }
 
     // E.g., greater, less, equal
+    /**
+     * Represents a block with two boolean arguments.
+     */
     booleanTwoArgBlock() {
         this.style = "arg";
         this.size = 2;
@@ -1570,6 +1606,11 @@ class ProtoBlock {
         this.generator = this.booleanTwoArgBlockGenerator;
     }
 
+    /**
+     * Generates the block with two boolean arguments.
+     * @param {number} expandY - Expansion factor for Y dimension (optional).
+     * @returns {Array} - An array containing generated SVG, docks, width, and height.
+     */
     booleanTwoArgBlockGenerator(expandY) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1596,6 +1637,9 @@ class ProtoBlock {
     }
 
     // E.g., color, shade, pensize, ...
+    /**
+     * Represents a block with a parameter (e.g., color, shade, pensize).
+     */
     parameterBlock() {
         this.style = "arg";
         this.parameter = true;
@@ -1605,6 +1649,10 @@ class ProtoBlock {
         this.generator = this.parameterBlockGenerator;
     }
 
+    /**
+     * Generates the parameter block.
+     * @returns {Array} - An array containing generated SVG, docks, width, and height.
+     */
     parameterBlockGenerator() {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1626,10 +1674,21 @@ class ProtoBlock {
     }
 }
 
+/**
+ * Checks if the given item is an object.
+ * @param {*} item - The item to check.
+ * @returns {boolean} - True if the item is an object, otherwise false.
+ */
 const isObject = (item) => {
     return item && typeof item === "object" && !Array.isArray(item);
 };
 
+/**
+ * Merges multiple objects deeply.
+ * @param {object} target - The target object to merge into.
+ * @param {...object} sources - The source objects to merge from.
+ * @returns {object} - The merged object.
+ */
 const mergeDeep = (target, ...sources) => {
     // From https://stackoverflow.com/a/34749873
     if (!sources.length) return target;
@@ -1649,33 +1708,108 @@ const mergeDeep = (target, ...sources) => {
     return mergeDeep(target, ...sources);
 };
 
+/**
+ * Represents a base block used as a foundation for other blocks.
+ * @extends ProtoBlock
+ */
 class BaseBlock extends ProtoBlock {
+    /**
+     * Creates an instance of BaseBlock.
+     * @param {string} name - The name of the block.
+     */
     constructor(name) {
         super(name);
 
+        /**
+         * The macro function associated with the block.
+         * @type {function|null}
+         */
         this.macroFunc = null;
+
+        /**
+         * The style properties of the block.
+         * @type {object}
+         * @private
+         */
         this._style = {};
+
+        /**
+         * Indicates if the block is designed for beginner mode.
+         * @type {boolean}
+         */
         this.beginnerModeBlock = false;
+
+        /**
+         * Indicates if the block is deprecated.
+         * @type {boolean}
+         */
         this.deprecated = false;
+
+        /**
+         * Additional search terms for the block.
+         * @type {Array<string>}
+         */
         this.extraSearchTerms = [];
+
+        /**
+         * Help strings associated with the block.
+         * @type {Array<string>}
+         */
         this.helpString = [];
+
+        /**
+         * Values for the piemenu's first column.
+         * @type {Array}
+         */
         this.piemenuValuesC1 = [];
+
+        /**
+         * Values for the piemenu's second column.
+         * @type {Array}
+         */
         this.piemenuValuesC2 = [];
+
+        /**
+         * Values for the piemenu's third column.
+         * @type {Array}
+         */
         this.piemenuValuesC3 = [];
+
+        /**
+         * Labels for the piemenu.
+         * @type {Array}
+         */
         this.piemenuLabels = [];
 
         // Just for brevity
+        /**
+         * Language preference for the block.
+         * @type {string}
+         */
         this.lang = localStorage.languagePreference || navigator.language;
     }
 
+    /**
+     * Sets the palette of the block.
+     * @param {string} palette - The palette name.
+     * @param {object} activity - The activity associated with the block.
+     */
     setPalette(palette, activity) {
         this.palette = activity.palettes.dict[palette];
     }
 
+    /**
+     * Sets the help string of the block.
+     * @param {Array<string>} help - The help string to set.
+     */
     setHelpString(help) {
         this.helpString = help;
     }
 
+    /**
+     * Forms the block with the given style.
+     * @param {object} style - The style properties of the block.
+     */
     formBlock(style) {
         mergeDeep(this._style, style);
         this._style.args ||= 0;
@@ -1748,6 +1882,10 @@ class BaseBlock extends ProtoBlock {
                 this._style.flows.bottom === "tail" ? "unavailable" : "in"
             );
 
+        /**
+         * Generates SVG artwork and dock layout for the block.
+         * @returns {Array} An array containing the SVG artwork, dock layout, width, height, and click height.
+         */
         this.generator = function() {
             const svg = new SVG();
             svg.setScale(this.scale);
