@@ -2017,22 +2017,43 @@ class BaseBlock extends ProtoBlock {
         };
     }
 
+    /**
+     * Associates a macro function with the block.
+     * @param {Function} macroFunc - The macro function to associate.
+     */
     makeMacro(macroFunc) {
         this.macroFunc = macroFunc;
     }
 
+    /**
+     * Updates the type of dock at the specified slot.
+     * @param {number} slot - The slot index of the dock.
+     * @param {string} value - The value to update the dock with.
+     */
     updateDockValue(slot, value) {
         this.dockTypes[slot] = value;
     }
 
+    /**
+     * Changes the name of the block.
+     * @param {string} name - The new name of the block.
+     */
     changeName(name) {
         this.name = name;
     }
 
+    /**
+     * Sets whether the block is a beginner mode block or not.
+     * @param {boolean} value - Indicates if the block is a beginner mode block.
+     */
     beginnerBlock(value) {
         this.beginnerModeBlock = value;
     }
 
+    /**
+     * Performs setup for the block within the provided activity.
+     * @param {object} activity - The activity context to set up the block in.
+     */
     setup(activity) {
         activity.blocks.protoBlockDict[this.name] = this;
 
@@ -2048,7 +2069,16 @@ class BaseBlock extends ProtoBlock {
     }
 }
 
+/**
+ * Represents a block that outputs a value.
+ * @extends BaseBlock
+ */
 class ValueBlock extends BaseBlock {
+    /**
+     * Creates a ValueBlock instance with the given name and optional display name.
+     * @param {string} name - The name of the block.
+     * @param {string} [displayName] - The display name of the block.
+     */
     constructor(name, displayName) {
         super(name);
         displayName ||= undefined;
@@ -2066,7 +2096,15 @@ class ValueBlock extends BaseBlock {
     }
 }
 
+/**
+ * Represents a block that outputs a boolean value.
+ * @extends BaseBlock
+ */
 class BooleanBlock extends BaseBlock {
+    /**
+     * Creates a BooleanBlock instance with the given name.
+     * @param {string} name - The name of the block.
+     */
     constructor(name) {
         super(name);
 
@@ -2080,7 +2118,16 @@ class BooleanBlock extends BaseBlock {
     }
 }
 
+/**
+ * Represents a block that outputs a boolean sensor value.
+ * @extends BaseBlock
+ */
 class BooleanSensorBlock extends BaseBlock {
+    /**
+     * Creates a BooleanSensorBlock instance with the given name and optional display name.
+     * @param {string} name - The name of the block.
+     * @param {string} [displayName] - The display name of the block.
+     */
     constructor(name, displayName) {
         super(name);
         displayName ||= undefined;
@@ -2096,7 +2143,16 @@ class BooleanSensorBlock extends BaseBlock {
     }
 }
 
+/**
+ * Represents a block with flow inputs and/or outputs.
+ * @extends BaseBlock
+ */
 class FlowBlock extends BaseBlock {
+    /**
+     * Creates a FlowBlock instance with the given name and optional display name.
+     * @param {string} name - The name of the block.
+     * @param {string} [displayName] - The display name of the block.
+     */
     constructor(name, displayName) {
         super(name);
         displayName ||= undefined;
@@ -2114,7 +2170,16 @@ class FlowBlock extends BaseBlock {
     }
 }
 
+/**
+ * Represents a block with leftward flow only.
+ * @extends BaseBlock
+ */
 class LeftBlock extends BaseBlock {
+    /**
+     * Creates a LeftBlock instance with the given name and optional display name.
+     * @param {string} name - The name of the block.
+     * @param {string} [displayName] - The display name of the block.
+     */
     constructor(name, displayName) {
         super(name);
         displayName ||= undefined;
@@ -2132,7 +2197,15 @@ class LeftBlock extends BaseBlock {
     }
 }
 
+/**
+ * Represents a flow clamp block.
+ * @extends FlowBlock
+ */
 class FlowClampBlock extends FlowBlock {
+    /**
+     * Creates an instance of FlowClampBlock.
+     * @param {string} name - The name of the block.
+     */
     constructor(name) {
         super(name);
 
@@ -2146,11 +2219,24 @@ class FlowClampBlock extends FlowBlock {
     }
 }
 
+/**
+ * Represents a stack clamp block.
+ * @extends BaseBlock
+ */
 class StackClampBlock extends BaseBlock {
+    /**
+     * Creates an instance of StackClampBlock.
+     * @param {string} name - The name of the block.
+     */
     constructor(name) {
         super(name);
 
+        /**
+         * Additional width for the block.
+         * @type {number}
+         */
         this.extraWidth = 40;
+        
         this.formBlock({
             flows: {
                 top: "cap",
