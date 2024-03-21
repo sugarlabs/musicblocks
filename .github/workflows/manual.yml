@@ -1,0 +1,35 @@
+name: Import standard labels
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  labels:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependency
+        run: npm install github-label-template
+        shell: bash
+
+      - name: Delete existing labels
+        run: |
+          echo "GitHub Token: ${{ secrets.GITHUB_TOKEN }}"
+          force=${{ inputs.force || 'false' }}
+          if [ "$force" = true ]; then
+            npx ghlbl -o ${{ secrets.OWNER_NAME }} -r ${{ secrets.REPO_NAME }} -t ${{ secrets.GITHUB_TOKEN }} -d
+          else
+            echo -e "Existing labels not removed"
+          fi
+        shell: bash
+
+      - name: Import labels from json file
+        run: npx ghlbl -o ${{ secrets.OWNER_NAME }} -r ${{ secrets.REPO_NAME }} -t ${{ secrets.GITHUB_TOKEN }} -i .github/workflows/labels.json
+        shell: bash
+
