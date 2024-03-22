@@ -127,22 +127,7 @@ class WidgetWindow {
         titleEl.id = `${this._key}WidgetID` ;
 
         this._nonclose.onmousedown = (e) => {
-            this._dragging = true;
-            if (this._maximized) {
-                // Perform special repositioning to make the drag feel right when
-                // restoring a window from maximized.
-                let bcr = this._drag.getBoundingClientRect();
-                let dx = (bcr.left - e.clientX) / (bcr.right - bcr.left);
-                const dy = bcr.top - e.clientY;
-
-                this._restore();
-                this.onmaximize();
-
-                bcr = this._drag.getBoundingClientRect();
-                dx *= bcr.right - bcr.left;
-                this.setPosition(e.clientX + dx, e.clientY + dy);
-            }
-
+            this._dragging = !this._maximized;
             this.takeFocus();
 
             this._dx = e.clientX - this._drag.getBoundingClientRect().left;
