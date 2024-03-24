@@ -180,11 +180,21 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
 // blocks, logo, palettes, and turtles for plugins and js-export.
 let globalActivity;
 
+/**
+ * Performs analysis on the project using the global activity.
+ * @returns {object} - The analysis result.
+ */
 const doAnalyzeProject = function() {
     return analyzeProject(globalActivity);
 };
 
+/**
+ * Represents an activity in the application.
+ */
 class Activity {
+    /**
+     * Creates an Activity instance.
+     */
     constructor() {
         globalActivity = this;
 
@@ -295,6 +305,7 @@ class Activity {
 
         /**
          * Initialises major variables and renders default stack.
+         * Sets up the initial state and dependencies of the activity.
          */
         this.setupDependencies = () => {
             createDefaultStack();
@@ -589,16 +600,26 @@ class Activity {
             }
         };
 
+        /**
+         * Finds and organizes blocks within the workspace.
+         * Blocks are positioned based on their connections and availability within the canvas area.
+         */
         this._findBlocks = () => {
+            // Ensure visibility of blocks
             if (!this.blocks.visible) {
                 this._changeBlockVisibility();
             }
+
+            // Reset active block and hide DOM label
             this.blocks.activeBlock = null;
             hideDOMLabel();
+
+            // Show blocks and set initial container position
             this.blocks.showBlocks();
             this.blocksContainer.x = 0;
             this.blocksContainer.y = 0;
 
+            // Calculate top and left positions for block placement
             let toppos;
             if (this.auxToolbar.style.display === "block") {
                 toppos = 90 + this.toolbarHeight;
@@ -607,12 +628,13 @@ class Activity {
             }
             const leftpos = Math.floor(this.canvas.width / 4);
 
+            // Update palettes and calculate initial block position
             this.palettes.updatePalettes();
             let x = Math.floor(leftpos * this.turtleBlocksScale);
             let y = Math.floor(toppos * this.turtleBlocksScale);
             let even = true;
 
-            // First the start blocks...
+            // Position start blocks first
             for (const blk in this.blocks.blockList) {
                 if (!this.blocks.blockList[blk].trash) {
                     const myBlock = this.blocks.blockList[blk];
@@ -620,6 +642,7 @@ class Activity {
                         continue;
                     }
 
+                    // Move block and its connected group
                     if (myBlock.connections[0] === null) {
                         const dx = x - myBlock.container.x;
                         const dy = y - myBlock.container.y;
@@ -634,6 +657,7 @@ class Activity {
                             }
                         }
 
+                        // Update x and y positions for next block placement
                         x += Math.floor(150 * this.turtleBlocksScale);
                         if (x > (this.canvas.width * 7) / 8 / this.turtleBlocksScale) {
                             even = !even;
@@ -649,7 +673,7 @@ class Activity {
                 }
             }
 
-            // ...then everything else.
+            // Position other blocks
             for (const blk in this.blocks.blockList) {
                 if (!this.blocks.blockList[blk].trash) {
                     const myBlock = this.blocks.blockList[blk];
@@ -657,6 +681,7 @@ class Activity {
                         continue;
                     }
 
+                    // Move block and its connected group
                     if (myBlock.connections[0] === null) {
                         const dx = x - myBlock.container.x;
                         const dy = y - myBlock.container.y;
@@ -670,6 +695,8 @@ class Activity {
                                 }
                             }
                         }
+
+                        // Update x and y positions for next block placement
                         x += 150 * this.turtleBlocksScale;
                         if (x > (this.canvas.width * 7) / 8 / this.turtleBlocksScale) {
                             even = !even;
@@ -690,6 +717,7 @@ class Activity {
             this.boundary.hide();
 
             // Return mice to the center of the screen.
+            // Reset turtles' positions to center of the screen
             for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
                 const savedPenState = this.turtles.turtleList[turtle].painter.penState;
                 this.turtles.turtleList[turtle].painter.penState = false;
@@ -1037,7 +1065,14 @@ class Activity {
 
         let isExecuting = false; // Flag variable to track execution status
 
+        /**
+         * Sets up a record button functionality for the given activity.
+         * @param {object} activity - The activity context.
+         */
         const doRecordButton = (activity) => {
+            /**
+             * Executes the record button functionality if execution is not already in progress.
+             */
             if (isExecuting) {
                 return; // Exit the function if execution is already in progress
             }
@@ -1046,6 +1081,10 @@ class Activity {
             activity._doRecordButton();
         };
 
+        /**
+         * Functionality for the record button.
+         * @private
+         */
         this._doRecordButton = () => {
             const start = document.getElementById("record"),
                 recInside = document.getElementById("rec_inside");
@@ -1053,6 +1092,10 @@ class Activity {
             var clickEvent = new Event("click");
             let flag = 0;
 
+            /**
+             * Records the screen using the browser's media devices API.
+             * @returns {Promise<MediaStream>} A promise resolving to the recorded media stream.
+             */
             async function recordScreen() {
                 flag = 1;
                 return await navigator.mediaDevices.getDisplayMedia(
@@ -1074,6 +1117,10 @@ class Activity {
 
             const that = this;
 
+            /**
+             * Saves the recorded chunks as a video file.
+             * @param {Blob[]} recordedChunks - The recorded video chunks.
+             */
             function saveFile(recordedChunks) {
                 flag = 1;
                 recInside.classList.remove("blink");
@@ -1099,6 +1146,9 @@ class Activity {
                 doRecordButton();
                 that.textMsg("click on stop sharing");
             }
+            /**
+             * Stops the recording process.
+             */
             function stopRec() {
                 flag = 0;
                 mediaRecorder.stop();
@@ -1107,7 +1157,12 @@ class Activity {
                 document.body.appendChild(node);
             }
 
-            // eslint-disable-next-line no-unused-vars
+            /**
+             * Creates a media recorder instance.
+             * @param {MediaStream} stream - The media stream to be recorded.
+             * @param {string} mimeType - The MIME type of the recording.
+             * @returns {MediaRecorder} The created media recorder instance.
+             */
             function createRecorder (stream, mimeType) {
                 flag = 1;
                 recInside.classList.add("blink");
@@ -1142,6 +1197,9 @@ class Activity {
                 return mediaRecorder;
             }
 
+            /**
+             * Handles the recording process.
+             */
             function recording() {
                 start.addEventListener(
                     "click",
@@ -1160,12 +1218,14 @@ class Activity {
                 );
             }
 
+            // Start recording process if not already executing
             if (flag == 0 && isExecuting) {
                 recording();
                 start.dispatchEvent(clickEvent);
                 flag = 1;
             };
 
+            // Stop recording if already executing
             if(flag == 1 && isExecuting){
                 start.addEventListener("click", stopRec);
                 flag = 0;
@@ -1180,6 +1240,11 @@ class Activity {
             activity._doSlowButton();
         };
 
+        /**
+         * Executes slow button functionality.
+         * Resets active block, hides DOM labels, adjusts turtle delay, resumes synth, and runs or steps logo commands.
+         * @private
+         */
         this._doSlowButton = () => {
             this.blocks.activeBlock = null;
             hideDOMLabel();
@@ -1201,6 +1266,11 @@ class Activity {
             activity._doStepButton();
         };
 
+        /**
+         * Executes step button functionality.
+         * Resets active block, hides DOM labels, adjusts turtle delay, resumes synth, and runs or steps logo commands.
+         * @private
+         */
         this._doStepButton = () => {
             this.blocks.activeBlock = null;
             hideDOMLabel();
@@ -1231,6 +1301,11 @@ class Activity {
             activity._doHardStopButton(onblur);
         };
 
+        /**
+         * Stops running of music blocks and stops all mid-way synths.
+         * @param {boolean} onblur - Indicates if the function is triggered by loss of focus.
+         * @private
+         */
         this._doHardStopButton = (onblur) => {
             this.blocks.activeBlock = null;
             hideDOMLabel();
@@ -1263,6 +1338,11 @@ class Activity {
             activity._doSwitchMode();
         };
 
+        /**
+         * Switches between beginner and advanced modes.
+         * Displays a message prompting browser refresh to apply mode change.
+         * @private
+         */
         this._doSwitchMode = () => {
             this.blocks.activeBlock = null;
             const mode = this.storage.beginnerMode;
@@ -1300,6 +1380,11 @@ class Activity {
             }
         };
 
+        /**
+         * Initializes the functionality of the horizontal scroll icon.
+         * Toggles horizontal scrolling and updates corresponding UI elements.
+         * @private
+         */
         this._setScroller = () => {
             this.blocks.activeBlock = null;
             this.scrollBlockContainer = !this.scrollBlockContainer;
@@ -1328,7 +1413,10 @@ class Activity {
             }
         };
 
-        // Load animation handler.
+        /**
+         * Displays loading animation with random messages.
+         * @private
+         */
         this.doLoadAnimation = () => {
             const messages = {
                 load_messages: [
@@ -1363,8 +1451,9 @@ class Activity {
             setInterval(changeText, 2000);
         };
 
-        /*
-         * Increases block size
+        /**
+         * Increases the size of blocks in the activity.
+         * @param {object} activity - The activity object.
          */
         const doLargerBlocks = async(activity) => {
             await activity._doLargerBlocks();
@@ -1395,8 +1484,9 @@ class Activity {
             document.getElementById("hideContents").click();
         };
 
-        /*
-         * Decreases block size
+        /**
+         * Decreases the size of blocks in the activity.
+         * @param {object} activity - The activity object.
          */
         const doSmallerBlocks = async(activity) => {
             await activity._doSmallerBlocks();
@@ -1406,6 +1496,10 @@ class Activity {
             }
         };
 
+        
+        /**
+         * Manages the resizing of blocks to handle larger size.
+         */
         this._doSmallerBlocks = async() => {
             this.blocks.activeBlock = null;
 
@@ -1431,6 +1525,7 @@ class Activity {
         /*
          * If either the block size has reached its minimum or maximum,
          * then the icons to make them smaller/bigger will be hidden.
+         * Sets the status of the smaller and larger block icons based on the current block size.
          */
         this.setSmallerLargerStatus = async() => {
             if (BLOCKSCALES[this.blockscale] < DEFAULTBLOCKSCALE) {
@@ -1447,13 +1542,17 @@ class Activity {
         };
 
 
-        /*
-         * Based on the active palette, remove a plugin palette from local storage.
+        /**
+         * Deletes a plugin palette from local storage based on the active palette.
+         * @param {object} activity - The activity object.
          */
         const deletePlugin = (activity) => {
             activity._deletePlugin();
         };
 
+        /**
+         * Deletes a plugin palette from local storage.
+         */
         this._deletePlugin = () => {
             if (this.palettes.activePalette !== null) {
                 const obj = JSON.parse(this.storage.plugins);
@@ -1611,6 +1710,9 @@ class Activity {
 
             const that = this;
 
+            /**
+             * Closes any open menus and labels.
+             */
             const closeAnyOpenMenusAndLabels = () => {
                 if (docById("wheelDiv") !== null) docById("wheelDiv").style.display = "none";
                 if (docById("contextWheelDiv") !== null)
@@ -1621,6 +1723,11 @@ class Activity {
                 if (docById("numberLabel") !== null) docById("numberLabel").style.display = "none";
             };
 
+            /**
+             * Normalizes wheel event data across different browsers.
+             * @param {WheelEvent} event - The wheel event object.
+             * @returns {Object} - Normalized pixelX and pixelY values.
+             */
             const normalizeWheel = (event) => {
                 const PIXEL_STEP = 10;
                 const LINE_HEIGHT = 40;
@@ -1631,12 +1738,14 @@ class Activity {
                     pX = 0,
                     pY = 0; // pixelX, pixelY
 
+                // Determine scroll values based on different event properties
                 if ("detail" in event) sY = event.detail;
                 if ("wheelDelta" in event) sY = -event.wheelDelta / 120;
                 if ("wheelDeltaY" in event) sY = -event.wheelDeltaY / 120;
                 if ("wheelDeltaX" in event) sX = -event.wheelDeltaX / 120;
 
                 // side scrolling on FF with DOMMouseScroll
+                // Handle horizontal scrolling on Firefox
                 if ("axis" in event && event.axis === event.HORIZONTAL_AXIS) {
                     sX = sY;
                     sY = 0;
@@ -1645,9 +1754,11 @@ class Activity {
                 pX = sX * PIXEL_STEP;
                 pY = sY * PIXEL_STEP;
 
+                // Determine delta values based on deltaMode
                 if ("deltaY" in event) pY = event.deltaY;
                 if ("deltaX" in event) pX = event.deltaX;
 
+                // Adjust pixel values based on deltaMode
                 if ((pX || pY) && event.deltaMode) {
                     if (event.deltaMode === 1) {
                         // ff uses deltamode = 1
@@ -1672,6 +1783,10 @@ class Activity {
             const myCanvas = document.getElementById("myCanvas");
             const initialTouches = [[null, null], [null, null]]; // Array to track two fingers (Y and X coordinates)
 
+            /**
+             * Handles touch start event on the canvas.
+             * @param {TouchEvent} event - The touch event object.
+             */
             myCanvas.addEventListener("touchstart", (event) => {
                 if (event.touches.length === 2) {
                     for (let i = 0; i < 2; i++) {
@@ -1681,6 +1796,10 @@ class Activity {
                 }
             });
 
+            /**
+             * Handles touch move event on the canvas.
+             * @param {TouchEvent} event - The touch event object.
+             */
             myCanvas.addEventListener("touchmove", (event) => {
                 if (event.touches.length === 2) {
                     for (let i = 0; i < 2; i++) {
@@ -1710,6 +1829,9 @@ class Activity {
                 }
             });
 
+            /**
+             * Handles touch end event on the canvas.
+             */
             myCanvas.addEventListener("touchend", () => {
                 for (let i = 0; i < 2; i++) {
                     initialTouches[i][0] = null;
@@ -1717,6 +1839,10 @@ class Activity {
                 }
             });
 
+            /**
+             * Handles wheel event on the canvas.
+             * @param {WheelEvent} event - The wheel event object.
+             */
             const __wheelHandler = (event) => {
                 const data = normalizeWheel(event); // normalize over different browsers
                 const delY = data.pixelY;
@@ -1747,6 +1873,10 @@ class Activity {
 
             docById("myCanvas").addEventListener("wheel", __wheelHandler, false);
 
+            /**
+             * Handles stage mouse up event.
+             * @param {MouseEvent} event - The mouse event object.
+             */
             const __stageMouseUpHandler = (event) => {
                 that.stageMouseDown = false;
                 that.moving = false;
@@ -1757,11 +1887,19 @@ class Activity {
                 }
             };
 
+            /**
+             * Handles mouse movement on the stage.
+             * @param {object} event - The mouse event object.
+             */
             this.stage.on("stagemousemove", (event) => {
                 that.stageX = event.stageX;
                 that.stageY = event.stageY;
             });
 
+            /**
+             * Handles mouse down event on the stage.
+             * @param {object} event - The mouse event object.
+             */
             this.stage.on("stagemousedown", (event) => {
                 that.stageMouseDown = true;
                 if ((that.stage.getObjectUnderPoint() !== null) | that.turtles.running()) {
@@ -1789,6 +1927,7 @@ class Activity {
                     }
 
                     // if we are moving the block container, deselect the active block.
+                    // Deselect active block if moving the block container
                     that.blocks.activeBlock = null;
 
                     // eslint-disable-next-line max-len
@@ -1813,30 +1952,45 @@ class Activity {
             });
         };
 
-        /*
+        /**
          * Sets up scrolling functionality in palette and across canvas
+         * Retrieves the scale of the stage.
+         * @returns {number} - The scale of the stage.
          */
         this.getStageScale = () => {
             return this.turtleBlocksScale;
         };
 
+        /**
+         * Retrieves the X coordinate of the stage.
+         * @returns {number} - The X coordinate of the stage.
+         */
         this.getStageX = () => {
             return this.turtles.screenX2turtleX(this.stageX / this.turtleBlocksScale);
         };
 
+        /**
+         * Retrieves the Y coordinate of the stage.
+         * @returns {number} - The Y coordinate of the stage.
+         */
         this.getStageY = () => {
             return this.turtles.screenY2turtleY(
                 (this.stageY - this.toolbarHeight) / this.turtleBlocksScale
             );
         };
 
+        /**
+         * Retrieves the mouse down state of the stage.
+         * @returns {boolean} - The mouse down state of the stage.
+         */
         this.getStageMouseDown = () => {
             return this.stageMouseDown;
         };
 
         /**
-         * Renders grid.
-         * @param imagePath {path of grid to be rendered}
+         * Creates and renders a grid on the stage.
+         * @param {string} imagePath - The path of the grid image.
+         * @returns {object} - The created grid object.
          */
         this._createGrid = (imagePath) => {
             const img = new Image();
@@ -1858,11 +2012,11 @@ class Activity {
         };
 
         /**
-         * @param  fillColor   {inner color of message}
-         * @param  strokeColor {border of message}
-         * @param  callback    {callback function assigned to particular message}
-         * @param  y           {position on canvas}
-         * @returns {description}
+         * Creates and renders a message container.
+         * @param {string} fillColor - The fill color of the message container.
+         * @param {string} strokeColor - The stroke color of the message container.
+         * @param {function} callback - The callback function assigned to the message container.
+         * @param {number} y - The position on the canvas.
          */
         this._createMsgContainer = (fillColor, strokeColor, callback, y) => {
             const container = new createjs.Container();
@@ -1918,6 +2072,7 @@ class Activity {
         };
 
         /*
+         * Creates and renders error message containers with appropriate artwork.
          * Some error messages have special artwork.
          */
         this._createErrorContainers = () => {
@@ -1928,8 +2083,8 @@ class Activity {
         };
 
         /**
-         * Renders error message with appropriate artwork
-         * @param  name {specifies svg to be rendered}
+         * Renders an error message with appropriate artwork.
+         * @param {string} name - The name specifying the SVG to be rendered.
          */
         this._makeErrorArtwork = (name) => {
             const container = new createjs.Container();
@@ -2174,6 +2329,7 @@ class Activity {
                     that.searchWidget.idInput_custom = ui.item.value;
                     that.searchWidget.protoblk = ui.item.specialDict;
                     that.doSearch();
+                    if (event.keyCode === 13) this.searchWidget.style.visibility = "visible";
                 },
                 focus: (event, ui) => {
                     event.preventDefault();
@@ -2402,7 +2558,6 @@ class Activity {
             const KEYCODE_DOWN = 40;
             const DEL = 46;
             const V = 86;
-            const ENTER = 13;
 
             // Shortcuts for creating new notes
             const KEYCODE_D = 68; // do
@@ -2456,7 +2611,10 @@ class Activity {
                         this._doFastButton();
                         break;
                     case 13: // 'R or ENTER'
-                        this.textMsg("ENter " + _("Play"));
+                        if (this.searchWidget.style.visibility === 'visible') {
+                            return;
+                        }
+                        this.textMsg("Enter " + _("Play"));
                         let stopbt = document.getElementById("stop");
                         if (stopbt) {
                             stopbt.style.color = platformColor.stopIconcolor;
@@ -3002,6 +3160,7 @@ class Activity {
                 canvasHolder.height = canvas.height;
             }
             document.getElementById("hideContents").click();
+            that.refreshCanvas();
         }
 
         let resizeTimeout;
@@ -3013,18 +3172,19 @@ class Activity {
             }, 100);
         });
         window.addEventListener("orientationchange",  handleResize);
-
-        const that = this;
-        const screenWidth = window.innerWidth;
-        const  resizeCanvas_ = () => {
-            if (screenWidth !== window.innerWidth) {
+        const that = this;        
+        const resizeCanvas_ = () => {
+            try {
                 that._onResize(false);
+                document.getElementById("hideContents").click();
+            } catch (error) {
+                console.error("An error occurred in resizeCanvas_:", error);
             }
-            document.getElementById("hideContents").click();
         };
         
         resizeCanvas_();
-        window.addEventListener("orientationchange", resizeCanvas_ );
+        window.addEventListener("orientationchange", resizeCanvas_);
+        
         /*
          * Restore last stack pushed to trashStack back onto canvas.
          * Hides palettes before update
@@ -3042,7 +3202,7 @@ class Activity {
             for (const name in this.palettes.dict) {
                 this.palettes.dict[name].hideMenu(true);
             }
-
+            
             this.blocks.activeBlock = null;
             this.refreshCanvas();
 
@@ -3134,6 +3294,18 @@ class Activity {
             this.refreshCanvas();
         };
 
+        this.handleKeyDown = (event) => {
+            
+            if (event.ctrlKey && event.key === "z") {
+                this._restoreTrash(activity);
+                activity.__tick();
+                event.preventDefault();
+            }
+        };
+
+        // Attach keydown event listener to document
+        document.addEventListener("keydown", this.handleKeyDown);
+
         /*
          * Open aux menu
          */
@@ -3153,6 +3325,18 @@ class Activity {
         this._showHideAuxMenu = (resize) => {
             const cellsize = 55;
             let dy;
+
+            // function to increase or decrease the "top" property of the top-right corner buttons
+
+            const topRightButtons = document.querySelectorAll("#buttoncontainerTOP .tooltipped");
+            const btnY = document.getElementById("Grid").getBoundingClientRect().top;
+
+            this.changeTopButtonsPosition = (value) => {
+                topRightButtons.forEach((child) => {
+                    child.style.top = `${btnY + value}px`;
+                });
+            };
+            
             if (!resize && this.toolbarHeight === 0) {
                 dy = cellsize + LEADING + 5;
                 this.toolbarHeight = dy;
@@ -3161,6 +3345,7 @@ class Activity {
                 this.turtles.deltaY(dy);
 
                 this.blocksContainer.y += dy;
+                this.changeTopButtonsPosition(dy);
                 this.blocks.checkBounds();
             } else {
                 dy = this.toolbarHeight;
@@ -3170,6 +3355,7 @@ class Activity {
                 this.turtles.deltaY(-dy);
 
                 this.blocksContainer.y -= dy;
+                this.changeTopButtonsPosition(-dy);
             }
 
             this.refreshCanvas();
@@ -4444,31 +4630,31 @@ class Activity {
             this.boundary.hide();
 
             if(!this.helpfulWheelItems.find(ele => ele.label === "Home [HOME]")) 
-                this.helpfulWheelItems.push({label: "Home [HOME]", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GOHOMEFADEDBUTTON))), display: true, fn: findBlocks});
+                this.helpfulWheelItems.push({label: "Home [HOME]", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(GOHOMEFADEDBUTTON)), display: true, fn: findBlocks});
 
             this.hideBlocksContainer = createButton(SHOWBLOCKSBUTTON, _("Show/hide block"),
                 changeBlockVisibility);
 
             if(!this.helpfulWheelItems.find(ele => ele.label === "Show/hide block")) 
-                this.helpfulWheelItems.push({label: "Show/hide block", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(SHOWBLOCKSBUTTON))), display: true, fn: changeBlockVisibility});
+                this.helpfulWheelItems.push({label: "Show/hide block", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SHOWBLOCKSBUTTON)), display: true, fn: changeBlockVisibility});
             
             this.collapseBlocksContainer = createButton(COLLAPSEBLOCKSBUTTON, _("Expand/collapse blocks"),
                 toggleCollapsibleStacks);
 
             if(!this.helpfulWheelItems.find(ele => ele.label === "Expand/collapse blocks")) 
-                this.helpfulWheelItems.push({label: "Expand/collapse blocks", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(COLLAPSEBLOCKSBUTTON))), display: true, fn: toggleCollapsibleStacks});
+                this.helpfulWheelItems.push({label: "Expand/collapse blocks", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBLOCKSBUTTON)), display: true, fn: toggleCollapsibleStacks});
             
             this.smallerContainer = createButton(SMALLERBUTTON, _("Decrease block size"),
                 doSmallerBlocks);
             
             if(!this.helpfulWheelItems.find(ele => ele.label === "Decrease block size")) 
-                this.helpfulWheelItems.push({label: "Decrease block size", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(SMALLERBUTTON))), display: true, fn: doSmallerBlocks});
+                this.helpfulWheelItems.push({label: "Decrease block size", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SMALLERBUTTON)), display: true, fn: doSmallerBlocks});
             
             this.largerContainer = createButton(BIGGERBUTTON, _("Increase block size"),
                 doLargerBlocks);
             
             if(!this.helpfulWheelItems.find(ele => ele.label === "Increase block size")) 
-                this.helpfulWheelItems.push({label: "Increase block size", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(BIGGERBUTTON))), display: true, fn: doLargerBlocks});
+                this.helpfulWheelItems.push({label: "Increase block size", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(BIGGERBUTTON)), display: true, fn: doLargerBlocks});
 
             if(!this.helpfulWheelItems.find(ele => ele.label === "Restore")) 
                 this.helpfulWheelItems.push({label: "Restore", icon: "imgsrc:header-icons/restore-from-trash.svg", display: true, fn: restoreTrash});
@@ -4489,16 +4675,16 @@ class Activity {
                 this.helpfulWheelItems.push({label: "Set Pitch Preview", icon: "imgsrc:header-icons/music-note.svg", display: true, fn: chooseKeyMenu});
         
             if(!this.helpfulWheelItems.find(ele => ele.label === "Grid")) 
-                this.helpfulWheelItems.push({label: "Grid", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(CARTESIANBUTTON))), display: true, fn: piemenuGrid});
+                this.helpfulWheelItems.push({label: "Grid", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CARTESIANBUTTON)), display: true, fn: piemenuGrid});
         
             if(!this.helpfulWheelItems.find(ele => ele.label === "Clean")) 
-                this.helpfulWheelItems.push({label: "Clean", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(CLEARBUTTON))), display: true, fn: () => this._allClear(false)});
+                this.helpfulWheelItems.push({label: "Clean", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CLEARBUTTON)), display: true, fn: () => this._allClear(false)});
             
             if(!this.helpfulWheelItems.find(ele => ele.label === "Collapse")) 
-                this.helpfulWheelItems.push({label: "Collapse", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(COLLAPSEBUTTON))), display: true, fn: this.turtles.collapse});
+                this.helpfulWheelItems.push({label: "Collapse", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBUTTON)), display: true, fn: this.turtles.collapse});
         
             if(!this.helpfulWheelItems.find(ele => ele.label === "Expand")) 
-                this.helpfulWheelItems.push({label: "Expand", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(EXPANDBUTTON))), display: false, fn: this.turtles.expand});
+                this.helpfulWheelItems.push({label: "Expand", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(EXPANDBUTTON)), display: false, fn: this.turtles.expand});
         
             if(!this.helpfulWheelItems.find(ele => ele.label === "Search for Blocks")) 
                 this.helpfulWheelItems.push({label: "Search for Blocks", icon: "imgsrc:header-icons/search-button.svg", display: true, fn: this._displayHelpfulSearchDiv});

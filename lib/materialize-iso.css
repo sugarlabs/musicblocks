@@ -1652,6 +1652,7 @@
 .materialize-iso section,
 .materialize-iso summary {
   display: block;
+  z-index: 1001;
 }
 .materialize-iso audio,
 .materialize-iso canvas,
@@ -2545,6 +2546,11 @@ i.left {
 @media only screen and (min-width: 601px) {
   .materialize-iso .container {
     width: 85%;
+  }
+}
+@media only screen and (max-width: 400px) {
+  ul.main.right {
+    margin-top: -55px;
   }
 }
 @media only screen and (min-width: 993px) {

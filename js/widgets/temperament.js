@@ -28,15 +28,13 @@
  */
 
 /* exported TemperamentWidget */
+
 /**
- * The TemperamentWidget constructor function.
+ * Represents a widget for managing temperament settings.
  * @constructor
  */
 function TemperamentWidget() {
-     /**
-     * Width of the button div.
-     * @type {number}
-     */
+    // Constants for button and icon sizes
     const BUTTONDIVWIDTH = 430;
 
     /**
@@ -61,6 +59,7 @@ function TemperamentWidget() {
      * Reference to the temperament cell.
      * @type {HTMLElement|null}
      */
+
     let temperamentCell = null;
 
      /**
@@ -136,12 +135,13 @@ function TemperamentWidget() {
     this.playbackForward = true;
 
     /**
-     * Adds a button to the specified row.
-     * @param {HTMLTableRowElement} row - The row to which the button will be added.
-     * @param {string} icon - The icon source.
+     * Adds a button to the widget.
+     * @private
+     * @param {HTMLTableRowElement} row - The table row to which the button will be added.
+     * @param {string} icon - The icon file name.
      * @param {number} iconSize - The size of the icon.
-     * @param {string} label - The label of the button.
-     * @returns {HTMLTableCellElement} The created button cell.
+     * @param {string} label - The label for the button.
+     * @returns {HTMLTableCellElement} - The created table cell.
      */
     this._addButton = function (row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
@@ -177,7 +177,8 @@ function TemperamentWidget() {
     };
 
     /**
-     * Draws the circle of notes.
+     * Draws or renders the circle of notes.
+     * @private
      * @returns {void}
      */
     this._circleOfNotes = function () {
@@ -487,7 +488,7 @@ function TemperamentWidget() {
                             this.ratiosNotesPair[index][1] +
                             "(- " +
                             centsDiff1[index].toFixed(2) +
-                            "%)" +
+                            "¢)" +
                             "</div>";
                     } else {
                         docById("noteInfo").innerHTML +=
@@ -497,7 +498,7 @@ function TemperamentWidget() {
                             this.ratiosNotesPair[index][1] +
                             "(+ " +
                             centsDiff1[index].toFixed(2) +
-                            "%)" +
+                            "¢)" +
                             "</div>";
                     }
                 }
@@ -1718,7 +1719,7 @@ function TemperamentWidget() {
                         addOctave +
                         "(" +
                         newCents.toFixed(0) +
-                        "%)" +
+                        "¢)" +
                         newOctave;
                 } else {
                     if (newCents > 30) {
@@ -1732,7 +1733,7 @@ function TemperamentWidget() {
                         addOctave +
                         "(+" +
                         newCents.toFixed(0) +
-                        "%)" +
+                        "¢)" +
                         newOctave;
                 }
             }
@@ -1989,9 +1990,7 @@ function TemperamentWidget() {
      */
     this.playAll = function () {
         let p = 0;
-        this.playbackForward = true;
         this._playing = !this._playing;
-
         this._logo.resetSynth(0);
 
         const cell = this.playButton;
@@ -2048,6 +2047,7 @@ function TemperamentWidget() {
             pitchNumber = this.tempRatios1.length - 1;
         }
 
+        const currentTime = new Date().getTime();
         const __playLoop = function (i) {
             if (i === pitchNumber) {
                 that.playbackForward = false;
@@ -2068,12 +2068,12 @@ function TemperamentWidget() {
             }
 
             if (that.circleIsVisible == false && docById("wheelDiv4") == null) {
-                if (i === pitchNumber) {
+                if (i === pitchNumber && that._playing) {
                     that.notesCircle.navItems[0].fillAttr = "#808080";
                     that.notesCircle.navItems[0].sliceHoverAttr.fill = "#808080";
                     that.notesCircle.navItems[0].slicePathAttr.fill = "#808080";
                     that.notesCircle.navItems[0].sliceSelectedAttr.fill = "#808080";
-                } else {
+                } else if (that._playing) {
                     that.notesCircle.navItems[i].fillAttr = "#808080";
                     that.notesCircle.navItems[i].sliceHoverAttr.fill = "#808080";
                     that.notesCircle.navItems[i].slicePathAttr.fill = "#808080";
@@ -2162,45 +2162,15 @@ function TemperamentWidget() {
                     __playLoop(i);
                 }, Singer.defaultBPMFactor * 1000 * duration);
             } else {
-                cell.innerHTML =
-                    '&nbsp;&nbsp;<img src="header-icons/' +
-                    "play-button.svg" +
-                    '" title="' +
-                    _("Play") +
-                    '" alt="' +
-                    _("Play") +
-                    '" height="' +
-                    ICONSIZE +
-                    '" width="' +
-                    ICONSIZE +
-                    '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
-                if (i !== -1) {
-                    setTimeout(function () {
-                        if (that.circleIsVisible == false && docById("wheelDiv4") == null) {
-                            that.notesCircle.navItems[i - 1].fillAttr = "#c8C8C8";
-                            that.notesCircle.navItems[i - 1].sliceHoverAttr.fill = "#c8C8C8";
-                            that.notesCircle.navItems[i - 1].slicePathAttr.fill = "#c8C8C8";
-                            that.notesCircle.navItems[i - 1].sliceSelectedAttr.fill = "#c8C8C8";
-                            that.notesCircle.refreshWheel();
-                        } else if (that.circleIsVisible == true && docById("wheelDiv4") == null) {
-                            const j = i - 1;
-                            docById("pitchNumber_" + j).style.background =
-                                platformColor.selectorBackground;
-                        } else if (docById("wheelDiv4") !== null) {
-                            that.wheel1.navItems[i - 1].fillAttr = "#e0e0e0";
-                            that.wheel1.navItems[i - 1].sliceHoverAttr.fill = "#e0e0e0";
-                            that.wheel1.navItems[i - 1].slicePathAttr.fill = "#e0e0e0";
-                            that.wheel1.navItems[i - 1].sliceSelectedAttr.fill = "#e0e0e0";
-                            that.wheel1.refreshWheel();
-                        }
-                    }, Singer.defaultBPMFactor * 1000 * duration);
-                }
-                that._playing = false;
+                that.inbetween = true;
             }
         };
-        if (this._playing) {
+        if ((this._playing && currentTime - this.lastClickTime > Singer.defaultBPMFactor * 1000 * duration) || (this.inbetween)) {
+            that.playbackForward = true;
+            this.inbetween = false;
             __playLoop(0);
         }
+        this.lastClickTime = currentTime;
     };
 
     /**
@@ -2264,6 +2234,9 @@ function TemperamentWidget() {
         temperamentCell.style.backgroundColor = platformColor.selectorBackground;
 
         this.playButton = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play all"));
+        this.lastClickTime = 0;
+        this.playbackForward = true;
+        this.inbetween = false;
         this.playButton.onclick = function () {
             that.playAll();
         };

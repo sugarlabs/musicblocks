@@ -113,7 +113,7 @@ class Palettes {
             element.setAttribute("class", "disable_highlighting");
             element.setAttribute(
                 "style",
-                "position: fixed; z-index: 1000; display: none ; left :0px; top:" + this.top + "px"
+                "position: absolute; z-index: 1000; display: none ; left :0px; top:" + this.top + "px"
             );
             element.innerHTML =
                 '<div style="float: left"><table width ="' +
@@ -877,8 +877,6 @@ class Palette {
     _showMenuItems() {
         this.model.update();
         const paletteList = docById("PaletteBody_items");
-
-        this.setupGrabScroll(paletteList);
 
         const blocks = this.model.blocks;
         blocks.reverse();
