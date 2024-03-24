@@ -3782,6 +3782,119 @@ class Activity {
             }
         };
 
+        function pitchToSolfege(pitchName) {
+            const pitchToSol = {
+                'c': 'do',
+                'd': 're',
+                'e': 'mi',
+                'f': 'fa',
+                'g': 'sol',
+                'a': 'la',
+                'b': 'ti'
+            };
+        
+            const lowercasePitchName = pitchName.toLowerCase();
+        
+            if (lowercasePitchName in pitchToSol) {
+                return pitchToSol[lowercasePitchName];
+            } else {
+                return null;
+            }
+        }
+        
+        function createPitchBlocks(pitch, blockId, musicBlocksJSON, pitchDuration) {
+            const blocks = [];
+        
+            console.log('Below is the pitch duration');
+            console.log(pitch.duration);
+            console.log(pitch);
+            pitchDuration = toFraction(pitchDuration);
+            console.log(pitchDuration);
+        
+            console.log('Below is the hidden array');
+        
+            if (musicBlocksJSON.length == 5) {
+                musicBlocksJSON.push(
+                    [blockId, ["newnote", {"collapsed": true}], 0, 0, [blockId - 3, blockId + 1, blockId + 4, blockId + 8]],
+                    [blockId + 1, "divide", 0, 0, [blockId, blockId + 2, blockId + 3]],
+                    [blockId + 2, ["number", {value: pitchDuration[0]}], 0, 0, [blockId + 1]],
+                    [blockId + 3, ["number", {value: pitchDuration[1]}], 0, 0, [blockId + 1]],
+                    [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]],
+                    [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
+                    [blockId + 6, ["solfege", {value: pitchToSolfege(pitch.name)}], 0, 0, [blockId + 5]],
+                    [blockId + 7, ["number", {value: pitch.pitch}], 0, 0, [blockId + 5]],
+                    [blockId + 8, "hidden", 0, 0, [blockId, blockId + 9]],
+                );
+        
+            } else {
+                console.log(blockId);
+                musicBlocksJSON.push(
+                    [blockId, ["newnote", {"collapsed": true}], 0, 0, [blockId - 1, blockId + 1, blockId + 4, blockId + 8]],
+                    [blockId + 1, "divide", 0, 0, [blockId, blockId + 2, blockId + 3]],
+                    [blockId + 2, ["number", {value: pitchDuration[0]}], 0, 0, [blockId + 1]],
+                    [blockId + 3, ["number", {value: pitchDuration[1]}], 0, 0, [blockId + 1]],
+                    [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]],
+                    [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
+                    [blockId + 6, ["solfege", {value: pitchToSolfege(pitch.name)}], 0, 0, [blockId + 5]],
+                    [blockId + 7, ["number", {value: pitch.pitch}], 0, 0, [blockId + 5]],
+                    [blockId + 8, "hidden", 0, 0, [blockId, blockId + 9]],
+                );
+            }
+        
+            console.log(blockId);
+            return blocks;
+        }
+        
+        this.parseABC = async function (tune) {
+            let musicBlocksJSON = [];
+            let blockId = 0;
+        
+            console.log('Below is the tune');
+            console.log(tune);
+        
+            const title = (tune.metaText?.title ?? "title").toString().toLowerCase();
+            const instruction = (tune.metaText?.instruction ?? "guitar").toString().toLowerCase();
+        
+            musicBlocksJSON.push(
+                [blockId++, ["action", {collapsed: false}], 100, 100, [null, blockId, blockId + 1, null]],
+                [blockId++, ["text", {value: title}], 0, 0, [blockId - 2]],
+                [blockId++, "settimbre", 0, 0, [blockId - 3, blockId, blockId + 2, blockId + 1]],
+                [blockId++, ["voicename", {value: instruction}], 0, 0, [blockId - 2]],
+                [blockId++, "hidden", 0, 0, [blockId - 3, null]]
+            );
+        
+            tune.lines.forEach(line => {
+                console.log(line + 'hehe');
+                line.staff.forEach(staff => {
+                    staff.voices.forEach(voice => {
+                        voice.forEach(element => {
+                            console.log('hello');
+                            if (element.el_type === "note") {
+                                const pitchBlocks = createPitchBlocks(element.pitches[0], blockId, musicBlocksJSON, element.duration);
+                                blockId = blockId + 9;
+                            }
+                        });
+                    });
+                });
+            });
+        
+            console.debug ('finished when you see: "block loading finished "');
+            document.body.style.cursor = "wait";
+            console.log('hell len')
+            musicBlocksJSON[musicBlocksJSON.length -1][4][1]=null
+            console.log(musicBlocksJSON)
+            // logo.textMsg(_("MIDI loading. This may take some time depending upon the number of notes in the track"));
+            this.blocks.loadNewBlocks(musicBlocksJSON);
+            return null;
+
+        }
+
+
+
+
+
+
+
         /**
          * Calculate time such that no matter how long it takes to load the program, the loading
          * animation will cycle at least once.
@@ -5292,7 +5405,7 @@ class Activity {
 
                 const files = event.dataTransfer.files;
                 const reader = new FileReader();
-
+                const abcReader = new FileReader();
                 // eslint-disable-next-line no-unused-vars
                 reader.onload = (theFile) => {
                     that.loading = true;
@@ -5362,9 +5475,32 @@ class Activity {
                     }, 200);
                 };
 
+                abcReader.onload = (event) => {
+                    const abcData = event.target.result;
+                    const tunebook = new ABCJS.parseOnly(abcData);
+                    console.log(tunebook)
+                    // Process each tune in the tunebook
+                    tunebook.forEach(tune => {
+                        this.parseABC(tune);
+                        console.log(hi)
+                        // Do something with the musicBlocksJSON, e.g., load it into MusicBlocks
+                    });
+                 
+                
+                    
+               
+           
+                };
                 // Work-around in case the handler is called by the
                 // widget drag & drop code.
                 if (files[0] !== undefined) {
+                    let extension = files[0].name.split('.').pop().toLowerCase();  //file extension from input file
+                    let isMidi = (extension == "abc");
+                    if (isMidi) {
+                        abcReader.readAsText(files[0]);
+                        console.log('abc')
+                        return;
+                    }
                     reader.readAsText(files[0]);
                     window.scroll(0, 0);
                 }
