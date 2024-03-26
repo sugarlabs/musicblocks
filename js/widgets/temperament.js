@@ -36,25 +36,102 @@
 function TemperamentWidget() {
     // Constants for button and icon sizes
     const BUTTONDIVWIDTH = 430;
+
+    /**
+     * Size of the buttons.
+     * @type {number}
+     */
     const BUTTONSIZE = 53;
+
+    /**
+     * Size of the icons.
+     * @type {number}
+     */
     const ICONSIZE = 32;
 
-    // DOM elements
+    /**
+     * Reference to the temperament table div.
+     * @type {HTMLElement}
+     */
     const temperamentTableDiv = document.createElement("div");
 
-    // Properties
+    /**
+     * Reference to the temperament cell.
+     * @type {HTMLElement|null}
+     */
+
     let temperamentCell = null;
+
+     /**
+     * Current temperament.
+     * @type {string|null}
+     */
     this.inTemperament = null;
+
+    /**
+     * Last triggered event.
+     * @type {string|null}
+     */
     this.lastTriggered = null;
+
+    /**
+     * Array of notes.
+     * @type {string[]}
+     */
     this.notes = [];
+
+     /**
+     * Array of frequencies.
+     * @type {number[]}
+     */
     this.frequencies = [];
+
+     /**
+     * Array of intervals.
+     * @type {number[]}
+     */
     this.intervals = [];
+
+    /**
+     * Array of ratios.
+     * @type {number[]}
+     */
     this.ratios = [];
+
+    /**
+     * Array representing the scale.
+     * @type {string[]}
+     */
     this.scale = [];
+
+    /**
+     * Array representing the cents.
+     * @type {number[]}
+     */
     this.cents = [];
+
+    /**
+     * Array of scale notes.
+     * @type {string[]}
+     */
     this.scaleNotes = [];
+
+    /**
+     * Current pitch number.
+     * @type {number}
+     */
     this.pitchNumber = 0;
+
+    /**
+     * Flag indicating whether the circle is visible.
+     * @type {boolean}
+     */
     this.circleIsVisible = true;
+
+     /**
+     * Flag indicating the playback direction.
+     * @type {boolean}
+     */
     this.playbackForward = true;
 
     /**
@@ -100,8 +177,9 @@ function TemperamentWidget() {
     };
 
     /**
-     * Renders the circle of notes.
+     * Draws or renders the circle of notes.
      * @private
+     * @returns {void}
      */
     this._circleOfNotes = function () {
         this.circleIsVisible = false;
@@ -152,10 +230,10 @@ function TemperamentWidget() {
         docById("wheelDiv2").style.background = "none";
 
         /**
-         * Initializes the main wheel for the circle of notes.
-         * @private
-         * @param {number[]} [ratios] - The ratios for the notes.
-         * @param {number} [pitchNumber] - The number of pitches.
+         * Creates the main wheel for the circle of notes.
+         * @param {number[]} [ratios] - The ratios for the wheel.
+         * @param {number} [pitchNumber] - The pitch number.
+         * @returns {void}
          */
         this.createMainWheel = function (ratios, pitchNumber) {
             if (ratios === undefined) {
@@ -279,6 +357,10 @@ function TemperamentWidget() {
             docById("temperamentTable").append(divAppend1);
         }
 
+        /**
+         * Handles the click event for the "clear" button in the temperament widget.
+         * @returns {void}
+         */
         if (divAppend1 !== undefined) {
             divAppend1.onclick = function () {
                 const ratio = that.ratios[0];
@@ -295,6 +377,10 @@ function TemperamentWidget() {
             };
         }
 
+        /**
+         * Handles the click event for the "back to 2:1 octave space" button in the temperament widget.
+         * @returns {void}
+         */
         if (divAppend2 !== undefined) {
             divAppend2.onclick = function () {
                 const powers = [];
@@ -320,11 +406,21 @@ function TemperamentWidget() {
             };
         }
 
+        /**
+         * Adds event listener to the temperament table for showing note information.
+         * @param {Event} event - The event object.
+         * @returns {void}
+         */
         docById("temperamentTable").addEventListener("click", function (event) {
             that.showNoteInfo(event);
         });
     };
 
+    /**
+     * Displays information about a note when clicked on the temperament widget.
+     * @param {Event} event - The click event triggering the display of note information.
+     * @returns {void}
+     */
     this.showNoteInfo = function (event) {
         for (let i = 0; i < this.notesCircle.navItemCount; i++) {
             if (
@@ -426,6 +522,11 @@ function TemperamentWidget() {
         }
     };
 
+    /**
+     * Allows editing the frequency of a note on the temperament widget.
+     * @param {Event} event - The event triggering the frequency edit.
+     * @returns {void}
+     */
     this.editFrequency = function (event) {
         const i = Number(event.target.dataset.message);
         const that = this;
@@ -489,6 +590,10 @@ function TemperamentWidget() {
         };
     };
 
+    /**
+     * Switches to displaying the graph of notes on the temperament widget.
+     * @returns {void}
+     */
     this._graphOfNotes = function () {
         this.circleIsVisible = true;
         this.toggleNotesButton();
@@ -661,6 +766,10 @@ function TemperamentWidget() {
         }
     };
 
+    /**
+     * Enters the edit mode for adjusting temperament settings.
+     * @returns {void}
+     */
     this.edit = function () {
         this.editMode = null;
         this._logo.synth.setMasterVolume(0);
@@ -732,6 +841,10 @@ function TemperamentWidget() {
         };
     };
 
+    /**
+     * Enters the equal temperament edit mode.
+     * @returns {void}
+     */
     this.equalEdit = function () {
         this.editMode = "equal";
         docById("userEdit").innerHTML = "";
@@ -936,6 +1049,10 @@ function TemperamentWidget() {
         };
     };
 
+    /**
+     * Enters the ratio edit mode for adjusting temperament settings based on ratios.
+     * @returns {void}
+     */
     this.ratioEdit = function () {
         this.editMode = "ratio";
         docById("userEdit").innerHTML = "";
@@ -1122,6 +1239,10 @@ function TemperamentWidget() {
         };
     };
 
+    /**
+     * Enters the arbitrary edit mode for adjusting temperament settings arbitrarily.
+     * @returns {void}
+     */
     this.arbitraryEdit = function () {
         this.editMode = "arbitrary";
         docById("userEdit").innerHTML = "";
@@ -1344,6 +1465,14 @@ function TemperamentWidget() {
         };
     };
 
+    /**
+     * Handles the event when the user interacts with the sliders in the arbitrary edit mode.
+     * @param {Event} event - The event object triggered by the slider interaction.
+     * @param {number} angle - The angle of the wheel.
+     * @param {number[]} ratios - The ratios representing the temperament.
+     * @param {number} pitchNumber - The number of pitches in the temperament.
+     * @returns {void}
+     */
     this.arbitraryEditSlider = function (event, angle, ratios, pitchNumber) {
         const frequency = this.frequencies[0];
         const frequencies = [];
@@ -1403,6 +1532,10 @@ function TemperamentWidget() {
         }
     };
 
+    /**
+     * Refreshes the inner wheel based on the frequency slider input.
+     * @returns {void}
+     */
     this._refreshInnerWheel = function () {
         docById("frequencydiv").innerHTML = docById("frequencySlider").value;
         const frequency = docById("frequencySlider").value;
@@ -1437,6 +1570,11 @@ function TemperamentWidget() {
         this._createInnerWheel(this.tempRatios, pitchNumber);
     };
 
+    /**
+     * Initiates the octave space edit mode.
+     * Allows the user to modify the octave space of the temperament.
+     * @returns {void}
+     */
     this.octaveSpaceEdit = function () {
         this.editMode = "octave";
         docById("userEdit").innerHTML = "";
@@ -1500,6 +1638,11 @@ function TemperamentWidget() {
         };
     };
 
+    /**
+     * Checks if the temperament matches any predefined temperaments or is custom.
+     * @param {number[]} ratios - The ratios representing the temperament.
+     * @returns {void}
+     */
     this.checkTemperament = function (ratios) {
         const intervals = [];
         let selectedTemperament;
@@ -1536,6 +1679,10 @@ function TemperamentWidget() {
         }
     };
 
+    /**
+     * Saves the modifications made to the temperament.
+     * @returns {void}
+     */
     this._save = function () {
         this.notes = [];
 
@@ -1806,6 +1953,11 @@ function TemperamentWidget() {
         }
     };
 
+    /**
+     * Plays the note at the specified pitch number.
+     * @param {number} pitchNumber - The pitch number of the note to play.
+     * @returns {void}
+     */
     this.playNote = function (pitchNumber) {
         this._logo.resetSynth(0);
         const duration = 1 / 2;
@@ -1832,6 +1984,10 @@ function TemperamentWidget() {
         );
     };
 
+    /**
+     * Plays all the notes in the temperament.
+     * @returns {void}
+     */
     this.playAll = function () {
         let p = 0;
         this._playing = !this._playing;
@@ -2017,6 +2173,11 @@ function TemperamentWidget() {
         this.lastClickTime = currentTime;
     };
 
+    /**
+     * Initializes the temperament widget.
+     * @param {Activity} activity - The activity associated with the widget.
+     * @returns {void}
+     */
     this.init = function (activity) {
         this.activity = activity;
         this._logo = this.activity.logo;
@@ -2155,6 +2316,10 @@ function TemperamentWidget() {
                 this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
             }
         }
+        /**
+         * Toggles the display mode of the notes button between circle and table view.
+         * @returns {void}
+         */
         this.toggleNotesButton = function () {
             if (this.circleIsVisible) {
                 noteCell.getElementsByTagName("img")[0].src = "header-icons/circle.svg";
