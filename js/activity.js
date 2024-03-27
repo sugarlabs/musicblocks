@@ -3805,13 +3805,10 @@ class Activity {
         function createPitchBlocks(pitch, blockId, musicBlocksJSON, pitchDuration) {
             const blocks = [];
         
-            console.log('Below is the pitch duration');
-            console.log(pitch.duration);
-            console.log(pitch);
+
             pitchDuration = toFraction(pitchDuration);
             console.log(pitchDuration);
         
-            console.log('Below is the hidden array');
         
             if (musicBlocksJSON.length == 5) {
                 musicBlocksJSON.push(
@@ -3821,7 +3818,7 @@ class Activity {
                     [blockId + 3, ["number", {value: pitchDuration[1]}], 0, 0, [blockId + 1]],
                     [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]],
                     [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
-                    [blockId + 6, ["solfege", {value: pitchToSolfege(pitch.name)}], 0, 0, [blockId + 5]],
+                    [blockId + 6, ["notename", {value: (pitch.name)}], 0, 0, [blockId + 5]],
                     [blockId + 7, ["number", {value: pitch.pitch}], 0, 0, [blockId + 5]],
                     [blockId + 8, "hidden", 0, 0, [blockId, blockId + 9]],
                 );
@@ -3835,7 +3832,7 @@ class Activity {
                     [blockId + 3, ["number", {value: pitchDuration[1]}], 0, 0, [blockId + 1]],
                     [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]],
                     [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
-                    [blockId + 6, ["solfege", {value: pitchToSolfege(pitch.name)}], 0, 0, [blockId + 5]],
+                    [blockId + 6, ["notename", {value: (pitch.name)}], 0, 0, [blockId + 5]],
                     [blockId + 7, ["number", {value: pitch.pitch}], 0, 0, [blockId + 5]],
                     [blockId + 8, "hidden", 0, 0, [blockId, blockId + 9]],
                 );
