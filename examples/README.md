@@ -397,6 +397,7 @@
 | Galton-music.html | Modeled after a Galton box, a Gaussian distribution of tones is generated. |
 | record-player.html | Record and playback a sequence of notes on a "vinyl". |
 | stocks.html | Generated from a Python script, this project is a musical representation of the price of a stock over time |
+| Morse-code-rhythms.html | Generate Morse code rhythms by typing in letters that generate rhythmic patterns |
 
 # Utilities
 
