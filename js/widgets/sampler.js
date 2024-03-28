@@ -484,31 +484,33 @@ function SampleWidget() {
         let chunks = [];
         let audioURL = null; 
         
-        function setUpAudio() {
+        async function setUpAudio() {
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ audio: true })
-                    .then(stream => {
-                        recorder = new MediaRecorder(stream);
-                        recorder.ondataavailable = e => {
-                            chunks.push(e.data);
-                        };
-                        recorder.onstop = e => {
-                            let blob = new Blob(chunks, { type: 'audio/webm' });
-                            chunks = [];
-                            audioURL = URL.createObjectURL(blob);
-                            displayRecordingStopMessage.call(that);
-                            togglePlaybackButtonState();
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    recorder = new MediaRecorder(stream);
+                    recorder.ondataavailable = e => {
+                        chunks.push(e.data);
+                    };
+                    recorder.onstop = async e => {
+                        let blob = new Blob(chunks, { type: 'audio/webm' });
+                        chunks = [];
+                        audioURL = URL.createObjectURL(blob);
+                        displayRecordingStopMessage.call(that);
+                        togglePlaybackButtonState();
 
-                            const audioData = e.target.result;
-                            that.sampleData = audioData;
-                            that.sampleName = `Recorded Audio ${audioURL}`;
-                            that._addSample();
-                        };
-                        can_record = true;
-                    })
-                    .catch(err => {
-                        console.log("The following error occurred: " + err);
-                    });
+                        const module = await import("https://cdn.jsdelivr.net/npm/webm-to-wav-converter@1.1.0/+esm");
+                        const getWaveBlob = module.getWaveBlob;
+                        const wavBlob = await getWaveBlob(blob);
+                        const wavAudioURL = URL.createObjectURL(wavBlob);
+                        that.sampleData = wavAudioURL;
+                        that.sampleName = `Recorded Audio ${audioURL}`;
+                        that._addSample();
+                    };
+                    can_record = true;
+                } catch (err) {
+                    console.log("The following error occurred: " + err);
+                }
             }
         }
         function ToggleMic(buttonElement) {
