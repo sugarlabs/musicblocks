@@ -630,10 +630,11 @@ class ProtoBlock {
             svg.getHeight()
         ];
     }
-    // E.g., distance . Distance block will calculate geometrical distance between two pointa
-    // by default (cursor x ,cursor y ) and x and y
+    
     /**
      * Configures a four-argument math block.
+     * E.g., distance . Distance block will calculate geometrical distance between two points
+     * by default (cursor x ,cursor y ) and x and y
      */
     fourArgMathBlock() {
         this.expandable = true;
