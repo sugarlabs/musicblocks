@@ -40,6 +40,11 @@
 */
 /* exported MusicKeyboard */
 
+/**
+ * Represents a Music Keyboard interface.
+ * @constructor
+ * @param {Activity} activity - The activity associated with the keyboard.
+ */
 function MusicKeyboard(activity) {
     const FAKEBLOCKNUMBER = 100000;
     const BUTTONDIVWIDTH = 535; // 5 buttons
@@ -56,34 +61,128 @@ function MusicKeyboard(activity) {
     const saveOnKeyUp = document.onkeyup;
 
     const w = window.innerWidth;
+    /**
+     * Reference to the activity associated with the keyboard.
+     * @type {Activity}
+     */
     this.activity = activity;
+
+    /**
+     * Scale factor for adjusting the cell size.
+     * @type {number}
+     */
     this._cellScale = w / 1200;
 
+    /**
+     * Indicates whether the keyboard is in beginner mode.
+     * @type {boolean}
+     */
     const beginnerMode = localStorage.beginnerMode;
 
+    /**
+     * Number of units in beginner mode.
+     * @type {number}
+     */
     const unit = beginnerMode === "true" ? 8 : 16;
+
+    /**
+     * Flag to track if stop or close button is clicked.
+     * @type {boolean}
+     */
     this._stopOrCloseClicked = false;
+
+    /**
+     * Flag indicating whether playback is currently active.
+     * @type {boolean}
+     */
     this.playingNow = false;
 
+    /**
+     * Array of instruments.
+     * @type {Array}
+     */
     this.instruments = [];
+
+    /**
+     * Array of note names.
+     * @type {Array}
+     */
     this.noteNames = [];
+
+    /**
+     * Array of octaves.
+     * @type {Array}
+     */
     this.octaves = [];
+
+    /**
+     * Flag indicating if the keyboard is currently shown.
+     * @type {boolean}
+     */
     this.keyboardShown = true;
+
+    /**
+     * Layout information for the keyboard.
+     * @type {Array}
+     */
     this.layout = [];
+
+    /**
+     * Container IDs associated with the keyboard.
+     * @type {Array}
+     */
     this.idContainer = [];
+  
+    /**
+     * Flag to track tick status.
+     * @type {boolean}
+     */
     this.tick = false;
+
+    /**
+     * Meter arguments.
+     * @type {Array}
+     */
     this.meterArgs = [4, 1 / 4];
 
     // Map between keyboard element ids and the note associated with the key.
+    /**
+     * Mapping between keyboard element IDs and associated notes.
+     * @type {Object}
+     */
     this.noteMapper = {};
+
+    /**
+     * Mapping between block numbers and keyboard elements.
+     * @type {Object}
+     */
     this.blockNumberMapper = {};
+
+    /**
+     * Mapping between instruments and keyboard elements.
+     * @type {Object}
+     */
     this.instrumentMapper = {};
+
+    /**
+     * Array of selected notes.
+     * @type {Array}
+     */
     let selectedNotes = [];
+
+    /**
+     * Array of row blocks.
+     * @type {Array}
+     */
     this._rowBlocks = [];
 
     // Each element in the array is [start time, note, id, duration, voice].
     this._notesPlayed = [];
 
+     /**
+     * Adds a row block to the keyboard.
+     * @param {number} rowBlock - The row block to add.
+     */
     this.addRowBlock = (rowBlock) => {
         // In case there is a repeat block, use a unique block number
         // for each instance.
@@ -94,6 +193,9 @@ function MusicKeyboard(activity) {
         this._rowBlocks.push(rowBlock);
     };
 
+    /**
+     * Processes the selected notes for playback.
+     */
     this.processSelected = () => {
         if (this._notesPlayed.length === 0) {
             selectedNotes = [];
@@ -148,6 +250,9 @@ function MusicKeyboard(activity) {
         }
     };
 
+    /**
+     * Adds keyboard shortcuts for triggering musical notes.
+     */
     this.addKeyboardShortcuts = function () {
         //      ;
         let duration = 0;
@@ -156,6 +261,10 @@ function MusicKeyboard(activity) {
         const temp2 = {};
         const current = new Set();
 
+        /**
+         * Handles the start of a musical note when a keyboard key is pressed.
+         * @param {KeyboardEvent} event - The keyboard event.
+         */
         const __startNote = (event) => {
             let i, id;
             if (WHITEKEYS.indexOf(event.keyCode) !== -1) {
@@ -232,6 +341,10 @@ function MusicKeyboard(activity) {
             }
         };
 
+        /**
+         * Handles the keyboard key down event to start playing musical notes.
+         * @param {KeyboardEvent} event - The keyboard event triggered when a key is pressed down.
+         */
         const __keyboarddown = function (event) {
             if (current.has(event.keyCode)) return;
 
@@ -241,6 +354,10 @@ function MusicKeyboard(activity) {
             //event.preventDefault();
         };
 
+        /**
+         * Handles the keyboard key up event to stop playing musical notes.
+         * @param {KeyboardEvent} event - The keyboard event triggered when a key is released.
+         */
         const __endNote = (event) => {
             let i, id;
             if (WHITEKEYS.indexOf(event.keyCode) !== -1) {
@@ -331,6 +448,10 @@ function MusicKeyboard(activity) {
             }
         };
 
+        /**
+         * Handles the end of a musical note when a key is released.
+         * @param {KeyboardEvent} event - The keyboard event.
+         */
         const __keyboardup = function (event) {
             current.delete(event.keyCode);
             __endNote(event);
@@ -341,6 +462,12 @@ function MusicKeyboard(activity) {
         document.onkeyup = __keyboardup;
     };
 
+    /**
+     * Handles the loading of musical keyboard elements and defines behavior for mouse events.
+     * @param {HTMLElement} element - The HTML element representing a musical key.
+     * @param {number} i - The index of the musical key in the layout.
+     * @param {number} blockNumber - The block number associated with the musical key.
+     */
     this.loadHandler = function (element, i, blockNumber) {
         const temp1 = this.displayLayout[i].noteName;
         let temp2;
@@ -362,6 +489,9 @@ function MusicKeyboard(activity) {
         let startDate = new Date();
         let startTime = 0;
 
+        /**
+         * Start a musical note when the element is clicked.
+         */
         const __startNote = (element) => {
             startDate = new Date();
             startTime = startDate.getTime(); // Milliseconds();
@@ -380,6 +510,9 @@ function MusicKeyboard(activity) {
             __startNote(this);
         };
 
+        /**
+         * End a musical note when the element is released.
+         */
         const __endNote = (element) => {
             const id = element.id;
             if (id.includes("blackRow")) {
@@ -447,6 +580,9 @@ function MusicKeyboard(activity) {
         };
     };
 
+    /**
+     * Initializes the MusicKeyboard object by setting up the widget window, layout, and event handlers.
+     */
     this.init = function () {
         this.tick = false;
         this.playingNow = false;
@@ -454,14 +590,25 @@ function MusicKeyboard(activity) {
         this._cellScale = w / 1200;
         // const iconSize = ICONSIZE * this._cellScale;
 
+        /**
+         * Widget window instance for the MusicKeyboard.
+         * @type {Window}
+         */
         const widgetWindow = window.widgetWindows.windowFor(this, "music keyboard");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
         this.displayLayout = this._keysLayout();
+        /**
+         * Beats per minute (BPM) for the MusicKeyboard.
+         * @type {number}
+         */
         const tur = this.activity.turtles.ithTurtle(0);
         this.bpm = tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
 
+        /**
+         * Event handler for maximizing/minimizing the widget window.
+         */
         this.widgetWindow.onmaximize = function () {
             if (widgetWindow._maximized) {
                 widgetWindow.getWidgetBody().style.position = "absolute";
@@ -486,6 +633,9 @@ function MusicKeyboard(activity) {
             }
         };
 
+        /**
+         * Event handler for closing the widget window.
+         */
         widgetWindow.onclose = () => {
             let myNode;
             document.onkeydown = saveOnKeyDown;
@@ -519,6 +669,10 @@ function MusicKeyboard(activity) {
             widgetWindow.destroy();
         };
 
+        /**
+         * Button to play all musical notes.
+         * @type {HTMLElement}
+         */
         this.playButton = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
 
         this.playButton.onclick = () => {
@@ -527,10 +681,18 @@ function MusicKeyboard(activity) {
             this.playAll();
         };
 
+        /**
+         * Button to export musical notes.
+         * @type {HTMLElement}
+         */
         widgetWindow.addButton("export-chunk.svg", ICONSIZE, _("Save")).onclick = () => {
             this._save();
         };
 
+        /**
+         * Button to clear all musical notes.
+         * @type {HTMLElement}
+         */
         widgetWindow.addButton("erase-button.svg", ICONSIZE, _("Clear")).onclick = () => {
             this._notesPlayed = [];
             selectedNotes = [];
@@ -556,17 +718,29 @@ function MusicKeyboard(activity) {
             // }
         };
 
+        /**
+         * Button to add a musical note.
+         * @type {HTMLElement}
+         */
         const addNoteButton = widgetWindow.addButton("add2.svg", ICONSIZE, _("Add note"));
         addNoteButton.setAttribute("id", "addnotes");
         addNoteButton.onclick = () => {
             this._createAddRowPieSubmenu();
         };
 
+        /**
+         * Button to access MIDI controls.
+         * @type {HTMLElement}
+         */
         this.midiButton = widgetWindow.addButton("midi.svg", ICONSIZE, _("MIDI"));
         this.midiButton.onclick = () => {
             this.doMIDI();
         };
 
+        /**
+         * Button to toggle the metronome.
+         * @type {HTMLElement}
+         */
         this.tickButton = widgetWindow.addButton("metronome.svg", ICONSIZE, _("Metronome"));
         this.tickButton.onclick = () => {
             if (this.tick) {
@@ -591,11 +765,23 @@ function MusicKeyboard(activity) {
         };
 
         // Append keyboard and div on widget windows
+        /**
+         * Keyboard div for displaying musical notes.
+         * @type {HTMLDivElement}
+         */
         this.keyboardDiv = document.createElement("div");
         const attr = document.createAttribute("id");
         attr.value = "mkbKeyboardDiv";
         this.keyboardDiv.setAttributeNode(attr);
+        /**
+         * Table div for the MusicKeyboard.
+         * @type {HTMLDivElement}
+         */
         this.keyTable = document.createElement("div");
+
+        /**
+         * Appends keyboard and table divs to the widget window body.
+         */
         widgetWindow.getWidgetBody().append(this.keyboardDiv);
         widgetWindow.getWidgetBody().append(this.keyTable);
         widgetWindow.getWidgetBody().style.height = "550px";
@@ -613,6 +799,10 @@ function MusicKeyboard(activity) {
         widgetWindow.sendToCenter();
     };
 
+    /**
+     * Plays the selected musical notes.
+     * If no notes are selected, the function returns early.
+     */
     this.playAll = function () {
         if (selectedNotes.length <= 0) {
             return;
@@ -690,6 +880,13 @@ function MusicKeyboard(activity) {
         }
     };
 
+    /**
+     * Plays a sequence of musical notes recursively with a specified time delay.
+     * 
+     * @param {number} counter - The index of the current note in the sequence.
+     * @param {number} time - The time duration of the current note.
+     * @param {HTMLElement} playButtonCell - The HTML element representing the play button.
+     */
     this.playOne = function (counter, time, playButtonCell) {
         setTimeout(() => {
             let cell, eleid, ele, notes, zx, res, maxWidth;
@@ -771,6 +968,13 @@ function MusicKeyboard(activity) {
         }, time * 1000 + 125);
     };
 
+    /**
+     * Plays a chord (multiple notes simultaneously) using a synthesizer.
+     * 
+     * @param {string[]} notes - Array of note names to be played as a chord.
+     * @param {number[]} noteValue - Array of note values (durations) for each note in the chord.
+     * @param {string[]} instruments - Array of instrument names or identifiers for each note.
+     */
     this._playChord = (notes, noteValue, instruments) => {
         if (notes[0] === "R") {
             return;
@@ -820,6 +1024,12 @@ function MusicKeyboard(activity) {
         }
     };
 
+    /**
+     * Fills chromatic gaps in a given list of notes by padding with missing notes.
+     * 
+     * @param {Object[]} noteList - List of notes represented as dictionaries containing `noteName` and `noteOctave`.
+     * @returns {Object[]} A new list of notes with chromatic gaps filled.
+     */
     function fillChromaticGaps(noteList) {
         // Assuming list of either solfege or letter class of the form
         // sol4 or G4.  Each entry is a dictionary with noteName and
@@ -961,6 +1171,20 @@ function MusicKeyboard(activity) {
         return newList;
     }
 
+    /**
+     * Generates a sorted and filtered layout of keys based on note information.
+     * 
+     * @returns {Object[]} An array of objects representing the layout of keys:
+     * [
+     *   {
+     *     noteName: string,
+     *     noteOctave: number,
+     *     blockNumber: number,
+     *     voice: string
+     *   },
+     *   ...
+     * ]
+     */
     this._keysLayout = function () {
         this.layout = [];
         const sortableList = [];
@@ -1043,6 +1267,13 @@ function MusicKeyboard(activity) {
         return newList;
     };
 
+    /**
+     * Sets notes in a specified column based on cell color markings.
+     * Removes existing notes starting at the specified start time.
+     * 
+     * @param {number} colIndex - The index of the column to set notes in.
+     * @param {boolean} playNote - Indicates whether to trigger note playback.
+     */
     this._setNotes = function (colIndex, playNote) {
         const start = docById("cells-" + colIndex).getAttribute("start");
 
@@ -1077,6 +1308,14 @@ function MusicKeyboard(activity) {
         }
     };
 
+    /**
+     * Sets a note cell based on the provided parameters.
+     * 
+     * @param {number} j - The row index of the note cell.
+     * @param {number} colIndex - The column index of the note cell.
+     * @param {string} start - The start time of the note.
+     * @param {boolean} playNote - Indicates whether to trigger note playback.
+     */
     this._setNoteCell = function (j, colIndex, start, playNote) {
         const n = this.layout.length;
         const temp1 = this.layout[n - j - 1].noteName;
@@ -1120,6 +1359,11 @@ function MusicKeyboard(activity) {
         }
     };
 
+    /**
+     * Makes the music keyboard cells clickable for interaction.
+     * Handles mouse events such as click, mouseover, and mouseup on the keyboard cells.
+     * Triggers the creation of pie submenu based on the clicked cell attributes.
+     */
     this.makeClickable = function () {
         const rowNote = docById("mkbNoteDurationRow");
         let cell;
@@ -1186,10 +1430,19 @@ function MusicKeyboard(activity) {
         }
     };
 
+    /**
+     * Calculates the width of a note based on its value.
+     * @param {number} noteValue - The value of the note.
+     * @returns {number} The width of the note.
+     */
     this._noteWidth = function (noteValue) {
         return Math.max(Math.floor(EIGHTHNOTEWIDTH * (8 * noteValue) * this._cellScale), 15);
     };
 
+    /**
+     * Creates the table structure for the music keyboard interface based on the selected notes.
+     * Updates the display of the keyboard layout with appropriate styles and dimensions.
+     */
     this._createTable = function () {
         this.processSelected();
         const mkbTableDiv = this.keyTable;
@@ -1359,6 +1612,11 @@ function MusicKeyboard(activity) {
         this.makeClickable();
     };
 
+    /**
+     * Creates a pie submenu based on the cell's attributes.
+     * @param {string} cellId - The ID of the cell triggering the submenu.
+     * @param {string} start - The start attribute of the cell.
+     */
     this._createpiesubmenu = function (cellId, start) {
         docById("wheelDivptm").style.display = "";
 
@@ -1523,6 +1781,11 @@ function MusicKeyboard(activity) {
         }
     };
 
+    /**
+     * Updates the duration of notes with the specified start time.
+     * @param {string} start - The start time of the notes to update.
+     * @param {number[]} duration - The new duration expressed as a fraction [numerator, denominator].
+     */
     this._updateDuration = function (start, duration) {
         start = parseInt(start);
         duration = parseInt(duration[0]) / parseInt(duration[1]);
@@ -1537,6 +1800,12 @@ function MusicKeyboard(activity) {
         this._createTable();
     };
 
+    /**
+     * Adds notes by dividing the existing note at the specified start time.
+     * @param {string} cellId - The ID of the cell where notes will be added.
+     * @param {string} start - The start time of the note to divide.
+     * @param {number} divideNoteBy - The number of divisions to create from the note.
+     */
     this._addNotes = function (cellId, start, divideNoteBy) {
         start = parseInt(start);
         const cell = docById(cellId);
@@ -1566,6 +1835,10 @@ function MusicKeyboard(activity) {
         this._createTable();
     };
 
+    /**
+     * Deletes notes with the specified start time.
+     * @param {string} start - The start time of the notes to delete.
+     */
     this._deleteNotes = function (start) {
         start = parseInt(start);
 
@@ -1576,6 +1849,11 @@ function MusicKeyboard(activity) {
         this._createTable();
     };
 
+    /**
+     * Divides a note at the specified start time into multiple notes.
+     * @param {string} start - The start time of the note to divide.
+     * @param {number} divideNoteBy - The number of divisions to create from the note.
+     */
     this._divideNotes = function (start, divideNoteBy) {
         start = parseInt(start);
 
@@ -1614,6 +1892,10 @@ function MusicKeyboard(activity) {
         this._createTable();
     };
 
+    /**
+     * Creates a submenu for adding a new row.
+     * The submenu allows selection between pitch and hertz options.
+     */
     this._createAddRowPieSubmenu = function () {
         docById("wheelDivptm").style.display = "";
         docById("wheelDivptm").style.zIndex = "300";
@@ -1827,6 +2109,11 @@ function MusicKeyboard(activity) {
         }
     };
 
+    /**
+     * Adds a new block between two existing blocks in the activity.
+     * @param {number} aboveBlock - The block number above which the new block will be inserted.
+     * @param {number} block - The block number of the new block to be inserted.
+     */
     this._addNotesBlockBetween = function (aboveBlock, block) {
         const belowBlock = last(this.activity.blocks.blockList[aboveBlock].connections);
         this.activity.blocks.blockList[aboveBlock].connections[
@@ -1849,6 +2136,10 @@ function MusicKeyboard(activity) {
         this.activity.refreshCanvas();
     };
 
+    /**
+     * Sorts the layout of notes based on their frequency values.
+     * Removes duplicate notes and adjusts connections accordingly.
+     */
     this._sortLayout = function () {
         this.layout.sort((a, b) => {
             let aValue, bValue;
@@ -1905,6 +2196,10 @@ function MusicKeyboard(activity) {
         }
     };
 
+    /**
+     * Removes a pitch block from the activity and adjusts connections.
+     * @param {number} blockNo - The block number of the pitch block to be removed.
+     */
     this._removePitchBlock = function (blockNo) {
         const c0 = this.activity.blocks.blockList[blockNo].connections[0];
         const c1 = last(this.activity.blocks.blockList[blockNo].connections);
@@ -1929,6 +2224,11 @@ function MusicKeyboard(activity) {
         this.activity.refreshCanvas();
     };
 
+    /**
+     * Creates a column pie submenu based on the provided index and condition.
+     * @param {number} index - The index used to retrieve block information.
+     * @param {string} condition - The condition that determines the type of submenu to create ('synthsblocks' or 'pitchblocks').    
+     */
     this._createColumnPieSubmenu = function (index, condition) {
         index = parseInt(index);
         if (
@@ -2110,6 +2410,9 @@ function MusicKeyboard(activity) {
             }
         };
 
+        /**
+         * Handles the hertz selection change for the pitch wheel.
+         */
         const __hertzSelectionChanged = () => {
             const blockValue =
                 this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
@@ -2141,6 +2444,10 @@ function MusicKeyboard(activity) {
             }
         }
 
+        /**
+         * Handles the selection change event for the pitch wheel.
+         * Updates the note label and octave based on the selected wheel values.
+         */
         const __selectionChanged = () => {
             let label = this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
             let labelValue, i, attr;
@@ -2200,6 +2507,11 @@ function MusicKeyboard(activity) {
             });
         };
 
+        /**
+         * Executes a pitch preview based on the current selection in the pitch wheel.
+         * This function triggers a synthesized sound preview of the selected note.
+         * After triggering the preview, it calls the __selectionChanged function to update UI elements.
+         */
         const __pitchPreview = () => {
             const label = this._pitchWheel.navItems[this._pitchWheel.selectedNavItemIndex].title;
             const i = noteLabelsI18n.indexOf(label);
@@ -2246,6 +2558,11 @@ function MusicKeyboard(activity) {
         }
     };
 
+    /**
+     * Creates a virtual musical keyboard interface.
+     * This function generates and displays a keyboard layout with keys represented as HTML elements.
+     * It sets up event handling for key presses on the keyboard.
+     */
     this._createKeyboard = function () {
         document.onkeydown = null;
         const mkbKeyboardDiv = this.keyboardDiv;
@@ -2461,6 +2778,11 @@ function MusicKeyboard(activity) {
                     continue;
                 }
 
+                /**
+                 * Sets up the HTML elements for the virtual musical keyboard layout.
+                 * This function creates HTML elements to represent the keys of a musical keyboard based on the specified display layout.
+                 * Each key element is configured with appropriate attributes and content based on note information.
+                 */
                 newel2.setAttribute(
                     "alt",
                     this.displayLayout[p].noteName +
@@ -2589,6 +2911,15 @@ function MusicKeyboard(activity) {
         // "settimbre" block .  eg, piano-do piano-re piano-mi
         // guitar-fa piano-sol piano-la piano-ti --> piano-[do re mi]
         // guitar-fa piano-[la ti]
+        /**
+         * Process the selected notes and organize them into groups based on voice similarity.
+         * Adjacent notes with the same voice are clustered together to facilitate wrapping in "settimbre" block.
+         * For example, notes like piano-do piano-re piano-mi guitar-fa piano-sol piano-la piano-ti
+         * will be organized into clusters such as piano-[do re mi], guitar-fa, and piano-[sol la ti].
+         * 
+         * @param {Array<Object>} selectedNotes - Array of selected notes to be processed.
+         * @returns {Array<Array<number>>} - Array of arrays containing indices of selected notes grouped by voice.
+         */
         this._clusterNotes = (selectedNotes) => {
             let i = 0;
             const newNotes = [];
@@ -2618,6 +2949,14 @@ function MusicKeyboard(activity) {
         };
 
         // Find the position of next setTimbre block
+        /**
+         * Calculate the required length of the next "setTimbre" block based on selected notes.
+         * This function computes the length of the next "setTimbre" block by considering the types and properties of the selected notes.
+         * 
+         * @param {Array<Array<number>>} selectedNotesGrp - Groups of selected notes (indices) organized by voice similarity.
+         * @param {Array<Object>} selectedNotes - Array of selected notes.
+         * @returns {number} - Required length for the next "setTimbre" block.
+         */
         this.findLen = (selectedNotesGrp, selectedNotes) => {
             let ans = 0;
             for (let i = 0; i < selectedNotesGrp.length; i++) {
@@ -2841,13 +3180,24 @@ function MusicKeyboard(activity) {
         else this.activity.textMsg(_("New action block generated"));
     };
 
+    /**
+     * Clears the note names and octaves arrays.
+     * @memberof ClassName
+     */
     this.clearBlocks = function () {
         this.noteNames = [];
         this.octaves = [];
     };
 
     /**
-     * @deprecated
+     * @deprecated This method is deprecated and should no longer be used.
+     * Adds a button to the specified row with the given icon, icon size, and label.
+     * @memberof ClassName
+     * @param {HTMLTableRowElement} row - The table row element to which the button will be added.
+     * @param {string} icon - The filename of the icon image.
+     * @param {number} iconSize - The size of the icon image (height and width).
+     * @param {string} label - The label or tooltip text for the button.
+     * @returns {HTMLTableCellElement} The cell element containing the button.
      */
     this._addButton = function (row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
@@ -2882,6 +3232,10 @@ function MusicKeyboard(activity) {
         return cell;
     };
 
+    /**
+     * Initiates MIDI functionality, allowing notes to be triggered by user interaction.
+     * @memberof ClassName
+     */
     this.doMIDI = () => {
         let duration = 0;
         let startTime = 0;
@@ -2895,6 +3249,11 @@ function MusicKeyboard(activity) {
                 key.objId; //convet solfege to alphabetic.
         }
 
+        /**
+         * Handler for starting a note on MIDI interaction.
+         * @param {MouseEvent} event - The mouse event triggering the note start.
+         * @param {HTMLElement} element - The HTML element representing the note.
+         */
         const __startNote = (event, element) => {
             if (!element) return;
             startTime = event.timeStamp; // Milliseconds();
@@ -2909,6 +3268,11 @@ function MusicKeyboard(activity) {
             );
         };
 
+        /**
+         * Handler for ending a note on MIDI interaction.
+         * @param {MouseEvent} event - The mouse event triggering the note end.
+         * @param {HTMLElement} element - The HTML element representing the note.
+         */
         const __endNote = (event, element) => {
             if (!element) return;
 
@@ -2950,6 +3314,12 @@ function MusicKeyboard(activity) {
             this._createTable();
         };
 
+        /**
+         * Converts a MIDI note number to a pitch and octave.
+         * @param {number} num - The MIDI note number.
+         * @returns {Array<string>} An array containing two possible pitch names and the octave.
+         * @memberof ClassName
+         */
         const numberToPitch = (num) => {
             const offset = 4;
             const octave = offset + Math.floor((num - 60) / 12);
@@ -2963,6 +3333,11 @@ function MusicKeyboard(activity) {
         //                 [1] : noteNumber : middle C always 60
         //                 [2] : velocity ,(currently not used).
 
+        /**
+         * Handles MIDI messages, triggering note start or end events based on the MIDI data.
+         * @param {MIDIMessageEvent} event - The MIDI message event containing note information.
+         * @memberof ClassName
+         */
         const onMIDIMessage = (event) => {
             const pitchOctave = numberToPitch(event.data[1]);
             const pitch1 = pitchOctave[0];
@@ -2977,6 +3352,12 @@ function MusicKeyboard(activity) {
             }
         };
 
+        /**
+         * Success callback function triggered upon receiving MIDI access.
+         * Initializes MIDI widget and sets up MIDI event handlers.
+         * @param {MIDIAccess} midiAccess - The MIDI access object containing MIDI inputs and outputs.
+         * @memberof ClassName
+         */
         const onMIDISuccess = (midiAccess) => {
             // re-init widget
             if (this.midiON) {
@@ -2996,11 +3377,21 @@ function MusicKeyboard(activity) {
             }
         };
 
+        /**
+         * Failure callback function triggered upon failing to get MIDI access in the browser.
+         * Displays an error message and updates MIDI state accordingly.
+         * @memberof ClassName
+         */
         const onMIDIFailure = () => {
             this.activity.errorMsg(_("Failed to get MIDI access in browser."));
             this.midiON = false;
         };
 
+        /**
+         * Requests MIDI access from the browser and initializes MIDI-related functionality.
+         * Calls success or failure callback functions based on the result of the request.
+         * @memberof ClassName
+         */
         navigator.requestMIDIAccess({ sysex: true }).then(onMIDISuccess, onMIDIFailure);
     };
 }
