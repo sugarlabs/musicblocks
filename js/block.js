@@ -2819,7 +2819,7 @@ class Block {
             let topBlk;
 
             const dx = event.stageX / that.activity.getStageScale() - that.container.x;
-            if (!moved && that.isCollapsible() && dx < 30 / that.activity.getStageScale()) {
+            if (that.isCollapsible() && dx < 30 / that.activity.getStageScale()) {
                 that.collapseToggle();
             } else if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
                 if (that.name === "media") {
