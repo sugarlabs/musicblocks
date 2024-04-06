@@ -302,7 +302,6 @@ class Turtle {
 
         this.singer.runningFromEvent = false;
 
-        this.activity.logo.turtleDicts[this.activity.turtles.turtleList.indexOf(this)] = [];
     }
 
     // ================================ CONTROLLER ============================

@@ -1320,11 +1320,31 @@ class Blocks {
             }
 
             let thisBlockobj = this.blockList[thisBlock];
-            if (thisBlockobj.name === "vspace") {
+
+            // Do not remove the silence block if the user places a block just over it.
+            if (
+                thisBlockobj?.name === "vspace" &&
+                this.blockList[thisBlockobj.connections[1]]?.name === "rest2" &&
+                this.blockList[thisBlockobj.connections[0]]?.name === "vspace"
+              ) {
                 return;
             }
 
             thisBlockobj = this.blockList[thisBlock];
+
+            // Do not remove the silence block if only vspace blocks are added before the silence block.
+
+            let block = thisBlockobj;
+            while (block?.name == "vspace") {
+                if (block?.name != "vspace") {
+                    break;
+                }
+                block = this.blockList[block.connections[0]];
+                if (block?.name == "newnote") {
+                    return;
+                }
+            }
+            
             if (thisBlockobj.name === "rest2") {
                 this._deletePitchBlocks(thisBlock);
             } else {
@@ -1364,6 +1384,12 @@ class Blocks {
          */
         this.deletePreviousDefault = (thisBlock) => {
             let thisBlockobj = this.blockList[thisBlock];
+
+            // Do not remove the silence block if only a vspace block is inserted after the silence block.
+            if (this.blockList[thisBlockobj.connections[0]]?.name === "rest2" && this.blockList[thisBlock]?.name === "vspace") {
+                return thisBlockobj.connections[0];
+            }
+
             if (this._blockInStack(thisBlock, ["rest2"])) {
                 this._deletePitchBlocks(thisBlock);
                 return this.blockList[thisBlock].connections[0];
@@ -2122,6 +2148,13 @@ class Blocks {
          */
         this._testConnectionType = (type1, type2) => {
             /** Can these two blocks dock? */
+            if (type1 === "vspaceout" && type2 === "vspacein") {
+                return true;
+            }
+            if (type1 === "vspacein" && type2 === "vspaceout") {
+                return true;
+            }
+            
             if (type1 === "in" && type2 === "out") {
                 return true;
             }
@@ -3593,7 +3626,7 @@ class Blocks {
          */
         this._calculateDragGroup = (blk) => {
             this.dragLoopCounter += 1;
-            if (this.dragLoopCount > this.blockList.length) {
+            if (this.dragLoopCounter > this.blockList.length) {
                 // eslint-disable-next-line no-console
                 console.debug(
                     "Maximum loop counter exceeded in calculateDragGroup... this is bad. " + blk
@@ -4420,6 +4453,12 @@ class Blocks {
             } else {
                 const cblk = this.blockList[blk].connections[0];
                 if (this.blockList[cblk].isExpandableBlock()) {
+                    if (this.blockList[blk].name === "forever") {
+                        if (this._isConnectedToNoteValue(cblk)) {
+                            this.activity.errorMsg(_("Forever loop detected inside a note value block. Unexpected things may happen."));
+                            return null; 
+                        }
+                    }
                     /** If it is the last connection, keep searching. */
                     if (blk === last(this.blockList[cblk].connections)) {
                         return this._insideNoteBlock(cblk);
@@ -4436,6 +4475,17 @@ class Blocks {
                 } else {
                     return this._insideNoteBlock(cblk);
                 }
+            }
+        };
+
+        this._isConnectedToNoteValue = (blk) => {
+            if (NOTEBLOCKS.indexOf(this.blockList[blk].name) !== -1) {
+                return true;
+            } else if (this.blockList[blk].connections[0] == null) {
+                return false;
+            } else {
+                const cblk = this.blockList[blk].connections[0];
+                return this._isConnectedToNoteValue(cblk);
             }
         };
 

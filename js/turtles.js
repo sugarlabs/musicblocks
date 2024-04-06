@@ -777,11 +777,11 @@ Turtles.TurtlesView = class {
         const turtlesStage = this.stage;
         // We put the buttons on the stage so they will be on top
 
-        const _makeButton = (svg, label, x, y) => {
+        const _makeButton = (svg, object, x, y) => {
             const container = document.createElement("div");
-            container.setAttribute("id", "" + label);
+            container.setAttribute("id", "" + object.name);
             container.setAttribute("class", "tooltipped");
-            container.setAttribute("data-tooltip", label);
+            container.setAttribute("data-tooltip", object.label);
             container.setAttribute("data-position", "bottom");
             jQuery.noConflict()(".tooltipped").tooltip({
                 html: true,
@@ -873,7 +873,10 @@ Turtles.TurtlesView = class {
         const __makeGridButton = () => {
             this.gridButton = _makeButton(
                 CARTESIANBUTTON,
-                _("Grid"),
+              {
+                "name":"Grid",
+                "label":_("Grid")
+              },
                 this._w - 10 - 3 * 55,
                 70 + LEADING + 6
             );
@@ -890,7 +893,10 @@ Turtles.TurtlesView = class {
         const __makeClearButton = () => {
             this._clearButton = _makeButton(
                 CLEARBUTTON,
-                _("Clean"),
+                {
+                "name":"Clean",
+                "label":_("Clean")
+                },
                 this._w - 5 - 2 * 55,
                 70 + LEADING + 6
             );
@@ -900,6 +906,9 @@ Turtles.TurtlesView = class {
                 let clearContent = document.getElementById("ClearContent");
                 clearContent.innerHTML = _("Confirm");
                 clearBox.style.visibility="visible";
+                let auxToolbar = docById("aux-toolbar");
+                let clearBtnPosition = auxToolbar.style.display === "block" ? "183px" : "125px";
+                clearBox.style.top = clearBtnPosition;
                 let func = this.activity._allClear;
                 clearBox.addEventListener('click', function(event) {
                     if(event.target.id == "clearClose"){
@@ -908,6 +917,19 @@ Turtles.TurtlesView = class {
                     else{
                        func();
                        clearBox.style.visibility = "hidden";
+                       if (auxToolbar.style.display === "block") {
+                        setTimeout(() => {
+                            docById("Grid").style.top = "136px";
+                            docById("Expand").style.top = "136px";
+                            docById("Collapse").style.top = "136px";
+                            docById("Clean").style.top = "136px";
+                        }, 0);
+                    } else {
+                        docById("Grid").style.top = "76px";
+                        docById("Expand").style.top = "76px";
+                        docById("Collapse").style.top = "76px";
+                        docById("Clean").style.top = "76px";
+                    }
                     }
                 });            
             };
@@ -924,7 +946,10 @@ Turtles.TurtlesView = class {
         const __makeCollapseButton = () => {
             this._collapseButton = _makeButton(
                 COLLAPSEBUTTON,
-                _("Collapse"),
+                {
+                "name":"Collapse",
+                "label":_("Collapse")
+                },
                 this._w - 55,
                 70 + LEADING + 6
             );
@@ -990,7 +1015,10 @@ Turtles.TurtlesView = class {
         const __makeExpandButton = () => {
             this._expandButton = _makeButton(
                 EXPANDBUTTON,
-                _("Expand"),
+                {
+                    "name":"Expand",
+                    "label":_("Expand"),
+                },
                 this._w - 55,
                 70 + LEADING + 6
             );

@@ -124,6 +124,16 @@ const MEDIASAFEAREA = [40, 4, 108, 80];
 const HIGHLIGHTCOLOR = "#FFFFFF";
 const ACTIVECOLOR = "#212121";
 
+/**
+ * Creates and displays a material highlight effect at the specified position on the stage.
+ * @param {number} x - The x-coordinate of the highlight position.
+ * @param {number} y - The y-coordinate of the highlight position.
+ * @param {number} r - The radius of the highlight.
+ * @param {Event} event - The event triggering the highlight.
+ * @param {number} scale - The scale factor for the stage.
+ * @param {createjs.Stage} stage - The stage to display the highlight on.
+ * @returns {Object} An object containing two shapes: 'highlight' and 'active'.
+ */
 const showMaterialHighlight = (x, y, r, event, scale, stage) => {
     const circles = {
         highlight: new createjs.Shape(),
@@ -153,6 +163,11 @@ const showMaterialHighlight = (x, y, r, event, scale, stage) => {
     return circles;
 };
 
+/**
+ * Hides the button highlight effect.
+ * @param {Object} circles - An object containing the highlight and active shapes.
+ * @param {createjs.Stage} stage - The stage from which to remove the highlight.
+ */
 const hideButtonHighlight = (circles, stage) => {
     // Un-real circles!
     if (circles.active === undefined) {
@@ -166,12 +181,18 @@ const hideButtonHighlight = (circles, stage) => {
     }, 410);
 };
 
+/**
+ * Hides the palette name display after a certain delay.
+ * @param {createjs.Text} palette_text - The palette text to hide.
+ * @param {createjs.Stage} stage - The stage from which to remove the palette text.
+ */
 const hidePaletteNameDisplay = (palette_text, stage) => {
     setTimeout(() => {
         stage.removeChild(palette_text);
     }, 150);
 };
 
+// Constants...
 const MENUWIDTH = 200;
 
 const PALETTEFILLER =
