@@ -2819,7 +2819,7 @@ class Block {
             let topBlk;
 
             const dx = event.stageX / that.activity.getStageScale() - that.container.x;
-            if (that.isCollapsible() && dx < 30 / that.activity.getStageScale()) {
+            if (!moved && that.isCollapsible() && dx < 30 / that.activity.getStageScale()) {
                 that.collapseToggle();
             } else if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
                 if (that.name === "media") {
@@ -2973,6 +2973,10 @@ class Block {
             const finalPos = oldY + dy;
             if (that.activity.blocksContainer.y === 0 && finalPos < 45) {
                 dy += 45 - finalPos;
+            }
+            //detect if movement was extremely small.
+            if(dx<10 && dy<10){
+                moved = false;
             }
 
             // scroll when reached edges.
