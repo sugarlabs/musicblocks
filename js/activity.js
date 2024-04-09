@@ -3802,14 +3802,29 @@ class Activity {
             }
         }
         
-        function createPitchBlocks(pitch, blockId, musicBlocksJSON, pitchDuration) {
+        function adjustPitch(note, keySignature) {
+            const accidental = keySignature.accidentals.find(acc => {
+              const noteToCompare = acc.note.toUpperCase().replace(',', '');
+              note = note.replace(',', '');
+              return noteToCompare === note;
+            });
+          
+            if (accidental) {
+              return note + (accidental.acc === "sharp" ? " ♯" : (accidental.acc === "flat" ? " ♭" : ""));
+            } else {
+              return note;
+            }
+          }
+        function createPitchBlocks(pitch, blockId, musicBlocksJSON, pitchDuration,keySignature) {
             const blocks = [];
-        
 
             pitchDuration = toFraction(pitchDuration);
-            console.log(pitchDuration);
+            
         
-        
+            
+           
+            const adjustedNote = adjustPitch(pitch.name , keySignature);
+            
             if (musicBlocksJSON.length == 5) {
                 musicBlocksJSON.push(
                     [blockId, ["newnote", {"collapsed": true}], 0, 0, [blockId - 3, blockId + 1, blockId + 4, blockId + 8]],
@@ -3818,7 +3833,7 @@ class Activity {
                     [blockId + 3, ["number", {value: pitchDuration[1]}], 0, 0, [blockId + 1]],
                     [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]],
                     [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
-                    [blockId + 6, ["notename", {value: (pitch.name)}], 0, 0, [blockId + 5]],
+                    [blockId + 6, ["notename", {value: adjustedNote}], 0, 0, [blockId + 5]],
                     [blockId + 7, ["number", {value: pitch.pitch}], 0, 0, [blockId + 5]],
                     [blockId + 8, "hidden", 0, 0, [blockId, blockId + 9]],
                 );
@@ -3832,7 +3847,7 @@ class Activity {
                     [blockId + 3, ["number", {value: pitchDuration[1]}], 0, 0, [blockId + 1]],
                     [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]],
                     [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
-                    [blockId + 6, ["notename", {value: (pitch.name)}], 0, 0, [blockId + 5]],
+                    [blockId + 6, ["notename", {value: adjustedNote}], 0, 0, [blockId + 5]],
                     [blockId + 7, ["number", {value: pitch.pitch}], 0, 0, [blockId + 5]],
                     [blockId + 8, "hidden", 0, 0, [blockId, blockId + 9]],
                 );
@@ -3846,8 +3861,7 @@ class Activity {
             let musicBlocksJSON = [];
             let blockId = 0;
         
-            console.log('Below is the tune');
-            console.log(tune);
+
         
             const title = (tune.metaText?.title ?? "title").toString().toLowerCase();
             const instruction = (tune.metaText?.instruction ?? "guitar").toString().toLowerCase();
@@ -3863,11 +3877,15 @@ class Activity {
             tune.lines.forEach(line => {
                 console.log(line + 'hehe');
                 line.staff.forEach(staff => {
+                    let keySignature = staff?.key;
                     staff.voices.forEach(voice => {
+                        console.log(voice)
+                     
+                        console.log(keySignature)
                         voice.forEach(element => {
                             console.log('hello');
                             if (element.el_type === "note") {
-                                const pitchBlocks = createPitchBlocks(element.pitches[0], blockId, musicBlocksJSON, element.duration);
+                                const pitchBlocks = createPitchBlocks(element.pitches[0], blockId, musicBlocksJSON, element.duration,keySignature);
                                 blockId = blockId + 9;
                             }
                         });
@@ -3885,10 +3903,6 @@ class Activity {
             return null;
 
         }
-
-
-
-
 
 
 
