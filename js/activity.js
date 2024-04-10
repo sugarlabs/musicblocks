@@ -3874,9 +3874,9 @@ class Activity {
                 [blockId++, "hidden", 0, 0, [blockId - 3, null]]
             );
         
-            tune.lines.forEach(line => {
+            tune.lines?.forEach(line => {
                 console.log(line + 'hehe');
-                line.staff.forEach(staff => {
+                line.staff?.forEach(staff => {
                     let keySignature = staff?.key;
                     staff.voices.forEach(voice => {
                         console.log(voice)
@@ -5490,11 +5490,11 @@ class Activity {
                     const abcData = event.target.result;
                     const tunebook = new ABCJS.parseOnly(abcData);
                     console.log(tunebook)
-                    // Process each tune in the tunebook
+                    
                     tunebook.forEach(tune => {
                         this.parseABC(tune);
-                        console.log(hi)
-                        // Do something with the musicBlocksJSON, e.g., load it into MusicBlocks
+                        console.log(tune)
+                    
                     });
                  
                 
