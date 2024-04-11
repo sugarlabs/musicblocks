@@ -3815,6 +3815,14 @@ class Activity {
               return note;
             }
           }
+          function abcToStandardValue(pitchValue) {
+           
+            
+            const octave = Math.floor(pitchValue/ 7) + 4; 
+            return  octave;
+        }
+        
+          
         function createPitchBlocks(pitch, blockId, musicBlocksJSON, pitchDuration,keySignature) {
             const blocks = [];
 
@@ -3834,7 +3842,7 @@ class Activity {
                     [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]],
                     [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
                     [blockId + 6, ["notename", {value: adjustedNote}], 0, 0, [blockId + 5]],
-                    [blockId + 7, ["number", {value: pitch.pitch}], 0, 0, [blockId + 5]],
+                    [blockId + 7, ["number", {value: abcToStandardValue(pitch.pitch)}], 0, 0, [blockId + 5]],
                     [blockId + 8, "hidden", 0, 0, [blockId, blockId + 9]],
                 );
         
@@ -3848,7 +3856,7 @@ class Activity {
                     [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]],
                     [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
                     [blockId + 6, ["notename", {value: adjustedNote}], 0, 0, [blockId + 5]],
-                    [blockId + 7, ["number", {value: pitch.pitch}], 0, 0, [blockId + 5]],
+                    [blockId + 7, ["number", {value: abcToStandardValue(pitch.pitch)}], 0, 0, [blockId + 5]],
                     [blockId + 8, "hidden", 0, 0, [blockId, blockId + 9]],
                 );
             }
@@ -5489,7 +5497,8 @@ class Activity {
                 abcReader.onload = (event) => {
                     const abcData = event.target.result;
                     const tunebook = new ABCJS.parseOnly(abcData);
-                    console.log(tunebook)
+                    const testone = new ABCJS.renderAbc("*",abcData)
+                    console.log(testone)
                     
                     tunebook.forEach(tune => {
                         this.parseABC(tune);
