@@ -140,7 +140,7 @@ const NSYMBOLS = { 1: "𝅝", 2: "𝅗𝅥", 4: "♩", 8: "♪", 16: "𝅘𝅥𝅯" };
  * @constant {Object.<number, string>}
  * @default
  */
-const RSYMBOLS = { 1: "𝄻", 2: "𝄼", 4: "𝄽" };
+const RSYMBOLS = { 1: "𝄻", 2: "𝄼", 4: "𝄽",8: "𝄾", 16: "𝄿" };
 
 /**
  * Maps from notes with flats to their corresponding notes with '♭' (flat) symbol.
