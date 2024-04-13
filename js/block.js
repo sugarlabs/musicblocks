@@ -2819,7 +2819,7 @@ class Block {
             let topBlk;
 
             const dx = event.stageX / that.activity.getStageScale() - that.container.x;
-            if (that.isCollapsible() && dx < 30 / that.activity.getStageScale()) {
+            if (!moved && that.isCollapsible() && dx < 30 / that.activity.getStageScale()) {
                 that.collapseToggle();
             } else if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
                 if (that.name === "media") {
@@ -2913,13 +2913,17 @@ class Block {
                 y: Math.round(that.container.y - that.original.y)
             };
         });
-
+            
         /**
          * Handles the pressmove event on the block container.
          * @param {Event} event - The pressmove event.
          */
         this.container.on("pressmove", (event) =>{
             // FIXME: More voodoo
+
+            let disX = Math.abs(event.stageX / that.activity.getStageScale() - that.original.x);
+            let disY = Math.abs(event.stageY / that.activity.getStageScale() - that.original.y);
+
             event.nativeEvent.preventDefault();
 
             // Don't allow silence block to be dragged out of a note.
@@ -2946,7 +2950,9 @@ class Block {
             }
 
             if (window.hasMouse) {
-                moved = true;
+                //check for shaky movements
+                if(disX > 2 || disY > 2) {
+                moved = true;}
             } else {
                 // Make it eaiser to select text on mobile.
                 setTimeout(() => {
