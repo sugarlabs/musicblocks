@@ -3868,7 +3868,7 @@ class Activity {
         this.parseABC = async function (tune) {
             let musicBlocksJSON = [];
             let blockId = 0;
-        
+            let keySignature
 
         
             const title = (tune.metaText?.title ?? "title").toString().toLowerCase();
@@ -3883,9 +3883,9 @@ class Activity {
             );
         
             tune.lines?.forEach(line => {
-                console.log(line + 'hehe');
+                console.log(line );
                 line.staff?.forEach(staff => {
-                    let keySignature = staff?.key;
+                    keySignature = staff?.key;
                     staff.voices.forEach(voice => {
                         console.log(voice)
                      
@@ -3900,11 +3900,29 @@ class Activity {
                     });
                 });
             });
-        
+        //Check if keySignature of the song exists
+            if(keySignature){
+            
+                musicBlocksJSON.push([blockId, "setkey2", 0, 0, [2, blockId + 1, blockId + 2, 5]],
+                [blockId + 1, ["notename",{value:keySignature.root}], 0, 0, [blockId]],
+                [blockId + 2, ["modename", {value: 'major'}], 0, 0, [blockId]])
+                //connect settimbre keyblock and note block with each other 
+                musicBlocksJSON[2][4][2]=blockId
+                musicBlocksJSON[4][4][0]=blockId
+                musicBlocksJSON[5][4][0]=blockId
+                musicBlocksJSON[2][4][0]=blockId
+
+                musicBlocksJSON[musicBlocksJSON.length -4][4][1]=null
+            }
+
+            else{
+                musicBlocksJSON[musicBlocksJSON.length -1][4][1]=null    
+            }
             console.debug ('finished when you see: "block loading finished "');
             document.body.style.cursor = "wait";
-            console.log('hell len')
-            musicBlocksJSON[musicBlocksJSON.length -1][4][1]=null
+            console.log( musicBlocksJSON[musicBlocksJSON.length -1])
+            console.log(musicBlocksJSON)
+            
             console.log(musicBlocksJSON)
             // logo.textMsg(_("MIDI loading. This may take some time depending upon the number of notes in the track"));
             this.blocks.loadNewBlocks(musicBlocksJSON);
