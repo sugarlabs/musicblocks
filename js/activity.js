@@ -3810,7 +3810,7 @@ class Activity {
             });
           
             if (accidental) {
-              return note + (accidental.acc === "sharp" ? " ♯" : (accidental.acc === "flat" ? " ♭" : ""));
+              return note + (accidental.acc === "sharp" ? "♯" : (accidental.acc === "flat" ? "♭" : ""));
             } else {
               return note;
             }
