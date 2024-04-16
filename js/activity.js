@@ -3875,11 +3875,17 @@ class Activity {
             const instruction = (tune.metaText?.instruction ?? "guitar").toString().toLowerCase();
         
             musicBlocksJSON.push(
-                [blockId++, ["action", {collapsed: false}], 100, 100, [null, blockId, blockId + 1, null]],
-                [blockId++, ["text", {value: title}], 0, 0, [blockId - 2]],
-                [blockId++, "settimbre", 0, 0, [blockId - 3, blockId, blockId + 2, blockId + 1]],
-                [blockId++, ["voicename", {value: instruction}], 0, 0, [blockId - 2]],
-                [blockId++, "hidden", 0, 0, [blockId - 3, null]]
+                [blockId, ["action", {collapsed: false}], 100, 100, [null, blockId+1, blockId + 2, null]],
+                [blockId+1, ["text", {value: title}], 0, 0, [blockId]],
+                [blockId+2, "hidden", 0, 0, [blockId, blockId + 3]],
+                [blockId+3, "print", 0, 0, [blockId+2, blockId + 4,blockId+7]],
+                [blockId+4, ["text", {value: title}], 0, 0, [blockId+3]],
+                [blockId+5, "setturtlename2", 0, 0, [blockId+12,blockId+6,'setkeyneeds to be added']],
+                [blockId+6, ["text", {value: "Voice 1"}], 0, 0, [blockId+5]],
+                [blockId+7, "meter", 0, 0, [blockId+3,blockId+8,blockId+9,blockId+12]],
+                [blockId, "settimbre", 0, 0, [blockId - 3, blockId, blockId + 2, blockId + 1]],
+                [blockId, ["voicename", {value: instruction}], 0, 0, [blockId - 2]],
+                [blockId, "hidden", 0, 0, [blockId - 3, null]]
             );
         
             tune.lines?.forEach(line => {
