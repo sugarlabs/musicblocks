@@ -3833,7 +3833,7 @@ class Activity {
            
             const adjustedNote = adjustPitch(pitch.name , keySignature);
             
-            if (musicBlocksJSON.length == 5) {
+            if (blockId == 19) {
                 musicBlocksJSON.push(
                     [blockId, ["newnote", {"collapsed": true}], 0, 0, [blockId - 3, blockId + 1, blockId + 4, blockId + 8]],
                     [blockId + 1, "divide", 0, 0, [blockId, blockId + 2, blockId + 3]],
@@ -3846,7 +3846,8 @@ class Activity {
                     [blockId + 8, "hidden", 0, 0, [blockId, blockId + 9]],
                 );
         
-            } else {
+            } 
+            else {
                 console.log(blockId);
                 musicBlocksJSON.push(
                     [blockId, ["newnote", {"collapsed": true}], 0, 0, [blockId - 1, blockId + 1, blockId + 4, blockId + 8]],
@@ -3867,7 +3868,8 @@ class Activity {
         
         this.parseABC = async function (tune) {
             let musicBlocksJSON = [];
-            let blockId = 0;
+            let musicBlocksHeader =[];
+            let blockId = 19;
             let keySignature='C'; //if Key signature consider C Maj as constant key 
             let meterNum = 4; //if Key signature consider C Maj as constant key 
             let meterDen = 4;
@@ -3876,34 +3878,14 @@ class Activity {
             const title = (tune.metaText?.title ?? "title").toString().toLowerCase();
             const instruction = (tune.metaText?.instruction ?? "guitar").toString().toLowerCase();
         
-            musicBlocksJSON.push(
-                [blockId, ["action", {collapsed: false}], 100, 100, [null, blockId+1, blockId + 2, null]],
-                [blockId+1, ["text", {value: title}], 0, 0, [blockId]],
-                [blockId+2, "hidden", 0, 0, [blockId, blockId + 3]],
-                [blockId+3, "print", 0, 0, [blockId+2, blockId + 4,blockId+7]],
-                [blockId+4, ["text", {value: title}], 0, 0, [blockId+3]],
-                [blockId+5, "setturtlename2", 0, 0, [blockId+12,blockId+6,'setkeyneeds to be added']],
-                [blockId+6, ["text", {value: "Voice 1"}], 0, 0, [blockId+5]],
-                [blockId+7, "meter", 0, 0, [blockId+3,blockId+8,blockId+9,blockId+12]],
-                [blockId+8, ["number", {value: meterNum}], 0, 0, [blockId+7]],
-                [blockId+9, "divide", 0, 0, [blockId+7,blockId+10,blockId+11]],
-                [blockId+10, ["number", {value: 1}], 0, 0, [blockId+9]],
-                [blockId+11, ["number", {value: meterDen}], 0, 0, [blockId+9]],
-                [blockId+12, "vspace", 0, 0, [blockId+7,blockId+5]],
-                [blockId+13, "setkey2", 0, 0, [blockId+5, blockId + 14, blockId + 15, blockId+16]],
-                [blockId + 14, ["notename",{value:keySignature.root}], 0, 0, [blockId+13]],
-                [blockId + 15, ["modename", {value: keySignature.mode}], 0, 0, [blockId+13]]
-                [blockId+16, "settimbre", 0, 0, [blockId +13, blockId+17, blockId + 19, blockId + 18]],
-                [blockId+17, ["voicename", {value: instruction}], 0, 0, [blockId +16]],
-                [blockId, "hidden", 0, 0, [blockId - 3, null]]
-            );
+           
         
             tune.lines?.forEach(line => {
                 console.log(line );
                 line.staff?.forEach(staff => {
                     keySignature = staff?.key;
-                    meterNum = staff?.meter.value[0].num
-                    meterDen = staff?.meter.value[0].den
+                    meterNum = staff?.meter?.value[0]?.num
+                    meterDen = staff?.meter?.value[0]?.den
                     staff.voices.forEach(voice => {
                         console.log(voice)
                      
@@ -3911,39 +3893,46 @@ class Activity {
                         voice.forEach(element => {
                             console.log('hello');
                             if (element.el_type === "note") {
-                                const pitchBlocks = createPitchBlocks(element.pitches[0], blockId, musicBlocksJSON, element.duration,keySignature);
+                                createPitchBlocks(element.pitches[0], blockId, musicBlocksJSON, element.duration,keySignature);
                                 blockId = blockId + 9;
                             }
                         });
                     });
                 });
             });
-        //Check if keySignature of the song exists
-            if(keySignature){
-            
-                musicBlocksJSON.push([blockId, "setkey2", 0, 0, [2, blockId + 1, blockId + 2, 5]],
-                [blockId + 1, ["notename",{value:keySignature.root}], 0, 0, [blockId]],
-                [blockId + 2, ["modename", {value: 'major'}], 0, 0, [blockId]])
-                //connect settimbre keyblock and note block with each other 
-                musicBlocksJSON[2][4][2]=blockId
-                musicBlocksJSON[4][4][0]=blockId
-                musicBlocksJSON[5][4][0]=blockId
-                musicBlocksJSON[2][4][0]=blockId
+            blockId=0
+            console.log(meterDen+'meterDen')
+            console.log(meterNum+'meterNum')
+            console.log(keySignature.root+'keySignature')
 
-                musicBlocksJSON[musicBlocksJSON.length -4][4][1]=null
-            }
-
-            else{
-                musicBlocksJSON[musicBlocksJSON.length -1][4][1]=null    
-            }
+            musicBlocksHeader.push(
+                [blockId, ["action", {collapsed: false}], 100, 100, [null, blockId+1, blockId + 2, null]],
+                [blockId+1, ["text", {value: title}], 0, 0, [blockId]],
+                [blockId+2, "hidden", 0, 0, [blockId, blockId + 3]],
+                [blockId+3, "print", 0, 0, [blockId+2, blockId + 4,blockId+7]],
+                [blockId+4, ["text", {value: title}], 0, 0, [blockId+3]],
+                [blockId+5, "setturtlename2", 0, 0, [blockId+12,blockId+6,blockId+13]],
+                [blockId+6, ["text", {value: "Voice 1"}], 0, 0, [blockId+5]],
+                [blockId+7, "meter", 0, 0, [blockId+3,blockId+8,blockId+9,blockId+12]],
+                [blockId+8, ["number", {value: 4}], 0, 0, [blockId+7]],
+                [blockId+9, "divide", 0, 0, [blockId+7,blockId+10,blockId+11]],
+                [blockId+10, ["number", {value: 1}], 0, 0, [blockId+9]],
+                [blockId+11, ["number", {value: 4}], 0, 0, [blockId+9]],
+                [blockId+12, "vspace", 0, 0, [blockId+7,blockId+5]],
+               [blockId+13, "setkey2", 0, 0, [blockId+5, blockId + 14, blockId + 15, blockId+16]],
+             [blockId + 14, ["notename",{value:keySignature.root}], 0, 0, [blockId+13]],
+             [blockId + 15, ["modename", {value: "major"}], 0, 0, [blockId+13]],
+              [blockId+16, "settimbre", 0, 0, [blockId +13, blockId+17, blockId+19, blockId + 18]],
+             [blockId+17, ["voicename", {value: instruction}], 0, 0, [blockId +16]],
+             [blockId+18, "hidden", 0, 0, [blockId+16, null]]
+            );
+          let combined_array=[...musicBlocksHeader,...musicBlocksJSON]
             console.debug ('finished when you see: "block loading finished "');
             document.body.style.cursor = "wait";
-            console.log( musicBlocksJSON[musicBlocksJSON.length -1])
-            console.log(musicBlocksJSON)
-            
-            console.log(musicBlocksJSON)
+            console.log(combined_array)
+            combined_array[combined_array.length -1][4][1]=null 
             // logo.textMsg(_("MIDI loading. This may take some time depending upon the number of notes in the track"));
-            this.blocks.loadNewBlocks(musicBlocksJSON);
+            this.blocks.loadNewBlocks(combined_array);
             return null;
 
         }
