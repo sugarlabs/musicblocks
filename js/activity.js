@@ -3868,7 +3868,9 @@ class Activity {
         this.parseABC = async function (tune) {
             let musicBlocksJSON = [];
             let blockId = 0;
-            let keySignature
+            let keySignature='C'; //if Key signature consider C Maj as constant key 
+            let meterNum = 4; //if Key signature consider C Maj as constant key 
+            let meterDen = 4;
 
         
             const title = (tune.metaText?.title ?? "title").toString().toLowerCase();
@@ -3883,8 +3885,16 @@ class Activity {
                 [blockId+5, "setturtlename2", 0, 0, [blockId+12,blockId+6,'setkeyneeds to be added']],
                 [blockId+6, ["text", {value: "Voice 1"}], 0, 0, [blockId+5]],
                 [blockId+7, "meter", 0, 0, [blockId+3,blockId+8,blockId+9,blockId+12]],
-                [blockId, "settimbre", 0, 0, [blockId - 3, blockId, blockId + 2, blockId + 1]],
-                [blockId, ["voicename", {value: instruction}], 0, 0, [blockId - 2]],
+                [blockId+8, ["number", {value: meterNum}], 0, 0, [blockId+7]],
+                [blockId+9, "divide", 0, 0, [blockId+7,blockId+10,blockId+11]],
+                [blockId+10, ["number", {value: 1}], 0, 0, [blockId+9]],
+                [blockId+11, ["number", {value: meterDen}], 0, 0, [blockId+9]],
+                [blockId+12, "vspace", 0, 0, [blockId+7,blockId+5]],
+                [blockId+13, "setkey2", 0, 0, [blockId+5, blockId + 14, blockId + 15, blockId+16]],
+                [blockId + 14, ["notename",{value:keySignature.root}], 0, 0, [blockId+13]],
+                [blockId + 15, ["modename", {value: keySignature.mode}], 0, 0, [blockId+13]]
+                [blockId+16, "settimbre", 0, 0, [blockId +13, blockId+17, blockId + 19, blockId + 18]],
+                [blockId+17, ["voicename", {value: instruction}], 0, 0, [blockId +16]],
                 [blockId, "hidden", 0, 0, [blockId - 3, null]]
             );
         
@@ -3892,6 +3902,8 @@ class Activity {
                 console.log(line );
                 line.staff?.forEach(staff => {
                     keySignature = staff?.key;
+                    meterNum = staff?.meter.value[0].num
+                    meterDen = staff?.meter.value[0].den
                     staff.voices.forEach(voice => {
                         console.log(voice)
                      
