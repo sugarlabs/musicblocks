@@ -878,6 +878,8 @@ class Palette {
         this.model.update();
         const paletteList = docById("PaletteBody_items");
 
+        this.setupGrabScroll(paletteList);
+
         const blocks = this.model.blocks;
         blocks.reverse();
         const protoListScope = [...this.protoList];
@@ -986,7 +988,7 @@ class Palette {
     }
 
     setupGrabScroll(paletteList) {
-        let posY, top;
+        let posY = 0, top;
 
         // eslint-disable-next-line no-unused-vars
         const mouseUpGrab = (event) => {
@@ -994,7 +996,7 @@ class Palette {
             document.body.style.cursor = "default";
         };
 
-        const mouseMoveGrab = (event) => {
+        const mouseMoveGrab = (event) => { 
             const dy = event.clientY - posY;
             paletteList.scrollTop = top - dy;
             document.body.style.cursor = "grabbing";
