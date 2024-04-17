@@ -3833,9 +3833,9 @@ class Activity {
            
             const adjustedNote = adjustPitch(pitch.name , keySignature);
             
-            if (blockId == 19) {
+            if (blockId == 21) {
                 musicBlocksJSON.push(
-                    [blockId, ["newnote", {"collapsed": true}], 0, 0, [blockId - 3, blockId + 1, blockId + 4, blockId + 8]],
+                    [blockId, ["newnote", {"collapsed": true}], 0, 0, [blockId - 1, blockId + 1, blockId + 4, blockId + 8]],
                     [blockId + 1, "divide", 0, 0, [blockId, blockId + 2, blockId + 3]],
                     [blockId + 2, ["number", {value: pitchDuration[0]}], 0, 0, [blockId + 1]],
                     [blockId + 3, ["number", {value: pitchDuration[1]}], 0, 0, [blockId + 1]],
@@ -3869,7 +3869,7 @@ class Activity {
         this.parseABC = async function (tune) {
             let musicBlocksJSON = [];
             let musicBlocksHeader =[];
-            let blockId = 19;
+            let blockId = 21;
             let keySignature='C'; //if Key signature consider C Maj as constant key 
             let meterNum = 4; //if Key signature consider C Maj as constant key 
             let meterDen = 4;
@@ -3906,25 +3906,34 @@ class Activity {
             console.log(keySignature.root+'keySignature')
 
             musicBlocksHeader.push(
-                [blockId, ["action", {collapsed: false}], 100, 100, [null, blockId+1, blockId + 2, null]],
-                [blockId+1, ["text", {value: title}], 0, 0, [blockId]],
-                [blockId+2, "hidden", 0, 0, [blockId, blockId + 3]],
-                [blockId+3, "print", 0, 0, [blockId+2, blockId + 4,blockId+7]],
-                [blockId+4, ["text", {value: title}], 0, 0, [blockId+3]],
-                [blockId+5, "setturtlename2", 0, 0, [blockId+12,blockId+6,blockId+13]],
-                [blockId+6, ["text", {value: "Voice 1"}], 0, 0, [blockId+5]],
-                [blockId+7, "meter", 0, 0, [blockId+3,blockId+8,blockId+9,blockId+12]],
-                [blockId+8, ["number", {value: 4}], 0, 0, [blockId+7]],
-                [blockId+9, "divide", 0, 0, [blockId+7,blockId+10,blockId+11]],
-                [blockId+10, ["number", {value: 1}], 0, 0, [blockId+9]],
-                [blockId+11, ["number", {value: 4}], 0, 0, [blockId+9]],
-                [blockId+12, "vspace", 0, 0, [blockId+7,blockId+5]],
-               [blockId+13, "setkey2", 0, 0, [blockId+5, blockId + 14, blockId + 15, blockId+16]],
-             [blockId + 14, ["notename",{value:keySignature.root}], 0, 0, [blockId+13]],
-             [blockId + 15, ["modename", {value: "major"}], 0, 0, [blockId+13]],
-              [blockId+16, "settimbre", 0, 0, [blockId +13, blockId+17, blockId+19, blockId + 18]],
-             [blockId+17, ["voicename", {value: instruction}], 0, 0, [blockId +16]],
-             [blockId+18, "hidden", 0, 0, [blockId+16, null]]
+            [blockId, ["start", {collapsed: false}], 100, 100, [null,blockId+1, null]],
+            [blockId+1, "print", 0, 0, [blockId, blockId + 2,blockId+3]],
+            [blockId+2, ["text", {value: title}], 0, 0, [blockId+1]],
+            
+            [blockId+3, "setturtlename2", 0, 0, [blockId+1,blockId+4,blockId+5]],
+            [blockId+4, ["text", {value: "V:1 Line 1"}], 0, 0, [blockId+3]],
+            [blockId+5, "meter", 0, 0, [blockId+3,blockId+6,blockId+7,blockId+10]],
+            [blockId+6, ["number", {value: 4}], 0, 0, [blockId+5]],
+            [blockId+7, "divide", 0, 0, [blockId+5,blockId+8,blockId+9]],
+            [blockId+8, ["number", {value: 1}], 0, 0, [blockId+7]],
+            [blockId+9, ["number", {value: 4}], 0, 0, [blockId+7]],
+            [blockId+10, "vspace", 0, 0, [blockId+5,blockId+11]],
+            [blockId+11, "setkey2", 0, 0, [blockId+10, blockId + 12, blockId + 13, blockId+14]],
+            [blockId+12, ["notename",{value:keySignature.root}], 0, 0, [blockId+11]],
+            [blockId+13, ["modename", {value: "major"}], 0, 0, [blockId+11]],
+            [blockId+14, "settimbre", 0, 0, [blockId +11, blockId+15, blockId+17, blockId + 16]],
+            [blockId+15, ["voicename", {value: instruction}], 0, 0, [blockId +14]],
+            [blockId+16, "hidden", 0, 0, [blockId+14, null]],
+            [blockId+17, ["nameddo", {value: "V:1 Line 1"}], 0, 0, [blockId+14, null]],
+            [blockId+18, ["action", {collapsed: false}], 100, 100, [null,blockId+19,blockId+20, null]],
+             [blockId+19, ["text", {value: "V:1 Line 1"}], 0, 0, [blockId+18]],
+             [blockId+20, "hidden", 0, 0, [blockId+18, blockId+21]]
+           
+            
+            
+            
+            
+            
             );
           let combined_array=[...musicBlocksHeader,...musicBlocksJSON]
             console.debug ('finished when you see: "block loading finished "');
