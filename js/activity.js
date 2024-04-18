@@ -3884,8 +3884,14 @@ class Activity {
                 console.log(line );
                 line.staff?.forEach(staff => {
                     keySignature = staff?.key;
-                    meterNum = staff?.meter?.value[0]?.num
-                    meterDen = staff?.meter?.value[0]?.den
+                    console.log('below is the staff')
+                    console.log(staff)
+                    meterNum = staff?.meter?.value[0]?.num ?? meterNum;
+                    meterDen = staff?.meter?.value[0]?.den ?? meterDen;
+                    console.log('Meter Denominator')
+                    console.log(meterDen)
+                    console.log(meterNum)
+                    
                     staff.voices.forEach(voice => {
                         console.log(voice)
                      
@@ -3913,14 +3919,14 @@ class Activity {
             [blockId+3, "setturtlename2", 0, 0, [blockId+1,blockId+4,blockId+5]],
             [blockId+4, ["text", {value: "V:1 Line 1"}], 0, 0, [blockId+3]],
             [blockId+5, "meter", 0, 0, [blockId+3,blockId+6,blockId+7,blockId+10]],
-            [blockId+6, ["number", {value: 4}], 0, 0, [blockId+5]],
+            [blockId+6, ["number", {value: meterNum}], 0, 0, [blockId+5]],
             [blockId+7, "divide", 0, 0, [blockId+5,blockId+8,blockId+9]],
             [blockId+8, ["number", {value: 1}], 0, 0, [blockId+7]],
-            [blockId+9, ["number", {value: 4}], 0, 0, [blockId+7]],
+            [blockId+9, ["number", {value: meterDen}], 0, 0, [blockId+7]],
             [blockId+10, "vspace", 0, 0, [blockId+5,blockId+11]],
             [blockId+11, "setkey2", 0, 0, [blockId+10, blockId + 12, blockId + 13, blockId+14]],
             [blockId+12, ["notename",{value:keySignature.root}], 0, 0, [blockId+11]],
-            [blockId+13, ["modename", {value: "major"}], 0, 0, [blockId+11]],
+            [blockId+13, ["modename", {value: keySignature.mode=="m"?"minor":"major"}], 0, 0, [blockId+11]],
             [blockId+14, "settimbre", 0, 0, [blockId +11, blockId+15, blockId+17, blockId + 16]],
             [blockId+15, ["voicename", {value: instruction}], 0, 0, [blockId +14]],
             [blockId+16, "hidden", 0, 0, [blockId+14, null]],
@@ -5531,8 +5537,8 @@ class Activity {
                 abcReader.onload = (event) => {
                     const abcData = event.target.result;
                     const tunebook = new ABCJS.parseOnly(abcData);
-                    const testone = new ABCJS.renderAbc("*",abcData)
-                    console.log(testone)
+                    
+                    console.log(tunebook)
                     
                     tunebook.forEach(tune => {
                         this.parseABC(tune);
