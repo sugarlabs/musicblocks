@@ -294,7 +294,7 @@ class HelpWidget {
                             } else if (typeof message[3] === "string") {
                                 // If it is a string, load the macro
                                 // assocuated with this block
-                                const blocksToLoad = getMacroExpansion(message[3], 100, 100);
+                                const blocksToLoad = getMacroExpansion(this.activity,message[3], 100, 100);
                                 // console.debug("CLICK: " + blocksToLoad);
                                 this.activity.blocks.loadNewBlocks(blocksToLoad);
                             } else {
@@ -629,7 +629,7 @@ class HelpWidget {
                         } else if (typeof message[3] === "string") {
                             // If it is a string, load the macro
                             // assocuated with this block
-                            const blocksToLoad = getMacroExpansion(message[3], 100, 100);
+                            const blocksToLoad = getMacroExpansion(this.activity,message[3], 100, 100);
                             // console.debug("CLICK: " + blocksToLoad);
                             this.activity.blocks.loadNewBlocks(blocksToLoad);
                         } else {
