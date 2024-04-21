@@ -1008,41 +1008,43 @@
 
         
         <!-- AI Interaction Section -->
-        <div id="searchBar" tabindex="-1">
-            <div id="ai-input-container">
-                <input type="text" id="ai-input" placeholder="Ask something..." />
-                <button onclick="sendAIRequest()">Ask AI</button>
-            </div>
-            <div id="ai-response-container">
-                <p id="ai-response">AI responses will appear here...</p>
-            </div>
+    
+        <div id="ai-input-container">
+            <input type="text" id="ai-input" placeholder="Ask something..." />
+            <button onclick="sendMessage()">Ask AI</button>
         </div>
+        <div id="ai-response-container">
+            <p id="ai-response">AI responses will appear here...</p >
+        </div>
+     
 
         <script>
+            document.addEventListener('DOMContentLoaded', init); // Ensure init is called when the document is ready
+        
             function init() {
                 console.log('Initialization complete.');
             }
-
+        
             function sendMessage() {
-                const inputField = document.getElementById('chat-input');
+                const inputField = document.getElementById('ai-input'); // Corrected ID from 'chat-input' to 'ai-input'
                 const message = inputField.value;
                 inputField.value = ''; // Clear the input field
-
-                displayMessage(message, 'You');
-
-                sendMessageToChatGPT(message).then(response => {
+        
+                queryChatGPT(message).then(response => { // Assuming queryChatGPT is correctly implemented in 'chatgpt.js'
+                    displayMessage(message, 'You');
                     displayMessage(response, 'ChatGPT');
                 }).catch(error => {
-                    console.error('Error sending message:', error);
+                console.error('Error sending message:', error);
+                displayMessage(error.message || "Failed to get response.", 'Error'); // Show the error message if available
                 });
             }
-
+        
             function displayMessage(message, sender) {
-                const chatWindow = document.getElementById('chat-window');
-                const messageDiv = document.createElement('div');
+                const responseContainer = document.getElementById('ai-response-container'); // Assuming you want to display messages here
+                const messageDiv = document.createElement('p'); // Changed from 'div' to 'p' for consistency with your HTML
                 messageDiv.textContent = `${sender}: ${message}`;
-                chatWindow.appendChild(messageDiv);
-                chatWindow.scrollTop = chatWindow.scrollHeight;
+                responseContainer.appendChild(messageDiv); // Append new message
+                responseContainer.scrollTop = responseContainer.scrollHeight; // Scroll to latest message
             }
         </script>
 
