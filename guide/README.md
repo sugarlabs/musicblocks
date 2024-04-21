@@ -381,11 +381,11 @@ alterations are necessary for harmonic or melodic purposes. Double
 sharps and flats help maintain the correct intervals, ensuring
 precise notation and clarity of musical expression.
 
-![double sharp and flat](./transform1.1.png "Using Double Sharp and Flat blocks")
+![double sharp and flat](./transform1_1.png "Using Double Sharp and Flat blocks")
 
-![la campanella](./transform1.2.png "La Campanella - Liszt")
+![la campanella](./transform1_2.png "La Campanella - Liszt")
 
-![mikrokosmos](./transform1.3.png "Mikrokosmos V Nr. 131 - Bartók")
+![mikrokosmos](./transform1_3.png "Mikrokosmos V Nr. 131 - Bartók")
 
 The example on the left shows how to play the double sharp as played in
 measure 6 of Liszt's La Campanella. The example on the right shows how to
