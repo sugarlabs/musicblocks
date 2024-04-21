@@ -8,14 +8,33 @@
 
 	    <meta name="description" content="Learn to code through music with Music Blocks. Arrange colorful blocks to create everything from simple melodies to interactive games.">
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height"/>
+
+        <meta charset="UTF-8">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <title>Music Blocks with ChatGPT</title>
+        <meta name="description" content="Learn to code through music with Music Blocks. Arrange colorful blocks to create everything from simple melodies to interactive games.">
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height"/>
 	
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
         <!-- <link href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap" rel="stylesheet"> --> 
         
-        <link rel="stylesheet" href="css/activities.css" />
+        <!-- <link rel="stylesheet" href="css/activities.css" /> -->
         <link rel="stylesheet" href="dist/css/style.css" />
         <link rel="stylesheet" href="dist/css/keyboard.css" />
         <link rel="stylesheet" href="dist/css/windows.css" />
+        <link id="dark-mode-css" rel="stylesheet" href="css/activities.css" disabled />
+        <link id="light-mode-css" rel="stylesheet" href="css/activities_light.css" />
+
+
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+        <link rel="stylesheet" href="lib/materialize-iso.css" />
+        <link type="text/css" href="fonts/material-icons.css" rel="stylesheet"/>
+        <link rel="apple-touch-icon" href="/activity/activity-icon-color-512.png">
+        <link rel="manifest" href="android_chrome_manifest.json" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <link rel="icon" sizes="192x192" href="favicon.ico" />
+        <meta id="theme-color" name="theme-color" content="#2196F3" />
         
         <noscript>
             JavaScript is required to view this page.
@@ -70,6 +89,8 @@
 
         <script src="lib/tweenjs.min.js" defer></script>
 
+        <script src="lib/chatgpt.js" defer></script>
+
         <!-- <script src="js/widgets/musickeyboard.js"></script> -->
 
         <!-- <script src="lib/movieclip-0.7.1.min.js"></script> -->
@@ -103,6 +124,8 @@
                 }
             }
         </script>
+
+
     </head>
 
     <!-- #96D3F3-->
@@ -124,9 +147,53 @@
      >
         <div
             id="loading-image-container"
-            style="position: absolute; width: 100%; height: 100%;cursor: wait; text-align: center; background-color: #FFFFFF;"
+            style="position: absolute; width: 100%; height: 100%;cursor: wait; text-align: center;"
         >
+
+        <button id="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
+
             <script>
+            function toggleTheme() {
+                // Get the link elements for both the dark and light CSS files
+                var darkCss = document.getElementById('dark-mode-css');
+                var lightCss = document.getElementById('light-mode-css');
+
+                    // Check if the dark mode CSS is enabled
+                if (darkCss.disabled) {
+                        // Enable dark mode and disable light mode
+                    darkCss.disabled = false;
+                        lightCss.disabled = true;
+                    } else {
+                        // Enable light mode and disable dark mode
+                        darkCss.disabled = true;
+                        lightCss.disabled = false;
+                    }
+                }
+
+                // Optional: Use local storage to remember the user's theme preference
+                // Check on page load what the last theme was and apply it
+                document.addEventListener('DOMContentLoaded', (event) => {
+                    const theme = localStorage.getItem('theme') || 'light'; // Default to light theme
+                    if (theme === 'dark') {
+                        toggleTheme(); // If the saved theme is dark, toggle to dark mode
+                    }
+                });
+
+                // Update the toggleTheme function to save the preference
+                function toggleTheme() {
+                    var darkCss = document.getElementById('dark-mode-css');
+                    var lightCss = document.getElementById('light-mode-css');
+                    
+                    if (darkCss.disabled) {
+                        darkCss.disabled = false;
+                        lightCss.disabled = true;
+                        localStorage.setItem('theme', 'dark');
+                    } else {
+                        darkCss.disabled = true;
+                        lightCss.disabled = false;
+                        localStorage.setItem('theme', 'light');
+                    }
+                }
                 let loadL10nSplashScreen = function() {
                     console.debug(
                         "The browser is set to " + navigator.language
@@ -937,6 +1004,47 @@
             />
             <ul class="matches" id="searchResults"></ul>
         </div>
+
+
+        
+        <!-- AI Interaction Section -->
+        <div id="searchBar" tabindex="-1">
+            <div id="ai-input-container">
+                <input type="text" id="ai-input" placeholder="Ask something..." />
+                <button onclick="sendAIRequest()">Ask AI</button>
+            </div>
+            <div id="ai-response-container">
+                <p id="ai-response">AI responses will appear here...</p>
+            </div>
+        </div>
+
+        <script>
+            function init() {
+                console.log('Initialization complete.');
+            }
+
+            function sendMessage() {
+                const inputField = document.getElementById('chat-input');
+                const message = inputField.value;
+                inputField.value = ''; // Clear the input field
+
+                displayMessage(message, 'You');
+
+                sendMessageToChatGPT(message).then(response => {
+                    displayMessage(response, 'ChatGPT');
+                }).catch(error => {
+                    console.error('Error sending message:', error);
+                });
+            }
+
+            function displayMessage(message, sender) {
+                const chatWindow = document.getElementById('chat-window');
+                const messageDiv = document.createElement('div');
+                messageDiv.textContent = `${sender}: ${message}`;
+                chatWindow.appendChild(messageDiv);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }
+        </script>
 
     </body>
 </html>

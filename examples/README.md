@@ -378,14 +378,6 @@
 | rock-paper-scissors.html | classic intransitive hand game |
 | quiz-game.html | answer the questions with musical letters |
 
-# Widgets
-
-Music Blocks has handy widgets for various musical concepts to create musical code, but the code itself can also be used to create handy widgets as well.
-
-| Example | Description |
-| --- | --- |
-| 5-EDO-using-ensemble-blocks.html | This is an example of a widget for creating equal-division temperament systems. By default, it has 5 Equal Divisions of the Octave (EDO) as an example. |
-
 # Misc.
 
 | Example | Description |

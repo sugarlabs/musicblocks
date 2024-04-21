@@ -218,6 +218,7 @@
 
 #loading-image {
   z-index: 100;
+  background-color: #fefefe
 }
 
 #popdown-palette {
