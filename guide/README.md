@@ -383,7 +383,7 @@ precise notation and clarity of musical expression.
 
 ![double sharp and flat](./transform1.1.png "Using Double Sharp and Flat blocks")
 
-![la campanella](./transform1.2png "La Campanella - Liszt")
+![la campanella](./transform1.2.png "La Campanella - Liszt")
 
 ![mikrokosmos](./transform1.3.png "Mikrokosmos V Nr. 131 - Bartók")
 
