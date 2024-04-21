@@ -31,7 +31,7 @@ This guide details the many musical features of the language.
    1. [Actions](#31-actions)
    2. [Pitch Transformations](#32-pitch-transformations)
       1. [Step Pitch Block](#321-step-pitch-block)
-      7. [Sharps and Flats](#322-sharps-and-flats)
+      2. [Sharps and Flats](#322-sharps-and-flats)
           1. [Double Sharps and Flats](#3221-double-sharps-and-flats)
       3. [Adjusting Transposition](#323-adjusting-transposition)
       4. [Summary of Pitch Movements](#324-summary-of-pitch-movements)
