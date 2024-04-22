@@ -937,6 +937,17 @@
             />
             <ul class="matches" id="searchResults"></ul>
         </div>
-
+        <script>
+            import Activity from '../js/activity.js';
+            document.addEventListener('DOMContentLoaded', function () {
+                try {
+                    const activity = new Activity();
+                    activity.initialize();
+                    console.log('Activity initialized successfully.');
+                } catch (e) {
+                    console.error('Error during initialization:', e);
+                }
+            });
+        </script>
     </body>
 </html>

@@ -7013,5 +7013,22 @@ class Blocks {
             this.bringToTop();
             this.activity.refreshCanvas();
         };
+        /**
+         * Remove a block from the system, ensuring all references are properly cleared.
+         * @param {number} blk - The identifier of the block to be removed.
+         * @param {boolean} [adjustDock=true] - Whether to adjust docks after removal.
+         */
+        Blocks.prototype.removeBlock = function(blk, adjustDock = true) {
+            this._extractBlock(blk, adjustDock);
+        
+            const block = this.blockList[blk];
+            if (!block) {
+                console.warn('removeBlock: No block found with ID:', blk);
+                return;
+            }
+        
+            delete this.blockList[blk];
+        };
     }
+    
 }

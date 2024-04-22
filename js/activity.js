@@ -230,6 +230,11 @@ class Activity {
         this.bassSharpBitmap = [null, null, null, null, null, null, null];
         this.bassFlatBitmap = [null, null, null, null, null, null, null];
 
+        this.selectionStart = null;
+        this.selectionEnd = null;
+        this.isSelecting = false;
+        this.selectedBlocks = [];
+
         const ERRORARTWORK = [
             "emptybox",
             "emptyheap",
@@ -255,6 +260,8 @@ class Activity {
         this.inTempoWidget = false;
         this.projectID = null;
         this.storage = localStorage;
+
+        
 
         this.beginnerMode = true;
         try {
@@ -5628,6 +5635,172 @@ class Activity {
                 this.planet.planet.setAnalyzeProject(doAnalyzeProject);
             }
         };
+    }
+
+    /**
+     * Initialize the event listeners for selection.
+     */
+    initializeSelectionEvents() {
+        const canvas = this.canvas; 
+        canvas.addEventListener('mousedown', this.mouseDownHandler.bind(this));
+        canvas.addEventListener('mousemove', this.mouseMoveHandler.bind(this));
+        canvas.addEventListener('mouseup', this.mouseUpHandler.bind(this));
+        document.addEventListener('keydown', this.keyDownHandler.bind(this));
+    }
+
+    /**
+     * Handle mouse down events.
+     */
+    mouseDownHandler(event) {
+        console.log('mouseDownHandler called', event);
+        this.selectionStart = { x: event.offsetX, y: event.offsetY };
+        this.isSelecting = true;
+        this.updateCanvas();
+    }
+
+    /**
+     * Handle mouse move events.
+     */
+    mouseMoveHandler(event) {
+        if (this.isSelecting) {
+            console.log('mouseMoveHandler called', event);
+            this.selectionEnd = { x: event.offsetX, y: event.offsetY };
+            this.updateCanvas();
+        }
+    }
+
+    /**
+     * Handle mouse up events.
+     */
+    mouseUpHandler(event) {
+        if (this.isSelecting) {
+            console.log('mouseUpHandler called', event);
+            this.selectionEnd = { x: event.offsetX, y: event.offsetY };
+            this.isSelecting = false;
+            this.selectedBlocks = this.findBlocksInSelection();
+            this.updateCanvas();
+        }
+    }
+
+    /**
+     * Handle key down events.
+     */
+    keyDownHandler(event) {
+        if (event.key === 'Delete' || event.keyCode === 46) {
+            console.log('keyDownHandler called', event);
+            this.deleteSelectedBlocks();
+            this.updateCanvas();
+        }
+    }
+
+
+    /**
+     * Finds blocks within the selection rectangle.
+     * 
+     * @returns {Array} - An array of selected block IDs.
+     */
+    findBlocksInSelection() {
+        const selectedBlocks = [];
+        const selectionRect = {
+            x1: Math.min(this.selectionStart.x, this.selectionEnd.x),
+            y1: Math.min(this.selectionStart.y, this.selectionEnd.y),
+            x2: Math.max(this.selectionStart.x, this.selectionEnd.x),
+            y2: Math.max(this.selectionStart.y, this.selectionEnd.y)
+        };
+
+        for (let blockId in this.blocks.blockList) {
+            const block = this.blocks.blockList[blockId];
+            const bounds = this.getBlockBounds(blockId);
+            if (bounds && bounds.x > selectionRect.x1 && bounds.x + bounds.width < selectionRect.x2 &&
+                bounds.y > selectionRect.y1 && bounds.y + bounds.height < selectionRect.y2) {
+                selectedBlocks.push(blockId);
+            }
+        }
+
+        return selectedBlocks;
+    }
+
+    /**
+     * Deletes selected blocks, leveraging the new removeBlock method.
+     */
+    deleteSelectedBlocks() {
+        this.selectedBlocks.forEach(blockId => {
+            this.removeBlock(blockId);
+        });
+        this.selectedBlocks = [];
+        this.refreshCanvas(); 
+    }
+
+
+    /**
+     * Retrieves the bounding box of a block.
+     * 
+     * @param {number} blockId - The identifier of the block.
+     * @returns {Object} An object containing x, y, width, and height of the block.
+     */
+    getBlockBounds(blockId) {
+        const block = this.blocks.blockList[blockId];
+        if (block) {
+            return {
+                x: block.container.x,
+                y: block.container.y,
+                width: block.width,
+                height: block.height
+            };
+        } 
+    }
+
+    /**
+     * Removes a block from the system, ensuring all references are properly cleared.
+     * 
+     * @param {number} blockId - The identifier of the block to be removed.
+     */
+    removeBlock(blockId) {
+        const block = this.blocks.blockList[blockId];
+        if (block) {
+            if (block.container && block.container.parent) {
+                block.container.parent.removeChild(block.container);
+            }
+            this.blocks.extractBlock(blockId);
+
+            console.log("Block removed:", blockId);
+        } else {
+            console.error("removeBlock: Block not found with ID:", blockId);
+        }
+    }
+
+    /**
+     * Updates the canvas by clearing it and re-drawing the selection rectangle
+     */
+    updateCanvas() {
+        const context = this.canvas.getContext('2d');
+        context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        if (this.isSelecting) {
+            this.drawSelectionRectangle(context);
+        }
+    }
+
+    /**
+     * Draws a semi-transparent blue rectangle used to represent the current selection
+     * 
+     * @param {CanvasRenderingContext2D} context - The identifier of the block to be removed.
+     */
+    drawSelectionRectangle(context) {
+        if (!this.selectionStart || !this.selectionEnd) return;
+        const width = this.selectionEnd.x - this.selectionStart.x;
+        const height = this.selectionEnd.y - this.selectionStart.y;
+        context.beginPath();
+        context.rect(this.selectionStart.x, this.selectionStart.y, width, height);
+        context.fillStyle = "rgba(0, 153, 255, 0.3)"; 
+        context.fill();
+        context.lineWidth = 1;
+        context.strokeStyle = "blue"; 
+        context.stroke();
+    }
+
+    initialize() {
+        console.log("initializing selection events")
+        this.initializeSelectionEvents();
     }
 }
 
