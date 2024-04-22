@@ -3782,26 +3782,6 @@ class Activity {
             }
         };
 
-        function pitchToSolfege(pitchName) {
-            const pitchToSol = {
-                'c': 'do',
-                'd': 're',
-                'e': 'mi',
-                'f': 'fa',
-                'g': 'sol',
-                'a': 'la',
-                'b': 'ti'
-            };
-        
-            const lowercasePitchName = pitchName.toLowerCase();
-        
-            if (lowercasePitchName in pitchToSol) {
-                return pitchToSol[lowercasePitchName];
-            } else {
-                return null;
-            }
-        }
-        
         function adjustPitch(note, keySignature) {
             const accidental = keySignature.accidentals.find(acc => {
               const noteToCompare = acc.note.toUpperCase().replace(',', '');
@@ -3823,7 +3803,7 @@ class Activity {
         }
         
           
-        function createPitchBlocks(pitch, blockId, musicBlocksJSON, pitchDuration,keySignature,actionBlock) {
+        function createPitchBlocks(pitch, blockId, pitchDuration,keySignature,actionBlock) {
             const blocks = [];
 
             pitchDuration = toFraction(pitchDuration);          
@@ -3851,6 +3831,8 @@ class Activity {
         this.parseABC = async function (tune) {
             let musicBlocksJSON = [];
             let musicBlocksHeader =[];
+            let staffBlocksMap = {};
+
             let blockId = 17;
             let keySignature='C'; //if Key signature consider C Maj as constant key 
             let meterNum = 4; //if Key signature consider C Maj as constant key 
@@ -3864,7 +3846,15 @@ class Activity {
         
             tune.lines?.forEach(line => {
                 console.log(line );
-                line.staff?.forEach(staff => {
+                line.staff?.forEach((staff,staffIndex) => {
+                    if (!staffBlocksMap.hasOwnProperty(staffIndex)) {
+                        staffBlocksMap[staffIndex] = {
+                            meterNum: staff?.meter?.value[0]?.num || 4,
+                            meterDen: staff?.meter?.value[0]?.den || 4,
+                            keySignature: staff.key,
+                            baseBlocks: []
+                        };
+                    }
                     keySignature = staff?.key;
                     console.log('below is the staff')
                     console.log(staff)
@@ -3881,7 +3871,7 @@ class Activity {
                         voice.forEach(element => {
                             console.log('hello');
                             if (element.el_type === "note") {
-                                createPitchBlocks(element.pitches[0], blockId, musicBlocksJSON, element.duration,keySignature,actionBlock);
+                                createPitchBlocks(element.pitches[0], blockId,element.duration,keySignature,actionBlock);
                                 blockId = blockId + 9;
                             }
                         });
@@ -3890,7 +3880,7 @@ class Activity {
                         actionBlock[actionBlock.length-1][4][1]=null
                         //update the namedo block
                         if(musicBlocksJSON.length!=0){
-                            //update the name do blocid
+                            //update the name do blocid with next bloc id 
                             musicBlocksJSON[musicBlocksJSON.length - 1][musicBlocksJSON[musicBlocksJSON.length - 1].length - 4][4][1] = blockId;
                             console.log('last Element');
                             console.log(musicBlocksJSON[musicBlocksJSON.length - 1][musicBlocksJSON[musicBlocksJSON.length - 1].length - 4] );
@@ -3899,14 +3889,19 @@ class Activity {
                         }   
 
 
-                      actionBlock.push ( [blockId, ["nameddo", {value: `V:1 Line ${musicBlocksJSON.length + 1}`}], 0, 0, [musicBlocksJSON.length === 0 ? 14 : blockId - actionBlock.length -4, null]],
+                      actionBlock.push ( [blockId, ["nameddo", {value: `V: ${staffIndex + 1} Line ${musicBlocksJSON.length + 1}`}], 0, 0, [musicBlocksJSON.length === 0 ? 14 : blockId - actionBlock.length -4, null]],
                         [blockId + 1, ["action", {collapsed: false}], 100, 100, [null, blockId + 2, blockId + 3, null]],
-                        [blockId + 2, ["text", {value: `V:1 Line ${musicBlocksJSON.length + 1}`}], 0, 0, [blockId + 1]],
+                        [blockId + 2, ["text", {value: `V: ${staffIndex + 1} Line ${musicBlocksJSON.length + 1}`}], 0, 0, [blockId + 1]],
                         [blockId + 3, "hidden", 0, 0, [blockId + 1, actionBlock[0][0]]] )// blockid of topaction block
                         
                         blockId=blockId+4
                         musicBlocksJSON.push(actionBlock)
+                     
+                        staffBlocksMap[staffIndex].baseBlocks.push(actionBlock);
+                     
+    
                     });
+    
                 });
             });
             blockId=0
@@ -3914,7 +3909,10 @@ class Activity {
             console.log(meterNum+'meterNum')
             console.log(keySignature.root+'keySignature')
             console.log('below is MBJSON')
+
             console.log(musicBlocksJSON)
+            console.log('below the hashmap')
+            console.log(staffBlocksMap)
             musicBlocksHeader.push(
             [blockId, ["start", {collapsed: false}], 100, 100, [null,blockId+1, null]],
             [blockId+1, "print", 0, 0, [blockId, blockId + 2,blockId+3]],
