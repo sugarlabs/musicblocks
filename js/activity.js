@@ -3875,21 +3875,32 @@ class Activity {
                                 blockId = blockId + 9;
                             }
                         });
-                        //update the newnote connection with action
+                        //update the newnote connection with hidden
+                        
                         actionBlock[0][4][0]=blockId+3
+                        
+
+
                         actionBlock[actionBlock.length-1][4][1]=null
                         //update the namedo block
-                        if(musicBlocksJSON.length!=0){
+                        if(staffBlocksMap[staffIndex].baseBlocks.length!=0){
                             //update the name do blocid with next bloc id 
-                            musicBlocksJSON[musicBlocksJSON.length - 1][musicBlocksJSON[musicBlocksJSON.length - 1].length - 4][4][1] = blockId;
+                            // musicBlocksJSON[musicBlocksJSON.length - 1][musicBlocksJSON[musicBlocksJSON.length - 1].length - 4][4][1] = blockId;
+                            // console.log('last Element');
+                            // console.log(musicBlocksJSON[musicBlocksJSON.length - 1][musicBlocksJSON[musicBlocksJSON.length - 1].length - 4] );
+                         //   staffBlocksMap[staffIndex].baseBlocks[staffBlocksMap[staffIndex].baseBlocks.length - 1][staffBlocksMap[staffIndex].baseBlocks[staffBlocksMap[staffIndex].baseBlocks.length - 1].length - 4][4][1] = blockId;
+                            
+                            
+                            staffBlocksMap[staffIndex].baseBlocks[staffBlocksMap[staffIndex].baseBlocks.length - 1][0][staffBlocksMap[staffIndex].baseBlocks[staffBlocksMap[staffIndex].baseBlocks.length - 1][0].length-4][4][1] =blockId
                             console.log('last Element');
-                            console.log(musicBlocksJSON[musicBlocksJSON.length - 1][musicBlocksJSON[musicBlocksJSON.length - 1].length - 4] );
+                            console.log(staffBlocksMap[staffIndex].baseBlocks[staffBlocksMap[staffIndex].baseBlocks.length - 1][0][staffBlocksMap[staffIndex].baseBlocks[staffBlocksMap[staffIndex].baseBlocks.length - 1][0].length-4]);
+                            
                             
                             
                         }   
 
 
-                      actionBlock.push ( [blockId, ["nameddo", {value: `V: ${staffIndex + 1} Line ${musicBlocksJSON.length + 1}`}], 0, 0, [musicBlocksJSON.length === 0 ? 14 : blockId - actionBlock.length -4, null]],
+                        actionBlock.push ( [blockId, ["nameddo", {value: `V: ${staffIndex + 1} Line ${musicBlocksJSON.length + 1}`}], 0, 0, [staffBlocksMap[staffIndex].baseBlocks.length === 0 ? null : staffBlocksMap[staffIndex].baseBlocks[staffBlocksMap[staffIndex].baseBlocks.length - 1][0][staffBlocksMap[staffIndex].baseBlocks[staffBlocksMap[staffIndex].baseBlocks.length - 1][0].length-4][0], null]],
                         [blockId + 1, ["action", {collapsed: false}], 100, 100, [null, blockId + 2, blockId + 3, null]],
                         [blockId + 2, ["text", {value: `V: ${staffIndex + 1} Line ${musicBlocksJSON.length + 1}`}], 0, 0, [blockId + 1]],
                         [blockId + 3, "hidden", 0, 0, [blockId + 1, actionBlock[0][0]]] )// blockid of topaction block
@@ -3897,59 +3908,59 @@ class Activity {
                         blockId=blockId+4
                         musicBlocksJSON.push(actionBlock)
                      
-                        staffBlocksMap[staffIndex].baseBlocks.push(actionBlock);
+                        staffBlocksMap[staffIndex].baseBlocks.push([actionBlock]);
                      
     
                     });
     
                 });
             });
-            blockId=0
-            console.log(meterDen+'meterDen')
-            console.log(meterNum+'meterNum')
-            console.log(keySignature.root+'keySignature')
-            console.log('below is MBJSON')
+            for(const staffIndex in staffBlocksMap){
+                blockId=0
 
-            console.log(musicBlocksJSON)
-            console.log('below the hashmap')
-            console.log(staffBlocksMap)
-            musicBlocksHeader.push(
-            [blockId, ["start", {collapsed: false}], 100, 100, [null,blockId+1, null]],
-            [blockId+1, "print", 0, 0, [blockId, blockId + 2,blockId+3]],
-            [blockId+2, ["text", {value: title}], 0, 0, [blockId+1]],
+                let startBlock = [
+                    [blockId, ["start", {collapsed: false}], 100, 100, [null, blockId + 1, null]],
+                    [blockId + 1, "print", 0, 0, [blockId, blockId + 2, blockId + 3]],
+                    [blockId + 2, ["text", {value: title}], 0, 0, [blockId + 1]],
+                    [blockId + 3, "setturtlename2", 0, 0, [blockId + 1, blockId + 4, blockId + 5]],
+                    [blockId + 4, ["text", {value: `V: ${staffIndex + 1} Line ${musicBlocksJSON.length + 1}`}], 0, 0, [blockId + 3]],
+                    [blockId + 5, "meter", 0, 0, [blockId + 3, blockId + 6, blockId + 7, blockId + 10]],
+                    [blockId + 6, ["number", {value: staffBlocksMap[staffIndex].meterNum}], 0, 0, [blockId + 5]],
+                    [blockId + 7, "divide", 0, 0, [blockId + 5, blockId + 8, blockId + 9]],
+                    [blockId + 8, ["number", {value: 1}], 0, 0, [blockId + 7]],
+                    [blockId + 9, ["number", {value: staffBlocksMap[staffIndex].meterDen}], 0, 0, [blockId + 7]],
+                    [blockId + 10, "vspace", 0, 0, [blockId + 5, blockId + 11]],
+                    [blockId + 11, "setkey2", 0, 0, [blockId + 10, blockId + 12, blockId + 13, blockId + 14]],
+                    [blockId + 12, ["notename", {value: staffBlocksMap[staffIndex].keySignature.root}], 0, 0, [blockId + 11]],
+                    [blockId + 13, ["modename", {value: staffBlocksMap[staffIndex].keySignature.mode == "m" ? "minor" : "major"}], 0, 0, [blockId + 11]],
+                    [blockId + 14, "settimbre", 0, 0, [blockId + 11, blockId + 15, staffBlocksMap[staffIndex].baseBlocks[0][0][staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4][0], blockId + 16]],
+                    [blockId + 15, ["voicename", {value: instruction}], 0, 0, [blockId + 14]],
+                    [blockId + 16, "hidden", 0, 0, [blockId + 14, null]]
+                ];
+                
+                 //update the first namedo block   with settimbre
+                 staffBlocksMap[staffIndex].baseBlocks[0][0][staffBlocksMap[staffIndex].baseBlocks[0][0].length-4][4][0]=blockId+14
+               
+                console.log(`For iter ${staffIndex}`)
+                 console.log(staffBlocksMap[staffIndex].baseBlocks[0][0][staffBlocksMap[staffIndex].baseBlocks[0][0].length-4])
+                
+                
+                 let lineBlock = staffBlocksMap[staffIndex].baseBlocks.reduce((acc, curr) => acc.concat(curr), []);
+                 let flattenedLineBlock = lineBlock.flat(); // Flatten the multidimensional array
+                 let combinedBlock = [...startBlock, ...flattenedLineBlock];
+                
+                console.log('below is the combine block');
+                console.log(combinedBlock)
+                this.blocks.loadNewBlocks(combinedBlock);
+                blockId=blockId+17
+            }
+    
             
-            [blockId+3, "setturtlename2", 0, 0, [blockId+1,blockId+4,blockId+5]],
-            [blockId+4, ["text", {value: "V:1 Line 1"}], 0, 0, [blockId+3]],
-            [blockId+5, "meter", 0, 0, [blockId+3,blockId+6,blockId+7,blockId+10]],
-            [blockId+6, ["number", {value: meterNum}], 0, 0, [blockId+5]],
-            [blockId+7, "divide", 0, 0, [blockId+5,blockId+8,blockId+9]],
-            [blockId+8, ["number", {value: 1}], 0, 0, [blockId+7]],
-            [blockId+9, ["number", {value: meterDen}], 0, 0, [blockId+7]],
-            [blockId+10, "vspace", 0, 0, [blockId+5,blockId+11]],
-            [blockId+11, "setkey2", 0, 0, [blockId+10, blockId + 12, blockId + 13, blockId+14]],
-            [blockId+12, ["notename",{value:keySignature.root}], 0, 0, [blockId+11]],
-            [blockId+13, ["modename", {value: keySignature.mode=="m"?"minor":"major"}], 0, 0, [blockId+11]],
-            [blockId+14, "settimbre", 0, 0, [blockId +11, blockId+15,  musicBlocksJSON[0][musicBlocksJSON[0].length - 4][0], blockId + 16]],
-            [blockId+15, ["voicename", {value: instruction}], 0, 0, [blockId +14]],
-            [blockId+16, "hidden", 0, 0, [blockId+14, null]],
 
-            );
-
-          let combined_array=[...musicBlocksHeader]
-         combined_array=     combined_array.concat(...musicBlocksJSON)
-
-          
-       
-          console.log('combined_array')
-          console.log(combined_array)
-
-          console.debug ('finished when you see: "block loading finished "');
-            document.body.style.cursor = "wait";
-            console.log(combined_array)
            
 
-            // logo.textMsg(_("MIDI loading. This may take some time depending upon the number of notes in the track"));
-            this.blocks.loadNewBlocks(combined_array);
+            // // logo.textMsg(_("MIDI loading. This may take some time depending upon the number of notes in the track"));
+            // this.blocks.loadNewBlocks(combined_array);
             return null;
 
         }
