@@ -3781,20 +3781,20 @@ class Activity {
                 document.attachEvent("finishedLoading", __functionload);
             }
         };
-
         function adjustPitch(note, keySignature) {
             const accidental = keySignature.accidentals.find(acc => {
-              const noteToCompare = acc.note.toUpperCase().replace(',', '');
-              note = note.replace(',', '');
-              return noteToCompare === note;
+                const noteToCompare = acc.note.toUpperCase().replace(',', '');
+                note = note.replace(',', '');
+                return noteToCompare.toLowerCase() === note.toLowerCase();
             });
-          
+        
             if (accidental) {
-              return note + (accidental.acc === "sharp" ? "♯" : (accidental.acc === "flat" ? "♭" : ""));
+                return note + (accidental.acc === "sharp" ? "♯" : (accidental.acc === "flat" ? "♭" : ""));
             } else {
-              return note;
+                return note;
             }
-          }
+        }
+        
           function abcToStandardValue(pitchValue) {
            
             
@@ -3830,13 +3830,10 @@ class Activity {
         
         this.parseABC = async function (tune) {
             let musicBlocksJSON = [];
-            let musicBlocksHeader =[];
+            
             let staffBlocksMap = {};
             let organizeBlock={}
             let blockId = 0;
-            let keySignature='C'; //if Key signature consider C Maj as constant key 
-            let meterNum = 4; //if Key signature consider C Maj as constant key 
-            let meterDen = 4;
 
         
             const title = (tune.metaText?.title ?? "title").toString().toLowerCase();
@@ -3874,7 +3871,7 @@ class Activity {
                                 [blockId + 1, "print", 0, 0, [blockId, blockId + 2, blockId + 3]],
                                 [blockId + 2, ["text", {value: title}], 0, 0, [blockId + 1]],
                                 [blockId + 3, "setturtlename2", 0, 0, [blockId + 1, blockId + 4, blockId + 5]],
-                                [blockId + 4, ["text", {value: `V: ${lineId } Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1}`}], 0, 0, [blockId + 3]],
+                                [blockId + 4, ["text", {value: `Voice ${parseInt(lineId)+1 } `}], 0, 0, [blockId + 3]],
                                 [blockId + 5, "meter", 0, 0, [blockId + 3, blockId + 6, blockId + 7, blockId + 10]],
                                 [blockId + 6, ["number", {value: staff?.meter?.value[0]?.num || 4}], 0, 0, [blockId + 5]],
                                 [blockId + 7, "divide", 0, 0, [blockId + 5, blockId + 8, blockId + 9]],
@@ -3931,9 +3928,9 @@ class Activity {
                         }   
 
 
-                        actionBlock.push ( [blockId, ["nameddo", {value: `V: ${lineId } Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1}`}], 0, 0, [staffBlocksMap[lineId].baseBlocks.length === 0 ? null : staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0][staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0].length-4][0], null]],
+                        actionBlock.push ( [blockId, ["nameddo", {value: `V: ${parseInt(lineId)+1} Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1}`}], 0, 0, [staffBlocksMap[lineId].baseBlocks.length === 0 ? null : staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0][staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0].length-4][0], null]],
                         [blockId + 1, ["action", {collapsed: false}], 100, 100, [null, blockId + 2, blockId + 3, null]],
-                        [blockId + 2, ["text", {value: `V: ${lineId } Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1}`}], 0, 0, [blockId + 1]],
+                        [blockId + 2, ["text", {value: `V: ${parseInt(lineId)+1} Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1}`}], 0, 0, [blockId + 1]],
                         [blockId + 3, "hidden", 0, 0, [blockId + 1, actionBlock[0][0]]] )// blockid of topaction block
                         
                         blockId=blockId+4
