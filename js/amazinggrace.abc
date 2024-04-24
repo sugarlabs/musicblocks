@@ -5,10 +5,18 @@ M: 3/4
 L: 1/8
 K: Dmaj
 V:1
-Ad
+Ad|"D"d4 fe/d/|"D"f4 fe|"G"d4 B2|"D"A4 Ad|
 V:2
-d2
+d2|A4 dB/A/|d4 AB|B4 d2|f4 df|
 V:1
-Ad
+"Bm"d4 fe/d/|"E7" f4 ef|"Asus" a6|"A/G"a4 fa||
 V:2
-d2
+f4 dB/A/|B4 Bd|d6|c4 df||
+V:1
+"D"a4 fe/d/|"D"f4 fe|"G"d4 B2|"D"A4 Ad|
+V:2
+f4 dB/A/|d4 AB|B4 d2|f4 df|
+V:1
+"Bm"d4 fe/d/|"E7"f4 "G/A"e2|"D" d6|"D"D4||
+V:2
+f4 dB/A/|B4 G2|F6|F4||
