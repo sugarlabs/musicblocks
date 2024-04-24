@@ -3832,8 +3832,8 @@ class Activity {
             let musicBlocksJSON = [];
             let musicBlocksHeader =[];
             let staffBlocksMap = {};
-
-            let blockId = 17;
+            let organizeBlock={}
+            let blockId = 0;
             let keySignature='C'; //if Key signature consider C Maj as constant key 
             let meterNum = 4; //if Key signature consider C Maj as constant key 
             let meterDen = 4;
@@ -3841,37 +3841,68 @@ class Activity {
         
             const title = (tune.metaText?.title ?? "title").toString().toLowerCase();
             const instruction = (tune.metaText?.instruction ?? "guitar").toString().toLowerCase();
-        
-           
-        
+            
+
             tune.lines?.forEach(line => {
                 console.log(line );
                 line.staff?.forEach((staff,staffIndex) => {
-                    if (!staffBlocksMap.hasOwnProperty(staffIndex)) {
-                        staffBlocksMap[staffIndex] = {
+                    
+                    if (!organizeBlock.hasOwnProperty(staffIndex)) {
+                        organizeBlock[staffIndex] = {
+                         arrangedBlocks:[]
+                        };
+                   
+                    }
+
+                   organizeBlock[staffIndex].arrangedBlocks.push(staff)
+        
+    
+                });
+            });
+            console.log('below is the arranged blocks')
+            console.log(organizeBlock)
+            for (const lineId in organizeBlock) {
+                organizeBlock[lineId].arrangedBlocks?.forEach((staff,staffIndex) => {
+                    if (!staffBlocksMap.hasOwnProperty(lineId)) {
+                        staffBlocksMap[lineId] = {
                             meterNum: staff?.meter?.value[0]?.num || 4,
                             meterDen: staff?.meter?.value[0]?.den || 4,
                             keySignature: staff.key,
-                            baseBlocks: []
+                            baseBlocks: [],
+                            startBlock: [
+                                [blockId, ["start", {collapsed: false}], 100, 100, [null, blockId + 1, null]],
+                                [blockId + 1, "print", 0, 0, [blockId, blockId + 2, blockId + 3]],
+                                [blockId + 2, ["text", {value: title}], 0, 0, [blockId + 1]],
+                                [blockId + 3, "setturtlename2", 0, 0, [blockId + 1, blockId + 4, blockId + 5]],
+                                [blockId + 4, ["text", {value: `V: ${lineId } Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1}`}], 0, 0, [blockId + 3]],
+                                [blockId + 5, "meter", 0, 0, [blockId + 3, blockId + 6, blockId + 7, blockId + 10]],
+                                [blockId + 6, ["number", {value: staff?.meter?.value[0]?.num || 4}], 0, 0, [blockId + 5]],
+                                [blockId + 7, "divide", 0, 0, [blockId + 5, blockId + 8, blockId + 9]],
+                                [blockId + 8, ["number", {value: 1}], 0, 0, [blockId + 7]],
+                                [blockId + 9, ["number", {value:  staff?.meter?.value[0]?.den || 4}], 0, 0, [blockId + 7]],
+                                [blockId + 10, "vspace", 0, 0, [blockId + 5, blockId + 11]],
+                                [blockId + 11, "setkey2", 0, 0, [blockId + 10, blockId + 12, blockId + 13, blockId + 14]],
+                                [blockId + 12, ["notename", {value: staff.key.root}], 0, 0, [blockId + 11]],
+                                [blockId + 13, ["modename", {value: staff.key.mode == "m" ? "minor" : "major"}], 0, 0, [blockId + 11]],
+                                //In Settimbre instead of null it should be nameddoblock of first action block
+                                [blockId + 14, "settimbre", 0, 0, [blockId + 11, blockId + 15, null, blockId + 16]],
+                                [blockId + 15, ["voicename", {value: instruction}], 0, 0, [blockId + 14]],
+                                [blockId + 16, "hidden", 0, 0, [blockId + 14, null]]
+                            ]
                         };
+                        //for adding startblock
+                        blockId=blockId+17
                     }
-                    keySignature = staff?.key;
-                    console.log('below is the staff')
-                    console.log(staff)
-                    meterNum = staff?.meter?.value[0]?.num ?? meterNum;
-                    meterDen = staff?.meter?.value[0]?.den ?? meterDen;
-                    console.log('Meter Denominator')
-                    console.log(meterDen)
-                    console.log(meterNum)
+        
                     let actionBlock=[]
                     staff.voices.forEach(voice => {
                         console.log(voice)
                      
-                        console.log(keySignature)
+                  
                         voice.forEach(element => {
                             console.log('hello');
                             if (element.el_type === "note") {
-                                createPitchBlocks(element.pitches[0], blockId,element.duration,keySignature,actionBlock);
+                                createPitchBlocks(element.pitches[0], blockId,element.duration,staff.key,actionBlock);
                                 blockId = blockId + 9;
                             }
                         });
@@ -3883,79 +3914,78 @@ class Activity {
 
                         actionBlock[actionBlock.length-1][4][1]=null
                         //update the namedo block
-                        if(staffBlocksMap[staffIndex].baseBlocks.length!=0){
+                        if(staffBlocksMap[lineId].baseBlocks.length!=0){
                             //update the name do blocid with next bloc id 
                             // musicBlocksJSON[musicBlocksJSON.length - 1][musicBlocksJSON[musicBlocksJSON.length - 1].length - 4][4][1] = blockId;
                             // console.log('last Element');
                             // console.log(musicBlocksJSON[musicBlocksJSON.length - 1][musicBlocksJSON[musicBlocksJSON.length - 1].length - 4] );
-                         //   staffBlocksMap[staffIndex].baseBlocks[staffBlocksMap[staffIndex].baseBlocks.length - 1][staffBlocksMap[staffIndex].baseBlocks[staffBlocksMap[staffIndex].baseBlocks.length - 1].length - 4][4][1] = blockId;
+                         //   staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1].length - 4][4][1] = blockId;
                             
                             
-                            staffBlocksMap[staffIndex].baseBlocks[staffBlocksMap[staffIndex].baseBlocks.length - 1][0][staffBlocksMap[staffIndex].baseBlocks[staffBlocksMap[staffIndex].baseBlocks.length - 1][0].length-4][4][1] =blockId
+                            staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0][staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0].length-4][4][1] =blockId
                             console.log('last Element');
-                            console.log(staffBlocksMap[staffIndex].baseBlocks[staffBlocksMap[staffIndex].baseBlocks.length - 1][0][staffBlocksMap[staffIndex].baseBlocks[staffBlocksMap[staffIndex].baseBlocks.length - 1][0].length-4]);
+                            console.log(staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0][staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0].length-4]);
                             
                             
                             
                         }   
 
 
-                        actionBlock.push ( [blockId, ["nameddo", {value: `V: ${staffIndex + 1} Line ${musicBlocksJSON.length + 1}`}], 0, 0, [staffBlocksMap[staffIndex].baseBlocks.length === 0 ? null : staffBlocksMap[staffIndex].baseBlocks[staffBlocksMap[staffIndex].baseBlocks.length - 1][0][staffBlocksMap[staffIndex].baseBlocks[staffBlocksMap[staffIndex].baseBlocks.length - 1][0].length-4][0], null]],
+                        actionBlock.push ( [blockId, ["nameddo", {value: `V: ${lineId } Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1}`}], 0, 0, [staffBlocksMap[lineId].baseBlocks.length === 0 ? null : staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0][staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0].length-4][0], null]],
                         [blockId + 1, ["action", {collapsed: false}], 100, 100, [null, blockId + 2, blockId + 3, null]],
-                        [blockId + 2, ["text", {value: `V: ${staffIndex + 1} Line ${musicBlocksJSON.length + 1}`}], 0, 0, [blockId + 1]],
+                        [blockId + 2, ["text", {value: `V: ${lineId } Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1}`}], 0, 0, [blockId + 1]],
                         [blockId + 3, "hidden", 0, 0, [blockId + 1, actionBlock[0][0]]] )// blockid of topaction block
                         
                         blockId=blockId+4
                         musicBlocksJSON.push(actionBlock)
                      
-                        staffBlocksMap[staffIndex].baseBlocks.push([actionBlock]);
+                        staffBlocksMap[lineId].baseBlocks.push([actionBlock]);
                      
     
                     });
     
                 });
-            });
-            for(const staffIndex in staffBlocksMap){
-                blockId=0
-
-                let startBlock = [
-                    [blockId, ["start", {collapsed: false}], 100, 100, [null, blockId + 1, null]],
-                    [blockId + 1, "print", 0, 0, [blockId, blockId + 2, blockId + 3]],
-                    [blockId + 2, ["text", {value: title}], 0, 0, [blockId + 1]],
-                    [blockId + 3, "setturtlename2", 0, 0, [blockId + 1, blockId + 4, blockId + 5]],
-                    [blockId + 4, ["text", {value: `V: ${staffIndex + 1} Line ${musicBlocksJSON.length + 1}`}], 0, 0, [blockId + 3]],
-                    [blockId + 5, "meter", 0, 0, [blockId + 3, blockId + 6, blockId + 7, blockId + 10]],
-                    [blockId + 6, ["number", {value: staffBlocksMap[staffIndex].meterNum}], 0, 0, [blockId + 5]],
-                    [blockId + 7, "divide", 0, 0, [blockId + 5, blockId + 8, blockId + 9]],
-                    [blockId + 8, ["number", {value: 1}], 0, 0, [blockId + 7]],
-                    [blockId + 9, ["number", {value: staffBlocksMap[staffIndex].meterDen}], 0, 0, [blockId + 7]],
-                    [blockId + 10, "vspace", 0, 0, [blockId + 5, blockId + 11]],
-                    [blockId + 11, "setkey2", 0, 0, [blockId + 10, blockId + 12, blockId + 13, blockId + 14]],
-                    [blockId + 12, ["notename", {value: staffBlocksMap[staffIndex].keySignature.root}], 0, 0, [blockId + 11]],
-                    [blockId + 13, ["modename", {value: staffBlocksMap[staffIndex].keySignature.mode == "m" ? "minor" : "major"}], 0, 0, [blockId + 11]],
-                    [blockId + 14, "settimbre", 0, 0, [blockId + 11, blockId + 15, staffBlocksMap[staffIndex].baseBlocks[0][0][staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4][0], blockId + 16]],
-                    [blockId + 15, ["voicename", {value: instruction}], 0, 0, [blockId + 14]],
-                    [blockId + 16, "hidden", 0, 0, [blockId + 14, null]]
-                ];
-                
-                 //update the first namedo block   with settimbre
-                 staffBlocksMap[staffIndex].baseBlocks[0][0][staffBlocksMap[staffIndex].baseBlocks[0][0].length-4][4][0]=blockId+14
-               
-                console.log(`For iter ${staffIndex}`)
-                 console.log(staffBlocksMap[staffIndex].baseBlocks[0][0][staffBlocksMap[staffIndex].baseBlocks[0][0].length-4])
-                
-                
-                 let lineBlock = staffBlocksMap[staffIndex].baseBlocks.reduce((acc, curr) => acc.concat(curr), []);
-                 let flattenedLineBlock = lineBlock.flat(); // Flatten the multidimensional array
-                 let combinedBlock = [...startBlock, ...flattenedLineBlock];
-                
-                console.log('below is the combine block');
-                console.log(combinedBlock)
-                this.blocks.loadNewBlocks(combinedBlock);
-                blockId=blockId+17
             }
-    
+         
+            let testblock = [];
+            console.log('below is the staff Block map')
+            console.log(staffBlocksMap)
+            for (const staffIndex in staffBlocksMap) {
+                console.log('startblock settrimbre');
+                console.log(staffBlocksMap[staffIndex].startBlock[staffBlocksMap[staffIndex].startBlock.length - 3]);
+                console.log('nameddo block first action block');
+                staffBlocksMap[staffIndex].startBlock[staffBlocksMap[staffIndex].startBlock.length - 3][4][2] = staffBlocksMap[staffIndex].baseBlocks[0][0][staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4][0];
+                console.log('startblock settrimbre');
+                console.log(staffBlocksMap[staffIndex].startBlock[staffBlocksMap[staffIndex].startBlock.length - 3]);
+                console.log(staffBlocksMap[staffIndex].baseBlocks[0][0][staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4][0]);
             
+                // Update the first namedo block with settimbre
+                staffBlocksMap[staffIndex].baseBlocks[0][0][staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4][4][0] = staffBlocksMap[staffIndex].startBlock[staffBlocksMap[staffIndex].startBlock.length - 3][0];
+            
+                console.log(`For iter ${staffIndex}`);
+                console.log(staffBlocksMap[staffIndex].baseBlocks[0][0][staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4]);
+            
+                let lineBlock = staffBlocksMap[staffIndex].baseBlocks.reduce((acc, curr) => acc.concat(curr), []);
+                let flattenedLineBlock = lineBlock.flat(); // Flatten the multidimensional array
+                let combinedBlock = [...staffBlocksMap[staffIndex].startBlock, ...flattenedLineBlock];
+            
+                testblock.push(...staffBlocksMap[staffIndex].startBlock);
+                testblock.push(...flattenedLineBlock);
+            
+                console.log('Below is the combined block:');
+                console.log(combinedBlock);
+            }
+            
+            console.log('below is the staff Block map')
+            console.log(staffBlocksMap);
+            
+            console.log('Test block:');
+            console.log(testblock);
+            
+            console.log('test block is ')
+            console.log(testblock)
+    
+          this.blocks.loadNewBlocks(testblock);
 
            
 
