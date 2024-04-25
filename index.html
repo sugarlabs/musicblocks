@@ -179,6 +179,68 @@
                       // Show the loading text after 6 seconds
                       loadingText.style.opacity = 1;
                     }, 4000); // Change 6000 to adjust the delay (in milliseconds)
+                    // Load the color profiles into the dropdown
+
+                    populateDropdownFromLocalStorage();
+
+                    const colorPicker = document.getElementById('colorPicker');
+                    const saveColor = document.getElementById('saveColor');
+                    const deleteColor = document.getElementById('deleteColor');
+                    const profileDropdown = document.getElementById('profileDropdown');
+
+                    // Save new profile to local storage
+                    saveColor.addEventListener('click', function() {
+                        const selectedColor = colorPicker.value;
+                        const profiles = getProfilesFromLocalStorage();
+                        console.log("inside add button")
+                        // Create a new profile object
+                        const newProfile = {
+                            name: selectedColor, 
+                            color: selectedColor
+                        };
+
+                        // Save profile to local storage
+                        profiles.push(newProfile);
+                        localStorage.setItem('colorProfiles', JSON.stringify(profiles));
+                        populateDropdownFromLocalStorage(); // Repopulate dropdown with the new profile
+                    });
+
+                    deleteColor.addEventListener('click', function() {
+                        const selectedColor = colorPicker.value;
+                        const profiles = getProfilesFromLocalStorage();
+                        console.log("inside delete button")
+                        // Remove selected color from local storage
+                         // Find the index of the profile with the selected color
+                        const indexToDelete = profiles.findIndex(profile => profile.color === selectedColor);
+
+                        // Make sure the profile was found before trying to remove it
+                        if (indexToDelete !== -1) {
+                            profiles.splice(indexToDelete, 1); // Remove the profile
+                        }
+                        // Save the updated profiles array back to local storage
+                        localStorage.setItem('colorProfiles', JSON.stringify(profiles));
+                        populateDropdownFromLocalStorage(); // Repopulate dropdown with the new profile
+                    });
+
+                    // Load the selected color profile
+                    profileDropdown.addEventListener('change', function(event) {
+                        const selectedProfileIndex = event.target.value;
+                        const profiles = getProfilesFromLocalStorage();
+
+                        if (selectedProfileIndex && profiles[selectedProfileIndex]) {
+                            // set the nav bar color to profile setting
+                            console.log("inside set color ");
+                            var elements = document.querySelectorAll('.nav-wrapper.blue');
+                            console.log("selected doc");
+                            console.log(elements);
+                            elements.forEach(function(element) {
+                                console.log("setting color");
+                                element.style.backgroundColor = profiles[selectedProfileIndex].color; // Replace with the desired background color
+                                
+                            });
+                        }
+                    });
+                    
                   });
               </script>
         </div>
@@ -287,6 +349,7 @@
                         alt="Close"
                     />
                 </div>
+                
             </div>
                 <div
                     class="popupMsg"
@@ -508,9 +571,9 @@
                 </div>
             </div>
 
-            <div class="materialize-iso" tabindex="-1">
+            <div class="materialize-iso" id="parent-nav" tabindex="-1">
                 <nav id="toolbars" class="nav-wrapper" role="navigation">
-                    <div class="blue nav-wrapper" tabindex="-1">
+                    <div class="blue nav-wrapper" id="nav1" tabindex="-1">
                         <div
                             id="mb-logo"
                             class="logo left tooltipped"
@@ -652,7 +715,7 @@
                         style="display: none;"
                         tabindex="-1"
                     >
-                        <div class="blue darken-1 nav-wrapper" tabindex="-1">
+                        <div class="blue darken-1 nav-wrapper" id="nav2" tabindex="-1">
                             <ul class="aux left">
                                 <li>
                                     <a
@@ -732,6 +795,24 @@
                                         ></a
                                     >
                                 </li>
+                                <li>
+                                    <a
+                                        id="colorSelector"
+                                        class="tooltipped"
+                                        data-position="left">
+                                        <i class="material-icons md-48">color_lens</i>
+                                    </a>
+                                    <div class="ColorDiv" style="background-color: white; height: auto; width: auto; display: flex; flex-direction: column;">
+                                        <input type="color" id="colorPicker" >
+                                        <button id="deleteColor" style="background-color: white; color:black; padding: auto; border-color: #FFFFFF; width: auto; height: auto; font-size: 12px;">Delete</button>
+                                        <button id="saveColor" style="background-color: white; color:black; padding: auto; border-color: #FFFFFF; width: auto; height: auto; font-size: 12px;">Add Profile</button>
+                                        <select id="profileDropdown" style="color: rgb(2, 2, 2); background-color: white; display: block; height:auto; width:auto; font-size: 12px;">
+                                            <!-- Options will be dynamically populated from local storage -->
+                                        </select>
+                                    </div>
+                                    
+                                </li>
+                                
                                 <li>
                                     <a
                                         id="mergeWithCurrentIcon"
@@ -865,6 +946,8 @@
                     <li><a id="he"></a></li>
                 </ul>
 
+
+
                 <ul id="newdropdown" class="dropdown-content">
                     <li><a id="new-project"></a></li>
                 </ul>
@@ -917,12 +1000,36 @@
             document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
             document.addEventListener('mozfullscreenchange', handleFullscreenChange);
             document.addEventListener('MSFullscreenChange', handleFullscreenChange);
-          
+
+
+            function populateDropdownFromLocalStorage() {
+                const profiles = getProfilesFromLocalStorage();
+                const profileDropdown = document.getElementById('profileDropdown');
+
+                // Clear existing options
+                profileDropdown.innerHTML = '';
+
+                // Populate dropdown with options from local storage
+                profiles.forEach((profile, index) => {
+                    const option = document.createElement('option');
+                    option.value = index; // Index in the local storage array
+                    option.textContent = profile.name;
+                    profileDropdown.appendChild(option);
+                });
+            }
+
+            function getProfilesFromLocalStorage() {
+                // Retrieve profiles from local storage or set to empty array if none exist
+                const storedProfiles = localStorage.getItem('colorProfiles');
+                return storedProfiles ? JSON.parse(storedProfiles) : [];
+            }
+
             function handleFullscreenChange() {
               var iconCode = document.querySelector('#FullScrIcon');
               count = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement ? 1 : 0;
               iconCode.textContent = count ? '\ue5d1' : '\ue5d0';
             }
+            
           </script>
         </div>
         </div>

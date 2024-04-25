@@ -71,6 +71,7 @@ class Toolbar {
                 ["restoreIcon", _("Restore")],
                 ["beginnerMode", _("Switch to beginner mode")],
                 ["advancedMode", _("Switch to advanced mode")],
+                ["colorSelector", _("Color Profiles")],
                 ["languageSelectIcon", _("Select language")],
                 ["save-html-beg", _("Save project as HTML"), "innerHTML"],
                 ["save-png-beg", _("Save mouse artwork as PNG"), "innerHTML"],
@@ -132,6 +133,7 @@ class Toolbar {
                 _("Restore"),
                 _("Switch to beginner mode"),
                 _("Switch to advanced mode"),
+                _("Color Profiles"),
                 _("Select language"),
                 _("Save project as HTML"),
                 _("Save mouse artwork as SVG"),
@@ -196,6 +198,7 @@ class Toolbar {
                 ["restoreIcon", _("Restore")],
                 ["beginnerMode", _("Switch to beginner mode")],
                 ["advancedMode", _("Switch to advanced mode")],
+                ["colorSelector", _("Color Profiles")],
                 ["languageSelectIcon", _("Select language")],
                 ["save-html-beg", _("Save project as HTML"), "innerHTML"],
                 ["save-png-beg", _("Save turtle artwork as PNG"), "innerHTML"],
@@ -252,6 +255,7 @@ class Toolbar {
                 _("Restore"),
                 _("Switch to beginner mode"),
                 _("Switch to advanced mode"),
+                _("Color Profiles"),
                 _("Select language"),
                 _("Save project as HTML"),
                 _("Save turtle artwork as PNG"),
@@ -708,6 +712,9 @@ class Toolbar {
             }
         };
     }
+
+
+
 
     /**
      * @public
