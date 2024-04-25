@@ -509,7 +509,7 @@
   color: #304ffe !important;
 }
 .materialize-iso .blue {
-  background-color: #2196F3; /*chnaged*/
+  background-color: #2196F3; 
 }
 .materialize-iso .blue-text {
   color: #2196F3 !important;
@@ -545,7 +545,7 @@
   color: #42A5F5 !important;
 }
 .materialize-iso .blue.darken-1 {
-  background-color: #1E88E5; /*chnaged*/
+  background-color: #1E88E5;
 }
 .materialize-iso .blue-text.text-darken-1 {
   color: #1E88E5 !important;
