@@ -24,7 +24,7 @@ const ABCHEADER = "X:1\nT:Music Blocks composition\nC:Mr. Mouse\nL:1/16\nM:C\n";
 
 /**
  * Returns the header string used for the ABC notation output.
- * The ABC header includes metadata for a music composition.
+ * The ABC header includes metadata for a music  composition.
  *
  * @returns {string} The ABC header string.
  */
