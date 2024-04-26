@@ -1739,3 +1739,8 @@ table {
     clear: both;
   }
 }
+
+/* Dark mode background color */
+canvas.dark-mode {
+  background-color: #1a1a1a !important;
+}

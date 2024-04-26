@@ -726,7 +726,6 @@ class Activity {
                 this.turtles.turtleList[turtle].painter.penState = savedPenState;
             }
         };
-
         /**
          * @param zero {hides container}
          * @param one {shows container}
@@ -1330,6 +1329,26 @@ class Activity {
                 }
             }
         };
+        
+        const doSwitchTheme = (activity) => {
+            activity._doSwitchTheme();
+            
+        }
+       
+        // this._backgroundColor
+        
+        this._doSwitchTheme = () => {
+            var canvas = document.getElementById("canvas");
+            canvas.classList.toggle("dark-mode");
+            // this.turtles.setBackgroundColor("#1a1a1");
+            // changeTurtle();
+        }
+        
+        // const toggleCanvasBackground = (isDarkMode) => {
+        //     // Toggle dark mode class on canvas
+        //     var canvas = document.getElementById("canvas");
+        //     canvas.classList.toggle("dark-mode");
+        // }
 
         /*
          * Switches between beginner/advanced mode
@@ -1338,6 +1357,7 @@ class Activity {
             activity._doSwitchMode();
         };
 
+        
         /**
          * Switches between beginner and advanced modes.
          * Displays a message prompting browser refresh to apply mode change.
@@ -2944,8 +2964,7 @@ class Activity {
             const $j = jQuery.noConflict();
             let w = 0,
                 h = 0;
-            if (typeof platform !== 'undefined' &&
-                    !platform.androidWebkit) {
+            if (!platform.androidWebkit) {
                 w = window.innerWidth;
                 h = window.innerHeight;
             } else {
@@ -3100,8 +3119,7 @@ class Activity {
             this.update = true;
 
             // Hide tooltips on mobile
-            if (typeof platform !== 'undefined' &&
-                    platform.mobile) {
+            if (platform.mobile) {
                 // palettes.setMobile(true);
                 // palettes.hide();
                 this.toolbar.disableTooltips($j);
@@ -5103,6 +5121,7 @@ class Activity {
 
             this.trashcan = new Trashcan(this);
             this.turtles = new Turtles(this);
+            // this.turtles.setBackgroundColor("#1a1a1a");
             this.boundary = new Boundary(this.blocksContainer);
             this.blocks = new Blocks(this);
             this.palettes = new Palettes(this);
@@ -5148,6 +5167,7 @@ class Activity {
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
             this.toolbar.renderMenuIcon(showHideAuxMenu);
             this.toolbar.renderHelpIcon(showHelp);
+            this.toolbar.renderDarkModeIcon(doSwitchTheme);
             this.toolbar.renderModeSelectIcon(doSwitchMode);
             this.toolbar.renderRunSlowlyIcon(doSlowButton);
             this.toolbar.renderRunStepIcon(doStepButton);
