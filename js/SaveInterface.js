@@ -106,8 +106,8 @@ class SaveInterface {
             }
 
             if (
-                this.PlanetInterface.getTimeLastSaved() !== this.timeLastSaved &&
-                this.PlanetInterface !== undefined
+                typeof this.PlanetInterface !== 'undefined' &&
+                this.PlanetInterface.getTimeLastSaved() !== this.timeLastSaved
             ) {
                 event.preventDefault();
                 // Will trigger when exit/reload cancelled.
