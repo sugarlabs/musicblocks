@@ -358,13 +358,16 @@ Bender ([@walterbender](https://github.com/walterbender))_.
 functional and user-interface designs. Many of his contributions were
 inspired by the music education ideas, representations and practices
 (e.g. aspects of matrix, musical cups) developed and published by
-[_Larry Scripp_](http://www.larryscripp.net/) with whom _Devin_
-studied at New England Conservatory and for whom he worked at Affron
-Scripp & Associates, LLC, [Center for Music and the Arts in Education
-(CMAIE)](http://centerformie.org/), and [Music in
-Education](http://music-in-education.org/). Some of the initial
-graphics were contributed by [_Chie
-Yasuda_](http://www.chieyasuda.com).
+[_Larry
+Scripp_](https://web.archive.org/web/20160204212801/http://www.larryscripp.net/)
+with whom _Devin_ studied at New England Conservatory and for whom he
+worked at Affron Scripp & Associates, LLC, [Center for Music and the
+Arts in Education
+(CMAIE)](https://web.archive.org/web/20210713204847/http://centerformie.org/),
+and [Music in
+Education](https://web.archive.org/web/20231130103746/http://music-in-education.org/). Some
+of the initial graphics were contributed by [_Chie
+Yasuda_](https://www.chieyasuda.com).
 
 Much of the initial coding specific to Music Blocks was done by _Yash
 Khandelwal ([@khandelwalYash](https://github.com/khandelwalYash))_ as
