@@ -678,6 +678,14 @@ class Block {
         this.container.updateCache();
     }
 
+    unhighlightSelectedBlocks (blk, selection) {
+        if(selection){
+            this.blocks.unhighlight(blk, true);
+            this.disconnectedBitmap.visible = true;
+            this.container.updateCache();
+        };
+    }
+
     /**
      * Resize and update number of slots in argClamp.
      * @public
@@ -2752,8 +2760,9 @@ class Block {
             if (!that.activity.logo.runningLilypond) {
                 document.body.style.cursor = "pointer";
             }
-
-            that.blocks.highlight(thisBlock, true);
+            if (!that.blocks.selectionModeOn) {
+                that.blocks.highlight(thisBlock, true);
+            }
             that.blocks.activeBlock = thisBlock;
             // that.activity.refreshCanvas();
         });
@@ -3043,8 +3052,9 @@ class Block {
                 that.blocks.longPressTimeout = null;
                 that.blocks.clearLongPress();
             }
-
-            that.blocks.unhighlight(thisBlock, true);
+            if(!that.blocks.selectionModeOn){
+                that.blocks.unhighlight(thisBlock, true);
+            }
             that.blocks.activeBlock = null;
 
             moved = false;

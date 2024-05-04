@@ -256,6 +256,15 @@ class Activity {
         this.projectID = null;
         this.storage = localStorage;
 
+        // Flag to indicate whether the user is performing a 2D drag operation.
+        this.isDragging = false;
+
+        // Flag to indicate the selection mode is on
+        this.selectionModeOn = false;
+
+        // Flag to check if the helpful search widget is active or not (for "click" event handler purpose)
+        this.isHelpfulSearchWidgetOn = false;
+
         this.beginnerMode = true;
         try {
             if (this.storage.beginnerMode === undefined) {
@@ -457,6 +466,19 @@ class Activity {
             }
 
             this.showHelpfulSearchWidget();
+            this.isHelpfulSearchWidgetOn = true;
+        }
+
+        // hides helpfulSearchDiv on canvas
+
+        this._hideHelpfulSearchWidget = (e) => {
+                if (docById("helpfulWheelDiv").style.display !== "none") {
+                    docById("helpfulWheelDiv").style.display = "none";
+                }
+                if (docById("helpfulSearchDiv").style.display !== "none" && e.target.id !== "helpfulSearch") {
+                    docById("helpfulSearchDiv").style.display = "none";
+                }
+                that.__tick();
         }
 
         /*
@@ -5009,6 +5031,195 @@ class Activity {
             img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svgData));
         };
 
+        // Setup mouse events to start the drag
+
+        this.setupMouseEvents = () => {
+            document.addEventListener(
+                "mousedown",
+                (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (event.target.id === "myCanvas") {
+                        this._createDrag(event);
+                    }
+                },
+                false
+            );
+        };
+
+        // deselect the selected blocks
+
+        this.deselectSelectedBlocks = () => {
+            this.unhighlightSelectedBlocks(false);
+            this.setSelectionMode(false);
+        }
+
+
+        this._create2Ddrag = () => {
+            this.dragArea = {};
+            this.selectedBlocks = [];
+            this.startX = 0;
+            this.startY = 0;
+            this.currentX = 0;
+            this.currentY = 0;
+            this.hasMouseMoved = false;
+            this.selectionArea = document.createElement("div");
+            document.body.appendChild(this.selectionArea);
+            
+            this.setupMouseEvents();
+
+            document.addEventListener("mousemove", (event)=>{
+                this.hasMouseMoved = true;
+                event.preventDefault();
+                // this.selectedBlocks = [];
+                if(this.isDragging){
+                    this.currentX = event.clientX;
+                    this.currentY = event.clientY;
+                    if (!this.blocks.isBlockMoving){
+                        this.setSelectionMode(true);
+                        this.drawSelectionArea();
+                        this.selectedBlocks = this.selectBlocksInDragArea();
+                        this.unhighlightSelectedBlocks(true, true);
+                        this.blocks.setSelectedBlocks(this.selectedBlocks);
+                    }    
+                }
+            })
+
+            document.addEventListener("mouseup", (event)=>{
+                event.preventDefault();
+                this.isDragging = false;
+                this.selectionArea.style.display = "none";
+                this.startX = 0;
+                this.startY = 0;
+                this.currentX = 0;
+                this.currentY = 0;
+                setTimeout(()=>{
+                    this.hasMouseMoved = false;
+                }, 100);
+            })
+            
+        };
+
+        // Set starting points of the drag
+
+        this._createDrag = (event) => {
+            this.isDragging = true;
+            this.startX = event.clientX;
+            this.startY = event.clientY;
+        };
+
+        // Draw the area that has been dragged
+
+        this.drawSelectionArea = () => {
+            let x = Math.min(this.startX, this.currentX);
+            let y = Math.min(this.startY, this.currentY);
+            let width = Math.abs(this.currentX - this.startX);
+            let height = Math.abs(this.currentY - this.startY);
+
+            this.selectionArea.style.display = "block";
+            this.selectionArea.style.position = "absolute";
+            this.selectionArea.style.left = x + "px";
+            this.selectionArea.style.top = y + "px";
+            this.selectionArea.style.height = height + "px";
+            this.selectionArea.style.width = width + "px";
+            this.selectionArea.style.zIndex = "9999";
+            this.selectionArea.style.backgroundColor = "rgba(137, 207, 240, 0.5)";
+            this.selectionArea.style.pointerEvents = "none";
+
+            this.dragArea = { x, y, width, height };
+        };
+
+        // Check if the block is overlapping the dragged area.
+
+        this.rectanglesOverlap = (rect1, rect2) => {
+            return (
+                rect1.x + rect1.width > rect2.x &&
+                rect1.x < rect2.x + rect2.width &&
+                rect1.y + rect1.height > rect2.y &&
+                rect1.y < rect2.y + rect2.height
+            );
+        }
+
+        // Select the blocks that overlap the dragged area.
+
+        this.selectBlocksInDragArea = (dragArea, blocks) => {
+            let selectedBlocks = [];
+            this.dragRect = this.dragArea;
+
+            this.blocks.blockList.forEach((block)=>{
+                    this.blockRect = {
+                        x: this.scrollBlockContainer ? block.container.x + this.blocksContainer.x : block.container.x,
+                        y: block.container.y + this.blocksContainer.y,
+                        height: block.height,
+                        width: block.width
+                    };
+                
+                if(this.rectanglesOverlap(this.blockRect, this.dragRect)){
+                    selectedBlocks.push(block);
+                }
+            })
+            return selectedBlocks;
+        }
+
+        // Unhighlight the selected blocks
+
+        this.unhighlightSelectedBlocks = (unhighlight, selectionModeOn) => {
+            for (let i = 0; i < this.selectedBlocks.length; i++) {
+                for (const blk in this.blocks.blockList) {
+                        if (this.isEqual(this.blocks.blockList[blk], this.selectedBlocks[i])){
+                            if(unhighlight){
+                                this.blocks.unhighlightSelectedBlocks(blk, true);
+                            } else{
+                                this.blocks.highlight(blk, true);
+                                this.refreshCanvas();
+                            }
+                    }
+                }
+            }
+        }
+
+        // Check if two blocks are same or not.
+
+        this.isEqual = (obj1, obj2) => {
+            const keys1 = Object.keys(obj1);
+            const keys2 = Object.keys(obj2);
+
+            if (keys1.length !== keys2.length) {
+                return false;
+            }
+
+            for (let key of keys1) {
+                if (!obj2.hasOwnProperty(key)) {
+                    return false;
+                }
+            }
+
+            for (let key of keys1) {
+                if (obj1[key] !== obj2[key]) {
+                    return false;
+                }
+            }
+
+            return true;
+        };
+
+        this.setSelectionMode = (selection) => {
+            if(selection){
+                if (!this.selectionModeOn) {
+                    if (this.selectedBlocks.length !== 0) {
+                        this.selectedBlocks = [];
+                        this.selectionModeOn = selection;
+                        this.blocks.setSelection(this.selectionModeOn);
+                    }
+                }
+            } else {
+                this.selectedBlocks = [];
+                this.selectionModeOn = selection;
+                this.blocks.setSelection(this.selectionModeOn);
+            }
+        }
+
+
         /*
          * Inits everything. The main function.
          */
@@ -5056,13 +5267,13 @@ class Activity {
             });
 
             document.addEventListener("click", (e) => {
-                if (docById("helpfulWheelDiv").style.display !== "none") {
-                    docById("helpfulWheelDiv").style.display = "none";
+                if(!this.hasMouseMoved){
+                    if (this.selectionModeOn) {
+                        this.deselectSelectedBlocks();
+                    } else {
+                        this._hideHelpfulSearchWidget(e);
+                    }
                 }
-                if (docById("helpfulSearchDiv").style.display !== "none" && e.target.id !== "helpfulSearch") {
-                    docById("helpfulSearchDiv").style.display = "none";
-                }
-                that.__tick();
             });
 
             this._createMsgContainer(
@@ -5613,6 +5824,10 @@ class Activity {
             }
 
             this.prepSearchWidget();
+
+            // create functionality of 2D drag to select blocks in bulk
+            
+            this._create2Ddrag();
 
             /*
             document.addEventListener("mousewheel", scrollEvent, false);

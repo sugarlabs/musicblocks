@@ -3436,7 +3436,7 @@ const piemenuBlockContext = (block) => {
                 ele.display = true;
                 ele.fn = stackPasting.bind(that);
             }
-        })
+        });
     };
 
     wheel.navItems[0].navigateFunction = stackPasting;
@@ -3450,7 +3450,17 @@ const piemenuBlockContext = (block) => {
     wheel.navItems[2].navigateFunction = () => {
         that.blocks.activeBlock = blockBlock;
         that.blocks.extract();
-        that.blocks.sendStackToTrash(that.blocks.blockList[blockBlock]);
+        if (that.blocks.selectionModeOn){
+            const blocksArray = that.blocks.selectedBlocks;
+            for(let i = 0; i < blocksArray.length; i++){
+                that.blocks.sendStackToTrash(blocksArray[i]);
+            }
+            // set selection mode to false
+            that.blocks.setSelectionToActivity(false);
+            that.blocks.activity.refreshCanvas();
+        } else {
+            that.blocks.sendStackToTrash(that.blocks.blockList[blockBlock]);
+        }
         docById("contextWheelDiv").style.display = "none";
     };
 

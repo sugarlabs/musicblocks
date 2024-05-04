@@ -161,6 +161,13 @@ class Blocks {
         this.inLongPress = false;
         this.customTemperamentDefined = false;
 
+        // Flag to track a block's movement to avoid drag-to-select functionality while moving a block
+        this.isBlockMoving = false;
+
+        this.selectionModeOn = false;
+
+        this.selectedBlocks = [];
+
         /**
          * We stage deletion of prototype action blocks on the palette so
          * as to avoid palette refresh race conditions.
@@ -2134,7 +2141,7 @@ class Blocks {
 
                 blk = this.insideExpandableBlock(blk);
             }
-
+            this.isBlockMoving = false;
             this.adjustExpandableClampBlock();
             this.activity.refreshCanvas();
         };
@@ -2395,7 +2402,7 @@ class Blocks {
          */
         this.moveBlockRelative = (blk, dx, dy) => {
             this.inLongPress = false;
-
+            this.isBlockMoving = true;
             const myBlock = this.blockList[blk];
             if (myBlock.container != null) {
                 myBlock.container.x += dx;
@@ -7012,6 +7019,22 @@ class Blocks {
             this.show();
             this.bringToTop();
             this.activity.refreshCanvas();
+        };
+
+        this.setSelection = (selection) => {
+            this.selectionModeOn = selection;
+        };
+
+        this.setSelectionToActivity = (selection) => {
+            this.activity.setSelectionMode(selection);
+        };
+
+        this.unhighlightSelectedBlocks = (blk, selection) =>{
+            this.blockList[blk].unhighlightSelectedBlocks(blk, selection);
+        };
+
+        this.setSelectedBlocks = (blocks) => {
+            this.selectedBlocks = blocks;
         };
     }
 }
