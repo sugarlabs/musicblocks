@@ -24,8 +24,7 @@ const ABCHEADER = "X:1\nT:Music Blocks composition\nC:Mr. Mouse\nL:1/16\nM:C\n";
 
 /**
  * Returns the header string used for the ABC notation output.
- * The ABC header includes metadata for a music  composition.
- *
+ * The ABC header includes metadata for a music composition.
  * @returns {string} The ABC header string.
  */
 const getABCHeader = function() {
@@ -34,7 +33,6 @@ const getABCHeader = function() {
 
 /**
  * Processes musical notes and converts them into ABC notation format.
- *
  * @param {object} logo - The logo object containing notationNotes to update.
  * @param {string} turtle - The identifier for the turtle.
  */
@@ -78,7 +76,6 @@ const processABCNotes = function(logo, turtle) {
 
     /**
      * Converts a musical note into ABC notation format.
-     *
      * @param {string|number} note - The musical note to convert. It can be a string note (e.g., 'C#') or a frequency (number).
      * @returns {string} The note converted to ABC notation.
      */
@@ -283,7 +280,6 @@ const processABCNotes = function(logo, turtle) {
 
            /**
             * Processes an incomplete tuplet and appends the corresponding ABC notation to the notation string.
-            *
             * @param {object} logo - The logo object containing notation information.
             * @param {string} turtle - The identifier for the turtle.
             * @param {number} i - The index of the current note within the notation staging.
@@ -456,7 +452,6 @@ const processABCNotes = function(logo, turtle) {
 
 /**
  * Generates ABC notation output based on the notation staging for each turtle in the activity.
- *
  * @param {object} activity - The activity object containing logo and notation information.
  * @returns {string} The generated ABC notation output.
  */
