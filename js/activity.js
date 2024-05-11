@@ -2944,7 +2944,8 @@ class Activity {
             const $j = jQuery.noConflict();
             let w = 0,
                 h = 0;
-            if (!platform.androidWebkit) {
+            if (typeof platform !== 'undefined' &&
+                    !platform.androidWebkit) {
                 w = window.innerWidth;
                 h = window.innerHeight;
             } else {
@@ -3099,7 +3100,8 @@ class Activity {
             this.update = true;
 
             // Hide tooltips on mobile
-            if (platform.mobile) {
+            if (typeof platform !== 'undefined' &&
+                    platform.mobile) {
                 // palettes.setMobile(true);
                 // palettes.hide();
                 this.toolbar.disableTooltips($j);

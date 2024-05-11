@@ -117,7 +117,8 @@ const COLLAPSIBLES = [
     "musickeyboard",
     "temperament",
     "interval",
-    "osctime"
+    "osctime",
+    "definemode"
 ];
 
 /**
