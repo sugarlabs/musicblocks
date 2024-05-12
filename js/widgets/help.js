@@ -43,21 +43,22 @@ class HelpWidget {
         this.isOpen = true;
 
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help", false);
-        widgetWindow.getWidgetBody().style.overflowY = "auto";
+       //widgetWindow.getWidgetBody().style.overflowY = "auto";
         // const canvasHeight = docById("myCanvas").getBoundingClientRect().height;
-        widgetWindow.getWidgetBody().style.maxHeight = "500px";
+        widgetWindow.getWidgetBody().style.maxHeight = "70vh";
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
-        widgetWindow.onClose = () => {
+        widgetWindow.onclose = () => {
             this.isOpen = false;
-            this.destroy();
+            document.onkeydown = activity.__keyPressed; 
+            widgetWindow.destroy();
         };
         // Position the widget and make it visible.
         this._helpDiv = document.createElement("div");
 
         // Give the DOM time to create the div.
-        setTimeout(() => this._setup(useActiveBlock), 0);
+        setTimeout(() => this._setup(useActiveBlock, 0), 0);
 
         // Position center
         setTimeout(this.widgetWindow.sendToCenter, 50);
@@ -68,9 +69,8 @@ class HelpWidget {
      * @param {useActiveBlock} Show help for the active block.
      * @returns {void}
      */
-    _setup(useActiveBlock) {
+    _setup(useActiveBlock, page) {
         // Which help page are we on?
-        let page = 0;
 
         this._helpDiv.style.width = 100 +"%";
         this._helpDiv.style.backgroundColor = "#e8e8e8";
@@ -91,7 +91,12 @@ class HelpWidget {
 
         let leftArrow, rightArrow;
         if (!useActiveBlock) {
-            this.widgetWindow.updateTitle(_("Take a tour"));
+            if (page == 0) {
+                this.widgetWindow.updateTitle(_("Take a tour"));
+            }
+            else {
+                this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
+            }
             rightArrow = document.getElementById("right-arrow");
             rightArrow.style.display = "block";
             rightArrow.classList.add("hover");
@@ -99,33 +104,62 @@ class HelpWidget {
             leftArrow = document.getElementById("left-arrow");
             leftArrow.style.display = "block";
             leftArrow.classList.add("hover");
+            
+            document.onkeydown = function handleArrowKeys(event) {
+                if (event.key === 'ArrowLeft') {
+                    leftArrow.click(); 
+                } else if (event.key === 'ArrowRight') {
+                    rightArrow.click(); 
+                }
+            } ;
 
             let cell = docById("left-arrow");
-
+            if (page === 0){
+                leftArrow.classList.add('disabled');
+            }
             cell.onclick = () => {
-                page = page - 1;
-                if (page < 0) {
-                    page = HELPCONTENT.length - 1;
-                }
-
-                this._showPage(page);
+                    if (page > 0){
+                        page = page - 1;
+                        leftArrow.classList.remove('disabled');
+                        if (page == 0) {
+                            this.widgetWindow.updateTitle(_("Take a tour"));
+                        }
+                        else {
+                            this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
+                        }
+                        this._showPage(page);
+                    }
+                    if (page === 0){
+                        leftArrow.classList.add('disabled');
+                    }
             };
 
             cell = docById("right-arrow");
 
             cell.onclick = () => {
                 page = page + 1;
+                leftArrow.classList.remove('disabled');
                 if (page === HELPCONTENT.length) {
                     page = 0;
                 }
-
+                if (page == 0) {
+                    this.widgetWindow.updateTitle(_("Take a tour"));
+                }
+                else {
+                    this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
+                }
                 this._showPage(page);
             };
         } else {
             if (this.activity.blocks.activeBlock.name !== null) {
                 const label = this.activity.blocks.blockList[this.activity.blocks.activeBlock]
                     .protoblock.staticLabels[0];
-                this.widgetWindow.updateTitle(_(label));
+                    if (page == 0) {
+                        this.widgetWindow.updateTitle(_("Take a tour"));
+                    }
+                    else {
+                        this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
+                    }
             }
 
             rightArrow = document.getElementById("right-arrow");
@@ -141,7 +175,7 @@ class HelpWidget {
             // display help menu
             docById("helpBodyDiv").style.height = "325px";
             docById("helpBodyDiv").style.width = "345px";
-            this._showPage(0);
+            this._showPage(page);
         } else {
             // display help for this block
             if (this.activity.blocks.activeBlock.name !== null) {
@@ -180,7 +214,7 @@ class HelpWidget {
 
                 if (message) {
                     const helpBody = docById("helpBodyDiv");
-                    helpBody.style.height = "";
+                    helpBody.style.height = "70vh";
 
                     let body = "";
                     if (message.length > 1) {
@@ -213,7 +247,7 @@ class HelpWidget {
 
                         // body = body + '<p><img src="' + path + "/" + name + '_block.svg"></p>';
                         const imageSrc = `${path}/${name}_block.svg` ;
-                        body += `<figure><img src=${imageSrc}></figure>`;
+                        body += `<figure style="width:100%;"><img style="max-width:100%;" src=${imageSrc}></figure>`;
                     }
 
                     body += `<p>${message[0]}</p>`;
@@ -260,7 +294,7 @@ class HelpWidget {
                             } else if (typeof message[3] === "string") {
                                 // If it is a string, load the macro
                                 // assocuated with this block
-                                const blocksToLoad = getMacroExpansion(message[3], 100, 100);
+                                const blocksToLoad = getMacroExpansion(this.activity, message[3], 100, 100);
                                 // console.debug("CLICK: " + blocksToLoad);
                                 this.activity.blocks.loadNewBlocks(blocksToLoad);
                             } else {
@@ -329,6 +363,43 @@ class HelpWidget {
                 this._prepareBlockList();
             };
         }
+        else{
+            const cell = docById("right-arrow");
+            let leftArrow = docById("left-arrow");
+            cell.onclick = () => {
+                page = page + 1;
+                leftArrow.classList.remove('disabled');
+                if (page === HELPCONTENT.length) {
+                    page = 0;
+                }
+                if (page == 0) {
+                    this.widgetWindow.updateTitle(_("Take a tour"));
+                }
+                else {
+                    this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
+                }
+                this._showPage(page);
+            };
+            if (page === 0){
+                leftArrow.classList.add('disabled');
+            }
+            leftArrow.onclick = () => {
+                    if (page > 0){
+                        page = page - 1;
+                        leftArrow.classList.remove('disabled');
+                        if (page == 0) {
+                            this.widgetWindow.updateTitle(_("Take a tour"));
+                        }
+                        else {
+                            this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
+                        }
+                        this._showPage(page);
+                    }
+                    if (page === 0){
+                        leftArrow.classList.add('disabled');
+                    }
+            };
+        }
 
         helpBody.style.color = "#505050";
         helpBody.insertAdjacentHTML("afterbegin", body) ;
@@ -385,7 +456,7 @@ class HelpWidget {
         this._helpDiv = document.createElement("div");
 
         //this._helpDiv.style.width = "500px";
-        this._helpDiv.style.height = "500px";
+        this._helpDiv.style.height = "70vh";
         this._helpDiv.style.backgroundColor = "#e8e8e8";
         
         const helpDivHTML =
@@ -393,8 +464,22 @@ class HelpWidget {
         this._helpDiv.insertAdjacentHTML("afterbegin", helpDivHTML) ;
 
         this.widgetWindow.getWidgetBody().append(this._helpDiv);
-        this.widgetWindow.sendToCenter();
         let cell = docById("right-arrow");
+        let rightArrow = docById("right-arrow");
+        let leftArrow = docById("left-arrow");
+
+        document.onkeydown = function handleArrowKeys(event) {
+            if (event.key === 'ArrowLeft') {
+                leftArrow.click(); 
+            } else if (event.key === 'ArrowRight') {
+                rightArrow.click(); 
+            }
+        };
+
+        if(this.index == this.appendedBlockList.length - 1)
+        {
+           rightArrow.classList.add("disabled");
+        }
         cell.onclick = () => {
             if (this.index !== this.appendedBlockList.length - 1) {
                 this.index += 1;
@@ -407,13 +492,19 @@ class HelpWidget {
         cell = docById("left-arrow");
 
         cell.onclick = () => {
-            if (this.index !== 0) {
-                this.index -= 1;
+            if (this.index == 0) {
+                const widgetWindow = window.widgetWindows.windowFor(this, "help", "help");
+                this.widgetWindow = widgetWindow;
+                widgetWindow.clear();
+                this._helpDiv = document.createElement("div");
+                this._setup(false, HELPCONTENT.length-1);
             }
-
-            this._blockHelp(
+            else {
+             this.index -= 1;
+             this._blockHelp (
                 this.activity.blocks.protoBlockDict[this.appendedBlockList[this.index]]
-            );
+             );
+            }
         };
         if (block.name !== null) {
             const label = block.staticLabels[0];
@@ -452,7 +543,7 @@ class HelpWidget {
             const message = block.helpString;
 
             const helpBody = docById("helpBodyDiv");
-            helpBody.style.height = "500px";
+            helpBody.style.height = "70vh";
             helpBody.style.backgroundColor = "#e8e8e8";
             if (message) {
                 let body = "";
@@ -538,7 +629,7 @@ class HelpWidget {
                         } else if (typeof message[3] === "string") {
                             // If it is a string, load the macro
                             // assocuated with this block
-                            const blocksToLoad = getMacroExpansion(message[3], 100, 100);
+                            const blocksToLoad = getMacroExpansion(this.activity, message[3], 100, 100);
                             // console.debug("CLICK: " + blocksToLoad);
                             this.activity.blocks.loadNewBlocks(blocksToLoad);
                         } else {

@@ -1,4 +1,4 @@
-// Copyright (c) 2018,19 Austin George
+// COPYRIGHT (c) 2018,19 Austin George
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -24,7 +24,7 @@ class Toolbar {
      * @constructor
      */
     constructor() {
-        this.stopIconColorWhenPlaying = "#ea174c";
+        this.stopIconColorWhenPlaying = window.platformColor.stopIconcolor;
         this.language = localStorage.languagePreference;
         if (this.language === undefined) {
             this.language = navigator.language;
@@ -49,6 +49,7 @@ class Toolbar {
                 ["record",_("Record")],
                 ["Full Screen", _("Full screen")],
                 ["FullScreen", _("Full screen")],
+		["Toggle Fullscreen", _("Toggle Fullscreen")],
                 ["newFile", _("New project")],
                 ["load", _("Load project from file")],
                 ["saveButton", _("Save project")],
@@ -66,7 +67,7 @@ class Toolbar {
                 ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["chooseKeyIcon", _("Set Pitch Preview")],
-                ["toggleJavaScriptIcon", _("Toggle JavaScript Editor")],
+                ["toggleJavaScriptIcon", _("JavaScript Editor")],
                 ["restoreIcon", _("Restore")],
                 ["beginnerMode", _("Switch to beginner mode")],
                 ["advancedMode", _("Switch to advanced mode")],
@@ -97,6 +98,7 @@ class Toolbar {
                 ["hi", _("हिंदी"), "innerHTML"],
                 ["ibo", _("igbo"), "innerHTML"],
                 ["ar", _("عربى"), "innerHTML"],
+                ["te", _("తెలుగు"), "innerHTML"],
                 ["he", _("עִברִית"), "innerHTML"]
             ];
 
@@ -107,7 +109,8 @@ class Toolbar {
                 _("Stop"),
                 _("Record"),
                 _("Full Screen"),
-                _("FullScreen"),
+                _("Full Screen"),
+                _("Toggle Fullscreen"),
                 _("New project"),
                 _("Load project from file"),
                 _("Save project"),
@@ -125,7 +128,7 @@ class Toolbar {
                 _("Disable horizontal scrolling"),
                 _("Merge with current project"),
                 _("Set Pitch Preview"),
-                _("Toggle JavaScript Editor"),
+                _("JavaScript Editor"),
                 _("Restore"),
                 _("Switch to beginner mode"),
                 _("Switch to advanced mode"),
@@ -138,7 +141,31 @@ class Toolbar {
                 _("Save sheet music as Lilypond"),
                 _("Save block artwork as SVG"),
                 _("Confirm"),
-                _("Select language")
+                _("Select language"),
+                _("Save project as HTML"),
+                _("Save turtle artwork as PNG"),
+                _("Save project as HTML"),
+                _("Save turtle artwork as SVG"),
+                _("Save turtle artwork as PNG"),
+                _("Save block artwork as SVG"),
+                _("Confirm"),
+                _("English (United States)"),
+                _("English (United Kingdom)"),
+                _("日本語"),
+                _("한국인"),
+                _("español"),
+                _("português"),
+                _("にほんご"),
+                _("中文"),
+                _("ภาษาไทย"),
+                _("aymara"),
+                _("quechua"),
+                _("guarani"),
+                _("हिंदी"),
+                _("తెలుగు"),
+                _("igbo"),
+                _("عربى"),
+                _("עִברִית")
             ];
         } else {
             strings = [
@@ -148,6 +175,7 @@ class Toolbar {
                 ["record", _("Record")],
                 ["Full Screen", _("Full Screen")],
                 ["FullScreen", _("Full Screen")],
+		["Toggle Fullscreen", _("Toggle Fullscreen")],
                 ["newFile", _("New project")],
                 ["load", _("Load project from file")],
                 ["saveButton", _("Save project")],
@@ -164,7 +192,7 @@ class Toolbar {
                 ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
                 ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
-                ["toggleJavaScriptIcon", _("Toggle JavaScript Editor")],
+                ["toggleJavaScriptIcon", _("JavaScript Editor")],
                 ["restoreIcon", _("Restore")],
                 ["beginnerMode", _("Switch to beginner mode")],
                 ["advancedMode", _("Switch to advanced mode")],
@@ -191,6 +219,7 @@ class Toolbar {
                 ["hi", _("हिंदी"), "innerHTML"],
                 ["ibo", _("igbo"), "innerHTML"],
                 ["ar", _("عربى"), "innerHTML"],
+                ["te", _("తెలుగు"), "innerHTML"],
                 ["he", _("עִברִית"), "innerHTML"]
             ];
 
@@ -201,7 +230,8 @@ class Toolbar {
                 _("Stop"),
                 _("Record"),
                 _("Full Screen"),
-                _("FullScreen"),
+                _("Full Screen"),
+                _("Toggle Fullscreen"),
                 _("New project"),
                 _("Load project from file"),
                 _("Save project"),
@@ -218,7 +248,7 @@ class Toolbar {
                 _("Enable horizontal scrolling"),
                 _("Disable horizontal scrolling"),
                 _("Merge with current project"),
-                _("Toggle JavaScript Editor"),
+                _("JavaScript Editor"),
                 _("Restore"),
                 _("Switch to beginner mode"),
                 _("Switch to advanced mode"),
@@ -243,6 +273,7 @@ class Toolbar {
                 _("quechua"),
                 _("guarani"),
                 _("हिंदी"),
+                _("తెలుగు"),
                 _("igbo"),
                 _("عربى"),
                 _("עִברִית")
@@ -264,9 +295,11 @@ class Toolbar {
             const trans = strings_[i];
             const elem = docById(obj[0]);
             if (strings[i].length === 3) {
-                elem.innerHTML = obj[1];
+                if (elem !== undefined && elem !== null) {
+                    elem.innerHTML = obj[1];
+                }
             } else {
-                if (elem !== null) {
+                if (elem !== undefined && elem !== null) {
                     elem.setAttribute("data-tooltip", trans);
                 }
             }
@@ -334,6 +367,9 @@ class Toolbar {
         }
 
         var tempClick = playIcon.onclick = () => {
+            const hideMsgs = () => {
+                this.activity.hideMsgs();
+            };
             isPlayIconRunning = false;
             onclick(this.activity);
             handleClick();
@@ -344,6 +380,7 @@ class Toolbar {
             stopIcon.addEventListener("click", function(){
                 clearTimeout(play_button_debounce_timeout);
                 isPlayIconRunning = true;
+                hideMsgs();
                 handleClick();
             });
         };
@@ -407,8 +444,22 @@ class Toolbar {
             WRAP = !WRAP;
             if (WRAP) {
                 wrapButtonTooltipData = _("Turtle Wrap Off");
+                this.activity.helpfulWheelItems.forEach(ele => {
+                    if (ele.label === "Turtle Wrap Off") {
+                        ele.display = true;
+                    } else if (ele.label === "Turtle Wrap On") {
+                        ele.display = false;
+                    }
+                })
             } else {
                 wrapButtonTooltipData = _("Turtle Wrap On");
+                this.activity.helpfulWheelItems.forEach(ele => {
+                    if (ele.label === "Turtle Wrap Off") {
+                        ele.display = false;
+                    } else if (ele.label === "Turtle Wrap On") {
+                        ele.display = true;
+                    }
+                })
             }
 
             wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
@@ -417,6 +468,46 @@ class Toolbar {
                 delay: 100
             });
         };
+    }
+
+    /**
+     * @public
+     * @returns {void}
+     */
+    changeWrap(activity) {
+        const wrapIcon = docById("wrapTurtle");
+        let wrapButtonTooltipData = "";
+
+        WRAP = !WRAP;
+        if (WRAP) {
+            wrapButtonTooltipData = _("Turtle Wrap Off");
+            activity.helpfulWheelItems.forEach(ele => {
+                if (ele.label === "Turtle Wrap Off") {
+                    ele.display = true;
+                } else if (ele.label === "Turtle Wrap On") {
+                    ele.display = false;
+                }
+            })
+        } else {
+            wrapButtonTooltipData = _("Turtle Wrap On");
+            activity.helpfulWheelItems.forEach(ele => {
+                if (ele.label === "Turtle Wrap Off") {
+                    ele.display = false;
+                } else if (ele.label === "Turtle Wrap On") {
+                    ele.display = true;
+                }
+            })
+        }
+
+        wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
+        $j(".tooltipped").tooltip({
+            html: true,
+            delay: 100
+        });
+
+        if (docById("helpfulWheelDiv").style.display !== "none") {
+            docById("helpfulWheelDiv").style.display = "none";
+        }
     }
 
     /**
@@ -705,6 +796,7 @@ class Toolbar {
         const delPluginIcon = docById("delPluginIcon");
         const enableHorizScrollIcon = docById("enableHorizScrollIcon");
         const disableHorizScrollIcon = docById("disableHorizScrollIcon");
+        const toggleJavaScriptIcon = docById("toggleJavaScriptIcon");
         const browser = fnBrowserDetect();
         const btn = document.getElementById("record");
         const hideIn = ["firefox", "safari"];
@@ -742,6 +834,7 @@ class Toolbar {
             loadPluginIcon.style.display = "none";
             delPluginIcon.style.display = "none";
             enableHorizScrollIcon.style.display = "none";
+            toggleJavaScriptIcon.style.display = "none";
         }
     }
 
@@ -891,6 +984,12 @@ class Toolbar {
 
             ar.onclick = () => {
                 languageBox.ar_onclick(this.activity);
+            };
+
+            const te = docById("te");
+
+            te.onclick = () => {
+                languageBox.te_onclick(this.activity);
             };
 
             const he = docById("he");

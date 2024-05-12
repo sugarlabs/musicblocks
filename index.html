@@ -3,8 +3,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <title>
-            Music Blocks is a collection of tools for exploring musical
-            concepts.
+           Music Blocks
         </title>
 
 	    <meta name="description" content="Learn to code through music with Music Blocks. Arrange colorful blocks to create everything from simple melodies to interactive games.">
@@ -17,7 +16,7 @@
         <link rel="stylesheet" href="dist/css/style.css" />
         <link rel="stylesheet" href="dist/css/keyboard.css" />
         <link rel="stylesheet" href="dist/css/windows.css" />
-
+        
         <noscript>
             JavaScript is required to view this page.
         </noscript>
@@ -30,7 +29,7 @@
 
         <script src="lib/reqwest.js" defer></script>
 
-        <script src="lib/jquery-2.1.4.js"></script>
+        <script src="lib/jquery-3.7.1.js"></script>
 
         <script src="lib/jquery-ui.js" defer></script>
 
@@ -104,12 +103,6 @@
                 }
             }
         </script>
-
-        <script type="text/javascript">
-            $(document).ready(function() {
-                doSearch();
-            });
-        </script>
     </head>
 
     <!-- #96D3F3-->
@@ -117,7 +110,7 @@
     </div>
     <div id="movable" tabindex="-1">
         <p>Solfege Pitch Preview</p>
-        <input class="radioBtn" type="radio" name="movable" value="true">
+        <input class="radioBtn" type="radio" name="movable" value="true" id="movabledo">
             <label for="movabledo">Movable Do</label>
         <input class="radioBtn" type="radio" name="movable" id="fixed" checked="checked" value="false">
             <label for="fixed">Fixed</label>
@@ -131,25 +124,30 @@
      >
         <div
             id="loading-image-container"
-            style="position: absolute; width: 100%; height: 100%;cursor: wait;"
+            style="position: absolute; width: 100%; height: 100%;cursor: wait; text-align: center; background-color: #FFFFFF;"
         >
             <script>
                 let loadL10nSplashScreen = function() {
                     console.debug(
                         "The browser is set to " + navigator.language
                     );
+                    let lang = navigator.language;
                     if (localStorage.languagePreference) {
                         console.debug(
                             "Music Blocks is set to " +
                                 localStorage.languagePreference
                         );
-                        let lang = localStorage.languagePreference;
-                    } else {
-                        let lang = navigator.language;
+                        lang = localStorage.languagePreference;
                     }
 
                     console.debug("Using " + lang);
-
+		    if (lang === undefined) {
+			lang = "enUS";
+			console.debug("Reverting to " + lang);
+		    }
+                    
+                    // Intentional placement of SVG image per user request by Japanese Schools.
+                    
                     if (lang === "ja") {
                         document.getElementById(
                             "loading-image-container"
@@ -159,12 +157,30 @@
                         document.getElementById(
                             "loading-image-container"
                         ).innerHTML =
-                            '<video autoplay muted playsinline style="width: 100%; height:500px; margin-top:30px; overflow: hidden;"><source src="loading-animation.webm" type="video/webm"><source src="loading-animation.mp4" type="video/mp4"></video>';
+                            '<video loop autoplay muted playsinline style="width: 100%; height:500px; margin-top:30px; overflow: hidden;"><source src="loading-animation.webm" type="video/webm"><source src="loading-animation.mp4" type="video/mp4"></video>';
                     }
                 };
 
                 loadL10nSplashScreen();
             </script>
+            <div class="loading-text" id="loadingText" style="margin-top:1.5rem;"></div>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    setTimeout(function() {
+                      const loadingText = document.getElementById("loadingText");
+                      const texts = ["Do, Re, Mi, Fa, Sol, La, Ti, Do", "Loading Music Blocks...", "Reading Music..."];
+              
+                      let index = 0;
+                      setInterval(function() {
+                        loadingText.textContent = texts[index];
+                        index = (index + 1) % texts.length;
+                      }, 2000); // Change 2000 to adjust cycle duration (in milliseconds)
+              
+                      // Show the loading text after 6 seconds
+                      loadingText.style.opacity = 1;
+                    }, 4000); // Change 6000 to adjust the delay (in milliseconds)
+                  });
+              </script>
         </div>
 
         <script>
@@ -260,25 +276,42 @@
                 <div
                     class="popupMsg"
                     id="printText"
-                    onclick="hidePrintText()"
                     tabindex="-1"
                 >
+                <div class="contentWrapper">
                     <span id="printTextContent"></span>
                     <img
                         class="msgCloseIcon"
+                        onclick="hidePrintText()"
                         src="images/close.svg"
                         alt="Close"
                     />
                 </div>
-
+            </div>
                 <div
                     class="popupMsg"
                     id="errorText"
-                    onclick="hideErrorText()"
                     tabindex="-1"
                 >
+                <div class="contentWrapper">
                     <span id="errorTextContent"></span>
                     <img
+                        class="msgCloseIcon"
+                        onclick="hideErrorText()"
+                        src="images/close.svg"
+                        alt="Close"
+                    />
+                </div>
+                </div>
+
+                <div
+                    class="clearPop"
+                    id="ClearButton"
+                    tabindex="-1"
+                >
+                    <span id="ClearContent"></span>
+                    <img
+                        id="clearClose"
                         class="msgCloseIcon"
                         src="images/close.svg"
                         alt="Close"
@@ -417,6 +450,8 @@
 
             <div id="contextWheelDiv" class="wheelNav" tabindex="-1"></div>
 
+            <div id="helpfulWheelDiv" class="wheelNav" style="display: none;" tabindex="-1"></div>
+
             <div id="submenuWheelDiv" class="wheelNav" tabindex="-1"></div>
 
             <div
@@ -479,10 +514,11 @@
                         <div
                             id="mb-logo"
                             class="logo left tooltipped"
-                            style="line-height: 0; height: 100%"
+                            style="line-height: 0; height: 100%; padding-right: 0;"
                             data-position="bottom"
                         >
                             <amp-img 
+                            alt="logo"
                             width="100%" 
                             src="images/logo.svg" 
                             >
@@ -823,6 +859,7 @@
 		    <li><a id="quz"></a></li>
                     <li><a id="gug"></a></li>
                     <li><a id="hi"></a></li>
+                    <li><a id="te"></a></li>
                     <li><a id="ibo"></a></li>
                     <li><a id="ar"></a></li>
                     <li><a id="he"></a></li>
@@ -875,6 +912,16 @@
                     iconCode.textContent='\ue5d0';
                     count = 0;
                 }
+            }
+            document.addEventListener('fullscreenchange', handleFullscreenChange);
+            document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+            document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+            document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+          
+            function handleFullscreenChange() {
+              var iconCode = document.querySelector('#FullScrIcon');
+              count = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement ? 1 : 0;
+              iconCode.textContent = count ? '\ue5d1' : '\ue5d0';
             }
           </script>
         </div>

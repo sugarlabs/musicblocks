@@ -106,6 +106,49 @@ class JSEditor {
         menuLeft.style.justifyContent = "end";
         menuLeft.style.alignItems = "center";
 
+        function generateTooltip(targetButton, tooltipText, positionOfTooltip = "bottom") {
+            const tooltipBox = document.createElement("div");
+            const tooltip = document.createElement("div");
+
+            tooltipBox.appendChild(tooltip);
+
+            document.body.appendChild(tooltipBox);
+
+            targetButton.addEventListener("mouseover", () => {
+                const rect = targetButton.getBoundingClientRect();
+
+                tooltip.style.position = "absolute";
+                tooltip.style.visibility = "visible";
+                tooltip.style.opacity = "1";
+                tooltip.style.transition = "opacity 0.2s ease-in-out";
+                tooltip.style.marginTop = "-10px";
+                tooltip.style.background = "#333";
+                tooltip.style.color = "#fff";
+                tooltip.style.padding = "0.5rem";
+                tooltip.style.borderRadius = "10px";
+                tooltip.style.zIndex = "99999";
+                tooltip.style.fontSize = "1rem";
+                tooltip.style.whiteSpace = "nowrap";
+                tooltip.textContent = tooltipText;
+
+                tooltip.style.top = `${
+                    rect.bottom + window.scrollY + (positionOfTooltip !== "bottom" ? -30 : 20)
+                }px`;
+                tooltip.style.left = `${
+                    rect.left + window.scrollX + (positionOfTooltip !== "bottom" ? -135 : 0)
+                }px`;
+            });
+
+            targetButton.addEventListener("mouseout", () => {
+                tooltip.style.opacity = "0";
+                setTimeout(() => {
+                    tooltip.style.visibility = "hidden";
+                }, 250);
+            });
+
+            return tooltip;
+        }
+
         const helpBtn = document.createElement("span");
         helpBtn.id = "js_editor_help_btn";
         helpBtn.classList.add("material-icons");
@@ -118,6 +161,7 @@ class JSEditor {
         helpBtn.innerHTML = "help_outline";
         helpBtn.onclick = this._toggleHelp.bind(this);
         menuLeft.appendChild(helpBtn);
+        generateTooltip(helpBtn, "Help");
 
         const generateBtn = document.createElement("span");
         generateBtn.classList.add("material-icons");
@@ -130,6 +174,7 @@ class JSEditor {
         generateBtn.innerHTML = "autorenew";
         generateBtn.onclick = this._generateCode.bind(this);
         menuLeft.appendChild(generateBtn);
+        generateTooltip(generateBtn, "Reset Code");
 
         const runBtn = document.createElement("span");
         runBtn.classList.add("material-icons");
@@ -143,6 +188,7 @@ class JSEditor {
         runBtn.onclick = this._runCode.bind(this);
         menuLeft.appendChild(runBtn);
         menubar.appendChild(menuLeft);
+        generateTooltip(runBtn, "Play");
 
         const menuRight = document.createElement("div");
         menuRight.style.height = "3rem";
@@ -156,7 +202,7 @@ class JSEditor {
         styleBtn.style.borderRadius = "50%";
         styleBtn.style.padding = ".25rem";
         styleBtn.style.marginRight = ".75rem";
-        styleBtn.style.fontSize = "1.5rem";
+        styleBtn.style.fontSize = "2rem";
         styleBtn.style.background = "#2196f3";
         styleBtn.style.cursor = "pointer";
         styleBtn.innerHTML = "invert_colors";
@@ -164,8 +210,10 @@ class JSEditor {
         menuRight.appendChild(styleBtn);
         menubar.appendChild(menuRight);
         this._editor.appendChild(menubar);
+        generateTooltip(styleBtn, "Change Theme", "left");
 
         const editorContainer = document.createElement("div");
+        editorContainer.id = "editor_container";
         editorContainer.style.width = "100%";
         editorContainer.style.height = "calc(100% - 11rem)";
         editorContainer.style.position = "relative";
@@ -188,9 +236,8 @@ class JSEditor {
         codeLines.style.fontWeight = "400";
         codeLines.style.letterSpacing = "normal";
         codeLines.style.lineHeight = "20px";
-        codeLines.style.background = "rgba(255, 255, 255, 0.1)";
-        codeLines.style.color = "white";
-        codeLines.style.setProperty("mix-blend-mode", "difference");
+        codeLines.style.background = "rgba(255, 255, 255, 0.075)";
+        codeLines.style.color = "rgba(255, 255, 255, 0.7)";
         codeLines.style.textAlign = "right";
         editorContainer.appendChild(codeLines);
 
@@ -219,8 +266,9 @@ class JSEditor {
         };
 
         const consolelabel = document.createElement("div");
+        consolelabel.id = "console_label";
         consolelabel.style.width = "100%";
-        consolelabel.style.height = "1.75rem";
+        consolelabel.style.height = "2rem";
         consolelabel.style.boxSizing = "border-box";
         consolelabel.style.borderTop = "1px solid gray";
         consolelabel.style.borderBottom = "1px solid gray";
@@ -232,6 +280,8 @@ class JSEditor {
         consolelabel.style.lineHeight = "20px";
         consolelabel.style.color = "indigo";
         consolelabel.style.background = "white";
+        consolelabel.style.display = "flex";
+        consolelabel.style.justifyContent = "space-between";
         consolelabel.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;CONSOLE";
         this._editor.appendChild(consolelabel);
 
@@ -251,6 +301,19 @@ class JSEditor {
         editorconsole.style.background = "lightcyan";
         editorconsole.style.cursor = "text";
         this._editor.appendChild(editorconsole);
+
+        const arrowBtn = document.createElement("span");
+        arrowBtn.id = "editor_console_btn";
+        arrowBtn.classList.add("material-icons");
+        arrowBtn.style.padding = ".25rem";
+        arrowBtn.style.fontSize = "2rem";
+        arrowBtn.style.cursor = "pointer";
+        arrowBtn.style.lineHeight = "0.75rem";
+        arrowBtn.style.marginLeft = "0";
+        arrowBtn.innerHTML = "keyboard_arrow_down";
+        arrowBtn.onclick = this._toggleConsole.bind(this);
+        consolelabel.appendChild(arrowBtn);
+        generateTooltip(arrowBtn, "Toggle Console","left");
 
         const highlight = (editor) => {
             // editor.textContent = editor.textContent;
@@ -330,6 +393,11 @@ class JSEditor {
         this._code = JSGenerate.code;
         this._jar.updateCode(this._code);
         this._setLinesCount(this._code);
+        const helpBtn = docById("js_editor_help_btn");
+        if (helpBtn) {
+            helpBtn.style.color = "white";
+        }
+        this._showingHelp = false;
     }
 
     /**
@@ -385,5 +453,55 @@ class JSEditor {
         this._styles[this._currentStyle].setAttribute("disabled", "true");
         this._currentStyle = (this._currentStyle + 1) % this._styles.length;
         this._styles[this._currentStyle].removeAttribute("disabled");
+
+        const editorLines = docById("editorLines");
+        switch (this._styles[this._currentStyle].href.split("/").pop().split(".")[0]) {
+            case "dracula":
+                editorLines.style.color = "#ffffff";
+                editorLines.style.background = "#5a5a5a";
+                break;
+            case "github":
+                editorLines.style.color = "#000000";
+                editorLines.style.background = "#eaeaea";
+                break;
+            case "railscasts":
+                editorLines.style.color = "#ffffff";
+                editorLines.style.background = "#2b2b2b";
+                break;
+            case "vs":
+                editorLines.style.color = "#000000";
+                editorLines.style.background = "#f2f2f2";
+                break;
+            default:
+                editorLines.style.color = "#ffffff";
+                editorLines.style.background = "#000000";
+                break;
+        }
+    }
+
+    /**
+     * Triggered when the console arrow button is pressed.
+     * Toggle console display.
+     *
+     * @returns {void}
+     */
+    _toggleConsole() {
+        const consoleContainer = docById("editorConsole");
+        const consoleLabel = docById("console_label");
+        const editorContainer = docById("editor_container");
+        const arrowBtn = docById("editor_console_btn");
+        if (this.isOpen) {
+            this.isOpen = false;
+            consoleContainer.style.display = "none";
+            consoleLabel.style.bottom = "0";
+            editorContainer.style.height = "calc(100% - 2.75rem)";
+            if (arrowBtn) arrowBtn.innerHTML = "keyboard_arrow_up";
+        } else {
+            this.isOpen = true;
+            consoleContainer.style.display = "block";
+            consoleLabel.style.display = "flex";
+            editorContainer.style.height = "calc(100% - 11rem)";
+            if (arrowBtn) arrowBtn.innerHTML = "keyboard_arrow_down";
+        }
     }
 }

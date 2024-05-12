@@ -31,12 +31,56 @@
 */
 /* exported PitchDrumMatrix */
 
+/**
+ * Represents a PitchDrumMatrix widget for making a mapping between pitch and drum sounds.
+ * 
+ * @class
+ * @memberof global
+ * @requires Singer
+ * @requires _ 
+ * @requires docById
+ * @requires platformColor
+ * @exports PitchDrumMatrix
+ */
 class PitchDrumMatrix {
+     /**
+     * Width of the button division.
+     * 
+     * @type {number}
+     */
     static BUTTONDIVWIDTH = 295; // 5 buttons
+
+    /**
+     * Width of the drum name column.
+     * 
+     * @type {number}
+     */
     static DRUMNAMEWIDTH = 50;
+
+    /**
+     * Width of the outer window.
+     * 
+     * @type {number}
+     */
     static OUTERWINDOWWIDTH = 128;
+
+    /**
+     * Width of the inner window.
+     * 
+     * @type {number}
+     */
     static INNERWINDOWWIDTH = 50;
+    /**
+     * Size of the buttons.
+     * 
+     * @type {number}
+     */
     static BUTTONSIZE = 53;
+     /**
+     * Size of the icons.
+     * 
+     * @type {number}
+     */
     static ICONSIZE = 32;
 
     constructor() {
@@ -62,19 +106,41 @@ class PitchDrumMatrix {
     }
 
     /**
-     * Initializes the pitch/drum matrix. First removes the previous matrix and them make another
-     * one in DOM (Document Object Model).
+     * Initializes the pitch/drum matrix. 
+     * 
+     * @param {Activity} activity - The activity instance.
      */
     init(activity) {
+        /**
+         * The activity associated with the PitchDrumMatrix.
+         * 
+         * @type {Activity}
+         */
         this.activity = activity;
         const w = window.innerWidth;
+        /**
+         * The scale factor for cell sizes.
+         * 
+         * @type {number}
+         * @private
+         */
         this._cellScale = w / 1200;
-
+        
+        /**
+         * The widget window for the PitchDrumMatrix.
+         * 
+         * @type {WidgetWindow}
+         */
         const widgetWindow = window.widgetWindows.windowFor(this, "pitch drum");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
-
+        
+        /**
+         * The button to play all sounds associated with the matrix.
+         * 
+         * @type {HTMLButtonElement}
+         */
         this.playButton = widgetWindow.addButton(
             "play-button.svg",
             PitchDrumMatrix.ICONSIZE,
@@ -86,7 +152,13 @@ class PitchDrumMatrix {
             this.activity.logo.turtleDelay = 0;
             this._playAll();
         };
-
+        
+        /**
+         * Flag indicating whether saving operation is locked.
+         * 
+         * @type {boolean}
+         * @private
+         */
         this._save_lock = false;
         widgetWindow.addButton(
             "export-chunk.svg",
@@ -110,16 +182,21 @@ class PitchDrumMatrix {
         ).onclick = () => {
             this._clear();
         };
-
+        
+        /**
+         * The container for the pitch/drum matrix.
+         * 
+         * @type {HTMLDivElement}
+         */
         this.pitchDrumDiv = document.createElement("div");
         widgetWindow.getWidgetBody().append(this.pitchDrumDiv);
         widgetWindow.getWidgetBody().style.height = "400px";
-        widgetWindow.getWidgetBody().style.width = "400px";
+        widgetWindow.getWidgetBody().style.width = "500px";
 
         // The pdm table
         const pdmTableDiv = this.pitchDrumDiv;
-        pdmTableDiv.style.display = "inline";
-        pdmTableDiv.style.visibility = "visible";
+        pdmTableDiv.style.position = "relative";
+        pdmTableDiv.style.visibility = "invisible";
         pdmTableDiv.style.border = "0px";
         pdmTableDiv.innerHTML = "";
 
@@ -174,7 +251,11 @@ class PitchDrumMatrix {
             labelCell.style.maxWidth = 0;
             labelCell.className = "headcol";
             labelCell.innerHTML = this.rowLabels[j] + this.rowArgs[j].toString().sub();
-
+            labelCell.style.position = "sticky";
+            labelCell.style.left = "0"; 
+            labelCell.style.top = "0"; 
+            labelCell.style.zIndex = "5";
+           
             pdmCell = pdmTableRow.insertCell();
             // Create tables to store individual notes.
             pdmCell.innerHTML =
@@ -199,12 +280,18 @@ class PitchDrumMatrix {
         labelCell.style.maxWidth = labelCell.style.minWidth;
         labelCell.className = "headcol";
         labelCell.innerHTML = "";
+        labelCell.style.position = "sticky";
+        labelCell.style.left = "0"; 
+        labelCell.style.top = "0"; 
+        labelCell.style.bottom = "0";
+        labelCell.style.zIndex = "20";
 
         const n = Math.max(Math.floor((window.innerHeight * 0.5) / 100), 8);
         const outerDiv = docById("pdmOuterDiv");
+        outerDiv.style.height = widgetWindow.getWidgetBody().style.height;
+        outerDiv.style.width = widgetWindow.getWidgetBody().style.width;
         let ow;
         if (pdmTable.rows.length + 2 > n) {
-            outerDiv.style.height = widgetWindow.getWidgetBody().style.height;
             ow = Math.max(
                 Math.min(
                     widgetWindow.getWidgetBody().style.width,
@@ -216,8 +303,6 @@ class PitchDrumMatrix {
                 PitchDrumMatrix.BUTTONDIVWIDTH
             ); // Add room for the vertical slider.
         } else {
-            outerDiv.style.height =
-                this._cellScale * MATRIXSOLFEHEIGHT * (pdmTable.rows.length + 3) + "px";
             ow = Math.max(
                 Math.min(
                     window.innerWidth / 2,
@@ -228,8 +313,6 @@ class PitchDrumMatrix {
             );
         }
 
-        outerDiv.style.width = ow + "px";
-
         const innerDiv = docById("pdmInnerDiv");
         innerDiv.style.height = widgetWindow.getWidgetBody().style.height;
         innerDiv.style.width = widgetWindow.getWidgetBody().style.width;
@@ -238,6 +321,9 @@ class PitchDrumMatrix {
         pdmCell = pdmTableRow.insertCell();
         // Create table to store drum names.
         pdmCell.innerHTML = '<table cellpadding="0px" id="pdmDrumTable"><tr></tr></table>';
+        pdmCell.style.position = "sticky";
+        pdmCell.style.bottom = "0";
+        pdmCell.style.zIndex = "10";
 
         // Add any drum blocks here.
         for (let i = 0; i < this.drums.length; i++) {
@@ -249,18 +335,18 @@ class PitchDrumMatrix {
         widgetWindow.onmaximize = () => {
             if (widgetWindow._maximized) {
                 widgetWindow.getWidgetBody().style.position = "absolute";
-                widgetWindow.getWidgetBody().style.height = "calc(100vh - 80px)";
-                widgetWindow.getWidgetBody().style.width = "200vh";
-                docById("pdmOuterDiv").style.height = "calc(100vh - 80px)";
-                docById("pdmOuterDiv").style.width = "calc(200vh - 64px)";
-                docById("pdmInnerDiv").style.width = "calc(200vh - 64px)";
-                docById("pdmInnerDiv").style.height = "calc(100vh - 80px)";
-                widgetWindow.getWidgetBody().style.left = "70px";
+                widgetWindow.getWidgetBody().style.height = "calc(-95px + 100vh)";
+                widgetWindow.getWidgetBody().style.width = "calc(-55px + 100vw)";
+                widgetWindow.getWidgetBody().style.left = "55px";
+                outerDiv.style.height = widgetWindow.getWidgetBody().style.height;
+                outerDiv.style.width = widgetWindow.getWidgetBody().style.width;
+                innerDiv.style.height = widgetWindow.getWidgetBody().style.height;
+                innerDiv.style.width = widgetWindow.getWidgetBody().style.width;
             } else {
                 widgetWindow.getWidgetBody().style.position = "relative";
                 widgetWindow.getWidgetBody().style.left = "0px";
                 widgetWindow.getWidgetBody().style.height = "400px";
-                widgetWindow.getWidgetBody().style.width = "400px";
+                widgetWindow.getWidgetBody().style.width = "500px";
                 const innerDiv = docById("pdmInnerDiv");
                 innerDiv.style.height = widgetWindow.getWidgetBody().style.height;
                 innerDiv.style.width = widgetWindow.getWidgetBody().style.width;
@@ -271,6 +357,8 @@ class PitchDrumMatrix {
     }
 
     /**
+     * Clears the row and column block arrays.
+     * 
      * @public
      * @returns {void}
      */
@@ -280,29 +368,35 @@ class PitchDrumMatrix {
     }
 
     /**
+     * Adds a pitch block to the row block array.
+     * 
      * @public
-     * @param {number} pitchBlock
-     * @return {void}
+     * @param {number} pitchBlock - The pitch block to add.
+     * @returns {void}
      */
     addRowBlock(pitchBlock) {
         this._rowBlocks.push(pitchBlock);
     }
 
     /**
+     * Adds a drum block to the column block array.
+     * 
      * @public
-     * @param {number} drumBlock
-     * @return {void}
+     * @param {number} drumBlock - The drum block to add.
+     * @returns {void}
      */
     addColBlock(drumBlock) {
         this._colBlocks.push(drumBlock);
     }
 
     /**
+     * Adds a node (intersection) to the block map.
+     * 
      * @public
-     * @param {number} pitchBlock
-     * @param {number} drumBlock
+     * @param {number} pitchBlock - The pitch block index.
+     * @param {number} drumBlock - The drum block index.
      * @returns {void}
-     */
+     */    
     addNode(pitchBlock, drumBlock) {
         let obj;
         for (let i = 0; i < this._blockMap.length; i++) {
@@ -315,11 +409,13 @@ class PitchDrumMatrix {
     }
 
     /**
+     * Removes a node (intersection) from the block map.
+     * 
      * @public
-     * @param {number} pitchBlock
-     * @param {number} drumBlock
+     * @param {number} pitchBlock - The pitch block index.
+     * @param {number} drumBlock - The drum block index.
      * @returns {void}
-     */
+     */    
     removeNode(pitchBlock, drumBlock) {
         let obj;
         for (let i = 0; i < this._blockMap.length; i++) {
@@ -331,15 +427,25 @@ class PitchDrumMatrix {
     }
 
     /**
+     * Returns the save lock element.
+     * 
      * @private
-     * @returns {HTMLElement}
-     */
+     * @returns {HTMLElement} - The save lock element.
+     */    
     _get_save_lock() {
         return this._save_lock;
     }
 
     /**
-     * @deprecated
+     * [DEPRECATED] Adds a button to the matrix.
+     * 
+     * @private
+     * @deprecated This method is deprecated.
+     * @param {HTMLTableRowElement} row - The table row to which the button will be added.
+     * @param {string} icon - The icon image source.
+     * @param {number} iconSize - The size of the icon.
+     * @param {string} label - The label text for the button.
+     * @returns {HTMLTableCellElement} - The cell element containing the button.
      */
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
@@ -375,8 +481,10 @@ class PitchDrumMatrix {
     }
 
     /**
+     * Adds a drum to the matrix.
+     * 
      * @private
-     * @param {number} drumIdx
+     * @param {number} drumIdx - The index of the drum to add.
      * @returns {void}
      */
     _addDrum(drumIdx) {
@@ -447,7 +555,8 @@ class PitchDrumMatrix {
     }
 
     /**
-     * Once the entire matrix is generated, this function makes it clickable.
+     * Makes the matrix clickable, enabling user interaction.
+     * 
      * @public
      * @returns {void}
      */
@@ -522,6 +631,8 @@ class PitchDrumMatrix {
     }
 
     /**
+     * Handles the scaling of the widget.
+     * 
      * @private
      * @returns {void}
      */
@@ -547,6 +658,8 @@ class PitchDrumMatrix {
     }
 
     /**
+     * Handles playing all pitch/drum combinations in the matrix.
+     * 
      * @private
      * @returns {void}
      */
@@ -654,9 +767,11 @@ class PitchDrumMatrix {
     }
 
     /**
+     * Plays the pitch and drum combination at the given index in the pairs array recursively.
+     * 
      * @private
-     * @param {number} i
-     * @param {number} pairs
+     * @param {number} i - The index indicating which pair of pitch and drum to play.
+     * @param {Array<Array<number>>} pairs - An array containing pairs of pitch and drum indices.
      * @returns {void}
      */
     _playPitchDrum(i, pairs) {
@@ -712,10 +827,12 @@ class PitchDrumMatrix {
     }
 
     /**
+     * Sets the pitch and drum combination for a specific cell in the matrix and plays the combination if specified.
+     * 
      * @private
-     * @param {number} colIndex
-     * @param {number} rowIndex
-     * @param {number} playNote
+     * @param {number} colIndex - The column index of the cell.
+     * @param {number} rowIndex - The row index of the cell.
+     * @param {number} playNote - A flag indicating whether to play the note or not.
      * @returns {void}
      */
     _setCellPitchDrum(colIndex, rowIndex, playNote) {
@@ -772,7 +889,17 @@ class PitchDrumMatrix {
             }
         }
     }
-
+    
+    /**
+     * Sets the pair of pitch and drum for a specific cell in the matrix and plays the combination if specified.
+     * 
+     * @private
+     * @param {number} rowIndex - The row index of the cell.
+     * @param {number} colIndex - The column index of the cell.
+     * @param {HTMLElement} cell - The HTML element representing the matrix cell.
+     * @param {boolean} playNote - A flag indicating whether to play the note or not.
+     * @returns {void}
+     */
     _setPairCell(rowIndex, colIndex, cell, playNote) {
         const pdmTable = docById("pdmTable");
         let row = pdmTable.rows[rowIndex];
@@ -812,6 +939,12 @@ class PitchDrumMatrix {
         }
     }
 
+    /**
+     * Clears all the selections in the matrix.
+     * 
+     * @private
+     * @returns {void}
+     */
     _clear() {
         // "Unclick" every entry in the matrix.
         const pdmTable = docById("pdmTable");
@@ -832,6 +965,8 @@ class PitchDrumMatrix {
     }
 
     /**
+     * Saves the current matrix as an action stack consisting of a set drum and pitch blocks.
+     * 
      * @private
      * @returns {void}
      */

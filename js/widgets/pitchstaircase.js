@@ -145,14 +145,12 @@ class PitchStaircase {
             const svgData =
                 "data:image/svg+xml;base64," +
                 window.btoa(
-                    unescape(
-                        encodeURIComponent(
+                    base64Encode(
                             SYNTHSVG.replace(/SVGWIDTH/g, svgWidth)
                                 .replace(/XSCALE/g, svgScale)
                                 .replace(/STOKEWIDTH/g, svgStrokeWidth)
                         )
-                    )
-                );
+                    );
             stepCell.style.backgroundImage = "url(" + svgData + ")";
             stepCell.style.backgroundRepeat = "no-repeat";
             stepCell.style.backgroundPosition = "center center";
@@ -608,7 +606,7 @@ class PitchStaircase {
         const w = window.innerWidth;
         this._cellScale = w / 1200;
 
-        const widgetWindow = window.widgetWindows.windowFor(this, "pitch staircase", "pitch staircase", false);
+        const widgetWindow = window.widgetWindows.windowFor(this, "pitch staircase", "pitch staircase", true);
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();

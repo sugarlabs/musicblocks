@@ -462,8 +462,8 @@ class Singer {
 
         // We need to save the state of the boxes and heap although there is a potential of a boxes collision with other turtles
         const saveBoxes = JSON.stringify(logo.boxes);
-        const saveTurtleHeaps = JSON.stringify(activity.logo.turtleHeaps[turtle]);
-        const saveTurtleDicts = JSON.stringify(activity.logo.turtleDicts[turtle]);
+        const saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
+        const saveTurtleDicts = JSON.stringify(logo.turtleDicts[turtle]);
         // .. and the turtle state
         const saveX = tur.x;
         const saveY = tur.y;
@@ -514,9 +514,21 @@ class Singer {
         tur.singer.tallyNotes = saveTallyNotes;
 
         // Restore previous state
-        activity.logo.boxes = JSON.parse(saveBoxes);
-        activity.logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
-        activity.logo.turtleDicts[turtle] = JSON.parse(saveTurtleDicts);
+        if (saveBoxes == undefined) {
+            logo.boxes = {}
+        } else {
+            logo.boxes = JSON.parse(saveBoxes);
+        }
+        if (saveTurtleHeaps == undefined) {
+            logo.turtleHeaps = {}
+        } else {
+            logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
+        }
+        if (saveTurtleDicts == undefined) {
+            logo.turtleDicts = {}
+        } else {
+            logo.turtleDicts[turtle] = JSON.parse(saveTurtleDicts);
+        }
 
         tur.painter.doPenUp();
         tur.painter.doSetXY(saveX, saveY);

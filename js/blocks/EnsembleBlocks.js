@@ -570,7 +570,7 @@ function setupEnsembleBlocks(activity) {
         constructor() {
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 //.TRANS: notes played by this mouse
-                super("turtlelapsednotes", _("mouse notes played"));
+                super("turtleelapsednotes", _("mouse notes played"));
                 this.setHelpString([
                     _("The Mouse elapse notes block returns the number of notes played by the specified mouse."),
                     "documentation",
@@ -1064,7 +1064,7 @@ function setupEnsembleBlocks(activity) {
                 .replace(/fill_color/g, fillColor)
                 .replace(/stroke_color/g, strokeColor);
 
-            tur.doTurtleShell(55, "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(artwork))));
+            tur.doTurtleShell(55, "data:image/svg+xml;base64," + window.btoa(base64Encode(artwork)));
 
             // Restore the heading.
             if (heading != 0) {

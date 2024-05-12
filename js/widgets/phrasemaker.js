@@ -64,6 +64,9 @@ const MATRIXGRAPHICS = [
 const MATRIXGRAPHICS2 = ["arc", "setxy"];
 const MATRIXSYNTHS = ["sine", "triangle", "sawtooth", "square", "hertz"]; // Deprecated
 
+/**
+ * Represents a PhraseMaker widget for creating and managing musical phrases.
+ */
 class PhraseMaker {
     // The phrasemaker widget
     static BUTTONDIVWIDTH = 535; // 8 buttons 535 = (55 + 4) * 9
@@ -72,10 +75,35 @@ class PhraseMaker {
     static BUTTONSIZE = 53;
     static ICONSIZE = 24;
     // stylePhraseMaker();
+
+    /**
+     * Constructs a new instance of the PhraseMaker.
+     */
     constructor() {
+        /**
+         * Tracks if stop or close has been clicked.
+         * @type {boolean}
+         * @private
+         */
         this._stopOrCloseClicked = false;
+
+        /**
+         * The name of the instrument associated with the PhraseMaker.
+         * @type {string}
+         * @private
+         */
         this._instrumentName = DEFAULTVOICE;
+
+        /**
+         * Flag indicating the initial state of the PhraseMaker.
+         * @type {boolean}
+         */
         this.isInitial = true;
+
+        /**
+         * Parameters for effects applied to the PhraseMaker.
+         * @type {object}
+         */
         this.paramsEffects = {
             doVibrato: false,
             doDistortion: false,
@@ -96,19 +124,66 @@ class PhraseMaker {
         };
 
         // rowLabels can contain either a pitch, a drum, or a graphics commands
+        /**
+         * Labels associated with rows in the PhraseMaker grid.
+         * @type {Array<string>}
+         */
         this.rowLabels = [];
         // rowArgs can contain an octave or the arg(s) to a graphics command
+        /**
+         * Arguments associated with rows in the PhraseMaker grid.
+         * @type {Array<any>}
+         */
         this.rowArgs = [];
 
         // We need to treat note blocks differently since they have both
         // pitch and rhythm.
+        /**
+         * Indicates if note blocks are present (both pitch and rhythm).
+         * @type {boolean}
+         * @private
+         */
         this._noteBlocks = false;
 
+        /**
+         * Tracks whether the PhraseMaker grid is sorted.
+         * @type {boolean}
+         */
         this.sorted = false;
+
+        /**
+         * Array of notes to be played.
+         * @type {Array<any>}
+         * @private
+         */
         this._notesToPlay = [];
+
+        /**
+         * Array indicating output as tuplets (1/12 or 1/(3x4)).
+         * @type {Array<any>}
+         * @private
+         */
         this._outputAsTuplet = []; // do we output 1/12 or 1/(3x4)?
+
+        /**
+         * Indicates if the PhraseMaker grid contains tuplets.
+         * @type {boolean}
+         * @private
+         */
         this._matrixHasTuplets = false;
+
+         /**
+         * Counter for the number of notes in the PhraseMaker.
+         * @type {number}
+         * @private
+         */
         this._notesCounter = 0;
+
+        /**
+         * Stored notes within the PhraseMaker.
+         * @type {Array<any>}
+         * @private
+         */
         this._noteStored = [];
 
         // The pitch-block number associated with a row; a rhythm block is
@@ -119,12 +194,34 @@ class PhraseMaker {
         // columns).
 
         // These arrays get created each time the matrix is built.
+        /**
+         * Pitch-block numbers associated with rows.
+         * @type {Array<number>}
+         * @private
+         */
         this._rowBlocks = []; // pitch-block number
+
+        /**
+         * Rhythm-block numbers associated with columns.
+         * @type {Array<Array<number>>}
+         * @private
+         */
         this._colBlocks = []; // [rhythm-block number, note number]
 
         // This array keeps track of the position of the rows after sorting.
+        /**
+         * Map of row positions after sorting.
+         * @type {Array<number>}
+         * @private
+         */
         this._rowMap = [];
+
         // And offsets due to deleting duplicates.
+        /**
+         * Offsets due to deleting duplicates.
+         * @type {Array<number>}
+         * @private
+         */
         this._rowOffset = [];
 
         // Track a number of DOM elements locally
@@ -142,6 +239,11 @@ class PhraseMaker {
         // This array is preserved between sessions.
         // We populate the blockMap whenever a note is selected and
         // restore any notes that might be present.
+        /**
+         * Preserved block map between sessions.
+         * @type {object}
+         * @private
+         */
         this._blockMap = {};
 
         this.blockNo = null;
@@ -150,30 +252,102 @@ class PhraseMaker {
         this.columnBlocksMap = [];
     }
 
-    stylePhraseMaker(){
+    /**
+     * Styles the appearance of the PhraseMaker widget to fit within the screen dimensions.
+     * Adjusts the dimensions and overflow settings of window frames and widget bodies.
+     */
+    stylePhraseMaker() {
+        /**
+         * Width of the screen.
+         * @type {number}
+         */
+        var screenWidth = window.innerWidth;
 
+        /**
+         * Height of the screen.
+         * @type {number}
+         */
+        var screenHeight = window.innerHeight;
+
+         /**
+          * Container element for floating windows.
+          * @type {HTMLElement}
+          */
         var floatingWindowsDiv = document.getElementById("floatingWindows");
+
+         /**
+          * Collection of window frame elements.
+          * @type {NodeListOf<Element>}
+          */
         var windowFrameElements = floatingWindowsDiv.querySelectorAll(".windowFrame");
     
         for (var i = 0; i < windowFrameElements.length; i++) {
+
+            /**
+             * Current window frame element.
+             * @type {Element}
+             */
             var windowFrame = windowFrameElements[i];
-            var wfWinBody = document.querySelector(".wfWinBody");
-            var wfbWidget = document.querySelector(".wfbWidget");
-            wfbWidget.style.overflow = "auto";
-            wfbWidget.style.width = "-webkit-fill-available";
-            wfbWidget.style.height = "-webkit-fill-available";
-            windowFrame.style.height = "405px";
-            windowFrame.style.width = "685px";
-            wfWinBody.style.position = "absolute";
-            wfWinBody.style.overflow = "auto";
-            wfWinBody.style.width = "-webkit-fill-available";
-            wfWinBody.style.height = "-webkit-fill-available";
-            wfWinBody.style.background = "#cccccc";
-            wfbWidget.style.position = "absolute";
-            wfbWidget.style.left = "55px";
+
+            /**
+             * Widget body element within the window frame.
+             * @type {Element}
+             */
+            var wfWinBody = windowFrame.querySelector(".wfWinBody");
+
+            /**
+             * Widget element within the window frame.
+             * @type {Element}
+             */
+            var wfbWidget = windowFrame.querySelector(".wfbWidget");
+
+            /**
+             * Total width of the window frame.
+             * @type {number}
+             */
+            var totalWidth = parseFloat(window.getComputedStyle(windowFrame).width);
+
+            /**
+             * Total height of the window frame.
+             * @type {number}
+             */
+            var totalHeight = parseFloat(window.getComputedStyle(windowFrame).height);
+
+            /**
+             * Maximum allowed width for the window frame.
+             * @type {number}
+             */
+            var maxWidth = screenWidth * 0.8;
+
+            /**
+             * Maximum allowed height for the window frame.
+             * @type {number}
+             */
+            var maxHeight = screenHeight * 0.8;
+    
+            if (totalWidth > screenWidth || totalHeight > screenHeight) {
+                windowFrame.style.height = Math.min(totalHeight, maxHeight) + "px";
+                windowFrame.style.width = Math.min(totalWidth, maxWidth) + "px";
+                wfbWidget.style.overflowY = totalHeight > maxHeight ? "auto" : "hidden";
+                wfbWidget.style.overflowX = totalWidth > maxWidth ? "auto" : "hidden";
+                wfbWidget.style.width = "-webkit-fill-available";
+                wfbWidget.style.height = "-webkit-fill-available";
+                wfbWidget.style.position = "absolute";
+                wfbWidget.style.left = "55px";
+                wfWinBody.style.position = "absolute";
+                wfWinBody.style.overflowY = totalHeight > maxHeight ? "auto" : "hidden";
+                wfWinBody.style.overflowX = totalWidth > maxWidth ? "auto" : "hidden";
+                wfWinBody.style.width = "-webkit-fill-available";
+                wfWinBody.style.height = "-webkit-fill-available";
+                wfWinBody.style.background = "#cccccc";
+            }
         }
     }
-
+ 
+    /**
+     * Clears block references within the PhraseMaker.
+     * Resets arrays used to track row and column blocks.
+     */
     clearBlocks() {
         // When creating a new matrix, we want to clear out any old
         // block references.
@@ -183,6 +357,11 @@ class PhraseMaker {
         this._rowOffset = [];
     }
 
+    /**
+     * Adds a row block to the PhraseMaker matrix.
+     * This method is called when encountering a pitch, drum, or some graphics blocks during matrix creation.
+     * @param {number} rowBlock - The pitch or drum block identifier to add to the matrix row.
+     */
     addRowBlock(rowBlock) {
         // When creating a matrix, we add rows whenever we encounter a
         // pitch or drum block (and some graphics blocks).
@@ -197,6 +376,12 @@ class PhraseMaker {
         this._rowBlocks.push(rowBlock);
     }
 
+    /**
+     * Adds a column block to the PhraseMaker matrix.
+     * This method is called when encountering rhythm blocks during matrix creation.
+     * @param {number} rhythmBlock - The rhythm block identifier to add to the matrix column.
+     * @param {number} n - The index of the rhythm block within the matrix column.
+     */
     addColBlock(rhythmBlock, n) {
         // When creating a matrix, we add columns when we encounter
         // rhythm blocks.
@@ -216,6 +401,14 @@ class PhraseMaker {
         }
     }
 
+    /**
+     * Adds a node to the PhraseMaker matrix.
+     * This method is used to preserve and restore the state of a cell in the matrix.
+     * @param {number} rowBlock - The pitch or drum block associated with the node.
+     * @param {number} rhythmBlock - The rhythm block associated with the node.
+     * @param {number} n - The index of the rhythm block within its column.
+     * @param {number} blk - The block identifier representing the matrix cell.
+     */
     addNode(rowBlock, rhythmBlock, n, blk) {
         // A node exists for each cell in the matrix. It is used to
         // preserve and restore the state of the cell.
@@ -235,6 +428,13 @@ class PhraseMaker {
         this._blockMap[blk].push([rowBlock, [rhythmBlock, n], j]);
     }
 
+    /**
+     * Removes a node from the PhraseMaker matrix.
+     * This method is called when the matrix is changed and a node needs to be removed.
+     * @param {number} rowBlock - The pitch or drum block associated with the node to remove.
+     * @param {number} rhythmBlock - The rhythm block associated with the node to remove.
+     * @param {number} n - The index of the rhythm block within its column.
+     */
     removeNode(rowBlock, rhythmBlock, n) {
         // When the matrix is changed, we may need to remove nodes.
         const blk = this.blockNo;
@@ -247,11 +447,22 @@ class PhraseMaker {
         }
     }
 
+    /**
+     * Provides access to the save lock mechanism.
+     * This method debounces the save button action.
+     * @private
+     * @returns {*} The save lock object.
+     */
     _get_save_lock() {
         // Debounce the save button.
         return this._save_lock;
     }
 
+    /**
+     * Initializes the PhraseMaker matrix widget.
+     * This method sets up the PhraseMaker matrix in the DOM (Document Object Model) and initializes its functionality.
+     * @param {Activity} activity - The activity instance associated with the PhraseMaker widget.
+     */
     init(activity) {
         // Initializes the matrix. First removes the previous matrix
         // and then make another one in DOM (document object model)
@@ -767,6 +978,10 @@ class PhraseMaker {
         }
     }
 
+    /**
+     * Creates a pie submenu for adding new rows to the matrix.
+     * This method initializes a wheel menu with options for adding different types of rows (e.g., pitch, drum, graphics).
+     */
     _createAddRowPieSubmenu() {
         // This menu is used to add new rows to the matrix.
         docById("wheelDivptm").style.display = "";
@@ -1020,6 +1235,10 @@ class PhraseMaker {
         }
     }
 
+    /**
+     * Executes actions related to adding a new pitch block.
+     * @param {number} blockN - The index of the block being added.
+     */
     pitchBlockAdded(blockN) {
         let i;
         for (i = 0; i < this.columnBlocksMap.length; i++) {
@@ -1031,6 +1250,11 @@ class PhraseMaker {
         setTimeout(this._createColumnPieSubmenu(i, "pitchblocks", true), 500);
     }
 
+    /**
+     * Creates a pie submenu for modifying 2-arg graphics blocks.
+     * @param {number} blockIndex - The index of the block.
+     * @param {object} blk - The block object.
+     */
     _createMatrixGraphics2PieSubmenu(blockIndex, blk) {
         // A wheel for modifying 2-arg graphics blocks
         docById("wheelDivptm").style.display = "";
@@ -1270,6 +1494,12 @@ class PhraseMaker {
         }
     }
 
+    /**
+     * Creates a pie submenu for modifying 1-arg blocks (graphics or hertz).
+     * @param {number} blockIndex - The index of the block.
+     * @param {string} condition - The type of block being modified ('synthsblocks' or 'graphicsblocks').
+     * @param {object} blk - The block object.
+     */
     _createMatrixGraphicsPieSubmenu(blockIndex, condition, blk) {
         // A wheel for modifying 1-arg blocks (graphics and hertz)
         docById("wheelDivptm").style.display = "";
@@ -1574,6 +1804,12 @@ class PhraseMaker {
         }
     }
 
+    /**
+     * Creates a pie submenu for modifying column blocks based on the provided condition.
+     * @param {string | number} index - The index of the column block.
+     * @param {string} condition - The condition specifying the type of block ('pitchblocks' or 'drumblocks').
+     * @param {boolean} sortedClose - Determines if the menu is sorted and closed.
+     */
     _createColumnPieSubmenu(index, condition, sortedClose) {
         index = parseInt(index);
         docById("wheelDivptm").style.display = "";
@@ -2010,6 +2246,11 @@ class PhraseMaker {
         }
     }
 
+    /**
+     * Replaces an old block with a new block, updating connections and refreshing the canvas.
+     * @param {string} oldblk - The ID of the old block to be replaced.
+     * @param {string} newblk - The ID of the new block to replace the old block.
+     */
     _blockReplace(oldblk, newblk) {
         // Find the connections from the old block
         const c0 = this.activity.blocks.blockList[oldblk].connections[0];
@@ -2064,6 +2305,12 @@ class PhraseMaker {
         this.activity.refreshCanvas();
     }
 
+    /**
+     * Adds a notes block between specified blocks, updating connections and refreshing the canvas.
+     * @param {string} aboveBlock - The ID of the block above the new notes block.
+     * @param {string} block - The ID of the new notes block to be added.
+     * @param {boolean} topBlock - Determines if the new block is added on top (true) or below (false).
+     */
     _addNotesBlockBetween(aboveBlock, block, topBlock) {
         let belowBlock;
         if (topBlock) {
@@ -2086,6 +2333,10 @@ class PhraseMaker {
         this.activity.refreshCanvas();
     }
 
+    /**
+     * Removes a pitch block and updates connections, adjusting docks, and refreshing the canvas.
+     * @param {string} blockNo - The ID of the pitch block to be removed.
+     */
     _removePitchBlock(blockNo) {
         const c0 = this.activity.blocks.blockList[blockNo].connections[0];
         const c1 = last(this.activity.blocks.blockList[blockNo].connections);
@@ -2103,11 +2354,19 @@ class PhraseMaker {
         this.activity.refreshCanvas();
     }
 
+    /**
+     * Generates a data URI from the provided file content.
+     * @param {string} file - The file content to be converted into a data URI.
+     * @returns {string} The data URI representing the file content.
+     */
     _generateDataURI(file) {
         const data = "data: text/html;charset=utf-8, " + encodeURIComponent(file);
         return data;
     }
 
+    /**
+     * Sorts the row labels based on frequency and updates internal data structures accordingly.
+     */
     _sort() {
         if (this.sorted) {
             return;
@@ -2128,7 +2387,8 @@ class PhraseMaker {
             }
             this._markedColsInRow.push(thisRow);
         }
-
+        // create a 'Set' object that contains only unique values
+        const uniqueFrequencies = new Set();
         const sortableList = [];
         let drumName;
         // Make a list to sort, skipping drums and graphics.
@@ -2148,26 +2408,21 @@ class PhraseMaker {
             }
 
             // We want to sort based on frequency, so we convert all notes to frequency.
-            if (MATRIXSYNTHS.indexOf(this.rowLabels[i]) !== -1) {
-                // Deprecated
+            const frequencyKey = noteToFrequency(
+                this.rowLabels[i] + this.rowArgs[i],
+                this.activity.turtles.ithTurtle(0).singer.keySignature
+            );
+
+            if (!uniqueFrequencies.has(frequencyKey)) {
                 sortableList.push([
-                    this.rowArgs[i],
+                    frequencyKey,
                     this.rowLabels[i],
                     this.rowArgs[i],
                     i,
                     this._noteStored[i]
                 ]);
-            } else {
-                sortableList.push([
-                    noteToFrequency(
-                        this.rowLabels[i] + this.rowArgs[i],
-                        this.activity.turtles.ithTurtle(0).singer.keySignature
-                    ),
-                    this.rowLabels[i],
-                    this.rowArgs[i],
-                    i,
-                    this._noteStored[i]
-                ]);
+
+                uniqueFrequencies.add(frequencyKey);
             }
         }
 
@@ -2303,8 +2558,13 @@ class PhraseMaker {
         }
 
         this.makeClickable();
+
     }
 
+    /**
+     * Opens a new window to export the Music Matrix as an HTML table with formatted content.
+     * Adds table headers and cell contents based on the current state of the Music Matrix.
+     */
     _export() {
         const exportWindow = window.open("");
         const exportDocument = exportWindow.document;
@@ -2471,6 +2731,12 @@ class PhraseMaker {
     }
 
     // Deprecated
+    /**
+     * Deprecated: Converts a note to its solfege representation.
+     * @param {string} note - The note to be converted.
+     * @param {number} index - The index of the note in the rowLabels array.
+     * @deprecated This method is no longer recommended for use.
+     */
     note2Solfege(note, index) {
         let octave, newNote;
         if (["♭", "♯"].indexOf(note[1]) === -1) {
@@ -2484,6 +2750,13 @@ class PhraseMaker {
         this.rowArgs[index] = octave;
     }
 
+    /**
+     * Adds a tuplet to the Music Matrix based on provided parameters.
+     * The tuplet consists of a specified interval and a list of notes.
+     * @param {Array} param - An array containing the parameters of the tuplet:
+     *   - param[0]: Array containing the interval of the tuplet as [numerator, denominator]
+     *   - param[1]: Array containing the list of notes to be added to the tuplet
+     */
     addTuplet(param) {
         // The first two parameters are the interval for the tuplet,
         // e.g., 1/4; the rest of the parameters are the list of notes
@@ -2689,10 +2962,20 @@ class PhraseMaker {
         this._matrixHasTuplets = true;
     }
 
+    /**
+     * Calculates the width of a note cell based on its note value.
+     * @param {number} noteValue - The value of the note (e.g., 4 for quarter note, 8 for eighth note).
+     * @returns {number} The calculated width of the note cell.
+     */
     _noteWidth(noteValue) {
         return Math.max(Math.floor(EIGHTHNOTEWIDTH * (8 / noteValue) * this._cellScale), 15);
     }
 
+    /**
+     * Adds notes to the matrix, filling specified beats with cells representing the notes.
+     * @param {number} numBeats - The number of beats to add notes for.
+     * @param {number} noteValue - The value of the notes (e.g., 4 for quarter notes, 8 for eighth notes).
+     */
     addNotes(numBeats, noteValue) {
         let noteValueToDisplay = calcNoteValueToDisplay(noteValue, 1);
 
@@ -2789,6 +3072,11 @@ class PhraseMaker {
         }
     }
 
+    /**
+     * Checks for note blocks or repeat blocks within the current block map.
+     * Sets the '_noteBlocks' flag to 'true' if any 'newnote' or 'repeat' block is found.
+     * @private
+     */
     _lookForNoteBlocksOrRepeat() {
         this._noteBlocks = false;
         const bno = this.blockNo;
@@ -2819,6 +3107,10 @@ class PhraseMaker {
         }
     }
 
+    /**
+     * Synchronizes marked blocks based on block mapping and helper information.
+     * @private
+     */
     _syncMarkedBlocks() {
         const newBlockMap = [];
         const blk = this.blockNo;
@@ -2853,6 +3145,12 @@ class PhraseMaker {
         });
     }
 
+    /**
+     * Establishes block connections based on specified parameters.
+     * @param {number} len - Length of the activity's block list.
+     * @param {number} [bottomOfClamp=null] - Bottom of the clamp connection (optional).
+     * @private
+     */
     blockConnection(len, bottomOfClamp) {
         const n = this.activity.blocks.blockList.length - len;
         let c;
@@ -2869,6 +3167,13 @@ class PhraseMaker {
         this.activity.blocks.adjustDocks(this.blockNo, true);
     }
 
+    /**
+     * Deletes a rhythm block specified by the block ID.
+     * Sends the block and its connected stack to the trash.
+     * Adjusts docks and refreshes the canvas after deletion.
+     * @param {number} blockToDelete - The ID of the rhythm block to delete.
+     * @private
+     */
     _deleteRhythmBlock(blockToDelete) {
         if (last(this.activity.blocks.blockList[blockToDelete].connections) !== null) {
             this.activity.blocks.sendStackToTrash(
@@ -2882,6 +3187,15 @@ class PhraseMaker {
         this.activity.refreshCanvas();
     }
 
+    /**
+     * Adds a new rhythm block with specified value and times.
+     * Loads new blocks based on the rhythm object (RHYTHMOBJ).
+     * Connects the new rhythm block to the existing block structure.
+     * Adjusts docks and refreshes the canvas after addition.
+     * @param {number[]} value - The value of the rhythm block as a fraction [numerator, denominator].
+     * @param {number} times - The number of times to repeat the rhythm block.
+     * @private
+     */
     _addRhythmBlock(value, times) {
         let RHYTHMOBJ = [];
         value = toFraction(value);
@@ -2916,6 +3230,15 @@ class PhraseMaker {
         this.activity.refreshCanvas();
     }
 
+    /**
+     * Updates the specified block with new values and triggers canvas refresh.
+     * Depending on the noteCase, different blocks and properties are updated.
+     * @param {number} i - The ID of the block to update.
+     * @param {number[] | null} value - The value to update the block with, represented as [numerator, denominator].
+     * @param {string | number} k - The value or parameter to update the block with.
+     * @param {string} noteCase - The case indicating the type of note update ("rhythm", "stuplet", "tupletnote", etc.).
+     * @private
+     */
     _update(i, value, k, noteCase) {
         const updates = [];
         value = toFraction(value);
@@ -2960,6 +3283,13 @@ class PhraseMaker {
         this.activity.saveLocally();
     }
 
+    /**
+     * Maps and collects blocks with a specified block name or type.
+     * @param {string} blockName - The name of the block to map and collect.
+     * @param {boolean} [withName=false] - Indicates whether to include the block name in the map.
+     * @returns {Array<number | Array<number, string>>} An array of block IDs or [block ID, block name] pairs.
+     * @private
+     */
     _mapNotesBlocks(blockName, withName) {
         const notesBlockMap = [];
         let blk = this.activity.blocks.blockList[this.blockNo].connections[1];
@@ -3007,6 +3337,10 @@ class PhraseMaker {
         return notesBlockMap;
     }
 
+    /**
+     * Recalculates and adjusts notes based on tuplet rhythms from the activity logo.
+     * @returns {Array<Array<number>>} An array containing adjusted notes represented as [noteValue, count].
+     */
     recalculateBlocks() {
         const adjustedNotes = [];
         adjustedNotes.push([this.activity.logo.tupletRhythms[0][2], 1]);
@@ -3026,6 +3360,11 @@ class PhraseMaker {
         return adjustedNotes;
     }
 
+    /**
+     * Readsjusts rhythm notes blocks based on recalculated notes and current notes block map.
+     * This method updates, adds, or deletes rhythm notes blocks as necessary to match the adjusted notes.
+     * @private
+     */
     _readjustNotesBlocks() {
         let notesBlockMap = this._mapNotesBlocks("rhythm2");
         const adjustedNotes = this.recalculateBlocks();
@@ -3060,6 +3399,11 @@ class PhraseMaker {
         this._colBlocks = colBlocks;
     }
 
+    /**
+     * Restarts the grid by regenerating rows based on the tuplet rhythms from the activity logo.
+     * This method initializes the grid with tuplets or notes as specified in the activity logo.
+     * @private
+     */
     _restartGrid() {
         this._matrixHasTuplets = false; // Force regeneration of tuplet rows.
         this.sorted = true;
@@ -3096,6 +3440,12 @@ class PhraseMaker {
         this._exitWheel.removeWheel();
     }
 
+    /**
+     * Adds specified number of notes to divide the existing notes in the grid.
+     * @param {number} noteToDivide - The index of the note where the division starts.
+     * @param {number} notesToAdd - The number of notes to add to the divided section.
+     * @private
+     */
     _addNotes(noteToDivide, notesToAdd) {
         noteToDivide = parseInt(noteToDivide);
         this._blockMapHelper = [];
@@ -3115,6 +3465,12 @@ class PhraseMaker {
         this._restartGrid.call(this);
     }
 
+    
+    /**
+     * Deletes a note from the grid and readjusts the notes accordingly.
+     * @param {number} noteToDivide - The index of the note to delete.
+     * @private
+     */
     _deleteNotes(noteToDivide) {
         if (this.activity.logo.tupletRhythms.length === 1) {
             return;
@@ -3135,6 +3491,12 @@ class PhraseMaker {
         this._restartGrid.call(this);
     }
 
+    /**
+     * Divides a note in the grid by a specified factor and readjusts the notes accordingly.
+     * @param {number} noteToDivide - The index of the note to divide.
+     * @param {number} divideNoteBy - The factor to divide the note by.
+     * @private
+     */
     _divideNotes(noteToDivide, divideNoteBy) {
         noteToDivide = parseInt(noteToDivide);
         this._blockMapHelper = [];
@@ -3172,6 +3534,12 @@ class PhraseMaker {
         this._restartGrid.call(this);
     }
 
+    /**
+     * Ties together a sequence of notes in the grid and updates the note value accordingly.
+     * @param {Object} mouseDownCell - The starting cell of the selection.
+     * @param {Object} mouseUpCell - The ending cell of the selection.
+     * @private
+     */
     _tieNotes(mouseDownCell, mouseUpCell) {
         let downCellId = null;
         let upCellId = null;
@@ -3219,6 +3587,13 @@ class PhraseMaker {
         this._restartGrid.call(this);
     }
 
+    /**
+     * Updates a specified tuplet note value and restarts the grid.
+     * @param {number} noteToDivide - The index of the tuplet note to update.
+     * @param {number} newNoteValue - The new value of the tuplet note.
+     * @param {string} condition - The condition specifying the type of tuplet note to update.
+     * @private
+     */
     _updateTuplet(noteToDivide, newNoteValue, condition) {
         this.activity.logo.tupletParams[noteToDivide][1] = newNoteValue;
         this._restartGrid.call(this);
@@ -3232,6 +3607,13 @@ class PhraseMaker {
         }
     }
 
+    /**
+     * Updates the value of a tuplet and readjusts the notes accordingly.
+     * @param {number} noteToDivide - The index of the tuplet to update.
+     * @param {number} oldTupletValue - The previous value of the tuplet.
+     * @param {number} newTupletValue - The new value of the tuplet.
+     * @private
+     */
     _updateTupletValue(noteToDivide, oldTupletValue, newTupletValue) {
         noteToDivide = parseInt(noteToDivide);
         oldTupletValue = parseInt(oldTupletValue);
@@ -3318,6 +3700,13 @@ class PhraseMaker {
         this._update(notesBlockMap[noteToDivide], null, newTupletValue, "stupletvalue");
     }
 
+    /**
+     * Creates a pie submenu for the specified note division and tuplet value condition.
+     * @param {number} noteToDivide - The index of the note to divide.
+     * @param {number} tupletValue - The current value of the tuplet.
+     * @param {string} condition - The condition that determines the type of pie submenu to create.
+     * @private
+     */
     _createpiesubmenu(noteToDivide, tupletValue, condition) {
         docById("wheelDivptm").style.display = "";
 
@@ -3582,6 +3971,11 @@ class PhraseMaker {
         }
     }
 
+    /**
+     * Makes the matrix clickable by adding event listeners to each cell.
+     * When a cell is clicked, it triggers appropriate actions based on the cell's content.
+     * @private
+     */
     makeClickable() {
         // Once the entire matrix is generated, this function makes it
         // clickable.
@@ -3795,6 +4189,12 @@ class PhraseMaker {
         }
     }
 
+    /**
+     * Plays all notes in the matrix.
+     * Toggles between playing and stopping notes based on the current state.
+     * Updates the UI accordingly.
+     * @public
+     */
     playAll() {
         // Play all of the notes in the matrix.
         this.playingNow = !this.playingNow;
@@ -3906,6 +4306,11 @@ class PhraseMaker {
         }
     }
 
+    /**
+     * Collects notes to play based on the matrix state.
+     * Generates a list of notes to play from row labels and note values.
+     * @private
+     */
     collectNotesToPlay() {
         // Generate the list of notes to play, on the fly from
         // row labels and note value (from "alt" attribute of
@@ -4026,6 +4431,10 @@ class PhraseMaker {
         this._notesToPlay = notes;
     }
 
+    /**
+     * Resets the matrix UI by clearing highlighted backgrounds.
+     * @private
+     */
     _resetMatrix() {
         let row = this._noteValueRow;
         let cell;
@@ -4043,6 +4452,13 @@ class PhraseMaker {
         }
     }
 
+    /**
+     * Initiates the playback of notes based on the current state and sequence.
+     * Controls the sequence of notes to play, updating UI and triggering synth sounds.
+     * @private
+     * @param {number} time - The playback time offset.
+     * @param {number} noteCounter - The current note index in the playback sequence.
+     */
     __playNote(time, noteCounter) {
         // If the widget is closed, stop playing.
         if (!this.widgetWindow.isVisible()) {
@@ -4191,6 +4607,12 @@ class PhraseMaker {
         }, Singer.defaultBPMFactor * 1000 * time + this.activity.logo.turtleDelay);
     }
 
+    /**
+     * Plays a chord by triggering synth notes for each pitch in the chord.
+     * @private
+     * @param {number[]} notes - Array of pitch values representing the chord.
+     * @param {number} noteValue - The duration value of the chord notes.
+     */
     _playChord(notes, noteValue) {
         setTimeout(() => {
             this.activity.logo.synth.trigger(
@@ -4243,6 +4665,11 @@ class PhraseMaker {
         }
     }
 
+    /**
+     * Processes graphics commands to update the turtle's painter state.
+     * @private
+     * @param {string[]} obj - An array containing the graphics command and its parameters.
+     */
     _processGraphics(obj) {
         switch (obj[0]) {
             case "forward":
@@ -4291,6 +4718,13 @@ class PhraseMaker {
         }
     }
 
+    /**
+     * Sets corresponding note when user clicks on a cell and plays that note if specified.
+     * @private
+     * @param {number} colIndex - The column index of the cell clicked.
+     * @param {number} rowIndex - The row index of the cell clicked.
+     * @param {boolean} playNote - Indicates whether to play the note associated with the cell.
+     */
     _setNotes(colIndex, rowIndex, playNote) {
         // Sets corresponding note when user clicks on any cell and
         // plays that note
@@ -4315,6 +4749,14 @@ class PhraseMaker {
         }
     }
 
+    /**
+     * Sets the content and triggers playback for the specified cell in the matrix.
+     * @private
+     * @param {number} j - Index of the row in the matrix.
+     * @param {number} colIndex - Index of the column in the matrix.
+     * @param {HTMLElement} cell - The HTML element representing the matrix cell.
+     * @param {boolean} playNote - Indicates whether to trigger playback for the note associated with the cell.
+     */
     _setNoteCell(j, colIndex, cell, playNote) {
         const note = this._noteStored[j];
         let drumName, graphicsBlock, graphicNote, obj;
@@ -4385,6 +4827,10 @@ class PhraseMaker {
         }
     }
 
+    /**
+     * Clears all entries in the matrix by reverting their background color and associated notes.
+     * @private
+     */
     _clear() {
         // 'Unclick' every entry in the matrix.
         let row, cell;
@@ -4401,6 +4847,10 @@ class PhraseMaker {
         }
     }
 
+    /**
+     * Saves the current matrix state as an action stack consisting of note and pitch blocks.
+     * @private
+     */
     _save() {
         /* Saves the current matrix as an action stack consisting of
          * note and pitch blocks (saving as chunks is deprecated). */

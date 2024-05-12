@@ -145,6 +145,14 @@ class LanguageBox {
         this._language = "he";
         this.hide();
     }
+    /**
+     * @public
+     * @returns {void}
+     */
+    te_onclick() {
+        this._language = "te";
+        this.hide();
+    }
 
     /**
      * @public
@@ -177,10 +185,12 @@ class LanguageBox {
      * @public
      * @returns {void}
      */
+    OnClick() {
+        window.location.reload();    
+    }
     hide() {
         const MSGPrefix =
-            "<a href='#' " +
-            "onClick='window.location.reload()'" +
+        "<a href='#' class='language-link' " +
             "onMouseOver='this.style.opacity = 0.5'" +
             "onMouseOut='this.style.opacity = 1'>";
         const MSGSuffix = "</a>";
@@ -196,6 +206,7 @@ class LanguageBox {
             zhCN: "刷新浏览器以更改您的语言偏好",
             th: "รีเฟรชเบราเซอร์เพื่อเปลี่ยนการตั้งค่าภาษาของคุณ",
             hi: "अपनी भाषा की वरीयता बदलने के लिए अपना ब्राउज़र ताज़ा करें",
+	    te: "మీ భాష ప్రాధాన్యతను మార్చడానికి మీ బ్రౌజర్‌ని రిఫ్రెష్ చేయండి.",
             ibo: "Mee ka nchọgharị gị gbanwee mmasị asụsụ gị.",
             ar: "حدث المتصفح لتغيير تفضيلات اللغة.",
             he: "רענן את הדפדפן כדי לשנות את העדפת השפה שלך.",
@@ -203,13 +214,21 @@ class LanguageBox {
             quz: "Actualice su navegador para cambiar su preferencia de idioma.",
             gug: "Actualice su navegador para cambiar su preferencia de idioma."
         };
-
-        this.activity.storage.languagePreference = this._language;
-
-        if (this._language === "ja" && this.activity.storage.kanaPreference === "kana") {
-            this.activity.textMsg(MSGPrefix + MSG["kana"] + MSGSuffix);
-        } else {
-            this.activity.textMsg(MSGPrefix + MSG[this._language] + MSGSuffix);
+        if (localStorage.getItem("languagePreference") === this._language) {
+            this.activity.textMsg(_("Music Blocks is already set to this language."));
         }
+        else{
+            this.activity.storage.languagePreference = this._language;
+            if (this._language === "ja" && this.activity.storage.kanaPreference === "kana") {
+                this.activity.textMsg(MSGPrefix + MSG["kana"] + MSGSuffix);
+            } else {
+                this.activity.textMsg(MSGPrefix + MSG[this._language] + MSGSuffix);
+            }
+        }
+
+         const languageLinks = document.querySelectorAll('.language-link');
+         languageLinks.forEach(link => {
+             link.addEventListener('click', () => this.OnClick());
+         });
     }
 }

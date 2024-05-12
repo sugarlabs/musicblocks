@@ -132,11 +132,65 @@ listening on port 3000.
 **NOTE:** _Use `ctrl + c` or `cmd + c` to quit the HTTP Server to avoid
 `socket.error:[Errno 48]`_.
 
+
+
+## Local Setup with Docker
+
+## Prerequisites
+
+Before you begin, ensure you have Docker installed on your machine. You can download and install Docker from the [official Docker website](https://www.docker.com/get-started).
+
+## Installation
+
+1. Clone the Music Blocks repository to your local machine:
+
+   ```bash
+   git clone https://github.com/sugarlabs/musicblocks.git
+   ```
+
+2. Navigate to the cloned repository:
+
+   ```bash
+   cd musicblocks
+   ```
+
+3. Build the Docker image using the provided Dockerfile:
+
+   ```bash
+   docker build -t musicblocks .
+   ```
+## Running Music Blocks
+
+1. Run the Docker container using the built image:
+
+   ```bash
+   docker run -p 3000:3000 musicblocks
+   ```
+
+   This command will start a Docker container running Music Blocks and expose it on port 3000.
+
+2. Access Music Blocks in your web browser by navigating to `http://localhost:3000`.
+
+## Stopping the Docker container
+
+To stop the Docker container, use `Ctrl + C` in your terminal. This will stop the container and free up the port it was using.
+
+## Additional Notes
+
+- Make sure to replace `musicblocks` with the appropriate image name if you have tagged the Docker image differently.
+- You can customize the port mapping (`-p`) if you prefer to use a different port for accessing Music Blocks.
+
+---
+
+This documentation provides a basic setup for running Music Blocks locally using Docker. Feel free to customize it further based on your specific requirements and environment.
 ## <a name="USING_MUSIC_BLOCKS"></a>Using Music Blocks
 
 Once Music Blocks is running, you'll want suggestions on how to use
 it. Follow [Using Music Blocks](./documentation/README.md) and [Music
 Blocks Guide](./guide/README.md).
+
+For Scratch and Snap users, you may want to look at [Music Blocks for
+Snap Users](./Music_Blocks_for_Snap_Users.md).
 
 Looking for a block? Find it in the
 [Palette Tables](./guide/README.md#6-appendix).
@@ -304,13 +358,16 @@ Bender ([@walterbender](https://github.com/walterbender))_.
 functional and user-interface designs. Many of his contributions were
 inspired by the music education ideas, representations and practices
 (e.g. aspects of matrix, musical cups) developed and published by
-[_Larry Scripp_](http://www.larryscripp.net/) with whom _Devin_
-studied at New England Conservatory and for whom he worked at Affron
-Scripp & Associates, LLC, [Center for Music and the Arts in Education
-(CMAIE)](http://centerformie.org/), and [Music in
-Education](http://music-in-education.org/). Some of the initial
-graphics were contributed by [_Chie
-Yasuda_](http://www.chieyasuda.com).
+[_Larry
+Scripp_](https://web.archive.org/web/20160204212801/http://www.larryscripp.net/)
+with whom _Devin_ studied at New England Conservatory and for whom he
+worked at Affron Scripp & Associates, LLC, [Center for Music and the
+Arts in Education
+(CMAIE)](https://web.archive.org/web/20210713204847/http://centerformie.org/),
+and [Music in
+Education](https://web.archive.org/web/20231130103746/http://music-in-education.org/). Some
+of the initial graphics were contributed by [_Chie
+Yasuda_](https://www.chieyasuda.com).
 
 Much of the initial coding specific to Music Blocks was done by _Yash
 Khandelwal ([@khandelwalYash](https://github.com/khandelwalYash))_ as

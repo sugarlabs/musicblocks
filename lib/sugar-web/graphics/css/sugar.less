@@ -41,6 +41,7 @@ body {
 }
 
 .unselectable {
+  user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
 }
@@ -312,6 +313,7 @@ input[type='range'] {
   cursor: pointer;
   background-color: @button-grey;
   border-radius: 2 * @subcell-size;
+  appearance: none;
   -webkit-appearance: none !important;
 }
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-            <title>Music Blocks is a collection of tools for exploring musical concepts.</title>
+            <title>Music Blocks </title>
       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <!--Import Google Icon Font-->
         <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
@@ -10,7 +10,7 @@
 
         <!-- Import clipboard.js -->
         <script src="libs/clipboard.min.js"></script>
-
+ 
         <!--Import style.css-->
         <link type="text/css" rel="stylesheet" href="css/style.css"/>
 
@@ -41,6 +41,26 @@
         <script type="text/javascript" src="js/Planet.js"></script>
         <script type="text/javascript" src="js/main.js"></script>
     </head>
+    <script>
+        document.addEventListener("scroll", function () {
+            var navbar = document.querySelector(".nav-extended");
+            if (navbar){
+                if (document.body.scrollTop > 210 || document.documentElement.scrollTop > 210) {
+                navbar.classList.remove("lighten-1");
+                }
+                else{
+                navbar.classList.add("lighten-1");
+                }
+        }
+        });
+        // Function to scroll to the top of the page
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }   
+   </script>
 
     <body>
         <nav class="nav-extended light-green lighten-1" role="navigation">
@@ -52,17 +72,39 @@
                 <ul class="right tabs tabs-transparent" id="localglobal">
                     <li class="tab"><a class="active" id="local-tab" href="#local"></a></li>
                     <li class="tab"><a id="global-tab" href="#global"></a></li>
+                    <li>
+                        <li id="s_one">
+                            <div class="nav-content" id="searchcontainer-one">
+                                <div class="container">
+                                    <div class="input-field search">
+                                        <i class="material-icons prefix "
+                                            id="searchicon">search</i><input
+                                            placeholder="Search here" id="global-search"
+                                            type="text"><span><i
+                                                class="material-icons"
+                                                id="search-close">clear</i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </li>
                 </ul>
             </div>
-            <div class="nav-content" id="searchcontainer" style="display: none;">
-                <div class="container">
-                    <div class="input-field search">
-                        <i class="material-icons prefix" id="searchicon">search</i><input placeholder="" id="global-search" type="text"><span><i class="material-icons" id="search-close">clear</i></span>
-                    </div>
+            </div>
+        </nav>
+        <nav class="nav-extended light-green lighten-1" id="two_header" role="navigation">
+            <div id="searchcontainer" class="nav-content">
+                <div class="input-field-2 search">
+                    <i class="material-icons prefix "
+                    id="searchicon">search</i><input
+                    placeholder="Search here for project" id="global-search-2"
+                    type="text"><span><i
+                    class="material-icons"
+                    id="search-close-2">clear</i></span>
                 </div>
             </div>
         </nav>
-
+        <button id="backToTopBtn" class="light-green lighten-1" onclick="scrollToTop()"><i class="material-icons">arrow_upward</i></button>
         <div id="local">
             <div class="section no-pad-bot">
                 <div class="container">
@@ -99,8 +141,8 @@
                                 </div>
                                 <div class="row">
                                     <div class="input-field">
-                                        <div class="chips chips-autocomplete" id="tagsadd"></div>
-                                        <label for="publish-tags" id="publish-tags-label"></label>
+                                        <div class="chips chips-initial" id="tagsadd"></div> 
+                                        <label  for="tagsadd" id="publish-tags-label"></label>
                                     </div>
                                 </div>
                             </div>
@@ -160,7 +202,7 @@
                                     <option value="DOWNLOADED" id="option-downloaded"></option>
                                     <option value="ALPHABETICAL" id="option-alphabetical"></option>
                                 </select>
-                                <label id="option-sort-by"></label>
+                                <label for="sort-select" id="option-sort-by"></label>
                             </div>
                         </div>
                         <div class="row">
@@ -257,7 +299,7 @@
                 </div>
                 <div class="modal-footer">
                     <div class="report-project-div">
-                        <a class="left tooltipped" id="projectviewer-report-project"><i class="material-icons red-text" id="report-icon" >error</i></a>
+                        <a class="left tooltipped" id="projectviewer-report-project"><i class="material-icons red-text" id="report-icon" >warning</i></a>
                         <a class="left tooltipped" id="projectviewer-report-project-disabled"><i class="material-icons grey-text" id="report-icon" >error</i></a>
                         <div class="card report-card" id="projectviewer-report-card" style="display: none;">
                             <div id="projectviewer-report-content" style="display: none;">

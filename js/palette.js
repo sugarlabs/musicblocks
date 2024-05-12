@@ -47,7 +47,7 @@ const paletteBlockButtonPush = (blocks, name, arg) => {
 
 const makePaletteIcons = (data, width, height) => {
     const img = new Image();
-    img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(data)));
+    img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
     if (width) img.width = width;
     if (height) img.height = height;
     return img;
@@ -113,7 +113,7 @@ class Palettes {
             element.setAttribute("class", "disable_highlighting");
             element.setAttribute(
                 "style",
-                "position: fixed; z-index: 1000; display: none ; left :0px; top:" + this.top + "px"
+                "position: absolute; z-index: 1000; display: none ; left :0px; top:" + this.top + "px"
             );
             element.innerHTML =
                 '<div style="float: left"><table width ="' +
@@ -403,12 +403,14 @@ class Palettes {
                 document.body.style.cursor = "text";
             } else {
                 document.body.style.cursor = "pointer";
+                this.showPalette(name);
             }
         };
 
         // eslint-disable-next-line no-unused-vars
         row.onclick = (event) => {
             if (name == "search") {
+                this._hideMenus();
                 this.activity.showSearchWidget();
             } else {
                 this.showPalette(name);
@@ -746,7 +748,7 @@ class PaletteModel {
             label,
             artwork,
             artwork64:
-                "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(artwork))),
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(artwork)),
             docks,
             image: block.image,
             scale: block.scale,
@@ -876,8 +878,6 @@ class Palette {
         this.model.update();
         const paletteList = docById("PaletteBody_items");
 
-        this.setupGrabScroll(paletteList);
-
         const blocks = this.model.blocks;
         blocks.reverse();
         const protoListScope = [...this.protoList];
@@ -990,7 +990,7 @@ class Palette {
 
         // eslint-disable-next-line no-unused-vars
         const mouseUpGrab = (event) => {
-            paletteList.onmousemove = null;
+            // paletteList.onmousemove = null;
             document.body.style.cursor = "default";
         };
 

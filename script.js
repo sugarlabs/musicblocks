@@ -8,7 +8,15 @@ $(document).ready(function() {
      * The user's selected mode, stored in local storage.
      * @type {string}
      */
-    var mode = localStorage.beginnerMode;
+    var mode;
+    try {
+        mode = localStorage.getItem("beginnerMode") || "true";
+    } catch (error) {
+        console.error("Error accessing localStorage:", error);
+       
+        mode = "true"; 
+    }
+
 
     /**
      * The icon element that displays the user's current mode.

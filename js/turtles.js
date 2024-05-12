@@ -576,6 +576,8 @@ Turtles.TurtlesView = class {
         this._collapseButton = null; // used by add method
         this._clearButton = null; // used by add method
         this.gridButton = null; // used by add method
+        this.collapse = null;
+        this.expand = null;
 
         // canvas background color
         this._backgroundColor = platformColor.background;
@@ -775,11 +777,11 @@ Turtles.TurtlesView = class {
         const turtlesStage = this.stage;
         // We put the buttons on the stage so they will be on top
 
-        const _makeButton = (svg, label, x, y) => {
+        const _makeButton = (svg, object, x, y) => {
             const container = document.createElement("div");
-            container.setAttribute("id", "" + label);
+            container.setAttribute("id", "" + object.name);
             container.setAttribute("class", "tooltipped");
-            container.setAttribute("data-tooltip", label);
+            container.setAttribute("data-tooltip", object.label);
             container.setAttribute("data-position", "bottom");
             jQuery.noConflict()(".tooltipped").tooltip({
                 html: true,
@@ -798,7 +800,7 @@ Turtles.TurtlesView = class {
                 }
             };
             const img = new Image();
-            img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(svg)));
+            img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svg));
 
             container.appendChild(img);
             container.setAttribute(
@@ -871,7 +873,10 @@ Turtles.TurtlesView = class {
         const __makeGridButton = () => {
             this.gridButton = _makeButton(
                 CARTESIANBUTTON,
-                _("Grid"),
+              {
+                "name":"Grid",
+                "label":_("Grid")
+              },
                 this._w - 10 - 3 * 55,
                 70 + LEADING + 6
             );
@@ -888,13 +893,45 @@ Turtles.TurtlesView = class {
         const __makeClearButton = () => {
             this._clearButton = _makeButton(
                 CLEARBUTTON,
-                _("Clean"),
+                {
+                "name":"Clean",
+                "label":_("Clean")
+                },
                 this._w - 5 - 2 * 55,
                 70 + LEADING + 6
             );
 
             this._clearButton.onclick = () => {
-                this.activity._allClear();
+                let clearBox = document.getElementById("ClearButton");
+                let clearContent = document.getElementById("ClearContent");
+                clearContent.innerHTML = _("Confirm");
+                clearBox.style.visibility="visible";
+                let auxToolbar = docById("aux-toolbar");
+                let clearBtnPosition = auxToolbar.style.display === "block" ? "183px" : "125px";
+                clearBox.style.top = clearBtnPosition;
+                let func = this.activity._allClear;
+                clearBox.addEventListener('click', function(event) {
+                    if(event.target.id == "clearClose"){
+                        this.style.visibility = "hidden";
+                    }
+                    else{
+                       func();
+                       clearBox.style.visibility = "hidden";
+                       if (auxToolbar.style.display === "block") {
+                        setTimeout(() => {
+                            docById("Grid").style.top = "136px";
+                            docById("Expand").style.top = "136px";
+                            docById("Collapse").style.top = "136px";
+                            docById("Clean").style.top = "136px";
+                        }, 0);
+                    } else {
+                        docById("Grid").style.top = "76px";
+                        docById("Expand").style.top = "76px";
+                        docById("Collapse").style.top = "76px";
+                        docById("Clean").style.top = "76px";
+                    }
+                    }
+                });            
             };
             
             if (doCollapse) {
@@ -903,13 +940,16 @@ Turtles.TurtlesView = class {
         };
 
         /**
-         * Makes collapse button by initailising 'EXPANDBUTTON' SVG.
+         * Makes collapse button by initailising 'COLLAPSEBUTTON' SVG.
          * Assigns click listener function to call __collapse() method.
          */
         const __makeCollapseButton = () => {
             this._collapseButton = _makeButton(
                 COLLAPSEBUTTON,
-                _("Collapse"),
+                {
+                "name":"Collapse",
+                "label":_("Collapse")
+                },
                 this._w - 55,
                 70 + LEADING + 6
             );
@@ -926,9 +966,47 @@ Turtles.TurtlesView = class {
                 this._expandButton.style.visibility = "visible";
                 this._collapseButton.style.visibility = "hidden";
                 this.gridButton.style.visibility = "hidden";
+                this.activity.helpfulWheelItems.forEach(ele => {
+                    if (ele.label === "Expand") {
+                        ele.display = true;
+                    } else if (ele.label === "Collapse") {
+                        ele.display = false;
+                    } else if (ele.label === "Grid") {
+                        ele.display = false;
+                    }
+                })
                 __collapse();
             };
         };
+
+        
+        this.collapse = () => {
+            const auxToolbar = docById("aux-toolbar");
+            if (auxToolbar.style.display === "block") {
+                const menuIcon = docById("menu");
+                auxToolbar.style.display = "none";
+                menuIcon.innerHTML = "menu";
+                docById("toggleAuxBtn").className -= "blue darken-1";
+            }
+            this._expandButton.style.visibility = "visible";
+            this._collapseButton.style.visibility = "hidden";
+            this.gridButton.style.visibility = "hidden";
+            this.activity.helpfulWheelItems.forEach(ele => {
+                if (ele.label === "Expand") {
+                    ele.display = true;
+                } else if (ele.label === "Collapse") {
+                    ele.display = false;
+                } else if (ele.label === "Grid") {
+                    ele.display = false;
+                }
+            })
+            __collapse();
+
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+                this.activity.__tick();
+            }
+        }
 
         /**
          * Makes expand button by initailising 'EXPANDBUTTON' SVG.
@@ -937,7 +1015,10 @@ Turtles.TurtlesView = class {
         const __makeExpandButton = () => {
             this._expandButton = _makeButton(
                 EXPANDBUTTON,
-                _("Expand"),
+                {
+                    "name":"Expand",
+                    "label":_("Expand"),
+                },
                 this._w - 55,
                 70 + LEADING + 6
             );
@@ -960,6 +1041,15 @@ Turtles.TurtlesView = class {
                 this.gridButton.style.visibility = "visible";
                 this._collapseButton.style.visibility = "visible";
                 this._expandButton.style.visibility = "hidden";
+                this.activity.helpfulWheelItems.forEach(ele => {
+                    if (ele.label === "Expand") {
+                        ele.display = false;
+                    } else if (ele.label === "Collapse") {
+                        ele.display = true;
+                    } else if (ele.label === "Grid") {
+                        ele.display = true;
+                    }
+                })
                 this._collapsedBoundary.visible = false;
                 turtlesStage.removeAllEventListeners("pressmove");
                 turtlesStage.removeAllEventListeners("mousedown");
@@ -992,6 +1082,68 @@ Turtles.TurtlesView = class {
                 this.masterStage.addChildAt(turtlesStage, 0);
             };
         };
+
+
+        this.expand = () => {
+            // If the aux toolbar is open, close it.
+            const auxToolbar = docById("aux-toolbar");
+            if (auxToolbar.style.display === "block") {
+                const menuIcon = docById("menu");
+                auxToolbar.style.display = "none";
+                menuIcon.innerHTML = "menu";
+                docById("toggleAuxBtn").className -= "blue darken-1";
+            }
+            this.hideMenu();
+            this.setStageScale(1.0);
+            this._expandedBoundary.visible = true;
+            this.gridButton.style.visibility = "visible";
+            this._collapseButton.style.visibility = "visible";
+            this._expandButton.style.visibility = "hidden";
+            this.activity.helpfulWheelItems.forEach(ele => {
+                if (ele.label === "Expand") {
+                    ele.display = false;
+                } else if (ele.label === "Collapse") {
+                    ele.display = true;
+                } else if (ele.label === "Grid") {
+                    ele.display = true;
+                }
+            })
+            this._collapsedBoundary.visible = false;
+            turtlesStage.removeAllEventListeners("pressmove");
+            turtlesStage.removeAllEventListeners("mousedown");
+
+            turtlesStage.x = 0;
+            turtlesStage.y = 0;
+            this._isShrunk = false;
+
+            for (let i = 0; i < this.turtleList.length; i++) {
+                this.turtleList[i].container.scaleX = 1;
+                this.turtleList[i].container.scaleY = 1;
+                this.turtleList[i].container.scale = 1;
+            }
+
+            this._clearButton.scaleX = 1;
+            this._clearButton.scaleY = 1;
+            this._clearButton.scale = 1;
+            this._clearButton.x = this._w - 5 - 2 * 55;
+
+            if (this.gridButton !== null) {
+                this.gridButton.scaleX = 1;
+                this.gridButton.scaleY = 1;
+                this.gridButton.scale = 1;
+                this.gridButton.x = this._w - 10 - 3 * 55;
+                this.gridButton.visible = true;
+            }
+
+            // remove the stage and add it back in position 0
+            this.masterStage.removeChild(turtlesStage);
+            this.masterStage.addChildAt(turtlesStage, 0);
+
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+                this.activity.__tick();
+            }
+        }
 
         /**
          * initializes all Buttons.
@@ -1061,8 +1213,7 @@ Turtles.TurtlesView = class {
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
-                    unescape(
-                        encodeURIComponent(
+                    base64Encode(
                             MBOUNDARY.replace("HEIGHT", this._h)
                                 .replace("WIDTH", this._w)
                                 .replace("Y", 10)
@@ -1073,8 +1224,7 @@ Turtles.TurtlesView = class {
                                 .replace("fill_color", this._backgroundColor)
                                 .replace("STROKE", 20)
                         )
-                    )
-                );
+                    );
             __makeAllButtons();
         };
         // Call the __makeBoundary2 function once the document is loaded
@@ -1102,8 +1252,7 @@ Turtles.TurtlesView = class {
             img.src =
                 "data:image/svg+xml;base64," +
                 window.btoa(
-                    unescape(
-                        encodeURIComponent(
+                    base64Encode(
                             MBOUNDARY.replace("HEIGHT", this._h)
                                 .replace("WIDTH", this._w)
                                 .replace("Y", 10 / CONTAINERSCALEFACTOR)
@@ -1114,7 +1263,6 @@ Turtles.TurtlesView = class {
                                 .replace("fill_color", this._backgroundColor)
                                 .replace("STROKE", 20 / CONTAINERSCALEFACTOR)
                         )
-                    )
                 );
         };
 

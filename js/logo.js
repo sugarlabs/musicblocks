@@ -1812,8 +1812,23 @@ class Logo {
 
         const tur = this.activity.turtles.ithTurtle(turtle);
 
-        if (tur.singer.embeddedGraphics === {}) return;
+        if(Object.keys) {
+            if(Object.keys(tur.singer.embeddedGraphics).length === 0) return;
 
+        } else{
+            const isEmpty = true;
+            for(const key in tur.singer.embeddedGraphics) {
+                if(tur.singer.embeddedGraphics.hasOwnProperty(key)){
+                    isEmpty = false;
+                    break;
+                }
+            }
+
+            if(isEmpty) return;
+
+        }
+
+        
         if (!(blk in tur.singer.embeddedGraphics)) return;
 
         if (tur.singer.embeddedGraphics[blk].length === 0) return;
@@ -1960,7 +1975,16 @@ class Logo {
                 for (let t = 0; t < NOTEDIV / tur.singer.dispatchFactor; t++) {
                     const deltaTime = waitTime + t * stepTime * tur.singer.dispatchFactor;
                     const deltaArg = arg / (NOTEDIV / tur.singer.dispatchFactor);
-                    setTimeout(() => tur.painter.doForward(deltaArg), deltaTime);
+                    if(t === 0) {
+                        setTimeout(() => tur.painter.doForward(deltaArg, "first"), deltaTime);
+                    }
+                    else if(t === (Math.ceil(NOTEDIV / tur.singer.dispatchFactor) - 1)) {
+                        setTimeout(() => tur.painter.doForward(deltaArg, "last"), deltaTime);
+                    }
+                    else {
+                        setTimeout(() => tur.painter.doForward(deltaArg, "middle"), deltaTime);
+                    }
+                    
                 }
             }
         };

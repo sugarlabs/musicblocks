@@ -37,6 +37,10 @@ self.addEventListener("activate", function (event) {
 });
 
 function updateCache(request, response) {
+    if (response.status === 206) {
+        console.log("Partial response is unsupported for caching.");
+        return Promise.resolve();
+    }
     return caches.open(CACHE).then(function (cache) {
         return cache.put(request, response);
     });
@@ -72,25 +76,28 @@ self.addEventListener("fetch", function (event) {
                 // version of the file to use the next time we show view
                 event.waitUntil(
                     fetch(event.request).then(function (response) {
-                        return updateCache(event.request, response);
+                        if (response.ok) {
+                            return updateCache(event.request, response);
+                        }
                     })
                 );
 
                 return response;
             },
-            function () {
+            async function () {
                 // The response was not found in the cache so we look
                 // for it on the server
-                return fetch(event.request)
-                    .then(function (response) {
-                        // If request was success, add or update it in the cache
+                try {
+                    const response = await fetch(event.request);
+                    // If request was success, add or update it in the cache
+                    if (response.ok) {
                         event.waitUntil(updateCache(event.request, response.clone()));
-                        return response;
-                    })
-                    .catch(function (error) {
-                        // eslint-disable-next-line no-console
-                        console.log("[PWA Builder] Network request failed and no cache." + error);
-                    });
+                    }
+                    return response;
+                } catch (error) {
+                    // eslint-disable-next-line no-console
+                    console.log("[PWA Builder] Network request failed and no cache." + error);
+                }
             }
         )
     );

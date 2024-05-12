@@ -199,17 +199,17 @@ class Blocks {
 
             let palette;
             /** Regenerate all of the artwork at the new scale. */
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 this.blockList[blk].resize(scale);
             }
 
             this.findStacks();
-            for (let stack = 0; stack < this.stackList.length; stack++) {
+            for (const stack in this.stackList) {
                 this.adjustDocks(this.stackList[stack], true);
             }
 
             /** Make sure trash is still hidden. */
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].trash) {
                     this.blockList[blk].hide();
                 }
@@ -218,13 +218,13 @@ class Blocks {
             /** We reset the protoblock scale on the palettes, but don't */
             /** modify the palettes themselves. */
             for (palette in this.activity.palettes.dict) {
-                for (let blk = 0; blk < this.activity.palettes.dict[palette].protoList.length; blk++) {
+                for (const blk in this.activity.palettes.dict[palette].protoList) {
                     this.activity.palettes.dict[palette].protoList[blk].scale = scale;
                 }
             }
 
             /** Force a refresh. */
-            await delayExecution(500);
+            await delayExecution(100);
             this.activity.refreshCanvas();
         };
 
@@ -1320,11 +1320,31 @@ class Blocks {
             }
 
             let thisBlockobj = this.blockList[thisBlock];
-            if (thisBlockobj.name === "vspace") {
+
+            // Do not remove the silence block if the user places a block just over it.
+            if (
+                thisBlockobj?.name === "vspace" &&
+                this.blockList[thisBlockobj.connections[1]]?.name === "rest2" &&
+                this.blockList[thisBlockobj.connections[0]]?.name === "vspace"
+              ) {
                 return;
             }
 
             thisBlockobj = this.blockList[thisBlock];
+
+            // Do not remove the silence block if only vspace blocks are added before the silence block.
+
+            let block = thisBlockobj;
+            while (block?.name == "vspace") {
+                if (block?.name != "vspace") {
+                    break;
+                }
+                block = this.blockList[block.connections[0]];
+                if (block?.name == "newnote") {
+                    return;
+                }
+            }
+            
             if (thisBlockobj.name === "rest2") {
                 this._deletePitchBlocks(thisBlock);
             } else {
@@ -1364,6 +1384,12 @@ class Blocks {
          */
         this.deletePreviousDefault = (thisBlock) => {
             let thisBlockobj = this.blockList[thisBlock];
+
+            // Do not remove the silence block if only a vspace block is inserted after the silence block.
+            if (this.blockList[thisBlockobj.connections[0]]?.name === "rest2" && this.blockList[thisBlock]?.name === "vspace") {
+                return thisBlockobj.connections[0];
+            }
+
             if (this._blockInStack(thisBlock, ["rest2"])) {
                 this._deletePitchBlocks(thisBlock);
                 return this.blockList[thisBlock].connections[0];
@@ -2122,10 +2148,29 @@ class Blocks {
          */
         this._testConnectionType = (type1, type2) => {
             /** Can these two blocks dock? */
+            if (type1 === "vspaceout" && type2 === "vspacein") {
+                return true;
+            }
+            if (type1 === "vspacein" && type2 === "vspaceout") {
+                return true;
+            }
+            
             if (type1 === "in" && type2 === "out") {
                 return true;
             }
             if (type1 === "out" && type2 === "in") {
+                return true;
+            }
+            if (type1 === "in" && type2 === "vspaceout") {
+                return true;
+            }
+            if (type1 === "vspaceout" && type2 === "in") {
+                return true;
+            }
+            if (type1 === "out" && type2 === "vspacein") {
+                return true;
+            }
+            if (type1 === "vspacein" && type2 === "out") {
                 return true;
             }
             if (type1 === "numberin" && ["numberout", "anyout"].indexOf(type2) !== -1) {
@@ -2168,6 +2213,18 @@ class Blocks {
                 return true;
             }
             if (type1 === "caseout" && type2 === "casein") {
+                return true;
+            }
+            if (type1 === "vspaceout" && type2 === "casein") {
+                return true;
+            }
+            if (type1 === "casein" && type2 === "vspaceout") {
+                return true;
+            }
+            if (type1 === "vspacein" && type2 === "caseout") {
+                return true;
+            }
+            if (type1 === "caseout" && type2 === "vspacein") {
                 return true;
             }
             if (
@@ -2243,7 +2300,7 @@ class Blocks {
          * @returns {void}
          */
         this.updateBlockPositions = () => {
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 this._moveBlock(blk, this.blockList[blk].container.x, this.blockList[blk].container.y);
             }
         };
@@ -2278,7 +2335,7 @@ class Blocks {
          */
         this.checkBounds = () => {
             let onScreen = true;
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].connections[0] == null) {
                     if (this.blockList[blk].offScreen(this.boundary)) {
                         this.activity.setHomeContainers(true);
@@ -2821,7 +2878,7 @@ class Blocks {
          * @returns{void}
          */
         this._searchForArgFlow = () => {
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].isArgFlowClampBlock()) {
                     this._searchCounter = 0;
                     this._searchForExpandables(blk);
@@ -3569,7 +3626,7 @@ class Blocks {
          */
         this._calculateDragGroup = (blk) => {
             this.dragLoopCounter += 1;
-            if (this.dragLoopCount > this.blockList.length) {
+            if (this.dragLoopCounter > this.blockList.length) {
                 // eslint-disable-next-line no-console
                 console.debug(
                     "Maximum loop counter exceeded in calculateDragGroup... this is bad. " + blk
@@ -3656,7 +3713,7 @@ class Blocks {
 
             /** Make sure we don't make two actions with the same name. */
             const actionNames = [];
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (
                     (this.blockList[blk].name === "text" || this.blockList[blk].name === "string") &&
                     !this.blockList[blk].trash
@@ -3688,7 +3745,7 @@ class Blocks {
          */
         this.findUniqueCustomName = (name) => {
             const noteNames = [];
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "text" && !this.blockList[blk].trash) {
                     const c = this.blockList[blk].connections[0];
                     if (c != null && this.blockList[c].name === "pitch" && !this.blockList[c].trash) {
@@ -3714,7 +3771,7 @@ class Blocks {
          */
         this.findUniqueTemperamentName = (name) => {
             const temperamentNames = [];
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "text" && !this.blockList[blk].trash) {
                     const c = this.blockList[blk].connections[0];
                     if (
@@ -3742,7 +3799,7 @@ class Blocks {
          * @returns {void}
          */
         this._findDrumURLs = () => {
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "text" || this.blockList[blk].name === "string") {
                     const c = this.blockList[blk].connections[0];
                     if (
@@ -3771,7 +3828,7 @@ class Blocks {
                 return;
             }
 
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "text") {
                     const c = this.blockList[blk].connections[0];
                     if (c != null && this.blockList[c].name === "box") {
@@ -3802,7 +3859,7 @@ class Blocks {
                 return;
             }
 
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "text") {
                     const c = this.blockList[blk].connections[0];
                     if (c != null && this.blockList[c].name === "storein") {
@@ -3851,7 +3908,7 @@ class Blocks {
                 return;
             }
 
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "storein2") {
                     if (this.blockList[blk].privateData === oldName) {
                         this.blockList[blk].privateData = newName;
@@ -3886,7 +3943,7 @@ class Blocks {
                 return;
             }
 
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].name === "namedbox") {
                     if (this.blockList[blk].privateData === oldName) {
                         this.blockList[blk].privateData = newName;
@@ -3924,7 +3981,7 @@ class Blocks {
 
             /** Update the blocks, do->oldName should be do->newName */
             /** Named dos are modified in a separate function below. */
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (blk === skipBlock) {
                     continue;
                 }
@@ -3983,7 +4040,7 @@ class Blocks {
             }
 
             /** Update the blocks, do->oldName should be do->newName */
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (
                     ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(
                         this.blockList[blk].name
@@ -4396,6 +4453,12 @@ class Blocks {
             } else {
                 const cblk = this.blockList[blk].connections[0];
                 if (this.blockList[cblk].isExpandableBlock()) {
+                    if (this.blockList[blk].name === "forever") {
+                        if (this._isConnectedToNoteValue(cblk)) {
+                            this.activity.errorMsg(_("Forever loop detected inside a note value block. Unexpected things may happen."));
+                            return null; 
+                        }
+                    }
                     /** If it is the last connection, keep searching. */
                     if (blk === last(this.blockList[cblk].connections)) {
                         return this._insideNoteBlock(cblk);
@@ -4415,6 +4478,17 @@ class Blocks {
             }
         };
 
+        this._isConnectedToNoteValue = (blk) => {
+            if (NOTEBLOCKS.indexOf(this.blockList[blk].name) !== -1) {
+                return true;
+            } else if (this.blockList[blk].connections[0] == null) {
+                return false;
+            } else {
+                const cblk = this.blockList[blk].connections[0];
+                return this._isConnectedToNoteValue(cblk);
+            }
+        };
+
         /**
          * Find an instance of a block type by name.
          * @param - blkName
@@ -4423,7 +4497,7 @@ class Blocks {
          */
         this.findBlockInstance = (blkName) => {
             /** Returns true if block of name blkName is loaded. */
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].name === blkName && !this.blockList[blk].trash) {
                     return true;
                 }
@@ -4952,11 +5026,19 @@ class Blocks {
 
             /** Reposition the paste location relative to the stage position. */
             if (this.selectedBlocksObj != null) {
-                this.selectedBlocksObj[0][2] = 175 - this.activity.blocksContainer.x + this.pasteDx;
-                this.selectedBlocksObj[0][3] = 75 - this.activity.blocksContainer.y + this.pasteDy;
-                this.pasteDx += 21;
-                this.pasteDy += 21;
+                if (docById("helpfulWheelDiv").style.display !== "none") {
+                    this.selectedBlocksObj[0][2] = docById("helpfulWheelDiv").offsetLeft + 240 - this.activity.blocksContainer.x;
+                    this.selectedBlocksObj[0][3] = docById("helpfulWheelDiv").offsetTop + 130 - this.activity.blocksContainer.y;
+
+                    docById("helpfulWheelDiv").style.display = "none";
+                } else {
+                    this.selectedBlocksObj[0][2] = 175 - this.activity.blocksContainer.x + this.pasteDx;
+                    this.selectedBlocksObj[0][3] = 75 - this.activity.blocksContainer.y + this.pasteDy;
+                    this.pasteDx += 21;
+                    this.pasteDy += 21;
+                }
                 this.loadNewBlocks(this.selectedBlocksObj);
+                this.activity.__tick();
             }
         };
 
@@ -5126,7 +5208,7 @@ class Blocks {
          * @returns boolean
          */
         this.findBlockInstance = (blkName) => {
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].name === blkName && !this.blockList[blk].trash) {
                     return true;
                 }
@@ -6467,7 +6549,7 @@ class Blocks {
 
             /** Do a final check on the action and boxes palettes. */
             let updatePalettes = false;
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (!this.blockList[blk].trash && this.blockList[blk].name === "action") {
                     const myBlock = this.blockList[blk];
                     const c = myBlock.connections[1];
@@ -6490,7 +6572,7 @@ class Blocks {
             }
 
             updatePalettes = false;
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (!this.blockList[blk].trash && this.blockList[blk].name === "storein") {
                     const myBlock = this.blockList[blk];
                     const c = myBlock.connections[1];
@@ -6635,7 +6717,7 @@ class Blocks {
             if (actionArg) {
                 const actionName = actionArg.value;
                 /** Look for any "orphan" action blocks. */
-                for (let blk = 0; blk < this.blockList.length; blk++) {
+                for (const blk in this.blockList) {
                     const thisBlock = this.blockList[blk];
 
                     /** We are only interested in do and nameddo blocks. */
@@ -6834,7 +6916,7 @@ class Blocks {
          * @returnss {void}
          */
         this.clearParameterBlocks = () => {
-            for (let blk = 0; blk < this.blockList.length; blk++) {
+            for (const blk in this.blockList) {
                 if (this.blockList[blk].protoblock.parameter && this.blockList[blk].text !== null) {
                     /** The audiofile block label is handled in block.js */
                     if (this.blockList[blk].name === "audiofile") {

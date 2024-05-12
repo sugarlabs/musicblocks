@@ -46,7 +46,6 @@
    Activity, LEADING, _THIS_IS_MUSIC_BLOCKS_, _THIS_IS_TURTLE_BLOCKS_,
    globalActivity, hideArrows, doAnalyzeProject
  */
-
 const LEADING = 0;
 const BLOCKSCALES = [1, 1.5, 2, 3, 4];
 const _THIS_IS_MUSIC_BLOCKS_ = true;
@@ -181,11 +180,21 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
 // blocks, logo, palettes, and turtles for plugins and js-export.
 let globalActivity;
 
+/**
+ * Performs analysis on the project using the global activity.
+ * @returns {object} - The analysis result.
+ */
 const doAnalyzeProject = function() {
     return analyzeProject(globalActivity);
 };
 
+/**
+ * Represents an activity in the application.
+ */
 class Activity {
+    /**
+     * Creates an Activity instance.
+     */
     constructor() {
         globalActivity = this;
 
@@ -296,6 +305,7 @@ class Activity {
 
         /**
          * Initialises major variables and renders default stack.
+         * Sets up the initial state and dependencies of the activity.
          */
         this.setupDependencies = () => {
             createDefaultStack();
@@ -369,6 +379,18 @@ class Activity {
             this.searchWidget.style.visibility = "hidden";
             this.searchWidget.placeholder = _("Search for blocks");
 
+            this.helpfulSearchWidget = document.createElement("input");
+            this.helpfulSearchWidget.setAttribute("id", "helpfulSearch");
+            this.helpfulSearchWidget.style.visibility = "hidden";
+            this.helpfulSearchWidget.placeholder = _("Search for blocks");
+            this.helpfulSearchWidget.classList.add("ui-autocomplete");
+            this.helpfulSearchWidget.style.cssText = `
+                padding: 2px;
+                border: 2px solid grey;
+                width: 220px;
+                height: 20px;
+                font-size: large;
+            `;
             this.progressBar = docById("myProgress");
             this.progressBar.style.visibility = "hidden";
 
@@ -377,7 +399,65 @@ class Activity {
             this.paste.style.visibility = "hidden";
 
             this.toolbarHeight = document.getElementById("toolbars").offsetHeight;
+
+            this.helpfulWheelItems = [];
+
+            this.setHelpfulSearchDiv();
         };
+
+        /*
+         * creates helpfulSearchDiv for search
+         */
+        this.setHelpfulSearchDiv = () => {
+            if (docById("helpfulSearchDiv")) {
+                docById("helpfulSearchDiv").parentNode.removeChild(
+                    docById("helpfulSearchDiv")
+                );
+            }
+            this.helpfulSearchDiv = document.createElement("div");
+            this.helpfulSearchDiv.setAttribute("id", "helpfulSearchDiv");
+            this.helpfulSearchDiv.style.cssText = `
+                position: absolute;
+                background-color: #f0f0f0;
+                padding: 5px;
+                border: 1px solid #ccc;
+                width: 230px;
+                display: none;
+                z-index: 1;
+            `;
+
+            document.body.appendChild(this.helpfulSearchDiv);
+
+            if (docById("helpfulSearch")) {
+                docById("helpfulSearch").parentNode.removeChild(
+                    docById("helpfulSearch")
+                );
+            }
+            this.helpfulSearchDiv.appendChild(this.helpfulSearchWidget);
+        }
+
+        /*
+         * displays helpfulSearchDiv on canvas
+         */
+        this._displayHelpfulSearchDiv = () => {
+            this.helpfulSearchDiv.style.left = docById("helpfulWheelDiv").offsetLeft + 80 * this.getStageScale() + "px";
+            this.helpfulSearchDiv.style.top = docById("helpfulWheelDiv").offsetTop + 110 * this.getStageScale() + "px";
+
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            this.helpfulSearchDiv.style.display = "block";
+            const menuWidth = this.helpfulSearchDiv.offsetWidth;
+            const menuHeight = this.helpfulSearchDiv.offsetHeight;
+
+            if (this.helpfulSearchDiv.offsetLeft + menuWidth > windowWidth) {
+                this.helpfulSearchDiv.style.left = (windowWidth - menuWidth) + "px";
+            }
+            if (this.helpfulSearchDiv.offsetTop + menuHeight > windowHeight) {
+                this.helpfulSearchDiv.style.top = (windowHeight - menuHeight) + "px";
+            }
+
+            this.showHelpfulSearchWidget();
+        }
 
         /*
          * Sets up right click functionality opening the context menus
@@ -389,10 +469,65 @@ class Activity {
                 (event) => {
                     event.preventDefault();
                     event.stopPropagation();
+                    if(event.target.id === "myCanvas") {
+                        this._displayHelpfulWheel(event);
+                    }
                 },
                 false
             );
         };
+
+        /*
+         * displays helpfulWheel on canvas on right click
+         */
+        this._displayHelpfulWheel = (event) => {
+            docById("helpfulWheelDiv").style.position = "absolute";
+
+            const x = event.clientX;
+            const y = event.clientY;
+        
+            const canvasLeft = this.canvas.offsetLeft + 28 * this.getStageScale();
+            const canvasTop = this.canvas.offsetTop + 6 * this.getStageScale();
+        
+            const helpfulWheelLeft = Math.max(Math.round(x * this.getStageScale() + canvasLeft) - 150, canvasLeft);
+            const helpfulWheelTop = Math.max(Math.round(y * this.getStageScale() + canvasTop) - 150, canvasTop);
+
+            docById("helpfulWheelDiv").style.left = helpfulWheelLeft + "px";
+           
+            docById("helpfulWheelDiv").style.top = helpfulWheelTop + "px";
+            
+            const windowWidth = window.innerWidth - 20;
+            const windowHeight = window.innerHeight - 20;
+            
+            if (helpfulWheelLeft + 350 > windowWidth) {
+                docById("helpfulWheelDiv").style.left = (windowWidth - 350) + "px";
+            }
+            if (helpfulWheelTop + 350 > windowHeight) {
+                docById("helpfulWheelDiv").style.top = (windowHeight - 350) + "px";
+            }
+
+            docById("helpfulWheelDiv").style.display = "";
+
+            const wheel = new wheelnav("helpfulWheelDiv", null, 300, 300);
+            wheel.colors = platformColor.wheelcolors;
+            wheel.slicePathFunction = slicePath().DonutSlice;
+            wheel.slicePathCustom = slicePath().DonutSliceCustomization();
+            wheel.slicePathCustom.minRadiusPercent = 0.45;
+            wheel.slicePathCustom.maxRadiusPercent = 1.0;
+            wheel.sliceSelectedPathCustom = wheel.slicePathCustom;
+            wheel.sliceInitPathCustom = wheel.slicePathCustom;
+            wheel.clickModeRotate = false;
+            const wheelItems = this.helpfulWheelItems.filter(ele => ele.display);
+            wheel.initWheel(wheelItems.map(ele => ele.icon));
+            wheel.createWheel();
+
+            wheel.navItems[0].selected = false;
+
+            wheelItems.forEach((ele, i) => {
+                wheel.navItems[i].setTooltip(_(ele.label));
+                wheel.navItems[i].navigateFunction = () => ele.fn(this);
+            })
+        }
 
         /*
          * Sets up plugin and palette boiler plate
@@ -459,18 +594,32 @@ class Activity {
          */
         const findBlocks = (activity) => {
             activity._findBlocks();
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+                activity.__tick();
+            }
         };
 
+        /**
+         * Finds and organizes blocks within the workspace.
+         * Blocks are positioned based on their connections and availability within the canvas area.
+         */
         this._findBlocks = () => {
+            // Ensure visibility of blocks
             if (!this.blocks.visible) {
                 this._changeBlockVisibility();
             }
+
+            // Reset active block and hide DOM label
             this.blocks.activeBlock = null;
             hideDOMLabel();
+
+            // Show blocks and set initial container position
             this.blocks.showBlocks();
             this.blocksContainer.x = 0;
             this.blocksContainer.y = 0;
 
+            // Calculate top and left positions for block placement
             let toppos;
             if (this.auxToolbar.style.display === "block") {
                 toppos = 90 + this.toolbarHeight;
@@ -479,12 +628,13 @@ class Activity {
             }
             const leftpos = Math.floor(this.canvas.width / 4);
 
+            // Update palettes and calculate initial block position
             this.palettes.updatePalettes();
             let x = Math.floor(leftpos * this.turtleBlocksScale);
             let y = Math.floor(toppos * this.turtleBlocksScale);
             let even = true;
 
-            // First the start blocks...
+            // Position start blocks first
             for (const blk in this.blocks.blockList) {
                 if (!this.blocks.blockList[blk].trash) {
                     const myBlock = this.blocks.blockList[blk];
@@ -492,6 +642,7 @@ class Activity {
                         continue;
                     }
 
+                    // Move block and its connected group
                     if (myBlock.connections[0] === null) {
                         const dx = x - myBlock.container.x;
                         const dy = y - myBlock.container.y;
@@ -506,6 +657,7 @@ class Activity {
                             }
                         }
 
+                        // Update x and y positions for next block placement
                         x += Math.floor(150 * this.turtleBlocksScale);
                         if (x > (this.canvas.width * 7) / 8 / this.turtleBlocksScale) {
                             even = !even;
@@ -521,7 +673,7 @@ class Activity {
                 }
             }
 
-            // ...then everything else.
+            // Position other blocks
             for (const blk in this.blocks.blockList) {
                 if (!this.blocks.blockList[blk].trash) {
                     const myBlock = this.blocks.blockList[blk];
@@ -529,6 +681,7 @@ class Activity {
                         continue;
                     }
 
+                    // Move block and its connected group
                     if (myBlock.connections[0] === null) {
                         const dx = x - myBlock.container.x;
                         const dy = y - myBlock.container.y;
@@ -542,6 +695,8 @@ class Activity {
                                 }
                             }
                         }
+
+                        // Update x and y positions for next block placement
                         x += 150 * this.turtleBlocksScale;
                         if (x > (this.canvas.width * 7) / 8 / this.turtleBlocksScale) {
                             even = !even;
@@ -562,6 +717,7 @@ class Activity {
             this.boundary.hide();
 
             // Return mice to the center of the screen.
+            // Reset turtles' positions to center of the screen
             for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
                 const savedPenState = this.turtles.turtleList[turtle].painter.penState;
                 this.turtles.turtleList[turtle].painter.penState = false;
@@ -848,6 +1004,11 @@ class Activity {
             if (table !== null) {
                 table.remove();
             }
+
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+                this.__tick();
+            }
         };
 
         /**
@@ -904,7 +1065,14 @@ class Activity {
 
         let isExecuting = false; // Flag variable to track execution status
 
+        /**
+         * Sets up a record button functionality for the given activity.
+         * @param {object} activity - The activity context.
+         */
         const doRecordButton = (activity) => {
+            /**
+             * Executes the record button functionality if execution is not already in progress.
+             */
             if (isExecuting) {
                 return; // Exit the function if execution is already in progress
             }
@@ -913,6 +1081,10 @@ class Activity {
             activity._doRecordButton();
         };
 
+        /**
+         * Functionality for the record button.
+         * @private
+         */
         this._doRecordButton = () => {
             const start = document.getElementById("record"),
                 recInside = document.getElementById("rec_inside");
@@ -920,6 +1092,10 @@ class Activity {
             var clickEvent = new Event("click");
             let flag = 0;
 
+            /**
+             * Records the screen using the browser's media devices API.
+             * @returns {Promise<MediaStream>} A promise resolving to the recorded media stream.
+             */
             async function recordScreen() {
                 flag = 1;
                 return await navigator.mediaDevices.getDisplayMedia(
@@ -941,6 +1117,10 @@ class Activity {
 
             const that = this;
 
+            /**
+             * Saves the recorded chunks as a video file.
+             * @param {Blob[]} recordedChunks - The recorded video chunks.
+             */
             function saveFile(recordedChunks) {
                 flag = 1;
                 recInside.classList.remove("blink");
@@ -966,6 +1146,9 @@ class Activity {
                 doRecordButton();
                 that.textMsg("click on stop sharing");
             }
+            /**
+             * Stops the recording process.
+             */
             function stopRec() {
                 flag = 0;
                 mediaRecorder.stop();
@@ -974,7 +1157,12 @@ class Activity {
                 document.body.appendChild(node);
             }
 
-            // eslint-disable-next-line no-unused-vars
+            /**
+             * Creates a media recorder instance.
+             * @param {MediaStream} stream - The media stream to be recorded.
+             * @param {string} mimeType - The MIME type of the recording.
+             * @returns {MediaRecorder} The created media recorder instance.
+             */
             function createRecorder (stream, mimeType) {
                 flag = 1;
                 recInside.classList.add("blink");
@@ -1009,6 +1197,9 @@ class Activity {
                 return mediaRecorder;
             }
 
+            /**
+             * Handles the recording process.
+             */
             function recording() {
                 start.addEventListener(
                     "click",
@@ -1027,12 +1218,14 @@ class Activity {
                 );
             }
 
+            // Start recording process if not already executing
             if (flag == 0 && isExecuting) {
                 recording();
                 start.dispatchEvent(clickEvent);
                 flag = 1;
             };
 
+            // Stop recording if already executing
             if(flag == 1 && isExecuting){
                 start.addEventListener("click", stopRec);
                 flag = 0;
@@ -1047,6 +1240,11 @@ class Activity {
             activity._doSlowButton();
         };
 
+        /**
+         * Executes slow button functionality.
+         * Resets active block, hides DOM labels, adjusts turtle delay, resumes synth, and runs or steps logo commands.
+         * @private
+         */
         this._doSlowButton = () => {
             this.blocks.activeBlock = null;
             hideDOMLabel();
@@ -1068,6 +1266,11 @@ class Activity {
             activity._doStepButton();
         };
 
+        /**
+         * Executes step button functionality.
+         * Resets active block, hides DOM labels, adjusts turtle delay, resumes synth, and runs or steps logo commands.
+         * @private
+         */
         this._doStepButton = () => {
             this.blocks.activeBlock = null;
             hideDOMLabel();
@@ -1098,6 +1301,11 @@ class Activity {
             activity._doHardStopButton(onblur);
         };
 
+        /**
+         * Stops running of music blocks and stops all mid-way synths.
+         * @param {boolean} onblur - Indicates if the function is triggered by loss of focus.
+         * @private
+         */
         this._doHardStopButton = (onblur) => {
             this.blocks.activeBlock = null;
             hideDOMLabel();
@@ -1130,6 +1338,11 @@ class Activity {
             activity._doSwitchMode();
         };
 
+        /**
+         * Switches between beginner and advanced modes.
+         * Displays a message prompting browser refresh to apply mode change.
+         * @private
+         */
         this._doSwitchMode = () => {
             this.blocks.activeBlock = null;
             const mode = this.storage.beginnerMode;
@@ -1162,8 +1375,16 @@ class Activity {
         const setScroller = (activity) => {
             activity._setScroller();
             activity._setupBlocksContainerEvents();
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+            }
         };
 
+        /**
+         * Initializes the functionality of the horizontal scroll icon.
+         * Toggles horizontal scrolling and updates corresponding UI elements.
+         * @private
+         */
         this._setScroller = () => {
             this.blocks.activeBlock = null;
             this.scrollBlockContainer = !this.scrollBlockContainer;
@@ -1172,13 +1393,30 @@ class Activity {
             if (this.scrollBlockContainer && !this.beginnerMode) {
                 enableHorizScrollIcon.style.display = "none";
                 disableHorizScrollIcon.style.display = "block";
+
+                this.helpfulWheelItems.forEach(ele => {
+                    if (ele.label === "Enable horizontal scrolling")
+                        ele.display = false;
+                    else if (ele.label === "Disable horizontal scrolling")
+                        ele.display = true;
+                })
             } else {
                 enableHorizScrollIcon.style.display = "block";
                 disableHorizScrollIcon.style.display = "none";
+
+                this.helpfulWheelItems.forEach(ele => {
+                    if (ele.label === "Enable horizontal scrolling")
+                        ele.display = true;
+                    else if (ele.label === "Disable horizontal scrolling")
+                        ele.display = false;
+                })
             }
         };
 
-        // Load animation handler.
+        /**
+         * Displays loading animation with random messages.
+         * @private
+         */
         this.doLoadAnimation = () => {
             const messages = {
                 load_messages: [
@@ -1213,87 +1451,108 @@ class Activity {
             setInterval(changeText, 2000);
         };
 
-        /*
-         * Increases block size
+        /**
+         * Increases the size of blocks in the activity.
+         * @param {object} activity - The activity object.
          */
-        const doLargerBlocks = (activity) => {
-            activity._doLargerBlocks();
+        const doLargerBlocks = async(activity) => {
+            await activity._doLargerBlocks();
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+                activity.__tick();
+            }
         };
 
-        this._doLargerBlocks = () => {
+        this._doLargerBlocks = async() => {
             this.blocks.activeBlock = null;
 
             if (!this.resizeDebounce) {
                 if (this.blockscale < BLOCKSCALES.length - 1) {
                     this.resizeDebounce = true;
                     this.blockscale += 1;
-                    this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
-
-                    const that = this;
-                    setTimeout(() => {
-                        that.resizeDebounce = false;
-                    }, 3000);
+                    await this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
                 }
 
-                this.setSmallerLargerStatus();
+                const that = this;
+                that.resizeDebounce = false;
+                await this.setSmallerLargerStatus();
+
             }
-            this.activity.refreshCanvas();
+            if(typeof(this.activity)!="undefined"){
+                 await this.activity.refreshCanvas();
+               }
             document.getElementById("hideContents").click();
         };
 
-        /*
-         * Decreases block size
+        /**
+         * Decreases the size of blocks in the activity.
+         * @param {object} activity - The activity object.
          */
-        const doSmallerBlocks = (activity) => {
-            activity._doSmallerBlocks();
+        const doSmallerBlocks = async(activity) => {
+            await activity._doSmallerBlocks();
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+                activity.__tick();
+            }
         };
 
-        this._doSmallerBlocks = () => {
+        
+        /**
+         * Manages the resizing of blocks to handle larger size.
+         */
+        this._doSmallerBlocks = async() => {
             this.blocks.activeBlock = null;
 
             if (!this.resizeDebounce) {
                 if (this.blockscale > 0) {
                     this.resizeDebounce = true;
                     this.blockscale -= 1;
-                    this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
+                    await this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
                 }
 
                 const that = this;
-                setTimeout(() => {
-                    that.resizeDebounce = false;
-                }, 3000);
+                that.resizeDebounce = false;
+
             }
 
-            this.setSmallerLargerStatus();
-            this.activity.refreshCanvas();
+            await this.setSmallerLargerStatus();
+            if(typeof(this.activity)!="undefined"){
+                await this.activity.refreshCanvas();
+            }
             document.getElementById("hideContents").click();
         };
 
         /*
          * If either the block size has reached its minimum or maximum,
          * then the icons to make them smaller/bigger will be hidden.
+         * Sets the status of the smaller and larger block icons based on the current block size.
          */
-        this.setSmallerLargerStatus = () => {
+        this.setSmallerLargerStatus = async() => {
             if (BLOCKSCALES[this.blockscale] < DEFAULTBLOCKSCALE) {
-                changeImage(this.smallerContainer.children[0], SMALLERBUTTON, SMALLERDISABLEBUTTON);
+                await changeImage(this.smallerContainer.children[0], SMALLERBUTTON, SMALLERDISABLEBUTTON);
             } else {
-                changeImage(this.smallerContainer.children[0], SMALLERDISABLEBUTTON, SMALLERBUTTON);
+                await changeImage(this.smallerContainer.children[0], SMALLERDISABLEBUTTON, SMALLERBUTTON);
             }
 
             if (BLOCKSCALES[this.blockscale] === 4) {
-                changeImage(this.largerContainer.children[0], BIGGERBUTTON, BIGGERDISABLEBUTTON);
+                await changeImage(this.largerContainer.children[0], BIGGERBUTTON, BIGGERDISABLEBUTTON);
             } else {
-                changeImage(this.largerContainer.children[0], BIGGERDISABLEBUTTON, BIGGERBUTTON);
+                await changeImage(this.largerContainer.children[0], BIGGERDISABLEBUTTON, BIGGERBUTTON);
             }
         };
 
-        /*
-         * Based on the active palette, remove a plugin palette from local storage.
+
+        /**
+         * Deletes a plugin palette from local storage based on the active palette.
+         * @param {object} activity - The activity object.
          */
         const deletePlugin = (activity) => {
             activity._deletePlugin();
         };
 
+        /**
+         * Deletes a plugin palette from local storage.
+         */
         this._deletePlugin = () => {
             if (this.palettes.activePalette !== null) {
                 const obj = JSON.parse(this.storage.plugins);
@@ -1451,14 +1710,24 @@ class Activity {
 
             const that = this;
 
+            /**
+             * Closes any open menus and labels.
+             */
             const closeAnyOpenMenusAndLabels = () => {
                 if (docById("wheelDiv") !== null) docById("wheelDiv").style.display = "none";
                 if (docById("contextWheelDiv") !== null)
                     docById("contextWheelDiv").style.display = "none";
+                if (docById("helpfulWheelDiv") !== null)
+                    docById("helpfulWheelDiv").style.display = "none";
                 if (docById("textLabel") !== null) docById("textLabel").style.display = "none";
                 if (docById("numberLabel") !== null) docById("numberLabel").style.display = "none";
             };
 
+            /**
+             * Normalizes wheel event data across different browsers.
+             * @param {WheelEvent} event - The wheel event object.
+             * @returns {Object} - Normalized pixelX and pixelY values.
+             */
             const normalizeWheel = (event) => {
                 const PIXEL_STEP = 10;
                 const LINE_HEIGHT = 40;
@@ -1469,12 +1738,14 @@ class Activity {
                     pX = 0,
                     pY = 0; // pixelX, pixelY
 
+                // Determine scroll values based on different event properties
                 if ("detail" in event) sY = event.detail;
                 if ("wheelDelta" in event) sY = -event.wheelDelta / 120;
                 if ("wheelDeltaY" in event) sY = -event.wheelDeltaY / 120;
                 if ("wheelDeltaX" in event) sX = -event.wheelDeltaX / 120;
 
                 // side scrolling on FF with DOMMouseScroll
+                // Handle horizontal scrolling on Firefox
                 if ("axis" in event && event.axis === event.HORIZONTAL_AXIS) {
                     sX = sY;
                     sY = 0;
@@ -1483,9 +1754,11 @@ class Activity {
                 pX = sX * PIXEL_STEP;
                 pY = sY * PIXEL_STEP;
 
+                // Determine delta values based on deltaMode
                 if ("deltaY" in event) pY = event.deltaY;
                 if ("deltaX" in event) pX = event.deltaX;
 
+                // Adjust pixel values based on deltaMode
                 if ((pX || pY) && event.deltaMode) {
                     if (event.deltaMode === 1) {
                         // ff uses deltamode = 1
@@ -1510,6 +1783,10 @@ class Activity {
             const myCanvas = document.getElementById("myCanvas");
             const initialTouches = [[null, null], [null, null]]; // Array to track two fingers (Y and X coordinates)
 
+            /**
+             * Handles touch start event on the canvas.
+             * @param {TouchEvent} event - The touch event object.
+             */
             myCanvas.addEventListener("touchstart", (event) => {
                 if (event.touches.length === 2) {
                     for (let i = 0; i < 2; i++) {
@@ -1519,6 +1796,10 @@ class Activity {
                 }
             });
 
+            /**
+             * Handles touch move event on the canvas.
+             * @param {TouchEvent} event - The touch event object.
+             */
             myCanvas.addEventListener("touchmove", (event) => {
                 if (event.touches.length === 2) {
                     for (let i = 0; i < 2; i++) {
@@ -1548,6 +1829,9 @@ class Activity {
                 }
             });
 
+            /**
+             * Handles touch end event on the canvas.
+             */
             myCanvas.addEventListener("touchend", () => {
                 for (let i = 0; i < 2; i++) {
                     initialTouches[i][0] = null;
@@ -1555,10 +1839,22 @@ class Activity {
                 }
             });
 
+            /**
+             * Handles wheel event on the canvas.
+             * @param {WheelEvent} event - The wheel event object.
+             */
             const __wheelHandler = (event) => {
                 const data = normalizeWheel(event); // normalize over different browsers
                 const delY = data.pixelY;
                 const delX = data.pixelX;
+               
+                //Ctrl+MouseWheel Zoom functionality
+                if (event.ctrlKey) {
+                    event.preventDefault(); // Prevent default scrolling behavior
+                   
+                    if(delY < 0 && doLargerBlocks(this));//Zoom IN
+                    if(delY >= 0 && doSmallerBlocks(this));//Zoom Out
+                }
                 if (delY !== 0 && event.axis === event.VERTICAL_AXIS) {
                     closeAnyOpenMenusAndLabels(); // closes all wheelnavs when scrolling .
                     that.blocksContainer.y -= delY;
@@ -1577,6 +1873,10 @@ class Activity {
 
             docById("myCanvas").addEventListener("wheel", __wheelHandler, false);
 
+            /**
+             * Handles stage mouse up event.
+             * @param {MouseEvent} event - The mouse event object.
+             */
             const __stageMouseUpHandler = (event) => {
                 that.stageMouseDown = false;
                 that.moving = false;
@@ -1587,11 +1887,19 @@ class Activity {
                 }
             };
 
+            /**
+             * Handles mouse movement on the stage.
+             * @param {object} event - The mouse event object.
+             */
             this.stage.on("stagemousemove", (event) => {
                 that.stageX = event.stageX;
                 that.stageY = event.stageY;
             });
 
+            /**
+             * Handles mouse down event on the stage.
+             * @param {object} event - The mouse event object.
+             */
             this.stage.on("stagemousedown", (event) => {
                 that.stageMouseDown = true;
                 if ((that.stage.getObjectUnderPoint() !== null) | that.turtles.running()) {
@@ -1619,6 +1927,7 @@ class Activity {
                     }
 
                     // if we are moving the block container, deselect the active block.
+                    // Deselect active block if moving the block container
                     that.blocks.activeBlock = null;
 
                     // eslint-disable-next-line max-len
@@ -1643,30 +1952,45 @@ class Activity {
             });
         };
 
-        /*
+        /**
          * Sets up scrolling functionality in palette and across canvas
+         * Retrieves the scale of the stage.
+         * @returns {number} - The scale of the stage.
          */
         this.getStageScale = () => {
             return this.turtleBlocksScale;
         };
 
+        /**
+         * Retrieves the X coordinate of the stage.
+         * @returns {number} - The X coordinate of the stage.
+         */
         this.getStageX = () => {
             return this.turtles.screenX2turtleX(this.stageX / this.turtleBlocksScale);
         };
 
+        /**
+         * Retrieves the Y coordinate of the stage.
+         * @returns {number} - The Y coordinate of the stage.
+         */
         this.getStageY = () => {
             return this.turtles.screenY2turtleY(
                 (this.stageY - this.toolbarHeight) / this.turtleBlocksScale
             );
         };
 
+        /**
+         * Retrieves the mouse down state of the stage.
+         * @returns {boolean} - The mouse down state of the stage.
+         */
         this.getStageMouseDown = () => {
             return this.stageMouseDown;
         };
 
         /**
-         * Renders grid.
-         * @param imagePath {path of grid to be rendered}
+         * Creates and renders a grid on the stage.
+         * @param {string} imagePath - The path of the grid image.
+         * @returns {object} - The created grid object.
          */
         this._createGrid = (imagePath) => {
             const img = new Image();
@@ -1688,11 +2012,11 @@ class Activity {
         };
 
         /**
-         * @param  fillColor   {inner color of message}
-         * @param  strokeColor {border of message}
-         * @param  callback    {callback function assigned to particular message}
-         * @param  y           {position on canvas}
-         * @returns {description}
+         * Creates and renders a message container.
+         * @param {string} fillColor - The fill color of the message container.
+         * @param {string} strokeColor - The stroke color of the message container.
+         * @param {function} callback - The callback function assigned to the message container.
+         * @param {number} y - The position on the canvas.
          */
         this._createMsgContainer = (fillColor, strokeColor, callback, y) => {
             const container = new createjs.Container();
@@ -1744,10 +2068,11 @@ class Activity {
                 that.msgText = text;
             };
 
-            img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(svgData)));
+            img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svgData));
         };
 
         /*
+         * Creates and renders error message containers with appropriate artwork.
          * Some error messages have special artwork.
          */
         this._createErrorContainers = () => {
@@ -1758,8 +2083,8 @@ class Activity {
         };
 
         /**
-         * Renders error message with appropriate artwork
-         * @param  name {specifies svg to be rendered}
+         * Renders an error message with appropriate artwork.
+         * @param {string} name - The name specifying the SVG to be rendered.
          */
         this._makeErrorArtwork = (name) => {
             const container = new createjs.Container();
@@ -1967,13 +2292,13 @@ class Activity {
                     ) {
                         //do nothing when clicked in the input field
                     } else if (
-                        docById("ui-id-1").style.display === "block" &&
+                        docById("ui-id-1") && docById("ui-id-1").style.display === "block" &&
                         (e.target === docById("ui-id-1") || docById("ui-id-1").contains(e.target))
                     ) {
                         //do nothing when clicked on the menu
                     } else if (document.getElementsByTagName("tr")[2].contains(e.target)) {
                         //do nothing when clicked on the search row
-                    } else {
+                    } else if(e.target.id === "myCanvas") {
                         that.hideSearchWidget();
                         document.removeEventListener("mousedown", closeListener);
                     }
@@ -2004,6 +2329,7 @@ class Activity {
                     that.searchWidget.idInput_custom = ui.item.value;
                     that.searchWidget.protoblk = ui.item.specialDict;
                     that.doSearch();
+                    if (event.keyCode === 13) this.searchWidget.style.visibility = "visible";
                 },
                 focus: (event, ui) => {
                     event.preventDefault();
@@ -2245,6 +2571,7 @@ class Activity {
             const disableKeys =
                 docById("lilypondModal").style.display === "block" ||
                 this.searchWidget.style.visibility === "visible" ||
+                this.helpfulSearchWidget.style.visibility === "visible" ||
                 docById("planet-iframe").style.display === "" ||
                 docById("paste").style.visibility === "visible" ||
                 docById("wheelDiv").style.display === "" ||
@@ -2258,7 +2585,7 @@ class Activity {
                 }
             }
 
-            if (event.altKey && !disableKeys) {
+            if ((event.altKey && !disableKeys) || (event.keyCode == 13) || (event.key == '/') || (event.key == '\\') ) {
                 switch (event.keyCode) {
                     case 66: // 'B'
                         this.textMsg("Alt-B " + _("Saving block artwork"));
@@ -2275,8 +2602,23 @@ class Activity {
                         this.textMsg("Alt-E " + _("Erase"));
                         this._allClear(false);
                         break;
-                    case 82: // 'R'
+                    case 82: // 'R or ENTER'
                         this.textMsg("Alt-R " + _("Play"));
+                        let stopbtn = document.getElementById("stop");
+                        if (stopbtn) {
+                            stopbtn.style.color = platformColor.stopIconcolor;
+                        }
+                        this._doFastButton();
+                        break;
+                    case 13: // 'R or ENTER'
+                        if (this.searchWidget.style.visibility === 'visible') {
+                            return;
+                        }
+                        this.textMsg("Enter " + _("Play"));
+                        let stopbt = document.getElementById("stop");
+                        if (stopbt) {
+                            stopbt.style.color = platformColor.stopIconcolor;
+                        }
                         this._doFastButton();
                         break;
                     case 83: // 'S'
@@ -2291,6 +2633,17 @@ class Activity {
                         this.textMsg("Alt-H " + _("Save block help"));
                         this._saveHelpBlocks();
                         break;
+                    case 191:
+                        if(event.key=='/' && (!this.beginnerMode) && (disableHorizScrollIcon.style.display == "block")) {
+                           this.blocksContainer.x += this.canvas.width / 10;
+                           this.stage.update();
+                        }
+                    case 220:
+                        if(event.key=='\\' && (!this.beginnerMode) && (disableHorizScrollIcon.style.display == "block")) {
+                            this.blocksContainer.x -= this.canvas.width / 10;
+                            this.stage.update();
+                        }
+    
                 }
             } else if (event.ctrlKey) {
                 switch (event.keyCode) {
@@ -2591,7 +2944,8 @@ class Activity {
             const $j = jQuery.noConflict();
             let w = 0,
                 h = 0;
-            if (!platform.androidWebkit) {
+            if (typeof platform !== 'undefined' &&
+                    !platform.androidWebkit) {
                 w = window.innerWidth;
                 h = window.innerHeight;
             } else {
@@ -2746,7 +3100,8 @@ class Activity {
             this.update = true;
 
             // Hide tooltips on mobile
-            if (platform.mobile) {
+            if (typeof platform !== 'undefined' &&
+                    platform.mobile) {
                 // palettes.setMobile(true);
                 // palettes.hide();
                 this.toolbar.disableTooltips($j);
@@ -2807,6 +3162,7 @@ class Activity {
                 canvasHolder.height = canvas.height;
             }
             document.getElementById("hideContents").click();
+            that.refreshCanvas();
         }
 
         let resizeTimeout;
@@ -2818,18 +3174,19 @@ class Activity {
             }, 100);
         });
         window.addEventListener("orientationchange",  handleResize);
-
-        const that = this;
-        const screenWidth = window.innerWidth;
-        const  resizeCanvas_ = () => {
-            if (screenWidth !== window.innerWidth) {
+        const that = this;        
+        const resizeCanvas_ = () => {
+            try {
                 that._onResize(false);
+                document.getElementById("hideContents").click();
+            } catch (error) {
+                console.error("An error occurred in resizeCanvas_:", error);
             }
-            document.getElementById("hideContents").click();
         };
         
         resizeCanvas_();
-        window.addEventListener("orientationchange", resizeCanvas_ );
+        window.addEventListener("orientationchange", resizeCanvas_);
+        
         /*
          * Restore last stack pushed to trashStack back onto canvas.
          * Hides palettes before update
@@ -2837,13 +3194,17 @@ class Activity {
          */
         const restoreTrash = (activity) => {
             activity._restoreTrash();
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+                activity.__tick();
+            }
         };
 
         this._restoreTrash = () => {
             for (const name in this.palettes.dict) {
                 this.palettes.dict[name].hideMenu(true);
             }
-
+            
             this.blocks.activeBlock = null;
             this.refreshCanvas();
 
@@ -2935,6 +3296,18 @@ class Activity {
             this.refreshCanvas();
         };
 
+        this.handleKeyDown = (event) => {
+            
+            if (event.ctrlKey && event.key === "z") {
+                this._restoreTrash(activity);
+                activity.__tick();
+                event.preventDefault();
+            }
+        };
+
+        // Attach keydown event listener to document
+        document.addEventListener("keydown", this.handleKeyDown);
+
         /*
          * Open aux menu
          */
@@ -2954,6 +3327,18 @@ class Activity {
         this._showHideAuxMenu = (resize) => {
             const cellsize = 55;
             let dy;
+
+            // function to increase or decrease the "top" property of the top-right corner buttons
+
+            const topRightButtons = document.querySelectorAll("#buttoncontainerTOP .tooltipped");
+            const btnY = document.getElementById("Grid").getBoundingClientRect().top;
+
+            this.changeTopButtonsPosition = (value) => {
+                topRightButtons.forEach((child) => {
+                    child.style.top = `${btnY + value}px`;
+                });
+            };
+            
             if (!resize && this.toolbarHeight === 0) {
                 dy = cellsize + LEADING + 5;
                 this.toolbarHeight = dy;
@@ -2962,6 +3347,7 @@ class Activity {
                 this.turtles.deltaY(dy);
 
                 this.blocksContainer.y += dy;
+                this.changeTopButtonsPosition(dy);
                 this.blocks.checkBounds();
             } else {
                 dy = this.toolbarHeight;
@@ -2971,6 +3357,7 @@ class Activity {
                 this.turtles.deltaY(-dy);
 
                 this.blocksContainer.y -= dy;
+                this.changeTopButtonsPosition(-dy);
             }
 
             this.refreshCanvas();
@@ -3059,6 +3446,10 @@ class Activity {
          */
         const changeBlockVisibility = (activity) => {
             activity._changeBlockVisibility();
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+                activity.__tick();
+            }
         };
 
         this._changeBlockVisibility = () => {
@@ -3089,6 +3480,10 @@ class Activity {
          */
         const toggleCollapsibleStacks = (activity) => {
             activity._toggleCollapsibleStacks();
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+                activity.__tick();
+            }
         };
 
         this._toggleCollapsibleStacks = () => {
@@ -3172,6 +3567,9 @@ class Activity {
          */
         const chooseKeyMenu = (that) => {
             piemenuKey(that);
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+            }
         };
 
         /*
@@ -4206,88 +4604,199 @@ class Activity {
          * These menu items are on the canvas, not the toolbar.
          */
         this._setupPaletteMenu = () => {
-            let removed = false;
-            if (docById("buttoncontainerBOTTOM")) {
-                removed = true;
-                docById("buttoncontainerBOTTOM").parentNode.removeChild(
-                    docById("buttoncontainerBOTTOM")
-                );
-            }
             const btnSize = this.cellSize;
-            // Lower right
+            const createButton = (icon, label, action) => {
+                const button = this._makeButton(icon, label, x, y, btnSize, 0);
+                this._loadButtonDragHandler(button, action, this);
+                x += btnSize;
+                return button;
+            };
+
             let x = window.innerWidth - 4 * btnSize - 27.5;
             const y = window.innerHeight - 57.5;
-            const dx = btnSize;
+
+            const removeButtonContainer = docById("buttoncontainerBOTTOM");
+            if (removeButtonContainer) {
+                removeButtonContainer.parentNode.removeChild(removeButtonContainer);
+            }
 
             const ButtonHolder = document.createElement("div");
             ButtonHolder.setAttribute("id", "buttoncontainerBOTTOM");
-            if (!removed) {
-                ButtonHolder.style.display = "none"; //  if firsttime: make visible later.
-            }
+            ButtonHolder.style.display = removeButtonContainer ? "none" : "block";
             document.body.appendChild(ButtonHolder);
 
-            this.homeButtonContainer = this._makeButton(
-                GOHOMEFADEDBUTTON,
+            this.homeButtonContainer = createButton(GOHOMEFADEDBUTTON,
                 _("Home") + " [" + _("Home").toUpperCase() + "]",
-                x,
-                y,
-                btnSize,
-                0
+                findBlocks
             );
-
-            this._loadButtonDragHandler(this.homeButtonContainer, findBlocks, this);
-
             this.boundary.hide();
 
-            x += dx;
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Home [HOME]")) 
+                this.helpfulWheelItems.push({label: "Home [HOME]", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(GOHOMEFADEDBUTTON)), display: true, fn: findBlocks});
 
-            this.hideBlocksContainer = this._makeButton(
-                SHOWBLOCKSBUTTON,
-                _("Show/hide block"),
-                x,
-                y,
-                btnSize,
-                0
-            );
-            this._loadButtonDragHandler(this.hideBlocksContainer, changeBlockVisibility, this);
+            this.hideBlocksContainer = createButton(SHOWBLOCKSBUTTON, _("Show/hide block"),
+                changeBlockVisibility);
 
-            x += dx;
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Show/hide block")) 
+                this.helpfulWheelItems.push({label: "Show/hide block", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SHOWBLOCKSBUTTON)), display: true, fn: changeBlockVisibility});
+            
+            this.collapseBlocksContainer = createButton(COLLAPSEBLOCKSBUTTON, _("Expand/collapse blocks"),
+                toggleCollapsibleStacks);
 
-            this.collapseBlocksContainer = this._makeButton(
-                COLLAPSEBLOCKSBUTTON,
-                _("Expand/collapse blocks"),
-                x,
-                y,
-                btnSize,
-                0
-            );
-            this._loadButtonDragHandler(
-                this.collapseBlocksContainer, toggleCollapsibleStacks, this
-            );
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Expand/collapse blocks")) 
+                this.helpfulWheelItems.push({label: "Expand/collapse blocks", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBLOCKSBUTTON)), display: true, fn: toggleCollapsibleStacks});
+            
+            this.smallerContainer = createButton(SMALLERBUTTON, _("Decrease block size"),
+                doSmallerBlocks);
+            
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Decrease block size")) 
+                this.helpfulWheelItems.push({label: "Decrease block size", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SMALLERBUTTON)), display: true, fn: doSmallerBlocks});
+            
+            this.largerContainer = createButton(BIGGERBUTTON, _("Increase block size"),
+                doLargerBlocks);
+            
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Increase block size")) 
+                this.helpfulWheelItems.push({label: "Increase block size", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(BIGGERBUTTON)), display: true, fn: doLargerBlocks});
 
-            x += dx;
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Restore")) 
+                this.helpfulWheelItems.push({label: "Restore", icon: "imgsrc:header-icons/restore-from-trash.svg", display: true, fn: restoreTrash});
+            
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap Off"))
+                this.helpfulWheelItems.push({label: "Turtle Wrap Off", icon: "imgsrc:header-icons/wrap-text.svg", display: true, fn: this.toolbar.changeWrap});
 
-            this.smallerContainer = this._makeButton(
-                SMALLERBUTTON,
-                _("Decrease block size"),
-                x,
-                y,
-                btnSize,
-                0
-            );
-            this._loadButtonDragHandler(this.smallerContainer, doSmallerBlocks, this);
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap On"))
+                this.helpfulWheelItems.push({label: "Turtle Wrap On", icon: "imgsrc:header-icons/wrap-text.svg", display: false, fn: this.toolbar.changeWrap});
 
-            x += dx;
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Enable horizontal scrolling")) 
+                this.helpfulWheelItems.push({label: "Enable horizontal scrolling", icon: "imgsrc:header-icons/compare-arrows.svg", display: this.beginnerMode ? false: true, fn: setScroller});
+            
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Disable horizontal scrolling")) 
+                this.helpfulWheelItems.push({label: "Disable horizontal scrolling", icon: "imgsrc:header-icons/lock.svg", display: false, fn: setScroller});
+            
+            if(_THIS_IS_MUSIC_BLOCKS_ && !this.helpfulWheelItems.find(ele => ele.label === "Set Pitch Preview")) 
+                this.helpfulWheelItems.push({label: "Set Pitch Preview", icon: "imgsrc:header-icons/music-note.svg", display: true, fn: chooseKeyMenu});
+        
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Grid")) 
+                this.helpfulWheelItems.push({label: "Grid", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CARTESIANBUTTON)), display: true, fn: piemenuGrid});
+        
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Clean")) 
+                this.helpfulWheelItems.push({label: "Clean", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CLEARBUTTON)), display: true, fn: () => this._allClear(false)});
+            
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Collapse")) 
+                this.helpfulWheelItems.push({label: "Collapse", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBUTTON)), display: true, fn: this.turtles.collapse});
+        
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Expand")) 
+                this.helpfulWheelItems.push({label: "Expand", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(EXPANDBUTTON)), display: false, fn: this.turtles.expand});
+        
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Search for Blocks")) 
+                this.helpfulWheelItems.push({label: "Search for Blocks", icon: "imgsrc:header-icons/search-button.svg", display: true, fn: this._displayHelpfulSearchDiv});
+        
+            if(!this.helpfulWheelItems.find(ele => ele.label === "Paste previous stack")) 
+                this.helpfulWheelItems.push({label: "Paste previous stack", icon: "imgsrc:header-icons/copy-button.svg", display: false, fn: this.turtles.expand});
+        
+        };
 
-            this.largerContainer = this._makeButton(
-                BIGGERBUTTON,
-                _("Increase block size"),
-                x,
-                y,
-                btnSize,
-                0
-            );
-            that._loadButtonDragHandler(this.largerContainer, doLargerBlocks, this);
+        /*
+         * Shows search widget on helpfulSearchDiv
+         */
+        this.showHelpfulSearchWidget = () => {
+            // Bring widget to top.
+            const $j = jQuery.noConflict();
+            if($j("#helpfulSearch")) {
+                try {
+                    $j("#helpfulSearch").autocomplete("destroy");
+                } catch {}
+            }
+            this.helpfulSearchWidget.style.zIndex = 1001;
+            this.helpfulSearchWidget.idInput_custom = "";
+            if(this.helpfulSearchDiv.style.display === "block") {
+
+                this.helpfulSearchWidget.value = null;
+                this.helpfulSearchWidget.style.visibility = "visible";
+
+                this.searchBlockPosition = [100, 100];
+                this.prepSearchWidget();
+
+                const that = this;
+                setTimeout(() => {
+                    that.helpfulSearchWidget.focus();
+                    that.doHelpfulSearch();
+                }, 500);
+
+                docById("helpfulWheelDiv").style.display = "none";
+            }
+        };
+
+        /*
+         * Uses JQuery to add autocompleted search suggestions
+         */
+        this.doHelpfulSearch = () => {
+            const $j = jQuery.noConflict();
+
+            const that = this;
+            $j("#helpfulSearch").autocomplete({
+                source: that.searchSuggestions,
+                select: (event, ui) => {
+                    event.preventDefault();
+                    that.helpfulSearchWidget.value = ui.item.label;
+                    that.helpfulSearchWidget.idInput_custom = ui.item.value;
+                    that.helpfulSearchWidget.protoblk = ui.item.specialDict;
+                    that.doHelpfulSearch();
+                },
+                focus: (event, ui) => {
+                    event.preventDefault();
+                    that.helpfulSearchWidget.value = ui.item.label;
+                }
+            });
+
+            $j("#helpfulSearch").autocomplete("widget").addClass("scrollSearch");
+
+            $j("#helpfulSearch").autocomplete("instance")._renderItem = (ul, item) => {
+                return $j("<li></li>")
+                    .data("item.autocomplete", item)
+                    .append(
+                        '<img src="' +
+                            item.artwork +
+                            '" height = "20px">' +
+                            "<a>" +
+                            " " +
+                            item.label +
+                            "</a>"
+                    )
+                    .appendTo(ul.css("z-index", 9999));
+            };
+            const searchInput = this.helpfulSearchWidget.idInput_custom;
+            if (!searchInput || searchInput.length <= 0) return;
+
+            const protoblk = this.helpfulSearchWidget.protoblk;
+            const paletteName = protoblk.palette.name;
+            const protoName = protoblk.name;
+
+            // eslint-disable-next-line no-prototype-builtins
+            if (this.blocks.protoBlockDict.hasOwnProperty(protoName)) {
+                this.palettes.dict[paletteName].makeBlockFromSearch(
+                    protoblk,
+                    protoName,
+                    (newBlock) => {
+                        that.blocks.moveBlock(
+                            newBlock,
+                            100 + that.searchBlockPosition[0] - that.blocksContainer.x,
+                            that.searchBlockPosition[1] - that.blocksContainer.y
+                        );
+                    }
+                );
+
+                // Move the position of the next newly created block.
+                this.searchBlockPosition[0] += STANDARDBLOCKHEIGHT;
+                this.searchBlockPosition[1] += STANDARDBLOCKHEIGHT;
+            } else if (this.deprecatedBlockNames.indexOf(searchInput) > -1) {
+                this.errorMsg(_("This block is deprecated."));
+            } else {
+                this.errorMsg(_("Block cannot be found."));
+            }
+
+            this.helpfulSearchWidget.value = "";
+            this.update = true;
         };
 
         /**
@@ -4355,7 +4864,7 @@ class Activity {
             };
 
             const img = new Image();
-            img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(name)));
+            img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(name));
 
             container.appendChild(img);
             container.setAttribute(
@@ -4497,7 +5006,7 @@ class Activity {
                 }
             };
 
-            img.src = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(svgData)));
+            img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svgData));
         };
 
         /*
@@ -4546,7 +5055,13 @@ class Activity {
                 }
             });
 
-            document.addEventListener("click", () => {
+            document.addEventListener("click", (e) => {
+                if (docById("helpfulWheelDiv").style.display !== "none") {
+                    docById("helpfulWheelDiv").style.display = "none";
+                }
+                if (docById("helpfulSearchDiv").style.display !== "none" && e.target.id !== "helpfulSearch") {
+                    docById("helpfulSearchDiv").style.display = "none";
+                }
                 that.__tick();
             });
 
@@ -4930,28 +5445,28 @@ class Activity {
             this.stage.enableMouseOver(10); // default is 20
 
             this.cartesianBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(CARTESIAN)))
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(CARTESIAN))
             );
             this.polarBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(POLAR)))
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(POLAR))
             );
             this.trebleBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(TREBLE)))
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE))
             );
             this.grandBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND)))
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(GRAND))
             );
             this.sopranoBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(SOPRANO)))
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(SOPRANO))
             );
             this.altoBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(ALTO)))
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(ALTO))
             );
             this.tenorBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(TENOR)))
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(TENOR))
             );
             this.bassBitmap = this._createGrid(
-                "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(BASS)))
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(BASS))
             );
 
             // We use G (one sharp) and F (one flat) as prototypes for all
@@ -4960,40 +5475,40 @@ class Activity {
             // horizonally so as not to overlap.
             for (let i = 0; i < 7; i++) {
                 this.grandSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_G)))
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(GRAND_G))
                 );
                 this.grandFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(GRAND_F)))
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(GRAND_F))
                 );
                 this.trebleSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(TREBLE_G)))
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_G))
                 );
                 this.trebleFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(TREBLE_F)))
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_F))
                 );
                 this.sopranoSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(TREBLE_G)))
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_G))
                 );
                 this.sopranoFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(TREBLE_F)))
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_F))
                 );
                 this.altoSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(TREBLE_G)))
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_G))
                 );
                 this.altoFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(TREBLE_F)))
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_F))
                 );
                 this.tenorSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(TREBLE_G)))
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_G))
                 );
                 this.tenorFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(TREBLE_F)))
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_F))
                 );
                 this.bassSharpBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(TREBLE_G)))
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_G))
                 );
                 this.bassFlatBitmap[i] = this._createGrid(
-                    "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(TREBLE_F)))
+                    "data:image/svg+xml;base64," + window.btoa(base64Encode(TREBLE_F))
                 );
             }
 

@@ -40,12 +40,17 @@ class ProjectViewer {
         const Planet = this.Planet ;
         this.id = id;
         const proj = this.ProjectCache[id];
+        const options = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+        const last_updated_timestamp = proj.ProjectLastUpdated;
+        const formatted_LastUpdated = new Date(last_updated_timestamp).toLocaleString(undefined, options);
+        const created_timestamp = proj.ProjectCreatedDate;
+        const formatted_CreatedDate = new Date(created_timestamp).toLocaleString(undefined, options);
 
         document.getElementById("projectviewer-title").textContent = proj.ProjectName;
-        document.getElementById("projectviewer-last-updated").textContent = proj.ProjectLastUpdated;
-        document.getElementById("projectviewer-date").textContent = proj.ProjectCreatedDate;
-        document.getElementById("projectviewer-downloads").textContent = proj.ProjectDownloads;
-        document.getElementById("projectviewer-likes").textContent = proj.ProjectLikes;
+        document.getElementById("projectviewer-last-updated").innerHTML = `<b>${formatted_LastUpdated}</b>`;
+        document.getElementById("projectviewer-date").innerHTML =`<b>${formatted_CreatedDate}</b>`;
+        document.getElementById("projectviewer-downloads").innerHTML = `<b>${proj.ProjectDownloads}</b>`;
+        document.getElementById("projectviewer-likes").innerHTML = `<b>${proj.ProjectLikes}</b>`;
 
         let img = proj.ProjectImage;
         if (img === "" || img === null)

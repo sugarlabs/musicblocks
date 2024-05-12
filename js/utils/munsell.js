@@ -24,7 +24,10 @@
 
 /* exported getMunsellColor, getcolor, searchColors, COLORS40 */
 
-/** 40 high-chroma colors [value, chroma, RGB] */
+/** 
+ * Array containing 40 high-chroma colors, each represented as [value, chroma, RGB].
+ * @type {Array}
+ */
 const COLORS40 = [
     [6, 24, "#ff007e"],
     [6, 24, "#ff0066"],
@@ -68,7 +71,15 @@ const COLORS40 = [
     [6, 24, "#ff0098"]
 ];
 
-/** 10RP 2.5R 5R 7.5R 10R ... 7.5RP -> V0 - V10 -> C0 - C28 (by 2) */
+/**
+ * Munsell color representation array.
+ * The array is organized in a sequence of Munsell colors ranging from 10RP to 7.5RP,
+ * with variations in value (V0 to V10) and chroma (C0 to C28 by 2).
+ *
+ * Each element in the array represents a specific Munsell color in RGB format.
+ *
+ * @type {Array<string>}
+ */
 const MUNSELL = [
     // 10RP (0R)
     "#000000",
@@ -6712,6 +6723,14 @@ const MUNSELL = [
     "#ffffff"
 ];
 
+/**
+ * Interpolates between two hex color values.
+ *
+ * @param {string} hex1 - The first hex color value.
+ * @param {string} hex2 - The second hex color value.
+ * @param {number} p - The interpolation parameter (between 0 and 1).
+ * @returns {string} The interpolated hex color value.
+ */
 const interpColor = (hex1, hex2, p)  => {
     if (hex1 === undefined && hex2 === undefined) {
         null;
@@ -6741,6 +6760,14 @@ const interpColor = (hex1, hex2, p)  => {
     }
 };
 
+/**
+ * Retrieves a Munsell color based on the specified hue, value, and chroma.
+ *
+ * @param {number} hue - The hue (color) value ranging from 0 to 100.
+ * @param {number} value - The value (shade) value ranging from 0 to 100.
+ * @param {number} chroma - The chroma (grey) value ranging from 0 to 100.
+ * @returns {string} The RGB representation of the Munsell color.
+ */
 let getMunsellColor = (hue, value, chroma) => {
     // hue (aka color) 0-100 -> 0-39
     // value (aka shade) 0-100 -> 0-10
@@ -6780,6 +6807,12 @@ let getMunsellColor = (hue, value, chroma) => {
     return interpColor(MUNSELL[h * 165 + v1 * 15 + c], MUNSELL[h * 165 + v2 * 15 + c], p);
 };
 
+/**
+ * Retrieves a color based on the specified color value.
+ *
+ * @param {number} color - The color value ranging from 0 to 100.
+ * @returns {Array} An array containing value, chroma, and RGB components of the color.
+ */
 let getcolor = (color) => {
     let h1 = Math.floor(color / 2.5);
     let h2 = h1 + 1;
@@ -6801,10 +6834,12 @@ let getcolor = (color) => {
 };
 
 /**
- * Searches for nearest match to high chroma colors, scaled from 0-100
- * @param {number} r - intensity of red
- * @param {number} g - intensity of green
- * @param {number} b - intensity of blue
+ * Searches for the nearest match to high chroma colors, scaled from 0 to 100.
+ *
+ * @param {number} r - Intensity of red.
+ * @param {number} g - Intensity of green.
+ * @param {number} b - Intensity of blue.
+ * @returns {number} The color value of the nearest match.
  */
 let searchColors = (r, g, b) => {
     let nearestColor = -1;

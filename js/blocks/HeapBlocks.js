@@ -18,29 +18,61 @@
 /* exported setupHeapBlocks */
 
 function setupHeapBlocks(activity) {
-
+    /**
+     * Represents a HeapBlock, a type of ValueBlock that returns the heap.
+     * @extends {ValueBlock}
+     */
     class HeapBlock extends ValueBlock {
+        /**
+         * Constructs a HeapBlock.
+         */
         constructor() {
+            // Call the constructor of the parent class (ValueBlock)
             super("heap");
+
+            /**
+             * Sets the palette for the HeapBlock.
+             * @type {string}
+             */
             this.setPalette("heap", activity);
+
+            /**
+             * Sets the block as a beginner block.
+             * @type {boolean}
+             */
             this.beginnerBlock(true);
 
-            this.setHelpString([
-                _("The Heap block returns the heap."),
-                "documentation",
-                ""
-            ]);
+            /**
+             * Sets the help string for the HeapBlock.
+             * @param {string[]} [] - An array with help string information.
+             */
+            this.setHelpString([_("The Heap block returns the heap."), "documentation", ""]);
 
+            /**
+             * Forms the block with specified parameters.
+             * @param {Object} {
+             *   name: string,
+             *   outType: string
+             * } - The block formation parameters.
+             */
             this.formBlock({
                 name: _("heap"),
                 outType: "numberout"
             });
         }
 
+        /**
+         * Returns the heap as a JSON string.
+         * @param {object} logo - The logo object.
+         * @param {number} turtle - The turtle number.
+         * @param {number} blk - The block number.
+         * @returns {string} - The JSON string representation of the heap.
+         */
         arg(logo, turtle, blk) {
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "heap"]);
             } else {
@@ -48,80 +80,189 @@ function setupHeapBlocks(activity) {
             }
         }
     }
-
+    /**
+     * Represents a ShowHeapBlock, a type of FlowBlock that displays the contents of the heap.
+     * @extends {FlowBlock}
+     */
     class ShowHeapBlock extends FlowBlock {
+        /**
+         * Constructs a ShowHeapBlock.
+         */
         constructor() {
+            // Call the constructor of the parent class (FlowBlock)
             super("showHeap");
+
+            /**
+             * Sets the palette for the ShowHeapBlock.
+             * @type {string}
+             */
             this.setPalette("heap", activity);
+
+            /**
+             * Sets the block as hidden and deprecated.
+             * @type {boolean}
+             */
             this.hidden = this.deprecated = true;
+
+            /**
+             * Sets the block as a beginner block.
+             * @type {boolean}
+             */
             this.beginnerBlock(true);
 
+            /**
+             * Sets the help string for the ShowHeapBlock.
+             * @param {string[]} [] - An array with help string information.
+             */
             this.setHelpString([
-                _("The Show-heap block displays the contents of the heap at the top of the screen."),
+                _(
+                    "The Show-heap block displays the contents of the heap at the top of the screen."
+                ),
                 "documentation",
                 ""
             ]);
 
+            /**
+             * Forms the block with specified parameters.
+             * @param {Object} {
+             *   name: string
+             * } - The block formation parameters.
+             */
             this.formBlock({
-                //.TRANS: Display the heap contents
+                // .TRANS: Display the heap contents
                 name: _("show heap")
             });
         }
 
+        /**
+         * Displays the contents of the heap at the top of the screen.
+         * @param {Array} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {number} turtle - The turtle number.
+         */
         flow(args, logo, turtle) {
             if (!(turtle in logo.turtleHeaps)) {
                 logo.turtleHeaps[turtle] = [];
             }
+
+            // Display the contents of the heap as a JSON string
             activity.textMsg(JSON.stringify(logo.turtleHeaps[turtle]));
         }
     }
-
+    /**
+     * Represents a HeapLengthBlock, a type of ValueBlock that returns the length of the heap.
+     * @extends {ValueBlock}
+     */
     class HeapLengthBlock extends ValueBlock {
+        /**
+         * Constructs a HeapLengthBlock.
+         */
         constructor() {
+            // Call the constructor of the parent class (ValueBlock)
             super("heapLength");
+
+            /**
+             * Sets the palette for the HeapLengthBlock.
+             * @type {string}
+             */
             this.setPalette("heap", activity);
+
+            /**
+             * Sets the block as a beginner block.
+             * @type {boolean}
+             */
             this.beginnerBlock(true);
 
+            /**
+             * Sets the help string for the HeapLengthBlock.
+             * @param {string[]} [] - An array with help string information.
+             */
             this.setHelpString([
                 _("The Heap-length block returns the length of the heap."),
                 "documentation",
                 ""
             ]);
 
+            /**
+             * Forms the block with specified parameters.
+             * @param {Object} {
+             *   name: string,
+             *   outType: string
+             * } - The block formation parameters.
+             */
             this.formBlock({
-                //.TRANS: How many entries are in the heap?
+                // .TRANS: How many entries are in the heap?
                 name: _("heap length"),
                 outType: "numberout"
             });
         }
 
+        /**
+         * Returns the length of the heap.
+         * @param {object} logo - The logo object.
+         * @param {number} turtle - The turtle number.
+         * @param {number} blk - The block number.
+         * @returns {number} - The length of the heap.
+         */
         arg(logo, turtle, blk) {
             if (!(turtle in logo.turtleHeaps)) {
                 logo.turtleHeaps[turtle] = [];
             }
+
+            // If in status matrix, push information to the status fields
             if (
                 logo.inStatusMatrix &&
-                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name === "print"
+                activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
+                    "print"
             ) {
                 logo.statusFields.push([blk, "heapLength"]);
             } else {
+                // Return the length of the heap
                 return logo.turtleHeaps[turtle].length;
             }
         }
     }
-
+    /**
+     * Represents a HeapEmptyBlock, a type of ValueBlock that returns true if the heap is empty.
+     * @extends {ValueBlock}
+     */
     class HeapEmptyBlock extends ValueBlock {
+        /**
+         * Constructs a HeapEmptyBlock.
+         */
         constructor() {
+            // Call the constructor of the parent class (ValueBlock)
             super("heapEmpty");
+
+            /**
+             * Sets the palette for the HeapEmptyBlock.
+             * @type {string}
+             */
             this.setPalette("heap", activity);
+
+            /**
+             * Sets the block as a beginner block.
+             * @type {boolean}
+             */
             this.beginnerBlock(true);
 
+            /**
+             * Sets the help string for the HeapEmptyBlock.
+             * @param {string[]} [] - An array with help string information.
+             */
             this.setHelpString([
                 _("The Heap-empty? block returns true if the heap is empty."),
                 "documentation",
                 ""
             ]);
 
+            /**
+             * Forms the block with specified parameters.
+             * @param {Object} {
+             *   name: string,
+             *   outType: string
+             * } - The block formation parameters.
+             */
             this.formBlock({
                 //.TRANS: Is the heap empty?
                 name: _("heap empty?"),
@@ -129,71 +270,174 @@ function setupHeapBlocks(activity) {
             });
         }
 
+        /**
+         * Returns true if the heap is empty.
+         * @param {object} logo - The logo object.
+         * @param {number} turtle - The turtle number.
+         * @returns {boolean} - True if the heap is empty, false otherwise.
+         */
         arg(logo, turtle) {
+            // Check if the turtle is in the logo's turtleHeaps
             if (turtle in logo.turtleHeaps)
+                // Return true if the length of the heap is 0, indicating it's empty
                 return logo.turtleHeaps[turtle].length === 0;
+
+            // Return true if the turtle is not in the logo's turtleHeaps
             return true;
         }
     }
-
+    /**
+     * Represents an EmptyHeapBlock, a type of FlowBlock that empties the heap.
+     * @extends {FlowBlock}
+     */
     class EmptyHeapBlock extends FlowBlock {
+        /**
+         * Constructs an EmptyHeapBlock.
+         */
         constructor() {
+            // Call the constructor of the parent class (FlowBlock)
             super("emptyHeap");
+
+            /**
+             * Sets the palette for the EmptyHeapBlock.
+             * @type {string}
+             */
             this.setPalette("heap", activity);
+
+            /**
+             * Sets the block as a beginner block.
+             * @type {boolean}
+             */
             this.beginnerBlock(true);
 
-            this.setHelpString([
-                _("The Empty-heap block empties the heap."),
-                "documentation",
-                ""
-            ]);
+            /**
+             * Sets the help string for the EmptyHeapBlock.
+             * @param {string[]} [] - An array with help string information.
+             */
+            this.setHelpString([_("The Empty-heap block empties the heap."), "documentation", ""]);
 
+            /**
+             * Forms the block with specified parameters.
+             * @param {Object} {
+             *   name: string
+             * } - The block formation parameters.
+             */
             this.formBlock({
                 //.TRANS: empty the heap
                 name: _("empty heap")
             });
         }
 
+        /**
+         * Empties the heap.
+         * @param {Array} args - Arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {number} turtle - The turtle number.
+         */
         flow(args, logo, turtle) {
+            // Set the turtle's heap to an empty array, effectively emptying the heap
             logo.turtleHeaps[turtle] = [];
         }
     }
-
+    /**
+     * Represents a ReverseHeapBlock, a type of FlowBlock that reverses the order of the heap.
+     * @extends {FlowBlock}
+     */
     class ReverseHeapBlock extends FlowBlock {
+        /**
+         * Constructs a ReverseHeapBlock.
+         */
         constructor() {
+            // Call the constructor of the parent class (FlowBlock)
             super("reverseHeap");
+
+            /**
+             * Sets the palette for the ReverseHeapBlock.
+             * @type {string}
+             */
             this.setPalette("heap", activity);
+
+            /**
+             * Sets the block as a beginner block.
+             * @type {boolean}
+             */
             this.beginnerBlock(true);
 
+            /**
+             * Sets the help string for the ReverseHeapBlock.
+             * @param {string[]} [] - An array with help string information.
+             */
             this.setHelpString([
                 _("The Reverse-heap block reverses the order of the heap."),
                 "documentation",
                 ""
             ]);
 
+            /**
+             * Forms the block with specified parameters.
+             * @param {Object} {
+             *   name: string
+             * } - The block formation parameters.
+             */
             this.formBlock({
                 //.TRANS: reverse the order of the heap
                 name: _("reverse heap")
             });
         }
 
+        /**
+         * Reverses the order of the heap.
+         * @param {Array} args - Arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {number} turtle - The turtle number.
+         */
         flow(args, logo, turtle) {
+            // Reverse the order of the turtle's heap
             logo.turtleHeaps[turtle] = logo.turtleHeaps[turtle].reverse();
         }
     }
-
+    /**
+     * Represents an IndexHeapBlock, a type of LeftBlock that returns a value in the heap at a specified location.
+     * @extends {LeftBlock}
+     */
     class IndexHeapBlock extends LeftBlock {
+        /**
+         * Constructs an IndexHeapBlock.
+         */
         constructor() {
+            // Call the constructor of the parent class (LeftBlock)
             super("indexHeap");
+
+            /**
+             * Sets the palette for the IndexHeapBlock.
+             * @type {string}
+             */
             this.setPalette("heap", activity);
+
+            /**
+             * Sets the block as a beginner block.
+             * @type {boolean}
+             */
             this.beginnerBlock(true);
 
+            /**
+             * Sets the help string for the IndexHeapBlock.
+             * @param {string[]} [] - An array with help string information.
+             */
             this.setHelpString([
                 _("The Index-heap block returns a value in the heap at a specified location."),
                 "documentation",
                 ""
             ]);
 
+            /**
+             * Forms the block with specified parameters.
+             * @param {Object} {
+             *   name: string,
+             *   args: number,
+             *   defaults: number[]
+             * } - The block formation parameters.
+             */
             this.formBlock({
                 //.TRANS: retrieve a value from the heap at index position in the heap
                 name: _("index heap"),
@@ -202,6 +446,14 @@ function setupHeapBlocks(activity) {
             });
         }
 
+        /**
+         * Retrieves a value from the heap at a specified index position.
+         * @param {object} logo - The logo object.
+         * @param {number} turtle - The turtle number.
+         * @param {number} blk - The block number.
+         * @param {number} receivedArg - The received argument.
+         * @returns {number} The value in the heap at the specified location.
+         */
         arg(logo, turtle, blk, receivedArg) {
             const cblk = activity.blocks.blockList[blk].connections[1];
             if (cblk === null) {
@@ -215,7 +467,7 @@ function setupHeapBlocks(activity) {
                 }
 
                 if (a === -1) {
-                    // -1 to access top of heap
+                    // -1 to access the top of the heap
                     a = logo.turtleHeaps[turtle].length;
                 } else if (a < 1) {
                     a = 1;
@@ -239,31 +491,67 @@ function setupHeapBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a SetHeapEntryBlock, a type of FlowBlock that sets a value in the heap at the specified location.
+     * @extends {FlowBlock}
+     */
     class SetHeapEntryBlock extends FlowBlock {
+        /**
+         * Constructs a SetHeapEntryBlock.
+         */
         constructor() {
+            // Call the constructor of the parent class (FlowBlock)
             super("setHeapEntry");
+
+            /**
+             * Sets the palette for the SetHeapEntryBlock.
+             * @type {string}
+             */
             this.setPalette("heap", activity);
+
+            /**
+             * Sets the block as a beginner block.
+             * @type {boolean}
+             */
             this.beginnerBlock(true);
 
+            /**
+             * Sets the help string for the SetHeapEntryBlock.
+             * @param {string[]} [] - An array with help string information.
+             */
             this.setHelpString([
                 _("The Set-heap entry block sets a value in he heap at the specified location."),
                 "documentation",
                 ""
             ]);
 
+            /**
+             * Forms the block with specified parameters.
+             * @param {Object} {
+             *   name: string,
+             *   args: number,
+             *   argTypes: string[],
+             *   defaults: number[],
+             *   argLabels: string[]
+             * } - The block formation parameters.
+             */
             this.formBlock({
                 name: _("set heap"),
                 args: 2,
                 argTypes: ["numberin", "anyin"],
                 defaults: [1, 100],
                 //.TRANS: value1 is a numeric value (JAPANESE ONLY)
-                argLabels: [
-                    _("index"),
-                    this.lang === "ja" ? _("value1") : _("value")
-                ]
+                argLabels: [_("index"), this.lang === "ja" ? _("value1") : _("value")]
             });
         }
 
+        /**
+         * Sets a value in the heap at the specified location.
+         * @param {number[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {number} turtle - The turtle number.
+         * @param {number} blk - The block number.
+         */
         flow(args, logo, turtle, blk) {
             if (args[0] === null || args[1] === null) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
@@ -299,48 +587,110 @@ function setupHeapBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a PopBlock, a type of ValueBlock that removes the value at the top of the heap.
+     * @extends {ValueBlock}
+     */
     class PopBlock extends ValueBlock {
+        /**
+         * Constructs a PopBlock.
+         */
         constructor() {
+            // Call the constructor of the parent class (ValueBlock)
             super("pop");
+
+            /**
+             * Sets the palette for the PopBlock.
+             * @type {string}
+             */
             this.setPalette("heap", activity);
+
+            /**
+             * Sets the block as a beginner block.
+             * @type {boolean}
+             */
             this.beginnerBlock(true);
 
+            /**
+             * Sets the help string for the PopBlock.
+             * @param {string[]} [] - An array with help string information.
+             */
             this.setHelpString([
                 _("The Pop block removes the value at the top of the heap."),
                 "documentation",
                 ""
             ]);
 
+            /**
+             * Forms the block with specified parameters.
+             * @param {Object} {
+             *   name: string,
+             *   outType: string
+             * } - The block formation parameters.
+             */
             this.formBlock({
                 //.TRANS: pop a value off the top of the heap
                 name: _("pop")
             });
         }
 
+        /**
+         * Removes the value at the top of the heap.
+         * @param {object} logo - The logo object.
+         * @param {number} turtle - The turtle number.
+         * @returns {number} The value removed from the top of the heap.
+         */
         arg(logo, turtle) {
-            if (
-                turtle in logo.turtleHeaps &&
-                logo.turtleHeaps[turtle].length > 0
-            ) {
+            if (turtle in logo.turtleHeaps && logo.turtleHeaps[turtle].length > 0) {
                 return logo.turtleHeaps[turtle].pop();
             }
             activity.errorMsg(_("empty heap"));
             return 0;
         }
     }
-
+    /**
+     * Represents a PushBlock, a type of FlowBlock that adds a value to the top of the heap.
+     * @extends {FlowBlock}
+     */
     class PushBlock extends FlowBlock {
+        /**
+         * Constructs a PushBlock.
+         */
         constructor() {
+            // Call the constructor of the parent class (FlowBlock)
             super("push");
+
+            /**
+             * Sets the palette for the PushBlock.
+             * @type {string}
+             */
             this.setPalette("heap", activity);
+
+            /**
+             * Sets the block as a beginner block.
+             * @type {boolean}
+             */
             this.beginnerBlock(true);
 
+            /**
+             * Sets the help string for the PushBlock.
+             * @param {string[]} [] - An array with help string information.
+             */
             this.setHelpString([
                 _("The Push block adds a value to the top of the heap."),
                 "documentation",
                 ""
             ]);
 
+            /**
+             * Forms the block with specified parameters.
+             * @param {Object} {
+             *   name: string,
+             *   args: number,
+             *   argTypes: string[],
+             *   defaults: any[]
+             * } - The block formation parameters.
+             */
             this.formBlock({
                 //.TRANS: push a value onto the top of the heap
                 name: _("push"),
@@ -350,6 +700,13 @@ function setupHeapBlocks(activity) {
             });
         }
 
+        /**
+         * Adds a value to the top of the heap.
+         * @param {any[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {number} turtle - The turtle number.
+         * @param {number} blk - The block number.
+         */
         flow(args, logo, turtle, blk) {
             if (args[0] === null) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);

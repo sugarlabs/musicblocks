@@ -1834,7 +1834,12 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
                 (cblk2 && that.blocks.blockList[cblk2].name == "newnote"))
         ) {
             that.value = 0;
-        } else {
+        } else if (that.value < 2 &&
+            that.blocks.blockList[cblk1].name === "pitch"
+        ) {
+            that.value = 1;
+        }
+        else {
             that.value -= 1;
         }
 
@@ -1848,7 +1853,15 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     };
 
     block._exitWheel.navItems[2].navigateFunction = () => {
-        that.value += 1;
+        const cblk = that.connections[0];
+        if (
+            that.value > 9 &&
+            (that.blocks.blockList[cblk].name === "pitch")
+        ) {
+            that.value = 10;
+        } else {
+            that.value += 1;
+        }
         that.text.text = that.value.toString();
 
         // Make sure text is on top.
@@ -3409,7 +3422,7 @@ const piemenuBlockContext = (block) => {
 
     wheel.navItems[0].selected = false;
 
-    wheel.navItems[0].navigateFunction = () => {
+    const stackPasting = function() {
         that.blocks.activeBlock = blockBlock;
         that.blocks.prepareStackForCopy();
         that.blocks.pasteDx = pasteDx;
@@ -3417,7 +3430,16 @@ const piemenuBlockContext = (block) => {
         that.blocks.pasteStack();
         pasteDx += 21;
         pasteDy += 21;
+
+        that.activity.helpfulWheelItems.forEach(ele => {
+            if (ele.label === "Paste previous stack") {
+                ele.display = true;
+                ele.fn = stackPasting.bind(that);
+            }
+        })
     };
+
+    wheel.navItems[0].navigateFunction = stackPasting;
 
     wheel.navItems[1].navigateFunction = () => {
         that.blocks.activeBlock = blockBlock;
@@ -3575,13 +3597,17 @@ const piemenuGrid = (activity) => {
         activity.turtles.gridWheel.removeWheel();
         activity.turtles._exitWheel.removeWheel();
     };
+
+    if (docById("helpfulWheelDiv").style.display !== "none") {
+        docById("helpfulWheelDiv").style.display = "none";
+    }
 };
 
 const piemenuKey = (activity) => {
     docById("chooseKeyDiv").style.display = "block";
     docById("movable").style.display = "block";
 
-    const keyNameWheel = new wheelnav("chooseKeyDiv", null, 1200, 1200);
+    const keyNameWheel = new wheelnav("chooseKeyDiv", null, 1700, 1700);
     const keyNameWheel2 = new wheelnav("keyNameWheel2", keyNameWheel.raphael);
     const keys = ["C", "G", "D", "A", "E", "B/C♭", "F♯/G♭", "C♯/D♭", "G♯/A♭", "D♯/E♭", "A♯/B♭", "F"];
 
@@ -3678,7 +3704,7 @@ const piemenuKey = (activity) => {
             let connectionsSetKey;
             let movable;
             for (const i in stacks) {
-                if (activity.logo.blocks.blockList[stacks[i]].name === "start") {
+                if (activity.blocks.blockList[stacks[i]].name === "start") {
                     const bottomBlock = activity.blocks.blockList[stacks[i]].connections[1];
                     if (activity.KeySignatureEnv[2]) {
                         activity.blocks._makeNewBlockWithConnections(

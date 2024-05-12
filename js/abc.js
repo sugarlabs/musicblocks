@@ -22,10 +22,22 @@
 // This header is prepended to the Abc output.
 const ABCHEADER = "X:1\nT:Music Blocks composition\nC:Mr. Mouse\nL:1/16\nM:C\n";
 
+/**
+ * Returns the header string used for the ABC notation output.
+ * The ABC header includes metadata for a music composition.
+ *
+ * @returns {string} The ABC header string.
+ */
 const getABCHeader = function() {
     return ABCHEADER;
 };
 
+/**
+ * Processes musical notes and converts them into ABC notation format.
+ *
+ * @param {object} logo - The logo object containing notationNotes to update.
+ * @param {string} turtle - The identifier for the turtle.
+ */
 const processABCNotes = function(logo, turtle) {
     // obj = [instructions] or
     // obj = [[notes], duration, dotCount, tupletValue, roundDown,
@@ -64,6 +76,12 @@ const processABCNotes = function(logo, turtle) {
         return returnString;
     };
 
+    /**
+     * Converts a musical note into ABC notation format.
+     *
+     * @param {string|number} note - The musical note to convert. It can be a string note (e.g., 'C#') or a frequency (number).
+     * @returns {string} The note converted to ABC notation.
+     */
     const __toABCnote = (note) => {
         // beams -- no space between notes
         // ties use ()
@@ -263,6 +281,16 @@ const processABCNotes = function(logo, turtle) {
                 }
             }
 
+           /**
+            * Processes an incomplete tuplet and appends the corresponding ABC notation to the notation string.
+            *
+            * @param {object} logo - The logo object containing notation information.
+            * @param {string} turtle - The identifier for the turtle.
+            * @param {number} i - The index of the current note within the notation staging.
+            * @param {number} count - The number of notes in the incomplete tuplet.
+            * @returns {number} The number of notes processed within the tuplet.
+            * @private
+            */
             const __processTuplet = (logo, turtle, i, count) => {
                 let j = 0;
                 let k = 0;
@@ -426,6 +454,12 @@ const processABCNotes = function(logo, turtle) {
     }
 };
 
+/**
+ * Generates ABC notation output based on the notation staging for each turtle in the activity.
+ *
+ * @param {object} activity - The activity object containing logo and notation information.
+ * @returns {string} The generated ABC notation output.
+ */
 const saveAbcOutput = function(activity) {
     // let turtleCount = 0;
 

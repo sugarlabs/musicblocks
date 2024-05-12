@@ -11,7 +11,7 @@ when the block is run in logo.js.
 ## How to make your block a part of the main repository
 
 1. Make your own copy of the musicblocks git repository by cloning the
-official [respository](https://github.com/sugarlabs/musicblocks.git)
+official [repository](https://github.com/sugarlabs/musicblocks.git)
 
 2. Create your block and make a pull request.
 
@@ -40,7 +40,7 @@ block is defined.
   
    `newblock.palette = palettes.dict['palettename'];`
 
-   Palettename can be pitch, tone, rythm, etc. The color of the block
+   Palette name can be pitch, tone, rhythm, etc. The color of the block
    is determined by the palette to which it is assigned. A complete
    list of available palettes is found in
    [turtledef.js](https://github.com/sugarlabs/musicblocks/blob/master/js/turtledefs.js).
@@ -107,9 +107,9 @@ to it. This is done in
 There are two different places to add your code, depending upon
 whether you block is a `flow` block, with in-flow and out-flow
 connections for vertical connections, or an `arg` block, which only
-connects horizonally into flow blocks or other arg blocks. For
+connects horizontally into flow blocks or other arg blocks. For
 example, the `setcolor' block is a flow block that can connect
-veritcally in a stack of blocks. The number block that connects to it
+vertically in a stack of blocks. The number block that connects to it
 horizontally is an arg block.
 
 There are two switch statements in `logo.js`, one for flow blocks
@@ -168,7 +168,7 @@ push onto the heap.
 
 Here you assign a block according to its bin.
 
-Check which bin belongs to which pallete, and then according to assign your block to the bin.
+Check which bin belongs to which palette, and then according to assign your block to the bin.
 
 Example:
     ```
