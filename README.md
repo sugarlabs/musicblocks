@@ -15,14 +15,14 @@ know that it is counting._” — Leibniz
 
 Music Blocks is a _Visual Programming Language_ and collection of
 _manipulative tools_ for exploring musical and mathematical concepts
-in an integrative and fun way.
+in an integrative and entertaining way.
 
 ## Getting Started
 
 Music Blocks is an interactive Web Application &mdash; the interaction
 is done via basic mouse events like _click_, _right click_, _click and
 drag_, etc. and keyboard events like _hotkey press_.  The application
-is audio-visual; it produces graphics artwork and music. Here are a
+is audio-visual; it produces graphics, artwork and music. Here are a
 couple of screenshots to give you an idea of how the application looks
 like:
 
@@ -33,9 +33,9 @@ like:
 Visit the Music Blocks website for a hands on experience:
 [https://musicblocks.sugarlabs.org](https://musicblocks.sugarlabs.org).
 
-Or get Music Blocks from the [Google Play Store](https://play.google.com/store/apps/details?id=my.musicblock.sugarlab)
+Or download Music Blocks from the [Google Play Store](https://play.google.com/store/apps/details?id=my.musicblock.sugarlab)
 
-Some background on why we combine music and programming can be found
+Additional background on why we combine music and programming can be found
 [here](./WhyMusicBlocks.md).
 
 **Refer to the following sections to get familiar with this application:**
@@ -65,24 +65,24 @@ welcome to participate in the evolution of Music Blocks.
 Music Blocks is available under the _GNU Affero General Public License
 (AGPL) v3.0_, a free, copyleft license.
 
-Music Blocks is designed to run in a web browser. The ideal way to run
+Music Blocks is designed to run on a web browser. The ideal way to run
 Music Blocks is to visit the URL
 [_musicblocks.sugarlabs.org_](https://musicblocks.sugarlabs.org) in
 your browser — _Google Chrome_ (or _Chromium_), _Microsoft Edge_
 (_Chromium-based_), _Mozilla Firefox_, and _Opera_ work best.
 
-To run from the latest master branch (experimental), visit
+To run from the most recent master branch (experimental), visit
 [_sugarlabs.github.io/musicblocks_](https://sugarlabs.github.io/musicblocks).
 
 ## <a name="HOW_TO_SET_UP_A_LOCAL_SERVER"></a>How to set up a _local server_
 
 Music Blocks is written using native browser technologies. The bulk of
-the functionality is in vanilla _JavaScript_. This means that most of
+the functionality is in vanilla _JavaScript_. Therefore, most of
 the functionality can be accessed by launching the
 [index.html](./index.html) file in the browser using
 `file:///absolute/path/to/index.html`.
 
-However, using so, some functionality will not be available. On top of
+However, doing so, some functionality will be unavailable. On top of
 that, some web browsers (e.g., Firefox v68) have restrictions that
 prevent Music Blocks from running using `file:///`.  Therefore, it is
 best to launch a _local web server_ from the directory of Music
@@ -212,14 +212,14 @@ architectural problems with this run. Since Music Blocks is a fork of
 Turtle Blocks JS, musical functionality was added on top of it.
 However, music is fundamental to Music Blocks. Besides, the Turtle
 Blocks JS started initially with handful of features and was written
-without a complex architecture. As Music Blocks got built on top of
-that, it got incrementally complex, but the architecture remained
+without a complex architecture. As Music Blocks was built on top of
+that, it became incrementally complex, but the architecture remained
 simple, thus resulting in a monolith. Also, the functionality is
 tightly coupled with the interface and native client API (Web API).
 
 Keeping these problems in mind, we have considered a foundational
 rebuild that will address all these issues, whilst adding buffers for
-future additions. We'll also be using a more elegant tech-stack to
+future additions. Additionally, we will make use of a more elegant tech-stack to
 develop and maintain this project given its scale. After the core is
 built, we'll be porting features from this application to it.
 
@@ -266,7 +266,7 @@ a PR, or create a new issue ticket.
 2. Use [labels](https://github.com/sugarlabs/musicblocks/labels) on
 your issues and PRs.
 
-3. Do not spam with lots of PRs with little changes.
+3. Please do not spam with many PRs consisting of little changes.
 
 4. If you are addressing a bulk change, divide your commits across
 multiple PRs, and send them one at a time. The fewer the number of
