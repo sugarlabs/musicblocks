@@ -4443,9 +4443,9 @@ class Activity {
                             // Find the turtle associated with this block.
                             // eslint-disable-next-line no-case-declarations
                             const turtle = this.turtles.turtleList[myBlock.value];
-                            if (turtle === null) {
+                            if (turtle === null || turtle === undefined) {
                                 args = {
-                                    id: Infinity,
+                                    id: this.turtles.turtleList.length,
                                     collapsed: false,
                                     xcor: 0,
                                     ycor: 0,
