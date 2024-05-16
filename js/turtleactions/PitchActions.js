@@ -321,6 +321,26 @@ function setupPitchActions(activity) {
         }
 
         /**
+         * set Sharp
+         *
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number|String} blk - corresponding Block object index in blocks.blockList or custom blockName
+         */
+        static setSharp(turtle,blk){
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
+            tur.singer.transposition += tur.singer.invertList.length > 0 ? -1 : 1;
+
+            const listenerName = "_sharp_" + turtle;
+            activity.logo.setDispatchBlock(blk, turtle, listenerName);
+
+            const __listener = event => {
+                tur.singer.transposition += tur.singer.invertList.length > 0 ? 1 : -1;
+            };
+
+            activity.logo.setTurtleListener(turtle, listenerName, __listener);
+}
+     
+        /**
          * Plays a nth modal pitch block.
          *
          * @param {Number} number - number of modal pitch
