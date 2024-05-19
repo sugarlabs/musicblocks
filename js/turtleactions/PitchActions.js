@@ -319,7 +319,7 @@ function setupPitchActions(activity) {
                 Singer.processPitch(activity, noteObj1[0], noteObj1[1], 0, turtle, blk);
             }
         }
-        
+
         /**
          * Plays a nth modal pitch block.
          *
