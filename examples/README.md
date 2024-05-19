@@ -377,6 +377,7 @@
 | musical-mastermind.html | Interactive game: Similar to the class game Mastermind, discover the notes in a short musical phrase. |
 | rock-paper-scissors.html | classic intransitive hand game |
 | quiz-game.html | answer the questions with musical letters |
+| CrossWordPuzzle.html | complete a crossword using musical letters |
 
 # Widgets
 
