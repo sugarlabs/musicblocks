@@ -8979,3 +8979,26 @@ msgstr "z座標の動き"
 #~msgid "half note 𝅗𝅥"
 #~msgstr "半音符 𝅗𝅥"
 
+msgid "current interval"
+msgstr "現在の音階"
+
+msgid "Solfege pitch preview"
+msgstr "ソルフェージュで音の高さのプレビュー"
+
+msgid "Moveable Do"
+msgstr "移動ド"
+
+msgid "Fixed Do"
+msgstr "固定ド"
+
+msgid "Fullscreen"
+msgstr "フルスクリーン"
+
+msgid "Javascript editor"
+msgstr "ジャバスクリプト エディタ"
+
+msgid "Turtle Wrap off"
+msgstr "画面の境界を無視しない"
+
+msgid "Turtle Wrap on"
+msgstr "画面の境界を無視する"
