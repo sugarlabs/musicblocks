@@ -1528,7 +1528,16 @@ function setupPitchBlocks(activity) {
         flow(args, logo, turtle, blk) {
             if (args[0] === undefined) return;
 
-            Singer.PitchActions.setSharp(turtle, blk);
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
+            tur.singer.transposition += tur.singer.invertList.length > 0 ? -1 : 1;
+
+            const listenerName = "_sharp_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            const __listener = (event) =>
+                (tur.singer.transposition += tur.singer.invertList.length > 0 ? 1 : -1);
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[0], 1];
         }
