@@ -678,8 +678,8 @@ class Block {
         this.container.updateCache();
     }
 
-    unhighlightSelectedBlocks (blk, selection) {
-        if(selection){
+    unhighlightSelectedBlocks(blk, selection) {
+        if (selection) {
             this.blocks.unhighlight(blk, true);
             this.disconnectedBitmap.visible = true;
             this.container.updateCache();
@@ -3052,7 +3052,7 @@ class Block {
                 that.blocks.longPressTimeout = null;
                 that.blocks.clearLongPress();
             }
-            if(!that.blocks.selectionModeOn){
+            if (!that.blocks.selectionModeOn) {
                 that.blocks.unhighlight(thisBlock, true);
             }
             that.blocks.activeBlock = null;

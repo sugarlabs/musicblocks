@@ -5075,7 +5075,7 @@ class Activity {
                 if(this.isDragging){
                     this.currentX = event.clientX;
                     this.currentY = event.clientY;
-                    if (!this.blocks.isBlockMoving){
+                    if (!this.blocks.isBlockMoving) {
                         this.setSelectionMode(true);
                         this.drawSelectionArea();
                         this.selectedBlocks = this.selectBlocksInDragArea();
@@ -5167,9 +5167,9 @@ class Activity {
             for (let i = 0; i < this.selectedBlocks.length; i++) {
                 for (const blk in this.blocks.blockList) {
                         if (this.isEqual(this.blocks.blockList[blk], this.selectedBlocks[i])){
-                            if(unhighlight){
+                            if (unhighlight) {
                                 this.blocks.unhighlightSelectedBlocks(blk, true);
-                            } else{
+                            } else {
                                 this.blocks.highlight(blk, true);
                                 this.refreshCanvas();
                             }
@@ -5204,7 +5204,7 @@ class Activity {
         };
 
         this.setSelectionMode = (selection) => {
-            if(selection){
+            if (selection) {
                 if (!this.selectionModeOn) {
                     if (this.selectedBlocks.length !== 0) {
                         this.selectedBlocks = [];
