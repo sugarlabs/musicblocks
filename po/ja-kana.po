@@ -9224,3 +9224,26 @@ msgstr "z座標の動き"
 #~msgid "half note 𝅗𝅥"
 #~msgstr "半おんぷ 𝅗𝅥"
 
+msgid "current interval"
+msgstr "げんざいの おんかい"
+
+msgid "Solfege pitch preview"
+msgstr "ソルフェージュで おとの たかさの プレビュー"
+
+msgid "Moveable Do"
+msgstr "いどうド"
+
+msgid "Fixed Do"
+msgstr "こていド"
+
+msgid "Fullscreen"
+msgstr "フルスクリーン"
+
+msgid "Javascript editor"
+msgstr "ジャバスクリプト エディタ"
+
+msgid "Turtle Wrap off"
+msgstr "がめんの きょうかいを むししない"
+
+msgid "Turtle Wrap on"
+msgstr "がめんの きょうかいを むしする"
