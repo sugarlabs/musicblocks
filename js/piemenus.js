@@ -3452,7 +3452,7 @@ const piemenuBlockContext = (block) => {
         that.blocks.extract();
         if (that.blocks.selectionModeOn){
             const blocksArray = that.blocks.selectedBlocks;
-            // figure out which of blocks in selectedBlocks are clamp blocks and nonClamp one's.
+            // figure out which of the blocks in selectedBlocks are clamp blocks and nonClamp blocks.
             const clampBlocks = [];
             const nonClampBlocks = [];
 
