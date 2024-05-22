@@ -3436,7 +3436,7 @@ const piemenuBlockContext = (block) => {
                 ele.display = true;
                 ele.fn = stackPasting.bind(that);
             }
-        })
+        });
     };
 
     wheel.navItems[0].navigateFunction = stackPasting;
@@ -3450,7 +3450,33 @@ const piemenuBlockContext = (block) => {
     wheel.navItems[2].navigateFunction = () => {
         that.blocks.activeBlock = blockBlock;
         that.blocks.extract();
-        that.blocks.sendStackToTrash(that.blocks.blockList[blockBlock]);
+        if (that.blocks.selectionModeOn){
+            const blocksArray = that.blocks.selectedBlocks;
+            // figure out which of the blocks in selectedBlocks are clamp blocks and nonClamp blocks.
+            const clampBlocks = [];
+            const nonClampBlocks = [];
+
+            for (let i = 0; i < blocksArray.length; i++) {
+                if (that.blocks.selectedBlocks[i].isClampBlock()) {
+                    clampBlocks.push(that.blocks.selectedBlocks[i]);
+                } else if (that.blocks.selectedBlocks[i].isDisconnected()) {
+                    nonClampBlocks.push(that.blocks.selectedBlocks[i]);
+                }
+            }
+            
+            for (let i = 0; i < clampBlocks.length; i++) {
+                that.blocks.sendStackToTrash(clampBlocks[i]);
+            }
+
+            for (let i = 0; i < nonClampBlocks.length; i++) {
+                that.blocks.sendStackToTrash(nonClampBlocks[i]);
+            }
+            // set selection mode to false
+            that.blocks.setSelectionToActivity(false);
+            that.blocks.activity.refreshCanvas();
+        } else {
+            that.blocks.sendStackToTrash(that.blocks.blockList[blockBlock]);
+        }
         docById("contextWheelDiv").style.display = "none";
     };
 
