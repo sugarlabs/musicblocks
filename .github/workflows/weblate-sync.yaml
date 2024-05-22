@@ -1,0 +1,14 @@
+name: Weblate - Create PR when weblate pushes changes
+on:
+  push:
+    branches:
+      - weblate-sync
+jobs:
+  weblateSync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create Pull Request
+        run: gh pr create --base main --head weblate-sync -t "Weblate Synchronization" --body ""
+        env:
+          GH_TOKEN: ${{ github.token }}
