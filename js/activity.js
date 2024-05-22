@@ -5068,7 +5068,7 @@ class Activity {
             
             this.setupMouseEvents();
 
-            document.addEventListener("mousemove", (event)=>{
+            document.addEventListener("mousemove", (event) => {
                 this.hasMouseMoved = true;
                 event.preventDefault();
                 // this.selectedBlocks = [];
@@ -5085,7 +5085,7 @@ class Activity {
                 }
             })
 
-            document.addEventListener("mouseup", (event)=>{
+            document.addEventListener("mouseup", (event) => {
                 event.preventDefault();
                 this.isDragging = false;
                 this.selectionArea.style.display = "none";
@@ -5093,7 +5093,7 @@ class Activity {
                 this.startY = 0;
                 this.currentX = 0;
                 this.currentY = 0;
-                setTimeout(()=>{
+                setTimeout(() => {
                     this.hasMouseMoved = false;
                 }, 100);
             })
@@ -5146,7 +5146,7 @@ class Activity {
             let selectedBlocks = [];
             this.dragRect = this.dragArea;
 
-            this.blocks.blockList.forEach((block)=>{
+            this.blocks.blockList.forEach((block) => {
                     this.blockRect = {
                         x: this.scrollBlockContainer ? block.container.x + this.blocksContainer.x : block.container.x,
                         y: block.container.y + this.blocksContainer.y,

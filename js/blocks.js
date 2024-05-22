@@ -7029,7 +7029,7 @@ class Blocks {
             this.activity.setSelectionMode(selection);
         };
 
-        this.unhighlightSelectedBlocks = (blk, selection) =>{
+        this.unhighlightSelectedBlocks = (blk, selection) => {
             this.blockList[blk].unhighlightSelectedBlocks(blk, selection);
         };
 
