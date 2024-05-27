@@ -11,2136 +11,19 @@
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.0.5\n"
 
-#: js/activity.js:443
-#: js/activity.js:443
-#: js/activity.js:445
-#: js/activity.js:453
-#: js/activity.js:472
-#: js/activity.js:472
-#: js/activity.js:475
-#: js/block.js:632
-#: js/pitchdrummatrix.js:178
-#: js/musicutils.js:37
-#: js/block.js:531
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:40
-#: js/block.js:532
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:40
-#: js/block.js:534
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:40
-#: js/block.js:534
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:40
-#: js/block.js:534
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:40
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/synthutils.js:14
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/block.js:535
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:43
-#: js/block.js:536
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:45
-#: js/block.js:536
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:45
-#: js/block.js:551
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:46
-#: js/block.js:551
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:46
-#: js/block.js:565
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:48
-#: js/musicutils.js:57
-#: js/block.js:565
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:48
-#: js/musicutils.js:57
-#: js/block.js:565
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:48
-#: js/musicutils.js:57
-#: js/block.js:567
-#: js/pitchdrummatrix.js:235
-#: js/musicutils.js:48
-#: js/musicutils.js:57
-#: js/block.js:720
-#: js/block.js:3892
-#: js/block.js:3901
-#: js/block.js:3912
-#: js/activity.js:2732
-#: js/analytics.js:475
-#: js/palette.js:676
-#: js/palette.js:685
-#: js/palette.js:694
-#: js/palette.js:703
-#: js/palette.js:1978
-#: js/palette.js:1989
-#: js/palette.js:2000
-#: js/palette.js:2011
-#: js/turtledefs.js:23
-#: js/basicblocks.js:1148
-#: js/basicblocks.js:1159
-#: js/basicblocks.js:2806
-#: js/basicblocks.js:2837
-#: js/basicblocks.js:2844
-#: js/basicblocks.js:2873
-#: js/basicblocks.js:2883
-#: js/basicblocks.js:2915
-#: js/basicblocks.js:2960
-#: js/basicblocks.js:2964
-#: js/basicblocks.js:2970
-#: js/macros.js:44
-#: js/blocks.js:784
-#: js/blocks.js:2385
-#: js/blocks.js:2386
-#: js/blocks.js:2578
-#: js/blocks.js:2784
-#: js/blocks.js:2940
-#: js/blocks.js:3503
-#: js/blocks.js:4308
-#: js/block.js:720
-#: js/block.js:3892
-#: js/block.js:3901
-#: js/block.js:3912
-#: js/activity.js:2732
-#: js/analytics.js:475
-#: js/palette.js:681
-#: js/palette.js:690
-#: js/palette.js:699
-#: js/palette.js:708
-#: js/palette.js:1983
-#: js/palette.js:1994
-#: js/palette.js:2005
-#: js/palette.js:2016
-#: js/turtledefs.js:23
-#: js/basicblocks.js:1148
-#: js/basicblocks.js:1159
-#: js/basicblocks.js:1170
-#: js/basicblocks.js:2817
-#: js/basicblocks.js:2848
-#: js/basicblocks.js:2855
-#: js/basicblocks.js:2884
-#: js/basicblocks.js:2894
-#: js/basicblocks.js:2926
-#: js/basicblocks.js:2971
-#: js/basicblocks.js:2975
-#: js/basicblocks.js:2981
-#: js/macros.js:44
-#: js/blocks.js:784
-#: js/blocks.js:2385
-#: js/blocks.js:2386
-#: js/blocks.js:2578
-#: js/blocks.js:2784
-#: js/blocks.js:2940
-#: js/blocks.js:3514
-#: js/blocks.js:4319
-#: js/block.js:720
-#: js/block.js:3892
-#: js/block.js:3901
-#: js/block.js:3912
-#: js/activity.js:2732
-#: js/analytics.js:475
-#: js/palette.js:681
-#: js/palette.js:690
-#: js/palette.js:699
-#: js/palette.js:708
-#: js/palette.js:1983
-#: js/palette.js:1994
-#: js/palette.js:2005
-#: js/palette.js:2016
-#: js/turtledefs.js:23
-#: js/basicblocks.js:1148
-#: js/basicblocks.js:1159
-#: js/basicblocks.js:1170
-#: js/basicblocks.js:2817
-#: js/basicblocks.js:2848
-#: js/basicblocks.js:2855
-#: js/basicblocks.js:2884
-#: js/basicblocks.js:2894
-#: js/basicblocks.js:2926
-#: js/basicblocks.js:2971
-#: js/basicblocks.js:2975
-#: js/basicblocks.js:2981
-#: js/macros.js:44
-#: js/blocks.js:784
-#: js/blocks.js:2385
-#: js/blocks.js:2386
-#: js/blocks.js:2578
-#: js/blocks.js:2784
-#: js/blocks.js:2940
-#: js/blocks.js:3514
-#: js/blocks.js:4319
-#: js/block.js:863
-#: js/block.js:4105
-#: js/block.js:4114
-#: js/block.js:4125
-#: js/activity.js:2934
-#: js/palette.js:734
-#: js/palette.js:745
-#: js/palette.js:754
-#: js/palette.js:763
-#: js/palette.js:2076
-#: js/palette.js:2088
-#: js/palette.js:2099
-#: js/palette.js:2110
-#: js/turtledefs.js:23
-#: js/basicblocks.js:1406
-#: js/basicblocks.js:1420
-#: js/basicblocks.js:1434
-#: js/basicblocks.js:3700
-#: js/basicblocks.js:3740
-#: js/basicblocks.js:3750
-#: js/basicblocks.js:3788
-#: js/basicblocks.js:3801
-#: js/basicblocks.js:3852
-#: js/basicblocks.js:3897
-#: js/basicblocks.js:3902
-#: js/basicblocks.js:3907
-#: js/rubrics.js:475
-#: js/macros.js:44
-#: js/blocks.js:863
-#: js/blocks.js:2466
-#: js/blocks.js:2467
-#: js/blocks.js:2659
-#: js/blocks.js:2865
-#: js/blocks.js:3021
-#: js/blocks.js:3661
-#: js/blocks.js:4458
-#: js/rhythmruler.js:1138
-#: js/rhythmruler.js:1140
-#: js/rhythmruler.js:1240
-#: js/rhythmruler.js:1242
-#: js/block.js:876
-#: js/block.js:4289
-#: js/block.js:4298
-#: js/block.js:4309
-#: js/activity.js:3042
-#: js/palette.js:750
-#: js/palette.js:759
-#: js/palette.js:768
-#: js/palette.js:777
-#: js/palette.js:2057
-#: js/palette.js:2068
-#: js/palette.js:2079
-#: js/palette.js:2090
-#: js/palette.js:2100
-#: js/turtledefs.js:23
-#: js/basicblocks.js:1407
-#: js/basicblocks.js:1421
-#: js/basicblocks.js:1435
-#: js/basicblocks.js:3720
-#: js/basicblocks.js:3760
-#: js/basicblocks.js:3770
-#: js/basicblocks.js:3808
-#: js/basicblocks.js:3821
-#: js/basicblocks.js:3862
-#: js/basicblocks.js:3917
-#: js/basicblocks.js:3922
-#: js/basicblocks.js:3927
-#: js/rubrics.js:476
-#: js/macros.js:44
-#: js/blocks.js:863
-#: js/blocks.js:2475
-#: js/blocks.js:2476
-#: js/blocks.js:2668
-#: js/blocks.js:2874
-#: js/blocks.js:3030
-#: js/blocks.js:3851
-#: js/blocks.js:4668
-#: js/rhythmruler.js:1149
-#: js/rhythmruler.js:1151
-#: js/rhythmruler.js:1251
-#: js/rhythmruler.js:1253
-#: js/block.js:923
-#: js/block.js:4637
-#: js/block.js:4646
-#: js/block.js:4657
-#: js/activity.js:3061
-#: js/palette.js:737
-#: js/palette.js:746
-#: js/palette.js:755
-#: js/palette.js:764
-#: js/palette.js:2043
-#: js/palette.js:2054
-#: js/palette.js:2065
-#: js/palette.js:2076
-#: js/palette.js:2086
-#: js/turtledefs.js:23
-#: js/basicblocks.js:1445
-#: js/basicblocks.js:1459
-#: js/basicblocks.js:1473
-#: js/basicblocks.js:3776
-#: js/basicblocks.js:3816
-#: js/basicblocks.js:3826
-#: js/basicblocks.js:3864
-#: js/basicblocks.js:3877
-#: js/basicblocks.js:3918
-#: js/basicblocks.js:3973
-#: js/basicblocks.js:3978
-#: js/basicblocks.js:3983
-#: js/rubrics.js:477
-#: js/macros.js:45
-#: js/blocks.js:816
-#: js/blocks.js:2432
-#: js/blocks.js:2433
-#: js/blocks.js:2625
-#: js/blocks.js:2869
-#: js/blocks.js:3025
-#: js/blocks.js:3866
-#: js/blocks.js:4705
-#: js/rhythmruler.js:1149
-#: js/rhythmruler.js:1151
-#: js/rhythmruler.js:1251
-#: js/rhythmruler.js:1253
-#: js/block.js:923
-#: js/block.js:4823
-#: js/block.js:4832
-#: js/block.js:4843
-#: js/activity.js:3079
-#: js/palette.js:737
-#: js/palette.js:746
-#: js/palette.js:755
-#: js/palette.js:764
-#: js/palette.js:2043
-#: js/palette.js:2054
-#: js/palette.js:2065
-#: js/palette.js:2076
-#: js/palette.js:2086
-#: js/turtledefs.js:23
-#: js/basicblocks.js:1441
-#: js/basicblocks.js:1455
-#: js/basicblocks.js:1469
-#: js/basicblocks.js:3762
-#: js/basicblocks.js:3802
-#: js/basicblocks.js:3812
-#: js/basicblocks.js:3850
-#: js/basicblocks.js:3863
-#: js/basicblocks.js:3904
-#: js/basicblocks.js:3959
-#: js/basicblocks.js:3964
-#: js/basicblocks.js:3969
-#: js/rubrics.js:477
-#: js/macros.js:45
-#: js/blocks.js:816
-#: js/blocks.js:2430
-#: js/blocks.js:2431
-#: js/blocks.js:2623
-#: js/blocks.js:2867
-#: js/blocks.js:3023
-#: js/blocks.js:3864
-#: js/blocks.js:4702
-#: js/rhythmruler.js:1149
-#: js/rhythmruler.js:1151
-#: js/rhythmruler.js:1251
-#: js/rhythmruler.js:1253
-#: js/block.js:923
-#: js/block.js:4836
-#: js/block.js:4845
-#: js/block.js:4856
-#: js/activity.js:3089
-#: js/palette.js:737
-#: js/palette.js:746
-#: js/palette.js:755
-#: js/palette.js:764
-#: js/palette.js:2043
-#: js/palette.js:2054
-#: js/palette.js:2065
-#: js/palette.js:2076
-#: js/palette.js:2086
-#: js/turtledefs.js:23
-#: js/basicblocks.js:1441
-#: js/basicblocks.js:1455
-#: js/basicblocks.js:1469
-#: js/basicblocks.js:3762
-#: js/basicblocks.js:3802
-#: js/basicblocks.js:3812
-#: js/basicblocks.js:3850
-#: js/basicblocks.js:3863
-#: js/basicblocks.js:3904
-#: js/basicblocks.js:3959
-#: js/basicblocks.js:3964
-#: js/basicblocks.js:3969
-#: js/rubrics.js:477
-#: js/macros.js:45
-#: js/blocks.js:816
-#: js/blocks.js:2432
-#: js/blocks.js:2433
-#: js/blocks.js:2625
-#: js/blocks.js:2869
-#: js/blocks.js:3025
-#: js/blocks.js:3866
-#: js/blocks.js:4704
-#: js/rhythmruler.js:1149
-#: js/rhythmruler.js:1151
-#: js/rhythmruler.js:1251
-#: js/rhythmruler.js:1253
-#: js/block.js:923
-#: js/block.js:4841
-#: js/block.js:4850
-#: js/block.js:4861
-#: js/activity.js:3079
-#: js/palette.js:737
-#: js/palette.js:746
-#: js/palette.js:755
-#: js/palette.js:764
-#: js/palette.js:2043
-#: js/palette.js:2054
-#: js/palette.js:2065
-#: js/palette.js:2076
-#: js/palette.js:2086
-#: js/turtledefs.js:23
-#: js/basicblocks.js:1474
-#: js/basicblocks.js:1488
-#: js/basicblocks.js:1502
-#: js/basicblocks.js:3808
-#: js/basicblocks.js:3848
-#: js/basicblocks.js:3858
-#: js/basicblocks.js:3896
-#: js/basicblocks.js:3909
-#: js/basicblocks.js:3950
-#: js/basicblocks.js:4005
-#: js/basicblocks.js:4010
-#: js/basicblocks.js:4015
-#: js/rubrics.js:477
-#: js/macros.js:45
-#: js/blocks.js:816
-#: js/blocks.js:2433
-#: js/blocks.js:2434
-#: js/blocks.js:2626
-#: js/blocks.js:2870
-#: js/blocks.js:3026
-#: js/blocks.js:3867
-#: js/blocks.js:4705
-#: js/rhythmruler.js:1157
-#: js/rhythmruler.js:1159
-#: js/rhythmruler.js:1259
-#: js/rhythmruler.js:1261
-#: js/block.js:923
-#: js/block.js:4845
-#: js/block.js:4854
-#: js/block.js:4865
-#: js/activity.js:3083
-#: js/palette.js:765
-#: js/palette.js:774
-#: js/palette.js:783
-#: js/palette.js:792
-#: js/palette.js:2072
-#: js/palette.js:2083
-#: js/palette.js:2094
-#: js/palette.js:2105
-#: js/palette.js:2115
-#: js/turtledefs.js:25
-#: js/basicblocks.js:1474
-#: js/basicblocks.js:1488
-#: js/basicblocks.js:1502
-#: js/basicblocks.js:3808
-#: js/basicblocks.js:3848
-#: js/basicblocks.js:3858
-#: js/basicblocks.js:3896
-#: js/basicblocks.js:3909
-#: js/basicblocks.js:3950
-#: js/basicblocks.js:4005
-#: js/basicblocks.js:4010
-#: js/basicblocks.js:4015
-#: js/rubrics.js:477
-#: js/macros.js:45
-#: js/blocks.js:816
-#: js/blocks.js:2433
-#: js/blocks.js:2434
-#: js/blocks.js:2626
-#: js/blocks.js:2870
-#: js/blocks.js:3026
-#: js/blocks.js:3867
-#: js/blocks.js:4705
-#: js/rhythmruler.js:1157
-#: js/rhythmruler.js:1159
-#: js/rhythmruler.js:1259
-#: js/rhythmruler.js:1261
-#: js/block.js:923
-#: js/block.js:4845
-#: js/block.js:4854
-#: js/block.js:4865
-#: js/activity.js:3083
-#: js/palette.js:765
-#: js/palette.js:774
-#: js/palette.js:783
-#: js/palette.js:792
-#: js/palette.js:2072
-#: js/palette.js:2083
-#: js/palette.js:2094
-#: js/palette.js:2105
-#: js/palette.js:2115
-#: js/turtledefs.js:25
-#: js/basicblocks.js:1474
-#: js/basicblocks.js:1488
-#: js/basicblocks.js:1502
-#: js/basicblocks.js:3808
-#: js/basicblocks.js:3848
-#: js/basicblocks.js:3858
-#: js/basicblocks.js:3896
-#: js/basicblocks.js:3909
-#: js/basicblocks.js:3950
-#: js/basicblocks.js:4005
-#: js/basicblocks.js:4010
-#: js/basicblocks.js:4015
-#: js/rubrics.js:477
-#: js/macros.js:45
-#: js/blocks.js:816
-#: js/blocks.js:2433
-#: js/blocks.js:2434
-#: js/blocks.js:2626
-#: js/blocks.js:2870
-#: js/blocks.js:3026
-#: js/blocks.js:3867
-#: js/blocks.js:4705
-#: js/rhythmruler.js:1157
-#: js/rhythmruler.js:1159
-#: js/rhythmruler.js:1259
-#: js/rhythmruler.js:1261
-#: js/block.js:923
-#: js/block.js:4845
-#: js/block.js:4854
-#: js/block.js:4865
-#: js/activity.js:3083
-#: js/palette.js:765
-#: js/palette.js:774
-#: js/palette.js:783
-#: js/palette.js:792
-#: js/palette.js:2072
-#: js/palette.js:2083
-#: js/palette.js:2094
-#: js/palette.js:2105
-#: js/palette.js:2115
-#: js/turtledefs.js:25
-#: js/basicblocks.js:1474
-#: js/basicblocks.js:1488
-#: js/basicblocks.js:1502
-#: js/basicblocks.js:3808
-#: js/basicblocks.js:3848
-#: js/basicblocks.js:3858
-#: js/basicblocks.js:3896
-#: js/basicblocks.js:3909
-#: js/basicblocks.js:3950
-#: js/basicblocks.js:4005
-#: js/basicblocks.js:4010
-#: js/basicblocks.js:4015
-#: js/rubrics.js:477
-#: js/macros.js:45
-#: js/blocks.js:816
-#: js/blocks.js:2433
-#: js/blocks.js:2434
-#: js/blocks.js:2626
-#: js/blocks.js:2870
-#: js/blocks.js:3026
-#: js/blocks.js:3867
-#: js/blocks.js:4705
-#: js/rhythmruler.js:1157
-#: js/rhythmruler.js:1159
-#: js/rhythmruler.js:1259
-#: js/rhythmruler.js:1261
-#: js/block.js:926
-#: js/block.js:4883
-#: js/block.js:4892
-#: js/block.js:4903
-#: js/activity.js:3083
-#: js/palette.js:765
-#: js/palette.js:774
-#: js/palette.js:783
-#: js/palette.js:792
-#: js/palette.js:2075
-#: js/palette.js:2086
-#: js/palette.js:2097
-#: js/palette.js:2108
-#: js/palette.js:2118
-#: js/turtledefs.js:25
-#: js/basicblocks.js:1474
-#: js/basicblocks.js:1488
-#: js/basicblocks.js:1502
-#: js/basicblocks.js:3830
-#: js/basicblocks.js:3870
-#: js/basicblocks.js:3880
-#: js/basicblocks.js:3918
-#: js/basicblocks.js:3931
-#: js/basicblocks.js:3972
-#: js/basicblocks.js:4027
-#: js/basicblocks.js:4032
-#: js/basicblocks.js:4037
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:816
-#: js/blocks.js:2437
-#: js/blocks.js:2438
-#: js/blocks.js:2630
-#: js/blocks.js:2874
-#: js/blocks.js:3030
-#: js/blocks.js:3871
-#: js/blocks.js:4724
-#: js/rhythmruler.js:1157
-#: js/rhythmruler.js:1159
-#: js/rhythmruler.js:1259
-#: js/rhythmruler.js:1261
-#: js/block.js:926
-#: js/block.js:4883
-#: js/block.js:4892
-#: js/block.js:4903
-#: js/activity.js:3078
-#: js/palette.js:765
-#: js/palette.js:774
-#: js/palette.js:783
-#: js/palette.js:792
-#: js/palette.js:2075
-#: js/palette.js:2086
-#: js/palette.js:2097
-#: js/palette.js:2108
-#: js/palette.js:2118
-#: js/turtledefs.js:25
-#: js/basicblocks.js:1475
-#: js/basicblocks.js:1489
-#: js/basicblocks.js:1503
-#: js/basicblocks.js:3832
-#: js/basicblocks.js:3872
-#: js/basicblocks.js:3882
-#: js/basicblocks.js:3920
-#: js/basicblocks.js:3933
-#: js/basicblocks.js:3974
-#: js/basicblocks.js:4029
-#: js/basicblocks.js:4034
-#: js/basicblocks.js:4039
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:816
-#: js/blocks.js:2437
-#: js/blocks.js:2438
-#: js/blocks.js:2630
-#: js/blocks.js:2874
-#: js/blocks.js:3030
-#: js/blocks.js:3871
-#: js/blocks.js:4724
-#: js/rhythmruler.js:1162
-#: js/rhythmruler.js:1164
-#: js/rhythmruler.js:1272
-#: js/rhythmruler.js:1274
-#: js/block.js:1046
-#: js/block.js:5109
-#: js/block.js:5118
-#: js/block.js:5129
-#: js/activity.js:3147
-#: js/palette.js:766
-#: js/palette.js:775
-#: js/palette.js:784
-#: js/palette.js:793
-#: js/palette.js:2076
-#: js/palette.js:2087
-#: js/palette.js:2098
-#: js/palette.js:2109
-#: js/palette.js:2119
-#: js/turtledefs.js:25
-#: js/basicblocks.js:1504
-#: js/basicblocks.js:1524
-#: js/basicblocks.js:1538
-#: js/basicblocks.js:3894
-#: js/basicblocks.js:3934
-#: js/basicblocks.js:3944
-#: js/basicblocks.js:3992
-#: js/basicblocks.js:4005
-#: js/basicblocks.js:4052
-#: js/basicblocks.js:4107
-#: js/basicblocks.js:4112
-#: js/basicblocks.js:4117
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:816
-#: js/blocks.js:2437
-#: js/blocks.js:2438
-#: js/blocks.js:2630
-#: js/blocks.js:2874
-#: js/blocks.js:3030
-#: js/blocks.js:3940
-#: js/blocks.js:4793
-#: js/rhythmruler.js:1162
-#: js/rhythmruler.js:1164
-#: js/rhythmruler.js:1272
-#: js/rhythmruler.js:1274
-#: js/block.js:1050
-#: js/block.js:5120
-#: js/block.js:5129
-#: js/block.js:5140
-#: js/activity.js:2267
-#: js/palette.js:766
-#: js/palette.js:775
-#: js/palette.js:784
-#: js/palette.js:793
-#: js/palette.js:2094
-#: js/palette.js:2105
-#: js/palette.js:2116
-#: js/palette.js:2127
-#: js/palette.js:2137
-#: js/turtledefs.js:25
-#: js/basicblocks.js:1514
-#: js/basicblocks.js:1534
-#: js/basicblocks.js:1548
-#: js/basicblocks.js:3942
-#: js/basicblocks.js:3982
-#: js/basicblocks.js:3992
-#: js/basicblocks.js:4040
-#: js/basicblocks.js:4053
-#: js/basicblocks.js:4100
-#: js/basicblocks.js:4155
-#: js/basicblocks.js:4160
-#: js/basicblocks.js:4165
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:809
-#: js/blocks.js:2430
-#: js/blocks.js:2431
-#: js/blocks.js:2623
-#: js/blocks.js:2867
-#: js/blocks.js:3023
-#: js/blocks.js:3931
-#: js/blocks.js:4784
-#: js/rhythmruler.js:1162
-#: js/rhythmruler.js:1164
-#: js/rhythmruler.js:1272
-#: js/rhythmruler.js:1274
-#: js/block.js:1050
-#: js/block.js:5120
-#: js/block.js:5129
-#: js/block.js:5140
-#: js/activity.js:2267
-#: js/palette.js:766
-#: js/palette.js:775
-#: js/palette.js:784
-#: js/palette.js:793
-#: js/palette.js:2094
-#: js/palette.js:2105
-#: js/palette.js:2116
-#: js/palette.js:2127
-#: js/palette.js:2137
-#: js/turtledefs.js:25
-#: js/basicblocks.js:1519
-#: js/basicblocks.js:1539
-#: js/basicblocks.js:1553
-#: js/basicblocks.js:3959
-#: js/basicblocks.js:3999
-#: js/basicblocks.js:4009
-#: js/basicblocks.js:4057
-#: js/basicblocks.js:4070
-#: js/basicblocks.js:4117
-#: js/basicblocks.js:4172
-#: js/basicblocks.js:4177
-#: js/basicblocks.js:4182
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:809
-#: js/blocks.js:2430
-#: js/blocks.js:2431
-#: js/blocks.js:2623
-#: js/blocks.js:2867
-#: js/blocks.js:3023
-#: js/blocks.js:3931
-#: js/blocks.js:4784
-#: js/rhythmruler.js:1162
-#: js/rhythmruler.js:1164
-#: js/rhythmruler.js:1272
-#: js/rhythmruler.js:1274
-#: js/block.js:1050
-#: js/block.js:5120
-#: js/block.js:5129
-#: js/block.js:5140
-#: js/activity.js:2267
-#: js/palette.js:766
-#: js/palette.js:775
-#: js/palette.js:784
-#: js/palette.js:793
-#: js/palette.js:2094
-#: js/palette.js:2105
-#: js/palette.js:2116
-#: js/palette.js:2127
-#: js/palette.js:2137
-#: js/turtledefs.js:25
-#: js/basicblocks.js:1519
-#: js/basicblocks.js:1539
-#: js/basicblocks.js:1553
-#: js/basicblocks.js:3959
-#: js/basicblocks.js:3999
-#: js/basicblocks.js:4009
-#: js/basicblocks.js:4057
-#: js/basicblocks.js:4070
-#: js/basicblocks.js:4117
-#: js/basicblocks.js:4172
-#: js/basicblocks.js:4177
-#: js/basicblocks.js:4182
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:808
-#: js/blocks.js:2429
-#: js/blocks.js:2430
-#: js/blocks.js:2622
-#: js/blocks.js:2866
-#: js/blocks.js:3022
-#: js/blocks.js:3930
-#: js/blocks.js:4783
-#: js/rhythmruler.js:1162
-#: js/rhythmruler.js:1164
-#: js/rhythmruler.js:1272
-#: js/rhythmruler.js:1274
-#: js/block.js:1050
-#: js/block.js:5120
-#: js/block.js:5129
-#: js/block.js:5140
-#: js/activity.js:2267
-#: js/palette.js:766
-#: js/palette.js:775
-#: js/palette.js:784
-#: js/palette.js:793
-#: js/palette.js:2094
-#: js/palette.js:2105
-#: js/palette.js:2116
-#: js/palette.js:2127
-#: js/palette.js:2137
-#: js/turtledefs.js:25
-#: js/basicblocks.js:1519
-#: js/basicblocks.js:1539
-#: js/basicblocks.js:1553
-#: js/basicblocks.js:3959
-#: js/basicblocks.js:3999
-#: js/basicblocks.js:4009
-#: js/basicblocks.js:4057
-#: js/basicblocks.js:4070
-#: js/basicblocks.js:4117
-#: js/basicblocks.js:4172
-#: js/basicblocks.js:4177
-#: js/basicblocks.js:4182
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:808
-#: js/blocks.js:2429
-#: js/blocks.js:2430
-#: js/blocks.js:2622
-#: js/blocks.js:2866
-#: js/blocks.js:3022
-#: js/blocks.js:3930
-#: js/blocks.js:4783
-#: js/rhythmruler.js:1162
-#: js/rhythmruler.js:1164
-#: js/rhythmruler.js:1272
-#: js/rhythmruler.js:1274
-#: js/block.js:1050
-#: js/block.js:5120
-#: js/block.js:5129
-#: js/block.js:5140
-#: js/activity.js:2267
-#: js/palette.js:766
-#: js/palette.js:775
-#: js/palette.js:784
-#: js/palette.js:793
-#: js/palette.js:2094
-#: js/palette.js:2105
-#: js/palette.js:2116
-#: js/palette.js:2127
-#: js/palette.js:2137
-#: js/turtledefs.js:25
-#: js/basicblocks.js:1526
-#: js/basicblocks.js:1546
-#: js/basicblocks.js:1560
-#: js/basicblocks.js:3966
-#: js/basicblocks.js:4006
-#: js/basicblocks.js:4016
-#: js/basicblocks.js:4064
-#: js/basicblocks.js:4077
-#: js/basicblocks.js:4124
-#: js/basicblocks.js:4179
-#: js/basicblocks.js:4184
-#: js/basicblocks.js:4189
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:808
-#: js/blocks.js:2429
-#: js/blocks.js:2430
-#: js/blocks.js:2622
-#: js/blocks.js:2866
-#: js/blocks.js:3022
-#: js/blocks.js:3930
-#: js/blocks.js:4783
-#: js/rhythmruler.js:1162
-#: js/rhythmruler.js:1164
-#: js/rhythmruler.js:1272
-#: js/rhythmruler.js:1274
-#: js/block.js:1162
-#: js/block.js:5410
-#: js/block.js:5419
-#: js/block.js:5430
-#: js/activity.js:2268
-#: js/palette.js:770
-#: js/palette.js:779
-#: js/palette.js:788
-#: js/palette.js:797
-#: js/palette.js:2098
-#: js/palette.js:2109
-#: js/palette.js:2120
-#: js/palette.js:2131
-#: js/palette.js:2141
-#: js/turtledefs.js:31
-#: js/basicblocks.js:1528
-#: js/basicblocks.js:1548
-#: js/basicblocks.js:1562
-#: js/basicblocks.js:3968
-#: js/basicblocks.js:4008
-#: js/basicblocks.js:4018
-#: js/basicblocks.js:4066
-#: js/basicblocks.js:4079
-#: js/basicblocks.js:4126
-#: js/basicblocks.js:4181
-#: js/basicblocks.js:4186
-#: js/basicblocks.js:4191
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:1023
-#: js/blocks.js:2839
-#: js/blocks.js:2840
-#: js/blocks.js:3054
-#: js/blocks.js:3356
-#: js/blocks.js:3549
-#: js/blocks.js:4588
-#: js/blocks.js:5446
-#: js/musickeyboard.js:369
-#: js/pitchtimematrix.js:1612
-#: js/rhythmruler.js:1171
-#: js/rhythmruler.js:1173
-#: js/rhythmruler.js:1281
-#: js/rhythmruler.js:1283
-#: js/block.js:1162
-#: js/block.js:5410
-#: js/block.js:5419
-#: js/block.js:5430
-#: js/activity.js:2268
-#: js/palette.js:770
-#: js/palette.js:779
-#: js/palette.js:788
-#: js/palette.js:797
-#: js/palette.js:2098
-#: js/palette.js:2109
-#: js/palette.js:2120
-#: js/palette.js:2131
-#: js/palette.js:2141
-#: js/turtledefs.js:35
-#: js/basicblocks.js:1528
-#: js/basicblocks.js:1548
-#: js/basicblocks.js:1562
-#: js/basicblocks.js:3968
-#: js/basicblocks.js:4008
-#: js/basicblocks.js:4018
-#: js/basicblocks.js:4066
-#: js/basicblocks.js:4079
-#: js/basicblocks.js:4126
-#: js/basicblocks.js:4181
-#: js/basicblocks.js:4186
-#: js/basicblocks.js:4191
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:1023
-#: js/blocks.js:2839
-#: js/blocks.js:2840
-#: js/blocks.js:3054
-#: js/blocks.js:3356
-#: js/blocks.js:3549
-#: js/blocks.js:4588
-#: js/blocks.js:5446
-#: js/musickeyboard.js:369
-#: js/pitchtimematrix.js:1612
-#: js/rhythmruler.js:1171
-#: js/rhythmruler.js:1173
-#: js/rhythmruler.js:1281
-#: js/rhythmruler.js:1283
-#: js/block.js:1162
-#: js/block.js:5410
-#: js/block.js:5419
-#: js/block.js:5430
-#: js/activity.js:2133
-#: js/palette.js:770
-#: js/palette.js:779
-#: js/palette.js:788
-#: js/palette.js:797
-#: js/palette.js:2098
-#: js/palette.js:2109
-#: js/palette.js:2120
-#: js/palette.js:2131
-#: js/palette.js:2141
-#: js/turtledefs.js:35
-#: js/basicblocks.js:1528
-#: js/basicblocks.js:1548
-#: js/basicblocks.js:1562
-#: js/basicblocks.js:3968
-#: js/basicblocks.js:4008
-#: js/basicblocks.js:4018
-#: js/basicblocks.js:4066
-#: js/basicblocks.js:4079
-#: js/basicblocks.js:4126
-#: js/basicblocks.js:4181
-#: js/basicblocks.js:4186
-#: js/basicblocks.js:4191
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:1023
-#: js/blocks.js:2839
-#: js/blocks.js:2840
-#: js/blocks.js:3054
-#: js/blocks.js:3356
-#: js/blocks.js:3549
-#: js/blocks.js:4588
-#: js/blocks.js:5446
-#: js/musickeyboard.js:369
-#: js/pitchtimematrix.js:1612
-#: js/rhythmruler.js:1171
-#: js/rhythmruler.js:1173
-#: js/rhythmruler.js:1281
-#: js/rhythmruler.js:1283
-#: js/block.js:1162
-#: js/block.js:5410
-#: js/block.js:5419
-#: js/block.js:5430
-#: js/activity.js:2133
-#: js/palette.js:770
-#: js/palette.js:779
-#: js/palette.js:788
-#: js/palette.js:797
-#: js/palette.js:2098
-#: js/palette.js:2109
-#: js/palette.js:2120
-#: js/palette.js:2131
-#: js/palette.js:2141
-#: js/turtledefs.js:35
-#: js/basicblocks.js:1528
-#: js/basicblocks.js:1548
-#: js/basicblocks.js:1562
-#: js/basicblocks.js:3968
-#: js/basicblocks.js:4008
-#: js/basicblocks.js:4018
-#: js/basicblocks.js:4066
-#: js/basicblocks.js:4079
-#: js/basicblocks.js:4126
-#: js/basicblocks.js:4181
-#: js/basicblocks.js:4186
-#: js/basicblocks.js:4191
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:1023
-#: js/blocks.js:2839
-#: js/blocks.js:2840
-#: js/blocks.js:3054
-#: js/blocks.js:3356
-#: js/blocks.js:3549
-#: js/blocks.js:4588
-#: js/blocks.js:5446
-#: js/musickeyboard.js:369
-#: js/pitchtimematrix.js:1612
-#: js/rhythmruler.js:1171
-#: js/rhythmruler.js:1173
-#: js/rhythmruler.js:1281
-#: js/rhythmruler.js:1283
-#: js/block.js:1162
-#: js/block.js:5410
-#: js/block.js:5419
-#: js/block.js:5430
-#: js/activity.js:2127
-#: js/palette.js:770
-#: js/palette.js:779
-#: js/palette.js:788
-#: js/palette.js:797
-#: js/palette.js:2098
-#: js/palette.js:2109
-#: js/palette.js:2120
-#: js/palette.js:2131
-#: js/palette.js:2141
-#: js/turtledefs.js:35
-#: js/basicblocks.js:1528
-#: js/basicblocks.js:1548
-#: js/basicblocks.js:1562
-#: js/basicblocks.js:3968
-#: js/basicblocks.js:4008
-#: js/basicblocks.js:4018
-#: js/basicblocks.js:4066
-#: js/basicblocks.js:4079
-#: js/basicblocks.js:4127
-#: js/basicblocks.js:4182
-#: js/basicblocks.js:4187
-#: js/basicblocks.js:4192
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:1023
-#: js/blocks.js:2849
-#: js/blocks.js:2850
-#: js/blocks.js:3064
-#: js/blocks.js:3366
-#: js/blocks.js:3559
-#: js/blocks.js:4598
-#: js/blocks.js:5455
-#: js/musickeyboard.js:369
-#: js/pitchtimematrix.js:1612
-#: js/rhythmruler.js:1171
-#: js/rhythmruler.js:1173
-#: js/rhythmruler.js:1281
-#: js/rhythmruler.js:1283
-#: js/block.js:1162
-#: js/block.js:5410
-#: js/block.js:5419
-#: js/block.js:5430
-#: js/activity.js:2127
-#: js/palette.js:770
-#: js/palette.js:779
-#: js/palette.js:788
-#: js/palette.js:797
-#: js/palette.js:2098
-#: js/palette.js:2109
-#: js/palette.js:2120
-#: js/palette.js:2131
-#: js/palette.js:2141
-#: js/turtledefs.js:35
-#: js/basicblocks.js:1527
-#: js/basicblocks.js:1547
-#: js/basicblocks.js:1561
-#: js/basicblocks.js:3967
-#: js/basicblocks.js:4007
-#: js/basicblocks.js:4017
-#: js/basicblocks.js:4065
-#: js/basicblocks.js:4078
-#: js/basicblocks.js:4126
-#: js/basicblocks.js:4181
-#: js/basicblocks.js:4186
-#: js/basicblocks.js:4191
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:1023
-#: js/blocks.js:2849
-#: js/blocks.js:2850
-#: js/blocks.js:3064
-#: js/blocks.js:3366
-#: js/blocks.js:3559
-#: js/blocks.js:4598
-#: js/blocks.js:5455
-#: js/musickeyboard.js:369
-#: js/pitchtimematrix.js:1612
-#: js/rhythmruler.js:1171
-#: js/rhythmruler.js:1173
-#: js/rhythmruler.js:1281
-#: js/rhythmruler.js:1283
-#: js/block.js:1162
-#: js/block.js:5410
-#: js/block.js:5419
-#: js/block.js:5430
-#: js/activity.js:2127
-#: js/palette.js:770
-#: js/palette.js:779
-#: js/palette.js:788
-#: js/palette.js:797
-#: js/palette.js:2098
-#: js/palette.js:2109
-#: js/palette.js:2120
-#: js/palette.js:2131
-#: js/palette.js:2141
-#: js/turtledefs.js:35
-#: js/basicblocks.js:1527
-#: js/basicblocks.js:1547
-#: js/basicblocks.js:1561
-#: js/basicblocks.js:3967
-#: js/basicblocks.js:4007
-#: js/basicblocks.js:4017
-#: js/basicblocks.js:4065
-#: js/basicblocks.js:4078
-#: js/basicblocks.js:4126
-#: js/basicblocks.js:4181
-#: js/basicblocks.js:4186
-#: js/basicblocks.js:4191
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:1023
-#: js/blocks.js:2849
-#: js/blocks.js:2850
-#: js/blocks.js:3064
-#: js/blocks.js:3366
-#: js/blocks.js:3559
-#: js/blocks.js:4598
-#: js/blocks.js:5455
-#: js/musickeyboard.js:369
-#: js/pitchtimematrix.js:1612
-#: js/rhythmruler.js:1171
-#: js/rhythmruler.js:1173
-#: js/rhythmruler.js:1281
-#: js/rhythmruler.js:1283
-#: js/block.js:1162
-#: js/block.js:5410
-#: js/block.js:5419
-#: js/block.js:5430
-#: js/activity.js:2127
-#: js/palette.js:770
-#: js/palette.js:779
-#: js/palette.js:788
-#: js/palette.js:797
-#: js/palette.js:2098
-#: js/palette.js:2109
-#: js/palette.js:2120
-#: js/palette.js:2131
-#: js/palette.js:2141
-#: js/turtledefs.js:35
-#: js/basicblocks.js:1527
-#: js/basicblocks.js:1547
-#: js/basicblocks.js:1561
-#: js/basicblocks.js:3967
-#: js/basicblocks.js:4007
-#: js/basicblocks.js:4017
-#: js/basicblocks.js:4065
-#: js/basicblocks.js:4078
-#: js/basicblocks.js:4126
-#: js/basicblocks.js:4181
-#: js/basicblocks.js:4186
-#: js/basicblocks.js:4191
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:1023
-#: js/blocks.js:2849
-#: js/blocks.js:2850
-#: js/blocks.js:3064
-#: js/blocks.js:3366
-#: js/blocks.js:3559
-#: js/blocks.js:4598
-#: js/blocks.js:5455
-#: js/musickeyboard.js:369
-#: js/pitchtimematrix.js:1612
-#: js/rhythmruler.js:1171
-#: js/rhythmruler.js:1173
-#: js/rhythmruler.js:1281
-#: js/rhythmruler.js:1283
-#: js/block.js:1162
-#: js/block.js:5410
-#: js/block.js:5419
-#: js/block.js:5430
-#: js/activity.js:2127
-#: js/palette.js:770
-#: js/palette.js:779
-#: js/palette.js:788
-#: js/palette.js:797
-#: js/palette.js:2098
-#: js/palette.js:2109
-#: js/palette.js:2120
-#: js/palette.js:2131
-#: js/palette.js:2141
-#: js/turtledefs.js:35
-#: js/basicblocks.js:1531
-#: js/basicblocks.js:1551
-#: js/basicblocks.js:1565
-#: js/basicblocks.js:3971
-#: js/basicblocks.js:4011
-#: js/basicblocks.js:4021
-#: js/basicblocks.js:4069
-#: js/basicblocks.js:4082
-#: js/basicblocks.js:4130
-#: js/basicblocks.js:4185
-#: js/basicblocks.js:4190
-#: js/basicblocks.js:4195
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:1023
-#: js/blocks.js:2849
-#: js/blocks.js:2850
-#: js/blocks.js:3064
-#: js/blocks.js:3366
-#: js/blocks.js:3559
-#: js/blocks.js:4598
-#: js/blocks.js:5455
-#: js/musickeyboard.js:369
-#: js/pitchtimematrix.js:1612
-#: js/rhythmruler.js:1171
-#: js/rhythmruler.js:1173
-#: js/rhythmruler.js:1281
-#: js/rhythmruler.js:1283
-#: js/block.js:1162
-#: js/block.js:5410
-#: js/block.js:5419
-#: js/block.js:5430
-#: js/activity.js:2127
-#: js/palette.js:770
-#: js/palette.js:779
-#: js/palette.js:788
-#: js/palette.js:797
-#: js/palette.js:2098
-#: js/palette.js:2109
-#: js/palette.js:2120
-#: js/palette.js:2131
-#: js/palette.js:2141
-#: js/turtledefs.js:35
-#: js/basicblocks.js:1531
-#: js/basicblocks.js:1551
-#: js/basicblocks.js:1565
-#: js/basicblocks.js:3971
-#: js/basicblocks.js:4011
-#: js/basicblocks.js:4021
-#: js/basicblocks.js:4069
-#: js/basicblocks.js:4082
-#: js/basicblocks.js:4130
-#: js/basicblocks.js:4185
-#: js/basicblocks.js:4190
-#: js/basicblocks.js:4195
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:1023
-#: js/blocks.js:2849
-#: js/blocks.js:2850
-#: js/blocks.js:3064
-#: js/blocks.js:3366
-#: js/blocks.js:3559
-#: js/blocks.js:4598
-#: js/blocks.js:5455
-#: js/musickeyboard.js:369
-#: js/pitchtimematrix.js:1612
-#: js/rhythmruler.js:1171
-#: js/rhythmruler.js:1173
-#: js/rhythmruler.js:1281
-#: js/rhythmruler.js:1283
-#: js/block.js:1162
-#: js/block.js:5410
-#: js/block.js:5419
-#: js/block.js:5430
-#: js/activity.js:2127
-#: js/palette.js:770
-#: js/palette.js:779
-#: js/palette.js:788
-#: js/palette.js:797
-#: js/palette.js:2098
-#: js/palette.js:2109
-#: js/palette.js:2120
-#: js/palette.js:2131
-#: js/palette.js:2141
-#: js/turtledefs.js:35
-#: js/basicblocks.js:1531
-#: js/basicblocks.js:1551
-#: js/basicblocks.js:1565
-#: js/basicblocks.js:3971
-#: js/basicblocks.js:4011
-#: js/basicblocks.js:4021
-#: js/basicblocks.js:4069
-#: js/basicblocks.js:4082
-#: js/basicblocks.js:4130
-#: js/basicblocks.js:4185
-#: js/basicblocks.js:4190
-#: js/basicblocks.js:4195
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:1023
-#: js/blocks.js:2849
-#: js/blocks.js:2850
-#: js/blocks.js:3064
-#: js/blocks.js:3366
-#: js/blocks.js:3559
-#: js/blocks.js:4598
-#: js/blocks.js:5455
-#: js/musickeyboard.js:369
-#: js/pitchtimematrix.js:1612
-#: js/rhythmruler.js:1171
-#: js/rhythmruler.js:1173
-#: js/rhythmruler.js:1281
-#: js/rhythmruler.js:1283
-#: js/block.js:1162
-#: js/block.js:5413
-#: js/block.js:5422
-#: js/block.js:5433
-#: js/activity.js:2127
-#: js/palette.js:770
-#: js/palette.js:779
-#: js/palette.js:788
-#: js/palette.js:797
-#: js/palette.js:2098
-#: js/palette.js:2109
-#: js/palette.js:2120
-#: js/palette.js:2131
-#: js/palette.js:2141
-#: js/turtledefs.js:35
-#: js/basicblocks.js:1537
-#: js/basicblocks.js:1557
-#: js/basicblocks.js:1571
-#: js/basicblocks.js:3977
-#: js/basicblocks.js:4017
-#: js/basicblocks.js:4027
-#: js/basicblocks.js:4075
-#: js/basicblocks.js:4088
-#: js/basicblocks.js:4136
-#: js/basicblocks.js:4191
-#: js/basicblocks.js:4196
-#: js/basicblocks.js:4201
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:1023
-#: js/blocks.js:2849
-#: js/blocks.js:2850
-#: js/blocks.js:3064
-#: js/blocks.js:3366
-#: js/blocks.js:3559
-#: js/blocks.js:4598
-#: js/blocks.js:5455
-#: js/musickeyboard.js:369
-#: js/pitchtimematrix.js:1612
-#: js/rhythmruler.js:1171
-#: js/rhythmruler.js:1173
-#: js/rhythmruler.js:1281
-#: js/rhythmruler.js:1283
-#: js/block.js:1162
-#: js/block.js:5430
-#: js/block.js:5439
-#: js/block.js:5450
-#: js/activity.js:2134
-#: js/palette.js:810
-#: js/palette.js:819
-#: js/palette.js:828
-#: js/palette.js:837
-#: js/palette.js:2142
-#: js/palette.js:2153
-#: js/palette.js:2164
-#: js/palette.js:2175
-#: js/palette.js:2185
-#: js/turtledefs.js:35
-#: js/basicblocks.js:1542
-#: js/basicblocks.js:1562
-#: js/basicblocks.js:1576
-#: js/basicblocks.js:3982
-#: js/basicblocks.js:4022
-#: js/basicblocks.js:4032
-#: js/basicblocks.js:4080
-#: js/basicblocks.js:4093
-#: js/basicblocks.js:4141
-#: js/basicblocks.js:4196
-#: js/basicblocks.js:4201
-#: js/basicblocks.js:4206
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:1023
-#: js/blocks.js:2849
-#: js/blocks.js:2850
-#: js/blocks.js:3064
-#: js/blocks.js:3366
-#: js/blocks.js:3559
-#: js/blocks.js:4600
-#: js/blocks.js:5457
-#: js/musickeyboard.js:369
-#: js/pitchtimematrix.js:1612
-#: js/rhythmruler.js:1176
-#: js/rhythmruler.js:1178
-#: js/rhythmruler.js:1286
-#: js/rhythmruler.js:1288
-#: js/block.js:1162
-#: js/block.js:5430
-#: js/block.js:5439
-#: js/block.js:5450
-#: js/activity.js:2134
-#: js/palette.js:810
-#: js/palette.js:819
-#: js/palette.js:828
-#: js/palette.js:837
-#: js/palette.js:2142
-#: js/palette.js:2153
-#: js/palette.js:2164
-#: js/palette.js:2175
-#: js/palette.js:2185
-#: js/turtledefs.js:35
-#: js/basicblocks.js:1542
-#: js/basicblocks.js:1562
-#: js/basicblocks.js:1576
-#: js/basicblocks.js:3982
-#: js/basicblocks.js:4022
-#: js/basicblocks.js:4032
-#: js/basicblocks.js:4080
-#: js/basicblocks.js:4093
-#: js/basicblocks.js:4141
-#: js/basicblocks.js:4196
-#: js/basicblocks.js:4201
-#: js/basicblocks.js:4206
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:1023
-#: js/blocks.js:2849
-#: js/blocks.js:2850
-#: js/blocks.js:3064
-#: js/blocks.js:3366
-#: js/blocks.js:3559
-#: js/blocks.js:4600
-#: js/blocks.js:5457
-#: js/musickeyboard.js:369
-#: js/pitchtimematrix.js:1612
-#: js/rhythmruler.js:1176
-#: js/rhythmruler.js:1178
-#: js/rhythmruler.js:1286
-#: js/rhythmruler.js:1288
-#: js/block.js:1162
-#: js/block.js:5430
-#: js/block.js:5439
-#: js/block.js:5450
-#: js/activity.js:2134
-#: js/palette.js:810
-#: js/palette.js:819
-#: js/palette.js:828
-#: js/palette.js:837
-#: js/palette.js:2142
-#: js/palette.js:2153
-#: js/palette.js:2164
-#: js/palette.js:2175
-#: js/palette.js:2185
-#: js/turtledefs.js:35
-#: js/basicblocks.js:1542
-#: js/basicblocks.js:1562
-#: js/basicblocks.js:1576
-#: js/basicblocks.js:3982
-#: js/basicblocks.js:4022
-#: js/basicblocks.js:4032
-#: js/basicblocks.js:4080
-#: js/basicblocks.js:4093
-#: js/basicblocks.js:4141
-#: js/basicblocks.js:4196
-#: js/basicblocks.js:4201
-#: js/basicblocks.js:4206
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:1023
-#: js/blocks.js:2849
-#: js/blocks.js:2850
-#: js/blocks.js:3064
-#: js/blocks.js:3366
-#: js/blocks.js:3559
-#: js/blocks.js:4600
-#: js/blocks.js:5457
-#: js/musickeyboard.js:369
-#: js/pitchtimematrix.js:1612
-#: js/rhythmruler.js:1176
-#: js/rhythmruler.js:1178
-#: js/rhythmruler.js:1286
-#: js/rhythmruler.js:1288
-#: js/block.js:1162
-#: js/block.js:5445
-#: js/block.js:5454
-#: js/block.js:5465
-#: js/activity.js:2137
-#: js/palette.js:810
-#: js/palette.js:819
-#: js/palette.js:828
-#: js/palette.js:837
-#: js/palette.js:2142
-#: js/palette.js:2153
-#: js/palette.js:2164
-#: js/palette.js:2175
-#: js/palette.js:2185
-#: js/turtledefs.js:35
-#: js/basicblocks.js:1553
-#: js/basicblocks.js:1573
-#: js/basicblocks.js:1587
-#: js/basicblocks.js:3993
-#: js/basicblocks.js:4033
-#: js/basicblocks.js:4043
-#: js/basicblocks.js:4091
-#: js/basicblocks.js:4104
-#: js/basicblocks.js:4152
-#: js/basicblocks.js:4207
-#: js/basicblocks.js:4212
-#: js/basicblocks.js:4217
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/blocks.js:1023
-#: js/blocks.js:2849
-#: js/blocks.js:2850
-#: js/blocks.js:3064
-#: js/blocks.js:3366
-#: js/blocks.js:3559
-#: js/blocks.js:4600
-#: js/blocks.js:5457
-#: js/musickeyboard.js:370
-#: js/pitchtimematrix.js:1642
-#: js/rhythmruler.js:1176
-#: js/rhythmruler.js:1178
-#: js/rhythmruler.js:1286
-#: js/rhythmruler.js:1288
-#: js/block.js:1165
-#: js/block.js:5575
-#: js/block.js:5584
-#: js/block.js:5595
-#: js/activity.js:2240
-#: js/palette.js:812
-#: js/palette.js:821
-#: js/palette.js:830
-#: js/palette.js:839
-#: js/palette.js:2144
-#: js/palette.js:2155
-#: js/palette.js:2166
-#: js/palette.js:2177
-#: js/palette.js:2187
-#: js/turtledefs.js:35
-#: js/basicblocks.js:1559
-#: js/basicblocks.js:1579
-#: js/basicblocks.js:1593
-#: js/basicblocks.js:4003
-#: js/basicblocks.js:4043
-#: js/basicblocks.js:4053
-#: js/basicblocks.js:4101
-#: js/basicblocks.js:4114
-#: js/basicblocks.js:4162
-#: js/basicblocks.js:4217
-#: js/basicblocks.js:4222
-#: js/basicblocks.js:4227
-#: js/rubrics.js:478
-#: js/macros.js:45
-#: js/macros.js:46
-#: js/blocks.js:1025
-#: js/blocks.js:2860
-#: js/blocks.js:2861
-#: js/blocks.js:3075
-#: js/blocks.js:3377
-#: js/blocks.js:3570
-#: js/blocks.js:4612
-#: js/blocks.js:5477
-#: js/musickeyboard.js:375
-#: js/pitchtimematrix.js:1716
-#: js/rhythmruler.js:1176
-#: js/rhythmruler.js:1178
-#: js/rhythmruler.js:1286
-#: js/rhythmruler.js:1288
-#: js/block.js:1186
-#: js/block.js:5751
-#: js/block.js:5760
-#: js/block.js:5771
-#: js/activity.js:2363
-#: js/palette.js:816
-#: js/palette.js:825
-#: js/palette.js:834
-#: js/palette.js:843
-#: js/palette.js:2148
-#: js/palette.js:2159
-#: js/palette.js:2170
-#: js/palette.js:2181
-#: js/palette.js:2190
-#: js/turtledefs.js:35
-#: js/basicblocks.js:1572
-#: js/basicblocks.js:1592
-#: js/basicblocks.js:1606
-#: js/basicblocks.js:4069
-#: js/basicblocks.js:4079
-#: js/basicblocks.js:4127
-#: js/basicblocks.js:4140
-#: js/basicblocks.js:4184
-#: js/basicblocks.js:4207
-#: js/basicblocks.js:4262
-#: js/basicblocks.js:4267
-#: js/basicblocks.js:4272
-#: js/rubrics.js:478
-#: js/macros.js:47
-#: js/macros.js:48
-#: js/macros.js:66
-#: js/macros.js:66
-#: js/macros.js:68
-#: js/macros.js:141
-#: js/blocks.js:1034
-#: js/blocks.js:2922
-#: js/blocks.js:2923
-#: js/blocks.js:3137
-#: js/blocks.js:3442
-#: js/blocks.js:3636
-#: js/blocks.js:4680
-#: js/blocks.js:5545
-#: js/musickeyboard.js:1823
-#: js/pitchtimematrix.js:3385
-#: js/rhythmruler.js:1229
-#: js/rhythmruler.js:1231
-#: js/rhythmruler.js:1340
-#: js/rhythmruler.js:1342
-#: js/RhythmBlockPaletteBlocks.js:14
-#: js/RhythmBlockPaletteBlocks.js:177
-#: js/RhythmBlockPaletteBlocks.js:14
-#: js/RhythmBlockPaletteBlocks.js:177
-#: js/RhythmBlockPaletteBlocks.js:14
-#: js/RhythmBlockPaletteBlocks.js:177
-#: js/RhythmBlockPaletteBlocks.js:14
-#: js/RhythmBlockPaletteBlocks.js:177
-#: js/RhythmBlockPaletteBlocks.js:14
-#: js/RhythmBlockPaletteBlocks.js:170
-#: js/block.js:1436
-#: js/block.js:7910
-#: js/block.js:7931
-#: js/block.js:7948
-#: js/activity.js:2693
-#: js/palette.js:932
-#: js/palette.js:941
-#: js/palette.js:950
-#: js/palette.js:959
-#: js/palette.js:2511
-#: js/palette.js:2522
-#: js/palette.js:2533
-#: js/palette.js:2544
-#: js/palette.js:2563
-#: js/turtledefs.js:76
-#: js/rubrics.js:497
-#: js/macros.js:153
-#: js/macros.js:249
-#: js/macros.js:250
-#: js/macros.js:259
-#: js/macros.js:801
-#: js/blocks.js:1120
-#: js/blocks.js:3549
-#: js/blocks.js:3550
-#: js/blocks.js:3786
-#: js/blocks.js:4168
-#: js/blocks.js:4363
-#: js/blocks.js:5526
-#: js/blocks.js:6776
-#: js/ActionBlocks.js:99
-#: js/ActionBlocks.js:147
-#: js/ActionBlocks.js:350
-#: js/ActionBlocks.js:415
-#: js/ActionBlocks.js:569
-#: js/ActionBlocks.js:629
-#: js/ActionBlocks.js:765
-#: js/ActionBlocks.js:768
-#: js/ActionBlocks.js:773
-#: js/ActionBlocks.js:805
-#: js/MeterBlocks.js:412
-#: js/MeterBlocks.js:479
-#: js/MeterBlocks.js:568
-#: js/MeterBlocks.js:669
-#: js/musickeyboard.js:2360
-#: js/pitchtimematrix.js:4708
-#: js/rhythmruler.js:1602
-#: js/rhythmruler.js:1610
-#: js/rhythmruler.js:1911
-#: js/rhythmruler.js:1919
-#: js/block.js:1436
-#: js/block.js:8089
-#: js/block.js:8110
-#: js/block.js:8127
-#: js/activity.js:2968
-#: js/palette.js:503
-#: js/palette.js:512
-#: js/palette.js:521
-#: js/palette.js:530
-#: js/palette.js:1122
-#: js/palette.js:1133
-#: js/palette.js:1144
-#: js/palette.js:1155
-#: js/palette.js:1174
-#: js/turtledefs.js:76
-#: js/rubrics.js:497
-#: js/macros.js:153
-#: js/macros.js:249
-#: js/macros.js:250
-#: js/macros.js:259
-#: js/macros.js:801
-#: js/blocks.js:1120
-#: js/blocks.js:3572
-#: js/blocks.js:3573
-#: js/blocks.js:3809
-#: js/blocks.js:4191
-#: js/blocks.js:4382
-#: js/blocks.js:5545
-#: js/blocks.js:6795
-#: js/ActionBlocks.js:99
-#: js/ActionBlocks.js:147
-#: js/ActionBlocks.js:343
-#: js/ActionBlocks.js:408
-#: js/ActionBlocks.js:562
-#: js/ActionBlocks.js:622
-#: js/ActionBlocks.js:749
-#: js/ActionBlocks.js:752
-#: js/ActionBlocks.js:757
-#: js/ActionBlocks.js:789
-#: js/MeterBlocks.js:390
-#: js/MeterBlocks.js:419
-#: js/MeterBlocks.js:455
-#: js/MeterBlocks.js:494
-#: js/musickeyboard.js:2421
-#: js/pitchtimematrix.js:4706
-#: js/rhythmruler.js:1602
-#: js/rhythmruler.js:1610
-#: js/rhythmruler.js:1911
-#: js/rhythmruler.js:1919
-#: js/block.js:1436
-#: js/block.js:8073
-#: js/block.js:8094
-#: js/block.js:8111
-#: js/activity.js:2984
-#: js/palette.js:503
-#: js/palette.js:512
-#: js/palette.js:521
-#: js/palette.js:530
-#: js/palette.js:1122
-#: js/palette.js:1133
-#: js/palette.js:1144
-#: js/palette.js:1155
-#: js/palette.js:1174
-#: js/turtledefs.js:78
-#: js/rubrics.js:501
-#: js/macros.js:153
-#: js/macros.js:249
-#: js/macros.js:250
-#: js/macros.js:259
-#: js/macros.js:801
-#: js/blocks.js:1112
-#: js/blocks.js:3545
-#: js/blocks.js:3546
-#: js/blocks.js:3779
-#: js/blocks.js:4160
-#: js/blocks.js:4346
-#: js/blocks.js:5496
-#: js/blocks.js:6721
-#: js/ActionBlocks.js:99
-#: js/ActionBlocks.js:147
-#: js/ActionBlocks.js:343
-#: js/ActionBlocks.js:408
-#: js/ActionBlocks.js:562
-#: js/ActionBlocks.js:622
-#: js/ActionBlocks.js:750
-#: js/ActionBlocks.js:753
-#: js/ActionBlocks.js:758
-#: js/ActionBlocks.js:790
-#: js/MeterBlocks.js:396
-#: js/MeterBlocks.js:425
-#: js/MeterBlocks.js:461
-#: js/MeterBlocks.js:500
-#: js/musickeyboard.js:2495
-#: js/pitchtimematrix.js:4718
-#: js/rhythmruler.js:1602
-#: js/rhythmruler.js:1610
-#: js/rhythmruler.js:1911
-#: js/rhythmruler.js:1919
-#: js/block.js:1436
-#: js/block.js:8073
-#: js/block.js:8094
-#: js/block.js:8111
-#: js/activity.js:2984
-#: js/palette.js:503
-#: js/palette.js:512
-#: js/palette.js:521
-#: js/palette.js:530
-#: js/palette.js:1122
-#: js/palette.js:1133
-#: js/palette.js:1144
-#: js/palette.js:1155
-#: js/palette.js:1174
-#: js/turtledefs.js:78
-#: js/rubrics.js:501
-#: js/macros.js:153
-#: js/macros.js:249
-#: js/macros.js:250
-#: js/macros.js:259
-#: js/macros.js:801
-#: js/blocks.js:1112
-#: js/blocks.js:3545
-#: js/blocks.js:3546
-#: js/blocks.js:3779
-#: js/blocks.js:4160
-#: js/blocks.js:4346
-#: js/blocks.js:5496
-#: js/blocks.js:6721
-#: js/ActionBlocks.js:99
-#: js/ActionBlocks.js:147
-#: js/ActionBlocks.js:343
-#: js/ActionBlocks.js:408
-#: js/ActionBlocks.js:562
-#: js/ActionBlocks.js:622
-#: js/ActionBlocks.js:750
-#: js/ActionBlocks.js:753
-#: js/ActionBlocks.js:758
-#: js/ActionBlocks.js:790
-#: js/MeterBlocks.js:396
-#: js/MeterBlocks.js:425
-#: js/MeterBlocks.js:461
-#: js/MeterBlocks.js:500
-#: js/musickeyboard.js:2495
-#: js/pitchtimematrix.js:4718
-#: js/rhythmruler.js:1602
-#: js/rhythmruler.js:1610
-#: js/rhythmruler.js:1911
-#: js/rhythmruler.js:1919
-#: js/block.js:1436
-#: js/block.js:8073
-#: js/block.js:8094
-#: js/block.js:8111
-#: js/activity.js:2984
-#: js/palette.js:506
-#: js/palette.js:515
-#: js/palette.js:524
-#: js/palette.js:533
-#: js/palette.js:1128
-#: js/palette.js:1139
-#: js/palette.js:1150
-#: js/palette.js:1161
-#: js/palette.js:1180
-#: js/turtledefs.js:78
-#: js/rubrics.js:501
-#: js/macros.js:153
-#: js/macros.js:249
-#: js/macros.js:250
-#: js/macros.js:259
-#: js/macros.js:801
-#: js/blocks.js:1112
-#: js/blocks.js:3545
-#: js/blocks.js:3546
-#: js/blocks.js:3779
-#: js/blocks.js:4160
-#: js/blocks.js:4346
-#: js/blocks.js:5496
-#: js/blocks.js:6721
-#: js/ActionBlocks.js:99
-#: js/ActionBlocks.js:147
-#: js/ActionBlocks.js:343
-#: js/ActionBlocks.js:408
-#: js/ActionBlocks.js:562
-#: js/ActionBlocks.js:622
-#: js/ActionBlocks.js:750
-#: js/ActionBlocks.js:753
-#: js/ActionBlocks.js:758
-#: js/ActionBlocks.js:790
-#: js/MeterBlocks.js:396
-#: js/MeterBlocks.js:425
-#: js/MeterBlocks.js:461
-#: js/MeterBlocks.js:500
-#: js/musickeyboard.js:2495
-#: js/pitchtimematrix.js:4718
-#: js/rhythmruler.js:1602
-#: js/rhythmruler.js:1610
-#: js/rhythmruler.js:1911
-#: js/rhythmruler.js:1919
-#: js/block.js:1414
-#: js/block.js:4018
-#: js/block.js:4036
-#: js/block.js:4047
-#: js/activity.js:2899
-#: js/palette.js:486
-#: js/palette.js:495
-#: js/palette.js:504
-#: js/palette.js:513
-#: js/palette.js:1089
-#: js/palette.js:1100
-#: js/palette.js:1111
-#: js/palette.js:1122
-#: js/palette.js:1141
-#: js/turtledefs.js:78
-#: js/rubrics.js:501
-#: js/macros.js:170
-#: js/macros.js:266
-#: js/macros.js:267
-#: js/macros.js:276
-#: js/macros.js:828
-#: js/blocks.js:1071
-#: js/blocks.js:3210
-#: js/blocks.js:3211
-#: js/blocks.js:3428
-#: js/blocks.js:3752
-#: js/blocks.js:3932
-#: js/blocks.js:4976
-#: js/blocks.js:5845
-#: js/ActionBlocks.js:99
-#: js/ActionBlocks.js:147
-#: js/ActionBlocks.js:343
-#: js/ActionBlocks.js:408
-#: js/ActionBlocks.js:562
-#: js/ActionBlocks.js:622
-#: js/ActionBlocks.js:750
-#: js/ActionBlocks.js:753
-#: js/ActionBlocks.js:758
-#: js/ActionBlocks.js:790
-#: js/MeterBlocks.js:396
-#: js/MeterBlocks.js:426
-#: js/MeterBlocks.js:462
-#: js/MeterBlocks.js:501
-#: js/musickeyboard.js:2495
-#: js/rhythmruler.js:1874
-#: js/rhythmruler.js:1881
-#: js/rhythmruler.js:2065
-#: js/rhythmruler.js:2072
-#: js/phrasemaker.js:4226
-#: js/block.js:1414
-#: js/block.js:4020
-#: js/block.js:4038
-#: js/block.js:4049
-#: js/activity.js:2899
-#: js/palette.js:486
-#: js/palette.js:495
-#: js/palette.js:504
-#: js/palette.js:513
-#: js/palette.js:1089
-#: js/palette.js:1100
-#: js/palette.js:1111
-#: js/palette.js:1122
-#: js/palette.js:1141
-#: js/turtledefs.js:78
-#: js/rubrics.js:501
-#: js/macros.js:170
-#: js/macros.js:266
-#: js/macros.js:267
-#: js/macros.js:276
-#: js/macros.js:828
-#: js/blocks.js:1071
-#: js/blocks.js:3210
-#: js/blocks.js:3211
-#: js/blocks.js:3428
-#: js/blocks.js:3752
-#: js/blocks.js:3932
-#: js/blocks.js:4976
-#: js/blocks.js:5845
-#: js/ActionBlocks.js:99
-#: js/ActionBlocks.js:147
-#: js/ActionBlocks.js:343
-#: js/ActionBlocks.js:408
-#: js/ActionBlocks.js:562
-#: js/ActionBlocks.js:622
-#: js/ActionBlocks.js:750
-#: js/ActionBlocks.js:753
-#: js/ActionBlocks.js:758
-#: js/ActionBlocks.js:790
-#: js/MeterBlocks.js:396
-#: js/MeterBlocks.js:426
-#: js/MeterBlocks.js:462
-#: js/MeterBlocks.js:501
-#: js/musickeyboard.js:2495
-#: js/rhythmruler.js:1874
-#: js/rhythmruler.js:1881
-#: js/rhythmruler.js:2065
-#: js/rhythmruler.js:2072
-#: js/phrasemaker.js:4226
-#: js/block.js:1439
-#: js/block.js:4063
-#: js/block.js:4081
-#: js/block.js:4092
-#: js/palette.js:505
-#: js/palette.js:514
-#: js/palette.js:523
-#: js/palette.js:532
-#: js/palette.js:1125
-#: js/palette.js:1136
-#: js/palette.js:1147
-#: js/palette.js:1158
-#: js/palette.js:1177
-#: js/turtledefs.js:101
-#: js/rubrics.js:522
-#: js/macros.js:168
-#: js/macros.js:264
-#: js/macros.js:265
-#: js/macros.js:274
-#: js/macros.js:826
-#: js/blocks.js:1001
-#: js/blocks.js:3394
-#: js/blocks.js:3395
-#: js/blocks.js:3620
-#: js/blocks.js:3981
-#: js/blocks.js:4172
-#: js/blocks.js:5305
-#: js/blocks.js:6432
-#: js/ActionBlocks.js:119
-#: js/ActionBlocks.js:167
-#: js/ActionBlocks.js:364
-#: js/ActionBlocks.js:429
-#: js/ActionBlocks.js:582
-#: js/ActionBlocks.js:643
-#: js/ActionBlocks.js:772
-#: js/ActionBlocks.js:775
-#: js/ActionBlocks.js:780
-#: js/ActionBlocks.js:813
-#: js/MeterBlocks.js:416
-#: js/MeterBlocks.js:446
-#: js/MeterBlocks.js:482
-#: js/MeterBlocks.js:521
-#: js/musickeyboard.js:2564
-#: js/rhythmruler.js:1925
-#: js/rhythmruler.js:1932
-#: js/rhythmruler.js:2116
-#: js/rhythmruler.js:2123
-#: js/phrasemaker.js:4402
-#: js/planetInterface.js:101
-#: js/planetInterface.js:101
-#: js/planetInterface.js:101
-#: js/planetInterface.js:101
-#: js/planetInterface.js:102
-#: js/planetInterface.js:104
-#: js/planetInterface.js:104
 #: js/planetInterface.js:104
 msgid "project undefined"
-msgstr ""
+msgstr "פרויקט לא מוגדר"
 
 #: js/logo.js:61
 msgid "Not a valid pitch name"
-msgstr ""
+msgstr "לא שם פיץ' חוקי"
 
 #: js/logo.js:507
 #: js/ProgramBlocks.js:258
 #: js/ProgramBlocks.js:427
 msgid "You must select a file."
-msgstr ""
+msgstr "עליך לבחור קובץ."
 
 #: js/logo.js:1184
 #: js/turtles.js:118
@@ -2157,7 +40,7 @@ msgstr "התחל"
 
 #: js/logo.js:1696
 msgid "Playback is ready."
-msgstr ""
+msgstr "ההשמעה מוכנה."
 
 #: js/blocks.js:1011
 #: js/blocks.js:3427
@@ -2230,7 +113,7 @@ msgstr "תיבה"
 
 #: js/blocks.js:1680
 msgid "Consider breaking this stack into parts."
-msgstr ""
+msgstr "שקול לפרק את הערימה הזו לחלקים."
 
 #: js/blocks.js:2408
 #: js/palette.js:653
@@ -2242,19 +125,19 @@ msgstr "פתיחת קובץ"
 #: js/blocks.js:2423
 #: js/activity.js:1875
 msgid "audio file"
-msgstr ""
+msgstr "קובץ שמע"
 
 #: js/blocks.js:2536
 #: js/blocks.js:3147
 #: js/block.js:3543
 msgid "on2"
-msgstr ""
+msgstr "עַל"
 
 #: js/blocks.js:2538
 #: js/blocks.js:3149
 #: js/block.js:3545
 msgid "off"
-msgstr ""
+msgstr "כבוי"
 
 #: js/blocks.js:2543
 #: js/blocks.js:3154
@@ -2273,7 +156,7 @@ msgstr ""
 #: js/BooleanBlocks.js:1033
 #: js/SensorsBlocks.js:910
 msgid "true"
-msgstr ""
+msgstr "נָכוֹן"
 
 #: js/blocks.js:2545
 #: js/blocks.js:3156
@@ -2290,7 +173,7 @@ msgstr ""
 #: js/BooleanBlocks.js:950
 #: js/SensorsBlocks.js:912
 msgid "false"
-msgstr ""
+msgstr "שֶׁקֶר"
 
 #: js/blocks.js:3183
 #: js/palette.js:574
@@ -2304,7 +187,7 @@ msgstr "טקסט"
 #: js/palette.js:642
 #: js/BoxesBlocks.js:514
 msgid "store in box"
-msgstr ""
+msgstr "לאחסן בקופסה"
 
 #: js/blocks.js:3384
 #: js/blocks.js:3824
@@ -2314,7 +197,7 @@ msgstr ""
 #: js/blocks.js:5794
 #: js/BoxesBlocks.js:772
 msgid "box1"
-msgstr ""
+msgstr "קופסא 1"
 
 #: js/blocks.js:3386
 #: js/blocks.js:3826
@@ -2324,7 +207,7 @@ msgstr ""
 #: js/blocks.js:5796
 #: js/BoxesBlocks.js:663
 msgid "box2"
-msgstr ""
+msgstr "קופסא 2"
 
 #: js/blocks.js:4058
 #: js/palette.js:639
@@ -2363,7 +246,7 @@ msgstr "ערך"
 
 #: js/blocks.js:4907
 msgid "There is no block selected."
-msgstr ""
+msgstr "לא נבחר בלוק."
 
 #: js/blocks.js:5002
 #: js/MediaBlocks.js:888
@@ -2374,18 +257,18 @@ msgstr "הצג"
 #: js/MediaBlocks.js:803
 #.TRANS: Avatar is the image used to determine the appearance of the mouse.
 msgid "avatar"
-msgstr ""
+msgstr "גִלגוּל"
 
 #: js/blocks.js:5008
 #: js/ToneBlocks.js:1010
 #: js/sampler.js:693
 #.TRANS: The sound sample that the user uploads.
 msgid "sample"
-msgstr ""
+msgstr "דוּגמָה"
 
 #: js/turtles.js:874
 msgid "Grid"
-msgstr ""
+msgstr "רֶשֶׁת"
 
 #: js/turtles.js:891
 #: js/turtledefs.js:626
@@ -2395,15 +278,15 @@ msgstr "נקה"
 #: js/turtles.js:912
 #: js/turtledefs.js:632
 msgid "Collapse"
-msgstr ""
+msgstr "להתמוטט"
 
 #: js/turtles.js:940
 msgid "Expand"
-msgstr ""
+msgstr "להתרחב"
 
 #: js/languagebox.js:198
 msgid "Refresh your browser to change your language preference."
-msgstr ""
+msgstr "רענן את הדפדפן שלך כדי לשנות את העדפת השפה שלך."
 
 #: js/languagebox.js:218
 msgid "Music Blocks is already set to this language."
@@ -2417,7 +300,7 @@ msgstr "Music Blocks כבר מוגדר לשפה זו"
 #: js/sampler.js:544
 #.TRANS: double sharp is a music term related to pitch
 msgid "double sharp"
-msgstr ""
+msgstr "חד כפול"
 
 #: js/piemenus.js:201
 #: js/PitchBlocks.js:1510
@@ -2430,7 +313,7 @@ msgstr ""
 #.TRANS: sharp is a half-step up in pitch
 #.TRANS: sharp is a music term related to pitch
 msgid "sharp"
-msgstr ""
+msgstr "חַד"
 
 #: js/piemenus.js:202
 #: js/musicutils.js:804
@@ -2453,7 +336,7 @@ msgstr ""
 #.TRANS: flat is a half-step down in pitch
 #.TRANS: flat is a music term related to pitch
 msgid "flat"
-msgstr ""
+msgstr " זוגי"
 
 #: js/piemenus.js:204
 #: js/musicutils.js:800
@@ -2463,7 +346,7 @@ msgstr ""
 #: js/sampler.js:548
 #.TRANS: double flat is a music term related to pitch
 msgid "double flat"
-msgstr ""
+msgstr "שטוח זוגי"
 
 #: js/piemenus.js:2861
 #: js/PitchBlocks.js:1357
@@ -2507,22 +390,22 @@ msgstr ""
 
 #: js/piemenus.js:3407
 msgid "Duplicate"
-msgstr ""
+msgstr "לְשַׁכְפֵּל"
 
 #: js/piemenus.js:3408
 #: js/turtledefs.js:534
 msgid "Extract"
-msgstr ""
+msgstr "לְהַעְתִיק"
 
 #: js/piemenus.js:3409
 msgid "Move to trash"
-msgstr ""
+msgstr "העבר לאשפה"
 
 #: js/piemenus.js:3410
 #: js/timbre.js:968
 #: js/StringHelper.js:69
 msgid "Close"
-msgstr ""
+msgstr "סגור"
 
 #: js/piemenus.js:3416
 msgid "Save stack"
@@ -2539,7 +422,7 @@ msgstr "עזרה"
 
 #: js/piemenus.js:3762
 msgid "You have chosen key "
-msgstr ""
+msgstr "אתה בחרת"
 
 #: js/piemenus.js:3766
 msgid " for your pitch preview."
@@ -2547,7 +430,7 @@ msgstr ""
 
 #: js/palette.js:571
 msgid "grid"
-msgstr ""
+msgstr "רֶשֶׁת"
 
 #: js/palette.js:577
 #: js/block.js:1540
@@ -2562,11 +445,11 @@ msgstr ""
 #: js/VolumeBlocks.js:502
 #: js/phrasemaker.js:823
 msgid "drum"
-msgstr ""
+msgstr "תוֹף"
 
 #: js/palette.js:580
 msgid "effect"
-msgstr ""
+msgstr "אפקט שמע"
 
 #: js/palette.js:586
 msgid "sargam"
@@ -2594,7 +477,7 @@ msgstr ""
 #: js/palette.js:598
 #: js/activity.js:1836
 msgid "voice name"
-msgstr ""
+msgstr "שם קול"
 
 #: js/palette.js:601
 #: js/PitchBlocks.js:1181
@@ -2607,7 +490,7 @@ msgstr ""
 #: js/WidgetBlocks.js:218
 #: js/IntervalsBlocks.js:63
 msgid "temperament"
-msgstr ""
+msgstr "הטמפרמנט"
 
 #: js/palette.js:609
 msgid "accidental"
@@ -2636,7 +519,7 @@ msgstr ""
 #: js/rhythmruler.js:1830
 #.TRANS: an arrangement of notes based on duration
 msgid "rhythm"
-msgstr ""
+msgstr "קֶצֶב"
 
 #: js/rubrics.js:523
 #: js/block.js:2339
@@ -2651,13 +534,13 @@ msgstr ""
 #.TRANS: pitch number
 #.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
 msgid "pitch"
-msgstr ""
+msgstr "מגרש מוזיקלי"
 
 #: js/rubrics.js:524
 #: js/turtledefs.js:123
 #: js/turtledefs.js:225
 msgid "tone"
-msgstr ""
+msgstr "צְלִיל"
 
 #: js/rubrics.js:525
 #: js/lilypond.js:613
@@ -2665,7 +548,7 @@ msgstr ""
 #: js/lilypond.js:918
 #: js/lilypond.js:956
 msgid "mouse"
-msgstr ""
+msgstr "עכבר"
 
 #: js/rubrics.js:526
 #: js/turtledefs.js:132
@@ -2704,19 +587,19 @@ msgstr "מדיה"
 
 #: js/rubrics.js:532
 msgid "mice"
-msgstr ""
+msgstr "עכברים"
 
 #: js/macros.js:711
 #: js/musicutils.js:783
 #: js/synthutils.js:181
 #.TRANS: animal sound effect
 msgid "duck"
-msgstr ""
+msgstr "ברווז"
 
 #: js/toolbar.js:46
 #: js/toolbar.js:107
 msgid "About Music Blocks"
-msgstr ""
+msgstr "על Music Blocks"
 
 #: js/toolbar.js:47
 #: js/toolbar.js:108
@@ -2782,7 +665,7 @@ msgstr ""
 #: js/arpeggio.js:644
 #: js/arpeggio.js:646
 msgid "Play"
-msgstr ""
+msgstr "לְשַׂחֵק"
 
 #: js/toolbar.js:48
 #: js/toolbar.js:109
@@ -2812,12 +695,12 @@ msgstr "עצור"
 #: js/toolbar.js:230
 #: js/turtledefs.js:498
 msgid "Record"
-msgstr ""
+msgstr "תקליט"
 
 #: js/toolbar.js:50
 #: js/toolbar.js:51
 msgid "Full screen"
-msgstr ""
+msgstr "מסך מלא"
 
 #: js/toolbar.js:52
 #: js/toolbar.js:112
@@ -2825,7 +708,7 @@ msgstr ""
 #: js/toolbar.js:232
 #: js/turtledefs.js:504
 msgid "Toggle Fullscreen"
-msgstr ""
+msgstr "החלף מסך מלא"
 
 #: js/toolbar.js:53
 #: js/toolbar.js:113
@@ -2834,7 +717,7 @@ msgstr ""
 #: js/turtledefs.js:510
 #: js/StringHelper.js:33
 msgid "New project"
-msgstr ""
+msgstr "פרוייקט חדש"
 
 #: js/toolbar.js:54
 #: js/toolbar.js:114
@@ -2868,28 +751,28 @@ msgstr "שמור פרויקט"
 #: js/toolbar.js:254
 #: js/toolbar.js:256
 msgid "Save project as HTML"
-msgstr ""
+msgstr "שמור את הפרויקט כ-HTML"
 
 #: js/toolbar.js:57
 #: js/toolbar.js:117
 #: js/toolbar.js:182
 #: js/toolbar.js:237
 msgid "Find and share projects"
-msgstr ""
+msgstr "למצוא ולשתף פרויקטים"
 
 #: js/toolbar.js:58
 #: js/toolbar.js:118
 #: js/toolbar.js:183
 #: js/toolbar.js:238
 msgid "Offline. Sharing is unavailable"
-msgstr ""
+msgstr "לא מקוון. השיתוף אינו זמין."
 
 #: js/toolbar.js:59
 #: js/toolbar.js:119
 #: js/toolbar.js:184
 #: js/toolbar.js:239
 msgid "Auxiliary menu"
-msgstr ""
+msgstr "תפריט עזר"
 
 #: js/toolbar.js:61
 #: js/toolbar.js:121
@@ -2919,7 +802,7 @@ msgstr "הצג סטטיסטיקות"
 #: js/toolbar.js:189
 #: js/toolbar.js:244
 msgid "Load plugin"
-msgstr ""
+msgstr "טען תוסף"
 
 #: js/toolbar.js:65
 #: js/toolbar.js:125
@@ -2927,21 +810,21 @@ msgstr ""
 #: js/toolbar.js:245
 #: js/turtledefs.js:696
 msgid "Delete plugin"
-msgstr ""
+msgstr "למחוק תוסף"
 
 #: js/toolbar.js:66
 #: js/toolbar.js:126
 #: js/toolbar.js:191
 #: js/toolbar.js:246
 msgid "Enable horizontal scrolling"
-msgstr ""
+msgstr "אפשר גלילה אופקית"
 
 #: js/toolbar.js:67
 #: js/toolbar.js:127
 #: js/toolbar.js:192
 #: js/toolbar.js:247
 msgid "Disable horizontal scrolling"
-msgstr ""
+msgstr "השבת גלילה אופקית"
 
 #: js/toolbar.js:68
 #: js/toolbar.js:128
@@ -2950,19 +833,19 @@ msgstr ""
 #: js/LocalCard.js:54
 #: js/StringHelper.js:71
 msgid "Merge with current project"
-msgstr ""
+msgstr "להתמזג עם הפרויקט הנוכחי"
 
 #: js/toolbar.js:69
 #: js/toolbar.js:129
 msgid "Set Pitch Preview"
-msgstr ""
+msgstr "הגדר תצוגה מקדימה של גובה הצליל"
 
 #: js/toolbar.js:70
 #: js/toolbar.js:130
 #: js/toolbar.js:194
 #: js/toolbar.js:249
 msgid "Toggle JavaScript Editor"
-msgstr ""
+msgstr "החלף את עורך JavaScript"
 
 #: js/toolbar.js:71
 #: js/toolbar.js:131
@@ -2970,21 +853,21 @@ msgstr ""
 #: js/toolbar.js:250
 #: js/turtledefs.js:724
 msgid "Restore"
-msgstr ""
+msgstr "לשחזר"
 
 #: js/toolbar.js:72
 #: js/toolbar.js:132
 #: js/toolbar.js:196
 #: js/toolbar.js:251
 msgid "Switch to beginner mode"
-msgstr ""
+msgstr "לעבור למצב מתחיל"
 
 #: js/toolbar.js:73
 #: js/toolbar.js:133
 #: js/toolbar.js:197
 #: js/toolbar.js:252
 msgid "Switch to advanced mode"
-msgstr ""
+msgstr "עבור למצב מתקדם"
 
 #: js/toolbar.js:74
 #: js/toolbar.js:134
@@ -2993,42 +876,42 @@ msgstr ""
 #: js/toolbar.js:253
 #: js/turtledefs.js:738
 msgid "Select language"
-msgstr ""
+msgstr "בחר שפה"
 
 #: js/toolbar.js:76
 #: js/toolbar.js:79
 #: js/toolbar.js:137
 #: js/turtledefs.js:579
 msgid "Save mouse artwork as PNG"
-msgstr ""
+msgstr "שמור גרפיקה כ-PNG"
 
 #: js/toolbar.js:78
 #: js/toolbar.js:136
 #: js/turtledefs.js:575
 msgid "Save mouse artwork as SVG"
-msgstr ""
+msgstr "שמור גרפיקה כ-SVG"
 
 #: js/toolbar.js:80
 #: js/toolbar.js:138
 #: js/turtledefs.js:583
 msgid "Save music as WAV"
-msgstr ""
+msgstr "לשמור מוזיקה כ-WAV"
 
 #: js/toolbar.js:81
 #: js/toolbar.js:139
 #: js/turtledefs.js:587
 msgid "Save sheet music as ABC"
-msgstr ""
+msgstr "לשמור מוזיקה כ-ABC"
 
 #: js/toolbar.js:82
 #: js/toolbar.js:140
 #: js/turtledefs.js:591
 msgid "Save sheet music as Lilypond"
-msgstr ""
+msgstr "לשמור מוזיקה כ-Lilypond"
 
 #: js/toolbar.js:83
 msgid "Save sheet music as MusicXML"
-msgstr ""
+msgstr "לשמור מוזיקה כ-MusicXML"
 
 #: js/toolbar.js:84
 #: js/toolbar.js:141
@@ -3038,7 +921,7 @@ msgstr ""
 #: js/turtledefs.js:562
 #: js/turtledefs.js:595
 msgid "Save block artwork as SVG"
-msgstr ""
+msgstr "שמור בלוקים כ-SVG"
 
 #: js/toolbar.js:85
 #: js/toolbar.js:142
@@ -3046,7 +929,7 @@ msgstr ""
 #: js/toolbar.js:205
 #: js/toolbar.js:260
 msgid "Confirm"
-msgstr ""
+msgstr "לְאַשֵׁר"
 
 #: js/toolbar.js:86
 #: js/toolbar.js:151
@@ -3179,14 +1062,14 @@ msgstr ""
 #: js/toolbar.js:258
 #: js/turtledefs.js:558
 msgid "Save turtle artwork as PNG"
-msgstr ""
+msgstr "שמור גרפיקה כ-PNG"
 
 #: js/toolbar.js:147
 #: js/toolbar.js:202
 #: js/toolbar.js:257
 #: js/turtledefs.js:554
 msgid "Save turtle artwork as SVG"
-msgstr ""
+msgstr "שמור גרפיקה כ-SVG"
 
 #: js/toolbar.js:154
 #: js/toolbar.js:209
@@ -3197,7 +1080,7 @@ msgstr ""
 #: js/toolbar.js:171
 #: js/toolbar.js:227
 msgid "About Turtle Blocks"
-msgstr ""
+msgstr "על Turtle Blocks"
 
 #: js/toolbar.js:429
 #: js/toolbar.js:440
@@ -3210,48 +1093,48 @@ msgstr ""
 
 #: js/block.js:1470
 msgid "matrix"
-msgstr ""
+msgstr "מַטרִיצָה"
 
 #: js/block.js:1477
 #: js/WidgetBlocks.js:1226
 #: plugins/rodi.rtp:324
 msgid "status"
-msgstr ""
+msgstr "מַצָב"
 
 #: js/block.js:1484
 msgid "drum mapper"
-msgstr ""
+msgstr "מפת תופים"
 
 #: js/block.js:1491
 msgid "ruler"
-msgstr ""
+msgstr "סַרְגֵל"
 
 #: js/block.js:1498
 #: js/WidgetBlocks.js:327
 #.TRANS: timbre is the character or quality of a musical sound
 msgid "timbre"
-msgstr ""
+msgstr "גָוֶן"
 
 #: js/block.js:1505
 msgid "stair"
-msgstr ""
+msgstr "מַדרֵגָה"
 
 #: js/block.js:1512
 #: js/WidgetBlocks.js:577
 #.TRANS: the speed at music is should be played.
 msgid "tempo"
-msgstr ""
+msgstr "טֶמפּוֹ"
 
 #: js/block.js:1519
 #: js/block.js:1582
 #: js/IntervalsBlocks.js:1268
 #.TRANS: mode, e.g., Major in C Major
 msgid "mode"
-msgstr ""
+msgstr "מצב מוזיקלי"
 
 #: js/block.js:1526
 msgid "slider"
-msgstr ""
+msgstr "המחוון"
 
 #: js/block.js:1533
 #: js/SensorsBlocks.js:1001
@@ -3263,7 +1146,7 @@ msgstr "קלט מקלדת"
 #: js/WidgetBlocks.js:988
 #.TRANS: widget for subdividing a measure into distinct rhythmic elements
 msgid "rhythm maker"
-msgstr ""
+msgstr "יוצר קצב"
 
 #: js/block.js:1554
 #: js/block.js:2182
@@ -3288,7 +1171,7 @@ msgstr ""
 #: js/phrasemaker.js:2534
 #.TRANS: the value (e.g., 1/4 note) of the note being played.
 msgid "note value"
-msgstr ""
+msgstr "ערך תו מוזיקלי"
 
 #: js/block.js:1561
 #: js/block.js:2110
@@ -3297,12 +1180,12 @@ msgstr ""
 #: js/OrnamentBlocks.js:312
 #.TRANS: calculate a relative step between notes based on semi-tones
 msgid "scalar interval"
-msgstr ""
+msgstr "מרווח סקלרי"
 
 #: js/block.js:1568
 #: js/RhythmBlocks.js:148
 msgid "milliseconds"
-msgstr ""
+msgstr "אלפיות השנייה"
 
 #: js/block.js:2180
 #: js/block.js:2184
@@ -3313,7 +1196,7 @@ msgstr ""
 #: js/rhythmruler.js:834
 #: js/rhythmruler.js:961
 msgid "silence"
-msgstr ""
+msgstr "דְמָמָה"
 
 #: js/block.js:2265
 #: js/block.js:3134
@@ -3330,60 +1213,60 @@ msgstr ""
 #: js/block.js:2333
 #.TRANS: scalar step
 msgid "down"
-msgstr ""
+msgstr "מטה"
 
 #: js/block.js:2334
 msgid "up"
-msgstr ""
+msgstr "מַעְלָה"
 
 #: js/block.js:3477
 #: js/block.js:3490
 #: js/ExtrasBlocks.js:612
 msgid "Cartesian"
-msgstr "קוארדינטות קרטזיות"
+msgstr "קרטזיאני"
 
 #: js/block.js:3478
 #: js/block.js:3491
 #: js/ExtrasBlocks.js:616
 msgid "polar"
-msgstr ""
+msgstr "קוֹטבִי"
 
 #: js/block.js:3479
 #: js/block.js:3492
 #: js/ExtrasBlocks.js:620
 msgid "Cartesian+polar"
-msgstr ""
+msgstr "הקוטב והקרטזאי"
 
 #: js/block.js:3480
 #: js/block.js:3499
 #: js/ExtrasBlocks.js:649
 msgid "none"
-msgstr ""
+msgstr "אף אחד"
 
 #: js/block.js:3493
 #: js/ExtrasBlocks.js:625
 msgid "treble"
-msgstr ""
+msgstr "סוֹפּרָנוֹ"
 
 #: js/block.js:3494
 #: js/ExtrasBlocks.js:629
 msgid "grand staff"
-msgstr ""
+msgstr "צוות גדול"
 
 #: js/block.js:3495
 #: js/ExtrasBlocks.js:633
 msgid "mezzo-soprano"
-msgstr ""
+msgstr "מצו סופרן"
 
 #: js/block.js:3496
 #: js/ExtrasBlocks.js:637
 msgid "alto"
-msgstr ""
+msgstr "אַלט"
 
 #: js/block.js:3497
 #: js/ExtrasBlocks.js:641
 msgid "tenor"
-msgstr ""
+msgstr "טֶנוֹר"
 
 #: js/block.js:3498
 #: js/ExtrasBlocks.js:645
@@ -3391,38 +1274,38 @@ msgstr ""
 #: js/synthutils.js:64
 #.TRANS: musical instrument
 msgid "bass"
-msgstr ""
+msgstr "בַּס"
 
 #: js/block.js:4075
 msgid "Not a number"
-msgstr ""
+msgstr "לא מספר"
 
 #: js/block.js:4082
 msgid "Octave value must be between 1 and 10."
-msgstr ""
+msgstr "ערך האוקטבה חייב להיות בין 1 ל-10."
 
 #: js/block.js:4090
 msgid "Numbers can have at most 10 digits."
-msgstr ""
+msgstr "מספרים יכולים להכיל 10 ספרות לכל היותר."
 
 #: js/notation.js:353
 msgid "Lilypond cannot process pickup of "
-msgstr ""
+msgstr "Lilypond לא יכול לעבד איסוף"
 
 #: js/turtledefs.js:40
 #.TRANS: put the URL to the guide here, e.g., https://github.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md
 msgid "guide url"
-msgstr ""
+msgstr "כתובת אתר"
 
 #: js/turtledefs.js:85
 #: js/turtledefs.js:437
 msgid "Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks."
-msgstr ""
+msgstr "Turtle Blocks הוא צב בהשראת לוגו המצייר תמונות צבעוניות עם בלוקי תכנות חזותיים המוצמדים זה לזה."
 
 #: js/turtledefs.js:118
 #: js/turtledefs.js:220
 msgid "search"
-msgstr ""
+msgstr "לחפש"
 
 #: js/turtledefs.js:120
 #: js/turtledefs.js:222
@@ -3430,17 +1313,17 @@ msgstr ""
 #: js/MeterBlocks.js:1343
 #.TRANS: musical meter (time signature), e.g., 4:4
 msgid "meter"
-msgstr ""
+msgstr "קֶצֶב"
 
 #: js/turtledefs.js:122
 #: js/turtledefs.js:224
 msgid "intervals"
-msgstr ""
+msgstr "מרווחים"
 
 #: js/turtledefs.js:124
 #: js/turtledefs.js:226
 msgid "ornament"
-msgstr ""
+msgstr "לְפַאֵר"
 
 #: js/turtledefs.js:125
 #: js/turtledefs.js:227
@@ -3448,23 +1331,23 @@ msgstr ""
 #: js/VolumeBlocks.js:502
 #: js/VolumeBlocks.js:545
 msgid "volume"
-msgstr ""
+msgstr "עָצמָה"
 
 #: js/turtledefs.js:129
 #: js/turtledefs.js:231
 msgid "boxes"
-msgstr ""
+msgstr "קופסאות"
 
 #: js/turtledefs.js:130
 #: js/turtledefs.js:232
 msgid "widgets"
-msgstr ""
+msgstr "ווידג'טים"
 
 #: js/turtledefs.js:131
 #: js/turtledefs.js:233
 #: js/phrasemaker.js:824
 msgid "graphics"
-msgstr ""
+msgstr "גרָפִיקָה"
 
 #: js/turtledefs.js:134
 #: js/turtledefs.js:236
@@ -3476,19 +1359,19 @@ msgstr "בוליאני"
 #: js/HeapBlocks.js:59
 #: js/status.js:147
 msgid "heap"
-msgstr ""
+msgstr "ערימה"
 
 #: js/turtledefs.js:138
 #: js/turtledefs.js:240
 #: js/ProgramBlocks.js:495
 #: js/DictBlocks.js:142
 msgid "dictionary"
-msgstr ""
+msgstr "מילון"
 
 #: js/turtledefs.js:139
 #: js/turtledefs.js:241
 msgid "ensemble"
-msgstr ""
+msgstr "אנסמבל"
 
 #: js/turtledefs.js:140
 #: js/turtledefs.js:242
@@ -3500,17 +1383,17 @@ msgstr "אקסטרה"
 #.TRANS: program as in computer program
 #.TRANS: program as in computer program
 msgid "program"
-msgstr ""
+msgstr "תכנית"
 
 #: js/turtledefs.js:143
 #: js/turtledefs.js:245
 msgid "my blocks"
-msgstr ""
+msgstr "הבלוקים שלי"
 
 #: js/turtledefs.js:185
 #: js/turtledefs.js:281
 msgid "artwork"
-msgstr ""
+msgstr "עבודת אומנות"
 
 #: js/turtledefs.js:185
 #: js/turtledefs.js:281
@@ -3520,75 +1403,75 @@ msgstr "לוגיקה"
 #: js/turtledefs.js:185
 #: js/turtledefs.js:281
 msgid "music"
-msgstr ""
+msgstr "מוּסִיקָה"
 
 #: js/turtledefs.js:187
 #: js/turtledefs.js:463
 msgid "Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way."
-msgstr ""
+msgstr "Music Blocks הוא אוסף של כלים לחקר מושגים מוזיקליים בסיסיים בצורה מהנה."
 
 #: js/turtledefs.js:436
 msgid "Welcome to Turtle Blocks"
-msgstr ""
+msgstr "ברוך הבא"
 
 #: js/turtledefs.js:438
 #: js/turtledefs.js:465
 #: js/turtledefs.js:774
 #: js/turtledefs.js:805
 msgid "The current version is"
-msgstr ""
+msgstr "הגרסה הנוכחית"
 
 #: js/turtledefs.js:446
 #: js/turtledefs.js:483
 msgid "Click the run button to run the project in fast mode."
-msgstr ""
+msgstr "לחץ על כפתור ההפעלה כדי להפעיל את הפרויקט במצב מהיר."
 
 #: js/turtledefs.js:452
 msgid "Stop the turtle."
-msgstr ""
+msgstr "לעצור את הצב"
 
 #: js/turtledefs.js:454
 #: js/turtledefs.js:491
 msgid "You can also type Alt-S to stop."
-msgstr ""
+msgstr "אתה יכול גם להקליד Alt-S כדי לעצור."
 
 #: js/turtledefs.js:462
 #: js/help.js:333
 msgid "Welcome to Music Blocks"
-msgstr ""
+msgstr "ברוך הבא"
 
 #: js/turtledefs.js:472
 #: js/help.js:334
 msgid "Meet Mr. Mouse!"
-msgstr ""
+msgstr "הכירו את מר מאוס"
 
 #: js/turtledefs.js:473
 msgid "Mr Mouse is our Music Blocks conductor."
-msgstr ""
+msgstr "מר מאוס הוא המנצח שלנו ב-Music Blocks."
 
 #: js/turtledefs.js:475
 msgid "Mr Mouse encourages you to explore Music Blocks."
-msgstr ""
+msgstr "מר עכבר מעודד אותך לחקור את בלוקי המוזיקה."
 
 #: js/turtledefs.js:477
 msgid "Let us start our tour!"
-msgstr ""
+msgstr "בואו נתחיל את הסיור שלנו"
 
 #: js/turtledefs.js:489
 msgid "Stop the music (and the mice)."
-msgstr ""
+msgstr "עצור את המוזיקה (ואת העכברים)."
 
 #: js/turtledefs.js:499
 msgid "Record your project as video."
-msgstr ""
+msgstr "הקלט את הפרויקט שלך כווידאו."
 
 #: js/turtledefs.js:505
 msgid "Toggle Fullscreen mode."
-msgstr ""
+msgstr "החלף מצב מסך מלא"
 
 #: js/turtledefs.js:511
 msgid "Initialize a new project."
-msgstr ""
+msgstr "להתחיל פרויקט חדש"
 
 #: js/turtledefs.js:517
 msgid "You can also load projects from the file system."
@@ -3601,7 +1484,7 @@ msgstr "מחיקה"
 
 #: js/turtledefs.js:523
 msgid "To delete a block, just right-click on it, then you will be able to see the delete option"
-msgstr ""
+msgstr "כדי למחוק בלוק, פשוט לחץ עליו באמצעות לחצן העכבר הימני ואז תוכל לראות את אפשרות המחיקה"
 
 #: js/turtledefs.js:528
 #: js/activity.js:2270
@@ -3611,49 +1494,49 @@ msgstr "העתק"
 
 #: js/turtledefs.js:529
 msgid "To copy a block, just right-click on it, then you will be able to see the copy option"
-msgstr ""
+msgstr "כדי להעתיק בלוק, פשוט לחץ עליו באמצעות לחצן העכבר הימני ואז תוכל לראות את אפשרות ההעתקה"
 
 #: js/turtledefs.js:535
 msgid "To extract a block, just right-click on it, then you will be able to see the extract option"
-msgstr ""
+msgstr "כדי לחלץ בלוק, פשוט לחץ עליו באמצעות לחצן העכבר הימני, ואז תוכל לראות את אפשרות החילוץ"
 
 #: js/turtledefs.js:542
 #: js/turtledefs.js:552
 #: js/turtledefs.js:573
 msgid "Save your project to a file."
-msgstr ""
+msgstr "לשמור את הפרויקט שלך לקובץ"
 
 #: js/turtledefs.js:549
 #: js/turtledefs.js:570
 msgid "save"
-msgstr ""
+msgstr "שמור"
 
 #: js/turtledefs.js:556
 #: js/turtledefs.js:577
 msgid "Save graphics from your project to as SVG."
-msgstr ""
+msgstr "שמור גרפיקה מהפרויקט שלך כ-SVG."
 
 #: js/turtledefs.js:560
 #: js/turtledefs.js:581
 msgid "Save graphics from your project as PNG."
-msgstr ""
+msgstr "שמור גרפיקה מהפרויקט שלך כ-PNG."
 
 #: js/turtledefs.js:564
 #: js/turtledefs.js:597
 msgid "Save block artwork as an SVG file."
-msgstr ""
+msgstr "שמור גרפיקת בלוק כקובץ SVG."
 
 #: js/turtledefs.js:585
 msgid "Save audio from your project as WAV."
-msgstr ""
+msgstr "שמור אודיו מהפרויקט שלך כ-WAV."
 
 #: js/turtledefs.js:589
 msgid "Save your project to as an ABC file."
-msgstr ""
+msgstr "שמור את הפרויקט שלך כקובץ ABC."
 
 #: js/turtledefs.js:593
 msgid "Save your project to as a Lilypond file."
-msgstr ""
+msgstr "שמור את הפרויקט שלך כקובץ Lilypond."
 
 #: js/turtledefs.js:604
 msgid "Load samples from server"
@@ -3669,11 +1552,11 @@ msgstr "סרגל כלים"
 
 #: js/turtledefs.js:612
 msgid "This toolbar contains the palette buttons including Rhythm Pitch Tone Action and more."
-msgstr ""
+msgstr "סרגל כלים זה מכיל את כפתורי הצבעים הכוללים קצב, גובה גובה, טון, פעולה ועוד."
 
 #: js/turtledefs.js:614
 msgid "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-msgstr ""
+msgstr "לחץ כדי להציג את פלטות הבלוקים וגרור בלוקים מהלוחות אל הקנבס כדי להשתמש בהם."
 
 #: js/turtledefs.js:620
 msgid "Cartesian/Polar"
