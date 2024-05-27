@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   version="1.1"
+   width="186"
+   height="46"
+   id="svg2"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <path
+     d="M 1,17 V 9 C 1,4.581722 4.581722,1 9,1 h 8 V 5 H 37 V 1 h 132 8 c 4.41828,0 8,3.581722 8,8 v 8 8 8 c 0,4.418278 -3.58172,8 -8,8 H 169 37 35 v 4 H 19 V 41 H 17 9 C 4.581722,41 1,37.418278 1,33 v -8 z"
+     id="path21"
+     style="fill:#1d8989;fill-opacity:1;stroke:#005459;stroke-width:2;stroke-linecap:round;stroke-opacity:1" />
+  <text
+     id="text23"
+     style="font-size:20px;font-family:Sans;text-anchor:end;fill:#000000"
+     x="40"><tspan
+       x="166"
+       y="28"
+       id="tspan25">rellenar pantalla</tspan></text>
+</svg>
