@@ -1,0 +1,632 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="334.35938"
+   height="570"
+   version="1.1"
+   id="svg496"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs500" />
+  <path
+     d="m 14.75,76.75 v -6 a 6,6 0 0 1 6,-6 h 6 v 3 h 15 v -3 h 13.5 60 6 a 6,6 0 0 1 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 a 6,6 0 0 1 -6,6 h -6 -60 -1.5 v 3 h -12 v -3 h -1.5 -6 a 7.5,7.5 0 0 0 -7.5,7.5 v 6 6 63 6 a 7.5,7.5 0 0 0 7.5,7.5 h 6 v 3 h 15 v -3 h 12 v 9 9 6 a 6,6 0 0 1 -6,6 h -6 -13.5 -1.5 v 3 h -12 v -3 h -1.5 -6 a 6,6 0 0 1 -6,-6 v -6 z"
+     style="fill:#ff8700;fill-opacity:1;stroke:#e86b0e;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path74" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text78"
+     x="14"
+     y="64"><tspan
+       x="44"
+       y="86.5"
+       id="tspan76"
+       style="stroke-width:1.5">音符</tspan></text>
+  <text
+     style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text82"
+     x="14"
+     y="64"><tspan
+       x="111.5"
+       y="82"
+       id="tspan80"
+       style="stroke-width:1.5">値</tspan></text>
+  <g
+     id="g98"
+     transform="matrix(0.5,0,0,0.5,14,68)"
+     style="isolation:isolate">
+    <rect
+       width="42"
+       height="42"
+       rx="5"
+       ry="5"
+       style="opacity:0.4;mix-blend-mode:multiply;fill:#292929"
+       id="rect88"
+       x="0"
+       y="0" />
+    <path
+       d="m 30.56,29.8 -4.17,-4.16 h 2.26 a 1.035,1.035 0 1 0 0,-2.07 h -4.71 a 1.08,1.08 0 0 0 -1.11,1 v 0 c 0,0 0,0 0,0.06 v 4.64 0 a 1.04,1.04 0 1 0 2.08,0 v -2.19 l 4.19,4.19 a 1,1 0 0 0 1.46,0 1,1 0 0 0 0,-1.47 z"
+       style="fill:#ffffff"
+       id="path90" />
+    <path
+       d="m 19.17,24.6 a 1.08,1.08 0 0 0 -1.11,-1 h -4.71 a 1.035,1.035 0 1 0 0,2.07 h 2.25 l -4.16,4.13 a 1.039447,1.039447 0 0 0 1.47,1.47 l 4.18,-4.19 v 2.26 a 1.04,1.04 0 1 0 2.08,0 V 24.7 c 0,0 0,0 0,-0.06 a 0.08,0.08 0 0 1 0,-0.04 z"
+       style="fill:#ffffff"
+       id="path92" />
+    <path
+       d="m 23.94,20.5 h 4.7 a 1.04,1.04 0 1 0 0,-2.08 h -2.25 l 4.17,-4.16 a 1,1 0 0 0 0,-1.47 1,1 0 0 0 -1.46,0 L 24.91,17 v -2.28 a 1.04,1.04 0 1 0 -2.08,0 v 4.64 a 0.43,0.43 0 0 0 0,0.05 v 0.05 a 1.09,1.09 0 0 0 1.11,1.04 z"
+       style="fill:#ffffff"
+       id="path94" />
+    <path
+       d="m 18.13,13.62 a 1.08,1.08 0 0 0 -1,1.09 V 17 l -4.18,-4.19 a 1,1 0 0 0 -1.47,0 1,1 0 0 0 0,1.46 l 4.16,4.17 h -2.29 a 1.04,1.04 0 1 0 0,2.08 h 4.71 a 1.09,1.09 0 0 0 1.11,-1 c 0,0 0,0 0,-0.06 v -4.75 a 1.07,1.07 0 0 0 -1.04,-1.09 z"
+       style="fill:#ffffff"
+       id="path96" />
+  </g>
+  <path
+     d="m 128.75,76.75 v -6 a 6,6 0 0 1 6,-6 h 6 15 45 6 a 6,6 0 0 1 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 25.5 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 a 6,6 0 0 1 -6,6 h -6 -45 -15 -6 a 6,6 0 0 1 -6,-6 v -6 -31.5 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path108" />
+  <text
+     style="font-size:13.5px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text112"
+     x="116"
+     y="64"><tspan
+       x="197"
+       y="98.5"
+       id="tspan110"
+       style="stroke-width:1.5">/</tspan></text>
+  <text
+     style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text116"
+     x="116"
+     y="64"><tspan
+       x="197"
+       y="82"
+       id="tspan114"
+       style="stroke-width:1.5" /></text>
+  <text
+     style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text120"
+     x="116"
+     y="64"><tspan
+       x="197"
+       y="113.5"
+       id="tspan118"
+       style="stroke-width:1.5" /></text>
+  <path
+     d="m 214.75,64.75 h 95.85937 v 30 H 214.75 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path126" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text130"
+     x="202"
+     y="64"><tspan
+       x="221.5"
+       y="85"
+       id="tspan128"
+       style="stroke-width:1.5">1</tspan></text>
+  <path
+     d="m 214.75,96.75 h 95.85937 v 30 H 214.75 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path136" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text140"
+     x="202"
+     y="96"><tspan
+       x="221.5"
+       y="117"
+       id="tspan138"
+       style="stroke-width:1.5">4</tspan></text>
+  <path
+     d="m 28.75,108.75 v -6 a 6,6 0 0 1 6,-6 h 6 v 3 h 15 v -3 h 30 6 a 6,6 0 0 1 6,6 v 6 6 6 a 6,6 0 0 1 -6,6 h -6 -30 -1.5 v 3 h -12 v -3 h -1.5 -6 a 6,6 0 0 1 -6,-6 v -6 z"
+     style="fill:#c4c4c4;fill-opacity:1;stroke:#a0a0a0;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path146" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text150"
+     x="28"
+     y="96"><tspan
+       x="82"
+       y="117"
+       id="tspan148"
+       style="stroke-width:1.5">↓</tspan></text>
+  <path
+     d="m 28.75,140.75 v -6 c 0,-3.31371 2.686292,-6 6,-6 h 6 v 3 h 15 v -3 h 57 6 c 3.31371,0 6,2.68629 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 25.5 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 c 0,3.31371 -2.68629,6 -6,6 h -6 -57 -1.5 v 3 h -12 v -3 h -1.5 -6 c -3.313708,0 -6,-2.68629 -6,-6 v -6 -31.5 z"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path156" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text160"
+     x="40"
+     y="128"><tspan
+       x="109"
+       y="164"
+       id="tspan158"
+       style="stroke-width:1.5">音の高さ</tspan></text>
+  <text
+     style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text164"
+     x="40"
+     y="128"><tspan
+       x="109"
+       y="146"
+       id="tspan162"
+       style="stroke-width:1.5">名前</tspan></text>
+  <text
+     style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text168"
+     x="40"
+     y="128"><tspan
+       x="109"
+       y="177.5"
+       id="tspan166"
+       style="stroke-width:1.5">オクターヴの高さ</tspan></text>
+  <path
+     d="m 126.75,128.75 h 93.36914 v 30 H 126.75 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path174" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text178"
+     x="114"
+     y="128"><tspan
+       x="133.5"
+       y="149"
+       id="tspan176"
+       style="stroke-width:1.5">sol</tspan></text>
+  <path
+     d="m 126.75,160.75 h 95.85937 v 30 H 126.75 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path184" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text188"
+     x="114"
+     y="160"><tspan
+       x="133.5"
+       y="181"
+       id="tspan186"
+       style="stroke-width:1.5">4</tspan></text>
+  <path
+     d="m 14.75,234.75 v -6 a 6,6 0 0 1 6,-6 h 6 v 3 h 15 v -3 h 13.5 60 6 a 6,6 0 0 1 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 a 6,6 0 0 1 -6,6 h -6 -60 -1.5 v 3 h -12 v -3 h -1.5 -6 a 7.5,7.5 0 0 0 -7.5,7.5 v 6 6 63 6 a 7.5,7.5 0 0 0 7.5,7.5 h 6 v 3 h 15 v -3 h 12 v 9 9 6 a 6,6 0 0 1 -6,6 h -6 -13.5 -1.5 v 3 h -12 v -3 h -1.5 -6 a 6,6 0 0 1 -6,-6 v -6 z"
+     style="fill:#ff8700;fill-opacity:1;stroke:#e86b0e;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path194" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text198"
+     x="14"
+     y="222"><tspan
+       x="44"
+       y="244.5"
+       id="tspan196"
+       style="stroke-width:1.5">音符</tspan></text>
+  <text
+     style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text202"
+     x="14"
+     y="222"><tspan
+       x="111.5"
+       y="240"
+       id="tspan200"
+       style="stroke-width:1.5">値</tspan></text>
+  <g
+     id="g218"
+     transform="matrix(0.5,0,0,0.5,14,226)"
+     style="isolation:isolate">
+    <rect
+       width="42"
+       height="42"
+       rx="5"
+       ry="5"
+       style="opacity:0.4;mix-blend-mode:multiply;fill:#292929"
+       id="rect208"
+       x="0"
+       y="0" />
+    <path
+       d="m 30.56,29.8 -4.17,-4.16 h 2.26 a 1.035,1.035 0 1 0 0,-2.07 h -4.71 a 1.08,1.08 0 0 0 -1.11,1 v 0 c 0,0 0,0 0,0.06 v 4.64 0 a 1.04,1.04 0 1 0 2.08,0 v -2.19 l 4.19,4.19 a 1,1 0 0 0 1.46,0 1,1 0 0 0 0,-1.47 z"
+       style="fill:#ffffff"
+       id="path210" />
+    <path
+       d="m 19.17,24.6 a 1.08,1.08 0 0 0 -1.11,-1 h -4.71 a 1.035,1.035 0 1 0 0,2.07 h 2.25 l -4.16,4.13 a 1.039447,1.039447 0 0 0 1.47,1.47 l 4.18,-4.19 v 2.26 a 1.04,1.04 0 1 0 2.08,0 V 24.7 c 0,0 0,0 0,-0.06 a 0.08,0.08 0 0 1 0,-0.04 z"
+       style="fill:#ffffff"
+       id="path212" />
+    <path
+       d="m 23.94,20.5 h 4.7 a 1.04,1.04 0 1 0 0,-2.08 h -2.25 l 4.17,-4.16 a 1,1 0 0 0 0,-1.47 1,1 0 0 0 -1.46,0 L 24.91,17 v -2.28 a 1.04,1.04 0 1 0 -2.08,0 v 4.64 a 0.43,0.43 0 0 0 0,0.05 v 0.05 a 1.09,1.09 0 0 0 1.11,1.04 z"
+       style="fill:#ffffff"
+       id="path214" />
+    <path
+       d="m 18.13,13.62 a 1.08,1.08 0 0 0 -1,1.09 V 17 l -4.18,-4.19 a 1,1 0 0 0 -1.47,0 1,1 0 0 0 0,1.46 l 4.16,4.17 h -2.29 a 1.04,1.04 0 1 0 0,2.08 h 4.71 a 1.09,1.09 0 0 0 1.11,-1 c 0,0 0,0 0,-0.06 v -4.75 a 1.07,1.07 0 0 0 -1.04,-1.09 z"
+       style="fill:#ffffff"
+       id="path216" />
+  </g>
+  <path
+     d="m 128.75,234.75 v -6 a 6,6 0 0 1 6,-6 h 6 15 45 6 a 6,6 0 0 1 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 25.5 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 a 6,6 0 0 1 -6,6 h -6 -45 -15 -6 a 6,6 0 0 1 -6,-6 v -6 -31.5 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path228" />
+  <text
+     style="font-size:13.5px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text232"
+     x="116"
+     y="222"><tspan
+       x="197"
+       y="256.5"
+       id="tspan230"
+       style="stroke-width:1.5">/</tspan></text>
+  <text
+     style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text236"
+     x="116"
+     y="222"><tspan
+       x="197"
+       y="240"
+       id="tspan234"
+       style="stroke-width:1.5" /></text>
+  <text
+     style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text240"
+     x="116"
+     y="222"><tspan
+       x="197"
+       y="271.5"
+       id="tspan238"
+       style="stroke-width:1.5" /></text>
+  <path
+     d="m 214.75,222.75 h 95.85937 v 30 H 214.75 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path246" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text250"
+     x="202"
+     y="222"><tspan
+       x="221.5"
+       y="243"
+       id="tspan248"
+       style="stroke-width:1.5">1</tspan></text>
+  <path
+     d="m 214.75,254.75 h 95.85937 v 30 H 214.75 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path256" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text260"
+     x="202"
+     y="254"><tspan
+       x="221.5"
+       y="275"
+       id="tspan258"
+       style="stroke-width:1.5">4</tspan></text>
+  <path
+     d="m 28.75,266.75 v -6 a 6,6 0 0 1 6,-6 h 6 v 3 h 15 v -3 h 30 6 a 6,6 0 0 1 6,6 v 6 6 6 a 6,6 0 0 1 -6,6 h -6 -30 -1.5 v 3 h -12 v -3 h -1.5 -6 a 6,6 0 0 1 -6,-6 v -6 z"
+     style="fill:#c4c4c4;fill-opacity:1;stroke:#a0a0a0;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path266" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text270"
+     x="28"
+     y="254"><tspan
+       x="82"
+       y="275"
+       id="tspan268"
+       style="stroke-width:1.5">↓</tspan></text>
+  <path
+     d="m 28.75,298.75 v -6 c 0,-3.31371 2.686292,-6 6,-6 h 6 v 3 h 15 v -3 h 57 6 c 3.31371,0 6,2.68629 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 25.5 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 c 0,3.31371 -2.68629,6 -6,6 h -6 -57 -1.5 v 3 h -12 v -3 h -1.5 -6 c -3.313708,0 -6,-2.68629 -6,-6 v -6 -31.5 z"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path276" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text280"
+     x="40"
+     y="286"><tspan
+       x="109"
+       y="322"
+       id="tspan278"
+       style="stroke-width:1.5">音の高さ</tspan></text>
+  <text
+     style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text284"
+     x="40"
+     y="286"><tspan
+       x="109"
+       y="304"
+       id="tspan282"
+       style="stroke-width:1.5">名前</tspan></text>
+  <text
+     style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text288"
+     x="40"
+     y="286"><tspan
+       x="109"
+       y="335.5"
+       id="tspan286"
+       style="stroke-width:1.5">オクターヴの高さ</tspan></text>
+  <path
+     d="m 126.75,286.75 h 93.36914 v 30 H 126.75 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path294" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text298"
+     x="114"
+     y="286"><tspan
+       x="133.5"
+       y="307"
+       id="tspan296"
+       style="stroke-width:1.5">mi</tspan></text>
+  <path
+     d="m 126.75,318.75 h 95.85937 v 30 H 126.75 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path304" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text308"
+     x="114"
+     y="318"><tspan
+       x="133.5"
+       y="339"
+       id="tspan306"
+       style="stroke-width:1.5">4</tspan></text>
+  <path
+     d="m 14.75,392.75 v -6 a 6,6 0 0 1 6,-6 h 6 v 3 h 15 v -3 h 13.5 60 6 a 6,6 0 0 1 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 a 6,6 0 0 1 -6,6 h -6 -60 -1.5 v 3 h -12 v -3 h -1.5 -6 a 7.5,7.5 0 0 0 -7.5,7.5 v 6 6 63 6 a 7.5,7.5 0 0 0 7.5,7.5 h 6 v 3 h 15 v -3 h 12 v 9 9 6 a 6,6 0 0 1 -6,6 h -6 -13.5 -1.5 v 3 h -12 v -3 h -1.5 -6 a 6,6 0 0 1 -6,-6 v -6 z"
+     style="fill:#ff8700;fill-opacity:1;stroke:#e86b0e;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path314" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text318"
+     x="14"
+     y="380"><tspan
+       x="44"
+       y="402.5"
+       id="tspan316"
+       style="stroke-width:1.5">音符</tspan></text>
+  <text
+     style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text322"
+     x="14"
+     y="380"><tspan
+       x="111.5"
+       y="398"
+       id="tspan320"
+       style="stroke-width:1.5">値</tspan></text>
+  <g
+     id="g338"
+     transform="matrix(0.5,0,0,0.5,14,384)"
+     style="isolation:isolate">
+    <rect
+       width="42"
+       height="42"
+       rx="5"
+       ry="5"
+       style="opacity:0.4;mix-blend-mode:multiply;fill:#292929"
+       id="rect328"
+       x="0"
+       y="0" />
+    <path
+       d="m 30.56,29.8 -4.17,-4.16 h 2.26 a 1.035,1.035 0 1 0 0,-2.07 h -4.71 a 1.08,1.08 0 0 0 -1.11,1 v 0 c 0,0 0,0 0,0.06 v 4.64 0 a 1.04,1.04 0 1 0 2.08,0 v -2.19 l 4.19,4.19 a 1,1 0 0 0 1.46,0 1,1 0 0 0 0,-1.47 z"
+       style="fill:#ffffff"
+       id="path330" />
+    <path
+       d="m 19.17,24.6 a 1.08,1.08 0 0 0 -1.11,-1 h -4.71 a 1.035,1.035 0 1 0 0,2.07 h 2.25 l -4.16,4.13 a 1.039447,1.039447 0 0 0 1.47,1.47 l 4.18,-4.19 v 2.26 a 1.04,1.04 0 1 0 2.08,0 V 24.7 c 0,0 0,0 0,-0.06 a 0.08,0.08 0 0 1 0,-0.04 z"
+       style="fill:#ffffff"
+       id="path332" />
+    <path
+       d="m 23.94,20.5 h 4.7 a 1.04,1.04 0 1 0 0,-2.08 h -2.25 l 4.17,-4.16 a 1,1 0 0 0 0,-1.47 1,1 0 0 0 -1.46,0 L 24.91,17 v -2.28 a 1.04,1.04 0 1 0 -2.08,0 v 4.64 a 0.43,0.43 0 0 0 0,0.05 v 0.05 a 1.09,1.09 0 0 0 1.11,1.04 z"
+       style="fill:#ffffff"
+       id="path334" />
+    <path
+       d="m 18.13,13.62 a 1.08,1.08 0 0 0 -1,1.09 V 17 l -4.18,-4.19 a 1,1 0 0 0 -1.47,0 1,1 0 0 0 0,1.46 l 4.16,4.17 h -2.29 a 1.04,1.04 0 1 0 0,2.08 h 4.71 a 1.09,1.09 0 0 0 1.11,-1 c 0,0 0,0 0,-0.06 v -4.75 a 1.07,1.07 0 0 0 -1.04,-1.09 z"
+       style="fill:#ffffff"
+       id="path336" />
+  </g>
+  <path
+     d="m 128.75,392.75 v -6 a 6,6 0 0 1 6,-6 h 6 15 45 6 a 6,6 0 0 1 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 25.5 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 a 6,6 0 0 1 -6,6 h -6 -45 -15 -6 a 6,6 0 0 1 -6,-6 v -6 -31.5 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path348" />
+  <text
+     style="font-size:13.5px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text352"
+     x="116"
+     y="380"><tspan
+       x="197"
+       y="414.5"
+       id="tspan350"
+       style="stroke-width:1.5">/</tspan></text>
+  <text
+     style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text356"
+     x="116"
+     y="380"><tspan
+       x="197"
+       y="398"
+       id="tspan354"
+       style="stroke-width:1.5" /></text>
+  <text
+     style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text360"
+     x="116"
+     y="380"><tspan
+       x="197"
+       y="429.5"
+       id="tspan358"
+       style="stroke-width:1.5" /></text>
+  <path
+     d="m 214.75,380.75 h 95.85937 v 30 H 214.75 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path366" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text370"
+     x="202"
+     y="380"><tspan
+       x="221.5"
+       y="401"
+       id="tspan368"
+       style="stroke-width:1.5">1</tspan></text>
+  <path
+     d="m 214.75,412.75 h 95.85937 v 30 H 214.75 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path376" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text380"
+     x="202"
+     y="412"><tspan
+       x="221.5"
+       y="433"
+       id="tspan378"
+       style="stroke-width:1.5">2</tspan></text>
+  <path
+     d="m 28.75,424.75 v -6 a 6,6 0 0 1 6,-6 h 6 v 3 h 15 v -3 h 30 6 a 6,6 0 0 1 6,6 v 6 6 6 a 6,6 0 0 1 -6,6 h -6 -30 -1.5 v 3 h -12 v -3 h -1.5 -6 a 6,6 0 0 1 -6,-6 v -6 z"
+     style="fill:#c4c4c4;fill-opacity:1;stroke:#a0a0a0;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path386" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text390"
+     x="28"
+     y="412"><tspan
+       x="82"
+       y="433"
+       id="tspan388"
+       style="stroke-width:1.5">↓</tspan></text>
+  <path
+     d="m 28.75,456.75 v -6 c 0,-3.31371 2.686292,-6 6,-6 h 6 v 3 h 15 v -3 h 57 6 c 3.31371,0 6,2.68629 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 25.5 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 c 0,3.31371 -2.68629,6 -6,6 h -6 -57 -1.5 v 3 h -12 v -3 h -1.5 -6 c -3.313708,0 -6,-2.68629 -6,-6 v -6 -31.5 z"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path396" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text400"
+     x="40"
+     y="444"><tspan
+       x="109"
+       y="480"
+       id="tspan398"
+       style="stroke-width:1.5">音の高さ</tspan></text>
+  <text
+     style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text404"
+     x="40"
+     y="444"><tspan
+       x="109"
+       y="462"
+       id="tspan402"
+       style="stroke-width:1.5">名前</tspan></text>
+  <text
+     style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text408"
+     x="40"
+     y="444"><tspan
+       x="109"
+       y="493.5"
+       id="tspan406"
+       style="stroke-width:1.5">オクターヴの高さ</tspan></text>
+  <path
+     d="m 126.75,444.75 h 93.36914 v 30 H 126.75 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path414" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text418"
+     x="114"
+     y="444"><tspan
+       x="133.5"
+       y="465"
+       id="tspan416"
+       style="stroke-width:1.5">sol</tspan></text>
+  <path
+     d="m 126.75,476.75 h 95.85937 v 30 H 126.75 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path424" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text428"
+     x="114"
+     y="476"><tspan
+       x="133.5"
+       y="497"
+       id="tspan426"
+       style="stroke-width:1.5">4</tspan></text>
+  <path
+     d="m 0.75,12.75 v -6 a 6,6 0 0 1 6,-6 h 6 v 3 h 15 v -3 h 13.5 96.70166 6 a 6,6 0 0 1 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 a 6,6 0 0 1 -6,6 h -6 H 41.25 39.75 v 3 h -12 v -3 h -1.5 -6 a 7.5,7.5 0 0 0 -7.5,7.5 v 6 6 472.5 6 a 7.5,7.5 0 0 0 7.5,7.5 h 6 v 3 h 15 v -3 h 12 v 9 9 6 a 6,6 0 0 1 -6,6 h -6 -13.5 -1.5 v 3 h -12 v -3 h -1.5 -6 a 6,6 0 0 1 -6,-6 v -6 z"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path434" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text438"><tspan
+       x="7.5"
+       y="22.5"
+       id="tspan436"
+       style="stroke-width:1.5">比で音程</tspan></text>
+  <text
+     style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text442"><tspan
+       x="135"
+       y="18"
+       id="tspan440"
+       style="stroke-width:1.5" /></text>
+  <path
+     d="m 151.75,12.75 v -6 a 6,6 0 0 1 6,-6 h 6 15 45 6 a 6,6 0 0 1 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 25.5 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 a 6,6 0 0 1 -6,6 h -6 -45 -15 -6 a 6,6 0 0 1 -6,-6 v -6 -31.5 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path448" />
+  <text
+     style="font-size:13.5px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text452"
+     x="139"><tspan
+       x="220"
+       y="34.5"
+       id="tspan450"
+       style="stroke-width:1.5">/</tspan></text>
+  <text
+     style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text456"
+     x="139"><tspan
+       x="220"
+       y="18"
+       id="tspan454"
+       style="stroke-width:1.5" /></text>
+  <text
+     style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text460"
+     x="139"><tspan
+       x="220"
+       y="49.5"
+       id="tspan458"
+       style="stroke-width:1.5" /></text>
+  <path
+     d="m 237.75,0.75 h 95.85937 v 30 H 237.75 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path466" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text470"
+     x="225"><tspan
+       x="244.5"
+       y="21"
+       id="tspan468"
+       style="stroke-width:1.5">3</tspan></text>
+  <path
+     d="m 237.75,32.75 h 95.85937 v 30 H 237.75 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path476" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text480"
+     x="225"
+     y="32"><tspan
+       x="244.5"
+       y="53"
+       id="tspan478"
+       style="stroke-width:1.5">2</tspan></text>
+  <path
+     d="m 14.75,44.75 v -6 a 6,6 0 0 1 6,-6 h 6 v 3 h 15 v -3 h 30 6 a 6,6 0 0 1 6,6 v 6 6 6 a 6,6 0 0 1 -6,6 h -6 -30 -1.5 v 3 h -12 v -3 h -1.5 -6 a 6,6 0 0 1 -6,-6 v -6 z"
+     style="fill:#c4c4c4;fill-opacity:1;stroke:#a0a0a0;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path486" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text490"
+     x="14"
+     y="32"><tspan
+       x="68"
+       y="53"
+       id="tspan488"
+       style="stroke-width:1.5">↓</tspan></text>
+</svg>
