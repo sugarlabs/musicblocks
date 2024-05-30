@@ -29,7 +29,8 @@
 
         <script src="lib/reqwest.js" defer></script>
 
-        <script src="lib/jquery-3.7.1.js"></script>
+        <!-- <script src="lib/jquery-3.7.1.js"></script> -->
+	<script src="lib/jquery-2.1.4.min.js"></script>
 
         <script src="lib/jquery-ui.js" defer></script>
 
@@ -102,6 +103,11 @@
                         });
                 }
             }
+        </script>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                doSearch();
+            });
         </script>
     </head>
 
