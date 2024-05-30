@@ -1560,25 +1560,25 @@ msgstr "לחץ כדי להציג את פלטות הבלוקים וגרור בל�
 
 #: js/turtledefs.js:620
 msgid "Cartesian/Polar"
-msgstr ""
+msgstr "קרטזיאני/קוטבי"
 
 #: js/turtledefs.js:621
 msgid "Show or hide a coordinate grid."
-msgstr ""
+msgstr "הצג או הסתר רשת קואורדינטות."
 
 #: js/turtledefs.js:627
 msgid "Clear the screen and return the mice to their initial positions."
-msgstr ""
+msgstr "נקה את המסך והחזר את העכברים למקומם ההתחלתי."
 
 #: js/turtledefs.js:633
 msgid "Collapse the graphics window."
-msgstr ""
+msgstr "כווץ את חלון הגרפיקה."
 
 #: js/turtledefs.js:638
 #: js/activity.js:4256
 #: js/activity.js:4256
 msgid "Home"
-msgstr ""
+msgstr "בית"
 
 #: js/turtledefs.js:639
 msgid "Return all blocks to the center of the screen."
