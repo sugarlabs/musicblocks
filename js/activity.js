@@ -5575,11 +5575,12 @@ class Activity {
                 };
 
                 abcReader.onload = (event) => {
-                    const abcData = event.target.result;
+                    let abcData = event.target.result;
+                    abcData = abcData.replace(/\\/g, '');
+                    
                     const tunebook = new ABCJS.parseOnly(abcData);
                     
                     console.log(tunebook)
-                    
                     tunebook.forEach(tune => {
                         this.parseABC(tune);
                         console.log(tune)
