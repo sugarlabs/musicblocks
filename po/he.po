@@ -1582,7 +1582,7 @@ msgstr "בית"
 
 #: js/turtledefs.js:639
 msgid "Return all blocks to the center of the screen."
-msgstr ""
+msgstr "החזר את כל הבלוקים למרכז המסך."
 
 #: js/turtledefs.js:644
 msgid "Show/hide blocks"
@@ -1594,7 +1594,7 @@ msgstr "הצג או הסתר את הבלוקים ואת הכלים"
 
 #: js/turtledefs.js:650
 msgid "Expand/collapse collapsable blocks"
-msgstr ""
+msgstr "הרחב/כווץ בלוקים הניתנים לכיווץ"
 
 #: js/turtledefs.js:651
 msgid "Expand or collapse start and action stacks."
@@ -1644,23 +1644,23 @@ msgstr "הצג סטטיסטיקות אודות פרויקט הצב שלך"
 
 #: js/turtledefs.js:697
 msgid "Delete a selected plugin."
-msgstr ""
+msgstr "מחק תוסף שנבחר."
 
 #: js/turtledefs.js:704
 msgid "Enable scrolling"
-msgstr ""
+msgstr "אפשר גלילה"
 
 #: js/turtledefs.js:705
 msgid "You can scroll the blocks on the canvas."
-msgstr ""
+msgstr "אתה יכול לגלול את הבלוקים על הבד."
 
 #: js/turtledefs.js:714
 msgid "Wrap Turtle"
-msgstr ""
+msgstr "לעטוף צב"
 
 #: js/turtledefs.js:715
 msgid "Turn Turtle wrapping On or Off."
-msgstr ""
+msgstr "הפעל או כבה את העטיפה"
 
 #: js/turtledefs.js:725
 msgid "Restore blocks from the trash."
@@ -1668,23 +1668,23 @@ msgstr "שחזור בלוקים מסל המחזור"
 
 #: js/turtledefs.js:732
 msgid "Switch mode"
-msgstr ""
+msgstr "להחליף מצב"
 
 #: js/turtledefs.js:733
 msgid "Switch between beginner and advance modes."
-msgstr ""
+msgstr "מעבר בין מצבי מתחיל למצב מתקדם."
 
 #: js/turtledefs.js:739
 msgid "Select your language preference."
-msgstr ""
+msgstr "בחר את העדפת השפה שלך."
 
 #: js/turtledefs.js:745
 msgid "Keyboard shortcuts"
-msgstr ""
+msgstr "קיצורי דרך במקלדת"
 
 #: js/turtledefs.js:746
 msgid "You can type d to create a do block and r to create a re block etc."
-msgstr ""
+msgstr "אתה יכול להקליד d כדי ליצור בלוק DO ו-r כדי ליצור בלוק RE וכו'."
 
 #: js/turtledefs.js:753
 msgid "Show these messages."
@@ -1694,37 +1694,37 @@ msgstr "הצג את הודעות אלה"
 #: js/turtledefs.js:790
 #: js/help.js:335
 msgid "Guide"
-msgstr ""
+msgstr "להנחות"
 
 #: js/turtledefs.js:760
 msgid "A detailed guide to Turtle Blocks is available."
-msgstr ""
+msgstr "מדריך מפורט ל-Turtle Blocks זמין."
 
 #: js/turtledefs.js:764
 msgid "Turtle Blocks Guide"
-msgstr ""
+msgstr "מדריך Turtle Blocks"
 
 #: js/turtledefs.js:767
 #: js/turtledefs.js:798
 #: js/help.js:336
 msgid "About"
-msgstr ""
+msgstr "לגבי"
 
 #: js/turtledefs.js:768
 msgid "Turtle Blocks is an open source collection of tools for exploring musical concepts."
-msgstr ""
+msgstr "Turtle Blocks הוא אוסף קוד פתוח של כלים לחקר מושגים מוזיקליים."
 
 #: js/turtledefs.js:770
 msgid "A full list of contributors can be found in the Turtle Blocks GitHub repository."
-msgstr ""
+msgstr "רשימה מלאה של תורמים ניתן למצוא במאגר Turtle Blocks GitHub."
 
 #: js/turtledefs.js:772
 msgid "Turtle Blocks is licensed under the AGPL."
-msgstr ""
+msgstr "Turtle Blocks מורשה תחת ה-AGPL."
 
 #: js/turtledefs.js:780
 msgid "Turtle Blocks GitHub repository"
-msgstr ""
+msgstr "Turtle Blocks מאגר GitHub"
 
 #: js/turtledefs.js:783
 #: js/turtledefs.js:814
@@ -1735,48 +1735,48 @@ msgstr "איחולנו"
 
 #: js/turtledefs.js:784
 msgid "You have finished the tour. Please enjoy Turtle Blocks!"
-msgstr ""
+msgstr "סיימת את הסיור. בבקשה תהנו מ-Turtle Blocks!"
 
 #: js/turtledefs.js:791
 msgid "A detailed guide to Music Blocks is available."
-msgstr ""
+msgstr "מדריך מפורט ל-Music Blocks זמין."
 
 #: js/turtledefs.js:795
 #: js/SaveInterface.js:76
 msgid "Music Blocks Guide"
-msgstr ""
+msgstr "מדריך Music Blocks"
 
 #: js/turtledefs.js:799
 msgid "Music Blocks is an open source collection of tools for exploring musical concepts."
-msgstr ""
+msgstr "Music Blocks הוא אוסף קוד פתוח של כלים לחקר מושגים מוזיקליים."
 
 #: js/turtledefs.js:801
 msgid "A full list of contributors can be found in the Music Blocks GitHub repository."
-msgstr ""
+msgstr "רשימה מלאה של תורמים ניתן למצוא במאגר Music Blocks GitHub."
 
 #: js/turtledefs.js:803
 msgid "Music Blocks is licensed under the AGPL."
-msgstr ""
+msgstr "Music Blocks מורשה תחת ה-AGPL."
 
 #: js/turtledefs.js:811
 msgid "Music Blocks GitHub repository"
-msgstr ""
+msgstr "Music Blocks מאגר GitHub"
 
 #: js/turtledefs.js:815
 msgid "You have finished the tour. Please enjoy Music Blocks!"
-msgstr ""
+msgstr "סיימת את הסיור. בבקשה תהנו מ-Music Blocks!"
 
 #: js/activity.js:369
 msgid "Search for blocks"
-msgstr ""
+msgstr "חפש בלוקים"
 
 #: js/activity.js:1145
 msgid "Refresh your browser to change to advanced mode."
-msgstr ""
+msgstr "רענן את הדפדפן כדי לעבור למצב מתקדם."
 
 #: js/activity.js:1150
 msgid "Refresh your browser to change to beginner mode."
-msgstr ""
+msgstr "רענן את הדפדפן שלך כדי לעבור למצב מתחיל."
 
 #: js/activity.js:1184
 msgid "Catching mice"
@@ -1816,19 +1816,19 @@ msgstr ""
 
 #: js/activity.js:1351
 msgid "plugins will be removed upon restart."
-msgstr ""
+msgstr "תוספים יוסרו עם הפעלה מחדש."
 
 #: js/activity.js:1360
 msgid "show Cartesian"
-msgstr ""
+msgstr "להראות קואורדינטות קרטזיות"
 
 #: js/activity.js:1842
 msgid "output tools"
-msgstr ""
+msgstr "כלים לתפוקה"
 
 #: js/activity.js:1845
 msgid "custom note"
-msgstr ""
+msgstr "תו מוזיקלי מותאם אישית"
 
 #: js/activity.js:1848
 msgid "accidental name"
@@ -1847,34 +1847,34 @@ msgstr ""
 #: js/activity.js:1857
 #: js/IntervalsBlocks.js:94
 msgid "temperament name"
-msgstr ""
+msgstr "שם טמפרמנט"
 
 #: js/activity.js:1863
 msgid "chord name"
-msgstr ""
+msgstr "שם אקורד"
 
 #: js/activity.js:1869
 msgid "filter type"
-msgstr ""
+msgstr "סוג מסנן"
 
 #: js/activity.js:1872
 msgid "oscillator type"
-msgstr ""
+msgstr "סוג מתנד"
 
 #: js/activity.js:1878
 #: js/DrumBlocks.js:32
 msgid "noise name"
-msgstr ""
+msgstr "שם רעש"
 
 #: js/activity.js:1881
 #: js/DrumBlocks.js:75
 msgid "drum name"
-msgstr ""
+msgstr "שם תוף"
 
 #: js/activity.js:1884
 #: js/DrumBlocks.js:119
 msgid "effects name"
-msgstr ""
+msgstr "שם האפקטים"
 
 #: js/activity.js:1887
 msgid "wrap mode"
@@ -1882,23 +1882,23 @@ msgstr ""
 
 #: js/activity.js:1890
 msgid "load file"
-msgstr ""
+msgstr "לטעון קובץ"
 
 #: js/activity.js:2056
 msgid "This block is deprecated."
-msgstr ""
+msgstr "בלוק זה הוצא משימוש."
 
 #: js/activity.js:2058
 msgid "Block cannot be found."
-msgstr ""
+msgstr "לא ניתן למצוא בלוק."
 
 #: js/activity.js:2266
 msgid "Saving block artwork"
-msgstr ""
+msgstr "שומר יצירות אמנות בלוק"
 
 #: js/activity.js:2277
 msgid "Erase"
-msgstr ""
+msgstr "לִמְחוֹק"
 
 #: js/activity.js:2301
 #: js/activity.js:2323
@@ -1907,51 +1907,51 @@ msgstr "הדבק"
 
 #: js/activity.js:2305
 msgid "Save block help"
-msgstr ""
+msgstr "שמור עזרה לחסום"
 
 #: js/activity.js:2390
 msgid "Jumping to the bottom of the page."
-msgstr ""
+msgstr "קופץ לתחתית העמוד."
 
 #: js/activity.js:2396
 msgid "Scrolling up."
-msgstr ""
+msgstr "גלילה למעלה"
 
 #: js/activity.js:2401
 msgid "Scrolling down."
-msgstr ""
+msgstr "גלילה למטה"
 
 #: js/activity.js:2406
 msgid "Extracting block"
-msgstr ""
+msgstr "בלוק מחלץ"
 
 #: js/activity.js:2414
 msgid "Moving block up."
-msgstr ""
+msgstr "העברת בלוק למעלה"
 
 #: js/activity.js:2435
 msgid "Moving block down."
-msgstr ""
+msgstr "העברת בלוק למטה"
 
 #: js/activity.js:2456
 msgid "Moving block left."
-msgstr ""
+msgstr "העברת בלוק שמאלה"
 
 #: js/activity.js:2473
 msgid "Moving block right."
-msgstr ""
+msgstr "העברת בלוק ימינה"
 
 #: js/activity.js:2488
 msgid "Jump to home position."
-msgstr ""
+msgstr "לך הביתה"
 
 #: js/activity.js:2515
 msgid "Hide blocks"
-msgstr ""
+msgstr "להסתיר בלוקים"
 
 #: js/activity.js:3389
 msgid "Click the run button to run the project."
-msgstr ""
+msgstr "לחץ על כפתור ההפעלה כדי להפעיל את הפרויקט."
 
 #: js/activity.js:3456
 #: js/SaveInterface.js:131
@@ -1965,29 +1965,29 @@ msgstr ""
 #: js/GlobalPlanet.js:495
 #.TRANS: default project title when saving as Lilypond
 msgid "My Project"
-msgstr ""
+msgstr "הפרויקט שלי"
 
 #: js/activity.js:4261
 msgid "Show/hide block"
-msgstr ""
+msgstr "הצג או הסתר בלוק"
 
 #: js/activity.js:4263
 msgid "Expand/collapse blocks"
-msgstr ""
+msgstr "להרחיב או לכווץ בלוק"
 
 #: js/activity.js:4381
 msgid "Could not parse JSON input."
-msgstr ""
+msgstr "לא ניתן לנתח את JSON"
 
 #: js/activity.js:4684
 #: js/activity.js:4771
 #: js/activity.js:4821
 msgid "Cannot load project from the file. Please check the file type."
-msgstr ""
+msgstr "לא ניתן לטעון את הפרויקט מהקובץ"
 
 #: js/activity.js:5051
 msgid "Invalid parameters"
-msgstr ""
+msgstr "פרמטרים לא חוקיים"
 
 #: js/turtle-singer.js:1334
 #.TRANS: partials are weighted components in a harmonic series
@@ -2048,89 +2048,89 @@ msgstr ""
 #: js/ActionBlocks.js:1256
 #: js/ExtrasBlocks.js:553
 msgid "start drum"
-msgstr ""
+msgstr "להתחיל תוף"
 
 #: js/SaveInterface.js:59
 #: js/SaveInterface.js:61
 #: js/SaveInterface.js:93
 msgid "Music Blocks Project"
-msgstr ""
+msgstr "פרויקט Music Blocks"
 
 #: js/SaveInterface.js:63
 msgid "This project was created in Music Blocks"
-msgstr ""
+msgstr "פרויקט זה נוצר ב-Music Blocks"
 
 #: js/SaveInterface.js:67
 msgid "Music Blocks is a Free/Libre Software application."
-msgstr ""
+msgstr "Music Blocks הוא יישום תוכנת FREE/LIBRE."
 
 #: js/SaveInterface.js:69
 msgid "The source code can be accessed at"
-msgstr ""
+msgstr "ניתן לגשת לקוד המקור בכתובת"
 
 #: js/SaveInterface.js:72
 msgid "For more information, please consult the"
-msgstr ""
+msgstr "למידע נוסף נא להתייעץ"
 
 #: js/SaveInterface.js:83
 msgid "Alternatively, open the file in Music Blocks using the Load project button."
-msgstr ""
+msgstr "לחלופין, פתח את הקובץ ב-Music Blocks באמצעות הלחצן Load project."
 
 #: js/SaveInterface.js:85
 msgid "Project Code"
-msgstr ""
+msgstr "קוד פרויקט"
 
 #: js/SaveInterface.js:87
 msgid "This code stores data about the blocks in a project."
-msgstr ""
+msgstr "קוד זה מאחסן נתונים על הבלוקים בפרויקט."
 
 #: js/SaveInterface.js:89
 msgid "Show"
-msgstr ""
+msgstr ""לְהַרְאוֹת
 
 #: js/SaveInterface.js:91
 msgid "Hide"
-msgstr ""
+msgstr "להתחבא"
 
 #: js/SaveInterface.js:197
 #: js/SaveInterface.js:58
 msgid "No description provided"
-msgstr ""
+msgstr "לא סופק תיאור"
 
 #: js/SaveInterface.js:332
 msgid "Your recording is in progress."
-msgstr ""
+msgstr "ההקלטה שלך בעיצומה."
 
 #: js/SaveInterface.js:401
 #.TRANS: File name prompt for save as Lilypond
 msgid "File name"
-msgstr ""
+msgstr "שם קובץ"
 
 #: js/SaveInterface.js:403
 #: js/StringHelper.js:39
 #.TRANS: Project title prompt for save as Lilypond
 msgid "Project title"
-msgstr ""
+msgstr "כותרת הפרויקט"
 
 #: js/SaveInterface.js:405
 #.TRANS: Project title prompt for save as Lilypond
 msgid "Project author"
-msgstr ""
+msgstr "מחבר הפרויקט"
 
 #: js/SaveInterface.js:407
 #.TRANS: MIDI prompt for save as Lilypond
 msgid "Include MIDI output?"
-msgstr ""
+msgstr "כולל פלט MIDI"
 
 #: js/SaveInterface.js:409
 #.TRANS: Guitar prompt for save as Lilypond
 msgid "Include guitar tablature output?"
-msgstr ""
+msgstr "כלול פלט טבלטור גיטרה"
 
 #: js/SaveInterface.js:411
 #.TRANS: Lilypond is a scripting language for generating sheet music
 msgid "Save as Lilypond"
-msgstr ""
+msgstr "שמור בתור Lilypond"
 
 #: js/SaveInterface.js:426
 #: js/EnsembleBlocks.js:75
@@ -2152,18 +2152,18 @@ msgstr ""
 #: js/EnsembleBlocks.js:1280
 #.TRANS: default project author when saving as Lilypond
 msgid "Mr. Mouse"
-msgstr ""
+msgstr "מר עכבר"
 
 #: js/SaveInterface.js:573
 msgid "The Lilypond code is copied to clipboard. You can paste it here: "
-msgstr ""
+msgstr "קוד Lilypond מועתק ללוח. אתה יכול להדביק אותו כאן:"
 
 #: js/RhythmBlockPaletteBlocks.js:50
 #: js/RhythmBlockPaletteBlocks.js:232
 #.TRANS: rhythm block
 #.TRANS: translate "rhythm1" as rhythm
 msgid "rhythm1"
-msgstr ""
+msgstr "קֶצֶב"
 
 #: js/RhythmBlockPaletteBlocks.js:70
 #: js/RhythmBlockPaletteBlocks.js:251
@@ -2171,50 +2171,50 @@ msgstr ""
 #: js/RhythmBlockPaletteBlocks.js:553
 #: js/RhythmBlockPaletteBlocks.js:874
 msgid "number of notes"
-msgstr ""
+msgstr "מספר הערות"
 
 #: js/RhythmBlockPaletteBlocks.js:126
 msgid "polyphonic rhythm"
-msgstr ""
+msgstr "קצב פוליפוני"
 
 #: js/RhythmBlockPaletteBlocks.js:218
 msgid "The Rhythm block is used to generate rhythm patterns."
-msgstr ""
+msgstr "בלוק הקצב משמש ליצירת דפוסי קצב."
 
 #: js/RhythmBlockPaletteBlocks.js:279
 msgid "1/64 note"
-msgstr ""
+msgstr "הערה 1/64"
 
 #: js/RhythmBlockPaletteBlocks.js:303
 msgid "1/32 note"
-msgstr ""
+msgstr "הערה 1/32"
 
 #: js/RhythmBlockPaletteBlocks.js:331
 msgid "1/16 note"
-msgstr ""
+msgstr "הערה 1/16"
 
 #: js/RhythmBlockPaletteBlocks.js:359
 msgid "eighth note"
-msgstr ""
+msgstr "הערה 1/8"
 
 #: js/RhythmBlockPaletteBlocks.js:387
 msgid "quarter note"
-msgstr ""
+msgstr "הערה 1/4"
 
 #: js/RhythmBlockPaletteBlocks.js:415
 msgid "half note"
-msgstr ""
+msgstr "הערה 1/2"
 
 #: js/RhythmBlockPaletteBlocks.js:443
 msgid "whole note"
-msgstr ""
+msgstr "פתק שלם"
 
 #: js/RhythmBlockPaletteBlocks.js:481
 #: js/RhythmBlockPaletteBlocks.js:550
 #: js/RhythmBlockPaletteBlocks.js:601
 #.TRANS: A tuplet is a note value divided into irregular time values.
 msgid "tuplet"
-msgstr ""
+msgstr "טופלת"
 
 #: js/RhythmBlockPaletteBlocks.js:767
 msgid "septuplet"
@@ -2226,7 +2226,7 @@ msgstr ""
 
 #: js/RhythmBlockPaletteBlocks.js:823
 msgid "triplet"
-msgstr ""
+msgstr "שְׁלִישִׁיָה"
 
 #: js/RhythmBlockPaletteBlocks.js:850
 msgid "simple tuplet"
@@ -2234,32 +2234,32 @@ msgstr ""
 
 #: js/RhythmBlockPaletteBlocks.js:860
 msgid "Tuplets are a collection of notes that get scaled to a specific duration."
-msgstr ""
+msgstr "Tuplets הם אוסף של הערות המותאמות לזמן מסוים."
 
 #: js/WidgetBlocks.js:71
 #.TRANS: sound envelope (ADSR)
 msgid "envelope"
-msgstr ""
+msgstr "מעטפת קול"
 
 #: js/WidgetBlocks.js:79
 #.TRANS: Attack time is the time taken for initial run-up of level from nil to peak, beginning when the key is first pressed.
 msgid "attack"
-msgstr ""
+msgstr "הַתקָפָה"
 
 #: js/WidgetBlocks.js:81
 #.TRANS: Decay time is the time taken for the subsequent run down from the attack level to the designated sustain level.
 msgid "decay"
-msgstr ""
+msgstr "בְּלִי"
 
 #: js/WidgetBlocks.js:83
 #.TRANS: Sustain level is the level during the main sequence of the sound's duration, until the key is released.
 msgid "sustain"
-msgstr ""
+msgstr "לָשֵׂאת"
 
 #: js/WidgetBlocks.js:85
 #.TRANS: Release time is the time taken for the level to decay from the sustain level to zero after the key is released.
 msgid "release"
-msgstr ""
+msgstr "לְשַׁחְרֵר"
 
 #: js/WidgetBlocks.js:96
 msgid "Attack value should be from 0 to 100."
@@ -2284,7 +2284,7 @@ msgstr ""
 #: js/WidgetBlocks.js:144
 #.TRANS: a filter removes some unwanted components from a signal
 msgid "filter"
-msgstr ""
+msgstr "לְסַנֵן"
 
 #: js/WidgetBlocks.js:149
 #: js/musicutils.js:706
@@ -2365,7 +2365,7 @@ msgstr ""
 
 #: js/WidgetBlocks.js:478
 msgid "oscilloscope"
-msgstr ""
+msgstr "אוֹסְצִילוֹסקוּפּ"
 
 #: js/WidgetBlocks.js:530
 msgid "The Custom mode block opens a tool to explore musical mode (the spacing of the notes in a scale)."
@@ -2374,7 +2374,7 @@ msgstr ""
 #: js/WidgetBlocks.js:536
 #.TRANS: musical mode is the pattern of half-steps in an octave, e.g., Major or Minor modes
 msgid "custom mode"
-msgstr ""
+msgstr "מצב מותאם אישית"
 
 #: js/WidgetBlocks.js:570
 msgid "The Tempo block opens a metronome to visualize the beat."
@@ -2387,7 +2387,7 @@ msgstr ""
 #: js/WidgetBlocks.js:623
 #: js/IntervalsBlocks.js:683
 msgid "arpeggio"
-msgstr ""
+msgstr "ארפג'יו"
 
 #: js/WidgetBlocks.js:677
 msgid "The Pitch drum matrix is used to map pitches to drum sounds."
@@ -2396,7 +2396,7 @@ msgstr ""
 #: js/WidgetBlocks.js:682
 #.TRANS: makes a mapping between pitches and drum sounds
 msgid "pitch-drum mapper"
-msgstr ""
+msgstr "ממפה גובה-תוף"
 
 #: js/WidgetBlocks.js:724
 msgid "You must have at least one pitch block and one drum block in the matrix."
@@ -2409,17 +2409,17 @@ msgstr ""
 #: js/WidgetBlocks.js:751
 #.TRANS: widget to generate pitches using a slider
 msgid "pitch slider"
-msgstr ""
+msgstr "מחוון הגובה"
 
 #: js/WidgetBlocks.js:788
 msgid "chromatic keyboard"
-msgstr ""
+msgstr "מקלדת כרומטית"
 
 #: js/WidgetBlocks.js:815
 #: js/WidgetBlocks.js:874
 #.TRANS: widget to generate pitches using a slider
 msgid "music keyboard"
-msgstr ""
+msgstr "מקלדת כרומטית"
 
 #: js/WidgetBlocks.js:859
 #: js/WidgetBlocks.js:866
@@ -2433,7 +2433,7 @@ msgstr ""
 #: js/WidgetBlocks.js:917
 #.TRANS: generate a progressive sequence of pitches
 msgid "pitch staircase"
-msgstr ""
+msgstr "גרם מדרגות במגרש"
 
 #: js/WidgetBlocks.js:982
 msgid "The Rhythm Maker block opens a tool to create drum machines."
@@ -2441,11 +2441,11 @@ msgstr ""
 
 #: js/WidgetBlocks.js:1036
 msgid "G major scale"
-msgstr ""
+msgstr "סולם ז' מז'ור"
 
 #: js/WidgetBlocks.js:1064
 msgid "C major scale"
-msgstr ""
+msgstr "סולם ג מז'ור"
 
 #: js/WidgetBlocks.js:1097
 msgid "The Phrase Maker block opens a tool to create musical phrases."
@@ -2454,7 +2454,7 @@ msgstr ""
 #: js/WidgetBlocks.js:1104
 #.TRANS: assigns pitch to a sequence of beats to generate a melody
 msgid "phrase maker"
-msgstr ""
+msgstr "יצרן ביטויים"
 
 #: js/WidgetBlocks.js:1168
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
@@ -2466,7 +2466,7 @@ msgstr ""
 
 #: js/IntervalsBlocks.js:45
 msgid "set temperament"
-msgstr ""
+msgstr "להגדיר מזג"
 
 #: js/IntervalsBlocks.js:63
 #: js/MediaBlocks.js:746
@@ -2481,7 +2481,7 @@ msgstr ""
 #: js/ToneBlocks.js:1025
 #.TRANS: adjusts the shift up or down by one octave (twelve half-steps in the interval between two notes, one having twice or half the frequency in Hz of the other.)
 msgid "octave"
-msgstr ""
+msgstr "אוֹקְטָבָה"
 
 #: js/IntervalsBlocks.js:99
 msgid "The Temperament name block is used to select a tuning method."
@@ -2497,12 +2497,12 @@ msgstr ""
 
 #: js/IntervalsBlocks.js:262
 msgid "interval number"
-msgstr ""
+msgstr "מספר מרווח"
 
 #: js/IntervalsBlocks.js:330
 #.TRANS: measure the distance between two pitches in semi-tones
 msgid "semi-tone interval measure"
-msgstr ""
+msgstr "מדידת מרווח חצי טון"
 
 #: js/IntervalsBlocks.js:397
 #: js/IntervalsBlocks.js:513
@@ -2533,7 +2533,7 @@ msgstr ""
 #: js/OrnamentBlocks.js:220
 #.TRANS: calculate a relative step between notes based on semi-tones
 msgid "semi-tone interval"
-msgstr ""
+msgstr "מרווח חצי טון"
 
 #: js/IntervalsBlocks.js:676
 msgid "The output of the example is: do, mi, sol, sol, ti, mi"
@@ -2557,7 +2557,7 @@ msgstr ""
 
 #: js/IntervalsBlocks.js:799
 msgid "ratio interval"
-msgstr ""
+msgstr "מרווח יחס"
 
 #: js/IntervalsBlocks.js:868
 msgid "In the figure, we add la to sol."
@@ -2566,16 +2566,16 @@ msgstr ""
 #: js/IntervalsBlocks.js:924
 #.TRANS: define a custom mode
 msgid "define mode"
-msgstr ""
+msgstr "להגדיר מצב"
 
 #: js/IntervalsBlocks.js:977
 msgid "movable Do"
-msgstr ""
+msgstr "DO מטלטלין"
 
 #: js/IntervalsBlocks.js:1028
 #.TRANS: mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
 msgid "mode length"
-msgstr ""
+msgstr "אורך מצב"
 
 #: js/IntervalsBlocks.js:1037
 msgid "The Mode length block is the number of notes in the current scale."
@@ -2588,7 +2588,7 @@ msgstr ""
 #: js/IntervalsBlocks.js:1088
 #.TRANS: the mode in music is 'major', 'minor', etc.
 msgid "current mode"
-msgstr ""
+msgstr "מצב נוכחי"
 
 #: js/IntervalsBlocks.js:1141
 #.TRANS: the key is a group of pitches with which a music composition is created
@@ -2649,7 +2649,7 @@ msgstr ""
 #: js/ActionBlocks.js:517
 #: js/ActionBlocks.js:707
 msgid "calculate"
-msgstr ""
+msgstr "לְחַשֵׁב"
 
 #: js/ActionBlocks.js:376
 #: js/ActionBlocks.js:593
@@ -2665,7 +2665,7 @@ msgstr ""
 #: js/ActionBlocks.js:1048
 #: js/MeterBlocks.js:769
 msgid "do1"
-msgstr ""
+msgstr "בצע"
 
 #: js/ActionBlocks.js:390
 #: js/ActionBlocks.js:610
@@ -2722,7 +2722,7 @@ msgstr ""
 
 #: js/ActionBlocks.js:1151
 msgid "broadcast"
-msgstr ""
+msgstr "לשדר"
 
 #: js/ActionBlocks.js:1208
 msgid "Each Start block is a separate voice."
@@ -2734,7 +2734,7 @@ msgstr ""
 
 #: js/ActionBlocks.js:1495
 msgid "define temperament"
-msgstr ""
+msgstr "להגדיר מזג"
 
 #: js/EnsembleBlocks.js:66
 msgid "mouse index heap"
@@ -2747,7 +2747,7 @@ msgstr ""
 #: js/EnsembleBlocks.js:77
 #: js/EnsembleBlocks.js:1080
 msgid "mouse name"
-msgstr ""
+msgstr "שם העכבר"
 
 #: js/EnsembleBlocks.js:77
 #: js/EnsembleBlocks.js:92
@@ -2805,7 +2805,7 @@ msgstr ""
 
 #: js/EnsembleBlocks.js:145
 msgid "stop mouse"
-msgstr ""
+msgstr "עצור עכבר"
 
 #: js/EnsembleBlocks.js:147
 msgid "The Stop mouse block stops the specified mouse."
@@ -2845,7 +2845,7 @@ msgstr ""
 
 #: js/EnsembleBlocks.js:206
 msgid "start mouse"
-msgstr ""
+msgstr "התחל עכבר"
 
 #: js/EnsembleBlocks.js:209
 msgid "The Start mouse block starts the specified mouse."
@@ -2874,7 +2874,7 @@ msgstr ""
 #: js/EnsembleBlocks.js:292
 #.TRANS: pen color for this mouse
 msgid "mouse color"
-msgstr ""
+msgstr "צבע עכבר"
 
 #: js/EnsembleBlocks.js:294
 msgid "The Mouse color block returns the pen color of the specified mouse."
@@ -2883,7 +2883,7 @@ msgstr ""
 #: js/EnsembleBlocks.js:306
 #.TRANS: pen color for this turtle
 msgid "turtle color"
-msgstr ""
+msgstr "צבע צב"
 
 #: js/EnsembleBlocks.js:308
 msgid "The Turtle color block returns the pen color of the specified turtle."
@@ -2892,7 +2892,7 @@ msgstr ""
 #: js/EnsembleBlocks.js:338
 #.TRANS: heading (compass direction) for this mouse
 msgid "mouse heading"
-msgstr ""
+msgstr "כותרת עכבר"
 
 #: js/EnsembleBlocks.js:340
 msgid "The Mouse heading block returns the heading of the specified mouse."
@@ -2901,7 +2901,7 @@ msgstr ""
 #: js/EnsembleBlocks.js:352
 #.TRANS: heading (compass direction) for this turtle
 msgid "turtle heading"
-msgstr ""
+msgstr "כותרת צב"
 
 #: js/EnsembleBlocks.js:354
 msgid "The Turtle heading block returns the heading of the specified turtle."
@@ -2917,7 +2917,7 @@ msgstr ""
 #: js/EnsembleBlocks.js:402
 #: js/BoxesBlocks.js:595
 msgid "name1"
-msgstr ""
+msgstr "כִּנוּי"
 
 #: js/EnsembleBlocks.js:391
 #: js/EnsembleBlocks.js:402
@@ -3076,7 +3076,7 @@ msgstr ""
 
 #: js/EnsembleBlocks.js:932
 msgid "new mouse"
-msgstr ""
+msgstr "עכבר חדש"
 
 #: js/EnsembleBlocks.js:934
 msgid "The New mouse block will create a new mouse."
@@ -3084,7 +3084,7 @@ msgstr ""
 
 #: js/EnsembleBlocks.js:945
 msgid "new turtle"
-msgstr ""
+msgstr "צב חדש"
 
 #: js/EnsembleBlocks.js:947
 msgid "The New turtle block will create a new turtle."
@@ -3092,7 +3092,7 @@ msgstr ""
 
 #: js/EnsembleBlocks.js:1011
 msgid "set mouse color"
-msgstr ""
+msgstr "הגדר צבע עכבר"
 
 #: js/EnsembleBlocks.js:1014
 msgid "The Set-mouse-color block is used to set the color of a mouse."
@@ -3100,7 +3100,7 @@ msgstr ""
 
 #: js/EnsembleBlocks.js:1020
 msgid "set turtle color"
-msgstr ""
+msgstr "להגדיר צבע צב"
 
 #: js/EnsembleBlocks.js:1023
 msgid "The Set-turtle-color block is used to set the color of a turtle."
@@ -3116,7 +3116,7 @@ msgstr ""
 
 #: js/EnsembleBlocks.js:1115
 msgid "mouse count"
-msgstr ""
+msgstr "ספירת עכברים"
 
 #: js/EnsembleBlocks.js:1118
 msgid "The Mouse-count block returns the number of mice."
@@ -3124,7 +3124,7 @@ msgstr ""
 
 #: js/EnsembleBlocks.js:1124
 msgid "turtle count"
-msgstr ""
+msgstr "ספירת צבים"
 
 #: js/EnsembleBlocks.js:1127
 msgid "The Turtle-count block returns the number of turtles."
@@ -3149,7 +3149,7 @@ msgstr ""
 #: js/EnsembleBlocks.js:1205
 #: js/EnsembleBlocks.js:1265
 msgid "set name"
-msgstr ""
+msgstr "להגדיר שם"
 
 #: js/EnsembleBlocks.js:1214
 #: js/EnsembleBlocks.js:1221
@@ -3296,7 +3296,7 @@ msgstr ""
 
 #: js/MediaBlocks.js:546
 msgid "camera"
-msgstr ""
+msgstr "מַצלֵמָה"
 
 #: js/MediaBlocks.js:551
 msgid "The Camera block connects a webcam to the Show block."
@@ -3304,7 +3304,7 @@ msgstr ""
 
 #: js/MediaBlocks.js:574
 msgid "video"
-msgstr ""
+msgstr "וִידֵאוֹ"
 
 #: js/MediaBlocks.js:579
 msgid "The Video block selects video for use with the Show block."
@@ -3349,7 +3349,7 @@ msgstr ""
 #: js/PitchBlocks.js:1827
 #.TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
 msgid "name2"
-msgstr ""
+msgstr "כִּנוּי"
 
 #: js/MediaBlocks.js:812
 msgid "The Avatar block is used to change the appearance of the mouse."
@@ -3376,7 +3376,7 @@ msgstr ""
 #: js/MediaBlocks.js:888
 #.TRANS: show1 is show as in display an image or text on the screen.
 msgid "show1"
-msgstr ""
+msgstr "לְהַצִיג"
 
 #: js/MediaBlocks.js:891
 msgid "obj"
@@ -3462,7 +3462,7 @@ msgstr ""
 #: js/ProgramBlocks.js:372
 #.TRANS: load a dictionary from a file
 msgid "load dictionary"
-msgstr ""
+msgstr "טען מילון"
 
 #: js/ProgramBlocks.js:390
 #: js/ProgramBlocks.js:658
@@ -3521,7 +3521,7 @@ msgstr ""
 #: js/ProgramBlocks.js:640
 #.TRANS: save a dictionary to a file
 msgid "save dictionary"
-msgstr ""
+msgstr "לשמור מילון"
 
 #: js/ProgramBlocks.js:720
 msgid "The Open palette block opens a palette."
@@ -4100,7 +4100,7 @@ msgstr "עד_ש"
 #: js/FlowBlocks.js:742
 #: js/FlowBlocks.js:822
 msgid "do2"
-msgstr ""
+msgstr "לְבַצֵעַ"
 
 #: js/FlowBlocks.js:812
 msgid "The While block will repeat while the condition is true."
