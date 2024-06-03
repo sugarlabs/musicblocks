@@ -106,8 +106,8 @@ class SaveInterface {
             }
 
             if (
-                this.PlanetInterface.getTimeLastSaved() !== this.timeLastSaved &&
-                this.PlanetInterface !== undefined
+                typeof this.PlanetInterface !== 'undefined' &&
+                this.PlanetInterface.getTimeLastSaved() !== this.timeLastSaved
             ) {
                 event.preventDefault();
                 // Will trigger when exit/reload cancelled.
@@ -571,12 +571,9 @@ class SaveInterface {
             tmp.remove();
             this.activity.textMsg(
                 _("The Lilypond code is copied to clipboard. You can paste it here: ") +
-                    "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a> " +
-                    "or " +
-                    "<a href='http://lilybin.com/' target='_blank'>http://lilybin.com</a>."
+                    "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a> "
             );
         }
-
         this.download("ly", "data:text;utf8," + encodeURIComponent(lydata), filename);
     }
 

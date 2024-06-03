@@ -1182,7 +1182,7 @@ function setupPitchBlocks(activity) {
             this.setPalette("pitch", activity);
             this.makeMacro((x, y) => [
                 [0, "pitch", x, y, [null, 1, 2, null]],
-                [1, ["customNote", { value: "C(+0%)" }], 0, 0, [0]],
+                [1, ["customNote", { value: "C(+0¢)" }], 0, 0, [0]],
                 [2, ["number", { value: 4 }], 0, 0, [0]]
             ]);
             this.hidden = true;
@@ -1528,7 +1528,16 @@ function setupPitchBlocks(activity) {
         flow(args, logo, turtle, blk) {
             if (args[0] === undefined) return;
 
-            Singer.PitchActions.setSharp(turtle, blk);
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
+            tur.singer.transposition += tur.singer.invertList.length > 0 ? -1 : 1;
+
+            const listenerName = "_sharp_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            const __listener = (event) =>
+                (tur.singer.transposition += tur.singer.invertList.length > 0 ? 1 : -1);
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[0], 1];
         }

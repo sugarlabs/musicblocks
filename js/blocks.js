@@ -161,6 +161,13 @@ class Blocks {
         this.inLongPress = false;
         this.customTemperamentDefined = false;
 
+        // Flag to track a block's movement to avoid drag-to-select functionality while moving a block
+        this.isBlockMoving = false;
+
+        this.selectionModeOn = false;
+
+        this.selectedBlocks = [];
+
         /**
          * We stage deletion of prototype action blocks on the palette so
          * as to avoid palette refresh race conditions.
@@ -2134,7 +2141,7 @@ class Blocks {
 
                 blk = this.insideExpandableBlock(blk);
             }
-
+            this.isBlockMoving = false;
             this.adjustExpandableClampBlock();
             this.activity.refreshCanvas();
         };
@@ -2395,7 +2402,7 @@ class Blocks {
          */
         this.moveBlockRelative = (blk, dx, dy) => {
             this.inLongPress = false;
-
+            this.isBlockMoving = true;
             const myBlock = this.blockList[blk];
             if (myBlock.container != null) {
                 myBlock.container.x += dx;
@@ -3626,7 +3633,7 @@ class Blocks {
          */
         this._calculateDragGroup = (blk) => {
             this.dragLoopCounter += 1;
-            if (this.dragLoopCount > this.blockList.length) {
+            if (this.dragLoopCounter > this.blockList.length) {
                 // eslint-disable-next-line no-console
                 console.debug(
                     "Maximum loop counter exceeded in calculateDragGroup... this is bad. " + blk
@@ -4453,6 +4460,12 @@ class Blocks {
             } else {
                 const cblk = this.blockList[blk].connections[0];
                 if (this.blockList[cblk].isExpandableBlock()) {
+                    if (this.blockList[blk].name === "forever") {
+                        if (this._isConnectedToNoteValue(cblk)) {
+                            this.activity.errorMsg(_("Forever loop detected inside a note value block. Unexpected things may happen."));
+                            return null; 
+                        }
+                    }
                     /** If it is the last connection, keep searching. */
                     if (blk === last(this.blockList[cblk].connections)) {
                         return this._insideNoteBlock(cblk);
@@ -4469,6 +4482,17 @@ class Blocks {
                 } else {
                     return this._insideNoteBlock(cblk);
                 }
+            }
+        };
+
+        this._isConnectedToNoteValue = (blk) => {
+            if (NOTEBLOCKS.indexOf(this.blockList[blk].name) !== -1) {
+                return true;
+            } else if (this.blockList[blk].connections[0] == null) {
+                return false;
+            } else {
+                const cblk = this.blockList[blk].connections[0];
+                return this._isConnectedToNoteValue(cblk);
             }
         };
 
@@ -6995,6 +7019,22 @@ class Blocks {
             this.show();
             this.bringToTop();
             this.activity.refreshCanvas();
+        };
+
+        this.setSelection = (selection) => {
+            this.selectionModeOn = selection;
+        };
+
+        this.setSelectionToActivity = (selection) => {
+            this.activity.setSelectionMode(selection);
+        };
+
+        this.unhighlightSelectedBlocks = (blk, selection) => {
+            this.blockList[blk].unhighlightSelectedBlocks(blk, selection);
+        };
+
+        this.setSelectedBlocks = (blocks) => {
+            this.selectedBlocks = blocks;
         };
     }
 }

@@ -3033,7 +3033,7 @@ msgid "turtle pitch number"
 msgstr "número de tono de tortuga"
 
 #: js/EnsembleBlocks.js:643
-msgid "The Turrle pitch block returns the current pitch number being played by the specified turtle."
+msgid "The Turtle pitch block returns the current pitch number being played by the specified turtle."
 msgstr "El bloque de tono de la tortuga devuelve el número de tono actual que está reproduciendo la tortuga especificado."
 
 #: js/EnsembleBlocks.js:747
@@ -8361,3 +8361,8 @@ msgstr "z del acelerómetro"
 #~msgid "collapse"
 #~msgstr "colapso"
 
+msgid "Current Interval"
+msgstr "intervalo actual"
+
+msgid "current interval"
+msgstr "intervalo actual"
