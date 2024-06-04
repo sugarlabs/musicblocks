@@ -21,8 +21,10 @@ const $j = jQuery.noConflict();
 let play_button_debounce_timeout = null;
 class Toolbar {
     /**
-     * @constructor
-     */
+    * Constructs a new Toolbar instance.
+    * 
+    * @constructor
+    */
     constructor() {
         this.stopIconColorWhenPlaying = window.platformColor.stopIconcolor;
         this.language = localStorage.languagePreference;
@@ -344,8 +346,10 @@ class Toolbar {
     }
 
     /**
+     * Renders the play icon with the provided onclick handler.
+     * 
      * @public
-     * @param {Function} onclick
+     * @param {Function} onclick - The onclick handler for the play icon.
      * @returns {void}
      */
     renderPlayIcon(onclick) {
@@ -387,8 +391,10 @@ class Toolbar {
     }
 
     /**
+     * Renders the stop icon with the provided onclick handler.
+     * 
      * @public
-     * @param {Function} onclick
+     * @param {Function} onclick - The onclick handler for the stop icon.
      * @returns {void}
      */
     renderStopIcon(onclick) {
@@ -400,8 +406,10 @@ class Toolbar {
     }
 
     /**
+     * Renders the new project icon with the provided onclick handler.
+     * 
      * @public
-     * @param {Function} onclick
+     * @param {Function} onclick - The onclick handler for the new project icon.
      * @returns {void}
      */
     renderNewProjectIcon(onclick) {
@@ -413,8 +421,10 @@ class Toolbar {
     }
 
     /**
+     * Renders the load icon with the provided onclick handler.
+     * 
      * @public
-     * @param {Function} onclick
+     * @param {Function} onclick - The onclick handler for the load icon.
      * @returns {void}
      */
     renderLoadIcon(onclick) {
@@ -426,8 +436,9 @@ class Toolbar {
     }
 
     /**
+     * Renders the wrap icon.
+     * 
      * @public
-     * @param {Function} onclick
      * @returns {void}
      */
     renderWrapIcon() {
@@ -471,7 +482,10 @@ class Toolbar {
     }
 
     /**
+     * Toggles the turtle wrap functionality.
+     * 
      * @public
+     * @param  {Object} activity - The activity object containing details of the current activity.
      * @returns {void}
      */
     changeWrap(activity) {
@@ -511,16 +525,18 @@ class Toolbar {
     }
 
     /**
+     * Renders the save icons based on the provided onclick handlers.
+     * 
      * @public
-     * @param  {Function} html_onclick
-     * @param  {Function} doSVG_onclick
-     * @param  {Function} svg_onclick
-     * @param  {Function} png_onclick
-     * @param  {Function} wave_onclick
-     * @param  {Function} ly_onclick
-     * @param  {Function} abc_onclick
-     * @param  {Function} mxml_onclick
-     * @param  {Function} blockartworksvg_onclick
+     * @param  {Function} html_onclick - The onclick handler for HTML.
+     * @param  {Function} doSVG_onclick - The onclick handler for SVG.
+     * @param  {Function} svg_onclick - The onclick handler for SVG.
+     * @param  {Function} png_onclick - The onclick handler for PNG.
+     * @param  {Function} wave_onclick - The onclick handler for Wave.
+     * @param  {Function} ly_onclick - The onclick handler for LY.
+     * @param  {Function} abc_onclick - The onclick handler for ABC.
+     * @param  {Function} mxml_onclick - The onclick handler for MXML.
+     * @param  {Function} blockartworksvg_onclick - The onclick handler for Block Artwork SVG.
      * @returns {void}
      */
     renderSaveIcons(
@@ -727,8 +743,10 @@ class Toolbar {
     }
 
     /**
+     * Renders the help icon with the provided onclick handler.
+     * 
      * @public
-     * @param {Function} onclick
+     * @param {Function} onclick - The onclick handler for the help icon.
      * @returns {void}
      */
     renderHelpIcon(onclick) {
@@ -740,8 +758,10 @@ class Toolbar {
     }
 
     /**
+     * Renders the mode select icon with the provided onclick handler.
+     * 
      * @public
-     * @param {Function} onclick
+     * @param {Function} onclick - The onclick handler for the mode select icon.
      * @returns {void}
      */
     renderModeSelectIcon(onclick) {
@@ -759,8 +779,10 @@ class Toolbar {
     }
 
     /**
+     * Renders the run step-by-step icon with the provided onclick handler.
+     * 
      * @public
-     * @param {Function} onclick
+     * @param {Function} onclick - The onclick handler for the run step-by-step icon.
      * @returns {void}
      */
     renderRunStepIcon(onclick) {
@@ -775,12 +797,14 @@ class Toolbar {
         };
     }
     /**
+     * Renders the advanced icons with the provided onclick handlers.
+     * 
      * @public
-     * @param  {Function} rec_onclick
-     * @param  {Function} analytics_onclick
-     * @param  {Function} openPlugin_onclick
-     * @param  {Function} delPlugin_onclick
-     * @param  {Function} setScroller
+     * @param  {Function} rec_onclick - The onclick handler for the record icon.
+     * @param  {Function} analytics_onclick - The onclick handler for the analytics icon.
+     * @param  {Function} openPlugin_onclick - The onclick handler for the open plugin icon.
+     * @param  {Function} delPlugin_onclick - The onclick handler for the delete plugin icon.
+     * @param  {Function} setScroller - The function to set the scroller.
      * @returns {void}
      */
     renderAdvancedIcons(
@@ -839,8 +863,10 @@ class Toolbar {
     }
 
     /**
+     * Renders the merge icon with the provided onclick handler.
+     * 
      * @public
-     * @param {Function} onclick
+     * @param {Function} onclick - The onclick handler for the merge icon.
      * @returns {void}
      */
     renderMergeIcon(onclick) {
@@ -852,8 +878,10 @@ class Toolbar {
     }
 
     /**
+     * Renders the restore icon with the provided onclick handler.
+     * 
      * @public
-     * @param {Function} onclick
+     * @param {Function} onclick - The onclick handler for the restore icon.
      * @returns {void}
      */
     renderRestoreIcon(onclick) {
@@ -865,8 +893,10 @@ class Toolbar {
     }
 
     /**
+     * Renders the choose key icon with the provided onclick handler.
+     * 
      * @public
-     * @param {Function} onclick
+     * @param {Function} onclick - The onclick handler for the choose key icon.
      * @returns {void}
      */
     renderChooseKeyIcon(onclick) {
@@ -880,8 +910,10 @@ class Toolbar {
     }
 
     /**
+     * Renders the JavaScript icon with the provided onclick handler.
+     * 
      * @public
-     * @param {Function} onclick
+     * @param {Function} onclick - The onclick handler for the JavaScript icon.
      * @returns {void}
      */
     renderJavaScriptIcon(onclick) {
@@ -889,8 +921,10 @@ class Toolbar {
     }
 
     /**
+     * Renders the language select icon with the provided languageBox object.
+     * 
      * @public
-     * @param  {Object} languageBox
+     * @param  {Object} languageBox - The languageBox object containing language options.
      * @returns {void}
      */
     renderLanguageSelectIcon(languageBox) {
