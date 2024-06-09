@@ -3781,6 +3781,7 @@ class Activity {
                 document.attachEvent("finishedLoading", __functionload);
             }
         };
+
         function adjustPitch(note, keySignature) {
             const accidental = keySignature.accidentals.find(acc => {
                 const noteToCompare = acc.note.toUpperCase().replace(',', '');
@@ -3803,12 +3804,21 @@ class Activity {
         }
         
           
-        function createPitchBlocks(pitch, blockId, pitchDuration,keySignature,actionBlock) {
+        function createPitchBlocks(pitches, blockId, pitchDuration,keySignature,actionBlock,triplet,meterDen) {
             const blocks = [];
-
-            pitchDuration = toFraction(pitchDuration);          
-            const adjustedNote = adjustPitch(pitch.name , keySignature);
             
+            const pitch = pitches;
+            pitchDuration = toFraction(pitchDuration);          
+            const adjustedNote = adjustPitch(pitch.name , keySignature).toUpperCase();
+            if(triplet!==undefined&&triplet!==null){
+                console.log('For the Pitch')
+                console.log(pitch)
+                console.log('below is the meter Den')
+                console.log(meterDen);
+                console.log('below is the triplet')
+                console.log(triplet)
+                pitchDuration[1]=meterDen*triplet
+            }
           
             actionBlock.push(
                 
@@ -3835,7 +3845,7 @@ class Activity {
             let organizeBlock={}
             let blockId = 0;
 
-        
+            let tripletFinder = null
             const title = (tune.metaText?.title ?? "title").toString().toLowerCase();
             const instruction = (tune.metaText?.instruction ?? "guitar").toString().toLowerCase();
             
@@ -3859,7 +3869,7 @@ class Activity {
             console.log('below is the arranged blocks')
             console.log(organizeBlock)
             for (const lineId in organizeBlock) {
-                organizeBlock[lineId].arrangedBlocks?.forEach((staff,staffIndex) => {
+                organizeBlock[lineId].arrangedBlocks?.forEach((staff) => {
                     if (!staffBlocksMap.hasOwnProperty(lineId)) {
                         staffBlocksMap[lineId] = {
                             meterNum: staff?.meter?.value[0]?.num || 4,
@@ -3899,7 +3909,19 @@ class Activity {
                         voice.forEach(element => {
                             console.log('hello');
                             if (element.el_type === "note") {
-                                createPitchBlocks(element.pitches[0], blockId,element.duration,staff.key,actionBlock);
+                                //check if triplet exists 
+                                if (element?.startTriplet !== null&&element?.startTriplet !== undefined) {
+                                    tripletFinder = element.startTriplet;
+                                }
+                                
+                                // Check and set tripletFinder to null if element?.endTriplets exists
+                          
+                          
+                             
+                                createPitchBlocks(element.pitches[0], blockId,element.duration,staff.key,actionBlock,tripletFinder,staffBlocksMap[lineId].meterDen);
+                                if (element?.endTriplet!== null &&element?.endTriplet!== undefined) {
+                                    tripletFinder = null;
+                                }
                                 blockId = blockId + 9;
                             }
                         });
