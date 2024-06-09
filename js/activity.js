@@ -3830,6 +3830,240 @@ class Activity {
             }
         };
 
+        function adjustPitch(note, keySignature) {
+            const accidental = keySignature.accidentals.find(acc => {
+                const noteToCompare = acc.note.toUpperCase().replace(',', '');
+                note = note.replace(',', '');
+                return noteToCompare.toLowerCase() === note.toLowerCase();
+            });
+        
+            if (accidental) {
+                return note + (accidental.acc === "sharp" ? "♯" : (accidental.acc === "flat" ? "♭" : ""));
+            } else {
+                return note;
+            }
+        }
+        
+          function abcToStandardValue(pitchValue) {
+           
+            
+            const octave = Math.floor(pitchValue/ 7) + 4; 
+            return  octave;
+        }
+        
+          
+        function createPitchBlocks(pitches, blockId, pitchDuration,keySignature,actionBlock,triplet,meterDen) {
+            const blocks = [];
+            
+            const pitch = pitches;
+            pitchDuration = toFraction(pitchDuration);          
+            const adjustedNote = adjustPitch(pitch.name , keySignature).toUpperCase();
+            if(triplet!==undefined&&triplet!==null){
+                console.log('For the Pitch')
+                console.log(pitch)
+                console.log('below is the meter Den')
+                console.log(meterDen);
+                console.log('below is the triplet')
+                console.log(triplet)
+                pitchDuration[1]=meterDen*triplet
+            }
+          
+            actionBlock.push(
+                
+                [blockId, ["newnote", {"collapsed": true}], 0, 0, [blockId - 1, blockId + 1, blockId + 4, blockId + 8]],
+                [blockId + 1, "divide", 0, 0, [blockId, blockId + 2, blockId + 3]],
+                [blockId + 2, ["number", {value: pitchDuration[0]}], 0, 0, [blockId + 1]],
+                [blockId + 3, ["number", {value: pitchDuration[1]}], 0, 0, [blockId + 1]],
+                [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]],
+                [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
+                [blockId + 6, ["notename", {value: adjustedNote}], 0, 0, [blockId + 5]],
+                [blockId + 7, ["number", {value: abcToStandardValue(pitch.pitch)}], 0, 0, [blockId + 5]],
+                [blockId + 8, "hidden", 0, 0, [blockId, blockId + 9]],
+            );
+
+      
+        
+            return blocks;
+        }
+        
+        this.parseABC = async function (tune) {
+            let musicBlocksJSON = [];
+            
+            let staffBlocksMap = {};
+            let organizeBlock={}
+            let blockId = 0;
+
+            let tripletFinder = null
+            const title = (tune.metaText?.title ?? "title").toString().toLowerCase();
+            const instruction = (tune.metaText?.instruction ?? "guitar").toString().toLowerCase();
+            
+
+            tune.lines?.forEach(line => {
+                console.log(line );
+                line.staff?.forEach((staff,staffIndex) => {
+                    
+                    if (!organizeBlock.hasOwnProperty(staffIndex)) {
+                        organizeBlock[staffIndex] = {
+                         arrangedBlocks:[]
+                        };
+                   
+                    }
+
+                   organizeBlock[staffIndex].arrangedBlocks.push(staff)
+        
+    
+                });
+            });
+            console.log('below is the arranged blocks')
+            console.log(organizeBlock)
+            for (const lineId in organizeBlock) {
+                organizeBlock[lineId].arrangedBlocks?.forEach((staff) => {
+                    if (!staffBlocksMap.hasOwnProperty(lineId)) {
+                        staffBlocksMap[lineId] = {
+                            meterNum: staff?.meter?.value[0]?.num || 4,
+                            meterDen: staff?.meter?.value[0]?.den || 4,
+                            keySignature: staff.key,
+                            baseBlocks: [],
+                            startBlock: [
+                                [blockId, ["start", {collapsed: false}], 100, 100, [null, blockId + 1, null]],
+                                [blockId + 1, "print", 0, 0, [blockId, blockId + 2, blockId + 3]],
+                                [blockId + 2, ["text", {value: title}], 0, 0, [blockId + 1]],
+                                [blockId + 3, "setturtlename2", 0, 0, [blockId + 1, blockId + 4, blockId + 5]],
+                                [blockId + 4, ["text", {value: `Voice ${parseInt(lineId)+1 } `}], 0, 0, [blockId + 3]],
+                                [blockId + 5, "meter", 0, 0, [blockId + 3, blockId + 6, blockId + 7, blockId + 10]],
+                                [blockId + 6, ["number", {value: staff?.meter?.value[0]?.num || 4}], 0, 0, [blockId + 5]],
+                                [blockId + 7, "divide", 0, 0, [blockId + 5, blockId + 8, blockId + 9]],
+                                [blockId + 8, ["number", {value: 1}], 0, 0, [blockId + 7]],
+                                [blockId + 9, ["number", {value:  staff?.meter?.value[0]?.den || 4}], 0, 0, [blockId + 7]],
+                                [blockId + 10, "vspace", 0, 0, [blockId + 5, blockId + 11]],
+                                [blockId + 11, "setkey2", 0, 0, [blockId + 10, blockId + 12, blockId + 13, blockId + 14]],
+                                [blockId + 12, ["notename", {value: staff.key.root}], 0, 0, [blockId + 11]],
+                                [blockId + 13, ["modename", {value: staff.key.mode == "m" ? "minor" : "major"}], 0, 0, [blockId + 11]],
+                                //In Settimbre instead of null it should be nameddoblock of first action block
+                                [blockId + 14, "settimbre", 0, 0, [blockId + 11, blockId + 15, null, blockId + 16]],
+                                [blockId + 15, ["voicename", {value: instruction}], 0, 0, [blockId + 14]],
+                                [blockId + 16, "hidden", 0, 0, [blockId + 14, null]]
+                            ]
+                        };
+                        //for adding startblock
+                        blockId=blockId+17
+                    }
+        
+                    let actionBlock=[]
+                    staff.voices.forEach(voice => {
+                        console.log(voice)
+                     
+                  
+                        voice.forEach(element => {
+                            console.log('hello');
+                            if (element.el_type === "note") {
+                                //check if triplet exists 
+                                if (element?.startTriplet !== null&&element?.startTriplet !== undefined) {
+                                    tripletFinder = element.startTriplet;
+                                }
+                                
+                                // Check and set tripletFinder to null if element?.endTriplets exists
+                          
+                          
+                             
+                                createPitchBlocks(element.pitches[0], blockId,element.duration,staff.key,actionBlock,tripletFinder,staffBlocksMap[lineId].meterDen);
+                                if (element?.endTriplet!== null &&element?.endTriplet!== undefined) {
+                                    tripletFinder = null;
+                                }
+                                blockId = blockId + 9;
+                            }
+                        });
+                        //update the newnote connection with hidden
+                        
+                        actionBlock[0][4][0]=blockId+3
+                        
+
+
+                        actionBlock[actionBlock.length-1][4][1]=null
+                        //update the namedo block
+                        if(staffBlocksMap[lineId].baseBlocks.length!=0){
+                            //update the name do blocid with next bloc id 
+                            // musicBlocksJSON[musicBlocksJSON.length - 1][musicBlocksJSON[musicBlocksJSON.length - 1].length - 4][4][1] = blockId;
+                            // console.log('last Element');
+                            // console.log(musicBlocksJSON[musicBlocksJSON.length - 1][musicBlocksJSON[musicBlocksJSON.length - 1].length - 4] );
+                         //   staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1].length - 4][4][1] = blockId;
+                            
+                            
+                            staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0][staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0].length-4][4][1] =blockId
+                            console.log('last Element');
+                            console.log(staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0][staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0].length-4]);
+                            
+                            
+                            
+                        }   
+
+
+                        actionBlock.push ( [blockId, ["nameddo", {value: `V: ${parseInt(lineId)+1} Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1}`}], 0, 0, [staffBlocksMap[lineId].baseBlocks.length === 0 ? null : staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0][staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0].length-4][0], null]],
+                        [blockId + 1, ["action", {collapsed: false}], 100, 100, [null, blockId + 2, blockId + 3, null]],
+                        [blockId + 2, ["text", {value: `V: ${parseInt(lineId)+1} Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1}`}], 0, 0, [blockId + 1]],
+                        [blockId + 3, "hidden", 0, 0, [blockId + 1, actionBlock[0][0]]] )// blockid of topaction block
+                        
+                        blockId=blockId+4
+                        musicBlocksJSON.push(actionBlock)
+                     
+                        staffBlocksMap[lineId].baseBlocks.push([actionBlock]);
+                     
+    
+                    });
+    
+                });
+            }
+         
+            let testblock = [];
+            console.log('below is the staff Block map')
+            console.log(staffBlocksMap)
+            for (const staffIndex in staffBlocksMap) {
+                console.log('startblock settrimbre');
+                console.log(staffBlocksMap[staffIndex].startBlock[staffBlocksMap[staffIndex].startBlock.length - 3]);
+                console.log('nameddo block first action block');
+                staffBlocksMap[staffIndex].startBlock[staffBlocksMap[staffIndex].startBlock.length - 3][4][2] = staffBlocksMap[staffIndex].baseBlocks[0][0][staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4][0];
+                console.log('startblock settrimbre');
+                console.log(staffBlocksMap[staffIndex].startBlock[staffBlocksMap[staffIndex].startBlock.length - 3]);
+                console.log(staffBlocksMap[staffIndex].baseBlocks[0][0][staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4][0]);
+            
+                // Update the first namedo block with settimbre
+                staffBlocksMap[staffIndex].baseBlocks[0][0][staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4][4][0] = staffBlocksMap[staffIndex].startBlock[staffBlocksMap[staffIndex].startBlock.length - 3][0];
+            
+                console.log(`For iter ${staffIndex}`);
+                console.log(staffBlocksMap[staffIndex].baseBlocks[0][0][staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4]);
+            
+                let lineBlock = staffBlocksMap[staffIndex].baseBlocks.reduce((acc, curr) => acc.concat(curr), []);
+                let flattenedLineBlock = lineBlock.flat(); // Flatten the multidimensional array
+                let combinedBlock = [...staffBlocksMap[staffIndex].startBlock, ...flattenedLineBlock];
+            
+                testblock.push(...staffBlocksMap[staffIndex].startBlock);
+                testblock.push(...flattenedLineBlock);
+            
+                console.log('Below is the combined block:');
+                console.log(combinedBlock);
+            }
+            
+            console.log('below is the staff Block map')
+            console.log(staffBlocksMap);
+            
+            console.log('Test block:');
+            console.log(testblock);
+            
+            console.log('test block is ')
+            console.log(testblock)
+    
+          this.blocks.loadNewBlocks(testblock);
+
+           
+
+            // // logo.textMsg(_("MIDI loading. This may take some time depending upon the number of notes in the track"));
+            // this.blocks.loadNewBlocks(combined_array);
+            return null;
+
+        }
+
+
+
         /**
          * Calculate time such that no matter how long it takes to load the program, the loading
          * animation will cycle at least once.
@@ -5529,7 +5763,7 @@ class Activity {
 
                 const files = event.dataTransfer.files;
                 const reader = new FileReader();
-
+                const abcReader = new FileReader();
                 // eslint-disable-next-line no-unused-vars
                 reader.onload = (theFile) => {
                     that.loading = true;
@@ -5599,9 +5833,34 @@ class Activity {
                     }, 200);
                 };
 
+                abcReader.onload = (event) => {
+                    let abcData = event.target.result;
+                    abcData = abcData.replace(/\\/g, '');
+                    
+                    const tunebook = new ABCJS.parseOnly(abcData);
+                    
+                    console.log(tunebook)
+                    tunebook.forEach(tune => {
+                        this.parseABC(tune);
+                        console.log(tune)
+                    
+                    });
+                 
+                
+                    
+               
+           
+                };
                 // Work-around in case the handler is called by the
                 // widget drag & drop code.
                 if (files[0] !== undefined) {
+                    let extension = files[0].name.split('.').pop().toLowerCase();  //file extension from input file
+                    let isMidi = (extension == "abc");
+                    if (isMidi) {
+                        abcReader.readAsText(files[0]);
+                        console.log('abc')
+                        return;
+                    }
                     reader.readAsText(files[0]);
                     window.scroll(0, 0);
                 }
