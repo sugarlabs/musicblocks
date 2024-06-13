@@ -32,6 +32,7 @@ This guide details the many musical features of the language.
    2. [Pitch Transformations](#32-pitch-transformations)
       1. [Step Pitch Block](#321-step-pitch-block)
       2. [Sharps and Flats](#322-sharps-and-flats)
+          1. [Double Sharps and Flats](#3221-double-sharps-and-flats)
       3. [Adjusting Transposition](#323-adjusting-transposition)
       4. [Summary of Pitch Movements](#324-summary-of-pitch-movements)
       5. [Set Key](#325-set-key)
@@ -368,6 +369,27 @@ lower by one half step. In the example, on the left, just the *Pitch*
 block `Mi` is lowered by one half step; on the right, both *Pitch*
 blocks are raised by one half step. (You can also use a double-sharp
 or double-flat accidental.)
+
+
+#### <a name= "DOUBLE-SHARPS-AND-FLATS">3.2.2.1 Double Sharps And Flats</a>
+
+Double sharps and flats, although not very common, are used in music
+notation to accurately represent pitches that are altered by two
+semitones. They arise in compositions that explore chromaticism,
+modulations to distant keys, or non-traditional scales where such
+alterations are necessary for harmonic or melodic purposes. Double
+sharps and flats help maintain the correct intervals, ensuring
+precise notation and clarity of musical expression.
+
+![double sharp and flat](./transform1_1.png "Using Double Sharp and Flat blocks")
+
+![la campanella](./transform1_2.png "La Campanella - Liszt")
+
+![mikrokosmos](./transform1_3.png "Mikrokosmos V Nr. 131 - Bartók")
+
+The example on the left shows how to play the double sharp as played in
+measure 6 of Liszt's La Campanella. The example on the right shows how to
+play the double flat harmony in measure 6 of Bartók's Mikrkosmos V, Nr. 131.
 
 #### <a name="ADJUST-TRANSPOSITION">3.2.3 Adjusting Transposition</a>
 
