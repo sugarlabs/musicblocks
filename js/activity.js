@@ -3657,6 +3657,203 @@ class Activity {
             }, 5000);
         };
 
+
+        this.transcribeMidi = async function(midi) {
+            let currentMidi = midi;        
+            let jsONON = [] ;
+            let k=0;
+            currentMidi.tracks.forEach(track => {
+                if (!track.notes.length) return;
+                let r = jsONON.length; 
+        
+                // find matching instrument
+                let instrument = "electronic synth";
+                if (track.instrument.name){
+                    for (let voices of VOICENAMES){
+                        if (track.instrument.name.indexOf(voices[1]) > -1){
+                            instrument = voices[0];
+                        }
+                    }
+                }
+        
+                jsONON.push(
+                    [r, ["action", { collapsed: false }], 100, 100, [null, r+1, r+2, null]],
+                    [r+1, ["text", { value: "track" + currentMidi.tracks.indexOf(track) }], 0, 0, [r]],
+                    [r+2, "settimbre", 0, 0, [r, r+3, r+5, r+4]],
+                    [r+3, ["voicename", {"value": instrument}], 0, 0, [r+2]],
+                    [r+4, "hidden", 0, 0, [r+2, null]]
+                );
+        
+                let time = 0;
+                let sched = [];
+                for (let noteIndex in track.notes){
+                    let note = track.notes[noteIndex];
+                    let name = note.name;
+                    let first = sched.length == 0;
+                    let start = note.time;
+                    let end = note.duration + note.time;
+                    if (note.duration == 0) continue;
+        
+                    if (first){
+                        sched.push({
+                            start: start,
+                            end: start + note.duration,
+                            notes: [name]
+                        });
+                        continue;
+                    }
+                    if (sched[sched.length-1].start == start && sched[sched.length-1].end == end)
+                        sched[sched.length-1].notes.push(name);
+                    else if (sched[sched.length-1].end > start && sched[sched.length-1].end >= end){
+                        // change prev, make 2 new
+                        let prevNotes = [...sched[sched.length-1].notes];
+                        let oldEnd = sched[sched.length-1].end;
+                        sched[sched.length-1].end = start;
+                        let newNotes = [...prevNotes];
+                        newNotes.push(name);
+                        sched.push({
+                            start: start,
+                            end: end,
+                            notes: newNotes
+                        });
+                        if (oldEnd > end){
+                            sched.push({
+                                start: end,
+                                end: oldEnd,
+                                notes: prevNotes
+                            });
+                        }
+                    }
+                    else if (sched[sched.length-1].end > start && sched[sched.length-1].end <= end){
+                        // change prev, make 2 new
+                        let prevNotes = [...sched[sched.length-1].notes];
+                        let oldEnd = sched[sched.length-1].end;
+                        sched[sched.length-1].end = start;
+                        let newNotes = [...prevNotes];
+                        newNotes.push(name);
+                        if (start < oldEnd){
+                            sched.push({
+                                start: start,
+                                end: oldEnd,
+                                notes: newNotes
+                            });
+                        }
+                        if (end > oldEnd){
+                            sched.push({
+                                start: oldEnd,
+                                end: end,
+                                notes: [name]
+                            });
+                        }
+                    }
+                    else if (sched[sched.length-1].end <= start) {
+                        // add silence, make new
+                        if (start > sched[sched.length-1].end)
+                            sched.push({
+                                start: sched[sched.length-1].end,
+                                end: start,
+                                notes: ["R"]
+                            });
+                        sched.push({
+                            start: start,
+                            end: end,
+                            notes: [name]
+                        });
+                    }
+                }
+        
+                let noteSum = 0;
+                let currentActionBlock = [];
+             
+                let addNewActionBlock = () => {
+                    let r = jsONON.length;
+                    if(k==0){
+                    jsONON.push(
+                        ...currentActionBlock
+                    );
+                    k=1;
+                    }
+                    else{
+                        jsONON.push(
+                            [r, ["action", { collapsed: false }], 100, 100, [null, r+1, r+2, null]],
+                            [r+1, ["text", { value: "track" + currentMidi.tracks.indexOf(track) }], 0, 0, [r]],
+                            [r+2, "settimbre", 0, 0, [r, r+3, r+5, r+4]],
+                            [r+3, ["voicename", {"value": instrument}], 0, 0, [r+2]],
+                            [r+4, "hidden", 0, 0, [r+2, null]],
+                            ...currentActionBlock)
+                    }
+                    console.log("currentActionBlock: ", currentActionBlock);
+                    console.log("jsonon: ", jsONON);
+                    console.debug("json: " + JSON.stringify(jsONON));
+                    currentActionBlock = [];
+                };
+        
+                for (let i in sched){
+                    let notes = sched[i].notes;
+                    let start = sched[i].start;
+                    let end = sched[i].end;
+                    let duration = end - start;
+                    let last = (i == sched.length - 1 || noteSum>=16);
+                    let first = (i == 0 || noteSum==0);
+                    let val = jsONON.length+currentActionBlock.length;
+                    let getPitch = (x, notes, prev) => {
+                        let ar = [];
+                        if (notes[0] == "R"){
+                            ar.push(
+                                [x, "rest2", 0, 0, [prev, null]]
+                            );
+                        }
+                        else {
+                            for (let na in notes){
+                                let name = notes[na];
+                                let first = na == 0;
+                                let last = na == notes.length - 1;
+                                ar.push(
+                                    [x, "pitch", 0, 0, [first ? prev : x-3, x+1, x+2, last ? null : x+3]],
+                                    [x+1, ["notename", {"value": name.substring(0, name.length-1)}], 0, 0, [x]],
+                                    [x+2, ["number", {"value": parseInt(name[name.length-1])}], 0, 0, [x]]
+                                );
+                                x += 3;
+                            }
+                        }
+                        return ar;
+                    };
+                    var obj = toFraction(duration * 3 / 8);
+                    if(k!=0) val=val+5; //since we are going to add action block in th front later
+                    let pitches = getPitch(val + 4, notes, val);
+                    currentActionBlock.push(
+                        [val, ["newnote", {"collapsed": true}], 0, 0, [first ? val-3 : val-1, val+1, val+4, val+pitches.length+4]], 
+                        [val + 1, "divide", 0, 0, [val, val + 2, val + 3]],
+                        [val + 2, ["number", { value: obj[0] }], 0, 0, [val + 1]],
+                        [val + 3, ["number", { value: obj[1] }], 0, 0, [val + 1]]
+                    );
+                    
+                    currentActionBlock = currentActionBlock.concat(pitches);
+                    let newLen=jsONON.length+currentActionBlock.length;
+                    currentActionBlock.push(
+                      
+                         [newLen, "hidden", 0, 0, [val, last ? null : newLen + 1]]
+                        //   [jsONON.length+currentActionBlock.length, "hidden", 0, 0, [val, last ? null : jsONON.length +currentActionBlock.length+ 1]]
+                    );
+        
+                    noteSum += duration;
+                    if (noteSum >= 16) {
+                        addNewActionBlock();
+                        noteSum = 0;
+                    }
+                }
+                if (currentActionBlock.length > 0) {
+                    addNewActionBlock();  
+                }
+        
+                console.debug('finished when you see: "block loading finished "');
+                document.body.style.cursor = "wait";
+                this.textMsg(_("MIDI loading. This may take some time depending upon the number of notes in the track"));
+            });
+            this.blocks.loadNewBlocks(jsONON);
+            return null;
+        }
+        
         /**
          * Loads MB project from Planet.
          * @param  projectID {Planet project ID}
@@ -5529,6 +5726,7 @@ class Activity {
 
                 const files = event.dataTransfer.files;
                 const reader = new FileReader();
+                let midiReader = new FileReader();
 
                 // eslint-disable-next-line no-unused-vars
                 reader.onload = (theFile) => {
@@ -5598,10 +5796,21 @@ class Activity {
                         }
                     }, 200);
                 };
+                midiReader.onload = (e) => {
+                    const midi = new Midi(e.target.result)
+                    console.debug(midi);
+                    this.transcribeMidi(midi);
+                }
 
                 // Work-around in case the handler is called by the
                 // widget drag & drop code.
                 if (files[0] !== undefined) {
+                    let extension = files[0].name.split('.').pop().toLowerCase();  //file extension from input file
+                    let isMidi = (extension == "mid") || (extension == "midi");
+                    if (isMidi){
+                        midiReader.readAsArrayBuffer(files[0]);
+                        return;
+                    }
                     reader.readAsText(files[0]);
                     window.scroll(0, 0);
                 }
