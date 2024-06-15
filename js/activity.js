@@ -551,9 +551,11 @@ class Activity {
             })
         }
 
-        /*
-         * Sets up plugin and palette boiler plate
-         */
+        /**
+        * Sets up plugin and palette boilerplate.
+        * This function initializes various properties related to the plugin objects,
+        * palette colors, and other settings used throughout the application.
+        */
         this.doPluginsAndPaletteCols = () => {
             // Calculate the palette colors.
             for (const p in platformColor.paletteColors) {
@@ -612,8 +614,15 @@ class Activity {
         };
 
         /**
-         * Recenters blocks by finding their position on the screen and moving them accordingly.
-         */
+        * Recenters blocks by updating their position on the screen.
+        * 
+        * This function triggers the `_findBlocks` method on the provided `activity` object,
+        * which recalculates the positions of blocks. If the 'helpfulWheelDiv' element is visible,
+        * it is hidden, and the `__tick` method is called to update the activity state.
+        * 
+        * @param {Object} activity - The activity instance containing the blocks to recenter.
+        * @constructor
+        */
         const findBlocks = (activity) => {
             activity._findBlocks();
             if (docById("helpfulWheelDiv").style.display !== "none") {
@@ -623,9 +632,11 @@ class Activity {
         };
 
         /**
-         * Finds and organizes blocks within the workspace.
-         * Blocks are positioned based on their connections and availability within the canvas area.
-         */
+        * Finds and organizes blocks within the workspace.
+        * Blocks are positioned based on their connections and availability within the canvas area.
+        * This method is part of the internal mechanism to ensure that blocks are displayed correctly and efficiently.
+        * @constructor
+        */
         this._findBlocks = () => {
             // Ensure visibility of blocks
             if (!this.blocks.visible) {
@@ -750,9 +761,14 @@ class Activity {
         };
 
         /**
-         * @param zero {hides container}
-         * @param one {shows container}
-         */
+        * Toggles the visibility of the home button container.
+        * 
+        * Depending on the state provided, this method will either hide or show the home button container.
+        * If the home button container is not initialized, the function will exit early.
+        * 
+        * @param {boolean} homeState - If true, shows the container; if false, hides it.
+        * @constructor
+        */
         this.setHomeContainers = (homeState) => {
             if (this.homeButtonContainer === null) {
                 return;
@@ -765,6 +781,14 @@ class Activity {
             }
         };
 
+        /**
+        * Saves the artwork for an individual help block.
+        * The process involves clearing the block list, generating the help blocks,
+        * and saving them as SVG files.
+        *
+        * @param {string} name - The name of the help block.
+        * @param {number} delay - The delay before executing the save process (in milliseconds).
+        */
         this.__saveHelpBlock = (name, delay) => {
             // Save the artwork for an individual help block.
             // (1) clear the block list

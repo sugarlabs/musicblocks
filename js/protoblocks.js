@@ -262,7 +262,6 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., forward, right
     /**
      * Sets up a one-argument block.
      * E.g., forward, right.
@@ -300,9 +299,9 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., wait for
     /**
      * Sets up a block with one boolean argument.
+     * E.g., wait for
      */
     oneBooleanArgBlock() {
         this.args = 1;
@@ -339,9 +338,9 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., setxy. These are expandable.
     /**
      * Sets up an expandable block with two arguments.
+     * E.g., setxy. These are expandable.
      */
     twoArgBlock() {
         this.expandable = true;
@@ -388,9 +387,9 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., ??? These are expandable.
     /**
      * Sets up an expandable block with three arguments.
+     * E.g., ??? These are expandable.
      */
     threeArgBlock() {
         this.expandable = true;
@@ -489,10 +488,10 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., sqrt, box
     /**
      * Sets up a block with one argument for mathematical operations.
      * This block follows the 'arg' style and has a single argument.
+     * E.g., sqrt, box
      */
     oneArgMathBlock() {
         this.style = "arg";
@@ -530,10 +529,10 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., plus, minus, multiply, divide, power,distance. These are also expandable.
     /**
      * Sets up a block with two arguments for mathematical operations.
      * This block is expandable, follows the 'arg' style, and has two arguments.
+     * E.g., plus, minus, multiply, divide, power,distance. These are also expandable.
      */
     twoArgMathBlock() {
         this.expandable = true;
@@ -630,10 +629,11 @@ class ProtoBlock {
             svg.getHeight()
         ];
     }
-    // E.g., distance . Distance block will calculate geometrical distance between two pointa
-    // by default (cursor x ,cursor y ) and x and y
+    
     /**
      * Configures a four-argument math block.
+     * E.g., distance . Distance block will calculate geometrical distance between two points
+     * by default (cursor x ,cursor y ) and x and y
      */
     fourArgMathBlock() {
         this.expandable = true;
@@ -683,10 +683,10 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., number, string. Value blocks get DOM textareas associated
-    // with them so their values can be edited by the user.
     /**
      * Configures a value block.
+     * E.g., number, string. Value blocks get DOM textareas associated
+     * with them so their values can be edited by the user.
      */
     valueBlock() {
         this.style = "value";
@@ -756,12 +756,12 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., start. A "child" flow is docked in an expandable clamp.
-    // There are no additional arguments and no flow above or below.
     /**
      * Sets up a stack clamp block with zero arguments. A "child" flow is docked
      * in an expandable clamp. There are no additional arguments and no flow
      * above or below.
+     * E.g., start. A "child" flow is docked in an expandable clamp.
+     * There are no additional arguments and no flow above or below.
      */
     stackClampZeroArgBlock() {
         this.style = "clamp";
@@ -806,9 +806,9 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., emptyclamp. Unlike start, there is a flow above and below.
     /**
      * Sets up a flow clamp block. Unlike start, there is a flow above and below.
+     * E.g., emptyclamp. Unlike start, there is a flow above and below.
      */
     flowClampBlock() {
         this.style = "clamp";
@@ -853,9 +853,9 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., repeat. Unlike action, there is a flow above and below.
     /**
      * Sets up a flow clamp block with one argument.
+     * E.g., repeat. Unlike action, there is a flow above and below.
      */
     flowClampOneArgBlock() {
         this.style = "clamp";
@@ -902,10 +902,10 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., tuplet, which takes two args plus an interior flow.
-    // There is a flow above and below.
     /**
      * Sets up a flow clamp block with two arguments.
+     * There is a flow above and below.
+     * E.g., tuplet, which takes two args plus an interior flow.
      */
     flowClampTwoArgBlock() {
         this.style = "clamp";
@@ -1001,9 +1001,9 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., do with args: innies instead of interior slots.
     /**
      * Sets up a clamp block with one argument slot.
+     * E.g., do with args: innies instead of interior slots.
      */
     argClampOneArgBlock() {
         this.style = "argclamp";
@@ -1051,9 +1051,9 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., calculate with args: innies instead of interior slots.
     /**
      * Sets up a clamp block with one argument slot for mathematical operations.
+     * E.g., calculate with args: innies instead of interior slots.
      */
     argClampOneArgMathBlock() {
         this.style = "argclamparg";
@@ -1101,7 +1101,10 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., named do with args: innies instead of interior slots.
+    /**
+     * Sets up an argument clamp block.
+     * E.g., named do with args: innies instead of interior slots.
+     */
     argClampBlock() {
         this.style = "argclamp";
         this.expandable = true;
@@ -1113,6 +1116,11 @@ class ProtoBlock {
         this.generator = this.argClampBlockGenerator;
     }
 
+    /**
+     * Generates SVG for an argument clamp block.
+     * @param {number[]} slots - Array of slots for clamping.
+     * @returns {Array} - Array containing SVG, docks, width, height, and hitHeight.
+     */
     argClampBlockGenerator(slots) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1138,7 +1146,10 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., named calculate with args: innies instead of interior slots.
+    /**
+     * Sets up an argument clamp math block.
+     * E.g., named calculate with args: innies instead of interior slots.
+     */
     argClampMathBlock() {
         this.style = "argclamparg";
         this.expandable = true;
@@ -1149,6 +1160,11 @@ class ProtoBlock {
         this.generator = this.argClampMathBlockGenerator;
     }
 
+    /**
+     * Generates SVG for an argument clamp math block.
+     * @param {number[]} slots - Array of slots for clamping.
+     * @returns {Array} - Array containing SVG, docks, width, height, and hitHeight.
+     */
     argClampMathBlockGenerator(slots) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1176,8 +1192,11 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., if.  A "child" flow is docked in an expandable clamp. The
-    // additional argument is a boolean. There is flow above and below.
+    /**
+     * Sets up a flow clamp boolean argument block.
+     * E.g., if.  A "child" flow is docked in an expandable clamp. The
+     * additional argument is a boolean. There is flow above and below.
+     */
     flowClampBooleanArgBlock() {
         this.style = "clamp";
         this.expandable = true;
@@ -1190,6 +1209,11 @@ class ProtoBlock {
         this.generator = this.flowClampBooleanArgBlockGenerator;
     }
 
+    /**
+     * Generates SVG for a flow clamp boolean argument block.
+     * @param {number} slots - Number of slots for clamping.
+     * @returns {Array} - Array containing SVG, docks, width, height, and hitHeight.
+     */
     flowClampBooleanArgBlockGenerator(slots) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1217,9 +1241,13 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., if then else.  Two "child" flows are docked in expandable
-    // clamps. The additional argument is a boolean. There is flow
-    // above and below.
+    /**
+     * Represents a block with two "child" flows docked in expandable clamps, with an additional boolean argument.
+     * E.g., if then else.  Two "child" flows are docked in expandable
+     * clamps. The additional argument is a boolean. There is flow
+     * above and below.
+     * @constructor
+     */
     doubleFlowClampBooleanArgBlock() {
         this.style = "doubleclamp";
         this.expandable = true;
@@ -1233,6 +1261,12 @@ class ProtoBlock {
         this.generator = this.doubleFlowClampBooleanArgBlockGenerator;
     }
 
+    /**
+     * Generates the block for doubleFlowClampBooleanArgBlock.
+     * @param {number} bottomSlots - The number of bottom slots.
+     * @param {number} topSlots - The number of top slots.
+     * @returns {Array} - Array containing SVG elements and block dimensions.
+     */
     doubleFlowClampBooleanArgBlockGenerator(bottomSlots,topSlots) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1268,7 +1302,11 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., forever. Unlike start, there is flow above and below.
+    /**
+     * Represents a block with flow above and below, e.g., forever.
+     * E.g., forever. Unlike start, there is flow above and below.
+     * @constructor
+     */
     flowClampZeroArgBlock() {
         this.style = "clamp";
         this.expandable = true;
@@ -1280,6 +1318,11 @@ class ProtoBlock {
         this.generator = this.flowClampZeroArgBlockGenerator;
     }
 
+    /**
+     * Generates the block for flowClampZeroArgBlock.
+     * @param {number} slots - The number of slots.
+     * @returns {Array} - Array containing SVG elements and block dimensions.
+     */
     flowClampZeroArgBlockGenerator(slots) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1306,7 +1349,11 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., count clamp: math block with interior slots
+    /**
+     * Represents a block like count clamp: math block with interior slots.
+     * E.g., count clamp: math block with interior slots
+     * @constructor
+     */
     argFlowClampBlock() {
         this.style = "argflowclamp";
         this.expandable = true;
@@ -1317,6 +1364,11 @@ class ProtoBlock {
         this.generator = this.argFlowClampGenerator;
     }
 
+    /**
+     * Generates the block for argFlowClampBlock.
+     * @param {number} slots - The number of slots.
+     * @returns {Array} - Array containing SVG elements and block dimensions.
+     */
     argFlowClampGenerator(slots) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1343,8 +1395,12 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., action. A "child" flow is docked in an expandable clamp.
-    // The additional argument is a name. Again, no flow above or below.
+    /**
+     * Represents a block with a "child" flow docked in an expandable clamp, with an additional argument as a name.
+     * E.g., action. A "child" flow is docked in an expandable clamp.
+     * The additional argument is a name. Again, no flow above or below.
+     * @constructor
+     */
     stackClampOneArgBlock() {
         this.style = "clamp";
         this.expandable = true;
@@ -1357,6 +1413,11 @@ class ProtoBlock {
         this.generator = this.stackClampOneArgBlockGenerator;
     }
 
+    /**
+     * Generates a stack clamp block with one argument.
+     * @param {number} [slots=1] - The number of slots for clamping (optional, default is 1).
+     * @returns {Array} - An array containing SVG representation of the block, docks, width, height, and hit height.
+     */
     stackClampOneArgBlockGenerator(slots) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1385,7 +1446,10 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., mouse button.
+    /**
+     * Generates a boolean zero-argument block.
+     * E.g., mouse button.
+     */
     booleanZeroArgBlock() {
         this.style = "arg";
         this.size = 1;
@@ -1394,6 +1458,10 @@ class ProtoBlock {
         this.generator = this.booleanZeroArgBlockGenerator;
     }
 
+    /**
+     * Generates SVG representation of a boolean zero-argument block.
+     * @returns {Array} - An array containing SVG representation of the block, docks, width, height, and hit height.
+     */
     booleanZeroArgBlockGenerator() {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1412,7 +1480,10 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., named sensor blocks
+    /**
+     * Generates a boolean one-argument block.
+     * E.g., named sensor blocks
+     */
     booleanOneArgBlock() {
         this.style = "arg";
         this.size = 2;
@@ -1423,6 +1494,10 @@ class ProtoBlock {
         this.generator = this.booleanOneArgBlockGenerator;
     }
 
+    /**
+     * Generates SVG representation of a boolean one-argument block.
+     * @returns {Array} - An array containing SVG representation of the block, docks, width, height, and hit height.
+     */
     booleanOneArgBlockGenerator() {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1442,7 +1517,10 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., not
+    /**
+     * Generates a boolean one-argument block with a boolean input.
+     * E.g., not
+     */
     booleanOneBooleanArgBlock() {
         this.style = "arg";
         this.size = 2;
@@ -1453,6 +1531,10 @@ class ProtoBlock {
         this.generator = this.booleanOneBooleanArgBlockGenerator;
     }
 
+    /**
+     * Generates SVG representation of a boolean one-argument block with a boolean input.
+     * @returns {Array} - An array containing SVG representation of the block, docks, width, height, and hit height.
+     */
     booleanOneBooleanArgBlockGenerator() {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1471,7 +1553,10 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., and, or
+    /**
+     * Generates a boolean two-argument block with boolean inputs.
+     * E.g., and, or
+     */
     booleanTwoBooleanArgBlock() {
         this.style = "arg";
         this.size = 3;
@@ -1483,6 +1568,10 @@ class ProtoBlock {
         this.generator = this.booleanTwoBooleanArgBlockGenerator;
     }
 
+    /**
+     * Generates SVG representation of a boolean two-argument block with boolean inputs.
+     * @returns {Array} - An array containing SVG representation of the block, docks, width, height, and hit height.
+     */
     booleanTwoBooleanArgBlockGenerator() {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1501,7 +1590,10 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., greater, less, equal
+    /**
+     * Represents a block with two boolean arguments.
+     * E.g., greater, less, equal
+     */
     booleanTwoArgBlock() {
         this.style = "arg";
         this.size = 2;
@@ -1514,6 +1606,11 @@ class ProtoBlock {
         this.generator = this.booleanTwoArgBlockGenerator;
     }
 
+    /**
+     * Generates the block with two boolean arguments.
+     * @param {number} expandY - Expansion factor for Y dimension (optional).
+     * @returns {Array} - An array containing generated SVG, docks, width, and height.
+     */
     booleanTwoArgBlockGenerator(expandY) {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1539,7 +1636,10 @@ class ProtoBlock {
         ];
     }
 
-    // E.g., color, shade, pensize, ...
+    /**
+     * Represents a block with a parameter (e.g., color, shade, pensize).
+     * E.g., color, shade, pensize, ...
+     */
     parameterBlock() {
         this.style = "arg";
         this.parameter = true;
@@ -1549,6 +1649,10 @@ class ProtoBlock {
         this.generator = this.parameterBlockGenerator;
     }
 
+    /**
+     * Generates the parameter block.
+     * @returns {Array} - An array containing generated SVG, docks, width, and height.
+     */
     parameterBlockGenerator() {
         const svg = new SVG();
         svg.setScale(this.scale);
@@ -1570,10 +1674,21 @@ class ProtoBlock {
     }
 }
 
+/**
+ * Checks if the given item is an object.
+ * @param {*} item - The item to check.
+ * @returns {boolean} - True if the item is an object, otherwise false.
+ */
 const isObject = (item) => {
     return item && typeof item === "object" && !Array.isArray(item);
 };
 
+/**
+ * Merges multiple objects deeply.
+ * @param {object} target - The target object to merge into.
+ * @param {...object} sources - The source objects to merge from.
+ * @returns {object} - The merged object.
+ */
 const mergeDeep = (target, ...sources) => {
     // From https://stackoverflow.com/a/34749873
     if (!sources.length) return target;
@@ -1593,33 +1708,108 @@ const mergeDeep = (target, ...sources) => {
     return mergeDeep(target, ...sources);
 };
 
+/**
+ * Represents a base block used as a foundation for other blocks.
+ * @extends ProtoBlock
+ */
 class BaseBlock extends ProtoBlock {
+    /**
+     * Creates an instance of BaseBlock.
+     * @param {string} name - The name of the block.
+     */
     constructor(name) {
         super(name);
 
+        /**
+         * The macro function associated with the block.
+         * @type {function|null}
+         */
         this.macroFunc = null;
+
+        /**
+         * The style properties of the block.
+         * @type {object}
+         * @private
+         */
         this._style = {};
+
+        /**
+         * Indicates if the block is designed for beginner mode.
+         * @type {boolean}
+         */
         this.beginnerModeBlock = false;
+
+        /**
+         * Indicates if the block is deprecated.
+         * @type {boolean}
+         */
         this.deprecated = false;
+
+        /**
+         * Additional search terms for the block.
+         * @type {Array<string>}
+         */
         this.extraSearchTerms = [];
+
+        /**
+         * Help strings associated with the block.
+         * @type {Array<string>}
+         */
         this.helpString = [];
+
+        /**
+         * Values for the piemenu's first column.
+         * @type {Array}
+         */
         this.piemenuValuesC1 = [];
+
+        /**
+         * Values for the piemenu's second column.
+         * @type {Array}
+         */
         this.piemenuValuesC2 = [];
+
+        /**
+         * Values for the piemenu's third column.
+         * @type {Array}
+         */
         this.piemenuValuesC3 = [];
+
+        /**
+         * Labels for the piemenu.
+         * @type {Array}
+         */
         this.piemenuLabels = [];
 
         // Just for brevity
+        /**
+         * Language preference for the block.
+         * @type {string}
+         */
         this.lang = localStorage.languagePreference || navigator.language;
     }
 
+    /**
+     * Sets the palette of the block.
+     * @param {string} palette - The palette name.
+     * @param {object} activity - The activity associated with the block.
+     */
     setPalette(palette, activity) {
         this.palette = activity.palettes.dict[palette];
     }
 
+    /**
+     * Sets the help string of the block.
+     * @param {Array<string>} help - The help string to set.
+     */
     setHelpString(help) {
         this.helpString = help;
     }
 
+    /**
+     * Forms the block with the given style.
+     * @param {object} style - The style properties of the block.
+     */
     formBlock(style) {
         mergeDeep(this._style, style);
         this._style.args ||= 0;
@@ -1692,6 +1882,10 @@ class BaseBlock extends ProtoBlock {
                 this._style.flows.bottom === "tail" ? "unavailable" : "in"
             );
 
+        /**
+         * Generates SVG artwork and dock layout for the block.
+         * @returns {Array} An array containing the SVG artwork, dock layout, width, height, and click height.
+         */
         this.generator = function() {
             const svg = new SVG();
             svg.setScale(this.scale);
@@ -1823,22 +2017,43 @@ class BaseBlock extends ProtoBlock {
         };
     }
 
+    /**
+     * Associates a macro function with the block.
+     * @param {Function} macroFunc - The macro function to associate.
+     */
     makeMacro(macroFunc) {
         this.macroFunc = macroFunc;
     }
 
+    /**
+     * Updates the type of dock at the specified slot.
+     * @param {number} slot - The slot index of the dock.
+     * @param {string} value - The value to update the dock with.
+     */
     updateDockValue(slot, value) {
         this.dockTypes[slot] = value;
     }
 
+    /**
+     * Changes the name of the block.
+     * @param {string} name - The new name of the block.
+     */
     changeName(name) {
         this.name = name;
     }
 
+    /**
+     * Sets whether the block is a beginner mode block or not.
+     * @param {boolean} value - Indicates if the block is a beginner mode block.
+     */
     beginnerBlock(value) {
         this.beginnerModeBlock = value;
     }
 
+    /**
+     * Performs setup for the block within the provided activity.
+     * @param {object} activity - The activity context to set up the block in.
+     */
     setup(activity) {
         activity.blocks.protoBlockDict[this.name] = this;
 
@@ -1854,7 +2069,16 @@ class BaseBlock extends ProtoBlock {
     }
 }
 
+/**
+ * Represents a block that outputs a value.
+ * @extends BaseBlock
+ */
 class ValueBlock extends BaseBlock {
+    /**
+     * Creates a ValueBlock instance with the given name and optional display name.
+     * @param {string} name - The name of the block.
+     * @param {string} [displayName] - The display name of the block.
+     */
     constructor(name, displayName) {
         super(name);
         displayName ||= undefined;
@@ -1872,7 +2096,15 @@ class ValueBlock extends BaseBlock {
     }
 }
 
+/**
+ * Represents a block that outputs a boolean value.
+ * @extends BaseBlock
+ */
 class BooleanBlock extends BaseBlock {
+    /**
+     * Creates a BooleanBlock instance with the given name.
+     * @param {string} name - The name of the block.
+     */
     constructor(name) {
         super(name);
 
@@ -1886,7 +2118,16 @@ class BooleanBlock extends BaseBlock {
     }
 }
 
+/**
+ * Represents a block that outputs a boolean sensor value.
+ * @extends BaseBlock
+ */
 class BooleanSensorBlock extends BaseBlock {
+    /**
+     * Creates a BooleanSensorBlock instance with the given name and optional display name.
+     * @param {string} name - The name of the block.
+     * @param {string} [displayName] - The display name of the block.
+     */
     constructor(name, displayName) {
         super(name);
         displayName ||= undefined;
@@ -1902,7 +2143,16 @@ class BooleanSensorBlock extends BaseBlock {
     }
 }
 
+/**
+ * Represents a block with flow inputs and/or outputs.
+ * @extends BaseBlock
+ */
 class FlowBlock extends BaseBlock {
+    /**
+     * Creates a FlowBlock instance with the given name and optional display name.
+     * @param {string} name - The name of the block.
+     * @param {string} [displayName] - The display name of the block.
+     */
     constructor(name, displayName) {
         super(name);
         displayName ||= undefined;
@@ -1920,7 +2170,16 @@ class FlowBlock extends BaseBlock {
     }
 }
 
+/**
+ * Represents a block with leftward flow only.
+ * @extends BaseBlock
+ */
 class LeftBlock extends BaseBlock {
+    /**
+     * Creates a LeftBlock instance with the given name and optional display name.
+     * @param {string} name - The name of the block.
+     * @param {string} [displayName] - The display name of the block.
+     */
     constructor(name, displayName) {
         super(name);
         displayName ||= undefined;
@@ -1938,7 +2197,15 @@ class LeftBlock extends BaseBlock {
     }
 }
 
+/**
+ * Represents a flow clamp block.
+ * @extends FlowBlock
+ */
 class FlowClampBlock extends FlowBlock {
+    /**
+     * Creates an instance of FlowClampBlock.
+     * @param {string} name - The name of the block.
+     */
     constructor(name) {
         super(name);
 
@@ -1952,11 +2219,24 @@ class FlowClampBlock extends FlowBlock {
     }
 }
 
+/**
+ * Represents a stack clamp block.
+ * @extends BaseBlock
+ */
 class StackClampBlock extends BaseBlock {
+    /**
+     * Creates an instance of StackClampBlock.
+     * @param {string} name - The name of the block.
+     */
     constructor(name) {
         super(name);
 
+        /**
+         * Additional width for the block.
+         * @type {number}
+         */
         this.extraWidth = 40;
+        
         this.formBlock({
             flows: {
                 top: "cap",
