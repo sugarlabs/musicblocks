@@ -491,7 +491,7 @@ class Activity {
                 (event) => {
                     event.preventDefault();
                     event.stopPropagation();
-                    if(event.target.id === "myCanvas") {
+                    if (event.target.id === "myCanvas") {
                         this._displayHelpfulWheel(event);
                     }
                 },
@@ -1248,7 +1248,7 @@ class Activity {
             };
 
             // Stop recording if already executing
-            if(flag == 1 && isExecuting){
+            if (flag == 1 && isExecuting){
                 start.addEventListener("click", stopRec);
                 flag = 0;
             }
@@ -1500,7 +1500,7 @@ class Activity {
                 await this.setSmallerLargerStatus();
 
             }
-            if(typeof(this.activity)!="undefined"){
+            if (typeof(this.activity)!="undefined"){
                  await this.activity.refreshCanvas();
                }
             document.getElementById("hideContents").click();
@@ -1538,7 +1538,7 @@ class Activity {
             }
 
             await this.setSmallerLargerStatus();
-            if(typeof(this.activity)!="undefined"){
+            if (typeof(this.activity)!="undefined"){
                 await this.activity.refreshCanvas();
             }
             document.getElementById("hideContents").click();
@@ -1874,8 +1874,8 @@ class Activity {
                 if (event.ctrlKey) {
                     event.preventDefault(); // Prevent default scrolling behavior
                    
-                    if(delY < 0 && doLargerBlocks(this));//Zoom IN
-                    if(delY >= 0 && doSmallerBlocks(this));//Zoom Out
+                    if (delY < 0 && doLargerBlocks(this));//Zoom IN
+                    if (delY >= 0 && doSmallerBlocks(this));//Zoom Out
                 }
                 if (delY !== 0 && event.axis === event.VERTICAL_AXIS) {
                     closeAnyOpenMenusAndLabels(); // closes all wheelnavs when scrolling .
@@ -2320,7 +2320,7 @@ class Activity {
                         //do nothing when clicked on the menu
                     } else if (document.getElementsByTagName("tr")[2].contains(e.target)) {
                         //do nothing when clicked on the search row
-                    } else if(e.target.id === "myCanvas") {
+                    } else if (e.target.id === "myCanvas") {
                         that.hideSearchWidget();
                         document.removeEventListener("mousedown", closeListener);
                     }
@@ -2656,12 +2656,12 @@ class Activity {
                         this._saveHelpBlocks();
                         break;
                     case 191:
-                        if(event.key=='/' && (!this.beginnerMode) && (disableHorizScrollIcon.style.display == "block")) {
+                        if (event.key=='/' && (!this.beginnerMode) && (disableHorizScrollIcon.style.display == "block")) {
                            this.blocksContainer.x += this.canvas.width / 10;
                            this.stage.update();
                         }
                     case 220:
-                        if(event.key=='\\' && (!this.beginnerMode) && (disableHorizScrollIcon.style.display == "block")) {
+                        if (event.key=='\\' && (!this.beginnerMode) && (disableHorizScrollIcon.style.display == "block")) {
                             this.blocksContainer.x -= this.canvas.width / 10;
                             this.stage.update();
                         }
@@ -4653,67 +4653,67 @@ class Activity {
             );
             this.boundary.hide();
 
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Home [HOME]")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Home [HOME]")) 
                 this.helpfulWheelItems.push({label: "Home [HOME]", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(GOHOMEFADEDBUTTON)), display: true, fn: findBlocks});
 
             this.hideBlocksContainer = createButton(SHOWBLOCKSBUTTON, _("Show/hide block"),
                 changeBlockVisibility);
 
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Show/hide block")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Show/hide block")) 
                 this.helpfulWheelItems.push({label: "Show/hide block", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SHOWBLOCKSBUTTON)), display: true, fn: changeBlockVisibility});
             
             this.collapseBlocksContainer = createButton(COLLAPSEBLOCKSBUTTON, _("Expand/collapse blocks"),
                 toggleCollapsibleStacks);
 
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Expand/collapse blocks")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Expand/collapse blocks")) 
                 this.helpfulWheelItems.push({label: "Expand/collapse blocks", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBLOCKSBUTTON)), display: true, fn: toggleCollapsibleStacks});
             
             this.smallerContainer = createButton(SMALLERBUTTON, _("Decrease block size"),
                 doSmallerBlocks);
             
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Decrease block size")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Decrease block size")) 
                 this.helpfulWheelItems.push({label: "Decrease block size", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SMALLERBUTTON)), display: true, fn: doSmallerBlocks});
             
             this.largerContainer = createButton(BIGGERBUTTON, _("Increase block size"),
                 doLargerBlocks);
             
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Increase block size")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Increase block size")) 
                 this.helpfulWheelItems.push({label: "Increase block size", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(BIGGERBUTTON)), display: true, fn: doLargerBlocks});
 
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Restore")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Restore")) 
                 this.helpfulWheelItems.push({label: "Restore", icon: "imgsrc:header-icons/restore-from-trash.svg", display: true, fn: restoreTrash});
             
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap Off"))
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap Off"))
                 this.helpfulWheelItems.push({label: "Turtle Wrap Off", icon: "imgsrc:header-icons/wrap-text.svg", display: true, fn: this.toolbar.changeWrap});
 
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap On"))
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap On"))
                 this.helpfulWheelItems.push({label: "Turtle Wrap On", icon: "imgsrc:header-icons/wrap-text.svg", display: false, fn: this.toolbar.changeWrap});
 
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Enable horizontal scrolling")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Enable horizontal scrolling")) 
                 this.helpfulWheelItems.push({label: "Enable horizontal scrolling", icon: "imgsrc:header-icons/compare-arrows.svg", display: this.beginnerMode ? false: true, fn: setScroller});
             
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Disable horizontal scrolling")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Disable horizontal scrolling")) 
                 this.helpfulWheelItems.push({label: "Disable horizontal scrolling", icon: "imgsrc:header-icons/lock.svg", display: false, fn: setScroller});
             
-            if(_THIS_IS_MUSIC_BLOCKS_ && !this.helpfulWheelItems.find(ele => ele.label === "Set Pitch Preview")) 
+            if (_THIS_IS_MUSIC_BLOCKS_ && !this.helpfulWheelItems.find(ele => ele.label === "Set Pitch Preview")) 
                 this.helpfulWheelItems.push({label: "Set Pitch Preview", icon: "imgsrc:header-icons/music-note.svg", display: true, fn: chooseKeyMenu});
         
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Grid")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Grid")) 
                 this.helpfulWheelItems.push({label: "Grid", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CARTESIANBUTTON)), display: true, fn: piemenuGrid});
         
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Clean")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Clean")) 
                 this.helpfulWheelItems.push({label: "Clean", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CLEARBUTTON)), display: true, fn: () => this._allClear(false)});
             
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Collapse")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Collapse")) 
                 this.helpfulWheelItems.push({label: "Collapse", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBUTTON)), display: true, fn: this.turtles.collapse});
         
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Expand")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Expand")) 
                 this.helpfulWheelItems.push({label: "Expand", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(EXPANDBUTTON)), display: false, fn: this.turtles.expand});
         
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Search for Blocks")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Search for Blocks")) 
                 this.helpfulWheelItems.push({label: "Search for Blocks", icon: "imgsrc:header-icons/search-button.svg", display: true, fn: this._displayHelpfulSearchDiv});
         
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Paste previous stack")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Paste previous stack")) 
                 this.helpfulWheelItems.push({label: "Paste previous stack", icon: "imgsrc:header-icons/copy-button.svg", display: false, fn: this.turtles.expand});
         
         };
@@ -4724,14 +4724,14 @@ class Activity {
         this.showHelpfulSearchWidget = () => {
             // Bring widget to top.
             const $j = jQuery.noConflict();
-            if($j("#helpfulSearch")) {
+            if ($j("#helpfulSearch")) {
                 try {
                     $j("#helpfulSearch").autocomplete("destroy");
                 } catch {}
             }
             this.helpfulSearchWidget.style.zIndex = 1001;
             this.helpfulSearchWidget.idInput_custom = "";
-            if(this.helpfulSearchDiv.style.display === "block") {
+            if (this.helpfulSearchDiv.style.display === "block") {
 
                 this.helpfulSearchWidget.value = null;
                 this.helpfulSearchWidget.style.visibility = "visible";
@@ -4818,6 +4818,8 @@ class Activity {
             }
 
             this.helpfulSearchWidget.value = "";
+            // Hide search div after search is complete.
+            docById("helpfulSearchDiv").style.display = "none";
             this.update = true;
         };
 
@@ -5072,7 +5074,7 @@ class Activity {
                 this.hasMouseMoved = true;
                 event.preventDefault();
                 // this.selectedBlocks = [];
-                if(this.isDragging){
+                if (this.isDragging){
                     this.currentX = event.clientX;
                     this.currentY = event.clientY;
                     if (!this.blocks.isBlockMoving) {
@@ -5154,7 +5156,7 @@ class Activity {
                         width: block.width
                     };
                 
-                if(this.rectanglesOverlap(this.blockRect, this.dragRect)){
+                if (this.rectanglesOverlap(this.blockRect, this.dragRect)){
                     selectedBlocks.push(block);
                 }
             })
@@ -5267,7 +5269,7 @@ class Activity {
             });
 
             document.addEventListener("click", (e) => {
-                if(!this.hasMouseMoved){
+                if (!this.hasMouseMoved){
                     if (this.selectionModeOn) {
                         this.deselectSelectedBlocks();
                     } else {
