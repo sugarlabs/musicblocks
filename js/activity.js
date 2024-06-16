@@ -3657,11 +3657,10 @@ class Activity {
             }, 5000);
         };
 
-
         this.transcribeMidi = async function(midi) {
             let currentMidi = midi;        
             let jsONON = [] ;
-            let k=0;
+            let k = 0;
             currentMidi.tracks.forEach(track => {
                 if (!track.notes.length) return;
                 let r = jsONON.length; 
@@ -3686,6 +3685,7 @@ class Activity {
         
                 let time = 0;
                 let sched = [];
+        
                 for (let noteIndex in track.notes){
                     let note = track.notes[noteIndex];
                     let name = note.name;
@@ -3765,26 +3765,33 @@ class Activity {
                 let noteSum = 0;
                 let currentActionBlock = [];
              
-                let addNewActionBlock = () => {
+                let addNewActionBlock = (isLastBlock = false) => {
                     let r = jsONON.length;
-                    if(k==0){
-                    jsONON.push(
-                        ...currentActionBlock
-                    );
-                    k=1;
-                    }
-                    else{
+                    console.log("json length before: ", jsONON.length);
+                    if (k == 0) {
                         jsONON.push(
-                            [r, ["action", { collapsed: false }], 100, 100, [null, r+1, r+2, null]],
+                            ...currentActionBlock
+                        );
+                        k = 1;
+                    } else {
+                        let settimbreIndex = r + 2;
+                        jsONON.push(
+                            [r, ["action", { collapsed: false }], 100, 100, [null, r+1, settimbreIndex, null]],
                             [r+1, ["text", { value: "track" + currentMidi.tracks.indexOf(track) }], 0, 0, [r]],
-                            [r+2, "settimbre", 0, 0, [r, r+3, r+5, r+4]],
-                            [r+3, ["voicename", {"value": instrument}], 0, 0, [r+2]],
-                            [r+4, "hidden", 0, 0, [r+2, null]],
-                            ...currentActionBlock)
+                            [settimbreIndex, "settimbre", 0, 0, [r, settimbreIndex+1, settimbreIndex+3, settimbreIndex+2]],
+                            [settimbreIndex+1, ["voicename", {"value": instrument}], 0, 0, [settimbreIndex]],
+                            [settimbreIndex+2, "hidden", 0, 0, [settimbreIndex, null]],
+                            ...currentActionBlock
+                        );
+                        // Adjust the first note block's top connection to settimbre
+                        currentActionBlock[0][4][0] = settimbreIndex;
+                    }
+                    if (isLastBlock) {
+                        let lastIndex = jsONON.length - 1;
+                        jsONON[lastIndex][4][1] = null; // Set the last hidden block's second value to null
                     }
                     console.log("currentActionBlock: ", currentActionBlock);
                     console.log("jsonon: ", jsONON);
-                    console.debug("json: " + JSON.stringify(jsONON));
                     currentActionBlock = [];
                 };
         
@@ -3793,9 +3800,15 @@ class Activity {
                     let start = sched[i].start;
                     let end = sched[i].end;
                     let duration = end - start;
-                    let last = (i == sched.length - 1 || noteSum>=16);
-                    let first = (i == 0 || noteSum==0);
-                    let val = jsONON.length+currentActionBlock.length;
+                    noteSum += duration;
+                    let isLastNoteInBlock = (noteSum >= 16);
+                    if (isLastNoteInBlock) {
+                        noteSum = 0;
+                    }
+                    let isLastNoteInSched = (i == sched.length - 1);
+                    let last = isLastNoteInBlock || isLastNoteInSched;
+                    let first = (i == 0 || noteSum == 0);
+                    let val = jsONON.length + currentActionBlock.length;
                     let getPitch = (x, notes, prev) => {
                         let ar = [];
                         if (notes[0] == "R"){
@@ -3819,7 +3832,7 @@ class Activity {
                         return ar;
                     };
                     var obj = toFraction(duration * 3 / 8);
-                    if(k!=0) val=val+5; //since we are going to add action block in th front later
+                    if (k != 0) val = val + 5; //since we are going to add action block in th front later
                     let pitches = getPitch(val + 4, notes, val);
                     currentActionBlock.push(
                         [val, ["newnote", {"collapsed": true}], 0, 0, [first ? val-3 : val-1, val+1, val+4, val+pitches.length+4]], 
@@ -3827,23 +3840,21 @@ class Activity {
                         [val + 2, ["number", { value: obj[0] }], 0, 0, [val + 1]],
                         [val + 3, ["number", { value: obj[1] }], 0, 0, [val + 1]]
                     );
-                    
+        
                     currentActionBlock = currentActionBlock.concat(pitches);
-                    let newLen=jsONON.length+currentActionBlock.length;
+                    let newLen = jsONON.length + currentActionBlock.length;
+                    if (k != 0) newLen = newLen + 5;
                     currentActionBlock.push(
-                      
-                         [newLen, "hidden", 0, 0, [val, last ? null : newLen + 1]]
-                        //   [jsONON.length+currentActionBlock.length, "hidden", 0, 0, [val, last ? null : jsONON.length +currentActionBlock.length+ 1]]
+                        [newLen, "hidden", 0, 0, [val, last ? null : newLen + 1]]
                     );
         
-                    noteSum += duration;
-                    if (noteSum >= 16) {
-                        addNewActionBlock();
-                        noteSum = 0;
+                    if (isLastNoteInBlock || isLastNoteInSched) {
+                        addNewActionBlock(isLastNoteInSched);
                     }
                 }
+        
                 if (currentActionBlock.length > 0) {
-                    addNewActionBlock();  
+                    addNewActionBlock(true);  
                 }
         
                 console.debug('finished when you see: "block loading finished "');
@@ -3852,7 +3863,8 @@ class Activity {
             });
             this.blocks.loadNewBlocks(jsONON);
             return null;
-        }
+        };
+        
         
         /**
          * Loads MB project from Planet.
