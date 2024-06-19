@@ -60,6 +60,7 @@ class Toolbar {
                 ["planetIconDisabled", _("Offline. Sharing is unavailable")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
                 ["helpIcon", _("Help")],
+                ["darkModeIcon", _("DarkMode")],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -121,6 +122,7 @@ class Toolbar {
                 _("Offline. Sharing is unavailable"),
                 _("Auxiliary menu"),
                 _("Help"),
+                _("DarkMode"),
                 _("Run slowly"),
                 _("Run step by step"),
                 _("Display statistics"),
@@ -186,6 +188,7 @@ class Toolbar {
                 ["planetIconDisabled", _("Offline. Sharing is unavailable")],
                 ["toggleAuxBtn", _("Auxiliary menu")],
                 ["helpIcon", _("Help")],
+                ["darkModeIcon", _("DarkMode")],
                 ["runSlowlyIcon", _("Run slowly")],
                 ["runStepByStepIcon", _("Run step by step")],
                 ["displayStatsIcon", _("Display statistics")],
@@ -242,6 +245,7 @@ class Toolbar {
                 _("Offline. Sharing is unavailable"),
                 _("Auxiliary menu"),
                 _("Help"),
+                _("DarkMode"),
                 _("Run slowly"),
                 _("Run step by step"),
                 _("Display statistics"),
@@ -753,6 +757,19 @@ class Toolbar {
         const helpIcon = docById("helpIcon");
 
         helpIcon.onclick = () => {
+            onclick(this.activity);
+        };
+    }
+    
+    /**
+     * @public
+     * @param {Function} onclick
+     * @returns {void}
+     */
+    renderDarkModeIcon(onclick) {
+        const darkModeIcon = docById("darkModeIcon");
+        // console.log("HEEEEE")
+        darkModeIcon.onclick = () => {
             onclick(this.activity);
         };
     }
