@@ -3684,6 +3684,7 @@ class Activity {
             return closest.value.split('/').map(Number);
         }
         
+        //Transcribe the midi file into MB
         this.transcribeMidi = async function(midi) {
             let currentMidi = midi;        
             let jsONON = [] ;
@@ -3706,7 +3707,6 @@ class Activity {
                 }
         
                 let actionBlockName = `chunk${actionBlockCounter}`;
-                // actionBlockNames.push(actionBlockName);
         
                 jsONON.push(
                     [r, ["action", { collapsed: false }], 100, 100, [null, r+1, r+2, null]],
