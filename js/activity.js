@@ -3657,8 +3657,7 @@ class Activity {
             }, 5000);
         };
 
-
-        
+  
         const standardDurations = [
             { value: "1/1", duration: 1 },
             { value: "1/2", duration: 0.5 },
@@ -3670,7 +3669,7 @@ class Activity {
             { value: "1/128", duration: 0.0078125 }
         ];
         
-        this.getClosestStandardNoteValue= function(duration) {
+        this.getClosestStandardNoteValue = function(duration) {
             let closest = standardDurations[0];
             let minDiff = Math.abs(duration - closest.duration);
             
@@ -3684,13 +3683,15 @@ class Activity {
             
             return closest.value.split('/').map(Number);
         }
-
         
         this.transcribeMidi = async function(midi) {
             let currentMidi = midi;        
             let jsONON = [] ;
             let k = 0;
-            currentMidi.tracks.forEach(track => {
+            let actionBlockCounter = 0; // Counter for action blocks
+            let actionBlockNames = []; // Array to store action block names
+        
+            currentMidi.tracks.forEach((track, trackIndex) => {
                 if (!track.notes.length) return;
                 let r = jsONON.length; 
         
@@ -3704,9 +3705,12 @@ class Activity {
                     }
                 }
         
+                let actionBlockName = `chunk${actionBlockCounter}`;
+                // actionBlockNames.push(actionBlockName);
+        
                 jsONON.push(
                     [r, ["action", { collapsed: false }], 100, 100, [null, r+1, r+2, null]],
-                    [r+1, ["text", { value: "track" + currentMidi.tracks.indexOf(track) }], 0, 0, [r]],
+                    [r+1, ["text", { value: actionBlockName }], 0, 0, [r]],
                     [r+2, "settimbre", 0, 0, [r, r+3, r+5, r+4]],
                     [r+3, ["voicename", {"value": instrument}], 0, 0, [r+2]],
                     [r+4, "hidden", 0, 0, [r+2, null]]
@@ -3793,10 +3797,12 @@ class Activity {
         
                 let noteSum = 0;
                 let currentActionBlock = [];
-             
+        
                 let addNewActionBlock = (isLastBlock = false) => {
                     let r = jsONON.length;
-                    console.log("json length before: ", jsONON.length);
+                    let actionBlockName = `chunk${actionBlockCounter}`;
+                    actionBlockNames.push(actionBlockName);
+        
                     if (k == 0) {
                         jsONON.push(
                             ...currentActionBlock
@@ -3806,7 +3812,7 @@ class Activity {
                         let settimbreIndex = r + 2;
                         jsONON.push(
                             [r, ["action", { collapsed: false }], 100, 100, [null, r+1, settimbreIndex, null]],
-                            [r+1, ["text", { value: "track" + currentMidi.tracks.indexOf(track) }], 0, 0, [r]],
+                            [r+1, ["text", { value: actionBlockName }], 0, 0, [r]],
                             [settimbreIndex, "settimbre", 0, 0, [r, settimbreIndex+1, settimbreIndex+3, settimbreIndex+2]],
                             [settimbreIndex+1, ["voicename", {"value": instrument}], 0, 0, [settimbreIndex]],
                             [settimbreIndex+2, "hidden", 0, 0, [settimbreIndex, null]],
@@ -3819,9 +3825,8 @@ class Activity {
                         let lastIndex = jsONON.length - 1;
                         jsONON[lastIndex][4][1] = null; // Set the last hidden block's second value to null
                     }
-                    console.log("currentActionBlock: ", currentActionBlock);
-                    console.log("jsonon: ", jsONON);
                     currentActionBlock = [];
+                    actionBlockCounter++; // Increment the action block counter
                 };
         
                 for (let i in sched){
@@ -3861,12 +3866,12 @@ class Activity {
                         return ar;
                     };
                     var obj = this.getClosestStandardNoteValue(duration * 3 / 8);
-                    if (k != 0) val = val + 5; //since we are going to add action block in th front later
+                    if (k != 0) val = val + 5; //since we are going to add action block in the front later
                     let pitches = getPitch(val + 4, notes, val);
                     currentActionBlock.push(
                         [val, ["newnote", {"collapsed": true}], 0, 0, [first ? val-3 : val-1, val+1, val+4, val+pitches.length+4]], 
-                        [val + 1, "divide", 0, 0, [val, val + 2, val + 3]],
-                        [val + 2, ["number", { value: obj[0] }], 0, 0, [val + 1]],
+                        [val + 1, "divide", 0, 0, [val, val+2, val+3, last ? null : val + pitches.length + 4 + 1]], 
+                        [val + 2, ["number", { value: obj[0] }], 0, 0, [val + 1]], 
                         [val + 3, ["number", { value: obj[1] }], 0, 0, [val + 1]]
                     );
         
@@ -3881,18 +3886,25 @@ class Activity {
                         addNewActionBlock(isLastNoteInSched);
                     }
                 }
-        
-                if (currentActionBlock.length > 0) {
-                    addNewActionBlock(true);  
-                }
-        
-                console.debug('finished when you see: "block loading finished "');
-                document.body.style.cursor = "wait";
-                this.textMsg(_("MIDI loading. This may take some time depending upon the number of notes in the track"));
             });
+        
+            let len = jsONON.length;
+            jsONON.push(
+                [len, ["start", { collapsed: false }], 100, 100, [null, len + 1, null]]
+            );
+        
+            // Add nameddo blocks based on the actionBlockNames
+            for (let i = 0; i < actionBlockCounter; i++) {
+                jsONON.push(
+                    [len + 1 + i, ["nameddo", { value: actionBlockNames[i] }], 0, 0, [len + i, (i < actionBlockCounter - 1) ? len + 2 + i : null]]
+                );
+            }
+        
+            console.log("json: ", jsONON);
             this.blocks.loadNewBlocks(jsONON);
             return null;
         };
+        
         
         
         /**
