@@ -27,7 +27,7 @@ class GlobalPlanet {
     constructor(Planet) {
         this.Planet = Planet ;
         this.ProjectViewer = null;
-
+        this.CollaborationSpace = null;
         this.offlineHTML = `<div class= "container center-align">
                             ${_(`Feature unavailable - cannot connect to server. Reload ${Planet.IsMusicBlocks ? "Music" : "Turtle"} Blocks to try again.`)}
                             </div>`;
@@ -596,6 +596,8 @@ class GlobalPlanet {
 
             this.ProjectViewer = new ProjectViewer(Planet);
             this.ProjectViewer.init();
+            this.CollaborationSpace = new CollaborationSpace(Planet);
+            this.CollaborationSpace.init();
         }
     };
 
