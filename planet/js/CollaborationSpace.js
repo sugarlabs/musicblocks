@@ -53,19 +53,6 @@ class CollaborationSpace {
         planetNav.appendChild(exitBtn);
         exitBtn.addEventListener("click", this.exitSpace);
 
-        // Add a note of under construction
-        const note = document.createElement("ul");
-        note.id = "constructionNote";
-        note.classList.add("right");
-        note.textContent = "(Under Construction)";
-        note.style.color = "black";
-        note.style.position = "relative";
-        note.style.top = "13px";
-        note.style.left = "35vh";
-
-
-        planetNav.appendChild(note);
-
     }
     
     renderCommonSpace(){
@@ -76,6 +63,20 @@ class CollaborationSpace {
 
         const localPage = document.getElementById("local");
         localPage.style.visibility = "hidden";
+
+        const planetBody = document.getElementById("planetBody");
+        // Add a note of under construction
+        const note = document.createElement("h5");
+        note.id = "constructionNote";
+        note.textContent = "(Under Construction)";
+        note.style.color = "black";
+        note.style.position = "absolute";
+        note.style.top = "50%";
+        note.style.left = "50%";
+        note.style.transform = "translate(-50%, -50%)";
+
+        planetBody.appendChild(note);
+
     }
 
     // Prepare the room by adding/hiding elements
