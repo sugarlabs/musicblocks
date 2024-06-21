@@ -53,6 +53,19 @@ class CollaborationSpace {
         planetNav.appendChild(exitBtn);
         exitBtn.addEventListener("click", this.exitSpace);
 
+        // Add a note of under construction
+        const note = document.createElement("ul");
+        note.id = "constructionNote";
+        note.classList.add("right");
+        note.textContent = "(Under Construction)";
+        note.style.color = "black";
+        note.style.position = "relative";
+        note.style.top = "13px";
+        note.style.left = "35vh";
+
+
+        planetNav.appendChild(note);
+
     }
     
     renderCommonSpace(){
@@ -77,6 +90,9 @@ class CollaborationSpace {
 
         const exitButton = document.getElementById("exitCollabRoom");
         exitButton.remove();
+
+        const constructionNote = document.getElementById("constructionNote");
+        constructionNote.remove();
         
         const globalTab = document.getElementById("global-tab");
         globalTab.style.display = "";
