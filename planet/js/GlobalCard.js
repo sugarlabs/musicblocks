@@ -90,7 +90,10 @@ class GlobalCard {
                                         )}</a> 
                                     </div> 
                                 </div> 
-                            </div> 
+                            </div>
+                            <a class="project-icon tooltipped" data-position="bottom" data-delay="50" data-tooltip="${_(
+                                "Collaborate"
+                            )}" id="global-project-collaborate-{ID}"><i class="material-icons">group</i></a> 
                         </div> 
                     </div> 
 
@@ -158,6 +161,12 @@ class GlobalCard {
         // eslint-disable-next-line no-unused-vars
         frag.getElementById(`global-project-image-${this.id}`).addEventListener("click", (evt) => {
             Planet.GlobalPlanet.ProjectViewer.open(this.id);
+        });
+
+        // set collaboration starter
+        // eslint-disable-next-line no-unused-vars
+        frag.getElementById(`global-project-collaborate-${this.id}`).addEventListener("click", (evt) => {
+            Planet.GlobalPlanet.CollaborationSpace.initiate();          
         });
 
         // set merge modify listener
