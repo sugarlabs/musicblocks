@@ -1240,6 +1240,11 @@ class Activity {
                 };
 
                 mediaRecorder.start(200);
+                setTimeout(() => {
+                    // eslint-disable-next-line no-console
+                    console.log("Resizing for Record", that.canvas.height);
+                    that._onResize();
+                }, 500);
                 return mediaRecorder;
             }
 
