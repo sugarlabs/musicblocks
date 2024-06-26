@@ -3799,7 +3799,7 @@ class Activity {
                 let noteSum = 0;
                 let currentActionBlock = [];
         
-                let addNewActionBlock = () => {
+                let addNewActionBlock = (isLastBlock=false) => {
                     let r = jsONON.length;
                     let actionBlockName = `chunk${actionBlockCounter}`;
                     actionBlockNames.push(actionBlockName);
@@ -3823,6 +3823,10 @@ class Activity {
                         );
                         
                     }
+                    if (isLastBlock) {
+                        let lastIndex = jsONON.length - 1;
+                        jsONON[lastIndex][4][1] = null; // Set the last hidden block's second value to null
+                    }
             
                     currentActionBlock = [];
                     actionBlockCounter++; // Increment the action block counter
@@ -3835,7 +3839,7 @@ class Activity {
                     let end = sched[i].end;
                     let duration = end - start;
                     noteSum += duration;
-                    let isLastNoteInBlock = (noteSum >= 16) || (noteblockCount > 0 && noteblockCount % 50 === 0);
+                    let isLastNoteInBlock = (noteSum >= 16) || (noteblockCount > 0 && noteblockCount % 24 === 0);
                     if (isLastNoteInBlock) {
                         noteSum = 0;
                     }
@@ -3884,7 +3888,7 @@ class Activity {
                         [newLen, "hidden", 0, 0, [val, last ? null : newLen + 1]]
                     );
                     if (isLastNoteInBlock || isLastNoteInSched ) {
-                        addNewActionBlock();
+                        addNewActionBlock(isLastNoteInSched);
                     }
         
                     if (noteblockCount >= MAX_NOTEBLOCKS) {
@@ -3894,7 +3898,7 @@ class Activity {
                 }
         
                 if (currentActionBlock.length > 0) {
-                    addNewActionBlock();  
+                    addNewActionBlock(true);  
                 }
                 
                 console.debug('finished when you see: "block loading finished "');
@@ -3915,6 +3919,7 @@ class Activity {
             }
         
             console.log("json: ", jsONON);
+            console.log("actionBlockCOunter: ",actionBlockCounter);
             console.log("blocks:  ", noteblockCount);
             this.blocks.loadNewBlocks(jsONON);
             return null;
