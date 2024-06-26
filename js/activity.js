@@ -3684,23 +3684,24 @@ class Activity {
             return closest.value.split('/').map(Number);
         }
         
-        //Transcribe the midi file into MB
         this.transcribeMidi = async function(midi) {
             let currentMidi = midi;        
             let jsONON = [] ;
             let k = 0;
             let actionBlockCounter = 0; // Counter for action blocks
             let actionBlockNames = []; // Array to store action block names
-        
+            let noteblockCount = 0; // Initialize noteblock counter
+            let MAX_NOTEBLOCKS = 100;
+            let offset = 100;
             currentMidi.tracks.forEach((track, trackIndex) => {
                 if (!track.notes.length) return;
                 let r = jsONON.length; 
         
                 // find matching instrument
                 let instrument = "electronic synth";
-                if (track.instrument.name){
-                    for (let voices of VOICENAMES){
-                        if (track.instrument.name.indexOf(voices[1]) > -1){
+                if (track.instrument.name) {
+                    for (let voices of VOICENAMES) {
+                        if (track.instrument.name.indexOf(voices[1]) > -1) {
                             instrument = voices[0];
                         }
                     }
@@ -3709,7 +3710,7 @@ class Activity {
                 let actionBlockName = `chunk${actionBlockCounter}`;
         
                 jsONON.push(
-                    [r, ["action", { collapsed: false }], 100, 100, [null, r+1, r+2, null]],
+                    [r, ["action", { collapsed: false }], 150, 100, [null, r+1, r+2, null]],
                     [r+1, ["text", { value: actionBlockName }], 0, 0, [r]],
                     [r+2, "settimbre", 0, 0, [r, r+3, r+5, r+4]],
                     [r+3, ["voicename", {"value": instrument}], 0, 0, [r+2]],
@@ -3719,7 +3720,7 @@ class Activity {
                 let time = 0;
                 let sched = [];
         
-                for (let noteIndex in track.notes){
+                for (let noteIndex in track.notes) {
                     let note = track.notes[noteIndex];
                     let name = note.name;
                     let first = sched.length == 0;
@@ -3727,7 +3728,7 @@ class Activity {
                     let end = note.duration + note.time;
                     if (note.duration == 0) continue;
         
-                    if (first){
+                    if (first) {
                         sched.push({
                             start: start,
                             end: start + note.duration,
@@ -3737,7 +3738,7 @@ class Activity {
                     }
                     if (sched[sched.length-1].start == start && sched[sched.length-1].end == end)
                         sched[sched.length-1].notes.push(name);
-                    else if (sched[sched.length-1].end > start && sched[sched.length-1].end >= end){
+                    else if (sched[sched.length-1].end > start && sched[sched.length-1].end >= end) {
                         // change prev, make 2 new
                         let prevNotes = [...sched[sched.length-1].notes];
                         let oldEnd = sched[sched.length-1].end;
@@ -3749,7 +3750,7 @@ class Activity {
                             end: end,
                             notes: newNotes
                         });
-                        if (oldEnd > end){
+                        if (oldEnd > end) {
                             sched.push({
                                 start: end,
                                 end: oldEnd,
@@ -3757,21 +3758,21 @@ class Activity {
                             });
                         }
                     }
-                    else if (sched[sched.length-1].end > start && sched[sched.length-1].end <= end){
+                    else if (sched[sched.length-1].end > start && sched[sched.length-1].end <= end) {
                         // change prev, make 2 new
                         let prevNotes = [...sched[sched.length-1].notes];
                         let oldEnd = sched[sched.length-1].end;
                         sched[sched.length-1].end = start;
                         let newNotes = [...prevNotes];
                         newNotes.push(name);
-                        if (start < oldEnd){
+                        if (start < oldEnd) {
                             sched.push({
                                 start: start,
                                 end: oldEnd,
                                 notes: newNotes
                             });
                         }
-                        if (end > oldEnd){
+                        if (end > oldEnd) {
                             sched.push({
                                 start: oldEnd,
                                 end: end,
@@ -3798,7 +3799,7 @@ class Activity {
                 let noteSum = 0;
                 let currentActionBlock = [];
         
-                let addNewActionBlock = (isLastBlock = false) => {
+                let addNewActionBlock = () => {
                     let r = jsONON.length;
                     let actionBlockName = `chunk${actionBlockCounter}`;
                     actionBlockNames.push(actionBlockName);
@@ -3810,48 +3811,46 @@ class Activity {
                         k = 1;
                     } else {
                         let settimbreIndex = r + 2;
+                        // Adjust the first note block's top connection to settimbre
+                        currentActionBlock[0][4][0] = settimbreIndex;
                         jsONON.push(
-                            [r, ["action", { collapsed: false }], 100, 100, [null, r+1, settimbreIndex, null]],
+                            [r, ["action", { collapsed: false }], 100+offset, 100+offset, [null, r+1, settimbreIndex, null]],
                             [r+1, ["text", { value: actionBlockName }], 0, 0, [r]],
                             [settimbreIndex, "settimbre", 0, 0, [r, settimbreIndex+1, settimbreIndex+3, settimbreIndex+2]],
                             [settimbreIndex+1, ["voicename", {"value": instrument}], 0, 0, [settimbreIndex]],
                             [settimbreIndex+2, "hidden", 0, 0, [settimbreIndex, null]],
                             ...currentActionBlock
                         );
-                        // Adjust the first note block's top connection to settimbre
-                        currentActionBlock[0][4][0] = settimbreIndex;
+                        
                     }
-                    if (isLastBlock) {
-                        let lastIndex = jsONON.length - 1;
-                        jsONON[lastIndex][4][1] = null; // Set the last hidden block's second value to null
-                    }
+            
                     currentActionBlock = [];
                     actionBlockCounter++; // Increment the action block counter
+                    offset+=100;
                 };
         
-                for (let i in sched){
+                for (let i in sched) {
                     let notes = sched[i].notes;
                     let start = sched[i].start;
                     let end = sched[i].end;
                     let duration = end - start;
                     noteSum += duration;
-                    let isLastNoteInBlock = (noteSum >= 16);
+                    let isLastNoteInBlock = (noteSum >= 16) || (noteblockCount > 0 && noteblockCount % 50 === 0);
                     if (isLastNoteInBlock) {
                         noteSum = 0;
                     }
                     let isLastNoteInSched = (i == sched.length - 1);
                     let last = isLastNoteInBlock || isLastNoteInSched;
-                    let first = (i == 0 || noteSum == 0);
+                    let first = (i == 0);
                     let val = jsONON.length + currentActionBlock.length;
                     let getPitch = (x, notes, prev) => {
                         let ar = [];
-                        if (notes[0] == "R"){
+                        if (notes[0] == "R") {
                             ar.push(
                                 [x, "rest2", 0, 0, [prev, null]]
                             );
-                        }
-                        else {
-                            for (let na in notes){
+                        } else {
+                            for (let na in notes) {
                                 let name = notes[na];
                                 let first = na == 0;
                                 let last = na == notes.length - 1;
@@ -3867,30 +3866,45 @@ class Activity {
                     };
                     var obj = this.getClosestStandardNoteValue(duration * 3 / 8);
                     if (k != 0) val = val + 5; //since we are going to add action block in the front later
-                    let pitches = getPitch(val + 4, notes, val);
+                    let pitches = getPitch(val + 5, notes, val);
                     currentActionBlock.push(
-                        [val, ["newnote", {"collapsed": true}], 0, 0, [first ? val-3 : val-1, val+1, val+4, val+pitches.length+4]], 
-                        [val + 1, "divide", 0, 0, [val, val+2, val+3, last ? null : val + pitches.length + 4 + 1]], 
+                        [val, ["newnote", {"collapsed": true}], 0, 0, [first ? val-3 : val-1, val+1, val+4, val+pitches.length+5]], 
+                        [val + 1, "divide", 0, 0, [val, val+2, val+3]], 
                         [val + 2, ["number", { value: obj[0] }], 0, 0, [val + 1]], 
-                        [val + 3, ["number", { value: obj[1] }], 0, 0, [val + 1]]
+                        [val + 3, ["number", { value: obj[1] }], 0, 0, [val + 1]],
+                        [val + 4, "vspace", 0, 0, [val, val + 5]],
                     );
-        
+                    noteblockCount++;
+                    pitches[0][4][0] = val + 4;
                     currentActionBlock = currentActionBlock.concat(pitches);
+        
                     let newLen = jsONON.length + currentActionBlock.length;
                     if (k != 0) newLen = newLen + 5;
                     currentActionBlock.push(
                         [newLen, "hidden", 0, 0, [val, last ? null : newLen + 1]]
                     );
+                    if (isLastNoteInBlock || isLastNoteInSched ) {
+                        addNewActionBlock();
+                    }
         
-                    if (isLastNoteInBlock || isLastNoteInSched) {
-                        addNewActionBlock(isLastNoteInSched);
+                    if (noteblockCount >= MAX_NOTEBLOCKS) {
+                        this.textMsg("MIDI file is too large.. Generating only 100 noteblocks")
+                        break;
                     }
                 }
+        
+                if (currentActionBlock.length > 0) {
+                    addNewActionBlock();  
+                }
+                
+                console.debug('finished when you see: "block loading finished "');
+                document.body.style.cursor = "wait";
+                // this.textMsg(_("MIDI loading. This may take some time depending upon the number of notes in the track"));
             });
         
             let len = jsONON.length;
             jsONON.push(
-                [len, ["start", { collapsed: false }], 100, 100, [null, len + 1, null]]
+                [len, ["start", { collapsed: false }], 300+offset, 100, [null, len + 1, null]]
             );
         
             // Add nameddo blocks based on the actionBlockNames
@@ -3901,12 +3915,12 @@ class Activity {
             }
         
             console.log("json: ", jsONON);
+            console.log("blocks:  ", noteblockCount);
             this.blocks.loadNewBlocks(jsONON);
             return null;
         };
         
-        
-        
+         
         /**
          * Loads MB project from Planet.
          * @param  projectID {Planet project ID}
