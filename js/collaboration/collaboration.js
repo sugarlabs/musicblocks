@@ -2,6 +2,9 @@
 import Y, { Doc } from "yjs";
 import SocketIOProvider from "y-socket.io";
 
+// const Y = require("yjs");
+// const SocketIOProvider = require("y-socket.io");
+
 console.log(Y);
 console.log(SocketIOProvider);
 
