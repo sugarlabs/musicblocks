@@ -150,8 +150,7 @@ let MYDEFINES = [
     "activity/blocks/EnsembleBlocks",
     "widgets/widgetWindows",
     "widgets/statistics",
-    "widgets/jseditor",
-    "collaboration/collaboration"
+    "widgets/jseditor"
 ];
 
 if (_THIS_IS_MUSIC_BLOCKS_) {
