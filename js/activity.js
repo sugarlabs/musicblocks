@@ -3399,14 +3399,14 @@ class Activity {
                 this.blocksContainer.y += dy;
                 this.changeTopButtonsPosition(dy);
 
-                this.cartesianBitmap.y = dy/2;
-                this.polarBitmap.y = dy/2;
-                this.trebleBitmap.y = dy/2;
-                this.grandBitmap.y = dy/2;
-                this.sopranoBitmap.y = dy/2;
-                this.altoBitmap.y = dy/2;
-                this.tenorBitmap.y = dy/2;
-                this.bassBitmap.y = dy/2;
+                this.cartesianBitmap.y += dy;
+                this.polarBitmap.y += dy;
+                this.trebleBitmap.y += dy;
+                this.grandBitmap.y += dy;
+                this.sopranoBitmap.y += dy;
+                this.altoBitmap.y += dy;
+                this.tenorBitmap.y += dy;
+                this.bassBitmap.y += dy;
                 this.blocks.checkBounds();
             
             } else{
@@ -3418,14 +3418,14 @@ class Activity {
                 this.blocksContainer.y -= dy
                 this.changeTopButtonsPosition(-dy);
                 
-                this.cartesianBitmap.y = -dy/2;
-                this.polarBitmap.y = -dy/2;
-                this.trebleBitmap.y = -dy/2;
-                this.grandBitmap.y = -dy/2;
-                this.sopranoBitmap.y = -dy/2;
-                this.altoBitmap.y = -dy/2;
-                this.tenorBitmap.y = -dy/2;
-                this.bassBitmap.y = -dy/2;
+                this.cartesianBitmap.y -= dy;
+                this.polarBitmap.y -= dy;
+                this.trebleBitmap.y -= dy;
+                this.grandBitmap.y -= dy;
+                this.sopranoBitmap.y -= dy;
+                this.altoBitmap.y -= dy;
+                this.tenorBitmap.y -= dy;
+                this.bassBitmap.y -= dy;
             }
 
             this.refreshCanvas();
