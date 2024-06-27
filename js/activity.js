@@ -3391,9 +3391,8 @@ class Activity {
             };
             
               if (!resize && this.toolbarHeight === 0) {
-                dy = cellsize + LEADING+5;
+                dy = cellsize + LEADING + 5;
                 
-                console.log(dy);
                 this.toolbarHeight = dy;
                 this.palettes.deltaY(dy);
                 this.turtles.deltaY(dy);
@@ -3409,16 +3408,16 @@ class Activity {
                 this.tenorBitmap.y = dy/2;
                 this.bassBitmap.y = dy/2;
                 this.blocks.checkBounds();
+            
             } else{
                 dy = this.toolbarHeight ;
                 this.toolbarHeight = 0; 
+                
                 this.turtles.deltaY(-dy);
-                
                 this.palettes.deltaY(-dy);
-                
-                
-                this.blocksContainer.y -= dy;
+                this.blocksContainer.y -= dy
                 this.changeTopButtonsPosition(-dy);
+                
                 this.cartesianBitmap.y = -dy/2;
                 this.polarBitmap.y = -dy/2;
                 this.trebleBitmap.y = -dy/2;
@@ -3427,8 +3426,6 @@ class Activity {
                 this.altoBitmap.y = -dy/2;
                 this.tenorBitmap.y = -dy/2;
                 this.bassBitmap.y = -dy/2;
-              
-                
             }
 
             this.refreshCanvas();
