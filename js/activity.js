@@ -3687,13 +3687,16 @@ class Activity {
         this.transcribeMidi = async function(midi) {
             let currentMidi = midi;        
             let jsONON = [] ;
-            let k = 0;
             let actionBlockCounter = 0; // Counter for action blocks
             let actionBlockNames = []; // Array to store action block names
             let noteblockCount = 0; // Initialize noteblock counter
             let MAX_NOTEBLOCKS = 100;
             let offset = 100;
+            let stopProcessing = false;
+            let trackCount=0;
             currentMidi.tracks.forEach((track, trackIndex) => {
+                let k = 0;
+                if (stopProcessing) return; // Exit if flag is set
                 if (!track.notes.length) return;
                 let r = jsONON.length; 
         
@@ -3707,7 +3710,7 @@ class Activity {
                     }
                 }
         
-                let actionBlockName = `chunk${actionBlockCounter}`;
+                let actionBlockName = `track${trackCount}chunk${actionBlockCounter}`;
         
                 jsONON.push(
                     [r, ["action", { collapsed: false }], 150, 100, [null, r+1, r+2, null]],
@@ -3721,6 +3724,7 @@ class Activity {
                 let sched = [];
         
                 for (let noteIndex in track.notes) {
+                    if (stopProcessing) break; // Exit inner loop if flag is set
                     let note = track.notes[noteIndex];
                     let name = note.name;
                     let first = sched.length == 0;
@@ -3801,7 +3805,7 @@ class Activity {
         
                 let addNewActionBlock = (isLastBlock=false) => {
                     let r = jsONON.length;
-                    let actionBlockName = `chunk${actionBlockCounter}`;
+                    let actionBlockName = `track${trackCount}chunk${actionBlockCounter}`;
                     actionBlockNames.push(actionBlockName);
         
                     if (k == 0) {
@@ -3834,6 +3838,7 @@ class Activity {
                 };
         
                 for (let i in sched) {
+                    if (stopProcessing) break; // Exit inner loop if flag is set
                     let notes = sched[i].notes;
                     let start = sched[i].start;
                     let end = sched[i].end;
@@ -3892,7 +3897,8 @@ class Activity {
                     }
         
                     if (noteblockCount >= MAX_NOTEBLOCKS) {
-                        this.textMsg("MIDI file is too large.. Generating only 100 noteblocks")
+                        this.textMsg("MIDI file is too large.. Generating only 100 noteblocks");
+                        stopProcessing = true;
                         break;
                     }
                 }
@@ -3900,7 +3906,11 @@ class Activity {
                 if (currentActionBlock.length > 0) {
                     addNewActionBlock(true);  
                 }
-                
+
+                trackCount++;
+                console.log("current action block: ", currentActionBlock);
+                console.log("current json: ", jsONON);
+                console.log("noteblockCount: ", noteblockCount);
                 console.debug('finished when you see: "block loading finished "');
                 document.body.style.cursor = "wait";
                 // this.textMsg(_("MIDI loading. This may take some time depending upon the number of notes in the track"));
@@ -3918,12 +3928,13 @@ class Activity {
                 );
             }
         
-            console.log("json: ", jsONON);
+            console.log("final json: ", jsONON);
             console.log("actionBlockCOunter: ",actionBlockCounter);
             console.log("blocks:  ", noteblockCount);
             this.blocks.loadNewBlocks(jsONON);
             return null;
         };
+        
         
          
         /**
