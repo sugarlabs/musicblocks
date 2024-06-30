@@ -5920,7 +5920,7 @@ class Activity {
 
                 const files = event.dataTransfer.files;
                 const reader = new FileReader();
-
+                const abcReader = new FileReader();
                 // eslint-disable-next-line no-unused-vars
                 reader.onload = (theFile) => {
                     that.loading = true;
@@ -6012,6 +6012,14 @@ class Activity {
                 // Work-around in case the handler is called by the
                 // widget drag & drop code.
                 if (files[0] !== undefined) {
+                    let extension = files[0].name.split('.').pop().toLowerCase();  //file extension from input file
+                    let isABC = (extension == "abc");
+                    if (isABC) {
+                        abcReader.readAsText(files[0]);
+                        console.log('abc')
+                        return;
+                    }
+                    reader.readAsText(files[0]);
                     reader.readAsText(files[0]);
                     window.scroll(0, 0);
                 }
