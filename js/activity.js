@@ -5085,8 +5085,8 @@ class Activity {
             document.addEventListener(
                 "mousedown",
                 (event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
+                    // event.preventDefault();
+                    // event.stopPropagation();
                     if (event.target.id === "myCanvas") {
                         this._createDrag(event);
                     }
