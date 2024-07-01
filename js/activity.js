@@ -3390,25 +3390,42 @@ class Activity {
                 });
             };
             
-            if (!resize && this.toolbarHeight === 0) {
+              if (!resize && this.toolbarHeight === 0) {
                 dy = cellsize + LEADING + 5;
+                
                 this.toolbarHeight = dy;
-
                 this.palettes.deltaY(dy);
                 this.turtles.deltaY(dy);
-
                 this.blocksContainer.y += dy;
                 this.changeTopButtonsPosition(dy);
+
+                this.cartesianBitmap.y += dy;
+                this.polarBitmap.y += dy;
+                this.trebleBitmap.y += dy;
+                this.grandBitmap.y += dy;
+                this.sopranoBitmap.y += dy;
+                this.altoBitmap.y += dy;
+                this.tenorBitmap.y += dy;
+                this.bassBitmap.y += dy;
                 this.blocks.checkBounds();
-            } else {
-                dy = this.toolbarHeight;
-                this.toolbarHeight = 0;
-
-                this.palettes.deltaY(-dy);
+            
+            } else{
+                dy = this.toolbarHeight ;
+                this.toolbarHeight = 0; 
+                
                 this.turtles.deltaY(-dy);
-
-                this.blocksContainer.y -= dy;
+                this.palettes.deltaY(-dy);
+                this.blocksContainer.y -= dy
                 this.changeTopButtonsPosition(-dy);
+                
+                this.cartesianBitmap.y -= dy;
+                this.polarBitmap.y -= dy;
+                this.trebleBitmap.y -= dy;
+                this.grandBitmap.y -= dy;
+                this.sopranoBitmap.y -= dy;
+                this.altoBitmap.y -= dy;
+                this.tenorBitmap.y -= dy;
+                this.bassBitmap.y -= dy;
             }
 
             this.refreshCanvas();
