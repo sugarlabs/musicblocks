@@ -802,7 +802,7 @@ Turtles.TurtlesView = class {
                     container.style.transition = '0.15s ease-out';
                     container.style.transform = 'scale(1)';
                 }
-            };              
+            };
             const img = new Image();
             img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(svg));
 
