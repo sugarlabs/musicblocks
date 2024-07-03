@@ -4923,6 +4923,8 @@ class Activity {
             container.onmouseover = (event) => {
                 if (!that.loading) {
                     document.body.style.cursor = "pointer";
+                    container.style.transition = '0.12s ease-out';
+                    container.style.transform = 'scale(1.15)';
                 }
             };
 
@@ -4930,6 +4932,8 @@ class Activity {
             container.onmouseout = (event) => {
                 if (!that.loading) {
                     document.body.style.cursor = "default";
+                    container.style.transition = '0.15s ease-out';
+                    container.style.transform = 'scale(1)';
                 }
             };
 
@@ -5085,8 +5089,8 @@ class Activity {
             document.addEventListener(
                 "mousedown",
                 (event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
+                    // event.preventDefault();
+                    // event.stopPropagation();
                     if (event.target.id === "myCanvas") {
                         this._createDrag(event);
                     }
