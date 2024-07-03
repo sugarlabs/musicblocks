@@ -3693,7 +3693,10 @@ class Activity {
             let MAX_NOTEBLOCKS = 100;
             let offset = 100;
             let stopProcessing = false;
-            let trackCount=0;
+            let trackCount = 0;
+            let actionBlockPerTrack = [];
+            let instruments = [];
+            
             currentMidi.tracks.forEach((track, trackIndex) => {
                 let k = 0;
                 if (stopProcessing) return; // Exit if flag is set
@@ -3709,16 +3712,16 @@ class Activity {
                         }
                     }
                 }
+                actionBlockPerTrack[trackCount] = 0;
+                instruments[trackCount] = instrument;
         
                 let actionBlockName = `track${trackCount}chunk${actionBlockCounter}`;
         
                 jsONON.push(
                     [r, ["action", { collapsed: false }], 150, 100, [null, r+1, r+2, null]],
-                    [r+1, ["text", { value: actionBlockName }], 0, 0, [r]],
-                    [r+2, "settimbre", 0, 0, [r, r+3, r+5, r+4]],
-                    [r+3, ["voicename", {"value": instrument}], 0, 0, [r+2]],
-                    [r+4, "hidden", 0, 0, [r+2, null]]
+                    [r+1, ["text", { value: actionBlockName }], 0, 0, [r]]
                 );
+                actionBlockPerTrack[trackCount]++;
         
                 let time = 0;
                 let sched = [];
@@ -3807,22 +3810,19 @@ class Activity {
                     let r = jsONON.length;
                     let actionBlockName = `track${trackCount}chunk${actionBlockCounter}`;
                     actionBlockNames.push(actionBlockName);
-        
+                    actionBlockPerTrack[trackCount]++;
                     if (k == 0) {
                         jsONON.push(
                             ...currentActionBlock
                         );
                         k = 1;
                     } else {
-                        let settimbreIndex = r + 2;
+                        let settimbreIndex = r;
                         // Adjust the first note block's top connection to settimbre
                         currentActionBlock[0][4][0] = settimbreIndex;
                         jsONON.push(
-                            [r, ["action", { collapsed: false }], 100+offset, 100+offset, [null, r+1, settimbreIndex, null]],
+                            [r, ["action", { collapsed: false }], 100+offset, 100+offset, [null, r+1, settimbreIndex+2, null]],
                             [r+1, ["text", { value: actionBlockName }], 0, 0, [r]],
-                            [settimbreIndex, "settimbre", 0, 0, [r, settimbreIndex+1, settimbreIndex+3, settimbreIndex+2]],
-                            [settimbreIndex+1, ["voicename", {"value": instrument}], 0, 0, [settimbreIndex]],
-                            [settimbreIndex+2, "hidden", 0, 0, [settimbreIndex, null]],
                             ...currentActionBlock
                         );
                         
@@ -3832,6 +3832,7 @@ class Activity {
                         jsONON[lastIndex][4][1] = null; // Set the last hidden block's second value to null
                     }
             
+                    console.log("current action block: ", currentActionBlock);
                     currentActionBlock = [];
                     actionBlockCounter++; // Increment the action block counter
                     offset+=100;
@@ -3874,10 +3875,10 @@ class Activity {
                         return ar;
                     };
                     var obj = this.getClosestStandardNoteValue(duration * 3 / 8);
-                    if (k != 0) val = val + 5; //since we are going to add action block in the front later
+                    if (k != 0) val = val + 2; //since we are going to add action block in the front later
                     let pitches = getPitch(val + 5, notes, val);
                     currentActionBlock.push(
-                        [val, ["newnote", {"collapsed": true}], 0, 0, [first ? val-3 : val-1, val+1, val+4, val+pitches.length+5]], 
+                        [val, ["newnote", {"collapsed": true}], 0, 0, [first ? val-2 : val-1, val+1, val+4, val+pitches.length+5]], 
                         [val + 1, "divide", 0, 0, [val, val+2, val+3]], 
                         [val + 2, ["number", { value: obj[0] }], 0, 0, [val + 1]], 
                         [val + 3, ["number", { value: obj[1] }], 0, 0, [val + 1]],
@@ -3888,7 +3889,7 @@ class Activity {
                     currentActionBlock = currentActionBlock.concat(pitches);
         
                     let newLen = jsONON.length + currentActionBlock.length;
-                    if (k != 0) newLen = newLen + 5;
+                    if (k != 0) newLen = newLen + 2;
                     currentActionBlock.push(
                         [newLen, "hidden", 0, 0, [val, last ? null : newLen + 1]]
                     );
@@ -3906,35 +3907,46 @@ class Activity {
                 if (currentActionBlock.length > 0) {
                     addNewActionBlock(true);  
                 }
-
+        
                 trackCount++;
                 console.log("current action block: ", currentActionBlock);
                 console.log("current json: ", jsONON);
                 console.log("noteblockCount: ", noteblockCount);
                 console.debug('finished when you see: "block loading finished "');
                 document.body.style.cursor = "wait";
-                // this.textMsg(_("MIDI loading. This may take some time depending upon the number of notes in the track"));
             });
         
             let len = jsONON.length;
-            jsONON.push(
-                [len, ["start", { collapsed: false }], 300+offset, 100, [null, len + 1, null]]
-            );
-        
+            let m = 0;
+            let actionIndex = 0;
             // Add nameddo blocks based on the actionBlockNames
-            for (let i = 0; i < actionBlockCounter; i++) {
+            for (let i = 0; i < trackCount; i++) {
+                let flag=true;
                 jsONON.push(
-                    [len + 1 + i, ["nameddo", { value: actionBlockNames[i] }], 0, 0, [len + i, (i < actionBlockCounter - 1) ? len + 2 + i : null]]
+                    [len + m, ["start", { collapsed: false }], 300 + offset, 100, [null, len + m + 1, null]],
+                    [len + m + 1, "settimbre", 0, 0, [len + m, len + m + 2, len + m + 4, len + m + 3]],
+                    [len + m + 2, ["voicename", { value: instruments[i] }], 0, 0, [len + m + 1]],
+                    [len + m + 3, "hidden", 0, 0, [len + m + 1, null]]
                 );
+                m += 4;
+        
+                for (let j = 0; j < actionBlockPerTrack[i]-1; j++) {
+                    jsONON.push(
+                        [len + m, ["nameddo", { value: actionBlockNames[actionIndex] }], 0, 0, [flag?len+m-3:len + m - 1, len + m + 1]]
+                    );
+                    m++;
+                    flag=false;
+                    actionIndex++;
+                }
+                jsONON[len + m - 1][4][1] = null;
             }
         
             console.log("final json: ", jsONON);
-            console.log("actionBlockCOunter: ",actionBlockCounter);
+            console.log("actionBlockCounter: ", actionBlockCounter);
             console.log("blocks:  ", noteblockCount);
             this.blocks.loadNewBlocks(jsONON);
             return null;
         };
-        
         
          
         /**
