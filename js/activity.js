@@ -4761,6 +4761,9 @@ class Activity {
         
             if (!this.helpfulWheelItems.find(ele => ele.label === "Paste previous stack")) 
                 this.helpfulWheelItems.push({label: "Paste previous stack", icon: "imgsrc:header-icons/copy-button.svg", display: false, fn: this.turtles.expand});
+            if(!this.helpfulWheelItems.find(ele => ele.label=== "Close"))
+                this.helpfulWheelItems.push({label: "Close", icon: "imgsrc:header-icons/cancel-button.svg",
+                display: true, fn: this._hideHelpfulSearchWidget});
         
         };
 
