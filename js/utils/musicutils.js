@@ -483,23 +483,25 @@ const NOTENAMES1 = [
  * @constant {Object.<string, string>}
  */
 const SOLFEGECONVERSIONTABLE = {
+    "C♭": "do" + FLAT,
     "C": "do",
     "C♯": "do" + SHARP,
+    "D♭": "re" + FLAT,
     "D": "re",
     "D♯": "re" + SHARP,
+    "E♭": "mi" + FLAT,
     "E": "mi",
     "F": "fa",
     "F♯": "fa" + SHARP,
+    "G♭": "sol" + FLAT,
     "G": "sol",
     "G♯": "sol" + SHARP,
+    "A♭": "la" + FLAT,
     "A": "la",
     "A♯": "la" + SHARP,
-    "B": "ti",
-    "D♭": "re" + FLAT,
-    "E♭": "mi" + FLAT,
-    "G♭": "sol" + FLAT,
-    "A♭": "la" + FLAT,
     "B♭": "ti" + FLAT,
+    "B": "ti",
+    "B♯": "ti" + SHARP,
     "R": _("rest")
 };
 
@@ -2686,7 +2688,6 @@ const getScaleAndHalfSteps = (keySignature) => {
     if (myKeySignature in EXTRATRANSPOSITIONS) {
         myKeySignature = EXTRATRANSPOSITIONS[myKeySignature][0];
     }
-
     return [thisScale, solfege, myKeySignature, obj[1]];
 };
 
@@ -3162,8 +3163,14 @@ const pitchToNumber = (pitch, octave, keySignature) => {
             pitchNumber = obj[1].indexOf(pitch.toLowerCase());
         } else {
             // eslint-disable-next-line no-console
-            console.debug("pitch " + pitch + " not found.");
-            pitchNumber = 0;
+            console.debug("pitch " + pitch + " not found in mode.");
+            // Try an equivalent pitch.
+            if (pitch.toLowerCase() in FIXEDSOLFEGE1) {
+                const thisPitch = FIXEDSOLFEGE1[pitch.toLowerCase()];
+                pitchNumber = obj[0].indexOf(thisPitch);
+            } else {
+                pitchNumber = 0;
+            }
         }
     }
     // We start at A0.
@@ -4316,7 +4323,6 @@ const buildScale = (keySignature) => {
             }
         }
     }
- 
     return [scale, halfSteps];
 };
 
