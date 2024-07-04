@@ -807,7 +807,7 @@ class Singer {
                 // Apply transpositions
                 const transposition = 2 * delta + tur.singer.transposition;
                 const alen = tur.singer.arpeggio.length;
-                let atrans = transposition;
+                let atrans = transposition + cents;
                 if (alen > 0 && i < alen) {
                     atrans += tur.singer.arpeggio[i];
                 }
@@ -846,11 +846,10 @@ class Singer {
                 // Apply transpositions
                 const transposition = 2 * delta + tur.singer.transposition;
                 const alen = tur.singer.arpeggio.length;
-                let atrans = transposition;
+                let atrans = transposition + cents;
                 if (alen > 0 && i < alen) {
                     atrans += tur.singer.arpeggio[i];
                 }
-
                 const noteObj = getNote(
                     note,
                     octave,
@@ -936,13 +935,20 @@ class Singer {
                     anote,
                     octave,
                     // FIXME: should not be hardwired to 12
-                    atrans + tur.singer.register * 12,  // transposition + tur.singer.register * 12,
+                    atrans + tur.singer.register * 12,
                     tur.singer.keySignature,
                     tur.singer.movable,
                     direction,
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
                 );
+
+                // Cents may have been added through a transposition.
+                if (noteObj[2] !== 0 && cents === 0) {
+                    cents = noteObj[2] * 100;
+                    console.log("applying cents:", cents);
+
+                }
 
                 // Apply ratio transposition:
                 // (1) convert note to Hertz
@@ -956,7 +962,7 @@ class Singer {
                     const hertz = pitchToFrequency(
                         noteObj[0],
                         noteObj[1],
-                        0,
+                        noteObj[2],
                         tur.singer.keySignature
                     ) * ratio;
                     noteObj = frequencyToPitch(hertz);
