@@ -414,6 +414,12 @@ to shift a pitch by cents.
 In the example above, G4 + 50 cents is 403Hz. (Recall that G4 is
 392Hz and G#4 is 415Hz).
 
+![cents by ratio](./50cents_by_ratio.svg "adding 50 cents to a pitch
+ using the ratio block")
+
+You can also use the ratio block for cents, although the math is a bit
+more complicated.
+
 ![register](./transform18.svg "The Register block")
 
 The *Register* block provides an easy way to modify the register
