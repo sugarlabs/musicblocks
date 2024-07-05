@@ -406,7 +406,13 @@ raise it by one octave.
 
 ![cents](./50cent_block.svg "adding 50 cents to a pitch using the semitone-transposition")
 
-A cent is a unit of measure for the ratio between two frequencies. A semitone is defined as 100 cents. The frequency between two adjacent pitches would be 50 cents. You can use the *semitone transpose* block to shift a pitch by cents.
+A cent is a unit of measure for the ratio between two frequencies. A
+semitone is defined as 100 cents. The frequency between two adjacent
+pitches would be 50 cents. You can use the *Semitone transpose* block
+to shift a pitch by cents.
+
+In the example above, G4 + 50 cents is 403Hz. (Recall that G4 is
+392Hz and G#4 is 415Hz).
 
 ![register](./transform18.svg "The Register block")
 
