@@ -943,13 +943,6 @@ class Singer {
                     activity.logo.synth.inTemperament
                 );
 
-                // Cents may have been added through a transposition.
-                if (noteObj[2] !== 0 && cents === 0) {
-                    cents = noteObj[2] * 100;
-                    console.log("applying cents:", cents);
-
-                }
-
                 // Apply ratio transposition:
                 // (1) convert note to Hertz
                 // (2) apply ratio
@@ -958,14 +951,22 @@ class Singer {
                 for (let i = 0; i < tur.singer.transpositionRatios.length; i++) {
                     ratio *= tur.singer.transpositionRatios[i];
                 }
+
                 if (ratio != 1) {
                     const hertz = pitchToFrequency(
                         noteObj[0],
                         noteObj[1],
                         noteObj[2],
                         tur.singer.keySignature
-                    ) * ratio;
-                    noteObj = frequencyToPitch(hertz);
+                    );
+                    noteObj = frequencyToPitch(hertz * ratio);
+                }
+
+                // Cents may have been added through a transposition.
+                if (noteObj[2] !== 0 && cents === 0) {
+                    cents = noteObj[2];
+                    // eslint-disable-next-line no-console
+                    console.log("applying cents:", cents);
                 }
 
                 if (tur.singer.drumStyle.length > 0) {

@@ -2480,10 +2480,11 @@ const frequencyToPitch = (hz) => {
         const f = A0 * Math.pow(TWELVEHUNDRETHROOT2, i);
         if (hz < f * 1.0003 && hz > f * 0.9997) {
             cents = i % 100;
+            let j = Math.floor((i / 100));
             if (cents > 50) {
                 cents -= 100;
+                j += 1;
             }
-            const j = Math.floor((i / 100) + 0.5);
             return [
                 PITCHES[(j + PITCHES.indexOf("A")) % 12],
                 Math.floor((j + PITCHES.indexOf("A")) / 12),
@@ -3571,11 +3572,11 @@ function getNote(
         transpositionFloor = Math.floor(transposition);
         transpositionCents = transposition - transpositionFloor;
         transpositionFloor = -transpositionFloor;
-        transpositionCents = -transpositionCents;
+        transpositionCents = -transpositionCents * 100;
         transposition = -transposition;
     } else {
         transpositionFloor = Math.floor(transposition);
-        transpositionCents = transposition - transpositionFloor;
+        transpositionCents = (transposition - transpositionFloor) * 100;
     }
 
     if (typeof noteArg !== "number") {
