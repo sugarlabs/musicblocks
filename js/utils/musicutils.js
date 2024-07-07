@@ -5195,7 +5195,7 @@ const pitchToFrequency = (pitch, octave, cents, keySignature) => {
  */
 const noteToFrequency = (note, keySignature) => {
     const obj = noteToPitchOctave(note);
-    return pitchToFrequency(obj[0], obj[1], obj[2], keySignature);
+    return pitchToFrequency(obj[0], obj[1], 0, keySignature);
 };
 
 /**
