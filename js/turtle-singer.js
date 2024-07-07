@@ -383,15 +383,18 @@ class Singer {
      * @param {Number} octave
      * @returns {Number} inverted value
      */
-    static calculateInvert(logo, turtle, note, octave) {
+    static calculateInvert(logo, turtle, note, octave, cents) {
         const activity = logo.activity;
         const tur = activity.turtles.ithTurtle(turtle);
 
+        if (cents === undefined) {
+            cents = 0;
+        }
         let delta = 0;
         const note1 = getNote(
             note,
             octave,
-            0,
+            cents,
             tur.singer.keySignature,
             tur.singer.movable,
             null,
@@ -405,7 +408,7 @@ class Singer {
             const note2 = getNote(
                 tur.singer.invertList[i][0],
                 tur.singer.invertList[i][1],
-                0,
+                -cents,  // this needs to be tested.
                 tur.singer.keySignature,
                 tur.singer.movable,
                 null,
@@ -951,7 +954,6 @@ class Singer {
                 for (let i = 0; i < tur.singer.transpositionRatios.length; i++) {
                     ratio *= tur.singer.transpositionRatios[i];
                 }
-
                 if (ratio != 1) {
                     const hertz = pitchToFrequency(
                         noteObj[0],
@@ -966,7 +968,6 @@ class Singer {
                 if (noteObj[2] !== 0 && cents === 0) {
                     cents = noteObj[2];
                     // eslint-disable-next-line no-console
-                    console.log("applying cents:", cents);
                 }
 
                 if (tur.singer.drumStyle.length > 0) {

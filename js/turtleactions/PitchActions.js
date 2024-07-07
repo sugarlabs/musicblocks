@@ -106,20 +106,29 @@ function setupPitchActions(activity) {
                 tur.singer.lastNotePlayed = ["G4", 4];
             }
 
-            const lastNotePlayed = tur.singer.lastNotePlayed;
+            let lastNotePlayed = tur.singer.lastNotePlayed;
+            let pitchName;
+            let octave;
+            let cents = 0;
 
             // At this point, lastNotePlayed is a tuple of the
             // pitchname-octave and the notevalue, e.g., ["C3", 8]
             // We only care about the pitchname and octave.
-            let pitchName = lastNotePlayed[0].slice(0, lastNotePlayed[0].length - 1);
-            let octave = parseInt(
-                lastNotePlayed[0].slice(lastNotePlayed[0].length - 1, lastNotePlayed[0].length)
-            );
-
+            if (typeof(lastNotePlayed[0]) === "number") {
+                // Convert freq tp o pitch.
+                lastNotePlayed = frequencyToPitch(lastNotePlayed[0]);
+                pitchName = lastNotePlayed[0];
+                octave = lastNotePlayed[1];
+                cents = lastNotePlayed[2];
+            } else {
+                pitchName = lastNotePlayed[0].slice(0, lastNotePlayed[0].length - 1);
+                octave = parseInt(
+                    lastNotePlayed[0].slice(lastNotePlayed[0].length - 1, lastNotePlayed[0].length));
+            }
             if (tur.singer.inverted) {
                 // If the last note is inverted then inverting it
                 // again to get the original note
-                const delta_temp = Singer.calculateInvert(activity.logo, turtle, pitchName, octave);
+                const delta_temp = Singer.calculateInvert(activity.logo, turtle, pitchName, octave, cents);
                 const transposition_temp = 2 * delta_temp;
                 const invertedNote = getNote(
                     pitchName,
@@ -143,7 +152,7 @@ function setupPitchActions(activity) {
                 value
             );
 
-            Singer.processPitch(activity, noteObj[0], noteObj[1], 0, turtle, blk);
+            Singer.processPitch(activity, noteObj[0], noteObj[1], cents, turtle, blk);
             return;            
         }
 
@@ -416,7 +425,6 @@ function setupPitchActions(activity) {
          */
         static setRatioTranspose(value, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
-
             tur.singer.transpositionRatios.push(value);
 
             const listenerName = "_transposition_ratio_" + turtle;
