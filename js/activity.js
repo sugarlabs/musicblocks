@@ -3696,7 +3696,12 @@ class Activity {
             let trackCount = 0;
             let actionBlockPerTrack = [];
             let instruments = [];
-            
+            let currentMidiTempoBpm=null;
+            currentMidiTempoBpm=currentMidi.header.tempos[0].bpm;
+            let currentMidiTimeSignature=currentMidi.header.timeSignatures[0].timeSignature;            
+            console.log("tempoBpm is: ", currentMidiTempoBpm);
+            console.log("tempo is : ",currentMidi.header.tempos);
+            console.log("time signatures are: ", currentMidi.header.timeSignatures);
             currentMidi.tracks.forEach((track, trackIndex) => {
                 let k = 0;
                 if (stopProcessing) return; // Exit if flag is set
@@ -3721,7 +3726,7 @@ class Activity {
                     [r, ["action", { collapsed: false }], 150, 100, [null, r+1, r+2, null]],
                     [r+1, ["text", { value: actionBlockName }], 0, 0, [r]]
                 );
-                actionBlockPerTrack[trackCount]++;
+                // actionBlockPerTrack[trackCount]++;
         
                 let time = 0;
                 let sched = [];
@@ -3921,16 +3926,23 @@ class Activity {
             let actionIndex = 0;
             // Add nameddo blocks based on the actionBlockNames
             for (let i = 0; i < trackCount; i++) {
+                 let vspaceIndex=len+m+6;
                 let flag=true;
                 jsONON.push(
                     [len + m, ["start", { collapsed: false }], 300 + offset, 100, [null, len + m + 1, null]],
-                    [len + m + 1, "settimbre", 0, 0, [len + m, len + m + 2, len + m + 4, len + m + 3]],
-                    [len + m + 2, ["voicename", { value: instruments[i] }], 0, 0, [len + m + 1]],
-                    [len + m + 3, "hidden", 0, 0, [len + m + 1, null]]
+                    [len + m +1,"meter",0,0,[len + m,len + m +2,len + m +3,len + m + 6]],
+                    [len + m + 2, ["number",{value: currentMidiTimeSignature[0]}],0,0,[len+m+1]],
+                    [len + m + 3,"divide",0,0,[len + m +1,len + m + 4,len + m + 5]],
+                    [len + m + 4,["number", {value : 1}],0,0,[len+m+3]],
+                    [len + m + 5,["number", {value : currentMidiTimeSignature[1]}],0,0,[len+m+3]],
+                    [len + m + 6,"vspace",0,0,[len + m + 1, len + m + 10 + actionBlockPerTrack[i]]],
+                    [len + m + 7, "settimbre", 0, 0, [len + m +15 +actionBlockPerTrack[i], len + m + 8, len + m + 10, len + m + 9]],
+                    [len + m + 8, ["voicename", { value: instruments[i] }], 0, 0, [len + m + 7]],
+                    [len + m + 9, "hidden", 0, 0, [len + m + 7, null]]
                 );
-                m += 4;
+                m += 10;
         
-                for (let j = 0; j < actionBlockPerTrack[i]-1; j++) {
+                for (let j = 0; j < actionBlockPerTrack[i]; j++) {
                     jsONON.push(
                         [len + m, ["nameddo", { value: actionBlockNames[actionIndex] }], 0, 0, [flag?len+m-3:len + m - 1, len + m + 1]]
                     );
@@ -3939,12 +3951,30 @@ class Activity {
                     actionIndex++;
                 }
                 jsONON[len + m - 1][4][1] = null;
+                let setBpmIndex=jsONON.length;
+                jsONON.push(
+                    [setBpmIndex, ["setbpm3", { value: 120 }], 0, 0, [vspaceIndex, setBpmIndex + 1, setBpmIndex + 2, setBpmIndex + 5]],
+                    [setBpmIndex + 1, ["number", { value: currentMidiTempoBpm?currentMidiTempoBpm:90}], 0, 0, [setBpmIndex]],
+                    [setBpmIndex + 2, "divide", 0, 0, [setBpmIndex, setBpmIndex + 3, setBpmIndex + 4]],
+                    [setBpmIndex + 3, ["number", { value: 1 }], 0, 0, [setBpmIndex + 2]],
+                    [setBpmIndex + 4, ["number", { value: currentMidiTimeSignature[1] }], 0, 0, [setBpmIndex + 2]],
+                    [setBpmIndex + 5, "vspace", 0, 0, [setBpmIndex, vspaceIndex + 1]],
+                    // [setBpmIndex + 6, "multiplybeatfactor", 0, 0, [setBpmIndex + 5, setBpmIndex + 7,setBpmIndex +10, setBpmIndex + 11]],
+                    // [setBpmIndex + 7, "divide", 0, 0, [setBpmIndex + 6, setBpmIndex + 8, setBpmIndex + 9]],
+                    // [setBpmIndex + 8, ["number", { value: 1 }], 0, 0, [setBpmIndex + 7]],
+                    // [setBpmIndex + 9, ["number", { value: 2 }], 0, 0, [setBpmIndex + 7]],
+                    // [setBpmIndex + 10, "vspace", 0, 0, [setBpmIndex + 6, startIndex+1]],
+                    // [setBpmIndex + 11, "hidden", 0, 0, [setBpmIndex + 6, null]]
+                )
+                m+=6;
+
             }
-        
+            
             console.log("final json: ", jsONON);
             console.log("actionBlockCounter: ", actionBlockCounter);
             console.log("blocks:  ", noteblockCount);
             this.blocks.loadNewBlocks(jsONON);
+            // this.textMsg("MIDI import is not currently precise. Consider changing the speed with the Beats Per Minute block or modifying note value with the Multiply Note Value block");
             return null;
         };
         
