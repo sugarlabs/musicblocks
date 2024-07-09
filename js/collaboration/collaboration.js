@@ -14,7 +14,19 @@
 
 /* eslint-disable no-undef */
 
+const RETRIES = 5;
+const DELAY_DURATION = 2000;
+let attempts = 0;
+
+function stopConnection(socket) {
+    if(attempts >= RETRIES){
+        console.log("Maximum calls to make connection exceeded. Stopped making calls");
+        socket.disconnect();
+    }
+}
+
 function makeConnection(){
+
     // connect to the local server
     const socket = io("http://localhost:8080/");
     socket.on("connect", () => {
@@ -23,6 +35,12 @@ function makeConnection(){
         } catch(error){
             console.log("Connection failed", error);
         }
+    });
+
+    socket.on("connect_error", (error) => {
+        attempts++;
+        console.log("Failed to connect to the socket server. Retrying in few seconds...");
+        setTimeout(stopConnection(socket), DELAY_DURATION);
     });
 }
 
