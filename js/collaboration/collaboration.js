@@ -13,20 +13,25 @@
 // Collaboration
 
 /* eslint-disable no-undef */
-import Y, { Doc } from "yjs";
-import SocketIOProvider from "y-socket.io";
 
-// const Y = require("yjs");
-// const SocketIOProvider = require("y-socket.io");
+function makeConnection(){
+    // connect to the local server
+    const socket = io("http://localhost:8080/");
+    socket.on("connect", () => {
+        try{
+            console.log("connected to the server");
+        } catch(error){
+            console.log("Connection failed", error);
+        }
+    });
+}
 
-console.log(Y);
-console.log(SocketIOProvider);
+function startCollaboration(){
+    document.addEventListener("DOMContentLoaded", () => {
+        makeConnection();
+        // initialiseDoc();
+    });
+}
 
-const doc = new Doc();
-const yMap = doc.getMap();
+startCollaboration();
 
-const socketIOProvider = new SocketIOProvider("ws://localhost:5000", "testing-doc", doc, {
-    autoConnect: true
-});
-
-socketIOProvider.awareness.on("change", () => console.log("connected from client"));
