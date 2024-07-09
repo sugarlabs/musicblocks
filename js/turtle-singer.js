@@ -383,15 +383,18 @@ class Singer {
      * @param {Number} octave
      * @returns {Number} inverted value
      */
-    static calculateInvert(logo, turtle, note, octave) {
+    static calculateInvert(logo, turtle, note, octave, cents) {
         const activity = logo.activity;
         const tur = activity.turtles.ithTurtle(turtle);
 
+        if (cents === undefined) {
+            cents = 0;
+        }
         let delta = 0;
         const note1 = getNote(
             note,
             octave,
-            0,
+            cents,
             tur.singer.keySignature,
             tur.singer.movable,
             null,
@@ -405,7 +408,7 @@ class Singer {
             const note2 = getNote(
                 tur.singer.invertList[i][0],
                 tur.singer.invertList[i][1],
-                0,
+                -cents,  // this needs to be tested.
                 tur.singer.keySignature,
                 tur.singer.movable,
                 null,
@@ -807,7 +810,7 @@ class Singer {
                 // Apply transpositions
                 const transposition = 2 * delta + tur.singer.transposition;
                 const alen = tur.singer.arpeggio.length;
-                let atrans = transposition;
+                let atrans = transposition + cents;
                 if (alen > 0 && i < alen) {
                     atrans += tur.singer.arpeggio[i];
                 }
@@ -846,11 +849,10 @@ class Singer {
                 // Apply transpositions
                 const transposition = 2 * delta + tur.singer.transposition;
                 const alen = tur.singer.arpeggio.length;
-                let atrans = transposition;
+                let atrans = transposition + cents;
                 if (alen > 0 && i < alen) {
                     atrans += tur.singer.arpeggio[i];
                 }
-
                 const noteObj = getNote(
                     note,
                     octave,
@@ -936,7 +938,7 @@ class Singer {
                     anote,
                     octave,
                     // FIXME: should not be hardwired to 12
-                    atrans + tur.singer.register * 12,  // transposition + tur.singer.register * 12,
+                    atrans + tur.singer.register * 12,
                     tur.singer.keySignature,
                     tur.singer.movable,
                     direction,
@@ -956,10 +958,16 @@ class Singer {
                     const hertz = pitchToFrequency(
                         noteObj[0],
                         noteObj[1],
-                        0,
+                        noteObj[2],
                         tur.singer.keySignature
-                    ) * ratio;
-                    noteObj = frequencyToPitch(hertz);
+                    );
+                    noteObj = frequencyToPitch(hertz * ratio);
+                }
+
+                // Cents may have been added through a transposition.
+                if (noteObj[2] !== 0 && cents === 0) {
+                    cents = noteObj[2];
+                    // eslint-disable-next-line no-console
                 }
 
                 if (tur.singer.drumStyle.length > 0) {
