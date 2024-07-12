@@ -122,11 +122,20 @@ This option removes the selected block from your program
 ![Delete](./delete.png "Delete")
 
 # Help
-This option shows a help screen with information about the selected block. You can use this option to learn more about the block's functionality and how to use it in your projects.
+Help
+The "Help" option shows a detailed help screen with information about the selected block. It includes descriptions of the block's functionality, usage instructions, and examples to help users understand how to incorporate the block into their projects effectively.
 
 ![Help](./help.png "Help")
 
-By using the right-click context menu in Music Blocks, you can quickly perform common tasks and manipulate blocks on the workspace. This can help you to work more efficiently and effectively in your projects.
+Example Usage:
+
+Right-click on a complex block to access its help screen. This provides insights into its properties, parameters, and practical applications within your project.
+Benefits:
+
+Enhanced Understanding: Gain a deeper understanding of each block's purpose and functionality.
+Efficiency: Quickly access relevant information without leaving the workspace, improving workflow efficiency.
+
+By utilizing the right-click context menu in Music Blocks, you can perform common tasks swiftly and manipulate blocks efficiently, aiding in more effective project development.
 
 Keyboard shortcuts
 ------------------
