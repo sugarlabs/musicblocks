@@ -1475,7 +1475,7 @@ While a bit fanciful, this example, which can be run by clicking on
 the link below, takes musical paint in a novel direction.
 
 [RUN
-LIVE](https://walterbender.github.io/musicblocks/index.html?id=1523896294964170&run=True&run=True)
+LIVE](https://sugarlabs.github.io/musicblocks/index.html?id=1523896294964170&run=True&run=True)
 
 ## <a name="ENSEMBLE">3.8 Ensemble</a>
 
