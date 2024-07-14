@@ -3691,13 +3691,14 @@ class Activity {
             let actionBlockNames = []; // Array to store action block names
             let noteblockCount = 0; // Initialize noteblock counter
             let MAX_NOTEBLOCKS = 100;
+            let shortestNoteDenominator = 0;
             let offset = 100;
             let stopProcessing = false;
             let trackCount = 0;
             let actionBlockPerTrack = [];
             let instruments = [];
             let currentMidiTempoBpm=null;
-            currentMidiTempoBpm=currentMidi.header.tempos[0].bpm;
+            currentMidiTempoBpm=Math.round(currentMidi.header.tempos[0].bpm);
             let currentMidiTimeSignature=currentMidi.header.timeSignatures[0].timeSignature;            
             console.log("tempoBpm is: ", currentMidiTempoBpm);
             console.log("tempo is : ",currentMidi.header.tempos);
@@ -3842,6 +3843,15 @@ class Activity {
                     actionBlockCounter++; // Increment the action block counter
                     offset+=100;
                 };
+                //Using for loop for finding the shortest note value
+                for (let j in sched) {
+                    let st = sched[j].start;
+                    let ed= sched[j].end;
+                    let dur = ed - st;
+                    var temp = this.getClosestStandardNoteValue(dur * 3 / 8);
+                    shortestNoteDenominator=Math.max(shortestNoteDenominator,temp[1]);
+                }
+                console.log("shortestNoteDenominator: ", shortestNoteDenominator);
         
                 for (let i in sched) {
                     if (stopProcessing) break; // Exit inner loop if flag is set
@@ -3880,6 +3890,17 @@ class Activity {
                         return ar;
                     };
                     var obj = this.getClosestStandardNoteValue(duration * 3 / 8);
+                    let scalingFactor=1;
+                    if(shortestNoteDenominator>32)
+                    scalingFactor=shortestNoteDenominator/32;
+
+                    if(obj[1]>=scalingFactor)
+                    obj[1]=obj[1]/scalingFactor;
+                    else
+                    obj[0]=obj[0]*scalingFactor;
+                    
+                    obj=this.getClosestStandardNoteValue(obj[0]/obj[1]); //to get the reduced fraction for 4/2 to 2/1
+                
                     if (k != 0) val = val + 2; //since we are going to add action block in the front later
                     let pitches = getPitch(val + 5, notes, val);
                     currentActionBlock.push(
@@ -3924,7 +3945,7 @@ class Activity {
             let len = jsONON.length;
             let m = 0;
             let actionIndex = 0;
-            // Add nameddo blocks based on the actionBlockNames
+            
             for (let i = 0; i < trackCount; i++) {
                  let vspaceIndex=len+m+6;
                 let flag=true;
@@ -3959,12 +3980,6 @@ class Activity {
                     [setBpmIndex + 3, ["number", { value: 1 }], 0, 0, [setBpmIndex + 2]],
                     [setBpmIndex + 4, ["number", { value: currentMidiTimeSignature[1] }], 0, 0, [setBpmIndex + 2]],
                     [setBpmIndex + 5, "vspace", 0, 0, [setBpmIndex, vspaceIndex + 1]],
-                    // [setBpmIndex + 6, "multiplybeatfactor", 0, 0, [setBpmIndex + 5, setBpmIndex + 7,setBpmIndex +10, setBpmIndex + 11]],
-                    // [setBpmIndex + 7, "divide", 0, 0, [setBpmIndex + 6, setBpmIndex + 8, setBpmIndex + 9]],
-                    // [setBpmIndex + 8, ["number", { value: 1 }], 0, 0, [setBpmIndex + 7]],
-                    // [setBpmIndex + 9, ["number", { value: 2 }], 0, 0, [setBpmIndex + 7]],
-                    // [setBpmIndex + 10, "vspace", 0, 0, [setBpmIndex + 6, startIndex+1]],
-                    // [setBpmIndex + 11, "hidden", 0, 0, [setBpmIndex + 6, null]]
                 )
                 m+=6;
 
@@ -5764,13 +5779,14 @@ class Activity {
                 (event) => {
                     // Read file here.
                     const reader = new FileReader();
-
+                    const midiReader = new FileReader();
+            
                     // eslint-disable-next-line no-unused-vars
                     reader.onload = (theFile) => {
                         that.loading = true;
                         document.body.style.cursor = "wait";
                         that.doLoadAnimation();
-
+            
                         setTimeout(() => {
                             const rawData = reader.result;
                             if (rawData === null || rawData === "") {
@@ -5792,9 +5808,9 @@ class Activity {
                                     for (const name in that.palettes.dict) {
                                         that.palettes.dict[name].hideMenu(true);
                                     }
-
+            
                                     that.stage.removeAllEventListeners("trashsignal");
-
+            
                                     if (!that.merging) {
                                         // Wait for the old blocks to be removed.
                                         // eslint-disable-next-line no-unused-vars
@@ -5805,7 +5821,7 @@ class Activity {
                                                 that.planet.saveLocally();
                                             }
                                         };
-
+            
                                         that.stage.addEventListener("trashsignal", __listener, false);
                                         that.sendAllToTrash(false, false);
                                         that._allClear(false);
@@ -5822,7 +5838,7 @@ class Activity {
                                         that.merging = false;
                                         that.blocks.loadNewBlocks(obj);
                                     }
-
+            
                                     that.loading = false;
                                     that.refreshCanvas();
                                 } catch (e) {
@@ -5839,11 +5855,27 @@ class Activity {
                             }
                         }, 200);
                     };
-
-                    reader.readAsText(that.fileChooser.files[0]);
+            
+                    midiReader.onload = (e) => {
+                        const midi = new Midi(e.target.result);
+                        console.debug(midi);
+                        this.transcribeMidi(midi);
+                    };
+            
+                    const file = that.fileChooser.files[0];
+                    if (file) {
+                        const extension = file.name.split('.').pop().toLowerCase();
+                        const isMidi = (extension === "mid") || (extension === "midi");
+                        if (isMidi) {
+                            midiReader.readAsArrayBuffer(file);
+                        } else {
+                            reader.readAsText(file);
+                        }
+                    }
                 },
                 false
             );
+            
 
             const __handleFileSelect = (event) => {
                 event.stopPropagation();
