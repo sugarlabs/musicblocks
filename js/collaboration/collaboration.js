@@ -56,18 +56,18 @@ class Collaboration {
             }
         });
 
-    socket.on("connect_error", (error) => {
-        attempts++;
-        console.log("Failed to connect to the socket server. Retrying in few seconds...");
-        setTimeout(stopConnection(socket), DELAY_DURATION);
-    });
-}
 
-function startCollaboration(){
-    document.addEventListener("DOMContentLoaded", () => {
-        makeConnection();
-        // initialiseDoc();
-    });
+        socket.on("new-block-added", (update) => {
+            this.activity.textMsg("New block added. rendering...");
+            setTimeout(this.activity.hideMsgs, 10000);
+            this.activity.renderProjectFromData(update);
+        });
+    };
+
+    // Start the collaboration
+    startCollaboration = () => {
+        this.makeConnection();
+    };
 }
 
 startCollaboration();
