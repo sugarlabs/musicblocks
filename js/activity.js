@@ -5426,6 +5426,7 @@ class Activity {
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.toolbar.renderChooseKeyIcon(chooseKeyMenu);
             }
+            this.toolbar.renderCollaborateIcon(initiateCollaboration);
             this.toolbar.renderJavaScriptIcon(toggleJSWindow);
             this.toolbar.renderLanguageSelectIcon(this.languageBox);
             this.toolbar.renderWrapIcon();
