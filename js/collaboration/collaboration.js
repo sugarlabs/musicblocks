@@ -42,17 +42,19 @@ class Collaboration {
         }
     };
 
-function makeConnection(){
-
-    // connect to the local server
-    const socket = io("http://localhost:8080/");
-    socket.on("connect", () => {
-        try{
-            console.log("connected to the server");
-        } catch(error){
-            console.log("Connection failed", error);
-        }
-    });
+    // Make calls to the socket server
+    makeConnection = () => {
+        // connect to the local server
+        const socket = io(this.PORT);
+        socket.on("connect", () => {
+            this.socket = socket;
+            try {
+                console.log("connected to the server");
+                this.hasCollaborationStarted = true;
+            } catch (error) {
+                console.log("Connection failed", error);
+            }
+        });
 
     socket.on("connect_error", (error) => {
         attempts++;
