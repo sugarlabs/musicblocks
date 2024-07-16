@@ -3697,9 +3697,22 @@ class Activity {
             let trackCount = 0;
             let actionBlockPerTrack = [];
             let instruments = [];
-            let currentMidiTempoBpm=null;
-            currentMidiTempoBpm=Math.round(currentMidi.header.tempos[0].bpm);
-            let currentMidiTimeSignature=currentMidi.header.timeSignatures[0].timeSignature;            
+            let defaultTempo=90;
+            let currentMidiTempoBpm = currentMidi.header.tempos;
+            if (currentMidiTempoBpm && currentMidiTempoBpm.length > 0) {
+                currentMidiTempoBpm = currentMidiTempoBpm[0].bpm;
+            } else {
+                currentMidiTempoBpm = defaultTempo;
+            }
+            
+            let defaultTimeSignature = [4, 4];
+            let currentMidiTimeSignature = currentMidi.header.timeSignatures;
+            if (currentMidiTimeSignature && currentMidiTimeSignature.length > 0) {
+                currentMidiTimeSignature = currentMidiTimeSignature[0].timeSignature;
+            } else {
+                currentMidiTimeSignature = defaultTimeSignature;
+            }
+            
             console.log("tempoBpm is: ", currentMidiTempoBpm);
             console.log("tempo is : ",currentMidi.header.tempos);
             console.log("time signatures are: ", currentMidi.header.timeSignatures);
@@ -3974,8 +3987,8 @@ class Activity {
                 jsONON[len + m - 1][4][1] = null;
                 let setBpmIndex=jsONON.length;
                 jsONON.push(
-                    [setBpmIndex, ["setbpm3", { value: 120 }], 0, 0, [vspaceIndex, setBpmIndex + 1, setBpmIndex + 2, setBpmIndex + 5]],
-                    [setBpmIndex + 1, ["number", { value: currentMidiTempoBpm?currentMidiTempoBpm:90}], 0, 0, [setBpmIndex]],
+                    [setBpmIndex, ["setbpm3"], 0, 0, [vspaceIndex, setBpmIndex + 1, setBpmIndex + 2, setBpmIndex + 5]],
+                    [setBpmIndex + 1, ["number", { value: currentMidiTempoBpm}], 0, 0, [setBpmIndex]],
                     [setBpmIndex + 2, "divide", 0, 0, [setBpmIndex, setBpmIndex + 3, setBpmIndex + 4]],
                     [setBpmIndex + 3, ["number", { value: 1 }], 0, 0, [setBpmIndex + 2]],
                     [setBpmIndex + 4, ["number", { value: currentMidiTimeSignature[1] }], 0, 0, [setBpmIndex + 2]],
