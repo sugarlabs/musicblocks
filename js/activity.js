@@ -551,6 +551,12 @@ class Activity {
             })
         }
 
+        // Initialize the collaboration
+        this._initiateCollaboration = () => {
+            this.collaboration.startCollaboration();
+            this.blocks.isLocalUpdate = true;
+        };
+
         // Render the project from received data
         this.renderProjectFromData = (update) => {
             const data = JSON.parse(update);
@@ -3373,6 +3379,11 @@ class Activity {
 
             this.refreshCanvas();
         };
+
+        // Start the collaboration
+        const initiateCollaboration = (activity) => {
+            activity._initiateCollaboration();
+        }
 
         this.handleKeyDown = (event) => {
             
