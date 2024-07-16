@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // Copyright (c) 2024 Ajeet Pratap Singh
 //
 // This program is free software; you can redistribute it and/or
@@ -56,6 +57,11 @@ class Collaboration {
             }
         });
 
+        socket.on("connect_error", () => {
+            this.attempts++;
+            console.log("Failed to connect to the socket server. Retrying in few seconds...");
+            setTimeout(this.stopConnection(socket), this.DELAY_DURATION);
+        });
 
         socket.on("new-block-added", (update) => {
             this.activity.textMsg("New block added. rendering...");
@@ -69,6 +75,4 @@ class Collaboration {
         this.makeConnection();
     };
 }
-
-startCollaboration();
 
