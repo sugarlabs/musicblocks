@@ -551,6 +551,33 @@ class Activity {
             })
         }
 
+        // Render the project from received data
+        this.renderProjectFromData = (update) => {
+            const data = JSON.parse(update);
+            document.body.style.cursor = "wait";
+            // this.doLoadAnimation();
+            this.blocks.isLocalUpdate = false;
+
+            // Render the blocks
+            for (const name in this.palettes.dict) {
+                this.palettes.dict[name].hideMenu(true);
+            }
+
+            this.stage.removeAllEventListeners("trashsignal");
+
+            // Wait for the old blocks to be removed.
+            // eslint-disable-next-line no-unused-vars
+            const __listener = (event) => {
+                this.blocks.loadNewBlocks(data);
+                this.stage.removeAllEventListeners("trashsignal");
+            };
+
+            this.stage.addEventListener("trashsignal", __listener, false);
+            this.sendAllToTrash(false, false);
+            this._allClear(false);
+            this.refreshCanvas();
+        };
+
         /**
         * Sets up plugin and palette boilerplate.
         * This function initializes various properties related to the plugin objects,
