@@ -14,16 +14,33 @@
 
 /* eslint-disable no-undef */
 
-const RETRIES = 5;
-const DELAY_DURATION = 2000;
-let attempts = 0;
 
-function stopConnection(socket) {
-    if(attempts >= RETRIES){
-        console.log("Maximum calls to make connection exceeded. Stopped making calls");
-        socket.disconnect();
+class Collaboration {
+    constructor(activity) {
+        this.activity = activity;
+        this.RETRIES = 5;
+        this.DELAY_DURATION = 2000;
+        this.attempts = 0;
+        this.socket = null;
+        this.blockList = this.activity.blocks.blockList;
+        this.PORT = "http://localhost:8080/";
+        this.hasCollaborationStarted = false;
+        this.updatedProjectHtml = null;
     }
-}
+
+    // Convert the blockList into html
+    convertBlockListToHtml = () => {
+        this.updatedProjectHtml = this.activity.prepareExport();
+        return this.updatedProjectHtml;
+    };
+
+    // Stop making calls to the socket server
+    stopConnection = (socket) => {
+        if (this.attempts >= this.RETRIES) {
+            console.log("Maximum calls to make connection exceeded. Stopped making calls");
+            socket.disconnect();
+        }
+    };
 
 function makeConnection(){
 
