@@ -5377,6 +5377,7 @@ class Activity {
 
             this.pasteBox = new PasteBox(this);
             this.languageBox = new LanguageBox(this);
+            this.collaboration = new Collaboration(this);
 
             // Show help on startup if first-time user.
             if (this.firstTimeUser) {
