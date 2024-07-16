@@ -4007,8 +4007,8 @@ class Activity {
                                 
                                 // Check and set tripletFinder to null if element?.endTriplets exists
                           
-                          
-                             
+                                console.log('pitches are below')
+                                console.log(element)
                                 createPitchBlocks(element.pitches[0], blockId,element.duration,staff.key,actionBlock,tripletFinder,staffBlocksMap[lineId].meterDen);
                                 if (element?.endTriplet!== null &&element?.endTriplet!== undefined) {
                                     tripletFinder = null;
