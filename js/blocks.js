@@ -168,6 +168,8 @@ class Blocks {
 
         this.selectedBlocks = [];
 
+        this.isLocalUpdate = false;
+
         /**
          * We stage deletion of prototype action blocks on the palette so
          * as to avoid palette refresh race conditions.
@@ -6541,6 +6543,10 @@ class Blocks {
                         }
                     }
                 }
+            }
+
+            if(this.activity.collaboration.hasCollaborationStarted){
+                this.isLocalUpdate = true;
             }
         };
 
