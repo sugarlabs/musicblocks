@@ -14,7 +14,10 @@ This section describes how to add new blocks to Music Blocks in the Widget secti
        // Blocks with some functionality  
    }
    ```
-3. Import the new class in the js/blocks/WidgetBlocks.js file at the bottom.
+3.  **Define new block**
+   Define the new block as mention in https://github.com/sugarlabs/musicblocks/tree/master/js#how-to-define-a-new-block
+
+4. Import the new class in the js/blocks/WidgetBlocks.js file at the bottom.
     ```
     new UniqueClass().setup(activity);
 
