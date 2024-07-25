@@ -5141,7 +5141,7 @@ class Activity {
             })
 
             document.addEventListener("mouseup", (event) => {
-                event.preventDefault();
+               // event.preventDefault();
                 this.isDragging = false;
                 this.selectionArea.style.display = "none";
                 this.startX = 0;
