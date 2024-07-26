@@ -33,8 +33,6 @@ like:
 Visit the Music Blocks website for a hands on experience:
 [https://musicblocks.sugarlabs.org](https://musicblocks.sugarlabs.org).
 
-Or download Music Blocks from the [Google Play Store](https://play.google.com/store/apps/details?id=my.musicblock.sugarlab)
-
 Additional background on why we combine music and programming can be found
 [here](./WhyMusicBlocks.md).
 
