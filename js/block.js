@@ -681,7 +681,9 @@ class Block {
     unhighlightSelectedBlocks(blk, selection) {
         if (selection) {
             this.blocks.unhighlight(blk, true);
-            this.disconnectedBitmap.visible = true;
+            if (!this.collapsed) {
+                this.disconnectedBitmap.visible = true;
+            }
             this.container.updateCache();
         };
     }
@@ -3381,23 +3383,23 @@ class Block {
 
         const labelElem = docById("labelDiv");
 
-	var safetext = function(text){
+        var safetext = function(text){
             // Best to avoid using these special characters in text strings
             // without first converting them to their "safe" form.
-	    var table = {
-		'<': 'lt',
-		'>': 'gt',
-		'"': 'quot',
-		'\'': 'apos',
-		'&': 'amp',
-		'\r': '#10',
-		'\n': '#13'
-	    };
-	
-	    return text.toString().replace(/[<>"'\r\n&]/g, function(chr){
-		return '&' + table[chr] + ';';
-	    });
-	};
+            var table = {
+                '<': 'lt',
+                '>': 'gt',
+                '"': 'quot',
+                '\'': 'apos',
+                '&': 'amp',
+                '\r': '#10',
+                '\n': '#13'
+            };
+        
+            return text.toString().replace(/[<>"'\r\n&]/g, function(chr){
+                return '&' + table[chr] + ';';
+            });
+        };
 
         if (this.name === "text") {
             labelElem.innerHTML =

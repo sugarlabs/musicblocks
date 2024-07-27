@@ -879,6 +879,9 @@ class Singer {
                     activity.logo.phraseMaker.rowLabels.push(last(tur.singer.drumStyle));
                     activity.logo.phraseMaker.rowArgs.push(-1);
                 } else {
+                    // Don't bother with the name conversions.
+                    activity.logo.phraseMaker.rowLabels.push(noteObj[0]);
+                    /*
                     // Was the pitch arg a note name or solfege name?
                     if (
                         SOLFEGENAMES1.indexOf(note) !== -1 &&
@@ -890,7 +893,7 @@ class Singer {
                     } else {
                         activity.logo.phraseMaker.rowLabels.push(noteObj[0]);
                     }
-
+                    */
                     activity.logo.phraseMaker.rowArgs.push(noteObj[1]);
                 }
             }
