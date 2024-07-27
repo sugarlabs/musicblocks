@@ -4070,6 +4070,13 @@ class Block {
                 focused = true;
             }, 100);
         }
+        setTimeout(() => {
+            if (this.activity.collaboration.hasCollaborationStarted) {
+                if (this.blocks.isLocalUpdate) {
+                    this.blocks.emitChanges("block-value-updated");
+                };
+            };
+        }, 3000);
     }
 
     /**

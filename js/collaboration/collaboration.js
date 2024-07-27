@@ -68,6 +68,20 @@ class Collaboration {
             setTimeout(this.activity.hideMsgs, 10000);
             this.activity.renderProjectFromData(update);
         });
+
+        socket.on("new-block-deleted", (update) => {
+            this.activity.textMsg("New block deleted. rendering...");
+            setTimeout(this.activity.hideMsgs, 10000);
+            this.activity.renderProjectFromData(update);
+        });
+
+        socket.on("block-moved/connected/disconnected", (update) => {
+            this.activity.renderProjectFromData(update);
+        });
+
+        socket.on("block-value-updated", (update) => {
+            this.activity.renderProjectFromData(update);
+        });
     };
 
     // Start the collaboration
