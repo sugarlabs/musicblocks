@@ -3070,7 +3070,7 @@ class Blocks {
 
         // Emit a message when a new block is created
         this.emitAddedBlock = () => {
-            if(this.activity.collaboration.hasCollaborationStarted){
+            if(this.activity.collaboration.hasCollaborationStarted) {
                 const update = this.activity.collaboration.convertBlockListToHtml();
                 this.activity.collaboration.socket.emit("new-block-added", update);
             }
@@ -3181,7 +3181,7 @@ class Blocks {
 
             /** Signal that a new block is created  */
             if (this.activity.collaboration.hasCollaborationStarted) {
-                if(this.isLocalUpdate){
+                if(this.isLocalUpdate) {
                     setTimeout(() => {
                         this.emitAddedBlock();
                     }, 200);
@@ -6545,7 +6545,7 @@ class Blocks {
                 }
             }
 
-            if(this.activity.collaboration.hasCollaborationStarted){
+            if(this.activity.collaboration.hasCollaborationStarted) {
                 this.isLocalUpdate = true;
             }
         };
