@@ -48,10 +48,10 @@ class Toolbar {
                 ["mb-logo", _("About Music Blocks")],
                 ["play", _("Play")],
                 ["stop", _("Stop")],
-                ["record",_("Record")],
+                ["record", _("Record")],
                 ["Full Screen", _("Full screen")],
                 ["FullScreen", _("Full screen")],
-		["Toggle Fullscreen", _("Toggle Fullscreen")],
+                ["Toggle Fullscreen", _("Toggle Fullscreen")],
                 ["newFile", _("New project")],
                 ["load", _("Load project from file")],
                 ["saveButton", _("Save project")],
@@ -71,6 +71,7 @@ class Toolbar {
                 ["chooseKeyIcon", _("Set Pitch Preview")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
                 ["restoreIcon", _("Restore")],
+                ["collaborateIcon", _("Collaborate")],
                 ["beginnerMode", _("Switch to beginner mode")],
                 ["advancedMode", _("Switch to advanced mode")],
                 ["languageSelectIcon", _("Select language")],
@@ -132,6 +133,7 @@ class Toolbar {
                 _("Set Pitch Preview"),
                 _("JavaScript Editor"),
                 _("Restore"),
+                _("Collaborate"),
                 _("Switch to beginner mode"),
                 _("Switch to advanced mode"),
                 _("Select language"),
@@ -177,7 +179,7 @@ class Toolbar {
                 ["record", _("Record")],
                 ["Full Screen", _("Full Screen")],
                 ["FullScreen", _("Full Screen")],
-		["Toggle Fullscreen", _("Toggle Fullscreen")],
+                ["Toggle Fullscreen", _("Toggle Fullscreen")],
                 ["newFile", _("New project")],
                 ["load", _("Load project from file")],
                 ["saveButton", _("Save project")],
@@ -196,6 +198,7 @@ class Toolbar {
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
                 ["restoreIcon", _("Restore")],
+                ["collaborateIcon", _("Collaborate")],
                 ["beginnerMode", _("Switch to beginner mode")],
                 ["advancedMode", _("Switch to advanced mode")],
                 ["languageSelectIcon", _("Select language")],
@@ -252,6 +255,7 @@ class Toolbar {
                 _("Merge with current project"),
                 _("JavaScript Editor"),
                 _("Restore"),
+                _("Collaboration"),
                 _("Switch to beginner mode"),
                 _("Switch to advanced mode"),
                 _("Select language"),
@@ -890,6 +894,13 @@ class Toolbar {
         restoreIcon.onclick = () => {
             onclick(this.activity);
         };
+    }
+
+    renderCollaborateIcon(onclick) {
+        const collaborateIcon = docById("collaborateIcon");
+        collaborateIcon.onclick = () => {
+            onclick(this.activity);
+        }
     }
 
     /**

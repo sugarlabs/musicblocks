@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // Copyright (c) 2024 Ajeet Pratap Singh
 //
 // This program is free software; you can redistribute it and/or
@@ -14,42 +15,64 @@
 
 /* eslint-disable no-undef */
 
-const RETRIES = 5;
-const DELAY_DURATION = 2000;
-let attempts = 0;
 
-function stopConnection(socket) {
-    if(attempts >= RETRIES){
-        console.log("Maximum calls to make connection exceeded. Stopped making calls");
-        socket.disconnect();
+class Collaboration {
+    constructor(activity) {
+        this.activity = activity;
+        this.RETRIES = 5;
+        this.DELAY_DURATION = 2000;
+        this.attempts = 0;
+        this.socket = null;
+        this.blockList = this.activity.blocks.blockList;
+        this.PORT = "http://localhost:8080/";
+        this.hasCollaborationStarted = false;
+        this.updatedProjectHtml = null;
     }
-}
 
-function makeConnection(){
+    // Convert the blockList into html
+    convertBlockListToHtml = () => {
+        this.updatedProjectHtml = this.activity.prepareExport();
+        return this.updatedProjectHtml;
+    };
 
-    // connect to the local server
-    const socket = io("http://localhost:8080/");
-    socket.on("connect", () => {
-        try{
-            console.log("connected to the server");
-        } catch(error){
-            console.log("Connection failed", error);
+    // Stop making calls to the socket server
+    stopConnection = (socket) => {
+        if (this.attempts >= this.RETRIES) {
+            console.log("Maximum calls to make connection exceeded. Stopped making calls");
+            socket.disconnect();
         }
-    });
+    };
 
-    socket.on("connect_error", (error) => {
-        attempts++;
-        console.log("Failed to connect to the socket server. Retrying in few seconds...");
-        setTimeout(stopConnection(socket), DELAY_DURATION);
-    });
+    // Make calls to the socket server
+    makeConnection = () => {
+        // connect to the local server
+        const socket = io(this.PORT);
+        socket.on("connect", () => {
+            this.socket = socket;
+            try {
+                console.log("connected to the server");
+                this.hasCollaborationStarted = true;
+            } catch (error) {
+                console.log("Connection failed", error);
+            }
+        });
+
+        socket.on("connect_error", () => {
+            this.attempts++;
+            console.log("Failed to connect to the socket server. Retrying in few seconds...");
+            setTimeout(this.stopConnection(socket), this.DELAY_DURATION);
+        });
+
+        socket.on("new-block-added", (update) => {
+            this.activity.textMsg("New block added. rendering...");
+            setTimeout(this.activity.hideMsgs, 10000);
+            this.activity.renderProjectFromData(update);
+        });
+    };
+
+    // Start the collaboration
+    startCollaboration = () => {
+        this.makeConnection();
+    };
 }
-
-function startCollaboration(){
-    document.addEventListener("DOMContentLoaded", () => {
-        makeConnection();
-        // initialiseDoc();
-    });
-}
-
-startCollaboration();
 
