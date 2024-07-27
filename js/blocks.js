@@ -168,6 +168,8 @@ class Blocks {
 
         this.selectedBlocks = [];
 
+        this.isLocalUpdate = false;
+
         /**
          * We stage deletion of prototype action blocks on the palette so
          * as to avoid palette refresh race conditions.
@@ -3066,6 +3068,14 @@ class Blocks {
             this.visible = true;
         };
 
+        // Emit a message when a new block is created
+        this.emitAddedBlock = () => {
+            if (this.activity.collaboration.hasCollaborationStarted) {
+                const update = this.activity.collaboration.convertBlockListToHtml();
+                this.activity.collaboration.socket.emit("new-block-added", update);
+            }
+        };
+
         /**
          * Make a new block with connections
          * @param - name - new variable
@@ -3168,6 +3178,15 @@ class Blocks {
 
             /** and we need to load the images into the container. */
             myBlock.imageLoad();
+
+            /** Signal that a new block is created  */
+            if (this.activity.collaboration.hasCollaborationStarted) {
+                if (this.isLocalUpdate) {
+                    setTimeout(() => {
+                        this.emitAddedBlock();
+                    }, 200);
+                };
+            };
             return myBlock;
         };
 
@@ -6524,6 +6543,10 @@ class Blocks {
                         }
                     }
                 }
+            }
+
+            if (this.activity.collaboration.hasCollaborationStarted) {
+                this.isLocalUpdate = true;
             }
         };
 
