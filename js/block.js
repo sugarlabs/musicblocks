@@ -208,6 +208,9 @@ const PIEMENUS = [
     "wrapmode"
 ];
 
+// Event for updating the value of a block
+const EMIT_BLOCK_VALUE_UPDATED = "block-value-updated";
+
 /**
  * Async function to create bitmap from SVG data.
  * @param {string} data - SVG data.
@@ -4070,6 +4073,13 @@ class Block {
                 focused = true;
             }, 100);
         }
+        setTimeout(() => {
+            if (this.activity.collaboration.hasCollaborationStarted) {
+                if (this.blocks.isLocalUpdate) {
+                    this.blocks.emitChanges(EMIT_BLOCK_VALUE_UPDATED);
+                };
+            };
+        }, 3000);
     }
 
     /**
