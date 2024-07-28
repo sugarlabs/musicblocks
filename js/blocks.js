@@ -171,6 +171,15 @@ class Blocks {
         // Flag to know if the block added is local 
         this.isLocalUpdate = false;
 
+        // Event for adding a new block
+        const EMIT_NEW_BLOCK_ADDED = "new-block-added";
+
+        // Event for moving connecting and disconnecting a block
+        const EMIT_BLOCK_MOVED_CONNECTED_DISCONNECTED = "block-moved/connected/disconnected";
+
+        // Event for deleting a new block
+        const EMIT_NEW_BLOCK_DELETED = "new-block-deleted";
+
         // Flag to avoid emitting move changes if a block is added
         this.hasEmittedBlockAddition = false;
 
@@ -2153,7 +2162,7 @@ class Blocks {
 
             if (this.activity.collaboration.hasCollaborationStarted) {
                 if (!this.hasEmittedBlockAddition) {
-                    this.emitChanges("block-moved/connected/disconnected");
+                    this.emitChanges(EMIT_BLOCK_MOVED_CONNECTED_DISCONNECTED);
                 }
             }
         };
@@ -3080,7 +3089,7 @@ class Blocks {
 
         // Emit a message when there is a change in the blocks of the project
         this.emitChanges = (emitMsg) => {
-            if (emitMsg == "new-block-added") {
+            if (emitMsg == EMIT_NEW_BLOCK_ADDED) {
                 this.hasEmittedBlockAddition = true;
             }
             const update = this.activity.collaboration.convertBlockListToHtml();
@@ -3194,7 +3203,7 @@ class Blocks {
             if (this.activity.collaboration.hasCollaborationStarted) {
                 if (this.isLocalUpdate) {
                     setTimeout(() => {
-                        this.emitChanges("new-block-added");
+                        this.emitChanges(EMIT_NEW_BLOCK_ADDED);
                         this.hasEmittedBlockAddition = false;
                     }, 200);
                 };
@@ -6953,7 +6962,7 @@ class Blocks {
 
             // Emit an event indicating a block a deleted
             if (this.activity.collaboration.hasCollaborationStarted) {
-                this.emitChanges("new-block-deleted");
+                this.emitChanges(EMIT_NEW_BLOCK_DELETED);
             };
         };
 
