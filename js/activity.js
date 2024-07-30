@@ -4204,6 +4204,22 @@ class Activity {
             for (let i = 0; i < trackCount; i++) {
                  let vspaceIndex=len+m+6;
                 let flag=true;
+                if(isPercussion[i])
+                {
+                    jsONON.push(
+                        [len + m, ["start", { collapsed: false }], 300 + offset, 100, [null, len + m + 1, null]],
+                        [len + m +1,"meter",0,0,[len + m,len + m +2,len + m +3,len + m + 6]],
+                        [len + m + 2, ["number",{value: currentMidiTimeSignature[0]}],0,0,[len+m+1]],
+                        [len + m + 3,"divide",0,0,[len + m +1,len + m + 4,len + m + 5]],
+                        [len + m + 4,["number", {value : 1}],0,0,[len+m+3]],
+                        [len + m + 5,["number", {value : currentMidiTimeSignature[1]}],0,0,[len+m+3]],
+                        [len + m + 6,"vspace",0,0,[len + m + 1,len + m + 8 + actionBlockPerTrack[i]]],
+                        [len + m + 7, ["nameddo", { value: "MIDI-conversion" }], 0, 0, [len + m +13 +actionBlockPerTrack[i], len + m + 8]],
+                    );
+                    flag=false;
+                    m+=8;
+                }
+                else{
                 jsONON.push(
                     [len + m, ["start", { collapsed: false }], 300 + offset, 100, [null, len + m + 1, null]],
                     [len + m +1,"meter",0,0,[len + m,len + m +2,len + m +3,len + m + 6]],
@@ -4211,19 +4227,12 @@ class Activity {
                     [len + m + 3,"divide",0,0,[len + m +1,len + m + 4,len + m + 5]],
                     [len + m + 4,["number", {value : 1}],0,0,[len+m+3]],
                     [len + m + 5,["number", {value : currentMidiTimeSignature[1]}],0,0,[len+m+3]],
-                    [len + m + 6,"vspace",0,0,[len + m + 1,isPercussion[i]? len + m + 11 + actionBlockPerTrack[i]:len + m + 10 + actionBlockPerTrack[i]]],
-                    [len + m + 7, "settimbre", 0, 0, [isPercussion[i]?len + m +16 +actionBlockPerTrack[i]:len + m +15 +actionBlockPerTrack[i], len + m + 8, len + m + 10, len + m + 9]],
+                    [len + m + 6,"vspace",0,0,[len + m + 1,len + m + 10 + actionBlockPerTrack[i]]],
+                    [len + m + 7, "settimbre", 0, 0, [len + m +15 +actionBlockPerTrack[i], len + m + 8, len + m + 10, len + m + 9]],
                     [len + m + 8, ["voicename", { value: instruments[i] }], 0, 0, [len + m + 7]],
                     [len + m + 9, "hidden", 0, 0, [len + m + 7, null]]
                 );
                 m += 10;
-                if(isPercussion[i])
-                {
-                    jsONON.push(
-                        [len + m, ["nameddo", { value: "MIDI-conversion" }], 0, 0, [len + m - 3, len + m + 1]],
-                    );
-                    flag=false;
-                    m+=1;
                 }
                 for (let j = 0; j < actionBlockPerTrack[i]; j++) {
                     jsONON.push(
