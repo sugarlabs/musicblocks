@@ -44,7 +44,7 @@ class Collaboration {
     };
 
     // Make calls to the socket server
-    makeConnection = () => {
+    makeConnection = (ID) => {
         // connect to the local server
         const socket = io(this.PORT);
         socket.on("connect", () => {
@@ -52,6 +52,7 @@ class Collaboration {
             try {
                 console.log("connected to the server");
                 this.hasCollaborationStarted = true;
+                socket.emit("joinRoom", ID);
             } catch (error) {
                 console.log("Connection failed", error);
             }
@@ -85,8 +86,8 @@ class Collaboration {
     };
 
     // Start the collaboration
-    startCollaboration = () => {
-        this.makeConnection();
+    startCollaboration = (ID) => {
+        this.makeConnection(ID);
     };
 }
 

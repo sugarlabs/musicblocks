@@ -3092,8 +3092,9 @@ class Blocks {
             if (emitMsg == EMIT_NEW_BLOCK_ADDED) {
                 this.hasEmittedBlockAddition = true;
             }
+            const room_id = this.activity.room_id;
             const update = this.activity.collaboration.convertBlockListToHtml();
-            this.activity.collaboration.socket.emit(emitMsg, update);
+            this.activity.collaboration.socket.emit(emitMsg, {room_id, update});
         };
 
         /**

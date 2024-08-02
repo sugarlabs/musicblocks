@@ -265,6 +265,9 @@ class Activity {
         // Flag to check if the helpful search widget is active or not (for "click" event handler purpose)
         this.isHelpfulSearchWidgetOn = false;
 
+        // ID for a specific room
+        this.room_id = null;
+
         this.beginnerMode = true;
         try {
             if (this.storage.beginnerMode === undefined) {
@@ -552,8 +555,8 @@ class Activity {
         }
 
         // Initialize the collaboration
-        this._initiateCollaboration = () => {
-            this.collaboration.startCollaboration();
+        this._initiateCollaboration = (ID) => {
+            this.collaboration.startCollaboration(ID);
             this.blocks.isLocalUpdate = true;
         };
 
@@ -5924,6 +5927,16 @@ class Activity {
             
             this._create2Ddrag();
 
+            setTimeout(() => {
+                console.log("dom is ready");
+                const urlParams = new URLSearchParams(window.location.search);
+                const room_id = urlParams.get('roomID');
+ 
+                if (room_id) {
+                    this.room_id = room_id;
+                    this._initiateCollaboration(this.room_id);
+                };
+            }, 7000);
             /*
             document.addEventListener("mousewheel", scrollEvent, false);
             document.addEventListener("DOMMouseScroll", scrollEvent, false);
