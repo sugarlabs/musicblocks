@@ -3929,7 +3929,16 @@ class Activity {
         }
 
 
+            /*
+        The parseABC function converts ABC notation to Music Blocks and is able to convert almost all the ABC notation to Music Blocks. However, the following aspects need work:
 
+        Hammers, pulls, and sliding offs grace notes (breaking the conversion)
+        Alternate endings (not failing but not showing correctly) and DS al coda
+        Bass voicing (failing)
+
+
+            
+            */
         this.parseABC = async function (tune) {
             let musicBlocksJSON = [];
             
