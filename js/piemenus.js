@@ -3443,7 +3443,7 @@ const piemenuBlockContext = (block) => {
         if (
             "customsample" === block.blocks.blockList[topBlock].name
         ) {
-            that.activity.errorMsg(_("Reload the widget, import the sample again, and export."));
+            that.activity.errorMsg(_("In order to copy a sample, you must reload the widget, import the sample again, and export."));
         } else {
             stackPasting();
         }
