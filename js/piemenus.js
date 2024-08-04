@@ -3439,7 +3439,15 @@ const piemenuBlockContext = (block) => {
         });
     };
 
-    wheel.navItems[0].navigateFunction = stackPasting;
+    wheel.navItems[0].navigateFunction = () => {
+        if (
+            "customsample" === block.blocks.blockList[topBlock].name
+        ) {
+            that.activity.errorMsg(_("Reload the widget, import the sample again, and export."));
+        } else {
+            stackPasting();
+        }
+    };
 
     wheel.navItems[1].navigateFunction = () => {
         that.blocks.activeBlock = blockBlock;
