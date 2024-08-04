@@ -133,7 +133,7 @@ class ProtoBlock {
         if (this.fontsize) {
             svg.setFontSize(this.fontsize);
         }
-        svg.setExpand(30 + this.extraWidth, 0, 0, 0);
+        svg.setExpand(10 + this.extraWidth, 0, 0, 0);
         return [
             svg.basicBlock(),
             svg.docks,

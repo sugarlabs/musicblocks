@@ -791,12 +791,16 @@ Turtles.TurtlesView = class {
             container.onmouseover = () => {
                 if (!activity.loading) {
                     document.body.style.cursor = "pointer";
+                    container.style.transition = '0.1s ease-out';
+                    container.style.transform = 'scale(1.15)';
                 }
             };
 
             container.onmouseout = () => {
                 if (!activity.loading) {
                     document.body.style.cursor = "default";
+                    container.style.transition = '0.15s ease-out';
+                    container.style.transform = 'scale(1)';
                 }
             };
             const img = new Image();

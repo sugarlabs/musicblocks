@@ -193,7 +193,7 @@ force the octave up or down; otherwise the user may just keep going up
 or down in either direction to go through scalar pitches of any mode.
 
 The next block is specified using a *Pitch-number* block (the `7th
-semi-tone` above `C` in `Octave 4` is `G`). The offset for the pitch
+semitone` above `C` in `Octave 4` is `G`). The offset for the pitch
 number can be modified using the *Set-pitch-number-offset* block.
 
 The pitch of the next block is specified using the *Hertz* block in
@@ -373,8 +373,8 @@ or double-flat accidental.)
 
 ![transposition](./transform2.svg "Adjusting transpositions")
 
-There are multiple ways to transpose a pitch: by semi-tone or scalar
-steps or by a ratio. The *Semi-tone-transposition* block (above left)
+There are multiple ways to transpose a pitch: by semitone or scalar
+steps or by a ratio. The *semitone-transposition* block (above left)
 can be used to make larger shifts in pitch in half-step units. A
 positive number shifts the pitch up and a negative number shifts the
 pitch down. The input must be a whole number. To shift up an entire
@@ -399,10 +399,26 @@ As a convenience, a number of standard scalar transpositions are
 provided: *Unison*, *Second*, *Third*, ..., *Seventh*, *Down third*,
 and *Down sixth*, as well as a transposition for *Octave*.
 
-![semi-tone transposition](./transform3.svg "raising an octave using semi-tone-transposition")
+![semitone transposition](./transform3.svg "raising an octave using semitone-transposition")
 
 In the example above, we take the song we programmed previously and
 raise it by one octave.
+
+![cents](./50cent_block.svg "adding 50 cents to a pitch using the semitone-transposition")
+
+A cent is a unit of measure for the ratio between two frequencies. A
+semitone is defined as 100 cents. The frequency between two adjacent
+pitches would be 50 cents. You can use the *Semitone transpose* block
+to shift a pitch by cents.
+
+In the example above, G4 + 50 cents is 403Hz. (Recall that G4 is
+392Hz and G#4 is 415Hz).
+
+![cents by ratio](./50cents_by_ratio.svg "adding 50 cents to a pitch
+ using the ratio block")
+
+You can also use the ratio block for cents, although the math is a bit
+more complicated.
 
 ![register](./transform18.svg "The Register block")
 
@@ -431,7 +447,7 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 
 | Representation | Pitch Movement | Properties |
 | --- | --- | --- |
-| Transposition | Semi-tone | Creates shifts in pitch by half-steps |
+| Transposition | semitone | Creates shifts in pitch by half-steps |
 | | | If the argument to transpose is positive, it will shift upwards in pitch; if it is negative, there will be a downwards shift. |
 | | | There are 12 half-steps shifts per octave. |
 | | | An argument of -12 will shift down one octave. |
@@ -439,11 +455,11 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 
 | Music Blocks Code with Scalar Transpose |
 | --- |
-| ![semi-tone transposition](./pitchmovement2.svg "semi-tone transposition") |
+| ![semitone transposition](./pitchmovement2.svg "semitone transposition") |
 
 | Standard Notation for Scalar Transpose |
 | --- |
-| ![semi-tone transposition](./pitchmovement2.png "semi-tone transposition") |
+| ![semitone transposition](./pitchmovement2.png "semitone transposition") |
 
 | Representation | Pitch Movement | Properties |
 | --- | --- | --- |
@@ -772,7 +788,7 @@ of scalar steps between two pitched.
 
 #### <a name= "ABSOLUTE-INTERVALS">3.2.7.1 Absolute Intervals</a>
 
-Absolute (or semi-tone) intervals are based on half-steps.
+Absolute (or semitone) intervals are based on half-steps.
 
 ![intervals](./transform14.svg "Using absolute intervals")
 
@@ -794,7 +810,7 @@ on the *Intervals* palette: *Major 2*, *Minor 3*, *Perfect 4*,
 The *Doubly* block can be used to create a double augmentation or
 double diminishment.
 
-The *Semi-tone interval measure* block can be used to measure the
+The *semitone interval measure* block can be used to measure the
 number of half-steps between two pitches.
 
 #### <a name= "RATIO-INTERVALS">3.2.7.2 Ratio Intervals</a>
@@ -1459,7 +1475,7 @@ While a bit fanciful, this example, which can be run by clicking on
 the link below, takes musical paint in a novel direction.
 
 [RUN
-LIVE](https://walterbender.github.io/musicblocks/index.html?id=1523896294964170&run=True&run=True)
+LIVE](https://sugarlabs.github.io/musicblocks/index.html?id=1523896294964170&run=True&run=True)
 
 ## <a name="ENSEMBLE">3.8 Ensemble</a>
 
