@@ -3852,7 +3852,7 @@ class Activity {
             }
         };
         //function to convert abc pitch to mb pitch
-        function adjustPitch(note, keySignature) {
+        function _adjustPitch(note, keySignature) {
             const accidental = keySignature.accidentals.find(acc => {
                 const noteToCompare = acc.note.toUpperCase().replace(',', '');
                 note = note.replace(',', '');
@@ -3866,26 +3866,33 @@ class Activity {
             }
         }
         //when converting to pitch value from abc to mb there is issue with the pithc standard comming out to be odd, using below function map the pitch to audible pitch
-        function abcToStandardValue(pitchValue) {
+        function _abcToStandardValue(pitchValue) {
            
             
             const octave = Math.floor(pitchValue/ 7) + 4; 
             return  octave;
         }
         //creates  pitch which consist of note pitch notename you could see them in the function
-        function createPitchBlocks(pitches, blockId, pitchDuration,keySignature,actionBlock,triplet,meterDen) {
+        function _createPitchBlocks(pitches, blockId, pitchDuration,keySignature,actionBlock,triplet,meterDen) {
             const blocks = [];
             
             const pitch = pitches;
             pitchDuration = toFraction(pitchDuration);          
-            const adjustedNote = adjustPitch(pitch.name , keySignature).toUpperCase();
-            if(triplet!==undefined&&triplet!==null){
+            const adjustedNote = _adjustPitch(pitch.name , keySignature).toUpperCase();
+            if(triplet !== undefined && triplet !== null){
+                // eslint-disable-next-line no-console
                 console.log('For the Pitch')
+                // eslint-disable-next-line no-console
                 console.log(pitch)
+                // eslint-disable-next-line no-console
                 console.log('below is the meter Den')
+                // eslint-disable-next-line no-console
                 console.log(meterDen);
+                // eslint-disable-next-line no-console
                 console.log('below is the triplet')
+                // eslint-disable-next-line no-console
                 console.log(triplet)
+
                 pitchDuration[1]=meterDen*triplet
             }
           
@@ -3898,7 +3905,7 @@ class Activity {
                 [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]],
                 [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
                 [blockId + 6, ["notename", {value: adjustedNote}], 0, 0, [blockId + 5]],
-                [blockId + 7, ["number", {value: abcToStandardValue(pitch.pitch)}], 0, 0, [blockId + 5]],
+                [blockId + 7, ["number", {value: _abcToStandardValue(pitch.pitch)}], 0, 0, [blockId + 5]],
                 [blockId + 8, "hidden", 0, 0, [blockId, blockId + 9]],
             );
 
@@ -3908,7 +3915,7 @@ class Activity {
         }
 
         //function to search index for particular type of block mainly used to find nammeddo block in repeat block
-        function searchIndexForMusicBlock(array, x) {
+        function _searchIndexForMusicBlock(array, x) {
             // Iterate over each sub-array in the main array
             for (let i = 0; i < array.length; i++) {
                 // Check if the 0th element of the sub-array matches x
@@ -4006,28 +4013,30 @@ class Activity {
                                 }
                                 
                                 // Check and set tripletFinder to null if element?.endTriplets exists
-                          
+                                // eslint-disable-next-line no-console
                                 console.log('pitches are below')
+                                // eslint-disable-next-line no-console
                                 console.log(element)
-                                createPitchBlocks(element.pitches[0], blockId,element.duration,staff.key,actionBlock,tripletFinder,staffBlocksMap[lineId].meterDen);
-                                if (element?.endTriplet!== null &&element?.endTriplet!== undefined) {
+                                _createPitchBlocks(element.pitches[0], blockId,element.duration,staff.key,actionBlock,tripletFinder,staffBlocksMap[lineId].meterDen);
+                                if (element?.endTriplet !== null && element?.endTriplet !== undefined) {
                                     tripletFinder = null;
                                 }
                                 blockId = blockId + 9;
                             }
 
                             //check repeat start and end block 
-                            else if(element.el_type==="bar"){
-                                if(element.type==="bar_left_repeat"){
+                            else if(element.el_type === "bar"){
+                                if(element.type === "bar_left_repeat"){
                                     staffBlocksMap[lineId].repeatArray.push({start : staffBlocksMap[lineId].baseBlocks.length ,end:-1})
                                 }
-                                else if (element.type ==="bar_right_repeat"){
-                                    const endBlockSearch =    staffBlocksMap[lineId].repeatArray
+                                else if (element.type === "bar_right_repeat"){
+                                    const endBlockSearch = staffBlocksMap[lineId].repeatArray
 
                                     for(const repeatbar in endBlockSearch){
-                                        console.log('endBlockSearch[repeatbar].end'+ endBlockSearch[repeatbar].end)
-                                        if(endBlockSearch[repeatbar].end==-1){
-                                            staffBlocksMap[lineId].repeatArray[repeatbar].end=staffBlocksMap[lineId].baseBlocks.length
+                                        // eslint-disable-next-line no-console
+                                        console.log('endBlockSearch[repeatbar].end' + endBlockSearch[repeatbar].end)
+                                        if(endBlockSearch[repeatbar].end == -1){
+                                            staffBlocksMap[lineId].repeatArray[repeatbar].end = staffBlocksMap[lineId].baseBlocks.length
                                         }
                                     }                     
 
@@ -4037,12 +4046,12 @@ class Activity {
                         });
                         
                         //update the newnote connection with hidden
-                        actionBlock[0][4][0]=blockId+3
-                         actionBlock[actionBlock.length-1][4][1]=null
+                        actionBlock[0][4][0] = blockId+3
+                         actionBlock[actionBlock.length-1][4][1] = null
                         
                             //update the namedo block if not first nameddo block appear
-                        if(staffBlocksMap[lineId].baseBlocks.length!=0){                          
-                        staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0][staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0].length-4][4][1] =blockId
+                        if(staffBlocksMap[lineId].baseBlocks.length != 0){                          
+                        staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0][staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0].length-4][4][1] = blockId
                         }   
                         //add the nameddo action text and hidden block for each line
                         actionBlock.push ( [blockId, ["nameddo", {value: `V: ${parseInt(lineId)+1} Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1}`}], 0, 0, [staffBlocksMap[lineId].baseBlocks.length === 0 ? null : staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0][staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0].length-4][0], null]],
@@ -4060,11 +4069,11 @@ class Activity {
                         }
                         
                         staffBlocksMap[lineId].nameddoArray[lineId].push(blockId);
-                        blockId=blockId+4
+                        blockId = blockId + 4
 
                         musicBlocksJSON.push(actionBlock)
     
-                        console.log('below is the repeat checker'+lineId)
+                        console.log('below is the repeat checker' + lineId)
                         staffBlocksMap[lineId].baseBlocks.push([actionBlock]);
                      
     
@@ -4074,7 +4083,9 @@ class Activity {
             }
          
             let finalBlock = [];
+            // eslint-disable-next-line no-console
             console.log('below is the staff Block map')
+            // eslint-disable-next-line no-console
             console.log(staffBlocksMap)
 
 
@@ -4089,13 +4100,11 @@ class Activity {
             
                 // Update the first namedo block with settimbre
                 staffBlocksMap[staffIndex].baseBlocks[0][0][staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4][4][0] = staffBlocksMap[staffIndex].startBlock[staffBlocksMap[staffIndex].startBlock.length - 3][0];
-            
+                // eslint-disable-next-line no-console
                 console.log(`For iter ${staffIndex}`);
+                // eslint-disable-next-line no-console
                 console.log(staffBlocksMap[staffIndex].baseBlocks[0][0][staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4]);
-            
-    
-                let repeatBlock =[]
-        
+                    
                 let repeatblockids=staffBlocksMap[staffIndex].repeatArray
                 for(const repeatId of repeatblockids){
                     if (repeatId.start==0){
@@ -4107,20 +4116,24 @@ class Activity {
 
                         //Update the settrimbre block
                         staffBlocksMap[staffIndex].startBlock[staffBlocksMap[staffIndex].startBlock.length - 3][4][2]=blockId
+                        // eslint-disable-next-line no-console
                         console.log('Following are the nameddo Array')
+                        // eslint-disable-next-line no-console
                         console.log(staffBlocksMap[staffIndex].nameddoArray)
-                        let firstnammedo=searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[0][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][0])
-                        let endnammedo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end])
-                        console.log('below is the firstnammedo')
-                        console.log( firstnammedo)  
-                        console.log('below and below is the error for you ')
+
+                        let firstnammedo = _searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[0][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][0])
+                        let endnammedo = _searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end])
                         
-                        console.log(staffBlocksMap[staffIndex].baseBlocks[0][0])
+                        // eslint-disable-next-line no-console
+                        console.log( firstnammedo)  
+
+                        
+                    
                         //because its [0]is the first nammeddo block obviously
 
                         // Check if staffBlocksMap[staffIndex].baseBlocks[repeatId.end+1] exists and has a [0] element
                     if (staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1] && staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0]) {
-                        let secondnammedo = searchIndexForMusicBlock(
+                        let secondnammedo = _searchIndexForMusicBlock(
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0], 
                             staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end + 1]
                         );
@@ -4129,58 +4142,48 @@ class Activity {
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0][secondnammedo][4][0] = blockId;
                         }
                     }
-                    staffBlocksMap[staffIndex].baseBlocks[0][0][firstnammedo][4][0]=blockId
-                    staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][endnammedo][4][1]=null
+                    staffBlocksMap[staffIndex].baseBlocks[0][0][firstnammedo][4][0] =blockId
+                    staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][endnammedo][4][1] = null
 
-                    blockId=blockId+2
+                    blockId = blockId + 2
                 
                     }
                     else{
-               
-                      
-                    
-                        const currentnammeddo =searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.start])
+                        const currentnammeddo =_searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.start])
 
-                        let prevnameddo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.start-1][0],staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0])
-                        let afternamedo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0],staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][1])
-                        let prevrepeatnameddo=-1
-                        if(prevnameddo==-1){
-                            prevrepeatnameddo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].repeatBlock,staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0])
+                        let prevnameddo = _searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.start-1][0],staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0])
+                        let afternamedo = _searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0],staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][1])
+                        let prevrepeatnameddo = -1
+                        if(prevnameddo == -1){
+                            prevrepeatnameddo = _searchIndexForMusicBlock(staffBlocksMap[staffIndex].repeatBlock,staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0])
                         }
                         
                   
                         const prevBlockId=staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0]
-                        console.log('prevBlockID')
-                        console.log(prevBlockId)
+                        
                         const currentBlockId=staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][0]
 
                         //needs null checking optmizie
-                    let nextBlockId=staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end+1]
+                        let nextBlockId=staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end+1]
                     
-                      staffBlocksMap[staffIndex].repeatBlock.push([blockId,"repeat",0,0,[staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0],blockId+1, currentBlockId,nextBlockId === null ? null : nextBlockId]])
-                      staffBlocksMap[staffIndex].repeatBlock.push([blockId + 1, ["number", {value: 2}], 100, 100, [blockId]])
+                        staffBlocksMap[staffIndex].repeatBlock.push([blockId,"repeat",0,0,[staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0],blockId+1, currentBlockId,nextBlockId === null ? null : nextBlockId]])
+                        staffBlocksMap[staffIndex].repeatBlock.push([blockId + 1, ["number", {value: 2}], 100, 100, [blockId]])
 
-                   if(prevnameddo!=-1){
+                   if(prevnameddo != -1){
                     staffBlocksMap[staffIndex].baseBlocks[repeatId.start-1][0][prevnameddo][4][1]=blockId
                    }else{
                     staffBlocksMap[staffIndex].repeatBlock[prevrepeatnameddo][4][3]=blockId
                    }
-                   if(afternamedo!=-1){
+                   if(afternamedo != -1){
                     staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][afternamedo][4][1]=null
                    }
-                    
-
                     staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0]=blockId
                    
                     if(nextBlockId!=null){
-                        console.log('below is the repeat next block id '+ repeatId)
-                        console.log(staffBlocksMap[staffIndex].baseBlocks)
-                        const nextnameddo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.end+1][0],nextBlockId)
+                        const nextnameddo = _searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.end+1][0],nextBlockId)
                         staffBlocksMap[staffIndex].baseBlocks[repeatId.end+1][0][nextnameddo][4][0]=blockId
                     }
-                 
-         
-                    blockId=blockId+2
+                    blockId = blockId + 2
                     }
                         
                     }
@@ -4192,20 +4195,9 @@ class Activity {
                     finalBlock.push(...staffBlocksMap[staffIndex].startBlock);
                     finalBlock.push(...flattenedLineBlock);
                     finalBlock.push(...staffBlocksMap[staffIndex].repeatBlock)
-                    console.log('Below is the combined block:');
-                    console.log(combinedBlock);
+                    
                 }
-                
-            
-           
-            
 
-            console.log('below is the staff Block map')
-            console.log(staffBlocksMap);
-
-            
-            console.log('test block is ')
-            console.log(finalBlock)
     
       this.blocks.loadNewBlocks(finalBlock);
 
@@ -5948,7 +5940,8 @@ class Activity {
                                     obj = JSON.parse(
                                         cleanData.match('<div class="code">(.+?)</div>')[1]
                                     );
-                                } else {
+                                } 
+                                else {
                                     obj = JSON.parse(cleanData);
                                 }
                                 for (const name in that.blocks.palettes.dict) {
@@ -6009,7 +6002,6 @@ class Activity {
                     tunebook.forEach(tune => {
                         //call parseABC to parse abcdata to MB json
                         this.parseABC(tune);
-                        console.log(tune)
                     
                     });
                  
