@@ -1555,7 +1555,70 @@ function setupWidgetBlocks(activity) {
             if (args.length === 1) return [args[0], 1];
         }
     }
-
+        /**
+     * Represents a block for inspecting the status of Music Blocks during execution.
+     * @extends StackClampBlock
+     */
+        class AIMusicBlocks extends StackClampBlock {
+            /**
+             * Creates a SamplerBlock instance.
+             */
+            constructor() {
+                super("aimusic");
+                this.setPalette("widgets", activity);
+                this.parameter = true;
+                this.beginnerBlock(false);
+    
+                this.setHelpString([
+                    _("Upload a sample and adjust its pitch center."),
+                    "documentation",
+                    null,
+                    "aimusic"
+                ]);
+    
+                //.TRANS: the speed at music is should be played.
+                this.formBlock({ name: _("aimusic"), canCollapse: true });
+                this.makeMacro((x, y) => [
+                    [0, "aimusic", x, y, [null, 1, 8]],
+                    [1, "settimbre", 0, 0, [0, 2, 6, 7]],
+                    [2, ["customsample", { value: ["", "", "do", 4] }], 0, 0, [1, 3, 4, 5]],
+                    [3, ["audiofile", { value: null }], 0, 0, [2]],
+                    [4, ["solfege", { value: "do" }], 0, 0, [2]],
+                    [5, ["number", { value: 4 }], 0, 0, [2]],
+                    [6, "vspace", 0, 0, [1, null]],
+                    [7, "hidden", 0, 0, [1, null]],
+                    [8, "hiddennoflow", 0, 0, [0, null]]
+                ]);
+            }
+    
+            /**
+             * Handles the flow of data for the sampler block.
+             * @param {any[]} args - The arguments passed to the block.
+             * @param {object} logo - The logo object.
+             * @param {object} turtle - The turtle object.
+             * @param {object} blk - The block object.
+             * @returns {number[]} - The output values.
+             */
+            flow(args, logo, turtle, blk) {
+                if (logo.sample === null) {
+                    logo.sample = new AIWidget();
+                }
+                logo.inSample = true;
+                logo.sample = new AIWidget();
+    
+                const listenerName = "_sampler_" + turtle;
+                logo.setDispatchBlock(blk, turtle, listenerName);
+    
+                // eslint-disable-next-line no-unused-vars
+                const __listener = event => {
+                    logo.sample.init(activity);
+                };
+    
+                logo.setTurtleListener(turtle, listenerName, __listener);
+    
+                return [args[0], 1];
+            }
+        }
     // Set up blocks if this is Music Blocks environment
     if (_THIS_IS_MUSIC_BLOCKS_) {
         new EnvelopeBlock().setup(activity);
@@ -1579,6 +1642,7 @@ function setupWidgetBlocks(activity) {
         new MatrixGMajorBlock().setup(activity);
         new MatrixCMajorBlock().setup(activity);
         new MatrixBlock().setup(activity);
+        new AIMusicBlocks().setup(activity);
     }
     // Instantiate and set up the StatusBlock
     new StatusBlock().setup(activity);
