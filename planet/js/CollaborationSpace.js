@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // Copyright (c) 2024 Ajeet Pratap Singh
 //
 // This program is free software; you can redistribute it and/or
@@ -81,14 +82,13 @@ class CollaborationSpace {
 
     // Prepare the room by adding/hiding elements
 
-    prepareRoom(){
+    prepareRoom() {
         this.renderNavbar();
         this.renderCommonSpace();
     }
 
     // Exit the collaboration space
-    exitSpace(){
-
+    exitSpace() {
         const exitButton = document.getElementById("exitCollabRoom");
         exitButton.remove();
 
@@ -141,13 +141,19 @@ class CollaborationSpace {
 
         return prefix + suffix;
     }
-    
+
     // Render the room
-    renderRoom(){
+    renderRoom() {
         this.prepareRoom();
     }
 
-    initiate() {
+    initiateCollabSpace() {
         this.renderRoom();
+    }
+
+    startCollaboration(ID) {
+        const collabLink = this.createLink(ID);
+        window.open(collabLink, "_blank");
+        // show the link in the message  
     }
 }
