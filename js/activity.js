@@ -5931,9 +5931,11 @@ class Activity {
                 console.log("dom is ready");
                 const urlParams = new URLSearchParams(window.location.search);
                 const room_id = urlParams.get('roomID');
+                const collabUrl = window.location.href;
  
                 if (room_id) {
                     this.room_id = room_id;
+                    this.textMsg(`Collaboration link ${collabUrl}`);
                     this._initiateCollaboration(this.room_id);
                 };
             }, 7000);
