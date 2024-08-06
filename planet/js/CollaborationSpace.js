@@ -119,7 +119,27 @@ class CollaborationSpace {
 
         const localPage = document.getElementById("local");
         localPage.style.visibility = "visible";
+    }
 
+    // Create the invite link for the collaboration
+    createLink(id) {
+        const roomID = this.createRoomID();
+        const link = `https://musicblocks.sugarlabs.org/index.html?id=${id}&run=False&roomID=${roomID}`;
+        return link;
+    }
+
+    // Create an unique room ID
+    createRoomID() {
+        const n = Date.now();
+        const stampStr = n.toString();
+        const prefix = stampStr.slice(0, 10);
+
+        let suffix = "";
+        for (let i = 0; i < 6; i++) {
+            suffix += Math.floor(Math.random() * 10).toString();
+        }
+
+        return prefix + suffix;
     }
     
     // Render the room
