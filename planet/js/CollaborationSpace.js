@@ -138,7 +138,6 @@ class CollaborationSpace {
         for (let i = 0; i < 6; i++) {
             suffix += Math.floor(Math.random() * 10).toString();
         }
-
         return prefix + suffix;
     }
 
@@ -153,7 +152,6 @@ class CollaborationSpace {
 
     startCollaboration(ID) {
         const collabLink = this.createLink(ID);
-        window.open(collabLink, "_blank");
-        // show the link in the message  
+        window.open(collabLink, "_blank"); 
     }
 }
