@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // Copyright (c) 2024 Ajeet Pratap Singh
 //
 // This program is free software; you can redistribute it and/or
@@ -81,14 +82,13 @@ class CollaborationSpace {
 
     // Prepare the room by adding/hiding elements
 
-    prepareRoom(){
+    prepareRoom() {
         this.renderNavbar();
         this.renderCommonSpace();
     }
 
     // Exit the collaboration space
-    exitSpace(){
-
+    exitSpace() {
         const exitButton = document.getElementById("exitCollabRoom");
         exitButton.remove();
 
@@ -119,15 +119,39 @@ class CollaborationSpace {
 
         const localPage = document.getElementById("local");
         localPage.style.visibility = "visible";
-
     }
-    
+
+    // Create the invite link for the collaboration
+    createLink(id) {
+        const roomID = this.createRoomID();
+        const link = `https://musicblocks.sugarlabs.org/index.html?id=${id}&run=False&roomID=${roomID}`;
+        return link;
+    }
+
+    // Create an unique room ID
+    createRoomID() {
+        const n = Date.now();
+        const stampStr = n.toString();
+        const prefix = stampStr.slice(0, 10);
+
+        let suffix = "";
+        for (let i = 0; i < 6; i++) {
+            suffix += Math.floor(Math.random() * 10).toString();
+        }
+        return prefix + suffix;
+    }
+
     // Render the room
-    renderRoom(){
+    renderRoom() {
         this.prepareRoom();
     }
 
-    initiate() {
+    initiateCollabSpace() {
         this.renderRoom();
+    }
+
+    startCollaboration(ID) {
+        const collabLink = this.createLink(ID);
+        window.open(collabLink, "_blank"); 
     }
 }

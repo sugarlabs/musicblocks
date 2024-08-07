@@ -166,7 +166,8 @@ class GlobalCard {
         // set collaboration starter
         // eslint-disable-next-line no-unused-vars
         frag.getElementById(`global-project-collaborate-${this.id}`).addEventListener("click", (evt) => {
-            Planet.GlobalPlanet.CollaborationSpace.initiate();          
+            // Planet.GlobalPlanet.CollaborationSpace.initiateCollabSpace();
+            Planet.GlobalPlanet.CollaborationSpace.startCollaboration(this.id);
         });
 
         // set merge modify listener
