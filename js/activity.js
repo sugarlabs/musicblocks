@@ -5938,7 +5938,7 @@ class Activity {
  
                 if (room_id) {
                     this.room_id = room_id;
-                    this.textMsg(`_("Collaboration link: ") ${collabUrl}`);
+                    this.textMsg(`${_("Collaboration link: ")} ${collabUrl}`);
                     this._initiateCollaboration(this.room_id);
                 };
             }, 5000);
