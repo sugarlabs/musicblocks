@@ -65,14 +65,10 @@ class Collaboration {
         });
 
         socket.on("new-block-added", (update) => {
-            this.activity.textMsg("New block added. rendering...");
-            setTimeout(this.activity.hideMsgs, 10000);
             this.activity.renderProjectFromData(update);
         });
 
         socket.on("new-block-deleted", (update) => {
-            this.activity.textMsg("New block deleted. rendering...");
-            setTimeout(this.activity.hideMsgs, 10000);
             this.activity.renderProjectFromData(update);
         });
 
