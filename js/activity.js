@@ -3701,7 +3701,7 @@ class Activity {
             let defaultTempo=90;
             let currentMidiTempoBpm = currentMidi.header.tempos;
             if (currentMidiTempoBpm && currentMidiTempoBpm.length > 0) {
-                currentMidiTempoBpm = currentMidiTempoBpm[0].bpm;
+                currentMidiTempoBpm = Math.round(currentMidiTempoBpm[0].bpm);
             } else {
                 currentMidiTempoBpm = defaultTempo;
             }
@@ -3950,13 +3950,9 @@ class Activity {
                     [r, ["action", { collapsed: false }], 150, 100, [null, r+1, r+2, null]],
                     [r+1, ["text", { value: actionBlockName }], 0, 0, [r]]
                 );
-                // actionBlockPerTrack[trackCount]++;
-        
-                let time = 0;
+
                 let sched = [];
-        
                 for (let noteIndex in track.notes) {
-                    if (stopProcessing) break; // Exit inner loop if flag is set
                     let note = track.notes[noteIndex];
                     let name = note.name;
                     let first = sched.length == 0;
@@ -3979,32 +3975,89 @@ class Activity {
                         });
                         continue;
                     }
-                
+                    let lastNotes=[];
                     let lastNote = sched[sched.length - 1];
-                  
-                    if (lastNote.start == start && lastNote.end == end) {
-                        lastNote.notes.push(name);
+                    // let secondLastNote = sched.length > 1 ? sched[sched.length - 2] : null;
+                
+                    if (sched[sched.length - 1].start === start && sched[sched.length - 1].end === end) {
+                        sched[sched.length - 1].notes.push(name);
+                    }
+                    else if (lastNote.start > start) {
+                        while(lastNote.start >= start){
+                        lastNotes.push(sched[sched.length-1]);
+                        sched.pop();
+                        lastNote = sched[sched.length - 1];
+                        }
+                        lastNote = sched[sched.length - 1];
+                        // let secondLastNote = sched.length > 1 ? sched[sched.length - 2] : null;
+                        if (lastNote) {
+                            let oldEnd2 = lastNote.end;
+                            let prevNotes2 = [...lastNote.notes];
+                            let newNotes2 = [...prevNotes2];
+                            newNotes2.push(name);
+                            lastNote.end = start;
+                
+                            if (start < oldEnd2) {
+                                sched.push({
+                                    start: start,
+                                    end: oldEnd2,
+                                    notes: newNotes2
+                                });
+                            }
+                        }
+                        // console.log("last: ",lastNote);
+                        while(lastNotes.length>0){
+                        let prevNotes = [...lastNotes[lastNotes.length-1].notes];
+                        let oldEnd = lastNotes[lastNotes.length-1].end;
+                        let oldStart = lastNotes[lastNotes.length-1].start;
+                        let newNotes = [...prevNotes];
+                        newNotes.push(name);
+                
+                        if (lastNotes[lastNotes.length-1].end <= end) {
+                            sched.push({
+                                start: oldStart,
+                                end: oldEnd,
+                                notes: newNotes
+                            });
+                            if (end > oldEnd && lastNotes.length==1) {
+                                sched.push({
+                                    start: oldEnd,
+                                    end: end,
+                                    notes: [name]
+                                });
+                            }
+                            lastNotes.pop();
+                        } else if (lastNotes[lastNotes.length-1].end > end) {
+                            sched.push({
+                                start: oldStart,
+                                end: end,
+                                notes: newNotes
+                            });
+                            if (oldEnd > end && lastNotes.length==1) {
+                                sched.push({
+                                    start: end,
+                                    end: oldEnd,
+                                    notes: prevNotes
+                                });
+                            }
+                            lastNotes.pop();
+                        }
+                    }
+                       
+                       
+                        
                     } 
-                   
-                   else if (lastNote.end > start && lastNote.end >= end) {
-                        // Change prev, make 2 new
+                    else if ( lastNote.start < start && lastNote.end > start && lastNote.end >= end) {
                         let prevNotes = [...lastNote.notes];
                         let oldEnd = lastNote.end;
-                        if(start>lastNote.start) {
                         lastNote.end = start;
-                        start=lastNote.start;
-                        }
-                        let newNotes = [...prevNotes, name];
-                        if(start==lastNote.start  && end==lastNote.end){ 
-                            lastNote.notes.push(name);
-                        }
-                        else{
+                        let newNotes = [...prevNotes];
+                        newNotes.push(name);
                         sched.push({
                             start: start,
                             end: end,
                             notes: newNotes
                         });
-                    }
                         if (oldEnd > end) {
                             sched.push({
                                 start: end,
@@ -4013,19 +4066,13 @@ class Activity {
                             });
                         }
                     } 
-                else if (lastNote.end > start && lastNote.end <= end) {
-                        // Change prev, make 2 new
+                    else if (lastNote.start < start  && lastNote.end > start && lastNote.end <= end) {
                         let prevNotes = [...lastNote.notes];
                         let oldEnd = lastNote.end;
-                        if(start>lastNote.start) {
-                            lastNote.end = start;
-                            start=lastNote.start;
-                         }
-                         let newNotes = [...prevNotes, name];
-                        if(start==lastNote.start ){ 
-                            lastNote.notes.push(name);
-                        }
-                        else if (start < oldEnd) {
+                        sched[sched.length - 1].end = start;
+                        let newNotes = [...prevNotes];
+                        newNotes.push(name);
+                        if (start < oldEnd) {
                             sched.push({
                                 start: start,
                                 end: oldEnd,
@@ -4039,10 +4086,9 @@ class Activity {
                                 notes: [name]
                             });
                         }
-                    } else if (lastNote.end <= start) {
-                        // Add silence, make new
+                    } 
+                    else if (lastNote.end <= start) {
                         if (start > lastNote.end) {
-                            // Add integer part of the duration as rest blocks
                             let integerPart = Math.floor(start - lastNote.end);
                             for (let c = 0; c < integerPart; c += 2) {
                                 sched.push({
@@ -4060,6 +4106,9 @@ class Activity {
                         });
                     }
                 }
+                
+
+                console.log(JSON.parse(JSON.stringify(sched)))
                 let noteSum = 0;
                 let currentActionBlock = [];
         
