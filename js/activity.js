@@ -3956,10 +3956,12 @@ class Activity {
                     let note = track.notes[noteIndex];
                     let name = note.name;
                     let first = sched.length == 0;
-                    let start = note.time;
-                    let end = note.duration + note.time;
+                    let start =Math.round(note.time*100)/100;
+                    let end = Math.round((note.duration + note.time)*100)/100;
                     if (note.duration == 0) continue;
-                
+                    console.log("note: ",note.name);
+                    console.log("start: ",start);
+                    console.log("end: ",end);
                     if (first) {
                         if (note.time > 0) {
                             sched.push({
@@ -4044,7 +4046,7 @@ class Activity {
                         }
                     }
                        
-                       
+                    console.log("sched INSIDE COND: ",JSON.parse(JSON.stringify(sched))); 
                         
                     } 
                     else if ( lastNote.start < start && lastNote.end > start && lastNote.end >= end) {
@@ -4105,10 +4107,10 @@ class Activity {
                             notes: [name]
                         });
                     }
+                    console.log("sched:  ",JSON.parse(JSON.stringify(sched)))
                 }
                 
 
-                console.log(JSON.parse(JSON.stringify(sched)))
                 let noteSum = 0;
                 let currentActionBlock = [];
         
