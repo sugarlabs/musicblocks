@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Liam Norman
+// Copyright (c) 2024 Abhijeet Singh
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -17,9 +17,9 @@
    instruments, slicePath, platformColor
 */
 
-/* exported SampleWidget */
+/* exported Abhijeet Singh */
 /**
- * Represents a Sample Widget.
+ * Represents a AI Widget.
  * @constructor
  */
 function AIWidget() {
@@ -907,21 +907,24 @@ function AIWidget() {
 
      * @returns {void}
      */
-    this.makeCanvas = function (width, height, turtleIdx, resized) {
+    this.makeCanvas = function (width, height) {
         // Create a container to center the elements
         const container = document.createElement("div");
-    
+        
         this.widgetWindow.getWidgetBody().appendChild(container);
-    
+        
         // Create a scrollable container for the textarea
         const scrollContainer = document.createElement("div");
         scrollContainer.style.overflowY = "auto"; // Enable vertical scrolling
         scrollContainer.style.height = height + "px"; // Set the height of the scroll container
         scrollContainer.style.border = "1px solid #ccc"; // Optional: Add a border for visibility
-        scrollContainer.style.marginBottom = "10px";
-        scrollContainer.style.marginLeft = "20px";
+        scrollContainer.style.marginBottom = "8px";
+        scrollContainer.style.marginLeft = "8px";
+        scrollContainer.style.display = "flex"; // Use flexbox for centering
+        scrollContainer.style.flexDirection = "column"; // Stack elements vertically
+        scrollContainer.style.alignItems = "center"; // Center items horizontally
         container.appendChild(scrollContainer);
-    
+        
         // Create the textarea element
         const textarea = document.createElement("textarea");
         textarea.style.height = height + "px"; // Keep the height for the scrollable area
@@ -932,38 +935,70 @@ function AIWidget() {
         textarea.style.padding = "10px";
         scrollContainer.appendChild(textarea); // Append textarea to scroll container
     
-        // Create the input text field
+        // Create hint text elements
+        const hintsContainer = document.createElement("div");
+        hintsContainer.style.marginBottom = "10px";
+        
+        hintsContainer.style.display = "flex";
+        hintsContainer.style.justifyContent = "center";
+        hintsContainer.style.marginTop = "8px";
+        const hints = ["simple abc song", "rock song"];
+        hints.forEach(hintText => {
+            const hint = document.createElement("span");
+            hint.textContent = hintText;
+            hint.style.marginRight = "20px";
+            hint.style.cursor = "pointer";
+            hint.style.marginRight="4px"
+            hint.style.fontSize = "20px";
+            hint.style.color = "blue";
+            hint.style.backgroundColor = "rgb(227 162 162 / 80%)"; // Light white background
+            hint.style.padding = "10px"; // Add padding for spacing
+            hint.style.borderRadius = "5px"; // Optional: Rounded corners
+           
+            hint.onclick = function () {
+                inputField.value = hintText;
+                hintsContainer.style.display = "none";
+            };
+            
+            hintsContainer.appendChild(hint);
+        });
+        
+        scrollContainer.appendChild(hintsContainer);
+    
+       
         const inputField = document.createElement("input");
         inputField.type = "text";
         inputField.className = "inputField";
         inputField.placeholder = "Enter text here";
         inputField.style.fontSize = "20px";
+        inputField.style.marginRight = "2px";
+        inputField.style.marginLeft = "64px";
         inputField.style.padding = "10px";
-        inputField.style.marginLeft = "180px";
         inputField.style.marginBottom = "10px";
-        inputField.style.marginTop = "20px";
+        inputField.style.width = "60%";
         container.appendChild(inputField);
-    
-        // Ensure inputField focuses when clicked
+        
+       
         inputField.addEventListener('click', function () {
             inputField.focus();
         });
     
-        // Create the submit button
+       
         const submitButton = document.createElement("button");
         submitButton.className = "submitButton";
         submitButton.textContent = "Submit";
         submitButton.style.fontSize = "20px";
         submitButton.style.padding = "10px 20px";
+        submitButton.style.marginBottom = "20px";
         container.appendChild(submitButton);
-    
-        // Function to handle the submit button click
+        
+       
         submitButton.onclick = function () {
-            const inputText = inputField.value.trim(); // Trim the input text
+            const inputText = inputField.value.trim();
             if (inputText === "") {
-                return; // Prevent further execution if input is empty
+                return;
             }
-    
+            
             const apiUrl = 'http://127.0.0.1:5000/ask-ollama';
             const prompt_eng = `
             Generate an ABC notation song based on the following description:
@@ -989,14 +1024,14 @@ function AIWidget() {
             - If your response includes other formats, please only output the ABC notation content within the curly braces.
             - Do not add other text at the bottom such as "Let me know if you need any changes! "
             `;
-    
-            // Prepare the request body
+            
+           
             const requestBody = JSON.stringify({ prompt: prompt_eng });
-    
-            // Disable the submit button and show loading message
-            submitButton.disabled = true; // Disable the submit button
-            textarea.value = "Loading..."; // Show loading message
-    
+            
+           
+            submitButton.disabled = true;
+            textarea.value = "Loading...";
+            
             fetch(apiUrl, {
                 method: 'POST',
                 headers: {
@@ -1006,47 +1041,47 @@ function AIWidget() {
             })
                 .then(response => response.json())
                 .then(data => {
-                    // Handle the response data
+                   
                     console.log('API Response:', data);
-    
-                    let responseText = data; // Adjust to match your API response structure
+            
+                    let responseText = data;
                     const abcStartIndex = responseText.indexOf("X:");
-                    // Extract ABC notation starting from "X:" to the first closing brace "}"
+                   
                     let abcNotation = responseText.substring(abcStartIndex);
-    
-                    // Find the position of the first closing brace after the "X:" index
+            
+                   
                     const closingBraceIndex = abcNotation.indexOf("}");
                     if (closingBraceIndex !== -1) {
-                        // Extract the notation from "X:" to the closing brace "}"
+                       
                         abcNotation = abcNotation.substring(0, closingBraceIndex + 1);
                     } else {
-                        // If there's no closing brace, just keep what we have (or handle the error)
+                       
                         console.warn("No closing brace found in the response.");
                     }
-    
-                    // Clean up the notation
-                    abcNotation = abcNotation.replace(/"|\}/g, '') // Remove quotes and closing braces
+            
+                   
+                    abcNotation = abcNotation.replace(/"|\}/g, '')
                         .trim();
-    
-                    // Add newlines before each tag, while ensuring no unwanted indentation
+            
+                   
                     abcNotation = abcNotation.replace(/(X:|T:|M:|L:|Q:|K:)/g, '\n$1').replace(/\n\s+/g, '\n').trim();
                     console.log(abcNotation);
-    
+            
                     let lines = abcNotation.split('\n').map(line => line.trim());
-    
+            
                     let formattedNotation = lines.map(line => {
-                        // Add a newline after each header
+                       
                         if (line.startsWith('X:') || line.startsWith('T:') || line.startsWith('M:') ||
                             line.startsWith('L:') || line.startsWith('Q:') || line.startsWith('K:')) {
                             return line + '\n';
                         }
                         return line;
                     }).join('');
-    
+            
                     console.log(formattedNotation);
                     abcNotationSong = formattedNotation;
-                    console.log('blasdfsdfjkl', abcNotationSong);
-    
+                    console.log('Updated abcNotationSong:', abcNotationSong);
+            
                     // Display the ABC notation song in the textarea
                     textarea.value = abcNotationSong;
                 })
@@ -1061,7 +1096,16 @@ function AIWidget() {
                     submitButton.disabled = false; // Re-enable the submit button
                 });
         };
+        
+        // Update abcNotationSong whenever the textarea content changes
+        textarea.addEventListener('input', function () {
+            abcNotationSong = textarea.value;
+            console.log('abcNotationSong updated to:', abcNotationSong);
+        });
     };
+    
+    
+    
     
     
     
