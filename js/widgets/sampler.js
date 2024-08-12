@@ -156,7 +156,7 @@ function SampleWidget() {
      * Pauses the sample playback.
      * @returns {void}
      */
-    this.pause = function () {
+    this.stop = function () {
         this.playBtn.innerHTML =
             '<img src="header-icons/play-button.svg" title="' +
             _("Play") +
@@ -176,10 +176,10 @@ function SampleWidget() {
      */
     this.resume = function () {
         this.playBtn.innerHTML =
-            '<img src="header-icons/pause-button.svg" title="' +
-            _("Pause") +
+            '<img src="header-icons/stop-button.svg" title="' +
+            _("Stop") +
             '" alt="' +
-            _("Pause") +
+            _("Stop") +
             '" height="' +
             ICONSIZE +
             '" width="' +
@@ -342,18 +342,10 @@ function SampleWidget() {
         this.playBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
         this.playBtn.onclick = () => {
             if (this.isMoving) {
-                this.pause();
-                this.playBtn.innerHTML =
-                    '<img src="header-icons/play-button.svg" title="' +
-                    _("Play") +
-                    '" alt="' +
-                    _("Play") +
-                    '" height="' +
-                    ICONSIZE +
-                    '" width="' +
-                    ICONSIZE +
-                    '" vertical-align="middle">';
-                this.isMoving = false;
+                this.stop();
+
+                console.log(this.activity.logo.synth.stop);
+                this.activity.logo.synth.stop();
             } else {
                 if (!(this.sampleName == "")) {
                     this.resume();
@@ -440,7 +432,7 @@ function SampleWidget() {
         this.setTimbre();
 
         this.activity.textMsg(_("Upload a sample and adjust its pitch center."));
-        this.pause();
+        this.stop();
 
         widgetWindow.sendToCenter();
     };
@@ -590,7 +582,7 @@ function SampleWidget() {
     this._waitAndEndPlaying = function () {
         return new Promise((resolve) => {
             setTimeout(() => {
-                this.pause();
+                this.stop();
                 resolve("ended");
             }, this.sampleLength);
         });
