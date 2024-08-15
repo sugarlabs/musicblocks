@@ -259,6 +259,9 @@ class Activity {
         // Flag to indicate whether the user is performing a 2D drag operation.
         this.isDragging = false;
 
+        //Flag to check is block is playing
+        this.isPlaying = false;
+
         // Flag to indicate the selection mode is on
         this.selectionModeOn = false;
 
@@ -1063,6 +1066,9 @@ class Activity {
          */
         const doFastButton = (activity, env) => {
             activity._doFastButton(env);
+           // console.log("isPlaying");
+            this.isPlaying = true;
+            
         };
 
         this._doFastButton = (env) => {
@@ -5130,7 +5136,7 @@ class Activity {
                 if (this.isDragging){
                     this.currentX = event.clientX;
                     this.currentY = event.clientY;
-                    if (!this.blocks.isBlockMoving) {
+                    if (!this.blocks.isBlockMoving && !this.isPlaying) {
                         this.setSelectionMode(true);
                         this.drawSelectionArea();
                         this.selectedBlocks = this.selectBlocksInDragArea();
@@ -5142,6 +5148,7 @@ class Activity {
 
             document.addEventListener("mouseup", (event) => {
                // event.preventDefault();
+                this.isPlaying = false;
                 this.isDragging = false;
                 this.selectionArea.style.display = "none";
                 this.startX = 0;
