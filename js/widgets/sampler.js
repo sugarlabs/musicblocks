@@ -264,16 +264,18 @@ function SampleWidget() {
             that._addSample();
 
             var newStack = [
+                [0,"settimbre",100,100,[null,1,null,5]],
                 [
-                    0,
+                    1,
                     ["customsample", { value: [that.sampleName, that.sampleData, "do", 4] }],
                     100,
                     100,
-                    [null, 1, 2, 3]
+                    [0, 2, 3, 4]
                 ],
-                [1, ["audiofile", { value: [that.sampleName, that.sampleData] }], 0, 0, [0]],
-                [2, ["solfege", { value: that.samplePitch }], 0, 0, [0]],
-                [3, ["number", { value: that.sampleOctave }], 0, 0, [0]]
+                [2, ["audiofile", { value: [that.sampleName, that.sampleData] }], 0, 0, [1]],
+                [3, ["solfege", { value: that.samplePitch }], 0, 0, [1]],
+                [4, ["number", { value: that.sampleOctave }], 0, 0, [1]],
+                [5,"hidden",0,0,[0,null]]
             ];
 
             that.activity.blocks.loadNewBlocks(newStack);
@@ -375,8 +377,8 @@ function SampleWidget() {
             } else {
                 if (!(this.sampleName == "")) {
                     this.resume();
-                    this._playReferencePitch();
                 }
+                this._playReferencePitch();
             }
         };
 
