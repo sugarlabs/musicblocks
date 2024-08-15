@@ -4196,14 +4196,14 @@ class Activity {
                         return ar;
                     };
                     var obj = this.getClosestStandardNoteValue(duration * 3 / 8);
-                    let scalingFactor=1;
-                    if(shortestNoteDenominator>32)
-                    scalingFactor=shortestNoteDenominator/32;
+                    // let scalingFactor=1;
+                    // if(shortestNoteDenominator>32)
+                    // scalingFactor=shortestNoteDenominator/32;
 
-                    if(obj[1]>=scalingFactor)
-                    obj[1]=obj[1]/scalingFactor;
-                    else
-                    obj[0]=obj[0]*scalingFactor;
+                    // if(obj[1]>=scalingFactor)
+                    // obj[1]=obj[1]/scalingFactor;
+                    // else
+                    // obj[0]=obj[0]*scalingFactor;
                     
                     obj=this.getClosestStandardNoteValue(obj[0]/obj[1]); //to get the reduced fraction for 4/2 to 2/1
                 
