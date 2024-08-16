@@ -380,11 +380,15 @@ function SampleWidget() {
                 // eslint-disable-next-line no-unused-vars
                 reader.onload = function (event) {
                     // if the file is of .wav type, save it
-                    if (reader.result.substring(reader.result.indexOf(":")+1, reader.result.indexOf(";")) === "audio/wav") {
-                        that.sampleData = reader.result;
-                        that.sampleName = fileChooser.files[0].name;
-                        that._addSample();
-                        that.getSampleLength();
+                    if (reader.result.substring(reader.result.indexOf(":")+1, reader.result.indexOf(";")) === "audio/wav") {                        
+                        if (reader.result.length <= 1333333) {
+                            that.sampleData = reader.result;
+                            that.sampleName = fileChooser.files[0].name;
+                            that._addSample();
+                        } else {
+                            that.sampleData = reader.result;
+                            that.getSampleLength();
+                        }
                     }
                     // otherwise, output error message
                     else {
