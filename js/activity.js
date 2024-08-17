@@ -1063,7 +1063,6 @@ class Activity {
          */
         const doFastButton = (activity, env) => {
             activity._doFastButton(env);
-            
         };
 
         this._doFastButton = (env) => {
@@ -5143,7 +5142,6 @@ class Activity {
 
             document.addEventListener("mouseup", (event) => {
                // event.preventDefault();
-                this.isPlaying = false;
                 this.isDragging = false;
                 this.selectionArea.style.display = "none";
                 this.startX = 0;
