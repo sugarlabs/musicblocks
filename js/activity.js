@@ -4046,7 +4046,7 @@ class Activity {
                         }
                     }
                        
-                    console.log("sched INSIDE COND: ",JSON.parse(JSON.stringify(sched))); 
+                    // console.log("sched INSIDE COND: ",JSON.parse(JSON.stringify(sched))); 
                         
                     } 
                     else if ( lastNote.start < start && lastNote.end > start && lastNote.end >= end) {
@@ -4107,7 +4107,7 @@ class Activity {
                             notes: [name]
                         });
                     }
-                    console.log("sched:  ",JSON.parse(JSON.stringify(sched)))
+                    console.log("sched:  ",JSON.parse(JSON.stringify(sched)));
                 }
                 
 
@@ -4254,12 +4254,13 @@ class Activity {
             
             for (let i = 0; i < trackCount; i++) {
                  let vspaceIndex=len+m+6;
-                let flag=true;
+                 let startIndex=len+m;
+                 let flag=true;
                 if(isPercussion[i])
                 {
                     jsONON.push(
-                        [len + m, ["start", { collapsed: false }], 300 + offset, 100, [null, len + m + 1, null]],
-                        [len + m +1,"meter",0,0,[len + m,len + m +2,len + m +3,len + m + 6]],
+                        [len + m, ["start", { collapsed: false }], 300 + offset, 100, [null, len + m + 14+actionBlockPerTrack[i], null]],
+                        [len + m +1,"meter",0,0,[len + m +14 + actionBlockPerTrack[i],len + m +2,len + m +3,len + m + 6]],
                         [len + m + 2, ["number",{value: currentMidiTimeSignature[0]}],0,0,[len+m+1]],
                         [len + m + 3,"divide",0,0,[len + m +1,len + m + 4,len + m + 5]],
                         [len + m + 4,["number", {value : 1}],0,0,[len+m+3]],
@@ -4272,8 +4273,8 @@ class Activity {
                 }
                 else{
                 jsONON.push(
-                    [len + m, ["start", { collapsed: false }], 300 + offset, 100, [null, len + m + 1, null]],
-                    [len + m +1,"meter",0,0,[len + m,len + m +2,len + m +3,len + m + 6]],
+                    [len + m, ["start", { collapsed: false }], 300 + offset, 100, [null, len + m+16+actionBlockPerTrack[i], null]],
+                    [len + m +1,"meter",0,0,[len + m+16+actionBlockPerTrack[i],len + m +2,len + m +3,len + m + 6]],
                     [len + m + 2, ["number",{value: currentMidiTimeSignature[0]}],0,0,[len+m+1]],
                     [len + m + 3,"divide",0,0,[len + m +1,len + m + 4,len + m + 5]],
                     [len + m + 4,["number", {value : 1}],0,0,[len+m+3]],
@@ -4304,6 +4305,11 @@ class Activity {
                     [setBpmIndex + 5, "vspace", 0, 0, [setBpmIndex, vspaceIndex + 1]],
                 )
                 m+=6;
+                jsONON.push(
+                    [len + m, "setturtlename2", 0, 0, [startIndex, len + m + 1,startIndex+1]],
+                    [len + m + 1, ["text", { value: `track${i}` }], 0, 0, [len + m]]
+                );
+                m+=2;
 
             }
             
