@@ -218,16 +218,6 @@ function SampleWidget() {
     };
 
     /**
-     * Gets the length of the sample and displays a warning if it exceeds 1MB.
-     * @returns {void}
-     */
-    this.getSampleLength = function () {
-        if (this.sampleData.length > 1333333) {
-            this.activity.errorMsg(_("Warning: Sample is bigger than 1MB."), this.timbreBlock);
-        }
-    };
-
-    /**
      * Displays an error message when the uploaded sample is not a .wav file.
      * @returns {void}
      */
@@ -380,14 +370,13 @@ function SampleWidget() {
                 // eslint-disable-next-line no-unused-vars
                 reader.onload = function (event) {
                     // if the file is of .wav type, save it
-                    if (reader.result.substring(reader.result.indexOf(":")+1, reader.result.indexOf(";")) === "audio/wav") {                        
+                    if (reader.result.substring(reader.result.indexOf(":")+1, reader.result.indexOf(";")) === "audio/wav") {
                         if (reader.result.length <= 1333333) {
                             that.sampleData = reader.result;
                             that.sampleName = fileChooser.files[0].name;
                             that._addSample();
                         } else {
-                            that.sampleData = reader.result;
-                            that.getSampleLength();
+                            that.activity.errorMsg(_("Warning: Sample is bigger than 1MB."), that.timbreBlock);
                         }
                     }
                     // otherwise, output error message
