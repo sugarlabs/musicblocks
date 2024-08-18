@@ -376,7 +376,7 @@ function SampleWidget() {
                             that.sampleName = fileChooser.files[0].name;
                             that._addSample();
                         } else {
-                            that.activity.errorMsg(_("Warning: Sample is bigger than 1MB."), that.timbreBlock);
+                            that.activity.errorMsg(_("Warning: Your sample cannot be loaded because it is >1MB."), that.timbreBlock);
                         }
                     }
                     // otherwise, output error message
