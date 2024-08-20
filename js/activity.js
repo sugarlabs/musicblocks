@@ -5130,7 +5130,7 @@ class Activity {
                 if (this.isDragging){
                     this.currentX = event.clientX;
                     this.currentY = event.clientY;
-                    if (!this.blocks.isBlockMoving) {
+                    if (!this.blocks.isBlockMoving && !this.turtles.running()) {
                         this.setSelectionMode(true);
                         this.drawSelectionArea();
                         this.selectedBlocks = this.selectBlocksInDragArea();
