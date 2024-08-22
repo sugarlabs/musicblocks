@@ -491,8 +491,10 @@ class Activity {
                 (event) => {
                     event.preventDefault();
                     event.stopPropagation();
-                    if (event.target.id === "myCanvas") {
-                        this._displayHelpfulWheel(event);
+                    if (!this.beginnerMode) {
+                        if (event.target.id === "myCanvas") {
+                            this._displayHelpfulWheel(event);
+                        }
                     }
                 },
                 false
