@@ -333,17 +333,6 @@ function SampleWidget() {
         this.playBtn.onclick = () => {
             if (this.isMoving) {
                 this.pause();
-                this.playBtn.innerHTML =
-                    '<img src="header-icons/play-button.svg" title="' +
-                    _("Play") +
-                    '" alt="' +
-                    _("Play") +
-                    '" height="' +
-                    ICONSIZE +
-                    '" width="' +
-                    ICONSIZE +
-                    '" vertical-align="middle">';
-                this.isMoving = false;
             } else {
                 if (!(this.sampleName == "")) {
                     this.resume();
