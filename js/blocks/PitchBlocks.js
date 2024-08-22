@@ -890,6 +890,7 @@ function setupPitchBlocks(activity) {
                 "note1"
             ]);
             this.formBlock({ outType: "solfegeout" });
+            this.beginnerBlock(true);
         }
     }
 
