@@ -164,7 +164,8 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 const bpmFactor =
                     TONEBPM / tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
 
-                const beatValue = bpmFactor / noteBeatValue;
+                const beatValue =
+                    bpmFactor == null ? 1 : bpmFactor / noteBeatValue;
 
                 /**
                  * Plays a note in the rhythm.
@@ -951,6 +952,8 @@ function setupRhythmBlockPaletteBlocks(activity) {
                         () => Singer.processNote(activity, thisBeat, false, blk, turtle, callback),
                         timeout
                     );
+                    console.log("rhythm22");
+                    
                 };
 
                 let __callback = null;
