@@ -951,9 +951,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                     setTimeout(
                         () => Singer.processNote(activity, thisBeat, false, blk, turtle, callback),
                         timeout
-                    );
-                    console.log("rhythm22");
-                    
+                    );   
                 };
 
                 let __callback = null;
