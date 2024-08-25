@@ -178,10 +178,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                  */
                 const __rhythmPlayNote = (thisBeat, blk, turtle, callback, timeout) => {
                     setTimeout(
-                        () =>{
-                            console.log("rhythm note playing");
-                            Singer.processNote(activity, thisBeat, false, blk, turtle, callback)
-                        },
+                        () => Singer.processNote(activity, thisBeat, false, blk, turtle, callback),
                         timeout
                     );
                 };
