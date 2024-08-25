@@ -1003,7 +1003,7 @@ function AIWidget() {
                 return;
             }
             
-            const apiUrl = 'http://127.0.0.1:5000/ask-ollama';
+            const apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
             const prompt_eng = `
             Generate an ABC notation song based on the following description:
             
@@ -1029,77 +1029,77 @@ function AIWidget() {
             - Do not add other text at the bottom such as "Let me know if you need any changes! "
             `;
             
-           
-            const requestBody = JSON.stringify({ prompt: prompt_eng });
+            const requestBody = JSON.stringify({
+                messages: [
+                    {
+                        role: "system",
+                        content: "You are a helpful assistant that generates ABC notation songs."
+                    },
+                    {
+                        role: "user",
+                        content: prompt_eng
+                    }
+                ],
+                model: "llama3-8b-8192"
+            });
             
-           
             submitButton.disabled = true;
             textarea.value = "Loading...";
             
             fetch(apiUrl, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${env.GROQ_API_KEY}` // Replace with your actual API key
                 },
                 body: requestBody
             })
                 .then(response => response.json())
                 .then(data => {
-                   
                     console.log('API Response:', data);
-            
-                    let responseText = data;
+                
+                    let responseText = data.choices[0].message?.content || "";
                     const abcStartIndex = responseText.indexOf("X:");
                    
                     let abcNotation = responseText.substring(abcStartIndex);
-            
-                   
+                
                     const closingBraceIndex = abcNotation.indexOf("}");
                     if (closingBraceIndex !== -1) {
-                       
                         abcNotation = abcNotation.substring(0, closingBraceIndex + 1);
                     } else {
-                       
                         console.warn("No closing brace found in the response.");
                     }
-            
-                   
-                    abcNotation = abcNotation.replace(/"|\}/g, '')
-                        .trim();
-            
-                   
+                
+                    abcNotation = abcNotation.replace(/"|\}/g, '').trim();
+                
                     abcNotation = abcNotation.replace(/(X:|T:|M:|L:|Q:|K:)/g, '\n$1').replace(/\n\s+/g, '\n').trim();
                     console.log(abcNotation);
-            
+                
                     let lines = abcNotation.split('\n').map(line => line.trim());
-            
+                
                     let formattedNotation = lines.map(line => {
-                       
                         if (line.startsWith('X:') || line.startsWith('T:') || line.startsWith('M:') ||
                             line.startsWith('L:') || line.startsWith('Q:') || line.startsWith('K:')) {
                             return line + '\n';
                         }
                         return line;
                     }).join('');
-            
+                
                     console.log(formattedNotation);
                     abcNotationSong = formattedNotation;
                     console.log('Updated abcNotationSong:', abcNotationSong);
-            
-                    // Display the ABC notation song in the textarea
+                
                     textarea.value = abcNotationSong;
                 })
                 .catch(error => {
-                    // Handle any errors
                     console.error('Error:', error);
-                    // Optionally, you can display an error message in the textarea if needed
                     textarea.value = "An error occurred: " + error.message;
                 })
                 .finally(() => {
-                    // Re-enable the submit button
-                    submitButton.disabled = false; // Re-enable the submit button
+                    submitButton.disabled = false;
                 });
         };
+        
         
         // Update abcNotationSong whenever the textarea content changes
         textarea.addEventListener('input', function () {
