@@ -536,7 +536,7 @@ function AIWidget() {
       this.activity.blocks.loadNewBlocks(finalBlock);
   
 
-  this.activity.textMsg(_("A new sample block was generated."));
+  this.activity.textMsg(_("New start block generated"));
 
         // // logo.textMsg(_("MIDI loading. This may take some time depending upon the number of notes in the track"));
         // this.blocks.loadNewBlocks(combined_array);
@@ -942,7 +942,11 @@ function AIWidget() {
         hintsContainer.style.display = "flex";
         hintsContainer.style.justifyContent = "center";
         hintsContainer.style.marginTop = "8px";
-        const hints = ["simple abc song", "rock song"];
+        const hints = ["Dance tune",
+            "Fiddle jig",
+            "Nice melody",
+            "Fun song",
+            "Simple canon"];
         hints.forEach(hintText => {
             const hint = document.createElement("span");
             hint.textContent = hintText;
