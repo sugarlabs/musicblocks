@@ -875,6 +875,7 @@ function setupPitchBlocks(activity) {
                 "note2"
             ]);
             this.formBlock({ outType: "noteout" });
+            this.beginnerBlock(true);
         }
     }
 
@@ -889,6 +890,7 @@ function setupPitchBlocks(activity) {
                 "note1"
             ]);
             this.formBlock({ outType: "solfegeout" });
+            this.beginnerBlock(true);
         }
     }
 
@@ -1038,6 +1040,32 @@ function setupPitchBlocks(activity) {
             }
         }
     }
+
+    class FiftyCentsBlock extends FlowBlock {
+        constructor() {
+            //.TRANS: cents are units used to specify the ratio between pitches. There are 100 cents between successive notes.
+            super("50cents", _("50 cents"));
+            this.setPalette("pitch", activity);
+            this.makeMacro((x, y) => [
+                [0, "settransposition", x, y, [null, 12, 1, 2]],
+                [1, "vspace", 0, 0, [0, 3]],
+                [2, "hidden", 0, 0, [0, null]],
+                [3, ["newnote", {"collapsed": false}], 0, 0, [1, 4, 7, 11]],
+                [4, "divide", 0, 0, [3, 5, 6]],
+                [5, ["number", {"value": 1}], 0, 0, [4]],
+                [6, ["number", {"value": 4}], 0, 0, [4]],
+                [7, "vspace", 0, 0, [3, 8]],
+                [8, "pitch", 0, 0, [7, 9, 10, null]],
+                [9, ["solfege", {"value": "sol"}], 0, 0, [8]],
+                [10, ["number", {"value": 4}], 0, 0, [8]],
+                [11, "hidden", 0, 0, [3, null]],
+                [12, "divide", 0, 0, [0, 13, 14]],
+                [13, ["number", {"value": 50}], 0, 0, [12]],
+                [14, ["number", {"value": 100}], 9, 0, [12]]
+            ]);
+        }
+    }
+
 
     class SetTranspositionBlock extends FlowClampBlock {
         constructor() {
@@ -1815,6 +1843,7 @@ function setupPitchBlocks(activity) {
                 [1, ["notename", { value: "G" }], 0, 0, [0]],
                 [2, ["number", { value: 4 }], 0, 0, [0]]
             ]);
+            this.beginnerBlock(true);
         }
     }
 
@@ -2041,6 +2070,7 @@ function setupPitchBlocks(activity) {
     new InvertBlock().setup(activity);
     new RegisterBlock().setup(activity);
     new SetRatioTranspositionBlock().setup(activity);
+    new FiftyCentsBlock().setup(activity);
     new SetTranspositionBlock().setup(activity);
     new OctaveBlock().setup(activity);
     new DownSixthBlock().setup(activity);

@@ -2412,7 +2412,6 @@ class PhraseMaker {
                 this.rowLabels[i] + this.rowArgs[i],
                 this.activity.turtles.ithTurtle(0).singer.keySignature
             );
-
             if (!uniqueFrequencies.has(frequencyKey)) {
                 sortableList.push([
                     frequencyKey,
@@ -4316,59 +4315,107 @@ class PhraseMaker {
         // row labels and note value (from "alt" attribute of
         // corresponding cells in the row)
 
-        // list of half-tones with solfeges
+        // list of half-tones with solfeges or letter names
         const MATRIXHALFTONES = [
+            "do♭",
+            "C♭",
             "do",
             "C",
+            "do♯",
             "C♯",
+
+            "re♭",
             "D♭",
             "re",
             "D",
+            "re♯",
             "D♯",
+
+            "mi♭",
             "E♭",
             "mi",
             "E",
+            "mi♯",
+            "E♯",
+
+            "fa♭",
+            "F♭",
             "fa",
             "F",
+            "fa♯",
             "F♯",
+
+            "sol♭",
             "G♭",
             "sol",
             "G",
+            "sol♯",
             "G♯",
+
+            "la♭",
             "A♭",
             "la",
             "A",
+            "la♯",
             "A♯",
+
+            "ti♭",
             "B♭",
             "ti",
-            "B"
+            "B",
+            "ti♯",
+            "B♯"
         ];
-        // list of half-tones in letter representations
+        // list of half-tones mapped to their letter representations
         const MATRIXHALFTONES2 = [
+            "C♭",
+            "C♭",
             "C",
             "C",
             "C♯",
+            "C♯",
+
+            "D♭",
             "D♭",
             "D",
             "D",
             "D♯",
+            "D♯",
+
+            "E♭",
             "E♭",
             "E",
             "E",
+            "E♯",
+            "E♯",
+
+            "F♭",
+            "F♭",
             "F",
             "F",
             "F♯",
+            "F♯",
+
+            "G♭",
             "G♭",
             "G",
             "G",
             "G♯",
+            "G♯",
+
+            "A♭",
             "A♭",
             "A",
             "A",
             "A♯",
+            "A♯",
+
+            "B♭",
             "B♭",
             "B",
-            "B"
+            "B",
+            "B♯",
+            "B♯"
         ];
         const notes = [];
         let row, cell, note;

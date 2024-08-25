@@ -1963,7 +1963,7 @@ function TemperamentWidget() {
         const duration = 1 / 2;
         let notes;
 
-        if (docById("wheelDiv4") == null) {
+        if (docById("wheelDiv4") === null) {
             notes = this.frequencies[pitchNumber];
             if (this.editMode == "equal" && this.eqTempHzs && this.eqTempHzs.length) {
                 notes = this.eqTempHzs[pitchNumber];
@@ -2307,12 +2307,18 @@ function TemperamentWidget() {
                 }
 
                 str[i] = note[i] + str[i][1];
-                this.frequencies[i] = this._logo.synth
-                    ._getFrequency(str[i], true, this.inTemperament)
-                    .toFixed(2);
                 this.intervals[i] = t.interval[i];
                 this.ratios[i] = t[this.intervals[i]];
                 this.cents[i] = 1200 * (Math.log10(this.ratios[i]) / Math.log10(this.powerBase));
+                if (i == 0) {
+                    this.frequencies[i] = this._logo.synth
+                        ._getFrequency(str[i], true, this.inTemperament)
+                        .toFixed(2);
+                } else {
+                    // Calculate frequency based on the ratio.
+                    const thisFreq = this.frequencies[0] * this.ratios[i];
+                    this.frequencies[i] = thisFreq.toFixed(2);
+                }
                 this.ratiosNotesPair[i] = [this.ratios[i], this.notes[i]];
             }
         }

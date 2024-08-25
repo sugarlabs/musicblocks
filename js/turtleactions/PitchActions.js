@@ -66,7 +66,8 @@ function setupPitchActions(activity) {
          * @param {Number|String} blk - corresponding Block object index in blocks.blockList or custom blockName
          */
         static playPitch(note, octave, cents, turtle, blk) {
-            return Singer.processPitch(activity, note, octave, cents, turtle, blk);
+            Singer.processPitch(activity, note, octave, cents, turtle, blk);
+            return;
         }
 
         /**
@@ -85,10 +86,8 @@ function setupPitchActions(activity) {
                 !activity.logo.inMusicKeyboard &&
                 tur.singer.inNoteBlock.length === 0
             ) {
-                // activity.errorMsg(_("The Scalar Step Block must be used inside of a Note Block."), blk);
+                // If there was no previous pitch, use default.
                 tur.singer.lastNotePlayed = ["G4", 4];
-                // activity.logo.stopTurtle = true;
-                // return;
             }
 
             if (typeof value !== "number") {
@@ -104,24 +103,32 @@ function setupPitchActions(activity) {
             }
 
             if (tur.singer.lastNotePlayed === null) {
-                // activity.errorMsg(_("The Scalar Step Block must be preceded by a Pitch Block."), blk);
                 tur.singer.lastNotePlayed = ["G4", 4];
             }
 
-            const lastNotePlayed = tur.singer.lastNotePlayed;
+            let lastNotePlayed = tur.singer.lastNotePlayed;
+            let pitchName;
+            let octave;
+            let cents = 0;
 
             // At this point, lastNotePlayed is a tuple of the
             // pitchname-octave and the notevalue, e.g., ["C3", 8]
             // We only care about the pitchname and octave.
-            let pitchName = lastNotePlayed[0].slice(0, lastNotePlayed[0].length - 1);
-            let octave = parseInt(
-                lastNotePlayed[0].slice(lastNotePlayed[0].length - 1, lastNotePlayed[0].length)
-            );
-
+            if (typeof(lastNotePlayed[0]) === "number") {
+                // Convert freq tp o pitch.
+                lastNotePlayed = frequencyToPitch(lastNotePlayed[0]);
+                pitchName = lastNotePlayed[0];
+                octave = lastNotePlayed[1];
+                cents = lastNotePlayed[2];
+            } else {
+                pitchName = lastNotePlayed[0].slice(0, lastNotePlayed[0].length - 1);
+                octave = parseInt(
+                    lastNotePlayed[0].slice(lastNotePlayed[0].length - 1, lastNotePlayed[0].length));
+            }
             if (tur.singer.inverted) {
                 // If the last note is inverted then inverting it
                 // again to get the original note
-                const delta_temp = Singer.calculateInvert(activity.logo, turtle, pitchName, octave);
+                const delta_temp = Singer.calculateInvert(activity.logo, turtle, pitchName, octave, cents);
                 const transposition_temp = 2 * delta_temp;
                 const invertedNote = getNote(
                     pitchName,
@@ -145,179 +152,8 @@ function setupPitchActions(activity) {
                 value
             );
 
-            let delta = 0;
-            if (!(tur.singer.invertList.length === 0)) {
-                tur.singer.inverted = true;
-                delta += Singer.calculateInvert(activity.logo, turtle, noteObj[0], noteObj[1]);
-            }
-
-            let transposition =
-                2 * delta +
-                (activity.turtles.ithTurtle(turtle).transposition
-                    ? activity.turtles.ithTurtle(turtle).transposition
-                    : 0);
-
-            const addPitch = (note, octave, cents, direction) => {
-                const t = transposition + tur.singer.register * 12;
-                const noteObj = getNote(
-                    note,
-                    octave,
-                    t,
-                    tur.singer.keySignature,
-                    true,
-                    direction,
-                    activity.errorMsg,
-                    activity.logo.synth.inTemperament
-                );
-
-                if (tur.singer.drumStyle.length > 0) {
-                    const drumname = last(tur.singer.drumStyle);
-                    if (EFFECTSNAMES.indexOf(drumname) === -1) {
-                        tur.singer.pitchDrumTable[noteObj[0] + noteObj[1]] = drumname;
-                    } else {
-                        // eslint-disable-next-line
-                        tur.singer.pitchDrumTable[noteObj[0] + noteObj[1]] = effectsname;
-                    }
-                }
-
-                if (
-                    !activity.logo.inMatrix &&
-                    !activity.logo.inMusicKeyboard &&
-                    tur.singer.inNoteBlock.length > 0
-                ) {
-                    tur.singer.notePitches[last(tur.singer.inNoteBlock)].push(noteObj[0]);
-                    tur.singer.noteOctaves[last(tur.singer.inNoteBlock)].push(noteObj[1]);
-                    tur.singer.noteCents[last(tur.singer.inNoteBlock)].push(cents);
-                    if (cents !== 0) {
-                        tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(
-                            pitchToFrequency(noteObj[0], noteObj[1], cents, tur.singer.keySignature)
-                        );
-                    } else {
-                        tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(0);
-                    }
-                }
-                return noteObj;
-            };
-
-            const noteObj1 = addPitch(noteObj[0], noteObj[1], 0);
-            // Only apply the transposition to the base note of an interval
-            transposition = 0;
-
-            if (activity.logo.inMatrix) {
-                activity.logo.phraseMaker.addRowBlock(blk);
-                if (activity.logo.pitchBlocks.indexOf(blk) === -1) {
-                    activity.logo.pitchBlocks.push(blk);
-                }
-
-                if (activity.logo.phraseMaker.rowLabels.length > 0) {
-                    if (last(activity.logo.phraseMaker.rowLabels) === "hertz") {
-                        const freq = pitchToFrequency(
-                            noteObj[0],
-                            noteObj[1],
-                            0,
-                            tur.singer.keySignature
-                        );
-                        activity.logo.phraseMaker.rowLabels.push("hertz");
-                        activity.logo.phraseMaker.rowArgs.push(parseInt(freq));
-                    } else {
-                        if (
-                            SOLFEGENAMES1.indexOf(last(activity.logo.phraseMaker.rowLabels)) !== -1
-                        ) {
-                            activity.logo.phraseMaker.rowLabels.push(
-                                SOLFEGECONVERSIONTABLE[noteObj1[0]]
-                            );
-                        } else {
-                            activity.logo.phraseMaker.rowLabels.push(noteObj1[0]);
-                        }
-
-                        activity.logo.phraseMaker.rowArgs.push(noteObj1[1]);
-                    }
-                } else {
-                    activity.logo.phraseMaker.rowLabels.push(noteObj1[0]);
-                    activity.logo.phraseMaker.rowArgs.push(noteObj1[1]);
-                }
-
-                tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
-                tur.singer.lastNotePlayed = [noteObj1[0] + noteObj1[1], 4];
-            } else if (activity.logo.inMusicKeyboard) {
-                if (tur.singer.drumStyle.length === 0) {
-                    activity.logo.musicKeyboard.instruments.push(last(tur.singer.instrumentNames));
-                    if (activity.logo.musicKeyboard.noteNames.length > 0) {
-                        if (last(activity.logo.musicKeyboard.noteNames) === "hertz") {
-                            const freq = pitchToFrequency(
-                                noteObj[0],
-                                noteObj[1],
-                                0,
-                                tur.singer.keySignature
-                            );
-                            activity.logo.musicKeyboard.noteNames.push("hertz");
-                            activity.logo.musicKeyboard.octaves.push(parseInt(freq));
-                        } else {
-                            if (
-                                SOLFEGENAMES1.indexOf(
-                                    last(activity.logo.musicKeyboard.noteNames)
-                                ) !== -1
-                            ) {
-                                activity.logo.musicKeyboard.noteNames.push(
-                                    SOLFEGECONVERSIONTABLE[noteObj1[0]]
-                                );
-                            } else {
-                                activity.logo.musicKeyboard.noteNames.push(noteObj1[0]);
-                            }
-
-                            activity.logo.musicKeyboard.octaves.push(noteObj1[1]);
-                        }
-                    } else {
-                        activity.logo.musicKeyboard.noteNames.push(noteObj1[0]);
-                        activity.logo.musicKeyboard.octaves.push(noteObj1[1]);
-                    }
-
-                    activity.logo.musicKeyboard.addRowBlock(blk);
-                    tur.singer.lastNotePlayed = [noteObj1[0] + noteObj1[1], 4];
-                }
-            }
-
-            let noteObj2;
-            for (let i = 0; i < tur.singer.intervals.length; i++) {
-                const ii = getInterval(
-                    tur.singer.intervals[i],
-                    tur.singer.keySignature,
-                    noteObj1[0]
-                );
-                noteObj2 = getNote(
-                    noteObj1[0],
-                    noteObj1[1],
-                    ii,
-                    tur.singer.keySignature,
-                    tur.singer.movable,
-                    null,
-                    activity.errorMsg,
-                    activity.logo.synth.inTemperament
-                );
-                addPitch(noteObj2[0], noteObj2[1], 0);
-            }
-
-            for (let i = 0; i < tur.singer.semitoneIntervals.length; i++) {
-                noteObj2 = getNote(
-                    noteObj1[0],
-                    noteObj1[1],
-                    tur.singer.semitoneIntervals[i][0],
-                    tur.singer.keySignature,
-                    tur.singer.movable,
-                    null,
-                    activity.errorMsg,
-                    activity.logo.synth.inTemperament
-                );
-                addPitch(noteObj2[0], noteObj2[1], 0, tur.singer.semitoneIntervals[i][1]);
-            }
-
-            if (tur.singer.inNoteBlock.length > 0) {
-                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(tur.singer.beatFactor);
-                tur.singer.pushedNote = true;
-            } else {
-                // stand-alone block
-                Singer.processPitch(activity, noteObj1[0], noteObj1[1], 0, turtle, blk);
-            }
+            Singer.processPitch(activity, noteObj[0], noteObj[1], cents, turtle, blk);
+            return;            
         }
 
         /**
@@ -403,7 +239,8 @@ function setupPitchActions(activity) {
                     calcOctave(tur.singer.currentOctave, octave, tur.singer.lastNotePlayed, note)
                 );
 
-            return Singer.processPitch(activity, note, _octave, 0, turtle, blk);
+            Singer.processPitch(activity, note, _octave, 0, turtle, blk);
+            return;
         }
 
         /**
@@ -438,7 +275,8 @@ function setupPitchActions(activity) {
                     activity.logo.synth.startingPitch,
                     tur.singer.pitchNumberOffset
                 );
-                return Singer.processPitch(activity, obj[0], obj[1], 0, turtle, blk);
+                Singer.processPitch(activity, obj[0], obj[1], 0, turtle, blk);
+                return;
             }
         }
 
@@ -456,112 +294,17 @@ function setupPitchActions(activity) {
             const note = obj[0];
             const octave = obj[1];
             const cents = obj[2];
-            let delta = 0;
 
-            if (tur.singer.justMeasuring.length > 0) {
-                // TODO: account for cents
-                const noteObj = getNote(
-                    note,
-                    octave,
-                    0,
-                    tur.singer.keySignature,
-                    tur.singer.movable,
-                    null,
-                    activity.errorMsg
-                );
-
-                const n = tur.singer.justMeasuring.length;
-                const pitchNumber =
-                    pitchToNumber(noteObj[0], noteObj[1], tur.singer.keySignature) -
-                    tur.singer.pitchNumberOffset;
-                if (tur.singer.firstPitch.length < n) {
-                    tur.singer.firstPitch.push(pitchNumber);
-                } else if (tur.singer.lastPitch.length < n) {
-                    tur.singer.lastPitch.push(pitchNumber);
-                }
-            } else if (tur.singer.inNoteBlock.length > 0) {
-                if (!(tur.singer.invertList.length === 0)) {
-                    delta += Singer.calculateInvert(activity.logo, turtle, note, octave);
-                }
-
-                const addPitch = (note, octave, cents, frequency, direction) => {
-                    const t = 2 * delta + tur.transposition + tur.singer.register * 12;
-                    const noteObj = getNote(
-                        note,
-                        octave,
-                        t,
-                        tur.singer.keySignature,
-                        tur.singer.movable,
-                        direction,
-                        activity.errorMsg,
-                        activity.logo.synth.inTemperament
-                    );
-                    if (tur.singer.drumStyle.length > 0) {
-                        const drumname = last(tur.singer.drumStyle);
-                        tur.singer.pitchDrumTable[noteObj[0] + noteObj[1]] = drumname;
-                    }
-
-                    tur.singer.notePitches[last(tur.singer.inNoteBlock)].push(noteObj[0]);
-                    tur.singer.noteOctaves[last(tur.singer.inNoteBlock)].push(noteObj[1]);
-                    tur.singer.noteCents[last(tur.singer.inNoteBlock)].push(cents);
-                    tur.singer.noteHertz[last(tur.singer.inNoteBlock)].push(frequency);
-                    return noteObj;
-                };
-
-                const noteObj1 = addPitch(note, octave, cents, hertz);
-
-                for (let i = 0; i < tur.singer.intervals.length; i++) {
-                    const ii = getInterval(
-                        tur.singer.intervals[i],
-                        tur.singer.keySignature,
-                        noteObj1[0]
-                    );
-                    const noteObj2 = getNote(
-                        noteObj1[0],
-                        noteObj1[1],
-                        ii,
-                        tur.singer.keySignature,
-                        tur.singer.movable,
-                        null,
-                        activity.errorMsg,
-                        activity.logo.synth.inTemperament
-                    );
-                    addPitch(noteObj2[0], noteObj2[1], cents, 0);
-                }
-
-                for (let i = 0; i < tur.singer.semitoneIntervals.length; i++) {
-                    const noteObj2 = getNote(
-                        noteObj1[0],
-                        noteObj1[1],
-                        tur.singer.semitoneIntervals[i][0],
-                        tur.singer.keySignature,
-                        tur.singer.movable,
-                        null,
-                        activity.errorMsg,
-                        activity.logo.synth.inTemperament
-                    );
-                    addPitch(
-                        noteObj2[0],
-                        noteObj2[1],
-                        cents,
-                        0,
-                        tur.singer.semitoneIntervals[i][1]
-                    );
-                }
-
-                tur.singer.noteBeatValues[last(tur.singer.inNoteBlock)].push(tur.singer.beatFactor);
-                tur.singer.pushedNote = true;
+            Singer.processPitch(activity, note, octave, cents, turtle, blk);
+            if (tur.singer.inNoteBlock.length > 0) {
                 if (activity.logo.runningLilypond) {
                     activity.logo.notation.notationMarkup(
                         turtle,
-                        pitchToFrequency(noteObj1[0], noteObj1[1], cents, tur.singer.keySignature)
+                        hertz  // FIXME: what if hertz was transformed?
                     );
                 }
-            } else {
-                tur.singer.defaultNoteValue = 32;
-                Singer.processPitch(activity, note, octave, cents, turtle, blk);
-                tur.singer.defaultNoteValue = 4;
             }
+            return;
         }
 
         /**
@@ -682,7 +425,6 @@ function setupPitchActions(activity) {
          */
         static setRatioTranspose(value, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
-
             tur.singer.transpositionRatios.push(value);
 
             const listenerName = "_transposition_ratio_" + turtle;

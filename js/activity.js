@@ -159,6 +159,7 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         "widgets/meterwidget",
         "widgets/phrasemaker",
         "widgets/arpeggio",
+        "widgets/aiwidget",
         "widgets/pitchdrummatrix",
         "widgets/rhythmruler",
         "widgets/pitchstaircase",
@@ -491,8 +492,10 @@ class Activity {
                 (event) => {
                     event.preventDefault();
                     event.stopPropagation();
-                    if(event.target.id === "myCanvas") {
-                        this._displayHelpfulWheel(event);
+                    if (!this.beginnerMode) {
+                        if (event.target.id === "myCanvas") {
+                            this._displayHelpfulWheel(event);
+                        }
                     }
                 },
                 false
@@ -1240,6 +1243,11 @@ class Activity {
                 };
 
                 mediaRecorder.start(200);
+                setTimeout(() => {
+                    // eslint-disable-next-line no-console
+                    console.log("Resizing for Record", that.canvas.height);
+                    that._onResize();
+                }, 500);
                 return mediaRecorder;
             }
 
@@ -1272,7 +1280,7 @@ class Activity {
             };
 
             // Stop recording if already executing
-            if(flag == 1 && isExecuting){
+            if (flag == 1 && isExecuting){
                 start.addEventListener("click", stopRec);
                 flag = 0;
             }
@@ -1524,7 +1532,7 @@ class Activity {
                 await this.setSmallerLargerStatus();
 
             }
-            if(typeof(this.activity)!="undefined"){
+            if (typeof(this.activity)!="undefined"){
                  await this.activity.refreshCanvas();
                }
             document.getElementById("hideContents").click();
@@ -1562,7 +1570,7 @@ class Activity {
             }
 
             await this.setSmallerLargerStatus();
-            if(typeof(this.activity)!="undefined"){
+            if (typeof(this.activity)!="undefined"){
                 await this.activity.refreshCanvas();
             }
             document.getElementById("hideContents").click();
@@ -1898,8 +1906,8 @@ class Activity {
                 if (event.ctrlKey) {
                     event.preventDefault(); // Prevent default scrolling behavior
                    
-                    if(delY < 0 && doLargerBlocks(this));//Zoom IN
-                    if(delY >= 0 && doSmallerBlocks(this));//Zoom Out
+                    if (delY < 0 && doLargerBlocks(this));//Zoom IN
+                    if (delY >= 0 && doSmallerBlocks(this));//Zoom Out
                 }
                 if (delY !== 0 && event.axis === event.VERTICAL_AXIS) {
                     closeAnyOpenMenusAndLabels(); // closes all wheelnavs when scrolling .
@@ -2344,7 +2352,7 @@ class Activity {
                         //do nothing when clicked on the menu
                     } else if (document.getElementsByTagName("tr")[2].contains(e.target)) {
                         //do nothing when clicked on the search row
-                    } else if(e.target.id === "myCanvas") {
+                    } else if (e.target.id === "myCanvas") {
                         that.hideSearchWidget();
                         document.removeEventListener("mousedown", closeListener);
                     }
@@ -2680,12 +2688,12 @@ class Activity {
                         this._saveHelpBlocks();
                         break;
                     case 191:
-                        if(event.key=='/' && (!this.beginnerMode) && (disableHorizScrollIcon.style.display == "block")) {
+                        if (event.key=='/' && (!this.beginnerMode) && (disableHorizScrollIcon.style.display == "block")) {
                            this.blocksContainer.x += this.canvas.width / 10;
                            this.stage.update();
                         }
                     case 220:
-                        if(event.key=='\\' && (!this.beginnerMode) && (disableHorizScrollIcon.style.display == "block")) {
+                        if (event.key=='\\' && (!this.beginnerMode) && (disableHorizScrollIcon.style.display == "block")) {
                             this.blocksContainer.x -= this.canvas.width / 10;
                             this.stage.update();
                         }
@@ -3385,25 +3393,42 @@ class Activity {
                 });
             };
             
-            if (!resize && this.toolbarHeight === 0) {
+              if (!resize && this.toolbarHeight === 0) {
                 dy = cellsize + LEADING + 5;
+                
                 this.toolbarHeight = dy;
-
                 this.palettes.deltaY(dy);
                 this.turtles.deltaY(dy);
-
                 this.blocksContainer.y += dy;
                 this.changeTopButtonsPosition(dy);
+
+                this.cartesianBitmap.y += dy;
+                this.polarBitmap.y += dy;
+                this.trebleBitmap.y += dy;
+                this.grandBitmap.y += dy;
+                this.sopranoBitmap.y += dy;
+                this.altoBitmap.y += dy;
+                this.tenorBitmap.y += dy;
+                this.bassBitmap.y += dy;
                 this.blocks.checkBounds();
-            } else {
-                dy = this.toolbarHeight;
-                this.toolbarHeight = 0;
-
-                this.palettes.deltaY(-dy);
+            
+            } else{
+                dy = this.toolbarHeight ;
+                this.toolbarHeight = 0; 
+                
                 this.turtles.deltaY(-dy);
-
-                this.blocksContainer.y -= dy;
+                this.palettes.deltaY(-dy);
+                this.blocksContainer.y -= dy
                 this.changeTopButtonsPosition(-dy);
+                
+                this.cartesianBitmap.y -= dy;
+                this.polarBitmap.y -= dy;
+                this.trebleBitmap.y -= dy;
+                this.grandBitmap.y -= dy;
+                this.sopranoBitmap.y -= dy;
+                this.altoBitmap.y -= dy;
+                this.tenorBitmap.y -= dy;
+                this.bassBitmap.y -= dy;
             }
 
             this.refreshCanvas();
@@ -4494,6 +4519,374 @@ class Activity {
                 document.attachEvent("finishedLoading", __functionload);
             }
         };
+        //function to convert abc pitch to mb pitch
+        function _adjustPitch(note, keySignature) {
+            const accidental = keySignature.accidentals.find(acc => {
+                const noteToCompare = acc.note.toUpperCase().replace(',', '');
+                note = note.replace(',', '');
+                return noteToCompare.toLowerCase() === note.toLowerCase();
+            });
+        
+            if (accidental) {
+                return note + (accidental.acc === "sharp" ? "♯" : (accidental.acc === "flat" ? "♭" : ""));
+            } else {
+                return note;
+            }
+        }
+        //when converting to pitch value from abc to mb there is issue with the pithc standard comming out to be odd, using below function map the pitch to audible pitch
+        function _abcToStandardValue(pitchValue) {
+           
+            
+            const octave = Math.floor(pitchValue/ 7) + 4; 
+            return  octave;
+        }
+        //creates  pitch which consist of note pitch notename you could see them in the function
+        function _createPitchBlocks(pitches, blockId, pitchDuration,keySignature,actionBlock,triplet,meterDen) {
+            const blocks = [];
+            
+            const pitch = pitches;
+            pitchDuration = toFraction(pitchDuration);          
+            const adjustedNote = _adjustPitch(pitch.name , keySignature).toUpperCase();
+            if(triplet !== undefined && triplet !== null){
+                // eslint-disable-next-line no-console
+                console.log('For the Pitch')
+                // eslint-disable-next-line no-console
+                console.log(pitch)
+                // eslint-disable-next-line no-console
+                console.log('below is the meter Den')
+                // eslint-disable-next-line no-console
+                console.log(meterDen);
+                // eslint-disable-next-line no-console
+                console.log('below is the triplet')
+                // eslint-disable-next-line no-console
+                console.log(triplet)
+
+                pitchDuration[1]=meterDen*triplet
+            }
+          
+            actionBlock.push(
+                
+                [blockId, ["newnote", {"collapsed": true}], 0, 0, [blockId - 1, blockId + 1, blockId + 4, blockId + 8]],
+                [blockId + 1, "divide", 0, 0, [blockId, blockId + 2, blockId + 3]],
+                [blockId + 2, ["number", {value: pitchDuration[0]}], 0, 0, [blockId + 1]],
+                [blockId + 3, ["number", {value: pitchDuration[1]}], 0, 0, [blockId + 1]],
+                [blockId + 4, "vspace", 0, 0, [blockId, blockId + 5]],
+                [blockId + 5, "pitch", 0, 0, [blockId + 4, blockId + 6, blockId + 7, null]],
+                [blockId + 6, ["notename", {value: adjustedNote}], 0, 0, [blockId + 5]],
+                [blockId + 7, ["number", {value: _abcToStandardValue(pitch.pitch)}], 0, 0, [blockId + 5]],
+                [blockId + 8, "hidden", 0, 0, [blockId, blockId + 9]],
+            );
+
+      
+        
+            return blocks;
+        }
+
+        //function to search index for particular type of block mainly used to find nammeddo block in repeat block
+        function _searchIndexForMusicBlock(array, x) {
+            // Iterate over each sub-array in the main array
+            for (let i = 0; i < array.length; i++) {
+                // Check if the 0th element of the sub-array matches x
+                if (array[i][0] === x) {
+                    // Return the index if a match is found
+                    return i;
+                }
+            }
+            // Return -1 if no match is found
+            return -1;
+        }
+
+
+            /*
+        The parseABC function converts ABC notation to Music Blocks and is able to convert almost all the ABC notation to Music Blocks. However, the following aspects need work:
+
+        Hammers, pulls, and sliding offs grace notes (breaking the conversion)
+        Alternate endings (not failing but not showing correctly) and DS al coda
+        Bass voicing (failing)
+
+
+            
+            */
+        this.parseABC = async function (tune) {
+            let musicBlocksJSON = [];
+            
+            let staffBlocksMap = {};
+            let organizeBlock={}
+            let blockId = 0;
+
+            let tripletFinder = null
+            const title = (tune.metaText?.title ?? "title").toString().toLowerCase();
+            const instruction = (tune.metaText?.instruction ?? "guitar").toString().toLowerCase();
+            
+
+            tune.lines?.forEach(line => {
+                console.log(line );
+                line.staff?.forEach((staff,staffIndex) => {
+                    
+                    if (!organizeBlock.hasOwnProperty(staffIndex)) {
+                        organizeBlock[staffIndex] = {
+                         arrangedBlocks:[]
+                        };
+                   
+                    }
+
+                   organizeBlock[staffIndex].arrangedBlocks.push(staff)
+        
+    
+                });
+            });
+            console.log('below is the arranged blocks')
+            console.log(organizeBlock)
+            for (const lineId in organizeBlock) {
+                organizeBlock[lineId].arrangedBlocks?.forEach((staff) => {
+                    if (!staffBlocksMap.hasOwnProperty(lineId)) {
+                        staffBlocksMap[lineId] = {
+                            meterNum: staff?.meter?.value[0]?.num || 4,
+                            meterDen: staff?.meter?.value[0]?.den || 4,
+                            keySignature: staff.key,
+                            baseBlocks: [],
+                            startBlock: [
+                                [blockId, ["start", {collapsed: false}], 100, 100, [null, blockId + 1, null]],
+                                [blockId + 1, "print", 0, 0, [blockId, blockId + 2, blockId + 3]],
+                                [blockId + 2, ["text", {value: title}], 0, 0, [blockId + 1]],
+                                [blockId + 3, "setturtlename2", 0, 0, [blockId + 1, blockId + 4, blockId + 5]],
+                                [blockId + 4, ["text", {value: `Voice ${parseInt(lineId)+1 } `}], 0, 0, [blockId + 3]],
+                                [blockId + 5, "meter", 0, 0, [blockId + 3, blockId + 6, blockId + 7, blockId + 10]],
+                                [blockId + 6, ["number", {value: staff?.meter?.value[0]?.num || 4}], 0, 0, [blockId + 5]],
+                                [blockId + 7, "divide", 0, 0, [blockId + 5, blockId + 8, blockId + 9]],
+                                [blockId + 8, ["number", {value: 1}], 0, 0, [blockId + 7]],
+                                [blockId + 9, ["number", {value:  staff?.meter?.value[0]?.den || 4}], 0, 0, [blockId + 7]],
+                                [blockId + 10, "vspace", 0, 0, [blockId + 5, blockId + 11]],
+                                [blockId + 11, "setkey2", 0, 0, [blockId + 10, blockId + 12, blockId + 13, blockId + 14]],
+                                [blockId + 12, ["notename", {value: staff.key.root}], 0, 0, [blockId + 11]],
+                                [blockId + 13, ["modename", {value: staff.key.mode == "m" ? "minor" : "major"}], 0, 0, [blockId + 11]],
+                                //In Settimbre instead of null it should be nameddoblock of first action block
+                                [blockId + 14, "settimbre", 0, 0, [blockId + 11, blockId + 15, null, blockId + 16]],
+                                [blockId + 15, ["voicename", {value: instruction}], 0, 0, [blockId + 14]],
+                                [blockId + 16, "hidden", 0, 0, [blockId + 14, null]]
+                            ],
+                            repeatBlock:[],
+                            repeatArray:[],
+                            nameddoArray:{},
+                        };
+                
+                     
+
+                        //for adding above 17 blocks above 
+                        blockId=blockId+17
+                    }
+
+                    let actionBlock=[]
+                    staff.voices.forEach(voice => {
+                        console.log(voice)
+                     
+                  
+                        voice.forEach(element => {
+                            console.log('hello');
+                            if (element.el_type === "note") {
+                                //check if triplet exists 
+                                if (element?.startTriplet !== null&&element?.startTriplet !== undefined) {
+                                    tripletFinder = element.startTriplet;
+                                }
+                                
+                                // Check and set tripletFinder to null if element?.endTriplets exists
+                                // eslint-disable-next-line no-console
+                                console.log('pitches are below')
+                                // eslint-disable-next-line no-console
+                                console.log(element)
+                                _createPitchBlocks(element.pitches[0], blockId,element.duration,staff.key,actionBlock,tripletFinder,staffBlocksMap[lineId].meterDen);
+                                if (element?.endTriplet !== null && element?.endTriplet !== undefined) {
+                                    tripletFinder = null;
+                                }
+                                blockId = blockId + 9;
+                            }
+
+                            //check repeat start and end block 
+                            else if(element.el_type === "bar"){
+                                if(element.type === "bar_left_repeat"){
+                                    staffBlocksMap[lineId].repeatArray.push({start : staffBlocksMap[lineId].baseBlocks.length ,end:-1})
+                                }
+                                else if (element.type === "bar_right_repeat"){
+                                    const endBlockSearch = staffBlocksMap[lineId].repeatArray
+
+                                    for(const repeatbar in endBlockSearch){
+                                        // eslint-disable-next-line no-console
+                                        console.log('endBlockSearch[repeatbar].end' + endBlockSearch[repeatbar].end)
+                                        if(endBlockSearch[repeatbar].end == -1){
+                                            staffBlocksMap[lineId].repeatArray[repeatbar].end = staffBlocksMap[lineId].baseBlocks.length
+                                        }
+                                    }                     
+
+                                }
+
+                            }
+                        });
+                        
+                        //update the newnote connection with hidden
+                        actionBlock[0][4][0] = blockId+3
+                         actionBlock[actionBlock.length-1][4][1] = null
+                        
+                            //update the namedo block if not first nameddo block appear
+                        if(staffBlocksMap[lineId].baseBlocks.length != 0){                          
+                        staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0][staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0].length-4][4][1] = blockId
+                        }   
+                        //add the nameddo action text and hidden block for each line
+                        actionBlock.push ( [blockId, ["nameddo", {value: `V: ${parseInt(lineId)+1} Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1}`}], 0, 0, [staffBlocksMap[lineId].baseBlocks.length === 0 ? null : staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0][staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0].length-4][0], null]],
+                        [blockId + 1, ["action", {collapsed: false}], 100, 100, [null, blockId + 2, blockId + 3, null]],
+                        [blockId + 2, ["text", {value: `V: ${parseInt(lineId)+1} Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1}`}], 0, 0, [blockId + 1]],
+                        [blockId + 3, "hidden", 0, 0, [blockId + 1, actionBlock[0][0]]] )// blockid of topaction block
+                        
+                        if (!staffBlocksMap[lineId].nameddoArray) {
+                            staffBlocksMap[lineId].nameddoArray = {};
+                        }
+                        
+                        // Ensure the array at nameddoArray[lineId] is initialized if it doesn't exist
+                        if (!staffBlocksMap[lineId].nameddoArray[lineId]) {
+                            staffBlocksMap[lineId].nameddoArray[lineId] = [];
+                        }
+                        
+                        staffBlocksMap[lineId].nameddoArray[lineId].push(blockId);
+                        blockId = blockId + 4
+
+                        musicBlocksJSON.push(actionBlock)
+    
+                        console.log('below is the repeat checker' + lineId)
+                        staffBlocksMap[lineId].baseBlocks.push([actionBlock]);
+                     
+    
+                    });
+    
+                });
+            }
+         
+            let finalBlock = [];
+            // eslint-disable-next-line no-console
+            console.log('below is the staff Block map')
+            // eslint-disable-next-line no-console
+            console.log(staffBlocksMap)
+
+
+            //Some Error are here need to be fixed 
+            for (const staffIndex in staffBlocksMap) {
+                
+                
+                
+                staffBlocksMap[staffIndex].startBlock[staffBlocksMap[staffIndex].startBlock.length - 3][4][2] = staffBlocksMap[staffIndex].baseBlocks[0][0][staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4][0];
+                
+
+            
+                // Update the first namedo block with settimbre
+                staffBlocksMap[staffIndex].baseBlocks[0][0][staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4][4][0] = staffBlocksMap[staffIndex].startBlock[staffBlocksMap[staffIndex].startBlock.length - 3][0];
+                // eslint-disable-next-line no-console
+                console.log(`For iter ${staffIndex}`);
+                // eslint-disable-next-line no-console
+                console.log(staffBlocksMap[staffIndex].baseBlocks[0][0][staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4]);
+                    
+                let repeatblockids=staffBlocksMap[staffIndex].repeatArray
+                for(const repeatId of repeatblockids){
+                    if (repeatId.start==0){
+                        
+                        
+                        
+                        staffBlocksMap[staffIndex].repeatBlock.push([blockId,"repeat",0,0,[ staffBlocksMap[staffIndex].startBlock[staffBlocksMap[staffIndex].startBlock.length - 3][0]/*setribmre*/,blockId+1,staffBlocksMap[staffIndex].nameddoArray[staffIndex][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end+1] === null ? null :staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end+1]]])
+                        staffBlocksMap[staffIndex].repeatBlock.push([blockId + 1, ["number", {value: 2}], 100, 100, [blockId]])
+
+                        //Update the settrimbre block
+                        staffBlocksMap[staffIndex].startBlock[staffBlocksMap[staffIndex].startBlock.length - 3][4][2]=blockId
+                        // eslint-disable-next-line no-console
+                        console.log('Following are the nameddo Array')
+                        // eslint-disable-next-line no-console
+                        console.log(staffBlocksMap[staffIndex].nameddoArray)
+
+                        let firstnammedo = _searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[0][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][0])
+                        let endnammedo = _searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end])
+                        
+                        // eslint-disable-next-line no-console
+                        console.log( firstnammedo)  
+
+                        
+                    
+                        //because its [0]is the first nammeddo block obviously
+
+                        // Check if staffBlocksMap[staffIndex].baseBlocks[repeatId.end+1] exists and has a [0] element
+                    if (staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1] && staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0]) {
+                        let secondnammedo = _searchIndexForMusicBlock(
+                            staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0], 
+                            staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end + 1]
+                        );
+
+                        if (secondnammedo != -1) {
+                            staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0][secondnammedo][4][0] = blockId;
+                        }
+                    }
+                    staffBlocksMap[staffIndex].baseBlocks[0][0][firstnammedo][4][0] =blockId
+                    staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][endnammedo][4][1] = null
+
+                    blockId = blockId + 2
+                
+                    }
+                    else{
+                        const currentnammeddo =_searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.start])
+
+                        let prevnameddo = _searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.start-1][0],staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0])
+                        let afternamedo = _searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0],staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][1])
+                        let prevrepeatnameddo = -1
+                        if(prevnameddo == -1){
+                            prevrepeatnameddo = _searchIndexForMusicBlock(staffBlocksMap[staffIndex].repeatBlock,staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0])
+                        }
+                        
+                  
+                        const prevBlockId=staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0]
+                        
+                        const currentBlockId=staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][0]
+
+                        //needs null checking optmizie
+                        let nextBlockId=staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end+1]
+                    
+                        staffBlocksMap[staffIndex].repeatBlock.push([blockId,"repeat",0,0,[staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0],blockId+1, currentBlockId,nextBlockId === null ? null : nextBlockId]])
+                        staffBlocksMap[staffIndex].repeatBlock.push([blockId + 1, ["number", {value: 2}], 100, 100, [blockId]])
+
+                   if(prevnameddo != -1){
+                    staffBlocksMap[staffIndex].baseBlocks[repeatId.start-1][0][prevnameddo][4][1]=blockId
+                   }else{
+                    staffBlocksMap[staffIndex].repeatBlock[prevrepeatnameddo][4][3]=blockId
+                   }
+                   if(afternamedo != -1){
+                    staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][afternamedo][4][1]=null
+                   }
+                    staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0]=blockId
+                   
+                    if(nextBlockId!=null){
+                        const nextnameddo = _searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.end+1][0],nextBlockId)
+                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end+1][0][nextnameddo][4][0]=blockId
+                    }
+                    blockId = blockId + 2
+                    }
+                        
+                    }
+                   
+                    let lineBlock = staffBlocksMap[staffIndex].baseBlocks.reduce((acc, curr) => acc.concat(curr), []);
+                    let flattenedLineBlock = lineBlock.flat(); // Flatten the multidimensional array
+                    let combinedBlock = [...staffBlocksMap[staffIndex].startBlock, ...flattenedLineBlock];
+                
+                    finalBlock.push(...staffBlocksMap[staffIndex].startBlock);
+                    finalBlock.push(...flattenedLineBlock);
+                    finalBlock.push(...staffBlocksMap[staffIndex].repeatBlock)
+                    
+                }
+
+    
+      this.blocks.loadNewBlocks(finalBlock);
+
+           
+
+            // // logo.textMsg(_("MIDI loading. This may take some time depending upon the number of notes in the track"));
+            // this.blocks.loadNewBlocks(combined_array);
+            return null;
+
+        }
+
+
 
         /**
          * Calculate time such that no matter how long it takes to load the program, the loading
@@ -5342,68 +5735,71 @@ class Activity {
             );
             this.boundary.hide();
 
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Home [HOME]")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Home [HOME]")) 
                 this.helpfulWheelItems.push({label: "Home [HOME]", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(GOHOMEFADEDBUTTON)), display: true, fn: findBlocks});
 
             this.hideBlocksContainer = createButton(SHOWBLOCKSBUTTON, _("Show/hide block"),
                 changeBlockVisibility);
 
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Show/hide block")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Show/hide block")) 
                 this.helpfulWheelItems.push({label: "Show/hide block", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SHOWBLOCKSBUTTON)), display: true, fn: changeBlockVisibility});
             
             this.collapseBlocksContainer = createButton(COLLAPSEBLOCKSBUTTON, _("Expand/collapse blocks"),
                 toggleCollapsibleStacks);
 
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Expand/collapse blocks")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Expand/collapse blocks")) 
                 this.helpfulWheelItems.push({label: "Expand/collapse blocks", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBLOCKSBUTTON)), display: true, fn: toggleCollapsibleStacks});
             
             this.smallerContainer = createButton(SMALLERBUTTON, _("Decrease block size"),
                 doSmallerBlocks);
             
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Decrease block size")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Decrease block size")) 
                 this.helpfulWheelItems.push({label: "Decrease block size", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SMALLERBUTTON)), display: true, fn: doSmallerBlocks});
             
             this.largerContainer = createButton(BIGGERBUTTON, _("Increase block size"),
                 doLargerBlocks);
             
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Increase block size")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Increase block size")) 
                 this.helpfulWheelItems.push({label: "Increase block size", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(BIGGERBUTTON)), display: true, fn: doLargerBlocks});
 
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Restore")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Restore")) 
                 this.helpfulWheelItems.push({label: "Restore", icon: "imgsrc:header-icons/restore-from-trash.svg", display: true, fn: restoreTrash});
             
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap Off"))
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap Off"))
                 this.helpfulWheelItems.push({label: "Turtle Wrap Off", icon: "imgsrc:header-icons/wrap-text.svg", display: true, fn: this.toolbar.changeWrap});
 
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap On"))
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap On"))
                 this.helpfulWheelItems.push({label: "Turtle Wrap On", icon: "imgsrc:header-icons/wrap-text.svg", display: false, fn: this.toolbar.changeWrap});
 
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Enable horizontal scrolling")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Enable horizontal scrolling")) 
                 this.helpfulWheelItems.push({label: "Enable horizontal scrolling", icon: "imgsrc:header-icons/compare-arrows.svg", display: this.beginnerMode ? false: true, fn: setScroller});
             
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Disable horizontal scrolling")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Disable horizontal scrolling")) 
                 this.helpfulWheelItems.push({label: "Disable horizontal scrolling", icon: "imgsrc:header-icons/lock.svg", display: false, fn: setScroller});
             
-            if(_THIS_IS_MUSIC_BLOCKS_ && !this.helpfulWheelItems.find(ele => ele.label === "Set Pitch Preview")) 
+            if (_THIS_IS_MUSIC_BLOCKS_ && !this.helpfulWheelItems.find(ele => ele.label === "Set Pitch Preview")) 
                 this.helpfulWheelItems.push({label: "Set Pitch Preview", icon: "imgsrc:header-icons/music-note.svg", display: true, fn: chooseKeyMenu});
         
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Grid")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Grid")) 
                 this.helpfulWheelItems.push({label: "Grid", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CARTESIANBUTTON)), display: true, fn: piemenuGrid});
         
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Clean")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Clean")) 
                 this.helpfulWheelItems.push({label: "Clean", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CLEARBUTTON)), display: true, fn: () => this._allClear(false)});
             
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Collapse")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Collapse")) 
                 this.helpfulWheelItems.push({label: "Collapse", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBUTTON)), display: true, fn: this.turtles.collapse});
         
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Expand")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Expand")) 
                 this.helpfulWheelItems.push({label: "Expand", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(EXPANDBUTTON)), display: false, fn: this.turtles.expand});
         
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Search for Blocks")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Search for Blocks")) 
                 this.helpfulWheelItems.push({label: "Search for Blocks", icon: "imgsrc:header-icons/search-button.svg", display: true, fn: this._displayHelpfulSearchDiv});
         
-            if(!this.helpfulWheelItems.find(ele => ele.label === "Paste previous stack")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Paste previous stack")) 
                 this.helpfulWheelItems.push({label: "Paste previous stack", icon: "imgsrc:header-icons/copy-button.svg", display: false, fn: this.turtles.expand});
+            if(!this.helpfulWheelItems.find(ele => ele.label=== "Close"))
+                this.helpfulWheelItems.push({label: "Close", icon: "imgsrc:header-icons/cancel-button.svg",
+                display: true, fn: this._hideHelpfulSearchWidget});
         
         };
 
@@ -5413,14 +5809,14 @@ class Activity {
         this.showHelpfulSearchWidget = () => {
             // Bring widget to top.
             const $j = jQuery.noConflict();
-            if($j("#helpfulSearch")) {
+            if ($j("#helpfulSearch")) {
                 try {
                     $j("#helpfulSearch").autocomplete("destroy");
                 } catch {}
             }
             this.helpfulSearchWidget.style.zIndex = 1001;
             this.helpfulSearchWidget.idInput_custom = "";
-            if(this.helpfulSearchDiv.style.display === "block") {
+            if (this.helpfulSearchDiv.style.display === "block") {
 
                 this.helpfulSearchWidget.value = null;
                 this.helpfulSearchWidget.style.visibility = "visible";
@@ -5507,6 +5903,8 @@ class Activity {
             }
 
             this.helpfulSearchWidget.value = "";
+            // Hide search div after search is complete.
+            docById("helpfulSearchDiv").style.display = "none";
             this.update = true;
         };
 
@@ -5564,6 +5962,8 @@ class Activity {
             container.onmouseover = (event) => {
                 if (!that.loading) {
                     document.body.style.cursor = "pointer";
+                    container.style.transition = '0.12s ease-out';
+                    container.style.transform = 'scale(1.15)';
                 }
             };
 
@@ -5571,6 +5971,8 @@ class Activity {
             container.onmouseout = (event) => {
                 if (!that.loading) {
                     document.body.style.cursor = "default";
+                    container.style.transition = '0.15s ease-out';
+                    container.style.transform = 'scale(1)';
                 }
             };
 
@@ -5726,8 +6128,8 @@ class Activity {
             document.addEventListener(
                 "mousedown",
                 (event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
+                    // event.preventDefault();
+                    // event.stopPropagation();
                     if (event.target.id === "myCanvas") {
                         this._createDrag(event);
                     }
@@ -5761,10 +6163,10 @@ class Activity {
                 this.hasMouseMoved = true;
                 event.preventDefault();
                 // this.selectedBlocks = [];
-                if(this.isDragging){
+                if (this.isDragging){
                     this.currentX = event.clientX;
                     this.currentY = event.clientY;
-                    if (!this.blocks.isBlockMoving) {
+                    if (!this.blocks.isBlockMoving && !this.turtles.running()) {
                         this.setSelectionMode(true);
                         this.drawSelectionArea();
                         this.selectedBlocks = this.selectBlocksInDragArea();
@@ -5775,7 +6177,7 @@ class Activity {
             })
 
             document.addEventListener("mouseup", (event) => {
-                event.preventDefault();
+               // event.preventDefault();
                 this.isDragging = false;
                 this.selectionArea.style.display = "none";
                 this.startX = 0;
@@ -5843,7 +6245,7 @@ class Activity {
                         width: block.width
                     };
                 
-                if(this.rectanglesOverlap(this.blockRect, this.dragRect)){
+                if (this.rectanglesOverlap(this.blockRect, this.dragRect)){
                     selectedBlocks.push(block);
                 }
             })
@@ -5956,7 +6358,7 @@ class Activity {
             });
 
             document.addEventListener("click", (e) => {
-                if(!this.hasMouseMoved){
+                if (!this.hasMouseMoved){
                     if (this.selectionModeOn) {
                         this.deselectSelectedBlocks();
                     } else {
@@ -6212,7 +6614,7 @@ class Activity {
                 const files = event.dataTransfer.files;
                 const reader = new FileReader();
                 let midiReader = new FileReader();
-
+                const abcReader = new FileReader();
                 // eslint-disable-next-line no-unused-vars
                 reader.onload = (theFile) => {
                     that.loading = true;
@@ -6233,7 +6635,8 @@ class Activity {
                                     obj = JSON.parse(
                                         cleanData.match('<div class="code">(.+?)</div>')[1]
                                     );
-                                } else {
+                                } 
+                                else {
                                     obj = JSON.parse(cleanData);
                                 }
                                 for (const name in that.blocks.palettes.dict) {
@@ -6287,6 +6690,24 @@ class Activity {
                     this.transcribeMidi(midi);
                 }
 
+                // Music Block Parser from abc to MB
+                abcReader.onload = (event) => {
+                    //get the abc data and replace the / so that the block does not break
+                    let abcData = event.target.result;
+                    abcData = abcData.replace(/\\/g, '');
+                    
+                    const tunebook = new ABCJS.parseOnly(abcData);
+                    
+                    console.log(tunebook)
+                    tunebook.forEach(tune => {
+                        //call parseABC to parse abcdata to MB json
+                        this.parseABC(tune);
+                    
+                    });
+                 
+                
+                };
+
                 // Work-around in case the handler is called by the
                 // widget drag & drop code.
                 if (files[0] !== undefined) {
@@ -6296,6 +6717,13 @@ class Activity {
                         midiReader.readAsArrayBuffer(files[0]);
                         return;
                     }
+                    let isABC = (extension == "abc");
+                    if (isABC) {
+                        abcReader.readAsText(files[0]);
+                        console.log('abc')
+                        return;
+                    }
+                    reader.readAsText(files[0]);
                     reader.readAsText(files[0]);
                     window.scroll(0, 0);
                 }
