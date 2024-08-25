@@ -231,7 +231,7 @@ class Turtle {
         this.singer.whichNoteToCount = 1;
         this.singer.movable = false;
 
-        this.singer.bpm = [];
+        this.singer.bpm = [1];
         this.singer.previousTurtleTime = 0;
         this.singer.turtleTime = 0;
         this.singer.pushedNote = false;
