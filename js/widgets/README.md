@@ -1,10 +1,15 @@
-# How to Add New Blocks in Widgets
+# How to add new widgets
 
-This section describes how to add new blocks to Music Blocks in the Widget section.
+This README describes how to add new widgets to Music Blocks.
 
-**Note:** Almost all code related to Widget Blocks is located inside `js/widgets` and then intilalized  in the `js/blocks/WidgetBlocks.js` file and imported in `js/activity.js`.
+**Note:** Almost all of the code associated with the widget itself is found in
+`js/widgets`. The code that defines the block associated with the widget is
+found in `js/blocks/WidgetBlocks.js`. Finally, files added to Music Blocks are
+imported in `js/activity.js`.
 
-1. **Create a New File:**
+Steps:
+
+1. **Create a new file that will define your widget:**
    Make a new file in `js/widgets` with a meaningful name.
 
 2. **Define the Block Class:**
@@ -14,23 +19,28 @@ This section describes how to add new blocks to Music Blocks in the Widget secti
        // Blocks with some functionality  
    }
    ```
+   This class will contain the code that defines the behavior of your widget.
+
 3. **Intialize the Class**
-   Initalize the class in `js/blocks/WidgetBlocks.` go to last line and intilaize it 
+   Define the block that will be used to launch your widget in `js/blocks/WidgetBlocks.`
+   Don't forget to initalize the class. (Look at the code towards the end of the file.)
    ```javascript
 
    new UniqueClass().setup(activity);
    ```
 
-4. **Import the Class**
-   Go to the `js/activity.js` to the Music block constants and import the your file
+4. **Import the widget**
+   In `js/activity.js`, import the widget code.
     ```javascript
     if (_THIS_IS_MUSIC_BLOCKS_) {
     const MUSICBLOCKS_EXTRAS = [
        ....
         "widgets/UniqueClassFileName",
-  
-    
     ];
-    
 }
    ```
+
+
+**Hint:** When creating a new widget, look for an existing widget with
+similar features. It is sometimes easier to fork than start building
+from scratch.
