@@ -27,6 +27,23 @@ class Collaboration {
         this.PORT = "http://localhost:8080/";
         this.hasCollaborationStarted = false;
         this.updatedProjectHtml = null;
+        this.randomNames = [
+            'Macrotis',
+            'Setonix',
+            'Petaurus',
+            'Marmosa',
+            'Macropus',
+            'Dasyurus',
+            'Caluromys',
+            'Acrobates',
+            'Didelphis',
+            'Philander',
+            'Lutreolina',
+            'Notoryctes',
+            'Metachirus',
+            'Dromiciops',
+            'Chaeropus'
+        ];
     }
 
     // Convert the blockList into html
@@ -122,9 +139,21 @@ class Collaboration {
         });
     };
 
+    // Generate a random name for the user
+    generateRandomName = () => {
+        const randomNum = Math.floor(Math.random() * 14);
+        const prefix = this.randomNames[randomNum];
+        const suffix = Math.floor(Math.random() * 50);
+        const name = prefix + suffix;
+        return name;
+    }
+
     // Start the collaboration
-    startCollaboration = (ID) => {
-        this.makeConnection(ID);
+    startCollaboration = (ID, name) => {
+        if (!name) {
+            name = this.generateRandomName();
+        }
+        this.makeConnection(ID, name);
     };
 }
 
