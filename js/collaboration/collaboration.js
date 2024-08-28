@@ -44,7 +44,7 @@ class Collaboration {
     };
 
     // Make calls to the socket server
-    makeConnection = (ID) => {
+    makeConnection = (room_id, name) => {
         // connect to the local server
         const socket = io(this.PORT);
         socket.on("connect", () => {
@@ -52,12 +52,53 @@ class Collaboration {
             try {
                 console.log("connected to the server");
                 this.hasCollaborationStarted = true;
-                socket.emit("joinRoom", ID);
+                socket.emit("joinRoom", {room_id, name});
+                this.activity.collabCursor.trackCursor();
             } catch (error) {
                 console.log("Connection failed", error);
             }
         });
 
+        socket.on("existing-cursor", (cursorArray) => {
+            if (cursorArray.length > 1) {
+                cursorArray.forEach(({id}) => {
+                    const ID = id[0];
+                    if (ID !== this.socket.id){
+                        this.activity.collabCursor.createCursor(ID);
+                    }
+                });
+            }
+        });
+
+        socket.on("new-cursor", ({id}) => {
+            this.activity.collabCursor.createCursor(id);
+        });
+
+        socket.on("remove-cursor", (id) => {
+            this.activity.collabCursor.removeCursor(id);
+        })
+
+        socket.on("mouse-move", (data) => {
+            const {socket_id, x, y} = data;
+            const cursor = this.activity.collabCursor.cursorContainer.get(socket_id);
+            if (cursor) {
+                cursor.style.left = `${x}px`;
+                cursor.style.top = `${y}px`;
+            }
+        });
+
+        socket.on("add-new-name", ({id, name}) => {
+            this.activity.collabCursor.nameContainer.set(id, name);
+        })
+
+        socket.on("add-existing-names", ((namesArray) => {
+            if (namesArray.length > 1) {
+                namesArray.forEach(({id, name}) => {
+                    this.activity.collabCursor.nameContainer.set(id, name);
+                });
+            }
+        }));
+        
         socket.on("connect_error", () => {
             this.attempts++;
             console.log("Failed to connect to the socket server. Retrying in few seconds...");
