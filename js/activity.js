@@ -555,8 +555,8 @@ class Activity {
         }
 
         // Initialize the collaboration
-        this._initiateCollaboration = (ID) => {
-            this.collaboration.startCollaboration(ID);
+        this._initiateCollaboration = (ID, name) => {
+            this.collaboration.startCollaboration(ID, name);
             this.blocks.isLocalUpdate = true;
         };
 
@@ -5422,6 +5422,7 @@ class Activity {
             this.pasteBox = new PasteBox(this);
             this.languageBox = new LanguageBox(this);
             this.collaboration = new Collaboration(this);
+            this.collabCursor = new Cursor(this);
 
             // Show help on startup if first-time user.
             if (this.firstTimeUser) {
@@ -5931,17 +5932,17 @@ class Activity {
             this._create2Ddrag();
 
             setTimeout(() => {
-                console.log("dom is ready");
                 const urlParams = new URLSearchParams(window.location.search);
                 const room_id = urlParams.get('roomID');
                 const collabUrl = window.location.href;
  
                 if (room_id) {
                     this.room_id = room_id;
+                    const collaboratorName = window.prompt("What is your name?");
                     this.textMsg(`${_("Collaboration link: ")} ${collabUrl}`);
-                    this._initiateCollaboration(this.room_id);
+                    this._initiateCollaboration(this.room_id, collaboratorName);
                 };
-            }, 5000);
+            }, 4000);
             /*
             document.addEventListener("mousewheel", scrollEvent, false);
             document.addEventListener("DOMMouseScroll", scrollEvent, false);
