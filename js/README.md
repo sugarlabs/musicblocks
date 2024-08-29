@@ -123,6 +123,12 @@ meaningful name, e.g. `setupGraphicsBlocks()`.
 4. Call that setup function in `js/basicblocks.js` from the
 `initBasicProtoBlocks()` function.
 
+5. Add artwork for the palette icon in `js/artwork.js`. There are
+several dictionaries that need to be updated as well: `PALETTECOLORS`
+and `PALETTEICONS`.
+
+6. Assign colors in `js/utils/platformstyle.js`.
+
 After the above steps are complete, move to [defining a new
 block](#how-to-define-a-new-block)
 
