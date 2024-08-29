@@ -18,12 +18,29 @@
 
 /* exported Trashcan */
 
+/**
+ * Represents a trashcan for disposing and restoring blocks.
+ * @class
+ */
 class Trashcan {
+    /**
+     * The width of the trashcan.
+     * @static
+     * @type {number}
+     */
     static TRASHWIDTH = 120;
+
+    /**
+     * The height of the trashcan.
+     * @static
+     * @type {number}
+     */
     static TRASHHEIGHT = 120;
 
     /**
+     * Creates a new Trashcan instance.
      * @constructor
+     * @param {Object} activity - The main activity object.
      */
     constructor(activity) {
         this.activity = activity;
@@ -46,39 +63,35 @@ class Trashcan {
     }
 
     /**
+     * Creates or updates the border highlight for the trashcan.
      * @private
-     * @param {boolean} isActive
-     * @returns {void}
+     * @param {boolean} isActive - Whether the highlight should be active.
      */
     _makeBorderHighlight(isActive) {
         const img = new Image();
 
         img.onload = () => {
             this._borderHighlightBitmap = new createjs.Bitmap(img);
-            this._borderHighlightBitmap.scaleX = this.activity.cellSize / this._iconsize;
-            this._borderHighlightBitmap.scaleY = this.activity.cellSize / this._iconsize;
-            if (!this._isHighlightInitialized) {
-                this._container.visible = false;
-                this._isHighlightInitialized = true;
-            } else {
-                this._container.removeChildAt(this._container.children.length - 1);
-            }
+            this._borderHighlightBitmap.scaleX = this._scale;
+            this._borderHighlightBitmap.scaleY = this._scale;
+            this._borderHighlightBitmap.scale = this._scale;
 
+            this._container.removeChild(this._borderHighlightBitmap);
             this._container.addChild(this._borderHighlightBitmap);
-            this._borderHighlightBitmap.visible = true;
+            this._isHighlightInitialized = true;
+            this._borderHighlightBitmap.visible = false;
         };
 
-        let highlightString =
-            "rgb(" +
-            this._highlightPower +
-            "," +
-            this._highlightPower +
-            "," +
-            this._highlightPower +
-            ")";
+        let highlightString = BORDER.replace("stroke_color", platformColor.trashBorderColor).replace(
+            "fill_color",
+            platformColor.trashBottomBackground
+        );
+
         if (isActive) {
-            // When trash is activated, warn the user with red highlight.
-            highlightString = platformColor.trashActive;
+            highlightString = highlightString.replace(
+                platformColor.trashBorderColor,
+                platformColor.trashBorderHighlightColor
+            );
         }
 
         img.src =
@@ -89,8 +102,8 @@ class Trashcan {
     }
 
     /**
+     * Creates the border for the trashcan.
      * @private
-     * @returns {void}
      */
     _makeBorder() {
         const img = new Image();
@@ -111,8 +124,8 @@ class Trashcan {
     }
 
     /**
+     * Creates the trash icon.
      * @private
-     * @returns {void}
      */
     _makeTrash() {
         const img = new Image();
@@ -120,12 +133,7 @@ class Trashcan {
         img.onload = () => {
             const bitmap = new createjs.Bitmap(img);
             this._container.addChild(bitmap);
-            this._iconsize = bitmap.getBounds().width;
-            bitmap.scaleX = this.activity.cellSize / this._iconsize;
-            bitmap.scaleY = this.activity.cellSize / this._iconsize;
-            bitmap.x = ((Trashcan.TRASHWIDTH - this.activity.cellSize) / 2) * bitmap.scaleX;
-            bitmap.y = ((Trashcan.TRASHHEIGHT - this.activity.cellSize) / 2) * bitmap.scaleY;
-            this._makeBorder();
+            this._makeBorderHighlight(false);
         };
 
         img.src =
@@ -136,9 +144,8 @@ class Trashcan {
     }
 
     /**
+     * Updates the position of the trashcan container.
      * @public
-     * @param {number} scale
-     * @returns {void}
      */
     updateContainerPosition() {
         this._container.x =
@@ -147,10 +154,20 @@ class Trashcan {
             window.innerHeight / this._scale - Trashcan.TRASHHEIGHT - (5 / 4) * this._iconsize;
     }
 
+    /**
+     * Checks if the trashcan should be resized.
+     * @param {number} newWidth - The new width.
+     * @param {number} newHeight - The new height.
+     * @returns {boolean} True if resize is needed, false otherwise.
+     */
     shouldResize(newWidth, newHeight) {
         return this._container.x !== newWidth || this._container.y !== newHeight;
     }
 
+    /**
+     * Handles the resize event for the trashcan.
+     * @param {number} scale - The scale factor.
+     */
     resizeEvent(scale) {
         this._scale = scale;
         this.updateContainerPosition();
@@ -174,16 +191,16 @@ class Trashcan {
     }
 
     /**
+     * Hides the trashcan.
      * @public
-     * @returns {void}
      */
     hide() {
         createjs.Tween.get(this._container).to({ alpha: 0 }, 200).set({ visible: false });
     }
 
     /**
+     * Shows the trashcan.
      * @public
-     * @returns {void}
      */
     show() {
         this.stopHighlightAnimation();
@@ -193,8 +210,8 @@ class Trashcan {
     }
 
     /**
+     * Starts the highlight animation for the trashcan.
      * @public
-     * @returns {void}
      */
     startHighlightAnimation() {
         if (this._inAnimation) {
@@ -202,31 +219,31 @@ class Trashcan {
         }
 
         this._inAnimation = true;
+        this._animationLevel = 0;
+        const that = this;
 
         this._animationInterval = setInterval(() => {
-            this._animationLevel += 20;
-            if (this._animationLevel >= this.animationTime) {
-                this.isVisible = true;
-                this._makeBorderHighlight(true); // Make it active.
-                this.activity.refreshCanvas();
-                clearInterval(this._animationInterval); // Autostop animation.
-                return;
+            that._animationLevel += 20;
+            if (that._animationLevel >= that.animationTime) {
+                clearInterval(that._animationInterval);
+                that._inAnimation = false;
+                that._highlightPower = 255;
+                that._makeBorderHighlight(true);
+            } else {
+                that._highlightPower = parseInt(
+                    255 - (255 * that._animationLevel) / that.animationTime,
+                    10
+                );
+                that._makeBorderHighlight(true);
             }
-
-            this._highlightPower = parseInt(
-                255 - 255 * (this._animationLevel / this.animationTime),
-                10
-            );
-            this._makeBorderHighlight(false);
-            this.activity.refreshCanvas();
         }, 20);
 
         this._switchHighlightVisibility(true);
     }
 
     /**
+     * Stops the highlight animation for the trashcan.
      * @public
-     * @returns {void}
      */
     stopHighlightAnimation() {
         if (!this._inAnimation) {
@@ -243,8 +260,9 @@ class Trashcan {
     }
 
     /**
+     * Switches the visibility of the highlight.
      * @private
-     * @returns {void}
+     * @param {boolean} bool - Whether to show or hide the highlight.
      */
     _switchHighlightVisibility(bool) {
         last(this._container.children).visible = bool;
@@ -254,10 +272,10 @@ class Trashcan {
     }
 
     /**
-     * @public
-     * @param {number} x - x coordinate
-     * @param {number} y - y coordinate
-     * @returns {boolean}
+     * Checks if a point is over the trashcan.
+     * @param {number} x - The x coordinate.
+     * @param {number} y - The y coordinate.
+     * @returns {boolean} True if the point is over the trashcan, false otherwise.
      */
     overTrashcan(x, y) {
         const tx = this._container.x;
