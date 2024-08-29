@@ -81,12 +81,15 @@ class Cursor {
     trackCursor() {
         if (this.activity.collaboration.hasCollaborationStarted) {
             let counter = 0
-            const EMIT_THRESHOLD = 50;
+            const EMIT_THRESHOLD = 5;
             const emitMouseMove = (e) => {
                 counter++;
                 if (counter >= EMIT_THRESHOLD) {
                     const roomID = this.activity.room_id;
-                    this.activity.collaboration.socket.emit("mouse-move", { room_id: roomID, x: e.clientX, y: e.clientY });
+                    const xScroll = this.activity.blocksContainer.x;
+                    const yScroll = this.activity.blocksContainer.y;
+                    const data = { room_id: roomID, x: e.pageX, y: e.pageY, scrollx: xScroll, scrolly: yScroll };
+                    this.activity.collaboration.socket.emit("mouse-move", data);
                     counter = 0;
                 };
             };

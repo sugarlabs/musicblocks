@@ -96,11 +96,15 @@ class Collaboration {
         })
 
         socket.on("mouse-move", (data) => {
-            const {socket_id, x, y} = data;
+            const { socket_id, x, y, scrollx, scrolly } = data;
             const cursor = this.activity.collabCursor.cursorContainer.get(socket_id);
             if (cursor) {
-                cursor.style.left = `${x}px`;
-                cursor.style.top = `${y}px`;
+                const currentScrollX = this.activity.blocksContainer.x;
+                const currentScrollY = this.activity.blocksContainer.y;
+                const adjustedX = x - (scrollx - currentScrollX);
+                const adjustedY = y - (scrolly - currentScrollY);
+                cursor.style.left = `${adjustedX}px`;
+                cursor.style.top = `${adjustedY}px`;
             }
         });
 
