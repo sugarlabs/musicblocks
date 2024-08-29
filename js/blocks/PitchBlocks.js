@@ -875,6 +875,7 @@ function setupPitchBlocks(activity) {
                 "note2"
             ]);
             this.formBlock({ outType: "noteout" });
+            this.beginnerBlock(true);
         }
     }
 
@@ -889,6 +890,7 @@ function setupPitchBlocks(activity) {
                 "note1"
             ]);
             this.formBlock({ outType: "solfegeout" });
+            this.beginnerBlock(true);
         }
     }
 
@@ -1841,6 +1843,7 @@ function setupPitchBlocks(activity) {
                 [1, ["notename", { value: "G" }], 0, 0, [0]],
                 [2, ["number", { value: 4 }], 0, 0, [0]]
             ]);
+            this.beginnerBlock(true);
         }
     }
 

@@ -40,6 +40,8 @@
 
         <script src="lib/Tone.js" defer></script>
 
+        <script src="lib/midi.js" defer></script>
+
         <script src="lib/jquery.ruler.js" defer></script>
 
         <script src="lib/modernizr-2.6.2.min.js" defer></script>
@@ -48,6 +50,8 @@
 
         <script src="lib/wheelnav.js" defer></script>
 
+        <script src="lib/abc.min.js" defer></script>
+
         <script src="lib/codejar/codejar.min.js" defer></script>
 
         <script src="lib/codejar/highlight.pack.js" defer></script>
@@ -55,6 +59,8 @@
         <script src="lib/astring.min.js" defer></script>
 
         <script src="./js/collaboration/collaboration.js"></script>
+
+        <script src="./js/collaboration/collabcursor.js"></script>
 
         <link rel="prefetch" type="application/l10n" href="./localization.ini"/>
 
@@ -411,7 +417,7 @@
                         class="file"
                         type="file"
                         id="myOpenFile"
-                        accept=".ta, .tb, .html"
+                        accept=".ta, .tb, .html,.mid,.midi"
                         tabindex="-1"
                     />
                     <input

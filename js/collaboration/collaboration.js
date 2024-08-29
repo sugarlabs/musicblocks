@@ -27,6 +27,23 @@ class Collaboration {
         this.PORT = "http://localhost:8080/";
         this.hasCollaborationStarted = false;
         this.updatedProjectHtml = null;
+        this.randomNames = [
+            'Macrotis',
+            'Setonix',
+            'Petaurus',
+            'Marmosa',
+            'Macropus',
+            'Dasyurus',
+            'Caluromys',
+            'Acrobates',
+            'Didelphis',
+            'Philander',
+            'Lutreolina',
+            'Notoryctes',
+            'Metachirus',
+            'Dromiciops',
+            'Chaeropus'
+        ];
     }
 
     // Convert the blockList into html
@@ -44,7 +61,7 @@ class Collaboration {
     };
 
     // Make calls to the socket server
-    makeConnection = (ID) => {
+    makeConnection = (room_id, name) => {
         // connect to the local server
         const socket = io(this.PORT);
         socket.on("connect", () => {
@@ -52,12 +69,57 @@ class Collaboration {
             try {
                 console.log("connected to the server");
                 this.hasCollaborationStarted = true;
-                socket.emit("joinRoom", ID);
+                socket.emit("joinRoom", {room_id, name});
+                this.activity.collabCursor.trackCursor();
             } catch (error) {
                 console.log("Connection failed", error);
             }
         });
 
+        socket.on("existing-cursor", (cursorArray) => {
+            if (cursorArray.length > 1) {
+                cursorArray.forEach(({id}) => {
+                    const ID = id[0];
+                    if (ID !== this.socket.id){
+                        this.activity.collabCursor.createCursor(ID);
+                    }
+                });
+            }
+        });
+
+        socket.on("new-cursor", ({id}) => {
+            this.activity.collabCursor.createCursor(id);
+        });
+
+        socket.on("remove-cursor", (id) => {
+            this.activity.collabCursor.removeCursor(id);
+        })
+
+        socket.on("mouse-move", (data) => {
+            const { socket_id, x, y, scrollx, scrolly } = data;
+            const cursor = this.activity.collabCursor.cursorContainer.get(socket_id);
+            if (cursor) {
+                const currentScrollX = this.activity.blocksContainer.x;
+                const currentScrollY = this.activity.blocksContainer.y;
+                const adjustedX = x - (scrollx - currentScrollX);
+                const adjustedY = y - (scrolly - currentScrollY);
+                cursor.style.left = `${adjustedX}px`;
+                cursor.style.top = `${adjustedY}px`;
+            }
+        });
+
+        socket.on("add-new-name", ({id, name}) => {
+            this.activity.collabCursor.nameContainer.set(id, name);
+        })
+
+        socket.on("add-existing-names", ((namesArray) => {
+            if (namesArray.length > 1) {
+                namesArray.forEach(({id, name}) => {
+                    this.activity.collabCursor.nameContainer.set(id, name);
+                });
+            }
+        }));
+        
         socket.on("connect_error", () => {
             this.attempts++;
             console.log("Failed to connect to the socket server. Retrying in few seconds...");
@@ -81,9 +143,21 @@ class Collaboration {
         });
     };
 
+    // Generate a random name for the user
+    generateRandomName = () => {
+        const randomNum = Math.floor(Math.random() * 14);
+        const prefix = this.randomNames[randomNum];
+        const suffix = Math.floor(Math.random() * 50);
+        const name = prefix + suffix;
+        return name;
+    }
+
     // Start the collaboration
-    startCollaboration = (ID) => {
-        this.makeConnection(ID);
+    startCollaboration = (ID, name) => {
+        if (!name) {
+            name = this.generateRandomName();
+        }
+        this.makeConnection(ID, name);
     };
 }
 
