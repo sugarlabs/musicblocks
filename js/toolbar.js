@@ -807,6 +807,7 @@ class Toolbar {
      * @param  {Function} setScroller - The function to set the scroller.
      * @returns {void}
      */
+    
     renderAdvancedIcons(
         rec_onclick,
         analytics_onclick,
@@ -814,51 +815,33 @@ class Toolbar {
         delPlugin_onclick,
         setScroller
     ) {
-        const RecIcon = docById("record");
-        const displayStatsIcon = docById("displayStatsIcon");
-        const loadPluginIcon = docById("loadPluginIcon");
-        const delPluginIcon = docById("delPluginIcon");
-        const enableHorizScrollIcon = docById("enableHorizScrollIcon");
-        const disableHorizScrollIcon = docById("disableHorizScrollIcon");
-        const toggleJavaScriptIcon = docById("toggleJavaScriptIcon");
+        const icons = {
+            record: docById("record"),
+            displayStats: docById("displayStatsIcon"),
+            loadPlugin: docById("loadPluginIcon"),
+            delPlugin: docById("delPluginIcon"),
+            enableHorizScroll: docById("enableHorizScrollIcon"),
+            disableHorizScroll: docById("disableHorizScrollIcon"),
+            toggleJavaScript: docById("toggleJavaScriptIcon")
+        };
+    
         const browser = fnBrowserDetect();
-        const btn = document.getElementById("record");
-        const hideIn = ["firefox", "safari"];
-        if (hideIn.includes(browser)) {
-            btn.classList.add("hide");
+        if (["firefox", "safari"].includes(browser)) {
+            icons.record.classList.add("hide");
         }
-
+    
         if (!this.activity.beginnerMode) {
-            RecIcon.innerHTML= `<i class=""material-icons main">${RECORDBUTTON}</i>`;
-            RecIcon.onclick = () => {
-                rec_onclick(this.activity);
-            };
-
-            displayStatsIcon.onclick = () => {
-                analytics_onclick(this.activity);
-            };
-
-            loadPluginIcon.onclick = () => {
-                openPlugin_onclick(this.activity);
-            };
-
-            delPluginIcon.onclick = () => {
-                delPlugin_onclick(this.activity);
-            };
-
-            enableHorizScrollIcon.onclick = () => {
-                setScroller(this.activity);
-            };
-
-            disableHorizScrollIcon.onclick = () => {
-                setScroller(this.activity);
-            };
+            icons.record.innerHTML = `<i class="material-icons main">${RECORDBUTTON}</i>`;
+            icons.record.onclick = () => rec_onclick(this.activity);
+            icons.displayStats.onclick = () => analytics_onclick(this.activity);
+            icons.loadPlugin.onclick = () => openPlugin_onclick(this.activity);
+            icons.delPlugin.onclick = () => delPlugin_onclick(this.activity);
+            icons.enableHorizScroll.onclick = () => setScroller(this.activity);
+            icons.disableHorizScroll.onclick = () => setScroller(this.activity);
         } else {
-            displayStatsIcon.style.display = "none";
-            loadPluginIcon.style.display = "none";
-            delPluginIcon.style.display = "none";
-            enableHorizScrollIcon.style.display = "none";
-            toggleJavaScriptIcon.style.display = "none";
+            ['displayStats', 'loadPlugin', 'delPlugin', 'enableHorizScroll', 'toggleJavaScript'].forEach(key => {
+                icons[key].style.display = "none";
+            });
         }
     }
 
