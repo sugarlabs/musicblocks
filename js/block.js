@@ -2834,11 +2834,7 @@ class Block {
             if (!moved && that.isCollapsible() && dx < 30 / that.activity.getStageScale()) {
                 that.collapseToggle();
             } else if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
-                if (that.name === "media") {
-                    that._doOpenMedia(thisBlock);
-                } else if (that.name === "audiofile") {
-                    that._doOpenMedia(thisBlock);
-                } else if (that.name === "loadFile") {
+                if (["media", "audiofile", "loadFile"].includes(that.name)) {
                     that._doOpenMedia(thisBlock);
                 } else if (SPECIALINPUTS.indexOf(that.name) !== -1) {
                     if (!that.trash) {
