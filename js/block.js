@@ -4571,14 +4571,8 @@ class Block {
         this._labelLock = false;
 
         // Load the synth for the selected drum.
-        if (this.name === "drumname") {
+        if (["drumname", "effectsname", "voicename", "noisename"].includes(this.name)) {
             this.activity.logo.synth.loadSynth(0, getDrumSynthName(this.value));
-        } else if (this.name === "effectsname") {
-            this.activity.logo.synth.loadSynth(0, getDrumSynthName(this.value));
-        } else if (this.name === "voicename") {
-            this.activity.logo.synth.loadSynth(0, getVoiceSynthName(this.value));
-        } else if (this.name === "noisename") {
-            this.activity.logo.synth.loadSynth(0, getNoiseSynthName(this.value));
         }
     }
 }
