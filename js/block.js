@@ -2834,11 +2834,7 @@ class Block {
             if (!moved && that.isCollapsible() && dx < 30 / that.activity.getStageScale()) {
                 that.collapseToggle();
             } else if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
-                if (that.name === "media") {
-                    that._doOpenMedia(thisBlock);
-                } else if (that.name === "audiofile") {
-                    that._doOpenMedia(thisBlock);
-                } else if (that.name === "loadFile") {
+                if (["media", "audiofile", "loadFile"].includes(that.name)) {
                     that._doOpenMedia(thisBlock);
                 } else if (SPECIALINPUTS.indexOf(that.name) !== -1) {
                     if (!that.trash) {
@@ -4575,14 +4571,8 @@ class Block {
         this._labelLock = false;
 
         // Load the synth for the selected drum.
-        if (this.name === "drumname") {
+        if (["drumname", "effectsname", "voicename", "noisename"].includes(this.name)) {
             this.activity.logo.synth.loadSynth(0, getDrumSynthName(this.value));
-        } else if (this.name === "effectsname") {
-            this.activity.logo.synth.loadSynth(0, getDrumSynthName(this.value));
-        } else if (this.name === "voicename") {
-            this.activity.logo.synth.loadSynth(0, getVoiceSynthName(this.value));
-        } else if (this.name === "noisename") {
-            this.activity.logo.synth.loadSynth(0, getNoiseSynthName(this.value));
         }
     }
 }
