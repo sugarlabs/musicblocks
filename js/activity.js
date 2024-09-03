@@ -588,8 +588,7 @@ class Activity {
             // default values
             this.DEFAULTDELAY = 500; // milleseconds
             this.TURTLESTEP = -1; // Run in step-by-step mode
-            this.blockscale = BLOCKSCALES.indexOf(DEFAULTBLOCKSCALE);
-            if (this.blockscale === -1) {
+            if (!BLOCKSCALES.includes(DEFAULTBLOCKSCALE)) {
                 this.blockscale = 1;
             }
 
@@ -2907,10 +2906,8 @@ class Activity {
                                 this.logo.tempo.resume();
                             }
                             if (
-                                this.blocks.activeBlock === null ||
-                                SPECIALINPUTS.indexOf(
-                                    this.blocks.blockList[this.blocks.activeBlock].name
-                                ) === -1
+                                this.blocks.activeBlock === null || 
+                                !SPECIALINPUTS.includes(this.blocks.blockList[this.blocks.activeBlock].name)
                             ) {
                                 this.logo.runLogoCommands();
                             }
@@ -5651,8 +5648,7 @@ class Activity {
 
                 const connections = [];
                 for (let c = 0; c < myBlock.connections.length; c++) {
-                    const mapConnection = blockMap.indexOf(myBlock.connections[c]);
-                    if (myBlock.connections[c] === null || mapConnection === -1) {
+                    if (myBlock.connections[c] === null || !blockMap.includes(myBlock.connections[c])) {
                         connections.push(null);
                     } else {
                         connections.push(mapConnection);
