@@ -2908,9 +2908,9 @@ class Activity {
                             }
                             if (
                                 this.blocks.activeBlock === null ||
-                                SPECIALINPUTS.indexOf(
+                                !SPECIALINPUTS.includes(
                                     this.blocks.blockList[this.blocks.activeBlock].name
-                                ) === -1
+                                )
                             ) {
                                 this.logo.runLogoCommands();
                             }
