@@ -290,7 +290,7 @@ class Activity {
                 document.webL10n.setLanguage(lang);
             } else {
                 lang = navigator.language;
-                if (lang.indexOf("-") !== -1) {
+                if (lang.includes("-")) {
                     lang = lang.slice(0, lang.indexOf("-"));
                     document.webL10n.setLanguage(lang);
                 }
@@ -898,7 +898,7 @@ class Activity {
                     ", " +
                     this.blocks.blockList[i].container.y +
                     ')">';
-                if (SPECIALINPUTS.indexOf(this.blocks.blockList[i].name) !== -1) {
+                if (SPECIALINPUTS.includes(this.blocks.blockList[i].name)) {
                     for (let p = 1; p < parts.length; p++) {
                         // FIXME: This is fragile.
                         if (p === 1) {
@@ -945,7 +945,7 @@ class Activity {
 
                 if (this.blocks.blockList[i].isCollapsible()) {
                     let y;
-                    if (INLINECOLLAPSIBLES.indexOf(this.blocks.blockList[i].name) !== -1) {
+                    if (INLINECOLLAPSIBLES.includes(this.blocks.blockList[i].name)) {
                         y = this.blocks.blockList[i].container.y + 4;
                     } else {
                         y = this.blocks.blockList[i].container.y + 12;
@@ -3322,9 +3322,9 @@ class Activity {
                         for (let b = 0; b < this.blocks.dragGroup.length; b++) {
                             const me = this.blocks.blockList[this.blocks.dragGroup[b]];
                             if (
-                                ["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].indexOf(
+                                ["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].includes(
                                     me.name
-                                ) !== -1 &&
+                                ) &&
                                 me.privateData === oldName
                             ) {
                                 me.privateData = uniqueName;
@@ -5260,13 +5260,13 @@ class Activity {
             const _flats = ["B" + FLAT, "E" + FLAT, "A" + FLAT, "D" + FLAT, "G" + FLAT, "C" + FLAT, "F" + FLAT];
             let dx = 0;
             for (let i = 0; i < 7; i++) {
-                if (scale.indexOf(_sharps[i]) !== -1) {
+                if (scale.includes(_sharps[i])) {
                     this.trebleSharpBitmap[i].x += dx;
                     this.trebleSharpBitmap[i].visible = true;
                     this.trebleSharpBitmap[i].updateCache();
                     dx += 15;
                 }
-                if (scale.indexOf(_flats[i]) !== -1) {
+                if (scale.includes(_flats[i])) {
                     this.trebleFlatBitmap[i].x += dx;
                     this.trebleFlatBitmap[i].visible = true;
                     this.trebleFlatBitmap[i].updateCache();
@@ -5303,13 +5303,13 @@ class Activity {
             const _flats = ["B" + FLAT, "E" + FLAT, "A" + FLAT, "D" + FLAT, "G" + FLAT, "C" + FLAT, "F" + FLAT];
             let dx = 0;
             for (let i = 0; i < 7; i++) {
-                if (scale.indexOf(_sharps[i]) !== -1) {
+                if (scale.includes(_sharps[i])) {
                     this.grandSharpBitmap[i].x += dx;
                     this.grandSharpBitmap[i].visible = true;
                     this.grandSharpBitmap[i].updateCache();
                     dx += 15;
                 }
-                if (scale.indexOf(_flats[i]) !== -1) {
+                if (scale.includes(_flats[i])) {
                     this.grandFlatBitmap[i].x += dx;
                     this.grandFlatBitmap[i].visible = true;
                     this.grandFlatBitmap[i].updateCache();
@@ -5344,13 +5344,13 @@ class Activity {
             const _flats = ["B" + FLAT, "E" + FLAT, "A" + FLAT, "D" + FLAT, "G" + FLAT, "C" + FLAT, "F" + FLAT];
             let dx = 0;
             for (let i = 0; i < 7; i++) {
-                if (scale.indexOf(_sharps[i]) !== -1) {
+                if (scale.includes(_sharps[i])) {
                     this.sopranoSharpBitmap[i].x += dx;
                     this.sopranoSharpBitmap[i].visible = true;
                     this.sopranoSharpBitmap[i].updateCache();
                     dx += 15;
                 }
-                if (scale.indexOf(_flats[i]) !== -1) {
+                if (scale.includes(_flats[i])) {
                     this.sopranoFlatBitmap[i].x += dx;
                     this.sopranoFlatBitmap[i].visible = true;
                     this.sopranoFlatBitmap[i].updateCache();
@@ -5390,13 +5390,13 @@ class Activity {
             const _flats = ["B" + FLAT, "E" + FLAT, "A" + FLAT, "D" + FLAT, "G" + FLAT, "C" + FLAT, "F" + FLAT];
             let dx = 0;
             for (let i = 0; i < 7; i++) {
-                if (scale.indexOf(_sharps[i]) !== -1) {
+                if (scale.includes(_sharps[i])) {
                     this.altoSharpBitmap[i].x += dx;
                     this.altoSharpBitmap[i].visible = true;
                     this.altoSharpBitmap[i].updateCache();
                     dx += 15;
                 }
-                if (scale.indexOf(_flats[i]) !== -1) {
+                if (scale.includes(_flats[i])) {
                     this.altoFlatBitmap[i].x += dx;
                     this.altoFlatBitmap[i].visible = true;
                     this.altoFlatBitmap[i].updateCache();
@@ -5432,13 +5432,13 @@ class Activity {
             const _flats = ["B" + FLAT, "E" + FLAT, "A" + FLAT, "D" + FLAT, "G" + FLAT, "C" + FLAT, "F" + FLAT];
             let dx = 0;
             for (let i = 0; i < 7; i++) {
-                if (scale.indexOf(_sharps[i]) !== -1) {
+                if (scale.includes(_sharps[i])) {
                     this.tenorSharpBitmap[i].x += dx;
                     this.tenorSharpBitmap[i].visible = true;
                     this.tenorSharpBitmap[i].updateCache();
                     dx += 15;
                 }
-                if (scale.indexOf(_flats[i]) !== -1) {
+                if (scale.includes(_flats[i])) {
                     this.tenorFlatBitmap[i].x += dx;
                     this.tenorFlatBitmap[i].visible = true;
                     this.tenorFlatBitmap[i].updateCache();
@@ -5475,13 +5475,13 @@ class Activity {
             const _flats = ["B" + FLAT, "E" + FLAT, "A" + FLAT, "D" + FLAT, "G" + FLAT, "C" + FLAT, "F" + FLAT];
             let dx = 0;
             for (let i = 0; i < 7; i++) {
-                if (scale.indexOf(_sharps[i]) !== -1) {
+                if (scale.includes(_sharps[i])) {
                     this.bassSharpBitmap[i].x += dx;
                     this.bassSharpBitmap[i].visible = true;
                     this.bassSharpBitmap[i].updateCache();
                     dx += 15;
                 }
-                if (scale.indexOf(_flats[i]) !== -1) {
+                if (scale.includes(_flats[i])) {
                     this.bassFlatBitmap[i].x += dx;
                     this.bassFlatBitmap[i].visible = true;
                     this.bassFlatBitmap[i].updateCache();
