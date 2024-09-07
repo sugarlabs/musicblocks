@@ -1749,7 +1749,7 @@ const getMacroExpansion = (activity, blkname, x, y) => {
     };
 
     if (
-        ["namedbox", "nameddo", "namedcalc", "namedarg", "nameddoArg"].indexOf(blkname) === -1 &&
+        !["namedbox", "nameddo", "namedcalc", "namedarg", "nameddoArg"].includes(blkname) &&
         blkname in BUILTINMACROS
     ) {
         return BUILTINMACROS[blkname];
