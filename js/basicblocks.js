@@ -37,7 +37,7 @@
  * Dictionary mapping old block names to their corresponding new block names for backward compatibility.
  * @constant {Object<string, string>}
  */
-const BACKWARDCOMPATIBILIYDICT = {
+export const BACKWARDCOMPATIBILIYDICT = {
     fullscreen: "vspace",
     fillscreen2: "fillscreen",
     sandwichclampcollapsed: "clamp",
@@ -72,41 +72,41 @@ const BACKWARDCOMPATIBILIYDICT = {
     shell: "turtleshell"
 };
 
-// Define blocks here. Note: The blocks are placed on the palettes
-// from bottom to top, i.e., the block at the top of a palette will be
-// the last block added to a palette.
+const setupFunctions = [
+    setupRhythmBlockPaletteBlocks,
+    setupRhythmBlocks,
+    setupMeterBlocks,
+    setupPitchBlocks,
+    setupIntervalsBlocks,
+    setupToneBlocks,
+    setupOrnamentBlocks,
+    setupVolumeBlocks,
+    setupDrumBlocks,
+    setupWidgetBlocks,
+    setupFlowBlocks,
+    setupNumberBlocks,
+    setupActionBlocks,
+    setupBoxesBlocks,
+    setupBooleanBlocks,
+    setupHeapBlocks,
+    setupDictBlocks,
+    setupExtrasBlocks,
+    setupProgramBlocks,
+    setupGraphicsBlocks,
+    setupPenBlocks,
+    setupMediaBlocks,
+    setupSensorsBlocks,
+    setupEnsembleBlocks
+];
+
 /**
  * @public
- * @param  {Object} palettes
- * @param  {Object} blocks
+ * @param  {Object} activity
  * @returns {void}
  */
-const initBasicProtoBlocks = (activity) => {
+export const initBasicProtoBlocks = (activity) => {
     activity.blocks.palettes = activity.palettes;
-    setupRhythmBlockPaletteBlocks(activity);
-    setupRhythmBlocks(activity);
-    setupMeterBlocks(activity);
-    setupPitchBlocks(activity);
-    setupIntervalsBlocks(activity);
-    setupToneBlocks(activity);
-    setupOrnamentBlocks(activity);
-    setupVolumeBlocks(activity);
-    setupDrumBlocks(activity);
-    setupWidgetBlocks(activity);
-    setupFlowBlocks(activity);
-    setupNumberBlocks(activity);
-    setupActionBlocks(activity);
-    setupBoxesBlocks(activity);
-    setupBooleanBlocks(activity);
-    setupHeapBlocks(activity);
-    setupDictBlocks(activity);
-    setupExtrasBlocks(activity);
-    setupProgramBlocks(activity);
-    setupGraphicsBlocks(activity);
-    setupPenBlocks(activity);
-    setupMediaBlocks(activity);
-    setupSensorsBlocks(activity);
-    setupEnsembleBlocks(activity);
+    setupFunctions.forEach(setup => setup(activity));
 
     // Push protoblocks onto their palettes.
     for (const protoblock in activity.blocks.protoBlockDict) {
