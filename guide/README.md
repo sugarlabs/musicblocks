@@ -142,12 +142,15 @@ case, an eighth note.
 At the bottom, two notes that are played consecutively are shown. They
 are both `1/8` notes, making the duration of the entire sequence
 `1/4`.
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725793425037300&run=True)
+
 
 ![notes](./note2.svg "A quarter note, a sixteenth note, and a half note Note value blocks")
 
 In this example, different note values are shown. From top to bottom,
 they are: `1/4` for an quarter note, `1/16` for a sixteenth note, and
 `1/2` for a half note.
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725793536240960&run=True)
 
 Note that any mathematical operations can be used as input to the
 *Note value*.
@@ -236,6 +239,7 @@ notes are located on a keyboard or staff.
 Multiple, simultaneous pitches can be specified by adding multiple
 *Pitch* blocks into a single *Note value* block, like the above
 example.
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725793652385126&run=True)
 
 ### <a name="RESTS">2.4 Rests</a>
 
@@ -243,6 +247,7 @@ example.
 
 A rest of the specified note value duration can be constructed using a
 *Silence* block in place of a *Pitch* block.
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725793737126028&run=True)
 
 ### <a name="DRUMS">2.5 Drums</a>
 
@@ -252,12 +257,14 @@ Anywhere a *Pitch* block can be used&mdash;e.g., inside of the matrix
 or a *Note value* block&mdash;a *Drum Sample* block can also be used
 instead. Currently there about two dozen different samples from which
 to choose. The default drum is a kick drum.
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725793852737369&run=True)
 
 ![drums](./note5.svg "Multiple Drum Sample blocks in combinations")
 
 Just as in the [multi-pitch](#23-multiple-pitches) example above, you
 can use multiple *Drum* blocks within a single *Note value* blocks,
 and combine them with *Pitch* blocks as well.
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725793935277059&run=True)
 
 ## <a name="PROGRAMMING-WITH-MUSIC">3. Programming with Music</a>
 
@@ -274,6 +281,8 @@ widget to help you get started.
 ![action](./chunk-2.svg "working of action stack")
 
 ![action](./chunk-1.svg "using action inside Start block")
+
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725788353457649&run=True)
 
 Every time you create a new *Action* stack, Music Blocks creates a new
 block specific to, and linked with, that stack. (The new block is
@@ -311,6 +320,7 @@ block to execute them sequentially.
 
 You can [repeat](#333-repeating-notes) actions either by using
 multiple *Action* blocks or using a *Repeat* block.
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725788849659637&run=True)
 
 ![multiple actions](./chunk-6.svg "multiple action stacks")
 
@@ -318,6 +328,7 @@ multiple *Action* blocks or using a *Repeat* block.
 
 You can also mix and match actions. Here we play the *Action* block with
 name `chunk0`, followed by `chunk1` twice, and then `chunk0` again.
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725789807251793&run=True)
 
 ![actions](./chunk-8.svg "creating a song using actions")
 
@@ -326,6 +337,8 @@ name `chunk0`, followed by `chunk1` twice, and then `chunk0` again.
 A few more chunks and we can make a song. (Can you read the block
 notation well enough to guess the outcome? Are you familiar with the
 song we created?)
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725791527821787&run=True)
+
 
 ### <a name="PITCH-TRANSFORMATION">3.2 Pitch Transformations</a>
 
