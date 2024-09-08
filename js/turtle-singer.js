@@ -227,7 +227,7 @@ class Singer {
 
             if (logo.inMatrix) {
                 logo.phraseMaker.addRowBlock(blk);
-                if (logo.pitchBlocks.indexOf(blk) === -1) {
+                if (!logo.pitchBlocks.includes(blk)) {
                     logo.pitchBlocks.push(blk);
                 }
 
@@ -798,7 +798,7 @@ class Singer {
         } else if (activity.logo.inPitchDrumMatrix) {
             if (note.toLowerCase() !== "rest") {
                 activity.logo.pitchDrumMatrix.addRowBlock(blk);
-                if (activity.logo.pitchBlocks.indexOf(blk) === -1) {
+                if (!activity.logo.pitchBlocks.includes(blk)) {
                     activity.logo.pitchBlocks.push(blk);
                 }
             }
@@ -837,7 +837,7 @@ class Singer {
         } else if (activity.logo.inMatrix) {
             if (note.toLowerCase() !== "rest") {
                 activity.logo.phraseMaker.addRowBlock(blk);
-                if (activity.logo.pitchBlocks.indexOf(blk) === -1) {
+                if (!activity.logo.pitchBlocks.includes(blk)) {
                     activity.logo.pitchBlocks.push(blk);
                 }
             }
@@ -1754,7 +1754,7 @@ class Singer {
 
                 // If there are multiple notes, remove the rests.
                 if (tur.singer.notePitches[thisBlk].length > 1) {
-                    while (tur.singer.notePitches[thisBlk].indexOf("rest") !== -1) {
+                    while (tur.singer.notePitches[thisBlk].includes("rest")) {
                         tur.singer.notePitches[thisBlk].splice(
                             tur.singer.notePitches[thisBlk].indexOf("rest"),
                             1
@@ -1901,22 +1901,22 @@ class Singer {
 
                             if (tur.singer.justCounting.length === 0) {
                                 if (tur.singer.noteDrums[thisBlk].length > 0) {
-                                    if (chordNotes.indexOf(note) === -1) {
+                                    if (!chordNotes.includes(note)) {
                                         chordNotes.push(note);
                                     }
 
                                     if (
-                                        chordDrums.indexOf(tur.singer.noteDrums[thisBlk][0]) === -1
+                                        !chordDrums.includes(tur.singer.noteDrums[thisBlk][0])
                                     ) {
                                         chordDrums.push(tur.singer.noteDrums[thisBlk][0]);
                                     }
                                 } else {
                                     if (courtesy[i]) {
-                                        if (chordNotes.indexOf(note + "♮") === -1) {
+                                        if (!chordNotes.includes(note + "♮")) {
                                             chordNotes.push(note + "♮");
                                         }
                                     } else {
-                                        if (chordNotes.indexOf(note) === -1) {
+                                        if (!chordNotes.includes(note)) {
                                             chordNotes.push(note);
                                         }
                                     }
@@ -1925,11 +1925,11 @@ class Singer {
                         } else if (tur.singer.tieCarryOver > 0) {
                             if (tur.singer.justCounting.length === 0) {
                                 if (courtesy[i]) {
-                                    if (chordNotes.indexOf(note) === -1) {
+                                    if (!chordNotes.includes(note)) {
                                         chordNotes.push(note);
                                     }
                                 } else {
-                                    if (chordNotes.indexOf(note) === -1) {
+                                    if (!chordNotes.includes(note)) {
                                         chordNotes.push(note);
                                     }
                                 }
@@ -2214,7 +2214,7 @@ class Singer {
                     }
 
                     for (let i = 0; i < tur.singer.tieFirstDrums.length; i++) {
-                        if (drums.indexOf(tur.singer.tieFirstDrums[i]) === -1) {
+                        if (!drums.includes(tur.singer.tieFirstDrums[i])) {
                             drums.push(tur.singer.tieFirstDrums[i]);
                         }
                     }

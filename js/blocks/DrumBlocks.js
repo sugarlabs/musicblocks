@@ -541,7 +541,7 @@ function setupDrumBlocks(activity) {
                 // Handle Pitch Drum Matrix context
                 logo.pitchDrumMatrix.drums.push(drumname);
                 logo.pitchDrumMatrix.addColBlock(blk);
-                if (logo.drumBlocks.indexOf(blk) === -1) {
+                if (!logo.drumBlocks.includes(blk)) {
                     logo.drumBlocks.push(blk);
                 }
             } else if (logo.inMatrix) {
@@ -550,7 +550,7 @@ function setupDrumBlocks(activity) {
                 logo.phraseMaker.rowArgs.push(-1);
 
                 logo.phraseMaker.addRowBlock(blk);
-                if (logo.drumBlocks.indexOf(blk) === -1) {
+                if (!logo.drumBlocks.includes(blk)) {
                     logo.drumBlocks.push(blk);
                 }
             } else if (logo.inMusicKeyboard) {
