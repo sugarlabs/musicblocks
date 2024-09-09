@@ -1114,9 +1114,13 @@ In the example, on the left, the result would be `Sol, Re, Sol, Sol,
 Re, Sol, Sol, Re, Sol, Sol, Re, Sol`; on the right the result would be
 `Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol`.
 
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725794018017026&run=True)
+
 #### <a name="SWINGING">3.3.4 Swinging Notes and Tied Notes</a>
 
 ![swing](./transform7.svg "swinging notes and tied notes")
+
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725867425283695&run=True)
 
 The *Swing* block works on pairs of notes (specified by note value),
 adding some duration (specified by swing value) to the first note and
@@ -1178,6 +1182,8 @@ The *Slur* block lengthens the sustain of notes&mdash;running longer than
 the noted duration and blending it into the next note&mdash;while
 maintaining the specified rhythmic value of the notes.
 
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725868210212676&run=True)
+
 #### <a name="BACKWARDS">3.3.7 Backwards</a>
 
 ![backwards](./transform11.svg "Backward block")
@@ -1226,6 +1232,8 @@ example, if you have 3 notes in sequence contained in a *Crescendo*
 block with a value of `5`, the final note will be at 15% more 
 than the original value for volume.
 
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725868641106995&run=True)
+
 NOTE: The *Crescendo* block does not alter the volume of a note as it
 is being played. Music Blocks does not yet have this functionality.
 
@@ -1237,7 +1245,7 @@ The default instrument is an electronic synthesizer, so by default,
 that is the instrument used when playing notes. You can override this
 default for a group of notes by using the *Set Instrument* block. It
 will select an [instrument](#342-setting-instrument) for the
-synthesizer for any contained blocks, e.g., violin.
+synthesizer for any contained blocks, e.g., violin. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725869548034418&run=True)
 
 ![default voice](../documentation/setdefaultinstrument_block.svg "Set Default Instrument")
 
@@ -1246,6 +1254,7 @@ block. In the example above, the default instrument is set to piano,
 so any note that is not inside of a *Set instrument* block will be
 played using the piano synthesizer. The first note in this example is
 piano; the second note is guitar; and the third is piano.
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725869737763127&run=True)
 
 #### <a name= "SETTINGKEY"></a>3.4.3 Setting Key and Mode
 
@@ -1258,6 +1267,7 @@ and a number of more exotic modes, such as Bebop, Geez, Maqam, etc.
 This block allows users to access "movable Do" within Music Blocks,
 where the mapping of solfege to particular pitch changes depending on
 the user's specified tonality.
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725870361330836&run=True)
 
 ![mode](./transform19.svg "Define mode block")
 
@@ -1275,6 +1285,7 @@ e.g. plus or minus up to one half step. The rate argument determines
 the rate of the variation.
 
 The other effects blocks also modulate pitch over time. Give them a try.
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725870963978517&run=True)
 
 ### <a name="VOICES">3.5 Voices</a>
 
@@ -1699,6 +1710,7 @@ You can use as many *Rhythm* blocks as you'd like inside the
 *Phrase maker* block. In the above example, two *Rhythm*
 blocks are used, resulting in three quarter notes and six eighth
 notes.
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725873372253840&run=True)
 
 #### <a name="CREATING-TUPLETS">4.2.3 Creating Tuplets</a>
 
@@ -1708,7 +1720,7 @@ notes.
 
 Tuplets are a collection of notes that get scaled to a specific
 duration. Using tuplets makes it easy to create groups of notes that
-are not based on a power of 2.
+are not based on a power of 2 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725874435939635&run=True).
 
 In the example above, three quarter notes&mdash;defined in the *Simple
 Tuplet* block&mdash;are played in the time of a single quarter
@@ -1730,6 +1742,7 @@ for intermixing multiple rhythms within single tuplet.
 
 In the example above, the two *Rhythm* blocks are embedded in the
 *Tuplet* block, resulting in a more complex rhythm.
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725874743559698&run=True)
 
 Note: You can mix and match *Rhythm* blocks and *Tuplet* blocks when
 defining your matrix.
@@ -1826,6 +1839,7 @@ sub-cells. Once the fourth tone has sounded, a progress bar will run
 from left to right across the screen. Each click of the mouse will
 define another beat within the cell. If you don't like your rhythm,
 use the *Undo* button and try again.
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725875683911786&run=True)
 
 ### <a name="modes">4.4 Musical Modes</a>
 
@@ -1914,6 +1928,7 @@ Note: The build-in modes in Music Blocks can be found in [musicutils.js](https:/
 
 The *Save* button exports a stack of blocks representing the mode that
 can be used inside the *Phrase maker* block.
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725877046734200&run=True)
 
 ### <a name="meters">4.5 Meters</a>
 
@@ -2258,6 +2273,8 @@ The *Drag* button will drag the widget.
 
 The *Close* button will close the widget.
 
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725879922065766&run=True)
+
 ###  <a name="oscilloscope">4.13 The Oscilloscope</a>
 
 Music Blocks has an Oscilloscope Widget to visualize the music as it plays.
@@ -2267,6 +2284,7 @@ Music Blocks has an Oscilloscope Widget to visualize the music as it plays.
 ![widget](./oscilloscope2.svg "Oscilloscope")
 
 A separate wave will be displayed for each mouse.
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725883406989554&run=True)
 
 ###  <a name="sampler">4.14 The Sampler</a>
 
@@ -2282,6 +2300,8 @@ You can then use the *Sample* block as you would any input to the *Set
 Instrument* block.
 
 ![widget](./sampler2.svg "Sampler Widget")
+
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725883527894966&run=True)
 
 ###  <a name="arpeggio">4.15 Arpeggio</a>
 
@@ -2307,6 +2327,8 @@ The sequence in the pattern above is ```do mi sol do do mi do sol mi
 do do sol```.
 
 ![widget](../documentation/custom_arpeggio.svg "Custom Arpeggio")
+
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725883915389933&run=True)
 
 ## <a name="BEYOND-MUSIC-BLOCKS">5. Beyond Music Blocks</a>
 
@@ -2413,6 +2435,8 @@ Editor*" (`<>`) button in the auxilliary menu.
 For the block stacks (and mouse art generated after running),
 
 ![Example Project](../js/js-export/samples/mode-up-down.png)
+
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725884337271676&run=True)
 
 the following code is generated:
 
