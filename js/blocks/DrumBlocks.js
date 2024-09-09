@@ -284,29 +284,20 @@ function setupDrumBlocks(activity) {
         }
 
         // Create instances of PlayDrumMacroBlock and set up drum macros for the activity
-        new PlayDrumMacroBlock("duck").setup(activity);
-        new PlayDrumMacroBlock("cat").setup(activity);
-        new PlayDrumMacroBlock("cricket").setup(activity);
-        new PlayDrumMacroBlock("dog").setup(activity);
-        new PlayDrumMacroBlock("bottle").setup(activity);
-        new PlayDrumMacroBlock("bubbles").setup(activity);
-        new PlayDrumMacroBlock("chine", "chime", true).setup(activity);
-        new PlayDrumMacroBlock("clang").setup(activity);
-        new PlayDrumMacroBlock("clap").setup(activity);
-        new PlayDrumMacroBlock("slap").setup(activity);
-        new PlayDrumMacroBlock("crash").setup(activity);
-        new PlayDrumMacroBlock("splash").setup(activity);
-        new PlayDrumMacroBlock("cowbell", "cow bell", true).setup(activity);
-        new PlayDrumMacroBlock("ridebell", "ride bell", true).setup(activity);
-        new PlayDrumMacroBlock("fingercymbals", "finger cymbals", true).setup(activity);
-        new PlayDrumMacroBlock("trianglebell", "triangle bell", true).setup(activity);
-        new PlayDrumMacroBlock("hihat", "hi hat", true).setup(activity);
-        new PlayDrumMacroBlock("darbuka", "darbuka drum", true).setup(activity);
-        new PlayDrumMacroBlock("cup", "cup drum", true).setup(activity);
-        new PlayDrumMacroBlock("floortom", "floor tom", true, "floor tom tom").setup(activity);
-        new PlayDrumMacroBlock("tom", "tom tom", true).setup(activity);
-        new PlayDrumMacroBlock("kick", "kick drum", true).setup(activity);
-        new PlayDrumMacroBlock("snare", "snare drum", true).setup(activity);
+        const drumConfigs = [
+            ["duck"], ["cat"], ["cricket"], ["dog"], ["bottle"], ["bubbles"],
+            ["chine", "chime", true], ["clang"], ["clap"], ["slap"], ["crash"], ["splash"],
+            ["cowbell", "cow bell", true], ["ridebell", "ride bell", true],
+            ["fingercymbals", "finger cymbals", true], ["trianglebell", "triangle bell", true],
+            ["hihat", "hi hat", true], ["darbuka", "darbuka drum", true],
+            ["cup", "cup drum", true], ["floortom", "floor tom", true, "floor tom tom"],
+            ["tom", "tom tom", true], ["kick", "kick drum", true], ["snare", "snare drum", true]
+        ];
+
+        drumConfigs.forEach(config => {
+            new PlayDrumMacroBlock(...config).setup(activity);
+});
+
     }
     /**
      * Class representing a MapDrumBlock, extending FlowClampBlock.
@@ -550,7 +541,7 @@ function setupDrumBlocks(activity) {
                 // Handle Pitch Drum Matrix context
                 logo.pitchDrumMatrix.drums.push(drumname);
                 logo.pitchDrumMatrix.addColBlock(blk);
-                if (logo.drumBlocks.indexOf(blk) === -1) {
+                if (!logo.drumBlocks.includes(blk)) {
                     logo.drumBlocks.push(blk);
                 }
             } else if (logo.inMatrix) {
@@ -559,7 +550,7 @@ function setupDrumBlocks(activity) {
                 logo.phraseMaker.rowArgs.push(-1);
 
                 logo.phraseMaker.addRowBlock(blk);
-                if (logo.drumBlocks.indexOf(blk) === -1) {
+                if (!logo.drumBlocks.includes(blk)) {
                     logo.drumBlocks.push(blk);
                 }
             } else if (logo.inMusicKeyboard) {
