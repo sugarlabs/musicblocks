@@ -35,7 +35,7 @@
    OPENMERGEBUTTON, OPENBUTTON, PLANETBUTTON, HELPBUTTON, SLOWBUTTON,
    HIDEBLOCKSBUTTON, HIDEBLOCKSFADEDBUTTON, COLLAPSEBLOCKSBUTTON,
    UTILITYBUTTONSPANNER, UTILITYBUTTON, WRAPTURTLEBUTTON,
-   RESTORETRASHBUTTON, COLLABORATEBUTTON, MENUBUTTON, GOHOMEFADEDBUTTON, GOHOMEBUTTON,
+   RESTORETRASHBUTTON, MENUBUTTON, GOHOMEFADEDBUTTON, GOHOMEBUTTON,
    SAVEDARKBUTTON, UPLOADPLANETBUTTON, PLANETDISABLEDBUTTON,
    SAVESVGBUTTON, SAVEPNGBUTTON, SAVEWAVBUTTON, SAVELILYPONDBUTTON,
    SAVEABCBUTTON, SAVEBLOCKARTWORKBUTTON, BEGINNERBUTTON,
@@ -641,9 +641,6 @@ const WRAPTURTLEBUTTON =
 
 const RESTORETRASHBUTTON =
     '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" id="svg6" version="1.1" viewBox="0 0 24 24" height="24" width="24"> <metadata id="metadata12"> <rdf:RDF> <cc:Work rdf:about=""> <dc:format>image/svg+xml</dc:format> <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" /> <dc:title></dc:title> </cc:Work> </rdf:RDF> </metadata> <defs id="defs10" /> <path style="fill:#ffffff" id="path2" d="m 19,4 h -3.5 l -1,-1 h -5 l -1,1 H 5 V 6 H 19 Z M 6,7 v 12 c 0,1.1 0.9,2 2,2 h 8 c 1.1,0 2,-0.9 2,-2 V 7 Z m 8,7 v 4 H 10 V 14 H 8 l 4,-4 4,4 z" /> <path id="path4" d="M0 0h24v24H0z" fill="none" /></svg>';
-
-const COLLABORATEBUTTON =
-    '<svg xmlns="http://www.w3.org/2000/svg" fill="#000000" width="24" height="24" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>';
 
 const MENUBUTTON =
     '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" id="svg6" version="1.1" viewBox="0 0 24 24" height="24" width="24"> <metadata id="metadata12"> <rdf:RDF> <cc:Work rdf:about=""> <dc:format>image/svg+xml</dc:format> <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" /> <dc:title></dc:title> </cc:Work> </rdf:RDF> </metadata> <defs id="defs10" /> <path style="fill:#ffffff" id="path2" d="m 2,15.5 v 2 h 20 v -2 z m 0,-5 v 2 h 20 v -2 z m 0,-5 v 2 h 20 v -2 z" /> <path id="path4" fill="none" d="M0 0h24v24H0z" /></svg>';
