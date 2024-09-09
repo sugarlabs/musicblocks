@@ -567,6 +567,9 @@ class Singer {
 
         const activity = logo.activity;
         const tur = activity.turtles.ithTurtle(turtle);
+        const actionArgs = [];
+        const saveNoteCount = tur.singer.notesPlayed;
+        const saveTallyNotes = tur.singer.tallyNotes;
 
         const saveState = {
             suppressOutput: tur.singer.suppressOutput,
@@ -604,6 +607,7 @@ class Singer {
             turtle,
             cblk,
             true,
+            actionArgs,
             [],
             activity.turtles.turtleList[turtle].queue.length
         );
@@ -635,7 +639,18 @@ class Singer {
         tur.painter.doPenUp();
         tur.painter.doSetXY(saveState.x, saveState.y);
         tur.painter.doSetHeading(saveState.orientation);
-
+        tur.painter.doSetXY(saveX, saveY);
+        tur.painter.color = saveColor;
+        tur.painter.value = saveValue;
+        tur.painter.chroma = saveChroma;
+        tur.painter.stroke = saveStroke;
+        tur.painter.canvasAlpha = saveCanvasAlpha;
+        tur.painter.doSetHeading(saveOrientation);
+        tur.painter.penState = savePenState;
+        tur.singer.suppressOutput = saveSuppressStatus;
+        tur.singer.previousTurtleTime = savePrevTurtleTime;
+        tur.singer.turtleTime = saveTurtleTime;
+        tur.singer.whichNoteToCount = saveWhichNoteToCount;
         tur.singer.justCounting.pop();
         tur.butNotThese = {};
 
