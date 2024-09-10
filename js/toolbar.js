@@ -71,7 +71,6 @@ class Toolbar {
                 ["chooseKeyIcon", _("Set Pitch Preview")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
                 ["restoreIcon", _("Restore")],
-                ["collaborateIcon", _("Collaborate")],
                 ["beginnerMode", _("Switch to beginner mode")],
                 ["advancedMode", _("Switch to advanced mode")],
                 ["languageSelectIcon", _("Select language")],
@@ -133,7 +132,6 @@ class Toolbar {
                 _("Set Pitch Preview"),
                 _("JavaScript Editor"),
                 _("Restore"),
-                _("Collaborate"),
                 _("Switch to beginner mode"),
                 _("Switch to advanced mode"),
                 _("Select language"),
@@ -198,7 +196,6 @@ class Toolbar {
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
                 ["restoreIcon", _("Restore")],
-                ["collaborateIcon", _("Collaborate")],
                 ["beginnerMode", _("Switch to beginner mode")],
                 ["advancedMode", _("Switch to advanced mode")],
                 ["languageSelectIcon", _("Select language")],
@@ -255,7 +252,6 @@ class Toolbar {
                 _("Merge with current project"),
                 _("JavaScript Editor"),
                 _("Restore"),
-                _("Collaboration"),
                 _("Switch to beginner mode"),
                 _("Switch to advanced mode"),
                 _("Select language"),
@@ -894,13 +890,6 @@ class Toolbar {
         restoreIcon.onclick = () => {
             onclick(this.activity);
         };
-    }
-
-    renderCollaborateIcon(onclick) {
-        const collaborateIcon = docById("collaborateIcon");
-        collaborateIcon.onclick = () => {
-            onclick(this.activity);
-        }
     }
 
     /**

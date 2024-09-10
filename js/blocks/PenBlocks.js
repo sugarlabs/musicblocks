@@ -885,7 +885,7 @@ function setupPenBlocks(activity) {
             } else if (logo.inMatrix) {
                 // If in matrix mode, add block to phrase maker.
                 logo.phraseMaker.addRowBlock(blk);
-                if (logo.pitchBlocks.indexOf(blk) === -1) {
+                if (!logo.pitchBlocks.includes(blk)) {
                     logo.pitchBlocks.push(blk);
                 }
 
@@ -952,7 +952,7 @@ function setupPenBlocks(activity) {
             } else if (logo.inMatrix) {
                 // If in matrix mode, add block to phrase maker.
                 logo.phraseMaker.addRowBlock(blk);
-                if (logo.pitchBlocks.indexOf(blk) === -1) {
+                if (!logo.pitchBlocks.includes(blk)) {
                     logo.pitchBlocks.push(blk);
                 }
 
@@ -1020,7 +1020,7 @@ function setupPenBlocks(activity) {
             } else if (logo.inMatrix) {
                 // If in matrix mode, add block to phrase maker.
                 logo.phraseMaker.addRowBlock(blk);
-                if (logo.pitchBlocks.indexOf(blk) === -1) {
+                if (!logo.pitchBlocks.includes(blk)) {
                     logo.pitchBlocks.push(blk);
                 }
 
@@ -1085,7 +1085,7 @@ function setupPenBlocks(activity) {
                 activity.errorMsg(NANERRORMSG, blk);
             } else if (logo.inMatrix) {
                 logo.phraseMaker.addRowBlock(blk);
-                if (logo.pitchBlocks.indexOf(blk) === -1) {
+                if (!logo.pitchBlocks.includes(blk)) {
                     logo.pitchBlocks.push(blk);
                 }
 
@@ -1147,7 +1147,7 @@ function setupPenBlocks(activity) {
                 activity.errorMsg(NANERRORMSG, blk);
             } else if (logo.inMatrix) {
                 logo.phraseMaker.addRowBlock(blk);
-                if (logo.pitchBlocks.indexOf(blk) === -1) {
+                if (!logo.pitchBlocks.includes(blk)) {
                     logo.pitchBlocks.push(blk);
                 }
 
@@ -1210,7 +1210,7 @@ function setupPenBlocks(activity) {
                 activity.errorMsg(NANERRORMSG, blk);
             } else if (logo.inMatrix) {
                 logo.phraseMaker.addRowBlock(blk);
-                if (logo.pitchBlocks.indexOf(blk) === -1) {
+                if (!logo.pitchBlocks.includes(blk)) {
                     logo.pitchBlocks.push(blk);
                 }
 

@@ -1008,7 +1008,7 @@ class SVG {
         }
         svg += this._corner(-1, -1, 90, 0, 1, true, true, false);
         svg += this._rLineTo(0, -this._expandY);
-        if (this._innies.indexOf(true) !== -1) {
+        if (this._innies.includes(true)) {
             svg += this._lineTo(x, this._radius + this._innieY2 + this._strokeWidth / 2.0);
             svg += this._doOutie();
         }
