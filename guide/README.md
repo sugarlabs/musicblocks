@@ -142,7 +142,7 @@ case, an eighth note.
 At the bottom, two notes that are played consecutively are shown. They
 are both `1/8` notes, making the duration of the entire sequence
 `1/4`.
-[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725793425037300&run=True)
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1726138873526815&run=True)
 
 
 ![notes](./note2.svg "A quarter note, a sixteenth note, and a half note Note value blocks")
@@ -150,7 +150,7 @@ are both `1/8` notes, making the duration of the entire sequence
 In this example, different note values are shown. From top to bottom,
 they are: `1/4` for an quarter note, `1/16` for a sixteenth note, and
 `1/2` for a half note.
-[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725793536240960&run=True)
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1726139143565736&run=True)
 
 Note that any mathematical operations can be used as input to the
 *Note value*.
@@ -173,6 +173,8 @@ pitch name and pitch octave of a note that in combination determines
 the frequency (and therefore pitch) at which the note is played.
 
 ![pitch block](./note3.svg "Specifying a pitch block's name and octave")
+
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1726139416021937&run=True)
 
 There are many systems you can use to specify a *pitch* block's name
 and octave. Some examples are shown above.
@@ -787,6 +789,8 @@ block.
 
 ![interval](./transform9.svg "Scalar interval block")
 
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1726142617030713&run=True)
+
 The *Scalar interval* block calculates a relative interval based on
 the current mode, skipping all notes outside of the mode. For example,
 a *fifth*, and adds the additional pitches to a note's playback. In
@@ -804,6 +808,8 @@ of scalar steps between two pitched.
 Absolute (or semitone) intervals are based on half-steps.
 
 ![intervals](./transform14.svg "Using absolute intervals")
+
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1726143428513328&run=True)
 
 The *Augmented* block calculates an absolute interval (in half-steps),
 e.g., an augmented fifth, and adds the additional pitches to a
@@ -833,6 +839,8 @@ example, a ratio of 2:1 would be an octave shift up; 1:2 would be an
 octave shift down; 3/2 would be a fifth.
 
 ![ratio interval](../documentation/ratiointerval_block.svg "Ratio Interval example")
+
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1726144197873608&run=True)
 
 The *Ratio Interval* block lets you generate an interval based on a
 ratio.
@@ -878,6 +886,8 @@ a `1/4` step, enabling rotation around a point between two notes. In
 rotation.
 
 ![inversion](./transform13.svg "inversion")
+
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1726144415115588&run=True)
 
 NOTE: The initial `C5` pitch (as a half note) remains unchanged (in
 all of the examples) as it is outside of the invert block.
@@ -1254,7 +1264,7 @@ block. In the example above, the default instrument is set to piano,
 so any note that is not inside of a *Set instrument* block will be
 played using the piano synthesizer. The first note in this example is
 piano; the second note is guitar; and the third is piano.
-[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725869737763127&run=True)
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1726145948711407&run=True)
 
 #### <a name= "SETTINGKEY"></a>3.4.3 Setting Key and Mode
 
