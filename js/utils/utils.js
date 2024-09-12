@@ -639,7 +639,7 @@ const processPluginData = (activity, pluginData) => {
                 // eslint-disable-next-line no-console
                 console.debug("adding palette " + name);
                 activity.palettes.add(name);
-                if (MULTIPALETTES[2].indexOf(name) === -1) MULTIPALETTES[2].push(name);
+                if (!MULTIPALETTES[2].includes(name)) MULTIPALETTES[2].push(name);
                 newPalette = true;
             }
         }
