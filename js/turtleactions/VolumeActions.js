@@ -250,7 +250,7 @@ function setupVolumeActions(activity) {
 
             const tur = activity.turtles.ithTurtle(turtle);
 
-            if (tur.singer.instrumentNames.indexOf(synth) === -1) {
+            if (!tur.singer.instrumentNames.includes(synth)) {
                 tur.singer.instrumentNames.push(synth);
                 activity.logo.synth.loadSynth(turtle, synth);
 
