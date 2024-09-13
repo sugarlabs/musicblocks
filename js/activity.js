@@ -6614,6 +6614,7 @@ class Activity {
                 const files = event.dataTransfer.files;
                 const reader = new FileReader();
                 let midiReader = new FileReader();
+
                 const abcReader = new FileReader();
                 // eslint-disable-next-line no-unused-vars
                 reader.onload = (theFile) => {
@@ -6708,15 +6709,35 @@ class Activity {
                 
                 };
 
+                // Music Block Parser from abc to MB
+                abcReader.onload = (event) => {
+                    //get the abc data and replace the / so that the block does not break
+                    let abcData = event.target.result;
+                    abcData = abcData.replace(/\\/g, '');
+                    
+                    const tunebook = new ABCJS.parseOnly(abcData);
+                    
+                    console.log(tunebook)
+                    tunebook.forEach(tune => {
+                        //call parseABC to parse abcdata to MB json
+                        this.parseABC(tune);
+                    
+                    });
+                 
+                
+                };
+
                 // Work-around in case the handler is called by the
                 // widget drag & drop code.
                 if (files[0] !== undefined) {
                     let extension = files[0].name.split('.').pop().toLowerCase();  //file extension from input file
+
                     let isMidi = (extension == "mid") || (extension == "midi");
                     if (isMidi){
                         midiReader.readAsArrayBuffer(files[0]);
                         return;
                     }
+
                     let isABC = (extension == "abc");
                     if (isABC) {
                         abcReader.readAsText(files[0]);
