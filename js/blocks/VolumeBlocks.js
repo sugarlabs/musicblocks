@@ -443,7 +443,7 @@ function setupVolumeBlocks(activity) {
 
             const tur = activity.turtles.ithTurtle(turtle);
 
-            if (tur.singer.instrumentNames.indexOf(synth) === -1) {
+            if (!tur.singer.instrumentNames.includes(synth)) {
                 tur.singer.instrumentNames.push(synth);
                 logo.synth.loadSynth(turtle, synth);
 

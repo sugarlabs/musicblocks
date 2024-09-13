@@ -86,15 +86,15 @@ function setupRhythmActions(activity) {
                  */
                 const turtleID = tur.id;
 
-                if (tur.singer.beatList.indexOf("everybeat") !== -1) {
+                if (tur.singer.beatList.includes("everybeat")) {
                     _enqueue();
                     activity.stage.dispatchEvent("__everybeat_" + turtleID + "__");
                 }
 
-                if (tur.singer.beatList.indexOf(beatValue) !== -1) {
+                if (tur.singer.beatList.includes(beatValue)) {
                     _enqueue();
                     activity.stage.dispatchEvent("__beat_" + beatValue + "_" + turtleID + "__");
-                } else if (beatValue > 1 && tur.singer.beatList.indexOf("offbeat") !== -1) {
+                } else if (beatValue > 1 && tur.singer.beatList.includes("offbeat")) {
                     _enqueue();
                     activity.stage.dispatchEvent("__offbeat_" + turtleID + "__");
                 }
