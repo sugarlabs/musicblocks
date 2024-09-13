@@ -2569,11 +2569,11 @@ const keySignatureToMode = (keySignature) => {
     } else if (key == "F" + FLAT) {
         parts = keySignature.split(" ");
         key = "F" + FLAT;
-    } else if (SOLFEGENAMES1.indexOf(key) !== -1) {
+    } else if (SOLFEGENAMES1.includes(key)) {
         // This conversion will be a bit iffy depending upon the current mode.
         // eslint-disable-next-line no-use-before-define
         key = getNote(key, 4, 0, "C Major", false)[0];
-    } else if (NOTESSHARP.indexOf(key) === -1 && NOTESFLAT.indexOf(key) === -1) {
+    } else if (!NOTESSHARP.includes(key) && !NOTESFLAT.includes(key)) {
         // eslint-disable-next-line no-console
         console.debug("Invalid key or missing name; reverting to C.");
         // Is is possible that the key was left out?
@@ -2650,7 +2650,7 @@ const getScaleAndHalfSteps = (keySignature) => {
     } else if (halfSteps.length > 7) {
         // If there are more than 7 notes, we need to add accidentals.
         for (let i = 0; i < halfSteps.length; i++) {
-            if (solfege.indexOf(SOLFMAPPER[i]) === -1) {
+            if (!solfege.includes(SOLFMAPPER[i])) {
                 solfege.push(SOLFMAPPER[i]);
             } else {
                 solfege.push(SOLFMAPPER[i] + SHARP);
@@ -2668,7 +2668,7 @@ const getScaleAndHalfSteps = (keySignature) => {
             n = 0;
             solf = SOLFMAPPER[solfege.length];
             // Ensure there are no duplicates.
-            while (solfege.indexOf(solf) !== -1) {
+            while (solfege.includes(solf)) {
                 n += 1;
                 solf = SOLFMAPPER[solfege.length + n];
             }
@@ -2682,7 +2682,7 @@ const getScaleAndHalfSteps = (keySignature) => {
     }
 
     let thisScale = NOTESSHARP;
-    if (NOTESFLAT.indexOf(myKeySignature) !== -1) {
+    if (NOTESFLAT.includes(myKeySignature)) {
         thisScale = NOTESFLAT;
     }
 
@@ -3044,9 +3044,9 @@ const getSharpFlatPreference = (keySignature) => {
     const obj2 = modeMapper(obj[0], obj[1]);
     const ks = obj2[0] + " " + obj2[1];
 
-    if (SHARPPREFERENCE.indexOf(ks) !== -1) {
+    if (SHARPPREFERENCE.includes(ks)) {
         return "sharp";
-    } else if (FLATPREFERENCE.indexOf(ks) !== -1) {
+    } else if (FLATPREFERENCE.includes(ks)) {
         return "flat";
     } else {
         return "natural";
@@ -3066,7 +3066,7 @@ const getCustomNote = (note) => {
     }
 
     let centsInfo = "";
-    if (note.indexOf("(") !== -1) {
+    if (note.includes("(")) {
         centsInfo = note.substring(note.indexOf("("), note.length);
     }
 
@@ -3155,12 +3155,12 @@ const pitchToNumber = (pitch, octave, keySignature) => {
     }
 
     let pitchNumber = 0;
-    if (PITCHES.indexOf(pitch) !== -1) {
+    if (PITCHES.includes(pitch)) {
         pitchNumber = PITCHES.indexOf(pitch.toUpperCase());
     } else {
         // obj[1] is the solfege mapping for the current key/mode
         const obj = getScaleAndHalfSteps(keySignature);
-        if (obj[1].indexOf(pitch.toLowerCase()) !== -1) {
+        if (obj[1].includes(pitch.toLowerCase())) {
             pitchNumber = obj[1].indexOf(pitch.toLowerCase());
         } else {
             // eslint-disable-next-line no-console
@@ -3594,13 +3594,13 @@ function getNote(
         }
         // Could be a number as a string (with or without an accidental.
         let noteAsNumber = noteArg;
-        if (["#", SHARP, FLAT, "b"].indexOf(noteArg.substr(-1)) !== -1) {
+        if (["#", SHARP, FLAT, "b"].includes(noteArg.substr(-1))) {
             noteAsNumber = noteArg.slice(0, noteArg.length - 1);
         }
         if (!isNaN(noteAsNumber)) {
-            if (["#", SHARP].indexOf(noteArg.substr(-1)) !== -1) {
+            if (["#", SHARP].includes(noteArg.substr(-1))) {
                 transpositionFloor += 1;
-            } else if (["b", FLAT].indexOf(noteArg.substr(-1)) !== -1) {
+            } else if (["b", FLAT].includes(noteArg.substr(-1))) {
                 transpositionFloor -= 1;
             }
             noteArg = Number(noteAsNumber);
@@ -3696,15 +3696,15 @@ function getNote(
         if (noteArg in EXTRATRANSPOSITIONS) {
             octave += EXTRATRANSPOSITIONS[noteArg][1];
             note = EXTRATRANSPOSITIONS[noteArg][0];
-        } else if (NOTESSHARP.indexOf(noteArg.toUpperCase()) !== -1) {
+        } else if (NOTESSHARP.includes(noteArg.toUpperCase())) {
             note = noteArg.toUpperCase();
-        } else if (NOTESFLAT.indexOf(noteArg) !== -1) {
+        } else if (NOTESFLAT.includes(noteArg)) {
             note = noteArg;
-        } else if (NOTESFLAT2.indexOf(noteArg) !== -1) {
+        } else if (NOTESFLAT2.includes(noteArg)) {
             // Convert to uppercase, e.g., d♭ -> D♭.
             note = NOTESFLAT[NOTESFLAT2.indexOf(noteArg)];
         } else {
-            if (["#", SHARP, FLAT, "b"].indexOf(noteArg.substr(-1)) !== -1) {
+            if (["#", SHARP, FLAT, "b"].includes(noteArg.substr(-1))) {
                 sharpFlat = true;
             }
 
@@ -3766,11 +3766,11 @@ function getNote(
             }
 
             let solfegePart;
-            if (halfSteps.indexOf(noteArg.substr(0, 1).toLowerCase()) !== -1) {
+            if (halfSteps.includes(noteArg.substr(0, 1).toLowerCase())) {
                 solfegePart = noteArg.substr(0, 1).toLowerCase();
-            } else if (halfSteps.indexOf(noteArg.substr(0, 2).toLowerCase()) !== -1) {
+            } else if (halfSteps.includes(noteArg.substr(0, 2).toLowerCase())) {
                 solfegePart = noteArg.substr(0, 2).toLowerCase();
-            } else if (halfSteps.indexOf(noteArg.substr(0, 3).toLowerCase()) !== -1) {
+            } else if (halfSteps.includes(noteArg.substr(0, 3).toLowerCase())) {
                 solfegePart = noteArg.substr(0, 3).toLowerCase();
             } else {
                 // The note should already be translated, but just in case...
@@ -3778,11 +3778,11 @@ function getNote(
                 // solfnotes_ is used in the interface for i18n
                 //.TRANS: the note names must be separated by single spaces
                 const solfnotes_ = _("ti la sol fa mi re do").split(" ");
-                if (solfnotes_.indexOf(noteArg.substr(0, 1).toLowerCase()) !== -1) {
+                if (solfnotes_.includes(noteArg.substr(0, 1).toLowerCase())) {
                     solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase())];
-                } else if (solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase()) !== -1) {
+                } else if (solfnotes_.includes(noteArg.substr(0, 2).toLowerCase())) {
                     solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase())];
-                } else if (solfnotes_.indexOf(noteArg.substr(0, 3).toLowerCase()) !== -1) {
+                } else if (solfnotes_.includes(noteArg.substr(0, 3).toLowerCase())) {
                     solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 3).toLowerCase())];
                 } else {
                     solfegePart = noteArg.substr(0, 2).toLowerCase();
@@ -3880,7 +3880,7 @@ function getNote(
             }
 
             let index;
-            if (halfSteps.indexOf(solfegePart) !== -1) {
+            if (halfSteps.includes(solfegePart)) {
                 index = halfSteps.indexOf(solfegePart) + offset;
                 if (index > 11) {
                     index -= 12;
@@ -3922,7 +3922,7 @@ function getNote(
             octave += deltaOctave;
 
             if (deltaNote > 0) {
-                if (NOTESSHARP.indexOf(note) !== -1) {
+                if (NOTESSHARP.includes(note)) {
                     let i = NOTESSHARP.indexOf(note);
                     i += deltaNote;
                     if (i < 0) {
@@ -3934,7 +3934,7 @@ function getNote(
                     }
 
                     note = NOTESSHARP[i];
-                } else if (NOTESFLAT.indexOf(note) !== -1) {
+                } else if (NOTESFLAT.includes(note)) {
                     let i = NOTESFLAT.indexOf(note);
                     i += deltaNote;
                     if (i < 0) {
@@ -3951,7 +3951,7 @@ function getNote(
                     console.debug("note not found? " + note);
                 }
             } else if (deltaNote < 0) {
-                if (NOTESFLAT.indexOf(note) !== -1) {
+                if (NOTESFLAT.includes(note)) {
                     let i = NOTESFLAT.indexOf(note);
                     i += deltaNote;
                     if (i < 0) {
@@ -3963,7 +3963,7 @@ function getNote(
                     }
 
                     note = NOTESFLAT[i];
-                } else if (NOTESSHARP.indexOf(note) !== -1) {
+                } else if (NOTESSHARP.includes(note)) {
                     let i = NOTESSHARP.indexOf(note);
                     i += deltaNote;
                     if (i < 0) {
@@ -4102,7 +4102,7 @@ function getNote(
         articulation = getArticulation(noteArg);
         noteArg = noteArg.replace(articulation, "");
 
-        if (SOLFEGENAMES.indexOf(noteArg) !== -1) {
+        if (SOLFEGENAMES.includes(noteArg)) {
             noteArg = FIXEDSOLFEGE[noteArg];
         }
 
@@ -4260,14 +4260,14 @@ const buildScale = (keySignature) => {
     }
 
     let thisScale;
-    if (NOTESFLAT.indexOf(myKeySignature) !== -1) {
-        if (SHARPPREFERENCE.indexOf(obj[0].toLowerCase() + " " + obj[1]) !== -1) {
+    if (NOTESFLAT.includes(myKeySignature)) {
+        if (SHARPPREFERENCE.includes(obj[0].toLowerCase() + " " + obj[1])) {
             thisScale = NOTESSHARP;
         } else {
             thisScale = NOTESFLAT;
         }
     } else {
-        if (FLATPREFERENCE.indexOf(obj[0].toLowerCase() + " " + obj[1]) !== -1) {
+        if (FLATPREFERENCE.includes(obj[0].toLowerCase() + " " + obj[1])) {
             thisScale = NOTESFLAT;
         } else {
             thisScale = NOTESSHARP;
@@ -4453,7 +4453,7 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
     let offset = 0;
     let i = PITCHES.indexOf(thisPitch);
     if (i !== -1) {
-        while (scale.indexOf(thisPitch) === -1) {
+        while (!scale.includes(thisPitch)) {
             i = PITCHES.indexOf(thisPitch);
             if (i === -1) {
                 i = PITCHES2.indexOf(thisPitch);
@@ -4479,7 +4479,7 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
 
     i = PITCHES2.indexOf(thisPitch);
     if (i !== -1) {
-        while (scale.indexOf(thisPitch) === -1) {
+        while (!scale.includes(thisPitch)) {
             i = PITCHES2.indexOf(thisPitch);
             if (i === -1) {
                 i = PITCHES.indexOf(thisPitch);
@@ -4681,7 +4681,7 @@ const scaleDegreeToPitchMapping = (keySignature, scaleDegree, movable, pitch) =>
             // For scale degrees which are undefined --> Use fallback notes
             let k = 0;
             for (let i = 0; i < 7; i++) {
-                if (definedScaleDegree.indexOf(i + 1) !== -1) {
+                if (definedScaleDegree.includes(i + 1)) {
                     finalScale.push(chosenModeScale[k]);
                     k++;
                 } else {
@@ -4870,7 +4870,7 @@ const getInterval = (interval, keySignature, pitch) => {
     // Offet is used in the case that the pitch is not in the current scale.
     // let offset = 0;
 
-    if (SOLFEGENAMES.indexOf(pitch) !== -1) {
+    if (SOLFEGENAMES.includes(pitch)) {
         pitch = FIXEDSOLFEGE[pitch];
     }
 
@@ -4881,7 +4881,7 @@ const getInterval = (interval, keySignature, pitch) => {
     } else if (pitch in STOSHARP) {
         pitch = STOSHARP[pitch];
         ii = scale.indexOf(pitch);
-    } else if (scale.indexOf(pitch) !== -1) {
+    } else if (scale.includes(pitch)) {
         ii = scale.indexOf(pitch);
     } else {
         ii = scale.indexOf(pitch);
@@ -4908,8 +4908,8 @@ const getInterval = (interval, keySignature, pitch) => {
             // Pitch is not in the consonant scale of this key, so we need to
             // shift up or down for a close match, step up or down, and then
             // compensate for the shift.
-            if (PITCHES.indexOf(pitch) !== -1) {
-                while (scale.indexOf(pitch) === -1) {
+            if (PITCHES.includes(pitch)) {
+                while (!scale.includes(pitch)) {
                     counter += 1;
                     if (counter > 24) {
                         break;
@@ -4931,8 +4931,8 @@ const getInterval = (interval, keySignature, pitch) => {
 
                 ii = scale.indexOf(pitch);
             } else {
-                if (PITCHES2.indexOf(pitch) !== -1) {
-                    while (scale.indexOf(pitch) === -1) {
+                if (PITCHES2.includes(pitch)) {
+                    while (!scale.includes(pitch)) {
                         counter += 1;
                         if (counter > 24) {
                             break;
@@ -5000,7 +5000,7 @@ const reducedFraction = (a, b) => {
 
     const gcm = greatestCommonMultiple(a, b);
 
-    if ([1, 2, 4, 8, 16].indexOf(b / gcm) !== -1) {
+    if ([1, 2, 4, 8, 16].includes(b / gcm)) {
         return a / gcm + "<br>&mdash;<br>" + b / gcm + "<br>" + NSYMBOLS[b / gcm];
     } else {
         return a / gcm + "<br>&mdash;<br>" + b / gcm + "<br><br>";
@@ -5121,7 +5121,7 @@ const durationToNoteValue = (duration) => {
     for (let dotCount = 0; dotCount < 3; dotCount++) {
         currentDotFactor = 2 - 1 / Math.pow(2, dotCount);
         d = duration * currentDotFactor;
-        if (POWER2.indexOf(d) !== -1) {
+        if (POWER2.includes(d)) {
             return [d, dotCount, null];
         }
     }
@@ -5136,7 +5136,7 @@ const durationToNoteValue = (duration) => {
         }
     }
 
-    if (POWER2.indexOf(roundDown) === -1) {
+    if (!POWER2.includes(roundDown)) {
         roundDown = 128;
     }
 
@@ -5237,7 +5237,7 @@ const splitSolfege = (value) => {
     // Separate the pitch from any attributes, e.g., # or b
     if (value != null && typeof value === "string") {
         let note, attr;
-        if (SOLFNOTES.indexOf(value) !== -1) {
+        if (SOLFNOTES.includes(value)) {
             note = value;
             attr = "";
         } else if (value.slice(0, 3) === "sol") {
@@ -5343,7 +5343,7 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
     // steps between lastNotePlayed and currentNote.
     let note, changedCurrent;
 
-    if (SOLFEGENAMES1.indexOf(currentNote) !== -1) {
+    if (SOLFEGENAMES1.includes(currentNote)) {
         note = FIXEDSOLFEGE1[currentNote];
     } else {
         note = currentNote;
@@ -5567,7 +5567,7 @@ const getPitchInfo = (activity, type, currentNote, tur) => {
     }
     // Map the pitch to the current scale.
     pitch = pitch.replace("#", SHARP).replace("b", FLAT);
-    if (buildScale(tur.singer.keySignature)[0].indexOf(pitch) === -1) {
+    if (!buildScale(tur.singer.keySignature)[0].includes(pitch)) {
         if (pitch in EQUIVALENTFLATS) {
             pitch = EQUIVALENTFLATS[pitch];
         } else if (pitch in EQUIVALENTSHARPS) {
@@ -5626,9 +5626,9 @@ const getPitchInfo = (activity, type, currentNote, tur) => {
                     activity.logo.synth.changeInTemperament
                 );
             case "pitch to color":
-                if (NOTESSHARP.indexOf(pitch) !== -1) {
+                if (NOTESSHARP.includes(pitch)) {
                     return NOTESSHARP.indexOf(pitch) * 8.33;
-                } else if (NOTESFLAT.indexOf(pitch) !== -1) {
+                } else if (NOTESFLAT.includes(pitch)) {
                     return NOTESFLAT.indexOf(pitch) * 8.33;
                 }
                 // eslint-disable-next-line no-console

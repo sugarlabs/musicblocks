@@ -108,15 +108,15 @@ const piemenuPitches = (
     // both at once.
     const hasOctaveWheel =
         block.connections[0] !== null &&
-        ["pitch", "setpitchnumberoffset", "invert1", "tofrequency"].indexOf(
+        ["pitch", "setpitchnumberoffset", "invert1", "tofrequency"].includes(
             block.blocks.blockList[block.connections[0]].name
-        ) !== -1;
+        );
 
     // If we are attached to a set key block, we want to order
     // pitch by fifths.
     if (
         block.connections[0] !== null &&
-        ["setkey", "setkey2"].indexOf(block.blocks.blockList[block.connections[0]].name) !== -1
+        ["setkey", "setkey2"].includes(block.blocks.blockList[block.connections[0]].name)
     ) {
         noteLabels = ["C", "G", "D", "A", "E", "B", "F"];
         noteValues = ["C", "G", "D", "A", "E", "B", "F"];
@@ -317,9 +317,9 @@ const piemenuPitches = (
         (!block.activity.KeySignatureEnv[2] && block.name === "solfege") ||
         (block.name === "notename" &&
             (block.connections[0] != undefined
-                ? ["setkey", "setkey2"].indexOf(
+                ? !["setkey", "setkey2"].includes(
                     block.blocks.blockList[block.connections[0]].name
-                ) === -1
+                )
                 : true))
     ) {
         if (scale[6 - i][0] === FIXEDSOLFEGE[note] || scale[6 - i][0] === note) {
@@ -479,7 +479,7 @@ const piemenuPitches = (
 
         if (
             tur.singer.instrumentNames.length === 0 ||
-            tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
             that.activity.logo.synth.createDefaultSynth(0);
@@ -513,9 +513,9 @@ const piemenuPitches = (
             (!block.activity.KeySignatureEnv[2] && that.name === "solfege") ||
             (that.name === "notename" &&
                 (that.connections[0] != undefined
-                    ? ["setkey", "setkey2"].indexOf(
+                    ? !["setkey", "setkey2"].includes(
                         that.blocks.blockList[that.connections[0]].name
-                    ) === -1
+                    )
                     : true))
         ) {
             let i = scale.indexOf(selection["note"]);
@@ -529,7 +529,7 @@ const piemenuPitches = (
                 i = NOTENAMES.indexOf(FIXEDSOLFEGE[that.value]);
             }
             if (
-                NOTENAMES.indexOf(selection["note"]) !== -1 ||
+                NOTENAMES.includes(selection["note"]) ||
                 scale[i][0] === FIXEDSOLFEGE[selection["note"]] ||
                 scale[i][0] === FIXEDSOLFEGE[that.value] ||
                 scale[i][0] === selection["note"]
@@ -578,7 +578,7 @@ const piemenuPitches = (
 
         if (
             that.connections[0] !== null &&
-            ["setkey", "setkey2"].indexOf(that.blocks.blockList[that.connections[0]].name) !== -1
+            ["setkey", "setkey2"].includes(that.blocks.blockList[that.connections[0]].name)
         ) {
             // We may need to update the mode widget.
             that.activity.logo.modeBlock = that.blocks.blockList.indexOf(that);
@@ -661,9 +661,9 @@ const piemenuCustomNotes = (
     // both at once.
     const hasOctaveWheel =
         block.connections[0] !== null &&
-        ["pitch", "setpitchnumberoffset", "invert1", "tofrequency"].indexOf(
+        ["pitch", "setpitchnumberoffset", "invert1", "tofrequency"].includes(
             block.blocks.blockList[block.connections[0]].name
-        ) !== -1;
+        );
 
     // Use advanced constructor for more wheelnav on same div
     block._customWheel = new wheelnav("wheelDiv", null, 800, 800);
@@ -940,7 +940,7 @@ const piemenuCustomNotes = (
 
         if (
             tur.singer.instrumentNames.length === 0 ||
-            tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
             that.activity.logo.synth.createDefaultSynth(0);
@@ -1195,7 +1195,7 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
 
         if (
             tur.singer.instrumentNames.length === 0 ||
-            tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
             that.activity.logo.synth.createDefaultSynth(0);
@@ -1398,7 +1398,7 @@ const piemenuNoteValue = (block, noteValue) => {
         cblk = block.blocks.blockList[cblk].connections[0];
         if (
             cblk !== null &&
-            ["neighbor", "neighbor2"].indexOf(block.blocks.blockList[cblk].name) !== -1
+            ["neighbor", "neighbor2"].includes(block.blocks.blockList[cblk].name)
         ) {
             subWheelValues = {
                 2: [8, 16, 32, 64],
@@ -1880,7 +1880,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
 
         if (
             tur.singer.instrumentNames.length === 0 ||
-            tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
             that.activity.logo.synth.createDefaultSynth(0);
@@ -1919,7 +1919,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
 
         if (
             tur.singer.instrumentNames.length === 0 ||
-            tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
             that.activity.logo.synth.createDefaultSynth(0);
@@ -2614,7 +2614,7 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
 
         if (
             tur.singer.instrumentNames.length === 0 ||
-            tur.singer.instrumentNames.indexOf(voice) === -1
+            !tur.singer.instrumentNames.includes(voice)
         ) {
             tur.singer.instrumentNames.push(voice);
             if (voice === DEFAULTVOICE) {
@@ -2808,7 +2808,7 @@ const piemenuIntervals = (block, selectedInterval) => {
                 for (let j = 0; j < 8; j++) {
                     if (l !== i) {
                         that._intervalWheel.navItems[l * 8 + j].navItem.hide();
-                    } else if (activeTabs.indexOf(j + 1) === -1) {
+                    } else if (!activeTabs.includes(j + 1)) {
                         that._intervalWheel.navItems[l * 8 + j].navItem.hide();
                     } else {
                         that._intervalWheel.navItems[l * 8 + j].navItem.show();
@@ -2840,7 +2840,7 @@ const piemenuIntervals = (block, selectedInterval) => {
     block._intervalNameWheel.navigateWheel(i);
 
     const j = Number(obj[1]);
-    if (INTERVALS[i][2].indexOf(j) !== -1) {
+    if (INTERVALS[i][2].includes(j)) {
         block._intervalWheel.navigateWheel(j - 1);
     } else {
         block._intervalWheel.navigateWheel(INTERVALS[i][2][0] - 1);
@@ -2874,7 +2874,7 @@ const piemenuIntervals = (block, selectedInterval) => {
 
         if (
             tur.singer.instrumentNames.length === 0 ||
-            tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
             that.activity.logo.synth.createDefaultSynth(0);
@@ -3037,7 +3037,7 @@ const piemenuModes = (block, selectedMode) => {
     const __setupAction = (i, activeTabs) => {
         that._modeNameWheel.navItems[i].navigateFunction = () => {
             for (let j = 0; j < 12; j++) {
-                if (activeTabs.indexOf(j) === -1) {
+                if (!activeTabs.includes(j)) {
                     that._modeWheel.navItems[j].navItem.hide();
                 } else {
                     that._modeWheel.navItems[j].navItem.show();
@@ -3192,7 +3192,7 @@ const piemenuModes = (block, selectedMode) => {
 
         if (
             tur.singer.instrumentNames.length === 0 ||
-            tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
             that.activity.logo.synth.createDefaultSynth(0);
@@ -3375,9 +3375,9 @@ const piemenuBlockContext = (block) => {
 
     const topBlock = block.blocks.findTopBlock(blockBlock);
     if (
-        ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].indexOf(
+        ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].includes(
             block.name
-        ) !== -1
+        )
     ) {
         labels.push("imgsrc:header-icons/save-blocks-button.svg");
     }
@@ -3409,9 +3409,9 @@ const piemenuBlockContext = (block) => {
     wheel.navItems[2].setTooltip(_("Move to trash"));
     wheel.navItems[3].setTooltip(_("Close"));
     if (
-        ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].indexOf(
+        ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].includes(
             block.blocks.blockList[topBlock].name
-        ) !== -1
+        )
     ) {
         wheel.navItems[4].setTooltip(_("Save stack"));
     }
@@ -3439,7 +3439,15 @@ const piemenuBlockContext = (block) => {
         });
     };
 
-    wheel.navItems[0].navigateFunction = stackPasting;
+    wheel.navItems[0].navigateFunction = () => {
+        if (
+            "customsample" === block.blocks.blockList[topBlock].name
+        ) {
+            that.activity.errorMsg(_("In order to copy a sample, you must reload the widget, import the sample again, and export it."));
+        } else {
+            stackPasting();
+        }
+    };
 
     wheel.navItems[1].navigateFunction = () => {
         that.blocks.activeBlock = blockBlock;
@@ -3485,9 +3493,9 @@ const piemenuBlockContext = (block) => {
     };
 
     if (
-        ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].indexOf(
+        ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].includes(
             block.name
-        ) !== -1
+        )
     ) {
         wheel.navItems[4].navigateFunction = () => {
             that.blocks.activeBlock = blockBlock;
@@ -3842,7 +3850,7 @@ const piemenuKey = (activity) => {
         const tur = activity.turtles.ithTurtle(0);
         if (
             tur.singer.instrumentNames.length === 0 ||
-            tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
             activity.logo.synth.createDefaultSynth(0);

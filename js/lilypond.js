@@ -66,21 +66,13 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             note = pitchObj[0] + pitchObj[1];
         }
 
-        return note
-            .replace(/♮/g, "!")
-            .replace(/♯/g, "is")
-            .replace(/♭/g, "es")
-            .replace(/10/g, "''''''''")
-            .replace(/1/g, ",, ")
-            .replace(/2/g, ", ")
-            .replace(/3/g, "")
-            .replace(/4/g, "'")
-            .replace(/5/g, "''")
-            .replace(/6/g, "'''")
-            .replace(/7/g, "''''")
-            .replace(/8/g, "''''''")
-            .replace(/9/g, "'''''''")
-            .toLowerCase();
+    const replacements = {
+            '♮': '!', '♯': 'is', '♭': 'es', '10': "''''''''",
+            '1': ',, ', '2': ', ', '3': '', '4': "'", '5': "''",
+            '6': "'''", '7': "''''", '8': "''''''", '9': "'''''''"
+        };
+
+        return note.replace(/[♮♯♭]|10|[1-9]/g, match => replacements[match]).toLowerCase();
     };
 
     let noteCounter = 0;
@@ -265,7 +257,7 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                             "mixolydian",
                             "aeolian",
                             "locrian"
-                        ].indexOf(mode) !== -1
+                        ].includes(mode)
                     ) {
                         logo.notationNotes[turtle] += " \\key " + key + " \\" + mode + "\n";
                     } else {
@@ -443,7 +435,7 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
                         // console.debug("saw a tie");
                         k++; // Increment notes in tuplet.
                         j++;
-                    } else if ([1, 0.5, 0.25, 0.125, 0.0625].indexOf(totalTupletDuration) !== -1) {
+                    } else if ([1, 0.5, 0.25, 0.125, 0.0625].includes(totalTupletDuration)) {
                         // Break up tuplet on POW2 values
                         incompleteTuplet = j;
                         break;
@@ -804,7 +796,7 @@ const saveLilypondOutput = function (activity) {
                             final = final + instrumentName.charAt(p - 1);
                         }
 
-                        if (occupiedShortNames.indexOf(final) === -1) {
+                        if (!occupiedShortNames.includes(final)) {
                             // not found in array so unique shortname
                             shortInstrumentName = final;
                             occupiedShortNames[t] = shortInstrumentName;
@@ -819,7 +811,7 @@ const saveLilypondOutput = function (activity) {
                     part2 = secondPart.charAt(0);
                     final = part1 + part2;
 
-                    if (occupiedShortNames.indexOf(final) === -1) {
+                    if (!occupiedShortNames.includes(final)) {
                         // found unique shortname
                         shortInstrumentName = final;
                         occupiedShortNames[t] = shortInstrumentName;
@@ -829,7 +821,7 @@ const saveLilypondOutput = function (activity) {
                         for (let q = 1; q < instrumentName.length; q++) {
                             part2 = part2 + secondPart.charAt(q);
                             final = part1 + part2;
-                            if (occupiedShortNames.indexOf(final) === -1) {
+                            if (!occupiedShortNames.includes(final)) {
                                 // found unique shortname
                                 shortInstrumentName = final;
                                 occupiedShortNames[t] = shortInstrumentName;
@@ -837,7 +829,7 @@ const saveLilypondOutput = function (activity) {
                             } else {
                                 part1 = part1 + firstPart.charAt(q);
                                 final = part1 + part2;
-                                if (occupiedShortNames.indexOf(final) === -1) {
+                                if (!occupiedShortNames.includes(final)) {
                                     // found unique shortname
                                     shortInstrumentName = final;
                                     occupiedShortNames[t] = shortInstrumentName;
