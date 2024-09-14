@@ -409,7 +409,7 @@ class JSEditor {
     _setLinesCount(code) {
         if (!docById("editorLines")) return;
 
-        const linesCount = code.replace(/\n+$/, "\n").split("\n").length + 1;
+        const linesCount = code.replace(/\n+$/, "\n").split("\n").length;
         let text = "";
         for (let i = 1; i < linesCount; i++) {
             text += `${i}\n`;

@@ -217,7 +217,8 @@ function SampleWidget() {
         this.octaveCenter = parseInt(o);
     };
 
-    /**
+
+     /**
      * Gets the length of the sample and displays a warning if it exceeds 1MB.
      * @returns {void}
      */
@@ -363,17 +364,6 @@ function SampleWidget() {
         this.playBtn.onclick = () => {
             if (this.isMoving) {
                 this.pause();
-                this.playBtn.innerHTML =
-                    '<img src="header-icons/play-button.svg" title="' +
-                    _("Play") +
-                    '" alt="' +
-                    _("Play") +
-                    '" height="' +
-                    ICONSIZE +
-                    '" width="' +
-                    ICONSIZE +
-                    '" vertical-align="middle">';
-                this.isMoving = false;
             } else {
                 if (!(this.sampleName == "")) {
                     this.resume();
@@ -401,10 +391,13 @@ function SampleWidget() {
                 reader.onload = function (event) {
                     // if the file is of .wav type, save it
                     if (reader.result.substring(reader.result.indexOf(":")+1, reader.result.indexOf(";")) === "audio/wav") {
-                        that.sampleData = reader.result;
-                        that.sampleName = fileChooser.files[0].name;
-                        that._addSample();
-                        that.getSampleLength();
+                        if (reader.result.length <= 1333333) {
+                            that.sampleData = reader.result;
+                            that.sampleName = fileChooser.files[0].name;
+                            that._addSample();
+                        } else {
+                            that.activity.errorMsg(_("Warning: Your sample cannot be loaded because it is >1MB."), that.timbreBlock);
+                        }
                     }
                     // otherwise, output error message
                     else {

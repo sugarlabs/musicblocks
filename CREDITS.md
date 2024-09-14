@@ -28,17 +28,11 @@ the educators and kids in Japan for their input.
 
 Related Websites
 ----------------
-http://www.larryscripp.net/
+https://musicblocks.net/
 
-http://centerformie.org/
+https://mapflc.com/lesson-plans/
 
-http://music-in-education.org/
-
-http://www.richardhermann.net/
-
-http://www.devinulibarri.com/
-
-http://gakken-plus.co.jp/
+https://gakken-steam.jp/music_blocks/
 
 Some of the graphics were contributed by Chie Yasuda (the Mouse theme
 originates with her). She also has been very patient with Devin as he

@@ -377,6 +377,15 @@
 | musical-mastermind.html | Interactive game: Similar to the class game Mastermind, discover the notes in a short musical phrase. |
 | rock-paper-scissors.html | classic intransitive hand game |
 | quiz-game.html | answer the questions with musical letters |
+| CrossWordPuzzle.html | complete a crossword using musical letters |
+
+# Widgets
+
+Music Blocks has handy widgets for various musical concepts to create musical code, but the code itself can also be used to create handy widgets as well.
+
+| Example | Description |
+| --- | --- |
+| 5-EDO-using-ensemble-blocks.html | This is an example of a widget for creating equal-division temperament systems. By default, it has 5 Equal Divisions of the Octave (EDO) as an example. |
 
 # Misc.
 
@@ -397,6 +406,10 @@
 | Galton-music.html | Modeled after a Galton box, a Gaussian distribution of tones is generated. |
 | record-player.html | Record and playback a sequence of notes on a "vinyl". |
 | stocks.html | Generated from a Python script, this project is a musical representation of the price of a stock over time |
+| Morse-code-rhythms.html | Generate Morse code rhythms by typing in letters that generate rhythmic patterns |
+| typing-game.html | Catch the falling alphabets/letters before they reach ground by inputting them correctly |
+| abacus-prototype.html | Working abacus example... remix to enrich this example. |
+
 
 # Utilities
 

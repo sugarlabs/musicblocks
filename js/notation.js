@@ -180,7 +180,7 @@ class Notation {
                 insideChord,
                 false
             ]);
-        } else if (["noise1", "noise2", "noise3"].indexOf(drum[0]) === -1) {
+        } else if (!["noise1", "noise2", "noise3"].includes(drum[0])) {
             const drumSymbol = getDrumSymbol(drum[0]);
             this._notationDrumStaging[turtle].push([
                 [drumSymbol],

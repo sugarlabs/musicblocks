@@ -283,7 +283,7 @@ function setupExtrasBlocks(activity) {
          */
         flow(args, logo) {
             activity.blocks.hideBlocks();
-            logo.showBlocksAfterRun = false;
+            logo.activity.showBlocksAfterRun = false;
             logo.turtleDelay = 0;
         }
     }

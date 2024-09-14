@@ -22,10 +22,20 @@
 // This header is prepended to the Abc output.
 const ABCHEADER = "X:1\nT:Music Blocks composition\nC:Mr. Mouse\nL:1/16\nM:C\n";
 
+/**
+ * Returns the header string used for the ABC notation output.
+ * The ABC header includes metadata for a music composition.
+ * @returns {string} The ABC header string.
+ */
 const getABCHeader = function() {
     return ABCHEADER;
 };
 
+/**
+ * Processes musical notes and converts them into ABC notation format.
+ * @param {object} logo - The logo object containing notationNotes to update.
+ * @param {string} turtle - The identifier for the turtle.
+ */
 const processABCNotes = function(logo, turtle) {
     // obj = [instructions] or
     // obj = [[notes], duration, dotCount, tupletValue, roundDown,
@@ -64,6 +74,11 @@ const processABCNotes = function(logo, turtle) {
         return returnString;
     };
 
+    /**
+     * Converts a musical note into ABC notation format.
+     * @param {string|number} note - The musical note to convert. It can be a string note (e.g., 'C#') or a frequency (number).
+     * @returns {string} The note converted to ABC notation.
+     */
     const __toABCnote = (note) => {
         // beams -- no space between notes
         // ties use ()
@@ -74,69 +89,39 @@ const processABCNotes = function(logo, turtle) {
         // Also, notes must be lowercase.
         // And the octave bounday is at C, not A.
 
-        // Convert frequencies here.
         if (typeof note === "number") {
             const pitchObj = frequencyToPitch(note);
             note = pitchObj[0] + pitchObj[1];
         }
 
-        if (note.indexOf("♯") > -1) {
-            note = "^" + note.replace("♯", "");
-        }
-        // check for double sharp
-        if (note.indexOf("♯") > -1) {
-            note = "^" + note.replace(/♯/g, "");
+        const replacements = {
+            "♯": "^",
+            "♭": "_",
+            "10": "'''''",
+            "9": "''''",
+            "8": "'''",
+            "7": "''",
+            "6": "'",
+            "5": "",
+            "4": "",
+            "3": ",",
+            "2": ",,",
+            "1": ",,,"
+        };
+
+        for (const [key, value] of Object.entries(replacements)) {
+            if (note.includes(key)) {
+                note = note.replace(new RegExp(key, 'g'), value);
+                if (key.length === 1) break;
+            }
         }
 
-        if (note.indexOf("♭") > -1) {
-            note = "_" + note.replace("♭", "");
+        // Convert to uppercase or lowercase based on the octave
+        if (note.includes("'''") || note.includes("''") || note.includes("'") || note.includes("")) {
+            return note.toLowerCase();
+        } else {
+            return note.toUpperCase();
         }
-        // check for double flat
-        if (note.indexOf("♭") > -1) {
-            note = "_" + note.replace(/♭/g, "");
-        }
-
-        if (note.indexOf("10") > -1) {
-            return note.replace("10", "'''''").toLowerCase();
-        }
-
-        if (note.indexOf("9") > -1) {
-            return note.replace("9", "''''").toLowerCase();
-        }
-
-        if (note.indexOf("8") > -1) {
-            return note.replace("8", "'''").toLowerCase();
-        }
-
-        if (note.indexOf("7") > -1) {
-            return note.replace("7", "''").toLowerCase();
-        }
-
-        if (note.indexOf("6") > -1) {
-            return note.replace("6", "'").toLowerCase();
-        }
-
-        if (note.indexOf("5") > -1) {
-            return note.replace("5", "").toLowerCase();
-        }
-
-        if (note.indexOf("4") > -1) {
-            return note.replace("4", "").toUpperCase();
-        }
-
-        if (note.indexOf("3") > -1) {
-            return note.replace("3", ",").toUpperCase();
-        }
-
-        if (note.indexOf("2") > -1) {
-            return note.replace("2", ",,").toUpperCase();
-        }
-
-        if (note.indexOf("1") > -1) {
-            return note.replace("1", ",,,").toUpperCase();
-        }
-
-        return note.toUpperCase();
     };
 
     let counter = 0;
@@ -263,6 +248,15 @@ const processABCNotes = function(logo, turtle) {
                 }
             }
 
+           /**
+            * Processes an incomplete tuplet and appends the corresponding ABC notation to the notation string.
+            * @param {object} logo - The logo object containing notation information.
+            * @param {string} turtle - The identifier for the turtle.
+            * @param {number} i - The index of the current note within the notation staging.
+            * @param {number} count - The number of notes in the incomplete tuplet.
+            * @returns {number} The number of notes processed within the tuplet.
+            * @private
+            */
             const __processTuplet = (logo, turtle, i, count) => {
                 let j = 0;
                 let k = 0;
@@ -426,6 +420,11 @@ const processABCNotes = function(logo, turtle) {
     }
 };
 
+/**
+ * Generates ABC notation output based on the notation staging for each turtle in the activity.
+ * @param {object} activity - The activity object containing logo and notation information.
+ * @returns {string} The generated ABC notation output.
+ */
 const saveAbcOutput = function(activity) {
     // let turtleCount = 0;
 

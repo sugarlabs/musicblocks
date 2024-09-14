@@ -100,8 +100,26 @@ function setupNumberBlocks(activity) {
                     activity.errorMsg(NOINPUTERRORMSG, blk);
                     return 0;
                 } else {
-                    const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                    const b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                    let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                    if (typeof(a) === "string") {
+                        try {
+                            a = parseInt(a);
+                        } catch (e) {
+                            logo.stopTurtle = true;
+                            activity.errorMsg(NANERRORMSG, blk);
+                            return 0;
+                        }
+                    }
+                    let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                    if (typeof(b) === "string") {
+                        try {
+                            b = parseInt(b);
+                        } catch (e) {
+                            logo.stopTurtle = true;
+                            activity.errorMsg(NANERRORMSG, blk);
+                            return 0;
+                        }
+                    }
 
                     try {
                         return MathUtility.doMod(a, b);
@@ -378,12 +396,24 @@ function setupNumberBlocks(activity) {
                     }
                 } else {
                     let a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                    let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                    if (typeof(a) === "string" && parseInt(a)) {
-                        a = parseInt(a);
+                    if (typeof(a) === "string") {
+                        try {
+                            a = parseInt(a);
+                        } catch (e) {
+                            logo.stopTurtle = true;
+                            activity.errorMsg(NANERRORMSG, blk);
+                            return 0;
+                        }
                     }
-                    if (typeof(b) === "string" && parseInt(a)) {
-                        b = parseInt(b);
+                    let b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                    if (typeof(b) === "string") {
+                        try {
+                            b = parseInt(b);
+                        } catch (e) {
+                            logo.stopTurtle = true;
+                            activity.errorMsg(NANERRORMSG, blk);
+                            return 0;
+                        }
                     }
                     try {
                         return MathUtility.doDivide(a, b);
@@ -477,23 +507,41 @@ function setupNumberBlocks(activity) {
                                 activity.blocks.blockList[noteBlock].value
                             ) :
                             logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                        try {
+                            return MathUtility.doMultiply(a, b);
+                        } catch (e) {
+                            logo.stopTurtle = true;
+                            activity.errorMsg(NANERRORMSG, blk);
+                            return 0;
+                        }
                     } else {
                         a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                        if (typeof(a) === "string") {
+                            try {
+                                a = parseInt(a);
+                            } catch (e) {
+                                logo.stopTurtle = true;
+                                activity.errorMsg(NANERRORMSG, blk);
+                                return 0;
+                            }
+                        }
                         b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
-                    }
-
-                    try {
-                        if (typeof(a) === "string" && parseInt(a)) {
-                            a = parseInt(a);
+                        if (typeof(b) === "string") {
+                            try {
+                                b = parseInt(b);
+                            } catch (e) {
+                                logo.stopTurtle = true;
+                                activity.errorMsg(NANERRORMSG, blk);
+                                return 0;
+                            }
                         }
-                        if (typeof(b) === "string" && parseInt(a)) {
-                            b = parseInt(b);
+                        try {
+                            return MathUtility.doMultiply(a, b);
+                        } catch (e) {
+                            logo.stopTurtle = true;
+                            activity.errorMsg(NANERRORMSG, blk);
+                            return 0;
                         }
-                        return MathUtility.doMultiply(a, b);
-                    } catch (e) {
-                        logo.stopTurtle = true;
-                        activity.errorMsg(NANERRORMSG, blk);
-                        return 0;
                     }
                 }
             }
@@ -529,7 +577,17 @@ function setupNumberBlocks(activity) {
                 const cblk = activity.blocks.blockList[blk].connections[1];
 
                 if (cblk !== null) {
-                    const a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+                    let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
+
+                    if (typeof(a) === "string") {
+                        try {
+                            a = parseInt(a);
+                        } catch (e) {
+                            logo.stopTurtle = true;
+                            activity.errorMsg(NANERRORMSG, blk);
+                            return 0;
+                        }
+                    }
 
                     try {
                         return MathUtility.doNegate(a);
@@ -622,7 +680,25 @@ function setupNumberBlocks(activity) {
                             logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
                     } else {
                         a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+                        if (typeof(a) === "string") {
+                            try {
+                                a = parseInt(a);
+                            } catch (e) {
+                                logo.stopTurtle = true;
+                                activity.errorMsg(NANERRORMSG, blk);
+                                return 0;
+                            }
+                        }
                         b = logo.parseArg(logo, turtle, cblk2, blk, receivedArg);
+                        if (typeof(b) === "string") {
+                            try {
+                                b = parseInt(b);
+                            } catch (e) {
+                                logo.stopTurtle = true;
+                                activity.errorMsg(NANERRORMSG, blk);
+                                return 0;
+                            }
+                        }
                     }
 
                     try {

@@ -608,7 +608,7 @@ class Logo {
         }
 
         if (logo.blockList[blk].protoblock.parameter) {
-            if (tur.parameterQueue.indexOf(blk) === -1) {
+            if (!tur.parameterQueue.includes(blk)) {
                 tur.parameterQueue.push(blk);
             }
         }
@@ -629,9 +629,9 @@ class Logo {
         } else if (logo.blockList[blk].isValueBlock()) {
             return logo.blockList[blk].value;
         } else if (
-            ["anyout", "numberout", "textout", "booleanout"].indexOf(
+            ["anyout", "numberout", "textout", "booleanout"].includes(
                 logo.blockList[blk].protoblock.dockTypes[0]
-            ) !== -1
+            )
         ) {
             switch (logo.blockList[blk].name) {
                 case "dectofrac":
@@ -835,9 +835,9 @@ class Logo {
         const queueLength = turtle.queue.length;
         for (let i = queueLength - 1; i > -1; i--) {
             if (
-                ["forever", "repeat", "while", "until"].indexOf(
+                ["forever", "repeat", "while", "until"].includes(
                     this.blockList[turtle.queue[i].blk].name
-                ) !== -1
+                )
             ) {
                 // while or until
                 loopBlkIdx = turtle.queue[i].blk;
@@ -846,9 +846,9 @@ class Logo {
                 turtle.queue.pop();
                 break;
             } else if (
-                ["forever", "repeat", "while", "until"].indexOf(
+                ["forever", "repeat", "while", "until"].includes(
                     this.blockList[turtle.queue[i].parentBlk].name
-                ) !== -1
+                )
             ) {
                 // repeat or forever
                 loopBlkIdx = turtle.queue[i].parentBlk;
@@ -1116,9 +1116,9 @@ class Logo {
 
         for (let blk = 0; blk < this.activity.blocks.stackList.length; blk++) {
             if (
-                ["start", "drum", "status", "oscilloscope"].indexOf(
+                ["start", "drum", "status", "oscilloscope"].includes(
                     this.blockList[this.activity.blocks.stackList[blk]].name
-                ) !== -1
+                )
             ) {
                 // Don't start on a start block in the trash
                 if (!this.blockList[this.activity.blocks.stackList[blk]].trash) {
@@ -1193,7 +1193,7 @@ class Logo {
                 ++turtle;
             }
 
-            if (["start", "drum"].indexOf(this.blockList[startHere].name) !== -1) {
+            if (["start", "drum"].includes(this.blockList[startHere].name)) {
                 turtle = this.blockList[startHere].value;
             }
 
@@ -1211,9 +1211,9 @@ class Logo {
             // Look for status and oscilloscope blocks.
             for (let b = 0; b < startBlocks.length; b++) {
                 if (
-                    ["status", "oscilloscope"].indexOf(
+                    ["status", "oscilloscope"].includes(
                         this.blockList[startBlocks[b]].name
-                    ) !== -1 &&
+                    ) &&
                     !this.blockList[startBlocks[b]].trash
                 ) {
                     const turtle = 0;
@@ -1240,9 +1240,9 @@ class Logo {
                 // If there are multiple start blocks, run them all.
                 for (let b = 0; b < startBlocks.length; b++) {
                     if (
-                        ["status", "oscilloscope"].indexOf(
+                        !["status", "oscilloscope"].includes(
                             this.blockList[startBlocks[b]].name
-                        ) === -1
+                        )
                     ) {
                         const turtle = this.blockList[startBlocks[b]].value;
                         const tur = this.activity.turtles.ithTurtle(turtle);
@@ -1472,9 +1472,9 @@ class Logo {
             if (
                 // If it's an arg block, print its value.
                 logo.blockList[blk].isArgBlock() ||
-                ["anyout", "numberout", "textout", "booleanout"].indexOf(
+                ["anyout", "numberout", "textout", "booleanout"].includes(
                     logo.blockList[blk].protoblock.dockTypes[0]
-                ) !== -1
+                )
             ) {
                 args.push(logo.parseArg(logo, turtle, blk, logo.receievedArg));
 
@@ -1779,11 +1779,11 @@ class Logo {
                     if (
                         blk !== null &&
                         logo.blockList[blk].connections[0] !== null &&
-                        ["status", "oscilloscope"].indexOf(
+                        ["status", "oscilloscope"].includes(
                             logo.blockList[
                                 logo.blockList[blk].connections[0]
                             ].name
-                        ) !== -1
+                        )
                     ) {
                         // console.debug("running status/oscilloscope block");
                     } else {

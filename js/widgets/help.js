@@ -294,7 +294,7 @@ class HelpWidget {
                             } else if (typeof message[3] === "string") {
                                 // If it is a string, load the macro
                                 // assocuated with this block
-                                const blocksToLoad = getMacroExpansion(message[3], 100, 100);
+                                const blocksToLoad = getMacroExpansion(this.activity, message[3], 100, 100);
                                 // console.debug("CLICK: " + blocksToLoad);
                                 this.activity.blocks.loadNewBlocks(blocksToLoad);
                             } else {
@@ -335,7 +335,7 @@ class HelpWidget {
                 _("Guide"),
                 _("About"),
                 _("Congratulations.")
-            ].indexOf(HELPCONTENT[page][0]) !== -1
+            ].includes(HELPCONTENT[page][0])
         ) {
             // body = body + '<p>&nbsp;<img src="' + HELPCONTENT[page][2] + '"></p>';
             body = `<figure>&nbsp;<img src=" ${HELPCONTENT[page][2]}"></figure>` ;
@@ -356,7 +356,7 @@ class HelpWidget {
             body += `<p><a href="${link}" target="_blank">${HELPCONTENT[page][4]}</a></p>` ;
         }
 
-        if ([_("Congratulations.")].indexOf(HELPCONTENT[page][0]) !== -1) {
+        if ([_("Congratulations.")].includes(HELPCONTENT[page][0])) {
             const cell = docById("right-arrow");
 
             cell.onclick = () => {
@@ -629,7 +629,7 @@ class HelpWidget {
                         } else if (typeof message[3] === "string") {
                             // If it is a string, load the macro
                             // assocuated with this block
-                            const blocksToLoad = getMacroExpansion(message[3], 100, 100);
+                            const blocksToLoad = getMacroExpansion(this.activity, message[3], 100, 100);
                             // console.debug("CLICK: " + blocksToLoad);
                             this.activity.blocks.loadNewBlocks(blocksToLoad);
                         } else {

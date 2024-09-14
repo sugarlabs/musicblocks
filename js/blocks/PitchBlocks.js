@@ -523,20 +523,20 @@ function setupPitchBlocks(activity) {
                             // Check to see if the octave was included.
                             const lastChar = arg1.charAt(arg1.length - 1);
                             let foundOctave = "";
-                            if ("12345678".indexOf(lastChar) !== -1) {
+                            if ("12345678".includes(lastChar)) {
                                 foundOctave = lastChar;
                                 arg1 = arg1.slice(0, arg1.length - 1);
                             }
-                            if (SOLFEGENAMES1.indexOf(arg1) !== -1) {
+                            if (SOLFEGENAMES1.includes(arg1)) {
                                 let sol = arg1;
                                 let attr;
-                                if (sol.indexOf(SHARP) != -1) {
+                                if (sol.includes(SHARP)) {
                                     attr = SHARP;
-                                } else if (sol.indexOf(FLAT) != -1) {
+                                } else if (sol.includes(FLAT)) {
                                     attr = FLAT;
-                                } else if (sol.indexOf(DOUBLEFLAT) != -1) {
+                                } else if (sol.includes(DOUBLEFLAT)) {
                                     attr = DOUBLEFLAT;
-                                } else if (sol.indexOf(DOUBLESHARP) != -1) {
+                                } else if (sol.includes(DOUBLESHARP)) {
                                     attr = DOUBLESHARP;
                                 } else {
                                     attr = NATURAL;
@@ -555,7 +555,7 @@ function setupPitchBlocks(activity) {
                                 } else {
                                     notePlayed += foundOctave;
                                 }
-                            } else if (NOTENAMES1.indexOf(arg1) !== -1) {
+                            } else if (NOTENAMES1.includes(arg1)) {
                                 if (foundOctave.length === 0) {
                                     notePlayed =
                                         arg1 +
@@ -563,7 +563,7 @@ function setupPitchBlocks(activity) {
                                 } else {
                                     notePlayed = arg1 + foundOctave;
                                 }
-                            } else if (ALLNOTENAMES.indexOf(arg1) !== -1) {
+                            } else if (ALLNOTENAMES.includes(arg1)) {
                                 // Why would the accidental be "b or #"?
                                 if (foundOctave.length === 0) {
                                     notePlayed =
@@ -875,6 +875,7 @@ function setupPitchBlocks(activity) {
                 "note2"
             ]);
             this.formBlock({ outType: "noteout" });
+            this.beginnerBlock(true);
         }
     }
 
@@ -889,6 +890,7 @@ function setupPitchBlocks(activity) {
                 "note1"
             ]);
             this.formBlock({ outType: "solfegeout" });
+            this.beginnerBlock(true);
         }
     }
 
@@ -1038,6 +1040,32 @@ function setupPitchBlocks(activity) {
             }
         }
     }
+
+    class FiftyCentsBlock extends FlowBlock {
+        constructor() {
+            //.TRANS: cents are units used to specify the ratio between pitches. There are 100 cents between successive notes.
+            super("50cents", _("50 cents"));
+            this.setPalette("pitch", activity);
+            this.makeMacro((x, y) => [
+                [0, "settransposition", x, y, [null, 12, 1, 2]],
+                [1, "vspace", 0, 0, [0, 3]],
+                [2, "hidden", 0, 0, [0, null]],
+                [3, ["newnote", {"collapsed": false}], 0, 0, [1, 4, 7, 11]],
+                [4, "divide", 0, 0, [3, 5, 6]],
+                [5, ["number", {"value": 1}], 0, 0, [4]],
+                [6, ["number", {"value": 4}], 0, 0, [4]],
+                [7, "vspace", 0, 0, [3, 8]],
+                [8, "pitch", 0, 0, [7, 9, 10, null]],
+                [9, ["solfege", {"value": "sol"}], 0, 0, [8]],
+                [10, ["number", {"value": 4}], 0, 0, [8]],
+                [11, "hidden", 0, 0, [3, null]],
+                [12, "divide", 0, 0, [0, 13, 14]],
+                [13, ["number", {"value": 50}], 0, 0, [12]],
+                [14, ["number", {"value": 100}], 9, 0, [12]]
+            ]);
+        }
+    }
+
 
     class SetTranspositionBlock extends FlowClampBlock {
         constructor() {
@@ -1528,7 +1556,16 @@ function setupPitchBlocks(activity) {
         flow(args, logo, turtle, blk) {
             if (args[0] === undefined) return;
 
-            Singer.PitchActions.setSharp(turtle, blk);
+            const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
+            tur.singer.transposition += tur.singer.invertList.length > 0 ? -1 : 1;
+
+            const listenerName = "_sharp_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            const __listener = (event) =>
+                (tur.singer.transposition += tur.singer.invertList.length > 0 ? 1 : -1);
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
 
             return [args[0], 1];
         }
@@ -1568,7 +1605,7 @@ function setupPitchBlocks(activity) {
                 logo.stopTurtle = true;
             } else if (logo.inMatrix) {
                 logo.phraseMaker.addRowBlock(blk);
-                if (logo.pitchBlocks.indexOf(blk) === -1) {
+                if (!logo.pitchBlocks.includes(blk)) {
                     logo.pitchBlocks.push(blk);
                 }
 
@@ -1806,6 +1843,7 @@ function setupPitchBlocks(activity) {
                 [1, ["notename", { value: "G" }], 0, 0, [0]],
                 [2, ["number", { value: 4 }], 0, 0, [0]]
             ]);
+            this.beginnerBlock(true);
         }
     }
 
@@ -1859,13 +1897,13 @@ function setupPitchBlocks(activity) {
                     let scaledegree = activity.blocks.blockList[c].value;
                     let attr;
 
-                    if (scaledegree.indexOf(SHARP) !== -1) {
+                    if (scaledegree.includes(SHARP)) {
                         attr = SHARP;
-                    } else if (scaledegree.indexOf(FLAT) !== -1) {
+                    } else if (scaledegree.includes(FLAT)) {
                         attr = FLAT;
-                    } else if (scaledegree.indexOf(DOUBLESHARP) !== -1) {
+                    } else if (scaledegree.includes(DOUBLESHARP)) {
                         attr = DOUBLESHARP;
-                    } else if (scaledegree.indexOf(DOUBLEFLAT) !== -1) {
+                    } else if (scaledegree.includes(DOUBLEFLAT)) {
                         attr = DOUBLEFLAT;
                     } else {
                         attr = NATURAL;
@@ -1904,7 +1942,7 @@ function setupPitchBlocks(activity) {
                     let semitones = ref;
 
                     semitones +=
-                        NOTESFLAT.indexOf(note) !== -1
+                        NOTESFLAT.includes(note)
                             ? NOTESFLAT.indexOf(note) - ref
                             : NOTESSHARP.indexOf(note) - ref;
     
@@ -1969,18 +2007,18 @@ function setupPitchBlocks(activity) {
 
                 // Check if string ends with accidental
                 if (
-                    SOLFEGENAMES1.indexOf(arg0.toLowerCase()) !== -1 ||
-                    NOTENAMES1.indexOf(arg0.toUpperCase()) !== -1
+                    SOLFEGENAMES1.includes(arg0.toLowerCase()) ||
+                    NOTENAMES1.includes(arg0.toUpperCase())
                 ) {
                     // Store accidental
                     let accSym = arg0.charAt(arg0.length - 1);
-                    if ([SHARP, FLAT, DOUBLESHARP, DOUBLEFLAT].indexOf(accSym) === -1) {
+                    if (![SHARP, FLAT, DOUBLESHARP, DOUBLEFLAT].includes(accSym)) {
                         accSym = NATURAL;
                     } else {
                         arg0 = arg0.substr(0, arg0.length - 1);
                     }
                     note =
-                        NOTENAMES.indexOf(arg0.toUpperCase()) !== -1
+                        NOTENAMES.includes(arg0.toUpperCase())
                             ? SOLFEGECONVERSIONTABLE[arg0.toUpperCase()]
                             : arg0;
                     note = accSym !== NATURAL ? note + accSym : note; // add accidental
@@ -2032,6 +2070,7 @@ function setupPitchBlocks(activity) {
     new InvertBlock().setup(activity);
     new RegisterBlock().setup(activity);
     new SetRatioTranspositionBlock().setup(activity);
+    new FiftyCentsBlock().setup(activity);
     new SetTranspositionBlock().setup(activity);
     new OctaveBlock().setup(activity);
     new DownSixthBlock().setup(activity);
