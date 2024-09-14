@@ -1737,7 +1737,7 @@ function Synth() {
                 future
         );
         // Effects don't work with sine, sawtooth, et al.
-        if (["sine", "sawtooth", "triangle", "square"].indexOf(instrumentName) !== -1) {
+        if (["sine", "sawtooth", "triangle", "square"].includes(instrumentName)) {
             paramsEffects = null;
         } else if (paramsEffects !== null && paramsEffects !== undefined) {
             if (paramsEffects["vibratoIntensity"] !== 0) {
