@@ -3139,7 +3139,7 @@ class Block {
                         this.blocks.mouseDownTime = new Date().getTime();
                         if (this.name === "media" || this.name === "loadFile") {
                             this._doOpenMedia(thisBlock);
-                        } else {
+                        } else if (!("ctrlKey" in event.nativeEvent && event.nativeEvent.ctrlKey)) {
                             this._changeLabel();
                         }
                     }
