@@ -61,8 +61,10 @@ function setupDrumActions(activity) {
             if (drum.slice(0, 4) === "http") return drum;
             
             for (const [, value] of Object.entries(DRUMNAMES)) {
-                if (value.includes(drum)) {
+                if (value[0] === drum) {
                     return value[1];
+                } else if (value[1] === drum) {
+                    return drum;
                 }
             }
             
