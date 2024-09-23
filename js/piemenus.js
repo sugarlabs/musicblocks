@@ -2161,6 +2161,9 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     if (block.name === "outputtools" || block.name === "grid") {
         // slightly larger menu
         size = 1000;
+    }else if ( block.name === "temperamentname"){
+        // slightly larger wheel size for the Temperament Menu
+        size = 1200;
     }
 
     // the selectedValueh selector
