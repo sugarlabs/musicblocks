@@ -1554,11 +1554,11 @@ const OSCTYPES = [
  * @constant {Array<Array<string>>}
  */
 const INITIALTEMPERAMENTS = [
-    [_("equal"), "equal", "equal"],
-    [_("just intonation"), "just intonation", "just intonation"],
-    [_("Pythagorean"), "Pythagorean", "Pythagorean"],
-    [_("meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
-    [_("meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"]
+    [_("Equal (12EDO)"), "equal", "equal"],
+    [_("5-limit Just Intonation"), "just intonation", "just intonation"],
+    [_("Pythagorean (3-limit JI)"), "Pythagorean", "Pythagorean"],
+    [_("Meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
+    [_("Meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"]
 ];
 
 /**
@@ -1566,12 +1566,12 @@ const INITIALTEMPERAMENTS = [
  * @type {Array<Array<string>>}
  */
 let TEMPERAMENTS = [
-    [_("equal"), "equal", "equal"],
-    [_("just intonation"), "just intonation", "just intonation"],
-    [_("Pythagorean"), "Pythagorean", "Pythagorean"],
-    [_("meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
-    [_("meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"],
-    [_("custom"), "custom", "custom"]
+    [_("Equal (12EDO)"), "equal", "equal"],
+    [_("5-limit Just Intonation"), "just intonation", "just intonation"],
+    [_("Pythagorean (3-limit JI)"), "Pythagorean", "Pythagorean"],
+    [_("Meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
+    [_("Meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"],
+    [_("Custom"), "custom", "custom"]
 ];
 
 /**
