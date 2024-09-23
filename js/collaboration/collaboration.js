@@ -56,7 +56,8 @@ class Collaboration {
     stopConnection = (socket) => {
         if (this.attempts >= this.RETRIES) {
             console.log("Maximum calls to make connection exceeded. Stopped making calls");
-            this.activity.textMsg(`${_("The Collaboration Server is currently busy. Please try again later.")}`)
+            const errorMsg = _("The Collaboration Server is currently busy. Please try again later.");
+            this.activity.textMsg(errorMsg);
             socket.disconnect();
         }
     };
