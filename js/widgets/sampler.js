@@ -217,6 +217,35 @@ function SampleWidget() {
         this.octaveCenter = parseInt(o);
     };
 
+
+     /**
+     * Gets the length of the sample and displays a warning if it exceeds 1MB.
+     * @returns {void}
+     */
+    this.getSampleLength = function () {
+        if (this.sampleData.length > 1333333) {
+            this.activity.errorMsg(_("Warning: Sample is bigger than 1MB."), this.timbreBlock);
+        }
+    };
+
+
+     /**
+     * Displays a message indicating that recording has started.
+     * @returns {void}
+     */
+    function displayRecordingStartMessage() {
+        this.activity.textMsg(_("Recording started..."));
+    }
+
+    /**
+     * Displays a message indicating that recording has stopped.
+     * @returns {void}
+     */
+    function displayRecordingStopMessage() {
+        this.activity.textMsg(_("Recording complete..."));
+    }
+
+
     /**
      * Displays an error message when the uploaded sample is not a .wav file.
      * @returns {void}
@@ -236,16 +265,18 @@ function SampleWidget() {
             that._addSample();
 
             var newStack = [
+                [0,"settimbre",100,100,[null,1,null,5]],
                 [
-                    0,
+                    1,
                     ["customsample", { value: [that.sampleName, that.sampleData, "do", 4] }],
                     100,
                     100,
-                    [null, 1, 2, 3]
+                    [0, 2, 3, 4]
                 ],
-                [1, ["audiofile", { value: [that.sampleName, that.sampleData] }], 0, 0, [0]],
-                [2, ["solfege", { value: that.samplePitch }], 0, 0, [0]],
-                [3, ["number", { value: that.sampleOctave }], 0, 0, [0]]
+                [2, ["audiofile", { value: [that.sampleName, that.sampleData] }], 0, 0, [1]],
+                [3, ["solfege", { value: that.samplePitch }], 0, 0, [1]],
+                [4, ["number", { value: that.sampleOctave }], 0, 0, [1]],
+                [5,"hidden",0,0,[0,null]]
             ];
 
             that.activity.blocks.loadNewBlocks(newStack);
@@ -336,8 +367,8 @@ function SampleWidget() {
             } else {
                 if (!(this.sampleName == "")) {
                     this.resume();
-                    this._playReferencePitch();
                 }
+                this._playReferencePitch();
             }
         };
 
@@ -411,6 +442,98 @@ function SampleWidget() {
             }
         };
 
+        this._recordBtn= widgetWindow.addButton(
+            "mic.svg",
+            ICONSIZE,
+            _("Toggle Mic"),
+            ""
+        );
+        this._recordBtn.onclick = function() {
+            ToggleMic(this);
+        }.bind(this._recordBtn);
+      
+        this._playbackBtn= widgetWindow.addButton(
+            "playback.svg",
+            ICONSIZE,
+            _("Playback"),
+            "");
+        this._playbackBtn.id="playbackBtn"
+        this._playbackBtn.classList.add("disabled");
+
+
+        const togglePlaybackButtonState = () => { 
+            if (!audioURL) {
+                this._playbackBtn.classList.add("disabled");
+            } else {
+                this._playbackBtn.classList.remove("disabled");
+            }
+        };
+
+        this._playbackBtn.onclick = () => {
+            playAudio();
+        };
+
+        let can_record = false;
+        let is_recording = false;
+        let recorder = null;
+        let chunks = [];
+        let audioURL = null; 
+        
+        async function setUpAudio() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    recorder = new MediaRecorder(stream);
+                    recorder.ondataavailable = e => {
+                        chunks.push(e.data);
+                    };
+                    recorder.onstop = async e => {
+                        let blob = new Blob(chunks, { type: 'audio/webm' });
+                        chunks = [];
+                        audioURL = URL.createObjectURL(blob);
+                        displayRecordingStopMessage.call(that);
+                        togglePlaybackButtonState();
+
+                        const module = await import("https://cdn.jsdelivr.net/npm/webm-to-wav-converter@1.1.0/+esm");
+                        const getWaveBlob = module.getWaveBlob;
+                        const wavBlob = await getWaveBlob(blob);
+                        const wavAudioURL = URL.createObjectURL(wavBlob);
+                        that.sampleData = wavAudioURL;
+                        that.sampleName = `Recorded Audio ${audioURL}`;
+                        that._addSample();
+                    };
+                    can_record = true;
+                } catch (err) {
+                    console.log("The following error occurred: " + err);
+                }
+            }
+        }
+        function ToggleMic(buttonElement) {
+            if (!can_record) return;
+            
+            is_recording = !is_recording;
+            if (is_recording) {
+                recorder.start();   
+                buttonElement.getElementsByTagName('img')[0].src = "header-icons/record.svg"; 
+                displayRecordingStartMessage.call(that);
+            } else {
+                recorder.stop();
+                buttonElement.getElementsByTagName('img')[0].src = "header-icons/mic.svg"; 
+            }
+        }
+        
+        function playAudio() {
+            if (audioURL) {
+                const audio = new Audio(audioURL);
+                audio.play();
+                console.log("Playing audio.");
+            } else {
+                console.error("No recorded audio available.");
+            }
+        }
+        
+        setUpAudio();
+ 
         widgetWindow.sendToCenter();
         this.widgetWindow = widgetWindow;
 

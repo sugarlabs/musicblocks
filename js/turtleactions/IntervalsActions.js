@@ -252,7 +252,7 @@ function setupIntervalsActions(activity) {
 
             const __listener = () => {
                 MUSICALMODES[modeName] = [];
-                if (tur.singer.defineMode.indexOf(0) === -1) {
+                if (!tur.singer.defineMode.includes(0)) {
                     tur.singer.defineMode.push(0);
                     activity.errorMsg(_("Adding missing pitch number 0."));
                 }

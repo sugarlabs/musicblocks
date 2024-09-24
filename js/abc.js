@@ -43,35 +43,10 @@ const processABCNotes = function(logo, turtle) {
     logo.notationNotes[turtle] = "";
 
     const __convertDuration = function(duration) {
-        let returnString = "";
-        switch (duration) {
-            case 64:
-                returnString = "1/4";
-                break;
-            case 32:
-                returnString = "1/2";
-                break;
-            case 16:
-                returnString = "1";
-                break;
-            case 8:
-                returnString = "2";
-                break;
-            case 4:
-                returnString = "4";
-                break;
-            case 2:
-                returnString = "8";
-                break;
-            case 1:
-                returnString = "16";
-                break;
-            default:
-                returnString = duration;
-                break;
-        }
-
-        return returnString;
+        const durationMap = {
+            64: "1/4", 32: "1/2", 16: "1", 8: "2", 4: "4", 2: "8", 1: "16"
+        };
+        return durationMap[duration] || duration.toString();
     };
 
     /**
