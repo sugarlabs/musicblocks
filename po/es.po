@@ -16,6 +16,9 @@
 #: js/SaveInterface.js:59
 #: js/SaveInterface.js:61
 #: js/SaveInterface.js:93
+#: js/SaveInterface.js:59
+#: js/SaveInterface.js:61
+#: js/SaveInterface.js:93
 msgid "Music Blocks Project"
 msgstr "Proyecto de Bloques de Música"
 
@@ -3782,7 +3785,7 @@ msgstr "número de tono de tortuga"
 
 #: js/blocks/EnsembleBlocks.js:643
 msgid "The Turtle pitch block returns the current pitch number being played by the specified turtle."
-msgstr "El bloque de tono de tortuga devuelve el número de tono actual que está tocando la tortuga especificada."
+msgstr "El bloque de tono de la tortuga devuelve el número de tono actual que está reproduciendo la tortuga especificado."
 
 #: js/blocks/EnsembleBlocks.js:747
 #: js/blocks/EnsembleBlocks.js:819
@@ -7808,9 +7811,6 @@ msgstr "alta"
 msgid "low"
 msgstr "baja"
 
-#~msgid "Toggle Fullscreen"
-#~msgstr "Alternar pantalla completa"
-
 #: js/toolbar.js:70
 
 #: js/toolbar.js:130
@@ -7822,11 +7822,6 @@ msgstr "baja"
 #~msgid "Toggle JavaScript Editor"
 #~msgstr "Alternar editor de JavaScript"
 
-#: js/EnsembleBlocks.js:643
-
-#~msgid "The Turtle pitch block returns the current pitch number being played by the specified turtle."
-#~msgstr "El bloque de tono de la tortuga devuelve el número de tono actual que está reproduciendo la tortuga especificado."
-
 #: js/PitchActions.js:88
 
 #~msgid "The Scalar Step Block must be used inside of a Note Block."
@@ -7836,11 +7831,6 @@ msgstr "baja"
 
 #~msgid "The Scalar Step Block must be preceded by a Pitch Block."
 #~msgstr "El bloque Paso escalar debe ir precedida de un bloque de tono."
-
-#: js/helper.js:150
-
-#~msgid "Show fewer tags"
-#~msgstr "Mostrar menos etiquetas"
 
 #: js/toolbar.js:110
 
