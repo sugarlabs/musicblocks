@@ -3785,7 +3785,7 @@ msgid "turtle pitch number"
 msgstr ""
 
 #: js/blocks/EnsembleBlocks.js:643
-msgid "The Turrle pitch block returns the current pitch number being played by the specified turtle."
+msgid "The Turtle pitch block returns the current pitch number being played by the specified turtle."
 msgstr ""
 
 #: js/blocks/EnsembleBlocks.js:747
@@ -6699,7 +6699,7 @@ msgid "The Status block opens a tool for inspecting the status of Music Blocks a
 msgstr ""
 
 #: js/blocks/WidgetBlocks.js:1580
-#.TRANS: the speed at music is should be played.
+#.TRANS: AI-generated music
 msgid "aimusic"
 msgstr ""
 
@@ -6729,8 +6729,7 @@ msgid "Dictionary with this name does not exist"
 msgstr ""
 
 #: js/turtleactions/DictActions.js:259
-msgid "Key with this name does not exist in \"+dict);
-"
+msgid "Key with this name does not exist in "
 msgstr ""
 
 #: js/turtleactions/DrumActions.js:227
@@ -7198,7 +7197,7 @@ msgid "duration"
 msgstr ""
 
 #: js/widgets/musickeyboard.js:3179
-msgid "New action blocks generated!"
+msgid "New action blocks generated"
 msgstr ""
 
 #: js/widgets/musickeyboard.js:3180
@@ -7589,7 +7588,7 @@ msgid "Download as File"
 msgstr ""
 
 #: planet/js/helper.js:150
-msgid "Show fewer tags\" + \" ▲"
+msgid "Show fewer tags"
 msgstr ""
 
 #: plugins/accelerometer.rtp:48

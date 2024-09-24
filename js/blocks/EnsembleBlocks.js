@@ -640,7 +640,7 @@ function setupEnsembleBlocks(activity) {
                 //.TRANS: convert current note for this turtle to piano key (1-88)
                 super("turtlepitch", _("turtle pitch number"));
                 this.setHelpString([
-                    _("The Turrle pitch block returns the current pitch number being played by the specified turtle."),
+                    _("The Turtle pitch block returns the current pitch number being played by the specified turtle."),
                     "documentation",
                     ""
                 ]);
