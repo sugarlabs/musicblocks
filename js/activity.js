@@ -4922,6 +4922,13 @@ class Activity {
          * Sets up a new "clean" MB i.e. new project instance
          */
         const _afterDelete = (that) => {
+
+            // Exit the user from collaboration if they are in it
+            if (this.collaboration.hasCollaborationStarted && !this.collaboration.hasExitedCollaboration) {
+                const room_id = this.room_id;
+                this.collaboration.socket.emit(this.EXIT_COLLABORATION, {room_id});
+            };
+
             if (that.turtles.running()) {
                 that._doHardStopButton();
             }
@@ -6507,6 +6514,12 @@ class Activity {
                 "change",
                 // eslint-disable-next-line no-unused-vars
                 (event) => {
+                    // Exit the user from collaboration if they are in it
+                    if (this.collaboration.hasCollaborationStarted && !this.collaboration.hasExitedCollaboration) {
+                        const room_id = this.room_id;  
+                        this.collaboration.socket.emit(this.EXIT_COLLABORATION, {room_id});
+                    }
+
                     // Read file here.
                     const reader = new FileReader();
                     const midiReader = new FileReader();
