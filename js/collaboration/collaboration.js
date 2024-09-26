@@ -155,6 +155,15 @@ class Collaboration {
         return name;
     }
 
+    // Exit the user from collaboration room
+    exitCollaboration = (userArray) => {
+        for (let i = 0; i < userArray.length; i++) {
+            this.activity.collabCursor.removeCursor(userArray[i]);
+        };
+        this.hasExitedCollaboration = true;
+        this.socket.disconnect();
+    }
+
     // Start the collaboration
     startCollaboration = (ID, name) => {
         if (!name) {
