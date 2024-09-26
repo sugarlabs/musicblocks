@@ -144,6 +144,10 @@ class Collaboration {
         socket.on("block-value-updated", (update) => {
             this.activity.renderProjectFromData(update);
         });
+
+        socket.on("exit-collaboration", (userArray) => {
+            this.exitCollaboration(userArray);
+        })
     };
 
     // Generate a random name for the user
