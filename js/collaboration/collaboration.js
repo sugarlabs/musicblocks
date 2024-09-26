@@ -27,6 +27,7 @@ class Collaboration {
         this.PORT = "http://localhost:8080/";
         this.hasCollaborationStarted = false;
         this.updatedProjectHtml = null;
+        this.hasExitedCollaboration = false;
         this.randomNames = [
             'Macrotis',
             'Setonix',
