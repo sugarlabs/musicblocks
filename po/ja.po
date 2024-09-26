@@ -407,7 +407,7 @@ msgstr "フルスクリーン"
 #: js/toolbar.js:236
 #: js/turtledefs.js:504
 msgid "Toggle Fullscreen"
-msgstr ""
+msgstr "フルスクリーンの切り替え"
 
 #: js/toolbar.js:55
 #: js/toolbar.js:116
@@ -7810,9 +7810,6 @@ msgstr "高"
 #: plugins/weather.rtp:149
 msgid "low"
 msgstr "低"
-
-#~msgid ""Toggle Fullscreen"
-#~msgstr ""フルスクリーンの切り替え"
 
 #: js/toolbar.js:70
 
