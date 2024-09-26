@@ -761,7 +761,7 @@ msgstr ""
 #: js/toolbar.js:234
 #: js/toolbar.js:235
 msgid "Full Screen"
-msgstr ""
+msgstr "フルスクリーン"
 
 #: js/toolbar.js:148
 #: js/toolbar.js:151
@@ -7287,7 +7287,7 @@ msgstr ""
 
 #: js/widgets/sampler.js:458
 msgid "Playback"
-msgstr ""
+msgstr "コンパイルされた音楽を再生"
 
 #: js/widgets/sampler.js:979
 #.TRANS: The reference tone is a sound used for comparison.
@@ -8285,9 +8285,6 @@ msgstr "低"
 
 #~msgid "play backward"
 #~msgstr "逆に再生"
-
-#~msgid "playback"
-#~msgstr "コンパイルされた音楽を再生"
 
 #~msgid "Merge project from file"
 #~msgstr "ファイルからプロジェクトをマージする"
