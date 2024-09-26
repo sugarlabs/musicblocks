@@ -553,7 +553,7 @@ msgstr "変化記号を設定"
 #: js/toolbar.js:197
 #: js/toolbar.js:253
 msgid "JavaScript Editor"
-msgstr ""
+msgstr "ジャバスクリプト エディタ"
 
 #: js/toolbar.js:73
 #: js/toolbar.js:134
@@ -797,12 +797,12 @@ msgstr "タートル・ブロックスについて"
 #: js/toolbar.js:457
 #: js/toolbar.js:497
 msgid "Turtle Wrap Off"
-msgstr ""
+msgstr "画面の境界を無視しない"
 
 #: js/toolbar.js:466
 #: js/toolbar.js:506
 msgid "Turtle Wrap On"
-msgstr ""
+msgstr "画面の境界を無視す"
 
 #: js/turtle-painter.js:1192
 #: js/turtle-painter.js:1193
@@ -7811,408 +7811,128 @@ msgstr "高"
 msgid "low"
 msgstr "低"
 
-#: js/toolbar.js:70
-
-#: js/toolbar.js:130
-
-#: js/toolbar.js:194
-
-#: js/toolbar.js:249
-
 #~msgid "Toggle JavaScript Editor"
 #~msgstr "JavaScript編集をオン／オフ"
-
-#: js/EnsembleBlocks.js:643
-
-#~msgid "The Turrle pitch block returns the current pitch number being played by the specified turtle."
-#~msgstr ""
-
-#: js/PitchActions.js:88
 
 #~msgid "The Scalar Step Block must be used inside of a Note Block."
 #~msgstr "音階内を上る／下りるブロックは、音符ブロックの中に入れて使ってください。"
 
-#: js/PitchActions.js:107
-
 #~msgid "The Scalar Step Block must be preceded by a Pitch Block."
 #~msgstr "音階内を上る／下りるブロックは、音の高さブロックの後に使ってください。"
-
-#: js/musickeyboard.js:2840
-
-#~msgid "New action blocks generated!"
-#~msgstr ""
-
-#: js/toolbar.js:110
-
-#: js/toolbar.js:204
-
-#~msgid "FullScreen"
-#~msgstr ""
-
-#: js/turtledefs.js:506
-
-#~msgid "Toggle full screen mode."
-#~msgstr ""
-
-#: js/RhythmBlockPaletteBlocks.js:386
-
-#~msgid "The Tuplet block is used to generate a group of notes played in a condensed amount of time."
-#~msgstr ""
-
-#: js/RhythmBlockPaletteBlocks.js:601
 
 #~msgid "Using tuplets makes it easy to create groups of notes that are not based on a power of 2."
 #~msgstr "<br><br>３連符（れんぷ）や５連符（れんぷ）など、２の倍数ではない音符（おんぷ）の数でグループを作りやすくなる。"
 
-#: js/IntervalsBlocks.js:43
-
 #~msgid "The Set temperament block is used to choose the tuning system used by Music Blocks."
 #~msgstr "<h2>音律（おんりつ）をせっていブロック</h2><br>ミュージック・ブロックスで用いる音階の調律（ちょうりつ）のしかたをせっていする。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。<br>★調律（ちょうりつ）とは<br>楽器の音の高さを、音律（おんりつ）にしたがって整えること。<br>★音律（おんりつ）とは<br>音程（おんてい）（音どうしのへだたり）の決め方。同じ音階でも、音律（おんりつ）によって音の高さが変わる。<br>★オクターヴの高さとは<br>同じ名前でも高さがちがう音を表すすうち。<br>"
-
-#: js/IntervalsBlocks.js:175
 
 #~msgid "The Interval number block returns the number of scalar steps in the current interval."
 #~msgstr "「音程を数で表示」ブロックは音階の数を経産して表示する"
 
-#: js/IntervalsBlocks.js:203
-
-#~msgid "The Semi-tone interval block measures the distance between two notes in semi-tones."
-#~msgstr ""
-
-#: js/IntervalsBlocks.js:484
-
 #~msgid "The Semi-tone interval block calculates a relative interval based on half steps."
 #~msgstr "<em>半音階的音程</em>ブロックは音階を無視、半音で新しい音高を計算して鳴らします。"
-
-#: js/IntervalsBlocks.js:522
 
 #~msgid "The Arpeggio block will run each note block multiple times, adding a transposition based on the specified chord."
 #~msgstr "「アルペジオ」ブロックは 「音符」ブロックを回数 再生して、コードによって 変更します。"
 
-#: js/IntervalsBlocks.js:811
-
 #~msgid "The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode."
 #~msgstr "<h2>音階の上下ブロック</h2><br>中に組み入れる「音符（おんぷ）ブロック」の音をきじゅんにして、別の音をつけ加える。"
-
-#: js/IntervalsBlocks.js:845
-
-#~msgid "The Define mode block allows you define a custom mode by specifiying pitch numbers."
-#~msgstr ""
-
-#: js/IntervalsBlocks.js:894
-
-#~msgid "When Movable do is false, the solfege note names are always tied to specific pitches,"
-#~msgstr ""
-
-#: js/IntervalsBlocks.js:896
-
-#~msgid "eg \"do\" is always \"C-natural\" when Movable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
-#~msgstr ""
-
-#: js/ActionBlocks.js:750
 
 #~msgid "The Action block is used to group together blocks so that they can be used more than once."
 #~msgstr "<h2>アクションブロック</h2><br>ふくすうのブロックを１つのグループとしてまとめ、実行する。グループとなったプログラムは、１つの「アクション」として自由に名前をつけることができる。"
 
-#: js/BooleanBlocks.js:188
-
 #~msgid "The Greater-than block returns True if the top number is greater than the bottom number."
 #~msgstr "<h2>しんぎブロック（大なり）</h2><br>２つのすうちをくらべて、すうちの大小をはんていする。「＞」は上のすうちが下のすうちよりも大きければ「真（しん）」、下のすうちと同じか小さければ「偽（ぎ）」という結果になる。<br><br>★しんぎブロックとは<br>「もし～ならば」などのじょうけんブロックを動かすために必要なブロック。<br>「もし～ならば」は、せいかくに表現すると、「もし～というじょうけんが正しいならば、次のブロックを実行する」という意味である。しんぎブロックは不等式などによるひかくが「正しい（真）」か、「正しくない（偽）」かの結果を表し、「もし～ならば」に続くブロックを実行するかどうか決める。"
-
-#: js/BooleanBlocks.js:237
 
 #~msgid "The Less-than block returns True if the top number is less than the bottom number."
 #~msgstr "<h2>しんぎブロック（小なり）</h2><br>２つのすうちをくらべて、すうちの大小をはんていする。「＜」は上のすうちが下のすうちよりも小さければ「真（しん）」、下のすうちと同じか大きければ「偽（ぎ）」という結果になる。<br><br>★しんぎブロックとは<br>「もし～ならば」などのじょうけんブロックを動かすために必要なブロック。<br>「もし～ならば」は、せいかくに表現すると、「もし～というじょうけんが正しいならば、次のブロックを実行する」という意味である。しんぎブロックは不等式などによるひかくが「正しい（真）」か、「正しくない（偽）」かの結果を表し、「もし～ならば」に続くブロックを実行するかどうか決める。"
 
-#: js/MediaBlocks.js:34
-
-#: js/MediaBlocks.js:72
-
 #~msgid "In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
 #~msgstr "<br>図の例では、右向きに進み続けるネズミがカンバスの右からはみ出ると、カンバスの左から出てくる。"
-
-#: js/MediaBlocks.js:43
-
-#: js/MediaBlocks.js:81
 
 #~msgid "In this example, the turtle moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
 #~msgstr "<br>図の例では、右向きに進み続けるタートルがカンバスの右からはみ出ると、カンバスの左から出てくる。"
 
-#: js/MediaBlocks.js:112
-
-#: js/MediaBlocks.js:150
-
 #~msgid "In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
 #~msgstr "<br>図の例では、上向きに進み続けるネズミがカンバスの上からはみ出ると、カンバスの下から出てくる。"
-
-#: js/MediaBlocks.js:121
-
-#: js/MediaBlocks.js:159
 
 #~msgid "In this example, the turtle moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
 #~msgstr "<br>図の例では、上向きに進み続けるタートルがカンバスの上からはみ出ると、カンバスの下から出てくる。"
 
-#: js/MediaBlocks.js:579
-
 #~msgid "video material"
 #~msgstr "がぞうそざい"
-
-#: js/ProgramBlocks.js:581
-
-#~msgid "The Run block block runs a block. It accepts two types of arguments: block number or block name."
-#~msgstr ""
-
-#: js/DrumBlocks.js:188
-
-#: js/DrumBlocks.js:195
 
 #~msgid "The Set drum block will select a drum sound to replace the pitch of any contained notes."
 #~msgstr "<h2>ドラムをせっていブロック</h2><br>「音符（おんぷ）ブロック」内の音を、ドラムの音に置きかえる。<br>図の例では、ソの音のかわりに、キックドラムの音がえんそうされる。"
 
-#: js/RhythmBlocks.js:30
-
 #~msgid "The Note value block is the value of the duration of the note currently being played."
 #~msgstr "<h2>音の長さブロック</h2><br>音の長さを表示する。<br>"
-
-#: js/RhythmBlocks.js:83
-
-#~msgid "The Milliseconds block is similar to a Note block except that it uses time (in MS) to specify the note duration."
-#~msgstr ""
-
-#: js/RhythmBlocks.js:235
-
-#~msgid "The Swing block works on pairs of notes (specified by note value), adding some duration (specified by swing value) to the first note and taking the same amount from the second note."
-#~msgstr ""
-
-#: js/RhythmBlocks.js:335
-
-#~msgid "The Multiply note value block changes the duration of notes by changing their note values."
-#~msgstr ""
-
-#: js/RhythmBlocks.js:506
 
 #~msgid "A rest of the specified note value duration can be constructed using a Silence block."
 #~msgstr "<h2>休符（きゅうふ）ブロック</h2><br>音がない部分に使われる。<br><br>★休符（きゅうふ）とは<br>休みの長さ。"
 
-#: js/HeapBlocks.js:60
-
-#~msgid "The Show-heap block displays the contents of the heap at the top of the screen."
-#~msgstr ""
-
-#: js/FlowBlocks.js:81
-
-#~msgid "The output of the example is: Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol."
-#~msgstr ""
-
-#: js/FlowBlocks.js:679
-
-#: js/FlowBlocks.js:688
-
-#: js/FlowBlocks.js:722
-
-#: js/FlowBlocks.js:731
-
 #~msgid "Conditionals lets your program take different actions depending on the condition."
 #~msgstr "<h2>じょうけんブロック</h2><br>じょうけんブロックを使うと、じょうけんによってちがうはたらきをするプログラムを作ることができる。"
-
-#: js/FlowBlocks.js:690
 
 #~msgid "In this example if the mouse button is pressed a snare drum will play, else a kick drum will play."
 #~msgstr "<br><br>図の例では、もし、パソコンのマウスを長おししていれば「キックドラム」ブロックをえんそうする。長おししていなければ（そうでなければ）「キックドラム」ブロックをえんそうする。"
 
-#: js/FlowBlocks.js:764
-
 #~msgid "In this example of a simple drum machine a kick drum will play 1/4 notes forever."
 #~msgstr "<br><br>図の例は「アクション」の実行をくり返す。"
-
-#: js/GraphicsBlocks.js:401
 
 #~msgid "The Arc block moves the mouse in a arc."
 #~msgstr "<h2>いどうブロック</h2><br>ネズミの位置を、指定した大きさと角度の円をえがいていどうさせる。角度のすうちは、プラスだと右回り、マイナスだと左回りになる。"
 
-#: js/GraphicsBlocks.js:408
-
 #~msgid "The Arc block moves the turtle in a arc."
 #~msgstr "<h2>いどうブロック</h2><br>タートルの位置を、指定した大きさと角度の円をえがいていどうさせる。角度のすうちは、プラスだと右回り、マイナスだと左回りになる。"
-
-#: js/GraphicsBlocks.js:464
 
 #~msgid "The Set heading block sets the heading of the mouse."
 #~msgstr "<h2>いどうブロック</h2><br>ネズミの向きを、指定したすうちの角度に変える。"
 
-#: js/GraphicsBlocks.js:810
-
-#~msgid "The Wrap block enables or disables screen wrapping for the graphics actions within it."
-#~msgstr ""
-
-#: js/OrnamentBlocks.js:295
-
 #~msgid "The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes."
 #~msgstr "<h2>スラーブロック</h2><br>音と次の音をなめらかにつなげる。ただし、「音符（おんぷ）ブロック」でせっていした音の長さは変わらない。<br><br>"
-
-#: js/OrnamentBlocks.js:324
 
 #~msgid "The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes."
 #~msgstr "<h2>スタッカートブロック</h2><br>音を短かく切る。ただし、「音符（おんぷ）ブロック」でせっていした音の長さは変わらない。<br><br>"
 
-#: js/VolumeBlocks.js:592
-
 #~msgid "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
 #~msgstr "<h2>デクレシェンドブロック</h2><br>音量をだんだん小さくする。"
-
-#: js/VolumeBlocks.js:594
 
 #~msgid "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
 #~msgstr "<br>たとえば、７つの音にすうちが５の「デクレシェンドブロック」を使うと、１音ごとにさいしょの音の音量の５パーセントずつ音量がへり、さいごの音はさいしょの音よりも３５パーセント音量が小さくなる。"
 
-#: js/VolumeBlocks.js:632
-
 #~msgid "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
 #~msgstr "<h2>クレシェンドブロック</h2><br>音量をだんだん大きくする。"
-
-#: js/VolumeBlocks.js:634
 
 #~msgid "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
 #~msgstr "<br>たとえば、７つの音に、すうちが５の「クレシェンドブロック」を使うと、１音ごとにさいしょの音の音量の５パーセントずつ音量がふえ、さいごの音はさいしょの音よりも３５パーセント音量が大きくなる。<br><br> "
 
-#: js/ToneBlocks.js:176
-
-#~msgid "The Partial block is used to specify a weight for a specific partical harmonic."
-#~msgstr ""
-
-#: js/ToneBlocks.js:213
-
-#~msgid "The Weighted partials block is used to specify the partials associated with a timbre."
-#~msgstr ""
-
-#: js/ToneBlocks.js:588
-
 #~msgid "The set default instrument block changes the default instrument from electronic synth to the instrument of your choice."
 #~msgstr "「音色標準を設定」ブロックは音色のデフォルトを「シンセサイザー」からお好みの楽器に設定します。"
-
-#: js/MeterBlocks.js:54
-
-#~msgid "The Beat factor block returns the ratio of the note value to meter note value."
-#~msgstr ""
-
-#: js/MeterBlocks.js:168
-
-#: js/MeterBlocks.js:179
 
 #~msgid "In the figure, it is used to take an action on the first beat of each measure."
 #~msgstr "<br><br>★拍（はく）とは<br>くり返されるリズムのこと。<br>★小節（しょうせつ）とは<br>楽譜（がくふ）の、たての線で区切られた部分。小節（しょうせつ）の中の拍（はく）は、拍子（ひょうし）と同じ数になる。"
 
-#: js/MeterBlocks.js:317
-
 #~msgid "(By default, it counts quarter notes.)"
 #~msgstr "<br><br>★拍（はく）とは<br>くり返されるリズムのこと。"
-
-#: js/DictBlocks.js:29
-
-#~msgid "The Show-dictionary block displays the contents of the dictionary at the top of the screen."
-#~msgstr ""
-
-#: js/ExtrasBlocks.js:268
-
-#~msgid "The Comment block prints a comment at the top of the screen when the program is running in slow mode."
-#~msgstr ""
-
-#: js/SensorsBlocks.js:235
-
-#~msgid "The Cursor over block triggers an event when the cursor is moved over a mouse."
-#~msgstr ""
-
-#: js/SensorsBlocks.js:242
-
-#~msgid "The Cursor over block triggers an event when the cursor is moved over a turtle."
-#~msgstr ""
-
-#: js/SensorsBlocks.js:264
-
-#~msgid "The Cursor out block triggers an event when the cursor is moved off of a mouse."
-#~msgstr ""
-
-#: js/SensorsBlocks.js:272
-
-#~msgid "The Cursor out block triggers an event when the cursor is moved off of a turtle."
-#~msgstr ""
-
-#: js/SensorsBlocks.js:292
-
-#~msgid "The Cursor button down block triggers an event when the curson button is press on a mouse."
-#~msgstr ""
-
-#: js/SensorsBlocks.js:299
-
-#~msgid "The Cursor button down block triggers an event when the curson button is press on a turtle."
-#~msgstr ""
-
-#: js/SensorsBlocks.js:319
-
-#~msgid "The Cursor button up block triggers an event when the cursor button is released while over a mouse."
-#~msgstr ""
-
-#: js/SensorsBlocks.js:326
-
-#~msgid "The Cursor button up block triggers an event when the cursor button is released while over a turtle."
-#~msgstr ""
-
-#: js/SensorsBlocks.js:346
-
-#~msgid "The Get blue block returns the blue component of the pixel under the mouse."
-#~msgstr ""
-
-#: js/SensorsBlocks.js:352
-
-#~msgid "The Get blue block returns the blue component of the pixel under the turtle."
-#~msgstr ""
-
-#: js/SensorsBlocks.js:379
-
-#~msgid "The Get green block returns the green component of the pixel under the mouse."
-#~msgstr ""
-
-#: js/SensorsBlocks.js:385
-
-#~msgid "The Get green block returns the green component of the pixel under the turtle."
-#~msgstr ""
-
-#: js/SensorsBlocks.js:500
-
-#~msgid "The Time block returns the number of seconds that the program has been running."
-#~msgstr ""
-
-#: js/GlobalCard.js:48
 
 #~msgid "More Details"
 #~msgstr "詳細"
 
-#: js/GlobalCard.js:54
-
 #~msgid "Share project"
 #~msgstr "プロジェクトをシェアする"
-
-#: js/GlobalCard.js:60
 
 #~msgid "Copy link to clipboard"
 #~msgstr "リンクをクリップボードにコピーする"
 
-#: js/GlobalCard.js:63
-
 #~msgid "Run project on startup."
 #~msgstr "スタートしたらプロジェクトを再生する"
-
-#: js/GlobalCard.js:64
 
 #~msgid "Show code blocks on startup."
 #~msgstr "スタートしたら、コードブロックを表示する"
 
-#: js/GlobalCard.js:65
-
 #~msgid "Collapse code blocks on startup."
 #~msgstr "スタートしたら、コードブロックを消す"
-
-#: js/GlobalCard.js:70
 
 #~msgid "Advanced Options"
 #~msgstr "上級オプション"
@@ -8220,12 +7940,8 @@ msgstr "低"
 #~msgid "Warning: Sound is only coming out from one side."
 #~msgstr "音は右か左の一つだけのスピーカから今なっています。"
 
-#: js/PitchBlocks.js:1540
-
 #~msgid "Hertz Block: Did you mean to use a Note block?"
 #~msgstr "ヘルツブロック：音符ブロックを使いますか？"
-
-#: js/musicutils.js:842
 
 #~msgid "triad (root position)"
 #~msgstr "三和音 (基本形)"
@@ -8254,35 +7970,11 @@ msgstr "低"
 #~msgid "thirteenth (root position)"
 #~msgstr "十三の和音 (基本形)"
 
-#: js/GlobalCard.js:48
-
-#~msgid "Unlike project"
-#~msgstr ""
-
-#: js/GlobalCard.js:51
-
 #~msgid "Like project"
 #~msgstr "プロジェクトに「いいね」をする"
 
-#: js/GlobalPlanet.js:30
-
-#~msgid "Feature unavailable - cannot connect to server. Reload Turtle Blocks to try again."
-#~msgstr ""
-
-#: js/Publisher.js:179
-
 #~msgid "Republish Project"
 #~msgstr "プロジェクトを再度公開する"
-
-#: js/blocks.js:2379
-
-#~msgid "audio file1"
-#~msgstr ""
-
-#: js/blocks.js:2387
-
-#~msgid "audio file2"
-#~msgstr ""
 
 #~msgid "dominant seventh"
 #~msgstr "セブンス"
@@ -8293,221 +7985,104 @@ msgstr "低"
 #~msgid "major seventh"
 #~msgstr "メジャー・セブンス"
 
-#: js/turtle-singer.js:1793
-
 #~msgid "Warning: Note value greater than 2."
 #~msgstr "注意：音の長さは2より大きいです。"
-
-#: js/IntervalsBlocks.js:537
 
 #~msgid "chord5"
 #~msgstr "５度の和音"
 
-#: js/IntervalsBlocks.js:543
-
 #~msgid "chord4"
 #~msgstr "4度の和音"
-
-#: js/IntervalsBlocks.js:549
 
 #~msgid "chord1"
 #~msgstr "1度の和音"
 
-#: js/SensorsBlocks.js:535
-
-#~msgid "The Cursor Y block returns the vertical position of the turtle."
-#~msgstr ""
-
-#: js/SensorsBlocks.js:567
-
-#~msgid "The Cursor X block returns the horizontal position of the turtle."
-#~msgstr ""
-
-#: js/EnsembleBlocks.js:1174
-
-#~msgid "The Nth-Turtlee name block returns the name of the nth turtle."
-#~msgstr ""
-
-#: js/turtledefs.js:538
-
 #~msgid "Run fast"
 #~msgstr "実行"
-
-#: js/turtledefs.js:652
 
 #~msgid "Expand/collapse collapsible blocks"
 #~msgstr "膨らむブロックを 表示/非表示"
 
-#: js/EnsembleBlocks.js:819
-
 #~msgid "The Nth-Mouse name block returns the name of the nth mice."
 #~msgstr "「何匹目のネズミの名前」のブロックは数字によってそのネズミの名前を表す。"
-
-#: js/activity.js:364
 
 #~msgid "search for blocks"
 #~msgstr "ブロックをさがす"
 
-#: js/activity.js:3298
-
 #~msgid "Please set browser zoom level to 100%"
 #~msgstr "ブラウザ表示を100%に設定してください。"
-
-#: js/SaveInterface.js:47
 
 #~msgid "To run this project, open Music Blocks in a web browser and drag and drop this file into the browser window."
 #~msgstr "このプロジェクトをひらくには、ミュージック・ブロックスにアクセスし、このファイルをアプリケーションのウィンドウにドラッグするか、"
 
-#: js/blocks.js:6143
-
 #~msgid "You must always have at least one start block."
 #~msgstr "スタートブロックは、１つ以上残しておいてください。"
-
-#: js/sampler.js:406
 
 #~msgid "pitch up"
 #~msgstr "音の高さを上げる"
 
-#: js/sampler.js:416
-
 #~msgid "pitch down"
 #~msgstr "音の高さを下げる"
-
-#: js/sampler.js:424
-
-#~msgid "accidental up"
-#~msgstr ""
-
-#: js/sampler.js:434
-
-#~msgid "accidental down"
-#~msgstr ""
-
-#: js/sampler.js:441
-
-#~msgid "octave up"
-#~msgstr ""
-
-#: js/sampler.js:451
-
-#~msgid "octave down"
-#~msgstr ""
-
-#: plugins/finance.rtp:28
 
 #~msgid "currency"
 #~msgstr "通貨"
 
-#: plugins/finance.rtp:28
-
-#: plugins/bitcoin.rtp:27
-
 #~msgid "from"
 #~msgstr "から"
-
-#: plugins/finance.rtp:69
 
 #~msgid "stock price"
 #~msgstr "株価"
 
-#: plugins/translate.rtp:73
-
 #~msgid "translate"
 #~msgstr "翻訳"
-
-#: plugins/translate.rtp:78
-
-#: plugins/translate.rtp:89
 
 #~msgid "hello"
 #~msgstr "こんにちは"
 
-#: plugins/translate.rtp:84
-
 #~msgid "detect lang"
 #~msgstr "言語を検出"
-
-#: plugins/translate.rtp:95
 
 #~msgid "set lang"
 #~msgstr "言語を設定"
 
-#: plugins/gmap.rtp:30
-
 #~msgid "city latitude"
 #~msgstr "市の緯度"
-
-#: plugins/gmap.rtp:40
 
 #~msgid "city longitude"
 #~msgstr "市の経度"
 
-#: plugins/gmap.rtp:71
-
-#: plugins/gmap.rtp:74
-
-#: plugins/gmap.rtp:104
-
-#: plugins/gmap.rtp:107
-
 #~msgid "Coordinate data not available."
 #~msgstr "座標データが見つかりません"
-
-#: plugins/gmap.rtp:116
 
 #~msgid "Google map"
 #~msgstr "グーグルマップ"
 
-#: plugins/gmap.rtp:116
-
-#: plugins/gmap.rtp:160
-
 #~msgid "coordinates"
 #~msgstr "座標"
-
-#: plugins/gmap.rtp:116
 
 #~msgid "zoom factor"
 #~msgstr "ズームファクター"
 
-#: plugins/gmap.rtp:144
-
 #~msgid "zoom"
 #~msgstr "ズーム"
-
-#: plugins/gmap.rtp:160
 
 #~msgid "latitude"
 #~msgstr "緯度"
 
-#: plugins/gmap.rtp:160
-
 #~msgid "longitude"
 #~msgstr "経度"
-
-#: plugins/maths.rtp:74
 
 #~msgid "degrees"
 #~msgstr "温度"
 
-#: plugins/maths.rtp:76
-
 #~msgid "radians"
 #~msgstr "ラジアン"
-
-#: plugins/dictionary.rtp:25
 
 #~msgid "define"
 #~msgstr "定義"
 
-#: plugins/bitcoin.rtp:27
-
 #~msgid "bitcoin"
 #~msgstr "ビットコイン"
-
-#: plugins/heap.rtp:81
-
-#: plugins/heap.rtp:85
 
 #~msgid "You need to select a file."
 #~msgstr "ファイルを選ぶ必要があります"
@@ -8515,148 +8090,74 @@ msgstr "低"
 #~msgid "accidental-override"
 #~msgstr "変化記号を無効"
 
-#: js/activity.js:1618
-
 #~msgid "show treble"
 #~msgstr "トレブル記号を表示"
-
-#: js/activity.js:1621
 
 #~msgid "hide Polar"
 #~msgstr "中心の角度をかくす"
 
-#: js/activity.js:1628
-
-#: js/activity.js:1652
-
 #~msgid "show bass"
 #~msgstr "バス記号を表示"
-
-#: js/activity.js:1637
 
 #~msgid "show mezzo-soprano"
 #~msgstr "メゾソプラノを表示"
 
-#: js/activity.js:1642
-
 #~msgid "show alto"
 #~msgstr "アルト記号を表示"
-
-#: js/activity.js:1647
 
 #~msgid "show tenor"
 #~msgstr "テノール記号を表示"
 
-#: js/activity.js:1657
-
 #~msgid "hide bass"
 #~msgstr "バス記号を隠す"
-
-#: js/activity.js:1664
 
 #~msgid "show Polar"
 #~msgstr "ほうがんと角度を表示"
 
-#: js/activity.js:1668
-
 #~msgid "hide Cartesian"
 #~msgstr "ほうがん（ざひょう）をかくす"
-
-#: js/notation.js:296
 
 #~msgid "Lilypond cannot process tempo of "
 #~msgstr "Lilypondではこのテンポを対応できません："
 
-#: js/SaveInterface.js:283
-
 #~msgid "Save as PDF"
 #~msgstr "PDFでほぞん"
-
-#: js/lilypond.js:263
 
 #~msgid "Lilypond ignoring mode"
 #~msgstr "Lilypondはこの音階を無視します"
 
-#: js/oscilloscope.js:49
-
-#~msgid "ZOOM IN"
-#~msgstr ""
-
-#: js/oscilloscope.js:61
-
-#~msgid "ZOOM OUT"
-#~msgstr ""
-
-#: js/SaveInterface.js:503
-
 #~msgid "Do you want to save your project?"
 #~msgstr "プロジェクトをほぞんしますか"
-
-#: js/palette.js:1188
 
 #~msgid "Click to select a block."
 #~msgstr "クリックしてブロックを選んで下さい"
 
-#: js/palette.js:1205
-
-#: js/palette.js:1208
-
-#: js/palette.js:1236
-
-#: js/palette.js:1239
-
 #~msgid "hide"
 #~msgstr "隠す"
-
-#: js/palette.js:1214
-
-#: js/palette.js:1217
 
 #~msgid "show2"
 #~msgstr "表示する"
 
-#: js/palette.js:1222
-
-#: js/palette.js:1225
-
-#: js/palette.js:1250
-
-#: js/palette.js:1253
-
 #~msgid "popout"
 #~msgstr "ポップアップ"
-
-#: js/palette.js:2423
 
 #~msgid "myblocks"
 #~msgstr "自分のブロック"
 
-#: js/DrumBlocks.js:416
-
 #~msgid "Drum Block: Did you mean to use a Note block?"
 #~msgstr "ドラムブロック：音符ブロックを使いますか？"
-
-#: js/pitchtracker.js:312
 
 #~msgid "save rhythms"
 #~msgstr "リズムだけをほぞん"
 
-#: js/PitchBlocks.js:934
-
 #~msgid "Pitch Block: Did you mean to use a Note block?"
 #~msgstr "音高ブロック：音符ブロックと一緒に使いますか?"
-
-#: js/SensorsBlocks.js:195
 
 #~msgid "The Click block returns True if a mouse has been clicked."
 #~msgstr "<h2>しんぎブロック（クリック）</h2><br>マウスがクリックされたかどうかはんていする。クリックとはおされたマウスボタンが、離されたときのことを示す。クリックされていれば「真（しん）」、されていなければ「偽（ぎ）」という値になる。"
 
-#: js/BoxesBlocks.js:318
-
 #~msgid "The box2 block returns the value stored in box2."
 #~msgstr "<h2>数値ブロック</h2><br>数値ブロックとして、箱２の数値を使う。"
-
-#: js/BoxesBlocks.js:365
 
 #~msgid "The box1 block returns the value stored in box1."
 #~msgstr "<h2>数値ブロック</h2><br>数値ブロックとして、箱１の数値を使う。"
@@ -9399,12 +8900,4 @@ msgstr "低"
 #~msgid "Fullscreen"
 #~msgstr "フルスクリーン"
 
-#~msgid "Javascript editor"
-#~msgstr "ジャバスクリプト エディタ"
-
-#~msgid "Turtle Wrap off"
-#~msgstr "画面の境界を無視しない"
-
-#~msgid "Turtle Wrap on"
-#~msgstr "画面の境界を無視す"
 
