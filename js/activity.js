@@ -269,6 +269,9 @@ class Activity {
         // ID for a specific room
         this.room_id = null;
 
+        // Event for exiting the collaboration
+        this.EXIT_COLLABORATION = "exit-collaboration";
+
         this.beginnerMode = true;
         try {
             if (this.storage.beginnerMode === undefined) {
