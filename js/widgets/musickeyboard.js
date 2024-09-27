@@ -3176,8 +3176,8 @@ function MusicKeyboard(activity) {
             this.activity.blocks.loadNewBlocks(newStack);
         }
 
-        if (actionGroups > 1) this.activity.textMsg(_("New action blocks generated!"));
-        else this.activity.textMsg(_("New action block generated"));
+        if (actionGroups > 1) this.activity.textMsg(_("New action blocks generated."));
+        else this.activity.textMsg(_("New action block generated."));
     };
 
     /**

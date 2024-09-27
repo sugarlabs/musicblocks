@@ -1576,7 +1576,7 @@ function setupWidgetBlocks(activity) {
                     "aimusic"
                 ]);
     
-                //.TRANS: the speed at music is should be played.
+                //.TRANS: AI-generated music
                 this.formBlock({ name: _("aimusic"), canCollapse: true });
                 this.makeMacro((x, y) => [
                     [0, "aimusic", x, y, [null, 1]],

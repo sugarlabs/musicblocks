@@ -177,6 +177,12 @@ class PlanetInterface {
          * Closes the current project if open, initializes a new project, loads the start page, and saves the project locally.
          */
         this.newProject = () => {
+            // Exit the user from collaboration if they are in it
+            if (this.activity.collaboration.hasCollaborationStarted && !this.activity.collaboration.hasExitedCollaboration) {
+                const event = this.activity.EXIT_COLLABORATION;
+                const room_id = this.activity.room_id;
+                this.activity.collaboration.socket.emit(event, room_id);
+            }
             this.closePlanet();
             this.initialiseNewProject();
             this.activity._loadStart();

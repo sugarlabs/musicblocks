@@ -116,8 +116,8 @@ function setupIntervalsActions(activity) {
             let os = numberToStringMap[Math.abs(octave) - 1] || Math.abs(octave);
             if (totalIntervals % 12 === 0 && letterGap === 0) {
                 if (octave < 0) {
-                    if(octave===-1)os = _('a')
-                    const a = os + " " + _('perfect') + " "+ plural + " " + _("below");
+                    if (octave === -1) os = _('a')
+                    const a = os + " " + _('perfect') + " " + plural + " " + _("below");
                     return a.charAt(0).toUpperCase() + a.slice(1);
                 }
                 if (octave > 1) {
@@ -127,7 +127,7 @@ function setupIntervalsActions(activity) {
             }
             
             if (totalIntervals > 21) {
-                if (octave >=1) {
+                if (octave >= 1) {
                     lastWord = ", " + _('plus') + " " + os + " " + plural;
                 }    
                 while (totalIntervals > 12) totalIntervals -= 12;
