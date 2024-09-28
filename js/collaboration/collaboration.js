@@ -27,6 +27,7 @@ class Collaboration {
         this.PORT = "http://localhost:8080/";
         this.hasCollaborationStarted = false;
         this.updatedProjectHtml = null;
+        this.hasExitedCollaboration = false;
         this.randomNames = [
             'Macrotis',
             'Setonix',
@@ -143,6 +144,10 @@ class Collaboration {
         socket.on("block-value-updated", (update) => {
             this.activity.renderProjectFromData(update);
         });
+
+        socket.on("exit-collaboration", (userArray) => {
+            this.exitCollaboration(userArray);
+        })
     };
 
     // Generate a random name for the user
@@ -152,6 +157,15 @@ class Collaboration {
         const suffix = Math.floor(Math.random() * 50);
         const name = prefix + suffix;
         return name;
+    }
+
+    // Exit the user from collaboration room
+    exitCollaboration = (userArray) => {
+        for (let i = 0; i < userArray.length; i++) {
+            this.activity.collabCursor.removeCursor(userArray[i]);
+        };
+        this.hasExitedCollaboration = true;
+        this.socket.disconnect();
     }
 
     // Start the collaboration
