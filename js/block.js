@@ -22,9 +22,8 @@
    DISABLEDFILLCOLOR, DISABLEDSTROKECOLOR, docById, DOUBLEFLAT,
    DOUBLESHARP, DRUMNAMES, EASTINDIANSOLFNOTES, EFFECTSNAMES,
    EXPANDBUTTON, FILTERTYPES, FLAT, getDrumName, getDrumSynthName,
-   getModeNumbers, getNoiseName, getNoiseSynthName, getTemperament,
-   getTemperamentKeys, getTemperamentsList, getTextWidth,
-   getVoiceSynthName, hideDOMLabel, HIGHLIGHTSTROKECOLORS,
+   getModeNumbers, getNoiseName, getTemperament,
+   getTemperamentKeys, getTemperamentsList, getTextWidth, hideDOMLabel, HIGHLIGHTSTROKECOLORS,
    i18nSolfege, INVERTMODES, isCustomTemperament, last, MEDIASAFEAREA,
    NATURAL, NOISENAMES, NSYMBOLS, NUMBERBLOCKDEFAULT, OSCTYPES,
    PALETTEFILLCOLORS, PALETTEHIGHLIGHTCOLORS, PALETTESTROKECOLORS,
@@ -228,7 +227,7 @@ const _blockMakeBitmap = (data, callback, args) => {
         callback(bitmap, args);
     };
 
-    img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
+    img.src = "data:image/svg+xml;base64," + window.btoa(COLLAPSEBUTTON);
 };
 
 /**
@@ -966,8 +965,7 @@ class Block {
 
         if (this.image.search("xmlns") !== -1) {
             image.src =
-                "data:image/svg+xml;base64," +
-                window.btoa(base64Encode(this.image));
+                "data:image/svg+xml;base64," + window.btoa(this.image);
         } else {
             image.src = this.image;
         }
@@ -1519,7 +1517,7 @@ class Block {
 
             image.src =
                 "data:image/svg+xml;base64," +
-                window.btoa(base64Encode(COLLAPSEBUTTON));
+                window.btoa(COLLAPSEBUTTON);
         };
 
         /**
@@ -1552,7 +1550,7 @@ class Block {
 
             image.src =
                 "data:image/svg+xml;base64," +
-                window.btoa(base64Encode(EXPANDBUTTON));
+                window.btoa(EXPANDBUTTON);
         };
 
         /**
@@ -2942,9 +2940,9 @@ class Block {
             if (
                 that?.name === "vspace" &&
                 that.blocks.blockList[that.connections[1]]?.name === "rest2"
-              ) {
+            ) {
                 return;
-              }
+            }
 
             // Do not allow a stack of blocks to be dragged if the stack contains a silence block.
             let block = that.blocks.blockList[that.connections[1]];
@@ -3382,21 +3380,20 @@ class Block {
 
         const labelElem = docById("labelDiv");
 
-        var safetext = function(text){
+        const safetext = (text) => {
             // Best to avoid using these special characters in text strings
             // without first converting them to their "safe" form.
-            var table = {
-                '<': 'lt',
-                '>': 'gt',
-                '"': 'quot',
-                '\'': 'apos',
-                '&': 'amp',
-                '\r': '#10',
-                '\n': '#13'
+            const table = {
+                "<": "lt",
+                ">": "gt",
+                '"': "quot",
+                "'": "apos",
+                "&": "amp",
+                "\r": "#10",
+                "\n": "#13"
             };
-        
-            return text.toString().replace(/[<>"'\r\n&]/g, function(chr){
-                return '&' + table[chr] + ';';
+            return text.toString().replace(/[<>"'\r\n&]/g, (chr) => {
+                return "&" + table[chr] + ";";
             });
         };
 

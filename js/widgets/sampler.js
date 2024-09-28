@@ -970,7 +970,7 @@ function SampleWidget() {
                 canvasCtx.fillRect(0, 0, width, height);
 
                 let oscText;
-                if (turtleIdx > 0) {
+                if (turtleIdx >= 0) {
                     //.TRANS: The sound sample that the user uploads.
                     oscText = this.sampleName != "" ? this.sampleName : _("sample");
                 }
