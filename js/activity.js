@@ -6112,7 +6112,7 @@ class Activity {
 
             document.addEventListener("mousemove", (event) => {
                 this.hasMouseMoved = true;
-                event.preventDefault();
+                // event.preventDefault();
                 // this.selectedBlocks = [];
                 if (this.isDragging){
                     this.currentX = event.clientX;
