@@ -1774,9 +1774,11 @@ function TemperamentWidget() {
         for (let i = 0; i < this.pitchNumber; i++) {
             const idx = newStack.length;
             if (
-                this.inTemperament === "equal" ||
+               (this.inTemperament === "equal" || this.inTemperament === "equal5" ||
+                this.inTemperament === "equal7" || this.inTemperament === "equal19" ||
+                this.inTemperament === "equal31" ) ||
                 this.inTemperament === "1/3 comma meantone" ||
-                (this.typeOfEdit === "equal" && this.divisions === this.pitchNumber)
+               (this.typeOfEdit === "equal" && this.divisions === this.pitchNumber)
             ) {
                 newStack.push([
                     idx,
