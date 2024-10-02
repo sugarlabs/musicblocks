@@ -1,0 +1,24 @@
+name: musicblocks
+services:
+  musicblocks:
+    build: https://github.com/sugarlabs/musicblocks.git#collaboration
+    ports: 
+      - "3000:3000"
+    #command: ["python", "-m", "http.server", "3000", "--bind", "0.0.0.0"]
+    env_file:
+     - ./environment
+  #planet-server:
+  #    build:
+  #        dockerfile: ./planet-server/Dockerfile
+      #volumes:
+      #  - planet-server/planet.sql:
+  collaboration-server:
+    #build: https://github.com/sugarlabs/collaboration-server.git
+    build:
+        dockerfile: ./collaboration-server/Dockerfile
+    volumes:
+      - .:/collaboration-server
+    environment:
+      NODE_ENV: development
+    #command: ["npm", "run", "server"]
+    command: ["npm", "run", "serve"]

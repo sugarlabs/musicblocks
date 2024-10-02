@@ -24,7 +24,8 @@ class Collaboration {
         this.attempts = 0;
         this.socket = null;
         this.blockList = this.activity.blocks.blockList;
-        this.PORT = "http://localhost:8080/";
+        this.HOST = process.env.COLLAB_HOST;
+        this.PORT = "8080";
         this.hasCollaborationStarted = false;
         this.updatedProjectHtml = null;
         this.randomNames = [
@@ -63,7 +64,7 @@ class Collaboration {
     // Make calls to the socket server
     makeConnection = (room_id, name) => {
         // connect to the local server
-        const socket = io(this.PORT);
+        const socket = io(this.HOST.concat(";", this.PORT));
         socket.on("connect", () => {
             this.socket = socket;
             try {
