@@ -24,8 +24,8 @@
 class ServerInterface {
 
     constructor(Planet) {
-        // this.ServerURL = "https://musicblocks.sugarlabs.org/planet-server/index.php";
-        this.ServerURL = "http://0.0.0.0:8080/planet-server/index.php";
+        this.ServerURL = "https://musicblocks.sugarlabs.org/planet-server/index.php";
+        // this.ServerURL = "http://0.0.0.0:8080/planet-server/index.php";
         this.ConnectionFailureData = {"success": false, "error": "ERROR_CONNECTION_FAILURE"};
         this.APIKey = "3f2d3a4c-c7a4-4c3c-892e-ac43784f7381";
     }
@@ -35,7 +35,6 @@ class ServerInterface {
 
         // eslint-disable-next-line no-unused-vars
         const req = jQuery.ajax({
-            dataType: 'jsonp',
             type: "POST",
             url: this.ServerURL,
             data: data
