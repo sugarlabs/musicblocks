@@ -1,5 +1,3 @@
-msgid ""
-msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-05-17 00:31-0400\n"
@@ -2131,6 +2129,9 @@ msgstr ""
 #: js/SaveInterface.js:59
 #: js/SaveInterface.js:61
 #: js/SaveInterface.js:93
+#: js/SaveInterface.js:59
+#: js/SaveInterface.js:61
+#: js/SaveInterface.js:93
 msgid "Music Blocks Project"
 msgstr ""
 
@@ -2286,7 +2287,7 @@ msgstr ""
 #: js/turtledefs.js:121
 #: js/turtledefs.js:223
 #: js/block-verbose.js:2622
-#: js/block.js:2550
+#: js/block.js:2546
 #: js/blocks/IntervalsBlocks.js:63
 #: js/blocks/SensorsBlocks.js:178
 #: js/blocks/PitchBlocks.js:1839
@@ -2342,10 +2343,6 @@ msgstr ""
 #: js/block-verbose.js:4559
 #: js/block-verbose.js:4577
 #: js/block-verbose.js:4588
-#: js/block.js:1573
-#: js/block.js:4483
-#: js/block.js:4501
-#: js/block.js:4512
 #: js/blocks.js:1018
 #: js/blocks.js:3491
 #: js/blocks.js:3492
@@ -2368,6 +2365,10 @@ msgstr ""
 #: js/palette.js:1151
 #: js/palette.js:1162
 #: js/palette.js:1181
+#: js/block.js:1569
+#: js/block.js:4478
+#: js/block.js:4496
+#: js/block.js:4507
 #: js/blocks/ActionBlocks.js:254
 #: js/blocks/ActionBlocks.js:307
 #: js/blocks/ActionBlocks.js:617
@@ -2920,11 +2921,11 @@ msgstr ""
 #: js/turtle-painter.js:1193
 #: js/turtles.js:118
 #: js/block-verbose.js:1623
-#: js/block.js:1587
 #: js/lilypond.js:749
 #: js/lilypond.js:913
 #: js/lilypond.js:951
 #: js/logo.js:1184
+#: js/block.js:1583
 #: js/blocks/ActionBlocks.js:1223
 #: js/blocks/ProgramBlocks.js:1267
 msgid "start"
@@ -2975,12 +2976,12 @@ msgstr ""
 #: js/turtledefs.js:228
 #: js/block-verbose.js:1700
 #: js/block-verbose.js:2626
-#: js/block.js:1664
-#: js/block.js:2554
 #: js/lilypond.js:732
 #: js/lilypond.js:897
 #: js/lilypond.js:941
 #: js/palette.js:577
+#: js/block.js:1660
+#: js/block.js:2550
 #: js/blocks/RhythmBlocks.js:766
 #: js/blocks/DrumBlocks.js:477
 #: js/blocks/VolumeBlocks.js:502
@@ -3440,50 +3441,50 @@ msgstr ""
 
 #: js/block-verbose.js:1616
 #: js/block-verbose.js:1735
-#: js/block.js:1580
-#: js/block.js:1699
 #: js/palette.js:605
+#: js/block.js:1576
+#: js/block.js:1695
 #: js/blocks/IntervalsBlocks.js:63
 #: js/blocks/WidgetBlocks.js:259
 msgid "temperament"
 msgstr ""
 
 #: js/block-verbose.js:1630
-#: js/block.js:1594
+#: js/block.js:1590
 msgid "matrix"
 msgstr ""
 
 #: js/block-verbose.js:1637
-#: js/block.js:1601
+#: js/block.js:1597
 #: js/blocks/WidgetBlocks.js:1509
 #: plugins/rodi.rtp:324
 msgid "status"
 msgstr ""
 
 #: js/block-verbose.js:1644
-#: js/block.js:1608
+#: js/block.js:1604
 msgid "drum mapper"
 msgstr ""
 
 #: js/block-verbose.js:1651
-#: js/block.js:1615
+#: js/block.js:1611
 msgid "ruler"
 msgstr ""
 
 #: js/block-verbose.js:1658
-#: js/block.js:1622
+#: js/block.js:1618
 #: js/blocks/WidgetBlocks.js:397
 #.TRANS: timbre is the character or quality of a musical sound
 msgid "timbre"
 msgstr ""
 
 #: js/block-verbose.js:1665
-#: js/block.js:1629
+#: js/block.js:1625
 msgid "stair"
 msgstr ""
 
 #: js/block-verbose.js:1672
-#: js/block.js:1636
+#: js/block.js:1632
 #: js/blocks/WidgetBlocks.js:707
 #.TRANS: the speed at music is should be played.
 msgid "tempo"
@@ -3491,26 +3492,26 @@ msgstr ""
 
 #: js/block-verbose.js:1679
 #: js/block-verbose.js:1742
-#: js/block.js:1643
-#: js/block.js:1706
+#: js/block.js:1639
+#: js/block.js:1702
 #: js/blocks/IntervalsBlocks.js:1464
 #.TRANS: mode, e.g., Major in C Major
 msgid "mode"
 msgstr ""
 
 #: js/block-verbose.js:1686
-#: js/block.js:1650
+#: js/block.js:1646
 msgid "slider"
 msgstr ""
 
 #: js/block-verbose.js:1693
-#: js/block.js:1657
+#: js/block.js:1653
 #: js/blocks/SensorsBlocks.js:1001
 msgid "keyboard"
 msgstr ""
 
 #: js/block-verbose.js:1707
-#: js/block.js:1671
+#: js/block.js:1667
 #: js/blocks/WidgetBlocks.js:1190
 #: js/blocks/WidgetBlocks.js:1228
 #.TRANS: widget for subdividing a measure into distinct rhythmic elements
@@ -3520,9 +3521,9 @@ msgstr ""
 #: js/block-verbose.js:1714
 #: js/block-verbose.js:2457
 #: js/block-verbose.js:2514
-#: js/block.js:1678
-#: js/block.js:2385
-#: js/block.js:2442
+#: js/block.js:1674
+#: js/block.js:2381
+#: js/block.js:2438
 #: js/blocks/MeterBlocks.js:1367
 #: js/blocks/OrnamentBlocks.js:220
 #: js/blocks/OrnamentBlocks.js:312
@@ -3548,9 +3549,9 @@ msgstr ""
 #: js/block-verbose.js:1721
 #: js/block-verbose.js:2382
 #: js/block-verbose.js:2405
-#: js/block.js:1685
-#: js/block.js:2310
-#: js/block.js:2333
+#: js/block.js:1681
+#: js/block.js:2306
+#: js/block.js:2329
 #: js/blocks/IntervalsBlocks.js:1071
 #: js/blocks/OrnamentBlocks.js:312
 #.TRANS: calculate a relative step between notes based on semi-tones
@@ -3558,7 +3559,7 @@ msgid "scalar interval"
 msgstr ""
 
 #: js/block-verbose.js:1728
-#: js/block.js:1692
+#: js/block.js:1688
 #: js/blocks/RhythmBlocks.js:148
 msgid "milliseconds"
 msgstr ""
@@ -3567,10 +3568,10 @@ msgstr ""
 #: js/block-verbose.js:2459
 #: js/block-verbose.js:2512
 #: js/block-verbose.js:2628
+#: js/block.js:2379
 #: js/block.js:2383
-#: js/block.js:2387
-#: js/block.js:2440
-#: js/block.js:2556
+#: js/block.js:2436
+#: js/block.js:2552
 #: js/blocks/RhythmBlocks.js:712
 #: js/blocks/ProgramBlocks.js:1273
 #: js/widgets/rhythmruler.js:1183
@@ -3581,13 +3582,13 @@ msgstr ""
 #: js/block-verbose.js:2548
 #: js/block-verbose.js:3492
 #: js/block-verbose.js:3509
+#: js/block.js:2472
+#: js/block.js:3411
+#: js/block.js:3428
 #: js/activity.js:2718
 #: js/activity.js:2769
-#: js/block.js:2476
-#: js/block.js:3416
-#: js/block.js:3433
-#: js/utils/musicutils.js:3780
-#: js/utils/musicutils.js:5273
+#: js/utils/musicutils.js:3961
+#: js/utils/musicutils.js:5454
 #.TRANS: the note names must be separated by single spaces
 #.TRANS: the note names must be separated by single spaces
 #.TRANS: the note names must be separated by single spaces
@@ -3595,27 +3596,27 @@ msgid "ti la sol fa mi re do"
 msgstr ""
 
 #: js/block-verbose.js:2616
-#: js/block.js:2544
+#: js/block.js:2540
 #.TRANS: scalar step
 #.TRANS: scalar step
 msgid "down"
 msgstr ""
 
 #: js/block-verbose.js:2617
-#: js/block.js:2545
+#: js/block.js:2541
 msgid "up"
 msgstr ""
 
 #: js/block-verbose.js:3026
-#: js/block.js:2950
+#: js/block.js:2946
 msgid "Silence block cannot be removed."
 msgstr ""
 
 #: js/block-verbose.js:3824
-#: js/block.js:3748
 #: js/blocks.js:2607
 #: js/blocks.js:3218
 #: js/palette.js:618
+#: js/block.js:3743
 #: js/blocks/BooleanBlocks.js:77
 #: js/blocks/BooleanBlocks.js:167
 #: js/blocks/BooleanBlocks.js:251
@@ -3632,9 +3633,9 @@ msgid "true"
 msgstr ""
 
 #: js/block-verbose.js:3824
-#: js/block.js:3748
 #: js/blocks.js:2609
 #: js/blocks.js:3220
+#: js/block.js:3743
 #: js/blocks/BooleanBlocks.js:79
 #: js/blocks/BooleanBlocks.js:169
 #: js/blocks/BooleanBlocks.js:253
@@ -3651,349 +3652,102 @@ msgstr ""
 
 #: js/block-verbose.js:3835
 #: js/block-verbose.js:3848
-#: js/block.js:3759
-#: js/block.js:3772
+#: js/block.js:3754
+#: js/block.js:3767
 #: js/blocks/ExtrasBlocks.js:615
 msgid "Cartesian"
 msgstr ""
 
 #: js/block-verbose.js:3836
 #: js/block-verbose.js:3849
-#: js/block.js:3760
-#: js/block.js:3773
+#: js/block.js:3755
+#: js/block.js:3768
 #: js/blocks/ExtrasBlocks.js:619
 msgid "polar"
 msgstr ""
 
 #: js/block-verbose.js:3837
 #: js/block-verbose.js:3850
-#: js/block.js:3761
-#: js/block.js:3774
+#: js/block.js:3756
+#: js/block.js:3769
 #: js/blocks/ExtrasBlocks.js:623
 msgid "Cartesian+polar"
 msgstr ""
 
 #: js/block-verbose.js:3838
 #: js/block-verbose.js:3857
-#: js/block.js:3762
-#: js/block.js:3781
+#: js/block.js:3757
+#: js/block.js:3776
 #: js/blocks/ExtrasBlocks.js:652
 msgid "none"
 msgstr ""
 
 #: js/block-verbose.js:3851
-#: js/block.js:3775
+#: js/block.js:3770
 #: js/blocks/ExtrasBlocks.js:628
 msgid "treble"
 msgstr ""
 
 #: js/block-verbose.js:3852
-#: js/block.js:3776
+#: js/block.js:3771
 #: js/blocks/ExtrasBlocks.js:632
 msgid "grand staff"
 msgstr ""
 
 #: js/block-verbose.js:3853
-#: js/block.js:3777
+#: js/block.js:3772
 #: js/blocks/ExtrasBlocks.js:636
 msgid "mezzo-soprano"
 msgstr ""
 
 #: js/block-verbose.js:3854
-#: js/block.js:3778
+#: js/block.js:3773
 #: js/blocks/ExtrasBlocks.js:640
 msgid "alto"
 msgstr ""
 
 #: js/block-verbose.js:3855
-#: js/block.js:3779
+#: js/block.js:3774
 #: js/blocks/ExtrasBlocks.js:644
 msgid "tenor"
 msgstr ""
 
 #: js/block-verbose.js:3856
-#: js/block.js:3780
-#: js/utils/musicutils.js:1115
+#: js/block.js:3775
 #: js/utils/synthutils.js:80
+#: js/utils/musicutils.js:1115
 #: js/blocks/ExtrasBlocks.js:648
 #.TRANS: musical instrument
 msgid "bass"
 msgstr ""
 
 #: js/block-verbose.js:3901
-#: js/block.js:3825
 #: js/blocks.js:2600
 #: js/blocks.js:3211
+#: js/block.js:3820
 msgid "on2"
 msgstr ""
 
 #: js/block-verbose.js:3903
-#: js/block.js:3827
 #: js/blocks.js:2602
 #: js/blocks.js:3213
+#: js/block.js:3822
 msgid "off"
 msgstr ""
 
 #: js/block-verbose.js:4470
-#: js/block.js:4394
+#: js/block.js:4389
 msgid "Not a number"
 msgstr ""
 
 #: js/block-verbose.js:4477
-#: js/block.js:4401
+#: js/block.js:4396
 msgid "Octave value must be between 1 and 10."
 msgstr ""
 
 #: js/block-verbose.js:4485
-#: js/block.js:4409
+#: js/block.js:4404
 msgid "Numbers can have at most 10 digits."
-msgstr ""
-
-#: js/activity.js:390
-#: js/activity.js:395
-msgid "Search for blocks"
-msgstr ""
-
-#: js/activity.js:1413
-msgid "Refresh your browser to change to advanced mode."
-msgstr ""
-
-#: js/activity.js:1418
-msgid "Refresh your browser to change to beginner mode."
-msgstr ""
-
-#: js/activity.js:1477
-msgid "Catching mice"
-msgstr ""
-
-#: js/activity.js:1478
-msgid "Cleaning the instruments"
-msgstr ""
-
-#: js/activity.js:1479
-msgid "Testing key pieces"
-msgstr ""
-
-#: js/activity.js:1480
-msgid "Sight-reading"
-msgstr ""
-
-#: js/activity.js:1481
-msgid "Combining math and music"
-msgstr ""
-
-#: js/activity.js:1482
-msgid "Generating more blocks"
-msgstr ""
-
-#: js/activity.js:1483
-msgid "Do Re Mi Fa Sol La Ti Do"
-msgstr ""
-
-#: js/activity.js:1484
-msgid "Tuning string instruments"
-msgstr ""
-
-#: js/activity.js:1485
-msgid "Pressing random keys"
-msgstr ""
-
-#: js/activity.js:1663
-msgid "plugins will be removed upon restart."
-msgstr ""
-
-#: js/activity.js:1672
-msgid "show Cartesian"
-msgstr ""
-
-#: js/activity.js:2211
-#: js/palette.js:589
-#: js/blocks/RhythmBlocks.js:923
-#: js/blocks/PitchBlocks.js:442
-#: js/blocks/PitchBlocks.js:1786
-#.TRANS: a numeric mapping of the notes in an octave based on the musical mode
-msgid "scale degree"
-msgstr ""
-
-#: js/activity.js:2214
-#: js/palette.js:598
-msgid "voice name"
-msgstr ""
-
-#: js/activity.js:2217
-#: js/palette.js:595
-msgid "invert mode"
-msgstr ""
-
-#: js/activity.js:2220
-msgid "output tools"
-msgstr ""
-
-#: js/activity.js:2223
-msgid "custom note"
-msgstr ""
-
-#: js/activity.js:2226
-msgid "accidental name"
-msgstr ""
-
-#: js/activity.js:2229
-#: js/blocks/PitchBlocks.js:855
-msgid "east indian solfege"
-msgstr ""
-
-#: js/activity.js:2232
-#: js/blocks/PitchBlocks.js:869
-msgid "note name"
-msgstr ""
-
-#: js/activity.js:2235
-#: js/blocks/IntervalsBlocks.js:94
-msgid "temperament name"
-msgstr ""
-
-#: js/activity.js:2238
-#: js/palette.js:592
-msgid "mode name"
-msgstr ""
-
-#: js/activity.js:2241
-msgid "chord name"
-msgstr ""
-
-#: js/activity.js:2244
-#: js/palette.js:615
-msgid "interval name"
-msgstr ""
-
-#: js/activity.js:2247
-msgid "filter type"
-msgstr ""
-
-#: js/activity.js:2250
-msgid "oscillator type"
-msgstr ""
-
-#: js/activity.js:2253
-#: js/blocks.js:2479
-#: js/blocks.js:2487
-msgid "audio file"
-msgstr ""
-
-#: js/activity.js:2256
-#: js/blocks/DrumBlocks.js:32
-msgid "noise name"
-msgstr ""
-
-#: js/activity.js:2259
-#: js/blocks/DrumBlocks.js:75
-msgid "drum name"
-msgstr ""
-
-#: js/activity.js:2262
-#: js/blocks/DrumBlocks.js:119
-msgid "effects name"
-msgstr ""
-
-#: js/activity.js:2265
-msgid "wrap mode"
-msgstr ""
-
-#: js/activity.js:2268
-msgid "load file"
-msgstr ""
-
-#: js/activity.js:2435
-#: js/activity.js:5851
-msgid "This block is deprecated."
-msgstr ""
-
-#: js/activity.js:2437
-#: js/activity.js:5853
-msgid "Block cannot be found."
-msgstr ""
-
-#: js/activity.js:2645
-msgid "Saving block artwork"
-msgstr ""
-
-#: js/activity.js:2656
-msgid "Erase"
-msgstr ""
-
-#: js/activity.js:2683
-#: js/activity.js:2705
-msgid "Paste"
-msgstr ""
-
-#: js/activity.js:2687
-msgid "Save block help"
-msgstr ""
-
-#: js/activity.js:2772
-msgid "Jumping to the bottom of the page."
-msgstr ""
-
-#: js/activity.js:2778
-msgid "Scrolling up."
-msgstr ""
-
-#: js/activity.js:2783
-msgid "Scrolling down."
-msgstr ""
-
-#: js/activity.js:2788
-msgid "Extracting block"
-msgstr ""
-
-#: js/activity.js:2796
-msgid "Moving block up."
-msgstr ""
-
-#: js/activity.js:2817
-msgid "Moving block down."
-msgstr ""
-
-#: js/activity.js:2838
-msgid "Moving block left."
-msgstr ""
-
-#: js/activity.js:2855
-msgid "Moving block right."
-msgstr ""
-
-#: js/activity.js:2870
-msgid "Jump to home position."
-msgstr ""
-
-#: js/activity.js:2897
-msgid "Hide blocks"
-msgstr ""
-
-#: js/activity.js:4500
-msgid "Click the run button to run the project."
-msgstr ""
-
-#: js/activity.js:5692
-msgid "Show/hide block"
-msgstr ""
-
-#: js/activity.js:5698
-msgid "Expand/collapse blocks"
-msgstr ""
-
-#: js/activity.js:5976
-msgid "Could not parse JSON input."
-msgstr ""
-
-#: js/activity.js:6475
-#: js/activity.js:6580
-#: js/activity.js:6631
-msgid "Cannot load project from the file. Please check the file type."
-msgstr ""
-
-#: js/activity.js:6917
-msgid "Invalid parameters"
 msgstr ""
 
 #: js/blocks.js:1212
@@ -4021,6 +3775,12 @@ msgstr ""
 #: js/palette.js:653
 #: js/blocks/MediaBlocks.js:602
 msgid "open file"
+msgstr ""
+
+#: js/blocks.js:2479
+#: js/blocks.js:2487
+#: js/activity.js:2253
+msgid "audio file"
 msgstr ""
 
 #: js/blocks.js:3247
@@ -4185,8 +3945,8 @@ msgid "Playback is ready."
 msgstr ""
 
 #: js/macros.js:711
-#: js/utils/musicutils.js:1162
 #: js/utils/synthutils.js:202
+#: js/utils/musicutils.js:1162
 #.TRANS: animal sound effect
 msgid "duck"
 msgstr ""
@@ -4207,6 +3967,30 @@ msgstr ""
 msgid "sargam"
 msgstr ""
 
+#: js/palette.js:589
+#: js/activity.js:2211
+#: js/blocks/RhythmBlocks.js:923
+#: js/blocks/PitchBlocks.js:442
+#: js/blocks/PitchBlocks.js:1786
+#.TRANS: a numeric mapping of the notes in an octave based on the musical mode
+msgid "scale degree"
+msgstr ""
+
+#: js/palette.js:592
+#: js/activity.js:2238
+msgid "mode name"
+msgstr ""
+
+#: js/palette.js:595
+#: js/activity.js:2217
+msgid "invert mode"
+msgstr ""
+
+#: js/palette.js:598
+#: js/activity.js:2214
+msgid "voice name"
+msgstr ""
+
 #: js/palette.js:601
 #: js/blocks/PitchBlocks.js:1209
 msgid "custom pitch"
@@ -4214,6 +3998,11 @@ msgstr ""
 
 #: js/palette.js:609
 msgid "accidental"
+msgstr ""
+
+#: js/palette.js:615
+#: js/activity.js:2244
+msgid "interval name"
 msgstr ""
 
 #: js/palette.js:633
@@ -4354,6 +4143,610 @@ msgstr ""
 
 #: js/turtle-singer.js:2077
 msgid "synth cannot play chords."
+msgstr ""
+
+#: js/activity.js:390
+#: js/activity.js:395
+msgid "Search for blocks"
+msgstr ""
+
+#: js/activity.js:1413
+msgid "Refresh your browser to change to advanced mode."
+msgstr ""
+
+#: js/activity.js:1418
+msgid "Refresh your browser to change to beginner mode."
+msgstr ""
+
+#: js/activity.js:1477
+msgid "Catching mice"
+msgstr ""
+
+#: js/activity.js:1478
+msgid "Cleaning the instruments"
+msgstr ""
+
+#: js/activity.js:1479
+msgid "Testing key pieces"
+msgstr ""
+
+#: js/activity.js:1480
+msgid "Sight-reading"
+msgstr ""
+
+#: js/activity.js:1481
+msgid "Combining math and music"
+msgstr ""
+
+#: js/activity.js:1482
+msgid "Generating more blocks"
+msgstr ""
+
+#: js/activity.js:1483
+msgid "Do Re Mi Fa Sol La Ti Do"
+msgstr ""
+
+#: js/activity.js:1484
+msgid "Tuning string instruments"
+msgstr ""
+
+#: js/activity.js:1485
+msgid "Pressing random keys"
+msgstr ""
+
+#: js/activity.js:1663
+msgid "plugins will be removed upon restart."
+msgstr ""
+
+#: js/activity.js:1672
+msgid "show Cartesian"
+msgstr ""
+
+#: js/activity.js:2220
+msgid "output tools"
+msgstr ""
+
+#: js/activity.js:2223
+msgid "custom note"
+msgstr ""
+
+#: js/activity.js:2226
+msgid "accidental name"
+msgstr ""
+
+#: js/activity.js:2229
+#: js/blocks/PitchBlocks.js:855
+msgid "east indian solfege"
+msgstr ""
+
+#: js/activity.js:2232
+#: js/blocks/PitchBlocks.js:869
+msgid "note name"
+msgstr ""
+
+#: js/activity.js:2235
+#: js/blocks/IntervalsBlocks.js:94
+msgid "temperament name"
+msgstr ""
+
+#: js/activity.js:2241
+msgid "chord name"
+msgstr ""
+
+#: js/activity.js:2247
+msgid "filter type"
+msgstr ""
+
+#: js/activity.js:2250
+msgid "oscillator type"
+msgstr ""
+
+#: js/activity.js:2256
+#: js/blocks/DrumBlocks.js:32
+msgid "noise name"
+msgstr ""
+
+#: js/activity.js:2259
+#: js/blocks/DrumBlocks.js:75
+msgid "drum name"
+msgstr ""
+
+#: js/activity.js:2262
+#: js/blocks/DrumBlocks.js:119
+msgid "effects name"
+msgstr ""
+
+#: js/activity.js:2265
+msgid "wrap mode"
+msgstr ""
+
+#: js/activity.js:2268
+msgid "load file"
+msgstr ""
+
+#: js/activity.js:2435
+#: js/activity.js:5851
+msgid "This block is deprecated."
+msgstr ""
+
+#: js/activity.js:2437
+#: js/activity.js:5853
+msgid "Block cannot be found."
+msgstr ""
+
+#: js/activity.js:2645
+msgid "Saving block artwork"
+msgstr ""
+
+#: js/activity.js:2656
+msgid "Erase"
+msgstr ""
+
+#: js/activity.js:2683
+#: js/activity.js:2705
+msgid "Paste"
+msgstr ""
+
+#: js/activity.js:2687
+msgid "Save block help"
+msgstr ""
+
+#: js/activity.js:2772
+msgid "Jumping to the bottom of the page."
+msgstr ""
+
+#: js/activity.js:2778
+msgid "Scrolling up."
+msgstr ""
+
+#: js/activity.js:2783
+msgid "Scrolling down."
+msgstr ""
+
+#: js/activity.js:2788
+msgid "Extracting block"
+msgstr ""
+
+#: js/activity.js:2796
+msgid "Moving block up."
+msgstr ""
+
+#: js/activity.js:2817
+msgid "Moving block down."
+msgstr ""
+
+#: js/activity.js:2838
+msgid "Moving block left."
+msgstr ""
+
+#: js/activity.js:2855
+msgid "Moving block right."
+msgstr ""
+
+#: js/activity.js:2870
+msgid "Jump to home position."
+msgstr ""
+
+#: js/activity.js:2897
+msgid "Hide blocks"
+msgstr ""
+
+#: js/activity.js:4500
+msgid "Click the run button to run the project."
+msgstr ""
+
+#: js/activity.js:5692
+msgid "Show/hide block"
+msgstr ""
+
+#: js/activity.js:5698
+msgid "Expand/collapse blocks"
+msgstr ""
+
+#: js/activity.js:5976
+msgid "Could not parse JSON input."
+msgstr ""
+
+#: js/activity.js:6475
+#: js/activity.js:6580
+#: js/activity.js:6631
+msgid "Cannot load project from the file. Please check the file type."
+msgstr ""
+
+#: js/activity.js:6917
+msgid "Invalid parameters"
+msgstr ""
+
+#: js/utils/synthutils.js:58
+#: js/utils/musicutils.js:1131
+#: js/blocks/DrumBlocks.js:191
+#.TRANS: white noise synthesizer
+msgid "white noise"
+msgstr ""
+
+#: js/utils/synthutils.js:60
+#: js/utils/musicutils.js:1132
+#.TRANS: brown noise synthesizer
+msgid "brown noise"
+msgstr ""
+
+#: js/utils/synthutils.js:62
+#: js/utils/musicutils.js:1133
+#.TRANS: pink noise synthesizer
+msgid "pink noise"
+msgstr ""
+
+#: js/utils/synthutils.js:72
+#: js/utils/musicutils.js:1109
+#: js/blocks/VolumeBlocks.js:47
+#.TRANS: musical instrument
+msgid "piano"
+msgstr ""
+
+#: js/utils/synthutils.js:74
+#: js/utils/musicutils.js:1110
+#.TRANS: musical instrument
+msgid "violin"
+msgstr ""
+
+#: js/utils/synthutils.js:76
+#: js/utils/musicutils.js:1111
+#.TRANS: viola musical instrument
+msgid "viola"
+msgstr ""
+
+#: js/utils/synthutils.js:78
+#: js/utils/musicutils.js:1114
+#.TRANS: musical instrument
+msgid "cello"
+msgstr ""
+
+#: js/utils/synthutils.js:82
+#: js/utils/musicutils.js:1116
+#.TRANS: viola musical instrument
+msgid "double bass"
+msgstr ""
+
+#: js/utils/synthutils.js:84
+#: js/utils/musicutils.js:1117
+#: js/widgets/rhythmruler.js:2511
+#.TRANS: musical instrument
+msgid "guitar"
+msgstr ""
+
+#: js/utils/synthutils.js:86
+#: js/utils/musicutils.js:1118
+#.TRANS: musical instrument
+msgid "acoustic guitar"
+msgstr ""
+
+#: js/utils/synthutils.js:88
+#: js/utils/musicutils.js:1119
+#.TRANS: musical instrument
+msgid "flute"
+msgstr ""
+
+#: js/utils/synthutils.js:90
+#: js/utils/musicutils.js:1120
+#.TRANS: musical instrument
+msgid "clarinet"
+msgstr ""
+
+#: js/utils/synthutils.js:92
+#: js/utils/musicutils.js:1121
+#.TRANS: musical instrument
+msgid "saxophone"
+msgstr ""
+
+#: js/utils/synthutils.js:94
+#: js/utils/musicutils.js:1122
+#.TRANS: musical instrument
+msgid "tuba"
+msgstr ""
+
+#: js/utils/synthutils.js:96
+#: js/utils/musicutils.js:1123
+#.TRANS: musical instrument
+msgid "trumpet"
+msgstr ""
+
+#: js/utils/synthutils.js:98
+#: js/utils/musicutils.js:1124
+#.TRANS: musical instrument
+msgid "oboe"
+msgstr ""
+
+#: js/utils/synthutils.js:100
+#: js/utils/musicutils.js:1125
+#.TRANS: musical instrument
+msgid "trombone"
+msgstr ""
+
+#: js/utils/synthutils.js:102
+#: js/utils/musicutils.js:1163
+#.TRANS: musical instrument
+msgid "banjo"
+msgstr ""
+
+#: js/utils/synthutils.js:104
+#: js/utils/musicutils.js:1164
+#.TRANS: musical instrument
+msgid "koto"
+msgstr ""
+
+#: js/utils/synthutils.js:106
+#: js/utils/musicutils.js:1165
+#.TRANS: musical instrument
+msgid "dulcimer"
+msgstr ""
+
+#: js/utils/synthutils.js:108
+#: js/utils/musicutils.js:1166
+#.TRANS: musical instrument
+msgid "electric guitar"
+msgstr ""
+
+#: js/utils/synthutils.js:110
+#: js/utils/musicutils.js:1167
+#.TRANS: musical instrument
+msgid "bassoon"
+msgstr ""
+
+#: js/utils/synthutils.js:112
+#: js/utils/musicutils.js:1168
+#.TRANS: musical instrument
+msgid "celeste"
+msgstr ""
+
+#: js/utils/synthutils.js:114
+#: js/utils/musicutils.js:1112
+#.TRANS: xylophone musical instrument
+msgid "xylophone"
+msgstr ""
+
+#: js/utils/synthutils.js:116
+#: js/utils/musicutils.js:1126
+#.TRANS: polytone synthesizer
+msgid "electronic synth"
+msgstr ""
+
+#: js/utils/synthutils.js:118
+#: js/utils/musicutils.js:1127
+#.TRANS: simple monotone synthesizer
+msgid "simple 1"
+msgstr ""
+
+#: js/utils/synthutils.js:120
+#.TRANS: simple monotone synthesizer
+msgid "simple-2"
+msgstr ""
+
+#: js/utils/synthutils.js:122
+#.TRANS: simple monotone synthesizer
+msgid "simple-3"
+msgstr ""
+
+#: js/utils/synthutils.js:124
+#.TRANS: simple monotone synthesizer
+msgid "simple-4"
+msgstr ""
+
+#: js/utils/synthutils.js:126
+#: js/utils/musicutils.js:1100
+#: js/utils/musicutils.js:1546
+#: js/blocks/PitchBlocks.js:85
+#.TRANS: sine wave
+msgid "sine"
+msgstr ""
+
+#: js/utils/synthutils.js:128
+#: js/utils/musicutils.js:1101
+#: js/utils/musicutils.js:1547
+#: js/blocks/PitchBlocks.js:39
+#.TRANS: square wave
+msgid "square"
+msgstr ""
+
+#: js/utils/synthutils.js:130
+#: js/utils/musicutils.js:1103
+#: js/utils/musicutils.js:1549
+#: js/blocks/PitchBlocks.js:108
+#.TRANS: sawtooth wave
+msgid "sawtooth"
+msgstr ""
+
+#: js/utils/synthutils.js:132
+#: js/utils/musicutils.js:1102
+#: js/utils/musicutils.js:1548
+#: js/blocks/PitchBlocks.js:62
+#: js/blocks/ToneBlocks.js:39
+#.TRANS: triangle wave
+msgid "triangle"
+msgstr ""
+
+#: js/utils/synthutils.js:134
+#: js/utils/musicutils.js:1083
+#: js/utils/musicutils.js:1134
+#: js/utils/musicutils.js:1177
+#: js/utils/musicutils.js:1199
+#: js/blocks/IntervalsBlocks.js:1124
+#: js/blocks/ToneBlocks.js:946
+#: js/blocks/VolumeBlocks.js:411
+#: js/blocks/WidgetBlocks.js:399
+#: js/blocks/WidgetBlocks.js:404
+#: js/turtleactions/VolumeActions.js:218
+#: js/widgets/modewidget.js:919
+#.TRANS: customize voice
+msgid "custom"
+msgstr ""
+
+#: js/utils/synthutils.js:136
+#: js/utils/musicutils.js:1113
+#.TRANS: vibraphone musical instrument
+msgid "vibraphone"
+msgstr ""
+
+#: js/utils/synthutils.js:148
+#: js/utils/musicutils.js:1135
+#: js/widgets/rhythmruler.js:2057
+#: js/widgets/rhythmruler.js:2319
+#.TRANS: musical instrument
+msgid "snare drum"
+msgstr ""
+
+#: js/utils/synthutils.js:150
+#: js/utils/musicutils.js:1136
+#.TRANS: musical instrument
+msgid "kick drum"
+msgstr ""
+
+#: js/utils/synthutils.js:152
+#: js/utils/musicutils.js:1137
+#.TRANS: musical instrument
+msgid "tom tom"
+msgstr ""
+
+#: js/utils/synthutils.js:154
+#: js/utils/musicutils.js:1138
+#.TRANS: musical instrument
+msgid "floor tom"
+msgstr ""
+
+#: js/utils/synthutils.js:156
+#: js/utils/musicutils.js:1139
+#.TRANS: musical instrument
+msgid "bass drum"
+msgstr ""
+
+#: js/utils/synthutils.js:158
+#: js/utils/musicutils.js:1140
+#.TRANS: a drum made from an inverted cup
+msgid "cup drum"
+msgstr ""
+
+#: js/utils/synthutils.js:160
+#: js/utils/musicutils.js:1141
+#.TRANS: musical instrument
+msgid "darbuka drum"
+msgstr ""
+
+#: js/utils/synthutils.js:162
+#.TRANS: musical instrument
+msgid "taiko"
+msgstr ""
+
+#: js/utils/synthutils.js:164
+#: js/utils/musicutils.js:1142
+#.TRANS: musical instrument
+msgid "hi hat"
+msgstr ""
+
+#: js/utils/synthutils.js:166
+#: js/utils/musicutils.js:1143
+#.TRANS: a small metal bell
+msgid "ride bell"
+msgstr ""
+
+#: js/utils/synthutils.js:168
+#: js/utils/musicutils.js:1144
+#.TRANS: musical instrument
+msgid "cow bell"
+msgstr ""
+
+#: js/utils/synthutils.js:170
+#: js/utils/musicutils.js:1147
+#.TRANS: musical instrument
+msgid "triangle bell"
+msgstr ""
+
+#: js/utils/synthutils.js:172
+#: js/utils/musicutils.js:1148
+#.TRANS: musical instrument
+msgid "finger cymbals"
+msgstr ""
+
+#: js/utils/synthutils.js:174
+#: js/utils/musicutils.js:1146
+#.TRANS: musical instrument
+msgid "japanese bell"
+msgstr ""
+
+#: js/utils/synthutils.js:176
+#: js/utils/musicutils.js:1149
+#.TRANS: a musically tuned set of bells
+msgid "chime"
+msgstr ""
+
+#: js/utils/synthutils.js:178
+#: js/utils/musicutils.js:1150
+#.TRANS: a musical instrument
+msgid "gong"
+msgstr ""
+
+#: js/utils/synthutils.js:180
+#: js/utils/musicutils.js:1151
+#.TRANS: sound effect
+msgid "clang"
+msgstr ""
+
+#: js/utils/synthutils.js:182
+#: js/utils/musicutils.js:1152
+#.TRANS: sound effect
+msgid "crash"
+msgstr ""
+
+#: js/utils/synthutils.js:184
+#: js/utils/musicutils.js:1153
+#.TRANS: sound effect
+msgid "bottle"
+msgstr ""
+
+#: js/utils/synthutils.js:186
+#: js/utils/musicutils.js:1154
+#.TRANS: sound effect
+msgid "clap"
+msgstr ""
+
+#: js/utils/synthutils.js:188
+#: js/utils/musicutils.js:1155
+#.TRANS: sound effect
+msgid "slap"
+msgstr ""
+
+#: js/utils/synthutils.js:190
+#: js/utils/musicutils.js:1156
+#.TRANS: sound effect
+msgid "splash"
+msgstr ""
+
+#: js/utils/synthutils.js:192
+#: js/utils/musicutils.js:1157
+#.TRANS: sound effect
+msgid "bubbles"
+msgstr ""
+
+#: js/utils/synthutils.js:194
+#: js/utils/musicutils.js:1158
+#.TRANS: sound effect
+msgid "raindrop"
+msgstr ""
+
+#: js/utils/synthutils.js:196
+#: js/utils/musicutils.js:1159
+#.TRANS: animal sound effect
+msgid "cat"
+msgstr ""
+
+#: js/utils/synthutils.js:198
+#: js/utils/musicutils.js:1160
+#.TRANS: animal sound effect
+msgid "cricket"
+msgstr ""
+
+#: js/utils/synthutils.js:200
+#: js/utils/musicutils.js:1161
+#.TRANS: animal sound effect
+msgid "dog"
 msgstr ""
 
 #: js/utils/musicutils.js:505
@@ -4740,22 +5133,6 @@ msgstr ""
 msgid "fibonacci"
 msgstr ""
 
-#: js/utils/musicutils.js:1083
-#: js/utils/musicutils.js:1134
-#: js/utils/musicutils.js:1177
-#: js/utils/musicutils.js:1199
-#: js/utils/synthutils.js:134
-#: js/blocks/IntervalsBlocks.js:1124
-#: js/blocks/ToneBlocks.js:946
-#: js/blocks/VolumeBlocks.js:411
-#: js/blocks/WidgetBlocks.js:399
-#: js/blocks/WidgetBlocks.js:404
-#: js/turtleactions/VolumeActions.js:218
-#: js/widgets/modewidget.js:919
-#.TRANS: customize voice
-msgid "custom"
-msgstr ""
-
 #: js/utils/musicutils.js:1085
 #: js/utils/musicutils.js:1531
 #: js/blocks/WidgetBlocks.js:176
@@ -4805,39 +5182,6 @@ msgstr ""
 msgid "peaking"
 msgstr ""
 
-#: js/utils/musicutils.js:1100
-#: js/utils/musicutils.js:1546
-#: js/utils/synthutils.js:126
-#: js/blocks/PitchBlocks.js:85
-#.TRANS: sine wave
-msgid "sine"
-msgstr ""
-
-#: js/utils/musicutils.js:1101
-#: js/utils/musicutils.js:1547
-#: js/utils/synthutils.js:128
-#: js/blocks/PitchBlocks.js:39
-#.TRANS: square wave
-msgid "square"
-msgstr ""
-
-#: js/utils/musicutils.js:1102
-#: js/utils/musicutils.js:1548
-#: js/utils/synthutils.js:132
-#: js/blocks/PitchBlocks.js:62
-#: js/blocks/ToneBlocks.js:39
-#.TRANS: triangle wave
-msgid "triangle"
-msgstr ""
-
-#: js/utils/musicutils.js:1103
-#: js/utils/musicutils.js:1549
-#: js/utils/synthutils.js:130
-#: js/blocks/PitchBlocks.js:108
-#.TRANS: sawtooth wave
-msgid "sawtooth"
-msgstr ""
-
 #: js/utils/musicutils.js:1105
 #: js/utils/musicutils.js:1312
 #: js/blocks/PitchBlocks.js:931
@@ -4863,116 +5207,6 @@ msgstr ""
 msgid "scalar"
 msgstr ""
 
-#: js/utils/musicutils.js:1109
-#: js/utils/synthutils.js:72
-#: js/blocks/VolumeBlocks.js:47
-#.TRANS: musical instrument
-msgid "piano"
-msgstr ""
-
-#: js/utils/musicutils.js:1110
-#: js/utils/synthutils.js:74
-#.TRANS: musical instrument
-msgid "violin"
-msgstr ""
-
-#: js/utils/musicutils.js:1111
-#: js/utils/synthutils.js:76
-#.TRANS: viola musical instrument
-msgid "viola"
-msgstr ""
-
-#: js/utils/musicutils.js:1112
-#: js/utils/synthutils.js:114
-#.TRANS: xylophone musical instrument
-msgid "xylophone"
-msgstr ""
-
-#: js/utils/musicutils.js:1113
-#: js/utils/synthutils.js:136
-#.TRANS: vibraphone musical instrument
-msgid "vibraphone"
-msgstr ""
-
-#: js/utils/musicutils.js:1114
-#: js/utils/synthutils.js:78
-#.TRANS: musical instrument
-msgid "cello"
-msgstr ""
-
-#: js/utils/musicutils.js:1116
-#: js/utils/synthutils.js:82
-#.TRANS: viola musical instrument
-msgid "double bass"
-msgstr ""
-
-#: js/utils/musicutils.js:1117
-#: js/utils/synthutils.js:84
-#: js/widgets/rhythmruler.js:2511
-#.TRANS: musical instrument
-msgid "guitar"
-msgstr ""
-
-#: js/utils/musicutils.js:1118
-#: js/utils/synthutils.js:86
-#.TRANS: musical instrument
-msgid "acoustic guitar"
-msgstr ""
-
-#: js/utils/musicutils.js:1119
-#: js/utils/synthutils.js:88
-#.TRANS: musical instrument
-msgid "flute"
-msgstr ""
-
-#: js/utils/musicutils.js:1120
-#: js/utils/synthutils.js:90
-#.TRANS: musical instrument
-msgid "clarinet"
-msgstr ""
-
-#: js/utils/musicutils.js:1121
-#: js/utils/synthutils.js:92
-#.TRANS: musical instrument
-msgid "saxophone"
-msgstr ""
-
-#: js/utils/musicutils.js:1122
-#: js/utils/synthutils.js:94
-#.TRANS: musical instrument
-msgid "tuba"
-msgstr ""
-
-#: js/utils/musicutils.js:1123
-#: js/utils/synthutils.js:96
-#.TRANS: musical instrument
-msgid "trumpet"
-msgstr ""
-
-#: js/utils/musicutils.js:1124
-#: js/utils/synthutils.js:98
-#.TRANS: musical instrument
-msgid "oboe"
-msgstr ""
-
-#: js/utils/musicutils.js:1125
-#: js/utils/synthutils.js:100
-#.TRANS: musical instrument
-msgid "trombone"
-msgstr ""
-
-#: js/utils/musicutils.js:1126
-#: js/utils/synthutils.js:116
-#.TRANS: polytone synthesizer
-msgid "electronic synth"
-msgstr ""
-
-#: js/utils/musicutils.js:1127
-#: js/utils/synthutils.js:118
-#.TRANS: simple monotone synthesizer
-msgid "simple 1"
-msgstr ""
-
 #: js/utils/musicutils.js:1128
 msgid "simple 2"
 msgstr ""
@@ -4985,221 +5219,8 @@ msgstr ""
 msgid "simple 4"
 msgstr ""
 
-#: js/utils/musicutils.js:1131
-#: js/utils/synthutils.js:58
-#: js/blocks/DrumBlocks.js:191
-#.TRANS: white noise synthesizer
-msgid "white noise"
-msgstr ""
-
-#: js/utils/musicutils.js:1132
-#: js/utils/synthutils.js:60
-#.TRANS: brown noise synthesizer
-msgid "brown noise"
-msgstr ""
-
-#: js/utils/musicutils.js:1133
-#: js/utils/synthutils.js:62
-#.TRANS: pink noise synthesizer
-msgid "pink noise"
-msgstr ""
-
-#: js/utils/musicutils.js:1135
-#: js/utils/synthutils.js:148
-#: js/widgets/rhythmruler.js:2057
-#: js/widgets/rhythmruler.js:2319
-#.TRANS: musical instrument
-msgid "snare drum"
-msgstr ""
-
-#: js/utils/musicutils.js:1136
-#: js/utils/synthutils.js:150
-#.TRANS: musical instrument
-msgid "kick drum"
-msgstr ""
-
-#: js/utils/musicutils.js:1137
-#: js/utils/synthutils.js:152
-#.TRANS: musical instrument
-msgid "tom tom"
-msgstr ""
-
-#: js/utils/musicutils.js:1138
-#: js/utils/synthutils.js:154
-#.TRANS: musical instrument
-msgid "floor tom"
-msgstr ""
-
-#: js/utils/musicutils.js:1139
-#: js/utils/synthutils.js:156
-#.TRANS: musical instrument
-msgid "bass drum"
-msgstr ""
-
-#: js/utils/musicutils.js:1140
-#: js/utils/synthutils.js:158
-#.TRANS: a drum made from an inverted cup
-msgid "cup drum"
-msgstr ""
-
-#: js/utils/musicutils.js:1141
-#: js/utils/synthutils.js:160
-#.TRANS: musical instrument
-msgid "darbuka drum"
-msgstr ""
-
-#: js/utils/musicutils.js:1142
-#: js/utils/synthutils.js:164
-#.TRANS: musical instrument
-msgid "hi hat"
-msgstr ""
-
-#: js/utils/musicutils.js:1143
-#: js/utils/synthutils.js:166
-#.TRANS: a small metal bell
-msgid "ride bell"
-msgstr ""
-
-#: js/utils/musicutils.js:1144
-#: js/utils/synthutils.js:168
-#.TRANS: musical instrument
-msgid "cow bell"
-msgstr ""
-
 #: js/utils/musicutils.js:1145
 msgid "japanese drum"
-msgstr ""
-
-#: js/utils/musicutils.js:1146
-#: js/utils/synthutils.js:174
-#.TRANS: musical instrument
-msgid "japanese bell"
-msgstr ""
-
-#: js/utils/musicutils.js:1147
-#: js/utils/synthutils.js:170
-#.TRANS: musical instrument
-msgid "triangle bell"
-msgstr ""
-
-#: js/utils/musicutils.js:1148
-#: js/utils/synthutils.js:172
-#.TRANS: musical instrument
-msgid "finger cymbals"
-msgstr ""
-
-#: js/utils/musicutils.js:1149
-#: js/utils/synthutils.js:176
-#.TRANS: a musically tuned set of bells
-msgid "chime"
-msgstr ""
-
-#: js/utils/musicutils.js:1150
-#: js/utils/synthutils.js:178
-#.TRANS: a musical instrument
-msgid "gong"
-msgstr ""
-
-#: js/utils/musicutils.js:1151
-#: js/utils/synthutils.js:180
-#.TRANS: sound effect
-msgid "clang"
-msgstr ""
-
-#: js/utils/musicutils.js:1152
-#: js/utils/synthutils.js:182
-#.TRANS: sound effect
-msgid "crash"
-msgstr ""
-
-#: js/utils/musicutils.js:1153
-#: js/utils/synthutils.js:184
-#.TRANS: sound effect
-msgid "bottle"
-msgstr ""
-
-#: js/utils/musicutils.js:1154
-#: js/utils/synthutils.js:186
-#.TRANS: sound effect
-msgid "clap"
-msgstr ""
-
-#: js/utils/musicutils.js:1155
-#: js/utils/synthutils.js:188
-#.TRANS: sound effect
-msgid "slap"
-msgstr ""
-
-#: js/utils/musicutils.js:1156
-#: js/utils/synthutils.js:190
-#.TRANS: sound effect
-msgid "splash"
-msgstr ""
-
-#: js/utils/musicutils.js:1157
-#: js/utils/synthutils.js:192
-#.TRANS: sound effect
-msgid "bubbles"
-msgstr ""
-
-#: js/utils/musicutils.js:1158
-#: js/utils/synthutils.js:194
-#.TRANS: sound effect
-msgid "raindrop"
-msgstr ""
-
-#: js/utils/musicutils.js:1159
-#: js/utils/synthutils.js:196
-#.TRANS: animal sound effect
-msgid "cat"
-msgstr ""
-
-#: js/utils/musicutils.js:1160
-#: js/utils/synthutils.js:198
-#.TRANS: animal sound effect
-msgid "cricket"
-msgstr ""
-
-#: js/utils/musicutils.js:1161
-#: js/utils/synthutils.js:200
-#.TRANS: animal sound effect
-msgid "dog"
-msgstr ""
-
-#: js/utils/musicutils.js:1163
-#: js/utils/synthutils.js:102
-#.TRANS: musical instrument
-msgid "banjo"
-msgstr ""
-
-#: js/utils/musicutils.js:1164
-#: js/utils/synthutils.js:104
-#.TRANS: musical instrument
-msgid "koto"
-msgstr ""
-
-#: js/utils/musicutils.js:1165
-#: js/utils/synthutils.js:106
-#.TRANS: musical instrument
-msgid "dulcimer"
-msgstr ""
-
-#: js/utils/musicutils.js:1166
-#: js/utils/synthutils.js:108
-#.TRANS: musical instrument
-msgid "electric guitar"
-msgstr ""
-
-#: js/utils/musicutils.js:1167
-#: js/utils/synthutils.js:110
-#.TRANS: musical instrument
-msgid "bassoon"
-msgstr ""
-
-#: js/utils/musicutils.js:1168
-#: js/utils/synthutils.js:112
-#.TRANS: musical instrument
-msgid "celeste"
 msgstr ""
 
 #: js/utils/musicutils.js:1170
@@ -5248,64 +5269,64 @@ msgid "half-diminished 7th"
 msgstr ""
 
 #: js/utils/musicutils.js:1557
-#: js/utils/musicutils.js:1569
+#: js/utils/musicutils.js:1573
 msgid "Equal (12EDO)"
 msgstr ""
 
 #: js/utils/musicutils.js:1558
-#: js/utils/musicutils.js:1570
-msgid "5-limit Just Intonation"
+#: js/utils/musicutils.js:1574
+msgid "Equal (5EDO)"
 msgstr ""
 
 #: js/utils/musicutils.js:1559
-#: js/utils/musicutils.js:1571
-msgid "Pythagorean (3-limit JI)"
+#: js/utils/musicutils.js:1575
+msgid "Equal (7EDO)"
 msgstr ""
 
 #: js/utils/musicutils.js:1560
+#: js/utils/musicutils.js:1576
+msgid "Equal (19EDO)"
+msgstr ""
+
 #: js/utils/musicutils.js:1561
-#: js/utils/musicutils.js:1572
-#: js/utils/musicutils.js:1573
+#: js/utils/musicutils.js:1577
+msgid "Equal (31EDO)"
+msgstr ""
+
+#: js/utils/musicutils.js:1562
+#: js/utils/musicutils.js:1578
+msgid "5-limit Just Intonation"
+msgstr ""
+
+#: js/utils/musicutils.js:1563
+#: js/utils/musicutils.js:1579
+msgid "Pythagorean (3-limit JI)"
+msgstr ""
+
+#: js/utils/musicutils.js:1564
+#: js/utils/musicutils.js:1565
+#: js/utils/musicutils.js:1580
+#: js/utils/musicutils.js:1581
 msgid "Meantone"
 msgstr ""
 
-#: js/utils/musicutils.js:1574
+#: js/utils/musicutils.js:1582
 msgid "Custom"
 msgstr ""
 
-#: js/utils/musicutils.js:5387
-#: js/utils/musicutils.js:5430
+#: js/utils/musicutils.js:5568
+#: js/utils/musicutils.js:5611
 msgid "current"
 msgstr ""
 
-#: js/utils/musicutils.js:5390
-#: js/utils/musicutils.js:5421
+#: js/utils/musicutils.js:5571
+#: js/utils/musicutils.js:5602
 msgid "next"
 msgstr ""
 
-#: js/utils/musicutils.js:5393
-#: js/utils/musicutils.js:5426
+#: js/utils/musicutils.js:5574
+#: js/utils/musicutils.js:5607
 msgid "previous"
-msgstr ""
-
-#: js/utils/synthutils.js:120
-#.TRANS: simple monotone synthesizer
-msgid "simple-2"
-msgstr ""
-
-#: js/utils/synthutils.js:122
-#.TRANS: simple monotone synthesizer
-msgid "simple-3"
-msgstr ""
-
-#: js/utils/synthutils.js:124
-#.TRANS: simple monotone synthesizer
-msgid "simple-4"
-msgstr ""
-
-#: js/utils/synthutils.js:162
-#.TRANS: musical instrument
-msgid "taiko"
 msgstr ""
 
 #: js/blocks/ActionBlocks.js:58
@@ -9308,11 +9329,11 @@ msgid "duration"
 msgstr ""
 
 #: js/widgets/musickeyboard.js:3179
-msgid "New action blocks generated"
+msgid "New action blocks generated."
 msgstr ""
 
 #: js/widgets/musickeyboard.js:3180
-msgid "New action block generated"
+msgid "New action block generated."
 msgstr ""
 
 #: js/widgets/musickeyboard.js:3365
@@ -9922,6 +9943,16 @@ msgstr ""
 #: plugins/weather.rtp:149
 msgid "low"
 msgstr ""
+
+#: js/widgets/musickeyboard.js:3179
+
+#~msgid "New action blocks generated"
+#~msgstr ""
+
+#: js/widgets/musickeyboard.js:3180
+
+#~msgid "New action block generated"
+#~msgstr ""
 
 #: js/toolbar.js:70
 
