@@ -152,8 +152,6 @@ const processABCNotes = function(logo, turtle) {
                         "\n";
                     i += 2;
                     break;
-                // fixed: how does one define pickup in ABC notation? 
-                // Fixed: how does one define multi-voice in ABC notation?
                 case "pickup":
                     {
                         // Handle pickup measure
