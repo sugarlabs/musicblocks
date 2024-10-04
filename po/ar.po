@@ -1,5 +1,7 @@
 # Walter Bender <walter@sugarlabs.org>. 2018
 #
+msgid ""
+msgstr ""
 "Project-Id-Version:\n"
 "POT-Creation-Date:\n"
 "PO-Revision-Date:\n"

@@ -2,6 +2,8 @@
 # This file is distributed under the AGPL
 # Walter Bender <walter@sugarlabs.org>, 2017.
 #
+msgid ""
+msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2012-12-28 11:07-0500\n"

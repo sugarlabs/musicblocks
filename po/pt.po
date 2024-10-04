@@ -3,6 +3,8 @@
 # This file is distributed under the AGPL
 # Walter Bender <walter@sugarlabs.org>, 2017.
 # Paulo Francisco Slomp <slomp@ufrgs.br>, 2019.
+msgid ""
+msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: 2019-01-14 23:57-0200\n"
