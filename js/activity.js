@@ -2401,7 +2401,11 @@ class Activity {
                             item.label +
                             "</a>"
                     )
-                    .appendTo(ul.css("z-index", 9999));
+                    .appendTo(ul.css({
+                        "z-index": 9999,
+                        "max-height": "200px",
+                        "overflow-y": "auto"
+                    }));
             };
             const searchInput = this.searchWidget.idInput_custom;
             if (!searchInput || searchInput.length <= 0) return;
