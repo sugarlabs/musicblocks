@@ -1,3 +1,5 @@
+msgid ""
+msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
@@ -2128,6 +2130,9 @@
 #: js/planetInterface.js:104
 #: js/planetInterface.js:104
 #: js/planetInterface.js:104
+#: js/SaveInterface.js:59
+#: js/SaveInterface.js:61
+#: js/SaveInterface.js:93
 #: js/SaveInterface.js:59
 #: js/SaveInterface.js:61
 #: js/SaveInterface.js:93

@@ -1,3 +1,5 @@
+msgid ""
+msgstr ""
 # POT file for Music Blocks
 # Copyright (C) 2017 Walter Bender
 # This file is distributed under the AGPL
@@ -19,6 +21,9 @@
 #js/toolbar.js:230
 #js/turtledefs.js:504
 #js/turtledefs.js:505
+#: js/SaveInterface.js:59
+#: js/SaveInterface.js:61
+#: js/SaveInterface.js:93
 #: js/SaveInterface.js:59
 #: js/SaveInterface.js:61
 #: js/SaveInterface.js:93

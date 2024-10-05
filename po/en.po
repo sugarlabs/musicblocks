@@ -1,3 +1,5 @@
+msgid ""
+msgstr ""
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
@@ -2133,6 +2135,9 @@
 #: js/planetInterface.js:104
 #: js/planetInterface.js:104
 #: js/planetInterface.js:104
+#: js/SaveInterface.js:59
+#: js/SaveInterface.js:61
+#: js/SaveInterface.js:93
 #: js/SaveInterface.js:59
 #: js/SaveInterface.js:61
 #: js/SaveInterface.js:93

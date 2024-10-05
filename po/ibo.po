@@ -1,3 +1,5 @@
+msgid ""
+msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: \n"
@@ -17,6 +19,9 @@
 #js/toolbar.js:230
 #js/turtledefs.js:504
 #js/turtledefs.js:505
+#: js/SaveInterface.js:59
+#: js/SaveInterface.js:61
+#: js/SaveInterface.js:93
 #: js/SaveInterface.js:59
 #: js/SaveInterface.js:61
 #: js/SaveInterface.js:93
