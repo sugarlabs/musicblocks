@@ -1,3 +1,5 @@
+msgid ""
+msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-07 00:30-0500\n"
@@ -15,6 +17,12 @@
 #js/toolbar.js:230
 #js/turtledefs.js:504
 #js/turtledefs.js:505
+#: js/SaveInterface.js:59
+#: js/SaveInterface.js:61
+#: js/SaveInterface.js:93
+#: js/SaveInterface.js:59
+#: js/SaveInterface.js:61
+#: js/SaveInterface.js:93
 #: js/SaveInterface.js:59
 #: js/SaveInterface.js:61
 #: js/SaveInterface.js:93
@@ -199,7 +207,7 @@ msgstr "taki muyuchik"
 #: js/turtledefs.js:121
 #: js/turtledefs.js:223
 #: js/block-verbose.js:2622
-#: js/block.js:2550
+#: js/block.js:2546
 #: js/blocks/IntervalsBlocks.js:63
 #: js/blocks/SensorsBlocks.js:178
 #: js/blocks/PitchBlocks.js:1839
@@ -261,10 +269,6 @@ msgstr ""
 #: js/block-verbose.js:4559
 #: js/block-verbose.js:4577
 #: js/block-verbose.js:4588
-#: js/block.js:1573
-#: js/block.js:4483
-#: js/block.js:4501
-#: js/block.js:4512
 #: js/blocks.js:1018
 #: js/blocks.js:3491
 #: js/blocks.js:3492
@@ -287,6 +291,10 @@ msgstr ""
 #: js/palette.js:1151
 #: js/palette.js:1162
 #: js/palette.js:1181
+#: js/block.js:1569
+#: js/block.js:4478
+#: js/block.js:4496
+#: js/block.js:4507
 #: js/blocks/ActionBlocks.js:254
 #: js/blocks/ActionBlocks.js:307
 #: js/blocks/ActionBlocks.js:617
@@ -903,11 +911,11 @@ msgstr ""
 #: js/turtle-painter.js:1193
 #: js/turtles.js:118
 #: js/block-verbose.js:1623
-#: js/block.js:1587
 #: js/lilypond.js:749
 #: js/lilypond.js:913
 #: js/lilypond.js:951
 #: js/logo.js:1184
+#: js/block.js:1583
 #: js/blocks/ActionBlocks.js:1223
 #: js/blocks/ProgramBlocks.js:1267
 #.TRANS: iniciar
@@ -966,12 +974,12 @@ msgstr "volumen"
 #: js/turtledefs.js:228
 #: js/block-verbose.js:1700
 #: js/block-verbose.js:2626
-#: js/block.js:1664
-#: js/block.js:2554
 #: js/lilypond.js:732
 #: js/lilypond.js:897
 #: js/lilypond.js:941
 #: js/palette.js:577
+#: js/block.js:1660
+#: js/block.js:2550
 #: js/blocks/RhythmBlocks.js:766
 #: js/blocks/DrumBlocks.js:477
 #: js/blocks/VolumeBlocks.js:502
@@ -1532,9 +1540,9 @@ msgstr ""
 
 #: js/block-verbose.js:1616
 #: js/block-verbose.js:1735
-#: js/block.js:1580
-#: js/block.js:1699
 #: js/palette.js:605
+#: js/block.js:1576
+#: js/block.js:1695
 #: js/blocks/IntervalsBlocks.js:63
 #: js/blocks/WidgetBlocks.js:259
 #.TRANS: temperamento
@@ -1542,13 +1550,13 @@ msgid "temperament"
 msgstr "munasqanman tikrakuq"
 
 #: js/block-verbose.js:1630
-#: js/block.js:1594
+#: js/block.js:1590
 #.TRANS: matriz
 msgid "matrix"
 msgstr ""
 
 #: js/block-verbose.js:1637
-#: js/block.js:1601
+#: js/block.js:1597
 #: js/blocks/WidgetBlocks.js:1509
 #: plugins/rodi.rtp:324
 #.TRANS: estatus
@@ -1556,19 +1564,19 @@ msgid "status"
 msgstr "kasta"
 
 #: js/block-verbose.js:1644
-#: js/block.js:1608
+#: js/block.js:1604
 #.TRANS: mapa del tambor
 msgid "drum mapper"
 msgstr ""
 
 #: js/block-verbose.js:1651
-#: js/block.js:1615
+#: js/block.js:1611
 #.TRANS: regla
 msgid "ruler"
 msgstr ""
 
 #: js/block-verbose.js:1658
-#: js/block.js:1622
+#: js/block.js:1618
 #: js/blocks/WidgetBlocks.js:397
 #.TRANS: timbre is the character or quality of a musical sound
 #.TRANS: timbre
@@ -1576,13 +1584,13 @@ msgid "timbre"
 msgstr "kunkariq"
 
 #: js/block-verbose.js:1665
-#: js/block.js:1629
+#: js/block.js:1625
 #.TRANS: escalera
 msgid "stair"
 msgstr ""
 
 #: js/block-verbose.js:1672
-#: js/block.js:1636
+#: js/block.js:1632
 #: js/blocks/WidgetBlocks.js:707
 #.TRANS: the speed at music is should be played.
 #.TRANS: tempo
@@ -1591,8 +1599,8 @@ msgstr "pacha"
 
 #: js/block-verbose.js:1679
 #: js/block-verbose.js:1742
-#: js/block.js:1643
-#: js/block.js:1706
+#: js/block.js:1639
+#: js/block.js:1702
 #: js/blocks/IntervalsBlocks.js:1464
 #.TRANS: mode, e.g., Major in C Major
 #.TRANS: modo
@@ -1600,20 +1608,20 @@ msgid "mode"
 msgstr "Tupasqa kunkakuna"
 
 #: js/block-verbose.js:1686
-#: js/block.js:1650
+#: js/block.js:1646
 #.TRANS: deslizador
 msgid "slider"
 msgstr ""
 
 #: js/block-verbose.js:1693
-#: js/block.js:1657
+#: js/block.js:1653
 #: js/blocks/SensorsBlocks.js:1001
 #.TRANS: teclado
 msgid "keyboard"
 msgstr "ñup’una taqi"
 
 #: js/block-verbose.js:1707
-#: js/block.js:1671
+#: js/block.js:1667
 #: js/blocks/WidgetBlocks.js:1190
 #: js/blocks/WidgetBlocks.js:1228
 #.TRANS: widget for subdividing a measure into distinct rhythmic elements
@@ -1624,9 +1632,9 @@ msgstr " kunka ruray"
 #: js/block-verbose.js:1714
 #: js/block-verbose.js:2457
 #: js/block-verbose.js:2514
-#: js/block.js:1678
-#: js/block.js:2385
-#: js/block.js:2442
+#: js/block.js:1674
+#: js/block.js:2381
+#: js/block.js:2438
 #: js/blocks/MeterBlocks.js:1367
 #: js/blocks/OrnamentBlocks.js:220
 #: js/blocks/OrnamentBlocks.js:312
@@ -1653,9 +1661,9 @@ msgstr "warurt'äwi chimpu chani"
 #: js/block-verbose.js:1721
 #: js/block-verbose.js:2382
 #: js/block-verbose.js:2405
-#: js/block.js:1685
-#: js/block.js:2310
-#: js/block.js:2333
+#: js/block.js:1681
+#: js/block.js:2306
+#: js/block.js:2329
 #: js/blocks/IntervalsBlocks.js:1071
 #: js/blocks/OrnamentBlocks.js:312
 #.TRANS: calculate a relative step between notes based on semi-tones
@@ -1664,7 +1672,7 @@ msgid "scalar interval"
 msgstr "intervalo escalar"
 
 #: js/block-verbose.js:1728
-#: js/block.js:1692
+#: js/block.js:1688
 #: js/blocks/RhythmBlocks.js:148
 #.TRANS: milisegundos
 msgid "milliseconds"
@@ -1674,10 +1682,10 @@ msgstr "k’ata tip"
 #: js/block-verbose.js:2459
 #: js/block-verbose.js:2512
 #: js/block-verbose.js:2628
+#: js/block.js:2379
 #: js/block.js:2383
-#: js/block.js:2387
-#: js/block.js:2440
-#: js/block.js:2556
+#: js/block.js:2436
+#: js/block.js:2552
 #: js/blocks/RhythmBlocks.js:712
 #: js/blocks/ProgramBlocks.js:1273
 #: js/widgets/rhythmruler.js:1183
@@ -1689,13 +1697,13 @@ msgstr "ch’in"
 #: js/block-verbose.js:2548
 #: js/block-verbose.js:3492
 #: js/block-verbose.js:3509
+#: js/block.js:2472
+#: js/block.js:3411
+#: js/block.js:3428
 #: js/activity.js:2718
 #: js/activity.js:2769
-#: js/block.js:2476
-#: js/block.js:3416
-#: js/block.js:3433
-#: js/utils/musicutils.js:3780
-#: js/utils/musicutils.js:5273
+#: js/utils/musicutils.js:3961
+#: js/utils/musicutils.js:5454
 #.TRANS: the note names must be separated by single spaces
 #.TRANS: the note names must be separated by single spaces
 #.TRANS: the note names must be separated by single spaces
@@ -1704,7 +1712,7 @@ msgid "ti la sol fa mi re do"
 msgstr "si la sol fa mi re do"
 
 #: js/block-verbose.js:2616
-#: js/block.js:2544
+#: js/block.js:2540
 #.TRANS: scalar step
 #.TRANS: scalar step
 #.TRANS: abajo
@@ -1712,22 +1720,22 @@ msgid "down"
 msgstr ""
 
 #: js/block-verbose.js:2617
-#: js/block.js:2545
+#: js/block.js:2541
 #.TRANS: arriba
 msgid "up"
 msgstr ""
 
 #: js/block-verbose.js:3026
-#: js/block.js:2950
+#: js/block.js:2946
 #.TRANS: El bloqueo de silencio no se puede eliminar.
 msgid "Silence block cannot be removed."
 msgstr ""
 
 #: js/block-verbose.js:3824
-#: js/block.js:3748
 #: js/blocks.js:2607
 #: js/blocks.js:3218
 #: js/palette.js:618
+#: js/block.js:3743
 #: js/blocks/BooleanBlocks.js:77
 #: js/blocks/BooleanBlocks.js:167
 #: js/blocks/BooleanBlocks.js:251
@@ -1745,9 +1753,9 @@ msgid "true"
 msgstr "chiqaq"
 
 #: js/block-verbose.js:3824
-#: js/block.js:3748
 #: js/blocks.js:2609
 #: js/blocks.js:3220
+#: js/block.js:3743
 #: js/blocks/BooleanBlocks.js:79
 #: js/blocks/BooleanBlocks.js:169
 #: js/blocks/BooleanBlocks.js:253
@@ -1765,8 +1773,8 @@ msgstr "llulla"
 
 #: js/block-verbose.js:3835
 #: js/block-verbose.js:3848
-#: js/block.js:3759
-#: js/block.js:3772
+#: js/block.js:3754
+#: js/block.js:3767
 #: js/blocks/ExtrasBlocks.js:615
 #.TRANS: Cartesiano
 msgid "Cartesian"
@@ -1774,8 +1782,8 @@ msgstr ""
 
 #: js/block-verbose.js:3836
 #: js/block-verbose.js:3849
-#: js/block.js:3760
-#: js/block.js:3773
+#: js/block.js:3755
+#: js/block.js:3768
 #: js/blocks/ExtrasBlocks.js:619
 #.TRANS: polar
 msgid "polar"
@@ -1783,8 +1791,8 @@ msgstr ""
 
 #: js/block-verbose.js:3837
 #: js/block-verbose.js:3850
-#: js/block.js:3761
-#: js/block.js:3774
+#: js/block.js:3756
+#: js/block.js:3769
 #: js/blocks/ExtrasBlocks.js:623
 #.TRANS: Cartesiano+polar
 msgid "Cartesian+polar"
@@ -1792,52 +1800,52 @@ msgstr ""
 
 #: js/block-verbose.js:3838
 #: js/block-verbose.js:3857
-#: js/block.js:3762
-#: js/block.js:3781
+#: js/block.js:3757
+#: js/block.js:3776
 #: js/blocks/ExtrasBlocks.js:652
 #.TRANS: ninguno
 msgid "none"
 msgstr ""
 
 #: js/block-verbose.js:3851
-#: js/block.js:3775
+#: js/block.js:3770
 #: js/blocks/ExtrasBlocks.js:628
 #.TRANS: agudos
 msgid "treble"
 msgstr ""
 
 #: js/block-verbose.js:3852
-#: js/block.js:3776
+#: js/block.js:3771
 #: js/blocks/ExtrasBlocks.js:632
 #.TRANS: staff grande
 msgid "grand staff"
 msgstr ""
 
 #: js/block-verbose.js:3853
-#: js/block.js:3777
+#: js/block.js:3772
 #: js/blocks/ExtrasBlocks.js:636
 #.TRANS: mezzo-soprano
 msgid "mezzo-soprano"
 msgstr ""
 
 #: js/block-verbose.js:3854
-#: js/block.js:3778
+#: js/block.js:3773
 #: js/blocks/ExtrasBlocks.js:640
 #.TRANS: alto
 msgid "alto"
 msgstr ""
 
 #: js/block-verbose.js:3855
-#: js/block.js:3779
+#: js/block.js:3774
 #: js/blocks/ExtrasBlocks.js:644
 #.TRANS: tenor
 msgid "tenor"
 msgstr ""
 
 #: js/block-verbose.js:3856
-#: js/block.js:3780
-#: js/utils/musicutils.js:1115
+#: js/block.js:3775
 #: js/utils/synthutils.js:80
+#: js/utils/musicutils.js:1115
 #: js/blocks/ExtrasBlocks.js:648
 #.TRANS: musical instrument
 #.TRANS: bass
@@ -1845,340 +1853,37 @@ msgid "bass"
 msgstr "aynacha ira"
 
 #: js/block-verbose.js:3901
-#: js/block.js:3825
 #: js/blocks.js:2600
 #: js/blocks.js:3211
+#: js/block.js:3820
 #.TRANS: encendido
 msgid "on2"
 msgstr ""
 
 #: js/block-verbose.js:3903
-#: js/block.js:3827
 #: js/blocks.js:2602
 #: js/blocks.js:3213
+#: js/block.js:3822
 #.TRANS: apagado
 msgid "off"
 msgstr ""
 
 #: js/block-verbose.js:4470
-#: js/block.js:4394
+#: js/block.js:4389
 #.TRANS: no es un número
 msgid "Not a number"
 msgstr ""
 
 #: js/block-verbose.js:4477
-#: js/block.js:4401
+#: js/block.js:4396
 #.TRANS: El bloqueo de silencio no se puede eliminar.
 msgid "Octave value must be between 1 and 10."
 msgstr ""
 
 #: js/block-verbose.js:4485
-#: js/block.js:4409
+#: js/block.js:4404
 #.TRANS: El bloqueo de silencio no se puede eliminar.
 msgid "Numbers can have at most 10 digits."
-msgstr ""
-
-#: js/activity.js:390
-#: js/activity.js:395
-#.TRANS: Buscar bloques
-msgid "Search for blocks"
-msgstr ""
-
-#: js/activity.js:1413
-#.TRANS: Actualice su navegador para cambiar al modo avanzado.
-msgid "Refresh your browser to change to advanced mode."
-msgstr ""
-
-#: js/activity.js:1418
-#.TRANS: Actualice su navegador para cambiar al modo principiante.
-msgid "Refresh your browser to change to beginner mode."
-msgstr ""
-
-#: js/activity.js:1477
-#.TRANS: atrapar ratones
-msgid "Catching mice"
-msgstr ""
-
-#: js/activity.js:1478
-#.TRANS: limpiar los instrumentos
-msgid "Cleaning the instruments"
-msgstr ""
-
-#: js/activity.js:1479
-#.TRANS: probando piezas clave
-msgid "Testing key pieces"
-msgstr ""
-
-#: js/activity.js:1480
-#.TRANS: lectura a primera vista
-msgid "Sight-reading"
-msgstr ""
-
-#: js/activity.js:1481
-#.TRANS: combinando matemáticas y música
-msgid "Combining math and music"
-msgstr ""
-
-#: js/activity.js:1482
-#.TRANS: generando más bloques
-msgid "Generating more blocks"
-msgstr ""
-
-#: js/activity.js:1483
-#.TRANS: Do Re Mi Fa Sol La Si Do
-msgid "Do Re Mi Fa Sol La Ti Do"
-msgstr ""
-
-#: js/activity.js:1484
-#.TRANS: afinar instrumentos de cuerda
-msgid "Tuning string instruments"
-msgstr ""
-
-#: js/activity.js:1485
-#.TRANS: presionando teclas aleatorias
-msgid "Pressing random keys"
-msgstr ""
-
-#: js/activity.js:1663
-#.TRANS: los plugins se eliminarán al reiniciar.
-msgid "plugins will be removed upon restart."
-msgstr ""
-
-#: js/activity.js:1672
-#.TRANS: Mostrar Cartesiano
-msgid "show Cartesian"
-msgstr ""
-
-#: js/activity.js:2211
-#: js/palette.js:589
-#: js/blocks/RhythmBlocks.js:923
-#: js/blocks/PitchBlocks.js:442
-#: js/blocks/PitchBlocks.js:1786
-#.TRANS: a numeric mapping of the notes in an octave based on the musical mode
-#.TRANS: grado de escala
-msgid "scale degree"
-msgstr ""
-
-#: js/activity.js:2214
-#: js/palette.js:598
-#.TRANS: nombre de voz
-msgid "voice name"
-msgstr ""
-
-#: js/activity.js:2217
-#: js/palette.js:595
-#.TRANS: modo invertido
-msgid "invert mode"
-msgstr ""
-
-#: js/activity.js:2220
-#.TRANS: herramientas de producción
-msgid "output tools"
-msgstr ""
-
-#: js/activity.js:2223
-#.TRANS: nota personalizada
-msgid "custom note"
-msgstr ""
-
-#: js/activity.js:2226
-#.TRANS: nombre accidental
-msgid "accidental name"
-msgstr ""
-
-#: js/activity.js:2229
-#: js/blocks/PitchBlocks.js:855
-#.TRANS: 
-msgid "east indian solfege"
-msgstr ""
-
-#: js/activity.js:2232
-#: js/blocks/PitchBlocks.js:869
-#.TRANS: nombre de la nota
-msgid "note name"
-msgstr ""
-
-#: js/activity.js:2235
-#: js/blocks/IntervalsBlocks.js:94
-#.TRANS: nombre de temperamento
-msgid "temperament name"
-msgstr ""
-
-#: js/activity.js:2238
-#: js/palette.js:592
-#.TRANS: nombre de modo
-msgid "mode name"
-msgstr ""
-
-#: js/activity.js:2241
-#.TRANS: nombre de achorde
-msgid "chord name"
-msgstr ""
-
-#: js/activity.js:2244
-#: js/palette.js:615
-#.TRANS: nombre de intervalo
-msgid "interval name"
-msgstr ""
-
-#: js/activity.js:2247
-#.TRANS: tipo de filtro
-msgid "filter type"
-msgstr ""
-
-#: js/activity.js:2250
-#.TRANS: tipo de oscilador
-msgid "oscillator type"
-msgstr ""
-
-#: js/activity.js:2253
-#: js/blocks.js:2479
-#: js/blocks.js:2487
-#.TRANS: archivo de audio
-msgid "audio file"
-msgstr ""
-
-#: js/activity.js:2256
-#: js/blocks/DrumBlocks.js:32
-#.TRANS: nombre de ruido
-msgid "noise name"
-msgstr ""
-
-#: js/activity.js:2259
-#: js/blocks/DrumBlocks.js:75
-#.TRANS: nombre del tambor
-msgid "drum name"
-msgstr ""
-
-#: js/activity.js:2262
-#: js/blocks/DrumBlocks.js:119
-#.TRANS: nombre de efectos
-msgid "effects name"
-msgstr ""
-
-#: js/activity.js:2265
-#.TRANS: modo de envoltura
-msgid "wrap mode"
-msgstr ""
-
-#: js/activity.js:2268
-#.TRANS: cargar archivo
-msgid "load file"
-msgstr ""
-
-#: js/activity.js:2435
-#: js/activity.js:5851
-#.TRANS: Este bloque está en desuso.
-msgid "This block is deprecated."
-msgstr ""
-
-#: js/activity.js:2437
-#: js/activity.js:5853
-#.TRANS: Este bloque no se puede encontrar.
-msgid "Block cannot be found."
-msgstr ""
-
-#: js/activity.js:2645
-#.TRANS: Guardar ilustraciones de bloques
-msgid "Saving block artwork"
-msgstr ""
-
-#: js/activity.js:2656
-#.TRANS: Borrar
-msgid "Erase"
-msgstr ""
-
-#: js/activity.js:2683
-#: js/activity.js:2705
-#.TRANS: Pegar
-msgid "Paste"
-msgstr ""
-
-#: js/activity.js:2687
-#.TRANS: Guardar ayuda de bloque
-msgid "Save block help"
-msgstr ""
-
-#: js/activity.js:2772
-#.TRANS: Saltando al final de la página
-msgid "Jumping to the bottom of the page."
-msgstr ""
-
-#: js/activity.js:2778
-#.TRANS: Desplazarse hacia arriba
-msgid "Scrolling up."
-msgstr ""
-
-#: js/activity.js:2783
-#.TRANS: Desplazarse hacia abajo
-msgid "Scrolling down."
-msgstr ""
-
-#: js/activity.js:2788
-#.TRANS: Bloque de extracción
-msgid "Extracting block"
-msgstr ""
-
-#: js/activity.js:2796
-#.TRANS: Mover bloque hacia arriba
-msgid "Moving block up."
-msgstr ""
-
-#: js/activity.js:2817
-#.TRANS: Mover bloque hacia abajo
-msgid "Moving block down."
-msgstr ""
-
-#: js/activity.js:2838
-#.TRANS: Mover bloque a la izquierda
-msgid "Moving block left."
-msgstr ""
-
-#: js/activity.js:2855
-#.TRANS: Mover bloque a la derecha
-msgid "Moving block right."
-msgstr ""
-
-#: js/activity.js:2870
-#.TRANS: Saltar a la posición inicial
-msgid "Jump to home position."
-msgstr ""
-
-#: js/activity.js:2897
-#.TRANS: Ocultar bloques
-msgid "Hide blocks"
-msgstr ""
-
-#: js/activity.js:4500
-#.TRANS: Haga clic en el botón ejecutar para ejecutar el proyecto.
-msgid "Click the run button to run the project."
-msgstr ""
-
-#: js/activity.js:5692
-#.TRANS: Mostrar/ocultar bloques
-msgid "Show/hide block"
-msgstr ""
-
-#: js/activity.js:5698
-#.TRANS: Expandir / Contraer bloques
-msgid "Expand/collapse blocks"
-msgstr ""
-
-#: js/activity.js:5976
-#.TRANS: No se pudo analizar la entrada de JSON.
-msgid "Could not parse JSON input."
-msgstr ""
-
-#: js/activity.js:6475
-#: js/activity.js:6580
-#: js/activity.js:6631
-#.TRANS: No se puede cargar el proyecto desde el archivo. Compruebe el tipo de archivo.
-msgid "Cannot load project from the file. Please check the file type."
-msgstr ""
-
-#: js/activity.js:6917
-#.TRANS: El parametro es invalido.
-msgid "Invalid parameters"
 msgstr ""
 
 #: js/blocks.js:1212
@@ -2209,6 +1914,13 @@ msgstr ""
 #: js/blocks/MediaBlocks.js:602
 #.TRANS: abrir archivo
 msgid "open file"
+msgstr ""
+
+#: js/blocks.js:2479
+#: js/blocks.js:2487
+#: js/activity.js:2253
+#.TRANS: archivo de audio
+msgid "audio file"
 msgstr ""
 
 #: js/blocks.js:3247
@@ -2400,8 +2112,8 @@ msgid "Playback is ready."
 msgstr ""
 
 #: js/macros.js:711
-#: js/utils/musicutils.js:1162
 #: js/utils/synthutils.js:202
+#: js/utils/musicutils.js:1162
 #.TRANS: animal sound effect
 #.TRANS: pato
 msgid "duck"
@@ -2427,6 +2139,34 @@ msgstr ""
 msgid "sargam"
 msgstr ""
 
+#: js/palette.js:589
+#: js/activity.js:2211
+#: js/blocks/RhythmBlocks.js:923
+#: js/blocks/PitchBlocks.js:442
+#: js/blocks/PitchBlocks.js:1786
+#.TRANS: a numeric mapping of the notes in an octave based on the musical mode
+#.TRANS: grado de escala
+msgid "scale degree"
+msgstr ""
+
+#: js/palette.js:592
+#: js/activity.js:2238
+#.TRANS: nombre de modo
+msgid "mode name"
+msgstr ""
+
+#: js/palette.js:595
+#: js/activity.js:2217
+#.TRANS: modo invertido
+msgid "invert mode"
+msgstr ""
+
+#: js/palette.js:598
+#: js/activity.js:2214
+#.TRANS: nombre de voz
+msgid "voice name"
+msgstr ""
+
 #: js/palette.js:601
 #: js/blocks/PitchBlocks.js:1209
 #.TRANS: personalizado tono
@@ -2437,6 +2177,12 @@ msgstr "sapallanpa kunka"
 #.TRANS: accidental
 msgid "accidental"
 msgstr "yanapaqnin"
+
+#: js/palette.js:615
+#: js/activity.js:2244
+#.TRANS: nombre de intervalo
+msgid "interval name"
+msgstr ""
 
 #: js/palette.js:633
 #: js/blocks/PitchBlocks.js:405
@@ -2597,6 +2343,722 @@ msgstr ""
 #.TRANS: Synth no puede tocar acordes.
 msgid "synth cannot play chords."
 msgstr ""
+
+#: js/activity.js:390
+#: js/activity.js:395
+#.TRANS: Buscar bloques
+msgid "Search for blocks"
+msgstr ""
+
+#: js/activity.js:1413
+#.TRANS: Actualice su navegador para cambiar al modo avanzado.
+msgid "Refresh your browser to change to advanced mode."
+msgstr ""
+
+#: js/activity.js:1418
+#.TRANS: Actualice su navegador para cambiar al modo principiante.
+msgid "Refresh your browser to change to beginner mode."
+msgstr ""
+
+#: js/activity.js:1477
+#.TRANS: atrapar ratones
+msgid "Catching mice"
+msgstr ""
+
+#: js/activity.js:1478
+#.TRANS: limpiar los instrumentos
+msgid "Cleaning the instruments"
+msgstr ""
+
+#: js/activity.js:1479
+#.TRANS: probando piezas clave
+msgid "Testing key pieces"
+msgstr ""
+
+#: js/activity.js:1480
+#.TRANS: lectura a primera vista
+msgid "Sight-reading"
+msgstr ""
+
+#: js/activity.js:1481
+#.TRANS: combinando matemáticas y música
+msgid "Combining math and music"
+msgstr ""
+
+#: js/activity.js:1482
+#.TRANS: generando más bloques
+msgid "Generating more blocks"
+msgstr ""
+
+#: js/activity.js:1483
+#.TRANS: Do Re Mi Fa Sol La Si Do
+msgid "Do Re Mi Fa Sol La Ti Do"
+msgstr ""
+
+#: js/activity.js:1484
+#.TRANS: afinar instrumentos de cuerda
+msgid "Tuning string instruments"
+msgstr ""
+
+#: js/activity.js:1485
+#.TRANS: presionando teclas aleatorias
+msgid "Pressing random keys"
+msgstr ""
+
+#: js/activity.js:1663
+#.TRANS: los plugins se eliminarán al reiniciar.
+msgid "plugins will be removed upon restart."
+msgstr ""
+
+#: js/activity.js:1672
+#.TRANS: Mostrar Cartesiano
+msgid "show Cartesian"
+msgstr ""
+
+#: js/activity.js:2220
+#.TRANS: herramientas de producción
+msgid "output tools"
+msgstr ""
+
+#: js/activity.js:2223
+#.TRANS: nota personalizada
+msgid "custom note"
+msgstr ""
+
+#: js/activity.js:2226
+#.TRANS: nombre accidental
+msgid "accidental name"
+msgstr ""
+
+#: js/activity.js:2229
+#: js/blocks/PitchBlocks.js:855
+#.TRANS: 
+msgid "east indian solfege"
+msgstr ""
+
+#: js/activity.js:2232
+#: js/blocks/PitchBlocks.js:869
+#.TRANS: nombre de la nota
+msgid "note name"
+msgstr ""
+
+#: js/activity.js:2235
+#: js/blocks/IntervalsBlocks.js:94
+#.TRANS: nombre de temperamento
+msgid "temperament name"
+msgstr ""
+
+#: js/activity.js:2241
+#.TRANS: nombre de achorde
+msgid "chord name"
+msgstr ""
+
+#: js/activity.js:2247
+#.TRANS: tipo de filtro
+msgid "filter type"
+msgstr ""
+
+#: js/activity.js:2250
+#.TRANS: tipo de oscilador
+msgid "oscillator type"
+msgstr ""
+
+#: js/activity.js:2256
+#: js/blocks/DrumBlocks.js:32
+#.TRANS: nombre de ruido
+msgid "noise name"
+msgstr ""
+
+#: js/activity.js:2259
+#: js/blocks/DrumBlocks.js:75
+#.TRANS: nombre del tambor
+msgid "drum name"
+msgstr ""
+
+#: js/activity.js:2262
+#: js/blocks/DrumBlocks.js:119
+#.TRANS: nombre de efectos
+msgid "effects name"
+msgstr ""
+
+#: js/activity.js:2265
+#.TRANS: modo de envoltura
+msgid "wrap mode"
+msgstr ""
+
+#: js/activity.js:2268
+#.TRANS: cargar archivo
+msgid "load file"
+msgstr ""
+
+#: js/activity.js:2435
+#: js/activity.js:5851
+#.TRANS: Este bloque está en desuso.
+msgid "This block is deprecated."
+msgstr ""
+
+#: js/activity.js:2437
+#: js/activity.js:5853
+#.TRANS: Este bloque no se puede encontrar.
+msgid "Block cannot be found."
+msgstr ""
+
+#: js/activity.js:2645
+#.TRANS: Guardar ilustraciones de bloques
+msgid "Saving block artwork"
+msgstr ""
+
+#: js/activity.js:2656
+#.TRANS: Borrar
+msgid "Erase"
+msgstr ""
+
+#: js/activity.js:2683
+#: js/activity.js:2705
+#.TRANS: Pegar
+msgid "Paste"
+msgstr ""
+
+#: js/activity.js:2687
+#.TRANS: Guardar ayuda de bloque
+msgid "Save block help"
+msgstr ""
+
+#: js/activity.js:2772
+#.TRANS: Saltando al final de la página
+msgid "Jumping to the bottom of the page."
+msgstr ""
+
+#: js/activity.js:2778
+#.TRANS: Desplazarse hacia arriba
+msgid "Scrolling up."
+msgstr ""
+
+#: js/activity.js:2783
+#.TRANS: Desplazarse hacia abajo
+msgid "Scrolling down."
+msgstr ""
+
+#: js/activity.js:2788
+#.TRANS: Bloque de extracción
+msgid "Extracting block"
+msgstr ""
+
+#: js/activity.js:2796
+#.TRANS: Mover bloque hacia arriba
+msgid "Moving block up."
+msgstr ""
+
+#: js/activity.js:2817
+#.TRANS: Mover bloque hacia abajo
+msgid "Moving block down."
+msgstr ""
+
+#: js/activity.js:2838
+#.TRANS: Mover bloque a la izquierda
+msgid "Moving block left."
+msgstr ""
+
+#: js/activity.js:2855
+#.TRANS: Mover bloque a la derecha
+msgid "Moving block right."
+msgstr ""
+
+#: js/activity.js:2870
+#.TRANS: Saltar a la posición inicial
+msgid "Jump to home position."
+msgstr ""
+
+#: js/activity.js:2897
+#.TRANS: Ocultar bloques
+msgid "Hide blocks"
+msgstr ""
+
+#: js/activity.js:4500
+#.TRANS: Haga clic en el botón ejecutar para ejecutar el proyecto.
+msgid "Click the run button to run the project."
+msgstr ""
+
+#: js/activity.js:5692
+#.TRANS: Mostrar/ocultar bloques
+msgid "Show/hide block"
+msgstr ""
+
+#: js/activity.js:5698
+#.TRANS: Expandir / Contraer bloques
+msgid "Expand/collapse blocks"
+msgstr ""
+
+#: js/activity.js:5976
+#.TRANS: No se pudo analizar la entrada de JSON.
+msgid "Could not parse JSON input."
+msgstr ""
+
+#: js/activity.js:6475
+#: js/activity.js:6580
+#: js/activity.js:6631
+#.TRANS: No se puede cargar el proyecto desde el archivo. Compruebe el tipo de archivo.
+msgid "Cannot load project from the file. Please check the file type."
+msgstr ""
+
+#: js/activity.js:6917
+#.TRANS: El parametro es invalido.
+msgid "Invalid parameters"
+msgstr ""
+
+#: js/utils/synthutils.js:58
+#: js/utils/musicutils.js:1131
+#: js/blocks/DrumBlocks.js:191
+#.TRANS: white noise synthesizer
+#.TRANS: ruido blanco
+msgid "white noise"
+msgstr "Yuraq rakhaqaqaq"
+
+#: js/utils/synthutils.js:60
+#: js/utils/musicutils.js:1132
+#.TRANS: brown noise synthesizer
+#.TRANS: ruido marrón
+msgid "brown noise"
+msgstr "ch’umpi chanraray"
+
+#: js/utils/synthutils.js:62
+#: js/utils/musicutils.js:1133
+#.TRANS: pink noise synthesizer
+#.TRANS: ruido rosa
+msgid "pink noise"
+msgstr "rosa chanraray"
+
+#: js/utils/synthutils.js:72
+#: js/utils/musicutils.js:1109
+#: js/blocks/VolumeBlocks.js:47
+#.TRANS: musical instrument
+#.TRANS: piano
+msgid "piano"
+msgstr ""
+
+#: js/utils/synthutils.js:74
+#: js/utils/musicutils.js:1110
+#.TRANS: musical instrument
+#.TRANS: violín
+msgid "violin"
+msgstr "violin"
+
+#: js/utils/synthutils.js:76
+#: js/utils/musicutils.js:1111
+#.TRANS: viola musical instrument
+#.TRANS: viola
+msgid "viola"
+msgstr "viola"
+
+#: js/utils/synthutils.js:78
+#: js/utils/musicutils.js:1114
+#.TRANS: musical instrument
+#.TRANS: violonchelo
+msgid "cello"
+msgstr "violonchelo"
+
+#: js/utils/synthutils.js:82
+#: js/utils/musicutils.js:1116
+#.TRANS: viola musical instrument
+#.TRANS: contrabajo
+msgid "double bass"
+msgstr "Viola takina waqachina"
+
+#: js/utils/synthutils.js:84
+#: js/utils/musicutils.js:1117
+#: js/widgets/rhythmruler.js:2511
+#.TRANS: musical instrument
+#.TRANS: guitarra
+msgid "guitar"
+msgstr "guitarra"
+
+#: js/utils/synthutils.js:86
+#: js/utils/musicutils.js:1118
+#.TRANS: musical instrument
+#.TRANS: guitarra acustica
+msgid "acoustic guitar"
+msgstr "aswan kunkayuq guitarra"
+
+#: js/utils/synthutils.js:88
+#: js/utils/musicutils.js:1119
+#.TRANS: musical instrument
+#.TRANS: flauta
+msgid "flute"
+msgstr "flauta"
+
+#: js/utils/synthutils.js:90
+#: js/utils/musicutils.js:1120
+#.TRANS: musical instrument
+#.TRANS: clarinete
+msgid "clarinet"
+msgstr "clarinete"
+
+#: js/utils/synthutils.js:92
+#: js/utils/musicutils.js:1121
+#.TRANS: musical instrument
+#.TRANS: saxofón
+msgid "saxophone"
+msgstr "saxofón"
+
+#: js/utils/synthutils.js:94
+#: js/utils/musicutils.js:1122
+#.TRANS: musical instrument
+#.TRANS: tuba
+msgid "tuba"
+msgstr "tuba"
+
+#: js/utils/synthutils.js:96
+#: js/utils/musicutils.js:1123
+#.TRANS: musical instrument
+#.TRANS: trompeta
+msgid "trumpet"
+msgstr "trompeta"
+
+#: js/utils/synthutils.js:98
+#: js/utils/musicutils.js:1124
+#.TRANS: musical instrument
+#.TRANS: oboe
+msgid "oboe"
+msgstr ""
+
+#: js/utils/synthutils.js:100
+#: js/utils/musicutils.js:1125
+#.TRANS: musical instrument
+#.TRANS: trombón
+msgid "trombone"
+msgstr "trombón"
+
+#: js/utils/synthutils.js:102
+#: js/utils/musicutils.js:1163
+#.TRANS: musical instrument
+#.TRANS: banjo
+msgid "banjo"
+msgstr ""
+
+#: js/utils/synthutils.js:104
+#: js/utils/musicutils.js:1164
+#.TRANS: musical instrument
+#.TRANS: koto
+msgid "koto"
+msgstr ""
+
+#: js/utils/synthutils.js:106
+#: js/utils/musicutils.js:1165
+#.TRANS: musical instrument
+#.TRANS: dulcimer
+msgid "dulcimer"
+msgstr ""
+
+#: js/utils/synthutils.js:108
+#: js/utils/musicutils.js:1166
+#.TRANS: musical instrument
+#.TRANS: guitarra electrica
+msgid "electric guitar"
+msgstr "tawtinku phinchikilla"
+
+#: js/utils/synthutils.js:110
+#: js/utils/musicutils.js:1167
+#.TRANS: musical instrument
+#.TRANS: fagot
+msgid "bassoon"
+msgstr ""
+
+#: js/utils/synthutils.js:112
+#: js/utils/musicutils.js:1168
+#.TRANS: musical instrument
+#.TRANS: celeste
+msgid "celeste"
+msgstr "yuraq anqhas"
+
+#: js/utils/synthutils.js:114
+#: js/utils/musicutils.js:1112
+#.TRANS: xylophone musical instrument
+#.TRANS: xilófono
+msgid "xylophone"
+msgstr ""
+
+#: js/utils/synthutils.js:116
+#: js/utils/musicutils.js:1126
+#.TRANS: polytone synthesizer
+#.TRANS: sintetizador electronico
+msgid "electronic synth"
+msgstr "sintetizador electronico"
+
+#: js/utils/synthutils.js:118
+#: js/utils/musicutils.js:1127
+#.TRANS: simple monotone synthesizer
+#.TRANS: simple-1
+msgid "simple 1"
+msgstr "qasi-1"
+
+#: js/utils/synthutils.js:120
+#.TRANS: simple monotone synthesizer
+#.TRANS: simple-2
+msgid "simple-2"
+msgstr "qasi-2"
+
+#: js/utils/synthutils.js:122
+#.TRANS: simple monotone synthesizer
+#.TRANS: simple-3
+msgid "simple-3"
+msgstr "qasi-3"
+
+#: js/utils/synthutils.js:124
+#.TRANS: simple monotone synthesizer
+#.TRANS: simple-4
+msgid "simple-4"
+msgstr "qasi-4"
+
+#: js/utils/synthutils.js:126
+#: js/utils/musicutils.js:1100
+#: js/utils/musicutils.js:1546
+#: js/blocks/PitchBlocks.js:85
+#.TRANS: sine wave
+#.TRANS: sine
+msgid "sine"
+msgstr "seno chimpu"
+
+#: js/utils/synthutils.js:128
+#: js/utils/musicutils.js:1101
+#: js/utils/musicutils.js:1547
+#: js/blocks/PitchBlocks.js:39
+#.TRANS: square wave
+#.TRANS: cuadrado
+msgid "square"
+msgstr "tawa k’uchu"
+
+#: js/utils/synthutils.js:130
+#: js/utils/musicutils.js:1103
+#: js/utils/musicutils.js:1549
+#: js/blocks/PitchBlocks.js:108
+#.TRANS: sawtooth wave
+#.TRANS: diente de sierra
+msgid "sawtooth"
+msgstr "khuchuña laka"
+
+#: js/utils/synthutils.js:132
+#: js/utils/musicutils.js:1102
+#: js/utils/musicutils.js:1548
+#: js/blocks/PitchBlocks.js:62
+#: js/blocks/ToneBlocks.js:39
+#.TRANS: triangle wave
+#.TRANS: triángulo
+msgid "triangle"
+msgstr "kimsa k’uchu"
+
+#: js/utils/synthutils.js:134
+#: js/utils/musicutils.js:1083
+#: js/utils/musicutils.js:1134
+#: js/utils/musicutils.js:1177
+#: js/utils/musicutils.js:1199
+#: js/blocks/IntervalsBlocks.js:1124
+#: js/blocks/ToneBlocks.js:946
+#: js/blocks/VolumeBlocks.js:411
+#: js/blocks/WidgetBlocks.js:399
+#: js/blocks/WidgetBlocks.js:404
+#: js/turtleactions/VolumeActions.js:218
+#: js/widgets/modewidget.js:919
+#.TRANS: customize voice
+#.TRANS: personalizado
+msgid "custom"
+msgstr "Runachasqa"
+
+#: js/utils/synthutils.js:136
+#: js/utils/musicutils.js:1113
+#.TRANS: vibraphone musical instrument
+#.TRANS: vibráfono
+msgid "vibraphone"
+msgstr ""
+
+#: js/utils/synthutils.js:148
+#: js/utils/musicutils.js:1135
+#: js/widgets/rhythmruler.js:2057
+#: js/widgets/rhythmruler.js:2319
+#.TRANS: musical instrument
+#.TRANS: tambor militar pequeño
+msgid "snare drum"
+msgstr "wankar"
+
+#: js/utils/synthutils.js:150
+#: js/utils/musicutils.js:1136
+#.TRANS: musical instrument
+#.TRANS: tambor de patada
+msgid "kick drum"
+msgstr "Hayt’ana wankar"
+
+#: js/utils/synthutils.js:152
+#: js/utils/musicutils.js:1137
+#.TRANS: musical instrument
+#.TRANS: tom tom
+msgid "tom tom"
+msgstr "tum tum"
+
+#: js/utils/synthutils.js:154
+#: js/utils/musicutils.js:1138
+#.TRANS: musical instrument
+#.TRANS: piso tom
+msgid "floor tom"
+msgstr "piso tom"
+
+#: js/utils/synthutils.js:156
+#: js/utils/musicutils.js:1139
+#.TRANS: musical instrument
+#.TRANS: tambor de bajo
+msgid "bass drum"
+msgstr ""
+
+#: js/utils/synthutils.js:158
+#: js/utils/musicutils.js:1140
+#.TRANS: a drum made from an inverted cup
+#.TRANS: taza de tambor
+msgid "cup drum"
+msgstr "qiru wankar"
+
+#: js/utils/synthutils.js:160
+#: js/utils/musicutils.js:1141
+#.TRANS: musical instrument
+#.TRANS: darbuka
+msgid "darbuka drum"
+msgstr "wankar darbuka"
+
+#: js/utils/synthutils.js:162
+#.TRANS: musical instrument
+#.TRANS: taiko
+msgid "taiko"
+msgstr "chakiyuq wankar"
+
+#: js/utils/synthutils.js:164
+#: js/utils/musicutils.js:1142
+#.TRANS: musical instrument
+#.TRANS: 
+msgid "hi hat"
+msgstr ""
+
+#: js/utils/synthutils.js:166
+#: js/utils/musicutils.js:1143
+#.TRANS: a small metal bell
+#.TRANS: campana de paseo
+msgid "ride bell"
+msgstr "puriq kampana/kalanka"
+
+#: js/utils/synthutils.js:168
+#: js/utils/musicutils.js:1144
+#.TRANS: musical instrument
+#.TRANS: campana de vaca
+msgid "cow bell"
+msgstr "waka kampana/kalanka"
+
+#: js/utils/synthutils.js:170
+#: js/utils/musicutils.js:1147
+#.TRANS: musical instrument
+#.TRANS: campana triangular
+msgid "triangle bell"
+msgstr "kimsa k’uchu kampana/kalanka"
+
+#: js/utils/synthutils.js:172
+#: js/utils/musicutils.js:1148
+#.TRANS: musical instrument
+#.TRANS: castañuelas
+msgid "finger cymbals"
+msgstr "kastañuylas"
+
+#: js/utils/synthutils.js:174
+#: js/utils/musicutils.js:1146
+#.TRANS: musical instrument
+#.TRANS: campana japonesa
+msgid "japanese bell"
+msgstr "campana japonesa"
+
+#: js/utils/synthutils.js:176
+#: js/utils/musicutils.js:1149
+#.TRANS: a musically tuned set of bells
+#.TRANS: campaneo
+msgid "chime"
+msgstr "thaya suyu"
+
+#: js/utils/synthutils.js:178
+#: js/utils/musicutils.js:1150
+#.TRANS: a musical instrument
+#.TRANS: gong
+msgid "gong"
+msgstr ""
+
+#: js/utils/synthutils.js:180
+#: js/utils/musicutils.js:1151
+#.TRANS: sound effect
+#.TRANS: estruendo
+msgid "clang"
+msgstr "q'iju"
+
+#: js/utils/synthutils.js:182
+#: js/utils/musicutils.js:1152
+#.TRANS: sound effect
+#.TRANS: choque
+msgid "crash"
+msgstr "q'axta"
+
+#: js/utils/synthutils.js:184
+#: js/utils/musicutils.js:1153
+#.TRANS: sound effect
+#.TRANS: botella
+msgid "bottle"
+msgstr "qhispillu wutilla"
+
+#: js/utils/synthutils.js:186
+#: js/utils/musicutils.js:1154
+#.TRANS: sound effect
+#.TRANS: palmada
+msgid "clap"
+msgstr "t'axllirt'äwi"
+
+#: js/utils/synthutils.js:188
+#: js/utils/musicutils.js:1155
+#.TRANS: sound effect
+#.TRANS: bofetada
+msgid "slap"
+msgstr "t'axlli"
+
+#: js/utils/synthutils.js:190
+#: js/utils/musicutils.js:1156
+#.TRANS: sound effect
+#.TRANS: salpicadura
+msgid "splash"
+msgstr "ch'itiqiri"
+
+#: js/utils/synthutils.js:192
+#: js/utils/musicutils.js:1157
+#.TRANS: sound effect
+#.TRANS: burbujas
+msgid "bubbles"
+msgstr "jupuqunaka"
+
+#: js/utils/synthutils.js:194
+#: js/utils/musicutils.js:1158
+#.TRANS: sound effect
+#.TRANS: gota de agua
+msgid "raindrop"
+msgstr "gota de agua"
+
+#: js/utils/synthutils.js:196
+#: js/utils/musicutils.js:1159
+#.TRANS: animal sound effect
+#.TRANS: gato
+msgid "cat"
+msgstr "phisi"
+
+#: js/utils/synthutils.js:198
+#: js/utils/musicutils.js:1160
+#.TRANS: animal sound effect
+#.TRANS: grillo
+msgid "cricket"
+msgstr "jirillu"
+
+#: js/utils/synthutils.js:200
+#: js/utils/musicutils.js:1161
+#.TRANS: animal sound effect
+#.TRANS: perro
+msgid "dog"
+msgstr "anuqara"
 
 #: js/utils/musicutils.js:505
 #: js/utils/musicutils.js:645
@@ -3068,23 +3530,6 @@ msgstr "minyo"
 msgid "fibonacci"
 msgstr ""
 
-#: js/utils/musicutils.js:1083
-#: js/utils/musicutils.js:1134
-#: js/utils/musicutils.js:1177
-#: js/utils/musicutils.js:1199
-#: js/utils/synthutils.js:134
-#: js/blocks/IntervalsBlocks.js:1124
-#: js/blocks/ToneBlocks.js:946
-#: js/blocks/VolumeBlocks.js:411
-#: js/blocks/WidgetBlocks.js:399
-#: js/blocks/WidgetBlocks.js:404
-#: js/turtleactions/VolumeActions.js:218
-#: js/widgets/modewidget.js:919
-#.TRANS: customize voice
-#.TRANS: personalizado
-msgid "custom"
-msgstr "Runachasqa"
-
 #: js/utils/musicutils.js:1085
 #: js/utils/musicutils.js:1531
 #: js/blocks/WidgetBlocks.js:176
@@ -3142,43 +3587,6 @@ msgstr ""
 msgid "peaking"
 msgstr ""
 
-#: js/utils/musicutils.js:1100
-#: js/utils/musicutils.js:1546
-#: js/utils/synthutils.js:126
-#: js/blocks/PitchBlocks.js:85
-#.TRANS: sine wave
-#.TRANS: sine
-msgid "sine"
-msgstr "seno chimpu"
-
-#: js/utils/musicutils.js:1101
-#: js/utils/musicutils.js:1547
-#: js/utils/synthutils.js:128
-#: js/blocks/PitchBlocks.js:39
-#.TRANS: square wave
-#.TRANS: cuadrado
-msgid "square"
-msgstr "tawa k’uchu"
-
-#: js/utils/musicutils.js:1102
-#: js/utils/musicutils.js:1548
-#: js/utils/synthutils.js:132
-#: js/blocks/PitchBlocks.js:62
-#: js/blocks/ToneBlocks.js:39
-#.TRANS: triangle wave
-#.TRANS: triángulo
-msgid "triangle"
-msgstr "kimsa k’uchu"
-
-#: js/utils/musicutils.js:1103
-#: js/utils/musicutils.js:1549
-#: js/utils/synthutils.js:130
-#: js/blocks/PitchBlocks.js:108
-#.TRANS: sawtooth wave
-#.TRANS: diente de sierra
-msgid "sawtooth"
-msgstr "khuchuña laka"
-
 #: js/utils/musicutils.js:1105
 #: js/utils/musicutils.js:1312
 #: js/blocks/PitchBlocks.js:931
@@ -3207,134 +3615,6 @@ msgstr "sapallan"
 msgid "scalar"
 msgstr "siqay"
 
-#: js/utils/musicutils.js:1109
-#: js/utils/synthutils.js:72
-#: js/blocks/VolumeBlocks.js:47
-#.TRANS: musical instrument
-#.TRANS: piano
-msgid "piano"
-msgstr ""
-
-#: js/utils/musicutils.js:1110
-#: js/utils/synthutils.js:74
-#.TRANS: musical instrument
-#.TRANS: violín
-msgid "violin"
-msgstr "violin"
-
-#: js/utils/musicutils.js:1111
-#: js/utils/synthutils.js:76
-#.TRANS: viola musical instrument
-#.TRANS: viola
-msgid "viola"
-msgstr "viola"
-
-#: js/utils/musicutils.js:1112
-#: js/utils/synthutils.js:114
-#.TRANS: xylophone musical instrument
-#.TRANS: xilófono
-msgid "xylophone"
-msgstr ""
-
-#: js/utils/musicutils.js:1113
-#: js/utils/synthutils.js:136
-#.TRANS: vibraphone musical instrument
-#.TRANS: vibráfono
-msgid "vibraphone"
-msgstr ""
-
-#: js/utils/musicutils.js:1114
-#: js/utils/synthutils.js:78
-#.TRANS: musical instrument
-#.TRANS: violonchelo
-msgid "cello"
-msgstr "violonchelo"
-
-#: js/utils/musicutils.js:1116
-#: js/utils/synthutils.js:82
-#.TRANS: viola musical instrument
-#.TRANS: contrabajo
-msgid "double bass"
-msgstr "Viola takina waqachina"
-
-#: js/utils/musicutils.js:1117
-#: js/utils/synthutils.js:84
-#: js/widgets/rhythmruler.js:2511
-#.TRANS: musical instrument
-#.TRANS: guitarra
-msgid "guitar"
-msgstr "guitarra"
-
-#: js/utils/musicutils.js:1118
-#: js/utils/synthutils.js:86
-#.TRANS: musical instrument
-#.TRANS: guitarra acustica
-msgid "acoustic guitar"
-msgstr "aswan kunkayuq guitarra"
-
-#: js/utils/musicutils.js:1119
-#: js/utils/synthutils.js:88
-#.TRANS: musical instrument
-#.TRANS: flauta
-msgid "flute"
-msgstr "flauta"
-
-#: js/utils/musicutils.js:1120
-#: js/utils/synthutils.js:90
-#.TRANS: musical instrument
-#.TRANS: clarinete
-msgid "clarinet"
-msgstr "clarinete"
-
-#: js/utils/musicutils.js:1121
-#: js/utils/synthutils.js:92
-#.TRANS: musical instrument
-#.TRANS: saxofón
-msgid "saxophone"
-msgstr "saxofón"
-
-#: js/utils/musicutils.js:1122
-#: js/utils/synthutils.js:94
-#.TRANS: musical instrument
-#.TRANS: tuba
-msgid "tuba"
-msgstr "tuba"
-
-#: js/utils/musicutils.js:1123
-#: js/utils/synthutils.js:96
-#.TRANS: musical instrument
-#.TRANS: trompeta
-msgid "trumpet"
-msgstr "trompeta"
-
-#: js/utils/musicutils.js:1124
-#: js/utils/synthutils.js:98
-#.TRANS: musical instrument
-#.TRANS: oboe
-msgid "oboe"
-msgstr ""
-
-#: js/utils/musicutils.js:1125
-#: js/utils/synthutils.js:100
-#.TRANS: musical instrument
-#.TRANS: trombón
-msgid "trombone"
-msgstr "trombón"
-
-#: js/utils/musicutils.js:1126
-#: js/utils/synthutils.js:116
-#.TRANS: polytone synthesizer
-#.TRANS: sintetizador electronico
-msgid "electronic synth"
-msgstr "sintetizador electronico"
-
-#: js/utils/musicutils.js:1127
-#: js/utils/synthutils.js:118
-#.TRANS: simple monotone synthesizer
-#.TRANS: simple-1
-msgid "simple 1"
-msgstr "qasi-1"
-
 #: js/utils/musicutils.js:1128
 #.TRANS: simple 2
 msgid "simple 2"
@@ -3350,258 +3630,10 @@ msgstr ""
 msgid "simple 4"
 msgstr ""
 
-#: js/utils/musicutils.js:1131
-#: js/utils/synthutils.js:58
-#: js/blocks/DrumBlocks.js:191
-#.TRANS: white noise synthesizer
-#.TRANS: ruido blanco
-msgid "white noise"
-msgstr "Yuraq rakhaqaqaq"
-
-#: js/utils/musicutils.js:1132
-#: js/utils/synthutils.js:60
-#.TRANS: brown noise synthesizer
-#.TRANS: ruido marrón
-msgid "brown noise"
-msgstr "ch’umpi chanraray"
-
-#: js/utils/musicutils.js:1133
-#: js/utils/synthutils.js:62
-#.TRANS: pink noise synthesizer
-#.TRANS: ruido rosa
-msgid "pink noise"
-msgstr "rosa chanraray"
-
-#: js/utils/musicutils.js:1135
-#: js/utils/synthutils.js:148
-#: js/widgets/rhythmruler.js:2057
-#: js/widgets/rhythmruler.js:2319
-#.TRANS: musical instrument
-#.TRANS: tambor militar pequeño
-msgid "snare drum"
-msgstr "wankar"
-
-#: js/utils/musicutils.js:1136
-#: js/utils/synthutils.js:150
-#.TRANS: musical instrument
-#.TRANS: tambor de patada
-msgid "kick drum"
-msgstr "Hayt’ana wankar"
-
-#: js/utils/musicutils.js:1137
-#: js/utils/synthutils.js:152
-#.TRANS: musical instrument
-#.TRANS: tom tom
-msgid "tom tom"
-msgstr "tum tum"
-
-#: js/utils/musicutils.js:1138
-#: js/utils/synthutils.js:154
-#.TRANS: musical instrument
-#.TRANS: piso tom
-msgid "floor tom"
-msgstr "piso tom"
-
-#: js/utils/musicutils.js:1139
-#: js/utils/synthutils.js:156
-#.TRANS: musical instrument
-#.TRANS: tambor de bajo
-msgid "bass drum"
-msgstr ""
-
-#: js/utils/musicutils.js:1140
-#: js/utils/synthutils.js:158
-#.TRANS: a drum made from an inverted cup
-#.TRANS: taza de tambor
-msgid "cup drum"
-msgstr "qiru wankar"
-
-#: js/utils/musicutils.js:1141
-#: js/utils/synthutils.js:160
-#.TRANS: musical instrument
-#.TRANS: darbuka
-msgid "darbuka drum"
-msgstr "wankar darbuka"
-
-#: js/utils/musicutils.js:1142
-#: js/utils/synthutils.js:164
-#.TRANS: musical instrument
-#.TRANS: 
-msgid "hi hat"
-msgstr ""
-
-#: js/utils/musicutils.js:1143
-#: js/utils/synthutils.js:166
-#.TRANS: a small metal bell
-#.TRANS: campana de paseo
-msgid "ride bell"
-msgstr "puriq kampana/kalanka"
-
-#: js/utils/musicutils.js:1144
-#: js/utils/synthutils.js:168
-#.TRANS: musical instrument
-#.TRANS: campana de vaca
-msgid "cow bell"
-msgstr "waka kampana/kalanka"
-
 #: js/utils/musicutils.js:1145
 #.TRANS: tambor japonés
 msgid "japanese drum"
 msgstr "tambor japonés"
-
-#: js/utils/musicutils.js:1146
-#: js/utils/synthutils.js:174
-#.TRANS: musical instrument
-#.TRANS: campana japonesa
-msgid "japanese bell"
-msgstr "campana japonesa"
-
-#: js/utils/musicutils.js:1147
-#: js/utils/synthutils.js:170
-#.TRANS: musical instrument
-#.TRANS: campana triangular
-msgid "triangle bell"
-msgstr "kimsa k’uchu kampana/kalanka"
-
-#: js/utils/musicutils.js:1148
-#: js/utils/synthutils.js:172
-#.TRANS: musical instrument
-#.TRANS: castañuelas
-msgid "finger cymbals"
-msgstr "kastañuylas"
-
-#: js/utils/musicutils.js:1149
-#: js/utils/synthutils.js:176
-#.TRANS: a musically tuned set of bells
-#.TRANS: campaneo
-msgid "chime"
-msgstr "thaya suyu"
-
-#: js/utils/musicutils.js:1150
-#: js/utils/synthutils.js:178
-#.TRANS: a musical instrument
-#.TRANS: gong
-msgid "gong"
-msgstr ""
-
-#: js/utils/musicutils.js:1151
-#: js/utils/synthutils.js:180
-#.TRANS: sound effect
-#.TRANS: estruendo
-msgid "clang"
-msgstr "q'iju"
-
-#: js/utils/musicutils.js:1152
-#: js/utils/synthutils.js:182
-#.TRANS: sound effect
-#.TRANS: choque
-msgid "crash"
-msgstr "q'axta"
-
-#: js/utils/musicutils.js:1153
-#: js/utils/synthutils.js:184
-#.TRANS: sound effect
-#.TRANS: botella
-msgid "bottle"
-msgstr "qhispillu wutilla"
-
-#: js/utils/musicutils.js:1154
-#: js/utils/synthutils.js:186
-#.TRANS: sound effect
-#.TRANS: palmada
-msgid "clap"
-msgstr "t'axllirt'äwi"
-
-#: js/utils/musicutils.js:1155
-#: js/utils/synthutils.js:188
-#.TRANS: sound effect
-#.TRANS: bofetada
-msgid "slap"
-msgstr "t'axlli"
-
-#: js/utils/musicutils.js:1156
-#: js/utils/synthutils.js:190
-#.TRANS: sound effect
-#.TRANS: salpicadura
-msgid "splash"
-msgstr "ch'itiqiri"
-
-#: js/utils/musicutils.js:1157
-#: js/utils/synthutils.js:192
-#.TRANS: sound effect
-#.TRANS: burbujas
-msgid "bubbles"
-msgstr "jupuqunaka"
-
-#: js/utils/musicutils.js:1158
-#: js/utils/synthutils.js:194
-#.TRANS: sound effect
-#.TRANS: gota de agua
-msgid "raindrop"
-msgstr "gota de agua"
-
-#: js/utils/musicutils.js:1159
-#: js/utils/synthutils.js:196
-#.TRANS: animal sound effect
-#.TRANS: gato
-msgid "cat"
-msgstr "phisi"
-
-#: js/utils/musicutils.js:1160
-#: js/utils/synthutils.js:198
-#.TRANS: animal sound effect
-#.TRANS: grillo
-msgid "cricket"
-msgstr "jirillu"
-
-#: js/utils/musicutils.js:1161
-#: js/utils/synthutils.js:200
-#.TRANS: animal sound effect
-#.TRANS: perro
-msgid "dog"
-msgstr "anuqara"
-
-#: js/utils/musicutils.js:1163
-#: js/utils/synthutils.js:102
-#.TRANS: musical instrument
-#.TRANS: banjo
-msgid "banjo"
-msgstr ""
-
-#: js/utils/musicutils.js:1164
-#: js/utils/synthutils.js:104
-#.TRANS: musical instrument
-#.TRANS: koto
-msgid "koto"
-msgstr ""
-
-#: js/utils/musicutils.js:1165
-#: js/utils/synthutils.js:106
-#.TRANS: musical instrument
-#.TRANS: dulcimer
-msgid "dulcimer"
-msgstr ""
-
-#: js/utils/musicutils.js:1166
-#: js/utils/synthutils.js:108
-#.TRANS: musical instrument
-#.TRANS: guitarra electrica
-msgid "electric guitar"
-msgstr "tawtinku phinchikilla"
-
-#: js/utils/musicutils.js:1167
-#: js/utils/synthutils.js:110
-#.TRANS: musical instrument
-#.TRANS: fagot
-msgid "bassoon"
-msgstr ""
-
-#: js/utils/musicutils.js:1168
-#: js/utils/synthutils.js:112
-#.TRANS: musical instrument
-#.TRANS: celeste
-msgid "celeste"
-msgstr "yuraq anqhas"
 
 #: js/utils/musicutils.js:1170
 #: js/widgets/temperament.js:787
@@ -3659,77 +3691,77 @@ msgid "half-diminished 7th"
 msgstr ""
 
 #: js/utils/musicutils.js:1557
-#: js/utils/musicutils.js:1569
+#: js/utils/musicutils.js:1573
 #.TRANS: Igual (12EDO)
 msgid "Equal (12EDO)"
 msgstr ""
 
 #: js/utils/musicutils.js:1558
-#: js/utils/musicutils.js:1570
+#: js/utils/musicutils.js:1574
+#.TRANS: Igual (5EDO)
+msgid "Equal (5EDO)"
+msgstr ""
+
+#: js/utils/musicutils.js:1559
+#: js/utils/musicutils.js:1575
+#.TRANS: Igual (7EDO)
+msgid "Equal (7EDO)"
+msgstr ""
+
+#: js/utils/musicutils.js:1560
+#: js/utils/musicutils.js:1576
+#.TRANS: Igual (19EDO)
+msgid "Equal (19EDO)"
+msgstr ""
+
+#: js/utils/musicutils.js:1561
+#: js/utils/musicutils.js:1577
+#.TRANS: Igual (31EDO)
+msgid "Equal (31EDO)"
+msgstr ""
+
+#: js/utils/musicutils.js:1562
+#: js/utils/musicutils.js:1578
 #.TRANS: 5-Límite de entonación justa
 msgid "5-limit Just Intonation"
 msgstr ""
 
-#: js/utils/musicutils.js:1559
-#: js/utils/musicutils.js:1571
+#: js/utils/musicutils.js:1563
+#: js/utils/musicutils.js:1579
 #.TRANS: Pythagorean (3-limite EJ)
 msgid "Pythagorean (3-limit JI)"
 msgstr ""
 
-#: js/utils/musicutils.js:1560
-#: js/utils/musicutils.js:1561
-#: js/utils/musicutils.js:1572
-#: js/utils/musicutils.js:1573
+#: js/utils/musicutils.js:1564
+#: js/utils/musicutils.js:1565
+#: js/utils/musicutils.js:1580
+#: js/utils/musicutils.js:1581
 #.TRANS: 
 msgid "Meantone"
 msgstr ""
 
-#: js/utils/musicutils.js:1574
+#: js/utils/musicutils.js:1582
 #.TRANS: Personalizado
 msgid "Custom"
 msgstr ""
 
-#: js/utils/musicutils.js:5387
-#: js/utils/musicutils.js:5430
+#: js/utils/musicutils.js:5568
+#: js/utils/musicutils.js:5611
 #.TRANS: actuales
 msgid "current"
 msgstr "actuales"
 
-#: js/utils/musicutils.js:5390
-#: js/utils/musicutils.js:5421
+#: js/utils/musicutils.js:5571
+#: js/utils/musicutils.js:5602
 #.TRANS: próximo
 msgid "next"
 msgstr "próximo"
 
-#: js/utils/musicutils.js:5393
-#: js/utils/musicutils.js:5426
+#: js/utils/musicutils.js:5574
+#: js/utils/musicutils.js:5607
 #.TRANS: anterior
 msgid "previous"
 msgstr "anterior"
-
-#: js/utils/synthutils.js:120
-#.TRANS: simple monotone synthesizer
-#.TRANS: simple-2
-msgid "simple-2"
-msgstr "qasi-2"
-
-#: js/utils/synthutils.js:122
-#.TRANS: simple monotone synthesizer
-#.TRANS: simple-3
-msgid "simple-3"
-msgstr "qasi-3"
-
-#: js/utils/synthutils.js:124
-#.TRANS: simple monotone synthesizer
-#.TRANS: simple-4
-msgid "simple-4"
-msgstr "qasi-4"
-
-#: js/utils/synthutils.js:162
-#.TRANS: musical instrument
-#.TRANS: taiko
-msgid "taiko"
-msgstr "chakiyuq wankar"
 
 #: js/blocks/ActionBlocks.js:58
 #.TRANS: El bloque Volver (Return) devolverá un valor de una acción.
@@ -4432,7 +4464,7 @@ msgid "turtle pitch number"
 msgstr ""
 
 #: js/blocks/EnsembleBlocks.js:643
-#.TRANS: El bloque de tono de tortuga devuelve el número de tono actual que está tocando la tortuga especificada.
+#.TRANS: El bloque de tono de la tortuga devuelve el número de tono actual que está reproduciendo la tortuga especificado.
 msgid "The Turtle pitch block returns the current pitch number being played by the specified turtle."
 msgstr ""
 
@@ -8074,7 +8106,7 @@ msgid "nine"
 msgstr ""
 
 #: js/turtleactions/IntervalsActions.js:119
-#.TRANS: 
+#.TRANS: el
 msgid "a"
 msgstr ""
 
@@ -8582,13 +8614,13 @@ msgid "duration"
 msgstr "unaykachiy"
 
 #: js/widgets/musickeyboard.js:3179
-#.TRANS: Nuevo bloques de acción creado
-msgid "New action blocks generated"
+#.TRANS: Nuevo bloques de acción creado.
+msgid "New action blocks generated."
 msgstr ""
 
 #: js/widgets/musickeyboard.js:3180
-#.TRANS: Nuevo bloque de acción creado
-msgid "New action block generated"
+#.TRANS: Nuevo bloque de acción creado.
+msgid "New action block generated."
 msgstr ""
 
 #: js/widgets/musickeyboard.js:3365
@@ -9341,6 +9373,16 @@ msgstr "jach’a"
 #.TRANS: baja
 msgid "low"
 msgstr "jisk’a"
+
+#: js/widgets/musickeyboard.js:3179
+
+#~msgid "New action blocks generated"
+#~msgstr ""
+
+#: js/widgets/musickeyboard.js:3180
+
+#~msgid "New action block generated"
+#~msgstr ""
 
 #~msgid ""Toggle Fullscreen"
 #~msgstr ""Ajarka pantalla sarnaqapxana"

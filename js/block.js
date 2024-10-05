@@ -22,8 +22,8 @@
    DISABLEDFILLCOLOR, DISABLEDSTROKECOLOR, docById, DOUBLEFLAT,
    DOUBLESHARP, DRUMNAMES, EASTINDIANSOLFNOTES, EFFECTSNAMES,
    EXPANDBUTTON, FILTERTYPES, FLAT, getDrumName, getDrumSynthName,
-   getModeNumbers, getNoiseName, getTemperament,
-   getTemperamentKeys, getTemperamentsList, getTextWidth, hideDOMLabel, HIGHLIGHTSTROKECOLORS,
+   getModeNumbers, getNoiseName, getTemperament, getTemperamentKeys,
+   getTemperamentsList, getTextWidth, hideDOMLabel, HIGHLIGHTSTROKECOLORS,
    i18nSolfege, INVERTMODES, isCustomTemperament, last, MEDIASAFEAREA,
    NATURAL, NOISENAMES, NSYMBOLS, NUMBERBLOCKDEFAULT, OSCTYPES,
    PALETTEFILLCOLORS, PALETTEHIGHLIGHTCOLORS, PALETTESTROKECOLORS,
@@ -227,7 +227,7 @@ const _blockMakeBitmap = (data, callback, args) => {
         callback(bitmap, args);
     };
 
-    img.src = "data:image/svg+xml;base64," + window.btoa(COLLAPSEBUTTON);
+    img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
 };
 
 /**
@@ -965,7 +965,7 @@ class Block {
 
         if (this.image.search("xmlns") !== -1) {
             image.src =
-                "data:image/svg+xml;base64," + window.btoa(this.image);
+                "data:image/svg+xml;base64," + window.btoa(window.base64Encode(this.image));
         } else {
             image.src = this.image;
         }
@@ -1516,8 +1516,7 @@ class Block {
             };
 
             image.src =
-                "data:image/svg+xml;base64," +
-                window.btoa(COLLAPSEBUTTON);
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBUTTON));
         };
 
         /**
@@ -1549,8 +1548,7 @@ class Block {
             };
 
             image.src =
-                "data:image/svg+xml;base64," +
-                window.btoa(EXPANDBUTTON);
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(EXPANDBUTTON));
         };
 
         /**
