@@ -330,8 +330,8 @@ class Palettes {
         if (this.mobile) {
             return;
         }
-
-        this.activity.hideSearchWidget(true);
+        // In order to open the search widget and palette menu simulataneously
+        // this.activity.hideSearchWidget(true);
         this.dict[name].showMenu(true);
         this.activePalette = name; // used to delete plugins
     }
