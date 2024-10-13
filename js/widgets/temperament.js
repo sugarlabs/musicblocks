@@ -1774,7 +1774,7 @@ function TemperamentWidget() {
         for (let i = 0; i < this.pitchNumber; i++) {
             const idx = newStack.length;
             if (
-                this.inTemperament === "equal" ||
+                this.inTemperament.startsWith("equal") ||
                 this.inTemperament === "1/3 comma meantone" ||
                 (this.typeOfEdit === "equal" && this.divisions === this.pitchNumber)
             ) {

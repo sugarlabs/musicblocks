@@ -2427,13 +2427,10 @@ class Activity {
                     that.doSearch();
                     if (event.keyCode === 13) this.searchWidget.style.visibility = "visible";
                 },
-                focus: (event, ui) => {
+                focus: (event) => {
                     event.preventDefault();
-                    that.searchWidget.value = ui.item.label;
                 }
             });
-
-            $j("#search").autocomplete("widget").addClass("scrollSearch");
 
             $j("#search").autocomplete("instance")._renderItem = (ul, item) => {
                 return $j("<li></li>")
@@ -2441,13 +2438,16 @@ class Activity {
                     .append(
                         '<img src="' +
                             item.artwork +
-                            '" height = "20px">' +
-                            "<a>" +
-                            " " +
+                            '" height="20px">' +
+                            "<a> " +
                             item.label +
                             "</a>"
                     )
-                    .appendTo(ul.css("z-index", 9999));
+                    .appendTo(ul.css({
+                        "z-index": 9999,
+                        "max-height": "200px",
+                        "overflow-y": "auto"
+                    }));
             };
             const searchInput = this.searchWidget.idInput_custom;
             if (!searchInput || searchInput.length <= 0) return;
@@ -6166,7 +6166,7 @@ class Activity {
 
             document.addEventListener("mousemove", (event) => {
                 this.hasMouseMoved = true;
-                event.preventDefault();
+                // event.preventDefault();
                 // this.selectedBlocks = [];
                 if (this.isDragging){
                     this.currentX = event.clientX;
