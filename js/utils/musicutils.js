@@ -3824,7 +3824,7 @@ function getNote(
     let note;
     let articulation;
 
-    if (temperament === "equal") {
+    if (temperament in PreDefinedTemperaments) {
         // Check for double flat or double sharp. Since bb and x behave
         // funny with string operations, we jump through some hoops.
         articulation = getArticulation(noteArg);
