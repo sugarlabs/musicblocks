@@ -24,6 +24,7 @@ class Collaboration {
         this.attempts = 0;
         this.socket = null;
         this.blockList = this.activity.blocks.blockList;
+        this.HOST = "http://127.0.0.1";
         this.PORT = "8080";
         this.COLLAB_HOST = "http://127.0.0.1";
         this.hasCollaborationStarted = false;
