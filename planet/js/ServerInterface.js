@@ -25,9 +25,9 @@ class ServerInterface {
 
     constructor(Planet) {
         // this.ServerURL = "https://musicblocks.sugarlabs.org/planet-server/index.php";
-        this.ServerURL = "http://localhost:3000/planet-server/index.php");
+        this.ServerURL = "http://0.0.0.0:8080/planet-server/index.php";
         this.ConnectionFailureData = {"success": false, "error": "ERROR_CONNECTION_FAILURE"};
-        this.APIKey = process.env.API_KEY;
+        this.APIKey = "3f2d3a4c-c7a4-4c3c-892e-ac43784f7381";
     }
 
     request (data, callback) {
@@ -42,6 +42,7 @@ class ServerInterface {
         })
             .done(data => {
                 callback(data);
+                console.log("success", data);
             })
             .fail(() => {
                 callback(this.ConnectionFailureData);
