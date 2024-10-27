@@ -1755,6 +1755,7 @@ class Activity {
          * Sets up block actions with regards to different mouse events
          */
         this._setupBlocksContainerEvents = () => {
+            const moving = false;
             const that = this;
             let lastCoords = { x: 0, y: 0, delta: 0 };
 
