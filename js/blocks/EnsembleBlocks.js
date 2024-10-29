@@ -75,16 +75,19 @@ function setupEnsembleBlocks(activity) {
         blockInstance.setHelpString(helpText);
     }
 
+    // New function to initialize block with common properties
+    function initializeBlock(blockInstance, paletteName, helpText) {
+        blockInstance.setPalette(paletteName, activity);
+        setHelpString(blockInstance, helpText);
+    }
+
     // Refactor TurtleHeapBlock
     class TurtleHeapBlock extends LeftBlock {
         constructor() {
             super("turtleheap", _THIS_IS_MUSIC_BLOCKS_ ? _("mouse index heap") : _("turtle index heap"));
-            this.setPalette("ensemble", activity);
-            
-            const helpText = _THIS_IS_MUSIC_BLOCKS_
+            initializeBlock(this, "ensemble", _THIS_IS_MUSIC_BLOCKS_
                 ? [_("The Mouse index heap block returns a value in the heap at a specified location for a specified mouse."), "documentation", ""]
-                : [_("The Turtle index heap block returns a value in the heap at a specified location for a specified turtle."), "documentation", ""];
-            setHelpString(this, helpText);
+                : [_("The Turtle index heap block returns a value in the heap at a specified location for a specified turtle."), "documentation", ""]);
 
             const formOptions = {
                 args: 2,
