@@ -327,7 +327,7 @@ const piemenuPitches = (
         } else {
             accidental = EQUIVALENTACCIDENTALS[scale[6 - i]].substr(1);
         }
-        block.value = block.value.replace(SHARP, "").replace(FLAT, "");
+        block.value = block.value.replace(SHARP, "").replace(FLAT, "").replace(DOUBLESHARP, "").replace(DOUBLEFLAT, "");
         block.value += accidental;
         block.text.text = block.value;
     }
