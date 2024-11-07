@@ -60,40 +60,42 @@ function _blockFindTurtle(activity, turtle, blk, receivedArg) {
 }
 
 function setupEnsembleBlocks(activity) {
+    // Extract common block setup logic
+    function setupBlock(blockClass) {
+        new blockClass().setup(activity);
+    }
+
+    // Extract common form block logic
+    function createFormBlock(blockInstance, options) {
+        blockInstance.formBlock(options);
+    }
+
+    // Extract common help string logic
+    function setHelpString(blockInstance, helpText) {
+        blockInstance.setHelpString(helpText);
+    }
+
+    // New function to initialize block with common properties
+    function initializeBlock(blockInstance, paletteName, helpText) {
+        blockInstance.setPalette(paletteName, activity);
+        setHelpString(blockInstance, helpText);
+    }
+
+    // Refactor TurtleHeapBlock
     class TurtleHeapBlock extends LeftBlock {
         constructor() {
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                super("turtleheap", _("mouse index heap"));
-                this.setHelpString([
-                    _("The Mouse index heap block returns a value in the heap at a specified location for a specified mouse."),
-                    "documentation",
-                    ""
-                ]);
+            super("turtleheap", _THIS_IS_MUSIC_BLOCKS_ ? _("mouse index heap") : _("turtle index heap"));
+            initializeBlock(this, "ensemble", _THIS_IS_MUSIC_BLOCKS_
+                ? [_("The Mouse index heap block returns a value in the heap at a specified location for a specified mouse."), "documentation", ""]
+                : [_("The Turtle index heap block returns a value in the heap at a specified location for a specified turtle."), "documentation", ""]);
 
-                this.formBlock({
-                    args: 2,
-                    defaults: [_("Mr. Mouse"), 1],
-                    argTypes: ["anyin", "numberin"],
-                    argLabels: [_("mouse name"), _("index")]
-                });
-            } else {
-                super("turtleheap", _("turtle index heap"));
-                this.setHelpString([
-                    _("The Turtle index heap block returns a value in the heap at a specified location for a specified turtle."),
-                    "documentation",
-                    ""
-                ]);
-
-                this.formBlock({
-                    args: 2,
-                    //.TRANS: Yertle is the name of a turtle.
-                    defaults: [_("Yertle"), 1],
-                    argTypes: ["anyin", "numberin"],
-                    argLabels: [_("turtle name"), _("index")]
-                });
-            }
-
-            this.setPalette("ensemble", activity);
+            const formOptions = {
+                args: 2,
+                defaults: [_THIS_IS_MUSIC_BLOCKS_ ? _("Mr. Mouse") : _("Yertle"), 1],
+                argTypes: ["anyin", "numberin"],
+                argLabels: [_THIS_IS_MUSIC_BLOCKS_ ? _("mouse name") : _("turtle name"), _("index")]
+            };
+            createFormBlock(this, formOptions);
         }
 
         arg(logo, turtle, blk, receivedArg) {
@@ -1064,6 +1066,7 @@ function setupEnsembleBlocks(activity) {
                 .replace(/fill_color/g, fillColor)
                 .replace(/stroke_color/g, strokeColor);
 
+            // eslint-disable-next-line no-undef
             tur.doTurtleShell(55, "data:image/svg+xml;base64," + window.btoa(base64Encode(artwork)));
 
             // Restore the heading.
@@ -1305,26 +1308,31 @@ function setupEnsembleBlocks(activity) {
         }
     }
 
-    new TurtleHeapBlock().setup(activity);
-    new StopTurtleBlock().setup(activity);
-    new StartTurtleBlock().setup(activity);
-    new TurtleColorBlock().setup(activity);
-    new TurtleHeadingBlock().setup(activity);
-    new SetXYTurtleBlock().setup(activity);
-    new SetTurtleBlock().setup(activity);
-    new YTurtleBlock().setup(activity);
-    new XTurtleBlock().setup(activity);
-    new TurtleElapsedNotesBlock().setup(activity);
-    new TurtlePitchBlock().setup(activity);
-    new TurtleNoteBlock().setup(activity);
-    new TurtleNote2Block().setup(activity);
-    new TurtleSyncBlock().setup(activity);
-    new NthTurtleNameBlock().setup(activity);
-    new NumberOfTurtlesBlock().setup(activity);
-    new FoundTurtleBlock().setup(activity);
-    new NewTurtleBlock().setup(activity);
-    new TurtleNameBlock().setup(activity);
-    new SetTurtleColorBlock().setup(activity);
-    new SetTurtleNameBlock().setup(activity);
-    new SetTurtleName2Block().setup(activity);
+    // initialize all blocks
+    const blockClasses = [
+        TurtleHeapBlock,
+        StopTurtleBlock,
+        StartTurtleBlock,
+        TurtleColorBlock,
+        TurtleHeadingBlock,
+        SetXYTurtleBlock,
+        SetTurtleBlock,
+        YTurtleBlock,
+        XTurtleBlock,
+        TurtleElapsedNotesBlock,
+        TurtlePitchBlock,
+        TurtleNoteBlock,
+        TurtleNote2Block,
+        TurtleSyncBlock,
+        NthTurtleNameBlock,
+        NumberOfTurtlesBlock,
+        FoundTurtleBlock,
+        NewTurtleBlock,
+        TurtleNameBlock,
+        SetTurtleColorBlock,
+        SetTurtleNameBlock,
+        SetTurtleName2Block
+    ];
+
+    blockClasses.forEach(setupBlock);
 }
