@@ -2097,10 +2097,12 @@ class Block {
                     if (that.name === "media") {
                         that.value = reader.result;
                         that.loadThumbnail(null);
+                        fileChooser.value = '';
                         return;
                     }
                     that.value = [fileChooser.files[0].name, reader.result];
                     that.blocks.updateBlockText(thisBlock);
+                    fileChooser.value = '';
                 }
             };
             if (that.name === "media") {
