@@ -1958,8 +1958,8 @@ class Activity {
 
                 that.stage.removeAllEventListeners("stagemousemove");
                 that.stage.on("stagemousemove", (event) => {
-                    that.stageX = moveEvent.stageX;
-                    that.stageY = moveEvent.stageY;
+                    that.stageX = event.stageX;
+                    that.stageY = event.stageY;
     
                     if (!that.moving) return;
 

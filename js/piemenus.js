@@ -3495,6 +3495,14 @@ const piemenuBlockContext = (block) => {
         docById("contextWheelDiv").style.display = "none";
     };
 
+    document.body.addEventListener("click", (event) => {
+        const wheelElement = document.getElementById("contextWheelDiv");
+        const displayStyle = window.getComputedStyle(wheelElement).display;
+        if (displayStyle === "block") {
+            wheelElement.style.display = "none";
+        }
+    });
+
     if (
         ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].includes(
             block.name
