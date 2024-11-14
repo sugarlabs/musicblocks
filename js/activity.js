@@ -6135,8 +6135,6 @@ class Activity {
 
         this._createDrag = (event) => {
             this.isDragging = true;
-            console.log("drag triggered");
-            
             this.startX = event.clientX;
             this.startY = event.clientY;
         };
