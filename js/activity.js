@@ -5660,7 +5660,7 @@ class Activity {
 
             const ButtonHolder = document.createElement("div");
             ButtonHolder.setAttribute("id", "buttoncontainerBOTTOM");
-            ButtonHolder.style.display = removeButtonContainer ? "none" : "block";
+            ButtonHolder.style.display = "block";
             document.body.appendChild(ButtonHolder);
 
             this.homeButtonContainer = createButton(GOHOMEFADEDBUTTON,
