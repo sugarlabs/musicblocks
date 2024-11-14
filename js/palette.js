@@ -111,12 +111,13 @@ class Palettes {
             const element = document.createElement("div");
             element.id = "palette";
             element.setAttribute("class", "disable_highlighting");
+            element.classList.add('flex-palette')
             element.setAttribute(
                 "style",
-                "position: absolute; z-index: 1000; display: none ; left :0px; top:" + this.top + "px"
+                "position: absolute; z-index: 1000; left :0px; top:" + this.top + "px"
             );
             element.innerHTML =
-                '<div style="float: left"><table width ="' +
+                '<div style="height:fit-content"><table width ="' +
                 1.5 * this.cellSize +
                 'px"bgcolor="white"><thead><tr></tr></thead></table><table width ="' +
                 4.5 * this.cellSize +
