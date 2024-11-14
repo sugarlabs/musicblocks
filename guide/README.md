@@ -1932,7 +1932,7 @@ clockwise, transforming it into *Locrian*.
 In the above example, the *Major* mode has been inverted, transforming
 it into *Phrygian*.
 
-Note: The build-in modes in Music Blocks can be found in [musicutils.js](https://github.com/sugarlabs/musicblocks/blob/master/js/musicutils.js#L68).
+Note: The build-in modes in Music Blocks can be found in [musicutils.js](https://github.com/sugarlabs/musicblocks/blob/master/js/utils/musicutils.js#L68).
 
 ![widget](./mode6.svg "phrase maker block")
 
