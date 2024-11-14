@@ -6080,11 +6080,7 @@ class Activity {
         }
  
         // end the drag on navbar
-
-        document.getElementById("toolbars").addEventListener("mouseover" , ()=>{
-            this.isDragging = false;
-        } );
-
+        document.getElementById("toolbars").addEventListener("mouseover", () => {this.isDragging = false;});
 
         this._create2Ddrag = () => {
             this.dragArea = {};
