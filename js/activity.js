@@ -6078,6 +6078,12 @@ class Activity {
             this.unhighlightSelectedBlocks(false);
             this.setSelectionMode(false);
         }
+ 
+        // end the drag on navbar
+
+        document.getElementById("toolbars").addEventListener("mouseover" , ()=>{
+            this.isDragging = false;
+        } );
 
 
         this._create2Ddrag = () => {
@@ -6129,6 +6135,8 @@ class Activity {
 
         this._createDrag = (event) => {
             this.isDragging = true;
+            console.log("drag triggered");
+            
             this.startX = event.clientX;
             this.startY = event.clientY;
         };
