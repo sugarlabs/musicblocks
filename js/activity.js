@@ -6141,13 +6141,13 @@ class Activity {
             let width = Math.abs(this.currentX - this.startX);
             let height = Math.abs(this.currentY - this.startY);
 
-            this.selectionArea.style.display = "block";
-            this.selectionArea.style.position = "absolute";
+            this.selectionArea.style.display = "flex";
+            this.selectionArea.style.position = "relative";
             this.selectionArea.style.left = x + "px";
             this.selectionArea.style.top = y + "px";
             this.selectionArea.style.height = height + "px";
             this.selectionArea.style.width = width + "px";
-            this.selectionArea.style.zIndex = "9999";
+            this.selectionArea.style.zIndex = "9989";
             this.selectionArea.style.backgroundColor = "rgba(137, 207, 240, 0.5)";
             this.selectionArea.style.pointerEvents = "none";
 
