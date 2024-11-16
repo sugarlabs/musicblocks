@@ -6144,7 +6144,7 @@ class Activity {
             let height = Math.abs(this.currentY - this.startY);
 
             this.selectionArea.style.display = "flex";
-            this.selectionArea.style.position = "relative";
+            this.selectionArea.style.position = "absolute";
             this.selectionArea.style.left = x + "px";
             this.selectionArea.style.top = y + "px";
             this.selectionArea.style.height = height + "px";
