@@ -2395,7 +2395,7 @@ const piemenuChords = (block, selectedChord) => {
     docById("wheelDiv").style.display = "";
 
     // the chord selector
-    block._chordWheel = new wheelnav("wheelDiv", null, 800, 800);
+    block._chordWheel = new wheelnav("wheelDiv", null, 1000, 1000);
     block._exitWheel = new wheelnav("_exitWheel", block._chordWheel.raphael);
 
     const chordLabels = [];
@@ -2468,7 +2468,7 @@ const piemenuChords = (block, selectedChord) => {
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
-    setWheelSize(300);
+    setWheelSize(400);
     docById("wheelDiv").style.left =
         Math.min(
             block.blocks.turtles._canvas.width - 300,
