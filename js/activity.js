@@ -1961,7 +1961,7 @@ class Activity {
                     that.stageX = event.stageX;
                     that.stageY = event.stageY;
     
-                    if (!that.moving) return;
+                    if (!moving) return;
 
                     // if we are moving the block container, deselect the active block.
                     // Deselect active block if moving the block container
