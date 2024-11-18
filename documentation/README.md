@@ -45,7 +45,7 @@ You can run it from
 
 When you first launch Music Blocks in your browser, you'll see a stack
 of blocks representing the notes: `Sol 4`, `Mi 4`and `Sol 4`. The first two notes are `1/4` note; third note is 
-`1/2` note.
+`1/2` note. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1731947644713000&run=True)
 
 ![The Play button](./play.png "play button")
 
@@ -308,7 +308,7 @@ Blocks.
 The *Forward* block, found on the *Mouse* palette, is used to draw
 straight lines. (Note that if this block is used inside of a *Note
 value* block&mdash;the line will be drawn as the note plays; otherwise
-the line is drawn "instantly".)
+the line is drawn "instantly".) [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1730651293282088&run=True)
 
 ![Right](./left_block.svg "right")
 
