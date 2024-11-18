@@ -21,6 +21,24 @@ You can run it from
 
 ![alt tag](./getting-started.png "Music Blocks in a browser")
 
+## TABLE OF CONTENTS
+1. [Getting Started]
+2. [Toolbars]
+3. [Context Menu]
+4. [The Block Context Menu]
+    1. [Extract Option]
+    2. [Duplicate Option]
+    3. [Delete Option]
+    4. [Help Option]
+5. [Keyboard Shortcuts]
+6. [Block Palettes]
+    1. [Defining a Note]
+    2. [A Quick Tour of Selected Blocks]
+7. [Flow Palette]
+8. [Widget Palette]
+9. [Stats]
+10. [Planet View]
+
 ## 1. Getting Started
 
 ![Default blocks](./getting_started_blocks.svg "default blocks")
@@ -163,7 +181,7 @@ for details specific to music: *Rhythm*, *Meter*, *Pitch*, *Intervals*,
 All of the other palettes are described in the
 [Turtle Blocks documentation pages](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
 
-### 6.1 Defining a note
+### 6.1 Defining a Note
 
 ![The Note Block](./newnote_block.svg "the note")
 
@@ -211,7 +229,7 @@ you can put as many *Pitch* blocks inside a note as you'd like. They
 will play together as a chord. You can also insert graphics blocks
 inside a note in order to create sound-sync animations.
 
-### 6.2 A quick tour of selected blocks
+### 6.2 A Quick Tour of Selected Blocks
 
 ![The Set Instrument block](./settimbre_block.svg "Set instrument block")
 
