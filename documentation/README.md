@@ -1,5 +1,4 @@
-﻿Using Music Blocks
-==================
+﻿# Using Music Blocks
 
 Music Blocks is a fork of [Turtle
 Blocks](href="https://turtle.sugarlabs.org). It has extensions for
@@ -22,8 +21,7 @@ You can run it from
 
 ![alt tag](./getting-started.png "Music Blocks in a browser")
 
-Getting Started
----------------
+## 1. Getting Started
 
 ![Default blocks](./getting_started_blocks.svg "default blocks")
 
@@ -65,8 +63,7 @@ To maximize screen real estate, Music Blocks overlays the program
 elements (stacks of blocks) on top of the canvas. These blocks can be
 hidden at any time while running the program.
 
-Toolbars
---------
+## 2. Toolbars
 
 There are five toolbars:
 
@@ -98,38 +95,37 @@ a block.
 
 Many blocks also incorporate "pie menus" for changing block parameters.
 
-## Context Menu
+## 3. Context Menu
 Context menus are an important part of user interfaces that provide users with quick access to a set of actions relevant to the context in which they are working.The right-click context menu in Music Blocks provides several options for working with blocks and the workspace. To access the right-click context menu, simply right-click anywhere in the workspace.
 
-# The Block context menu:
+## 4. The Block Context Menu
 This context menu appears when you right-click on a block in the workspace. It provides options such as "Duplicate," "Delete," "Help," and "Copy to Palette." The "Duplicate" option creates a copy of the selected block, while the "Delete" option removes the selected block from the workspace. The "Help" option opens a help dialog for the selected block, and the "Copy to Palette" option adds the selected block to the user's custom block palette.
 
 ![Right-click context menu](./block_context.png "Right-click context menu")
 
-# Extract
+### 4.1 Extract Option
 The "Extract" option in Music Blocks allows you to separate a nested block into its individual components or sub-blocks. This can be useful if you want to modify or reuse specific parts of a block without affecting the rest of the block.
 
 ![Extract the selected block](./extract.png "Extract the selected block")
 
-# Duplicate
+### 4.2 Duplicate Option
 This option creates a duplicate of the selected block and places it next to the original block.
 
 ![Duplicate](./duplicate.png "Duplicate")
 
-# Delete
-This option removes the selected block from your program
+### 4.3 Delete Option
+This option removes the selected block from your program.
 
 ![Delete](./delete.png "Delete")
 
-# Help
+### 4.4 Help Option
 This option shows a help screen with information about the selected block. You can use this option to learn more about the block's functionality and how to use it in your projects.
 
 ![Help](./help.png "Help")
 
 By using the right-click context menu in Music Blocks, you can quickly perform common tasks and manipulate blocks on the workspace. This can help you to work more efficiently and effectively in your projects.
 
-Keyboard shortcuts
-------------------
+## 5. Keyboard Shortcuts
 
 There are several keyboard shortcuts:
 
@@ -147,8 +143,7 @@ highlighting the block(s) you want to copy.
 You can directly type notes using *d* for `Do`, *r* for `Re`, *m* for
 `Mi`, *f* for `Fa`, *s* for `Sol`, *l* for `La`, and *t* for `Ti`.
 
-Block Palettes
---------------
+## 6. Block Palettes
 
 The block palettes are displayed on the left side of the screen. These
 palettes contain the blocks used to create programs.
@@ -168,8 +163,7 @@ for details specific to music: *Rhythm*, *Meter*, *Pitch*, *Intervals*,
 All of the other palettes are described in the
 [Turtle Blocks documentation pages](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
 
-Defining a note
----------------
+### 6.1 Defining a note
 
 ![The Note Block](./newnote_block.svg "the note")
 
@@ -217,8 +211,7 @@ you can put as many *Pitch* blocks inside a note as you'd like. They
 will play together as a chord. You can also insert graphics blocks
 inside a note in order to create sound-sync animations.
 
-A quick tour of selected blocks
--------------------------------
+### 6.2 A quick tour of selected blocks
 
 ![The Set Instrument block](./settimbre_block.svg "Set instrument block")
 
@@ -386,8 +379,7 @@ messages during program execution. It is very useful as a debugging
 tool and also as a means of adding lyrics to your music&mdash;think
 karaoke.
 
-Flow Palette
-------------
+## 7. Flow Palette
 
 The Flow palette is described in more detail in the Turtle Blocks
 documentation. Here we review a few ways to approach taking different
@@ -410,8 +402,7 @@ to create a series of strings: "action1", "action2", ...,
 
 ![Do](./do-actions.svg "Do actions")
 
-Widget Palette
---------------
+## 8. Widget Palette
 
 Music Blocks has various Widgets that can be used within Music Blocks
 to enhance your experience. The *Pitch-time matrix* is described here.
@@ -492,16 +483,14 @@ the chunk in the clamp of the *Pitch-time Marix* block.
 More details about all of the widgets are available in the
 [Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md).
 
-Stats
------
+## 9. Stats
 
 Project statistics are available from a button the the secondary
 toolbar in advanced mode.
 
 ![Stats](./stats.svg "Stats Details")
 
-Planet View 
------------
+## 10. Planet View 
 
 Music Blocks also provides a Planet view to find and share
 projects. It has options to load project from file locally and make
