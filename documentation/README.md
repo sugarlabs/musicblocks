@@ -267,7 +267,7 @@ repeated in turn, e.g. duplicate x2 of `4 4 8` would result in `4 4 4
 
 The *Start* block, found on the *Action* palette, is tied to the *Run*
 button. Anything inside of the clamp of the *Start* button will be run
-when the button is pressed.
+when the button is pressed. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732004679481517&run=True)
 
 ![The Start block](./multiple_start_blocks.svg "Start Block")
 
@@ -287,7 +287,7 @@ create an *Action* block, a new block corresponding to that action is
 added to the palette. The name given to the action is the name
 associated with the new block. (It is common practice to use *Action*
 blocks to define short phrases of music that can be repeated and
-modified.)
+modified.) [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732004679481517&run=True)
 
 Actions are a powerful organizational element for your program and can
 be used in many powerful ways, e.g., an action can be associated with
@@ -295,32 +295,32 @@ an event, such as an on beat or off beat or mouse click. See
 [Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md),
 for further details and examples.
 
-![The Storein Box block](./storebox1_block.svg "storein-Box-Add One")
+![The Storein Box block](./storebox1_block.svg "store in box & add 1 to Block")
 
 The *Store in* block, found on the *Boxes* palette, is used to store a
 value. That value can be retrieved using the *Box* block. The value
 can be modified using the *Add one* block. These blocks are the
 typical way in which variables are stored and retrieved in Music
-Blocks.
+Blocks. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732020971700880&run=True)
 
-![Forward](./forward_block.svg "forward")
+![Forward](./forward_block.svg "Forward Block")
 
-The *Forward* block, found on the *Mouse* palette, is used to draw
+The *Forward* block, found on the *Graphics/Mouse* palette, is used to draw
 straight lines. (Note that if this block is used inside of a *Note
 value* block&mdash;the line will be drawn as the note plays; otherwise
 the line is drawn "instantly".) [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1730651293282088&run=True)
 
-![Right](./left_block.svg "right")
+![Right](./left_block.svg "Right/Left Block")
 
-The *Right* block, found on the *Mouse* palette, is used to rotate the
+The *Right/Left* block, found on the *Graphics/Mouse* palette, is used to rotate the
 mouse heading. (Note that if this block is used inside of a *Note
 value* block&mdash;the heading will change as the note plays;
-otherwise the heading is changed "instantly".)
+otherwise the heading is changed "instantly".) [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732023891064703&run=True)
 
-![Pen Up](./mousebutton_block.svg "pen up-pen down")
+![Pen Up](./mousebutton_block.svg "Pen up and Pen down Block")
 
 The *Pen up* and *Pen down* blocks, found on the *Pen* palette,
-determine whether or not the mouse draws as it moves.
+determine whether or not the mouse draws as it moves. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732030390164543&run=True)
 
 ![Set Shade](./setshade_block.svg "set shade")
 
@@ -503,7 +503,7 @@ More details about all of the widgets are available in the
 
 ## 9. Stats
 
-Project statistics are available from a button the the secondary
+Project statistics are available from a button on the secondary
 toolbar in advanced mode.
 
 ![Stats](./stats.svg "Stats Details")
