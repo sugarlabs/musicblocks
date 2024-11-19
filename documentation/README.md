@@ -236,7 +236,7 @@ inside a note in order to create sound-sync animations.
 The *Set instrument* block, found on the *Tone* palette, lets you choose a
 timbre for a note. In the above example, a guitar model is used to
 make any notes contained within the block's clamp will sound as if
-they are being played on a guitar.
+they are being played on a guitar. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1731948356610795&run=True)
 
 ![The Set Volume block](./setsynthvolume_block.svg "Set synth volume")
 
@@ -248,28 +248,28 @@ volume), of any notes contained with the block's clamp.
 
 The *Set drum* block, which is used inside of the clamp of a *Note
 value* block is used to add drum sounds to a note. It is found on the
-*Drum* palette.
+*Drum* palette. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732000719242159&run=True)
 
-![The Repeat block](./repeat_block.svg "Repeat")
+![The Repeat block](./repeat_block.svg "Repeat Block")
 
 The *Repeat* block, found on the *Flow* palette, is used to create
 loops. Whatever stack of blocks are placed inside its clamp will be
 repeated. It can be used to repeat individual notes, or entire phrases
-of music.
+of music. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732003682836455&run=True)
 
-![The Duplicate block](./duplicatenotes_block.svg "Duplicate block")
+![The Duplicate block](./duplicatenotes_block.svg "Duplicate Block")
 
 The *Duplicate* block, found on the *Rhythms* palette, is used to
 repeat any contained notes. Similar to using a *Repeat* block, but
 rather than repeating a sequence of notes multiple times, each note is
 repeated in turn, e.g. duplicate x2 of `4 4 8` would result in `4 4 4
-4 8 8`, where as repeat x2 of `4 4 8` would result in `4 4 8 4 4 8`.
+4 8 8`, where as repeat x2 of `4 4 8` would result in `4 4 8 4 4 8`. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732003870740637&run=True)
 
 The *Start* block, found on the *Action* palette, is tied to the *Run*
 button. Anything inside of the clamp of the *Start* button will be run
 when the button is pressed.
 
-![The Start block](./multiple_start_blocks.svg "Start")
+![The Start block](./multiple_start_blocks.svg "Start Block")
 
 Note that you can have multiple mice and that each mouse is
 equivalent to a "voice" in music. It can play notes of various pitches
