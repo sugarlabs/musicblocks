@@ -295,7 +295,7 @@ an event, such as an on beat or off beat or mouse click. See
 [Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md),
 for further details and examples.
 
-![The Storein Box block](./storebox1_block.svg "store in box & add 1 to Block")
+![The Storein Box block](./storebox1_block.svg "Store in box & Add 1 to Block")
 
 The *Store in* block, found on the *Boxes* palette, is used to store a
 value. That value can be retrieved using the *Box* block. The value
@@ -322,44 +322,44 @@ otherwise the heading is changed "instantly".) [RUN LIVE](https://musicblocks.su
 The *Pen up* and *Pen down* blocks, found on the *Pen* palette,
 determine whether or not the mouse draws as it moves. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732030390164543&run=True)
 
-![Set Shade](./setshade_block.svg "set shade")
+![Set Shade](./setshade_block.svg "Set shade Block")
 
 The *Set shade* block, also found on the *Pen* palette, is used to set
 the lightness or darkness of the "ink" used in the mouse pen. `set
-shade 0` is black. `set shade 100` is white.
+shade 0` is black. `set shade 100` is white. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732096229605656&run=True)
 
-![Set Color](./setcolor_block.svg "set color")
+![Set Color](./setcolor_block.svg "Set color Block")
 
 The *Set color* block, also found on the *Pen* palette, is used to set
 the color of the "ink" used in the mouse pen. `set color 0` is
-red. `set color 70` is blue.
+red. `set color 70` is blue. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732096675098636&run=True)
 
-![Random](./random_block.svg "random")
+![Random](./random_block.svg "Random Block")
 
 The *Random* block, found on the *Numbers* palette, is used to
 generate a random number, because sometimes being unpredictable is
-nice.
+nice. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732097168390186&run=True)
 
-![One of This or That](./oneOf_block.svg "on of this or that")
+![One of This or That](./oneOf_block.svg "One of this or that Block")
 
 The *One of* block, also found on the *Numbers* palette, is used to
 generate a binary choice, one of "this" or "that", because sometimes
-being unpredictable is nice.
+being unpredictable is nice. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732113139904914&run=True)
 
-![alt tag](./show_block.svg "show media")
+![alt tag](./show_block.svg "Show media Block")
 
 The *Show* block, found on the *Media* palette, is used to display
-text and images.
+text and images. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732117445989018&run=True)
 
-![Mouse Button](./mousebutton_block.svg "mousebutton")
+![Mouse Button](./mousebutton_block.svg "Mouse button Block")
 
 The *Mouse button* block, found on the *Sensors* palette, returns true
 if the mouse button is clicked. The mouse button block can be used to
-create some interactivity in your program.
+create some interactivity in your program. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732030390164543&run=True)
 
-![Cursor XY](./x_block.svg "cursorx-cursory")
+![Cursor XY](./x_block.svg "Cursor x - Cursor y Block")
 
-The *Cursor x* and *Cursor y* blocks, also found on the *Sensors* palette, return the X and Y coordinates of the cursor. These blocks can also be used to create interactive programs.
+The *Cursor x* and *Cursor y* blocks, also found on the *Sensors* palette, return the X and Y coordinates of the cursor. These blocks can also be used to create interactive programs. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732117445989018&run=True)
 
 ![alt tag](./input_block.svg "input")
 
