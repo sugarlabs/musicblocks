@@ -361,25 +361,25 @@ create some interactivity in your program. [RUN LIVE](https://musicblocks.sugarl
 
 The *Cursor x* and *Cursor y* blocks, also found on the *Sensors* palette, return the X and Y coordinates of the cursor. These blocks can also be used to create interactive programs. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732117445989018&run=True)
 
-![alt tag](./input_block.svg "input")
+![alt tag](./input_block.svg "Input Block")
 
 Prompting the user for input is done with the *Input* block. This
-block will display a messgae with a prompt and open an input form at
+block will display a message with a prompt and open an input form at
 the current position of the mouse. Program execution is paused until
 the user types into the form and types RETURN (or Enter). The contents
-of the input form are then transferred to *Input-value* block.
+of the input form are then transferred to *Input-value* block. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732171497274793&run=True)
 
-![Push](./push_block.svg "push")
+![Push](./push_block.svg "Push Block")
 
-![Pop](./pop_block.svg "pop")
+![Pop](./pop_block.svg "Pop Block")
 
 The *Push* and *Pop* blocks, found on the *Heap* palette, are used to
 store and retrieve values on/from a first-in, last-out (FILO) program
-heap. There is a separate heap maintained for each *Start* block.
+heap. There is a separate heap maintained for each *Start* block. <!-- [RUN LIVE]() -->
 
-![Get Value](./getDict_block.svg "get value")
+![Get Value](./getDict_block.svg "Get value Block")
 
-![Set Value](./setDict_block.svg "set value")
+![Set Value](./setDict_block.svg "Set value Block")
 
 The *Get value* and *Set value* blocks are found on the *Dictionary*
 palette. They are used to get and set values in a dictionary
@@ -388,26 +388,26 @@ dictionary and you can have as many dictionaries as you'd like as
 well. There is also a built-in dictionary associated with each *Start*
 block that has key/value pairs for parameters such as x, y, heading,
 color, shade, grey, pen size, notes played, current pitch, pitch
-number, and note value.
+number, and note value. <!-- [RUN LIVE]() -->
 
-![Print](./print_block.svg "print")
+![Print](./print_block.svg "Print Block")
 
 The *Print* block, found on the *Extras* palette, is used to print
 messages during program execution. It is very useful as a debugging
 tool and also as a means of adding lyrics to your music&mdash;think
-karaoke.
+karaoke. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732172483377262&run=True)
 
 ## 7. Flow Palette
 
-The Flow palette is described in more detail in the Turtle Blocks
-documentation. Here we review a few ways to approach taking different
+The Flow palette is described in more detail in the [Turtle Blocks
+documentation](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation). Here we review a few ways to approach taking different
 actions on different beats.
 
 The *Switch* block will take the action defined in the *Case* that
 matches the argument passed to the *Switch* block. In the figure
 below, it will take a different action based on the beat value: "on
 case 1 run action1", "on case 2, run action2", ..., "on case 4 run
-action4". You can also define a default action.
+action4". You can also define a default action. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732173207750796&run=True)
 
 ![Switch](./switch-on-beat.svg "Switch on Beat")
 
@@ -416,7 +416,7 @@ action4". You can also define a default action.
 Another way to do the same thing is with the *Do* block found on the
 Action palette. In the figure below, we add the beat count to "action"
 to create a series of strings: "action1", "action2", ...,
-"action4". We then "do" that action.
+"action4". We then "do" that action. <!-- [RUN LIVE]() -->
 
 ![Do](./do-actions.svg "Do actions")
 
@@ -443,7 +443,7 @@ familiar with math).
 *Pitch-time Matrix* blocks clamp is used to define the matrix:
 A row in the matrix is created for each *Pitch* block and columns are
 created for individual notes, which are created by using *Rhythm*
-blocks, individual note blocks, or the *Tuplet* block.
+blocks, individual note blocks, or the *Tuplet* block. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732180386380311&run=True)
 
 ![Rhythm](./rhythmruler2_block.svg "Rhythm block")
 
@@ -455,7 +455,7 @@ for a quarter note, etc. (Recall that in traditional Western notation
 all note values are (1) in powers of two, and are (2) in relation to
 the "whole note", which is in turn (3) defined by tempo, or
 beats&mdash;usually quarter notes&mdash;per minute) Each note is
-represented by a column in the matrix.
+represented by a column in the matrix. <!-- [RUN LIVE]() -->
 
 Special ratios of the whole note can be created very easily with the
 *Rhythm* block by choosing an integer other than the traditional
@@ -488,7 +488,7 @@ notes, etc. This design choice allows for maximum flexibility) You can
 mix and match *Rhythm* and individual *Note* blocks within a *Tuplet*
 block to generate complex rhythms (e.g. two quarter notes plus an
 eighth note is possible within the tuplet). Each note is represented
-by a column in the matrix.
+by a column in the matrix. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732191858479236&run=True)
 
 Note: Each time you open the matrix, it tries to reconstruct the notes
 marked from the previous matrix. If you modify the *Pitch* and
