@@ -596,7 +596,10 @@ const piemenuPitches = (
             that.value += selection["attr"];
             that.text.text = selection["note"] + selection["attr"];
         }
-
+        // Store the selected accidental in the block for later use.
+        prevAccidental = selection["attr"];
+        block.prevAccidental = prevAccidental;
+       
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
         __pitchPreview();
