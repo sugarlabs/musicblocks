@@ -349,6 +349,7 @@ class Notation {
         } else {
             if (this.activity.logo.runningLilypond) {
                 obj = rationalToFraction(factor);
+                if (!obj) return; // Prevent undefined obj error
                 this.activity.errorMsg(
                     _("Lilypond cannot process pickup of ") + obj[0] + "/" + obj[1]
                 );
