@@ -21,25 +21,28 @@ You can run it from
 
 ![alt tag](./getting-started.png "Music Blocks in a browser")
 
-## TABLE OF CONTENTS
-1. [Getting Started]
-2. [Toolbars]
-3. [Context Menu]
-4. [The Block Context Menu]
-    1. [Extract Option]
-    2. [Duplicate Option]
-    3. [Delete Option]
-    4. [Help Option]
-5. [Keyboard Shortcuts]
-6. [Block Palettes]
-    1. [Defining a Note]
-    2. [A Quick Tour of Selected Blocks]
-7. [Flow Palette]
-8. [Widget Palette]
-9. [Stats]
-10. [Planet View]
+## <a>TABLE OF CONTENTS</a>
 
-## 1. Getting Started
+1. [Getting Started](#1-getting-started)
+2. [Toolbars](#2-toolbars)
+3. [Context Menu](#3-context-menu)
+4. [The Block Context Menu](#4-the-block-context-menu)
+    1. [Extract Option](#41-extract-option)
+    2. [Duplicate Option](#42-duplicate-option)
+    3. [Delete Option](#43-delete-option)
+    4. [Help Option](#44-help-option)
+5. [Keyboard Shortcuts](#5-keyboard-shortcuts)
+6. [Block Palettes](#6-block-palettes)
+    1. [Defining a Note](#61-defining-a-note)
+    2. [A Quick Tour of Selected Blocks](#62-a-quick-tour-of-selected-blocks)
+7. [Flow Palette](#7-flow-palette)
+8. [Widget Palette](#8-widget-palette)
+9. [Stats](#9-stats)
+10. [Planet View](#10-planet-view)
+
+## <a>1. Getting Started</a>
+
+[Back to Table of Contents](#table-of-contents)
 
 ![Default blocks](./getting_started_blocks.svg "default blocks")
 
@@ -81,7 +84,9 @@ To maximize screen real estate, Music Blocks overlays the program
 elements (stacks of blocks) on top of the canvas. These blocks can be
 hidden at any time while running the program.
 
-## 2. Toolbars
+## <a>2. Toolbars</a>
+
+[Back to Table of Contents](#table-of-contents)
 
 There are five toolbars:
 
@@ -113,37 +118,45 @@ a block.
 
 Many blocks also incorporate "pie menus" for changing block parameters.
 
-## 3. Context Menu
+## <a>3. Context Menu</a>
+
+[Back to Table of Contents](#table-of-contents)
+
 Context menus are an important part of user interfaces that provide users with quick access to a set of actions relevant to the context in which they are working.The right-click context menu in Music Blocks provides several options for working with blocks and the workspace. To access the right-click context menu, simply right-click anywhere in the workspace.
 
-## 4. The Block Context Menu
+## <a>4. The Block Context Menu</a>
+
+[Back to Table of Contents](#table-of-contents)
+
 This context menu appears when you right-click on a block in the workspace. It provides options such as "Duplicate," "Delete," "Help," and "Copy to Palette." The "Duplicate" option creates a copy of the selected block, while the "Delete" option removes the selected block from the workspace. The "Help" option opens a help dialog for the selected block, and the "Copy to Palette" option adds the selected block to the user's custom block palette.
 
 ![Right-click context menu](./block_context.png "Right-click context menu")
 
-### 4.1 Extract Option
+### <a>4.1 Extract Option</a>
 The "Extract" option in Music Blocks allows you to separate a nested block into its individual components or sub-blocks. This can be useful if you want to modify or reuse specific parts of a block without affecting the rest of the block.
 
 ![Extract the selected block](./extract.png "Extract the selected block")
 
-### 4.2 Duplicate Option
+### <a>4.2 Duplicate Option</a>
 This option creates a duplicate of the selected block and places it next to the original block.
 
 ![Duplicate](./duplicate.png "Duplicate")
 
-### 4.3 Delete Option
+### <a>4.3 Delete Option</a>
 This option removes the selected block from your program.
 
 ![Delete](./delete.png "Delete")
 
-### 4.4 Help Option
+### <a>4.4 Help Option</a>
 This option shows a help screen with information about the selected block. You can use this option to learn more about the block's functionality and how to use it in your projects.
 
 ![Help](./help.png "Help")
 
 By using the right-click context menu in Music Blocks, you can quickly perform common tasks and manipulate blocks on the workspace. This can help you to work more efficiently and effectively in your projects.
 
-## 5. Keyboard Shortcuts
+## <a>5. Keyboard Shortcuts</a>
+
+[Back to Table of Contents](#table-of-contents)
 
 There are several keyboard shortcuts:
 
@@ -161,7 +174,9 @@ highlighting the block(s) you want to copy.
 You can directly type notes using *d* for `Do`, *r* for `Re`, *m* for
 `Mi`, *f* for `Fa`, *s* for `Sol`, *l* for `La`, and *t* for `Ti`.
 
-## 6. Block Palettes
+## <a>6. Block Palettes</a>
+
+[Back to Table of Contents](#table-of-contents)
 
 The block palettes are displayed on the left side of the screen. These
 palettes contain the blocks used to create programs.
@@ -181,7 +196,7 @@ for details specific to music: *Rhythm*, *Meter*, *Pitch*, *Intervals*,
 All of the other palettes are described in the
 [Turtle Blocks documentation pages](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
 
-### 6.1 Defining a Note
+### <a>6.1 Defining a Note</a>
 
 ![The Note Block](./newnote_block.svg "the note")
 
@@ -229,7 +244,7 @@ you can put as many *Pitch* blocks inside a note as you'd like. They
 will play together as a chord. You can also insert graphics blocks
 inside a note in order to create sound-sync animations.
 
-### 6.2 A Quick Tour of Selected Blocks
+### <a>6.2 A Quick Tour of Selected Blocks</a>
 
 ![The Set Instrument block](./settimbre_block.svg "Set instrument block")
 
@@ -397,7 +412,9 @@ messages during program execution. It is very useful as a debugging
 tool and also as a means of adding lyrics to your music&mdash;think
 karaoke. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732172483377262&run=True)
 
-## 7. Flow Palette
+## <a>7. Flow Palette</a>
+
+[Back to Table of Contents](#table-of-contents)
 
 The Flow palette is described in more detail in the [Turtle Blocks
 documentation](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation). Here we review a few ways to approach taking different
@@ -420,7 +437,9 @@ to create a series of strings: "action1", "action2", ...,
 
 ![Do](./do-actions.svg "Do actions")
 
-## 8. Widget Palette
+## <a>8. Widget Palette</a>
+
+[Back to Table of Contents](#table-of-contents)
 
 Music Blocks has various Widgets that can be used within Music Blocks
 to enhance your experience. The *Pitch-time matrix* is described here.
@@ -501,14 +520,18 @@ the chunk in the clamp of the *Pitch-time Marix* block.
 More details about all of the widgets are available in the
 [Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md).
 
-## 9. Stats
+## <a>9. Stats</a>
+
+[Back to Table of Contents](#table-of-contents)
 
 Project statistics are available from a button on the secondary
 toolbar in advanced mode.
 
 ![Stats](./stats.svg "Stats Details")
 
-## 10. Planet View 
+## <a>10. Planet View</a>
+
+[Back to Table of Contents](#table-of-contents)
 
 Music Blocks also provides a Planet view to find and share
 projects. It has options to load project from file locally and make
@@ -530,3 +553,5 @@ can download.
 ![Planet](./planet-3.png)
 
 ![Planet](./planet-4.png)
+
+[Back to Table of Contents](#table-of-contents)
