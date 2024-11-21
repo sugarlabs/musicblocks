@@ -1961,7 +1961,7 @@ class Activity {
                     that.stageX = event.stageX;
                     that.stageY = event.stageY;
     
-                    if (!moving) return;
+                    if (!that.moving) return;
 
                     // if we are moving the block container, deselect the active block.
                     // Deselect active block if moving the block container
@@ -6062,6 +6062,8 @@ class Activity {
             document.addEventListener(
                 "mousedown",
                 (event) => {
+                    if (event.button !==2) return;
+                    this.moving = false;
                     // event.preventDefault();
                     // event.stopPropagation();
                     if (event.target.id === "myCanvas") {
@@ -6114,6 +6116,8 @@ class Activity {
 
             document.addEventListener("mouseup", (event) => {
                // event.preventDefault();
+                if (event.button !== 2) return;
+                this.moving = true;
                 this.isDragging = false;
                 this.selectionArea.style.display = "none";
                 this.startX = 0;
