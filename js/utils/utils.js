@@ -1157,6 +1157,7 @@ readable-fractions/681534#681534
 
     let df = 1.0;
     let top = 1;
+    let iterations = 0
     const maxIterations = 1000;
     let bot = 1;
 
