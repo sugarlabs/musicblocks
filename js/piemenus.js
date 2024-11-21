@@ -94,7 +94,7 @@ const piemenuPitches = (
     custom
 ) => {
     let prevPitch = null;
-
+    let prevAccidental = block.prevAccidental || null; // to remember the previous accidental value
     // wheelNav pie menu for pitch selection
     if (block.blocks.stageClick) {
         return;
