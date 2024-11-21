@@ -1158,7 +1158,7 @@ readable-fractions/681534#681534
     let df = 1.0;
     let top = 1;
     let iterations = 0
-    const maxIterations = 1000;
+    const maxIterations = 10000;
     let bot = 1;
 
     while (Math.abs(df - d) > 0.00000001 && iterations < maxIterations) {
@@ -1174,7 +1174,7 @@ readable-fractions/681534#681534
     }
 
     if (iterations === maxIterations) {
-        console.warn("rationalToFraction: Reached iteration limit");
+        //console.warn("rationalToFraction: Reached iteration limit");
         return [top, bot];
     }
 
