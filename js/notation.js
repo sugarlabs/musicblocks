@@ -354,7 +354,6 @@ class Notation {
                     _("Lilypond cannot process pickup of ") + obj[0] + "/" + obj[1]
                 );
             }
-
             obj = rationalToFraction(1 - factor);
             for (let i = 0; i < obj[0]; i++) {
                 this.activity.logo.updateNotation(["R"], obj[1], turtle, false, "");

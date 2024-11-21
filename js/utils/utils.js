@@ -1143,6 +1143,9 @@ readable-fractions/681534#681534
     "3/5"
 
     */
+    if (d === 0 || isNaN(d) || !isFinite(d)) {
+        return [0, 1];
+    }
 
     let invert;
     if (d > 1) {
@@ -1154,17 +1157,24 @@ readable-fractions/681534#681534
 
     let df = 1.0;
     let top = 1;
+    const maxIterations = 1000;
     let bot = 1;
 
-    while (Math.abs(df - d) > 0.00000001) {
+    while (Math.abs(df - d) > 0.00000001 && iterations < maxIterations) {
         if (df < d) {
             top += 1;
         } else {
             bot += 1;
-            top = Math.floor(d * bot);
+            top = Math.round(d * bot);
         }
 
         df = top / bot;
+        iterations++;
+    }
+
+    if (iterations === maxIterations) {
+        console.warn("rationalToFraction: Reached iteration limit");
+        return [top, bot];
     }
 
     if (bot === 0 || top === 0) {
