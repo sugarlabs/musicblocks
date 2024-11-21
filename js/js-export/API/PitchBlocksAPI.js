@@ -178,9 +178,4 @@ class PitchBlocksAPI {
         const args = JSInterface.validateArgs("numToOctave", [number]);
         return Singer.PitchActions.numToPitch(args[0], "octave", this.turIndex);
     }
-
-    // getPitchInfo(type) {
-    //     let args = JSInterface.validateArgs("getPitchInfo", [type]);
-    //     return Singer.PitchActions.getPitchInfo(args[0], this.turIndex);
-    // }
 }
