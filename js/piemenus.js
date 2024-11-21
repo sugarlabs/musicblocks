@@ -334,30 +334,21 @@ const piemenuPitches = (
 
     if (!custom) {
         // Navigate to a the current accidental value.
-        if (accidental === "") {
-            block._accidentalsWheel.navigateWheel(2);
-        } else {
-            switch (accidental) {
-                case DOUBLEFLAT:
-                    block._accidentalsWheel.navigateWheel(4);
-                    break;
-                case FLAT:
-                    block._accidentalsWheel.navigateWheel(3);
-                    break;
-                case NATURAL:
-                    block._accidentalsWheel.navigateWheel(2);
-                    break;
-                case SHARP:
-                    block._accidentalsWheel.navigateWheel(1);
-                    break;
-                case DOUBLESHARP:
-                    block._accidentalsWheel.navigateWheel(0);
-                    break;
-                default:
-                    block._accidentalsWheel.navigateWheel(2);
-                    break;
-            }
+        let accidentalIndex = 2; // Default to "natural" if none is set.
+        if (prevAccidental !== null) {
+            accidentalIndex = accidentals.indexOf(prevAccidental);
+        } else if (accidental === DOUBLEFLAT) {
+            accidentalIndex = 4;
+        } else if (accidental === FLAT) {
+            accidentalIndex = 3;
+        } else if (accidental === NATURAL) {
+            accidentalIndex = 2;
+        } else if (accidental === SHARP) {
+            accidentalIndex = 1;
+        } else if (accidental === DOUBLESHARP) {
+            accidentalIndex = 0;
         }
+        block._accidentalsWheel.navigateWheel(accidentalIndex);
     }
 
     if (hasOctaveWheel) {
