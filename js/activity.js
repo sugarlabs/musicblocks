@@ -1798,25 +1798,17 @@ class Activity {
          */
         this._setupBlocksContainerEvents = () => {
             const moving = false;
-            let lastCoords = {
-                x: 0,
-                y: 0,
-                delta: 0
-            };
-
             const that = this;
+            let lastCoords = { x: 0, y: 0, delta: 0 };
 
             /**
              * Closes any open menus and labels.
              */
             const closeAnyOpenMenusAndLabels = () => {
-                if (docById("wheelDiv") !== null) docById("wheelDiv").style.display = "none";
-                if (docById("contextWheelDiv") !== null)
-                    docById("contextWheelDiv").style.display = "none";
-                if (docById("helpfulWheelDiv") !== null)
-                    docById("helpfulWheelDiv").style.display = "none";
-                if (docById("textLabel") !== null) docById("textLabel").style.display = "none";
-                if (docById("numberLabel") !== null) docById("numberLabel").style.display = "none";
+                ['wheelDiv', 'contextWheelDiv', 'helpfulWheelDiv', 'textLabel', 'numberLabel'].forEach(id => {
+                    const elem = docById(id);
+                    if (elem) elem.style.display = 'none';
+                });
             };
 
             /**
@@ -1940,30 +1932,23 @@ class Activity {
              * @param {WheelEvent} event - The wheel event object.
              */
             const __wheelHandler = (event) => {
-                const data = normalizeWheel(event); // normalize over different browsers
+                const data = normalizeWheel(event);
                 const delY = data.pixelY;
                 const delX = data.pixelX;
-               
-                //Ctrl+MouseWheel Zoom functionality
+    
                 if (event.ctrlKey) {
-                    event.preventDefault(); // Prevent default scrolling behavior
-                   
-                    if (delY < 0 && doLargerBlocks(this));//Zoom IN
-                    if (delY >= 0 && doSmallerBlocks(this));//Zoom Out
-                }
-                if (delY !== 0 && event.axis === event.VERTICAL_AXIS) {
-                    closeAnyOpenMenusAndLabels(); // closes all wheelnavs when scrolling .
+                    event.preventDefault();
+                    delY < 0 ? doLargerBlocks(that) : doSmallerBlocks(that);
+                } else if (delY !== 0 && event.axis === event.VERTICAL_AXIS) {
+                    closeAnyOpenMenusAndLabels();
                     that.blocksContainer.y -= delY;
-                }
-                // horizontal scroll
-                if (that.scrollBlockContainer) {
-                    if (delX !== 0 && event.axis === event.HORIZONTAL_AXIS) {
-                        closeAnyOpenMenusAndLabels();
-                        that.blocksContainer.x -= delX;
-                    }
+                } else if (that.scrollBlockContainer && delX !== 0 && event.axis === event.HORIZONTAL_AXIS) {
+                    closeAnyOpenMenusAndLabels();
+                    that.blocksContainer.x -= delX;
                 } else {
                     event.preventDefault();
                 }
+    
                 that.refreshCanvas();
             };
 
@@ -2017,10 +2002,8 @@ class Activity {
                 that.stage.on("stagemousemove", (event) => {
                     that.stageX = event.stageX;
                     that.stageY = event.stageY;
-
-                    if (!moving) {
-                        return;
-                    }
+    
+                    if (!that.moving) return;
 
                     // if we are moving the block container, deselect the active block.
                     // Deselect active block if moving the block container
@@ -4229,7 +4212,7 @@ class Activity {
                     let st = sched[j].start;
                     let ed= sched[j].end;
                     let dur = ed - st;
-                    var temp = this.getClosestStandardNoteValue(dur * 3 / 8);
+                    let temp = this.getClosestStandardNoteValue(dur * 3 / 8);
                     shortestNoteDenominator=Math.max(shortestNoteDenominator,temp[1]);
                 }
         
@@ -4271,7 +4254,7 @@ class Activity {
                         }
                         return ar;
                     };
-                    var obj = this.getClosestStandardNoteValue(duration * 3 / 8);
+                    let obj = this.getClosestStandardNoteValue(duration * 3 / 8);
                     // let scalingFactor=1;
                     // if(shortestNoteDenominator>32)
                     // scalingFactor=shortestNoteDenominator/32;
@@ -5731,7 +5714,7 @@ class Activity {
 
             const ButtonHolder = document.createElement("div");
             ButtonHolder.setAttribute("id", "buttoncontainerBOTTOM");
-            ButtonHolder.style.display = removeButtonContainer ? "none" : "block";
+            ButtonHolder.style.display = "block";
             document.body.appendChild(ButtonHolder);
 
             this.homeButtonContainer = createButton(GOHOMEFADEDBUTTON,
@@ -6149,7 +6132,9 @@ class Activity {
             this.unhighlightSelectedBlocks(false);
             this.setSelectionMode(false);
         }
-
+ 
+        // end the drag on navbar
+        document.getElementById("toolbars").addEventListener("mouseover", () => {this.isDragging = false;});
 
         this._create2Ddrag = () => {
             this.dragArea = {};
@@ -6212,13 +6197,13 @@ class Activity {
             let width = Math.abs(this.currentX - this.startX);
             let height = Math.abs(this.currentY - this.startY);
 
-            this.selectionArea.style.display = "block";
+            this.selectionArea.style.display = "flex";
             this.selectionArea.style.position = "absolute";
             this.selectionArea.style.left = x + "px";
             this.selectionArea.style.top = y + "px";
             this.selectionArea.style.height = height + "px";
             this.selectionArea.style.width = width + "px";
-            this.selectionArea.style.zIndex = "9999";
+            this.selectionArea.style.zIndex = "9989";
             this.selectionArea.style.backgroundColor = "rgba(137, 207, 240, 0.5)";
             this.selectionArea.style.pointerEvents = "none";
 

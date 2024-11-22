@@ -1898,7 +1898,7 @@ function MusicKeyboard(activity) {
      */
     this._createAddRowPieSubmenu = function () {
         docById("wheelDivptm").style.display = "";
-        docById("wheelDivptm").style.zIndex = "300";
+        // docById("wheelDivptm").style.zIndex = "300";
         const pitchLabels = ["do", "re", "mi", "fa", "sol", "la", "ti"];
         const hertzLabels = [262, 294, 327, 348, 392, 436, 490, 523];
         const VALUESLABEL = ["pitch", "hertz"];
@@ -1943,7 +1943,7 @@ function MusicKeyboard(activity) {
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["x", " "]);
+        this._exitWheel.createWheel(["×", " "]);
 
         const x = docById("addnotes").getBoundingClientRect().x;
         const y = docById("addnotes").getBoundingClientRect().y;

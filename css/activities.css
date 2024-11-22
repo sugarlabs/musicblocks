@@ -1732,6 +1732,10 @@ table {
 .disable_highlighting {
   user-select: none;
 }
+#palette.flex-palette {
+  display: flex !important;
+  flex-direction: row !important;
+}
 
 @media (max-width: 390px) {
   #right-arrow,
