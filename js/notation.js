@@ -347,13 +347,6 @@ class Notation {
             this._notationStaging[turtle].push("pickup", beat);
             this._pickupPOW2[turtle] = true;
         } else {
-            if (this.activity.logo.runningLilypond) {
-                obj = rationalToFraction(factor);
-                if (!obj) return; // Prevent undefined obj error
-                this.activity.errorMsg(
-                    _("Lilypond cannot process pickup of ") + obj[0] + "/" + obj[1]
-                );
-            }
             obj = rationalToFraction(1 - factor);
             for (let i = 0; i < obj[0]; i++) {
                 this.activity.logo.updateNotation(["R"], obj[1], turtle, false, "");
