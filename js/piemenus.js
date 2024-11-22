@@ -327,7 +327,7 @@ const piemenuPitches = (
         } else {
             accidental = EQUIVALENTACCIDENTALS[scale[6 - i]].substr(1);
         }
-        block.value = block.value.replace(SHARP, "").replace(FLAT, "");
+        block.value = block.value.replace(SHARP, "").replace(FLAT, "").replace(DOUBLESHARP, "").replace(DOUBLEFLAT, "");
         block.value += accidental;
         block.text.text = block.value;
     }
@@ -2395,7 +2395,7 @@ const piemenuChords = (block, selectedChord) => {
     docById("wheelDiv").style.display = "";
 
     // the chord selector
-    block._chordWheel = new wheelnav("wheelDiv", null, 800, 800);
+    block._chordWheel = new wheelnav("wheelDiv", null, 1000, 1000);
     block._exitWheel = new wheelnav("_exitWheel", block._chordWheel.raphael);
 
     const chordLabels = [];
@@ -2468,7 +2468,7 @@ const piemenuChords = (block, selectedChord) => {
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
-    setWheelSize(300);
+    setWheelSize(400);
     docById("wheelDiv").style.left =
         Math.min(
             block.blocks.turtles._canvas.width - 300,
@@ -3494,6 +3494,14 @@ const piemenuBlockContext = (block) => {
     wheel.navItems[3].navigateFunction = () => {
         docById("contextWheelDiv").style.display = "none";
     };
+
+    document.body.addEventListener("click", (event) => {
+        const wheelElement = document.getElementById("contextWheelDiv");
+        const displayStyle = window.getComputedStyle(wheelElement).display;
+        if (displayStyle === "block") {
+            wheelElement.style.display = "none";
+        }
+    });
 
     if (
         ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].includes(

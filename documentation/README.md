@@ -1,5 +1,4 @@
-﻿Using Music Blocks
-==================
+﻿# Using Music Blocks
 
 Music Blocks is a fork of [Turtle
 Blocks](href="https://turtle.sugarlabs.org). It has extensions for
@@ -22,14 +21,34 @@ You can run it from
 
 ![alt tag](./getting-started.png "Music Blocks in a browser")
 
-Getting Started
----------------
+## <a>TABLE OF CONTENTS</a>
+
+1. [Getting Started](#1-getting-started)
+2. [Toolbars](#2-toolbars)
+3. [Context Menu](#3-context-menu)
+4. [The Block Context Menu](#4-the-block-context-menu)
+    1. [Extract Option](#41-extract-option)
+    2. [Duplicate Option](#42-duplicate-option)
+    3. [Delete Option](#43-delete-option)
+    4. [Help Option](#44-help-option)
+5. [Keyboard Shortcuts](#5-keyboard-shortcuts)
+6. [Block Palettes](#6-block-palettes)
+    1. [Defining a Note](#61-defining-a-note)
+    2. [A Quick Tour of Selected Blocks](#62-a-quick-tour-of-selected-blocks)
+7. [Flow Palette](#7-flow-palette)
+8. [Widget Palette](#8-widget-palette)
+9. [Stats](#9-stats)
+10. [Planet View](#10-planet-view)
+
+## <a>1. Getting Started</a>
+
+[Back to Table of Contents](#table-of-contents)
 
 ![Default blocks](./getting_started_blocks.svg "default blocks")
 
 When you first launch Music Blocks in your browser, you'll see a stack
 of blocks representing the notes: `Sol 4`, `Mi 4`and `Sol 4`. The first two notes are `1/4` note; third note is 
-`1/2` note.
+`1/2` note. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1731947644713000&run=True)
 
 ![The Play button](./play.png "play button")
 
@@ -65,8 +84,9 @@ To maximize screen real estate, Music Blocks overlays the program
 elements (stacks of blocks) on top of the canvas. These blocks can be
 hidden at any time while running the program.
 
-Toolbars
---------
+## <a>2. Toolbars</a>
+
+[Back to Table of Contents](#table-of-contents)
 
 There are five toolbars:
 
@@ -98,38 +118,45 @@ a block.
 
 Many blocks also incorporate "pie menus" for changing block parameters.
 
-## Context Menu
+## <a>3. Context Menu</a>
+
+[Back to Table of Contents](#table-of-contents)
+
 Context menus are an important part of user interfaces that provide users with quick access to a set of actions relevant to the context in which they are working.The right-click context menu in Music Blocks provides several options for working with blocks and the workspace. To access the right-click context menu, simply right-click anywhere in the workspace.
 
-# The Block context menu:
+## <a>4. The Block Context Menu</a>
+
+[Back to Table of Contents](#table-of-contents)
+
 This context menu appears when you right-click on a block in the workspace. It provides options such as "Duplicate," "Delete," "Help," and "Copy to Palette." The "Duplicate" option creates a copy of the selected block, while the "Delete" option removes the selected block from the workspace. The "Help" option opens a help dialog for the selected block, and the "Copy to Palette" option adds the selected block to the user's custom block palette.
 
 ![Right-click context menu](./block_context.png "Right-click context menu")
 
-# Extract
+### <a>4.1 Extract Option</a>
 The "Extract" option in Music Blocks allows you to separate a nested block into its individual components or sub-blocks. This can be useful if you want to modify or reuse specific parts of a block without affecting the rest of the block.
 
 ![Extract the selected block](./extract.png "Extract the selected block")
 
-# Duplicate
+### <a>4.2 Duplicate Option</a>
 This option creates a duplicate of the selected block and places it next to the original block.
 
 ![Duplicate](./duplicate.png "Duplicate")
 
-# Delete
-This option removes the selected block from your program
+### <a>4.3 Delete Option</a>
+This option removes the selected block from your program.
 
 ![Delete](./delete.png "Delete")
 
-# Help
+### <a>4.4 Help Option</a>
 This option shows a help screen with information about the selected block. You can use this option to learn more about the block's functionality and how to use it in your projects.
 
 ![Help](./help.png "Help")
 
 By using the right-click context menu in Music Blocks, you can quickly perform common tasks and manipulate blocks on the workspace. This can help you to work more efficiently and effectively in your projects.
 
-Keyboard shortcuts
-------------------
+## <a>5. Keyboard Shortcuts</a>
+
+[Back to Table of Contents](#table-of-contents)
 
 There are several keyboard shortcuts:
 
@@ -147,8 +174,9 @@ highlighting the block(s) you want to copy.
 You can directly type notes using *d* for `Do`, *r* for `Re`, *m* for
 `Mi`, *f* for `Fa`, *s* for `Sol`, *l* for `La`, and *t* for `Ti`.
 
-Block Palettes
---------------
+## <a>6. Block Palettes</a>
+
+[Back to Table of Contents](#table-of-contents)
 
 The block palettes are displayed on the left side of the screen. These
 palettes contain the blocks used to create programs.
@@ -168,8 +196,7 @@ for details specific to music: *Rhythm*, *Meter*, *Pitch*, *Intervals*,
 All of the other palettes are described in the
 [Turtle Blocks documentation pages](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
 
-Defining a note
----------------
+### <a>6.1 Defining a Note</a>
 
 ![The Note Block](./newnote_block.svg "the note")
 
@@ -217,15 +244,14 @@ you can put as many *Pitch* blocks inside a note as you'd like. They
 will play together as a chord. You can also insert graphics blocks
 inside a note in order to create sound-sync animations.
 
-A quick tour of selected blocks
--------------------------------
+### <a>6.2 A Quick Tour of Selected Blocks</a>
 
 ![The Set Instrument block](./settimbre_block.svg "Set instrument block")
 
 The *Set instrument* block, found on the *Tone* palette, lets you choose a
 timbre for a note. In the above example, a guitar model is used to
 make any notes contained within the block's clamp will sound as if
-they are being played on a guitar.
+they are being played on a guitar. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1731948356610795&run=True)
 
 ![The Set Volume block](./setsynthvolume_block.svg "Set synth volume")
 
@@ -237,28 +263,28 @@ volume), of any notes contained with the block's clamp.
 
 The *Set drum* block, which is used inside of the clamp of a *Note
 value* block is used to add drum sounds to a note. It is found on the
-*Drum* palette.
+*Drum* palette. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732000719242159&run=True)
 
-![The Repeat block](./repeat_block.svg "Repeat")
+![The Repeat block](./repeat_block.svg "Repeat Block")
 
 The *Repeat* block, found on the *Flow* palette, is used to create
 loops. Whatever stack of blocks are placed inside its clamp will be
 repeated. It can be used to repeat individual notes, or entire phrases
-of music.
+of music. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732003682836455&run=True)
 
-![The Duplicate block](./duplicatenotes_block.svg "Duplicate block")
+![The Duplicate block](./duplicatenotes_block.svg "Duplicate Block")
 
 The *Duplicate* block, found on the *Rhythms* palette, is used to
 repeat any contained notes. Similar to using a *Repeat* block, but
 rather than repeating a sequence of notes multiple times, each note is
 repeated in turn, e.g. duplicate x2 of `4 4 8` would result in `4 4 4
-4 8 8`, where as repeat x2 of `4 4 8` would result in `4 4 8 4 4 8`.
+4 8 8`, where as repeat x2 of `4 4 8` would result in `4 4 8 4 4 8`. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732003870740637&run=True)
 
 The *Start* block, found on the *Action* palette, is tied to the *Run*
 button. Anything inside of the clamp of the *Start* button will be run
-when the button is pressed.
+when the button is pressed. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732004679481517&run=True)
 
-![The Start block](./multiple_start_blocks.svg "Start")
+![The Start block](./multiple_start_blocks.svg "Start Block")
 
 Note that you can have multiple mice and that each mouse is
 equivalent to a "voice" in music. It can play notes of various pitches
@@ -276,7 +302,7 @@ create an *Action* block, a new block corresponding to that action is
 added to the palette. The name given to the action is the name
 associated with the new block. (It is common practice to use *Action*
 blocks to define short phrases of music that can be repeated and
-modified.)
+modified.) [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732004679481517&run=True)
 
 Actions are a powerful organizational element for your program and can
 be used in many powerful ways, e.g., an action can be associated with
@@ -284,91 +310,91 @@ an event, such as an on beat or off beat or mouse click. See
 [Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md),
 for further details and examples.
 
-![The Storein Box block](./storebox1_block.svg "storein-Box-Add One")
+![The Storein Box block](./storebox1_block.svg "Store in box & Add 1 to Block")
 
 The *Store in* block, found on the *Boxes* palette, is used to store a
 value. That value can be retrieved using the *Box* block. The value
 can be modified using the *Add one* block. These blocks are the
 typical way in which variables are stored and retrieved in Music
-Blocks.
+Blocks. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732020971700880&run=True)
 
-![Forward](./forward_block.svg "forward")
+![Forward](./forward_block.svg "Forward Block")
 
-The *Forward* block, found on the *Mouse* palette, is used to draw
+The *Forward* block, found on the *Graphics/Mouse* palette, is used to draw
 straight lines. (Note that if this block is used inside of a *Note
 value* block&mdash;the line will be drawn as the note plays; otherwise
-the line is drawn "instantly".)
+the line is drawn "instantly".) [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1730651293282088&run=True)
 
-![Right](./left_block.svg "right")
+![Right](./left_block.svg "Right/Left Block")
 
-The *Right* block, found on the *Mouse* palette, is used to rotate the
+The *Right/Left* block, found on the *Graphics/Mouse* palette, is used to rotate the
 mouse heading. (Note that if this block is used inside of a *Note
 value* block&mdash;the heading will change as the note plays;
-otherwise the heading is changed "instantly".)
+otherwise the heading is changed "instantly".) [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732023891064703&run=True)
 
-![Pen Up](./mousebutton_block.svg "pen up-pen down")
+![Pen Up](./mousebutton_block.svg "Pen up and Pen down Block")
 
 The *Pen up* and *Pen down* blocks, found on the *Pen* palette,
-determine whether or not the mouse draws as it moves.
+determine whether or not the mouse draws as it moves. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732030390164543&run=True)
 
-![Set Shade](./setshade_block.svg "set shade")
+![Set Shade](./setshade_block.svg "Set shade Block")
 
 The *Set shade* block, also found on the *Pen* palette, is used to set
 the lightness or darkness of the "ink" used in the mouse pen. `set
-shade 0` is black. `set shade 100` is white.
+shade 0` is black. `set shade 100` is white. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732096229605656&run=True)
 
-![Set Color](./setcolor_block.svg "set color")
+![Set Color](./setcolor_block.svg "Set color Block")
 
 The *Set color* block, also found on the *Pen* palette, is used to set
 the color of the "ink" used in the mouse pen. `set color 0` is
-red. `set color 70` is blue.
+red. `set color 70` is blue. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732096675098636&run=True)
 
-![Random](./random_block.svg "random")
+![Random](./random_block.svg "Random Block")
 
 The *Random* block, found on the *Numbers* palette, is used to
 generate a random number, because sometimes being unpredictable is
-nice.
+nice. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732097168390186&run=True)
 
-![One of This or That](./oneOf_block.svg "on of this or that")
+![One of This or That](./oneOf_block.svg "One of this or that Block")
 
 The *One of* block, also found on the *Numbers* palette, is used to
 generate a binary choice, one of "this" or "that", because sometimes
-being unpredictable is nice.
+being unpredictable is nice. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732113139904914&run=True)
 
-![alt tag](./show_block.svg "show media")
+![alt tag](./show_block.svg "Show media Block")
 
 The *Show* block, found on the *Media* palette, is used to display
-text and images.
+text and images. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732117445989018&run=True)
 
-![Mouse Button](./mousebutton_block.svg "mousebutton")
+![Mouse Button](./mousebutton_block.svg "Mouse button Block")
 
 The *Mouse button* block, found on the *Sensors* palette, returns true
 if the mouse button is clicked. The mouse button block can be used to
-create some interactivity in your program.
+create some interactivity in your program. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732030390164543&run=True)
 
-![Cursor XY](./x_block.svg "cursorx-cursory")
+![Cursor XY](./x_block.svg "Cursor x - Cursor y Block")
 
-The *Cursor x* and *Cursor y* blocks, also found on the *Sensors* palette, return the X and Y coordinates of the cursor. These blocks can also be used to create interactive programs.
+The *Cursor x* and *Cursor y* blocks, also found on the *Sensors* palette, return the X and Y coordinates of the cursor. These blocks can also be used to create interactive programs. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732117445989018&run=True)
 
-![alt tag](./input_block.svg "input")
+![alt tag](./input_block.svg "Input Block")
 
 Prompting the user for input is done with the *Input* block. This
-block will display a messgae with a prompt and open an input form at
+block will display a message with a prompt and open an input form at
 the current position of the mouse. Program execution is paused until
 the user types into the form and types RETURN (or Enter). The contents
-of the input form are then transferred to *Input-value* block.
+of the input form are then transferred to *Input-value* block. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732171497274793&run=True)
 
-![Push](./push_block.svg "push")
+![Push](./push_block.svg "Push Block")
 
-![Pop](./pop_block.svg "pop")
+![Pop](./pop_block.svg "Pop Block")
 
 The *Push* and *Pop* blocks, found on the *Heap* palette, are used to
 store and retrieve values on/from a first-in, last-out (FILO) program
-heap. There is a separate heap maintained for each *Start* block.
+heap. There is a separate heap maintained for each *Start* block. <!-- [RUN LIVE]() -->
 
-![Get Value](./getDict_block.svg "get value")
+![Get Value](./getDict_block.svg "Get value Block")
 
-![Set Value](./setDict_block.svg "set value")
+![Set Value](./setDict_block.svg "Set value Block")
 
 The *Get value* and *Set value* blocks are found on the *Dictionary*
 palette. They are used to get and set values in a dictionary
@@ -377,27 +403,28 @@ dictionary and you can have as many dictionaries as you'd like as
 well. There is also a built-in dictionary associated with each *Start*
 block that has key/value pairs for parameters such as x, y, heading,
 color, shade, grey, pen size, notes played, current pitch, pitch
-number, and note value.
+number, and note value. <!-- [RUN LIVE]() -->
 
-![Print](./print_block.svg "print")
+![Print](./print_block.svg "Print Block")
 
 The *Print* block, found on the *Extras* palette, is used to print
 messages during program execution. It is very useful as a debugging
 tool and also as a means of adding lyrics to your music&mdash;think
-karaoke.
+karaoke. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732172483377262&run=True)
 
-Flow Palette
-------------
+## <a>7. Flow Palette</a>
 
-The Flow palette is described in more detail in the Turtle Blocks
-documentation. Here we review a few ways to approach taking different
+[Back to Table of Contents](#table-of-contents)
+
+The Flow palette is described in more detail in the [Turtle Blocks
+documentation](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation). Here we review a few ways to approach taking different
 actions on different beats.
 
 The *Switch* block will take the action defined in the *Case* that
 matches the argument passed to the *Switch* block. In the figure
 below, it will take a different action based on the beat value: "on
 case 1 run action1", "on case 2, run action2", ..., "on case 4 run
-action4". You can also define a default action.
+action4". You can also define a default action. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732173207750796&run=True)
 
 ![Switch](./switch-on-beat.svg "Switch on Beat")
 
@@ -406,12 +433,13 @@ action4". You can also define a default action.
 Another way to do the same thing is with the *Do* block found on the
 Action palette. In the figure below, we add the beat count to "action"
 to create a series of strings: "action1", "action2", ...,
-"action4". We then "do" that action.
+"action4". We then "do" that action. <!-- [RUN LIVE]() -->
 
 ![Do](./do-actions.svg "Do actions")
 
-Widget Palette
---------------
+## <a>8. Widget Palette</a>
+
+[Back to Table of Contents](#table-of-contents)
 
 Music Blocks has various Widgets that can be used within Music Blocks
 to enhance your experience. The *Pitch-time matrix* is described here.
@@ -434,7 +462,7 @@ familiar with math).
 *Pitch-time Matrix* blocks clamp is used to define the matrix:
 A row in the matrix is created for each *Pitch* block and columns are
 created for individual notes, which are created by using *Rhythm*
-blocks, individual note blocks, or the *Tuplet* block.
+blocks, individual note blocks, or the *Tuplet* block. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732180386380311&run=True)
 
 ![Rhythm](./rhythmruler2_block.svg "Rhythm block")
 
@@ -446,7 +474,7 @@ for a quarter note, etc. (Recall that in traditional Western notation
 all note values are (1) in powers of two, and are (2) in relation to
 the "whole note", which is in turn (3) defined by tempo, or
 beats&mdash;usually quarter notes&mdash;per minute) Each note is
-represented by a column in the matrix.
+represented by a column in the matrix. <!-- [RUN LIVE]() -->
 
 Special ratios of the whole note can be created very easily with the
 *Rhythm* block by choosing an integer other than the traditional
@@ -479,7 +507,7 @@ notes, etc. This design choice allows for maximum flexibility) You can
 mix and match *Rhythm* and individual *Note* blocks within a *Tuplet*
 block to generate complex rhythms (e.g. two quarter notes plus an
 eighth note is possible within the tuplet). Each note is represented
-by a column in the matrix.
+by a column in the matrix. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732191858479236&run=True)
 
 Note: Each time you open the matrix, it tries to reconstruct the notes
 marked from the previous matrix. If you modify the *Pitch* and
@@ -492,16 +520,18 @@ the chunk in the clamp of the *Pitch-time Marix* block.
 More details about all of the widgets are available in the
 [Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md).
 
-Stats
------
+## <a>9. Stats</a>
 
-Project statistics are available from a button the the secondary
+[Back to Table of Contents](#table-of-contents)
+
+Project statistics are available from a button on the secondary
 toolbar in advanced mode.
 
 ![Stats](./stats.svg "Stats Details")
 
-Planet View 
------------
+## <a>10. Planet View</a>
+
+[Back to Table of Contents](#table-of-contents)
 
 Music Blocks also provides a Planet view to find and share
 projects. It has options to load project from file locally and make
@@ -523,3 +553,5 @@ can download.
 ![Planet](./planet-3.png)
 
 ![Planet](./planet-4.png)
+
+[Back to Table of Contents](#table-of-contents)
