@@ -625,6 +625,24 @@ const piemenuPitches = (
     // Hide the widget when the exit button is clicked.
     block._exitWheel.navItems[0].navigateFunction = () => {
         that._piemenuExitTime = new Date().getTime();
+        const selectedNote =
+        that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+        const selectedAccidental =
+        !custom && that._accidentalsWheel
+            ? that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title
+            : "";
+
+        // Update the block's displayed text with the note and accidental
+        if (selectedAccidental === "♮" || selectedAccidental === "") {
+                   that.text.text = selectedNote; // Natural or no accidental
+        } else {
+        that.text.text = selectedNote + selectedAccidental; // Combine note and accidental
+        }
+
+        // Update the block value and refresh the cache
+        that.value = selectedNote + (selectedAccidental === "♮" ? "" : selectedAccidental);
+        that.container.setChildIndex(that.text, that.container.children.length - 1);
+        that.updateCache();
         docById("wheelDiv").style.display = "none";
         that._pitchWheel.removeWheel();
         if (!custom) {
