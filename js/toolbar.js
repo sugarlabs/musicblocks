@@ -767,15 +767,104 @@ class Toolbar {
     renderModeSelectIcon(onclick) {
         const begIcon = docById("beginnerMode");
         const advIcon = docById("advancedMode");
-        if (begIcon.style.display === "none") {
-            advIcon.onclick = () => {
-                onclick(this.activity);
-            };
-        } else {
-            begIcon.onclick = () => {
-                onclick(this.activity);
-            };
+        const displayStatsIcon = docById("displayStatsIcon");
+        const loadPluginIcon = docById("loadPluginIcon");
+        const delPluginIcon = docById("delPluginIcon");
+        const enableHorizScrollIcon = docById("enableHorizScrollIcon");
+        const toggleJavaScriptIcon = docById("toggleJavaScriptIcon");
+    
+        const advancedIcons = [
+            displayStatsIcon,
+            loadPluginIcon,
+            delPluginIcon,
+            enableHorizScrollIcon,
+            toggleJavaScriptIcon
+        ];
+    
+        const switchMode = () => {
+            if (!this.activity) {
+                console.error('Activity not initialized');
+                return;
+            }
+        
+            try {
+                // Toggle mode in activity
+                this.activity.beginnerMode = !this.activity.beginnerMode;
+                
+                // Save to localStorage
+                try {
+                    localStorage.setItem('beginnerMode', this.activity.beginnerMode.toString());
+                } catch (e) {
+                    console.error('Error saving to localStorage:', e);
+                }
+        
+                // Update icon visibility
+                if (begIcon) begIcon.style.display = this.activity.beginnerMode ? "none" : "block";
+                if (advIcon) advIcon.style.display = this.activity.beginnerMode ? "block" : "none";
+        
+                // Toggle visibility of advanced features
+                advancedIcons.forEach(icon => {
+                    if (icon) {
+                        icon.style.display = this.activity.beginnerMode ? "none" : "block";
+                    }
+                });
+        
+                // Hide all palettes first
+                if (this.activity.palettes && this.activity.palettes.dict) {
+                    for (const name in this.activity.palettes.dict) {
+                        const palette = this.activity.palettes.dict[name];
+                        if (palette && typeof palette.hideMenu === 'function') {
+                            palette.hideMenu(true);
+                        }
+                    }
+                }
+        
+                // Update palettes for new mode
+                if (this.activity.palettes && typeof this.activity.palettes.updatePalettes === 'function') {
+                    this.activity.palettes.updatePalettes();
+                }
+                
+                // Regenerate all palettes with new mode
+                if (typeof this.activity.regeneratePalettes === 'function') {
+                    this.activity.regeneratePalettes();
+                }
+        
+                // Call the provided onclick handler
+                if (onclick) {
+                    onclick(this.activity);
+                }
+        
+                // Force canvas refresh
+                if (typeof this.activity.refreshCanvas === 'function') {
+                    this.activity.refreshCanvas();
+                }
+        
+            } catch (e) {
+                console.error('Error switching modes:', e);
+                // Error message to user
+                if (this.activity && typeof this.activity.errorMsg === 'function') {
+                    this.activity.errorMsg(_('Error switching modes. Please refresh the page.'));
+                }
+            }
+        };
+    
+        // Attach click handlers
+        if (begIcon) {
+            begIcon.onclick = switchMode;
         }
+        if (advIcon) {
+            advIcon.onclick = switchMode;
+        }
+    
+        // Initial render of icons based on current mode
+        begIcon.style.display = this.activity.beginnerMode ? "none" : "block";
+        advIcon.style.display = this.activity.beginnerMode ? "block" : "none";
+        
+        advancedIcons.forEach(icon => {
+            if (icon) {
+                icon.style.display = this.activity.beginnerMode ? "none" : "block";
+            }
+        });
     }
 
     /**

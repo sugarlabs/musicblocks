@@ -385,6 +385,59 @@ class Palettes {
         docById("palette").style.visibility = "visible";
     }
 
+    clear() {
+        try {
+            // First hide all palettes
+            for (const name in this.dict) {
+                if (this.dict.hasOwnProperty(name)) {
+                    const palette = this.dict[name];
+                    if (palette && typeof palette.hideMenu === 'function') {
+                        palette.hideMenu();
+                    }
+                }
+            }
+    
+            // Store the original top position
+            const originalTop = 60 + this.top;
+    
+            // Remove the palette DOM element if it exists
+            const paletteElement = docById("palette");
+            if (paletteElement) {
+                paletteElement.parentNode.removeChild(paletteElement);
+            }
+    
+            // Clear the dictionary and reset state
+            this.dict = {};
+            this.visible = false;
+            this.activePalette = null;
+            this.paletteObject = null;
+    
+            // Calculate the available height for the palette
+            const maxHeight = window.innerHeight - originalTop - 10;
+    
+            // Recreate the palette using the original initialization code
+            const element = document.createElement("div");
+            element.id = "palette";
+            element.setAttribute("class", "disable_highlighting");
+            element.classList.add('flex-palette');
+            element.setAttribute(
+                "style",
+                `position: fixed; z-index: 1000; left: 0px; top: ${originalTop}px; max-height: ${maxHeight}px; overflow-y: auto;`
+            );
+            element.innerHTML =
+                '<div style="height:fit-content"><table width ="' +
+                1.5 * this.cellSize +
+                'px"bgcolor="white"><thead><tr></tr></thead></table><table width ="' +
+                4.5 * this.cellSize +
+                'px"bgcolor="white"><thead><tr><td style= "width:28px"></tr></thead><tbody></tbody></table></div>';
+            element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
+            document.body.appendChild(element);
+    
+        } catch (e) {
+            console.error('Error clearing palettes:', e);
+        }
+    }
+
     setBlocks(blocks) {
         this.blocks = blocks;
         return this;
