@@ -27,6 +27,12 @@
  * @classdesc methods are imported by a importMethod function call from MusicBlocks class.
  */
 class RhythmBlocksAPI {
+    /**
+     * Plays a note with the specified value.
+     * @param {number} value - The value/duration of the note to play
+     * @param {Function} flow - Flow function to execute after playing the note
+     * @returns {string} ENDFLOWCOMMAND
+     */
     async playNote(value, flow) {
         const args = JSInterface.validateArgs("playNote", [value, flow]);
         await this.runCommand("playNote", [args[0], "newnote", this.turIndex, MusicBlocks.BLK]);
@@ -34,6 +40,12 @@ class RhythmBlocksAPI {
         return this.ENDFLOWCOMMAND;
     }
 
+    /**
+     * Plays a note with a specified duration in milliseconds.
+     * @param {number} value - The duration in milliseconds
+     * @param {Function} flow - Flow function to execute after playing the note
+     * @returns {string} ENDFLOWCOMMAND
+     */
     async playNoteMillis(value, flow) {
         const args = JSInterface.validateArgs("playNoteMillis", [value, flow]);
         await this.runCommand("playNote", [args[0], "osctime", this.turIndex, MusicBlocks.BLK]);
@@ -41,10 +53,20 @@ class RhythmBlocksAPI {
         return this.ENDFLOWCOMMAND;
     }
 
+    /**
+     * Plays a rest (silence) for the current turtle.
+     * @returns {Promise} Command execution promise
+     */
     playRest() {
         return this.runCommand("playRest", [this.turIndex]);
     }
 
+    /**
+     * Adds a rhythmic dot to extend the duration of a note.
+     * @param {number} value - The dot value to apply
+     * @param {Function} flow - Flow function to execute after applying the dot
+     * @returns {string} ENDFLOWCOMMAND
+     */
     async dot(value, flow) {
         const args = JSInterface.validateArgs("dot", [value, flow]);
         await this.runCommand("doRhythmicDot", [args[0], this.turIndex]);
@@ -52,6 +74,11 @@ class RhythmBlocksAPI {
         return this.ENDFLOWCOMMAND;
     }
 
+    /**
+     * Ties two notes together.
+     * @param {Function} flow - Flow function to execute after applying the tie
+     * @returns {string} ENDFLOWCOMMAND
+     */
     async tie(flow) {
         const args = JSInterface.validateArgs("tie", [flow]);
         await this.runCommand("doTie", [this.turIndex]);
@@ -59,6 +86,12 @@ class RhythmBlocksAPI {
         return this.ENDFLOWCOMMAND;
     }
 
+    /**
+     * Multiplies the duration of a note by a specified factor.
+     * @param {number} factor - The multiplication factor to apply
+     * @param {Function} flow - Flow function to execute after multiplication
+     * @returns {string} ENDFLOWCOMMAND
+     */
     async multiplyNoteValue(factor, flow) {
         const args = JSInterface.validateArgs("multiplyNoteValue", [factor, flow]);
         await this.runCommand("multiplyNoteValue", [args[0], this.turIndex]);
@@ -66,6 +99,13 @@ class RhythmBlocksAPI {
         return this.ENDFLOWCOMMAND;
     }
 
+    /**
+     * Applies a swing rhythm effect to notes.
+     * @param {number} swingValue - The amount of swing to apply
+     * @param {number} noteValue - The note value to apply swing to
+     * @param {Function} flow - Flow function to execute after applying swing
+     * @returns {string} ENDFLOWCOMMAND
+     */
     async swing(swingValue, noteValue, flow) {
         const args = JSInterface.validateArgs("multiplyNoteValue", [swingValue, noteValue, flow]);
         await this.runCommand("addSwing", [args[0], args[1], this.turIndex]);
