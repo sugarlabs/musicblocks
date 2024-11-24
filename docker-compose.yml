@@ -25,4 +25,7 @@ services:
       NODE_ENV: development
     #command: ["npm", "run", "server"]
     command: ["npm", "run", "server"]
+<<<<<<< HEAD
     
+=======
+>>>>>>> 1cd7482f (update test-collab branch to contain all the logic to test the collaboration locally (#4077))
