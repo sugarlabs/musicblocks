@@ -634,14 +634,19 @@ const piemenuPitches = (
 
         // Update the block's displayed text with the note and accidental
         if (selectedAccidental === "♮" || selectedAccidental === "") {
-            that.text.text = selectedNote; // Natural or no accidental
+            // Natural or no accidental: display only the note
+            that.text.text = selectedNote; 
         } else {
-            that.text.text = selectedNote + selectedAccidental; // Combine note and accidental
+            // Combine note and accidental for display
+            that.text.text = selectedNote + selectedAccidental;
         }
         // Update the block value and refresh the cache
         that.value = selectedNote + (selectedAccidental === "♮" ? "" : selectedAccidental);
+        // Ensure proper layering of the text element
         that.container.setChildIndex(that.text, that.container.children.length - 1);
+        // Refresh the block's cache
         that.updateCache();
+        // Hide the pie menu and remove the wheels 
         docById("wheelDiv").style.display = "none";
         that._pitchWheel.removeWheel();
         if (!custom) {
