@@ -25,4 +25,3 @@ services:
       NODE_ENV: development
     #command: ["npm", "run", "server"]
     command: ["npm", "run", "server"]
-    
