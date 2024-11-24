@@ -58,21 +58,17 @@ function setupDrumActions(activity) {
          * @returns {String}
          */
         static GetDrumname(drum) {
-            let drumname = DEFAULTDRUM;
-            if (drum.slice(0, 4) === "http") {
-                drumname = drum;
-            } else {
-                for (const d in DRUMNAMES) {
-                    if (DRUMNAMES[d][0] === drum) {
-                        drumname = DRUMNAMES[d][1];
-                        break;
-                    } else if (DRUMNAMES[d][1] === drum) {
-                        drumname = drum;
-                        break;
-                    }
+            if (drum.slice(0, 4) === "http") return drum;
+            
+            for (const [, value] of Object.entries(DRUMNAMES)) {
+                if (value[0] === drum) {
+                    return value[1];
+                } else if (value[1] === drum) {
+                    return drum;
                 }
             }
-            return drumname;
+            
+            return DEFAULTDRUM;
         }
 
         /**

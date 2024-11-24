@@ -383,13 +383,10 @@ class Singer {
      * @param {Number} octave
      * @returns {Number} inverted value
      */
-    static calculateInvert(logo, turtle, note, octave, cents) {
+    static calculateInvert(logo, turtle, note, octave, cents = 0) {
         const activity = logo.activity;
         const tur = activity.turtles.ithTurtle(turtle);
 
-        if (cents === undefined) {
-            cents = 0;
-        }
         let delta = 0;
         const note1 = getNote(
             note,
@@ -408,7 +405,7 @@ class Singer {
             const note2 = getNote(
                 tur.singer.invertList[i][0],
                 tur.singer.invertList[i][1],
-                -cents,  // this needs to be tested.
+                -cents,
                 tur.singer.keySignature,
                 tur.singer.movable,
                 null,
@@ -570,44 +567,39 @@ class Singer {
 
         const activity = logo.activity;
         const tur = activity.turtles.ithTurtle(turtle);
+        const actionArgs = [];
+        const saveNoteCount = tur.singer.notesPlayed;
+        const saveTallyNotes = tur.singer.tallyNotes;
 
-        const saveSuppressStatus = tur.singer.suppressOutput;
-
-        // We need to save the state of the boxes, heap, and dict although there is a potential of a boxes collision with other turtles.
-        const saveBoxes = JSON.stringify(logo.boxes);
-        const saveTurtleHeaps = JSON.stringify(logo.turtleHeaps[turtle]);
-        const saveTurtleDicts = JSON.stringify(logo.turtleDicts[turtle]);
-        // .. and the turtle state
-        const saveX = tur.x;
-        const saveY = tur.y;
-        const saveColor = tur.painter.color;
-        const saveValue = tur.painter.value;
-        const saveChroma = tur.painter.chroma;
-        const saveStroke = tur.painter.stroke;
-        const saveCanvasAlpha = tur.painter.canvasAlpha;
-        const saveOrientation = tur.orientation;
-        const savePenState = tur.painter.penState;
-
-        const saveWhichNoteToCount = tur.singer.whichNoteToCount;
-
-        const savePrevTurtleTime = tur.singer.previousTurtleTime;
-        const saveTurtleTime = tur.singer.turtleTime;
+        const saveState = {
+            suppressOutput: tur.singer.suppressOutput,
+            boxes: JSON.stringify(logo.boxes),
+            turtleHeaps: JSON.stringify(logo.turtleHeaps[turtle]),
+            turtleDicts: JSON.stringify(logo.turtleDicts[turtle]),
+            x: tur.x,
+            y: tur.y,
+            color: tur.painter.color,
+            value: tur.painter.value,
+            chroma: tur.painter.chroma,
+            stroke: tur.painter.stroke,
+            canvasAlpha: tur.painter.canvasAlpha,
+            orientation: tur.orientation,
+            penState: tur.painter.penState,
+            whichNoteToCount: tur.singer.whichNoteToCount,
+            prevTurtleTime: tur.singer.previousTurtleTime,
+            turtleTime: tur.singer.turtleTime,
+            noteCount: tur.singer.notesPlayed,
+            tallyNotes: tur.singer.tallyNotes
+        };
 
         tur.singer.suppressOutput = true;
         tur.singer.justCounting.push(true);
 
-        for (const b in tur.endOfClampSignals) {
-            tur.butNotThese[b] = [];
-            for (const i in tur.endOfClampSignals[b]) {
-                tur.butNotThese[b].push(i);
-            }
-        }
+        Object.keys(tur.endOfClampSignals).forEach(b => {
+            tur.butNotThese[b] = Object.keys(tur.endOfClampSignals[b]);
+        });
 
-        const actionArgs = [];
-        const saveNoteCount = tur.singer.notesPlayed;
-        const saveTallyNotes = tur.singer.tallyNotes;
         tur.running = true;
-
         tur.singer.whichNoteToCount += tur.singer.inNoteBlock.length;
 
         activity.logo.runFromBlockNow(
@@ -616,19 +608,37 @@ class Singer {
             cblk,
             true,
             actionArgs,
+            [],
             activity.turtles.turtleList[turtle].queue.length
         );
-        const returnValue = tur.singer.tallyNotes - saveTallyNotes;
-
-        tur.singer.notesPlayed = saveNoteCount;
-        tur.singer.tallyNotes = saveTallyNotes;
+        const returnValue = tur.singer.tallyNotes - saveState.tallyNotes;
 
         // Restore previous state
-        activity.logo.boxes = JSON.parse(saveBoxes);
-        activity.logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
-        activity.logo.turtleDicts[turtle] = JSON.parse(saveTurtleDicts);
+        Object.assign(tur.singer, {
+            notesPlayed: saveState.noteCount,
+            tallyNotes: saveState.tallyNotes,
+            previousTurtleTime: saveState.prevTurtleTime,
+            turtleTime: saveState.turtleTime,
+            whichNoteToCount: saveState.whichNoteToCount,
+            suppressOutput: saveState.suppressOutput
+        });
+
+        Object.assign(tur.painter, {
+            color: saveState.color,
+            value: saveState.value,
+            chroma: saveState.chroma,
+            stroke: saveState.stroke,
+            canvasAlpha: saveState.canvasAlpha,
+            penState: saveState.penState
+        });
+
+        activity.logo.boxes = JSON.parse(saveState.boxes);
+        activity.logo.turtleHeaps[turtle] = JSON.parse(saveState.turtleHeaps);
+        activity.logo.turtleDicts[turtle] = JSON.parse(saveState.turtleDicts);
 
         tur.painter.doPenUp();
+        tur.painter.doSetXY(saveState.x, saveState.y);
+        tur.painter.doSetHeading(saveState.orientation);
         tur.painter.doSetXY(saveX, saveY);
         tur.painter.color = saveColor;
         tur.painter.value = saveValue;
@@ -637,15 +647,11 @@ class Singer {
         tur.painter.canvasAlpha = saveCanvasAlpha;
         tur.painter.doSetHeading(saveOrientation);
         tur.painter.penState = savePenState;
-
+        tur.singer.suppressOutput = saveSuppressStatus;
         tur.singer.previousTurtleTime = savePrevTurtleTime;
         tur.singer.turtleTime = saveTurtleTime;
-
         tur.singer.whichNoteToCount = saveWhichNoteToCount;
-
         tur.singer.justCounting.pop();
-        tur.singer.suppressOutput = saveSuppressStatus;
-
         tur.butNotThese = {};
 
         return returnValue;

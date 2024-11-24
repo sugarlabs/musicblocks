@@ -88,7 +88,7 @@ function setupToneActions(activity) {
                 activity.logo.phraseMaker._instrumentName = synth;
             }
 
-            if (tur.singer.instrumentNames.indexOf(synth) === -1) {
+            if (!tur.singer.instrumentNames.includes(synth)) {
                 tur.singer.instrumentNames.push(synth);
                 activity.logo.synth.loadSynth(turtle, synth);
 

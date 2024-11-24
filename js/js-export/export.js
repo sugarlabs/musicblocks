@@ -353,7 +353,8 @@ class MusicBlocks {
 
     set PICKUP(value) {
         const args = JSInterface.validateArgs("PICKUP", [value]);
-        Singer.MeterActions.setPickup(args[0], this.turIndex);
+        const validatedValue = Math.max(0, args[0]);
+        Singer.MeterActions.setPickup(validatedValue, this.turIndex);
     }
 
     get WHOLENOTESPLAYED() {
