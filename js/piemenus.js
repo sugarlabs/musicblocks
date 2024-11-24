@@ -634,11 +634,10 @@ const piemenuPitches = (
 
         // Update the block's displayed text with the note and accidental
         if (selectedAccidental === "♮" || selectedAccidental === "") {
-                   that.text.text = selectedNote; // Natural or no accidental
+            that.text.text = selectedNote; // Natural or no accidental
         } else {
-        that.text.text = selectedNote + selectedAccidental; // Combine note and accidental
+            that.text.text = selectedNote + selectedAccidental; // Combine note and accidental
         }
-
         // Update the block value and refresh the cache
         that.value = selectedNote + (selectedAccidental === "♮" ? "" : selectedAccidental);
         that.container.setChildIndex(that.text, that.container.children.length - 1);
