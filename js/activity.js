@@ -260,6 +260,9 @@ class Activity {
         // Flag to indicate whether the user is performing a 2D drag operation.
         this.isDragging = false;
 
+        // Flag to indicate whether user is selecting
+        this.isSelecting = false;
+
         // Flag to indicate the selection mode is on
         this.selectionModeOn = false;
 
@@ -492,7 +495,7 @@ class Activity {
                 (event) => {
                     event.preventDefault();
                     event.stopPropagation();
-                    if (!this.beginnerMode) {
+                    if (!this.beginnerMode && !this.isSelecting) {
                         if (event.target.id === "myCanvas") {
                             this._displayHelpfulWheel(event);
                         }
@@ -6101,7 +6104,7 @@ class Activity {
                 this.hasMouseMoved = true;
                 // event.preventDefault();
                 // this.selectedBlocks = [];
-                if (this.isDragging){
+                if (this.isDragging && this.isSelecting){
                     this.currentX = event.clientX;
                     this.currentY = event.clientY;
                     if (!this.blocks.isBlockMoving && !this.turtles.running()) {
