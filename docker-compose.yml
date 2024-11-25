@@ -6,8 +6,8 @@ services:
     ports: 
       - "3000:3000"
     command: ["python", "-m", "http.server", "3000", "--bind", "0.0.0.0"]
-    # env_file:
-    #  - ./environment
+    env_file:
+     - ./environment
   # planet-server:
   #    build:
   #        dockerfile: ../planet-server/Dockerfile
@@ -25,7 +25,3 @@ services:
       NODE_ENV: development
     #command: ["npm", "run", "server"]
     command: ["npm", "run", "server"]
-<<<<<<< HEAD
-    
-=======
->>>>>>> 1cd7482f (update test-collab branch to contain all the logic to test the collaboration locally (#4077))
