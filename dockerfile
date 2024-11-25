@@ -1,14 +1,16 @@
 # First stage: Build stage
-FROM alpine:latest AS first
-RUN git clone https://github.com/sugarlabs/planet-server.git
-
 FROM python:latest AS build
 
 WORKDIR /app
 
 COPY . .
 
-COPY --from=first /planet-server /app/planet-server
+# Second stage: Final stage
+FROM python:latest
+
+WORKDIR /app
+
+COPY --from=build /app /app
 
 EXPOSE 3000
 
