@@ -3475,37 +3475,70 @@ const piemenuBlockContext = (block) => {
     };
 
     wheel.navItems[2].navigateFunction = () => {
-        that.blocks.activeBlock = blockBlock;
-        that.blocks.extract();
-        if (that.blocks.selectionModeOn){
-            const blocksArray = that.blocks.selectedBlocks;
-            // figure out which of the blocks in selectedBlocks are clamp blocks and nonClamp blocks.
-            const clampBlocks = [];
-            const nonClampBlocks = [];
-
-            for (let i = 0; i < blocksArray.length; i++) {
-                if (that.blocks.selectedBlocks[i].isClampBlock()) {
-                    clampBlocks.push(that.blocks.selectedBlocks[i]);
-                } else if (that.blocks.selectedBlocks[i].isDisconnected()) {
-                    nonClampBlocks.push(that.blocks.selectedBlocks[i]);
+        // Show confirmation dialog
+        const dialog = document.createElement("div");
+        dialog.style.position = "absolute";
+        dialog.style.left = "50%";
+        dialog.style.top = "50%";
+        dialog.style.transform = "translate(-50%, -50%)";
+        dialog.style.backgroundColor = "#fff";
+        dialog.style.border = "1px solid #ccc";
+        dialog.style.borderRadius = "8px";
+        dialog.style.padding = "20px";
+        dialog.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
+        dialog.style.zIndex = 10000;
+        dialog.innerHTML = `
+            <p style="font-size: 16px; margin-bottom: 20px;">Are you sure you want to move this block to trash?</p>
+            <div style="text-align: right;">
+                <button id="confirmBtn" style="margin-right: 10px; padding: 8px 16px; background-color: #28a745; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Confirm</button>
+                <button id="cancelBtn" style="padding: 8px 16px; background-color: #dc3545; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+            </div>
+        `;
+    
+        document.body.appendChild(dialog);
+    
+        // Add event listeners to the buttons
+        document.getElementById("confirmBtn").addEventListener("click", () => {
+            // Confirm action: Move the block to trash
+            if (that.blocks.selectionModeOn) {
+                const blocksArray = that.blocks.selectedBlocks;
+                const clampBlocks = [];
+                const nonClampBlocks = [];
+    
+                for (let i = 0; i < blocksArray.length; i++) {
+                    if (blocksArray[i].isClampBlock()) {
+                        clampBlocks.push(blocksArray[i]);
+                    } else if (blocksArray[i].isDisconnected()) {
+                        nonClampBlocks.push(blocksArray[i]);
+                    }
                 }
+    
+                for (let i = 0; i < clampBlocks.length; i++) {
+                    that.blocks.sendStackToTrash(clampBlocks[i]);
+                }
+    
+                for (let i = 0; i < nonClampBlocks.length; i++) {
+                    that.blocks.sendStackToTrash(nonClampBlocks[i]);
+                }
+    
+                that.blocks.setSelectionToActivity(false);
+                that.blocks.activity.refreshCanvas();
+            } else {
+                that.blocks.sendStackToTrash(that.blocks.blockList[blockBlock]);
             }
-            
-            for (let i = 0; i < clampBlocks.length; i++) {
-                that.blocks.sendStackToTrash(clampBlocks[i]);
-            }
-
-            for (let i = 0; i < nonClampBlocks.length; i++) {
-                that.blocks.sendStackToTrash(nonClampBlocks[i]);
-            }
-            // set selection mode to false
-            that.blocks.setSelectionToActivity(false);
-            that.blocks.activity.refreshCanvas();
-        } else {
-            that.blocks.sendStackToTrash(that.blocks.blockList[blockBlock]);
-        }
-        docById("contextWheelDiv").style.display = "none";
+    
+            // Close the dialog and pie menu
+            document.body.removeChild(dialog);
+            docById("contextWheelDiv").style.display = "none";
+        });
+    
+        document.getElementById("cancelBtn").addEventListener("click", () => {
+            // Cancel action: Close the dialog and pie menu
+            document.body.removeChild(dialog);
+            docById("contextWheelDiv").style.display = "none";
+        });
     };
+
 
     wheel.navItems[3].navigateFunction = () => {
         docById("contextWheelDiv").style.display = "none";

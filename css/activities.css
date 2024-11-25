@@ -1584,7 +1584,7 @@ input.timbreName {
   -o-transition: ease 1s;
   -webkit-transition: ease 1s;
   transition: ease 1s;
-  z-index: 10000;
+  z-index: 9999;
 }
 
 .wheelNav > svg {
