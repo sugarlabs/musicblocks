@@ -668,9 +668,6 @@ class Toolbar {
     
         Record.style.display = "block"; // Ensure visibility
         Record.innerHTML = `<i class="material-icons main">${RECORDBUTTON}</i>`;
-        Record.onclick = () => {
-            rec_onclick(this.activity);
-        };
     }
 
     /**
@@ -939,6 +936,9 @@ class Toolbar {
         if (!this.activity.beginnerMode) {
 
             this.updateRecordButton(rec_onclick);
+            docById("record").onclick = () => {
+                rec_onclick(this.activity);
+            };
 
             displayStatsIcon.onclick = () => {
                 analytics_onclick(this.activity);
