@@ -550,78 +550,54 @@ class Toolbar {
         mxml_onclick,
         blockartworksvg_onclick
     ) {
-        const saveButton = docById("saveButton");
-        const saveButtonAdvanced = docById("saveButtonAdvanced");
-        let saveHTML;
-        let savePNG;
-        let saveWAV;
-        let saveSVG;
-        let saveLY;
-        let saveABC;
-        let saveMXML;
-        let svgData;
-
+        const saveButton = docById('saveButton');
+        const saveButtonAdvanced = docById('saveButtonAdvanced');
         if (this.activity.beginnerMode) {
             if (this.language === "ja") {
                 saveButton.onclick = () => {
                     html_onclick(this.activity);
-                };
-            } else {
-                saveButton.style.display = "block";
-                saveButtonAdvanced.style.display = "none";
-
-                saveButton.onclick = () => {
-                    saveHTML = docById("save-html-beg");
+                }
+            }
+            else {
+                saveButton.style.display = 'block';
+                saveButtonAdvanced.style.display = 'none';
+                saveButton.onclick = () => {  // Changed to arrow function to preserve this
+                    const saveHTML = docById('save-html-beg');
+                    console.debug(saveHTML);
                     saveHTML.onclick = () => {
                         html_onclick(this.activity);
                     };
-
-                    savePNG = docById("save-png-beg");
-                    svgData = doSVG(
-                        this.activity.canvas,
-                        this.activity.logo,
-                        this.activity.turtles,
-                        this.activity.canvas.width,
-                        this.activity.canvas.height,
-                        1.0
-                    );
-
-                    if (svgData == "") {
+                    const savePNG = docById('save-png-beg');
+                    console.debug(savePNG);
+                    const svgData = doSVG_onclick(canvas, logo, turtles, canvas.width, canvas.height, 1.0);
+                    if (svgData == '') {
                         savePNG.disabled = true;
-                        savePNG.className = "grey-text inactiveLink";
+                        savePNG.className = 'grey-text inactiveLink';
                     } else {
                         savePNG.disabled = false;
-                        savePNG.className = "";
+                        savePNG.className = '';
                         savePNG.onclick = () => {
                             png_onclick(this.activity);
                         };
-                    }
+                    }  
                 };
             }
         } else {
-            // console.debug("ADVANCED MODE BUTTONS");
-            saveButton.style.display = "none";
-            saveButtonAdvanced.style.display = "block";
+            console.debug('ADVANCED MODE BUTTONS')
+            saveButton.style.display = 'none';
+            saveButtonAdvanced.style.display = 'block';
             saveButtonAdvanced.onclick = () => {
-                saveHTML = docById("save-html");
-                // console.debug(saveHTML);
-
+                const saveHTML = docById('save-html');
+                console.debug(saveHTML);
                 saveHTML.onclick = () => {
                     html_onclick(this.activity);
                 };
-
-                saveSVG = docById("save-svg");
-                savePNG = docById("save-png");
-                svgData = doSVG(
-                    this.activity.canvas,
-                    this.activity.logo,
-                    this.activity.turtles,
-                    this.activity.canvas.width,
-                    this.activity.canvas.height,
-                    1.0);
-
-                // If there is no mouse artwork to save then grey out.
-                if (svgData == "") {
+                const saveSVG = docById('save-svg');
+                const savePNG = docById('save-png');
+                console.debug(savePNG);
+                const svgData = doSVG_onclick(canvas, logo, turtles, canvas.width, canvas.height, 1.0);
+                // if there is no mouse artwork to save then grey out
+                if (svgData == '') {
                     saveSVG.disabled = true;
                     savePNG.disabled = true;
                     saveSVG.className = "grey-text inactiveLink";
@@ -631,7 +607,7 @@ class Toolbar {
                     savePNG.disabled = false;
                     saveSVG.className = "";
                     savePNG.className = "";
-
+                    
                     saveSVG.onclick = () => {
                         svg_onclick(this.activity);
                     };
@@ -642,38 +618,59 @@ class Toolbar {
                 }
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
-                    saveWAV = docById("save-wav");
-
-                    saveWAV.onclick = () => {
-                        wave_onclick(this.activity);
-                    };
-
-                    saveLY = docById("save-ly");
-
+                    const saveWAV = docById('save-wav');
+                    // Until we fix #1744, disable recorder on FF
+                    // if (platform.FF) {
+                        saveWAV.disabled = true;
+                        saveWAV.className = 'grey-text inactiveLink';
+                    // } else {
+                    //    saveWAV.onclick = function () {
+                    //        wave_onclick();
+                    //    };
+                    // }
+                    const saveLY = docById('save-ly');
                     saveLY.onclick = () => {
                         ly_onclick(this.activity);
                     };
-
-                    saveABC = docById("save-abc");
-
+                    const saveABC = docById('save-abc');
                     saveABC.onclick = () => {
                         abc_onclick(this.activity);
                     };
-
-                    saveMXML = docById("save-mxml");
-
+                    const saveMXML = docById('save-mxml');
                     saveMXML.onclick = () => {
                         mxml_onclick(this.activity);
                     };
                 }
-
-                const saveArtworkSVG = docById("save-blockartwork-svg");
-
+                const saveArtworkSVG = docById('save-blockartwork-svg');
                 saveArtworkSVG.onclick = () => {
                     blockartworksvg_onclick(this.activity);
                 };
-            };
+            }
         }
+    }
+
+    /**
+     * Renders Record button style
+     * 
+     * @public 
+     * @param {Function} rec_onclick
+     * @returns {void}
+     */  
+    updateRecordButton(rec_onclick) {
+        const Record = docById("record");
+        const browser = fnBrowserDetect();
+        const hideIn = ["firefox", "safari"];
+    
+        if (hideIn.includes(browser)) {
+            Record.classList.add("hide");
+            return;
+        }
+    
+        Record.style.display = "block"; // Ensure visibility
+        Record.innerHTML = `<i class="material-icons main">${RECORDBUTTON}</i>`;
+        Record.onclick = () => {
+            rec_onclick(this.activity);
+        };
     }
 
     /**
@@ -762,9 +759,10 @@ class Toolbar {
      * 
      * @public
      * @param {Function} onclick - The onclick handler for the mode select icon.
+     * @param {Function} rec_onclick
      * @returns {void}
      */
-    renderModeSelectIcon(onclick) {
+    renderModeSelectIcon(onclick, rec_onclick) {
         const begIcon = docById("beginnerMode");
         const advIcon = docById("advancedMode");
         const displayStatsIcon = docById("displayStatsIcon");
@@ -772,6 +770,9 @@ class Toolbar {
         const delPluginIcon = docById("delPluginIcon");
         const enableHorizScrollIcon = docById("enableHorizScrollIcon");
         const toggleJavaScriptIcon = docById("toggleJavaScriptIcon");
+        // Add save menu elements
+        const saveButton = docById('saveButton');
+        const saveButtonAdvanced = docById('saveButtonAdvanced');
     
         const advancedIcons = [
             displayStatsIcon,
@@ -783,67 +784,83 @@ class Toolbar {
     
         const switchMode = () => {
             if (!this.activity) {
-                console.error('Activity not initialized');
+                console.error("Activity not initialized");
                 return;
             }
         
             try {
-                // Toggle mode in activity
+                // Toggle beginnerMode state
                 this.activity.beginnerMode = !this.activity.beginnerMode;
-                
-                // Save to localStorage
+        
+                // Save the current mode to localStorage
                 try {
-                    localStorage.setItem('beginnerMode', this.activity.beginnerMode.toString());
-                } catch (e) {
-                    console.error('Error saving to localStorage:', e);
+                    localStorage.setItem("beginnerMode", this.activity.beginnerMode.toString());
+                } catch (error) {
+                    console.error("Error saving to localStorage:", error);
                 }
         
-                // Update icon visibility
+                // Update beginner and advanced mode icons visibility
                 if (begIcon) begIcon.style.display = this.activity.beginnerMode ? "none" : "block";
                 if (advIcon) advIcon.style.display = this.activity.beginnerMode ? "block" : "none";
         
-                // Toggle visibility of advanced features
+                // Toggle visibility of advanced icons
                 advancedIcons.forEach(icon => {
                     if (icon) {
                         icon.style.display = this.activity.beginnerMode ? "none" : "block";
                     }
                 });
         
-                // Hide all palettes first
-                if (this.activity.palettes && this.activity.palettes.dict) {
+                // Update the Record button logic dynamically
+                if (docById("record")) {
+                    if (this.activity.beginnerMode) {
+                        docById("record").style.display = "none"; // Hide in beginner mode
+                    } else {
+                        // Reinitialize the Record button for advanced mode
+                        this.updateRecordButton(rec_onclick);
+                    }
+                }
+        
+                // Update save menu visibility
+                if (saveButton) {
+                    saveButton.style.display = this.activity.beginnerMode ? "block" : "none";
+                }
+                if (saveButtonAdvanced) {
+                    saveButtonAdvanced.style.display = this.activity.beginnerMode ? "none" : "block";
+                }
+        
+                // Hide all palettes
+                if (this.activity.palettes?.dict) {
                     for (const name in this.activity.palettes.dict) {
                         const palette = this.activity.palettes.dict[name];
-                        if (palette && typeof palette.hideMenu === 'function') {
+                        if (palette?.hideMenu) {
                             palette.hideMenu(true);
                         }
                     }
                 }
         
-                // Update palettes for new mode
-                if (this.activity.palettes && typeof this.activity.palettes.updatePalettes === 'function') {
+                // Update palettes for the new mode
+                if (this.activity.palettes?.updatePalettes) {
                     this.activity.palettes.updatePalettes();
                 }
-                
-                // Regenerate all palettes with new mode
-                if (typeof this.activity.regeneratePalettes === 'function') {
+        
+                // Regenerate palettes for the new mode
+                if (this.activity.regeneratePalettes) {
                     this.activity.regeneratePalettes();
                 }
         
-                // Call the provided onclick handler
+                // Trigger the provided onclick handler
                 if (onclick) {
                     onclick(this.activity);
                 }
         
-                // Force canvas refresh
-                if (typeof this.activity.refreshCanvas === 'function') {
+                // Refresh the canvas
+                if (this.activity.refreshCanvas) {
                     this.activity.refreshCanvas();
                 }
-        
-            } catch (e) {
-                console.error('Error switching modes:', e);
-                // Error message to user
-                if (this.activity && typeof this.activity.errorMsg === 'function') {
-                    this.activity.errorMsg(_('Error switching modes. Please refresh the page.'));
+            } catch (error) {
+                console.error("Error switching modes:", error);
+                if (this.activity?.errorMsg) {
+                    this.activity.errorMsg("Error switching modes. Please refresh the page.");
                 }
             }
         };
@@ -865,6 +882,14 @@ class Toolbar {
                 icon.style.display = this.activity.beginnerMode ? "none" : "block";
             }
         });
+
+        // Initial render of save menu
+        if (saveButton) {
+            saveButton.style.display = this.activity.beginnerMode ? "block" : "none";
+        }
+        if (saveButtonAdvanced) {
+            saveButtonAdvanced.style.display = this.activity.beginnerMode ? "none" : "block";
+        }
     }
 
     /**
@@ -885,6 +910,7 @@ class Toolbar {
             docById("stop").style.color = this.stopIconColorWhenPlaying;
         };
     }
+
     /**
      * Renders the advanced icons with the provided onclick handlers.
      * 
@@ -903,25 +929,16 @@ class Toolbar {
         delPlugin_onclick,
         setScroller
     ) {
-        const RecIcon = docById("record");
         const displayStatsIcon = docById("displayStatsIcon");
         const loadPluginIcon = docById("loadPluginIcon");
         const delPluginIcon = docById("delPluginIcon");
         const enableHorizScrollIcon = docById("enableHorizScrollIcon");
         const disableHorizScrollIcon = docById("disableHorizScrollIcon");
         const toggleJavaScriptIcon = docById("toggleJavaScriptIcon");
-        const browser = fnBrowserDetect();
-        const btn = document.getElementById("record");
-        const hideIn = ["firefox", "safari"];
-        if (hideIn.includes(browser)) {
-            btn.classList.add("hide");
-        }
-
+        
         if (!this.activity.beginnerMode) {
-            RecIcon.innerHTML= `<i class=""material-icons main">${RECORDBUTTON}</i>`;
-            RecIcon.onclick = () => {
-                rec_onclick(this.activity);
-            };
+
+            this.updateRecordButton(rec_onclick);
 
             displayStatsIcon.onclick = () => {
                 analytics_onclick(this.activity);
@@ -943,6 +960,7 @@ class Toolbar {
                 setScroller(this.activity);
             };
         } else {
+            docById("record").style.display = "none";
             displayStatsIcon.style.display = "none";
             loadPluginIcon.style.display = "none";
             delPluginIcon.style.display = "none";
