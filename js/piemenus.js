@@ -3505,6 +3505,10 @@ const piemenuBlockContext = (block) => {
             that.blocks.sendStackToTrash(that.blocks.blockList[blockBlock]);
         }
         docById("contextWheelDiv").style.display = "none";
+        // prompting a notification on deleting any block 
+        activity.textMsg(
+            _("You can restore deleted blocks from the trash with the Restore From Trash button.")
+        );       
     };
 
     wheel.navItems[3].navigateFunction = () => {
