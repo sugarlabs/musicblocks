@@ -397,9 +397,6 @@ class Palettes {
                 }
             }
     
-            // Store the original top position
-            const originalTop = 60 + this.top;
-    
             // Remove the palette DOM element if it exists
             const paletteElement = docById("palette");
             if (paletteElement) {
@@ -411,10 +408,7 @@ class Palettes {
             this.visible = false;
             this.activePalette = null;
             this.paletteObject = null;
-    
-            // Calculate the available height for the palette
-            const maxHeight = window.innerHeight - originalTop - 10;
-    
+
             // Recreate the palette using the original initialization code
             const element = document.createElement("div");
             element.id = "palette";
@@ -422,7 +416,7 @@ class Palettes {
             element.classList.add('flex-palette');
             element.setAttribute(
                 "style",
-                `position: fixed; z-index: 1000; left: 0px; top: ${originalTop}px; max-height: ${maxHeight}px; overflow-y: auto;`
+                `position: fixed; z-index: 1000; left: 0px; top: ${60+this.top}px; overflow-y: auto;`
             );
             element.innerHTML =
                 '<div style="height:fit-content"><table width ="' +
