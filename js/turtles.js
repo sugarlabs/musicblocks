@@ -577,7 +577,6 @@ Turtles.TurtlesView = class {
         this._collapseButton = null; // used by add method
         this._clearButton = null; // used by add method
         this.gridButton = null; // used by add method
-        this.selectButton = null; // used to enable select mode
         this.collapse = null;
         this.expand = null;
 
@@ -870,26 +869,6 @@ Turtles.TurtlesView = class {
             dragCanvas();
 
             this.activity.refreshCanvas();
-        };
-
-         /**
-         * Makes 'select' button by initailising 'SELECTBUTTON' SVG.
-         * Toggles isSelecting on click.
-         */
-        const __makeSelectButton = () => {
-            this.selectButton = _makeButton(
-                SELECTBUTTON,
-                {
-                    "name":"Select",
-                    "label":_("Select")
-                },
-                this._w - 10 - 4 * 55,
-                70 + LEADING + 6
-            );
-            const that = this;
-            this.selectButton.onclick  = () => {
-                this.activity.isSelecting = !this.activity.isSelecting;
-            };
         };
 
         /**
@@ -1191,7 +1170,6 @@ Turtles.TurtlesView = class {
             __makeExpandButton();
             __makeClearButton();
             __makeGridButton();
-            __makeSelectButton();
             jQuery.noConflict()(".tooltipped").each(function(){
                 jQuery.noConflict()(this).tooltip(
                     {

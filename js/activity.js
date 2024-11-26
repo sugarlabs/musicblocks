@@ -495,7 +495,7 @@ class Activity {
                 (event) => {
                     event.preventDefault();
                     event.stopPropagation();
-                    if (!this.beginnerMode && !this.isSelecting) {
+                    if (!this.beginnerMode) {
                         if (event.target.id === "myCanvas") {
                             this._displayHelpfulWheel(event);
                         }
@@ -5719,6 +5719,9 @@ class Activity {
         
             if (!this.helpfulWheelItems.find(ele => ele.label === "Grid")) 
                 this.helpfulWheelItems.push({label: "Grid", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CARTESIANBUTTON)), display: true, fn: piemenuGrid});
+
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Select")) 
+                this.helpfulWheelItems.push({label: "Select", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SELECTBUTTON)), display: true, fn: this.selectMode });
         
             if (!this.helpfulWheelItems.find(ele => ele.label === "Clean")) 
                 this.helpfulWheelItems.push({label: "Clean", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CLEARBUTTON)), display: true, fn: () => this._allClear(false)});
@@ -6065,7 +6068,7 @@ class Activity {
             document.addEventListener(
                 "mousedown",
                 (event) => {
-                    if (event.button !==2) return;
+                    if (!this.isSelecting) return;
                     this.moving = false;
                     // event.preventDefault();
                     // event.stopPropagation();
@@ -6086,6 +6089,11 @@ class Activity {
  
         // end the drag on navbar
         document.getElementById("toolbars").addEventListener("mouseover", () => {this.isDragging = false;});
+
+        this.selectMode = () => {
+            this.isSelecting = !this.isSelecting;;
+            if (this.moving) this.moving = false;
+        }
 
         this._create2Ddrag = () => {
             this.dragArea = {};
@@ -6119,8 +6127,7 @@ class Activity {
 
             document.addEventListener("mouseup", (event) => {
                // event.preventDefault();
-                if (event.button !== 2) return;
-                this.moving = true;
+                if (!this.isSelecting) return;
                 this.isDragging = false;
                 this.selectionArea.style.display = "none";
                 this.startX = 0;
