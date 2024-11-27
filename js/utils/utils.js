@@ -831,49 +831,65 @@ const processRawPluginData = (activity, rawData) => {
  * @param {object} obj - The processed plugin data object.
  */
 const updatePluginObj = (activity, obj) => {
-    if (!obj) {
+    if (obj === null) {
         return;
     }
 
-    // All are defined together
-    const categories = [
-        "PALETTEPLUGINS",
-        "PALETTEFILLCOLORS",
-        "PALETTESTROKECOLORS",
-        "PALETTEHIGHLIGHTCOLORS",
-        "FLOWPLUGINS",
-        "ARGPLUGINS",
-        "BLOCKPLUGINS",
-        "ONLOAD",
-        "ONSTART",
-        "ONSTOP",
-    ];
-
-    categories.forEach((category) => {
-        if (obj[category]) {
-            if (!activity.pluginObjs[category]) {
-                activity.pluginObjs[category] = {};
-            }
-            Object.assign(activity.pluginObjs[category], obj[category]); // Merge objects
-        }
-    });
-
-    if (obj["MACROPLUGINS"]) {
-        if (!activity.pluginObjs["MACROPLUGINS"]) {
-            activity.pluginObjs["MACROPLUGINS"] = {};
-        }
-        Object.assign(activity.pluginObjs["MACROPLUGINS"], obj["MACROPLUGINS"]);
+    for (const name in obj["PALETTEPLUGINS"]) {
+        activity.pluginObjs["PALETTEPLUGINS"][name] = obj["PALETTEPLUGINS"][name];
     }
 
-    if (obj["GLOBALS"]) {
+    for (const name in obj["PALETTEFILLCOLORS"]) {
+        activity.pluginObjs["PALETTEFILLCOLORS"][name] = obj["PALETTEFILLCOLORS"][name];
+    }
+
+    for (const name in obj["PALETTESTROKECOLORS"]) {
+        activity.pluginObjs["PALETTESTROKECOLORS"][name] = obj["PALETTESTROKECOLORS"][name];
+    }
+
+    for (const name in obj["PALETTEHIGHLIGHTCOLORS"]) {
+        activity.pluginObjs["PALETTEHIGHLIGHTCOLORS"][name] = obj["PALETTEHIGHLIGHTCOLORS"][name];
+    }
+
+    for (const flow in obj["FLOWPLUGINS"]) {
+        activity.pluginObjs["FLOWPLUGINS"][flow] = obj["FLOWPLUGINS"][flow];
+    }
+
+    for (const arg in obj["ARGPLUGINS"]) {
+        activity.pluginObjs["ARGPLUGINS"][arg] = obj["ARGPLUGINS"][arg];
+    }
+
+    for (const block in obj["BLOCKPLUGINS"]) {
+        activity.pluginObjs["BLOCKPLUGINS"][block] = obj["BLOCKPLUGINS"][block];
+    }
+
+    if ("MACROPLUGINS" in obj) {
+        for (const macro in obj["MACROPLUGINS"]) {
+            activity.pluginObjs["MACROPLUGINS"][macro] = obj["MACROPLUGINS"][macro];
+        }
+    }
+
+    if ("GLOBALS" in obj) {
         if (!("GLOBALS" in activity.pluginObjs)) {
             activity.pluginObjs["GLOBALS"] = "";
         }
         activity.pluginObjs["GLOBALS"] += obj["GLOBALS"];
     }
 
-    if (obj["IMAGES"]) {
+    if ("IMAGES" in obj) {
         activity.pluginObjs["IMAGES"] = obj["IMAGES"];
+    }
+
+    for (const name in obj["ONLOAD"]) {
+        activity.pluginObjs["ONLOAD"][name] = obj["ONLOAD"][name];
+    }
+
+    for (const name in obj["ONSTART"]) {
+        activity.pluginObjs["ONSTART"][name] = obj["ONSTART"][name];
+    }
+
+    for (const name in obj["ONSTOP"]) {
+        activity.pluginObjs["ONSTOP"][name] = obj["ONSTOP"][name];
     }
 };
 
@@ -1202,21 +1218,28 @@ let mixedNumber = (d) => {
 
     if (typeof d === "number") {
         const floor = Math.floor(d);
-        const isFractional = d > floor;
-
-        if (isFractional) {
+        if (d > floor) {
             const obj = rationalToFraction(d - floor);
-            if (obj[1] > 99) return d.toFixed(2); // Limit denominator size.
-
-            const fractionPart = `${obj[0]}/${obj[1]}`;
-            return floor === 0 ? fractionPart : `${floor} ${fractionPart}`;
+            if (floor === 0) {
+                return obj[0] + "/" + obj[1];
+            } else {
+                if (obj[0] === 1 && obj[1] === 1) {
+                    return floor + 1;
+                } else {
+                    if (obj[1] > 99) {
+                        return d.toFixed(2);
+                    } else {
+                        return floor + " " + obj[0] + "/" + obj[1];
+                    }
+                }
+            }
+        } else {
+            return d.toString() + "/1";
         }
-
-        return `${d}/1`; // Whole numbers.
+    } else {
+        return d;
     }
-
-    return d.toString(); // Non-numeric inputs.
-};
+}
 
 /**
  * Calculates the least common denominator (LCD) of two numbers.
@@ -1241,19 +1264,38 @@ let rationalSum = (a, b) => {
     }
 
     // Make sure a and b components are integers.
-    const normalize = (arr) => {
-        if (!Number.isInteger(arr[0]) || !Number.isInteger(arr[1])) {
-            const fraction = rationalToFraction(arr[0] / arr[1]);
-            return [fraction[0], fraction[1]];
-        }
-        return arr;
-    };
+    let obja0, objb0, obja1, objb1;
+    if (Math.floor(a[0]) !== a[0]) {
+        obja0 = rationalToFraction(a[0]);
+    } else {
+        obja0 = [a[0], 1];
+    }
 
-    a = normalize(a);
-    b = normalize(b);
+    if (Math.floor(b[0]) !== b[0]) {
+        objb0 = rationalToFraction(b[0]);
+    } else {
+        objb0 = [b[0], 1];
+    }
+
+    if (Math.floor(a[1]) !== a[1]) {
+        obja1 = rationalToFraction(a[1]);
+    } else {
+        obja1 = [a[1], 1];
+    }
+
+    if (Math.floor(b[1]) !== b[1]) {
+        objb1 = rationalToFraction(b[1]);
+    } else {
+        objb1 = [b[1], 1];
+    }
+
+    a[0] = obja0[0] * obja1[1];
+    a[1] = obja0[1] * obja1[0];
+    b[0] = objb0[0] * objb1[1];
+    b[1] = objb0[1] * objb1[0];
 
     // Find the least common denomenator
-    const lcd = LCD(a[1], b[1]);
+    const lcd = LCD(a[1], b[1]);  
     // const c0 = (a[0] * lcd) / a[1] + (b[0] * lcd) / b[1];
     return [(a[0] * lcd) / a[1] + (b[0] * lcd) / b[1], lcd];
 };
