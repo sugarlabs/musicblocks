@@ -6091,8 +6091,9 @@ class Activity {
         document.getElementById("toolbars").addEventListener("mouseover", () => {this.isDragging = false;});
 
         this.selectMode = () => {
-            this.isSelecting = !this.isSelecting;;
-            if (this.moving) this.moving = false;
+            this.moving = false;
+            this.isSelecting = !this.isSelecting;
+            (this.isSelecting) ? this.textMsg(_("Select is enabled")) : this.textMsg(_("Select is disabled"));
         }
 
         this._create2Ddrag = () => {
