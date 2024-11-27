@@ -892,7 +892,7 @@ Turtles.TurtlesView = class {
         };
 
         const renderClearConfirmation = () => {
-            const modelContainer = document.getElementById("clear-model-container");
+            const modalContainer = document.getElementById("clear-modal-container");
             const clearDropdown = document.getElementById("cleardropdown");
             clearDropdown.innerHTML = "";
         
@@ -920,7 +920,7 @@ Turtles.TurtlesView = class {
             `;
             confirmButton.onclick = () => {
                 this.activity._allClear(); 
-                modelContainer.style.display = "none";
+                modalContainer.style.display = "none";
             };
             clearDropdown.appendChild(confirmButton);
         
@@ -936,11 +936,11 @@ Turtles.TurtlesView = class {
                 cursor: pointer;
             `;
             cancelButton.onclick = () => {
-                modelContainer.style.display = "none"; 
+                modalContainer.style.display = "none"; 
             };
             clearDropdown.appendChild(cancelButton);
         
-            modelContainer.style.display = "flex";
+            modalContainer.style.display = "flex";
         };
         
         
