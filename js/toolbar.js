@@ -569,7 +569,14 @@ class Toolbar {
                     };
                     const savePNG = docById('save-png-beg');
                     console.debug(savePNG);
-                    const svgData = doSVG_onclick(canvas, logo, turtles, canvas.width, canvas.height, 1.0);
+                    const svgData = doSVG_onclick(
+                        this.activity.canvas, 
+                        this.activity.logo, 
+                        this.activity.turtles, 
+                        this.activity.canvas.width, 
+                        this.activity.canvas.height, 
+                        1.0
+                    );
                     if (svgData == '') {
                         savePNG.disabled = true;
                         savePNG.className = 'grey-text inactiveLink';
@@ -595,7 +602,14 @@ class Toolbar {
                 const saveSVG = docById('save-svg');
                 const savePNG = docById('save-png');
                 console.debug(savePNG);
-                const svgData = doSVG_onclick(canvas, logo, turtles, canvas.width, canvas.height, 1.0);
+                const svgData = doSVG_onclick(
+                    this.activity.canvas, 
+                    this.activity.logo, 
+                    this.activity.turtles, 
+                    this.activity.canvas.width, 
+                    this.activity.canvas.height, 
+                    1.0
+                );
                 // if there is no mouse artwork to save then grey out
                 if (svgData == '') {
                     saveSVG.disabled = true;
@@ -810,19 +824,73 @@ class Toolbar {
                 // Update the Record button logic dynamically
                 if (docById("record")) {
                     if (this.activity.beginnerMode) {
-                        docById("record").style.display = "none"; // Hide in beginner mode
+                        docById("record").style.display = "none";
                     } else {
                         // Reinitialize the Record button for advanced mode
                         this.updateRecordButton(rec_onclick);
                     }
                 }
         
-                // Update save menu visibility
+                // Update save menu visibility and reinitialize handlers
+                const saveButton = docById('saveButton');
+                const saveButtonAdvanced = docById('saveButtonAdvanced');
+
                 if (saveButton) {
                     saveButton.style.display = this.activity.beginnerMode ? "block" : "none";
+                    saveButton.onclick = null;
                 }
                 if (saveButtonAdvanced) {
                     saveButtonAdvanced.style.display = this.activity.beginnerMode ? "none" : "block";
+                    saveButtonAdvanced.onclick = null;
+                }
+
+                // Re-render save icons to attach new handlers
+                if (this.activity.toolbar) {
+                    // Generate SVG data
+                    const svgData = doSVG(
+                        this.activity.canvas, 
+                        this.activity.logo, 
+                        this.activity.turtles, 
+                        this.activity.canvas.width, 
+                        this.activity.canvas.height, 
+                        1.0
+                    );
+                
+                    this.activity.toolbar.renderSaveIcons(
+                        this.activity.save.saveHTML.bind(this.activity.save),
+                        doSVG,
+                        this.activity.save.saveSVG.bind(this.activity.save),
+                        this.activity.save.savePNG.bind(this.activity.save),
+                        this.activity.save.saveWAV.bind(this.activity.save),
+                        this.activity.save.saveLilypond.bind(this.activity.save),
+                        this.activity.save.saveAbc.bind(this.activity.save),
+                        this.activity.save.saveMxml.bind(this.activity.save),
+                        this.activity.save.saveBlockArtwork.bind(this.activity.save)
+                    );
+                
+                    // After rendering, check SVG data and update button states
+                    const saveSVG = docById('save-svg');
+                    const savePNG = docById('save-png');
+                
+                    if (svgData === '') {
+                        if (saveSVG) {
+                            saveSVG.disabled = true;
+                            saveSVG.className = "grey-text inactiveLink";
+                        }
+                        if (savePNG) {
+                            savePNG.disabled = true;
+                            savePNG.className = "grey-text inactiveLink";
+                        }
+                    } else {
+                        if (saveSVG) {
+                            saveSVG.disabled = false;
+                            saveSVG.className = "";
+                        }
+                        if (savePNG) {
+                            savePNG.disabled = false;
+                            savePNG.className = "";
+                        }
+                    }
                 }
         
                 // Hide all palettes

@@ -1395,7 +1395,17 @@ class Activity {
             this.saveLocally();
         
             // Update toolbar display
-            activity.toolbar.renderSaveIcons(this.save.saveHTML.bind(save), doSVG, this.save.saveSVG.bind(save), this.save.savePNG.bind(save), this.save.saveWAV.bind(save), this.save.saveLilypond.bind(save), this.save.saveAbc.bind(save), this.save.saveMxml.bind(save), this.save.saveBlockArtwork.bind(save));
+            activity.toolbar.renderSaveIcons(
+                this.save.saveHTML.bind(save),
+                doSVG,
+                this.save.saveSVG.bind(save),
+                this.save.savePNG.bind(save),
+                this.save.saveWAV.bind(save),
+                this.save.saveLilypond.bind(save),
+                this.save.saveAbc.bind(save),
+                this.save.saveMxml.bind(save),
+                this.save.saveBlockArtwork.bind(save)
+            );
             activity.toolbar.renderModeSelectIcon(() => {});
             
             // Force canvas refresh
