@@ -260,6 +260,9 @@ class Activity {
         // Flag to indicate whether the user is performing a 2D drag operation.
         this.isDragging = false;
 
+        // Flag to indicate whether user is selecting
+        this.isSelecting = false;
+
         // Flag to indicate the selection mode is on
         this.selectionModeOn = false;
 
@@ -5716,6 +5719,9 @@ class Activity {
         
             if (!this.helpfulWheelItems.find(ele => ele.label === "Grid")) 
                 this.helpfulWheelItems.push({label: "Grid", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CARTESIANBUTTON)), display: true, fn: piemenuGrid});
+
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Select")) 
+                this.helpfulWheelItems.push({label: "Select", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SELECTBUTTON)), display: true, fn: this.selectMode });
         
             if (!this.helpfulWheelItems.find(ele => ele.label === "Clean")) 
                 this.helpfulWheelItems.push({label: "Clean", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CLEARBUTTON)), display: true, fn: () => this._allClear(false)});
@@ -6062,6 +6068,8 @@ class Activity {
             document.addEventListener(
                 "mousedown",
                 (event) => {
+                    if (!this.isSelecting) return;
+                    this.moving = false;
                     // event.preventDefault();
                     // event.stopPropagation();
                     if (event.target.id === "myCanvas") {
@@ -6082,6 +6090,12 @@ class Activity {
         // end the drag on navbar
         document.getElementById("toolbars").addEventListener("mouseover", () => {this.isDragging = false;});
 
+        this.selectMode = () => {
+            this.moving = false;
+            this.isSelecting = !this.isSelecting;
+            (this.isSelecting) ? this.textMsg(_("Select is enabled.")) : this.textMsg(_("Select is disabled."));
+        }
+
         this._create2Ddrag = () => {
             this.dragArea = {};
             this.selectedBlocks = [];
@@ -6099,7 +6113,7 @@ class Activity {
                 this.hasMouseMoved = true;
                 // event.preventDefault();
                 // this.selectedBlocks = [];
-                if (this.isDragging){
+                if (this.isDragging && this.isSelecting){
                     this.currentX = event.clientX;
                     this.currentY = event.clientY;
                     if (!this.blocks.isBlockMoving && !this.turtles.running()) {
@@ -6114,6 +6128,7 @@ class Activity {
 
             document.addEventListener("mouseup", (event) => {
                // event.preventDefault();
+                if (!this.isSelecting) return;
                 this.isDragging = false;
                 this.selectionArea.style.display = "none";
                 this.startX = 0;
