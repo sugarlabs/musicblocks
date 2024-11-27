@@ -6093,7 +6093,7 @@ class Activity {
         this.selectMode = () => {
             this.moving = false;
             this.isSelecting = !this.isSelecting;
-            (this.isSelecting) ? this.textMsg(_("Select is enabled")) : this.textMsg(_("Select is disabled"));
+            (this.isSelecting) ? this.textMsg(_("Select is enabled.")) : this.textMsg(_("Select is disabled."));
         }
 
         this._create2Ddrag = () => {
