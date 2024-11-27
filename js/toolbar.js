@@ -770,10 +770,14 @@ class Toolbar {
      * 
      * @public
      * @param {Function} onclick - The onclick handler for the mode select icon.
-     * @param {Function} rec_onclick
+     * @param {Function} rec_onclick - The onclick handler for the record button
+     * @param {Function} analytics_onclick - The onclick handler for analytics
+     * @param {Function} openPlugin_onclick - The onclick handler for plugins
+     * @param {Function} delPlugin_onclick - The onclick handler for deleting plugins
+     * @param {Function} setScroller - The scroller handler
      * @returns {void}
      */
-    renderModeSelectIcon(onclick, rec_onclick) {
+    renderModeSelectIcon(onclick, rec_onclick, analytics_onclick, openPlugin_onclick, delPlugin_onclick, setScroller) {
         const begIcon = docById("beginnerMode");
         const advIcon = docById("advancedMode");
         const displayStatsIcon = docById("displayStatsIcon");
@@ -784,7 +788,7 @@ class Toolbar {
         // Add save menu elements
         const saveButton = docById('saveButton');
         const saveButtonAdvanced = docById('saveButtonAdvanced');
-    
+
         const advancedIcons = [
             displayStatsIcon,
             loadPluginIcon,
@@ -792,56 +796,79 @@ class Toolbar {
             enableHorizScrollIcon,
             toggleJavaScriptIcon
         ];
-    
+
+        // Function to update all advanced icons handlers and visibility
+        const updateAdvancedIcons = () => {
+            const recordButton = docById("record");
+            if (recordButton) {
+                if (!this.activity.beginnerMode) {
+                    recordButton.style.display = "block";
+                    this.updateRecordButton(rec_onclick);
+                    recordButton.onclick = () => rec_onclick(this.activity);
+                } else {
+                    recordButton.style.display = "none";
+                }
+            }
+
+            // Set up click handlers for advanced icons when in advanced mode
+            if (!this.activity.beginnerMode) {
+                if (displayStatsIcon) {
+                    displayStatsIcon.style.display = "block";
+                    displayStatsIcon.onclick = () => analytics_onclick(this.activity);
+                }
+                if (loadPluginIcon) {
+                    loadPluginIcon.style.display = "block";
+                    loadPluginIcon.onclick = () => openPlugin_onclick(this.activity);
+                }
+                if (delPluginIcon) {
+                    delPluginIcon.style.display = "block";
+                    delPluginIcon.onclick = () => delPlugin_onclick(this.activity);
+                }
+                if (enableHorizScrollIcon) {
+                    enableHorizScrollIcon.style.display = "block";
+                    enableHorizScrollIcon.onclick = () => setScroller(this.activity);
+                }
+                if (toggleJavaScriptIcon) {
+                    toggleJavaScriptIcon.style.display = "block";
+                }
+            } else {
+                // Hide advanced icons in beginner mode
+                advancedIcons.forEach(icon => {
+                    if (icon) icon.style.display = "none";
+                });
+            }
+        };
+
         const switchMode = () => {
             if (!this.activity) {
                 console.error("Activity not initialized");
                 return;
             }
-        
+
             try {
                 // Toggle beginnerMode state
                 this.activity.beginnerMode = !this.activity.beginnerMode;
-        
+
                 // Save the current mode to localStorage
                 try {
                     localStorage.setItem("beginnerMode", this.activity.beginnerMode.toString());
                 } catch (error) {
                     console.error("Error saving to localStorage:", error);
                 }
-        
-                // Update beginner and advanced mode icons visibility
+
+                // Update beginner/advanced mode toggle icons
                 if (begIcon) begIcon.style.display = this.activity.beginnerMode ? "none" : "block";
                 if (advIcon) advIcon.style.display = this.activity.beginnerMode ? "block" : "none";
-        
-                // Toggle visibility of advanced icons
-                advancedIcons.forEach(icon => {
-                    if (icon) {
-                        icon.style.display = this.activity.beginnerMode ? "none" : "block";
-                    }
-                });
-        
-                // Update the Record button logic dynamically
-                if (docById("record")) {
-                    if (this.activity.beginnerMode) {
-                        docById("record").style.display = "none";
-                    } else {
-                        // Reinitialize the Record button for advanced mode
-                        this.updateRecordButton(rec_onclick);
-                    }
-                }
-        
-                // Update save menu visibility and reinitialize handlers
-                const saveButton = docById('saveButton');
-                const saveButtonAdvanced = docById('saveButtonAdvanced');
 
+                // Update all advanced icons and their handlers
+                updateAdvancedIcons();
+
+                // Update save menu visibility
                 if (saveButton) {
                     saveButton.style.display = this.activity.beginnerMode ? "block" : "none";
-                    saveButton.onclick = null;
                 }
                 if (saveButtonAdvanced) {
                     saveButtonAdvanced.style.display = this.activity.beginnerMode ? "none" : "block";
-                    saveButtonAdvanced.onclick = null;
                 }
 
                 // Re-render save icons to attach new handlers
@@ -917,7 +944,7 @@ class Toolbar {
                 if (onclick) {
                     onclick(this.activity);
                 }
-        
+
                 // Refresh the canvas
                 if (this.activity.refreshCanvas) {
                     this.activity.refreshCanvas();
@@ -929,24 +956,15 @@ class Toolbar {
                 }
             }
         };
-    
+
         // Attach click handlers
-        if (begIcon) {
-            begIcon.onclick = switchMode;
-        }
-        if (advIcon) {
-            advIcon.onclick = switchMode;
-        }
-    
-        // Initial render of icons based on current mode
+        if (begIcon) begIcon.onclick = switchMode;
+        if (advIcon) advIcon.onclick = switchMode;
+
+        // Initial setup of icons and handlers
         begIcon.style.display = this.activity.beginnerMode ? "none" : "block";
         advIcon.style.display = this.activity.beginnerMode ? "block" : "none";
-        
-        advancedIcons.forEach(icon => {
-            if (icon) {
-                icon.style.display = this.activity.beginnerMode ? "none" : "block";
-            }
-        });
+        updateAdvancedIcons();
 
         // Initial render of save menu
         if (saveButton) {
@@ -974,67 +992,6 @@ class Toolbar {
             onclick(this.activity);
             docById("stop").style.color = this.stopIconColorWhenPlaying;
         };
-    }
-
-    /**
-     * Renders the advanced icons with the provided onclick handlers.
-     * 
-     * @public
-     * @param  {Function} rec_onclick - The onclick handler for the record icon.
-     * @param  {Function} analytics_onclick - The onclick handler for the analytics icon.
-     * @param  {Function} openPlugin_onclick - The onclick handler for the open plugin icon.
-     * @param  {Function} delPlugin_onclick - The onclick handler for the delete plugin icon.
-     * @param  {Function} setScroller - The function to set the scroller.
-     * @returns {void}
-     */
-    renderAdvancedIcons(
-        rec_onclick,
-        analytics_onclick,
-        openPlugin_onclick,
-        delPlugin_onclick,
-        setScroller
-    ) {
-        const displayStatsIcon = docById("displayStatsIcon");
-        const loadPluginIcon = docById("loadPluginIcon");
-        const delPluginIcon = docById("delPluginIcon");
-        const enableHorizScrollIcon = docById("enableHorizScrollIcon");
-        const disableHorizScrollIcon = docById("disableHorizScrollIcon");
-        const toggleJavaScriptIcon = docById("toggleJavaScriptIcon");
-        
-        if (!this.activity.beginnerMode) {
-
-            this.updateRecordButton(rec_onclick);
-            docById("record").onclick = () => {
-                rec_onclick(this.activity);
-            };
-
-            displayStatsIcon.onclick = () => {
-                analytics_onclick(this.activity);
-            };
-
-            loadPluginIcon.onclick = () => {
-                openPlugin_onclick(this.activity);
-            };
-
-            delPluginIcon.onclick = () => {
-                delPlugin_onclick(this.activity);
-            };
-
-            enableHorizScrollIcon.onclick = () => {
-                setScroller(this.activity);
-            };
-
-            disableHorizScrollIcon.onclick = () => {
-                setScroller(this.activity);
-            };
-        } else {
-            docById("record").style.display = "none";
-            displayStatsIcon.style.display = "none";
-            loadPluginIcon.style.display = "none";
-            delPluginIcon.style.display = "none";
-            enableHorizScrollIcon.style.display = "none";
-            toggleJavaScriptIcon.style.display = "none";
-        }
     }
 
     /**
