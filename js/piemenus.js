@@ -94,7 +94,7 @@ const piemenuPitches = (
     custom
 ) => {
     let prevPitch = null;
-
+    let prevAccidental = block.prevAccidental || null; // to remember the previous accidental value
     // wheelNav pie menu for pitch selection
     if (block.blocks.stageClick) {
         return;
@@ -334,30 +334,21 @@ const piemenuPitches = (
 
     if (!custom) {
         // Navigate to a the current accidental value.
-        if (accidental === "") {
-            block._accidentalsWheel.navigateWheel(2);
-        } else {
-            switch (accidental) {
-                case DOUBLEFLAT:
-                    block._accidentalsWheel.navigateWheel(4);
-                    break;
-                case FLAT:
-                    block._accidentalsWheel.navigateWheel(3);
-                    break;
-                case NATURAL:
-                    block._accidentalsWheel.navigateWheel(2);
-                    break;
-                case SHARP:
-                    block._accidentalsWheel.navigateWheel(1);
-                    break;
-                case DOUBLESHARP:
-                    block._accidentalsWheel.navigateWheel(0);
-                    break;
-                default:
-                    block._accidentalsWheel.navigateWheel(2);
-                    break;
-            }
+        let accidentalIndex = 2; // Default to "natural" if none is set.
+        if (prevAccidental !== null) {
+            accidentalIndex = accidentals.indexOf(prevAccidental);
+        } else if (accidental === DOUBLEFLAT) {
+            accidentalIndex = 4;
+        } else if (accidental === FLAT) {
+            accidentalIndex = 3;
+        } else if (accidental === NATURAL) {
+            accidentalIndex = 2;
+        } else if (accidental === SHARP) {
+            accidentalIndex = 1;
+        } else if (accidental === DOUBLESHARP) {
+            accidentalIndex = 0;
         }
+        block._accidentalsWheel.navigateWheel(accidentalIndex);
     }
 
     if (hasOctaveWheel) {
@@ -605,7 +596,10 @@ const piemenuPitches = (
             that.value += selection["attr"];
             that.text.text = selection["note"] + selection["attr"];
         }
-
+        // Store the selected accidental in the block for later use.
+        prevAccidental = selection["attr"];
+        block.prevAccidental = prevAccidental;
+       
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
         __pitchPreview();
@@ -631,6 +625,28 @@ const piemenuPitches = (
     // Hide the widget when the exit button is clicked.
     block._exitWheel.navItems[0].navigateFunction = () => {
         that._piemenuExitTime = new Date().getTime();
+        const selectedNote =
+        that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+        const selectedAccidental =
+        !custom && that._accidentalsWheel
+            ? that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title
+            : "";
+
+        // Update the block's displayed text with the note and accidental
+        if (selectedAccidental === "♮" || selectedAccidental === "") {
+            // Natural or no accidental: display only the note
+            that.text.text = selectedNote; 
+        } else {
+            // Combine note and accidental for display
+            that.text.text = selectedNote + selectedAccidental;
+        }
+        // Update the block value and refresh the cache
+        that.value = selectedNote + (selectedAccidental === "♮" ? "" : selectedAccidental);
+        // Ensure proper layering of the text element
+        that.container.setChildIndex(that.text, that.container.children.length - 1);
+        // Refresh the block's cache
+        that.updateCache();
+        // Hide the pie menu and remove the wheels 
         docById("wheelDiv").style.display = "none";
         that._pitchWheel.removeWheel();
         if (!custom) {
@@ -3489,6 +3505,10 @@ const piemenuBlockContext = (block) => {
             that.blocks.sendStackToTrash(that.blocks.blockList[blockBlock]);
         }
         docById("contextWheelDiv").style.display = "none";
+        // prompting a notification on deleting any block 
+        activity.textMsg(
+            _("You can restore deleted blocks from the trash with the Restore From Trash button.")
+        );       
     };
 
     wheel.navItems[3].navigateFunction = () => {

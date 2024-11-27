@@ -891,58 +891,75 @@ Turtles.TurtlesView = class {
             };
         };
 
-        /**
-         * Makes clear button by initailising 'CLEARBUTTON' SVG.
-         * Assigns click listener function to call allClear() method.
-         */
+        const renderClearConfirmation = () => {
+            const modalContainer = document.getElementById("clear-modal-container");
+            const clearDropdown = document.getElementById("cleardropdown");
+            clearDropdown.innerHTML = "";
+        
+            const title = document.createElement("div");
+            title.innerHTML = `<h2 style="color: #0066FF; font-size: 24px; text-align: left; margin: 0;">${_("Clear Workspace")}</h2>`;
+            clearDropdown.appendChild(title);
+        
+            const confirmationMessage = document.createElement("div");
+            confirmationMessage.innerHTML = `<div style="color: #666666; font-size: 16px; margin-bottom: 24px; text-align: left;">
+                ${_("Are you sure you want to clear the workspace ?")}
+            </div>`;
+            clearDropdown.appendChild(confirmationMessage);
+        
+            const confirmButton = document.createElement("button");
+            confirmButton.innerHTML = _("Confirm");
+            confirmButton.style.cssText = `
+                background-color: #2196F3;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 8px 16px;
+                font-weight: bold;
+                cursor: pointer;
+                margin-right: 16px;
+            `;
+            confirmButton.onclick = () => {
+                this.activity._allClear(); 
+                modalContainer.style.display = "none";
+            };
+            clearDropdown.appendChild(confirmButton);
+        
+            const cancelButton = document.createElement("button");
+            cancelButton.innerHTML = _("Cancel");
+            cancelButton.style.cssText = `
+                background-color: #f1f1f1;
+                color: black;
+                border: none;
+                border-radius: 4px;
+                padding: 8px 16px;
+                font-weight: bold;
+                cursor: pointer;
+            `;
+            cancelButton.onclick = () => {
+                modalContainer.style.display = "none"; 
+            };
+            clearDropdown.appendChild(cancelButton);
+        
+            modalContainer.style.display = "flex";
+        };
+        
+        
         const __makeClearButton = () => {
+            // Create the Clear button using the existing _makeButton helper
             this._clearButton = _makeButton(
                 CLEARBUTTON,
                 {
-                    "name":"Clean",
-                    "label":_("Clean")
+                    name: "Clean",
+                    label: _("Clean"),
                 },
                 this._w - 5 - 2 * 55,
                 70 + LEADING + 6
             );
-
-            this._clearButton.onclick = () => {
-                const clearBox = document.getElementById("ClearButton");
-                const clearContent = document.getElementById("ClearContent");
-                clearContent.innerHTML = _("Confirm");
-                clearBox.style.visibility="visible";
-                const auxToolbar = docById("aux-toolbar");
-                const clearBtnPosition = auxToolbar.style.display === "block" ? "183px" : "125px";
-                clearBox.style.top = clearBtnPosition;
-                const func = this.activity._allClear;
-                clearBox.addEventListener("click", function(event) {
-                    if(event.target.id == "clearClose"){
-                        this.style.visibility = "hidden";
-                    }
-                    else{
-                        func();
-                        clearBox.style.visibility = "hidden";
-                        if (auxToolbar.style.display === "block") {
-                            setTimeout(() => {
-                                docById("Grid").style.top = "136px";
-                                docById("Expand").style.top = "136px";
-                                docById("Collapse").style.top = "136px";
-                                docById("Clean").style.top = "136px";
-                            }, 0);
-                        } else {
-                            docById("Grid").style.top = "76px";
-                            docById("Expand").style.top = "76px";
-                            docById("Collapse").style.top = "76px";
-                            docById("Clean").style.top = "76px";
-                        }
-                    }
-                });
-            };
-            
-            if (doCollapse) {
-                __collapse();
-            }
+        
+            // Assign click listener to the Clear button
+            this._clearButton.onclick = renderClearConfirmation;
         };
+        
 
         /**
          * Makes collapse button by initailising 'COLLAPSEBUTTON' SVG.
