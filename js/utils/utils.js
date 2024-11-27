@@ -1239,7 +1239,7 @@ let mixedNumber = (d) => {
     } else {
         return d;
     }
-}
+};
 
 /**
  * Calculates the least common denominator (LCD) of two numbers.
@@ -1295,7 +1295,7 @@ let rationalSum = (a, b) => {
     b[1] = objb0[1] * objb1[0];
 
     // Find the least common denomenator
-    const lcd = LCD(a[1], b[1]);  
+    const lcd = LCD(a[1], b[1]);
     // const c0 = (a[0] * lcd) / a[1] + (b[0] * lcd) / b[1];
     return [(a[0] * lcd) / a[1] + (b[0] * lcd) / b[1], lcd];
 };
