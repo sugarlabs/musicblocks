@@ -3628,7 +3628,7 @@ const piemenuGrid = (activity) => {
     activity.turtles.gridWheel.sliceSelectedPathCustom = activity.turtles.gridWheel.slicePathCustom;
     activity.turtles.gridWheel.sliceInitPathCustom = activity.turtles.gridWheel.slicePathCustom;
     activity.turtles.gridWheel.animatetime = 0; // 300;
-    activity.turtles.gridWheel.clickModeRotate = false;
+    activity.turtles.gridWheel.clickModeRotate = true;
     const { fill, stroke } = platformColor.gridWheelcolors.selected;
     activity.turtles.gridWheel.sliceHoverAttr = { fill, stroke, "stroke-width": 2 };
     activity.turtles.gridWheel.sliceSelectedAttr = { fill, stroke, "stroke-width": 2 };
