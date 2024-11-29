@@ -3652,7 +3652,7 @@ const piemenuGrid = (activity) => {
     activity.turtles._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
     activity.turtles._exitWheel.slicePathCustom.maxRadiusPercent = 0.3;
     activity.turtles._exitWheel.sliceSelectedPathCustom =
-        activity.turtles._exitWheel.slicePathCustom;
+    activity.turtles._exitWheel.slicePathCustom;
     activity.turtles._exitWheel.sliceInitPathCustom = activity.turtles._exitWheel.slicePathCustom;
     activity.turtles._exitWheel.clickModeRotate = false;
     activity.turtles._exitWheel.createWheel(["×", " "]);
@@ -3670,7 +3670,8 @@ const piemenuGrid = (activity) => {
         activity.turtles.gridWheel.removeWheel();
         activity.turtles._exitWheel.removeWheel();
     };
-     const clickOutsideHandler = (event) => {
+
+    const clickOutsideHandler = (event) => {
         const piemenu = docById("wheelDivptm");
         if (!piemenu.contains(event.target)) {
             hidePiemenu(activity);
