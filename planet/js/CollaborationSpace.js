@@ -124,7 +124,7 @@ class CollaborationSpace {
     // Create the invite link for the collaboration
     createLink(id) {
         const roomID = this.createRoomID();
-        const link = `https://musicblocks.sugarlabs.org/index.html?id=${id}&run=False&roomID=${roomID}`;
+        const link = `http://127.0.0.1:3000/index.html?id=${id}&run=False&roomID=${roomID}`;
         return link;
     }
 

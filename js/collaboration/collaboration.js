@@ -24,10 +24,11 @@ class Collaboration {
         this.attempts = 0;
         this.socket = null;
         this.blockList = this.activity.blocks.blockList;
-        this.HOST = process.env.COLLAB_HOST;
         this.PORT = "8080";
+        this.COLLAB_HOST = "http://127.0.0.1";
         this.hasCollaborationStarted = false;
         this.updatedProjectHtml = null;
+        this.hasExitedCollaboration = false;
         this.randomNames = [
             'Macrotis',
             'Setonix',
@@ -57,6 +58,8 @@ class Collaboration {
     stopConnection = (socket) => {
         if (this.attempts >= this.RETRIES) {
             console.log("Maximum calls to make connection exceeded. Stopped making calls");
+            const errorMsg = _("The Collaboration Server is currently busy. Please try again later.");
+            this.activity.textMsg(errorMsg);
             socket.disconnect();
         }
     };
@@ -64,7 +67,7 @@ class Collaboration {
     // Make calls to the socket server
     makeConnection = (room_id, name) => {
         // connect to the local server
-        const socket = io(this.HOST.concat(";", this.PORT));
+        const socket = io(this.COLLAB_HOST.concat(":", this.PORT));
         socket.on("connect", () => {
             this.socket = socket;
             try {
@@ -142,6 +145,10 @@ class Collaboration {
         socket.on("block-value-updated", (update) => {
             this.activity.renderProjectFromData(update);
         });
+
+        socket.on("exit-collaboration", (userArray) => {
+            this.exitCollaboration(userArray);
+        })
     };
 
     // Generate a random name for the user
@@ -151,6 +158,15 @@ class Collaboration {
         const suffix = Math.floor(Math.random() * 50);
         const name = prefix + suffix;
         return name;
+    }
+
+    // Exit the user from collaboration room
+    exitCollaboration = (userArray) => {
+        for (let i = 0; i < userArray.length; i++) {
+            this.activity.collabCursor.removeCursor(userArray[i]);
+        };
+        this.hasExitedCollaboration = true;
+        this.socket.disconnect();
     }
 
     // Start the collaboration
