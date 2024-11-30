@@ -109,9 +109,20 @@
             }
         </script>
         <script type="text/javascript">
-            $(document).ready(function() {
-                doSearch();
-            });
+            document.addEventListener("DOMContentLoaded", () => {
+            const script = document.createElement("script");
+            script.src = "js/activity.js";
+            script.onload = () => {
+                if (typeof Activity !== "undefined") {
+                    const activityInstance = new Activity();
+                    if (typeof activityInstance.doSearch === "function") {
+                        activityInstance.doSearch();
+                    }
+                }
+            };
+            document.body.appendChild(script);
+        });
+    document.body.appendChild(script);
         </script>
     </head>
 
