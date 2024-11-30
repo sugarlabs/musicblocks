@@ -703,7 +703,7 @@ counter-clockwise, transforming it into _Locrian_.
 In the above example, the _Major_ mode has been inverted, transforming
 it into _Phrygian_.
 
-Note: The build-in modes in Music Blocks can be found in (musicutils.js)[https://github.com/sugarlabs/musicblocks/blob/master/js/musicutils.js#L68].
+Note: The build-in modes in Music Blocks can be found in (musicutils.js)[https://github.com/sugarlabs/musicblocks/blob/master/js/utils/musicutils.js#L68].
 
 ![alt tag](./mode6.svg " ")
 

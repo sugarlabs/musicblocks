@@ -1297,18 +1297,18 @@ function setupProgramBlocks(activity) {
                         if (i < blockArgs.length) {
                             if (typeof blockArgs[i] === "number") {
                                 if (
-                                    ["anyin", "numberin"].indexOf(
+                                    !["anyin", "numberin"].includes(
                                         activity.blocks.protoBlockDict[protoblk].dockTypes[i]
-                                    ) === -1
+                                    )
                                 ) {
                                     activity.errorMsg(_("Warning: block argument type mismatch"));
                                 }
                                 newBlock.push([i, ["number", { value: blockArgs[i] }], 0, 0, [0]]);
                             } else if (typeof blockArgs[i] === "string") {
                                 if (
-                                    ["anyin", "textin"].indexOf(
+                                    !["anyin", "textin"].includes(
                                         activity.blocks.protoBlockDict[protoblk].dockTypes[i]
-                                    ) === -1
+                                    )
                                 ) {
                                     activity.errorMsg(_("Warning: block argument type mismatch"));
                                 }

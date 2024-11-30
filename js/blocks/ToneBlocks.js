@@ -849,7 +849,7 @@ function setupToneBlocks(activity) {
                 ""
             ]);
             this.makeMacro((x, y) => [
-                [0, "setdefaultvoice", x, y, [null, 1, null]],
+                [0, "setdefaultinstrument", x, y, [null, 1, null]],
                 [1, ["voicename", { value: DEFAULTVOICE }], 0, 0, [0]]
             ]);
 

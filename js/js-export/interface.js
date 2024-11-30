@@ -248,7 +248,7 @@ class JSInterface {
      * @returns {Boolean}
      */
     static isClampBlock(blockName) {
-        return JSInterface._clampBlocks.indexOf(blockName) !== -1;
+        return JSInterface._clampBlocks.includes(blockName);
     }
 
     /**
@@ -288,7 +288,7 @@ class JSInterface {
      * @returns {Boolean}
      */
     static methodReturns(blockName) {
-        return JSInterface._returningMethods.indexOf(blockName) !== -1;
+        return JSInterface._returningMethods.includes(blockName);
     }
 
     /**
@@ -439,10 +439,10 @@ class JSInterface {
                         const solfeges = ["do", "re", "mi", "fa", "sol", "la", "ti"];
                         const letters = ["c", "d", "e", "f", "g", "a", "b"];
                         if (
-                            solfeges.indexOf(strs[0].toLowerCase()) !== -1 ||
-                            letters.indexOf(strs[0].toLowerCase()) !== -1
+                            solfeges.includes(strs[0].toLowerCase()) ||
+                            letters.includes(strs[0].toLowerCase())
                         ) {
-                            if (solfeges.indexOf(strs[0].toLowerCase()) !== -1) {
+                            if (solfeges.includes(strs[0].toLowerCase())) {
                                 arg = strs[0].toLowerCase();
                             } else {
                                 arg = strs[0].toUpperCase();
@@ -457,7 +457,7 @@ class JSInterface {
                                     doubleflat: DOUBLEFLAT
                                 };
 
-                                if (accidentals.indexOf(strs[1]) !== -1) {
+                                if (accidentals.includes(strs[1])) {
                                     arg += strs[1];
                                 } else if (strs[1].toLowerCase() in accidentals2) {
                                     arg += accidentals2[strs[1].toLowerCase()];
@@ -484,9 +484,9 @@ class JSInterface {
                             "doubleflat"
                         ];
 
-                        if (accidentals.indexOf(arg) !== -1) {
+                        if (accidentals.includes(arg)) {
                             arg = accidentalOuts[accidentals.indexOf(arg)];
-                        } else if (accidentals2.indexOf(arg.toLowerCase()) !== -1) {
+                        } else if (accidentals2.includes(arg.toLowerCase())) {
                             arg = accidentalOuts[accidentals2.indexOf(arg.toLowerCase())];
                         }
                     } else if (props["constraints"]["type"] === "oneof") {
@@ -546,7 +546,7 @@ class JSInterface {
                             "triangle",
                             "vibraphone"
                         ];
-                        if (instruments.indexOf(arg) !== -1) {
+                        if (instruments.includes(arg)) {
                             arg = arg.toLowerCase();
                         } else {
                             JSEditor.logConsole(
@@ -576,7 +576,7 @@ class JSInterface {
                             "slap",
                             "raindrop"
                         ];
-                        if (drums.indexOf(arg) !== -1) {
+                        if (drums.includes(arg)) {
                             arg = arg.toLowerCase();
                         } else {
                             JSEditor.logConsole(
@@ -600,7 +600,7 @@ class JSInterface {
                     } else if (props["constraints"]["type"] === "letterkey") {
                         const strs = arg.split(" ");
                         const letters = ["c", "d", "e", "f", "g", "a", "b"];
-                        if (letters.indexOf(strs[0].toLowerCase()) !== -1) {
+                        if (letters.includes(strs[0].toLowerCase())) {
                             arg = strs[0].toUpperCase();
 
                             if (strs.length > 1) {
@@ -612,7 +612,7 @@ class JSInterface {
                                     doubleflat: DOUBLEFLAT
                                 };
 
-                                if (accidentals.indexOf(strs[1]) !== -1) {
+                                if (accidentals.includes(strs[1])) {
                                     arg += strs[1];
                                 } else if (strs[1].toLowerCase() in accidentals2) {
                                     arg += accidentals2[strs[1].toLowerCase()];

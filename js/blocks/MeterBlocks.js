@@ -1319,7 +1319,7 @@ function setupMeterBlocks(activity) {
          */
         flow(args, logo, turtle, blk) {
             const arg0 = args[0];
-            if (args.length !== 1 || typeof args[0] !== "number") {
+            if (args.length !== 1 || typeof args[0] !== "number" || arg0 < 0) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             }

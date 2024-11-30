@@ -335,7 +335,7 @@ class HelpWidget {
                 _("Guide"),
                 _("About"),
                 _("Congratulations.")
-            ].indexOf(HELPCONTENT[page][0]) !== -1
+            ].includes(HELPCONTENT[page][0])
         ) {
             // body = body + '<p>&nbsp;<img src="' + HELPCONTENT[page][2] + '"></p>';
             body = `<figure>&nbsp;<img src=" ${HELPCONTENT[page][2]}"></figure>` ;
@@ -356,7 +356,7 @@ class HelpWidget {
             body += `<p><a href="${link}" target="_blank">${HELPCONTENT[page][4]}</a></p>` ;
         }
 
-        if ([_("Congratulations.")].indexOf(HELPCONTENT[page][0]) !== -1) {
+        if ([_("Congratulations.")].includes(HELPCONTENT[page][0])) {
             const cell = docById("right-arrow");
 
             cell.onclick = () => {

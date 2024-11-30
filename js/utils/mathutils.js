@@ -97,8 +97,8 @@ class MathUtility {
         } else if (
             typeof a === "string" &&
             typeof b === "string" &&
-            SOLFEGENAMES.indexOf(a) !== -1 &&
-            SOLFEGENAMES.indexOf(b) !== -1
+            SOLFEGENAMES.includes(a) &&
+            SOLFEGENAMES.includes(b)
         ) {
             return GetRandomSolfege(a, b, c);
         } else {

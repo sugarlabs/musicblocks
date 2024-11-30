@@ -256,7 +256,7 @@ function setupDictActions(activity) {
                 return msg;
               }
               else if(! (key in activity.logo.turtleDicts[turtle][dict])){
-                var msg=_("Key with this name does not exist in "+dict);
+                  var msg=_("Key with this name does not exist in ") + dict;
                 return msg;
               }
 

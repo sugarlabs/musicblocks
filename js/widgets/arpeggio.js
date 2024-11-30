@@ -331,7 +331,7 @@ class Arpeggio {
      * @returns {boolean} true/false
      */
     _inMode(i) {
-        return this._modeNumbers.indexOf(i.toString()) !== -1;
+        return this._modeNumbers.includes(i.toString());
     }
 
     /**

@@ -805,7 +805,7 @@ counter-clockwise, transforming it into *Locrian*.
 In the above example, the *Major* mode has been 転回ed, transforming
 it into *Phrygian*.
 
-Note: The build-in 音階とモード in ミュージック・ブロックス can be found in [musicutils.js](https://github.com/sugarlabs/musicblocks/blob/master/js/musicutils.js#L68).
+Note: The build-in 音階とモード in ミュージック・ブロックス can be found in [musicutils.js](https://github.com/sugarlabs/musicblocks/blob/master/js/utils/musicutils.js#L68).
 
 ![alt tag](./mode6.svg "ピッチ・タイム行列 block")
 

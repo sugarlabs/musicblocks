@@ -207,7 +207,7 @@ function setupWidgetBlocks(activity) {
                     }
                 }
 
-                if ([-12, -24, -48, -96].indexOf(args[1]) === -1) {
+                if (![-12, -24, -48, -96].includes(args[1])) {
                     //.TRANS: rolloff is the steepness of a change in frequency.
                     activity.errorMsg(
                         _("Rolloff value should be either -12, -24, -48, or -96 decibels/octave.")
@@ -1576,7 +1576,7 @@ function setupWidgetBlocks(activity) {
                     "aimusic"
                 ]);
     
-                //.TRANS: the speed at music is should be played.
+                //.TRANS: AI-generated music
                 this.formBlock({ name: _("aimusic"), canCollapse: true });
                 this.makeMacro((x, y) => [
                     [0, "aimusic", x, y, [null, 1]],

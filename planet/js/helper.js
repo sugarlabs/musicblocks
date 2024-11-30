@@ -80,7 +80,7 @@ function toggleText(id, a, b) {
     const el = document.getElementById(id);
 
     const prevHTML = el.innerHTML ;
-    const updatedHTML = prevHTML.indexOf(a) !== -1 ? prevHTML.replace(a,b) : prevHTML.replace(b,a) ;
+    const updatedHTML = prevHTML.includes(a) ? prevHTML.replace(a,b) : prevHTML.replace(b,a) ;
 
     el.innerHTML = "" ;
     el.insertAdjacentHTML("afterbegin", updatedHTML) ;
@@ -99,7 +99,7 @@ function hideOnClickOutside(eles, other) {
         let ok = false;
 
         for (let i = 0; i < eles.length; i++)
-            if (path.indexOf(eles[i]) !== -1)
+            if (path.includes(eles[i]))
                 ok = true;
 
         if (ok === false) {
@@ -147,7 +147,7 @@ $(document).ready(() => {
     // eslint-disable-next-line no-unused-vars
     document.getElementById("view-more-chips").addEventListener("click", (evt) => {
         const showMore = _("Show more tags") + " ▼";
-        const showLess = _("Show fewer tags" + " ▲");
+        const showLess = _("Show fewer tags") + " ▲";
         toggleExpandable("morechips", "flexchips");
         toggleText("view-more-chips", showMore, showLess);
     });

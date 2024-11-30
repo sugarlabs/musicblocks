@@ -743,7 +743,7 @@ notes.
 
 
 注意：《音乐拼块》中的内建模式可以在 [musicutils.js] 中找到
-(https://github.com/sugarlabs/musicblocks/blob/master/js/musicutils.js#L68).
+(https://github.com/sugarlabs/musicblocks/blob/master/js/utils/musicutils.js#L68).
 
 ![alt tag](../guide/mode6.svg "Pitch-time Matrix block")
 

@@ -461,7 +461,7 @@ class Toolbar {
                     } else if (ele.label === "Turtle Wrap On") {
                         ele.display = false;
                     }
-                })
+                });
             } else {
                 wrapButtonTooltipData = _("Turtle Wrap On");
                 this.activity.helpfulWheelItems.forEach(ele => {
@@ -470,7 +470,7 @@ class Toolbar {
                     } else if (ele.label === "Turtle Wrap On") {
                         ele.display = true;
                     }
-                })
+                });
             }
 
             wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
@@ -501,7 +501,7 @@ class Toolbar {
                 } else if (ele.label === "Turtle Wrap On") {
                     ele.display = false;
                 }
-            })
+            });
         } else {
             wrapButtonTooltipData = _("Turtle Wrap On");
             activity.helpfulWheelItems.forEach(ele => {
@@ -510,7 +510,7 @@ class Toolbar {
                 } else if (ele.label === "Turtle Wrap On") {
                     ele.display = true;
                 }
-            })
+            });
         }
 
         wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
@@ -929,108 +929,15 @@ class Toolbar {
      */
     renderLanguageSelectIcon(languageBox) {
         const languageSelectIcon = docById("languageSelectIcon");
+        const languages = [
+            "enUS", "enUK", "es", "pt", "ko", "ja", "kana", "zhCN", "th",
+            "ayc", "quz", "gug", "hi", "ibo", "ar", "te", "he"
+        ];
+    
         languageSelectIcon.onclick = () => {
-            const enUS = docById("enUS");
-
-            enUS.onclick = () => {
-                languageBox.enUS_onclick(this.activity);
-            };
-
-            const enUK = docById("enUK");
-
-            enUK.onclick = () => {
-                languageBox.enUK_onclick(this.activity);
-            };
-
-            const es = docById("es");
-
-            es.onclick = () => {
-                languageBox.es_onclick(this.activity);
-            };
-
-            const pt = docById("pt");
-
-            pt.onclick = () => {
-                languageBox.pt_onclick(this.activity);
-            };
-
-            const ko = docById("ko");
-
-            ko.onclick = () => {
-                languageBox.ko_onclick(this.activity);
-            };
-
-            const ja = docById("ja");
-
-            ja.onclick = () => {
-                languageBox.ja_onclick(this.activity);
-            };
-
-            const kana = docById("kana");
-
-            kana.onclick = () => {
-                languageBox.kana_onclick(this.activity);
-            };
-
-            const zhCN = docById("zhCN");
-
-            zhCN.onclick = () => {
-                languageBox.zhCN_onclick(this.activity);
-            };
-
-            const th = docById("th");
-
-            th.onclick = () => {
-                languageBox.th_onclick(this.activity);
-            };
-
-            const ayc = docById("ayc");
-
-            ayc.onclick = () => {
-                languageBox.ayc_onclick(this.activity);
-            };
-
-            const quz = docById("quz");
-
-            quz.onclick = () => {
-                languageBox.quz_onclick(this.activity);
-            };
-
-            const gug = docById("gug");
-
-            gug.onclick = () => {
-                languageBox.gug_onclick(this.activity);
-            };
-
-            const hi = docById("hi");
-
-            hi.onclick = () => {
-                languageBox.hi_onclick(this.activity);
-            };
-
-            const ibo = docById("ibo");
-
-            ibo.onclick = () => {
-                languageBox.ibo_onclick(this.activity);
-            };
-
-            const ar = docById("ar");
-
-            ar.onclick = () => {
-                languageBox.ar_onclick(this.activity);
-            };
-
-            const te = docById("te");
-
-            te.onclick = () => {
-                languageBox.te_onclick(this.activity);
-            };
-
-            const he = docById("he");
-
-            he.onclick = () => {
-                languageBox.he_onclick(this.activity);
-            };
+            languages.forEach(lang => {
+                docById(lang).onclick = () => languageBox[`${lang}_onclick`](this.activity);
+            });
         };
     }
 
@@ -1060,3 +967,33 @@ class Toolbar {
         }
     };
 }
+function renderNewProjectConfirmation() {
+    const modalContainer = document.getElementById("modal-container");
+    const newDropdown = document.getElementById("newdropdown");
+    newDropdown.innerHTML = '';
+    const title = document.createElement("div");
+    title.innerHTML = `<h2 style="color: #0066FF; font-size: 24px; text-align: left; margin: 0;">${_("New Project")}</h2>`;
+    newDropdown.appendChild(title);
+    const confirmationMessage = document.createElement("div");
+    confirmationMessage.innerHTML = `<div id="confirmation-message" style="color: #666666; font-size: 16px; margin-bottom: 24px; text-align: left;">${_("Are you sure you want to create a new project?")}</div>`;
+    newDropdown.appendChild(confirmationMessage);
+    const confirmationButtonLi = document.createElement("li");
+    confirmationButtonLi.style.textAlign = "center";
+    confirmationButtonLi.style.width = "fit-content";
+    const confirmationButton = document.createElement("a");
+    confirmationButton.id = "new-project";
+    confirmationButton.style.display = "inline-block";
+    confirmationButton.style.backgroundColor = "#2196F3";
+    confirmationButton.style.color = "white";
+    confirmationButton.style.textDecoration = "none";
+    confirmationButton.style.borderRadius = "4px";
+    confirmationButton.style.fontWeight = "bold";
+    confirmationButton.innerHTML = _("Confirm");
+    confirmationButtonLi.appendChild(confirmationButton);
+    newDropdown.appendChild(confirmationButtonLi);
+    modalContainer.style.display = "flex";
+    confirmationButton.onclick = () => {
+        modalContainer.style.display = "none";
+    };
+}
+renderNewProjectConfirmation();

@@ -186,7 +186,7 @@ function MusicKeyboard(activity) {
     this.addRowBlock = (rowBlock) => {
         // In case there is a repeat block, use a unique block number
         // for each instance.
-        while (this._rowBlocks.indexOf(rowBlock) !== -1) {
+        while (this._rowBlocks.includes(rowBlock)) {
             rowBlock = rowBlock + 1000000;
         }
 
@@ -267,14 +267,14 @@ function MusicKeyboard(activity) {
          */
         const __startNote = (event) => {
             let i, id;
-            if (WHITEKEYS.indexOf(event.keyCode) !== -1) {
+            if (WHITEKEYS.includes(event.keyCode)) {
                 i = WHITEKEYS.indexOf(event.keyCode);
                 id = "whiteRow" + i.toString();
-            } else if (BLACKKEYS.indexOf(event.keyCode) !== -1) {
+            } else if (BLACKKEYS.includes(event.keyCode)) {
                 i = BLACKKEYS.indexOf(event.keyCode);
-                if ([2, 6, 9, 13, 16, 20].indexOf(i) !== -1) return;
+                if ([2, 6, 9, 13, 16, 20].includes(i)) return;
                 id = "blackRow" + i.toString();
-            } else if (HERTZKEYS.indexOf(event.keyCode) !== -1) {
+            } else if (HERTZKEYS.includes(event.keyCode)) {
                 i = HERTZKEYS.indexOf(event.keyCode);
                 id = "hertzRow" + i.toString();
             } else if (SPACE == event.keyCode) {
@@ -360,14 +360,14 @@ function MusicKeyboard(activity) {
          */
         const __endNote = (event) => {
             let i, id;
-            if (WHITEKEYS.indexOf(event.keyCode) !== -1) {
+            if (WHITEKEYS.includes(event.keyCode)) {
                 i = WHITEKEYS.indexOf(event.keyCode);
                 id = "whiteRow" + i.toString();
-            } else if (BLACKKEYS.indexOf(event.keyCode) !== -1) {
+            } else if (BLACKKEYS.includes(event.keyCode)) {
                 i = BLACKKEYS.indexOf(event.keyCode);
-                if ([2, 6, 9, 13, 16, 20].indexOf(i) !== -1) return;
+                if ([2, 6, 9, 13, 16, 20].includes(i)) return;
                 id = "blackRow" + i.toString();
-            } else if (HERTZKEYS.indexOf(event.keyCode) !== -1) {
+            } else if (HERTZKEYS.includes(event.keyCode)) {
                 i = HERTZKEYS.indexOf(event.keyCode);
                 id = "hertzRow" + i.toString();
             } else if (SPACE == event.keyCode) {
@@ -1227,7 +1227,7 @@ function MusicKeyboard(activity) {
         this.remove = [];
 
         sortedList = sortedList.filter((item) => {
-            if (unique.indexOf(item.noteName + item.noteOctave) === -1) {
+            if (!unique.includes(item.noteName + item.noteOctave)) {
                 unique.push(item.noteName + item.noteOctave);
                 return true;
             } else if (item.noteName === "drum") {
@@ -1570,9 +1570,9 @@ function MusicKeyboard(activity) {
                 cell.style.maxWidth = cell.style.width;
 
                 if (
-                    selectedNotes[j].blockNumber.indexOf(
+                    selectedNotes[j].blockNumber.includes(
                         this.displayLayout[n - i - 1].blockNumber
-                    ) !== -1
+                    )
                 ) {
                     ind = selectedNotes[j].blockNumber.indexOf(
                         this.displayLayout[n - i - 1].blockNumber
@@ -1898,7 +1898,7 @@ function MusicKeyboard(activity) {
      */
     this._createAddRowPieSubmenu = function () {
         docById("wheelDivptm").style.display = "";
-        docById("wheelDivptm").style.zIndex = "300";
+        // docById("wheelDivptm").style.zIndex = "300";
         const pitchLabels = ["do", "re", "mi", "fa", "sol", "la", "ti"];
         const hertzLabels = [262, 294, 327, 348, 392, 436, 490, 523];
         const VALUESLABEL = ["pitch", "hertz"];
@@ -1943,7 +1943,7 @@ function MusicKeyboard(activity) {
         this._exitWheel.sliceSelectedPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.sliceInitPathCustom = this._exitWheel.slicePathCustom;
         this._exitWheel.clickModeRotate = false;
-        this._exitWheel.createWheel(["x", " "]);
+        this._exitWheel.createWheel(["×", " "]);
 
         const x = docById("addnotes").getBoundingClientRect().x;
         const y = docById("addnotes").getBoundingClientRect().y;
@@ -1997,8 +1997,8 @@ function MusicKeyboard(activity) {
                     }
 
                     if (
-                        pitchLabels[i].indexOf(lastNote) !== -1 ||
-                        lastNote.indexOf(pitchLabels[i]) !== -1
+                        pitchLabels[i].includes(lastNote) ||
+                        lastNote.includes(pitchLabels[i])
                     ) {
                         break;
                     }
@@ -2081,7 +2081,7 @@ function MusicKeyboard(activity) {
                     this._sortLayout(this.layout);
 
                     this.displayLayout = this.layout.map((note) => {
-                        if (SOLFEGENAMES.indexOf(note.noteName) !== -1) {
+                        if (SOLFEGENAMES.includes(note.noteName)) {
                             return { ...note, noteName: FIXEDSOLFEGE[note.noteName] };
                         }
                         return note;
@@ -2168,7 +2168,7 @@ function MusicKeyboard(activity) {
         const unique = [];
         this.remove = [];
         this.layout = this.layout.filter((item, pos) => {
-            if (unique.indexOf(item.noteName + item.noteOctave) === -1) {
+            if (!unique.includes(item.noteName + item.noteOctave)) {
                 unique.push(item.noteName + item.noteOctave);
                 return true;
             }
@@ -2387,7 +2387,7 @@ function MusicKeyboard(activity) {
             let accidentalsValue = 2;
 
             for (let i = 0; i < accidentals.length; i++) {
-                if (noteValue.indexOf(accidentals[i]) !== -1) {
+                if (noteValue.includes(accidentals[i])) {
                     accidentalsValue = i;
                     noteValue = noteValue.substr(0, noteValue.indexOf(accidentals[i]));
                     break;
@@ -2619,7 +2619,7 @@ function MusicKeyboard(activity) {
                 parenttbl2 = document.getElementById("myrow2");
                 newel2 = document.createElement("td");
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
-                if ([2, 6, 9, 13, 16, 20].indexOf(myrow2Id) !== -1) {
+                if ([2, 6, 9, 13, 16, 20].includes(myrow2Id)) {
                     parenttbl2.appendChild(newel2);
                     el = docById("blackRow" + myrow2Id.toString());
                     el.style.background = "transparent";
@@ -2708,14 +2708,14 @@ function MusicKeyboard(activity) {
                 newel.style.zIndex = "100";
                 parenttbl.appendChild(newel);
             } else if (
-                this.displayLayout[p].noteName.indexOf(SHARP) !== -1 ||
-                this.displayLayout[p].noteName.indexOf("#") !== -1
+                this.displayLayout[p].noteName.includes(SHARP) ||
+                this.displayLayout[p].noteName.includes("#")
             ) {
                 parenttbl2 = document.getElementById("myrow2");
                 newel2 = document.createElement("td");
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
                 newel2.style.textAlign = "center";
-                if ([2, 6, 9, 13, 16, 20].indexOf(myrow2Id) !== -1) {
+                if ([2, 6, 9, 13, 16, 20].includes(myrow2Id)) {
                     parenttbl2.appendChild(newel2);
                     el = docById("blackRow" + myrow2Id.toString());
                     el.style.background = "transparent";
@@ -2758,15 +2758,15 @@ function MusicKeyboard(activity) {
                 newel2.style.zIndex = "200";
                 parenttbl2.appendChild(newel2);
             } else if (
-                this.displayLayout[p].noteName.indexOf(FLAT) !== -1 ||
-                this.displayLayout[p].noteName.indexOf("b") !== -1
+                this.displayLayout[p].noteName.includes(FLAT) ||
+                this.displayLayout[p].noteName.includes("b")
             ) {
                 parenttbl2 = document.getElementById("myrow2");
                 newel2 = document.createElement("td");
                 // elementid2 = document.getElementsByTagName("td").length;
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
                 newel2.style.textAlign = "center";
-                if ([2, 6, 9, 13, 16, 20].indexOf(myrow2Id) !== -1) {
+                if ([2, 6, 9, 13, 16, 20].includes(myrow2Id)) {
                     parenttbl2.appendChild(newel2);
                     el = docById("blackRow" + myrow2Id.toString());
                     el.style.background = "transparent";
@@ -2797,7 +2797,7 @@ function MusicKeyboard(activity) {
                 ]);
                 nname = this.displayLayout[p].noteName.replace(FLAT, "").replace("b", "");
                 if (this.displayLayout[p].blockNumber <= FAKEBLOCKNUMBER) {
-                    if (SOLFEGENAMES.indexOf(nname) !== -1) {
+                    if (SOLFEGENAMES.includes(nname)) {
                         newel2.innerHTML =
                             "<small>(" +
                             String.fromCharCode(BLACKKEYS[myrow2Id]) +
@@ -2843,7 +2843,7 @@ function MusicKeyboard(activity) {
                 ]);
 
                 if (this.displayLayout[p].blockNumber <= FAKEBLOCKNUMBER) {
-                    if (SOLFEGENAMES.indexOf(this.displayLayout[p].noteName) !== -1) {
+                    if (SOLFEGENAMES.includes(this.displayLayout[p].noteName)) {
                         newel.innerHTML =
                             (myrowId < WHITEKEYS.length
                                 ? "<small>(" +
@@ -3095,7 +3095,7 @@ function MusicKeyboard(activity) {
                                     0,
                                     [previousBlock, thisBlock + 1, thisBlock + 2, lastConnection]
                                 ]);
-                                if (["#", "b", "♯", "♭"].indexOf(note.noteOctave[j][1]) !== -1) {
+                                if (["#", "b", "♯", "♭"].includes(note.noteOctave[j][1])) {
                                     newStack.push([
                                         thisBlock + 1,
                                         [
@@ -3176,8 +3176,8 @@ function MusicKeyboard(activity) {
             this.activity.blocks.loadNewBlocks(newStack);
         }
 
-        if (actionGroups > 1) this.activity.textMsg(_("New action blocks generated!"));
-        else this.activity.textMsg(_("New action block generated"));
+        if (actionGroups > 1) this.activity.textMsg(_("New action blocks generated."));
+        else this.activity.textMsg(_("New action block generated."));
     };
 
     /**

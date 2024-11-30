@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /**
  * @file This contains the prototype of the Turtles component.
  * @author Walter Bender
@@ -791,16 +792,16 @@ Turtles.TurtlesView = class {
             container.onmouseover = () => {
                 if (!activity.loading) {
                     document.body.style.cursor = "pointer";
-                    container.style.transition = '0.1s ease-out';
-                    container.style.transform = 'scale(1.15)';
+                    container.style.transition = "0.1s ease-out";
+                    container.style.transform = "scale(1.15)";
                 }
             };
 
             container.onmouseout = () => {
                 if (!activity.loading) {
                     document.body.style.cursor = "default";
-                    container.style.transition = '0.15s ease-out';
-                    container.style.transform = 'scale(1)';
+                    container.style.transition = "0.15s ease-out";
+                    container.style.transform = "scale(1)";
                 }
             };
             const img = new Image();
@@ -877,10 +878,10 @@ Turtles.TurtlesView = class {
         const __makeGridButton = () => {
             this.gridButton = _makeButton(
                 CARTESIANBUTTON,
-              {
-                "name":"Grid",
-                "label":_("Grid")
-              },
+                {
+                    "name":"Grid",
+                    "label":_("Grid")
+                },
                 this._w - 10 - 3 * 55,
                 70 + LEADING + 6
             );
@@ -898,44 +899,44 @@ Turtles.TurtlesView = class {
             this._clearButton = _makeButton(
                 CLEARBUTTON,
                 {
-                "name":"Clean",
-                "label":_("Clean")
+                    "name":"Clean",
+                    "label":_("Clean")
                 },
                 this._w - 5 - 2 * 55,
                 70 + LEADING + 6
             );
 
             this._clearButton.onclick = () => {
-                let clearBox = document.getElementById("ClearButton");
-                let clearContent = document.getElementById("ClearContent");
+                const clearBox = document.getElementById("ClearButton");
+                const clearContent = document.getElementById("ClearContent");
                 clearContent.innerHTML = _("Confirm");
                 clearBox.style.visibility="visible";
-                let auxToolbar = docById("aux-toolbar");
-                let clearBtnPosition = auxToolbar.style.display === "block" ? "183px" : "125px";
+                const auxToolbar = docById("aux-toolbar");
+                const clearBtnPosition = auxToolbar.style.display === "block" ? "183px" : "125px";
                 clearBox.style.top = clearBtnPosition;
-                let func = this.activity._allClear;
-                clearBox.addEventListener('click', function(event) {
+                const func = this.activity._allClear;
+                clearBox.addEventListener("click", function(event) {
                     if(event.target.id == "clearClose"){
                         this.style.visibility = "hidden";
                     }
                     else{
-                       func();
-                       clearBox.style.visibility = "hidden";
-                       if (auxToolbar.style.display === "block") {
-                        setTimeout(() => {
-                            docById("Grid").style.top = "136px";
-                            docById("Expand").style.top = "136px";
-                            docById("Collapse").style.top = "136px";
-                            docById("Clean").style.top = "136px";
-                        }, 0);
-                    } else {
-                        docById("Grid").style.top = "76px";
-                        docById("Expand").style.top = "76px";
-                        docById("Collapse").style.top = "76px";
-                        docById("Clean").style.top = "76px";
+                        func();
+                        clearBox.style.visibility = "hidden";
+                        if (auxToolbar.style.display === "block") {
+                            setTimeout(() => {
+                                docById("Grid").style.top = "136px";
+                                docById("Expand").style.top = "136px";
+                                docById("Collapse").style.top = "136px";
+                                docById("Clean").style.top = "136px";
+                            }, 0);
+                        } else {
+                            docById("Grid").style.top = "76px";
+                            docById("Expand").style.top = "76px";
+                            docById("Collapse").style.top = "76px";
+                            docById("Clean").style.top = "76px";
+                        }
                     }
-                    }
-                });            
+                });
             };
             
             if (doCollapse) {
@@ -951,8 +952,8 @@ Turtles.TurtlesView = class {
             this._collapseButton = _makeButton(
                 COLLAPSEBUTTON,
                 {
-                "name":"Collapse",
-                "label":_("Collapse")
+                    "name":"Collapse",
+                    "label":_("Collapse")
                 },
                 this._w - 55,
                 70 + LEADING + 6
@@ -978,7 +979,7 @@ Turtles.TurtlesView = class {
                     } else if (ele.label === "Grid") {
                         ele.display = false;
                     }
-                })
+                });
                 __collapse();
             };
         };
@@ -1003,14 +1004,14 @@ Turtles.TurtlesView = class {
                 } else if (ele.label === "Grid") {
                     ele.display = false;
                 }
-            })
+            });
             __collapse();
 
             if (docById("helpfulWheelDiv").style.display !== "none") {
                 docById("helpfulWheelDiv").style.display = "none";
                 this.activity.__tick();
             }
-        }
+        };
 
         /**
          * Makes expand button by initailising 'EXPANDBUTTON' SVG.
@@ -1053,7 +1054,7 @@ Turtles.TurtlesView = class {
                     } else if (ele.label === "Grid") {
                         ele.display = true;
                     }
-                })
+                });
                 this._collapsedBoundary.visible = false;
                 turtlesStage.removeAllEventListeners("pressmove");
                 turtlesStage.removeAllEventListeners("mousedown");
@@ -1111,7 +1112,7 @@ Turtles.TurtlesView = class {
                 } else if (ele.label === "Grid") {
                     ele.display = true;
                 }
-            })
+            });
             this._collapsedBoundary.visible = false;
             turtlesStage.removeAllEventListeners("pressmove");
             turtlesStage.removeAllEventListeners("mousedown");
@@ -1147,7 +1148,7 @@ Turtles.TurtlesView = class {
                 docById("helpfulWheelDiv").style.display = "none";
                 this.activity.__tick();
             }
-        }
+        };
 
         /**
          * initializes all Buttons.
@@ -1218,17 +1219,17 @@ Turtles.TurtlesView = class {
                 "data:image/svg+xml;base64," +
                 window.btoa(
                     base64Encode(
-                            MBOUNDARY.replace("HEIGHT", this._h)
-                                .replace("WIDTH", this._w)
-                                .replace("Y", 10)
-                                .replace("X", 10)
-                                .replace("DY", dy)
-                                .replace("DX", dx)
-                                .replace("stroke_color", platformColor.ruleColor)
-                                .replace("fill_color", this._backgroundColor)
-                                .replace("STROKE", 20)
-                        )
-                    );
+                        MBOUNDARY.replace("HEIGHT", this._h)
+                            .replace("WIDTH", this._w)
+                            .replace("Y", 10)
+                            .replace("X", 10)
+                            .replace("DY", dy)
+                            .replace("DX", dx)
+                            .replace("stroke_color", platformColor.ruleColor)
+                            .replace("fill_color", this._backgroundColor)
+                            .replace("STROKE", 20)
+                    )
+                );
             __makeAllButtons();
         };
         // Call the __makeBoundary2 function once the document is loaded
@@ -1257,16 +1258,16 @@ Turtles.TurtlesView = class {
                 "data:image/svg+xml;base64," +
                 window.btoa(
                     base64Encode(
-                            MBOUNDARY.replace("HEIGHT", this._h)
-                                .replace("WIDTH", this._w)
-                                .replace("Y", 10 / CONTAINERSCALEFACTOR)
-                                .replace("X", 10 / CONTAINERSCALEFACTOR)
-                                .replace("DY", dy)
-                                .replace("DX", dx)
-                                .replace("stroke_color", platformColor.ruleColor)
-                                .replace("fill_color", this._backgroundColor)
-                                .replace("STROKE", 20 / CONTAINERSCALEFACTOR)
-                        )
+                        MBOUNDARY.replace("HEIGHT", this._h)
+                            .replace("WIDTH", this._w)
+                            .replace("Y", 10 / CONTAINERSCALEFACTOR)
+                            .replace("X", 10 / CONTAINERSCALEFACTOR)
+                            .replace("DY", dy)
+                            .replace("DX", dx)
+                            .replace("stroke_color", platformColor.ruleColor)
+                            .replace("fill_color", this._backgroundColor)
+                            .replace("STROKE", 20 / CONTAINERSCALEFACTOR)
+                    )
                 );
         };
 

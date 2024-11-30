@@ -1554,11 +1554,15 @@ const OSCTYPES = [
  * @constant {Array<Array<string>>}
  */
 const INITIALTEMPERAMENTS = [
-    [_("equal"), "equal", "equal"],
-    [_("just intonation"), "just intonation", "just intonation"],
-    [_("Pythagorean"), "Pythagorean", "Pythagorean"],
-    [_("meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
-    [_("meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"]
+    [_("Equal (12EDO)"), "equal", "equal"],
+    [_("Equal (5EDO)"), "equal5", "equal5"],
+    [_("Equal (7EDO)"), "equal7", "equal7"],
+    [_("Equal (19EDO)"), "equal19", "equal19"],
+    [_("Equal (31EDO)"), "equal31", "equal31"],
+    [_("5-limit Just Intonation"), "just intonation", "just intonation"],
+    [_("Pythagorean (3-limit JI)"), "Pythagorean", "Pythagorean"],
+    [_("Meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
+    [_("Meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"]
 ];
 
 /**
@@ -1566,12 +1570,16 @@ const INITIALTEMPERAMENTS = [
  * @type {Array<Array<string>>}
  */
 let TEMPERAMENTS = [
-    [_("equal"), "equal", "equal"],
-    [_("just intonation"), "just intonation", "just intonation"],
-    [_("Pythagorean"), "Pythagorean", "Pythagorean"],
-    [_("meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
-    [_("meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"],
-    [_("custom"), "custom", "custom"]
+    [_("Equal (12EDO)"), "equal", "equal"],
+    [_("Equal (5EDO)"), "equal5", "equal5"],
+    [_("Equal (7EDO)"), "equal7", "equal7"],
+    [_("Equal (19EDO)"), "equal19", "equal19"],
+    [_("Equal (31EDO)"), "equal31", "equal31"],
+    [_("5-limit Just Intonation"), "just intonation", "just intonation"],
+    [_("Pythagorean (3-limit JI)"), "Pythagorean", "Pythagorean"],
+    [_("Meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
+    [_("Meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"],
+    [_("Custom"), "custom", "custom"]
 ];
 
 /**
@@ -1580,6 +1588,10 @@ let TEMPERAMENTS = [
  */
 const PreDefinedTemperaments = {
     "equal": true,
+    "equal5": true,
+    "equal7": true,
+    "equal19": true,
+    "equal31": true,
     "just intonation": true,
     "Pythagorean": true,
     "1/3 comma meantone": true,
@@ -1629,6 +1641,175 @@ const TEMPERAMENT = {
             "minor 7",
             "major 7",
             "perfect 8"
+        ]
+    },
+    "equal5":{
+        // Equal 5EDO temperament: 5 Equal Divisions of the Octave
+        "perfect 1": Math.pow(2, 0 / 5),//Unison
+        "minor 2": Math.pow(2, 1 / 5),
+        "augmented 1": Math.pow(2, 1 / 5),
+        "major 2": Math.pow(2, 2 / 5),
+        "augmented 2": Math.pow(2, 2 / 5),
+        "minor 3": Math.pow(2, 2/ 5),
+        "major 3": Math.pow(2, 3 / 5),
+        "augmented 3": Math.pow(2, 3 / 5),
+        "diminished 4": Math.pow(2, 3 / 5),
+        "perfect 4": Math.pow(2, 3 / 5),
+        "augmented 4": Math.pow(2, 4 / 5),
+        "diminished 5": Math.pow(2, 4 / 5),
+        "perfect 5": Math.pow(2, 5 / 5),
+        "augmented 5": Math.pow(2, 5 / 5),
+        "minor 6": Math.pow(2, 5 / 5),
+        "major 6": Math.pow(2, 5 / 5),
+        "augmented 6": Math.pow(2, 5 / 5),
+        "minor 7": Math.pow(2, 5 / 5),
+        "major 7": Math.pow(2, 5 / 5),
+        "augmented 7": Math.pow(2, 5 / 5),
+        "diminished 8": Math.pow(2, 5 / 5),
+        "perfect 8": Math.pow(2, 5 / 5),
+        "pitchNumber": 5,
+        "interval": [
+            "perfect 1",
+            "minor 2",
+            "major 2",
+            "major 3",
+            "augmented 4",
+            "perfect 5"
+
+        ]
+    },
+     "equal7":{
+        // Equal 7EDO Temperament: 7 Equal Divisions of the Octave
+        "perfect 1": Math.pow(2, 0 / 7),//Unison
+        "minor 2": Math.pow(2, 1 / 7),
+        "augmented 1": Math.pow(2, 1 / 7),
+        "major 2": Math.pow(2, 2 / 7),
+        "augmented 2": Math.pow(2, 2 / 7),
+        "minor 3": Math.pow(2, 3 / 7),
+        "major 3": Math.pow(2, 3 / 7),
+        "augmented 3": Math.pow(2, 4 / 7),
+        "diminished 4": Math.pow(2, 4 / 7),
+        "perfect 4": Math.pow(2, 4 / 7),
+        "augmented 4": Math.pow(2, 5 / 7),
+        "diminished 5": Math.pow(2, 4 / 7),
+        "perfect 5": Math.pow(2, 5 / 7),
+        "augmented 5": Math.pow(2, 6 / 7),
+        "minor 6": Math.pow(2, 5 / 7),
+        "major 6": Math.pow(2, 6 / 7),
+        "augmented 6": Math.pow(2, 7 / 7),
+        "minor 7": Math.pow(2, 6 / 7),
+        "major 7": Math.pow(2, 6 / 7),
+        "augmented 7": Math.pow(2, 7 / 7),// wraps around
+        "diminished 8": Math.pow(2, 7 / 7),
+        "perfect 8": Math.pow(2, 7 / 7),
+        "pitchNumber": 7,
+        "interval": [
+            "perfect 1",
+            "minor 2",
+            "major 2",
+            "major 3",
+            "perfect 4",
+            "perfect 5",
+            "major 6",
+            "perfect 8"
+        ]
+    },
+    "equal19":{
+        // Equal 19EDO Temperament: 19 Equal Divisions of the Octave
+        "perfect 1": Math.pow(2, 0 / 19), 
+        "minor 2":  Math.pow(2, 2 / 19), 
+        "augmented 1":  Math.pow(2, 1 / 19), 
+        "major 2":  Math.pow(2, 3 / 19), 
+        "augmented 2":  Math.pow(2, 4 / 19), 
+        "minor 3":  Math.pow(2, 5 / 19), 
+        "major 3":  Math.pow(2, 6 / 19), 
+        "augmented 3":  Math.pow(2, 7 / 19), 
+        "diminished 4":  Math.pow(2, 7 / 19), 
+        "perfect 4":  Math.pow(2, 8 / 19), 
+        "augmented 4":  Math.pow(2, 9 / 19), 
+        "diminished 5":  Math.pow(2, 9 / 19), 
+        "perfect 5":  Math.pow(2, 10 / 19), 
+        "augmented 5": Math.pow(2, 11 / 19), 
+        "minor 6":  Math.pow(2, 12 / 19), 
+        "major 6":  Math.pow(2, 13 / 19), 
+        "augmented 6":  Math.pow(2, 14 / 19), 
+        "minor 7":  Math.pow(2, 15 / 19), 
+        "major 7":  Math.pow(2, 16 / 19), 
+        "augmented 7":  Math.pow(2, 17 / 19), 
+        "diminished 8":  Math.pow(2, 18 / 19), 
+        "perfect 8":  Math.pow(2, 19 / 19), 
+        "pitchNumber": 19,
+        "interval": [
+            "perfect 1",
+            "augmented 1", 
+            "minor 2",  
+            "major 2", 
+            "augmented 2", 
+            "minor 3", 
+            "major 3", 
+            "augmented 3", 
+            "perfect 4", 
+            "augmented 4",  
+            "perfect 5", 
+            "augmented 5",
+            "minor 6", 
+            "major 6", 
+            "augmented 6", 
+            "minor 7", 
+            "major 7", 
+            "augmented 7", 
+            "diminished 8", 
+            "perfect 8",
+        ] 
+    },
+    "equal31":{
+        // Equal 31EDO Temperament: 31 Equal Divisions of the Octave
+        "perfect 1": Math.pow(2, 0 / 31),
+        "minor 2": Math.pow(2, 3 / 31),
+        "augmented 1": Math.pow(2, 2 / 31),
+        "major 2": Math.pow(2, 5 / 31),
+        "augmented 2": Math.pow(2, 6 / 31),
+        "minor 3": Math.pow(2, 8 / 31),
+        "major 3": Math.pow(2, 10 / 31),
+        "augmented 3": Math.pow(2, 11 / 31),
+        "diminished 4": Math.pow(2, 12 / 31),
+        "perfect 4": Math.pow(2, 13 / 31),
+        "augmented 4": Math.pow(2, 15 / 31),
+        "diminished 5": Math.pow(2, 16 / 31),
+        "perfect 5": Math.pow(2, 18 / 31),
+        "augmented 5":Math.pow(2, 19 / 31),
+        "minor 6": Math.pow(2, 21 / 31),
+        "major 6": Math.pow(2, 23 / 31),
+        "augmented 6": Math.pow(2, 24 / 31),
+        "minor 7": Math.pow(2, 26 / 31),
+        "major 7": Math.pow(2, 28 / 31),
+        "augmented 7": Math.pow(2, 29 / 31),
+        "diminished 8": Math.pow(2, 30 / 31),
+        "perfect 8": Math.pow(2, 31 / 31),
+        "pitchNumber": 21,
+        "interval": [
+            "perfect 1", 
+            "augmented 1",
+            "minor 2",  
+            "major 2", 
+            "augmented 2", 
+            "minor 3", 
+            "major 3", 
+            "augmented 3", 
+            "diminished 4", 
+            "perfect 4", 
+            "augmented 4", 
+            "diminished 5", 
+            "perfect 5", 
+            "augmented 5",
+            "minor 6", 
+            "major 6", 
+            "augmented 6", 
+            "minor 7", 
+            "major 7", 
+            "augmented 7",
+            "diminished 8", 
+            "perfect 8" 
         ]
     },
     "just intonation": {
@@ -3643,7 +3824,7 @@ function getNote(
     let note;
     let articulation;
 
-    if (temperament === "equal") {
+    if (temperament in PreDefinedTemperaments) {
         // Check for double flat or double sharp. Since bb and x behave
         // funny with string operations, we jump through some hoops.
         articulation = getArticulation(noteArg);

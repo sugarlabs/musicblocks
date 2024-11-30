@@ -427,7 +427,7 @@ class RhythmRuler {
             // Look for any old entries that we may have missed.
             for (let i = 0; i < this._dissectHistory.length; i++) {
                 const drum = this._dissectHistory[i][1];
-                if (drums.indexOf(drum) === -1) {
+                if (!drums.includes(drum)) {
                     const history = JSON.parse(JSON.stringify(this._dissectHistory[i][0]));
                     dissectHistory.push([history, drum]);
                 }
@@ -2273,7 +2273,7 @@ class RhythmRuler {
 
         for (let d = 0; d < DRUMNAMES.length; d++) {
             if (DRUMNAMES[d][1] === drum) {
-                if (EFFECTSNAMES.indexOf(drum) === -1) {
+                if (!EFFECTSNAMES.includes(drum)) {
                     this._saveDrumMachine(selectedRuler, drum, false);
                 } else {
                     this._saveDrumMachine(selectedRuler, drum, true);
@@ -2712,7 +2712,7 @@ class RhythmRuler {
             noteValues = selectedRuler[0];
             for (let i = 0; i < noteValues.length; i++) {
                 t += 1 / noteValues[i];
-                if (rList.indexOf(t) === -1) {
+                if (!rList.includes(t)) {
                     rList.push(t);
                 }
             }
@@ -2773,7 +2773,7 @@ class RhythmRuler {
         // Look for any old entries that we may have missed.
         for (let i = 0; i < this._dissectHistory.length; i++) {
             drum = this._dissectHistory[i][1];
-            if (drums.indexOf(drum) === -1) {
+            if (!drums.includes(drum)) {
                 history = JSON.parse(JSON.stringify(this._dissectHistory[i][0]));
                 dissectHistory.push([history, drum]);
             }
