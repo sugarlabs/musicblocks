@@ -561,12 +561,13 @@ class Toolbar {
             else {
                 saveButton.style.display = 'block';
                 saveButtonAdvanced.style.display = 'none';
-                saveButton.onclick = () => {  // Changed to arrow function to preserve this
+                saveButton.onclick = () => {
                     const saveHTML = docById('save-html-beg');
                     console.debug(saveHTML);
                     saveHTML.onclick = () => {
                         html_onclick(this.activity);
                     };
+
                     const savePNG = docById('save-png-beg');
                     console.debug(savePNG);
                     const svgData = doSVG_onclick(
@@ -577,6 +578,7 @@ class Toolbar {
                         this.activity.canvas.height, 
                         1.0
                     );
+                    
                     if (svgData == '') {
                         savePNG.disabled = true;
                         savePNG.className = 'grey-text inactiveLink';
@@ -595,7 +597,8 @@ class Toolbar {
             saveButtonAdvanced.style.display = 'block';
             saveButtonAdvanced.onclick = () => {
                 const saveHTML = docById('save-html');
-                console.debug(saveHTML);
+                //console.debug(saveHTML);
+
                 saveHTML.onclick = () => {
                     html_onclick(this.activity);
                 };
@@ -610,6 +613,7 @@ class Toolbar {
                     this.activity.canvas.height, 
                     1.0
                 );
+
                 // if there is no mouse artwork to save then grey out
                 if (svgData == '') {
                     saveSVG.disabled = true;
@@ -633,15 +637,10 @@ class Toolbar {
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
                     const saveWAV = docById('save-wav');
-                    // Until we fix #1744, disable recorder on FF
-                    // if (platform.FF) {
-                        saveWAV.disabled = true;
-                        saveWAV.className = 'grey-text inactiveLink';
-                    // } else {
-                    //    saveWAV.onclick = function () {
-                    //        wave_onclick();
-                    //    };
-                    // }
+                     saveWAV.onclick = () => {
+                        wave_onclick(this.activity);
+                    };
+
                     const saveLY = docById('save-ly');
                     saveLY.onclick = () => {
                         ly_onclick(this.activity);
@@ -680,8 +679,9 @@ class Toolbar {
             return;
         }
     
-        Record.style.display = "block"; // Ensure visibility
+        Record.style.display = "block";
         Record.innerHTML = `<i class="material-icons main">${RECORDBUTTON}</i>`;
+        Record.onclick = () => rec_onclick(this.activity);
     }
 
     /**
@@ -771,208 +771,85 @@ class Toolbar {
      * @public
      * @param {Function} onclick - The onclick handler for the mode select icon.
      * @param {Function} rec_onclick - The onclick handler for the record button
-     * @param {Function} analytics_onclick - The onclick handler for analytics
-     * @param {Function} openPlugin_onclick - The onclick handler for plugins
-     * @param {Function} delPlugin_onclick - The onclick handler for deleting plugins
-     * @param {Function} setScroller - The scroller handler
      * @returns {void}
      */
-    renderModeSelectIcon(onclick, rec_onclick, analytics_onclick, openPlugin_onclick, delPlugin_onclick, setScroller) {
+    renderModeSelectIcon(onclick, rec_onclick) {
         const begIcon = docById("beginnerMode");
         const advIcon = docById("advancedMode");
-        const displayStatsIcon = docById("displayStatsIcon");
-        const loadPluginIcon = docById("loadPluginIcon");
-        const delPluginIcon = docById("delPluginIcon");
-        const enableHorizScrollIcon = docById("enableHorizScrollIcon");
-        const toggleJavaScriptIcon = docById("toggleJavaScriptIcon");
-        // Add save menu elements
-        const saveButton = docById('saveButton');
-        const saveButtonAdvanced = docById('saveButtonAdvanced');
 
-        const advancedIcons = [
-            displayStatsIcon,
-            loadPluginIcon,
-            delPluginIcon,
-            enableHorizScrollIcon,
-            toggleJavaScriptIcon
-        ];
+        // Update UI based on current mode
+        const updateUIForMode = () => {
+            begIcon.style.display = this.activity.beginnerMode ? "none" : "block";
+            advIcon.style.display = this.activity.beginnerMode ? "block" : "none";
 
-        // Function to update all advanced icons handlers and visibility
-        const updateAdvancedIcons = () => {
+            // Update record button
             const recordButton = docById("record");
-            if (recordButton) {
+            if (recordButton) {    
                 if (!this.activity.beginnerMode) {
                     recordButton.style.display = "block";
                     this.updateRecordButton(rec_onclick);
-                    recordButton.onclick = () => rec_onclick(this.activity);
                 } else {
                     recordButton.style.display = "none";
                 }
             }
 
-            // Set up click handlers for advanced icons when in advanced mode
-            if (!this.activity.beginnerMode) {
-                if (displayStatsIcon) {
-                    displayStatsIcon.style.display = "block";
-                    displayStatsIcon.onclick = () => analytics_onclick(this.activity);
+            // Update advanced icons
+            const advancedIcons = [
+                "displayStatsIcon",
+                "loadPluginIcon", 
+                "delPluginIcon",
+                "enableHorizScrollIcon",
+                "toggleJavaScriptIcon"
+            ];
+
+            advancedIcons.forEach(iconId => {
+                const icon = docById(iconId);
+                if (icon) {
+                    icon.style.display = this.activity.beginnerMode ? "none" : "block";
                 }
-                if (loadPluginIcon) {
-                    loadPluginIcon.style.display = "block";
-                    loadPluginIcon.onclick = () => openPlugin_onclick(this.activity);
-                }
-                if (delPluginIcon) {
-                    delPluginIcon.style.display = "block";
-                    delPluginIcon.onclick = () => delPlugin_onclick(this.activity);
-                }
-                if (enableHorizScrollIcon) {
-                    enableHorizScrollIcon.style.display = "block";
-                    enableHorizScrollIcon.onclick = () => setScroller(this.activity);
-                }
-                if (toggleJavaScriptIcon) {
-                    toggleJavaScriptIcon.style.display = "block";
-                }
-            } else {
-                // Hide advanced icons in beginner mode
-                advancedIcons.forEach(icon => {
-                    if (icon) icon.style.display = "none";
-                });
-            }
+            });
+
+            // Update save buttons
+            const saveButton = docById('saveButton');
+            const saveButtonAdvanced = docById('saveButtonAdvanced');
+            if (saveButton) saveButton.style.display = this.activity.beginnerMode ? "block" : "none";
+            if (saveButtonAdvanced) saveButtonAdvanced.style.display = this.activity.beginnerMode ? "none" : "block";
         };
 
-        const switchMode = () => {
-            if (!this.activity) {
-                console.error("Activity not initialized");
-                return;
-            }
-
+        // Handle mode switching
+        const handleModeSwitch = (event) => {
+            this.activity.beginnerMode = !this.activity.beginnerMode;
+            
             try {
-                // Toggle beginnerMode state
-                this.activity.beginnerMode = !this.activity.beginnerMode;
+                localStorage.setItem("beginnerMode", this.activity.beginnerMode.toString());
+            } catch (e) {
+                console.error(e);
+            }
 
-                // Save the current mode to localStorage
-                try {
-                    localStorage.setItem("beginnerMode", this.activity.beginnerMode.toString());
-                } catch (error) {
-                    console.error("Error saving to localStorage:", error);
-                }
+            updateUIForMode();
 
-                // Update beginner/advanced mode toggle icons
-                if (begIcon) begIcon.style.display = this.activity.beginnerMode ? "none" : "block";
-                if (advIcon) advIcon.style.display = this.activity.beginnerMode ? "block" : "none";
+            if (onclick) {
+                onclick(this.activity);
+            }
 
-                // Update all advanced icons and their handlers
-                updateAdvancedIcons();
+            // Update palettes
+            if (this.activity.palettes?.updatePalettes) {
+                this.activity.palettes.updatePalettes();
+            }
 
-                // Update save menu visibility
-                if (saveButton) {
-                    saveButton.style.display = this.activity.beginnerMode ? "block" : "none";
-                }
-                if (saveButtonAdvanced) {
-                    saveButtonAdvanced.style.display = this.activity.beginnerMode ? "none" : "block";
-                }
-
-                // Re-render save icons to attach new handlers
-                if (this.activity.toolbar) {
-                    // Generate SVG data
-                    const svgData = doSVG(
-                        this.activity.canvas, 
-                        this.activity.logo, 
-                        this.activity.turtles, 
-                        this.activity.canvas.width, 
-                        this.activity.canvas.height, 
-                        1.0
-                    );
-                
-                    this.activity.toolbar.renderSaveIcons(
-                        this.activity.save.saveHTML.bind(this.activity.save),
-                        doSVG,
-                        this.activity.save.saveSVG.bind(this.activity.save),
-                        this.activity.save.savePNG.bind(this.activity.save),
-                        this.activity.save.saveWAV.bind(this.activity.save),
-                        this.activity.save.saveLilypond.bind(this.activity.save),
-                        this.activity.save.saveAbc.bind(this.activity.save),
-                        this.activity.save.saveMxml.bind(this.activity.save),
-                        this.activity.save.saveBlockArtwork.bind(this.activity.save)
-                    );
-                
-                    // After rendering, check SVG data and update button states
-                    const saveSVG = docById('save-svg');
-                    const savePNG = docById('save-png');
-                
-                    if (svgData === '') {
-                        if (saveSVG) {
-                            saveSVG.disabled = true;
-                            saveSVG.className = "grey-text inactiveLink";
-                        }
-                        if (savePNG) {
-                            savePNG.disabled = true;
-                            savePNG.className = "grey-text inactiveLink";
-                        }
-                    } else {
-                        if (saveSVG) {
-                            saveSVG.disabled = false;
-                            saveSVG.className = "";
-                        }
-                        if (savePNG) {
-                            savePNG.disabled = false;
-                            savePNG.className = "";
-                        }
-                    }
-                }
-        
-                // Hide all palettes
-                if (this.activity.palettes?.dict) {
-                    for (const name in this.activity.palettes.dict) {
-                        const palette = this.activity.palettes.dict[name];
-                        if (palette?.hideMenu) {
-                            palette.hideMenu(true);
-                        }
-                    }
-                }
-        
-                // Update palettes for the new mode
-                if (this.activity.palettes?.updatePalettes) {
-                    this.activity.palettes.updatePalettes();
-                }
-        
-                // Regenerate palettes for the new mode
-                if (this.activity.regeneratePalettes) {
-                    this.activity.regeneratePalettes();
-                }
-        
-                // Trigger the provided onclick handler
-                if (onclick) {
-                    onclick(this.activity);
-                }
-
-                // Refresh the canvas
-                if (this.activity.refreshCanvas) {
-                    this.activity.refreshCanvas();
-                }
-            } catch (error) {
-                console.error("Error switching modes:", error);
-                if (this.activity?.errorMsg) {
-                    this.activity.errorMsg("Error switching modes. Please refresh the page.");
-                }
+            // Refresh canvas
+            if (this.activity.refreshCanvas) {
+                this.activity.refreshCanvas();
             }
         };
 
-        // Attach click handlers
-        if (begIcon) begIcon.onclick = switchMode;
-        if (advIcon) advIcon.onclick = switchMode;
+        begIcon.onclick = null;
+        advIcon.onclick = null;
 
-        // Initial setup of icons and handlers
-        begIcon.style.display = this.activity.beginnerMode ? "none" : "block";
-        advIcon.style.display = this.activity.beginnerMode ? "block" : "none";
-        updateAdvancedIcons();
+        begIcon.onclick = handleModeSwitch;
+        advIcon.onclick = handleModeSwitch;
 
-        // Initial render of save menu
-        if (saveButton) {
-            saveButton.style.display = this.activity.beginnerMode ? "block" : "none";
-        }
-        if (saveButtonAdvanced) {
-            saveButtonAdvanced.style.display = this.activity.beginnerMode ? "none" : "block";
-        }
+        updateUIForMode();
     }
 
     /**

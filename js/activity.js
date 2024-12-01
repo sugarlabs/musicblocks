@@ -1389,26 +1389,25 @@ class Activity {
          * Switches between beginner/advanced mode
          */
         const doSwitchMode = (activity) => {
-            // Toggle beginner mode
-            activity.beginnerMode = !activity.beginnerMode;
-        
-            this.saveLocally();
-        
-            // Update toolbar display
+            // Update toolbar
             activity.toolbar.renderSaveIcons(
-                this.save.saveHTML.bind(save),
+                activity.save.saveHTML.bind(activity.save),
                 doSVG,
-                this.save.saveSVG.bind(save),
-                this.save.savePNG.bind(save),
-                this.save.saveWAV.bind(save),
-                this.save.saveLilypond.bind(save),
-                this.save.saveAbc.bind(save),
-                this.save.saveMxml.bind(save),
-                this.save.saveBlockArtwork.bind(save)
+                activity.save.saveSVG.bind(activity.save),
+                activity.save.savePNG.bind(activity.save),
+                activity.save.saveWAV.bind(activity.save),
+                activity.save.saveLilypond.bind(activity.save),
+                activity.save.saveAbc.bind(activity.save),
+                activity.save.saveMxml.bind(activity.save),
+                activity.save.saveBlockArtwork.bind(activity.save)
             );
-            activity.toolbar.renderModeSelectIcon(() => {});
-            
-            // Force canvas refresh
+        
+            // Regenerate palettes
+            if (activity.regeneratePalettes) {
+                activity.regeneratePalettes();
+            }
+        
+            // Force immediate canvas refresh
             activity.refreshCanvas();
         };
 
@@ -6375,7 +6374,7 @@ class Activity {
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
             this.toolbar.renderMenuIcon(showHideAuxMenu);
             this.toolbar.renderHelpIcon(showHelp);
-            this.toolbar.renderModeSelectIcon(doSwitchMode);
+            this.toolbar.renderModeSelectIcon(doSwitchMode, doRecordButton);
             this.toolbar.renderRunSlowlyIcon(doSlowButton);
             this.toolbar.renderRunStepIcon(doStepButton);
             // this.toolbar.renderAdvancedIcons(
