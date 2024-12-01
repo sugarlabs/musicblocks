@@ -766,14 +766,17 @@ class Toolbar {
     }
 
     /**
-     * Renders the mode select icon with the provided onclick handler.
+     * Renders the mode changes with the provided onclick handler.
      * 
      * @public
-     * @param {Function} onclick - The onclick handler for the mode select icon.
-     * @param {Function} rec_onclick - The onclick handler for the record button
+     * @param  {Function} rec_onclick - The onclick handler for the record icon.
+     * @param  {Function} analytics_onclick - The onclick handler for the analytics icon.
+     * @param  {Function} openPlugin_onclick - The onclick handler for the open plugin icon.
+     * @param  {Function} delPlugin_onclick - The onclick handler for the delete plugin icon.
+     * @param  {Function} setScroller - The function to set the scroller.
      * @returns {void}
      */
-    renderModeSelectIcon(onclick, rec_onclick) {
+    renderModeSelectIcon(onclick, rec_onclick, analytics_onclick, openPlugin_onclick, delPlugin_onclick, setScroller) {
         const begIcon = docById("beginnerMode");
         const advIcon = docById("advancedMode");
 
@@ -784,30 +787,72 @@ class Toolbar {
 
             // Update record button
             const recordButton = docById("record");
-            if (recordButton) {    
+            if (recordButton) {
                 if (!this.activity.beginnerMode) {
                     recordButton.style.display = "block";
-                    this.updateRecordButton(rec_onclick);
+                    this.updateRecordButton();
+                    recordButton.onclick = () => rec_onclick(this.activity);
                 } else {
                     recordButton.style.display = "none";
                 }
             }
 
-            // Update advanced icons
-            const advancedIcons = [
-                "displayStatsIcon",
-                "loadPluginIcon", 
-                "delPluginIcon",
-                "enableHorizScrollIcon",
-                "toggleJavaScriptIcon"
-            ];
-
-            advancedIcons.forEach(iconId => {
-                const icon = docById(iconId);
-                if (icon) {
-                    icon.style.display = this.activity.beginnerMode ? "none" : "block";
+            if (!this.activity.beginnerMode) {
+                // Display Stats
+                const displayStatsIcon = docById("displayStatsIcon");
+                if (displayStatsIcon) {
+                    displayStatsIcon.style.display = "block";
+                    displayStatsIcon.onclick = () => analytics_onclick(this.activity);
                 }
-            });
+
+                // Load Plugin
+                const loadPluginIcon = docById("loadPluginIcon");
+                if (loadPluginIcon) {
+                    loadPluginIcon.style.display = "block";
+                    loadPluginIcon.onclick = () => openPlugin_onclick(this.activity);
+                }
+
+                // Delete Plugin
+                const delPluginIcon = docById("delPluginIcon");
+                if (delPluginIcon) {
+                    delPluginIcon.style.display = "block";
+                    delPluginIcon.onclick = () => delPlugin_onclick(this.activity);
+                }
+
+                // Horizontal Scroll
+                const enableHorizScrollIcon = docById("enableHorizScrollIcon");
+                const disableHorizScrollIcon = docById("disableHorizScrollIcon");
+                if (enableHorizScrollIcon) {
+                    enableHorizScrollIcon.style.display = "block";
+                    enableHorizScrollIcon.onclick = () => setScroller(this.activity);
+                }
+                if (disableHorizScrollIcon) {
+                    disableHorizScrollIcon.onclick = () => setScroller(this.activity);
+                }
+
+                // JavaScript Toggle
+                const toggleJavaScriptIcon = docById("toggleJavaScriptIcon");
+                if (toggleJavaScriptIcon) {
+                    toggleJavaScriptIcon.style.display = "block";
+                }
+            } else {
+                // Hide all advanced icons in beginner mode
+                const advancedIcons = [
+                    "displayStatsIcon",
+                    "loadPluginIcon", 
+                    "delPluginIcon",
+                    "enableHorizScrollIcon",
+                    "disableHorizScrollIcon",
+                    "toggleJavaScriptIcon"
+                ];
+
+                advancedIcons.forEach(iconId => {
+                    const icon = docById(iconId);
+                    if (icon) {
+                        icon.style.display = "none";
+                    }
+                });
+            }
 
             // Update save buttons
             const saveButton = docById('saveButton');
@@ -832,12 +877,10 @@ class Toolbar {
                 onclick(this.activity);
             }
 
-            // Update palettes
             if (this.activity.palettes?.updatePalettes) {
                 this.activity.palettes.updatePalettes();
             }
 
-            // Refresh canvas
             if (this.activity.refreshCanvas) {
                 this.activity.refreshCanvas();
             }
