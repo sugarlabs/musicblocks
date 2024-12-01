@@ -835,6 +835,15 @@ class Toolbar {
                 if (toggleJavaScriptIcon) {
                     toggleJavaScriptIcon.style.display = "block";
                 }
+
+                // Update helpful wheel items visibility for advanced mode
+                if (this.activity.helpfulWheelItems) {
+                    this.activity.helpfulWheelItems.forEach(item => {
+                        if (item.label === "Enable horizontal scrolling") {
+                            item.display = true;
+                        }
+                    });
+                }
             } else {
                 // Hide all advanced icons in beginner mode
                 const advancedIcons = [
@@ -852,6 +861,15 @@ class Toolbar {
                         icon.style.display = "none";
                     }
                 });
+
+                // Update helpful wheel items visibility for beginner mode
+                if (this.activity.helpfulWheelItems) {
+                    this.activity.helpfulWheelItems.forEach(item => {
+                        if (item.label === "Enable horizontal scrolling") {
+                            item.display = false;
+                        }
+                    });
+                }
             }
 
             // Update save buttons
@@ -872,6 +890,21 @@ class Toolbar {
             }
 
             updateUIForMode();
+
+            // Reinitialize tooltips after mode switch
+            if (!this.tooltipsDisabled) {
+                $j(".tooltipped").tooltip({
+                    html: true,
+                    delay: 100
+                });
+            }
+
+            // Reinitialize dropdowns
+            $j(".materialize-iso, .dropdown-trigger").dropdown({
+                constrainWidth: false,
+                hover: false,
+                belowOrigin: true
+            });
 
             if (onclick) {
                 onclick(this.activity);
