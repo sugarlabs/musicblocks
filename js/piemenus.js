@@ -3652,20 +3652,34 @@ const piemenuGrid = (activity) => {
     activity.turtles._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
     activity.turtles._exitWheel.slicePathCustom.maxRadiusPercent = 0.3;
     activity.turtles._exitWheel.sliceSelectedPathCustom =
-        activity.turtles._exitWheel.slicePathCustom;
+    activity.turtles._exitWheel.slicePathCustom;
     activity.turtles._exitWheel.sliceInitPathCustom = activity.turtles._exitWheel.slicePathCustom;
     activity.turtles._exitWheel.clickModeRotate = false;
     activity.turtles._exitWheel.createWheel(["×", " "]);
 
     activity.turtles._exitWheel.navItems[0].navigateFunction = () => {
-        docById("wheelDivptm").style.display = "none";
-        activity.turtles.gridWheel.removeWheel();
-        activity.turtles._exitWheel.removeWheel();
+        hidePiemenu(activity);
     };
 
     if (docById("helpfulWheelDiv").style.display !== "none") {
         docById("helpfulWheelDiv").style.display = "none";
     }
+
+    const hidePiemenu = (activity) => {
+        docById("wheelDivptm").style.display = "none";
+        activity.turtles.gridWheel.removeWheel();
+        activity.turtles._exitWheel.removeWheel();
+    };
+
+    const clickOutsideHandler = (event) => {
+        const piemenu = docById("wheelDivptm");
+        if (!piemenu.contains(event.target)) {
+            hidePiemenu(activity);
+            document.removeEventListener("mousedown", clickOutsideHandler);
+        }
+    };
+
+    document.addEventListener("mousedown", clickOutsideHandler);
 };
 
 const piemenuKey = (activity) => {

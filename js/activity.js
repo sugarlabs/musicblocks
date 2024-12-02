@@ -1393,38 +1393,26 @@ class Activity {
          * Switches between beginner/advanced mode
          */
         const doSwitchMode = (activity) => {
-            activity._doSwitchMode();
-        };
-
-        /**
-         * Switches between beginner and advanced modes.
-         * Displays a message prompting browser refresh to apply mode change.
-         * @private
-         */
-        this._doSwitchMode = () => {
-            this.blocks.activeBlock = null;
-            const mode = this.storage.beginnerMode;
-
-            const MSGPrefix =
-                "<a href='#' " +
-                "onClick='window.location.reload()'" +
-                "onMouseOver='this.style.opacity = 0.5'" +
-                "onMouseOut='this.style.opacity = 1'>";
-            const MSGSuffix = "</a>";
-
-            if (mode === null || mode === undefined || mode === "true") {
-                this.textMsg(
-                    _(MSGPrefix + _("Refresh your browser to change to advanced mode.") + MSGSuffix)
-                );
-                this.storage.setItem("beginnerMode", false);
-            } else {
-                this.textMsg(
-                    _(MSGPrefix + _("Refresh your browser to change to beginner mode.") + MSGSuffix)
-                );
-                this.storage.setItem("beginnerMode", true);
+            // Update toolbar
+            activity.toolbar.renderSaveIcons(
+                activity.save.saveHTML.bind(activity.save),
+                doSVG,
+                activity.save.saveSVG.bind(activity.save),
+                activity.save.savePNG.bind(activity.save),
+                activity.save.saveWAV.bind(activity.save),
+                activity.save.saveLilypond.bind(activity.save),
+                activity.save.saveAbc.bind(activity.save),
+                activity.save.saveMxml.bind(activity.save),
+                activity.save.saveBlockArtwork.bind(activity.save)
+            );
+        
+            // Regenerate palettes
+            if (activity.regeneratePalettes) {
+                activity.regeneratePalettes();
             }
-
-            this.refreshCanvas();
+        
+            // Force immediate canvas refresh
+            activity.refreshCanvas();
         };
 
         /*
@@ -6402,12 +6390,9 @@ class Activity {
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
             this.toolbar.renderMenuIcon(showHideAuxMenu);
             this.toolbar.renderHelpIcon(showHelp);
-            this.toolbar.renderModeSelectIcon(doSwitchMode);
+            this.toolbar.renderModeSelectIcon(doSwitchMode, doRecordButton, doAnalytics, doOpenPlugin, deletePlugin, setScroller);
             this.toolbar.renderRunSlowlyIcon(doSlowButton);
             this.toolbar.renderRunStepIcon(doStepButton);
-            this.toolbar.renderAdvancedIcons(
-                doRecordButton, doAnalytics, doOpenPlugin, deletePlugin, setScroller
-            );
             this.toolbar.renderMergeIcon(_doMergeLoad);
             this.toolbar.renderRestoreIcon(restoreTrash);
             if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -6962,6 +6947,105 @@ class Activity {
                 this.planet.planet.setAnalyzeProject(doAnalyzeProject);
             }
         };
+    }
+
+    /**
+     * Saves the current state locally
+     * @returns {void}
+     */
+    saveLocally() {
+        try {
+            localStorage.setItem('beginnerMode', this.beginnerMode.toString());
+        } catch (e) {
+            console.error('Error saving to localStorage:', e);
+        }
+    }
+
+    /**
+     * Regenerates all palettes based on current mode
+     * @returns {void}
+     */
+    regeneratePalettes() {
+        try {
+            // Store current palette positions
+            const palettePositions = {};
+            if (this.palettes && this.palettes.dict) {
+                for (const name in this.palettes.dict) {
+                    const palette = this.palettes.dict[name];
+                    if (palette && palette.container && typeof palette.container.x !== 'undefined') {
+                        palettePositions[name] = {
+                            x: palette.container.x,
+                            y: palette.container.y,
+                            visible: !!palette.visible
+                        };
+                    }
+                }
+            }
+    
+            // Safely hide and clear existing palettes
+            if (!this.palettes) {
+                console.warn('Palettes object not initialized');
+                return;
+            }
+    
+            if (typeof this.palettes.hide !== 'function') {
+                console.warn('Palettes hide method not available');
+            } else {
+                this.palettes.hide();
+            }
+    
+            if (typeof this.palettes.clear !== 'function') {
+                console.warn('Palettes clear method not available');
+                // Fallback clear implementation
+                this.palettes.dict = {};
+                this.palettes.visible = false;
+                this.palettes.activePalette = null;
+                this.palettes.paletteObject = null;
+            } else {
+                this.palettes.clear();
+            }
+    
+            // Reinitialize palettes
+            initPalettes(this.palettes);
+            
+            // Reinitialize blocks
+            if (this.blocks) {
+                initBasicProtoBlocks(this);
+            }
+    
+            // Restore palette positions
+            if (this.palettes && this.palettes.dict) {
+                for (const name in palettePositions) {
+                    const palette = this.palettes.dict[name];
+                    const pos = palettePositions[name];
+                    
+                    if (palette && palette.container && pos) {
+                        palette.container.x = pos.x;
+                        palette.container.y = pos.y;
+                        
+                        if (pos.visible) {
+                            palette.showMenu(true);
+                        }
+                    }
+                }
+            }
+    
+            // Update the palette display
+            if (this.palettes && typeof this.palettes.updatePalettes === 'function') {
+                this.palettes.updatePalettes();
+            }
+            
+            // Update blocks
+            if (this.blocks && typeof this.blocks.updateBlockPositions === 'function') {
+                this.blocks.updateBlockPositions();
+            }
+            
+            this.refreshCanvas();
+    
+        } catch (e) {
+            console.error('Error regenerating palettes:', e);
+            this.errorMsg(_('Error regenerating palettes. Please refresh the page.'));
+        }
     }
 }
 
