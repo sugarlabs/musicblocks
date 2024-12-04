@@ -3507,7 +3507,7 @@ const piemenuBlockContext = (block) => {
         docById("contextWheelDiv").style.display = "none";
         // prompting a notification on deleting any block 
         activity.textMsg(
-            _("You can restore deleted blocks from the trash with the Restore From Trash button.")
+            _("You can restore deleted blocks from the trash with the Restore From Trash button."), 3000
         );       
     };
 
