@@ -1,12 +1,12 @@
 # First stage: Build stage
-FROM python:3.9-slim AS build
+FROM python:latest AS build
 
 WORKDIR /app
 
 COPY . .
 
 # Second stage: Final stage
-FROM python:3.9-slim
+FROM python:latest
 
 WORKDIR /app
 
