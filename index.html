@@ -324,12 +324,24 @@
                         let printText = document.getElementById("printText");
                         printText.classList.remove("show");
                     }
-
+                
                     function hideErrorText() {
                         let errorText = document.getElementById("errorText");
                         errorText.classList.remove("show");
                         hideArrows(); // This function is declared in js/activity.js
                     }
+                
+                    document.addEventListener("click", function (event) {
+                        let printText = document.getElementById("printText");
+                        let errorText = document.getElementById("errorText");
+                
+                        if (printText && printText.classList.contains("show") && !printText.contains(event.target)) {
+                            hidePrintText();
+                        }
+                        if (errorText && errorText.classList.contains("show") && !errorText.contains(event.target)) {
+                            hideErrorText();
+                        }
+                    });
                 </script>
 
                 <div id ="canvasContainer">
