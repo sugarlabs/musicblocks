@@ -1,22 +1,16 @@
 # First stage: Build stage
-FROM python:latest AS build
+FROM python:3.9-slim AS build
 
 WORKDIR /app
-
-RUN useradd -m appuser
 
 COPY . .
 
 # Second stage: Final stage
-FROM python:latest
-
-RUN useradd -m appuser
+FROM python:3.9-slim
 
 WORKDIR /app
 
 COPY --from=build /app /app
-
-USER appuser
 
 EXPOSE 3000
 
