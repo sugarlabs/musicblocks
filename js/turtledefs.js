@@ -184,7 +184,6 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
     MULTIPALETTEICONS = ["artwork", "logic", "music"];
     MULTIPALETTENAMES = [_("artwork"), _("logic"), _("music")];
 } else {
-    // TITLESTRING = _("Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way.");
     TITLESTRING = _("Music Blocks");
     // We don't include "extras" since we want to be able to delete
     // plugins from the extras palette.
