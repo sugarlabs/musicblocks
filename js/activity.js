@@ -4907,7 +4907,7 @@ class Activity {
             }
         };
 
-        this.textMsg = (msg) => {
+        this.textMsg = (msg,duration = _MSGTIMEOUT_) => {
             if (this.msgTimeoutID !== null) {
                 clearTimeout(this.msgTimeoutID);
                 this.msgTimeoutID = null;
@@ -4925,7 +4925,7 @@ class Activity {
             this.msgTimeoutID = setTimeout(() => {
                 that.printText.classList.remove("show");
                 that.msgTimeoutID = null;
-            }, _MSGTIMEOUT_);
+            }, duration);
         };
 
         this.errorMsg = (msg, blk, text, timeout) => {
