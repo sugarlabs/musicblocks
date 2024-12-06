@@ -3114,6 +3114,10 @@ class Block {
             ) {
                 if (this.activity.trashcan.isVisible) {
                     this.blocks.sendStackToTrash(this);
+                    this.activity.textMsg(
+                        _("You can restore deleted blocks from the trash with the Restore From Trash button."), 3000
+                    );
+
                 }
             } else {
                 // Otherwise, process move.
