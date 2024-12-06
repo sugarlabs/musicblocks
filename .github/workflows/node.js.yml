@@ -30,3 +30,8 @@ jobs:
 
     - run: npm ci
     - run: npm run build --if-present
+
+    # Post-run cleanup to remove the build directory after the job finishes
+    - name: Post-run cleanup
+      if: always()
+      run: rm -rf ./build
