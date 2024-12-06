@@ -2000,5 +2000,59 @@ function Synth() {
         Tone.Destination.volume.rampTo(db, 0.01);
     };
 
+    /**
+     * Starts Recording
+     * @function
+     * @memberof Synth
+     */
+    this.startRecording = async () => {
+
+        await Tone.start();
+
+        this.mic = new Tone.UserMedia();
+        this.recorder = new Tone.Recorder();
+
+        await this.mic.open()
+        .then(() => {
+            console.log("Mic opened");
+
+            this.mic.connect(this.recorder);
+
+            this.recorder.start();
+
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+        
+    }
+
+    /**
+     * Stops Recording
+     * @function
+     * @memberof Synth
+     */
+    this.stopRecording = async () => {
+
+        const recording = await this.recorder.stop();
+        this.mic.close();
+        this.audioURL = URL.createObjectURL(recording);
+        return this.audioURL;
+        
+    }
+
+    /**
+     * Plays Recording
+     * @function
+     * @memberof Synth
+     */
+    this.playRecording = async () => {
+
+        const player = new Tone.Player().toDestination();
+        await player.load(this.audioURL)
+        player.start();
+        
+    }
+
     return this;
 }

@@ -233,7 +233,7 @@ function SampleWidget() {
      * Displays a message indicating that recording has started.
      * @returns {void}
      */
-    function displayRecordingStartMessage() {
+    this.displayRecordingStartMessage = function () {
         this.activity.textMsg(_("Recording started..."));
     }
 
@@ -241,7 +241,7 @@ function SampleWidget() {
      * Displays a message indicating that recording has stopped.
      * @returns {void}
      */
-    function displayRecordingStopMessage() {
+    this.displayRecordingStopMessage = function () {
         this.activity.textMsg(_("Recording complete..."));
     }
 
@@ -448,92 +448,40 @@ function SampleWidget() {
             _("Toggle Mic"),
             ""
         );
-        this._recordBtn.onclick = function() {
-            ToggleMic(this);
-        }.bind(this._recordBtn);
-      
+
         this._playbackBtn= widgetWindow.addButton(
             "playback.svg",
             ICONSIZE,
             _("Playback"),
             "");
-        this._playbackBtn.id="playbackBtn"
+
+        this._playbackBtn.id="playbackBtn";
         this._playbackBtn.classList.add("disabled");
+        
+        let is_recording = false;
 
-
-        const togglePlaybackButtonState = () => { 
-            if (!audioURL) {
-                this._playbackBtn.classList.add("disabled");
+        this._recordBtn.onclick = async () => {
+            if (!is_recording) {
+                await this.activity.logo.synth.startRecording();
+                is_recording = true;
+                this._recordBtn.getElementsByTagName('img')[0].src = "header-icons/record.svg";
+                this.displayRecordingStartMessage();
             } else {
+                this.recordingURL = await this.activity.logo.synth.stopRecording();
+                is_recording = false;
+                this._recordBtn.getElementsByTagName('img')[0].src = "header-icons/mic.svg";
+                this.displayRecordingStopMessage();
                 this._playbackBtn.classList.remove("disabled");
             }
         };
 
         this._playbackBtn.onclick = () => {
-            playAudio();
+            this.sampleData = this.recordingURL;
+            this.sampleName = `Recorded Audio ${this.recordingURL}`;
+            this._addSample();
+            this.activity.logo.synth.playRecording();
         };
 
-        let can_record = false;
-        let is_recording = false;
-        let recorder = null;
-        let chunks = [];
-        let audioURL = null; 
-        
-        async function setUpAudio() {
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    recorder = new MediaRecorder(stream);
-                    recorder.ondataavailable = e => {
-                        chunks.push(e.data);
-                    };
-                    recorder.onstop = async e => {
-                        let blob = new Blob(chunks, { type: 'audio/webm' });
-                        chunks = [];
-                        audioURL = URL.createObjectURL(blob);
-                        displayRecordingStopMessage.call(that);
-                        togglePlaybackButtonState();
-
-                        const module = await import("https://cdn.jsdelivr.net/npm/webm-to-wav-converter@1.1.0/+esm");
-                        const getWaveBlob = module.getWaveBlob;
-                        const wavBlob = await getWaveBlob(blob);
-                        const wavAudioURL = URL.createObjectURL(wavBlob);
-                        that.sampleData = wavAudioURL;
-                        that.sampleName = `Recorded Audio ${audioURL}`;
-                        that._addSample();
-                    };
-                    can_record = true;
-                } catch (err) {
-                    console.log("The following error occurred: " + err);
-                }
-            }
-        }
-        function ToggleMic(buttonElement) {
-            if (!can_record) return;
-            
-            is_recording = !is_recording;
-            if (is_recording) {
-                recorder.start();   
-                buttonElement.getElementsByTagName('img')[0].src = "header-icons/record.svg"; 
-                displayRecordingStartMessage.call(that);
-            } else {
-                recorder.stop();
-                buttonElement.getElementsByTagName('img')[0].src = "header-icons/mic.svg"; 
-            }
-        }
-        
-        function playAudio() {
-            if (audioURL) {
-                const audio = new Audio(audioURL);
-                audio.play();
-                console.log("Playing audio.");
-            } else {
-                console.error("No recorded audio available.");
-            }
-        }
-        
-        setUpAudio();
- 
         widgetWindow.sendToCenter();
         this.widgetWindow = widgetWindow;
 
