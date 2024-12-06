@@ -84,7 +84,7 @@ To maximize screen real estate, Music Blocks overlays the program
 elements (stacks of blocks) on top of the canvas. These blocks can be
 hidden at any time while running the program.
 
-<a>2. Toolbars</a>
+## <a>2. Toolbars</a>
 Back to Table of Contents
 
 There are five main toolbars in the application, each serving specific purposes:
