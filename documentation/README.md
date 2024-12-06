@@ -84,38 +84,55 @@ To maximize screen real estate, Music Blocks overlays the program
 elements (stacks of blocks) on top of the canvas. These blocks can be
 hidden at any time while running the program.
 
-## <a>2. Toolbars</a>
+<a>2. Toolbars</a>
+Back to Table of Contents
 
-[Back to Table of Contents](#table-of-contents)
+There are five main toolbars in the application, each serving specific purposes:
 
-There are five toolbars:
+1. Main Toolbar
+Located at the top of the screen, the Main Toolbar provides access to key project and control features:
+Play Button: Starts executing the current project.
+Stop Button: Halts the execution of the project.
+New Project Button: Creates a blank canvas for a new project.
+Load/Save Buttons: Load an existing project or save the current one.
+Planet Button: Access community-shared projects for collaboration or inspiration.
+Hamburger Button: Opens the Secondary Toolbar for advanced features.
+Help Button: Accesses documentation or in-app guidance for assistance.
 
-(1) The *Main* toolbar across the top of the screen. There you will
-find the *Play* button, the *Stop* button, the *New Project* button,
-buttons for loading and saving projects, the *Planet* button, where
-you can access community projects, the *hamburger* button, which opens
-the secondary toolbar, and the *help* button.
+2. Secondary Toolbar
+Accessible via the Hamburger Button on the Main Toolbar, this toolbar provides advanced control options:
+Run Slowly: Executes the project at a slower pace for detailed observation.
+Run Step by Step: Executes the project one step at a time for debugging.
+Display Statistics: Shows project performance and runtime details.
+Beginner/Advanced Mode Toggle: Switch between simplified and advanced interface options.
+Language Selector: Change the application's language.
 
-(2) On the *Secondary* toolbar you will find the buttons *Run slowly*,
-*Run step by step*, *Display Statistics*, *beginner/advanced mode*,
-etc. and also the button for selecting language.
+3. Palette Toolbar
+Positioned on the left side of the screen, the Palette Toolbar is the source of building blocks for the project:
+Each Palette contains blocks categorized by functionality (e.g., motion, logic, or visuals).
+Drag blocks from the palette to the canvas to build your project.
+Blocks often feature Pie Menus for parameter customization, which can be accessed by right-clicking.
 
-(3) The *Palette* toolbar is on the left side of the screen. New
-blocks are dragged from the palette.
+4. Upper Canvas Toolbar
+Located on the top-right of the canvas, this toolbar manages the workspace:
+Show Grids: Toggles a grid overlay to help align blocks.
+Clear Screen: Removes all content from the canvas.
+Toggle Display Size: Adjusts the canvas size for better visibility.
 
-(4) On the upper right of the canvas is a small toolbar for showing
-grids, clearing the screen, and toggling the display size.
+5. Lower Canvas Toolbar
+Situated on the bottom-right of the canvas, this toolbar offers additional block-related controls:
+Home Button: Resets the canvas to the default view.
+Show/Hide Blocks: Toggles the visibility of all blocks.
+Expand/Collapse Blocks: Expands or collapses grouped blocks.
+Increase/Decrease Block Size: Adjusts the size of the blocks for easier handling.
 
-(5) On the lower right of the canvas is a small toolbar where you will
-find the *Home* button, buttons for show/hide blocks, expand/collapse
-blocks and decrease/increase block size.
-
+Contextual Menus and Additional Features-
+For further details, refer to the Turtle Blocks Documentation Pages.
 These toolbars are described in detail in the
 [Turtle Blocks documentation pages](https://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
 
 An additional "contextual" menu appears whenever you *right click* on
 a block.
-
 Many blocks also incorporate "pie menus" for changing block parameters.
 
 ## <a>3. Context Menu</a>
