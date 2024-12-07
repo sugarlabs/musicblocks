@@ -82,7 +82,7 @@ let MULTIPALETTEICONS;
 let MULTIPALETTENAMES;
 
 if (_THIS_IS_TURTLE_BLOCKS_) {
-    TITLESTRING = _("Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks.");
+    TITLESTRING = _("Turtle Blocks");
 
     // We don't include "extras" since we want to be able to delete
     // plugins from the extras palette.
@@ -184,8 +184,7 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
     MULTIPALETTEICONS = ["artwork", "logic", "music"];
     MULTIPALETTENAMES = [_("artwork"), _("logic"), _("music")];
 } else {
-    TITLESTRING = _("Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way.");
-
+    TITLESTRING = _("Music Blocks");
     // We don't include "extras" since we want to be able to delete
     // plugins from the extras palette.
     BUILTINPALETTES = [
