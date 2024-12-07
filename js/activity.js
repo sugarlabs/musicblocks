@@ -3222,7 +3222,19 @@ class Activity {
          * Repositions blocks about trash area
          */
         const restoreTrash = (activity) => {
+            if (!activity.blocks || !activity.blocks.trashStacks || activity.blocks.trashStacks.length === 0) {
+                activity.textMsg(
+                    _("Nothing in the trash to restore."),
+                    3000 
+                );
+                return;
+            }
             activity._restoreTrash();
+            activity.textMsg(
+                _("Item restored from the trash."),
+                3000 
+            );
+        
             if (docById("helpfulWheelDiv").style.display !== "none") {
                 docById("helpfulWheelDiv").style.display = "none";
                 activity.__tick();
