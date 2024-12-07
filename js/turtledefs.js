@@ -82,7 +82,7 @@ let MULTIPALETTEICONS;
 let MULTIPALETTENAMES;
 
 if (_THIS_IS_TURTLE_BLOCKS_) {
-    TITLESTRING = _("Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks.");
+    TITLESTRING = _("Turtle Blocks");
 
     // We don't include "extras" since we want to be able to delete
     // plugins from the extras palette.
