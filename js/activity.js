@@ -3223,7 +3223,19 @@ class Activity {
          * Repositions blocks about trash area
          */
         const restoreTrash = (activity) => {
+            if (!activity.blocks || !activity.blocks.trashStacks || activity.blocks.trashStacks.length === 0) {
+                activity.textMsg(
+                    _("Nothing in the trash to restore."),
+                    3000 
+                );
+                return;
+            }
             activity._restoreTrash();
+            activity.textMsg(
+                _("Item restored from the trash."),
+                3000 
+            );
+        
             if (docById("helpfulWheelDiv").style.display !== "none") {
                 docById("helpfulWheelDiv").style.display = "none";
                 activity.__tick();
@@ -4908,7 +4920,7 @@ class Activity {
             }
         };
 
-        this.textMsg = (msg) => {
+        this.textMsg = (msg,duration = _MSGTIMEOUT_) => {
             if (this.msgTimeoutID !== null) {
                 clearTimeout(this.msgTimeoutID);
                 this.msgTimeoutID = null;
@@ -4926,7 +4938,7 @@ class Activity {
             this.msgTimeoutID = setTimeout(() => {
                 that.printText.classList.remove("show");
                 that.msgTimeoutID = null;
-            }, _MSGTIMEOUT_);
+            }, duration);
         };
 
         this.errorMsg = (msg, blk, text, timeout) => {
