@@ -43,35 +43,10 @@ const processABCNotes = function(logo, turtle) {
     logo.notationNotes[turtle] = "";
 
     const __convertDuration = function(duration) {
-        let returnString = "";
-        switch (duration) {
-            case 64:
-                returnString = "1/4";
-                break;
-            case 32:
-                returnString = "1/2";
-                break;
-            case 16:
-                returnString = "1";
-                break;
-            case 8:
-                returnString = "2";
-                break;
-            case 4:
-                returnString = "4";
-                break;
-            case 2:
-                returnString = "8";
-                break;
-            case 1:
-                returnString = "16";
-                break;
-            default:
-                returnString = duration;
-                break;
-        }
-
-        return returnString;
+        const durationMap = {
+            64: "1/4", 32: "1/2", 16: "1", 8: "2", 4: "4", 2: "8", 1: "16"
+        };
+        return durationMap[duration] || duration.toString();
     };
 
     /**
@@ -89,69 +64,39 @@ const processABCNotes = function(logo, turtle) {
         // Also, notes must be lowercase.
         // And the octave bounday is at C, not A.
 
-        // Convert frequencies here.
         if (typeof note === "number") {
             const pitchObj = frequencyToPitch(note);
             note = pitchObj[0] + pitchObj[1];
         }
 
-        if (note.indexOf("♯") > -1) {
-            note = "^" + note.replace("♯", "");
-        }
-        // check for double sharp
-        if (note.indexOf("♯") > -1) {
-            note = "^" + note.replace(/♯/g, "");
+        const replacements = {
+            "♯": "^",
+            "♭": "_",
+            "10": "'''''",
+            "9": "''''",
+            "8": "'''",
+            "7": "''",
+            "6": "'",
+            "5": "",
+            "4": "",
+            "3": ",",
+            "2": ",,",
+            "1": ",,,"
+        };
+
+        for (const [key, value] of Object.entries(replacements)) {
+            if (note.includes(key)) {
+                note = note.replace(new RegExp(key, "g"), value);
+                if (key.length === 1) break;
+            }
         }
 
-        if (note.indexOf("♭") > -1) {
-            note = "_" + note.replace("♭", "");
+        // Convert to uppercase or lowercase based on the octave
+        if (note.includes("'''") || note.includes("''") || note.includes("'") || note.includes("")) {
+            return note.toLowerCase();
+        } else {
+            return note.toUpperCase();
         }
-        // check for double flat
-        if (note.indexOf("♭") > -1) {
-            note = "_" + note.replace(/♭/g, "");
-        }
-
-        if (note.indexOf("10") > -1) {
-            return note.replace("10", "'''''").toLowerCase();
-        }
-
-        if (note.indexOf("9") > -1) {
-            return note.replace("9", "''''").toLowerCase();
-        }
-
-        if (note.indexOf("8") > -1) {
-            return note.replace("8", "'''").toLowerCase();
-        }
-
-        if (note.indexOf("7") > -1) {
-            return note.replace("7", "''").toLowerCase();
-        }
-
-        if (note.indexOf("6") > -1) {
-            return note.replace("6", "'").toLowerCase();
-        }
-
-        if (note.indexOf("5") > -1) {
-            return note.replace("5", "").toLowerCase();
-        }
-
-        if (note.indexOf("4") > -1) {
-            return note.replace("4", "").toUpperCase();
-        }
-
-        if (note.indexOf("3") > -1) {
-            return note.replace("3", ",").toUpperCase();
-        }
-
-        if (note.indexOf("2") > -1) {
-            return note.replace("2", ",,").toUpperCase();
-        }
-
-        if (note.indexOf("1") > -1) {
-            return note.replace("1", ",,,").toUpperCase();
-        }
-
-        return note.toUpperCase();
     };
 
     let counter = 0;
@@ -208,15 +153,28 @@ const processABCNotes = function(logo, turtle) {
                     i += 2;
                     break;
                 case "pickup":
-                    // FIXME: how does one define pickup in ABC notation?
-                    i += 1;
+                    {
+                        // Handle pickup measure
+                        const pickupDuration = logo.notation.notationStaging[turtle][i + 1];
+                        logo.notationNotes[turtle] += `K: pickup=${pickupDuration}\n`;
+                        i += 1;
+                    } // <- made a seperate block for this since js doesnt allow declaration of variables using let or const directly inside a case block
                     break;
                 case "voice one":
+                    logo.notationNotes[turtle] += "V:1\n";
+                    break;
                 case "voice two":
+                    logo.notationNotes[turtle] += "V:2\n";
+                    break;
                 case "voice three":
+                    logo.notationNotes[turtle] += "V:3\n";
+                    break;
                 case "voice four":
+                    logo.notationNotes[turtle] += "V:4\n";
+                    break;
                 case "one voice":
-                    // FIXME: how does one define multi-voice in ABC notation?
+                    // Return to a single voice
+                    logo.notationNotes[turtle] += "V:1\n";
                     break;
                 default:
                     logo.notationNotes[turtle] += obj;
@@ -278,7 +236,7 @@ const processABCNotes = function(logo, turtle) {
                 }
             }
 
-           /**
+            /**
             * Processes an incomplete tuplet and appends the corresponding ABC notation to the notation string.
             * @param {object} logo - The logo object containing notation information.
             * @param {string} turtle - The identifier for the turtle.

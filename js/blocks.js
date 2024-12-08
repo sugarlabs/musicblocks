@@ -263,7 +263,7 @@ class Blocks {
             const firstConnection = blkObj.connections[0];
             let connectionIdx;
 
-            if (SPECIALINPUTS.indexOf(blkObj.name) === -1) {
+            if (!SPECIALINPUTS.includes(blkObj.name)) {
                 const clampList = [];
                 this.findNestedClampBlocks(blk, clampList);
 
@@ -348,11 +348,11 @@ class Blocks {
             let myBlock;
             for (blk in this.blockList) {
                 myBlock = this.blockList[blk];
-                if (["newnote", "interval", "osctime"].indexOf(myBlock.name) !== -1) {
+                if (["newnote", "interval", "osctime"].includes(myBlock.name)) {
                     continue;
                 }
 
-                if (COLLAPSIBLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
+                if (COLLAPSIBLES.includes(myBlock.name) && !myBlock.trash) {
                     if (myBlock.collapsed) {
                         someCollapsed = true;
                     } else {
@@ -368,11 +368,11 @@ class Blocks {
                  */
                 for (blk in this.blockList) {
                     myBlock = this.blockList[blk];
-                    if (["newnote", "interval", "osctime"].indexOf(myBlock.name) !== -1) {
+                    if (["newnote", "interval", "osctime"].includes(myBlock.name)) {
                         continue;
                     }
 
-                    if (COLLAPSIBLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
+                    if (COLLAPSIBLES.includes(myBlock.name) && !myBlock.trash) {
                         myBlock.collapseToggle();
                     }
                 }
@@ -380,11 +380,11 @@ class Blocks {
                 /** If no blocks are collapsed, collapse them all. */
                 for (blk in this.blockList) {
                     myBlock = this.blockList[blk];
-                    if (["newnote", "interval", "osctime"].indexOf(myBlock.name) !== -1) {
+                    if (["newnote", "interval", "osctime"].includes(myBlock.name)) {
                         continue;
                     }
 
-                    if (COLLAPSIBLES.indexOf(myBlock.name) !== -1 && !myBlock.trash) {
+                    if (COLLAPSIBLES.includes(myBlock.name) && !myBlock.trash) {
                         if (!myBlock.collapsed) {
                             myBlock.collapseToggle();
                         }
@@ -413,7 +413,7 @@ class Blocks {
          * @returns boolean
          */
         this._actionBlock = (name) => {
-            return ["do", "doArg", "calc", "calcArg"].indexOf(name) !== -1;
+            return ["do", "doArg", "calc", "calcArg"].includes(name);
         };
 
         /**
@@ -423,7 +423,7 @@ class Blocks {
          * @returns boolean
          */
         this._namedActionBlock = (name) => {
-            return ["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].indexOf(name) !== -1;
+            return ["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].includes(name);
         };
 
         /**
@@ -541,7 +541,7 @@ class Blocks {
         this._getBlockSize = (blk) => {
             const myBlock = this.blockList[blk];
             /** Special case for collapsed note blocks. */
-            if (["newnote", "interval", "osctime"].indexOf(myBlock.name) !== -1 && myBlock.collapsed) {
+            if (["newnote", "interval", "osctime"].includes(myBlock.name) && myBlock.collapsed) {
                 return 1;
             }
 
@@ -564,7 +564,7 @@ class Blocks {
 
             /** Which connection do we start with? */
             let ci;
-            if (["doArg", "calcArg", "makeblock"].indexOf(myBlock.name) !== -1) {
+            if (["doArg", "calcArg", "makeblock"].includes(myBlock.name)) {
                 ci = 2;
             } else {
                 ci = 1;
@@ -807,7 +807,7 @@ class Blocks {
             if (this.blocksToCollapse.indexOf(blk) != -1) {
                 size = 1;
             } else if (
-                ["newnote", "interval", "osctime"].indexOf(myBlock.name) !== -1 &&
+                ["newnote", "interval", "osctime"].includes(myBlock.name) &&
                 myBlock.collapsed
             ) {
                 size = 1;
@@ -1225,7 +1225,7 @@ class Blocks {
                         oldBlock
                     ]);
                 }
-            } else if (NOTEBLOCKS.indexOf(this.blockList[parentblk].name) !== -1) {
+            } else if (NOTEBLOCKS.includes(this.blockList[parentblk].name)) {
                 cblk = this.blockList[parentblk].connections[2];
                 if (cblk == null) {
                     const newVspaceBlock = this.makeBlock("vspace", "__NOARG__");
@@ -1265,7 +1265,7 @@ class Blocks {
             let counter = 0;
             // eslint-disable-next-line no-constant-condition
             while (true) {
-                if (NOTEBLOCKS.indexOf(this.blockList[c].name) !== -1) {
+                if (NOTEBLOCKS.includes(this.blockList[c].name)) {
                     break;
                 }
 
@@ -1294,9 +1294,9 @@ class Blocks {
                 }
 
                 const nextBlock = last(this.blockList[thisBlock].connections);
-                if (PITCHBLOCKS.indexOf(this.blockList[thisBlock].name) !== -1) {
+                if (PITCHBLOCKS.includes(this.blockList[thisBlock].name)) {
                     this._extractBlock(thisBlock, false);
-                } else if (["flat", "sharp"].indexOf(this.blockList[thisBlock].name) !== -1) {
+                } else if (["flat", "sharp"].includes(this.blockList[thisBlock].name)) {
                     /** The pitch block might be inside a sharp or flat block. */
                     const b = this.blockList[thisBlock].connections[1];
                     if (this._blockInStack(b, PITCHBLOCKS)) {
@@ -1403,7 +1403,7 @@ class Blocks {
             } else {
                 while (thisBlockobj.connections[0] != null) {
                     const i = thisBlockobj.connections[0];
-                    if (NOTEBLOCKS.indexOf(this.blockList[i].name) !== -1) {
+                    if (NOTEBLOCKS.includes(this.blockList[i].name)) {
                         break;
                     } else if (this.blockList[i].name === "rest2") {
                         const silenceBlock = i;
@@ -1622,8 +1622,8 @@ class Blocks {
                     continue;
                 }
 
-                if (COLLAPSIBLES.indexOf(this.blockList[b].name) !== -1) {
-                    if (INLINECOLLAPSIBLES.indexOf(this.blockList[b].name) === -1) {
+                if (COLLAPSIBLES.includes(this.blockList[b].name)) {
+                    if (!INLINECOLLAPSIBLES.includes(this.blockList[b].name)) {
                         if (this.blockList[b].collapsed) {
                             continue;
                         }
@@ -1664,7 +1664,7 @@ class Blocks {
                          */
                         continue;
                     } else if (
-                        ["backward", "status"].indexOf(this.blockList[b].name) !== -1 &&
+                        ["backward", "status"].includes(this.blockList[b].name) &&
                         i === 1 &&
                         this.blockList[b].connections[1] != null &&
                         this.blockList[this.blockList[b].connections[1]].isNoHitBlock()
@@ -1728,7 +1728,7 @@ class Blocks {
                         ) {
                             /** pass */
                         } else if (
-                            ["doArg", "nameddoArg"].indexOf(this.blockList[newBlock].name) !== -1 &&
+                            ["doArg", "nameddoArg"].includes(this.blockList[newBlock].name) &&
                             newConnection === this.blockList[newBlock].connections.length - 1
                         ) {
                             /** pass */
@@ -1741,9 +1741,9 @@ class Blocks {
                             let si = newConnection - 1;
                             /** Which slot is this block in? */
                             if (
-                                ["doArg", "calcArg", "makeblock"].indexOf(
+                                ["doArg", "calcArg", "makeblock"].includes(
                                     this.blockList[newBlock].name
-                                ) !== -1
+                                )
                             ) {
                                 si = newConnection - 2;
                             }
@@ -1787,7 +1787,7 @@ class Blocks {
                                 this.moveBlockRelative(this.dragGroup[c], 40, 40);
                             }
                         } else if (
-                            ["doArg", "nameddoArg"].indexOf(this.blockList[newBlock].name) !== -1 &&
+                            ["doArg", "nameddoArg"].includes(this.blockList[newBlock].name) &&
                             newConnection === this.blockList[newBlock].connections.length - 1
                         ) {
                             /** If it is the bottom of the flow, insert as usual. */
@@ -1811,9 +1811,9 @@ class Blocks {
                             const ci = this.blockList[newBlock].connections.indexOf(connection);
                             let si = ci - 1;
                             if (
-                                ["doArg", "calcArg", "makeblock"].indexOf(
+                                ["doArg", "calcArg", "makeblock"].includes(
                                     this.blockList[newBlock].name
-                                ) !== -1
+                                )
                             ) {
                                 si = ci - 2;
                             }
@@ -2060,13 +2060,13 @@ class Blocks {
             /** FIXME: improve mechanism for testing block types. */
             if (
                 (myBlock.isArgBlock() ||
-                    ["calcArg", "namedcalcArg", "makeblock"].indexOf(myBlock.name) !== -1) &&
+                    ["calcArg", "namedcalcArg", "makeblock"].includes(myBlock.name)) &&
                 newBlock != null
             ) {
                 /** We care about twoarg blocks with connections to the first arg; */
                 if (this.blockList[newBlock].isTwoArgBlock()) {
                     if (this.blockList[newBlock].connections[1] === thisBlock) {
-                        if (this._checkTwoArgBlocks.indexOf(newBlock) === -1) {
+                        if (!this._checkTwoArgBlocks.includes(newBlock)) {
                             this._checkTwoArgBlocks.push(newBlock);
                         }
                     }
@@ -2075,7 +2075,7 @@ class Blocks {
                     this.blockList[newBlock].isExpandableBlock()
                 ) {
                     if (this.blockList[newBlock].connections[1] === thisBlock) {
-                        if (this._checkTwoArgBlocks.indexOf(newBlock) === -1) {
+                        if (!this._checkTwoArgBlocks.includes(newBlock)) {
                             this._checkTwoArgBlocks.push(newBlock);
                         }
                     }
@@ -2180,16 +2180,16 @@ class Blocks {
             if (type1 === "vspacein" && type2 === "out") {
                 return true;
             }
-            if (type1 === "numberin" && ["numberout", "anyout"].indexOf(type2) !== -1) {
+            if (type1 === "numberin" && ["numberout", "anyout"].includes(type2)) {
                 return true;
             }
-            if (["numberout", "anyout"].indexOf(type1) !== -1 && type2 === "numberin") {
+            if (["numberout", "anyout"].includes(type1) && type2 === "numberin") {
                 return true;
             }
-            if (type1 === "textin" && ["textout", "anyout"].indexOf(type2) !== -1) {
+            if (type1 === "textin" && ["textout", "anyout"].includes(type2)) {
                 return true;
             }
-            if (["textout", "anyout"].indexOf(type1) !== -1 && type2 === "textin") {
+            if (["textout", "anyout"].includes(type1) && type2 === "textin") {
                 return true;
             }
             if (type1 === "booleanout" && type2 === "booleanin") {
@@ -2236,23 +2236,23 @@ class Blocks {
             }
             if (
                 type1 === "solfegein" &&
-                ["anyout", "solfegeout", "textout", "noteout", "scaledegreeout", "numberout"].indexOf(
+                ["anyout", "solfegeout", "textout", "noteout", "scaledegreeout", "numberout"].includes(
                     type2
-                ) !== -1
+                )
             ) {
                 return true;
             }
             if (
                 type2 === "solfegein" &&
-                ["anyout", "solfegeout", "textout", "noteout", "scaledegreeout", "numberout"].indexOf(
+                ["anyout", "solfegeout", "textout", "noteout", "scaledegreeout", "numberout"].includes(
                     type1
-                ) !== -1
+                )
             ) {
                 return true;
             }
             if (
                 type1 === "notein" &&
-                ["solfegeout", "scaledegreeout", "textout", "noteout"].indexOf(type2) !== -1
+                ["solfegeout", "scaledegreeout", "textout", "noteout"].includes(type2)
             ) {
                 return true;
             }
@@ -2264,7 +2264,7 @@ class Blocks {
             }
             if (
                 type2 === "notein" &&
-                ["solfegeout", "scaledegreeout", "textout", "noteout"].indexOf(type1) !== -1
+                ["solfegeout", "scaledegreeout", "textout", "noteout"].includes(type1)
             ) {
                 return true;
             }
@@ -2279,7 +2279,7 @@ class Blocks {
                     "solfegeout",
                     "scaledegreeout",
                     "noteout"
-                ].indexOf(type2) !== -1
+                ].includes(type2)
             ) {
                 return true;
             }
@@ -2294,7 +2294,7 @@ class Blocks {
                     "solfegeout",
                     "scaledegreeout",
                     "noteout"
-                ].indexOf(type1) !== -1
+                ].includes(type1)
             ) {
                 return true;
             }
@@ -2620,7 +2620,7 @@ class Blocks {
                     break;
             }
 
-            if (WIDENAMES.indexOf(myBlock.name) === -1 && label.length > maxLength) {
+            if (!WIDENAMES.includes(myBlock.name) && label.length > maxLength) {
                 label = label.substr(0, maxLength - 1) + "...";
             }
 
@@ -2753,7 +2753,7 @@ class Blocks {
             /** Is there a block of any of these names in this stack? */
             let counter = 0;
             while (thisBlock != null) {
-                if (names.indexOf(this.blockList[thisBlock].name) !== -1) {
+                if (names.includes(this.blockList[thisBlock].name)) {
                     return true;
                 }
 
@@ -3121,7 +3121,7 @@ class Blocks {
             }
 
             /** Deprecated: If we drag in a synth block, we need to load the synth. */
-            if (["sine", "sawtooth", "triangle", "square"].indexOf(name) !== -1) {
+            if (["sine", "sawtooth", "triangle", "square"].includes(name)) {
                 this.activity.logo.synth.loadSynth(0, name);
             }
 
@@ -3133,7 +3133,7 @@ class Blocks {
                     "nameddoArg",
                     "namedcalcArg",
                     "outputtools"
-                ].indexOf(name) !== -1
+                ].includes(name)
             ) {
                 this.blockList.push(new Block(this.protoBlockDict[name], this, postProcessArg[1]));
             } else if (name === "namedarg") {
@@ -3395,7 +3395,7 @@ class Blocks {
                     "nameddoArg",
                     "namedcalcArg",
                     "namedarg"
-                ].indexOf(name) !== -1
+                ].includes(name)
             ) {
                 postProcess = (args) => {
                     that.blockList[thisBlock].value = null;
@@ -3430,7 +3430,7 @@ class Blocks {
                             "nameddoArg",
                             "namedcalcArg",
                             "namedarg"
-                        ].indexOf(name) !== -1
+                        ].includes(name)
                     ) {
                         if (that.protoBlockDict[proto].defaults[0] === undefined) {
                             that.makeNewBlock(proto, postProcess, postProcessArg);
@@ -3510,7 +3510,7 @@ class Blocks {
                             that.blockList[b].value = v;
                             let l = value.toString();
                             if (
-                                WIDENAMES.indexOf(that.blockList[b].name) === -1 &&
+                                !WIDENAMES.includes(that.blockList[b].name) &&
                                 getTextWidth(l, "bold 20pt Sans") > TEXTWIDTH
                             ) {
                                 l = l.substr(0, STRINGLEN) + "...";
@@ -3537,7 +3537,7 @@ class Blocks {
                         that.blockList[b].value = v;
                         let l = v.toString();
                         if (
-                            WIDENAMES.indexOf(that.blockList[b].name) === -1 &&
+                            !WIDENAMES.includes(that.blockList[b].name) &&
                             getTextWidth(l, "bold 20pt Sans") > TEXTWIDTH
                         ) {
                             l = l.substr(0, STRINGLEN) + "...";
@@ -3736,7 +3736,7 @@ class Blocks {
 
             let i = 1;
             let value = name;
-            while (actionNames.indexOf(value) !== -1) {
+            while (actionNames.includes(value)) {
                 value = name + i.toString();
                 i += 1;
             }
@@ -3763,7 +3763,7 @@ class Blocks {
 
             let i = 1;
             let value = name;
-            while (noteNames.indexOf(value) !== -1) {
+            while (noteNames.includes(value)) {
                 value = name + i.toString();
                 i += 1;
             }
@@ -3793,7 +3793,7 @@ class Blocks {
 
             let i = 1;
             let value = name;
-            while (temperamentNames.indexOf(value) !== -1) {
+            while (temperamentNames.includes(value)) {
                 value = name + i.toString();
                 i += 1;
             }
@@ -3811,9 +3811,9 @@ class Blocks {
                     const c = this.blockList[blk].connections[0];
                     if (
                         c != null &&
-                        ["playdrum", "setdrum", "playnoise", "setvoice"].indexOf(
+                        ["playdrum", "setdrum", "playnoise", "setvoice"].includes(
                             this.blockList[c].name
-                        ) !== -1
+                        )
                     ) {
                         if (this.blockList[blk].value.slice(0, 4) === "http") {
                             this.activity.logo.synth.loadSynth(0, this.blockList[blk].value);
@@ -4000,7 +4000,7 @@ class Blocks {
                 }
 
                 if (
-                    [
+                    ![
                         "do",
                         "calc",
                         "doArg",
@@ -4009,7 +4009,7 @@ class Blocks {
                         "offbeatdo",
                         "onbeatdo",
                         "listen"
-                    ].indexOf(blkParent.name) === -1
+                    ].includes(blkParent.name)
                 ) {
                     continue;
                 }
@@ -4049,9 +4049,9 @@ class Blocks {
             /** Update the blocks, do->oldName should be do->newName */
             for (const blk in this.blockList) {
                 if (
-                    ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(
+                    ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].includes(
                         this.blockList[blk].name
-                    ) !== -1
+                    )
                 ) {
                     if (this.blockList[blk].privateData === oldName) {
                         this.blockList[blk].privateData = newName;
@@ -4473,7 +4473,7 @@ class Blocks {
                         /** Connection 1 of a note block is not inside the clamp. */
                         return null;
                     } else {
-                        if (NOTEBLOCKS.indexOf(this.blockList[cblk].name) !== -1) {
+                        if (NOTEBLOCKS.includes(this.blockList[cblk].name)) {
                             return cblk;
                         } else {
                             return null;
@@ -4486,7 +4486,7 @@ class Blocks {
         };
 
         this._isConnectedToNoteValue = (blk) => {
-            if (NOTEBLOCKS.indexOf(this.blockList[blk].name) !== -1) {
+            if (NOTEBLOCKS.includes(this.blockList[blk].name)) {
                 return true;
             } else if (this.blockList[blk].connections[0] == null) {
                 return false;
@@ -4603,7 +4603,7 @@ class Blocks {
                 return null;
             }
 
-            if (PITCHBLOCKS.indexOf(this.blockList[blk].name) !== -1) {
+            if (PITCHBLOCKS.includes(this.blockList[blk].name)) {
                 return blk;
             } else if (this.blockList[blk].name === "rest2") {
                 return blk;
@@ -4625,9 +4625,9 @@ class Blocks {
             }
 
             if (
-                ["pitch", "setpitchnumberoffset", "invert1", "tofrequency", "nthmodalpitch"].indexOf(
+                ["pitch", "setpitchnumberoffset", "invert1", "tofrequency", "nthmodalpitch"].includes(
                     this.blockList[blk].name
-                ) !== -1
+                )
             ) {
                 const oblk = this.blockList[blk].connections[2];
                 if (oblk === null) {
@@ -4655,9 +4655,9 @@ class Blocks {
             }
 
             if (
-                ["pitch", "setpitchnumberoffset", "invert1", "tofrequency", "nthmodalpitch"].indexOf(
+                ["pitch", "setpitchnumberoffset", "invert1", "tofrequency", "nthmodalpitch"].includes(
                     this.blockList[blk].name
-                ) !== -1
+                )
             ) {
                 const oblk = this.blockList[blk].connections[2];
                 if (oblk !== null && this.blockList[oblk].name === "number") {
@@ -4695,12 +4695,12 @@ class Blocks {
                 }
 
                 if (
-                    [
+                    ![
                         "interval",
                         "setscalartransposition",
                         "semitoneinterval",
                         "settransposition"
-                    ].indexOf(this.blockList[c].name) === -1
+                    ].includes(this.blockList[c].name)
                 ) {
                     return false;
                 }
@@ -4890,9 +4890,9 @@ class Blocks {
             const myBlock = this.blockList[blk];
             if (
                 myBlock.connections[0] !== null &&
-                ["pitch", "setpitchnumberoffset", "invert1", "tofrequency", "nthmodalpitch"].indexOf(
+                ["pitch", "setpitchnumberoffset", "invert1", "tofrequency", "nthmodalpitch"].includes(
                     this.blockList[myBlock.connections[0]].name
-                ) !== -1 &&
+                ) &&
                 this.blockList[myBlock.connections[0]].connections[2] === blk
             ) {
                 return true;
@@ -4939,7 +4939,7 @@ class Blocks {
 
             const c2v = this.blockList[c2].value;
             for (let i = 0; i < this.blockList.length; i++) {
-                if (["setbpm3", "setmasterbpm2"].indexOf(this.blockList[i].name) !== -1) {
+                if (["setbpm3", "setmasterbpm2"].includes(this.blockList[i].name)) {
                     const bn = this.blockList[i].connections[1];
                     if (bn === null || this.blockList[bn].name !== "number") {
                         continue;
@@ -5068,7 +5068,7 @@ class Blocks {
              * connection is the block containing its label.
              */
             let name = "---";
-            if (["temperament1", "definemode", "action"].indexOf(blockObjs[0][1]) !== -1) {
+            if (["temperament1", "definemode", "action"].includes(blockObjs[0][1])) {
                 const nameBlk = blockObjs[0][4][1];
                 if (nameBlk == null) {
                     // eslint-disable-next-line no-console
@@ -5085,7 +5085,7 @@ class Blocks {
             } else {
                 /** Look for "show", "turtleshell", or "customsample". */
                 for (let i = 0; i < blockObjs.length; i++) {
-                    if (["show", "turtleshell", "customsample"].indexOf(blockObjs[i][1]) !== -1) {
+                    if (["show", "turtleshell", "customsample"].includes(blockObjs[i][1])) {
                         switch (blockObjs[i][1]) {
                             case "show":
                                 name = _("show") + "-" + MathUtility.doRandom(0, 1000);
@@ -5160,7 +5160,7 @@ class Blocks {
                         "nameddoArg",
                         "namedcalcArg",
                         "outputtools"
-                    ].indexOf(myBlock.name) !== -1
+                    ].includes(myBlock.name)
                 ) {
                     blockItem = [b, [myBlock.name, { value: myBlock.privateData }], x, y, []];
                 } else {
@@ -5334,16 +5334,16 @@ class Blocks {
                     }
                 }
 
-                if (["arg", "twoarg"].indexOf(this.protoBlockDict[name].style) !== -1) {
+                if (["arg", "twoarg"].includes(this.protoBlockDict[name].style)) {
                     if (this.protoBlockDict[name].expandable) {
                         this._checkTwoArgBlocks.push(this.blockList.length + b);
                     }
                 }
 
                 if (
-                    ["clamp", "argclamp", "argclamparg", "doubleclamp", "argflowclamp"].indexOf(
+                    ["clamp", "argclamp", "argclamparg", "doubleclamp", "argflowclamp"].includes(
                         this.protoBlockDict[name].style
-                    ) !== -1
+                    )
                 ) {
                     this._checkArgClampBlocks.push(this.blockList.length + b);
                 }
@@ -5384,7 +5384,7 @@ class Blocks {
                         break;
                 }
 
-                if (COLLAPSIBLES.indexOf(name) !== -1) {
+                if (COLLAPSIBLES.includes(name)) {
                     if (
                         typeof blkData[1] === "object" &&
                         blkData[1].length > 1 &&
@@ -5402,7 +5402,7 @@ class Blocks {
             /** Make sure new storein names have palette entries. */
             for (const b in storeinNames) {
                 const blkData = blockObjs[storeinNames[b]];
-                if (currentStoreinNames.indexOf(blkData[1][1]) === -1) {
+                if (!currentStoreinNames.includes(blkData[1][1])) {
                     if (typeof blkData[1][1] === "string") {
                         name = blkData[1][1];
                     } else {
@@ -5435,7 +5435,7 @@ class Blocks {
 
                 const oldName = name;
                 let i = 1;
-                while (currentActionNames.indexOf(name) !== -1) {
+                while (currentActionNames.includes(name)) {
                     name = oldName + i.toString();
                     i += 1;
                     /** Should never happen... but just in case. */
@@ -5466,7 +5466,7 @@ class Blocks {
                         blkName = thisBlkData[1][0];
                     }
                     if (
-                        ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(blkName) !== -1
+                        ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].includes(blkName)
                     ) {
                         if (thisBlkData[1][1]["value"] === oldName) {
                             thisBlkData[1][1] = { value: name };
@@ -5594,7 +5594,7 @@ class Blocks {
                             }
                         }
 
-                        if (["note", "slur", "staccato", "swing"].indexOf(name) !== -1) {
+                        if (["note", "slur", "staccato", "swing"].includes(name)) {
                             /** We need to convert to newnote style: */
                             /** (1) add a vspace to the start of the clamp of a note block. */
                             const clampBlock = blockObjs[b][4][2];
@@ -5754,9 +5754,9 @@ class Blocks {
                 if (typeof blkData[1] === "object") {
                     if (blkData[1].length === 1) {
                         blkInfo = [blkData[1][0], { value: null }];
-                    } else if (["number", "string"].indexOf(typeof blkData[1][1]) !== -1) {
+                    } else if (["number", "string"].includes(typeof blkData[1][1])) {
                         blkInfo = [blkData[1][0], { value: blkData[1][1] }];
-                        if (COLLAPSIBLES.indexOf(blkData[1][0]) !== -1) {
+                        if (COLLAPSIBLES.includes(blkData[1][0])) {
                             blkInfo[1]["collapsed"] = false;
                         }
                     } else {
@@ -5764,7 +5764,7 @@ class Blocks {
                     }
                 } else {
                     blkInfo = [blkData[1], { value: null }];
-                    if (COLLAPSIBLES.indexOf(blkData[1]) !== -1) {
+                    if (COLLAPSIBLES.includes(blkData[1])) {
                         blkInfo[1]["collapsed"] = false;
                     }
                 }
@@ -6174,7 +6174,7 @@ class Blocks {
                             const thisBlock = args[0];
                             let value = args[1];
                             if (
-                                ["simple 1", "simple 2", "simple 3", "simple 4"].indexOf(value) !== -1
+                                ["simple 1", "simple 2", "simple 3", "simple 4"].includes(value)
                             ) {
                                 value = "sine";
                             }
@@ -6729,7 +6729,7 @@ class Blocks {
 
                     /** We are only interested in do and nameddo blocks. */
                     if (
-                        [
+                        ![
                             "nameddo",
                             "namedcalcArg",
                             "nameddoArg",
@@ -6737,7 +6737,7 @@ class Blocks {
                             "calc",
                             "calcArg",
                             "doArg"
-                        ].indexOf(thisBlock.name) === -1
+                        ].includes(thisBlock.name)
                     ) {
                         continue;
                     }
@@ -6901,9 +6901,9 @@ class Blocks {
                     ) {
                         this._checkTwoArgBlocks.push(blk);
                     } else if (
-                        ["clamp", "argclamp", "argclamparg", "doubleclamp", "argflowclamp"].indexOf(
+                        ["clamp", "argclamp", "argclamparg", "doubleclamp", "argflowclamp"].includes(
                             myBlock.protoblock.style
-                        ) !== -1
+                        )
                     ) {
                         this._checkArgClampBlocks.push(blk);
                     }

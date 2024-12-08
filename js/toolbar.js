@@ -51,7 +51,7 @@ class Toolbar {
                 ["record",_("Record")],
                 ["Full Screen", _("Full screen")],
                 ["FullScreen", _("Full screen")],
-		["Toggle Fullscreen", _("Toggle Fullscreen")],
+                ["Toggle Fullscreen", _("Toggle Fullscreen")],
                 ["newFile", _("New project")],
                 ["load", _("Load project from file")],
                 ["saveButton", _("Save project")],
@@ -177,7 +177,7 @@ class Toolbar {
                 ["record", _("Record")],
                 ["Full Screen", _("Full Screen")],
                 ["FullScreen", _("Full Screen")],
-		["Toggle Fullscreen", _("Toggle Fullscreen")],
+                ["Toggle Fullscreen", _("Toggle Fullscreen")],
                 ["newFile", _("New project")],
                 ["load", _("Load project from file")],
                 ["saveButton", _("Save project")],
@@ -461,7 +461,7 @@ class Toolbar {
                     } else if (ele.label === "Turtle Wrap On") {
                         ele.display = false;
                     }
-                })
+                });
             } else {
                 wrapButtonTooltipData = _("Turtle Wrap On");
                 this.activity.helpfulWheelItems.forEach(ele => {
@@ -470,7 +470,7 @@ class Toolbar {
                     } else if (ele.label === "Turtle Wrap On") {
                         ele.display = true;
                     }
-                })
+                });
             }
 
             wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
@@ -501,7 +501,7 @@ class Toolbar {
                 } else if (ele.label === "Turtle Wrap On") {
                     ele.display = false;
                 }
-            })
+            });
         } else {
             wrapButtonTooltipData = _("Turtle Wrap On");
             activity.helpfulWheelItems.forEach(ele => {
@@ -510,7 +510,7 @@ class Toolbar {
                 } else if (ele.label === "Turtle Wrap On") {
                     ele.display = true;
                 }
-            })
+            });
         }
 
         wrapIcon.setAttribute("data-tooltip", wrapButtonTooltipData);
@@ -550,78 +550,72 @@ class Toolbar {
         mxml_onclick,
         blockartworksvg_onclick
     ) {
-        const saveButton = docById("saveButton");
-        const saveButtonAdvanced = docById("saveButtonAdvanced");
-        let saveHTML;
-        let savePNG;
-        let saveWAV;
-        let saveSVG;
-        let saveLY;
-        let saveABC;
-        let saveMXML;
-        let svgData;
-
+        const saveButton = docById('saveButton');
+        const saveButtonAdvanced = docById('saveButtonAdvanced');
         if (this.activity.beginnerMode) {
             if (this.language === "ja") {
                 saveButton.onclick = () => {
                     html_onclick(this.activity);
-                };
-            } else {
-                saveButton.style.display = "block";
-                saveButtonAdvanced.style.display = "none";
-
+                }
+            }
+            else {
+                saveButton.style.display = 'block';
+                saveButtonAdvanced.style.display = 'none';
                 saveButton.onclick = () => {
-                    saveHTML = docById("save-html-beg");
+                    const saveHTML = docById('save-html-beg');
+                    console.debug(saveHTML);
                     saveHTML.onclick = () => {
                         html_onclick(this.activity);
                     };
 
-                    savePNG = docById("save-png-beg");
-                    svgData = doSVG(
-                        this.activity.canvas,
-                        this.activity.logo,
-                        this.activity.turtles,
-                        this.activity.canvas.width,
-                        this.activity.canvas.height,
+                    const savePNG = docById('save-png-beg');
+                    console.debug(savePNG);
+                    const svgData = doSVG_onclick(
+                        this.activity.canvas, 
+                        this.activity.logo, 
+                        this.activity.turtles, 
+                        this.activity.canvas.width, 
+                        this.activity.canvas.height, 
                         1.0
                     );
-
-                    if (svgData == "") {
+                    
+                    if (svgData == '') {
                         savePNG.disabled = true;
-                        savePNG.className = "grey-text inactiveLink";
+                        savePNG.className = 'grey-text inactiveLink';
                     } else {
                         savePNG.disabled = false;
-                        savePNG.className = "";
+                        savePNG.className = '';
                         savePNG.onclick = () => {
                             png_onclick(this.activity);
                         };
-                    }
+                    }  
                 };
             }
         } else {
-            // console.debug("ADVANCED MODE BUTTONS");
-            saveButton.style.display = "none";
-            saveButtonAdvanced.style.display = "block";
+            console.debug('ADVANCED MODE BUTTONS')
+            saveButton.style.display = 'none';
+            saveButtonAdvanced.style.display = 'block';
             saveButtonAdvanced.onclick = () => {
-                saveHTML = docById("save-html");
-                // console.debug(saveHTML);
+                const saveHTML = docById('save-html');
+                //console.debug(saveHTML);
 
                 saveHTML.onclick = () => {
                     html_onclick(this.activity);
                 };
+                const saveSVG = docById('save-svg');
+                const savePNG = docById('save-png');
+                console.debug(savePNG);
+                const svgData = doSVG_onclick(
+                    this.activity.canvas, 
+                    this.activity.logo, 
+                    this.activity.turtles, 
+                    this.activity.canvas.width, 
+                    this.activity.canvas.height, 
+                    1.0
+                );
 
-                saveSVG = docById("save-svg");
-                savePNG = docById("save-png");
-                svgData = doSVG(
-                    this.activity.canvas,
-                    this.activity.logo,
-                    this.activity.turtles,
-                    this.activity.canvas.width,
-                    this.activity.canvas.height,
-                    1.0);
-
-                // If there is no mouse artwork to save then grey out.
-                if (svgData == "") {
+                // if there is no mouse artwork to save then grey out
+                if (svgData == '') {
                     saveSVG.disabled = true;
                     savePNG.disabled = true;
                     saveSVG.className = "grey-text inactiveLink";
@@ -631,7 +625,7 @@ class Toolbar {
                     savePNG.disabled = false;
                     saveSVG.className = "";
                     savePNG.className = "";
-
+                    
                     saveSVG.onclick = () => {
                         svg_onclick(this.activity);
                     };
@@ -642,38 +636,52 @@ class Toolbar {
                 }
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
-                    saveWAV = docById("save-wav");
-
-                    saveWAV.onclick = () => {
+                    const saveWAV = docById('save-wav');
+                     saveWAV.onclick = () => {
                         wave_onclick(this.activity);
                     };
 
-                    saveLY = docById("save-ly");
-
+                    const saveLY = docById('save-ly');
                     saveLY.onclick = () => {
                         ly_onclick(this.activity);
                     };
-
-                    saveABC = docById("save-abc");
-
+                    const saveABC = docById('save-abc');
                     saveABC.onclick = () => {
                         abc_onclick(this.activity);
                     };
-
-                    saveMXML = docById("save-mxml");
-
+                    const saveMXML = docById('save-mxml');
                     saveMXML.onclick = () => {
                         mxml_onclick(this.activity);
                     };
                 }
-
-                const saveArtworkSVG = docById("save-blockartwork-svg");
-
+                const saveArtworkSVG = docById('save-blockartwork-svg');
                 saveArtworkSVG.onclick = () => {
                     blockartworksvg_onclick(this.activity);
                 };
-            };
+            }
         }
+    }
+
+    /**
+     * Renders Record button style
+     * 
+     * @public 
+     * @param {Function} rec_onclick
+     * @returns {void}
+     */  
+    updateRecordButton(rec_onclick) {
+        const Record = docById("record");
+        const browser = fnBrowserDetect();
+        const hideIn = ["firefox", "safari"];
+    
+        if (hideIn.includes(browser)) {
+            Record.classList.add("hide");
+            return;
+        }
+    
+        Record.style.display = "block";
+        Record.innerHTML = `<i class="material-icons main">${RECORDBUTTON}</i>`;
+        Record.onclick = () => rec_onclick(this.activity);
     }
 
     /**
@@ -758,24 +766,166 @@ class Toolbar {
     }
 
     /**
-     * Renders the mode select icon with the provided onclick handler.
+     * Renders the mode changes with the provided onclick handler.
      * 
      * @public
-     * @param {Function} onclick - The onclick handler for the mode select icon.
+     * @param  {Function} rec_onclick - The onclick handler for the record icon.
+     * @param  {Function} analytics_onclick - The onclick handler for the analytics icon.
+     * @param  {Function} openPlugin_onclick - The onclick handler for the open plugin icon.
+     * @param  {Function} delPlugin_onclick - The onclick handler for the delete plugin icon.
+     * @param  {Function} setScroller - The function to set the scroller.
      * @returns {void}
      */
-    renderModeSelectIcon(onclick) {
+    renderModeSelectIcon(onclick, rec_onclick, analytics_onclick, openPlugin_onclick, delPlugin_onclick, setScroller) {
         const begIcon = docById("beginnerMode");
         const advIcon = docById("advancedMode");
-        if (begIcon.style.display === "none") {
-            advIcon.onclick = () => {
+
+        // Update UI based on current mode
+        const updateUIForMode = () => {
+            begIcon.style.display = this.activity.beginnerMode ? "none" : "block";
+            advIcon.style.display = this.activity.beginnerMode ? "block" : "none";
+
+            // Update record button
+            const recordButton = docById("record");
+            if (recordButton) {
+                if (!this.activity.beginnerMode) {
+                    recordButton.style.display = "block";
+                    this.updateRecordButton();
+                    recordButton.onclick = () => rec_onclick(this.activity);
+                } else {
+                    recordButton.style.display = "none";
+                }
+            }
+
+            if (!this.activity.beginnerMode) {
+                // Display Stats
+                const displayStatsIcon = docById("displayStatsIcon");
+                if (displayStatsIcon) {
+                    displayStatsIcon.style.display = "block";
+                    displayStatsIcon.onclick = () => analytics_onclick(this.activity);
+                }
+
+                // Load Plugin
+                const loadPluginIcon = docById("loadPluginIcon");
+                if (loadPluginIcon) {
+                    loadPluginIcon.style.display = "block";
+                    loadPluginIcon.onclick = () => openPlugin_onclick(this.activity);
+                }
+
+                // Delete Plugin
+                const delPluginIcon = docById("delPluginIcon");
+                if (delPluginIcon) {
+                    delPluginIcon.style.display = "block";
+                    delPluginIcon.onclick = () => delPlugin_onclick(this.activity);
+                }
+
+                // Horizontal Scroll
+                const enableHorizScrollIcon = docById("enableHorizScrollIcon");
+                const disableHorizScrollIcon = docById("disableHorizScrollIcon");
+                if (enableHorizScrollIcon) {
+                    enableHorizScrollIcon.style.display = "block";
+                    enableHorizScrollIcon.onclick = () => setScroller(this.activity);
+                }
+                if (disableHorizScrollIcon) {
+                    disableHorizScrollIcon.onclick = () => setScroller(this.activity);
+                }
+
+                // JavaScript Toggle
+                const toggleJavaScriptIcon = docById("toggleJavaScriptIcon");
+                if (toggleJavaScriptIcon) {
+                    toggleJavaScriptIcon.style.display = "block";
+                }
+
+                // Update helpful wheel items visibility for advanced mode
+                if (this.activity.helpfulWheelItems) {
+                    this.activity.helpfulWheelItems.forEach(item => {
+                        if (item.label === "Enable horizontal scrolling") {
+                            item.display = true;
+                        }
+                    });
+                }
+            } else {
+                // Hide all advanced icons in beginner mode
+                const advancedIcons = [
+                    "displayStatsIcon",
+                    "loadPluginIcon", 
+                    "delPluginIcon",
+                    "enableHorizScrollIcon",
+                    "disableHorizScrollIcon",
+                    "toggleJavaScriptIcon"
+                ];
+
+                advancedIcons.forEach(iconId => {
+                    const icon = docById(iconId);
+                    if (icon) {
+                        icon.style.display = "none";
+                    }
+                });
+
+                // Update helpful wheel items visibility for beginner mode
+                if (this.activity.helpfulWheelItems) {
+                    this.activity.helpfulWheelItems.forEach(item => {
+                        if (item.label === "Enable horizontal scrolling") {
+                            item.display = false;
+                        }
+                    });
+                }
+            }
+
+            // Update save buttons
+            const saveButton = docById('saveButton');
+            const saveButtonAdvanced = docById('saveButtonAdvanced');
+            if (saveButton) saveButton.style.display = this.activity.beginnerMode ? "block" : "none";
+            if (saveButtonAdvanced) saveButtonAdvanced.style.display = this.activity.beginnerMode ? "none" : "block";
+        };
+
+        // Handle mode switching
+        const handleModeSwitch = (event) => {
+            this.activity.beginnerMode = !this.activity.beginnerMode;
+            
+            try {
+                localStorage.setItem("beginnerMode", this.activity.beginnerMode.toString());
+            } catch (e) {
+                console.error(e);
+            }
+
+            updateUIForMode();
+
+            // Reinitialize tooltips after mode switch
+            if (!this.tooltipsDisabled) {
+                $j(".tooltipped").tooltip({
+                    html: true,
+                    delay: 100
+                });
+            }
+
+            // Reinitialize dropdowns
+            $j(".materialize-iso, .dropdown-trigger").dropdown({
+                constrainWidth: false,
+                hover: false,
+                belowOrigin: true
+            });
+
+            if (onclick) {
                 onclick(this.activity);
-            };
-        } else {
-            begIcon.onclick = () => {
-                onclick(this.activity);
-            };
-        }
+            }
+
+            if (this.activity.palettes?.updatePalettes) {
+                this.activity.palettes.updatePalettes();
+            }
+
+            if (this.activity.refreshCanvas) {
+                this.activity.refreshCanvas();
+            }
+        };
+
+        begIcon.onclick = null;
+        advIcon.onclick = null;
+
+        begIcon.onclick = handleModeSwitch;
+        advIcon.onclick = handleModeSwitch;
+
+        updateUIForMode();
     }
 
     /**
@@ -795,71 +945,6 @@ class Toolbar {
             onclick(this.activity);
             docById("stop").style.color = this.stopIconColorWhenPlaying;
         };
-    }
-    /**
-     * Renders the advanced icons with the provided onclick handlers.
-     * 
-     * @public
-     * @param  {Function} rec_onclick - The onclick handler for the record icon.
-     * @param  {Function} analytics_onclick - The onclick handler for the analytics icon.
-     * @param  {Function} openPlugin_onclick - The onclick handler for the open plugin icon.
-     * @param  {Function} delPlugin_onclick - The onclick handler for the delete plugin icon.
-     * @param  {Function} setScroller - The function to set the scroller.
-     * @returns {void}
-     */
-    renderAdvancedIcons(
-        rec_onclick,
-        analytics_onclick,
-        openPlugin_onclick,
-        delPlugin_onclick,
-        setScroller
-    ) {
-        const RecIcon = docById("record");
-        const displayStatsIcon = docById("displayStatsIcon");
-        const loadPluginIcon = docById("loadPluginIcon");
-        const delPluginIcon = docById("delPluginIcon");
-        const enableHorizScrollIcon = docById("enableHorizScrollIcon");
-        const disableHorizScrollIcon = docById("disableHorizScrollIcon");
-        const toggleJavaScriptIcon = docById("toggleJavaScriptIcon");
-        const browser = fnBrowserDetect();
-        const btn = document.getElementById("record");
-        const hideIn = ["firefox", "safari"];
-        if (hideIn.includes(browser)) {
-            btn.classList.add("hide");
-        }
-
-        if (!this.activity.beginnerMode) {
-            RecIcon.innerHTML= `<i class=""material-icons main">${RECORDBUTTON}</i>`;
-            RecIcon.onclick = () => {
-                rec_onclick(this.activity);
-            };
-
-            displayStatsIcon.onclick = () => {
-                analytics_onclick(this.activity);
-            };
-
-            loadPluginIcon.onclick = () => {
-                openPlugin_onclick(this.activity);
-            };
-
-            delPluginIcon.onclick = () => {
-                delPlugin_onclick(this.activity);
-            };
-
-            enableHorizScrollIcon.onclick = () => {
-                setScroller(this.activity);
-            };
-
-            disableHorizScrollIcon.onclick = () => {
-                setScroller(this.activity);
-            };
-        } else {
-            displayStatsIcon.style.display = "none";
-            loadPluginIcon.style.display = "none";
-            delPluginIcon.style.display = "none";
-            enableHorizScrollIcon.style.display = "none";
-            toggleJavaScriptIcon.style.display = "none";
-        }
     }
 
     /**
@@ -929,108 +1014,15 @@ class Toolbar {
      */
     renderLanguageSelectIcon(languageBox) {
         const languageSelectIcon = docById("languageSelectIcon");
+        const languages = [
+            "enUS", "enUK", "es", "pt", "ko", "ja", "kana", "zhCN", "th",
+            "ayc", "quz", "gug", "hi", "ibo", "ar", "te", "he"
+        ];
+    
         languageSelectIcon.onclick = () => {
-            const enUS = docById("enUS");
-
-            enUS.onclick = () => {
-                languageBox.enUS_onclick(this.activity);
-            };
-
-            const enUK = docById("enUK");
-
-            enUK.onclick = () => {
-                languageBox.enUK_onclick(this.activity);
-            };
-
-            const es = docById("es");
-
-            es.onclick = () => {
-                languageBox.es_onclick(this.activity);
-            };
-
-            const pt = docById("pt");
-
-            pt.onclick = () => {
-                languageBox.pt_onclick(this.activity);
-            };
-
-            const ko = docById("ko");
-
-            ko.onclick = () => {
-                languageBox.ko_onclick(this.activity);
-            };
-
-            const ja = docById("ja");
-
-            ja.onclick = () => {
-                languageBox.ja_onclick(this.activity);
-            };
-
-            const kana = docById("kana");
-
-            kana.onclick = () => {
-                languageBox.kana_onclick(this.activity);
-            };
-
-            const zhCN = docById("zhCN");
-
-            zhCN.onclick = () => {
-                languageBox.zhCN_onclick(this.activity);
-            };
-
-            const th = docById("th");
-
-            th.onclick = () => {
-                languageBox.th_onclick(this.activity);
-            };
-
-            const ayc = docById("ayc");
-
-            ayc.onclick = () => {
-                languageBox.ayc_onclick(this.activity);
-            };
-
-            const quz = docById("quz");
-
-            quz.onclick = () => {
-                languageBox.quz_onclick(this.activity);
-            };
-
-            const gug = docById("gug");
-
-            gug.onclick = () => {
-                languageBox.gug_onclick(this.activity);
-            };
-
-            const hi = docById("hi");
-
-            hi.onclick = () => {
-                languageBox.hi_onclick(this.activity);
-            };
-
-            const ibo = docById("ibo");
-
-            ibo.onclick = () => {
-                languageBox.ibo_onclick(this.activity);
-            };
-
-            const ar = docById("ar");
-
-            ar.onclick = () => {
-                languageBox.ar_onclick(this.activity);
-            };
-
-            const te = docById("te");
-
-            te.onclick = () => {
-                languageBox.te_onclick(this.activity);
-            };
-
-            const he = docById("he");
-
-            he.onclick = () => {
-                languageBox.he_onclick(this.activity);
-            };
+            languages.forEach(lang => {
+                docById(lang).onclick = () => languageBox[`${lang}_onclick`](this.activity);
+            });
         };
     }
 
@@ -1060,3 +1052,33 @@ class Toolbar {
         }
     };
 }
+function renderNewProjectConfirmation() {
+    const modalContainer = document.getElementById("modal-container");
+    const newDropdown = document.getElementById("newdropdown");
+    newDropdown.innerHTML = '';
+    const title = document.createElement("div");
+    title.innerHTML = `<h2 style="color: #0066FF; font-size: 24px; text-align: left; margin: 0;">${_("New Project")}</h2>`;
+    newDropdown.appendChild(title);
+    const confirmationMessage = document.createElement("div");
+    confirmationMessage.innerHTML = `<div id="confirmation-message" style="color: #666666; font-size: 16px; margin-bottom: 24px; text-align: left;">${_("Are you sure you want to create a new project?")}</div>`;
+    newDropdown.appendChild(confirmationMessage);
+    const confirmationButtonLi = document.createElement("li");
+    confirmationButtonLi.style.textAlign = "center";
+    confirmationButtonLi.style.width = "fit-content";
+    const confirmationButton = document.createElement("a");
+    confirmationButton.id = "new-project";
+    confirmationButton.style.display = "inline-block";
+    confirmationButton.style.backgroundColor = "#2196F3";
+    confirmationButton.style.color = "white";
+    confirmationButton.style.textDecoration = "none";
+    confirmationButton.style.borderRadius = "4px";
+    confirmationButton.style.fontWeight = "bold";
+    confirmationButton.innerHTML = _("Confirm");
+    confirmationButtonLi.appendChild(confirmationButton);
+    newDropdown.appendChild(confirmationButtonLi);
+    modalContainer.style.display = "flex";
+    confirmationButton.onclick = () => {
+        modalContainer.style.display = "none";
+    };
+}
+renderNewProjectConfirmation();

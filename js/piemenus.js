@@ -94,7 +94,7 @@ const piemenuPitches = (
     custom
 ) => {
     let prevPitch = null;
-
+    let prevAccidental = block.prevAccidental || null; // to remember the previous accidental value
     // wheelNav pie menu for pitch selection
     if (block.blocks.stageClick) {
         return;
@@ -108,15 +108,15 @@ const piemenuPitches = (
     // both at once.
     const hasOctaveWheel =
         block.connections[0] !== null &&
-        ["pitch", "setpitchnumberoffset", "invert1", "tofrequency"].indexOf(
+        ["pitch", "setpitchnumberoffset", "invert1", "tofrequency"].includes(
             block.blocks.blockList[block.connections[0]].name
-        ) !== -1;
+        );
 
     // If we are attached to a set key block, we want to order
     // pitch by fifths.
     if (
         block.connections[0] !== null &&
-        ["setkey", "setkey2"].indexOf(block.blocks.blockList[block.connections[0]].name) !== -1
+        ["setkey", "setkey2"].includes(block.blocks.blockList[block.connections[0]].name)
     ) {
         noteLabels = ["C", "G", "D", "A", "E", "B", "F"];
         noteValues = ["C", "G", "D", "A", "E", "B", "F"];
@@ -317,9 +317,9 @@ const piemenuPitches = (
         (!block.activity.KeySignatureEnv[2] && block.name === "solfege") ||
         (block.name === "notename" &&
             (block.connections[0] != undefined
-                ? ["setkey", "setkey2"].indexOf(
+                ? !["setkey", "setkey2"].includes(
                     block.blocks.blockList[block.connections[0]].name
-                ) === -1
+                )
                 : true))
     ) {
         if (scale[6 - i][0] === FIXEDSOLFEGE[note] || scale[6 - i][0] === note) {
@@ -327,37 +327,28 @@ const piemenuPitches = (
         } else {
             accidental = EQUIVALENTACCIDENTALS[scale[6 - i]].substr(1);
         }
-        block.value = block.value.replace(SHARP, "").replace(FLAT, "");
+        block.value = block.value.replace(SHARP, "").replace(FLAT, "").replace(DOUBLESHARP, "").replace(DOUBLEFLAT, "");
         block.value += accidental;
         block.text.text = block.value;
     }
 
     if (!custom) {
         // Navigate to a the current accidental value.
-        if (accidental === "") {
-            block._accidentalsWheel.navigateWheel(2);
-        } else {
-            switch (accidental) {
-                case DOUBLEFLAT:
-                    block._accidentalsWheel.navigateWheel(4);
-                    break;
-                case FLAT:
-                    block._accidentalsWheel.navigateWheel(3);
-                    break;
-                case NATURAL:
-                    block._accidentalsWheel.navigateWheel(2);
-                    break;
-                case SHARP:
-                    block._accidentalsWheel.navigateWheel(1);
-                    break;
-                case DOUBLESHARP:
-                    block._accidentalsWheel.navigateWheel(0);
-                    break;
-                default:
-                    block._accidentalsWheel.navigateWheel(2);
-                    break;
-            }
+        let accidentalIndex = 2; // Default to "natural" if none is set.
+        if (prevAccidental !== null) {
+            accidentalIndex = accidentals.indexOf(prevAccidental);
+        } else if (accidental === DOUBLEFLAT) {
+            accidentalIndex = 4;
+        } else if (accidental === FLAT) {
+            accidentalIndex = 3;
+        } else if (accidental === NATURAL) {
+            accidentalIndex = 2;
+        } else if (accidental === SHARP) {
+            accidentalIndex = 1;
+        } else if (accidental === DOUBLESHARP) {
+            accidentalIndex = 0;
         }
+        block._accidentalsWheel.navigateWheel(accidentalIndex);
     }
 
     if (hasOctaveWheel) {
@@ -479,7 +470,7 @@ const piemenuPitches = (
 
         if (
             tur.singer.instrumentNames.length === 0 ||
-            tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
             that.activity.logo.synth.createDefaultSynth(0);
@@ -513,9 +504,9 @@ const piemenuPitches = (
             (!block.activity.KeySignatureEnv[2] && that.name === "solfege") ||
             (that.name === "notename" &&
                 (that.connections[0] != undefined
-                    ? ["setkey", "setkey2"].indexOf(
+                    ? !["setkey", "setkey2"].includes(
                         that.blocks.blockList[that.connections[0]].name
-                    ) === -1
+                    )
                     : true))
         ) {
             let i = scale.indexOf(selection["note"]);
@@ -529,7 +520,7 @@ const piemenuPitches = (
                 i = NOTENAMES.indexOf(FIXEDSOLFEGE[that.value]);
             }
             if (
-                NOTENAMES.indexOf(selection["note"]) !== -1 ||
+                NOTENAMES.includes(selection["note"]) ||
                 scale[i][0] === FIXEDSOLFEGE[selection["note"]] ||
                 scale[i][0] === FIXEDSOLFEGE[that.value] ||
                 scale[i][0] === selection["note"]
@@ -578,7 +569,7 @@ const piemenuPitches = (
 
         if (
             that.connections[0] !== null &&
-            ["setkey", "setkey2"].indexOf(that.blocks.blockList[that.connections[0]].name) !== -1
+            ["setkey", "setkey2"].includes(that.blocks.blockList[that.connections[0]].name)
         ) {
             // We may need to update the mode widget.
             that.activity.logo.modeBlock = that.blocks.blockList.indexOf(that);
@@ -605,7 +596,10 @@ const piemenuPitches = (
             that.value += selection["attr"];
             that.text.text = selection["note"] + selection["attr"];
         }
-
+        // Store the selected accidental in the block for later use.
+        prevAccidental = selection["attr"];
+        block.prevAccidental = prevAccidental;
+       
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
         __pitchPreview();
@@ -631,6 +625,28 @@ const piemenuPitches = (
     // Hide the widget when the exit button is clicked.
     block._exitWheel.navItems[0].navigateFunction = () => {
         that._piemenuExitTime = new Date().getTime();
+        const selectedNote =
+        that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+        const selectedAccidental =
+        !custom && that._accidentalsWheel
+            ? that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title
+            : "";
+
+        // Update the block's displayed text with the note and accidental
+        if (selectedAccidental === "♮" || selectedAccidental === "") {
+            // Natural or no accidental: display only the note
+            that.text.text = selectedNote; 
+        } else {
+            // Combine note and accidental for display
+            that.text.text = selectedNote + selectedAccidental;
+        }
+        // Update the block value and refresh the cache
+        that.value = selectedNote + (selectedAccidental === "♮" ? "" : selectedAccidental);
+        // Ensure proper layering of the text element
+        that.container.setChildIndex(that.text, that.container.children.length - 1);
+        // Refresh the block's cache
+        that.updateCache();
+        // Hide the pie menu and remove the wheels 
         docById("wheelDiv").style.display = "none";
         that._pitchWheel.removeWheel();
         if (!custom) {
@@ -661,9 +677,9 @@ const piemenuCustomNotes = (
     // both at once.
     const hasOctaveWheel =
         block.connections[0] !== null &&
-        ["pitch", "setpitchnumberoffset", "invert1", "tofrequency"].indexOf(
+        ["pitch", "setpitchnumberoffset", "invert1", "tofrequency"].includes(
             block.blocks.blockList[block.connections[0]].name
-        ) !== -1;
+        );
 
     // Use advanced constructor for more wheelnav on same div
     block._customWheel = new wheelnav("wheelDiv", null, 800, 800);
@@ -940,7 +956,7 @@ const piemenuCustomNotes = (
 
         if (
             tur.singer.instrumentNames.length === 0 ||
-            tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
             that.activity.logo.synth.createDefaultSynth(0);
@@ -1195,7 +1211,7 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
 
         if (
             tur.singer.instrumentNames.length === 0 ||
-            tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
             that.activity.logo.synth.createDefaultSynth(0);
@@ -1398,7 +1414,7 @@ const piemenuNoteValue = (block, noteValue) => {
         cblk = block.blocks.blockList[cblk].connections[0];
         if (
             cblk !== null &&
-            ["neighbor", "neighbor2"].indexOf(block.blocks.blockList[cblk].name) !== -1
+            ["neighbor", "neighbor2"].includes(block.blocks.blockList[cblk].name)
         ) {
             subWheelValues = {
                 2: [8, 16, 32, 64],
@@ -1880,7 +1896,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
 
         if (
             tur.singer.instrumentNames.length === 0 ||
-            tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
             that.activity.logo.synth.createDefaultSynth(0);
@@ -1919,7 +1935,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
 
         if (
             tur.singer.instrumentNames.length === 0 ||
-            tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
             that.activity.logo.synth.createDefaultSynth(0);
@@ -2161,6 +2177,9 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     if (block.name === "outputtools" || block.name === "grid") {
         // slightly larger menu
         size = 1000;
+    }else if ( block.name === "temperamentname"){
+        // slightly larger wheel size for the Temperament Menu
+        size = 1200;
     }
 
     // the selectedValueh selector
@@ -2392,7 +2411,7 @@ const piemenuChords = (block, selectedChord) => {
     docById("wheelDiv").style.display = "";
 
     // the chord selector
-    block._chordWheel = new wheelnav("wheelDiv", null, 800, 800);
+    block._chordWheel = new wheelnav("wheelDiv", null, 1000, 1000);
     block._exitWheel = new wheelnav("_exitWheel", block._chordWheel.raphael);
 
     const chordLabels = [];
@@ -2465,7 +2484,7 @@ const piemenuChords = (block, selectedChord) => {
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
     docById("wheelDiv").style.position = "absolute";
-    setWheelSize(300);
+    setWheelSize(400);
     docById("wheelDiv").style.left =
         Math.min(
             block.blocks.turtles._canvas.width - 300,
@@ -2614,7 +2633,7 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
 
         if (
             tur.singer.instrumentNames.length === 0 ||
-            tur.singer.instrumentNames.indexOf(voice) === -1
+            !tur.singer.instrumentNames.includes(voice)
         ) {
             tur.singer.instrumentNames.push(voice);
             if (voice === DEFAULTVOICE) {
@@ -2808,7 +2827,7 @@ const piemenuIntervals = (block, selectedInterval) => {
                 for (let j = 0; j < 8; j++) {
                     if (l !== i) {
                         that._intervalWheel.navItems[l * 8 + j].navItem.hide();
-                    } else if (activeTabs.indexOf(j + 1) === -1) {
+                    } else if (!activeTabs.includes(j + 1)) {
                         that._intervalWheel.navItems[l * 8 + j].navItem.hide();
                     } else {
                         that._intervalWheel.navItems[l * 8 + j].navItem.show();
@@ -2840,7 +2859,7 @@ const piemenuIntervals = (block, selectedInterval) => {
     block._intervalNameWheel.navigateWheel(i);
 
     const j = Number(obj[1]);
-    if (INTERVALS[i][2].indexOf(j) !== -1) {
+    if (INTERVALS[i][2].includes(j)) {
         block._intervalWheel.navigateWheel(j - 1);
     } else {
         block._intervalWheel.navigateWheel(INTERVALS[i][2][0] - 1);
@@ -2874,7 +2893,7 @@ const piemenuIntervals = (block, selectedInterval) => {
 
         if (
             tur.singer.instrumentNames.length === 0 ||
-            tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
             that.activity.logo.synth.createDefaultSynth(0);
@@ -3037,7 +3056,7 @@ const piemenuModes = (block, selectedMode) => {
     const __setupAction = (i, activeTabs) => {
         that._modeNameWheel.navItems[i].navigateFunction = () => {
             for (let j = 0; j < 12; j++) {
-                if (activeTabs.indexOf(j) === -1) {
+                if (!activeTabs.includes(j)) {
                     that._modeWheel.navItems[j].navItem.hide();
                 } else {
                     that._modeWheel.navItems[j].navItem.show();
@@ -3192,7 +3211,7 @@ const piemenuModes = (block, selectedMode) => {
 
         if (
             tur.singer.instrumentNames.length === 0 ||
-            tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
             that.activity.logo.synth.createDefaultSynth(0);
@@ -3375,9 +3394,9 @@ const piemenuBlockContext = (block) => {
 
     const topBlock = block.blocks.findTopBlock(blockBlock);
     if (
-        ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].indexOf(
+        ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].includes(
             block.name
-        ) !== -1
+        )
     ) {
         labels.push("imgsrc:header-icons/save-blocks-button.svg");
     }
@@ -3409,9 +3428,9 @@ const piemenuBlockContext = (block) => {
     wheel.navItems[2].setTooltip(_("Move to trash"));
     wheel.navItems[3].setTooltip(_("Close"));
     if (
-        ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].indexOf(
+        ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].includes(
             block.blocks.blockList[topBlock].name
-        ) !== -1
+        )
     ) {
         wheel.navItems[4].setTooltip(_("Save stack"));
     }
@@ -3486,16 +3505,28 @@ const piemenuBlockContext = (block) => {
             that.blocks.sendStackToTrash(that.blocks.blockList[blockBlock]);
         }
         docById("contextWheelDiv").style.display = "none";
+        // prompting a notification on deleting any block 
+        activity.textMsg(
+            _("You can restore deleted blocks from the trash with the Restore From Trash button."), 3000
+        );       
     };
 
     wheel.navItems[3].navigateFunction = () => {
         docById("contextWheelDiv").style.display = "none";
     };
 
+    document.body.addEventListener("click", (event) => {
+        const wheelElement = document.getElementById("contextWheelDiv");
+        const displayStyle = window.getComputedStyle(wheelElement).display;
+        if (displayStyle === "block") {
+            wheelElement.style.display = "none";
+        }
+    });
+
     if (
-        ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].indexOf(
+        ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].includes(
             block.name
-        ) !== -1
+        )
     ) {
         wheel.navItems[4].navigateFunction = () => {
             that.blocks.activeBlock = blockBlock;
@@ -3597,7 +3628,7 @@ const piemenuGrid = (activity) => {
     activity.turtles.gridWheel.sliceSelectedPathCustom = activity.turtles.gridWheel.slicePathCustom;
     activity.turtles.gridWheel.sliceInitPathCustom = activity.turtles.gridWheel.slicePathCustom;
     activity.turtles.gridWheel.animatetime = 0; // 300;
-    activity.turtles.gridWheel.clickModeRotate = false;
+    activity.turtles.gridWheel.clickModeRotate = true;
     const { fill, stroke } = platformColor.gridWheelcolors.selected;
     activity.turtles.gridWheel.sliceHoverAttr = { fill, stroke, "stroke-width": 2 };
     activity.turtles.gridWheel.sliceSelectedAttr = { fill, stroke, "stroke-width": 2 };
@@ -3621,20 +3652,34 @@ const piemenuGrid = (activity) => {
     activity.turtles._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
     activity.turtles._exitWheel.slicePathCustom.maxRadiusPercent = 0.3;
     activity.turtles._exitWheel.sliceSelectedPathCustom =
-        activity.turtles._exitWheel.slicePathCustom;
+    activity.turtles._exitWheel.slicePathCustom;
     activity.turtles._exitWheel.sliceInitPathCustom = activity.turtles._exitWheel.slicePathCustom;
     activity.turtles._exitWheel.clickModeRotate = false;
     activity.turtles._exitWheel.createWheel(["×", " "]);
 
     activity.turtles._exitWheel.navItems[0].navigateFunction = () => {
-        docById("wheelDivptm").style.display = "none";
-        activity.turtles.gridWheel.removeWheel();
-        activity.turtles._exitWheel.removeWheel();
+        hidePiemenu(activity);
     };
 
     if (docById("helpfulWheelDiv").style.display !== "none") {
         docById("helpfulWheelDiv").style.display = "none";
     }
+
+    const hidePiemenu = (activity) => {
+        docById("wheelDivptm").style.display = "none";
+        activity.turtles.gridWheel.removeWheel();
+        activity.turtles._exitWheel.removeWheel();
+    };
+
+    const clickOutsideHandler = (event) => {
+        const piemenu = docById("wheelDivptm");
+        if (!piemenu.contains(event.target)) {
+            hidePiemenu(activity);
+            document.removeEventListener("mousedown", clickOutsideHandler);
+        }
+    };
+
+    document.addEventListener("mousedown", clickOutsideHandler);
 };
 
 const piemenuKey = (activity) => {
@@ -3850,7 +3895,7 @@ const piemenuKey = (activity) => {
         const tur = activity.turtles.ithTurtle(0);
         if (
             tur.singer.instrumentNames.length === 0 ||
-            tur.singer.instrumentNames.indexOf(DEFAULTVOICE) === -1
+            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
             activity.logo.synth.createDefaultSynth(0);

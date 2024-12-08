@@ -40,6 +40,8 @@
 
         <script src="lib/Tone.js" defer></script>
 
+        <script src="lib/midi.js" defer></script>
+
         <script src="lib/jquery.ruler.js" defer></script>
 
         <script src="lib/modernizr-2.6.2.min.js" defer></script>
@@ -47,6 +49,8 @@
         <script src="lib/raphael.min.js" defer></script>
 
         <script src="lib/wheelnav.js" defer></script>
+
+        <script src="lib/abc.min.js" defer></script>
 
         <script src="lib/codejar/codejar.min.js" defer></script>
 
@@ -310,18 +314,9 @@
                 </div>
                 </div>
 
-                <div
-                    class="clearPop"
-                    id="ClearButton"
-                    tabindex="-1"
-                >
-                    <span id="ClearContent"></span>
-                    <img
-                        id="clearClose"
-                        class="msgCloseIcon"
-                        src="images/close.svg"
-                        alt="Close"
-                    />
+                <div id="clear-modal-container" style="display: none; z-index: 999; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.4); align-items: center; justify-content: center;">
+                    <div id="cleardropdown" style="background-color: white; padding: 24px; border-radius: 8px; width: 400px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);">
+                    </div>
                 </div>
 
                 <script>
@@ -400,7 +395,7 @@
                         class="file"
                         type="file"
                         id="myOpenFile"
-                        accept=".ta, .tb, .html"
+                        accept=".ta, .tb, .html,.mid,.midi"
                         tabindex="-1"
                     />
                     <input
@@ -870,10 +865,10 @@
                     <li><a id="ar"></a></li>
                     <li><a id="he"></a></li>
                 </ul>
-
-                <ul id="newdropdown" class="dropdown-content">
-                    <li><a id="new-project"></a></li>
-                </ul>
+                <div id="modal-container" style="display: none;z-index: 999;">
+                    <ul id="newdropdown" class="dropdown-content" style="padding: 24px;">
+                    </ul>
+                </div>
  
            <script>  
                 var elem = document.documentElement;

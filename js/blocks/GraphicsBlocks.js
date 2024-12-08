@@ -329,7 +329,7 @@ function setupGraphicsBlocks(activity) {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else if (logo.inMatrix) {
                     logo.phraseMaker.addRowBlock(blk);
-                    if (logo.pitchBlocks.indexOf(blk) === -1) {
+                    if (!logo.pitchBlocks.includes(blk)) {
                         logo.pitchBlocks.push(blk);
                     }
                     logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
@@ -625,7 +625,7 @@ function setupGraphicsBlocks(activity) {
                         activity.errorMsg(NANERRORMSG, blk);
                     } else if (logo.inMatrix) {
                         logo.phraseMaker.addRowBlock(blk);
-                        if (logo.pitchBlocks.indexOf(blk) === -1) {
+                        if (!logo.pitchBlocks.includes(blk)) {
                             logo.pitchBlocks.push(blk);
                         }
                         logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
@@ -697,7 +697,7 @@ function setupGraphicsBlocks(activity) {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else if (logo.inMatrix) {
                     logo.phraseMaker.addRowBlock(blk);
-                    if (logo.pitchBlocks.indexOf(blk) === -1) {
+                    if (!logo.pitchBlocks.includes(blk)) {
                         logo.pitchBlocks.push(blk);
                     }
                     logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
@@ -772,7 +772,7 @@ function setupGraphicsBlocks(activity) {
                         activity.errorMsg(NANERRORMSG, blk);
                     } else if (logo.inMatrix) {
                         logo.phraseMaker.addRowBlock(blk);
-                        if (logo.pitchBlocks.indexOf(blk) === -1) {
+                        if (!logo.pitchBlocks.includes(blk)) {
                             logo.pitchBlocks.push(blk);
                         }
                         logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
@@ -853,7 +853,7 @@ function setupGraphicsBlocks(activity) {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else if (logo.inMatrix) {
                     logo.phraseMaker.addRowBlock(blk);
-                    if (logo.pitchBlocks.indexOf(blk) === -1) {
+                    if (!logo.pitchBlocks.includes(blk)) {
                         logo.pitchBlocks.push(blk);
                     }
                     logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
@@ -933,7 +933,7 @@ function setupGraphicsBlocks(activity) {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else if (logo.inMatrix) {
                     logo.phraseMaker.addRowBlock(blk);
-                    if (logo.pitchBlocks.indexOf(blk) === -1) {
+                    if (!logo.pitchBlocks.includes(blk)) {
                         logo.pitchBlocks.push(blk);
                     }
                     logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
@@ -1015,7 +1015,7 @@ function setupGraphicsBlocks(activity) {
                         activity.errorMsg(NANERRORMSG, blk);
                     } else if (logo.inMatrix) {
                         logo.phraseMaker.addRowBlock(blk);
-                        if (logo.pitchBlocks.indexOf(blk) === -1) {
+                        if (!logo.pitchBlocks.includes(blk)) {
                             logo.pitchBlocks.push(blk);
                         }
                         logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
@@ -1098,7 +1098,7 @@ function setupGraphicsBlocks(activity) {
                         activity.errorMsg(NANERRORMSG, blk);
                     } else if (logo.inMatrix) {
                         logo.phraseMaker.addRowBlock(blk);
-                        if (logo.pitchBlocks.indexOf(blk) === -1) {
+                        if (!logo.pitchBlocks.includes(blk)) {
                             logo.pitchBlocks.push(blk);
                         }
                         logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);

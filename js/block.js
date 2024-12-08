@@ -22,9 +22,8 @@
    DISABLEDFILLCOLOR, DISABLEDSTROKECOLOR, docById, DOUBLEFLAT,
    DOUBLESHARP, DRUMNAMES, EASTINDIANSOLFNOTES, EFFECTSNAMES,
    EXPANDBUTTON, FILTERTYPES, FLAT, getDrumName, getDrumSynthName,
-   getModeNumbers, getNoiseName, getNoiseSynthName, getTemperament,
-   getTemperamentKeys, getTemperamentsList, getTextWidth,
-   getVoiceSynthName, hideDOMLabel, HIGHLIGHTSTROKECOLORS,
+   getModeNumbers, getNoiseName, getTemperament, getTemperamentKeys,
+   getTemperamentsList, getTextWidth, hideDOMLabel, HIGHLIGHTSTROKECOLORS,
    i18nSolfege, INVERTMODES, isCustomTemperament, last, MEDIASAFEAREA,
    NATURAL, NOISENAMES, NSYMBOLS, NUMBERBLOCKDEFAULT, OSCTYPES,
    PALETTEFILLCOLORS, PALETTEHIGHLIGHTCOLORS, PALETTESTROKECOLORS,
@@ -490,7 +489,7 @@ class Block {
      * @returns {boolean} - Returns true if the block is collapsible, otherwise false.
      */
     isCollapsible() {
-        return COLLAPSIBLES.indexOf(this.name) !== -1;
+        return COLLAPSIBLES.includes(this.name);
     }
 
     /**
@@ -498,7 +497,7 @@ class Block {
      * @returns {boolean} - Returns true if the block is inline collapsible, otherwise false.
      */
     isInlineCollapsible() {
-        return INLINECOLLAPSIBLES.indexOf(this.name) !== -1;
+        return INLINECOLLAPSIBLES.includes(this.name);
     }
 
     /**
@@ -963,8 +962,7 @@ class Block {
 
         if (this.image.search("xmlns") !== -1) {
             image.src =
-                "data:image/svg+xml;base64," +
-                window.btoa(base64Encode(this.image));
+                "data:image/svg+xml;base64," + window.btoa(window.base64Encode(this.image));
         } else {
             image.src = this.image;
         }
@@ -1212,7 +1210,7 @@ class Block {
                     "nameddoArg",
                     "namedcalc",
                     "namedcalcArg"
-                ].indexOf(this.name) !== -1
+                ].includes(this.name)
             ) {
                 block_label = this.overrideName;
                 if (getTextWidth(block_label, "bold 20pt Sans") > TEXTWIDTH) {
@@ -1223,7 +1221,7 @@ class Block {
             }
         } else if (this.protoblock.staticLabels.length > 0 && !this.protoblock.image) {
             // Label should be defined inside _().
-            if (SPECIALINPUTS.indexOf(this.name) !== -1) {
+            if (SPECIALINPUTS.includes(this.name)) {
                 block_label = "";
             } else {
                 block_label = this.protoblock.staticLabels[0];
@@ -1279,7 +1277,7 @@ class Block {
         // const thisBlock = this.blocks.blockList.indexOf(this);
         let proto, obj, label, attr;
         // Value blocks get a modifiable text label.
-        if (SPECIALINPUTS.indexOf(this.name) !== -1) {
+        if (SPECIALINPUTS.includes(this.name)) {
             if (this.value == null) {
                 switch (this.name) {
                     case "text":
@@ -1396,7 +1394,7 @@ class Block {
             }
 
             if (
-                WIDENAMES.indexOf(this.name) === -1 &&
+                !WIDENAMES.includes(this.name) &&
                 getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH
             ) {
                 label = label.substr(0, STRINGLEN) + "...";
@@ -1515,8 +1513,7 @@ class Block {
             };
 
             image.src =
-                "data:image/svg+xml;base64," +
-                window.btoa(base64Encode(COLLAPSEBUTTON));
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBUTTON));
         };
 
         /**
@@ -1548,8 +1545,7 @@ class Block {
             };
 
             image.src =
-                "data:image/svg+xml;base64," +
-                window.btoa(base64Encode(EXPANDBUTTON));
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(EXPANDBUTTON));
         };
 
         /**
@@ -1804,8 +1800,8 @@ class Block {
             return false;
         }
 
-        if (COLLAPSIBLES.indexOf(this.name) !== -1) {
-            if (INLINECOLLAPSIBLES.indexOf(this.name) === -1) {
+        if (COLLAPSIBLES.includes(this.name)) {
+            if (!INLINECOLLAPSIBLES.includes(this.name)) {
                 return false;
             }
         }
@@ -1914,7 +1910,7 @@ class Block {
      * @returns {boolean} - True if the block is a no-hit block, false otherwise.
      */
     isNoHitBlock() {
-        return NOHIT.indexOf(this.name) !== -1;
+        return NOHIT.includes(this.name);
     }
 
     /**
@@ -1938,7 +1934,7 @@ class Block {
      * @returns {boolean} - True if the block is a two-argument boolean block, false otherwise.
      */
     isTwoArgBooleanBlock() {
-        return ["equal", "greater", "less"].indexOf(this.name) !== -1;
+        return ["equal", "greater", "less"].includes(this.name);
     }
 
     /**
@@ -2101,10 +2097,12 @@ class Block {
                     if (that.name === "media") {
                         that.value = reader.result;
                         that.loadThumbnail(null);
+                        fileChooser.value = '';
                         return;
                     }
                     that.value = [fileChooser.files[0].name, reader.result];
                     that.blocks.updateBlockText(thisBlock);
+                    fileChooser.value = '';
                 }
             };
             if (that.name === "media") {
@@ -2480,15 +2478,15 @@ class Block {
                             .replace(DOUBLESHARP, "")
                             .replace(DOUBLEFLAT, "");
                         const i = ["ti", "la", "sol", "fa", "mi", "re", "do"].indexOf(stripped);
-                        if (this.blocks.blockList[c1].value.indexOf(SHARP) !== -1) {
+                        if (this.blocks.blockList[c1].value.includes(SHARP)) {
                             return solfnotes_[i] + SHARP + " " + this.blocks.blockList[c2].value;
-                        } else if (this.blocks.blockList[c1].value.indexOf(FLAT) !== -1) {
+                        } else if (this.blocks.blockList[c1].value.includes(FLAT)) {
                             return solfnotes_[i] + FLAT + " " + this.blocks.blockList[c2].value;
-                        } else if (this.blocks.blockList[c1].value.indexOf(DOUBLESHARP) !== -1) {
+                        } else if (this.blocks.blockList[c1].value.includes(DOUBLESHARP)) {
                             return (
                                 solfnotes_[i] + DOUBLESHARP + " " + this.blocks.blockList[c2].value
                             );
-                        } else if (this.blocks.blockList[c1].value.indexOf(DOUBLEFLAT) !== -1) {
+                        } else if (this.blocks.blockList[c1].value.includes(DOUBLEFLAT)) {
                             return (
                                 solfnotes_[i] + DOUBLEFLAT + " " + this.blocks.blockList[c2].value
                             );
@@ -2656,12 +2654,12 @@ class Block {
         this.text.y = Math.floor((TEXTY * blockScale) / 2 + 0.5);
 
         // Some special cases
-        if (SPECIALINPUTS.indexOf(this.name) !== -1) {
+        if (SPECIALINPUTS.includes(this.name)) {
             this.text.textAlign = "center";
             this.text.x = Math.floor((VALUETEXTX * blockScale) / 2 + 10.0);
-            if (EXTRAWIDENAMES.indexOf(this.name) !== -1) {
+            if (EXTRAWIDENAMES.includes(this.name)) {
                 this.text.x *= 3.0;
-            } else if (WIDENAMES.indexOf(this.name) !== -1) {
+            } else if (WIDENAMES.includes(this.name)) {
                 this.text.x = Math.floor(this.text.x * 1.75 + 0.5);
             } else if (this.name === "text") {
                 this.text.x = Math.floor(this.width / 2 + 0.5);
@@ -2834,13 +2832,9 @@ class Block {
             if (!moved && that.isCollapsible() && dx < 30 / that.activity.getStageScale()) {
                 that.collapseToggle();
             } else if ((!window.hasMouse && getInput) || (window.hasMouse && !moved)) {
-                if (that.name === "media") {
+                if (["media", "audiofile", "loadFile"].includes(that.name)) {
                     that._doOpenMedia(thisBlock);
-                } else if (that.name === "audiofile") {
-                    that._doOpenMedia(thisBlock);
-                } else if (that.name === "loadFile") {
-                    that._doOpenMedia(thisBlock);
-                } else if (SPECIALINPUTS.indexOf(that.name) !== -1) {
+                } else if (SPECIALINPUTS.includes(that.name)) {
                     if (!that.trash) {
                         if (that._triggerLongPress) {
                             that._triggerLongPress = false;
@@ -2943,9 +2937,9 @@ class Block {
             if (
                 that?.name === "vspace" &&
                 that.blocks.blockList[that.connections[1]]?.name === "rest2"
-              ) {
+            ) {
                 return;
-              }
+            }
 
             // Do not allow a stack of blocks to be dragged if the stack contains a silence block.
             let block = that.blocks.blockList[that.connections[1]];
@@ -3133,8 +3127,8 @@ class Block {
                 this.blocks.adjustDocks(this.blocks.blockList.indexOf(this), true);
             }
         } else if (
-            SPECIALINPUTS.indexOf(this.name) !== -1 ||
-            ["media", "loadFile"].indexOf(this.name) !== -1
+            SPECIALINPUTS.includes(this.name) ||
+            ["media", "loadFile"].includes(this.name)
         ) {
             if (!haveClick) {
                 // Simulate click on Android.
@@ -3186,7 +3180,7 @@ class Block {
         this._check_meter_block = null;
 
         // Special pie menus
-        if (PIEMENUS.indexOf(this.name) !== -1) {
+        if (PIEMENUS.includes(this.name)) {
             return true;
         }
 
@@ -3383,21 +3377,20 @@ class Block {
 
         const labelElem = docById("labelDiv");
 
-        var safetext = function(text){
+        const safetext = (text) => {
             // Best to avoid using these special characters in text strings
             // without first converting them to their "safe" form.
-            var table = {
-                '<': 'lt',
-                '>': 'gt',
-                '"': 'quot',
-                '\'': 'apos',
-                '&': 'amp',
-                '\r': '#10',
-                '\n': '#13'
+            const table = {
+                "<": "lt",
+                ">": "gt",
+                '"': "quot",
+                "'": "apos",
+                "&": "amp",
+                "\r": "#10",
+                "\n": "#13"
             };
-        
-            return text.toString().replace(/[<>"'\r\n&]/g, function(chr){
-                return '&' + table[chr] + ';';
+            return text.toString().replace(/[<>"'\r\n&]/g, (chr) => {
+                return "&" + table[chr] + ";";
             });
         };
 
@@ -3561,7 +3554,7 @@ class Block {
             const categories = [];
             const categoriesList = [];
             for (let i = 0; i < DRUMNAMES.length; i++) {
-                if (EFFECTSNAMES.indexOf(DRUMNAMES[i][1]) === -1) {
+                if (!EFFECTSNAMES.includes(DRUMNAMES[i][1])) {
                     const label = _(DRUMNAMES[i][1]);
                     if (getTextWidth(label, "bold 30pt Sans") > 400) {
                         drumLabels.push(label.substr(0, 8) + "...");
@@ -3571,7 +3564,7 @@ class Block {
 
                     drumValues.push(DRUMNAMES[i][1]);
 
-                    if (categoriesList.indexOf(DRUMNAMES[i][4]) === -1) {
+                    if (!categoriesList.includes(DRUMNAMES[i][4])) {
                         categoriesList.push(DRUMNAMES[i][4]);
                     }
 
@@ -3592,7 +3585,7 @@ class Block {
             const effectcategories = [];
             const effectcategoriesList = [];
             for (let i = 0; i < DRUMNAMES.length; i++) {
-                if (EFFECTSNAMES.indexOf(DRUMNAMES[i][1]) !== -1) {
+                if (EFFECTSNAMES.includes(DRUMNAMES[i][1])) {
                     const label = _(DRUMNAMES[i][1]);
                     if (getTextWidth(label, "Bold 30pt Sans") > 400) {
                         effectLabels.push(label.substr(0, 8) + "...");
@@ -3602,7 +3595,7 @@ class Block {
 
                     effectValues.push(DRUMNAMES[i][1]);
 
-                    if (effectcategoriesList.indexOf(DRUMNAMES[i][4]) === -1) {
+                    if (!effectcategoriesList.includes(DRUMNAMES[i][4])) {
                         effectcategoriesList.push(DRUMNAMES[i][4]);
                     }
 
@@ -3673,7 +3666,7 @@ class Block {
 
                 voiceValues.push(VOICENAMES[i][1]);
 
-                if (categoriesList.indexOf(VOICENAMES[i][3]) === -1) {
+                if (!categoriesList.includes(VOICENAMES[i][3])) {
                     categoriesList.push(VOICENAMES[i][3]);
                 }
 
@@ -3702,7 +3695,7 @@ class Block {
 
                 noiseValues.push(NOISENAMES[i][1]);
 
-                if (categoriesList.indexOf(NOISENAMES[i][3]) === -1) {
+                if (!categoriesList.includes(NOISENAMES[i][3])) {
                     categoriesList.push(NOISENAMES[i][3]);
                 }
 
@@ -3810,7 +3803,7 @@ class Block {
                 values = this.protoblock.extraSearchTerms;
                 labels = this.protoblock.piemenuLabels;
             }
-            if (values.indexOf(selectedValue) === -1) {
+            if (!values.includes(selectedValue)) {
                 selectedValue = values[3];  // letter class
             }
             piemenuBasic(this, labels, values, selectedValue, platformColor.piemenuBasic);
@@ -3848,7 +3841,7 @@ class Block {
                     cblk = this.blocks.blockList[cblk].connections[0];
                     if (
                         cblk !== null &&
-                        ["rhythm2", "stuplet"].indexOf(this.blocks.blockList[cblk].name) !== -1
+                        ["rhythm2", "stuplet"].includes(this.blocks.blockList[cblk].name)
                     ) {
                         piemenuNumber(this, [2, 4, 8, 16], this.value);
                     } else {
@@ -3874,9 +3867,9 @@ class Block {
                     cblk = this.blocks.blockList[cblk].connections[0];
                     if (
                         cblk !== null &&
-                        ["neighbor", "neighbor2", "rhythm2", "stuplet"].indexOf(
+                        ["neighbor", "neighbor2", "rhythm2", "stuplet"].includes(
                             this.blocks.blockList[cblk].name
-                        ) !== -1
+                        )
                     ) {
                         values = [3, 2, 1];
                     }
@@ -4030,7 +4023,7 @@ class Block {
              * @returns {void}
              */
             let __keypress = (event) =>{
-                if ([13, 10, 9].indexOf(event.keyCode) !== -1) {
+                if ([13, 10, 9].includes(event.keyCode)) {
                     __blur(event);
                 }
             };
@@ -4079,7 +4072,7 @@ class Block {
      * @returns {void}
      */
     _exitKeyPressed(event) {
-        if ([13, 10, 9].indexOf(event.keyCode) !== -1) {
+        if ([13, 10, 9].includes(event.keyCode)) {
             this._labelChanged(true, false);
             event.preventDefault();
             this.label.removeEventListener("keypress", this._exitKeyPressed);
@@ -4446,7 +4439,7 @@ class Block {
         }
 
         if (
-            WIDENAMES.indexOf(this.name) === -1 &&
+            !WIDENAMES.includes(this.name) &&
             getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH
         ) {
             let slen = label.length - 5;
@@ -4575,14 +4568,8 @@ class Block {
         this._labelLock = false;
 
         // Load the synth for the selected drum.
-        if (this.name === "drumname") {
+        if (["drumname", "effectsname", "voicename", "noisename"].includes(this.name)) {
             this.activity.logo.synth.loadSynth(0, getDrumSynthName(this.value));
-        } else if (this.name === "effectsname") {
-            this.activity.logo.synth.loadSynth(0, getDrumSynthName(this.value));
-        } else if (this.name === "voicename") {
-            this.activity.logo.synth.loadSynth(0, getVoiceSynthName(this.value));
-        } else if (this.name === "noisename") {
-            this.activity.logo.synth.loadSynth(0, getNoiseSynthName(this.value));
         }
     }
 }

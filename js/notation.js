@@ -180,7 +180,7 @@ class Notation {
                 insideChord,
                 false
             ]);
-        } else if (["noise1", "noise2", "noise3"].indexOf(drum[0]) === -1) {
+        } else if (!["noise1", "noise2", "noise3"].includes(drum[0])) {
             const drumSymbol = getDrumSymbol(drum[0]);
             this._notationDrumStaging[turtle].push([
                 [drumSymbol],
@@ -347,13 +347,6 @@ class Notation {
             this._notationStaging[turtle].push("pickup", beat);
             this._pickupPOW2[turtle] = true;
         } else {
-            if (this.activity.logo.runningLilypond) {
-                obj = rationalToFraction(factor);
-                this.activity.errorMsg(
-                    _("Lilypond cannot process pickup of ") + obj[0] + "/" + obj[1]
-                );
-            }
-
             obj = rationalToFraction(1 - factor);
             for (let i = 0; i < obj[0]; i++) {
                 this.activity.logo.updateNotation(["R"], obj[1], turtle, false, "");

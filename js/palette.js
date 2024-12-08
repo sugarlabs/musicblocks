@@ -111,12 +111,13 @@ class Palettes {
             const element = document.createElement("div");
             element.id = "palette";
             element.setAttribute("class", "disable_highlighting");
+            element.classList.add('flex-palette')
             element.setAttribute(
                 "style",
-                "position: absolute; z-index: 1000; display: none ; left :0px; top:" + this.top + "px"
+                "position: absolute; z-index: 1000; left :0px; top:" + this.top + "px"
             );
             element.innerHTML =
-                '<div style="float: left"><table width ="' +
+                '<div style="height:fit-content"><table width ="' +
                 1.5 * this.cellSize +
                 'px"bgcolor="white"><thead><tr></tr></thead></table><table width ="' +
                 4.5 * this.cellSize +
@@ -269,7 +270,7 @@ class Palettes {
             listBody
         );
         for (const name of MULTIPALETTES[i]) {
-            if (this.activity.beginnerMode && SKIPPALETTES.indexOf(name) !== -1) {
+            if (this.activity.beginnerMode && SKIPPALETTES.includes(name)) {
                 continue;
             }
             if (name === "myblocks") {
@@ -330,8 +331,8 @@ class Palettes {
         if (this.mobile) {
             return;
         }
-
-        this.activity.hideSearchWidget(true);
+        // In order to open the search widget and palette menu simulataneously
+        // this.activity.hideSearchWidget(true);
         this.dict[name].showMenu(true);
         this.activePalette = name; // used to delete plugins
     }
@@ -382,6 +383,53 @@ class Palettes {
 
     show() {
         docById("palette").style.visibility = "visible";
+    }
+
+    clear() {
+        try {
+            // First hide all palettes
+            for (const name in this.dict) {
+                if (this.dict.hasOwnProperty(name)) {
+                    const palette = this.dict[name];
+                    if (palette && typeof palette.hideMenu === 'function') {
+                        palette.hideMenu();
+                    }
+                }
+            }
+    
+            // Remove the palette DOM element if it exists
+            const paletteElement = docById("palette");
+            if (paletteElement) {
+                paletteElement.parentNode.removeChild(paletteElement);
+            }
+    
+            // Clear the dictionary and reset state
+            this.dict = {};
+            this.visible = false;
+            this.activePalette = null;
+            this.paletteObject = null;
+
+            // Recreate the palette using the original initialization code
+            const element = document.createElement("div");
+            element.id = "palette";
+            element.setAttribute("class", "disable_highlighting");
+            element.classList.add('flex-palette');
+            element.setAttribute(
+                "style",
+                `position: fixed; z-index: 1000; left: 0px; top: ${60+this.top}px; overflow-y: auto;`
+            );
+            element.innerHTML =
+                '<div style="height:fit-content"><table width ="' +
+                1.5 * this.cellSize +
+                'px"bgcolor="white"><thead><tr></tr></thead></table><table width ="' +
+                4.5 * this.cellSize +
+                'px"bgcolor="white"><thead><tr><td style= "width:28px"></tr></thead><tbody></tbody></table></div>';
+            element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
+            document.body.appendChild(element);
+    
+        } catch (e) {
+            console.error('Error clearing palettes:', e);
+        }
     }
 
     setBlocks(blocks) {
@@ -893,7 +941,7 @@ class Palette {
             let img = makePaletteIcons(b.artwork);
 
             if (b.image) {
-                if (["media", "camera", "video"].indexOf(b.blkname) !== -1) {
+                if (["media", "camera", "video"].includes(b.blkname)) {
                     // Use artwork.js strings as images for:
                     // cameraPALETTE, videoPALETTE, mediaPALETTE
                     img = makePaletteIcons(eval(b.blkname + "PALETTE"));
@@ -1029,15 +1077,15 @@ class Palette {
 
         for (let i = 0; i < this.model.blocks.length; i++) {
             if (
-                ["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].indexOf(
+                ["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].includes(
                     this.model.blocks[i].blkname
-                ) !== -1 &&
+                ) &&
                 this.model.blocks[i].modname === name
             ) {
                 this.model.blocks.splice(i, 1);
                 break;
             } else if (
-                ["storein"].indexOf(this.model.blocks[i].blkname) !== -1 &&
+                ["storein"].includes(this.model.blocks[i].blkname) &&
                 this.model.blocks[i].modname === _("store in") + " " + name
             ) {
                 this.model.blocks.splice(i, 1);
@@ -1049,7 +1097,7 @@ class Palette {
     add(protoblock, top) {
         // Add a new palette entry to the end of the list (default) or
         // to the top.
-        if (this.protoList.indexOf(protoblock) === -1) {
+        if (!this.protoList.includes(protoblock)) {
             if (top) this.protoList.push(protoblock);
             else this.protoList.push(protoblock);
         }
@@ -1190,17 +1238,17 @@ class Palette {
         const lastBlock = this.activity.blocks.blockList.length;
 
         if (
-            ["namedbox", "nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(
+            !["namedbox", "nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].includes(
                 protoblk.name
-            ) === -1 &&
+            ) &&
             blockIsMacro(this.activity, blkname)
         ) {
             this._makeBlockFromProtoblock(protoblk, true, blkname, null, 100, 100);
             callback(lastBlock);
         } else if (
-            ["namedbox", "nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(
+            !["namedbox", "nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].includes(
                 protoblk.name
-            ) === -1 &&
+            ) &&
             blkname in this.palettes.pluginMacros
         ) {
             this._makeBlockFromProtoblock(protoblk, true, blkname, null, 100, 100);
@@ -1236,9 +1284,9 @@ class Palette {
 
             let macroExpansion = null;
             if (
-                ["namedbox", "nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(
+                !["namedbox", "nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].includes(
                     protoblk.name
-                ) === -1
+                )
             ) {
                 macroExpansion = getMacroExpansion(this.activity, blkname, saveX, saveY);
                 if (macroExpansion === null) {
