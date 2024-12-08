@@ -54,6 +54,7 @@ const processABCNotes = function(logo, turtle) {
      * @param {string|number} note - The musical note to convert. It can be a string note (e.g., 'C#') or a frequency (number).
      * @returns {string} The note converted to ABC notation.
      */
+
     const __toABCnote = (note) => {
         // beams -- no space between notes
         // ties use ()
@@ -64,41 +65,47 @@ const processABCNotes = function(logo, turtle) {
         // Also, notes must be lowercase.
         // And the octave bounday is at C, not A.
 
+        const OCTAVE_NOTATION_MAP = {
+            10: "'''''",
+            9: "''''",
+            8: "'''",
+            7: "''",
+            6: "'",
+            5: "",
+            4: "",
+            3: ",",
+            2: ",,",
+            1: ",,,"
+        };
+
+        const ACCIDENTAL_MAP = {
+            "♯": "^",
+            "♭": "_"
+        };
+
+        // Handle frequency conversion
         if (typeof note === "number") {
             const pitchObj = frequencyToPitch(note);
             note = pitchObj[0] + pitchObj[1];
         }
 
-        const replacements = {
-            "♯": "^",
-            "♭": "_",
-            "10": "'''''",
-            "9": "''''",
-            "8": "'''",
-            "7": "''",
-            "6": "'",
-            "5": "",
-            "4": "",
-            "3": ",",
-            "2": ",,",
-            "1": ",,,"
-        };
+        // Handle accidentals first
+        for (const [symbol, replacement] of Object.entries(ACCIDENTAL_MAP)) {
+            note = note.replace(new RegExp(symbol, "g"), replacement);
+        }
 
-        for (const [key, value] of Object.entries(replacements)) {
-            if (note.includes(key)) {
-                note = note.replace(new RegExp(key, "g"), value);
-                if (key.length === 1) break;
+        // Handle octave notation
+        for (const [octave, notation] of Object.entries(OCTAVE_NOTATION_MAP)) {
+            if (note.includes(octave)) {
+                note = note.replace(new RegExp(octave, "g"), notation);
+                break;  // Only one octave notation should apply
             }
         }
 
-        // Convert to uppercase or lowercase based on the octave
-        if (note.includes("'''") || note.includes("''") || note.includes("'") || note.includes("")) {
-            return note.toLowerCase();
-        } else {
-            return note.toUpperCase();
-        }
+        // Convert case based on octave
+        return note.includes("'") || note === "" ? note.toLowerCase() : note.toUpperCase();
     };
-
+    
     let counter = 0;
     let queueSlur = false;
     let articulation = false;
