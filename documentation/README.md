@@ -117,9 +117,20 @@ The **Secondary** toolbar appears when you click the **hamburger button** (three
 
 -   **Run Slowly**: Executes the program slowly to allow you to follow the process step by step.
 -   **Run Step by Step**: Runs the program one step at a time, ideal for debugging and analysis.
--   **Display Statistics**: Displays project statistics such as performance metrics.
--   **Beginner/Advanced Mode**: Switches between a simplified view for beginners and a more advanced view for experienced users.
--   **Language Selector**: Allows you to change the language of the interface.
+-   **Merge with Current Project**: Combines the current project with another, promoting collaboration and reusability.
+-   **Turtle Wrap**: Enables wrapping of the turtle's position to seamlessly continue from the opposite edge of the canvas.
+-   **Set Pitch Preview**: Lets users preview pitches while composing, providing instant feedback.
+-   **Restore**: Resets changes and restores the project to its last saved state
+-   **Switch to Advanced Mode**: Quickly transition from Beginner to Advanced mode for more tools and customization options.
+        <h4>These are the extra options you get when you access the advanced mode:</h4>
+        1. *Display Statistics*: Provides insights into project performance, such as usage and execution metrics.<br>
+        2. *Load Plugin*: Integrates external plugins to enhance functionality and extend features.<br>
+        3. *Delete Plugin*: Allows the removal of plugins that are no longer needed.<br>
+        4. *Horizontal Scrolling*: Enables horizontal navigation for easier handling of large projects.<br>
+        5. *JavaScript Editor*: Includes an editor for writing and embedding custom JavaScript code.<br>
+        6.*Record*: Adds a "Record" button to the main palette, enabling users to record their compositions directly.
+
+-   **Select Language**: Offers a multilingual interface, allowing users to change the language as per their preference.
 
 ---
 
@@ -154,7 +165,31 @@ Located at the lower right of the canvas, this small toolbar provides additional
 
 ### 6. Contextual Menu
 
-In addition to the main toolbars, there is a contextual menu that appears whenever you **right-click** on a block. This menu offers options for modifying block parameters, making it easier to fine-tune your project.
+#### Contextual Menu for Blocks:
+When you right-click on a block, the following options are available:
+- **Extract**: Detaches the selected block from its current position, making it a standalone entity.
+- **Move to Trash**: Deletes the selected block by moving it to the trash.
+- **Duplicate**: Creates an identical copy of the selected block for reuse.
+- **Help**: Provides detailed information about the functionality of the selected block.
+- **Close**: Closes the contextual menu.
+
+#### Contextual Menu for Background:
+When you right-click on the background, the following options are available:
+- **Grid**: Toggles the display of a grid in the workspace for better alignment and organization.
+- **Set Pitch Preview**: Adjusts and previews pitches while working on a composition.
+- **Enable Horizontal Scrolling**: Allows horizontal navigation for easier management of large projects.
+- **Turtle Wrap Off**: Toggles the turtle wrap feature, which determines whether the turtle wraps around the canvas edges.
+- **Restore**: Reverts the workspace to its last saved state.
+- **Increase Block Size**: Enlarges the size of all blocks for better visibility.
+- **Decrease Block Size**: Shrinks the size of all blocks to save space.
+- **Expand/Collapse Block**: Expands or collapses individual blocks to show or hide their details.
+- **Show/Hide Block**: Toggles the visibility of selected blocks in the workspace.
+- **Home**: Centers the workspace view on the initial starting point.
+- **Close**: Exits the contextual menu.
+- **Search for Blocks**: Opens a search bar to locate specific blocks within the workspace.
+- **Collapse**: Collapses all blocks to their minimal state.
+- **Clean**: Organizes and tidies up the workspace by aligning blocks systematically.
+- **Select**: Enables selection mode for selecting multiple blocks or elements in the workspace.
 
 ---
 
