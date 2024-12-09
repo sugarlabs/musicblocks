@@ -2751,7 +2751,7 @@ function MusicKeyboard(activity) {
                               ")</small><br/>"
                             : "";
                 }
-                if (p >= 0 && p < this.layout.length) {
+                if (p < this.layout.length) {
                     this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
                     this.layout[p].objId = "blackRow" + myrow2Id.toString();
                 }
