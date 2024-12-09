@@ -479,11 +479,13 @@ class Activity {
                 if (docById("helpfulWheelDiv").style.display !== "none") {
                     docById("helpfulWheelDiv").style.display = "none";
                 }
-                if (docById("helpfulSearchDiv").style.display !== "none" && e.target.id !== "helpfulSearch") {
+                if (docById("helpfulSearchDiv").style.display !== "none" && !docById("helpfulSearchDiv").contains(e.target) && e.target.id !== "helpfulSearch") {
                     docById("helpfulSearchDiv").style.display = "none";
                 }
                 that.__tick();
         }
+
+        document.addEventListener("click", this._hideHelpfulSearchWidget);
 
         /*
          * Sets up right click functionality opening the context menus
