@@ -108,6 +108,14 @@ function SampleWidget() {
      */
     this.pitchAnalysers = {};
 
+     // Properties for live microphone waveform visualization
+     this.audioContext = null;      
+     this.analyser = null;          
+     this.mediaStreamSource = null; 
+     this.dataArray = null;         
+     this.bufferLength = 0;         
+     this.isVisualizing = false;    
+
     /**
      * Updates the blocks related to the sample.
      * @private
@@ -307,7 +315,7 @@ function SampleWidget() {
      * @param {object} activity - The activity object.
      * @returns {void}
      */
-    this.init = function (activity) {
+    this.init = async function (activity) {
         this.activity = activity;
         this._directions = [];
         this._widgetFirstTimes = [];
@@ -503,6 +511,7 @@ function SampleWidget() {
                         that._addSample();
                     };
                     can_record = true;
+                    return stream;
                 } catch (err) {
                     console.log("The following error occurred: " + err);
                 }
@@ -516,9 +525,13 @@ function SampleWidget() {
                 recorder.start();   
                 buttonElement.getElementsByTagName('img')[0].src = "header-icons/record.svg"; 
                 displayRecordingStartMessage.call(that);
+                // turn on visualization
+                that.isVisualizing = true; 
             } else {
                 recorder.stop();
                 buttonElement.getElementsByTagName('img')[0].src = "header-icons/mic.svg"; 
+                // turn off visualization
+                that.isVisualizing = false; 
             }
         }
         
@@ -530,6 +543,18 @@ function SampleWidget() {
             } else {
                 console.error("No recorded audio available.");
             }
+        }
+
+        const stream = await setUpAudio();
+        // Initialize audio visualization for microphone waveform
+        if (stream) {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            this.analyser = this.audioContext.createAnalyser();
+            this.analyser.fftSize = 2048;
+            this.bufferLength = this.analyser.frequencyBinCount;
+            this.dataArray = new Uint8Array(this.bufferLength);
+            this.mediaStreamSource = this.audioContext.createMediaStreamSource(stream);
+            this.mediaStreamSource.connect(this.analyser);
         }
         
         setUpAudio();
@@ -979,19 +1004,45 @@ function SampleWidget() {
                 canvasCtx.fillText(_("reference tone"), 10, 10);
                 canvasCtx.fillText(oscText, 10, canvas.height / 2 + 10);
 
-                for (let turtleIdx = 0; turtleIdx < 2; turtleIdx += 1) {
-                    const dataArray = this.pitchAnalysers[turtleIdx].getValue();
+                for (let idx = 0; idx < 2; idx += 1) {
+                    let dataArray;
+                    let useMicData = (idx === 1 && this.isVisualizing && this.analyser);
+    
+                    if (useMicData) {
+                        // Get mic data for the red line
+                        this.analyser.getByteTimeDomainData(this.dataArray);
+                        dataArray = this.dataArray;
+                    } else {
+                        // Use pitch analyser data
+                        dataArray = this.pitchAnalysers[idx].getValue();
+                    }
+    
                     const bufferLength = dataArray.length;
-                    const rbga = SAMPLEOSCCOLORS[turtleIdx];
-                    const sliceWidth = (width * this.zoomFactor) / bufferLength;
+                    const rbga = SAMPLEOSCCOLORS[idx];
                     canvasCtx.lineWidth = 2;
                     canvasCtx.strokeStyle = rbga;
                     canvasCtx.beginPath();
-
+    
                     let x = 0;
-
+                    // For pitch data (idx == 0 or !this.isVisualizing), we use original logic
+                    // For mic data (idx == 1 and this.isVisualizing), we use simple scaling
+                    let sliceWidth = (width * this.zoomFactor) / bufferLength;
+    
                     for (let i = 0; i < bufferLength; i++) {
-                        const y = (height / 2) * (1 - dataArray[i]) + this.verticalOffset;
+                        let y;
+                        if (useMicData) {
+                            // Mic waveform logic (replicating the separate canvas scenario)
+                            // dataArray[i] is 0-255, 128 is silence
+                            // Map silence (128) to center (height/2)
+                            const v = dataArray[i] / 128.0; // ~1 at silence
+                            // Direct mapping: no verticalOffset or (1 - data)
+                            // Just center around height/2
+                            y = v * (height / 2);
+                        } else {
+                            // Original pitch logic
+                            y = (height / 2) * (1 - dataArray[i]) + this.verticalOffset;
+                        }
+    
                         if (i === 0) {
                             canvasCtx.moveTo(x, y);
                         } else {
@@ -999,12 +1050,17 @@ function SampleWidget() {
                         }
                         x += sliceWidth;
                     }
+    
                     canvasCtx.lineTo(canvas.width, canvas.height / 2);
                     canvasCtx.stroke();
-                    this.verticalOffset = canvas.height / 4;
+    
+                    // Adjust verticalOffset only affects pitch data lines
+                    // For mic line, we don't rely on verticalOffset
+                    this.verticalOffset = canvas.height / 10;
                 }
             }
         };
         draw();
     };
+        
 }
