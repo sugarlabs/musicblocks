@@ -277,7 +277,15 @@ function setupRhythmBlockPaletteBlocks(activity) {
          * Constructs a SixtyFourthNoteBlock.
          */
         constructor() {
-            super("sixtyfourthNote", _("1/64 note") + " 𝅘𝅥𝅱");
+            if (isAppleBrowser()) {
+                super("sixtyfourthNote", _("1/64 note"));
+                // Custom generator only needed for Apple devices
+                this.appleNoteBlock();
+            } else {
+                // TRANS: Do not modify the following line
+                super("sixtyfourthNote", _("1/64 note") + " 𝅘𝅥𝅱");
+            }
+
             this.setPalette(rhythmBlockPalette, activity);
             this.setHelpString();
             this.makeMacro((x, y) => [
@@ -300,8 +308,14 @@ function setupRhythmBlockPaletteBlocks(activity) {
          * Constructs a ThirtySecondNoteBlock instance.
          */
         constructor() {
-            // TRANS: Do not modify the following line
-            super("thirtysecondNote", _("1/32 note") + " 𝅘𝅥𝅰");
+            if (isAppleBrowser()) {
+                super("thirtysecondNote", _("1/32 note"));
+                // Custom generator only needed for Apple devices
+                this.appleNoteBlock();
+            } else {
+                // TRANS: Do not modify the following line
+                super("thirtysecondNote", _("1/32 note") + " 𝅘𝅥𝅰");
+            }
 
             // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
@@ -328,8 +342,14 @@ function setupRhythmBlockPaletteBlocks(activity) {
          * Constructs a SixteenthNoteBlock instance.
          */
         constructor() {
-            // TRANS: Do not modify the following line
-            super("sixteenthNote", _("1/16 note") + " 𝅘𝅥𝅯");
+            if (isAppleBrowser()) {
+                super("sixteenthNote", _("1/16 note"));
+                // Custom generator only needed for Apple devices
+                this.appleNoteBlock();
+            } else {
+                // TRANS: Do not modify the following line
+                super("sixteenthNote", _("1/16 note") + " 𝅘𝅥𝅯");
+            }
 
             // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
@@ -412,8 +432,14 @@ function setupRhythmBlockPaletteBlocks(activity) {
          * Constructs a HalfNoteBlock instance.
          */
         constructor() {
-            // TRANS: Do not modify the following line
-            super("halfNote", _("half note") + " 𝅗𝅥");
+            if (isAppleBrowser()) {
+                super("halfNote", _("half note"));
+                // Custom generator only needed for Apple devices
+                this.appleNoteBlock();
+            } else {
+                // TRANS: Do not modify the following line
+                super("halfNote", _("half note") + " 𝅗𝅥");
+            }
 
             // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
@@ -440,8 +466,14 @@ function setupRhythmBlockPaletteBlocks(activity) {
          * Constructs a WholeNoteBlock instance.
          */
         constructor() {
-            // TRANS: Do not modify the following line
-            super("wholeNote", _("whole note") + " 𝅝");
+            if (isAppleBrowser()) {
+                super("wholeNote", _("whole note"));
+                // Custom generator only needed for Apple devices
+                this.appleNoteBlock();
+            } else {
+                // TRANS: Do not modify the following line
+                super("wholeNote", _("whole note") + " 𝅝");
+            }
 
             // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
@@ -995,4 +1027,14 @@ function setupRhythmBlockPaletteBlocks(activity) {
     new QuintupletBlock().setup(activity);
     new TripletBlock().setup(activity);
     new STupletBlock().setup(activity);
+}
+
+// Function to check if the browser is Safari or Chrome on a Mac or iPad
+function isAppleBrowser() {
+    const userAgent = navigator.userAgent;
+    const isMac = userAgent.includes('Macintosh');
+    const isIPad = userAgent.includes('iPad') || (userAgent.includes('Macintosh') && 'ontouchend' in document); // Detects iPad in desktop mode
+    const isSafari = userAgent.includes('Safari') && !userAgent.includes('Chrome');
+    const isChrome = userAgent.includes('Chrome');
+    return (isMac || isIPad) && (isSafari || isChrome);
 }
