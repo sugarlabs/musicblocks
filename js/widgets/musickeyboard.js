@@ -132,7 +132,7 @@ function MusicKeyboard(activity) {
      * @type {Array}
      */
     this.idContainer = [];
-  
+
     /**
      * Flag to track tick status.
      * @type {boolean}
@@ -179,7 +179,7 @@ function MusicKeyboard(activity) {
     // Each element in the array is [start time, note, id, duration, voice].
     this._notesPlayed = [];
 
-     /**
+    /**
      * Adds a row block to the keyboard.
      * @param {number} rowBlock - The row block to add.
      */
@@ -882,7 +882,7 @@ function MusicKeyboard(activity) {
 
     /**
      * Plays a sequence of musical notes recursively with a specified time delay.
-     * 
+     *
      * @param {number} counter - The index of the current note in the sequence.
      * @param {number} time - The time duration of the current note.
      * @param {HTMLElement} playButtonCell - The HTML element representing the play button.
@@ -970,7 +970,7 @@ function MusicKeyboard(activity) {
 
     /**
      * Plays a chord (multiple notes simultaneously) using a synthesizer.
-     * 
+     *
      * @param {string[]} notes - Array of note names to be played as a chord.
      * @param {number[]} noteValue - Array of note values (durations) for each note in the chord.
      * @param {string[]} instruments - Array of instrument names or identifiers for each note.
@@ -1026,7 +1026,7 @@ function MusicKeyboard(activity) {
 
     /**
      * Fills chromatic gaps in a given list of notes by padding with missing notes.
-     * 
+     *
      * @param {Object[]} noteList - List of notes represented as dictionaries containing `noteName` and `noteOctave`.
      * @returns {Object[]} A new list of notes with chromatic gaps filled.
      */
@@ -1173,7 +1173,7 @@ function MusicKeyboard(activity) {
 
     /**
      * Generates a sorted and filtered layout of keys based on note information.
-     * 
+     *
      * @returns {Object[]} An array of objects representing the layout of keys:
      * [
      *   {
@@ -1270,7 +1270,7 @@ function MusicKeyboard(activity) {
     /**
      * Sets notes in a specified column based on cell color markings.
      * Removes existing notes starting at the specified start time.
-     * 
+     *
      * @param {number} colIndex - The index of the column to set notes in.
      * @param {boolean} playNote - Indicates whether to trigger note playback.
      */
@@ -1310,7 +1310,7 @@ function MusicKeyboard(activity) {
 
     /**
      * Sets a note cell based on the provided parameters.
-     * 
+     *
      * @param {number} j - The row index of the note cell.
      * @param {number} colIndex - The column index of the note cell.
      * @param {string} start - The start time of the note.
@@ -1570,9 +1570,7 @@ function MusicKeyboard(activity) {
                 cell.style.maxWidth = cell.style.width;
 
                 if (
-                    selectedNotes[j].blockNumber.includes(
-                        this.displayLayout[n - i - 1].blockNumber
-                    )
+                    selectedNotes[j].blockNumber.includes(this.displayLayout[n - i - 1].blockNumber)
                 ) {
                     ind = selectedNotes[j].blockNumber.indexOf(
                         this.displayLayout[n - i - 1].blockNumber
@@ -1996,10 +1994,7 @@ function MusicKeyboard(activity) {
                         lastNote = null;
                     }
 
-                    if (
-                        pitchLabels[i].includes(lastNote) ||
-                        lastNote.includes(pitchLabels[i])
-                    ) {
+                    if (pitchLabels[i].includes(lastNote) || lastNote.includes(pitchLabels[i])) {
                         break;
                     }
                 }
@@ -2227,7 +2222,7 @@ function MusicKeyboard(activity) {
     /**
      * Creates a column pie submenu based on the provided index and condition.
      * @param {number} index - The index used to retrieve block information.
-     * @param {string} condition - The condition that determines the type of submenu to create ('synthsblocks' or 'pitchblocks').    
+     * @param {string} condition - The condition that determines the type of submenu to create ('synthsblocks' or 'pitchblocks').
      */
     this._createColumnPieSubmenu = function (index, condition) {
         index = parseInt(index);
@@ -2619,7 +2614,7 @@ function MusicKeyboard(activity) {
                 parenttbl2 = document.getElementById("myrow2");
                 newel2 = document.createElement("td");
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
-                if ([2, 6, 9, 13, 16, 20].includes(myrow2Id)) {
+                if ([2, 6, 9, 13, 16, 20, 23, 27, 30, 34].includes(myrow2Id)) {
                     parenttbl2.appendChild(newel2);
                     el = docById("blackRow" + myrow2Id.toString());
                     el.style.background = "transparent";
@@ -2717,7 +2712,7 @@ function MusicKeyboard(activity) {
                 newel2 = document.createElement("td");
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
                 newel2.style.textAlign = "center";
-                if ([2, 6, 9, 13, 16, 20].includes(myrow2Id)) {
+                if ([2, 6, 9, 13, 16, 20, 23, 27, 30, 34].includes(myrow2Id)) {
                     parenttbl2.appendChild(newel2);
                     el = docById("blackRow" + myrow2Id.toString());
                     el.style.background = "transparent";
@@ -2769,7 +2764,7 @@ function MusicKeyboard(activity) {
                 // elementid2 = document.getElementsByTagName("td").length;
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
                 newel2.style.textAlign = "center";
-                if ([2, 6, 9, 13, 16, 20].includes(myrow2Id)) {
+                if ([2, 6, 9, 13, 16, 20, 23, 27, 30, 34].includes(myrow2Id)) {
                     parenttbl2.appendChild(newel2);
                     el = docById("blackRow" + myrow2Id.toString());
                     el.style.background = "transparent";
@@ -2921,7 +2916,7 @@ function MusicKeyboard(activity) {
          * Adjacent notes with the same voice are clustered together to facilitate wrapping in "settimbre" block.
          * For example, notes like piano-do piano-re piano-mi guitar-fa piano-sol piano-la piano-ti
          * will be organized into clusters such as piano-[do re mi], guitar-fa, and piano-[sol la ti].
-         * 
+         *
          * @param {Array<Object>} selectedNotes - Array of selected notes to be processed.
          * @returns {Array<Array<number>>} - Array of arrays containing indices of selected notes grouped by voice.
          */
@@ -2957,7 +2952,7 @@ function MusicKeyboard(activity) {
         /**
          * Calculate the required length of the next "setTimbre" block based on selected notes.
          * This function computes the length of the next "setTimbre" block by considering the types and properties of the selected notes.
-         * 
+         *
          * @param {Array<Array<number>>} selectedNotesGrp - Groups of selected notes (indices) organized by voice similarity.
          * @param {Array<Object>} selectedNotes - Array of selected notes.
          * @returns {number} - Required length for the next "setTimbre" block.
