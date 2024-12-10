@@ -996,3 +996,13 @@ function setupRhythmBlockPaletteBlocks(activity) {
     new TripletBlock().setup(activity);
     new STupletBlock().setup(activity);
 }
+
+// Function to check if the browser is Safari or Chrome on a Mac or iPad
+function isAppleBrowser() {
+    const userAgent = navigator.userAgent;
+    const isMac = userAgent.includes('Macintosh');
+    const isIPad = userAgent.includes('iPad') || (userAgent.includes('Macintosh') && 'ontouchend' in document); // Detects iPad in desktop mode
+    const isSafari = userAgent.includes('Safari') && !userAgent.includes('Chrome');
+    const isChrome = userAgent.includes('Chrome');
+    return (isMac || isIPad) && (isSafari || isChrome);
+}
