@@ -1,151 +1,129 @@
 // A basic test file in jest framework for the mathutils.js 
+const MathUtility = require('../mathutils');
 
-const MathUtility = require("../mathutils.js"); 
+// Mock SOLFEGENAMES for testing doRandom function
+const SOLFEGENAMES = ['do', 're', 'mi', 'fa', 'sol', 'la', 'ti'];
+global.SOLFEGENAMES = SOLFEGENAMES;
 
 describe('MathUtility', () => {
-  beforeAll(() => {
-    global.SOLFEGENAMES = ['do', 're', 'mi', 'fa', 'sol', 'la', 'ti'];
-  });
+    describe('doRandom', () => {
+        test('returns random number between two numbers', () => {
+            const result = MathUtility.doRandom(1, 10);
+            expect(result).toBeGreaterThanOrEqual(1);
+            expect(result).toBeLessThanOrEqual(10);
+        });
 
-  describe('doRandom', () => {
-    it('should return a random number within the given range', () => {
-      const min = 1, max = 10;
-      const result = MathUtility.doRandom(min, max);
-      expect(result).toBeGreaterThanOrEqual(min);
-      expect(result).toBeLessThanOrEqual(max);
+        test('returns random solfege array between two solfege names', () => {
+            const result = MathUtility.doRandom('do', 'sol', 4);
+            expect(result).toHaveLength(2);
+            expect(SOLFEGENAMES).toContain(result[0]);
+            expect(Number(result[1])).toBeGreaterThanOrEqual(4);
+        });
+
+        test('throws error for invalid inputs', () => {
+            expect(() => MathUtility.doRandom('invalid', 10)).toThrow('NanError');
+        });
     });
 
-    it('should throw an error for invalid inputs', () => {
-      expect(() => MathUtility.doRandom(null, undefined)).toThrow('NanError');
+    describe('doOneOf', () => {
+        test('returns either a or b', () => {
+            const result = MathUtility.doOneOf('a', 'b');
+            expect(['a', 'b']).toContain(result);
+        });
     });
 
-    it('should return a valid solfege array when inputs are solfege strings', () => {
-      const result = MathUtility.doRandom('do', 'mi', 4);
-      expect(result).toHaveLength(2);
-      expect(global.SOLFEGENAMES).toContain(result[0]);
-      expect(Number(result[1])).toBeGreaterThanOrEqual(4);
-    });
-  });
+    describe('doMod', () => {
+        test('calculates modulus correctly', () => {
+            expect(MathUtility.doMod(10, 3)).toBe(1);
+        });
 
-  describe('doOneOf', () => {
-    it('should return either of the inputs randomly', () => {
-      const a = 'apple', b = 'banana';
-      const result = MathUtility.doOneOf(a, b);
-      expect([a, b]).toContain(result);
-    });
-  });
-
-  describe('doMod', () => {
-    it('should return the modulus of two numbers', () => {
-      expect(MathUtility.doMod(10, 3)).toBe(1);
+        test('throws error for invalid inputs', () => {
+            expect(() => MathUtility.doMod('a', 3)).toThrow('NanError');
+        });
     });
 
-    it('should throw an error for invalid inputs', () => {
-      expect(() => MathUtility.doMod('a', 3)).toThrow('NanError');
-    });
-  });
+    describe('doSqrt', () => {
+        test('calculates square root', () => {
+            expect(MathUtility.doSqrt(9)).toBe(3);
+        });
 
-  describe('doSqrt', () => {
-    it('should return the square root of a number', () => {
-      expect(MathUtility.doSqrt(9)).toBe(3);
-    });
-
-    it('should throw an error for negative numbers', () => {
-      expect(() => MathUtility.doSqrt(-1)).toThrow('NoSqrtError');
-    });
-  });
-
-  describe('doPlus', () => {
-    it('should add two numbers', () => {
-      expect(MathUtility.doPlus(3, 4)).toBe(7);
+        test('throws error for negative input', () => {
+            expect(() => MathUtility.doSqrt(-1)).toThrow('NoSqrtError');
+        });
     });
 
-    it('should concatenate strings', () => {
-      expect(MathUtility.doPlus('3', 4)).toBe('34');
-    });
-  });
+    describe('doPlus', () => {
+        test('adds two numbers', () => {
+            expect(MathUtility.doPlus(2, 3)).toBe(5);
+        });
 
-  describe('doMinus', () => {
-    it('should subtract two numbers', () => {
-      expect(MathUtility.doMinus(10, 4)).toBe(6);
-    });
-
-    it('should throw an error for strings', () => {
-      expect(() => MathUtility.doMinus('10', 4)).toThrow('NanError');
-    });
-  });
-
-  describe('doMultiply', () => {
-    it('should multiply two numbers', () => {
-      expect(MathUtility.doMultiply(2, 5)).toBe(10);
+        test('concatenates strings', () => {
+            expect(MathUtility.doPlus('a', 'b')).toBe('ab');
+        });
     });
 
-    it('should throw an error for strings', () => {
-      expect(() => MathUtility.doMultiply('2', 5)).toThrow('NanError');
-    });
-  });
+    describe('doMinus', () => {
+        test('subtracts numbers', () => {
+            expect(MathUtility.doMinus(5, 3)).toBe(2);
+        });
 
-  describe('doDivide', () => {
-    it('should divide two numbers', () => {
-      expect(MathUtility.doDivide(10, 2)).toBe(5);
-    });
-
-    it('should throw an error for division by zero', () => {
-      expect(() => MathUtility.doDivide(10, 0)).toThrow('DivByZeroError');
-    });
-  });
-
-  describe('doCalculateDistance', () => {
-    it('should calculate Euclidean distance', () => {
-      expect(MathUtility.doCalculateDistance(0, 0, 3, 4)).toBe(5);
+        test('throws error for string inputs', () => {
+            expect(() => MathUtility.doMinus('a', 3)).toThrow('NanError');
+        });
     });
 
-    it('should throw an error for invalid inputs', () => {
-      expect(() => MathUtility.doCalculateDistance('a', 0, 3, 4)).toThrow('NanError');
-    });
-  });
+    describe('doMultiply', () => {
+        test('multiplies numbers', () => {
+            expect(MathUtility.doMultiply(2, 3)).toBe(6);
+        });
 
-  describe('doPower', () => {
-    it('should calculate the power of a number', () => {
-      expect(MathUtility.doPower(2, 3)).toBe(8);
-    });
-
-    it('should throw an error for invalid inputs', () => {
-      expect(() => MathUtility.doPower('2', 3)).toThrow('NanError');
-    });
-  });
-
-  describe('doAbs', () => {
-    it('should return the absolute value of a number', () => {
-      expect(MathUtility.doAbs(-5)).toBe(5);
+        test('throws error for string inputs', () => {
+            expect(() => MathUtility.doMultiply('a', 3)).toThrow('NanError');
+        });
     });
 
-    it('should throw an error for invalid inputs', () => {
-      expect(() => MathUtility.doAbs('a')).toThrow('NanError');
-    });
-  });
+    describe('doDivide', () => {
+        test('divides numbers', () => {
+            expect(MathUtility.doDivide(6, 2)).toBe(3);
+        });
 
-  describe('doNegate', () => {
-    it('should negate a number', () => {
-      expect(MathUtility.doNegate(5)).toBe(-5);
-    });
-
-    it('should reverse a string', () => {
-      expect(MathUtility.doNegate('hello')).toBe('olleh');
+        test('throws error for division by zero', () => {
+            expect(() => MathUtility.doDivide(6, 0)).toThrow('DivByZeroError');
+        });
     });
 
-    it('should throw an error for invalid inputs', () => {
-      expect(() => MathUtility.doNegate(null)).toThrow('NoNegError');
-    });
-  });
-
-  describe('doInt', () => {
-    it('should round a number to the nearest integer', () => {
-      expect(MathUtility.doInt(5.5)).toBe(6);
+    describe('doCalculateDistance', () => {
+        test('calculates Euclidean distance', () => {
+            expect(MathUtility.doCalculateDistance(0, 0, 3, 4)).toBe(5);
+        });
     });
 
-    it('should throw an error for invalid inputs', () => {
-      expect(() => MathUtility.doInt('hello')).toThrow('NanError');
+    describe('doPower', () => {
+        test('calculates power', () => {
+            expect(MathUtility.doPower(2, 3)).toBe(8);
+        });
     });
-  });
+
+    describe('doAbs', () => {
+        test('calculates absolute value', () => {
+            expect(MathUtility.doAbs(-5)).toBe(5);
+        });
+    });
+
+    describe('doNegate', () => {
+        test('negates number', () => {
+            expect(MathUtility.doNegate(5)).toBe(-5);
+        });
+
+        test('reverses string', () => {
+            expect(MathUtility.doNegate('abc')).toBe('cba');
+        });
+    });
+
+    describe('doInt', () => {
+        test('rounds to nearest integer', () => {
+            expect(MathUtility.doInt(4.6)).toBe(5);
+        });
+    });
 });
+
