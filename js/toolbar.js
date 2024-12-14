@@ -822,14 +822,26 @@ class Toolbar {
                 // Horizontal Scroll
                 const enableHorizScrollIcon = docById("enableHorizScrollIcon");
                 const disableHorizScrollIcon = docById("disableHorizScrollIcon");
+                
                 if (enableHorizScrollIcon) {
                     enableHorizScrollIcon.style.display = "block";
-                    enableHorizScrollIcon.onclick = () => setScroller(this.activity);
+                    enableHorizScrollIcon.onclick = () => {
+                        setScroller(this.activity);
+                        this.activity.textMsg(
+                            _("Horizontal scrolling enabled.")
+                        );
+                    };
                 }
+                
                 if (disableHorizScrollIcon) {
-                    disableHorizScrollIcon.onclick = () => setScroller(this.activity);
+                    disableHorizScrollIcon.onclick = () => {
+                        setScroller(this.activity);
+                        this.activity.textMsg(
+                            _("Horizontal scrolling disabled.")
+                        );
+                    };
                 }
-
+                
                 // JavaScript Toggle
                 const toggleJavaScriptIcon = docById("toggleJavaScriptIcon");
                 if (toggleJavaScriptIcon) {
