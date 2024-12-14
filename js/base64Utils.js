@@ -28,3 +28,4 @@ function base64Decode(str) {
 }
 
 export default { base64Encode, base64Decode };
+//module.exports = { base64Encode, base64Decode };
