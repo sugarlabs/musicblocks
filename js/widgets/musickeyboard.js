@@ -2619,7 +2619,7 @@ function MusicKeyboard(activity) {
                 parenttbl2 = document.getElementById("myrow2");
                 newel2 = document.createElement("td");
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
-                if ([2, 6, 9, 13, 16, 20].includes(myrow2Id)) {
+                if ([2, 6, 9, 13, 16, 20, 23, 27, 30, 34, 37, 41, 44, 48, 51, 55, 58, 62].includes(myrow2Id)) {
                     parenttbl2.appendChild(newel2);
                     el = docById("blackRow" + myrow2Id.toString());
                     el.style.background = "transparent";
@@ -2717,7 +2717,7 @@ function MusicKeyboard(activity) {
                 newel2 = document.createElement("td");
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
                 newel2.style.textAlign = "center";
-                if ([2, 6, 9, 13, 16, 20].includes(myrow2Id)) {
+                if ([2, 6, 9, 13, 16, 20, 23, 27, 30, 34, 37, 41, 44, 48, 51, 55, 58, 62].includes(myrow2Id)) {
                     parenttbl2.appendChild(newel2);
                     el = docById("blackRow" + myrow2Id.toString());
                     el.style.background = "transparent";
@@ -2769,7 +2769,7 @@ function MusicKeyboard(activity) {
                 // elementid2 = document.getElementsByTagName("td").length;
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
                 newel2.style.textAlign = "center";
-                if ([2, 6, 9, 13, 16, 20].includes(myrow2Id)) {
+                if ([2, 6, 9, 13, 16, 20, 23, 27, 30, 34, 37, 41, 44, 48, 51, 55, 58, 62].includes(myrow2Id)) {
                     parenttbl2.appendChild(newel2);
                     el = docById("blackRow" + myrow2Id.toString());
                     el.style.background = "transparent";
