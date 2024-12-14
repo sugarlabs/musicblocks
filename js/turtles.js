@@ -891,57 +891,6 @@ Turtles.TurtlesView = class {
             };
         };
 
-        const renderClearConfirmation = () => {
-            const modalContainer = document.getElementById("clear-modal-container");
-            const clearDropdown = document.getElementById("cleardropdown");
-            clearDropdown.innerHTML = "";
-        
-            const title = document.createElement("div");
-            title.innerHTML = `<h2 style="color: #0066FF; font-size: 24px; text-align: left; margin: 0;">${_("Clear Workspace")}</h2>`;
-            clearDropdown.appendChild(title);
-        
-            const confirmationMessage = document.createElement("div");
-            confirmationMessage.innerHTML = `<div style="color: #666666; font-size: 16px; margin-bottom: 24px; text-align: left;">
-                ${_("Are you sure you want to clear the workspace ?")}
-            </div>`;
-            clearDropdown.appendChild(confirmationMessage);
-        
-            const confirmButton = document.createElement("button");
-            confirmButton.innerHTML = _("Confirm");
-            confirmButton.style.cssText = `
-                background-color: #2196F3;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                padding: 8px 16px;
-                font-weight: bold;
-                cursor: pointer;
-                margin-right: 16px;
-            `;
-            confirmButton.onclick = () => {
-                this.activity._allClear(); 
-                modalContainer.style.display = "none";
-            };
-            clearDropdown.appendChild(confirmButton);
-        
-            const cancelButton = document.createElement("button");
-            cancelButton.innerHTML = _("Cancel");
-            cancelButton.style.cssText = `
-                background-color: #f1f1f1;
-                color: black;
-                border: none;
-                border-radius: 4px;
-                padding: 8px 16px;
-                font-weight: bold;
-                cursor: pointer;
-            `;
-            cancelButton.onclick = () => {
-                modalContainer.style.display = "none"; 
-            };
-            clearDropdown.appendChild(cancelButton);
-        
-            modalContainer.style.display = "flex";
-        };
         
         
         const __makeClearButton = () => {
@@ -957,9 +906,10 @@ Turtles.TurtlesView = class {
             );
         
             // Assign click listener to the Clear button
-            this._clearButton.onclick = renderClearConfirmation;
+            this._clearButton.onclick = () => {
+                this.activity._allClear();
+            };
         };
-        
 
         /**
          * Makes collapse button by initailising 'COLLAPSEBUTTON' SVG.
