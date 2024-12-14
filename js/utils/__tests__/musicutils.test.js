@@ -41,7 +41,7 @@ describe("musicutils", () => {
 });
 
 describe("Temperament Functions", () => {
-    test("getTemperamentsList should return the list of temperaments", () => {
+    it("getTemperamentsList should return the list of temperaments", () => {
         expect(getTemperamentsList()).toEqual([
             [_("Equal (12EDO)"), "equal", "equal"],
             [_("Equal (5EDO)"), "equal5", "equal5"],
@@ -114,35 +114,35 @@ describe("Temperament Functions", () => {
           };
         });
       
-        test("addTemperamentToList should add a new temperament if not predefined", () => {
+        it("addTemperamentToList should add a new temperament if not predefined", () => {
           const newEntry = "customTemperament";
           addTemperamentToList(newEntry);
           expect(TEMPERAMENTS).toContain(newEntry);
         });
       
-        test("addTemperamentToList should not add a predefined temperament", () => {
+        it("addTemperamentToList should not add a predefined temperament", () => {
           const predefinedEntry = "equal";
           addTemperamentToList(predefinedEntry);
           expect(TEMPERAMENTS).not.toContain(predefinedEntry);
         });
       
-        test("deleteTemperamentFromList should remove a temperament from the dictionary", () => {
+        it("deleteTemperamentFromList should remove a temperament from the dictionary", () => {
           const oldEntry = "equal";
           deleteTemperamentFromList(oldEntry);
           expect(TEMPERAMENT[oldEntry]).toBeUndefined();
         });
       
-        test("addTemperamentToDictionary should add a new temperament to the dictionary", () => {
+        it("addTemperamentToDictionary should add a new temperament to the dictionary", () => {
           const entryName = "newTemperament";
           const entryValue = {
             pitchNumber: 7,
             interval: ["perfect 1", "minor 3", "major 3"]
           };
           addTemperamentToDictionary(entryName, entryValue);
-          expect(TEMPERAMENT[entryName]).toEqual(entryValue);
+          it(TEMPERAMENT[entryName]).toEqual(entryValue);
         });
       
-        test("updateTemperaments should update TEMPERAMENTS with new entries", () => {
+        it("updateTemperaments should update TEMPERAMENTS with new entries", () => {
           const newEntry = "customTemperament";
           TEMPERAMENT[newEntry] = {
             pitchNumber: 8,
@@ -152,7 +152,7 @@ describe("Temperament Functions", () => {
           expect(TEMPERAMENTS.some(([_, name]) => name === newEntry)).toBe(true);
         });
       
-        test("updateTemperaments should not duplicate predefined temperaments", () => {
+        it("updateTemperaments should not duplicate predefined temperaments", () => {
           updateTemperaments();
           const predefinedEntries = TEMPERAMENTS.filter(([_, name]) => name in PreDefinedTemperaments);
           expect(predefinedEntries.length).toBe(Object.keys(PreDefinedTemperaments).length);
@@ -161,20 +161,20 @@ describe("Temperament Functions", () => {
 });
 
 describe("Constants", () => {
-    test("should have correct default values", () => {
+    it("should have correct default values", () => {
         expect(DEFAULTINVERT).toBe("even");
         expect(DEFAULTMODE).toBe("major");
     });
 });
 
 describe("customMode", () => {
-    test("should return custom mode from MUSICALMODES", () => {
+    it("should return custom mode from MUSICALMODES", () => {
         expect(customMode).toEqual([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     });
 });
 
 describe("getInvertMode", () => {
-    test("should return the correct invert mode name", () => {
+    it("should return the correct invert mode name", () => {
         expect(getInvertMode("even")).toBe("even");
         expect(getInvertMode("scalar")).toBe("scalar");
         expect(getInvertMode("nonexistent")).toBe("nonexistent");
@@ -182,21 +182,21 @@ describe("getInvertMode", () => {
 });
 
 describe("getIntervalNumber", () => {
-    test("should return the number of semi-tones for a given interval", () => {
+    it("should return the number of semi-tones for a given interval", () => {
         expect(getIntervalNumber("perfect 5")).toBe(7);
         expect(getIntervalNumber("major 3")).toBe(4);
     });
 });
 
 describe("getIntervalDirection", () => {
-    test("should return the direction of the interval", () => {
+    it("should return the direction of the interval", () => {
         expect(getIntervalDirection("diminished 6")).toBe(-1);
         expect(getIntervalDirection("minor 3")).toBe(-1);
     });
 });
 
 describe("getIntervalRatio", () => {
-    test("should return the ratio for a given interval", () => {
+    it("should return the ratio for a given interval", () => {
         expect(getIntervalRatio("perfect 5")).toBe(1.5);
         expect(getIntervalRatio("major 3")).toBe(1.25);
     });
@@ -205,17 +205,17 @@ describe("getIntervalRatio", () => {
 //
 
 describe("getModeNumbers", () => {
-    test("should return the correct mode numbers for a valid mode", () => {
+    it("should return the correct mode numbers for a valid mode", () => {
         expect(getModeNumbers("chromatic")).toBe("0 1 2 3 4 5 6 7 8 9 10 11");
         expect(getModeNumbers("major")).toBe("0 2 4 5 7 9 11");
         expect(getModeNumbers("minor")).toBe("0 2 3 5 7 8 10");
     });
 
-    test("should return an empty string for an invalid mode", () => {
+    it("should return an empty string for an invalid mode", () => {
         expect(getModeNumbers("invalidMode")).toBe("");
     });
 
-    test("should handle custom mode correctly", () => {
+    it("should handle custom mode correctly", () => {
         expect(getModeNumbers("custom")).toBe("0 1 2 3 4 5 6 7 8 9 10 11");
     });
 });
