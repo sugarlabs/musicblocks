@@ -1,8 +1,3 @@
-/* eslint-disable no-trailing-spaces */
-/* eslint-disable indent */
-/* eslint-disable quotes */
-/* eslint-disable no-undef */
-// Mock global window for btoa function
 global._ = jest.fn((str) => str);
 global.window = {
     btoa: jest.fn((str) => Buffer.from(str, "utf8").toString("base64"))
