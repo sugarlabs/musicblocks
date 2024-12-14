@@ -1526,7 +1526,7 @@ class Activity {
                     else if (ele.label === "Disable horizontal scrolling")
                         ele.display = false;
                 })
-                activity.textMsg(_("Horizontal scrolling disabled."),3000);
+                activity.textMsg(("Horizontal scrolling disabled."), 3000);
 
             }
         };
