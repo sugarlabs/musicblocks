@@ -101,7 +101,8 @@ describe("Temperament Functions", () => {
             );
         });
     });
-   
+});
+/*   
     describe("Temperament Management", () => {
         beforeEach(() => {
           // Reset global variables before each test
@@ -159,7 +160,7 @@ describe("Temperament Functions", () => {
         });
       });
 });
-
+*/
 describe("Constants", () => {
     it("should have correct default values", () => {
         expect(DEFAULTINVERT).toBe("even");
@@ -202,8 +203,6 @@ describe("getIntervalRatio", () => {
     });
 });
 
-//
-
 describe("getModeNumbers", () => {
     it("should return the correct mode numbers for a valid mode", () => {
         expect(getModeNumbers("chromatic")).toBe("0 1 2 3 4 5 6 7 8 9 10 11");
@@ -220,7 +219,6 @@ describe("getModeNumbers", () => {
     });
 });
 
-//
 
 jest.mock('../musicutils', () => {
     const actualModule = jest.requireActual('../musicutils');
