@@ -102,65 +102,7 @@ describe("Temperament Functions", () => {
         });
     });
 });
-/*   
-    describe("Temperament Management", () => {
-        beforeEach(() => {
-          // Reset global variables before each test
-          global.TEMPERAMENTS = [...INITIALTEMPERAMENTS];
-          global.TEMPERAMENT = {
-            equal: {
-              pitchNumber: 12,
-              interval: ["perfect 1", "minor 2", "major 2"]
-            }
-          };
-        });
-      
-        it("addTemperamentToList should add a new temperament if not predefined", () => {
-          const newEntry = "customTemperament";
-          addTemperamentToList(newEntry);
-          expect(TEMPERAMENTS).toContain(newEntry);
-        });
-      
-        it("addTemperamentToList should not add a predefined temperament", () => {
-          const predefinedEntry = "equal";
-          addTemperamentToList(predefinedEntry);
-          expect(TEMPERAMENTS).not.toContain(predefinedEntry);
-        });
-      
-        it("deleteTemperamentFromList should remove a temperament from the dictionary", () => {
-          const oldEntry = "equal";
-          deleteTemperamentFromList(oldEntry);
-          expect(TEMPERAMENT[oldEntry]).toBeUndefined();
-        });
-      
-        it("addTemperamentToDictionary should add a new temperament to the dictionary", () => {
-          const entryName = "newTemperament";
-          const entryValue = {
-            pitchNumber: 7,
-            interval: ["perfect 1", "minor 3", "major 3"]
-          };
-          addTemperamentToDictionary(entryName, entryValue);
-          it(TEMPERAMENT[entryName]).toEqual(entryValue);
-        });
-      
-        it("updateTemperaments should update TEMPERAMENTS with new entries", () => {
-          const newEntry = "customTemperament";
-          TEMPERAMENT[newEntry] = {
-            pitchNumber: 8,
-            interval: ["perfect 1", "minor 3"]
-          };
-          updateTemperaments();
-          expect(TEMPERAMENTS.some(([_, name]) => name === newEntry)).toBe(true);
-        });
-      
-        it("updateTemperaments should not duplicate predefined temperaments", () => {
-          updateTemperaments();
-          const predefinedEntries = TEMPERAMENTS.filter(([_, name]) => name in PreDefinedTemperaments);
-          expect(predefinedEntries.length).toBe(Object.keys(PreDefinedTemperaments).length);
-        });
-      });
-});
-*/
+
 describe("Constants", () => {
     it("should have correct default values", () => {
         expect(DEFAULTINVERT).toBe("even");
