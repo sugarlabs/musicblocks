@@ -1515,6 +1515,7 @@ class Activity {
                         ele.display = true;
                 })
                 activity.textMsg(_("Horizontal scrolling enabled."),3000);
+
             } else {
                 enableHorizScrollIcon.style.display = "block";
                 disableHorizScrollIcon.style.display = "none";
@@ -1526,6 +1527,7 @@ class Activity {
                         ele.display = false;
                 })
                 activity.textMsg(_("Horizontal scrolling disabled."),3000);
+                
             }
         };
 
