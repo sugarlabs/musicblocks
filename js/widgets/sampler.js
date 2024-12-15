@@ -458,17 +458,20 @@ function SampleWidget() {
         this._playbackBtn.id="playbackBtn";
         this._playbackBtn.classList.add("disabled");
         
-        let is_recording = false;
+        this.is_recording = false;
 
         this._recordBtn.onclick = async () => {
-            if (!is_recording) {
+            if (!this.is_recording) {
                 await this.activity.logo.synth.startRecording();
-                is_recording = true;
+                this.is_recording = true;
                 this._recordBtn.getElementsByTagName('img')[0].src = "header-icons/record.svg";
                 this.displayRecordingStartMessage();
+                this.activity.logo.synth.LiveWaveForm();
+
+                // Display Live Waveform
             } else {
                 this.recordingURL = await this.activity.logo.synth.stopRecording();
-                is_recording = false;
+                this.is_recording = false;
                 this._recordBtn.getElementsByTagName('img')[0].src = "header-icons/mic.svg";
                 this.displayRecordingStopMessage();
                 this._playbackBtn.classList.remove("disabled");
@@ -480,6 +483,7 @@ function SampleWidget() {
             this.sampleName = `Recorded Audio ${this.recordingURL}`;
             this._addSample();
             this.activity.logo.synth.playRecording();
+            // Display Recorded Waveform
         };
 
         widgetWindow.sendToCenter();
@@ -910,13 +914,13 @@ function SampleWidget() {
 
         const draw = () => {
             this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
-            if (this.pitchAnalysers[turtleIdx] && (this.running || resized)) {
+            if (this.is_recording || (this.pitchAnalysers[turtleIdx] && (this.running || resized))) {
                 canvasCtx.fillStyle = "#FFFFFF";
                 canvasCtx.font = "10px Verdana";
                 this.verticalOffset = -canvas.height / 4;
                 this.zoomFactor = 40.0;
                 canvasCtx.fillRect(0, 0, width, height);
-
+        
                 let oscText;
                 if (turtleIdx >= 0) {
                     //.TRANS: The sound sample that the user uploads.
@@ -926,18 +930,27 @@ function SampleWidget() {
                 //.TRANS: The reference tone is a sound used for comparison.
                 canvasCtx.fillText(_("reference tone"), 10, 10);
                 canvasCtx.fillText(oscText, 10, canvas.height / 2 + 10);
-
+        
                 for (let turtleIdx = 0; turtleIdx < 2; turtleIdx += 1) {
-                    const dataArray = this.pitchAnalysers[turtleIdx].getValue();
+                    let dataArray;
+                    if (this.is_recording) {
+                        dataArray = turtleIdx === 0 
+                            ? this.pitchAnalysers[0].getValue()
+                            : this.activity.logo.synth.getValues();
+                            console.log(dataArray);
+                    } else {
+                        dataArray = this.pitchAnalysers[turtleIdx].getValue();
+                    }
+        
                     const bufferLength = dataArray.length;
                     const rbga = SAMPLEOSCCOLORS[turtleIdx];
                     const sliceWidth = (width * this.zoomFactor) / bufferLength;
                     canvasCtx.lineWidth = 2;
                     canvasCtx.strokeStyle = rbga;
                     canvasCtx.beginPath();
-
+        
                     let x = 0;
-
+                    
                     for (let i = 0; i < bufferLength; i++) {
                         const y = (height / 2) * (1 - dataArray[i]) + this.verticalOffset;
                         if (i === 0) {

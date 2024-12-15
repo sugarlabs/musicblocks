@@ -2006,25 +2006,18 @@ function Synth() {
      * @memberof Synth
      */
     this.startRecording = async () => {
-
         await Tone.start();
-
         this.mic = new Tone.UserMedia();
         this.recorder = new Tone.Recorder();
-
         await this.mic.open()
         .then(() => {
             console.log("Mic opened");
-
             this.mic.connect(this.recorder);
-
             this.recorder.start();
-
         })
         .catch((error) => {
             console.log(error);
         });
-        
     }
 
     /**
@@ -2033,12 +2026,10 @@ function Synth() {
      * @memberof Synth
      */
     this.stopRecording = async () => {
-
-        const recording = await this.recorder.stop();
+        this.recording = await this.recorder.stop();
         this.mic.close();
-        this.audioURL = URL.createObjectURL(recording);
+        this.audioURL = URL.createObjectURL(this.recording);
         return this.audioURL;
-        
     }
 
     /**
@@ -2047,12 +2038,30 @@ function Synth() {
      * @memberof Synth
      */
     this.playRecording = async () => {
-
         const player = new Tone.Player().toDestination();
         await player.load(this.audioURL)
         player.start();
-        
     }
+
+    /**
+     * Analyzing the audio
+     * @function
+     * @memberof Synth
+     */
+    this.LiveWaveForm = () => {
+        this.analyser = new Tone.Analyser('waveform', 8192);
+        this.mic.connect(this.analyser);
+    }
+
+    /**
+    * Gets real-time waveform values
+    * @function
+    * @memberof Synth
+    */
+    this.getValues = () => {
+        const values = this.analyser.getValue();
+        return values;
+    };
 
     return this;
 }
