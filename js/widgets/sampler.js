@@ -234,7 +234,7 @@ function SampleWidget() {
      * @returns {void}
      */
     this.displayRecordingStartMessage = function () {
-        this.activity.textMsg(_("Recording started..."));
+        this.activity.textMsg(_("Recording started"));
     }
 
     /**
@@ -242,7 +242,7 @@ function SampleWidget() {
      * @returns {void}
      */
     this.displayRecordingStopMessage = function () {
-        this.activity.textMsg(_("Recording complete..."));
+        this.activity.textMsg(_("Recording complete"));
     }
 
 
@@ -467,8 +467,6 @@ function SampleWidget() {
                 this._recordBtn.getElementsByTagName('img')[0].src = "header-icons/record.svg";
                 this.displayRecordingStartMessage();
                 this.activity.logo.synth.LiveWaveForm();
-
-                // Display Live Waveform
             } else {
                 this.recordingURL = await this.activity.logo.synth.stopRecording();
                 this.is_recording = false;
@@ -483,7 +481,6 @@ function SampleWidget() {
             this.sampleName = `Recorded Audio ${this.recordingURL}`;
             this._addSample();
             this.activity.logo.synth.playRecording();
-            // Display Recorded Waveform
         };
 
         widgetWindow.sendToCenter();
@@ -930,13 +927,13 @@ function SampleWidget() {
                 //.TRANS: The reference tone is a sound used for comparison.
                 canvasCtx.fillText(_("reference tone"), 10, 10);
                 canvasCtx.fillText(oscText, 10, canvas.height / 2 + 10);
-        
+
                 for (let turtleIdx = 0; turtleIdx < 2; turtleIdx += 1) {
                     let dataArray;
                     if (this.is_recording) {
                         dataArray = turtleIdx === 0 
                             ? this.pitchAnalysers[0].getValue()
-                            : this.activity.logo.synth.getValues();
+                            : this.activity.logo.synth.getWaveFormValues();
                             console.log(dataArray);
                     } else {
                         dataArray = this.pitchAnalysers[turtleIdx].getValue();

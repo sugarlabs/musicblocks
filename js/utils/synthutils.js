@@ -2058,7 +2058,7 @@ function Synth() {
     * @function
     * @memberof Synth
     */
-    this.getValues = () => {
+    this.getWaveFormValues = () => {
         const values = this.analyser.getValue();
         return values;
     };
