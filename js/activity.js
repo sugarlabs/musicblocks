@@ -1589,6 +1589,8 @@ class Activity {
                     this.resizeDebounce = true;
                     this.blockscale += 1;
                     await this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
+                    this.refreshCanvas();
+                    this.blocks.checkBounds();
                 }
 
                 const that = this;
@@ -1626,6 +1628,8 @@ class Activity {
                     this.resizeDebounce = true;
                     this.blockscale -= 1;
                     await this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
+                    this.refreshCanvas();
+                    this.blocks.checkBounds();
                 }
 
                 const that = this;
