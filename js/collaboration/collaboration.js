@@ -24,8 +24,8 @@ class Collaboration {
         this.attempts = 0;
         this.socket = null;
         this.blockList = this.activity.blocks.blockList;
-        this.PORT = "8080";
-        this.COLLAB_HOST = "http://127.0.0.1";
+        this.PORT = "8080"; // container's 8080
+        this.COLLAB_HOST = "http://127.0.0.1"; // it should reflect the service names of compose file
         this.hasCollaborationStarted = false;
         this.updatedProjectHtml = null;
         this.hasExitedCollaboration = false;

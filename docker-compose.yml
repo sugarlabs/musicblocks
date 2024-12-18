@@ -25,3 +25,7 @@ services:
       NODE_ENV: development
     #command: ["npm", "run", "server"]
     command: ["npm", "run", "server"]
+
+
+    # don't port map to external host but use docker's internl network settings to connect the internal services
+    # inside the docker itself.
