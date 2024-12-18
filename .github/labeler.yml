@@ -1,0 +1,11 @@
+bug:
+  - '**/*.py'        
+  - 'src/bugs/**'     
+
+feature:
+  - '**/*.js'         
+  - 'src/features/**'  
+
+documentation:
+  - '**/*.md'         
+  - 'docs/**'         
