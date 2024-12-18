@@ -1,0 +1,34 @@
+# Configuration for the Label Labeler GitHub Action
+
+default:
+  - name: 'new issue'
+    color: '#d73a4a'
+
+title:
+
+  - regex: '^bug:'
+    labels:
+      - name: 'bug'
+        color: '#d73a4a'
+
+  - regex: '^feat:'
+    labels:
+      - name: 'feature'
+        color: '#0075ca'
+
+  - regex: '^docs:'
+    labels:
+      - name: 'documentation'
+        color: '#0075ca'
+
+comments:
+  - regex: '^help wanted'
+    labels:
+      - name: 'help wanted'
+        color: '#008672'
+
+assignees:
+  - action: added
+    labels:
+      - name: 'in-progress'
+        color: '#0e8a16'
