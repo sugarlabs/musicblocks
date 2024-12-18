@@ -1082,7 +1082,7 @@ class Activity {
             document.body.appendChild(modal);
         };
         
-        this._allClear = (noErase) => {
+        this._allClear = (noErase, skipConfirmation = false) => {
             const clearCanvasAction = () => {
                 this.blocks.activeBlock = null;
                 hideDOMLabel();
@@ -1130,7 +1130,11 @@ class Activity {
                 }
             };
         
-            renderClearConfirmation(clearCanvasAction);
+            if (skipConfirmation) {
+                clearCanvasAction();
+            } else {
+                renderClearConfirmation(clearCanvasAction);
+            }
         };
         /**
          * Sets up play button functionality; runs Music Blocks.
@@ -3723,7 +3727,7 @@ class Activity {
             document.querySelector("#myOpenFile").click();
             window.scroll(0, 0);
             doHardStopButton(that);
-            that._allClear(true);
+            that._allClear(true, true);
         };
 
         window.prepareExport = this.prepareExport;
