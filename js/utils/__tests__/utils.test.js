@@ -17,7 +17,6 @@ describe("Utility Functions (logic-only)", () => {
         hex2rgb;
 
     beforeAll(() => {
-        // Mock global objects that the code relies on
         global.window = {
             btoa: (str) => Buffer.from(str, "utf8").toString("base64"),
             outerHeight: 600,
@@ -66,7 +65,6 @@ describe("Utility Functions (logic-only)", () => {
             kanaPreference: ""
         };
 
-        // Mock XMLHttpRequest
         global.XMLHttpRequest = class {
             open() {}
             setRequestHeader() {}
@@ -76,22 +74,13 @@ describe("Utility Functions (logic-only)", () => {
             }
         };
 
-        // The code references `self.location` in HttpRequest constructor
-        // We can mock `self` as `global` in Node and give it a location
         global.self = {
             location: { href: "file:///" },
             console: console
         };
 
-        // Read the code from the file as a string
         const code = fs.readFileSync(path.join(__dirname, "../utils.js"), "utf8");
 
-        // We'll wrap the code in a function that returns the functions we need
-        // We know from the code snippet that these functions are defined in the code:
-        // toTitleCase, fileExt, fileBasename, last, safeSVG, toFixed2, mixedNumber,
-        // nearestBeat, oneHundredToFraction, rationalToFraction, rgbToHex, hexToRGB, hex2rgb
-        //
-        // We'll create a new Function that executes the code and returns an object with these functions.
         const wrapper = new Function(`
             ${code}
             return {
