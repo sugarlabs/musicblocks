@@ -447,7 +447,6 @@ class Palettes {
     _loadPaletteButtonHandler(name, row) {
         // eslint-disable-next-line no-unused-vars
         row.onmouseover = (event) => {
-            // Disable hover only if dropdown is clicked
             if (!this.dropdownClicked) {
                 if (name === "search") {
                     document.body.style.cursor = "text";
@@ -464,12 +463,11 @@ class Palettes {
                 this.activity.showSearchWidget();
                 this.dropdownClicked = false;
             } else {
-                this.dropdownClicked = !this.dropdownClicked; // Toggle dropdown click state
-                console.log("Dropdown clicked state:", this.dropdownClicked);
+                this.dropdownClicked = !this.dropdownClicked; 
                 if (this.dropdownClicked) {
-                    this.showPalette(name); // Show the clicked palette
+                    this.showPalette(name); 
                 } else {
-                    this._hideMenus(); // Hide menus if toggled off
+                    this._hideMenus(); 
                 }
             }
         };
