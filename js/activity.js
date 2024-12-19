@@ -1588,20 +1588,18 @@ class Activity {
                 if (this.blockscale < BLOCKSCALES.length - 1) {
                     this.resizeDebounce = true;
                     this.blockscale += 1;
+                    this.clearCache();
                     await this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
-                    this.refreshCanvas();
                     this.blocks.checkBounds();
+                    this.refreshCanvas();
                 }
 
                 const that = this;
                 that.resizeDebounce = false;
-                await this.setSmallerLargerStatus();
-
             }
-            if (typeof(this.activity)!="undefined"){
-                 await this.activity.refreshCanvas();
-               }
-            document.getElementById("hideContents").click();
+        
+            await this.setSmallerLargerStatus();
+            await this.stage.update();
         };
 
         /**
@@ -1627,9 +1625,10 @@ class Activity {
                 if (this.blockscale > 0) {
                     this.resizeDebounce = true;
                     this.blockscale -= 1;
+                    this.clearCache();                
                     await this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
-                    this.refreshCanvas();
                     this.blocks.checkBounds();
+                    this.refreshCanvas();
                 }
 
                 const that = this;
@@ -1638,10 +1637,7 @@ class Activity {
             }
 
             await this.setSmallerLargerStatus();
-            if (typeof(this.activity)!="undefined"){
-                await this.activity.refreshCanvas();
-            }
-            document.getElementById("hideContents").click();
+            await this.stage.update();
         };
 
         /*
@@ -3641,6 +3637,17 @@ class Activity {
          */
         this.onRunTurtle = () => {
             // TODO: plugin support
+        };
+
+        /*
+         * Clears cache for all blocks
+         */
+        this.clearCache = () => {
+            this.blocks.blockList.forEach(block => {
+                if (block.container) {
+                    block.container.uncache();
+                }
+            });
         };
 
         /*
