@@ -447,21 +447,28 @@ class Palettes {
     _loadPaletteButtonHandler(name, row) {
         // eslint-disable-next-line no-unused-vars
         row.onmouseover = (event) => {
-            if (name == "search") {
-                document.body.style.cursor = "text";
-            } else {
-                document.body.style.cursor = "pointer";
-                this.showPalette(name);
+            if (!this.dropdownClicked) {
+                if (name === "search") {
+                    document.body.style.cursor = "text";
+                } else {
+                    document.body.style.cursor = "pointer";
+                    this.showPalette(name);
+                }
             }
         };
-
-        // eslint-disable-next-line no-unused-vars
+        
         row.onclick = (event) => {
-            if (name == "search") {
+            if (name === "search") {
                 this._hideMenus();
                 this.activity.showSearchWidget();
+                this.dropdownClicked = false;
             } else {
-                this.showPalette(name);
+                this.dropdownClicked = !this.dropdownClicked; 
+                if (this.dropdownClicked) {
+                    this.showPalette(name); 
+                } else {
+                    this._hideMenus(); 
+                }
             }
         };
 
