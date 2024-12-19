@@ -111,7 +111,7 @@ class Palettes {
             const element = document.createElement("div");
             element.id = "palette";
             element.setAttribute("class", "disable_highlighting");
-            element.classList.add('flex-palette')
+            element.classList.add("flex-palette");
             element.setAttribute(
                 "style",
                 "position: absolute; z-index: 1000; left :0px; top:" + this.top + "px"
@@ -283,7 +283,7 @@ class Palettes {
             );
         }
     }
-    
+
     makeSearchButton(name, icon, listBody) {
         const row = listBody.insertRow(-1);
         const img = row.insertCell(-1);
@@ -391,18 +391,18 @@ class Palettes {
             for (const name in this.dict) {
                 if (this.dict.hasOwnProperty(name)) {
                     const palette = this.dict[name];
-                    if (palette && typeof palette.hideMenu === 'function') {
+                    if (palette && typeof palette.hideMenu === "function") {
                         palette.hideMenu();
                     }
                 }
             }
-    
+
             // Remove the palette DOM element if it exists
             const paletteElement = docById("palette");
             if (paletteElement) {
                 paletteElement.parentNode.removeChild(paletteElement);
             }
-    
+
             // Clear the dictionary and reset state
             this.dict = {};
             this.visible = false;
@@ -413,10 +413,10 @@ class Palettes {
             const element = document.createElement("div");
             element.id = "palette";
             element.setAttribute("class", "disable_highlighting");
-            element.classList.add('flex-palette');
+            element.classList.add("flex-palette");
             element.setAttribute(
                 "style",
-                `position: fixed; z-index: 1000; left: 0px; top: ${60+this.top}px; overflow-y: auto;`
+                `position: fixed; z-index: 1000; left: 0px; top: ${60 + this.top}px; overflow-y: auto;`
             );
             element.innerHTML =
                 '<div style="height:fit-content"><table width ="' +
@@ -426,9 +426,8 @@ class Palettes {
                 'px"bgcolor="white"><thead><tr><td style= "width:28px"></tr></thead><tbody></tbody></table></div>';
             element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
             document.body.appendChild(element);
-    
         } catch (e) {
-            console.error('Error clearing palettes:', e);
+            console.error("Error clearing palettes:", e);
         }
     }
 
@@ -446,7 +445,7 @@ class Palettes {
     // Palette Button event handlers
     _loadPaletteButtonHandler(name, row) {
         // eslint-disable-next-line no-unused-vars
-        row.onmouseover = (event) => {
+        row.onclick = (event) => {
             if (name == "search") {
                 document.body.style.cursor = "text";
             } else {
@@ -795,8 +794,7 @@ class PaletteModel {
             actualHeight: height,
             label,
             artwork,
-            artwork64:
-                "data:image/svg+xml;base64," + window.btoa(base64Encode(artwork)),
+            artwork64: "data:image/svg+xml;base64," + window.btoa(base64Encode(artwork)),
             docks,
             image: block.image,
             scale: block.scale,
@@ -839,9 +837,8 @@ class Palette {
     }
 
     hideMenu() {
-        docById(
-            "palette"
-        ).childNodes[0].style.borderRight = `1px solid ${platformColor.selectorSelected}`;
+        docById("palette").childNodes[0].style.borderRight =
+            `1px solid ${platformColor.selectorSelected}`;
         this._hideMenuItems();
     }
 
@@ -1253,11 +1250,11 @@ class Palette {
         ) {
             this._makeBlockFromProtoblock(protoblk, true, blkname, null, 100, 100);
             callback(lastBlock);
-            return(lastBlock);
+            return lastBlock;
         } else {
             const newBlock = paletteBlockButtonPush(this.activity.blocks, newBlk, arg);
             callback(newBlock);
-            return(newBlock);
+            return newBlock;
         }
     }
 
@@ -1309,7 +1306,7 @@ class Palette {
                 // the palette.
                 if (
                     this.activity.blocks.blockList[topBlk].container.x <
-                        this.activity.palettes.paletteWidth * 2
+                    this.activity.palettes.paletteWidth * 2
                 ) {
                     this.activity.blocks.moveBlock(
                         topBlk,
@@ -1370,7 +1367,7 @@ class Palette {
                 // the palette.
                 if (
                     this.activity.blocks.blockList[topBlk].container.x <
-                        this.activity.palettes.paletteWidth * 2
+                    this.activity.palettes.paletteWidth * 2
                 ) {
                     this.activity.blocks.moveBlock(
                         topBlk,
@@ -1388,7 +1385,7 @@ class Palette {
                 // the palette.
                 if (
                     this.activity.blocks.blockList[newBlock].container.x <
-                        this.activity.palettes.paletteWidth * 2
+                    this.activity.palettes.paletteWidth * 2
                 ) {
                     this.activity.blocks.moveBlock(
                         newBlock,
