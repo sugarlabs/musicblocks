@@ -5931,5 +5931,14 @@ module.exports = {
     getArticulation,
     keySignatureToMode,
     getScaleAndHalfSteps,
-    modeMapper
+    modeMapper,
+    getSharpFlatPreference,
+    getCustomNote,
+    pitchToNumber,
+    numberToPitchSharp,
+    getNumber,
+    getNoteFromInterval,
+    numberToPitch,
+    GetNotesForInterval,
+    base64Encode
 };
