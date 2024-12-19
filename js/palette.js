@@ -446,15 +446,20 @@ class Palettes {
     // Palette Button event handlers
     _loadPaletteButtonHandler(name, row) {
         // eslint-disable-next-line no-unused-vars
-        row.onmouseover = (event) => {
-            if (name == "search") {
+        let timeout;
+
+        row.onmouseover = () => {
+            if (name === "search") {
                 document.body.style.cursor = "text";
             } else {
                 document.body.style.cursor = "pointer";
-                this.showPalette(name);
+                clearTimeout(timeout);
+                timeout = setTimeout(() => this.showPalette(name), 400);
             }
         };
-
+        
+        row.onmouseout = () => clearTimeout(timeout);
+        
         // eslint-disable-next-line no-unused-vars
         row.onclick = (event) => {
             if (name == "search") {
