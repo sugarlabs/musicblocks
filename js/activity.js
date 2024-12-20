@@ -1595,7 +1595,9 @@ class Activity {
                 }
 
                 const that = this;
-                that.resizeDebounce = false;
+                setTimeout(() => {
+                    that.resizeDebounce = false;
+                }, 200);
             }
         
             await this.setSmallerLargerStatus();
@@ -1632,7 +1634,9 @@ class Activity {
                 }
 
                 const that = this;
-                that.resizeDebounce = false;
+                setTimeout(() => {
+                    that.resizeDebounce = false;
+                }, 200);
 
             }
 
@@ -3645,16 +3649,12 @@ class Activity {
         this.clearCache = () => {
             this.blocks.blockList.forEach(block => {
                 if (block.container) {
-                    if (block.container.cacheCanvas) {
-                        block.container.uncache();
-                        block.container.cache();
-                    }
+                    block.container.uncache();
+                    block.container.cache(0,0,1,1);
                 }
-                if (block.bitmap) {
-                    if (block.bitmap.cacheCanvas) {
-                        block.bitmap.uncache();
-                        block.bitmap.cache();
-                    }
+                if (block.bitmap) {            
+                    block.bitmap.uncache();
+                    block.bitmap.cache();
                 }
             });
         };
