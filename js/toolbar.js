@@ -827,18 +827,12 @@ class Toolbar {
                     enableHorizScrollIcon.style.display = "block";
                     enableHorizScrollIcon.onclick = () => {
                         setScroller(this.activity);
-                        this.activity.textMsg(
-                            _("Horizontal scrolling enabled.")
-                        );
                     };
                 }
                 
                 if (disableHorizScrollIcon) {
                     disableHorizScrollIcon.onclick = () => {
                         setScroller(this.activity);
-                        this.activity.textMsg(
-                            _("Horizontal scrolling disabled.")
-                        );
                     };
                 }
                 
