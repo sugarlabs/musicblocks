@@ -95,7 +95,7 @@ msgstr "記入がありません"
 
 #: js/SaveInterface.js:332
 msgid "Your recording is in progress."
-msgstr ""
+msgstr "録音中"
 
 #: js/SaveInterface.js:401
 #.TRANS: File name prompt for save as Lilypond
@@ -152,7 +152,7 @@ msgstr "ミスター・マウス"
 
 #: js/SaveInterface.js:573
 msgid "The Lilypond code is copied to clipboard. You can paste it here: "
-msgstr ""
+msgstr "Lilypondがくふのフォーマットはクリップボードにコピーしてある。次のウェブサイトに貼り付けると楽譜が見られます。。"
 
 #: js/languagebox.js:198
 msgid "Refresh your browser to change your language preference."
@@ -164,7 +164,7 @@ msgstr " Music Blocksは既にこの言語に設定されています。"
 
 #: js/planetInterface.js:131
 msgid "project undefined"
-msgstr ""
+msgstr "プロジェクト未定義"
 
 #: js/rubrics.js:523
 #: js/turtledefs.js:119
@@ -509,7 +509,7 @@ msgstr "上"
 #: js/block-verbose.js:3026
 #: js/block.js:2948
 msgid "Silence block cannot be removed."
-msgstr ""
+msgstr "「休符」は取り出すことができません。"
 
 #: js/block-verbose.js:3824
 #: js/blocks.js:2607
@@ -642,12 +642,12 @@ msgstr "数字ではありません"
 #: js/block-verbose.js:4477
 #: js/block.js:4398
 msgid "Octave value must be between 1 and 10."
-msgstr ""
+msgstr "オクターヴの値が「１」から「１０」までの範囲でなければなりません。"
 
 #: js/block-verbose.js:4485
 #: js/block.js:4406
 msgid "Numbers can have at most 10 digits."
-msgstr ""
+msgstr "数字は最大１０桁までです。"
 
 #: js/blocks.js:1212
 #: js/blocks.js:3444
@@ -680,7 +680,7 @@ msgstr "ファイルを開く"
 #: js/blocks.js:2487
 #: js/activity.js:2229
 msgid "audio file"
-msgstr ""
+msgstr "オーディオファイル"
 
 #: js/blocks.js:3247
 #: js/palette.js:622
@@ -753,7 +753,7 @@ msgstr "値"
 
 #: js/blocks.js:4465
 msgid "Forever loop detected inside a note value block. Unexpected things may happen."
-msgstr ""
+msgstr "「ずっとくり返す」状態が「音符」の中にある。"
 
 #: js/blocks.js:4988
 msgid "There is no block selected."
@@ -902,7 +902,7 @@ msgstr "キーボードでおんがくをつくっているよ"
 
 #: js/activity.js:1656
 msgid "plugins will be removed upon restart."
-msgstr ""
+msgstr "プラグインは再起動時に削除されます。"
 
 #: js/activity.js:1665
 msgid "show Cartesian"
@@ -1214,7 +1214,7 @@ msgstr "プロジェクトを読みこめません。ファイルの種類をか
 
 #: js/activity.js:6916
 msgid "Invalid parameters"
-msgstr ""
+msgstr "無効なパラメータ"
 
 #: js/activity.js:7060
 msgid "Error regenerating palettes. Please refresh the page."
@@ -1376,7 +1376,7 @@ msgstr "説明"
 
 #: js/piemenus.js:3465
 msgid "In order to copy a sample, you must reload the widget, import the sample again, and export it."
-msgstr ""
+msgstr "サンプルをコピーするため、ツールを再度試して、またサンプルをロード読み込で、保存することが必要です。"
 
 #: js/piemenus.js:3510
 msgid "You can restore deleted blocks from the trash with the Restore From Trash button."
@@ -1933,7 +1933,7 @@ msgstr "タートル・ブロックへようこそ"
 
 #: js/turtledefs.js:436
 msgid "Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks."
-msgstr ""
+msgstr "ミュージック・ブロックスは、"
 
 #: js/turtledefs.js:437
 #: js/turtledefs.js:464
@@ -1949,7 +1949,7 @@ msgstr "クリックをすると、ふつうのスピードでプログラムを
 
 #: js/turtledefs.js:451
 msgid "Stop the turtle."
-msgstr ""
+msgstr "タータルを止める"
 
 #: js/turtledefs.js:453
 #: js/turtledefs.js:490
@@ -1992,7 +1992,7 @@ msgstr "再生されているビデオを録音する"
 
 #: js/turtledefs.js:504
 msgid "Toggle Fullscreen mode."
-msgstr ""
+msgstr "フルスクリーンの切り替え"
 
 #: js/turtledefs.js:510
 msgid "Initialize a new project."
@@ -2009,11 +2009,11 @@ msgstr "消す"
 
 #: js/turtledefs.js:522
 msgid "To delete a block, just right-click on it, then you will be able to see the delete option"
-msgstr ""
+msgstr "ブロックを消すには、ブロックを右クリックすると「消す」オプションが表示されます。"
 
 #: js/turtledefs.js:528
 msgid "To copy a block, just right-click on it, then you will be able to see the copy option"
-msgstr ""
+msgstr "ブロックをコピーには、ブロックを右クリックすると「コピー」オプションが表示されます。"
 
 #: js/turtledefs.js:534
 msgid "To extract a block, just right-click on it, then you will be able to see the extract option"
@@ -2237,7 +2237,7 @@ msgstr "ミュージック・ブロックスのプログラムは、だれでも
 
 #: js/turtledefs.js:779
 msgid "Turtle Blocks GitHub repository"
-msgstr ""
+msgstr "タータル・ブロックスのリポジトリ"
 
 #: js/turtledefs.js:782
 #: js/turtledefs.js:813
@@ -2248,7 +2248,7 @@ msgstr "おめでとうございます！"
 
 #: js/turtledefs.js:783
 msgid "You have finished the tour. Please enjoy Turtle Blocks!"
-msgstr ""
+msgstr "ツアーはここで終わり。タータル・ブロックスを自由に楽しもう。"
 
 #: js/turtledefs.js:790
 msgid "A detailed guide to Music Blocks is available."
@@ -2697,179 +2697,179 @@ msgstr "休符"
 
 #: js/utils/musicutils.js:689
 msgid "Perfect unison"
-msgstr ""
+msgstr "完全1度"
 
 #: js/utils/musicutils.js:689
 msgid "Diminished second"
-msgstr ""
+msgstr "減2度"
 
 #: js/utils/musicutils.js:690
 msgid "Minor second"
-msgstr ""
+msgstr "短2度"
 
 #: js/utils/musicutils.js:690
 msgid "Augmented unison"
-msgstr ""
+msgstr "増1度"
 
 #: js/utils/musicutils.js:691
 msgid "Major second"
-msgstr ""
+msgstr "長2度"
 
 #: js/utils/musicutils.js:691
 msgid "Diminished third"
-msgstr ""
+msgstr "減3度"
 
 #: js/utils/musicutils.js:692
 msgid "Minor third"
-msgstr ""
+msgstr "短3度"
 
 #: js/utils/musicutils.js:692
 msgid "Augmented second"
-msgstr ""
+msgstr "増2度"
 
 #: js/utils/musicutils.js:693
 msgid "Major third"
-msgstr ""
+msgstr "長3度"
 
 #: js/utils/musicutils.js:693
 msgid "Diminished fourth"
-msgstr ""
+msgstr "減4度"
 
 #: js/utils/musicutils.js:694
 msgid "Perfect fourth"
-msgstr ""
+msgstr "完全4度"
 
 #: js/utils/musicutils.js:694
 msgid "Augmented third"
-msgstr ""
+msgstr "増3度"
 
 #: js/utils/musicutils.js:695
 msgid "Diminished fifth"
-msgstr ""
+msgstr "減5度"
 
 #: js/utils/musicutils.js:695
 msgid "Augmented fourth"
-msgstr ""
+msgstr "増4度"
 
 #: js/utils/musicutils.js:696
 msgid "Perfect fifth"
-msgstr ""
+msgstr "完全5度"
 
 #: js/utils/musicutils.js:696
 msgid "Diminished sixth"
-msgstr ""
+msgstr "減6度"
 
 #: js/utils/musicutils.js:697
 msgid "Minor sixth"
-msgstr ""
+msgstr "短6度"
 
 #: js/utils/musicutils.js:697
 msgid "Augmented fifth"
-msgstr ""
+msgstr "増5度"
 
 #: js/utils/musicutils.js:698
 msgid "Major sixth"
-msgstr ""
+msgstr "長6度"
 
 #: js/utils/musicutils.js:698
 msgid "Diminished seventh"
-msgstr ""
+msgstr "減7度"
 
 #: js/utils/musicutils.js:699
 msgid "Minor seventh"
-msgstr ""
+msgstr "短7度"
 
 #: js/utils/musicutils.js:699
 msgid "Augmented sixth"
-msgstr ""
+msgstr "増6度"
 
 #: js/utils/musicutils.js:700
 msgid "Major seventh"
-msgstr ""
+msgstr "長7度"
 
 #: js/utils/musicutils.js:700
 msgid "Diminished octave"
-msgstr ""
+msgstr "減8度"
 
 #: js/utils/musicutils.js:701
 msgid "Perfect octave"
-msgstr ""
+msgstr "完全8度"
 
 #: js/utils/musicutils.js:701
 msgid "Augmented seventh"
-msgstr ""
+msgstr "増7度"
 
 #: js/utils/musicutils.js:702
 msgid "Minor ninth"
-msgstr ""
+msgstr "短9度"
 
 #: js/utils/musicutils.js:702
 msgid "Augmented octave"
-msgstr ""
+msgstr "増8度"
 
 #: js/utils/musicutils.js:703
 msgid "Major ninth"
-msgstr ""
+msgstr "長9度"
 
 #: js/utils/musicutils.js:703
 msgid "Diminished tenth"
-msgstr ""
+msgstr "減10度"
 
 #: js/utils/musicutils.js:704
 msgid "Minor tenth"
-msgstr ""
+msgstr "短10度"
 
 #: js/utils/musicutils.js:704
 msgid "Augmented ninth"
-msgstr ""
+msgstr "増9度"
 
 #: js/utils/musicutils.js:705
 msgid "Major tenth"
-msgstr ""
+msgstr "長10度"
 
 #: js/utils/musicutils.js:705
 msgid "Diminished eleventh"
-msgstr ""
+msgstr "減11度"
 
 #: js/utils/musicutils.js:706
 msgid "Perfect eleventh"
-msgstr ""
+msgstr "完全11度"
 
 #: js/utils/musicutils.js:706
 msgid "Augmented tenth"
-msgstr ""
+msgstr "増10度"
 
 #: js/utils/musicutils.js:707
 msgid "Diminished twelfth"
-msgstr ""
+msgstr "減12度"
 
 #: js/utils/musicutils.js:707
 msgid "Augmented eleventh"
-msgstr ""
+msgstr "増11度"
 
 #: js/utils/musicutils.js:708
 msgid "Perfect twelfth"
-msgstr ""
+msgstr "完全12度"
 
 #: js/utils/musicutils.js:708
 msgid "Diminished thirteenth"
-msgstr ""
+msgstr "減13度"
 
 #: js/utils/musicutils.js:709
 msgid "Minor thirteenth"
-msgstr ""
+msgstr "短13度"
 
 #: js/utils/musicutils.js:709
 msgid "Augmented fifth, plus an octave"
-msgstr ""
+msgstr "増12度"
 
 #: js/utils/musicutils.js:710
 msgid "Major thirteenth"
-msgstr ""
+msgstr "長13度"
 
 #: js/utils/musicutils.js:710
 msgid "Diminished seventh, plus an octave"
-msgstr ""
+msgstr "減14度"
 
 #: js/utils/musicutils.js:838
 #.TRANS: ordinal number. Please keep exactly one space between each number.
@@ -3210,48 +3210,48 @@ msgstr "減五短七の和音（ハーフ・ディミニッシュト）"
 #: js/utils/musicutils.js:1557
 #: js/utils/musicutils.js:1573
 msgid "Equal (12EDO)"
-msgstr ""
+msgstr "12平均律"
 
 #: js/utils/musicutils.js:1558
 #: js/utils/musicutils.js:1574
 msgid "Equal (5EDO)"
-msgstr ""
+msgstr "5平均律"
 
 #: js/utils/musicutils.js:1559
 #: js/utils/musicutils.js:1575
 msgid "Equal (7EDO)"
-msgstr ""
+msgstr "7平均律"
 
 #: js/utils/musicutils.js:1560
 #: js/utils/musicutils.js:1576
 msgid "Equal (19EDO)"
-msgstr ""
+msgstr "19平均律"
 
 #: js/utils/musicutils.js:1561
 #: js/utils/musicutils.js:1577
 msgid "Equal (31EDO)"
-msgstr ""
+msgstr "31平均律"
 
 #: js/utils/musicutils.js:1562
 #: js/utils/musicutils.js:1578
 msgid "5-limit Just Intonation"
-msgstr ""
+msgstr "5限界純正律"
 
 #: js/utils/musicutils.js:1563
 #: js/utils/musicutils.js:1579
 msgid "Pythagorean (3-limit JI)"
-msgstr ""
+msgstr "ピタゴラス音律"
 
 #: js/utils/musicutils.js:1564
 #: js/utils/musicutils.js:1565
 #: js/utils/musicutils.js:1580
 #: js/utils/musicutils.js:1581
 msgid "Meantone"
-msgstr ""
+msgstr "中全音律"
 
 #: js/utils/musicutils.js:1582
 msgid "Custom"
-msgstr ""
+msgstr "オリジナル"
 
 #: js/utils/musicutils.js:5568
 #: js/utils/musicutils.js:5611
@@ -3337,7 +3337,7 @@ msgstr ""
 #: js/blocks/ActionBlocks.js:900
 #: js/blocks/ActionBlocks.js:908
 msgid "Invalid argument"
-msgstr ""
+msgstr "無効な議論"
 
 #: js/blocks/ActionBlocks.js:944
 msgid "In the example, it is used with the One of block to choose a random phase."
@@ -4137,7 +4137,7 @@ msgstr "<h2>音声ブロック</h2><br>打ち込んだ文字を、機械音声�
 
 #: js/blocks/MediaBlocks.js:546
 msgid "camera"
-msgstr ""
+msgstr "カメラ"
 
 #: js/blocks/MediaBlocks.js:551
 msgid "The Camera block connects a webcam to the Show block."
@@ -4145,7 +4145,7 @@ msgstr ""
 
 #: js/blocks/MediaBlocks.js:574
 msgid "video"
-msgstr ""
+msgstr "ビデオ"
 
 #: js/blocks/MediaBlocks.js:579
 msgid "The Video block selects video for use with the Show block."
@@ -5338,7 +5338,7 @@ msgstr "<h2>音の高さブロック</h2><br>音の高さを、CDEFGABの７つ�
 
 #: js/blocks/PitchBlocks.js:884
 msgid "solfege"
-msgstr ""
+msgstr "ソルファ"
 
 #: js/blocks/PitchBlocks.js:887
 msgid "Pitch can be specified in terms of do re mi fa sol la ti."
@@ -6216,7 +6216,7 @@ msgstr "<h2>実行じょうきょうブロック</h2><br>ブロックの実行�
 #: js/blocks/WidgetBlocks.js:1580
 #.TRANS: AI-generated music
 msgid "aimusic"
-msgstr ""
+msgstr "AI音楽"
 
 #: js/blocks/EnsembleBlocks.js:87
 msgid "mouse index heap"
@@ -6224,7 +6224,7 @@ msgstr "ネズミヒープに番号をふる"
 
 #: js/blocks/EnsembleBlocks.js:87
 msgid "turtle index heap"
-msgstr ""
+msgstr "タートル ヒープに番号をふる"
 
 #: js/blocks/EnsembleBlocks.js:89
 msgid "The Mouse index heap block returns a value in the heap at a specified location for a specified mouse."
@@ -6252,7 +6252,7 @@ msgstr ""
 #: js/blocks/EnsembleBlocks.js:1222
 #: js/blocks/EnsembleBlocks.js:1296
 msgid "Yertle"
-msgstr ""
+msgstr "ヤートル"
 
 #: js/blocks/EnsembleBlocks.js:96
 #: js/blocks/EnsembleBlocks.js:1083
@@ -6775,7 +6775,7 @@ msgstr "拍の数"
 #: js/turtleactions/MeterActions.js:101
 #: js/turtleactions/MeterActions.js:139
 msgid "beats per minute must be greater than"
-msgstr ""
+msgstr "１分あたりの拍の数には、これより大きいあたいをせっていしてください："
 
 #: js/turtleactions/MeterActions.js:111
 #: js/turtleactions/MeterActions.js:149
@@ -6785,7 +6785,7 @@ msgstr "最大限"
 #: js/turtleactions/MeterActions.js:117
 #: js/turtleactions/MeterActions.js:155
 msgid "beats per minute is"
-msgstr ""
+msgstr "１分あたりの拍の数は"
 
 #: js/turtleactions/DictActions.js:75
 #: js/turtleactions/DictActions.js:142
@@ -6795,11 +6795,11 @@ msgstr "フォント"
 
 #: js/turtleactions/DictActions.js:255
 msgid "Dictionary with this name does not exist"
-msgstr ""
+msgstr "この名前の辞書は存在しません。"
 
 #: js/turtleactions/DictActions.js:259
 msgid "Key with this name does not exist in "
-msgstr ""
+msgstr "この名前のキーワードは次の辞書にはいていません："
 
 #: js/turtleactions/DrumActions.js:227
 msgid "Noise Block: Did you mean to use a Note block?"
@@ -6807,39 +6807,39 @@ msgstr "音符ブロックを使いますか？"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "one"
-msgstr ""
+msgstr "１度"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "two"
-msgstr ""
+msgstr "２度"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "three"
-msgstr ""
+msgstr "３度"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "four"
-msgstr ""
+msgstr "４度"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "five"
-msgstr ""
+msgstr "５度"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "six"
-msgstr ""
+msgstr "６度"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "seven"
-msgstr ""
+msgstr "７度"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "eight"
-msgstr ""
+msgstr "８度"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "nine"
-msgstr ""
+msgstr "９度"
 
 #: js/turtleactions/IntervalsActions.js:119
 msgid "a"
@@ -6847,19 +6847,19 @@ msgstr ""
 
 #: js/turtleactions/IntervalsActions.js:120
 msgid "below"
-msgstr ""
+msgstr "下"
 
 #: js/turtleactions/IntervalsActions.js:124
 msgid "above"
-msgstr ""
+msgstr "上"
 
 #: js/turtleactions/IntervalsActions.js:131
 msgid "plus"
-msgstr ""
+msgstr "と"
 
 #: js/turtleactions/IntervalsActions.js:139
 msgid " below"
-msgstr ""
+msgstr "下"
 
 #: js/turtleactions/IntervalsActions.js:257
 msgid "Adding missing pitch number 0."
@@ -6985,7 +6985,7 @@ msgstr "新しいアクションを作りました！"
 
 #: js/widgets/meterwidget.js:275
 msgid "Reset"
-msgstr ""
+msgstr "リセット"
 
 #: js/widgets/meterwidget.js:301
 msgid "Click in the circle to select strong beats for the meter."
@@ -6993,11 +6993,11 @@ msgstr "クリックで強い拍の位置を選べます。"
 
 #: js/widgets/oscilloscope.js:79
 msgid "Zoom In"
-msgstr ""
+msgstr "ズームイン"
 
 #: js/widgets/oscilloscope.js:88
 msgid "Zoom Out"
-msgstr ""
+msgstr "ズームアウト"
 
 #: js/widgets/pitchdrummatrix.js:356
 #: js/widgets/pitchdrummatrix.js:752
@@ -7060,7 +7060,7 @@ msgstr "１分あたりの拍数でテンポを決められます。"
 
 #: js/widgets/tempo.js:261
 msgid "Please enter a number between 30 and 1000"
-msgstr ""
+msgstr "３０から１０００までの数字を入力してください。"
 
 #: js/widgets/tempo.js:268
 #: js/widgets/tempo.js:271
@@ -7069,11 +7069,11 @@ msgstr "1分あたりの拍の数は、30から1000までのはんいでせっ�
 
 #: js/widgets/tempo.js:287
 msgid "The beats per minute must be below 1000."
-msgstr ""
+msgstr "1分あたりの拍の数は、最大1000です。"
 
 #: js/widgets/tempo.js:303
 msgid "The beats per minute must be above 30"
-msgstr ""
+msgstr "１分あたりの拍の数には、３０より大きいあたいをせっていしてください。"
 
 #: js/widgets/timbre.js:766
 msgid "Synthesizer"
@@ -7095,7 +7095,7 @@ msgstr "音響効果"
 
 #: js/widgets/timbre.js:904
 msgid "Filter"
-msgstr ""
+msgstr "フィルター"
 
 #: js/widgets/timbre.js:946
 msgid "Add filter"
@@ -7133,15 +7133,15 @@ msgstr "ディストーションの大きさ"
 #: js/widgets/aiwidget.js:180
 #: js/widgets/sampler.js:227
 msgid "Warning: Sample is bigger than 1MB."
-msgstr ""
+msgstr "ワーニング：サンプルは１MBより大きいです。"
 
 #: js/widgets/aiwidget.js:539
 msgid "New start block generated"
-msgstr ""
+msgstr "新しい「スタート」ブロックを作りました。"
 
 #: js/widgets/aiwidget.js:541
 msgid "MIDI loading. This may take some time depending upon the number of notes in the track"
-msgstr ""
+msgstr "「MIDI]を読み込み中です。音符の数とトラックの数によって時間がかかるかもしれません。"
 
 #: js/widgets/aiwidget.js:551
 #: js/widgets/sampler.js:254
@@ -7155,7 +7155,7 @@ msgstr "音色 サンプルを 保存"
 
 #: js/widgets/aiwidget.js:701
 msgid "AI Music"
-msgstr ""
+msgstr "AI音楽"
 
 #: js/widgets/arpeggio.js:239
 msgid "Click in the grid to add steps to the arpeggio."
@@ -7224,11 +7224,11 @@ msgstr "リズムメーカーの音の長さは、最大２５６です。"
 
 #: js/widgets/sampler.js:237
 msgid "Recording started..."
-msgstr ""
+msgstr "録音中"
 
 #: js/widgets/sampler.js:245
 msgid "Recording complete..."
-msgstr ""
+msgstr "録音完了"
 
 #: js/widgets/sampler.js:283
 msgid "A new sample block was generated."
@@ -7244,16 +7244,17 @@ msgstr ""
 
 #: js/widgets/sampler.js:448
 msgid "Toggle Mic"
-msgstr ""
+msgstr "マイクの切り替え"
 
 #: js/widgets/sampler.js:458
+#: "コンパイルされた音楽を再生"
 msgid "Playback"
-msgstr "コンパイルされた音楽を再生"
+msgstr "再生"
 
 #: js/widgets/sampler.js:979
 #.TRANS: The reference tone is a sound used for comparison.
 msgid "reference tone"
-msgstr ""
+msgstr "参照ピッチ"
 
 #: js/widgets/musickeyboard.js:744
 msgid "Metronome"
@@ -7291,7 +7292,7 @@ msgstr "2:1 オクターヴ・スペースに戻る"
 
 #: js/widgets/temperament.js:447
 msgid "edit"
-msgstr ""
+msgstr "編集する"
 
 #: js/widgets/temperament.js:454
 #: js/widgets/temperament.js:456
@@ -7461,7 +7462,7 @@ msgstr "ミュージック・ブロックスで開きます"
 
 #: planet/js/SaveInterface.js:35
 msgid "Open in Turtle Blocks"
-msgstr ""
+msgstr "タートル ブロックスで開きます"
 
 #: planet/js/GlobalCard.js:68
 msgid "Share"
@@ -7894,12 +7895,12 @@ msgstr "低"
 #: js/widgets/musickeyboard.js:3179
 
 #~msgid "New action blocks generated"
-#~msgstr ""
+#~msgstr "新しいアクションを作りました"
 
 #: js/widgets/musickeyboard.js:3180
 
 #~msgid "New action block generated"
-#~msgstr ""
+#~msgstr "新しいアクションを作りました"
 
 #~msgid "Toggle JavaScript Editor"
 #~msgstr "JavaScript編集をオン／オフ"
