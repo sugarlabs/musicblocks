@@ -1017,54 +1017,125 @@ class Activity {
         /*
          * Clears "canvas"
          */
-        this._allClear = (noErase) => {
-            this.blocks.activeBlock = null;
-            hideDOMLabel();
-
-            this.logo.boxes = {};
-            this.logo.time = 0;
-            this.hideMsgs();
-            this.hideGrids();
-            this.turtles.setBackgroundColor(-1);
-            this.logo.svgOutput = "";
-            this.logo.notationOutput = "";
-            for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
-                this.logo.turtleHeaps[turtle] = [];
-                this.logo.turtleDicts[turtle] = {};
-                this.logo.notation.notationStaging[turtle] = [];
-                this.logo.notation.notationDrumStaging[turtle] = [];
-                if (noErase === undefined || !noErase) {
-                    this.turtles.turtleList[turtle].painter.doClear(true, true, true);
-                }
-            }
-
-            this.blocksContainer.x = 0;
-            this.blocksContainer.y = 0;
-
-            // Code specific to cleaning up Music Blocks
-            Element.prototype.remove = () => {
-                this.parentElement.removeChild(this);
-            };
-
-            NodeList.prototype.remove = HTMLCollection.prototype.remove = () => {
-                for (let i = 0, len = this.length; i < len; i++) {
-                    if (this[i] && this[i].parentElement) {
-                        this[i].parentElement.removeChild(this[i]);
+        const renderClearConfirmation = (clearCanvasAction) => {
+            // Create a custom modal for confirmation
+            const modal = document.createElement("div");
+            modal.style.position = "fixed";
+            modal.style.top = "50%";
+            modal.style.left = "50%";
+            modal.style.transform = "translate(-50%, -50%)";
+            modal.style.width = "400px";
+            modal.style.padding = "24px";
+            modal.style.backgroundColor = "#fff";
+            modal.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
+            modal.style.borderRadius = "8px";
+            modal.style.zIndex = "10000";
+            modal.style.textAlign = "left";
+            const title = document.createElement("h2");
+            title.textContent = "Clear Workspace";
+            title.style.color = "#0066FF";
+            title.style.fontSize = "24px";
+            title.style.margin = "0 0 16px 0";
+            modal.appendChild(title);
+            const message = document.createElement("p");
+            message.textContent = "Are you sure you want to clear the workspace?";
+            message.style.color = "#666666";
+            message.style.fontSize = "16px";
+            message.style.marginBottom = "24px";
+            modal.appendChild(message);
+            // Add buttons
+            const buttonContainer = document.createElement("div");
+            buttonContainer.style.display = "flex";
+            buttonContainer.style.justifyContent = "flex-start";
+        
+            const confirmBtn = document.createElement("button");
+            confirmBtn.textContent = "Confirm";
+            confirmBtn.style.backgroundColor = "#2196F3";
+            confirmBtn.style.color = "white";
+            confirmBtn.style.border = "none";
+            confirmBtn.style.borderRadius = "4px";
+            confirmBtn.style.padding = "8px 16px";
+            confirmBtn.style.fontWeight = "bold";
+            confirmBtn.style.cursor = "pointer";
+            confirmBtn.style.marginRight = "16px";
+            confirmBtn.addEventListener("click", () => {
+                document.body.removeChild(modal);
+                clearCanvasAction();
+            });
+        
+            const cancelBtn = document.createElement("button");
+            cancelBtn.textContent = "Cancel";
+            cancelBtn.style.backgroundColor = "#f1f1f1";
+            cancelBtn.style.color = "black";
+            cancelBtn.style.border = "none";
+            cancelBtn.style.borderRadius = "4px";
+            cancelBtn.style.padding = "8px 16px";
+            cancelBtn.style.fontWeight = "bold";
+            cancelBtn.style.cursor = "pointer";
+            cancelBtn.addEventListener("click", () => {
+                document.body.removeChild(modal);
+            });
+        
+            buttonContainer.appendChild(confirmBtn);
+            buttonContainer.appendChild(cancelBtn);
+            modal.appendChild(buttonContainer);
+            document.body.appendChild(modal);
+        };
+        
+        this._allClear = (noErase, skipConfirmation = false) => {
+            const clearCanvasAction = () => {
+                this.blocks.activeBlock = null;
+                hideDOMLabel();
+        
+                this.logo.boxes = {};
+                this.logo.time = 0;
+                this.hideMsgs();
+                this.hideGrids();
+                this.turtles.setBackgroundColor(-1);
+                this.logo.svgOutput = "";
+                this.logo.notationOutput = "";
+                for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+                    this.logo.turtleHeaps[turtle] = [];
+                    this.logo.turtleDicts[turtle] = {};
+                    this.logo.notation.notationStaging[turtle] = [];
+                    this.logo.notation.notationDrumStaging[turtle] = [];
+                    if (noErase === undefined || !noErase) {
+                        this.turtles.turtleList[turtle].painter.doClear(true, true, true);
                     }
                 }
+        
+                this.blocksContainer.x = 0;
+                this.blocksContainer.y = 0;
+        
+                Element.prototype.remove = () => {
+                    this.parentElement.removeChild(this);
+                };
+        
+                NodeList.prototype.remove = HTMLCollection.prototype.remove = () => {
+                    for (let i = 0, len = this.length; i < len; i++) {
+                        if (this[i] && this[i].parentElement) {
+                            this[i].parentElement.removeChild(this[i]);
+                        }
+                    }
+                };
+        
+                const table = docById("myTable");
+                if (table !== null) {
+                    table.remove();
+                }
+        
+                if (docById("helpfulWheelDiv").style.display !== "none") {
+                    docById("helpfulWheelDiv").style.display = "none";
+                    this.__tick();
+                }
             };
-
-            const table = docById("myTable");
-            if (table !== null) {
-                table.remove();
-            }
-
-            if (docById("helpfulWheelDiv").style.display !== "none") {
-                docById("helpfulWheelDiv").style.display = "none";
-                this.__tick();
+        
+            if (skipConfirmation) {
+                clearCanvasAction();
+            } else {
+                renderClearConfirmation(clearCanvasAction);
             }
         };
-
         /**
          * Sets up play button functionality; runs Music Blocks.
          * @param env {specifies environment}
@@ -1447,6 +1518,8 @@ class Activity {
                     else if (ele.label === "Disable horizontal scrolling")
                         ele.display = true;
                 })
+                activity.textMsg(("Horizontal scrolling enabled."), 3000);
+
             } else {
                 enableHorizScrollIcon.style.display = "block";
                 disableHorizScrollIcon.style.display = "none";
@@ -1457,6 +1530,8 @@ class Activity {
                     else if (ele.label === "Disable horizontal scrolling")
                         ele.display = false;
                 })
+                activity.textMsg(("Horizontal scrolling disabled."), 3000);
+
             }
         };
 
@@ -1517,18 +1592,20 @@ class Activity {
                 if (this.blockscale < BLOCKSCALES.length - 1) {
                     this.resizeDebounce = true;
                     this.blockscale += 1;
+                    this.clearCache();
                     await this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
+                    this.blocks.checkBounds();
+                    this.refreshCanvas();
                 }
 
                 const that = this;
-                that.resizeDebounce = false;
-                await this.setSmallerLargerStatus();
-
+                setTimeout(() => {
+                    that.resizeDebounce = false;
+                }, 200);
             }
-            if (typeof(this.activity)!="undefined"){
-                 await this.activity.refreshCanvas();
-               }
-            document.getElementById("hideContents").click();
+        
+            await this.setSmallerLargerStatus();
+            await this.stage.update();
         };
 
         /**
@@ -1554,19 +1631,21 @@ class Activity {
                 if (this.blockscale > 0) {
                     this.resizeDebounce = true;
                     this.blockscale -= 1;
+                    this.clearCache();                
                     await this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
+                    this.blocks.checkBounds();
+                    this.refreshCanvas();
                 }
 
                 const that = this;
-                that.resizeDebounce = false;
+                setTimeout(() => {
+                    that.resizeDebounce = false;
+                }, 200);
 
             }
 
             await this.setSmallerLargerStatus();
-            if (typeof(this.activity)!="undefined"){
-                await this.activity.refreshCanvas();
-            }
-            document.getElementById("hideContents").click();
+            await this.stage.update();
         };
 
         /*
@@ -3569,6 +3648,22 @@ class Activity {
         };
 
         /*
+         * Clears cache for all blocks
+         */
+        this.clearCache = () => {
+            this.blocks.blockList.forEach(block => {
+                if (block.container) {
+                    block.container.uncache();
+                    block.container.cache();
+                }
+                if (block.bitmap) {            
+                    block.bitmap.uncache();
+                    block.bitmap.cache();
+                }
+            });
+        };
+
+        /*
          * Updates all canvas elements
          */
         this.refreshCanvas = () => {
@@ -3576,15 +3671,17 @@ class Activity {
                 return;
             }
 
-            this.blockRefreshCanvas = true;
-
+            this.blockRefreshCanvas = true;           
+            // Force stage clear and update
+            this.stage.clear();
+            this.stage.update();
+            this.update = true;
+            
             const that = this;
             setTimeout(() => {
                 that.blockRefreshCanvas = false;
+                that.stage.update();
             }, 5);
-
-            this.stage.update(event);
-            this.update = true;
         };
 
         /*
@@ -3652,7 +3749,7 @@ class Activity {
             document.querySelector("#myOpenFile").click();
             window.scroll(0, 0);
             doHardStopButton(that);
-            that._allClear(true);
+            that._allClear(true, true);
         };
 
         window.prepareExport = this.prepareExport;
