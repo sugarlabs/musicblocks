@@ -3650,7 +3650,7 @@ class Activity {
             this.blocks.blockList.forEach(block => {
                 if (block.container) {
                     block.container.uncache();
-                    block.container.cache(0,0,1,1);
+                    block.container.cache();
                 }
                 if (block.bitmap) {            
                     block.bitmap.uncache();
@@ -3667,15 +3667,17 @@ class Activity {
                 return;
             }
 
-            this.blockRefreshCanvas = true;
-
+            this.blockRefreshCanvas = true;           
+            // Force stage clear and update
+            this.stage.clear();
+            this.stage.update();
+            this.update = true;
+            
             const that = this;
             setTimeout(() => {
                 that.blockRefreshCanvas = false;
+                that.stage.update();
             }, 5);
-
-            this.stage.update(event);
-            this.update = true;
         };
 
         /*
