@@ -3645,7 +3645,16 @@ class Activity {
         this.clearCache = () => {
             this.blocks.blockList.forEach(block => {
                 if (block.container) {
-                    block.container.uncache();
+                    if (block.container.cacheCanvas) {
+                        block.container.uncache();
+                        block.container.cache();
+                    }
+                }
+                if (block.bitmap) {
+                    if (block.bitmap.cacheCanvas) {
+                        block.bitmap.uncache();
+                        block.bitmap.cache();
+                    }
                 }
             });
         };
