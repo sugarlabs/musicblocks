@@ -1592,18 +1592,20 @@ class Activity {
                 if (this.blockscale < BLOCKSCALES.length - 1) {
                     this.resizeDebounce = true;
                     this.blockscale += 1;
+                    this.clearCache();
                     await this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
+                    this.blocks.checkBounds();
+                    this.refreshCanvas();
                 }
 
                 const that = this;
-                that.resizeDebounce = false;
-                await this.setSmallerLargerStatus();
-
+                setTimeout(() => {
+                    that.resizeDebounce = false;
+                }, 200);
             }
-            if (typeof(this.activity)!="undefined"){
-                 await this.activity.refreshCanvas();
-               }
-            document.getElementById("hideContents").click();
+        
+            await this.setSmallerLargerStatus();
+            await this.stage.update();
         };
 
         /**
@@ -1629,19 +1631,21 @@ class Activity {
                 if (this.blockscale > 0) {
                     this.resizeDebounce = true;
                     this.blockscale -= 1;
+                    this.clearCache();                
                     await this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
+                    this.blocks.checkBounds();
+                    this.refreshCanvas();
                 }
 
                 const that = this;
-                that.resizeDebounce = false;
+                setTimeout(() => {
+                    that.resizeDebounce = false;
+                }, 200);
 
             }
 
             await this.setSmallerLargerStatus();
-            if (typeof(this.activity)!="undefined"){
-                await this.activity.refreshCanvas();
-            }
-            document.getElementById("hideContents").click();
+            await this.stage.update();
         };
 
         /*
@@ -3644,6 +3648,22 @@ class Activity {
         };
 
         /*
+         * Clears cache for all blocks
+         */
+        this.clearCache = () => {
+            this.blocks.blockList.forEach(block => {
+                if (block.container) {
+                    block.container.uncache();
+                    block.container.cache();
+                }
+                if (block.bitmap) {            
+                    block.bitmap.uncache();
+                    block.bitmap.cache();
+                }
+            });
+        };
+
+        /*
          * Updates all canvas elements
          */
         this.refreshCanvas = () => {
@@ -3651,15 +3671,17 @@ class Activity {
                 return;
             }
 
-            this.blockRefreshCanvas = true;
-
+            this.blockRefreshCanvas = true;           
+            // Force stage clear and update
+            this.stage.clear();
+            this.stage.update();
+            this.update = true;
+            
             const that = this;
             setTimeout(() => {
                 that.blockRefreshCanvas = false;
+                that.stage.update();
             }, 5);
-
-            this.stage.update(event);
-            this.update = true;
         };
 
         /*
