@@ -140,7 +140,7 @@ const NSYMBOLS = { 1: "𝅝", 2: "𝅗𝅥", 4: "♩", 8: "♪", 16: "𝅘𝅥𝅯" };
  * @constant {Object.<number, string>}
  * @default
  */
-const RSYMBOLS = { 1: "𝄻", 2: "𝄼", 4: "𝄽",8: "𝄾", 16: "𝄿" };
+const RSYMBOLS = { 1: "𝄻", 2: "𝄼", 4: "𝄽", 8: "𝄾", 16: "𝄿" };
 
 /**
  * Maps from notes with flats to their corresponding notes with '♭' (flat) symbol.
@@ -202,7 +202,6 @@ const NOTESSHARP = [
     "A" + SHARP,
     "B"
 ];
-
 
 /**
  * Array of notes with flats.
@@ -324,7 +323,7 @@ const CONVERT_UP = {
     "G♯": "A" + FLAT,
     "A♯": "B" + FLAT,
     "B♯": "C",
-    "B": "C" + FLAT,
+    "B": "C" + FLAT
 };
 
 /**
@@ -679,36 +678,35 @@ const ALLNOTESTEP = {
     "B#": 0
 };
 
-
 /**
  * semitone/intervalnumber --> lettergap/notenamesgap -->intervalnames
  * @constant {Object.<number, Object.<number,string>}
  */
 
 const SEMITONETOINTERVALMAP = {
-     0: { 0: _("Perfect unison"), 1: _("Diminished second") },
-     1: { 1: _("Minor second"), 0: _("Augmented unison") },
-     2: { 1: _("Major second"), 2: _("Diminished third") },
-     3: { 2: _("Minor third"), 1: _("Augmented second") },
-     4: { 2: _("Major third"), 3: _("Diminished fourth") },
-     5: { 3: _("Perfect fourth"), 2: _("Augmented third") },
-     6: { 4: _("Diminished fifth"), 3: _("Augmented fourth") },
-     7: { 4: _("Perfect fifth"), 5: _("Diminished sixth") },
-     8: { 5: _("Minor sixth"), 4: _("Augmented fifth") },
-     9: { 5: _("Major sixth"), 6: _("Diminished seventh") },
-     10: { 6: _("Minor seventh"), 5: _("Augmented sixth") },
-     11: { 6: _("Major seventh"), 0: _("Diminished octave") },
-     12: { 0: _("Perfect octave"), 6: _("Augmented seventh") },
-     13: { 1: _("Minor ninth"), 0: _("Augmented octave") },
-     14: { 1: _("Major ninth"), 2: _("Diminished tenth") },
-     15: { 2: _("Minor tenth"), 1: _("Augmented ninth") },
-     16: { 2: _("Major tenth"), 3: _("Diminished eleventh") },
-     17: { 3: _("Perfect eleventh"), 2: _("Augmented tenth") },
-     18: { 4: _("Diminished twelfth"), 3: _("Augmented eleventh") },
-     19: { 4: _("Perfect twelfth"), 5: _("Diminished thirteenth") },
-     20: { 5: _("Minor thirteenth"), 4: _("Augmented fifth, plus an octave") },
-     21: { 5: _("Major thirteenth"), 6: _("Diminished seventh, plus an octave") },
- };
+    0: { 0: _("Perfect unison"), 1: _("Diminished second") },
+    1: { 1: _("Minor second"), 0: _("Augmented unison") },
+    2: { 1: _("Major second"), 2: _("Diminished third") },
+    3: { 2: _("Minor third"), 1: _("Augmented second") },
+    4: { 2: _("Major third"), 3: _("Diminished fourth") },
+    5: { 3: _("Perfect fourth"), 2: _("Augmented third") },
+    6: { 4: _("Diminished fifth"), 3: _("Augmented fourth") },
+    7: { 4: _("Perfect fifth"), 5: _("Diminished sixth") },
+    8: { 5: _("Minor sixth"), 4: _("Augmented fifth") },
+    9: { 5: _("Major sixth"), 6: _("Diminished seventh") },
+    10: { 6: _("Minor seventh"), 5: _("Augmented sixth") },
+    11: { 6: _("Major seventh"), 0: _("Diminished octave") },
+    12: { 0: _("Perfect octave"), 6: _("Augmented seventh") },
+    13: { 1: _("Minor ninth"), 0: _("Augmented octave") },
+    14: { 1: _("Major ninth"), 2: _("Diminished tenth") },
+    15: { 2: _("Minor tenth"), 1: _("Augmented ninth") },
+    16: { 2: _("Major tenth"), 3: _("Diminished eleventh") },
+    17: { 3: _("Perfect eleventh"), 2: _("Augmented tenth") },
+    18: { 4: _("Diminished twelfth"), 3: _("Augmented eleventh") },
+    19: { 4: _("Perfect twelfth"), 5: _("Diminished thirteenth") },
+    20: { 5: _("Minor thirteenth"), 4: _("Augmented fifth, plus an octave") },
+    21: { 5: _("Major thirteenth"), 6: _("Diminished seventh, plus an octave") }
+};
 
 /**
  * Array containing preferences for keys with sharps.
@@ -968,16 +966,11 @@ const MATRIXSOLFEHEIGHT = 30;
  * Image URL for a whole note.
  * @constant {string}
  */
-const wholeNoteImg =
-    "data:image/svg+xml;base64," + window.btoa(base64Encode(WHOLENOTE));
-const halfNoteImg =
-    "data:image/svg+xml;base64," + window.btoa(base64Encode(HALFNOTE));
-const quarterNoteImg =
-    "data:image/svg+xml;base64," + window.btoa(base64Encode(QUARTERNOTE));
-const eighthNoteImg =
-    "data:image/svg+xml;base64," + window.btoa(base64Encode(EIGHTHNOTE));
-const sixteenthNoteImg =
-    "data:image/svg+xml;base64," + window.btoa(base64Encode(SIXTEENTHNOTE));
+const wholeNoteImg = "data:image/svg+xml;base64," + window.btoa(base64Encode(WHOLENOTE));
+const halfNoteImg = "data:image/svg+xml;base64," + window.btoa(base64Encode(HALFNOTE));
+const quarterNoteImg = "data:image/svg+xml;base64," + window.btoa(base64Encode(QUARTERNOTE));
+const eighthNoteImg = "data:image/svg+xml;base64," + window.btoa(base64Encode(EIGHTHNOTE));
+const sixteenthNoteImg = "data:image/svg+xml;base64," + window.btoa(base64Encode(SIXTEENTHNOTE));
 const thirtysecondNoteImg =
     "data:image/svg+xml;base64," + window.btoa(base64Encode(THIRTYSECONDNOTE));
 const sixtyfourthNoteImg =
@@ -986,7 +979,8 @@ const sixtyfourthNoteImg =
 /**
  * Map from note duration to corresponding note symbols.
  * @constant {Object.<number, string>}
- */    
+ */
+
 const NOTESYMBOLS = {
     1: wholeNoteImg,
     2: halfNoteImg,
@@ -1271,15 +1265,59 @@ const DEFAULTCHORD = CHORDNAMES[9];
  */
 const CHORDVALUES = [
     //scalar
-    [[0, 0], [2, 0], [4, 0]],
-    [[2, 0], [4, 0], [7, 0]],
-    [[-3, 0], [0, 0], [2, 0]],
-    [[0, 0], [2, 0], [4, 0], [6, 0]],
-    [[2, 0], [4, 0], [6, 0], [7, 0]],
-    [[-3, 0], [-1, 0], [0, 0], [2, 0]],
-    [[-1, 0], [0, 0], [2, 0], [4, 0]],
-    [[0, 0], [2, 0], [4, 0], [6, 0], [8, 0]],
-    [[0, 0], [2, 0], [4, 0], [6, 0], [12, 0]],
+    [
+        [0, 0],
+        [2, 0],
+        [4, 0]
+    ],
+    [
+        [2, 0],
+        [4, 0],
+        [7, 0]
+    ],
+    [
+        [-3, 0],
+        [0, 0],
+        [2, 0]
+    ],
+    [
+        [0, 0],
+        [2, 0],
+        [4, 0],
+        [6, 0]
+    ],
+    [
+        [2, 0],
+        [4, 0],
+        [6, 0],
+        [7, 0]
+    ],
+    [
+        [-3, 0],
+        [-1, 0],
+        [0, 0],
+        [2, 0]
+    ],
+    [
+        [-1, 0],
+        [0, 0],
+        [2, 0],
+        [4, 0]
+    ],
+    [
+        [0, 0],
+        [2, 0],
+        [4, 0],
+        [6, 0],
+        [8, 0]
+    ],
+    [
+        [0, 0],
+        [2, 0],
+        [4, 0],
+        [6, 0],
+        [12, 0]
+    ],
     //semitone
     [[0, 0], [0, 4], [0, 7]],
     [[0, 0], [0, 3], [0, 7]],
@@ -1292,7 +1330,11 @@ const CHORDVALUES = [
     [[0, 0], [0, 3], [0, 6], [0, 9]],
     [[0, 0], [0, 3], [0, 6], [0, 10]],
     // custom is always at the end of the list
-    [[0, 0], [0, 4], [0, 7]],
+    [
+        [0, 0],
+        [0, 4],
+        [0, 7]
+    ]
 ];
 
 /**
@@ -1643,14 +1685,14 @@ const TEMPERAMENT = {
             "perfect 8"
         ]
     },
-    "equal5":{
+    "equal5": {
         // Equal 5EDO temperament: 5 Equal Divisions of the Octave
-        "perfect 1": Math.pow(2, 0 / 5),//Unison
+        "perfect 1": Math.pow(2, 0 / 5), //Unison
         "minor 2": Math.pow(2, 1 / 5),
         "augmented 1": Math.pow(2, 1 / 5),
         "major 2": Math.pow(2, 2 / 5),
         "augmented 2": Math.pow(2, 2 / 5),
-        "minor 3": Math.pow(2, 2/ 5),
+        "minor 3": Math.pow(2, 2 / 5),
         "major 3": Math.pow(2, 3 / 5),
         "augmented 3": Math.pow(2, 3 / 5),
         "diminished 4": Math.pow(2, 3 / 5),
@@ -1668,19 +1710,11 @@ const TEMPERAMENT = {
         "diminished 8": Math.pow(2, 5 / 5),
         "perfect 8": Math.pow(2, 5 / 5),
         "pitchNumber": 5,
-        "interval": [
-            "perfect 1",
-            "minor 2",
-            "major 2",
-            "major 3",
-            "augmented 4",
-            "perfect 5"
-
-        ]
+        "interval": ["perfect 1", "minor 2", "major 2", "major 3", "augmented 4", "perfect 5"]
     },
-     "equal7":{
+    "equal7": {
         // Equal 7EDO Temperament: 7 Equal Divisions of the Octave
-        "perfect 1": Math.pow(2, 0 / 7),//Unison
+        "perfect 1": Math.pow(2, 0 / 7), //Unison
         "minor 2": Math.pow(2, 1 / 7),
         "augmented 1": Math.pow(2, 1 / 7),
         "major 2": Math.pow(2, 2 / 7),
@@ -1699,7 +1733,7 @@ const TEMPERAMENT = {
         "augmented 6": Math.pow(2, 7 / 7),
         "minor 7": Math.pow(2, 6 / 7),
         "major 7": Math.pow(2, 6 / 7),
-        "augmented 7": Math.pow(2, 7 / 7),// wraps around
+        "augmented 7": Math.pow(2, 7 / 7), // wraps around
         "diminished 8": Math.pow(2, 7 / 7),
         "perfect 8": Math.pow(2, 7 / 7),
         "pitchNumber": 7,
@@ -1714,55 +1748,55 @@ const TEMPERAMENT = {
             "perfect 8"
         ]
     },
-    "equal19":{
+    "equal19": {
         // Equal 19EDO Temperament: 19 Equal Divisions of the Octave
-        "perfect 1": Math.pow(2, 0 / 19), 
-        "minor 2":  Math.pow(2, 2 / 19), 
-        "augmented 1":  Math.pow(2, 1 / 19), 
-        "major 2":  Math.pow(2, 3 / 19), 
-        "augmented 2":  Math.pow(2, 4 / 19), 
-        "minor 3":  Math.pow(2, 5 / 19), 
-        "major 3":  Math.pow(2, 6 / 19), 
-        "augmented 3":  Math.pow(2, 7 / 19), 
-        "diminished 4":  Math.pow(2, 7 / 19), 
-        "perfect 4":  Math.pow(2, 8 / 19), 
-        "augmented 4":  Math.pow(2, 9 / 19), 
-        "diminished 5":  Math.pow(2, 9 / 19), 
-        "perfect 5":  Math.pow(2, 10 / 19), 
-        "augmented 5": Math.pow(2, 11 / 19), 
-        "minor 6":  Math.pow(2, 12 / 19), 
-        "major 6":  Math.pow(2, 13 / 19), 
-        "augmented 6":  Math.pow(2, 14 / 19), 
-        "minor 7":  Math.pow(2, 15 / 19), 
-        "major 7":  Math.pow(2, 16 / 19), 
-        "augmented 7":  Math.pow(2, 17 / 19), 
-        "diminished 8":  Math.pow(2, 18 / 19), 
-        "perfect 8":  Math.pow(2, 19 / 19), 
+        "perfect 1": Math.pow(2, 0 / 19),
+        "minor 2": Math.pow(2, 2 / 19),
+        "augmented 1": Math.pow(2, 1 / 19),
+        "major 2": Math.pow(2, 3 / 19),
+        "augmented 2": Math.pow(2, 4 / 19),
+        "minor 3": Math.pow(2, 5 / 19),
+        "major 3": Math.pow(2, 6 / 19),
+        "augmented 3": Math.pow(2, 7 / 19),
+        "diminished 4": Math.pow(2, 7 / 19),
+        "perfect 4": Math.pow(2, 8 / 19),
+        "augmented 4": Math.pow(2, 9 / 19),
+        "diminished 5": Math.pow(2, 9 / 19),
+        "perfect 5": Math.pow(2, 10 / 19),
+        "augmented 5": Math.pow(2, 11 / 19),
+        "minor 6": Math.pow(2, 12 / 19),
+        "major 6": Math.pow(2, 13 / 19),
+        "augmented 6": Math.pow(2, 14 / 19),
+        "minor 7": Math.pow(2, 15 / 19),
+        "major 7": Math.pow(2, 16 / 19),
+        "augmented 7": Math.pow(2, 17 / 19),
+        "diminished 8": Math.pow(2, 18 / 19),
+        "perfect 8": Math.pow(2, 19 / 19),
         "pitchNumber": 19,
         "interval": [
             "perfect 1",
-            "augmented 1", 
-            "minor 2",  
-            "major 2", 
-            "augmented 2", 
-            "minor 3", 
-            "major 3", 
-            "augmented 3", 
-            "perfect 4", 
-            "augmented 4",  
-            "perfect 5", 
+            "augmented 1",
+            "minor 2",
+            "major 2",
+            "augmented 2",
+            "minor 3",
+            "major 3",
+            "augmented 3",
+            "perfect 4",
+            "augmented 4",
+            "perfect 5",
             "augmented 5",
-            "minor 6", 
-            "major 6", 
-            "augmented 6", 
-            "minor 7", 
-            "major 7", 
-            "augmented 7", 
-            "diminished 8", 
-            "perfect 8",
-        ] 
+            "minor 6",
+            "major 6",
+            "augmented 6",
+            "minor 7",
+            "major 7",
+            "augmented 7",
+            "diminished 8",
+            "perfect 8"
+        ]
     },
-    "equal31":{
+    "equal31": {
         // Equal 31EDO Temperament: 31 Equal Divisions of the Octave
         "perfect 1": Math.pow(2, 0 / 31),
         "minor 2": Math.pow(2, 3 / 31),
@@ -1777,7 +1811,7 @@ const TEMPERAMENT = {
         "augmented 4": Math.pow(2, 15 / 31),
         "diminished 5": Math.pow(2, 16 / 31),
         "perfect 5": Math.pow(2, 18 / 31),
-        "augmented 5":Math.pow(2, 19 / 31),
+        "augmented 5": Math.pow(2, 19 / 31),
         "minor 6": Math.pow(2, 21 / 31),
         "major 6": Math.pow(2, 23 / 31),
         "augmented 6": Math.pow(2, 24 / 31),
@@ -1788,28 +1822,28 @@ const TEMPERAMENT = {
         "perfect 8": Math.pow(2, 31 / 31),
         "pitchNumber": 21,
         "interval": [
-            "perfect 1", 
+            "perfect 1",
             "augmented 1",
-            "minor 2",  
-            "major 2", 
-            "augmented 2", 
-            "minor 3", 
-            "major 3", 
-            "augmented 3", 
-            "diminished 4", 
-            "perfect 4", 
-            "augmented 4", 
-            "diminished 5", 
-            "perfect 5", 
+            "minor 2",
+            "major 2",
+            "augmented 2",
+            "minor 3",
+            "major 3",
+            "augmented 3",
+            "diminished 4",
+            "perfect 4",
+            "augmented 4",
+            "diminished 5",
+            "perfect 5",
             "augmented 5",
-            "minor 6", 
-            "major 6", 
-            "augmented 6", 
-            "minor 7", 
-            "major 7", 
+            "minor 6",
+            "major 6",
+            "augmented 6",
+            "minor 7",
+            "major 7",
             "augmented 7",
-            "diminished 8", 
-            "perfect 8" 
+            "diminished 8",
+            "perfect 8"
         ]
     },
     "just intonation": {
@@ -2124,7 +2158,6 @@ const updateTemperaments = () => {
     }
 };
 
-
 /**
  * Default invert mode.
  * @constant {string}
@@ -2217,7 +2250,9 @@ const getInvertMode = (name) => {
  * @param {string} name - The name of the interval.
  * @returns {number} The number of semi-tones for the interval.
  */
-const getIntervalNumber = name => { return INTERVALVALUES[name][0]; };
+const getIntervalNumber = (name) => {
+    return INTERVALVALUES[name][0];
+};
 
 /**
  * Get the direction of the interval (-1 down, 0 neutral, 1 up).
@@ -2225,7 +2260,9 @@ const getIntervalNumber = name => { return INTERVALVALUES[name][0]; };
  * @param {string} name - The name of the interval.
  * @returns {number} The direction of the interval.
  */
-const getIntervalDirection = name =>  { return INTERVALVALUES[name][1];};
+const getIntervalDirection = (name) => {
+    return INTERVALVALUES[name][1];
+};
 
 /**
  * Get the ratio for a specific interval.
@@ -2233,8 +2270,9 @@ const getIntervalDirection = name =>  { return INTERVALVALUES[name][1];};
  * @param {string} name - The name of the interval.
  * @returns {number} The ratio for the interval.
  */
-const getIntervalRatio = name => { return INTERVALVALUES[name][2];};
-
+const getIntervalRatio = (name) => {
+    return INTERVALVALUES[name][2];
+};
 
 /**
  * Get the mode numbers for a specific mode name.
@@ -2243,7 +2281,7 @@ const getIntervalRatio = name => { return INTERVALVALUES[name][2];};
  * @returns {string} The mode numbers.
  */
 const getModeNumbers = (name) => {
-    const __convert =  obj => {
+    const __convert = (obj) => {
         let n = 0;
         let m = "";
         for (let i = 0; i < obj.length; i++) {
@@ -2461,7 +2499,6 @@ const getNoiseName = (name) => {
     return DEFAULTNOISE;
 };
 
-
 /**
  * Get the noise icon file path based on its name.
  * @function
@@ -2661,7 +2698,7 @@ const frequencyToPitch = (hz) => {
         const f = A0 * Math.pow(TWELVEHUNDRETHROOT2, i);
         if (hz < f * 1.0003 && hz > f * 0.9997) {
             cents = i % 100;
-            let j = Math.floor((i / 100));
+            let j = Math.floor(i / 100);
             if (cents > 50) {
                 cents -= 100;
                 j += 1;
@@ -2700,7 +2737,7 @@ const getArticulation = (note) => {
         .replace("E", "")
         .replace("F", "")
         .replace("G", "")
-        .replace("^^", "")  // up/down from custom notes
+        .replace("^^", "") // up/down from custom notes
         .replace("vv", "")
         .replace("^", "")
         .replace("v", "");
@@ -3441,7 +3478,7 @@ const getNoteFromInterval = (pitch, interval) => {
     const pitches = ["C", "D", "E", "F", "G", "A", "B"];
     const priorAttrs = [DOUBLEFLAT, FLAT, "", SHARP, DOUBLESHARP];
     // let majorintervalNote;
-    
+
     /**
      * Find the note that corresponds to a major interval.
      * @function
@@ -3486,7 +3523,7 @@ const getNoteFromInterval = (pitch, interval) => {
             }
         }
     };
-    
+
     /**
      * Find notes for intervals other than major intervals.
      * @function
@@ -3679,11 +3716,11 @@ const GetNotesForInterval = (tur) => {
         secondNote = "C",
         octave = 0;
     if (noteStatus && noteStatus[0]) {
-        firstNote = noteStatus[0][0].replace(/\d/g,"");//removing all numbers like '1'
+        firstNote = noteStatus[0][0].replace(/\d/g, ""); //removing all numbers like '1'
         if (!noteStatus[0][1]) {
             return { firstNote, secondNote: firstNote, octave };
         }
-        secondNote = noteStatus[0][1].replace(/\d/g,"");
+        secondNote = noteStatus[0][1].replace(/\d/g, "");
         const octavea = parseInt(noteStatus[0][0].replace(/[^0-9]/g, ""));
         const octaveb = parseInt(noteStatus[0][1].replace(/[^0-9]/g, ""));
         octave = octaveb - octavea;
@@ -3694,9 +3731,8 @@ const GetNotesForInterval = (tur) => {
     }
 
     if (intervals && intervals.length) {
-        octave=Math.floor(intervals[0]/7);
-
-    } else if (noteOctave&&noteOctave[last(tur.singer.inNoteBlock)]) {
+        octave = Math.floor(intervals[0] / 7);
+    } else if (noteOctave && noteOctave[last(tur.singer.inNoteBlock)]) {
         const octaveblk = noteOctave[last(tur.singer.inNoteBlock)];
         octave = octaveblk[octaveblk.length - 1] - octaveblk[0];
     }
@@ -3709,6 +3745,17 @@ const GetNotesForInterval = (tur) => {
     return { firstNote, secondNote, octave };
 };
 
+/**
+ * Encodes a string to Base64 format.
+ * @param {string} str - The string to encode.
+ * @returns {string} - The Base64 encoded string.
+ */
+function base64Encode(str) {
+    let encoder = new TextEncoder();
+    let uint8Array = encoder.encode(str);
+    let binaryString = String.fromCharCode(...uint8Array);
+    return binaryString;
+}
 
 /**
  * Get the note based on various parameters.
@@ -3807,11 +3854,7 @@ function getNote(
             if (kOffset === -1) {
                 kOffset = 0;
                 // eslint-disable-next-line no-console
-                console.log(
-                    "Cannot find " +
-                    keySignature.split(" ")[0] +
-                    ". Reverting to C"
-                );
+                console.log("Cannot find " + keySignature.split(" ")[0] + ". Reverting to C");
             }
         }
         if (getSharpFlatPreference(keySignature) === "sharp") {
@@ -4419,10 +4462,28 @@ const _calculate_pitch_number = (activity, np, tur) => {
 const buildScale = (keySignature) => {
     // FIX ME: temporary hard-coded fix to avoid errors in pitch preview
     if (keySignature == "C♭ major") {
-        const scale = ["C" + FLAT, "D" + FLAT, "E" + FLAT, "F" + FLAT, "G" + FLAT, "A" + FLAT, "B" + FLAT, "C" + FLAT];
+        const scale = [
+            "C" + FLAT,
+            "D" + FLAT,
+            "E" + FLAT,
+            "F" + FLAT,
+            "G" + FLAT,
+            "A" + FLAT,
+            "B" + FLAT,
+            "C" + FLAT
+        ];
         return [scale, [2, 2, 1, 2, 2, 2, 1]];
     } else if (keySignature == "F♭ major") {
-        const scale = ["F" + FLAT, "G" + FLAT, "A" + FLAT, "B" + DOUBLEFLAT, "C" + FLAT, "D" + FLAT, "E" + FLAT, "F" + FLAT];
+        const scale = [
+            "F" + FLAT,
+            "G" + FLAT,
+            "A" + FLAT,
+            "B" + DOUBLEFLAT,
+            "C" + FLAT,
+            "D" + FLAT,
+            "E" + FLAT,
+            "F" + FLAT
+        ];
         return [scale, [2, 2, 1, 2, 2, 2, 1]];
     }
 
@@ -4551,7 +4612,7 @@ const _getStepSize = (keySignature, pitch, direction, transposition, temperament
     } else if (thisPitch in STOSHARP) {
         thisPitch = STOSHARP[thisPitch];
     }
-    
+
     /**
      * Check if two pitches are logically equivalent.
      * @function
@@ -4716,14 +4777,15 @@ const getStepSizeDown = (keySignature, pitch, transposition, temperament) => {
     return _getStepSize(keySignature, pitch, "down", transposition, temperament);
 };
 
-
 /**
  * Get the length of the mode (number of notes) for the given key signature.
  * @function
  * @param {string} keySignature - The key signature.
  * @returns {number} The length of the mode.
  */
-const getModeLength = keySignature => { return buildScale(keySignature)[1].length; };
+const getModeLength = (keySignature) => {
+    return buildScale(keySignature)[1].length;
+};
 
 /**
  * Map scale degree to pitch or vice versa for a chosen mode.
@@ -5175,7 +5237,7 @@ const getInterval = (interval, keySignature, pitch) => {
  * @returns {string} The reduced fraction as a string.
  */
 const reducedFraction = (a, b) => {
-    const greatestCommonMultiple =  (a, b) => {
+    const greatestCommonMultiple = (a, b) => {
         return b === 0 ? a : greatestCommonMultiple(b, a % b);
     };
 
@@ -5594,7 +5656,7 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
  * @param {(number|string)} arg - The argument for interval octave calculation.
  * @returns {number} The calculated octave value.
  */
-const calcOctaveInterval = arg => {
+const calcOctaveInterval = (arg) => {
     // Used by intervals to determine octave to use in an interval.
     let value = 0;
     switch (arg) {
@@ -5662,7 +5724,7 @@ const convertFromSolfege = (note) => {
  * @param {number} factor - The duration factor to convert.
  * @returns {string|null} The string representation of the duration factor.
  */
-const convertFactor = factor => {
+const convertFactor = (factor) => {
     switch (factor) {
         case 0.0625: // 1/16
             return "16";
@@ -5774,7 +5836,7 @@ const getPitchInfo = (activity, type, currentNote, tur) => {
                 }
                 return SOLFEGENAMES[buildScale(tur.singer.keySignature)[0].indexOf(pitch)];
             case "pitch class":
-                return ((pitchToNumber(pitch, octave, tur.singer.keySignature) - 3) % 12);
+                return (pitchToNumber(pitch, octave, tur.singer.keySignature) - 3) % 12;
             case "scalar class":
                 return scaleDegreeToPitchMapping(
                     tur.singer.keySignature,
@@ -5789,7 +5851,7 @@ const getPitchInfo = (activity, type, currentNote, tur) => {
                     tur.singer.movable,
                     pitch
                 );
-                return (obj[0] + obj[1]);
+                return obj[0] + obj[1];
             case "nth degree":
                 return buildScale(tur.singer.keySignature)[0].indexOf(pitch);
             case "staff y":
@@ -5824,4 +5886,88 @@ const getPitchInfo = (activity, type, currentNote, tur) => {
         // eslint-disable-next-line no-console
         console.debug("Waiting for note to play");
     }
+};
+module.exports = {
+    updateTemperaments,
+    scaleDegreeToPitchMapping,
+    buildScale,
+    getNote,
+    getModeLength,
+    nthDegreeToPitch
+    ,getInterval,
+    _calculate_pitch_number,
+    _getStepSize,
+    reducedFraction,
+    toFraction,
+    durationToNoteValue,
+    calcNoteValueToDisplay,
+    noteToPitchOctave,
+    pitchToFrequency,
+    noteIsSolfege,
+    getSolfege,
+    splitSolfege,
+    i18nSolfege,
+    splitScaleDegree,
+    getNumNote,
+    calcOctave,
+    calcOctaveInterval,
+    isInt,
+    convertFromSolfege,
+    convertFactor,
+    getPitchInfo,
+    noteToFrequency,
+    TEMPERAMENT,
+    setOctaveRatio,
+    getOctaveRatio,
+    TEMPERAMENT,
+    TEMPERAMENTS,
+    INITIALTEMPERAMENTS,
+    PreDefinedTemperaments,
+    getTemperamentsList,
+    getTemperament,
+    getTemperamentKeys,
+    addTemperamentToList,
+    deleteTemperamentFromList,
+    addTemperamentToDictionary,
+    updateTemperaments,
+
+    DEFAULTINVERT,
+    DEFAULTMODE,
+    customMode,
+    getInvertMode,
+    getIntervalNumber,
+    getIntervalDirection,
+    getIntervalRatio,
+
+    getModeNumbers,
+    getDrumIndex,
+    getDrumName,
+    getDrumSymbol,
+    getFilterTypes,
+    getOscillatorTypes,
+    getDrumIcon,
+    getDrumSynthName,
+    getNoiseName,
+    getNoiseIcon,
+    getNoiseSynthName,
+    getVoiceName,
+    getVoiceIcon,
+    getVoiceSynthName,
+    isCustomTemperament,
+    getTemperamentName,
+    noteToObj,
+    frequencyToPitch,
+    getArticulation,
+    keySignatureToMode,
+    getScaleAndHalfSteps,
+    modeMapper,
+    getSharpFlatPreference,
+    getCustomNote,
+    pitchToNumber,
+    numberToPitchSharp,
+    getNumber,
+    getNoteFromInterval,
+    numberToPitch,
+    GetNotesForInterval,
+    base64Encode
 };

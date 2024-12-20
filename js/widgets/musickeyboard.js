@@ -2619,7 +2619,7 @@ function MusicKeyboard(activity) {
                 parenttbl2 = document.getElementById("myrow2");
                 newel2 = document.createElement("td");
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
-                if ([2, 6, 9, 13, 16, 20].includes(myrow2Id)) {
+                if ([2, 6, 9, 13, 16, 20, 23, 27, 30, 34, 37, 41, 44, 48, 51, 55, 58, 62].includes(myrow2Id)) {
                     parenttbl2.appendChild(newel2);
                     el = docById("blackRow" + myrow2Id.toString());
                     el.style.background = "transparent";
@@ -2644,8 +2644,10 @@ function MusicKeyboard(activity) {
                     this.displayLayout[p].blockNumber
                 ]);
 
-                this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
-                this.layout[p].objId = "blackRow" + myrow2Id.toString();
+                if (p < this.layout.length) {
+                    this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
+                    this.layout[p].objId = "blackRow" + myrow2Id.toString();
+                }
 
                 myrow2Id++;
                 newel2.innerHTML = "";
@@ -2715,7 +2717,7 @@ function MusicKeyboard(activity) {
                 newel2 = document.createElement("td");
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
                 newel2.style.textAlign = "center";
-                if ([2, 6, 9, 13, 16, 20].includes(myrow2Id)) {
+                if ([2, 6, 9, 13, 16, 20, 23, 27, 30, 34, 37, 41, 44, 48, 51, 55, 58, 62].includes(myrow2Id)) {
                     parenttbl2.appendChild(newel2);
                     el = docById("blackRow" + myrow2Id.toString());
                     el.style.background = "transparent";
@@ -2749,9 +2751,10 @@ function MusicKeyboard(activity) {
                               ")</small><br/>"
                             : "";
                 }
-
-                this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
-                this.layout[p].objId = "blackRow" + myrow2Id.toString();
+                if (p < this.layout.length) {
+                    this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
+                    this.layout[p].objId = "blackRow" + myrow2Id.toString();
+                }
 
                 myrow2Id++;
                 newel2.style.position = "relative";
@@ -2766,7 +2769,7 @@ function MusicKeyboard(activity) {
                 // elementid2 = document.getElementsByTagName("td").length;
                 newel2.setAttribute("id", "blackRow" + myrow2Id.toString());
                 newel2.style.textAlign = "center";
-                if ([2, 6, 9, 13, 16, 20].includes(myrow2Id)) {
+                if ([2, 6, 9, 13, 16, 20, 23, 27, 30, 34, 37, 41, 44, 48, 51, 55, 58, 62].includes(myrow2Id)) {
                     parenttbl2.appendChild(newel2);
                     el = docById("blackRow" + myrow2Id.toString());
                     el.style.background = "transparent";
@@ -2814,9 +2817,10 @@ function MusicKeyboard(activity) {
                             this.displayLayout[p].noteOctave;
                     }
                 }
-
-                this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
-                this.layout[p].objId = "blackRow" + myrow2Id.toString();
+                if (p < this.layout.length) {
+                    this.displayLayout[p].objId = "blackRow" + myrow2Id.toString();
+                    this.layout[p].objId = "blackRow" + myrow2Id.toString();
+                }
 
                 myrow2Id++;
                 newel2.style.position = "relative";
@@ -2863,9 +2867,10 @@ function MusicKeyboard(activity) {
                             this.displayLayout[p].noteOctave;
                     }
                 }
-
-                this.displayLayout[p].objId = "whiteRow" + myrowId.toString();
-                this.layout[p].objId = "whiteRow" + myrowId.toString();
+                if (p < this.layout.length) {
+                    this.displayLayout[p].objId = "whiteRow" + myrowId.toString();
+                    this.layout[p].objId = "whiteRow" + myrowId.toString();
+                }
 
                 myrowId++;
                 newel.style.position = "relative";

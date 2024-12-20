@@ -233,16 +233,16 @@ function SampleWidget() {
      * Displays a message indicating that recording has started.
      * @returns {void}
      */
-    function displayRecordingStartMessage() {
-        this.activity.textMsg(_("Recording started..."));
+    this.displayRecordingStartMessage = function () {
+        this.activity.textMsg(_("Recording started"));
     }
 
     /**
      * Displays a message indicating that recording has stopped.
      * @returns {void}
      */
-    function displayRecordingStopMessage() {
-        this.activity.textMsg(_("Recording complete..."));
+    this.displayRecordingStopMessage = function () {
+        this.activity.textMsg(_("Recording complete"));
     }
 
 
@@ -448,92 +448,41 @@ function SampleWidget() {
             _("Toggle Mic"),
             ""
         );
-        this._recordBtn.onclick = function() {
-            ToggleMic(this);
-        }.bind(this._recordBtn);
-      
+
         this._playbackBtn= widgetWindow.addButton(
             "playback.svg",
             ICONSIZE,
             _("Playback"),
             "");
-        this._playbackBtn.id="playbackBtn"
+
+        this._playbackBtn.id="playbackBtn";
         this._playbackBtn.classList.add("disabled");
+        
+        this.is_recording = false;
 
-
-        const togglePlaybackButtonState = () => { 
-            if (!audioURL) {
-                this._playbackBtn.classList.add("disabled");
+        this._recordBtn.onclick = async () => {
+            if (!this.is_recording) {
+                await this.activity.logo.synth.startRecording();
+                this.is_recording = true;
+                this._recordBtn.getElementsByTagName('img')[0].src = "header-icons/record.svg";
+                this.displayRecordingStartMessage();
+                this.activity.logo.synth.LiveWaveForm();
             } else {
+                this.recordingURL = await this.activity.logo.synth.stopRecording();
+                this.is_recording = false;
+                this._recordBtn.getElementsByTagName('img')[0].src = "header-icons/mic.svg";
+                this.displayRecordingStopMessage();
                 this._playbackBtn.classList.remove("disabled");
             }
         };
 
         this._playbackBtn.onclick = () => {
-            playAudio();
+            this.sampleData = this.recordingURL;
+            this.sampleName = `Recorded Audio ${this.recordingURL}`;
+            this._addSample();
+            this.activity.logo.synth.playRecording();
         };
 
-        let can_record = false;
-        let is_recording = false;
-        let recorder = null;
-        let chunks = [];
-        let audioURL = null; 
-        
-        async function setUpAudio() {
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    recorder = new MediaRecorder(stream);
-                    recorder.ondataavailable = e => {
-                        chunks.push(e.data);
-                    };
-                    recorder.onstop = async e => {
-                        let blob = new Blob(chunks, { type: 'audio/webm' });
-                        chunks = [];
-                        audioURL = URL.createObjectURL(blob);
-                        displayRecordingStopMessage.call(that);
-                        togglePlaybackButtonState();
-
-                        const module = await import("https://cdn.jsdelivr.net/npm/webm-to-wav-converter@1.1.0/+esm");
-                        const getWaveBlob = module.getWaveBlob;
-                        const wavBlob = await getWaveBlob(blob);
-                        const wavAudioURL = URL.createObjectURL(wavBlob);
-                        that.sampleData = wavAudioURL;
-                        that.sampleName = `Recorded Audio ${audioURL}`;
-                        that._addSample();
-                    };
-                    can_record = true;
-                } catch (err) {
-                    console.log("The following error occurred: " + err);
-                }
-            }
-        }
-        function ToggleMic(buttonElement) {
-            if (!can_record) return;
-            
-            is_recording = !is_recording;
-            if (is_recording) {
-                recorder.start();   
-                buttonElement.getElementsByTagName('img')[0].src = "header-icons/record.svg"; 
-                displayRecordingStartMessage.call(that);
-            } else {
-                recorder.stop();
-                buttonElement.getElementsByTagName('img')[0].src = "header-icons/mic.svg"; 
-            }
-        }
-        
-        function playAudio() {
-            if (audioURL) {
-                const audio = new Audio(audioURL);
-                audio.play();
-                console.log("Playing audio.");
-            } else {
-                console.error("No recorded audio available.");
-            }
-        }
-        
-        setUpAudio();
- 
         widgetWindow.sendToCenter();
         this.widgetWindow = widgetWindow;
 
@@ -962,13 +911,13 @@ function SampleWidget() {
 
         const draw = () => {
             this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
-            if (this.pitchAnalysers[turtleIdx] && (this.running || resized)) {
+            if (this.is_recording || (this.pitchAnalysers[turtleIdx] && (this.running || resized))) {
                 canvasCtx.fillStyle = "#FFFFFF";
                 canvasCtx.font = "10px Verdana";
                 this.verticalOffset = -canvas.height / 4;
                 this.zoomFactor = 40.0;
                 canvasCtx.fillRect(0, 0, width, height);
-
+        
                 let oscText;
                 if (turtleIdx >= 0) {
                     //.TRANS: The sound sample that the user uploads.
@@ -980,16 +929,25 @@ function SampleWidget() {
                 canvasCtx.fillText(oscText, 10, canvas.height / 2 + 10);
 
                 for (let turtleIdx = 0; turtleIdx < 2; turtleIdx += 1) {
-                    const dataArray = this.pitchAnalysers[turtleIdx].getValue();
+                    let dataArray;
+                    if (this.is_recording) {
+                        dataArray = turtleIdx === 0 
+                            ? this.pitchAnalysers[0].getValue()
+                            : this.activity.logo.synth.getWaveFormValues();
+                            console.log(dataArray);
+                    } else {
+                        dataArray = this.pitchAnalysers[turtleIdx].getValue();
+                    }
+        
                     const bufferLength = dataArray.length;
                     const rbga = SAMPLEOSCCOLORS[turtleIdx];
                     const sliceWidth = (width * this.zoomFactor) / bufferLength;
                     canvasCtx.lineWidth = 2;
                     canvasCtx.strokeStyle = rbga;
                     canvasCtx.beginPath();
-
+        
                     let x = 0;
-
+                    
                     for (let i = 0; i < bufferLength; i++) {
                         const y = (height / 2) * (1 - dataArray[i]) + this.verticalOffset;
                         if (i === 0) {

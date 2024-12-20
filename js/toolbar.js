@@ -822,14 +822,26 @@ class Toolbar {
                 // Horizontal Scroll
                 const enableHorizScrollIcon = docById("enableHorizScrollIcon");
                 const disableHorizScrollIcon = docById("disableHorizScrollIcon");
+                
                 if (enableHorizScrollIcon) {
                     enableHorizScrollIcon.style.display = "block";
-                    enableHorizScrollIcon.onclick = () => setScroller(this.activity);
+                    enableHorizScrollIcon.onclick = () => {
+                        setScroller(this.activity);
+                        this.activity.textMsg(
+                            _("Horizontal scrolling enabled.")
+                        );
+                    };
                 }
+                
                 if (disableHorizScrollIcon) {
-                    disableHorizScrollIcon.onclick = () => setScroller(this.activity);
+                    disableHorizScrollIcon.onclick = () => {
+                        setScroller(this.activity);
+                        this.activity.textMsg(
+                            _("Horizontal scrolling disabled.")
+                        );
+                    };
                 }
-
+                
                 // JavaScript Toggle
                 const toggleJavaScriptIcon = docById("toggleJavaScriptIcon");
                 if (toggleJavaScriptIcon) {
@@ -1057,7 +1069,7 @@ function renderNewProjectConfirmation() {
     const newDropdown = document.getElementById("newdropdown");
     newDropdown.innerHTML = '';
     const title = document.createElement("div");
-    title.innerHTML = `<h2 style="color: #0066FF; font-size: 24px; text-align: left; margin: 0;">${_("New Project")}</h2>`;
+    title.innerHTML = `<h2 style="color: #0066FF; font-size: 24px; text-align: left; margin: 0;">${_("New project")}</h2>`;
     newDropdown.appendChild(title);
     const confirmationMessage = document.createElement("div");
     confirmationMessage.innerHTML = `<div id="confirmation-message" style="color: #666666; font-size: 16px; margin-bottom: 24px; text-align: left;">${_("Are you sure you want to create a new project?")}</div>`;
