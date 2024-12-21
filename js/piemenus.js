@@ -3597,8 +3597,7 @@ const piemenuGrid = (activity) => {
             "imgsrc: images/grid/Mezzo-soprano.svg",
             "imgsrc: images/grid/Alto.svg",
             "imgsrc: images/grid/Tenor.svg",
-            "imgsrc: images/grid/Bass.svg",
-            ""
+            "imgsrc: images/grid/Bass.svg"
         ];
 
         gridLabels = [
@@ -3611,8 +3610,7 @@ const piemenuGrid = (activity) => {
             "Mezzo Soprano",
             "Alto",
             "Tenor",
-            "Bass",
-            "Blank"
+            "Bass"
         ];
     }
 
