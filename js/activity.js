@@ -5889,13 +5889,10 @@ class Activity {
                     that.helpfulSearchWidget.protoblk = ui.item.specialDict;
                     that.doHelpfulSearch();
                 },
-                focus: (event, ui) => {
+                focus: (event) => {
                     event.preventDefault();
-                    that.helpfulSearchWidget.value = ui.item.label;
                 }
             });
-
-            $j("#helpfulSearch").autocomplete("widget").addClass("scrollSearch");
 
             $j("#helpfulSearch").autocomplete("instance")._renderItem = (ul, item) => {
                 return $j("<li></li>")
