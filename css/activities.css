@@ -72,6 +72,24 @@
   margin-top: 60px;
 }
 
+#helpfulSearchDiv{
+  display: block !important;
+  position: absolute;
+  background-color: #f0f0f0;
+  padding: 5px;
+  border: 1px solid #ccc;
+  width: 230px;
+  z-index: 1;
+}
+
+#helpfulSearch{
+  padding: 2px;
+  border: 2px solid grey;
+  width: 220px;
+  height: 20px;
+  font-size: large;
+}
+
 .ui-menu {
   position: relative;
   background-color: rgba(255, 255, 255, 1);
