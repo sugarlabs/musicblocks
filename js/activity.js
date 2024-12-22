@@ -3749,7 +3749,6 @@ class Activity {
             document.querySelector("#myOpenFile").click();
             window.scroll(0, 0);
             doHardStopButton(that);
-            that._allClear(true, true);
         };
 
         window.prepareExport = this.prepareExport;
