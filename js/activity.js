@@ -397,13 +397,6 @@ class Activity {
             this.helpfulSearchWidget.style.visibility = "hidden";
             this.helpfulSearchWidget.placeholder = _("Search for blocks");
             this.helpfulSearchWidget.classList.add("ui-autocomplete");
-            this.helpfulSearchWidget.style.cssText = `
-                padding: 2px;
-                border: 2px solid grey;
-                width: 220px;
-                height: 20px;
-                font-size: large;
-            `;
             this.progressBar = docById("myProgress");
             this.progressBar.style.visibility = "hidden";
 
@@ -429,17 +422,40 @@ class Activity {
             }
             this.helpfulSearchDiv = document.createElement("div");
             this.helpfulSearchDiv.setAttribute("id", "helpfulSearchDiv");
-            this.helpfulSearchDiv.style.cssText = `
-                position: absolute;
-                background-color: #f0f0f0;
-                padding: 5px;
-                border: 1px solid #ccc;
-                width: 230px;
-                display: none;
-                z-index: 1;
-            `;
 
             document.body.appendChild(this.helpfulSearchDiv);
+
+            // Create the div for the close button (cross button)
+            const closeButtonDiv = document.createElement("div");
+            closeButtonDiv.style.cssText = 
+                "position: absolute;" +
+                "top: 10px;" +  // Adjust the top position to center it vertically
+                "right: 10px;" + // Position the button on the right side of the helpfulSearchDiv
+                "cursor: pointer;";
+
+            // Create the cross button itself
+            const closeButton = document.createElement("button");
+            closeButton.textContent = "×"; // You can use HTML entity or an icon
+            closeButton.style.cssText = 
+            "position: absolute;" +
+                "top: 50%;" +  // Center vertically
+                "right: -30px;" +  // Place it outside the input, adjust as needed
+                "transform: translateY(-50%);" +  // Align with vertical center of input
+                "background: transparent;" +
+                "border: none;" +
+                "font-size: large;" +
+                "cursor: pointer;";
+
+            // Append the cross button to the closeButtonDiv
+            closeButtonDiv.appendChild(closeButton);
+
+            // Append the closeButtonDiv to the helpfulSearchDiv
+            this.helpfulSearchDiv.appendChild(closeButtonDiv);
+
+            // Add event listener to remove the search div from the DOM when clicked on the close button
+            closeButton.addEventListener("click", () => {
+                this.helpfulSearchDiv.parentNode.removeChild(this.helpfulSearchDiv); // Remove from DOM
+            });
 
             if (docById("helpfulSearch")) {
                 docById("helpfulSearch").parentNode.removeChild(
@@ -453,6 +469,9 @@ class Activity {
          * displays helpfulSearchDiv on canvas
          */
         this._displayHelpfulSearchDiv = () => {
+            if (!docById("helpfulSearchDiv")) {
+                this.setHelpfulSearchDiv();  // Re-create and append the div if it's not found
+            }
             this.helpfulSearchDiv.style.left = docById("helpfulWheelDiv").offsetLeft + 80 * this.getStageScale() + "px";
             this.helpfulSearchDiv.style.top = docById("helpfulWheelDiv").offsetTop + 110 * this.getStageScale() + "px";
 
@@ -479,13 +498,9 @@ class Activity {
                 if (docById("helpfulWheelDiv").style.display !== "none") {
                     docById("helpfulWheelDiv").style.display = "none";
                 }
-                if (docById("helpfulSearchDiv").style.display !== "none" && !docById("helpfulSearchDiv").contains(e.target) && e.target.id !== "helpfulSearch") {
-                    docById("helpfulSearchDiv").style.display = "none";
-                }
                 that.__tick();
         }
 
-        document.addEventListener("click", this._hideHelpfulSearchWidget);
 
         /*
          * Sets up right click functionality opening the context menus
