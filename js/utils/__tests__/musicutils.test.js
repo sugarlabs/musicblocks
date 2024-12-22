@@ -1,3 +1,5 @@
+const { TextEncoder } = require('util');
+global.TextEncoder = TextEncoder;
 global._ = jest.fn((str) => str);
 global.window = {
     btoa: jest.fn((str) => Buffer.from(str, "utf8").toString("base64"))
