@@ -459,6 +459,7 @@ function SampleWidget() {
         this._playbackBtn.classList.add("disabled");
         
         this.is_recording = false;
+        this.playback = false;
 
         this._recordBtn.onclick = async () => {
             if (!this.is_recording) {
@@ -477,10 +478,16 @@ function SampleWidget() {
         };
 
         this._playbackBtn.onclick = () => {
-            this.sampleData = this.recordingURL;
-            this.sampleName = `Recorded Audio ${this.recordingURL}`;
-            this._addSample();
-            this.activity.logo.synth.playRecording();
+            if (!this.playback) {
+                this.sampleData = this.recordingURL;
+                this.sampleName = `Recorded Audio ${this.recordingURL}`;
+                this._addSample();
+                this.activity.logo.synth.playRecording();
+                this.playback = true
+            } else {
+                this.activity.logo.synth.stopPlayBackRecording();
+                this.playback = false;
+            }
         };
 
         widgetWindow.sendToCenter();
