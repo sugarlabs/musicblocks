@@ -575,7 +575,7 @@ class Activity {
             const hideWheel = (e) => {
                 if (docById("helpfulWheelDiv") && !docById("helpfulWheelDiv").contains(e.target)) {
                     docById("helpfulWheelDiv").style.display = "none";
-                    document.removeEventListener("click", hideWheelOnClickOutside);
+                    document.removeEventListener("click", hideWheel);
                 }
             };
             document.addEventListener("click", hideWheel);
