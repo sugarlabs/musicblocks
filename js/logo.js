@@ -1844,7 +1844,7 @@ class Logo {
         const suppressOutput = tur.singer.suppressOutput;
 
         const __pen = (turtle, name, b, timeout) => {
-            let arg; // Declaring `arg` within the function to avoid sharing 
+            let arg;
             switch (name) {
                 case "penup":
                 case "pendown":
