@@ -17,7 +17,7 @@ const postcss = require("gulp-postcss");
 const autoprefixer = require("autoprefixer");
 const cssnano = require("cssnano");
 const replace = require("gulp-replace");
-const minifyCSS = require("gulp-minify-css");
+const minifyCSS = require("gulp-clean-css");
 const gulp = require("gulp");
 const prettier = require("gulp-prettier");
 
