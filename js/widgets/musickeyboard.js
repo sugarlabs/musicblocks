@@ -474,7 +474,7 @@ function MusicKeyboard(activity) {
      * @param {HTMLElement} element - The HTML element representing a musical key.
      * @param {number} i - The index of the musical key in the layout.
      * @param {number} blockNumber - The block number associated with the musical key.
-     */ 
+     */
     this.loadHandler = function (element, i, blockNumber) {
         const temp1 = this.displayLayout[i].noteName;
         let temp2;
@@ -494,8 +494,7 @@ function MusicKeyboard(activity) {
 
         let duration = 0;
         let startDate = new Date();
-        let startTime = 0;
-        
+        let startTime = 0;      
 
         /**
          * Start a musical note when the element is clicked.
