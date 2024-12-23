@@ -3633,7 +3633,6 @@ const piemenuGrid = (activity) => {
 
     activity.turtles.gridWheel.clockwise = false;
     activity.turtles.gridWheel.initWheel(grids);
-    activity.turtles.gridWheel.navItems[gridLabels.length - 1].enabled = false;
     activity.turtles.gridWheel.createWheel();
     activity.turtles.gridWheel.navigateWheel(
         activity.turtles.currentGrid ? activity.turtles.currentGrid : 0
