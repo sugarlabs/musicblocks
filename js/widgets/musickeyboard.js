@@ -170,6 +170,12 @@ function MusicKeyboard(activity) {
      */
     let selectedNotes = [];
 
+        /**
+     * String of active note.
+     * @type {Array}
+     */
+    let activeKey = null;
+
     /**
      * Array of row blocks.
      * @type {Array}
@@ -461,13 +467,14 @@ function MusicKeyboard(activity) {
         document.onkeydown = __keyboarddown;
         document.onkeyup = __keyboardup;
     };
+    
 
     /**
      * Handles the loading of musical keyboard elements and defines behavior for mouse events.
      * @param {HTMLElement} element - The HTML element representing a musical key.
      * @param {number} i - The index of the musical key in the layout.
      * @param {number} blockNumber - The block number associated with the musical key.
-     */
+     */ 
     this.loadHandler = function (element, i, blockNumber) {
         const temp1 = this.displayLayout[i].noteName;
         let temp2;
@@ -488,6 +495,7 @@ function MusicKeyboard(activity) {
         let duration = 0;
         let startDate = new Date();
         let startTime = 0;
+        
 
         /**
          * Start a musical note when the element is clicked.
@@ -507,6 +515,7 @@ function MusicKeyboard(activity) {
         };
 
         element.onmousedown = function () {
+            activeKey = element;
             __startNote(this);
         };
 
@@ -514,6 +523,7 @@ function MusicKeyboard(activity) {
          * End a musical note when the element is released.
          */
         const __endNote = (element) => {
+    
             const id = element.id;
             if (id.includes("blackRow")) {
                 element.style.backgroundColor = "black";
@@ -576,7 +586,18 @@ function MusicKeyboard(activity) {
         };
 
         element.onmouseup = function () {
-            __endNote(this);
+            if (activeKey === element) {
+                __endNote(this);
+                activeKey = null;
+            } else {
+                const id = activeKey.id;
+                if (id.includes("blackRow")) {
+                    activeKey.style.backgroundColor = "black";
+                } else {
+                    activeKey.style.backgroundColor = "white";
+                }
+                activeKey = null;
+            }
         };
     };
 
@@ -2572,6 +2593,9 @@ function MusicKeyboard(activity) {
         mkbKeyboardDiv.style.width = "100%";
         mkbKeyboardDiv.style.top = "0px";
         mkbKeyboardDiv.style.overflow = "auto";
+        mkbKeyboardDiv.style.userSelect = 'none';
+        mkbKeyboardDiv.style.webkitUserSelect = 'none'; // Safari/Chrome
+        mkbKeyboardDiv.style.msUserSelect = 'none'; // Edge
         mkbKeyboardDiv.innerHTML = "";
         mkbKeyboardDiv.innerHTML =
             ' <div id="keyboardHolder2"><table class="white"><tbody><tr id="myrow"></tr></tbody></table><table class="black"><tbody><tr id="myrow2"></tr></tbody></table></div>';
