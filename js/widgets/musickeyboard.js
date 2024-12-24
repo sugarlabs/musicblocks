@@ -171,6 +171,12 @@ function MusicKeyboard(activity) {
     let selectedNotes = [];
 
     /**
+     * String of active note.
+     * @type {Array}
+     */
+    let activeKey = null;
+
+    /**
      * Array of row blocks.
      * @type {Array}
      */
@@ -507,6 +513,7 @@ function MusicKeyboard(activity) {
         };
 
         element.onmousedown = function () {
+            activeKey = element;
             __startNote(this);
         };
 
@@ -576,7 +583,18 @@ function MusicKeyboard(activity) {
         };
 
         element.onmouseup = function () {
-            __endNote(this);
+            if (activeKey === element) {
+                __endNote(this);
+                activeKey = null;
+            } else {
+                const id = activeKey.id;
+                if (id.includes("blackRow")) {
+                    activeKey.style.backgroundColor = "black";
+                } else {
+                    activeKey.style.backgroundColor = "white";
+                }
+                activeKey = null;
+            }
         };
     };
 
@@ -2572,6 +2590,9 @@ function MusicKeyboard(activity) {
         mkbKeyboardDiv.style.width = "100%";
         mkbKeyboardDiv.style.top = "0px";
         mkbKeyboardDiv.style.overflow = "auto";
+        mkbKeyboardDiv.style.userSelect = 'none';
+        mkbKeyboardDiv.style.webkitUserSelect = 'none'; // Safari/Chrome
+        mkbKeyboardDiv.style.msUserSelect = 'none'; // Edge
         mkbKeyboardDiv.innerHTML = "";
         mkbKeyboardDiv.innerHTML =
             ' <div id="keyboardHolder2"><table class="white"><tbody><tr id="myrow"></tr></tbody></table><table class="black"><tbody><tr id="myrow2"></tr></tbody></table></div>';
