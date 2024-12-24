@@ -370,7 +370,7 @@ function setupGraphicsBlocks(activity) {
          */
         constructor() {
             // Call the constructor of the parent class
-            super("clear", _("clear"));
+            super("clear", _("Clear").toLowerCase());
 
             // Set the palette and activity for the Clear block
             this.setPalette("graphics", activity);

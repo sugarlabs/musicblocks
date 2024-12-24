@@ -3582,7 +3582,7 @@ const piemenuGrid = (activity) => {
         gridLabels = [
             "Blank",
             "Cartesian",
-            "Cartesian Polar",
+            "Cartesian/Polar",
             "Polar",
             "Blank"
         ];
@@ -3603,7 +3603,7 @@ const piemenuGrid = (activity) => {
         gridLabels = [
             "Blank",
             "Cartesian",
-            "Cartesian Polar",
+            "Cartesian/Polar",
             "Polar",
             "Treble",
             "Grand",
@@ -3848,11 +3848,10 @@ const piemenuKey = (activity) => {
                     activity.blocks.blockList[activity.blocks.blockList.length - 1].value =
                         activity.KeySignatureEnv[1];
                     activity.textMsg(
-                        _("You have chosen key ") +
+                        _("You have chosen key for your pitch preview.") +
                             activity.KeySignatureEnv[0] +
                             " " +
-                            activity.KeySignatureEnv[1] +
-                            _(" for your pitch preview.")
+                            activity.KeySignatureEnv[1]
                     );
                 }
             }

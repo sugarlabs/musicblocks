@@ -31,7 +31,7 @@ function setupToneBlocks(activity) {
          * Creates an instance of OscillatorBlock.
          */
         constructor() {
-            super("oscillator", _("oscillator"));
+            super("oscillator", _("Oscillator").toLowerCase());
             this.setPalette("tone", activity);
             this.setHelpString();
             this.formBlock({
@@ -627,7 +627,7 @@ function setupToneBlocks(activity) {
                 name: _("chorus"),
                 args: 3,
                 defaults: [1.5, 3.5, 70],
-                argLabels: [_("rate"), _("delay") + " (MS)", _("depth")]
+                argLabels: [_("rate"), _("delay (MS)"), _("depth")]
             });
         }
 

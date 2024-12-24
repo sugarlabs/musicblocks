@@ -3758,20 +3758,20 @@ class Block {
                 gridLabels = [
                     _("Cartesian"),
                     _("polar"),
-                    _("Cartesian+polar"),
+                    _("Cartesian/Polar"),
                     _("none")
                 ];
                 gridValues = [
                     "Cartesian",
                     "polar",
-                    "Cartesian+polar",
+                    "Cartesian/Polar",
                     "none"
                 ];
             } else {
                 gridLabels = [
                     _("Cartesian"),
                     _("polar"),
-                    _("Cartesian+polar"),
+                    _("Cartesian/Polar"),
                     _("treble"),
                     _("grand staff"),
                     _("mezzo-soprano"),
@@ -3783,7 +3783,7 @@ class Block {
                 gridValues = [
                     "Cartesian",
                     "polar",
-                    "Cartesian+polar",
+                    "Cartesian/Polar",
                     "treble",
                     "grand staff",
                     "mezzo-soprano",

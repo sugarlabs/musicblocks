@@ -316,7 +316,7 @@ function TemperamentWidget() {
             divAppend.id = "divAppend";
             divAppend.innerHTML =
                 '<div id="clearNotes" style="float:left;">' +
-                _("clear") +
+                _("Clear") +
                 '</div><div id="standardOctave" style="float:right;">' +
                 _("back to 2:1 octave space") +
                 "</div>";
@@ -344,7 +344,7 @@ function TemperamentWidget() {
         } else {
             divAppend1 = document.createElement("div");
             divAppend1.id = "divAppend";
-            divAppend1.innerHTML = _("clear");
+            divAppend1.innerHTML = _("Clear");
             divAppend1.style.textAlign = "center";
             divAppend1.style.position = "absolute";
             divAppend1.style.zIndex = 2;
@@ -451,9 +451,9 @@ function TemperamentWidget() {
                 }
                 docById("noteInfo").innerHTML +=
                     '<img src="header-icons/close-button.svg" id="close" title="' +
-                    _("close") +
+                    _("Close") +
                     '" alt="' +
-                    _("close") +
+                    _("Close") +
                     '" height=20px width=20px align="right"><br>';
                 let noteDefined = false;
                 for (let j = 0; j < this.ratiosNotesPair.length; j++) {
@@ -1490,9 +1490,9 @@ function TemperamentWidget() {
                     '<div class="popup" id="noteInfo1" style="width:180px; height:135px;"><span class="popuptext" id="myPopup"></span></div>';
                 docById("noteInfo1").innerHTML +=
                     '<img src="header-icons/close-button.svg" id="close" title="' +
-                    _("close") +
+                    _("Close") +
                     '" alt="' +
-                    _("close") +
+                    _("Close") +
                     '" height=20px width=20px align="right">';
                 docById("noteInfo1").innerHTML +=
                     '<br><center><input type="range" class="sliders" id = "frequencySlider" style="width:170px; background:white; border:0;" min="' +
@@ -1926,7 +1926,7 @@ function TemperamentWidget() {
         const that = this;
         setTimeout(() => {
             that.activity.blocks.loadNewBlocks(newStack);
-            that.activity.textMsg(_("New action block generated!"));
+            that.activity.textMsg(_("New action block generated."));
         }, 500);
 
         if (isCustomTemperament(this.inTemperament)) {

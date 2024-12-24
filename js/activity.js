@@ -5789,11 +5789,11 @@ class Activity {
             if (!this.helpfulWheelItems.find(ele => ele.label === "Home [HOME]")) 
                 this.helpfulWheelItems.push({label: "Home [HOME]", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(GOHOMEFADEDBUTTON)), display: true, fn: findBlocks});
 
-            this.hideBlocksContainer = createButton(SHOWBLOCKSBUTTON, _("Show/hide block"),
+            this.hideBlocksContainer = createButton(SHOWBLOCKSBUTTON, _("Show/hide blocks"),
                 changeBlockVisibility);
 
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Show/hide block")) 
-                this.helpfulWheelItems.push({label: "Show/hide block", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SHOWBLOCKSBUTTON)), display: true, fn: changeBlockVisibility});
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Show/hide blocks")) 
+                this.helpfulWheelItems.push({label: "Show/hide blocks", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SHOWBLOCKSBUTTON)), display: true, fn: changeBlockVisibility});
             
             this.collapseBlocksContainer = createButton(COLLAPSEBLOCKSBUTTON, _("Expand/collapse blocks"),
                 toggleCollapsibleStacks);
@@ -5837,8 +5837,8 @@ class Activity {
             if (!this.helpfulWheelItems.find(ele => ele.label === "Select")) 
                 this.helpfulWheelItems.push({label: "Select", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SELECTBUTTON)), display: true, fn: this.selectMode });
         
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Clean")) 
-                this.helpfulWheelItems.push({label: "Clean", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CLEARBUTTON)), display: true, fn: () => this._allClear(false)});
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Clear")) 
+                this.helpfulWheelItems.push({label: "Clear", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CLEARBUTTON)), display: true, fn: () => this._allClear(false)});
             
             if (!this.helpfulWheelItems.find(ele => ele.label === "Collapse")) 
                 this.helpfulWheelItems.push({label: "Collapse", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBUTTON)), display: true, fn: this.turtles.collapse});

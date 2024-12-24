@@ -132,8 +132,8 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
         _("pen"),
         _("number"),
         _("boolean"),
-        _("media"),
-        _("sensors"),
+        _("Media").toLowerCase(),
+        _("Sensors").toLowerCase(),
         _("heap"),
         _("dictionary"),
         _("ensemble"),
@@ -182,7 +182,7 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
 
     // Icons used to select between multipalettes.
     MULTIPALETTEICONS = ["artwork", "logic", "music"];
-    MULTIPALETTENAMES = [_("artwork"), _("logic"), _("music")];
+    MULTIPALETTENAMES = [_("artwork"), _("logic"), _("Music").toLowerCase()];
 } else {
     TITLESTRING = _("Music Blocks");
     // We don't include "extras" since we want to be able to delete
@@ -233,8 +233,8 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
         _("pen"),
         _("number"),
         _("boolean"),
-        _("media"),
-        _("sensors"),
+        _("Media").toLowerCase(),
+        _("Sensors").toLowerCase(),
         _("heap"),
         _("dictionary"),
         _("ensemble"),
@@ -277,7 +277,7 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
 
     // Icons used to select between multipalettes.
     MULTIPALETTEICONS = ["music", "logic", "artwork"];
-    MULTIPALETTENAMES = [_("music"), _("logic"), _("artwork")];
+    MULTIPALETTENAMES = [_("Music").toLowerCase(), _("logic"), _("artwork")];
 }
 
 const getMainToolbarButtonNames = (name) => {
@@ -545,7 +545,7 @@ const createHelpContent = (activity) => {
     } else {
         if (_THIS_IS_TURTLE_BLOCKS_) {
             HELPCONTENT.push([
-                _("save"),
+                _("Save"),
                 _("Save project") +
                     ": " +
                     _("Save your project to a file.") +
@@ -566,7 +566,7 @@ const createHelpContent = (activity) => {
             ]);
         } else {
             HELPCONTENT.push([
-                _("save"),
+                _("Save"),
                 _("Save project") +
                     ": " +
                     _("Save your project to a file.") +
@@ -622,7 +622,7 @@ const createHelpContent = (activity) => {
             window.btoa(base64Encode(CARTESIANBUTTON))
     ]);
     HELPCONTENT.push([
-        _("Clean"),
+        _("Clear"),
         _("Clear the screen and return the mice to their initial positions."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(CLEARBUTTON))
@@ -672,7 +672,7 @@ const createHelpContent = (activity) => {
             window.btoa(base64Encode(MENUBUTTON))
     ]);
     HELPCONTENT.push([
-        _("Run slow"),
+        _("Run slowly"),
         _("Click to run the project in slow mode."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(SLOWBUTTON))
