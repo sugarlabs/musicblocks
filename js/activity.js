@@ -6601,7 +6601,7 @@ class Activity {
             
                                         that.stage.addEventListener("trashsignal", __listener, false);
                                         that.sendAllToTrash(false, false);
-                                        that._allClear(false,true);
+                                        that._allClear(false, true);
                                         if (that.planet) {
                                             that.planet.closePlanet();
                                             that.planet.initialiseNewProject(
