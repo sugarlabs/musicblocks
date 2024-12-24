@@ -493,7 +493,7 @@ function MusicKeyboard(activity) {
 
         let duration = 0;
         let startDate = new Date();
-        let startTime = 0; 
+        let startTime = 0;
 
         /**
          * Start a musical note when the element is clicked.
