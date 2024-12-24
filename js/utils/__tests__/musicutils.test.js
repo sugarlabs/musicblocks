@@ -101,7 +101,7 @@ describe("Temperament Functions", () => {
         [_("Pythagorean (3-limit JI)"), "Pythagorean", "Pythagorean"],
         [_("Meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
         [_("Meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"],
-        [_("Custom"), "custom", "custom"]
+        [_("custom"), "custom", "custom"]
     ];
     global.INITIALTEMPERAMENTS = [
         [_("Equal (12EDO)"), "equal", "equal"],
@@ -139,7 +139,7 @@ describe("Temperament Functions", () => {
                 [_("Pythagorean (3-limit JI)"), "Pythagorean", "Pythagorean"],
                 [_("Meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
                 [_("Meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"],
-                [_("Custom"), "custom", "custom"]
+                [_("custom"), "custom", "custom"]
             ]);
         });
     
@@ -191,7 +191,7 @@ describe("Temperament Functions", () => {
     
         describe('addTemperamentToList', () => {
             it('adds a new entry to TEMPERAMENTS if not predefined', () => {
-              const newEntry = ["Custom", "custom", "custom"];
+              const newEntry = ["custom", "custom", "custom"];
               addTemperamentToList(newEntry);
               expect(TEMPERAMENTS).toContainEqual(newEntry);
             });

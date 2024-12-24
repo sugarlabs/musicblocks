@@ -5088,7 +5088,7 @@ class Blocks {
                     if (["show", "turtleshell", "customsample"].includes(blockObjs[i][1])) {
                         switch (blockObjs[i][1]) {
                             case "show":
-                                name = _("show") + "-" + MathUtility.doRandom(0, 1000);
+                            name = _("Show").toLowerCase() + "-" + MathUtility.doRandom(0, 1000);
                                 break;
                             case "turtleshell":
                                 name = _("avatar") + "-" + MathUtility.doRandom(0, 1000);

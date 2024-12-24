@@ -816,9 +816,9 @@ function MusicKeyboard(activity) {
                 '&nbsp;&nbsp;<img src="header-icons/' +
                 "stop-button.svg" +
                 '" title="' +
-                _("stop") +
+                _("Stop") +
                 '" alt="' +
-                _("stop") +
+                _("Stop") +
                 '" height="' +
                 ICONSIZE +
                 '" width="' +
@@ -1546,7 +1546,7 @@ function MusicKeyboard(activity) {
         cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) * 1.5 + "px";
         cell.style.maxWidth = cell.style.minWidth;
         cell.className = "headcol"; // This cell is fixed horizontally.
-        cell.innerHTML = _("duration");
+        cell.innerHTML = _("duration (MS)");
         cell.style.position = "sticky";
         cell.style.left = "0px";
         cell.style.zIndex = "1";

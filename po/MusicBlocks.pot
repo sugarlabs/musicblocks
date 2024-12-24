@@ -4173,7 +4173,7 @@ msgid "frequency"
 msgstr ""
 
 #: js/blocks/MediaBlocks.js:692
-msgid "duration (ms)"
+msgid "duration (MS)"
 msgstr ""
 
 #: js/blocks/MediaBlocks.js:728
@@ -5475,7 +5475,7 @@ msgid "starting from 1 and regardless of tonal framework (i.e. not always 8 note
 msgstr ""
 
 #: js/blocks/PitchBlocks.js:1749
-msgid "N^th Modal Pitch takes a number as an input as the n^th degree for the given mode. 0 is the first position, 1 is the second, -1 is the note before the first etc."
+msgid "Nth Modal Pitch takes a number as an input as the nth degree for the given mode. 0 is the first position, 1 is the second, -1 is the note before the first etc."
 msgstr ""
 
 #: js/blocks/PitchBlocks.js:1751

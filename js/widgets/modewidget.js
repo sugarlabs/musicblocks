@@ -1014,7 +1014,7 @@ class ModeWidget {
         // Create a new stack for the chunk.
         // console.debug(newStack);
         this.activity.blocks.loadNewBlocks(newStack);
-        this.activity.textMsg(_("New action block generated!"));
+        this.activity.textMsg(_("New action block generated."));
 
         // And save a stack of pitchnumbers to be used with the define mode
         newStack = [

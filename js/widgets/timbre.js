@@ -414,9 +414,9 @@ class TimbreWidget {
                 '&nbsp;&nbsp;<img src="header-icons/' +
                 "stop-button.svg" +
                 '" title="' +
-                _("stop") +
+                _("Stop") +
                 '" alt="' +
-                _("stop") +
+                _("Stop") +
                 '" height="' +
                 TimbreWidget.ICONSIZE +
                 '" width="' +
