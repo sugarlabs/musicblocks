@@ -467,7 +467,7 @@ function MusicKeyboard(activity) {
         document.onkeydown = __keyboarddown;
         document.onkeyup = __keyboardup;
     };
-    
+
     /**
      * Handles the loading of musical keyboard elements and defines behavior for mouse events.
      * @param {HTMLElement} element - The HTML element representing a musical key.
@@ -493,7 +493,7 @@ function MusicKeyboard(activity) {
 
         let duration = 0;
         let startDate = new Date();
-        let startTime = 0;    
+        let startTime = 0; 
 
         /**
          * Start a musical note when the element is clicked.
