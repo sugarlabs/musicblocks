@@ -3749,6 +3749,7 @@ class Activity {
             document.querySelector("#myOpenFile").click();
             window.scroll(0, 0);
             doHardStopButton(that);
+            that._allClear(true, true);
         };
 
         window.prepareExport = this.prepareExport;
@@ -6600,6 +6601,7 @@ class Activity {
             
                                         that.stage.addEventListener("trashsignal", __listener, false);
                                         that.sendAllToTrash(false, false);
+                                        that._allClear(false,true);
                                         if (that.planet) {
                                             that.planet.closePlanet();
                                             that.planet.initialiseNewProject(
