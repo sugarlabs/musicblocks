@@ -170,7 +170,7 @@ function MusicKeyboard(activity) {
      */
     let selectedNotes = [];
 
-        /**
+    /**
      * String of active note.
      * @type {Array}
      */
@@ -468,7 +468,6 @@ function MusicKeyboard(activity) {
         document.onkeyup = __keyboardup;
     };
     
-
     /**
      * Handles the loading of musical keyboard elements and defines behavior for mouse events.
      * @param {HTMLElement} element - The HTML element representing a musical key.
@@ -494,7 +493,7 @@ function MusicKeyboard(activity) {
 
         let duration = 0;
         let startDate = new Date();
-        let startTime = 0;      
+        let startTime = 0;    
 
         /**
          * Start a musical note when the element is clicked.
@@ -522,7 +521,6 @@ function MusicKeyboard(activity) {
          * End a musical note when the element is released.
          */
         const __endNote = (element) => {
-    
             const id = element.id;
             if (id.includes("blackRow")) {
                 element.style.backgroundColor = "black";
