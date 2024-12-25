@@ -103,7 +103,7 @@ Linux systems, the `python3` command is not bound to python. You may
 need to perform a `sudo apt install python-is-python3` on Debian-like
 distros, or equivalent on others.)
 
-4. After cloning the Music Blocks repository, you can choose one of two methods to start a local server: using Python or using npm
+4. After cloning the musicblocks repository, you can choose one of two methods to start a local server: using Python or using npm
 
    **Using Python**
 
