@@ -508,7 +508,7 @@ function setupExtrasBlocks(activity) {
                     logo.oscilloscopeTurtles.indexOf(activity.turtles.turtleList[turtleIndex]) < 0
                 )
                     logo.oscilloscopeTurtles.push(activity.turtles.turtleList[turtleIndex]);
-            } else if (!logo.inStatusMatrix) {
+            } else if (!logo.inStatusMatrix && !logo.inMatrix)  {
                 if (args.length === 1) {
                     if (args[0] !== null) {
                         const tur = activity.turtles.ithTurtle(turtle);
@@ -534,6 +534,13 @@ function setupExtrasBlocks(activity) {
                         }
                     }
                 }
+            } else if (logo.inMatrix) {
+                logo.phraseMaker.addRowBlock(blk);
+                if (!logo.pitchBlocks.includes(blk)) {
+                    logo.pitchBlocks.push(blk);
+                }
+                logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
+                logo.phraseMaker.rowArgs.push(args[0]);
             }
         }
     }

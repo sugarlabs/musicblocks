@@ -664,7 +664,9 @@ class PhraseMaker {
             cell.innerHTML = "";
             this._headcols[i] = cell;
 
-            if (drumName != null) {
+            if (this.rowLabels[i].toLowerCase() === "print") {
+                cell.innerHTML = "Lyrics";
+            } else if (drumName != null) {
                 cell.innerHTML =
                     '&nbsp;&nbsp;<img src="' +
                     getDrumIcon(drumName) +
@@ -769,7 +771,12 @@ class PhraseMaker {
             cell.setAttribute("alt", i);
             this._labelcols[i] = cell;
 
-            if (drumName != null) {
+            if (this.rowLabels[i].toLowerCase() === "print") {
+                cell.innerHTML = "Lyrics";
+                cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
+                cell.style.textAlign = "center";
+                cell.style.verticalAlign = "middle";
+            } else if (drumName != null) {
                 cell.innerHTML = _(drumName);
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
                 cell.setAttribute("alt", i + "__" + "drumblocks");
