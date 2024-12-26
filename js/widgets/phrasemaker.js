@@ -637,7 +637,8 @@ class PhraseMaker {
             drumName = getDrumName(this.rowLabels[i]);
 
             // Depending on the row, we choose a different background color.
-            if (
+            if (this.rowLabels[i] === "print") break;
+            else if (
                 MATRIXGRAPHICS.indexOf(this.rowLabels[i]) != -1 ||
                 MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) != -1
             ) {
@@ -664,9 +665,8 @@ class PhraseMaker {
             cell.innerHTML = "";
             this._headcols[i] = cell;
 
-            if (this.rowLabels[i].toLowerCase() === "print") {
-                cell.innerHTML = "Lyrics";
-            } else if (drumName != null) {
+            if (this.rowLabels[i] === "print") break;
+            else if (drumName != null) {
                 cell.innerHTML =
                     '&nbsp;&nbsp;<img src="' +
                     getDrumIcon(drumName) +
@@ -771,12 +771,8 @@ class PhraseMaker {
             cell.setAttribute("alt", i);
             this._labelcols[i] = cell;
 
-            if (this.rowLabels[i].toLowerCase() === "print") {
-                cell.innerHTML = "Lyrics";
-                cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
-                cell.style.textAlign = "center";
-                cell.style.verticalAlign = "middle";
-            } else if (drumName != null) {
+            if (this.rowLabels[i] === "print") break;
+            else if (drumName != null) {
                 cell.innerHTML = _(drumName);
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
                 cell.setAttribute("alt", i + "__" + "drumblocks");
@@ -934,75 +930,74 @@ class PhraseMaker {
 
 
         // Add a row for lyrics
-        const lyricsRow = ptmTable.insertRow();
-        lyricsRow.setAttribute("id", "lyricRow");
-        lyricsRow.style.position = "sticky";
+        if (this.rowLabels.includes("print")) { 
 
-        // Label Cell (Fixed like "note value")
-        cell = lyricsRow.insertCell();
-        cell.setAttribute("colspan", "2");
-        cell.className = "headcol";
-        cell.style.position = "sticky";
-        cell.style.left = "1.2px";
-        cell.style.zIndex = "1";
-        cell.style.backgroundColor = platformColor.lyricsLabelBackground || "#FF2B77";
-        cell.style.textAlign = "center";
-        cell.innerHTML = "Lyrics";
-
-        // Nested Table for Input Fields
-        tempTable = document.createElement("table");
-        tempTable.setAttribute("cellpadding", "0px");
-        const inputRow = tempTable.insertRow();
-
-        // Add input cells for lyrics
+            this._lyricsON = true;
+            const lyricsRow = ptmTable.insertRow();
+            lyricsRow.setAttribute("id", "lyricRow");
+            lyricsRow.style.position = "sticky";
+    
+            // Label Cell (Fixed like "note value")
+            cell = lyricsRow.insertCell();
+            cell.setAttribute("colspan", "2");
+            cell.className = "headcol";
+            cell.style.position = "sticky";
+            cell.style.left = "1.2px";
+            cell.style.zIndex = "1";
+            cell.style.backgroundColor = platformColor.lyricsLabelBackground || "#FF2B77";
+            cell.style.textAlign = "center";
+            cell.innerHTML = "Lyrics";
+    
+            // Nested Table for Input Fields
+            tempTable = document.createElement("table");
+            tempTable.setAttribute("cellpadding", "0px");
+            const inputRow = tempTable.insertRow();
+    
+            // Add input cells for lyrics       
+            this._lyrics = Array(this.activity.logo.tupletRhythms.length).fill("");
+            for (let i = 0; i < this.activity.logo.tupletRhythms.length; i++) {
+                const noteValue = this.activity.logo.tupletRhythms[i][2];
+                const inputCell = inputRow.insertCell();
+                inputCell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
+                inputCell.style.width = this._noteWidth(noteValue) + "px";
+                inputCell.style.minWidth = inputCell.style.width;
+                inputCell.style.maxWidth = inputCell.style.width;
+                inputCell.style.backgroundColor = "#FF6EA1"; 
+                inputCell.style.fontFamily = "sans-serif"; 
+                inputCell.style.cursor = "default"; 
+                inputCell.style.borderSpacing = "1px 1px"; 
+                inputCell.style.borderCollapse = "collapse"; 
+                inputCell.style.boxSizing = "border-box"; 
+                inputCell.style.padding = "0"; 
+                inputCell.style.borderRadius = "6px"; 
+                inputCell.style.border = "none"; 
+                inputCell.setAttribute("alt", i + "__" + "graphicsblocks2");
+                
+                const lyricsInput = document.createElement("input");
+                lyricsInput.type = "text";
+                
+               
+                lyricsInput.style.height = inputCell.style.height; 
+                lyricsInput.style.width = "100%";
+                lyricsInput.style.minWidth = inputCell.style.minWidth; 
+                lyricsInput.style.maxWidth = inputCell.style.maxWidth; 
+                lyricsInput.style.fontSize = "inherit"; 
+                lyricsInput.style.fontFamily = "sans-serif"; 
+                lyricsInput.style.cursor = "default"; 
+                lyricsInput.style.boxSizing = "border-box";
+                lyricsInput.style.padding = "0"; 
+                lyricsInput.style.border = "none"; 
+                lyricsInput.style.borderRadius = "6px"; 
+                lyricsInput.style.backgroundColor = "#FF6EA1"; 
+                
+                inputCell.appendChild(lyricsInput);
+                lyricsInput.addEventListener("input", (event) => {
+                    this._lyrics[i] = event.target.value;
+                });
+            };
+            lyricsRow.insertCell().appendChild(tempTable);
+        }
         
-        this._lyrics = Array(this.activity.logo.tupletRhythms.length).fill("");
-        for (let i = 0; i < this.activity.logo.tupletRhythms.length; i++) {
-            const inputCell = inputRow.insertCell();
-            inputCell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
-            inputCell.style.width = Math.floor(MATRIXSOLFEWIDTH * 0.93 * this._cellScale) + "px";
-            inputCell.style.minWidth = inputCell.style.width;
-            inputCell.style.maxWidth = inputCell.style.width;
-            inputCell.style.backgroundColor = "#FF6EA1"; 
-            inputCell.style.fontFamily = "sans-serif"; 
-            inputCell.style.cursor = "default"; 
-            inputCell.style.borderSpacing = "1px 1px"; 
-            inputCell.style.borderCollapse = "collapse"; 
-            inputCell.style.boxSizing = "border-box"; 
-            inputCell.style.padding = "0"; 
-            inputCell.style.borderRadius = "6px"; 
-            inputCell.style.border = "none"; 
-            inputCell.setAttribute("alt", i + "__" + "graphicsblocks2");
-            
-            const lyricsInput = document.createElement("input");
-            lyricsInput.type = "text";
-            
-           
-            lyricsInput.style.height = inputCell.style.height; 
-            lyricsInput.style.width = "100%";
-            lyricsInput.style.minWidth = inputCell.style.minWidth; 
-            lyricsInput.style.maxWidth = inputCell.style.maxWidth; 
-            lyricsInput.style.fontSize = "inherit"; 
-            lyricsInput.style.fontFamily = "sans-serif"; 
-            lyricsInput.style.cursor = "default"; 
-            lyricsInput.style.boxSizing = "border-box";
-            lyricsInput.style.padding = "0"; 
-            lyricsInput.style.border = "none"; 
-            lyricsInput.style.borderRadius = "6px"; 
-            lyricsInput.style.backgroundColor = "#FF6EA1"; 
-            
-            inputCell.appendChild(lyricsInput);
-            
-
-            // Optional: Add input listener
-            lyricsInput.addEventListener("input", (event) => {
-                this._lyrics[i] = event.target.value;
-            });
-        };
-
-        // Append Nested Table to Row
-        lyricsRow.insertCell().appendChild(tempTable);
-
         // An extra row for the note and tuplet values
         ptmTableRow = ptmTable.insertRow();
         ptmCell = ptmTableRow.insertCell();
@@ -3090,7 +3085,8 @@ class PhraseMaker {
         for (let j = 0; j < numBeats; j++) {
             for (let i = 0; i < rowCount; i++) {
                 // Depending on the row, we choose a different background color.
-                if (
+                if (this.rowLabels[i] === "print") break; 
+                else if (
                     MATRIXGRAPHICS.indexOf(this.rowLabels[i]) != -1 ||
                     MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) != -1
                 ) {
