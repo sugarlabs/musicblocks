@@ -3433,6 +3433,177 @@ class Activity {
             this.refreshCanvas();
         };
 
+        this._restoreTrashById = (blockId) => {
+            const blockIndex = this.blocks.trashStacks.indexOf(blockId);
+            if (blockIndex === -1) return; // Block not found in trash
+        
+            this.blocks.trashStacks.splice(blockIndex, 1); // Remove from trash
+        
+            for (const name in this.palettes.dict) {
+                this.palettes.dict[name].hideMenu(true);
+            }
+        
+            this.blocks.activeBlock = null;
+            this.refreshCanvas();
+        
+            const dx = 0;
+            const dy = -this.cellSize * 3; // Reposition
+        
+            // Restore drag group
+            this.blocks.findDragGroup(blockId);
+            for (let b = 0; b < this.blocks.dragGroup.length; b++) {
+                const blk = this.blocks.dragGroup[b];
+                this.blocks.blockList[blk].trash = false;
+                this.blocks.moveBlockRelative(blk, dx, dy);
+                this.blocks.blockList[blk].show();
+            }
+        
+            this.blocks.raiseStackToTop(blockId);       
+            const restoredBlock = this.blocks.blockList[blockId];
+        
+            if (restoredBlock.name === 'start' || restoredBlock.name === 'drum') {
+                const turtle = restoredBlock.value;
+                this.turtles.turtleList[turtle].inTrash = false;
+                this.turtles.turtleList[turtle].container.visible = true;
+            } else if (restoredBlock.name === 'action') {
+                const actionArg = this.blocks.blockList[restoredBlock.connections[1]];
+                if (actionArg !== null) {
+                    let label;
+                    const oldName = actionArg.value;
+                    restoredBlock.trash = true;
+                    const uniqueName = this.blocks.findUniqueActionName(oldName);
+                    restoredBlock.trash = false;
+        
+                    if (uniqueName !== actionArg) {
+                        actionArg.value = uniqueName;
+                        label = uniqueName.length > 8 ? uniqueName.substr(0, 7) + '...' : uniqueName;
+                        actionArg.text.text = label;
+        
+                        if (actionArg.label !== null) {
+                            actionArg.label.value = uniqueName;
+                        }
+                        actionArg.container.updateCache();
+                        for (let b = 0; b < this.blocks.dragGroup.length; b++) {
+                            const me = this.blocks.blockList[this.blocks.dragGroup[b]];
+                            if (
+                                ["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].includes(
+                                    me.name
+                                ) &&
+                                me.privateData === oldName
+                            ) {
+                                me.privateData = uniqueName;
+                                me.value = uniqueName;
+                                label = uniqueName.length > 8 ? uniqueName.substr(0, 7) + '...' : uniqueName;
+                                me.text.text = label;
+                                me.overrideName = label;
+                                me.regenerateArtwork();
+                                me.container.updateCache();
+                            }
+                        }
+                    }
+                }
+            }
+        
+            this.refreshCanvas();
+        }; 
+
+        // Add event listener for trash icon click
+        document.getElementById('trashContainer').addEventListener('click', () => {
+            this._renderTrashView();
+        }); 
+
+        // function to hide trashView from canvas
+        function handleClickOutsideTrashView(trashView) {
+            let firstClick = true;
+            document.addEventListener('click', (event) => {
+                if (firstClick) {
+                    firstClick = false;
+                    return;
+                }
+                if (!trashView.contains(event.target) && event.target !== trashView) {
+                    trashView.style.display = 'none';
+                }
+            });
+        }
+
+        this._renderTrashView = () => {
+            const trashList = document.getElementById('trashList');
+            const trashView = document.createElement('div');
+            trashView.id = 'trashView';
+            trashView.classList.add('trash-view');
+
+            trashView.style.position = 'relative';
+            trashView.style.backgroundColor = 'rgba(255, 255, 255, 1)';
+            trashView.style.maxWidth = '396px';
+            trashView.style.maxHeight = '200px';
+            trashView.style.overflowY = 'auto';
+            trashView.style.fontSize = '16px';
+            trashView.style.color = 'black';
+            trashView.style.border = '2px solid #87cefa';
+            trashView.style.listStyleType = 'none';
+            trashView.style.margin = '10px';
+            trashView.style.padding = '10px';
+            trashView.style.textAlign = 'left';
+            trashView.innerHTML = '';
+        
+            // Iterate over trash stack and render each item
+            this.blocks.trashStacks.forEach((blockId) => {
+                const block = this.blocks.blockList[blockId];
+                // Create container for each block
+                const listItem = document.createElement('div');
+                listItem.classList.add('trash-item');
+                listItem.style.padding = '2px 12px';
+                listItem.style.margin = '1px 0';
+                listItem.style.borderRadius = '4px';
+                listItem.style.transition = 'background-color 0.3s';
+
+                const svgData = block.artwork;
+                const encodedData = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgData);
+        
+                const img = document.createElement('img');
+                img.src = encodedData;
+                img.alt = 'Block Icon';
+                img.style.width = '30px';
+                img.style.height = '30px';
+                img.style.marginRight = '10px';
+                img.style.verticalAlign = 'middle';
+
+                const textNode = document.createTextNode(block.name);
+        
+                // Append image and name to the list item
+                listItem.appendChild(img);
+                listItem.appendChild(textNode);
+                listItem.dataset.blockId = blockId;
+
+                listItem.addEventListener('mouseover', () => {
+                    listItem.style.backgroundColor = '#d9d9d9';
+                });
+                listItem.addEventListener('mouseout', () => {
+                    listItem.style.backgroundColor = '';
+                });
+                // Restore item on click
+                listItem.addEventListener('click', () => {
+                    this._restoreTrashById(blockId);
+                    activity.textMsg(
+                        _("Item restored from the trash"),
+                        3000 
+                    );
+                    trashView.style.display = 'none';
+                });
+                handleClickOutsideTrashView(trashView);
+        
+                trashView.appendChild(listItem);
+            });
+        
+            // Append or replace the view in the container
+            const existingView = document.getElementById('trashView');
+            if (existingView) {
+                trashList.replaceChild(trashView, existingView);
+            } else {
+                trashList.appendChild(trashView);
+            }
+        };
+
         this.handleKeyDown = (event) => {
             
             if (event.ctrlKey && event.key === "z") {
