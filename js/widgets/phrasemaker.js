@@ -258,7 +258,7 @@ class PhraseMaker {
          */
         this._lyrics = [];
 
-        this._lyricsON = true;
+        this._lyricsON = false;
 
         this._durationArray = [];
 
@@ -516,6 +516,7 @@ class PhraseMaker {
             this.activity.hideMsgs();
             docById("wheelDivptm").style.display = "none";
 
+            document.onkeydown = activity.__keyPressed; 
             widgetWindow.destroy();
         };
 
@@ -930,9 +931,8 @@ class PhraseMaker {
 
 
         // Add a row for lyrics
-        if (this.rowLabels.includes("print")) { 
+        if (this._lyricsON) { 
 
-            this._lyricsON = true;
             const lyricsRow = ptmTable.insertRow();
             lyricsRow.setAttribute("id", "lyricRow");
             lyricsRow.style.position = "sticky";
@@ -993,6 +993,7 @@ class PhraseMaker {
                 inputCell.appendChild(lyricsInput);
                 lyricsInput.addEventListener("input", (event) => {
                     this._lyrics[i] = event.target.value;
+                    lyricsInput.focus();
                 });
             };
             lyricsRow.insertCell().appendChild(tempTable);
@@ -2466,6 +2467,8 @@ class PhraseMaker {
 
         // Keep track of marked cells.
         this._markedColsInRow = [];
+        console.log("in sort ->",this._lyricsON);
+        //let lyricsSwitch = this._lyricsON;
         let thisRow, row, n, cell;
         for (let r = 0; r < this.rowLabels.length; r++) {
             thisRow = [];
@@ -2649,6 +2652,7 @@ class PhraseMaker {
         }
 
         this.makeClickable();
+        //this._lyricsON = false;
 
     }
 
@@ -3085,8 +3089,7 @@ class PhraseMaker {
         for (let j = 0; j < numBeats; j++) {
             for (let i = 0; i < rowCount; i++) {
                 // Depending on the row, we choose a different background color.
-                if (this.rowLabels[i] === "print") break; 
-                else if (
+                if (
                     MATRIXGRAPHICS.indexOf(this.rowLabels[i]) != -1 ||
                     MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) != -1
                 ) {

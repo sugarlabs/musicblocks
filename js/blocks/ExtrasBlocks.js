@@ -535,12 +535,7 @@ function setupExtrasBlocks(activity) {
                     }
                 }
             } else if (logo.inMatrix) {
-                logo.phraseMaker.addRowBlock(blk);
-                if (!logo.pitchBlocks.includes(blk)) {
-                    logo.pitchBlocks.push(blk);
-                }
-                logo.phraseMaker.rowLabels.push(activity.blocks.blockList[blk].name);
-                logo.phraseMaker.rowArgs.push(args[0]);
+                logo.phraseMaker._lyricsON = true;
             }
         }
     }
