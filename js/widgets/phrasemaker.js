@@ -2461,8 +2461,6 @@ class PhraseMaker {
 
         // Keep track of marked cells.
         this._markedColsInRow = [];
-        console.log("in sort ->",this._lyricsON);
-        //let lyricsSwitch = this._lyricsON;
         let thisRow, row, n, cell;
         for (let r = 0; r < this.rowLabels.length; r++) {
             thisRow = [];
@@ -2646,7 +2644,6 @@ class PhraseMaker {
         }
 
         this.makeClickable();
-        //this._lyricsON = false;
 
     }
 
@@ -2853,7 +2850,6 @@ class PhraseMaker {
 
         const tupletTimeFactor = param[0][0] / param[0][1];
         const numberOfNotes = param[1].length;
-        console.log("num", numberOfNotes);
         let totalNoteInterval = 0;
         // const ptmTable = docById("ptmTable");
         let lcd;
