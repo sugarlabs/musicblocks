@@ -928,7 +928,6 @@ class PhraseMaker {
             j += 1;
         }       
 
-
         // Add a row for lyrics if they are enabled in the ExtraBlocks.js
         if (this._lyricsON) { 
 
