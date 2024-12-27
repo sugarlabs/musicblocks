@@ -151,12 +151,7 @@ const processABCNotes = function(logo, turtle) {
                     logo.notationNotes[turtle] += "";
                     break;
                 case "meter":
-                    logo.notationNotes[turtle] +=
-                        "M:" +
-                        logo.notation.notationStaging[turtle][i + 1] +
-                        "/" +
-                        logo.notation.notationStaging[turtle][i + 2] +
-                        "\n";
+                    logo.notationNotes[turtle] += `M:${logo.notation.notationStaging[turtle][i + 1]}/${logo.notation.notationStaging[turtle][i + 2]}\n`;
                     i += 2;
                     break;
                 case "pickup":
