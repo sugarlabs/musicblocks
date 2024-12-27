@@ -49,7 +49,7 @@ class Toolbar {
                 ["play", _("Play")],
                 ["stop", _("Stop")],
                 ["record",_("Record")],
-                ["Full Screen", _("Full screen")],
+                ["Full screen", _("Full screen")],
                 ["FullScreen", _("Full screen")],
                 ["Toggle Fullscreen", _("Toggle Fullscreen")],
                 ["newFile", _("New project")],
@@ -110,8 +110,8 @@ class Toolbar {
                 _("Play"),
                 _("Stop"),
                 _("Record"),
-                _("Full Screen"),
-                _("Full Screen"),
+                _("Full screen"),
+                _("Full screen"),
                 _("Toggle Fullscreen"),
                 _("New project"),
                 _("Load project from file"),
@@ -175,8 +175,8 @@ class Toolbar {
                 ["play", _("Play")],
                 ["stop", _("Stop")],
                 ["record", _("Record")],
-                ["Full Screen", _("Full Screen")],
-                ["FullScreen", _("Full Screen")],
+                ["Full screen", _("Full screen")],
+                ["FullScreen", _("Full screen")],
                 ["Toggle Fullscreen", _("Toggle Fullscreen")],
                 ["newFile", _("New project")],
                 ["load", _("Load project from file")],
@@ -231,8 +231,8 @@ class Toolbar {
                 _("Play"),
                 _("Stop"),
                 _("Record"),
-                _("Full Screen"),
-                _("Full Screen"),
+                _("Full screen"),
+                _("Full screen"),
                 _("Toggle Fullscreen"),
                 _("New project"),
                 _("Load project from file"),
@@ -822,14 +822,20 @@ class Toolbar {
                 // Horizontal Scroll
                 const enableHorizScrollIcon = docById("enableHorizScrollIcon");
                 const disableHorizScrollIcon = docById("disableHorizScrollIcon");
+                
                 if (enableHorizScrollIcon) {
                     enableHorizScrollIcon.style.display = "block";
-                    enableHorizScrollIcon.onclick = () => setScroller(this.activity);
+                    enableHorizScrollIcon.onclick = () => {
+                        setScroller(this.activity);
+                    };
                 }
+                
                 if (disableHorizScrollIcon) {
-                    disableHorizScrollIcon.onclick = () => setScroller(this.activity);
+                    disableHorizScrollIcon.onclick = () => {
+                        setScroller(this.activity);
+                    };
                 }
-
+                
                 // JavaScript Toggle
                 const toggleJavaScriptIcon = docById("toggleJavaScriptIcon");
                 if (toggleJavaScriptIcon) {
@@ -1057,7 +1063,7 @@ function renderNewProjectConfirmation() {
     const newDropdown = document.getElementById("newdropdown");
     newDropdown.innerHTML = '';
     const title = document.createElement("div");
-    title.innerHTML = `<h2 style="color: #0066FF; font-size: 24px; text-align: left; margin: 0;">${_("New Project")}</h2>`;
+    title.innerHTML = `<h2 style="color: #0066FF; font-size: 24px; text-align: left; margin: 0;">${_("New project")}</h2>`;
     newDropdown.appendChild(title);
     const confirmationMessage = document.createElement("div");
     confirmationMessage.innerHTML = `<div id="confirmation-message" style="color: #666666; font-size: 16px; margin-bottom: 24px; text-align: left;">${_("Are you sure you want to create a new project?")}</div>`;

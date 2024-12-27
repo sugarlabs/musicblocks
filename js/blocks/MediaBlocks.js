@@ -689,7 +689,7 @@ function setupMediaBlocks(activity) {
             this.formBlock({
                 args: 2,
                 defaults: [392, 1000 / 3],
-                argLabels: [_("frequency"), _("duration (ms)")]
+                argLabels: [_("frequency"), _("duration (MS)")]
             });
 
             // Form block with specified connections
@@ -885,7 +885,7 @@ function setupMediaBlocks(activity) {
             // Form block with name, arguments, default values, and labels
             this.formBlock({
                 //.TRANS: show1 is show as in display an image or text on the screen.
-                name: this.lang === "ja" ? _("show1") : _("show"),
+                name: this.lang === "ja" ? _("show1") : _("Show").toLowerCase(),
                 //.TRANS: a media object
                 args: 2,
                 argLabels: [_("size"), _("obj")],
@@ -927,7 +927,7 @@ function setupMediaBlocks(activity) {
          * @constructor
          */
         constructor() {
-            super("media", _("media"));
+            super("media", _("Media").toLowerCase());
 
             // Set palette and activity for the block
             this.setPalette("media", activity);

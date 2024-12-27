@@ -4199,7 +4199,7 @@ class PhraseMaker {
         this.playingNow = !this.playingNow;
 
         if (this.playingNow) {
-            this.widgetWindow.modifyButton(0, "stop-button.svg", PhraseMaker.ICONSIZE, _("stop"));
+            this.widgetWindow.modifyButton(0, "stop-button.svg", PhraseMaker.ICONSIZE, _("Stop"));
 
             this.activity.logo.synth.stop();
 
@@ -5353,6 +5353,6 @@ class PhraseMaker {
 
         // Create a new stack for the chunk.
         this.activity.blocks.loadNewBlocks(newStack);
-        this.activity.textMsg(_("New action block generated!"));
+        this.activity.textMsg(_("New action block generated."));
     }
 }

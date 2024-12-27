@@ -2000,5 +2000,77 @@ function Synth() {
         Tone.Destination.volume.rampTo(db, 0.01);
     };
 
+    /**
+     * Starts Recording
+     * @function
+     * @memberof Synth
+     */
+    this.startRecording = async () => {
+        await Tone.start();
+        this.mic = new Tone.UserMedia();
+        this.recorder = new Tone.Recorder();
+        await this.mic.open()
+        .then(() => {
+            console.log("Mic opened");
+            this.mic.connect(this.recorder);
+            this.recorder.start();
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+    }
+
+    /**
+     * Stops Recording
+     * @function
+     * @memberof Synth
+     */
+    this.stopRecording = async () => {
+        this.recording = await this.recorder.stop();
+        this.mic.close();
+        this.audioURL = URL.createObjectURL(this.recording);
+        return this.audioURL;
+    }
+
+    /**
+     * Plays Recording
+     * @function
+     * @memberof Synth
+     */
+    this.playRecording = async () => {
+        this.player = new Tone.Player().toDestination();
+        await this.player.load(this.audioURL)
+        this.player.start();
+    }
+
+    /**
+     * Stops Recording
+     * @function
+     * @memberof Synth
+     */
+    this.stopPlayBackRecording = () => {
+        this.player.stop();
+    }
+
+    /**
+     * Analyzing the audio
+     * @function
+     * @memberof Synth
+     */
+    this.LiveWaveForm = () => {
+        this.analyser = new Tone.Analyser('waveform', 8192);
+        this.mic.connect(this.analyser);
+    }
+
+    /**
+    * Gets real-time waveform values
+    * @function
+    * @memberof Synth
+    */
+    this.getWaveFormValues = () => {
+        const values = this.analyser.getValue();
+        return values;
+    };
+
     return this;
 }

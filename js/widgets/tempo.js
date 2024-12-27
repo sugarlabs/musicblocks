@@ -411,7 +411,7 @@ class Tempo {
                 [5, ["vspace", {}], 0, 0, [0, null]]
             ];
             this.activity.blocks.loadNewBlocks(newStack);
-            this.activity.textMsg(_("New action block generated!"));
+            this.activity.textMsg(_("New action block generated."));
         }, 200 * i);
     }
 

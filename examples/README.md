@@ -18,6 +18,10 @@
 
 | Example | Description |
 | --- | --- |
+| on-beat.html | An example of using On-Strong-Beat and On-Weak-Beat to trigger graphics and other beat-specific modulations. | Music, Examples | 3 | 0 | 0 | B, A, G | 340 | G4, 392Hz | G5, 784Hz |
+
+| Example | Description |
+| --- | --- |
 | Mississippi-Hotdog.html | "Mississippi Hotdog": a simple example of a repeated phrase |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |
@@ -403,7 +407,8 @@ Music Blocks has handy widgets for various musical concepts to create musical co
 | equal-temperament-calculation.html | Calculate an octave tuned to equal temperament by using 2^(1/12) |
 | Twinkle-Twinkle-with-Pythagorean-tuning.html | Listen to the difference tuning makes |
 | el.html | Experimentation with the *One of this or that* block.
-| Galton-music.html | Modeled after a Galton box, a Gaussian distribution of tones is generated. |
+| Galton-music.html | Modeled after a Galton box, a Gaussian distribution of tones is generated. A nice way to explore musical mode. |
+| Galton-box-with-retrograde.html | Colorful twist on Galton box example |
 | record-player.html | Record and playback a sequence of notes on a "vinyl". |
 | stocks.html | Generated from a Python script, this project is a musical representation of the price of a stock over time |
 | Morse-code-rhythms.html | Generate Morse code rhythms by typing in letters that generate rhythmic patterns |

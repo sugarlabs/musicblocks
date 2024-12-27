@@ -133,7 +133,7 @@ function setupFlowBlocks(activity) {
 
             // Form the block with specific parameters
             this.formBlock({
-                name: _("duplicate"),
+                name: _("Duplicate").toLowerCase(),
                 args: 1,
                 defaults: [2]
             });
@@ -601,7 +601,7 @@ function setupFlowBlocks(activity) {
 
             // Form the block with specific parameters
             this.formBlock({
-                name: _("stop"),
+                name: _("Stop").toLowerCase(),
                 flows: {
                     top: true,
                     bottom: "tail",

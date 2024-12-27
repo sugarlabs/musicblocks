@@ -26,7 +26,7 @@ globalActivity.logo.pluginVars['rodi'] = {
    'lightSensorCache': null,
    'lightSensorValidFor': 100,
    'lightSensorCacheExpires': 0,
-   'moveStatus': _('stop'),
+   'moveStatus': _('Stop').toLowerCase(),
    'distanceCache': null,
    'distanceValidFor': 100,
    'distanceCacheExpires': 0
@@ -70,7 +70,7 @@ globalActivity.logo.pluginVars['rodi']['doRodiMove'] = function (logo, blk, left
         } else if (left > 0) {
             logo.pluginVars['rodi']['moveStatus'] = _('forward');
         } else {
-            logo.pluginVars['rodi']['moveStatus'] = _('stop');
+            logo.pluginVars['rodi']['moveStatus'] = _('Stop').toLowerCase();
         }
     } else {
         if (left > right) {
@@ -188,9 +188,9 @@ logo.pluginVars['rodi']['doAsyncCall'](logo, blk, apiUrl);
 const rodiSing = new ProtoBlock('rodising');
 rodiSing.palette = globalActivity.palettes.dict['rodi'];
 globalActivity.blocks.protoBlockDict['rodising'] = rodiSing;
-rodiSing.staticLabels.push(_('play'));
+rodiSing.staticLabels.push(_('Play').toLowerCase());
 rodiSing.staticLabels.push(_('note'));
-rodiSing.staticLabels.push(_('duration'));
+rodiSing.staticLabels.push(_('duration (MS)'));
 rodiSing.adjustWidthToLabel();
 rodiSing.twoArgBlock();
 rodiSing.dockTypes[1] = 'numberin';
@@ -410,7 +410,7 @@ logo.pluginVars['rodi']['doRodiMove'](logo, blk, 100, 100);
 const rodiStop = new ProtoBlock('rodistop');
 rodiStop.palette = globalActivity.palettes.dict['rodi'];
 globalActivity.blocks.protoBlockDict['rodistop'] = rodiStop;
-rodiStop.staticLabels.push(_('stop'));
+rodiStop.staticLabels.push(_('Stop').toLowerCase());
 rodiStop.adjustWidthToLabel();
 rodiStop.zeroArgBlock();
 
