@@ -508,7 +508,9 @@ function setupExtrasBlocks(activity) {
                     logo.oscilloscopeTurtles.indexOf(activity.turtles.turtleList[turtleIndex]) < 0
                 )
                     logo.oscilloscopeTurtles.push(activity.turtles.turtleList[turtleIndex]);
-            } else if (!logo.inStatusMatrix && !logo.inMatrix)  {
+            } else if (logo.inMatrix) {
+                logo.phraseMaker._lyricsON = true;
+            } else if (!logo.inStatusMatrix) {
                 if (args.length === 1) {
                     if (args[0] !== null) {
                         const tur = activity.turtles.ithTurtle(turtle);
@@ -534,8 +536,6 @@ function setupExtrasBlocks(activity) {
                         }
                     }
                 }
-            } else if (logo.inMatrix) {
-                logo.phraseMaker._lyricsON = true;
             }
         }
     }

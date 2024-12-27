@@ -210,7 +210,7 @@ class PhraseMaker {
 
         // This array keeps track of the position of the rows after sorting.
         /**
-         * Map of row positions after sorting. 
+         * Map of row positions after sorting.
          * @type {Array<number>}
          * @private
          */
@@ -258,10 +258,11 @@ class PhraseMaker {
          */
         this._lyrics = [];
 
-        this._lyricsON = false;
-
-        this._durationArray = [];
-
+        /**
+         * Marks the presence of print block
+         * @type {boolean}
+         */
+        this.lyricsON = false;
     }
 
     /**
@@ -515,8 +516,6 @@ class PhraseMaker {
             this._stopOrCloseClicked = true;
             this.activity.hideMsgs();
             docById("wheelDivptm").style.display = "none";
-
-            document.onkeydown = activity.__keyPressed; 
             widgetWindow.destroy();
         };
 
@@ -930,7 +929,7 @@ class PhraseMaker {
         }       
 
 
-        // Add a row for lyrics
+        // Add a row for lyrics if they are enabled in the ExtraBlocks.js
         if (this._lyricsON) { 
 
             const lyricsRow = ptmTable.insertRow();
@@ -993,6 +992,7 @@ class PhraseMaker {
                 inputCell.appendChild(lyricsInput);
                 lyricsInput.addEventListener("input", (event) => {
                     this._lyrics[i] = event.target.value;
+                    //Disable keyboard shortcuts when typing lyrics
                     lyricsInput.focus();
                 });
             };
@@ -1041,14 +1041,8 @@ class PhraseMaker {
         this._tupletNoteValueRow = tempTable.insertRow();
         const tempTable2 = tempTable;
         this._tupletValueRow = tempTable.insertRow();
-        this._noteValueRow = tempTable.insertRow(); 
+        this._noteValueRow = tempTable.insertRow();
         ptmTableRow.insertCell().append(tempTable);
-
-        console.log(tempTable2.outerHTML);
-
-        
-
-        
 
         if (this._blockMap[this.blockNo] === undefined) {
             this._blockMap[this.blockNo] = [];
@@ -5268,7 +5262,7 @@ class PhraseMaker {
                         if (!this._lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
                             lastConnection = null;
                         } else {
-                            lastConnection = thisBlock + 3; 
+                            lastConnection = thisBlock + 3;
                         }
 
                         if (note[0][j][1] === "♯") {
