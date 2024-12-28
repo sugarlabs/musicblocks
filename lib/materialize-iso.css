@@ -2545,7 +2545,7 @@ i.left {
 }
 @media only screen and (min-width: 601px) {
   .materialize-iso .container {
-    width: 85%;
+    width: 75%;
   }
 }
 @media only screen and (max-width: 400px) {
@@ -3436,12 +3436,13 @@ i.left {
 }
 
 
-@media only screen and (max-width: 400px) {
+@media only screen and (max-width: 450px) {
   .materialize-iso .filler, .materialize-iso .logo {
     display: none;
   }
+
   .materialize-iso nav .main i.material-icons {
-    font-size: 20px;  
+    font-size: 20px;
     position: relative;
     margin-left: -5px;
     margin-right: -5px;
@@ -3449,7 +3450,29 @@ i.left {
   }
 
   .materialize-iso nav .aux i.material-icons {
-    font-size: 17px;  
+    font-size: 17px;
+    position: relative;
+    margin-left: -7.5px;
+    margin-right: -7.5px;
+    padding: 0px;
+  }
+}
+
+
+@media only screen and (max-width: 400px) {
+  .materialize-iso .filler, .materialize-iso .logo {
+    display: none;
+  }
+  .materialize-iso nav .main i.material-icons {
+    font-size: 18px;  
+    position: relative;
+    margin-left: -5px;
+    margin-right: -5px;
+    padding: 0px;
+  }
+
+  .materialize-iso nav .aux i.material-icons {
+    font-size: 16px;  
     position: relative;
     margin-left: -7.5px;
     margin-right: -7.5px;
