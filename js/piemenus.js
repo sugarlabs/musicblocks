@@ -3582,7 +3582,7 @@ const piemenuGrid = (activity) => {
         gridLabels = [
             "Blank",
             "Cartesian",
-            "Cartesian Polar",
+            "Cartesian/Polar",
             "Polar",
             "Blank"
         ];
@@ -3597,22 +3597,20 @@ const piemenuGrid = (activity) => {
             "imgsrc: images/grid/Mezzo-soprano.svg",
             "imgsrc: images/grid/Alto.svg",
             "imgsrc: images/grid/Tenor.svg",
-            "imgsrc: images/grid/Bass.svg",
-            ""
+            "imgsrc: images/grid/Bass.svg"
         ];
 
         gridLabels = [
             "Blank",
             "Cartesian",
-            "Cartesian Polar",
+            "Cartesian/Polar",
             "Polar",
             "Treble",
             "Grand",
             "Mezzo Soprano",
             "Alto",
             "Tenor",
-            "Bass",
-            "Blank"
+            "Bass"
         ];
     }
 
@@ -3635,7 +3633,6 @@ const piemenuGrid = (activity) => {
 
     activity.turtles.gridWheel.clockwise = false;
     activity.turtles.gridWheel.initWheel(grids);
-    activity.turtles.gridWheel.navItems[gridLabels.length - 1].enabled = false;
     activity.turtles.gridWheel.createWheel();
     activity.turtles.gridWheel.navigateWheel(
         activity.turtles.currentGrid ? activity.turtles.currentGrid : 0
@@ -3851,11 +3848,10 @@ const piemenuKey = (activity) => {
                     activity.blocks.blockList[activity.blocks.blockList.length - 1].value =
                         activity.KeySignatureEnv[1];
                     activity.textMsg(
-                        _("You have chosen key ") +
+                        _("You have chosen key for your pitch preview.") +
                             activity.KeySignatureEnv[0] +
                             " " +
-                            activity.KeySignatureEnv[1] +
-                            _(" for your pitch preview.")
+                            activity.KeySignatureEnv[1]
                     );
                 }
             }

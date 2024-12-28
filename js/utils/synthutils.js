@@ -2038,9 +2038,18 @@ function Synth() {
      * @memberof Synth
      */
     this.playRecording = async () => {
-        const player = new Tone.Player().toDestination();
-        await player.load(this.audioURL)
-        player.start();
+        this.player = new Tone.Player().toDestination();
+        await this.player.load(this.audioURL)
+        this.player.start();
+    }
+
+    /**
+     * Stops Recording
+     * @function
+     * @memberof Synth
+     */
+    this.stopPlayBackRecording = () => {
+        this.player.stop();
     }
 
     /**

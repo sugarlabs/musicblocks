@@ -577,7 +577,7 @@ class PitchStaircase {
         }
 
         this.activity.blocks.loadNewBlocks(newStack);
-        this.activity.textMsg(_("New action block generated!"));
+        this.activity.textMsg(_("New action block generated."));
     }
 
     /**

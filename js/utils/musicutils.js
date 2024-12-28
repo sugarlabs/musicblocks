@@ -1167,7 +1167,7 @@ const SELECTORSTRINGS = [
     //.TRANS: musical temperament
     _("just intonation"),
     //.TRANS: musical temperament
-    _("meantone"),
+    _("Meantone").toLowerCase(),
     _("custom"),
     //.TRANS: double flat is a music term related to pitch
     _("double flat"),
@@ -1621,7 +1621,7 @@ let TEMPERAMENTS = [
     [_("Pythagorean (3-limit JI)"), "Pythagorean", "Pythagorean"],
     [_("Meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
     [_("Meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"],
-    [_("Custom"), "custom", "custom"]
+    [_("custom"), "custom", "custom"]
 ];
 
 /**

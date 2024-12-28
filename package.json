@@ -27,7 +27,7 @@
     "@babel/core": "^7.11.1",
     "@babel/preset-env": "^7.11.0",
     "babel-eslint": "^10.1.0",
-    "clean-css": "^4.2.3",
+    "clean-css": "^4.2.4",
     "eslint": "^7.6.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-config-standard": "^14.1.1",
@@ -37,7 +37,6 @@
     "gulp": "^5.0.0",
     "gulp-babel": "^8.0.0",
     "gulp-clean-css": "^4.3.0",
-    "gulp-minify-css": "^1.2.4",
     "gulp-prettier": "^3.0.0",
     "gulp-uglify": "^3.0.2",
     "jest": "^29.7.0"

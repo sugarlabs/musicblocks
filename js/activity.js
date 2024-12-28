@@ -397,13 +397,6 @@ class Activity {
             this.helpfulSearchWidget.style.visibility = "hidden";
             this.helpfulSearchWidget.placeholder = _("Search for blocks");
             this.helpfulSearchWidget.classList.add("ui-autocomplete");
-            this.helpfulSearchWidget.style.cssText = `
-                padding: 2px;
-                border: 2px solid grey;
-                width: 220px;
-                height: 20px;
-                font-size: large;
-            `;
             this.progressBar = docById("myProgress");
             this.progressBar.style.visibility = "hidden";
 
@@ -429,17 +422,40 @@ class Activity {
             }
             this.helpfulSearchDiv = document.createElement("div");
             this.helpfulSearchDiv.setAttribute("id", "helpfulSearchDiv");
-            this.helpfulSearchDiv.style.cssText = `
-                position: absolute;
-                background-color: #f0f0f0;
-                padding: 5px;
-                border: 1px solid #ccc;
-                width: 230px;
-                display: none;
-                z-index: 1;
-            `;
 
             document.body.appendChild(this.helpfulSearchDiv);
+
+            // Create the div for the close button (cross button)
+            const closeButtonDiv = document.createElement("div");
+            closeButtonDiv.style.cssText = 
+                "position: absolute;" +
+                "top: 10px;" +  // Adjust the top position to center it vertically
+                "right: 10px;" + // Position the button on the right side of the helpfulSearchDiv
+                "cursor: pointer;";
+
+            // Create the cross button itself
+            const closeButton = document.createElement("button");
+            closeButton.textContent = "×"; // You can use HTML entity or an icon
+            closeButton.style.cssText = 
+            "position: absolute;" +
+                "top: 50%;" +  // Center vertically
+                "right: -30px;" +  // Place it outside the input, adjust as needed
+                "transform: translateY(-50%);" +  // Align with vertical center of input
+                "background: transparent;" +
+                "border: none;" +
+                "font-size: large;" +
+                "cursor: pointer;";
+
+            // Append the cross button to the closeButtonDiv
+            closeButtonDiv.appendChild(closeButton);
+
+            // Append the closeButtonDiv to the helpfulSearchDiv
+            this.helpfulSearchDiv.appendChild(closeButtonDiv);
+
+            // Add event listener to remove the search div from the DOM when clicked on the close button
+            closeButton.addEventListener("click", () => {
+                this.helpfulSearchDiv.parentNode.removeChild(this.helpfulSearchDiv); // Remove from DOM
+            });
 
             if (docById("helpfulSearch")) {
                 docById("helpfulSearch").parentNode.removeChild(
@@ -453,6 +469,9 @@ class Activity {
          * displays helpfulSearchDiv on canvas
          */
         this._displayHelpfulSearchDiv = () => {
+            if (!docById("helpfulSearchDiv")) {
+                this.setHelpfulSearchDiv();  // Re-create and append the div if it's not found
+            }
             this.helpfulSearchDiv.style.left = docById("helpfulWheelDiv").offsetLeft + 80 * this.getStageScale() + "px";
             this.helpfulSearchDiv.style.top = docById("helpfulWheelDiv").offsetTop + 110 * this.getStageScale() + "px";
 
@@ -479,13 +498,9 @@ class Activity {
                 if (docById("helpfulWheelDiv").style.display !== "none") {
                     docById("helpfulWheelDiv").style.display = "none";
                 }
-                if (docById("helpfulSearchDiv").style.display !== "none" && !docById("helpfulSearchDiv").contains(e.target) && e.target.id !== "helpfulSearch") {
-                    docById("helpfulSearchDiv").style.display = "none";
-                }
                 that.__tick();
         }
 
-        document.addEventListener("click", this._hideHelpfulSearchWidget);
 
         /*
          * Sets up right click functionality opening the context menus
@@ -5774,11 +5789,11 @@ class Activity {
             if (!this.helpfulWheelItems.find(ele => ele.label === "Home [HOME]")) 
                 this.helpfulWheelItems.push({label: "Home [HOME]", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(GOHOMEFADEDBUTTON)), display: true, fn: findBlocks});
 
-            this.hideBlocksContainer = createButton(SHOWBLOCKSBUTTON, _("Show/hide block"),
+            this.hideBlocksContainer = createButton(SHOWBLOCKSBUTTON, _("Show/hide blocks"),
                 changeBlockVisibility);
 
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Show/hide block")) 
-                this.helpfulWheelItems.push({label: "Show/hide block", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SHOWBLOCKSBUTTON)), display: true, fn: changeBlockVisibility});
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Show/hide blocks")) 
+                this.helpfulWheelItems.push({label: "Show/hide blocks", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SHOWBLOCKSBUTTON)), display: true, fn: changeBlockVisibility});
             
             this.collapseBlocksContainer = createButton(COLLAPSEBLOCKSBUTTON, _("Expand/collapse blocks"),
                 toggleCollapsibleStacks);
@@ -5822,8 +5837,8 @@ class Activity {
             if (!this.helpfulWheelItems.find(ele => ele.label === "Select")) 
                 this.helpfulWheelItems.push({label: "Select", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SELECTBUTTON)), display: true, fn: this.selectMode });
         
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Clean")) 
-                this.helpfulWheelItems.push({label: "Clean", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CLEARBUTTON)), display: true, fn: () => this._allClear(false)});
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Clear")) 
+                this.helpfulWheelItems.push({label: "Clear", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CLEARBUTTON)), display: true, fn: () => this._allClear(false)});
             
             if (!this.helpfulWheelItems.find(ele => ele.label === "Collapse")) 
                 this.helpfulWheelItems.push({label: "Collapse", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBUTTON)), display: true, fn: this.turtles.collapse});
@@ -5889,13 +5904,10 @@ class Activity {
                     that.helpfulSearchWidget.protoblk = ui.item.specialDict;
                     that.doHelpfulSearch();
                 },
-                focus: (event, ui) => {
+                focus: (event) => {
                     event.preventDefault();
-                    that.helpfulSearchWidget.value = ui.item.label;
                 }
             });
-
-            $j("#helpfulSearch").autocomplete("widget").addClass("scrollSearch");
 
             $j("#helpfulSearch").autocomplete("instance")._renderItem = (ul, item) => {
                 return $j("<li></li>")
@@ -6601,7 +6613,7 @@ class Activity {
             
                                         that.stage.addEventListener("trashsignal", __listener, false);
                                         that.sendAllToTrash(false, false);
-                                        that._allClear(false);
+                                        that._allClear(false, true);
                                         if (that.planet) {
                                             that.planet.closePlanet();
                                             that.planet.initialiseNewProject(

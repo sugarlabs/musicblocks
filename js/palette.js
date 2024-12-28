@@ -621,7 +621,7 @@ class PaletteModel {
         let label = "";
         switch (protoBlock.name) {
             case "grid":
-                label = _("grid");
+                label = _("Grid").toLowerCase();
                 break;
             case "text":
                 label = _("text");

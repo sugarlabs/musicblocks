@@ -528,8 +528,8 @@ const PALLABELS = [
     _("number"),
     _("flow"),
     _("action"),
-    _("sensors"),
-    _("media"),
+    _("Sensors").toLowerCase(),
+    _("Media").toLowerCase(),
     _("mice")
 ];
 

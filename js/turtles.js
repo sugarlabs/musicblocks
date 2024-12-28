@@ -898,8 +898,8 @@ Turtles.TurtlesView = class {
             this._clearButton = _makeButton(
                 CLEARBUTTON,
                 {
-                    name: "Clean",
-                    label: _("Clean"),
+                    name: "Clear",
+                    label: _("Clear"),
                 },
                 this._w - 5 - 2 * 55,
                 70 + LEADING + 6
