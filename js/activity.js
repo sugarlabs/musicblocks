@@ -1160,6 +1160,7 @@ class Activity {
         };
 
         this._doFastButton = (env) => {
+            this._onResize();
             this.blocks.activeBlock = null;
             hideDOMLabel();
 
