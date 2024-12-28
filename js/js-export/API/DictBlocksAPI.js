@@ -51,3 +51,5 @@ class DictBlocksAPI {
         return this.runCommand("getValue", [args[1], args[0], this.turIndex]);
     }
 }
+
+module.exports = DictBlocksAPI;
