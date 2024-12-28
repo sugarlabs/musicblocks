@@ -992,14 +992,17 @@ class Palette {
                 };
                 onMouseMove(event);
 
-                document.addEventListener("touchmove", onMouseMove);
+                document.addEventListener("touchmove", onMouseMove, { passive: false });
                 document.addEventListener("mousemove", onMouseMove);
 
                 const that = this;
                 const up = (event) => {
+                    event.preventDefault();
                     document.body.style.cursor = "default";
                     document.removeEventListener("mousemove", onMouseMove);
+                    document.removeEventListener("touchmove", onMouseMove);
                     img.onmouseup = null;
+                    img.ontouchend = null;
 
                     const x = parseInt(img.style.left);
                     const y = parseInt(img.style.top);
