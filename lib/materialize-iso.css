@@ -3461,7 +3461,7 @@ i.left {
 
 @media only screen and (max-width: 400px) {
   .materialize-iso .filler, .materialize-iso .logo {
-    display: none;
+    display: block;
   }
   .materialize-iso nav .main i.material-icons {
     font-size: 18px;  
@@ -3477,6 +3477,17 @@ i.left {
     margin-left: -7.5px;
     margin-right: -7.5px;
     padding: 0px;
+  }
+}
+
+@media only screen and (min-width: 360px) and (max-width: 400px) {
+  .materialize-iso nav .main i.material-icons,
+  .materialize-iso nav .aux i.material-icons {
+    font-size: 19px; 
+    position: relative;
+    margin-left: -4px; 
+    margin-right: -4px;
+    padding: 0; 
   }
 }
 
