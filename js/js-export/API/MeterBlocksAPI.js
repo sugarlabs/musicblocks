@@ -74,3 +74,6 @@ class MeterBlocksAPI {
         return Singer.MeterActions.getNotesPlayed(args[0], this.turIndex);
     }
 }
+
+
+module.exports = MeterBlocksAPI;
