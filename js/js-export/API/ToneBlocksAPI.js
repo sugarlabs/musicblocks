@@ -129,3 +129,4 @@ class ToneBlocksAPI {
         return this.ENDFLOWCOMMAND;
     }
 }
+module.exports = ToneBlocksAPI;

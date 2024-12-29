@@ -179,3 +179,4 @@ class PitchBlocksAPI {
         return Singer.PitchActions.numToPitch(args[0], "octave", this.turIndex);
     }
 }
+module.exports = PitchBlocksAPI;

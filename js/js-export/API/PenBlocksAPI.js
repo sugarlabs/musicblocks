@@ -99,3 +99,4 @@ class PenBlocksAPI {
         return this.runCommand("doSetFont", [args[0]]);
     }
 }
+module.exports = PenBlocksAPI;
