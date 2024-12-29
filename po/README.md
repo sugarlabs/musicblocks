@@ -3,7 +3,7 @@ Internationalization
 
 We are using PO files as the basic mechanism for managing translation
 of Music Blocks. We'd prefer that translators work with the Sugar
-Labs [Pootle server](http://translate.sugarlabs.org/projects/MusicBlocks/) and
+Labs [Pootle server](https://weblate.sugarlabs.org/) and
 we will work with you to set up a PO file for your language if one is
 not presently on the server. Also feel free to make Pull Requests
 directly to this repository with updates to existing (or new) PO
