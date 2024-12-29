@@ -991,8 +991,8 @@ msgid "Not a number"
 msgstr "数字ではありません"
 
 #: js/block.js:4401
-msgid "Octave value must be between 1 and 10."
-msgstr "オクターヴの値が「１」から「１０」までの範囲でなければなりません。"
+msgid "Octave value must be between 1 and 8."
+msgstr "オクターヴの値が「１」から「8」までの範囲でなければなりません。"
 
 #: js/block.js:4409
 msgid "Numbers can have at most 10 digits."

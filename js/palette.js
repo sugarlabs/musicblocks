@@ -980,6 +980,7 @@ class Palette {
                 };
 
                 const onMouseMove = (e) => {
+                    e.preventDefault();
                     let x, y;
                     if (e.type === "touchmove") {
                         x = e.touches[0].clientX;
@@ -992,14 +993,16 @@ class Palette {
                 };
                 onMouseMove(event);
 
-                document.addEventListener("touchmove", onMouseMove);
+                document.addEventListener("touchmove", onMouseMove, { passive: false });
                 document.addEventListener("mousemove", onMouseMove);
 
                 const that = this;
                 const up = (event) => {
                     document.body.style.cursor = "default";
                     document.removeEventListener("mousemove", onMouseMove);
+                    document.removeEventListener("touchmove", onMouseMove);
                     img.onmouseup = null;
+                    img.ontouchend = null;
 
                     const x = parseInt(img.style.left);
                     const y = parseInt(img.style.top);
@@ -1009,15 +1012,15 @@ class Palette {
                     document.body.removeChild(img);
                     itemCell.appendChild(img);
 
-                    if (!x || !y) return;
+                    // if (!x || !y) return;
 
                     that._makeBlockFromProtoblock(
                         protoListScope[blk],
                         true,
                         b.modname,
                         event,
-                        x - that.activity.blocksContainer.x,
-                        y - that.activity.blocksContainer.y
+                        (x || that.activity.blocksContainer.x + 100) - that.activity.blocksContainer.x,
+                        (y || that.activity.blocksContainer.y + 100) - that.activity.blocksContainer.y
                     );
                 };
 

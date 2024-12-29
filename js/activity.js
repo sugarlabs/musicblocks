@@ -452,16 +452,11 @@ class Activity {
             // Append the closeButtonDiv to the helpfulSearchDiv
             this.helpfulSearchDiv.appendChild(closeButtonDiv);
 
-            // Add event listener to remove the search div from the DOM when clicked on the close button
-            closeButton.addEventListener("click", () => {
-                this.helpfulSearchDiv.parentNode.removeChild(this.helpfulSearchDiv); // Remove from DOM
-            });
+            // Add event listener to remove the search div from the DOM
+            const modeButton = docById("begIconText");
+            closeButton.addEventListener("click", this._hideHelpfulSearchWidget);
+            modeButton.addEventListener("click", this._hideHelpfulSearchWidget);
 
-            if (docById("helpfulSearch")) {
-                docById("helpfulSearch").parentNode.removeChild(
-                    docById("helpfulSearch")
-                );
-            }
             this.helpfulSearchDiv.appendChild(this.helpfulSearchWidget);
         }
 
@@ -497,6 +492,9 @@ class Activity {
         this._hideHelpfulSearchWidget = (e) => {
                 if (docById("helpfulWheelDiv").style.display !== "none") {
                     docById("helpfulWheelDiv").style.display = "none";
+                }
+                if (this.helpfulSearchDiv && this.helpfulSearchDiv.parentNode) {
+                    this.helpfulSearchDiv.parentNode.removeChild(this.helpfulSearchDiv);
                 }
                 that.__tick();
         }
@@ -2391,6 +2389,9 @@ class Activity {
             // Bring widget to top.
             this.searchWidget.style.zIndex = 1001;
             this.searchWidget.style.border = "2px solid blue";
+            if (this.helpfulSearchDiv) {
+                this._hideHelpfulSearchWidget();
+            }
             if (this.searchWidget.style.visibility === "visible") {
                 this.hideSearchWidget();
             } else {
