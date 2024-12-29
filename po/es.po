@@ -997,8 +997,8 @@ msgid "Not a number"
 msgstr "no es un número"
 
 #: js/block.js:4401
-msgid "Octave value must be between 1 and 10."
-msgstr "El bloqueo de silencio no se puede eliminar."
+msgid "Octave value must be between 1 and 8."
+msgstr "El valor de octava debe estar entre 1 y 8."
 
 #: js/block.js:4409
 msgid "Numbers can have at most 10 digits."

@@ -990,7 +990,7 @@ msgid "Not a number"
 msgstr ""
 
 #: js/block.js:4401
-msgid "Octave value must be between 1 and 10."
+msgid "Octave value must be between 1 and 8."
 msgstr ""
 
 #: js/block.js:4409
