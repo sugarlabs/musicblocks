@@ -48,3 +48,4 @@ class OrnamentBlocksAPI {
         return this.ENDFLOWCOMMAND;
     }
 }
+module.exports = OrnamentBlocksAPI;

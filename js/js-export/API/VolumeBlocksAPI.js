@@ -58,3 +58,4 @@ class VolumeBlocksAPI {
         return Singer.VolumeActions.getSynthVolume(args[0], this.turIndex);
     }
 }
+module.exports = VolumeBlocksAPI;
