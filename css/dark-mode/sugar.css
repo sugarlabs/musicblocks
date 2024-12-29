@@ -1,0 +1,32 @@
+/* Force dark mode on Sugar activity container */
+.dark-mode #main-toolbar {
+    background-color: #1a1a1a !important;
+}
+
+.dark-mode #canvas-container,
+.dark-mode #workspace-container,
+.dark-mode .sugar-canvas-container,
+.dark-mode .sugar-workspace-container {
+    background: #1a1a1a !important;
+    background-color: #1a1a1a !important;
+}
+
+/* Force dark mode on activity elements */
+.dark-mode .activity-container,
+.dark-mode .activity-root,
+.dark-mode #activity-palette,
+.dark-mode #activity-toolbar {
+    background: #1a1a1a !important;
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+/* Force dark mode on Sugar-specific elements */
+.dark-mode .sugar-activity,
+.dark-mode .sugar-toolbar,
+.dark-mode .sugar-palette,
+.dark-mode [class*="sugar"] {
+    background: #1a1a1a !important;
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+} 

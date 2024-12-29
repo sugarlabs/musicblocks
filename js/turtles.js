@@ -31,6 +31,10 @@
 // What is the scale factor when stage is shrunk?
 const CONTAINERSCALEFACTOR = 4;
 
+// Add near the top with other constants
+const DARK_BG = '#1a1a1a';
+const LIGHT_BG = '#ffffff';
+
 /**
  * Class for managing all the turtles.
  *
@@ -54,6 +58,8 @@ class Turtles {
         importMembers(this, "", [activity]);
         // Inititalize all actions related to blocks executed by Turtle objects
         this.initActions();
+        // Add background color property
+        this._backgroundColor = window.platformColor.background || LIGHT_BG;
     }
 
     /**
@@ -361,6 +367,25 @@ class Turtles {
      */
     get scale() {
         return this._scale;
+    }
+
+    /**
+     * @param {Boolean} isDark - whether the background should be dark
+     * @returns {void}
+     */
+    setBackgroundColor(isDark) {
+        this._backgroundColor = isDark ? DARK_BG : LIGHT_BG;
+        
+        // Update boundary if it exists
+        if (this._expandedBoundary) {
+            this._expandedBoundary.visible = false;
+            this.__makeBoundary();
+        }
+        
+        // Update stage background
+        if (this.masterStage) {
+            this.masterStage.update();
+        }
     }
 }
 

@@ -13,22 +13,39 @@
 
 requirejs.config({
     baseUrl: "lib",
+    packages: [],
+    paths: {
+        activity: "../js",
+        easeljs: "../lib/easeljs",
+        prefixfree: "../bower_components/prefixfree/prefixfree.min",
+        sugar: "../lib/sugar-web/activity/activity",
+        webL10n: "../lib/webL10n"
+    },
     shim: {
-        easel: {
+        easeljs: {
             exports: "createjs"
         }
-    },
-    paths: {
-        utils: "../js/utils",
-        widgets: "../js/widgets",
-        activity: "../js",
-        easel: "../lib/easeljs",
-        twewn: "../lib/tweenjs",
-        prefixfree: "../bower_components/prefixfree/prefixfree.min",
-        samples: "../sounds/samples",
-        planet: "../js/planet"
-    },
-    packages: []
+    }
 });
 
-requirejs(["activity/activity"]);
+requirejs(["activity/activity", "sugar-web/env", "sugar-web/graphics/icon"], function (activity, env, icon) {
+    // Initialize dark mode based on Sugar environment
+    env.getEnvironment(function (err, environment) {
+        const isDarkMode = environment.colorvalue && environment.colorvalue.stroke === '#ffffff';
+        if (isDarkMode) {
+            document.body.classList.add('dark-mode');
+            if (activity.turtles) {
+                activity.turtles.setBackgroundColor(true);
+            }
+        }
+    });
+
+    // Listen for Sugar color changes
+    window.addEventListener('sugar-colorchange', function(e) {
+        const isDarkMode = e.detail.stroke === '#ffffff';
+        document.body.classList.toggle('dark-mode', isDarkMode);
+        if (activity.turtles) {
+            activity.turtles.setBackgroundColor(isDarkMode);
+        }
+    });
+});

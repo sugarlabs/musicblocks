@@ -99,3 +99,30 @@ input[type=range]:focus::-ms-fill-lower {
 input[type=range]:focus::-ms-fill-upper {
   background: #90c100;
 }
+
+/* Add these dark mode overrides at the end of style.css */
+.dark-mode .nav-wrapper,
+.dark-mode .blue,
+.dark-mode .blue.darken-1,
+.dark-mode .blue.darken-2,
+.dark-mode .blue.lighten-1,
+.dark-mode nav,
+.dark-mode header {
+    background: #1a1a1a !important;
+    background-color: #1a1a1a !important;
+}
+
+.dark-mode .materialize-iso,
+.dark-mode .materialize-red,
+.dark-mode .materialize-red-text {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+/* Override Material Design colors */
+.dark-mode [class*="blue"],
+.dark-mode [class*="darken"],
+.dark-mode [class*="lighten"] {
+    background: #1a1a1a !important;
+    background-color: #1a1a1a !important;
+}
