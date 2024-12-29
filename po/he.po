@@ -987,8 +987,8 @@ msgid "Not a number"
 msgstr "לא מספר"
 
 #: js/block.js:4401
-msgid "Octave value must be between 1 and 10."
-msgstr "ערך האוקטבה חייב להיות בין 1 ל-10."
+msgid "Octave value must be between 1 and 8."
+msgstr "ערך האוקטבה חייב להיות בין 1 ל-8."
 
 #: js/block.js:4409
 msgid "Numbers can have at most 10 digits."

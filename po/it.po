@@ -3104,8 +3104,8 @@ msgid "Not a number"
 msgstr "Non un numero"
 
 #: js/block.js:4401
-msgid "Octave value must be between 1 and 10."
-msgstr "Il valore dell'ottava deve essere compreso tra 1 e 10"
+msgid "Octave value must be between 1 and 8."
+msgstr "Il valore dell'ottava deve essere compreso tra 1 e 8"
 
 #: js/block.js:4409
 msgid "Numbers can have at most 10 digits."
