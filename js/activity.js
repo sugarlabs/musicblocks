@@ -457,11 +457,6 @@ class Activity {
             closeButton.addEventListener("click", this._hideHelpfulSearchWidget);
             modeButton.addEventListener("click", this._hideHelpfulSearchWidget);
 
-            if (docById("helpfulSearch")) {
-                docById("helpfulSearch").parentNode.removeChild(
-                    docById("helpfulSearch")
-                );
-            }
             this.helpfulSearchDiv.appendChild(this.helpfulSearchWidget);
         }
 
