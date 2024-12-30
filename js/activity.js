@@ -3325,11 +3325,6 @@ class Activity {
                 );
                 return;
             }
-            activity._restoreTrash();
-            activity.textMsg(
-                _("Item restored from the trash."),
-                3000 
-            );
         
             if (docById("helpfulWheelDiv").style.display !== "none") {
                 docById("helpfulWheelDiv").style.display = "none";
@@ -3337,101 +3332,27 @@ class Activity {
             }
         };
 
-        this._restoreTrash = () => {
-            for (const name in this.palettes.dict) {
-                this.palettes.dict[name].hideMenu(true);
-            }
-            
-            this.blocks.activeBlock = null;
-            this.refreshCanvas();
-
-            const dx = 0;
-            const dy = -this.cellSize * 3; // Reposition
-
-            if (this.blocks.trashStacks.length === 0) {
+        const restoreTrashShortcut = (activity) => {
+            if (!activity.blocks || !activity.blocks.trashStacks || activity.blocks.trashStacks.length === 0) {
+                activity.textMsg(
+                    _("Nothing in the trash to restore."),
+                    3000 
+                );
                 return;
             }
+            const lastId = this.blocks.trashStacks[this.blocks.trashStacks.length - 1];
+            if (lastId) this._restoreTrashById(lastId);
+            activity.textMsg(
+                _("Item restored from the trash."),
+                3000 
+            );
 
-            const thisBlock = this.blocks.trashStacks.pop();
-
-            // Restore drag group in trash
-            this.blocks.findDragGroup(thisBlock);
-            for (let b = 0; b < this.blocks.dragGroup.length; b++) {
-                const blk = this.blocks.dragGroup[b];
-                this.blocks.blockList[blk].trash = false;
-                this.blocks.moveBlockRelative(blk, dx, dy);
-                this.blocks.blockList[blk].show();
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+                activity.__tick();
             }
-
-            this.blocks.raiseStackToTop(thisBlock);
-
-            if (
-                this.blocks.blockList[thisBlock].name === "start" ||
-                this.blocks.blockList[thisBlock].name === "drum"
-            ) {
-                const turtle = this.blocks.blockList[thisBlock].value;
-                this.turtles.turtleList[turtle].inTrash = false;
-                this.turtles.turtleList[turtle].container.visible = true;
-            } else if (this.blocks.blockList[thisBlock].name === "action") {
-                // We need to add a palette entry for this action.
-                // But first we need to ensure we have a unqiue name,
-                // as the name could have been taken in the interim.
-                const actionArg = this.blocks.blockList[
-                    this.blocks.blockList[thisBlock].connections[1]
-                ];
-                if (actionArg !== null) {
-                    let label;
-                    const oldName = actionArg.value;
-                    // Mark the action block as still being in the
-                    // trash so that its name won't be considered when
-                    // looking for a unique name.
-                    this.blocks.blockList[thisBlock].trash = true;
-                    const uniqueName = this.blocks.findUniqueActionName(oldName);
-                    this.blocks.blockList[thisBlock].trash = false;
-
-                    if (uniqueName !== actionArg) {
-                        actionArg.value = uniqueName;
-
-                        label = actionArg.value.toString();
-                        if (label.length > 8) {
-                            label = label.substr(0, 7) + "...";
-                        }
-                        actionArg.text.text = label;
-
-                        if (actionArg.label !== null) {
-                            actionArg.label.value = uniqueName;
-                        }
-
-                        actionArg.container.updateCache();
-
-                        // Check the drag group to ensure any do blocks are updated (in case of recursion).
-                        for (let b = 0; b < this.blocks.dragGroup.length; b++) {
-                            const me = this.blocks.blockList[this.blocks.dragGroup[b]];
-                            if (
-                                ["nameddo", "nameddoArg", "namedcalc", "namedcalcArg"].includes(
-                                    me.name
-                                ) &&
-                                me.privateData === oldName
-                            ) {
-                                me.privateData = uniqueName;
-                                me.value = uniqueName;
-
-                                label = me.value.toString();
-                                if (label.length > 8) {
-                                    label = label.substr(0, 7) + "...";
-                                }
-                                me.text.text = label;
-                                me.overrideName = label;
-                                me.regenerateArtwork();
-                                me.container.updateCache();
-                            }
-                        }
-                    }
-                }
-            }
-
-            this.refreshCanvas();
-        };
+        
+        }
 
         this._restoreTrashById = (blockId) => {
             const blockIndex = this.blocks.trashStacks.indexOf(blockId);
@@ -3503,12 +3424,16 @@ class Activity {
                     }
                 }
             }
+            activity.textMsg(
+                _("Item restored from the trash."),
+                3000 
+            );
         
             this.refreshCanvas();
         }; 
 
         // Add event listener for trash icon click
-        document.getElementById('trashContainer').addEventListener('click', () => {
+        document.getElementById('restoreIcon').addEventListener('click', () => {
             this._renderTrashView();
         }); 
 
@@ -3527,67 +3452,71 @@ class Activity {
         }
 
         this._renderTrashView = () => {
+            if (!activity.blocks || !activity.blocks.trashStacks || activity.blocks.trashStacks.length === 0) {
+                return;
+            }
             const trashList = document.getElementById('trashList');
             const trashView = document.createElement('div');
             trashView.id = 'trashView';
             trashView.classList.add('trash-view');
-
-            trashView.style.position = 'relative';
-            trashView.style.backgroundColor = 'rgba(255, 255, 255, 1)';
-            trashView.style.maxWidth = '396px';
-            trashView.style.maxHeight = '200px';
-            trashView.style.overflowY = 'auto';
-            trashView.style.fontSize = '16px';
-            trashView.style.color = 'black';
-            trashView.style.border = '2px solid #87cefa';
-            trashView.style.listStyleType = 'none';
-            trashView.style.margin = '10px';
-            trashView.style.padding = '10px';
-            trashView.style.textAlign = 'left';
+        
+            trashView.style = `position: relative; background-color: white; max-width: 396px; max-height: 200px; 
+                                overflow-y: auto; font-size: 16px; color: black; border: 2px solid #87cefa; 
+                                list-style-type: none; margin: 10px; padding: 10px; text-align: left;`;
             trashView.innerHTML = '';
         
-            // Iterate over trash stack and render each item
+            // Sticky buttons
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style = 'position: sticky; top: 0; height: 40px; display: flex; gap: 10px; background: white; padding: 5px 0;';
+        
+            const restoreLastBtn = document.createElement('button');
+            restoreLastBtn.textContent = 'Restore Last';
+            restoreLastBtn.style = 'display: flex; align-items: center; justify-content: center; width: 100px; height: 40px;';
+            restoreLastBtn.addEventListener('click', () => {
+                const lastId = this.blocks.trashStacks[this.blocks.trashStacks.length - 1];
+                if (lastId) this._restoreTrashById(lastId);
+                trashView.style.display = 'none';
+            });
+        
+            const restoreAllBtn = document.createElement('button');
+            restoreAllBtn.textContent = 'Restore All';
+            restoreAllBtn.style = 'display: flex; align-items: center; justify-content: center; width: 100px; height: 40px;';
+            restoreAllBtn.addEventListener('click', () => {
+                while (this.blocks.trashStacks.length > 0) {
+                    this._restoreTrashById(this.blocks.trashStacks[0]);
+                }
+                trashView.style.display = 'none';
+            });
+        
+            buttonContainer.appendChild(restoreLastBtn);
+            buttonContainer.appendChild(restoreAllBtn);
+            trashView.appendChild(buttonContainer);
+        
+            // Render trash items
             this.blocks.trashStacks.forEach((blockId) => {
                 const block = this.blocks.blockList[blockId];
-                // Create container for each block
                 const listItem = document.createElement('div');
                 listItem.classList.add('trash-item');
-                listItem.style.padding = '2px 12px';
-                listItem.style.margin = '1px 0';
-                listItem.style.borderRadius = '4px';
-                listItem.style.transition = 'background-color 0.3s';
-
+                listItem.style = 'padding: 2px 12px; margin: 1px 0; border-radius: 4px; transition: background-color 0.3s;';
+        
                 const svgData = block.artwork;
                 const encodedData = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgData);
         
                 const img = document.createElement('img');
                 img.src = encodedData;
                 img.alt = 'Block Icon';
-                img.style.width = '30px';
-                img.style.height = '30px';
-                img.style.marginRight = '10px';
-                img.style.verticalAlign = 'middle';
-
+                img.style = 'width: 30px; height: 30px; margin-right: 10px; vertical-align: middle;';
+        
                 const textNode = document.createTextNode(block.name);
         
-                // Append image and name to the list item
                 listItem.appendChild(img);
                 listItem.appendChild(textNode);
                 listItem.dataset.blockId = blockId;
-
-                listItem.addEventListener('mouseover', () => {
-                    listItem.style.backgroundColor = '#d9d9d9';
-                });
-                listItem.addEventListener('mouseout', () => {
-                    listItem.style.backgroundColor = '';
-                });
-                // Restore item on click
+        
+                listItem.addEventListener('mouseover', () => listItem.style.backgroundColor = '#d9d9d9');
+                listItem.addEventListener('mouseout', () => listItem.style.backgroundColor = '');
                 listItem.addEventListener('click', () => {
                     this._restoreTrashById(blockId);
-                    activity.textMsg(
-                        _("Item restored from the trash"),
-                        3000 
-                    );
                     trashView.style.display = 'none';
                 });
                 handleClickOutsideTrashView(trashView);
@@ -3595,7 +3524,6 @@ class Activity {
                 trashView.appendChild(listItem);
             });
         
-            // Append or replace the view in the container
             const existingView = document.getElementById('trashView');
             if (existingView) {
                 trashList.replaceChild(trashView, existingView);
@@ -3604,17 +3532,6 @@ class Activity {
             }
         };
 
-        this.handleKeyDown = (event) => {
-            
-            if (event.ctrlKey && event.key === "z") {
-                this._restoreTrash(activity);
-                activity.__tick();
-                event.preventDefault();
-            }
-        };
-
-        // Attach keydown event listener to document
-        document.addEventListener("keydown", this.handleKeyDown);
 
         /*
          * Open aux menu
@@ -5985,7 +5902,7 @@ class Activity {
                 this.helpfulWheelItems.push({label: "Increase block size", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(BIGGERBUTTON)), display: true, fn: doLargerBlocks});
 
             if (!this.helpfulWheelItems.find(ele => ele.label === "Restore")) 
-                this.helpfulWheelItems.push({label: "Restore", icon: "imgsrc:header-icons/restore-from-trash.svg", display: true, fn: restoreTrash});
+                this.helpfulWheelItems.push({label: "Restore", icon: "imgsrc:header-icons/restore-from-trash.svg", display: true, fn: restoreTrashShortcut});
             
             if (!this.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap Off"))
                 this.helpfulWheelItems.push({label: "Turtle Wrap Off", icon: "imgsrc:header-icons/wrap-text.svg", display: true, fn: this.toolbar.changeWrap});
