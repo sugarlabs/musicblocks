@@ -94,7 +94,6 @@ describe("Utility Functions (logic-only)", () => {
         const results = wrapper();
         Synth = results.Synth();
         instruments = results.instruments;
-        console.log({ instruments })
         DEFAULTSYNTHVOLUME = results.DEFAULTSYNTHVOLUME;
         CUSTOMSAMPLES = results.CUSTOMSAMPLES;
         SAMPLECENTERNO = results.SAMPLECENTERNO;
