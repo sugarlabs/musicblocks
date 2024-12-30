@@ -51,6 +51,7 @@
     "gulp-sourcemaps": "^2.6.5",
     "http-server": "^14.1.1",
     "lodash.template": "^4.5.0",
-    "node-static": "^0.7.11"
+    "node-static": "^0.7.11",
+    "tone": "^15.0.4"
   }
 }
