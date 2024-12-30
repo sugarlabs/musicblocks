@@ -1871,10 +1871,10 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     block._exitWheel.navItems[2].navigateFunction = () => {
         const cblk = that.connections[0];
         if (
-            that.value > 9 &&
+            that.value >= 8 &&
             (that.blocks.blockList[cblk].name === "pitch")
         ) {
-            that.value = 10;
+            that.value = 8;
         } else {
             that.value += 1;
         }
