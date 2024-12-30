@@ -2379,6 +2379,11 @@ class Blocks {
          * @returns {void}
          */
         this._moveBlock = (blk, x, y) => {
+            // If doing two-finger scroll, don't process any block movements
+            if (this.activity.inTwoFingerScroll) {
+                return;
+            }
+
             const myBlock = this.blockList[blk];
             if (myBlock.container != null) {
                 /** Round position so font renders clearly. */
@@ -2401,6 +2406,11 @@ class Blocks {
          * @returns {void}
          */
         this.moveBlockRelative = (blk, dx, dy) => {
+            // If doing two-finger scroll, don't allow block disconnection
+            if (this.activity.inTwoFingerScroll) {
+                return;
+            }
+            
             this.inLongPress = false;
             this.isBlockMoving = true;
             const myBlock = this.blockList[blk];
@@ -2412,6 +2422,22 @@ class Blocks {
             } else {
                 // eslint-disable-next-line no-console
                 console.debug("No container yet for block " + myBlock.name);
+            }
+        };
+
+        this.moveContainer = (dx, dy) => {
+            if (!this.activity.scrollBlockContainer && dx !== 0) {
+                dx = 0;
+            }
+
+            this.activity.blocksContainer.x += dx;
+            this.activity.blocksContainer.y += dy;
+            
+            if (!this._scrollThrottleTimer) {
+                this._scrollThrottleTimer = setTimeout(() => {
+                    this.checkBounds();
+                    this._scrollThrottleTimer = null;
+                }, 50);
             }
         };
 

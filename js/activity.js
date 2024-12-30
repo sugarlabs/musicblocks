@@ -1916,7 +1916,9 @@ class Activity {
             // Assuming you have defined 'that' and 'closeAnyOpenMenusAndLabels' elsewhere in your code
 
             const myCanvas = document.getElementById("myCanvas");
-            const initialTouches = [[null, null], [null, null]]; // Array to track two fingers (Y and X coordinates)
+            let lastTouchY = null;
+            let lastTouchX = null;
+            let initialTouchDistance = null;
 
             /**
              * Handles touch start event on the canvas.
@@ -1924,54 +1926,50 @@ class Activity {
              */
             myCanvas.addEventListener("touchstart", (event) => {
                 if (event.touches.length === 2) {
-                    for (let i = 0; i < 2; i++) {
-                        initialTouches[i][0] = event.touches[i].clientY;
-                        initialTouches[i][1] = event.touches[i].clientX;
-                    }
+                    that.inTwoFingerScroll = true;
+
+                    lastTouchY = (event.touches[0].clientY + event.touches[1].clientY) / 2;
+                    lastTouchX = (event.touches[0].clientX + event.touches[1].clientX) / 2;
+                    
+                    // Calculate initial distance between fingers for potential zoom detection
+                    initialTouchDistance = Math.hypot(
+                        event.touches[0].clientX - event.touches[1].clientX,
+                        event.touches[0].clientY - event.touches[1].clientY
+                    );
                 }
             });
 
-            /**
-             * Handles touch move event on the canvas.
-             * @param {TouchEvent} event - The touch event object.
-             */
             myCanvas.addEventListener("touchmove", (event) => {
-                if (event.touches.length === 2) {
-                    for (let i = 0; i < 2; i++) {
-                        const touchY = event.touches[i].clientY;
-                        const touchX = event.touches[i].clientX;
-
-                        if (initialTouches[i][0] !== null && initialTouches[i][1] !== null) {
-                            const deltaY = touchY - initialTouches[i][0];
-                            const deltaX = touchX - initialTouches[i][1];
-
-                            if (deltaY !== 0) {
-                                closeAnyOpenMenusAndLabels();
-                                that.blocksContainer.y -= deltaY;
-                            }
-
-                            if (deltaX !== 0) {
-                                closeAnyOpenMenusAndLabels();
-                                that.blocksContainer.x -= deltaX;
-                            }
-
-                            initialTouches[i][0] = touchY;
-                            initialTouches[i][1] = touchX;
-                        }
+                if (event.touches.length === 2 && that.inTwoFingerScroll) {
+                    
+                    // Calculate center point
+                    const currentTouchY = (event.touches[0].clientY + event.touches[1].clientY) / 2;
+                    const currentTouchX = (event.touches[0].clientX + event.touches[1].clientX) / 2;
+                    
+                    if (lastTouchY !== null && lastTouchX !== null) {
+                        const deltaY = currentTouchY - lastTouchY;
+                        const deltaX = currentTouchX - lastTouchX;
+                        that.blocks.moveContainer(deltaX, deltaY);
                     }
-
-                    that.refreshCanvas();
+                    
+                    lastTouchY = currentTouchY;
+                    lastTouchX = currentTouchX;
                 }
             });
 
-            /**
-             * Handles touch end event on the canvas.
-             */
             myCanvas.addEventListener("touchend", () => {
-                for (let i = 0; i < 2; i++) {
-                    initialTouches[i][0] = null;
-                    initialTouches[i][1] = null;
+                that.inTwoFingerScroll = false;
+                lastTouchY = null;
+                lastTouchX = null;
+                initialTouchDistance = null;
+                
+                // Clear throttle timers
+                if (that.blocks._scrollThrottleTimer) {
+                    clearTimeout(that.blocks._scrollThrottleTimer);
+                    that.blocks._scrollThrottleTimer = null;
                 }
+
+                that.refreshCanvas();
             });
 
             /**
