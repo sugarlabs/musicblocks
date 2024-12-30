@@ -1807,19 +1807,21 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         (Math.round(selectorWidth * block.blocks.blockScale) * block.protoblock.scale) / 2 + "px";
     // Navigate to a the current number value.
     let i = wheelValues.indexOf(selectedValue);
-    if (i === -1) {
-        i = 0;
+    if (i === -1 || selectedValue < 1 || selectedValue > 8) {
+        selectedValue = Math.min(Math.max(selectedValue, 1), 8);
+        i = wheelValues.indexOf(selectedValue);
     }
-
-    // In case of float value, navigate to the nearest integer
+    
+    // In case of float value, navigate to the nearest integer within the range
     if (selectedValue % 1 !== 0) {
-        i = wheelValues.indexOf(Math.floor(selectedValue + 0.5));
+        selectedValue = Math.min(Math.max(Math.floor(selectedValue + 0.5), 1), 8);
+        i = wheelValues.indexOf(selectedValue);
     }
-
+    
     if (i !== -1) {
         block._numberWheel.navigateWheel(i);
     }
-
+    
     block.label.style.fontSize =
         Math.round((20 * block.blocks.blockScale * block.protoblock.scale) / 2) + "px";
 
@@ -1841,49 +1843,36 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
 
     block._exitWheel.navItems[1].navigateFunction = () => {
         const cblk1 = that.connections[0];
-        const cblk2 = that.blocks.blockList[cblk1].connections[0];
-
-        // Check if the number block is connected to a note value and prevent the value to go below zero
-        if (
-            that.value < 1 &&
-            (that.blocks.blockList[cblk1].name === "newnote" ||
-                (cblk2 && that.blocks.blockList[cblk2].name == "newnote"))
-        ) {
-            that.value = 0;
-        } else if (that.value < 2 &&
-            that.blocks.blockList[cblk1].name === "pitch"
-        ) {
-            that.value = 1;
-        }
-        else {
+        const cblk2 = that.blocks.blockList[cblk1]?.connections[0];
+    
+        // Decrease the value but ensure it does not go below 1
+        if (that.value > 1) {
             that.value -= 1;
         }
-
+    
         that.text.text = that.value.toString();
-
+    
         // Make sure text is on top.
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
-
+    
         that.label.value = that.value;
     };
 
     block._exitWheel.navItems[2].navigateFunction = () => {
         const cblk = that.connections[0];
-        if (
-            that.value >= 8 &&
-            (that.blocks.blockList[cblk].name === "pitch")
-        ) {
-            that.value = 8;
-        } else {
+    
+        // Increase the value but ensure it does not exceed 8
+        if (that.value < 8) {
             that.value += 1;
         }
+    
         that.text.text = that.value.toString();
-
+    
         // Make sure text is on top.
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
-
+    
         that.label.value = that.value;
     };
 
