@@ -1841,7 +1841,6 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         // Make sure text is on top.
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
-    
         that.label.value = that.value;
     };
     block._exitWheel.navItems[2].navigateFunction = () => {
