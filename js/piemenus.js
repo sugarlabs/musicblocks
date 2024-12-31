@@ -1844,19 +1844,16 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     
         that.label.value = that.value;
     };
-
     block._exitWheel.navItems[2].navigateFunction = () => {
         const cblk = that.connections[0];
         // Increase the value but ensure it does not exceed 8
         if (that.value < 8) {
             that.value += 1;
         }
-    
         that.text.text = that.value.toString();
         // Make sure text is on top.
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
-    
         that.label.value = that.value;
     };
 
@@ -1864,9 +1861,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         const label = that._numberWheel.navItems[that._numberWheel.selectedNavItemIndex].title;
         const i = wheelLabels.indexOf(label);
         const actualPitch = numberToPitch(wheelValues[i] + 3);
-
         const tur = that.activity.turtles.ithTurtle(0);
-
         if (
             tur.singer.instrumentNames.length === 0 ||
             !tur.singer.instrumentNames.includes(DEFAULTVOICE)
@@ -1875,10 +1870,8 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
             that.activity.logo.synth.createDefaultSynth(0);
             that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
-
         that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
         Singer.setSynthVolume(that.activity.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
-
         actualPitch[0] = actualPitch[0].replace(SHARP, "#").replace(FLAT, "b");
         if (!that._triggerLock) {
             that._triggerLock = true;
@@ -1891,7 +1884,6 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
                 null
             );
         }
-
         setTimeout(() => {
             that._triggerLock = false;
         }, 1 / 8);
@@ -1903,9 +1895,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         const label = that._numberWheel.navItems[that._numberWheel.selectedNavItemIndex].title;
         const i = wheelLabels.indexOf(label);
         const actualPitch = frequencyToPitch(wheelValues[i]);
-
         const tur = that.activity.turtles.ithTurtle(0);
-
         if (
             tur.singer.instrumentNames.length === 0 ||
             !tur.singer.instrumentNames.includes(DEFAULTVOICE)
@@ -1914,10 +1904,8 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
             that.activity.logo.synth.createDefaultSynth(0);
             that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
-
         that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
         Singer.setSynthVolume(that.activity.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
-
         actualPitch[0] = actualPitch[0].replace(SHARP, "#").replace(FLAT, "b");
         if (!that._triggerLock) {
             that._triggerLock = true;
@@ -1930,14 +1918,11 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
                 null
             );
         }
-
         setTimeout(() => {
             that._triggerLock = false;
         }, 1 / 8);
-
         __selectionChanged();
     };
-
     // Handler for pitchnumber preview. Block is to ensure that
     // only pitchnumber block's pie menu gets a sound preview
     if (
@@ -1948,7 +1933,6 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
             block._numberWheel.navItems[i].navigateFunction = __pitchPreviewForNum;
         }
     }
-
     // Handler for Hertz preview. Need to also ensure that
     // only hertz block gets a different sound preview
     if (block._usePieNumberC1() && block.blocks.blockList[block.connections[0]].name === "hertz") {
