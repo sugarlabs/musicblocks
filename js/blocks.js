@@ -260,6 +260,14 @@ class Blocks {
             /** Remove a single block from within a stack. */
             const blkObj = this.blockList[blk];
 
+            // Exit if already disconnected from parent
+            if (blkObj.connections[0] === null) {
+                this.activity.textMsg(
+                    _("The block is already extracted"), 3000
+                );
+                return;
+            }
+
             const firstConnection = blkObj.connections[0];
             let connectionIdx;
 
