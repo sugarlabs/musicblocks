@@ -3366,7 +3366,7 @@ class Activity {
         
             this.blocks.activeBlock = null;
             this.refreshCanvas();
-        
+
             const dx = 0;
             const dy = -this.cellSize * 3; // Reposition
         
@@ -3394,12 +3394,12 @@ class Activity {
                     restoredBlock.trash = true;
                     const uniqueName = this.blocks.findUniqueActionName(oldName);
                     restoredBlock.trash = false;
-        
+
                     if (uniqueName !== actionArg) {
                         actionArg.value = uniqueName;
                         label = uniqueName.length > 8 ? uniqueName.substr(0, 7) + '...' : uniqueName;
                         actionArg.text.text = label;
-        
+
                         if (actionArg.label !== null) {
                             actionArg.label.value = uniqueName;
                         }
