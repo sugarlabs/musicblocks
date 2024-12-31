@@ -3552,6 +3552,9 @@ const piemenuBlockContext = (block) => {
     const LONG_PRESS_DURATION = 500;
 
     block.container.on("touchstart", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        
         if (event.touches.length !== 1) return;
         
         longPressTimer = setTimeout(() => {
@@ -3577,9 +3580,12 @@ const piemenuBlockContext = (block) => {
         }
     };
 
+    block.container.on("touchmove", (event) => {
+        event.preventDefault();
+        clearTimer();
+    });
     block.container.on("touchend", clearTimer);
     block.container.on("touchcancel", clearTimer);
-    block.container.on("touchmove", clearTimer);
 };
 
 /**

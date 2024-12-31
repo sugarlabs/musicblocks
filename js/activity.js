@@ -511,7 +511,10 @@ class Activity {
             document.addEventListener("contextmenu", (event) => {
                 event.preventDefault();
                 event.stopPropagation();
-                if (!this.beginnerMode && event.target.id === "myCanvas") {
+        
+                if (!this.beginnerMode && 
+                    event.target.id === "myCanvas" && 
+                    !event.target.closest('.block')) {
                     this._displayHelpfulWheel(event);
                 }
             }, false);
@@ -520,7 +523,11 @@ class Activity {
                 if (event.touches.length !== 1) return;
                 
                 const touch = event.touches[0];
-                if (!this.beginnerMode && touch.target.id === "myCanvas") {
+
+                if (!this.beginnerMode && 
+                    touch.target.id === "myCanvas" && 
+                    !touch.target.closest('.block')) {
+                    
                     longPressTimer = setTimeout(() => {
                         const touchEvent = {
                             clientX: touch.clientX,
