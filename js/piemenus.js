@@ -1635,23 +1635,18 @@ const piemenuNoteValue = (block, noteValue) => {
 
 const piemenuNumber = (block, wheelValues, selectedValue) => {
     // input form and  wheelNav pie menu for number selection
-
     if (block.blocks.stageClick) {
         return;
     }
-
     docById("wheelDiv").style.display = "";
-
     // the number selector
     block._numberWheel = new wheelnav("wheelDiv", null, 600, 600);
     // exit button
     block._exitWheel = new wheelnav("_exitWheel", block._numberWheel.raphael);
-
     const wheelLabels = [];
     for (let i = 0; i < wheelValues.length; i++) {
         wheelLabels.push(wheelValues[i].toString());
     }
-
     // spacer
     wheelLabels.push(null);
 
@@ -1811,23 +1806,19 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         selectedValue = Math.min(Math.max(selectedValue, 1), 8);
         i = wheelValues.indexOf(selectedValue);
     }
-    
     // In case of float value, navigate to the nearest integer within the range
     if (selectedValue % 1 !== 0) {
         selectedValue = Math.min(Math.max(Math.floor(selectedValue + 0.5), 1), 8);
         i = wheelValues.indexOf(selectedValue);
     }
-    
     if (i !== -1) {
         block._numberWheel.navigateWheel(i);
     }
-    
     block.label.style.fontSize =
         Math.round((20 * block.blocks.blockScale * block.protoblock.scale) / 2) + "px";
 
     block.label.style.display = "";
     block.label.focus();
-
     // Hide the widget when the selection is made.
     for (let i = 0; i < wheelLabels.length; i++) {
         block._numberWheel.navItems[i].navigateFunction = () => {
@@ -1835,23 +1826,19 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
             __exitMenu();
         };
     }
-
     // Or use the exit wheel...
     block._exitWheel.navItems[0].navigateFunction = () => {
         __exitMenu();
     };
-
+   
     block._exitWheel.navItems[1].navigateFunction = () => {
         const cblk1 = that.connections[0];
         const cblk2 = that.blocks.blockList[cblk1]?.connections[0];
-    
         // Decrease the value but ensure it does not go below 1
         if (that.value > 1) {
             that.value -= 1;
         }
-    
         that.text.text = that.value.toString();
-    
         // Make sure text is on top.
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
@@ -1861,14 +1848,12 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
 
     block._exitWheel.navItems[2].navigateFunction = () => {
         const cblk = that.connections[0];
-    
         // Increase the value but ensure it does not exceed 8
         if (that.value < 8) {
             that.value += 1;
         }
     
         that.text.text = that.value.toString();
-    
         // Make sure text is on top.
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
