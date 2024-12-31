@@ -1830,7 +1830,6 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     block._exitWheel.navItems[0].navigateFunction = () => {
         __exitMenu();
     };
-   
     block._exitWheel.navItems[1].navigateFunction = () => {
         const cblk1 = that.connections[0];
         const cblk2 = that.blocks.blockList[cblk1]?.connections[0];
