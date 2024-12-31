@@ -3320,7 +3320,7 @@ class Activity {
         const restoreTrash = (activity) => {
             if (!activity.blocks || !activity.blocks.trashStacks || activity.blocks.trashStacks.length === 0) {
                 activity.textMsg(
-                    _("Nothing in the trash to restore."),
+                    _("Trash can is empty."),
                     3000 
                 );
                 return;
@@ -3332,10 +3332,10 @@ class Activity {
             }
         };
 
-        const restoreTrashShortcut = (activity) => {
+        const restoreTrashPop = (activity) => {
             if (!activity.blocks || !activity.blocks.trashStacks || activity.blocks.trashStacks.length === 0) {
                 activity.textMsg(
-                    _("Nothing in the trash to restore."),
+                    _("Trash can is empty."),
                     3000 
                 );
                 return;
@@ -3460,33 +3460,27 @@ class Activity {
             trashView.id = 'trashView';
             trashView.classList.add('trash-view');
         
-            trashView.style = `position: relative; background-color: white; max-width: 396px; max-height: 200px; 
-                                overflow-y: auto; font-size: 16px; color: black; border: 2px solid #87cefa; 
-                                list-style-type: none; margin: 0; padding: 0; text-align: left;`;
-            trashView.innerHTML = '';
-        
             // Sticky buttons
             const buttonContainer = document.createElement('div');
-            buttonContainer.style = `position: sticky; top: 0; z-index: 10; display: flex; gap: 10px; background: white;
-                                     margin: 0; padding: 5px; border-bottom: 1px solid #d9d9d9;`;
+            buttonContainer.classList.add('button-container');
         
             const restoreLastBtn = document.createElement('button');
             restoreLastBtn.textContent = 'Restore Last';
-            restoreLastBtn.style = 'display: flex; align-items: center; justify-content: center; width: 100px; height: 40px;';
+            restoreLastBtn.classList.add('restore-button');
             restoreLastBtn.addEventListener('click', () => {
                 const lastId = this.blocks.trashStacks[this.blocks.trashStacks.length - 1];
                 if (lastId) this._restoreTrashById(lastId);
-                trashView.style.display = 'none';
+                trashView.classList.add('hidden');
             });
         
             const restoreAllBtn = document.createElement('button');
             restoreAllBtn.textContent = 'Restore All';
-            restoreAllBtn.style = 'display: flex; align-items: center; justify-content: center; width: 100px; height: 40px;';
+            restoreAllBtn.classList.add('restore-button');
             restoreAllBtn.addEventListener('click', () => {
                 while (this.blocks.trashStacks.length > 0) {
                     this._restoreTrashById(this.blocks.trashStacks[0]);
                 }
-                trashView.style.display = 'none';
+                trashView.classList.add('hidden');
             });
         
             buttonContainer.appendChild(restoreLastBtn);
@@ -3498,7 +3492,6 @@ class Activity {
                 const block = this.blocks.blockList[blockId];
                 const listItem = document.createElement('div');
                 listItem.classList.add('trash-item');
-                listItem.style = 'padding: 2px 12px; margin: 1px 0; border-radius: 4px; transition: background-color 0.3s;';
         
                 const svgData = block.artwork;
                 const encodedData = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgData);
@@ -3506,7 +3499,7 @@ class Activity {
                 const img = document.createElement('img');
                 img.src = encodedData;
                 img.alt = 'Block Icon';
-                img.style = 'width: 30px; height: 30px; margin-right: 10px; vertical-align: middle;';
+                img.classList.add('trash-item-icon');
         
                 const textNode = document.createTextNode(block.name);
         
@@ -3514,11 +3507,11 @@ class Activity {
                 listItem.appendChild(textNode);
                 listItem.dataset.blockId = blockId;
         
-                listItem.addEventListener('mouseover', () => listItem.style.backgroundColor = '#d9d9d9');
-                listItem.addEventListener('mouseout', () => listItem.style.backgroundColor = '');
+                listItem.addEventListener('mouseover', () => listItem.classList.add('hover'));
+                listItem.addEventListener('mouseout', () => listItem.classList.remove('hover'));
                 listItem.addEventListener('click', () => {
                     this._restoreTrashById(blockId);
-                    trashView.style.display = 'none';
+                    trashView.classList.add('hidden');
                 });
                 handleClickOutsideTrashView(trashView);
         
@@ -3532,7 +3525,6 @@ class Activity {
                 trashList.appendChild(trashView);
             }
         };
-
 
         /*
          * Open aux menu
@@ -5903,7 +5895,7 @@ class Activity {
                 this.helpfulWheelItems.push({label: "Increase block size", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(BIGGERBUTTON)), display: true, fn: doLargerBlocks});
 
             if (!this.helpfulWheelItems.find(ele => ele.label === "Restore")) 
-                this.helpfulWheelItems.push({label: "Restore", icon: "imgsrc:header-icons/restore-from-trash.svg", display: true, fn: restoreTrashShortcut});
+                this.helpfulWheelItems.push({label: "Restore", icon: "imgsrc:header-icons/restore-from-trash.svg", display: true, fn: restoreTrashPop});
             
             if (!this.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap Off"))
                 this.helpfulWheelItems.push({label: "Turtle Wrap Off", icon: "imgsrc:header-icons/wrap-text.svg", display: true, fn: this.toolbar.changeWrap});
