@@ -505,7 +505,7 @@ class Activity {
 
         /*
          * Sets up right click functionality opening the context menus
-         * (if block is right clicked)
+         * (if block is right clicked or long-pressed)
          */
         this.doContextMenus = () => {
             document.addEventListener(
@@ -1927,6 +1927,8 @@ class Activity {
             myCanvas.addEventListener("touchstart", (event) => {
                 if (event.touches.length === 2) {
                     that.inTwoFingerScroll = true;
+
+                    closeAnyOpenMenusAndLabels();
 
                     lastTouchY = (event.touches[0].clientY + event.touches[1].clientY) / 2;
                     lastTouchX = (event.touches[0].clientX + event.touches[1].clientX) / 2;

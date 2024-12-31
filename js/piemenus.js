@@ -3502,6 +3502,40 @@ const piemenuBlockContext = (block) => {
     setTimeout(() => {
         that.blocks.stageClick = false;
     }, 500);
+
+    // Long-press on blocks
+    let longPressTimer = null;
+    const LONG_PRESS_DURATION = 500;
+
+    block.container.on("touchstart", (event) => {
+        if (event.touches.length !== 1) return;
+        
+        longPressTimer = setTimeout(() => {
+            docById("contextWheelDiv").style.position = "absolute";
+            docById("contextWheelDiv").style.display = "";
+            
+            const x = block.container.x;
+            const y = block.container.y;
+            const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
+            const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
+            
+            docById("contextWheelDiv").style.left = Math.round((x + block.activity.blocksContainer.x) * 
+                block.activity.getStageScale() + canvasLeft) + "px";
+            docById("contextWheelDiv").style.top = Math.round((y + block.activity.blocksContainer.y) * 
+                block.activity.getStageScale() + canvasTop) + "px";
+        }, LONG_PRESS_DURATION);
+    });
+
+    const clearTimer = () => {
+        if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+        }
+    };
+
+    block.container.on("touchend", clearTimer);
+    block.container.on("touchcancel", clearTimer);
+    block.container.on("touchmove", clearTimer);
 };
 
 /**
