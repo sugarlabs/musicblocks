@@ -3462,12 +3462,13 @@ class Activity {
         
             trashView.style = `position: relative; background-color: white; max-width: 396px; max-height: 200px; 
                                 overflow-y: auto; font-size: 16px; color: black; border: 2px solid #87cefa; 
-                                list-style-type: none; margin: 10px; padding: 10px; text-align: left;`;
+                                list-style-type: none; margin: 0; padding: 0; text-align: left;`;
             trashView.innerHTML = '';
         
             // Sticky buttons
             const buttonContainer = document.createElement('div');
-            buttonContainer.style = 'position: sticky; top: 0; height: 40px; display: flex; gap: 10px; background: white; padding: 5px 0;';
+            buttonContainer.style = `position: sticky; top: 0; z-index: 10; display: flex; gap: 10px; background: white;
+                                     margin: 0; padding: 5px; border-bottom: 1px solid #d9d9d9;`;
         
             const restoreLastBtn = document.createElement('button');
             restoreLastBtn.textContent = 'Restore Last';
