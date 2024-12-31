@@ -502,22 +502,49 @@ class Activity {
 
         /*
          * Sets up right click functionality opening the context menus
-         * (if block is right clicked)
+         * (if block is right clicked or long-pressed)
          */
         this.doContextMenus = () => {
-            document.addEventListener(
-                "contextmenu",
-                (event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    if (!this.beginnerMode) {
-                        if (event.target.id === "myCanvas") {
-                            this._displayHelpfulWheel(event);
-                        }
-                    }
-                },
-                false
-            );
+            let longPressTimer = null;
+            const LONG_PRESS_DURATION = 500;
+
+            document.addEventListener("contextmenu", (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                if (!this.beginnerMode && event.target.id === "myCanvas") {
+                    this._displayHelpfulWheel(event);
+                }
+            }, false);
+
+            document.addEventListener("touchstart", (event) => {
+                if (event.touches.length !== 1) return;
+                
+                const touch = event.touches[0];
+                if (!this.beginnerMode && touch.target.id === "myCanvas") {
+                    longPressTimer = setTimeout(() => {
+                        const touchEvent = {
+                            clientX: touch.clientX,
+                            clientY: touch.clientY,
+                            preventDefault: () => {},
+                            stopPropagation: () => {},
+                            target: touch.target
+                        };
+                        this._displayHelpfulWheel(touchEvent);
+                    }, LONG_PRESS_DURATION);
+                }
+            }, false);
+
+            // Clear timer if touch ends or moves
+            const clearTimer = () => {
+                if (longPressTimer) {
+                    clearTimeout(longPressTimer);
+                    longPressTimer = null;
+                }
+            };
+
+            document.addEventListener("touchend", clearTimer, false);
+            document.addEventListener("touchcancel", clearTimer, false);
+            document.addEventListener("touchmove", clearTimer, false);
         };
 
         /*
@@ -1924,6 +1951,8 @@ class Activity {
             myCanvas.addEventListener("touchstart", (event) => {
                 if (event.touches.length === 2) {
                     that.inTwoFingerScroll = true;
+
+                    closeAnyOpenMenusAndLabels();
 
                     lastTouchY = (event.touches[0].clientY + event.touches[1].clientY) / 2;
                     lastTouchX = (event.touches[0].clientX + event.touches[1].clientX) / 2;
