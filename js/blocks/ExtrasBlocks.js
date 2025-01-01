@@ -534,6 +534,8 @@ function setupExtrasBlocks(activity) {
                         }
                     }
                 }
+            }else if (logo.inMatrix) {
+                logo.phraseMaker.addRowBlock(blk);
             }
         }
     }
