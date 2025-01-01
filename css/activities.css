@@ -111,7 +111,7 @@
   z-index: 10;
   display: flex;
   gap: 10px;
-  background: white;
+  background: #2196F3;
   margin: 0;
   padding: 5px;
   border-bottom: 1px solid #d9d9d9;
@@ -121,9 +121,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100px;
-  height: 40px;
+  width: 90px;
+  height: 35px;
   cursor: pointer;
+  background-color: white;
+  border-radius: 8px;
 }
 
 .trash-item {

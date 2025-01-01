@@ -3465,7 +3465,7 @@ class Activity {
             buttonContainer.classList.add('button-container');
         
             const restoreLastBtn = document.createElement('button');
-            restoreLastBtn.textContent = 'Restore Last';
+            restoreLastBtn.textContent = "Restore last";
             restoreLastBtn.classList.add('restore-button');
             restoreLastBtn.addEventListener('click', () => {
                 const lastId = this.blocks.trashStacks[this.blocks.trashStacks.length - 1];
@@ -3474,7 +3474,7 @@ class Activity {
             });
         
             const restoreAllBtn = document.createElement('button');
-            restoreAllBtn.textContent = 'Restore All';
+            restoreAllBtn.textContent = "Restore all";
             restoreAllBtn.classList.add('restore-button');
             restoreAllBtn.addEventListener('click', () => {
                 while (this.blocks.trashStacks.length > 0) {
