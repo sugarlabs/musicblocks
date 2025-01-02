@@ -329,7 +329,7 @@ class Toolbar {
     renderLogoIcon(onclick) {
         const logoIcon = docById("mb-logo");
         if (this.language === "ja") {
-            logoIcon.innerHTML = '<img style="width: 100%;" src="images/logo-ja.svg">';
+            logoIcon.innerHTML = '<img style="width: 100%;" src="">';
         }
 
         logoIcon.onmouseenter = () => {
