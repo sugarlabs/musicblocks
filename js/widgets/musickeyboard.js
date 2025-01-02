@@ -1917,8 +1917,7 @@ function MusicKeyboard(activity) {
     this._createAddRowPieSubmenu = function () {
         docById("wheelDivptm").style.display = "";
         // docById("wheelDivptm").style.zIndex = "300";
-        const pitchLabels = [   "do", "do♯", "re", "re♯", "mi", "fa", "fa♯", "sol", "sol♯", "la", "la♯", "ti",
-        ];
+        const pitchLabels = ["do", "do♯", "re", "re♯", "mi", "fa", "fa♯", "sol", "sol♯", "la", "la♯", "ti"];
         const hertzLabels = [262, 294, 327, 348, 392, 436, 490, 523];
         const VALUESLABEL = ["pitch", "hertz"];
         const VALUES = ["imgsrc: images/chime.svg", "imgsrc: images/synth.svg"];
@@ -2119,8 +2118,8 @@ function MusicKeyboard(activity) {
                     this.displayLayout = this.displayLayout.concat(sortedHertzList);
                     this._createKeyboard();
                     this._createTable();
-                    const n= this.layout.length;
-                    const key = this.layout[n-1];
+                    const n = this.layout.length;
+                    const key = this.layout[n - 1];
                     this.getElement[key.noteName.toString() + key.noteOctave.toString()] = key.objId;
                     this.getElement[FIXEDSOLFEGE1[key.noteName.toString()] + "" + key.noteOctave] =
                         key.objId; //convet solfege to alphabetic.
