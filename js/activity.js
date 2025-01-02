@@ -502,22 +502,80 @@ class Activity {
 
         /*
          * Sets up right click functionality opening the context menus
-         * (if block is right clicked)
+         * (if block is right clicked or long-pressed)
          */
         this.doContextMenus = () => {
-            document.addEventListener(
-                "contextmenu",
-                (event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    if (!this.beginnerMode) {
-                        if (event.target.id === "myCanvas") {
-                            this._displayHelpfulWheel(event);
-                        }
-                    }
-                },
-                false
-            );
+            let longPressTimer = null;
+            const LONG_PRESS_DURATION = 500;
+
+            // Function to check if coordinates are within any block
+            const isCoordinateOnBlock = (x, y) => {
+                if (!this.blocks || !this.blocks.blockList) return false;
+                
+                return this.blocks.blockList.some(block => {
+                    if (!block || !block.container || block.trash) return false;
+                    
+                    const blockX = block.container.x + this.blocksContainer.x;
+                    const blockY = block.container.y + this.blocksContainer.y;
+                    
+                    return (x >= blockX && 
+                           x <= blockX + block.width && 
+                           y >= blockY && 
+                           y <= blockY + block.height);
+                });
+            };
+        
+            document.addEventListener("contextmenu", (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+        
+                const canvasRect = this.canvas.getBoundingClientRect();
+                const x = event.clientX - canvasRect.left;
+                const y = event.clientY - canvasRect.top;
+        
+                if (!this.beginnerMode && 
+                    event.target.id === "myCanvas" && 
+                    !isCoordinateOnBlock(x, y)) {
+                    this._displayHelpfulWheel(event);
+                }
+            }, false);
+
+            document.addEventListener("touchstart", (event) => {
+                if (event.touches.length !== 1) return;
+                
+                const touch = event.touches[0];
+                const canvasRect = this.canvas.getBoundingClientRect();
+                const x = touch.clientX - canvasRect.left;
+                const y = touch.clientY - canvasRect.top;
+
+                if (!this.beginnerMode && 
+                    touch.target.id === "myCanvas" && 
+                    !isCoordinateOnBlock(x, y)) {
+                    
+                    longPressTimer = setTimeout(() => {
+                        const touchEvent = {
+                            clientX: touch.clientX,
+                            clientY: touch.clientY,
+                            preventDefault: () => {},
+                            stopPropagation: () => {},
+                            target: touch.target
+                        };
+                        this._displayHelpfulWheel(touchEvent);
+                    }, LONG_PRESS_DURATION);
+                }
+            }, false);
+
+            // Clear timer if touch ends or moves
+            const clearTimer = () => {
+                if (longPressTimer) {
+                    clearTimeout(longPressTimer);
+                    longPressTimer = null;
+                }
+            };
+
+            document.addEventListener("touchend", clearTimer, false);
+            document.addEventListener("touchcancel", clearTimer, false);
+            document.addEventListener("touchmove", clearTimer, false);
         };
 
         /*
@@ -1913,7 +1971,9 @@ class Activity {
             // Assuming you have defined 'that' and 'closeAnyOpenMenusAndLabels' elsewhere in your code
 
             const myCanvas = document.getElementById("myCanvas");
-            const initialTouches = [[null, null], [null, null]]; // Array to track two fingers (Y and X coordinates)
+            let lastTouchY = null;
+            let lastTouchX = null;
+            let initialTouchDistance = null;
 
             /**
              * Handles touch start event on the canvas.
@@ -1921,54 +1981,52 @@ class Activity {
              */
             myCanvas.addEventListener("touchstart", (event) => {
                 if (event.touches.length === 2) {
-                    for (let i = 0; i < 2; i++) {
-                        initialTouches[i][0] = event.touches[i].clientY;
-                        initialTouches[i][1] = event.touches[i].clientX;
-                    }
+                    that.inTwoFingerScroll = true;
+
+                    closeAnyOpenMenusAndLabels();
+
+                    lastTouchY = (event.touches[0].clientY + event.touches[1].clientY) / 2;
+                    lastTouchX = (event.touches[0].clientX + event.touches[1].clientX) / 2;
+                    
+                    // Calculate initial distance between fingers for potential zoom detection
+                    initialTouchDistance = Math.hypot(
+                        event.touches[0].clientX - event.touches[1].clientX,
+                        event.touches[0].clientY - event.touches[1].clientY
+                    );
                 }
             });
 
-            /**
-             * Handles touch move event on the canvas.
-             * @param {TouchEvent} event - The touch event object.
-             */
             myCanvas.addEventListener("touchmove", (event) => {
-                if (event.touches.length === 2) {
-                    for (let i = 0; i < 2; i++) {
-                        const touchY = event.touches[i].clientY;
-                        const touchX = event.touches[i].clientX;
-
-                        if (initialTouches[i][0] !== null && initialTouches[i][1] !== null) {
-                            const deltaY = touchY - initialTouches[i][0];
-                            const deltaX = touchX - initialTouches[i][1];
-
-                            if (deltaY !== 0) {
-                                closeAnyOpenMenusAndLabels();
-                                that.blocksContainer.y -= deltaY;
-                            }
-
-                            if (deltaX !== 0) {
-                                closeAnyOpenMenusAndLabels();
-                                that.blocksContainer.x -= deltaX;
-                            }
-
-                            initialTouches[i][0] = touchY;
-                            initialTouches[i][1] = touchX;
-                        }
+                if (event.touches.length === 2 && that.inTwoFingerScroll) {
+                    
+                    // Calculate center point
+                    const currentTouchY = (event.touches[0].clientY + event.touches[1].clientY) / 2;
+                    const currentTouchX = (event.touches[0].clientX + event.touches[1].clientX) / 2;
+                    
+                    if (lastTouchY !== null && lastTouchX !== null) {
+                        const deltaY = currentTouchY - lastTouchY;
+                        const deltaX = currentTouchX - lastTouchX;
+                        that.blocks.moveContainer(deltaX, deltaY);
                     }
-
-                    that.refreshCanvas();
+                    
+                    lastTouchY = currentTouchY;
+                    lastTouchX = currentTouchX;
                 }
             });
 
-            /**
-             * Handles touch end event on the canvas.
-             */
             myCanvas.addEventListener("touchend", () => {
-                for (let i = 0; i < 2; i++) {
-                    initialTouches[i][0] = null;
-                    initialTouches[i][1] = null;
+                that.inTwoFingerScroll = false;
+                lastTouchY = null;
+                lastTouchX = null;
+                initialTouchDistance = null;
+                
+                // Clear throttle timers
+                if (that.blocks._scrollThrottleTimer) {
+                    clearTimeout(that.blocks._scrollThrottleTimer);
+                    that.blocks._scrollThrottleTimer = null;
                 }
+
+                that.refreshCanvas();
             });
 
             /**
