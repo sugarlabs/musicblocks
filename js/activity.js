@@ -510,23 +510,11 @@ class Activity {
                 (event) => {
                     event.preventDefault();
                     event.stopPropagation();
-                    if(this.beginnerMode) return;
-                    const x=event.clientX;
-                    const y=event.clientY;               
-                    const clickedOnBlock=this.blocks.blockList.some((block)=>{
-                        if (block.trash) return false;
-                        const blockX= block.container.x;
-                        const blockY= block.container.y;
-                        return x >= blockX && 
-                        x <= blockX + block.width &&
-                        y >= blockY && 
-                        y <= blockY + block.height;                            
-
-                    });
-                    if (!clickedOnBlock && event.target.id === "myCanvas") {
+                    if (this.beginnerMode) return;          
+                    if (!this.blocks.isCoordinateOnBlock(event.clientX, event.clientY) && 
+                        event.target.id === "myCanvas") {
                         this._displayHelpfulWheel(event);
-                    }
-                    
+                    }                 
                 },
                 false
             );
