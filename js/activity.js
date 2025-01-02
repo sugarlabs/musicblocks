@@ -508,13 +508,34 @@ class Activity {
             let longPressTimer = null;
             const LONG_PRESS_DURATION = 500;
 
+            // Function to check if coordinates are within any block
+            const isCoordinateOnBlock = (x, y) => {
+                if (!this.blocks || !this.blocks.blockList) return false;
+                
+                return this.blocks.blockList.some(block => {
+                    if (!block || !block.container || block.trash) return false;
+                    
+                    const blockX = block.container.x + this.blocksContainer.x;
+                    const blockY = block.container.y + this.blocksContainer.y;
+                    
+                    return (x >= blockX && 
+                           x <= blockX + block.width && 
+                           y >= blockY && 
+                           y <= blockY + block.height);
+                });
+            };
+        
             document.addEventListener("contextmenu", (event) => {
                 event.preventDefault();
                 event.stopPropagation();
         
+                const canvasRect = this.canvas.getBoundingClientRect();
+                const x = event.clientX - canvasRect.left;
+                const y = event.clientY - canvasRect.top;
+        
                 if (!this.beginnerMode && 
                     event.target.id === "myCanvas" && 
-                    !event.target.closest('.block')) {
+                    !isCoordinateOnBlock(x, y)) {
                     this._displayHelpfulWheel(event);
                 }
             }, false);
@@ -523,10 +544,13 @@ class Activity {
                 if (event.touches.length !== 1) return;
                 
                 const touch = event.touches[0];
+                const canvasRect = this.canvas.getBoundingClientRect();
+                const x = touch.clientX - canvasRect.left;
+                const y = touch.clientY - canvasRect.top;
 
                 if (!this.beginnerMode && 
                     touch.target.id === "myCanvas" && 
-                    !touch.target.closest('.block')) {
+                    !isCoordinateOnBlock(x, y)) {
                     
                     longPressTimer = setTimeout(() => {
                         const touchEvent = {
