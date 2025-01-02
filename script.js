@@ -13,10 +13,8 @@ $(document).ready(function() {
         mode = localStorage.getItem("beginnerMode") || "true";
     } catch (error) {
         console.error("Error accessing localStorage:", error);
-       
-        mode = "true"; 
+        mode = "true";
     }
-
 
     /**
      * The icon element that displays the user's current mode.
@@ -32,10 +30,10 @@ $(document).ready(function() {
 
     // Set the mode icon and tooltip based on the user's selected mode.
     if (mode === null || mode === "true") {
-        modeIcon.innerHTML = "star_border";
+        modeIcon.textContent = "star_border"; // Use textContent for plain text
         modeText.setAttribute("data-tooltip", "Switch to advanced mode");
     } else {
-        modeIcon.innerHTML = "star";
+        modeIcon.textContent = "star"; // Use textContent for plain text
         modeText.setAttribute("data-tooltip", "Switch to beginner mode");
     }
 

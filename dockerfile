@@ -14,7 +14,15 @@ RUN useradd -m appuser
 
 WORKDIR /app
 
+# Create a non-root user
+RUN groupadd -r appgroup && useradd -r -g appgroup appuser
+
+# Set file ownership to the non-root user
 COPY --from=build /app /app
+RUN chown -R appuser:appgroup /app
+
+# Switch to the non-root user
+USER appuser
 
 USER appuser
 
