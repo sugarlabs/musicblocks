@@ -256,7 +256,7 @@ class PhraseMaker {
          * @type {Array<string>}
          * @private
          */
-        this._lyrics = [];
+        this.lyrics = [];
 
         /**
          * Marks the presence of print block
@@ -952,7 +952,7 @@ class PhraseMaker {
             const inputRow = tempTable.insertRow();
 
             // Add input cells for lyrics
-            this._lyrics = Array(this.activity.logo.tupletRhythms.length).fill("");
+            this.lyrics = Array(this.activity.logo.tupletRhythms.length).fill("");
             for (let i = 0; i < this.activity.logo.tupletRhythms.length; i++) {
                 const noteValue = this.activity.logo.tupletRhythms[i][2];
                 const inputCell = inputRow.insertCell();
@@ -991,7 +991,7 @@ class PhraseMaker {
                 lyricsInput.addEventListener("focus", () => this.activity.isInputON = true);
                 lyricsInput.addEventListener("blur", () => this.activity.isInputON = false);
                 lyricsInput.addEventListener("input", (event) => {
-                    this._lyrics[i] = event.target.value;
+                    this.lyrics[i] = event.target.value;
                 });
 
             };
@@ -5431,7 +5431,7 @@ class PhraseMaker {
                             }
                             previousBlock = thisBlock;
                             thisBlock += 3;
-                        }                    
+                        }
                     }
                 }
                 if (this._lyricsON) {
@@ -5444,22 +5444,22 @@ class PhraseMaker {
                     ]);
                     previousBlock = thisBlock;
                     thisBlock += 1;
-                    if (this._lyrics[i] && this._lyrics !== "") {
+                    if (this.lyrics[i] && this.lyrics !== "") {
                         newStack.push([
                             thisBlock,
-                            ["text", { value: this._lyrics[i] }], 
-                            0, 
-                            0, 
+                            ["text", { value: this.lyrics[i] }],
+                            0,
+                            0,
                             [previousBlock]
                         ]);
                     } else {
                         newStack.push([
                             thisBlock,
-                            ["text", { value: "..." }], 
-                            0, 
-                            0, 
+                            ["text", { value: "..." }],
+                            0,
+                            0,
                             [previousBlock]
-                        ]); 
+                        ]);
                     }
                 }
             }
