@@ -51,3 +51,4 @@ class DrumBlocksAPI {
         return this.runCommand("playNoise", [args[0], this.turIndex]);
     }
 }
+module.exports=DrumBlocksAPI;

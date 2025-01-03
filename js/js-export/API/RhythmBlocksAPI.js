@@ -113,3 +113,4 @@ class RhythmBlocksAPI {
         return this.ENDFLOWCOMMAND;
     }
 }
+module.exports=RhythmBlocksAPI;
