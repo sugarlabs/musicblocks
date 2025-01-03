@@ -38,7 +38,7 @@
  * NumberBlocks.js
  */
 class MathUtility {
-   /**
+    /**
      * Returns a random integer in a range.
      *
      * @static
@@ -74,7 +74,7 @@ class MathUtility {
             octave = octave === undefined ? 4 : octave;
 
             const broadScale = [];
-            for (const i of [octave, octave + 1]) {
+            for (const i of[octave, octave + 1]) {
                 for (let j = 0; j < SOLFEGENAMES.length; j++) {
                     broadScale.push(SOLFEGENAMES[j] + " " + i);
                 }
@@ -114,7 +114,7 @@ class MathUtility {
      * @param {*} b
      * @returns {*} - Either a or b.
      */
-    static doOneOf(a, b) {
+    static pickRandom(a, b) {
         return Math.random() < 0.5 ? a : b;
     }
 
@@ -229,7 +229,7 @@ class MathUtility {
         }
     }
 
-     /**
+    /**
      * Calculates Euclidean distance between (cursor x, cursor y) and (mouse 'x' and mouse 'y').
      *
      * @static
@@ -257,7 +257,7 @@ class MathUtility {
         }
     }
 
-   /**
+    /**
      * Returns a to the power of b.
      *
      * @static
@@ -290,7 +290,7 @@ class MathUtility {
         }
     }
 
-   /**
+    /**
      * Returns negative value (if number) or string in reverse (if string).
      *
      * @static
