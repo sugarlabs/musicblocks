@@ -24,8 +24,10 @@ class Collaboration {
         this.attempts = 0;
         this.socket = null;
         this.blockList = this.activity.blocks.blockList;
-        this.PORT = "8080";
-        this.COLLAB_HOST = "http://127.0.0.1";
+        // this.PORT = "8080"; // container's 8080
+        // this.COLLAB_HOST = "http://collaboration-server"; // it should reflect the service names of compose file
+        this.COLLAB_URL = "/"
+        // this.COLLAB_URL = "http://localhost:8080"
         this.hasCollaborationStarted = false;
         this.updatedProjectHtml = null;
         this.hasExitedCollaboration = false;
@@ -67,7 +69,8 @@ class Collaboration {
     // Make calls to the socket server
     makeConnection = (room_id, name) => {
         // connect to the local server
-        const socket = io(this.COLLAB_HOST.concat(":", this.PORT));
+        // const socket = io(this.COLLAB_HOST.concat(":", this.PORT));
+        const socket = io(this.COLLAB_URL);
         socket.on("connect", () => {
             this.socket = socket;
             try {

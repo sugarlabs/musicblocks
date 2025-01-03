@@ -1,27 +1,60 @@
+# name: musicblocks
+# services:
+#   musicblocks:
+#     build:
+#       # context: https://github.com/sugarlabs/musicblocks.git#test-collab
+#       context: ./
+#     ports:
+#       - "3000:3000"
+#     command: ["python", "-m", "http.server", "3000", "--bind", "0.0.0.0"]
+#     # networks:
+#     #   - internal-network
+#     depends_on:
+#       - collaboration-server
+#     # env_file:
+#     #  - ./environment
+#   # planet-server:
+#   #    build:
+#   #        dockerfile: ../planet-server/Dockerfile
+#   #    ports:
+#   #      - "8000:8000"
+#   collaboration-server:
+#     # build: https://github.com/sugarlabs/collaboration-server.git#test-collab
+#     build: ../collaboration-server
+#     # build:
+#     #     dockerfile: ../collaboration-server/Dockerfile
+#     # volumes:
+#     #   - .:/collaboration-server
+#     # ports:
+#     #   - "8080:8080"
+#     expose:
+#       - "8080"
+#     environment:
+#       NODE_ENV: development
+#     #command: ["npm", "run", "server"]
+#     command: ["npm", "run", "server"]
+#     # networks:
+#     #   - internal-network
+# # networks:
+# #   internal-network:
+# #     driver: bridge
+#     # don't port map to external host but use docker's internl network settings to connect the internal services
+#     # inside the docker itself.
+
 name: musicblocks
 services:
   musicblocks:
-    build: 
+    build:
       context: https://github.com/sugarlabs/musicblocks.git#test-collab
-    ports: 
+    ports:
       - "3000:3000"
-    command: ["python", "-m", "http.server", "3000", "--bind", "0.0.0.0"]
-    # env_file:
-    #  - ./environment
-  # planet-server:
-  #    build:
-  #        dockerfile: ../planet-server/Dockerfile
-  #    ports:
-  #      - "8000:8000"
+    depends_on:
+      - collaboration-server
+
   collaboration-server:
     build: https://github.com/sugarlabs/collaboration-server.git#test-collab
-    # build:
-    #     dockerfile: ../collaboration-server/Dockerfile
-    # volumes:
-    #   - .:/collaboration-server
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
     environment:
       NODE_ENV: development
-    #command: ["npm", "run", "server"]
     command: ["npm", "run", "server"]
