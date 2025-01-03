@@ -1430,7 +1430,7 @@ function setupWidgetBlocks(activity) {
             logo.phraseMaker.rowArgs = [];
             logo.phraseMaker.graphicsBlocks = [];
             logo.phraseMaker.clearBlocks();
-            logo.phraseMaker._lyricsON = false;
+            logo.phraseMaker.lyricsON = false;
 
             logo.tupletRhythms = [];
             logo.tupletParams = [];

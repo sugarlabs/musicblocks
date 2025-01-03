@@ -256,7 +256,7 @@ class PhraseMaker {
          * @type {Array<string>}
          * @private
          */
-        this.lyrics = [];
+        this._lyrics = [];
 
         /**
          * Marks the presence of print block
@@ -929,7 +929,7 @@ class PhraseMaker {
         }
 
         // Add a row for lyrics if they are enabled in the ExtraBlocks.js
-        if (this._lyricsON) {
+        if (this.lyricsON) {
 
             const lyricsRow = ptmTable.insertRow();
             lyricsRow.setAttribute("id", "lyricRow");
@@ -952,7 +952,7 @@ class PhraseMaker {
             const inputRow = tempTable.insertRow();
 
             // Add input cells for lyrics
-            this.lyrics = Array(this.activity.logo.tupletRhythms.length).fill("");
+            this._lyrics = Array(this.activity.logo.tupletRhythms.length).fill("");
             for (let i = 0; i < this.activity.logo.tupletRhythms.length; i++) {
                 const noteValue = this.activity.logo.tupletRhythms[i][2];
                 const inputCell = inputRow.insertCell();
@@ -991,7 +991,7 @@ class PhraseMaker {
                 lyricsInput.addEventListener("focus", () => this.activity.isInputON = true);
                 lyricsInput.addEventListener("blur", () => this.activity.isInputON = false);
                 lyricsInput.addEventListener("input", (event) => {
-                    this.lyrics[i] = event.target.value;
+                    this._lyrics[i] = event.target.value;
                 });
 
             };
@@ -5122,7 +5122,7 @@ class PhraseMaker {
                     if (obj === null) {
                         // add a hertz block
                         // The last connection in last pitch block is null.
-                        if (!this._lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
+                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
                             lastConnection = null;
                         } else {
                             lastConnection = thisBlock + 2;
@@ -5147,7 +5147,7 @@ class PhraseMaker {
                     } else if (drumName != null) {
                         // add a playdrum block
                         // The last connection in last pitch block is null.
-                        if (!this._lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
+                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
                             lastConnection = null;
                         } else {
                             lastConnection = thisBlock + 2;
@@ -5172,7 +5172,7 @@ class PhraseMaker {
                     } else if (note[0][j].slice(0, 4) === "http") {
                         // add a playdrum block with URL
                         // The last connection in last pitch block is null.
-                        if (!this._lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
+                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
                             lastConnection = null;
                         } else {
                             lastConnection = thisBlock + 2;
@@ -5197,7 +5197,7 @@ class PhraseMaker {
                     } else if (obj.length > 2) {
                         // add a 2-arg graphics block
                         // The last connection in last pitch block is null.
-                        if (!this._lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
+                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
                             lastConnection = null;
                         } else {
                             lastConnection = thisBlock + 3;
@@ -5229,7 +5229,7 @@ class PhraseMaker {
                     } else if (obj.length > 1) {
                         // add a 1-arg graphics block
                         // The last connection in last pitch block is null.
-                        if (!this._lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
+                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
                             lastConnection = null;
                         } else {
                             lastConnection = thisBlock + 2;
@@ -5254,7 +5254,7 @@ class PhraseMaker {
                     } else {
                         // add a pitch block
                         // The last connection in last pitch block is null.
-                        if (!this._lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
+                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
                             lastConnection = null;
                         } else {
                             lastConnection = thisBlock + 3;
@@ -5434,7 +5434,7 @@ class PhraseMaker {
                         }
                     }
                 }
-                if (this._lyricsON) {
+                if (this.lyricsON) {
                     newStack.push([
                         thisBlock,
                         "print",
@@ -5444,10 +5444,10 @@ class PhraseMaker {
                     ]);
                     previousBlock = thisBlock;
                     thisBlock += 1;
-                    if (this.lyrics[i] && this.lyrics !== "") {
+                    if (this._lyrics[i] && this._lyrics !== "") {
                         newStack.push([
                             thisBlock,
-                            ["text", { value: this.lyrics[i] }],
+                            ["text", { value: this._lyrics[i] }],
                             0,
                             0,
                             [previousBlock]
