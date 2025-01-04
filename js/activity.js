@@ -514,7 +514,7 @@ class Activity {
                     if (!this.blocks.isCoordinateOnBlock(event.clientX, event.clientY) && 
                         event.target.id === "myCanvas") {
                         this._displayHelpfulWheel(event);
-                    }                 
+                    }         
                 },
                 false
             );
