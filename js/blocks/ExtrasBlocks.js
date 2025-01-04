@@ -508,6 +508,8 @@ function setupExtrasBlocks(activity) {
                     logo.oscilloscopeTurtles.indexOf(activity.turtles.turtleList[turtleIndex]) < 0
                 )
                     logo.oscilloscopeTurtles.push(activity.turtles.turtleList[turtleIndex]);
+            } else if (logo.inMatrix) {
+                logo.phraseMaker.lyricsON = true;
             } else if (!logo.inStatusMatrix) {
                 if (args.length === 1) {
                     if (args[0] !== null) {

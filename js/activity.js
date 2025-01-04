@@ -269,6 +269,9 @@ class Activity {
         // Flag to check if the helpful search widget is active or not (for "click" event handler purpose)
         this.isHelpfulSearchWidgetOn = false;
 
+        //Flag to check if any other input box is active or not
+        this.isInputON = false;
+
         this.beginnerMode = true;
         try {
             if (this.storage.beginnerMode === undefined) {
@@ -2698,6 +2701,7 @@ class Activity {
                 docById("lilypondModal").style.display === "block" ||
                 this.searchWidget.style.visibility === "visible" ||
                 this.helpfulSearchWidget.style.visibility === "visible" ||
+                this.isInputON ||
                 docById("planet-iframe").style.display === "" ||
                 docById("paste").style.visibility === "visible" ||
                 docById("wheelDiv").style.display === "" ||
