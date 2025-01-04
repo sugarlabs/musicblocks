@@ -86,3 +86,4 @@ class GraphicsBlocksAPI {
         return this.runCommand("doScrollXY", [args[0], args[1]]);
     }
 }
+module.exports = GraphicsBlocksAPI;
