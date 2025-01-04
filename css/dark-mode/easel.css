@@ -1,0 +1,25 @@
+/* EaselJS stage and canvas dark mode */
+.dark-mode canvas,
+.dark-mode #canvas,
+.dark-mode #myCanvas,
+.dark-mode #overlayCanvas {
+    background: #1a1a1a !important;
+    background-color: #1a1a1a !important;
+}
+
+/* Force dark mode on stage container */
+.dark-mode .createjs-container,
+.dark-mode .easeljs-container,
+.dark-mode [class*="createjs"],
+.dark-mode [class*="easeljs"] {
+    background: #1a1a1a !important;
+    background-color: #1a1a1a !important;
+}
+
+/* Force dark mode on workspace */
+.dark-mode #workspace,
+.dark-mode .workspace,
+.dark-mode .canvasHolder {
+    background: #1a1a1a !important;
+    background-color: #1a1a1a !important;
+} 

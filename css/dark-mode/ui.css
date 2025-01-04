@@ -1,0 +1,19 @@
+/* Force dark mode on UI elements */
+.dark-mode .toolbar,
+.dark-mode #main-toolbar,
+.dark-mode #aux-toolbar,
+.dark-mode header,
+.dark-mode .nav-content,
+.dark-mode .dropdown-content,
+.dark-mode #modal-container,
+.dark-mode #searchBar {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+/* Override any Material UI components */
+.dark-mode .btn,
+.dark-mode .btn-floating,
+.dark-mode .dropdown-trigger {
+    background-color: #1a1a1a !important;
+} 
