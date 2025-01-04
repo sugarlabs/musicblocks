@@ -952,7 +952,12 @@ class PhraseMaker {
             const inputRow = tempTable.insertRow();
 
             // Add input cells for lyrics
-            this._lyrics = Array(this.activity.logo.tupletRhythms.length).fill("");
+            if (!this._lyrics || this._lyrics.length === 0) {
+                this._lyrics = Array(this.activity.logo.tupletRhythms.length).fill("");
+            } else if (this.activity.logo.tupletRhythms.length > this._lyrics.length) {
+                const additionalLength = this.activity.logo.tupletRhythms.length - this._lyrics.length;
+                this._lyrics = this._lyrics.concat(Array(additionalLength).fill(""));
+            }
             for (let i = 0; i < this.activity.logo.tupletRhythms.length; i++) {
                 const noteValue = this.activity.logo.tupletRhythms[i][2];
                 const inputCell = inputRow.insertCell();
@@ -973,6 +978,7 @@ class PhraseMaker {
 
                 const lyricsInput = document.createElement("input");
                 lyricsInput.type = "text";
+                lyricsInput.value = this._lyrics[i];
 
                 lyricsInput.style.height = inputCell.style.height;
                 lyricsInput.style.width = "100%";
@@ -3550,7 +3556,7 @@ class PhraseMaker {
         this._restartGrid.call(this);
     }
 
-    
+
     /**
      * Deletes a note from the grid and readjusts the notes accordingly.
      * @param {number} noteToDivide - The index of the note to delete.
@@ -4593,6 +4599,10 @@ class PhraseMaker {
      * @param {number} noteCounter - The current note index in the playback sequence.
      */
     __playNote(time, noteCounter) {
+        // Show lyrics while playing notes.
+        if (this.lyricsON) {
+            this.activity.textMsg(this._lyrics[noteCounter]);
+        }
         // If the widget is closed, stop playing.
         if (!this.widgetWindow.isVisible()) {
             return;
@@ -4965,7 +4975,16 @@ class PhraseMaker {
      * @private
      */
     _clear() {
-        // 'Unclick' every entry in the matrix.
+        // Reset the `_lyrics` array
+        this._lyrics = Array(this._lyrics.length).fill("");
+        const lyricsRow = document.getElementById("lyricRow");
+        if (lyricsRow) {
+            const inputFields = lyricsRow.querySelectorAll("input[type='text']");
+            inputFields.forEach((inputField, index) => {
+                inputField.value = this._lyrics[index] || "";
+            });
+        }
+        // 'Unclick' every entry in the matrix
         let row, cell;
         for (let i = 0; i < this.rowLabels.length; i++) {
             row = this._rows[i];
@@ -4979,6 +4998,7 @@ class PhraseMaker {
             }
         }
     }
+
 
     /**
      * Saves the current matrix state as an action stack consisting of note and pitch blocks.
@@ -5440,7 +5460,7 @@ class PhraseMaker {
                         "print",
                         0,
                         0,
-                        [previousBlock, thisBlock + 1, null] // c is set to null for now
+                        [previousBlock, thisBlock + 1, null]
                     ]);
                     previousBlock = thisBlock;
                     thisBlock += 1;
