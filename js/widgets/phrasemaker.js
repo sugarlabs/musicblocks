@@ -250,6 +250,19 @@ class PhraseMaker {
         this.notesBlockMap = [];
         this._blockMapHelper = [];
         this.columnBlocksMap = [];
+
+        /**
+         * Stores lyrics for each column.
+         * @type {Array<string>}
+         * @private
+         */
+        this._lyrics = [];
+
+        /**
+         * Marks the presence of print block
+         * @type {boolean}
+         */
+        this.lyricsON = false;
     }
 
     /**
@@ -280,7 +293,7 @@ class PhraseMaker {
           * @type {NodeListOf<Element>}
           */
         var windowFrameElements = floatingWindowsDiv.querySelectorAll(".windowFrame");
-    
+
         for (var i = 0; i < windowFrameElements.length; i++) {
 
             /**
@@ -324,7 +337,7 @@ class PhraseMaker {
              * @type {number}
              */
             var maxHeight = screenHeight * 0.8;
-    
+
             if (totalWidth > screenWidth || totalHeight > screenHeight) {
                 windowFrame.style.height = Math.min(totalHeight, maxHeight) + "px";
                 windowFrame.style.width = Math.min(totalWidth, maxWidth) + "px";
@@ -343,7 +356,7 @@ class PhraseMaker {
             }
         }
     }
- 
+
     /**
      * Clears block references within the PhraseMaker.
      * Resets arrays used to track row and column blocks.
@@ -503,7 +516,6 @@ class PhraseMaker {
             this._stopOrCloseClicked = true;
             this.activity.hideMsgs();
             docById("wheelDivptm").style.display = "none";
-
             widgetWindow.destroy();
         };
 
@@ -625,7 +637,8 @@ class PhraseMaker {
             drumName = getDrumName(this.rowLabels[i]);
 
             // Depending on the row, we choose a different background color.
-            if (
+            if (this.rowLabels[i] === "print") break;
+            else if (
                 MATRIXGRAPHICS.indexOf(this.rowLabels[i]) != -1 ||
                 MATRIXGRAPHICS2.indexOf(this.rowLabels[i]) != -1
             ) {
@@ -652,7 +665,8 @@ class PhraseMaker {
             cell.innerHTML = "";
             this._headcols[i] = cell;
 
-            if (drumName != null) {
+            if (this.rowLabels[i] === "print") break;
+            else if (drumName != null) {
                 cell.innerHTML =
                     '&nbsp;&nbsp;<img src="' +
                     getDrumIcon(drumName) +
@@ -757,7 +771,8 @@ class PhraseMaker {
             cell.setAttribute("alt", i);
             this._labelcols[i] = cell;
 
-            if (drumName != null) {
+            if (this.rowLabels[i] === "print") break;
+            else if (drumName != null) {
                 cell.innerHTML = _(drumName);
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
                 cell.setAttribute("alt", i + "__" + "drumblocks");
@@ -913,6 +928,82 @@ class PhraseMaker {
             j += 1;
         }
 
+        // Add a row for lyrics if they are enabled in the ExtraBlocks.js
+        if (this.lyricsON) {
+
+            const lyricsRow = ptmTable.insertRow();
+            lyricsRow.setAttribute("id", "lyricRow");
+            lyricsRow.style.position = "sticky";
+
+            // Label Cell (Fixed like "note value")
+            cell = lyricsRow.insertCell();
+            cell.setAttribute("colspan", "2");
+            cell.className = "headcol";
+            cell.style.position = "sticky";
+            cell.style.left = "1.2px";
+            cell.style.zIndex = "1";
+            cell.style.backgroundColor = platformColor.lyricsLabelBackground || "#FF2B77";
+            cell.style.textAlign = "center";
+            cell.innerHTML = "Lyrics";
+
+            // Nested Table for Input Fields
+            tempTable = document.createElement("table");
+            tempTable.setAttribute("cellpadding", "0px");
+            const inputRow = tempTable.insertRow();
+
+            // Add input cells for lyrics
+            if (!this._lyrics || this._lyrics.length === 0) {
+                this._lyrics = Array(this.activity.logo.tupletRhythms.length).fill("");
+            } else if (this.activity.logo.tupletRhythms.length > this._lyrics.length) {
+                const additionalLength = this.activity.logo.tupletRhythms.length - this._lyrics.length;
+                this._lyrics = this._lyrics.concat(Array(additionalLength).fill(""));
+            }
+            for (let i = 0; i < this.activity.logo.tupletRhythms.length; i++) {
+                const noteValue = this.activity.logo.tupletRhythms[i][2];
+                const inputCell = inputRow.insertCell();
+                inputCell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + 1 + "px";
+                inputCell.style.width = this._noteWidth(noteValue) + "px";
+                inputCell.style.minWidth = inputCell.style.width;
+                inputCell.style.maxWidth = inputCell.style.width;
+                inputCell.style.backgroundColor = "#FF6EA1";
+                inputCell.style.fontFamily = "sans-serif";
+                inputCell.style.cursor = "default";
+                inputCell.style.borderSpacing = "1px 1px";
+                inputCell.style.borderCollapse = "collapse";
+                inputCell.style.boxSizing = "border-box";
+                inputCell.style.padding = "0";
+                inputCell.style.borderRadius = "6px";
+                inputCell.style.border = "none";
+                inputCell.setAttribute("alt", i + "__" + "graphicsblocks2");
+
+                const lyricsInput = document.createElement("input");
+                lyricsInput.type = "text";
+                lyricsInput.value = this._lyrics[i];
+
+                lyricsInput.style.height = inputCell.style.height;
+                lyricsInput.style.width = "100%";
+                lyricsInput.style.minWidth = inputCell.style.minWidth;
+                lyricsInput.style.maxWidth = inputCell.style.maxWidth;
+                lyricsInput.style.fontSize = "inherit";
+                lyricsInput.style.fontFamily = "sans-serif";
+                lyricsInput.style.cursor = "default";
+                lyricsInput.style.boxSizing = "border-box";
+                lyricsInput.style.padding = "0";
+                lyricsInput.style.border = "none";
+                lyricsInput.style.borderRadius = "6px";
+                lyricsInput.style.backgroundColor = "#FF6EA1";
+
+                inputCell.appendChild(lyricsInput);
+                lyricsInput.addEventListener("focus", () => this.activity.isInputON = true);
+                lyricsInput.addEventListener("blur", () => this.activity.isInputON = false);
+                lyricsInput.addEventListener("input", (event) => {
+                    this._lyrics[i] = event.target.value;
+                });
+
+            };
+            lyricsRow.insertCell().appendChild(tempTable);
+        }
+
         // An extra row for the note and tuplet values
         ptmTableRow = ptmTable.insertRow();
         ptmCell = ptmTableRow.insertCell();
@@ -953,6 +1044,7 @@ class PhraseMaker {
         tempTable = document.createElement("table");
         tempTable.setAttribute("cellpadding", "0px");
         this._tupletNoteValueRow = tempTable.insertRow();
+        const tempTable2 = tempTable;
         this._tupletValueRow = tempTable.insertRow();
         this._noteValueRow = tempTable.insertRow();
         ptmTableRow.insertCell().append(tempTable);
@@ -3464,7 +3556,7 @@ class PhraseMaker {
         this._restartGrid.call(this);
     }
 
-    
+
     /**
      * Deletes a note from the grid and readjusts the notes accordingly.
      * @param {number} noteToDivide - The index of the note to delete.
@@ -4507,6 +4599,10 @@ class PhraseMaker {
      * @param {number} noteCounter - The current note index in the playback sequence.
      */
     __playNote(time, noteCounter) {
+        // Show lyrics while playing notes.
+        if (this.lyricsON) {
+            this.activity.textMsg(this._lyrics[noteCounter]);
+        }
         // If the widget is closed, stop playing.
         if (!this.widgetWindow.isVisible()) {
             return;
@@ -4879,7 +4975,16 @@ class PhraseMaker {
      * @private
      */
     _clear() {
-        // 'Unclick' every entry in the matrix.
+        // Reset the `_lyrics` array
+        this._lyrics = Array(this._lyrics.length).fill("");
+        const lyricsRow = document.getElementById("lyricRow");
+        if (lyricsRow) {
+            const inputFields = lyricsRow.querySelectorAll("input[type='text']");
+            inputFields.forEach((inputField, index) => {
+                inputField.value = this._lyrics[index] || "";
+            });
+        }
+        // 'Unclick' every entry in the matrix
         let row, cell;
         for (let i = 0; i < this.rowLabels.length; i++) {
             row = this._rows[i];
@@ -4893,6 +4998,7 @@ class PhraseMaker {
             }
         }
     }
+
 
     /**
      * Saves the current matrix state as an action stack consisting of note and pitch blocks.
@@ -5036,7 +5142,7 @@ class PhraseMaker {
                     if (obj === null) {
                         // add a hertz block
                         // The last connection in last pitch block is null.
-                        if (note[0].length === 1 || j === note[0].length - 1) {
+                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
                             lastConnection = null;
                         } else {
                             lastConnection = thisBlock + 2;
@@ -5061,7 +5167,7 @@ class PhraseMaker {
                     } else if (drumName != null) {
                         // add a playdrum block
                         // The last connection in last pitch block is null.
-                        if (note[0].length === 1 || j === note[0].length - 1) {
+                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
                             lastConnection = null;
                         } else {
                             lastConnection = thisBlock + 2;
@@ -5086,7 +5192,7 @@ class PhraseMaker {
                     } else if (note[0][j].slice(0, 4) === "http") {
                         // add a playdrum block with URL
                         // The last connection in last pitch block is null.
-                        if (note[0].length === 1 || j === note[0].length - 1) {
+                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
                             lastConnection = null;
                         } else {
                             lastConnection = thisBlock + 2;
@@ -5111,7 +5217,7 @@ class PhraseMaker {
                     } else if (obj.length > 2) {
                         // add a 2-arg graphics block
                         // The last connection in last pitch block is null.
-                        if (note[0].length === 1 || j === note[0].length - 1) {
+                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
                             lastConnection = null;
                         } else {
                             lastConnection = thisBlock + 3;
@@ -5143,7 +5249,7 @@ class PhraseMaker {
                     } else if (obj.length > 1) {
                         // add a 1-arg graphics block
                         // The last connection in last pitch block is null.
-                        if (note[0].length === 1 || j === note[0].length - 1) {
+                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
                             lastConnection = null;
                         } else {
                             lastConnection = thisBlock + 2;
@@ -5168,7 +5274,7 @@ class PhraseMaker {
                     } else {
                         // add a pitch block
                         // The last connection in last pitch block is null.
-                        if (note[0].length === 1 || j === note[0].length - 1) {
+                        if (!this.lyricsON && (note[0].length === 1 || j === note[0].length - 1)) {
                             lastConnection = null;
                         } else {
                             lastConnection = thisBlock + 3;
@@ -5346,6 +5452,34 @@ class PhraseMaker {
                             previousBlock = thisBlock;
                             thisBlock += 3;
                         }
+                    }
+                }
+                if (this.lyricsON) {
+                    newStack.push([
+                        thisBlock,
+                        "print",
+                        0,
+                        0,
+                        [previousBlock, thisBlock + 1, null]
+                    ]);
+                    previousBlock = thisBlock;
+                    thisBlock += 1;
+                    if (this._lyrics[i] && this._lyrics !== "") {
+                        newStack.push([
+                            thisBlock,
+                            ["text", { value: this._lyrics[i] }],
+                            0,
+                            0,
+                            [previousBlock]
+                        ]);
+                    } else {
+                        newStack.push([
+                            thisBlock,
+                            ["text", { value: "..." }],
+                            0,
+                            0,
+                            [previousBlock]
+                        ]);
                     }
                 }
             }
