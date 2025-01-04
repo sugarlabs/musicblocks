@@ -510,11 +510,11 @@ class Activity {
                 (event) => {
                     event.preventDefault();
                     event.stopPropagation();
-                    if (!this.beginnerMode) {
-                        if (event.target.id === "myCanvas") {
-                            this._displayHelpfulWheel(event);
-                        }
-                    }
+                    if (this.beginnerMode) return;          
+                    if (!this.blocks.isCoordinateOnBlock(event.clientX, event.clientY) && 
+                        event.target.id === "myCanvas") {
+                        this._displayHelpfulWheel(event);
+                    }         
                 },
                 false
             );
