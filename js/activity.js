@@ -508,6 +508,9 @@ class Activity {
          * (if block is right clicked or long-pressed)
          */
         this.doContextMenus = () => {
+            let longPressTimer = null;
+            const LONG_PRESS_DURATION = 500;
+
             document.addEventListener(
                 "contextmenu",
                 (event) => {
@@ -521,6 +524,38 @@ class Activity {
                 },
                 false
             );
+
+            // Add touch event handlers
+            document.addEventListener("touchstart", (event) => {
+                if (event.touches.length !== 1) return;
+                
+                const touch = event.touches[0];
+                if (!this.beginnerMode && touch.target.id === "myCanvas" && 
+                    !this.blocks.isCoordinateOnBlock(touch.clientX, touch.clientY)) {
+                    longPressTimer = setTimeout(() => {
+                        const touchEvent = {
+                            clientX: touch.clientX,
+                            clientY: touch.clientY,
+                            preventDefault: () => {},
+                            stopPropagation: () => {},
+                            target: touch.target
+                        };
+                        this._displayHelpfulWheel(touchEvent);
+                    }, LONG_PRESS_DURATION);
+                }
+            }, false);
+
+            // Clear timer if touch ends or moves
+            const clearTimer = () => {
+                if (longPressTimer) {
+                    clearTimeout(longPressTimer);
+                    longPressTimer = null;
+                }
+            };
+
+            document.addEventListener("touchend", clearTimer, false);
+            document.addEventListener("touchcancel", clearTimer, false);
+            document.addEventListener("touchmove", clearTimer, false);
         };
 
         /*
