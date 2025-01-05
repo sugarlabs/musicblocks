@@ -129,4 +129,6 @@ class ToneBlocksAPI {
         return this.ENDFLOWCOMMAND;
     }
 }
-module.exports = ToneBlocksAPI;
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = ToneBlocksAPI;
+}

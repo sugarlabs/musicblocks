@@ -6858,7 +6858,9 @@ let searchColors = (r, g, b) => {
 
     return nearestColor;
 };
-module.exports = {interpColor, getMunsellColor, getcolor, searchColors};
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {interpColor, getMunsellColor, getcolor, searchColors};
+}
 // /**
 //  * @deprecated
 //  * @param {number} r - intensity of red
