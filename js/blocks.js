@@ -5039,9 +5039,6 @@ class Blocks {
             }
 
             this.inLongPress = true;
-
-            const helpfulWheel = docById("helpfulWheelDiv");
-            helpfulWheel.style.display = "none";
             
             piemenuBlockContext(this.blockList[this.activeBlock]);
         };
