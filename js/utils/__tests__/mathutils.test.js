@@ -21,13 +21,20 @@ describe('MathUtility', () => {
         });
 
         test('throws error for invalid inputs', () => {
-            expect(() => MathUtility.doRandom('invalid', 10)).toThrow('NanError');
+            expect(() => MathUtility.doRandom('invalid', 10)).toThrow('NanError'); //Invalid solfage name
+            expect(() => MathUtility.doRandom(1, 'invalid')).toThrow('NanError'); //Invalid input
+        });
+
+        test('returns valid random solfege for octave', () => {
+            const result = MathUtility.doRandom('do', 'ti', 4);
+            expect(SOLFEGENAMES).toContain(result[0]); //Check if the result contains a valid solfage name 
+            expect(Number(result[1])).toBeGreaterThanOrEqual(4); //Ensure octave is valid
         });
     });
 
-    describe('doOneOf', () => {
+    describe('pickRandom', () => {
         test('returns either a or b', () => {
-            const result = MathUtility.doOneOf('a', 'b');
+            const result = MathUtility.pickRandom('a', 'b');
             expect(['a', 'b']).toContain(result);
         });
     });
@@ -126,4 +133,3 @@ describe('MathUtility', () => {
         });
     });
 });
-
