@@ -48,4 +48,6 @@ class OrnamentBlocksAPI {
         return this.ENDFLOWCOMMAND;
     }
 }
-module.exports = OrnamentBlocksAPI;
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = OrnamentBlocksAPI;
+}
