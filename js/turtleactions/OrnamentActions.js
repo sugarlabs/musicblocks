@@ -129,3 +129,4 @@ function setupOrnamentActions(activity) {
         }
     };
 }
+module.exports = setupOrnamentActions;
