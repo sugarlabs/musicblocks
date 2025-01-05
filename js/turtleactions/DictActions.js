@@ -264,3 +264,4 @@ function setupDictActions(activity) {
         }
     };
 }
+module.exports = setupDictActions;
