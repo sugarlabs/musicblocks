@@ -589,6 +589,18 @@ class Activity {
 
             docById("helpfulWheelDiv").style.display = "";
 
+            docById("helpfulWheelDiv").addEventListener('touchstart', (e) => {
+                e.stopPropagation();
+            }, true);
+            
+            docById("helpfulWheelDiv").addEventListener('touchend', (e) => {
+                e.stopPropagation();
+            }, true);
+            
+            docById("helpfulWheelDiv").addEventListener('touchmove', (e) => {
+                e.stopPropagation();
+            }, true);
+
             const wheel = new wheelnav("helpfulWheelDiv", null, 300, 300);
             wheel.colors = platformColor.wheelcolors;
             wheel.slicePathFunction = slicePath().DonutSlice;
