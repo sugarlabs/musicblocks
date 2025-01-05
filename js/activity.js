@@ -573,6 +573,15 @@ class Activity {
                 wheel.navItems[i].setTooltip(_(ele.label));
                 wheel.navItems[i].navigateFunction = () => ele.fn(this);
             })
+            const closeHelpfulWheel = (e) => {
+                const isClickInside = helpfulWheelDiv.contains(e.target);
+                if (!isClickInside) {
+                    helpfulWheelDiv.style.display = "none"; 
+                    document.removeEventListener("click", closeHelpfulWheel);
+                }
+            };
+        
+            document.addEventListener("click", closeHelpfulWheel);
         }
 
         /**
