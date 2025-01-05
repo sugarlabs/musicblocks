@@ -1965,7 +1965,6 @@ class Activity {
             const myCanvas = document.getElementById("myCanvas");
             let lastTouchY = null;
             let lastTouchX = null;
-            let initialTouchDistance = null;
 
             /**
              * Handles touch start event on the canvas.
@@ -1973,23 +1972,19 @@ class Activity {
              */
             myCanvas.addEventListener("touchstart", (event) => {
                 if (event.touches.length === 2) {
+                    event.preventDefault();
                     that.inTwoFingerScroll = true;
 
                     closeAnyOpenMenusAndLabels();
 
                     lastTouchY = (event.touches[0].clientY + event.touches[1].clientY) / 2;
                     lastTouchX = (event.touches[0].clientX + event.touches[1].clientX) / 2;
-                    
-                    // Calculate initial distance between fingers for potential zoom detection
-                    initialTouchDistance = Math.hypot(
-                        event.touches[0].clientX - event.touches[1].clientX,
-                        event.touches[0].clientY - event.touches[1].clientY
-                    );
                 }
-            });
+            }, { passive: false });
 
             myCanvas.addEventListener("touchmove", (event) => {
                 if (event.touches.length === 2 && that.inTwoFingerScroll) {
+                    event.preventDefault();
                     
                     // Calculate center point
                     const currentTouchY = (event.touches[0].clientY + event.touches[1].clientY) / 2;
@@ -2004,13 +1999,12 @@ class Activity {
                     lastTouchY = currentTouchY;
                     lastTouchX = currentTouchX;
                 }
-            });
+            }, { passive: false });
 
             myCanvas.addEventListener("touchend", () => {
                 that.inTwoFingerScroll = false;
                 lastTouchY = null;
                 lastTouchX = null;
-                initialTouchDistance = null;
                 
                 // Clear throttle timers
                 if (that.blocks._scrollThrottleTimer) {
