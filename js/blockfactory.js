@@ -187,18 +187,12 @@ class SVG {
 
     /**
      * @public
-     * @param {number} w
-     * @param {number} h
-     * @param {number} w2
-     * @param {number} h2
+     * @param {[number, number, number, number]} dimensions
      * @returns {void}
      */
-    setExpand(w, h, w2, h2) {
-        // TODO: make this an array
-        this._expandX = w;
-        this._expandY = h;
-        this._expandX2 = w2;
-        this._expandY2 = h2;
+    setExpand(dimensions) {
+        // Store expansion dimensions as array [w, h, w2, h2]
+        [this._expandX, this._expandY, this._expandX2, this._expandY2] = dimensions;
     }
 
     /**
