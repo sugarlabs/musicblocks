@@ -994,6 +994,13 @@ class PhraseMaker {
                 lyricsInput.style.backgroundColor = "#FF6EA1";
 
                 inputCell.appendChild(lyricsInput);
+                inputCell.addEventListener("mouseover", (event) => {
+                    event.target.style.backgroundColor = platformColor.selectorSelected;
+                });
+
+                inputCell.addEventListener("mouseout", (event) => {
+                    event.target.style.backgroundColor = "#FF6EA1";
+                });
                 lyricsInput.addEventListener("focus", () => this.activity.isInputON = true);
                 lyricsInput.addEventListener("blur", () => this.activity.isInputON = false);
                 lyricsInput.addEventListener("input", (event) => {
@@ -3112,17 +3119,17 @@ class PhraseMaker {
                 // Using the alt attribute to store the note value
                 cell.setAttribute("alt", 1 / noteValue);
 
-                cell.onmouseover = (event) => {
+                cell.addEventListener("mouseover", (event) => {
                     if (event.target.style.backgroundColor !== "black") {
                         event.target.style.backgroundColor = platformColor.selectorSelected;
                     }
-                };
+                });
 
-                cell.onmouseout = (event) => {
+                cell.addEventListener("mouseout", (event) => {
                     if (event.target.style.backgroundColor !== "black") {
                         event.target.style.backgroundColor = event.target.getAttribute("cellColor");
                     }
-                };
+                });
             }
 
             // Add a note value.
