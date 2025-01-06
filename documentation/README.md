@@ -165,6 +165,22 @@ Located at the lower right of the canvas, this small toolbar provides additional
 
 ### 6. Contextual Menu
 
+
+### 7. Pie Menus
+
+Many blocks in Music Blocks also feature "pie menus" that allow you to change block parameters quickly by selecting options from a circular menu that appears when you hover over the block.
+
+---
+
+For further details on how to use these toolbars effectively, you can refer to the [Turtle Blocks Documentation](https://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
+
+
+## <a>3. Context Menu</a>
+
+[Back to Table of Contents](#table-of-contents)
+
+Context menus are an important part of user interfaces that provide users with quick access to a set of actions relevant to the context in which they are working.The right-click context menu in Music Blocks provides several options for working with blocks and the workspace. To access the right-click context menu, simply right-click anywhere in the workspace.
+
 #### Contextual Menu for Blocks:
 When you right-click on a block, the following options are available:
 - **Extract**: Detaches the selected block from its current position, making it a standalone entity.
@@ -192,21 +208,6 @@ When you right-click on the background, the following options are available:
 - **Select**: Enables selection mode for selecting multiple blocks or elements in the workspace.
 
 ---
-
-### 7. Pie Menus
-
-Many blocks in Music Blocks also feature "pie menus" that allow you to change block parameters quickly by selecting options from a circular menu that appears when you hover over the block.
-
----
-
-For further details on how to use these toolbars effectively, you can refer to the [Turtle Blocks Documentation](https://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
-
-
-## <a>3. Context Menu</a>
-
-[Back to Table of Contents](#table-of-contents)
-
-Context menus are an important part of user interfaces that provide users with quick access to a set of actions relevant to the context in which they are working.The right-click context menu in Music Blocks provides several options for working with blocks and the workspace. To access the right-click context menu, simply right-click anywhere in the workspace.
 
 ## <a>4. The Block Context Menu</a>
 
