@@ -230,3 +230,4 @@ function setupDrumActions(activity) {
         }
     };
 }
+module.exports = setupDrumActions;
