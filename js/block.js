@@ -91,7 +91,7 @@ const STRINGLEN = 9;
  * Length of a long touch in milliseconds.
  * @type {number}
  */
-const LONGPRESSTIME = 1500;
+const LONGPRESSTIME = 500;
 const INLINECOLLAPSIBLES = ["newnote", "interval", "osctime", "definemode"];
 
 /**
@@ -3076,6 +3076,36 @@ class Block {
             that.blocks.activeBlock = null;
 
             moved = false;
+        });
+
+        this.container.on("touchstart", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            that.blocks.mouseDownTime = new Date().getTime();
+            that.blocks.longPressTimeout = setTimeout(() => {
+                that.blocks.activeBlock = that.blocks.blockList.indexOf(that);
+                piemenuBlockContext(that);
+            }, LONGPRESSTIME);
+        }, { passive: false });
+
+        this.container.on("touchstart", (event) => {
+            if (event.touches.length > 1) {
+                if (that.blocks.longPressTimeout) {
+                    clearTimeout(that.blocks.longPressTimeout);
+                }
+            }
+        });
+
+        this.container.on("touchmove", () => {
+            if (that.blocks.longPressTimeout) {
+                clearTimeout(that.blocks.longPressTimeout);
+            }
+        });
+
+        this.container.on("touchend touchcancel", () => {
+            if (that.blocks.longPressTimeout) {
+                clearTimeout(that.blocks.longPressTimeout);
+            }
         });
     }
 
