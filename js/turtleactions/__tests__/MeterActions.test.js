@@ -151,9 +151,5 @@ describe('setupMeterActions', () => {
         
         const meter = Singer.MeterActions.getCurrentMeter(0);  
         expect(meter).toBe('4:1');  
-    });
-    
-    
-    
-    
+    });   
 });
