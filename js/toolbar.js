@@ -357,6 +357,7 @@ class Toolbar {
         const stopIcon = docById("stop");
 
         let isPlayIconRunning = false;
+        const recordButton = docById("record");
 
         function handleClick() {
             if (!isPlayIconRunning) {
@@ -365,6 +366,9 @@ class Toolbar {
                 saveButtonAdvanced.disabled = true;
                 saveButton.className = "grey-text inactiveLink";
                 saveButtonAdvanced.className = "grey-text inactiveLink";
+                recordButton._tempOnClick = recordButton.onclick;
+                recordButton.onclick = null;
+                recordButton.style.opacity = "0.4";
                 // eslint-disable-next-line no-console
                 console.log("Wait for next 2 seconds to play the music");
             } else {
@@ -375,6 +379,8 @@ class Toolbar {
                 saveButtonAdvanced.disabled = false;
                 saveButton.className = "";
                 saveButtonAdvanced.className = "";
+                recordButton.onclick = recordButton._tempOnClick;
+                recordButton.style.opacity = "1";
             }
         }
 
