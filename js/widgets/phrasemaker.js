@@ -47,7 +47,8 @@ Globals location
 */
 
 /* exported PhraseMaker */
-
+// The last selected index for piemenu 
+let lastIndex = 5;
 const MATRIXGRAPHICS = [
     "forward",
     "back",
@@ -1759,6 +1760,7 @@ class PhraseMaker {
                 this._pitchWheel.selectedNavItemIndex
             ].title;
             docById("wheelnav-_exitWheel-title-1").children[0].textContent = this.blockValue;
+            lastIndex = this._pitchWheel.selectedNavItemIndex; // Update lastIndex
             // eslint-disable-next-line no-use-before-define
             __selectionChanged(true);
         };
@@ -1901,7 +1903,10 @@ class PhraseMaker {
                 }
             }
         }
-    }
+            if (lastIndex !== null && this._pitchWheel.navItems[lastIndex]) {
+                this._pitchWheel.navigateWheel(lastIndex);
+            }
+}
 
     /**
      * Creates a pie submenu for modifying column blocks based on the provided condition.
