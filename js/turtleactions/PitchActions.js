@@ -642,3 +642,4 @@ function setupPitchActions(activity) {
         }
     };
 }
+module.exports = setupPitchActions;

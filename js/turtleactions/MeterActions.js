@@ -369,3 +369,4 @@ function setupMeterActions(activity) {
         }
     };
 }
+module.exports = setupMeterActions;
