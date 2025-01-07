@@ -1903,6 +1903,9 @@ class PhraseMaker {
                 }
             }
         }
+            if (lastIndex !== null && this._pitchWheel.navItems[lastIndex]) {
+                this._pitchWheel.navigateWheel(lastIndex);
+            }
 }
 
     /**
