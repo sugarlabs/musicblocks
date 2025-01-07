@@ -361,12 +361,20 @@ class Toolbar {
         function handleClick() {
             if (!isPlayIconRunning) {
                 playIcon.onclick = null;
+                saveButton.disabled = true;
+                saveButtonAdvanced.disabled = true;
+                saveButton.className = "grey-text inactiveLink";
+                saveButtonAdvanced.className = "grey-text inactiveLink";
                 // eslint-disable-next-line no-console
                 console.log("Wait for next 2 seconds to play the music");
             } else {
                 // eslint-disable-next-line no-use-before-define
                 playIcon.onclick = tempClick;
                 isPlayIconRunning = false;
+                saveButton.disabled = false;
+                saveButtonAdvanced.disabled = false;
+                saveButton.className = "";
+                saveButtonAdvanced.className = "";
             }
         }
 
