@@ -67,6 +67,7 @@ class Toolbar {
                 ["delPluginIcon", _("Delete plugin")],
                 ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
                 ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
+                ["darkModeIcon", _("Change theme")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["chooseKeyIcon", _("Set Pitch Preview")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
@@ -128,6 +129,7 @@ class Toolbar {
                 _("Delete plugin"),
                 _("Enable horizontal scrolling"),
                 _("Disable horizontal scrolling"),
+                _("Change theme"),
                 _("Merge with current project"),
                 _("Set Pitch Preview"),
                 _("JavaScript Editor"),
@@ -193,6 +195,7 @@ class Toolbar {
                 ["delPluginIcon", _("Delete plugin")],
                 ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
                 ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
+                ["darkModeIcon", _("Change theme")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
                 ["restoreIcon", _("Restore")],
@@ -249,6 +252,7 @@ class Toolbar {
                 _("Delete plugin"),
                 _("Enable horizontal scrolling"),
                 _("Disable horizontal scrolling"),
+                _("Change theme"),
                 _("Merge with current project"),
                 _("JavaScript Editor"),
                 _("Restore"),
@@ -422,7 +426,7 @@ class Toolbar {
 
     /**
      * Renders the load icon with the provided onclick handler.
-     * 
+     *
      * @public
      * @param {Function} onclick - The onclick handler for the load icon.
      * @returns {void}
@@ -433,6 +437,14 @@ class Toolbar {
         loadIcon.onclick = () => {
             onclick(this.activity);
         };
+    }
+
+    renderDarkModeIcon(onclick) {
+        const darkModeIcon = docById("darkModeIcon");
+
+        darkModeIcon.onclick = () => {
+            onclick();
+        }
     }
 
     /**
