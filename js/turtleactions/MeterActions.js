@@ -369,4 +369,6 @@ function setupMeterActions(activity) {
         }
     };
 }
-module.exports = setupMeterActions;
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports =setupMeterActions;
+}

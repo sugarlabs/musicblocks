@@ -642,4 +642,6 @@ function setupPitchActions(activity) {
         }
     };
 }
-module.exports = setupPitchActions;
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = setupPitchActions;
+}
