@@ -488,4 +488,7 @@ function setupToneActions(activity) {
         }
     };
 }
-module.exports = setupToneActions;
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = setupToneActions;
+}
+
