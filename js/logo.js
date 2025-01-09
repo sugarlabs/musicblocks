@@ -956,6 +956,24 @@ class Logo {
         }
 
         this.activity.showBlocksAfterRun = false;
+        const saveButton = docById('saveButton');
+        const saveButtonAdvanced = docById('saveButtonAdvanced');
+        saveButton.disabled = false;
+        saveButtonAdvanced.disabled = false;
+        saveButton.className = saveButton.className.replace('grey-text inactiveLink', '').trim();
+        saveButtonAdvanced.className = saveButtonAdvanced.className.replace('grey-text inactiveLink', '').trim();
+
+        const Record = docById("record");
+        Record.disabled = false;
+        Record.className = Record.className.replace('grey-text inactiveLink', '').trim();
+        const outerCircle = Record.querySelector("circle:not(#rec_inside)");
+        if (outerCircle) {
+            outerCircle.setAttribute("stroke", "#FFFFFF"); // Change the stroke color of the outer circle to white
+        }
+        const recInside = Record.querySelector("#rec_inside");
+        if (recInside) {
+            recInside.setAttribute("fill", "#FFFFFF"); // Change the inner circle fill color to white
+        }
     }
 
     /**
@@ -1795,6 +1813,18 @@ class Logo {
                         saveButtonAdvanced.disabled = false;
                         saveButton.className = saveButton.className.replace('grey-text inactiveLink', '').trim();
                         saveButtonAdvanced.className = saveButtonAdvanced.className.replace('grey-text inactiveLink', '').trim();
+
+                        const Record = docById("record");
+                        Record.disabled = false;
+                        Record.className = Record.className.replace('grey-text inactiveLink', '').trim();
+                        const outerCircle = Record.querySelector("circle:not(#rec_inside)");
+                        if (outerCircle) {
+                            outerCircle.setAttribute("stroke", "#FFFFFF"); // Change the stroke color of the outer circle to white
+                        }
+                        const recInside = Record.querySelector("#rec_inside");
+                        if (recInside) {
+                            recInside.setAttribute("fill", "#FFFFFF"); // Change the inner circle fill color to white
+                        }
                     }
                 }
                 document.getElementById("stop").style.color = "white";

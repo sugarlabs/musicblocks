@@ -1199,6 +1199,18 @@ class Activity {
                     saveButtonAdvanced.disabled = true;
                     saveButton.className = "grey-text inactiveLink";
                     saveButtonAdvanced.className = "grey-text inactiveLink";
+
+                    const Record = docById("record");
+                    Record.disabled = true;
+                    Record.className = "grey-text inactiveLink";
+                    const outerCircle = Record.querySelector("circle:not(#rec_inside)");
+                    if (outerCircle) {
+                        outerCircle.setAttribute("stroke", "#9E9E9E"); // Change the stroke color of the outer circle
+                    }
+                    const recInside = Record.querySelector("#rec_inside");
+                    if (recInside) {
+                        recInside.setAttribute("fill", "#9E9E9E"); // inner circle fill color
+                    }
                 }
 
                 this.logo.runLogoCommands(null, env);
