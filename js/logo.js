@@ -1789,6 +1789,12 @@ class Logo {
                     } else {
                         logo.activity.blocks.showBlocks();
                         logo.activity.showBlocksAfterRun = false;
+                        const saveButton = docById('saveButton');
+                        const saveButtonAdvanced = docById('saveButtonAdvanced');
+                        saveButton.disabled = false;
+                        saveButtonAdvanced.disabled = false;
+                        saveButton.className = saveButton.className.replace('grey-text inactiveLink', '').trim();
+                        saveButtonAdvanced.className = saveButtonAdvanced.className.replace('grey-text inactiveLink', '').trim();
                     }
                 }
                 document.getElementById("stop").style.color = "white";

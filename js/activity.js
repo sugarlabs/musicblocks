@@ -1193,6 +1193,12 @@ class Activity {
                 if (!this.turtles.isShrunk()) {
                     this.blocks.hideBlocks();
                     this.showBlocksAfterRun = true;
+                    const saveButton = docById('saveButton');
+                    const saveButtonAdvanced = docById('saveButtonAdvanced');
+                    saveButton.disabled = true;
+                    saveButtonAdvanced.disabled = true;
+                    saveButton.className = "grey-text inactiveLink";
+                    saveButtonAdvanced.className = "grey-text inactiveLink";
                 }
 
                 this.logo.runLogoCommands(null, env);
@@ -3625,6 +3631,7 @@ class Activity {
             hideDOMLabel();
 
             if (this.blocks.visible) {
+                console.log("krishna");
                 this.blocks.hideBlocks();
                 this.showBlocksAfterRun = false;
                 this.palettes.hide();
