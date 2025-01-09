@@ -3631,7 +3631,6 @@ class Activity {
             hideDOMLabel();
 
             if (this.blocks.visible) {
-                console.log("krishna");
                 this.blocks.hideBlocks();
                 this.showBlocksAfterRun = false;
                 this.palettes.hide();
