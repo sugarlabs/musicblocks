@@ -1800,7 +1800,6 @@ class Logo {
                 saveButton.className = "";
                 saveButtonAdvanced.className = "";
                 recordButton.className = "";
-                recordButton.className = "";
             }
         }
     }
