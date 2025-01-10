@@ -393,12 +393,12 @@ class Activity {
 
             this.searchWidget = docById("search");
             this.searchWidget.style.visibility = "hidden";
-            this.searchWidget.placeholder = _("Search for blocks");
+            this.searchWidget.placeholder = _("Search");
 
             this.helpfulSearchWidget = document.createElement("input");
             this.helpfulSearchWidget.setAttribute("id", "helpfulSearch");
             this.helpfulSearchWidget.style.visibility = "hidden";
-            this.helpfulSearchWidget.placeholder = _("Search for blocks");
+            this.helpfulSearchWidget.placeholder = _("Search");
             this.helpfulSearchWidget.classList.add("ui-autocomplete");
             this.progressBar = docById("myProgress");
             this.progressBar.style.visibility = "hidden";
@@ -2400,7 +2400,10 @@ class Activity {
         this.showSearchWidget = () => {
             // Bring widget to top.
             this.searchWidget.style.zIndex = 1001;
-            this.searchWidget.style.border = "2px solid blue";
+            this.searchWidget.style.borderBottom = "1px solid #0cafff";
+            this.searchWidget.style.borderTop = "0px";
+            this.searchWidget.style.borderRight = "0px";
+            this.searchWidget.style.borderLeft = "0px";
             if (this.helpfulSearchDiv) {
                 this._hideHelpfulSearchWidget();
             }
@@ -2415,9 +2418,9 @@ class Activity {
                 this.searchWidget.value = null;
                 this.searchWidget.style.visibility = "visible";
                 this.searchWidget.style.left =
-                    this.palettes.getSearchPos()[0] * this.turtleBlocksScale * 1.5 + "px";
+                    this.palettes.getSearchPos()[0] * this.turtleBlocksScale * 1.428571 + "px";
                 this.searchWidget.style.top =
-                    this.palettes.getSearchPos()[1] * this.turtleBlocksScale * 0.95 + "px";
+                    this.palettes.getSearchPos()[1] * this.turtleBlocksScale * 0.9774193548 + "px";
 
                 this.searchBlockPosition = [100, 100];
                 this.prepSearchWidget();
@@ -2442,6 +2445,18 @@ class Activity {
                     }
                 };
                 document.addEventListener("mousedown", closeListener);
+
+
+                // Add hover behavior for the search widget
+                this.searchWidget.addEventListener("mouseover", () => {
+                    this.searchWidget.style.backgroundColor = "#ddd"; // Change color on hover
+                        
+                });
+
+                this.searchWidget.addEventListener("mouseout", () => {
+                    this.searchWidget.style.backgroundColor = "white"; // Revert color when not hovered
+                    
+                });
 
                 // Give the browser time to update before selecting
                 // focus.
