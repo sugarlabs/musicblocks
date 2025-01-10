@@ -191,7 +191,7 @@ class Tempo {
             );
         }
 
-        this.activity.textMsg(_("Adjust the tempo with the buttons."));
+        activity.textMsg(_("Adjust the tempo with the buttons."),3000);
         this.resume();
 
         widgetWindow.sendToCenter();
@@ -258,17 +258,17 @@ class Tempo {
         const input = this.BPMInputs[i].value;
 
         if (isNaN(input)) {
-            this.activity.errorMsg(_("Please enter a number between 30 and 1000"));
+            activity.errorMsg(_("Please enter a number between 30 and 1000"), 3000);
             return;
         }
         
         this.BPMs[i] = this.BPMInputs[i].value;
         if (this.BPMs[i] > 1000) {
             this.BPMs[i] = 1000;
-            this.activity.errorMsg(_("The beats per minute must be between 30 and 1000."));
+            activity.errorMsg(_("The beats per minute must be between 30 and 1000."), 3000);
         } else if (this.BPMs[i] < 30) {
             this.BPMs[i] = 30;
-            this.activity.errorMsg(_("The beats per minute must be between 30 and 1000."));
+            activity.errorMsg(_("The beats per minute must be between 30 and 1000."), 3000);
         }
 
         this._updateBPM(i);
@@ -284,7 +284,7 @@ class Tempo {
         this.BPMs[i] = parseFloat(this.BPMs[i]) + Math.round(0.1 * this.BPMs[i]);
 
         if (this.BPMs[i] > 1000) {
-            this.activity.errorMsg(_("The beats per minute must be below 1000."));
+            activity.errorMsg(_("The beats per minute must be below 1000."), 3000);
             this.BPMs[i] = 1000;
         }
 
@@ -300,7 +300,7 @@ class Tempo {
     slowDown(i) {
         this.BPMs[i] = parseFloat(this.BPMs[i]) - Math.round(0.1 * this.BPMs[i]);
         if (this.BPMs[i] < 30) {
-            this.activity.errorMsg(_("The beats per minute must be above 30"));
+            activity.errorMsg(_("The beats per minute must be above 30"), 3000);
             this.BPMs[i] = 30;
         }
 
@@ -411,7 +411,7 @@ class Tempo {
                 [5, ["vspace", {}], 0, 0, [0, null]]
             ];
             this.activity.blocks.loadNewBlocks(newStack);
-            this.activity.textMsg(_("New action block generated."));
+            activity.textMsg(_("New action block generated."), 3000);
         }, 200 * i);
     }
 

@@ -234,7 +234,7 @@ function SampleWidget() {
      * @returns {void}
      */
     this.displayRecordingStartMessage = function () {
-        this.activity.textMsg(_("Recording started"));
+        activity.textMsg(_("Recording started"), 3000);
     }
 
     /**
@@ -242,7 +242,7 @@ function SampleWidget() {
      * @returns {void}
      */
     this.displayRecordingStopMessage = function () {
-        this.activity.textMsg(_("Recording complete"));
+        activity.textMsg(_("Recording complete"), 3000);
     }
 
 
@@ -280,7 +280,7 @@ function SampleWidget() {
             ];
 
             that.activity.blocks.loadNewBlocks(newStack);
-            that.activity.textMsg(_("A new sample block was generated."));
+            activity.textMsg(_("A new sample block was generated."), 3000);
         }, 1000);
     };
 
@@ -500,7 +500,7 @@ function SampleWidget() {
 
         this.setTimbre();
 
-        this.activity.textMsg(_("Upload a sample and adjust its pitch center."));
+        activity.textMsg(_("Upload a sample and adjust its pitch center."), 3000);
         this.pause();
 
         widgetWindow.sendToCenter();
