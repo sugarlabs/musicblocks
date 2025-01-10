@@ -1792,6 +1792,14 @@ class Logo {
                     }
                 }
                 document.getElementById("stop").style.color = "white";
+                const saveButton = docById('saveButton');
+                const saveButtonAdvanced = docById('saveButtonAdvanced');
+                const recordButton = docById("record");
+                saveButton.disabled = false;
+                saveButtonAdvanced.disabled = false;
+                saveButton.className = "";
+                saveButtonAdvanced.className = "";
+                recordButton.className = "";
             }
         }
     }
