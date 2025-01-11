@@ -1282,8 +1282,16 @@ class Activity {
                     }
                 );
 
-                const filename = window.prompt("Enter file name"),
-                    downloadLink = document.createElement("a");
+                const filename = window.prompt("Enter file name");
+                if (filename === null || filename.trim() === "") {
+                    alert("File save canceled.");
+                    flag = 0;
+                    recording();
+                    doRecordButton();
+                    return; // Exit without saving the file
+                }
+
+                const downloadLink = document.createElement("a");
                 downloadLink.href = URL.createObjectURL(blob);
                 downloadLink.download = `${filename}.webm`;
 
