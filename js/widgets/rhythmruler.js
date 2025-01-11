@@ -814,7 +814,7 @@ class RhythmRuler {
             }
         }
 
-        this.activity.textMsg(_("Click on the ruler to divide it."));
+        activity.textMsg(_("Click on the ruler to divide it."), 3000);
         // this._piemenuRuler(this._rulerSelected);
     }
 
@@ -2251,7 +2251,7 @@ class RhythmRuler {
         }
 
         this.activity.blocks.loadNewBlocks(newStack);
-        this.activity.textMsg(_("New action block generated."));
+        activity.textMsg(_("New action block generated."), 3000);
     }
 
     /**
@@ -2469,7 +2469,7 @@ class RhythmRuler {
             }
 
             this.activity.blocks.loadNewBlocks(newStack);
-            this.activity.textMsg(_("New action block generated."));
+            activity.textMsg(_("New action block generated."), 3000);
             if (selectedRuler > this.Rulers.length - 2) {
                 return;
             } else {

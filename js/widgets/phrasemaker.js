@@ -1072,7 +1072,7 @@ class PhraseMaker {
         }
 
         if (this.isInitial) {
-            this.activity.textMsg(_("Click on the table to add notes."));
+            activity.textMsg(_("Click on the table to add notes."), 3000);
             this.widgetWindow.sendToCenter();
             this.inInitial = false;
         }
@@ -4613,7 +4613,7 @@ class PhraseMaker {
     __playNote(time, noteCounter) {
         // Show lyrics while playing notes.
         if (this.lyricsON) {
-            this.activity.textMsg(this._lyrics[noteCounter]);
+            activity.textMsg(this._lyrics[noteCounter], 3000);
         }
         // If the widget is closed, stop playing.
         if (!this.widgetWindow.isVisible()) {
@@ -5499,6 +5499,6 @@ class PhraseMaker {
 
         // Create a new stack for the chunk.
         this.activity.blocks.loadNewBlocks(newStack);
-        this.activity.textMsg(_("New action block generated."));
+        activity.textMsg(_("New action block generated."), 3000 );
     }
 }

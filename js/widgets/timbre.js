@@ -779,7 +779,7 @@ class TimbreWidget {
             if (this.osc.length === 0) {
                 this._synth();
             } else {
-                this.activity.errorMsg(_("Unable to use synth due to existing oscillator"));
+                activity.errorMsg(_("Unable to use synth due to existing oscillator"), 3000);
             }
         };
 
@@ -984,7 +984,7 @@ class TimbreWidget {
             filterButtonCell.style.backgroundColor = platformColor.selectorBackground;
         };
 
-        this.activity.textMsg(_("Click on buttons to open the timbre design tools."));
+        activity.textMsg(_("Click on buttons to open the timbre design tools."), 3000);
         widgetWindow.sendToCenter();
     }
 
@@ -1916,7 +1916,7 @@ class TimbreWidget {
                 (el) => el.filterType === elem.value
             );
             if (error.length > 1) {
-                this.activity.errorMsg(_("Filter already present."));
+                activity.errorMsg(_("Filter already present."), 3000);
             }
             this._playNote("G4", 1 / 8);
         };
