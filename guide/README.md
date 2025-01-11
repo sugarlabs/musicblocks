@@ -2716,3 +2716,63 @@ Looking for a block? The tables below (one for beginner mode and one for advance
 | | custom mode |
 
 [Back to Table of Contents](#TABLE-OF-CONTENTS)
+
+
+
+### Context Menus
+
+Context menus provide quick access to useful actions within Music Blocks. 
+They appear when you right-click on blocks, workspaces, or UI elements. These menus contain options for:
+
+- **Copying and Pasting Blocks**: Quickly duplicate blocks.
+- **Deleting Blocks**: Remove unwanted blocks from the workspace.
+- **Expanding and Collapsing Blocks**: Manage block visibility for a better workspace experience.
+- **Help and Documentation**: Get contextual help on specific blocks.
+- **Block-Specific Actions**: Some blocks offer additional options like toggling settings.
+
+To use a context menu, right-click on a block or area in the workspace and choose an option from the menu.
+
+
+
+### Improved Help Strings
+
+To enhance the user experience, help strings have been improved to provide better clarity and guidance:
+
+- **Clearer Descriptions**: Blocks now have concise but informative descriptions.
+- **Examples Added**: Some blocks include small examples to illustrate their usage.
+- **Consistency Maintained**: Language consistency ensures a smooth learning curve.
+- **Tooltips Updated**: Hovering over blocks provides meaningful hints.
+
+These improvements help beginners and advanced users alike to understand block functionalities more intuitively.
+
+
+
+### Macros
+
+Macros allow users to automate repetitive tasks by creating reusable sequences of blocks. Music Blocks now includes:
+
+- **Predefined Macros**: Commonly used sequences can be accessed from the macro menu.
+- **Custom Macros**: Users can create their own macros and save them for reuse.
+- **Improved Macro Management**: Rename, edit, and delete macros with ease.
+
+To create a macro, select a group of blocks, right-click, and choose "Create Macro." Saved macros appear in the Macro menu.
+
+
+
+### Register and Panning Blocks
+
+#### Register Block
+The **Register Block** adjusts the octave of the following notes. This is useful for transposing melodies up or down without changing their relative pitch relationships.
+
+- **Usage**: Place the Register Block before a sequence of notes to shift their octave.
+- **Example**: 
+  - Register +1 shifts notes up by one octave.
+  - Register -1 shifts notes down by one octave.
+
+#### Panning Block
+The **Panning Block** controls the stereo positioning of sounds, allowing users to create a sense of spatial movement in their music.
+
+- **Left (-100) to Right (100) Control**: A value of -100 places the sound completely to the left, 100 to the right, and 0 centers the sound.
+- **Dynamic Panning**: Use variables or mathematical expressions to dynamically adjust panning during playback.
+
+These blocks enhance musical expressiveness by controlling pitch register and stereo positioning.
