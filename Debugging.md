@@ -35,7 +35,16 @@ you will make mistakes along the way. Music Blocks provides a number
 of mechanisms, reviewed below, to help you explore ideas and find
 mistakes.
 
-## 1. Clicking on an individual stack of blocks
+## <a>TABLE OF CONTENTS</a>
+
+1. [Clicking on an Individual Stack of Blocks](#1-clicking-on-an-individual-stack-of-blocks)
+2. [Print and Comment Blocks](#2-print-and-comment-blocks)
+3. [Status Widget](#3-status-widget)
+4. [Playback Modes](#4-playback-modes)
+5. [Show and Hide blocks](#5-show-and-hide-blocks)
+6. [Browser Console](#6-browser-console)
+
+## <a>1. Clicking on an Individual Stack of Blocks</a>
 
 The *Play* button (in top left corner) will run all of the *Start*
 blocks simultaneously. (Every Music Blocks project has at least one
@@ -43,38 +52,44 @@ blocks simultaneously. (Every Music Blocks project has at least one
 clicking on a stack. This lets you test and debug small sections of
 code, or, as in the example below, you can play a single voice by
 clicking on one of the *Start* blocks or single phase by clicking on
-one of the *Action* blocks.
+one of the *Action* blocks. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732463245651983&run=True)
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/images/startblocks_debug_guide.png "Start blocks")
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/images/startblocks_debug_guide.png "Start Blocks")
 
-## 2. Print and Comment blocks
+## <a>2. Print and Comment Blocks</a>
+
+[Back to Table of Contents](#table-of-contents)
 
 The *Print* block (found on the *Extras* palette) can be used to print
 a message while running a program. It is useful to determine if a
 section of code is being executed when expected or if a box or
 parameter contains an expected value.
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/images/print_example2_debug_guide.png "Print blocks")
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/images/print_example2_debug_guide.png "Print Block")
 
 The *Print* block is used to display the number of whole notes played,
 in this case, `1/4 + 1/4 + 1/2`, which adds up to `1`, which is
-displayed at the top of the browser window.
+displayed at the top of the browser window. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732474452574359&run=True)
 
 The *Comment* block (also found on the *Extras* palette) is similar to
 the *Print* block, except it only prints a message when the program is
 being run in *Playback Slow* mode (See below). Comments are also
-written to the browser console.
+written to the browser console. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732825564345176&run=True)
 
-## 3. Status widget
+![Comment Block](./images/Comment_block_DebuggingMd.svg "Comment Block")
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/status1.svg "given Music block")
+## <a>3. Status Widget</a>
 
-![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/images/status_example_debug_guide.png "status in tabular form")
+[Back to Table of Contents](#table-of-contents)
+
+![Status Widget Block](./images/Status_widget_debuggingMd.svg "Status Widget Block")
+
+![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/images/status_example_debug_guide.png "Status in tabular form")
 
 The *Status widget* is a tool for inspecting the status of Music
 Blocks as it is running. By default, the key, BPM, and volume are
 displayed. Also, each note is displayed as it is played. There is one
-row per voice in the status table.
+row per voice in the status table. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732541757152077&run=True)
 
 Additional *Print* blocks can be added to the *Status* widget to
 display additional music factors, e.g., duplicate, transposition,
@@ -82,13 +97,15 @@ skip, [staccato](#MORE-TRANSFORMATIONS),
 [slur](#MORE-TRANSFORMATIONS), and [graphics](#GRAPHICS) factors,
 e.g., x, y, heading, color, shade, grey, and pensize.
 
-![alt tag](https://rawgithub.com/sugarlabs/musicblocks/master/guide/status3.svg "additional programming within the Status block")
+![Additional Programming within the Status Widget Block](./images/Status_Widget_additional_programming_DebuggingMd.svg "Additional Programming within the Status Widget Block")
 
 You can do additional programming within the status block. In the
 example above, `whole notes played` is multiplied by `4` (e.g. quarter notes)
-before being displayed.
+before being displayed. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732553086132345&run=True)
 
-## 4. Playback modes
+## <a>4. Playback Modes</a>
+
+[Back to Table of Contents](#table-of-contents)
 
 Clicking on the Play button will play your program at full speed.
 (It will also hide the blocks while the program runs, which improves
@@ -96,16 +113,18 @@ performance.) But there are two other playback modes.
 
 On the Secondary Menu, there are two other Play buttons.
 
-During Playback Slow mode the program will pause between the execution
+During *Playback Slow* mode the program will pause between the execution
 of each block and the block being executed will be highlighted. This is
 useful for following program flow, ensuring that the sequence of blocks
 being executed is what you expect. In addition, the value stored in any
 box or parameter is displayed on the block as the program runs, so you
 can "inspect" program elements as the program runs.
 
-Run Step by Step advances one block per button press.
+*Run Step by Step* advances one block per button press.
 
-## 5. Show and Hide blocks
+## <a>5. Show and Hide blocks</a>
+
+[Back to Table of Contents](#table-of-contents)
 
 The *Show* and *Hide* blocks (found on the *Extras* palette) are
 useful for setting
@@ -117,7 +136,7 @@ gets to the *Show* block. Then the blocks are displayed and
 run in *Playback Slow* mode. When the *Hide* block is encountered, the
 blocks are hidden and the program resumes running at full speed.
 
-## 6. Browser console
+## <a>6. Browser Console</a>
 
 As Music Blocks runs, some debugging information is written to the
 browser console, such as the notes being played and comments (See the
@@ -127,3 +146,5 @@ browser console, such as the notes being played and comments (See the
 ![alt tag](https://github.com/sugarlabs/musicblocks/blob/master/images/browserconsole_debug_guide.png "Console blocks")
 
 Shown above is the console output from three notes: `sol mi sol`.
+
+[Back to Table of Contents](#table-of-contents)

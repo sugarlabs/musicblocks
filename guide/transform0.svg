@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="349"
    height="615"
    style=""
    version="1.1"
    id="svg5931"
    sodipodi:docname="transform0.svg"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <metadata
      id="metadata5937">
     <rdf:RDF>
@@ -40,13 +40,16 @@
      inkscape:window-height="1001"
      id="namedview5933"
      showgrid="false"
-     inkscape:zoom="10.510569"
-     inkscape:cx="92.147309"
-     inkscape:cy="581.26659"
+     inkscape:zoom="1.3138211"
+     inkscape:cx="124.0656"
+     inkscape:cy="289.61325"
      inkscape:window-x="-9"
      inkscape:window-y="-9"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg_1" />
+     inkscape:current-layer="svg_195"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1" />
   <rect
      id="backgroundrect"
      width="100%"
@@ -74,15 +77,13 @@
              style="fill:#DAA926;fill-opacity:1;stroke:#DAAF30;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
              id="svg_4" />
           <text
-             style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
              id="svg_5"
-             y="-53.83333507180214"
-             x="-199.3333384990692">
-            <tspan
-               x="-177.3333384990692"
-               y="-31.83333507180214"
-               id="svg_6">start</tspan>
-          </text>
+             y="-53.833336"
+             x="-199.33334"><tspan
+               x="-177.33334"
+               y="-31.833336"
+               id="svg_6">start</tspan></text>
         </g>
       </g>
     </g>
@@ -99,25 +100,21 @@
              style="fill:#FF8B2D;fill-opacity:1;stroke:#E86B0E;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
              id="svg_18" />
           <text
-             style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
              id="svg_19"
-             y="-53.83333507180214"
-             x="-199.3333384990692">
-            <tspan
-               x="-179.3333384990692"
-               y="-38.83333507180214"
-               id="svg_20">note</tspan>
-          </text>
+             y="-53.833336"
+             x="-199.33334"><tspan
+               x="-179.33334"
+               y="-38.833336"
+               id="svg_20">note</tspan></text>
           <text
-             style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+             style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
              id="svg_21"
-             y="-53.83333507180214"
-             x="-199.3333384990692">
-            <tspan
-               x="-114.33333849906921"
-               y="-41.83333507180214"
-               id="svg_22">value</tspan>
-          </text>
+             y="-53.833336"
+             x="-199.33334"><tspan
+               x="-114.33334"
+               y="-41.833336"
+               id="svg_22">value</tspan></text>
         </g>
       </g>
       <g
@@ -135,35 +132,29 @@
            style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
            id="svg_32" />
         <text
-           style="font-size:9px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_33"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-145.3333384990692"
-             y="-30.83333507180214"
-             id="svg_34">/</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-145.33334"
+             y="-30.833336"
+             id="svg_34">/</tspan></text>
         <text
-           style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_35"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-145.3333384990692"
-             y="-41.83333507180214"
-             id="svg_36" />
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-145.33334"
+             y="-41.833336"
+             id="svg_36" /></text>
         <text
-           style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_37"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-145.3333384990692"
-             y="-20.83333507180214"
-             id="svg_38" />
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-145.33334"
+             y="-20.833336"
+             id="svg_38" /></text>
       </g>
     </g>
     <g
@@ -177,15 +168,13 @@
            style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
            id="svg_41" />
         <text
-           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_42"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-186.3333384990692"
-             y="-39.83333507180214"
-             id="svg_43">1</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-186.33334"
+             y="-39.833336"
+             id="svg_43">1</tspan></text>
       </g>
     </g>
     <g
@@ -199,15 +188,13 @@
            style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
            id="svg_46" />
         <text
-           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_47"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-186.3333384990692"
-             y="-39.83333507180214"
-             id="svg_48">8</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-186.33334"
+             y="-39.833336"
+             id="svg_48">8</tspan></text>
       </g>
     </g>
     <g
@@ -221,15 +208,13 @@
            style="fill:#B0B0B0;fill-opacity:1;stroke:#A0A0A0;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
            id="svg_51" />
         <text
-           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_52"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-163.3333384990692"
-             y="-39.83333507180214"
-             id="svg_53">↓</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-163.33334"
+             y="-39.833336"
+             id="svg_53">↓</tspan></text>
       </g>
     </g>
     <g
@@ -243,35 +228,29 @@
            style="fill:#77C428;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
            id="svg_56" />
         <text
-           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_57"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-153.3333384990692"
-             y="-29.83333507180214"
-             id="svg_58">pitch</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-153.33334"
+             y="-29.833336"
+             id="svg_58">pitch</tspan></text>
         <text
-           style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_59"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-153.3333384990692"
-             y="-41.83333507180214"
-             id="svg_60">name</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-153.33334"
+             y="-41.833336"
+             id="svg_60">name</tspan></text>
         <text
-           style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_61"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-153.3333384990692"
-             y="-20.83333507180214"
-             id="svg_62">octave</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-153.33334"
+             y="-20.833336"
+             id="svg_62">octave</tspan></text>
       </g>
     </g>
     <g
@@ -285,15 +264,13 @@
            style="fill:#77C428;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
            id="svg_65" />
         <text
-           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_66"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-186.3333384990692"
-             y="-39.83333507180214"
-             id="svg_67">la</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-186.33334"
+             y="-39.833336"
+             id="svg_67">la</tspan></text>
       </g>
     </g>
     <g
@@ -307,15 +284,13 @@
            style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
            id="svg_70" />
         <text
-           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_71"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-186.3333384990692"
-             y="-39.83333507180214"
-             id="svg_72">4</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-186.33334"
+             y="-39.833336"
+             id="svg_72">4</tspan></text>
       </g>
     </g>
     <g
@@ -329,25 +304,21 @@
            style="fill:#D68136;fill-opacity:1;stroke:#B7651A;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
            id="svg_75" />
         <text
-           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_76"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-194.3333384990692"
-             y="-38.83333507180214"
-             id="svg_77">repeat</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-194.33334"
+             y="-38.833336"
+             id="svg_77">repeat</tspan></text>
         <text
-           style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_78"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-154.3333384990692"
-             y="-41.83333507180214"
-             id="svg_79" />
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-154.33334"
+             y="-41.833336"
+             id="svg_79" /></text>
       </g>
     </g>
     <g
@@ -361,15 +332,13 @@
            style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
            id="svg_82" />
         <text
-           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_83"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-186.3333384990692"
-             y="-39.83333507180214"
-             id="svg_84">7</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-186.33334"
+             y="-39.833336"
+             id="svg_84">7</tspan></text>
       </g>
     </g>
     <g
@@ -385,25 +354,21 @@
              style="fill:#FF8B2D;fill-opacity:1;stroke:#E86B0E;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
              id="svg_88" />
           <text
-             style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
              id="svg_89"
-             y="-53.83333507180214"
-             x="-199.3333384990692">
-            <tspan
-               x="-179.3333384990692"
-               y="-38.83333507180214"
-               id="svg_90">note</tspan>
-          </text>
+             y="-53.833336"
+             x="-199.33334"><tspan
+               x="-179.33334"
+               y="-38.833336"
+               id="svg_90">note</tspan></text>
           <text
-             style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+             style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
              id="svg_91"
-             y="-53.83333507180214"
-             x="-199.3333384990692">
-            <tspan
-               x="-114.33333849906921"
-               y="-41.83333507180214"
-               id="svg_92">value</tspan>
-          </text>
+             y="-53.833336"
+             x="-199.33334"><tspan
+               x="-114.33334"
+               y="-41.833336"
+               id="svg_92">value</tspan></text>
         </g>
       </g>
       <g
@@ -421,35 +386,29 @@
            style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
            id="svg_102" />
         <text
-           style="font-size:9px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_103"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-145.3333384990692"
-             y="-30.83333507180214"
-             id="svg_104">/</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-145.33334"
+             y="-30.833336"
+             id="svg_104">/</tspan></text>
         <text
-           style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_105"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-145.3333384990692"
-             y="-41.83333507180214"
-             id="svg_106" />
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-145.33334"
+             y="-41.833336"
+             id="svg_106" /></text>
         <text
-           style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_107"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-145.3333384990692"
-             y="-20.83333507180214"
-             id="svg_108" />
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-145.33334"
+             y="-20.833336"
+             id="svg_108" /></text>
       </g>
     </g>
     <g
@@ -463,15 +422,13 @@
            style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
            id="svg_111" />
         <text
-           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_112"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-186.3333384990692"
-             y="-39.83333507180214"
-             id="svg_113">1</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-186.33334"
+             y="-39.833336"
+             id="svg_113">1</tspan></text>
       </g>
     </g>
     <g
@@ -485,15 +442,13 @@
            style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
            id="svg_116" />
         <text
-           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_117"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-186.3333384990692"
-             y="-39.83333507180214"
-             id="svg_118">8</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-186.33334"
+             y="-39.833336"
+             id="svg_118">8</tspan></text>
       </g>
     </g>
     <g
@@ -507,15 +462,13 @@
            style="fill:#B0B0B0;fill-opacity:1;stroke:#A0A0A0;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
            id="svg_121" />
         <text
-           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_122"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-163.3333384990692"
-             y="-39.83333507180214"
-             id="svg_123">↓</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-163.33334"
+             y="-39.833336"
+             id="svg_123">↓</tspan></text>
       </g>
     </g>
     <g
@@ -529,25 +482,21 @@
            style="fill:#77C428;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
            id="svg_126" />
         <text
-           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_127"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-111.33333849906921"
-             y="-39.83333507180214"
-             id="svg_128">scalar step (+/–)</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-111.33334"
+             y="-39.833336"
+             id="svg_128">scalar step (+/–)</tspan></text>
         <text
-           style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_129"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-111.33333849906921"
-             y="-41.83333507180214"
-             id="svg_130" />
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-111.33334"
+             y="-41.833336"
+             id="svg_130" /></text>
       </g>
     </g>
     <g
@@ -561,15 +510,13 @@
            style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
            id="svg_133" />
         <text
-           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_134"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-186.3333384990692"
-             y="-39.83333507180214"
-             id="svg_135">1</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-186.33334"
+             y="-39.833336"
+             id="svg_135">1</tspan></text>
       </g>
     </g>
     <g
@@ -583,25 +530,21 @@
            style="fill:#D68136;fill-opacity:1;stroke:#B7651A;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
            id="svg_138" />
         <text
-           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_139"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-194.3333384990692"
-             y="-38.83333507180214"
-             id="svg_140">repeat</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-194.33334"
+             y="-38.833336"
+             id="svg_140">repeat</tspan></text>
         <text
-           style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_141"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-154.3333384990692"
-             y="-41.83333507180214"
-             id="svg_142" />
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-154.33334"
+             y="-41.833336"
+             id="svg_142" /></text>
       </g>
     </g>
     <g
@@ -615,15 +558,13 @@
            style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
            id="svg_145" />
         <text
-           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_146"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-186.3333384990692"
-             y="-39.83333507180214"
-             id="svg_147">7</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-186.33334"
+             y="-39.833336"
+             id="svg_147">7</tspan></text>
       </g>
     </g>
     <g
@@ -639,25 +580,21 @@
              style="fill:#FF8B2D;fill-opacity:1;stroke:#E86B0E;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
              id="svg_151" />
           <text
-             style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+             style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
              id="svg_152"
-             y="-53.83333507180214"
-             x="-199.3333384990692">
-            <tspan
-               x="-179.3333384990692"
-               y="-38.83333507180214"
-               id="svg_153">note</tspan>
-          </text>
+             y="-53.833336"
+             x="-199.33334"><tspan
+               x="-179.33334"
+               y="-38.833336"
+               id="svg_153">note</tspan></text>
           <text
-             style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+             style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
              id="svg_154"
-             y="-53.83333507180214"
-             x="-199.3333384990692">
-            <tspan
-               x="-114.33333849906921"
-               y="-41.83333507180214"
-               id="svg_155">value</tspan>
-          </text>
+             y="-53.833336"
+             x="-199.33334"><tspan
+               x="-114.33334"
+               y="-41.833336"
+               id="svg_155">value</tspan></text>
         </g>
       </g>
     </g>
@@ -672,35 +609,29 @@
            style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
            id="svg_165" />
         <text
-           style="font-size:9px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_166"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-145.3333384990692"
-             y="-30.83333507180214"
-             id="svg_167">/</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-145.33334"
+             y="-30.833336"
+             id="svg_167">/</tspan></text>
         <text
-           style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_168"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-145.3333384990692"
-             y="-41.83333507180214"
-             id="svg_169" />
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-145.33334"
+             y="-41.833336"
+             id="svg_169" /></text>
         <text
-           style="font-size:6px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           style="font-size:6px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_170"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-145.3333384990692"
-             y="-20.83333507180214"
-             id="svg_171" />
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-145.33334"
+             y="-20.833336"
+             id="svg_171" /></text>
       </g>
     </g>
     <g
@@ -714,15 +645,13 @@
            style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
            id="svg_174" />
         <text
-           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_175"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-186.3333384990692"
-             y="-39.83333507180214"
-             id="svg_176">1</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-186.33334"
+             y="-39.833336"
+             id="svg_176">1</tspan></text>
       </g>
     </g>
     <g
@@ -736,15 +665,13 @@
            style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
            id="svg_179" />
         <text
-           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_180"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-186.3333384990692"
-             y="-39.83333507180214"
-             id="svg_181">8</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-186.33334"
+             y="-39.833336"
+             id="svg_181">8</tspan></text>
       </g>
     </g>
     <g
@@ -758,15 +685,13 @@
            style="fill:#B0B0B0;fill-opacity:1;stroke:#A0A0A0;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
            id="svg_184" />
         <text
-           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_185"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-163.3333384990692"
-             y="-39.83333507180214"
-             id="svg_186">↓</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-163.33334"
+             y="-39.833336"
+             id="svg_186">↓</tspan></text>
       </g>
     </g>
     <g
@@ -780,25 +705,21 @@
            style="fill:#77C428;fill-opacity:1;stroke:#57AD02;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
            id="svg_189" />
         <text
-           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_190"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-111.33333849906921"
-             y="-39.83333507180214"
-             id="svg_191">scalar step (+/–)</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-111.33334"
+             y="-39.833336"
+             id="svg_191">scalar step (+/–)</tspan></text>
         <text
-           style="font-size:6.666666666666667px;fill:#282828;font-family:sans-serif;text-anchor:end"
+           style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
            id="svg_192"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-111.33333849906921"
-             y="-41.83333507180214"
-             id="svg_193" />
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-111.33334"
+             y="-41.833336"
+             id="svg_193" /></text>
       </g>
     </g>
     <g
@@ -812,15 +733,13 @@
            style="fill:#FF5293;fill-opacity:1;stroke:#FF2C76;stroke-width:1;stroke-linecap:round;stroke-opacity:1;"
            id="svg_196" />
         <text
-           style="font-size:10px;fill:#282828;font-family:sans-serif;text-anchor:start"
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
            id="svg_197"
-           y="-53.83333507180214"
-           x="-199.3333384990692">
-          <tspan
-             x="-186.3333384990692"
-             y="-39.83333507180214"
-             id="svg_198">1</tspan>
-        </text>
+           y="-53.833336"
+           x="-199.33334"><tspan
+             x="-186.33334"
+             y="-39.833336"
+             id="svg_198">-1</tspan></text>
       </g>
     </g>
   </g>
