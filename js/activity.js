@@ -1303,7 +1303,7 @@ class Activity {
                 // eslint-disable-next-line no-use-before-define
                 recording();
                 doRecordButton();
-                that.textMsg(_("click on stop sharing"));
+                that.textMsg(_("Click on stop sharing"));
             }
             /**
              * Stops the recording process.
