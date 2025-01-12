@@ -13,10 +13,22 @@ $(document).ready(function() {
         mode = localStorage.getItem("beginnerMode") || "true";
     } catch (error) {
         console.error("Error accessing localStorage:", error);
-       
-        mode = "true"; 
+
+        mode = "true";
     }
 
+    /**
+     * The user's selected dark mode, stored in local storage.
+     * @type {boolean}
+     */
+    var isDarkModeON;
+    try {
+        console.log("log from script.js");
+        isDarkModeON = localStorage.getItem("isDarkModeON") === "true";
+    } catch (error) {
+        console.error("Error accessing localStorage:", error);
+        isDarkModeON = false; // Default to light mode
+    }
 
     /**
      * The icon element that displays the user's current mode.
@@ -29,6 +41,12 @@ $(document).ready(function() {
      * @type {HTMLElement}
      */
     var modeText = document.getElementById("modeText");
+
+    /**
+     * The dark mode icon element.
+     * @type {HTMLElement}
+     */
+    var darkModeIcon = document.getElementById("darkModeIcon");
 
     // Set the mode icon and tooltip based on the user's selected mode.
     if (mode === null || mode === "true") {
