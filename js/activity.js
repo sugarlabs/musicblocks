@@ -1282,9 +1282,9 @@ class Activity {
                     }
                 );
 
-                const filename = window.prompt("Enter file name");
+                const filename = window.prompt(_("Enter file name"));
                 if (filename === null || filename.trim() === "") {
-                    alert("File save canceled.");
+                    alert(_("File save canceled"));
                     flag = 0;
                     recording();
                     doRecordButton();
@@ -1303,7 +1303,7 @@ class Activity {
                 // eslint-disable-next-line no-use-before-define
                 recording();
                 doRecordButton();
-                that.textMsg("click on stop sharing");
+                that.textMsg(_("click on stop sharing"));
             }
             /**
              * Stops the recording process.
