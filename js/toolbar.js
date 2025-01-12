@@ -49,7 +49,7 @@ class Toolbar {
                 ["play", _("Play")],
                 ["stop", _("Stop")],
                 ["record",_("Record")],
-                ["Full Screen", _("Full screen")],
+                ["Full screen", _("Full screen")],
                 ["FullScreen", _("Full screen")],
                 ["Toggle Fullscreen", _("Toggle Fullscreen")],
                 ["newFile", _("New project")],
@@ -110,8 +110,8 @@ class Toolbar {
                 _("Play"),
                 _("Stop"),
                 _("Record"),
-                _("Full Screen"),
-                _("Full Screen"),
+                _("Full screen"),
+                _("Full screen"),
                 _("Toggle Fullscreen"),
                 _("New project"),
                 _("Load project from file"),
@@ -175,8 +175,8 @@ class Toolbar {
                 ["play", _("Play")],
                 ["stop", _("Stop")],
                 ["record", _("Record")],
-                ["Full Screen", _("Full Screen")],
-                ["FullScreen", _("Full Screen")],
+                ["Full screen", _("Full screen")],
+                ["FullScreen", _("Full screen")],
                 ["Toggle Fullscreen", _("Toggle Fullscreen")],
                 ["newFile", _("New project")],
                 ["load", _("Load project from file")],
@@ -231,8 +231,8 @@ class Toolbar {
                 _("Play"),
                 _("Stop"),
                 _("Record"),
-                _("Full Screen"),
-                _("Full Screen"),
+                _("Full screen"),
+                _("Full screen"),
                 _("Toggle Fullscreen"),
                 _("New project"),
                 _("Load project from file"),
@@ -355,7 +355,7 @@ class Toolbar {
     renderPlayIcon(onclick) {
         const playIcon = docById("play");
         const stopIcon = docById("stop");
-
+        const recordButton = docById("record");
         let isPlayIconRunning = false;
 
         function handleClick() {
@@ -378,6 +378,11 @@ class Toolbar {
             onclick(this.activity);
             handleClick();
             stopIcon.style.color = this.stopIconColorWhenPlaying;
+            saveButton.disabled = true;
+            saveButtonAdvanced.disabled = true;
+           saveButton.className = "grey-text inactiveLink";
+           saveButtonAdvanced.className = "grey-text inactiveLink";
+           recordButton.className = "grey-text inactiveLink";
             isPlayIconRunning = true;
             play_button_debounce_timeout = setTimeout(function() { handleClick(); }, 2000);
 
@@ -399,9 +404,15 @@ class Toolbar {
      */
     renderStopIcon(onclick) {
         const stopIcon = docById("stop");
+        const recordButton = docById("record");
         stopIcon.onclick = () => {
             onclick(this.activity);
             stopIcon.style.color = "white";
+            saveButton.disabled = false;
+            saveButtonAdvanced.disabled = false;
+            saveButton.className = "";
+            saveButtonAdvanced.className = "";
+            recordButton.className = "";
         };
     }
 
@@ -827,18 +838,12 @@ class Toolbar {
                     enableHorizScrollIcon.style.display = "block";
                     enableHorizScrollIcon.onclick = () => {
                         setScroller(this.activity);
-                        this.activity.textMsg(
-                            _("Horizontal scrolling enabled.")
-                        );
                     };
                 }
                 
                 if (disableHorizScrollIcon) {
                     disableHorizScrollIcon.onclick = () => {
                         setScroller(this.activity);
-                        this.activity.textMsg(
-                            _("Horizontal scrolling disabled.")
-                        );
                     };
                 }
                 

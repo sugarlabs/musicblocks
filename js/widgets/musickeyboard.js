@@ -171,6 +171,12 @@ function MusicKeyboard(activity) {
     let selectedNotes = [];
 
     /**
+     * String of active note.
+     * @type {Array}
+     */
+    let activeKey = null;
+
+    /**
      * Array of row blocks.
      * @type {Array}
      */
@@ -507,6 +513,7 @@ function MusicKeyboard(activity) {
         };
 
         element.onmousedown = function () {
+            activeKey = element;
             __startNote(this);
         };
 
@@ -576,7 +583,18 @@ function MusicKeyboard(activity) {
         };
 
         element.onmouseup = function () {
-            __endNote(this);
+            if (activeKey === element) {
+                __endNote(this);
+                activeKey = null;
+            } else {
+                const id = activeKey.id;
+                if (id.includes("blackRow")) {
+                    activeKey.style.backgroundColor = "black";
+                } else {
+                    activeKey.style.backgroundColor = "white";
+                }
+                activeKey = null;
+            }
         };
     };
 
@@ -816,9 +834,9 @@ function MusicKeyboard(activity) {
                 '&nbsp;&nbsp;<img src="header-icons/' +
                 "stop-button.svg" +
                 '" title="' +
-                _("stop") +
+                _("Stop") +
                 '" alt="' +
-                _("stop") +
+                _("Stop") +
                 '" height="' +
                 ICONSIZE +
                 '" width="' +
@@ -1546,7 +1564,7 @@ function MusicKeyboard(activity) {
         cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) * 1.5 + "px";
         cell.style.maxWidth = cell.style.minWidth;
         cell.className = "headcol"; // This cell is fixed horizontally.
-        cell.innerHTML = _("duration");
+        cell.innerHTML = _("duration (MS)");
         cell.style.position = "sticky";
         cell.style.left = "0px";
         cell.style.zIndex = "1";
@@ -1899,7 +1917,7 @@ function MusicKeyboard(activity) {
     this._createAddRowPieSubmenu = function () {
         docById("wheelDivptm").style.display = "";
         // docById("wheelDivptm").style.zIndex = "300";
-        const pitchLabels = ["do", "re", "mi", "fa", "sol", "la", "ti"];
+        const pitchLabels = ["do", "do♯", "re", "re♯", "mi", "fa", "fa♯", "sol", "sol♯", "la", "la♯", "ti"];
         const hertzLabels = [262, 294, 327, 348, 392, 436, 490, 523];
         const VALUESLABEL = ["pitch", "hertz"];
         const VALUES = ["imgsrc: images/chime.svg", "imgsrc: images/synth.svg"];
@@ -2004,7 +2022,10 @@ function MusicKeyboard(activity) {
                     }
                 }
 
-                rLabel = pitchLabels[(i + 1) % pitchLabels.length];
+                do {
+                    rLabel = pitchLabels[(i + 1) % pitchLabels.length];
+                    i = (i + 1) % pitchLabels.length;
+                } while (this.layout.some(note => note.noteName === rLabel));
                 for (let j = this.layout.length; j > 0; j--) {
                     rArg = this.layout[j - 1].noteOctave;
                     if (isNaN(rArg)) {
@@ -2097,6 +2118,11 @@ function MusicKeyboard(activity) {
                     this.displayLayout = this.displayLayout.concat(sortedHertzList);
                     this._createKeyboard();
                     this._createTable();
+                    const n = this.layout.length;
+                    const key = this.layout[n - 1];
+                    this.getElement[key.noteName.toString() + key.noteOctave.toString()] = key.objId;
+                    this.getElement[FIXEDSOLFEGE1[key.noteName.toString()] + "" + key.noteOctave] =
+                        key.objId; //convet solfege to alphabetic.
                 }, 500);
             } else {
                 // eslint-disable-next-line no-console
@@ -2572,6 +2598,9 @@ function MusicKeyboard(activity) {
         mkbKeyboardDiv.style.width = "100%";
         mkbKeyboardDiv.style.top = "0px";
         mkbKeyboardDiv.style.overflow = "auto";
+        mkbKeyboardDiv.style.userSelect = 'none';
+        mkbKeyboardDiv.style.webkitUserSelect = 'none'; // Safari/Chrome
+        mkbKeyboardDiv.style.msUserSelect = 'none'; // Edge
         mkbKeyboardDiv.innerHTML = "";
         mkbKeyboardDiv.innerHTML =
             ' <div id="keyboardHolder2"><table class="white"><tbody><tr id="myrow"></tr></tbody></table><table class="black"><tbody><tr id="myrow2"></tr></tbody></table></div>';
@@ -3181,8 +3210,8 @@ function MusicKeyboard(activity) {
             this.activity.blocks.loadNewBlocks(newStack);
         }
 
-        if (actionGroups > 1) this.activity.textMsg(_("New action blocks generated."));
-        else this.activity.textMsg(_("New action block generated."));
+        if (actionGroups > 1) activity.textMsg(_("New action blocks generated."), 3000);
+        else activity.textMsg(_("New action block generated."), 3000);
     };
 
     /**
@@ -3367,7 +3396,7 @@ function MusicKeyboard(activity) {
             // re-init widget
             if (this.midiON) {
                 this.midiButton.style.background = "#00FF00";
-                this.activity.textMsg(_("MIDI device present."));
+                activity.textMsg(_("MIDI device present."), 3000);
                 return;
             }
             midiAccess.inputs.forEach((input) => {
@@ -3375,10 +3404,10 @@ function MusicKeyboard(activity) {
             });
             if (midiAccess.inputs.size) {
                 this.midiButton.style.background = "#00FF00";
-                this.activity.textMsg(_("MIDI device present."));
+                activity.textMsg(_("MIDI device present."), 3000);
                 this.midiON = true;
             } else {
-                this.activity.textMsg(_("No MIDI device found."));
+                activity.textMsg(_("No MIDI device found."), 3000);
             }
         };
 
@@ -3388,7 +3417,7 @@ function MusicKeyboard(activity) {
          * @memberof ClassName
          */
         const onMIDIFailure = () => {
-            this.activity.errorMsg(_("Failed to get MIDI access in browser."));
+            activity.errorMsg(_("Failed to get MIDI access in browser."), 3000);
             this.midiON = false;
         };
 

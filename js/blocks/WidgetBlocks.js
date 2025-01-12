@@ -78,7 +78,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             //.TRANS: sound envelope (ADSR)
-            super("envelope", _("envelope"));
+            super("envelope", _("Envelope").toLowerCase());
             this.setPalette("widgets", activity);
             this.setHelpString();
             this.formBlock({
@@ -168,7 +168,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             //.TRANS: a filter removes some unwanted components from a signal
-            super("filter", _("filter"));
+            super("filter", _("Filter").toLowerCase());
             this.setPalette("widgets", activity);
             this.setHelpString();
             this.formBlock({
@@ -1430,6 +1430,7 @@ function setupWidgetBlocks(activity) {
             logo.phraseMaker.rowArgs = [];
             logo.phraseMaker.graphicsBlocks = [];
             logo.phraseMaker.clearBlocks();
+            logo.phraseMaker.lyricsON = false;
 
             logo.tupletRhythms = [];
             logo.tupletParams = [];
@@ -1577,7 +1578,7 @@ function setupWidgetBlocks(activity) {
                 ]);
     
                 //.TRANS: AI-generated music
-                this.formBlock({ name: _("aimusic"), canCollapse: true });
+                this.formBlock({ name: _("AI Music"), canCollapse: true });
                 this.makeMacro((x, y) => [
                     [0, "aimusic", x, y, [null, 1]],
                     

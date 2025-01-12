@@ -3114,6 +3114,9 @@ class Block {
             ) {
                 if (this.activity.trashcan.isVisible) {
                     this.blocks.sendStackToTrash(this);
+                    this.activity.textMsg(
+                        _("You can restore deleted blocks from the trash with the Restore From Trash button."), 3000
+                    );
                 }
             } else {
                 // Otherwise, process move.
@@ -3755,20 +3758,20 @@ class Block {
                 gridLabels = [
                     _("Cartesian"),
                     _("polar"),
-                    _("Cartesian+polar"),
+                    _("Cartesian/Polar"),
                     _("none")
                 ];
                 gridValues = [
                     "Cartesian",
                     "polar",
-                    "Cartesian+polar",
+                    "Cartesian/Polar",
                     "none"
                 ];
             } else {
                 gridLabels = [
                     _("Cartesian"),
                     _("polar"),
-                    _("Cartesian+polar"),
+                    _("Cartesian/Polar"),
                     _("treble"),
                     _("grand staff"),
                     _("mezzo-soprano"),
@@ -3780,7 +3783,7 @@ class Block {
                 gridValues = [
                     "Cartesian",
                     "polar",
-                    "Cartesian+polar",
+                    "Cartesian/Polar",
                     "treble",
                     "grand staff",
                     "mezzo-soprano",
@@ -4393,9 +4396,9 @@ class Block {
                 this.value = oldValue;
             }
             
-            if(cblk1 != null && this.blocks.blockList[cblk1].name === "pitch" && (this.value > 10 || this.value < 1)) {
+            if(cblk1 != null && this.blocks.blockList[cblk1].name === "pitch" && (this.value > 8 || this.value < 1)) {
                 const thisBlock = this.blocks.blockList.indexOf(this);
-                this.activity.errorMsg(_("Octave value must be between 1 and 10."), thisBlock);
+                this.activity.errorMsg(_("Octave value must be between 1 and 8."), thisBlock);
                 this.activity.refreshCanvas();
                 this.label.value = oldValue;
                 this.value = oldValue;

@@ -18,6 +18,10 @@
 
 | Example | Description |
 | --- | --- |
+| on-beat.html | An example of using On-Strong-Beat and On-Weak-Beat to trigger graphics and other beat-specific modulations. | Music, Examples | 3 | 0 | 0 | B, A, G | 340 | G4, 392Hz | G5, 784Hz |
+
+| Example | Description |
+| --- | --- |
 | Mississippi-Hotdog.html | "Mississippi Hotdog": a simple example of a repeated phrase |
 
 | Tags | Duples | Triplets | Quintuplets | Pitch Names | Number of Notes | Lowest Note | Highest Note |

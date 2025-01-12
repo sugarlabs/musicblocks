@@ -35,7 +35,7 @@ class StringHelper {
             ["global-tab",_("Global")],
             ["global-search",_("Search for a project"),"placeholder"],
             ["localtitle",_("My Projects")],
-            ["publisher-ptitle",_("Publish Project")],
+            ["publisher-ptitle",_("Publish project")],
             ["publish-title-label",_("Project title")],
             ["publish-tags-label",_("Tags (max 5)")],
             ["publish-description-label",_("Description")],

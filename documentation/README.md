@@ -554,7 +554,7 @@ action4". You can also define a default action. [RUN LIVE](https://musicblocks.s
 Another way to do the same thing is with the _Do_ block found on the
 Action palette. In the figure below, we add the beat count to "action"
 to create a series of strings: "action1", "action2", ...,
-"action4". We then "do" that action. <!-- [RUN LIVE]() -->
+"action4". We then "do" that action. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732830205442211&run=True)
 
 ![Do](./do-actions.svg "Do actions")
 
@@ -587,7 +587,7 @@ familiar with math).
 *Pitch-time Matrix* blocks clamp is used to define the matrix:
 A row in the matrix is created for each *Pitch* block and columns are
 created for individual notes, which are created by using *Rhythm*
-blocks, individual note blocks, or the *Tuplet* block. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732180386380311&run=True)
+blocks, individual note blocks, or the *Tuplet* block. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732827221942868&run=True)
 
 
 ![Rhythm](./rhythmruler2_block.svg "Rhythm block")
@@ -600,7 +600,7 @@ for a quarter note, etc. (Recall that in traditional Western notation
 all note values are (1) in powers of two, and are (2) in relation to
 the "whole note", which is in turn (3) defined by tempo, or
 beats&mdash;usually quarter notes&mdash;per minute) Each note is
-represented by a column in the matrix. <!-- [RUN LIVE]() -->
+represented by a column in the matrix. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732457552545828&run=True)
 
 Special ratios of the whole note can be created very easily with the
 _Rhythm_ block by choosing an integer other than the traditional

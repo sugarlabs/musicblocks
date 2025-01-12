@@ -133,7 +133,7 @@ class PitchSlider {
             MakeToolbar(id);
         }
 
-        this.activity.textMsg(_("Click on the slider to create a note block."));
+        activity.textMsg(_("Click on the slider to create a note block."), 3000);
         setTimeout(this.widgetWindow.sendToCenter, 0);
     }
 

@@ -5088,7 +5088,7 @@ class Blocks {
                     if (["show", "turtleshell", "customsample"].includes(blockObjs[i][1])) {
                         switch (blockObjs[i][1]) {
                             case "show":
-                                name = _("show") + "-" + MathUtility.doRandom(0, 1000);
+                            name = _("Show").toLowerCase() + "-" + MathUtility.doRandom(0, 1000);
                                 break;
                             case "turtleshell":
                                 name = _("avatar") + "-" + MathUtility.doRandom(0, 1000);
@@ -7035,6 +7035,26 @@ class Blocks {
 
         this.setSelectedBlocks = (blocks) => {
             this.selectedBlocks = blocks;
+        };
+        
+        /**
+        * Checks if coordinates intersect with any block
+        * @public
+        * @param {number} x - The x coordinate to check
+        * @param {number} y - The y coordinate to check  
+        * @returns {boolean} True if coordinates intersect with a block
+        */
+        this.isCoordinateOnBlock = function(x, y) {
+            return this.blockList.some(block => {
+                if (block.trash) return false;
+                
+                const blockX = block.container.x;
+                const blockY = block.container.y;
+                return x >= blockX && 
+                    x <= blockX + block.width &&
+                    y >= blockY && 
+                    y <= blockY + block.height;
+            });
         };
     }
 }
