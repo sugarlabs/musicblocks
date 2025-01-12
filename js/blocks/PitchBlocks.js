@@ -926,7 +926,7 @@ function setupPitchBlocks(activity) {
             ]);
             this.formBlock({
                 //.TRANS: pitch inversion rotates a pitch around another pitch
-                name: _("invert"),
+                name: _("Invert").toLowerCase(),
                 args: 3,
                 defaults: ["sol", 4, _("even")],
                 argTypes: ["solfegein", "anyin", "anyin"],
@@ -1703,7 +1703,7 @@ function setupPitchBlocks(activity) {
             super("scaledegree", _("nth modal pitch"));
             this.setPalette("pitch", activity);
             this.setHelpString([
-                _("n^th Modal Pitch takes the pattern of pitches in semitones for a mode and makes each point a degree of the mode,") +
+                _("nth Modal Pitch takes the pattern of pitches in semitones for a mode and makes each point a degree of the mode,") +
                     " " +
                     _("starting from 1 and regardless of tonal framework (i.e. not always 8 notes in the octave)"),
                 "documentation",
@@ -1746,7 +1746,7 @@ function setupPitchBlocks(activity) {
             this.setPalette("pitch", activity);
             this.piemenuValuesC1 = [7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7];
             this.setHelpString([
-                _("N^th Modal Pitch takes a number as an input as the n^th degree for the given mode. 0 is the first position, 1 is the second, -1 is the note before the first etc.") +
+                _("Nth Modal Pitch takes a number as an input as the nth degree for the given mode. 0 is the first position, 1 is the second, -1 is the note before the first etc.") +
                     " " +
                     _("The pitches change according to the mode specified without any need for respellings."),
                 "documentation",

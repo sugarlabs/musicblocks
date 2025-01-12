@@ -271,7 +271,7 @@ function setupExtrasBlocks(activity) {
          * Creates an instance of HideBlocksBlock.
          */
         constructor() {
-            super("hideblocks", _("hide blocks"));
+            super("hideblocks", _("Hide blocks").toLowerCase());
             this.setPalette("extras", activity);
             this.setHelpString([_("The Hide blocks block hides the blocks."), "documentation", ""]);
         }
@@ -508,6 +508,8 @@ function setupExtrasBlocks(activity) {
                     logo.oscilloscopeTurtles.indexOf(activity.turtles.turtleList[turtleIndex]) < 0
                 )
                     logo.oscilloscopeTurtles.push(activity.turtles.turtleList[turtleIndex]);
+            } else if (logo.inMatrix) {
+                logo.phraseMaker.lyricsON = true;
             } else if (!logo.inStatusMatrix) {
                 if (args.length === 1) {
                     if (args[0] !== null) {
@@ -620,8 +622,8 @@ function setupExtrasBlocks(activity) {
                 case "polar":
                     act._showPolar();
                     break;
-                case _("Cartesian+polar"):
-                case "Cartesian+polar":
+                case _("Cartesian/Polar"):
+                case "Cartesian/Polar":
                     act._showPolar();
                     act._showCartesian();
                     break;

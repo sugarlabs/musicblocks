@@ -103,9 +103,11 @@ Linux systems, the `python3` command is not bound to python. You may
 need to perform a `sudo apt install python-is-python3` on Debian-like
 distros, or equivalent on others.)
 
-4. After cloning the musicblocks repository, run
+4. After cloning the musicblocks repository, you can choose one of two methods to start a local server: using Python or using npm
 
-    for _Linux_ and _macOS_:
+   **Using Python**
+
+   for _Linux_ and _macOS_:
 
     ```bash
     python -c "import os, sys; os.system('python -m SimpleHTTPServer 3000 --bind 127.0.0.1') if sys.version_info.major==2 else os.system('python -m http.server 3000 --bind 127.0.0.1')"
@@ -117,17 +119,29 @@ distros, or equivalent on others.)
     python -c "import os, sys; os.system('python -m SimpleHTTPServer 3000') if sys.version_info.major==2 else os.system('python -m http.server 3000 --bind 127.0.0.1')"
     ```
 
-    If you have `npm` installed, simply run `npm run serve` for Linux
-    and macOS, and `npm run winserve` for Windows.
+
+    **Using npm**
+
+    for _Linux_ and _macOS_:
+
+    ```bash
+    npm run serve
+    ```
+
+    for _Windows_:
+
+    ```bash
+    npm run winserve
+    ```
 
     **NOTE:** _Make sure you can run either `python` or `py` from your
     terminal, to launch the Python prompt._
 
-5. You should see a message `Serving HTTP on 127.0.0.1 port 3000
+6. You should see a message `Serving HTTP on 127.0.0.1 port 3000
 (http://127.0.0.1:3000/) ...` since the HTTP Server is set to start
 listening on port 3000.
 
-6. Open your favorite browser and visit `localhost:3000` or `127.0.0.1:3000`.
+7. Open your favorite browser and visit `localhost:3000` or `127.0.0.1:3000`.
 
 **NOTE:** _Use `ctrl + c` or `cmd + c` to quit the HTTP Server to avoid
 `socket.error:[Errno 48]`_.

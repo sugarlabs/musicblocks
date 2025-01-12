@@ -1792,6 +1792,14 @@ class Logo {
                     }
                 }
                 document.getElementById("stop").style.color = "white";
+                const saveButton = docById('saveButton');
+                const saveButtonAdvanced = docById('saveButtonAdvanced');
+                const recordButton = docById("record");
+                saveButton.disabled = false;
+                saveButtonAdvanced.disabled = false;
+                saveButton.className = "";
+                saveButtonAdvanced.className = "";
+                recordButton.className = "";
             }
         }
     }
@@ -1843,8 +1851,8 @@ class Logo {
 
         const suppressOutput = tur.singer.suppressOutput;
 
-        let arg;
         const __pen = (turtle, name, b, timeout) => {
+            let arg;
             switch (name) {
                 case "penup":
                 case "pendown":
