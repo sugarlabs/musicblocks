@@ -965,7 +965,7 @@ function MusicKeyboard(activity) {
                     this._createKeyboard();
                 }
             }
-        }, time * 1000 + 125);
+        }, time * 1000 );
     };
 
     /**
