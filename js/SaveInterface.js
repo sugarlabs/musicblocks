@@ -598,6 +598,9 @@ class SaveInterface {
                 // eslint-disable-next-line no-console
                 console.debug("Error: " + dataurl);
                 //TODO: Error message box
+                this.activity.textMsg(
+                    _("Error during PDF generation. Please try again or check your Lilypond data.")
+                );
             } else {
                 this.activity.save.download("pdf", dataurl, filename);
             }
