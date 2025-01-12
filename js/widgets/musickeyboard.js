@@ -2980,7 +2980,7 @@ function MusicKeyboard(activity) {
         var actionGroups = parseInt(selectedNotes.length / actionGroupInterval) + 1;
 
         for (let actionGroup = 0; actionGroup < actionGroups; actionGroup++) {
-            let currentSelectedNotes = selectedNotes.slice(
+            const currentSelectedNotes = selectedNotes.slice(
                 actionGroup * actionGroupInterval,
                 (actionGroup + 1) * actionGroupInterval
             );
@@ -3039,8 +3039,8 @@ function MusicKeyboard(activity) {
 
                     // note value is saved as a fraction
                     newStack.push([idx + 2, "divide", 0, 0, [idx, idx + 3, idx + 4]]);
-                    const maxWidth = Math.max.apply(Math, note.duration);
-
+                    const scaleFactor = 2.6666666665;
+                    const maxWidth = Math.max.apply(Math, note.duration) / scaleFactor;
                     const obj = toFraction(maxWidth);
                     newStack.push([idx + 3, ["number", { value: obj[0] }], 0, 0, [idx + 2]]);
                     newStack.push([idx + 4, ["number", { value: obj[1] }], 0, 0, [idx + 2]]);
