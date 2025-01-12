@@ -597,7 +597,22 @@ class SaveInterface {
             if (!success) {
                 // eslint-disable-next-line no-console
                 console.debug("Error: " + dataurl);
-                //TODO: Error message box
+                const errorBox = document.createElement("div");
+                errorBox.style.position = "fixed";
+                errorBox.style.top = "50%";
+                errorBox.style.left = "50%";
+                errorBox.style.transform = "translate(-50%, -50%)";
+                errorBox.style.padding = "20px";
+                errorBox.style.backgroundColor = "#f44336"; 
+                errorBox.style.color = "#fff"; 
+                errorBox.style.borderRadius = "5px";
+                errorBox.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
+                errorBox.innerText = "An error occurred while saving the Lilypond file as a PDF. Please try again.";
+                document.body.appendChild(errorBox);
+                setTimeout(() => {
+                    errorBox.remove();
+                }, 5000);
+
             } else {
                 this.activity.save.download("pdf", dataurl, filename);
             }
