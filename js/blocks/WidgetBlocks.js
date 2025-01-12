@@ -1630,7 +1630,7 @@ function setupWidgetBlocks(activity) {
         new oscilloscopeWidgetBlock().setup(activity);
         new PitchSliderBlock().setup(activity);
         new ChromaticBlock().setup(activity);
-        # new AIMusicBlocks().setup(activity);
+        // new AIMusicBlocks().setup(activity);
         new MusicKeyboard2Block().setup(activity);
         new MusicKeyboardBlock().setup(activity);
         new PitchStaircaseBlock().setup(activity);
