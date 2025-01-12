@@ -51,21 +51,21 @@
 }
 
 #search[type="text"] {
-  width: 400px;
+  width: 86.5px;
   box-sizing: border-box;
   position: absolute;
   background-color: white;
   background-repeat: no-repeat;
-  padding: 4.5px 10px 4.5px 20px;
+  padding: 9.2px 1.3px 8.8px 0.7px;
   -webkit-transition: width 0.4s ease-in-out;
   transition: width 0.4s ease-in-out;
-  font-size: 24px;
+  font-size: 16px;
   color: black;
   max-width: 100%;
 }
 
 #search:focus {
-  border: 2px solid #87cefa;
+  border: 0px solid #87cefa;
 }
 
 #search.open {
