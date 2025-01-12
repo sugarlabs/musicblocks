@@ -320,20 +320,6 @@ class Activity {
         }
 
 
-        // Function to handle translation and case conversion
-        function translateText(input) {
-            // Convert the input to lowercase for translation
-            let translatedText = _(input.toLowerCase());
-        
-            // Capitalize the first letter if necessary
-            if (input === input.charAt(0).toUpperCase() + input.slice(1)) {
-            translatedText = translatedText.charAt(0).toUpperCase() + translatedText.slice(1);
-            }
-            
-            // returns the tranlated text 
-            return translatedText;
-        }
-
         /**
          * Initialises major variables and renders default stack.
          * Sets up the initial state and dependencies of the activity.
@@ -408,12 +394,12 @@ class Activity {
 
             this.searchWidget = docById("search");
             this.searchWidget.style.visibility = "hidden";
-            this.searchWidget.placeholder = translateText("Search");
+            this.searchWidget.placeholder = _("Search");
 
             this.helpfulSearchWidget = document.createElement("input");
             this.helpfulSearchWidget.setAttribute("id", "helpfulSearch");
             this.helpfulSearchWidget.style.visibility = "hidden";
-            this.helpfulSearchWidget.placeholder = translateText("Search");
+            this.helpfulSearchWidget.placeholder = _("Search");
             this.helpfulSearchWidget.classList.add("ui-autocomplete");
             this.progressBar = docById("myProgress");
             this.progressBar.style.visibility = "hidden";

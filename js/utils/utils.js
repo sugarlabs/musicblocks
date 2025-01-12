@@ -58,7 +58,8 @@ const changeImage = (imgElement, from, to) => {
 };
 
 /**
- * A simple localization function for translating strings.
+ * Enhanced _() method to handle case variations for translations
+ * and preserve the case of the input text.
  * @function
  * @param {string} text - The input text to be translated.
  * @returns {string} The translated text.
@@ -69,47 +70,73 @@ function _(text) {
         return "";
     }
 
-    let replaced = text;
-    const replace = [
-        ",",
-        "(",
-        ")",
-        "?",
-        "¿",
-        "<",
-        ">",
-        ".",
-        "\n",
-        '"',
-        ":",
-        "%s",
-        "%d",
-        "/",
-        "'",
-        ";",
-        "×",
-        "!",
-        "¡"
-    ];
-    for (let p = 0; p < replace.length; p++) {
-        replaced = replaced.replace(replace[p], "");
-    }
-
-    replaced = replaced.replace(/ /g, "-");
-
-    if (localStorage.kanaPreference === "kana") {
-        const lang = document.webL10n.getLanguage();
-        if (lang === "ja") {
-            replaced = "kana-" + replaced;
-        }
-    }
-
     try {
-        let translation = document.webL10n.get(replaced);
-        if (translation === "") {
-            translation = text;
+        let replaced = text;
+        // Replace certain characters from the input text
+        const replace = [
+            ",",
+            "(",
+            ")",
+            "?",
+            "¿",
+            "<",
+            ">",
+            ".",
+            "\n",
+            '"',
+            ":",
+            "%s",
+            "%d",
+            "/",
+            "'",
+            ";",
+            "×",
+            "!",
+            "¡"
+        ];
+        for (let p = 0; p < replace.length; p++) {
+            replaced = replaced.replace(replace[p], "");
         }
-        return translation;
+
+        replaced = replaced.replace(/ /g, "-");
+
+        if (localStorage.kanaPreference === "kana") {
+            const lang = document.webL10n.getLanguage();
+            if (lang === "ja") {
+                replaced = "kana-" + replaced;
+            }
+        }
+        // first, we actually tried to find out if there was an existing translation with SAME case
+        let translated = document.webL10n.get(text);
+
+        // If no translation is found, try the lowercase translation
+        if (!translated || translated === text) {
+            translated = document.webL10n.get(text.toLowerCase());
+        }
+
+        //if still no translation is found, try the initial caps translation too
+        if (!translated || translated === text) {
+            const initialCaps = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+            translated = document.webL10n.get(initialCaps);
+        }
+
+        //function returns the ORIGINAL case without any translation if no translation exists
+        translated = translated || text;
+
+        // this if ensures Correct LETTER CASING, for example, "Search" -> "Buscar" and "SEARCH" -> "BUSCAR" and "search" -> "buscar"
+        if (text === text.toUpperCase()) {
+            //if the input is all uppercase, then we will return the translation in uppercase
+            return translated.toUpperCase();
+        } else if (text === text.toLowerCase()) {
+            //if the input is all lowercase,then return the translation in lowercase
+            return translated.toLowerCase();
+        } else if (text.charAt(0).toUpperCase() + text.slice(1).toLowerCase() === text) {
+            //if the input is in title case, then return the translation in title case
+            return translated.charAt(0).toUpperCase() + translated.slice(1).toLowerCase();
+        }
+
+        // return the translation as is if any of the case does not match
+        return translated;
     } catch (e) {
         // console.debug("i18n error: " + text);
         return text;
@@ -130,7 +157,7 @@ let format = (str, data) => {
             if (x === undefined) {
                 // eslint-disable-next-line no-console
                 console.debug("Undefined value in template string", str, name, x, v);
-            }
+            }  
 
             x = x[v];
         });
