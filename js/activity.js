@@ -284,8 +284,11 @@ class Activity {
                 if (typeof this.isDarkModeON === "string") {
                     if (this.isDarkModeON === "true") {
                         this.isDarkModeON = true;
+                        body.classList.add('dark-mode');
+                        //navbar.classList.add('dark-mode');
                     } else if (this.isDarkModeON === "false") {
                         this.isDarkModeON = false;
+                        body.classList.remove('dark-mode');
                     }
                 }
             }
