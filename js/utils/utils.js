@@ -167,7 +167,7 @@ let format = (str, data) => {
             if (x === undefined) {
                 // eslint-disable-next-line no-console
                 console.debug("Undefined value in template string", str, name, x, v);
-            }  
+            }
 
             x = x[v];
         });
@@ -179,7 +179,6 @@ let format = (str, data) => {
         return _(item);
     });
 };
-
 
 /**
  * Detects the current browser name.
