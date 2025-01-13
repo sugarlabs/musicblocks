@@ -29,14 +29,14 @@ You can run it from
 2. [Toolbars](#2-toolbars)
 3. [Context Menu](#3-context-menu)
 4. [The Block Context Menu](#4-the-block-context-menu)
-    1. [Extract Option](#41-extract-option)
-    2. [Duplicate Option](#42-duplicate-option)
-    3. [Delete Option](#43-delete-option)
-    4. [Help Option](#44-help-option)
+    1. [Extract Option](#1-extract)
+    2. [Duplicate Option](#2-duplicate)
+    3. [Delete Option](#3-delete)
+    4. [Help Option](#4-help)
 5. [Keyboard Shortcuts](#5-keyboard-shortcuts)
 6. [Block Palettes](#6-block-palettes)
-    1. [Defining a Note](#61-defining-a-note)
-    2. [A Quick Tour of Selected Blocks](#62-a-quick-tour-of-selected-blocks)
+    1. [Defining a Note](#1-defining-a-note)
+    2. [A Quick Tour of Selected Blocks](#2-a-quick-tour-of-selected-blocks)
 7. [Flow Palette](#7-flow-palette)
 8. [Widget Palette](#8-widget-palette)
 9. [Stats](#9-stats)
@@ -163,9 +163,13 @@ Located at the lower right of the canvas, this small toolbar provides additional
 
 ---
 
-### 6. Contextual Menu
+## <a>3. Context Menu</a>
 
-#### Contextual Menu for Blocks:
+[Back to Table of Contents](#table-of-contents)
+
+Context menus are an important part of user interfaces that provide users with quick access to a set of actions relevant to the context in which they are working.The right-click context menu in Music Blocks provides several options for working with blocks and the workspace. To access the right-click context menu, simply right-click anywhere in the workspace.
+
+### 1. Contextual Menu for Blocks:
 When you right-click on a block, the following options are available:
 - **Extract**: Detaches the selected block from its current position, making it a standalone entity.
 - **Move to Trash**: Deletes the selected block by moving it to the trash.
@@ -173,7 +177,7 @@ When you right-click on a block, the following options are available:
 - **Help**: Provides detailed information about the functionality of the selected block.
 - **Close**: Closes the contextual menu.
 
-#### Contextual Menu for Background:
+### 2. Contextual Menu for Background:
 When you right-click on the background, the following options are available:
 - **Grid**: Toggles the display of a grid in the workspace for better alignment and organization.
 - **Set Pitch Preview**: Adjusts and previews pitches while working on a composition.
@@ -191,22 +195,13 @@ When you right-click on the background, the following options are available:
 - **Clean**: Organizes and tidies up the workspace by aligning blocks systematically.
 - **Select**: Enables selection mode for selecting multiple blocks or elements in the workspace.
 
----
-
-### 7. Pie Menus
+###  3. Pie Menus
 
 Many blocks in Music Blocks also feature "pie menus" that allow you to change block parameters quickly by selecting options from a circular menu that appears when you hover over the block.
 
----
-
 For further details on how to use these toolbars effectively, you can refer to the [Turtle Blocks Documentation](https://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
 
-
-## <a>3. Context Menu</a>
-
-[Back to Table of Contents](#table-of-contents)
-
-Context menus are an important part of user interfaces that provide users with quick access to a set of actions relevant to the context in which they are working.The right-click context menu in Music Blocks provides several options for working with blocks and the workspace. To access the right-click context menu, simply right-click anywhere in the workspace.
+---
 
 ## <a>4. The Block Context Menu</a>
 
@@ -218,14 +213,14 @@ This context menu appears when you right-click on a block in the workspace. It p
 ![Right-click context menu](./block_context.png "Right-click context menu")
 
 
-# Extract
+## 1. Extract
 
 The "Extract" option in Music Blocks allows you to separate a nested block into its individual components or sub-blocks. This can be useful if you want to modify or reuse specific parts of a block without affecting the rest of the block.
 
 ![Extract the selected block](./extract.png "Extract the selected block")
 
 
-# Duplicate
+## 2. Duplicate
 
 
 This option creates a duplicate of the selected block and places it next to the original block.
@@ -233,13 +228,13 @@ This option creates a duplicate of the selected block and places it next to the 
 ![Duplicate](./duplicate.png "Duplicate")
 
 
-# Delete
+## 3. Delete
 
 This option removes the selected block from your program
 
 ![Delete](./delete.png "Delete")
 
-# Help
+## 4. Help
 
 
 This option shows a help screen with information about the selected block. You can use this option to learn more about the block's functionality and how to use it in your projects.
@@ -249,7 +244,7 @@ This option shows a help screen with information about the selected block. You c
 By using the right-click context menu in Music Blocks, you can quickly perform common tasks and manipulate blocks on the workspace. This can help you to work more efficiently and effectively in your projects.
 
 
-## Keyboard shortcuts
+## 5. Keyboard shortcuts
 
 
 [Back to Table of Contents](#table-of-contents)
@@ -272,7 +267,7 @@ You can directly type notes using _d_ for `Do`, _r_ for `Re`, _m_ for
 `Mi`, _f_ for `Fa`, _s_ for `Sol`, _l_ for `La`, and _t_ for `Ti`.
 
 
-## Block Palettes
+## 6. Block Palettes
 
 
 [Back to Table of Contents](#table-of-contents)
@@ -297,7 +292,7 @@ All of the other palettes are described in the
 [Turtle Blocks documentation pages](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
 
 
-## Defining a note
+### 1. Defining a note
 
 ![The Note Block](./newnote_block.svg "the note")
 
@@ -346,7 +341,7 @@ will play together as a chord. You can also insert graphics blocks
 inside a note in order to create sound-sync animations.
 
 
-## A quick tour of selected blocks
+### 2. A quick tour of selected blocks
 
 
 ![The Set Instrument block](./settimbre_block.svg "Set instrument block")
@@ -533,7 +528,7 @@ karaoke. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=173217248337
 
 
 
-## Flow Palette
+## 7. Flow Palette
 [Back to Table of Contents](#table-of-contents)
 
 
@@ -559,7 +554,7 @@ to create a series of strings: "action1", "action2", ...,
 ![Do](./do-actions.svg "Do actions")
 
 
-## Widget Palette
+## 8. Widget Palette
 
 
 [Back to Table of Contents](#table-of-contents)
@@ -647,7 +642,7 @@ More details about all of the widgets are available in the
 [Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md).
 
 
-## Stats
+## 9. Stats
 
 
 [Back to Table of Contents](#table-of-contents)
@@ -658,7 +653,7 @@ toolbar in advanced mode.
 ![Stats](./stats.svg "Stats Details")
 
 
-## Planet View
+## 10. Planet View
 
 
 [Back to Table of Contents](#table-of-contents)
