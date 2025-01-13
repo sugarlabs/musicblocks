@@ -425,9 +425,6 @@ const createHelpContent = (activity) => {
     }
 
     let LOGO = LOGODEFAULT;
-    if (language === "ja") {
-        LOGO = LOGOJA;
-    }
 
     if (_THIS_IS_TURTLE_BLOCKS_) {
         HELPCONTENT = [
