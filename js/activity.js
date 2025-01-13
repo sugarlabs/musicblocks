@@ -2408,7 +2408,7 @@ class Activity {
         this.showSearchWidget = () => {
             // Bring widget to top.
             this.searchWidget.style.zIndex = 1001;
-            this.searchWidget.style.border = "2px solid blue";
+            this.searchWidget.style.border = "2px solid lightblue";
             if (this.helpfulSearchDiv) {
                 this._hideHelpfulSearchWidget();
             }
