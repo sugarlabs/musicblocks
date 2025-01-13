@@ -591,18 +591,23 @@ class SaveInterface {
      * @instance
      */
     afterSaveLilypondPDF(lydata, filename) {
-        document.body.style.cursor = "wait";
+        document.body.style.cursor = "wait"; 
+        
         window.Converter.ly2pdf(lydata, (success, dataurl) => {
-            document.body.style.cursor = "default";
+            document.body.style.cursor = "default"; 
+    
             if (!success) {
-                // eslint-disable-next-line no-console
                 console.debug("Error: " + dataurl);
-                //TODO: Error message box
+                this.showErrorMessageBox("An error occurred while converting the Lilypond file to PDF. Please try again.");
             } else {
                 this.activity.save.download("pdf", dataurl, filename);
             }
         });
     }
+    showErrorMessageBox(message) {
+        alert(message);
+    }
+    
 
     /**
     * 
