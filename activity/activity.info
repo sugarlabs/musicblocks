@@ -9,6 +9,7 @@ website = http://sugarlabs.github.io/musicblocks/guide/
 categories = programming art music
 summary = A Logo-inspired mouse that plays music
 repository = https://github.com/sugarlabs/musicblocks
+supports_dark_mode = true
 
 
 

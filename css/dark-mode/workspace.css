@@ -1,0 +1,23 @@
+/* Dark mode styles for workspace */
+:root {
+    --dark-bg: #1a1a1a;
+    --dark-secondary: #2e2e2e;
+    --dark-border: #3d3d3d;
+    --dark-text: #ffffff;
+}
+
+body.dark-mode {
+    background-color: var(--dark-bg);
+    color: var(--dark-text);
+}
+
+/* Other UI elements */
+body.dark-mode .palette {
+    background-color: var(--dark-secondary);
+    border: 1px solid var(--dark-border);
+}
+
+body.dark-mode .toolbar {
+    background-color: var(--dark-secondary);
+    border-color: var(--dark-border);
+} 

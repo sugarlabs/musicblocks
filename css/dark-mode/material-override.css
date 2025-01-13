@@ -1,0 +1,28 @@
+/* Material Design Overrides */
+.dark-mode .nav-wrapper,
+.dark-mode .blue,
+.dark-mode [class*="blue"],
+.dark-mode [class*="darken"],
+.dark-mode [class*="lighten"],
+.dark-mode .materialize-iso,
+.dark-mode .materialize-red,
+.dark-mode nav,
+.dark-mode header,
+.dark-mode .toolbar {
+    background: #1a1a1a !important;
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+/* Override any Material Design components */
+.dark-mode .btn,
+.dark-mode .btn-floating,
+.dark-mode .dropdown-trigger,
+.dark-mode .dropdown-content,
+.dark-mode .modal,
+.dark-mode .modal-content,
+.dark-mode .collection,
+.dark-mode .collection-item {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+} 

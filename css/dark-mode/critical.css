@@ -1,0 +1,30 @@
+/* Critical dark mode styles */
+.dark-mode #loading-image-container {
+    background: #1a1a1a !important;
+    background-color: #1a1a1a !important;
+}
+
+.dark-mode #canvas,
+.dark-mode #myCanvas,
+.dark-mode #overlayCanvas,
+.dark-mode .canvasHolder,
+.dark-mode #workspace {
+    background: #1a1a1a !important;
+    background-color: #1a1a1a !important;
+}
+
+/* Force dark mode on workspace */
+.dark-mode .workspace,
+.dark-mode .workspace *:not(.block):not(.blockLabel) {
+    background: #1a1a1a !important;
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+/* Force dark mode on canvas container */
+.dark-mode .canvasHolder,
+.dark-mode .canvasHolder *:not(.block):not(.blockLabel) {
+    background: #1a1a1a !important;
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+} 

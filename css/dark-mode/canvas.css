@@ -1,0 +1,22 @@
+/* Force dark mode on canvas elements */
+.dark-mode #workspace,
+.dark-mode .canvasHolder,
+.dark-mode #canvas,
+.dark-mode #myCanvas,
+.dark-mode #overlayCanvas,
+.dark-mode #hideContents {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+/* SVG and graphical elements */
+.dark-mode svg,
+.dark-mode path,
+.dark-mode rect,
+.dark-mode circle,
+.dark-mode line,
+.dark-mode polyline,
+.dark-mode polygon {
+    fill: currentColor !important;
+    stroke: currentColor !important;
+} 

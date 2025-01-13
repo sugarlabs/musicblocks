@@ -1,0 +1,53 @@
+/* Force dark mode on block containers */
+.dark-mode .palette,
+.dark-mode .paletteContainer,
+.dark-mode #palette {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+/* Preserve block colors */
+.dark-mode .block.start { background-color: #FFB800 !important; }
+.dark-mode .block.pitch { background-color: #4CAF50 !important; }
+.dark-mode .block.note { background-color: #FF8A65 !important; }
+.dark-mode .block.rhythm { background-color: #7CB342 !important; }
+.dark-mode .block.drum { background-color: #00BCD4 !important; }
+.dark-mode .block.number { background-color: #FF69B4 !important; }
+
+/* Block value inputs */
+.dark-mode .value {
+    background-color: #FF69B4 !important; /* Pink for value inputs */
+}
+
+/* Block text and labels */
+.dark-mode .blockLabel,
+.dark-mode .blockText,
+.dark-mode .blockValue {
+    color: #000000 !important; /* Keep text dark for readability on colored blocks */
+}
+
+/* Block workspace */
+.dark-mode #workspace {
+    background-color: #1a1a1a !important;
+}
+
+/* Left sidebar categories */
+.dark-mode .blockCategory {
+    background-color: #2d2d2d !important;
+    border-bottom: 1px solid #4d4d4d !important;
+}
+
+/* Block connections */
+.dark-mode .blockConnectionPoint {
+    background-color: #ffffff !important;
+}
+
+/* Block hover states */
+.dark-mode .block:hover {
+    filter: brightness(1.1);
+}
+
+/* Block selection */
+.dark-mode .block.selected {
+    outline: 2px solid #ffffff !important;
+} 

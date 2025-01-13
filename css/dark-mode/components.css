@@ -1,0 +1,108 @@
+/* Wheel navigation and special components */
+.dark-mode .wheelNav,
+.dark-mode #wheelDiv,
+.dark-mode #wheelDiv2,
+.dark-mode #meterWheelDiv,
+.dark-mode #contextWheelDiv,
+.dark-mode #submenuWheelDiv,
+.dark-mode #helpfulWheelDiv {
+    background-color: #2d2d2d !important;
+    color: #ffffff !important;
+}
+
+/* Modal and dialog components */
+.dark-mode .modal,
+.dark-mode #lilypondModal,
+.dark-mode .modal-overlay,
+.dark-mode #helpElem,
+.dark-mode #tourData {
+    background-color: #2d2d2d !important;
+    color: #ffffff !important;
+}
+
+/* Lists and dropdowns */
+.dark-mode ul,
+.dark-mode li,
+.dark-mode .dropdown-content li > a,
+.dark-mode .dropdown-content li > span {
+    background-color: #2d2d2d !important;
+    color: #ffffff !important;
+}
+
+/* Additional components */
+.dark-mode .search-wrapper,
+.dark-mode .search-results,
+.dark-mode .help-container,
+.dark-mode .settings-container,
+.dark-mode .plugin-container {
+    background-color: #2d2d2d !important;
+    color: #ffffff !important;
+}
+
+/* Ensure all icons are visible */
+.dark-mode i.material-icons {
+    color: #ffffff !important;
+}
+
+/* Handle hover states */
+.dark-mode .btn:hover,
+.dark-mode button:hover,
+.dark-mode .nav-wrapper a:hover {
+    background-color: #4d4d4d !important;
+}
+
+/* Status indicators */
+.dark-mode .status-indicator,
+.dark-mode .loading-indicator,
+.dark-mode .progress-bar {
+    background-color: #3d3d3d !important;
+    color: #ffffff !important;
+}
+
+/* Block specific components */
+.dark-mode .set-instrument {
+    background-color: #00BCD4 !important; /* Cyan */
+}
+
+.dark-mode .pitch-block {
+    background-color: #4CAF50 !important; /* Green */
+}
+
+.dark-mode .note-value {
+    background-color: #FF69B4 !important; /* Pink */
+}
+
+.dark-mode .drum-block {
+    background-color: #00BCD4 !important; /* Cyan */
+}
+
+/* Block labels */
+.dark-mode .name-label,
+.dark-mode .value-label,
+.dark-mode .number-label {
+    color: #000000 !important;
+    background-color: transparent !important;
+}
+
+/* Block connections */
+.dark-mode .connector {
+    background-color: #ffffff !important;
+}
+
+/* Block shadows */
+.dark-mode .block {
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Force dark mode on components */
+.dark-mode .modal,
+.dark-mode .modal-content,
+.dark-mode .modal-footer,
+.dark-mode .modal-header,
+.dark-mode .tooltipped,
+.dark-mode .tooltip-content,
+.dark-mode .collection,
+.dark-mode .collection-item {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+} 

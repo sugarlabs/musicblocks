@@ -1,0 +1,89 @@
+/* Import other dark mode files */
+@import 'base.css';
+@import 'ui.css';
+@import 'components.css';
+@import 'canvas.css';
+@import 'blocks.css';
+@import 'workspace.css';
+@import 'canvas-override.css';
+@import 'easel.css';
+@import 'sugar.css';
+
+/* Force dark mode on ALL elements */
+.dark-mode,
+.dark-mode *:not([class*="block"]):not([class*="blockLabel"]) {
+    background: #1a1a1a !important;
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+    border-color: #3d3d3d !important;
+}
+
+/* Specifically target the white workspace area */
+.dark-mode #body,
+.dark-mode #canvas,
+.dark-mode #myCanvas,
+.dark-mode #overlayCanvas,
+.dark-mode .canvasHolder,
+.dark-mode #workspace,
+.dark-mode #loading-image-container,
+.dark-mode .palette,
+.dark-mode .paletteContainer,
+.dark-mode .blockContainer,
+.dark-mode .blockArea,
+.dark-mode .wheelNav,
+.dark-mode #searchBar,
+.dark-mode .search-wrapper {
+    background: #1a1a1a !important;
+    background-color: #1a1a1a !important;
+}
+
+/* Force dark mode on Material Design elements */
+.dark-mode .nav-wrapper,
+.dark-mode .blue,
+.dark-mode [class*="blue"],
+.dark-mode [class*="darken"],
+.dark-mode [class*="lighten"],
+.dark-mode .materialize-iso {
+    background: #1a1a1a !important;
+    background-color: #1a1a1a !important;
+}
+
+/* Preserve block colors */
+.dark-mode .block,
+.dark-mode [class*="block-"],
+.dark-mode .blockLabel,
+.dark-mode [class*="block"] {
+    background-color: initial !important;
+    color: initial !important;
+    border-color: initial !important;
+}
+
+/* Force dark mode on any dynamically added content */
+.dark-mode div,
+.dark-mode span,
+.dark-mode table,
+.dark-mode tr,
+.dark-mode td,
+.dark-mode th,
+.dark-mode input,
+.dark-mode select,
+.dark-mode button {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
+}
+
+/* Force dark mode on CreateJS stage */
+.dark-mode #canvas,
+.dark-mode canvas,
+.dark-mode .createjs-canvas {
+    background: #1a1a1a !important;
+    background-color: #1a1a1a !important;
+}
+
+/* Force dark mode on stage container */
+.dark-mode .canvasHolder,
+.dark-mode #workspace,
+.dark-mode [class*="createjs-container"] {
+    background: #1a1a1a !important;
+    background-color: #1a1a1a !important;
+} 
