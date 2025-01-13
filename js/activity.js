@@ -505,9 +505,12 @@ class Activity {
 
         /*
          * Sets up right click functionality opening the context menus
-         * (if block is right clicked)
+         * (if block is right clicked or long-pressed)
          */
         this.doContextMenus = () => {
+            let longPressTimer = null;
+            const LONG_PRESS_DURATION = 500;
+
             document.addEventListener(
                 "contextmenu",
                 (event) => {
@@ -521,6 +524,38 @@ class Activity {
                 },
                 false
             );
+
+            // Add touch event handlers
+            document.addEventListener("touchstart", (event) => {
+                if (event.touches.length !== 1) return;
+                
+                const touch = event.touches[0];
+                if (!this.beginnerMode && touch.target.id === "myCanvas" && 
+                    !this.blocks.isCoordinateOnBlock(touch.clientX, touch.clientY)) {
+                    longPressTimer = setTimeout(() => {
+                        const touchEvent = {
+                            clientX: touch.clientX,
+                            clientY: touch.clientY,
+                            preventDefault: () => {},
+                            stopPropagation: () => {},
+                            target: touch.target
+                        };
+                        this._displayHelpfulWheel(touchEvent);
+                    }, LONG_PRESS_DURATION);
+                }
+            }, false);
+
+            // Clear timer if touch ends or moves
+            const clearTimer = () => {
+                if (longPressTimer) {
+                    clearTimeout(longPressTimer);
+                    longPressTimer = null;
+                }
+            };
+
+            document.addEventListener("touchend", clearTimer, false);
+            document.addEventListener("touchcancel", clearTimer, false);
+            document.addEventListener("touchmove", clearTimer, false);
         };
 
         /*
@@ -553,6 +588,18 @@ class Activity {
             }
 
             docById("helpfulWheelDiv").style.display = "";
+
+            docById("helpfulWheelDiv").addEventListener('touchstart', (e) => {
+                e.stopPropagation();
+            }, true);
+            
+            docById("helpfulWheelDiv").addEventListener('touchend', (e) => {
+                e.stopPropagation();
+            }, true);
+            
+            docById("helpfulWheelDiv").addEventListener('touchmove', (e) => {
+                e.stopPropagation();
+            }, true);
 
             const wheel = new wheelnav("helpfulWheelDiv", null, 300, 300);
             wheel.colors = platformColor.wheelcolors;
@@ -1933,7 +1980,8 @@ class Activity {
             // Assuming you have defined 'that' and 'closeAnyOpenMenusAndLabels' elsewhere in your code
 
             const myCanvas = document.getElementById("myCanvas");
-            const initialTouches = [[null, null], [null, null]]; // Array to track two fingers (Y and X coordinates)
+            let lastTouchY = null;
+            let lastTouchX = null;
 
             /**
              * Handles touch start event on the canvas.
@@ -1941,54 +1989,47 @@ class Activity {
              */
             myCanvas.addEventListener("touchstart", (event) => {
                 if (event.touches.length === 2) {
-                    for (let i = 0; i < 2; i++) {
-                        initialTouches[i][0] = event.touches[i].clientY;
-                        initialTouches[i][1] = event.touches[i].clientX;
-                    }
-                }
-            });
+                    event.preventDefault();
+                    that.inTwoFingerScroll = true;
 
-            /**
-             * Handles touch move event on the canvas.
-             * @param {TouchEvent} event - The touch event object.
-             */
+                    closeAnyOpenMenusAndLabels();
+
+                    lastTouchY = (event.touches[0].clientY + event.touches[1].clientY) / 2;
+                    lastTouchX = (event.touches[0].clientX + event.touches[1].clientX) / 2;
+                }
+            }, { passive: false });
+
             myCanvas.addEventListener("touchmove", (event) => {
-                if (event.touches.length === 2) {
-                    for (let i = 0; i < 2; i++) {
-                        const touchY = event.touches[i].clientY;
-                        const touchX = event.touches[i].clientX;
-
-                        if (initialTouches[i][0] !== null && initialTouches[i][1] !== null) {
-                            const deltaY = touchY - initialTouches[i][0];
-                            const deltaX = touchX - initialTouches[i][1];
-
-                            if (deltaY !== 0) {
-                                closeAnyOpenMenusAndLabels();
-                                that.blocksContainer.y -= deltaY;
-                            }
-
-                            if (deltaX !== 0) {
-                                closeAnyOpenMenusAndLabels();
-                                that.blocksContainer.x -= deltaX;
-                            }
-
-                            initialTouches[i][0] = touchY;
-                            initialTouches[i][1] = touchX;
-                        }
+                if (event.touches.length === 2 && that.inTwoFingerScroll) {
+                    event.preventDefault();
+                    
+                    // Calculate center point
+                    const currentTouchY = (event.touches[0].clientY + event.touches[1].clientY) / 2;
+                    const currentTouchX = (event.touches[0].clientX + event.touches[1].clientX) / 2;
+                    
+                    if (lastTouchY !== null && lastTouchX !== null) {
+                        const deltaY = currentTouchY - lastTouchY;
+                        const deltaX = currentTouchX - lastTouchX;
+                        that.blocks.moveContainer(deltaX, deltaY);
                     }
-
-                    that.refreshCanvas();
+                    
+                    lastTouchY = currentTouchY;
+                    lastTouchX = currentTouchX;
                 }
-            });
+            }, { passive: false });
 
-            /**
-             * Handles touch end event on the canvas.
-             */
             myCanvas.addEventListener("touchend", () => {
-                for (let i = 0; i < 2; i++) {
-                    initialTouches[i][0] = null;
-                    initialTouches[i][1] = null;
+                that.inTwoFingerScroll = false;
+                lastTouchY = null;
+                lastTouchX = null;
+                
+                // Clear throttle timers
+                if (that.blocks._scrollThrottleTimer) {
+                    clearTimeout(that.blocks._scrollThrottleTimer);
+                    that.blocks._scrollThrottleTimer = null;
                 }
+
+                that.refreshCanvas();
             });
 
             /**

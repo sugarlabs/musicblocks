@@ -3341,6 +3341,18 @@ const piemenuBlockContext = (block) => {
 
     docById("contextWheelDiv").style.display = "";
 
+    docById("contextWheelDiv").addEventListener('touchstart', (e) => {
+        e.stopPropagation();
+    }, true);
+    
+    docById("contextWheelDiv").addEventListener('touchend', (e) => {
+        e.stopPropagation();
+    }, true);
+    
+    docById("contextWheelDiv").addEventListener('touchmove', (e) => {
+        e.stopPropagation();
+    }, true);
+
     const labels = [
         "imgsrc:header-icons/copy-button.svg",
         "imgsrc:header-icons/extract-button.svg",
