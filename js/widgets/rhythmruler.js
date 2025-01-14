@@ -20,7 +20,7 @@
    TONEBPM, Singer, _, delayExecution, docById,
    calcNoteValueToDisplay, platformColor, beginnerMode, last,
    EIGHTHNOTEWIDTH, nearestBeat, rationalToFraction, DRUMNAMES,
-   VOICENAMES, EFFECTSNAMES
+   VOICENAMES, EFFECTSNAMES, wheelnav, slicePath
 */
 /*
     Globals location
@@ -560,15 +560,98 @@ class RhythmRuler {
          * @private
          * @returns {void}
          */
-        this._dissectNumber.oninput = () => {
-            // Put a limit on the size (2 <--> 128).
-            this._dissectNumber.onmouseout = () => {
-                this._dissectNumber.value = Math.max(this._dissectNumber.value, 2);
+        const that = this;
+        this._dissectNumber.onclick = (event) => {
+            const values = activity.beginnerMode ? [2, 3, 4] : [2, 3, 4, 5, 7];
+
+            const menuDiv = docById('wheelDivptm');
+            menuDiv.innerHTML = ''; 
+
+            menuDiv.style.display = '';
+            const x = event.clientX - 50;
+            const y = event.clientY - 50;
+            menuDiv.style.position = 'absolute';
+            menuDiv.style.left = Math.min(activity.canvas.width - 200, Math.max(0, x)) + 'px';
+            menuDiv.style.top = Math.min(activity.canvas.height - 250, Math.max(0, y)) + 'px';
+
+            const wheelNav = new wheelnav('wheelDivptm', null, 200, 200);
+            wheelNav.colors = platformColor.wheelcolors;
+            wheelNav.slicePathFunction = slicePath().DonutSlice;
+            wheelNav.slicePathCustom = slicePath().DonutSliceCustomization();
+            wheelNav.sliceSelectedPathCustom = wheelNav.slicePathCustom;
+            wheelNav.sliceInitPathCustom = wheelNav.slicePathCustom;
+            wheelNav.clickModeRotate = false;
+
+            const exitMenu = () => {
+                menuDiv.style.display = 'none';
+                document.removeEventListener('click', handleOutside);
+                if (wheelNav) {
+                    wheelNav.removeWheel();
+                }
             };
 
-            this._dissectNumber.value = Math.max(Math.min(this._dissectNumber.value, 128), 2);
+            // Click outside to close
+            const handleOutside = (e) => {
+                if (!menuDiv.contains(e.target) && e.target !== that._dissectNumber) {
+                    exitMenu();
+                }
+            };
+            setTimeout(() => {
+                document.addEventListener('click', handleOutside);
+            }, 0);
+
+            // Configure center button for close
+            wheelNav.centerButton = true;
+            wheelNav.centerButtonRadius = 25;
+            wheelNav.centerButtonHover = true;
+            wheelNav.centerButtonClickable = true;
+            wheelNav.centerButtonCallback = exitMenu;
+            wheelNav.centerButtonContent = '×';
+
+            const labels = values.map(v => v.toString());
+            wheelNav.initWheel(labels);
+            wheelNav.createWheel();
+
+            // Add click handlers for numbers
+            for (let i = 0; i < values.length; i++) {
+                wheelNav.navItems[i].navigateFunction = () => {
+                    that._dissectNumber.value = values[i];
+                    that._update();
+                    exitMenu();
+                };
+            }
+            // manual entry
+            const inputDiv = document.createElement('div');
+            inputDiv.style.position = 'absolute';
+            inputDiv.style.top = '50%';
+            inputDiv.style.left = '50%';
+            inputDiv.style.transform = 'translate(-50%, -50%)';
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.min = '2';
+            input.max = '128';
+            input.value = that._dissectNumber.value;
+
+            input.oninput = () => {
+                if (input.value.length > 3) {
+                    input.value = input.value.slice(0, 3);
+                }
+                // Ensure value is between 2-128
+                let value = parseInt(input.value);
+                if (value < 2) input.value = '2';
+                if (value > 128) input.value = '128';
+            };
+            input.onchange = () => {
+                that._dissectNumber.value = input.value;
+                that._update();
+                exitMenu();
+            };
+            inputDiv.appendChild(input);
+            menuDiv.appendChild(inputDiv);
         };
 
+        // Remove mouseout handler
+        this._dissectNumber.onmouseout = null;
         /**
          * Event handler for the click event of the undo button.
          * Undoes the last action.
