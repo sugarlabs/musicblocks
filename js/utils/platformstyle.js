@@ -19,7 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* exported showButtonHighlight */
 
-const isDarkModeON = JSON.parse(localStorage.darkMode);
+const isDarkModeON = localStorage.darkMode
+  ? JSON.parse(localStorage.darkMode)
+  : false;
+
 
 window.platform = {
     android: /Android/i.test(navigator.userAgent),
