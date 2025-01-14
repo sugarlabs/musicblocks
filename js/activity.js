@@ -1282,8 +1282,16 @@ class Activity {
                     }
                 );
 
-                const filename = window.prompt("Enter file name"),
-                    downloadLink = document.createElement("a");
+                const filename = window.prompt(_("Enter file name"));
+                if (filename === null || filename.trim() === "") {
+                    alert(_("File save canceled"));
+                    flag = 0;
+                    recording();
+                    doRecordButton();
+                    return; // Exit without saving the file
+                }
+
+                const downloadLink = document.createElement("a");
                 downloadLink.href = URL.createObjectURL(blob);
                 downloadLink.download = `${filename}.webm`;
 
@@ -1295,7 +1303,7 @@ class Activity {
                 // eslint-disable-next-line no-use-before-define
                 recording();
                 doRecordButton();
-                that.textMsg("click on stop sharing");
+                that.textMsg(_("Click on stop saving"));
             }
             /**
              * Stops the recording process.
@@ -2400,7 +2408,7 @@ class Activity {
         this.showSearchWidget = () => {
             // Bring widget to top.
             this.searchWidget.style.zIndex = 1001;
-            this.searchWidget.style.border = "2px solid blue";
+            this.searchWidget.style.border = "2px solid lightblue";
             if (this.helpfulSearchDiv) {
                 this._hideHelpfulSearchWidget();
             }

@@ -160,7 +160,7 @@ class ModeWidget {
         this._setMode();
 
         //.TRANS: A circle of notes represents the musical mode.
-        this.activity.textMsg(_("Click in the circle to select notes for the mode."));
+        activity.textMsg(_("Click in the circle to select notes for the mode."), 3000);
         setTimeout(this.widgetWindow.sendToCenter, 0);
     }
 
@@ -1014,7 +1014,7 @@ class ModeWidget {
         // Create a new stack for the chunk.
         // console.debug(newStack);
         this.activity.blocks.loadNewBlocks(newStack);
-        this.activity.textMsg(_("New action block generated."));
+        activity.textMsg(_("New action block generated."), 3000);
 
         // And save a stack of pitchnumbers to be used with the define mode
         newStack = [
