@@ -2408,7 +2408,10 @@ class Activity {
         this.showSearchWidget = () => {
             // Bring widget to top.
             this.searchWidget.style.zIndex = 1001;
-            this.searchWidget.style.border = "2px solid lightblue";
+            this.searchWidget.style.borderTop = "0px solid #0cafff";
+            this.searchWidget.style.borderRight = "0px solid #0cafff";
+            this.searchWidget.style.borderLeft = "0px solid #0cafff";
+            this.searchWidget.style.borderBottom = "1px solid #0cafff";
             if (this.helpfulSearchDiv) {
                 this._hideHelpfulSearchWidget();
             }
@@ -2423,7 +2426,7 @@ class Activity {
                 this.searchWidget.value = null;
                 this.searchWidget.style.visibility = "visible";
                 this.searchWidget.style.left =
-                    this.palettes.getSearchPos()[0] * this.turtleBlocksScale * 1.5 + "px";
+                    this.palettes.getSearchPos()[0] * this.turtleBlocksScale * 1.2857142 + "px";
                 this.searchWidget.style.top =
                     this.palettes.getSearchPos()[1] * this.turtleBlocksScale * 0.95 + "px";
 
