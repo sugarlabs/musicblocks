@@ -37,6 +37,7 @@ console.log("platform", isDarkModeON);
 
 if (isDarkModeON) {
     window.platformColor = {
+        textColor : "#E2E2E2",
         blockText: "#E2E2E2",
         paletteColors: {
             widgets: ["#4CAF50", "#388E3C", "#66BB6A", "#A5D6A7"],
@@ -65,7 +66,7 @@ if (isDarkModeON) {
             dictionary: ["#A1887F", "#6D4C41", "#8D6E63", "#D7CCC8"],
             ensemble: ["#7986CB", "#3F51B5", "#5C6BC0", "#9FA8DA"]
         },
-    
+
         disconnected: "#424242", // Dimmed gray
         header: "#1E88E5", // Blue header
         aux: "#1976D2",
@@ -79,11 +80,14 @@ if (isDarkModeON) {
         background: "#303030", // Very dark gray
         paletteSelected: "#1E1E1E",
         paletteBackground: "#1C1C1C",
+        paletteLabelBackground: "#022363",
+        paletteLabelSelected: "#01143b",
         paletteText: "#BDBDBD",
         rulerHighlight: "#FFEB3B",
         selectorBackground: "#64B5F6",
         selectorSelected: "#1E88E5",
         labelColor: "#BDBDBD",
+        lyricsLabelBackground: "#FF2B77",
         tupletBackground: "#424242",
         drumBackground: "#00ACC1",
         pitchBackground: "#4CAF50",
@@ -169,9 +173,9 @@ if (isDarkModeON) {
         modePieMenusElseColorPush: "#81C784",
         wheelcolors: ["#757575", "#9E9E9E", "#757575", "#9E9E9E", "#616161"]
     };
-    
 } else {
     window.platformColor = {
+        textColor : "black",
         blockText: "#282828",
         paletteColors: {
             widgets: ["#7CD622", "#57AD02", "#77C428", "#B4EB7D"],
@@ -204,7 +208,7 @@ if (isDarkModeON) {
             dictionary: ["#D98A43", "#B7651A", "#D68136", "#ECC6A4"],
             ensemble: ["#92A9FF", "#5370DC", "#728FF9", "#CDD8FF"]
         },
-    
+
         disconnected: "#C4C4C4", // disconnected block color
         header: platform.FF ? "#4DA6FF" : "#4DA6FF",
         aux: "#1A8CFF",
@@ -218,6 +222,8 @@ if (isDarkModeON) {
         background: "#F9F9F9",
         paletteSelected: "#F3F3F3",
         paletteBackground: "#FFFFFF",
+        paletteLabelBackground: "#8CC6FF",
+        paletteLabelSelected: "#1A8CFF",
         paletteText: "#666666",
         rulerHighlight: "#FFBF00",
         selectorBackground: "#8CC6FF",

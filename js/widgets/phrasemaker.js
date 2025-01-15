@@ -1051,7 +1051,6 @@ class PhraseMaker {
         tempTable = document.createElement("table");
         tempTable.setAttribute("cellpadding", "0px");
         this._tupletNoteValueRow = tempTable.insertRow();
-        const tempTable2 = tempTable;
         this._tupletValueRow = tempTable.insertRow();
         this._noteValueRow = tempTable.insertRow();
         ptmTableRow.insertCell().append(tempTable);

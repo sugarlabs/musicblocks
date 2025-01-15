@@ -275,7 +275,6 @@ class Activity {
         // Flag to check  if  dark mode is on or not
         this.isDarkModeON = false;
         try {
-            console.log("log from activity");
             if (this.storage.darkMode === undefined) {
                 this.isDarkModeON = false;
             } else if (this.storage.darkMode !== null) {
@@ -1682,7 +1681,7 @@ class Activity {
                 if (this.blockscale > 0) {
                     this.resizeDebounce = true;
                     this.blockscale -= 1;
-                    this.clearCache();                
+                    this.clearCache();
                     await this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
                     this.blocks.checkBounds();
                     this.refreshCanvas();
@@ -6495,6 +6494,7 @@ class Activity {
                 console.log(`Dark Mode is now ${this.isDarkModeON ? "ON" : "OFF"}`);
                 try {
                     this.storage.darkMode = this.isDarkModeON.toString(); // Save the state as a string
+                    window.location.reload();
                 } catch (e) {
                     console.error("Error saving darkMode state to storage:", e);
                 }
