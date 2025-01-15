@@ -3484,6 +3484,8 @@ class Activity {
                 }
                 trashView.classList.add('hidden');
             });
+            restoreLastIcon.setAttribute("title", _("Restore Last Item"));
+            restoreAllIcon.setAttribute("title", _("Restore All Items"));
         
             buttonContainer.appendChild(restoreLastIcon);
             buttonContainer.appendChild(restoreAllIcon);
