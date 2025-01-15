@@ -3460,31 +3460,33 @@ class Activity {
             trashView.id = 'trashView';
             trashView.classList.add('trash-view');
         
-            // Sticky buttons
+            // Sticky icons
             const buttonContainer = document.createElement('div');
             buttonContainer.classList.add('button-container');
         
-            const restoreLastBtn = document.createElement('button');
-            restoreLastBtn.textContent = "Restore last";
-            restoreLastBtn.classList.add('restore-button');
-            restoreLastBtn.addEventListener('click', () => {
+            const restoreLastIcon = document.createElement('a');
+            restoreLastIcon.id = 'restoreLastIcon';
+            restoreLastIcon.classList.add('restore-last-icon');
+            restoreLastIcon.innerHTML = '<i class="material-icons md-48">restore_from_trash</i>';
+            restoreLastIcon.addEventListener('click', () => {
                 const lastId = this.blocks.trashStacks[this.blocks.trashStacks.length - 1];
                 if (lastId) this._restoreTrashById(lastId);
                 trashView.classList.add('hidden');
             });
         
-            const restoreAllBtn = document.createElement('button');
-            restoreAllBtn.textContent = "Restore all";
-            restoreAllBtn.classList.add('restore-button');
-            restoreAllBtn.addEventListener('click', () => {
+            const restoreAllIcon = document.createElement('a');
+            restoreAllIcon.id = 'restoreAllIcon';
+            restoreAllIcon.classList.add('restore-all-icon');
+            restoreAllIcon.innerHTML = '<i class="material-icons md-48">delete_sweep</i>';
+            restoreAllIcon.addEventListener('click', () => {
                 while (this.blocks.trashStacks.length > 0) {
                     this._restoreTrashById(this.blocks.trashStacks[0]);
                 }
                 trashView.classList.add('hidden');
             });
         
-            buttonContainer.appendChild(restoreLastBtn);
-            buttonContainer.appendChild(restoreAllBtn);
+            buttonContainer.appendChild(restoreLastIcon);
+            buttonContainer.appendChild(restoreAllIcon);
             trashView.appendChild(buttonContainer);
         
             // Render trash items
@@ -3514,7 +3516,7 @@ class Activity {
                     trashView.classList.add('hidden');
                 });
                 handleClickOutsideTrashView(trashView);
-        
+                
                 trashView.appendChild(listItem);
             });
         
@@ -3524,7 +3526,7 @@ class Activity {
             } else {
                 trashList.appendChild(trashView);
             }
-        };
+        };  
 
         /*
          * Open aux menu

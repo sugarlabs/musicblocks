@@ -107,6 +107,8 @@
 
 .button-container {
   position: sticky;
+  display: flex;
+  justify-content: space-between;
   top: 0;
   z-index: 10;
   display: flex;
@@ -115,17 +117,6 @@
   margin: 0;
   padding: 5px;
   border-bottom: 1px solid #d9d9d9;
-}
-
-.restore-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 90px;
-  height: 35px;
-  cursor: pointer;
-  background-color: white;
-  border-radius: 8px;
 }
 
 .trash-item {
@@ -145,6 +136,27 @@
   margin-right: 10px;
   vertical-align: middle;
 }
+
+#restoreLastIcon, #restoreAllIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+  color: white;
+  background-color: transparent;
+  transition: background-color 0.3s;
+}
+
+#restoreLastIcon:hover, #restoreAllIcon:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.material-icons.md-48 {
+  font-size: 32px;
+}
+
 
 .hidden {
   display: none;
