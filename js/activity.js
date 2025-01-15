@@ -513,7 +513,10 @@ class Activity {
                 (event) => {
                     event.preventDefault();
                     event.stopPropagation();
-                    if (this.beginnerMode) return;          
+                    if (this.beginnerMode) return;
+                    if (this.isHelpfulSearchWidgetOn) {
+                        this._hideHelpfulSearchWidget();
+                    }
                     if (!this.blocks.isCoordinateOnBlock(event.clientX, event.clientY) && 
                         event.target.id === "myCanvas") {
                         this._displayHelpfulWheel(event);
