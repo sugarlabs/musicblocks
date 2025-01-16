@@ -29,22 +29,24 @@ class ServerInterface {
         this.APIKey = "3f2d3a4c-c7a4-4c3c-892e-ac43784f7381" ;
     }
 
-    request (data, callback) {
+    request(data, callback) {
         data["api-key"] = this.APIKey;
-
-        // eslint-disable-next-line no-unused-vars
+    
+        console.log("Request data:", data); // Debug log
         const req = jQuery.ajax({
             type: "POST",
             url: this.ServerURL,
             data: data
         })
-            .done(data => {
-                callback(data);
-            })
-            .fail(() => {
-                callback(this.ConnectionFailureData);
-            });
-    };
+        .done(data => {
+            console.log("Server response:", data); // Debug log
+            callback(data);
+        })
+        .fail(err => {
+            console.error("Request failed. Error:", err); // Debug log
+            callback(this.ConnectionFailureData);
+        });
+    }
 
     getTagManifest(callback) {
         const obj = {"action": "getTagManifest"};
@@ -88,6 +90,7 @@ class ServerInterface {
 
     convertFile (From, To, Data, callback) {
         const obj = {"action": "convertData", "From": From, "To": To, "Data": Data};
+        console.log("Sending data to server:", obj); // Debug log
         this.request(obj, callback);
     };
 

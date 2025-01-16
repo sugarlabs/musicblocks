@@ -409,6 +409,8 @@ class SaveInterface {
         docById("guitarText").textContent = _("Include guitar tablature output?");
         //.TRANS: Lilypond is a scripting language for generating sheet music
         docById("submitLilypond").textContent = _("Save as Lilypond");
+        //.TRANS: LilypondPDF option
+        docById("submitPDF").textContent = _("Save as Lilypond PDF");
         docById("fileName").value = filename;
         if (activity.PlanetInterface !== undefined) {
             docById("title").value = activity.PlanetInterface.getCurrentProjectName();
@@ -429,12 +431,10 @@ class SaveInterface {
         docById("submitLilypond").onclick = () => {
             activity.save.saveLYFile(false);
         };
-        // if (this.planet){
-        //     docById('submitPDF').onclick = function(){this.saveLYFile(true);}.bind(this);
-        //     docById('submitPDF').disabled = false;
-        // } else {
-        //     docById('submitPDF').disabled = true;
-        // }
+        docById("submitPDF").onclick = () => {
+            activity.save.saveLYFile(true); // Set isPDF to true for PDF generation
+            console.log("saveasPDF button clicked");
+        };        
         docByClass("close")[0].onclick = () => {
             activity.logo.runningLilypond = false;
             docById("lilypondModal").style.display = "none";
@@ -453,7 +453,7 @@ class SaveInterface {
      */
     saveLYFile(isPDF) {
         if (isPDF === undefined) {
-            isPDF = false;
+            isPDF = false; // Default to LY file generation
         }
         let filename = docById("fileName").value;
         const projectTitle = docById("title").value;
@@ -466,8 +466,14 @@ class SaveInterface {
         const guitarCheck = docById("guitarCheck").checked;
 
         if (filename != null) {
-            if (fileExt(filename) !== "ly") {
-                filename += ".ly";
+            if(!isPDF){
+                if (fileExt(filename) !== "ly") {
+                    filename += ".ly";
+                }
+            } else {
+                if (fileExt(filename) !== "pdf") {
+                    filename += ".pdf";
+                }
             }
         }
 
@@ -499,13 +505,14 @@ class SaveInterface {
             this.activity.logo.guitarOutputEnd = "      >>\n%}\n";
         }
 
-        // Suppress music and turtle output when generating
-        // Lilypond output.
+        // Suppress music and turtle output when generating Lilypond output
         this.activity.logo.runningLilypond = true;
         if (isPDF) {
-            this.notationConvert = "pdf";
+            this.notationConvert = "pdf"; // Set notationConvert to PDF mode
+            console.log("PDF generation mode activated."); // Confirm PDF mode
+            
         } else {
-            this.notationConvert = "";
+            this.notationConvert = ""; // Default to LY file generation
         }
         this.activity.logo.notationOutput = lyheader;
         this.activity.logo.notationNotes = {};
@@ -517,7 +524,7 @@ class SaveInterface {
         document.body.style.cursor = "wait";
         this.activity.logo.runLogoCommands();
 
-        // Close the dialog box after hitting button.
+        // Close the dialog box after hitting button
         docById("lilypondModal").style.display = "none";
     }
 
@@ -533,6 +540,7 @@ class SaveInterface {
     * @instance
     */
     afterSaveLilypond(filename) {
+        console.log("notationConvert:", this.notationConvert);
         const ly = saveLilypondOutput(this.activity);
         switch (this.notationConvert) {
             case "pdf":
@@ -543,6 +551,8 @@ class SaveInterface {
                 break;
         }
         this.notationConvert = "";
+        
+
     }
 
     /**
@@ -577,7 +587,6 @@ class SaveInterface {
         this.download("ly", "data:text;utf8," + encodeURIComponent(lydata), filename);
     }
 
-
     /**
      * Perform actions after saving a Lilypond file in PDF format.
      *
@@ -591,15 +600,36 @@ class SaveInterface {
      * @instance
      */
     afterSaveLilypondPDF(lydata, filename) {
+        console.log("afterSaveLilypondPDF called!"); // Log when this method is triggered
+        console.log("Lilypond data for PDF:", lydata); // Log the Lilypond data being converted
+        //console.log("Filename for PDF:", filename); // Log the filename for the generated PDF
+        filename="yourPDF";
+
         document.body.style.cursor = "wait";
         window.Converter.ly2pdf(lydata, (success, dataurl) => {
             document.body.style.cursor = "default";
             if (!success) {
-                // eslint-disable-next-line no-console
                 console.debug("Error: " + dataurl);
-                //TODO: Error message box
+                // Add error message handling if needed
+                const errorBox = document.createElement("div");
+                errorBox.style.position = "fixed";
+                errorBox.style.top = "50%";
+                errorBox.style.left = "50%";
+                errorBox.style.transform = "translate(-50%, -50%)";
+                errorBox.style.padding = "20px";
+                errorBox.style.backgroundColor = "#f44336"; 
+                errorBox.style.color = "#fff"; 
+                errorBox.style.borderRadius = "5px";
+                errorBox.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
+                errorBox.innerText = "Oopsie. An error occurred while saving the Lilypond file as a PDF.";
+                document.body.appendChild(errorBox);
+                setTimeout(() => {
+                    errorBox.remove();
+                }, 5000);
+
             } else {
-                this.activity.save.download("pdf", dataurl, filename);
+                // Download the generated PDF
+                this.download("ly", "data:text;utf8," + encodeURIComponent(lydata), filename);
             }
         });
     }
