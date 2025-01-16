@@ -174,10 +174,81 @@
                 loadL10nSplashScreen();
             </script>
             <div class="loading-text" id="loadingText" style="margin-top:1.5rem;"></div>
+            <a href="https://www.sugarlabs.org/" target="_blank" id="link-to-sugarLabs">
+                <div class= "bottom-right-logo1" id="bottom-right-logo">
+                    <h1  class="upper-text" id="this-is-a-text">This is a</h1>
+                </div>     
+                <div class="logo-container" id="bottom-right-logo">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 501 167" height="50" width="150">
+                        <!-- Define the gradient for the rainbow animation in 'sugar'-->
+                        <defs>
+                            <linearGradient id="rainbow-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="red">
+                                    <animate attributeName="stop-color" values="red;orange;yellow;green;blue;indigo;violet;red" dur="10s" repeatCount="indefinite" />
+                                </stop>
+                                <stop offset="100%" stop-color="violet">
+                                    <animate attributeName="stop-color" values="violet;red;orange;yellow;green;blue;indigo;violet" dur="10s" repeatCount="indefinite" />
+                                </stop>
+                            </linearGradient>
+
+                            <!-- Define the gradient for the border animation in 'sugar' -->
+                            <linearGradient id="dull-colors-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#7a7a7a">
+                                    <animate attributeName="stop-color" values="#7a7a7a;#a2a2a2;#5c5c5c;#8e8e8e;#7a7a7a" dur="5s" repeatCount="indefinite" />
+                                </stop>
+                                <stop offset="100%" stop-color="#5c5c5c">
+                                    <animate attributeName="stop-color" values="#5c5c5c;#8e8e8e;#7a7a7a;#a2a2a2;#5c5c5c" dur="5s" repeatCount="indefinite" />
+                                </stop>
+                            </linearGradient>
+                            
+                        </defs>
+
+                        <!-- Logo paths -->
+                        <path d="m63.05 117.52c-11.05 0-21.12-5.5-21.12-11.539 0-3.157 2.303-5.63 5.244-5.63 2.02 0 3.719 1.183 5.515 2.435 2.592 1.809 5.529 3.855 10.651 3.855 5.139 0 8.21-2.647 8.21-5.209 0-3.416-5.271-5.607-10.852-7.927-7.799-3.243-16.639-6.918-16.639-15.886 0-10.573 9.933-16.279 19.28-16.279 7.89 0 18.895 4.132 18.895 10.86 0 2.526-1.763 5.244-5.632 5.244-2.068 0-3.558-1.125-4.997-2.212-1.872-1.414-3.994-3.02-8.266-3.02-1.209 0-7.242.227-7.242 4.726 0 2.729 4.879 4.613 10.04 6.608 7.772 3 17.446 6.739 17.446 16.333.002 12.12-10.646 17.636-20.538 17.636"
+                            fill="url(#rainbow-gradient)"
+                            stroke="url(#dull-colors-gradient)"
+                            stroke-width="3" />
+                        <path d="m117.65 117.52c-10.726 0-22.19-5.854-22.19-22.281v-27.59c0-3.773 2.418-6.309 6.02-6.309s6.02 2.536 6.02 6.309v27.299c0 7.979 3.224 11.693 10.146 11.693 6.922 0 10.146-3.715 10.146-11.693v-27.3c0-3.773 2.418-6.309 6.02-6.309 3.6 0 6.02 2.536 6.02 6.309v27.59c0 16.428-11.46 22.282-22.18 22.282"
+                            fill="url(#rainbow-gradient)"
+                            stroke="url(#dull-colors-gradient)"
+                            stroke-width="3" />
+                        <path d="m175.53 137.85c-8.493 0-21.509-4.994-21.509-11.149 0-2.758 1.671-5.729 5.342-5.729 2.02 0 3.766 1.074 5.785 2.317 2.804 1.728 5.981 3.683 11.06 3.683 10.827 0 12.215-9.426 12.273-13.816-3.037 2.818-7.04 4.37-11.498 4.37-16.03 0-24.414-14.13-24.414-28.09s8.386-28.09 24.414-28.09c4.424 0 8.692 1.905 11.688 4.32.654-2.638 2.95-4.32 6.122-4.32 2.778 0 5.731 2.077 5.731 5.923v44.24c0 16-9.811 26.346-24.993 26.346m1.452-65.63c-9.132 0-12.372 9.271-12.372 17.212s3.24 17.211 12.372 17.211c9.13 0 12.371-9.271 12.371-17.211s-3.241-17.212-12.371-17.212"
+                            fill="url(#rainbow-gradient)"
+                            stroke="url(#dull-colors-gradient)"
+                            stroke-width="3" />
+                        <path d="m256.26 117.52c-2.625 0-5.279-1.729-5.68-5.04-3.492 3.314-7.752 5.04-12.52 5.04-16.03 0-24.411-14.13-24.411-28.09 0-13.958 8.385-28.09 24.411-28.09 4.755 0 8.745 1.484 12.563 4.743.52-3.119 3.091-4.743 5.636-4.743 2.776 0 5.727 2.076 5.727 5.923v44.33c.001 3.846-2.95 5.923-5.726 5.923m-18.199-45.3c-9.132 0-12.373 9.273-12.373 17.212 0 7.94 3.241 17.212 12.373 17.212 9.133 0 12.373-9.272 12.373-17.212 0-7.939-3.24-17.212-12.373-17.212"
+                            fill="url(#rainbow-gradient)"
+                            stroke="url(#dull-colors-gradient)"
+                            stroke-width="3" />
+                        <path d="m282.98 117.52c-3.601 0-6.02-2.536-6.02-6.311v-43.561c0-3.774 2.419-6.309 6.02-6.309 3.289 0 5.593 2.118 5.965 5.361 2.537-2.849 6.103-5.361 10.1-5.361 3.768 0 6.503 2.572 6.503 6.115 0 2.326-1.173 5.322-6.76 6.375-2.961.515-9.793 2.788-9.793 12.89v24.49c0 3.774-2.419 6.311-6.02 6.311"
+                            fill="url(#rainbow-gradient)"
+                            stroke="url(#dull-colors-gradient)"
+                            stroke-width="3" />
+                        <path d="m324.99 111.21c0 2.808-1.646 4.551-4.259 4.551-2.614 0-4.26-1.743-4.26-4.551v-66.21c0-2.808 1.646-4.55 4.26-4.55 2.613 0 4.259 1.743 4.259 4.55z"
+                            fill="#969696"
+                            stroke-width="0" />
+                        <path d="m386.07 111.59c0 3-2.324 4.164-3.969 4.164-1.742 0-3.969-1.162-3.969-4.164v-3.581h-.193c-3.68 5.228-8.52 7.745-14.04 7.745-14.52 0-22.65-12.682-22.65-26.331s8.131-26.33 22.65-26.33c5.906 0 10.07 2.516 14.04 6.873h.193v-2.71c0-3 2.227-4.163 3.969-4.163 1.645 0 3.969 1.162 3.969 4.163zm-22.17-3.195c10.455 0 14.13-10.26 14.13-18.972 0-8.712-3.678-18.973-14.13-18.973-10.453 0-14.13 10.261-14.13 18.973 0 8.713 3.679 18.972 14.13 18.972"
+                            fill="#969696"
+                            stroke-width="0" />
+                        <path d="m404.95 44.997c0-2.808 1.646-4.55 4.26-4.55s4.26 1.743 4.26 4.55v25.07h.192c2.227-3.194 6.97-6.969 13.745-6.969 13.941 0 21.975 12.681 21.975 26.33s-8.03 26.331-21.975 26.331c-6.775 0-11.324-2.421-13.745-7.07h-.192v2.518c0 2.808-1.646 4.551-4.26 4.551s-4.26-1.743-4.26-4.551zm21.781 63.4c10.453 0 14.13-10.26 14.13-18.972 0-8.712-3.678-18.973-14.13-18.973-10.455 0-14.13 10.261-14.13 18.973 0 8.713 3.68 18.972 14.13 18.972"
+                            fill="#969696"
+                            stroke-width="0" />
+                        <path d="m482 63.1c7.07 0 17.13 3.775 17.13 9.1 0 1.839-1.26 3.484-3.873 3.484-3.678 0-5.13-5.227-13.262-5.227-4.84 0-9 2.129-9 6.485 0 9 27.491 8.03 27.491 22.941 0 10.746-9.196 15.877-18.778 15.877-10.843 0-19.361-5.422-19.361-9.779 0-2.321 1.646-3.87 3.484-3.87 3.775 0 6.873 6.291 16.17 6.291 6.195 0 9.971-3.484 9.971-6.97 0-10.07-27.491-9.486-27.491-23.812-.001-9.485 8.904-14.519 17.52-14.519"
+                            fill="#969696"
+                            stroke-width="0" />
+                    </svg>
+                    
+                </div>
+                <div class= "bottom-right-logo3" id="bottom-right-logo">
+                    <h1 class="lower-text" id="project-text">project.</h1>
+                </div>
+            </a>
             <script>
                 document.addEventListener("DOMContentLoaded", function() {
                     setTimeout(function() {
                       const loadingText = document.getElementById("loadingText");
+                      document.getElementById("project-text").textContent = _("project.");
+                      document.getElementById("this-is-a-text").textContent = _("This is a");
                       const texts = ["Do, Re, Mi, Fa, Sol, La, Ti, Do", "Loading Music Blocks...", "Reading Music..."];
               
                       let index = 0;

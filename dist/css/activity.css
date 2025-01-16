@@ -192,7 +192,7 @@ img.icon:hover {
   background-color: rgba(139, 195, 74, 0.8);
 }
 #loading-image-container {
-  z-index: 99999;
+  z-index: 89999;
 }
 body {
   background-color: #9cf;
@@ -228,4 +228,61 @@ input.number {
 }
 #canvas {
   overflow-y: visible;
+}
+.upper-text, .lower-text {
+  margin: 0;
+  font-size: 23px;
+  font-style: italic;
+  font-weight: 100;
+}
+.lower-text{
+  text-align: right;
+}
+@keyframes rainbowAnimation {
+  0% { stop-color: red; }
+  20% { stop-color: orange; }
+  40% { stop-color: yellow; }
+  60% { stop-color: green; }
+  80% { stop-color: blue; }
+  100% { stop-color: violet; }
+}
+@keyframes dullBorderAnimation {
+  0% { stop-color: #7a7a7a; }  /* Gray */
+  25% { stop-color: #a2a2a2; } /* Light Gray */
+  50% { stop-color: #5c5c5c; } /* Dark Gray */
+  75% { stop-color: #8e8e8e; } /* Medium Gray */
+  100% { stop-color: #7a7a7a; } /* Back to Gray */
+}
+.bottom-right-logo1{
+  z-index: 99999;
+  position: absolute;
+  bottom: 57px; /* Distance from the bottom */
+  right: 210px;  /* Distance from the right */
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.bottom-right-logo3{
+  z-index: 99999;
+  position: absolute;
+  bottom: 3px; /* Distance from the bottom */
+  right: 3px;  /* Distance from the right */
+  padding: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.logo-container{
+  z-index: 99999;
+  position: absolute;
+  bottom: 0px; /* Distance from the bottom */
+  right: 20px;  /* Distance from the right */
+  padding: 0px;
+  border-radius: 0px;
+  cursor: pointer;
+}
+#link-to-sugarLabs:link ,
+#link-to-sugarLabs:visited ,
+#link-to-sugarLabs:hover ,
+#link-to-sugarLabs:active  {
+  color: #000;
 }

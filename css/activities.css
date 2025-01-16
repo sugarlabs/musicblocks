@@ -421,7 +421,7 @@ img.icon:hover {
 }
 
 #loading-image-container {
-  z-index: 99999;
+  z-index: 89999;
 }
 
 body {
@@ -1768,4 +1768,52 @@ table {
     display: block;
     clear: both;
   }
+}
+.upper-text, .lower-text {
+  margin: 0;
+  font-size: 12px;
+  font-style: italic;
+  font-weight: 100;
+}
+.lower-text{
+  text-align: right;
+}
+@keyframes rainbowAnimation {
+  0% { stop-color: red; }
+  20% { stop-color: orange; }
+  40% { stop-color: yellow; }
+  60% { stop-color: green; }
+  80% { stop-color: blue; }
+  100% { stop-color: violet; }
+}
+@keyframes dullBorderAnimation {
+  0% { stop-color: #7a7a7a; }  /* Gray */
+  25% { stop-color: #a2a2a2; } /* Light Gray */
+  50% { stop-color: #5c5c5c; } /* Dark Gray */
+  75% { stop-color: #8e8e8e; } /* Medium Gray */
+  100% { stop-color: #7a7a7a; } /* Back to Gray */
+}
+.bottom-right-logo1{
+  position: absolute;
+  bottom: 30px; /* Distance from the bottom */
+  right: 125px;  /* Distance from the right */
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.bottom-right-logo3{
+  position: absolute;
+  bottom: 3px; /* Distance from the bottom */
+  right: 3px;  /* Distance from the right */
+  padding: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.logo-container{
+  position: absolute;
+  bottom: 3px; /* Distance from the bottom */
+  right: 25px;  /* Distance from the right */
+  padding: 0px;
+  border-radius: 5px;
+  cursor: pointer;
 }
