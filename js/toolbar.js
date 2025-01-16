@@ -564,7 +564,8 @@ class Toolbar {
         ly_onclick,
         abc_onclick,
         mxml_onclick,
-        blockartworksvg_onclick
+        blockartworksvg_onclick,
+        blockartworkpng_onclick
     ) {
         const saveButton = docById('saveButton');
         const saveButtonAdvanced = docById('saveButtonAdvanced');
@@ -676,7 +677,7 @@ class Toolbar {
                 };
                 const saveArtworkPNG = docById('save-blockartwork-png');
                 saveArtworkPNG.onclick = () => {
-                    blockartworksvg_onclick(this.activity);
+                    blockartworkpng_onclick(this.activity);
                 };
             }
         }
