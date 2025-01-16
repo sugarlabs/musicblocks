@@ -84,6 +84,7 @@ class Toolbar {
                 ["save-ly", _("Save sheet music as Lilypond"), "innerHTML"],
                 ["save-mxml", _("Save sheet music as MusicXML"), "innerHTML"],
                 ["save-blockartwork-svg", _("Save block artwork as SVG"), "innerHTML"],
+                ["save-blockartwork-png", _("Save block artwork as PNG"), "innerHTML"],
                 ["new-project", _("Confirm"), "innerHTML"],
                 ["enUS", _("English (United States)"), "innerHTML"],
                 ["enUK", _("English (United Kingdom)"), "innerHTML"],
@@ -142,6 +143,7 @@ class Toolbar {
                 _("Save sheet music as ABC"),
                 _("Save sheet music as Lilypond"),
                 _("Save block artwork as SVG"),
+                _("Save block artwork as PNG"),              
                 _("Confirm"),
                 _("Select language"),
                 _("Save project as HTML"),
@@ -150,6 +152,7 @@ class Toolbar {
                 _("Save turtle artwork as SVG"),
                 _("Save turtle artwork as PNG"),
                 _("Save block artwork as SVG"),
+                _("Save block artwork as PNG"),
                 _("Confirm"),
                 _("English (United States)"),
                 _("English (United Kingdom)"),
@@ -205,6 +208,7 @@ class Toolbar {
                 ["save-svg", _("Save turtle artwork as SVG"), "innerHTML"],
                 ["save-png", _("Save turtle artwork as PNG"), "innerHTML"],
                 ["save-blockartwork-svg", _("Save block artwork as SVG"), "innerHTML"],
+                ["save-blockartwork-png", _("Save block artwork as PNG"), "innerHTML"],
                 ["new-project", _("Confirm"), "innerHTML"],
                 ["enUS", _("English (United States)"), "innerHTML"],
                 ["enUK", _("English (United Kingdom)"), "innerHTML"],
@@ -261,6 +265,7 @@ class Toolbar {
                 _("Save turtle artwork as SVG"),
                 _("Save turtle artwork as PNG"),
                 _("Save block artwork as SVG"),
+                _("Save block artwork as PNG"), 
                 _("Confirm"),
                 _("English (United States)"),
                 _("English (United Kingdom)"),
@@ -667,6 +672,10 @@ class Toolbar {
                 }
                 const saveArtworkSVG = docById('save-blockartwork-svg');
                 saveArtworkSVG.onclick = () => {
+                    blockartworksvg_onclick(this.activity);
+                };
+                const saveArtworkPNG = docById('save-blockartwork-png');
+                saveArtworkPNG.onclick = () => {
                     blockartworksvg_onclick(this.activity);
                 };
             }
