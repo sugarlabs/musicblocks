@@ -884,7 +884,7 @@ class Palette {
         if (createHeader) {
             let header = this.menuContainer.children[0];
             header = header.insertRow();
-            header.style.background = platformColor.selectorSelected;
+            header.style.backgroundColor = platformColor.paletteLabelBackground;
             header.innerHTML =
                 '<td style ="width: 100%; height: 42px; box-sizing: border-box; display: flex; flex-direction: row; align-items: center; justify-content: space-between;"></td>';
             header = header.children[0];
@@ -903,7 +903,7 @@ class Palette {
             const label = document.createElement("span");
             label.textContent = toTitleCase(_(this.name));
             label.style.fontWeight = "bold";
-            label.style.color = platformColor.paletteBackground;
+            label.style.color = platformColor.textColor;
             header.appendChild(label);
 
             const closeDownImg = document.createElement("span");

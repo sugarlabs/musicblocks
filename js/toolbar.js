@@ -1086,7 +1086,7 @@ function renderNewProjectConfirmation() {
     const confirmationButton = document.createElement("a");
     confirmationButton.id = "new-project";
     confirmationButton.style.display = "inline-block";
-    confirmationButton.style.backgroundColor = "#2196F3";
+    confirmationButton.style.backgroundColor = "#0066FF";
     confirmationButton.style.color = "white";
     confirmationButton.style.textDecoration = "none";
     confirmationButton.style.borderRadius = "4px";

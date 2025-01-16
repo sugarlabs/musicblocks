@@ -942,7 +942,7 @@ class PhraseMaker {
             cell.style.position = "sticky";
             cell.style.left = "1.2px";
             cell.style.zIndex = "1";
-            cell.style.backgroundColor = platformColor.lyricsLabelBackground || "#FF2B77";
+            cell.style.backgroundColor = platformColor.lyricsLabelBackground;
             cell.style.textAlign = "center";
             cell.innerHTML = "Lyrics";
 
@@ -3143,6 +3143,7 @@ class PhraseMaker {
             cell.style.textAlign = "center";
             cell.innerHTML = noteValueToDisplay;
             cell.style.backgroundColor = platformColor.rhythmcellcolor;
+            cell.style.color = platformColor.textColor;
             cell.setAttribute("alt", noteValue);
 
             if (this._matrixHasTuplets) {

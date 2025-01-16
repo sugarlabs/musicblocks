@@ -37,3 +37,17 @@
     color: white !important;
 }
 
+.dark-mode .dropdown-content li > a{
+    background-color: #1c1c1c;
+    color: #3fe0d1;
+}
+
+.dark-mode .dropdown-content li > a:hover {
+    color: #252525
+}
+
+.dark-mode .dropdown-content{
+    background-color: #1c1c1c;
+}
+
+

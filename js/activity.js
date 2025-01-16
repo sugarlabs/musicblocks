@@ -1075,7 +1075,7 @@ class Activity {
             modal.style.transform = "translate(-50%, -50%)";
             modal.style.width = "400px";
             modal.style.padding = "24px";
-            modal.style.backgroundColor = "#fff";
+            modal.style.backgroundColor = platformColor.dialogueBox;
             modal.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
             modal.style.borderRadius = "8px";
             modal.style.zIndex = "10000";
@@ -1087,8 +1087,8 @@ class Activity {
             title.style.margin = "0 0 16px 0";
             modal.appendChild(title);
             const message = document.createElement("p");
-            message.textContent = "Are you sure you want to clear the workspace?";
-            message.style.color = "#666666";
+            message.textContent = _("Are you sure you want to clear the workspace?");
+            message.style.color = platformColor.textColor;
             message.style.fontSize = "16px";
             message.style.marginBottom = "24px";
             modal.appendChild(message);
@@ -1096,10 +1096,10 @@ class Activity {
             const buttonContainer = document.createElement("div");
             buttonContainer.style.display = "flex";
             buttonContainer.style.justifyContent = "flex-start";
-        
+
             const confirmBtn = document.createElement("button");
             confirmBtn.textContent = "Confirm";
-            confirmBtn.style.backgroundColor = "#2196F3";
+            confirmBtn.style.backgroundColor = "#0066FF";
             confirmBtn.style.color = "white";
             confirmBtn.style.border = "none";
             confirmBtn.style.borderRadius = "4px";

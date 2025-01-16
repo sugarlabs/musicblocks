@@ -33,42 +33,42 @@ window.platform = {
 
 platform.androidWebkit = platform.android && !platform.FF;
 platform.FFOS = platform.FF && (platform.mobile || platform.tablet) && !platform.android;
-console.log("platform", isDarkModeON);
 
 if (isDarkModeON) {
     window.platformColor = {
         textColor : "#E2E2E2",
         blockText: "#E2E2E2",
+        dialogueBox:"#1C1C1C",
         paletteColors: {
-            widgets: ["#4CAF50", "#388E3C", "#66BB6A", "#A5D6A7"],
-            pitch: ["#4CAF50", "#388E3C", "#66BB6A", "#A5D6A7"],
-            rhythm: ["#FF5722", "#D84315", "#FF7043", "#FFAB91"],
-            meter: ["#FF5722", "#D84315", "#FF7043", "#FFAB91"],
-            tone: ["#00BCD4", "#008BA3", "#00ACC1", "#80DEEA"],
-            ornament: ["#00BCD4", "#008BA3", "#00ACC1", "#80DEEA"],
-            intervals: ["#4CAF50", "#388E3C", "#66BB6A", "#A5D6A7"],
-            volume: ["#00BCD4", "#008BA3", "#00ACC1", "#80DEEA"],
-            drum: ["#00BCD4", "#008BA3", "#00ACC1", "#80DEEA"],
-            graphics: ["#7986CB", "#3F51B5", "#5C6BC0", "#9FA8DA"],
-            turtle: ["#7986CB", "#3F51B5", "#5C6BC0", "#9FA8DA"],
-            pen: ["#7986CB", "#3F51B5", "#5C6BC0", "#9FA8DA"],
-            boxes: ["#FF9800", "#E65100", "#FFAB40", "#FFE0B2"],
-            action: ["#FFC107", "#FFA000", "#FFCA28", "#FFECB3"],
-            media: ["#FF5252", "#D32F2F", "#FF6E6E", "#FFCDD2"],
-            number: ["#F48FB1", "#EC407A", "#F06292", "#F8BBD0"],
-            boolean: ["#BA68C8", "#8E24AA", "#AB47BC", "#E1BEE7"],
-            flow: ["#A1887F", "#6D4C41", "#8D6E63", "#D7CCC8"],
-            sensors: ["#CDDC39", "#827717", "#DCE775", "#F0F4C3"],
-            extras: ["#757575", "#424242", "#616161", "#BDBDBD"],
-            program: ["#757575", "#424242", "#616161", "#BDBDBD"],
-            myblocks: ["#FFC107", "#FFA000", "#FFCA28", "#FFECB3"],
-            heap: ["#A1887F", "#6D4C41", "#8D6E63", "#D7CCC8"],
-            dictionary: ["#A1887F", "#6D4C41", "#8D6E63", "#D7CCC8"],
-            ensemble: ["#7986CB", "#3F51B5", "#5C6BC0", "#9FA8DA"]
+            widgets: ["#2E7D32", "#1B5E20", "#388E3C", "#81C784"],
+            pitch: ["#2E7D32", "#1B5E20", "#388E3C", "#81C784"],
+            rhythm: ["#BF360C", "#8C2A0B", "#D84315", "#FF8A65"],
+            meter: ["#BF360C", "#8C2A0B", "#D84315", "#FF8A65"],
+            tone: ["#00838F", "#005662", "#0097A7", "#4DD0E1"],
+            ornament: ["#00838F", "#005662", "#0097A7", "#4DD0E1"],
+            intervals: ["#2E7D32", "#1B5E20", "#388E3C", "#81C784"],
+            volume: ["#00838F", "#005662", "#0097A7", "#4DD0E1"],
+            drum: ["#00838F", "#005662", "#0097A7", "#4DD0E1"],
+            graphics: ["#3949AB", "#283593", "#5E35B1", "#7986CB"],
+            turtle: ["#3949AB", "#283593", "#5E35B1", "#7986CB"],
+            pen: ["#3949AB", "#283593", "#5E35B1", "#7986CB"],
+            boxes: ["#E65100", "#BF360C", "#F57C00", "#FFB74D"],
+            action: ["#FF8F00", "#FF6F00", "#FFB300", "#FFE082"],
+            media: ["#C62828", "#8E0000", "#E53935", "#FF8A80"],
+            number: ["#AD1457", "#880E4F", "#EC407A", "#F48FB1"],
+            boolean: ["#7B1FA2", "#4A0072", "#9C27B0", "#CE93D8"],
+            flow: ["#5D4037", "#3E2723", "#795548", "#BCAAA4"],
+            sensors: ["#827717", "#4B830D", "#C0CA33", "#E6EE9C"],
+            extras: ["#424242", "#212121", "#616161", "#9E9E9E"],
+            program: ["#424242", "#212121", "#616161", "#9E9E9E"],
+            myblocks: ["#FF8F00", "#FF6F00", "#FFB300", "#FFE082"],
+            heap: ["#5D4037", "#3E2723", "#795548", "#BCAAA4"],
+            dictionary: ["#5D4037", "#3E2723", "#795548", "#BCAAA4"],
+            ensemble: ["#3949AB", "#283593", "#5E35B1", "#7986CB"]
         },
 
-        disconnected: "#424242", // Dimmed gray
-        header: "#1E88E5", // Blue header
+        disconnected: "#5C5C5C",
+        header: "#1E88E5",
         aux: "#1976D2",
         sub: "#64B5F6",
         doHeaderShadow: !platform.FF,
@@ -87,7 +87,7 @@ if (isDarkModeON) {
         selectorBackground: "#64B5F6",
         selectorSelected: "#1E88E5",
         labelColor: "#BDBDBD",
-        lyricsLabelBackground: "#FF2B77",
+        lyricsLabelBackground: "#C7225D",
         tupletBackground: "#424242",
         drumBackground: "#00ACC1",
         pitchBackground: "#4CAF50",
@@ -177,6 +177,7 @@ if (isDarkModeON) {
     window.platformColor = {
         textColor : "black",
         blockText: "#282828",
+        dialogueBox:"#fff",
         paletteColors: {
             widgets: ["#7CD622", "#57AD02", "#77C428", "#B4EB7D"],
             pitch: ["#7CD622", "#57AD02", "#77C428", "#B4EB7D"],
@@ -229,6 +230,7 @@ if (isDarkModeON) {
         selectorBackground: "#8CC6FF",
         selectorSelected: "#1A8CFF",
         labelColor: "#a0a0a0",
+        lyricsLabelBackground: "#FF2B77",
         tupletBackground: "#c0c0c0",
         drumBackground: "#3EDCDD",
         pitchBackground: "#7CD622",
