@@ -1,0 +1,34 @@
+/* Target body with maximum specificity */
+html[data-theme="dark"] body#body,
+body#body[data-theme="dark"],
+body#body[style*="background"][data-theme="dark"],
+#body[data-theme="dark"],
+[data-theme="dark"]#body {
+    background: #121212 !important;
+    background-color: #121212 !important;
+}
+
+/* Target the main container */
+body[data-theme="dark"] #main,
+body[data-theme="dark"] #canvas,
+body[data-theme="dark"] .canvasHolder {
+    background: #121212 !important;
+    background-color: #121212 !important;
+}
+
+/* Keep toolbar dark */
+body[data-theme="dark"] #toolbars,
+body[data-theme="dark"] .nav-wrapper {
+    background-color: #1e1e1e !important;
+}
+
+/* Override any dynamic background changes */
+@keyframes darkMode {
+    from { background: #121212 !important; }
+    to { background: #121212 !important; }
+}
+
+body[data-theme="dark"] {
+    animation: darkMode 1ms forwards !important;
+    transition: none !important;
+} 

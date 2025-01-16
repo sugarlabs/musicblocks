@@ -4,7 +4,7 @@
             <title>Music Blocks </title>
       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <!--Import Google Icon Font-->
-        <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <!--Import materialize.css-->
         <link type="text/css" rel="stylesheet" href="libs/materialize.min.css" media="screen,projection"/>
 
@@ -16,6 +16,30 @@
 
         <!--Let browser know website is optimized for mobile-->
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+        <script>
+            window.addEventListener('load', function() {
+                const themeToggle = document.getElementById('theme-toggle');
+                if (!themeToggle) {
+                    console.error('Theme toggle not found');
+                    return;
+                }
+                
+                if (localStorage.getItem('theme') === 'dark') {
+                    document.body.setAttribute('data-theme', 'dark');
+                }
+                
+                themeToggle.onclick = function() {
+                    if (document.body.getAttribute('data-theme') === 'dark') {
+                        document.body.removeAttribute('data-theme');
+                        localStorage.setItem('theme', 'light');
+                    } else {
+                        document.body.setAttribute('data-theme', 'dark');
+                        localStorage.setItem('theme', 'dark');
+                    }
+                };
+            });
+        </script>
 
         <!--Import jQuery before materialize.js-->
         <script type="text/javascript" src="libs/jquery-3.2.1.min.js"></script>
@@ -40,6 +64,9 @@
 
         <script type="text/javascript" src="js/Planet.js"></script>
         <script type="text/javascript" src="js/main.js"></script>
+
+        <link rel="stylesheet" href="css/dark-theme.css">
+        <script src="js/theme.js" defer></script>
     </head>
     <script>
         document.addEventListener("scroll", function () {
@@ -66,28 +93,28 @@
         <nav class="nav-extended light-green lighten-1" role="navigation">
             <div class="nav-wrapper container">
                 <a id="logo-container" class="brand-logo inactiveLink"><i class="material-icons" id="planeticon">public</i></a>
+                <ul class="right"><li><a id="theme-toggle" class="waves-effect waves-light">Dark Mode</a></li></ul>
                 <ul class="right"><li><a id="close-planet" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip=""><i class="material-icons">close</i></a></li></ul>
                 <ul class="right"><li><a id="planet-open-file" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip=""><i class="material-icons">folder_open</i></a></li></ul>
                 <ul class="right"><li><a id="planet-new-project" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip=""><i class="material-icons">note_add</i></a></li></ul>
                 <ul class="right tabs tabs-transparent" id="localglobal">
                     <li class="tab"><a class="active" id="local-tab" href="#local"></a></li>
                     <li class="tab"><a id="global-tab" href="#global"></a></li>
-                    <li>
-                        <li id="s_one">
-                            <div class="nav-content" id="searchcontainer-one">
-                                <div class="container">
-                                    <div class="input-field search">
-                                        <i class="material-icons prefix "
-                                            id="searchicon">search</i><input
-                                            placeholder="Search here" id="global-search"
-                                            type="text"><span><i
-                                                class="material-icons"
-                                                id="search-close">clear</i></span>
-                                    </div>
+                    <li id="s_one">
+                        <div class="nav-content" id="searchcontainer-one">
+                            <div class="container">
+                                <div class="input-field search">
+                                    <i class="material-icons prefix "
+                                        id="searchicon">search</i><input
+                                        placeholder="Search here" id="global-search"
+                                        type="text"><span><i
+                                            class="material-icons"
+                                            id="search-close">clear</i></span>
                                 </div>
                             </div>
-                        </li>
+                        </div>
                     </li>
+                </li>
                 </ul>
             </div>
             </div>

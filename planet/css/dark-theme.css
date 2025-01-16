@@ -1,0 +1,13 @@
+/* Only apply dark theme to main content, not loading screen */
+body[data-theme="dark"] {
+    background-color: #121212 !important;
+    color: #ffffff !important;
+}
+
+body[data-theme="dark"] .nav-extended {
+    background-color: #1e1e1e !important;
+}
+
+body[data-theme="dark"] .card {
+    background-color: #242424 !important;
+} 

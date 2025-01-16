@@ -509,3 +509,93 @@ a {
 	font-size: 16px;
 	outline: none;
 }
+
+.switch label {
+    display: flex;
+    align-items: center;
+}
+
+.switch label i {
+    margin: 0 5px;
+    font-size: 20px;
+}
+
+/* Customize switch colors for dark mode */
+[data-theme="dark"] .switch label input[type=checkbox]:checked + .lever {
+    background-color: #4a4a4a;
+}
+
+[data-theme="dark"] .switch label input[type=checkbox]:checked + .lever:after {
+    background-color: #26a69a;
+}
+
+/* Theme switch styling */
+.theme-switch {
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+}
+
+.theme-switch .switch {
+    margin: 0;
+}
+
+.theme-switch .switch label {
+    display: flex;
+    align-items: center;
+}
+
+.theme-switch .switch label i {
+    margin: 0 5px;
+    font-size: 20px;
+    color: #fff;
+}
+
+.theme-switch .switch .lever {
+    margin: 0 8px;
+}
+
+/* Ensure the switch is visible in both light and dark modes */
+.theme-switch .switch .lever:after {
+    background-color: #f1f1f1;
+}
+
+[data-theme="dark"] .theme-switch .switch .lever:after {
+    background-color: #26a69a;
+}
+
+/* Theme toggle styling */
+.nav-wrapper .switch {
+    margin: 0 15px;
+}
+
+.nav-wrapper .switch label {
+    display: flex;
+    align-items: center;
+    height: 64px;
+}
+
+.nav-wrapper .switch label i {
+    color: #fff;
+    margin: 0 8px;
+    font-size: 20px;
+}
+
+.nav-wrapper .switch .lever {
+    margin: 0 4px;
+}
+
+/* Theme toggle in nav */
+.nav-wrapper .switch {
+    padding: 0 10px;
+    margin-top: 15px;
+}
+
+.nav-wrapper .switch label i {
+    color: #fff;
+    vertical-align: middle;
+}
+
+.nav-wrapper .switch .lever {
+    margin: 0 8px;
+}
