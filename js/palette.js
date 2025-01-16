@@ -135,8 +135,8 @@ class Palettes {
             makePaletteIcons(
                 PALETTEICONS[MULTIPALETTEICONS[i]]
                     .replace("background_fill_color", platformColor.paletteLabelBackground)
-                    .replace(/stroke_color/g, "#E2E2E2")
-                    .replace(/fill_color/g, "#F9F9F9"),
+                    .replace(/stroke_color/g, platformColor.strokeColor)
+                    .replace(/fill_color/g, platformColor.fillColor),
                 1.5 * this.cellSize,
                 1.5 * this.cellSize
             )
