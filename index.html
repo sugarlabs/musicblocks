@@ -177,17 +177,22 @@
             <script>
                 document.addEventListener("DOMContentLoaded", function() {
                     setTimeout(function() {
-                      const loadingText = document.getElementById("loadingText");
-                      const texts = ["Do, Re, Mi, Fa, Sol, La, Ti, Do", "Loading Music Blocks...", "Reading Music..."];
-              
-                      let index = 0;
-                      setInterval(function() {
-                        loadingText.textContent = texts[index];
-                        index = (index + 1) % texts.length;
-                      }, 2000); // Change 2000 to adjust cycle duration (in milliseconds)
-              
-                      // Show the loading text after 6 seconds
-                      loadingText.style.opacity = 1;
+                        const loadingText = document.getElementById("loadingText");
+                        const texts = ["Do, Re, Mi, Fa, Sol, La, Ti, Do", "Loading Music Blocks...", "Reading Music..."];
+                        let index = 0;
+
+                        const intervalId = setInterval(function() {
+                            loadingText.textContent = texts[index];
+                            index = (index + 1) % texts.length;
+                        }, 2000); // Change 2000 to adjust cycle duration (in milliseconds)
+
+                        // Stop changing text and finalize loading after 6 seconds
+                        setTimeout(function () {
+                            clearInterval(intervalId);
+                            loadingText.textContent = "Loading Complete!";
+                            loadingText.style.opacity = 1;
+                        }, 6000);
+
                     }, 4000); // Change 6000 to adjust the delay (in milliseconds)
                   });
               </script>
