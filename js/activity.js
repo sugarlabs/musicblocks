@@ -6572,7 +6572,8 @@ class Activity {
                 this.save.saveLilypond.bind(this.save),
                 this.save.saveAbc.bind(this.save),
                 this.save.saveMxml.bind(this.save),
-                this.save.saveBlockArtwork.bind(this.save)
+                this.save.saveBlockArtwork.bind(this.save),
+                this.save.saveBlockArtworkPNG.bind(this.save)
             );
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
             this.toolbar.renderMenuIcon(showHideAuxMenu);
