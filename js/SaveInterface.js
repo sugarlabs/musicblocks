@@ -456,6 +456,7 @@ class SaveInterface {
             isPDF = false; // Default to LY file generation
         }
         let filename = docById("fileName").value;
+        console.log(filename);
         const projectTitle = docById("title").value;
         const projectAuthor = docById("author").value;
 
@@ -465,17 +466,17 @@ class SaveInterface {
         const MIDICheck = docById("MIDICheck").checked;
         const guitarCheck = docById("guitarCheck").checked;
 
-        if (filename != null) {
-            if(!isPDF){
-                if (fileExt(filename) !== "ly") {
-                    filename += ".ly";
-                }
-            } else {
-                if (fileExt(filename) !== "pdf") {
-                    filename += ".pdf";
-                }
-            }
-        }
+        // if (filename != null) {
+        //     if(!isPDF){
+        //         if (fileExt(filename) !== "ly") {
+        //             filename += ".ly";
+        //         }
+        //     } else {
+        //         if (fileExt(filename) !== "pdf") {
+        //             filename += ".pdf";
+        //         }
+        //     }
+        // }
 
         const mapLilypondObj = {
             "My Music Blocks Creation": projectTitle,
@@ -569,10 +570,14 @@ class SaveInterface {
      */
 
     afterSaveLilypondLY(lydata, filename) {
+        filename = docById("fileName").value;
+        console.log(filename);
         if (platform.FF) {
             // eslint-disable-next-line no-console
             console.debug('execCommand("copy") does not work on FireFox');
         } else {
+            
+            console.log("FileName is :", filename);
             const tmp = jQuery("<textarea />").appendTo(document.body);
             tmp.val(lydata);
             tmp.select();
@@ -613,7 +618,7 @@ class SaveInterface {
                 // Add error message handling if needed
                 const tmp = jQuery("<textarea />").appendTo(document.body);
                 this.activity.textMsg(
-                    _("Oopsie. Looks like we couldn’t save your music as a PDF. ") 
+                    _("Oops. Looks like we couldn’t save your music as a PDF. ") 
                 );             
             } else {
                 // Download the generated PDF
