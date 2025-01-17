@@ -674,119 +674,67 @@ class Activity {
         * @constructor
         */
         this._findBlocks = () => {
-            // Ensure visibility of blocks
             if (!this.blocks.visible) {
                 this._changeBlockVisibility();
             }
-
-            // Reset active block and hide DOM label
             this.blocks.activeBlock = null;
             hideDOMLabel();
-
-            // Show blocks and set initial container position
             this.blocks.showBlocks();
             this.blocksContainer.x = 0;
             this.blocksContainer.y = 0;
-
-            // Calculate top and left positions for block placement
             let toppos;
             if (this.auxToolbar.style.display === "block") {
                 toppos = 90 + this.toolbarHeight;
             } else {
                 toppos = 90;
             }
-            const leftpos = Math.floor(this.canvas.width / 4);
-
-            // Update palettes and calculate initial block position
-            this.palettes.updatePalettes();
-            let x = Math.floor(leftpos * this.turtleBlocksScale);
-            let y = Math.floor(toppos * this.turtleBlocksScale);
-            let even = true;
-
-            // Position start blocks first
-            for (const blk in this.blocks.blockList) {
-                if (!this.blocks.blockList[blk].trash) {
-                    const myBlock = this.blocks.blockList[blk];
-                    if (myBlock.name !== "start") {
-                        continue;
-                    }
-
-                    // Move block and its connected group
-                    if (myBlock.connections[0] === null) {
-                        const dx = x - myBlock.container.x;
-                        const dy = y - myBlock.container.y;
-                        this.blocks.moveBlockRelative(blk, dx, dy);
-                        this.blocks.findDragGroup(blk);
-                        if (this.blocks.dragGroup.length > 0) {
-                            for (let b = 0; b < this.blocks.dragGroup.length; b++) {
-                                const bblk = this.blocks.dragGroup[b];
-                                if (b !== 0) {
-                                    this.blocks.moveBlockRelative(bblk, dx, dy);
-                                }
-                            }
-                        }
-
-                        // Update x and y positions for next block placement
-                        x += Math.floor(150 * this.turtleBlocksScale);
-                        if (x > (this.canvas.width * 7) / 8 / this.turtleBlocksScale) {
-                            even = !even;
-                            if (even) {
-                                x = Math.floor(leftpos);
-                            } else {
-                                x = Math.floor(leftpos + STANDARDBLOCKHEIGHT);
-                            }
-
-                            y += STANDARDBLOCKHEIGHT;
+        
+            const columnSpacing = Math.floor(600 * this.turtleBlocksScale);
+            const leftColumnX = Math.floor((this.canvas.width / 4) * this.turtleBlocksScale);
+            const rightColumnX = leftColumnX + columnSpacing;
+            const initialY = Math.floor(toppos * this.turtleBlocksScale);
+            const verticalSpacing = Math.floor(20 * this.turtleBlocksScale); 
+            let leftColumnY = initialY;
+            let rightColumnY = initialY;
+            let placeInLeftColumn = true; 
+           
+            const moveBlockAndGroup = (blk, x, y) => {
+                const myBlock = this.blocks.blockList[blk];
+                const dx = x - myBlock.container.x;
+                const dy = y - myBlock.container.y;
+        
+                this.blocks.moveBlockRelative(blk, dx, dy);
+                this.blocks.findDragGroup(blk);
+        
+                if (this.blocks.dragGroup.length > 0) {
+                    for (let b = 0; b < this.blocks.dragGroup.length; b++) {
+                        const bblk = this.blocks.dragGroup[b];
+                        if (b !== 0) {
+                            this.blocks.moveBlockRelative(bblk, dx, dy);
                         }
                     }
                 }
-            }
+            };
 
-            // Position other blocks
             for (const blk in this.blocks.blockList) {
                 if (!this.blocks.blockList[blk].trash) {
                     const myBlock = this.blocks.blockList[blk];
-                    if (myBlock.name === "start") {
+                    if (myBlock.connections[0] !== null) {
                         continue;
                     }
-
-                    // Move block and its connected group
-                    if (myBlock.connections[0] === null) {
-                        const dx = x - myBlock.container.x;
-                        const dy = y - myBlock.container.y;
-                        this.blocks.moveBlockRelative(blk, dx, dy);
-                        this.blocks.findDragGroup(blk);
-                        if (this.blocks.dragGroup.length > 0) {
-                            for (let b = 0; b < this.blocks.dragGroup.length; b++) {
-                                const bblk = this.blocks.dragGroup[b];
-                                if (b !== 0) {
-                                    this.blocks.moveBlockRelative(bblk, dx, dy);
-                                }
-                            }
-                        }
-
-                        // Update x and y positions for next block placement
-                        x += 150 * this.turtleBlocksScale;
-                        if (x > (this.canvas.width * 7) / 8 / this.turtleBlocksScale) {
-                            even = !even;
-                            if (even) {
-                                x = Math.floor(leftpos);
-                            } else {
-                                x = Math.floor(leftpos + STANDARDBLOCKHEIGHT);
-                            }
-
-                            y += STANDARDBLOCKHEIGHT;
-                        }
+                    if (placeInLeftColumn) {
+                        moveBlockAndGroup(blk, leftColumnX, leftColumnY);
+                        leftColumnY += myBlock.height + verticalSpacing;
+                    } else {
+                        moveBlockAndGroup(blk, rightColumnX, rightColumnY);
+                        rightColumnY += myBlock.height + verticalSpacing;
                     }
+                    placeInLeftColumn = !placeInLeftColumn;
                 }
             }
-
-            // Blocks are all home, so reset go-home-button.
+        
             this.setHomeContainers(false);
             this.boundary.hide();
-
-            // Return mice to the center of the screen.
-            // Reset turtles' positions to center of the screen
             for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
                 const savedPenState = this.turtles.turtleList[turtle].painter.penState;
                 this.turtles.turtleList[turtle].painter.penState = false;
