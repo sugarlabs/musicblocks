@@ -611,22 +611,10 @@ class SaveInterface {
             if (!success) {
                 console.debug("Error: " + dataurl);
                 // Add error message handling if needed
-                const errorBox = document.createElement("div");
-                errorBox.style.position = "fixed";
-                errorBox.style.top = "50%";
-                errorBox.style.left = "50%";
-                errorBox.style.transform = "translate(-50%, -50%)";
-                errorBox.style.padding = "20px";
-                errorBox.style.backgroundColor = "#f44336"; 
-                errorBox.style.color = "#fff"; 
-                errorBox.style.borderRadius = "5px";
-                errorBox.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
-                errorBox.innerText = "Oopsie. An error occurred while saving the Lilypond file as a PDF.";
-                document.body.appendChild(errorBox);
-                setTimeout(() => {
-                    errorBox.remove();
-                }, 5000);
-
+                const tmp = jQuery("<textarea />").appendTo(document.body);
+                this.activity.textMsg(
+                    _("Oopsie. Looks like we couldn’t save your music as a PDF. ") 
+                );             
             } else {
                 // Download the generated PDF
                 this.download("ly", "data:text;utf8," + encodeURIComponent(lydata), filename);
