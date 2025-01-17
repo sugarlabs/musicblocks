@@ -18,6 +18,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           token: ${{ secrets.GH_TOKEN }}
+          fetch-depth: 0
           
       - name: Set up Git
         run: |
@@ -27,7 +28,7 @@ jobs:
         
       - name: Deploy to GitHub Pages
         run: |
-          git checkout gh-pages
+          git checkout gh-pages || git checkout --orphan gh-pages
           # Make changes to gh-pages branch if necessary
           git add .
           git commit -m "Deploy updates"
