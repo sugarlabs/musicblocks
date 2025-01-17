@@ -326,7 +326,6 @@ class SaveInterface {
         })
     }
 
-
     /**
     * Save audio recording in WAV format.
     *
