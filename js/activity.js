@@ -1043,7 +1043,7 @@ class Activity {
         };
        
         /**
-        * @returns {SVG} returns SVG of blocks
+        * @returns {PNG} returns PNG of block artwork
         */
         this.printBlockPNG = async () => {
             // Setps to convert the SVG to PNG of BlockArtwork
