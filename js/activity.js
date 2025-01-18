@@ -192,6 +192,9 @@ const doAnalyzeProject = function() {
 /**
  * Represents an activity in the application.
  */
+function docById(id) {
+    return document.getElementById(id);
+}
 class Activity {
     /**
      * Creates an Activity instance.
