@@ -452,7 +452,7 @@ class SaveInterface {
      */
     saveLYFile(isPDF) {
         if (isPDF === undefined) {
-            isPDF = false; // Default to LY file generation
+            isPDF = false;
         }
         let filename = docById("fileName").value;
         const projectTitle = docById("title").value;
@@ -464,17 +464,17 @@ class SaveInterface {
         const MIDICheck = docById("MIDICheck").checked;
         const guitarCheck = docById("guitarCheck").checked;
 
-        // if (filename != null) {
-        //     if(!isPDF){
-        //         if (fileExt(filename) !== "ly") {
-        //             filename += ".ly";
-        //         }
-        //     } else {
-        //         if (fileExt(filename) !== "pdf") {
-        //             filename += ".pdf";
-        //         }
-        //     }
-        // }
+        if (filename != null) {
+            if(!isPDF){
+                if (fileExt(filename) !== "ly") {
+                    filename += ".ly";
+                }
+            } else {
+                if (fileExt(filename) !== "pdf") {
+                    filename += ".pdf";
+                }
+            }
+        }
 
         const mapLilypondObj = {
             "My Music Blocks Creation": projectTitle,
@@ -504,7 +504,8 @@ class SaveInterface {
             this.activity.logo.guitarOutputEnd = "      >>\n%}\n";
         }
 
-        // Suppress music and turtle output when generating Lilypond output
+        // Suppress music and turtle output when generating
+        // Lilypond output.
         this.activity.logo.runningLilypond = true;
         if (isPDF) {
             this.notationConvert = "pdf";
@@ -547,8 +548,6 @@ class SaveInterface {
                 break;
         }
         this.notationConvert = "";
-        
-
     }
 
     /**
@@ -610,10 +609,10 @@ class SaveInterface {
                 );             
             } else {
                 // Download the generated PDF
-                this.download("ly", "data:text;utf8," + encodeURIComponent(lydata), filename);
+                this.activity.save.download("pdf", dataurl, filename);
             }
         });
-    }            
+    }
 
     /**
     * 
