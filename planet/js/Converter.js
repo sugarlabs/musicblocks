@@ -32,7 +32,6 @@ class Converter {
 
     ly2pdf(data, callback) {
         const encodedData = window.btoa(encodeURIComponent(data));
-        console.log("Encoded LilyPond data:", encodedData); // Debug log
         this.ServerInterface.convertFile("ly", "pdf", window.btoa(encodeURIComponent(data)), function(result) {
             this.afterly2pdf(result,callback);
         }.bind(this));

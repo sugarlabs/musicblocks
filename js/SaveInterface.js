@@ -410,7 +410,7 @@ class SaveInterface {
         //.TRANS: Lilypond is a scripting language for generating sheet music
         docById("submitLilypond").textContent = _("Save as Lilypond");
         //.TRANS: LilypondPDF option
-        docById("submitPDF").textContent = _("Save as Lilypond PDF");
+        // docById("submitPDF").textContent = _("Save as Lilypond PDF");
         docById("fileName").value = filename;
         if (activity.PlanetInterface !== undefined) {
             docById("title").value = activity.PlanetInterface.getCurrentProjectName();
@@ -431,10 +431,9 @@ class SaveInterface {
         docById("submitLilypond").onclick = () => {
             activity.save.saveLYFile(false);
         };
-        docById("submitPDF").onclick = () => {
-            activity.save.saveLYFile(true); // Set isPDF to true for PDF generation
-            console.log("saveasPDF button clicked");
-        };        
+        // docById("submitPDF").onclick = () => {
+        //     activity.save.saveLYFile(true); // Set isPDF to true for PDF generation
+        // };        
         docByClass("close")[0].onclick = () => {
             activity.logo.runningLilypond = false;
             docById("lilypondModal").style.display = "none";
@@ -456,7 +455,6 @@ class SaveInterface {
             isPDF = false; // Default to LY file generation
         }
         let filename = docById("fileName").value;
-        console.log(filename);
         const projectTitle = docById("title").value;
         const projectAuthor = docById("author").value;
 
@@ -509,11 +507,9 @@ class SaveInterface {
         // Suppress music and turtle output when generating Lilypond output
         this.activity.logo.runningLilypond = true;
         if (isPDF) {
-            this.notationConvert = "pdf"; // Set notationConvert to PDF mode
-            console.log("PDF generation mode activated."); // Confirm PDF mode
-            
+            this.notationConvert = "pdf";
         } else {
-            this.notationConvert = ""; // Default to LY file generation
+            this.notationConvert = "";
         }
         this.activity.logo.notationOutput = lyheader;
         this.activity.logo.notationNotes = {};
@@ -525,7 +521,7 @@ class SaveInterface {
         document.body.style.cursor = "wait";
         this.activity.logo.runLogoCommands();
 
-        // Close the dialog box after hitting button
+        // Close the dialog box after hitting button.
         docById("lilypondModal").style.display = "none";
     }
 
@@ -541,7 +537,6 @@ class SaveInterface {
     * @instance
     */
     afterSaveLilypond(filename) {
-        console.log("notationConvert:", this.notationConvert);
         const ly = saveLilypondOutput(this.activity);
         switch (this.notationConvert) {
             case "pdf":
@@ -570,14 +565,10 @@ class SaveInterface {
      */
 
     afterSaveLilypondLY(lydata, filename) {
-        filename = docById("fileName").value;
-        console.log(filename);
         if (platform.FF) {
             // eslint-disable-next-line no-console
             console.debug('execCommand("copy") does not work on FireFox');
         } else {
-            
-            console.log("FileName is :", filename);
             const tmp = jQuery("<textarea />").appendTo(document.body);
             tmp.val(lydata);
             tmp.select();
@@ -605,17 +596,14 @@ class SaveInterface {
      * @instance
      */
     afterSaveLilypondPDF(lydata, filename) {
-        console.log("afterSaveLilypondPDF called!"); // Log when this method is triggered
-        console.log("Lilypond data for PDF:", lydata); // Log the Lilypond data being converted
-        //console.log("Filename for PDF:", filename); // Log the filename for the generated PDF
-        filename="yourPDF";
-
+        filename = docById("fileName").value;
         document.body.style.cursor = "wait";
         window.Converter.ly2pdf(lydata, (success, dataurl) => {
             document.body.style.cursor = "default";
             if (!success) {
+                // eslint-disable-next-line no-console
                 console.debug("Error: " + dataurl);
-                // Add error message handling if needed
+                // Error message handling if needed
                 const tmp = jQuery("<textarea />").appendTo(document.body);
                 this.activity.textMsg(
                     _("Oops. Looks like we couldn’t save your music as a PDF. ") 
@@ -625,7 +613,7 @@ class SaveInterface {
                 this.download("ly", "data:text;utf8," + encodeURIComponent(lydata), filename);
             }
         });
-    }
+    }            
 
     /**
     * 
