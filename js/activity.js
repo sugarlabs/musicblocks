@@ -3331,7 +3331,7 @@ class Activity {
                 document.getElementById("hideContents").click();
             } catch (error) {
                 // eslint-disable-next-line no-console
-                console.error("An error occurred in resizeCanvas_:", error);
+                // console.error("An error occurred in resizeCanvas_:", error);
             }
         };
         
