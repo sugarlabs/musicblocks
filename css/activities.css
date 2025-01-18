@@ -982,6 +982,7 @@ table {
 #helpBodyDiv .message {
   text-align: center;
   line-height: 1.2;
+  margin: auto;
 }
 
 #helpBodyDiv .icon-container {

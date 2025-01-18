@@ -325,6 +325,8 @@ class HelpWidget {
     _showPage(page) {
         const helpBody = docById("helpBodyDiv");
         helpBody.innerHTML = "" ;
+        const totalPages = HELPCONTENT.length;
+        const pageCount = `Page ${page + 1} of ${totalPages}`;
 
         // Previous HTML content is removed, and new one is generated. 
         let body = "";
@@ -345,8 +347,8 @@ class HelpWidget {
         
         const helpContentHTML =
         `<h1 class="heading">${HELPCONTENT[page][0]}</h1> 
-         <p class ="description">${HELPCONTENT[page][1]}</p>
-        ` ;
+         <p class="description">${HELPCONTENT[page][1]}</p>
+         <p>${pageCount}</p>`;
         
         body += helpContentHTML ;
 
