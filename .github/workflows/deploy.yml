@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - master
-      - deployment-pipeline-added
   pull_request:
     branches:
       - master
-      - deployment-pipeline-added
   workflow_dispatch:
 
 jobs:
@@ -30,7 +28,6 @@ jobs:
       - name: Deploy to GitHub Pages
         run: |
           git checkout gh-pages || git checkout --orphan gh-pages
-          # Make changes to gh-pages branch if necessary
           git add .
           git commit -m "Deploy updates"
           git push origin gh-pages --force
