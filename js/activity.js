@@ -3340,9 +3340,7 @@ class Activity {
                 );
                 return;
             }
-            for(let i = this.blocks.trashStacks.length - 1; i < this.blocks.trashStacks.length; i++){
-                this._restoreTrashById(this.blocks.trashStacks[i]);
-            }
+            this._restoreTrashById(this.blocks.trashStacks[this.blocks.trashStacks.length - 1]);
             activity.textMsg(
                 _("Item restored from the trash."),
                 3000 
@@ -3470,9 +3468,7 @@ class Activity {
             restoreLastIcon.classList.add('restore-last-icon');
             restoreLastIcon.innerHTML = '<i class="material-icons md-48">restore_from_trash</i>';
             restoreLastIcon.addEventListener('click', () => {
-                for(let i = this.blocks.trashStacks.length - 1; i < this.blocks.trashStacks.length; i++){
-                    this._restoreTrashById(this.blocks.trashStacks[i]);
-                }
+                this._restoreTrashById(this.blocks.trashStacks[this.blocks.trashStacks.length - 1]);
                 trashView.classList.add('hidden');
             });
         
