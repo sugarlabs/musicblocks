@@ -90,6 +90,72 @@
   font-size: large;
 }
 
+.trash-view {
+  position: relative;
+  background-color: white;
+  max-width: 396px;
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 16px;
+  color: black;
+  border: 2px solid #87cefa;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.button-container {
+  position: sticky;
+  display: flex;
+  justify-content: space-between;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  gap: 10px;
+  background: #2196F3;
+  margin: 0;
+  padding: 5px;
+  border-bottom: 1px solid #d9d9d9;
+}
+
+.trash-item {
+  padding: 2px 12px;
+  margin: 1px 0;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.trash-item.hover {
+  background-color: #d9d9d9;
+}
+
+.trash-item-icon {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+#restoreLastIcon, #restoreAllIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  cursor: pointer; 
+}
+
+
+.material-icons.md-48 {
+  font-size: 32px;
+}
+
+
+.hidden {
+  display: none;
+}
+
 .ui-menu {
   position: relative;
   background-color: rgba(255, 255, 255, 1);
