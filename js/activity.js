@@ -1512,6 +1512,7 @@ class Activity {
                 activity.save.saveLilypond.bind(activity.save),
                 activity.save.saveLilypond.bind(afterSaveLilypond),
                 activity.save.afterSaveLilypondLY.bind(activity.save),
+                activity.save.afterSaveLilypondPDF.bind(activity.save),
                 activity.save.saveAbc.bind(activity.save),
                 activity.save.saveMxml.bind(activity.save),
                 activity.save.saveBlockArtwork.bind(activity.save)
