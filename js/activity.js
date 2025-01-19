@@ -272,6 +272,17 @@ class Activity {
         //Flag to check if any other input box is active or not
         this.isInputON = false;
 
+        // If the theme is set to "darkMode", enable dark mode else diable
+        try {
+            if (this.storage.myThemeName === "darkMode") {
+                body.classList.add("dark-mode");
+            } else {
+                body.classList.remove("dark-mode");
+            }
+        } catch (e) {
+            console.error("Error accessing myThemeName storage:", e);
+        }
+
         this.beginnerMode = true;
         try {
             if (this.storage.beginnerMode === undefined) {
@@ -1054,20 +1065,20 @@ class Activity {
             modal.style.transform = "translate(-50%, -50%)";
             modal.style.width = "400px";
             modal.style.padding = "24px";
-            modal.style.backgroundColor = "#fff";
+            modal.style.backgroundColor = platformColor.dialogueBox;
             modal.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
             modal.style.borderRadius = "8px";
             modal.style.zIndex = "10000";
             modal.style.textAlign = "left";
             const title = document.createElement("h2");
             title.textContent = "Clear Workspace";
-            title.style.color = "#0066FF";
+            title.style.color = platformColor.blueButton;
             title.style.fontSize = "24px";
             title.style.margin = "0 0 16px 0";
             modal.appendChild(title);
             const message = document.createElement("p");
-            message.textContent = "Are you sure you want to clear the workspace?";
-            message.style.color = "#666666";
+            message.textContent = _("Are you sure you want to clear the workspace?");
+            message.style.color = platformColor.textColor;
             message.style.fontSize = "16px";
             message.style.marginBottom = "24px";
             modal.appendChild(message);
@@ -1075,10 +1086,10 @@ class Activity {
             const buttonContainer = document.createElement("div");
             buttonContainer.style.display = "flex";
             buttonContainer.style.justifyContent = "flex-start";
-        
+
             const confirmBtn = document.createElement("button");
             confirmBtn.textContent = "Confirm";
-            confirmBtn.style.backgroundColor = "#2196F3";
+            confirmBtn.style.backgroundColor = platformColor.blueButton;
             confirmBtn.style.color = "white";
             confirmBtn.style.border = "none";
             confirmBtn.style.borderRadius = "4px";
@@ -1670,7 +1681,7 @@ class Activity {
                 if (this.blockscale > 0) {
                     this.resizeDebounce = true;
                     this.blockscale -= 1;
-                    this.clearCache();                
+                    this.clearCache();
                     await this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
                     this.blocks.checkBounds();
                     this.refreshCanvas();
@@ -6561,6 +6572,21 @@ class Activity {
 
             this._createErrorContainers();
 
+            // Function to toggle theme mode
+            this.toggleThemeMode = () => {
+                if (this.storage.myThemeName === "darkMode") {
+                    // If currently in dark mode, remove the theme
+                    delete this.storage.myThemeName;
+                } else {
+                    this.storage.myThemeName = "darkMode";
+                }
+                try {
+                    window.location.reload();
+                } catch (e) {
+                    console.error("Error reloading the window:", e);
+                }
+            };
+
             /* Z-Order (top to bottom):
              *   menus
              *   palettes
@@ -6627,6 +6653,7 @@ class Activity {
             this.toolbar.renderModeSelectIcon(doSwitchMode, doRecordButton, doAnalytics, doOpenPlugin, deletePlugin, setScroller);
             this.toolbar.renderRunSlowlyIcon(doSlowButton);
             this.toolbar.renderRunStepIcon(doStepButton);
+            this.toolbar.renderDarkModeIcon(this.toggleThemeMode);
             this.toolbar.renderMergeIcon(_doMergeLoad);
             this.toolbar.renderRestoreIcon(restoreTrash);
             if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -7190,6 +7217,7 @@ class Activity {
     saveLocally() {
         try {
             localStorage.setItem('beginnerMode', this.beginnerMode.toString());
+            localStorage.setItem('isDarkModeON', this.isDarkModeON.toString());
         } catch (e) {
             console.error('Error saving to localStorage:', e);
         }

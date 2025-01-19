@@ -943,7 +943,7 @@ class PhraseMaker {
             cell.style.position = "sticky";
             cell.style.left = "1.2px";
             cell.style.zIndex = "1";
-            cell.style.backgroundColor = platformColor.lyricsLabelBackground || "#FF2B77";
+            cell.style.backgroundColor = platformColor.lyricsLabelBackground;
             cell.style.textAlign = "center";
             cell.innerHTML = "Lyrics";
 
@@ -966,7 +966,7 @@ class PhraseMaker {
                 inputCell.style.width = this._noteWidth(noteValue) + "px";
                 inputCell.style.minWidth = inputCell.style.width;
                 inputCell.style.maxWidth = inputCell.style.width;
-                inputCell.style.backgroundColor = "#FF6EA1";
+                inputCell.style.backgroundColor = platformColor.lyricsInputBackground;
                 inputCell.style.fontFamily = "sans-serif";
                 inputCell.style.cursor = "default";
                 inputCell.style.borderSpacing = "1px 1px";
@@ -992,7 +992,7 @@ class PhraseMaker {
                 lyricsInput.style.padding = "0";
                 lyricsInput.style.border = "none";
                 lyricsInput.style.borderRadius = "6px";
-                lyricsInput.style.backgroundColor = "#FF6EA1";
+                lyricsInput.style.backgroundColor = platformColor.lyricsInputBackground;
 
                 inputCell.appendChild(lyricsInput);
                 inputCell.addEventListener("mouseover", (event) => {
@@ -1000,7 +1000,7 @@ class PhraseMaker {
                 });
 
                 inputCell.addEventListener("mouseout", (event) => {
-                    event.target.style.backgroundColor = "#FF6EA1";
+                    event.target.style.backgroundColor = platformColor.lyricsInputBackground;
                 });
                 lyricsInput.addEventListener("focus", () => this.activity.isInputON = true);
                 lyricsInput.addEventListener("blur", () => this.activity.isInputON = false);
@@ -1052,7 +1052,6 @@ class PhraseMaker {
         tempTable = document.createElement("table");
         tempTable.setAttribute("cellpadding", "0px");
         this._tupletNoteValueRow = tempTable.insertRow();
-        const tempTable2 = tempTable;
         this._tupletValueRow = tempTable.insertRow();
         this._noteValueRow = tempTable.insertRow();
         ptmTableRow.insertCell().append(tempTable);
@@ -3149,6 +3148,7 @@ class PhraseMaker {
             cell.style.textAlign = "center";
             cell.innerHTML = noteValueToDisplay;
             cell.style.backgroundColor = platformColor.rhythmcellcolor;
+            cell.style.color = platformColor.textColor;
             cell.setAttribute("alt", noteValue);
 
             if (this._matrixHasTuplets) {
