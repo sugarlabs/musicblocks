@@ -5071,6 +5071,7 @@ class Activity {
          */
         this.showContents = () => {
             docById("loading-image-container").style.display = "none";
+            docById("bottom-right-logo").style.display = "none";
             docById("palette").style.display = "block";
             // docById('canvas').style.display = 'none';
             docById("hideContents").style.display = "block";

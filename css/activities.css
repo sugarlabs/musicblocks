@@ -487,7 +487,7 @@ img.icon:hover {
 }
 
 #loading-image-container {
-  z-index: 99999;
+  z-index: 89999;
 }
 
 body {
@@ -1835,4 +1835,23 @@ table {
     display: block;
     clear: both;
   }
+}
+.logo-container{
+  position: absolute;
+  bottom: 1px; /* Distance from the bottom */
+  right: 23px;  /* Distance from the right */
+  padding: 0px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+#link-to-sugarLabs:link ,
+#link-to-sugarLabs:visited ,
+#link-to-sugarLabs:hover ,
+#link-to-sugarLabs:active  {
+  color: #000;
+}
+.color-change {
+  fill : #033CD2;
+  stroke : #78E600;
+  stroke-width: 3;
 }
