@@ -276,3 +276,6 @@ class Trashcan {
         return true;
     }
 }
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Trashcan;
+}

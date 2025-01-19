@@ -149,3 +149,6 @@ class PasteBox {
         img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
     }
 }
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = PasteBox;
+}

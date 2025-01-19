@@ -476,6 +476,14 @@ const createHelpContent = (activity) => {
                     _("Let us start our tour!"),
                 "data:image/svg+xml;base64," +
                     window.btoa(base64Encode(MOUSEPALETTEICON))
+            ],            
+            [
+                _("Guide"),
+                _("A detailed guide to Music Blocks is available."),
+                "data:image/svg+xml;base64," +
+                    window.btoa(base64Encode(LOGO)),
+                GUIDEURL,
+                _("Music Blocks Guide")
             ],
             [
                 _("Play"),
@@ -697,7 +705,7 @@ const createHelpContent = (activity) => {
             "data:image/svg+xml;base64," +
                 window.btoa(
                     base64Encode(PLUGINSDELETEBUTTON))
-                
+
         ]);
         HELPCONTENT.push([
             _("Enable scrolling"),
@@ -705,8 +713,8 @@ const createHelpContent = (activity) => {
             "data:image/svg+xml;base64," +
                 window.btoa(
                     base64Encode(SCROLLUNLOCKBUTTON))
-                
-        ]);
+
+        ]);        
     }
     // TODO: Add merge
     HELPCONTENT.push([
@@ -715,7 +723,7 @@ const createHelpContent = (activity) => {
         "data:image/svg+xml;base64," +
             window.btoa(
                 base64Encode(WRAPTURTLEBUTTON))
-            
+
     ]);
     // TODO: Music Blocks: set pitch preview
     // TODO: toggle JS editor
@@ -725,7 +733,7 @@ const createHelpContent = (activity) => {
         "data:image/svg+xml;base64," +
             window.btoa(
                 base64Encode(RESTORETRASHBUTTON))
-            
+                            
     ]);
     HELPCONTENT.push([
         _("Switch mode"),
@@ -785,14 +793,6 @@ const createHelpContent = (activity) => {
                 window.btoa(base64Encode(LOGO))
         ]);
     } else {
-        HELPCONTENT.push([
-            _("Guide"),
-            _("A detailed guide to Music Blocks is available."),
-            "data:image/svg+xml;base64," +
-                window.btoa(base64Encode(LOGO)),
-            GUIDEURL,
-            _("Music Blocks Guide")
-        ]);
         HELPCONTENT.push([
             _("About"),
             _("Music Blocks is an open source collection of tools for exploring musical concepts.") +

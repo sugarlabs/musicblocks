@@ -538,6 +538,7 @@ class SaveInterface {
     * @instance
     */
     afterSaveLilypond(filename) {
+        filename = docById("fileName").value;
         const ly = saveLilypondOutput(this.activity);
         switch (this.notationConvert) {
             case "pdf":
@@ -564,6 +565,7 @@ class SaveInterface {
      */
 
     afterSaveLilypondLY(lydata, filename) {
+        filename = docById("fileName").value;
         if (platform.FF) {
             // eslint-disable-next-line no-console
             console.debug('execCommand("copy") does not work on FireFox');
