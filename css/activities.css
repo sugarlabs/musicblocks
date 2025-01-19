@@ -51,7 +51,7 @@
 }
 
 #search[type="text"] {
-  width: 400px;
+  width: 300px;
   box-sizing: border-box;
   position: absolute;
   background-color: white;
@@ -88,6 +88,72 @@
   width: 220px;
   height: 20px;
   font-size: large;
+}
+
+.trash-view {
+  position: relative;
+  background-color: white;
+  max-width: 396px;
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 16px;
+  color: black;
+  border: 2px solid #87cefa;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.button-container {
+  position: sticky;
+  display: flex;
+  justify-content: space-between;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  gap: 10px;
+  background: #2196F3;
+  margin: 0;
+  padding: 5px;
+  border-bottom: 1px solid #d9d9d9;
+}
+
+.trash-item {
+  padding: 2px 12px;
+  margin: 1px 0;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.trash-item.hover {
+  background-color: #d9d9d9;
+}
+
+.trash-item-icon {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+#restoreLastIcon, #restoreAllIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  cursor: pointer; 
+}
+
+
+.material-icons.md-48 {
+  font-size: 32px;
+}
+
+
+.hidden {
+  display: none;
 }
 
 .ui-menu {
@@ -421,7 +487,7 @@ img.icon:hover {
 }
 
 #loading-image-container {
-  z-index: 99999;
+  z-index: 89999;
 }
 
 body {
@@ -982,6 +1048,7 @@ table {
 #helpBodyDiv .message {
   text-align: center;
   line-height: 1.2;
+  margin: auto;
 }
 
 #helpBodyDiv .icon-container {
@@ -1768,4 +1835,23 @@ table {
     display: block;
     clear: both;
   }
+}
+.logo-container{
+  position: absolute;
+  bottom: 1px; /* Distance from the bottom */
+  right: 23px;  /* Distance from the right */
+  padding: 0px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+#link-to-sugarLabs:link ,
+#link-to-sugarLabs:visited ,
+#link-to-sugarLabs:hover ,
+#link-to-sugarLabs:active  {
+  color: #000;
+}
+.color-change {
+  fill : #033CD2;
+  stroke : #78E600;
+  stroke-width: 3;
 }

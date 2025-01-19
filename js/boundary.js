@@ -122,3 +122,6 @@ class Boundary {
         this._container.visible = true;
     }
 }
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = Boundary;
+}

@@ -333,7 +333,7 @@ class Toolbar {
     renderLogoIcon(onclick) {
         const logoIcon = docById("mb-logo");
         if (this.language === "ja") {
-            logoIcon.innerHTML = '<img style="width: 100%;" src="images/logo-ja.svg">';
+            logoIcon.innerHTML = '<img style="width: 100%; transform: scale(0.85);" src="images/logo-ja.svg">';
         }
 
         logoIcon.onmouseenter = () => {
@@ -359,7 +359,7 @@ class Toolbar {
     renderPlayIcon(onclick) {
         const playIcon = docById("play");
         const stopIcon = docById("stop");
-
+        const recordButton = docById("record");
         let isPlayIconRunning = false;
 
         function handleClick() {
@@ -382,6 +382,11 @@ class Toolbar {
             onclick(this.activity);
             handleClick();
             stopIcon.style.color = this.stopIconColorWhenPlaying;
+            saveButton.disabled = true;
+            saveButtonAdvanced.disabled = true;
+           saveButton.className = "grey-text inactiveLink";
+           saveButtonAdvanced.className = "grey-text inactiveLink";
+           recordButton.className = "grey-text inactiveLink";
             isPlayIconRunning = true;
             play_button_debounce_timeout = setTimeout(function() { handleClick(); }, 2000);
 
@@ -403,9 +408,15 @@ class Toolbar {
      */
     renderStopIcon(onclick) {
         const stopIcon = docById("stop");
+        const recordButton = docById("record");
         stopIcon.onclick = () => {
             onclick(this.activity);
             stopIcon.style.color = "white";
+            saveButton.disabled = false;
+            saveButtonAdvanced.disabled = false;
+            saveButton.className = "";
+            saveButtonAdvanced.className = "";
+            recordButton.className = "";
         };
     }
 

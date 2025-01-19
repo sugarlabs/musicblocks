@@ -1,14 +1,36 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
    version="1.1"
    width="278.34229"
    height="424.5"
-   id="svg3641">
+   id="svg3641"
+   sodipodi:docname="matrix14.svg"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#999999"
+     borderopacity="1"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.844523"
+     inkscape:cx="139.33142"
+     inkscape:cy="212.25"
+     inkscape:window-width="1920"
+     inkscape:window-height="1001"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g2211" />
   <metadata
      id="metadata3670">
     <rdf:RDF>
@@ -17,7 +39,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -27,12 +49,10 @@
      y="-126.87307"
      x="226.04298"
      id="text27-9"
-     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000">
-    <tspan
+     style="font-size:13.33333302px;font-family:Sans;text-anchor:end;fill:#000000"><tspan
        x="320.043"
        y="-104.37307"
-       id="tspan29-2" />
-  </text>
+       id="tspan29-2" /></text>
   <g
      transform="translate(224.89053,-114.87307)"
      id="g2228">
@@ -48,12 +68,10 @@
            id="path1148" />
         <text
            style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1152">
-          <tspan
+           id="text1152"><tspan
              x="46.333332"
              y="13.5"
-             id="tspan1150">half note</tspan>
-        </text>
+             id="tspan1150">half note</tspan></text>
       </g>
     </g>
     <path
@@ -76,28 +94,22 @@
            id="path920" />
         <text
            style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text924">
-          <tspan
+           id="text924"><tspan
              x="56.894855"
              y="24"
-             id="tspan922">rhythm</tspan>
-        </text>
+             id="tspan922">rhythm</tspan></text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text928">
-          <tspan
+           id="text928"><tspan
              x="56.894855"
              y="11.25"
-             id="tspan926">number of notes</tspan>
-        </text>
+             id="tspan926">number of notes</tspan></text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text932">
-          <tspan
+           id="text932"><tspan
              x="56.894855"
              y="32.25"
-             id="tspan930">note value</tspan>
-        </text>
+             id="tspan930">note value</tspan></text>
       </g>
     </g>
     <g
@@ -112,12 +124,10 @@
            id="path938" />
         <text
            style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text942">
-          <tspan
+           id="text942"><tspan
              x="13.333333"
              y="13.833333"
-             id="tspan940">1</tspan>
-        </text>
+             id="tspan940">1</tspan></text>
       </g>
     </g>
     <g
@@ -132,28 +142,22 @@
            id="path948" />
         <text
            style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text952">
-          <tspan
+           id="text952"><tspan
              x="54.333332"
              y="23.799999"
-             id="tspan950">/</tspan>
-        </text>
+             id="tspan950">/</tspan></text>
         <text
            style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text956">
-          <tspan
+           id="text956"><tspan
              x="54.333332"
              y="10.75"
-             id="tspan954" />
-        </text>
+             id="tspan954" /></text>
         <text
            style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text960">
-          <tspan
+           id="text960"><tspan
              x="54.333332"
              y="31.75"
-             id="tspan958" />
-        </text>
+             id="tspan958" /></text>
       </g>
     </g>
     <g
@@ -168,12 +172,10 @@
            id="path966" />
         <text
            style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text970">
-          <tspan
+           id="text970"><tspan
              x="13.333333"
              y="13.833333"
-             id="tspan968">1</tspan>
-        </text>
+             id="tspan968">1</tspan></text>
       </g>
     </g>
     <g
@@ -188,12 +190,10 @@
            id="path976" />
         <text
            style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text980">
-          <tspan
+           id="text980"><tspan
              x="13.333333"
              y="13.833333"
-             id="tspan978">2</tspan>
-        </text>
+             id="tspan978">2</tspan></text>
       </g>
     </g>
   </g>
@@ -211,28 +211,22 @@
            id="path996" />
         <text
            style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1000">
-          <tspan
+           id="text1000"><tspan
              x="56.894855"
              y="24"
-             id="tspan998">rhythm</tspan>
-        </text>
+             id="tspan998">rhythm</tspan></text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1004">
-          <tspan
+           id="text1004"><tspan
              x="56.894855"
              y="11.25"
-             id="tspan1002">number of notes</tspan>
-        </text>
+             id="tspan1002">number of notes</tspan></text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1008">
-          <tspan
+           id="text1008"><tspan
              x="56.894855"
              y="32.25"
-             id="tspan1006">note value</tspan>
-        </text>
+             id="tspan1006">note value</tspan></text>
       </g>
     </g>
     <g
@@ -247,12 +241,10 @@
            id="path1014" />
         <text
            style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text1018">
-          <tspan
+           id="text1018"><tspan
              x="13.333333"
              y="13.833333"
-             id="tspan1016">1</tspan>
-        </text>
+             id="tspan1016">1</tspan></text>
       </g>
     </g>
     <g
@@ -267,28 +259,22 @@
            id="path1024" />
         <text
            style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1028">
-          <tspan
+           id="text1028"><tspan
              x="54.333332"
              y="23.799999"
-             id="tspan1026">/</tspan>
-        </text>
+             id="tspan1026">/</tspan></text>
         <text
            style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1032">
-          <tspan
+           id="text1032"><tspan
              x="54.333332"
              y="10.75"
-             id="tspan1030" />
-        </text>
+             id="tspan1030" /></text>
         <text
            style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1036">
-          <tspan
+           id="text1036"><tspan
              x="54.333332"
              y="31.75"
-             id="tspan1034" />
-        </text>
+             id="tspan1034" /></text>
       </g>
     </g>
     <g
@@ -303,12 +289,10 @@
            id="path1042" />
         <text
            style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text1046">
-          <tspan
+           id="text1046"><tspan
              x="13.333333"
              y="13.833333"
-             id="tspan1044">1</tspan>
-        </text>
+             id="tspan1044">1</tspan></text>
       </g>
     </g>
     <g
@@ -323,12 +307,10 @@
            id="path1052" />
         <text
            style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text1056">
-          <tspan
+           id="text1056"><tspan
              x="13.333333"
              y="13.833333"
-             id="tspan1054">4</tspan>
-        </text>
+             id="tspan1054">4</tspan></text>
       </g>
     </g>
   </g>
@@ -347,28 +329,22 @@
            id="path1072" />
         <text
            style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1076">
-          <tspan
+           id="text1076"><tspan
              x="56.894855"
              y="24"
-             id="tspan1074">rhythm</tspan>
-        </text>
+             id="tspan1074">rhythm</tspan></text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1080">
-          <tspan
+           id="text1080"><tspan
              x="56.894855"
              y="11.25"
-             id="tspan1078">number of notes</tspan>
-        </text>
+             id="tspan1078">number of notes</tspan></text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1084">
-          <tspan
+           id="text1084"><tspan
              x="56.894855"
              y="32.25"
-             id="tspan1082">note value</tspan>
-        </text>
+             id="tspan1082">note value</tspan></text>
       </g>
     </g>
     <g
@@ -383,12 +359,10 @@
            id="path1090" />
         <text
            style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text1094">
-          <tspan
+           id="text1094"><tspan
              x="13.333333"
              y="13.833333"
-             id="tspan1092">1</tspan>
-        </text>
+             id="tspan1092">1</tspan></text>
       </g>
     </g>
     <g
@@ -403,28 +377,22 @@
            id="path1100" />
         <text
            style="font-size:14px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1104">
-          <tspan
+           id="text1104"><tspan
              x="54.333332"
              y="23.799999"
-             id="tspan1102">/</tspan>
-        </text>
+             id="tspan1102">/</tspan></text>
         <text
            style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1108">
-          <tspan
+           id="text1108"><tspan
              x="54.333332"
              y="10.75"
-             id="tspan1106" />
-        </text>
+             id="tspan1106" /></text>
         <text
            style="font-size:9.33333302px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1112">
-          <tspan
+           id="text1112"><tspan
              x="54.333332"
              y="31.75"
-             id="tspan1110" />
-        </text>
+             id="tspan1110" /></text>
       </g>
     </g>
     <g
@@ -439,12 +407,10 @@
            id="path1118" />
         <text
            style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text1122">
-          <tspan
+           id="text1122"><tspan
              x="13.333333"
              y="13.833333"
-             id="tspan1120">1</tspan>
-        </text>
+             id="tspan1120">1</tspan></text>
       </g>
     </g>
     <g
@@ -459,12 +425,10 @@
            id="path1128" />
         <text
            style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-           id="text1132">
-          <tspan
+           id="text1132"><tspan
              x="13.333333"
              y="13.833333"
-             id="tspan1130">8</tspan>
-        </text>
+             id="tspan1130">8</tspan></text>
       </g>
     </g>
   </g>
@@ -483,12 +447,10 @@
            id="path1148-9" />
         <text
            style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1152-1">
-          <tspan
+           id="text1152-1"><tspan
              x="46.333332"
              y="13.5"
-             id="tspan1150-2">quarter note</tspan>
-        </text>
+             id="tspan1150-2">quarter note</tspan></text>
       </g>
     </g>
     <g
@@ -514,13 +476,13 @@
            style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
            id="path1148-7" />
         <text
-           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
-           id="text1152-5">
-          <tspan
-             x="46.333332"
-             y="13.5"
-             id="tspan1150-3">eighthnote</tspan>
-        </text>
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;display:inline;fill:#000000"
+           id="text1152-5"
+           x="2.5300128"
+           y="0.1807152"><tspan
+             x="48.863346"
+             y="13.680716"
+             id="tspan1150-3">eighth note</tspan></text>
       </g>
     </g>
     <g

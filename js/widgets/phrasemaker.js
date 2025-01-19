@@ -47,7 +47,8 @@ Globals location
 */
 
 /* exported PhraseMaker */
-
+// The last selected index for piemenu 
+let lastIndex = 5;
 const MATRIXGRAPHICS = [
     "forward",
     "back",
@@ -1070,7 +1071,7 @@ class PhraseMaker {
         }
 
         if (this.isInitial) {
-            this.activity.textMsg(_("Click on the table to add notes."));
+            activity.textMsg(_("Click on the table to add notes."), 3000);
             this.widgetWindow.sendToCenter();
             this.inInitial = false;
         }
@@ -1758,6 +1759,7 @@ class PhraseMaker {
                 this._pitchWheel.selectedNavItemIndex
             ].title;
             docById("wheelnav-_exitWheel-title-1").children[0].textContent = this.blockValue;
+            lastIndex = this._pitchWheel.selectedNavItemIndex; // Update lastIndex
             // eslint-disable-next-line no-use-before-define
             __selectionChanged(true);
         };
@@ -1900,7 +1902,10 @@ class PhraseMaker {
                 }
             }
         }
-    }
+            if (lastIndex !== null && this._pitchWheel.navItems[lastIndex]) {
+                this._pitchWheel.navigateWheel(lastIndex);
+            }
+}
 
     /**
      * Creates a pie submenu for modifying column blocks based on the provided condition.
@@ -4608,7 +4613,7 @@ class PhraseMaker {
     __playNote(time, noteCounter) {
         // Show lyrics while playing notes.
         if (this.lyricsON) {
-            this.activity.textMsg(this._lyrics[noteCounter]);
+            activity.textMsg(this._lyrics[noteCounter], 3000);
         }
         // If the widget is closed, stop playing.
         if (!this.widgetWindow.isVisible()) {
@@ -5494,6 +5499,6 @@ class PhraseMaker {
 
         // Create a new stack for the chunk.
         this.activity.blocks.loadNewBlocks(newStack);
-        this.activity.textMsg(_("New action block generated."));
+        activity.textMsg(_("New action block generated."), 3000 );
     }
 }

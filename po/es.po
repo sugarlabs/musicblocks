@@ -42,6 +42,14 @@ msgstr ""
 msgid "Music Blocks Project"
 msgstr "Proyecto de Bloques de Música"
 
+#: js/activity.js:1285
+msgid "Enter file name"
+msgstr "Introduzca el nombre del archivo"
+
+#: js/activity.js:1306
+msgid "Click on stop saving"
+msgstr "Haga clic en dejar de guardar"
+
 #: js/SaveInterface.js:63
 msgid "This project was created in Music Blocks"
 msgstr "Este proyecto fue creado en Bloques de Música"

@@ -302,7 +302,7 @@ img.icon:hover {
   background-color: rgba(139, 195, 74, 0.8);
 }
 #loading-image-container {
-  z-index: 99999;
+  z-index: 89999;
 }
 body {
   background-color: #92b5c8 !important;

@@ -1756,7 +1756,7 @@ msgstr "画面の境界を無視しない"
 #: js/toolbar.js:466
 #: js/toolbar.js:506
 msgid "Turtle Wrap On"
-msgstr "画面の境界を無視す"
+msgstr "画面の境界を無視する"
 
 #: js/toolbar.js:1069
 msgid "Are you sure you want to create a new project?"
@@ -1886,7 +1886,7 @@ msgstr "タートル・ブロックへようこそ"
 
 #: js/turtledefs.js:436
 msgid "Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks."
-msgstr "ミュージック・ブロックスは、"
+msgstr "タートル・ブロックスはアートと数学を求めるビジュアル・プログラミング言語だ。"
 
 #: js/turtledefs.js:437
 #: js/turtledefs.js:464
@@ -6710,7 +6710,7 @@ msgstr "この名前の辞書は存在しません。"
 
 #: js/turtleactions/DictActions.js:259
 msgid "Key with this name does not exist in "
-msgstr "この名前のキーワードは次の辞書にはいていません："
+msgstr "この名前のキーワードは次の辞書に入ていません："
 
 #: js/turtleactions/DrumActions.js:227
 msgid "Noise Block: Did you mean to use a Note block?"
@@ -6719,7 +6719,7 @@ msgstr "音符ブロックを使いますか？"
 #: js/turtleactions/MeterActions.js:101
 #: js/turtleactions/MeterActions.js:139
 msgid "beats per minute must be greater than"
-msgstr "１分あたりの拍の数には、これより大きいあたいをせっていしてください："
+msgstr "１分あたりの拍の数には、これより大きい値を設定してください："
 
 #: js/turtleactions/MeterActions.js:111
 #: js/turtleactions/MeterActions.js:149
@@ -6857,7 +6857,7 @@ msgstr "「MIDI]を読み込み中です。音符の数とトラックの数に�
 #: js/widgets/aiwidget.js:551
 #: js/widgets/sampler.js:254
 msgid "Upload failed: Sample is not a .wav file."
-msgstr ""
+msgstr "アップロードできませんでした： サンプルは .wavファイルでは ありません。"
 
 #: js/widgets/aiwidget.js:679
 #: js/widgets/sampler.js:432
@@ -6945,7 +6945,7 @@ msgstr "音色サンプルをアップロード"
 
 #: js/widgets/sampler.js:399
 msgid "Warning: Your sample cannot be loaded because it is >1MB."
-msgstr ""
+msgstr "ワーニング：音色サンプルは> 1MBであるため 読み込むことができません。"
 
 #: js/widgets/sampler.js:448
 msgid "Toggle Mic"
@@ -7216,7 +7216,7 @@ msgstr "ビブラートの速さ"
 
 #: js/widgets/timbre.js:1919
 msgid "Filter already present."
-msgstr ""
+msgstr "フィルターは もう 存在しています。"
 
 #: js/widgets/timbre.js:2507
 msgid "distortion amount"

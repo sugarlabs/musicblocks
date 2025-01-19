@@ -129,4 +129,6 @@ function setupOrnamentActions(activity) {
         }
     };
 }
-module.exports = setupOrnamentActions;
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = setupOrnamentActions;
+}

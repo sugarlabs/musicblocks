@@ -1630,6 +1630,7 @@ function setupWidgetBlocks(activity) {
         new oscilloscopeWidgetBlock().setup(activity);
         new PitchSliderBlock().setup(activity);
         new ChromaticBlock().setup(activity);
+        // new AIMusicBlocks().setup(activity);
         new MusicKeyboard2Block().setup(activity);
         new MusicKeyboardBlock().setup(activity);
         new PitchStaircaseBlock().setup(activity);
@@ -1638,7 +1639,6 @@ function setupWidgetBlocks(activity) {
         new MatrixGMajorBlock().setup(activity);
         new MatrixCMajorBlock().setup(activity);
         new MatrixBlock().setup(activity);
-        new AIMusicBlocks().setup(activity);
     }
     // Instantiate and set up the StatusBlock
     new StatusBlock().setup(activity);

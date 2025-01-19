@@ -264,4 +264,6 @@ function setupDictActions(activity) {
         }
     };
 }
-module.exports = setupDictActions;
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = setupDictActions;
+}

@@ -3639,7 +3639,7 @@ const piemenuKey = (activity) => {
     docById("chooseKeyDiv").style.display = "block";
     docById("movable").style.display = "block";
 
-    const keyNameWheel = new wheelnav("chooseKeyDiv", null, 1700, 1700);
+    const keyNameWheel = new wheelnav("chooseKeyDiv", null, 1300, 1300);
     const keyNameWheel2 = new wheelnav("keyNameWheel2", keyNameWheel.raphael);
     const keys = ["C", "G", "D", "A", "E", "B/C♭", "F♯/G♭", "C♯/D♭", "G♯/A♭", "D♯/E♭", "A♯/B♭", "F"];
 
@@ -3647,8 +3647,8 @@ const piemenuKey = (activity) => {
 
     keyNameWheel.slicePathFunction = slicePath().DonutSlice;
     keyNameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-    keyNameWheel.slicePathCustom.minRadiusPercent = 0.5;
-    keyNameWheel.slicePathCustom.maxRadiusPercent = 0.8;
+    keyNameWheel.slicePathCustom.minRadiusPercent = 0.6;
+    keyNameWheel.slicePathCustom.maxRadiusPercent = 0.9;
     keyNameWheel.sliceSelectedPathCustom = keyNameWheel.slicePathCustom;
     keyNameWheel.sliceInitPathCustom = keyNameWheel.slicePathCustom;
     keyNameWheel.titleRotateAngle = 0;
@@ -3660,7 +3660,7 @@ const piemenuKey = (activity) => {
     keyNameWheel2.colors = platformColor.pitchWheelcolors;
     keyNameWheel2.slicePathFunction = slicePath().DonutSlice;
     keyNameWheel2.slicePathCustom = slicePath().DonutSliceCustomization();
-    keyNameWheel2.slicePathCustom.minRadiusPercent = 0.8;
+    keyNameWheel2.slicePathCustom.minRadiusPercent = 0.9;
     keyNameWheel2.slicePathCustom.maxRadiusPercent = 1;
     keyNameWheel2.sliceSelectedPathCustom = keyNameWheel2.slicePathCustom;
     keyNameWheel2.sliceInitPathCustom = keyNameWheel2.slicePathCustom;
@@ -3686,7 +3686,7 @@ const piemenuKey = (activity) => {
     modenameWheel.slicePathFunction = slicePath().DonutSlice;
     modenameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
     modenameWheel.slicePathCustom.minRadiusPercent = 0.2;
-    modenameWheel.slicePathCustom.maxRadiusPercent = 0.5;
+    modenameWheel.slicePathCustom.maxRadiusPercent = 0.6;
     modenameWheel.sliceSelectedPathCustom = modenameWheel.slicePathCustom;
     modenameWheel.sliceInitPathCustom = modenameWheel.slicePathCustom;
     modenameWheel.titleRotateAngle = 0;
