@@ -229,23 +229,19 @@ input.number {
 #canvas {
   overflow-y: visible;
 }
-.upper-text {
-  margin: 0;
-  font-size: 14px;
-  font-style: italic;
-  font-weight: 100;
-}
-.lower-text{
-  text-align: right;
-}
-.bottom-right-logo1{
+.logo-container{
   position: absolute;
-  bottom: 32px; /* Distance from the bottom */
+  bottom: 1px; /* Distance from the bottom */
   right: 23px;  /* Distance from the right */
-  padding: 10px;
+  padding: 0px;
   border-radius: 5px;
   cursor: pointer;
-  color: black;
+}
+#link-to-sugarLabs:link ,
+#link-to-sugarLabs:visited ,
+#link-to-sugarLabs:hover ,
+#link-to-sugarLabs:active  {
+  color: #000;
 }
 .logo-container{
   position: absolute;
@@ -260,4 +256,9 @@ input.number {
 #link-to-sugarLabs:hover ,
 #link-to-sugarLabs:active  {
   color: #000;
+}
+.color-change {
+  fill : #033CD2;
+  stroke : #78E600;
+  stroke-width: 3;
 }

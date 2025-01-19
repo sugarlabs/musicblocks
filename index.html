@@ -173,7 +173,6 @@
 
                 loadL10nSplashScreen();
             </script>
-            <div class="loading-text" id="loadingText" style="margin-top:1.5rem;"></div>
             <a href="https://www.sugarlabs.org/" target="_blank" id="link-to-sugarLabs">
                 <div class= "bottom-right-logo1" id="bottom-right-logo">
                     <h1  class="upper-text" id="this-is-a-text"></h1>
@@ -204,35 +203,6 @@
                             fill="#969696"
                             stroke-width="0" />
                     </svg>
-
-                    <script>
-                        // List of color pairs to dynamically alot.
-                        const colorPairs = [
-                            { fill: "#A00000", stroke: "#FF7800" },
-                            { fill: "#68008C", stroke: "#78E600" },
-                            { fill: "#6E008C", stroke: "#00BEFF" },
-                            { fill: "#006E00", stroke: "#00BEFF" },
-                            { fill: "#033CD2", stroke: "#00BEFF" },
-                            { fill: "#033CD2", stroke: "#FF64D2" },
-                            { fill: "#006E00", stroke: "#78E600" },
-                            { fill: "#6E008C", stroke: "#FFD732" },
-                            { fill: "#68008C", stroke: "#78E600" },
-                            { fill: "#6E008C", stroke: "#FF7800" },
-                            { fill: "#6E008C", stroke: "#FF64D2" },
-                            { fill: "#033CD2", stroke: "#FF7800" }
-                        ];
-                        const paths = document.querySelectorAll(".color-change");
-                        // Randomly select a color pair
-                        const randomColorPair = colorPairs[Math.floor(Math.random() * colorPairs.length)];
-                        // apply random pairs.
-                        paths.forEach(path => {
-                            path.setAttribute("fill", randomColorPair.fill);
-                            path.setAttribute("stroke", randomColorPair.stroke);
-                            path.setAttribute("stroke-width",3)
-                        });
-                        document.getElementById("this-is-a-text").textContent = "A proud initiative by";
-                    </script>
-                    
                 </div>
             </a>
             <script>
