@@ -25,15 +25,20 @@ This guide explains how themes are managed in Music Blocks (MB) and how you can 
 
    To persist a theme, save its name locally when toggled. For example, the **dark mode** implementation:
    ```javascript
-   this.toggleDarkMode = () => {
-       this.isDarkModeON = !this.isDarkModeON; // Toggle the boolean value
-       try {
-           this.storage.darkMode = this.isDarkModeON.toString(); // Save the state as a string
-           window.location.reload(); // Reload the browser
-       } catch (e) {
-           console.error("Error saving darkMode state to storage:", e);
-       }
-   };
+    // Function to toggle theme mode
+    this.toggleThemeMode = () => {
+        if (this.storage.myThemeName === "darkMode") {
+            // If currently in dark mode, remove the theme
+            delete this.storage.myThemeName;
+        } else {
+            this.storage.myThemeName = "darkMode";
+        }
+        try {
+            window.location.reload();
+        } catch (e) {
+            console.error("Error reloading the window:", e);
+        }
+    };
    ```
 
 5. **Applying the Theme After Reload**
@@ -44,29 +49,16 @@ This guide explains how themes are managed in Music Blocks (MB) and how you can 
 
    Example:
    ```javascript
-   // Flag to check if dark mode is enabled
-   this.isDarkModeON = false;
-
-   try {
-       if (this.storage.darkMode === undefined) {
-           this.isDarkModeON = false;
-       } else if (this.storage.darkMode !== null) {
-           this.isDarkModeON = this.storage.darkMode;
-
-           if (typeof this.isDarkModeON === "string") {
-               if (this.isDarkModeON === "true") {
-                   this.isDarkModeON = true;
-                   body.classList.add('dark-mode'); // Add class to body
-               } else if (this.isDarkModeON === "false") {
-                   this.isDarkModeON = false;
-                   body.classList.remove('dark-mode'); // Remove class
-               }
-           }
-       }
-   } catch (e) {
-       console.error("Error accessing darkMode storage:", e);
-       this.isDarkModeON = false;
-   }
+    // If the theme is set to "darkMode", enable dark mode else diable
+    try {
+        if (this.storage.myThemeName === "darkMode") {
+            body.classList.add("dark-mode");
+        } else {
+            body.classList.remove("dark-mode");
+        }
+    } catch (e) {
+        console.error("Error accessing myThemeName storage:", e);
+    }
    ```
 
 6. **Theme Integration in `platformstyle.js`**

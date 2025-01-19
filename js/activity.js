@@ -272,28 +272,15 @@ class Activity {
         //Flag to check if any other input box is active or not
         this.isInputON = false;
 
-        // Flag to check  if  dark mode is on or not
-        this.isDarkModeON = false;
+        // If the theme is set to "darkMode", enable dark mode else diable
         try {
-            if (this.storage.darkMode === undefined) {
-                this.isDarkModeON = false;
-            } else if (this.storage.darkMode !== null) {
-                this.isDarkModeON = this.storage.darkMode;
-
-                if (typeof this.isDarkModeON === "string") {
-                    if (this.isDarkModeON === "true") {
-                        this.isDarkModeON = true;
-                        body.classList.add('dark-mode');
-                        //navbar.classList.add('dark-mode');
-                    } else if (this.isDarkModeON === "false") {
-                        this.isDarkModeON = false;
-                        body.classList.remove('dark-mode');
-                    }
-                }
+            if (this.storage.myThemeName === "darkMode") {
+                body.classList.add("dark-mode");
+            } else {
+                body.classList.remove("dark-mode");
             }
         } catch (e) {
-            console.error("Error accessing darkMode storage:", e);
-            this.isDarkModeON = false;
+            console.error("Error accessing myThemeName storage:", e);
         }
 
         this.beginnerMode = true;
@@ -1082,7 +1069,7 @@ class Activity {
             modal.style.textAlign = "left";
             const title = document.createElement("h2");
             title.textContent = "Clear Workspace";
-            title.style.color = "#0066FF";
+            title.style.color = platformColor.blueButton;
             title.style.fontSize = "24px";
             title.style.margin = "0 0 16px 0";
             modal.appendChild(title);
@@ -6488,15 +6475,18 @@ class Activity {
 
             this._createErrorContainers();
 
-            // Function to toggle dark mode
-            this.toggleDarkMode = () => {
-                this.isDarkModeON = !this.isDarkModeON; // Toggle the boolean value
-                console.log(`Dark Mode is now ${this.isDarkModeON ? "ON" : "OFF"}`);
+            // Function to toggle theme mode
+            this.toggleThemeMode = () => {
+                if (this.storage.myThemeName === "darkMode") {
+                    // If currently in dark mode, remove the theme
+                    delete this.storage.myThemeName;
+                } else {
+                    this.storage.myThemeName = "darkMode";
+                }
                 try {
-                    this.storage.darkMode = this.isDarkModeON.toString(); // Save the state as a string
                     window.location.reload();
                 } catch (e) {
-                    console.error("Error saving darkMode state to storage:", e);
+                    console.error("Error reloading the window:", e);
                 }
             };
 
@@ -6566,7 +6556,7 @@ class Activity {
             this.toolbar.renderModeSelectIcon(doSwitchMode, doRecordButton, doAnalytics, doOpenPlugin, deletePlugin, setScroller);
             this.toolbar.renderRunSlowlyIcon(doSlowButton);
             this.toolbar.renderRunStepIcon(doStepButton);
-            this.toolbar.renderDarkModeIcon(this.toggleDarkMode);
+            this.toolbar.renderDarkModeIcon(this.toggleThemeMode);
             this.toolbar.renderMergeIcon(_doMergeLoad);
             this.toolbar.renderRestoreIcon(restoreTrash);
             if (_THIS_IS_MUSIC_BLOCKS_) {

@@ -19,9 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* exported showButtonHighlight */
 
-const isDarkModeON = localStorage.darkMode
-  ? JSON.parse(localStorage.darkMode)
-  : false;
+const themeName = localStorage.myThemeName || undefined;
 
 
 window.platform = {
@@ -34,7 +32,7 @@ window.platform = {
 platform.androidWebkit = platform.android && !platform.FF;
 platform.FFOS = platform.FF && (platform.mobile || platform.tablet) && !platform.android;
 
-if (isDarkModeON) {
+if (themeName === "darkMode") {
     window.platformColor = {
         textColor : "#E2E2E2",
         blockText: "#E2E2E2",

@@ -18,19 +18,6 @@ $(document).ready(function() {
     }
 
     /**
-     * The user's selected dark mode, stored in local storage.
-     * @type {boolean}
-     */
-    var isDarkModeON;
-    try {
-        console.log("log from script.js");
-        isDarkModeON = localStorage.getItem("isDarkModeON") === "true";
-    } catch (error) {
-        console.error("Error accessing localStorage:", error);
-        isDarkModeON = false; // Default to light mode
-    }
-
-    /**
      * The icon element that displays the user's current mode.
      * @type {HTMLElement}
      */
