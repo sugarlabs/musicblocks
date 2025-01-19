@@ -326,6 +326,12 @@ class Palettes {
         row.style.alignItems = "center";
         row.style.width = "126px";
         row.style.backgroundColor = platformColor.paletteBackground;
+        row.addEventListener('mouseover', () => {
+            row.style.backgroundColor = platformColor.hoverColor;
+        });
+        row.addEventListener('mouseout', () => {
+            row.style.backgroundColor = platformColor.paletteBackground;
+        });
 
         this._loadPaletteButtonHandler(name, row);
     }

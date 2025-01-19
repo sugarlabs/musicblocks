@@ -40,6 +40,7 @@ if (themeName === "darkMode") {
         strokeColor: "#E2E2E2",
         fillColor: "#F9F9F9",
         blueButton: "#0066FF",
+        hoverColor:  "#808080",
         paletteColors: {
             widgets: ["#2E7D32", "#1B5E20", "#388E3C", "#81C784"],
             pitch: ["#2E7D32", "#1B5E20", "#388E3C", "#81C784"],
@@ -183,6 +184,7 @@ if (themeName === "darkMode") {
         strokeColor: "#E2E2E2",
         fillColor: "#F9F9F9",
         blueButton: "#0066FF",
+        hoverColor:  "#E0E0E0",
         paletteColors: {
             widgets: ["#7CD622", "#57AD02", "#77C428", "#B4EB7D"],
             pitch: ["#7CD622", "#57AD02", "#77C428", "#B4EB7D"],
