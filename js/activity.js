@@ -1086,7 +1086,7 @@ class Activity {
 
             const confirmBtn = document.createElement("button");
             confirmBtn.textContent = "Confirm";
-            confirmBtn.style.backgroundColor = "#0066FF";
+            confirmBtn.style.backgroundColor = platformColor.blueButton;
             confirmBtn.style.color = "white";
             confirmBtn.style.border = "none";
             confirmBtn.style.borderRadius = "4px";

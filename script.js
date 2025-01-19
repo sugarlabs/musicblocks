@@ -29,12 +29,6 @@ $(document).ready(function() {
      */
     var modeText = document.getElementById("modeText");
 
-    /**
-     * The dark mode icon element.
-     * @type {HTMLElement}
-     */
-    var darkModeIcon = document.getElementById("darkModeIcon");
-
     // Set the mode icon and tooltip based on the user's selected mode.
     if (mode === null || mode === "true") {
         modeIcon.innerHTML = "star_border";
