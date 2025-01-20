@@ -872,9 +872,14 @@ function MusicKeyboard(activity) {
             }
 
             this._stopOrCloseClicked = false;
-            this._playChord(notes, selectedNotes[0].duration, selectedNotes[0].voice);
-            const maxWidth = Math.max.apply(Math, selectedNotes[0].duration);
-            this.playOne(1, maxWidth, playButtonCell);
+
+            // Convert durations to seconds based on BPM
+            const durationInSeconds = selectedNotes[0].duration.map(
+                (beatDuration) => (beatDuration * 60) / this.bpm
+            );
+            this._playChord(notes, durationInSeconds, selectedNotes[0].voice);
+            const maxDuration = Math.max(...durationInSeconds);
+            this.playOne(1, maxDuration, playButtonCell);
         } else {
             if (!this.keyboardShown) {
                 this._createTable();
@@ -900,7 +905,7 @@ function MusicKeyboard(activity) {
 
     /**
      * Plays a sequence of musical notes recursively with a specified time delay.
-     * 
+     *
      * @param {number} counter - The index of the current note in the sequence.
      * @param {number} time - The time duration of the current note.
      * @param {HTMLElement} playButtonCell - The HTML element representing the play button.
@@ -954,15 +959,24 @@ function MusicKeyboard(activity) {
                 }
 
                 if (this.playingNow) {
+                    const durationInSeconds = selectedNotes[counter].duration.map(
+                        (beatDuration) => (beatDuration * 60) / this.bpm
+                    );
+
                     this._playChord(
                         notes,
-                        selectedNotes[counter].duration,
+                        durationInSeconds,
                         selectedNotes[counter].voice
                     );
                 }
 
-                maxWidth = Math.max.apply(Math, selectedNotes[counter].duration);
-                this.playOne(counter + 1, maxWidth, playButtonCell);
+                maxDuration = Math.max(
+                    ...selectedNotes[counter].duration.map(
+                        (beatDuration) => (beatDuration * 60) / this.bpm
+                    )
+                );
+
+                this.playOne(counter + 1, maxDuration, playButtonCell);
             } else {
                 playButtonCell.innerHTML =
                     '&nbsp;&nbsp;<img src="header-icons/' +
@@ -988,7 +1002,7 @@ function MusicKeyboard(activity) {
 
     /**
      * Plays a chord (multiple notes simultaneously) using a synthesizer.
-     * 
+     *
      * @param {string[]} notes - Array of note names to be played as a chord.
      * @param {number[]} noteValue - Array of note values (durations) for each note in the chord.
      * @param {string[]} instruments - Array of instrument names or identifiers for each note.
@@ -1564,7 +1578,7 @@ function MusicKeyboard(activity) {
         cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) * 1.5 + "px";
         cell.style.maxWidth = cell.style.minWidth;
         cell.className = "headcol"; // This cell is fixed horizontally.
-        cell.innerHTML = _("duration (MS)");
+        cell.innerHTML = _("Time Value");
         cell.style.position = "sticky";
         cell.style.left = "0px";
         cell.style.zIndex = "1";
