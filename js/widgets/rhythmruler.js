@@ -563,33 +563,35 @@ class RhythmRuler {
         const that = this;
         this._dissectNumber.onclick = (event) => {
             const values = activity.beginnerMode ? [2, 3, 4] : [2, 3, 4, 5, 7];
-
+        
             const menuDiv = docById('wheelDivptm');
             menuDiv.innerHTML = ''; 
-
+        
             menuDiv.style.display = '';
             const x = event.clientX - 50;
             const y = event.clientY - 50;
             menuDiv.style.position = 'absolute';
             menuDiv.style.left = Math.min(activity.canvas.width - 200, Math.max(0, x)) + 'px';
             menuDiv.style.top = Math.min(activity.canvas.height - 250, Math.max(0, y)) + 'px';
-
-            const wheelNav = new wheelnav('wheelDivptm', null, 200, 200);
+            
+            const wheelNav = new wheelnav('wheelDivptm', null, 150, 150);
             wheelNav.colors = platformColor.wheelcolors;
             wheelNav.slicePathFunction = slicePath().DonutSlice;
             wheelNav.slicePathCustom = slicePath().DonutSliceCustomization();
             wheelNav.sliceSelectedPathCustom = wheelNav.slicePathCustom;
             wheelNav.sliceInitPathCustom = wheelNav.slicePathCustom;
             wheelNav.clickModeRotate = false;
+            wheelNav.navItemsSize = 30; 
 
             const exitMenu = () => {
                 menuDiv.style.display = 'none';
                 document.removeEventListener('click', handleOutside);
+                document.removeEventListener('keydown', handleKeydown);
                 if (wheelNav) {
                     wheelNav.removeWheel();
                 }
             };
-
+            
             // Click outside to close
             const handleOutside = (e) => {
                 if (!menuDiv.contains(e.target) && e.target !== that._dissectNumber) {
@@ -599,27 +601,7 @@ class RhythmRuler {
             setTimeout(() => {
                 document.addEventListener('click', handleOutside);
             }, 0);
-
-            // Configure center button for close
-            wheelNav.centerButton = true;
-            wheelNav.centerButtonRadius = 25;
-            wheelNav.centerButtonHover = true;
-            wheelNav.centerButtonClickable = true;
-            wheelNav.centerButtonCallback = exitMenu;
-            wheelNav.centerButtonContent = '×';
-
-            const labels = values.map(v => v.toString());
-            wheelNav.initWheel(labels);
-            wheelNav.createWheel();
-
-            // Add click handlers for numbers
-            for (let i = 0; i < values.length; i++) {
-                wheelNav.navItems[i].navigateFunction = () => {
-                    that._dissectNumber.value = values[i];
-                    that._update();
-                    exitMenu();
-                };
-            }
+            
             // manual entry
             const inputDiv = document.createElement('div');
             inputDiv.style.position = 'absolute';
@@ -631,7 +613,7 @@ class RhythmRuler {
             input.min = '2';
             input.max = '128';
             input.value = that._dissectNumber.value;
-
+        
             input.oninput = () => {
                 if (input.value.length > 3) {
                     input.value = input.value.slice(0, 3);
@@ -641,13 +623,44 @@ class RhythmRuler {
                 if (value < 2) input.value = '2';
                 if (value > 128) input.value = '128';
             };
+            
             input.onchange = () => {
                 that._dissectNumber.value = input.value;
-                that._update();
                 exitMenu();
             };
             inputDiv.appendChild(input);
             menuDiv.appendChild(inputDiv);
+
+            // enter key project can't run
+            const handleKeydown = (e) => {
+                if (e.key === 'Enter') {
+                    // console.log('enter');
+                    e.preventDefault();
+                    input.blur(); 
+                    exitMenu();
+                }
+            };
+            document.addEventListener('keydown', handleKeydown);
+           
+            // Configure center button for close
+            wheelNav.centerButton = true;
+            wheelNav.centerButtonRadius = 25;
+            wheelNav.centerButtonHover = true;
+            wheelNav.centerButtonClickable = true;
+            wheelNav.centerButtonCallback = exitMenu;
+            wheelNav.centerButtonContent = '×';
+        
+            const labels = values.map(v => v.toString());
+            wheelNav.initWheel(labels);
+            wheelNav.createWheel();
+        
+            // Add click handlers for numbers
+            for (let i = 0; i < values.length; i++) {
+                wheelNav.navItems[i].navigateFunction = () => {
+                    that._dissectNumber.value = values[i];
+                    exitMenu();
+                };
+            }
         };
 
         // Remove mouseout handler
