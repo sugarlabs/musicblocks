@@ -272,6 +272,17 @@ class Activity {
         //Flag to check if any other input box is active or not
         this.isInputON = false;
 
+        // If the theme is set to "darkMode", enable dark mode else diable
+        try {
+            if (this.storage.myThemeName === "darkMode") {
+                body.classList.add("dark-mode");
+            } else {
+                body.classList.remove("dark-mode");
+            }
+        } catch (e) {
+            console.error("Error accessing myThemeName storage:", e);
+        }
+
         this.beginnerMode = true;
         try {
             if (this.storage.beginnerMode === undefined) {
@@ -1054,20 +1065,20 @@ class Activity {
             modal.style.transform = "translate(-50%, -50%)";
             modal.style.width = "400px";
             modal.style.padding = "24px";
-            modal.style.backgroundColor = "#fff";
+            modal.style.backgroundColor = platformColor.dialogueBox;
             modal.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
             modal.style.borderRadius = "8px";
             modal.style.zIndex = "10000";
             modal.style.textAlign = "left";
             const title = document.createElement("h2");
             title.textContent = "Clear Workspace";
-            title.style.color = "#0066FF";
+            title.style.color = platformColor.blueButton;
             title.style.fontSize = "24px";
             title.style.margin = "0 0 16px 0";
             modal.appendChild(title);
             const message = document.createElement("p");
-            message.textContent = "Are you sure you want to clear the workspace?";
-            message.style.color = "#666666";
+            message.textContent = _("Are you sure you want to clear the workspace?");
+            message.style.color = platformColor.textColor;
             message.style.fontSize = "16px";
             message.style.marginBottom = "24px";
             modal.appendChild(message);
@@ -1075,10 +1086,10 @@ class Activity {
             const buttonContainer = document.createElement("div");
             buttonContainer.style.display = "flex";
             buttonContainer.style.justifyContent = "flex-start";
-        
+
             const confirmBtn = document.createElement("button");
             confirmBtn.textContent = "Confirm";
-            confirmBtn.style.backgroundColor = "#2196F3";
+            confirmBtn.style.backgroundColor = platformColor.blueButton;
             confirmBtn.style.color = "white";
             confirmBtn.style.border = "none";
             confirmBtn.style.borderRadius = "4px";
@@ -1510,6 +1521,8 @@ class Activity {
                 activity.save.savePNG.bind(activity.save),
                 activity.save.saveWAV.bind(activity.save),
                 activity.save.saveLilypond.bind(activity.save),
+                activity.save.saveLilypond.bind(afterSaveLilypond),
+                activity.save.afterSaveLilypondLY.bind(activity.save),
                 activity.save.saveAbc.bind(activity.save),
                 activity.save.saveMxml.bind(activity.save),
                 activity.save.saveBlockArtwork.bind(activity.save)
@@ -1668,7 +1681,7 @@ class Activity {
                 if (this.blockscale > 0) {
                     this.resizeDebounce = true;
                     this.blockscale -= 1;
-                    this.clearCache();                
+                    this.clearCache();
                     await this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
                     this.blocks.checkBounds();
                     this.refreshCanvas();
@@ -3346,16 +3359,11 @@ class Activity {
         const restoreTrash = (activity) => {
             if (!activity.blocks || !activity.blocks.trashStacks || activity.blocks.trashStacks.length === 0) {
                 activity.textMsg(
-                    _("Nothing in the trash to restore."),
+                    _("Trash can is empty."),
                     3000 
                 );
                 return;
             }
-            activity._restoreTrash();
-            activity.textMsg(
-                _("Item restored from the trash."),
-                3000 
-            );
         
             if (docById("helpfulWheelDiv").style.display !== "none") {
                 docById("helpfulWheelDiv").style.display = "none";
@@ -3363,74 +3371,77 @@ class Activity {
             }
         };
 
-        this._restoreTrash = () => {
+        const restoreTrashPop = (activity) => {
+            if (!activity.blocks || !activity.blocks.trashStacks || activity.blocks.trashStacks.length === 0) {
+                activity.textMsg(
+                    _("Trash can is empty."),
+                    3000 
+                );
+                return;
+            }
+            this._restoreTrashById(this.blocks.trashStacks[this.blocks.trashStacks.length - 1]);
+            activity.textMsg(
+                _("Item restored from the trash."),
+                3000 
+            );
+
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+                activity.__tick();
+            }
+        
+        }
+
+        this._restoreTrashById = (blockId) => {
+            const blockIndex = this.blocks.trashStacks.indexOf(blockId);
+            if (blockIndex === -1) return; // Block not found in trash
+        
+            this.blocks.trashStacks.splice(blockIndex, 1); // Remove from trash
+        
             for (const name in this.palettes.dict) {
                 this.palettes.dict[name].hideMenu(true);
             }
-            
+        
             this.blocks.activeBlock = null;
             this.refreshCanvas();
 
             const dx = 0;
             const dy = -this.cellSize * 3; // Reposition
-
-            if (this.blocks.trashStacks.length === 0) {
-                return;
-            }
-
-            const thisBlock = this.blocks.trashStacks.pop();
-
-            // Restore drag group in trash
-            this.blocks.findDragGroup(thisBlock);
+        
+            // Restore drag group
+            this.blocks.findDragGroup(blockId);
             for (let b = 0; b < this.blocks.dragGroup.length; b++) {
                 const blk = this.blocks.dragGroup[b];
                 this.blocks.blockList[blk].trash = false;
                 this.blocks.moveBlockRelative(blk, dx, dy);
                 this.blocks.blockList[blk].show();
             }
-
-            this.blocks.raiseStackToTop(thisBlock);
-
-            if (
-                this.blocks.blockList[thisBlock].name === "start" ||
-                this.blocks.blockList[thisBlock].name === "drum"
-            ) {
-                const turtle = this.blocks.blockList[thisBlock].value;
+        
+            this.blocks.raiseStackToTop(blockId);       
+            const restoredBlock = this.blocks.blockList[blockId];
+        
+            if (restoredBlock.name === 'start' || restoredBlock.name === 'drum') {
+                const turtle = restoredBlock.value;
                 this.turtles.turtleList[turtle].inTrash = false;
                 this.turtles.turtleList[turtle].container.visible = true;
-            } else if (this.blocks.blockList[thisBlock].name === "action") {
-                // We need to add a palette entry for this action.
-                // But first we need to ensure we have a unqiue name,
-                // as the name could have been taken in the interim.
-                const actionArg = this.blocks.blockList[
-                    this.blocks.blockList[thisBlock].connections[1]
-                ];
+            } else if (restoredBlock.name === 'action') {
+                const actionArg = this.blocks.blockList[restoredBlock.connections[1]];
                 if (actionArg !== null) {
                     let label;
                     const oldName = actionArg.value;
-                    // Mark the action block as still being in the
-                    // trash so that its name won't be considered when
-                    // looking for a unique name.
-                    this.blocks.blockList[thisBlock].trash = true;
+                    restoredBlock.trash = true;
                     const uniqueName = this.blocks.findUniqueActionName(oldName);
-                    this.blocks.blockList[thisBlock].trash = false;
+                    restoredBlock.trash = false;
 
                     if (uniqueName !== actionArg) {
                         actionArg.value = uniqueName;
-
-                        label = actionArg.value.toString();
-                        if (label.length > 8) {
-                            label = label.substr(0, 7) + "...";
-                        }
+                        label = uniqueName.length > 8 ? uniqueName.substr(0, 7) + '...' : uniqueName;
                         actionArg.text.text = label;
 
                         if (actionArg.label !== null) {
                             actionArg.label.value = uniqueName;
                         }
-
                         actionArg.container.updateCache();
-
-                        // Check the drag group to ensure any do blocks are updated (in case of recursion).
                         for (let b = 0; b < this.blocks.dragGroup.length; b++) {
                             const me = this.blocks.blockList[this.blocks.dragGroup[b]];
                             if (
@@ -3441,11 +3452,7 @@ class Activity {
                             ) {
                                 me.privateData = uniqueName;
                                 me.value = uniqueName;
-
-                                label = me.value.toString();
-                                if (label.length > 8) {
-                                    label = label.substr(0, 7) + "...";
-                                }
+                                label = uniqueName.length > 8 ? uniqueName.substr(0, 7) + '...' : uniqueName;
                                 me.text.text = label;
                                 me.overrideName = label;
                                 me.regenerateArtwork();
@@ -3455,21 +3462,110 @@ class Activity {
                     }
                 }
             }
-
+            activity.textMsg(
+                _("Item restored from the trash."),
+                3000 
+            );
+        
             this.refreshCanvas();
-        };
+        }; 
 
-        this.handleKeyDown = (event) => {
-            
-            if (event.ctrlKey && event.key === "z") {
-                this._restoreTrash(activity);
-                activity.__tick();
-                event.preventDefault();
+        // Add event listener for trash icon click
+        document.getElementById('restoreIcon').addEventListener('click', () => {
+            this._renderTrashView();
+        }); 
+
+        // function to hide trashView from canvas
+        function handleClickOutsideTrashView(trashView) {
+            let firstClick = true;
+            document.addEventListener('click', (event) => {
+                if (firstClick) {
+                    firstClick = false;
+                    return;
+                }
+                if (!trashView.contains(event.target) && event.target !== trashView) {
+                    trashView.style.display = 'none';
+                }
+            });
+        }
+
+        this._renderTrashView = () => {
+            if (!activity.blocks || !activity.blocks.trashStacks || activity.blocks.trashStacks.length === 0) {
+                return;
             }
-        };
-
-        // Attach keydown event listener to document
-        document.addEventListener("keydown", this.handleKeyDown);
+            const trashList = document.getElementById('trashList');
+            const trashView = document.createElement('div');
+            trashView.id = 'trashView';
+            trashView.classList.add('trash-view');
+        
+            // Sticky icons
+            const buttonContainer = document.createElement('div');
+            buttonContainer.classList.add('button-container');
+        
+            const restoreLastIcon = document.createElement('a');
+            restoreLastIcon.id = 'restoreLastIcon';
+            restoreLastIcon.classList.add('restore-last-icon');
+            restoreLastIcon.innerHTML = '<i class="material-icons md-48">restore_from_trash</i>';
+            restoreLastIcon.addEventListener('click', () => {
+                this._restoreTrashById(this.blocks.trashStacks[this.blocks.trashStacks.length - 1]);
+                trashView.classList.add('hidden');
+            });
+        
+            const restoreAllIcon = document.createElement('a');
+            restoreAllIcon.id = 'restoreAllIcon';
+            restoreAllIcon.classList.add('restore-all-icon');
+            restoreAllIcon.innerHTML = '<i class="material-icons md-48">delete_sweep</i>';
+            restoreAllIcon.addEventListener('click', () => {
+                while (this.blocks.trashStacks.length > 0) {
+                    this._restoreTrashById(this.blocks.trashStacks[0]);
+                }
+                trashView.classList.add('hidden');
+            });
+            restoreLastIcon.setAttribute("title", _("Restore last item"));
+            restoreAllIcon.setAttribute("title", _("Restore all items"));
+        
+            buttonContainer.appendChild(restoreLastIcon);
+            buttonContainer.appendChild(restoreAllIcon);
+            trashView.appendChild(buttonContainer);
+        
+            // Render trash items
+            this.blocks.trashStacks.forEach((blockId) => {
+                const block = this.blocks.blockList[blockId];
+                const listItem = document.createElement('div');
+                listItem.classList.add('trash-item');
+        
+                const svgData = block.artwork;
+                const encodedData = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgData);
+        
+                const img = document.createElement('img');
+                img.src = encodedData;
+                img.alt = 'Block Icon';
+                img.classList.add('trash-item-icon');
+        
+                const textNode = document.createTextNode(block.name);
+        
+                listItem.appendChild(img);
+                listItem.appendChild(textNode);
+                listItem.dataset.blockId = blockId;
+        
+                listItem.addEventListener('mouseover', () => listItem.classList.add('hover'));
+                listItem.addEventListener('mouseout', () => listItem.classList.remove('hover'));
+                listItem.addEventListener('click', () => {
+                    this._restoreTrashById(blockId);
+                    trashView.classList.add('hidden');
+                });
+                handleClickOutsideTrashView(trashView);
+                
+                trashView.appendChild(listItem);
+            });
+        
+            const existingView = document.getElementById('trashView');
+            if (existingView) {
+                trashList.replaceChild(trashView, existingView);
+            } else {
+                trashList.appendChild(trashView);
+            }
+        };  
 
         /*
          * Open aux menu
@@ -4986,6 +5082,7 @@ class Activity {
          */
         this.showContents = () => {
             docById("loading-image-container").style.display = "none";
+            docById("bottom-right-logo").style.display = "none";
             docById("palette").style.display = "block";
             // docById('canvas').style.display = 'none';
             docById("hideContents").style.display = "block";
@@ -5840,7 +5937,7 @@ class Activity {
                 this.helpfulWheelItems.push({label: "Increase block size", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(BIGGERBUTTON)), display: true, fn: doLargerBlocks});
 
             if (!this.helpfulWheelItems.find(ele => ele.label === "Restore")) 
-                this.helpfulWheelItems.push({label: "Restore", icon: "imgsrc:header-icons/restore-from-trash.svg", display: true, fn: restoreTrash});
+                this.helpfulWheelItems.push({label: "Restore", icon: "imgsrc:header-icons/restore-from-trash.svg", display: true, fn: restoreTrashPop});
             
             if (!this.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap Off"))
                 this.helpfulWheelItems.push({label: "Turtle Wrap Off", icon: "imgsrc:header-icons/wrap-text.svg", display: true, fn: this.toolbar.changeWrap});
@@ -6475,6 +6572,21 @@ class Activity {
 
             this._createErrorContainers();
 
+            // Function to toggle theme mode
+            this.toggleThemeMode = () => {
+                if (this.storage.myThemeName === "darkMode") {
+                    // If currently in dark mode, remove the theme
+                    delete this.storage.myThemeName;
+                } else {
+                    this.storage.myThemeName = "darkMode";
+                }
+                try {
+                    window.location.reload();
+                } catch (e) {
+                    console.error("Error reloading the window:", e);
+                }
+            };
+
             /* Z-Order (top to bottom):
              *   menus
              *   palettes
@@ -6541,6 +6653,7 @@ class Activity {
             this.toolbar.renderModeSelectIcon(doSwitchMode, doRecordButton, doAnalytics, doOpenPlugin, deletePlugin, setScroller);
             this.toolbar.renderRunSlowlyIcon(doSlowButton);
             this.toolbar.renderRunStepIcon(doStepButton);
+            this.toolbar.renderDarkModeIcon(this.toggleThemeMode);
             this.toolbar.renderMergeIcon(_doMergeLoad);
             this.toolbar.renderRestoreIcon(restoreTrash);
             if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -7104,6 +7217,7 @@ class Activity {
     saveLocally() {
         try {
             localStorage.setItem('beginnerMode', this.beginnerMode.toString());
+            localStorage.setItem('isDarkModeON', this.isDarkModeON.toString());
         } catch (e) {
             console.error('Error saving to localStorage:', e);
         }

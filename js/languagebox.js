@@ -232,3 +232,6 @@ class LanguageBox {
          });
     }
 }
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = LanguageBox;
+}

@@ -31,4 +31,4 @@ requirejs.config({
     packages: []
 });
 
-requirejs(["activity/activity"]);
+requirejs(["utils/utils", "activity/activity"]);
