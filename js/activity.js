@@ -1052,6 +1052,44 @@ class Activity {
                 encodeURIComponent(svg)
             );
         };
+       
+        /**
+        * @returns {PNG} returns PNG of block artwork
+        */
+        this.printBlockPNG = async () => {
+            // Setps to convert the SVG to PNG of BlockArtwork
+            // Step 1: Generate the SVG content
+            // Step 2: Create a Canvas element
+            // Step 3: Convert SVG to an Image object
+            // Step 4: Draw SVG on the Canvas and export as PNG
+
+            const svgContent = this.printBlockSVG();
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const parser = new DOMParser();
+            const svgDoc = parser.parseFromString(decodeURIComponent(svgContent), "image/svg+xml");
+            const svgElement = svgDoc.documentElement;
+            const width = parseInt(svgElement.getAttribute('width'), 10);
+            const height = parseInt(svgElement.getAttribute('height'), 10);
+            canvas.width = width;
+            canvas.height = height;
+            const img = new Image();
+            const svgBlob = new Blob([decodeURIComponent(svgContent)], { type: "image/svg+xml;charset=utf-8" });
+            const url = URL.createObjectURL(svgBlob);
+            return new Promise((resolve, reject) => {
+                img.onload = () => {
+                    ctx.drawImage(img, 0, 0);
+                    URL.revokeObjectURL(url);
+                    const pngDataUrl = canvas.toDataURL("image/png");
+                    resolve(pngDataUrl);
+                };
+                img.onerror = (err) => {
+                    URL.revokeObjectURL(url);
+                    reject(err);
+                };
+                img.src = url;
+            });
+        };
 
         /*
          * Clears "canvas"
@@ -1525,7 +1563,8 @@ class Activity {
                 activity.save.afterSaveLilypondLY.bind(activity.save),
                 activity.save.saveAbc.bind(activity.save),
                 activity.save.saveMxml.bind(activity.save),
-                activity.save.saveBlockArtwork.bind(activity.save)
+                activity.save.saveBlockArtwork.bind(activity.save),
+                activity.save.saveBlockArtworkPNG.bind(activity.save)
             );
         
             // Regenerate palettes
@@ -6645,7 +6684,8 @@ class Activity {
                 this.save.saveLilypond.bind(this.save),
                 this.save.saveAbc.bind(this.save),
                 this.save.saveMxml.bind(this.save),
-                this.save.saveBlockArtwork.bind(this.save)
+                this.save.saveBlockArtwork.bind(this.save),
+                this.save.saveBlockArtworkPNG.bind(this.save)
             );
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
             this.toolbar.renderMenuIcon(showHideAuxMenu);

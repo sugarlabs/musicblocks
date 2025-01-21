@@ -311,6 +311,20 @@ class SaveInterface {
         const svg = "data:image/svg+xml;utf8," + activity.printBlockSVG();
         activity.save.download("svg", svg, null);
     }
+   
+    /**
+     * This method is to save BlockArtwork and download the PNG representation of block artwork from the provided activity.
+     * 
+     * @param {SaveInterface} activity - The activity object containing block artwork to save.
+     * @returns {void}
+     * @method
+     * @instance
+     */ 
+    saveBlockArtworkPNG(activity) {
+        activity.printBlockPNG().then((pngDataUrl) => {
+        activity.save.download("png", pngDataUrl, null);
+        })
+    }
 
     /**
     * Save audio recording in WAV format.
