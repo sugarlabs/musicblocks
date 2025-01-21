@@ -2895,8 +2895,7 @@ class Block {
             }, LONGPRESSTIME);
 
             //hide the trash when block is being collapse or expand
-            const hasColExpBtns =
-                this.collapseButtonBitmap && this.expandButtonBitmap;
+            const hasColExpBtns = this.collapseButtonBitmap && this.expandButtonBitmap;
 
             if (hasColExpBtns) {
                 const localPoint = this.container.globalToLocal(event.stageX, event.stageY);
