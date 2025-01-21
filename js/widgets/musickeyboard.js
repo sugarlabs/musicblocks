@@ -911,8 +911,9 @@ function MusicKeyboard(activity) {
      * @param {HTMLElement} playButtonCell - The HTML element representing the play button.
      */
     this.playOne = function (counter, time, playButtonCell) {
+        console.log("beat ->",selectedNotes);
         setTimeout(() => {
-            let cell, eleid, ele, notes, zx, res, maxWidth;
+            let cell, eleid, ele, notes, zx, res, maxDuration;
             if (counter < selectedNotes.length) {
                 if (this._stopOrCloseClicked) {
                     return;
@@ -1008,6 +1009,7 @@ function MusicKeyboard(activity) {
      * @param {string[]} instruments - Array of instrument names or identifiers for each note.
      */
     this._playChord = (notes, noteValue, instruments) => {
+        noteValue[0] *= 4;
         if (notes[0] === "R") {
             return;
         }
