@@ -911,8 +911,6 @@ function MusicKeyboard(activity) {
      * @param {HTMLElement} playButtonCell - The HTML element representing the play button.
      */
     this.playOne = function (counter, time, playButtonCell) {
-    //fix "time". I think it should hold same value as noteValue. But is does not. time < noteValue that,s why overlapping.
-        console.log("beat ->",selectedNotes);
         setTimeout(() => {
             let cell, eleid, ele, notes, zx, res, maxDuration;
             if (counter < selectedNotes.length) {
@@ -984,7 +982,7 @@ function MusicKeyboard(activity) {
                     '&nbsp;&nbsp;<img src="header-icons/' +
                     "play-button.svg" +
                     '" title="' +
-                    _("Play") +s
+                    _("Play") +
                     '" alt="' +
                     _("Play") +
                     '" height="' +
@@ -999,7 +997,7 @@ function MusicKeyboard(activity) {
                     this._createKeyboard();
                 }
             }
-        }, time * 1000 + 125);
+        }, time * 1000);
     };
 
     /**
@@ -1010,7 +1008,6 @@ function MusicKeyboard(activity) {
      * @param {string[]} instruments - Array of instrument names or identifiers for each note.
      */
     this._playChord = (notes, noteValue, instruments) => {
-        console.log("*");
         if (notes[0] === "R") {
             return;
         }
@@ -1061,7 +1058,7 @@ function MusicKeyboard(activity) {
 
     /**
      * Fills chromatic gaps in a given list of notes by padding with missing notes.
-     * 
+     *
      * @param {Object[]} noteList - List of notes represented as dictionaries containing `noteName` and `noteOctave`.
      * @returns {Object[]} A new list of notes with chromatic gaps filled.
      */
