@@ -4396,9 +4396,9 @@ class Block {
                 this.value = oldValue;
             }
             
-            if(cblk1 != null && this.blocks.blockList[cblk1].name === "pitch" && (this.value > 10 || this.value < 1)) {
+            if(cblk1 != null && this.blocks.blockList[cblk1].name === "pitch" && (this.value > 8 || this.value < 1)) {
                 const thisBlock = this.blocks.blockList.indexOf(this);
-                this.activity.errorMsg(_("Octave value must be between 1 and 10."), thisBlock);
+                this.activity.errorMsg(_("Octave value must be between 1 and 8."), thisBlock);
                 this.activity.refreshCanvas();
                 this.label.value = oldValue;
                 this.value = oldValue;

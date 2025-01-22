@@ -293,3 +293,6 @@ function setupVolumeActions(activity) {
         }
     };
 }
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = setupVolumeActions;
+}

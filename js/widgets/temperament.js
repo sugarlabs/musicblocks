@@ -926,7 +926,7 @@ function TemperamentWidget() {
             try{
                 that.performEqualEdit(event);
             } catch{
-                this.activity.errorMsg(_("The Number of divisions is too large."));
+                activity.errorMsg(_("The Number of divisions is too large."), 3000);
             }
 
         });
@@ -1613,7 +1613,7 @@ function TemperamentWidget() {
             const ratio = startRatio / endRatio;
             if (ratio !== 2) {
                 that.activity.textMsg(
-                    _("The octave ratio has changed. This changes temperament significantly.")
+                    _("The octave ratio has changed. This changes temperament significantly."), 3000
                 );
             }
             const powers = [];
@@ -1926,7 +1926,7 @@ function TemperamentWidget() {
         const that = this;
         setTimeout(() => {
             that.activity.blocks.loadNewBlocks(newStack);
-            that.activity.textMsg(_("New action block generated."));
+            activity.textMsg(_("New action block generated."), 3000);
         }, 500);
 
         if (isCustomTemperament(this.inTemperament)) {

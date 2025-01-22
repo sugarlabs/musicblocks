@@ -78,7 +78,7 @@ like Snap, you can change the size of the blocks.
 
 ### Operators and Predicates
 
-Infix vs Prefix
+**Infix vs Prefix**
 
 Snap uses Infix notation for its operators:
 
@@ -106,7 +106,8 @@ In Snap, you make variables explicitly.
 ![Snap Variables](./images/snap/snap-variables.png)
 
 The Set To and Change By commands are specified through pull-down menus.
-Store in Box
+
+**Store in Box**
 
 In Music Blocks, we use an analogy of a shoe box. You put something
 into a box and then reference the thing by the name you have given to
@@ -151,7 +152,7 @@ to “12”) to store the possible outcome of rolling two dice. I store in
 the box named “box” the sum of two random numbers between 1 and 6, so
 the box named “box” has a number between 2 and 12. Then I increment
 the box named for the number stored in “box” by one. Later in the
-program I make a bar chart showing the value stored in each box.
+program, I make a bar chart showing the value stored in each box.
 
 ![Music Blocks Dice](./images/snap/dice.png)
 
@@ -223,7 +224,7 @@ Stitch, since the embroidery machines only have one needle (“single
 threaded”). But in music, we often have more than one voice or
 instrument. You get a separate “thread” for each Start block.
 
-For example, we can implement a simple mirror paint by using four Start blocks.
+For example, we can implement a simple mirror paint by using four Start blocks. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732171217345259&run=True)
 
 ![Music Blocks Start Blocks](./images/snap/multiple-mouse.png)
 
@@ -474,13 +475,13 @@ multiple Note blocks. The actions are used in combination to create
 music.
 
 Here is an example of a canon (Frère Jacques), using four voices, each
-sharing the actions.
+sharing the actions. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732463245651983&run=True)
 
 ![Frere Jacques](./images/snap/frere-jacques.png)
 
 ## For further information
 
-[Music Blocks README](./README.md) exxplains where to find Music Blocks.
+[Music Blocks README](./README.md) explains where to find Music Blocks.
 
 [Using Music Blocks](./documentation/README.md) has basic instructions.
 

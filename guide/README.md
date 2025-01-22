@@ -42,6 +42,10 @@ This guide details the many musical features of the language.
       8. [Chords](#328-chords)
       9. [Inversion](#329-inversion)
       10. [Converters](#3210-converters)
+          1. [Y to Pitch](#32101-y-to-pitch)
+          2. [Pitch converter](#32102-pitch-converter)
+          3. [Number to Octave](#32103-number-to-octave)
+          4. [Number to Pitch](#32104-number-to-pitch)
    3. [Note Value Transformations](#33-note-value-transformations)
       1. [Dotted Notes](#331-dotted-notes)
       2. [Speeding Up and Slowing Down Notes via Mathematical Operations](#332-speeding-up-and-slowing-down-notes-via-mathematical-operations)
@@ -60,7 +64,7 @@ This guide details the many musical features of the language.
    7. [Interactions](#37-interactions)
    8. [Ensemble](#38-ensemble)
 4. [Widgets](#4-widgets)
-    1. [Monitoring Status](#41-status)
+    1. [Monitoring Status](#41-monitoring-status)
     2. [Generating groups of Notes](#42-generating-chunks-of-notes)
        1. [The Phrase Maker](#421-the-phrase-maker)
        2. [The Rhythm Block](#422-the-rhythm-block) 
@@ -94,7 +98,7 @@ run. Look for `RUN LIVE` links.
 
 ## <a name="#GETTING-STARTED">1. Getting Started</a>
 
-[Back to Table of Contents](#TABLE-OF-CONTENTS) | [Next Section (2. Making Sounds)](#NOTES)
+[Back to Table of Contents](#table-of-contents) | [Next Section (2. Making Sounds)](#2-making-sounds)
 
 Music Blocks is designed to run in a browser. Most of the development
 has been done in Chrome, but it should also work in Firefox, Opera,
@@ -118,7 +122,7 @@ JS](http://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
 ## <a name="NOTES">2. Making Sounds</a>
 
 [Previous Section (1. Getting Started)](#1-getting-started) | [Back to
-Table of Contents](#TABLE-OF-CONTENTS) | [Next Section (3. Programming with
+Table of Contents](#table-of-contents) | [Next Section (3. Programming with
 Music)](#3-programming-with-music)
 
 Music Blocks incorporates many common elements of music, such as
@@ -174,7 +178,7 @@ the frequency (and therefore pitch) at which the note is played.
 
 ![pitch block](./note3.svg "Specifying a pitch block's name and octave")
 
-[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1726139416021937&run=True)
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733100820296221&run=True)
 
 There are many systems you can use to specify a *pitch* block's name
 and octave. Some examples are shown above.
@@ -271,7 +275,7 @@ and combine them with *Pitch* blocks as well.
 ## <a name="PROGRAMMING-WITH-MUSIC">3. Programming with Music</a>
 
 [Previous Section (2. Making Sounds)](#2-making-sounds) | [Back to Table of
-Contents](#TABLE-OF-CONTENTS) | [Next Section (4. Widgets)](#4-widgets)
+Contents](#table-of-contents) | [Next Section (4. Widgets)](#4-widgets)
 
 This section of the guide discusses how to use chunks of notes to
 program music. Note that you can program with chunks you create by
@@ -299,16 +303,13 @@ executed when the block is referred to by something else, such as a
 start block. This is useful in orchestrating more complex programs of
 music.
 
-A *Start* Block is a *Action* that will automatically be executed once
+A *Start* Block is an *Action* that will automatically be executed once
 the start button is pressed.  This is where most of your programs will
 begin at.  There are many ways to *Run* a program: you can click on
 the *Run* button at the upper-left corner of the screen to run the
-music at a fast speed; a long press on the *Run* button will run it
+music at a fast speed; you can click the *Run Slowly* button to run it
 slower (useful for debugging); and the *Step* button can be used to
-step through the program one block per button press. (An extra-long
-press of the *Run* button will play back the music slowly. A long
-press of the *Step* button will step through the program note by
-note.)
+step through the program one block per button press.
 
 In the example above, the *Action* block named "chunk" is inside of a
 *Start* block, which means that when any of the start buttons is
@@ -353,10 +354,7 @@ There are many ways to transform pitch, rhythm, and other sonic qualities.
 The *Step Pitch* block will move up or down notes in a scale from the
 last played note. In the example above, *Step Pitch* blocks are used
 inside of *Repeat* blocks to repeat the code `7` times, playing up and
-down a scale.
-
-[RUN
-LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523032034365533&run=True)
+down a scale. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732586286359989&run=True)
 
 ![scalar step](./transform16.svg
  "Using the Scalar Step Up and Down blocks")
@@ -370,7 +368,7 @@ recent note played.
 
 In this example, we are using the *Mode length* block, which returns
 the number of scalar steps in the current mode (7 for Major and Minor
-modes).
+modes). [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733192676935416&run=True)
 
 #### <a name="SHARPS-AND-FLATS">3.2.2 Sharps And Flats</a>
 
@@ -380,9 +378,9 @@ The *Accidental* block can be wrapped around *Pitch* blocks, *Note
 value* blocks, or chunks of notes inside of [*Action*](#31-actions)
 blocks. A sharp will raise the pitch by one half step. A flat will
 lower by one half step. In the example, on the left, just the *Pitch*
-block `Mi` is lowered by one half step; on the right, both *Pitch*
+block `re` is lowered by one half step; on the right, both *Pitch*
 blocks are raised by one half step. (You can also use a double-sharp
-or double-flat accidental.)
+or double-flat accidental.) [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733231694757697&run=True)
 
 #### <a name="ADJUST-TRANSPOSITION">3.2.3 Adjusting Transposition</a>
 
@@ -402,13 +400,13 @@ transposition of `1` would transpose `C` to `D` (even though it is a
 transposition of `2` half steps). To transpose `E` to `F` is `1`
 scalar step (or `1` half step). To shift an entire octave, scalar
 transpose by the mode length up or down. (In major scales, the mode
-length is `7`.)
+length is `7`.) [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733306280056376&run=True)
 
 ![ratio transposition](../documentation/setratio_block.svg "raising by a fifth using transpose by ratio")
 
 The *Transpose-by-ratio* block shifts a pitch based on a ratio. For
 example, a ratio of 2:1 would shift a pitch by an octave; a ratio of
-3:2 would shift a pitch by a fifth.
+3:2 would shift a pitch by a fifth. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733307313746261&run=True)
 
 As a convenience, a number of standard scalar transpositions are
 provided: *Unison*, *Second*, *Third*, ..., *Seventh*, *Down third*,
@@ -417,7 +415,7 @@ and *Down sixth*, as well as a transposition for *Octave*.
 ![semitone transposition](./transform3.svg "raising an octave using semitone-transposition")
 
 In the example above, we take the song we programmed previously and
-raise it by one octave.
+raise it by one octave. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733340896349788&run=True)
 
 ![cents](./50cent_block.svg "adding 50 cents to a pitch using the semitone-transposition")
 
@@ -427,20 +425,20 @@ pitches would be 50 cents. You can use the *Semitone transpose* block
 to shift a pitch by cents.
 
 In the example above, G4 + 50 cents is 403Hz. (Recall that G4 is
-392Hz and G#4 is 415Hz).
+392Hz and G#4 is 415Hz). [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733411391096443&run=True)
 
 ![cents by ratio](./50cents_by_ratio.svg "adding 50 cents to a pitch
  using the ratio block")
 
 You can also use the ratio block for cents, although the math is a bit
-more complicated.
+more complicated. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733425512725578&run=True)
 
 ![register](./transform18.svg "The Register block")
 
 The *Register* block provides an easy way to modify the register
 (octave) of the notes that follow it. In the example above it is first
 used to bump the `Mi 4` note up by one octave and then to bump the
-`Sol 4` note down by one octave.
+`Sol 4` note down by one octave. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733426232664999&run=True)
 
 #### <a name="PITCH-MOVEMENT">3.2.4 Summary of Pitch Movements</a>
 
@@ -454,7 +452,7 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 | Music Blocks Code for Scalar Step |
 | --- |
 | ![scalar](./pitchmovement1.svg "scalar") |
-| The example above demonstrates traveling up and down the major scale by moving an octave up from the starting note, do, one note at a time and then back down the same way. |
+| The example above demonstrates traveling up and down the major scale by moving an octave up from the starting note, do, one note at a time and then back down the same way. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733440581953078&run=True) |
 
 | Standard Notation with Scalar Step |
 | --- |
@@ -470,7 +468,7 @@ used to bump the `Mi 4` note up by one octave and then to bump the
 
 | Music Blocks Code with Scalar Transpose |
 | --- |
-| ![semitone transposition](./pitchmovement2.svg "semitone transposition") |
+| ![Scalar transpose Block](./pitchmovement2.svg "Scalar transpose Block") <br> [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733441522669991&run=True)|
 
 | Standard Notation for Scalar Transpose |
 | --- |
@@ -508,13 +506,11 @@ note in the scale from which the pattern is applied is "C".
 Using the example above, one can modify the arguments to *Set key* in
 order to move up and down one octave in a scale. The example shows G
 Major scale, which has an F#, but it could be used for any combination
-of key and mode.
+of key and mode. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1662103714150464&run=True)
 
 | Standard Notation for Set Key Example |
 | --- |
 | ![set key notation](./setkey2.png "Standard Notation Set Key") |
-
-[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1662103714150464&run=True)
 
 Various examples for Major modes are shown in the following table.
 
@@ -582,7 +578,7 @@ You can find the *Set key* block on the *Intervals* palette.
 
 | Music Blocks for Set Key and Movable Do | 
 | --- |
-| ![scalar transposition](./pitchmovement3.svg "scalar transposition") |
+| ![scalar transposition](./pitchmovement3.svg "scalar transposition") <br> [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733441522669991&run=True)|
 
 | Standard Notation for Set Key and Movable Do |
 | --- |
@@ -595,7 +591,7 @@ You can find the *Set key* block on the *Intervals* palette.
 
 | Music Blocks Code with Scale Degrees 1-5 |
 | --- |
-| ![scale degree](./pitchmovement4.svg "scale degree") |
+| ![scale degree](./pitchmovement4.svg "scale degree") <br> [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733480662614787&run=True)|
 
 | Standard Notation for Scale Degrees 1-5 |
 | --- |
@@ -610,7 +606,7 @@ You can find the *Set key* block on the *Intervals* palette.
 
 | Music Blocks Code with Set Key and Movable Do |
 | --- |
-| ![movable do](./pitchmovement5.svg "movable do") |
+| ![movable do](./pitchmovement5.svg "movable do")  <br> [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733481433887068&run=True)|
 
 | Standard Notation Code for Set Key and Movable Do |
 | --- |
@@ -622,7 +618,7 @@ You can find the *Set key* block on the *Intervals* palette.
 
 | Music Blocks for Set Key and Scalar Step |
 | --- |
-| ![movable do](./pitchmovement6.svg "movable do") |
+| ![movable do](./pitchmovement6.svg "movable do") <br> [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733487475028348&run=True)|
 
 | Standard Notation with Set Key and Scalar Step |
 | --- |
@@ -774,7 +770,7 @@ depending on whether or not a *Movable Do* block is present.
 | Scalar Inversion | Movable | Yes. Inversion around a specified axis within *nth modal pitch* space. |
 | Pitch Number | Movable | No effect. Pitches can be transformed via Set Pitch Number Offset. |
 
-Illustrative example:
+**Illustrative example:**
 
 The following example demonstrates how the Scale Degree functionality
 combines math and musical modifiers. When combining numbers and
@@ -783,7 +779,7 @@ block.
 
 ![Scale Degree Improv Example](./scale-degree-improv.svg "Scale Degree Improv")
 
-[Scale Degree Improv](https://musicblocks.sugarlabs.org/index.html?id=1675577999425474&run=True)
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1675577999425474&run=True)
 
 #### <a name="INTERVALS">3.2.7 Intervals</a>
 
@@ -851,7 +847,7 @@ A chord is a group of notes that are played together (often used for
 harmony in music). There are triads (three notes), tetrachords (four
 notes), and even five-, six-, and seven-note chords.
 
-The *Chord* block builds a chord from a base note.
+The *Chord* block builds a chord from a base note. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733533569615271&run=True)
 
 ![chord](../documentation/chordinterval_block.svg "Chord Block")
 
@@ -872,7 +868,7 @@ sequence.
 ![arpeggio](../documentation/arpeggio_block.svg "Arpeggio Block")
 
 In the example above, since the Major chord intervals are 1 4 7, the
-notes played are do, mi, sol, sol, ti, mi.
+notes played are do, mi, sol, sol, ti, mi. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733828377963278&run=True)
 
 #### <a name= "INVERSION">3.2.9 Inversion</a>
 
@@ -896,7 +892,7 @@ The above example code has an *even* inversion for two notes `F5` and
 `D5` around the reference pitch of `C5`. We would expect the following
 results:
 
-Even inversion
+**Even inversion**
 
 | Starting pitch | Distance from `C5`    | Inverse distance from `C5` | Ending pitch |
 | :------------: | :-------------------: | :------------------------: | :----------: |
@@ -919,7 +915,7 @@ Underneath the *even* inversion in the example code is an *odd*
 inversion for the same two notes of `F5` and `D5` around the same
 reference pitch of `C5`. We would expect the following results:
 
-Odd inversion
+**Odd inversion**
 
 | Starting pitch | Distance from midway-point between `C5` and `C♯5` | Inverse distance from midway-point between `C5` and `C♯5` | Ending pitch |
 | :------------: | :-----------------------------------------------: | :-------------------------------------------------------: | :----------: |
@@ -943,7 +939,7 @@ axis of rotation).
 
 ![odd invert](./invert-odd.png "odd invert example")
 
-Scalar inversion
+**Scalar inversion**
 
 Underneath the *even* and *odd* inversion blocks in the example code
 is an inversion block set to *scalar*. We would expect the following
@@ -987,7 +983,7 @@ where the right argument is converted accordingly, and output is received on the
 
 ![staff](treble.svg "Treble clef staff")
 
-### <a name="y-to-pitch">3.2.9.1 Y to Pitch</a>
+#### <a name="y-to-pitch">3.2.10.1 Y to Pitch</a>
 
 ![y pos](../documentation/ytopitch_block.svg "Y to Pitch converter")
 
@@ -995,7 +991,7 @@ This converter takes input in the form of a number that represents Staff Y posit
 
 Additionally, the block can be plugged into a print block to view the converted note value.
 
-### <a name="pitch-converter">3.2.9.2 Pitch converter</a>
+#### <a name="pitch-converter">3.2.10.2 Pitch converter</a>
 
 ![pitch converter](../documentation/outputtools_block.svg "Pitch converter block")
 
@@ -1011,41 +1007,41 @@ Below explained is the utility of every conversion option:
 #### **0. Alphabet:**
 Prints the alphabet data of the note being played e.g A, B, C, D, E, F, G, including accidentals.
 
-#### **1. Alphabet class:**
+#### **1. Alphabet Class:**
 Prints the alphabet data of the note being played e.g A, B, C, D, E, F, G. It doesn't print any info regarding accidentals.
 
 #### **2. Solfege Syllable:**
 Similar to Alphabet class, returns the data in form of solfege e.g do, re, mi.
 It too, gives no info regarding accidentals.
 
-#### **3. Pitch class:**
+#### **3. Pitch Class:**
 Returns a number between 0 to 11, corresponding to the note played, where C is 0 and B is 11. Each increase in the number signifies an increase by one semitone.
 
-#### **4. Scalar class:**
-Returns a number between 1-7 corresponding to the scale degree of the note being played, with reference to the chosen mode. Provides no info regarding accidentals.
+#### **4. Pitch Number:**
+Value of the pitch of the note currently being played. It is different from Pitch class in the way that it can go below 0 and above 11 depending upon the octave.
 
-#### **5. Scale Degree:**
-Intuitively, returns the scale degree of the note being played with reference to the chosen mode. It can also be thought of as Scalar class with accidentals.
-
-#### **6. N^th Degree:**
-Zero-based index of the degree of note being played in the chosen mode.
-
-#### **7. Pitch in Hertz:**
+#### **5. Pitch in Hertz:**
 Returns the value in hertz of the pitch of the note being currently played.
 
-#### **8. Pitch Number:**
-Value of the pitch of the note currently being played. It is different from Pitch class in the way that it can go below 0 and above 11 depending upon the octave.
+#### **6. Scalar Class:**
+Returns a number between 1-7 corresponding to the scale degree of the note being played, with reference to the chosen mode. Provides no info regarding accidentals.
+
+#### **7. Scale Degree:**
+Intuitively, returns the scale degree of the note being played with reference to the chosen mode. It can also be thought of as Scalar class with accidentals.
+
+#### **8. N^th Degree:**
+Zero-based index of the degree of note being played in the chosen mode.
 
 #### **9. Staff Y:**
 Returns the Y staff position of the note being played according to staff dimensions. It takes into account only the alphabet class, no accidental info is processed.
 
-### <a name="number-2-octave">3.2.9.3 Number to Octave  </a>
+#### <a name="number-2-octave">3.2.10.3 Number to Octave  </a>
   
 ![pitch converter](../documentation/number2octave_block.svg "Y to Pitch converter")
 
 This converter takes a numeric value which denotes pitch number and returns the octave corresponding to that pitch number.
 
-### <a name="number-2-pitch">3.2.9.4 Number to Pitch</a>
+#### <a name="number-2-pitch">3.2.10.4 Number to Pitch</a>
 
 ![pitch converter](../documentation/number2pitch_block.svg "Y to Pitch converter")
 
@@ -1065,7 +1061,7 @@ This converter takes a numeric value which denotes pitch number and returns the 
 | pitch number | Converts pitch to pitch number (as defined above). G maps to 7. |
 | pitch in hertz | Converts pitch to hertz. G4 maps to 392Hz. |
 | pitch to color | Converts pitch to a color value (0-100). C maps to 0, G maps to 58.3, etc. |
-| pitch to shade | Coverts the octave value of the current pitch to a shade. Octave 4 maps to 50. |
+| pitch to shade | Converts the octave value of the current pitch to a shade. Octave 4 maps to 50. |
 
 ### <a name="NOTE-VALUE-TRANSFORMATION">3.3 Note Value Transformations</a>
 
@@ -1079,7 +1075,7 @@ play for `3/8` `(i.e. 1/4 + 1/8)` of a beat. A dotted eighth note will
 play for `3/16` `(i.e. 1/8 + 1/16)` of a beat. A double dot extends
 the duration by `75%` `(i.e. 50% + [50% of 50%])`. For example, a
 double-dotted quarter note will play for `7/16` `(i.e. 1/4 + 1/8 +
-1/16)` of a beat (which is the same as `4/16 + 2/16 + 1/16 = 7/16`).
+1/16)` of a beat (which is the same as `4/16 + 2/16 + 1/16 = 7/16`). [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733856425527606&run=True)
 
 The dot block is useful as an expression of musical rhythm--it is
 convenient and helps to organize musical ideas (e.g. many melodies use
@@ -1103,14 +1099,12 @@ the duration of the notes by changing their note values. Multiplying
 the note value of an `1/8` note by `1/2` is the equivalent of playing
 a `1/16` note (i.e. `1/2 * 1/8 = 1/16`) . Multiplying the note value
 of an `1/8` note by `2/1` (which has the effect of dividing by `1/2`)
-will result in the equivalent of a `1/4` note.
+will result in the equivalent of a `1/4` note. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733894227395433&run=True)
 
 ![drums](./drum4.svg "speeding up drum beats over time")
 
 In the above example, the sequence of [drum](#25-drums) note values is
-decreased over time, at each repetition.
-
-[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&run=True)
+decreased over time, at each repetition. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&run=True)
 
 #### <a name="REPETITION">3.3.3 Repeating Notes</a>
 
@@ -1122,9 +1116,7 @@ note in a sequence.
 
 In the example, on the left, the result would be `Sol, Re, Sol, Sol,
 Re, Sol, Sol, Re, Sol, Sol, Re, Sol`; on the right the result would be
-`Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol`.
-
-[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725794018017026&run=True)
+`Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol`. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725794018017026&run=True)
 
 #### <a name="SWINGING">3.3.4 Swinging Notes and Tied Notes</a>
 
@@ -1137,7 +1129,7 @@ adding some duration (specified by swing value) to the first note and
 taking the same amount from the second note. Notes that do not match
 note value are unchanged.
 
-In the example, `re5` would be played as a `1/6` note and `mi5` would
+In the example, `fa4` would be played as a `1/6` note and `sol4` would
 be played as a `1/12` note (`1/8 + 1/24 === 1/6` and `1/8 - 1/24 ===
 1/12`). Observe that the total duration of the pair of notes is
 unchanged.
@@ -1160,7 +1152,7 @@ before the beat.
 The Beat count block is the number of the current beat, eg 1, 2, 3, or 4. 
 In the figure, it is used to take an action on the first beat of each measure.
 
-![beat count](..documentation/beatvalue_block.svg "beat count")
+![beat count](../documentation/beatvalue_block.svg "beat count")
 
 The Measure count block returns the current measure.
 
@@ -1264,7 +1256,7 @@ block. In the example above, the default instrument is set to piano,
 so any note that is not inside of a *Set instrument* block will be
 played using the piano synthesizer. The first note in this example is
 piano; the second note is guitar; and the third is piano.
-[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1726145948711407&run=True)
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1734599929166507&run=True)
 
 #### <a name= "SETTINGKEY"></a>3.4.3 Setting Key and Mode
 
@@ -1317,9 +1309,7 @@ It gets more interesting if we shift up and down octaves.
 
 ![voices](./voices4.svg "playing the various voices offset in time")
 
-And even more interesting if we bring the various voices offset in time.
-
-[RUN
+And even more interesting if we bring the various voices offset in time [RUN
 LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523026536194324&run=True)
 
 ![events](./voices5.svg "queuing the various voices using events")
@@ -1328,7 +1318,7 @@ An alternative to use a preprogrammed delay is to use the *Broadcast*
 block to bring in multiple voices. In the example above, after each
 section of the song is played, a new event is broadcasted, bringing in
 a new voice. Note the use of the *Mouse Sync* block. This ensures that
-the multiple voices are synced to the same master clock.
+the multiple voices are synced to the same master clock. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1734439833660485&run=True)
 
 ![drum](./drum3.svg "usage of kick drum")
 
@@ -1336,7 +1326,7 @@ A special *Start drum* version of the *Start* block is available for
 laying down a drum track. Any *Pitch* blocks encountered while starting
 from a drum will be played as `C2` with the default drum sample. In
 the example above, all of the notes in `chunk` will be played with a
-kick drum.
+kick drum. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1734456316657915&run=True)
 
 ### <a name="GRAPHICS">3.6 Adding graphics</a>
 
@@ -1350,18 +1340,12 @@ blocks, the graphics stay in sync with the music. In this example, the
 turtle moves forward each time a quarter note is played. It turns
 right during the eighth note. The pitch is decreased by one half step,
 the pen size decreases, and the pen color increases at each step in
-the inner repeat loop.
-
-[RUN
-LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523494709674021&run=True)
+the inner repeat loop. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523494709674021&run=True)
 
 ![graphics](./graphics3.svg "synchronizing graphics and music")
 
 Another example of graphics synchronized to the music by placing the
-graphics commands inside of *Note value* blocks
-
-[RUN
-LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523106271018484&run=True)
+graphics commands inside of *Note value* blocks. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1734456316657915&run=True)
 
 ![graphics](./graphics5.svg "using beat to synchronize graphics")
 
@@ -1371,8 +1355,8 @@ action for each note, but the parameters associated with the action,
 such as pen width, are dependent upon which beat we are on. On Beat 1,
 the pen size is set to `50` and the volume to `75`. On Beat `3`, the
 pen size is set to `25` and the volume to `50`. On off beats, the pen
-size is set to `5` and the volumne to `5`. The resultant graphic is
-shown below.
+size is set to `5` and the volume to `5`. The resultant graphic is
+shown below. [RUN LIVE]()
 
 ![graphics](./graphics6.svg "graphics modulated by beat")
 
@@ -1433,15 +1417,13 @@ actions over the specified rhythm.
 ![tree](./tree-example.svg "another example of the No-clock block")
 
 Another example of embedding graphics into notes: in case, a recursive
-tree drawing, where the pitch goes up as the branches ascend.
+tree drawing, where the pitch goes up as the branches ascend. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523029986215035&run=True)
 
 ![tree](./tree.svg "tree graphic")
 
-[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523029986215035&run=True)
-
 ### <a name="INTERACTIONS">3.7 Interactions</a>
 
-There are many ways to interactive with Music Blocks, including
+There are many ways to be interactive with Music Blocks, including
 tracking the mouse position to impact some aspect of the music.
 
 ![interactivity](./interactive.svg "interactions")
@@ -1450,17 +1432,13 @@ For example, we can launch the phrases (chunks) interactively. We use
 the mouse position to generate a suffix: `0`, `1`, `2`, or `3`,
 depending on the quadrant. When the mouse is in the lower-left
 quadrant, `chunk0` is played; lower-right quadrant, `chunk1`;
-upper-left quadrant, `chunk2`; and upper-right quadrant, `chunk3`.
-
-[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523028011868930&run=True)
+upper-left quadrant, `chunk2`; and upper-right quadrant, `chunk3`. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523028011868930&run=True)
 
 ![piano](./interactive2.svg "creation of a two-key piano")
 
 In the example above, a simple two-key piano is created by associating
 *click* events on two different turtles with individual notes. Can you
-make an 8-key piano?
-
-[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1523107390715125&run=True)
+make an 8-key piano? [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1734501444456205&run=True)
 
 ![random](./interactive3.svg "adding randomness to your music")
 
@@ -1576,7 +1554,7 @@ The *Set mouse* block sends a stack of blocks to be run by the specified mouse.
 
 ## <a name="WIDGETS">4. Widgets</a>
 
-[Previous Section (3. Programming with Music)](#3-programming-with-music) | [Back to Table of Contents](#TABLE-OF-CONTENTS) | [Next Section (5. Beyond Music Blocks)](#5-beyond-music-blocks)
+[Previous Section (3. Programming with Music)](#3-programming-with-music) | [Back to Table of Contents](#table-of-contents) | [Next Section (5. Beyond Music Blocks)](#5-beyond-music-blocks)
 
 This section of the guide will talk about the various Widgets that can
 be used within Music Blocks to enhance your experience.
@@ -1589,16 +1567,16 @@ You can hide the widget by clicking on the *Close* button.
 
 You can move the widget by dragging its containing the window.
 
-### <a name="status">4.1 Status</a>
+### <a name="status">4.1 Monitoring Status</a>
 
-![widget](./status1.svg "given Music block")
+![widget](../images/Status_widget_debuggingMd.svg "given Music block")
 
 ![widget](./status2.svg "status in tabular form")
 
 The *Status widget* is a tool for inspecting the status of Music
 Blocks as it is running. By default, the key, BPM, and volume are
 displayed. Also, each note is displayed as it is played. There is one
-row per voice in the status table.
+row per voice in the status table. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732541757152077&run=True)
 
 Additional *Print* blocks can be added to the *Status* widget to
 display additional music factors, e.g., duplicate, transposition,
@@ -1606,12 +1584,12 @@ skip, [staccato and slur](#336-staccato-and-slur), and
 [graphics](#36-adding-graphics) factors, e.g., x, y, heading, color,
 shade, grey, and pensize.
 
-![widget](./status3.svg "additional programming within the Status
+![widget](../images/Status_Widget_additional_programming_DebuggingMd.svg "additional programming within the Status
  block")
 
 You can do additional programming within the status block. In the
 example above, `whole notes played` is multiplied by `4` (to calculate
-quarter notes played) before being displayed.
+quarter notes played) before being displayed. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732553086132345&run=True)
 
 ### <a name="GENERATION"></a>4.2 Generating Chunks of Notes 
 
@@ -1730,7 +1708,7 @@ notes.
 
 Tuplets are a collection of notes that get scaled to a specific
 duration. Using tuplets makes it easy to create groups of notes that
-are not based on a power of 2 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725874435939635&run=True).
+are not based on a power of 2. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725874435939635&run=True).
 
 In the example above, three quarter notes&mdash;defined in the *Simple
 Tuplet* block&mdash;are played in the time of a single quarter
@@ -1744,7 +1722,7 @@ In the example above, the three quarter notes are defined in the
 *Rhythm* block embedded in the *Tuplet* block. As with the *Simple
 Tuplet* example, they are played in the time of a single quarter
 note. The result is three twelfth notes. This more complex form allows
-for intermixing multiple rhythms within single tuplet.
+for intermixing multiple rhythms within single tuplet. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1735745904945622&run=True)
 
 ![widget](./matrix12.svg "embedding rhythm and Tuplet block")
 
@@ -1780,7 +1758,7 @@ scale in the 4th octave are added to the grid. Note that in order to
 put the highest note on top, the first pitch is the `Sol` in `Octave
 5`. From there, we use `-1` as the argument to the *Scalar step* block
 inside the *Repeat*, working our way down to `Sol` in `Octave
-4`. Another detail to note is the use of the *Mode length* block.
+4`. Another detail to note is the use of the *Mode length* block. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1735824170382853&run=True)
 
 ### <a name="rhythms">4.3 Generating Rhythms</a>
 
@@ -1868,7 +1846,7 @@ intervals.
 Note that not every mode uses 7 intervals per octave. For example, the
 *Chromatic* mode uses 11 intervals: `1, 1, 1, 1, 1, 1, 1, 1, 1,
 1, 1, 1`. The *Japanese* mode uses only 5 intervals: `1, 4,
-2, 3, 2],`. What is important is that the sum of the intervals
+2, 3, 2`. What is important is that the sum of the intervals
 in an octave is 12 half-steps.
 
 The *Mode length* block will return the number of intervals (scalar
@@ -1970,7 +1948,7 @@ The *Save* button will export *On strong beat do* blocks for each strong beat.
 The *Set Drum* block is used to map the enclosed pitches into drum
 sounds. Drum sounds are played in a monopitch using the specified drum
 sample. In the example above, a `kick drum` will be substituted for
-each occurrence of a `Re` `4`.
+each occurrence of a `sol` `4`.
 
 ![widget](./drum5a.svg "pitch-drum matrix 1")
 
@@ -1982,7 +1960,7 @@ each occurrence of a `Re` `4`.
 
 As an experience for creating mapping with the *Set Drum* block, we
 provide the *Drum-Pitch* Matrix. You use it to map between pitches and
-drums. The output is a stack of *Set Dum* blocks.
+drums. The output is a stack of *Set Drum* blocks.
 
 ### <a name="stairs">4.7 Exploring Musical Proportions</a>
 
@@ -1992,7 +1970,7 @@ using a given pitch and musical proportion.
 
 The *Pitch* blocks contained in the clamp of the *Pitch Staircase*
 block define the pitches to be initialized simultaneously. By default,
-one pitch is defined and it have default note "la" and octave "3".
+one pitch is defined and it have default note "sol" and octave "3".
 
 ![widget](./pitchstaircase0.svg "generating arbitrary pitches")
 
@@ -2027,7 +2005,7 @@ is shown below:
 ![widget](./pitchstaircase4.svg "Pitch Stair block")
 
 These stacks can be used with the *Phrase maker* block to define
-the rows in the matrix.
+the rows in the matrix. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1736204720563059&run=True)
 
 ![widget](./pitchstaircase5.svg "Pitch Stair block")
 
@@ -2118,14 +2096,14 @@ combination of filters you define.
 ![widget](./timbre1a.svg "the notes inside Timbre block")
 
 You can also put notes in the *Timbre* block to use for testing your
-sound. In the example above, a scale will be used for the test.
+sound. In the example above, a scale will be used for the test. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1736280874343528&run=True)
 
 * The *Save* button, which will save your custom timbre for use in
 your program.
 
 ![widget](./timbre3.svg "select synth")
 
-* The *Synth* button, which lets you choose between an AM synth, a PM
+* The *Synth* button, which lets you choose between an AM synth, a FM
 synth, or a Duo synth.
 
 ![widget](./timbre4.svg "select osc")
@@ -2192,6 +2170,8 @@ making it narrower or wider than pure. It is also possible to change
 and create different tuning systems.
 
 ![widget](./temperament1.svg "the Temperament block")
+
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725879922065766&run=True)
 
 The *Temperament* block is used to launch a widget that enables the
 user to visualize and edit notes within an octave.
@@ -2283,8 +2263,6 @@ The *Drag* button will drag the widget.
 
 The *Close* button will close the widget.
 
-[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725879922065766&run=True)
-
 ###  <a name="oscilloscope">4.13 The Oscilloscope</a>
 
 Music Blocks has an Oscilloscope Widget to visualize the music as it plays.
@@ -2342,7 +2320,7 @@ do do sol```.
 
 ## <a name="BEYOND-MUSIC-BLOCKS">5. Beyond Music Blocks</a>
 
-[Previous Section (4. Widgets)](#4-widgets) | [Back to Table of Contents](#TABLE-OF-CONTENTS)
+[Previous Section (4. Widgets)](#4-widgets) | [Back to Table of Contents](#table-of-contents) | [Next Section (6. Appendix)](#6-appendix)
 
 Music Blocks is a waypoint, not a destination. One of the goals is to
 point the learner towards other powerful tools.
@@ -2492,7 +2470,7 @@ methods, getters, setters.
 
 ## <a name="APPENDIX">6. Appendix</a>
 
-[Previous Section (5. Beyond Music Blocks)](#5-beyond-music-blocks) | [Back to Table of Contents](#TABLE-OF-CONTENTS)
+[Previous Section (5. Beyond Music Blocks)](#5-beyond-music-blocks) | [Back to Table of Contents](#table-of-contents)
 
 ### <a name="BEGINNER_PALETTES">6.1 Beginner Palettes</a>
 
@@ -2715,4 +2693,4 @@ Looking for a block? The tables below (one for beginner mode and one for advance
 | | 1/64 note |
 | | custom mode |
 
-[Back to Table of Contents](#TABLE-OF-CONTENTS)
+[Back to Table of Contents](#table-of-contents)

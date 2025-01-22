@@ -42,6 +42,14 @@ msgstr ""
 msgid "Music Blocks Project"
 msgstr "Proyecto de Bloques de Música"
 
+#: js/activity.js:1285
+msgid "Enter file name"
+msgstr "Introduzca el nombre del archivo"
+
+#: js/activity.js:1306
+msgid "Click on stop saving"
+msgstr "Haga clic en dejar de guardar"
+
 #: js/SaveInterface.js:63
 msgid "This project was created in Music Blocks"
 msgstr "Este proyecto fue creado en Bloques de Música"
@@ -997,8 +1005,8 @@ msgid "Not a number"
 msgstr "no es un número"
 
 #: js/block.js:4401
-msgid "Octave value must be between 1 and 10."
-msgstr "El bloqueo de silencio no se puede eliminar."
+msgid "Octave value must be between 1 and 8."
+msgstr "El valor de octava debe estar entre 1 y 8."
 
 #: js/block.js:4409
 msgid "Numbers can have at most 10 digits."

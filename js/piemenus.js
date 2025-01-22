@@ -1635,23 +1635,18 @@ const piemenuNoteValue = (block, noteValue) => {
 
 const piemenuNumber = (block, wheelValues, selectedValue) => {
     // input form and  wheelNav pie menu for number selection
-
     if (block.blocks.stageClick) {
         return;
     }
-
     docById("wheelDiv").style.display = "";
-
     // the number selector
     block._numberWheel = new wheelnav("wheelDiv", null, 600, 600);
     // exit button
     block._exitWheel = new wheelnav("_exitWheel", block._numberWheel.raphael);
-
     const wheelLabels = [];
     for (let i = 0; i < wheelValues.length; i++) {
         wheelLabels.push(wheelValues[i].toString());
     }
-
     // spacer
     wheelLabels.push(null);
 
@@ -1807,25 +1802,23 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         (Math.round(selectorWidth * block.blocks.blockScale) * block.protoblock.scale) / 2 + "px";
     // Navigate to a the current number value.
     let i = wheelValues.indexOf(selectedValue);
-    if (i === -1) {
-        i = 0;
+    if (i === -1 || selectedValue < 1 || selectedValue > 8) {
+        selectedValue = Math.min(Math.max(selectedValue, 1), 8);
+        i = wheelValues.indexOf(selectedValue);
     }
-
-    // In case of float value, navigate to the nearest integer
+    // In case of float value, navigate to the nearest integer within the range
     if (selectedValue % 1 !== 0) {
-        i = wheelValues.indexOf(Math.floor(selectedValue + 0.5));
+        selectedValue = Math.min(Math.max(Math.floor(selectedValue + 0.5), 1), 8);
+        i = wheelValues.indexOf(selectedValue);
     }
-
     if (i !== -1) {
         block._numberWheel.navigateWheel(i);
     }
-
     block.label.style.fontSize =
         Math.round((20 * block.blocks.blockScale * block.protoblock.scale) / 2) + "px";
 
     block.label.style.display = "";
     block.label.focus();
-
     // Hide the widget when the selection is made.
     for (let i = 0; i < wheelLabels.length; i++) {
         block._numberWheel.navItems[i].navigateFunction = () => {
@@ -1833,57 +1826,33 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
             __exitMenu();
         };
     }
-
     // Or use the exit wheel...
     block._exitWheel.navItems[0].navigateFunction = () => {
         __exitMenu();
     };
-
     block._exitWheel.navItems[1].navigateFunction = () => {
         const cblk1 = that.connections[0];
-        const cblk2 = that.blocks.blockList[cblk1].connections[0];
-
-        // Check if the number block is connected to a note value and prevent the value to go below zero
-        if (
-            that.value < 1 &&
-            (that.blocks.blockList[cblk1].name === "newnote" ||
-                (cblk2 && that.blocks.blockList[cblk2].name == "newnote"))
-        ) {
-            that.value = 0;
-        } else if (that.value < 2 &&
-            that.blocks.blockList[cblk1].name === "pitch"
-        ) {
-            that.value = 1;
-        }
-        else {
+        const cblk2 = that.blocks.blockList[cblk1]?.connections[0];
+        // Decrease the value but ensure it does not go below 1
+        if (that.value > 1) {
             that.value -= 1;
         }
-
         that.text.text = that.value.toString();
-
         // Make sure text is on top.
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
-
         that.label.value = that.value;
     };
-
     block._exitWheel.navItems[2].navigateFunction = () => {
         const cblk = that.connections[0];
-        if (
-            that.value > 9 &&
-            (that.blocks.blockList[cblk].name === "pitch")
-        ) {
-            that.value = 10;
-        } else {
+        // Increase the value but ensure it does not exceed 8
+        if (that.value < 8) {
             that.value += 1;
         }
         that.text.text = that.value.toString();
-
         // Make sure text is on top.
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
-
         that.label.value = that.value;
     };
 
@@ -1891,9 +1860,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         const label = that._numberWheel.navItems[that._numberWheel.selectedNavItemIndex].title;
         const i = wheelLabels.indexOf(label);
         const actualPitch = numberToPitch(wheelValues[i] + 3);
-
         const tur = that.activity.turtles.ithTurtle(0);
-
         if (
             tur.singer.instrumentNames.length === 0 ||
             !tur.singer.instrumentNames.includes(DEFAULTVOICE)
@@ -1902,10 +1869,8 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
             that.activity.logo.synth.createDefaultSynth(0);
             that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
-
         that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
         Singer.setSynthVolume(that.activity.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
-
         actualPitch[0] = actualPitch[0].replace(SHARP, "#").replace(FLAT, "b");
         if (!that._triggerLock) {
             that._triggerLock = true;
@@ -1918,7 +1883,6 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
                 null
             );
         }
-
         setTimeout(() => {
             that._triggerLock = false;
         }, 1 / 8);
@@ -1930,9 +1894,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         const label = that._numberWheel.navItems[that._numberWheel.selectedNavItemIndex].title;
         const i = wheelLabels.indexOf(label);
         const actualPitch = frequencyToPitch(wheelValues[i]);
-
         const tur = that.activity.turtles.ithTurtle(0);
-
         if (
             tur.singer.instrumentNames.length === 0 ||
             !tur.singer.instrumentNames.includes(DEFAULTVOICE)
@@ -1941,10 +1903,8 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
             that.activity.logo.synth.createDefaultSynth(0);
             that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
-
         that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
         Singer.setSynthVolume(that.activity.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
-
         actualPitch[0] = actualPitch[0].replace(SHARP, "#").replace(FLAT, "b");
         if (!that._triggerLock) {
             that._triggerLock = true;
@@ -1957,14 +1917,11 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
                 null
             );
         }
-
         setTimeout(() => {
             that._triggerLock = false;
         }, 1 / 8);
-
         __selectionChanged();
     };
-
     // Handler for pitchnumber preview. Block is to ensure that
     // only pitchnumber block's pie menu gets a sound preview
     if (
@@ -1975,7 +1932,6 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
             block._numberWheel.navItems[i].navigateFunction = __pitchPreviewForNum;
         }
     }
-
     // Handler for Hertz preview. Need to also ensure that
     // only hertz block gets a different sound preview
     if (block._usePieNumberC1() && block.blocks.blockList[block.connections[0]].name === "hertz") {
@@ -3683,7 +3639,7 @@ const piemenuKey = (activity) => {
     docById("chooseKeyDiv").style.display = "block";
     docById("movable").style.display = "block";
 
-    const keyNameWheel = new wheelnav("chooseKeyDiv", null, 1700, 1700);
+    const keyNameWheel = new wheelnav("chooseKeyDiv", null, 1300, 1300);
     const keyNameWheel2 = new wheelnav("keyNameWheel2", keyNameWheel.raphael);
     const keys = ["C", "G", "D", "A", "E", "B/C♭", "F♯/G♭", "C♯/D♭", "G♯/A♭", "D♯/E♭", "A♯/B♭", "F"];
 
@@ -3691,8 +3647,8 @@ const piemenuKey = (activity) => {
 
     keyNameWheel.slicePathFunction = slicePath().DonutSlice;
     keyNameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-    keyNameWheel.slicePathCustom.minRadiusPercent = 0.5;
-    keyNameWheel.slicePathCustom.maxRadiusPercent = 0.8;
+    keyNameWheel.slicePathCustom.minRadiusPercent = 0.6;
+    keyNameWheel.slicePathCustom.maxRadiusPercent = 0.9;
     keyNameWheel.sliceSelectedPathCustom = keyNameWheel.slicePathCustom;
     keyNameWheel.sliceInitPathCustom = keyNameWheel.slicePathCustom;
     keyNameWheel.titleRotateAngle = 0;
@@ -3704,7 +3660,7 @@ const piemenuKey = (activity) => {
     keyNameWheel2.colors = platformColor.pitchWheelcolors;
     keyNameWheel2.slicePathFunction = slicePath().DonutSlice;
     keyNameWheel2.slicePathCustom = slicePath().DonutSliceCustomization();
-    keyNameWheel2.slicePathCustom.minRadiusPercent = 0.8;
+    keyNameWheel2.slicePathCustom.minRadiusPercent = 0.9;
     keyNameWheel2.slicePathCustom.maxRadiusPercent = 1;
     keyNameWheel2.sliceSelectedPathCustom = keyNameWheel2.slicePathCustom;
     keyNameWheel2.sliceInitPathCustom = keyNameWheel2.slicePathCustom;
@@ -3730,7 +3686,7 @@ const piemenuKey = (activity) => {
     modenameWheel.slicePathFunction = slicePath().DonutSlice;
     modenameWheel.slicePathCustom = slicePath().DonutSliceCustomization();
     modenameWheel.slicePathCustom.minRadiusPercent = 0.2;
-    modenameWheel.slicePathCustom.maxRadiusPercent = 0.5;
+    modenameWheel.slicePathCustom.maxRadiusPercent = 0.6;
     modenameWheel.sliceSelectedPathCustom = modenameWheel.slicePathCustom;
     modenameWheel.sliceInitPathCustom = modenameWheel.slicePathCustom;
     modenameWheel.titleRotateAngle = 0;

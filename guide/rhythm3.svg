@@ -1,15 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
    width="261.98407mm"
    height="140.28709mm"
    viewBox="0 0 261.98407 140.2871"
    version="1.1"
-   id="svg8">
+   id="svg8"
+   sodipodi:docname="rhythm3.svg"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#999999"
+     borderopacity="1"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="1.48"
+     inkscape:cx="494.93243"
+     inkscape:cy="265.2027"
+     inkscape:window-width="1920"
+     inkscape:window-height="1001"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg8" />
   <defs
      id="defs2">
     <marker
@@ -48,7 +71,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -652,22 +675,23 @@
        d="m 153.58479,17.376154 c 0.44055,-0.664804 1.67812,-0.648919 2.30695,0 v 3.937554 c 0.3845,0.768985 0.76899,0.768985 1.15348,0 V 10.743656 c 0.76899,-0.7689856 1.53797,-0.7689856 2.30696,0 v 7.109619 c 0.38449,0.768985 0.76898,0.768985 1.15348,0 v -0.566253 c 0.76898,-0.768985 1.53797,-0.768985 2.30695,0 v 0.566253 c 0.38449,0.768985 0.76899,0.768985 1.15348,0 v -0.566253 c 0.76898,-0.768985 1.53797,-0.768985 2.30696,0 v 0.566253 c 0.38449,0.768985 0.76898,0.768985 1.15347,0 v -0.13632 c 0.76899,-0.768985 1.53797,-0.768985 2.30696,0 v 7.057187 c 0,2.69145 -1.15348,4.22942 -3.46043,4.613912 h -9.22783 c -2.30695,0 -3.46043,-1.53797 -3.46043,-4.613912 0,0 -0.0761,-6.677122 0,-7.397988 z" />
   </g>
   <rect
-     style="fill:#93befe;fill-opacity:1;stroke:none;stroke-width:2.3818;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     style="fill:#93befe;fill-opacity:1;stroke:none;stroke-width:1.7581;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      id="rect1673-6"
-     width="219.78156"
+     width="119.74772"
      height="27.760744"
-     x="39.190258"
+     x="20"
      y="11.493998" />
   <rect
-     style="fill:#5599ff;fill-opacity:1;stroke:none;stroke-width:2.3818;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     style="fill:#5599ff;fill-opacity:1;stroke:none;stroke-width:1.43801;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      id="rect1673-6-1"
-     width="219.78156"
+     width="80.112083"
      height="27.760744"
-     x="39.635189"
+     x="20"
      y="39.906105" />
   <g
      id="g1878-8"
-     transform="matrix(0.22939922,0,0,0.22939922,23.25285,19.03894)">
+     transform="matrix(0.22939922,0,0,0.22939922,23.25285,19.03894)"
+     style="display:none">
     <path
        style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
        id="path2986-7"
@@ -684,11 +708,12 @@
     <polygon
        style="fill:#000000"
        id="polygon11-0"
-       points="21.55,37.977 21.55,17.667 39.512,27.822 " />
+       points="21.55,17.667 39.512,27.822 21.55,37.977 " />
   </g>
   <g
      id="g1878-2"
-     transform="matrix(0.22939922,0,0,0.22939922,23.25285,47.45105)">
+     transform="matrix(0.22939922,0,0,0.22939922,23.25285,47.45105)"
+     style="display:none">
     <path
        style="fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none"
        id="path2986-3"
@@ -705,11 +730,11 @@
     <polygon
        style="fill:#000000"
        id="polygon11-9"
-       points="21.55,17.667 39.512,27.822 21.55,37.977 " />
+       points="39.512,27.822 21.55,37.977 21.55,17.667 " />
   </g>
   <g
      id="g3488"
-     transform="translate(-155.66205,-107.31381)">
+     transform="translate(-170.25517,-107.56271)">
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.9389px;line-height:7.14375px;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -742,22 +767,22 @@
          style="stroke-width:0.264583px">—</tspan></text>
   </g>
   <rect
-     style="fill:#5599ff;fill-opacity:1;stroke:none;stroke-width:1.68351;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     style="fill:#5599ff;fill-opacity:1;stroke:none;stroke-width:1.75017;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      id="rect1673-6-1-2"
-     width="109.80209"
+     width="118.66991"
      height="27.760744"
-     x="149.16972"
+     x="140.30191"
      y="11.493998" />
   <rect
-     style="fill:#93befe;fill-opacity:1;stroke:none;stroke-width:1.37292;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     style="fill:#93befe;fill-opacity:1;stroke:none;stroke-width:1.4318;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      id="rect1673-6-2"
-     width="73.025002"
+     width="79.422829"
      height="27.760744"
-     x="113.01347"
+     x="100.53455"
      y="39.906105" />
   <g
      id="g3529"
-     transform="translate(-109.62454,-108.28996)">
+     transform="translate(-117.05003,-108.28996)">
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.9389px;line-height:7.14375px;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -825,41 +850,49 @@
   </g>
   <g
      id="g3529-9"
-     transform="translate(-34.537924,-108.28996)">
+     transform="matrix(0.98726823,0,0,1,-38.053969,-92.011905)">
+    <rect
+       style="display:inline;fill:#5599ff;fill-opacity:1;stroke:none;stroke-width:1.43344;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1"
+       width="79.605324"
+       height="27.760744"
+       x="221.21753"
+       y="132.0119"
+       sodipodi:insensitive="true" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.9389px;line-height:7.14375px;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="257.53595"
-       y="160.51889"
+       x="261.86774"
+       y="144.2148"
        id="text5191-4-3"><tspan
          id="tspan5189-0-1"
-         x="257.53595"
-         y="160.51889"
+         x="261.86774"
+         y="144.2148"
          style="stroke-width:0.264583px">1</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.9389px;line-height:7.14375px;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="257.59744"
-       y="167.16452"
+       x="261.92923"
+       y="150.86043"
        id="text5195-6-9"><tspan
          id="tspan5193-2-4"
-         x="257.59744"
-         y="167.16452"
+         x="261.92923"
+         y="150.86043"
          style="stroke-width:0.264583px">3</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.9389px;line-height:7.14375px;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="256.68106"
-       y="163.39435"
+       x="261.01285"
+       y="147.09026"
        id="text5269-0-7"><tspan
          id="tspan5267-8-8"
-         x="256.68106"
-         y="163.39435"
+         x="261.01285"
+         y="147.09026"
          style="stroke-width:0.264583px">—</tspan></text>
   </g>
   <g
      id="g3529-4"
-     transform="translate(-184.07712,-108.28996)">
+     transform="translate(-197.05003,-108.28996)">
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.9389px;line-height:7.14375px;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"

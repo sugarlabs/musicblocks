@@ -13,10 +13,9 @@ $(document).ready(function() {
         mode = localStorage.getItem("beginnerMode") || "true";
     } catch (error) {
         console.error("Error accessing localStorage:", error);
-       
-        mode = "true"; 
-    }
 
+        mode = "true";
+    }
 
     /**
      * The icon element that displays the user's current mode.

@@ -130,12 +130,13 @@ class Palettes {
         td.width = 1.5 * this.cellSize;
         td.height = 1.5 * this.cellSize;
         td.style.position = "relative";
+        td.style.backgroundColor = platformColor.paletteBackground;
         td.appendChild(
             makePaletteIcons(
                 PALETTEICONS[MULTIPALETTEICONS[i]]
-                    .replace("background_fill_color", platformColor.selectorBackground)
-                    .replace(/stroke_color/g, platformColor.ruleColor)
-                    .replace(/fill_color/g, platformColor.background),
+                    .replace("background_fill_color", platformColor.paletteLabelBackground)
+                    .replace(/stroke_color/g, platformColor.strokeColor)
+                    .replace(/fill_color/g, platformColor.fillColor),
                 1.5 * this.cellSize,
                 1.5 * this.cellSize
             )
@@ -146,7 +147,7 @@ class Palettes {
         cover.style.top = "0";
         cover.style.width = "100%";
         cover.style.height = "1px";
-        cover.style.background = platformColor.selectorBackground;
+        cover.style.background = platformColor.paletteLabelBackground;
         td.appendChild(cover);
         td.onmouseover = () => {
             this.showSelection(i, tr);
@@ -161,23 +162,23 @@ class Palettes {
             if (j === i) {
                 img = makePaletteIcons(
                     PALETTEICONS[MULTIPALETTEICONS[j]]
-                        .replace("background_fill_color", platformColor.selectorSelected)
-                        .replace(/stroke_color/g, platformColor.ruleColor)
-                        .replace(/fill_color/g, platformColor.background),
+                        .replace("background_fill_color", platformColor.paletteLabelSelected)
+                        .replace(/stroke_color/g, platformColor.strokeColor)
+                        .replace(/fill_color/g, platformColor.fillColor),
                     this.cellSize,
                     this.cellSize
                 );
-                tr.children[j].children[1].style.background = platformColor.selectorSelected;
+                tr.children[j].children[1].style.background = platformColor.paletteLabelSelected;
             } else {
                 img = makePaletteIcons(
                     PALETTEICONS[MULTIPALETTEICONS[j]]
-                        .replace("background_fill_color", platformColor.selectorBackground)
-                        .replace(/stroke_color/g, platformColor.ruleColor)
-                        .replace(/fill_color/g, platformColor.background),
+                        .replace("background_fill_color", platformColor.paletteLabelBackground)
+                        .replace(/stroke_color/g, platformColor.strokeColor)
+                        .replace(/fill_color/g, platformColor.fillColor),
                     this.cellSize,
                     this.cellSize
                 );
-                tr.children[j].children[1].style.background = platformColor.selectorBackground;
+                tr.children[j].children[1].style.background = platformColor.paletteLabelBackground;
             }
             tr.children[j].children[0].src = img.src;
         }
@@ -283,7 +284,7 @@ class Palettes {
             );
         }
     }
-    
+
     makeSearchButton(name, icon, listBody) {
         const row = listBody.insertRow(-1);
         const img = row.insertCell(-1);
@@ -302,6 +303,7 @@ class Palettes {
         row.style.flexDirection = "row";
         row.style.alignItems = "center";
         row.style.width = "126px";
+        row.style.backgroundColor = platformColor.paletteBackground;
 
         this._loadPaletteButtonHandler(name, row);
     }
@@ -323,6 +325,13 @@ class Palettes {
         row.style.flexDirection = "row";
         row.style.alignItems = "center";
         row.style.width = "126px";
+        row.style.backgroundColor = platformColor.paletteBackground;
+        row.addEventListener('mouseover', () => {
+            row.style.backgroundColor = platformColor.hoverColor;
+        });
+        row.addEventListener('mouseout', () => {
+            row.style.backgroundColor = platformColor.paletteBackground;
+        });
 
         this._loadPaletteButtonHandler(name, row);
     }
@@ -426,7 +435,7 @@ class Palettes {
                 'px"bgcolor="white"><thead><tr><td style= "width:28px"></tr></thead><tbody></tbody></table></div>';
             element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
             document.body.appendChild(element);
-    
+
         } catch (e) {
             console.error('Error clearing palettes:', e);
         }
@@ -457,9 +466,9 @@ class Palettes {
                 timeout = setTimeout(() => this.showPalette(name), 400);
             }
         };
-        
+
         row.onmouseout = () => clearTimeout(timeout);
-        
+
         // eslint-disable-next-line no-unused-vars
         row.onclick = (event) => {
             if (name == "search") {
@@ -881,7 +890,7 @@ class Palette {
         if (createHeader) {
             let header = this.menuContainer.children[0];
             header = header.insertRow();
-            header.style.background = platformColor.selectorSelected;
+            header.style.backgroundColor = platformColor.paletteLabelBackground;
             header.innerHTML =
                 '<td style ="width: 100%; height: 42px; box-sizing: border-box; display: flex; flex-direction: row; align-items: center; justify-content: space-between;"></td>';
             header = header.children[0];
@@ -900,7 +909,7 @@ class Palette {
             const label = document.createElement("span");
             label.textContent = toTitleCase(_(this.name));
             label.style.fontWeight = "bold";
-            label.style.color = platformColor.paletteBackground;
+            label.style.color = platformColor.textColor;
             header.appendChild(label);
 
             const closeDownImg = document.createElement("span");
@@ -980,6 +989,7 @@ class Palette {
                 };
 
                 const onMouseMove = (e) => {
+                    e.preventDefault();
                     let x, y;
                     if (e.type === "touchmove") {
                         x = e.touches[0].clientX;
@@ -992,14 +1002,16 @@ class Palette {
                 };
                 onMouseMove(event);
 
-                document.addEventListener("touchmove", onMouseMove);
+                document.addEventListener("touchmove", onMouseMove, { passive: false });
                 document.addEventListener("mousemove", onMouseMove);
 
                 const that = this;
                 const up = (event) => {
                     document.body.style.cursor = "default";
                     document.removeEventListener("mousemove", onMouseMove);
+                    document.removeEventListener("touchmove", onMouseMove);
                     img.onmouseup = null;
+                    img.ontouchend = null;
 
                     const x = parseInt(img.style.left);
                     const y = parseInt(img.style.top);
@@ -1009,15 +1021,15 @@ class Palette {
                     document.body.removeChild(img);
                     itemCell.appendChild(img);
 
-                    if (!x || !y) return;
+                    // if (!x || !y) return;
 
                     that._makeBlockFromProtoblock(
                         protoListScope[blk],
                         true,
                         b.modname,
                         event,
-                        x - that.activity.blocksContainer.x,
-                        y - that.activity.blocksContainer.y
+                        (x || that.activity.blocksContainer.x + 100) - that.activity.blocksContainer.x,
+                        (y || that.activity.blocksContainer.y + 100) - that.activity.blocksContainer.y
                     );
                 };
 

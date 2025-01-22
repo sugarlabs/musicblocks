@@ -326,4 +326,6 @@ class MathUtility {
     }
 }
 // Ensure mathutils.js exports the MathUtility class
-module.exports = MathUtility;
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = MathUtility;
+}
