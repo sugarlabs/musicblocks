@@ -875,7 +875,7 @@ function MusicKeyboard(activity) {
 
             // Convert durations to seconds based on BPM
             const durationInSeconds = selectedNotes[0].duration.map(
-                (beatDuration) => (beatDuration * 60) / this.bpm
+                (beatDuration) => (beatDuration * 60 * 4) / (this.bpm)
             );
             this._playChord(notes, durationInSeconds, selectedNotes[0].voice);
             const maxDuration = Math.max(...durationInSeconds);
@@ -911,6 +911,7 @@ function MusicKeyboard(activity) {
      * @param {HTMLElement} playButtonCell - The HTML element representing the play button.
      */
     this.playOne = function (counter, time, playButtonCell) {
+    //fix "time". I think it should hold same value as noteValue. But is does not. time < noteValue that,s why overlapping.
         console.log("beat ->",selectedNotes);
         setTimeout(() => {
             let cell, eleid, ele, notes, zx, res, maxDuration;
@@ -961,7 +962,7 @@ function MusicKeyboard(activity) {
 
                 if (this.playingNow) {
                     const durationInSeconds = selectedNotes[counter].duration.map(
-                        (beatDuration) => (beatDuration * 60) / this.bpm
+                        (beatDuration) => (beatDuration * 60 * 4) / this.bpm
                     );
 
                     this._playChord(
@@ -973,7 +974,7 @@ function MusicKeyboard(activity) {
 
                 maxDuration = Math.max(
                     ...selectedNotes[counter].duration.map(
-                        (beatDuration) => (beatDuration * 60) / this.bpm
+                        (beatDuration) => (beatDuration * 60 * 4) / this.bpm
                     )
                 );
 
@@ -983,7 +984,7 @@ function MusicKeyboard(activity) {
                     '&nbsp;&nbsp;<img src="header-icons/' +
                     "play-button.svg" +
                     '" title="' +
-                    _("Play") +
+                    _("Play") +s
                     '" alt="' +
                     _("Play") +
                     '" height="' +
@@ -1009,7 +1010,7 @@ function MusicKeyboard(activity) {
      * @param {string[]} instruments - Array of instrument names or identifiers for each note.
      */
     this._playChord = (notes, noteValue, instruments) => {
-        noteValue[0] *= 4;
+        console.log("*");
         if (notes[0] === "R") {
             return;
         }
