@@ -15,13 +15,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Set up Git
         run: |
-          git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           git config --global user.name "GitHub Actions"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
         
@@ -29,5 +29,5 @@ jobs:
         run: |
           git checkout gh-pages || git checkout --orphan gh-pages
           git add .
-          git commit -m "Deploy updates"
-          git push origin gh-pages --force
+          git commit -m "Deploy updates" || echo "No changes to commit"
+          git push origin gh-pages 
