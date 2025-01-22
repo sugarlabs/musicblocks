@@ -674,14 +674,21 @@ class Activity {
         * @constructor
         */
         this._findBlocks = () => {
+            // Ensure visibility of blocks
             if (!this.blocks.visible) {
                 this._changeBlockVisibility();
             }
+        
+            // Reset active block and hide DOM label
             this.blocks.activeBlock = null;
             hideDOMLabel();
+        
+            // Show blocks and set initial container position
             this.blocks.showBlocks();
             this.blocksContainer.x = 0;
             this.blocksContainer.y = 0;
+        
+            // Calculate initial positions for block placement
             let toppos;
             if (this.auxToolbar.style.display === "block") {
                 toppos = 90 + this.toolbarHeight;
@@ -689,15 +696,35 @@ class Activity {
                 toppos = 90;
             }
         
-            const columnSpacing = Math.floor(600 * this.turtleBlocksScale);
-            const leftColumnX = Math.floor((this.canvas.width / 4) * this.turtleBlocksScale);
-            const rightColumnX = leftColumnX + columnSpacing;
+            const screenWidth = window.innerWidth;
+        
+            /**
+             * Number of columns are dynamic accrding to the screen size 
+             * Minimum column width is set to 400px to ensure readability and usability.
+             */
+        
+            const minColumnWidth = 400;
+            let numColumns;
+        
+            // Determine device type and adjust number of columns
+            if (screenWidth <= 320) {
+                // For small screen phones
+                numColumns = 1;
+            } else {
+                // anything other than small screen phones
+                numColumns = Math.floor(screenWidth / minColumnWidth);
+            }
+        
+            const columnSpacing = screenWidth / numColumns;
             const initialY = Math.floor(toppos * this.turtleBlocksScale);
-            const verticalSpacing = Math.floor(20 * this.turtleBlocksScale); 
-            let leftColumnY = initialY;
-            let rightColumnY = initialY;
-            let placeInLeftColumn = true; 
-           
+            const verticalSpacing = Math.floor(20 * this.turtleBlocksScale);
+        
+            const columnXPositions = Array.from({ length: numColumns }, (_, i) =>
+                Math.floor(i * columnSpacing + columnSpacing / 2)
+            );
+            const columnYPositions = Array(numColumns).fill(initialY);
+        
+            // Helper function to move a block and its connected group
             const moveBlockAndGroup = (blk, x, y) => {
                 const myBlock = this.blocks.blockList[blk];
                 const dx = x - myBlock.container.x;
@@ -715,26 +742,36 @@ class Activity {
                     }
                 }
             };
-
+        
+            // Position blocks in columns
             for (const blk in this.blocks.blockList) {
                 if (!this.blocks.blockList[blk].trash) {
                     const myBlock = this.blocks.blockList[blk];
+        
+                    // Skip blocks already connected
                     if (myBlock.connections[0] !== null) {
                         continue;
                     }
-                    if (placeInLeftColumn) {
-                        moveBlockAndGroup(blk, leftColumnX, leftColumnY);
-                        leftColumnY += myBlock.height + verticalSpacing;
-                    } else {
-                        moveBlockAndGroup(blk, rightColumnX, rightColumnY);
-                        rightColumnY += myBlock.height + verticalSpacing;
+        
+                    // Determine column and position
+                    let minYIndex = 0;
+                    for (let i = 1; i < numColumns; i++) {
+                        if (columnYPositions[i] < columnYPositions[minYIndex]) {
+                            minYIndex = i;
+                        }
                     }
-                    placeInLeftColumn = !placeInLeftColumn;
+        
+                    moveBlockAndGroup(blk, columnXPositions[minYIndex], columnYPositions[minYIndex]);
+                    columnYPositions[minYIndex] += myBlock.height + verticalSpacing;
                 }
             }
         
+            // Blocks are all home, so reset go-home-button.
             this.setHomeContainers(false);
             this.boundary.hide();
+        
+            // Return mice to the center of the screen.
+            // Reset turtles' positions to center of the screen
             for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
                 const savedPenState = this.turtles.turtleList[turtle].painter.penState;
                 this.turtles.turtleList[turtle].painter.penState = false;
@@ -742,7 +779,7 @@ class Activity {
                 this.turtles.turtleList[turtle].painter.doSetHeading(0);
                 this.turtles.turtleList[turtle].painter.penState = savedPenState;
             }
-        };
+        }; 
 
         /**
         * Toggles the visibility of the home button container.
