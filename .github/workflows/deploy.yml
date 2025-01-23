@@ -27,11 +27,12 @@ jobs:
         
       - name: Deploy to GitHub Pages
         run: |
-         git fetch origin gh-pages || true
-          git checkout gh-pages 2>/dev/null || git checkout --orphan gh-pages
+          mkdir -p deploy
+          cp -r * deploy
+          git checkout gh-pages || git checkout --orphan gh-pages
           git rm -rf . > /dev/null 2>&1 || true
           git clean -fxd
-          cp -r ../$(basename $GITHUB_WORKSPACE)/* .
+          cp -r deploy/* .
           git add .
           git commit -m "Deploy updates from $(date)" || echo "No changes to commit"
           git push origin gh-pages
