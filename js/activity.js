@@ -673,6 +673,9 @@ class Activity {
         * This method is part of the internal mechanism to ensure that blocks are displayed correctly and efficiently.
         * @constructor
         */
+        // Flag to track number of clicks and for alternate mode switching while clicking 
+        this._isFirstHomeClick = true; 
+       
         this._findBlocks = () => {
             // Ensure visibility of blocks
             if (!this.blocks.visible) {
@@ -688,85 +691,158 @@ class Activity {
             this.blocksContainer.x = 0;
             this.blocksContainer.y = 0;
         
-            // Calculate initial positions for block placement
-            let toppos;
-            if (this.auxToolbar.style.display === "block") {
-                toppos = 90 + this.toolbarHeight;
-            } else {
-                toppos = 90;
-            }
+            if (this._isFirstHomeClick) {
+                // First clicked logic (arrange blocks in rows may have overlapping of blocks)
+                let toppos;
+                if (this.auxToolbar.style.display === "block") {
+                    toppos = 90 + this.toolbarHeight;
+                } else {
+                    toppos = 90;
+                }
+                const leftpos = Math.floor(this.canvas.width / 4);
         
-            const screenWidth = window.innerWidth;
+                this.palettes.updatePalettes();
+                let x = Math.floor(leftpos * this.turtleBlocksScale);
+                let y = Math.floor(toppos * this.turtleBlocksScale);
+                let even = true;
         
-            /**
-             * Number of columns are dynamic accrding to the screen size 
-             * Minimum column width is set to 400px to ensure readability and usability.
-             */
+                // Position "start" blocks first
+                for (const blk in this.blocks.blockList) {
+                    if (!this.blocks.blockList[blk].trash) {
+                        const myBlock = this.blocks.blockList[blk];
+                        if (myBlock.name !== "start") {
+                            continue;
+                        }
         
-            const minColumnWidth = 400;
-            let numColumns;
+                        if (myBlock.connections[0] === null) {
+                            const dx = x - myBlock.container.x;
+                            const dy = y - myBlock.container.y;
+                            this.blocks.moveBlockRelative(blk, dx, dy);
+                            this.blocks.findDragGroup(blk);
         
-            // Determine device type and adjust number of columns
-            if (screenWidth <= 320) {
-                // For small screen phones
-                numColumns = 1;
-            } else {
-                // anything other than small screen phones
-                numColumns = Math.floor(screenWidth / minColumnWidth);
-            }
-        
-            const columnSpacing = screenWidth / numColumns;
-            const initialY = Math.floor(toppos * this.turtleBlocksScale);
-            const verticalSpacing = Math.floor(20 * this.turtleBlocksScale);
-        
-            const columnXPositions = Array.from({ length: numColumns }, (_, i) =>
-                Math.floor(i * columnSpacing + columnSpacing / 2)
-            );
-            const columnYPositions = Array(numColumns).fill(initialY);
-        
-            // Helper function to move a block and its connected group
-            const moveBlockAndGroup = (blk, x, y) => {
-                const myBlock = this.blocks.blockList[blk];
-                const dx = x - myBlock.container.x;
-                const dy = y - myBlock.container.y;
-        
-                this.blocks.moveBlockRelative(blk, dx, dy);
-                this.blocks.findDragGroup(blk);
-        
-                if (this.blocks.dragGroup.length > 0) {
-                    for (let b = 0; b < this.blocks.dragGroup.length; b++) {
-                        const bblk = this.blocks.dragGroup[b];
-                        if (b !== 0) {
-                            this.blocks.moveBlockRelative(bblk, dx, dy);
+                            if (this.blocks.dragGroup.length > 0) {
+                                for (let b = 0; b < this.blocks.dragGroup.length; b++) {
+                                    const bblk = this.blocks.dragGroup[b];
+                                    if (b !== 0) {
+                                        this.blocks.moveBlockRelative(bblk, dx, dy);
+                                    }
+                                }
+                            }
+                           
+                            x += Math.floor(150 * this.turtleBlocksScale);
+                            if (x > (this.canvas.width * 7) / 8 / this.turtleBlocksScale) {
+                                even = !even;
+                                if (even) {
+                                    x = Math.floor(leftpos);
+                                } else {
+                                    x = Math.floor(leftpos + STANDARDBLOCKHEIGHT);
+                                }
+                                y += STANDARDBLOCKHEIGHT;
+                            }
                         }
                     }
                 }
-            };
         
-            // Position blocks in columns
-            for (const blk in this.blocks.blockList) {
-                if (!this.blocks.blockList[blk].trash) {
-                    const myBlock = this.blocks.blockList[blk];
+                // Position other blocks
+                for (const blk in this.blocks.blockList) {
+                    if (!this.blocks.blockList[blk].trash) {
+                        const myBlock = this.blocks.blockList[blk];
+                        if (myBlock.name === "start") {
+                            continue;
+                        }
         
-                    // Skip blocks already connected
-                    if (myBlock.connections[0] !== null) {
-                        continue;
-                    }
+                        if (myBlock.connections[0] === null) {
+                            const dx = x - myBlock.container.x;
+                            const dy = y - myBlock.container.y;
+                            this.blocks.moveBlockRelative(blk, dx, dy);
+                            this.blocks.findDragGroup(blk);
         
-                    // Determine column and position
-                    let minYIndex = 0;
-                    for (let i = 1; i < numColumns; i++) {
-                        if (columnYPositions[i] < columnYPositions[minYIndex]) {
-                            minYIndex = i;
+                            if (this.blocks.dragGroup.length > 0) {
+                                for (let b = 0; b < this.blocks.dragGroup.length; b++) {
+                                    const bblk = this.blocks.dragGroup[b];
+                                    if (b !== 0) {
+                                        this.blocks.moveBlockRelative(bblk, dx, dy);
+                                    }
+                                }
+                            }
+        
+                            x += Math.floor(150 * this.turtleBlocksScale);
+                            if (x > (this.canvas.width * 7) / 8 / this.turtleBlocksScale) {
+                                even = !even;
+                                if (even) {
+                                    x = Math.floor(leftpos);
+                                } else {
+                                    x = Math.floor(leftpos + STANDARDBLOCKHEIGHT);
+                                }
+                                y += STANDARDBLOCKHEIGHT;
+                            }
                         }
                     }
+                }
+            } else {
+                // Second click logic (arrange blocks in columns this avoid overlapping of blocks)
+                let toppos;
+                if (this.auxToolbar.style.display === "block") {
+                    toppos = 90 + this.toolbarHeight;
+                } else {
+                    toppos = 90;
+                }
+
+                /**
+                * Device type resolution ranges and typical orientation:
+                * Desktop: 1024x768 to 5120x2880 (Landscape primary, Portrait supported)
+                * Tablet: 768x1024 to 2560x1600 (Portrait common, Landscape supported)
+                * Mobile: 320x480 to 1440x3200 (Portrait primary, Landscape supported)
+                * Minimum column width is set to 400px to ensure readability and usability.
+                */
         
-                    moveBlockAndGroup(blk, columnXPositions[minYIndex], columnYPositions[minYIndex]);
-                    columnYPositions[minYIndex] += myBlock.height + verticalSpacing;
+                const screenWidth = window.innerWidth;
+                const minColumnWidth = 400;
+                let numColumns = screenWidth <= 320 ? 1 : Math.floor(screenWidth / minColumnWidth);
+        
+                const baseColumnSpacing = screenWidth / numColumns;
+                const columnSpacing = baseColumnSpacing * 1.2;
+        
+                const initialY = Math.floor(toppos * this.turtleBlocksScale);
+                const baseVerticalSpacing = Math.floor(20 * this.turtleBlocksScale);
+                const verticalSpacing = baseVerticalSpacing * 1.2;
+        
+                const columnXPositions = Array.from({ length: numColumns }, (_, i) =>
+                    Math.floor(i * columnSpacing + columnSpacing / 2)
+                );
+                const columnYPositions = Array(numColumns).fill(initialY);
+        
+                for (const blk in this.blocks.blockList) {
+                    if (!this.blocks.blockList[blk].trash) {
+                        const myBlock = this.blocks.blockList[blk];
+                        if (myBlock.connections[0] === null) {
+                            let minYIndex = 0;
+                            for (let i = 1; i < numColumns; i++) {
+                                if (columnYPositions[i] < columnYPositions[minYIndex]) {
+                                    minYIndex = i;
+                                }
+                            }
+        
+                            const dx = columnXPositions[minYIndex] - myBlock.container.x;
+                            const dy = columnYPositions[minYIndex] - myBlock.container.y;
+                            this.blocks.moveBlockRelative(blk, dx, dy);
+                            this.blocks.findDragGroup(blk);
+        
+                            if (this.blocks.dragGroup.length > 0) {
+                                for (let b = 0; b < this.blocks.dragGroup.length; b++) {
+                                    const bblk = this.blocks.dragGroup[b];
+                                    if (b !== 0) {
+                                        this.blocks.moveBlockRelative(bblk, dx, dy);
+                                    }
+                                }
+                            }
+                            columnYPositions[minYIndex] += myBlock.height + verticalSpacing;
+                        }
+                    }
                 }
             }
         
-            // Blocks are all home, so reset go-home-button.
+            // Reset go-home button
             this.setHomeContainers(false);
             this.boundary.hide();
         
@@ -779,7 +855,9 @@ class Activity {
                 this.turtles.turtleList[turtle].painter.doSetHeading(0);
                 this.turtles.turtleList[turtle].painter.penState = savedPenState;
             }
-        }; 
+            // Alternate mode switching on clicking Home button
+            this._isFirstHomeClick = !this._isFirstHomeClick;
+        };
 
         /**
         * Toggles the visibility of the home button container.
