@@ -2894,6 +2894,21 @@ class Block {
                 that.blocks.triggerLongPress();
             }, LONGPRESSTIME);
 
+            //hide the trash when block is being collapse or expand
+            const hasColExpBtns = this.collapseButtonBitmap && this.expandButtonBitmap;
+
+            if (hasColExpBtns) {
+                const localPoint = this.container.globalToLocal(event.stageX, event.stageY);
+                const isColExpClick =
+                    this.collapseButtonBitmap.getBounds().contains(localPoint.x, localPoint.y) ||
+                    this.expandButtonBitmap.getBounds().contains(localPoint.x, localPoint.y);
+
+                if (isColExpClick) {
+                    that.activity.trashcan.hide();
+                    return;
+                }
+            }
+            
             // Always show the trash when there is a block selected,
             that.activity.trashcan.show();
 

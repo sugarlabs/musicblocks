@@ -1623,6 +1623,7 @@ function MusicKeyboard(activity) {
             cell.setAttribute("start", selectedNotes[j].startTime);
             cell.setAttribute("dur", maxWidth);
             cell.style.backgroundColor = platformColor.rhythmcellcolor;
+            cell.style.color = platformColor.textColor;
         }
 
         const innerDiv = docById("mkbInnerDiv");

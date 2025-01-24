@@ -2147,50 +2147,50 @@ msgstr ""
 #: js/SaveInterface.js:61
 #: js/SaveInterface.js:93
 msgid "Music Blocks Project"
-msgstr ""
+msgstr "میوزک بلاکس پروجیکٹ"
 
 #: js/SaveInterface.js:63
 msgid "This project was created in Music Blocks"
-msgstr ""
+msgstr "یہ پروجیکٹ میوزک بلاکس میں تخلیق کیا گیا تھا"
 
 #: js/SaveInterface.js:67
 msgid "Music Blocks is a Free/Libre Software application."
-msgstr ""
+msgstr "میوزک بلاکس ایک مفت/آزاد سافٹ ویئر ایپلیکیشن ہے۔"
 
 #: js/SaveInterface.js:69
 msgid "The source code can be accessed at"
-msgstr ""
+msgstr "سورس کوڈ یہاں سے حاصل کیا جا سکتا ہے"
 
 #: js/SaveInterface.js:72
 msgid "For more information, please consult the"
-msgstr ""
+msgstr "مزید معلومات کے لیے، براہ کرم رجوع کریں"
 
 #: js/SaveInterface.js:76
 #: js/turtledefs.js:794
 msgid "Music Blocks Guide"
-msgstr ""
+msgstr "میوزک بلاکس گائیڈ"
 
 #: js/SaveInterface.js:83
 msgid "Alternatively, open the file in Music Blocks using the Load project button."
-msgstr ""
+msgstr "متبادل کے طور پر، میوزک بلاکس میں فائل کو لوڈ پروجیکٹ بٹن استعمال کرکے کھولیں"
 
 #: js/SaveInterface.js:85
 msgid "Project Code"
-msgstr ""
+msgstr "پروجیکٹ کوڈ"
 
 #: js/SaveInterface.js:87
 msgid "This code stores data about the blocks in a project."
-msgstr ""
+msgstr "یہ کوڈ پروجیکٹ میں بلاکس کے ڈیٹا کو محفوظ کرتا ہے۔"
 
 #: js/SaveInterface.js:89
 #: js/blocks.js:5091
 #: js/blocks/MediaBlocks.js:888
 msgid "Show"
-msgstr ""
+msgstr "دکھائیں"
 
 #: js/SaveInterface.js:91
 msgid "Hide"
-msgstr ""
+msgstr "چھپائیں"
 
 #: js/SaveInterface.js:131
 #: js/SaveInterface.js:204
@@ -2204,47 +2204,47 @@ msgstr ""
 #: planet/js/ProjectStorage.js:27
 #.TRANS: default project title when saving as Lilypond
 msgid "My Project"
-msgstr ""
+msgstr "میرا پروجیکٹ"
 
 #: js/SaveInterface.js:197
 #: planet/js/SaveInterface.js:58
 msgid "No description provided"
-msgstr ""
+msgstr "کوئی تفصیل فراہم نہیں کی گئی"
 
 #: js/SaveInterface.js:332
 msgid "Your recording is in progress."
-msgstr ""
+msgstr "آپ کی ریکارڈنگ جاری ہے۔"
 
 #: js/SaveInterface.js:401
 #.TRANS: File name prompt for save as Lilypond
 msgid "File name"
-msgstr ""
+msgstr "فائل کا نام"
 
 #: js/SaveInterface.js:403
 #: planet/js/StringHelper.js:39
 #.TRANS: Project title prompt for save as Lilypond
 msgid "Project title"
-msgstr ""
+msgstr "پروجیکٹ کا عنوان"
 
 #: js/SaveInterface.js:405
 #.TRANS: Project title prompt for save as Lilypond
 msgid "Project author"
-msgstr ""
+msgstr "پروجیکٹ کا مصنف"
 
 #: js/SaveInterface.js:407
 #.TRANS: MIDI prompt for save as Lilypond
 msgid "Include MIDI output?"
-msgstr ""
+msgstr "کیا MIDI آؤٹ پٹ شامل کریں؟"
 
 #: js/SaveInterface.js:409
 #.TRANS: Guitar prompt for save as Lilypond
 msgid "Include guitar tablature output?"
-msgstr ""
+msgstr "کیا گٹار ٹیبلچر آؤٹ پٹ شامل کریں؟"
 
 #: js/SaveInterface.js:411
 #.TRANS: Lilypond is a scripting language for generating sheet music
 msgid "Save as Lilypond"
-msgstr ""
+msgstr "للیپونڈ کے طور پر محفوظ کریں"
 
 #: js/SaveInterface.js:426
 #: js/blocks/EnsembleBlocks.js:94
@@ -2266,19 +2266,19 @@ msgstr ""
 #: js/blocks/EnsembleBlocks.js:1283
 #.TRANS: default project author when saving as Lilypond
 msgid "Mr. Mouse"
-msgstr ""
+msgstr "مسٹر ماؤس"
 
 #: js/SaveInterface.js:573
 msgid "The Lilypond code is copied to clipboard. You can paste it here: "
-msgstr ""
+msgstr "للیپونڈ کوڈ کلپ بورڈ میں کاپی کیا گیا ہے۔ آپ اسے یہاں چسپاں کر سکتے ہیں: "
 
 #: js/languagebox.js:198
 msgid "Refresh your browser to change your language preference."
-msgstr ""
+msgstr "اپنی زبان کی ترجیح کو تبدیل کرنے کے لئے اپنے براؤزر کو تازہ دم کریں۔"
 
 #: js/languagebox.js:218
 msgid "Music Blocks is already set to this language."
-msgstr ""
+msgstr "میوزک بلاکس پہلے ہی اس زبان پر سیٹ ہے"
 
 #: js/lilypond.js:605
 #: js/lilypond.js:904
@@ -3482,7 +3482,7 @@ msgstr ""
 #: js/toolbar.js:234
 #: js/toolbar.js:235
 msgid "Full screen"
-msgstr ""
+msgstr "مکمل اسکرین"
 
 #: js/toolbar.js:54
 #: js/toolbar.js:115
@@ -3500,7 +3500,7 @@ msgstr ""
 #: js/turtledefs.js:509
 #: planet/js/StringHelper.js:33
 msgid "New project"
-msgstr ""
+msgstr "نیا پروجیکٹ"
 
 #: js/toolbar.js:56
 #: js/toolbar.js:117
@@ -3541,7 +3541,7 @@ msgstr ""
 #: js/toolbar.js:185
 #: js/toolbar.js:241
 msgid "Find and share projects"
-msgstr ""
+msgstr "منصوبے تلاش کریں اور شیئر کریں"
 
 #: js/toolbar.js:60
 #: js/toolbar.js:121
@@ -3555,7 +3555,7 @@ msgstr ""
 #: js/toolbar.js:187
 #: js/toolbar.js:243
 msgid "Auxiliary menu"
-msgstr ""
+msgstr "معاون مینو"
 
 #: js/toolbar.js:63
 #: js/toolbar.js:124
@@ -3563,7 +3563,7 @@ msgstr ""
 #: js/toolbar.js:245
 #: js/turtledefs.js:675
 msgid "Run slowly"
-msgstr ""
+msgstr "آہستہ سے چلائیں"
 
 #: js/toolbar.js:64
 #: js/toolbar.js:125
@@ -3617,12 +3617,12 @@ msgstr ""
 #: planet/js/LocalCard.js:54
 #: planet/js/StringHelper.js:71
 msgid "Merge with current project"
-msgstr ""
+msgstr "موجودہ منصوبے کے ساتھ ضم کریں"
 
 #: js/toolbar.js:71
 #: js/toolbar.js:132
 msgid "Set Pitch Preview"
-msgstr ""
+msgstr "پچ پیش نظارہ سیٹ کریں"
 
 #: js/toolbar.js:72
 #: js/toolbar.js:133
@@ -3637,7 +3637,7 @@ msgstr ""
 #: js/toolbar.js:254
 #: js/turtledefs.js:723
 msgid "Restore"
-msgstr ""
+msgstr "بحال"
 
 #: js/toolbar.js:74
 #: js/toolbar.js:135
@@ -3651,7 +3651,7 @@ msgstr ""
 #: js/toolbar.js:200
 #: js/toolbar.js:256
 msgid "Switch to advanced mode"
-msgstr ""
+msgstr "جدید موڈ میں سوئچ کریں"
 
 #: js/toolbar.js:76
 #: js/toolbar.js:137
@@ -3864,7 +3864,7 @@ msgstr ""
 #: js/toolbar.js:457
 #: js/toolbar.js:497
 msgid "Turtle Wrap Off"
-msgstr ""
+msgstr "کچھی لپیٹ آف"
 
 #: js/toolbar.js:466
 #: js/toolbar.js:506
@@ -10102,7 +10102,7 @@ msgstr ""
 #: plugins/rodi.rtp:191
 
 #~msgid "play"
-#~msgstr ""
+#~msgstr "کھیل"
 
 #: js/notation.js:353
 
