@@ -3203,6 +3203,9 @@ class Activity {
                     this.saveLocally();
                 }
             }
+            if (!this.stage) {
+                return;
+            }
 
             const $j = jQuery.noConflict();
             let w = 0,
