@@ -144,17 +144,15 @@ class TimbreWidget {
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
         cell.innerHTML =
-            '&nbsp;&nbsp;<img src="header-icons/' +
-            icon +
-            '" title="' +
-            label +
-            '" alt="' +
-            label +
-            '" height="' +
-            iconSize +
-            '" width="' +
-            iconSize +
-            '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+            `&nbsp;&nbsp;<img 
+                src="header-icons/${icon}" 
+                title="${label}" 
+                alt="${label}" 
+                height="${iconSize}" 
+                width="${iconSize}" 
+                vertical-align="middle" 
+                align-content="center"
+            >&nbsp;&nbsp;`;
         cell.style.width = TimbreWidget.BUTTONSIZE + "px";
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
@@ -411,32 +409,28 @@ class TimbreWidget {
         const cell = this.playButton;
         if (this._playing) {
             cell.innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/' +
-                "stop-button.svg" +
-                '" title="' +
-                _("stop") +
-                '" alt="' +
-                _("stop") +
-                '" height="' +
-                TimbreWidget.ICONSIZE +
-                '" width="' +
-                TimbreWidget.ICONSIZE +
-                '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                `&nbsp;&nbsp;<img 
+                    src="header-icons/stop-button.svg" 
+                    title="${_("Stop")}" 
+                    alt="${_("Stop")}" 
+                    height="${TimbreWidget.ICONSIZE}" 
+                    width="${TimbreWidget.ICONSIZE}" 
+                    vertical-align="middle" 
+                    align-content="center"
+                >&nbsp;&nbsp;`;
         } else {
             this.activity.logo.synth.setMasterVolume(0);
             this.activity.logo.synth.stop();
             cell.innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/' +
-                "play-button.svg" +
-                '" title="' +
-                _("Play") +
-                '" alt="' +
-                _("Play") +
-                '" height="' +
-                TimbreWidget.ICONSIZE +
-                '" width="' +
-                TimbreWidget.ICONSIZE +
-                '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                `&nbsp;&nbsp;<img 
+                    src="header-icons/play-button.svg" 
+                    title="${_("Play")}" 
+                    alt="${_("Play")}" 
+                    height="${TimbreWidget.ICONSIZE}" 
+                    width="${TimbreWidget.ICONSIZE}" 
+                    vertical-align="middle" 
+                    align-content="center"
+                >&nbsp;&nbsp;`;
         }
 
         if (this.notesToPlay.length === 0) {
@@ -459,17 +453,15 @@ class TimbreWidget {
                 }, Singer.defaultBPMFactor * 1000 * this.notesToPlay[i - 1][1]);
             } else {
                 cell.innerHTML =
-                    '&nbsp;&nbsp;<img src="header-icons/' +
-                    "play-button.svg" +
-                    '" title="' +
-                    _("Play") +
-                    '" alt="' +
-                    _("Play") +
-                    '" height="' +
-                    TimbreWidget.ICONSIZE +
-                    '" width="' +
-                    TimbreWidget.ICONSIZE +
-                    '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                    `&nbsp;&nbsp;<img 
+                        src="header-icons/play-button.svg" 
+                        title="${_("Play")}" 
+                        alt="${_("Play")}" 
+                        height="${TimbreWidget.ICONSIZE}" 
+                        width="${TimbreWidget.ICONSIZE}" 
+                        vertical-align="middle" 
+                        align-content="center"
+                    >&nbsp;&nbsp;`;
                 this._playing = false;
             }
         };
@@ -1217,13 +1209,11 @@ class TimbreWidget {
 
         const mainDiv = docById("synth0");
         mainDiv.innerHTML =
-            '<p><input type="radio" name="synthsName" value="AMSynth"/>' +
-            _("AM synth") +
-            '</br><input type="radio" name="synthsName" value="FMSynth"/>' +
-            _("FM synth") +
-            '</br><input type="radio" name="synthsName" value="DuoSynth"/>' +
-            _("duo synth") +
-            "</br></p>";
+            `<p>
+                <input type="radio" name="synthsName" value="AMSynth"/>${_("AM synth")}<br>
+                <input type="radio" name="synthsName" value="FMSynth"/>${_("FM synth")}<br>
+                <input type="radio" name="synthsName" value="DuoSynth"/>${_("duo synth")}<br>
+            </p>`;
 
         const subDiv = docById("synth1");
         const synthsName = docByName("synthsName");
@@ -2088,17 +2078,13 @@ class TimbreWidget {
 
         const mainDiv = docById("effect0");
         mainDiv.innerHTML =
-            '<p><input type="radio" name="effectsName" value="Tremolo"/>' +
-            _("tremolo") +
-            '</br><input type="radio" name="effectsName" value="Vibrato"/>' +
-            _("vibrato") +
-            '</br><input type="radio" name="effectsName" value="Chorus"/>' +
-            _("chorus") +
-            '</br><input type="radio" name="effectsName" value="Phaser"/>' +
-            _("phaser") +
-            '</br><input type="radio" name="effectsName" value="Distortion"/>' +
-            _("distortion") +
-            "</br></p>";
+            `<p>
+                <input type="radio" name="effectsName" value="Tremolo"/>${_("tremolo")}<br>
+                <input type="radio" name="effectsName" value="Vibrato"/>${_("vibrato")}<br>
+                <input type="radio" name="effectsName" value="Chorus"/>${_("chorus")}<br>
+                <input type="radio" name="effectsName" value="Phaser"/>${_("phaser")}<br>
+                <input type="radio" name="effectsName" value="Distortion"/>${_("distortion")}<br>
+            </p>`;
 
         const subDiv = docById("effect1");
         const effectsName = docByName("effectsName");

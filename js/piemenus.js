@@ -1080,9 +1080,7 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
     // enable changing values while pie-menu is open
     const labelElem = docById("labelDiv");
     labelElem.innerHTML =
-        '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' +
-        note +
-        '" />';
+        `<input id="numberLabel" style="position: absolute; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;" class="number" type="number" value="${note}" />`;
     labelElem.classList.add("hasKeyboard");
 
     block.label = docById("numberLabel");
@@ -1522,9 +1520,7 @@ const piemenuNoteValue = (block, noteValue) => {
 
     const labelElem = docById("labelDiv");
     labelElem.innerHTML =
-        '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' +
-        noteValue +
-        '" />';
+        `<input id="numberLabel" style="position: absolute; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;" class="number" type="number" value="${noteValue}" />`;
     labelElem.classList.add("hasKeyboard");
     block.label = docById("numberLabel");
 
@@ -1760,9 +1756,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
 
     const labelElem = docById("labelDiv");
     labelElem.innerHTML =
-        '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' +
-        selectedValue +
-        '" />';
+        `<input id="numberLabel" style="position: absolute; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;" class="number" type="number" value="${selectedValue}" />`;
     labelElem.classList.add("hasKeyboard");
     block.label = docById("numberLabel");
 
@@ -2085,9 +2079,7 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
 
     const labelElem = docById("labelDiv");
     labelElem.innerHTML =
-        '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' +
-        selectedValue +
-        '" />';
+        `<input id="numberLabel" style="position: absolute; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;" class="number" type="number" value="${selectedValue}" />`;
     labelElem.classList.add("hasKeyboard");
     block.label = docById("numberLabel");
 

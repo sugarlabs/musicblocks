@@ -80,28 +80,26 @@ class Tempo {
             if (this.isMoving) {
                 this.pause();
                 pauseBtn.innerHTML =
-                    '<img src="header-icons/play-button.svg" title="' +
-                    _("Play") +
-                    '" alt="' +
-                    _("Play") +
-                    '" height="' +
-                    Tempo.ICONSIZE +
-                    '" width="' +
-                    Tempo.ICONSIZE +
-                    '" vertical-align="middle">';
+                    `<img 
+                        src="header-icons/play-button.svg" 
+                        title="${_("Play")}" 
+                        alt="${_("Play")}" 
+                        height="${Tempo.ICONSIZE}" 
+                        width="${Tempo.ICONSIZE}" 
+                        vertical-align="middle"
+                    >`;
                 this.isMoving = false;
             } else {
                 this.resume();
                 pauseBtn.innerHTML =
-                    '<img src="header-icons/pause-button.svg" title="' +
-                    _("Pause") +
-                    '" alt="' +
-                    _("Pause") +
-                    '" height="' +
-                    Tempo.ICONSIZE +
-                    '" width="' +
-                    Tempo.ICONSIZE +
-                    '" vertical-align="middle">';
+                    `<img 
+                        src="header-icons/pause-button.svg" 
+                        title="${_("Pause")}" 
+                        alt="${_("Pause")}" 
+                        height="${Tempo.ICONSIZE}" 
+                        width="${Tempo.ICONSIZE}" 
+                        vertical-align="middle"
+                    >`;
                 this.isMoving = true;
             }
         };

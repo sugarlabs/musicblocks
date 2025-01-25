@@ -78,26 +78,22 @@ class StatusMatrix {
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 cell.innerHTML =
-                    '&nbsp;&nbsp;<img src="images/mouse.svg" title="' +
-                    turtle.name +
-                    '" alt="' +
-                    turtle.name +
-                    '" height="' +
-                    iconSize +
-                    '" width="' +
-                    iconSize +
-                    '">&nbsp;&nbsp;';
+                    `&nbsp;&nbsp;<img 
+                        src="images/mouse.svg" 
+                        title="${turtle.name}" 
+                        alt="${turtle.name}" 
+                        height="${iconSize}" 
+                        width="${iconSize}"
+                    >&nbsp;&nbsp;`;
             } else {
                 cell.innerHTML =
-                    '&nbsp;&nbsp;<img src="header-icons/turtle-button.svg" title="' +
-                    turtle.name +
-                    '" alt="' +
-                    turtle.name +
-                    '" height="' +
-                    iconSize +
-                    '" width="' +
-                    iconSize +
-                    '">&nbsp;&nbsp;';
+                    `&nbsp;&nbsp;<img 
+                        src="header-icons/turtle-button.svg" 
+                        title="${turtle.name}" 
+                        alt="${turtle.name}" 
+                        height="${iconSize}"
+                        width="${iconSize}"
+                    >&nbsp;&nbsp;`;
             }
             cell.style.width = "212.5px";
             this.widgetWindow.onmaximize = () => {
@@ -167,7 +163,7 @@ class StatusMatrix {
             let str = label;
             str = label.charAt(0).toUpperCase() + label.slice(1);
             // console.log(str);
-            cell.innerHTML = "&nbsp;<b>" + str + "</b>";
+            cell.innerHTML = `&nbsp;<b>${str}</b>`;
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;
             cell.style.paddingLeft = "10px";
@@ -189,7 +185,7 @@ class StatusMatrix {
                 Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
             const str = _("note");
             const label = str.charAt(0).toUpperCase() + str.slice(1);
-            cell.innerHTML = "&nbsp;<b>" + label + "</b>";
+            cell.innerHTML = `&nbsp;<b>${label}</b>`;
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;
             cell.style.paddingLeft = "10px";

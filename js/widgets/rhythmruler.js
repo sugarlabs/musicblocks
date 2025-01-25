@@ -633,15 +633,13 @@ class RhythmRuler {
             } else {
                 const drumcell = rhythmRulerTableRow.insertCell();
                 drumcell.innerHTML =
-                    '<img src="header-icons/play-button.svg" title="' +
-                    _("Play") +
-                    '" alt="' +
-                    _("Play") +
-                    '" height="' +
-                    iconSize +
-                    '" width="' +
-                    iconSize +
-                    '" />';
+                    `<img 
+                        src="header-icons/play-button.svg" 
+                        title="${_("Play")}" 
+                        alt="${_("Play")}" 
+                        height="${iconSize}" 
+                        width="${iconSize}" 
+                    />`;
                 drumcell.className = "headcol"; // Position fixed when scrolling horizontally
                 drumcell.style.cursor = "pointer";
                 drumcell.onclick = ((id) => {
@@ -649,15 +647,14 @@ class RhythmRuler {
                         if (this._playing) {
                             if (this._rulerPlaying === id) {
                                 drumcell.innerHTML =
-                                    '<img src="header-icons/play-button.svg" title="' +
-                                    _("Play") +
-                                    '" alt="' +
-                                    _("Play") +
-                                    '" height="' +
-                                    iconSize +
-                                    '" width="' +
-                                    iconSize +
-                                    '" vertical-align="middle">';
+                                    `<img 
+                                        src="header-icons/play-button.svg" 
+                                        title="${_("Play")}" 
+                                        alt="${_("Play")}" 
+                                        height="${iconSize}" 
+                                        width="${iconSize}" 
+                                        vertical-align="middle"
+                                    >`;
                                 this._playing = false;
                                 this._playingOne = false;
                                 this._playingAll = false;
@@ -677,15 +674,14 @@ class RhythmRuler {
                             this._startingTime = null;
                             this._rulerPlaying = id;
                             drumcell.innerHTML =
-                                '<img src="header-icons/pause-button.svg" title="' +
-                                _("Pause") +
-                                '" alt="' +
-                                _("Pause") +
-                                '" height="' +
-                                iconSize +
-                                '" width="' +
-                                iconSize +
-                                '" vertical-align="middle">';
+                                `<img 
+                                    src="header-icons/pause-button.svg" 
+                                    title="${_("Pause")}" 
+                                    alt="${_("Pause")}" 
+                                    height="${iconSize}" 
+                                    width="${iconSize}" 
+                                    vertical-align="middle"
+                                >`;
                             this._elapsedTimes[id] = 0;
                             this._offsets[id] = 0;
                             this._playOne();
@@ -696,7 +692,7 @@ class RhythmRuler {
 
             const rulerCell = rhythmRulerTableRow.insertCell();
             // Create individual rulers as tables.
-            rulerCell.innerHTML = '<table id="rulerCellTable' + i + '"></table>';
+            rulerCell.innerHTML = `<table id="rulerCellTable${i}"></table>`;
 
             const rulerCellTable = docById("rulerCellTable" + i);
             rulerCellTable.style.textAlign = "center";
@@ -946,15 +942,14 @@ class RhythmRuler {
                     this._tapTimes = [];
                     this._tapEndTime = null;
                     this._tapButton.innerHTML =
-                        '<img src="header-icons/tap-button.svg" title="' +
-                        _("tap a rhythm") +
-                        '" alt="' +
-                        _("tap a rhythm") +
-                        '" height="' +
-                        RhythmRuler.ICONSIZE +
-                        '" width="' +
-                        RhythmRuler.ICONSIZE +
-                        '" vertical-align="middle">';
+                        `<img 
+                            src="header-icons/tap-button.svg" 
+                            title="${_("tap a rhythm")}" 
+                            alt="${_("tap a rhythm")}" 
+                            height="${RhythmRuler.ICONSIZE}" 
+                            width="${RhythmRuler.ICONSIZE}" 
+                            vertical-align="middle"
+                        >`;
                     return;
                 }
 
@@ -1148,15 +1143,14 @@ class RhythmRuler {
         this._tapEndTime = null;
         // let iconSize = RhythmRuler.ICONSIZE;
         this._tapButton.innerHTML =
-            '<img src="header-icons/tap-button.svg" title="' +
-            _("tap a rhythm") +
-            '" alt="' +
-            _("tap a rhythm") +
-            '" height="' +
-            RhythmRuler.ICONSIZE +
-            '" width="' +
-            RhythmRuler.ICONSIZE +
-            '" vertical-align="middle">';
+            `<img 
+                src="header-icons/tap-button.svg" 
+                title="${_("tap a rhythm")}" 
+                alt="${_("tap a rhythm")}" 
+                height="${RhythmRuler.ICONSIZE}" 
+                width="${RhythmRuler.ICONSIZE}" 
+                vertical-align="middle"
+            >`;
     }
 
     /**
@@ -1180,7 +1174,7 @@ class RhythmRuler {
             let obj;
             if (noteValue < 0) {
                 obj = rationalToFraction(Math.abs(Math.abs(-1 / noteValue)));
-                cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]) + " " + _("silence");
+                cell.innerHTML = `${calcNoteValueToDisplay(obj[1], obj[0])} ${_("silence")}}`;
             } else {
                 obj = rationalToFraction(Math.abs(Math.abs(1 / noteValue)));
                 cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
@@ -1761,15 +1755,14 @@ class RhythmRuler {
         this._tapMode = true;
         const iconSize = RhythmRuler.ICONSIZE;
         this._tapButton.innerHTML =
-            '<img src="header-icons/tap-active-button.svg" title="' +
-            _("tap a rhythm") +
-            '" alt="' +
-            _("tap a rhythm") +
-            '" height="' +
-            iconSize +
-            '" width="' +
-            iconSize +
-            '" vertical-align="middle">';
+            `<img 
+                src="header-icons/tap-active-button.svg" 
+                title="${_("tap a rhythm")}" 
+                alt="${_("tap a rhythm")}" 
+                height="${iconSize}" 
+                width="${iconSize}" 
+                vertical-align="middle"
+            >`;
     }
 
     /**
@@ -1786,15 +1779,14 @@ class RhythmRuler {
         this._rulerPlaying = -1;
         this._startingTime = null;
         this._playAllCell.innerHTML =
-            '<img src="header-icons/play-button.svg" title="' +
-            _("Play all") +
-            '" alt="' +
-            _("Play all") +
-            '" height="' +
-            RhythmRuler.ICONSIZE +
-            '" width="' +
-            RhythmRuler.ICONSIZE +
-            '" vertical-align="middle">';
+            `<img 
+                src="header-icons/play-button.svg" 
+                title="${_("Play all")}" 
+                alt="${_("Play all")}" 
+                height="${RhythmRuler.ICONSIZE}" 
+                width="${RhythmRuler.ICONSIZE}" 
+                vertical-align="middle"
+            >`;
         for (let r = 0; r < this.Rulers.length; r++) {
             this._rulerSelected = r;
             while (this.Rulers[r][1].length > 0) {
@@ -1812,15 +1804,14 @@ class RhythmRuler {
      */
     __pause() {
         this._playAllCell.innerHTML =
-            '<img src="header-icons/play-button.svg" title="' +
-            _("Play all") +
-            '" alt="' +
-            _("Play all") +
-            '" height="' +
-            RhythmRuler.ICONSIZE +
-            '" width="' +
-            RhythmRuler.ICONSIZE +
-            '" vertical-align="middle">';
+            `<img 
+                src="header-icons/play-button.svg" 
+                title="${_("Play all")}" 
+                alt="${_("Play all")}" 
+                height="${RhythmRuler.ICONSIZE}" 
+                width="${RhythmRuler.ICONSIZE}" 
+                vertical-align="middle"
+            >`;
         this._playing = false;
         this._playingAll = false;
         this._playingOne = false;
@@ -1860,15 +1851,14 @@ class RhythmRuler {
      */
     __resume() {
         this._playAllCell.innerHTML =
-            '<img src="header-icons/pause-button.svg" title="' +
-            _("Pause") +
-            '" alt="' +
-            _("Pause") +
-            '" height="' +
-            RhythmRuler.ICONSIZE +
-            '" width="' +
-            RhythmRuler.ICONSIZE +
-            '" vertical-align="middle">';
+            `<img 
+                src="header-icons/pause-button.svg" 
+                title="${_("Pause")}" 
+                alt="${_("Pause")}" 
+                height="${RhythmRuler.ICONSIZE}" 
+                width="${RhythmRuler.ICONSIZE}" 
+                vertical-align="middle"
+            >`;
         this.activity.logo.turtleDelay = 0;
         this._playingAll = true;
         this._playing = true;

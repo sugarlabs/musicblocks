@@ -450,17 +450,15 @@ class PitchDrumMatrix {
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
         cell.innerHTML =
-            '&nbsp;&nbsp;<img src="header-icons/' +
-            icon +
-            '" title="' +
-            label +
-            '" alt="' +
-            label +
-            '" height="' +
-            iconSize +
-            '" width="' +
-            iconSize +
-            '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+            `&nbsp;&nbsp;<img 
+                src="header-icons/${icon}" 
+                title="${label}" 
+                alt="${label}" 
+                height="${iconSize}" 
+                width="${iconSize}" 
+                vertical-align="middle" 
+                align-content="center"
+            >&nbsp;&nbsp;`;
         cell.style.width = PitchDrumMatrix.BUTTONSIZE + "px";
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
@@ -540,17 +538,14 @@ class PitchDrumMatrix {
         }
 
         cell.innerHTML =
-            '&nbsp;&nbsp;<img src="' +
-            getDrumIcon(name) +
-            '" title="' +
-            name +
-            '" alt="' +
-            name +
-            '" height="' +
-            PitchDrumMatrix.ICONSIZE +
-            '" width="' +
-            PitchDrumMatrix.ICONSIZE +
-            '" vertical-align="middle">&nbsp;&nbsp;';
+            `&nbsp;&nbsp;<img 
+                src="${getDrumIcon(name)}" 
+                title="${name}" 
+                alt="${name}" 
+                height="${PitchDrumMatrix.ICONSIZE}" 
+                width="${PitchDrumMatrix.ICONSIZE}" 
+                vertical-align="middle"
+            >&nbsp;&nbsp;`;
         cell.style.backgroundColor = platformColor.selectorBackground;
     }
 
@@ -668,30 +663,26 @@ class PitchDrumMatrix {
         const icon = this.playButton;
         if (this._playing) {
             icon.innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/' +
-                "stop-button.svg" +
-                '" title="' +
-                _("Stop") +
-                '" alt="' +
-                _("Stop") +
-                '" height="' +
-                PitchDrumMatrix.ICONSIZE +
-                '" width="' +
-                PitchDrumMatrix.ICONSIZE +
-                '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                `&nbsp;&nbsp;<img 
+                    src="header-icons/stop-button.svg" 
+                    title="${_("Stop")}" 
+                    alt="${_("Stop")}" 
+                    height="${PitchDrumMatrix.ICONSIZE}" 
+                    width="${PitchDrumMatrix.ICONSIZE}" 
+                    vertical-align="middle" 
+                    align-content="center"
+                >&nbsp;&nbsp;`;
         } else {
             icon.innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/' +
-                "play-button.svg" +
-                '" title="' +
-                _("Play") +
-                '" alt="' +
-                _("Play") +
-                '" height="' +
-                PitchDrumMatrix.ICONSIZE +
-                '" width="' +
-                PitchDrumMatrix.ICONSIZE +
-                '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                `&nbsp;&nbsp;<img 
+                    src="header-icons/play-button.svg" 
+                    title="${_("Play")}" 
+                    alt="${_("Play")}" 
+                    height="${PitchDrumMatrix.ICONSIZE}" 
+                    width="${PitchDrumMatrix.ICONSIZE}" 
+                    vertical-align="middle" 
+                    align-content="center"
+                >&nbsp;&nbsp;`;
             this._playing = false;
             return;
         }
@@ -735,34 +726,30 @@ class PitchDrumMatrix {
             setTimeout(() => {
                 this._playing = false;
                 icon.innerHTML =
-                    '&nbsp;&nbsp;<img src="header-icons/' +
-                    "play-button.svg" +
-                    '" title="' +
-                    _("Play") +
-                    '" alt="' +
-                    _("Play") +
-                    '" height="' +
-                    PitchDrumMatrix.ICONSIZE +
-                    '" width="' +
-                    PitchDrumMatrix.ICONSIZE +
-                    '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                    `&nbsp;&nbsp;<img 
+                        src="header-icons/play-button.svg" 
+                        title="${_("Play")}" 
+                        alt="${_("Play")}" 
+                        height="${PitchDrumMatrix.ICONSIZE}" 
+                        width="${PitchDrumMatrix.ICONSIZE}" 
+                        vertical-align="middle" 
+                        align-content="center"
+                    >&nbsp;&nbsp;`;
             }, pairs.length * 1000);
         } else {
             if (!this.widgetWindow._maximized) {
                 this.activity.textMsg(_("Click in the grid to map notes to drums."));
             }
             icon.innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/' +
-                "play-button.svg" +
-                '" title="' +
-                _("Play") +
-                '" alt="' +
-                _("Play") +
-                '" height="' +
-                PitchDrumMatrix.ICONSIZE +
-                '" width="' +
-                PitchDrumMatrix.ICONSIZE +
-                '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                `&nbsp;&nbsp;<img 
+                    src="header-icons/play-button.svg" 
+                    title="${_("Play")}" 
+                    alt="${_("Play")}" 
+                    height="${PitchDrumMatrix.ICONSIZE}" 
+                    width="${PitchDrumMatrix.ICONSIZE}" 
+                    vertical-align="middle" 
+                    align-content="center"
+                >&nbsp;&nbsp;`;
         }
     }
 
@@ -783,17 +770,15 @@ class PitchDrumMatrix {
             }
             const icon = this.playButton;
             icon.innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/' +
-                "play-button.svg" +
-                '" title="' +
-                _("Play") +
-                '" alt="' +
-                _("Play") +
-                '" height="' +
-                PitchDrumMatrix.ICONSIZE +
-                '" width="' +
-                PitchDrumMatrix.ICONSIZE +
-                '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                `&nbsp;&nbsp;<img 
+                    src="header-icons/play-button.svg" 
+                    title="${_("Play")}" 
+                    alt="${_("Play")}" 
+                    height="${PitchDrumMatrix.ICONSIZE}" 
+                    width="${PitchDrumMatrix.ICONSIZE}" 
+                    vertical-align="middle" 
+                    align-content="center"
+                >&nbsp;&nbsp;`;
             return;
         }
         const drumTable = docById("pdmDrumTable");

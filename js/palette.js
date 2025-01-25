@@ -117,11 +117,21 @@ class Palettes {
                 "position: absolute; z-index: 1000; left :0px; top:" + this.top + "px"
             );
             element.innerHTML =
-                '<div style="height:fit-content"><table width ="' +
-                1.5 * this.cellSize +
-                'px"bgcolor="white"><thead><tr></tr></thead></table><table width ="' +
-                4.5 * this.cellSize +
-                'px"bgcolor="white"><thead><tr><td style= "width:28px"></tr></thead><tbody></tbody></table></div>';
+                `<div style="height:fit-content">
+                    <table width="${1.5 * this.cellSize}" bgcolor="white">
+                        <thead>
+                            <tr></tr>
+                        </thead>
+                    </table>
+                    <table width ="${4.5 * this.cellSize}" bgcolor="white">
+                        <thead>
+                            <tr>
+                                <td style= "width:28px"></td>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>`;
             element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
             document.body.appendChild(element);
         }
@@ -419,11 +429,22 @@ class Palettes {
                 `position: fixed; z-index: 1000; left: 0px; top: ${60+this.top}px; overflow-y: auto;`
             );
             element.innerHTML =
-                '<div style="height:fit-content"><table width ="' +
-                1.5 * this.cellSize +
-                'px"bgcolor="white"><thead><tr></tr></thead></table><table width ="' +
-                4.5 * this.cellSize +
-                'px"bgcolor="white"><thead><tr><td style= "width:28px"></tr></thead><tbody></tbody></table></div>';
+                `<div style="height:fit-content">
+                    <table width="${1.5 * this.cellSize}" bgcolor="white">
+                        <thead>
+                            <tr></tr>
+                        </thead>
+                    </table>
+                    <table width="${4.5 * this.cellSize}" bgcolor="white">
+                        <thead>
+                            <tr>
+                                <td style= "width:28px"></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>`;
             element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
             document.body.appendChild(element);
     

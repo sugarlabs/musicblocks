@@ -158,15 +158,14 @@ function SampleWidget() {
      */
     this.pause = function () {
         this.playBtn.innerHTML =
-            '<img src="header-icons/play-button.svg" title="' +
-            _("Play") +
-            '" alt="' +
-            _("Play") +
-            '" height="' +
-            ICONSIZE +
-            '" width="' +
-            ICONSIZE +
-            '" vertical-align="middle">';
+            `<img 
+                src="header-icons/play-button.svg" 
+                title="${_("Play")}" 
+                alt="${_("Play")}" 
+                height="${ICONSIZE}" 
+                width="${ICONSIZE}" 
+                vertical-align="middle"
+            >`;
         this.isMoving = false;
     };
 
@@ -176,15 +175,14 @@ function SampleWidget() {
      */
     this.resume = function () {
         this.playBtn.innerHTML =
-            '<img src="header-icons/pause-button.svg" title="' +
-            _("Pause") +
-            '" alt="' +
-            _("Pause") +
-            '" height="' +
-            ICONSIZE +
-            '" width="' +
-            ICONSIZE +
-            '" vertical-align="middle">';
+            `<img 
+                src="header-icons/pause-button.svg" 
+                title="${_("Pause")}" 
+                alt="${_("Pause")}" 
+                height="${ICONSIZE}" 
+                width="${ICONSIZE}" 
+                vertical-align="middle"
+            >`;
         this.isMoving = true;
     };
 
