@@ -171,7 +171,9 @@ class Arpeggio {
             arpeggioCell = arpeggioTableRow.insertCell();
             // Create tables to store individual notes.
             arpeggioCell.innerHTML =
-                '<table cellpadding="0px" id="arpeggioCellTable' + j + '"><tr></tr></table>';
+                `<table cellpadding="0px" id="arpeggioCellTable${j}">
+                    <tr></tr>
+                </table>`;
             arpeggioCellTable = docById("arpeggioCellTable" + j);
 
             // We'll use this element to put the clickable notes for this row.
@@ -295,17 +297,15 @@ class Arpeggio {
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
         cell.innerHTML =
-            '&nbsp;&nbsp;<img src="header-icons/' +
-            icon +
-            '" title="' +
-            label +
-            '" alt="' +
-            label +
-            '" height="' +
-            iconSize +
-            '" width="' +
-            iconSize +
-            '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+            `&nbsp;&nbsp;<img 
+                src="header-icons/${icon}" 
+                title="${label}" 
+                alt="${label}" 
+                height="${iconSize}" 
+                width="${iconSize}" 
+                vertical-align="middle" 
+                align-content="center"
+            >&nbsp;&nbsp;`;
         cell.style.width = Arpeggio.BUTTONSIZE + "px";
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
@@ -528,30 +528,26 @@ class Arpeggio {
         const icon = this.playButton;
         if (this._playing) {
             icon.innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/' +
-                "stop-button.svg" +
-                '" title="' +
-                _("Stop") +
-                '" alt="' +
-                _("Stop") +
-                '" height="' +
-                Arpeggio.ICONSIZE +
-                '" width="' +
-                Arpeggio.ICONSIZE +
-                '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                `&nbsp;&nbsp;<img 
+                    src="header-icons/stop-button.svg" 
+                    title="${_("Stop")}" 
+                    alt="${_("Stop")}" 
+                    height="${Arpeggio.ICONSIZE}" 
+                    width="${Arpeggio.ICONSIZE}" 
+                    vertical-align="middle" 
+                    align-content="center"
+                >&nbsp;&nbsp;`;
         } else {
             icon.innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/' +
-                "play-button.svg" +
-                '" title="' +
-                _("Play") +
-                '" alt="' +
-                _("Play") +
-                '" height="' +
-                Arpeggio.ICONSIZE +
-                '" width="' +
-                Arpeggio.ICONSIZE +
-                '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                `&nbsp;&nbsp;<img 
+                    src="header-icons/play-button.svg" 
+                    title="${_("Play")}" 
+                    alt="${_("Play")}" 
+                    height="${Arpeggio.ICONSIZE}" 
+                    width="${Arpeggio.ICONSIZE}" 
+                    vertical-align="middle" 
+                    align-content="center"
+                >&nbsp;&nbsp;`;
             this._playing = false;
             return;
         }
@@ -638,17 +634,15 @@ class Arpeggio {
         } else {
             const icon = this.playButton;
             icon.innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/' +
-                "play-button.svg" +
-                '" title="' +
-                _("Play") +
-                '" alt="' +
-                _("Play") +
-                '" height="' +
-                Arpeggio.ICONSIZE +
-                '" width="' +
-                Arpeggio.ICONSIZE +
-                '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                `&nbsp;&nbsp;<img 
+                    src="header-icons/play-button.svg" 
+                    title="${_("Play")}" 
+                    alt="${_("Play")}" 
+                    height="${Arpeggio.ICONSIZE}" 
+                    width="${Arpeggio.ICONSIZE}" 
+                    vertical-align="middle" 
+                    align-content="center"
+                >&nbsp;&nbsp;`;
             this._playing = false;
         }
     }

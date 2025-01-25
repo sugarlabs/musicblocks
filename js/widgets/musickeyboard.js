@@ -884,17 +884,15 @@ function MusicKeyboard(activity) {
 
             this._stopOrCloseClicked = true;
             playButtonCell.innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/' +
-                "play-button.svg" +
-                '" title="' +
-                _("Play") +
-                '" alt="' +
-                _("Play") +
-                '" height="' +
-                ICONSIZE +
-                '" width="' +
-                ICONSIZE +
-                '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                `&nbsp;&nbsp;<img 
+                    src="header-icons/play-button.svg" 
+                    title="${_("Play")}" 
+                    alt="${_("Play")}" 
+                    height="${ICONSIZE}" 
+                    width="${ICONSIZE}" 
+                    vertical-align="middle" 
+                    align-content="center"
+                >&nbsp;&nbsp;`;
         }
     };
 
@@ -965,17 +963,15 @@ function MusicKeyboard(activity) {
                 this.playOne(counter + 1, maxWidth, playButtonCell);
             } else {
                 playButtonCell.innerHTML =
-                    '&nbsp;&nbsp;<img src="header-icons/' +
-                    "play-button.svg" +
-                    '" title="' +
-                    _("Play") +
-                    '" alt="' +
-                    _("Play") +
-                    '" height="' +
-                    ICONSIZE +
-                    '" width="' +
-                    ICONSIZE +
-                    '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                    `&nbsp;&nbsp;<img 
+                        src="header-icons/play-button.svg" 
+                        title="${_("Play")}" 
+                        alt="${_("Play")}" 
+                        height="${ICONSIZE}" 
+                        width="${ICONSIZE}" 
+                        vertical-align="middle" 
+                        align-content="center"
+                    >&nbsp;&nbsp;`;
                 this.playingNow = false;
                 if (!this.keyboardShown) {
                     this._createTable();
@@ -1517,10 +1513,7 @@ function MusicKeyboard(activity) {
                 cell.innerHTML = this.displayLayout[i].noteOctave.toString() + "HZ";
             } else {
                 cell.innerHTML =
-                    i18nSolfege(this.displayLayout[i].noteName) +
-                    "<sub>" +
-                    this.displayLayout[i].noteOctave.toString() +
-                    "</sub>";
+                    `${i18nSolfege(this.displayLayout[i].noteName)}<sub>${this.displayLayout[i].noteOctave.toString()}</sub>`;
             }
 
             cell.setAttribute("id", "labelcol" + (n - i - 1));
@@ -1543,7 +1536,7 @@ function MusicKeyboard(activity) {
 
             mkbCell = mkbTableRow.insertCell();
             // Create tables to store individual notes.
-            mkbCell.innerHTML = '<table cellpadding="0px" id="mkbCellTable' + j + '"></table>';
+            mkbCell.innerHTML = `<table cellpadding="0px" id="mkbCellTable${j}"></table>`;
             mkbCellTable = docById("mkbCellTable" + j);
             mkbCellTable.style.marginTop = "-1px";
 
@@ -1618,7 +1611,7 @@ function MusicKeyboard(activity) {
             cell.style.maxWidth = cell.style.width;
             cell.style.lineHeight = 60 + "%";
             cell.style.textAlign = "center";
-            cell.innerHTML = dur[0].toString() + "/" + dur[1].toString();
+            cell.innerHTML = `${dur[0].toString()}/${dur[1].toString()}`;
             cell.setAttribute("id", "cells-" + j);
             cell.setAttribute("start", selectedNotes[j].startTime);
             cell.setAttribute("dur", maxWidth);
@@ -2701,9 +2694,9 @@ function MusicKeyboard(activity) {
                     this.displayLayout[p].blockNumber
                 ]);
                 newel.innerHTML =
-                    (myrowId < WHITEKEYS.length
-                        ? "<small>(" + String.fromCharCode(WHITEKEYS[myrowId]) + ")</small><br/>"
-                        : "") + this.displayLayout[p].voice;
+                    `${(myrowId < WHITEKEYS.length
+                        ? `<small>(${String.fromCharCode(WHITEKEYS[myrowId])})</small><br/>`
+                        : "")}${this.displayLayout[p].voice}`;
 
                 this.displayLayout[p].objId = "whiteRow" + myrowId.toString();
 
@@ -2729,9 +2722,9 @@ function MusicKeyboard(activity) {
                     this.displayLayout[p].blockNumber
                 ]);
                 newel.innerHTML =
-                    (myrow3Id < HERTZKEYS.length
-                        ? "<small>(" + String.fromCharCode(HERTZKEYS[myrow3Id]) + ")</small><br/>"
-                        : "") + this.displayLayout[p].noteOctave;
+                    `${(myrow3Id < HERTZKEYS.length
+                        ? "<small>(${String.fromCharCode(HERTZKEYS[myrow3Id])})</small><br/>"
+                        : "")}${this.displayLayout[p].noteOctave}`;
 
                 this.displayLayout[p].objId = "hertzRow" + myrow3Id.toString();
 
@@ -2776,9 +2769,7 @@ function MusicKeyboard(activity) {
                 if (this.displayLayout[p].blockNumber >= FAKEBLOCKNUMBER) {
                     newel2.innerHTML =
                         myrow2Id < BLACKKEYS.length
-                            ? "<small>(" +
-                              String.fromCharCode(BLACKKEYS[myrow2Id]) +
-                              ")</small><br/>"
+                            ? `<small>(${String.fromCharCode(BLACKKEYS[myrow2Id])})</small><br/>`
                             : "";
                 }
                 if (p < this.layout.length) {
@@ -2832,19 +2823,10 @@ function MusicKeyboard(activity) {
                 if (this.displayLayout[p].blockNumber <= FAKEBLOCKNUMBER) {
                     if (SOLFEGENAMES.includes(nname)) {
                         newel2.innerHTML =
-                            "<small>(" +
-                            String.fromCharCode(BLACKKEYS[myrow2Id]) +
-                            ")</small><br/>" +
-                            i18nSolfege(nname) +
-                            FLAT +
-                            this.displayLayout[p].noteOctave;
+                            `<small>(${String.fromCharCode(BLACKKEYS[myrow2Id])})</small><br/>${i18nSolfege(nname)}${FLAT}${this.displayLayout[p].noteOctave}`;
                     } else {
                         newel2.innerHTML =
-                            "<small>(" +
-                            String.fromCharCode(BLACKKEYS[myrow2Id]) +
-                            ")</small><br/>" +
-                            this.displayLayout[p].noteName +
-                            this.displayLayout[p].noteOctave;
+                            `<small>(${String.fromCharCode(BLACKKEYS[myrow2Id])})</small><br/>${this.displayLayout[p].noteName}${this.displayLayout[p].noteOctave}`;
                     }
                 }
                 if (p < this.layout.length) {
@@ -2879,22 +2861,14 @@ function MusicKeyboard(activity) {
                 if (this.displayLayout[p].blockNumber <= FAKEBLOCKNUMBER) {
                     if (SOLFEGENAMES.includes(this.displayLayout[p].noteName)) {
                         newel.innerHTML =
-                            (myrowId < WHITEKEYS.length
-                                ? "<small>(" +
-                                  String.fromCharCode(WHITEKEYS[myrowId]) +
-                                  ")</small><br/>"
-                                : "") +
-                            i18nSolfege(this.displayLayout[p].noteName) +
-                            this.displayLayout[p].noteOctave;
+                            `${(myrowId < WHITEKEYS.length
+                                ? `<small>(${String.fromCharCode(WHITEKEYS[myrowId])})</small><br/>`
+                                : "")}${i18nSolfege(this.displayLayout[p].noteName)}${this.displayLayout[p].noteOctave}`;
                     } else {
                         newel.innerHTML =
-                            (myrowId < WHITEKEYS.length
-                                ? "<small>(" +
-                                  String.fromCharCode(WHITEKEYS[myrowId]) +
-                                  ")</small><br/>"
-                                : "") +
-                            this.displayLayout[p].noteName +
-                            this.displayLayout[p].noteOctave;
+                            `${(myrowId < WHITEKEYS.length
+                                ? `<small>(${String.fromCharCode(WHITEKEYS[myrowId])})</small><br/>`
+                                : "")}${this.displayLayout[p].noteName}${this.displayLayout[p].noteOctave}`;
                     }
                 }
                 if (p < this.layout.length) {
@@ -2915,10 +2889,7 @@ function MusicKeyboard(activity) {
         newel.setAttribute("id", "rest");
         newel.setAttribute("alt", "R__");
         newel.innerHTML =
-            "<small>(" +
-            // .TRANS: a rest is a pause in the music.
-            _("rest") +
-            ")</small><br/>";
+            `<small>(${_("rest")})</small><br/>`;
         newel.style.position = "relative";
         newel.style.zIndex = "100";
 
@@ -3237,17 +3208,15 @@ function MusicKeyboard(activity) {
     this._addButton = function (row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
         cell.innerHTML =
-            '&nbsp;&nbsp;<img src="header-icons/' +
-            icon +
-            '" title="' +
-            label +
-            '" alt="' +
-            label +
-            '" height="' +
-            iconSize +
-            '" width="' +
-            iconSize +
-            '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+            `&nbsp;&nbsp;<img 
+                src="header-icons/${icon}" 
+                title="${label}" 
+                alt="${label}" 
+                height="${iconSize}" 
+                width="${iconSize}" 
+                vertical-align="middle" 
+                align-content="center"
+            >&nbsp;&nbsp;`;
         cell.style.width = BUTTONSIZE + "px";
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
