@@ -3036,7 +3036,17 @@ function MusicKeyboard(activity) {
                 [2, "hidden", 0, 0, [0, selectedNotes.length == 0 ? null : 3]]
             ];
 
-            let prevId = 2;
+            // Add BPM
+            newStack.push(
+                [3, "setmasterbpm2", 0, 0, [2, 4, 5, 8]],
+                [4, ["number", { value: this.bpm }], 0, 0, [3]],
+                [5, "divide", 0, 0, [3, 6, 7]],
+                [6, ["number", { value: 1 }], 0, 0, [5]],
+                [7, ["number", { value: 4 }], 0, 0, [5]],
+                [8, "vspace", 0, 0, [3, 9]]
+            );
+
+            let prevId = 8;
             let endOfStackIdx, id;
 
             for (let noteGrp = 0; noteGrp < newNotes.length; noteGrp++) {
