@@ -872,9 +872,14 @@ function MusicKeyboard(activity) {
             }
 
             this._stopOrCloseClicked = false;
-            this._playChord(notes, selectedNotes[0].duration, selectedNotes[0].voice);
-            const maxWidth = Math.max.apply(Math, selectedNotes[0].duration);
-            this.playOne(1, maxWidth, playButtonCell);
+
+            // Convert durations to seconds based on BPM
+            const durationInSeconds = selectedNotes[0].duration.map(
+                (beatDuration) => (beatDuration * 60 * 4) / (this.bpm)
+            );
+            this._playChord(notes, durationInSeconds, selectedNotes[0].voice);
+            const maxDuration = Math.max(...durationInSeconds);
+            this.playOne(1, maxDuration, playButtonCell);
         } else {
             if (!this.keyboardShown) {
                 this._createTable();
@@ -898,14 +903,14 @@ function MusicKeyboard(activity) {
 
     /**
      * Plays a sequence of musical notes recursively with a specified time delay.
-     * 
+     *
      * @param {number} counter - The index of the current note in the sequence.
      * @param {number} time - The time duration of the current note.
      * @param {HTMLElement} playButtonCell - The HTML element representing the play button.
      */
     this.playOne = function (counter, time, playButtonCell) {
         setTimeout(() => {
-            let cell, eleid, ele, notes, zx, res, maxWidth;
+            let cell, eleid, ele, notes, zx, res, maxDuration;
             if (counter < selectedNotes.length) {
                 if (this._stopOrCloseClicked) {
                     return;
@@ -952,15 +957,24 @@ function MusicKeyboard(activity) {
                 }
 
                 if (this.playingNow) {
+                    const durationInSeconds = selectedNotes[counter].duration.map(
+                        (beatDuration) => (beatDuration * 60 * 4) / this.bpm
+                    );
+
                     this._playChord(
                         notes,
-                        selectedNotes[counter].duration,
+                        durationInSeconds,
                         selectedNotes[counter].voice
                     );
                 }
 
-                maxWidth = Math.max.apply(Math, selectedNotes[counter].duration);
-                this.playOne(counter + 1, maxWidth, playButtonCell);
+                maxDuration = Math.max(
+                    ...selectedNotes[counter].duration.map(
+                        (beatDuration) => (beatDuration * 60 * 4) / this.bpm
+                    )
+                );
+
+                this.playOne(counter + 1, maxDuration, playButtonCell);
             } else {
                 playButtonCell.innerHTML =
                     `&nbsp;&nbsp;<img 
@@ -979,12 +993,12 @@ function MusicKeyboard(activity) {
                     this._createKeyboard();
                 }
             }
-        }, time * 1000 + 125);
+        }, time * 1000);
     };
 
     /**
      * Plays a chord (multiple notes simultaneously) using a synthesizer.
-     * 
+     *
      * @param {string[]} notes - Array of note names to be played as a chord.
      * @param {number[]} noteValue - Array of note values (durations) for each note in the chord.
      * @param {string[]} instruments - Array of instrument names or identifiers for each note.
@@ -1040,7 +1054,7 @@ function MusicKeyboard(activity) {
 
     /**
      * Fills chromatic gaps in a given list of notes by padding with missing notes.
-     * 
+     *
      * @param {Object[]} noteList - List of notes represented as dictionaries containing `noteName` and `noteOctave`.
      * @returns {Object[]} A new list of notes with chromatic gaps filled.
      */
@@ -1557,7 +1571,7 @@ function MusicKeyboard(activity) {
         cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) * 1.5 + "px";
         cell.style.maxWidth = cell.style.minWidth;
         cell.className = "headcol"; // This cell is fixed horizontally.
-        cell.innerHTML = _("duration (MS)");
+        cell.innerHTML = _("Note Value");
         cell.style.position = "sticky";
         cell.style.left = "0px";
         cell.style.zIndex = "1";
@@ -2993,7 +3007,17 @@ function MusicKeyboard(activity) {
                 [2, "hidden", 0, 0, [0, selectedNotes.length == 0 ? null : 3]]
             ];
 
-            let prevId = 2;
+            // Add BPM
+            newStack.push(
+                [3, "setmasterbpm2", 0, 0, [2, 4, 5, 8]],
+                [4, ["number", { value: this.bpm }], 0, 0, [3]],
+                [5, "divide", 0, 0, [3, 6, 7]],
+                [6, ["number", { value: 1 }], 0, 0, [5]],
+                [7, ["number", { value: 4 }], 0, 0, [5]],
+                [8, "vspace", 0, 0, [3, 9]]
+            );
+
+            let prevId = 8;
             let endOfStackIdx, id;
 
             for (let noteGrp = 0; noteGrp < newNotes.length; noteGrp++) {
