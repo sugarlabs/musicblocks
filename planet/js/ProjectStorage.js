@@ -26,7 +26,13 @@ class ProjectStorage {
         this.Planet = Planet ;
         this.defaultProjectName = _("My Project");
         this.LocalStorage = null;
-        this.data = null;
+        this.data = {
+            Projects: {},
+            LikedProjects: {},
+            ReportedProjects: {},
+            DefaultCreatorName: _("anonymous"),
+            CurrentProject: null
+        };
         this.LocalStorageKey = "ProjectData";
         this.VersionKey = "StorageVersion";
         this.Version = "v2";
@@ -59,77 +65,53 @@ class ProjectStorage {
     };
 
     async saveLocally(data, image) {
-        if (this.data.CurrentProject === undefined)
-            this.initialiseNewProject();
+        if (!this.data.CurrentProject)
+            await this.initialiseNewProject();
 
-        const c = this.data.CurrentProject;
-        if (!this.data.Projects[c]) {
-            this.data.Projects[c] = {
-                ProjectName: this.defaultProjectName,
-                ProjectData: null,
-                ProjectImage: null,
-                PublishedData: null,
-                DateLastModified: Date.now()
-            };
-        }
-
-        this.data.Projects[c].ProjectData = data;
-        this.data.Projects[c].ProjectImage = image;
-        this.data.Projects[c].DateLastModified = Date.now();
+        const currentProject = this.getCachedCurrentProject();
+        currentProject.ProjectData = data;
+        currentProject.ProjectImage = image;
+        currentProject.DateLastModified = Date.now();
         await this.save();
     };
 
     async getCurrentProjectData() {
         await this.dataLoaded;
-        const c = this.data.CurrentProject;
-        if (!this.data.Projects[c]?.ProjectData) {
-            // Lazy load project data from storage
-            const storedData = await this.get(`ProjectData_${c}`);
-            this.data.Projects[c].ProjectData = storedData;
+        const currentProject = this.getCachedCurrentProject();
+
+        if (!currentProject.ProjectData) {
+            currentProject.ProjectData = await this.get(`ProjectData_${this.data.CurrentProject}`);
         }
-        return this.data.Projects[c]?.ProjectData ?? null;
+        return currentProject.ProjectData ?? null;
     };
 
     getCurrentProjectName() {
-        const c = this.data.CurrentProject;
-        return this.data.Projects[c]?.ProjectName ?? this.defaultProjectName ; 
+        const currentProject = this.getCachedCurrentProject();
+        return currentProject?.ProjectName ?? this.defaultProjectName ; 
     };
 
     async getCurrentProjectDescription() {
-        const c = this.data.CurrentProject;
+        const currentProject = this.getCachedCurrentProject();
 
-        if (this.data.Projects[c] && this.data.Projects[c].PublishedData !== null) {
-            if (!this.data.Projects[c].PublishedData) {
-                // Lazy load published data
-                const storedPublishedData = await this.get(`PublishedData_${c}`);
-                this.data.Projects[c].PublishedData = storedPublishedData;
-            }
-            return this.data.Projects[c].PublishedData.ProjectDescription;
+        if (currentProject && currentProject.PublishedData === null) {
+            currentProject.PublishedData = await this.get(`PublishedData_${this.data.CurrentProject}`);
         }
-
-        return null;
-    };
+        return currentProject?.PublishedData?.ProjectDescription ?? null;
+    }
 
     async getCurrentProjectImage() {
-        const c = this.data.CurrentProject;
+        const currentProject = this.getCachedCurrentProject();
 
-        if (!this.data.Projects[c]?.ProjectImage) {
-            // Lazy load project image from storage
-            const storedImage = await this.get(`ProjectImage_${c}`);
-            this.data.Projects[c].ProjectImage = storedImage;
+        if (!currentProject.ProjectImage) {
+            currentProject.ProjectImage = await this.get(`ProjectImage_${this.data.CurrentProject}`);
         }
-
-        return this.data.Projects[c]?.ProjectImage ?? this.ImageDataURL;
+        return currentProject?.ProjectImage ?? this.ImageDataURL;
     };
 
-    async initialiseNewProject(name, data, image) {
-        name = name ?? this.defaultProjectName;
-        data = data ?? null;
-        image = image ?? null;
-
-        const c = this.generateID();
-        this.data.CurrentProject = c;
-        this.data.Projects[c] = {
+    async initialiseNewProject(name = this.defaultProjectName, data = null, image = null) {
+        const id = this.generateID();
+        this.data.CurrentProject = id;
+        this.data.Projects[id] = {
             ProjectName: name,
             ProjectData: data,
             ProjectImage: image,
@@ -140,14 +122,18 @@ class ProjectStorage {
     };
 
     async renameProject(id, name) {
-        this.data.Projects[id].ProjectName = name;
-        await this.save();
+        if (this.data.Projects[id]) {
+            this.data.Projects[id].ProjectName = name;
+            await this.save();
+        }
     };
 
     async addPublishedData(id, data) {
-        this.data.Projects[id].PublishedData = data;
-        await this.save();
-    };
+        if (this.data.Projects[id]) {
+            this.data.Projects[id].PublishedData = data;
+            await this.save();
+        }
+    }
 
     async deleteProject(id) {
         delete this.data.Projects[id];
@@ -207,7 +193,6 @@ class ProjectStorage {
         try {
             return JSON.parse(jsonobj);
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.log(e);
             return null;
         }
@@ -232,26 +217,6 @@ class ProjectStorage {
     };
 
     async initialiseStorage() {
-
-        if (!this.data) {
-            this.data = {};
-        }
-
-        if (!this.data.Projects) {
-            this.data.Projects = {};
-        }
-
-        if (!this.data.LikedProjects) {
-            this.data.LikedProjects = {};
-        }
-
-        if (!this.data.ReportedProjects) {
-            this.data.ReportedProjects = {};
-        }
-
-        if (!this.data.DefaultCreatorName) {
-            this.data.DefaultCreatorName = _("anonymous");
-        }
         this.fireDataLoaded();
         await this.save();
     };
@@ -279,4 +244,19 @@ class ProjectStorage {
         await this.restore();
         await this.initialiseStorage();
     };
-};
+
+    getCachedCurrentProject() {
+        const currentProjectID = this.data.CurrentProject;
+        if (!currentProjectID) return null;
+        if (!this.data.Projects[currentProjectID]) {
+            this.data.Projects[currentProjectID] = {
+                ProjectName: this.defaultProjectName,
+                ProjectData: null,
+                ProjectImage: null,
+                PublishedData: null,
+                DateLastModified: Date.now()
+            };
+        }
+        return this.data.Projects[currentProjectID];
+    };
+}
