@@ -2882,7 +2882,7 @@ class Block {
          * Handles the mousedown event on the block container.
          * @param {Event} event - The mousedown event.
          */
-        this.container.on("mousedown", (event) =>{
+        this.container.on("mousedown", (event) => {
             if (event.nativeEvent) {
                 event.nativeEvent.preventDefault();
             }

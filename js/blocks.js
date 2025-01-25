@@ -2425,22 +2425,6 @@ class Blocks {
             }
         };
 
-        this.moveContainer = (dx, dy) => {
-            if (!this.activity.scrollBlockContainer && dx !== 0) {
-                dx = 0;
-            }
-
-            this.activity.blocksContainer.x += dx;
-            this.activity.blocksContainer.y += dy;
-            
-            if (!this._scrollThrottleTimer) {
-                this._scrollThrottleTimer = setTimeout(() => {
-                    this.checkBounds();
-                    this._scrollThrottleTimer = null;
-                }, 50);
-            }
-        };
-
         /**
          * Moves the blocks in a stack to a new position.
          * @param blk - block
