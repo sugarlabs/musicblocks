@@ -409,15 +409,17 @@ class TimbreWidget {
         const cell = this.playButton;
         if (this._playing) {
             cell.innerHTML =
-                `&nbsp;&nbsp;<img 
-                    src="header-icons/stop-button.svg" 
-                    title="${_("Stop")}" 
-                    alt="${_("Stop")}" 
-                    height="${TimbreWidget.ICONSIZE}" 
-                    width="${TimbreWidget.ICONSIZE}" 
-                    vertical-align="middle" 
-                    align-content="center"
-                >&nbsp;&nbsp;`;
+                '&nbsp;&nbsp;<img src="header-icons/' +
+                "stop-button.svg" +
+                '" title="' +
+                _("Stop") +
+                '" alt="' +
+                _("Stop") +
+                '" height="' +
+                TimbreWidget.ICONSIZE +
+                '" width="' +
+                TimbreWidget.ICONSIZE +
+                '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
         } else {
             this.activity.logo.synth.setMasterVolume(0);
             this.activity.logo.synth.stop();

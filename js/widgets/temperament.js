@@ -313,8 +313,11 @@ function TemperamentWidget() {
             const divAppend = document.createElement("div");
             divAppend.id = "divAppend";
             divAppend.innerHTML =
-                `<div id="clearNotes" style="float:left;">${_("Clear")}</div>
-                <div id="standardOctave" style="float:right;">${_("back to 2:1 octave space")}</div>`;
+                '<div id="clearNotes" style="float:left;">' +
+                _("Clear") +
+                '</div><div id="standardOctave" style="float:right;">' +
+                _("back to 2:1 octave space") +
+                "</div>";
             divAppend.style.textAlign = "center";
             divAppend.style.position = "absolute";
             divAppend.style.zIndex = 2;
@@ -447,15 +450,11 @@ function TemperamentWidget() {
                         >`;
                 }
                 docById("noteInfo").innerHTML +=
-                    `<img 
-                        src="header-icons/close-button.svg" 
-                        id="close"
-                        title="${_("Close")}" 
-                        alt="${_("Close")}" 
-                        height="20px" 
-                        width="20px" 
-                        align="right"
-                    ><br>`;
+                    '<img src="header-icons/close-button.svg" id="close" title="' +
+                    _("Close") +
+                    '" alt="' +
+                    _("Close") +
+                    '" height=20px width=20px align="right"><br>';
                 let noteDefined = false;
                 for (let j = 0; j < this.ratiosNotesPair.length; j++) {
                     if (this.ratios[i] == this.ratiosNotesPair[j][0]) {
@@ -1436,7 +1435,11 @@ function TemperamentWidget() {
                 docById("wheelDiv3").innerHTML +=
                     '<div class="popup" id="noteInfo1" style="width:180px; height:135px;"><span class="popuptext" id="myPopup"></span></div>';
                 docById("noteInfo1").innerHTML +=
-                    `<img src="header-icons/close-button.svg" id="close" title="${_("Close")}" alt="${_("Close")}" height=20px width=20px align="right">`;
+                    '<img src="header-icons/close-button.svg" id="close" title="' +
+                    _("Close") +
+                    '" alt="' +
+                    _("Close") +
+                    '" height=20px width=20px align="right">';
                 docById("noteInfo1").innerHTML +=
                     `<br><center><input type="range" class="sliders" id = "frequencySlider" style="width:170px; background:white; border:0;" min="${frequencies[i]}" max="${frequencies[i + 1]}" value="30"></center>`;
                 docById("noteInfo1").innerHTML +=

@@ -813,15 +813,17 @@ function MusicKeyboard(activity) {
 
         if (this.playingNow) {
             playButtonCell.innerHTML =
-                `&nbsp;&nbsp;<img 
-                    src="header-icons/stop-button.svg" 
-                    title="${_("Stop")}" 
-                    alt="${_("Stop")}" 
-                    height="${ICONSIZE}" 
-                    width="${ICONSIZE}" 
-                    vertical-align="middle" 
-                    align-content="center"
-                >&nbsp;&nbsp;`;
+                '&nbsp;&nbsp;<img src="header-icons/' +
+                "stop-button.svg" +
+                '" title="' +
+                _("Stop") +
+                '" alt="' +
+                _("Stop") +
+                '" height="' +
+                ICONSIZE +
+                '" width="' +
+                ICONSIZE +
+                '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
 
             if (selectedNotes.length < 1) {
                 return;
