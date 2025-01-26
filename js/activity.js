@@ -510,38 +510,56 @@ class Activity {
         this.doContextMenus = () => {
             let longPressTimer = null;
             const LONG_PRESS_DURATION = 500;
-
-            document.addEventListener(
-                "contextmenu",
-                (event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    if (this.beginnerMode) return;          
-                    if (!this.blocks.isCoordinateOnBlock(event.clientX, event.clientY) && 
-                        event.target.id === "myCanvas") {
-                        this._displayHelpfulWheel(event);
-                    }         
-                },
-                false
-            );
-
-            // Add touch event handlers
+        
+            // Handle right-click (contextmenu event)
+            document.addEventListener("contextmenu", (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                if (!this.beginnerMode && !this.blocks.isCoordinateOnBlock(event.clientX, event.clientY) && 
+                    event.target.id === "myCanvas") {
+                    this._displayHelpfulWheel(event);
+                }
+            }, false);
+        
+            // Handle touch start (long-press)
             document.addEventListener("touchstart", (event) => {
                 if (event.touches.length !== 1) return;
+                event.preventDefault();
                 
                 const touch = event.touches[0];
-                if (!this.beginnerMode && touch.target.id === "myCanvas" && 
-                    !this.blocks.isCoordinateOnBlock(touch.clientX, touch.clientY)) {
-                    longPressTimer = setTimeout(() => {
-                        const touchEvent = {
-                            clientX: touch.clientX,
-                            clientY: touch.clientY,
-                            preventDefault: () => {},
-                            stopPropagation: () => {},
-                            target: touch.target
-                        };
-                        this._displayHelpfulWheel(touchEvent);
-                    }, LONG_PRESS_DURATION);
+                const isOnBlock = this.blocks.isCoordinateOnBlock(touch.clientX, touch.clientY);
+        
+                if (touch.target.id === "myCanvas") {
+                    if (!isOnBlock && !this.beginnerMode) {
+                        // Handle canvas long press for helpful wheel
+                        longPressTimer = setTimeout(() => {
+                            this._displayHelpfulWheel({
+                                clientX: touch.clientX,
+                                clientY: touch.clientY,
+                                preventDefault: () => {},
+                                stopPropagation: () => {},
+                                target: touch.target
+                            });
+                        }, LONG_PRESS_DURATION);
+                    } else {
+                        // Handle block long press for block menu
+                        longPressTimer = setTimeout(() => {
+                            const block = this.blocks.blockList.find(b => {
+                                // Manual coordinate transformation
+                                const containerX = b.container.x;
+                                const containerY = b.container.y;
+                                const scaleX = b.container.scaleX || 1;
+                                const scaleY = b.container.scaleY || 1;
+            
+                                const localX = (touch.clientX - containerX) / scaleX;
+                                const localY = (touch.clientY - containerY) / scaleY;
+            
+                                const isHit = b.container.hitTest(localX, localY);
+                                return isHit;
+                            });
+                            piemenuBlockContext(block);
+                        }, LONG_PRESS_DURATION);
+                    }
                 }
             }, false);
 
@@ -552,10 +570,10 @@ class Activity {
                     longPressTimer = null;
                 }
             };
-
+              
+            document.addEventListener("touchmove", clearTimer, false);
             document.addEventListener("touchend", clearTimer, false);
             document.addEventListener("touchcancel", clearTimer, false);
-            document.addEventListener("touchmove", clearTimer, false);
         };
 
         /*

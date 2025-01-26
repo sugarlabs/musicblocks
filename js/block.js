@@ -3086,48 +3086,6 @@ class Block {
 
             moved = false;
         });
-
-        this.container.on("touchstart", (event) => {
-            if (event.touches.length === 1) {
-                event.preventDefault();
-                event.stopPropagation();
-
-                const touch = event.touches[0];
-                const mouseEvent = new MouseEvent('mousedown', {
-                    clientX: touch.clientX,
-                    clientY: touch.clientY,
-                    screenX: touch.screenX,
-                    screenY: touch.screenY
-                });
-                this.container.dispatchEvent(mouseEvent);
-
-                that.blocks.mouseDownTime = new Date().getTime();
-                that.blocks.longPressTimeout = setTimeout(() => {
-                    that.blocks.activeBlock = that.blocks.blockList.indexOf(that);
-                    piemenuBlockContext(that);
-                }, LONGPRESSTIME);
-            }
-        }, { passive: false });
-
-        this.container.on("touchstart", (event) => {
-            if (event.touches.length > 1) {
-                if (that.blocks.longPressTimeout) {
-                    clearTimeout(that.blocks.longPressTimeout);
-                }
-            }
-        });
-
-        this.container.on("touchmove", () => {
-            if (that.blocks.longPressTimeout) {
-                clearTimeout(that.blocks.longPressTimeout);
-            }
-        });
-
-        this.container.on("touchend touchcancel", () => {
-            if (that.blocks.longPressTimeout) {
-                clearTimeout(that.blocks.longPressTimeout);
-            }
-        });
     }
 
     /**
