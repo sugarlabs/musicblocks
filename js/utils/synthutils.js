@@ -80,6 +80,8 @@ const VOICENAMES = [
     [_("bass"), "bass", "images/voices.svg", "string"],
     //.TRANS: viola musical instrument
     [_("double bass"), "double bass", "images/voices.svg", "string"],
+    //.TRANS: sitar musical instrument
+    [_("sitar"), "sitar", "images/synth.svg", "string"],
     //.TRANS: musical instrument
     [_("guitar"), "guitar", "images/voices.svg", "string"],
     //.TRANS: musical instrument
@@ -264,7 +266,8 @@ const SOUNDSAMPLESDEFINES = [
     "samples/viola",
     "samples/oboe",
     "samples/trombone",
-    "samples/doublebass" // "samples/japanese_bell",
+    "samples/doublebass",
+    "samples/sitar"
 ];
 
 // Some samples have a default volume other than 50 (See #1697)
@@ -300,7 +303,8 @@ const DEFAULTSYNTHVOLUME = {
     "slap": 60,
     "vibraphone": 100,
     "xylophone": 100,
-    "japanese drum": 90
+    "japanese drum": 90,
+    "sitar": 100
 };
 
 /**
@@ -327,12 +331,13 @@ const SAMPLECENTERNO = {
     "koto": ["C5", 51], // pitchToNumber('C', 5, 'C Major')],
     "dulcimer": ["C4", 39], // pitchToNumber('C', 4, 'C Major')],
     "electric guitar": ["C3", 27], // pitchToNumber('C', 3, 'C Major')],
-    "bassoon": ["D4", 41], // pitchToNumber('C', 5, 'C Major')],
+    "bassoon": ["D4", 41], // pitchToNumber('D', 4, 'D Major')],
     "celeste": ["C3", 27], // pitchToNumber('C', 3, 'C Major')],
-    "vibraphone": ["C5", 51],
-    "xylophone": ["C4", 39],
-    "viola": ["D4", 53],
-    "double bass": ["C4", 39]
+    "vibraphone": ["C5", 51], // pitchToNumber('C', 5, 'C Major')],
+    "xylophone": ["C4", 39], // pitchToNumber('C', 4, 'C Major')],
+    "viola": ["D4", 53], // pitchToNumber('D', 4, 'D Major')],
+    "double bass": ["C4", 39], // pitchToNumber('C', 4, 'C Major')],
+    "sitar": ["C4", 39] // pitchToNumber('C', 4, 'C Major')]
 };
 
 
@@ -355,7 +360,7 @@ const percussionInstruments = ["koto", "banjo", "dulcimer", "xylophone", "celest
  * @constant
  * @type {Array<string>}
  */
-const stringInstruments = ["piano", "guitar", "acoustic guitar", "electric guitar"];
+const stringInstruments = ["piano","sitar", "guitar", "acoustic guitar", "electric guitar"];
 
 /**
  * Validates and sets parameters for an instrument.
@@ -828,7 +833,8 @@ function Synth() {
                 { name: "bassoon", data: BASSOON_SAMPLE },
                 { name: "celeste", data: CELESTE_SAMPLE },
                 { name: "vibraphone", data: VIBRAPHONE_SAMPLE },
-                { name: "xylophone", data: XYLOPHONE_SAMPLE }
+                { name: "xylophone", data: XYLOPHONE_SAMPLE },
+                { name: "sitar", data: SITAR_SAMPLE }
             ],
             drum: [
                 { name: "bottle", data: BOTTLE_SAMPLE },
