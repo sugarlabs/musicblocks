@@ -2379,6 +2379,11 @@ class Blocks {
          * @returns {void}
          */
         this._moveBlock = (blk, x, y) => {
+            // If doing two-finger scroll, don't process any block movements
+            if (this.activity.inTwoFingerScroll) {
+                return;
+            }
+
             const myBlock = this.blockList[blk];
             if (myBlock.container != null) {
                 /** Round position so font renders clearly. */
@@ -2401,6 +2406,11 @@ class Blocks {
          * @returns {void}
          */
         this.moveBlockRelative = (blk, dx, dy) => {
+            // If doing two-finger scroll, don't allow block disconnection
+            if (this.activity.inTwoFingerScroll) {
+                return;
+            }
+            
             this.inLongPress = false;
             this.isBlockMoving = true;
             const myBlock = this.blockList[blk];
@@ -5013,6 +5023,7 @@ class Blocks {
             }
 
             this.inLongPress = true;
+            
             piemenuBlockContext(this.blockList[this.activeBlock]);
         };
 

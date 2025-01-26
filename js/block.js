@@ -91,7 +91,7 @@ const STRINGLEN = 9;
  * Length of a long touch in milliseconds.
  * @type {number}
  */
-const LONGPRESSTIME = 1500;
+const LONGPRESSTIME = 500;
 const INLINECOLLAPSIBLES = ["newnote", "interval", "osctime", "definemode"];
 
 /**
@@ -2882,7 +2882,12 @@ class Block {
          * Handles the mousedown event on the block container.
          * @param {Event} event - The mousedown event.
          */
-        this.container.on("mousedown", (event) =>{
+        this.container.on("mousedown", (event) => {
+            if (event.nativeEvent) {
+                event.nativeEvent.preventDefault();
+            }
+            event.stopPropagation();
+
             docById("contextWheelDiv").style.display = "none";
 
             // Track time for detecting long pause...
@@ -2941,7 +2946,11 @@ class Block {
          */
         this.container.on("pressmove", (event) =>{
             // FIXME: More voodoo
-            event.nativeEvent.preventDefault();
+            if (event.nativeEvent) {
+                event.nativeEvent.preventDefault();
+            } else {
+                event.preventDefault();
+            }
 
             // Don't allow silence block to be dragged out of a note.
             if (that.name === "rest2") {
@@ -3091,6 +3100,48 @@ class Block {
             that.blocks.activeBlock = null;
 
             moved = false;
+        });
+
+        this.container.on("touchstart", (event) => {
+            if (event.touches.length === 1) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                const touch = event.touches[0];
+                const mouseEvent = new MouseEvent('mousedown', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY,
+                    screenX: touch.screenX,
+                    screenY: touch.screenY
+                });
+                this.container.dispatchEvent(mouseEvent);
+
+                that.blocks.mouseDownTime = new Date().getTime();
+                that.blocks.longPressTimeout = setTimeout(() => {
+                    that.blocks.activeBlock = that.blocks.blockList.indexOf(that);
+                    piemenuBlockContext(that);
+                }, LONGPRESSTIME);
+            }
+        }, { passive: false });
+
+        this.container.on("touchstart", (event) => {
+            if (event.touches.length > 1) {
+                if (that.blocks.longPressTimeout) {
+                    clearTimeout(that.blocks.longPressTimeout);
+                }
+            }
+        });
+
+        this.container.on("touchmove", () => {
+            if (that.blocks.longPressTimeout) {
+                clearTimeout(that.blocks.longPressTimeout);
+            }
+        });
+
+        this.container.on("touchend touchcancel", () => {
+            if (that.blocks.longPressTimeout) {
+                clearTimeout(that.blocks.longPressTimeout);
+            }
         });
     }
 
