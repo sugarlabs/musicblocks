@@ -523,6 +523,7 @@ class JSInterface {
                             "cello",
                             "bass",
                             "double bass",
+                            "sitar",
                             "guitar",
                             "acoustic guitar",
                             "flute",
