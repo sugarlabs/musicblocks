@@ -176,8 +176,8 @@ class ProjectStorage {
     };
 
     async set(key, obj) {
-        const jsonobj = JSON.stringify(obj);
-        await this.LocalStorage.setItem(key, jsonobj);
+        const jsonobj = JSON.stringify(obj) ;
+        await this.LocalStorage.setItem(key, jsonobj) ;
         const savedjsonobj = await this.LocalStorage.getItem(key);
 
         if (savedjsonobj !== jsonobj)
@@ -185,9 +185,9 @@ class ProjectStorage {
     };
 
     async get(key) {
-        const jsonobj = await this.LocalStorage.getItem(key);
+        const jsonobj = await this.LocalStorage.getItem(key) ;
 
-        if (jsonobj === null || jsonobj === "")
+        if (jsonobj === null || jsonobj === "" )
             return null;
 
         try {
@@ -204,7 +204,7 @@ class ProjectStorage {
     };
 
     async restore() {
-        const currentData = await this.get(this.LocalStorageKey);
+        const currentData = await this.get(this.LocalStorageKey) ;
 
         try {
             this.data = (typeof currentData === "string") ?
@@ -222,7 +222,7 @@ class ProjectStorage {
     };
 
     getDefaultCreatorName() {
-        return this.data.DefaultCreatorName;
+        return this.data.DefaultCreatorName ;
     };
 
     async port() {
