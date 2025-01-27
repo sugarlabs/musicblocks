@@ -461,9 +461,19 @@ class Toolbar {
 
     renderDarkModeIcon(onclick) {
         const darkModeIcon = docById("darkModeIcon");
+        const MSGPrefix =
+        "<div id='theme-link' " +
+            "onMouseOver='this.style.opacity = 0.5'" +
+            "onMouseOut='this.style.opacity = 1'>";
+        const MSGSuffix = "</div>"; 
 
         darkModeIcon.onclick = () => {
-            onclick();
+            this.activity.textMsg(MSGPrefix + "Refresh your browser." + MSGSuffix);
+
+            const themeLink = docById("theme-link");
+            themeLink.addEventListener( "click", () => {
+                onclick();
+            })
         }
     }
 
