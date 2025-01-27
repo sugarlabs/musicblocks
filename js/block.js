@@ -2085,7 +2085,7 @@ class Block {
      * @param {number} thisBlock - Index of the current block.
      */
     _doOpenMedia(thisBlock) {
-        const fileChooser = docById("myOpenAll");
+        const fileChooser = that.name=="media" ? docById("myMedia") : docById("audio");
         const that = this;
 
         const __readerAction = () => {
