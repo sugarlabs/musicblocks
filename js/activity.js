@@ -1517,6 +1517,7 @@ class Activity {
             activity.toolbar.renderSaveIcons(
                 activity.save.saveHTML.bind(activity.save),
                 doSVG,
+                activity.save.saveMIDI.bind(activity.save),
                 activity.save.saveSVG.bind(activity.save),
                 activity.save.savePNG.bind(activity.save),
                 activity.save.saveWAV.bind(activity.save),
@@ -6639,6 +6640,7 @@ class Activity {
             this.toolbar.renderSaveIcons(
                 this.save.saveHTML.bind(this.save),
                 doSVG,
+                this.save.saveMIDI.bind(this.save),
                 this.save.saveSVG.bind(this.save),
                 this.save.savePNG.bind(this.save),
                 this.save.saveWAV.bind(this.save),
