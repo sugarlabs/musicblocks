@@ -247,3 +247,6 @@ saveMxmlOutput = (logo) => {
 
     return res;
 };
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = saveMxmlOutput;
+}
