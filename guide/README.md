@@ -1718,6 +1718,8 @@ common in music, is called a *triplet*. Other common tuplets include a
 
 ![widget](./matrix11.svg "usage of tuplet")
 
+![Rhythm Block embedded in Tuplet Block](./matrix16.svg "Rhythm Block embedded in Tuplet Block")
+
 In the example above, the three quarter notes are defined in the
 *Rhythm* block embedded in the *Tuplet* block. As with the *Simple
 Tuplet* example, they are played in the time of a single quarter
