@@ -1708,7 +1708,7 @@ notes.
 
 Tuplets are a collection of notes that get scaled to a specific
 duration. Using tuplets makes it easy to create groups of notes that
-are not based on a power of 2. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725874435939635&run=True).
+are not based on a power of 2. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725874435939635&run=True)
 
 In the example above, three quarter notes&mdash;defined in the *Simple
 Tuplet* block&mdash;are played in the time of a single quarter
