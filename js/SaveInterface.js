@@ -312,22 +312,20 @@ class SaveInterface {
             return midi.toArray();
         };
 
-        // Create a download link
+        
         // Generate and download MIDI file
         const midiData = generateMidi(data); // Replace with your MIDI generation function
         const blob = new Blob([midiData], { type: "audio/midi" });
         const url = URL.createObjectURL(blob);
 
-        // Create a download link
+        
         const link = document.createElement("a");
         link.href = url;
         link.download = "generated-output.midi";
-
-        // Trigger the download automatically
-        document.body.appendChild(link); // Append the link to the DOM (optional)
-        link.click(); // Programmatically trigger a click event
-        document.body.removeChild(link); // Clean up the DOM
-        URL.revokeObjectURL(url); // Revoke the blob URL
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
 
 
 
