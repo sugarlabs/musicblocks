@@ -21,6 +21,9 @@
  * Class representing the SaveInterface.
  * @class
  */
+requirejs(["tonejsMidi"]);
+
+
 class SaveInterface {
     /**
      * Creates an instance of SaveInterface.
@@ -48,7 +51,7 @@ class SaveInterface {
          * @member {number}
          */
         this.timeLastSaved = -100;
-        
+
         /**
          * HTML template for saving projects.
          * @member {string}
@@ -264,6 +267,72 @@ class SaveInterface {
         }, 500);
     }
 
+    saveMIDI(activity) {
+
+        const data = this.activity.logo.notation.notationStaging;
+        console.log(data);
+
+        // Define mappings for clefs, instruments, or other properties
+        const CLEFS = ["treble", "bass", "percussion"];
+        const INSTRUMENTS = ["piano", "violin", "drums"]; // Example instrument mapping
+
+        // Function to calculate note duration from inverted duration
+        const parseDuration = (invertedDuration, ticksPerQuarter = 480) => {
+            return ticksPerQuarter / invertedDuration; // Convert to ticks
+        };
+
+        // Function to generate a MIDI file
+        const generateMidi = (data) => {
+            const midi = new Midi();
+            const ticksPerQuarter = 480;
+
+            // Process each block (like `notationStaging`)
+            Object.keys(data).forEach((block, index) => {
+                const track = midi.addTrack();
+                track.name = `Track ${index + 1}`;
+
+                // Process notes in each block
+                data[block].forEach((noteData) => {
+                    const noteName = noteData[0][0]; // Extract note (e.g., "F4")
+                    const durationInverted = noteData[1];
+                    const durationTicks = parseDuration(durationInverted, ticksPerQuarter);
+                    const startTime = 0; // Example; adjust based on timing data
+
+                    // Add note to the track
+                    track.addNote({
+                        name: noteName,
+                        time: startTime / ticksPerQuarter,
+                        duration: durationTicks / ticksPerQuarter,
+                        velocity: 0.8 // Example velocity
+                    });
+                });
+            });
+
+            // Return MIDI data as binary
+            return midi.toArray();
+        };
+
+        // Create a download link
+        // Generate and download MIDI file
+        const midiData = generateMidi(data); // Replace with your MIDI generation function
+        const blob = new Blob([midiData], { type: "audio/midi" });
+        const url = URL.createObjectURL(blob);
+
+        // Create a download link
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "generated-output.midi";
+
+        // Trigger the download automatically
+        document.body.appendChild(link); // Append the link to the DOM (optional)
+        link.click(); // Programmatically trigger a click event
+        document.body.removeChild(link); // Clean up the DOM
+        URL.revokeObjectURL(url); // Revoke the blob URL
+
+
+
+    }
+
     /**
      * This method is to save SVG representation of an activity
      * 
@@ -306,12 +375,12 @@ class SaveInterface {
      * @returns {void}
      * @method
      * @instance
-     */   
+     */
     saveBlockArtwork(activity) {
         const svg = "data:image/svg+xml;utf8," + activity.printBlockSVG();
         activity.save.download("svg", svg, null);
     }
-   
+
     /**
      * This method is to save BlockArtwork and download the PNG representation of block artwork from the provided activity.
      * 
@@ -319,10 +388,10 @@ class SaveInterface {
      * @returns {void}
      * @method
      * @instance
-     */ 
+     */
     saveBlockArtworkPNG(activity) {
         activity.printBlockPNG().then((pngDataUrl) => {
-        activity.save.download("png", pngDataUrl, null);
+            activity.save.download("png", pngDataUrl, null);
         })
     }
 
@@ -587,7 +656,7 @@ class SaveInterface {
             tmp.remove();
             this.activity.textMsg(
                 _("The Lilypond code is copied to clipboard. You can paste it here: ") +
-                    "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a> "
+                "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a> "
             );
         }
         this.download("ly", "data:text;utf8," + encodeURIComponent(lydata), filename);
