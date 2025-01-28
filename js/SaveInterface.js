@@ -272,16 +272,13 @@ class SaveInterface {
         const data = this.activity.logo.notation.notationStaging;
         console.log(data);
 
-        // Define mappings for clefs, instruments, or other properties
-        const CLEFS = ["treble", "bass", "percussion"];
-        const INSTRUMENTS = ["piano", "violin", "drums"]; // Example instrument mapping
+        //Define mapping for instruments.
 
         // Function to calculate note duration from inverted duration
         const parseDuration = (invertedDuration, ticksPerQuarter = 480) => {
-            return ticksPerQuarter / invertedDuration; // Convert to ticks
+            return ticksPerQuarter / invertedDuration;
         };
 
-        // Function to generate a MIDI file
         const generateMidi = (data) => {
             const midi = new Midi();
             const ticksPerQuarter = 480;
@@ -291,30 +288,27 @@ class SaveInterface {
                 const track = midi.addTrack();
                 track.name = `Track ${index + 1}`;
 
-                // Process notes in each block
                 data[block].forEach((noteData) => {
-                    const noteName = noteData[0][0]; // Extract note (e.g., "F4")
+                    const noteName = noteData[0][0];
                     const durationInverted = noteData[1];
                     const durationTicks = parseDuration(durationInverted, ticksPerQuarter);
-                    const startTime = 0; // Example; adjust based on timing data
+                    const startTime = 0;
 
-                    // Add note to the track
                     track.addNote({
                         name: noteName,
                         time: startTime / ticksPerQuarter,
                         duration: durationTicks / ticksPerQuarter,
-                        velocity: 0.8 // Example velocity
+                        velocity: 0.8
                     });
                 });
             });
 
-            // Return MIDI data as binary
             return midi.toArray();
         };
 
         
         // Generate and download MIDI file
-        const midiData = generateMidi(data); // Replace with your MIDI generation function
+        const midiData = generateMidi(data);
         const blob = new Blob([midiData], { type: "audio/midi" });
         const url = URL.createObjectURL(blob);
 
@@ -326,9 +320,6 @@ class SaveInterface {
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
-
-
-
     }
 
     /**
