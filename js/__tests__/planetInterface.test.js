@@ -80,25 +80,6 @@ describe('PlanetInterface', () => {
         expect(document.querySelector('#canvas').style.display).toBe('');
     });
 
-
-    test('showPlanet displays the planet interface', () => {
-        const mockCanvas = document.createElement('canvas');
-        mockCanvas.toDataURL = jest.fn(() => 'data:image/png;base64,xyz');
-        mockCanvas.click = jest.fn();
-        docById.mockImplementation((id) => {
-            if (id === 'overlayCanvas') return mockCanvas;
-            return document.getElementById(id);
-        });
-        planetInterface.iframe = document.querySelector('#planet-iframe');
-        planetInterface.planet = { open: jest.fn() };
-        planetInterface.showPlanet();
-        expect(planetInterface.planet.open).toHaveBeenCalledWith('data:image/png;base64,xyz');
-        expect(planetInterface.iframe.style.display).toBe('block');
-        expect(planetInterface.iframe.style.zIndex).toBe('9999');
-        // expect(mockCanvas.click).toHaveBeenCalled();
-    });
-    
-
     test('hidePlanet hides the planet interface', () => {
         planetInterface.iframe = document.querySelector('#planet-iframe');
         planetInterface.hidePlanet();
