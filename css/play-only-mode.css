@@ -1,0 +1,36 @@
+.play-only #palette {
+    display: none !important; 
+    visibility: hidden !important; 
+    height: 0 !important; 
+    width: 0 !important; 
+    pointer-events: none !important; 
+    overflow: hidden !important;
+}   
+
+.play-only #Grid {
+    display: none !important; 
+    visibility: hidden !important; 
+    height: 0 !important; 
+    width: 0 !important; 
+    pointer-events: none !important; 
+    overflow: hidden !important; 
+}
+
+.play-only #Clear {
+    display: none !important; 
+    visibility: hidden !important; 
+    height: 0 !important; 
+    width: 0 !important; 
+    pointer-events: none !important; 
+    overflow: hidden !important; 
+}
+
+.play-only #Collapse {
+    display: none !important; 
+    visibility: hidden !important; 
+    height: 0 !important; 
+    width: 0 !important; 
+    pointer-events: none !important; 
+    overflow: hidden !important;
+}
+

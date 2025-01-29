@@ -973,6 +973,21 @@
           </script>
         </div>
         </div>
+        <script>
+            function togglePlayOnlyMode() {
+                const isSmallScreen =
+                    window.innerWidth < 768 || window.innerHeight < 600;
+                const body = document.body;
+                if (isSmallScreen) {
+                    body.classList.add("play-only");
+                } else {
+                    body.classList.remove("play-only");
+                }
+            }
+            togglePlayOnlyMode();
+            window.addEventListener("resize", togglePlayOnlyMode);
+        </script>
+        
         <div id="searchBar" tabindex="-1">
             <input
                 type="text"
