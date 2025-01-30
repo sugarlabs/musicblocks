@@ -1957,8 +1957,10 @@ class Singer {
                             if (
                                 activity.logo.runningLilypond ||
                                 activity.logo.runningMxml ||
-                                activity.logo.runningAbc
+                                activity.logo.runningAbc ||
+                                activity.logo.runningMIDI
                             ) {
+                                activity.logo.notationMIDI(chordNotes, d, turtle);
                                 activity.logo.updateNotation(chordNotes, d, turtle, -1, chordDrums);
                             }
                         }

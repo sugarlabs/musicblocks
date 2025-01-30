@@ -269,57 +269,179 @@ class SaveInterface {
 
     saveMIDI(activity) {
 
-        const data = this.activity.logo.notation.notationStaging;
-        console.log(data);
-
-        //Define mapping for instruments.
-
-        // Function to calculate note duration from inverted duration
-        const parseDuration = (invertedDuration, ticksPerQuarter = 480) => {
-            return ticksPerQuarter / invertedDuration;
+        const data = {
+            "0": [
+                [
+                    [
+                        "C4"
+                    ],
+                    4,
+                    0,
+                    null,
+                    null,
+                    -1,
+                    false
+                ],
+                [
+                    [
+                        "E4"
+                    ],
+                    8,
+                    0,
+                    null,
+                    null,
+                    -1,
+                    false
+                ]
+            ],
+            "1": [
+                [
+                    [
+                        "G4"
+                    ],
+                    4,
+                    0,
+                    null,
+                    null,
+                    -1,
+                    false
+                ],
+                [
+                    [
+                        "B4"
+                    ],
+                    8,
+                    0,
+                    null,
+                    null,
+                    -1,
+                    false
+                ]
+            ],
+            "2": [
+                [
+                    [
+                        "D4"
+                    ],
+                    2,
+                    0,
+                    null,
+                    null,
+                    -1,
+                    false
+                ]
+            ],
+            "3": [
+                [
+                    [
+                        "F4"
+                    ],
+                    4,
+                    0,
+                    null,
+                    null,
+                    -1,
+                    false
+                ],
+                [
+                    [
+                        "A4"
+                    ],
+                    8,
+                    0,
+                    null,
+                    null,
+                    -1,
+                    false
+                ]
+            ],
+            "4": [
+                [
+                    [
+                        "C5"
+                    ],
+                    4,
+                    0,
+                    null,
+                    null,
+                    -1,
+                    false
+                ]
+            ]
         };
+        // Suppress music and turtle output when generating
+        // Lilypond output.
+        activity.logo.runningMIDI = true;
+        activity.logo.notationOutput = "DK";
+        activity.logo.notationNotes = {};
+        for (let t = 0; t < activity.turtles.turtleList.length; t++) {
+            activity.logo.notation.notationStaging[t] = [];
+            activity.logo.notation.notationDrumStaging[t] = [];
+            activity.turtles.turtleList[t].painter.doClear(true, true, true);
+        }
+        activity.logo.runLogoCommands();
 
-        const generateMidi = (data) => {
-            const midi = new Midi();
-            const ticksPerQuarter = 480;
+        console.log("List ->",activity.logo._midiData);
 
-            // Process each block (like `notationStaging`)
-            Object.keys(data).forEach((block, index) => {
-                const track = midi.addTrack();
-                track.name = `Track ${index + 1}`;
+        // //Define mapping for instruments.
 
-                data[block].forEach((noteData) => {
-                    const noteName = noteData[0][0];
-                    const durationInverted = noteData[1];
-                    const durationTicks = parseDuration(durationInverted, ticksPerQuarter);
-                    const startTime = 0;
+        // // Function to calculate note duration from inverted duration
+        // const parseDuration = (invertedDuration, ticksPerQuarter = 480) => {
+        //     return ticksPerQuarter / invertedDuration;
+        // };
 
-                    track.addNote({
-                        name: noteName,
-                        time: startTime / ticksPerQuarter,
-                        duration: durationTicks / ticksPerQuarter,
-                        velocity: 0.8
-                    });
-                });
-            });
+        // const generateMidi = (data) => {
+        //     const tempo = 120; // Beats per minute
+        //     const secondsPerBeat = 60 / tempo;
 
-            return midi.toArray();
-        };
+        //     const midi = new Midi();
+        //     const track = midi.addTrack();
+
+        //     Object.entries(data).forEach(([blockIndex, notes]) => {
+        //         const startTime = blockIndex * secondsPerBeat;
+
+        //         notes.forEach(noteData => {
+        //             const [noteArray, noteValueInverted] = noteData;
+        //             const pitch = noteArray[0];
+        //             const duration = 1 / noteValueInverted;
+
+        //             // Add the note to the MIDI track
+        //             track.addNote({
+        //                 name: pitch,
+        //                 time: startTime, // Start time in seconds
+        //                 duration: duration, // Duration in beats
+        //                 velocity: 0.8 // Optional: Velocity (volume of the note)
+        //             });
+        //         });
+        //     });
+
+        //     // Download the MIDI file
+        //     const midiData = midi.toArray();
+        //     const blob = new Blob([midiData], { type: "audio/midi" });
+        //     const url = URL.createObjectURL(blob);
+
+        //     const link = document.createElement("a");
+        //     link.href = url;
+        //     link.download = "generated-output.midi";
+        //     link.click();
+        //     URL.revokeObjectURL(url);
+
+        // };
+
+
+        // // Generate and download MIDI file
+        // const midiData = generateMidi(data);
+        // const blob = new Blob([midiData], { type: "audio/midi" });
+        // const url = URL.createObjectURL(blob);
 
         
-        // Generate and download MIDI file
-        const midiData = generateMidi(data);
-        const blob = new Blob([midiData], { type: "audio/midi" });
-        const url = URL.createObjectURL(blob);
-
-        
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = "generated-output.midi";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        // const link = document.createElement("a");
+        // link.href = url;
+        // link.download = "generated-output.midi";
+        // document.body.appendChild(link);
+        // link.click();
+        // document.body.removeChild(link);
+        // URL.revokeObjectURL(url);
     }
 
     /**
