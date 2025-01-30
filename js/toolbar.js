@@ -463,7 +463,12 @@ class Toolbar {
         const darkModeIcon = docById("darkModeIcon");
 
         darkModeIcon.onclick = () => {
-            onclick();
+            this.activity.textMsg(`<div id="theme-link" onmouseover="this.style.opacity=0.5" onmouseout="this.style.opacity=1"> ${_("Refresh your browser to change your theme.")} </div>`);
+              
+            const themeLink = docById("theme-link");
+            themeLink.addEventListener( "click", () => {
+                onclick();
+            })
         }
     }
 
