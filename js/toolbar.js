@@ -468,7 +468,7 @@ class Toolbar {
         const MSGSuffix = "</div>"; 
 
         darkModeIcon.onclick = () => {
-            this.activity.textMsg(_(MSGPrefix + "Refresh your browser to change your theme." + MSGSuffix));
+            this.activity.textMsg(MSGPrefix + _("Refresh your browser to change your theme.") + MSGSuffix);
 
             const themeLink = docById("theme-link");
             themeLink.addEventListener( "click", () => {
