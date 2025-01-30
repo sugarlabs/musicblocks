@@ -502,3 +502,6 @@ class Notation {
         this._pickupPoint[turtle] = null;
     }
 }
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Notation;
+}
