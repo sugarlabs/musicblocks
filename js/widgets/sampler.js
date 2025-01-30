@@ -453,6 +453,51 @@ function SampleWidget() {
             _("Playback"),
             "");
 
+        this._promptBtn= widgetWindow.addButton(
+            "prompt.svg",
+            ICONSIZE,
+            _("Prompt"),
+            "");
+
+        this._promptBtn.onclick = () => {
+            this.widgetWindow.clear();
+            let width, height;
+            if (!this.widgetWindow.isMaximized()) {
+                width = SAMPLEWIDTH;
+                height = SAMPLEHEIGHT;
+            } else {
+                width = this.widgetWindow.getWidgetBody().getBoundingClientRect().width;
+                height = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 70;
+            }
+
+            const container = document.createElement("div");
+            this.widgetWindow.getWidgetBody().appendChild(container);
+            
+            container.style.height = height + "px";
+            container.style.width = width + "px";
+            container.style.display = "flex";
+            container.style.flexDirection = "column";
+            container.style.alignItems = "center";
+            container.style.justifyContent = "center";
+            container.style.gap = "10px";
+
+            const textArea = document.createElement("textarea");
+            textArea.style.height = 200 + "px";
+            textArea.style.width = 500 + "px";
+            textArea.style.fontSize = 30 + "px";
+            textArea.style.resize = "none";
+            textArea.placeholder = "Enter text here";
+
+            const button = document.createElement("button");
+            button.style.height = 40 + "px";
+            button.style.width = 80 + "px";
+            button.style.cursor = "pointer";
+            button.innerHTML = "Submit";
+
+            container.appendChild(textArea);
+            container.appendChild(button);
+        }
+
         this._playbackBtn.id="playbackBtn";
         this._playbackBtn.classList.add("disabled");
         
