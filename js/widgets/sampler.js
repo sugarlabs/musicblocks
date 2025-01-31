@@ -471,6 +471,7 @@ function SampleWidget() {
             }
 
             const container = document.createElement("div");
+            container.id = "samplerPrompt";
             this.widgetWindow.getWidgetBody().appendChild(container);
             
             container.style.height = height + "px";
