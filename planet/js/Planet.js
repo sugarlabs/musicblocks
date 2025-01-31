@@ -153,19 +153,8 @@ class Planet {
 
 // trigger and sync the dark mode of the planet with the main page
 document.addEventListener("DOMContentLoaded", function () {
-    const toggleButton = document.getElementById("toggle-dark-mode");
-
     if (localStorage.getItem("darkMode") === "enabled") {
         document.body.classList.add("dark-mode");
-    }
-    if (toggleButton) {
-        toggleButton.addEventListener("click", function () {
-            document.body.classList.toggle("dark-mode");
-            const newMode = document.body.classList.contains("dark-mode") ? "enabled" : "disabled";
-
-            localStorage.setItem("darkMode", newMode);
-            localStorage.setItem("darkModeTrigger", Date.now());
-        });
     }
     window.addEventListener("storage", function (event) {
         if (event.key === "darkMode" || event.key === "darkModeTrigger") {
