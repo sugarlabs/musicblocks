@@ -299,17 +299,6 @@ class Logo {
         return this._notation;
     }
 
-    set midiData(midiData) {
-        if (typeof midiData !== "object" || midiData === null) {
-            throw new TypeError("midiData must be an object.");
-        }
-        this._midiData = midiData;
-    }
-
-    get midiData() {
-        return this._midiData;
-    }
-
     // ========= Utilities ========================================================================
 
     /**
