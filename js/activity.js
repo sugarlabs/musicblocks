@@ -6677,10 +6677,18 @@ class Activity {
             // Function to toggle theme mode
             this.toggleThemeMode = () => {
                 if (this.storage.myThemeName === "darkMode") {
-                    // If currently in dark mode, remove the theme
                     delete this.storage.myThemeName;
+                    localStorage.setItem("darkMode", "disabled");
                 } else {
                     this.storage.myThemeName = "darkMode";
+                    localStorage.setItem("darkMode", "enabled");
+                }
+                const planetIframe = document.getElementById("planet-iframe");
+                if (planetIframe) {
+                    planetIframe.contentWindow.postMessage(
+                        { darkMode: localStorage.getItem("darkMode") },
+                        "*"
+                    );
                 }
                 try {
                     window.location.reload();
