@@ -268,7 +268,6 @@ class SaveInterface {
     }
 
     saveMIDI(activity) {
-
         // Suppress music and turtle output when generating
         activity.logo.runningMIDI = true;
         activity.logo.runLogoCommands();
@@ -277,8 +276,6 @@ class SaveInterface {
 
         // Function to calculate note duration in beats from inverted duration;
         const generateMidi = (data) => {
-            const tempo = 120;
-            const secondsPerBeat = 60 / tempo;
 
             const normalizeNote = (note) => {
                 return note.replace("♯", "#").replace("♭", "b");
@@ -295,7 +292,7 @@ class SaveInterface {
                 notes.forEach((noteData) => {
                     if (!noteData.note || noteData.note.length === 0) return;
 
-                    const duration = 1 / noteData.duration;
+                    const duration = ((1 / noteData.duration) * 60 * 4) / (noteData.bpm);
 
                     noteData.note.forEach((pitch) => {
                         if (pitch.includes("R")) {
@@ -318,17 +315,13 @@ class SaveInterface {
             const midiData = midi.toArray();
             const blob = new Blob([midiData], { type: "audio/midi" });
             const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = "generated-output.mid";
-            link.click();
-            URL.revokeObjectURL(url);
+            activity.save.download("midi", url, null);
         };
         const data = activity.logo._midiData;
         setTimeout(() => {
             generateMidi(data);
             activity.logo._midiData = {};
-        },2000);
+        },500);
     }
 
     /**
