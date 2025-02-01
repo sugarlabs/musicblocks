@@ -1,64 +1,71 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>
-        Music Blocks
-    </title>
-
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
     <meta name="description"
         content="Learn to code through music with Music Blocks. Arrange colorful blocks to create everything from simple melodies to interactive games.">
-    <meta name="viewport"
-        content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#2196F3">
+    <title>Music Blocks</title>
 
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-    <!-- <link href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap" rel="stylesheet"> -->
+    <!-- Icons & PWA -->
+    <link rel="icon" sizes="192x192" href="favicon.ico">
+    <link rel="apple-touch-icon" href="/activity/activity-icon-color-512.png">
+    <link rel="manifest" href="android_chrome_manifest.json">
 
-    <link rel="stylesheet" href="css/activities.css" />
-    <link rel="stylesheet" href="dist/css/style.css" />
-    <link rel="stylesheet" href="dist/css/keyboard.css" />
-    <link rel="stylesheet" href="dist/css/windows.css" />
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="fonts/material-icons.css">
+    <link rel="stylesheet" href="css/activities.css">
+    <link rel="stylesheet" href="dist/css/style.css">
+    <link rel="stylesheet" href="dist/css/keyboard.css">
+    <link rel="stylesheet" href="dist/css/windows.css">
+    <link rel="stylesheet" href="lib/materialize-iso.css">
+    <link rel="stylesheet" href="css/darkmode.css">
 
-    <noscript>
-        JavaScript is required to view this page.
-    </noscript>
+    <!-- Localization -->
+    <link rel="prefetch" type="application/l10n" href="./localization.ini">
 
-    <!-- <script src="js/utils/detectIE.js"></script> -->
+    <noscript>JavaScript is required to view this page.</noscript>
 
-    <!-- <script src="sounds/samples/manifest.js"></script> -->
+    <!-- Critical JavaScript (Inline) -->
+    <script>
+        let canvas, stage, lang;
+        function init() {
+            canvas = document.getElementById("canvas");
+            stage = new createjs.Stage(canvas);
+            stage.update();
+        }
 
-    <!-- <script src="lib/mespeak.js"></script> -->
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/sw.js").then(reg => {
+                console.debug("[PWA Builder] Service worker registered for scope:", reg.scope);
+            });
+        }
 
+        document.addEventListener("DOMContentLoaded", () => {
+            doSearch();
+        });
+    </script>
+
+    <!-- JavaScript Libraries (Deferred) -->
     <script src="lib/reqwest.js" defer></script>
-
-    <!-- <script src="lib/jquery-3.7.1.js"></script> -->
-    <script src="lib/jquery-2.1.4.min.js"></script>
-
+    <script src="lib/jquery-2.1.4.min.js" defer></script>
     <script src="lib/jquery-ui.js" defer></script>
-
     <script src="lib/materialize.min.js" defer></script>
-
     <script src="lib/webL10n.js" defer></script>
-
     <script src="lib/Tone.js" defer></script>
-
     <script src="lib/midi.js" defer></script>
-
     <script src="lib/jquery.ruler.js" defer></script>
-
     <script src="lib/modernizr-2.6.2.min.js" defer></script>
-
     <script src="lib/raphael.min.js" defer></script>
-
     <script src="lib/wheelnav.js" defer></script>
-
     <script src="lib/abc.min.js" defer></script>
-
     <script src="lib/codejar/codejar.min.js" defer></script>
-
     <script src="lib/codejar/highlight.pack.js" defer></script>
-
     <script src="lib/astring.min.js" defer></script>
 
     <link rel="prefetch" type="application/l10n" href="./localization.ini" />
@@ -77,47 +84,9 @@
         <link rel="stylesheet" href="css/themes.css" />
 
     <script src="lib/easeljs.min.js" defer></script>
-
     <script src="lib/tweenjs.min.js" defer></script>
+    <script data-main="js/loader" src="lib/require.js" defer></script>
 
-    <!-- <script src="js/widgets/musickeyboard.js"></script> -->
-
-    <!-- <script src="lib/movieclip-0.7.1.min.js"></script> -->
-
-    <script>
-        let canvas, stage, lang;
-        function init() {
-            canvas = document.getElementById("canvas");
-            stage = new createjs.Stage(canvas);
-            stage.update();
-            // createjs.Ticker.addEventListener("tick", stage);
-        }
-    </script>
-
-    <script>
-        if ("serviceWorker" in navigator) {
-            if (navigator.serviceWorker.controller) {
-                console.debug(
-                    "[PWA Builder] active service worker found, no need to register"
-                );
-            } else {
-                // Register the service worker
-                navigator.serviceWorker
-                    .register("/sw.js")
-                    .then(function (reg) {
-                        console.debug(
-                            "[PWA Builder] Service worker has been registered for scope: " +
-                            reg.scope
-                        );
-                    });
-            }
-        }
-    </script>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            doSearch();
-        });
-    </script>
 </head>
 
 <!-- #96D3F3-->
