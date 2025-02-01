@@ -270,51 +270,49 @@ class SaveInterface {
     saveMIDI(activity) {
 
         // Suppress music and turtle output when generating
-        // Lilypond output.
         activity.logo.runningMIDI = true;
-        activity.logo.notationOutput = "DK";
-        activity.logo.notationNotes = {};
-        for (let t = 0; t < activity.turtles.turtleList.length; t++) {
-            activity.logo.notation.notationStaging[t] = [];
-            activity.logo.notation.notationDrumStaging[t] = [];
-            activity.turtles.turtleList[t].painter.doClear(true, true, true);
-        }
         activity.logo.runLogoCommands();
 
         console.log("List ->",activity.logo._midiData);
 
-        // Function to calculate note duration in beats from inverted duration
-        const parseDuration = (invertedDuration) => 1 / invertedDuration;
+        // Function to calculate note duration in beats from inverted duration;
         const generateMidi = (data) => {
-            const tempo = 120; // Beats per minute
+            const tempo = 120;
             const secondsPerBeat = 60 / tempo;
+
+            const normalizeNote = (note) => {
+                return note.replace("♯", "#").replace("♭", "b");
+            };
 
             const midi = new Midi();
 
             Object.entries(data).forEach(([blockIndex, notes]) => {
                 const track = midi.addTrack();
-                track.name = `Track ${parseInt(blockIndex) + 1}`; // Ensure track naming is correct
+                track.name = `Track ${parseInt(blockIndex) + 1}`;
 
-                let currentTime = parseFloat(blockIndex) * secondsPerBeat; // Convert blockIndex to number safely
+                let currentTime = 0;
 
                 notes.forEach((noteData) => {
-                    if (!noteData.note || noteData.note.length === 0) return; // Safety check
+                    if (!noteData.note || noteData.note.length === 0) return;
 
-                    const duration = parseDuration(noteData.duration); // Convert to beats
+                    const duration = 1 / noteData.duration;
 
                     noteData.note.forEach((pitch) => {
+                        if (pitch.includes("R")) {
+                            currentTime += duration;
+                        } else {
                         track.addNote({
-                            name: pitch,
-                            time: currentTime, // Start time in seconds
-                            duration: duration, // Duration in beats
+                            name: normalizeNote(pitch),
+                            time: currentTime,
+                            duration: duration,
                             velocity: 0.8
                         });
+                        }
                     });
 
-                    currentTime += duration; // Accumulate time for next note
+                    currentTime += duration;
                 });
             });
-            activity.logo._midiData = {};
 
             // Generate MIDI file and trigger download
             const midiData = midi.toArray();
@@ -329,8 +327,8 @@ class SaveInterface {
         const data = activity.logo._midiData;
         setTimeout(() => {
             generateMidi(data);
+            activity.logo._midiData = {};
         },2000);
-
     }
 
     /**
