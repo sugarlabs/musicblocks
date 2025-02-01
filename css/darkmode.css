@@ -54,6 +54,15 @@
     color: #fff;
 }
 
+.dark-mode .modal-content {
+    background-color: #1c1c1c;
+    color: #fff;
+}
+
+.dark-mode #submitLilypond {
+    background-color: rgb(0, 102, 255);
+}
+
 .dark-mode #search, #helpfulSearch, .ui-autocomplete{
     background-color: #1c1c1c;
     color: #fff;
