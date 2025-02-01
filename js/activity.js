@@ -443,27 +443,18 @@ class Activity {
             const closeButtonDiv = document.createElement("div");
             closeButtonDiv.style.cssText =
                 "position: absolute;" +
-                "top: 10px;" +  // Adjust the top position to center it vertically
-                "right: 10px;" + // Position the button on the right side of the helpfulSearchDiv
+                "top: 10px;" +
+                "right: 10px;" +
                 "cursor: pointer;";
 
             // Create the cross button itself
             const closeButton = document.createElement("button");
-            closeButton.textContent = "×"; // You can use HTML entity or an icon
-            closeButton.style.cssText =
-            "position: absolute;" +
-                "top: 50%;" +  // Center vertically
-                "right: -30px;" +  // Place it outside the input, adjust as needed
-                "transform: translateY(-50%);" +  // Align with vertical center of input
-                "background: transparent;" +
-                "border: none;" +
-                "font-size: large;" +
-                "cursor: pointer;";
+            closeButton.textContent = "×";
+            closeButton.id = "crossButton";
+            document.body.appendChild(closeButton);
 
-            // Append the cross button to the closeButtonDiv
             closeButtonDiv.appendChild(closeButton);
 
-            // Append the closeButtonDiv to the helpfulSearchDiv
             this.helpfulSearchDiv.appendChild(closeButtonDiv);
 
             // Add event listener to remove the search div from the DOM

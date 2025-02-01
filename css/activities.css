@@ -16,6 +16,20 @@
   outline: none;
 }
 
+body:not(.dark-mode) #helpfulSearch,
+body:not(.dark-mode) .ui-autocomplete {
+    background-color: #fff !important;
+    color: #000 !important;
+}
+
+body:not(.dark-mode) .ui-autocomplete li:hover {
+    background-color: #ddd !important;
+}
+
+body:not(.dark-mode) #helpfulSearchDiv {
+    background-color: #f9f9f9 !important;
+}
+
 .modal {
   display: none;
   position: fixed;
@@ -92,7 +106,7 @@
   display: block !important;
   position: absolute;
   background-color: #f0f0f0;
-  padding: 5px;
+  padding: 2px;
   border: 1px solid #ccc;
   width: 230px;
   z-index: 1;
@@ -104,6 +118,17 @@
   width: 220px;
   height: 20px;
   font-size: large;
+}
+
+#crossButton {
+  position: absolute;
+  top: 50%;
+  right: -30px;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  font-size: large;
+  cursor: pointer;
 }
 
 .trash-view {
