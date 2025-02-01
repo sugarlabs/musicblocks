@@ -54,4 +54,19 @@
     color: #fff;
 }
 
+.dark-mode #search, #helpfulSearch, .ui-autocomplete{
+    background-color: #1c1c1c;
+    color: #fff;
+}
 
+.dark-mode .ui-autocomplete li:hover{
+    background-color: #225a91;
+}
+
+.dark-mode #helpfulSearchDiv{
+    background-color: transparent;
+}
+
+.dark-mode #crossButton{
+    color: #fff;
+}
