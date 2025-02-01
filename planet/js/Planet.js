@@ -150,3 +150,19 @@ class Planet {
     };
 
 }
+
+// trigger and sync the dark mode of the planet with the main page
+document.addEventListener("DOMContentLoaded", function () {
+    if (localStorage.getItem("darkMode") === "enabled") {
+        document.body.classList.add("dark-mode");
+    }
+    window.addEventListener("storage", function (event) {
+        if (event.key === "darkMode" || event.key === "darkModeTrigger") {
+            if (localStorage.getItem("darkMode") === "enabled") {
+                document.body.classList.add("dark-mode");
+            } else {
+                document.body.classList.remove("dark-mode");
+            }
+        }
+    });
+});

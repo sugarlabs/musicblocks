@@ -3111,7 +3111,9 @@ class Block {
         }
 
         // Always hide the trash when there is no block selected.
-        this.activity.trashcan.hide();
+        if (!moved) {
+            this.activity.trashcan.hide();
+        }
 
         if (this.blocks.longPressTimeout != null) {
             clearTimeout(this.blocks.longPressTimeout);
