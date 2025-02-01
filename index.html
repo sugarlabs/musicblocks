@@ -987,5 +987,20 @@
             <ul class="matches" id="searchResults"></ul>
         </div>
 
+        <!-- sidebar for learning lection -->
+        <div id="sidebar1"> 
+            <button id="teaching-tools-btn">Teaching Tools</button>
+        </div>
+        <script>
+            const teachingToolsBtn = document.getElementById('teaching-tools-btn');
+            const teachingToolsSection = document.getElementById('teaching-tools');
+            teachingToolsBtn.addEventListener('click', () => {
+                if (teachingToolsSection.style.display === 'none' || !teachingToolsSection.style.display) {
+                teachingToolsSection.style.display = 'block';
+            } else {
+                teachingToolsSection.style.display = 'none';
+            }
+        });
+        </script>
     </body>
 </html>
