@@ -185,7 +185,7 @@ When you **right-click on a block**, the following options are available:
 
 ![Duplicate](./duplicate.png "Duplicate")
 
-**Help**: The Help option displays a detailed help screen for the selected block. This screen provides valuable information about the block’s functionality, purpose, and usage instructions, making it easier for users to understand and effectively incorporate the block into their projects.
+**Help**: The Help option displays a detailed help screen for the selected block. This screen provides valuable information about the block’s functionality, purpose, and usage instructions, making it easier for users to understand and effectively incorporate the block into their projects. Additionally, the help screen allows you to insert blocks from the help examples directly into your program by clicking on the download icon (labeled "Load this block" in the image below).
 
 ![Help](./help.png "Help")
 
