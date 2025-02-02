@@ -107,10 +107,10 @@ if (themeName === "darkMode") {
         exitWheelcolors2: ["#757575", "#7986CB", "#4CAF50"],
         pitchWheelcolors: ["#388E3C", "#4CAF50", "#388E3C", "#008BA3", "#388E3C", "#4CAF50", "#66BB6A"],
         gridWheelcolors: {
-            wheel: ["#1C1C1C"],
+            wheel: ["#D6D6D6"], 
             selected: {
-                fill: "#303030",
-                stroke: "#757575"
+                fill: "#858585",  
+                stroke: "#777"    
             }
         },
         drumWheelcolors: ["#008BA3", "#00ACC1"],

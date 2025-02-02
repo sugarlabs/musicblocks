@@ -54,4 +54,46 @@
     color: #fff;
 }
 
+body.dark-mode #floatingWindows > .windowFrame {
+    background-color: #1C1C1C !important;  
+    border: 2px solid #444 !important;     
+    color: #FFFFFF !important;             
+}
 
+body.dark-mode #helpBodyDiv {
+    background: #1C1C1C !important; 
+    color: #FFFFFF !important;      
+    border: 1px solid #444 !important; /
+}
+
+body.dark-mode #helpDiv {
+    background: #2A2A2A !important;  
+    color: #FFFFFF !important;       
+    box-shadow: 0 1px 10px #0000008f !important;  
+    border-radius: 5px !important;   
+} 
+
+body.dark-mode #helpButtonsDiv {
+    background: #1C1C1C !important;  
+    color: #FFFFFF !important;       
+    border: 1px solid #444 !important; 
+    transition: background-color 0.3s ease-in-out !important; 
+}
+
+body.dark-mode #floatingWindows > .windowFrame {
+    background-color: #1A1A1A !important; 
+    border: 2px solid #555 !important;
+}
+
+body.dark-mode #helpBodyDiv,
+body.dark-mode #helpDiv {
+    background: #1E1E1E !important;
+    color: #FFFFFF !important;
+} 
+
+body.dark-mode #floatingWindows > .windowFrame, 
+body.dark-mode #helpDiv, 
+body.dark-mode #helpBodyDiv, 
+body.dark-mode #helpButtonsDiv {
+    transition: background-color 0.3s ease-in-out !important;
+} 
