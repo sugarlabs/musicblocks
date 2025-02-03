@@ -19,8 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* exported showButtonHighlight */
 
-const themeName = localStorage.myThemeName || undefined;
-
+const themePreference = localStorage.themePreference || undefined;
 
 window.platform = {
     android: /Android/i.test(navigator.userAgent),
@@ -32,15 +31,15 @@ window.platform = {
 platform.androidWebkit = platform.android && !platform.FF;
 platform.FFOS = platform.FF && (platform.mobile || platform.tablet) && !platform.android;
 
-if (themeName === "darkMode") {
-    window.platformColor = {
-        textColor : "#E2E2E2",
+let platformThemes = {
+    dark: {
+        textColor: "#E2E2E2",
         blockText: "#E2E2E2",
-        dialogueBox:"#1C1C1C",
+        dialogueBox: "#1C1C1C",
         strokeColor: "#E2E2E2",
         fillColor: "#F9F9F9",
         blueButton: "#0066FF",
-        hoverColor:  "#808080",
+        hoverColor: "#808080",
         paletteColors: {
             widgets: ["#2E7D32", "#1B5E20", "#388E3C", "#81C784"],
             pitch: ["#2E7D32", "#1B5E20", "#388E3C", "#81C784"],
@@ -105,7 +104,15 @@ if (themeName === "darkMode") {
         piemenuBasic: ["#00ACC1", "#4CAF50", "#008BA3", "#4CAF50", "#008BA3"],
         exitWheelcolors: ["#757575", "#BDBDBD"],
         exitWheelcolors2: ["#757575", "#7986CB", "#4CAF50"],
-        pitchWheelcolors: ["#388E3C", "#4CAF50", "#388E3C", "#008BA3", "#388E3C", "#4CAF50", "#66BB6A"],
+        pitchWheelcolors: [
+            "#388E3C",
+            "#4CAF50",
+            "#388E3C",
+            "#008BA3",
+            "#388E3C",
+            "#4CAF50",
+            "#66BB6A"
+        ],
         gridWheelcolors: {
             wheel: ["#1C1C1C"],
             selected: {
@@ -175,16 +182,15 @@ if (themeName === "darkMode") {
         modePieMenusIfColorPush: "#66BB6A",
         modePieMenusElseColorPush: "#81C784",
         wheelcolors: ["#757575", "#9E9E9E", "#757575", "#9E9E9E", "#616161"]
-    };
-} else {
-    window.platformColor = {
-        textColor : "black",
+    },
+    light: {
+        textColor: "black",
         blockText: "#282828",
-        dialogueBox:"#fff",
+        dialogueBox: "#fff",
         strokeColor: "#E2E2E2",
         fillColor: "#F9F9F9",
         blueButton: "#0066FF",
-        hoverColor:  "#E0E0E0",
+        hoverColor: "#E0E0E0",
         paletteColors: {
             widgets: ["#7CD622", "#57AD02", "#77C428", "#B4EB7D"],
             pitch: ["#7CD622", "#57AD02", "#77C428", "#B4EB7D"],
@@ -247,13 +253,21 @@ if (themeName === "darkMode") {
         pitchLabelBackground: "#77C428",
         graphicsLabelBackground: "#728FF9",
         rhythmcellcolor: "#c8c8c8",
-        stopIconcolor : "#ea174c",
+        stopIconcolor: "#ea174c",
         hitAreaGraphicsBeginFill: "#FFF",
         orange: "#e37a00", // 5YR
         piemenuBasic: ["#3ea4a3", "#60bfbc", "#1d8989", "#60bfbc", "#1d8989"],
         exitWheelcolors: ["#808080", "#c0c0c0"],
         exitWheelcolors2: ["#808080", "#92a9ff", "#80a080"],
-        pitchWheelcolors: ["#77c428", "#93e042", "#77c428", "#5ba900", "#77c428", "#93e042", "#adfd55"],
+        pitchWheelcolors: [
+            "#77c428",
+            "#93e042",
+            "#77c428",
+            "#5ba900",
+            "#77c428",
+            "#93e042",
+            "#adfd55"
+        ],
         gridWheelcolors: {
             wheel: ["#ffffff"],
             selected: {
@@ -323,7 +337,163 @@ if (themeName === "darkMode") {
         modePieMenusIfColorPush: "#4b8b0e",
         modePieMenusElseColorPush: "#66a62d",
         wheelcolors: ["#808080", "#909090", "#808080", "#909090", "#707070"]
-    };
+    },
+    pastel: {
+        textColor: "black",
+        blockText: "#282828",
+        dialogueBox: "#fff",
+        strokeColor: "#E2E2E2",
+        fillColor: "#F9F9F9",
+        blueButton: "#FF8FA8",
+        hoverColor: "#E0E0E0",
+        paletteColors: {
+            widgets: ["#FFB3C6", "#FF8FA8", "#FFC0CB", "#FFD9E2"],
+            pitch: ["#FFB3C6", "#FF8FA8", "#FFC0CB", "#FFD9E2"],
+            rhythm: ["#99EDED", "#6BD9D9", "#B2F0EA", "#D6F7F7"],
+            meter: ["#99EDED", "#6BD9D9", "#B2F0EA", "#D6F7F7"],
+            tone: ["#99EDED", "#6BD9D9", "#B2F0EA", "#D6F7F7"],
+            ornament: ["#99EDED", "#6BD9D9", "#B2F0EA", "#D6F7F7"],
+            intervals: ["#FFB3C6", "#FF8FA8", "#FFC0CB", "#FFD9E2"],
+            volume: ["#99EDED", "#6BD9D9", "#B2F0EA", "#D6F7F7"],
+            drum: ["#99EDED", "#6BD9D9", "#B2F0EA", "#D6F7F7"],
+            graphics: ["#FFB3C6", "#FF8FA8", "#FFC0CB", "#FFD9E2"],
+            turtle: ["#FFB3C6", "#FF8FA8", "#FFC0CB", "#FFD9E2"],
+            pen: ["#FFB3C6", "#FF8FA8", "#FFC0CB", "#FFD9E2"],
+            boxes: ["#FFB3C6", "#FF8FA8", "#FFC0CB", "#FFD9E2"],
+            action: ["#FFB3C6", "#FF8FA8", "#FFC0CB", "#FFD9E2"],
+            media: ["#99EDED", "#6BD9D9", "#B2F0EA", "#D6F7F7"],
+            number: ["#FFB3C6", "#FF8FA8", "#FFC0CB", "#FFD9E2"],
+            boolean: ["#99EDED", "#6BD9D9", "#B2F0EA", "#D6F7F7"],
+            flow: ["#FFB3C6", "#FF8FA8", "#FFC0CB", "#FFD9E2"],
+            sensors: ["#99EDED", "#6BD9D9", "#B2F0EA", "#D6F7F7"],
+            extras: ["#C4C4C4", "#A0A0A0", "#B0B0B0", "#D0D0D0"],
+            program: ["#C4C4C4", "#A0A0A0", "#B0B0B0", "#D0D0D0"],
+            myblocks: ["#FFB3C6", "#FF8FA8", "#FFC0CB", "#FFD9E2"],
+            heap: ["#FFB3C6", "#FF8FA8", "#FFC0CB", "#FFD9E2"],
+            dictionary: ["#FFB3C6", "#FF8FA8", "#FFC0CB", "#FFD9E2"],
+            ensemble: ["#FFB3C6", "#FF8FA8", "#FFC0CB", "#FFD9E2"]
+        },
+        disconnected: "#C4C4C4",
+        header: "#FFB3C6",
+        aux: "#6BD9D9",
+        sub: "#D6F7F7",
+        doHeaderShadow: !platform.FF,
+        rule: "#E2E2E2",
+        ruleColor: "#E2E2E2",
+        trashColor: "#C0C0C0",
+        trashBorder: "#808080",
+        trashActive: "#FF0000",
+        background: "#F9F9F9",
+        paletteSelected: "#F3F3F3",
+        paletteBackground: "#FFFFFF",
+        paletteLabelBackground: "#6BD9D9",
+        paletteLabelSelected: "#FF8FA8",
+        paletteText: "#666666",
+        rulerHighlight: "#FF8FA8",
+        selectorBackground: "#6BD9D9",
+        selectorSelected: "#FF8FA8",
+        labelColor: "#a0a0a0",
+        lyricsLabelBackground: "#FF8FA8",
+        lyricsInputBackground: "#FFC0CB",
+        tupletBackground: "#c0c0c0",
+        drumBackground: "#99EDED",
+        pitchBackground: "#FFB3C6",
+        graphicsBackground: "#FFB3C6",
+        drumLabelBackground: "#6BD9D9",
+        pitchLabelBackground: "#FF8FA8",
+        graphicsLabelBackground: "#FF8FA8",
+        rhythmcellcolor: "#c8c8c8",
+        stopIconcolor: "#ea174c",
+        hitAreaGraphicsBeginFill: "#FFF",
+        orange: "#e37a00",
+        piemenuBasic: ["#FFB3C6", "#FF8FA8", "#FFC0CB", "#D6F7F7", "#6BD9D9"],
+        exitWheelcolors: ["#808080", "#c0c0c0"],
+        exitWheelcolors2: ["#808080", "#FFB3C6", "#80a080"],
+        pitchWheelcolors: [
+            "#FFB3C6",
+            "#FF8FA8",
+            "#FFC0CB",
+            "#FFD9E2",
+            "#FFB3C6",
+            "#FF8FA8",
+            "#FFC0CB"
+        ],
+        gridWheelcolors: {
+            wheel: ["#ffffff"],
+            selected: { fill: "#dedede", stroke: "#a3a3a3" }
+        },
+        drumWheelcolors: ["#6BD9D9", "#99EDED"],
+        graphicWheelcolors: ["#FFB3C6", "#FF8FA8"],
+        accidentalsWheelcolors: ["#FFB3C6", "#FF8FA8", "#FFB3C6", "#FFC0CB", "#FFB3C6"],
+        accidentalsWheelcolorspush: "#c0c0c0",
+        octavesWheelcolors: [
+            "#FFB3C6",
+            "#FF8FA8",
+            "#FFC0CB",
+            "#FFD9E2",
+            "#FFB3C6",
+            "#FF8FA8",
+            "#FFC0CB",
+            "#FFD9E2",
+            "#c0c0c0",
+            "#c0c0c0",
+            "#c0c0c0",
+            "#c0c0c0",
+            "#c0c0c0",
+            "#c0c0c0"
+        ],
+        blockLabelsWheelcolors: [
+            "#FFB3C6",
+            "#FF8FA8",
+            "#FFC0CB",
+            "#FFD9E2",
+            "#FFB3C6",
+            "#FF8FA8",
+            "#FFC0CB",
+            "#FFD9E2",
+            "#FFB3C6",
+            "#FF8FA8",
+            "#FFC0CB",
+            "#FFD9E2"
+        ],
+        noteValueWheelcolors: ["#FFB3C6", "#FF8FA8"],
+        tabsWheelcolors: ["#FFB3C6", "#FF8FA8"],
+        numberWheelcolors: ["#FFB3C6", "#FF8FA8"],
+        piemenuBasicundefined: ["#FFB3C6", "#FF8FA8", "#FFC0CB"],
+        booleanWheelcolors: ["#99EDED", "#6BD9D9"], // Teal
+        piemenuVoicesColors: ["#FFB3C6", "#FF8FA8", "#FFC0CB", "#D6F7F7", "#6BD9D9"],
+        intervalNameWheelcolors: ["#FFB3C6", "#FF8FA8", "#FFB3C6", "#FFC0CB", "#FF8FA8"],
+        intervalWheelcolors: ["#FFB3C6", "#FF8FA8", "#FFB3C6", "#FFC0CB", "#FF8FA8"],
+        modeWheelcolors: ["#FFB3C6", "#FF8FA8"],
+        modeGroupWheelcolors: [
+            "#FFB3C6",
+            "#FF8FA8",
+            "#FFC0CB",
+            "#FFD9E2",
+            "#FFB3C6",
+            "#FF8FA8",
+            "#FFC0CB",
+            "#FFD9E2",
+            "#c0c0c0",
+            "#c0c0c0",
+            "#c0c0c0",
+            "#c0c0c0",
+            "#c0c0c0",
+            "#c0c0c0"
+        ],
+        modePieMenusIfColorPush: "#FF8FA8",
+        modePieMenusElseColorPush: "#6BD9D9",
+        wheelcolors: ["#808080", "#909090", "#808080", "#909090", "#707070"]
+    }
+};
+
+for (const theme in platformThemes) {
+    if (themePreference === theme) {
+        window.platformColor = platformThemes[theme];
+        break;
+    } else {
+        window.platformColor = platformThemes["light"];
+    }
 }
 
 document.querySelector("meta[name=theme-color]").content = platformColor.header;
