@@ -146,7 +146,6 @@ class Planet {
     }
 }
 
-// trigger and sync the dark mode of the planet with the main page
 document.addEventListener("DOMContentLoaded", function () {
     let themes = ["light", "pastel", "dark"];
     for (let i = 0; i < themes.length; i++) {
