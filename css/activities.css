@@ -16,18 +16,18 @@
   outline: none;
 }
 
-body:not(.dark-mode) #helpfulSearch,
-body:not(.dark-mode) .ui-autocomplete {
-    background-color: #fff !important;
-    color: #000 !important;
+body:not(.dark) #helpfulSearch,
+body:not(.dark) .ui-autocomplete {
+  background-color: #fff !important;
+  color: #000 !important;
 }
 
-body:not(.dark-mode) .ui-autocomplete li:hover {
-    background-color: #ddd !important;
+body:not(.dark) .ui-autocomplete li:hover {
+  background-color: #ddd !important;
 }
 
-body:not(.dark-mode) #helpfulSearchDiv {
-    background-color: #f9f9f9 !important;
+body:not(.dark) #helpfulSearchDiv {
+  background-color: #f9f9f9 !important;
 }
 
 .modal {
@@ -102,7 +102,7 @@ body:not(.dark-mode) #helpfulSearchDiv {
   margin-top: 60px;
 }
 
-#helpfulSearchDiv{
+#helpfulSearchDiv {
   display: block !important;
   position: absolute;
   background-color: #f0f0f0;
@@ -112,7 +112,7 @@ body:not(.dark-mode) #helpfulSearchDiv {
   z-index: 1;
 }
 
-#helpfulSearch{
+#helpfulSearch {
   padding: 2px;
   border: 2px solid grey;
   width: 220px;
@@ -154,7 +154,7 @@ body:not(.dark-mode) #helpfulSearchDiv {
   z-index: 10;
   display: flex;
   gap: 10px;
-  background: #2196F3;
+  background: #2196f3;
   margin: 0;
   padding: 5px;
   border-bottom: 1px solid #d9d9d9;
@@ -178,20 +178,19 @@ body:not(.dark-mode) #helpfulSearchDiv {
   vertical-align: middle;
 }
 
-#restoreLastIcon, #restoreAllIcon {
+#restoreLastIcon,
+#restoreAllIcon {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 48px;
   height: 48px;
-  cursor: pointer; 
+  cursor: pointer;
 }
-
 
 .material-icons.md-48 {
   font-size: 32px;
 }
-
 
 .hidden {
   display: none;
@@ -1877,22 +1876,22 @@ table {
     clear: both;
   }
 }
-.logo-container{
+.logo-container {
   position: absolute;
   bottom: 1px; /* Distance from the bottom */
-  right: 23px;  /* Distance from the right */
+  right: 23px; /* Distance from the right */
   padding: 0px;
   border-radius: 5px;
   cursor: pointer;
 }
-#link-to-sugarLabs:link ,
-#link-to-sugarLabs:visited ,
-#link-to-sugarLabs:hover ,
-#link-to-sugarLabs:active  {
+#link-to-sugarLabs:link,
+#link-to-sugarLabs:visited,
+#link-to-sugarLabs:hover,
+#link-to-sugarLabs:active {
   color: #000;
 }
 .color-change {
-  fill : #033CD2;
-  stroke : #78E600;
+  fill: #033cd2;
+  stroke: #78e600;
   stroke-width: 3;
 }

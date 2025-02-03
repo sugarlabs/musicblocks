@@ -22,7 +22,6 @@
 */
 
 class Planet {
-
     constructor(isMusicBlocks, storage) {
         this.LocalPlanet = null;
         this.GlobalPlanet = null;
@@ -46,52 +45,52 @@ class Planet {
     prepareUserID() {
         let id = getCookie(this.UserIDCookie);
 
-        if (id === ""){
+        if (id === "") {
             id = this.ProjectStorage.generateID();
             setCookie(this.UserIDCookie, id, 3650);
         }
 
         this.UserID = id;
-    };
+    }
 
     open(image) {
         this.LocalPlanet.setCurrentProjectImage(image);
         this.LocalPlanet.updateProjects();
         this.oldCurrentProjectID = this.ProjectStorage.getCurrentProjectID();
-    };
+    }
 
     saveLocally(data, image) {
         this.ProjectStorage.saveLocally(data, image);
-    };
+    }
 
     setAnalyzeProject(func) {
         this.analyzeProject = func;
-    };
+    }
 
     setLoadProjectFromData(func) {
         this.loadProjectFromData = func;
-    };
+    }
 
     setPlanetClose(func) {
         this.planetClose = func;
-    };
+    }
 
     setLoadNewProject(func) {
         this.loadNewProject = func;
-    };
+    }
 
     setLoadProjectFromFile(func) {
         this.loadProjectFromFile = func;
-    };
+    }
 
     setOnConverterLoad(func) {
         this.onConverterLoad = func;
-    };
+    }
 
-    openProjectFromPlanet(id,error) {
-        this.GlobalPlanet.openGlobalProject(id,error);
-    };
-    
+    openProjectFromPlanet(id, error) {
+        this.GlobalPlanet.openGlobalProject(id, error);
+    }
+
     async init() {
         this.StringHelper = new StringHelper(this);
         this.StringHelper.init();
@@ -101,42 +100,39 @@ class Planet {
         this.ServerInterface = new ServerInterface(this);
         this.ServerInterface.init();
 
-
         // eslint-disable-next-line no-unused-vars
-        document.getElementById("close-planet").addEventListener("click", evt => {
+        document.getElementById("close-planet").addEventListener("click", (evt) => {
             this.closeButton();
         });
 
         // eslint-disable-next-line no-unused-vars
-        document.getElementById("planet-open-file").addEventListener("click", evt => {
+        document.getElementById("planet-open-file").addEventListener("click", (evt) => {
             this.loadProjectFromFile();
         });
 
         // eslint-disable-next-line no-unused-vars
-        document.getElementById("planet-new-project").addEventListener("click", evt => {
+        document.getElementById("planet-new-project").addEventListener("click", (evt) => {
             this.loadNewProject();
         });
 
         this.ServerInterface.getTagManifest(
-            function(data) {
+            function (data) {
                 this.initPlanets(data);
             }.bind(this)
         );
-    };
+    }
 
     closeButton() {
         if (this.ProjectStorage.getCurrentProjectID() !== this.oldCurrentProjectID) {
-            const data = this.ProjectStorage.getCurrentProjectData() ;
-            (!data) ? this.loadNewProject() : this.loadProjectFromData(data) ;
-        }
-        
-        else this.planetClose();
-    };
-    
+            const data = this.ProjectStorage.getCurrentProjectData();
+            !data ? this.loadNewProject() : this.loadProjectFromData(data);
+        } else this.planetClose();
+    }
+
     initPlanets(tags) {
-        const status = tags.success || false ;
-        this.ConnectedToServer = status ;
-        if (status) this.TagsManifest = tags.data ;
+        const status = tags.success || false;
+        this.ConnectedToServer = status;
+        if (status) this.TagsManifest = tags.data;
 
         this.Converter = new Converter(this);
         this.Converter.init();
@@ -147,18 +143,17 @@ class Planet {
         this.LocalPlanet.init();
         this.GlobalPlanet = new GlobalPlanet(this);
         this.GlobalPlanet.init();
-    };
-
+    }
 }
 
 // trigger and sync the dark mode of the planet with the main page
 document.addEventListener("DOMContentLoaded", function () {
-    if (localStorage.getItem("darkMode") === "enabled") {
+    if (localStorage.getItem("dark") === "enabled") {
         document.body.classList.add("dark-mode");
     }
     window.addEventListener("storage", function (event) {
-        if (event.key === "darkMode" || event.key === "darkModeTrigger") {
-            if (localStorage.getItem("darkMode") === "enabled") {
+        if (event.key === "dark" || event.key === "darkTrigger") {
+            if (localStorage.getItem("dark") === "enabled") {
                 document.body.classList.add("dark-mode");
             } else {
                 document.body.classList.remove("dark-mode");
