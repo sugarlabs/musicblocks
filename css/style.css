@@ -1,3 +1,15 @@
+#sidebar1 {
+  width: 250px;
+  background-color: #2c3e50;
+  padding: 20px;
+  min-height: 10vh;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+#sidebar1 > * {
+  margin-bottom: 10px;
+}
 input[type="range"] {
   height: 4px;
   appearance: none;
