@@ -208,6 +208,7 @@ class Logo {
         this.collectingStats = false;
         this.runningAbc = false;
         this.runningMxml = false;
+        this.runningMIDI = false;
         this._checkingCompletionState = false;
         this.recording = false;
 
@@ -230,6 +231,9 @@ class Logo {
         this.inOscilloscope = false;
         this.updatingStatusMatrix = false;
         this.statusFields = [];
+
+        // Midi Data
+        this._midiData = {};
 
         // When running in step-by-step mode, the next command to run
         // is queued here.
@@ -796,6 +800,13 @@ class Logo {
         }
     }
 
+    notationMIDI(note, duration, turtle, bpm) {
+        if (!this._midiData[turtle]) {
+            this._midiData[turtle] = [];
+        }
+        this._midiData[turtle].push({ note, duration, bpm });
+    }
+
     // ========================================================================
 
     /**
@@ -900,7 +911,7 @@ class Logo {
 
         this.activity.turtles
             .ithTurtle(turtle)
-            .initTurtle(this.runningLilypond || this.runningAbc || this.runningMxml);
+            .initTurtle(this.runningLilypond || this.runningAbc || this.runningMxml || this.runningMIDI);
     }
 
     /**
@@ -1690,7 +1701,11 @@ class Logo {
                         // console.log("saving mxml output");
                         logo.activity.save.afterSaveMxml();
                         logo.runningMxml = false;
-                    } else if (tur.singer.suppressOutput) {
+                    } else if (logo.runningMIDI) {
+                        console.log("Save MIDI file");
+                        logo.runningMIDI = false;
+                    }
+                    else if (tur.singer.suppressOutput) {
                         // console.debug("finishing compiling");
                         if (!logo.recording) {
                             logo.activity.errorMsg(_("Playback is ready."));

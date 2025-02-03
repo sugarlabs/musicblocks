@@ -1245,6 +1245,7 @@ class Singer {
         const tur = activity.turtles.ithTurtle(turtle);
         const bpmFactor =
             TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
+        let bpmValue = Number(last(tur.singer.bpm));
 
         let noteBeatValue = isOsc
             ? noteValue === 0
@@ -1957,8 +1958,10 @@ class Singer {
                             if (
                                 activity.logo.runningLilypond ||
                                 activity.logo.runningMxml ||
-                                activity.logo.runningAbc
+                                activity.logo.runningAbc ||
+                                activity.logo.runningMIDI
                             ) {
+                                activity.logo.notationMIDI(chordNotes, d, turtle, bpmValue);
                                 activity.logo.updateNotation(chordNotes, d, turtle, -1, chordDrums);
                             }
                         }

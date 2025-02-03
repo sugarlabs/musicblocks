@@ -21,6 +21,9 @@
  * Class representing the SaveInterface.
  * @class
  */
+requirejs(["tonejsMidi"]);
+
+
 class SaveInterface {
     /**
      * Creates an instance of SaveInterface.
@@ -48,7 +51,7 @@ class SaveInterface {
          * @member {number}
          */
         this.timeLastSaved = -100;
-        
+
         /**
          * HTML template for saving projects.
          * @member {string}
@@ -264,6 +267,63 @@ class SaveInterface {
         }, 500);
     }
 
+    saveMIDI(activity) {
+        // Suppress music and turtle output when generating
+        activity.logo.runningMIDI = true;
+        activity.logo.runLogoCommands();
+
+        console.log("List ->",activity.logo._midiData);
+
+        // Function to calculate note duration in beats from inverted duration;
+        const generateMidi = (data) => {
+
+            const normalizeNote = (note) => {
+                return note.replace("♯", "#").replace("♭", "b");
+            };
+
+            const midi = new Midi();
+
+            Object.entries(data).forEach(([blockIndex, notes]) => {
+                const track = midi.addTrack();
+                track.name = `Track ${parseInt(blockIndex) + 1}`;
+
+                let currentTime = 0;
+
+                notes.forEach((noteData) => {
+                    if (!noteData.note || noteData.note.length === 0) return;
+
+                    const duration = ((1 / noteData.duration) * 60 * 4) / (noteData.bpm);
+
+                    noteData.note.forEach((pitch) => {
+                        if (pitch.includes("R")) {
+                            currentTime += duration;
+                        } else {
+                        track.addNote({
+                            name: normalizeNote(pitch),
+                            time: currentTime,
+                            duration: duration,
+                            velocity: 0.8
+                        });
+                        }
+                    });
+
+                    currentTime += duration;
+                });
+            });
+
+            // Generate MIDI file and trigger download
+            const midiData = midi.toArray();
+            const blob = new Blob([midiData], { type: "audio/midi" });
+            const url = URL.createObjectURL(blob);
+            activity.save.download("midi", url, null);
+        };
+        const data = activity.logo._midiData;
+        setTimeout(() => {
+            generateMidi(data);
+            activity.logo._midiData = {};
+        },500);
+    }
+
     /**
      * This method is to save SVG representation of an activity
      * 
@@ -306,12 +366,12 @@ class SaveInterface {
      * @returns {void}
      * @method
      * @instance
-     */   
+     */
     saveBlockArtwork(activity) {
         const svg = "data:image/svg+xml;utf8," + activity.printBlockSVG();
         activity.save.download("svg", svg, null);
     }
-   
+
     /**
      * This method is to save BlockArtwork and download the PNG representation of block artwork from the provided activity.
      * 
@@ -319,10 +379,10 @@ class SaveInterface {
      * @returns {void}
      * @method
      * @instance
-     */ 
+     */
     saveBlockArtworkPNG(activity) {
         activity.printBlockPNG().then((pngDataUrl) => {
-        activity.save.download("png", pngDataUrl, null);
+            activity.save.download("png", pngDataUrl, null);
         })
     }
 
@@ -587,7 +647,7 @@ class SaveInterface {
             tmp.remove();
             this.activity.textMsg(
                 _("The Lilypond code is copied to clipboard. You can paste it here: ") +
-                    "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a> "
+                "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a> "
             );
         }
         this.download("ly", "data:text;utf8," + encodeURIComponent(lydata), filename);
