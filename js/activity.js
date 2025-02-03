@@ -6667,13 +6667,20 @@ class Activity {
 
             // Function to toggle theme mode
             this.toggleThemeMode = () => {
-                if (this.storage.myThemeName === "darkMode") {
+                const isDarkMode = this.storage.myThemeName === "darkMode";
+                const rootElement = document.documentElement; // Apply to the root element for full effect
+            
+                if (isDarkMode) {
                     delete this.storage.myThemeName;
                     localStorage.setItem("darkMode", "disabled");
+                    rootElement.classList.remove("dark-mode");
                 } else {
                     this.storage.myThemeName = "darkMode";
                     localStorage.setItem("darkMode", "enabled");
+                    rootElement.classList.add("dark-mode");
                 }
+            
+                // Notify the iframe about the theme change
                 const planetIframe = document.getElementById("planet-iframe");
                 if (planetIframe) {
                     planetIframe.contentWindow.postMessage(
@@ -6681,11 +6688,26 @@ class Activity {
                         "*"
                     );
                 }
-                try {
-                    window.location.reload();
-                } catch (e) {
-                    console.error("Error reloading the window:", e);
+            
+                // Apply theme to all relevant UI elements dynamically
+                applyDarkModeToUI();
+            };
+            
+            // Function to update all UI elements without refresh
+            function applyDarkModeToUI() {
+                const isDarkMode = localStorage.getItem("darkMode") === "enabled";
+                const rootElement = document.documentElement;
+                
+                if (isDarkMode) {
+                    rootElement.classList.add("dark-mode");
+                } else {
+                    rootElement.classList.remove("dark-mode");
                 }
+            }
+            
+            // Apply theme on page load
+            window.onload = () => {
+                applyDarkModeToUI();
             };
 
             /* Z-Order (top to bottom):
