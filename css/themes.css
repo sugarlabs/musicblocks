@@ -1,0 +1,234 @@
+/* Dark Mode */
+
+.dark .blue {
+  background-color: #022363 !important;
+}
+
+.dark .blue.darken-1 {
+  background-color: #01143b !important;
+}
+
+.dark #floatingWindows > .windowFrame {
+  border: 2px solid #000000;
+  background-color: #454545;
+}
+
+.dark .wfbtItem {
+  background-color: #225a91;
+}
+
+.dark #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
+  color: #e8e8e8;
+}
+
+.dark .popupMsg {
+  background-color: #084e86;
+  color: #e8e8e8;
+}
+
+.dark #printText {
+  border-color: #000000;
+}
+
+.dark #loading-image-container {
+  background: #1a1a1a !important;
+  background-color: #1a1a1a !important;
+}
+
+.dark #loadingText {
+  color: white !important;
+}
+
+.dark .dropdown-content li > a {
+  background-color: #1c1c1c;
+  color: #3fe0d1;
+}
+
+.dark .dropdown-content li > a:hover {
+  color: #252525;
+}
+
+.dark .dropdown-content {
+  background-color: #1c1c1c;
+}
+
+.dark .language-link {
+  color: #fff;
+}
+
+.dark .modal-content {
+  background-color: #1c1c1c;
+  color: #fff;
+}
+
+.dark #submitLilypond {
+  background-color: rgb(0, 102, 255);
+}
+
+.dark #search,
+#helpfulSearch,
+.ui-autocomplete {
+  background-color: #1c1c1c;
+  color: #fff;
+}
+
+.dark .ui-autocomplete li:hover {
+  background-color: #225a91;
+}
+
+.dark #helpfulSearchDiv {
+  background-color: transparent;
+}
+
+.dark #crossButton {
+  color: #fff;
+}
+
+/* Pastel Theme */
+
+.pastel .blue {
+  background-color: #ffb3d9 !important;
+}
+
+.pastel .blue.darken-1 {
+  background-color: #f28ab2 !important;
+}
+
+.pastel #floatingWindows > .windowFrame {
+  border: 2px solid #a3d6d1 !important;
+  background-color: #f2e1f4 !important;
+}
+
+.pastel .wfbtItem {
+  background-color: #d8f3e1 !important;
+  border: 1px solid #a3d6d1 !important;
+}
+
+.pastel #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
+  color: #2a5a62 !important;
+  font-weight: 600;
+}
+
+/* Popups & Messages */
+.pastel .popupMsg {
+  background-color: #ffb3d9 !important;
+  color: #396e6f !important;
+  border: 1px solid #a3d6d1 !important;
+  border-radius: 8px;
+}
+
+/* Printing Elements */
+.pastel #printText {
+  border-color: #a3d6d1 !important;
+}
+
+/* Loading States */
+.pastel #loading-image-container {
+  background: #ffe9f0 !important;
+  background-color: #ffe9f0 !important;
+  border: 1px solid #a3d6d1 !important;
+}
+
+.pastel #loadingText {
+  color: #3b8c7e !important;
+  font-size: 1.1rem;
+}
+
+/* Dropdowns */
+.pastel .dropdown-content li > a {
+  background-color: #ffebf2 !important;
+  color: #5d8d8c !important;
+  transition: all 0.3s ease;
+}
+
+.pastel .dropdown-content li > a:hover {
+  background-color: #d8f3e1 !important;
+  color: #2a5a62 !important;
+}
+
+.pastel .dropdown-content {
+  background-color: #ffebf2 !important;
+  border: 1px solid #a3d6d1 !important;
+  border-radius: 6px;
+}
+
+/* Language Selector */
+.pastel .language-link {
+  color: #5d8d8c !important;
+  transition: color 0.3s ease;
+}
+
+.pastel .language-link:hover {
+  color: #ffb3d9 !important;
+}
+
+/* Modals */
+.pastel .modal-content {
+  background-color: #ffebf2 !important;
+  color: #396e6f !important;
+  border: 2px solid #a3d6d1 !important;
+  border-radius: 12px;
+}
+
+/* Forms & Inputs */
+.pastel #submitLilypond {
+  background-color: #67d6cc !important;
+  color: #ffffff !important;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.pastel #submitLilypond:hover {
+  background-color: #5d8d8c !important;
+}
+
+.pastel #search,
+.pastel #helpfulSearch,
+.pastel .ui-autocomplete {
+  background-color: #ffebf2 !important;
+  color: #396e6f !important;
+  border: 1px solid #a3d6d1 !important;
+  border-radius: 6px;
+}
+
+.pastel .ui-autocomplete li:hover {
+  background-color: #d8f3e1 !important;
+  color: #2a5a62 !important;
+}
+
+/* Helpful Search */
+.pastel #helpfulSearchDiv {
+  background-color: transparent !important;
+}
+
+/* Close Button */
+.pastel #crossButton {
+  color: #5d8d8c !important;
+  transition: all 0.3s ease;
+}
+
+.pastel #crossButton:hover {
+  color: #ffb3d9 !important;
+  transform: scale(1.1);
+}
+
+.pastel {
+  --primary-pink: #ffb3d9;
+  --dark-pink: #f28ab2;
+  --soft-mint: #d8f3e1;
+  --teal-text: #2a5a62;
+  --muted-teal: #396e6f;
+  --pale-bg: #ffebf2;
+}
+
+/* Smooth transitions */
+.pastel *:not(.modal):not(.dropdown-content) {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Input focus states */
+.pastel input:focus,
+.pastel textarea:focus {
+  border-color: var(--primary-pink) !important;
+  box-shadow: 0 0 8px rgba(255, 179, 217, 0.3) !important;
+}

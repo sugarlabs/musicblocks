@@ -67,7 +67,7 @@ class Toolbar {
                 ["delPluginIcon", _("Delete plugin")],
                 ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
                 ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
-                ["themeModeIcon", _("Change theme")],
+                ["themeSelectIcon", _("Change theme")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["chooseKeyIcon", _("Set Pitch Preview")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
@@ -104,7 +104,11 @@ class Toolbar {
                 ["ar", _("عربى"), "innerHTML"],
                 ["te", _("తెలుగు"), "innerHTML"],
                 ["he", _("עִברִית"), "innerHTML"],
-                ["ur", _("اردو"), "innerHTML"]
+                ["ur", _("اردو"), "innerHTML"],
+                ["ur", _("اردو"), "innerHTML"],
+                ["light", _("Light Mode"), "innerHTML"],
+                ["dark", _("Dark Mode"), "innerHTML"],
+                ["pastel", _("Pastel Theme"), "innerHTML"]
             ];
 
             // Workaround for FF
@@ -174,7 +178,10 @@ class Toolbar {
                 _("igbo"),
                 _("عربى"),
                 _("עִברִית"),
-                _("اردو")
+                _("اردو"),
+                _("Light Mode"),
+                _("Dark Mode"),
+                _("Pastel Theme")
             ];
         } else {
             strings = [
@@ -200,7 +207,7 @@ class Toolbar {
                 ["delPluginIcon", _("Delete plugin")],
                 ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
                 ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
-                ["themeModeIcon", _("Change theme")],
+                ["themeSelectIcon", _("Change theme")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
                 ["restoreIcon", _("Restore")],
@@ -232,7 +239,10 @@ class Toolbar {
                 ["ar", _("عربى"), "innerHTML"],
                 ["te", _("తెలుగు"), "innerHTML"],
                 ["he", _("עִברִית"), "innerHTML"],
-                ["ur", _("اردو"), "innerHTML"]
+                ["ur", _("اردو"), "innerHTML"],
+                ["light", _("Light Mode"), "innerHTML"],
+                ["dark", _("Dark Mode"), "innerHTML"],
+                ["pastel", _("Pastel Theme"), "innerHTML"]
             ];
 
             // Workaround for FF
@@ -291,7 +301,10 @@ class Toolbar {
                 _("igbo"),
                 _("عربى"),
                 _("עִברִית"),
-                _("اردو")
+                _("اردو"),
+                _("Light Mode"),
+                _("Dark Mode"),
+                _("Pastel Theme")
             ];
         }
 
@@ -463,12 +476,11 @@ class Toolbar {
         };
     }
 
-    renderThemeSelectIcon(themeBox) {
+    renderThemeSelectIcon(themeBox, themes) {
         const themeSelectIcon = docById("themeSelectIcon");
-        const themes = ["light", "dark", "custom"];
-
+        let themeList = themes;
         themeSelectIcon.onclick = () => {
-            themes.forEach((theme) => {
+            themeList.forEach((theme) => {
                 docById(theme).onclick = () => themeBox[`${theme}_onclick`](this.activity);
             });
         };

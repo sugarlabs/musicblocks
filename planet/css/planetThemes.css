@@ -1,0 +1,302 @@
+/* Dark Mode */
+
+.dark {
+  background-color: #303030;
+  color: #e0e0e0;
+}
+
+.dark .nav-extended {
+  background-color: #2f6b2f !important;
+  border-bottom: 1px solid #444444;
+}
+
+.dark .nav-wrapper .brand-logo,
+.dark .nav-wrapper a,
+.dark .tabs .tab a {
+  color: #ffffff !important;
+}
+
+.dark .tabs .tab a.active {
+  color: #a8d5a8 !important;
+  border-bottom: 2px solid #a8d5a8;
+}
+
+.dark #backToTopBtn {
+  background-color: #2f6b2f !important;
+  color: #ffffff !important;
+}
+
+.dark .modal {
+  background-color: #424242;
+  color: #e0e0e0;
+}
+
+.dark .modal-footer {
+  background-color: #383838;
+}
+
+.dark .dropdown-content {
+  background-color: #424242 !important;
+  color: #ffffff !important;
+  border: 1px solid #444444;
+}
+
+.dark .dropdown-content li > a:hover {
+  background-color: #383838 !important;
+  color: #ffffff !important;
+}
+
+.dark #view-more-chips {
+  color: #e0e0e0 !important;
+}
+.dark #local-projects .card {
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+  border: 1px solid #252525;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.dark #local-projects .card .card-title {
+  color: #e0e0e0 !important;
+}
+
+.dark #local-projects .card .card-content {
+  color: #bdbdbd;
+}
+s .dark #local-projects .card:hover {
+  background-color: #242424;
+  box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.5);
+}
+
+.dark #local-projects .card .btn {
+  background-color: #2f6b2f;
+  color: #ffffff;
+}
+
+.dark #local-projects .card .btn:hover {
+  background-color: #388e3c;
+}
+
+.dark #global-projects .card {
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+  border: 1px solid #252525;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.dark #global-projects .card .card-title {
+  color: #e0e0e0 !important;
+}
+
+.dark #global-projects .card .card-content {
+  color: #bdbdbd;
+}
+
+.dark #global-projects .card:hover {
+  background-color: #242424;
+  box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.5);
+}
+
+.dark #global-projects .card .btn {
+  background-color: #2f6b2f;
+  color: #ffffff;
+}
+
+.dark #global-projects .card .btn:hover {
+  background-color: #388e3c;
+}
+
+.dark .modal-footer .btn-flat {
+  color: #ffffff !important;
+  background-color: transparent !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  font-weight: bold;
+}
+
+.dark .modal-footer .btn-flat:hover {
+  background-color: #a8d5a8 !important;
+  color: #303030 !important;
+}
+.dark .close-button {
+  color: #e0e0e0;
+  font-size: 1.5rem;
+  transition: color 0.3s ease;
+}
+
+.dark .close-button:hover {
+  color: #a8d5a8;
+}
+
+.dark .select-wrapper {
+  position: relative;
+  height: 3rem;
+  line-height: 3rem;
+  margin-top: 0.5rem;
+}
+
+.dark .select-wrapper input.select-dropdown {
+  color: #ffffff !important;
+  font-size: 1rem;
+  line-height: normal;
+  padding-left: 10px;
+  height: 3rem;
+  box-sizing: border-box;
+  background-color: #424242 !important;
+  border: 1px solid #444444 !important;
+}
+
+.dark .select-wrapper:after {
+  content: "\25BC";
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  color: #ffffff !important;
+  font-size: 0.8rem;
+  pointer-events: none;
+}
+
+.dark .dropdown-content {
+  background-color: #424242 !important;
+  border: 1px solid #444444;
+  color: #ffffff !important;
+}
+
+.dark .dropdown-content li > a {
+  color: #ffffff !important;
+  padding: 0.5rem 1rem;
+}
+
+.dark .dropdown-content li > a:hover {
+  background-color: #383838 !important;
+  color: #a8d5a8 !important;
+}
+
+/*Pastel Theme  */
+
+.pastel {
+  background-color: #fff0f5 !important; /* Soft pink background */
+  color: #5a5a5a !important; /* Dark gray text */
+}
+
+.pastel .nav-extended {
+  background-color: #99eded !important; /* Mint header */
+  border-bottom: 1px solid #b2f0ea !important; /* Light mint border */
+}
+
+.pastel .nav-wrapper .brand-logo,
+.pastel .nav-wrapper a,
+.pastel .tabs .tab a {
+  color: #2a5a62 !important; /* Teal text */
+}
+
+.pastel .tabs .tab a.active {
+  color: #011313 !important;
+  font-weight: bold; /* Bright mint accent */
+  border-bottom: 2px solid #ffb3c6; /* Pink underline */
+}
+
+.pastel #backToTopBtn {
+  background-color: #ffb3c6 !important; /* Primary pink */
+  color: #2a5a62 !important; /* Teal text */
+}
+
+.pastel #backToTopBtn:hover {
+  background-color: #f28ab2 !important;
+}
+
+.pastel .modal {
+  background-color: #d6f7f7 !important; /* Light mint background */
+  color: #5d8d8c !important; /* Soft teal text */
+}
+
+.pastel .modal-footer {
+  background-color: #b2f0ea !important; /* Medium mint */
+}
+
+.pastel .dropdown-content {
+  background-color: #d6f7f7 !important; /* Light mint */
+  color: #2a5a62 !important; /* Teal text */
+  border: 1px solid #99eded !important; /* Mint border */
+}
+
+.pastel .dropdown-content li > a:hover {
+  background-color: #b2f0ea !important; /* Mint hover */
+  color: #ff8fa8 !important; /* Pink text */
+}
+
+.pastel #view-more-chips {
+  color: #5d8d8c !important; /* Soft teal */
+}
+
+.pastel #local-projects .card,
+.pastel #global-projects .card {
+  background-color: #fff0f5 !important; /* Soft pink */
+  color: #5d8d8c !important; /* Teal text */
+  border: 1px solid #9ecfc9 !important; /* Mint border */
+  box-shadow: 0 4px 6px rgba(255, 179, 198, 0.1) !important; /* Pink shadow */
+}
+
+.pastel .card .card-title {
+  color: #2a5a62 !important; /* Dark teal */
+}
+
+.pastel .card .card-content {
+  color: #7aa6a5 !important; /* Medium teal */
+}
+
+.pastel .card:hover {
+  background-color: #ffebf2 !important; /* Slightly darker pink */
+  box-shadow: 0 6px 8px rgba(228, 107, 180, 0.926) !important;
+  transform: translateY(-2px); /* Add lift effect */
+}
+
+.pastel .card .btn {
+  background-color: #ffb3c6 !important; /* Pink button */
+  color: #2a5a62 !important; /* Teal text */
+}
+
+.pastel .card .btn:hover {
+  background-color: #f28ab2 !important;
+  color: #fff !important;
+}
+
+.pastel .modal-footer .btn-flat {
+  color: #2a5a62 !important; /* Teal text */
+}
+
+.pastel .modal-footer .btn-flat:hover {
+  background-color: #6bd9d9 !important; /* Mint background */
+  color: #ff8fa8 !important; /* Pink text */
+}
+
+.pastel .close-button {
+  color: #5d8d8c !important; /* Soft teal */
+}
+
+.pastel .close-button:hover {
+  color: #ff8fa8 !important; /* Pink hover */
+}
+
+.pastel .select-wrapper input.select-dropdown {
+  background-color: #d6f7f7 !important; /* Mint background */
+  color: #2a5a62 !important; /* Teal text */
+  border: 1px solid #99eded !important;
+}
+
+.pastel .select-wrapper:after {
+  color: #5d8d8c !important; /* Teal arrow */
+}
+
+.pastel .card .material-icons {
+  color: teal !important;
+}
+
+.pastel .dropdown-content li > a {
+  transition: all 0.2s ease;
+}
+
+.pastel .btn,
+.pastel .card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
