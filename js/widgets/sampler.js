@@ -300,6 +300,34 @@ function SampleWidget() {
         return this._save_lock;
     };
 
+    //Drag-and-Drop sample files
+    this.drag_and_drop = function () {
+        console.log("drag and drop")
+        const dropZone = document.getElementsByClassName("samplerCanvas")[0];
+
+        dropZone.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            dropZone.classList.add("dragover");
+        })
+    
+        dropZone.addEventListener("dragleave", () => {
+            dropZone.classList.remove("dragover");
+        })
+
+        dropZone.addEventListener( "drop", (e) => {
+            e.preventDefault();
+            dropZone.classList.remove("dragover");
+
+            const files = e.dataTransfer.files;
+            handleFiles(files);
+        })
+
+
+        function handleFiles(files) {
+            console.log(files);
+        }
+    }
+
     /**
      * Initializes the Sample Widget.
      * @param {object} activity - The activity object.
@@ -384,6 +412,8 @@ function SampleWidget() {
                 const sampleFile = fileChooser.files[0];
                 const reader = new FileReader();
                 reader.readAsDataURL(sampleFile);
+                console.log(sampleFile);
+                
 
                 // eslint-disable-next-line no-unused-vars
                 reader.onload = function (event) {
@@ -393,6 +423,7 @@ function SampleWidget() {
                             that.sampleData = reader.result;
                             that.sampleName = fileChooser.files[0].name;
                             that._addSample();
+                            console.log("sample added"); 
                         } else {
                             that.activity.errorMsg(_("Warning: Your sample cannot be loaded because it is >1MB."), that.timbreBlock);
                         }
@@ -502,6 +533,7 @@ function SampleWidget() {
         this.pause();
 
         widgetWindow.sendToCenter();
+        this.drag_and_drop();
     };
 
     /**
@@ -969,5 +1001,6 @@ function SampleWidget() {
             }
         };
         draw();
+        console.log("canvas drawn");    
     };
 }
