@@ -160,6 +160,7 @@ class Palettes {
         cover.style.background = platformColor.paletteLabelBackground;
         td.appendChild(cover);
         td.onmouseover = () => {
+            this.activity.hideSearchWidget();
             this.showSelection(i, tr);
             this.makePalettes(i);
         };
