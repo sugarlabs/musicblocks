@@ -105,7 +105,19 @@ This guide explains how you can add your own custom theme in Music Blocks!
     }
     ```
 
-    Add your theme here too.
+    Add your theme here too. In activity.js, you will find just below there is this for loop, this checks for all the themes in the themes array we just saw above and then add the theme class in themes.css (which you will add in later steps) ehich matches the themePreference object in localStorage.
+
+    ```javascript
+    for (let i = 0; i < this.themes.length; i++) {
+        if (this.themes[i] === this.storage.themePreference) {
+            body.classList.add(this.themes[i]);
+        } else {
+            body.classList.remove(this.themes[i]);
+        }
+    }
+    ```
+
+    If no theme is selected i.e there is no themePreference in localStorage. the styles will default to light mode because it is the base styling with no class in themes.css. But when there is a themePreference in localStorage, the class respective to the chosen theme will be added to the elements which will apply because of higher specificity.
 
 4.  **Adding your theme to the planet page**
 
@@ -124,7 +136,8 @@ This guide explains how you can add your own custom theme in Music Blocks!
     });
     ```
 
-    Add your theme here too. This checks for the themePreference after the DOM is loaded, to apply styles to planet page.
+    Add your theme here too. And this for loop above checks (after the DOM is loaded) for all themes in themes array to add the class in planetThemes.css (which you will add in later steps) which match themePreference in localStorage to the elements on planet/index.html. That is why the changes happen after the reload.
+    If no theme is selected i.e there is no themePreference in localStorage. the styles will default to light mode because it is the base styling with no class in planetThemes.css . But when there is a themePreference in localStorage, the class respective to the chosen theme will be added to the elements which will apply because of higher specificity.
 
 5.  **Using themeBox to add functionality to your options in the dropdown menu**
 
@@ -192,6 +205,22 @@ This guide explains how you can add your own custom theme in Music Blocks!
         your_theme: {your_styling}
         }
         ```
+
+        There is a for loop below this
+
+        ```javascript
+        for (const theme in platformThemes) {
+            if (themePreference === theme) {
+                window.platformColor = platformThemes[theme];
+                break;
+            } else {
+                window.platformColor = platformThemes["light"];
+            }
+        }
+        ```
+
+        This checks for keys(themes) in platformThemes, then assign the window.platformColor to that key(theme).
+        Then platformColor is used to style things elsewhere. if there is no theme in themePreference, it will default to light mode.
 
     3. planet/css/planetThemes.css (this is styling used for planet page) you can do what you did in the first part of themes.css to add your styling
 
