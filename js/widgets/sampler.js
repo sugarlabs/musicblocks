@@ -302,7 +302,6 @@ function SampleWidget() {
 
     //Drag-and-Drop sample files
     this.drag_and_drop = () => {
-        console.log("drag and drop")
         const dropZone = document.getElementsByClassName("samplerCanvas")[0];
 
         dropZone.addEventListener("dragover", (e) => {
@@ -323,15 +322,24 @@ function SampleWidget() {
         })
 
         const handleFiles = (files) => {
-
             const sampleFile = files[0];
             const reader = new FileReader();
             reader.readAsDataURL(sampleFile);
 
-            reader.onload = (e) =>{
-                console.log(sampleFile.name);
-                this.sampleData = reader.result;
-                this.sampleName = sampleFile.name;
+            reader.onload = () =>{
+                if (reader.result.substring(reader.result.indexOf(":")+1, reader.result.indexOf(";")) === "audio/wav"){
+                    if (reader.result.length <= 1333333){
+                        this.sampleData = reader.result;
+                        this.sampleName = sampleFile.name;
+                        this._addSample();
+                    }
+                    else{
+                        this.activity.errorMsg(_("Warning: Your sample cannot be loaded because it is >1MB."), this.timbreBlock);
+                    }            
+                }
+                else{
+                    this.showSampleTypeError();
+                }
             }
         }
     }
