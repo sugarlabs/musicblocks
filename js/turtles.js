@@ -960,6 +960,10 @@ Turtles.TurtlesView = class {
                 menuIcon.innerHTML = "menu";
                 docById("toggleAuxBtn").className -= "blue darken-1";
             }
+            // Store the currently selected grid
+            if (this.activity.turtles.currentGrid !== undefined) {
+                this.selectedGrid = this.activity.turtles.currentGrid;
+            }
             this._expandButton.style.visibility = "visible";
             this._collapseButton.style.visibility = "hidden";
             this.gridButton.style.visibility = "hidden";
@@ -1047,6 +1051,15 @@ Turtles.TurtlesView = class {
                     this.gridButton.scale = 1;
                     this.gridButton.x = this._w - 10 - 3 * 55;
                     this.gridButton.visible = true;
+                }
+
+                // Restore the previously selected grid
+                if (this.selectedGrid !== undefined) {
+                    this.activity.turtles.currentGrid = this.selectedGrid;
+                    this.activity.turtles.doGrid(this.selectedGrid);
+                } else {
+                    this.activity.turtles.currentGrid = 0;
+                    this.activity.turtles.doGrid(0);
                 }
 
                 // remove the stage and add it back in position 0
