@@ -484,6 +484,7 @@ class Palettes {
             } else {
                 document.body.style.cursor = "pointer";
                 clearTimeout(timeout);
+                this.activity.hideSearchWidget();
                 timeout = setTimeout(() => this.showPalette(name), 400);
             }
         };
@@ -496,6 +497,7 @@ class Palettes {
                 this._hideMenus();
                 this.activity.showSearchWidget();
             } else {
+                this.activity.hideSearchWidget();
                 this.showPalette(name);
             }
         };
