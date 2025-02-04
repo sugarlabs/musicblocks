@@ -301,7 +301,7 @@ function SampleWidget() {
     };
 
     //Drag-and-Drop sample files
-    this.drag_and_drop = function () {
+    this.drag_and_drop = () => {
         console.log("drag and drop")
         const dropZone = document.getElementsByClassName("samplerCanvas")[0];
 
@@ -322,9 +322,17 @@ function SampleWidget() {
             handleFiles(files);
         })
 
+        const handleFiles = (files) => {
 
-        function handleFiles(files) {
-            console.log(files);
+            const sampleFile = files[0];
+            const reader = new FileReader();
+            reader.readAsDataURL(sampleFile);
+
+            reader.onload = (e) =>{
+                console.log(sampleFile.name);
+                this.sampleData = reader.result;
+                this.sampleName = sampleFile.name;
+            }
         }
     }
 
@@ -412,8 +420,6 @@ function SampleWidget() {
                 const sampleFile = fileChooser.files[0];
                 const reader = new FileReader();
                 reader.readAsDataURL(sampleFile);
-                console.log(sampleFile);
-                
 
                 // eslint-disable-next-line no-unused-vars
                 reader.onload = function (event) {
@@ -423,7 +429,6 @@ function SampleWidget() {
                             that.sampleData = reader.result;
                             that.sampleName = fileChooser.files[0].name;
                             that._addSample();
-                            console.log("sample added"); 
                         } else {
                             that.activity.errorMsg(_("Warning: Your sample cannot be loaded because it is >1MB."), that.timbreBlock);
                         }
@@ -1001,6 +1006,5 @@ function SampleWidget() {
             }
         };
         draw();
-        console.log("canvas drawn");    
     };
 }
