@@ -323,6 +323,11 @@ function MusicKeyboard(activity) {
                 );
 
                 if (this.tick) {
+                    console.log(this.endTime);
+
+                    if (this.endTime === undefined) {
+                        return;
+                    }
                     let restDuration = (startTime[id] - this.endTime) / 1000.0;
 
                     restDuration /= 60; // time in minutes
@@ -330,6 +335,7 @@ function MusicKeyboard(activity) {
                     restDuration *= this.meterArgs[1];
 
                     restDuration = parseFloat((Math.round(restDuration * unit) / unit).toFixed(4));
+                    console.log(restDuration);
 
                     if (restDuration === 0) {
                         restDuration = 0;
@@ -763,6 +769,8 @@ function MusicKeyboard(activity) {
         this.tickButton.onclick = () => {
             if (this.tick) {
                 this.tick = false;
+                //if (this._notesPlayed.length === 0)
+                this.endTime = undefined;
                 this.loopTick.stop();
             } else {
                 this.tick = true;
