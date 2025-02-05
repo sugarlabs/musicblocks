@@ -670,6 +670,134 @@ class Activity {
         };
 
         /**
+        * Ensures blocks stay within canvas boundaries when resized.
+        */
+        function repositionBlocks(activity) {
+            const blocks = Object.values(activity.blocks.blockList);
+            const canvasWidth = window.innerWidth;
+
+            blocks.forEach(block => {
+                
+                // Store the initial position before any resizing
+                if (!block.initialPosition) {
+                    block.initialPosition = { x: block.container.x, y: block.container.y };
+                }
+
+                //optimizing for tablets
+                if (canvasWidth<768 && !block.beforeMobilePosition) { 
+                    block.beforeMobilePosition = { x: block.container.x, y: block.container.y }; 
+                } 
+                
+                if (canvasWidth>=768 && block.beforeMobilePosition) { 
+                    block.container.x = block.beforeMobilePosition.x; 
+                    block.container.y = block.beforeMobilePosition.y; 
+                }
+
+                // Store position when the screen width first goes below 600px
+                if (canvasWidth<600 && !block.before600pxPosition) {
+                    block.before600pxPosition = { x: block.container.x, y: block.container.y };
+                }
+
+                // Restore position when resizing back above 600px
+                if (canvasWidth >= 600 && block.before600pxPosition) {
+                    block.container.x = block.before600pxPosition.x;
+                    block.container.y = block.before600pxPosition.y;
+                }
+
+                //optimizing for mobile
+                if (canvasWidth < 480 && !block.beforeSmallPhonePosition) {
+                    block.beforeSmallPhonePosition = { x: block.container.x, y: block.container.y };
+                }
+    
+        
+                if (canvasWidth >= 480 && block.beforeSmallPhonePosition) {
+                    block.container.x = block.beforeSmallPhonePosition.x;
+                    block.container.y = block.beforeSmallPhonePosition.y;
+                }
+
+                //ensuring that the blocks are within the horizontal boundary
+                if (block.container.x + block.width > canvasWidth) {
+                    block.container.x =canvasWidth-block.width-10;
+                }
+            });
+
+            activity._findBlocks();
+        }
+
+        //if any window resize event occurs:
+        window.addEventListener("resize", () => repositionBlocks(this));
+
+        /**
+        * Finds and organizes blocks within the workspace.
+        * Arranges blocks in grid format on wide screens and vertically on narrow screens.
+         */
+        this._findBlocks = () => {
+            if (!this.blocks.visible) {
+                this._changeBlockVisibility();
+            }
+
+            this.blocks.activeBlock = null;
+            hideDOMLabel();
+            this.blocks.showBlocks();
+            this.blocksContainer.x = 0;
+            this.blocksContainer.y = 0;
+
+            const screenWidth = window.innerWidth;
+            const isNarrowScreen = screenWidth < 600;
+            const minColumnWidth = 400;
+            let numColumns = isNarrowScreen ? 1 : Math.floor(screenWidth / minColumnWidth);
+
+            let toppos = this.auxToolbar.style.display === "block" ? 90 + this.toolbarHeight : 90;
+            let x = isNarrowScreen ? Math.floor(screenWidth / 2) : Math.floor(this.canvas.width / 4);
+            let y = Math.floor(toppos * this.turtleBlocksScale);
+            let verticalSpacing = Math.floor(40 * this.turtleBlocksScale);
+
+            const columnSpacing = (screenWidth / numColumns) * 1.2;
+            const columnXPositions = Array.from({ length: numColumns }, (_, i) =>
+                Math.floor(i * columnSpacing + columnSpacing / 2)
+            );
+            const columnYPositions = Array(numColumns).fill(y);
+
+            for (const blk in this.blocks.blockList) {
+                if (!this.blocks.blockList[blk].trash) {
+
+                        // Store original position only once
+                        if (!myBlock.originalPosition) {
+                        myBlock.originalPosition = { x: myBlock.container.x, y: myBlock.container.y };
+                        }
+
+                    const myBlock = this.blocks.blockList[blk];
+                    if (myBlock.connections[0] === null) {
+                        if (isNarrowScreen) {
+                            const dx = x - myBlock.container.x;
+                            const dy = y - myBlock.container.y;
+                            this.blocks.moveBlockRelative(blk, dx, dy);
+                            y += myBlock.height + verticalSpacing;
+                        } else {
+                            let minYIndex = columnYPositions.indexOf(Math.min(...columnYPositions));
+                            const dx = columnXPositions[minYIndex] - myBlock.container.x;
+                            const dy = columnYPositions[minYIndex] - myBlock.container.y;
+                            this.blocks.moveBlockRelative(blk, dx, dy);
+                            columnYPositions[minYIndex] += myBlock.height + verticalSpacing;
+                        }
+                    }
+                }
+            }
+
+            repositionBlocks(this);
+            this.setHomeContainers(false);
+            this.boundary.hide();
+
+            for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+                const savedPenState = this.turtles.turtleList[turtle].painter.penState;
+                this.turtles.turtleList[turtle].painter.penState = false;
+                this.turtles.turtleList[turtle].painter.doSetXY(0, 0);
+                this.turtles.turtleList[turtle].painter.doSetHeading(0);
+                this.turtles.turtleList[turtle].painter.penState = savedPenState;
+            }
+        };
+
+        /**
         * Finds and organizes blocks within the workspace.
         * Blocks are positioned based on their connections and availability within the canvas area.
         * This method is part of the internal mechanism to ensure that blocks are displayed correctly and efficiently.
