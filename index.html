@@ -70,7 +70,7 @@
 
         <link type="text/css" href="fonts/material-icons.css" rel="stylesheet"/>
         <link rel="stylesheet" href="lib/materialize-iso.css" />
-        <link rel="stylesheet" href="css/darkmode.css" />
+        <link rel="stylesheet" href="css/themes.css" />
 
         <script src="lib/easeljs.min.js" defer></script>
 
@@ -776,13 +776,13 @@
                                     >
                                 </li>
                                 <li>
-                                    <a
-                                        id="darkModeIcon"
-                                        class="tooltipped"
-                                        data-position="bottom"
-                                        ><i class="material-icons md-48"
-                                            >brightness_4</i
-                                        ></a>
+                                  <a
+                                  id="themeSelectIcon"
+                                  class="tooltipped dropdown-trigger"
+                                  data-position="left"
+                                  data-activates="themedropdown"
+                                  ><i class="material-icons md-48">brightness_4</i></a
+                                >
                                 </li>
                                 <li>
                                     <a
@@ -920,6 +920,12 @@
                     <li><a id="he"></a></li>
                     <li><a id="ur"></a></li>
                 </ul>
+
+                <ul id="themedropdown" class="dropdown-content">
+                  <li><a id="light"></a></li>
+                  <li><a id="dark"></a></li>
+                </ul>
+
                 <div id="modal-container" style="display: none;z-index: 999;">
                     <ul id="newdropdown" class="dropdown-content" style="padding: 24px;">
                     </ul>

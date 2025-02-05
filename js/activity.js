@@ -26,7 +26,7 @@
    getMacroExpansion, getOctaveRatio, getTemperament, GOHOMEBUTTON,
    GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
    hideDOMLabel, initBasicProtoBlocks, initPalettes,
-   INLINECOLLAPSIBLES, jQuery, JSEditor, LanguageBox, Logo, MSGBLOCK,
+   INLINECOLLAPSIBLES, jQuery, JSEditor, LanguageBox, ThemeBox, Logo, MSGBLOCK,
    NANERRORMSG, NOACTIONERRORMSG, NOBOXERRORMSG, NOINPUTERRORMSG,
    NOMICERRORMSG, NOSQRTERRORMSG, NOSTRINGERRORMSG, PALETTEFILLCOLORS,
    PALETTESTROKECOLORS, PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
@@ -85,6 +85,7 @@ let MYDEFINES = [
     "activity/turtle-singer",
     "activity/turtle-painter",
     "activity/languagebox",
+    "activity/themebox",
     "activity/basicblocks",
     "activity/blockfactory",
     "activity/piemenus",
@@ -272,15 +273,17 @@ class Activity {
         //Flag to check if any other input box is active or not
         this.isInputON = false;
 
-        // If the theme is set to "darkMode", enable dark mode else diable
+        this.themes = ["light", "dark"];
         try {
-            if (this.storage.myThemeName === "darkMode") {
-                body.classList.add("dark-mode");
-            } else {
-                body.classList.remove("dark-mode");
+            for (let i = 0; i < this.themes.length; i++) {
+                if (this.themes[i] === this.storage.themePreference) {
+                    body.classList.add(this.themes[i]);
+                } else {
+                    body.classList.remove(this.themes[i]);
+                }
             }
         } catch (e) {
-            console.error("Error accessing myThemeName storage:", e);
+            console.error("Error accessing themePreference storage:", e);
         }
 
         this.beginnerMode = true;
@@ -385,6 +388,7 @@ class Activity {
             this.logo = null;
             this.pasteBox = null;
             this.languageBox = null;
+            this.themeBox = null;
             this.planet = null;
             window.converter = null;
             this.buttonsVisible = true;
@@ -6665,28 +6669,7 @@ class Activity {
 
             this._createErrorContainers();
 
-            // Function to toggle theme mode
-            this.toggleThemeMode = () => {
-                if (this.storage.myThemeName === "darkMode") {
-                    delete this.storage.myThemeName;
-                    localStorage.setItem("darkMode", "disabled");
-                } else {
-                    this.storage.myThemeName = "darkMode";
-                    localStorage.setItem("darkMode", "enabled");
-                }
-                const planetIframe = document.getElementById("planet-iframe");
-                if (planetIframe) {
-                    planetIframe.contentWindow.postMessage(
-                        { darkMode: localStorage.getItem("darkMode") },
-                        "*"
-                    );
-                }
-                try {
-                    window.location.reload();
-                } catch (e) {
-                    console.error("Error reloading the window:", e);
-                }
-            };
+            
 
             /* Z-Order (top to bottom):
              *   menus
@@ -6714,6 +6697,7 @@ class Activity {
 
             this.pasteBox = new PasteBox(this);
             this.languageBox = new LanguageBox(this);
+            this.themeBox = new ThemeBox(this);
 
             // Show help on startup if first-time user.
             if (this.firstTimeUser) {
@@ -6755,7 +6739,7 @@ class Activity {
             this.toolbar.renderModeSelectIcon(doSwitchMode, doRecordButton, doAnalytics, doOpenPlugin, deletePlugin, setScroller);
             this.toolbar.renderRunSlowlyIcon(doSlowButton);
             this.toolbar.renderRunStepIcon(doStepButton);
-            this.toolbar.renderDarkModeIcon(this.toggleThemeMode);
+            this.toolbar.renderThemeSelectIcon(this.themeBox, this.themes);
             this.toolbar.renderMergeIcon(_doMergeLoad);
             this.toolbar.renderRestoreIcon(restoreTrash);
             if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -7320,7 +7304,7 @@ class Activity {
     saveLocally() {
         try {
             localStorage.setItem('beginnerMode', this.beginnerMode.toString());
-            localStorage.setItem('isDarkModeON', this.isDarkModeON.toString());
+            localStorage.setItem("themePreference", this.themePreference.toString());
         } catch (e) {
             // eslint-disable-next-line no-console
             console.error('Error saving to localStorage:', e);
