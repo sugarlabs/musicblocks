@@ -2868,6 +2868,11 @@ class Activity {
                         if (this.searchWidget.style.visibility === 'visible') {
                             return;
                         }
+                        if (docById("paste").style.visibility === "visible") {
+                            this.pasted();
+			    docById("paste").style.visibility = "hidden";
+                            return;
+                        }
                         this.textMsg("Enter " + _("Play"));
                         let stopbt = document.getElementById("stop");
                         if (stopbt) {
