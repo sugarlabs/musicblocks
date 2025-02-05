@@ -942,7 +942,7 @@ class Activity {
                 */
 
                 const screenWidth = window.innerWidth;
-                const minColumnWidth = 400;
+                const minColumnWidth = 320;
                 let numColumns = screenWidth <= 320 ? 1 : Math.floor(screenWidth / minColumnWidth);
 
                 const baseColumnSpacing = screenWidth / numColumns;
