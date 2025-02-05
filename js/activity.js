@@ -703,7 +703,7 @@ class Activity {
                     block.container.x = block.before600pxPosition.x;
                     block.container.y = block.before600pxPosition.y;
                 }
-
+ 
                 //optimizing for mobile
                 if (canvasWidth < 480 && !block.beforeSmallPhonePosition) {
                     block.beforeSmallPhonePosition = { x: block.container.x, y: block.container.y };
@@ -715,9 +715,26 @@ class Activity {
                     block.container.y = block.beforeSmallPhonePosition.y;
                 }
 
+                if (canvasWidth < 400 && !block.beforeVerySmallPhonePosition) {
+                    block.beforeVerySmallPhonePosition = { x: block.container.x, y: block.container.y };
+                }
+                
+                if (canvasWidth >= 400 && block.beforeVerySmallPhonePosition) {
+                    block.container.x = block.beforeVerySmallPhonePosition.x;
+                    block.container.y = block.beforeVerySmallPhonePosition.y;
+                }
+
                 //ensuring that the blocks are within the horizontal boundary
                 if (block.container.x + block.width > canvasWidth) {
                     block.container.x =canvasWidth-block.width-10;
+                }
+
+                if (block.container.x + block.width > canvasWidth) {
+                    block.container.x = Math.max(10, canvasWidth - block.width - 10);
+                }
+                
+                if (block.container.x < 0) {
+                    block.container.x = 100; // Ensure it stays visible
                 }
             });
 
