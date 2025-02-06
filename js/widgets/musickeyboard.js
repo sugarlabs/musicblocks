@@ -132,12 +132,17 @@ function MusicKeyboard(activity) {
      * @type {Array}
      */
     this.idContainer = [];
-  
+
     /**
      * Flag to track tick status.
      * @type {boolean}
      */
     this.tick = false;
+
+    /** Flag to track if the metronome is on.
+     * @type {boolean}
+     */
+    this.metronomeON = false;
 
     /**
      * Meter arguments.
@@ -165,6 +170,12 @@ function MusicKeyboard(activity) {
     this.instrumentMapper = {};
 
     /**
+     * Flag to track first note while using metronome.
+     * @type {boolean}
+     */
+    this.firstNote = false;
+
+    /**
      * Array of selected notes.
      * @type {Array}
      */
@@ -175,8 +186,6 @@ function MusicKeyboard(activity) {
      * @type {Array}
      */
     let activeKey = null;
-
-    let firstNote = false; // Flag to start playing notes
 
     /**
      * Array of row blocks.
@@ -262,14 +271,19 @@ function MusicKeyboard(activity) {
      * Adds keyboard shortcuts for triggering musical notes.
      */
     this.addKeyboardShortcuts = function () {
-        //      ;
+
         let duration = 0;
         const startTime = {};
         const temp1 = {};
         const temp2 = {};
         const current = new Set();
 
-        const getNoteId = (event) => {
+        /**
+         * Gets the ID of the musical note associated with a keyboard event.
+         * @param {KeyboardEvent} event - The keyboard event.
+         * @returns {string} The ID of the musical note.
+         */
+        const __getNoteId = (event) => {
             let id;
             const key = event.keyCode;
 
@@ -293,7 +307,7 @@ function MusicKeyboard(activity) {
          * @param {KeyboardEvent} event - The keyboard event.
          */
         const __startNote = (event) => {
-            const id = getNoteId(event);
+            const id = __getNoteId(event);
 
             const ele = docById(id);
             if (!(id in startTime)) {
@@ -357,7 +371,7 @@ function MusicKeyboard(activity) {
          * @param {KeyboardEvent} event - The keyboard event triggered when a key is released.
          */
         const __endNote = (event) => {
-            const id = getNoteId(event);
+            const id = __getNoteId(event);
             const ele = docById(id);
             const newDate = new Date();
             const noteEndTime = newDate.getTime();
@@ -738,67 +752,60 @@ function MusicKeyboard(activity) {
          */
         this.tickButton = widgetWindow.addButton("metronome.svg", ICONSIZE, _("Metronome"));
         this.tickButton.onclick = () => {
-            if (this.tick) {
+
+            let interval;
+
+            if (this.metronomeON) {
+                this.metronomeON = false;
+                this.tickButton.style.removeProperty("background");
                 this.tick = false;
                 this.firstNote = false;
                 this.loopTick.stop();
-            } else {
 
+                const countdownContainer = docById("countdownContainer");
+                if (countdownContainer) {
+                    countdownContainer.remove();
+                    clearInterval(interval);
+                }
+
+            } else {
+                this.metronomeON = true;
+                this.tickButton.style.background = platformColor.orange;
                 const winBody = document.getElementsByClassName("wfbWidget")[0];
 
                 // Create a container for the countdown
                 const countdownContainer = document.createElement("div");
                 countdownContainer.id = "countdownContainer";
 
-                countdownContainer.style.position = "absolute";
-                countdownContainer.style.top = "0";
-                countdownContainer.style.left = "0";
-                countdownContainer.style.width = "100%";
-                countdownContainer.style.height = "100%";
-                countdownContainer.style.zIndex = "5";
-                countdownContainer.style.background = "rgba(0, 0, 0, 0.5)";
-                countdownContainer.style.pointerEvents = "all"; // Prevent interaction with other elements
-
-                // Centered inner countdown display
                 const countdownDisplay = document.createElement("div");
-                countdownDisplay.style.position = "absolute";
-                countdownDisplay.style.top = "50%";
-                countdownDisplay.style.left = "50%";
-                countdownDisplay.style.transform = "translate(-50%, -50%)";
-                countdownDisplay.style.background = "rgba(0, 0, 0, 0.8)";
-                countdownDisplay.style.color = "white";
-                countdownDisplay.style.padding = "20px";
-                countdownDisplay.style.borderRadius = "10px";
-                countdownDisplay.style.textAlign = "center";
-                countdownDisplay.innerText = "4";
-
-                // Append countdown display to container
+                countdownDisplay.id = "countdownDisplay";
+                countdownDisplay.innerText = "3";
                 countdownContainer.appendChild(countdownDisplay);
                 winBody.appendChild(countdownContainer);
 
-                let count = 4;
-                const interval = setInterval(() => {
+                let count = 3;
+                interval = setInterval(() => {
                     count--;
                     if (count === 0) {
                         clearInterval(interval);
                         countdownContainer.remove(); // Removes countdown display
-                        this.tick = true;
-                        this.activity.logo.synth.loadSynth(0, "cow bell");
-                        this.loopTick = this.activity.logo.synth.loop(
-                            0,
-                            "cow bell",
-                            "C5",
-                            1 / 64,
-                            0,
-                            this.bpm || 90,
-                            0.07
-                        );
+                        if (this.metronomeON) {
+                            this.tick = true;
+                            this.activity.logo.synth.loadSynth(0, "cow bell");
+                            this.loopTick = this.activity.logo.synth.loop(
+                                0,
+                                "cow bell",
+                                "C5",
+                                1 / 64,
+                                0,
+                                this.bpm || 90,
+                                0.07
+                            );
+                        }
                     } else {
                         countdownDisplay.textContent = count;
                     }
                 }, 1000);
-
-
                 setTimeout(() => {
                     this.activity.logo.synth.start();
                 }, 500);
