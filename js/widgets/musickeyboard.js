@@ -142,7 +142,7 @@ function MusicKeyboard(activity) {
     /** Flag to track if the metronome is on.
      * @type {boolean}
      */
-    this.metronomeON = false;
+    this.metronomeInterval = false;
 
     /**
      * Meter arguments.
@@ -763,43 +763,52 @@ function MusicKeyboard(activity) {
          */
         this.tickButton = widgetWindow.addButton("metronome.svg", ICONSIZE, _("Metronome"));
         this.tickButton.onclick = () => {
-
-            let interval;
-
-            if (this.metronomeON) {
-                this.metronomeON = false;
+            if (this.metronomeInterval || this.metronomeON) {
+                // Turn off metronome
                 this.tickButton.style.removeProperty("background");
+
+                if (this.tick && this.loopTick) {
+                    this.loopTick.stop();
+                }
                 this.tick = false;
                 this.firstNote = false;
-                this.loopTick.stop();
+                this.metronomeON = false;
 
                 const countdownContainer = docById("countdownContainer");
                 if (countdownContainer) {
                     countdownContainer.remove();
-                    clearInterval(interval);
+                }
+                if (this.metronomeInterval) {
+                    clearInterval(this.metronomeInterval);
+                    this.metronomeInterval = null;
                 }
 
             } else {
+                // Turn on metronome
                 this.metronomeON = true;
                 this.tickButton.style.background = platformColor.orange;
-                const winBody = document.getElementsByClassName("wfbWidget")[0];
 
-                // Create a container for the countdown
+                const winBody = document.getElementsByClassName("wfbWidget")[0];
                 const countdownContainer = document.createElement("div");
                 countdownContainer.id = "countdownContainer";
 
                 const countdownDisplay = document.createElement("div");
                 countdownDisplay.id = "countdownDisplay";
-                countdownDisplay.innerText = "3";
+                countdownDisplay.textContent = "3";
                 countdownContainer.appendChild(countdownDisplay);
                 winBody.appendChild(countdownContainer);
 
+                // Start countdown
                 let count = 3;
-                interval = setInterval(() => {
+                this.metronomeInterval = setInterval(() => {
                     count--;
+
                     if (count === 0) {
-                        clearInterval(interval);
-                        countdownContainer.remove(); // Removes countdown display
+                        clearInterval(this.metronomeInterval);
+                        this.metronomeInterval = null;
+
+                        countdownContainer.remove();
+
                         if (this.metronomeON) {
                             this.tick = true;
                             this.activity.logo.synth.loadSynth(0, "cow bell");
@@ -817,8 +826,12 @@ function MusicKeyboard(activity) {
                         countdownDisplay.textContent = count;
                     }
                 }, 1000);
+
+                // Start audio
                 setTimeout(() => {
-                    this.activity.logo.synth.start();
+                    if (this.metronomeON) {
+                        this.activity.logo.synth.start();
+                    }
                 }, 500);
             }
         };
