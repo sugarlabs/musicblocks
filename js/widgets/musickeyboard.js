@@ -743,17 +743,62 @@ function MusicKeyboard(activity) {
                 this.firstNote = false;
                 this.loopTick.stop();
             } else {
-                this.tick = true;
-                this.activity.logo.synth.loadSynth(0, "cow bell");
-                this.loopTick = this.activity.logo.synth.loop(
-                    0,
-                    "cow bell",
-                    "C5",
-                    1 / 64,
-                    0,
-                    this.bpm || 90,
-                    0.07
-                );
+
+                const winBody = document.getElementsByClassName("wfbWidget")[0];
+
+                // Create a container for the countdown
+                const countdownContainer = document.createElement("div");
+                countdownContainer.id = "countdownContainer";
+
+                countdownContainer.style.position = "absolute";
+                countdownContainer.style.top = "0";
+                countdownContainer.style.left = "0";
+                countdownContainer.style.width = "100%";
+                countdownContainer.style.height = "100%";
+                countdownContainer.style.zIndex = "5";
+                countdownContainer.style.background = "rgba(0, 0, 0, 0.5)";
+                countdownContainer.style.pointerEvents = "all"; // Prevent interaction with other elements
+
+                // Centered inner countdown display
+                const countdownDisplay = document.createElement("div");
+                countdownDisplay.style.position = "absolute";
+                countdownDisplay.style.top = "50%";
+                countdownDisplay.style.left = "50%";
+                countdownDisplay.style.transform = "translate(-50%, -50%)";
+                countdownDisplay.style.background = "rgba(0, 0, 0, 0.8)";
+                countdownDisplay.style.color = "white";
+                countdownDisplay.style.padding = "20px";
+                countdownDisplay.style.borderRadius = "10px";
+                countdownDisplay.style.textAlign = "center";
+                countdownDisplay.innerText = "4";
+
+                // Append countdown display to container
+                countdownContainer.appendChild(countdownDisplay);
+                winBody.appendChild(countdownContainer);
+
+                let count = 4;
+                const interval = setInterval(() => {
+                    count--;
+                    if (count === 0) {
+                        clearInterval(interval);
+                        countdownContainer.remove(); // Removes countdown display
+                        this.tick = true;
+                        this.activity.logo.synth.loadSynth(0, "cow bell");
+                        this.loopTick = this.activity.logo.synth.loop(
+                            0,
+                            "cow bell",
+                            "C5",
+                            1 / 64,
+                            0,
+                            this.bpm || 90,
+                            0.07
+                        );
+                    } else {
+                        countdownDisplay.textContent = count;
+                    }
+                }, 1000);
+
+
                 setTimeout(() => {
                     this.activity.logo.synth.start();
                 }, 500);
