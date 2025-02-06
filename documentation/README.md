@@ -27,6 +27,8 @@ You can run it from
 
 1. [Getting Started](#1-getting-started)
 2. [Toolbars](#2-toolbars)
+    1. [Main Toolbar](#1-main-toolbar)
+    2. [Secondary Toolbar](#2-secondary-toolbar)
 3. [Context Menus](#3-context-menus)
     1. [Contextual Menu for Blocks](#1-contextual-menu-for-blocks)
     2. [Contextual Menu for Background](#2-contextual-menu-for-background)
