@@ -320,16 +320,27 @@ function MusicKeyboard(activity) {
                 if (temp1[id] === "hertz") {
                     temp2[id] = parseInt(ele.getAttribute("alt").split("__")[1]);
                 } else if (temp1[id] in FIXEDSOLFEGE1) {
-                    temp2[id] = FIXEDSOLFEGE1[temp1[id]].replace(SHARP, "#").replace(FLAT, "b") + ele.getAttribute("alt").split("__")[1];
+                    temp2[id] =
+                        FIXEDSOLFEGE1[temp1[id]].replace(SHARP, "#").replace(FLAT, "b") +
+                        ele.getAttribute("alt").split("__")[1];
                 } else {
-                    temp2[id] = temp1[id].replace(SHARP, "#").replace(FLAT, "b") + ele.getAttribute("alt").split("__")[1];
+                    temp2[id] =
+                        temp1[id].replace(SHARP, "#").replace(FLAT, "b") +
+                        ele.getAttribute("alt").split("__")[1];
                 }
 
                 if (id == "rest") {
                     return;
                 }
 
-                this.activity.logo.synth.trigger(0, temp2[id], 1, this.instrumentMapper[id], null, null);
+                this.activity.logo.synth.trigger(
+                    0,
+                    temp2[id],
+                    1,
+                    this.instrumentMapper[id],
+                    null,
+                    null
+                );
 
                 if (this.tick && this.endTime !== undefined && this.firstNote) {
                     let restDuration = (startTime[id] - this.endTime) / 1000.0;
