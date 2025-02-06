@@ -991,7 +991,6 @@ class Toolbar {
 
         runStepByStepIcon.onclick = () => {
             onclick(this.activity);
-            docById("stop").style.color = this.stopIconColorWhenPlaying;
         };
     }
 
