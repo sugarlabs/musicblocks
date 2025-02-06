@@ -176,6 +176,8 @@ function MusicKeyboard(activity) {
      */
     let activeKey = null;
 
+    let firstNote = false; // Flag to start playing notes
+
     /**
      * Array of row blocks.
      * @type {Array}
@@ -267,30 +269,35 @@ function MusicKeyboard(activity) {
         const temp2 = {};
         const current = new Set();
 
+        const getNoteId = (event) => {
+            let id;
+            const key = event.keyCode;
+
+            if (WHITEKEYS.includes(key)) {
+                id = `whiteRow${WHITEKEYS.indexOf(key)}`;
+            } else if (BLACKKEYS.includes(key)) {
+                const i = BLACKKEYS.indexOf(key);
+                if ([2, 6, 9, 13, 16, 20].includes(i)) return null;
+                id = `blackRow${i}`;
+            } else if (HERTZKEYS.includes(key)) {
+                id = `hertzRow${HERTZKEYS.indexOf(key)}`;
+            } else if (key === SPACE) {
+                id = 'rest';
+            }
+
+            return id;
+        };
+
         /**
          * Handles the start of a musical note when a keyboard key is pressed.
          * @param {KeyboardEvent} event - The keyboard event.
          */
         const __startNote = (event) => {
-            let i, id;
-            if (WHITEKEYS.includes(event.keyCode)) {
-                i = WHITEKEYS.indexOf(event.keyCode);
-                id = "whiteRow" + i.toString();
-            } else if (BLACKKEYS.includes(event.keyCode)) {
-                i = BLACKKEYS.indexOf(event.keyCode);
-                if ([2, 6, 9, 13, 16, 20].includes(i)) return;
-                id = "blackRow" + i.toString();
-            } else if (HERTZKEYS.includes(event.keyCode)) {
-                i = HERTZKEYS.indexOf(event.keyCode);
-                id = "hertzRow" + i.toString();
-            } else if (SPACE == event.keyCode) {
-                id = "rest";
-            }
+            const id = getNoteId(event);
 
             const ele = docById(id);
             if (!(id in startTime)) {
-                const startDate = new Date();
-                startTime[id] = startDate.getTime();
+                startTime[id] = new Date().getTime();
             }
 
             if (ele !== null && ele !== undefined) {
@@ -299,59 +306,38 @@ function MusicKeyboard(activity) {
                 if (temp1[id] === "hertz") {
                     temp2[id] = parseInt(ele.getAttribute("alt").split("__")[1]);
                 } else if (temp1[id] in FIXEDSOLFEGE1) {
-                    temp2[id] =
-                        FIXEDSOLFEGE1[temp1[id]].replace(SHARP, "#").replace(FLAT, "b") +
-                        ele.getAttribute("alt").split("__")[1];
+                    temp2[id] = FIXEDSOLFEGE1[temp1[id]].replace(SHARP, "#").replace(FLAT, "b") + ele.getAttribute("alt").split("__")[1];
                 } else {
-                    temp2[id] =
-                        temp1[id].replace(SHARP, "#").replace(FLAT, "b") +
-                        ele.getAttribute("alt").split("__")[1];
+                    temp2[id] = temp1[id].replace(SHARP, "#").replace(FLAT, "b") + ele.getAttribute("alt").split("__")[1];
                 }
 
                 if (id == "rest") {
-                    this.endTime = undefined;
                     return;
                 }
 
-                this.activity.logo.synth.trigger(
-                    0,
-                    temp2[id],
-                    1,
-                    this.instrumentMapper[id],
-                    null,
-                    null
-                );
+                this.activity.logo.synth.trigger(0, temp2[id], 1, this.instrumentMapper[id], null, null);
 
-                if (this.tick) {
-                    console.log(this.endTime);
-
-                    if (this.endTime === undefined) {
-                        return;
-                    }
+                if (this.tick && this.endTime !== undefined && this.firstNote) {
                     let restDuration = (startTime[id] - this.endTime) / 1000.0;
-
-                    restDuration /= 60; // time in minutes
+                    restDuration /= 60; // Convert time to minutes
                     restDuration *= this.bpm;
                     restDuration *= this.meterArgs[1];
-
                     restDuration = parseFloat((Math.round(restDuration * unit) / unit).toFixed(4));
-                    console.log(restDuration);
+                    const EPSILON = 0.0600;
 
-                    if (restDuration === 0) {
-                        restDuration = 0;
-                    } else {
+                    if (restDuration > EPSILON && current.size === 0) {
                         this._notesPlayed.push({
                             startTime: this.endTime,
                             noteOctave: "R",
                             objId: null,
                             duration: parseFloat(restDuration)
                         });
-                        //this._createTable();
                     }
                 }
-                this.endTime = undefined;
+                this.firstNote = true;
             }
         };
+
 
         /**
          * Handles the keyboard key down event to start playing musical notes.
@@ -371,25 +357,11 @@ function MusicKeyboard(activity) {
          * @param {KeyboardEvent} event - The keyboard event triggered when a key is released.
          */
         const __endNote = (event) => {
-            let i, id;
-            if (WHITEKEYS.includes(event.keyCode)) {
-                i = WHITEKEYS.indexOf(event.keyCode);
-                id = "whiteRow" + i.toString();
-            } else if (BLACKKEYS.includes(event.keyCode)) {
-                i = BLACKKEYS.indexOf(event.keyCode);
-                if ([2, 6, 9, 13, 16, 20].includes(i)) return;
-                id = "blackRow" + i.toString();
-            } else if (HERTZKEYS.includes(event.keyCode)) {
-                i = HERTZKEYS.indexOf(event.keyCode);
-                id = "hertzRow" + i.toString();
-            } else if (SPACE == event.keyCode) {
-                id = "rest";
-            }
-
+            const id = getNoteId(event);
             const ele = docById(id);
             const newDate = new Date();
-            this.endTime = newDate.getTime();
-            duration = (this.endTime - startTime[id]) / 1000.0;
+            const noteEndTime = newDate.getTime();
+            duration = (noteEndTime - startTime[id]) / 1000.0;
 
             if (ele !== null && ele !== undefined) {
                 if (id.includes("blackRow")) {
@@ -400,23 +372,21 @@ function MusicKeyboard(activity) {
 
                 // no = ele.getAttribute("alt").split("__")[2];
 
-                duration /= 60;
-                duration *= this.bpm;
-                duration *= this.meterArgs[1];
+                let processedDuration = duration / 60;
+                processedDuration *= this.bpm;
+                processedDuration *= this.meterArgs[1];
+                processedDuration = parseFloat((Math.round(processedDuration * unit) / unit).toFixed(4));
 
-                duration = parseFloat((Math.round(duration * unit) / unit).toFixed(4));
-
-                if (duration === 0) {
-                    duration = 1 / unit;
-                } else if (duration < 0) {
-                    duration = -duration;
+                if (processedDuration <= 0) {
+                    processedDuration = 1 / unit;
                 }
+
                 if (id == "rest") {
                     this._notesPlayed.push({
                         startTime: startTime[id],
                         noteOctave: "R",
                         objId: null,
-                        duration: parseFloat(duration)
+                        duration: parseFloat(processedDuration)
                     });
                 } else {
                     this.activity.logo.synth.stopSound(0, this.instrumentMapper[id], temp2[id]);
@@ -424,7 +394,7 @@ function MusicKeyboard(activity) {
                         startTime: startTime[id],
                         noteOctave: temp2[id],
                         objId: id,
-                        duration: duration,
+                        duration: processedDuration,
                         voice: this.instrumentMapper[id],
                         blockNumber: this.blockNumberMapper[id]
                     });
@@ -454,6 +424,7 @@ function MusicKeyboard(activity) {
                     docById("mkbOuterDiv").style.width = w + "px";
                     docById("mkbInnerDiv").style.height = "100%";
                 }
+                this.endTime = noteEndTime;
                 delete startTime[id];
                 delete temp1[id];
                 delete temp2[id];
@@ -769,8 +740,7 @@ function MusicKeyboard(activity) {
         this.tickButton.onclick = () => {
             if (this.tick) {
                 this.tick = false;
-                //if (this._notesPlayed.length === 0)
-                this.endTime = undefined;
+                this.firstNote = false;
                 this.loopTick.stop();
             } else {
                 this.tick = true;
