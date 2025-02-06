@@ -1553,9 +1553,17 @@ class Activity {
                 // Queue and take first step.
                 if (!this.turtles.running()) {
                     this.logo.runLogoCommands();
+                    docById("stop").style.color = this.toolbar.stopIconColorWhenPlaying;
                 }
                 this.logo.step();
             } else {
+
+                const noBlocks = Object.keys(this.logo.stepQueue).every(key=>this.logo.stepQueue[key].length===0);
+                if (noBlocks) {
+                this.logo.doStopTurtles();
+                docById("stop").style.color = "white";
+                return;
+            }
                 this.logo.turtleDelay = this.TURTLESTEP;
                 this.logo.step();
             }
