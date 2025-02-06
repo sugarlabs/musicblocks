@@ -1,4 +1,4 @@
-// Copyright (c) 2018-21 Walter Bender
+// Copyright (c) 2025 Arjun Jayan
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -49,7 +49,7 @@ class ThemeBox {
     //  * @returns {void}
     //  */
     // custom_onclick() {
-    //     this._theme = "pastel";
+    //     this._theme = "custom";
     //     this.setPreference();
     // }
 

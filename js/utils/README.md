@@ -6,18 +6,18 @@ This guide explains how you can add your own custom theme or customize an existi
 
 ### How themes work in Music Blocks
 
-1. When the page loads for the first time, the default theme of light mode is used. (because no themePreference has been set yet)
+1. When the page loads for the first time, the default theme of light mode is used.
 
-2. When you choose a theme, an Object stores inside the localStorage called themePreference.
+2. When you choose a theme, an object stores inside the localStorage called themePreference.
 
-3. As of now, all the styling of Music Blocks happens at the time of loading. So we will simply load the page.
+3. As of now, all styling of Music Blocks happens at the time of loading. When we change themes, we reload the page.
 
-4. The stylings on the main page happen due to two things:
+4. Most of the Music Blocks theme styles are defined in two places:
 
     1. css/themes.css
     2. js/utils/platformstyle.js
 
-5. the styling on the planet page happens due to one file
+5. The Plant theme styles are defined in:
 
     1. planet/css/planetThemes.css
 
@@ -27,7 +27,7 @@ This guide explains how you can add your own custom theme or customize an existi
 
 ### Steps on Theme Customization:
 
-Note: I have added a pastel theme as an example here, but if you want to customise an existing theme, just put your changes in the dark mode and choose dark mode from the theme dropdown. You can skip to step no. 6 if that is your goal.
+Note: If you want to customise an existing theme, just put your changes in the dark mode and choose dark mode from the theme dropdown. You can skip to step no. 6 if that is your goal.
 
 1.  **Adding your theme's name to the list in index.html**
 
@@ -42,10 +42,7 @@ Note: I have added a pastel theme as an example here, but if you want to customi
             <a id="dark"></a>
         </li>
         <li>
-            <a id="pastel"></a>
-        </li>
-        <li>
-            <a id="your_theme"></a>
+            <a id="custom"></a>
         </li>
     </ul>
     ```
@@ -59,16 +56,14 @@ Note: I have added a pastel theme as an example here, but if you want to customi
     string = [[...],
         ["light", _("Light Mode"), "innerHTML"],
         ["dark", _("Dark Mode"), "innerHTML"],
-        ["pastel", _("Pastel Theme"), "innerHTML"],
-        ["your_theme", _("Your Theme's Name"), "innerHTML"]];
+        ["custom", _("Custom Theme"), "innerHTML"]];
     ```
 
     ```javascript
     string = [_(...),
     _("Light Mode"),
     _("Dark Mode"),
-    _("Pastel Theme"),
-    _("Your Theme Name")];
+    _("Custom Theme")];
     ```
 
     There will be two same arrays in the else statement, repeat the process. This is to display your theme's name in the dropdown menu item you created in Step 1.
@@ -101,13 +96,13 @@ Note: I have added a pastel theme as an example here, but if you want to customi
     class Activity {
         constructor(
             ...
-            this.themes = ["light", "pastel", "dark", "your_theme"];
+            this.themes = ["light", "dark", "custom"];
             ...
         )
     }
     ```
 
-    Add your theme here too. In activity.js, you will find just below there is this for loop, this checks for all the themes in the themes array we just saw above and then add the theme class in themes.css (which you will add in later steps) which matches the themePreference object in localStorage.
+    Add your theme here too. In activity.js, you will find just below there is this "for" loop, this checks for all the themes in the themes array we just saw above and then add the theme class in themes.css (which you will add in later steps) which matches the themePreference object in localStorage.
 
     ```javascript
     for (let i = 0; i < this.themes.length; i++) {
@@ -119,7 +114,7 @@ Note: I have added a pastel theme as an example here, but if you want to customi
     }
     ```
 
-    If no theme is selected, i.e., there is no themePreference in localStorage. The styles will default to light mode, as it is the base styling without a class in themes.css. But when there is a themePreference in localStorage, the class respective to the chosen theme will be added to the elements which will apply because of higher specificity.
+    If no theme has been selected (i.e., themePreference has not been defined in localStorage), the styles will default to "light". Otherwise, the theme defined in themePreference will be applied.
 
 4.  **Adding your theme to the planet page**
 
@@ -127,7 +122,7 @@ Note: I have added a pastel theme as an example here, but if you want to customi
 
     ```javascript
     document.addEventListener("DOMContentLoaded", function () {
-        let themes = ["light", "pastel", "dark", "your_theme"];
+        let themes = ["light", "dark", "custom"];
         for (let i = 0; i < themes.length; i++) {
             if (themes[i] === localStorage.getItem("themePreference")) {
                 document.body.classList.add(themes[i]);
@@ -138,8 +133,8 @@ Note: I have added a pastel theme as an example here, but if you want to customi
     });
     ```
 
-    Add your theme here as well. This for loop above checks (after the DOM is loaded) for all themes in themes array to add the class in planetThemes.css (which you will add in later steps) which match themePreference in localStorage to the elements on planet/index.html. That is why the changes happen after the reload.
-    If no theme is selected (i.e., there is no themePreference in localStorage), the styles will default to light mode because it is the base styling with no class in planetThemes.css . But when there is a themePreference in localStorage, the class respective to the chosen theme will be added to the elements which will apply because of higher specificity.
+    Add your theme here as well. The "for" loop shown above checks (after the DOM is loaded) for all themes in themes array to add the class in planetThemes.css (which you will add in later steps) which match themePreference in localStorage to the elements on planet/index.html. That is why the changes happen after the reload.
+    If no theme has been selected (i.e., themePreference has not been defined in localStorage), the styles will default to "light". Otherwise, the theme defined in themePreference will be applied.
 
 5.  **Using themeBox to add functionality to your options in the dropdown menu**
 
@@ -170,17 +165,8 @@ Note: I have added a pastel theme as an example here, but if you want to customi
      * @public
      * @returns {void}
      */
-    pastel_onclick() {
-        this._theme = "pastel";
-        this.setPreference();
-    }
-
-    /**
-     * @public
-     * @returns {void}
-     */
-    your_theme_onclick() {
-        this._theme = "your_theme";
+    custom_onclick() {
+        this._theme = "custom";
         this.setPreference();
     }
     ...
@@ -196,21 +182,20 @@ Note: I have added a pastel theme as an example here, but if you want to customi
     You have to add styling to three places,
 
     1. css/themes.css (this is external styling used for floating windows, search bar, etc.)
-       If you go here, you will find styling for dark mode, and pastel theme, just write your css using them as a template below the last theme's CSS. There is no light mode here because it is the default.
+       If you go here, you will find styling for dark mode, just write your css using them as a template below the last theme's CSS. There is no light mode here because it is the default.
 
     2. js/utils/platformstyle.js (this is styling in JS, used to for the rest of the stuff not covered in themes.css)
-       Find the platformThemes object and add your styling there using the dark, pastel, light themes as a template
+       Find the platformThemes object and add your styling there using the dark and light themes as a template
 
         ```javascript
         let platformThemes = {
         dark: {...},
         light: {...},
-        pastel: {...},
-        your_theme: {your_styling}
+        custom: {Your Styling}
         }
         ```
 
-        There is a for loop below this
+        There is a "for" loop below this
 
         ```javascript
         for (const theme in platformThemes) {

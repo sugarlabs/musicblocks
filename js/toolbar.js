@@ -107,7 +107,7 @@ class Toolbar {
                 ["ur", _("اردو"), "innerHTML"],
                 ["light", _("Light Mode"), "innerHTML"],
                 ["dark", _("Dark Mode"), "innerHTML"],
-                // ["custom", _("Theme Name"), "innerHTML"],
+                // ["custom", _("Custom Theme"), "innerHTML"],
             ];
 
             // Workaround for FF
@@ -241,7 +241,7 @@ class Toolbar {
                 ["ur", _("اردو"), "innerHTML"],
                 ["light", _("Light Mode"), "innerHTML"],
                 ["dark", _("Dark Mode"), "innerHTML"]
-                // ["custom", _("Theme Name"), "innerHTML"],
+                // ["custom", _("Custom Theme"), "innerHTML"],
             ];
 
             // Workaround for FF
