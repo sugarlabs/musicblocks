@@ -12,6 +12,8 @@
 }
 */
 
+@import url("play-only-mode.css");
+
 *:focus {
   outline: none;
 }
