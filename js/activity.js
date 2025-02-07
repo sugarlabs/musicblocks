@@ -2885,7 +2885,7 @@ class Activity {
                         this.logo.doStopTurtles();
                         break;
                     case 86: // 'V'
-                        this.textMsg("Alt-V " + _("Paste"));
+                        // this.textMsg("Alt-V " + _("Paste"));
                         this.blocks.pasteStack();
                         break;
                     case 72: // 'H' save block help
@@ -2907,7 +2907,7 @@ class Activity {
             } else if (event.ctrlKey) {
                 switch (event.keyCode) {
                     case V:
-                        this.textMsg("Ctl-V " + _("Paste"));
+                        // this.textMsg("Ctl-V " + _("Paste"));
                         this.pasteBox.createBox(this.turtleBlocksScale, 200, 200);
                         this.pasteBox.show();
                         docById("paste").style.left =
