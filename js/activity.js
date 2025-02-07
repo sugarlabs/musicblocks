@@ -671,90 +671,94 @@ class Activity {
 
         /**
         * Ensures blocks stay within canvas boundaries when resized.
+        * Ensures that music blocks are responsive to horizontal resizing.
+        * Ensures that overall integrity of blocks isn't hampered with.
         */
         function repositionBlocks(activity) {
-            const blocks = Object.values(activity.blocks.blockList);
+            
             const canvasWidth = window.innerWidth;
+            const processedBlocks = new Set();
+        
+            //Array for storing individual dragGroups (the chunks of code linked together which are not connected)
+            const dragGroups = [];
 
-            blocks.forEach(block => {
-                // Store the initial position before any resizing
-                if (!block.initialPosition) {
-                    block.initialPosition = { x: block.container.x, y: block.container.y };
-                }
+            // Identifying individual dragGroups 
+            Object.values(activity.blocks.blockList).forEach(block => {
+                if (!processedBlocks.has(block.id)) {
+                    
+                    activity.blocks.findDragGroup(block.id); 
 
-                // Optimizing for tablets
-                if (canvasWidth < 768 && !block.beforeMobilePosition) {
-                    block.beforeMobilePosition = { x: block.container.x, y: block.container.y };
-                }
-                if (canvasWidth >= 768 && block.beforeMobilePosition) {
-                    block.container.x = block.beforeMobilePosition.x;
-                    block.container.y = block.beforeMobilePosition.y;
-                }
-
-                // Store position when the screen width first goes below 600px
-                if (canvasWidth < 600 && !block.before600pxPosition) {
-                    block.before600pxPosition = { x: block.container.x, y: block.container.y };
-                }
-                // Restore position when resizing back above 600px
-                if (canvasWidth >= 600 && block.before600pxPosition) {
-                    block.container.x = block.before600pxPosition.x;
-                    block.container.y = block.before600pxPosition.y;
-                }
-
-                // Optimizing for mobile
-                if (canvasWidth < 480 && !block.beforeSmallPhonePosition) {
-                    block.beforeSmallPhonePosition = { x: block.container.x, y: block.container.y };
-                }
-                if (canvasWidth >= 480 && block.beforeSmallPhonePosition) {
-                    block.container.x = block.beforeSmallPhonePosition.x;
-                    block.container.y = block.beforeSmallPhonePosition.y;
-                }
-
-                if (canvasWidth < 400 && !block.beforeVerySmallPhonePosition) {
-                    block.beforeVerySmallPhonePosition = { x: block.container.x, y: block.container.y };
-                }
-                if (canvasWidth >= 400 && block.beforeVerySmallPhonePosition) {
-                    block.container.x = block.beforeVerySmallPhonePosition.x;
-                    block.container.y = block.beforeVerySmallPhonePosition.y;
-                }
-
-                ///
-                // Move connected blocks (inner and outer) to keep them intact
-                if (block.connections.length > 0) {
-                    block.connections.forEach(conn => {
-                        if (conn !== null) {
-                            let connectedBlock = activity.blocks.blockList[conn];
-                            if (connectedBlock) {
-                                // Calculate the relative position of the connected block
-                                const relativeX = connectedBlock.container.x - block.container.x;
-                                const relativeY = connectedBlock.container.y - block.container.y;
-
-                                // Move the connected block to maintain its relative position
-                                connectedBlock.container.x = block.container.x + relativeX;
-                                connectedBlock.container.y = block.container.y + relativeY;
-                            }
-                        }
-                    });
-                }
-                ///
-
-                //ensuring that the blocks are within the horizontal boundary
-                if (block.container.x + block.width > canvasWidth) {
-                    block.container.x =canvasWidth-block.width-10;
-                }
-
-                if (block.container.x + block.width > canvasWidth) {
-                    block.container.x = Math.max(10, canvasWidth - block.width - 10);
-                }
-                
-                if (block.container.x < 0) {
-                    block.container.x = 100; // Ensure it stays visible
+                    if (activity.blocks.dragGroup.length > 0) {
+                        dragGroups.push([...activity.blocks.dragGroup]); // Store the group into dragGroups
+                        activity.blocks.dragGroup.forEach(id => processedBlocks.add(id)); // Process individual groups
+                    }
                 }
             });
+        
+            // Repositioning of dragGroups according to horizontal resizing
+            dragGroups.forEach(group => {
+                let referenceBlock = activity.blocks.blockList[group[0]]; 
+        
+                // Store initial positions
+                if (!referenceBlock.initialPosition) {
+                    referenceBlock.initialPosition = { x: referenceBlock.container.x, y: referenceBlock.container.y };
+                }
+        
+                if (canvasWidth < 768 && !referenceBlock.beforeMobilePosition) {
+                    referenceBlock.beforeMobilePosition = { x: referenceBlock.container.x, y: referenceBlock.container.y };
+                }
 
+                if (canvasWidth >= 768 && referenceBlock.beforeMobilePosition) {
+                    let dx = referenceBlock.beforeMobilePosition.x - referenceBlock.container.x;
+                    let dy = referenceBlock.beforeMobilePosition.y - referenceBlock.container.y;
+                    group.forEach(blockId => {
+                        let block = activity.blocks.blockList[blockId];
+                        block.container.x += dx;
+                        block.container.y += dy;
+                    });
+                }
+        
+                if (canvasWidth < 600 && !referenceBlock.before600pxPosition) {
+                    referenceBlock.before600pxPosition = { x: referenceBlock.container.x, y: referenceBlock.container.y };
+                }
+
+                if (canvasWidth >= 600 && referenceBlock.before600pxPosition) {
+                    let dx = referenceBlock.before600pxPosition.x - referenceBlock.container.x;
+                    let dy = referenceBlock.before600pxPosition.y - referenceBlock.container.y;
+
+                    group.forEach(blockId => {
+                        let block = activity.blocks.blockList[blockId];
+                        block.container.x += dx;
+                        block.container.y += dy;
+                    });
+                }
+        
+                // Ensure blocks stay within horizontal boundary
+                let rightmostX = Math.max(...group.map(id => activity.blocks.blockList[id].container.x + activity.blocks.blockList[id].width));
+        
+                if (rightmostX > canvasWidth) {
+                    let shiftX = Math.max(10, canvasWidth - rightmostX - 10);
+
+                    group.forEach(blockId => {
+                        activity.blocks.blockList[blockId].container.x += shiftX;
+                    });
+                }
+                
+                // Ensures that blocks do not go hide behind the search for blocks div
+                let leftmostX = Math.min(...group.map(id => activity.blocks.blockList[id].container.x));
+                if (leftmostX < 0) {
+                    let shiftX = 100 - leftmostX;
+
+                    group.forEach(blockId => {
+                        activity.blocks.blockList[blockId].container.x += shiftX;
+                    });
+                }
+                
+            });
+        
             activity._findBlocks();
         }
-
+        
         //if any window resize event occurs:
         window.addEventListener("resize", () => repositionBlocks(this));
 
@@ -827,10 +831,8 @@ class Activity {
                             }
 
                         });
-
                     }
                 }
-                
             }
 
             repositionBlocks(this);
