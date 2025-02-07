@@ -827,6 +827,26 @@ class Toolbar {
             begIcon.style.display = this.activity.beginnerMode ? "none" : "block";
             advIcon.style.display = this.activity.beginnerMode ? "block" : "none";
 
+            // Disable horizontal scrolling if switching to beginner mode
+            if (this.activity.beginnerMode) {
+                if (this.activity.scrollBlockContainer) {
+                    this.activity.scrollBlockContainer = false;
+                    docById("enableHorizScrollIcon").style.display = "block";
+                    docById("disableHorizScrollIcon").style.display = "none";
+                    
+                    if (this.activity.helpfulWheelItems) {
+                        this.activity.helpfulWheelItems.forEach(ele => {
+                            if (ele.label === "Enable horizontal scrolling") {
+                                ele.display = true;
+                            }
+                            if (ele.label === "Disable horizontal scrolling") {
+                                ele.display = false;
+                            }
+                        });
+                    }
+                }
+            }
+
             // Update record button
             const recordButton = docById("record");
             if (recordButton) {
