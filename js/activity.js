@@ -677,39 +677,34 @@ class Activity {
             const canvasWidth = window.innerWidth;
 
             blocks.forEach(block => {
-                
                 // Store the initial position before any resizing
                 if (!block.initialPosition) {
                     block.initialPosition = { x: block.container.x, y: block.container.y };
                 }
 
-                //optimizing for tablets
-                if (canvasWidth<768 && !block.beforeMobilePosition) { 
-                    block.beforeMobilePosition = { x: block.container.x, y: block.container.y }; 
-                } 
-                
-                if (canvasWidth>=768 && block.beforeMobilePosition) { 
-                    block.container.x = block.beforeMobilePosition.x; 
-                    block.container.y = block.beforeMobilePosition.y; 
+                // Optimizing for tablets
+                if (canvasWidth < 768 && !block.beforeMobilePosition) {
+                    block.beforeMobilePosition = { x: block.container.x, y: block.container.y };
+                }
+                if (canvasWidth >= 768 && block.beforeMobilePosition) {
+                    block.container.x = block.beforeMobilePosition.x;
+                    block.container.y = block.beforeMobilePosition.y;
                 }
 
                 // Store position when the screen width first goes below 600px
-                if (canvasWidth<600 && !block.before600pxPosition) {
+                if (canvasWidth < 600 && !block.before600pxPosition) {
                     block.before600pxPosition = { x: block.container.x, y: block.container.y };
                 }
-
                 // Restore position when resizing back above 600px
                 if (canvasWidth >= 600 && block.before600pxPosition) {
                     block.container.x = block.before600pxPosition.x;
                     block.container.y = block.before600pxPosition.y;
                 }
- 
-                //optimizing for mobile
+
+                // Optimizing for mobile
                 if (canvasWidth < 480 && !block.beforeSmallPhonePosition) {
                     block.beforeSmallPhonePosition = { x: block.container.x, y: block.container.y };
                 }
-    
-        
                 if (canvasWidth >= 480 && block.beforeSmallPhonePosition) {
                     block.container.x = block.beforeSmallPhonePosition.x;
                     block.container.y = block.beforeSmallPhonePosition.y;
@@ -718,11 +713,30 @@ class Activity {
                 if (canvasWidth < 400 && !block.beforeVerySmallPhonePosition) {
                     block.beforeVerySmallPhonePosition = { x: block.container.x, y: block.container.y };
                 }
-                
                 if (canvasWidth >= 400 && block.beforeVerySmallPhonePosition) {
                     block.container.x = block.beforeVerySmallPhonePosition.x;
                     block.container.y = block.beforeVerySmallPhonePosition.y;
                 }
+
+                ///
+                // Move connected blocks (inner and outer) to keep them intact
+                if (block.connections.length > 0) {
+                    block.connections.forEach(conn => {
+                        if (conn !== null) {
+                            let connectedBlock = activity.blocks.blockList[conn];
+                            if (connectedBlock) {
+                                // Calculate the relative position of the connected block
+                                const relativeX = connectedBlock.container.x - block.container.x;
+                                const relativeY = connectedBlock.container.y - block.container.y;
+
+                                // Move the connected block to maintain its relative position
+                                connectedBlock.container.x = block.container.x + relativeX;
+                                connectedBlock.container.y = block.container.y + relativeY;
+                            }
+                        }
+                    });
+                }
+                ///
 
                 //ensuring that the blocks are within the horizontal boundary
                 if (block.container.x + block.width > canvasWidth) {
@@ -777,13 +791,13 @@ class Activity {
 
             for (const blk in this.blocks.blockList) {
                 if (!this.blocks.blockList[blk].trash) {
+                    const myBlock = this.blocks.blockList[blk];
 
                         // Store original position only once
                         if (!myBlock.originalPosition) {
                         myBlock.originalPosition = { x: myBlock.container.x, y: myBlock.container.y };
-                        }
+                    }
 
-                    const myBlock = this.blocks.blockList[blk];
                     if (myBlock.connections[0] === null) {
                         if (isNarrowScreen) {
                             const dx = x - myBlock.container.x;
@@ -798,7 +812,25 @@ class Activity {
                             columnYPositions[minYIndex] += myBlock.height + verticalSpacing;
                         }
                     }
+
+                    // Making code to make sure that 
+                    if (myBlock.connections.length>0)  {
+                        myBlock.connections.forEach(conn  =>  {
+                            if (conn !== null) {
+                                let innerBlock = this.blocks.blockList[conn] ;
+                                if (innerBlock) {
+
+                                    innerBlock.container.x = myBlock.container.x + innerBlock.relativeX;
+                                    innerBlock.container.y = myBlock.container.y + innerBlock.relativeY;
+                                }
+
+                            }
+
+                        });
+
+                    }
                 }
+                
             }
 
             repositionBlocks(this);
@@ -813,6 +845,7 @@ class Activity {
                 this.turtles.turtleList[turtle].painter.penState = savedPenState;
             }
         };
+
 
         /**
         * Finds and organizes blocks within the workspace.
