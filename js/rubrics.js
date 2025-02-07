@@ -867,3 +867,18 @@ const getStatsFromNotation = (activity) => {
     // console.debug(projectStats);
     return projectStats;
 };
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        TACAT,
+        TAPAL,
+        TASCORE,
+        PALS,
+        PALLABELS,
+        analyzeProject,
+        scoreToChartData,
+        getChartOptions,
+        runAnalytics,
+        getStatsFromNotation
+    };
+}
