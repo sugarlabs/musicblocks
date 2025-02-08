@@ -404,11 +404,36 @@ Turtles.TurtlesModel = class {
         // List of all of the turtles, one for each start block
         this._turtleList = [];
 
-        /**
-         * @todo Add methods to initialize the turtleList, directly access the
-         * required turtle rather than having to "get" the turtleList itself,
-         * and return the length of the turtleList (number of Turtles).
-         */
+        
+    }
+
+    /**
+     * Initializes the turtleList with a given list of turtles.
+     *
+     * @param {Array} turtles - Array of turtle objects to initialize the list.
+     * @returns {void}
+     */
+    initializeTurtleList(turtles) {
+        this._turtleList = turtles;
+    }
+
+    /**
+     * Returns the turtle at the specified index.
+     *
+     * @param {Number} index - The index of the turtle to retrieve.
+     * @returns {Object} The turtle object at the specified index.
+     */
+    getTurtle(index) {
+        return this._turtleList[index];
+    }
+
+    /**
+     * Returns the number of turtles in the turtleList.
+     *
+     * @returns {Number} The number of turtles.
+     */
+    getTurtleCount() {
+        return this._turtleList.length;
     }
 
     /**
