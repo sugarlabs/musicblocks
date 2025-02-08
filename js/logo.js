@@ -800,11 +800,12 @@ class Logo {
         }
     }
 
-    notationMIDI(note, duration, turtle, bpm, instrument, drum) {
+    notationMIDI(note, drum, duration, turtle, bpm, instrument) {
+
         if (!this._midiData[turtle]) {
             this._midiData[turtle] = [];
         }
-        if (drum) instrument = "drums";
+        if (drum) drum = drum[0];
         this._midiData[turtle].push({ note, duration, bpm, instrument, drum });
     }
 
@@ -1703,7 +1704,6 @@ class Logo {
                         logo.activity.save.afterSaveMxml();
                         logo.runningMxml = false;
                     } else if (logo.runningMIDI) {
-                        console.log("Save MIDI file");
                         logo.runningMIDI = false;
                     }
                     else if (tur.singer.suppressOutput) {
