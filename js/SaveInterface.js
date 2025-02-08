@@ -21,9 +21,6 @@
  * Class representing the SaveInterface.
  * @class
  */
-requirejs(["tonejsMidi"]);
-
-
 class SaveInterface {
     /**
      * Creates an instance of SaveInterface.
@@ -389,6 +386,7 @@ class SaveInterface {
                     }
                     globalTime += duration;
                 });
+                globalTime = 0;
             });
 
             // Generate the MIDI file and trigger download.
