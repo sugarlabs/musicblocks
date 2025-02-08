@@ -300,6 +300,57 @@ function SampleWidget() {
         return this._save_lock;
     };
 
+    //To handle sample files
+    this.handleFiles = (sampleFile) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(sampleFile);
+
+        reader.onload = () =>{
+            // if the file is of .wav type, save it
+            if (reader.result.substring(reader.result.indexOf(":")+1, reader.result.indexOf(";")) === "audio/wav"){
+                if (reader.result.length <= 1333333){
+                    this.sampleData = reader.result;
+                    this.sampleName = sampleFile.name;
+                    this._addSample();
+                }
+                else{
+                    this.activity.errorMsg(_("Warning: Your sample cannot be loaded because it is >1MB."), this.timbreBlock);
+                }            
+            }
+             // otherwise, output error message
+            else{
+                this.showSampleTypeError();
+            }
+        }
+        reader.onloadend = () => {
+            if (reader.result) {
+                const value = [sampleFile.name, reader.result];
+            }
+        };
+    }
+
+    //Drag-and-Drop sample files
+    this.drag_and_drop = () => {
+        const dropZone = document.getElementsByClassName("samplerCanvas")[0];
+
+        dropZone.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            dropZone.classList.add("dragover");
+        })
+    
+        dropZone.addEventListener("dragleave", () => {
+            dropZone.classList.remove("dragover");
+        })
+
+        dropZone.addEventListener( "drop", (e) => {
+            e.preventDefault();
+            dropZone.classList.remove("dragover");
+
+            const sampleFiles = e.dataTransfer.files[0];
+            this.handleFiles(sampleFiles);
+        })
+    }
+
     /**
      * Initializes the Sample Widget.
      * @param {object} activity - The activity object.
@@ -382,33 +433,7 @@ function SampleWidget() {
             const __readerAction = function (event) {
                 window.scroll(0, 0);
                 const sampleFile = fileChooser.files[0];
-                const reader = new FileReader();
-                reader.readAsDataURL(sampleFile);
-
-                // eslint-disable-next-line no-unused-vars
-                reader.onload = function (event) {
-                    // if the file is of .wav type, save it
-                    if (reader.result.substring(reader.result.indexOf(":")+1, reader.result.indexOf(";")) === "audio/wav") {
-                        if (reader.result.length <= 1333333) {
-                            that.sampleData = reader.result;
-                            that.sampleName = fileChooser.files[0].name;
-                            that._addSample();
-                        } else {
-                            that.activity.errorMsg(_("Warning: Your sample cannot be loaded because it is >1MB."), that.timbreBlock);
-                        }
-                    }
-                    // otherwise, output error message
-                    else {
-                        that.showSampleTypeError();
-                    }
-                };
-
-                reader.onloadend = function () {
-                    if (reader.result) {
-                        // eslint-disable-next-line no-unused-vars
-                        const value = [fileChooser.files[0].name, reader.result];
-                    }
-                };
+                that.handleFiles(sampleFile);
                 fileChooser.removeEventListener("change", __readerAction);
             };
 
@@ -502,6 +527,7 @@ function SampleWidget() {
         this.pause();
 
         widgetWindow.sendToCenter();
+        this.drag_and_drop();
     };
 
     /**
