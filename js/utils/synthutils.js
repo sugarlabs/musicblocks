@@ -1448,18 +1448,12 @@ function Synth() {
      */
     this.loadSynth = (turtle, sourceName) => {
         /* eslint-disable */
-        if (sourceName in instruments[turtle]) {
-            if (sourceName.substring(0,13) === "customsample_") {
-                console.debug("loading custom " + sourceName);
-                this.createSynth(turtle, sourceName, sourceName, null);
-            // } else {
-            //     console.debug(sourceName + " already loaded");
-            }
-
+        if (sourceName.substring(0, 13) === "customsample_") {
+            console.debug("loading custom " + sourceName);
         } else {
             console.debug("loading " + sourceName);
-            this.createSynth(turtle, sourceName, sourceName, null);
         }
+        this.createSynth(turtle, sourceName, sourceName, null);
         this.setVolume(turtle, sourceName, last(Singer.masterVolume));
 
         if (sourceName in instruments[turtle]) {
