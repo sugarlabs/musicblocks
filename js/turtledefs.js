@@ -502,12 +502,6 @@ const createHelpContent = (activity) => {
         ];
     }
     HELPCONTENT.push([
-        _("Record"),
-        _("Record your project as video."),
-        "data:image/svg+xml;base64," +
-            window.btoa(base64Encode(RECORDBUTTON))
-    ]);
-    HELPCONTENT.push([
         _("Toggle Fullscreen"),
         _("Toggle Fullscreen mode."),
         "data:image/svg+xml;base64," +
@@ -525,28 +519,14 @@ const createHelpContent = (activity) => {
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(LOADBUTTON))
     ]);
-    HELPCONTENT.push([
-        _("Delete"),
-        _("To delete a block, just right-click on it, then you will be able to see the delete option"),
-        "data:image/svg+xml;base64," +
-            window.btoa(base64Encode(EMPTYTRASHCONFIRMBUTTON))
-    ]);
-    HELPCONTENT.push([
-        _("Copy"),
-        _("To copy a block, just right-click on it, then you will be able to see the copy option"),
-        "data:image/svg+xml;base64," +
-            window.btoa(base64Encode(COPYBUTTON))
-    ]);
-    HELPCONTENT.push([
-        _("Extract"),
-        _("To extract a block, just right-click on it, then you will be able to see the extract option"),
-        "data:image/svg+xml;base64," +
-            window.btoa(base64Encode(EXTRACTBUTTON))
-    ]);
     if (activity.beginnerMode) {
         HELPCONTENT.push([
             _("Save project"),
-            _("Save your project to a file."),
+            _("Save your project to a file.") +
+            ": <br/><br/>" +
+            _("Save project as HTML") +
+            "<br/>" +
+            _("Save mouse artwork as PNG"),
             "data:image/svg+xml;base64," +
                 window.btoa(base64Encode(SAVEBUTTON))
         ]);
@@ -612,6 +592,62 @@ const createHelpContent = (activity) => {
         _("This button opens a viewer for loading example projects."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(PLANETBUTTON))
+    ]);    
+    HELPCONTENT.push([
+        _("Expand/collapse option toolbar"),
+        _("Click this button to expand or collapse the auxillary toolbar."),
+        "data:image/svg+xml;base64," +
+            window.btoa(base64Encode(MENUBUTTON))
+    ]);    
+    HELPCONTENT.push([
+        _("Help"),
+        _("Show these messages."),
+        "data:image/svg+xml;base64," +
+            window.btoa(base64Encode(HELPBUTTON))
+    ]);
+    HELPCONTENT.push([
+        _("Run slowly"),
+        _("Click to run the project in slow mode."),
+        "data:image/svg+xml;base64," +
+            window.btoa(base64Encode(SLOWBUTTON))
+    ]);
+    HELPCONTENT.push([
+        _("Run step by step"),
+        _("Click to run the project step by step."),
+        "data:image/svg+xml;base64," +
+            window.btoa(base64Encode(STEPBUTTON))
+    ]);
+    // TODO: Music Blocks: change theme    
+    // TODO: Add merge
+    HELPCONTENT.push([
+        _("Wrap Turtle"),
+        _("Turn Turtle wrapping On or Off."),
+        "data:image/svg+xml;base64," +
+            window.btoa(
+                base64Encode(WRAPTURTLEBUTTON))
+
+    ]);
+    // TODO: Music Blocks: set pitch preview
+    // TODO: toggle JS editor
+    HELPCONTENT.push([
+        _("Restore"),
+        _("Restore blocks from the trash."),
+        "data:image/svg+xml;base64," +
+            window.btoa(
+                base64Encode(RESTORETRASHBUTTON))
+                            
+    ]);
+    HELPCONTENT.push([
+        _("Switch mode"),
+        _("Switch between beginner and advance modes."),
+        "data:image/svg+xml;base64," +
+            window.btoa(base64Encode(ADVANCEDBUTTON))
+    ]);
+    HELPCONTENT.push([
+        _("Select language"),
+        _("Select your language preference."),
+        "data:image/svg+xml;base64," +
+            window.btoa(base64Encode(LANGUAGEBUTTON))
     ]);
     if (_THIS_IS_MUSIC_BLOCKS_) {
         HELPCONTENT.push([
@@ -621,6 +657,32 @@ const createHelpContent = (activity) => {
                 _("Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."),
             "data:image/svg+xml;base64," +
                 window.btoa(base64Encode(RHYTHMPALETTEICON))
+        ]);
+    }  
+    HELPCONTENT.push([
+        _("Delete"),
+        _("To delete a block, just right-click on it, then you will be able to see the delete option"),
+        "data:image/svg+xml;base64," +
+            window.btoa(base64Encode(EMPTYTRASHCONFIRMBUTTON))
+    ]);
+    HELPCONTENT.push([
+        _("Copy"),
+        _("To copy a block, just right-click on it, then you will be able to see the copy option"),
+        "data:image/svg+xml;base64," +
+            window.btoa(base64Encode(COPYBUTTON))
+    ]);
+    HELPCONTENT.push([
+        _("Extract"),
+        _("To extract a block, just right-click on it, then you will be able to see the extract option"),
+        "data:image/svg+xml;base64," +
+            window.btoa(base64Encode(EXTRACTBUTTON))
+    ]);
+    if (_THIS_IS_MUSIC_BLOCKS_) {
+        HELPCONTENT.push([
+            _("Keyboard shortcuts"),
+            _("You can type d to create a do block and r to create a re block etc."),
+            "data:image/svg+xml;base64," +
+                window.btoa(base64Encode(SHORTCUTSBUTTON))
         ]);
     }
     HELPCONTENT.push([
@@ -673,25 +735,13 @@ const createHelpContent = (activity) => {
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(BIGGERBUTTON))
     ]);
-    HELPCONTENT.push([
-        _("Expand/collapse option toolbar"),
-        _("Click this button to expand or collapse the auxillary toolbar."),
-        "data:image/svg+xml;base64," +
-            window.btoa(base64Encode(MENUBUTTON))
-    ]);
-    HELPCONTENT.push([
-        _("Run slowly"),
-        _("Click to run the project in slow mode."),
-        "data:image/svg+xml;base64," +
-            window.btoa(base64Encode(SLOWBUTTON))
-    ]);
-    HELPCONTENT.push([
-        _("Run step by step"),
-        _("Click to run the project step by step."),
-        "data:image/svg+xml;base64," +
-            window.btoa(base64Encode(STEPBUTTON))
-    ]);
-    if (!activity.beginnerMode) {
+    if (!activity.beginnerMode) {        
+        HELPCONTENT.push([
+            _("Record"),
+            _("Record your project as video."),
+            "data:image/svg+xml;base64," +
+                window.btoa(base64Encode(RECORDBUTTON))
+        ]);
         HELPCONTENT.push([
             _("Display statistics"),
             _("Display statistics about your Music project."),
@@ -716,51 +766,6 @@ const createHelpContent = (activity) => {
 
         ]);        
     }
-    // TODO: Add merge
-    HELPCONTENT.push([
-        _("Wrap Turtle"),
-        _("Turn Turtle wrapping On or Off."),
-        "data:image/svg+xml;base64," +
-            window.btoa(
-                base64Encode(WRAPTURTLEBUTTON))
-
-    ]);
-    // TODO: Music Blocks: set pitch preview
-    // TODO: toggle JS editor
-    HELPCONTENT.push([
-        _("Restore"),
-        _("Restore blocks from the trash."),
-        "data:image/svg+xml;base64," +
-            window.btoa(
-                base64Encode(RESTORETRASHBUTTON))
-                            
-    ]);
-    HELPCONTENT.push([
-        _("Switch mode"),
-        _("Switch between beginner and advance modes."),
-        "data:image/svg+xml;base64," +
-            window.btoa(base64Encode(ADVANCEDBUTTON))
-    ]);
-    HELPCONTENT.push([
-        _("Select language"),
-        _("Select your language preference."),
-        "data:image/svg+xml;base64," +
-            window.btoa(base64Encode(LANGUAGEBUTTON))
-    ]);
-    if (_THIS_IS_MUSIC_BLOCKS_) {
-        HELPCONTENT.push([
-            _("Keyboard shortcuts"),
-            _("You can type d to create a do block and r to create a re block etc."),
-            "data:image/svg+xml;base64," +
-                window.btoa(base64Encode(SHORTCUTSBUTTON))
-        ]);
-    }
-    HELPCONTENT.push([
-        _("Help"),
-        _("Show these messages."),
-        "data:image/svg+xml;base64," +
-            window.btoa(base64Encode(HELPBUTTON))
-    ]);
     if (_THIS_IS_TURTLE_BLOCKS_) {
         HELPCONTENT.push([
             _("Guide"),
