@@ -716,6 +716,8 @@ class Activity {
                         block.container.x += dx;
                         block.container.y += dy;
                     });
+                    referenceBlock.beforeMobilePosition = null; // Clear stored position
+                    //this prevents old groups from affecting new calculations.
                 }
         
                 if (canvasWidth < 600 && !referenceBlock.before600pxPosition) {
@@ -731,6 +733,7 @@ class Activity {
                         block.container.x += dx;
                         block.container.y += dy;
                     });
+                    referenceBlock.before600pxPosition = null;
                 }
         
                 // Ensure blocks stay within horizontal boundary
