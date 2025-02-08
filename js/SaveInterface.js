@@ -273,50 +273,89 @@ class SaveInterface {
         activity.logo.runLogoCommands();
 
         console.log("List ->",activity.logo._midiData);
-
-        // Function to calculate note duration in beats from inverted duration;
         const generateMidi = (data) => {
-
             const normalizeNote = (note) => {
                 return note.replace("♯", "#").replace("♭", "b");
+            };
+            const MIDI_INSTRUMENTS = {
+                default: 0,   // Acoustic Grand Piano
+                piano: 0,
+                violin: 40,
+                viola: 41,
+                cello: 42,
+                "double bass": 43,
+                bass: 32,
+                sitar: 104,
+                guitar: 24,
+                "acoustic guitar": 25,
+                "electric guitar": 27,
+                flute: 73,
+                clarinet: 71,
+                saxophone: 65,
+                tuba: 58,
+                trumpet: 56,
+                oboe: 68,
+                trombone: 57,
+                banjo: 105,
+                koto: 107,
+                dulcimer: 15,
+                bassoon: 70,
+                celeste: 8,
+                xylophone: 13,
+                "electronic synth": 81,
+                sine: 81,  // Approximate with Lead 2 (Sawtooth)
+                square: 80,
+                sawtooth: 81,
+                triangle: 81,  // Approximate with Lead 2 (Sawtooth)
+                vibraphone: 11
             };
 
             const midi = new Midi();
 
             Object.entries(data).forEach(([blockIndex, notes]) => {
-                const track = midi.addTrack();
-                track.name = `Track ${parseInt(blockIndex) + 1}`;
 
-                let currentTime = 0;
+                const mainTrack = midi.addTrack();
+                mainTrack.name = `Track ${parseInt(blockIndex) + 1}`;
+
+                let trackMap = new Map();
+                let globalTime = 0;
 
                 notes.forEach((noteData) => {
                     if (!noteData.note || noteData.note.length === 0) return;
+                    const duration = ((1 / noteData.duration) * 60 * 4) / noteData.bpm;
+                    const instrument = noteData.instrument || "default";
 
-                    const duration = ((1 / noteData.duration) * 60 * 4) / (noteData.bpm);
+                    if (!trackMap.has(instrument)) {
+                        const instrumentTrack = midi.addTrack();
+                        instrumentTrack.name = `Track ${parseInt(blockIndex) + 1} - ${instrument}`;
+                        instrumentTrack.instrument.number = MIDI_INSTRUMENTS[instrument] ?? MIDI_INSTRUMENTS["default"];
+                        trackMap.set(instrument, instrumentTrack);
+                    }
+
+                    const instrumentTrack = trackMap.get(instrument);
 
                     noteData.note.forEach((pitch) => {
-                        if (pitch.includes("R")) {
-                            currentTime += duration;
-                        } else {
-                        track.addNote({
-                            name: normalizeNote(pitch),
-                            time: currentTime,
-                            duration: duration,
-                            velocity: 0.8
-                        });
+
+                        if (!pitch.includes("R")) {
+                            instrumentTrack.addNote({
+                                name: normalizeNote(pitch),
+                                time: globalTime,
+                                duration: duration,
+                                velocity: 0.8
+                            });
                         }
                     });
-
-                    currentTime += duration;
+                    globalTime += duration;
                 });
             });
 
-            // Generate MIDI file and trigger download
+            // Generate the MIDI file and trigger download.
             const midiData = midi.toArray();
             const blob = new Blob([midiData], { type: "audio/midi" });
             const url = URL.createObjectURL(blob);
             activity.save.download("midi", url, null);
         };
+
         const data = activity.logo._midiData;
         setTimeout(() => {
             generateMidi(data);
@@ -326,7 +365,7 @@ class SaveInterface {
 
     /**
      * This method is to save SVG representation of an activity
-     * 
+     *
      * @param {SaveInterface} activity -The activity object to save
      * @returns {void}
      * @method

@@ -1961,7 +1961,7 @@ class Singer {
                                 activity.logo.runningAbc ||
                                 activity.logo.runningMIDI
                             ) {
-                                activity.logo.notationMIDI(chordNotes, d, turtle, bpmValue);
+                                activity.logo.notationMIDI(chordNotes, d, turtle, bpmValue || 90, last(tur.singer.instrumentNames));
                                 activity.logo.updateNotation(chordNotes, d, turtle, -1, chordDrums);
                             }
                         }

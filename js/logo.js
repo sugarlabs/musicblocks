@@ -800,11 +800,11 @@ class Logo {
         }
     }
 
-    notationMIDI(note, duration, turtle, bpm) {
+    notationMIDI(note, duration, turtle, bpm, instrument) {
         if (!this._midiData[turtle]) {
             this._midiData[turtle] = [];
         }
-        this._midiData[turtle].push({ note, duration, bpm });
+        this._midiData[turtle].push({ note, duration, bpm, instrument });
     }
 
     // ========================================================================
