@@ -674,6 +674,189 @@ class Activity {
         };
 
         /**
+        * Ensures blocks stay within canvas boundaries when resized.
+        * Ensures that music blocks are responsive to horizontal resizing.
+        * Ensures that overall integrity of blocks isn't hampered with.
+        */
+        function repositionBlocks(activity) {
+            
+            const canvasWidth = window.innerWidth;
+            const processedBlocks = new Set();
+        
+            //Array for storing individual dragGroups (the chunks of code linked together which are not connected)
+            const dragGroups = [];
+
+            // Identifying individual dragGroups 
+            Object.values(activity.blocks.blockList).forEach(block => {
+                if (!processedBlocks.has(block.id)) {
+                    
+                    activity.blocks.findDragGroup(block.id); 
+
+                    if (activity.blocks.dragGroup.length > 0) {
+                        dragGroups.push([...activity.blocks.dragGroup]); // Store the group into dragGroups
+                        activity.blocks.dragGroup.forEach(id => processedBlocks.add(id)); // Process individual groups
+                    }
+                }
+            });
+        
+            // Repositioning of dragGroups according to horizontal resizing
+            dragGroups.forEach(group => {
+                let referenceBlock = activity.blocks.blockList[group[0]]; 
+        
+                // Store initial positions
+                if (!referenceBlock.initialPosition) {
+                    referenceBlock.initialPosition = { x: referenceBlock.container.x, y: referenceBlock.container.y };
+                }
+        
+                if (canvasWidth < 768 && !referenceBlock.beforeMobilePosition) {
+                    referenceBlock.beforeMobilePosition = { x: referenceBlock.container.x, y: referenceBlock.container.y };
+                }
+
+                if (canvasWidth >= 768 && referenceBlock.beforeMobilePosition) {
+                    let dx = referenceBlock.beforeMobilePosition.x - referenceBlock.container.x;
+                    let dy = referenceBlock.beforeMobilePosition.y - referenceBlock.container.y;
+                    group.forEach(blockId => {
+                        let block = activity.blocks.blockList[blockId];
+                        block.container.x += dx;
+                        block.container.y += dy;
+                    });
+                    referenceBlock.beforeMobilePosition = null; // Clear stored position
+                    //this prevents old groups from affecting new calculations.
+                }
+        
+                if (canvasWidth < 600 && !referenceBlock.before600pxPosition) {
+                    referenceBlock.before600pxPosition = { x: referenceBlock.container.x, y: referenceBlock.container.y };
+                }
+
+                if (canvasWidth >= 600 && referenceBlock.before600pxPosition) {
+                    let dx = referenceBlock.before600pxPosition.x - referenceBlock.container.x;
+                    let dy = referenceBlock.before600pxPosition.y - referenceBlock.container.y;
+
+                    group.forEach(blockId => {
+                        let block = activity.blocks.blockList[blockId];
+                        block.container.x += dx;
+                        block.container.y += dy;
+                    });
+                    referenceBlock.before600pxPosition = null;
+                }
+        
+                // Ensure blocks stay within horizontal boundary
+                let rightmostX = Math.max(...group.map(id => activity.blocks.blockList[id].container.x + activity.blocks.blockList[id].width));
+        
+                if (rightmostX > canvasWidth) {
+                    let shiftX = Math.max(10, canvasWidth - rightmostX - 10);
+
+                    group.forEach(blockId => {
+                        activity.blocks.blockList[blockId].container.x += shiftX;
+                    });
+                }
+                
+                // Ensures that blocks do not go hide behind the search for blocks div
+                let leftmostX = Math.min(...group.map(id => activity.blocks.blockList[id].container.x));
+                if (leftmostX < 0) {
+                    let shiftX = 100 - leftmostX;
+
+                    group.forEach(blockId => {
+                        activity.blocks.blockList[blockId].container.x += shiftX;
+                    });
+                }
+                
+            });
+        
+            activity._findBlocks();
+        }
+        
+        //if any window resize event occurs:
+        window.addEventListener("resize", () => repositionBlocks(this));
+
+        /**
+        * Finds and organizes blocks within the workspace.
+        * Arranges blocks in grid format on wide screens and vertically on narrow screens.
+         */
+        this._findBlocks = () => {
+            if (!this.blocks.visible) {
+                this._changeBlockVisibility();
+            }
+
+            this.blocks.activeBlock = null;
+            hideDOMLabel();
+            this.blocks.showBlocks();
+            this.blocksContainer.x = 0;
+            this.blocksContainer.y = 0;
+
+            const screenWidth = window.innerWidth;
+            const isNarrowScreen = screenWidth < 600;
+            const minColumnWidth = 400;
+            let numColumns = isNarrowScreen ? 1 : Math.floor(screenWidth / minColumnWidth);
+
+            let toppos = this.auxToolbar.style.display === "block" ? 90 + this.toolbarHeight : 90;
+            let x = isNarrowScreen ? Math.floor(screenWidth / 2) : Math.floor(this.canvas.width / 4);
+            let y = Math.floor(toppos * this.turtleBlocksScale);
+            let verticalSpacing = Math.floor(40 * this.turtleBlocksScale);
+
+            const columnSpacing = (screenWidth / numColumns) * 1.2;
+            const columnXPositions = Array.from({ length: numColumns }, (_, i) =>
+                Math.floor(i * columnSpacing + columnSpacing / 2)
+            );
+            const columnYPositions = Array(numColumns).fill(y);
+
+            for (const blk in this.blocks.blockList) {
+                if (!this.blocks.blockList[blk].trash) {
+                    const myBlock = this.blocks.blockList[blk];
+
+                        // Store original position only once
+                        if (!myBlock.originalPosition) {
+                        myBlock.originalPosition = { x: myBlock.container.x, y: myBlock.container.y };
+                    }
+
+                    if (myBlock.connections[0] === null) {
+                        if (isNarrowScreen) {
+                            const dx = x - myBlock.container.x;
+                            const dy = y - myBlock.container.y;
+                            this.blocks.moveBlockRelative(blk, dx, dy);
+                            y += myBlock.height + verticalSpacing;
+                        } else {
+                            let minYIndex = columnYPositions.indexOf(Math.min(...columnYPositions));
+                            const dx = columnXPositions[minYIndex] - myBlock.container.x;
+                            const dy = columnYPositions[minYIndex] - myBlock.container.y;
+                            this.blocks.moveBlockRelative(blk, dx, dy);
+                            columnYPositions[minYIndex] += myBlock.height + verticalSpacing;
+                        }
+                    }
+
+                    // Making code to make sure that 
+                    if (myBlock.connections.length>0)  {
+                        myBlock.connections.forEach(conn  =>  {
+                            if (conn !== null) {
+                                let innerBlock = this.blocks.blockList[conn] ;
+                                if (innerBlock) {
+
+                                    innerBlock.container.x = myBlock.container.x + innerBlock.relativeX;
+                                    innerBlock.container.y = myBlock.container.y + innerBlock.relativeY;
+                                }
+
+                            }
+
+                        });
+                    }
+                }
+            }
+
+            repositionBlocks(this);
+            this.setHomeContainers(false);
+            this.boundary.hide();
+
+            for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+                const savedPenState = this.turtles.turtleList[turtle].painter.penState;
+                this.turtles.turtleList[turtle].painter.penState = false;
+                this.turtles.turtleList[turtle].painter.doSetXY(0, 0);
+                this.turtles.turtleList[turtle].painter.doSetHeading(0);
+                this.turtles.turtleList[turtle].painter.penState = savedPenState;
+            }
+        };
+
+
+        /**
         * Finds and organizes blocks within the workspace.
         * Blocks are positioned based on their connections and availability within the canvas area.
         * This method is part of the internal mechanism to ensure that blocks are displayed correctly and efficiently.
@@ -801,7 +984,7 @@ class Activity {
                 */
 
                 const screenWidth = window.innerWidth;
-                const minColumnWidth = 400;
+                const minColumnWidth = 320;
                 let numColumns = screenWidth <= 320 ? 1 : Math.floor(screenWidth / minColumnWidth);
 
                 const baseColumnSpacing = screenWidth / numColumns;
