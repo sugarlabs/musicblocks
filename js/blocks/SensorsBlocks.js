@@ -718,31 +718,33 @@ function setupSensorsBlocks(activity) {
          * @returns {number} - The argument value representing the color.
          */
         arg(logo, turtle) {
-            const wasVisible = activity.turtles.turtleList[turtle].container.visible;
-            activity.turtles.turtleList[turtle].container.visible = false;
-            const x = activity.turtles.turtleList[turtle].container.x;
-            const y = activity.turtles.turtleList[turtle].container.y;
-            activity.refreshCanvas();
+            // const wasVisible = activity.turtles.turtleList[turtle].container.visible;
+            // activity.turtles.turtleList[turtle].container.visible = false;
+            // const x = activity.turtles.turtleList[turtle].container.x;
+            // const y = activity.turtles.turtleList[turtle].container.y;
+            // activity.refreshCanvas();
 
-            const canvas = docById("overlayCanvas");
-            const ctx = canvas.getContext("2d");
-            const imgData = ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
-            let color = searchColors(imgData[0], imgData[1], imgData[2]);
+            // const canvas = docById("overlayCanvas");
+            // const ctx = canvas.getContext("2d");
+            // const imgData = ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
+            // let color = searchColors(imgData[0], imgData[1], imgData[2]);
 
-            if (imgData[3] === 0) {
-                color = platformColor.background
-                    .substring(
-                        platformColor.background.indexOf("(") + 1,
-                        platformColor.background.lastIndexOf(")")
-                    )
-                    .split(/,\s*/);
-                color = searchColors(color[0], color[1], color[2]);
-            }
+            // if (imgData[3] === 0) {
+            //     color = platformColor.background
+            //         .substring(
+            //             platformColor.background.indexOf("(") + 1,
+            //             platformColor.background.lastIndexOf(")")
+            //         )
+            //         .split(/,\s*/);
+            //     color = searchColors(color[0], color[1], color[2]);
+            // }
 
-            if (wasVisible) {
-                activity.turtles.turtleList[turtle].container.visible = true;
-            }
-            return color;
+            // if (wasVisible) {
+            //     activity.turtles.turtleList[turtle].container.visible = true;
+            // }
+            // return color;
+
+            console.log(logo.p5.hello());
         }
     }
 

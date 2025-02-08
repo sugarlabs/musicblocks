@@ -95,6 +95,7 @@ let MYDEFINES = [
     "activity/SaveInterface",
     "utils/musicutils",
     "utils/synthutils",
+    "utils/p5utils",
     "utils/mathutils",
     "activity/pastebox",
     "prefixfree.min",

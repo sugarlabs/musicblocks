@@ -219,6 +219,8 @@ class Logo {
         this.synth = new Synth();
         this.synth.changeInTemperament = false;
 
+        this.p5 = new P5();
+
         // Mode widget
         this.modeBlock = null;
 
