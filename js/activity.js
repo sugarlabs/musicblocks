@@ -2876,6 +2876,11 @@ class Activity {
                         if (this.searchWidget.style.visibility === 'visible') {
                             return;
                         }
+                        if (docById("paste").style.visibility === "visible") {
+                            this.pasted();
+			    docById("paste").style.visibility = "hidden";
+                            return;
+                        }
                         this.textMsg("Enter " + _("Play"));
                         let stopbt = document.getElementById("stop");
                         if (stopbt) {
@@ -2888,7 +2893,7 @@ class Activity {
                         this.logo.doStopTurtles();
                         break;
                     case 86: // 'V'
-                        this.textMsg("Alt-V " + _("Paste"));
+                        // this.textMsg("Alt-V " + _("Paste"));
                         this.blocks.pasteStack();
                         break;
                     case 72: // 'H' save block help
@@ -2910,7 +2915,7 @@ class Activity {
             } else if (event.ctrlKey) {
                 switch (event.keyCode) {
                     case V:
-                        this.textMsg("Ctl-V " + _("Paste"));
+                        // this.textMsg("Ctl-V " + _("Paste"));
                         this.pasteBox.createBox(this.turtleBlocksScale, 200, 200);
                         this.pasteBox.show();
                         docById("paste").style.left =
