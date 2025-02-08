@@ -151,18 +151,14 @@ class Planet {
 
 }
 
-// trigger and sync the dark mode of the planet with the main page
+// sync the dark mode of the planet with the main page and themePreference
 document.addEventListener("DOMContentLoaded", function () {
-    if (localStorage.getItem("darkMode") === "enabled") {
-        document.body.classList.add("dark-mode");
-    }
-    window.addEventListener("storage", function (event) {
-        if (event.key === "darkMode" || event.key === "darkModeTrigger") {
-            if (localStorage.getItem("darkMode") === "enabled") {
-                document.body.classList.add("dark-mode");
-            } else {
-                document.body.classList.remove("dark-mode");
-            }
+    let themes = ["light", "dark"];
+    for (let i = 0; i < themes.length; i++) {
+        if (themes[i] === localStorage.getItem("themePreference")) {
+            document.body.classList.add(themes[i]);
+        } else {
+            document.body.classList.remove(themes[i]);
         }
-    });
+    }
 });
