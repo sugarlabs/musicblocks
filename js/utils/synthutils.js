@@ -82,6 +82,8 @@ const VOICENAMES = [
     [_("double bass"), "double bass", "images/voices.svg", "string"],
     //.TRANS: sitar musical instrument
     [_("sitar"), "sitar", "images/synth.svg", "string"],
+    //.TRANS: harmonium musical instrument
+    [_("harmonium"), "harmonium", "images/voices.svg", "string"],
     //.TRANS: musical instrument
     [_("guitar"), "guitar", "images/voices.svg", "string"],
     //.TRANS: musical instrument
@@ -267,7 +269,8 @@ const SOUNDSAMPLESDEFINES = [
     "samples/oboe",
     "samples/trombone",
     "samples/doublebass",
-    "samples/sitar"
+    "samples/sitar",
+    "samples/harmonium"
 ];
 
 // Some samples have a default volume other than 50 (See #1697)
@@ -304,7 +307,8 @@ const DEFAULTSYNTHVOLUME = {
     "vibraphone": 100,
     "xylophone": 100,
     "japanese drum": 90,
-    "sitar": 100
+    "sitar": 100,
+    "harmonium": 100
 };
 
 /**
@@ -337,7 +341,8 @@ const SAMPLECENTERNO = {
     "xylophone": ["C4", 39], // pitchToNumber('C', 4, 'C Major')],
     "viola": ["D4", 53], // pitchToNumber('D', 4, 'D Major')],
     "double bass": ["C4", 39], // pitchToNumber('C', 4, 'C Major')],
-    "sitar": ["C4", 39] // pitchToNumber('C', 4, 'C Major')]
+    "sitar": ["C4", 39], // pitchToNumber('C', 4, 'C Major')]
+    "harmonium": ["C4", 39] // pitchToNumber('C', 4, 'C Major')]
 };
 
 
@@ -360,7 +365,7 @@ const percussionInstruments = ["koto", "banjo", "dulcimer", "xylophone", "celest
  * @constant
  * @type {Array<string>}
  */
-const stringInstruments = ["piano","sitar", "guitar", "acoustic guitar", "electric guitar"];
+const stringInstruments = ["piano","harmonium","sitar", "guitar", "acoustic guitar", "electric guitar"];
 
 /**
  * Validates and sets parameters for an instrument.
@@ -834,7 +839,8 @@ function Synth() {
                 { name: "celeste", data: CELESTE_SAMPLE },
                 { name: "vibraphone", data: VIBRAPHONE_SAMPLE },
                 { name: "xylophone", data: XYLOPHONE_SAMPLE },
-                { name: "sitar", data: SITAR_SAMPLE }
+                { name: "sitar", data: SITAR_SAMPLE },
+                { name: "harmonium", data: HARMONIUM_SAMPLE }
             ],
             drum: [
                 { name: "bottle", data: BOTTLE_SAMPLE },
