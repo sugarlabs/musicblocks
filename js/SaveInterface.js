@@ -310,6 +310,18 @@ class SaveInterface {
                 vibraphone: 11
             };
 
+            const DRUM_MIDI_MAP = {
+                kick: 36,
+                snare: 38,
+                hiHat: 42,
+                openHiHat: 46,
+                tom1: 48,
+                tom2: 50,
+                ride: 51,
+                crash: 49,
+                clap: 39
+            };
+
             const midi = new Midi();
 
             Object.entries(data).forEach(([blockIndex, notes]) => {
@@ -325,26 +337,47 @@ class SaveInterface {
                     const duration = ((1 / noteData.duration) * 60 * 4) / noteData.bpm;
                     const instrument = noteData.instrument || "default";
 
-                    if (!trackMap.has(instrument)) {
-                        const instrumentTrack = midi.addTrack();
-                        instrumentTrack.name = `Track ${parseInt(blockIndex) + 1} - ${instrument}`;
-                        instrumentTrack.instrument.number = MIDI_INSTRUMENTS[instrument] ?? MIDI_INSTRUMENTS["default"];
-                        trackMap.set(instrument, instrumentTrack);
-                    }
+                    if (instrument === "drums") {
+                        if (!trackMap.has("drums")) {
+                            const drumTrack = midi.addTrack();
+                            drumTrack.name = `Track ${parseInt(blockIndex) + 1} - drums`;
+                            drumTrack.channel = 9; // Drums must be on Channel 10
+                            trackMap.set("drums", drumTrack);
+                        }
 
-                    const instrumentTrack = trackMap.get(instrument);
-
-                    noteData.note.forEach((pitch) => {
-
-                        if (!pitch.includes("R")) {
-                            instrumentTrack.addNote({
-                                name: normalizeNote(pitch),
+                        const drumTrack = trackMap.get("drums");
+                        noteData.note.forEach((drumType) => {
+                            const midiNumber = DRUM_MIDI_MAP[drumType] || 36; // default to Bass Drum
+                            drumTrack.addNote({
+                                midi: midiNumber,
                                 time: globalTime,
                                 duration: duration,
-                                velocity: 0.8
+                                velocity: 0.9,
                             });
+                        });
+
+                    } else {
+                        if (!trackMap.has(instrument)) {
+                            const instrumentTrack = midi.addTrack();
+                            instrumentTrack.name = `Track ${parseInt(blockIndex) + 1} - ${instrument}`;
+                            instrumentTrack.instrument.number = MIDI_INSTRUMENTS[instrument] ?? MIDI_INSTRUMENTS["default"];
+                            trackMap.set(instrument, instrumentTrack);
                         }
-                    });
+
+                        const instrumentTrack = trackMap.get(instrument);
+
+                        noteData.note.forEach((pitch) => {
+
+                            if (!pitch.includes("R")) {
+                                instrumentTrack.addNote({
+                                    name: normalizeNote(pitch),
+                                    time: globalTime,
+                                    duration: duration,
+                                    velocity: 0.8
+                                });
+                            }
+                        });
+                    }
                     globalTime += duration;
                 });
             });
