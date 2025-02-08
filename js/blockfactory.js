@@ -1803,3 +1803,7 @@ class SVG {
         return this._header(false) + svg;
     }
 }
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { SVG };
+}
