@@ -83,10 +83,10 @@ class Turtles {
     addTurtle(startBlock, infoDict) {
         this.add(startBlock, infoDict);
         if (this.isShrunk()) {
-            const t = last(this.turtleList);
-            t.container.scaleX = CONTAINERSCALEFACTOR;
-            t.container.scaleY = CONTAINERSCALEFACTOR;
-            t.container.scale = CONTAINERSCALEFACTOR;
+            const lastTurtle = this.getTurtle(this.getTurtleCount() - 1);
+            lastTurtle.container.scaleX = CONTAINERSCALEFACTOR;
+            lastTurtle.container.scaleY = CONTAINERSCALEFACTOR;
+            lastTurtle.container.scale = CONTAINERSCALEFACTOR;
         }
     }
 
@@ -101,8 +101,8 @@ class Turtles {
     add(startBlock, infoDict) {
         if (startBlock !== null) {
             // console.debug("adding a new turtle " + startBlock.name);
-            if (startBlock.value !== this.turtleList.length) {
-                startBlock.value = this.turtleList.length;
+            if (startBlock.value !== this.getTurtleCount()) {
+                startBlock.value = this.getTurtleCount();
                 // console.debug("turtle #" + startBlock.value);
             }
         }
@@ -126,8 +126,8 @@ class Turtles {
 
         const turtlesStage = this.activity.stage;
 
-        let i = this.turtleList.length % 10; // used for turtle (mouse) skin color
-        this.turtleList.push(turtle); // add new turtle to turtle list
+        let i = this.getTurtleCount() % 10; // used for turtle (mouse) skin color
+        this.pushTurtle(turtle); // add new turtle to turtle list
 
         if (startBlock === null) {
             // Hidden start block for when there are no start blocks
@@ -138,8 +138,8 @@ class Turtles {
             this.createArtwork(turtle, i, true);
         } else {
             // Search for companion and use that turtle's colors.
-            for (let j = 0; j < this.turtleList.length; j++) {
-                if (this.turtleList[j].companionTurtle === this.turtleList.length - 1) {
+            for (let j = 0; j < this.getTurtleCount(); j++) {
+                if (this.getTurtle(j).companionTurtle === this.getTurtleCount() - 1) {
                     i = j % 10;
                     break;
                 }
@@ -230,8 +230,9 @@ class Turtles {
      * @returns {void}
      */
     markAllAsStopped() {
-        for (const turtle in this.turtleList) {
-            this.turtleList[turtle].running = false;
+        for (let i = 0; i < this.getTurtleCount(); i++) {
+            const turtle = this.getTurtle(i);
+            turtle.running = false;
         }
 
         this.activity.refreshCanvas();
@@ -437,6 +438,17 @@ Turtles.TurtlesModel = class {
     }
 
     /**
+     * Save the Turtle object to the TurtleList.
+     *
+     * @returns {void}
+     * @param {Object} turtle
+     */
+    pushTurtle(turtle) {
+        if(!this._turtleList.includes(this))
+        this._turtleList.push(turtle);
+    }
+
+    /**
      * Adds createjs related properties of turtles and turtlesStage.
      *
      * @param {Object} turtle
@@ -527,8 +539,8 @@ Turtles.TurtlesModel = class {
      * @return {Boolean} - running
      */
     running() {
-        for (const turtle in this.turtleList) {
-            if (this.turtleList[turtle].running) {
+        for(let i = 0; i < this.getTurtleCount(); i++) {
+            if (this.getTurtle(i).running) {
                 return true;
             }
         }
@@ -540,7 +552,7 @@ Turtles.TurtlesModel = class {
      * @returns {Object} ith Turtle object
      */
     ithTurtle(i) {
-        return this._turtleList[Number(i)];
+        return this.getTurtle(i);
     }
 
     /**
@@ -548,8 +560,8 @@ Turtles.TurtlesModel = class {
      * @returns index number of companion turtle or i
      */
     companionTurtle(i) {
-        for (let t = 0; t < this._turtleList.length; t++) {
-            if (this._turtleList[t].companionTurtle === i) {
+        for (let t = 0; t < this.getTurtleCount(); t++) {
+            if (this.getTurtle(t).companionTurtle === i) {
                 return t;
             }
         }
@@ -562,8 +574,8 @@ Turtles.TurtlesModel = class {
      */
     turtleCount() {
         let count = 0;
-        for (let t = 0; t < this._turtleList.length; t++) {
-            if (this.companionTurtle(t) === t && !this._turtleList[t].inTrash) {
+        for (let t = 0; t < this.getTurtleCount(); t++) {
+            if (this.companionTurtle(t) === t && !this.getTurtle(t).inTrash) {
                 count += 1;
             }
         }
@@ -687,12 +699,12 @@ Turtles.TurtlesView = class {
     /**
      * Changes body background in DOM to current colour.
      *
-     * @param {Number} turtle - Turtle index in turtleList
+     * @param {Number} index - Turtle index in turtleList
      * @returns {void}
      */
-    setBackgroundColor(turtle) {
+    setBackgroundColor(index) {
         const color =
-            turtle === -1 ? platformColor.background : this.turtleList[turtle].painter.canvasColor;
+        index === -1 ? platformColor.background : this.getTurtle(index).painter.canvasColor;
         this._backgroundColor = color;
         this.makeBackground();
         this.activity.refreshCanvas();
@@ -879,10 +891,11 @@ Turtles.TurtlesView = class {
             turtlesStage.y = 55 + LEADING + 6;
             this._isShrunk = true;
 
-            for (let i = 0; i < this.turtleList.length; i++) {
-                this.turtleList[i].container.scaleX = CONTAINERSCALEFACTOR;
-                this.turtleList[i].container.scaleY = CONTAINERSCALEFACTOR;
-                this.turtleList[i].container.scale = CONTAINERSCALEFACTOR;
+            for (let i = 0; i < this.getTurtleCount(); i++) {
+                const turtle = this.getTurtle(i);
+                turtle.container.scaleX = CONTAINERSCALEFACTOR;
+                turtle.container.scaleY = CONTAINERSCALEFACTOR;
+                turtle.container.scale = CONTAINERSCALEFACTOR;
             }
 
             // remove the stage and add it back at the top
@@ -1056,10 +1069,11 @@ Turtles.TurtlesView = class {
                 turtlesStage.y = 0;
                 this._isShrunk = false;
 
-                for (let i = 0; i < this.turtleList.length; i++) {
-                    this.turtleList[i].container.scaleX = 1;
-                    this.turtleList[i].container.scaleY = 1;
-                    this.turtleList[i].container.scale = 1;
+                for (let i = 0; i < this.getTurtleCount(); i++) {
+                    const turtle = this.getTurtle(i);
+                    turtle.container.scaleX = 1;
+                    turtle.container.scaleY = 1;
+                    turtle.container.scale = 1;
                 }
 
                 this._clearButton.scaleX = 1;
@@ -1123,10 +1137,11 @@ Turtles.TurtlesView = class {
             turtlesStage.y = 0;
             this._isShrunk = false;
 
-            for (let i = 0; i < this.turtleList.length; i++) {
-                this.turtleList[i].container.scaleX = 1;
-                this.turtleList[i].container.scaleY = 1;
-                this.turtleList[i].container.scale = 1;
+            for (let i = 0; i < this.getTurtleCount(); i++) {
+                const turtle = this.getTurtle(i);
+                turtle.container.scaleX = 1;
+                turtle.container.scaleY = 1;
+                turtle.container.scale = 1;
             }
 
             this._clearButton.scaleX = 1;
