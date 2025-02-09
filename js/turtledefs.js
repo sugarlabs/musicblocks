@@ -501,6 +501,14 @@ const createHelpContent = (activity) => {
             ]
         ];
     }
+    if (!activity.beginnerMode) {        
+        HELPCONTENT.push([
+            _("Record"),
+            _("Record your project as video."),
+            "data:image/svg+xml;base64," +
+                window.btoa(base64Encode(RECORDBUTTON))
+        ]);
+    }
     HELPCONTENT.push([
         _("Toggle Fullscreen"),
         _("Toggle Fullscreen mode."),
@@ -552,34 +560,14 @@ const createHelpContent = (activity) => {
             ]);
         } else {
             HELPCONTENT.push([
-                _("Save"),
-                _("Save project") +
-                    ": " +
-                    _("Save your project to a file.") +
-                    "<br/><br/>" +
-                    _("Save mouse artwork as SVG") +
-                    ": " +
-                    _("Save graphics from your project to as SVG.") +
-                    "<br/><br/>" +
-                    _("Save mouse artwork as PNG") +
-                    ": " +
-                    _("Save graphics from your project as PNG.") +
-                    "<br/><br/>" +
-                    _("Save music as WAV") +
-                    ": " +
-                    _("Save audio from your project as WAV.") +
-                    "<br/><br/>" +
-                    _("Save sheet music as ABC") +
-                    ": " +
-                    _("Save your project to as an ABC file.") +
-                    "<br/><br/>" +
-                    _("Save sheet music as Lilypond") +
-                    ": " +
-                    _("Save your project to as a Lilypond file.") +
-                    "<br/><br/>" +
-                    _("Save block artwork as SVG") +
-                    ": " +
-                    _("Save block artwork as an SVG file."),
+                _("Save project"),
+                _("Save project as HTML") +
+                "<br/>" +
+                _("Save music as WAV") +
+                "<br/>" +
+                _("Save sheet music as ABC, Lilypond or MusicXML") +
+                "<br/>" +
+                _("Save block artwork as SVG or PNG"),
                 "data:image/svg+xml;base64," +
                     window.btoa(base64Encode(SAVEBUTTON))
             ]);
@@ -615,6 +603,31 @@ const createHelpContent = (activity) => {
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(STEPBUTTON))
     ]);
+    if (!activity.beginnerMode) {
+        HELPCONTENT.push([
+            _("Display statistics"),
+            _("Display statistics about your Music project."),
+            "data:image/svg+xml;base64," +
+                window.btoa(base64Encode(STATSBUTTON))
+        ]);
+        // TODO: add plugin
+        HELPCONTENT.push([
+            _("Delete plugin"),
+            _("Delete a selected plugin."),
+            "data:image/svg+xml;base64," +
+                window.btoa(
+                    base64Encode(PLUGINSDELETEBUTTON))
+
+        ]);
+        HELPCONTENT.push([
+            _("Enable scrolling"),
+            _("You can scroll the blocks on the canvas."),
+            "data:image/svg+xml;base64," +
+                window.btoa(
+                    base64Encode(SCROLLUNLOCKBUTTON))
+
+        ]);        
+    }
     // TODO: Music Blocks: change theme    
     // TODO: Add merge
     HELPCONTENT.push([
@@ -734,37 +747,6 @@ const createHelpContent = (activity) => {
             "data:image/svg+xml;base64," +
                 window.btoa(base64Encode(RHYTHMPALETTEICON))
         ]);
-    }
-    if (!activity.beginnerMode) {        
-        HELPCONTENT.push([
-            _("Record"),
-            _("Record your project as video."),
-            "data:image/svg+xml;base64," +
-                window.btoa(base64Encode(RECORDBUTTON))
-        ]);
-        HELPCONTENT.push([
-            _("Display statistics"),
-            _("Display statistics about your Music project."),
-            "data:image/svg+xml;base64," +
-                window.btoa(base64Encode(STATSBUTTON))
-        ]);
-        // TODO: add plugin
-        HELPCONTENT.push([
-            _("Delete plugin"),
-            _("Delete a selected plugin."),
-            "data:image/svg+xml;base64," +
-                window.btoa(
-                    base64Encode(PLUGINSDELETEBUTTON))
-
-        ]);
-        HELPCONTENT.push([
-            _("Enable scrolling"),
-            _("You can scroll the blocks on the canvas."),
-            "data:image/svg+xml;base64," +
-                window.btoa(
-                    base64Encode(SCROLLUNLOCKBUTTON))
-
-        ]);        
     }
     if (_THIS_IS_TURTLE_BLOCKS_) {
         HELPCONTENT.push([
