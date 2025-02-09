@@ -16,19 +16,7 @@
   outline: none;
 }
 
-body:not(.dark-mode) #helpfulSearch,
-body:not(.dark-mode) .ui-autocomplete {
-    background-color: #fff !important;
-    color: #000 !important;
-}
 
-body:not(.dark-mode) .ui-autocomplete li:hover {
-    background-color: #ddd !important;
-}
-
-body:not(.dark-mode) #helpfulSearchDiv {
-    background-color: #f9f9f9 !important;
-}
 
 .modal {
   display: none;

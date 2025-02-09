@@ -1,0 +1,175 @@
+/* Dark Mode */
+
+.dark {
+    background-color: #303030;
+    color: #e0e0e0;
+  }
+  
+  .dark .nav-extended {
+    background-color: #2f6b2f !important;
+    border-bottom: 1px solid #444444;
+  }
+  
+  .dark .nav-wrapper .brand-logo,
+  .dark .nav-wrapper a,
+  .dark .tabs .tab a {
+    color: #ffffff !important;
+  }
+  
+  .dark .tabs .tab a.active {
+    color: #a8d5a8 !important;
+    border-bottom: 2px solid #a8d5a8;
+  }
+  
+  .dark #backToTopBtn {
+    background-color: #2f6b2f !important;
+    color: #ffffff !important;
+  }
+  
+  .dark .modal {
+    background-color: #424242;
+    color: #e0e0e0;
+  }
+  
+  .dark .modal-footer {
+    background-color: #383838;
+  }
+  
+  .dark .dropdown-content {
+    background-color: #424242 !important;
+    color: #ffffff !important;
+    border: 1px solid #444444;
+  }
+  
+  .dark .dropdown-content li > a:hover {
+    background-color: #383838 !important;
+    color: #ffffff !important;
+  }
+  
+  .dark #view-more-chips {
+    color: #e0e0e0 !important;
+  }
+  .dark #local-projects .card {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border: 1px solid #252525;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+  }
+  
+  .dark #local-projects .card .card-title {
+    color: #e0e0e0 !important;
+  }
+  
+  .dark #local-projects .card .card-content {
+    color: #bdbdbd;
+  }
+  s .dark #local-projects .card:hover {
+    background-color: #242424;
+    box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.5);
+  }
+  
+  .dark #local-projects .card .btn {
+    background-color: #2f6b2f;
+    color: #ffffff;
+  }
+  
+  .dark #local-projects .card .btn:hover {
+    background-color: #388e3c;
+  }
+  
+  .dark #global-projects .card {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+    border: 1px solid #252525;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+  }
+  
+  .dark #global-projects .card .card-title {
+    color: #e0e0e0 !important;
+  }
+  
+  .dark #global-projects .card .card-content {
+    color: #bdbdbd;
+  }
+  
+  .dark #global-projects .card:hover {
+    background-color: #242424;
+    box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.5);
+  }
+  
+  .dark #global-projects .card .btn {
+    background-color: #2f6b2f;
+    color: #ffffff;
+  }
+  
+  .dark #global-projects .card .btn:hover {
+    background-color: #388e3c;
+  }
+  
+  .dark .modal-footer .btn-flat {
+    color: #ffffff !important;
+    background-color: transparent !important;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-weight: bold;
+  }
+  
+  .dark .modal-footer .btn-flat:hover {
+    background-color: #a8d5a8 !important;
+    color: #303030 !important;
+  }
+  .dark .close-button {
+    color: #e0e0e0;
+    font-size: 1.5rem;
+    transition: color 0.3s ease;
+  }
+  
+  .dark .close-button:hover {
+    color: #a8d5a8;
+  }
+  
+  .dark .select-wrapper {
+    position: relative;
+    height: 3rem;
+    line-height: 3rem;
+    margin-top: 0.5rem;
+  }
+  
+  .dark .select-wrapper input.select-dropdown {
+    color: #ffffff !important;
+    font-size: 1rem;
+    line-height: normal;
+    padding-left: 10px;
+    height: 3rem;
+    box-sizing: border-box;
+    background-color: #424242 !important;
+    border: 1px solid #444444 !important;
+  }
+  
+  .dark .select-wrapper:after {
+    content: "\25BC";
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    color: #ffffff !important;
+    font-size: 0.8rem;
+    pointer-events: none;
+  }
+  
+  .dark .dropdown-content {
+    background-color: #424242 !important;
+    border: 1px solid #444444;
+    color: #ffffff !important;
+  }
+  
+  .dark .dropdown-content li > a {
+    color: #ffffff !important;
+    padding: 0.5rem 1rem;
+  }
+  
+  .dark .dropdown-content li > a:hover {
+    background-color: #383838 !important;
+    color: #a8d5a8 !important;
+  }
+  
+  /* Your Custom theme for planet page goes below if you don't want to change the existing theme*/

@@ -568,25 +568,22 @@ Turtles.TurtlesView = class {
 
         this._isShrunk = false; // whether canvas is collapsed
 
-        /**
-         * @todo write comments to describe each variable
-         */
-        this._expandedBoundary = null;
-        this._collapsedBoundary = null;
-        this._expandButton = null; // used by add method
-        this._collapseButton = null; // used by add method
-        this._clearButton = null; // used by add method
-        this.gridButton = null; // used by add method
-        this.collapse = null;
-        this.expand = null;
+        this._expandedBoundary = null; // The boundary when the canvas is expanded
+        this._collapsedBoundary = null; // The boundry when the canvas is collapsed
+        this._expandButton = null; // Button to expand the canvas 
+        this._collapseButton = null; // Button to collapse the canvas
+        this._clearButton = null; // Button to clear the canvas
+        this.gridButton = null; // Button to select the grid style
+        this.collapse = null; // Function to collapse the canvas
+        this.expand = null; // Function to expand the canvas
 
         // canvas background color
         this._backgroundColor = platformColor.background;
 
-        this._locked = false;
+        this._locked = false; // whether the canvas is locked
         this._queue = []; // temporarily stores [w, h, scale]
 
-        this.currentGrid = null;
+        this.currentGrid = null; // currently selected grid
 
         // Attach an event listener to the 'resize' event
         window.addEventListener("resize", () => {

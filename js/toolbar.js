@@ -67,7 +67,7 @@ class Toolbar {
                 ["delPluginIcon", _("Delete plugin")],
                 ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
                 ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
-                ["darkModeIcon", _("Change theme")],
+                ["themeSelectIcon", _("Change theme")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["chooseKeyIcon", _("Set Pitch Preview")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
@@ -104,7 +104,10 @@ class Toolbar {
                 ["ar", _("عربى"), "innerHTML"],
                 ["te", _("తెలుగు"), "innerHTML"],
                 ["he", _("עִברִית"), "innerHTML"],
-                ["ur", _("اردو"), "innerHTML"]
+                ["ur", _("اردو"), "innerHTML"],
+                ["light", _("Light Mode"), "innerHTML"],
+                ["dark", _("Dark Mode"), "innerHTML"],
+                // ["custom", _("Custom Theme"), "innerHTML"],
             ];
 
             // Workaround for FF
@@ -174,7 +177,10 @@ class Toolbar {
                 _("igbo"),
                 _("عربى"),
                 _("עִברִית"),
-                _("اردو")
+                _("اردو"),
+                _("Light Mode"),
+                _("Dark Mode")
+                // _("Custom Theme"),
             ];
         } else {
             strings = [
@@ -200,7 +206,7 @@ class Toolbar {
                 ["delPluginIcon", _("Delete plugin")],
                 ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
                 ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
-                ["darkModeIcon", _("Change theme")],
+                ["themeSelectIcon", _("Change theme")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
                 ["restoreIcon", _("Restore")],
@@ -232,7 +238,10 @@ class Toolbar {
                 ["ar", _("عربى"), "innerHTML"],
                 ["te", _("తెలుగు"), "innerHTML"],
                 ["he", _("עִברִית"), "innerHTML"],
-                ["ur", _("اردو"), "innerHTML"]
+                ["ur", _("اردو"), "innerHTML"],
+                ["light", _("Light Mode"), "innerHTML"],
+                ["dark", _("Dark Mode"), "innerHTML"]
+                // ["custom", _("Custom Theme"), "innerHTML"],
             ];
 
             // Workaround for FF
@@ -291,7 +300,10 @@ class Toolbar {
                 _("igbo"),
                 _("عربى"),
                 _("עִברִית"),
-                _("اردو")
+                _("اردو"),
+                _("Light Mode"),
+                _("Dark Mode")
+                // _("Custom Theme"),
             ];
         }
 
@@ -459,17 +471,14 @@ class Toolbar {
         };
     }
 
-    renderDarkModeIcon(onclick) {
-        const darkModeIcon = docById("darkModeIcon");
-
-        darkModeIcon.onclick = () => {
-            this.activity.textMsg(`<div id="theme-link" onmouseover="this.style.opacity=0.5" onmouseout="this.style.opacity=1"> ${_("Refresh your browser to change your theme.")} </div>`);
-              
-            const themeLink = docById("theme-link");
-            themeLink.addEventListener( "click", () => {
-                onclick();
-            })
-        }
+    renderThemeSelectIcon(themeBox, themes) {
+        const themeSelectIcon = docById("themeSelectIcon");
+        let themeList = themes;
+        themeSelectIcon.onclick = () => {
+            themeList.forEach((theme) => {
+                docById(theme).onclick = () => themeBox[`${theme}_onclick`](this.activity);
+            });
+        };
     }
 
     /**
