@@ -989,19 +989,41 @@
         </div>
         </div>
         <script>
+            let persistentNotification = null; 
+        
             function togglePlayOnlyMode() {
-                const isSmallScreen =
-                    window.innerWidth < 768 || window.innerHeight < 600;
+                const isSmallScreen = window.innerWidth < 768 || window.innerHeight < 600;
                 const body = document.body;
+        
                 if (isSmallScreen) {
                     body.classList.add("play-only");
+                    showPersistentNotification();
                 } else {
                     body.classList.remove("play-only");
+                    removePersistentNotification();
                 }
             }
+        
+            function showPersistentNotification() {
+                if (!persistentNotification) {
+                    persistentNotification = document.createElement("div");
+                    persistentNotification.id = "persistentNotification";
+                    persistentNotification.innerHTML = "Play only mode. For the full Music Blocks experience, please open with a larger display";
+                    document.body.appendChild(persistentNotification);
+                }
+            }
+        
+            function removePersistentNotification() {
+                if (persistentNotification) {
+                    persistentNotification.remove();
+                    persistentNotification = null;
+                }
+            }
+        
             togglePlayOnlyMode();
             window.addEventListener("resize", togglePlayOnlyMode);
         </script>
+        
         
         <div id="searchBar" tabindex="-1">
             <input
