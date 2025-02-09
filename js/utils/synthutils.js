@@ -972,7 +972,13 @@ function Synth() {
             }
             chunks = [];
             const url = URL.createObjectURL(blob);
-            download(url, "");
+                // Prompt the user for the file name
+            const fileName = window.prompt("Enter file name", "recording");
+            if (fileName) {
+                download(url, fileName + (platform.FF ? ".wav" : ".ogg"));
+            } else {
+                alert("Download cancelled.");
+            }
         };
         // this.recorder.start();
         // setTimeout(()=>{this.recorder.stop();},5000);
