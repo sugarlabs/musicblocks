@@ -823,8 +823,6 @@ if (typeof module !== "undefined" && module.exports) {
         LOGOJA1,
         NUMBERBLOCKDEFAULT,
         DEFAULTPALETTE,
-        getMainToolbarButtonNames,
-        getAuxToolbarButtonNames,
         TITLESTRING
       }
 }
