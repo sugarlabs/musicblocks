@@ -82,28 +82,26 @@ class ModeWidget {
                 this._playing = false;
 
                 this._playButton.innerHTML =
-                    '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
-                    _("Play all") +
-                    '" alt="' +
-                    _("Play all") +
-                    '" height="' +
-                    ModeWidget.ICONSIZE +
-                    '" width="' +
-                    ModeWidget.ICONSIZE +
-                    '" vertical-align="middle">&nbsp;&nbsp;';
+                    `&nbsp;&nbsp;<img 
+                        src="header-icons/play-button.svg" 
+                        title="${_("Play all")}" 
+                        alt="${_("Play all")}" 
+                        height="${ModeWidget.ICONSIZE}" 
+                        width="${ModeWidget.ICONSIZE}" 
+                        vertical-align="middle"
+                    >&nbsp;&nbsp;`;
             } else {
                 this._playing = true;
 
                 this._playButton.innerHTML =
-                    '&nbsp;&nbsp;<img src="header-icons/stop-button.svg" title="' +
-                    _("Stop") +
-                    '" alt="' +
-                    _("Stop") +
-                    '" height="' +
-                    ModeWidget.ICONSIZE +
-                    '" width="' +
-                    ModeWidget.ICONSIZE +
-                    '" vertical-align="middle">&nbsp;&nbsp;';
+                    `&nbsp;&nbsp;<img 
+                        src="header-icons/stop-button.svg" 
+                        title="${_("Stop")}" 
+                        alt="${_("Stop")}" 
+                        height="${ModeWidget.ICONSIZE}" 
+                        width="${ModeWidget.ICONSIZE}" 
+                        vertical-align="middle"
+                    >&nbsp;&nbsp;`;
 
                 this._playAll();
             }
@@ -178,17 +176,15 @@ class ModeWidget {
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
         cell.innerHTML =
-            '&nbsp;&nbsp;<img src="header-icons/' +
-            icon +
-            '" title="' +
-            label +
-            '" alt="' +
-            label +
-            '" height="' +
-            iconSize +
-            '" width="' +
-            iconSize +
-            '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+            `&nbsp;&nbsp;<img 
+                src="header-icons/${icon}" 
+                title="${label}" 
+                alt="${label}" 
+                height="${iconSize}" 
+                width="${iconSize}" 
+                vertical-align="middle" 
+                align-content="center"
+            >&nbsp;&nbsp;`;
         cell.style.width = ModeWidget.BUTTONSIZE + "px";
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
@@ -638,15 +634,14 @@ class ModeWidget {
                         note_key.src = highlightImgs[0];
                     }
                     this._playButton.innerHTML =
-                        '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
-                        _("Play all") +
-                        '" alt="' +
-                        _("Play all") +
-                        '" height="' +
-                        ModeWidget.ICONSIZE +
-                        '" width="' +
-                        ModeWidget.ICONSIZE +
-                        '" vertical-align="middle">&nbsp;&nbsp;';
+                        `&nbsp;&nbsp;<img 
+                            src="header-icons/play-button.svg" 
+                            title="${_("Play all")}" 
+                            alt="${_("Play all")}" 
+                            height="${ModeWidget.ICONSIZE}" 
+                            width="${ModeWidget.ICONSIZE}" 
+                            vertical-align="middle"
+                        >&nbsp;&nbsp;`;
                     this._resetNotes();
                     this._locked = false;
                 }, 1000 * time);
@@ -708,15 +703,14 @@ class ModeWidget {
                     // Did we just play the last note?
                     this._playing = false;
                     this._playButton.innerHTML =
-                        '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
-                        _("Play all") +
-                        '" alt="' +
-                        _("Play all") +
-                        '" height="' +
-                        ModeWidget.ICONSIZE +
-                        '" width="' +
-                        ModeWidget.ICONSIZE +
-                        '" vertical-align="middle">&nbsp;&nbsp;';
+                        `&nbsp;&nbsp;<img 
+                            src="header-icons/play-button.svg" 
+                            title="${_("Play all")}" 
+                            alt="${_("Play all")}" 
+                            height="${ModeWidget.ICONSIZE}" 
+                            width="${ModeWidget.ICONSIZE}" 
+                            vertical-align="middle"
+                        >&nbsp;&nbsp;`;
                     this._resetNotes();
                     this._locked = false;
                 }, 1000 * time);

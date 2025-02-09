@@ -185,6 +185,16 @@ class LanguageBox {
      * @public
      * @returns {void}
      */
+    ur_onclick() {
+        this._language = "ur"; 
+        this.hide();
+    }
+    
+    
+    /**
+     * @public
+     * @returns {void}
+     */
     OnClick() {
         window.location.reload();    
     }
@@ -212,7 +222,8 @@ class LanguageBox {
             he: "רענן את הדפדפן כדי לשנות את העדפת השפה שלך.",
             ayc: "Actualice su navegador para cambiar su preferencia de idioma.",
             quz: "Actualice su navegador para cambiar su preferencia de idioma.",
-            gug: "Actualice su navegador para cambiar su preferencia de idioma."
+            gug: "Actualice su navegador para cambiar su preferencia de idioma.",
+            ur:"اپنی زبان کی ترجیح کو تبدیل کرنے کے لئے اپنے براؤزر کو تازہ دم کریں۔"
         };
         if (localStorage.getItem("languagePreference") === this._language) {
             this.activity.textMsg(_("Music Blocks is already set to this language."));

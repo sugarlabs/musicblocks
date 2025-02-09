@@ -3,15 +3,14 @@ description: List a new project for Dedicated Mentoring Program (DMP) 2024
 title: "[DMP 2024]: "
 labels: ["DMP 2024"]
 body:
-  - type: textarea
+    - type: textarea
     id: ticket-description
     validations:
       required: true
     attributes:
       label: Ticket Contents
-      value: |
-        ## Description
-        [Provide a brief description of the feature, including why it is needed and what it will accomplish.]
+      description: "Provide a brief description of the feature, including why it is needed and what it will accomplish. E.g., 'This feature aims to create an interactive UI for students to collaborate on assignments in real-time.'"
+
 
   - type: textarea
     id: ticket-goals

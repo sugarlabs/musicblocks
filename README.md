@@ -259,6 +259,21 @@ following resources:
 Programmers, please follow these general [guidelines for
 contributions](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md).
 
+### Translators
+
+Music Blocks uses
+[PO files](https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html)
+to maintain translations of the text strings used in the
+interface. The PO files are available through an
+[interactive website](https://weblate.sugarlabs.org/projects/music-blocks/music-blocks/).
+
+Alternatively, translators can clone the
+[git repo](https://github.com/sugarlabs/musicblocks.git), edit the PO files
+locally, and make a pull request.
+
+Note that once the PO files are updated, they are compiled into an INI
+file, which is the file used by Music Blocks.
+
 ### New Contributors
 
 Use the

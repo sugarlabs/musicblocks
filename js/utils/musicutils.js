@@ -1109,6 +1109,7 @@ const SELECTORSTRINGS = [
     _("bass"),
     _("double bass"),
     _("guitar"),
+    _("sitar"),
     _("acoustic guitar"),
     _("flute"),
     _("clarinet"),

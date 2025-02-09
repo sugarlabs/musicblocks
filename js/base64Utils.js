@@ -12,7 +12,7 @@ function base64Encode(str) {
     let encoder = new TextEncoder();
     let uint8Array = encoder.encode(str);
     let binaryString = String.fromCharCode(...uint8Array);
-    return (binaryString);
+    return btoa(binaryString); // Proper Base64 encoding
 }
 
 /**
@@ -27,5 +27,6 @@ function base64Decode(str) {
     return decoder.decode(uint8Array);
 }
 
-export default { base64Encode, base64Decode };
-//module.exports = { base64Encode, base64Decode };
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { base64Encode, base64Decode };
+}

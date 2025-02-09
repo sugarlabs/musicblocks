@@ -532,26 +532,24 @@ class PhraseMaker {
             this.activity.logo.resetSynth(0);
             if (this.playingNow) {
                 this._playButton.innerHTML =
-                    '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
-                    _("Play") +
-                    '" alt="' +
-                    _("Play") +
-                    '" height="' +
-                    PhraseMaker.ICONSIZE +
-                    '" width="' +
-                    PhraseMaker.ICONSIZE +
-                    '" vertical-align="middle">&nbsp;&nbsp;';
+                    `&nbsp;&nbsp;<img 
+                        src="header-icons/play-button.svg" 
+                        title="${_("Play")}" 
+                        alt="${_("Play")}" 
+                        height="${PhraseMaker.ICONSIZE}" 
+                        width="${PhraseMaker.ICONSIZE}" 
+                        vertical-align="middle"
+                    >&nbsp;&nbsp;`;
             } else {
                 this._playButton.innerHTML =
-                    '&nbsp;&nbsp;<img src="header-icons/stop-button.svg" title="' +
-                    _("Stop") +
-                    '" alt="' +
-                    _("Stop") +
-                    '" height="' +
-                    PhraseMaker.ICONSIZE +
-                    '" width="' +
-                    PhraseMaker.ICONSIZE +
-                    '" vertical-align="middle">&nbsp;&nbsp;';
+                    `&nbsp;&nbsp;<img 
+                        src="header-icons/stop-button.svg" 
+                        title="${_("Stop")}" 
+                        alt="${_("Stop")}" 
+                        height="${PhraseMaker.ICONSIZE}" 
+                        width="${PhraseMaker.ICONSIZE}" 
+                        vertical-align="middle"
+                    >&nbsp;&nbsp;`;
             }
             this.playAll();
         };
@@ -669,57 +667,48 @@ class PhraseMaker {
             if (this.rowLabels[i] === "print") break;
             else if (drumName != null) {
                 cell.innerHTML =
-                    '&nbsp;&nbsp;<img src="' +
-                    getDrumIcon(drumName) +
-                    '" title="' +
-                    _(drumName) +
-                    '" alt="' +
-                    _(drumName) +
-                    '" height="' +
-                    iconSize +
-                    '" width="' +
-                    iconSize +
-                    '" vertical-align="middle">&nbsp;&nbsp;';
+                    `&nbsp;&nbsp;<img 
+                        src="${getDrumIcon(drumName)}" 
+                        title="${_(drumName)}" 
+                        alt="${_(drumName)}" 
+                        height="${iconSize}" 
+                        width="${iconSize}" 
+                        vertical-align="middle"
+                    >&nbsp;&nbsp;`;
             } else if (this.rowLabels[i].slice(0, 4) === "http") {
                 cell.innerHTML =
-                    '&nbsp;&nbsp;<img src="' +
-                    getDrumIcon(this.rowLabels[i]) +
-                    '" title="' +
-                    this.rowLabels[i] +
-                    '" alt="' +
-                    this.rowLabels[i] +
-                    '" height="' +
-                    iconSize / 2 +
-                    '" width="' +
-                    iconSize / 2 +
-                    '" vertical-align="middle"/>&nbsp;&nbsp;';
+                    `&nbsp;&nbsp;<img 
+                        src="${getDrumIcon(this.rowLabels[i])}" 
+                        title="${this.rowLabels[i]}" 
+                        alt="${this.rowLabels[i]}" 
+                        height="${iconSize / 2}" 
+                        width="${iconSize / 2}" 
+                        vertical-align="middle"
+                    />&nbsp;&nbsp;`;
             } else if (MATRIXSYNTHS.includes(this.rowLabels[i])) {
                 cell.innerHTML =
-                    '&nbsp;&nbsp;<img src="' +
-                    "images/synth2.svg" +
-                    '" height="' +
-                    iconSize +
-                    '" width="' +
-                    iconSize +
-                    '" vertical-align="middle">&nbsp;&nbsp;';
+                    `&nbsp;&nbsp;<img 
+                        src="images/synth2.svg" 
+                        height="${iconSize}" 
+                        width="${iconSize}" 
+                        vertical-align="middle"
+                    >&nbsp;&nbsp;`;
             } else if (MATRIXGRAPHICS.includes(this.rowLabels[i])) {
                 cell.innerHTML =
-                    '&nbsp;&nbsp;<img src="' +
-                    "images/mouse.svg" +
-                    '" height="' +
-                    iconSize +
-                    '" width="' +
-                    iconSize +
-                    '" vertical-align="middle">&nbsp;&nbsp;';
+                    `&nbsp;&nbsp;<img 
+                        src="images/mouse.svg" 
+                        height="${iconSize}" 
+                        width="${iconSize}" 
+                        vertical-align="middle"
+                    >&nbsp;&nbsp;`;
             } else if (MATRIXGRAPHICS2.includes(this.rowLabels[i])) {
                 cell.innerHTML =
-                    '&nbsp;&nbsp;<img src="' +
-                    "images/mouse.svg" +
-                    '" height="' +
-                    iconSize +
-                    '" width="' +
-                    iconSize +
-                    '" vertical-align="middle">&nbsp;&nbsp;';
+                    `&nbsp;&nbsp;<img 
+                        src="images/mouse.svg" 
+                        height="${iconSize}" 
+                        width="${iconSize}" 
+                        vertical-align="middle"
+                    >&nbsp;&nbsp;`;
             } else {
                 const BELLSETIDX = {
                     C: 1,
@@ -741,20 +730,18 @@ class PhraseMaker {
                 noteName = this.rowLabels[i];
                 if (noteName in BELLSETIDX && this.rowArgs[i] === 4) {
                     cell.innerHTML =
-                        '<img src="' +
-                        "images/8_bellset_key_" +
-                        BELLSETIDX[noteName] +
-                        ".svg" +
-                        '" width="' +
-                        cell.style.width +
-                        '" vertical-align="middle">';
+                        `<img 
+                            src="images/8_bellset_key_${BELLSETIDX[noteName]}.svg" 
+                            width="${cell.style.width}" 
+                            vertical-align="middle"
+                        >`;
                 } else if (["C", "do"].includes(noteName) && this.rowArgs[i] === 5) {
                     cell.innerHTML =
-                        '<img src="' +
-                        "images/8_bellset_key_8.svg" +
-                        '" width="' +
-                        cell.style.width +
-                        '" vertical-align="middle">';
+                        `<img 
+                            src="images/8_bellset_key_8.svg" 
+                            width="${cell.style.width}" 
+                            vertical-align="middle"
+                        >`;
                 }
             }
 
@@ -813,7 +800,7 @@ class PhraseMaker {
                 blockLabel = this.activity.blocks.protoBlockDict[this.rowLabels[i]][
                     "staticLabels"
                 ][0];
-                cell.innerHTML = blockLabel + "<br>" + this.rowArgs[i];
+                cell.innerHTML = `${blockLabel}<br>${this.rowArgs[i]}`;
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + "px";
                 cell.setAttribute("alt", i + "__" + "graphicsblocks");
 
@@ -833,7 +820,7 @@ class PhraseMaker {
                     "staticLabels"
                 ][0];
                 cell.innerHTML =
-                    blockLabel + "<br>" + this.rowArgs[i][0] + " " + this.rowArgs[i][1];
+                    `${blockLabel}<br>${this.rowArgs[i][0]} ${this.rowArgs[i][1]}`;
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + "px";
                 cell.setAttribute("alt", i + "__" + "graphicsblocks2");
 
@@ -856,7 +843,7 @@ class PhraseMaker {
                     !isCustomTemperament(this.activity.logo.synth.inTemperament)
                 ) {
                     cell.innerHTML =
-                        i18nSolfege(this.rowLabels[i]) + this.rowArgs[i].toString().sub();
+                        `${i18nSolfege(this.rowLabels[i])}${this.rowArgs[i].toString().sub()}`;
                     noteObj = getNote(
                         this.rowLabels[i],
                         this.rowArgs[i],
@@ -1555,13 +1542,12 @@ class PhraseMaker {
             const iconSize = PhraseMaker.ICONSIZE * (window.innerWidth / 1200);
             if (MATRIXGRAPHICS2.includes(this.rowLabels[blockIndex])) {
                 cell.innerHTML =
-                    '&nbsp;&nbsp;<img src="' +
-                    "images/mouse.svg" +
-                    '" height="' +
-                    iconSize +
-                    '" width="' +
-                    iconSize +
-                    '" vertical-align="middle">&nbsp;&nbsp;';
+                    `&nbsp;&nbsp;<img 
+                        src="images/mouse.svg" 
+                        height="${iconSize}" 
+                        width="${iconSize}" 
+                        vertical-align="middle"
+                    >&nbsp;&nbsp;`;
             }
 
             cell = this._labelcols[blockIndex];
@@ -1570,11 +1556,7 @@ class PhraseMaker {
                     "staticLabels"
                 ][0];
                 cell.innerHTML =
-                    blockLabel +
-                    "<br>" +
-                    this.rowArgs[blockIndex][0] +
-                    " " +
-                    this.rowArgs[blockIndex][1];
+                    `${blockLabel}<br>${this.rowArgs[blockIndex][0]} ${this.rowArgs[blockIndex][1]}`;
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + "px";
             }
 
@@ -1837,22 +1819,20 @@ class PhraseMaker {
             const iconSize = PhraseMaker.ICONSIZE * (window.innerWidth / 1200);
             if (MATRIXSYNTHS.includes(this.rowLabels[blockIndex])) {
                 cell.innerHTML =
-                    '&nbsp;&nbsp;<img src="' +
-                    "images/synth2.svg" +
-                    '" height="' +
-                    iconSize +
-                    '" width="' +
-                    iconSize +
-                    '" vertical-align="middle">&nbsp;&nbsp;';
+                    `&nbsp;&nbsp;<img 
+                        src="images/synth2.svg" 
+                        height="${iconSize}" 
+                        width="${iconSize}" 
+                        vertical-align="middle"
+                    >&nbsp;&nbsp;`;
             } else if (MATRIXGRAPHICS.includes(this.rowLabels[blockIndex])) {
                 cell.innerHTML =
-                    '&nbsp;&nbsp;<img src="' +
-                    "images/mouse.svg" +
-                    '" height="' +
-                    iconSize +
-                    '" width="' +
-                    iconSize +
-                    '" vertical-align="middle">&nbsp;&nbsp;';
+                    `&nbsp;&nbsp;<img 
+                        src="images/mouse.svg" 
+                        height="${iconSize}" 
+                        width="${iconSize}" 
+                        vertical-align="middle"
+                    >&nbsp;&nbsp;`;
             }
 
             cell = this._labelcols[blockIndex];
@@ -1863,7 +1843,7 @@ class PhraseMaker {
                 blockLabel = this.activity.blocks.protoBlockDict[this.rowLabels[blockIndex]][
                     "staticLabels"
                 ][0];
-                cell.innerHTML = blockLabel + "<br>" + this.rowArgs[blockIndex];
+                cell.innerHTML = `${blockLabel}<br>${this.rowArgs[blockIndex]}`;
                 cell.style.fontSize = Math.floor(this._cellScale * 12) + "px";
             }
 
@@ -2194,33 +2174,28 @@ class PhraseMaker {
             const iconSize = PhraseMaker.ICONSIZE * (w / 1200);
             if (drumName != null) {
                 cell.innerHTML =
-                    '&nbsp;&nbsp;<img src="' +
-                    getDrumIcon(drumName) +
-                    '" title="' +
-                    _(drumName) +
-                    '" alt="' +
-                    _(drumName) +
-                    '" height="' +
-                    iconSize +
-                    '" width="' +
-                    iconSize +
-                    '" vertical-align="middle">&nbsp;&nbsp;';
+                    `&nbsp;&nbsp;<img 
+                        src="${getDrumIcon(drumName)}" 
+                        title="${_(drumName)}" 
+                        alt="${_(drumName)}" 
+                        height="${iconSize}" 
+                        width="${iconSize}" 
+                        vertical-align="middle"
+                    >&nbsp;&nbsp;`;
             } else if (noteName in BELLSETIDX && this.rowArgs[index] === 4) {
                 cell.innerHTML =
-                    '<img src="' +
-                    "images/8_bellset_key_" +
-                    BELLSETIDX[noteName] +
-                    ".svg" +
-                    '" width="' +
-                    cell.style.width +
-                    '" vertical-align="middle">';
+                    `<img 
+                        src="images/8_bellset_key_${BELLSETIDX[noteName]}.svg" 
+                        width="${cell.style.width}" 
+                        vertical-align="middle"
+                    >`;
             } else if (noteName === "C" && this.rowArgs[index] === 5) {
                 cell.innerHTML =
-                    '<img src="' +
-                    "images/8_bellset_key_8.svg" +
-                    '" width="' +
-                    cell.style.width +
-                    '" vertical-align="middle">';
+                    `<img 
+                        src="images/8_bellset_key_8.svg" 
+                        width="${cell.style.width}" 
+                        vertical-align="middle"
+                    >`;
             }
 
             cell = this._labelcols[index];
@@ -2232,7 +2207,7 @@ class PhraseMaker {
                 !isCustomTemperament(this.activity.logo.synth.inTemperament)
             ) {
                 cell.innerHTML =
-                    i18nSolfege(this.rowLabels[index]) + this.rowArgs[index].toString().sub();
+                    `${i18nSolfege(this.rowLabels[index])}${this.rowArgs[index].toString().sub()}`;
                 noteObj = getNote(
                     this.rowLabels[index],
                     this.rowArgs[index],
@@ -2255,9 +2230,9 @@ class PhraseMaker {
                         this.activity.errorMsg,
                         this.activity.logo.synth.inTemperament
                     );
-                    cell.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
+                    cell.innerHTML = `${this.rowLabels[i]}${this.rowArgs[i].toString().sub()}`;
                 } else {
-                    cell.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
+                    cell.innerHTML = `${this.rowLabels[i]}${this.rowArgs[i].toString().sub()}`;
                     noteObj = [this.rowLabels[i], this.rowArgs[i]];
                 }
             }
@@ -2723,14 +2698,14 @@ class PhraseMaker {
                     "staticLabels"
                 ][0];
                 exportLabel.innerHTML =
-                    blockLabel + "<br>" + this.rowArgs[i][0] + " " + this.rowArgs[i][1];
+                    `${blockLabel}<br>${this.rowArgs[i][0]} ${this.rowArgs[i][1]}`;
                 exportLabel.style.fontSize = Math.floor(this._cellScale * 12) + "px";
             } else {
                 if (noteIsSolfege(this.rowLabels[i])) {
                     exportLabel.innerHTML =
-                        i18nSolfege(this.rowLabels[i]) + this.rowArgs[i].toString().sub();
+                        `${i18nSolfege(this.rowLabels[i])}${this.rowArgs[i].toString().sub()}`;
                 } else {
-                    exportLabel.innerHTML = this.rowLabels[i] + this.rowArgs[i].toString().sub();
+                    exportLabel.innerHTML = `${this.rowLabels[i]}${this.rowArgs[i].toString().sub()}`;
                 }
             }
 
@@ -2820,13 +2795,7 @@ class PhraseMaker {
         const saveDocument = exportDocument;
         const uriData = saveDocument.documentElement.outerHTML;
         exportDocument.body.innerHTML +=
-            '<br><a id="downloadb1" style="background: #C374E9;' +
-            "border-radius: 5%;" +
-            "padding: 0.3em;" +
-            "text-decoration: none;" +
-            "margin: 0.5em;" +
-            'color: white;" ' +
-            "download>Download Matrix</a>";
+            `<br><a id="downloadb1" style="background: #C374E9; border-radius: 5%; padding: 0.3em; text-decoration: none; margin: 0.5em; color: white;" download>Download Matrix</a>`;
         exportDocument.getElementById("downloadb1").download = "MusicMatrix";
         exportDocument.getElementById("downloadb1").href = this._generateDataURI(uriData);
         exportDocument.close();
@@ -2975,17 +2944,13 @@ class PhraseMaker {
             if (obj[1] < 13) {
                 if (NOTESYMBOLS != undefined && obj[1] in NOTESYMBOLS) {
                     cell.innerHTML =
-                        obj[0] +
-                        "<br>&mdash;<br>" +
-                        obj[1] +
-                        "<br>" +
-                        '<img src="' +
-                        NOTESYMBOLS[obj[1]] +
-                        '" height=' +
-                        (MATRIXSOLFEHEIGHT / 2) * this._cellScale +
-                        ">";
+                        `${obj[0]}<br>&mdash;<br>${obj[1]}<br>
+                        <img 
+                            src="${NOTESYMBOLS[obj[1]]}" 
+                            height="${(MATRIXSOLFEHEIGHT / 2) * this._cellScale}"
+                        >`;
                 } else {
-                    cell.innerHTML = obj[0] + "<br>&mdash;<br>" + obj[1] + "<br><br>";
+                    cell.innerHTML = `${obj[0]}<br>&mdash;<br>${obj[1]}<br><br>`;
                 }
             } else {
                 cell.innerHTML = "";
@@ -4637,15 +4602,14 @@ class PhraseMaker {
                 );
                 this.playingNow = false;
                 this._playButton.innerHTML =
-                    '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
-                    _("Play") +
-                    '" alt="' +
-                    _("Play") +
-                    '" height="' +
-                    PhraseMaker.ICONSIZE +
-                    '" width="' +
-                    PhraseMaker.ICONSIZE +
-                    '" vertical-align="middle">&nbsp;&nbsp;';
+                    `&nbsp;&nbsp;<img 
+                        src="header-icons/play-button.svg" 
+                        title="${_("Play")}" 
+                        alt="${_("Play")}" 
+                        height="${PhraseMaker.ICONSIZE}" 
+                        width="${PhraseMaker.ICONSIZE}" 
+                        vertical-align="middle"
+                    >&nbsp;&nbsp;`;
             } else {
                 row = this._noteValueRow;
                 cell = row.cells[this._colIndex];
