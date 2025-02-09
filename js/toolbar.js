@@ -105,8 +105,8 @@ class Toolbar {
                 ["te", _("తెలుగు"), "innerHTML"],
                 ["he", _("עִברִית"), "innerHTML"],
                 ["ur", _("اردو"), "innerHTML"],
-                ["light", _("Light Mode"), "innerHTML"],
-                ["dark", _("Dark Mode"), "innerHTML"],
+                ["light", _("<i class='material-icons'>brightness_7</i>"), "innerHTML"],
+                ["dark", _("<i class='material-icons'>brightness_4</i>"), "innerHTML"],
                 // ["custom", _("Custom Theme"), "innerHTML"],
             ];
 
@@ -239,8 +239,8 @@ class Toolbar {
                 ["te", _("తెలుగు"), "innerHTML"],
                 ["he", _("עִברִית"), "innerHTML"],
                 ["ur", _("اردو"), "innerHTML"],
-                ["light", _("Light Mode"), "innerHTML"],
-                ["dark", _("Dark Mode"), "innerHTML"]
+                ["light", _("<i class='material-icons'>brightness_7</i>"), "innerHTML"],
+                ["dark", _("<i class='material-icons'>brightness_4</i>"), "innerHTML"]
                 // ["custom", _("Custom Theme"), "innerHTML"],
             ];
 
@@ -472,6 +472,12 @@ class Toolbar {
     }
 
     renderThemeSelectIcon(themeBox, themes) {
+        const icon = document.getElementById("themeSelectIcon")
+        themes.forEach((theme) =>{
+            if(localStorage.themePreference === theme){
+                icon.innerHTML = document.getElementById(theme).innerHTML;
+            }
+        })
         const themeSelectIcon = docById("themeSelectIcon");
         let themeList = themes;
         themeSelectIcon.onclick = () => {

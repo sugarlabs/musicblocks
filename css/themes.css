@@ -1,3 +1,24 @@
+/* Theme DropDown Styling */
+
+#themedropdown{
+  background-color: transparent;
+  box-shadow: none;
+  display: flex;
+  left: 51.5% !important;          /* Move the dropdown to the center */
+  transform: translateX(-50%) !important;  /* Adjust for exact centering */
+}
+
+#themedropdown a{
+  color: #2196F3;
+  transition: all 0.3s ease;
+}
+#themedropdown a:hover{
+  color: #1E88E5;
+  background-color: transparent;
+  transition: all 0.3s ease;
+}
+
+
 /* Dark Mode */
 
 .dark .blue {
@@ -37,19 +58,6 @@
   
   .dark #loadingText {
     color: white !important;
-  }
-  
-  .dark .dropdown-content li > a {
-    background-color: #1c1c1c;
-    color: #3fe0d1;
-  }
-  
-  .dark .dropdown-content li > a:hover {
-    color: #252525;
-  }
-  
-  .dark .dropdown-content {
-    background-color: #1c1c1c;
   }
   
   .dark .language-link {
