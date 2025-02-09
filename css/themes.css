@@ -1,3 +1,17 @@
+body:not(.dark) #helpfulSearch,
+body:not(.dark) .ui-autocomplete {
+    background-color: #fff !important;
+    color: #000 !important;
+}
+
+body:not(.dark) .ui-autocomplete li:hover {
+    background-color: #ddd !important;
+}
+
+body:not(.dark) #helpfulSearchDiv {
+    background-color: #f9f9f9 !important;
+}
+
 /* Dark Mode */
 
 .dark .blue {
@@ -68,16 +82,16 @@
   .dark #search,
   #helpfulSearch,
   .ui-autocomplete {
-    background-color: #1c1c1c;
-    color: #fff;
+    background-color: #1c1c1c !important;
+    color: #fff !important;
   }
   
   .dark .ui-autocomplete li:hover {
-    background-color: #225a91;
+    background-color: #225a91 !important;
   }
   
   .dark #helpfulSearchDiv {
-    background-color: transparent;
+    background-color: transparent !important;
   }
   
   .dark #crossButton {
