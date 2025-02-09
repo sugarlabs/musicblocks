@@ -622,6 +622,8 @@ table {
 
 #canvas {
   overflow-y: visible;
+  background-color: #FFFFFF; 
+  width: 100%;
 }
 
 #statusDiv {
