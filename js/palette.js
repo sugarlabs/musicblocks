@@ -112,18 +112,16 @@ class Palettes {
             element.id = "palette";
             element.setAttribute("class", "disable_highlighting");
             element.classList.add('flex-palette')
-            element.setAttribute(
-                "style",
-                "position: absolute; z-index: 1000; left :0px; top:" + this.top + "px"
-            );
+            element.classList.add("palette-container");
+            element.style.top = this.top + "px";
             element.innerHTML =
                 `<div style="height:fit-content">
-                    <table width="${1.5 * this.cellSize}" bgcolor="white">
+                    <table class="palette-body">
                         <thead>
                             <tr></tr>
                         </thead>
                     </table>
-                    <table width ="${4.5 * this.cellSize}" bgcolor="white">
+                    <table class="palette-body">
                         <thead>
                             <tr>
                                 <td style= "width:28px"></td>
@@ -306,7 +304,7 @@ class Palettes {
         img.style.height = `${this.cellSize}px`;
         label.textContent = toTitleCase(_(name));
         label.style.color = platformColor.paletteText;
-        row.style.borderBottom = "1px solid #0CAFFF";
+        row.classList.add('palette-border');
         label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
         label.style.padding = "4px";
         row.style.display = "flex";
@@ -336,12 +334,10 @@ class Palettes {
         row.style.alignItems = "center";
         row.style.width = "126px";
         row.style.backgroundColor = platformColor.paletteBackground;
-        row.addEventListener('mouseover', () => {
-            row.style.backgroundColor = platformColor.hoverColor;
-        });
-        row.addEventListener('mouseout', () => {
-            row.style.backgroundColor = platformColor.paletteBackground;
-        });
+        row.classList.add('palette-item-row');
+        row.style.setProperty('--palette-background', platformColor.paletteBackground);
+        row.style.setProperty('--palette-hover', platformColor.hoverColor);
+
 
         this._loadPaletteButtonHandler(name, row);
     }

@@ -1884,3 +1884,37 @@ table {
   stroke : #78E600;
   stroke-width: 3;
 }
+.palette-container {
+  position: absolute;
+  z-index: 1000;
+  left: 0;
+}
+.palette-border {
+  border-bottom: 1px solid #0CAFFF;
+}
+.palette-body {
+  min-width: 180px; 
+  background: var(--palette-background);
+  float: left;
+  border: 1px solid var(--selector-selected);
+}
+
+.palette-item-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 126px;
+  background-color: var(--palette-background, white);
+  transition: background-color 0.2s ease-in-out; 
+}
+
+
+.palette-item-row:hover {
+  background-color: var(--palette-hover, lightgray);
+}
+
+@media (max-width: 768px) {
+  .palette-container {
+    width: 100%;
+  }
+}
