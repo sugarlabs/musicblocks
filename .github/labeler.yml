@@ -1,0 +1,10 @@
+bug:
+  - "**/*.py"              # Match all Python files globally (if any are present)
+
+feature:
+  - "**/*.js"              # Match all JavaScript files globally (if any)
+
+documentation:
+  - "**/*.md"              # Match all Markdown files
+  - "documentation/**"     # Match everything in the 'documentation' folder
+  - "docs/**"              # Match everything in the 'docs' folder
