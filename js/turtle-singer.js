@@ -666,15 +666,9 @@ class Singer {
      * @returns {void}
      */
     static setMasterVolume(logo, volume) {
-        const activity = logo.activity;
         volume = Math.min(Math.max(volume, 0), 100);
 
         logo.synth.setMasterVolume(volume);
-        for (const turtle of activity.turtles.turtleList) {
-            for (const synth in turtle.singer.synthVolume) {
-                turtle.singer.synthVolume[synth].push(volume);
-            }
-        }
     }
 
     /**

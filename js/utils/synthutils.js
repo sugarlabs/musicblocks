@@ -1196,7 +1196,7 @@ function Synth() {
      * @returns {Tone.Sampler|Tone.Player} - The created synth.
      */
     this._createSampleSynth = (turtle, instrumentName, sourceName) => {
-        let tempSynth;
+        let synth;
         if (sourceName in this.samples.voice) {
             instrumentsSource[instrumentName] = [2, sourceName];
             const noteDict = {};
@@ -1205,24 +1205,24 @@ function Synth() {
             } else {
                 noteDict["C4"] = this.samples.voice[sourceName];
             }
-            tempSynth = new Tone.Sampler(noteDict);
+            synth = new Tone.Sampler(noteDict);
         } else if (sourceName in this.samples.drum) {
             instrumentsSource[instrumentName] = [1, sourceName];
-            tempSynth = new Tone.Player(this.samples.drum[sourceName]);
+            synth = new Tone.Player(this.samples.drum[sourceName]);
         } else if (sourceName in CUSTOMSAMPLES){
             instrumentsSource[instrumentName] = [2, sourceName];
             const noteDict = {};
             const params = CUSTOMSAMPLES[sourceName];
             const center = this._parseSampleCenterNo(params[1], params[2]);
             noteDict[center] = params[0];
-            tempSynth = new Tone.Sampler(noteDict);
+            synth = new Tone.Sampler(noteDict);
         } else {
             // default drum sample
             instrumentsSource[instrumentName] = [1, "drum"];
-            tempSynth = new Tone.Player(this.samples.drum[DEFAULTDRUM]);
+            synth = new Tone.Player(this.samples.drum[DEFAULTDRUM]);
         }
 
-        return tempSynth;
+        return synth;
     };
     
     /**
@@ -1460,8 +1460,6 @@ function Synth() {
             console.debug("loading " + sourceName);
             this.createSynth(turtle, sourceName, sourceName, null);
         }
-        this.setVolume(turtle, sourceName, last(Singer.masterVolume));
-
         if (sourceName in instruments[turtle]) {
             return instruments[turtle][sourceName].toDestination();
         }
@@ -1772,10 +1770,10 @@ function Synth() {
         }
 
         let tempNotes = notes;
-        let tempSynth = instruments[turtle]["electronic synth"];
+        let synth = instruments[turtle][instrumentName];
         let flag = 0;
         if (instrumentName in instruments[turtle]) {
-            tempSynth = instruments[turtle][instrumentName];
+            synth = instruments[turtle][instrumentName];
             flag = instrumentsSource[instrumentName][0];
             if (flag === 1 || flag === 2) {
                 const sampleName = instrumentsSource[instrumentName][1];
@@ -1783,6 +1781,9 @@ function Synth() {
                 console.debug(sampleName);
             }
         }
+        const volume =  last(Singer.masterVolume);
+        const db = Tone.gainToDb(volume / 100);
+        Tone.Destination.volume.rampTo(db, 0.01);
 
         // Get note values as per the source of the synth.
         if (future === undefined) {
@@ -1794,12 +1795,12 @@ function Synth() {
                     instrumentName.slice(0, 4) === "http" ||
                     instrumentName.slice(0, 21) === "data:audio/wav;base64"
                 ) {
-                    tempSynth.start(Tone.now() + future);
+                    synth.start(Tone.now() + future);
                 } else if (instrumentName.slice(0, 4) === "file") {
-                    tempSynth.start(Tone.now() + future);
+                    synth.start(Tone.now() + future);
                 } else {
                     try {
-                        tempSynth.start(Tone.now() + future);
+                        synth.start(Tone.now() + future);
                     } catch (e) {
                         // Occasionally we see "Start time must be
                         // strictly greater than previous start time"
@@ -1810,7 +1811,7 @@ function Synth() {
                 break;
             case 2: // voice sample
                 this._performNotes(
-                    tempSynth.toDestination(),
+                    synth.toDestination(),
                     notes,
                     beatValue,
                     paramsEffects,
@@ -1825,7 +1826,7 @@ function Synth() {
                 }
 
                 this._performNotes(
-                    tempSynth.toDestination(),
+                    synth.toDestination(),
                     tempNotes,
                     beatValue,
                     paramsEffects,
@@ -1835,12 +1836,12 @@ function Synth() {
                 );
                 break;
             case 4:
-                tempSynth.triggerAttackRelease("c2", beatValue, Tone.now + future);
+                synth.triggerAttackRelease("c2", beatValue, Tone.now + future);
                 break;
             case 0: // default synth
             default:
                 this._performNotes(
-                    tempSynth.toDestination(),
+                    synth.toDestination(),
                     tempNotes,
                     beatValue,
                     paramsEffects,
@@ -1985,15 +1986,6 @@ function Synth() {
      * @returns {number} The volume level.
      * @deprecated This method is currently unused and may not return correct values.
      */
-    this.getVolume = (turtle, instrumentName) => {
-        if (instrumentName in instruments[turtle]) {
-            return instruments[turtle][instrumentName].volume.value;
-        } else {
-            // eslint-disable-next-line no-console
-            console.debug("instrument not found");
-            return 50;
-        }
-    };
     
     /**
      * Sets the master volume for all instruments.

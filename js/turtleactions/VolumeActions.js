@@ -171,7 +171,9 @@ function setupVolumeActions(activity) {
             volume = Math.max(Math.min(volume, 100), 0);
 
             if (volume === 0) activity.errorMsg(_("Setting volume to 0."), blk);
-
+            if (Singer.masterVolume.length === 2) {
+                Singer.masterVolume.pop();
+            }
             Singer.masterVolume.push(volume);
 
             const tur = activity.turtles.ithTurtle(turtle);
