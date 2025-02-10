@@ -1,88 +1,130 @@
 /* Dark Mode */
 
 .dark .blue {
-    background-color: #022363 !important;
-  }
-  
-  .dark .blue.darken-1 {
-    background-color: #01143b !important;
-  }
-  
-  .dark #floatingWindows > .windowFrame {
-    border: 2px solid #000000;
-    background-color: #454545;
-  }
-  
-  .dark .wfbtItem {
-    background-color: #225a91;
-  }
-  
-  .dark #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
-    color: #e8e8e8;
-  }
-  
-  .dark .popupMsg {
-    background-color: #084e86;
-    color: #e8e8e8;
-  }
-  
-  .dark #printText {
-    border-color: #000000;
-  }
-  
-  .dark #loading-image-container {
-    background: #1a1a1a !important;
-    background-color: #1a1a1a !important;
-  }
-  
-  .dark #loadingText {
-    color: white !important;
-  }
-  
-  .dark .dropdown-content li > a {
-    background-color: #1c1c1c;
-    color: #3fe0d1;
-  }
-  
-  .dark .dropdown-content li > a:hover {
-    color: #252525;
-  }
-  
-  .dark .dropdown-content {
-    background-color: #1c1c1c;
-  }
-  
-  .dark .language-link {
-    color: #fff;
-  }
-  
-  .dark .modal-content {
-    background-color: #1c1c1c;
-    color: #fff;
-  }
-  
-  .dark #submitLilypond {
-    background-color: rgb(0, 102, 255);
-  }
-  
-  .dark #search,
-  #helpfulSearch,
-  .ui-autocomplete {
-    background-color: #1c1c1c;
-    color: #fff;
-  }
-  
-  .dark .ui-autocomplete li:hover {
-    background-color: #225a91;
-  }
-  
-  .dark #helpfulSearchDiv {
-    background-color: transparent;
-  }
-  
-  .dark #crossButton {
-    color: #fff;
-  }
+  background-color: #022363 !important;
+}
 
+.dark .blue.darken-1 {
+  background-color: #01143b !important;
+}
 
-/* Your Custom Theme can go here if you don't want to modify the existing dark mode */
+.dark #floatingWindows > .windowFrame {
+  border: 2px solid #000000;
+  background-color: #454545;
+}
+
+.dark .wfbtItem {
+  background-color: #225a91;
+}
+
+.dark #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
+  color: #e8e8e8;
+}
+
+.dark .popupMsg {
+  background-color: #084e86;
+  color: #e8e8e8;
+}
+
+.dark #printText {
+  border-color: #000000;
+}
+
+.dark #loading-image-container {
+  background: #1a1a1a !important;
+  background-color: #1a1a1a !important;
+}
+
+.dark #loadingText {
+  color: white !important;
+}
+
+.dark .dropdown-content li > a {
+  background-color: #1c1c1c;
+  color: #3fe0d1;
+}
+
+.dark .dropdown-content li > a:hover {
+  color: #252525;
+}
+
+.dark .dropdown-content {
+  background-color: #1c1c1c;
+}
+
+.dark .language-link {
+  color: #fff;
+}
+
+.dark .modal-content {
+  background-color: #1c1c1c;
+  color: #fff;
+}
+
+.dark #submitLilypond {
+  background-color: rgb(0, 102, 255);
+}
+
+.dark #search,
+.dark #helpfulSearch,
+.dark .ui-autocomplete {
+  background-color: #1c1c1c;
+  color: #fff;
+}
+
+.dark .ui-autocomplete li:hover {
+  background-color: #225a91;
+}
+
+.dark #helpfulSearchDiv {
+  background-color: transparent;
+}
+
+.dark #crossButton {
+  color: #fff;
+}
+
+/* New Additions */
+
+/* Fix for Collapsed View Background in Dark Mode */
+.dark .collapsed-view {
+  background-color: #1c1c1c !important;
+  color: #e8e8e8 !important;
+  border: 1px solid #333;
+}
+
+/* Aux Toolbar Fix */
+.dark #aux-toolbar {
+  background-color: #1c1c1c !important;
+  border: 1px solid #333;
+}
+
+/* Buttons inside Aux Toolbar */
+.dark #toggleAuxBtn {
+  background-color: #022363 !important;
+  color: #fff !important;
+  border: 1px solid #333;
+}
+
+/* Grid Button */
+.dark #gridButton {
+  background-color: #01143b !important;
+  color: #fff !important;
+}
+
+/* Tooltip Dark Mode */
+.dark .tooltipped {
+  background-color: #222 !important;
+  color: #e8e8e8 !important;
+  border: 1px solid #444;
+}
+
+/* Floating Windows Fix */
+.dark #floatingWindows {
+  background-color: #2b2b2b !important;
+}
+
+/* Fix for Window Borders */
+.dark .windowFrame {
+  border: 2px solid #444 !important;
+}

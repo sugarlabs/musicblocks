@@ -1000,48 +1000,69 @@ Turtles.TurtlesView = class {
             }
 
             this._expandButton.onclick = () => {
-                // If the aux toolbar is open, close it.
+                // Get the aux toolbar
                 const auxToolbar = docById("aux-toolbar");
+                const menuIcon = docById("menu");
+                const toggleAuxBtn = docById("toggleAuxBtn");
+            
+                // If the aux toolbar is open, close it.
                 if (auxToolbar.style.display === "block") {
-                    const menuIcon = docById("menu");
                     auxToolbar.style.display = "none";
                     menuIcon.innerHTML = "menu";
-                    docById("toggleAuxBtn").className -= "blue darken-1";
+                    toggleAuxBtn.classList.remove("blue", "darken-1");
                 }
+            
                 this.hideMenu();
                 this.setStageScale(1.0);
                 this._expandedBoundary.visible = true;
                 this.gridButton.style.visibility = "visible";
                 this._collapseButton.style.visibility = "visible";
                 this._expandButton.style.visibility = "hidden";
+            
+                // Apply dark mode styles dynamically
+                if (document.body.classList.contains("dark")) {
+                    auxToolbar.classList.add("dark");
+                    document.querySelector("#floatingWindows > .windowFrame").classList.add("dark");
+                    document.querySelector("#loading-image-container").classList.add("dark");
+                    document.querySelector("#loadingText").classList.add("dark");
+                    document.querySelectorAll(".dropdown-content li > a").forEach(el => el.classList.add("dark"));
+                } else {
+                    auxToolbar.classList.remove("dark");
+                    document.querySelector("#floatingWindows > .windowFrame").classList.remove("dark");
+                    document.querySelector("#loading-image-container").classList.remove("dark");
+                    document.querySelector("#loadingText").classList.remove("dark");
+                    document.querySelectorAll(".dropdown-content li > a").forEach(el => el.classList.remove("dark"));
+                }
+            
+                // Update the helpful wheel items
                 this.activity.helpfulWheelItems.forEach(ele => {
                     if (ele.label === "Expand") {
                         ele.display = false;
-                    } else if (ele.label === "Collapse") {
-                        ele.display = true;
-                    } else if (ele.label === "Grid") {
+                    } else if (ele.label === "Collapse" || ele.label === "Grid") {
                         ele.display = true;
                     }
                 });
+            
                 this._collapsedBoundary.visible = false;
                 turtlesStage.removeAllEventListeners("pressmove");
                 turtlesStage.removeAllEventListeners("mousedown");
-
+            
                 turtlesStage.x = 0;
                 turtlesStage.y = 0;
                 this._isShrunk = false;
-
+            
+                // Reset all turtle elements
                 for (let i = 0; i < this.turtleList.length; i++) {
                     this.turtleList[i].container.scaleX = 1;
                     this.turtleList[i].container.scaleY = 1;
                     this.turtleList[i].container.scale = 1;
                 }
-
+            
                 this._clearButton.scaleX = 1;
                 this._clearButton.scaleY = 1;
                 this._clearButton.scale = 1;
                 this._clearButton.x = this._w - 5 - 2 * 55;
-
+            
                 if (this.gridButton !== null) {
                     this.gridButton.scaleX = 1;
                     this.gridButton.scaleY = 1;
@@ -1049,7 +1070,7 @@ Turtles.TurtlesView = class {
                     this.gridButton.x = this._w - 10 - 3 * 55;
                     this.gridButton.visible = true;
                 }
-
+            
                 // Restore the previously selected grid
                 if (this.selectedGrid !== undefined) {
                     this.activity.turtles.currentGrid = this.selectedGrid;
@@ -1058,11 +1079,13 @@ Turtles.TurtlesView = class {
                     this.activity.turtles.currentGrid = 0;
                     this.activity.turtles.doGrid(0);
                 }
-
-                // remove the stage and add it back in position 0
+            
+                // Remove the stage and add it back in position 0
                 this.masterStage.removeChild(turtlesStage);
                 this.masterStage.addChildAt(turtlesStage, 0);
             };
+            
+            
         };
 
 
