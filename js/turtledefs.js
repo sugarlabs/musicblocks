@@ -22,7 +22,7 @@
    STEPBUTTON, STOPTURTLEBUTTON, WRAPTURTLEBUTTON, _THIS_IS_TURTLE_BLOCKS_,
    _THIS_IS_MUSIC_BLOCKS_, MOUSEPALETTEICON, FULLSCREENBUTTON, RECORDBUTTON,
    PLUGINSBUTTON, OPENMERGEBUTTON, PITCHPREVIEWBUTTON, JAVASCRIPTBUTTON,
-   DARKMODEBUTTON
+   RECORDHELPBUTTON, DARKMODEBUTTON
 */
 
 /* exported
@@ -508,7 +508,7 @@ const createHelpContent = (activity) => {
             _("Record"),
             _("Record your project as video."),
             "data:image/svg+xml;base64," +
-                window.btoa(base64Encode(RECORDBUTTON))
+                window.btoa(base64Encode(RECORDHELPBUTTON))
         ]);
     }
     HELPCONTENT.push([
