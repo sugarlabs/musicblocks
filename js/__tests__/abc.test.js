@@ -111,7 +111,7 @@ describe("OCTAVE_NOTATION_MAP", () => {
         expect(OCTAVE_NOTATION_MAP[2]).toBe(",,");
         expect(OCTAVE_NOTATION_MAP[1]).toBe(",,,");
         expect(OCTAVE_NOTATION_MAP[0]).toBeUndefined();
-    });
+    }); 
 });
 
 describe("ACCIDENTAL_MAP", () => {
