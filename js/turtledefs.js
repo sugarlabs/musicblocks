@@ -20,7 +20,9 @@
    RHYTHMPALETTEICON, RUNBUTTON, SAVEBUTTON, SCROLLUNLOCKBUTTON,
    SHORTCUTSBUTTON, SLOWBUTTON, SMALLERBUTTON, STATSBUTTON,
    STEPBUTTON, STOPTURTLEBUTTON, WRAPTURTLEBUTTON, _THIS_IS_TURTLE_BLOCKS_,
-   _THIS_IS_MUSIC_BLOCKS_, MOUSEPALETTEICON, FULLSCREENBUTTON, RECORDBUTTON
+   _THIS_IS_MUSIC_BLOCKS_, MOUSEPALETTEICON, FULLSCREENBUTTON, RECORDBUTTON,
+   PLUGINSBUTTON, OPENMERGEBUTTON, PITCHPREVIEWBUTTON, JAVASCRIPTBUTTON,
+   DARKMODEBUTTON
 */
 
 /* exported
@@ -610,7 +612,14 @@ const createHelpContent = (activity) => {
             "data:image/svg+xml;base64," +
                 window.btoa(base64Encode(STATSBUTTON))
         ]);
-        // TODO: add plugin
+        HELPCONTENT.push([
+            _("Load plugin"),
+            _("Load a selected plugin."),
+            "data:image/svg+xml;base64," +
+                window.btoa(
+                    base64Encode(PLUGINSBUTTON))
+
+        ]);
         HELPCONTENT.push([
             _("Delete plugin"),
             _("Delete a selected plugin."),
@@ -628,8 +637,18 @@ const createHelpContent = (activity) => {
 
         ]);        
     }
-    // TODO: Music Blocks: change theme    
-    // TODO: Add merge
+    HELPCONTENT.push([
+        _("Change theme"),
+        _("Switch between dark and light mode."),
+        "data:image/svg+xml;base64," +
+            window.btoa(base64Encode(DARKMODEBUTTON))
+    ]);
+    HELPCONTENT.push([
+        _("Merge with current project"),
+        _(" Click to add another project into the current one."),
+        "data:image/svg+xml;base64," +
+            window.btoa(base64Encode(OPENMERGEBUTTON))
+    ]);
     HELPCONTENT.push([
         _("Wrap Turtle"),
         _("Turn Turtle wrapping On or Off."),
@@ -638,8 +657,20 @@ const createHelpContent = (activity) => {
                 base64Encode(WRAPTURTLEBUTTON))
 
     ]);
-    // TODO: Music Blocks: set pitch preview
-    // TODO: toggle JS editor
+    HELPCONTENT.push([
+        _("Set Pitch Preview"),
+        _("Click to set the current pitch."),
+        "data:image/svg+xml;base64," +
+            window.btoa(base64Encode(PITCHPREVIEWBUTTON))
+    ]);
+    if (!activity.beginnerMode) {
+        HELPCONTENT.push([
+            _("JavaScript Editor"),
+            _("Converts Music Block programs to JavaScript."),
+            "data:image/svg+xml;base64," +
+                window.btoa(base64Encode(JAVASCRIPTBUTTON))
+        ]);
+    }
     HELPCONTENT.push([
         _("Restore"),
         _("Restore blocks from the trash."),

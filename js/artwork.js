@@ -45,7 +45,7 @@
    SCROLLUNLOCKBUTTON, EMPTYTRASHCONFIRMBUTTON, COPYBUTTON,
    PASTEBUTTON, EXTRACTBUTTON, METRONOMESVG, PITCHPREVIEWBUTTON,
    JAVASCRIPTBUTTON, GRAND_G, GRAND_F, TREBLE_G, TREBLE_F,
-   FULLSCREENBUTTON
+   FULLSCREENBUTTON, DARKMODEBUTTON
 */
 
 // Defined below are the inline SVGs used for turtles and blocks. SVGs
@@ -766,3 +766,6 @@ const TREBLE_F = // One flat each on the treble and bass clefs
 
 const TREBLE_G = // One sharp each on the treble and bass clefs
       '<svg version="1.0" width="1200" height="900" id="svg296" sodipodi:docname="grand-g.svg" inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"> <text xml:space="preserve" style="font-size:48px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px" x="99.945312" y="340.08594" id="text583"><tspan id="tspan581" x="99.945312" y="340.08594" style="font-size:48px">♯</tspan></text> </svg>';
+
+const DARKMODEBUTTON = //For light/dark theme
+      '<svg height="55px" width="55px" viewBox="0 -960 960 960" fill="#292929" opacity="0.4" version="1.1" id="svg1" xmlns="http://www.w3.org/2000/svg"><path id="path1" d="M 481.01562 -933.98438 L 346.01562 -800 L 160 -800 L 160 -613.98438 L 26.015625 -480 L 160 -346.01562 L 160 -160 L 346.01562 -160 L 481.01562 -28.984375 L 613.98438 -160 L 800 -160 L 800 -346.01562 L 933.98438 -480 L 800 -613.98438 L 800 -800 L 613.98438 -800 L 481.01562 -933.98438 z M 490 -676.01562 C 543.94667 -676.01562 589.94208 -656.98438 627.96875 -618.98438 C 665.99542 -580.98437 685 -535.02135 685 -481.05469 C 685 -427.09469 665.99542 -381.08686 627.96875 -343.04688 C 589.94208 -305.01353 543.94667 -286.01562 490 -286.01562 C 476.66667 -286.01563 463.33333 -287.50781 450 -290.50781 C 436.66667 -293.50781 423.6823 -297.67448 411.01562 -303.00781 C 445.6823 -319.67448 473.31771 -343.90885 493.98438 -375.74219 C 514.65103 -407.57552 525 -442.6823 525 -481.01562 C 525 -519.34897 514.65103 -554.41667 493.98438 -586.25 C 473.31771 -618.08333 445.6823 -642.00781 411.01562 -658.00781 C 423.70229 -664.00781 436.7124 -668.48438 450.03906 -671.48438 C 463.35906 -674.48438 476.66667 -676.01562 490 -676.01562 z"/></svg>'
