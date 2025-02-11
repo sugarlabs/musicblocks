@@ -75,16 +75,16 @@
   .dark #search,
   #helpfulSearch,
   .ui-autocomplete {
-    background-color: #1c1c1c;
-    color: #fff;
+    background-color: #1c1c1c !important;
+    color: #fff !important;
   }
   
   .dark .ui-autocomplete li:hover {
-    background-color: #225a91;
+    background-color: #225a91 !important;
   }
   
   .dark #helpfulSearchDiv {
-    background-color: transparent;
+    background-color: transparent !important;
   }
   
   .dark #crossButton {
