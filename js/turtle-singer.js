@@ -2389,3 +2389,7 @@ class Singer {
         activity.stage.update();
     }
 }
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Singer;
+}
