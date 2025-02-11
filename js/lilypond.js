@@ -745,7 +745,7 @@ const saveLilypondOutput = function (activity) {
                 if (t in activity.turtles.turtleList) {
                     // const turtleNumber = tNumber;
 
-                    instrumentName = activity.turtles.turtleList[t].name;
+                    instrumentName = activity.turtles.getTurtle(t).name;
                     if (instrumentName === _("start") || instrumentName === _("start drum")) {
                         instrumentName = RODENTS[tNumber % 12];
                     } else if (instrumentName === tNumber.toString()) {
@@ -897,9 +897,9 @@ const saveLilypondOutput = function (activity) {
                         instrumentName = _("drum") + NUMBERNAMES[tNumber - startDrums];
                     } else {
                         if (t in activity.turtles.turtleList) {
-                            instrumentName = activity.turtles.turtleList[t].name;
+                            instrumentName = activity.turtles.getTurtle(t).name;
                         } else if (tNumber in activity.turtles.turtleList) {
-                            instrumentName = activity.turtles.turtleList[tNumber].name;
+                            instrumentName = activity.turtles.getTurtle(tNumber).name;
                         } else {
                             instrumentName = _("mouse");
                         }
@@ -941,9 +941,9 @@ const saveLilypondOutput = function (activity) {
                         instrumentName = _("drum") + NUMBERNAMES[tNumber - startDrums];
                     } else {
                         if (t in activity.turtles.turtleList) {
-                            instrumentName = activity.turtles.turtleList[t].name;
+                            instrumentName = activity.turtles.getTurtle(t).name;
                         } else if (tNumber in activity.turtles.turtleList) {
-                            instrumentName = activity.turtles.turtleList[tNumber].name;
+                            instrumentName = activity.turtles.getTurtle(tNumber).name;
                         } else {
                             instrumentName = _("mouse");
                         }

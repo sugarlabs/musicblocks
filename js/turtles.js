@@ -405,7 +405,7 @@ Turtles.TurtlesModel = class {
         // List of all of the turtles, one for each start block
         this._turtleList = [];
 
-        
+
     }
 
     /**
@@ -444,8 +444,30 @@ Turtles.TurtlesModel = class {
      * @param {Object} turtle
      */
     pushTurtle(turtle) {
-        if(!this._turtleList.includes(this))
-        this._turtleList.push(turtle);
+        if(!this._turtleList.includes(turtle))
+            this._turtleList.push(turtle);
+    }
+
+    /**
+     * Returns the index of the turtle in the turtleList.
+     *
+     * @param {Object} turtle
+     * @returns {Number} index
+     */
+    getIndexOfTurtle(turtle) {
+        return this._turtleList.indexOf(turtle);
+    }
+
+    /**
+     * Removes the turtle at the specified index from the turtleList.
+     *
+     * @param {Number} index - The index of the turtle to remove.
+     * @returns {void}
+     */
+    removeTurtle(index) {
+        if (index >= 0 && index < this._turtleList.length) {
+            this._turtleList.splice(index, 1);
+        }
     }
 
     /**
@@ -627,13 +649,13 @@ Turtles.TurtlesView = class {
             // Call the updateDimensions function when resizing occurs
             var screenWidth = (
                 window.innerWidth ||
-                    document.documentElement.clientWidth ||
-                    document.body.clientWidth
+                document.documentElement.clientWidth ||
+                document.body.clientWidth
             );
             var screenHeight = (
                 window.innerHeight ||
-                    document.documentElement.clientHeight ||
-                    document.body.clientHeight
+                document.documentElement.clientHeight ||
+                document.body.clientHeight
             );
 
             // Set a scaling factor to adjust the dimensions based on the screen size
@@ -704,7 +726,7 @@ Turtles.TurtlesView = class {
      */
     setBackgroundColor(index) {
         const color =
-        index === -1 ? platformColor.background : this.getTurtle(index).painter.canvasColor;
+            index === -1 ? platformColor.background : this.getTurtle(index).painter.canvasColor;
         this._backgroundColor = color;
         this.makeBackground();
         this.activity.refreshCanvas();
@@ -845,10 +867,10 @@ Turtles.TurtlesView = class {
             container.setAttribute(
                 "style",
                 "position: absolute; right:" +
-                    (document.body.clientWidth - x) +
-                    "px;  top: " +
-                    y +
-                    "px;"
+                (document.body.clientWidth - x) +
+                "px;  top: " +
+                y +
+                "px;"
             );
             docById("buttoncontainerTOP").appendChild(container);
             return container;
@@ -926,8 +948,8 @@ Turtles.TurtlesView = class {
             };
         };
 
-        
-        
+
+
         const __makeClearButton = () => {
             // Create the Clear button using the existing _makeButton helper
             this._clearButton = _makeButton(
@@ -939,7 +961,7 @@ Turtles.TurtlesView = class {
                 this._w - 5 - 2 * 55,
                 70 + LEADING + 6
             );
-        
+
             // Assign click listener to the Clear button
             this._clearButton.onclick = () => {
                 this.activity._allClear();
@@ -986,7 +1008,7 @@ Turtles.TurtlesView = class {
             };
         };
 
-        
+
         this.collapse = () => {
             const auxToolbar = docById("aux-toolbar");
             if (auxToolbar.style.display === "block") {

@@ -593,7 +593,7 @@ function setupWidgetBlocks(activity) {
                             blocks,
                             turtle,
                             Math.max(0, blocks.length - 2),
-                            turtle == last(activity.turtles.turtleList)
+                            turtle == activity.turtles.getTurtle(activity.turtles.getTurtleCount() - 1)
                         );
                 }
                 blocks[0][4][2] = blocks.length;

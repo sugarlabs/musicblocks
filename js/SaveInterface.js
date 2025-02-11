@@ -364,10 +364,10 @@ class SaveInterface {
         activity.logo.runningAbc = true;
         activity.logo.notationOutput = ABCHEADER;
         activity.logo.notationNotes = {};
-        for (let t = 0; t < activity.turtles.turtleList.length; t++) {
+        for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
             activity.logo.notation.notationStaging[t] = [];
             activity.logo.notation.notationDrumStaging[t] = [];
-            activity.turtles.turtleList[t].painter.doClear(true, true, true);
+            activity.turtles.getTurtle(t).painter.doClear(true, true, true);
         }
         activity.logo.runLogoCommands();
     }
@@ -523,10 +523,10 @@ class SaveInterface {
         }
         this.activity.logo.notationOutput = lyheader;
         this.activity.logo.notationNotes = {};
-        for (let t = 0; t < this.activity.turtles.turtleList.length; t++) {
+        for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
             this.activity.logo.notation.notationStaging[t] = [];
             this.activity.logo.notation.notationDrumStaging[t] = [];
-            this.activity.turtles.turtleList[t].painter.doClear(true, true, true);
+            this.activity.turtles.getTurtle(t).painter.doClear(true, true, true);
         }
         document.body.style.cursor = "wait";
         this.activity.logo.runLogoCommands();
@@ -636,10 +636,10 @@ class SaveInterface {
     // eslint-disable-next-line no-unused-vars
     saveMxml(filename) {
         this.activity.logo.runningMxml = true;
-        for (let t = 0; t < this.activity.turtles.turtleList.length; t++) {
+        for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
             this.activity.logo.notation.notationStaging[t] = [];
             this.activity.logo.notation.notationDrumStaging[t] = [];
-            this.activity.turtles.turtleList[t].painter.doClear(true, true, true);
+            this.activity.turtles.getTurtle(t).painter.doClear(true, true, true);
         }
 
         this.activity.logo.runLogoCommands();

@@ -326,14 +326,14 @@ function setupActionBlocks(activity) {
             actionArgs = receivedArg;
 
             if (name in logo.actions) {
-                activity.turtles.turtleList[turtle].running = true;
+                activity.turtles.getTurtle(turtle).running = true;
                 logo.runFromBlockNow(
                     logo,
                     turtle,
                     logo.actions[name],
                     true,
                     actionArgs,
-                    activity.turtles.turtleList[turtle].queue.length
+                    activity.turtles.getTurtle(turtle).queue.length
                 );
                 return logo.returns[turtle].shift();
             } else {
@@ -551,14 +551,14 @@ function setupActionBlocks(activity) {
 
             if (name in logo.actions) {
                 // Just run the stack.
-                activity.turtles.turtleList[turtle].running = true;
+                activity.turtles.getTurtle(turtle).running = true;
                 logo.runFromBlockNow(
                     logo,
                     turtle,
                     logo.actions[name],
                     true,
                     actionArgs,
-                    activity.turtles.turtleList[turtle].queue.length
+                    activity.turtles.getTurtle(turtle).queue.length
                 );
                 return logo.returns[turtle].pop();
             } else {
@@ -748,14 +748,14 @@ function setupActionBlocks(activity) {
             } else {
                 const name = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
                 if (name in logo.actions) {
-                    activity.turtles.turtleList[turtle].running = true;
+                    activity.turtles.getTurtle(turtle).running = true;
                     logo.runFromBlockNow(
                         logo,
                         turtle,
                         logo.actions[name],
                         true,
                         actionArgs,
-                        activity.turtles.turtleList[turtle].queue.length
+                        activity.turtles.getTurtle(turtle).queue.length
                     );
                     return logo.returns[turtle].pop();
                 } else {
