@@ -31,27 +31,28 @@ Note: If you want to customise an existing theme, just put your changes in the d
 
 1.  **Adding your theme's icon to the list in index.html**
 
-    Go to index.html from root, and add your theme to the list (please follow the conventions used by other themes for proper implementation)
+    Go to index.html from root, and add your theme's icon to the list (please follow the conventions used by other themes for proper implementation)
+    Add your theme's icon to the bottom of the list, you can find icons in [Material Icons](https://materializecss.com/icons.html).
 
     ```javascript
     <ul style="display: none;" id="themedropdown" class="dropdown-content">
-        <a id="light" class="tooltipped" data-tooltip="Light Mode"></a>
-        <a id="dark" class="tooltipped" data-tooltip="Dark Mode"></a>
-        <a id="custom" class="tooltipped" data-tooltip="Custom Theme"></a>
+        <a id="light" class="tooltipped" data-tooltip="Light Mode"><i class='material-icons'>brightness_7</i></a>
+        <a id="dark" class="tooltipped" data-tooltip="Dark Mode"><i class='material-icons'>brightness_4</i></a>
+        <a id="custom" class="tooltipped" data-tooltip="Custom Theme"><i class='material-icons'>choose_your_material_icon</i></a>
     </ul>
     ```
 
 2.  **Now go to js/toolbar.js, find init(activity){...}**
 
     There will be 4 arrays named string (two in an if statement, rest two in the else statement).
-    Add your theme's icon to the bottom of the array, you can find icons in [Material Icons](https://materializecss.com/icons.html).
+    Add your theme's name to the bottom of the pre-existing themes.
 
 
     ```javascript
     string = [[...],
-        ["light", _("<i class='material-icons'>brightness_7</i>"), "innerHTML"],
-        ["dark", _("<i class='material-icons'>brightness_7</i>"), "innerHTML"],
-        ["custom", _("<i class='material-icons'>custom_material_icon</i>"), "innerHTML"]];
+        ["light", _("Light Mode")],
+        ["dark", _("Dark Mode")],
+        ["custom", _("Custom Theme")]];
     ```
 
     ```javascript
