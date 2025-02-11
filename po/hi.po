@@ -13,6 +13,15 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.0.5\n"
 
+msgid "Change theme"
+msgstr "थीम बदलें"
+
+msgid "Light Mode"
+msgstr "प्रकाश मोड"
+
+msgid "Dark Mode"
+msgstr "अंधेरा मोड"
+
 #js/toolbar.js:111
 #js/toolbar.js:230
 #js/turtledefs.js:504
