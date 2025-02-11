@@ -852,7 +852,7 @@ function setupMediaBlocks(activity) {
                 if (typeof args[0] === "string") {
                     activity.errorMsg(NANERRORMSG, blk);
                 } else {
-                    activity.turtles.turtleList[turtle].doTurtleShell(args[0], args[1]);
+                    activity.turtles.getTurtle(turtle).doTurtleShell(args[0], args[1]);
                 }
             }
         }

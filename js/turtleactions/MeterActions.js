@@ -184,14 +184,17 @@ function setupMeterActions(activity) {
         static onEveryBeatDo(action, isflow, receivedArg, turtle, blk) {
             // Set up a listener for every beat for this turtle.
             const orgTurtle = turtle;
-            if (!activity.turtles.turtleList[orgTurtle].companionTurtle) {
-                turtle = activity.turtles.turtleList.length;
-                activity.turtles.turtleList[orgTurtle].companionTurtle = turtle;
+
+            // Create a companion turtle if it doesn't exist
+            if (!activity.turtles.getTurtle(orgTurtle).companionTurtle) {
+                turtle = activity.turtles.getTurtleCount();
+                activity.turtles.getTurtle(orgTurtle).companionTurtle = turtle;
                 activity.turtles.addTurtle(activity.blocks.blockList[blk], {});
                 activity.logo.prepSynths();
             }
-            turtle = activity.turtles.turtleList[orgTurtle].companionTurtle;
+            turtle = activity.turtles.getTurtle(orgTurtle).companionTurtle;
 
+            // Get the companion turtle object
             const tur = activity.turtles.ithTurtle(turtle);
 
             const __listener = () => {
@@ -200,8 +203,7 @@ function setupMeterActions(activity) {
                     tur.parentFlowQueue.push(blk);
                     tur.queue.push(queueBlock);
                 } else {
-                    // Since the turtle has stopped running, we need
-                    // to run the stack from here.
+                    // Run the stack if the turtle has stopped running
                     activity.logo.runFromBlockNow(
                         activity.logo,
                         turtle,
@@ -212,6 +214,7 @@ function setupMeterActions(activity) {
                 }
             };
 
+            // Set up the event listener for every beat
             const eventName = "__everybeat_" + turtle + "__";
             tur.queue = [];
             tur.parentFlowQueue = [];
@@ -220,11 +223,14 @@ function setupMeterActions(activity) {
             activity.logo.initTurtle(turtle);
             activity.logo.setTurtleListener(turtle, eventName, __listener);
 
+            // Calculate the duration of every beat
             const turOrg = activity.turtles.ithTurtle(orgTurtle);
             let duration =
                 60 / (turOrg.singer.bpm.length > 0 ? last(turOrg.singer.bpm) : Singer.masterBPM);
             // Consider meter when calculating duration.
             duration = (duration * 4) / turOrg.singer.noteValuePerBeat;
+
+            // Clear any existing interval and set a new one
             if (tur.interval !== undefined) {
                 clearInterval(tur.interval);
             }
