@@ -24,6 +24,10 @@
     background-color: #022363 !important;
   }
   
+  .dark #canvas {
+    background-color: #1c1c1c;
+  }
+  
   .dark .blue.darken-1 {
     background-color: #01143b !important;
   }
