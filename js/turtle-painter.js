@@ -1474,3 +1474,7 @@ class Painter {
         this.turtle.updateCache();
     }
 }
+
+if (typeof module !== "undefined" && module.exports) {
+module.exports = Painter;
+}

@@ -40,7 +40,8 @@
     "gulp-clean-css": "^4.3.0",
     "gulp-prettier": "^3.0.0",
     "gulp-uglify": "^3.0.2",
-    "jest": "^29.7.0"
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
   },
   "dependencies": {
     "autoprefixer": "^10.4.16",
@@ -50,6 +51,9 @@
     "gulp-replace": "^1.0.0",
     "gulp-sass": "^5.1.0",
     "gulp-sourcemaps": "^2.6.5",
-    "http-server": "^14.1.1"
+    "http-server": "^14.1.1",
+    "lodash.template": "^4.5.0",
+    "node-static": "^0.7.11",
+    "tone": "^15.0.4"
   }
 }
