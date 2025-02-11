@@ -1704,7 +1704,7 @@ class Logo {
                         logo.activity.save.afterSaveMxml();
                         logo.runningMxml = false;
                     } else if (logo.runningMIDI) {
-                        logo.activity.save.afterSaveMIDI();
+                        logo.activity.save.afterSaveMIDI(); //save midi
                         logo.runningMIDI = false;
                     }
                     else if (tur.singer.suppressOutput) {

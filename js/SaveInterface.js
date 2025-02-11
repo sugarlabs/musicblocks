@@ -264,6 +264,17 @@ class SaveInterface {
         }, 500);
     }
 
+    /**
+     * Save MIDI file.
+     *
+     * This method generates required MIDI data.
+     *
+     * @param {SaveInterface} activity - The activity object to save.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
     saveMIDI(activity) {
         // Suppress music and turtle output when generating
         activity.logo.runningMIDI = true;
@@ -271,6 +282,16 @@ class SaveInterface {
         document.body.style.cursor = "wait";
     }
 
+    /**
+     * Perform actions after generating MIDI data.
+     *
+     * This method generates a MIDI file using _midiData.
+     *
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
     afterSaveMIDI() {
         const generateMidi = (data) => {
             const normalizeNote = (note) => {
