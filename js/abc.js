@@ -24,7 +24,7 @@ const ABCHEADER = "X:1\nT:Music Blocks composition\nC:Mr. Mouse\nL:1/16\nM:C\n";
 const OCTAVE_NOTATION_MAP = {
     10: "'''''",
     9: "''''",
-    8: "'''", 
+    8: "'''",
     7: "''",
     6: "'",
     5: "",
@@ -334,7 +334,6 @@ const processABCNotes = function(logo, turtle) {
 
                     for (let ii = 0; ii < notes.length; ii++) {
                         logo.notationNotes[turtle] += __toABCnote(notes[ii]);
-                        logo.notationNotes[turtle] += " ";
                     }
 
                     if (notes.length > 1) {

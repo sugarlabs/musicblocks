@@ -39,7 +39,7 @@ describe('processABCNotes', () => {
 
     it('should process notes and update notationNotes correctly', () => {
         processABCNotes(logo, "0");
-        expect(logo.notationNotes["0"]).toBe("G^ 4 G^4 F 4 F4 G^ 2 G^8 ");
+        expect(logo.notationNotes["0"]).toBe("G^4 G^4 F4 F4 G^2 G^8 ");
     });
 });
 
@@ -78,7 +78,7 @@ describe('saveAbcOutput', () => {
                                "L:1/16\n"+
                                "M:C\n"+
                                "K:CMAJOR\n"+
-                               "G^ 4 G^4 F 4 F4 G^ 2 G^8 \n";
+                               "G^4 G^4 F4 F4 G^2 G^8 \n";
 
         const result = saveAbcOutput(activity);
         expect(result).toBe(expectedOutput);
@@ -111,7 +111,7 @@ describe("OCTAVE_NOTATION_MAP", () => {
         expect(OCTAVE_NOTATION_MAP[2]).toBe(",,");
         expect(OCTAVE_NOTATION_MAP[1]).toBe(",,,");
         expect(OCTAVE_NOTATION_MAP[0]).toBeUndefined();
-    }); 
+    });
 });
 
 describe("ACCIDENTAL_MAP", () => {
