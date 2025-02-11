@@ -268,7 +268,10 @@ class SaveInterface {
         // Suppress music and turtle output when generating
         activity.logo.runningMIDI = true;
         activity.logo.runLogoCommands();
+        document.body.style.cursor = "wait";
+    }
 
+    afterSaveMIDI() {
         const generateMidi = (data) => {
             const normalizeNote = (note) => {
                 return note.replace("♯", "#").replace("♭", "b");
@@ -329,6 +332,7 @@ class SaveInterface {
             };
 
             const midi = new Midi();
+            midi.header.ticksPerBeat = 480;
 
             Object.entries(data).forEach(([blockIndex, notes]) => {
 
@@ -395,11 +399,11 @@ class SaveInterface {
             const url = URL.createObjectURL(blob);
             activity.save.download("midi", url, null);
         };
-
         const data = activity.logo._midiData;
         setTimeout(() => {
             generateMidi(data);
             activity.logo._midiData = {};
+            document.body.style.cursor = "default";
         },500);
     }
 
