@@ -3582,12 +3582,15 @@ const piemenuGrid = (activity) => {
     activity.turtles.gridWheel.clockwise = false;
     activity.turtles.gridWheel.initWheel(grids);
     activity.turtles.gridWheel.createWheel();
-    activity.turtles.gridWheel.navigateWheel(
-        activity.turtles.currentGrid ? activity.turtles.currentGrid : 0
-    );
-
+    const storedGrid = activity.turtles.currentGrid ?? 0;
+    activity.turtles.gridWheel.navigateWheel(storedGrid);
+      
     for (let i = 0; i < gridLabels.length; i++) {
-        activity.turtles.gridWheel.navItems[i].navigateFunction = activity.turtles.doGrid;
+        activity.turtles.gridWheel.navItems[i].navigateFunction = function () {
+            activity.hideGrids();
+            activity.turtles.currentGrid = i;
+            activity.turtles.doGrid(i);
+        };
         activity.turtles.gridWheel.navItems[i].setTooltip(gridLabels[i]);
     }
 

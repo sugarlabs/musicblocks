@@ -3370,7 +3370,7 @@ i.left {
   }
 
   .materialize-iso nav .aux i.material-icons {
-    font-size: 32px;  
+    font-size: 48px;  
     position: relative;
     margin: 0;
     padding: 0;
@@ -3382,14 +3382,12 @@ i.left {
     display: none;
   }
   .materialize-iso nav i.material-icons {
-    font-size: 28px;  
     position: relative;
     margin: 0;
     padding: 0;
   }
 
   .materialize-iso nav .aux i.material-icons {
-    font-size: 23px;  
     position: relative;
     margin: 0;
     padding: 0;
@@ -3401,14 +3399,14 @@ i.left {
     display: none;
   }
   .materialize-iso nav .main i.material-icons {
-    font-size: 26px;  
+    font-size: 5.3vw; 
     position: relative;
     margin: 0;
     padding: 0;
   }
 
   .materialize-iso nav .aux i.material-icons {
-    font-size: 23px;  
+    font-size: 5.3vw;  
     position: relative;
     margin: 0;
     padding: 0;
@@ -3421,14 +3419,12 @@ i.left {
   }
 
   .materialize-iso nav .main i.material-icons {
-    width: 20px;
     position: relative;
     margin: 0;
     padding: 0;
   }
 
   .materialize-iso nav  .aux i.material-icons{
-    width: 10px;
     position: relative;
     margin: 0;
     padding: 0;
@@ -3442,7 +3438,7 @@ i.left {
   }
 
   .materialize-iso nav .main i.material-icons {
-    font-size: 20px;
+    font-size: 7.5vw;
     position: relative;
     margin-left: -8px;
     margin-right: -8px;
@@ -3450,10 +3446,10 @@ i.left {
   }
 
   .materialize-iso nav .aux i.material-icons {
-    font-size: 17px;
+    font-size: 7.5vw;
     position: relative;
-    margin-left: -7.5px;
-    margin-right: -7.5px;
+    margin-left: -8px;
+    margin-right: -8px;
     padding: 0px;
   }
 }

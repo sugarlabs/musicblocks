@@ -13,7 +13,7 @@
  
         <!--Import style.css-->
         <link type="text/css" rel="stylesheet" href="css/style.css"/>
-        <link type="text/css" rel="stylesheet" href="css/darkMode.css"/>
+        <link type="text/css" rel="stylesheet" href="css/planetThemes.css"/>
 
         <!--Let browser know website is optimized for mobile-->
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -69,7 +69,6 @@
                 <a id="logo-container" class="brand-logo inactiveLink"><i class="material-icons" id="planeticon">public</i></a>
                 <ul class="right"><li><a id="close-planet" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip=""><i class="material-icons">close</i></a></li></ul>
                 <ul class="right"><li><a id="planet-open-file" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip=""><i class="material-icons">folder_open</i></a></li></ul>
-                <ul class="right"><li><a id="toggle-dark-mode" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip="Toggle Dark Mode"><i class="material-icons">brightness_6</i></a></li></ul>
                 <ul class="right"><li><a id="planet-new-project" class="tooltipped" data-position="bottom" data-delay="50" data-tooltip=""><i class="material-icons">note_add</i></a></li></ul>
                 <ul class="right tabs tabs-transparent" id="localglobal">
                     <li class="tab"><a class="active" id="local-tab" href="#local"></a></li>
@@ -338,11 +337,5 @@
                 </div>
             </div>
         </div>
-        <script>
-            // Dark Mode Toggle Functionality
-            document.getElementById('toggle-dark-mode').addEventListener('click', function () {
-                document.body.classList.toggle('dark-mode');
-            });
-        </script>
     </body>
 </html>

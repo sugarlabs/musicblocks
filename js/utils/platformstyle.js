@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* exported showButtonHighlight */
 
-const themeName = localStorage.myThemeName || undefined;
+const themePreference = localStorage.themePreference || undefined;
 
 
 window.platform = {
@@ -32,15 +32,15 @@ window.platform = {
 platform.androidWebkit = platform.android && !platform.FF;
 platform.FFOS = platform.FF && (platform.mobile || platform.tablet) && !platform.android;
 
-if (themeName === "darkMode") {
-    window.platformColor = {
-        textColor : "#E2E2E2",
+let platformThemes = {
+    dark: {
+        textColor: "#E2E2E2",
         blockText: "#E2E2E2",
-        dialogueBox:"#1C1C1C",
+        dialogueBox: "#1C1C1C",
         strokeColor: "#E2E2E2",
         fillColor: "#F9F9F9",
         blueButton: "#0066FF",
-        hoverColor:  "#808080",
+        hoverColor: "#808080",
         paletteColors: {
             widgets: ["#2E7D32", "#1B5E20", "#388E3C", "#81C784"],
             pitch: ["#2E7D32", "#1B5E20", "#388E3C", "#81C784"],
@@ -105,7 +105,15 @@ if (themeName === "darkMode") {
         piemenuBasic: ["#00ACC1", "#4CAF50", "#008BA3", "#4CAF50", "#008BA3"],
         exitWheelcolors: ["#757575", "#BDBDBD"],
         exitWheelcolors2: ["#757575", "#7986CB", "#4CAF50"],
-        pitchWheelcolors: ["#388E3C", "#4CAF50", "#388E3C", "#008BA3", "#388E3C", "#4CAF50", "#66BB6A"],
+        pitchWheelcolors: [
+            "#388E3C",
+            "#4CAF50",
+            "#388E3C",
+            "#008BA3",
+            "#388E3C",
+            "#4CAF50",
+            "#66BB6A"
+        ],
         gridWheelcolors: {
             wheel: ["#1C1C1C"],
             selected: {
@@ -175,16 +183,15 @@ if (themeName === "darkMode") {
         modePieMenusIfColorPush: "#66BB6A",
         modePieMenusElseColorPush: "#81C784",
         wheelcolors: ["#757575", "#9E9E9E", "#757575", "#9E9E9E", "#616161"]
-    };
-} else {
-    window.platformColor = {
-        textColor : "black",
+    },
+    light: {
+        textColor: "black",
         blockText: "#282828",
-        dialogueBox:"#fff",
+        dialogueBox: "#fff",
         strokeColor: "#E2E2E2",
         fillColor: "#F9F9F9",
         blueButton: "#0066FF",
-        hoverColor:  "#E0E0E0",
+        hoverColor: "#E0E0E0",
         paletteColors: {
             widgets: ["#7CD622", "#57AD02", "#77C428", "#B4EB7D"],
             pitch: ["#7CD622", "#57AD02", "#77C428", "#B4EB7D"],
@@ -247,13 +254,21 @@ if (themeName === "darkMode") {
         pitchLabelBackground: "#77C428",
         graphicsLabelBackground: "#728FF9",
         rhythmcellcolor: "#c8c8c8",
-        stopIconcolor : "#ea174c",
+        stopIconcolor: "#ea174c",
         hitAreaGraphicsBeginFill: "#FFF",
         orange: "#e37a00", // 5YR
         piemenuBasic: ["#3ea4a3", "#60bfbc", "#1d8989", "#60bfbc", "#1d8989"],
         exitWheelcolors: ["#808080", "#c0c0c0"],
         exitWheelcolors2: ["#808080", "#92a9ff", "#80a080"],
-        pitchWheelcolors: ["#77c428", "#93e042", "#77c428", "#5ba900", "#77c428", "#93e042", "#adfd55"],
+        pitchWheelcolors: [
+            "#77c428",
+            "#93e042",
+            "#77c428",
+            "#5ba900",
+            "#77c428",
+            "#93e042",
+            "#adfd55"
+        ],
         gridWheelcolors: {
             wheel: ["#ffffff"],
             selected: {
@@ -323,7 +338,17 @@ if (themeName === "darkMode") {
         modePieMenusIfColorPush: "#4b8b0e",
         modePieMenusElseColorPush: "#66a62d",
         wheelcolors: ["#808080", "#909090", "#808080", "#909090", "#707070"]
-    };
+    },
+    // custom: {Your styling},
+}
+
+for (const theme in platformThemes) {
+    if (themePreference === theme) {
+        window.platformColor = platformThemes[theme];
+        break;
+    } else {
+        window.platformColor = platformThemes["light"];
+    }
 }
 
 document.querySelector("meta[name=theme-color]").content = platformColor.header;

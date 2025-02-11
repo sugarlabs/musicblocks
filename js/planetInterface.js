@@ -307,7 +307,6 @@ class PlanetInterface {
          */
         this.init = async () => {
             this.iframe = document.getElementById("planet-iframe");
-            this.iframe.style.backgroundColor = platformColor.background;
             try {
                 await this.iframe.contentWindow.makePlanet(
                     _THIS_IS_MUSIC_BLOCKS_,
@@ -330,4 +329,7 @@ class PlanetInterface {
             this.mainCanvas = this.activity.canvas;
         };
     }
+}
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = PlanetInterface;
 }

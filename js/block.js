@@ -2085,8 +2085,8 @@ class Block {
      * @param {number} thisBlock - Index of the current block.
      */
     _doOpenMedia(thisBlock) {
-        const fileChooser = docById("myOpenAll");
         const that = this;
+        const fileChooser = that.name=="media" ? docById("myMedia") : docById("audio");
 
         const __readerAction = () => {
             window.scroll(0, 0);
@@ -3111,7 +3111,9 @@ class Block {
         }
 
         // Always hide the trash when there is no block selected.
-        this.activity.trashcan.hide();
+        if (!moved) {
+            this.activity.trashcan.hide();
+        }
 
         if (this.blocks.longPressTimeout != null) {
             clearTimeout(this.blocks.longPressTimeout);
