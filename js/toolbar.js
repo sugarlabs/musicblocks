@@ -68,6 +68,8 @@ class Toolbar {
                 ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
                 ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
                 ["themeSelectIcon", _("Change theme")],
+                ["light", _("Light Mode")],
+                ["dark", _("Dark Mode")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["chooseKeyIcon", _("Set Pitch Preview")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
@@ -104,10 +106,7 @@ class Toolbar {
                 ["ar", _("عربى"), "innerHTML"],
                 ["te", _("తెలుగు"), "innerHTML"],
                 ["he", _("עִברִית"), "innerHTML"],
-                ["ur", _("اردو"), "innerHTML"],
-                ["light", _("Light Mode"), "innerHTML"],
-                ["dark", _("Dark Mode"), "innerHTML"],
-                // ["custom", _("Custom Theme"), "innerHTML"],
+                ["ur", _("اردو"), "innerHTML"]
             ];
 
             // Workaround for FF
@@ -134,7 +133,9 @@ class Toolbar {
                 _("Delete plugin"),
                 _("Enable horizontal scrolling"),
                 _("Disable horizontal scrolling"),
-                _("Change theme"),
+                _("Change theme"),               
+                _("Light Mode"),
+                _("Dark Mode"),
                 _("Merge with current project"),
                 _("Set Pitch Preview"),
                 _("JavaScript Editor"),
@@ -177,10 +178,7 @@ class Toolbar {
                 _("igbo"),
                 _("عربى"),
                 _("עִברִית"),
-                _("اردو"),
-                _("Light Mode"),
-                _("Dark Mode")
-                // _("Custom Theme"),
+                _("اردو")
             ];
         } else {
             strings = [
@@ -207,6 +205,8 @@ class Toolbar {
                 ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
                 ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
                 ["themeSelectIcon", _("Change theme")],
+                ["light", _("Light Mode")],
+                ["dark", _("Dark Mode")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
                 ["restoreIcon", _("Restore")],
@@ -238,10 +238,7 @@ class Toolbar {
                 ["ar", _("عربى"), "innerHTML"],
                 ["te", _("తెలుగు"), "innerHTML"],
                 ["he", _("עִברִית"), "innerHTML"],
-                ["ur", _("اردو"), "innerHTML"],
-                ["light", _("Light Mode"), "innerHTML"],
-                ["dark", _("Dark Mode"), "innerHTML"]
-                // ["custom", _("Custom Theme"), "innerHTML"],
+                ["ur", _("اردو"), "innerHTML"]
             ];
 
             // Workaround for FF
@@ -268,7 +265,9 @@ class Toolbar {
                 _("Delete plugin"),
                 _("Enable horizontal scrolling"),
                 _("Disable horizontal scrolling"),
-                _("Change theme"),
+                _("Change theme"),               
+                _("Light Mode"),
+                _("Dark Mode"),
                 _("Merge with current project"),
                 _("JavaScript Editor"),
                 _("Restore"),
@@ -300,10 +299,7 @@ class Toolbar {
                 _("igbo"),
                 _("عربى"),
                 _("עִברִית"),
-                _("اردو"),
-                _("Light Mode"),
-                _("Dark Mode")
-                // _("Custom Theme"),
+                _("اردو")
             ];
         }
 
@@ -472,6 +468,12 @@ class Toolbar {
     }
 
     renderThemeSelectIcon(themeBox, themes) {
+        const icon = document.getElementById("themeSelectIcon")
+        themes.forEach((theme) =>{
+            if(localStorage.themePreference === theme){
+                icon.innerHTML = document.getElementById(theme).innerHTML;
+            }
+        })
         const themeSelectIcon = docById("themeSelectIcon");
         let themeList = themes;
         themeSelectIcon.onclick = () => {
