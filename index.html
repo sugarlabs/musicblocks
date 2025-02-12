@@ -993,13 +993,61 @@
             function togglePlayOnlyMode() {
                 const isSmallScreen = window.innerWidth < 768 || window.innerHeight < 600;
                 const body = document.body;
+                const homeButton = document.getElementById("Home [HOME]");
+                const buttonContainer = document.getElementById("buttoncontainerBOTTOM");
         
                 if (isSmallScreen) {
                     body.classList.add("play-only");
                     showPersistentNotification();
+        
+                    if (buttonContainer) {
+                        buttonContainer.style.display = "flex";
+                        buttonContainer.style.justifyContent = "flex-end";
+                        buttonContainer.style.alignItems = "center";
+                    }
+        
+                    if (homeButton) {
+                        homeButton.style.display = "flex";
+                        homeButton.style.position = "fixed";
+                        homeButton.style.right = "15px";
+                        homeButton.style.bottom = "15px";
+                        homeButton.style.zIndex = "10000";
+                    }
+        
+                    hideElementById("Show/hide blocks");
+                    hideElementById("Expand/collapse blocks");
+                    hideElementById("Decrease block size");
+                    hideElementById("Increase block size");
+                    hideElementById("grid");
+                    hideElementById("palette");
+        
                 } else {
                     body.classList.remove("play-only");
                     removePersistentNotification();
+        
+                    if (homeButton) homeButton.style = "";
+                    if (buttonContainer) buttonContainer.style = "";
+        
+                    showElementById("Show/hide blocks");
+                    showElementById("Expand/collapse blocks");
+                    showElementById("Decrease block size");
+                    showElementById("Increase block size");
+                    showElementById("grid");
+                    showElementById("palette");
+                }
+            }
+        
+            function hideElementById(elementId) {
+                const elem = document.getElementById(elementId);
+                if (elem) {
+                    elem.style.display = "none";
+                }
+            }
+        
+            function showElementById(elementId) {
+                const elem = document.getElementById(elementId);
+                if (elem) {
+                    elem.style.display = "";
                 }
             }
         
@@ -1007,7 +1055,7 @@
                 if (!persistentNotification) {
                     persistentNotification = document.createElement("div");
                     persistentNotification.id = "persistentNotification";
-                    persistentNotification.innerHTML = "Play only mode. For the full Music Blocks experience, please open with a larger display";
+                    persistentNotification.innerHTML = "Play only mode enabled. For full Music Blocks experience, use a larger display.";
                     document.body.appendChild(persistentNotification);
                 }
             }
@@ -1020,8 +1068,10 @@
             }
         
             togglePlayOnlyMode();
+            
             window.addEventListener("resize", togglePlayOnlyMode);
         </script>
+        
         
         
         <div id="searchBar" tabindex="-1">
