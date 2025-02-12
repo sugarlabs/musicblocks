@@ -675,6 +675,10 @@ function MusicKeyboard(activity) {
                 myNode.innerHTML = "";
             }
 
+            this.tick = false;
+            this.firstNote = false;
+            this.metronomeON = false;
+
             selectedNotes = [];
             if (this.loopTick) this.loopTick.stop();
             docById("wheelDivptm").style.display = "none";
