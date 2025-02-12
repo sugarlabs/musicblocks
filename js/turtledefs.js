@@ -22,7 +22,8 @@
    STEPBUTTON, STOPTURTLEBUTTON, WRAPTURTLEBUTTON, _THIS_IS_TURTLE_BLOCKS_,
    _THIS_IS_MUSIC_BLOCKS_, MOUSEPALETTEICON, FULLSCREENBUTTON, RECORDBUTTON,
    PLUGINSBUTTON, OPENMERGEBUTTON, PITCHPREVIEWBUTTON, JAVASCRIPTBUTTON,
-   RECORDHELPBUTTON, DARKMODEBUTTON
+   RECORDHELPBUTTON, DARKMODEBUTTON, SELECTHELPBUTTON, BLOCKMENUBUTTON,
+   CANVASMENUBUTTON
 */
 
 /* exported
@@ -692,6 +693,12 @@ const createHelpContent = (activity) => {
             window.btoa(base64Encode(LANGUAGEBUTTON))
     ]); 
     HELPCONTENT.push([
+        _("Contextual Menu for Blocks"),
+        _("Right-click a block to access common actions and manage blocks in the workspace."),
+        "data:image/svg+xml;base64," +
+            window.btoa(base64Encode(BLOCKMENUBUTTON))
+    ]);
+    HELPCONTENT.push([
         _("Delete"),
         _("To delete a block, just right-click on it, then you will be able to see the delete option"),
         "data:image/svg+xml;base64," +
@@ -718,12 +725,24 @@ const createHelpContent = (activity) => {
         ]);
     }
     HELPCONTENT.push([
+        _("Contextual Menu for Canvas"),
+        _("Right-click on the canvas to perform additional canvas-related tasks."),
+        "data:image/svg+xml;base64," +
+            window.btoa(base64Encode(CANVASMENUBUTTON))
+    ]);
+    HELPCONTENT.push([
         _("Grid"),
         _("Turn on/off lines for cartesian or polar grids.") +
         "<br/>" +
         _("Turn on/off music staffs."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(CARTESIANBUTTON))
+    ]);
+    HELPCONTENT.push([
+        _("Select"),
+        _("Left-click and drag on workspace to select multiple blocks."),
+        "data:image/svg+xml;base64," +
+            window.btoa(base64Encode(SELECTHELPBUTTON))
     ]);
     HELPCONTENT.push([
         _("Clear"),
