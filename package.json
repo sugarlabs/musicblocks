@@ -28,6 +28,7 @@
     "@babel/preset-env": "^7.11.0",
     "babel-eslint": "^10.1.0",
     "clean-css": "^4.2.4",
+    "cypress": "^14.0.2",
     "eslint": "^7.6.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-config-standard": "^14.1.1",
