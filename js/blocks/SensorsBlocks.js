@@ -86,8 +86,8 @@ function setupSensorsBlocks(activity) {
             if (cblk !== null) {
                 inputElem.placeholder = activity.blocks.blockList[cblk].value;
             }
-            inputElem.style.left = activity.turtles.turtleList[turtle].container.x + "px";
-            inputElem.style.top = activity.turtles.turtleList[turtle].container.y + "px";
+            inputElem.style.left = activity.turtles.getTurtle(turtle).container.x + "px";
+            inputElem.style.top = activity.turtles.getTurtle(turtle).container.y + "px";
             inputElem.focus();
 
             docById("labelDiv").classList.add("hasKeyboard");
@@ -325,7 +325,7 @@ function setupSensorsBlocks(activity) {
          * @returns {string} - The argument value representing the click event.
          */
         arg(logo, turtle) {
-            return "click" + activity.turtles.turtleList[turtle].id;
+            return "click" + activity.turtles.getTurtle(turtle).id;
         }
     }
 
@@ -370,7 +370,7 @@ function setupSensorsBlocks(activity) {
          * @returns {string} - The argument value representing the cursor-over event.
          */
         arg(logo, turtle) {
-            return "CursorOver" + activity.turtles.turtleList[turtle].id;
+            return "CursorOver" + activity.turtles.getTurtle(turtle).id;
         }
     }
 
@@ -417,7 +417,7 @@ function setupSensorsBlocks(activity) {
          * @returns {string} - The argument value representing the cursor-out event.
          */
         arg(logo, turtle) {
-            return "CursorOut" + activity.turtles.turtleList[turtle].id;
+            return "CursorOut" + activity.turtles.getTurtle(turtle).id;
         }
     }
 
@@ -461,7 +461,7 @@ function setupSensorsBlocks(activity) {
          * @returns {string} - The argument value representing the cursor button-down event.
          */
         arg(logo, turtle) {
-            return "CursorDown" + activity.turtles.turtleList[turtle].id;
+            return "CursorDown" + activity.turtles.getTurtle(turtle).id;
         }
     }
 
@@ -505,7 +505,7 @@ function setupSensorsBlocks(activity) {
          * @returns {string} - The argument value representing the cursor button-up event.
          */
         arg(logo, turtle) {
-            return "CursorUp" + activity.turtles.turtleList[turtle].id;
+            return "CursorUp" + activity.turtles.getTurtle(turtle).id;
         }
     }
 
@@ -558,7 +558,7 @@ function setupSensorsBlocks(activity) {
          * @returns {number} - The argument value representing the blue component.
          */
         arg(logo, turtle) {
-            let colorString = activity.turtles.turtleList[turtle].painter.canvasColor;
+            let colorString = activity.turtles.getTurtle(turtle).painter.canvasColor;
             if (colorString[2] === "#") colorString = hex2rgb(colorString.split("#")[1]);
             const obj = colorString.split("(")[1].split(",");
             return parseInt(Number(obj[0]) / 2.55);
@@ -614,7 +614,7 @@ function setupSensorsBlocks(activity) {
          * @returns {number} - The argument value representing the green component.
          */
         arg(logo, turtle) {
-            let colorString = activity.turtles.turtleList[turtle].painter.canvasColor;
+            let colorString = activity.turtles.getTurtle(turtle).painter.canvasColor;
             if (colorString[1] === "#") colorString = hex2rgb(colorString.split("#")[1]);
             const obj = colorString.split("(")[1].split(",");
             return parseInt(Number(obj[0]) / 2.55);
@@ -666,7 +666,7 @@ function setupSensorsBlocks(activity) {
          * @returns {number} - The argument value representing the red component.
          */
         arg(logo, turtle) {
-            let colorString = activity.turtles.turtleList[turtle].painter.canvasColor;
+            let colorString = activity.turtles.getTurtle(turtle).painter.canvasColor;
             if (colorString[0] === "#") colorString = hex2rgb(colorString.split("#")[1]);
             const obj = colorString.split("(")[1].split(",");
             return parseInt(Number(obj[0]) / 2.55);
@@ -718,10 +718,11 @@ function setupSensorsBlocks(activity) {
          * @returns {number} - The argument value representing the color.
          */
         arg(logo, turtle) {
-            const wasVisible = activity.turtles.turtleList[turtle].container.visible;
-            activity.turtles.turtleList[turtle].container.visible = false;
-            const x = activity.turtles.turtleList[turtle].container.x;
-            const y = activity.turtles.turtleList[turtle].container.y;
+            const requiredTurtle = activity.turtles.getTurtle(turtle); ; 
+            const wasVisible = requiredTurtle.container.visible;
+            requiredTurtle.container.visible = false;
+            const x = requiredTurtle.container.x;
+            const y = requiredTurtle.container.y;
             activity.refreshCanvas();
 
             const canvas = docById("overlayCanvas");
@@ -740,7 +741,7 @@ function setupSensorsBlocks(activity) {
             }
 
             if (wasVisible) {
-                activity.turtles.turtleList[turtle].container.visible = true;
+                activity.turtles.getTurtle(turtle).container.visible = true;
             }
             return color;
         }

@@ -56,7 +56,7 @@ function _blockFindTurtle(activity, turtle, blk, receivedArg) {
         console.debug("Could not find target turtle name from arg");
         return null;
     }
-    return activity.turtles.turtleList[getTargetTurtle(activity.turtles, targetTurtle)];
+    return activity.turtles.getTurtle(getTargetTurtle(activity.turtles, targetTurtle));
 }
 
 function setupEnsembleBlocks(activity) {
@@ -329,7 +329,7 @@ function setupEnsembleBlocks(activity) {
             const thisTurtle = _blockFindTurtle(activity, turtle, blk, receivedArg);
 
             if (thisTurtle) return thisTurtle.painter.color;
-            return activity.turtles.turtleList[turtle].painter.color;
+            return activity.turtles.getTurtle(turtle).painter.color;
         }
     }
 
@@ -375,7 +375,7 @@ function setupEnsembleBlocks(activity) {
             const thisTurtle = _blockFindTurtle(activity, turtle, blk, receivedArg);
 
             if (thisTurtle) return thisTurtle.orientation;
-            return activity.turtles.turtleList[turtle].orientation;
+            return activity.turtles.getTurtle(turtle).orientation;
         }
     }
 
@@ -421,7 +421,7 @@ function setupEnsembleBlocks(activity) {
                     activity.errorMsg(NANERRORMSG, blk);
                     logo.stopTurtle = true;
                 } else {
-                    activity.turtles.turtleList[targetTurtle].painter.doSetXY(args[1], args[2]);
+                    activity.turtles.getTurtle(targetTurtle).painter.doSetXY(args[1], args[2]);
                 }
             }
         }
@@ -514,7 +514,7 @@ function setupEnsembleBlocks(activity) {
             let thisTurtle = _blockFindTurtle(activity, turtle, blk, receivedArg);
 
             if (thisTurtle) return activity.turtles.screenY2turtleY(thisTurtle.container.y);
-            thisTurtle = activity.turtles.turtleList[turtle];
+            thisTurtle = activity.turtles.getTurtle(turtle);
             // eslint-disable-next-line no-console
             console.debug("Mouse not found. Using current mouse value instead.");
             return activity.turtles.screenY2turtleY(thisTurtle.container.y);
@@ -561,7 +561,7 @@ function setupEnsembleBlocks(activity) {
 
             if (thisTurtle) return activity.turtles.screenX2turtleX(thisTurtle.container.x);
 
-            thisTurtle = activity.turtles.turtleList[turtle];
+            thisTurtle = activity.turtles.getTurtle(turtle);
             // eslint-disable-next-line no-console
             console.debug("Mouse not found. Using current mouse value instead.");
             return activity.turtles.screenX2turtleX(thisTurtle.container.x);
@@ -667,8 +667,8 @@ function setupEnsembleBlocks(activity) {
 
             const tur = activity.turtles.ithTurtle(turtle);
 
-            for (let i = 0; i < activity.turtles.turtleList.length; i++) {
-                const thisTurtle = activity.turtles.turtleList[i];
+            for (let i = 0; i < activity.turtles.getTurtleCount(); i++) {
+                const thisTurtle = activity.turtles.getTurtle(i);
                 if (targetTurtle === thisTurtle.name) {
                     let obj;
                     if (thisTurtle.singer.lastNotePlayed !== null) {
@@ -777,7 +777,7 @@ function setupEnsembleBlocks(activity) {
             const cblk = activity.blocks.blockList[blk].connections[1];
             const targetTurtle = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
 
-            for (let i = 0; i < activity.turtles.turtleList.length; i++) {
+            for (let i = 0; i < activity.turtles.getTurtleCount(); i++) {
                 const thisTurtle = activity.turtles.ithTurtle(i);
                 if (targetTurtle === thisTurtle.name) {
                     if (
@@ -968,8 +968,8 @@ function setupEnsembleBlocks(activity) {
             if (getTargetTurtle(activity.turtles, turtleName) === null) {
                 const blockNumber = activity.blocks.blockList.length;
 
-                const x = activity.turtles.turtleX2screenX(activity.turtles.turtleList[turtle].x);
-                const y = activity.turtles.turtleY2screenY(activity.turtles.turtleList[turtle].y);
+                const x = activity.turtles.turtleX2screenX(activity.turtles.getTurtle(turtle).x);
+                const y = activity.turtles.turtleY2screenY(activity.turtles.getTurtle(turtle).y);
 
                 const newBlock = [
                     [0, "start", x, y, [null, 1, null]],
@@ -1108,7 +1108,7 @@ function setupEnsembleBlocks(activity) {
         }
 
         arg(logo, turtle) {
-            return activity.turtles.turtleList[turtle].name;
+            return activity.turtles.getTurtle(turtle).name;
         }
     }
 
@@ -1186,8 +1186,8 @@ function setupEnsembleBlocks(activity) {
             let a = logo.parseArg(logo, turtle, cblk, blk, receivedArg);
             if (typeof a === "number") {
                 a -= 1; // Internally, we count from 0
-                if (a >= 0 && a < activity.turtles.turtleList.length) {
-                    return activity.turtles.turtleList[a].name;
+                if (a >= 0 && a < activity.turtles.getTurtleCount()) {
+                    return activity.turtles.getTurtle(a).name;
                 } else {
                     if (_THIS_IS_MUSIC_BLOCKS_) {
                         activity.errorMsg(_("Cannot find mouse"));
@@ -1233,18 +1233,18 @@ function setupEnsembleBlocks(activity) {
                 activity.errorMsg(NOINPUTERRORMSG, blk);
                 return;
             } else if (args[0] === -1) {
-                activity.turtles.turtleList[turtle].rename(args[1]);
+                activity.turtles.getTurtle(turtle).rename(args[1]);
                 foundTargetTurtle = true;
             } else if (typeof args[0] === "number") {
                 const i = Math.floor(args[0]);
-                if (i >= 0 && i < activity.turtles.turtleList.length) {
-                    activity.turtles.turtleList[i].rename(args[1]);
+                if (i >= 0 && i < activity.turtles.getTurtleCount()) {
+                    activity.turtles.getTurtle(i).rename(args[1]);
                     foundTargetTurtle = true;
                 }
             } else {
-                for (let i = 0; i < activity.turtles.turtleList.length; i++) {
-                    if (activity.turtles.turtleList[i].name === args[0]) {
-                        activity.turtles.turtleList[i].rename(args[1]);
+                for (let i = 0; i < activity.turtles.getTurtleCount(); i++) {
+                    if (activity.turtles.getTurtle(i).name === args[0]) {
+                        activity.turtles.getTurtle(i).rename(args[1]);
                         foundTargetTurtle = true;
                         break;
                     }
@@ -1258,7 +1258,7 @@ function setupEnsembleBlocks(activity) {
                     activity.errorMsg(_("Cannot find turtle") + " " + args[0], blk);
                 }
             } else {
-                activity.turtles.turtleList[turtle].rename(args[1]);
+                activity.turtles.getTurtle(turtle).rename(args[1]);
             }
         }
     }
@@ -1304,7 +1304,7 @@ function setupEnsembleBlocks(activity) {
                 return;
             }
 
-            activity.turtles.turtleList[turtle].rename(args[0]);
+            activity.turtles.getTurtle(turtle).rename(args[0]);
         }
     }
 

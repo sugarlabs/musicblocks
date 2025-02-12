@@ -1757,3 +1757,7 @@ const getMacroExpansion = (activity, blkname, x, y) => {
         return null;
     }
 };
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = blockIsMacro;
+    module.exports = getMacroExpansion; 
+}

@@ -854,3 +854,12 @@ const createHelpContent = (activity) => {
         ]);
     }
 };
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        createDefaultStack,
+        LOGOJA1,
+        NUMBERBLOCKDEFAULT,
+        DEFAULTPALETTE,
+        TITLESTRING
+      }
+}

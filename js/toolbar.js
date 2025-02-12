@@ -67,7 +67,9 @@ class Toolbar {
                 ["delPluginIcon", _("Delete plugin")],
                 ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
                 ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
-                ["darkModeIcon", _("Change theme")],
+                ["themeSelectIcon", _("Change theme")],
+                ["light", _("Light Mode")],
+                ["dark", _("Dark Mode")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["chooseKeyIcon", _("Set Pitch Preview")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
@@ -131,7 +133,9 @@ class Toolbar {
                 _("Delete plugin"),
                 _("Enable horizontal scrolling"),
                 _("Disable horizontal scrolling"),
-                _("Change theme"),
+                _("Change theme"),               
+                _("Light Mode"),
+                _("Dark Mode"),
                 _("Merge with current project"),
                 _("Set Pitch Preview"),
                 _("JavaScript Editor"),
@@ -200,7 +204,9 @@ class Toolbar {
                 ["delPluginIcon", _("Delete plugin")],
                 ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
                 ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
-                ["darkModeIcon", _("Change theme")],
+                ["themeSelectIcon", _("Change theme")],
+                ["light", _("Light Mode")],
+                ["dark", _("Dark Mode")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
                 ["restoreIcon", _("Restore")],
@@ -259,7 +265,9 @@ class Toolbar {
                 _("Delete plugin"),
                 _("Enable horizontal scrolling"),
                 _("Disable horizontal scrolling"),
-                _("Change theme"),
+                _("Change theme"),               
+                _("Light Mode"),
+                _("Dark Mode"),
                 _("Merge with current project"),
                 _("JavaScript Editor"),
                 _("Restore"),
@@ -459,17 +467,20 @@ class Toolbar {
         };
     }
 
-    renderDarkModeIcon(onclick) {
-        const darkModeIcon = docById("darkModeIcon");
-
-        darkModeIcon.onclick = () => {
-            this.activity.textMsg(`<div id="theme-link" onmouseover="this.style.opacity=0.5" onmouseout="this.style.opacity=1"> ${_("Refresh your browser to change your theme.")} </div>`);
-              
-            const themeLink = docById("theme-link");
-            themeLink.addEventListener( "click", () => {
-                onclick();
-            })
-        }
+    renderThemeSelectIcon(themeBox, themes) {
+        const icon = document.getElementById("themeSelectIcon")
+        themes.forEach((theme) =>{
+            if(localStorage.themePreference === theme){
+                icon.innerHTML = document.getElementById(theme).innerHTML;
+            }
+        })
+        const themeSelectIcon = docById("themeSelectIcon");
+        let themeList = themes;
+        themeSelectIcon.onclick = () => {
+            themeList.forEach((theme) => {
+                docById(theme).onclick = () => themeBox[`${theme}_onclick`](this.activity);
+            });
+        };
     }
 
     /**
@@ -991,7 +1002,6 @@ class Toolbar {
 
         runStepByStepIcon.onclick = () => {
             onclick(this.activity);
-            docById("stop").style.color = this.stopIconColorWhenPlaying;
         };
     }
 

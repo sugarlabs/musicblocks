@@ -62,7 +62,7 @@ class Oscilloscope {
 
         widgetWindow.onclose = () => {
             for (const turtle of this.divisions) {
-                const turtleIdx = this.activity.turtles.turtleList.indexOf(turtle);
+                const turtleIdx = this.activity.turtles.getIndexOfTurtle(turtle);
                 cancelAnimationFrame(this.drawVisualIDs[turtleIdx]);
             }
 
@@ -194,7 +194,7 @@ class Oscilloscope {
         }
         document.getElementsByTagName("canvas")[0].innerHTML = "";
         for (const turtle of this.divisions) {
-            const turtleIdx = this.activity.turtles.turtleList.indexOf(turtle);
+            const turtleIdx = this.activity.turtles.getIndexOfTurtle(turtle);
             this.reconnectSynthsToAnalyser(turtleIdx);
             this.makeCanvas(width, height / this.divisions.length, turtle, turtleIdx, true);
         }

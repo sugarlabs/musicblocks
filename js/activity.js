@@ -26,7 +26,7 @@
    getMacroExpansion, getOctaveRatio, getTemperament, GOHOMEBUTTON,
    GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
    hideDOMLabel, initBasicProtoBlocks, initPalettes,
-   INLINECOLLAPSIBLES, jQuery, JSEditor, LanguageBox, Logo, MSGBLOCK,
+   INLINECOLLAPSIBLES, jQuery, JSEditor, LanguageBox, ThemeBox, Logo, MSGBLOCK,
    NANERRORMSG, NOACTIONERRORMSG, NOBOXERRORMSG, NOINPUTERRORMSG,
    NOMICERRORMSG, NOSQRTERRORMSG, NOSTRINGERRORMSG, PALETTEFILLCOLORS,
    PALETTESTROKECOLORS, PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
@@ -85,6 +85,7 @@ let MYDEFINES = [
     "activity/turtle-singer",
     "activity/turtle-painter",
     "activity/languagebox",
+    "activity/themebox",
     "activity/basicblocks",
     "activity/blockfactory",
     "activity/piemenus",
@@ -272,15 +273,17 @@ class Activity {
         //Flag to check if any other input box is active or not
         this.isInputON = false;
 
-        // If the theme is set to "darkMode", enable dark mode else diable
+        this.themes = ["light", "dark"];
         try {
-            if (this.storage.myThemeName === "darkMode") {
-                body.classList.add("dark-mode");
-            } else {
-                body.classList.remove("dark-mode");
+            for (let i = 0; i < this.themes.length; i++) {
+                if (this.themes[i] === this.storage.themePreference) {
+                    body.classList.add(this.themes[i]);
+                } else {
+                    body.classList.remove(this.themes[i]);
+                }
             }
         } catch (e) {
-            console.error("Error accessing myThemeName storage:", e);
+            console.error("Error accessing themePreference storage:", e);
         }
 
         this.beginnerMode = true;
@@ -385,6 +388,7 @@ class Activity {
             this.logo = null;
             this.pasteBox = null;
             this.languageBox = null;
+            this.themeBox = null;
             this.planet = null;
             window.converter = null;
             this.buttonsVisible = true;
@@ -670,6 +674,189 @@ class Activity {
         };
 
         /**
+        * Ensures blocks stay within canvas boundaries when resized.
+        * Ensures that music blocks are responsive to horizontal resizing.
+        * Ensures that overall integrity of blocks isn't hampered with.
+        */
+        function repositionBlocks(activity) {
+            
+            const canvasWidth = window.innerWidth;
+            const processedBlocks = new Set();
+        
+            //Array for storing individual dragGroups (the chunks of code linked together which are not connected)
+            const dragGroups = [];
+
+            // Identifying individual dragGroups 
+            Object.values(activity.blocks.blockList).forEach(block => {
+                if (!processedBlocks.has(block.id)) {
+                    
+                    activity.blocks.findDragGroup(block.id); 
+
+                    if (activity.blocks.dragGroup.length > 0) {
+                        dragGroups.push([...activity.blocks.dragGroup]); // Store the group into dragGroups
+                        activity.blocks.dragGroup.forEach(id => processedBlocks.add(id)); // Process individual groups
+                    }
+                }
+            });
+        
+            // Repositioning of dragGroups according to horizontal resizing
+            dragGroups.forEach(group => {
+                let referenceBlock = activity.blocks.blockList[group[0]]; 
+        
+                // Store initial positions
+                if (!referenceBlock.initialPosition) {
+                    referenceBlock.initialPosition = { x: referenceBlock.container.x, y: referenceBlock.container.y };
+                }
+        
+                if (canvasWidth < 768 && !referenceBlock.beforeMobilePosition) {
+                    referenceBlock.beforeMobilePosition = { x: referenceBlock.container.x, y: referenceBlock.container.y };
+                }
+
+                if (canvasWidth >= 768 && referenceBlock.beforeMobilePosition) {
+                    let dx = referenceBlock.beforeMobilePosition.x - referenceBlock.container.x;
+                    let dy = referenceBlock.beforeMobilePosition.y - referenceBlock.container.y;
+                    group.forEach(blockId => {
+                        let block = activity.blocks.blockList[blockId];
+                        block.container.x += dx;
+                        block.container.y += dy;
+                    });
+                    referenceBlock.beforeMobilePosition = null; // Clear stored position
+                    //this prevents old groups from affecting new calculations.
+                }
+        
+                if (canvasWidth < 600 && !referenceBlock.before600pxPosition) {
+                    referenceBlock.before600pxPosition = { x: referenceBlock.container.x, y: referenceBlock.container.y };
+                }
+
+                if (canvasWidth >= 600 && referenceBlock.before600pxPosition) {
+                    let dx = referenceBlock.before600pxPosition.x - referenceBlock.container.x;
+                    let dy = referenceBlock.before600pxPosition.y - referenceBlock.container.y;
+
+                    group.forEach(blockId => {
+                        let block = activity.blocks.blockList[blockId];
+                        block.container.x += dx;
+                        block.container.y += dy;
+                    });
+                    referenceBlock.before600pxPosition = null;
+                }
+        
+                // Ensure blocks stay within horizontal boundary
+                let rightmostX = Math.max(...group.map(id => activity.blocks.blockList[id].container.x + activity.blocks.blockList[id].width));
+        
+                if (rightmostX > canvasWidth) {
+                    let shiftX = Math.max(10, canvasWidth - rightmostX - 10);
+
+                    group.forEach(blockId => {
+                        activity.blocks.blockList[blockId].container.x += shiftX;
+                    });
+                }
+                
+                // Ensures that blocks do not go hide behind the search for blocks div
+                let leftmostX = Math.min(...group.map(id => activity.blocks.blockList[id].container.x));
+                if (leftmostX < 0) {
+                    let shiftX = 100 - leftmostX;
+
+                    group.forEach(blockId => {
+                        activity.blocks.blockList[blockId].container.x += shiftX;
+                    });
+                }
+                
+            });
+        
+            activity._findBlocks();
+        }
+        
+        //if any window resize event occurs:
+        window.addEventListener("resize", () => repositionBlocks(this));
+
+        /**
+        * Finds and organizes blocks within the workspace.
+        * Arranges blocks in grid format on wide screens and vertically on narrow screens.
+         */
+        this._findBlocks = () => {
+            if (!this.blocks.visible) {
+                this._changeBlockVisibility();
+            }
+
+            this.blocks.activeBlock = null;
+            hideDOMLabel();
+            this.blocks.showBlocks();
+            this.blocksContainer.x = 0;
+            this.blocksContainer.y = 0;
+
+            const screenWidth = window.innerWidth;
+            const isNarrowScreen = screenWidth < 600;
+            const minColumnWidth = 400;
+            let numColumns = isNarrowScreen ? 1 : Math.floor(screenWidth / minColumnWidth);
+
+            let toppos = this.auxToolbar.style.display === "block" ? 90 + this.toolbarHeight : 90;
+            let x = isNarrowScreen ? Math.floor(screenWidth / 2) : Math.floor(this.canvas.width / 4);
+            let y = Math.floor(toppos * this.turtleBlocksScale);
+            let verticalSpacing = Math.floor(40 * this.turtleBlocksScale);
+
+            const columnSpacing = (screenWidth / numColumns) * 1.2;
+            const columnXPositions = Array.from({ length: numColumns }, (_, i) =>
+                Math.floor(i * columnSpacing + columnSpacing / 2)
+            );
+            const columnYPositions = Array(numColumns).fill(y);
+
+            for (const blk in this.blocks.blockList) {
+                if (!this.blocks.blockList[blk].trash) {
+                    const myBlock = this.blocks.blockList[blk];
+
+                        // Store original position only once
+                        if (!myBlock.originalPosition) {
+                        myBlock.originalPosition = { x: myBlock.container.x, y: myBlock.container.y };
+                    }
+
+                    if (myBlock.connections[0] === null) {
+                        if (isNarrowScreen) {
+                            const dx = x - myBlock.container.x;
+                            const dy = y - myBlock.container.y;
+                            this.blocks.moveBlockRelative(blk, dx, dy);
+                            y += myBlock.height + verticalSpacing;
+                        } else {
+                            let minYIndex = columnYPositions.indexOf(Math.min(...columnYPositions));
+                            const dx = columnXPositions[minYIndex] - myBlock.container.x;
+                            const dy = columnYPositions[minYIndex] - myBlock.container.y;
+                            this.blocks.moveBlockRelative(blk, dx, dy);
+                            columnYPositions[minYIndex] += myBlock.height + verticalSpacing;
+                        }
+                    }
+
+                    // Making code to make sure that 
+                    if (myBlock.connections.length>0)  {
+                        myBlock.connections.forEach(conn  =>  {
+                            if (conn !== null) {
+                                let innerBlock = this.blocks.blockList[conn] ;
+                                if (innerBlock) {
+
+                                    innerBlock.container.x = myBlock.container.x + innerBlock.relativeX;
+                                    innerBlock.container.y = myBlock.container.y + innerBlock.relativeY;
+                                }
+
+                            }
+
+                        });
+                    }
+                }
+            }
+
+            repositionBlocks(this);
+            this.setHomeContainers(false);
+            this.boundary.hide();
+
+            for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+                const savedPenState = this.turtles.turtleList[turtle].painter.penState;
+                this.turtles.turtleList[turtle].painter.penState = false;
+                this.turtles.turtleList[turtle].painter.doSetXY(0, 0);
+                this.turtles.turtleList[turtle].painter.doSetHeading(0);
+                this.turtles.turtleList[turtle].painter.penState = savedPenState;
+            }
+        };
+
+
+        /**
         * Finds and organizes blocks within the workspace.
         * Blocks are positioned based on their connections and availability within the canvas area.
         * This method is part of the internal mechanism to ensure that blocks are displayed correctly and efficiently.
@@ -797,7 +984,7 @@ class Activity {
                 */
 
                 const screenWidth = window.innerWidth;
-                const minColumnWidth = 400;
+                const minColumnWidth = 320;
                 let numColumns = screenWidth <= 320 ? 1 : Math.floor(screenWidth / minColumnWidth);
 
                 const baseColumnSpacing = screenWidth / numColumns;
@@ -848,12 +1035,13 @@ class Activity {
 
             // Return mice to the center of the screen.
             // Reset turtles' positions to center of the screen
-            for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
-                const savedPenState = this.turtles.turtleList[turtle].painter.penState;
-                this.turtles.turtleList[turtle].painter.penState = false;
-                this.turtles.turtleList[turtle].painter.doSetXY(0, 0);
-                this.turtles.turtleList[turtle].painter.doSetHeading(0);
-                this.turtles.turtleList[turtle].painter.penState = savedPenState;
+            for (let turtle = 0; turtle < this.turtles.getTurtleCount(); turtle++) {
+                const requiredTurtle = this.turtles.getTurtle(turtle);
+                const savedPenState = requiredTurtle.painter.penState;
+                requiredTurtle.painter.penState = false;
+                requiredTurtle.painter.doSetXY(0, 0);
+                requiredTurtle.painter.doSetHeading(0);
+                requiredTurtle.painter.penState = savedPenState;
             }
             // Alternate mode switching on clicking Home button
             this._isFirstHomeClick = !this._isFirstHomeClick;
@@ -1223,13 +1411,13 @@ class Activity {
                 this.turtles.setBackgroundColor(-1);
                 this.logo.svgOutput = "";
                 this.logo.notationOutput = "";
-                for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+                for (let turtle = 0; turtle < this.turtles.getTurtleCount(); turtle++) {
                     this.logo.turtleHeaps[turtle] = [];
                     this.logo.turtleDicts[turtle] = {};
                     this.logo.notation.notationStaging[turtle] = [];
                     this.logo.notation.notationDrumStaging[turtle] = [];
                     if (noErase === undefined || !noErase) {
-                        this.turtles.turtleList[turtle].painter.doClear(true, true, true);
+                        this.turtles.getTurtle(turtle).painter.doClear(true, true, true);
                     }
                 }
 
@@ -1553,9 +1741,17 @@ class Activity {
                 // Queue and take first step.
                 if (!this.turtles.running()) {
                     this.logo.runLogoCommands();
+                    docById("stop").style.color = this.toolbar.stopIconColorWhenPlaying;
                 }
                 this.logo.step();
             } else {
+
+                const noBlocks = Object.keys(this.logo.stepQueue).every(key=>this.logo.stepQueue[key].length===0);
+                if (noBlocks) {
+                this.logo.doStopTurtles();
+                docById("stop").style.color = "white";
+                return;
+            }
                 this.logo.turtleDelay = this.TURTLESTEP;
                 this.logo.step();
             }
@@ -2868,6 +3064,11 @@ class Activity {
                         if (this.searchWidget.style.visibility === 'visible') {
                             return;
                         }
+                        if (docById("paste").style.visibility === "visible") {
+                            this.pasted();
+			    docById("paste").style.visibility = "hidden";
+                            return;
+                        }
                         this.textMsg("Enter " + _("Play"));
                         let stopbt = document.getElementById("stop");
                         if (stopbt) {
@@ -2880,7 +3081,7 @@ class Activity {
                         this.logo.doStopTurtles();
                         break;
                     case 86: // 'V'
-                        this.textMsg("Alt-V " + _("Paste"));
+                        // this.textMsg("Alt-V " + _("Paste"));
                         this.blocks.pasteStack();
                         break;
                     case 72: // 'H' save block help
@@ -2902,7 +3103,7 @@ class Activity {
             } else if (event.ctrlKey) {
                 switch (event.keyCode) {
                     case V:
-                        this.textMsg("Ctl-V " + _("Paste"));
+                        // this.textMsg("Ctl-V " + _("Paste"));
                         this.pasteBox.createBox(this.turtleBlocksScale, 200, 200);
                         this.pasteBox.show();
                         docById("paste").style.left =
@@ -3366,8 +3567,8 @@ class Activity {
                 this.palettes.setMobile(false);
             }
 
-            for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
-                this.turtles.turtleList[turtle].painter.doClear(false, false, true);
+            for (let turtle = 0; turtle < this.turtles.getTurtleCount(); turtle++) {
+                this.turtles.getTurtle(turtle).painter.doClear(false, false, true);
             }
 
             const artcanvas = docById("overlayCanvas");
@@ -3515,8 +3716,8 @@ class Activity {
         
             if (restoredBlock.name === 'start' || restoredBlock.name === 'drum') {
                 const turtle = restoredBlock.value;
-                this.turtles.turtleList[turtle].inTrash = false;
-                this.turtles.turtleList[turtle].container.visible = true;
+                this.turtles.getTurtle(turtle).inTrash = false;
+                this.turtles.getTurtle(turtle).container.visible = true;
             } else if (restoredBlock.name === 'action') {
                 const actionArg = this.blocks.blockList[restoredBlock.connections[1]];
                 if (actionArg !== null) {
@@ -3774,8 +3975,8 @@ class Activity {
                 ) {
                     const turtle = this.blocks.blockList[blk].value;
                     if (!this.blocks.blockList[blk].trash && turtle !== null) {
-                        this.turtles.turtleList[turtle].inTrash = true;
-                        this.turtles.turtleList[turtle].container.visible = false;
+                        this.turtles.getTurtle(turtle).inTrash = true;
+                        this.turtles.getTurtle(turtle).container.visible = false;
                     }
                 } else if (this.blocks.blockList[blk].name === "action") {
                     if (!this.blocks.blockList[blk].trash) {
@@ -4678,12 +4879,12 @@ class Activity {
             const __afterLoad = async () => {
                 if (!that.turtles.running()) {
                     that.stage.update(event);
-                    for (let turtle = 0; turtle < that.turtles.turtleList.length; turtle++) {
+                    for (let turtle = 0; turtle < that.turtles.getTurtleCount(); turtle++) {
                         that.logo.turtleHeaps[turtle] = [];
                         that.logo.turtleDicts[turtle] = {};
                         that.logo.notation.notationStaging[turtle] = [];
                         that.logo.notation.notationDrumStaging[turtle] = [];
-                        that.turtles.turtleList[turtle].painter.doClear(true, true, false);
+                        that.turtles.getTurtle(turtle).painter.doClear(true, true, false);
                     }
                     if (_THIS_IS_MUSIC_BLOCKS_) {
                         const imgUrl =
@@ -4808,8 +5009,8 @@ class Activity {
                     }
 
                     if (run && that.firstRun) {
-                        for (let turtle = 0; turtle < that.turtles.turtleList.length; turtle++) {
-                            that.turtles.turtleList[turtle].painter.doClear(true, true, false);
+                        for (let turtle = 0; turtle < that.turtles.getTurtleCount(); turtle++) {
+                            that.turtles.getTurtle(turtle).painter.doClear(true, true, false);
                         }
 
                         that.textMsg(_("Click the run button to run the project."));
@@ -5813,10 +6014,10 @@ class Activity {
                         case "drum":
                             // Find the turtle associated with this block.
                             // eslint-disable-next-line no-case-declarations
-                            const turtle = this.turtles.turtleList[myBlock.value];
+                            const turtle = this.turtles.getTurtle(myBlock.value);
                             if (turtle === null || turtle === undefined) {
                                 args = {
-                                    id: this.turtles.turtleList.length,
+                                    id: this.turtles.getTurtleCount(),
                                     collapsed: false,
                                     xcor: 0,
                                     ycor: 0,
@@ -6665,28 +6866,7 @@ class Activity {
 
             this._createErrorContainers();
 
-            // Function to toggle theme mode
-            this.toggleThemeMode = () => {
-                if (this.storage.myThemeName === "darkMode") {
-                    delete this.storage.myThemeName;
-                    localStorage.setItem("darkMode", "disabled");
-                } else {
-                    this.storage.myThemeName = "darkMode";
-                    localStorage.setItem("darkMode", "enabled");
-                }
-                const planetIframe = document.getElementById("planet-iframe");
-                if (planetIframe) {
-                    planetIframe.contentWindow.postMessage(
-                        { darkMode: localStorage.getItem("darkMode") },
-                        "*"
-                    );
-                }
-                try {
-                    window.location.reload();
-                } catch (e) {
-                    console.error("Error reloading the window:", e);
-                }
-            };
+            
 
             /* Z-Order (top to bottom):
              *   menus
@@ -6714,6 +6894,7 @@ class Activity {
 
             this.pasteBox = new PasteBox(this);
             this.languageBox = new LanguageBox(this);
+            this.themeBox = new ThemeBox(this);
 
             // Show help on startup if first-time user.
             if (this.firstTimeUser) {
@@ -6755,7 +6936,7 @@ class Activity {
             this.toolbar.renderModeSelectIcon(doSwitchMode, doRecordButton, doAnalytics, doOpenPlugin, deletePlugin, setScroller);
             this.toolbar.renderRunSlowlyIcon(doSlowButton);
             this.toolbar.renderRunStepIcon(doStepButton);
-            this.toolbar.renderDarkModeIcon(this.toggleThemeMode);
+            this.toolbar.renderThemeSelectIcon(this.themeBox, this.themes);
             this.toolbar.renderMergeIcon(_doMergeLoad);
             this.toolbar.renderRestoreIcon(restoreTrash);
             if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -7320,7 +7501,7 @@ class Activity {
     saveLocally() {
         try {
             localStorage.setItem('beginnerMode', this.beginnerMode.toString());
-            localStorage.setItem('isDarkModeON', this.isDarkModeON.toString());
+            localStorage.setItem("themePreference", this.themePreference.toString());
         } catch (e) {
             // eslint-disable-next-line no-console
             console.error('Error saving to localStorage:', e);

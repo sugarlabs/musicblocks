@@ -512,8 +512,8 @@ function doSVG(canvas, logo, turtles, width, height, scale) {
 
     let turtleSVG = "";
     for (const turtle in turtles.turtleList) {
-        turtles.turtleList[turtle].painter.closeSVG();
-        turtleSVG += turtles.turtleList[turtle].painter.svgOutput;
+        turtles.getTurtle(turtle).painter.closeSVG();
+        turtleSVG += turtles.getTurtle(turtle).painter.svgOutput;
     }
 
     let svg =
@@ -543,8 +543,8 @@ function doSVG(canvas, logo, turtles, width, height, scale) {
  */
 let isSVGEmpty = (turtles) => {
     for (const turtle in turtles.turtleList) {
-        turtles.turtleList[turtle].painter.closeSVG();
-        if (turtles.turtleList[turtle].painter.svgOutput !== "") {
+        turtles.getTurtle(turtle).painter.closeSVG();
+        if (turtles.getTurtle(turtle).painter.svgOutput !== "") {
             return false;
         }
     }
@@ -1022,7 +1022,7 @@ let doUseCamera = (args, turtles, turtle, isVideo, cameraID, setCameraID, errorM
         canvas.height = h;
         canvas.getContext("2d").drawImage(video, 0, 0, w, h);
         const data = canvas.toDataURL("image/png");
-        turtles.turtleList[turtle].doShowImage(args[0], data);
+        turtles.getTurtle(turtle).doShowImage(args[0], data);
     }
 
     if (!hasSetupCamera) {
