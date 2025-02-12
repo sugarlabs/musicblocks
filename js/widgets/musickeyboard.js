@@ -832,11 +832,9 @@ function MusicKeyboard(activity) {
                 }, 1000);
 
                 // Start audio
-                setTimeout(() => {
-                    if (this.metronomeON) {
-                        this.activity.logo.synth.start();
-                    }
-                }, 500);
+                if (this.metronomeON) {
+                    this.activity.logo.synth.start();
+                }
             }
         };
 
