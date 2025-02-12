@@ -43,6 +43,7 @@
     "jest-environment-jsdom": "^29.7.0"
   },
   "dependencies": {
+    "@tonejs/midi": "^2.0.28",
     "autoprefixer": "^10.4.16",
     "cssnano": "^6.0.1",
     "gulp-concat": "^2.6.1",
