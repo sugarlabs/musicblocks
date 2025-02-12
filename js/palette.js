@@ -112,18 +112,16 @@ class Palettes {
             element.id = "palette";
             element.setAttribute("class", "disable_highlighting");
             element.classList.add('flex-palette')
-            element.setAttribute(
-                "style",
-                "position: absolute; z-index: 1000; left :0px; top:" + this.top + "px"
-            );
+            element.classList.add("palette-container");
+            element.style.top = this.top + "px";
             element.innerHTML =
                 `<div style="height:fit-content">
-                    <table width="${1.5 * this.cellSize}" bgcolor="white">
+                    <table class="palette-body">
                         <thead>
                             <tr></tr>
                         </thead>
                     </table>
-                    <table width ="${4.5 * this.cellSize}" bgcolor="white">
+                    <table class="palette-body">
                         <thead>
                             <tr>
                                 <td style= "width:28px"></td>
@@ -300,20 +298,19 @@ class Palettes {
         const img = row.insertCell(-1);
         const label = row.insertCell(-1);
         img.appendChild(icon);
-        img.style.padding = "4px";
-        img.style.boxSizing = "content-box";
+        img.classList.add('palette-image');
         img.style.width = `${this.cellSize}px`;
         img.style.height = `${this.cellSize}px`;
+
+        label.classList.add('palette-label');
         label.textContent = toTitleCase(_(name));
-        label.style.color = platformColor.paletteText;
-        row.style.borderBottom = "1px solid #0CAFFF";
-        label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
-        label.style.padding = "4px";
-        row.style.display = "flex";
-        row.style.flexDirection = "row";
-        row.style.alignItems = "center";
-        row.style.width = "126px";
-        row.style.backgroundColor = platformColor.paletteBackground;
+        label.classList.add('palette-label', localStorage.kanaPreference === "kana" ? 'kana-text' : 'regular-text');
+        label.style.color = platformColor.paletteText; 
+
+
+row.classList.add('palette-border', 'palette-row');
+row.style.backgroundColor = platformColor.paletteBackground;
+
 
         this._loadPaletteButtonHandler(name, row);
     }
@@ -322,29 +319,32 @@ class Palettes {
         const row = listBody.insertRow(-1);
         const img = row.insertCell(-1);
         const label = row.insertCell(-1);
+    
         img.appendChild(icon);
-        img.style.padding = "4px";
-        img.style.boxSizing = "content-box";
+    
+        img.classList.add('palette-image');
         img.style.width = `${this.cellSize}px`;
         img.style.height = `${this.cellSize}px`;
+    
+        label.classList.add('palette-label', localStorage.kanaPreference === "kana" ? 'kana-text' : 'regular-text');
         label.textContent = toTitleCase(_(name));
         label.style.color = platformColor.paletteText;
-        label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
-        label.style.padding = "4px";
-        row.style.display = "flex";
-        row.style.flexDirection = "row";
-        row.style.alignItems = "center";
-        row.style.width = "126px";
+    
+        row.classList.add('palette-row');
         row.style.backgroundColor = platformColor.paletteBackground;
-        row.addEventListener('mouseover', () => {
+    
+        
+        row.addEventListener("mouseenter", () => {
             row.style.backgroundColor = platformColor.hoverColor;
         });
-        row.addEventListener('mouseout', () => {
+    
+        row.addEventListener("mouseleave", () => {
             row.style.backgroundColor = platformColor.paletteBackground;
         });
-
+    
         this._loadPaletteButtonHandler(name, row);
     }
+    
 
     showPalette(name) {
         if (this.mobile) {
@@ -433,10 +433,7 @@ class Palettes {
             element.id = "palette";
             element.setAttribute("class", "disable_highlighting");
             element.classList.add('flex-palette');
-            element.setAttribute(
-                "style",
-                `position: fixed; z-index: 1000; left: 0px; top: ${60+this.top}px; overflow-y: auto;`
-            );
+            element.classList.add('palette-fixed-container');
             element.innerHTML =
                 `<div style="height:fit-content">
                     <table width="${1.5 * this.cellSize}" bgcolor="white">
@@ -454,7 +451,9 @@ class Palettes {
                         </tbody>
                     </table>
                 </div>`;
-            element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
+                element.childNodes[0].classList.add('palette-menu-border');
+element.childNodes[0].style.setProperty('--selected-border-color', platformColor.selectorSelected);
+
             document.body.appendChild(element);
 
         } catch (e) {
@@ -892,17 +891,12 @@ class Palette {
 
         palBody.insertAdjacentHTML(
             "afterbegin",
-            `<thead></thead><tbody style = "display: block;   width: 100% ; height:auto ; max-height: ${palBodyHeight}px;  overflow: auto; overflow-x: hidden;" id="PaletteBody_items" class="PalScrol"></tbody>`
+            `<thead></thead><tbody class="palette-items-container" id="PaletteBody_items"></tbody>`
         );
 
-        palBody.style.minWidth = "180px";
-        palBody.style.background = platformColor.paletteBackground;
-        palBody.style.float = "left";
-
-        palBody.style.border = `1px solid ${platformColor.selectorSelected}`;
+        palBody.classList.add('palette-body-container');
         [palBody.childNodes[0], palBody.childNodes[1]].forEach((item) => {
-            item.style.boxSizing = "border-box";
-            item.style.padding = "8px";
+            item.classList.add('palette-body-cell')
         });
         palDiv.appendChild(palBody);
 
@@ -911,30 +905,25 @@ class Palette {
         if (createHeader) {
             let header = this.menuContainer.children[0];
             header = header.insertRow();
-            header.style.backgroundColor = platformColor.paletteLabelBackground;
-            header.innerHTML =
-                '<td style ="width: 100%; height: 42px; box-sizing: border-box; display: flex; flex-direction: row; align-items: center; justify-content: space-between;"></td>';
-            header = header.children[0];
-            header.style.padding = "8px";
+            header.classList.add('palette-header');
+            header.innerHTML = '<td class="palette-header-cell"></td>';  
 
             const labelImg = makePaletteIcons(
                 PALETTEICONS[this.name],
                 this.palettes.cellSize,
                 this.palettes.cellSize
             );
-            labelImg.style.borderRadius = "4px";
-            labelImg.style.padding = "2px";
-            labelImg.style.backgroundColor = platformColor.paletteBackground;
+            
+            labelImg.classList.add('palette-icon');
             header.appendChild(labelImg);
 
             const label = document.createElement("span");
             label.textContent = toTitleCase(_(this.name));
-            label.style.fontWeight = "bold";
-            label.style.color = platformColor.textColor;
+            label.classList.add('palette-label');
             header.appendChild(label);
 
             const closeDownImg = document.createElement("span");
-            closeDownImg.style.height = `${this.palettes.cellSize}px`;
+            closeDownImg.classList.add('palette-close-button');
             const closeImg = makePaletteIcons(
                 CLOSEICON.replace("fill_color", platformColor.selectorSelected),
                 this.palettes.cellSize,
