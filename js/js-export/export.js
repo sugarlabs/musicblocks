@@ -38,11 +38,12 @@ class Mouse {
      * @param {Function} flow - flow function associated with the Mouse
      */
     constructor(flow) {
-        if (Mouse.MouseList.length < globalActivity.turtles.turtleList.length) {
-            this.turtle = globalActivity.turtles.turtleList[Mouse.MouseList.length];
+        const numberOfTurtles = globalActivity.turtles.getTurtleCount() ; 
+        if (Mouse.MouseList.length < numberOfTurtles) {
+            this.turtle = globalActivity.turtles.getTurtle(Mouse.MouseList.length);
         } else {
             globalActivity.turtles.addTurtle();
-            this.turtle = last(globalActivity.turtles.turtleList);
+            this.turtle = globalActivity.turtles.getTurtle(numberOfTurtles - 1);
             Mouse.AddedTurtles.push(this.turtle);
         }
 
@@ -96,7 +97,7 @@ class MusicBlocks {
     constructor(mouse) {
         this.mouse = mouse;
         this.turtle = mouse.turtle;
-        this.turIndex = globalActivity.turtles.turtleList.indexOf(this.turtle);
+        this.turIndex = globalActivity.turtles.getIndexOfTurtle(this.turtle);
 
         this.listeners = [];
 
@@ -186,8 +187,8 @@ class MusicBlocks {
         for (const turtle of Mouse.AddedTurtles) {
             turtle.container.visible = false;
             turtle.inTrash = true;
-            const turIndex = globalActivity.turtles.turtleList.indexOf(turtle);
-            globalActivity.turtles.turtleList.splice(turIndex, 1);
+            const turIndex = globalActivity.turtles.getIndexOfTurtle(turtle);
+            globalActivity.turtles.removeTurtle(turIndex);
         }
 
         MusicBlocks._blockNo = -1;
@@ -298,7 +299,7 @@ class MusicBlocks {
 
     print(message) {
         JSEditor.logConsole(
-            `Mouse "${this.turtle.name}" (${globalActivity.turtles.turtleList.indexOf(this.turtle)}): ${message}`
+            `Mouse "${this.turtle.name}" (${globalActivity.turtles.getIndexOfTurtle(this.turtle)}): ${message}`
         );
         if (message === undefined) {
             globalActivity.textMsg("undefined");

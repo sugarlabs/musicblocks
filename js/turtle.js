@@ -659,7 +659,7 @@ Turtle.TurtleModel = class {
             startBlock.overrideName = this._name;
             startBlock.collapseText.text = this._name;
             startBlock.regenerateArtwork(false);
-            startBlock.value = this._turtles.turtleList.indexOf(this);
+            startBlock.value = this._turtles.getIndexOfTurtle(this);
         }
     }
 };

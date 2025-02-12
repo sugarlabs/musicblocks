@@ -1035,12 +1035,13 @@ class Activity {
 
             // Return mice to the center of the screen.
             // Reset turtles' positions to center of the screen
-            for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
-                const savedPenState = this.turtles.turtleList[turtle].painter.penState;
-                this.turtles.turtleList[turtle].painter.penState = false;
-                this.turtles.turtleList[turtle].painter.doSetXY(0, 0);
-                this.turtles.turtleList[turtle].painter.doSetHeading(0);
-                this.turtles.turtleList[turtle].painter.penState = savedPenState;
+            for (let turtle = 0; turtle < this.turtles.getTurtleCount(); turtle++) {
+                const requiredTurtle = this.turtles.getTurtle(turtle);
+                const savedPenState = requiredTurtle.painter.penState;
+                requiredTurtle.painter.penState = false;
+                requiredTurtle.painter.doSetXY(0, 0);
+                requiredTurtle.painter.doSetHeading(0);
+                requiredTurtle.painter.penState = savedPenState;
             }
             // Alternate mode switching on clicking Home button
             this._isFirstHomeClick = !this._isFirstHomeClick;
@@ -1410,13 +1411,13 @@ class Activity {
                 this.turtles.setBackgroundColor(-1);
                 this.logo.svgOutput = "";
                 this.logo.notationOutput = "";
-                for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+                for (let turtle = 0; turtle < this.turtles.getTurtleCount(); turtle++) {
                     this.logo.turtleHeaps[turtle] = [];
                     this.logo.turtleDicts[turtle] = {};
                     this.logo.notation.notationStaging[turtle] = [];
                     this.logo.notation.notationDrumStaging[turtle] = [];
                     if (noErase === undefined || !noErase) {
-                        this.turtles.turtleList[turtle].painter.doClear(true, true, true);
+                        this.turtles.getTurtle(turtle).painter.doClear(true, true, true);
                     }
                 }
 
@@ -3566,8 +3567,8 @@ class Activity {
                 this.palettes.setMobile(false);
             }
 
-            for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
-                this.turtles.turtleList[turtle].painter.doClear(false, false, true);
+            for (let turtle = 0; turtle < this.turtles.getTurtleCount(); turtle++) {
+                this.turtles.getTurtle(turtle).painter.doClear(false, false, true);
             }
 
             const artcanvas = docById("overlayCanvas");
@@ -3715,8 +3716,8 @@ class Activity {
         
             if (restoredBlock.name === 'start' || restoredBlock.name === 'drum') {
                 const turtle = restoredBlock.value;
-                this.turtles.turtleList[turtle].inTrash = false;
-                this.turtles.turtleList[turtle].container.visible = true;
+                this.turtles.getTurtle(turtle).inTrash = false;
+                this.turtles.getTurtle(turtle).container.visible = true;
             } else if (restoredBlock.name === 'action') {
                 const actionArg = this.blocks.blockList[restoredBlock.connections[1]];
                 if (actionArg !== null) {
@@ -3974,8 +3975,8 @@ class Activity {
                 ) {
                     const turtle = this.blocks.blockList[blk].value;
                     if (!this.blocks.blockList[blk].trash && turtle !== null) {
-                        this.turtles.turtleList[turtle].inTrash = true;
-                        this.turtles.turtleList[turtle].container.visible = false;
+                        this.turtles.getTurtle(turtle).inTrash = true;
+                        this.turtles.getTurtle(turtle).container.visible = false;
                     }
                 } else if (this.blocks.blockList[blk].name === "action") {
                     if (!this.blocks.blockList[blk].trash) {
@@ -4878,12 +4879,12 @@ class Activity {
             const __afterLoad = async () => {
                 if (!that.turtles.running()) {
                     that.stage.update(event);
-                    for (let turtle = 0; turtle < that.turtles.turtleList.length; turtle++) {
+                    for (let turtle = 0; turtle < that.turtles.getTurtleCount(); turtle++) {
                         that.logo.turtleHeaps[turtle] = [];
                         that.logo.turtleDicts[turtle] = {};
                         that.logo.notation.notationStaging[turtle] = [];
                         that.logo.notation.notationDrumStaging[turtle] = [];
-                        that.turtles.turtleList[turtle].painter.doClear(true, true, false);
+                        that.turtles.getTurtle(turtle).painter.doClear(true, true, false);
                     }
                     if (_THIS_IS_MUSIC_BLOCKS_) {
                         const imgUrl =
@@ -5008,8 +5009,8 @@ class Activity {
                     }
 
                     if (run && that.firstRun) {
-                        for (let turtle = 0; turtle < that.turtles.turtleList.length; turtle++) {
-                            that.turtles.turtleList[turtle].painter.doClear(true, true, false);
+                        for (let turtle = 0; turtle < that.turtles.getTurtleCount(); turtle++) {
+                            that.turtles.getTurtle(turtle).painter.doClear(true, true, false);
                         }
 
                         that.textMsg(_("Click the run button to run the project."));
@@ -6013,10 +6014,10 @@ class Activity {
                         case "drum":
                             // Find the turtle associated with this block.
                             // eslint-disable-next-line no-case-declarations
-                            const turtle = this.turtles.turtleList[myBlock.value];
+                            const turtle = this.turtles.getTurtle(myBlock.value);
                             if (turtle === null || turtle === undefined) {
                                 args = {
-                                    id: this.turtles.turtleList.length,
+                                    id: this.turtles.getTurtleCount(),
                                     collapsed: false,
                                     xcor: 0,
                                     ycor: 0,

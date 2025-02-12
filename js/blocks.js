@@ -3232,7 +3232,7 @@ class Blocks {
             let thisBlock = this.blockList.length;
             if (name === "start") {
                 postProcess = (thisBlock) => {
-                    that.blockList[thisBlock].value = that.turtles.turtleList.length;
+                    that.blockList[thisBlock].value = that.turtles.getTurtleCount();
                     that.turtles.addTurtle(that.blockList[thisBlock]);
                 };
 
@@ -5802,7 +5802,7 @@ class Blocks {
                         postProcess = (args) => {
                             const thisBlock = args[0];
                             const blkInfo = args[1];
-                            that.blockList[thisBlock].value = that.turtles.turtleList.length;
+                            that.blockList[thisBlock].value = that.turtles.getTurtleCount();
                             that.turtles.addTurtle(that.blockList[thisBlock], blkInfo);
                         };
 

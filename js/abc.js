@@ -21,6 +21,23 @@
 
 // This header is prepended to the Abc output.
 const ABCHEADER = "X:1\nT:Music Blocks composition\nC:Mr. Mouse\nL:1/16\nM:C\n";
+const OCTAVE_NOTATION_MAP = {
+    10: "'''''",
+    9: "''''",
+    8: "'''",
+    7: "''",
+    6: "'",
+    5: "",
+    4: "",
+    3: ",",
+    2: ",,",
+    1: ",,,"
+};
+
+const ACCIDENTAL_MAP = {
+    "♯": "^",
+    "♭": "_"
+};
 
 /**
  * Returns the header string used for the ABC notation output.
@@ -65,24 +82,6 @@ const processABCNotes = function(logo, turtle) {
         // Also, notes must be lowercase.
         // And the octave bounday is at C, not A.
 
-        const OCTAVE_NOTATION_MAP = {
-            10: "'''''",
-            9: "''''",
-            8: "'''",
-            7: "''",
-            6: "'",
-            5: "",
-            4: "",
-            3: ",",
-            2: ",,",
-            1: ",,,"
-        };
-
-        const ACCIDENTAL_MAP = {
-            "♯": "^",
-            "♭": "_"
-        };
-
         // Handle frequency conversion
         if (typeof note === "number") {
             const pitchObj = frequencyToPitch(note);
@@ -105,7 +104,7 @@ const processABCNotes = function(logo, turtle) {
         // Convert case based on octave
         return note.includes("'") || note === "" ? note.toLowerCase() : note.toUpperCase();
     };
-    
+
     let counter = 0;
     let queueSlur = false;
     let articulation = false;
@@ -335,7 +334,6 @@ const processABCNotes = function(logo, turtle) {
 
                     for (let ii = 0; ii < notes.length; ii++) {
                         logo.notationNotes[turtle] += __toABCnote(notes[ii]);
-                        logo.notationNotes[turtle] += " ";
                     }
 
                     if (notes.length > 1) {
@@ -445,3 +443,7 @@ const saveAbcOutput = function(activity) {
     activity.logo.notationOutput += "\n";
     return activity.logo.notationOutput;
 };
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { getABCHeader, processABCNotes, saveAbcOutput, ACCIDENTAL_MAP, OCTAVE_NOTATION_MAP };
+}

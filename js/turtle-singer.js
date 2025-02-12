@@ -503,7 +503,7 @@ class Singer {
             cblk,
             true,
             actionArgs,
-            activity.turtles.turtleList[turtle].queue.length
+            activity.turtles.getTurtle(turtle).queue.length
         );
 
         const returnValue = rationalSum(tur.singer.notesPlayed, [
@@ -609,7 +609,7 @@ class Singer {
             true,
             actionArgs,
             [],
-            activity.turtles.turtleList[turtle].queue.length
+            activity.turtles.getTurtle(turtle).queue.length
         );
         const returnValue = tur.singer.tallyNotes - saveState.tallyNotes;
 
@@ -2390,4 +2390,8 @@ class Singer {
 
         activity.stage.update();
     }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Singer;
 }
