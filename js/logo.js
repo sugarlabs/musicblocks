@@ -462,6 +462,7 @@ class Logo {
      * @returns {void}
      */
     processShow(turtle, blk, arg0, arg1) {
+        const requiredTurtle = this.activity.turtles.getTurtle(turtle);
         if (typeof arg1 === "string") {
             const len = arg1.length;
             if (len === 14 && arg1.substr(0, 14) === CAMERAVALUE) {
@@ -485,15 +486,15 @@ class Logo {
                     this.activity.errorMsg
                 );
             } else if (len > 10 && arg1.substr(0, 10) === "data:image") {
-                this.activity.turtles.turtleList[turtle].doShowImage(arg0, arg1);
+                requiredTurtle.doShowImage(arg0, arg1);
             } else if (len > 8 && arg1.substr(0, 8) === "https://") {
-                this.activity.turtles.turtleList[turtle].doShowURL(arg0, arg1);
+                requiredTurtle.doShowURL(arg0, arg1);
             } else if (len > 7 && arg1.substr(0, 7) === "http://") {
-                this.activity.turtles.turtleList[turtle].doShowURL(arg0, arg1);
+                requiredTurtle.doShowURL(arg0, arg1);
             } else if (len > 7 && arg1.substr(0, 7) === "file://") {
-                this.activity.turtles.turtleList[turtle].doShowURL(arg0, arg1);
+                requiredTurtle.doShowURL(arg0, arg1);
             } else {
-                this.activity.turtles.turtleList[turtle].doShowText(arg0, arg1);
+                requiredTurtle.doShowText(arg0, arg1);
             }
         } else if (
             typeof arg1 === "object" &&
@@ -502,12 +503,12 @@ class Logo {
                 .name === "loadFile"
         ) {
             if (arg1) {
-                this.activity.turtles.turtleList[turtle].doShowText(arg0, arg1[1]);
+                requiredTurtle.doShowText(arg0, arg1[1]);
             } else {
                 this.activity.errorMsg(_("You must select a file."));
             }
         } else {
-            this.activity.turtles.turtleList[turtle].doShowText(arg0, arg1);
+            requiredTurtle.doShowText(arg0, arg1);
         }
     }
 
@@ -670,7 +671,7 @@ class Logo {
                         logo.statusFields.push([blk, "color"]);
                     } else {
                         logo.blockList[blk].value =
-                            logo.activity.turtles.turtleList[turtle].painter.color;
+                            logo.activity.turtles.getTurtle(turtle).painter.color;
                     }
                     break;
 
@@ -923,10 +924,10 @@ class Logo {
             for (const instrumentName in instruments[turtle]) {
                 this.synth.stopSound(turtle, instrumentName);
             }
-            const comp = this.activity.turtles.turtleList[turtle].companionTurtle;
+            const comp = this.activity.turtles.getTurtle(turtle).companionTurtle;
             if (comp) {
-                this.activity.turtles.turtleList[comp].running = false;
-                const interval = this.activity.turtles.turtleList[comp].interval;
+                this.activity.turtles.getTurtle(comp).running = false;
+                const interval = this.activity.turtles.getTurtle(comp).interval;
                 if (interval) clearInterval(interval);
             }
         }
@@ -1023,7 +1024,7 @@ class Logo {
         this.firstNoteTime = null;
 
         // Ensure we have at least one turtle.
-        if (this.activity.turtles.turtleList.length === 0) {
+        if (this.activity.turtles.getTurtleCount() === 0) {
             this.activity.turtles.add(null);
         }
 
@@ -1081,16 +1082,9 @@ class Logo {
 
         // Init the graphic state.
         for (const turtle in this.activity.turtles.turtleList) {
-            this.activity.turtles.turtleList[
-                turtle
-            ].container.x = this.activity.turtles.turtleX2screenX(
-                this.activity.turtles.turtleList[turtle].x
-            );
-            this.activity.turtles.turtleList[
-                turtle
-            ].container.y = this.activity.turtles.turtleY2screenY(
-                this.activity.turtles.turtleList[turtle].y
-            );
+            const requiredTurtle = this.activity.turtles.getTurtle(turtle);
+            requiredTurtle.container.x = this.activity.turtles.turtleX2screenX(requiredTurtle.x);
+            requiredTurtle.container.y = this.activity.turtles.turtleY2screenY(requiredTurtle.y);
         }
 
         // Set up status block.
@@ -1166,13 +1160,13 @@ class Logo {
         this.onRunTurtle();
 
         // Make sure that there is atleast one turtle.
-        if (this.activity.turtles.turtleList.length === 0) {
+        if (this.activity.turtles.getTurtleCount() === 0) {
             this.activity.turtles.addTurtle(null);
         }
 
         // Mark all turtles as not running.
         for (const turtle in this.activity.turtles.turtleList) {
-            this.activity.turtles.turtleList[turtle].running = false;
+            this.activity.turtles.getTurtle(turtle).running = false;
         }
 
         /*
@@ -1187,8 +1181,8 @@ class Logo {
             // turtle, i.e., which turtle should we use?
             let turtle = 0;
             while (
-                this.activity.turtles.turtleList[turtle].inTrash &&
-                turtle < this.activity.turtles.turtleList.length
+                this.activity.turtles.getTurtle(turtle).inTrash &&
+                turtle < this.activity.turtles.getTurtleCount()
             ) {
                 ++turtle;
             }
@@ -1645,21 +1639,21 @@ class Logo {
                 }
 
                 // Make sure SVG path is closed.
-                logo.activity.turtles.turtleList[turtle].painter.closeSVG();
+                logo.activity.turtles.getTurtle(turtle).painter.closeSVG();
 
                 // Mark the turtle as not running.
-                logo.activity.turtles.turtleList[turtle].running = false;
+                logo.activity.turtles.getTurtle(turtle).running = false;
                 if (!logo.activity.turtles.running() && queueStart === 0) {
                     logo.onStopTurtle();
                 }
             } else {
-                logo.activity.turtles.turtleList[turtle].running = false;
+                logo.activity.turtles.getTurtle(turtle).running = false;
             }
 
-            const comp = logo.activity.turtles.turtleList[turtle].companionTurtle;
+            const comp = logo.activity.turtles.getTurtle(turtle).companionTurtle;
             if (comp) {
-                logo.activity.turtles.turtleList[comp].running = false;
-                const interval = logo.activity.turtles.turtleList[comp].interval;
+                logo.activity.turtles.getTurtle(comp).running = false;
+                const interval = logo.activity.turtles.getTurtle(comp).interval;
                 if (interval) clearInterval(interval);
             }
             // Because flow can come from calc blocks, we are not
@@ -1742,8 +1736,8 @@ class Logo {
             if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
                 // Nothing else to do. Clean up.
                 if (
-                    logo.activity.turtles.turtleList[turtle].queue.length === 0 ||
-                    blk !== last(logo.activity.turtles.turtleList[turtle].queue).parentBlk
+                    logo.activity.turtles.getTurtle(turtle).queue.length === 0 ||
+                    blk !== last(logo.activity.turtles.getTurtle(turtle).queue).parentBlk
                 ) {
                     setTimeout(() => {
                         if (logo.activity.blocks.visible) {
@@ -1762,7 +1756,7 @@ class Logo {
                 // Make sure the turtles are on top.
                 const i = logo.activity.stage.children.length - 1;
                 logo.activity.stage.setChildIndex(
-                    logo.activity.turtles.turtleList[turtle].container,
+                    logo.activity.turtles.getTurtle(turtle).container,
                     i
                 );
                 logo.activity.refreshCanvas();

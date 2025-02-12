@@ -2329,3 +2329,7 @@ class StackClampBlock extends BaseBlock {
         });
     }
 }
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = ProtoBlock;
+}
