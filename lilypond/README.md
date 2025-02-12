@@ -19,7 +19,7 @@ Open the [LilyPond download page](http://www.lilypond.org/download.html) and dow
 
 ## Installing LilyPond
 ### Installation for GNU/Linux and FreeBSD
-[Read GNU/Linux Installation on the Lilypond webpage](http://www.lilypond.org/unix.html)
+[Read GNU/Linux Installation on the Lilypond webpage](https://lilypond.org/doc/v2.23/Documentation/web/unix)
 
 1. Right click the link and save it as `filename.sh` (for example save as `lilypond-2.18.2-1.linux-64.sh`)
 2. Open a terminal and go to the directory into which the `.sh` file was downloaded (by default ~/Downloads), e.g.,
@@ -30,7 +30,7 @@ sudo ./lilypond-2.16.2-1.linux-64.sh
 ```
 
 ### Installation for Windows
-[Read Windows Installation on the Lilypond webpage](http://www.lilypond.org/windows.html)
+[Read Windows Installation on the Lilypond webpage](https://lilypond.org/doc/v2.23/Documentation/web/windows)
 
 Download the `.exe` file and run it to launch the installation process.
 
