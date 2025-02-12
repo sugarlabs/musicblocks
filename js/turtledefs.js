@@ -23,7 +23,7 @@
    _THIS_IS_MUSIC_BLOCKS_, MOUSEPALETTEICON, FULLSCREENBUTTON, RECORDBUTTON,
    PLUGINSBUTTON, OPENMERGEBUTTON, PITCHPREVIEWBUTTON, JAVASCRIPTBUTTON,
    RECORDHELPBUTTON, DARKMODEBUTTON, SELECTHELPBUTTON, BLOCKMENUBUTTON,
-   CANVASMENUBUTTON
+   CANVASMENUBUTTON, RHYTHMPALETTEHELPICON, PITCHPREVIEWHELPBUTTON
 */
 
 /* exported
@@ -662,7 +662,7 @@ const createHelpContent = (activity) => {
         _("Set Pitch Preview"),
         _("Click to set the current pitch."),
         "data:image/svg+xml;base64," +
-            window.btoa(base64Encode(PITCHPREVIEWBUTTON))
+            window.btoa(base64Encode(PITCHPREVIEWHELPBUTTON))
     ]);
     if (!activity.beginnerMode) {
         HELPCONTENT.push([
@@ -795,7 +795,7 @@ const createHelpContent = (activity) => {
                 " " +
                 _("Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."),
             "data:image/svg+xml;base64," +
-                window.btoa(base64Encode(RHYTHMPALETTEICON))
+                window.btoa(base64Encode(RHYTHMPALETTEHELPICON))
         ]);
     }
     if (_THIS_IS_TURTLE_BLOCKS_) {

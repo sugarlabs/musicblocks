@@ -46,7 +46,8 @@
    PASTEBUTTON, EXTRACTBUTTON, METRONOMESVG, PITCHPREVIEWBUTTON,
    JAVASCRIPTBUTTON, GRAND_G, GRAND_F, TREBLE_G, TREBLE_F,
    FULLSCREENBUTTON, RECORDHELPBUTTON, DARKMODEBUTTON, SELECTHELPBUTTON,
-   BLOCKMENUBUTTON, CANVASMENUBUTTON
+   BLOCKMENUBUTTON, CANVASMENUBUTTON, RHYTHMPALETTEHELPICON,
+   PITCHPREVIEWHELPBUTTON
 */
 
 // Defined below are the inline SVGs used for turtles and blocks. SVGs
@@ -442,6 +443,9 @@ const RHYTHMPALETTEICON =
 
 const NOTESPALETTEICON = RHYTHMPALETTEICON;
 
+const RHYTHMPALETTEHELPICON = // For help widget
+    '<svg width="55" height="55" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56"><g fill="#292929" fill-opacity="0.4"><rect width="56" height="56" fill="none"/><path d="M7.24,42.72a4.17,4.17,0,0,1-.61,0A3.47,3.47,0,0,1,4,41a3.77,3.77,0,0,1-.14-3.37A6.37,6.37,0,0,1,9.49,34a4.6,4.6,0,0,1,1.49.2V14.88a2.68,2.68,0,0,1,.1-.78,1.07,1.07,0,0,1,1.05-.82,1.16,1.16,0,0,1,1.14.75,2.1,2.1,0,0,1,.13.85V37.16A1.82,1.82,0,0,1,13,38.58a6.21,6.21,0,0,1-5.75,4.14ZM10,35.66A6.48,6.48,0,0,0,5.67,39.9a.67.67,0,0,0,.12.56.8.8,0,0,0,.61.35l.12,0a6.18,6.18,0,0,0,4.13-3.59,5.85,5.85,0,0,0,.22-.56l0-.13A1,1,0,0,0,10.6,36,1,1,0,0,0,10,35.66Z"/><path d="M33.56,42.54h-.4a3.33,3.33,0,0,1-2.52-1.3,3.67,3.67,0,0,1-.5-3.07,5.86,5.86,0,0,1,5.49-4.23,4.57,4.57,0,0,1,1.49.25v-19a3.35,3.35,0,0,1,0-.69,1.11,1.11,0,0,1,2.18,0,3.54,3.54,0,0,1,0,.71c0,7.32,0,14.6,0,21.89,0,0,0,.1,0,.15a1.2,1.2,0,0,1-.25,1,6.44,6.44,0,0,1-2,3,5.87,5.87,0,0,1-3.58,1.3Z"/><path d="M46.64,42.54h-.4a3.33,3.33,0,0,1-2.52-1.3,3.7,3.7,0,0,1-.5-3.07,5.86,5.86,0,0,1,5.49-4.23,4.52,4.52,0,0,1,1.49.25v-19a3.31,3.31,0,0,1,0-.69,1.11,1.11,0,0,1,2.18,0,3.54,3.54,0,0,1,.05.71c0,7.32,0,14.6,0,21.89,0,0,0,.1,0,.15a1.19,1.19,0,0,1-.24,1,6.54,6.54,0,0,1-2,3,5.87,5.87,0,0,1-3.58,1.3Z"/></g></svg>'
+
 const SENSORSPALETTEICON =
     '<svg width="55" height="55" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56"><title>アセット 17</title><g id="レイヤー_2" data-name="レイヤー 2"><g id="Icon"><rect width="56" height="56" style="fill:#fff;opacity:0"/><path d="M44,14H12a1.56,1.56,0,0,0-1.56,1.56V34.61A1.56,1.56,0,0,0,12,36.17H44a1.56,1.56,0,0,0,1.56-1.56V15.55A1.56,1.56,0,0,0,44,14Zm-.56,18.93a1.32,1.32,0,0,1-1.33,1.32H13.85a1.32,1.32,0,0,1-1.33-1.32V17.24a1.33,1.33,0,0,1,1.33-1.33h28.3a1.33,1.33,0,0,1,1.33,1.33Z" style="fill:#aabb00;stroke:#748400;stroke-miterlimit:10;stroke-width:0.64px"/><path d="M35.35,46.31H12.47a1.59,1.59,0,0,1-1.53-1.94L12,39.61a1.57,1.57,0,0,1,1.53-1.24H34.29a1.57,1.57,0,0,1,1.53,1.24l1.06,4.76A1.59,1.59,0,0,1,35.35,46.31Z" style="fill:#aabb00;stroke:#748400;stroke-miterlimit:10;stroke-width:0.64px"/><rect x="40.24" y="38.37" width="4.85" height="7.94" rx="2.42" ry="2.42" style="fill:#aabb00;stroke:#748400;stroke-miterlimit:10;stroke-width:0.64px"/><rect x="42.27" y="39.59" width="0.78" height="1.63" rx="0.39" ry="0.39" style="fill:#fc2905"/></g></g></svg>';
 
@@ -756,6 +760,9 @@ const METRONOMESVG =
 
 const PITCHPREVIEWBUTTON =
       '<?xml version="1.0" encoding="UTF-8" standalone="no"?> <svg width="55" height="55" viewBox="0 0 55.000001 55.000001" version="1.1" id="svg864" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"> <g transform="matrix(4.021879,0,0,4.021879,268.33692,99.65892)" style="fill:#292929;fill-opacity:0.4;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" > <path style="fill:#292929;fill-opacity:0.4" d="m -61.801691,-12.829594 c 0,-0.554667 0.272,-1.045333 0.816,-1.472 0.544,-0.437333 1.12,-0.656 1.728,-0.656 0.176,0 0.342667,0.02267 0.5,0.068 0.157333,0.04533 -0.138667,-0.09067 0,0 v -9.268 h 0.796 v 10.352 c 0,0.597333 -0.261333,1.093333 -0.784,1.488 -0.522667,0.394667 -1.098667,0.592 -1.728,0.592 -0.352,0 -0.661333,-0.101333 -0.928,-0.304 -0.266667,-0.213333 -0.4,-0.48 -0.4,-0.8 z" /> </g> </svg>';
+
+const PITCHPREVIEWHELPBUTTON = // For help widget
+      '<svg xmlns="http://www.w3.org/2000/svg" width="36px" height="36px" viewBox="0 0 24 24" fill="#292929" fill-opacity="0.4" ><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>';
 
 const JAVASCRIPTBUTTON =
       '<?xml version="1.0" encoding="UTF-8" standalone="no"?> <!-- Created with Inkscape (http://www.inkscape.org/) --> <svg width="55" height="55" viewBox="0 0 14.552083 14.552084" version="1.1" id="svg5" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"> <g> <text xml:space="preserve" style="font-size:11.8659px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.317835;fill:#292929;fill-opacity:0.4;" x="-0.38877353" y="8.8153467" transform="scale(0.7616083,1.3130109)"><tspan style="stroke-width:0.317835;fill:#292929;fill-opacity:0.4;" x="-0.38877353" y="8.8153467">&lt; &gt;</tspan></text> </g> </svg>';
