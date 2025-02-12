@@ -146,17 +146,15 @@ function TemperamentWidget() {
     this._addButton = function (row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
         cell.innerHTML =
-            '&nbsp;&nbsp;<img src="header-icons/' +
-            icon +
-            '" title="' +
-            label +
-            '" alt="' +
-            label +
-            '" height="' +
-            iconSize +
-            '" width="' +
-            iconSize +
-            '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+            `&nbsp;&nbsp;<img 
+                src="header-icons/${icon}" 
+                title="${label}" 
+                alt="${label}" 
+                height="${iconSize}" 
+                width="${iconSize}" 
+                vertical-align="middle" 
+                align-content="center"
+            >&nbsp;&nbsp;`;
         cell.style.width = BUTTONSIZE + "px";
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;
@@ -436,18 +434,20 @@ function TemperamentWidget() {
                 }
 
                 docById("information").innerHTML +=
-                    '<div class="popup" id="noteInfo" style=" left: ' +
-                    x +
-                    "px; top: " +
-                    y +
-                    'px;"><span class="popuptext" id="myPopup"></span></div>';
+                    `<div class="popup" id="noteInfo" style="left: ${x}px; top: ${y}px;">
+                        <span class="popuptext" id="myPopup"></span>
+                    </div>`;
                 if (i !== 0) {
                     docById("noteInfo").innerHTML +=
-                        '<img src="header-icons/edit.svg" id="edit" title="' +
-                        _("edit") +
-                        '" alt="edit" height=20px width=20px data-message="' +
-                        i +
-                        '">';
+                        `<img 
+                            src="header-icons/edit.svg" 
+                            id="edit" 
+                            title="${_("edit")}" 
+                            alt="edit" 
+                            height="20px" 
+                            width="20px" 
+                            data-message="${i}"
+                        >`;
                 }
                 docById("noteInfo").innerHTML +=
                     '<img src="header-icons/close-button.svg" id="close" title="' +
@@ -460,11 +460,7 @@ function TemperamentWidget() {
                     if (this.ratios[i] == this.ratiosNotesPair[j][0]) {
                         noteDefined = true;
                         docById("noteInfo").innerHTML +=
-                            '<div id="note">&nbsp;' +
-                            _("note") +
-                            "&nbsp;" +
-                            this.ratiosNotesPair[j][1] +
-                            "</div>";
+                            `<div id="note">&nbsp;${_("note")}&nbsp;${this.ratiosNotesPair[j][1]}</div>`;
                         break;
                     }
                 }
@@ -482,28 +478,14 @@ function TemperamentWidget() {
                     const index = centsDiff1.indexOf(min);
                     if (centsDiff[index] < 0) {
                         docById("noteInfo").innerHTML +=
-                            '<div id="note">&nbsp;' +
-                            _("note") +
-                            "&nbsp;" +
-                            this.ratiosNotesPair[index][1] +
-                            "(- " +
-                            centsDiff1[index].toFixed(2) +
-                            "¢)" +
-                            "</div>";
+                            `<div id="note">&nbsp;${_("note")}&nbsp;${this.ratiosNotesPair[index][1]}(-${centsDiff1[index].toFixed(2)}¢)</div>`;
                     } else {
                         docById("noteInfo").innerHTML +=
-                            '<div id="note">&nbsp;' +
-                            _("note") +
-                            "&nbsp;" +
-                            this.ratiosNotesPair[index][1] +
-                            "(+ " +
-                            centsDiff1[index].toFixed(2) +
-                            "¢)" +
-                            "</div>";
+                            `<div id="note">&nbsp;${_("note")}&nbsp;${this.ratiosNotesPair[index][1]}(${centsDiff1[index].toFixed(2)}¢)</div>`;
                     }
                 }
                 docById("noteInfo").innerHTML +=
-                    '<div id="frequency">&nbsp;' + _("frequency") + "&nbsp;" + frequency + "</div>";
+                    `<div id="frequency">&nbsp;${_("frequency")}&nbsp;${frequency}</div>`;
 
                 docById("noteInfo").style.top = "130px";
                 docById("noteInfo").style.left = "132px";
@@ -536,21 +518,11 @@ function TemperamentWidget() {
         docById("note").innerHTML = "";
         docById("frequency").innerHTML = "";
         docById("noteInfo").innerHTML +=
-            '<center><input type="range" class="sliders" id="frequencySlider1" style="width:170px; background:white; border:0;" min="' +
-            this.frequencies[i - 1] +
-            '" max="' +
-            this.frequencies[i + 1] +
-            '"></center>';
+            `<center><input type="range" class="sliders" id="frequencySlider1" style="width:170px; background:white; border:0;" min="${this.frequencies[i - 1]}" max="${this.frequencies[i + 1]}"></center>`;
         docById("noteInfo").innerHTML +=
-            "<br>&nbsp;&nbsp;" +
-            _("frequency") +
-            '<span class="rangeslidervalue" id="frequencydiv1">' +
-            this.frequencies[i] +
-            "</span>";
+            `<br>&nbsp;&nbsp;${_("frequency")}<span class="rangeslidervalue" id="frequencydiv1">${this.frequencies[i]}</span>`;
         docById("noteInfo").innerHTML +=
-            '<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>' +
-            _("done") +
-            "</center><div>";
+            `<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>${_("done")}</center><div>`;
 
         docById("frequencySlider1").oninput = function () {
             docById("frequencydiv1").innerHTML = docById("frequencySlider1").value;
@@ -669,15 +641,15 @@ function TemperamentWidget() {
 
             notesCell[(i, 0)] = notesRow[i].insertCell(-1);
             notesCell[(i, 0)].innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
-                _("Play") +
-                '" alt="' +
-                _("Play") +
-                '" height="20px" width="20px" id="play_' +
-                i +
-                '" data-id="' +
-                i +
-                '">&nbsp;&nbsp;';
+                `&nbsp;&nbsp;<img 
+                    src="header-icons/play-button.svg" 
+                    title="${_("Play")}" 
+                    alt="${_("Play")}" 
+                    height="20px" 
+                    width="20px" 
+                    id="play_${i}" 
+                    data-id="${i}"
+                >&nbsp;&nbsp;`;
             notesCell[(i, 0)].style.width = 40 + "px";
             notesCell[(i, 0)].style.backgroundColor = platformColor.selectorBackground;
             notesCell[(i, 0)].style.textAlign = "center";
@@ -781,9 +753,7 @@ function TemperamentWidget() {
         }
         temperamentTableDiv.innerHTML = "";
         temperamentTableDiv.innerHTML =
-            '<table id="editOctave" width="' +
-            BUTTONDIVWIDTH +
-            '"><tbody><tr id="menu"></tr></tbody></table>';
+            `<table id="editOctave" width="${BUTTONDIVWIDTH}"><tbody><tr id="menu"></tr></tbody></table>`;
         const editMenus = [_("equal"), _("ratios"), _("arbitrary"), _("octave space")];
         let menus = "";
 
@@ -851,16 +821,11 @@ function TemperamentWidget() {
         const equalEdit = docById("userEdit");
         equalEdit.style.backgroundColor = "#c8C8C8";
         equalEdit.innerHTML =
-            "<br>" +
-            _("pitch number") +
-            '&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="octaveIn" value="0"></input> &nbsp;&nbsp; ' +
-            _("to") +
-            ' &nbsp;&nbsp; <input type="text" id="octaveOut" value="0"></input><br><br>';
+            `<br>${_("pitch number")}&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="octaveIn" value="0"></input>
+            &nbsp;&nbsp; ${_("to")}&nbsp;&nbsp;
+            <input type="text" id="octaveOut" value="0"></input><br><br>`;
         equalEdit.innerHTML +=
-            _("number of divisions") +
-            ' &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="divisions" value="' +
-            this.pitchNumber +
-            '"></input>';
+            `${_("number of divisions")} &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="divisions" value="${this.pitchNumber}"></input>`;
         equalEdit.style.paddingLeft = "80px";
         const that = this;
 
@@ -871,18 +836,12 @@ function TemperamentWidget() {
             divAppend.id = "divAppend";
             if (preview) {
                 divAppend.innerHTML =
-                    '<div id="preview" style="float:left;">' +
-                    _("back") +
-                    '</div><div id="done_" style="float:right;">' +
-                    _("done") +
-                    "</div>";
+                    `<div id="preview" style="float:left;">${_("back")}</div>
+                    <div id="done_" style="float:right;">${_("done")}</div>`;
             } else {
                 divAppend.innerHTML =
-                    '<div id="preview" style="float:left;">' +
-                    _("preview") +
-                    '</div><div id="done_" style="float:right;">' +
-                    _("done") +
-                    "</div>";
+                    `<div id="preview" style="float:left;">${_("preview")}</div>
+                    <div id="done_" style="float:right;">${_("done")}</div>`;
             }
             divAppend.style.textAlign = "center";
             divAppend.style.marginLeft = "-80px";
@@ -1059,12 +1018,9 @@ function TemperamentWidget() {
         const ratioEdit = docById("userEdit");
         ratioEdit.style.backgroundColor = "#c8C8C8";
         ratioEdit.innerHTML =
-            "<br>" +
-            _("ratio") +
-            ' &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="ratioIn" value="1"></input> &nbsp;&nbsp; : &nbsp;&nbsp; <input type="text" id="ratioOut" value="1"></input><br><br>';
+            `<br>${_("ratio")} &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="ratioIn" value="1"></input> &nbsp;&nbsp; : &nbsp;&nbsp; <input type="text" id="ratioOut" value="1"></input><br><br>`;
         ratioEdit.innerHTML +=
-            _("recursion") +
-            ' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="recursion" value="1"></input>';
+            `${_("recursion")} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="recursion" value="1"></input>`;
         ratioEdit.style.paddingLeft = "100px";
         const that = this;
 
@@ -1074,18 +1030,12 @@ function TemperamentWidget() {
             divAppend.id = "divAppend";
             if (preview) {
                 divAppend.innerHTML =
-                    '<div id="preview" style="float:left;">' +
-                    _("back") +
-                    '</div><div id="done_" style="float:right;">' +
-                    _("done") +
-                    "</div>";
+                    `<div id="preview" style="float:left;">${_("back")}</div>
+                    <div id="done_" style="float:right;">${_("done")}</div>`;
             } else {
                 divAppend.innerHTML =
-                    '<div id="preview" style="float:left;">' +
-                    _("preview") +
-                    '</div><div id="done_" style="float:right;">' +
-                    _("done") +
-                    "</div>";
+                    `<div id="preview" style="float:left;">${_("preview")}</div>
+                    <div id="done_" style="float:right;">${_("done")}</div>`;
             }
             divAppend.style.textAlign = "center";
             divAppend.style.marginLeft = "-100px";
@@ -1336,11 +1286,7 @@ function TemperamentWidget() {
         this._createInnerWheel();
 
         arbitraryEdit.innerHTML +=
-            '<canvas id="circ1" width = ' +
-            BUTTONDIVWIDTH +
-            "px height = " +
-            height +
-            "px></canvas>";
+            `<canvas id="circ1" width = "${BUTTONDIVWIDTH}" height = "${height}"></canvas>`;
 
         const canvas = docById("circ1");
         canvas.style.position = "absolute";
@@ -1495,21 +1441,11 @@ function TemperamentWidget() {
                     _("Close") +
                     '" height=20px width=20px align="right">';
                 docById("noteInfo1").innerHTML +=
-                    '<br><center><input type="range" class="sliders" id = "frequencySlider" style="width:170px; background:white; border:0;" min="' +
-                    frequencies[i] +
-                    '" max="' +
-                    frequencies[i + 1] +
-                    '" value="30"></center>';
+                    `<br><center><input type="range" class="sliders" id = "frequencySlider" style="width:170px; background:white; border:0;" min="${frequencies[i]}" max="${frequencies[i + 1]}" value="30"></center>`;
                 docById("noteInfo1").innerHTML +=
-                    "&nbsp;&nbsp;" +
-                    _("frequency") +
-                    ' : <span class="rangeslidervalue" id="frequencydiv">' +
-                    frequencies[i] +
-                    "</span>";
+                    `&nbsp;&nbsp;${_("frequency")} : <span class="rangeslidervalue" id="frequencydiv">${frequencies[i]}</span>`;
                 docById("noteInfo1").innerHTML +=
-                    '<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>' +
-                    _("done") +
-                    "</center><div>";
+                    `<br><br><div id="done" style="background:rgb(196, 196, 196);"><center>${_("done")}</center><div>`;
 
                 docById("noteInfo1").style.top = "100px";
                 docById("noteInfo1").style.left = "90px";
@@ -1583,11 +1519,8 @@ function TemperamentWidget() {
         const octaveSpaceEdit = docById("userEdit");
         octaveSpaceEdit.style.backgroundColor = "#c8C8C8";
         octaveSpaceEdit.innerHTML =
-            "<br><br>" +
-            _("octave space") +
-            ' &nbsp;&nbsp;&nbsp;&nbsp; <input type="text" id="startNote" value="' +
-            octaveRatio +
-            '" style="width:50px;"></input> &nbsp;&nbsp; : &nbsp;&nbsp; <input type="text" id="endNote" value="1" style="width:50px;"></input><br><br>';
+            `<br><br>${_("octave space")} &nbsp;&nbsp;&nbsp;&nbsp; 
+            <input type="text" id="startNote" value="${octaveRatio}" style="width:50px;"></input> &nbsp;&nbsp; : &nbsp;&nbsp; <input type="text" id="endNote" value="1" style="width:50px;"></input><br><br>`;
         octaveSpaceEdit.style.paddingLeft = "70px";
         const that = this;
 
@@ -1996,32 +1929,28 @@ function TemperamentWidget() {
         const cell = this.playButton;
         if (this._playing) {
             cell.innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/' +
-                "stop-button.svg" +
-                '" title="' +
-                _("Stop") +
-                '" alt="' +
-                _("Stop") +
-                '" height="' +
-                ICONSIZE +
-                '" width="' +
-                ICONSIZE +
-                '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                `&nbsp;&nbsp;<img 
+                    src="header-icons/stop-button.svg" 
+                    title="${_("Stop")}" 
+                    alt="${_("Stop")}" 
+                    height="${ICONSIZE}" 
+                    width="${ICONSIZE}" 
+                    vertical-align="middle" 
+                    align-content="center"
+                >&nbsp;&nbsp;`;
         } else {
             this._logo.synth.setMasterVolume(0);
             this._logo.synth.stop();
             cell.innerHTML =
-                '&nbsp;&nbsp;<img src="header-icons/' +
-                "play-button.svg" +
-                '" title="' +
-                _("Play") +
-                '" alt="' +
-                _("Play") +
-                '" height="' +
-                ICONSIZE +
-                '" width="' +
-                ICONSIZE +
-                '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+                `&nbsp;&nbsp;<img 
+                    src="header-icons/play-button.svg" 
+                    title="${_("Play")}" 
+                    alt="${_("Play")}" 
+                    height="${ICONSIZE}" 
+                    width="${ICONSIZE}" 
+                    vertical-align="middle" 
+                    align-content="center"
+                >&nbsp;&nbsp;`;
         }
 
         const duration = 1 / 2;

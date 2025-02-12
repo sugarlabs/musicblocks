@@ -117,11 +117,21 @@ class Palettes {
                 "position: absolute; z-index: 1000; left :0px; top:" + this.top + "px"
             );
             element.innerHTML =
-                '<div style="height:fit-content"><table width ="' +
-                1.5 * this.cellSize +
-                'px"bgcolor="white"><thead><tr></tr></thead></table><table width ="' +
-                4.5 * this.cellSize +
-                'px"bgcolor="white"><thead><tr><td style= "width:28px"></tr></thead><tbody></tbody></table></div>';
+                `<div style="height:fit-content">
+                    <table width="${1.5 * this.cellSize}" bgcolor="white">
+                        <thead>
+                            <tr></tr>
+                        </thead>
+                    </table>
+                    <table width ="${4.5 * this.cellSize}" bgcolor="white">
+                        <thead>
+                            <tr>
+                                <td style= "width:28px"></td>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>`;
             element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
             document.body.appendChild(element);
         }
@@ -130,12 +140,13 @@ class Palettes {
         td.width = 1.5 * this.cellSize;
         td.height = 1.5 * this.cellSize;
         td.style.position = "relative";
+        td.style.backgroundColor = platformColor.paletteBackground;
         td.appendChild(
             makePaletteIcons(
                 PALETTEICONS[MULTIPALETTEICONS[i]]
-                    .replace("background_fill_color", platformColor.selectorBackground)
-                    .replace(/stroke_color/g, platformColor.ruleColor)
-                    .replace(/fill_color/g, platformColor.background),
+                    .replace("background_fill_color", platformColor.paletteLabelBackground)
+                    .replace(/stroke_color/g, platformColor.strokeColor)
+                    .replace(/fill_color/g, platformColor.fillColor),
                 1.5 * this.cellSize,
                 1.5 * this.cellSize
             )
@@ -146,7 +157,7 @@ class Palettes {
         cover.style.top = "0";
         cover.style.width = "100%";
         cover.style.height = "1px";
-        cover.style.background = platformColor.selectorBackground;
+        cover.style.background = platformColor.paletteLabelBackground;
         td.appendChild(cover);
         td.onmouseover = () => {
             this.showSelection(i, tr);
@@ -161,23 +172,23 @@ class Palettes {
             if (j === i) {
                 img = makePaletteIcons(
                     PALETTEICONS[MULTIPALETTEICONS[j]]
-                        .replace("background_fill_color", platformColor.selectorSelected)
-                        .replace(/stroke_color/g, platformColor.ruleColor)
-                        .replace(/fill_color/g, platformColor.background),
+                        .replace("background_fill_color", platformColor.paletteLabelSelected)
+                        .replace(/stroke_color/g, platformColor.strokeColor)
+                        .replace(/fill_color/g, platformColor.fillColor),
                     this.cellSize,
                     this.cellSize
                 );
-                tr.children[j].children[1].style.background = platformColor.selectorSelected;
+                tr.children[j].children[1].style.background = platformColor.paletteLabelSelected;
             } else {
                 img = makePaletteIcons(
                     PALETTEICONS[MULTIPALETTEICONS[j]]
-                        .replace("background_fill_color", platformColor.selectorBackground)
-                        .replace(/stroke_color/g, platformColor.ruleColor)
-                        .replace(/fill_color/g, platformColor.background),
+                        .replace("background_fill_color", platformColor.paletteLabelBackground)
+                        .replace(/stroke_color/g, platformColor.strokeColor)
+                        .replace(/fill_color/g, platformColor.fillColor),
                     this.cellSize,
                     this.cellSize
                 );
-                tr.children[j].children[1].style.background = platformColor.selectorBackground;
+                tr.children[j].children[1].style.background = platformColor.paletteLabelBackground;
             }
             tr.children[j].children[0].src = img.src;
         }
@@ -283,7 +294,7 @@ class Palettes {
             );
         }
     }
-    
+
     makeSearchButton(name, icon, listBody) {
         const row = listBody.insertRow(-1);
         const img = row.insertCell(-1);
@@ -302,6 +313,7 @@ class Palettes {
         row.style.flexDirection = "row";
         row.style.alignItems = "center";
         row.style.width = "126px";
+        row.style.backgroundColor = platformColor.paletteBackground;
 
         this._loadPaletteButtonHandler(name, row);
     }
@@ -323,6 +335,13 @@ class Palettes {
         row.style.flexDirection = "row";
         row.style.alignItems = "center";
         row.style.width = "126px";
+        row.style.backgroundColor = platformColor.paletteBackground;
+        row.addEventListener('mouseover', () => {
+            row.style.backgroundColor = platformColor.hoverColor;
+        });
+        row.addEventListener('mouseout', () => {
+            row.style.backgroundColor = platformColor.paletteBackground;
+        });
 
         this._loadPaletteButtonHandler(name, row);
     }
@@ -419,14 +438,25 @@ class Palettes {
                 `position: fixed; z-index: 1000; left: 0px; top: ${60+this.top}px; overflow-y: auto;`
             );
             element.innerHTML =
-                '<div style="height:fit-content"><table width ="' +
-                1.5 * this.cellSize +
-                'px"bgcolor="white"><thead><tr></tr></thead></table><table width ="' +
-                4.5 * this.cellSize +
-                'px"bgcolor="white"><thead><tr><td style= "width:28px"></tr></thead><tbody></tbody></table></div>';
+                `<div style="height:fit-content">
+                    <table width="${1.5 * this.cellSize}" bgcolor="white">
+                        <thead>
+                            <tr></tr>
+                        </thead>
+                    </table>
+                    <table width="${4.5 * this.cellSize}" bgcolor="white">
+                        <thead>
+                            <tr>
+                                <td style= "width:28px"></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>`;
             element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
             document.body.appendChild(element);
-    
+
         } catch (e) {
             console.error('Error clearing palettes:', e);
         }
@@ -457,9 +487,9 @@ class Palettes {
                 timeout = setTimeout(() => this.showPalette(name), 400);
             }
         };
-        
+
         row.onmouseout = () => clearTimeout(timeout);
-        
+
         // eslint-disable-next-line no-unused-vars
         row.onclick = (event) => {
             if (name == "search") {
@@ -881,7 +911,7 @@ class Palette {
         if (createHeader) {
             let header = this.menuContainer.children[0];
             header = header.insertRow();
-            header.style.background = platformColor.selectorSelected;
+            header.style.backgroundColor = platformColor.paletteLabelBackground;
             header.innerHTML =
                 '<td style ="width: 100%; height: 42px; box-sizing: border-box; display: flex; flex-direction: row; align-items: center; justify-content: space-between;"></td>';
             header = header.children[0];
@@ -900,7 +930,7 @@ class Palette {
             const label = document.createElement("span");
             label.textContent = toTitleCase(_(this.name));
             label.style.fontWeight = "bold";
-            label.style.color = platformColor.paletteBackground;
+            label.style.color = platformColor.textColor;
             header.appendChild(label);
 
             const closeDownImg = document.createElement("span");

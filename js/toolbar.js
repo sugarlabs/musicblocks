@@ -67,6 +67,9 @@ class Toolbar {
                 ["delPluginIcon", _("Delete plugin")],
                 ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
                 ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
+                ["themeSelectIcon", _("Change theme")],
+                ["light", _("Light Mode")],
+                ["dark", _("Dark Mode")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["chooseKeyIcon", _("Set Pitch Preview")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
@@ -84,6 +87,7 @@ class Toolbar {
                 ["save-ly", _("Save sheet music as Lilypond"), "innerHTML"],
                 ["save-mxml", _("Save sheet music as MusicXML"), "innerHTML"],
                 ["save-blockartwork-svg", _("Save block artwork as SVG"), "innerHTML"],
+                ["save-blockartwork-png", _("Save block artwork as PNG"), "innerHTML"],
                 ["new-project", _("Confirm"), "innerHTML"],
                 ["enUS", _("English (United States)"), "innerHTML"],
                 ["enUK", _("English (United Kingdom)"), "innerHTML"],
@@ -101,7 +105,8 @@ class Toolbar {
                 ["ibo", _("igbo"), "innerHTML"],
                 ["ar", _("عربى"), "innerHTML"],
                 ["te", _("తెలుగు"), "innerHTML"],
-                ["he", _("עִברִית"), "innerHTML"]
+                ["he", _("עִברִית"), "innerHTML"],
+                ["ur", _("اردو"), "innerHTML"]
             ];
 
             // Workaround for FF
@@ -128,6 +133,9 @@ class Toolbar {
                 _("Delete plugin"),
                 _("Enable horizontal scrolling"),
                 _("Disable horizontal scrolling"),
+                _("Change theme"),               
+                _("Light Mode"),
+                _("Dark Mode"),
                 _("Merge with current project"),
                 _("Set Pitch Preview"),
                 _("JavaScript Editor"),
@@ -142,6 +150,7 @@ class Toolbar {
                 _("Save sheet music as ABC"),
                 _("Save sheet music as Lilypond"),
                 _("Save block artwork as SVG"),
+                _("Save block artwork as PNG"),              
                 _("Confirm"),
                 _("Select language"),
                 _("Save project as HTML"),
@@ -150,6 +159,7 @@ class Toolbar {
                 _("Save turtle artwork as SVG"),
                 _("Save turtle artwork as PNG"),
                 _("Save block artwork as SVG"),
+                _("Save block artwork as PNG"),
                 _("Confirm"),
                 _("English (United States)"),
                 _("English (United Kingdom)"),
@@ -167,7 +177,8 @@ class Toolbar {
                 _("తెలుగు"),
                 _("igbo"),
                 _("عربى"),
-                _("עִברִית")
+                _("עִברִית"),
+                _("اردو")
             ];
         } else {
             strings = [
@@ -193,6 +204,9 @@ class Toolbar {
                 ["delPluginIcon", _("Delete plugin")],
                 ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
                 ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
+                ["themeSelectIcon", _("Change theme")],
+                ["light", _("Light Mode")],
+                ["dark", _("Dark Mode")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
                 ["restoreIcon", _("Restore")],
@@ -205,6 +219,7 @@ class Toolbar {
                 ["save-svg", _("Save turtle artwork as SVG"), "innerHTML"],
                 ["save-png", _("Save turtle artwork as PNG"), "innerHTML"],
                 ["save-blockartwork-svg", _("Save block artwork as SVG"), "innerHTML"],
+                ["save-blockartwork-png", _("Save block artwork as PNG"), "innerHTML"],
                 ["new-project", _("Confirm"), "innerHTML"],
                 ["enUS", _("English (United States)"), "innerHTML"],
                 ["enUK", _("English (United Kingdom)"), "innerHTML"],
@@ -222,7 +237,8 @@ class Toolbar {
                 ["ibo", _("igbo"), "innerHTML"],
                 ["ar", _("عربى"), "innerHTML"],
                 ["te", _("తెలుగు"), "innerHTML"],
-                ["he", _("עִברִית"), "innerHTML"]
+                ["he", _("עִברִית"), "innerHTML"],
+                ["ur", _("اردو"), "innerHTML"]
             ];
 
             // Workaround for FF
@@ -249,6 +265,9 @@ class Toolbar {
                 _("Delete plugin"),
                 _("Enable horizontal scrolling"),
                 _("Disable horizontal scrolling"),
+                _("Change theme"),               
+                _("Light Mode"),
+                _("Dark Mode"),
                 _("Merge with current project"),
                 _("JavaScript Editor"),
                 _("Restore"),
@@ -261,6 +280,7 @@ class Toolbar {
                 _("Save turtle artwork as SVG"),
                 _("Save turtle artwork as PNG"),
                 _("Save block artwork as SVG"),
+                _("Save block artwork as PNG"), 
                 _("Confirm"),
                 _("English (United States)"),
                 _("English (United Kingdom)"),
@@ -278,7 +298,8 @@ class Toolbar {
                 _("తెలుగు"),
                 _("igbo"),
                 _("عربى"),
-                _("עִברִית")
+                _("עִברִית"),
+                _("اردو")
             ];
         }
 
@@ -329,7 +350,7 @@ class Toolbar {
     renderLogoIcon(onclick) {
         const logoIcon = docById("mb-logo");
         if (this.language === "ja") {
-            logoIcon.innerHTML = '<img style="width: 100%;" src="images/logo-ja.svg">';
+            logoIcon.innerHTML = '<img style="width: 100%; transform: scale(0.85);" src="images/logo-ja.svg">';
         }
 
         logoIcon.onmouseenter = () => {
@@ -433,7 +454,7 @@ class Toolbar {
 
     /**
      * Renders the load icon with the provided onclick handler.
-     * 
+     *
      * @public
      * @param {Function} onclick - The onclick handler for the load icon.
      * @returns {void}
@@ -443,6 +464,22 @@ class Toolbar {
 
         loadIcon.onclick = () => {
             onclick(this.activity);
+        };
+    }
+
+    renderThemeSelectIcon(themeBox, themes) {
+        const icon = document.getElementById("themeSelectIcon")
+        themes.forEach((theme) =>{
+            if(localStorage.themePreference === theme){
+                icon.innerHTML = document.getElementById(theme).innerHTML;
+            }
+        })
+        const themeSelectIcon = docById("themeSelectIcon");
+        let themeList = themes;
+        themeSelectIcon.onclick = () => {
+            themeList.forEach((theme) => {
+                docById(theme).onclick = () => themeBox[`${theme}_onclick`](this.activity);
+            });
         };
     }
 
@@ -559,7 +596,8 @@ class Toolbar {
         ly_onclick,
         abc_onclick,
         mxml_onclick,
-        blockartworksvg_onclick
+        blockartworksvg_onclick,
+        blockartworkpng_onclick
     ) {
         const saveButton = docById('saveButton');
         const saveButtonAdvanced = docById('saveButtonAdvanced');
@@ -668,6 +706,10 @@ class Toolbar {
                 const saveArtworkSVG = docById('save-blockartwork-svg');
                 saveArtworkSVG.onclick = () => {
                     blockartworksvg_onclick(this.activity);
+                };
+                const saveArtworkPNG = docById('save-blockartwork-png');
+                saveArtworkPNG.onclick = () => {
+                    blockartworkpng_onclick(this.activity);
                 };
             }
         }
@@ -960,7 +1002,6 @@ class Toolbar {
 
         runStepByStepIcon.onclick = () => {
             onclick(this.activity);
-            docById("stop").style.color = this.stopIconColorWhenPlaying;
         };
     }
 
@@ -1033,7 +1074,7 @@ class Toolbar {
         const languageSelectIcon = docById("languageSelectIcon");
         const languages = [
             "enUS", "enUK", "es", "pt", "ko", "ja", "kana", "zhCN", "th",
-            "ayc", "quz", "gug", "hi", "ibo", "ar", "te", "he"
+            "ayc", "quz", "gug", "hi", "ibo", "ar", "te", "he", "ur"
         ];
     
         languageSelectIcon.onclick = () => {
@@ -1085,7 +1126,7 @@ function renderNewProjectConfirmation() {
     const confirmationButton = document.createElement("a");
     confirmationButton.id = "new-project";
     confirmationButton.style.display = "inline-block";
-    confirmationButton.style.backgroundColor = "#2196F3";
+    confirmationButton.style.backgroundColor = platformColor.blueButton;
     confirmationButton.style.color = "white";
     confirmationButton.style.textDecoration = "none";
     confirmationButton.style.borderRadius = "4px";

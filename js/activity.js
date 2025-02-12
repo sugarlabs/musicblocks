@@ -26,7 +26,7 @@
    getMacroExpansion, getOctaveRatio, getTemperament, GOHOMEBUTTON,
    GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
    hideDOMLabel, initBasicProtoBlocks, initPalettes,
-   INLINECOLLAPSIBLES, jQuery, JSEditor, LanguageBox, Logo, MSGBLOCK,
+   INLINECOLLAPSIBLES, jQuery, JSEditor, LanguageBox, ThemeBox, Logo, MSGBLOCK,
    NANERRORMSG, NOACTIONERRORMSG, NOBOXERRORMSG, NOINPUTERRORMSG,
    NOMICERRORMSG, NOSQRTERRORMSG, NOSTRINGERRORMSG, PALETTEFILLCOLORS,
    PALETTESTROKECOLORS, PALETTEHIGHLIGHTCOLORS, HIGHLIGHTSTROKECOLORS,
@@ -85,6 +85,7 @@ let MYDEFINES = [
     "activity/turtle-singer",
     "activity/turtle-painter",
     "activity/languagebox",
+    "activity/themebox",
     "activity/basicblocks",
     "activity/blockfactory",
     "activity/piemenus",
@@ -272,6 +273,19 @@ class Activity {
         //Flag to check if any other input box is active or not
         this.isInputON = false;
 
+        this.themes = ["light", "dark"];
+        try {
+            for (let i = 0; i < this.themes.length; i++) {
+                if (this.themes[i] === this.storage.themePreference) {
+                    body.classList.add(this.themes[i]);
+                } else {
+                    body.classList.remove(this.themes[i]);
+                }
+            }
+        } catch (e) {
+            console.error("Error accessing themePreference storage:", e);
+        }
+
         this.beginnerMode = true;
         try {
             if (this.storage.beginnerMode === undefined) {
@@ -374,6 +388,7 @@ class Activity {
             this.logo = null;
             this.pasteBox = null;
             this.languageBox = null;
+            this.themeBox = null;
             this.planet = null;
             window.converter = null;
             this.buttonsVisible = true;
@@ -430,29 +445,20 @@ class Activity {
 
             // Create the div for the close button (cross button)
             const closeButtonDiv = document.createElement("div");
-            closeButtonDiv.style.cssText = 
+            closeButtonDiv.style.cssText =
                 "position: absolute;" +
-                "top: 10px;" +  // Adjust the top position to center it vertically
-                "right: 10px;" + // Position the button on the right side of the helpfulSearchDiv
+                "top: 10px;" +
+                "right: 10px;" +
                 "cursor: pointer;";
 
             // Create the cross button itself
             const closeButton = document.createElement("button");
-            closeButton.textContent = "×"; // You can use HTML entity or an icon
-            closeButton.style.cssText = 
-            "position: absolute;" +
-                "top: 50%;" +  // Center vertically
-                "right: -30px;" +  // Place it outside the input, adjust as needed
-                "transform: translateY(-50%);" +  // Align with vertical center of input
-                "background: transparent;" +
-                "border: none;" +
-                "font-size: large;" +
-                "cursor: pointer;";
+            closeButton.textContent = "×";
+            closeButton.id = "crossButton";
+            document.body.appendChild(closeButton);
 
-            // Append the cross button to the closeButtonDiv
             closeButtonDiv.appendChild(closeButton);
 
-            // Append the closeButtonDiv to the helpfulSearchDiv
             this.helpfulSearchDiv.appendChild(closeButtonDiv);
 
             // Add event listener to remove the search div from the DOM
@@ -513,11 +519,14 @@ class Activity {
                 (event) => {
                     event.preventDefault();
                     event.stopPropagation();
-                    if (this.beginnerMode) return;          
-                    if (!this.blocks.isCoordinateOnBlock(event.clientX, event.clientY) && 
+                    if (this.beginnerMode) return;
+                    if (this.isHelpfulSearchWidgetOn) {
+                        this._hideHelpfulSearchWidget();
+                    }
+                    if (!this.blocks.isCoordinateOnBlock(event.clientX, event.clientY) &&
                         event.target.id === "myCanvas") {
                         this._displayHelpfulWheel(event);
-                    }         
+                    }
                 },
                 false
             );
@@ -531,20 +540,20 @@ class Activity {
 
             const x = event.clientX;
             const y = event.clientY;
-        
+
             const canvasLeft = this.canvas.offsetLeft + 28 * this.getStageScale();
             const canvasTop = this.canvas.offsetTop + 6 * this.getStageScale();
-        
+
             const helpfulWheelLeft = Math.max(Math.round(x * this.getStageScale() + canvasLeft) - 150, canvasLeft);
             const helpfulWheelTop = Math.max(Math.round(y * this.getStageScale() + canvasTop) - 150, canvasTop);
 
             docById("helpfulWheelDiv").style.left = helpfulWheelLeft + "px";
-           
+
             docById("helpfulWheelDiv").style.top = helpfulWheelTop + "px";
-            
+
             const windowWidth = window.innerWidth - 20;
             const windowHeight = window.innerHeight - 20;
-            
+
             if (helpfulWheelLeft + 350 > windowWidth) {
                 docById("helpfulWheelDiv").style.left = (windowWidth - 350) + "px";
             }
@@ -576,11 +585,11 @@ class Activity {
             const closeHelpfulWheel = (e) => {
                 const isClickInside = helpfulWheelDiv.contains(e.target);
                 if (!isClickInside) {
-                    helpfulWheelDiv.style.display = "none"; 
+                    helpfulWheelDiv.style.display = "none";
                     document.removeEventListener("click", closeHelpfulWheel);
                 }
             };
-        
+
             document.addEventListener("click", closeHelpfulWheel);
         }
 
@@ -648,11 +657,11 @@ class Activity {
 
         /**
         * Recenters blocks by updating their position on the screen.
-        * 
+        *
         * This function triggers the `_findBlocks` method on the provided `activity` object,
         * which recalculates the positions of blocks. If the 'helpfulWheelDiv' element is visible,
         * it is hidden, and the `__tick` method is called to update the activity state.
-        * 
+        *
         * @param {Object} activity - The activity instance containing the blocks to recenter.
         * @constructor
         */
@@ -665,11 +674,197 @@ class Activity {
         };
 
         /**
+        * Ensures blocks stay within canvas boundaries when resized.
+        * Ensures that music blocks are responsive to horizontal resizing.
+        * Ensures that overall integrity of blocks isn't hampered with.
+        */
+        function repositionBlocks(activity) {
+            
+            const canvasWidth = window.innerWidth;
+            const processedBlocks = new Set();
+        
+            //Array for storing individual dragGroups (the chunks of code linked together which are not connected)
+            const dragGroups = [];
+
+            // Identifying individual dragGroups 
+            Object.values(activity.blocks.blockList).forEach(block => {
+                if (!processedBlocks.has(block.id)) {
+                    
+                    activity.blocks.findDragGroup(block.id); 
+
+                    if (activity.blocks.dragGroup.length > 0) {
+                        dragGroups.push([...activity.blocks.dragGroup]); // Store the group into dragGroups
+                        activity.blocks.dragGroup.forEach(id => processedBlocks.add(id)); // Process individual groups
+                    }
+                }
+            });
+        
+            // Repositioning of dragGroups according to horizontal resizing
+            dragGroups.forEach(group => {
+                let referenceBlock = activity.blocks.blockList[group[0]]; 
+        
+                // Store initial positions
+                if (!referenceBlock.initialPosition) {
+                    referenceBlock.initialPosition = { x: referenceBlock.container.x, y: referenceBlock.container.y };
+                }
+        
+                if (canvasWidth < 768 && !referenceBlock.beforeMobilePosition) {
+                    referenceBlock.beforeMobilePosition = { x: referenceBlock.container.x, y: referenceBlock.container.y };
+                }
+
+                if (canvasWidth >= 768 && referenceBlock.beforeMobilePosition) {
+                    let dx = referenceBlock.beforeMobilePosition.x - referenceBlock.container.x;
+                    let dy = referenceBlock.beforeMobilePosition.y - referenceBlock.container.y;
+                    group.forEach(blockId => {
+                        let block = activity.blocks.blockList[blockId];
+                        block.container.x += dx;
+                        block.container.y += dy;
+                    });
+                    referenceBlock.beforeMobilePosition = null; // Clear stored position
+                    //this prevents old groups from affecting new calculations.
+                }
+        
+                if (canvasWidth < 600 && !referenceBlock.before600pxPosition) {
+                    referenceBlock.before600pxPosition = { x: referenceBlock.container.x, y: referenceBlock.container.y };
+                }
+
+                if (canvasWidth >= 600 && referenceBlock.before600pxPosition) {
+                    let dx = referenceBlock.before600pxPosition.x - referenceBlock.container.x;
+                    let dy = referenceBlock.before600pxPosition.y - referenceBlock.container.y;
+
+                    group.forEach(blockId => {
+                        let block = activity.blocks.blockList[blockId];
+                        block.container.x += dx;
+                        block.container.y += dy;
+                    });
+                    referenceBlock.before600pxPosition = null;
+                }
+        
+                // Ensure blocks stay within horizontal boundary
+                let rightmostX = Math.max(...group.map(id => activity.blocks.blockList[id].container.x + activity.blocks.blockList[id].width));
+        
+                if (rightmostX > canvasWidth) {
+                    let shiftX = Math.max(10, canvasWidth - rightmostX - 10);
+
+                    group.forEach(blockId => {
+                        activity.blocks.blockList[blockId].container.x += shiftX;
+                    });
+                }
+                
+                // Ensures that blocks do not go hide behind the search for blocks div
+                let leftmostX = Math.min(...group.map(id => activity.blocks.blockList[id].container.x));
+                if (leftmostX < 0) {
+                    let shiftX = 100 - leftmostX;
+
+                    group.forEach(blockId => {
+                        activity.blocks.blockList[blockId].container.x += shiftX;
+                    });
+                }
+                
+            });
+        
+            activity._findBlocks();
+        }
+        
+        //if any window resize event occurs:
+        window.addEventListener("resize", () => repositionBlocks(this));
+
+        /**
+        * Finds and organizes blocks within the workspace.
+        * Arranges blocks in grid format on wide screens and vertically on narrow screens.
+         */
+        this._findBlocks = () => {
+            if (!this.blocks.visible) {
+                this._changeBlockVisibility();
+            }
+
+            this.blocks.activeBlock = null;
+            hideDOMLabel();
+            this.blocks.showBlocks();
+            this.blocksContainer.x = 0;
+            this.blocksContainer.y = 0;
+
+            const screenWidth = window.innerWidth;
+            const isNarrowScreen = screenWidth < 600;
+            const minColumnWidth = 400;
+            let numColumns = isNarrowScreen ? 1 : Math.floor(screenWidth / minColumnWidth);
+
+            let toppos = this.auxToolbar.style.display === "block" ? 90 + this.toolbarHeight : 90;
+            let x = isNarrowScreen ? Math.floor(screenWidth / 2) : Math.floor(this.canvas.width / 4);
+            let y = Math.floor(toppos * this.turtleBlocksScale);
+            let verticalSpacing = Math.floor(40 * this.turtleBlocksScale);
+
+            const columnSpacing = (screenWidth / numColumns) * 1.2;
+            const columnXPositions = Array.from({ length: numColumns }, (_, i) =>
+                Math.floor(i * columnSpacing + columnSpacing / 2)
+            );
+            const columnYPositions = Array(numColumns).fill(y);
+
+            for (const blk in this.blocks.blockList) {
+                if (!this.blocks.blockList[blk].trash) {
+                    const myBlock = this.blocks.blockList[blk];
+
+                        // Store original position only once
+                        if (!myBlock.originalPosition) {
+                        myBlock.originalPosition = { x: myBlock.container.x, y: myBlock.container.y };
+                    }
+
+                    if (myBlock.connections[0] === null) {
+                        if (isNarrowScreen) {
+                            const dx = x - myBlock.container.x;
+                            const dy = y - myBlock.container.y;
+                            this.blocks.moveBlockRelative(blk, dx, dy);
+                            y += myBlock.height + verticalSpacing;
+                        } else {
+                            let minYIndex = columnYPositions.indexOf(Math.min(...columnYPositions));
+                            const dx = columnXPositions[minYIndex] - myBlock.container.x;
+                            const dy = columnYPositions[minYIndex] - myBlock.container.y;
+                            this.blocks.moveBlockRelative(blk, dx, dy);
+                            columnYPositions[minYIndex] += myBlock.height + verticalSpacing;
+                        }
+                    }
+
+                    // Making code to make sure that 
+                    if (myBlock.connections.length>0)  {
+                        myBlock.connections.forEach(conn  =>  {
+                            if (conn !== null) {
+                                let innerBlock = this.blocks.blockList[conn] ;
+                                if (innerBlock) {
+
+                                    innerBlock.container.x = myBlock.container.x + innerBlock.relativeX;
+                                    innerBlock.container.y = myBlock.container.y + innerBlock.relativeY;
+                                }
+
+                            }
+
+                        });
+                    }
+                }
+            }
+
+            repositionBlocks(this);
+            this.setHomeContainers(false);
+            this.boundary.hide();
+
+            for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+                const savedPenState = this.turtles.turtleList[turtle].painter.penState;
+                this.turtles.turtleList[turtle].painter.penState = false;
+                this.turtles.turtleList[turtle].painter.doSetXY(0, 0);
+                this.turtles.turtleList[turtle].painter.doSetHeading(0);
+                this.turtles.turtleList[turtle].painter.penState = savedPenState;
+            }
+        };
+
+
+        /**
         * Finds and organizes blocks within the workspace.
         * Blocks are positioned based on their connections and availability within the canvas area.
         * This method is part of the internal mechanism to ensure that blocks are displayed correctly and efficiently.
         * @constructor
         */
+        // Flag to track number of clicks and for alternate mode switching while clicking
+        this._isFirstHomeClick = true;
+
         this._findBlocks = () => {
             // Ensure visibility of blocks
             if (!this.blocks.visible) {
@@ -685,120 +880,179 @@ class Activity {
             this.blocksContainer.x = 0;
             this.blocksContainer.y = 0;
 
-            // Calculate top and left positions for block placement
-            let toppos;
-            if (this.auxToolbar.style.display === "block") {
-                toppos = 90 + this.toolbarHeight;
+            if (this._isFirstHomeClick) {
+                // First clicked logic (arrange blocks in rows may have overlapping of blocks)
+                let toppos;
+                if (this.auxToolbar.style.display === "block") {
+                    toppos = 90 + this.toolbarHeight;
+                } else {
+                    toppos = 90;
+                }
+                const leftpos = Math.floor(this.canvas.width / 4);
+
+                this.palettes.updatePalettes();
+                let x = Math.floor(leftpos * this.turtleBlocksScale);
+                let y = Math.floor(toppos * this.turtleBlocksScale);
+                let even = true;
+
+                // Position "start" blocks first
+                for (const blk in this.blocks.blockList) {
+                    if (!this.blocks.blockList[blk].trash) {
+                        const myBlock = this.blocks.blockList[blk];
+                        if (myBlock.name !== "start") {
+                            continue;
+                        }
+                        if (myBlock.connections[0] === null) {
+                            const dx = x - myBlock.container.x;
+                            const dy = y - myBlock.container.y;
+                            this.blocks.moveBlockRelative(blk, dx, dy);
+                            this.blocks.findDragGroup(blk);
+
+                            if (this.blocks.dragGroup.length > 0) {
+                                for (let b = 0; b < this.blocks.dragGroup.length; b++) {
+                                    const bblk = this.blocks.dragGroup[b];
+                                    if (b !== 0) {
+                                        this.blocks.moveBlockRelative(bblk, dx, dy);
+                                    }
+                                }
+                            }
+
+                            x += Math.floor(150 * this.turtleBlocksScale);
+                            if (x > (this.canvas.width * 7) / 8 / this.turtleBlocksScale) {
+                                even = !even;
+                                if (even) {
+                                    x = Math.floor(leftpos);
+                                } else {
+                                    x = Math.floor(leftpos + STANDARDBLOCKHEIGHT);
+                                }
+                                y += STANDARDBLOCKHEIGHT;
+                            }
+                        }
+                    }
+                }
+
+                // Position other blocks
+                for (const blk in this.blocks.blockList) {
+                    if (!this.blocks.blockList[blk].trash) {
+                        const myBlock = this.blocks.blockList[blk];
+                        if (myBlock.name === "start") {
+                            continue;
+                        }
+                        if (myBlock.connections[0] === null) {
+                            const dx = x - myBlock.container.x;
+                            const dy = y - myBlock.container.y;
+                            this.blocks.moveBlockRelative(blk, dx, dy);
+                            this.blocks.findDragGroup(blk);
+
+                            if (this.blocks.dragGroup.length > 0) {
+                                for (let b = 0; b < this.blocks.dragGroup.length; b++) {
+                                    const bblk = this.blocks.dragGroup[b];
+                                    if (b !== 0) {
+                                        this.blocks.moveBlockRelative(bblk, dx, dy);
+                                    }
+                                }
+                            }
+
+                            x += Math.floor(150 * this.turtleBlocksScale);
+                            if (x > (this.canvas.width * 7) / 8 / this.turtleBlocksScale) {
+                                even = !even;
+                                if (even) {
+                                    x = Math.floor(leftpos);
+                                } else {
+                                    x = Math.floor(leftpos + STANDARDBLOCKHEIGHT);
+                                }
+                                y += STANDARDBLOCKHEIGHT;
+                            }
+                        }
+                    }
+                }
             } else {
-                toppos = 90;
-            }
-            const leftpos = Math.floor(this.canvas.width / 4);
+                // Second click logic (arrange blocks in columns this avoid overlapping of blocks)
+                let toppos;
+                if (this.auxToolbar.style.display === "block") {
+                    toppos = 90 + this.toolbarHeight;
+                } else {
+                    toppos = 90;
+                }
 
-            // Update palettes and calculate initial block position
-            this.palettes.updatePalettes();
-            let x = Math.floor(leftpos * this.turtleBlocksScale);
-            let y = Math.floor(toppos * this.turtleBlocksScale);
-            let even = true;
+                /**
+                * Device type resolution ranges and typical orientation:
+                * Desktop: 1024x768 to 5120x2880 (Landscape primary, Portrait supported)
+                * Tablet: 768x1024 to 2560x1600 (Portrait common, Landscape supported)
+                * Mobile: 320x480 to 1440x3200 (Portrait primary, Landscape supported)
+                * Minimum column width is set to 400px to ensure readability and usability.
+                */
 
-            // Position start blocks first
-            for (const blk in this.blocks.blockList) {
-                if (!this.blocks.blockList[blk].trash) {
-                    const myBlock = this.blocks.blockList[blk];
-                    if (myBlock.name !== "start") {
-                        continue;
-                    }
+                const screenWidth = window.innerWidth;
+                const minColumnWidth = 320;
+                let numColumns = screenWidth <= 320 ? 1 : Math.floor(screenWidth / minColumnWidth);
 
-                    // Move block and its connected group
-                    if (myBlock.connections[0] === null) {
-                        const dx = x - myBlock.container.x;
-                        const dy = y - myBlock.container.y;
-                        this.blocks.moveBlockRelative(blk, dx, dy);
-                        this.blocks.findDragGroup(blk);
-                        if (this.blocks.dragGroup.length > 0) {
-                            for (let b = 0; b < this.blocks.dragGroup.length; b++) {
-                                const bblk = this.blocks.dragGroup[b];
-                                if (b !== 0) {
-                                    this.blocks.moveBlockRelative(bblk, dx, dy);
+                const baseColumnSpacing = screenWidth / numColumns;
+                const columnSpacing = baseColumnSpacing * 1.2;
+
+                const initialY = Math.floor(toppos * this.turtleBlocksScale);
+                const baseVerticalSpacing = Math.floor(20 * this.turtleBlocksScale);
+                const verticalSpacing = baseVerticalSpacing * 1.2;
+
+                const columnXPositions = Array.from({ length: numColumns }, (_, i) =>
+                    Math.floor(i * columnSpacing + columnSpacing / 2)
+                );
+                const columnYPositions = Array(numColumns).fill(initialY);
+
+                for (const blk in this.blocks.blockList) {
+                    if (!this.blocks.blockList[blk].trash) {
+                        const myBlock = this.blocks.blockList[blk];
+                        if (myBlock.connections[0] === null) {
+                            let minYIndex = 0;
+                            for (let i = 1; i < numColumns; i++) {
+                                if (columnYPositions[i] < columnYPositions[minYIndex]) {
+                                    minYIndex = i;
                                 }
                             }
-                        }
 
-                        // Update x and y positions for next block placement
-                        x += Math.floor(150 * this.turtleBlocksScale);
-                        if (x > (this.canvas.width * 7) / 8 / this.turtleBlocksScale) {
-                            even = !even;
-                            if (even) {
-                                x = Math.floor(leftpos);
-                            } else {
-                                x = Math.floor(leftpos + STANDARDBLOCKHEIGHT);
+                            const dx = columnXPositions[minYIndex] - myBlock.container.x;
+                            const dy = columnYPositions[minYIndex] - myBlock.container.y;
+                            this.blocks.moveBlockRelative(blk, dx, dy);
+                            this.blocks.findDragGroup(blk);
+
+                            if (this.blocks.dragGroup.length > 0) {
+                                for (let b = 0; b < this.blocks.dragGroup.length; b++) {
+                                    const bblk = this.blocks.dragGroup[b];
+                                    if (b !== 0) {
+                                        this.blocks.moveBlockRelative(bblk, dx, dy);
+                                    }
+                                }
                             }
-
-                            y += STANDARDBLOCKHEIGHT;
+                            columnYPositions[minYIndex] += myBlock.height + verticalSpacing;
                         }
                     }
                 }
             }
 
-            // Position other blocks
-            for (const blk in this.blocks.blockList) {
-                if (!this.blocks.blockList[blk].trash) {
-                    const myBlock = this.blocks.blockList[blk];
-                    if (myBlock.name === "start") {
-                        continue;
-                    }
-
-                    // Move block and its connected group
-                    if (myBlock.connections[0] === null) {
-                        const dx = x - myBlock.container.x;
-                        const dy = y - myBlock.container.y;
-                        this.blocks.moveBlockRelative(blk, dx, dy);
-                        this.blocks.findDragGroup(blk);
-                        if (this.blocks.dragGroup.length > 0) {
-                            for (let b = 0; b < this.blocks.dragGroup.length; b++) {
-                                const bblk = this.blocks.dragGroup[b];
-                                if (b !== 0) {
-                                    this.blocks.moveBlockRelative(bblk, dx, dy);
-                                }
-                            }
-                        }
-
-                        // Update x and y positions for next block placement
-                        x += 150 * this.turtleBlocksScale;
-                        if (x > (this.canvas.width * 7) / 8 / this.turtleBlocksScale) {
-                            even = !even;
-                            if (even) {
-                                x = Math.floor(leftpos);
-                            } else {
-                                x = Math.floor(leftpos + STANDARDBLOCKHEIGHT);
-                            }
-
-                            y += STANDARDBLOCKHEIGHT;
-                        }
-                    }
-                }
-            }
-
-            // Blocks are all home, so reset go-home-button.
+            // Reset go-home button
             this.setHomeContainers(false);
             this.boundary.hide();
 
             // Return mice to the center of the screen.
             // Reset turtles' positions to center of the screen
-            for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
-                const savedPenState = this.turtles.turtleList[turtle].painter.penState;
-                this.turtles.turtleList[turtle].painter.penState = false;
-                this.turtles.turtleList[turtle].painter.doSetXY(0, 0);
-                this.turtles.turtleList[turtle].painter.doSetHeading(0);
-                this.turtles.turtleList[turtle].painter.penState = savedPenState;
+            for (let turtle = 0; turtle < this.turtles.getTurtleCount(); turtle++) {
+                const requiredTurtle = this.turtles.getTurtle(turtle);
+                const savedPenState = requiredTurtle.painter.penState;
+                requiredTurtle.painter.penState = false;
+                requiredTurtle.painter.doSetXY(0, 0);
+                requiredTurtle.painter.doSetHeading(0);
+                requiredTurtle.painter.penState = savedPenState;
             }
+            // Alternate mode switching on clicking Home button
+            this._isFirstHomeClick = !this._isFirstHomeClick;
         };
 
         /**
         * Toggles the visibility of the home button container.
-        * 
+        *
         * Depending on the state provided, this method will either hide or show the home button container.
         * If the home button container is not initialized, the function will exit early.
-        * 
+        *
         * @param {boolean} homeState - If true, shows the container; if false, hides it.
         * @constructor
         */
@@ -1038,6 +1292,44 @@ class Activity {
                 encodeURIComponent(svg)
             );
         };
+       
+        /**
+        * @returns {PNG} returns PNG of block artwork
+        */
+        this.printBlockPNG = async () => {
+            // Setps to convert the SVG to PNG of BlockArtwork
+            // Step 1: Generate the SVG content
+            // Step 2: Create a Canvas element
+            // Step 3: Convert SVG to an Image object
+            // Step 4: Draw SVG on the Canvas and export as PNG
+
+            const svgContent = this.printBlockSVG();
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const parser = new DOMParser();
+            const svgDoc = parser.parseFromString(decodeURIComponent(svgContent), "image/svg+xml");
+            const svgElement = svgDoc.documentElement;
+            const width = parseInt(svgElement.getAttribute('width'), 10);
+            const height = parseInt(svgElement.getAttribute('height'), 10);
+            canvas.width = width;
+            canvas.height = height;
+            const img = new Image();
+            const svgBlob = new Blob([decodeURIComponent(svgContent)], { type: "image/svg+xml;charset=utf-8" });
+            const url = URL.createObjectURL(svgBlob);
+            return new Promise((resolve, reject) => {
+                img.onload = () => {
+                    ctx.drawImage(img, 0, 0);
+                    URL.revokeObjectURL(url);
+                    const pngDataUrl = canvas.toDataURL("image/png");
+                    resolve(pngDataUrl);
+                };
+                img.onerror = (err) => {
+                    URL.revokeObjectURL(url);
+                    reject(err);
+                };
+                img.src = url;
+            });
+        };
 
         /*
          * Clears "canvas"
@@ -1051,20 +1343,20 @@ class Activity {
             modal.style.transform = "translate(-50%, -50%)";
             modal.style.width = "400px";
             modal.style.padding = "24px";
-            modal.style.backgroundColor = "#fff";
+            modal.style.backgroundColor = platformColor.dialogueBox;
             modal.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
             modal.style.borderRadius = "8px";
             modal.style.zIndex = "10000";
             modal.style.textAlign = "left";
             const title = document.createElement("h2");
             title.textContent = "Clear Workspace";
-            title.style.color = "#0066FF";
+            title.style.color = platformColor.blueButton;
             title.style.fontSize = "24px";
             title.style.margin = "0 0 16px 0";
             modal.appendChild(title);
             const message = document.createElement("p");
-            message.textContent = "Are you sure you want to clear the workspace?";
-            message.style.color = "#666666";
+            message.textContent = _("Are you sure you want to clear the workspace?");
+            message.style.color = platformColor.textColor;
             message.style.fontSize = "16px";
             message.style.marginBottom = "24px";
             modal.appendChild(message);
@@ -1072,10 +1364,10 @@ class Activity {
             const buttonContainer = document.createElement("div");
             buttonContainer.style.display = "flex";
             buttonContainer.style.justifyContent = "flex-start";
-        
+
             const confirmBtn = document.createElement("button");
             confirmBtn.textContent = "Confirm";
-            confirmBtn.style.backgroundColor = "#2196F3";
+            confirmBtn.style.backgroundColor = platformColor.blueButton;
             confirmBtn.style.color = "white";
             confirmBtn.style.border = "none";
             confirmBtn.style.borderRadius = "4px";
@@ -1087,7 +1379,7 @@ class Activity {
                 document.body.removeChild(modal);
                 clearCanvasAction();
             });
-        
+
             const cancelBtn = document.createElement("button");
             cancelBtn.textContent = "Cancel";
             cancelBtn.style.backgroundColor = "#f1f1f1";
@@ -1100,18 +1392,18 @@ class Activity {
             cancelBtn.addEventListener("click", () => {
                 document.body.removeChild(modal);
             });
-        
+
             buttonContainer.appendChild(confirmBtn);
             buttonContainer.appendChild(cancelBtn);
             modal.appendChild(buttonContainer);
             document.body.appendChild(modal);
         };
-        
+
         this._allClear = (noErase, skipConfirmation = false) => {
             const clearCanvasAction = () => {
                 this.blocks.activeBlock = null;
                 hideDOMLabel();
-        
+
                 this.logo.boxes = {};
                 this.logo.time = 0;
                 this.hideMsgs();
@@ -1119,23 +1411,23 @@ class Activity {
                 this.turtles.setBackgroundColor(-1);
                 this.logo.svgOutput = "";
                 this.logo.notationOutput = "";
-                for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
+                for (let turtle = 0; turtle < this.turtles.getTurtleCount(); turtle++) {
                     this.logo.turtleHeaps[turtle] = [];
                     this.logo.turtleDicts[turtle] = {};
                     this.logo.notation.notationStaging[turtle] = [];
                     this.logo.notation.notationDrumStaging[turtle] = [];
                     if (noErase === undefined || !noErase) {
-                        this.turtles.turtleList[turtle].painter.doClear(true, true, true);
+                        this.turtles.getTurtle(turtle).painter.doClear(true, true, true);
                     }
                 }
-        
+
                 this.blocksContainer.x = 0;
                 this.blocksContainer.y = 0;
-        
+
                 Element.prototype.remove = () => {
                     this.parentElement.removeChild(this);
                 };
-        
+
                 NodeList.prototype.remove = HTMLCollection.prototype.remove = () => {
                     for (let i = 0, len = this.length; i < len; i++) {
                         if (this[i] && this[i].parentElement) {
@@ -1143,18 +1435,18 @@ class Activity {
                         }
                     }
                 };
-        
+
                 const table = docById("myTable");
                 if (table !== null) {
                     table.remove();
                 }
-        
+
                 if (docById("helpfulWheelDiv").style.display !== "none") {
                     docById("helpfulWheelDiv").style.display = "none";
                     this.__tick();
                 }
             };
-        
+
             if (skipConfirmation) {
                 clearCanvasAction();
             } else {
@@ -1449,9 +1741,17 @@ class Activity {
                 // Queue and take first step.
                 if (!this.turtles.running()) {
                     this.logo.runLogoCommands();
+                    docById("stop").style.color = this.toolbar.stopIconColorWhenPlaying;
                 }
                 this.logo.step();
             } else {
+
+                const noBlocks = Object.keys(this.logo.stepQueue).every(key=>this.logo.stepQueue[key].length===0);
+                if (noBlocks) {
+                this.logo.doStopTurtles();
+                docById("stop").style.color = "white";
+                return;
+            }
                 this.logo.turtleDelay = this.TURTLESTEP;
                 this.logo.step();
             }
@@ -1507,16 +1807,19 @@ class Activity {
                 activity.save.savePNG.bind(activity.save),
                 activity.save.saveWAV.bind(activity.save),
                 activity.save.saveLilypond.bind(activity.save),
+                activity.save.saveLilypond.bind(afterSaveLilypond),
+                activity.save.afterSaveLilypondLY.bind(activity.save),
                 activity.save.saveAbc.bind(activity.save),
                 activity.save.saveMxml.bind(activity.save),
-                activity.save.saveBlockArtwork.bind(activity.save)
+                activity.save.saveBlockArtwork.bind(activity.save),
+                activity.save.saveBlockArtworkPNG.bind(activity.save)
             );
-        
+
             // Regenerate palettes
             if (activity.regeneratePalettes) {
                 activity.regeneratePalettes();
             }
-        
+
             // Force immediate canvas refresh
             activity.refreshCanvas();
         };
@@ -1637,7 +1940,7 @@ class Activity {
                     that.resizeDebounce = false;
                 }, 200);
             }
-        
+
             await this.setSmallerLargerStatus();
             await this.stage.update();
         };
@@ -1654,7 +1957,7 @@ class Activity {
             }
         };
 
-        
+
         /**
          * Manages the resizing of blocks to handle larger size.
          */
@@ -1665,7 +1968,7 @@ class Activity {
                 if (this.blockscale > 0) {
                     this.resizeDebounce = true;
                     this.blockscale -= 1;
-                    this.clearCache();                
+                    this.clearCache();
                     await this.blocks.setBlockScale(BLOCKSCALES[this.blockscale]);
                     this.blocks.checkBounds();
                     this.refreshCanvas();
@@ -1999,7 +2302,7 @@ class Activity {
                 const data = normalizeWheel(event);
                 const delY = data.pixelY;
                 const delX = data.pixelX;
-    
+
                 if (event.ctrlKey) {
                     event.preventDefault();
                     delY < 0 ? doLargerBlocks(that) : doSmallerBlocks(that);
@@ -2012,7 +2315,7 @@ class Activity {
                 } else {
                     event.preventDefault();
                 }
-    
+
                 that.refreshCanvas();
             };
 
@@ -2066,7 +2369,7 @@ class Activity {
                 that.stage.on("stagemousemove", (event) => {
                     that.stageX = event.stageX;
                     that.stageY = event.stageY;
-    
+
                     if (!that.moving) return;
 
                     // if we are moving the block container, deselect the active block.
@@ -2761,6 +3064,11 @@ class Activity {
                         if (this.searchWidget.style.visibility === 'visible') {
                             return;
                         }
+                        if (docById("paste").style.visibility === "visible") {
+                            this.pasted();
+			    docById("paste").style.visibility = "hidden";
+                            return;
+                        }
                         this.textMsg("Enter " + _("Play"));
                         let stopbt = document.getElementById("stop");
                         if (stopbt) {
@@ -2773,7 +3081,7 @@ class Activity {
                         this.logo.doStopTurtles();
                         break;
                     case 86: // 'V'
-                        this.textMsg("Alt-V " + _("Paste"));
+                        // this.textMsg("Alt-V " + _("Paste"));
                         this.blocks.pasteStack();
                         break;
                     case 72: // 'H' save block help
@@ -2790,12 +3098,12 @@ class Activity {
                             this.blocksContainer.x -= this.canvas.width / 10;
                             this.stage.update();
                         }
-    
+
                 }
             } else if (event.ctrlKey) {
                 switch (event.keyCode) {
                     case V:
-                        this.textMsg("Ctl-V " + _("Paste"));
+                        // this.textMsg("Ctl-V " + _("Paste"));
                         this.pasteBox.createBox(this.turtleBlocksScale, 200, 200);
                         this.pasteBox.show();
                         docById("paste").style.left =
@@ -3087,6 +3395,9 @@ class Activity {
                     this.saveLocally();
                 }
             }
+            if (!this.stage) {
+                return;
+            }
 
             const $j = jQuery.noConflict();
             let w = 0,
@@ -3106,7 +3417,7 @@ class Activity {
             this._innerHeight = window.innerHeight;
             this._outerWidth = window.outerWidth;
             this._outerHeight = window.outerHeight;
-    
+
             if (docById("labelDiv").classList.contains("hasKeyboard")) {
                 return;
             }
@@ -3256,8 +3567,8 @@ class Activity {
                 this.palettes.setMobile(false);
             }
 
-            for (let turtle = 0; turtle < this.turtles.turtleList.length; turtle++) {
-                this.turtles.turtleList[turtle].painter.doClear(false, false, true);
+            for (let turtle = 0; turtle < this.turtles.getTurtleCount(); turtle++) {
+                this.turtles.getTurtle(turtle).painter.doClear(false, false, true);
             }
 
             const artcanvas = docById("overlayCanvas");
@@ -3272,7 +3583,7 @@ class Activity {
 
             this.blocks.checkBounds();
         };
-        
+
         const container = document.getElementById("canvasContainer");
         const canvas = document.getElementById("myCanvas");
         const overCanvas = document.getElementById("canvas");
@@ -3321,7 +3632,7 @@ class Activity {
             }, 100);
         });
         window.addEventListener("orientationchange",  handleResize);
-        const that = this;        
+        const that = this;
         const resizeCanvas_ = () => {
             try {
                 that._onResize(false);
@@ -3331,10 +3642,10 @@ class Activity {
                 console.error("An error occurred in resizeCanvas_:", error);
             }
         };
-        
+
         resizeCanvas_();
         window.addEventListener("orientationchange", resizeCanvas_);
-        
+
         /*
          * Restore last stack pushed to trashStack back onto canvas.
          * Hides palettes before update
@@ -3343,16 +3654,11 @@ class Activity {
         const restoreTrash = (activity) => {
             if (!activity.blocks || !activity.blocks.trashStacks || activity.blocks.trashStacks.length === 0) {
                 activity.textMsg(
-                    _("Nothing in the trash to restore."),
+                    _("Trash can is empty."),
                     3000 
                 );
                 return;
             }
-            activity._restoreTrash();
-            activity.textMsg(
-                _("Item restored from the trash."),
-                3000 
-            );
         
             if (docById("helpfulWheelDiv").style.display !== "none") {
                 docById("helpfulWheelDiv").style.display = "none";
@@ -3360,74 +3666,76 @@ class Activity {
             }
         };
 
-        this._restoreTrash = () => {
+        const restoreTrashPop = (activity) => {
+            if (!activity.blocks || !activity.blocks.trashStacks || activity.blocks.trashStacks.length === 0) {
+                activity.textMsg(
+                    _("Trash can is empty."),
+                    3000 
+                );
+                return;
+            }
+            this._restoreTrashById(this.blocks.trashStacks[this.blocks.trashStacks.length - 1]);
+            activity.textMsg(
+                _("Item restored from the trash."),
+                3000
+            );
+
+            if (docById("helpfulWheelDiv").style.display !== "none") {
+                docById("helpfulWheelDiv").style.display = "none";
+                activity.__tick();
+            }
+        
+        }
+
+        this._restoreTrashById = (blockId) => {
+            const blockIndex = this.blocks.trashStacks.indexOf(blockId);
+            if (blockIndex === -1) return; // Block not found in trash
+        
+            this.blocks.trashStacks.splice(blockIndex, 1); // Remove from trash
+        
             for (const name in this.palettes.dict) {
                 this.palettes.dict[name].hideMenu(true);
             }
-            
             this.blocks.activeBlock = null;
             this.refreshCanvas();
 
             const dx = 0;
             const dy = -this.cellSize * 3; // Reposition
-
-            if (this.blocks.trashStacks.length === 0) {
-                return;
-            }
-
-            const thisBlock = this.blocks.trashStacks.pop();
-
-            // Restore drag group in trash
-            this.blocks.findDragGroup(thisBlock);
+        
+            // Restore drag group
+            this.blocks.findDragGroup(blockId);
             for (let b = 0; b < this.blocks.dragGroup.length; b++) {
                 const blk = this.blocks.dragGroup[b];
                 this.blocks.blockList[blk].trash = false;
                 this.blocks.moveBlockRelative(blk, dx, dy);
                 this.blocks.blockList[blk].show();
             }
-
-            this.blocks.raiseStackToTop(thisBlock);
-
-            if (
-                this.blocks.blockList[thisBlock].name === "start" ||
-                this.blocks.blockList[thisBlock].name === "drum"
-            ) {
-                const turtle = this.blocks.blockList[thisBlock].value;
-                this.turtles.turtleList[turtle].inTrash = false;
-                this.turtles.turtleList[turtle].container.visible = true;
-            } else if (this.blocks.blockList[thisBlock].name === "action") {
-                // We need to add a palette entry for this action.
-                // But first we need to ensure we have a unqiue name,
-                // as the name could have been taken in the interim.
-                const actionArg = this.blocks.blockList[
-                    this.blocks.blockList[thisBlock].connections[1]
-                ];
+        
+            this.blocks.raiseStackToTop(blockId);       
+            const restoredBlock = this.blocks.blockList[blockId];
+        
+            if (restoredBlock.name === 'start' || restoredBlock.name === 'drum') {
+                const turtle = restoredBlock.value;
+                this.turtles.getTurtle(turtle).inTrash = false;
+                this.turtles.getTurtle(turtle).container.visible = true;
+            } else if (restoredBlock.name === 'action') {
+                const actionArg = this.blocks.blockList[restoredBlock.connections[1]];
                 if (actionArg !== null) {
                     let label;
                     const oldName = actionArg.value;
-                    // Mark the action block as still being in the
-                    // trash so that its name won't be considered when
-                    // looking for a unique name.
-                    this.blocks.blockList[thisBlock].trash = true;
+                    restoredBlock.trash = true;
                     const uniqueName = this.blocks.findUniqueActionName(oldName);
-                    this.blocks.blockList[thisBlock].trash = false;
+                    restoredBlock.trash = false;
 
                     if (uniqueName !== actionArg) {
                         actionArg.value = uniqueName;
-
-                        label = actionArg.value.toString();
-                        if (label.length > 8) {
-                            label = label.substr(0, 7) + "...";
-                        }
+                        label = uniqueName.length > 8 ? uniqueName.substr(0, 7) + '...' : uniqueName;
                         actionArg.text.text = label;
 
                         if (actionArg.label !== null) {
                             actionArg.label.value = uniqueName;
                         }
-
                         actionArg.container.updateCache();
-
-                        // Check the drag group to ensure any do blocks are updated (in case of recursion).
                         for (let b = 0; b < this.blocks.dragGroup.length; b++) {
                             const me = this.blocks.blockList[this.blocks.dragGroup[b]];
                             if (
@@ -3438,11 +3746,7 @@ class Activity {
                             ) {
                                 me.privateData = uniqueName;
                                 me.value = uniqueName;
-
-                                label = me.value.toString();
-                                if (label.length > 8) {
-                                    label = label.substr(0, 7) + "...";
-                                }
+                                label = uniqueName.length > 8 ? uniqueName.substr(0, 7) + '...' : uniqueName;
                                 me.text.text = label;
                                 me.overrideName = label;
                                 me.regenerateArtwork();
@@ -3452,21 +3756,110 @@ class Activity {
                     }
                 }
             }
-
+            activity.textMsg(
+                _("Item restored from the trash."),
+                3000 
+            );
+        
             this.refreshCanvas();
-        };
+        }; 
 
-        this.handleKeyDown = (event) => {
-            
-            if (event.ctrlKey && event.key === "z") {
-                this._restoreTrash(activity);
-                activity.__tick();
-                event.preventDefault();
+        // Add event listener for trash icon click
+        document.getElementById('restoreIcon').addEventListener('click', () => {
+            this._renderTrashView();
+        }); 
+
+        // function to hide trashView from canvas
+        function handleClickOutsideTrashView(trashView) {
+            let firstClick = true;
+            document.addEventListener('click', (event) => {
+                if (firstClick) {
+                    firstClick = false;
+                    return;
+                }
+                if (!trashView.contains(event.target) && event.target !== trashView) {
+                    trashView.style.display = 'none';
+                }
+            });
+        }
+
+        this._renderTrashView = () => {
+            if (!activity.blocks || !activity.blocks.trashStacks || activity.blocks.trashStacks.length === 0) {
+                return;
             }
-        };
-
-        // Attach keydown event listener to document
-        document.addEventListener("keydown", this.handleKeyDown);
+            const trashList = document.getElementById('trashList');
+            const trashView = document.createElement('div');
+            trashView.id = 'trashView';
+            trashView.classList.add('trash-view');
+        
+            // Sticky icons
+            const buttonContainer = document.createElement('div');
+            buttonContainer.classList.add('button-container');
+        
+            const restoreLastIcon = document.createElement('a');
+            restoreLastIcon.id = 'restoreLastIcon';
+            restoreLastIcon.classList.add('restore-last-icon');
+            restoreLastIcon.innerHTML = '<i class="material-icons md-48">restore_from_trash</i>';
+            restoreLastIcon.addEventListener('click', () => {
+                this._restoreTrashById(this.blocks.trashStacks[this.blocks.trashStacks.length - 1]);
+                trashView.classList.add('hidden');
+            });
+        
+            const restoreAllIcon = document.createElement('a');
+            restoreAllIcon.id = 'restoreAllIcon';
+            restoreAllIcon.classList.add('restore-all-icon');
+            restoreAllIcon.innerHTML = '<i class="material-icons md-48">delete_sweep</i>';
+            restoreAllIcon.addEventListener('click', () => {
+                while (this.blocks.trashStacks.length > 0) {
+                    this._restoreTrashById(this.blocks.trashStacks[0]);
+                }
+                trashView.classList.add('hidden');
+            });
+            restoreLastIcon.setAttribute("title", _("Restore last item"));
+            restoreAllIcon.setAttribute("title", _("Restore all items"));
+        
+            buttonContainer.appendChild(restoreLastIcon);
+            buttonContainer.appendChild(restoreAllIcon);
+            trashView.appendChild(buttonContainer);
+        
+            // Render trash items
+            this.blocks.trashStacks.forEach((blockId) => {
+                const block = this.blocks.blockList[blockId];
+                const listItem = document.createElement('div');
+                listItem.classList.add('trash-item');
+        
+                const svgData = block.artwork;
+                const encodedData = 'data:image/svg+xml;utf8,' + encodeURIComponent(svgData);
+        
+                const img = document.createElement('img');
+                img.src = encodedData;
+                img.alt = 'Block Icon';
+                img.classList.add('trash-item-icon');
+        
+                const textNode = document.createTextNode(block.name);
+        
+                listItem.appendChild(img);
+                listItem.appendChild(textNode);
+                listItem.dataset.blockId = blockId;
+        
+                listItem.addEventListener('mouseover', () => listItem.classList.add('hover'));
+                listItem.addEventListener('mouseout', () => listItem.classList.remove('hover'));
+                listItem.addEventListener('click', () => {
+                    this._restoreTrashById(blockId);
+                    trashView.classList.add('hidden');
+                });
+                handleClickOutsideTrashView(trashView);
+                
+                trashView.appendChild(listItem);
+            });
+        
+            const existingView = document.getElementById('trashView');
+            if (existingView) {
+                trashList.replaceChild(trashView, existingView);
+            } else {
+                trashList.appendChild(trashView);
+            }
+        };  
 
         /*
          * Open aux menu
@@ -3498,10 +3891,10 @@ class Activity {
                     child.style.top = `${btnY + value}px`;
                 });
             };
-            
+
               if (!resize && this.toolbarHeight === 0) {
                 dy = cellsize + LEADING + 5;
-                
+
                 this.toolbarHeight = dy;
                 this.palettes.deltaY(dy);
                 this.turtles.deltaY(dy);
@@ -3517,16 +3910,16 @@ class Activity {
                 this.tenorBitmap.y += dy;
                 this.bassBitmap.y += dy;
                 this.blocks.checkBounds();
-            
+
             } else{
                 dy = this.toolbarHeight ;
-                this.toolbarHeight = 0; 
-                
+                this.toolbarHeight = 0;
+
                 this.turtles.deltaY(-dy);
                 this.palettes.deltaY(-dy);
                 this.blocksContainer.y -= dy
                 this.changeTopButtonsPosition(-dy);
-                
+
                 this.cartesianBitmap.y -= dy;
                 this.polarBitmap.y -= dy;
                 this.trebleBitmap.y -= dy;
@@ -3582,8 +3975,8 @@ class Activity {
                 ) {
                     const turtle = this.blocks.blockList[blk].value;
                     if (!this.blocks.blockList[blk].trash && turtle !== null) {
-                        this.turtles.turtleList[turtle].inTrash = true;
-                        this.turtles.turtleList[turtle].container.visible = false;
+                        this.turtles.getTurtle(turtle).inTrash = true;
+                        this.turtles.getTurtle(turtle).container.visible = false;
                     }
                 } else if (this.blocks.blockList[blk].name === "action") {
                     if (!this.blocks.blockList[blk].trash) {
@@ -3694,7 +4087,7 @@ class Activity {
                     block.container.uncache();
                     block.container.cache();
                 }
-                if (block.bitmap) {            
+                if (block.bitmap) {
                     block.bitmap.uncache();
                     block.bitmap.cache();
                 }
@@ -3709,12 +4102,12 @@ class Activity {
                 return;
             }
 
-            this.blockRefreshCanvas = true;           
+            this.blockRefreshCanvas = true;
             // Force stage clear and update
             this.stage.clear();
             this.stage.update();
             this.update = true;
-            
+
             const that = this;
             setTimeout(() => {
                 that.blockRefreshCanvas = false;
@@ -3806,7 +4199,7 @@ class Activity {
             }, 5000);
         };
 
-  
+
         const standardDurations = [
             { value: "1/1", duration: 1 },
             { value: "1/2", duration: 0.5 },
@@ -3817,11 +4210,11 @@ class Activity {
             { value: "1/64", duration: 0.015625 },
             { value: "1/128", duration: 0.0078125 }
         ];
-        
+
         this.getClosestStandardNoteValue = function(duration) {
             let closest = standardDurations[0];
             let minDiff = Math.abs(duration - closest.duration);
-            
+
             for (let i = 1; i < standardDurations.length; i++) {
                 let diff = Math.abs(duration - standardDurations[i].duration);
                 if (diff < minDiff) {
@@ -3829,12 +4222,12 @@ class Activity {
                     minDiff = diff;
                 }
             }
-            
+
             return closest.value.split('/').map(Number);
         }
-        
+
         this.transcribeMidi = async function(midi) {
-            let currentMidi = midi;        
+            let currentMidi = midi;
             let jsONON = [] ;
             let actionBlockCounter = 0; // Counter for action blocks
             let actionBlockNames = []; // Array to store action block names
@@ -3854,7 +4247,7 @@ class Activity {
             } else {
                 currentMidiTempoBpm = defaultTempo;
             }
-            
+
             let defaultTimeSignature = [4, 4];
             let currentMidiTimeSignature = currentMidi.header.timeSignatures;
             if (currentMidiTimeSignature && currentMidiTimeSignature.length > 0) {
@@ -3862,7 +4255,7 @@ class Activity {
             } else {
                 currentMidiTimeSignature = defaultTimeSignature;
             }
-            
+
             let precurssionFlag = false;
             const isPercussion=[];
             // console.log("tempoBpm is: ", currentMidiTempoBpm);
@@ -3874,7 +4267,7 @@ class Activity {
                 let isPercussionTrack =(track.instrument.percussion && (track.channel===9 || track.channel===10))
                 isPercussion.push(isPercussionTrack);
                 if (!track.notes.length) return;
-                let r = jsONON.length; 
+                let r = jsONON.length;
                 // console.log("notes: ",track.notes);
                 if(track.instrument.percussion && (track.channel==9 || track.channel==10) && precurssionFlag==false){
                     jsONON.push(
@@ -4090,9 +4483,9 @@ class Activity {
                 }
                 actionBlockPerTrack[trackCount] = 0;
                 instruments[trackCount] = instrument;
-        
+
                 let actionBlockName = `track${trackCount}chunk${actionBlockCounter}`;
-        
+
                 jsONON.push(
                     [r, ["action", { collapsed: false }], 150, 100, [null, r+1, r+2, null]],
                     [r+1, ["text", { value: actionBlockName }], 0, 0, [r]]
@@ -4124,7 +4517,7 @@ class Activity {
                     let lastNotes=[];
                     let lastNote = sched[sched.length - 1];
                     // let secondLastNote = sched.length > 1 ? sched[sched.length - 2] : null;
-                
+
                     if (sched[sched.length - 1].start === start && sched[sched.length - 1].end === end) {
                         sched[sched.length - 1].notes.push(name);
                     }
@@ -4142,7 +4535,7 @@ class Activity {
                             let newNotes2 = [...prevNotes2];
                             newNotes2.push(name);
                             lastNote.end = start;
-                
+
                             if (start < oldEnd2) {
                                 sched.push({
                                     start: start,
@@ -4157,7 +4550,7 @@ class Activity {
                             let oldStart = lastNotes[lastNotes.length-1].start;
                             let newNotes = [...prevNotes];
                             newNotes.push(name);
-                
+
                             if (lastNotes[lastNotes.length-1].end <= end) {
                                 sched.push(
                                     {
@@ -4268,7 +4661,7 @@ class Activity {
 
                 let noteSum = 0;
                 let currentActionBlock = [];
-        
+
                 let addNewActionBlock = (isLastBlock=false) => {
                     let r = jsONON.length;
                     let actionBlockName = `track${trackCount}chunk${actionBlockCounter}`;
@@ -4288,14 +4681,14 @@ class Activity {
                             [r+1, ["text", { value: actionBlockName }], 0, 0, [r]],
                             ...currentActionBlock
                         );
-                        
+
                     }
                     if (isLastBlock) {
                         let lastIndex = jsONON.length - 1;
                         // Set the last hidden block's second value to null
                         jsONON[lastIndex][4][1] = null;
                     }
-            
+
                     currentActionBlock = [];
                     actionBlockCounter++; // Increment the action block counter
                     offset+=100;
@@ -4308,7 +4701,7 @@ class Activity {
                     let temp = this.getClosestStandardNoteValue(dur * 3 / 8);
                     shortestNoteDenominator=Math.max(shortestNoteDenominator,temp[1]);
                 }
-        
+
                 for (let i in sched) {
                     if (stopProcessing) break; // Exit inner loop if flag is set
                     let notes = sched[i].notes;
@@ -4356,24 +4749,24 @@ class Activity {
                     // obj[1]=obj[1]/scalingFactor;
                     // else
                     // obj[0]=obj[0]*scalingFactor;
-                    
+
                     // To get the reduced fraction for 4/2 to 2/1
                     obj=this.getClosestStandardNoteValue(obj[0]/obj[1]);
-                
+
                     // Since we are going to add action block in the front later
                     if (k != 0) val = val + 2;
                     let pitches = getPitch(val + 5, notes, val);
                     currentActionBlock.push(
-                        [val, ["newnote", {"collapsed": true}], 0, 0, [first ? val-2 : val-1, val+1, val+4, val+pitches.length+5]], 
-                        [val + 1, "divide", 0, 0, [val, val+2, val+3]], 
-                        [val + 2, ["number", { value: obj[0] }], 0, 0, [val + 1]], 
+                        [val, ["newnote", {"collapsed": true}], 0, 0, [first ? val-2 : val-1, val+1, val+4, val+pitches.length+5]],
+                        [val + 1, "divide", 0, 0, [val, val+2, val+3]],
+                        [val + 2, ["number", { value: obj[0] }], 0, 0, [val + 1]],
                         [val + 3, ["number", { value: obj[1] }], 0, 0, [val + 1]],
                         [val + 4, "vspace", 0, 0, [val, val + 5]],
                     );
                     noteblockCount++;
                     pitches[0][4][0] = val + 4;
                     currentActionBlock = currentActionBlock.concat(pitches);
-        
+
                     let newLen = jsONON.length + currentActionBlock.length;
                     if (k != 0) newLen = newLen + 2;
                     currentActionBlock.push(
@@ -4382,18 +4775,18 @@ class Activity {
                     if (isLastNoteInBlock || isLastNoteInSched ) {
                         addNewActionBlock(isLastNoteInSched);
                     }
-        
+
                     if (totalnoteblockCount >= MAX_NOTEBLOCKS) {
                         this.textMsg("MIDI file is too large.. Generating only 100 noteblocks");
                         stopProcessing = true;
                         break;
                     }
                 }
-        
+
                 if (currentActionBlock.length > 0) {
-                    addNewActionBlock(true);  
+                    addNewActionBlock(true);
                 }
-        
+
                 trackCount++;
                 // console.log("current action block: ", currentActionBlock);
                 // console.log("current json: ", jsONON);
@@ -4401,11 +4794,11 @@ class Activity {
                 // console.debug('finished when you see: "block loading finished "');
                 document.body.style.cursor = "wait";
             });
-        
+
             let len = jsONON.length;
             let m = 0;
             let actionIndex = 0;
-            
+
             for (let i = 0; i < trackCount; i++) {
                  let vspaceIndex=len+m+6;
                  let startIndex=len+m;
@@ -4466,12 +4859,12 @@ class Activity {
                 m+=2;
 
             }
-            
+
             this.blocks.loadNewBlocks(jsONON);
             // this.textMsg("MIDI import is not currently precise. Consider changing the speed with the Beats Per Minute block or modifying note value with the Multiply Note Value block");
             return null;
         };
-        
+
         /**
          * Loads MB project from Planet.
          * @param  projectID {Planet project ID}
@@ -4486,12 +4879,12 @@ class Activity {
             const __afterLoad = async () => {
                 if (!that.turtles.running()) {
                     that.stage.update(event);
-                    for (let turtle = 0; turtle < that.turtles.turtleList.length; turtle++) {
+                    for (let turtle = 0; turtle < that.turtles.getTurtleCount(); turtle++) {
                         that.logo.turtleHeaps[turtle] = [];
                         that.logo.turtleDicts[turtle] = {};
                         that.logo.notation.notationStaging[turtle] = [];
                         that.logo.notation.notationDrumStaging[turtle] = [];
-                        that.turtles.turtleList[turtle].painter.doClear(true, true, false);
+                        that.turtles.getTurtle(turtle).painter.doClear(true, true, false);
                     }
                     if (_THIS_IS_MUSIC_BLOCKS_) {
                         const imgUrl =
@@ -4616,8 +5009,8 @@ class Activity {
                     }
 
                     if (run && that.firstRun) {
-                        for (let turtle = 0; turtle < that.turtles.turtleList.length; turtle++) {
-                            that.turtles.turtleList[turtle].painter.doClear(true, true, false);
+                        for (let turtle = 0; turtle < that.turtles.getTurtleCount(); turtle++) {
+                            that.turtles.getTurtle(turtle).painter.doClear(true, true, false);
                         }
 
                         that.textMsg(_("Click the run button to run the project."));
@@ -4651,7 +5044,7 @@ class Activity {
                 note = note.replace(',', '');
                 return noteToCompare.toLowerCase() === note.toLowerCase();
             });
-        
+
             if (accidental) {
                 return note + (accidental.acc === "sharp" ? "♯" : (accidental.acc === "flat" ? "♭" : ""));
             } else {
@@ -4661,21 +5054,21 @@ class Activity {
         // When converting to pitch value from ABC to MB there is issue
         // with the octave conversion. We map the pitch to audible pitch.
         function _abcToStandardValue(pitchValue) {
-            const octave = Math.floor(pitchValue/ 7) + 4; 
+            const octave = Math.floor(pitchValue/ 7) + 4;
             return  octave;
         }
         // Creates pitch which consist of note pitch notename you could
         // see them in the function.
         function _createPitchBlocks(pitches, blockId, pitchDuration,keySignature,actionBlock,triplet,meterDen) {
             const blocks = [];
-            
+
             const pitch = pitches;
-            pitchDuration = toFraction(pitchDuration);          
+            pitchDuration = toFraction(pitchDuration);
             const adjustedNote = _adjustPitch(pitch.name , keySignature).toUpperCase();
             if (triplet !== undefined && triplet !== null){
                 pitchDuration[1] = meterDen * triplet
             }
-          
+
             actionBlock.push(
                 [blockId, ["newnote", {"collapsed": true}], 0, 0, [blockId - 1, blockId + 1, blockId + 4, blockId + 8]],
                 [blockId + 1, "divide", 0, 0, [blockId, blockId + 2, blockId + 3]],
@@ -4729,7 +5122,7 @@ class Activity {
                         organizeBlock[staffIndex] = {
                          arrangedBlocks:[]
                         };
-                   
+
                     }
 
                    organizeBlock[staffIndex].arrangedBlocks.push(staff)
@@ -4768,7 +5161,7 @@ class Activity {
                             nameddoArray:{},
                         };
 
-                        // For adding 17 blocks above 
+                        // For adding 17 blocks above
                         blockId += 17
                     }
 
@@ -4776,11 +5169,11 @@ class Activity {
                     staff.voices.forEach(voice => {
                         voice.forEach(element => {
                             if (element.el_type === "note") {
-                                //check if triplet exists 
+                                //check if triplet exists
                                 if (element?.startTriplet !== null&&element?.startTriplet !== undefined) {
                                     tripletFinder = element.startTriplet;
                                 }
-                                
+
                                 // Check and set tripletFinder to null
                                 // if element?.endTriplets exists.
                                 _createPitchBlocks(element.pitches[0], blockId,element.duration,staff.key,actionBlock,tripletFinder,staffBlocksMap[lineId].meterDen);
@@ -4798,17 +5191,17 @@ class Activity {
                                         if (endBlockSearch[repeatbar].end === -1) {
                                             staffBlocksMap[lineId].repeatArray[repeatbar].end = staffBlocksMap[lineId].baseBlocks.length;
                                         }
-                                    }                     
+                                    }
 
                                 }
 
                             }
                         });
-                        
+
                         // Update the newnote connection with hidden
                         actionBlock[0][4][0] = blockId + 3;
                         actionBlock[actionBlock.length-1][4][1] = null;
-                        
+
                         // Update the namedo block if not first
                         // nameddo block appear
                         if (staffBlocksMap[lineId].baseBlocks.length != 0) {
@@ -4854,16 +5247,16 @@ class Activity {
                                 [blockId + 1, actionBlock[0][0]]
                             ]
                         ); // blockid of topaction block
-                        
+
                         if (!staffBlocksMap[lineId].nameddoArray) {
                             staffBlocksMap[lineId].nameddoArray = {};
                         }
-                        
+
                         // Ensure the array at nameddoArray[lineId] is initialized if it doesn't exist
                         if (!staffBlocksMap[lineId].nameddoArray[lineId]) {
                             staffBlocksMap[lineId].nameddoArray[lineId] = [];
                         }
-                        
+
                         staffBlocksMap[lineId].nameddoArray[lineId].push(blockId);
                         blockId += 4;
 
@@ -4872,9 +5265,9 @@ class Activity {
                     });
                 });
             }
-         
+
             let finalBlock = [];
-            // Some Error are here need to be fixed 
+            // Some Error are here need to be fixed
             for (const staffIndex in staffBlocksMap) {
                 staffBlocksMap[staffIndex].startBlock[staffBlocksMap[staffIndex].startBlock.length - 3][4][2] = staffBlocksMap[staffIndex].baseBlocks[0][0][staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4][0];
                 // Update the first namedo block with settimbre
@@ -4899,7 +5292,7 @@ class Activity {
                         // exists and has a [0] element
                     if (staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1] && staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0]) {
                         let secondnammedo = _searchIndexForMusicBlock(
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0], 
+                            staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0],
                             staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end + 1]
                         );
 
@@ -4924,7 +5317,7 @@ class Activity {
 
                         // Needs null checking optmizie
                         let nextBlockId = staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end+1];
-                    
+
                         staffBlocksMap[staffIndex].repeatBlock.push(
                             [blockId,"repeat",0,0,[staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0],blockId+1, currentBlockId,nextBlockId === null ? null : nextBlockId]]
                         );
@@ -4952,11 +5345,11 @@ class Activity {
                 // Flatten the multidimensional array
                 let flattenedLineBlock = lineBlock.flat();
                 let combinedBlock = [...staffBlocksMap[staffIndex].startBlock, ...flattenedLineBlock];
-                
+
                 finalBlock.push(...staffBlocksMap[staffIndex].startBlock);
                 finalBlock.push(...flattenedLineBlock);
                 finalBlock.push(...staffBlocksMap[staffIndex].repeatBlock);
-                    
+
             }
             this.blocks.loadNewBlocks(finalBlock);
             return null;
@@ -4983,6 +5376,7 @@ class Activity {
          */
         this.showContents = () => {
             docById("loading-image-container").style.display = "none";
+            docById("bottom-right-logo").style.display = "none";
             docById("palette").style.display = "block";
             // docById('canvas').style.display = 'none';
             docById("hideContents").style.display = "block";
@@ -5620,10 +6014,10 @@ class Activity {
                         case "drum":
                             // Find the turtle associated with this block.
                             // eslint-disable-next-line no-case-declarations
-                            const turtle = this.turtles.turtleList[myBlock.value];
+                            const turtle = this.turtles.getTurtle(myBlock.value);
                             if (turtle === null || turtle === undefined) {
                                 args = {
-                                    id: this.turtles.turtleList.length,
+                                    id: this.turtles.getTurtleCount(),
                                     collapsed: false,
                                     xcor: 0,
                                     ycor: 0,
@@ -5809,75 +6203,75 @@ class Activity {
             );
             this.boundary.hide();
 
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Home [HOME]")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Home [HOME]"))
                 this.helpfulWheelItems.push({label: "Home [HOME]", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(GOHOMEFADEDBUTTON)), display: true, fn: findBlocks});
 
             this.hideBlocksContainer = createButton(SHOWBLOCKSBUTTON, _("Show/hide blocks"),
                 changeBlockVisibility);
 
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Show/hide blocks")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Show/hide blocks"))
                 this.helpfulWheelItems.push({label: "Show/hide blocks", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SHOWBLOCKSBUTTON)), display: true, fn: changeBlockVisibility});
-            
+
             this.collapseBlocksContainer = createButton(COLLAPSEBLOCKSBUTTON, _("Expand/collapse blocks"),
                 toggleCollapsibleStacks);
 
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Expand/collapse blocks")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Expand/collapse blocks"))
                 this.helpfulWheelItems.push({label: "Expand/collapse blocks", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBLOCKSBUTTON)), display: true, fn: toggleCollapsibleStacks});
-            
+
             this.smallerContainer = createButton(SMALLERBUTTON, _("Decrease block size"),
                 doSmallerBlocks);
-            
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Decrease block size")) 
+
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Decrease block size"))
                 this.helpfulWheelItems.push({label: "Decrease block size", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SMALLERBUTTON)), display: true, fn: doSmallerBlocks});
-            
+
             this.largerContainer = createButton(BIGGERBUTTON, _("Increase block size"),
                 doLargerBlocks);
-            
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Increase block size")) 
+
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Increase block size"))
                 this.helpfulWheelItems.push({label: "Increase block size", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(BIGGERBUTTON)), display: true, fn: doLargerBlocks});
 
             if (!this.helpfulWheelItems.find(ele => ele.label === "Restore")) 
-                this.helpfulWheelItems.push({label: "Restore", icon: "imgsrc:header-icons/restore-from-trash.svg", display: true, fn: restoreTrash});
-            
+                this.helpfulWheelItems.push({label: "Restore", icon: "imgsrc:header-icons/restore-from-trash.svg", display: true, fn: restoreTrashPop});
+
             if (!this.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap Off"))
                 this.helpfulWheelItems.push({label: "Turtle Wrap Off", icon: "imgsrc:header-icons/wrap-text.svg", display: true, fn: this.toolbar.changeWrap});
 
             if (!this.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap On"))
                 this.helpfulWheelItems.push({label: "Turtle Wrap On", icon: "imgsrc:header-icons/wrap-text.svg", display: false, fn: this.toolbar.changeWrap});
 
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Enable horizontal scrolling")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Enable horizontal scrolling"))
                 this.helpfulWheelItems.push({label: "Enable horizontal scrolling", icon: "imgsrc:header-icons/compare-arrows.svg", display: this.beginnerMode ? false: true, fn: setScroller});
-            
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Disable horizontal scrolling")) 
+
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Disable horizontal scrolling"))
                 this.helpfulWheelItems.push({label: "Disable horizontal scrolling", icon: "imgsrc:header-icons/lock.svg", display: false, fn: setScroller});
-            
-            if (_THIS_IS_MUSIC_BLOCKS_ && !this.helpfulWheelItems.find(ele => ele.label === "Set Pitch Preview")) 
+
+            if (_THIS_IS_MUSIC_BLOCKS_ && !this.helpfulWheelItems.find(ele => ele.label === "Set Pitch Preview"))
                 this.helpfulWheelItems.push({label: "Set Pitch Preview", icon: "imgsrc:header-icons/music-note.svg", display: true, fn: chooseKeyMenu});
-        
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Grid")) 
+
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Grid"))
                 this.helpfulWheelItems.push({label: "Grid", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CARTESIANBUTTON)), display: true, fn: piemenuGrid});
 
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Select")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Select"))
                 this.helpfulWheelItems.push({label: "Select", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SELECTBUTTON)), display: true, fn: this.selectMode });
-        
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Clear")) 
+
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Clear"))
                 this.helpfulWheelItems.push({label: "Clear", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CLEARBUTTON)), display: true, fn: () => this._allClear(false)});
-            
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Collapse")) 
+
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Collapse"))
                 this.helpfulWheelItems.push({label: "Collapse", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBUTTON)), display: true, fn: this.turtles.collapse});
-        
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Expand")) 
+
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Expand"))
                 this.helpfulWheelItems.push({label: "Expand", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(EXPANDBUTTON)), display: false, fn: this.turtles.expand});
-        
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Search for Blocks")) 
+
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Search for Blocks"))
                 this.helpfulWheelItems.push({label: "Search for Blocks", icon: "imgsrc:header-icons/search-button.svg", display: true, fn: this._displayHelpfulSearchDiv});
-        
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Paste previous stack")) 
+
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Paste previous stack"))
                 this.helpfulWheelItems.push({label: "Paste previous stack", icon: "imgsrc:header-icons/copy-button.svg", display: false, fn: this.turtles.expand});
             if(!this.helpfulWheelItems.find(ele => ele.label=== "Close"))
                 this.helpfulWheelItems.push({label: "Close", icon: "imgsrc:header-icons/cancel-button.svg",
                 display: true, fn: this._hideHelpfulSearchWidget});
-        
+
         };
 
         /*
@@ -6220,7 +6614,7 @@ class Activity {
             this.unhighlightSelectedBlocks(false);
             this.setSelectionMode(false);
         }
- 
+
         // end the drag on navbar
         document.getElementById("toolbars").addEventListener("mouseover", () => {this.isDragging = false;});
 
@@ -6240,7 +6634,7 @@ class Activity {
             this.hasMouseMoved = false;
             this.selectionArea = document.createElement("div");
             document.body.appendChild(this.selectionArea);
-            
+
             this.setupMouseEvents();
 
             document.addEventListener("mousemove", (event) => {
@@ -6256,7 +6650,7 @@ class Activity {
                         this.selectedBlocks = this.selectBlocksInDragArea();
                         this.unhighlightSelectedBlocks(true, true);
                         this.blocks.setSelectedBlocks(this.selectedBlocks);
-                    }    
+                    }
                 }
             })
 
@@ -6273,7 +6667,7 @@ class Activity {
                     this.hasMouseMoved = false;
                 }, 100);
             })
-            
+
         };
 
         // Set starting points of the drag
@@ -6329,7 +6723,7 @@ class Activity {
                         height: block.height,
                         width: block.width
                     };
-                
+
                 if (this.rectanglesOverlap(this.blockRect, this.dragRect)){
                     selectedBlocks.push(block);
                 }
@@ -6472,6 +6866,8 @@ class Activity {
 
             this._createErrorContainers();
 
+            
+
             /* Z-Order (top to bottom):
              *   menus
              *   palettes
@@ -6498,6 +6894,7 @@ class Activity {
 
             this.pasteBox = new PasteBox(this);
             this.languageBox = new LanguageBox(this);
+            this.themeBox = new ThemeBox(this);
 
             // Show help on startup if first-time user.
             if (this.firstTimeUser) {
@@ -6530,7 +6927,8 @@ class Activity {
                 this.save.saveLilypond.bind(this.save),
                 this.save.saveAbc.bind(this.save),
                 this.save.saveMxml.bind(this.save),
-                this.save.saveBlockArtwork.bind(this.save)
+                this.save.saveBlockArtwork.bind(this.save),
+                this.save.saveBlockArtworkPNG.bind(this.save)
             );
             this.toolbar.renderPlanetIcon(this.planet, doOpenSamples);
             this.toolbar.renderMenuIcon(showHideAuxMenu);
@@ -6538,6 +6936,7 @@ class Activity {
             this.toolbar.renderModeSelectIcon(doSwitchMode, doRecordButton, doAnalytics, doOpenPlugin, deletePlugin, setScroller);
             this.toolbar.renderRunSlowlyIcon(doSlowButton);
             this.toolbar.renderRunStepIcon(doStepButton);
+            this.toolbar.renderThemeSelectIcon(this.themeBox, this.themes);
             this.toolbar.renderMergeIcon(_doMergeLoad);
             this.toolbar.renderRestoreIcon(restoreTrash);
             if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -6592,13 +6991,13 @@ class Activity {
                     // Read file here.
                     const reader = new FileReader();
                     const midiReader = new FileReader();
-            
+
                     // eslint-disable-next-line no-unused-vars
                     reader.onload = (theFile) => {
                         that.loading = true;
                         document.body.style.cursor = "wait";
                         that.doLoadAnimation();
-            
+
                         setTimeout(() => {
                             const rawData = reader.result;
                             if (rawData === null || rawData === "") {
@@ -6620,9 +7019,9 @@ class Activity {
                                     for (const name in that.palettes.dict) {
                                         that.palettes.dict[name].hideMenu(true);
                                     }
-            
+
                                     that.stage.removeAllEventListeners("trashsignal");
-            
+
                                     if (!that.merging) {
                                         // Wait for the old blocks to be removed.
                                         // eslint-disable-next-line no-unused-vars
@@ -6633,7 +7032,7 @@ class Activity {
                                                 that.planet.saveLocally();
                                             }
                                         };
-            
+
                                         that.stage.addEventListener("trashsignal", __listener, false);
                                         that.sendAllToTrash(false, false);
                                         that._allClear(false, true);
@@ -6650,7 +7049,7 @@ class Activity {
                                         that.merging = false;
                                         that.blocks.loadNewBlocks(obj);
                                     }
-            
+
                                     that.loading = false;
                                     that.refreshCanvas();
                                 } catch (e) {
@@ -6667,13 +7066,14 @@ class Activity {
                             }
                         }, 200);
                     };
-            
+
                     midiReader.onload = (e) => {
                         const midi = new Midi(e.target.result);
+                        // eslint-disable-next-line no-console
                         console.debug(midi);
                         this.transcribeMidi(midi);
                     };
-            
+
                     const file = that.fileChooser.files[0];
                     if (file) {
                         const extension = file.name.split('.').pop().toLowerCase();
@@ -6687,7 +7087,7 @@ class Activity {
                 },
                 false
             );
-            
+
 
             const __handleFileSelect = (event) => {
                 event.stopPropagation();
@@ -6718,7 +7118,7 @@ class Activity {
                                     obj = JSON.parse(
                                         cleanData.match('<div class="code">(.+?)</div>')[1]
                                     );
-                                } 
+                                }
                                 else {
                                     obj = JSON.parse(cleanData);
                                 }
@@ -6769,6 +7169,7 @@ class Activity {
                 };
                 midiReader.onload = (e) => {
                     const midi = new Midi(e.target.result)
+                    // eslint-disable-next-line no-console
                     console.debug(midi);
                     this.transcribeMidi(midi);
                 }
@@ -6778,17 +7179,17 @@ class Activity {
                     //get the abc data and replace the / so that the block does not break
                     let abcData = event.target.result;
                     abcData = abcData.replace(/\\/g, '');
-                    
+
                     const tunebook = new ABCJS.parseOnly(abcData);
-                    
+                    // eslint-disable-next-line no-console
                     console.log(tunebook)
                     tunebook.forEach(tune => {
                         //call parseABC to parse abcdata to MB json
                         this.parseABC(tune);
-                    
+
                     });
-                 
-                
+
+
                 };
 
                 // Music Block Parser from abc to MB
@@ -6796,17 +7197,17 @@ class Activity {
                     //get the abc data and replace the / so that the block does not break
                     let abcData = event.target.result;
                     abcData = abcData.replace(/\\/g, '');
-                    
+
                     const tunebook = new ABCJS.parseOnly(abcData);
-                    
+                    // eslint-disable-next-line no-console
                     console.log(tunebook)
                     tunebook.forEach(tune => {
                         //call parseABC to parse abcdata to MB json
                         this.parseABC(tune);
-                    
+
                     });
-                 
-                
+
+
                 };
 
                 // Work-around in case the handler is called by the
@@ -6823,7 +7224,6 @@ class Activity {
                     let isABC = (extension == "abc");
                     if (isABC) {
                         abcReader.readAsText(files[0]);
-                        console.log('abc')
                         return;
                     }
                     reader.readAsText(files[0]);
@@ -7075,7 +7475,7 @@ class Activity {
             this.prepSearchWidget();
 
             // create functionality of 2D drag to select blocks in bulk
-            
+
             this._create2Ddrag();
 
             /*
@@ -7101,7 +7501,9 @@ class Activity {
     saveLocally() {
         try {
             localStorage.setItem('beginnerMode', this.beginnerMode.toString());
+            localStorage.setItem("themePreference", this.themePreference.toString());
         } catch (e) {
+            // eslint-disable-next-line no-console
             console.error('Error saving to localStorage:', e);
         }
     }
@@ -7126,20 +7528,23 @@ class Activity {
                     }
                 }
             }
-    
+
             // Safely hide and clear existing palettes
             if (!this.palettes) {
+                // eslint-disable-next-line no-console
                 console.warn('Palettes object not initialized');
                 return;
             }
-    
+
             if (typeof this.palettes.hide !== 'function') {
+                // eslint-disable-next-line no-console
                 console.warn('Palettes hide method not available');
             } else {
                 this.palettes.hide();
             }
-    
+
             if (typeof this.palettes.clear !== 'function') {
+                // eslint-disable-next-line no-console
                 console.warn('Palettes clear method not available');
                 // Fallback clear implementation
                 this.palettes.dict = {};
@@ -7149,45 +7554,47 @@ class Activity {
             } else {
                 this.palettes.clear();
             }
-    
+
             // Reinitialize palettes
             initPalettes(this.palettes);
-            
+
             // Reinitialize blocks
             if (this.blocks) {
                 initBasicProtoBlocks(this);
             }
-    
+
             // Restore palette positions
             if (this.palettes && this.palettes.dict) {
                 for (const name in palettePositions) {
                     const palette = this.palettes.dict[name];
                     const pos = palettePositions[name];
-                    
+
                     if (palette && palette.container && pos) {
                         palette.container.x = pos.x;
                         palette.container.y = pos.y;
-                        
+
                         if (pos.visible) {
                             palette.showMenu(true);
                         }
                     }
                 }
             }
-    
+
             // Update the palette display
             if (this.palettes && typeof this.palettes.updatePalettes === 'function') {
                 this.palettes.updatePalettes();
             }
-            
+
             // Update blocks
             if (this.blocks && typeof this.blocks.updateBlockPositions === 'function') {
                 this.blocks.updateBlockPositions();
             }
-            
+
+
             this.refreshCanvas();
-    
+
         } catch (e) {
+            // eslint-disable-next-line no-console
             console.error('Error regenerating palettes:', e);
             this.errorMsg(_('Error regenerating palettes. Please refresh the page.'));
         }

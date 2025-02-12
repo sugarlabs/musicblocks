@@ -311,6 +311,20 @@ class SaveInterface {
         const svg = "data:image/svg+xml;utf8," + activity.printBlockSVG();
         activity.save.download("svg", svg, null);
     }
+   
+    /**
+     * This method is to save BlockArtwork and download the PNG representation of block artwork from the provided activity.
+     * 
+     * @param {SaveInterface} activity - The activity object containing block artwork to save.
+     * @returns {void}
+     * @method
+     * @instance
+     */ 
+    saveBlockArtworkPNG(activity) {
+        activity.printBlockPNG().then((pngDataUrl) => {
+        activity.save.download("png", pngDataUrl, null);
+        })
+    }
 
     /**
     * Save audio recording in WAV format.
@@ -350,10 +364,10 @@ class SaveInterface {
         activity.logo.runningAbc = true;
         activity.logo.notationOutput = ABCHEADER;
         activity.logo.notationNotes = {};
-        for (let t = 0; t < activity.turtles.turtleList.length; t++) {
+        for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
             activity.logo.notation.notationStaging[t] = [];
             activity.logo.notation.notationDrumStaging[t] = [];
-            activity.turtles.turtleList[t].painter.doClear(true, true, true);
+            activity.turtles.getTurtle(t).painter.doClear(true, true, true);
         }
         activity.logo.runLogoCommands();
     }
@@ -509,10 +523,10 @@ class SaveInterface {
         }
         this.activity.logo.notationOutput = lyheader;
         this.activity.logo.notationNotes = {};
-        for (let t = 0; t < this.activity.turtles.turtleList.length; t++) {
+        for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
             this.activity.logo.notation.notationStaging[t] = [];
             this.activity.logo.notation.notationDrumStaging[t] = [];
-            this.activity.turtles.turtleList[t].painter.doClear(true, true, true);
+            this.activity.turtles.getTurtle(t).painter.doClear(true, true, true);
         }
         document.body.style.cursor = "wait";
         this.activity.logo.runLogoCommands();
@@ -533,6 +547,7 @@ class SaveInterface {
     * @instance
     */
     afterSaveLilypond(filename) {
+        filename = docById("fileName").value;
         const ly = saveLilypondOutput(this.activity);
         switch (this.notationConvert) {
             case "pdf":
@@ -559,6 +574,7 @@ class SaveInterface {
      */
 
     afterSaveLilypondLY(lydata, filename) {
+        filename = docById("fileName").value;
         if (platform.FF) {
             // eslint-disable-next-line no-console
             console.debug('execCommand("copy") does not work on FireFox');
@@ -620,10 +636,10 @@ class SaveInterface {
     // eslint-disable-next-line no-unused-vars
     saveMxml(filename) {
         this.activity.logo.runningMxml = true;
-        for (let t = 0; t < this.activity.turtles.turtleList.length; t++) {
+        for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
             this.activity.logo.notation.notationStaging[t] = [];
             this.activity.logo.notation.notationDrumStaging[t] = [];
-            this.activity.turtles.turtleList[t].painter.doClear(true, true, true);
+            this.activity.turtles.getTurtle(t).painter.doClear(true, true, true);
         }
 
         this.activity.logo.runLogoCommands();

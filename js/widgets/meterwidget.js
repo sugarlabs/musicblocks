@@ -190,27 +190,25 @@ class MeterWidget {
                 this._click_lock = true;
                 if (this.__getPlayingStatus()) {
                     playBtn.innerHTML =
-                        '&nbsp;&nbsp;<img src="header-icons/play-button.svg" title="' +
-                        _("Play all") +
-                        '" alt="' +
-                        _("Play all") +
-                        '" height="' +
-                        MeterWidget.ICONSIZE +
-                        '" width="' +
-                        MeterWidget.ICONSIZE +
-                        '" vertical-align="middle">&nbsp;&nbsp;';
+                        `&nbsp;&nbsp;<img 
+                            src="header-icons/play-button.svg" 
+                            title="${_("Play all")}" 
+                            alt="${_("Play all")}" 
+                            height="${MeterWidget.ICONSIZE}" 
+                            width="${MeterWidget.ICONSIZE}" 
+                            vertical-align="middle"
+                        >&nbsp;&nbsp;`;
                     this._playing = false;
                 } else {
                     playBtn.innerHTML =
-                        '&nbsp;&nbsp;<img src="header-icons/stop-button.svg" title="' +
-                        _("Stop") +
-                        '" alt="' +
-                        _("Stop") +
-                        '" height="' +
-                        MeterWidget.ICONSIZE +
-                        '" width="' +
-                        MeterWidget.ICONSIZE +
-                        '" vertical-align="middle">&nbsp;&nbsp;';
+                        `&nbsp;&nbsp;<img 
+                            src="header-icons/stop-button.svg" 
+                            title="${_("Stop")}" 
+                            alt="${_("Stop")}" 
+                            height="${MeterWidget.ICONSIZE}" 
+                            width="${MeterWidget.ICONSIZE}" 
+                            vertical-align="middle"
+                        >&nbsp;&nbsp;`;
                     this._playing = true;
                     this.activity.logo.turtleDelay = 0;
                     this.activity.logo.resetSynth(0);
@@ -257,16 +255,12 @@ class MeterWidget {
         const divInput = document.createElement("div");
         divInput.className = "wfbtItem";
         divInput.innerHTML =
-            '<input style="float: left ;" value="' +
-            v1 +
-            '" type="number" id="beatValue" min="1" max="16" >';
+            `<input style="float: left;" value="${v1}" type="number" id="beatValue" min="1" max="16" >`;
 
         const divInput2 = document.createElement("div");
         divInput2.className = "wfbtItem";
         divInput2.innerHTML =
-            '<input style="float: left;" value="' +
-            1 / this._beatValue +
-            '" type="number" id="beatValue" min="1" max="35">';
+            `<input style="float: left;" value="${1 / this._beatValue}" type="number" id="beatValue" min="1" max="35">`;
 
         widgetWindow._toolbar.appendChild(divInput);
         widgetWindow._toolbar.appendChild(divInput2);
@@ -423,17 +417,15 @@ class MeterWidget {
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
         cell.innerHTML =
-            '&nbsp;&nbsp;<img src="header-icons/' +
-            icon +
-            '" title="' +
-            label +
-            '" alt="' +
-            label +
-            '" height="' +
-            iconSize +
-            '" width="' +
-            iconSize +
-            '" vertical-align="middle" align-content="center">&nbsp;&nbsp;';
+            `&nbsp;&nbsp;<img 
+                src="header-icons/${icon}" 
+                title="${label}" 
+                alt="${label}" 
+                height="${iconSize}" 
+                width="${iconSize}" 
+                vertical-align="middle" 
+                align-content="center"
+            >&nbsp;&nbsp;`;
         cell.style.width = MeterWidget.BUTTONSIZE + "px";
         cell.style.minWidth = cell.style.width;
         cell.style.maxWidth = cell.style.width;

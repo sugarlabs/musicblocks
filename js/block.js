@@ -738,9 +738,9 @@ class Block {
 
             if (this.name === "start" || this.name === "drum") {
                 // Rescale the decoration on the start blocks.
-                for (let t = 0; t < this.activity.turtles.turtleList.length; t++) {
-                    if (this.activity.turtles.turtleList[t].startBlock === this) {
-                        this.activity.turtles.turtleList[t].resizeDecoration(
+                for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
+                    if (this.activity.turtles.getTurtle(t).startBlock === this) {
+                        this.activity.turtles.getTurtle(t).resizeDecoration(
                             scale,
                             this.bitmap.image.width
                         );
@@ -2085,8 +2085,8 @@ class Block {
      * @param {number} thisBlock - Index of the current block.
      */
     _doOpenMedia(thisBlock) {
-        const fileChooser = docById("myOpenAll");
         const that = this;
+        const fileChooser = that.name=="media" ? docById("myMedia") : docById("audio");
 
         const __readerAction = () => {
             window.scroll(0, 0);
@@ -2894,6 +2894,21 @@ class Block {
                 that.blocks.triggerLongPress();
             }, LONGPRESSTIME);
 
+            //hide the trash when block is being collapse or expand
+            const hasColExpBtns = this.collapseButtonBitmap && this.expandButtonBitmap;
+
+            if (hasColExpBtns) {
+                const localPoint = this.container.globalToLocal(event.stageX, event.stageY);
+                const isColExpClick =
+                    this.collapseButtonBitmap.getBounds().contains(localPoint.x, localPoint.y) ||
+                    this.expandButtonBitmap.getBounds().contains(localPoint.x, localPoint.y);
+
+                if (isColExpClick) {
+                    that.activity.trashcan.hide();
+                    return;
+                }
+            }
+            
             // Always show the trash when there is a block selected,
             that.activity.trashcan.show();
 
@@ -3096,7 +3111,9 @@ class Block {
         }
 
         // Always hide the trash when there is no block selected.
-        this.activity.trashcan.hide();
+        if (!moved) {
+            this.activity.trashcan.hide();
+        }
 
         if (this.blocks.longPressTimeout != null) {
             clearTimeout(this.blocks.longPressTimeout);
@@ -3306,9 +3323,9 @@ class Block {
                     dx = (25 * this.protoblock.scale) / 2;
                 }
 
-                for (let t = 0; t < this.activity.turtles.turtleList.length; t++) {
-                    if (this.activity.turtles.turtleList[t].startBlock === this) {
-                        this.activity.turtles.turtleList[t].decorationBitmap.x =
+                for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
+                    if (this.activity.turtles.getTurtle(t).startBlock === this) {
+                        this.activity.turtles.getTurtle(t).decorationBitmap.x =
                             this.width - dx - (30 * this.protoblock.scale) / 2;
                         break;
                     }

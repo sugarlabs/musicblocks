@@ -187,18 +187,17 @@ class SVG {
 
     /**
      * @public
-     * @param {number} w
-     * @param {number} h
-     * @param {number} w2
-     * @param {number} h2
+     * @param {number} w - width
+     * @param {number} h - height
+     * @param {number} w2 - width2
+     * @param {number} h2 - height2
      * @returns {void}
      */
     setExpand(w, h, w2, h2) {
-        // TODO: make this an array
-        this._expandX = w;
-        this._expandY = h;
-        this._expandX2 = w2;
-        this._expandY2 = h2;
+        // Store expansion dimensions as array internally
+        this._expandDimensions = [w, h, w2, h2];
+        // Keep individual properties in sync for backward compatibility
+        [this._expandX, this._expandY, this._expandX2, this._expandY2] = this._expandDimensions;
     }
 
     /**
@@ -1803,4 +1802,8 @@ class SVG {
         svg += this._footer();
         return this._header(false) + svg;
     }
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { SVG };
 }
