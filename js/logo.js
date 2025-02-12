@@ -367,7 +367,6 @@ class Logo {
             tur.singer.synthVolume[DEFAULTVOICE] = [DEFAULTVOLUME];
         }
 
-        Singer.setMasterVolume(this, DEFAULTVOLUME);
         for (const turtle in this.activity.turtles.turtleList) {
             for (const synth in this.activity.turtles.ithTurtle(turtle).singer.synthVolume) {
                 Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
@@ -1029,7 +1028,6 @@ class Logo {
 
         Singer.masterBPM = TARGETBPM;
         Singer.defaultBPMFactor = TONEBPM / TARGETBPM;
-        Singer.masterVolume = [DEFAULTVOLUME];
         this.synth.changeInTemperament = false;
 
         this._checkingCompletionState = false;
