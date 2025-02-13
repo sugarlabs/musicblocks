@@ -1323,3 +1323,7 @@ Turtles.TurtlesView = class {
         return this;
     }
 };
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Turtles;
+}
