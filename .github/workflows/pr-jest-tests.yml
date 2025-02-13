@@ -1,0 +1,57 @@
+name: Run Jest Tests on PR
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Jest tests
+        id: run-tests
+        run: |
+          npm test | tee test-results.txt
+          if [ ${PIPESTATUS[0]} -eq 0 ]; then
+            echo "TESTS_PASSED=true" >> $GITHUB_ENV
+          else
+            echo "TESTS_PASSED=false" >> $GITHUB_ENV
+          fi
+
+      - name: Upload test results as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results.txt
+
+      - name: Add PR Comment with Jest results
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const path = 'test-results.txt';
+            const output = fs.existsSync(path) ? fs.readFileSync(path, 'utf8') : 'No output captured.';
+            const truncatedOutput = output.length > 6000 ? output.slice(-6000) : output;
+
+            const message = process.env.TESTS_PASSED === 'true'
+              ? `✅ All Jest tests passed! Ready to merge.\n\n<details><summary>Test Output</summary>\n\n\`\`\`\n${truncatedOutput}\n\`\`\`\n\n</details>`
+              : `❌ Jest tests failed. Please check the logs below:\n\n<details><summary>Test Output</summary>\n\n\`\`\`\n${truncatedOutput}\n\`\`\`\n\n</details>`;
+
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: message
+            });
