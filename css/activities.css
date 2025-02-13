@@ -1730,10 +1730,6 @@ input.timbreName {
   position: fixed;
 }
 
-.dark #chooseKeyDiv {
-  background: #333;
-}
-
 #chooseKeyDiv > svg {
   width: 100%;
   height: 100%;
@@ -1749,11 +1745,6 @@ input.timbreName {
   font-family: sans-serif;
   text-align: center;
   margin-left: 24px;
-}
-
-.dark #movable {
-  background: #333;
-  color: white;
 }
 
 .radioBtn {
