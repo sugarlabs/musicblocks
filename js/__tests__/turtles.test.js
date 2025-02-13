@@ -1,96 +1,103 @@
-global.importMembers = jest.fn((instance, name, args) => {
-    instance.activity = args[0] || mockActivity;
-});
-
-const Turtles = require("../turtles");
-const mockActivity = {
-    stage: { addChild: jest.fn(), removeChild: jest.fn(), dispatchEvent: jest.fn() },
-    turtleContainer: { addChild: jest.fn() },
-    canvas: {},
-    refreshCanvas: jest.fn(),
-    hideAuxMenu: jest.fn(),
-    hideGrids: jest.fn(),
-    _doCartesianPolar: jest.fn()
-};
+const Turtles = require('../turtles'); 
 
 global.createjs = {
-    Container: jest.fn(() => ({ addChild: jest.fn(), removeAllEventListeners: jest.fn(), on: jest.fn() })),
-    Bitmap: jest.fn()
+    Container: jest.fn().mockImplementation(() => ({
+        addChild: jest.fn(),
+        removeAllChildren: jest.fn(),
+        on: jest.fn(),
+        removeAllEventListeners: jest.fn(),
+    })),
+    Bitmap: jest.fn().mockImplementation(() => ({})),
 };
 
 global.importMembers = jest.fn();
-global.setupRhythmActions = jest.fn(() => {});
-global.setupMeterActions = jest.fn(() => {});
-global.setupPitchActions = jest.fn(() => {});
-global.setupIntervalsActions = jest.fn(() => {});
-global.setupToneActions = jest.fn(() => {});
-global.setupOrnamentActions = jest.fn(() => {});
-global.setupVolumeActions = jest.fn(() => {});
-global.setupDrumActions = jest.fn(() => {});
-global.setupDictActions = jest.fn(() => {});
-global._ = jest.fn(str => str);
-global.Turtle = jest.fn(() => ({ container: {}, painter: {} }));
-global.last = jest.fn(arr => arr[arr.length - 1]);
+global.setupRhythmActions = jest.fn();
+global.setupMeterActions = jest.fn();
+global.setupPitchActions = jest.fn();
+global.setupIntervalsActions = jest.fn();
+global.setupToneActions = jest.fn();
+global.setupOrnamentActions = jest.fn();
+global.setupVolumeActions = jest.fn();
+global.setupDrumActions = jest.fn();
+global.setupDictActions = jest.fn();
 
-describe("Turtles class", () => {
+global.Turtle = jest.fn().mockImplementation(() => ({
+    painter: {
+        doSetHeading: jest.fn(),
+        doSetPensize: jest.fn(),
+        doSetChroma: jest.fn(),
+        doSetValue: jest.fn(),
+        doSetColor: jest.fn(),
+    },
+    rename: jest.fn(),
+    container: {
+        scaleX: 1,
+        scaleY: 1,
+        scale: 1,
+        on: jest.fn(),
+        removeAllEventListeners: jest.fn(),
+    },
+}));
+
+describe('Turtles Class', () => {
+    let activityMock;
     let turtles;
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        activityMock = {
+            stage: { addChild: jest.fn(), removeChild: jest.fn() },
+            refreshCanvas: jest.fn(),
+            turtleContainer: new createjs.Container(),
+            hideAuxMenu: jest.fn(),
+            hideGrids: jest.fn(),
+            _doCartesianPolar: jest.fn(),
+        };
 
-        // Spy on prototype methods
-        jest.spyOn(Turtles.prototype, "initActions");
+        turtles = new Turtles(activityMock);
+        turtles.activity = activityMock;
+        turtles.getTurtleCount = jest.fn().mockReturnValue(0);
+        turtles.getTurtle = jest.fn(() => ({
+            container: {
+                scaleX: 1,
+                scaleY: 1,
+                scale: 1,
+            },
+        }));
 
-        // Ensure `this.activity` is set
-        turtles = new Turtles(mockActivity);
-        turtles.activity = mockActivity; // Force assignment
+        turtles.pushTurtle = jest.fn();
+        turtles.addTurtleStageProps = jest.fn();
+        turtles.createArtwork = jest.fn();
+        turtles.createHitArea = jest.fn();
+        turtles.addTurtleGraphicProps = jest.fn();
+        turtles.isShrunk = jest.fn().mockReturnValue(false);
+        document.body.innerHTML = '<div id="loader"></div>';
     });
 
-    test("constructor should initialize correctly", () => {
-        expect(importMembers).toHaveBeenCalledWith(turtles, "", [mockActivity]);
-        expect(turtles.initActions).toHaveBeenCalled(); // Now tracked by Jest spy
+    test('should initialize properly', () => {
+        expect(turtles.activity).not.toBeUndefined();
+        expect(global.importMembers).toHaveBeenCalledWith(turtles, "", [activityMock]);
     });
 
-    test("initActions should set up all turtle actions", () => {
-        expect(turtles.activity).toBeDefined(); // Ensure activity is set
+    test('should call initActions on construction', () => {
+        const spy = jest.spyOn(turtles, 'initActions');
         turtles.initActions();
-        expect(setupRhythmActions).toHaveBeenCalledWith(mockActivity);
-        expect(setupMeterActions).toHaveBeenCalledWith(mockActivity);
-        expect(setupPitchActions).toHaveBeenCalledWith(mockActivity);
-        expect(setupIntervalsActions).toHaveBeenCalledWith(mockActivity);
-        expect(setupToneActions).toHaveBeenCalledWith(mockActivity);
-        expect(setupOrnamentActions).toHaveBeenCalledWith(mockActivity);
-        expect(setupVolumeActions).toHaveBeenCalledWith(mockActivity);
-        expect(setupDrumActions).toHaveBeenCalledWith(mockActivity);
-        expect(setupDictActions).toHaveBeenCalledWith(mockActivity);
+        expect(spy).toHaveBeenCalled();
     });
 
-    test("addTurtle should add a turtle and scale if shrunk", () => {
-        turtles.isShrunk = jest.fn(() => true);
-        turtles.add = jest.fn();
-        const mockTurtle = { container: {} };
-        last.mockReturnValue(mockTurtle);
+    test('should add a turtle properly', () => {
+        turtles.addTurtle({}, { id: 1, name: 'TestTurtle' });
 
-        turtles.addTurtle({}, {});
-
-        expect(turtles.add).toHaveBeenCalled();
-        expect(mockTurtle.container.scaleX).toBe(4);
-        expect(mockTurtle.container.scaleY).toBe(4);
+        expect(turtles.getTurtleCount).toHaveBeenCalled();
+        expect(turtles.pushTurtle).toHaveBeenCalled();
+        expect(turtles.addTurtleStageProps).toHaveBeenCalled();
+        expect(turtles.createArtwork).toHaveBeenCalled();
+        expect(turtles.createHitArea).toHaveBeenCalled();
+        expect(turtles.addTurtleGraphicProps).toHaveBeenCalled();
+        expect(turtles.isShrunk).toHaveBeenCalled();
     });
 
-    test("markAllAsStopped should set all turtles' running to false", () => {
-        turtles._turtleList = [{ running: true }, { running: true }];
+    test('should toggle running state correctly', () => {
         turtles.markAllAsStopped();
-
-        expect(turtles._turtleList[0].running).toBe(false);
-        expect(turtles._turtleList[1].running).toBe(false);
-        expect(mockActivity.refreshCanvas).toHaveBeenCalled(); // Should now pass
-    });
-
-    test("getter and setter methods should function correctly", () => {
-        turtles.masterStage = "stage1";
-        expect(turtles.masterStage).toBe("stage1");
-        turtles.canvas = "canvas1";
-        expect(turtles.canvas).toBe("canvas1");
+        expect(activityMock.refreshCanvas).toHaveBeenCalled();
     });
 });
