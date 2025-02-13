@@ -3,12 +3,10 @@ global.jQuery = jest.fn(() => ({
     trigger: jest.fn(),
 }));
 global.jQuery.noConflict = jest.fn(() => global.jQuery);
-
 global._ = jest.fn((str) => str);
 global._THIS_IS_TURTLE_BLOCKS_ = true;
 global.TITLESTRING = "Music Blocks";
 global.GUIDEURL = "../guide/guide.html";
-
 global.fileExt = jest.fn((file) => {
     if (!file) { // This covers both null and undefined
         return "";
@@ -19,12 +17,10 @@ global.fileExt = jest.fn((file) => {
     }
     return parts.pop();
 });
-
 global.window = {
     isElectron: false,
     prompt: jest.fn(),
 };
-
 global.document = {
     createElement: jest.fn(() => ({
         setAttribute: jest.fn(),
@@ -35,7 +31,6 @@ global.document = {
         removeChild: jest.fn(),
     },
 };
-
 global.docById = jest.fn((id) => document.getElementById(id));;
 global.docByClass = jest.fn((classname) => document.getElementsByClassName(classname));
 
