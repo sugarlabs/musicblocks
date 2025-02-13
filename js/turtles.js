@@ -1060,69 +1060,7 @@ Turtles.TurtlesView = class {
             }
 
             this._expandButton.onclick = () => {
-                // If the aux toolbar is open, close it.
-                const auxToolbar = docById("aux-toolbar");
-                if (auxToolbar.style.display === "block") {
-                    const menuIcon = docById("menu");
-                    auxToolbar.style.display = "none";
-                    menuIcon.innerHTML = "menu";
-                    docById("toggleAuxBtn").className -= "blue darken-1";
-                }
-                this.hideMenu();
-                this.setStageScale(1.0);
-                this._expandedBoundary.visible = true;
-                this.gridButton.style.visibility = "visible";
-                this._collapseButton.style.visibility = "visible";
-                this._expandButton.style.visibility = "hidden";
-                this.activity.helpfulWheelItems.forEach(ele => {
-                    if (ele.label === "Expand") {
-                        ele.display = false;
-                    } else if (ele.label === "Collapse") {
-                        ele.display = true;
-                    } else if (ele.label === "Grid") {
-                        ele.display = true;
-                    }
-                });
-                this._collapsedBoundary.visible = false;
-                turtlesStage.removeAllEventListeners("pressmove");
-                turtlesStage.removeAllEventListeners("mousedown");
-
-                turtlesStage.x = 0;
-                turtlesStage.y = 0;
-                this._isShrunk = false;
-
-                for (let i = 0; i < this.getTurtleCount(); i++) {
-                    const turtle = this.getTurtle(i);
-                    turtle.container.scaleX = 1;
-                    turtle.container.scaleY = 1;
-                    turtle.container.scale = 1;
-                }
-
-                this._clearButton.scaleX = 1;
-                this._clearButton.scaleY = 1;
-                this._clearButton.scale = 1;
-                this._clearButton.x = this._w - 5 - 2 * 55;
-
-                if (this.gridButton !== null) {
-                    this.gridButton.scaleX = 1;
-                    this.gridButton.scaleY = 1;
-                    this.gridButton.scale = 1;
-                    this.gridButton.x = this._w - 10 - 3 * 55;
-                    this.gridButton.visible = true;
-                }
-
-                // Restore the previously selected grid
-                if (this.selectedGrid !== undefined) {
-                    this.activity.turtles.currentGrid = this.selectedGrid;
-                    this.activity.turtles.doGrid(this.selectedGrid);
-                } else {
-                    this.activity.turtles.currentGrid = 0;
-                    this.activity.turtles.doGrid(0);
-                }
-
-                // remove the stage and add it back in position 0
-                this.masterStage.removeChild(turtlesStage);
-                this.masterStage.addChildAt(turtlesStage, 0);
+                this.expand();
             };
         };
 
@@ -1179,6 +1117,15 @@ Turtles.TurtlesView = class {
                 this.gridButton.visible = true;
             }
 
+            // Restore the previously selected grid
+            if (this.selectedGrid !== undefined) {
+                this.activity.turtles.currentGrid = this.selectedGrid;
+                this.activity.turtles.doGrid(this.selectedGrid);
+            } else {
+                this.activity.turtles.currentGrid = 0;
+                this.activity.turtles.doGrid(0);
+            }
+            
             // remove the stage and add it back in position 0
             this.masterStage.removeChild(turtlesStage);
             this.masterStage.addChildAt(turtlesStage, 0);
