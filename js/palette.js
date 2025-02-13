@@ -1452,3 +1452,7 @@ const initPalettes = async (palettes) => {
     console.debug("Time to show the palettes.");
     palettes.show();
 };
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { Palettes, initPalettes };
+}
