@@ -670,7 +670,6 @@ class Singer {
         const firstConnection = activity.logo.blockList[blk].connections[0];
         const lastConnection = last(activity.logo.blockList[blk].connections);
         volume = Math.min(Math.max(volume, 0), 100);
-     
         logo.synth.setMasterVolume(volume, firstConnection, lastConnection);
         for (const turtle of activity.turtles.turtleList) {
             for (const synth in turtle.singer.synthVolume) {
