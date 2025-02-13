@@ -97,3 +97,24 @@
     padding: 5px !important;
     border-radius: 5px !important;
 }
+
+@media only screen and (max-width: 400px) {
+    .play-only ul.main.right {
+      margin-top: 0px !important; 
+      position: relative !important;
+      display: flex !important;
+      flex-wrap: wrap !important;
+      justify-content: center !important;
+      align-items: center !important;
+      gap: 10px !important;
+    }
+  
+    .play-only nav {
+      min-height: 50px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+  }
+  
+  
