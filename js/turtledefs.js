@@ -724,12 +724,14 @@ const createHelpContent = (activity) => {
                 window.btoa(base64Encode(SHORTCUTSBUTTON))
         ]);
     }
-    HELPCONTENT.push([
-        _("Contextual Menu for Canvas"),
-        _("Right-click on the canvas to perform additional canvas-related tasks."),
-        "data:image/svg+xml;base64," +
-            window.btoa(base64Encode(CANVASMENUBUTTON))
-    ]);
+    if (!activity.beginnerMode) {
+        HELPCONTENT.push([
+            _("Contextual Menu for Canvas"),
+            _("Right-click on the canvas to perform additional canvas-related tasks."),
+            "data:image/svg+xml;base64," +
+                window.btoa(base64Encode(CANVASMENUBUTTON))
+        ]);
+    }
     HELPCONTENT.push([
         _("Grid"),
         _("Turn on/off lines for cartesian or polar grids.") +
@@ -737,12 +739,6 @@ const createHelpContent = (activity) => {
         _("Turn on/off music staffs."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(CARTESIANBUTTON))
-    ]);
-    HELPCONTENT.push([
-        _("Select"),
-        _("Left-click and drag on workspace to select multiple blocks."),
-        "data:image/svg+xml;base64," +
-            window.btoa(base64Encode(SELECTHELPBUTTON))
     ]);
     HELPCONTENT.push([
         _("Clear"),
@@ -788,6 +784,14 @@ const createHelpContent = (activity) => {
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(BIGGERBUTTON))
     ]);    
+    if (!activity.beginnerMode) {
+        HELPCONTENT.push([
+            _("Select"),
+            _("Left-click and drag on workspace to select multiple blocks."),
+            "data:image/svg+xml;base64," +
+                window.btoa(base64Encode(SELECTHELPBUTTON))
+        ]);
+    }
     if (_THIS_IS_MUSIC_BLOCKS_) {
         HELPCONTENT.push([
             _("Palette buttons"),
