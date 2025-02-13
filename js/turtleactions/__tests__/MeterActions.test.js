@@ -25,6 +25,8 @@ describe('setupMeterActions', () => {
                 ithTurtle: jest.fn(),
                 turtleList: [],
                 addTurtle: jest.fn(),
+                getTurtle: jest.fn((id) => targetTurtle),
+                getTurtleCount: jest.fn(() => 1),
             },
             blocks: {
                 blockList: { 1: {} },
