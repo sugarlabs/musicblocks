@@ -102,6 +102,7 @@ describe('rubrics.js test suite', () => {
                     getTurtleCount: jest.fn(() => 1),
                     getTurtle: jest.fn((id) => ({
                     painter: { doClear: jest.fn() }
+                }))
                 }
             };
 
