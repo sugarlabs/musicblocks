@@ -66,6 +66,19 @@
   .dark .language-link {
     color: #fff;
   }
+
+  .dark .dropdown-content li > a {
+    background-color: #1c1c1c;
+    color: #3fe0d1;
+  }
+
+  .dark .dropdown-content li > a:hover {
+    color: #252525;
+  }
+
+  .dark .dropdown-content {
+    background-color: #1c1c1c;
+  }
   
   .dark .modal-content {
     background-color: #1c1c1c;
