@@ -95,5 +95,19 @@
     color: #fff;
   }
 
+  .dark #saveddropdown.active{ 
+    background-color: #022363 ;
+    > a.inactiveLink{
+      background-color: #132446 ;
+    }
+  }
+  
+  .dark #saveddropdownbeg.active{  
+    background-color: #022363 ;
+    > a.inactiveLink{
+      background-color: #132446 ;
+    }
+  }
+
 
 /* Your Custom Theme can go here if you don't want to modify the existing dark mode */

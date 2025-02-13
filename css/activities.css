@@ -1898,3 +1898,45 @@ table {
   stroke : #78E600;
   stroke-width: 3;
 }
+
+
+#saveddropdown.active{
+  transform: translateX(-33%) !important;  
+  background-color: #2196F3;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  overflow: hidden;
+  border-bottom-left-radius: 10%;
+  border-bottom-right-radius: 10%;
+  > a {
+    padding: 10px;
+    margin-bottom: -25px;
+  }
+  > a:hover{
+    background-color: transparent;
+  }
+  > a.inactiveLink{
+    background-color: #4682b4;
+    clip-path: inset(0 0 30px 0);
+  }
+}
+
+#saveddropdownbeg.active{
+  transform: translateX(-25%) !important;  
+  background-color: #2196F3;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom-left-radius: 10%;
+  border-bottom-right-radius: 10%;
+  overflow: hidden;
+  > a {
+    padding: 10px;
+    margin-bottom: -25px;
+  }
+  > a:hover{
+    background-color: transparent;
+  }
+  > a.inactiveLink{
+    background-color: #4682b4;
+  }
+}
