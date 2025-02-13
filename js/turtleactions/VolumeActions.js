@@ -172,11 +172,15 @@ function setupVolumeActions(activity) {
 
             if (volume === 0) activity.errorMsg(_("Setting volume to 0."), blk);
 
+            if(Singer.masterVolume.length === 2) {  
+                Singer.masterVolume.pop();
+            }
+
             Singer.masterVolume.push(volume);
 
             const tur = activity.turtles.ithTurtle(turtle);
             if (!tur.singer.suppressOutput) {
-                Singer.setMasterVolume(activity.logo, volume);
+                Singer.setMasterVolume(activity.logo, volume, blk);
             }
         }
 
@@ -210,8 +214,10 @@ function setupVolumeActions(activity) {
          * @param {Number} turtle - Turtle index in turtles.turtleList
          * @returns {void}
          */
-        static setSynthVolume(synthname, volume, turtle) {
+        static setSynthVolume(synthname, volume, turtle, blk) {
             let synth = null;
+            const firstConnection = activity.logo.blockList[blk].connections[0];
+            const lastConnection = last(activity.logo.blockList[blk].connections);
 
             if (synthname === DEFAULTVOICE || synthname === _(DEFAULTVOICE)) {
                 synth = DEFAULTVOICE;
@@ -263,6 +269,12 @@ function setupVolumeActions(activity) {
             tur.singer.synthVolume[synth].push(volume);
             if (!tur.singer.suppressOutput) {
                 Singer.setSynthVolume(activity.logo, turtle, synth, volume);
+                if(firstConnection === null && lastConnection === null) {
+                    setTimeout(()=>{
+                        activity.logo.synth.trigger(0, "G4", 1 / 4, synthname, null, null, false);
+                    },250)
+                }
+             
             }
         }
 

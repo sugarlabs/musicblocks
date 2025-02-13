@@ -578,7 +578,7 @@ function setupVolumeBlocks(activity) {
                 }
             }
 
-            Singer.VolumeActions.setSynthVolume(arg0, arg1, turtle);
+            Singer.VolumeActions.setSynthVolume(arg0, arg1, turtle, blk);
         }
     }
 
