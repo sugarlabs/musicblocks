@@ -1,0 +1,54 @@
+name: Run Jest Tests on PR
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  test:
+    name: Run Jest Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Jest Tests
+        id: jest
+        run: |
+          npm test -- --json --outputFile=jest-results.json || echo "TESTS_FAILED=true" >> $GITHUB_ENV
+
+      - name: Read Jest Results
+        id: results
+        run: |
+          if [ "$TESTS_FAILED" = "true" ]; then
+            echo "TESTS_PASSED=false" >> $GITHUB_ENV
+            echo "FAILED_TESTS<<EOF" >> $GITHUB_ENV
+            jq -c '[.testResults[] | select(.status == "failed") | {name: .name}]' jest-results.json >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+          else
+            echo "TESTS_PASSED=true" >> $GITHUB_ENV
+            echo "FAILED_TESTS=[]" >> $GITHUB_ENV
+          fi
+
+      - name: Post Comment on PR
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            ${{ env.TESTS_PASSED == 'true' && '✅ All Jest tests passed! This PR is ready to merge.' || '❌ Some Jest tests failed. Please check the logs and fix the issues before merging.' }}
+            
+            **Failed Tests:**
+            ```json
+            ${{ env.FAILED_TESTS }}
+            ```
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
