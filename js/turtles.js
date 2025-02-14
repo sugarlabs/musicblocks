@@ -994,7 +994,6 @@ Turtles.TurtlesView = class {
                 }
                 this._expandButton.style.visibility = "visible";
                 this._collapseButton.style.visibility = "hidden";
-                this.gridButton.style.visibility = "hidden";
                 this.activity.helpfulWheelItems.forEach(ele => {
                     if (ele.label === "Expand") {
                         ele.display = true;
@@ -1323,3 +1322,7 @@ Turtles.TurtlesView = class {
         return this;
     }
 };
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Turtles;
+}
