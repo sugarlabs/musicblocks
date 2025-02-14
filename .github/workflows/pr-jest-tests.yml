@@ -6,6 +6,9 @@ on:
       - opened
       - synchronize
 
+permissions:
+  pull-requests: write
+
 jobs:
   test:
     name: Run Jest Tests
@@ -27,29 +30,33 @@ jobs:
         id: jest
         run: |
           npm test -- --json --outputFile=jest-results.json || echo "TESTS_FAILED=true" >> $GITHUB_ENV
-
       - name: Read Jest Results
         id: results
         run: |
           if [ "$TESTS_FAILED" = "true" ]; then
             echo "TESTS_PASSED=false" >> $GITHUB_ENV
+            FAILED_TESTS=$(jq -r '[.testResults[] | select(.status == "failed") | .name] | map(split("/") | last) | join("\n")' jest-results.json)
             echo "FAILED_TESTS<<EOF" >> $GITHUB_ENV
-            jq -c '[.testResults[] | select(.status == "failed") | {name: .name}]' jest-results.json >> $GITHUB_ENV
+            echo "$FAILED_TESTS" >> $GITHUB_ENV
             echo "EOF" >> $GITHUB_ENV
           else
             echo "TESTS_PASSED=true" >> $GITHUB_ENV
-            echo "FAILED_TESTS=[]" >> $GITHUB_ENV
+            echo "FAILED_TESTS=None" >> $GITHUB_ENV
           fi
-
-      - name: Post Comment on PR
-        uses: mshick/add-pr-comment@v2
-        with:
-          message: |
-            ${{ env.TESTS_PASSED == 'true' && '✅ All Jest tests passed! This PR is ready to merge.' || '❌ Some Jest tests failed. Please check the logs and fix the issues before merging.' }}
-            
-            **Failed Tests:**
-            ```json
-            ${{ env.FAILED_TESTS }}
-            ```
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Post Comment on PR using GitHub CLI
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+          COMMENT_FILE=$(mktemp)
+          {
+            echo "${{ env.TESTS_PASSED == 'true' && '✅ All Jest tests passed! This PR is ready to merge.' || '❌ Some Jest tests failed. Please check the logs and fix the issues before merging.' }}"
+            echo ""
+            echo "**Failed Tests:**"
+            echo ""
+            echo '```'
+            echo "${{ env.FAILED_TESTS }}"
+            echo '```'
+          } > "$COMMENT_FILE"
+          gh pr comment "$PR_NUMBER" --body-file "$COMMENT_FILE"
           
