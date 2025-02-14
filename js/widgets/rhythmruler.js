@@ -560,13 +560,117 @@ class RhythmRuler {
          * @private
          * @returns {void}
          */
-        this._dissectNumber.oninput = () => {
-            // Put a limit on the size (2 <--> 128).
-            this._dissectNumber.onmouseout = () => {
-                this._dissectNumber.value = Math.max(this._dissectNumber.value, 2);
+
+        this._dissectNumber.onclick = (event) => {
+            // Remove existing pie menu if any
+            const existingMenu = document.getElementById("pieMenu");
+            if (existingMenu) existingMenu.remove();
+
+            // Create the pie menu
+            const pieMenu = document.createElement("div");
+            pieMenu.id = "pieMenu";
+            pieMenu.style.cssText = `
+                position: absolute;
+                top: ${this._dissectNumber.getBoundingClientRect().bottom + window.scrollY + 5}px;
+                left: ${this._dissectNumber.getBoundingClientRect().left + window.scrollX}px;
+                width: 120px; height: 120px; border-radius: 50%;
+                background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; 
+                align-items: center; z-index: 10001; pointer-events: auto;
+            `;
+
+            // Inner circle
+            const innerCircle = document.createElement("div");
+            innerCircle.style.cssText = `
+                width: 50px; height: 50px; border-radius: 50%;
+                background: rgba(255, 255, 255, 0.9); display: flex;
+                justify-content: center; align-items: center; position: relative;
+            `;
+            pieMenu.appendChild(innerCircle);
+
+            const values = activity.beginnerMode ? [2, 3, 4] : [2, 3, 4, 5, 7];
+            const radius = 40;
+
+            // Create number buttons in a circular pattern
+            values.forEach((num, index) => {
+                const angle = (index * (360 / values.length)) * (Math.PI / 180);
+                const button = document.createElement("div");
+                button.innerText = num;
+                button.style.cssText = `
+        width: 30px; height: 30px; border-radius: 50%; background: white;
+        display: flex; justify-content: center; align-items: center;
+        font-size: 16px; font-weight: bold; cursor: pointer; position: absolute;
+        top: ${60 + Math.sin(angle) * radius - 15}px;
+        left: ${60 + Math.cos(angle) * radius - 15}px;
+    `;
+
+                // Hover effect for outer circle buttons
+                button.onmouseover = () => button.style.background = "#ff6ea1";
+                button.onmouseout = () => button.style.background = "white";
+
+                button.onclick = () => {
+                    this._dissectNumber.value = Math.max(Math.min(num, 128), 2);
+                    pieMenu.remove();
+                };
+                pieMenu.appendChild(button);
+            });
+
+            // Action buttons (+, -, X) in inner circle
+            const createActionButton = (symbol, angle, onClick) => {
+                const button = document.createElement("div");
+                button.innerText = symbol;
+                button.style.cssText = `
+                    width: 22px; height: 22px; border-radius: 50%; background: black;
+                    color: white; display: flex; justify-content: center;
+                    align-items: center; cursor: pointer; font-size: 14px;
+                    position: absolute; transition: background 0.2s;
+                    top: ${25 + Math.sin((angle * Math.PI) / 180) * 15 - 11}px;
+                    left: ${25 + Math.cos((angle * Math.PI) / 180) * 15 - 11}px;
+                `;
+                button.onmouseover = () => (button.style.background = "#ff4444");
+                button.onmouseout = () => (button.style.background = "black");
+                button.onclick = (e) => {
+                    e.stopPropagation();
+                    onClick();
+                };
+                innerCircle.appendChild(button);
             };
 
-            this._dissectNumber.value = Math.max(Math.min(this._dissectNumber.value, 128), 2);
+            // Add (+), (-), (X) buttons
+            createActionButton("+", -90, () => {
+                let currentValue = parseInt(this._dissectNumber.value);
+                // Check if the value is NaN or invalid, set it to 2 if so
+                if (isNaN(currentValue)) {
+                    currentValue = 2;
+                }
+                currentValue = Math.max(currentValue + 1, 2);
+                this._dissectNumber.value = Math.min(currentValue, 128); // Ensure it doesn't exceed 128
+            });
+            createActionButton("-", 150, () => {
+                let currentValue = parseInt(this._dissectNumber.value);
+                // Check if the value is NaN or invalid, set it to 2 if so
+                if (isNaN(currentValue)) {
+                    currentValue = 2;
+                }
+                this._dissectNumber.value = Math.max(currentValue - 1, 2);
+            });
+            createActionButton("X", 30, () => pieMenu.remove());
+
+            // Click outside to close
+            const handleOutside = (e) => {
+                if (!pieMenu.contains(e.target) && e.target !== this._dissectNumber) {
+                    pieMenu.remove();
+                    document.removeEventListener('click', handleOutside);
+                }
+            };
+            document.addEventListener('click', handleOutside);
+
+            // Input validation
+            this._dissectNumber.oninput = () => {
+                this._dissectNumber.value = Math.max(Math.min(parseInt(this._dissectNumber.value) || 2, 128), 2);
+            };
+
+            // Append the pie menu to the body
+            document.body.appendChild(pieMenu);
         };
 
         /**
