@@ -33,10 +33,13 @@ global.document = {
 };
 global.docById = jest.fn((id) => document.getElementById(id));;
 global.docByClass = jest.fn((classname) => document.getElementsByClassName(classname));
+global.mockRunLogoCommands = jest.fn();
+global.mockDownload = jest.fn();
 
 const { SaveInterface } = require('../SaveInterface');
 const { LILYPONDHEADER } = require('../lilypond');
 global.LILYPONDHEADER = LILYPONDHEADER;
+global.instance = new SaveInterface();
 
 describe("SaveInterface", () => {
     let mockActivity;
@@ -78,29 +81,25 @@ describe("download", () => {
         };
         instance = new SaveInterface(mockActivity);
         document.body.innerHTML = "";
+        mockDownloadURL = jest.spyOn(instance, 'downloadURL'); // Spy on downloadURL
     });
 
     it("should set correct filename and extension when defaultfilename is provided", () => {
-        const mockDownloadURL = jest.spyOn(instance, 'downloadURL'); // Spy on downloadURL
         instance.download("abc", "data", "custom");
         expect(mockDownloadURL).toHaveBeenCalledWith("custom.abc", "data");
     });
 
     it("should default filename to 'My Project.abc' if defaultfilename is null", () => {
-        global._.mockReturnValue("My Project");
-        const mockDownloadURL = jest.spyOn(instance, 'downloadURL');
         instance.download("abc", "data", null);
         expect(mockDownloadURL).toHaveBeenCalledWith("undefined.abc", "data");
     });
 
     it("should append the extension if not present in the filename", () => {
-        const mockDownloadURL = jest.spyOn(instance, 'downloadURL');
         instance.download("wav", "data", "My Project");
         expect(mockDownloadURL).toHaveBeenCalledWith("My Project.wav", "data");
     });
 
     it("should not append the extension if already present in the filename", () => {
-        const mockDownloadURL = jest.spyOn(instance, 'downloadURL');
         instance.download("xml", "data", "My Project");
         expect(mockDownloadURL).toHaveBeenCalledWith("My Project.xml", "data");
     });
@@ -137,37 +136,22 @@ describe('downloadURL', () => {
     });
 });
 
-describe('prepareHTML', () => {
-    class MockActivity {
-        constructor() {
-            this.htmlSaveTemplate = "<html><body><h1>{{ project_name }}</h1><p>{{ project_description }}</p><img src='{{ project_image }}'/><div>{{ data }}</div></body></html>";
-            this.data = {
-                CurrentProject: 'project1',
-                Projects: {
-                    project1: {
-                        ProjectName: 'Mock Project',
-                        PublishedData: { ProjectDescription: 'Mock Description' },
-                        ProjectImage: 'mock-image.png',
-                    }
-                }
-            };
-            this.defaultProjectName = 'Default Project';
-            this.ImageDataURL = 'default-image.png';
-        }
+describe("prepareHTML", () => {
+    let activity;
 
-        prepareExport() {
-            return 'Mock Exported Data';
-        }
-
-        PlanetInterface = {
-            getCurrentProjectDescription: () => this.data.Projects[this.data.CurrentProject]?.PublishedData?.ProjectDescription ?? null,
-            getCurrentProjectName: () => this.data.Projects[this.data.CurrentProject]?.ProjectName ?? this.defaultProjectName,
-            getCurrentProjectImage: () => this.data.Projects[this.data.CurrentProject]?.ProjectImage ?? this.ImageDataURL,
+    beforeEach(() => {
+        activity = {
+            htmlSaveTemplate: "<html><body><h1>{{ project_name }}</h1><p>{{ project_description }}</p><img src='{{ project_image }}'/><div>{{ data }}</div></body></html>",
+            prepareExport: jest.fn(() => "Mock Exported Data"),
+            PlanetInterface: {
+                getCurrentProjectDescription: jest.fn(() => "Mock Description"),
+                getCurrentProjectName: jest.fn(() => "Mock Project"),
+                getCurrentProjectImage: jest.fn(() => "mock-image.png"),
+            },
         };
-    }
+    });
 
-    it('should replace placeholders with actual project data', () => {
-        const activity = new MockActivity();
+    it("should replace placeholders with actual project data", () => {
         let file = activity.htmlSaveTemplate;
         file = file
             .replace(/{{ project_description }}/g, activity.PlanetInterface.getCurrentProjectDescription())
@@ -175,18 +159,18 @@ describe('prepareHTML', () => {
             .replace(/{{ data }}/g, activity.prepareExport())
             .replace(/{{ project_image }}/g, activity.PlanetInterface.getCurrentProjectImage());
 
-        expect(file).toContain('<h1>Mock Project</h1>');
-        expect(file).toContain('<p>Mock Description</p>');
+        expect(file).toContain("<h1>Mock Project</h1>");
+        expect(file).toContain("<p>Mock Description</p>");
         expect(file).toContain("<img src='mock-image.png'/>");
-        expect(file).toContain('<div>Mock Exported Data</div>');
+        expect(file).toContain("<div>Mock Exported Data</div>");
     });
 });
+
 
 describe('saveHTML', () => {
     it('should call prepareHTML and download the file', () => {
         const mockPrepareHTML = jest.fn(() => '<html>Mock HTML</html>');
-        const mockDownload = jest.fn();
-        const instance = new SaveInterface();
+
         const activity = {
             save: {
                 prepareHTML: mockPrepareHTML,
@@ -206,9 +190,7 @@ describe('saveHTMLNoPrompt', () => {
 
     it('should call prepareHTML and download the file with the correct filename', () => {
         const mockPrepareHTML = jest.fn(() => '<html>Mock HTML</html>');
-        const mockDownloadURL = jest.fn();
         const mockGetProjectName = jest.fn(() => 'MockProject');
-
         const activity = {
             save: {
                 prepareHTML: mockPrepareHTML,
@@ -219,7 +201,6 @@ describe('saveHTMLNoPrompt', () => {
             }
         };
 
-        const instance = new SaveInterface();
         instance.saveHTMLNoPrompt(activity);
         jest.runAllTimers();
 
@@ -232,10 +213,7 @@ describe('saveHTMLNoPrompt', () => {
 describe('saveSVG', () => {
     it('should call doSVG and download the SVG file', () => {
         const mockDoSVG = jest.fn(() => '<svg>Mock SVG</svg>');
-        const mockDownload = jest.fn();
-
         global.doSVG = mockDoSVG;
-
         const activity = {
             save: {
                 download: mockDownload,
@@ -245,7 +223,6 @@ describe('saveSVG', () => {
             turtles: 'mockTurtles'
         };
 
-        const instance = new SaveInterface();
         instance.saveSVG(activity);
         expect(mockDoSVG).toHaveBeenCalledWith(
             activity.canvas,
@@ -269,17 +246,13 @@ describe('savePNG', () => {
     });
 
     it('should call toDataURL and download the PNG file', () => {
-        const mockDownload = jest.fn();
         const mockCanvas = { toDataURL: jest.fn(() => 'data:image/png;base64,mockdata') };
         global.docById = jest.fn(() => mockCanvas);
-
         const activity = {
             save: {
                 download: mockDownload,
             }
         };
-
-        const instance = new SaveInterface();
         instance.savePNG(activity);
 
         expect(mockCanvas.toDataURL).toHaveBeenCalledWith("image/png");
@@ -290,16 +263,12 @@ describe('savePNG', () => {
 describe('saveBlockArtwork', () => {
     it('should call printBlockSVG and download the SVG file', () => {
         const mockPrintBlockSVG = jest.fn(() => '<svg>Mock SVG</svg>');
-        const mockDownload = jest.fn();
-
         const activity = {
             save: {
                 download: mockDownload,
             },
             printBlockSVG: mockPrintBlockSVG
         };
-
-        const instance = new SaveInterface();
         instance.saveBlockArtwork(activity);
 
         expect(mockPrintBlockSVG).toHaveBeenCalled();
@@ -310,16 +279,12 @@ describe('saveBlockArtwork', () => {
 describe('saveBlockArtworkPNG', () => {
     it('should call printBlockPNG and download the PNG file', async () => {
         const mockPrintBlockPNG = jest.fn(() => Promise.resolve('data:image/png;base64,mockdata'));
-        const mockDownload = jest.fn();
-
         const activity = {
             save: {
                 download: mockDownload,
             },
             printBlockPNG: mockPrintBlockPNG
         };
-
-        const instance = new SaveInterface();
         await instance.saveBlockArtworkPNG(activity);
 
         expect(mockPrintBlockPNG).toHaveBeenCalled();
@@ -335,7 +300,6 @@ describe('saveWAV', () => {
     it('should start audio recording and update UI', () => {
         const mockSetupRecorder = jest.fn();
         const mockStartRecording = jest.fn();
-        const mockRunLogoCommands = jest.fn();
         const mockTextMsg = jest.fn();
 
         const activity = {
@@ -350,7 +314,6 @@ describe('saveWAV', () => {
             textMsg: mockTextMsg,
         };
 
-        const instance = new SaveInterface();
         instance.saveWAV(activity);
 
         expect(document.body.style.cursor).toBe("wait");
@@ -368,7 +331,7 @@ describe('saveAbc', () => {
     });
 
     it('should prepare and run ABC notation commands', () => {
-        const mockRunLogoCommands = jest.fn();
+
         const activity = {
             logo: {
                 runningAbc: false,
@@ -385,7 +348,7 @@ describe('saveAbc', () => {
             }
         };
 
-        const instance = new SaveInterface();
+
         instance.saveAbc(activity);
 
         expect(document.body.style.cursor).toBe("wait");
@@ -396,7 +359,6 @@ describe('saveAbc', () => {
 
 describe('afterSaveAbc', () => {
     it('should encode and download ABC notation output', () => {
-        const mockDownload = jest.fn();
         const mockSaveAbcOutput = jest.fn(() => "mock_abc_data");
 
         global.saveAbcOutput = mockSaveAbcOutput;
@@ -407,7 +369,7 @@ describe('afterSaveAbc', () => {
             }
         };
 
-        const instance = new SaveInterface();
+
         instance.afterSaveAbc.call({ activity });
 
         expect(mockSaveAbcOutput).toHaveBeenCalledWith(activity);
@@ -464,7 +426,7 @@ describe('saveLilypond', () => {
     });
 
     it('should open the Lilypond modal and populate fields', () => {
-        const instance = new SaveInterface();
+
         instance.saveLilypond(activity);
 
         expect(docById("lilypondModal").style.display).toBe("block");
@@ -474,7 +436,7 @@ describe('saveLilypond', () => {
     });
 
     it('should close the modal when close button is clicked', () => {
-        const instance = new SaveInterface();
+
         instance.saveLilypond(activity);
 
         const closeButton = docByClass("close")[0];
@@ -485,7 +447,7 @@ describe('saveLilypond', () => {
     });
 
     it('should call saveLYFile when save button is clicked', () => {
-        const instance = new SaveInterface();
+
         instance.saveLilypond(activity);
 
         const saveButton = docById("submitLilypond");
@@ -601,8 +563,7 @@ describe('saveLYFile', () => {
 %}
 
 }`;
-        const receivedMIDIOutput = mockActivity.logo.MIDIOutput;
-        expect(receivedMIDIOutput).toContain(expectedMIDIOutput);
+        expect(mockActivity.logo.MIDIOutput).toContain(expectedMIDIOutput);
     });
 
 });
@@ -653,7 +614,6 @@ describe('afterSaveLilypond', () => {
 
     it('should call saveLilypondOutput and afterSaveLilypondLY', () => {
         instance.afterSaveLilypond("ignored.ly");
-
         expect(mockSaveLilypondOutput).toHaveBeenCalledWith(instance.activity);
         expect(instance.afterSaveLilypondLY).toHaveBeenCalledWith("Lilypond Data", "TestProject.ly");
         expect(instance.notationConvert).toBe("");
@@ -677,22 +637,18 @@ describe('afterSaveLilypondPDF', () => {
 
         instance = new SaveInterface();
         instance.activity = activity;
+        lydata = "Lilypond Data";
+        filename = "TestProject.pdf";
+        dataurl = "data:application/pdf;base64,abc123";
     });
 
     it('should set cursor to "wait" and call ly2pdf with correct arguments', () => {
-        const lydata = "Lilypond Data";
-        const filename = "TestProject.pdf";
-
         instance.afterSaveLilypondPDF(lydata, filename);
         expect(document.body.style.cursor).toBe("wait");
         expect(window.Converter.ly2pdf).toHaveBeenCalledWith(lydata, expect.any(Function));
     });
 
     it('should reset cursor to "default" and call activity.save.download on success', () => {
-        const lydata = "Lilypond Data";
-        const filename = "TestProject.pdf";
-        const dataurl = "data:application/pdf;base64,abc123";
-
         // Mock ly2pdf to call the callback with success
         window.Converter.ly2pdf.mockImplementation((lydata, callback) => {
             callback(true, dataurl);
@@ -704,8 +660,6 @@ describe('afterSaveLilypondPDF', () => {
     });
 
     it('should reset cursor to "default" and log an error on failure', () => {
-        const lydata = "Lilypond Data";
-        const filename = "TestProject.pdf";
         const errorMessage = "Conversion failed";
 
         window.Converter.ly2pdf.mockImplementation((lydata, callback) => {
@@ -719,7 +673,6 @@ describe('afterSaveLilypondPDF', () => {
 
         expect(document.body.style.cursor).toBe("default");
         expect(console.debug).toHaveBeenCalledWith("Error: " + errorMessage);
-
         // Verify activity.save.download is not called
         expect(activity.save.download).not.toHaveBeenCalled();
     });
