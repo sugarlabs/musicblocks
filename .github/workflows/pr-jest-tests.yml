@@ -31,6 +31,7 @@ jobs:
         id: jest
         run: |
           npm test -- --json --outputFile=jest-results.json || echo "TESTS_FAILED=true" >> $GITHUB_ENV
+
       - name: Read Jest Results
         id: results
         run: |
@@ -44,6 +45,7 @@ jobs:
             echo "TESTS_PASSED=true" >> $GITHUB_ENV
             echo "FAILED_TESTS=None" >> $GITHUB_ENV
           fi
+
       - name: Post Comment on PR using GitHub CLI
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -60,4 +62,3 @@ jobs:
             echo '```'
           } > "$COMMENT_FILE"
           gh pr comment "$PR_NUMBER" --body-file "$COMMENT_FILE"
-          
