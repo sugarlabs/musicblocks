@@ -18,6 +18,19 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensures full history is fetched
+
+      - name: Configure Git User
+        run: |
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Merge PR with Master (Simulated)
+        run: |
+          git fetch origin master
+          git checkout -b test-merged-pr
+          git merge origin/master --no-edit
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
