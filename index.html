@@ -678,6 +678,25 @@
                                     ></a
                                 >
                             </li>
+                            <!-- Dropdown menu for Play-Only Mode -->
+                            <ul id="aux-dropdown" class="dropdown-content">
+                                <li>
+                                    <a id="themeSelectIcon" class="tooltipped dropdown-trigger" data-position="left" data-activates="themedropdown">
+                                        <i class="material-icons md-48">brightness_7</i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a id="restoreIcon" class="tooltipped" data-position="bottom">
+                                        <i class="material-icons md-48">restore_from_trash</i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a id="languageSelectIcon" class="tooltipped dropdown-trigger" data-position="left" data-activates="languagedropdown">
+                                        <i class="material-icons md-48">translate</i>
+                                    </a>
+                                </li>
+                            </ul>
+                            
                             <li>
                                 <a
                                     id="helpIcon"
@@ -988,66 +1007,34 @@
         </div>
         </div>
         <script>
-            let persistentNotification = null; 
+            let persistentNotification = null;
         
             function togglePlayOnlyMode() {
                 const isSmallScreen = window.innerWidth < 768 || window.innerHeight < 600;
                 const body = document.body;
-                const homeButton = document.getElementById("Home [HOME]");
-                const buttonContainer = document.getElementById("buttoncontainerBOTTOM");
+                const auxToolbar = document.getElementById("aux-toolbar");
+                const toggleAuxBtn = document.getElementById("toggleAuxBtn");
         
                 if (isSmallScreen) {
+                    // Enable Play-Only Mode
                     body.classList.add("play-only");
                     showPersistentNotification();
         
-                    if (buttonContainer) {
-                        buttonContainer.style.display = "flex";
-                        buttonContainer.style.justifyContent = "flex-end";
-                        buttonContainer.style.alignItems = "center";
+                    if (auxToolbar) {
+                        auxToolbar.style.display = "none"; 
                     }
-        
-                    if (homeButton) {
-                        homeButton.style.display = "flex";
-                        homeButton.style.position = "fixed";
-                        homeButton.style.right = "15px";
-                        homeButton.style.bottom = "15px";
-                        homeButton.style.zIndex = "10000";
-                    }
-        
-                    hideElementById("Show/hide blocks");
-                    hideElementById("Expand/collapse blocks");
-                    hideElementById("Decrease block size");
-                    hideElementById("Increase block size");
-                    hideElementById("grid");
-                    hideElementById("palette");
+                    
+                    enableAuxDropdown();
         
                 } else {
                     body.classList.remove("play-only");
                     removePersistentNotification();
         
-                    if (homeButton) homeButton.style = "";
-                    if (buttonContainer) buttonContainer.style = "";
+                    if (auxToolbar) {
+                        auxToolbar.style.display = "";
+                    }
         
-                    showElementById("Show/hide blocks");
-                    showElementById("Expand/collapse blocks");
-                    showElementById("Decrease block size");
-                    showElementById("Increase block size");
-                    showElementById("grid");
-                    showElementById("palette");
-                }
-            }
-        
-            function hideElementById(elementId) {
-                const elem = document.getElementById(elementId);
-                if (elem) {
-                    elem.style.display = "none";
-                }
-            }
-        
-            function showElementById(elementId) {
-                const elem = document.getElementById(elementId);
-                if (elem) {
-                    elem.style.display = "";
+                    disableAuxDropdown();
                 }
             }
         
@@ -1055,7 +1042,8 @@
                 if (!persistentNotification) {
                     persistentNotification = document.createElement("div");
                     persistentNotification.id = "persistentNotification";
-                    persistentNotification.innerHTML = "Play only mode enabled. For full Music Blocks experience, use a larger display.";
+                    persistentNotification.innerHTML =
+                        "Play only mode enabled. For full Music Blocks experience, use a larger display.";
                     document.body.appendChild(persistentNotification);
                 }
             }
@@ -1067,11 +1055,31 @@
                 }
             }
         
+            function enableAuxDropdown() {
+                const toggleAuxBtn = document.getElementById("toggleAuxBtn");
+                if (toggleAuxBtn) {
+                    toggleAuxBtn.addEventListener("click", function (event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+        
+                        const auxDropdown = document.getElementById("aux-dropdown");
+                        if (auxDropdown) {
+                            auxDropdown.classList.toggle("show-dropdown");
+                        }
+                    });
+                }
+            }
+        
+            function disableAuxDropdown() {
+                const auxDropdown = document.getElementById("aux-dropdown");
+                if (auxDropdown) {
+                    auxDropdown.classList.remove("show-dropdown");
+                }
+            }
+        
             togglePlayOnlyMode();
-            
             window.addEventListener("resize", togglePlayOnlyMode);
         </script>
-        
         
         
         <div id="searchBar" tabindex="-1">
