@@ -923,9 +923,20 @@ class PhraseMaker {
             lyricsRow.setAttribute("id", "lyricRow");
             lyricsRow.style.position = "sticky";
 
+            // Label Icon
+            cell = lyricsRow.insertCell();
+            cell.setAttribute("colspan", "1");
+            cell.className = "headcol";
+            cell.style.position = "sticky";
+            cell.style.left = "1.2px";
+            cell.style.zIndex = "1";
+            cell.style.backgroundColor = platformColor.lyricsLabelBackground;
+            cell.style.textAlign = "center";
+            cell.innerHTML = `<img src="images/pen.svg" height="${iconSize}" width="${iconSize}" vertical-align="middle">`;
+
             // Label Cell (Fixed like "note value")
             cell = lyricsRow.insertCell();
-            cell.setAttribute("colspan", "2");
+            cell.setAttribute("colspan", "1");
             cell.className = "headcol";
             cell.style.position = "sticky";
             cell.style.left = "1.2px";
