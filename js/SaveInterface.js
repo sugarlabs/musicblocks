@@ -663,3 +663,8 @@ class SaveInterface {
         this.activity.logo.runningMxml = false;
     }
 }
+
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { SaveInterface };
+}
