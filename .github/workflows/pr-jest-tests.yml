@@ -1,0 +1,77 @@
+name: Run Jest Tests on PR
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  test:
+    name: Run Jest Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensures full history is fetched
+
+      - name: Configure Git User
+        run: |
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Merge PR with Master (Simulated)
+        run: |
+          git fetch origin master
+          git checkout -b test-merged-pr
+          git merge origin/master --no-edit
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Jest Tests
+        id: jest
+        run: |
+          npm test -- --json --outputFile=jest-results.json || echo "TESTS_FAILED=true" >> $GITHUB_ENV
+
+      - name: Read Jest Results
+        id: results
+        run: |
+          if [ "$TESTS_FAILED" = "true" ]; then
+            echo "TESTS_PASSED=false" >> $GITHUB_ENV
+            FAILED_TESTS=$(jq -r '[.testResults[] | select(.status == "failed") | .name] | map(split("/") | last) | join("\n")' jest-results.json)
+            echo "FAILED_TESTS<<EOF" >> $GITHUB_ENV
+            echo "$FAILED_TESTS" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+          else
+            echo "TESTS_PASSED=true" >> $GITHUB_ENV
+            echo "FAILED_TESTS=None" >> $GITHUB_ENV
+          fi
+
+      - name: Post Comment on PR using GitHub CLI
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+          COMMENT_FILE=$(mktemp)
+          {
+            echo "${{ env.TESTS_PASSED == 'true' && '✅ All Jest tests passed! This PR is ready to merge.' || '❌ Some Jest tests failed. Please check the logs and fix the issues before merging.' }}"
+            echo ""
+            echo "**Failed Tests:**"
+            echo ""
+            echo '```'
+            echo "${{ env.FAILED_TESTS }}"
+            echo '```'
+          } > "$COMMENT_FILE"
+          gh pr comment "$PR_NUMBER" --body-file "$COMMENT_FILE"
