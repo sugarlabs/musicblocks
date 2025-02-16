@@ -16,7 +16,19 @@
   outline: none;
 }
 
+body:not(.dark) #helpfulSearch,
+body:not(.dark) .ui-autocomplete {
+    background-color: #fff !important;
+    color: #000 !important;
+}
 
+body:not(.dark) .ui-autocomplete li:hover {
+    background-color: #ddd !important;
+}
+
+body:not(.dark) #helpfulSearchDiv {
+    background-color: #f9f9f9 !important;
+}
 
 .modal {
   display: none;
@@ -622,6 +634,8 @@ table {
 
 #canvas {
   overflow-y: visible;
+  background-color: #FFFFFF; 
+  width: 100%;
 }
 
 #statusDiv {
