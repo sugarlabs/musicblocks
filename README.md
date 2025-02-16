@@ -96,46 +96,17 @@ CLI_), on your local machine.
 2. In a terminal, `cd` to the directory where you downloaded/cloned
 Music Blocks, using `cd path/to/musicblocks/`.
 
-3. If you do not have [_Python_](https://www.python.org) installed,
-you'll need to install it.  You can test for Python in a terminal
-using `python`. Type `exit()` to exit Python. (Note that on some older
-Linux systems, the `python3` command is not bound to python. You may
-need to perform a `sudo apt install python-is-python3` on Debian-like
-distros, or equivalent on others.)
-
-4. After cloning the musicblocks repository, you can choose one of two methods to start a local server: using Python or using npm
-
-   **Using Python**
-
-   for _Linux_ and _macOS_:
+3. After you are in `path/to/musicblocks/` directory, install the dependencies using the following command
 
     ```bash
-    python -c "import os, sys; os.system('python -m SimpleHTTPServer 3000 --bind 127.0.0.1') if sys.version_info.major==2 else os.system('python -m http.server 3000 --bind 127.0.0.1')"
+    npm install
     ```
 
-    for _Windows_:
-
-    ```bash
-    python -c "import os, sys; os.system('python -m SimpleHTTPServer 3000') if sys.version_info.major==2 else os.system('python -m http.server 3000 --bind 127.0.0.1')"
-    ```
-
-
-    **Using npm**
-
-    for _Linux_ and _macOS_:
+4. After cloning the musicblocks repository, you can start a local server using npm
 
     ```bash
     npm run serve
     ```
-
-    for _Windows_:
-
-    ```bash
-    npm run winserve
-    ```
-
-    **NOTE:** _Make sure you can run either `python` or `py` from your
-    terminal, to launch the Python prompt._
 
 6. You should see a message `Serving HTTP on 127.0.0.1 port 3000
 (http://127.0.0.1:3000/) ...` since the HTTP Server is set to start
