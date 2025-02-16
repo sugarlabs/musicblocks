@@ -1998,7 +1998,7 @@ steps simultaneously. A second *Play-all* button to the right of the
 stair plays in increasing order of frequency first, then in 
 decreasing order of frequency as well, completing a scale.
 
-The *Save stack* button will export pitch stacks. For example, in the
+Clicking the wave icon shown in the widget will subdivide the pitch stacks according to the musical proportions defined in the widget's input fields.The *Save stack* button will export pitch stacks. For example, in the
 above configuration, the output from pressing the *Save stack* button
 is shown below:
 
