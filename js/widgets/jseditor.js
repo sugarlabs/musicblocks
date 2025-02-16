@@ -210,7 +210,7 @@ class JSEditor {
         menuRight.appendChild(styleBtn);
         menubar.appendChild(menuRight);
         this._editor.appendChild(menubar);
-        generateTooltip(styleBtn, "Change Theme", "left");
+        generateTooltip(styleBtn, "Change theme", "left");
 
         const editorContainer = document.createElement("div");
         editorContainer.id = "editor_container";
