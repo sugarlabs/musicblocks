@@ -105,7 +105,7 @@ Music Blocks, using `cd path/to/musicblocks/`.
 4. After cloning the musicblocks repository, you can start a local server using npm
 
     ```bash
-    npm run serve
+    npm run dev
     ```
 
 6. You should see a message `Serving HTTP on 127.0.0.1 port 3000
