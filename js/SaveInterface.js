@@ -425,7 +425,7 @@ class SaveInterface {
             generateMidi(data);
             activity.logo._midiData = {};
             document.body.style.cursor = "default";
-        },500);
+        }, 500);
     }
 
     /**
