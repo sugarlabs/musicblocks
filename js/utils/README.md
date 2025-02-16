@@ -29,34 +29,30 @@ This guide explains how you can add your own custom theme or customize an existi
 
 Note: If you want to customise an existing theme, just put your changes in the dark mode and choose dark mode from the theme dropdown. You can skip to step no. 6 if that is your goal.
 
-1.  **Adding your theme's name to the list in index.html**
+1.  **Adding your theme's icon to the list in index.html**
 
-    Go to index.html from root, and add your theme to the list (please follow the conventions used by other themes for proper implementation)
+    Go to index.html from root, and add your theme's icon to the list (please follow the conventions used by other themes for proper implementation)
+    Add your theme's icon to the bottom of the list, you can find icons in [Material Icons](https://materializecss.com/icons.html).
 
     ```javascript
-    <ul id="themedropdown" class="dropdown-content">
-        <li>
-            <a id="light"></a>
-        </li>
-        <li>
-            <a id="dark"></a>
-        </li>
-        <li>
-            <a id="custom"></a>
-        </li>
+    <ul style="display: none;" id="themedropdown" class="dropdown-content">
+        <a id="light" class="tooltipped" data-tooltip="Light Mode"><i class='material-icons'>brightness_7</i></a>
+        <a id="dark" class="tooltipped" data-tooltip="Dark Mode"><i class='material-icons'>brightness_4</i></a>
+        <a id="custom" class="tooltipped" data-tooltip="Custom Theme"><i class='material-icons'>choose_your_material_icon</i></a>
     </ul>
     ```
 
 2.  **Now go to js/toolbar.js, find init(activity){...}**
 
     There will be 4 arrays named string (two in an if statement, rest two in the else statement).
-    Add your theme's name to the bottom of the array
+    Add your theme's name to the bottom of the pre-existing themes.
+
 
     ```javascript
     string = [[...],
-        ["light", _("Light Mode"), "innerHTML"],
-        ["dark", _("Dark Mode"), "innerHTML"],
-        ["custom", _("Custom Theme"), "innerHTML"]];
+        ["light", _("Light Mode")],
+        ["dark", _("Dark Mode")],
+        ["custom", _("Custom Theme")]];
     ```
 
     ```javascript
@@ -177,7 +173,7 @@ Note: If you want to customise an existing theme, just put your changes in the d
 
 6.  **Now to add styling for your theme**
 
-    (If you skipped to here, these are the files responsible for styling, the CSS is easy to understand and modify, but to change the color of elements in javascript files, look at the entire code base and search for "platformColor". You will find all the places where JS is used to style. You don't have to add your own theme, you can just change styling in dark mode CSS and JS, and then choose dark mode n the toolbar.)
+    (If you skipped to here, these are the files responsible for styling, the CSS is easy to understand and modify, but to change the color of elements in javascript files, look at the entire code base and search for "platformColor". You will find all the places where JS is used to style. You don't have to add your own theme, you can just change styling in dark mode CSS and JS, and then choose dark mode in the toolbar.)
 
     You have to add styling to three places,
 

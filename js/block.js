@@ -738,9 +738,9 @@ class Block {
 
             if (this.name === "start" || this.name === "drum") {
                 // Rescale the decoration on the start blocks.
-                for (let t = 0; t < this.activity.turtles.turtleList.length; t++) {
-                    if (this.activity.turtles.turtleList[t].startBlock === this) {
-                        this.activity.turtles.turtleList[t].resizeDecoration(
+                for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
+                    if (this.activity.turtles.getTurtle(t).startBlock === this) {
+                        this.activity.turtles.getTurtle(t).resizeDecoration(
                             scale,
                             this.bitmap.image.width
                         );
@@ -3323,9 +3323,9 @@ class Block {
                     dx = (25 * this.protoblock.scale) / 2;
                 }
 
-                for (let t = 0; t < this.activity.turtles.turtleList.length; t++) {
-                    if (this.activity.turtles.turtleList[t].startBlock === this) {
-                        this.activity.turtles.turtleList[t].decorationBitmap.x =
+                for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
+                    if (this.activity.turtles.getTurtle(t).startBlock === this) {
+                        this.activity.turtles.getTurtle(t).decorationBitmap.x =
                             this.width - dx - (30 * this.protoblock.scale) / 2;
                         break;
                     }

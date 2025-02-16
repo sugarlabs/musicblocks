@@ -497,17 +497,18 @@ function setupExtrasBlocks(activity) {
             if (logo.inOscilloscope && cblk !== null) {
                 const name = activity.blocks.blockList[cblk].value;
                 let turtleIndex = -1;
-                for (let i = 0; i < activity.turtles.turtleList.length; i++) {
-                    if (!activity.turtles.turtleList[i].inTrash) {
-                        const turtleName = activity.turtles.turtleList[i].name;
+                for (let i = 0; i < activity.turtles.getTurtleCount(); i++) {
+                    const turtle = activity.turtles.getTurtle(i);
+                    if (!turtle.inTrash) {
+                        const turtleName = turtle.name;
                         if (turtleName === name) turtleIndex = i;
                     }
                 }
                 if (
                     turtleIndex > -1 &&
-                    logo.oscilloscopeTurtles.indexOf(activity.turtles.turtleList[turtleIndex]) < 0
+                    logo.oscilloscopeTurtles.indexOf(activity.turtles.getTurtle(turtleIndex)) < 0
                 )
-                    logo.oscilloscopeTurtles.push(activity.turtles.turtleList[turtleIndex]);
+                    logo.oscilloscopeTurtles.push(activity.turtles.getTurtle(turtleIndex));
             } else if (logo.inMatrix) {
                 logo.phraseMaker.lyricsON = true;
             } else if (!logo.inStatusMatrix) {

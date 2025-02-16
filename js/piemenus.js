@@ -2594,7 +2594,6 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
         }
 
         setTimeout(() => {
-            that.activity.logo.synth.setMasterVolume(DEFAULTVOLUME);
             Singer.setSynthVolume(that.activity.logo, 0, voice, DEFAULTVOLUME);
             that.activity.logo.synth.trigger(0, "G4", 1 / 4, voice, null, null, false);
             that.activity.logo.synth.start();

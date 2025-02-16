@@ -748,10 +748,10 @@ const runAnalytics = (activity) => {
     // Using lilypond output to run through code and get some stats.
     logo.runningLilypond = true;
     logo.notationNotes = {};
-    for (let turtle = 0; turtle < turtles.turtleList.length; turtle++) {
+    for (let turtle = 0; turtle < turtles.getTurtleCount(); turtle++) {
         logo.notation.notationStaging[turtle] = [];
         logo.notation.notationDrumStaging[turtle] = [];
-        turtles.turtleList[turtle].painter.doClear(true, true, true);
+        turtles.getTurtle(turtle).painter.doClear(true, true, true);
     }
     document.body.style.cursor = "wait";
     logo.collectingStats = true;

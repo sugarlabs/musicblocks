@@ -1,7 +1,31 @@
+/* Theme DropDown Styling */
+
+#themedropdown{
+  background-color: transparent;
+  box-shadow: none;
+  display: flex;         
+  transform: translateX(-25%) !important;  
+}
+
+#themedropdown a{
+  color: #2196F3;
+  transition: all 0.3s ease;
+}
+#themedropdown a:hover{
+  color: #1E88E5;
+  background-color: transparent;
+  transition: all 0.3s ease;
+}
+
+
 /* Dark Mode */
 
 .dark .blue {
     background-color: #022363 !important;
+  }
+  
+  .dark #canvas {
+    background-color: #1c1c1c;
   }
   
   .dark .blue.darken-1 {
@@ -39,19 +63,6 @@
     color: white !important;
   }
   
-  .dark .dropdown-content li > a {
-    background-color: #1c1c1c;
-    color: #3fe0d1;
-  }
-  
-  .dark .dropdown-content li > a:hover {
-    color: #252525;
-  }
-  
-  .dark .dropdown-content {
-    background-color: #1c1c1c;
-  }
-  
   .dark .language-link {
     color: #fff;
   }
@@ -68,21 +79,31 @@
   .dark #search,
   #helpfulSearch,
   .ui-autocomplete {
-    background-color: #1c1c1c;
-    color: #fff;
+    background-color: #1c1c1c !important;
+    color: #fff !important;
   }
   
   .dark .ui-autocomplete li:hover {
-    background-color: #225a91;
+    background-color: #225a91 !important;
   }
   
   .dark #helpfulSearchDiv {
-    background-color: transparent;
+    background-color: transparent !important;
   }
   
   .dark #crossButton {
     color: #fff;
   }
+
+  .dark #chooseKeyDiv {
+    background: #333;
+  }
+  
+.dark #movable {
+  background: #333;
+  color: white;
+}
+
 
 
 /* Your Custom Theme can go here if you don't want to modify the existing dark mode */
