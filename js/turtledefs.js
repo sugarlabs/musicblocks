@@ -242,7 +242,6 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
         _("dictionary"),
         _("ensemble"),
         _("extras"),
-        //.TRANS: program as in computer program
         _("program"),
         _("my blocks")
     ];
@@ -646,7 +645,7 @@ const createHelpContent = (activity) => {
     ]);
     HELPCONTENT.push([
         _("Merge with current project"),
-        _(" Click to add another project into the current one."),
+        _("Click to add another project into the current one."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(OPENMERGEBUTTON))
     ]);
@@ -694,25 +693,25 @@ const createHelpContent = (activity) => {
     ]); 
     HELPCONTENT.push([
         _("Contextual Menu for Blocks"),
-        _("Right-click a block to access common actions and manage blocks in the workspace."),
+        _("Right-click on a block to access common actions."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(BLOCKMENUBUTTON))
     ]);
     HELPCONTENT.push([
         _("Delete"),
-        _("To delete a block, just right-click on it, then you will be able to see the delete option"),
+        _("To delete a block, right-click on it. Then you will see the delete option"),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(EMPTYTRASHCONFIRMBUTTON))
     ]);
     HELPCONTENT.push([
         _("Copy"),
-        _("To copy a block, just right-click on it, then you will be able to see the copy option"),
+        _("To copy a block, right-click on it. Then you will see the copy option"),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(COPYBUTTON))
     ]);
     HELPCONTENT.push([
         _("Extract"),
-        _("To extract a block, just right-click on it, then you will be able to see the extract option"),
+        _("To extract a block, right-click on it. Then you will see the extract option"),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(EXTRACTBUTTON))
     ]);
