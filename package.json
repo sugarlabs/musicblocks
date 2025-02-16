@@ -19,7 +19,7 @@
   },
   "scripts": {
     "lint": "eslint js/**/*.js",
-    "serve": "http-server -a 127.0.0.1 -p 3000",
+    "serve": "http-server -a 127.0.0.1 -p 3000 --gzip --brotli",
     "test": "jest",
     "cypress:run": "cypress run"   
   },
