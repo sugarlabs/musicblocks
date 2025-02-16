@@ -75,3 +75,4 @@ jobs:
             echo '```'
           } > "$COMMENT_FILE"
           gh pr comment "$PR_NUMBER" --body-file "$COMMENT_FILE"
+# Workflow to ensure the changes in the PR to pass all the tests 
