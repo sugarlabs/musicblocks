@@ -591,6 +591,10 @@ const createHelpContent = (activity) => {
                     ": " +
                     _("Save audio from your project as WAV.") +
                     "<br/><br/>" +
+                    _("Save music as MIDI") +
+                    ": " +
+                    _("Save your project in MIDI format.") +
+                    "<br/><br/>" +
                     _("Save sheet music as ABC") +
                     ": " +
                     _("Save your project to as an ABC file.") +
