@@ -60,7 +60,7 @@ class PitchStaircase {
         const cell = row.insertCell(-1);
         cell.innerHTML =
             `&nbsp;&nbsp;<img 
-                src="header-icons/icon" 
+                src="header-icons/play-button.svg" 
                 title="${label}" 
                 alt="${label}" 
                 height="${iconSize}" 
