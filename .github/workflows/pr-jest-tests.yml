@@ -77,7 +77,7 @@ jobs:
           } > "$COMMENT_FILE"
 
       - name: PR comment
-        if: github.event.pull_request.head.repo.full_name == github.repository
+        if: github.event.pull_request.head.repo.fork == true
         uses: thollander/actions-comment-pull-request@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}  # Fix: Moved from `env:` to `with:`
