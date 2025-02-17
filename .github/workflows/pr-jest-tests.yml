@@ -61,5 +61,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          file-path: {{ step.results.outputs.COMMENT_FILE }}
-          pr-number: {{ steps.results.outputs.PR_NUMBER }}
+          file-path: ${{ step.results.outputs.COMMENT_FILE }}
+          pr-number: ${{ steps.results.outputs.PR_NUMBER }}
