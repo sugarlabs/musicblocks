@@ -311,25 +311,25 @@ const processABCNotes = function(logo, turtle) {
             if (obj[NOTATIONTUPLETVALUE] > 0) {
                 if (incompleteTuplet === 0) {
                     const tupletFraction = toFraction(tupletDuration /
-                                                    targetDuration);
-                    logo.notationNotes[turtle] +=
-                        "(" + tupletFraction[0] + ":" + tupletFraction[1] + "";
-                    i += __processTuplet(
-                        logo, turtle, i, obj[NOTATIONTUPLETVALUE]) - 1;
-                } else {
-                    const tupletFraction = toFraction(
-                        obj[NOTATIONTUPLETVALUE] / incompleteTuplet);
-                    logo.notationNotes[turtle] +=
-                        "(" + tupletFraction[0] + ":" + tupletFraction[1] + "";
-                    i += __processTuplet(logo, turtle, i, incompleteTuplet) - 1;
-                }
+            //                                         targetDuration);
+            //         logo.notationNotes[turtle] +=
+            //             "(" + tupletFraction[0] + ":" + tupletFraction[1] + "";
+            //         i += __processTuplet(
+            //             logo, turtle, i, obj[NOTATIONTUPLETVALUE]) - 1;
+            //     } else {
+            //         const tupletFraction = toFraction(
+            //             obj[NOTATIONTUPLETVALUE] / incompleteTuplet);
+            //         logo.notationNotes[turtle] +=
+            //             "(" + tupletFraction[0] + ":" + tupletFraction[1] + "";
+            //         i += __processTuplet(logo, turtle, i, incompleteTuplet) - 1;
+            //     }
 
-                targetDuration = 0;
-                tupletDuration = 0;
-            } else {
-                if (typeof notes === "object") {
-                    if (notes.length > 1) {
-                        logo.notationNotes[turtle] += "[";
+            //     targetDuration = 0;
+            //     tupletDuration = 0;
+            // } else {
+            //     if (typeof notes === "object") {
+            //         if (notes.length > 1) {
+            //             logo.notationNotes[turtle] += "[";
                     }
 
                     for (let ii = 0; ii < notes.length; ii++) {
