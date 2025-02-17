@@ -935,7 +935,20 @@ class Toolbar {
             const saveButton = docById('saveButton');
             const saveButtonAdvanced = docById('saveButtonAdvanced');
             if (saveButton) saveButton.style.display = this.activity.beginnerMode ? "block" : "none";
-            if (saveButtonAdvanced) saveButtonAdvanced.style.display = this.activity.beginnerMode ? "none" : "block";
+            if (saveButtonAdvanced) saveButtonAdvanced.style.display = this.activity.beginnerMode ? "none" : "block";   
+            activity.toolbar.renderSaveIcons(
+                activity.save.saveHTML.bind(activity.save),
+                doSVG,
+                activity.save.saveSVG.bind(activity.save),
+                activity.save.savePNG.bind(activity.save),
+                activity.save.saveWAV.bind(activity.save),
+                activity.save.saveLilypond.bind(activity.save),
+                activity.save.afterSaveLilypondLY.bind(activity.save),
+                activity.save.saveAbc.bind(activity.save),
+                activity.save.saveMxml.bind(activity.save),
+                activity.save.saveBlockArtwork.bind(activity.save),
+                activity.save.saveBlockArtworkPNG.bind(activity.save)
+            );
         };
 
         // Handle mode switching
