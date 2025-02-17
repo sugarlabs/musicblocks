@@ -79,9 +79,9 @@ jobs:
           } > "$COMMENT_FILE"
 
       - name: PR comment
-        uses: thollander/actions-comment-pull-request@v3
-        with:
-          file-path: ${{ steps.results.outputs.COMMENT_FILE }}
-          pr-number: ${{ steps.results.outputs.PR_NUMBER }}
         env:
+          COMMENT_FILE: ${{ steps.results.outputs.COMMENT_FILE }}
+          PR_NUMBER: ${{ steps.results.outputs.PR_NUMBER }}
           GITHUB_TOKEN: ${{ secrets.PAT }}
+        run: |
+          gh pr comment "$PR_NUMBER" "$COMMENT_FILE"
