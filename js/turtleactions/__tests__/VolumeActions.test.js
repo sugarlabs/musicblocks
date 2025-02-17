@@ -40,13 +40,16 @@ describe('setupVolumeActions', () => {
                 ithTurtle: jest.fn(),
             },
             blocks: {
-                blockList: { 1: {} },
+                blockList: {
+                    1: { connections: [{}, {}] },
+                },
             },
             logo: {
                 setDispatchBlock: jest.fn(),
                 setTurtleListener: jest.fn(),
                 synth: {
                     loadSynth: jest.fn(),
+                    setMasterVolume: jest.fn(),
                 },
                 notation: {
                     notationBeginArticulation: jest.fn(),
@@ -54,7 +57,8 @@ describe('setupVolumeActions', () => {
                     notationEndCrescendo: jest.fn(),
                 },
                 blockList: {
-                    block1: { connections: [{}, {}] },
+                    1: { connections: [{}, {}] },
+                    2: { connections: [{}] },
                 },
             },
             errorMsg: jest.fn(),
@@ -67,7 +71,7 @@ describe('setupVolumeActions', () => {
         activity.logo.blockList['testBlock'] = { connections: [{}] };
         targetTurtle = {
             singer: {
-                synthVolume: { default: [DEFAULTVOLUME] }, 
+                synthVolume: { default: [DEFAULTVOLUME] },
                 crescendoInitialVolume: { default: [DEFAULTVOLUME] },
                 crescendoDelta: [],
                 inCrescendo: [],
@@ -78,10 +82,10 @@ describe('setupVolumeActions', () => {
             },
         };
         activity.turtles.ithTurtle.mockReturnValue(targetTurtle);
-
+    
         setupVolumeActions(activity);
         activity.errorMsg.mockImplementation((message) => {
-            if (message.includes('not found') && !message.includes('invalidSynth')) {
+            if (message.includes('not found')) {
                 message = message.replace("null", "invalidSynth");
             }
             return message;
@@ -218,14 +222,18 @@ describe('setupVolumeActions', () => {
     });
 
     it('should set synth volume correctly', () => {
-        Singer.VolumeActions.setSynthVolume('piano', 80, 0, 'block1');
-        expect(targetTurtle.singer.synthVolume['piano']).toContain(80);
-        expect(Singer.setSynthVolume).toHaveBeenCalledWith(activity.logo, 0, 'piano', 80);
+        targetTurtle.singer.synthVolume['default'] = [DEFAULTVOLUME];
+        activity.logo.blockList = { testBlock: { connections: [{}] } };
+        const someBlockId = 'testBlock';
+        Singer.VolumeActions.setSynthVolume('default', 70, 0, someBlockId);
+        expect(targetTurtle.singer.synthVolume['default']).toContain(70);
+        expect(Singer.setSynthVolume).toHaveBeenCalledWith(activity.logo, 0, 'default', 70);
     });
 
     it('should not set volume for undefined synth', () => {
         const errorMsgSpy = jest.spyOn(activity, 'errorMsg');
-        Singer.VolumeActions.setSynthVolume('null', 50, 0, 'block1');
+        activity.logo.blockList['testBlock'] = { connections: [{}] };
+        Singer.VolumeActions.setSynthVolume('null', 50, 0, 'testBlock');
         expect(errorMsgSpy).toHaveBeenCalledWith('nullnot found');
-    }); 
+    });  
 });
