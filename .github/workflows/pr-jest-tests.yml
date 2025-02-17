@@ -10,7 +10,9 @@ jobs:
   test:
     name: Run Jest Tests
     runs-on: ubuntu-latest
-    permissions: write-all
+    permissions:
+      pull-requests: write
+      contents: read
 
     steps:
       - name: Checkout Repository
