@@ -6,18 +6,17 @@ on:
       - opened
       - synchronize
 
-permissions: write-all
-
 jobs:
   test:
     name: Run Jest Tests
     runs-on: ubuntu-latest
+    permissions: write-all
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Nodejs
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -33,26 +32,32 @@ jobs:
       - name: Read Jest Results
         id: results
         run: |
-          # Check if tests failed and set the appropriate environment variables
+          # Default TESTS_FAILED to false
+          if [ -z "$TESTS_FAILED" ]; then
+            TESTS_FAILED=false
+          fi
+
+          # Set TESTS_PASSED properly
           if [ "$TESTS_FAILED" = "true" ]; then
+            TESTS_PASSED=false
             echo "TESTS_PASSED=false" >> $GITHUB_ENV
             FAILED_TESTS=$(jq -r '[.testResults[] | select(.status == "failed") | .name] | map(split("/") | last) | join("\n")' jest-results.json)
             echo "FAILED_TESTS<<EOF" >> $GITHUB_ENV
             echo "$FAILED_TESTS" >> $GITHUB_ENV
             echo "EOF" >> $GITHUB_ENV
           else
+            TESTS_PASSED=true
             echo "TESTS_PASSED=true" >> $GITHUB_ENV
             echo "FAILED_TESTS=None" >> $GITHUB_ENV
           fi
 
           # Extract PR number
           PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-          
+
           # Generate a temporary file for the comment
           COMMENT_FILE=$(mktemp)
 
-          # Prepare the comment with the test result and failed tests (if any)
-          echo "TESTS_PASSED=$TESTS_PASSED" >> $GITHUB_ENV
+          # Save variables to GITHUB_OUTPUT
           echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_OUTPUT
           echo "COMMENT_FILE=$COMMENT_FILE" >> $GITHUB_OUTPUT
 
@@ -74,7 +79,7 @@ jobs:
       - name: PR comment
         uses: thollander/actions-comment-pull-request@v3
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}  # Fix: Moved from `env:` to `with:`
           file-path: ${{ steps.results.outputs.COMMENT_FILE }}
           pr-number: ${{ steps.results.outputs.PR_NUMBER }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
