@@ -6,11 +6,12 @@ on:
       - opened
       - synchronize
 
+permissions: write-all
+
 jobs:
   test:
     name: Run Jest Tests
     runs-on: ubuntu-latest
-    permissions: write-all
 
     steps:
       - name: Checkout Repository
