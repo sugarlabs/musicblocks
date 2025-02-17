@@ -426,16 +426,16 @@ const saveAbcOutput = function(activity) {
     // for (const t in activity.logo.notation.notationStaging) {
     //     turtleCount += 1;
     // }
-    // eslint-disable-next-line no-console
-    // console.debug("saving as abc: " + turtleCount);
+    // // eslint-disable-next-line no-console
+    // // console.debug("saving as abc: " + turtleCount);
 
-    for (const t in activity.logo.notation.notationStaging) {
-        activity.logo.notationOutput +=
-            "K:" + activity.turtles.ithTurtle(t).singer.keySignature
-                .toUpperCase()
-                .replace(" ", "")
-                .replace("♭", "b")
-                .replace("♯", "#") + "\n";
+    // for (const t in activity.logo.notation.notationStaging) {
+    //     activity.logo.notationOutput +=
+    //         "K:" + activity.turtles.ithTurtle(t).singer.keySignature
+    //             .toUpperCase()
+    //             .replace(" ", "")
+    //             .replace("♭", "b")
+    //             .replace("♯", "#") + "\n";
         processABCNotes(activity.logo, t);
         activity.logo.notationOutput += activity.logo.notationNotes[t];
     }
