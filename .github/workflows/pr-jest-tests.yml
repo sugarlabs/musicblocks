@@ -84,4 +84,4 @@ jobs:
           PR_NUMBER: ${{ steps.results.outputs.PR_NUMBER }}
           GITHUB_TOKEN: ${{ secrets.PAT }}
         run: |
-          gh pr comment "$PR_NUMBER" "$COMMENT_FILE"
+          gh pr comment "$PR_NUMBER" --body-file "$COMMENT_FILE"
