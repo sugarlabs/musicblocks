@@ -1,38 +1,22 @@
 name: Run Jest Tests on PR
 
 on:
-  pull_request:
+  pull_request_target:
     types:
       - opened
       - synchronize
-
-permissions:
-  pull-requests: write
-  contents: read
 
 jobs:
   test:
     name: Run Jest Tests
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Ensures full history is fetched
-
-      - name: Configure Git User
-        run: |
-          git config --global user.email "github-actions@github.com"
-          git config --global user.name "GitHub Actions"
-
-      - name: Merge PR with Master (Simulated)
-        run: |
-          git fetch origin master
-          git checkout -b test-merged-pr
-          git merge origin/master --no-edit
-
-      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -58,11 +42,6 @@ jobs:
             echo "TESTS_PASSED=true" >> $GITHUB_ENV
             echo "FAILED_TESTS=None" >> $GITHUB_ENV
           fi
-
-      - name: Post Comment on PR using GitHub CLI
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
           PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
           COMMENT_FILE=$(mktemp)
           {
@@ -74,4 +53,12 @@ jobs:
             echo "${{ env.FAILED_TESTS }}"
             echo '```'
           } > "$COMMENT_FILE"
-          gh pr comment "$PR_NUMBER" --body-file "$COMMENT_FILE"
+
+      - name: PR comment
+        uses: thollander/actions-comment-pull-request@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+        with:
+          file-path: {{ step.results.outputs.COMMENT_FILE }}
+          pr-number: {{ steps.results.outputs.PR_NUMBER }}
