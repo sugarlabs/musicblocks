@@ -83,4 +83,5 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}  # Fix: Moved from `env:` to `with:`
           file-path: ${{ steps.results.outputs.COMMENT_FILE }}
           pr-number: ${{ steps.results.outputs.PR_NUMBER }}
-
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
