@@ -132,26 +132,26 @@ const processABCNotes = function(logo, turtle) {
                     logo.notationNotes[turtle] += "!<(!";
                     break;
                 case "end crescendo":
-                    logo.notationNotes[turtle] += "!<)!";
-                    break;
-                case "begin decrescendo":
-                    logo.notationNotes[turtle] += "!>(!";
-                    break;
-                case "end decrescendo":
-                    logo.notationNotes[turtle] += "!<(!";
-                    break;
-                case "begin slur":
-                    queueSlur = true;
-                    break;
-                case "end slur":
-                    logo.notationNotes[turtle] += "";
-                    break;
-                case "tie":
-                    logo.notationNotes[turtle] += "";
-                    break;
-                case "meter":
-                    logo.notationNotes[turtle] +=
-                        "M:" +
+                //     logo.notationNotes[turtle] += "!<)!";
+                //     break;
+                // case "begin decrescendo":
+                //     logo.notationNotes[turtle] += "!>(!";
+                //     break;
+                // case "end decrescendo":
+                //     logo.notationNotes[turtle] += "!<(!";
+                //     break;
+                // case "begin slur":
+                //     queueSlur = true;
+                //     break;
+                // case "end slur":
+                //     logo.notationNotes[turtle] += "";
+                //     break;
+                // case "tie":
+                //     logo.notationNotes[turtle] += "";
+                //     break;
+                // case "meter":
+                //     logo.notationNotes[turtle] +=
+                //         "M:" +
                         logo.notation.notationStaging[turtle][i + 1] +
                         "/" +
                         logo.notation.notationStaging[turtle][i + 2] +
