@@ -1771,6 +1771,7 @@ class Activity {
          * @private
          */
         this._doHardStopButton = (onblur) => {
+            this.blocks = this.blocks || {}; // Initialize if undefined
             this.blocks.activeBlock = null;
             hideDOMLabel();
 
