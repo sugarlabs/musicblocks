@@ -18,10 +18,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install Dependencies
+      - name: Setup Nodejs
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+
+      - name: Install Dependencies
         run: npm install
 
       - name: Run Jest Tests
