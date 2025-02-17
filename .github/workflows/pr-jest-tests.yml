@@ -1,3 +1,4 @@
+
 name: Run Jest Tests on PR
 
 on:
@@ -32,10 +33,12 @@ jobs:
       - name: Read Jest Results
         id: results
         run: |
+          # Default TESTS_FAILED to false
           if [ -z "$TESTS_FAILED" ]; then
             TESTS_FAILED=false
           fi
 
+          # Set TESTS_PASSED properly
           if [ "$TESTS_FAILED" = "true" ]; then
             TESTS_PASSED=false
             echo "TESTS_PASSED=false" >> $GITHUB_ENV
@@ -49,13 +52,17 @@ jobs:
             echo "FAILED_TESTS=None" >> $GITHUB_ENV
           fi
 
+          # Extract PR number
           PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
 
+          # Generate a temporary file for the comment
           COMMENT_FILE=$(mktemp)
 
+          # Save variables to GITHUB_OUTPUT
           echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_OUTPUT
           echo "COMMENT_FILE=$COMMENT_FILE" >> $GITHUB_OUTPUT
 
+          # Generate content for the comment file
           {
             if [ "$TESTS_PASSED" = "true" ]; then
               echo "✅ All Jest tests passed! This PR is ready to merge."
@@ -70,25 +77,48 @@ jobs:
             fi
           } > "$COMMENT_FILE"
 
-      - name: Debug Output
-        run: |
-          echo "TESTS_PASSED: $TESTS_PASSED"
-          echo "COMMENT_BODY: $(cat ${{ steps.results.outputs.COMMENT_FILE }})"
-
       - name: PR comment
+        if: steps.pr-changes.outputs.changes != '[]'
         run: |
           COMMENT_BODY=$(cat "${{ steps.results.outputs.COMMENT_FILE }}")
+
+          # Debug output to ensure correct comment body format
+          echo "Comment body:"
+          echo "$COMMENT_BODY"
+
+          ESCAPED_COMMENT_BODY=$(echo "$COMMENT_BODY" | jq -Rs .)
+
+          # Debug output to show the escaped comment body
+          echo "Escaped Comment body:"
+          echo "$ESCAPED_COMMENT_BODY"
+          
           PR_NUMBER="${{ steps.results.outputs.PR_NUMBER }}"
+          
+          # Define the GitHub Token
           GH_TOKEN="${{ secrets.GITHUB_TOKEN }}"
           
           # Define the GitHub API URL for posting the comment on the PR
           COMMENT_URL="https://api.github.com/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments"
           
-          # Escape the comment body for correct JSON formatting
-          ESCAPED_COMMENT_BODY=$(echo "$COMMENT_BODY" | jq -Rs .)
+          # Check if the comment body is correctly formatted
+          if [ -z "$ESCAPED_COMMENT_BODY" ]; then
+            echo "Error: ESCAPED_COMMENT_BODY is empty"
+            exit 1
+          fi
+
+          # Make the POST request to the GitHub API to create the comment
+          RESPONSE=$(curl -s -H "Authorization: token ${GH_TOKEN}" -X POST -d "{\"body\":$ESCAPED_COMMENT_BODY}" $COMMENT_URL)
+
+          # Debug output to inspect the response
+          echo "Response from GitHub API:"
+          echo "$RESPONSE"
+
+          # Check if the response contains an error message
+          ERROR_MESSAGE=$(echo "$RESPONSE" | jq -r .message)
           
-          # Use `curl` to post the comment
-          curl -s -H "Authorization: token ${GH_TOKEN}" \
-               -X POST \
-               -d "{\"body\":$ESCAPED_COMMENT_BODY}" \
-               $COMMENT_URL
+          if [ "$ERROR_MESSAGE" != "null" ]; then
+            echo "Error posting comment: $ERROR_MESSAGE"
+            exit 1  # Fail the step if an error occurs
+          else
+            echo "Successfully posted comment"
+          fi
