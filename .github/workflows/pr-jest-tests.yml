@@ -1,4 +1,3 @@
-
 name: Run Jest Tests on PR
 
 on:
@@ -62,6 +61,7 @@ jobs:
           COMMENT_FILE=$(mktemp)
 
           # Save variables to GITHUB_OUTPUT
+          echo "TESTS_PASSED=$TESTS_PASSED" >> $GITHUB_ENV
           echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_OUTPUT
           echo "COMMENT_FILE=$COMMENT_FILE" >> $GITHUB_OUTPUT
 
@@ -80,48 +80,19 @@ jobs:
             fi
           } > "$COMMENT_FILE"
 
-      - name: PR comment
-        if: steps.pr-changes.outputs.changes != '[]'
+      - name: Post PR Comment using gh CLI
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          COMMENT_BODY=$(cat "${{ steps.results.outputs.COMMENT_FILE }}")
-
-          # Debug output to ensure correct comment body format
-          echo "Comment body:"
-          echo "$COMMENT_BODY"
-
-          ESCAPED_COMMENT_BODY=$(echo "$COMMENT_BODY" | jq -Rs .)
-
-          # Debug output to show the escaped comment body
-          echo "Escaped Comment body:"
-          echo "$ESCAPED_COMMENT_BODY"
-          
-          PR_NUMBER="${{ steps.results.outputs.PR_NUMBER }}"
-          
-          # Define the GitHub Token
-          GH_TOKEN="${{ secrets.GITHUB_TOKEN }}"
-          
-          # Define the GitHub API URL for posting the comment on the PR
-          COMMENT_URL="https://api.github.com/repos/${{ github.repository }}/issues/${PR_NUMBER}/comments"
-          
-          # Check if the comment body is correctly formatted
-          if [ -z "$ESCAPED_COMMENT_BODY" ]; then
-            echo "Error: ESCAPED_COMMENT_BODY is empty"
-            exit 1
-          fi
-
-          # Make the POST request to the GitHub API to create the comment
-          RESPONSE=$(curl -s -H "Authorization: token ${GH_TOKEN}" -X POST -d "{\"body\":$ESCAPED_COMMENT_BODY}" $COMMENT_URL)
-
-          # Debug output to inspect the response
-          echo "Response from GitHub API:"
-          echo "$RESPONSE"
-
-          # Check if the response contains an error message
-          ERROR_MESSAGE=$(echo "$RESPONSE" | jq -r .message)
-          
-          if [ "$ERROR_MESSAGE" != "null" ]; then
-            echo "Error posting comment: $ERROR_MESSAGE"
-            exit 1  # Fail the step if an error occurs
+          COMMENT_BODY=""
+          if [ "$TESTS_PASSED" = "true" ]; then
+            COMMENT_BODY="✅ All Jest tests passed! This PR is ready to merge."
           else
-            echo "Successfully posted comment"
+            COMMENT_BODY="❌ Some Jest tests failed. Please check the logs and fix the issues before merging."
+            COMMENT_BODY+="\n\nFailed Tests:\n"
+            while IFS= read -r line; do
+              COMMENT_BODY+="\n$line"
+            done <<< "$FAILED_TESTS"
           fi
+
+          echo -e "$COMMENT_BODY" | gh pr comment ${{ steps.results.outputs.PR_NUMBER }} --body-file -
