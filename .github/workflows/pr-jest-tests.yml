@@ -1,0 +1,65 @@
+name: Run Jest Tests on PR
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  test:
+    name: Run Jest Tests
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Nodejs
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Jest Tests
+        id: jest
+        run: |
+          npm test -- --json --outputFile=jest-results.json || echo "TESTS_FAILED=true" >> $GITHUB_ENV
+
+      - name: Read Jest Results
+        id: results
+        run: |
+          if [ "$TESTS_FAILED" = "true" ]; then
+            echo "TESTS_PASSED=false" >> $GITHUB_ENV
+            FAILED_TESTS=$(jq -r '[.testResults[] | select(.status == "failed") | .name] | map(split("/") | last) | join("\n")' jest-results.json)
+            echo "FAILED_TESTS<<EOF" >> $GITHUB_ENV
+            echo "$FAILED_TESTS" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+          else
+            echo "TESTS_PASSED=true" >> $GITHUB_ENV
+            echo "FAILED_TESTS=None" >> $GITHUB_ENV
+          fi
+          PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+          COMMENT_FILE=$(mktemp)
+          {
+            echo "${{ env.TESTS_PASSED == 'true' && '✅ All Jest tests passed! This PR is ready to merge.' || '❌ Some Jest tests failed. Please check the logs and fix the issues before merging.' }}"
+            echo ""
+            echo "**Failed Tests:**"
+            echo ""
+            echo '```'
+            echo "${{ env.FAILED_TESTS }}"
+            echo '```'
+          } > "$COMMENT_FILE"
+          echo "COMMENT_FILE=$COMMENT_FILE" >> GITHUB_OUTPUT
+          echo "PR_NUMBER=$PR_NUMBER" >> GITHUB_OUTPUT
+
+      - name: PR comment
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          file-path: ${{ steps.results.outputs.COMMENT_FILE }}
+          pr-number: ${{ steps.results.outputs.PR_NUMBER }}

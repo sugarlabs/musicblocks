@@ -80,6 +80,7 @@ class Toolbar {
                 ["save-html-beg", _("Save project as HTML"), "innerHTML"],
                 ["save-png-beg", _("Save mouse artwork as PNG"), "innerHTML"],
                 ["save-html", _("Save project as HTML"), "innerHTML"],
+                ["save-midi", _("Save project as MIDI"), "innerHTML"],
                 ["save-svg", _("Save mouse artwork as SVG"), "innerHTML"],
                 ["save-png", _("Save mouse artwork as PNG"), "innerHTML"],
                 ["save-wav", _("Save music as WAV"), "innerHTML"],
@@ -144,6 +145,7 @@ class Toolbar {
                 _("Switch to advanced mode"),
                 _("Select language"),
                 _("Save project as HTML"),
+                _("Save project as MIDI"),
                 _("Save mouse artwork as SVG"),
                 _("Save mouse artwork as PNG"),
                 _("Save music as WAV"),
@@ -577,6 +579,7 @@ class Toolbar {
      * 
      * @public
      * @param  {Function} html_onclick - The onclick handler for HTML.
+     * @param  {Function} midi_onclick - The onclick handler for MIDI.
      * @param  {Function} doSVG_onclick - The onclick handler for SVG.
      * @param  {Function} svg_onclick - The onclick handler for SVG.
      * @param  {Function} png_onclick - The onclick handler for PNG.
@@ -591,6 +594,7 @@ class Toolbar {
         html_onclick,
         doSVG_onclick,
         svg_onclick,
+        midi_onclick,
         png_onclick,
         wave_onclick,
         ly_onclick,
@@ -685,6 +689,11 @@ class Toolbar {
                 }
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
+                    const saveMIDI = docById("save-midi");
+                    saveMIDI.onclick = () => {
+                        midi_onclick(this.activity);
+                    };
+
                     const saveWAV = docById('save-wav');
                      saveWAV.onclick = () => {
                         wave_onclick(this.activity);
