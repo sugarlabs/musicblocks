@@ -82,17 +82,8 @@ jobs:
 
       - name: Post PR Comment using gh CLI
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT }}
+          COMMENT_FILE: ${{ steps.results.outputs.COMMENT_FILE }}
+          PR_NUMBER: ${{ steps.results.outputs.PR_NUMBER }}
         run: |
-          COMMENT_BODY=""
-          if [ "$TESTS_PASSED" = "true" ]; then
-            COMMENT_BODY="✅ All Jest tests passed! This PR is ready to merge."
-          else
-            COMMENT_BODY="❌ Some Jest tests failed. Please check the logs and fix the issues before merging."
-            COMMENT_BODY+="\n\nFailed Tests:\n"
-            while IFS= read -r line; do
-              COMMENT_BODY+="\n$line"
-            done <<< "$FAILED_TESTS"
-          fi
-
-          echo -e "$COMMENT_BODY" | gh pr comment ${{ steps.results.outputs.PR_NUMBER }} --body-file -
+          gh pr comment "$PR_NUMBER" --body-file "$COMMENT_FILE"
