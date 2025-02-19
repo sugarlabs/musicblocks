@@ -82,7 +82,7 @@ jobs:
 
       - name: Post PR Comment using gh CLI
         env:
-          GH_TOKEN: ${{ secrets.PAT }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
           COMMENT_FILE: ${{ steps.results.outputs.COMMENT_FILE }}
           PR_NUMBER: ${{ steps.results.outputs.PR_NUMBER }}
         run: |
