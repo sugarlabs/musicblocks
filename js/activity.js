@@ -169,74 +169,74 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         "widgets/pitchslider",
         "widgets/musickeyboard",
         "widgets/timbre",
-        "widgets/oscilloscope",
-        "widgets/sampler",
-        "activity/lilypond",
-        "activity/abc",
-        "activity/mxml"
-    ];
-    MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
-}
+//         "widgets/oscilloscope",
+//         "widgets/sampler",
+//         "activity/lilypond",
+//         "activity/abc",
+//         "activity/mxml"
+//     ];
+//     MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
+// }
 
-// Create a global variable from the Activity obj to provide access to
-// blocks, logo, palettes, and turtles for plugins and js-export.
-let globalActivity;
+// // Create a global variable from the Activity obj to provide access to
+// // blocks, logo, palettes, and turtles for plugins and js-export.
+// let globalActivity;
 
-/**
- * Performs analysis on the project using the global activity.
- * @returns {object} - The analysis result.
- */
-const doAnalyzeProject = function() {
-    return analyzeProject(globalActivity);
-};
+// /**
+//  * Performs analysis on the project using the global activity.
+//  * @returns {object} - The analysis result.
+//  */
+// const doAnalyzeProject = function() {
+//     return analyzeProject(globalActivity);
+// };
 
-/**
- * Represents an activity in the application.
- */
-class Activity {
-    /**
-     * Creates an Activity instance.
-     */
-    constructor() {
-        globalActivity = this;
+// /**
+//  * Represents an activity in the application.
+//  */
+// class Activity {
+//     /**
+//      * Creates an Activity instance.
+//      */
+//     constructor() {
+//         globalActivity = this;
 
-        this.cellSize = 55;
-        this.searchSuggestions = [];
-        this.homeButtonContainer;
+//         this.cellSize = 55;
+//         this.searchSuggestions = [];
+//         this.homeButtonContainer;
 
-        this.msgTimeoutID = null;
-        this.msgText = null;
-        this.errorMsgTimeoutID = null;
-        this.errorMsgText = null;
-        this.errorMsgArrow = null;
-        this.errorArtwork = {};
+//         this.msgTimeoutID = null;
+//         this.msgText = null;
+//         this.errorMsgTimeoutID = null;
+//         this.errorMsgText = null;
+//         this.errorMsgArrow = null;
+//         this.errorArtwork = {};
 
-        this.cartesianBitmap = null;
-        this.polarBitmap = null;
-        this.trebleBitmap = null;
-        this.trebleSharpBitmap = [null, null, null, null, null, null, null];
-        this.trebleFlatBitmap = [null, null, null, null, null, null, null];
-        this.grandBitmap = null;
-        this.grandSharpBitmap = [null, null, null, null, null, null, null];
-        this.grandFlatBitmap = [null, null, null, null, null, null, null];
-        this.sopranoBitmap = null;
-        this.sopranoSharpBitmap = [null, null, null, null, null, null, null];
-        this.sopranoFlatBitmap = [null, null, null, null, null, null, null];
-        this.altoBitmap = null;
-        this.altoSharpBitmap = [null, null, null, null, null, null, null];
-        this.altoFlatBitmap = [null, null, null, null, null, null, null];
-        this.tenorBitmap = null;
-        this.tenorSharpBitmap = [null, null, null, null, null, null, null];
-        this.tenorFlatBitmap = [null, null, null, null, null, null, null];
-        this.bassBitmap = null;
-        this.bassSharpBitmap = [null, null, null, null, null, null, null];
-        this.bassFlatBitmap = [null, null, null, null, null, null, null];
+//         this.cartesianBitmap = null;
+//         this.polarBitmap = null;
+//         this.trebleBitmap = null;
+//         this.trebleSharpBitmap = [null, null, null, null, null, null, null];
+//         this.trebleFlatBitmap = [null, null, null, null, null, null, null];
+//         this.grandBitmap = null;
+//         this.grandSharpBitmap = [null, null, null, null, null, null, null];
+//         this.grandFlatBitmap = [null, null, null, null, null, null, null];
+//         this.sopranoBitmap = null;
+//         this.sopranoSharpBitmap = [null, null, null, null, null, null, null];
+//         this.sopranoFlatBitmap = [null, null, null, null, null, null, null];
+//         this.altoBitmap = null;
+//         this.altoSharpBitmap = [null, null, null, null, null, null, null];
+//         this.altoFlatBitmap = [null, null, null, null, null, null, null];
+//         this.tenorBitmap = null;
+//         this.tenorSharpBitmap = [null, null, null, null, null, null, null];
+//         this.tenorFlatBitmap = [null, null, null, null, null, null, null];
+//         this.bassBitmap = null;
+//         this.bassSharpBitmap = [null, null, null, null, null, null, null];
+//         this.bassFlatBitmap = [null, null, null, null, null, null, null];
 
-        const ERRORARTWORK = [
-            "emptybox",
-            "emptyheap",
-            "negroot",
-            "noinput",
+//         const ERRORARTWORK = [
+//             "emptybox",
+//             "emptyheap",
+//             "negroot",
+//             "noinput",
             "zerodivide",
             "notanumber",
             "nostack",
