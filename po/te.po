@@ -2216,7 +2216,7 @@ msgstr "స్క్రీన్‌ను తిరిగిపెట్టం�
 #: js/turtledefs.js:750
 #: js/turtles.js:980
 msgid "Collapse"
-msgstr ""అసంగతి"
+msgstr "అసంగతి"
 
 #: js/turtledefs.js:751
 msgid "Collapse the graphics window."
