@@ -250,57 +250,57 @@ class Block {
         this.overrideName = overrideName;
 
         this.name = protoblock.name;
-        this.activity = this.blocks.activity;
+        // this.activity = this.blocks.activity;
 
-        this.collapsed = false; // Is this collapsible block collapsed?
-        this.inCollapsed = false; // Is this block in a collapsed stack?
-        this.trash = false; // Is this block in the trash?
-        this.loadComplete = false; // Has the block finished loading?
-        this.label = null; // Editable textview in DOM.
-        this.labelattr = null; // Editable textview in DOM.
-        this.text = null; // A dynamically generated text label on block itself.
-        this.value = null; // Value for number, text, and media blocks.
-        this.privateData = null; // A block may have some private data,
-        // e.g., nameboxes use this field to store
-        // the box name associated with the block.
-        this.customID = null; // Used by custom temperaments.
-        this.image = protoblock.image; // The file path of the image.
-        this.imageBitmap = null;
-        this.controller = null; // Note blocks get a controller
+        // this.collapsed = false; // Is this collapsible block collapsed?
+        // this.inCollapsed = false; // Is this block in a collapsed stack?
+        // this.trash = false; // Is this block in the trash?
+        // this.loadComplete = false; // Has the block finished loading?
+        // this.label = null; // Editable textview in DOM.
+        // this.labelattr = null; // Editable textview in DOM.
+        // this.text = null; // A dynamically generated text label on block itself.
+        // this.value = null; // Value for number, text, and media blocks.
+        // this.privateData = null; // A block may have some private data,
+        // // e.g., nameboxes use this field to store
+        // // the box name associated with the block.
+        // this.customID = null; // Used by custom temperaments.
+        // this.image = protoblock.image; // The file path of the image.
+        // this.imageBitmap = null;
+        // this.controller = null; // Note blocks get a controller
 
-        // All blocks have at a container and least one bitmap.
-        this.container = null;
-        this.bounds = null;
-        this.width = 0;
-        this.height = 0;
-        this.hitHeight = 0;
-        this.bitmap = null;
-        this.highlightBitmap = null;
-        this.disconnectedBitmap = null;
-        this.disconnectedHighlightBitmap = null;
+        // // All blocks have at a container and least one bitmap.
+        // this.container = null;
+        // this.bounds = null;
+        // this.width = 0;
+        // this.height = 0;
+        // this.hitHeight = 0;
+        // this.bitmap = null;
+        // this.highlightBitmap = null;
+        // this.disconnectedBitmap = null;
+        // this.disconnectedHighlightBitmap = null;
 
-        // The svg from which the bitmaps are generated
-        this.artwork = null;
-        this.collapseArtwork = null;
+        // // The svg from which the bitmaps are generated
+        // this.artwork = null;
+        // this.collapseArtwork = null;
 
-        // Start and Action blocks has a collapse button
-        this.collapseButtonBitmap = null;
-        this.expandButtonBitmap = null;
-        this.collapseBlockBitmap = null;
-        this.highlightCollapseBlockBitmap = null;
-        this.collapseText = null;
+        // // Start and Action blocks has a collapse button
+        // this.collapseButtonBitmap = null;
+        // this.expandButtonBitmap = null;
+        // this.collapseBlockBitmap = null;
+        // this.highlightCollapseBlockBitmap = null;
+        // this.collapseText = null;
 
-        this.size = 1; // Proto size is copied here.
-        this.docks = []; // Proto dock is copied here.
-        this.connections = [];
+        // this.size = 1; // Proto size is copied here.
+        // this.docks = []; // Proto dock is copied here.
+        // this.connections = [];
 
-        // Keep track of clamp count for blocks with clamps.
-        this.clampCount = [1, 1];
-        this.argClampSlots = [1];
+        // // Keep track of clamp count for blocks with clamps.
+        // this.clampCount = [1, 1];
+        // this.argClampSlots = [1];
 
-        // Some blocks have some post process after they are first loaded.
-        this.postProcess = null;
-        this.postProcessArg = this;
+        // // Some blocks have some post process after they are first loaded.
+        // this.postProcess = null;
+        // this.postProcessArg = this;
 
         // Lock on label change
         this._labelLock = false;
