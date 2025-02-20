@@ -2110,7 +2110,7 @@ msgid "Switch between dark and light mode."
 msgstr "Cambiar entre modo brillante y oscuro."
 
 #: js/turtledefs.js:649
-msgid " Click to add another project into the current one."
+msgid "Click to add another project into the current one."
 msgstr "Haga clic para agregar otro proyecto al actual."
 
 #: js/turtledefs.js:654
@@ -2150,7 +2150,7 @@ msgid "Contextual Menu for Blocks"
 msgstr "Menú contextual para bloques"
 
 #: js/turtledefs.js:697
-msgid "Right-click a block to access common actions and manage blocks in the workspace."
+msgid "Right-click on a block to access common actions."
 msgstr "Haga clic con el botón derecho en un bloque para acceder a acciones comunes y administrar bloques en el espacio de trabajo."
 
 #: js/turtledefs.js:702
@@ -2159,15 +2159,15 @@ msgid "Delete"
 msgstr "Borrar"
 
 #: js/turtledefs.js:703
-msgid "To delete a block, just right-click on it, then you will be able to see the delete option"
+msgid "To delete a block, right-click on it. You will see the delete option."
 msgstr "Para eliminar un bloque, simplemente haz clic derecho sobre él, luego podrás ver la opción de eliminar."
 
 #: js/turtledefs.js:709
-msgid "To copy a block, just right-click on it, then you will be able to see the copy option"
+msgid "To copy a block, right-click on it. You will see the copy option."
 msgstr "Para copiar un bloque, simplemente haz clic derecho sobre él, luego podrás ver la opción de copiar."
 
 #: js/turtledefs.js:715
-msgid "To extract a block, just right-click on it, then you will be able to see the extract option"
+msgid "To extract a block, right-click on it. You will see the extract option."
 msgstr "Para extraer un bloque, simplemente haz clic derecho sobre él, luego podrás ver la opción de extracción."
 
 #: js/turtledefs.js:721
@@ -7067,7 +7067,7 @@ msgid "Metronome"
 msgstr "Metrónomo"
 
 #: js/widgets/musickeyboard.js:1574
-msgid "Note Value"
+msgid "Note value"
 msgstr "Valor de la nota"
 
 #: js/widgets/musickeyboard.js:3209

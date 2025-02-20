@@ -2103,7 +2103,7 @@ msgid "Switch between dark and light mode."
 msgstr ""
 
 #: js/turtledefs.js:649
-msgid " Click to add another project into the current one."
+msgid "Click to add another project into the current one."
 msgstr ""
 
 #: js/turtledefs.js:654
@@ -2143,7 +2143,7 @@ msgid "Contextual Menu for Blocks"
 msgstr ""
 
 #: js/turtledefs.js:697
-msgid "Right-click a block to access common actions and manage blocks in the workspace."
+msgid "Right-click on a block to access common actions."
 msgstr ""
 
 #: js/turtledefs.js:702
@@ -2152,15 +2152,15 @@ msgid "Delete"
 msgstr "తొలగించు"
 
 #: js/turtledefs.js:703
-msgid "To delete a block, just right-click on it, then you will be able to see the delete option"
+msgid "To delete a block, right-click on it. You will see the delete option."
 msgstr ""
 
 #: js/turtledefs.js:709
-msgid "To copy a block, just right-click on it, then you will be able to see the copy option"
+msgid "To copy a block, right-click on it. You will see the copy option."
 msgstr ""
 
 #: js/turtledefs.js:715
-msgid "To extract a block, just right-click on it, then you will be able to see the extract option"
+msgid "To extract a block, right-click on it. You will see the extract option."
 msgstr ""
 
 #: js/turtledefs.js:721
@@ -2216,7 +2216,7 @@ msgstr "స్క్రీన్‌ను తిరిగిపెట్టం�
 #: js/turtledefs.js:750
 #: js/turtles.js:980
 msgid "Collapse"
-msgstr ""అసంగతి"
+msgstr "అసంగతి"
 
 #: js/turtledefs.js:751
 msgid "Collapse the graphics window."
@@ -7060,7 +7060,7 @@ msgid "Metronome"
 msgstr "మెట్రానోమ్"
 
 #: js/widgets/musickeyboard.js:1574
-msgid "Note Value"
+msgid "Note value"
 msgstr ""
 
 #: js/widgets/musickeyboard.js:3209
