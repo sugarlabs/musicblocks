@@ -48,7 +48,7 @@ class SaveInterface {
          * @member {number}
          */
         this.timeLastSaved = -100;
-        
+
         /**
          * HTML template for saving projects.
          * @member {string}
@@ -265,8 +265,172 @@ class SaveInterface {
     }
 
     /**
+     * Save MIDI file.
+     *
+     * This method generates required MIDI data.
+     *
+     * @param {SaveInterface} activity - The activity object to save.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
+    saveMIDI(activity) {
+        // Suppress music and turtle output when generating
+        activity.logo.runningMIDI = true;
+        activity.logo.runLogoCommands();
+        document.body.style.cursor = "wait";
+    }
+
+    /**
+     * Perform actions after generating MIDI data.
+     *
+     * This method generates a MIDI file using _midiData.
+     *
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
+    afterSaveMIDI() {
+        const generateMidi = (data) => {
+            const normalizeNote = (note) => {
+                return note.replace("♯", "#").replace("♭", "b");
+            };
+            const MIDI_INSTRUMENTS = {
+                default: 0,   // Acoustic Grand Piano
+                piano: 0,
+                violin: 40,
+                viola: 41,
+                cello: 42,
+                "double bass": 43,
+                bass: 32,
+                sitar: 104,
+                guitar: 24,
+                "acoustic guitar": 25,
+                "electric guitar": 27,
+                flute: 73,
+                clarinet: 71,
+                saxophone: 65,
+                tuba: 58,
+                trumpet: 56,
+                oboe: 68,
+                trombone: 57,
+                banjo: 105,
+                koto: 107,
+                dulcimer: 15,
+                bassoon: 70,
+                celeste: 8,
+                xylophone: 13,
+                "electronic synth": 81,
+                sine: 81,  // Approximate with Lead 2 (Sawtooth)
+                square: 80,
+                sawtooth: 81,
+                triangle: 81,  // Approximate with Lead 2 (Sawtooth)
+                vibraphone: 11
+            };
+
+            const DRUM_MIDI_MAP = {
+                "snare drum": 38,
+                "kick drum": 36,
+                "tom tom": 41,
+                "floor tom tom": 43,
+                "cup drum": 47, // Closest: Low-Mid Tom
+                "darbuka drum": 50, // Closest: High Tom
+                "japanese drum": 56, // Closest: Cowbell or Tambourine
+                "hi hat": 42,
+                "ride bell": 53,
+                "cow bell": 56,
+                "triangle bell": 81,
+                "finger cymbals": 69, // Closest: Open Hi-Hat
+                "chime": 82, // Closest: Shaker
+                "gong": 52, // Closest: Chinese Cymbal
+                "clang": 55, // Closest: Splash Cymbal
+                "crash": 49,
+                "clap": 39,
+                "slap": 40,
+                "raindrop": 88  // Custom mapping (not in GM), can use melodic notes
+            };
+
+            const midi = new Midi();
+            midi.header.ticksPerBeat = 480;
+
+            Object.entries(data).forEach(([blockIndex, notes]) => {
+
+                const mainTrack = midi.addTrack();
+                mainTrack.name = `Track ${parseInt(blockIndex) + 1}`;
+
+                let trackMap = new Map();
+                let globalTime = 0;
+
+                notes.forEach((noteData) => {
+                    if (!noteData.note || noteData.note.length === 0) return;
+                    const duration = ((1 / noteData.duration) * 60 * 4) / noteData.bpm;
+                    const instrument = noteData.instrument || "default";
+
+                    if (noteData.drum) {
+                        const drum = noteData.drum || false;
+                        if (!trackMap.has(drum)) {
+                            const drumTrack = midi.addTrack();
+                            drumTrack.name = `Track ${parseInt(blockIndex) + 1} - ${drum}`;
+                            drumTrack.channel = 9; // Drums must be on Channel 10
+                            trackMap.set(drum, drumTrack);
+                        }
+
+                        const drumTrack = trackMap.get(drum);
+
+                        const midiNumber = DRUM_MIDI_MAP[drum] || 36; // default to Bass Drum
+                        drumTrack.addNote({
+                            midi: midiNumber,
+                            time: globalTime,
+                            duration: duration,
+                            velocity: 0.9,
+                        });
+
+                    } else {
+                        if (!trackMap.has(instrument)) {
+                            const instrumentTrack = midi.addTrack();
+                            instrumentTrack.name = `Track ${parseInt(blockIndex) + 1} - ${instrument}`;
+                            instrumentTrack.instrument.number = MIDI_INSTRUMENTS[instrument] ?? MIDI_INSTRUMENTS["default"];
+                            trackMap.set(instrument, instrumentTrack);
+                        }
+
+                        const instrumentTrack = trackMap.get(instrument);
+
+                        noteData.note.forEach((pitch) => {
+
+                            if (!pitch.includes("R")) {
+                                instrumentTrack.addNote({
+                                    name: normalizeNote(pitch),
+                                    time: globalTime,
+                                    duration: duration,
+                                    velocity: 0.8
+                                });
+                            }
+                        });
+                    }
+                    globalTime += duration;
+                });
+                globalTime = 0;
+            });
+
+            // Generate the MIDI file and trigger download.
+            const midiData = midi.toArray();
+            const blob = new Blob([midiData], { type: "audio/midi" });
+            const url = URL.createObjectURL(blob);
+            activity.save.download("midi", url, null);
+        };
+        const data = activity.logo._midiData;
+        setTimeout(() => {
+            generateMidi(data);
+            activity.logo._midiData = {};
+            document.body.style.cursor = "default";
+        }, 500);
+    }
+
+    /**
      * This method is to save SVG representation of an activity
-     * 
+     *
      * @param {SaveInterface} activity -The activity object to save
      * @returns {void}
      * @method
@@ -306,12 +470,12 @@ class SaveInterface {
      * @returns {void}
      * @method
      * @instance
-     */   
+     */
     saveBlockArtwork(activity) {
         const svg = "data:image/svg+xml;utf8," + activity.printBlockSVG();
         activity.save.download("svg", svg, null);
     }
-   
+
     /**
      * This method is to save BlockArtwork and download the PNG representation of block artwork from the provided activity.
      * 
@@ -319,10 +483,10 @@ class SaveInterface {
      * @returns {void}
      * @method
      * @instance
-     */ 
+     */
     saveBlockArtworkPNG(activity) {
         activity.printBlockPNG().then((pngDataUrl) => {
-        activity.save.download("png", pngDataUrl, null);
+            activity.save.download("png", pngDataUrl, null);
         })
     }
 
@@ -364,10 +528,10 @@ class SaveInterface {
         activity.logo.runningAbc = true;
         activity.logo.notationOutput = ABCHEADER;
         activity.logo.notationNotes = {};
-        for (let t = 0; t < activity.turtles.turtleList.length; t++) {
+        for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
             activity.logo.notation.notationStaging[t] = [];
             activity.logo.notation.notationDrumStaging[t] = [];
-            activity.turtles.turtleList[t].painter.doClear(true, true, true);
+            activity.turtles.getTurtle(t).painter.doClear(true, true, true);
         }
         activity.logo.runLogoCommands();
     }
@@ -523,10 +687,10 @@ class SaveInterface {
         }
         this.activity.logo.notationOutput = lyheader;
         this.activity.logo.notationNotes = {};
-        for (let t = 0; t < this.activity.turtles.turtleList.length; t++) {
+        for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
             this.activity.logo.notation.notationStaging[t] = [];
             this.activity.logo.notation.notationDrumStaging[t] = [];
-            this.activity.turtles.turtleList[t].painter.doClear(true, true, true);
+            this.activity.turtles.getTurtle(t).painter.doClear(true, true, true);
         }
         document.body.style.cursor = "wait";
         this.activity.logo.runLogoCommands();
@@ -587,7 +751,7 @@ class SaveInterface {
             tmp.remove();
             this.activity.textMsg(
                 _("The Lilypond code is copied to clipboard. You can paste it here: ") +
-                    "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a> "
+                "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a> "
             );
         }
         this.download("ly", "data:text;utf8," + encodeURIComponent(lydata), filename);
@@ -636,10 +800,10 @@ class SaveInterface {
     // eslint-disable-next-line no-unused-vars
     saveMxml(filename) {
         this.activity.logo.runningMxml = true;
-        for (let t = 0; t < this.activity.turtles.turtleList.length; t++) {
+        for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
             this.activity.logo.notation.notationStaging[t] = [];
             this.activity.logo.notation.notationDrumStaging[t] = [];
-            this.activity.turtles.turtleList[t].painter.doClear(true, true, true);
+            this.activity.turtles.getTurtle(t).painter.doClear(true, true, true);
         }
 
         this.activity.logo.runLogoCommands();

@@ -193,7 +193,7 @@ used with the `Add-1` and `Add to` blocks.
 
 ```
     setter(logo, value, turtle, blk) {
-        logo.turtles.turtleList[turtle].painter.doSetHeading(value);
+        logo.turtles.getTurtle(turtle).painter.doSetHeading(value);
     }
 ```
 
@@ -370,7 +370,7 @@ class StartDrumBlock extends StartBlock {
         if (logo.inStatusMatrix && logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === 'print') {
             logo.statusFields.push([blk, 'x']);
         } else {
-            return logo.turtles.screenX2turtleX(logo.turtles.turtleList[turtle].container.x);
+            return logo.turtles.screenX2turtleX(logo.turtles.getTurtle(turtle).container.x);
         }
     }
 }

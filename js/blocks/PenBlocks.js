@@ -176,9 +176,7 @@ function setupPenBlocks(activity) {
          * @param {Object} turtle - The turtle object.
          */
         flow(args, logo, turtle) {
-            activity.turtles.turtleList[
-                activity.turtles.companionTurtle(turtle)
-            ].painter.doStartFill();
+            activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).painter.doStartFill();
         }
     }
 
@@ -194,9 +192,7 @@ function setupPenBlocks(activity) {
         }
 
         flow(args, logo, turtle) {
-            activity.turtles.turtleList[
-                activity.turtles.companionTurtle(turtle)
-            ].painter.doEndFill();
+            activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).painter.doEndFill();
         }
     }
 
@@ -229,35 +225,18 @@ function setupPenBlocks(activity) {
          * @param {Object} turtle - The turtle object.
          */
         flow(args, logo, turtle) {
+            const requiredTurtle = activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle));
             if (args.length === 3) {
-                const hue =
-                    activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].painter
-                        .color;
-                const value =
-                    activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].painter
-                        .value;
-                const chroma =
-                    activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].painter
-                        .chroma;
-                activity.turtles.turtleList[
-                    activity.turtles.companionTurtle(turtle)
-                ].painter.doSetHue(args[0]);
-                activity.turtles.turtleList[
-                    activity.turtles.companionTurtle(turtle)
-                ].painter.doSetValue(args[1]);
-                activity.turtles.turtleList[
-                    activity.turtles.companionTurtle(turtle)
-                ].painter.doSetChroma(args[2]);
+                const hue = requiredTurtle.painter.color;
+                const value = requiredTurtle.painter.value;
+                const chroma = requiredTurtle.painter.chroma;
+                requiredTurtle.painter.doSetHue(args[0]);
+                requiredTurtle.painter.doSetValue(args[1]);
+                requiredTurtle.painter.doSetChroma(args[2]);
                 activity.turtles.setBackgroundColor(activity.turtles.companionTurtle(turtle));
-                activity.turtles.turtleList[
-                    activity.turtles.companionTurtle(turtle)
-                ].painter.doSetHue(hue);
-                activity.turtles.turtleList[
-                    activity.turtles.companionTurtle(turtle)
-                ].painter.doSetValue(value);
-                activity.turtles.turtleList[
-                    activity.turtles.companionTurtle(turtle)
-                ].painter.doSetChroma(chroma);
+                requiredTurtle.painter.doSetHue(hue);
+                requiredTurtle.painter.doSetValue(value);
+                requiredTurtle.painter.doSetChroma(chroma);
                 logo.svgOutput = "";
             }
         }
@@ -293,7 +272,7 @@ function setupPenBlocks(activity) {
          */
         updateParameter(logo, turtle) {
             return toFixed2(
-                activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].painter.chroma
+                activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).painter.chroma
             );
         }
 
@@ -304,7 +283,7 @@ function setupPenBlocks(activity) {
          * @param {Object} turtle - The turtle object.
          */
         setter(logo, value, turtle) {
-            const turtleObj = activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)];
+            const turtleObj = activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle));
             turtleObj.painter.doSetChroma(value);
         }
 
@@ -323,7 +302,7 @@ function setupPenBlocks(activity) {
             ) {
                 logo.statusFields.push([blk, "grey"]);
             } else {
-                return activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].painter
+                return activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).painter
                     .chroma;
             }
         }
@@ -358,7 +337,7 @@ function setupPenBlocks(activity) {
          */
         updateParameter(logo, turtle) {
             return toFixed2(
-                activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].painter.value
+                activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).painter.value
             );
         }
 
@@ -369,7 +348,7 @@ function setupPenBlocks(activity) {
          * @param {Object} turtle - The turtle object.
          */
         setter(logo, value, turtle) {
-            const turtleObj = activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)];
+            const turtleObj = activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle));
             turtleObj.painter.doSetValue(value);
         }
 
@@ -388,7 +367,7 @@ function setupPenBlocks(activity) {
             ) {
                 logo.statusFields.push([blk, "shade"]);
             } else {
-                return activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].painter
+                return activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).painter
                     .value;
             }
         }
@@ -426,7 +405,7 @@ function setupPenBlocks(activity) {
          */
         updateParameter(logo, turtle) {
             return toFixed2(
-                activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].painter.color
+                activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).painter.color
             );
         }
 
@@ -437,7 +416,7 @@ function setupPenBlocks(activity) {
          * @param {Object} turtle - The turtle object.
          */
         setter(logo, value, turtle) {
-            const turtleObj = activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)];
+            const turtleObj = activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle));
             turtleObj.painter.doSetColor(value);
         }
 
@@ -456,7 +435,7 @@ function setupPenBlocks(activity) {
             ) {
                 logo.statusFields.push([blk, "color"]);
             } else {
-                return activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].painter
+                return activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).painter
                     .color;
             }
         }
@@ -479,12 +458,12 @@ function setupPenBlocks(activity) {
 
         updateParameter(logo, turtle) {
             return toFixed2(
-                activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].painter.stroke
+                activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).painter.stroke
             );
         }
 
         setter(logo, value, turtle) {
-            const turtleObj = activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)];
+            const turtleObj = activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle));
             turtleObj.painter.doSetPensize(value);
         }
 
@@ -496,7 +475,7 @@ function setupPenBlocks(activity) {
             ) {
                 logo.statusFields.push([blk, "pensize"]);
             } else {
-                return activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].painter
+                return activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).painter
                     .stroke;
             }
         }
@@ -542,9 +521,7 @@ function setupPenBlocks(activity) {
             }
 
             if (typeof args[0] === "string") {
-                activity.turtles.turtleList[
-                    activity.turtles.companionTurtle(turtle)
-                ].painter.doSetFont(args[0]);
+                activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).painter.doSetFont(args[0]);
             }
         }
     }

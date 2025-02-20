@@ -171,14 +171,16 @@ function setupVolumeActions(activity) {
             volume = Math.max(Math.min(volume, 100), 0);
 
             if (volume === 0) activity.errorMsg(_("Setting volume to 0."), blk);
-            if (Singer.masterVolume.length === 2) {
+
+            if(Singer.masterVolume.length === 2) {  
                 Singer.masterVolume.pop();
             }
+
             Singer.masterVolume.push(volume);
 
             const tur = activity.turtles.ithTurtle(turtle);
             if (!tur.singer.suppressOutput) {
-                Singer.setMasterVolume(activity.logo, volume);
+                Singer.setMasterVolume(activity.logo, volume, blk);
             }
         }
 
@@ -210,10 +212,21 @@ function setupVolumeActions(activity) {
          * @param {String} synthname - type of synth
          * @param {Number} volume
          * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} [blk] - corresponding Block index in blocks.blockList
          * @returns {void}
          */
-        static setSynthVolume(synthname, volume, turtle) {
+        static setSynthVolume(synthname, volume, turtle, blk) {
             let synth = null;
+            let firstConnection;
+            let lastConnection;
+
+            if (activity.logo.blockList && activity.logo.blockList[blk]) {
+                firstConnection = activity.logo.blockList[blk].connections[0];
+                lastConnection = last(activity.logo.blockList[blk].connections);
+            } else {
+                firstConnection = null;
+                lastConnection = null;
+            }
 
             if (synthname === DEFAULTVOICE || synthname === _(DEFAULTVOICE)) {
                 synth = DEFAULTVOICE;
@@ -265,6 +278,12 @@ function setupVolumeActions(activity) {
             tur.singer.synthVolume[synth].push(volume);
             if (!tur.singer.suppressOutput) {
                 Singer.setSynthVolume(activity.logo, turtle, synth, volume);
+                if(firstConnection === null && lastConnection === null) {
+                    setTimeout(()=>{
+                        activity.logo.synth.trigger(0, "G4", 1 / 4, synthname, null, null, false);
+                    },250)
+                }
+             
             }
         }
 

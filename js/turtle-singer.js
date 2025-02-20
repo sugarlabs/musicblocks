@@ -503,7 +503,7 @@ class Singer {
             cblk,
             true,
             actionArgs,
-            activity.turtles.turtleList[turtle].queue.length
+            activity.turtles.getTurtle(turtle).queue.length
         );
 
         const returnValue = rationalSum(tur.singer.notesPlayed, [
@@ -609,7 +609,7 @@ class Singer {
             true,
             actionArgs,
             [],
-            activity.turtles.turtleList[turtle].queue.length
+            activity.turtles.getTurtle(turtle).queue.length
         );
         const returnValue = tur.singer.tallyNotes - saveState.tallyNotes;
 
@@ -663,12 +663,29 @@ class Singer {
      * @static
      * @param {Object} logo
      * @param {Number} volume
+     * @param {Number} [blk] - corresponding Block index in blocks.blockList
      * @returns {void}
      */
-    static setMasterVolume(logo, volume) {
-        volume = Math.min(Math.max(volume, 0), 100);
+    static setMasterVolume(logo, volume, blk) {
+        const activity = logo.activity;
+        let firstConnection;
+        let lastConnection;
 
-        logo.synth.setMasterVolume(volume);
+        if (activity.logo.blockList && activity.logo.blockList[blk]) {
+            firstConnection = activity.logo.blockList[blk].connections[0];
+            lastConnection = last(activity.logo.blockList[blk].connections);
+        } else {
+            firstConnection = null;
+            lastConnection = null;
+        }
+
+        volume = Math.min(Math.max(volume, 0), 100);
+        logo.synth.setMasterVolume(volume, firstConnection, lastConnection);
+        for (const turtle of activity.turtles.turtleList) {
+            for (const synth in turtle.singer.synthVolume) {
+                turtle.singer.synthVolume[synth].push(volume);
+            }
+        }
     }
 
     /**
@@ -679,9 +696,10 @@ class Singer {
      * @param {Object} turtle
      * @param {Number} synth
      * @param {Number} volume
+     * @param {Number} [blk] - corresponding Block index in blocks.blockList
      * @returns {void}
      */
-    static setSynthVolume(logo, turtle, synth, volume) {
+    static setSynthVolume(logo, turtle, synth, volume, blk) {
         volume = Math.min(Math.max(volume, 0), 100);
 
         switch (synth) {
@@ -689,10 +707,10 @@ class Singer {
             case "noise2":
             case "noise3":
                 // Noise is very very loud
-                logo.synth.setVolume(turtle, synth, volume / 25);
+                logo.synth.setVolume(turtle, synth, volume / 25, blk);
                 break;
             default:
-                logo.synth.setVolume(turtle, synth, volume);
+                logo.synth.setVolume(turtle, synth, volume, blk);
         }
     }
 
@@ -1239,6 +1257,7 @@ class Singer {
         const tur = activity.turtles.ithTurtle(turtle);
         const bpmFactor =
             TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
+        let bpmValue = Number(last(tur.singer.bpm));
 
         let noteBeatValue = isOsc
             ? noteValue === 0
@@ -1951,8 +1970,10 @@ class Singer {
                             if (
                                 activity.logo.runningLilypond ||
                                 activity.logo.runningMxml ||
-                                activity.logo.runningAbc
+                                activity.logo.runningAbc ||
+                                activity.logo.runningMIDI
                             ) {
+                                activity.logo.notationMIDI(chordNotes, chordDrums, d, turtle, bpmValue || 90, last(tur.singer.instrumentNames));
                                 activity.logo.updateNotation(chordNotes, d, turtle, -1, chordDrums);
                             }
                         }
@@ -2382,4 +2403,8 @@ class Singer {
 
         activity.stage.update();
     }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Singer;
 }

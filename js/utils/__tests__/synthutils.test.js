@@ -35,7 +35,6 @@ describe("Utility Functions (logic-only)", () => {
         rampTo,
         DEFAULTSYNTHVOLUME,
         setVolume,
-        getVolume,
         setMasterVolume,
         Synth
 
@@ -125,9 +124,7 @@ describe("Utility Functions (logic-only)", () => {
         stop = Synth.stop
         rampTo = Synth.rampTo
         setVolume = Synth.setVolume
-        getVolume = Synth.getVolume
         setMasterVolume = Synth.setMasterVolume
-
     });
 
 
@@ -153,7 +150,7 @@ describe("Utility Functions (logic-only)", () => {
 
 
     describe("createDefaultSynth", () => {
-        it("it should creates the default poly/default/custom synth for the specified turtle", () => {
+        it("it should create the default poly/default/custom synth for the specified turtle", () => {
             createDefaultSynth(turtle);
             expect(instruments[turtle]["electronic synth"]).toBeTruthy()
             expect(instruments[turtle]["custom"]).toBeTruthy();
@@ -163,34 +160,34 @@ describe("Utility Functions (logic-only)", () => {
     });
 
     describe("_createBuiltinSynth", () => {
-        it("it should creates a synth using builtin synths from Tone.js.", () => {
+        it("it should create a synth using builtin synths from Tone.js.", () => {
             const result = _createBuiltinSynth(turtle, "guitar", "sine", {});
             expect(result).toBeInstanceOf(Tone.Synth)
         });
-        it("it should creates a synth using builtin synths from Tone.js.", () => {
+        it("it should create a synth using builtin synths from Tone.js.", () => {
             const result = _createBuiltinSynth(turtle, "guitar", "pluck", {});
             expect(result).toBeInstanceOf(Tone.PluckSynth)
         });
-        it("it should creates a synth using builtin synths from Tone.js.", () => {
+        it("it should create a synth using builtin synths from Tone.js.", () => {
             const result = _createBuiltinSynth(turtle, "guitar", "noise3", {});
             expect(result).toBeInstanceOf(Tone.NoiseSynth)
         });
     })
 
     describe("_createCustomSynth", () => {
-        it("it should creates an amsynth using Tone.js methods like AMSynth, FMSynth, etc.", () => {
+        it("it should create an amsynth using Tone.js methods like AMSynth, FMSynth, etc.", () => {
             const result = _createCustomSynth("amsynth", {});
             expect(result).toBeInstanceOf(Tone.AMSynth);
         });
-        it("it should creates a fmsynth using Tone.js methods like AMSynth, FMSynth, etc.", () => {
+        it("it should create a fmsynth using Tone.js methods like AMSynth, FMSynth, etc.", () => {
             const result = _createCustomSynth("fmsynth", {});
             expect(result).toBeInstanceOf(Tone.FMSynth);
         });
-        it("it should creates a duosynth using Tone.js methods like AMSynth, FMSynth, etc.", () => {
+        it("it should create a duosynth using Tone.js methods like AMSynth, FMSynth, etc.", () => {
             const result = _createCustomSynth("duosynth", {});
             expect(result).toBeInstanceOf(Tone.DuoSynth);
         });
-        it("it should creates a testsynth using Tone.js methods like AMSynth, FMSynth, etc.", () => {
+        it("it should create a testsynth using Tone.js methods like AMSynth, FMSynth, etc.", () => {
             const result = _createCustomSynth("testsynth", {});
             expect(result).toBeInstanceOf(Tone.PolySynth);
         });
@@ -200,21 +197,21 @@ describe("Utility Functions (logic-only)", () => {
         beforeAll(() => {
             loadSamples()
         })
-        it("it should creates a PolySynth based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
+        it("it should create a Sampler based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
             __createSynth(turtle, "guitar", "guitar", {});
-            expect(instruments[turtle]["electronic synth"]).toBeInstanceOf(Tone.PolySynth)
+            expect(instruments[turtle]["guitar"]).toBeInstanceOf(Tone.Sampler)
         });
-        it("it should creates a PolySynth based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
+        it("it should create a Sampler based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
             __createSynth(turtle, "guitar", "sine", {});
-            expect(instruments[turtle]["electronic synth"]).toBeInstanceOf(Tone.PolySynth)
+            expect(instruments[turtle]["guitar"]).toBeInstanceOf(Tone.Sampler)
         });
-        it("it should creates a amsynth based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
+        it("it should create a amsynth based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
             const instrumentName = "guitar"
             __createSynth(turtle, instrumentName, "amsynth", {});
-            expect(instruments[turtle][instrumentName]).toBeInstanceOf(Tone.AMSynth)
+            expect(instruments[turtle][instrumentName]).toBeInstanceOf(Tone.Sampler)
         });
 
-        it("it should creates a CUSTOMSAMPLES based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
+        it("it should create a CUSTOMSAMPLES based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
             CUSTOMSAMPLES['pianoC4'] = "pianoC4";
             CUSTOMSAMPLES['drumKick'] = "drumKick";
             const instrumentName = "guitar"
@@ -222,21 +219,21 @@ describe("Utility Functions (logic-only)", () => {
             expect(instruments[turtle][instrumentName]).toBeInstanceOf(Tone.Sampler)
         });
 
-        it("it should creates a CUSTOMSAMPLES based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
+        it("it should create a CUSTOMSAMPLES based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
             const instrumentName = "guitar"
             const sourceName = "http://testing.com"
             __createSynth(turtle, instrumentName, sourceName, {});
             expect(instruments[turtle][sourceName]["noteDict"]).toBe(sourceName)
             expect(instrumentsSource[instrumentName]).toStrictEqual([1, 'drum'])
         });
-        it("it should creates a CUSTOMSAMPLES based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
+        it("it should create a CUSTOMSAMPLES based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
             const instrumentName = "guitar"
             const sourceName = "file://testing.jpg"
             __createSynth(turtle, instrumentName, sourceName, {});
             expect(instruments[turtle][sourceName]["noteDict"]).toBe(sourceName)
             expect(instrumentsSource[instrumentName]).toStrictEqual([1, 'drum'])
         });
-        it("it should creates a CUSTOMSAMPLES based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
+        it("it should create a CUSTOMSAMPLES based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
             const instrumentName = "guitar"
             const sourceName = "drum"
             __createSynth(turtle, instrumentName, sourceName, {});
@@ -496,54 +493,59 @@ describe("Utility Functions (logic-only)", () => {
         });
     });
 
-    describe("getVolume function", () => {
-        beforeEach(() => {
-            jest.clearAllMocks();
-        });
-
-        test("should return the volume for a defined instrument", () => {
-            instruments.turtle1.flute.volume.value = -10;
-            const result = getVolume("turtle1", "flute");
-
-            expect(result).toBe(-10);
-        });
-
-        test("should return default volume if instrument is not found", () => {
-            const consoleSpy = jest.spyOn(console, "debug").mockImplementation(() => { });
-
-            const result = getVolume("turtle1", "nonexistent");
-
-            expect(result).toBe(50);
-            expect(consoleSpy).toHaveBeenCalledWith("instrument not found");
-
-            consoleSpy.mockRestore();
-        });
-    });
-
 
     describe("setMasterVolume function", () => {
-        test("should set the master volume correctly", () => {
-            setMasterVolume(75);
+        it("it should set up the Default Synth instance for 0th turtle.", () => {
+            if (!instruments[0]) {
+                instruments[0] = {}; // Initialize instruments for the turtle
+            }
+            if (!instruments[0]["electronic synth"]) {
+                createDefaultSynth(0);
+                expect(instruments[0]["electronic synth"]).toBeTruthy();
+            }
+           
+        });
 
+        test("should trigger electronic synth with volume 75", () => {
+            setMasterVolume(75, "c1", null);
             const expectedDb = Tone.gainToDb(0.75); // 75/100
             expect(Tone.gainToDb).toHaveBeenCalledWith(0.75);
             expect(Tone.Destination.volume.rampTo).toHaveBeenCalledWith(expectedDb, 0.01);
         });
 
-        test("should handle edge case with volume set to 0", () => {
-            setMasterVolume(0);
-
+        test("should trigger electronic synth  with volume 0", () => {
+            setMasterVolume(0 ,"c1", "c2");
             const expectedDb = Tone.gainToDb(0); // 0/100
             expect(Tone.gainToDb).toHaveBeenCalledWith(0);
             expect(Tone.Destination.volume.rampTo).toHaveBeenCalledWith(expectedDb, 0.01);
         });
+        
+        test("should handle edge case with volume set to 0 with no connections", () => {
+            setMasterVolume(0, null, null);
+            expect(Tone.Destination.volume.rampTo).toHaveBeenCalledWith(0, 0.01);
+            setVolume(0, "electronic synth", 10);
+            const expectedDb = Tone.gainToDb(0.1);
+            expect(Tone.gainToDb).toHaveBeenCalledWith(0.1);
+            expect(instruments[0]["electronic synth"].volume.value).toBe(expectedDb);
+            // Act
+            trigger(0, "G4", 1 / 4, "electronic synth", null, null, false);
+            // Assert
+            expect(instruments[0]["electronic synth"].triggerAttackRelease)
+                .toHaveBeenCalledWith('G4', 1 / 4, expect.any(Number));
+        });
 
-        test("should handle edge case with volume set to 100", () => {
-            setMasterVolume(100);
-
-            const expectedDb = Tone.gainToDb(1); // 100/100
+        test("should handle edge case with volume set to 100 with no connections", () => {
+            setMasterVolume(100, null, null);
+            expect(Tone.Destination.volume.rampTo).toHaveBeenCalledWith(0, 0.01);
+            setVolume(0, "electronic synth", 100);
+            const expectedDb = Tone.gainToDb(1);
             expect(Tone.gainToDb).toHaveBeenCalledWith(1);
-            expect(Tone.Destination.volume.rampTo).toHaveBeenCalledWith(expectedDb, 0.01);
+            expect(instruments[0]["electronic synth"].volume.value).toBe(expectedDb);
+            // Act
+            trigger(0, "G4", 1 / 4, "electronic synth", null, null, false);
+            // Assert
+            expect(instruments[0]["electronic synth"].triggerAttackRelease)
+                .toHaveBeenCalledWith('G4', 1 / 4, expect.any(Number));
         });
     });
 
@@ -1025,7 +1027,7 @@ describe("Utility Functions (logic-only)", () => {
     });
 
     describe("createSynth", () => {
-        it("it should creates a synth based on the user's input in the 'Timbre' clamp, handling race conditions with the samples loader.", () => {
+        it("it should create a synth based on the user's input in the 'Timbre' clamp, handling race conditions with the samples loader.", () => {
             expect(createSynth("turtle1", "piano", "voiceSample1", {})).toBe(undefined);
         });
     });

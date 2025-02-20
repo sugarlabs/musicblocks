@@ -923,9 +923,20 @@ class PhraseMaker {
             lyricsRow.setAttribute("id", "lyricRow");
             lyricsRow.style.position = "sticky";
 
+            // Label Icon
+            cell = lyricsRow.insertCell();
+            cell.setAttribute("colspan", "1");
+            cell.className = "headcol";
+            cell.style.position = "sticky";
+            cell.style.left = "1.2px";
+            cell.style.zIndex = "1";
+            cell.style.backgroundColor = platformColor.lyricsLabelBackground;
+            cell.style.textAlign = "center";
+            cell.innerHTML = `<img src="images/pen.svg" height="${iconSize}" width="${iconSize}" vertical-align="middle">`;
+
             // Label Cell (Fixed like "note value")
             cell = lyricsRow.insertCell();
-            cell.setAttribute("colspan", "2");
+            cell.setAttribute("colspan", "1");
             cell.className = "headcol";
             cell.style.position = "sticky";
             cell.style.left = "1.2px";
@@ -4790,45 +4801,46 @@ class PhraseMaker {
      * @param {string[]} obj - An array containing the graphics command and its parameters.
      */
     _processGraphics(obj) {
+        const firstTurtle = this.activity.turtles.getTurtle(0);
         switch (obj[0]) {
             case "forward":
-                this.activity.turtles.turtleList[0].painter.doForward(obj[1]);
+                firstTurtle.painter.doForward(obj[1]);
                 break;
             case "back":
-                this.activity.turtles.turtleList[0].painter.doForward(-obj[1]);
+                firstTurtle.painter.doForward(-obj[1]);
                 break;
             case "right":
-                this.activity.turtles.turtleList[0].painter.doRight(obj[1]);
+                firstTurtle.painter.doRight(obj[1]);
                 break;
             case "left":
-                this.activity.turtles.turtleList[0].painter.doRight(-obj[1]);
+                firstTurtle.painter.doRight(-obj[1]);
                 break;
             case "setcolor":
-                this.activity.turtles.turtleList[0].painter.doSetColor(obj[1]);
+                firstTurtle.painter.doSetColor(obj[1]);
                 break;
             case "sethue":
-                this.activity.turtles.turtleList[0].painter.doSetHue(obj[1]);
+                firstTurtle.painter.doSetHue(obj[1]);
                 break;
             case "setshade":
-                this.activity.turtles.turtleList[0].painter.doSetValue(obj[1]);
+                firstTurtle.painter.doSetValue(obj[1]);
                 break;
             case "setgrey":
-                this.activity.turtles.turtleList[0].painter.doSetChroma(obj[1]);
+                firstTurtle.painter.doSetChroma(obj[1]);
                 break;
             case "settranslucency":
-                this.activity.turtles.turtleList[0].painter.doSetPenAlpha(1.0 - obj[1] / 100);
+                firstTurtle.painter.doSetPenAlpha(1.0 - obj[1] / 100);
                 break;
             case "setpensize":
-                this.activity.turtles.turtleList[0].painter.doSetPensize(obj[1]);
+                firstTurtle.painter.doSetPensize(obj[1]);
                 break;
             case "setheading":
-                this.activity.turtles.turtleList[0].painter.doSetHeading(obj[1]);
+                firstTurtle.painter.doSetHeading(obj[1]);
                 break;
             case "arc":
-                this.activity.turtles.turtleList[0].painter.doArc(obj[1], obj[2]);
+                firstTurtle.painter.doArc(obj[1], obj[2]);
                 break;
             case "setxy":
-                this.activity.turtles.turtleList[0].painter.doSetXY(obj[1], obj[2]);
+                firstTurtle.painter.doSetXY(obj[1], obj[2]);
                 break;
             default:
                 //eslint-disable-next-line no-console
