@@ -129,7 +129,6 @@ describe('setupVolumeActions', () => {
         expect(activity.logo.setTurtleListener).toHaveBeenCalled();
     });
     
-    
     it('should set panning correctly', () => {
         Singer.VolumeActions.setPanning(50, 0);
         expect(targetTurtle.singer.panner.pan.value).toBe(0.5); 
