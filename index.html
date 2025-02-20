@@ -677,25 +677,25 @@
                                         >menu</i
                                     ></a
                                 >
-                            </li>
                             <!-- Dropdown menu for Play-Only Mode -->
-                            <ul id="aux-dropdown" class="dropdown-content">
-                                <li>
-                                    <a id="themeSelectIcon" class="tooltipped dropdown-trigger" data-position="left" data-activates="themedropdown">
-                                        <i class="material-icons md-48">brightness_7</i>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a id="restoreIcon" class="tooltipped" data-position="bottom">
-                                        <i class="material-icons md-48">restore_from_trash</i>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a id="languageSelectIcon" class="tooltipped dropdown-trigger" data-position="left" data-activates="languagedropdown">
-                                        <i class="material-icons md-48">translate</i>
-                                    </a>
-                                </li>
-                            </ul>
+                                <ul id="aux-dropdown" class="dropdown-content">
+                                    <li>
+                                        <a id="themeSelectIcon" class="tooltipped dropdown-trigger" data-position="left" data-activates="themedropdown">
+                                            <i class="material-icons md-48">brightness_7</i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a id="restoreIcon" class="tooltipped" data-position="bottom">
+                                            <i class="material-icons md-48">restore_from_trash</i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a id="languageSelectIcon" class="tooltipped dropdown-trigger" data-position="left" data-activates="languagedropdown">
+                                            <i class="material-icons md-48">translate</i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
                             
                             <li>
                                 <a
@@ -1037,6 +1037,25 @@
                     disableAuxDropdown();
                 }
             }
+
+            if (toggleAuxBtn) {
+                toggleAuxBtn.onclick = (e) => {
+                    e.preventDefault();  // Prevent default action
+                    if (window.innerWidth < 768 || window.innerHeight < 600) {
+                        toggleAuxDropdown();  // Trigger custom dropdown
+                        } else {
+                            toggleAuxiliaryMenu();  // Trigger full auxiliary menu for larger screens
+                            }
+                        };
+                    }
+                    // Function to toggle simplified dropdown in play-only mode
+                    function toggleAuxDropdown() {
+                        const auxDropdown = document.getElementById("aux-dropdown");
+                        if (auxDropdown) {
+                            auxDropdown.classList.toggle("show-dropdown");
+                        }
+                    }
+
        
             function showPersistentNotification() {
                 if (!persistentNotification) {
