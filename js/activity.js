@@ -4228,13 +4228,36 @@ class Activity {
         }
 
         this.transcribeMidi = async function(midi) {
+
+        const DRUM_MIDI_MAP = {
+            38: ["snare drum"],
+            36: ["kick drum"],
+            41: ["tom tom"],
+            43: ["floor tom tom"],
+            47: ["cup drum"],
+            50: ["darbuka drum"],
+            56: ["japanese drum", "cow bell"],
+            42: ["hi hat"],
+            53: ["ride bell"],
+            81: ["triangle bell"],
+            69: ["finger cymbals"],
+            82: ["chime"],
+            52: ["gong"],
+            55: ["clang"],
+            49: ["crash"],
+            39: ["clap"],
+            40: ["slap"],
+            88: ["raindrop"]
+        };
+
+
             let currentMidi = midi;
             let jsONON = [] ;
             let actionBlockCounter = 0; // Counter for action blocks
             let actionBlockNames = []; // Array to store action block names
             let totalnoteblockCount = 0; // Initialize noteblock counter
             let noteblockCount = 0;
-            const MAX_NOTEBLOCKS = 100;
+            const MAX_NOTEBLOCKS = 200;
             let shortestNoteDenominator = 0;
             let offset = 100;
             let stopProcessing = false;
@@ -4262,11 +4285,10 @@ class Activity {
             // console.log("tempoBpm is: ", currentMidiTempoBpm);
             // console.log("tempo is : ",currentMidi.header.tempos);
             // console.log("time signatures are: ", currentMidi.header.timeSignatures);
+            console.log(currentMidi);
             currentMidi.tracks.forEach((track, trackIndex) => {
                 let k = 0;
                 if (stopProcessing) return; // Exit if flag is set
-                let isPercussionTrack =(track.instrument.percussion && (track.channel===9 || track.channel===10))
-                isPercussion.push(isPercussionTrack);
                 if (!track.notes.length) return;
                 let r = jsONON.length;
                 // console.log("notes: ",track.notes);
@@ -4292,6 +4314,7 @@ class Activity {
                 );
 
                 let sched = [];
+                isPercussion.push(track.instrument.percussion && (track.channel === 9 || track.channel === 10));
 
                 track.notes.forEach((note, index) => {
                     let name = note.name;
@@ -4299,7 +4322,6 @@ class Activity {
                     let end = Math.round((note.time + note.duration) * 100) / 100;
 
                     if (note.duration === 0) return; // Skip zero-duration notes
-
 
                     let lastNote = sched[sched.length - 1];
 
@@ -4400,9 +4422,10 @@ class Activity {
                                 [x, "rest2", 0, 0, [prev, null]]
                             );
                         } else if (precurssionFlag) {
+                            let drumname = DRUM_MIDI_MAP[track.notes[0].midi][0] || "kick drum";
                             ar.push(
                                 [x, "playdrum", 0, 0, [first ? prev : x-1, x+1, null]],
-                                [x+1, ["drumname",{"value":"bass drum"}], 0, 0,[x]],
+                                [x+1, ["drumname",{"value":drumname}], 0, 0,[x]],
                             );
                             x += 2;
                         } else {
@@ -4431,7 +4454,7 @@ class Activity {
                     // obj[0]=obj[0]*scalingFactor;
 
                     // To get the reduced fraction for 4/2 to 2/1
-                    obj=this.getClosestStandardNoteValue(obj[0]/obj[1]);
+                    obj = this.getClosestStandardNoteValue(obj[0]/obj[1]);
 
                     // Since we are going to add action block in the front later
                     if (k != 0) val = val + 2;
@@ -4478,13 +4501,14 @@ class Activity {
             let len = jsONON.length;
             let m = 0;
             let actionIndex = 0;
+            console.log(instruments);
 
             for (let i = 0; i < trackCount; i++) {
-                 let vspaceIndex=len+m+6;
-                 let startIndex=len+m;
-                 let flag=true;
-                if(isPercussion[i])
-                {
+                let vspaceIndex=len+m+6;
+                let startIndex=len+m;
+                let flag=true;
+
+                if (isPercussion[i]) {
                     jsONON.push(
                         [len + m, ["start", { collapsed: false }], 300 + offset, 100, [null, len + m + 14+actionBlockPerTrack[i], null]],
                         [len + m +1,"meter",0,0,[len + m +14 + actionBlockPerTrack[i],len + m +2,len + m +3,len + m + 6]],
@@ -4493,26 +4517,26 @@ class Activity {
                         [len + m + 4,["number", {value : 1}],0,0,[len+m+3]],
                         [len + m + 5,["number", {value : currentMidiTimeSignature[1]}],0,0,[len+m+3]],
                         [len + m + 6,"vspace",0,0,[len + m + 1,len + m + 8 + actionBlockPerTrack[i]]],
-                        [len + m + 7, ["nameddo", { value: "MIDI-conversion" }], 0, 0, [len + m +13 +actionBlockPerTrack[i], len + m + 8]],
+                        [len + m + 7, "hidden", 0, 0, [len + m +13 +actionBlockPerTrack[i], len + m + 8]],
                     );
-                    flag=false;
+                    flag = false;
                     m+=8;
+                } else {
+                    jsONON.push(
+                        [len + m, ["start", { collapsed: false }], 300 + offset, 100, [null, len + m+16+actionBlockPerTrack[i], null]],
+                        [len + m +1,"meter",0,0,[len + m+16+actionBlockPerTrack[i],len + m +2,len + m +3,len + m + 6]],
+                        [len + m + 2, ["number",{value: currentMidiTimeSignature[0]}],0,0,[len+m+1]],
+                        [len + m + 3,"divide",0,0,[len + m +1,len + m + 4,len + m + 5]],
+                        [len + m + 4,["number", {value : 1}],0,0,[len+m+3]],
+                        [len + m + 5,["number", {value : currentMidiTimeSignature[1]}],0,0,[len+m+3]],
+                        [len + m + 6,"vspace",0,0,[len + m + 1,len + m + 10 + actionBlockPerTrack[i]]],
+                        [len + m + 7, "settimbre", 0, 0, [len + m +15 +actionBlockPerTrack[i], len + m + 8, len + m + 10, len + m + 9]],
+                        [len + m + 8, ["voicename", { value: instruments[i] }], 0, 0, [len + m + 7]],
+                        [len + m + 9, "hidden", 0, 0, [len + m + 7, null]]
+                    );
+                    m += 10;
                 }
-                else{
-                jsONON.push(
-                    [len + m, ["start", { collapsed: false }], 300 + offset, 100, [null, len + m+16+actionBlockPerTrack[i], null]],
-                    [len + m +1,"meter",0,0,[len + m+16+actionBlockPerTrack[i],len + m +2,len + m +3,len + m + 6]],
-                    [len + m + 2, ["number",{value: currentMidiTimeSignature[0]}],0,0,[len+m+1]],
-                    [len + m + 3,"divide",0,0,[len + m +1,len + m + 4,len + m + 5]],
-                    [len + m + 4,["number", {value : 1}],0,0,[len+m+3]],
-                    [len + m + 5,["number", {value : currentMidiTimeSignature[1]}],0,0,[len+m+3]],
-                    [len + m + 6,"vspace",0,0,[len + m + 1,len + m + 10 + actionBlockPerTrack[i]]],
-                    [len + m + 7, "settimbre", 0, 0, [len + m +15 +actionBlockPerTrack[i], len + m + 8, len + m + 10, len + m + 9]],
-                    [len + m + 8, ["voicename", { value: instruments[i] }], 0, 0, [len + m + 7]],
-                    [len + m + 9, "hidden", 0, 0, [len + m + 7, null]]
-                );
-                m += 10;
-                }
+
                 for (let j = 0; j < actionBlockPerTrack[i]; j++) {
                     jsONON.push(
                         [len + m, ["nameddo", { value: actionBlockNames[actionIndex] }], 0, 0, [flag?len+m-3:len + m - 1, len + m + 1]]
