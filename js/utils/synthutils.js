@@ -1981,6 +1981,9 @@ function Synth() {
         // Convert volume to decibals
         const db = Tone.gainToDb(nv / 100);
         if (instrumentName in instruments[turtle]) {
+            if (instruments[turtle][instrumentName].volume === undefined) {
+                instruments[turtle][instrumentName].volume = { value: 0 }; 
+            }
             instruments[turtle][instrumentName].volume.value = db;
         }
     };
@@ -1991,24 +1994,22 @@ function Synth() {
      * @memberof Synth
      * @param {number} volume - The master volume level (0 to 100).
      */
-    this.setMasterVolume = (volume, firstConnection, lastConnection) => {
+    this.setMasterVolume = (volume, firstConnection = null, lastConnection = null) => {
         if (!instruments[0]["electronic synth"]) {
             this.createDefaultSynth(0);
         }
-        this.setVolume(0, "electronic synth", volume);
-
 
         if (firstConnection === null && lastConnection === null) {
             // Reset volume to default (0 dB) first
-             Tone.Destination.volume.rampTo(0, 0.01); 
-            setTimeout(()=>{
+            Tone.Destination.volume.rampTo(0, 0.01);
+            this.setVolume(0, "electronic synth", volume);
+            setTimeout(() => {
                 this.trigger(0, "G4", 1 / 4, "electronic synth", null, null, false);
-            },200)
-        }
-        else{
+            }, 200);
+        } else {
             const db = Tone.gainToDb(volume / 100);
             Tone.Destination.volume.rampTo(db, 0.01);
-        } 
+        }
     };
 
     /**

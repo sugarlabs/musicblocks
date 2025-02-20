@@ -663,12 +663,22 @@ class Singer {
      * @static
      * @param {Object} logo
      * @param {Number} volume
+     * @param {Number} [blk] - corresponding Block index in blocks.blockList
      * @returns {void}
      */
     static setMasterVolume(logo, volume, blk) {
         const activity = logo.activity;
-        const firstConnection = activity.logo.blockList[blk].connections[0];
-        const lastConnection = last(activity.logo.blockList[blk].connections);
+        let firstConnection;
+        let lastConnection;
+
+        if (activity.logo.blockList && activity.logo.blockList[blk]) {
+            firstConnection = activity.logo.blockList[blk].connections[0];
+            lastConnection = last(activity.logo.blockList[blk].connections);
+        } else {
+            firstConnection = null;
+            lastConnection = null;
+        }
+
         volume = Math.min(Math.max(volume, 0), 100);
         logo.synth.setMasterVolume(volume, firstConnection, lastConnection);
         for (const turtle of activity.turtles.turtleList) {
@@ -686,6 +696,7 @@ class Singer {
      * @param {Object} turtle
      * @param {Number} synth
      * @param {Number} volume
+     * @param {Number} [blk] - corresponding Block index in blocks.blockList
      * @returns {void}
      */
     static setSynthVolume(logo, turtle, synth, volume, blk) {
