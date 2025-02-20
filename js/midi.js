@@ -167,7 +167,7 @@ const transcribeMidi = async (midi) => {
             let st = sched[j].start;
             let ed = sched[j].end;
             let dur = ed - st;
-            let temp = this.activity.getClosestStandardNoteValue(dur * 3 / 8);
+            let temp = activity.getClosestStandardNoteValue(dur * 3 / 8);
             shortestNoteDenominator = Math.max(shortestNoteDenominator, temp[1]);
         }
 
@@ -214,7 +214,7 @@ const transcribeMidi = async (midi) => {
                 }
                 return ar;
             };
-            let obj = this.activity.getClosestStandardNoteValue(duration * 3 / 8);
+            let obj = activity.getClosestStandardNoteValue(duration * 3 / 8);
             // let scalingFactor=1;
             // if(shortestNoteDenominator>32)
             // scalingFactor=shortestNoteDenominator/32;
@@ -225,7 +225,7 @@ const transcribeMidi = async (midi) => {
             // obj[0]=obj[0]*scalingFactor;
 
             // To get the reduced fraction for 4/2 to 2/1
-            obj = this.activity.getClosestStandardNoteValue(obj[0] / obj[1]);
+            obj = activity.getClosestStandardNoteValue(obj[0] / obj[1]);
 
             // Since we are going to add action block in the front later
             if (k != 0) val = val + 2;
@@ -251,7 +251,7 @@ const transcribeMidi = async (midi) => {
             }
 
             if (totalnoteblockCount >= MAX_NOTEBLOCKS) {
-                this.textMsg("MIDI file is too large.. Generating only 100 noteblocks");
+                activity.textMsg("MIDI file is too large.. Generating only 100 noteblocks");
                 stopProcessing = true;
                 break;
             }
@@ -335,7 +335,7 @@ const transcribeMidi = async (midi) => {
 
     }
 
-    this.activity.blocks.loadNewBlocks(jsONON);
+    activity.blocks.loadNewBlocks(jsONON);
     // this.textMsg("MIDI import is not currently precise. Consider changing the speed with the Beats Per Minute block or modifying note value with the Multiply Note Value block");
     return null;
 };
