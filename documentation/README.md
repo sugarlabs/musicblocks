@@ -231,21 +231,49 @@ For further details on how to use these toolbars effectively, you can refer to t
 [Back to Table of Contents](#table-of-contents)
 
 
-There are several keyboard shortcuts:
+## General Shortcuts
+| Key Combination       | Description                                             |
+|------------------------|---------------------------------------------------------|
+| `Alt + B`             | Save the current block artwork.                        |
+| `Alt + C`             | Copy the selected blocks.                              |
+| `Alt + D`             | Prompt to delete custom macros.                        |
+| `Alt + E`             | Clear all elements.                                    |
+| `Alt + R` or `Enter`  | Play the project. Activates the play button.           |
+| `Alt + S`             | Stop all running processes (e.g., turtles).            |
+| `Alt + H`             | Save help blocks.                                      |
+| `Ctrl + V`            | Open the paste box.                                    |
+| `Space`               | Toggle the zoom level of the stage.                    |
+| `ESC`                 | Hide widgets or stop ongoing processes.                |
 
-_PgUp_ and _PgDn_ will scroll the screen vertically. This is useful for
-creating long stacks of blocks.
+## Navigation Shortcuts
+| Key                   | Description                                             |
+|------------------------|---------------------------------------------------------|
+| `HOME`                | Jump to the home position for blocks or palettes.       |
+| `END`                 | Scroll to the bottom of the page.                       |
+| `PAGE UP`             | Scroll up by half the screen height.                   |
+| `PAGE DOWN`           | Scroll down by half the screen height.                 |
+| `Arrow Up`            | Move the active block or scroll up.                    |
+| `Arrow Down`          | Move the active block or scroll down.                  |
+| `Arrow Left`          | Move the active block or scroll left. (In Horizontal mode)|
+| `Arrow Right`         | Move the active block or scroll right.(In Horizontal mode)|
 
-You can use the arrow keys to move blocks and the _Delete_ key to
-remove an individual block from a stack.
+## Music Note Creation
+| Key                   | Description                                             |
+|------------------------|---------------------------------------------------------|
+| `D`                   | Create a "Do" note.                                    |
+| `R`                   | Create a "Re" note.                                    |
+| `M`                   | Create a "Mi" note.                                    |
+| `F`                   | Create a "Fa" note.                                    |
+| `S`                   | Create a "Sol" note.                                   |
+| `L`                   | Create a "La" note.                                    |
+| `T`                   | Create a "Ti" note.                                    |
 
-_Enter_ is the equivalent of clicking the _Run_ button.
-
-_Alt-C_ is copy and _Alt-V_ is paste. Be sure that the cursor is
-highlighting the block(s) you want to copy.
-
-You can directly type notes using _d_ for `Do`, _r_ for `Re`, _m_ for
-`Mi`, _f_ for `Fa`, _s_ for `Sol`, _l_ for `La`, and _t_ for `Ti`.
+## Special Block Manipulations
+| Key Combination       | Description                                             |
+|------------------------|---------------------------------------------------------|
+| `/`                   | Scroll blocks container to the right (In Horizontal mode).  |
+| `\`                   | Scroll blocks container to the left (In Horizontal mode.   |
+| `DEL`                 | Extract the selected block.                            |
 
 
 ## 5. Block Palettes
