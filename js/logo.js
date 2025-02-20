@@ -208,6 +208,7 @@ class Logo {
         this.collectingStats = false;
         this.runningAbc = false;
         this.runningMxml = false;
+        this.runningMIDI = false;
         this._checkingCompletionState = false;
         this.recording = false;
 
@@ -230,6 +231,9 @@ class Logo {
         this.inOscilloscope = false;
         this.updatingStatusMatrix = false;
         this.statusFields = [];
+
+        // Midi Data
+        this._midiData = {};
 
         // When running in step-by-step mode, the next command to run
         // is queued here.
@@ -367,7 +371,6 @@ class Logo {
             tur.singer.synthVolume[DEFAULTVOICE] = [DEFAULTVOLUME];
         }
 
-        Singer.setMasterVolume(this, DEFAULTVOLUME);
         for (const turtle in this.activity.turtles.turtleList) {
             for (const synth in this.activity.turtles.ithTurtle(turtle).singer.synthVolume) {
                 Singer.setSynthVolume(this, turtle, synth, DEFAULTVOLUME);
@@ -797,6 +800,15 @@ class Logo {
         }
     }
 
+    notationMIDI(note, drum, duration, turtle, bpm, instrument) {
+
+        if (!this._midiData[turtle]) {
+            this._midiData[turtle] = [];
+        }
+        if (drum) drum = drum[0];
+        this._midiData[turtle].push({ note, duration, bpm, instrument, drum });
+    }
+
     // ========================================================================
 
     /**
@@ -901,7 +913,7 @@ class Logo {
 
         this.activity.turtles
             .ithTurtle(turtle)
-            .initTurtle(this.runningLilypond || this.runningAbc || this.runningMxml);
+            .initTurtle(this.runningLilypond || this.runningAbc || this.runningMxml || this.runningMIDI);
     }
 
     /**
@@ -1030,7 +1042,6 @@ class Logo {
 
         Singer.masterBPM = TARGETBPM;
         Singer.defaultBPMFactor = TONEBPM / TARGETBPM;
-        Singer.masterVolume = [DEFAULTVOLUME];
         this.synth.changeInTemperament = false;
 
         this._checkingCompletionState = false;
@@ -1684,7 +1695,11 @@ class Logo {
                         // console.log("saving mxml output");
                         logo.activity.save.afterSaveMxml();
                         logo.runningMxml = false;
-                    } else if (tur.singer.suppressOutput) {
+                    } else if (logo.runningMIDI) {
+                        logo.activity.save.afterSaveMIDI();
+                        logo.runningMIDI = false;
+                    }
+                    else if (tur.singer.suppressOutput) {
                         // console.debug("finishing compiling");
                         if (!logo.recording) {
                             logo.activity.errorMsg(_("Playback is ready."));
