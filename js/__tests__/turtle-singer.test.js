@@ -17,6 +17,8 @@ global.isCustomTemperament = mockGlobals.isCustomTemperament;
 global.getStepSizeUp = mockGlobals.getStepSizeUp;
 global.numberToPitch = mockGlobals.numberToPitch;
 global.pitchToNumber = mockGlobals.pitchToNumber;
+global.last = jest.fn((array) => array[array.length - 1]);
+
 
 describe('Singer Class', () => {
     let turtleMock;
