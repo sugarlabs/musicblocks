@@ -1031,13 +1031,13 @@
                     removePersistentNotification();
         
                     if (auxToolbar) {
-                        auxToolbar.style.display = "";
+                        auxToolbar.style.display = "none";
                     }
         
                     disableAuxDropdown();
                 }
             }
-        
+       
             function showPersistentNotification() {
                 if (!persistentNotification) {
                     persistentNotification = document.createElement("div");
