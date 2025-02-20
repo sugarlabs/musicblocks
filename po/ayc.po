@@ -4835,7 +4835,7 @@ msgstr "mayman chiqas riq "
 #: js/blocks/ProgramBlocks.js:1048
 #.TRANS: número de conexion
 msgid "connection number"
-msgstr "hap’ichiypa yupaynin"
+msgstr "hap’ichiypa yupaynin""
 
 #: js/blocks/ProgramBlocks.js:1140
 #.TRANS: El bloque crear bloque crea un bloque.
