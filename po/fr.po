@@ -195,7 +195,7 @@ msgstr "Votre enregistrement est en cours."
 #: js/SaveInterface.js:415
 #.TRANS: File name prompt for save as Lilypond
 msgid "File name"
-msgstr "om de fichier""
+msgstr "om de fichier"
 
 #: js/SaveInterface.js:417
 #: planet/js/StringHelper.js:39

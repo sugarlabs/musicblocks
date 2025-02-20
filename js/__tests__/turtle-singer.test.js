@@ -54,6 +54,12 @@ describe('Singer Class', () => {
                 inPitchDrumMatrix: false,
                 inMatrix: false,
                 clearNoteParams: jest.fn(),
+                // Add blockList here
+                blockList: {
+                    mockBlk: {
+                        connections: ['mockConnection1', 'mockConnection2']
+                    }
+                }
             },
         };
 
@@ -99,12 +105,13 @@ describe('Singer Class', () => {
     });
 
     test('should set master volume correctly', () => {
-        Singer.setMasterVolume(logoMock, 50);
-        expect(logoMock.synth.setMasterVolume).toHaveBeenCalledWith(50);
+        Singer.setMasterVolume(logoMock, 50, 'mockBlk');
+        expect(logoMock.synth.setMasterVolume).toHaveBeenCalledWith(50, 'mockConnection1', 'mockConnection2');
     });
 
     test('should set synth volume correctly', () => {
-        Singer.setSynthVolume(logoMock, turtleMock, 'noise1', 80);
-        expect(logoMock.synth.setVolume).toHaveBeenCalledWith(turtleMock, 'noise1', 80 / 25);
-    });  
+        Singer.setSynthVolume(logoMock, turtleMock, 'noise1', 80, 'mockBlk');
+        expect(logoMock.synth.setVolume).toHaveBeenCalledWith(turtleMock, 'noise1', 80 / 25, 'mockBlk');
+    });
+ 
 });

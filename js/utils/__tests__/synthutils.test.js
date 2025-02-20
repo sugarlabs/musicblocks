@@ -209,7 +209,7 @@ describe("Utility Functions (logic-only)", () => {
             expect(instruments[turtle]["electronic synth"]).toBeInstanceOf(Tone.PolySynth)
         });
         it("it should creates a amsynth based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
-            const instrumentName = "guitar"
+            let instrumentName = "guitar"
             __createSynth(turtle, instrumentName, "amsynth", {});
             expect(instruments[turtle][instrumentName]).toBeInstanceOf(Tone.AMSynth)
         });
@@ -217,28 +217,28 @@ describe("Utility Functions (logic-only)", () => {
         it("it should creates a CUSTOMSAMPLES based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
             CUSTOMSAMPLES['pianoC4'] = "pianoC4";
             CUSTOMSAMPLES['drumKick'] = "drumKick";
-            const instrumentName = "guitar"
+            let instrumentName = "guitar"
             __createSynth(turtle, instrumentName, "pianoC4", {});
             expect(instruments[turtle][instrumentName]).toBeInstanceOf(Tone.Sampler)
         });
 
         it("it should creates a CUSTOMSAMPLES based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
-            const instrumentName = "guitar"
-            const sourceName = "http://testing.com"
+            let instrumentName = "guitar"
+            let sourceName = "http://testing.com"
             __createSynth(turtle, instrumentName, sourceName, {});
             expect(instruments[turtle][sourceName]["noteDict"]).toBe(sourceName)
             expect(instrumentsSource[instrumentName]).toStrictEqual([1, 'drum'])
         });
         it("it should creates a CUSTOMSAMPLES based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
-            const instrumentName = "guitar"
-            const sourceName = "file://testing.jpg"
+            let instrumentName = "guitar"
+            let sourceName = "file://testing.jpg"
             __createSynth(turtle, instrumentName, sourceName, {});
             expect(instruments[turtle][sourceName]["noteDict"]).toBe(sourceName)
             expect(instrumentsSource[instrumentName]).toStrictEqual([1, 'drum'])
         });
         it("it should creates a CUSTOMSAMPLES based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
-            const instrumentName = "guitar"
-            const sourceName = "drum"
+            let instrumentName = "guitar"
+            let sourceName = "drum"
             __createSynth(turtle, instrumentName, sourceName, {});
             expect(instrumentsSource[instrumentName]).toStrictEqual([1, 'drum'])
         });
@@ -1024,9 +1024,14 @@ describe("Utility Functions (logic-only)", () => {
         });
     });
 
+
     describe("createSynth", () => {
         it("it should creates a synth based on the user's input in the 'Timbre' clamp, handling race conditions with the samples loader.", () => {
-            expect(createSynth("turtle1", "piano", "voiceSample1", {})).toBe(undefined);
+            const turtle = "turtle1";  // Use const or let
+            const instrumentName = "piano";  // Localize declaration
+            const sourceName = "voiceSample1";  // Localize declaration
+            expect(createSynth(turtle, instrumentName, sourceName, {})).toBe(undefined);
         });
     });
+
 });

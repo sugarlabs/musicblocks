@@ -57,6 +57,11 @@ describe('setupVolumeActions', () => {
                     notationEndArticulation: jest.fn(),
                     notationEndCrescendo: jest.fn(),
                 },
+                blockList: {
+                    mockBlk: {
+                        connections: ['mockConnection1', 'mockConnection2']
+                    }
+                }
             },
             errorMsg: jest.fn(),
         };
@@ -83,7 +88,7 @@ describe('setupVolumeActions', () => {
     it('should set master volume correctly', () => {
         Singer.VolumeActions.setMasterVolume(80, 0, 1);
         expect(Singer.masterVolume).toContain(80);
-        expect(Singer.setMasterVolume).toHaveBeenCalledWith(activity.logo, 80);
+        expect(Singer.setMasterVolume).toHaveBeenCalledWith(activity.logo, 80, expect.any(Number));;
     });
 
     it('should handle out-of-range master volume', () => {
@@ -98,7 +103,7 @@ describe('setupVolumeActions', () => {
 
     it('should set synth volume correctly', () => {
         targetTurtle.singer.synthVolume['default'] = [DEFAULTVOLUME];
-        Singer.VolumeActions.setSynthVolume('default', 70, 0);
+        Singer.VolumeActions.setSynthVolume('default', 70, 0, 'mockBlk');
 
         expect(targetTurtle.singer.synthVolume['default']).toContain(70);
         expect(Singer.setSynthVolume).toHaveBeenCalledWith(activity.logo, 0, 'default', 70);
