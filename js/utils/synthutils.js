@@ -1349,7 +1349,6 @@ function Synth() {
         synthOptions = validateAndSetParams(synthOptions, params);
 
         let tempSynth;
-        console.log(sourceName,'AMANANANAN');
         if (sourceName.toLowerCase() === "amsynth") {
             tempSynth = new Tone.AMSynth(synthOptions);
         } else if (sourceName.toLowerCase() === "fmsynth") {
@@ -1374,8 +1373,6 @@ function Synth() {
      */
     this.__createSynth = (turtle, instrumentName, sourceName, params) => {
         // Ensure the structure is initialized
-        console.log("sourceName:", sourceName);
-        console.log("instrumentName:", instrumentName);
 
         this._loadSample(sourceName);
         if (sourceName in this.samples.voice || sourceName in this.samples.drum) {
@@ -1408,7 +1405,6 @@ function Synth() {
             }
 
             if (!instruments[turtle][instrumentName]) {
-            console.log("AYNCHAM3",sourceName);
 
                 instruments[turtle][instrumentName] = this._createCustomSynth(
                     sourceName,
