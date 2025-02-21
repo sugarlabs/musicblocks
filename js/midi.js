@@ -244,7 +244,6 @@ const transcribeMidi = async (midi) => {
     let len = jsONON.length;
     let m = 0;
     let actionIndex = 0;
-    console.log(instruments);
 
     for (let i = 0; i < trackCount; i++) {
         let vspaceIndex = len + m + 6;
