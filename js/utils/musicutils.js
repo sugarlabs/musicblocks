@@ -816,6 +816,8 @@ const GRAPHICS = [
     "set pen size"
 ];
 
+
+
 //The "original solfege" https://en.wikipedia.org/wiki/Solf%C3%A8ge#Origin
 // const ARETINIANSOLFNOTES = ['si', 'la', 'sol', 'fa', 'mi', 're', 'ut'];
 // https://en.wikipedia.org/wiki/Iroha
@@ -2056,6 +2058,31 @@ const TEMPERAMENT = {
         ]
     }
 };
+
+const REVERSE_DRUM_MIDI_MAP = {
+    38: ["snare drum"],
+    36: ["kick drum"],
+    41: ["tom tom"],
+    43: ["floor tom tom"],
+    47: ["cup drum"],
+    50: ["darbuka drum"],
+    56: ["japanese drum", "cow bell"],
+    42: ["hi hat"],
+    53: ["ride bell"],
+    81: ["triangle bell"],
+    69: ["finger cymbals"],
+    82: ["chime"],
+    52: ["gong"],
+    55: ["clang"],
+    49: ["crash"],
+    39: ["clap"],
+    40: ["slap"],
+    88: ["raindrop"]
+};
+
+const getReverseDrumMidi = () => {
+    return REVERSE_DRUM_MIDI_MAP;
+}
 
 /**
  * Set the global octave ratio.

@@ -1,41 +1,20 @@
+const MAX_NOTEBLOCKS = 200;
+const defaultTempo = 90;
+const drumMidi = getReverseDrumMidi();
+
 const transcribeMidi = async (midi) => {
-
-    const REVERSE_DRUM_MIDI_MAP = {
-        38: ["snare drum"],
-        36: ["kick drum"],
-        41: ["tom tom"],
-        43: ["floor tom tom"],
-        47: ["cup drum"],
-        50: ["darbuka drum"],
-        56: ["japanese drum", "cow bell"],
-        42: ["hi hat"],
-        53: ["ride bell"],
-        81: ["triangle bell"],
-        69: ["finger cymbals"],
-        82: ["chime"],
-        52: ["gong"],
-        55: ["clang"],
-        49: ["crash"],
-        39: ["clap"],
-        40: ["slap"],
-        88: ["raindrop"]
-    };
-
-
     let currentMidi = midi;
     let jsONON = [];
     let actionBlockCounter = 0; // Counter for action blocks
     let actionBlockNames = []; // Array to store action block names
     let totalnoteblockCount = 0; // Initialize noteblock counter
     let noteblockCount = 0;
-    const MAX_NOTEBLOCKS = 200;
     let shortestNoteDenominator = 0;
     let offset = 100;
     let stopProcessing = false;
     let trackCount = 0;
     let actionBlockPerTrack = [];
     let instruments = [];
-    let defaultTempo = 90;
     let currentMidiTempoBpm = currentMidi.header.tempos;
     if (currentMidiTempoBpm && currentMidiTempoBpm.length > 0) {
         currentMidiTempoBpm = Math.round(currentMidiTempoBpm[0].bpm);
@@ -131,7 +110,7 @@ const transcribeMidi = async (midi) => {
         let noteSum = 0;
         let currentActionBlock = [];
 
-        let addNewActionBlock = (isLastBlock = false) => {
+        const addNewActionBlock = (isLastBlock = false) => {
             let r = jsONON.length;
             let actionBlockName = `track${trackCount}chunk${actionBlockCounter}`;
             actionBlockNames.push(actionBlockName);
@@ -186,14 +165,14 @@ const transcribeMidi = async (midi) => {
             let last = isLastNoteInBlock || isLastNoteInSched;
             let first = (i == 0);
             let val = jsONON.length + currentActionBlock.length;
-            let getPitch = (x, notes, prev) => {
+            const getPitch = (x, notes, prev) => {
                 let ar = [];
                 if (notes[0] == "R") {
                     ar.push(
                         [x, "rest2", 0, 0, [prev, null]]
                     );
                 } else if (precurssionFlag) {
-                    let drumname = REVERSE_DRUM_MIDI_MAP[track.notes[0].midi][0] || "kick drum";
+                    let drumname = drumMidi[track.notes[0].midi][0] || "kick drum";
                     ar.push(
                         [x, "playdrum", 0, 0, [first ? prev : x - 1, x + 1, null]],
                         [x + 1, ["drumname", { "value": drumname }], 0, 0, [x]],
