@@ -12,6 +12,8 @@
 }
 */
 
+@import url("play-only-mode.css");
+
 *:focus {
   outline: none;
 }
@@ -1897,4 +1899,22 @@ table {
   fill : #033CD2;
   stroke : #78E600;
   stroke-width: 3;
+}
+
+#persistentNotification {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1E88E5; 
+  color: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  font-size: 14px;
+  font-weight: bold;
+  z-index: 1000;
+  text-align: center;
+  min-width: 250px;
+  max-width: 80%;
 }
