@@ -1377,6 +1377,7 @@ function Synth() {
      * @param {Object} params - Additional parameters for synth configuration.
      */
     this.__createSynth = (turtle, instrumentName, sourceName, params) => {
+        // Ensure the structure is initialized
 
         this._loadSample(sourceName);
         if (sourceName in this.samples.voice || sourceName in this.samples.drum) {
@@ -1389,6 +1390,10 @@ function Synth() {
                 )
             }
         } else if (sourceName in BUILTIN_SYNTHS) {
+            if (instruments[turtle] && instruments[turtle][instrumentName]) {
+                delete instruments[turtle][instrumentName];
+            }
+
             if (!instruments[turtle][instrumentName]) {
                 instruments[turtle][instrumentName] = this._createBuiltinSynth(
                     turtle,
@@ -1398,7 +1403,12 @@ function Synth() {
                 );
             }
         } else if (sourceName in CUSTOM_SYNTHS) {
+            if (instruments[turtle] && instruments[turtle][instrumentName]) {
+                delete instruments[turtle][instrumentName];
+            }
+
             if (!instruments[turtle][instrumentName]) {
+
                 instruments[turtle][instrumentName] = this._createCustomSynth(
                     sourceName,
                     params
@@ -1407,6 +1417,10 @@ function Synth() {
 
             instrumentsSource[instrumentName] = [0, "poly"];
         } else if (sourceName in CUSTOMSAMPLES) {
+            if (instruments[turtle] && instruments[turtle][instrumentName]) {
+                delete instruments[turtle][instrumentName];
+            }
+
             if (!instruments[turtle][instrumentName]) {
                 instruments[turtle][instrumentName] = this._createSampleSynth(
                     turtle,
@@ -1958,6 +1972,21 @@ function Synth() {
 
         synth.volume.linearRampToValueAtTime(db, Tone.now() + rampTime);
     };
+
+    /**
+     * new Addtion
+     * Gets the volume for a specific instrument.
+     * @param {string} turtle - The name of the turtle (e.g., "turtle1").
+     * @param {string} instrumentName - The name of the instrument (e.g., "flute").
+     * @returns {number} The volume level in decibels or 50 if not found.
+     */
+    this.getVolume = (turtle, instrumentName) => {
+        if (instruments[turtle] && instruments[turtle][instrumentName]) {
+            return instruments[turtle][instrumentName].volume.value;
+        }
+        console.debug("instrument not found");
+        return 50;  // Default volume
+    }
     
     /**
      * Sets the volume of a specific instrument for a given turtle.
