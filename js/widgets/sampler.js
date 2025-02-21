@@ -307,7 +307,7 @@ function SampleWidget() {
 
         reader.onload = () => {
             // if the file is of .wav type, save it
-            if (reader.result.substring(reader.result.indexOf(":")+1, reader.result.indexOf(";")) === "audio/wav") {
+            if (reader.result.substring(reader.result.indexOf(":") + 1, reader.result.indexOf(";")) === "audio/wav") {
                 if (reader.result.length <= 1333333) {
                     this.sampleData = reader.result;
                     this.sampleName = sampleFile.name;
