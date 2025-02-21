@@ -7,6 +7,7 @@ class Sampler {
     this.stop = jest.fn().mockReturnThis();
     this.triggerAttack = jest.fn().mockReturnThis();
     this.volume = {
+      value: 0, 
       linearRampToValueAtTime: jest.fn().mockImplementation()
     }
     this.triggerRelease = jest.fn().mockReturnThis();
@@ -56,6 +57,10 @@ class Synth {
     this.synthOptions = synthOptions
     this.triggerAttackRelease = jest.fn().mockReturnThis();
     this.chain = jest.fn().mockReturnThis();
+    this.volume = {
+      value: 0,
+      linearRampToValueAtTime: jest.fn().mockImplementation()
+    };
   }
   toDestination() {
     return this;
@@ -77,6 +82,10 @@ class PolySynth {
     this.triggerAttack = jest.fn().mockReturnThis();
     this.start = jest.fn().mockReturnThis();
     this.triggerAttackRelease = jest.fn().mockReturnThis();
+    this.volume = {
+      value: 0,
+      linearRampToValueAtTime: jest.fn().mockImplementation()
+    };
   }
 
   toDestination() {
