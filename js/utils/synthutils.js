@@ -1385,7 +1385,6 @@ function Synth() {
                 )
             }
         } else if (sourceName in BUILTIN_SYNTHS) {
-            //new addition
             if (instruments[turtle] && instruments[turtle][instrumentName]) {
                 delete instruments[turtle][instrumentName];
             }
@@ -1399,7 +1398,6 @@ function Synth() {
                 );
             }
         } else if (sourceName in CUSTOM_SYNTHS) {
-            //new addition
             if (instruments[turtle] && instruments[turtle][instrumentName]) {
                 delete instruments[turtle][instrumentName];
             }
@@ -1414,7 +1412,6 @@ function Synth() {
 
             instrumentsSource[instrumentName] = [0, "poly"];
         } else if (sourceName in CUSTOMSAMPLES) {
-            //new addition
             if (instruments[turtle] && instruments[turtle][instrumentName]) {
                 delete instruments[turtle][instrumentName];
             }
