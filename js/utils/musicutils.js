@@ -2080,6 +2080,11 @@ const REVERSE_DRUM_MIDI_MAP = {
     88: ["raindrop"]
 };
 
+/**
+ * Get reversed midi for drum.
+ * @function
+ * @returns {Object}
+ */
 const getReverseDrumMidi = () => {
     return REVERSE_DRUM_MIDI_MAP;
 }

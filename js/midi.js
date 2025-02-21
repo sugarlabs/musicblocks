@@ -1,9 +1,10 @@
 const MAX_NOTEBLOCKS = 200;
 const defaultTempo = 90;
 const drumMidi = getReverseDrumMidi();
+const isPercussion = [];
 
 const transcribeMidi = async (midi) => {
-    let currentMidi = midi;
+    const currentMidi = midi;
     let jsONON = [];
     let actionBlockCounter = 0; // Counter for action blocks
     let actionBlockNames = []; // Array to store action block names
@@ -31,18 +32,14 @@ const transcribeMidi = async (midi) => {
     }
 
     let precurssionFlag = false;
-    const isPercussion = [];
     // console.log("tempoBpm is: ", currentMidiTempoBpm);
     // console.log("tempo is : ",currentMidi.header.tempos);
     // console.log("time signatures are: ", currentMidi.header.timeSignatures);
-    console.log(currentMidi);
     currentMidi.tracks.forEach((track, trackIndex) => {
         let k = 0;
         if (stopProcessing) return; // Exit if flag is set
         if (!track.notes.length) return;
         let r = jsONON.length;
-        // console.log("notes: ",track.notes);
-        // find matching instrument
         let instrument = "electronic synth";
         if (track.instrument.name && !track.instrument.percussion) {
             for (let voices of VOICENAMES) {
@@ -71,7 +68,7 @@ const transcribeMidi = async (midi) => {
             let start = Math.round(note.time * 100) / 100;
             let end = Math.round((note.time + note.duration) * 100) / 100;
 
-            if (note.duration === 0) return; // Skip zero-duration notes
+            if (note.duration === 0) return;
 
             let lastNote = sched[sched.length - 1];
 
@@ -102,10 +99,8 @@ const transcribeMidi = async (midi) => {
                 sched.push({ start: lastNote.end, end: start, notes: ["R"] });
             }
 
-            // Add the new note to the schedule
             sched.push({ start: start, end: end, notes: [name] });
         });
-
 
         let noteSum = 0;
         let currentActionBlock = [];
@@ -138,14 +133,12 @@ const transcribeMidi = async (midi) => {
             }
 
             currentActionBlock = [];
-            actionBlockCounter++; // Increment the action block counter
+            actionBlockCounter++;
             offset += 100;
         };
         //Using for loop for finding the shortest note value
         for (let j in sched) {
-            let st = sched[j].start;
-            let ed = sched[j].end;
-            let dur = ed - st;
+            let dur = sched[j].end - sched[j].start;;
             let temp = activity.getClosestStandardNoteValue(dur * 3 / 8);
             shortestNoteDenominator = Math.max(shortestNoteDenominator, temp[1]);
         }
