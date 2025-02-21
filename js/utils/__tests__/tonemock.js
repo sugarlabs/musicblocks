@@ -56,10 +56,10 @@ class Synth {
   constructor(synthOptions) {
     this.synthOptions = synthOptions
     this.triggerAttackRelease = jest.fn().mockReturnThis();
-    this.stop = jest.fn().mockReturnThis(); // Ensure stop is mocked here
-    this.triggerAttack = jest.fn().mockReturnThis(); // new
-    this.triggerRelease = jest.fn().mockReturnThis(); // new
-    this.start = jest.fn().mockReturnThis(); // new
+    this.stop = jest.fn().mockReturnThis();
+    this.triggerAttack = jest.fn().mockReturnThis(); 
+    this.triggerRelease = jest.fn().mockReturnThis();
+    this.start = jest.fn().mockReturnThis();
     this.chain = jest.fn().mockReturnThis();
     this.volume = {
       value: 0,
