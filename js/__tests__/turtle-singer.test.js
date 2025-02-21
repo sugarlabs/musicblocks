@@ -59,7 +59,7 @@ describe('Singer Class', () => {
                 // Add blockList here
                 blockList: {
                     mockBlk: {
-                        connections: ['mockConnection1', 'mockConnection2']
+                        connections: [0, 0]
                     }
                 }
             },
@@ -108,7 +108,7 @@ describe('Singer Class', () => {
 
     test('should set master volume correctly', () => {
         Singer.setMasterVolume(logoMock, 50, 'mockBlk');
-        expect(logoMock.synth.setMasterVolume).toHaveBeenCalledWith(50, 'mockConnection1', 'mockConnection2');
+        expect(logoMock.synth.setMasterVolume).toHaveBeenCalledWith(50, 0, 0);
     });
 
     test('should set synth volume correctly', () => {
