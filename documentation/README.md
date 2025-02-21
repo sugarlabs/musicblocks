@@ -231,49 +231,55 @@ For further details on how to use these toolbars effectively, you can refer to t
 [Back to Table of Contents](#table-of-contents)
 
 
+# Keyboard Shortcuts Guide
+
 ## General Shortcuts
-| Key Combination       | Description                                             |
-|------------------------|---------------------------------------------------------|
-| `Alt + B`             | Save the current block artwork.                        |
-| `Alt + C`             | Copy the selected blocks.                              |
-| `Alt + D`             | Prompt to delete custom macros.                        |
-| `Alt + E`             | Clear all elements.                                    |
-| `Alt + R` or `Enter`  | Play the project. Activates the play button.           |
-| `Alt + S`             | Stop all running processes (e.g., turtles).            |
-| `Alt + H`             | Save help blocks.                                      |
-| `Ctrl + V`            | Open the paste box.                                    |
-| `Space`               | Toggle the zoom level of the stage.                    |
-| `ESC`                 | Hide widgets or stop ongoing processes.                |
+
+| Key Combination (Windows) | Key Combination (Mac)       | Description                                             |
+|----------------------------|-----------------------------|---------------------------------------------------------|
+| `Alt + B`                 | `Option + B`               | Save the current block artwork.                        |
+| `Alt + C`                 | `Option + C`               | Copy the selected blocks.                              |
+| `Alt + D`                 | `Option + D`               | Prompt to delete custom macros.                        |
+| `Alt + E`                 | `Option + E`               | Clear all elements.                                    |
+| `Alt + R` or `Enter`      | `Option + R` or `Return`   | Play the project. Activates the play button.           |
+| `Alt + S`                 | `Option + S`               | Stop all running processes (e.g., turtles).            |
+| `Alt + H`                 | `Option + H`               | Save help blocks.                                      |
+| `Ctrl + V`                | `Command + V`              | Open the paste box.                                    |
+| `Space`                   | `Space`                   | Toggle the zoom level of the stage.                    |
+| `ESC`                     | `ESC`                     | Hide widgets or stop ongoing processes.                |
 
 ## Navigation Shortcuts
-| Key                   | Description                                             |
-|------------------------|---------------------------------------------------------|
-| `HOME`                | Jump to the home position for blocks or palettes.       |
-| `END`                 | Scroll to the bottom of the page.                       |
-| `PAGE UP`             | Scroll up by half the screen height.                   |
-| `PAGE DOWN`           | Scroll down by half the screen height.                 |
-| `Arrow Up`            | Move the active block or scroll up.                    |
-| `Arrow Down`          | Move the active block or scroll down.                  |
-| `Arrow Left`          | Move the active block or scroll left. (In Horizontal mode)|
-| `Arrow Right`         | Move the active block or scroll right.(In Horizontal mode)|
+
+| Key (Windows)      | Key (Mac)                            | Description                                             |
+|---------------------|--------------------------------------|---------------------------------------------------------|
+| `HOME`             | `Fn + Left Arrow`                   | Jump to the home position for blocks or palettes.       |
+| `END`              | `Fn + Right Arrow`                  | Scroll to the bottom of the page.                       |
+| `PAGE UP`          | `Fn + Up Arrow`                     | Scroll up by half the screen height.                   |
+| `PAGE DOWN`        | `Fn + Down Arrow`                   | Scroll down by half the screen height.                 |
+| `Arrow Up`         | `Arrow Up`                          | Move the active block or scroll up.                    |
+| `Arrow Down`       | `Arrow Down`                        | Move the active block or scroll down.                  |
+| `Arrow Left`       | `Arrow Left`                        | Move the active block or scroll left (In Horizontal mode).|
+| `Arrow Right`      | `Arrow Right`                       | Move the active block or scroll right (In Horizontal mode).|
 
 ## Music Note Creation
-| Key                   | Description                                             |
-|------------------------|---------------------------------------------------------|
-| `D`                   | Create a "Do" note.                                    |
-| `R`                   | Create a "Re" note.                                    |
-| `M`                   | Create a "Mi" note.                                    |
-| `F`                   | Create a "Fa" note.                                    |
-| `S`                   | Create a "Sol" note.                                   |
-| `L`                   | Create a "La" note.                                    |
-| `T`                   | Create a "Ti" note.                                    |
+
+| Key (Windows) | Key (Mac)     | Description               |
+|---------------|---------------|---------------------------|
+| `D`           | `D`           | Create a "Do" note.       |
+| `R`           | `R`           | Create a "Re" note.       |
+| `M`           | `M`           | Create a "Mi" note.       |
+| `F`           | `F`           | Create a "Fa" note.       |
+| `S`           | `S`           | Create a "Sol" note.      |
+| `L`           | `L`           | Create a "La" note.       |
+| `T`           | `T`           | Create a "Ti" note.       |
 
 ## Special Block Manipulations
-| Key Combination       | Description                                             |
-|------------------------|---------------------------------------------------------|
-| `/`                   | Scroll blocks container to the right (In Horizontal mode).  |
-| `\`                   | Scroll blocks container to the left (In Horizontal mode.   |
-| `DEL`                 | Extract the selected block.                            |
+
+| Key (Windows) | Key (Mac) | Description                                                 |
+|----------------------------|-----------------------|-------------------------------------------------------------|
+| `/`                        | `/`                  | Scroll blocks container to the right (In Horizontal mode).  |
+| `\`                        | `\`                  | Scroll blocks container to the left (In Horizontal mode).   |
+| `DEL`                      | `Delete`             | Extract the selected block.                                 |
 
 
 ## 5. Block Palettes
