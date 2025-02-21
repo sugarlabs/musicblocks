@@ -365,7 +365,7 @@ const percussionInstruments = ["koto", "banjo", "dulcimer", "xylophone", "celest
  * @constant
  * @type {Array<string>}
  */
-const stringInstruments = ["piano","harmonium","sitar", "guitar", "acoustic guitar", "electric guitar"];
+const stringInstruments = ["piano", "harmonium", "sitar", "guitar", "acoustic guitar", "electric guitar"];
 /**
  * Validates and sets parameters for an instrument.
  * @function
