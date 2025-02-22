@@ -205,6 +205,28 @@ describe("save HTML methods", () => {
     });
 });
 
+describe('saveMIDI Method', () => {
+    let instance, activity, mockLogo;
+
+    beforeEach(() => {
+        mockLogo = {
+            runningMIDI: false,
+            runLogoCommands: jest.fn()
+        };
+        activity = {
+            logo: mockLogo
+        };
+        instance = new SaveInterface();
+    });
+
+    it('should set runningMIDI to true and run logo commands', () => {
+        instance.saveMIDI(activity);
+        expect(activity.logo.runningMIDI).toBe(true);
+        expect(activity.logo.runLogoCommands).toHaveBeenCalled();
+        expect(document.body.style.cursor).toBe("wait");
+    });
+});
+
 describe('save artwork methods', () => {
     beforeEach(() => {
         document.body.innerHTML = `
