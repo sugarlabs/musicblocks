@@ -2936,12 +2936,12 @@ class Activity {
         };
         
         //To create a sampler widget
-        this.makeSamplerWidget = (sampleFile, sampleData) => {
+        this.makeSamplerWidget = (sampleName, sampleData) => {
             let samplerStack = [
                 [0, "sampler", 300 - this.blocksContainer.x, 300 - this.blocksContainer.y, [null, 1, 8]],
                 [1, "settimbre", 0, 0, [0, 2, 6, 7]],
                 [2, ["customsample", { value: ["", "", "do", 4] }], 0, 0, [1, 3, 4, 5]],
-                [3, ["audiofile", { value: [sampleFile.name, sampleData] }], 0, 0, [2]],
+                [3, ["audiofile", { value: [sampleName, sampleData] }], 0, 0, [2]],
                 [4, ["solfege", { value: "do" }], 0, 0, [2]],
                 [5, ["number", { value: 4 }], 0, 0, [2]],
                 [6, "vspace", 0, 0, [1, null]],
@@ -6500,7 +6500,7 @@ class Activity {
                                     );
                                 }
                                 else if (files[0].type === "audio/wav") {
-                                    obj = this.makeSamplerWidget(files[0], reader.result);
+                                    obj = this.makeSamplerWidget(files[0].name, reader.result);
                                 }
                                 else {
                                     obj = JSON.parse(cleanData);
