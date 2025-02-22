@@ -435,4 +435,6 @@ class MusicBlocks {
         return Singer.VolumeActions.masterVolume;
     }
 }
-module.exports = {Mouse, MusicBlocks};
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {Mouse, MusicBlocks};
+}
