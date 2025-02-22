@@ -2934,6 +2934,22 @@ class Activity {
             // note block to the active block.
             this.blocks.activeBlock = this.blocks.blockList.length - 1;
         };
+        
+        //To create a sampler widget
+        this.makeSamplerWidget = (sampleFile, sampleData) => {
+            let samplerStack = [
+                [0, "sampler", 300 - this.blocksContainer.x, 300 - this.blocksContainer.y, [null, 1, 8]],
+                [1, "settimbre", 0, 0, [0, 2, 6, 7]],
+                [2, ["customsample", { value: ["", "", "do", 4] }], 0, 0, [1, 3, 4, 5]],
+                [3, ["audiofile", { value: [sampleFile.name, sampleData] }], 0, 0, [2]],
+                [4, ["solfege", { value: "do" }], 0, 0, [2]],
+                [5, ["number", { value: 4 }], 0, 0, [2]],
+                [6, "vspace", 0, 0, [1, null]],
+                [7, "hidden", 0, 0, [1, null]],
+                [8, "hiddennoflow", 0, 0, [0, null]]
+            ];
+            return samplerStack;
+        };
 
         /*
          * Handles keyboard shortcuts in MB
@@ -6482,6 +6498,9 @@ class Activity {
                                     obj = JSON.parse(
                                         cleanData.match('<div class="code">(.+?)</div>')[1]
                                     );
+                                }
+                                else if (files[0].type === "audio/wav") {
+                                    obj = this.makeSamplerWidget(files[0], reader.result);
                                 }
                                 else {
                                     obj = JSON.parse(cleanData);
