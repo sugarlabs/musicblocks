@@ -77,12 +77,15 @@ describe("download", () => {
             beginnerMode: false,
             PlanetInterface: {
                 getCurrentProjectName: jest.fn(() => "My Project"),
-            },
+            }
         };
         instance = new SaveInterface(mockActivity);
         document.body.innerHTML = "";
         mockDownloadURL = jest.spyOn(instance, 'downloadURL'); // Spy on downloadURL
-
+        Object.defineProperty(window, 'prompt', {
+            writable: true,
+            value: jest.fn(() => "My Project.abc"),
+        });
     });
 
     it("should set correct filename and extension when defaultfilename is provided", () => {
@@ -92,7 +95,7 @@ describe("download", () => {
 
     it("should default filename to 'My Project.abc' if defaultfilename is null", () => {
         instance.download("abc", "data", null);
-        expect(mockDownloadURL).toHaveBeenCalledWith("undefined.abc", "data");
+        expect(mockDownloadURL).toHaveBeenCalledWith("My Project.abc", "data");
     });
 
     it("should append the extension if not present in the filename", () => {
@@ -127,6 +130,9 @@ describe("download", () => {
         expect(clickMock).toHaveBeenCalled();
         expect(document.body.appendChild).toHaveBeenCalled();
         expect(document.body.removeChild).toHaveBeenCalled();
+    });
+    afterEach(() => {
+        jest.restoreAllMocks();
     });
 });
 
