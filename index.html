@@ -69,6 +69,7 @@
         <meta id="theme-color" name="theme-color" content="#2196F3" />
 
         <link type="text/css" href="fonts/material-icons.css" rel="stylesheet"/>
+        <link rel="preload" href="/fonts/material-icons.woff2" as="font" type="font/woff2" crossorigin="anonymous">
         <link rel="stylesheet" href="lib/materialize-iso.css" />
         <link rel="stylesheet" href="css/themes.css" />
 
@@ -311,7 +312,6 @@
             id="canvas"
             width="100%"
             height="100%"
-            style="background-color:#FFFFFF; width:100%"
         >
         </canvas>
 
@@ -781,7 +781,7 @@
                                   class="tooltipped dropdown-trigger"
                                   data-position="left"
                                   data-activates="themedropdown"
-                                  ><i class="material-icons md-48">brightness_4</i></a
+                                  ><i class="material-icons md-48">brightness_7</i></a
                                 >
                                 </li>
                                 <li>
@@ -890,6 +890,7 @@
 
                 <ul id="saveddropdown" class="dropdown-content">
                     <li><a id="save-html"></a></li>
+                    <li><a id="save-midi"></a></li>
                     <li><a id="save-svg"></a></li>
                     <li><a id="save-png"></a></li>
                     <li><a id="save-wav"></a></li>
@@ -921,9 +922,9 @@
                     <li><a id="ur"></a></li>
                 </ul>
 
-                <ul id="themedropdown" class="dropdown-content">
-                  <li><a id="light"></a></li>
-                  <li><a id="dark"></a></li>
+                <ul style="display: none;" id="themedropdown" class="dropdown-content">
+                  <a id="light" class="tooltipped" data-tooltip="Light Mode"><i class='material-icons'>brightness_7</i></a>
+                  <a id="dark" class="tooltipped" data-tooltip="Dark Mode"><i class='material-icons'>brightness_4</i></a>
                 </ul>
 
                 <div id="modal-container" style="display: none;z-index: 999;">

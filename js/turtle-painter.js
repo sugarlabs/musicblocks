@@ -1176,7 +1176,7 @@ class Painter {
             turtles.gy = this.turtle.ctx.canvas.height;
         }
 
-        const i = turtles.turtleList.indexOf(this) % 10;
+        const i = turtles.getIndexOfTurtle(this) % 10;
         if (resetPen) {
             this.color = i * 10;
             this.value = DEFAULTVALUE;
@@ -1314,23 +1314,24 @@ class Painter {
         this.turtle.ctx.putImageData(newImgData, 0, 0);
 
         // Draw under the turtle as the canvas moves
-        for (let t = 0; t < turtles.turtleList.length; t++) {
-            if (turtles.turtleList[t].inTrash) {
+        for (let t = 0; t < turtles.getTurtleCount(); t++) {
+            const turtle = turtles.getTurtle(t);
+            if (turtle.inTrash) {
                 continue;
             }
 
-            if (turtles.turtleList[t].painter.penState) {
-                turtles.turtleList[t].painter._processColor();
-                this.turtle.ctx.lineWidth = turtles.turtleList[t].painter.stroke;
+            if (turtle.painter.penState) {
+                turtle.painter._processColor();
+                this.turtle.ctx.lineWidth = turtle.painter.stroke;
                 this.turtle.ctx.lineCap = "round";
                 this.turtle.ctx.beginPath();
                 this.turtle.ctx.moveTo(
-                    turtles.turtleList[t].container.x + dx,
-                    turtles.turtleList[t].container.y + dy
+                    turtle.container.x + dx,
+                    turtle.container.y + dy
                 );
                 this.turtle.ctx.lineTo(
-                    turtles.turtleList[t].container.x,
-                    turtles.turtleList[t].container.y
+                    turtle.container.x,
+                    turtle.container.y
                 );
                 this.turtle.ctx.stroke();
                 this.turtle.ctx.closePath();

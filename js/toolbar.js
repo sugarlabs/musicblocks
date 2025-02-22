@@ -68,6 +68,8 @@ class Toolbar {
                 ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
                 ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
                 ["themeSelectIcon", _("Change theme")],
+                ["light", _("Light Mode")],
+                ["dark", _("Dark Mode")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["chooseKeyIcon", _("Set Pitch Preview")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
@@ -78,6 +80,7 @@ class Toolbar {
                 ["save-html-beg", _("Save project as HTML"), "innerHTML"],
                 ["save-png-beg", _("Save mouse artwork as PNG"), "innerHTML"],
                 ["save-html", _("Save project as HTML"), "innerHTML"],
+                ["save-midi", _("Save project as MIDI"), "innerHTML"],
                 ["save-svg", _("Save mouse artwork as SVG"), "innerHTML"],
                 ["save-png", _("Save mouse artwork as PNG"), "innerHTML"],
                 ["save-wav", _("Save music as WAV"), "innerHTML"],
@@ -104,10 +107,7 @@ class Toolbar {
                 ["ar", _("عربى"), "innerHTML"],
                 ["te", _("తెలుగు"), "innerHTML"],
                 ["he", _("עִברִית"), "innerHTML"],
-                ["ur", _("اردو"), "innerHTML"],
-                ["light", _("Light Mode"), "innerHTML"],
-                ["dark", _("Dark Mode"), "innerHTML"],
-                // ["custom", _("Custom Theme"), "innerHTML"],
+                ["ur", _("اردو"), "innerHTML"]
             ];
 
             // Workaround for FF
@@ -134,7 +134,9 @@ class Toolbar {
                 _("Delete plugin"),
                 _("Enable horizontal scrolling"),
                 _("Disable horizontal scrolling"),
-                _("Change theme"),
+                _("Change theme"),               
+                _("Light Mode"),
+                _("Dark Mode"),
                 _("Merge with current project"),
                 _("Set Pitch Preview"),
                 _("JavaScript Editor"),
@@ -143,6 +145,7 @@ class Toolbar {
                 _("Switch to advanced mode"),
                 _("Select language"),
                 _("Save project as HTML"),
+                _("Save project as MIDI"),
                 _("Save mouse artwork as SVG"),
                 _("Save mouse artwork as PNG"),
                 _("Save music as WAV"),
@@ -177,10 +180,7 @@ class Toolbar {
                 _("igbo"),
                 _("عربى"),
                 _("עִברִית"),
-                _("اردو"),
-                _("Light Mode"),
-                _("Dark Mode")
-                // _("Custom Theme"),
+                _("اردو")
             ];
         } else {
             strings = [
@@ -207,6 +207,8 @@ class Toolbar {
                 ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
                 ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
                 ["themeSelectIcon", _("Change theme")],
+                ["light", _("Light Mode")],
+                ["dark", _("Dark Mode")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
                 ["restoreIcon", _("Restore")],
@@ -238,10 +240,7 @@ class Toolbar {
                 ["ar", _("عربى"), "innerHTML"],
                 ["te", _("తెలుగు"), "innerHTML"],
                 ["he", _("עִברִית"), "innerHTML"],
-                ["ur", _("اردو"), "innerHTML"],
-                ["light", _("Light Mode"), "innerHTML"],
-                ["dark", _("Dark Mode"), "innerHTML"]
-                // ["custom", _("Custom Theme"), "innerHTML"],
+                ["ur", _("اردو"), "innerHTML"]
             ];
 
             // Workaround for FF
@@ -268,7 +267,9 @@ class Toolbar {
                 _("Delete plugin"),
                 _("Enable horizontal scrolling"),
                 _("Disable horizontal scrolling"),
-                _("Change theme"),
+                _("Change theme"),               
+                _("Light Mode"),
+                _("Dark Mode"),
                 _("Merge with current project"),
                 _("JavaScript Editor"),
                 _("Restore"),
@@ -300,10 +301,7 @@ class Toolbar {
                 _("igbo"),
                 _("عربى"),
                 _("עִברִית"),
-                _("اردو"),
-                _("Light Mode"),
-                _("Dark Mode")
-                // _("Custom Theme"),
+                _("اردو")
             ];
         }
 
@@ -472,6 +470,12 @@ class Toolbar {
     }
 
     renderThemeSelectIcon(themeBox, themes) {
+        const icon = document.getElementById("themeSelectIcon")
+        themes.forEach((theme) =>{
+            if(localStorage.themePreference === theme){
+                icon.innerHTML = document.getElementById(theme).innerHTML;
+            }
+        })
         const themeSelectIcon = docById("themeSelectIcon");
         let themeList = themes;
         themeSelectIcon.onclick = () => {
@@ -575,6 +579,7 @@ class Toolbar {
      * 
      * @public
      * @param  {Function} html_onclick - The onclick handler for HTML.
+     * @param  {Function} midi_onclick - The onclick handler for MIDI.
      * @param  {Function} doSVG_onclick - The onclick handler for SVG.
      * @param  {Function} svg_onclick - The onclick handler for SVG.
      * @param  {Function} png_onclick - The onclick handler for PNG.
@@ -589,6 +594,7 @@ class Toolbar {
         html_onclick,
         doSVG_onclick,
         svg_onclick,
+        midi_onclick,
         png_onclick,
         wave_onclick,
         ly_onclick,
@@ -683,6 +689,11 @@ class Toolbar {
                 }
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
+                    const saveMIDI = docById("save-midi");
+                    saveMIDI.onclick = () => {
+                        midi_onclick(this.activity);
+                    };
+
                     const saveWAV = docById('save-wav');
                      saveWAV.onclick = () => {
                         wave_onclick(this.activity);
@@ -934,6 +945,19 @@ class Toolbar {
             const saveButtonAdvanced = docById('saveButtonAdvanced');
             if (saveButton) saveButton.style.display = this.activity.beginnerMode ? "block" : "none";
             if (saveButtonAdvanced) saveButtonAdvanced.style.display = this.activity.beginnerMode ? "none" : "block";
+            activity.toolbar.renderSaveIcons(
+                activity.save.saveHTML.bind(activity.save),
+                doSVG,
+                activity.save.saveSVG.bind(activity.save),
+                activity.save.saveMIDI.bind(activity.save),
+                activity.save.savePNG.bind(activity.save),
+                activity.save.saveWAV.bind(activity.save),
+                activity.save.saveLilypond.bind(activity.save),
+                activity.save.saveAbc.bind(activity.save),
+                activity.save.saveMxml.bind(activity.save),
+                activity.save.saveBlockArtwork.bind(activity.save),
+                activity.save.saveBlockArtworkPNG.bind(activity.save)
+            );
         };
 
         // Handle mode switching
