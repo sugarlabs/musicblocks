@@ -293,63 +293,11 @@ class SaveInterface {
      * @instance
      */
     afterSaveMIDI() {
+        const instrumentMIDI = getMidiInstrument();
+        const drumMIDI = getMidiDrum();
         const generateMidi = (data) => {
             const normalizeNote = (note) => {
                 return note.replace("♯", "#").replace("♭", "b");
-            };
-            const MIDI_INSTRUMENTS = {
-                default: 0,   // Acoustic Grand Piano
-                piano: 0,
-                violin: 40,
-                viola: 41,
-                cello: 42,
-                "double bass": 43,
-                bass: 32,
-                sitar: 104,
-                guitar: 24,
-                "acoustic guitar": 25,
-                "electric guitar": 27,
-                flute: 73,
-                clarinet: 71,
-                saxophone: 65,
-                tuba: 58,
-                trumpet: 56,
-                oboe: 68,
-                trombone: 57,
-                banjo: 105,
-                koto: 107,
-                dulcimer: 15,
-                bassoon: 70,
-                celeste: 8,
-                xylophone: 13,
-                "electronic synth": 81,
-                sine: 81,  // Approximate with Lead 2 (Sawtooth)
-                square: 80,
-                sawtooth: 81,
-                triangle: 81,  // Approximate with Lead 2 (Sawtooth)
-                vibraphone: 11
-            };
-
-            const DRUM_MIDI_MAP = {
-                "snare drum": 38,
-                "kick drum": 36,
-                "tom tom": 41,
-                "floor tom tom": 43,
-                "cup drum": 47, // Closest: Low-Mid Tom
-                "darbuka drum": 50, // Closest: High Tom
-                "japanese drum": 56, // Closest: Cowbell or Tambourine
-                "hi hat": 42,
-                "ride bell": 53,
-                "cow bell": 56,
-                "triangle bell": 81,
-                "finger cymbals": 69, // Closest: Open Hi-Hat
-                "chime": 82, // Closest: Shaker
-                "gong": 52, // Closest: Chinese Cymbal
-                "clang": 55, // Closest: Splash Cymbal
-                "crash": 49,
-                "clap": 39,
-                "slap": 40,
-                "raindrop": 88  // Custom mapping (not in GM), can use melodic notes
             };
 
             const midi = new Midi();
@@ -379,7 +327,7 @@ class SaveInterface {
 
                         const drumTrack = trackMap.get(drum);
 
-                        const midiNumber = DRUM_MIDI_MAP[drum] || 36; // default to Bass Drum
+                        const midiNumber = drumMIDI[drum] || 36; // default to Bass Drum
                         drumTrack.addNote({
                             midi: midiNumber,
                             time: globalTime,
@@ -391,7 +339,7 @@ class SaveInterface {
                         if (!trackMap.has(instrument)) {
                             const instrumentTrack = midi.addTrack();
                             instrumentTrack.name = `Track ${parseInt(blockIndex) + 1} - ${instrument}`;
-                            instrumentTrack.instrument.number = MIDI_INSTRUMENTS[instrument] ?? MIDI_INSTRUMENTS["default"];
+                            instrumentTrack.instrument.number = instrumentMIDI[instrument] ?? instrumentMIDI["default"];
                             trackMap.set(instrument, instrumentTrack);
                         }
 
