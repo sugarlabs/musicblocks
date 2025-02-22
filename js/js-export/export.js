@@ -435,3 +435,4 @@ class MusicBlocks {
         return Singer.VolumeActions.masterVolume;
     }
 }
+module.exports = {Mouse, MusicBlocks};
