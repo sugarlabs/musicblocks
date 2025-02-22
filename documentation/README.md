@@ -245,7 +245,7 @@ For further details on how to use these toolbars effectively, you can refer to t
 | `Alt + E`                 | `Option + E`               | Clear all elements.                                    |
 | `Alt + R` or `Enter`      | `Option + R` or `Return`   | Play the project. Activates the play button.           |
 | `Alt + S`                 | `Option + S`               | Stop all running processes (e.g., turtles).            |
-| `Alt + H`                 | `Option + H`               | Save help blocks.                                      |
+| `Alt + H`                 | `Option + H`               | Save help blocks - Generate and save artwork for each block.|
 | `Ctrl + V`                | `Command + V`              | Open the paste box.                                    |
 | `Space`                   | `Space`                   | Toggle the zoom level of the stage.                    |
 | `ESC`                     | `ESC`                     | Hide widgets or stop ongoing processes.                |
