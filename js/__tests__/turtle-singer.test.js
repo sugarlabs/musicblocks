@@ -17,6 +17,8 @@ global.isCustomTemperament = mockGlobals.isCustomTemperament;
 global.getStepSizeUp = mockGlobals.getStepSizeUp;
 global.numberToPitch = mockGlobals.numberToPitch;
 global.pitchToNumber = mockGlobals.pitchToNumber;
+global.last = jest.fn((array) => array[array.length - 1]);
+
 
 describe('Singer Class', () => {
     let turtleMock;
@@ -54,6 +56,12 @@ describe('Singer Class', () => {
                 inPitchDrumMatrix: false,
                 inMatrix: false,
                 clearNoteParams: jest.fn(),
+                // Add blockList here
+                blockList: {
+                    mockBlk: {
+                        connections: [0, 0]
+                    }
+                }
             },
         };
 
@@ -99,12 +107,13 @@ describe('Singer Class', () => {
     });
 
     test('should set master volume correctly', () => {
-        Singer.setMasterVolume(logoMock, 50);
-        expect(logoMock.synth.setMasterVolume).toHaveBeenCalledWith(50);
+        Singer.setMasterVolume(logoMock, 50, 'mockBlk');
+        expect(logoMock.synth.setMasterVolume).toHaveBeenCalledWith(50, 0, 0);
     });
 
     test('should set synth volume correctly', () => {
-        Singer.setSynthVolume(logoMock, turtleMock, 'noise1', 80);
-        expect(logoMock.synth.setVolume).toHaveBeenCalledWith(turtleMock, 'noise1', 80 / 25);
-    });  
+        Singer.setSynthVolume(logoMock, turtleMock, 'noise1', 80, 'mockBlk');
+        expect(logoMock.synth.setVolume).toHaveBeenCalledWith(turtleMock, 'noise1', 80 / 25, 'mockBlk');
+    });
+ 
 });
