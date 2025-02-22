@@ -117,7 +117,7 @@
     }
   }
 
-  @media (max-width: 768px), (max-height: 600px) {
+@media (max-width: 768px), (max-height: 600px) {
     /* Enable the auxiliary button */
     .play-only #toggleAuxBtn {
         pointer-events: auto !important;
@@ -128,9 +128,10 @@
     .play-only #aux-toolbar {
         display: none !important;
     }
+}
 
     /* Custom dropdown for play-only mode */
-    .play-only #aux-dropdown {
+.play-only #aux-dropdown {
         display: none;
         position: absolute;
         top: 50px;
@@ -143,24 +144,52 @@
         z-index: 1000;
     }
 
-    .play-only #aux-dropdown.show-dropdown {
-        display: block;
-    }
+.play-only #aux-dropdown.show-dropdown {
+    display: block;
+    opacity: 1; /* Make sure to override the default 0 opacity */
+    transition: opacity 0.3s ease-in-out; /* optional for a smooth fade-in */
+}
+      
 
-    .play-only #aux-dropdown a {
-        display: block;
-        padding: 8px 12px;
-        text-decoration: none;
-        color: black;
-    }
+.play-only #aux-dropdown a {
+    display: block;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: black;
+}
 
-    .play-only #aux-dropdown a:hover {
-        background-color: #f2f2f2;
-    }
+.play-only #aux-dropdown a:hover {
+    background-color: #f2f2f2;
 }
 
 
+
 .play-only #aux-toolbar {
+    display: none !important;
+}
+
+/* Make the container background invisible without affecting child elements */
+.play-only #buttoncontainerBOTTOM {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: auto !important;
+    box-shadow: none !important;
+}
+
+/* Ensure the Home button remains visible */
+.play-only #Home\ \[HOME\] {
+    display: flex !important;
+    position: fixed !important;
+}
+
+.play-only .dropdown-content {
+    background: white !important;
+    box-shadow: none !important;
+}
+
+.play-only .dropdown-overlay {
     display: none !important;
 }
 

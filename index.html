@@ -675,26 +675,40 @@
                                         id="menu"
                                         class="animated-icon material-icons md-48 "
                                         >menu</i
-                                    ></a
-                                >
+                                    ></a>
                             <!-- Dropdown menu for Play-Only Mode -->
-                                <ul id="aux-dropdown" class="dropdown-content">
-                                    <li>
-                                        <a id="themeSelectIcon" class="tooltipped dropdown-trigger" data-position="left" data-activates="themedropdown">
-                                            <i class="material-icons md-48">brightness_7</i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a id="restoreIcon" class="tooltipped" data-position="bottom">
-                                            <i class="material-icons md-48">restore_from_trash</i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a id="languageSelectIcon" class="tooltipped dropdown-trigger" data-position="left" data-activates="languagedropdown">
-                                            <i class="material-icons md-48">translate</i>
-                                        </a>
-                                    </li>
-                                </ul>
+                                <!-- Dropdown menu for Play-Only Mode (outside the <a>) -->
+<ul id="aux-dropdown" class="dropdown-content">
+    <li>
+      <a
+        id="themeSelectIcon"
+        class="tooltipped dropdown-trigger"
+        data-position="left"
+        data-activates="themedropdown"
+      >
+        <i class="material-icons md-48">brightness_7</i>
+      </a>
+    </li>
+    <li>
+      <a
+        id="restoreIcon"
+        class="tooltipped"
+        data-position="bottom"
+      >
+        <i class="material-icons md-48">restore_from_trash</i>
+      </a>
+    </li>
+    <li>
+      <a
+        id="languageSelectIcon"
+        class="tooltipped dropdown-trigger"
+        data-position="left"
+        data-activates="languagedropdown"
+      >
+        <i class="material-icons md-48">translate</i>
+      </a>
+    </li>
+  </ul>  
                             </li>
                             
                             <li>
@@ -1007,100 +1021,93 @@
         </div>
         </div>
         <script>
-            let persistentNotification = null;
-        
-            function togglePlayOnlyMode() {
-                const isSmallScreen = window.innerWidth < 768 || window.innerHeight < 600;
-                const body = document.body;
-                const auxToolbar = document.getElementById("aux-toolbar");
-                const toggleAuxBtn = document.getElementById("toggleAuxBtn");
-        
-                if (isSmallScreen) {
-                    // Enable Play-Only Mode
-                    body.classList.add("play-only");
-                    showPersistentNotification();
-        
-                    if (auxToolbar) {
-                        auxToolbar.style.display = "none"; 
-                    }
-                    
-                    enableAuxDropdown();
-        
-                } else {
-                    body.classList.remove("play-only");
-                    removePersistentNotification();
-        
-                    if (auxToolbar) {
-                        auxToolbar.style.display = "none";
-                    }
-        
-                    disableAuxDropdown();
-                }
-            }
+  document.addEventListener('DOMContentLoaded', function() {
+    // -------------------------------------
+    // 1) Initialize Materialize dropdowns
+    //    (Older Materialize 0.100.x w/ jQuery)
+    // -------------------------------------
+    $('.dropdown-trigger').dropdown({
+      // You can add options if needed
+      // inDuration: 300,
+      // outDuration: 225,
+      // hover: false,
+      // coverTrigger: false,
+      // alignment: 'right',
+    });
 
-            if (toggleAuxBtn) {
-                toggleAuxBtn.onclick = (e) => {
-                    e.preventDefault();  // Prevent default action
-                    if (window.innerWidth < 768 || window.innerHeight < 600) {
-                        toggleAuxDropdown();  // Trigger custom dropdown
-                        } else {
-                            toggleAuxiliaryMenu();  // Trigger full auxiliary menu for larger screens
-                            }
-                        };
-                    }
-                    // Function to toggle simplified dropdown in play-only mode
-                    function toggleAuxDropdown() {
-                        const auxDropdown = document.getElementById("aux-dropdown");
-                        if (auxDropdown) {
-                            auxDropdown.classList.toggle("show-dropdown");
-                        }
-                    }
+    // -------------------------------------
+    // 2) Play-Only Mode logic
+    // -------------------------------------
+    const body = document.body;
+    let persistentNotification = null;
 
-       
-            function showPersistentNotification() {
-                if (!persistentNotification) {
-                    persistentNotification = document.createElement("div");
-                    persistentNotification.id = "persistentNotification";
-                    persistentNotification.innerHTML =
-                        "Play only mode enabled. For full Music Blocks experience, use a larger display.";
-                    document.body.appendChild(persistentNotification);
-                }
-            }
-        
-            function removePersistentNotification() {
-                if (persistentNotification) {
-                    persistentNotification.remove();
-                    persistentNotification = null;
-                }
-            }
-        
-            function enableAuxDropdown() {
-                const toggleAuxBtn = document.getElementById("toggleAuxBtn");
-                if (toggleAuxBtn) {
-                    toggleAuxBtn.addEventListener("click", function (event) {
-                        event.preventDefault();
-                        event.stopPropagation();
-        
-                        const auxDropdown = document.getElementById("aux-dropdown");
-                        if (auxDropdown) {
-                            auxDropdown.classList.toggle("show-dropdown");
-                        }
-                    });
-                }
-            }
-        
-            function disableAuxDropdown() {
-                const auxDropdown = document.getElementById("aux-dropdown");
-                if (auxDropdown) {
-                    auxDropdown.classList.remove("show-dropdown");
-                }
-            }
-        
-            togglePlayOnlyMode();
-            window.addEventListener("resize", togglePlayOnlyMode);
-        </script>
-        
-        
+    function showPersistentNotification() {
+      if (!persistentNotification) {
+        persistentNotification = document.createElement('div');
+        persistentNotification.id = 'persistentNotification';
+        persistentNotification.innerHTML =
+          'Play only mode enabled. For full Music Blocks experience, use a larger display.';
+        document.body.appendChild(persistentNotification);
+      }
+    }
+
+    function removePersistentNotification() {
+      if (persistentNotification) {
+        persistentNotification.remove();
+        persistentNotification = null;
+      }
+    }
+
+    function togglePlayOnlyMode() {
+      const isSmallScreen = window.innerWidth < 768 || window.innerHeight < 600;
+
+      if (isSmallScreen) {
+        // Enable Play-Only Mode
+        body.classList.add('play-only');
+        showPersistentNotification();
+        // Hide or disable any full aux toolbar if you want:
+        // document.getElementById('aux-toolbar').style.display = 'none';
+      } else {
+        // Disable Play-Only Mode
+        body.classList.remove('play-only');
+        removePersistentNotification();
+        // Re-enable your normal toolbar if needed:
+        // document.getElementById('aux-toolbar').style.display = 'block';
+      }
+    }
+
+    // Run once on load, and again on resize
+    togglePlayOnlyMode();
+    window.addEventListener('resize', togglePlayOnlyMode);
+
+    // -------------------------------------
+    // 3) Main menu button click
+    // -------------------------------------
+    const toggleAuxBtn = document.getElementById('toggleAuxBtn');
+    const auxDropdown = document.getElementById('aux-dropdown');
+
+    // Optional: If you want a custom toggle on small screens only
+    toggleAuxBtn.addEventListener('click', function(event) {
+      const isSmallScreen = window.innerWidth < 768 || window.innerHeight < 600;
+
+      if (isSmallScreen) {
+        // Prevent the default Materialize dropdown from opening
+        // because we want our custom "play-only" dropdown
+        event.preventDefault();
+        event.stopPropagation();
+
+        // Manually toggle the #aux-dropdown
+        auxDropdown.classList.toggle('show-dropdown');
+      } else {
+        // On larger screens, let Materialize handle it
+        // Or do something else, like open #aux-toolbar
+        // event.preventDefault(); // remove this if you want default dropdown
+        // ...
+      }
+    });
+  });
+</script>
+
         <div id="searchBar" tabindex="-1">
             <input
                 type="text"
