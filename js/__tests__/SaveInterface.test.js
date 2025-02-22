@@ -328,7 +328,11 @@ describe('saveWAV & saveABC methods', () => {
                 runLogoCommands: mockRunLogoCommands
             },
             turtles: {
-                turtleList: [{ painter: { doClear: jest.fn() } }]
+                turtleList: [{ painter: { doClear: jest.fn() } }],
+                getTurtleCount: jest.fn(() => 1),
+                getTurtle: function(index) {
+                    return this.turtleList[index];
+                }
             }
         };
 
@@ -442,7 +446,11 @@ describe('saveLilypond Methods', () => {
             ...activity,
             turtles: {
                 turtleList: [{ painter: { doClear: jest.fn() } }],
-            },
+                getTurtleCount: jest.fn(() => 1),
+                getTurtle: function(index) {
+                    return this.turtleList[index];
+                }
+            }
         };
 
         instance = new SaveInterface();
@@ -594,7 +602,13 @@ describe('MXML Methods', () => {
             turtleList: [
                 { painter: mockPainter1 },
                 { painter: mockPainter2 }
-            ]
+            ],
+            getTurtleCount: function() {
+                return this.turtleList.length;
+            },
+            getTurtle: function(index) {
+                return this.turtleList[index];
+            }
         };
 
         // Mock logo object
