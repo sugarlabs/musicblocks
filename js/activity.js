@@ -6609,6 +6609,12 @@ class Activity {
                         abcReader.readAsText(files[0]);
                         return;
                     }
+
+                    if (files[0].type === "audio/wav") {
+                        reader.readAsDataURL(files[0]);
+                        return;
+                    }
+                    
                     reader.readAsText(files[0]);
                     reader.readAsText(files[0]);
                     window.scroll(0, 0);
