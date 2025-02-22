@@ -16,10 +16,10 @@
 
 const MAX_NOTEBLOCKS = 200;
 const defaultTempo = 90;
-const drumMidi = getReverseDrumMidi();
 
 const transcribeMidi = async (midi) => {
     const currentMidi = midi;
+    const drumMidi = getReverseDrumMidi();
     const isPercussion = [];
     let jsONON = [];
     let actionBlockCounter = 0; // Counter for action blocks
