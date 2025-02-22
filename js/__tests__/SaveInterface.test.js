@@ -1,3 +1,20 @@
+const { Midi } = require('@tonejs/midi');
+// Mocking the @tonejs/midi library
+jest.mock('@tonejs/midi', () => {
+    return {
+        Midi: jest.fn().mockImplementation(() => ({
+            header: { ticksPerBeat: 480 },
+            addTrack: jest.fn(() => ({
+                addNote: jest.fn(),
+                name: '',
+                instrument: { number: 0 },
+                channel: 0
+            })),
+            toArray: jest.fn(() => new Uint8Array([1, 2, 3]))
+        }))
+    };
+})
+global.Midi = Midi;
 global.jQuery = jest.fn(() => ({
     on: jest.fn(),
     trigger: jest.fn(),
@@ -206,7 +223,7 @@ describe("save HTML methods", () => {
 });
 
 describe('saveMIDI Method', () => {
-    let instance, activity, mockLogo;
+    let activity, mockLogo;
 
     beforeEach(() => {
         mockLogo = {
@@ -216,7 +233,7 @@ describe('saveMIDI Method', () => {
         activity = {
             logo: mockLogo
         };
-        instance = new SaveInterface();
+
     });
 
     it('should set runningMIDI to true and run logo commands', () => {
@@ -224,6 +241,84 @@ describe('saveMIDI Method', () => {
         expect(activity.logo.runningMIDI).toBe(true);
         expect(activity.logo.runLogoCommands).toHaveBeenCalled();
         expect(document.body.style.cursor).toBe("wait");
+    });
+});
+
+describe('afterSaveMIDI', () => {
+
+    beforeEach(() => {
+        global.activity = {
+            logo: {
+                _midiData: {
+                    "0": [
+                        {
+                            note: ["G4"],
+                            duration: 4,
+                            bpm: 90,
+                            instrument: "guitar"
+                        },
+                        {
+                            note: ["E4"],
+                            duration: 4,
+                            bpm: 90,
+                            instrument: "guitar"
+                        }
+                    ]
+                }
+            },
+            save: {
+                download: jest.fn()
+            }
+        };
+
+        global.URL.createObjectURL = jest.fn(() => 'mockURL');
+        jest.useFakeTimers();
+
+        global.getMidiInstrument = jest.fn(() => ({
+            default: 0,
+            guitar: 25
+        }));
+
+        global.getMidiDrum = jest.fn(() => ({
+            "snare drum": 38,
+            "kick drum": 36
+        }));
+
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it('should generate MIDI and trigger download', () => {
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        expect(Midi).toHaveBeenCalled();
+        expect(activity.save.download).toHaveBeenCalledWith('midi', 'mockURL', null);
+        expect(activity.logo._midiData).toEqual({});
+        expect(document.body.style.cursor).toBe('default');
+    });
+
+    it('should create instrument tracks and add notes correctly', () => {
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        const tracks = Midi.mock.results[0].value.addTrack.mock.results.map(res => res.value);
+        const instrumentTrack = tracks.find(track => track.name === 'Track 1 - guitar');
+        expect(instrumentTrack.instrument.number).toBe(25);
+        expect(instrumentTrack.addNote).toHaveBeenNthCalledWith(1, {
+            name: 'G4',
+            time: 0,
+            duration: 0.6666666666666666,
+            velocity: 0.8
+        });
+        expect(instrumentTrack.addNote).toHaveBeenNthCalledWith(2, {
+            name: 'E4',
+            time: 0.6666666666666666,
+            duration: 0.6666666666666666,
+            velocity: 0.8
+        });
     });
 });
 
