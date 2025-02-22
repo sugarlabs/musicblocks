@@ -358,7 +358,6 @@ describe('saveWAV & saveABC methods', () => {
             }
         };
 
-
         instance.saveAbc(activity);
 
         expect(document.body.style.cursor).toBe("wait");
@@ -376,7 +375,6 @@ describe('saveWAV & saveABC methods', () => {
                 download: mockDownload
             }
         };
-
 
         instance.afterSaveAbc.call({ activity });
 
@@ -657,7 +655,6 @@ describe('MXML Methods', () => {
         global.saveMxmlOutput = jest.fn().mockReturnValue("<score>Mock MXML Data</score>");
     });
 
-
     it('should initialize MXML state and clear turtle canvases', () => {
         instance.saveMxml("test.mxml");
 
@@ -677,8 +674,6 @@ describe('MXML Methods', () => {
         // Verify logo commands run
         expect(activity.logo.runLogoCommands).toHaveBeenCalled();
     });
-
-
 
     it('should generate XML and trigger download', () => {
         const filename = "TestScore.xml";
