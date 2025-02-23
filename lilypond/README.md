@@ -35,6 +35,7 @@ sudo ./lilypond-2.16.2-1.linux-64.sh
 Download the `.exe` file and run it to launch the installation process.
 
 ### Installation for Mac OS
+[Read Windows Installation on the Lilypond webpage](https://lilypond.org/doc/v2.23/Documentation/web/macos-x)
 1. Open the `.tar.bz2` file once it gets downloaded.
  <img src="\images\ly_mac_1.png"></img>
 2. Clicking it will, open the `Archive Utility` and extract it's contents.
