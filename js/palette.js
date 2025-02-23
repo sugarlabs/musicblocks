@@ -175,7 +175,7 @@ class Palettes {
                 if (tr.children[j] && tr.children[j].children[1]) {
                     tr.children[j].children[1].style.background = platformColor.paletteLabelSelected;
                 }
-                
+
             } else {
                 img = makePaletteIcons(
                     PALETTEICONS[MULTIPALETTEICONS[j]]
@@ -188,7 +188,7 @@ class Palettes {
                 if (tr.children[j] && tr.children[j].children[1]) {
                     tr.children[j].children[1].style.background = platformColor.paletteLabelBackground;
                 }
-                
+
             }
             tr.children[j].children[0].src = img.src;
         }
@@ -296,55 +296,41 @@ class Palettes {
     }
 
     makeSearchButton(name, icon, listBody) {
-        const searchRow = listBody.insertRow(0);
-        searchRow.classList.add("palette-row", "search-bar");
-    
-        const searchCell = searchRow.insertCell(0);
-        searchCell.colSpan = 3;
-        const searchInput = document.createElement("input");
-        searchInput.type = "text";
-        searchInput.placeholder = "Search...";
-        searchInput.classList.add("search-input");
-        searchCell.appendChild(searchInput);
-
         const row = listBody.insertRow(-1);
-        row.classList.add("palette-row");
-    
         const img = row.insertCell(-1);
         const label = row.insertCell(-1);
-        
         img.appendChild(icon);
         img.classList.add("palette-icon");
         label.classList.add("palette-label");
-    
+        row.classList.add("palette-row");
         row.addEventListener("mouseover", () => {
             row.classList.add("palette-hover");
         });
-    
         row.addEventListener("mouseout", () => {
             row.classList.remove("palette-hover");
         });
-    
+
+
         this._loadPaletteButtonHandler(name, row);
     }
-    
+
 
     makeButton(name, icon, listBody) {
         const row = listBody.insertRow(-1);
         const img = row.insertCell(-1);
         const label = row.insertCell(-1);
         img.appendChild(icon);
-        
+
         label.textContent = toTitleCase(_(name));
         img.classList.add("palette-icon");
         label.classList.add("palette-label");
         row.classList.add("palette-row");
         row.addEventListener("mouseover", () => {
-        row.classList.add("palette-hover");
-});
+            row.classList.add("palette-hover");
+        });
         row.addEventListener("mouseout", () => {
-        row.classList.remove("palette-hover");
-});
+            row.classList.remove("palette-hover");
+        });
 
         row.addEventListener('mouseover', () => {
             row.style.backgroundColor = platformColor.hoverColor;
@@ -366,7 +352,7 @@ class Palettes {
         this.activePalette = name; // used to delete plugins
     }
 
-    _showMenus() {}
+    _showMenus() { }
 
     _hideMenus() {
         // Hide the menu buttons and the palettes themselves.
@@ -425,13 +411,13 @@ class Palettes {
                     }
                 }
             }
-    
+
             // Remove the palette DOM element if it exists
             const paletteElement = docById("palette");
             if (paletteElement) {
                 paletteElement.parentNode.removeChild(paletteElement);
             }
-    
+
             // Clear the dictionary and reset state
             this.dict = {};
             this.visible = false;
@@ -445,7 +431,7 @@ class Palettes {
             element.classList.add('flex-palette');
             element.setAttribute(
                 "style",
-                `position: fixed; z-index: 1000; left: 0px; top: ${60+this.top}px; overflow-y: auto;`
+                `position: fixed; z-index: 1000; left: 0px; top: ${60 + this.top}px; overflow-y: auto;`
             );
             element.innerHTML =
                 `<div style="height:fit-content">
@@ -464,8 +450,8 @@ class Palettes {
                         </tbody>
                     </table>
                 </div>`;
-                element.childNodes[0].classList.add("palette-border");
-                element.childNodes[0].style.borderColor = platformColor.selectorSelected;
+            element.childNodes[0].classList.add("palette-border");
+            element.childNodes[0].style.borderColor = platformColor.selectorSelected;
             document.body.appendChild(element);
 
         } catch (e) {
@@ -528,7 +514,7 @@ class Palettes {
             const actionBlock = this.dict["action"].protoList[blk];
             if (
                 ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(actionBlock.name) !==
-                    -1 &&
+                -1 &&
                 actionBlock.defaults[0] === actionName
             ) {
                 // Remove the palette protoList entry for this block.
@@ -908,8 +894,8 @@ class Palette {
 
         palBody.classList.add("palette-body");
         [palBody.childNodes[0], palBody.childNodes[1]].forEach((item) => {
-        item.classList.add("palette-body-child");
-});
+            item.classList.add("palette-body-child");
+        });
 
         palDiv.appendChild(palBody);
 
@@ -919,27 +905,27 @@ class Palette {
             let table = this.menuContainer.children[0];
             let headerRow = table.insertRow(); // Create a new row
             headerRow.classList.add("palette-header");
-        
+
             let cell = headerRow.insertCell(); // Create a new cell
             cell.classList.add("palette-header-cell");
-        
+
             // Create the search icon
             let searchIcon = document.createElement("i");
             searchIcon.classList.add("palette-icon", "search-icon");
-        
+
             // Create the search text
             let searchText = document.createElement("span");
             searchText.classList.add("palette-label");
             searchText.textContent = "Search";
-        
+
             // Append elements properly
             cell.appendChild(searchIcon);
             cell.appendChild(searchText);
-        
-        
-    
-        
-        
+
+
+
+
+
             const labelImg = makePaletteIcons(
                 PALETTEICONS[this.name],
                 this.palettes.cellSize,
@@ -1314,11 +1300,11 @@ class Palette {
         ) {
             this._makeBlockFromProtoblock(protoblk, true, blkname, null, 100, 100);
             callback(lastBlock);
-            return(lastBlock);
+            return (lastBlock);
         } else {
             const newBlock = paletteBlockButtonPush(this.activity.blocks, newBlk, arg);
             callback(newBlock);
-            return(newBlock);
+            return (newBlock);
         }
     }
 
@@ -1370,7 +1356,7 @@ class Palette {
                 // the palette.
                 if (
                     this.activity.blocks.blockList[topBlk].container.x <
-                        this.activity.palettes.paletteWidth * 2
+                    this.activity.palettes.paletteWidth * 2
                 ) {
                     this.activity.blocks.moveBlock(
                         topBlk,
@@ -1431,7 +1417,7 @@ class Palette {
                 // the palette.
                 if (
                     this.activity.blocks.blockList[topBlk].container.x <
-                        this.activity.palettes.paletteWidth * 2
+                    this.activity.palettes.paletteWidth * 2
                 ) {
                     this.activity.blocks.moveBlock(
                         topBlk,
@@ -1449,7 +1435,7 @@ class Palette {
                 // the palette.
                 if (
                     this.activity.blocks.blockList[newBlock].container.x <
-                        this.activity.palettes.paletteWidth * 2
+                    this.activity.palettes.paletteWidth * 2
                 ) {
                     this.activity.blocks.moveBlock(
                         newBlock,
