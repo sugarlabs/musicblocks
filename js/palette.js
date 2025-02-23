@@ -112,10 +112,8 @@ class Palettes {
             element.id = "palette";
             element.setAttribute("class", "disable_highlighting");
             element.classList.add('flex-palette')
-            element.setAttribute(
-                "style",
-                "position: absolute; z-index: 1000; left :0px; top:" + this.top + "px"
-            );
+            element.classList.add("palette-container");
+            element.style.top = `${this.top}px`;
             element.innerHTML =
                 `<div style="height:fit-content">
                     <table width="${1.5 * this.cellSize}" bgcolor="white">
@@ -152,11 +150,7 @@ class Palettes {
             )
         );
         const cover = document.createElement("div");
-        cover.style.position = "absolute";
-        cover.style.zIndex = "10";
-        cover.style.top = "0";
-        cover.style.width = "100%";
-        cover.style.height = "1px";
+        cover.classList.add("palette-cover");
         cover.style.background = platformColor.paletteLabelBackground;
         td.appendChild(cover);
         td.onmouseover = () => {
@@ -178,7 +172,10 @@ class Palettes {
                     this.cellSize,
                     this.cellSize
                 );
-                tr.children[j].children[1].style.background = platformColor.paletteLabelSelected;
+                if (tr.children[j] && tr.children[j].children[1]) {
+                    tr.children[j].children[1].style.background = platformColor.paletteLabelSelected;
+                }
+
             } else {
                 img = makePaletteIcons(
                     PALETTEICONS[MULTIPALETTEICONS[j]]
@@ -188,7 +185,10 @@ class Palettes {
                     this.cellSize,
                     this.cellSize
                 );
-                tr.children[j].children[1].style.background = platformColor.paletteLabelBackground;
+                if (tr.children[j] && tr.children[j].children[1]) {
+                    tr.children[j].children[1].style.background = platformColor.paletteLabelBackground;
+                }
+
             }
             tr.children[j].children[0].src = img.src;
         }
@@ -300,42 +300,38 @@ class Palettes {
         const img = row.insertCell(-1);
         const label = row.insertCell(-1);
         img.appendChild(icon);
-        img.style.padding = "4px";
-        img.style.boxSizing = "content-box";
-        img.style.width = `${this.cellSize}px`;
-        img.style.height = `${this.cellSize}px`;
-        label.textContent = toTitleCase(_(name));
-        label.style.color = platformColor.paletteText;
-        row.style.borderBottom = "1px solid #0CAFFF";
-        label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
-        label.style.padding = "4px";
-        row.style.display = "flex";
-        row.style.flexDirection = "row";
-        row.style.alignItems = "center";
-        row.style.width = "126px";
-        row.style.backgroundColor = platformColor.paletteBackground;
+        img.classList.add("palette-icon");
+        label.classList.add("palette-label");
+        row.classList.add("palette-row");
+        row.addEventListener("mouseover", () => {
+            row.classList.add("palette-hover");
+        });
+        row.addEventListener("mouseout", () => {
+            row.classList.remove("palette-hover");
+        });
+
 
         this._loadPaletteButtonHandler(name, row);
     }
+
 
     makeButton(name, icon, listBody) {
         const row = listBody.insertRow(-1);
         const img = row.insertCell(-1);
         const label = row.insertCell(-1);
         img.appendChild(icon);
-        img.style.padding = "4px";
-        img.style.boxSizing = "content-box";
-        img.style.width = `${this.cellSize}px`;
-        img.style.height = `${this.cellSize}px`;
+
         label.textContent = toTitleCase(_(name));
-        label.style.color = platformColor.paletteText;
-        label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
-        label.style.padding = "4px";
-        row.style.display = "flex";
-        row.style.flexDirection = "row";
-        row.style.alignItems = "center";
-        row.style.width = "126px";
-        row.style.backgroundColor = platformColor.paletteBackground;
+        img.classList.add("palette-icon");
+        label.classList.add("palette-label");
+        row.classList.add("palette-row");
+        row.addEventListener("mouseover", () => {
+            row.classList.add("palette-hover");
+        });
+        row.addEventListener("mouseout", () => {
+            row.classList.remove("palette-hover");
+        });
+
         row.addEventListener('mouseover', () => {
             row.style.backgroundColor = platformColor.hoverColor;
         });
@@ -356,7 +352,7 @@ class Palettes {
         this.activePalette = name; // used to delete plugins
     }
 
-    _showMenus() {}
+    _showMenus() { }
 
     _hideMenus() {
         // Hide the menu buttons and the palettes themselves.
@@ -415,13 +411,13 @@ class Palettes {
                     }
                 }
             }
-    
+
             // Remove the palette DOM element if it exists
             const paletteElement = docById("palette");
             if (paletteElement) {
                 paletteElement.parentNode.removeChild(paletteElement);
             }
-    
+
             // Clear the dictionary and reset state
             this.dict = {};
             this.visible = false;
@@ -435,7 +431,7 @@ class Palettes {
             element.classList.add('flex-palette');
             element.setAttribute(
                 "style",
-                `position: fixed; z-index: 1000; left: 0px; top: ${60+this.top}px; overflow-y: auto;`
+                `position: fixed; z-index: 1000; left: 0px; top: ${60 + this.top}px; overflow-y: auto;`
             );
             element.innerHTML =
                 `<div style="height:fit-content">
@@ -454,7 +450,8 @@ class Palettes {
                         </tbody>
                     </table>
                 </div>`;
-            element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
+            element.childNodes[0].classList.add("palette-border");
+            element.childNodes[0].style.borderColor = platformColor.selectorSelected;
             document.body.appendChild(element);
 
         } catch (e) {
@@ -517,7 +514,7 @@ class Palettes {
             const actionBlock = this.dict["action"].protoList[blk];
             if (
                 ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(actionBlock.name) !==
-                    -1 &&
+                -1 &&
                 actionBlock.defaults[0] === actionName
             ) {
                 // Remove the palette protoList entry for this block.
@@ -895,27 +892,39 @@ class Palette {
             `<thead></thead><tbody style = "display: block;   width: 100% ; height:auto ; max-height: ${palBodyHeight}px;  overflow: auto; overflow-x: hidden;" id="PaletteBody_items" class="PalScrol"></tbody>`
         );
 
-        palBody.style.minWidth = "180px";
-        palBody.style.background = platformColor.paletteBackground;
-        palBody.style.float = "left";
-
-        palBody.style.border = `1px solid ${platformColor.selectorSelected}`;
+        palBody.classList.add("palette-body");
         [palBody.childNodes[0], palBody.childNodes[1]].forEach((item) => {
-            item.style.boxSizing = "border-box";
-            item.style.padding = "8px";
+            item.classList.add("palette-body-child");
         });
+
         palDiv.appendChild(palBody);
 
         this.menuContainer = palBody;
 
         if (createHeader) {
-            let header = this.menuContainer.children[0];
-            header = header.insertRow();
-            header.style.backgroundColor = platformColor.paletteLabelBackground;
-            header.innerHTML =
-                '<td style ="width: 100%; height: 42px; box-sizing: border-box; display: flex; flex-direction: row; align-items: center; justify-content: space-between;"></td>';
-            header = header.children[0];
-            header.style.padding = "8px";
+            let table = this.menuContainer.children[0];
+            let headerRow = table.insertRow(); // Create a new row
+            headerRow.classList.add("palette-header");
+
+            let cell = headerRow.insertCell(); // Create a new cell
+            cell.classList.add("palette-header-cell");
+
+            // Create the search icon
+            let searchIcon = document.createElement("i");
+            searchIcon.classList.add("palette-icon", "search-icon");
+
+            // Create the search text
+            let searchText = document.createElement("span");
+            searchText.classList.add("palette-label");
+            searchText.textContent = "Search";
+
+            // Append elements properly
+            cell.appendChild(searchIcon);
+            cell.appendChild(searchText);
+
+
+
+
 
             const labelImg = makePaletteIcons(
                 PALETTEICONS[this.name],
@@ -1291,11 +1300,11 @@ class Palette {
         ) {
             this._makeBlockFromProtoblock(protoblk, true, blkname, null, 100, 100);
             callback(lastBlock);
-            return(lastBlock);
+            return (lastBlock);
         } else {
             const newBlock = paletteBlockButtonPush(this.activity.blocks, newBlk, arg);
             callback(newBlock);
-            return(newBlock);
+            return (newBlock);
         }
     }
 
@@ -1347,7 +1356,7 @@ class Palette {
                 // the palette.
                 if (
                     this.activity.blocks.blockList[topBlk].container.x <
-                        this.activity.palettes.paletteWidth * 2
+                    this.activity.palettes.paletteWidth * 2
                 ) {
                     this.activity.blocks.moveBlock(
                         topBlk,
@@ -1408,7 +1417,7 @@ class Palette {
                 // the palette.
                 if (
                     this.activity.blocks.blockList[topBlk].container.x <
-                        this.activity.palettes.paletteWidth * 2
+                    this.activity.palettes.paletteWidth * 2
                 ) {
                     this.activity.blocks.moveBlock(
                         topBlk,
@@ -1426,7 +1435,7 @@ class Palette {
                 // the palette.
                 if (
                     this.activity.blocks.blockList[newBlock].container.x <
-                        this.activity.palettes.paletteWidth * 2
+                    this.activity.palettes.paletteWidth * 2
                 ) {
                     this.activity.blocks.moveBlock(
                         newBlock,
