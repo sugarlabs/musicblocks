@@ -984,3 +984,7 @@ const saveLilypondOutput = function (activity) {
     activity.logo.notationOutput += "\n%}\n\n";
     return activity.logo.notationOutput;
 };
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { LILYPONDHEADER };
+}

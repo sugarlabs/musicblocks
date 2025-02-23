@@ -765,3 +765,6 @@ class ASTUtils {
         return AST;
     }
 }
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = ASTUtils;
+}
