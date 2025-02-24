@@ -182,7 +182,7 @@ class MeterWidget {
          *
          * @private
          */
-        const playBtn = widgetWindow.addButton("play-button.svg", MeterWidget.ICONSIZE, t("Play"));
+        const playBtn = widgetWindow.addButton("play-button.svg", MeterWidget.ICONSIZE, _("Play"));
         playBtn.onclick = () => {
             if (this._get_click_lock()) {
                 return;
@@ -192,8 +192,8 @@ class MeterWidget {
                     playBtn.innerHTML =
                         `&nbsp;&nbsp;<img 
                             src="header-icons/play-button.svg" 
-                            title="${t("Play all")}" 
-                            alt="${t("Play all")}" 
+                            title="${_("Play all")}" 
+                            alt="${_("Play all")}" 
                             height="${MeterWidget.ICONSIZE}" 
                             width="${MeterWidget.ICONSIZE}" 
                             vertical-align="middle"
@@ -203,8 +203,8 @@ class MeterWidget {
                     playBtn.innerHTML =
                         `&nbsp;&nbsp;<img 
                             src="header-icons/stop-button.svg" 
-                            title="${t("Stop")}" 
-                            alt="${t("Stop")}" 
+                            title="${_("Stop")}" 
+                            alt="${_("Stop")}" 
                             height="${MeterWidget.ICONSIZE}" 
                             width="${MeterWidget.ICONSIZE}" 
                             vertical-align="middle"
@@ -224,7 +224,7 @@ class MeterWidget {
         widgetWindow.addButton(
             "export-chunk.svg",
             MeterWidget.ICONSIZE,
-            t("Save")
+            _("Save")
         ).onclick = () => {
             this._save();
         };
@@ -266,7 +266,7 @@ class MeterWidget {
         widgetWindow._toolbar.appendChild(divInput2);
 
         //TRANS.: Reset the widget layout
-        widgetWindow.addButton("reload.svg", MeterWidget.ICONSIZE, t("Reset")).onclick = () => {
+        widgetWindow.addButton("reload.svg", MeterWidget.ICONSIZE, _("Reset")).onclick = () => {
             //change Values of blocks in stack.
             this._playing = false;
             const el = divInput.children[0];
@@ -292,7 +292,7 @@ class MeterWidget {
             this.activity.logo.runLogoCommands(widgetBlock);
         };
 
-        activity.textMsg(t("Click in the circle to select strong beats for the meter."), 3000);
+        activity.textMsg(_("Click in the circle to select strong beats for the meter."), 3000);
         widgetWindow.sendToCenter();
         this._scale.call(this.widgetWindow);
     }

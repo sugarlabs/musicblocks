@@ -56,41 +56,41 @@ class SaveInterface {
          */
         this.htmlSaveTemplate =
             '<!DOCTYPE html><html lang="en"><head> <meta charset="utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="description" content="{{ project_description }}"> <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"> <title>{{ project_name }}</title> <meta property="og:site_name" content="Music Blocks"/> <meta property="og:type" content="website"/> <meta property="og:title" content="' +
-            t("Music Blocks Project") +
+            _("Music Blocks Project") +
             ' - {{ project_name }}"/> <meta property="og:description" content="{{ project_description }}"/> <style>body{background-color: #dbf0fb;}#main{background-color: white; padding: 5%; position: fixed; width: 80vw; height: max-content; margin: auto; top: 0; left: 0; bottom: 0; right: 0; display: flex; flex-direction: column; justify-content: center; text-align: center; color: #424242; box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23); font-family: "Roboto", "Helvetica","Arial",sans-serif;}h3{font-weight: 400; font-size: 36px; margin-top: 10px;}hr{border-top: 0px solid #ccc; margin: 1em;}.btn{border: solid; border-color: #96D3F3; padding: 5px 10px; line-height: 50px; color: #0a3e58;}.btn:hover{transition: 0.4s; -webkit-transition: 0.3s; -moz-transition: 0.3s; background-color: #96D3F3;}.code{word-break: break-all; height: 15vh; background: #f6f8fa; color: #494949; text-align: justify; margin-right: 10vw; margin-left: 10vw; padding: 16px; overflow: auto; line-height: 1.45; background-color: #f6f8fa; border-radius: 3px; font-family: "SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace;}.image{border-radius: 2px 2px 0 0; position: relative; background-color: #96D3F3;}.image-div{margin-bottom: 10px;}.moreinfo-div{margin-top: 20px;}h4{font-weight: 500; font-size: 1.4em; margin-top: 10px; margin-bottom: 10px;}.tbcode{margin-bottom: 10px;}</style></head><body> <div id="main"> <div class="image-div"><img class="image" id="project-image" src="{{ project_image }}"></div><h3 id="title">' +
-            t("Music Blocks Project") +
+            _("Music Blocks Project") +
             ' - {{ project_name }}</h3> <p>{{ project_description }}</p><hr> <div> <div style="color: #9E9E9E"><p>' +
-            t("This project was created in Music Blocks") +
+            _("This project was created in Music Blocks") +
             ' (<a href="https://musicblocks.sugarlabs.org" target="_blank">https://musicblocks.sugarlabs.org</a>). ' +
             TITLESTRING +
             " " +
-            t("Music Blocks is a Free/Libre Software application.") +
+            _("Music Blocks is a Free/Libre Software application.") +
             " " +
-            t("The source code can be accessed at") +
+            _("The source code can be accessed at") +
             ' <a href="https://github.com/sugarlabs/musicblocks" target="_blank">https://github.com/sugarlabs/musicblocks</a>.' +
             " " +
-            t("For more information, please consult the") +
+            _("For more information, please consult the") +
             ' <a href="' +
             GUIDEURL +
             '" target="_blank">' +
-            t("Music Blocks Guide") +
+            _("Music Blocks Guide") +
             "</a>." +
             "</p><p>" +
-            t(
+            _(
                 "To run this project, open Music Blocks in a web browser and drag and drop this file into the browser window."
             ) +
             " " +
-            t("Alternatively, open the file in Music Blocks using the Load project button.") +
+            _("Alternatively, open the file in Music Blocks using the Load project button.") +
             '</p></div><div class="moreinfo-div"> <div class="tbcode"><h4>' +
-            t("Project Code") +
+            _("Project Code") +
             "</h4>" +
-            t("This code stores data about the blocks in a project.") +
+            _("This code stores data about the blocks in a project.") +
             ' <a href="javascript:toggle();" id="showhide">' +
-            t("Show") +
+            _("Show") +
             '</a></div> <div class="code">{{ data }}</div></div></div></div><script type="text/javascript">function toggle(){if (document.getElementsByClassName("code")[0].style.display=="none"){document.getElementsByClassName("code")[0].style.display="flex";document.getElementById("showhide").textContent = "' +
-            t("Hide") +
+            _("Hide") +
             '";} else {document.getElementsByClassName("code")[0].style.display="none";document.getElementById("showhide").textContent = "Show";}} var name=decodeURIComponent(window.location.pathname.split("/").pop().slice(0, -5)); var prefix="' +
-            t("Music Blocks Project") +
+            _("Music Blocks Project") +
             ' - "; var title=prefix+name; document.querySelector(' +
             "'" +
             'meta[property="og:title"]' +
@@ -128,7 +128,7 @@ class SaveInterface {
         let filename = null;
         if (defaultfilename === undefined || defaultfilename === null) {
             if (this.activity.PlanetInterface === undefined) {
-                defaultfilename = t("My Project");
+                defaultfilename = _("My Project");
             } else {
                 defaultfilename = this.activity.PlanetInterface.getCurrentProjectName();
             }
@@ -194,14 +194,14 @@ class SaveInterface {
      */
     prepareHTML() {
         let file = this.htmlSaveTemplate;
-        let description = t("No description provided");
+        let description = _("No description provided");
         if (this.activity.PlanetInterface !== undefined) {
             description = this.activity.PlanetInterface.getCurrentProjectDescription();
         }
 
         // let author = '';
         // Currently we're using anonymous for authors - not storing names.
-        let name = t("My Project");
+        let name = _("My Project");
         if (this.activity.PlanetInterface !== undefined) {
             name = this.activity.PlanetInterface.getCurrentProjectName();
         }
@@ -259,7 +259,7 @@ class SaveInterface {
                     html
                 );
             } else {
-                activity.save.downloadURL(t("My Project").replace(" ", "_") + ".html", html);
+                activity.save.downloadURL(_("My Project").replace(" ", "_") + ".html", html);
             }
         }, 500);
     }
@@ -455,7 +455,7 @@ class SaveInterface {
         activity.logo.synth.setupRecorder();
         activity.logo.synth.recorder.start();
         activity.logo.runLogoCommands();
-        activity.textMsg(t("Your recording is in progress."));
+        activity.textMsg(_("Your recording is in progress."));
     }
 
     /**
@@ -512,7 +512,7 @@ class SaveInterface {
      */
     saveLilypond(activity) {
         const lyext = "ly";
-        let filename = t("My Project");
+        let filename = _("My Project");
         if (activity.PlanetInterface !== undefined) {
             filename = activity.PlanetInterface.getCurrentProjectName();
         }
@@ -524,23 +524,23 @@ class SaveInterface {
         docById("lilypondModal").style.display = "block";
 
         //.TRANS: File name prompt for save as Lilypond
-        docById("fileNameText").textContent = t("File name");
+        docById("fileNameText").textContent = _("File name");
         //.TRANS: Project title prompt for save as Lilypond
-        docById("titleText").textContent = t("Project title");
+        docById("titleText").textContent = _("Project title");
         //.TRANS: Project title prompt for save as Lilypond
-        docById("authorText").textContent = t("Project author");
+        docById("authorText").textContent = _("Project author");
         //.TRANS: MIDI prompt for save as Lilypond
-        docById("MIDIText").textContent = t("Include MIDI output?");
+        docById("MIDIText").textContent = _("Include MIDI output?");
         //.TRANS: Guitar prompt for save as Lilypond
-        docById("guitarText").textContent = t("Include guitar tablature output?");
+        docById("guitarText").textContent = _("Include guitar tablature output?");
         //.TRANS: Lilypond is a scripting language for generating sheet music
-        docById("submitLilypond").textContent = t("Save as Lilypond");
+        docById("submitLilypond").textContent = _("Save as Lilypond");
         docById("fileName").value = filename;
         if (activity.PlanetInterface !== undefined) {
             docById("title").value = activity.PlanetInterface.getCurrentProjectName();
         } else {
             //.TRANS: default project title when saving as Lilypond
-            docById("title").value = t("My Project");
+            docById("title").value = _("My Project");
         }
 
         // Load custom author saved in local storage.
@@ -549,7 +549,7 @@ class SaveInterface {
             docById("author").value = JSON.parse(customAuthorData);
         } else {
             //.TRANS: default project author when saving as Lilypond
-            docById("author").value = t("Mr. Mouse");
+            docById("author").value = _("Mr. Mouse");
         }
 
         docById("submitLilypond").onclick = () => {
@@ -698,7 +698,7 @@ class SaveInterface {
             document.execCommand("copy");
             tmp.remove();
             this.activity.textMsg(
-                t("The Lilypond code is copied to clipboard. You can paste it here: ") +
+                _("The Lilypond code is copied to clipboard. You can paste it here: ") +
                 "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a> "
             );
         }

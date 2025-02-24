@@ -38,14 +38,14 @@ function setupFlowBlocks(activity) {
 
             // Set the help string for the block
             this.setHelpString([
-                t("The Backward block runs code in reverse order (Musical retrograde)."),
+                _("The Backward block runs code in reverse order (Musical retrograde)."),
                 "documentation",
                 ""
             ]);
 
             // Form the block with specific parameters
             this.formBlock({
-                name: t("backward")
+                name: _("backward")
             });
 
             // Define the macro for creating the block
@@ -121,9 +121,9 @@ function setupFlowBlocks(activity) {
 
             // Set the help string for the block
             this.setHelpString([
-                t("The Duplicate block will run each block multiple times.") +
+                _("The Duplicate block will run each block multiple times.") +
                     " " +
-                    t(
+                    _(
                         "The output of the example is: Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol."
                     ),
                 "documentation",
@@ -133,7 +133,7 @@ function setupFlowBlocks(activity) {
 
             // Form the block with specific parameters
             this.formBlock({
-                name: t("Duplicate").toLowerCase(),
+                name: _("Duplicate").toLowerCase(),
                 args: 1,
                 defaults: [2]
             });
@@ -331,7 +331,7 @@ function setupFlowBlocks(activity) {
 
             // Set the help string for the block
             this.setHelpString([
-                t("The Default block is used inside of a Switch to define the default action."),
+                _("The Default block is used inside of a Switch to define the default action."),
                 "documentation",
                 null,
                 "switchhelp"
@@ -339,7 +339,7 @@ function setupFlowBlocks(activity) {
 
             // Form the block with specific parameters
             this.formBlock({
-                name: t("default")
+                name: _("default")
             });
 
             // Update the dock values for caseout and casein
@@ -358,7 +358,7 @@ function setupFlowBlocks(activity) {
             const switchBlk = last(logo.switchBlocks[turtle]);
             if (switchBlk === null) {
                 // Handle the case when the Default Case block is not inside a Switch block
-                activity.errorMsg(t("The Case Block must be used inside of a Switch Block."), blk);
+                activity.errorMsg(_("The Case Block must be used inside of a Switch Block."), blk);
                 logo.stopTurtle = true;
                 return;
             }
@@ -386,7 +386,7 @@ function setupFlowBlocks(activity) {
 
             // Set the help string for the block
             this.setHelpString([
-                t("The Case block is used inside of a Switch to define matches."),
+                _("The Case block is used inside of a Switch to define matches."),
                 "documentation",
                 null,
                 "switchhelp"
@@ -394,7 +394,7 @@ function setupFlowBlocks(activity) {
 
             // Form the block with specific parameters
             this.formBlock({
-                name: t("case"),
+                name: _("case"),
                 args: 1,
                 argTypes: ["anyin"]
             });
@@ -415,7 +415,7 @@ function setupFlowBlocks(activity) {
             const switchBlk = last(logo.switchBlocks[turtle]);
             if (switchBlk === null) {
                 // Handle the case when the Case block is not inside a Switch block
-                activity.errorMsg(t("The Case Block must be used inside of a Switch Block."), blk);
+                activity.errorMsg(_("The Case Block must be used inside of a Switch Block."), blk);
                 logo.stopTurtle = true;
                 return;
             }
@@ -443,7 +443,7 @@ function setupFlowBlocks(activity) {
 
             // Set the help string for the block
             this.setHelpString([
-                t("The Switch block will run the code in the matching Case."),
+                _("The Switch block will run the code in the matching Case."),
                 "documentation",
                 null,
                 "switchhelp"
@@ -451,7 +451,7 @@ function setupFlowBlocks(activity) {
 
             // Form the block with specific parameters
             this.formBlock({
-                name: t("switch"),
+                name: _("switch"),
                 args: 1,
                 argTypes: ["anyin"]
             });
@@ -592,16 +592,16 @@ function setupFlowBlocks(activity) {
 
             // Set the help string for the block
             this.setHelpString([
-                t("The Stop block will stop a loop") +
+                _("The Stop block will stop a loop") +
                     ": " +
-                    t("Forever, Repeat, While, or Until."),
+                    _("Forever, Repeat, While, or Until."),
                 "documentation",
                 ""
             ]);
 
             // Form the block with specific parameters
             this.formBlock({
-                name: t("Stop").toLowerCase(),
+                name: _("Stop").toLowerCase(),
                 flows: {
                     top: true,
                     bottom: "tail",
@@ -650,7 +650,7 @@ function setupFlowBlocks(activity) {
 
             // Set the help string for the block
             this.setHelpString([
-                t("The Waitfor block will wait until the condition is true."),
+                _("The Waitfor block will wait until the condition is true."),
                 "documentation",
                 null,
                 "waitforhelp"
@@ -658,7 +658,7 @@ function setupFlowBlocks(activity) {
 
             // Form the block with specific parameters
             this.formBlock({
-                name: t("wait for"),
+                name: _("wait for"),
                 args: 1,
                 argTypes: ["booleanin"]
             });
@@ -729,7 +729,7 @@ function setupFlowBlocks(activity) {
 
             // Set the help string for the block
             this.setHelpString([
-                t("The Until block will repeat until the condition is true."),
+                _("The Until block will repeat until the condition is true."),
                 "documentation",
                 null,
                 "untilhelp"
@@ -737,9 +737,9 @@ function setupFlowBlocks(activity) {
 
             // Form the block with specific parameters
             this.formBlock({
-                name: t("until"),
+                name: _("until"),
                 flows: {
-                    labels: [this.lang === "ja" ? t("do2") : t("do")]
+                    labels: [this.lang === "ja" ? _("do2") : _("do")]
                 },
                 args: 1,
                 argTypes: ["booleanin"]
@@ -809,7 +809,7 @@ function setupFlowBlocks(activity) {
 
             // Set the help string for the block
             this.setHelpString([
-                t("The While block will repeat while the condition is true."),
+                _("The While block will repeat while the condition is true."),
                 "documentation",
                 null,
                 "whilehelp"
@@ -817,9 +817,9 @@ function setupFlowBlocks(activity) {
 
             // Form the block with specific parameters
             this.formBlock({
-                name: t("while"),
+                name: _("while"),
                 flows: {
-                    labels: [this.lang === "ja" ? t("do2") : t("do")]
+                    labels: [this.lang === "ja" ? _("do2") : _("do")]
                 },
                 args: 1,
                 argTypes: ["booleanin"]
@@ -896,22 +896,22 @@ function setupFlowBlocks(activity) {
 
             if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    t(
+                    _(
                         "Conditionals lets your program take different actions depending on the condition."
                     ) +
                         " " +
-                        t("In this example if the mouse button is pressed a snare drum will play."),
+                        _("In this example if the mouse button is pressed a snare drum will play."),
                     "documentation",
                     null,
                     "elifhelp"
                 ]);
             } else {
                 this.setHelpString([
-                    t(
+                    _(
                         "Conditionals lets your program take different actions depending on the condition."
                     ) +
                         " " +
-                        t(
+                        _(
                             "In this example if the mouse button is pressed a snare drum will play, else a kick drum will play."
                         ),
                     "documentation",
@@ -922,9 +922,9 @@ function setupFlowBlocks(activity) {
 
             // Form the block with specific parameters
             this.formBlock({
-                name: t("if"),
+                name: _("if"),
                 flows: {
-                    labels: [t("then"), t("else")]
+                    labels: [_("then"), _("else")]
                 },
                 args: 1,
                 argTypes: ["booleanin"]
@@ -961,22 +961,22 @@ function setupFlowBlocks(activity) {
 
             if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    t(
+                    _(
                         "Conditionals lets your program take different actions depending on the condition."
                     ) +
                         " " +
-                        t("In this example if the mouse button is pressed a snare drum will play."),
+                        _("In this example if the mouse button is pressed a snare drum will play."),
                     "documentation",
                     null,
                     "ifhelp"
                 ]);
             } else {
                 this.setHelpString([
-                    t(
+                    _(
                         "Conditionals lets your program take different actions depending on the condition."
                     ) +
                         " " +
-                        t("In this example if the mouse button is pressed a snare drum will play."),
+                        _("In this example if the mouse button is pressed a snare drum will play."),
                     "documentation",
                     null,
                     "ifhelp"
@@ -985,9 +985,9 @@ function setupFlowBlocks(activity) {
 
             // Form the block with specific parameters
             this.formBlock({
-                name: t("if"),
+                name: _("if"),
                 flows: {
-                    labels: [t("then")]
+                    labels: [_("then")]
                 },
                 args: 1,
                 argTypes: ["booleanin"]
@@ -1022,9 +1022,9 @@ function setupFlowBlocks(activity) {
 
             // Set the help string for the block
             this.setHelpString([
-                t("The Forever block will repeat the contained blocks forever.") +
+                _("The Forever block will repeat the contained blocks forever.") +
                     " " +
-                    t(
+                    _(
                         "In this example of a simple drum machine a kick drum will play 1/4 notes forever."
                     ),
                 "documentation",
@@ -1034,7 +1034,7 @@ function setupFlowBlocks(activity) {
 
             // Form the block with specific parameters
             this.formBlock({
-                name: t("forever")
+                name: _("forever")
             });
         }
 
@@ -1070,9 +1070,9 @@ function setupFlowBlocks(activity) {
 
             // Set the help string for the block
             this.setHelpString([
-                t("The Repeat block will repeat the contained blocks.") +
+                _("The Repeat block will repeat the contained blocks.") +
                     " " +
-                    t("In this example the note will be played 4 times."),
+                    _("In this example the note will be played 4 times."),
                 "documentation",
                 null,
                 "repeathelp"
@@ -1080,7 +1080,7 @@ function setupFlowBlocks(activity) {
 
             // Form the block with specific parameters
             this.formBlock({
-                name: t("repeat"),
+                name: _("repeat"),
                 args: 1,
                 argLabels: [""],
                 defaults: [4]
@@ -1120,7 +1120,7 @@ function setupFlowBlocks(activity) {
          */
         constructor() {
             // Call the constructor of the parent class
-            super("duplicatefactor", t("duplicate factor"));
+            super("duplicatefactor", _("duplicate factor"));
 
             // Set the palette and activity for the block
             this.setPalette("flow", activity);

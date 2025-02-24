@@ -224,7 +224,7 @@ function setupDrumActions(activity) {
 
                 tur.singer.pushedNote = true;
             } else {
-                activity.errorMsg(t("Noise Block: Did you mean to use a Note block?"), blk);
+                activity.errorMsg(_("Noise Block: Did you mean to use a Note block?"), blk);
                 return;
             }
         }

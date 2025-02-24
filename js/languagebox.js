@@ -205,7 +205,7 @@ class LanguageBox {
             "onMouseOut='this.style.opacity = 1'>";
         const MSGSuffix = "</a>";
         const MSG = {
-            default: t("Refresh your browser to change your language preference."),
+            default: _("Refresh your browser to change your language preference."),
             enUS: "Refresh your browser to change your language preference.",
             enUK: "Refresh your browser to change your language preference.",
             ja: "言語を変えるには、ブラウザをこうしんしてください。",
@@ -226,7 +226,7 @@ class LanguageBox {
             ur:"اپنی زبان کی ترجیح کو تبدیل کرنے کے لئے اپنے براؤزر کو تازہ دم کریں۔"
         };
         if (localStorage.getItem("languagePreference") === this._language) {
-            this.activity.textMsg(t("Music Blocks is already set to this language."));
+            this.activity.textMsg(_("Music Blocks is already set to this language."));
         }
         else{
             this.activity.storage.languagePreference = this._language;

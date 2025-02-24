@@ -1015,7 +1015,7 @@ class Blocks {
 
                         const blk = that.blockList.length - 1;
                         that.blockList[parentblk].connections[1] = blk;
-                        that.blockList[blk].value = that.findUniqueActionName(t("action"));
+                        that.blockList[blk].value = that.findUniqueActionName(_("action"));
                         let label = that.blockList[blk].value;
                         if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
                             label = label.substr(0, STRINGLEN) + "...";
@@ -1209,7 +1209,7 @@ class Blocks {
 
                         const blk = that.blockList.length - 1;
                         that.blockList[parentblk].connections[1] = blk;
-                        that.blockList[blk].value = t("box");
+                        that.blockList[blk].value = _("box");
                         let label = that.blockList[blk].value;
                         if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
                             label = label.substr(0, STRINGLEN) + "...";
@@ -1710,7 +1710,7 @@ class Blocks {
             if (newBlock != null) {
                 const n = this._countBlocksInStack(this.findTopBlock(newBlock));
                 if (n > LONGSTACK) {
-                    this.activity.errorMsg(t("Consider breaking this stack into parts."));
+                    this.activity.errorMsg(_("Consider breaking this stack into parts."));
                 }
 
                 /** We found a match. */
@@ -2469,14 +2469,14 @@ class Blocks {
                     try {
                         label = myBlock.value[0].toString();
                     } catch (e) {
-                        label = t("open file");
+                        label = _("open file");
                     }
                     maxLength = 10;
                     break;
                 case "audiofile":
                     try {
                         if (myBlock.value[0] === null) {
-                            label = t("audio file");
+                            label = _("audio file");
                         } else {
                             label = myBlock.value[0].toString();
                             if (getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
@@ -2484,7 +2484,7 @@ class Blocks {
                             }
                         }
                     } catch (e) {
-                        label = t("audio file");
+                        label = _("audio file");
                     }
                     break;
                 case "solfege":
@@ -2506,7 +2506,7 @@ class Blocks {
                     }
                     break;
                 case "customNote":
-                    label = t(myBlock.value);
+                    label = _(myBlock.value);
                     break;
                 case "eastindiansolfege":
                     if (myBlock.value === null) myBlock.value = "sol";
@@ -2521,13 +2521,13 @@ class Blocks {
                     if (myBlock.value === null) {
                         myBlock.value = DEFAULTMODE;
                     }
-                    label = t(myBlock.value); /** + ' ' + getModeNumbers(myBlock.value); */
+                    label = _(myBlock.value); /** + ' ' + getModeNumbers(myBlock.value); */
                     break;
                 case "chordname":
                     if (myBlock.value === null) {
                         myBlock.value = DEFAULTCHORD;
                     }
-                    label = t(myBlock.value);
+                    label = _(myBlock.value);
                     break;
                 case "accidentalname":
                 case "intervalname":
@@ -2542,10 +2542,10 @@ class Blocks {
                         }
                     }
                     obj = myBlock.value.split(" ");
-                    label = t(obj[0]) + " " + obj[1];
+                    label = _(obj[0]) + " " + obj[1];
                     break;
                 case "grid":
-                    label = t(myBlock.value);
+                    label = _(myBlock.value);
                     break;
                 case "filtertype":
                 case "drumname":
@@ -2575,7 +2575,7 @@ class Blocks {
                                 break;
                         }
                     }
-                    label = t(myBlock.value);
+                    label = _(myBlock.value);
                     break;
                 case "noisename":
                     label = getNoiseName(myBlock.value);
@@ -2583,7 +2583,7 @@ class Blocks {
                 case "temperamentname":
                     // eslint-disable-next-line no-case-declarations
                     const temperaments = getTemperamentsList();
-                    label = t(temperaments[0][1]); /** equal by default */
+                    label = _(temperaments[0][1]); /** equal by default */
                     for (let i = 0; i < temperaments.length; i++) {
                         if (temperaments[i][1] === myBlock.value) {
                             if (temperaments[i][0].length === 0) {
@@ -2597,16 +2597,16 @@ class Blocks {
                     break;
                 case "wrapmode":
                     if (myBlock.value === "on") {
-                        label = t("on2");
+                        label = _("on2");
                     } else {
-                        label = t("off");
+                        label = _("off");
                     }
                     break;
                 case "boolean":
                     if (myBlock.value) {
-                        label = t("true");
+                        label = _("true");
                     } else {
-                        label = t("false");
+                        label = _("false");
                     }
                     break;
                 default:
@@ -3193,12 +3193,12 @@ class Blocks {
                     case "invertmode":
                     case "filtertype":
                     case "noisename":
-                        that.blockList[thisBlock].text.text = t(value);
+                        that.blockList[thisBlock].text.text = _(value);
                         break;
                     case "temperamentname":
                         // eslint-disable-next-line no-case-declarations
                         const temperaments = getTemperamentsList();
-                        that.blockList[thisBlock].text.text = t(temperaments[0][1]);
+                        that.blockList[thisBlock].text.text = _(temperaments[0][1]);
                         for (let i = 0; i < temperaments.length; i++) {
                             if (temperaments[i][1] === value) {
                                 that.blockList[thisBlock].text.text = temperaments[i][0];
@@ -3208,16 +3208,16 @@ class Blocks {
                         break;
                     case "wrapmode":
                         if (value === "on") {
-                            that.blockList[thisBlock].text.text = t("on2");
+                            that.blockList[thisBlock].text.text = _("on2");
                         } else {
-                            that.blockList[thisBlock].text.text = t("off");
+                            that.blockList[thisBlock].text.text = _("off");
                         }
                         break;
                     case "boolean":
                         if (value) {
-                            that.blockList[thisBlock].text.text = t("true");
+                            that.blockList[thisBlock].text.text = _("true");
                         } else {
-                            that.blockList[thisBlock].text.text = t("false");
+                            that.blockList[thisBlock].text.text = _("false");
                         }
                         break;
                     default:
@@ -3244,7 +3244,7 @@ class Blocks {
                 };
                 postProcessArg = [thisBlock, arg];
             } else if (name === "text") {
-                postProcessArg = [thisBlock, t("text")];
+                postProcessArg = [thisBlock, _("text")];
             } else if (name === "boolean") {
                 postProcessArg = [thisBlock, true];
             } else if (name === "solfege") {
@@ -3307,7 +3307,7 @@ class Blocks {
                     const v = args[1];
                     that.blockList[b].value = v;
                     const o = v.split(" ");
-                    that.blockList[b].text.text = t(o[0]) + " " + o[1];
+                    that.blockList[b].text.text = _(o[0]) + " " + o[1];
                     that.blockList[b].container.updateCache();
                 };
 
@@ -3318,7 +3318,7 @@ class Blocks {
                     const v = args[1];
                     that.blockList[b].value = v;
                     const o = v.split(" ");
-                    that.blockList[b].text.text = t(o[0]) + " " + o[1];
+                    that.blockList[b].text.text = _(o[0]) + " " + o[1];
                     that.blockList[b].container.updateCache();
                 };
 
@@ -3440,14 +3440,14 @@ class Blocks {
                     } else if (name === "storein2") {
                         postProcess = (args) => {
                             const c = that.blockList[thisBlock].connections[0];
-                            if (args[1] === t("store in box")) {
-                                that.blockList[c].privateData = t("box");
+                            if (args[1] === _("store in box")) {
+                                that.blockList[c].privateData = _("box");
                             } else {
                                 that.blockList[c].privateData = args[1];
                                 if (args[1] === "box1") {
-                                    that.blockList[c].overrideName = t("box1");
+                                    that.blockList[c].overrideName = _("box1");
                                 } else if (args[1] === "box2") {
-                                    that.blockList[c].overrideName = t("box2");
+                                    that.blockList[c].overrideName = _("box2");
                                 } else {
                                     that.blockList[c].overrideName = args[1];
                                 }
@@ -3488,8 +3488,8 @@ class Blocks {
 
                 if (myBlock.name === "action") {
                     /** Make sure we don't make two actions with the same name. */
-                    value = this.findUniqueActionName(t("action"));
-                    if (value !== t("action")) {
+                    value = this.findUniqueActionName(_("action"));
+                    if (value !== _("action")) {
                         /** TODO: are there return or arg blocks? */
                         this.newNameddoBlock(value, false, false);
                         /** this.activity.palettes.hide(); */
@@ -3714,7 +3714,7 @@ class Blocks {
          */
         this.findUniqueActionName = (name, actionBlk) => {
             /** If we have a stack named 'action', make the protoblock visible. */
-            if (name === t("action")) {
+            if (name === _("action")) {
                 this.setActionProtoVisiblity(true);
             }
 
@@ -3831,7 +3831,7 @@ class Blocks {
          * return {void}
          */
         this.renameBoxes = (oldName, newName) => {
-            if (oldName === newName || oldName === t("box")) {
+            if (oldName === newName || oldName === _("box")) {
                 return;
             }
 
@@ -3862,7 +3862,7 @@ class Blocks {
          * return {void}
          */
         this.renameStoreinBoxes = (oldName, newName) => {
-            if (oldName === newName || oldName === t("box")) {
+            if (oldName === newName || oldName === _("box")) {
                 return;
             }
 
@@ -3885,9 +3885,9 @@ class Blocks {
                     if (this.blockList[blk].privateData === oldName) {
                         this.blockList[blk].privateData = newName;
                         if (newName === "box1") {
-                            this.blockList[blk].overrideName = t("box1");
+                            this.blockList[blk].overrideName = _("box1");
                         } else if (newName === "box2") {
-                            this.blockList[blk].overrideName = t("box2");
+                            this.blockList[blk].overrideName = _("box2");
                         } else {
                             this.blockList[blk].overrideName = newName;
                         }
@@ -3911,7 +3911,7 @@ class Blocks {
          * return {void}
          */
         this.renameStorein2Boxes = (oldName, newName) => {
-            if (oldName === newName || oldName === t("box")) {
+            if (oldName === newName || oldName === _("box")) {
                 return;
             }
 
@@ -3920,9 +3920,9 @@ class Blocks {
                     if (this.blockList[blk].privateData === oldName) {
                         this.blockList[blk].privateData = newName;
                         if (newName === "box1") {
-                            this.blockList[blk].overrideName = t("box1");
+                            this.blockList[blk].overrideName = _("box1");
                         } else if (newName === "box2") {
-                            this.blockList[blk].overrideName = t("box2");
+                            this.blockList[blk].overrideName = _("box2");
                         } else {
                             this.blockList[blk].overrideName = newName;
                         }
@@ -3946,7 +3946,7 @@ class Blocks {
          * return {void}
          */
         this.renameNamedboxes = (oldName, newName) => {
-            if (oldName === newName || oldName === t("box")) {
+            if (oldName === newName || oldName === _("box")) {
                 return;
             }
 
@@ -3955,9 +3955,9 @@ class Blocks {
                     if (this.blockList[blk].privateData === oldName) {
                         this.blockList[blk].privateData = newName;
                         if (newName === "box1") {
-                            this.blockList[blk].overrideName = t("box1");
+                            this.blockList[blk].overrideName = _("box1");
                         } else if (newName === "box2") {
-                            this.blockList[blk].overrideName = t("box2");
+                            this.blockList[blk].overrideName = _("box2");
                         } else {
                             this.blockList[blk].overrideName = newName;
                         }
@@ -4073,7 +4073,7 @@ class Blocks {
                 const block = actionsPalette.protoList[blockId];
                 if (
                     ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(block.name) !==
-                    -1 /** && block.defaults[0] !== t('action') */ &&
+                    -1 /** && block.defaults[0] !== _('action') */ &&
                     block.defaults[0] === oldName
                 ) {
                     block.defaults[0] = newName;
@@ -4119,7 +4119,7 @@ class Blocks {
             myStoreinBlock.palette = this.activity.palettes.dict["boxes"];
             myStoreinBlock.defaults.push(name);
             myStoreinBlock.defaults.push(NUMBERBLOCKDEFAULT);
-            myStoreinBlock.staticLabels.push(t("store in"), t("name"), t("value"));
+            myStoreinBlock.staticLabels.push(_("store in"), _("name"), _("value"));
             myStoreinBlock.adjustWidthToLabel();
             myStoreinBlock.twoArgBlock();
             myStoreinBlock.dockTypes[1] = "anyin";
@@ -4266,7 +4266,7 @@ class Blocks {
          * @returns boolean
          */
         this.newNameddoBlock = (name, hasReturn, hasArgs) => {
-            if (name === t("action")) {
+            if (name === _("action")) {
                 /** 'action' already has its associated palette entries. */
                 return false;
             }
@@ -4462,7 +4462,7 @@ class Blocks {
                 if (this.blockList[cblk].isExpandableBlock()) {
                     if (this.blockList[blk].name === "forever") {
                         if (this._isConnectedToNoteValue(cblk)) {
-                            this.activity.errorMsg(t("Forever loop detected inside a note value block. Unexpected things may happen."));
+                            this.activity.errorMsg(_("Forever loop detected inside a note value block. Unexpected things may happen."));
                             return null; 
                         }
                     }
@@ -4985,7 +4985,7 @@ class Blocks {
          */
         this.prepareStackForCopy = () => {
             if (this.activeBlock == null) {
-                this.activity.errorMsg(t("There is no block selected."));
+                this.activity.errorMsg(_("There is no block selected."));
                 // eslint-disable-next-line no-console
                 console.debug("No active block to copy.");
                 return;
@@ -5088,13 +5088,13 @@ class Blocks {
                     if (["show", "turtleshell", "customsample"].includes(blockObjs[i][1])) {
                         switch (blockObjs[i][1]) {
                             case "show":
-                            name = t("Show").toLowerCase() + "-" + MathUtility.doRandom(0, 1000);
+                            name = _("Show").toLowerCase() + "-" + MathUtility.doRandom(0, 1000);
                                 break;
                             case "turtleshell":
-                                name = t("avatar") + "-" + MathUtility.doRandom(0, 1000);
+                                name = _("avatar") + "-" + MathUtility.doRandom(0, 1000);
                                 break;
                             case "sample":
-                                name = t("sample") + "-" + MathUtility.doRandom(0, 1000);
+                                name = _("sample") + "-" + MathUtility.doRandom(0, 1000);
                                 break;
                             default:
                                 name = blockObjs[i][1] + "-" + MathUtility.doRandom(0, 1000);
@@ -5204,7 +5204,7 @@ class Blocks {
 
             myBlock.palette = this.activity.palettes.dict["myblocks"];
             myBlock.zeroArgBlock();
-            myBlock.staticLabels.push(t(name));
+            myBlock.staticLabels.push(_(name));
             this.protoBlockDict[blkName].palette.add(this.protoBlockDict[blkName]);
         };
 
@@ -5429,7 +5429,7 @@ class Blocks {
                 }
 
                 /** If we have a stack named 'action', make the protoblock visible. */
-                if (name === t("action")) {
+                if (name === _("action")) {
                     this.setActionProtoVisiblity(true);
                 }
 
@@ -5859,9 +5859,9 @@ class Blocks {
                             that.blockList[thisBlock].privateData = value;
                             that.blockList[thisBlock].value = null;
                             if (value === "box1") {
-                                that.blockList[thisBlock].overrideName = t("box1");
+                                that.blockList[thisBlock].overrideName = _("box1");
                             } else if (value === "box2") {
-                                that.blockList[thisBlock].overrideName = t("box2");
+                                that.blockList[thisBlock].overrideName = _("box2");
                             } else {
                                 that.blockList[thisBlock].overrideName = value;
                             }
@@ -5880,9 +5880,9 @@ class Blocks {
                             that.blockList[thisBlock].privateData = value;
 
                             if (value === "box1") {
-                                that.blockList[thisBlock].overrideName = t("box1");
+                                that.blockList[thisBlock].overrideName = _("box1");
                             } else if (value === "box2") {
-                                that.blockList[thisBlock].overrideName = t("box2");
+                                that.blockList[thisBlock].overrideName = _("box2");
                             } else {
                                 that.blockList[thisBlock].overrideName = value;
                             }
@@ -6560,7 +6560,7 @@ class Blocks {
                 if (!this.blockList[blk].trash && this.blockList[blk].name === "action") {
                     const myBlock = this.blockList[blk];
                     const c = myBlock.connections[1];
-                    if (c != null && this.blockList[c].value !== t("action")) {
+                    if (c != null && this.blockList[c].value !== _("action")) {
                         if (
                             this.newNameddoBlock(
                                 this.blockList[c].value,
@@ -6583,7 +6583,7 @@ class Blocks {
                 if (!this.blockList[blk].trash && this.blockList[blk].name === "storein") {
                     const myBlock = this.blockList[blk];
                     const c = myBlock.connections[1];
-                    if (c != null && this.blockList[c].value !== t("box")) {
+                    if (c != null && this.blockList[c].value !== _("box")) {
                         const name = this.blockList[c].value;
                         if (name !== null) {
                             /** Is there an old block with this name still around? */
@@ -6875,7 +6875,7 @@ class Blocks {
                 this.blockList[blk].trash = true;
                 this.blockList[blk].hide();
                 const title = this.blockList[blk].protoblock.staticLabels[0];
-                closeBlkWidgets(t(title));
+                closeBlkWidgets(_(title));
                 this.activity.refreshCanvas();
             }
 

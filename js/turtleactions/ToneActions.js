@@ -131,12 +131,12 @@ function setupToneActions(activity) {
          */
         static doVibrato(intensity, rate, turtle, blk) {
             if (intensity < 1 || intensity > 100) {
-                activity.errorMsg(t("Vibrato intensity must be between 1 and 100."), blk);
+                activity.errorMsg(_("Vibrato intensity must be between 1 and 100."), blk);
                 activity.logo.stopTurtle = true;
             }
 
             if (rate <= 0) {
-                activity.errorMsg(t("Vibrato rate must be greater than 0."), blk);
+                activity.errorMsg(_("Vibrato rate must be greater than 0."), blk);
                 activity.logo.stopTurtle = true;
             }
 
@@ -189,7 +189,7 @@ function setupToneActions(activity) {
             chorusDepth /= 100;
 
             if (chorusDepth < 0 || chorusDepth > 1) {
-                activity.errorMsg(t("Depth is out of range."), blk);
+                activity.errorMsg(_("Depth is out of range."), blk);
                 activity.logo.stopTurtle = true;
             }
 
@@ -262,7 +262,7 @@ function setupToneActions(activity) {
 
             if (depth < 0 || depth > 1) {
                 //.TRANS: Depth is the intesity of the tremolo or chorus effect.
-                activity.errorMsg(t("Depth is out of range."), blk);
+                activity.errorMsg(_("Depth is out of range."), blk);
                 activity.logo.stopTurtle = true;
             }
 
@@ -298,7 +298,7 @@ function setupToneActions(activity) {
             distortion /= 100;
 
             if (distortion < 0 || distortion > 1) {
-                activity.errorMsg(t("Distortion must be from 0 to 100."), blk);
+                activity.errorMsg(_("Distortion must be from 0 to 100."), blk);
                 activity.logo.stopTurtle = true;
             }
 
@@ -329,7 +329,7 @@ function setupToneActions(activity) {
         static doHarmonic(harmonic, turtle, blk) {
             if (typeof harmonic !== "number" || harmonic < 0) {
                 //.TRANS: partials components in a harmonic series
-                activity.errorMsg(t("Partial must be greater than or equal to 0."));
+                activity.errorMsg(_("Partial must be greater than or equal to 0."));
                 activity.logo.stopTurtle = true;
                 return;
             }
@@ -375,7 +375,7 @@ function setupToneActions(activity) {
             if (activity.logo.inTimbre) {
                 activity.logo.timbre.FMSynthParams = [];
                 if (activity.logo.timbre.osc.length != 0) {
-                    activity.errorMsg(t("Unable to use synth due to existing oscillator"));
+                    activity.errorMsg(_("Unable to use synth due to existing oscillator"));
                 }
             }
 
@@ -385,7 +385,7 @@ function setupToneActions(activity) {
             }
 
             if (modulationIndex < 0) {
-                activity.errorMsg(t("The input cannot be negative."));
+                activity.errorMsg(_("The input cannot be negative."));
                 modulationIndex = -modulationIndex;
             }
 
@@ -414,7 +414,7 @@ function setupToneActions(activity) {
             if (activity.logo.inTimbre) {
                 activity.logo.timbre.AMSynthParams = [];
                 if (activity.logo.timbre.osc.length != 0) {
-                    activity.errorMsg(t("Unable to use synth due to existing oscillator"));
+                    activity.errorMsg(_("Unable to use synth due to existing oscillator"));
                 }
             }
 
@@ -424,7 +424,7 @@ function setupToneActions(activity) {
             }
 
             if (harmonicity < 0) {
-                activity.errorMsg(t("The input cannot be negative."));
+                activity.errorMsg(_("The input cannot be negative."));
                 harmonicity = -harmonicity;
             }
 
@@ -453,7 +453,7 @@ function setupToneActions(activity) {
         static defDuoSynth(synthVibratoRate, synthVibratoAmount, turtle, blk) {
             if (activity.logo.inTimbre) {
                 if (activity.logo.timbre.osc.length != 0) {
-                    activity.errorMsg(t("Unable to use synth due to existing oscillator"));
+                    activity.errorMsg(_("Unable to use synth due to existing oscillator"));
                 }
                 activity.logo.timbre.duoSynthParams = [];
             }

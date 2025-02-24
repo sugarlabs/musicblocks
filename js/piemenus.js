@@ -197,11 +197,11 @@ const piemenuPitches = (
         block._accidentalsWheel.animatetime = 0; // 300;
         block._accidentalsWheel.createWheel(accidentalLabels);
         block._accidentalsWheel.setTooltips([
-            t("double sharp"),
-            t("sharp"),
-            t("natural"),
-            t("flat"),
-            t("double flat")
+            _("double sharp"),
+            _("sharp"),
+            _("natural"),
+            _("flat"),
+            _("double flat")
         ]);
     }
     if (hasOctaveWheel) {
@@ -2364,7 +2364,7 @@ const piemenuChords = (block, selectedChord) => {
 
     const chordLabels = [];
     for (let i = 0; i < CHORDNAMES.length; i++) {
-        const name = t(CHORDNAMES[i]);
+        const name = _(CHORDNAMES[i]);
         if (name.length === 0) {
             chordLabels.push(CHORDNAMES[i]);  // In case i18n fails
         } else {
@@ -2690,7 +2690,7 @@ const piemenuIntervals = (block, selectedInterval) => {
     // block._intervalNameWheel.clickModeRotate = false;
     const labels = [];
     for (let i = 0; i < INTERVALS.length; i++) {
-        labels.push(t(INTERVALS[i][1]));
+        labels.push(_(INTERVALS[i][1]));
     }
 
     block._intervalNameWheel.animatetime = 0; // 300;
@@ -2824,7 +2824,7 @@ const piemenuIntervals = (block, selectedInterval) => {
 
         that.value = INTERVALS[that._intervalNameWheel.selectedNavItemIndex][1] + " " + number;
         if (label === "perfect 1") {
-            that.text.text = t("unison");
+            that.text.text = _("unison");
         } else {
             that.text.text = label + " " + number;
         }
@@ -2978,15 +2978,15 @@ const piemenuModes = (block, selectedMode) => {
             that.text.text =
                 that._modeNameWheel.navItems[that._modeNameWheel.selectedNavItemIndex].title;
 
-            if (that.text.text === t("major") + " / " + t("ionian")) {
+            if (that.text.text === _("major") + " / " + _("ionian")) {
                 that.value = "major";
-            } else if (that.text.text === t("minor") + " / " + t("aeolian")) {
+            } else if (that.text.text === _("minor") + " / " + _("aeolian")) {
                 that.value = "aeolian";
             } else {
                 for (let i = 0; i < MODE_PIE_MENUS[modeGroup].length; i++) {
                     const modename = MODE_PIE_MENUS[modeGroup][i];
 
-                    if (t(modename) === that.text.text) {
+                    if (_(modename) === that.text.text) {
                         that.value = modename;
                         break;
                     }
@@ -3051,17 +3051,17 @@ const piemenuModes = (block, selectedMode) => {
             switch (modename) {
                 case "ionian":
                 case "major":
-                    labels.push(t("major") + " / " + t("ionian"));
+                    labels.push(_("major") + " / " + _("ionian"));
                     break;
                 case "aeolian":
                 case "minor":
-                    labels.push(t("minor") + " / " + t("aeolian"));
+                    labels.push(_("minor") + " / " + _("aeolian"));
                     break;
                 default:
                     if (modename === " ") {
                         labels.push(" ");
                     } else {
-                        labels.push(t(modename));
+                        labels.push(_(modename));
                     }
                     break;
             }
@@ -3370,20 +3370,20 @@ const piemenuBlockContext = (block) => {
     wheel.initWheel(labels);
     wheel.createWheel();
 
-    wheel.navItems[0].setTooltip(t("Duplicate"));
-    wheel.navItems[1].setTooltip(t("Extract"));
-    wheel.navItems[2].setTooltip(t("Move to trash"));
-    wheel.navItems[3].setTooltip(t("Close"));
+    wheel.navItems[0].setTooltip(_("Duplicate"));
+    wheel.navItems[1].setTooltip(_("Extract"));
+    wheel.navItems[2].setTooltip(_("Move to trash"));
+    wheel.navItems[3].setTooltip(_("Close"));
     if (
         ["customsample", "temperament1", "definemode", "show", "turtleshell", "action"].includes(
             block.blocks.blockList[topBlock].name
         )
     ) {
-        wheel.navItems[4].setTooltip(t("Save stack"));
+        wheel.navItems[4].setTooltip(_("Save stack"));
     }
 
     if (helpButton !== null) {
-        wheel.navItems[helpButton].setTooltip(t("Help"));
+        wheel.navItems[helpButton].setTooltip(_("Help"));
     }
 
     wheel.navItems[0].selected = false;
@@ -3409,7 +3409,7 @@ const piemenuBlockContext = (block) => {
         if (
             "customsample" === block.blocks.blockList[topBlock].name
         ) {
-            that.activity.errorMsg(t("In order to copy a sample, you must reload the widget, import the sample again, and export it."));
+            that.activity.errorMsg(_("In order to copy a sample, you must reload the widget, import the sample again, and export it."));
         } else {
             stackPasting();
         }
@@ -3454,7 +3454,7 @@ const piemenuBlockContext = (block) => {
         docById("contextWheelDiv").style.display = "none";
         // prompting a notification on deleting any block 
         activity.textMsg(
-            t("You can restore deleted blocks from the trash with the Restore From Trash button."), 3000
+            _("You can restore deleted blocks from the trash with the Restore From Trash button."), 3000
         );       
     };
 
@@ -3798,7 +3798,7 @@ const piemenuKey = (activity) => {
                     activity.blocks.blockList[activity.blocks.blockList.length - 1].value =
                         activity.KeySignatureEnv[1];
                     activity.textMsg(
-                        t("You have chosen key for your pitch preview.") +
+                        _("You have chosen key for your pitch preview.") +
                             activity.KeySignatureEnv[0] +
                             " " +
                             activity.KeySignatureEnv[1]

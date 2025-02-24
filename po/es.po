@@ -1659,7 +1659,7 @@ msgstr "Envolver"
 
 #: js/toolbar.js:1121
 msgid "Are you sure you want to create a new project?"
-msgstr "Â¿Estás seguro de que deseas crear un nuevo proyecto?"
+msgstr "¿Estás seguro de que deseas crear un nuevo proyecto?"
 
 #: js/logo.js:61
 msgid "Not a valid pitch name"
@@ -1940,7 +1940,7 @@ msgstr "Bienvenidos a TortuBloques"
 
 #: js/turtledefs.js:439
 msgid "Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks."
-msgstr "TortuBloques es una tortuga basada en Logo que dibuja imÃÂÃÂ¡genes coloridas programable de una forma visual con bloques encastrables."
+msgstr "TortuBloques es una tortuga basada en Logo que dibuja imÃÃ¡genes coloridas programable de una forma visual con bloques encastrables."
 
 #: js/turtledefs.js:440
 #: js/turtledefs.js:467
@@ -2545,7 +2545,7 @@ msgstr "Séptimo disminuido, más una octava"
 #: js/utils/musicutils.js:836
 #.TRANS: ordinal number. Please keep exactly one space between each number.
 msgid "1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th"
-msgstr "1ÃÂº 2ÃÂº 3ÃÂº 4ÃÂº 5ÃÂº 6ÃÂº 7ÃÂº 8ÃÂº 9ÃÂº 10ÃÂº 11ÃÂº 12ÃÂº"
+msgstr "1Ãº 2Ãº 3Ãº 4Ãº 5Ãº 6Ãº 7Ãº 8Ãº 9Ãº 10Ãº 11Ãº 12Ãº"
 
 #: js/utils/musicutils.js:1002
 #: js/utils/musicutils.js:1186
@@ -3255,11 +3255,11 @@ msgstr "7mo menor-mayor"
 
 #: js/utils/musicutils.js:1192
 msgid "fully-diminished 7th"
-msgstr "7ÃÂº completamente disminuido"
+msgstr "7Ãº completamente disminuido"
 
 #: js/utils/musicutils.js:1193
 msgid "half-diminished 7th"
-msgstr "7ÃÂº medio disminuido"
+msgstr "7Ãº medio disminuido"
 
 #: js/utils/musicutils.js:1600
 #: js/utils/musicutils.js:1616
@@ -3590,7 +3590,7 @@ msgstr "El bloque Pila-vacío? devuelve verdadero si la pila está vacío."
 #: js/blocks/HeapBlocks.js:268
 #.TRANS: Is the heap empty?
 msgid "heap empty?"
-msgstr "ÃÂ¿pila vacía?"
+msgstr "Ã¿pila vacía?"
 
 #: js/blocks/HeapBlocks.js:317
 msgid "The Empty-heap block empties the heap."
@@ -3613,7 +3613,7 @@ msgstr "revertir la pila"
 
 #: js/blocks/HeapBlocks.js:428
 msgid "The Index-heap block returns a value in the heap at a specified location."
-msgstr "El bloque ÃÂndice de pila devuelve un valor en la pila en una ubicación especificada."
+msgstr "El bloque Ãndice de pila devuelve un valor en la pila en una ubicación especificada."
 
 #: js/blocks/HeapBlocks.js:443
 #.TRANS: retrieve a value from the heap at index position in the heap
@@ -7596,7 +7596,7 @@ msgstr "Cargar más proyectos"
 
 #: planet/js/StringHelper.js:56
 msgid "Last Updated"
-msgstr "ÃÂltima actualización"
+msgstr "Ãltima actualización"
 
 #: planet/js/StringHelper.js:57
 msgid "Creation Date"
@@ -7924,7 +7924,7 @@ msgstr "mover"
 #~msgstr "Borrar el espacio de trabajo"
 
 #~msgid "Are you sure you want to clear the workspace ?"
-#~msgstr "Â¿Estás seguro de que quieres borrar el espacio de trabajo?"
+#~msgstr "¿Estás seguro de que quieres borrar el espacio de trabajo?"
 
 #~msgid "meantone"
 #~msgstr ""
@@ -8461,7 +8461,7 @@ msgstr "mover"
 #~msgstr "mi bloques"
 
 #~msgid "Do you want to save your project?"
-#~msgstr "ÃÂ¿Quieres guardar tu proyecto?"
+#~msgstr "Ã¿Quieres guardar tu proyecto?"
 
 #~msgid "Drum Block: Did you mean to use a Note block?"
 #~msgstr "Bloque de tambor: Quizás quiso decir utilizar un bloque de nota?"
@@ -8500,10 +8500,10 @@ msgstr "mover"
 #~msgstr "Las transposiciones escalares son iguales a las transposiciones de semitono para el temperamento personalizado."
 
 #~msgid "You can only tie notes of the same pitch. Did you mean to use slur?"
-#~msgstr "Solo puedes atar notas del mismo tono. ÃÂ¿Querías usar legato?"
+#~msgstr "Solo puedes atar notas del mismo tono. Ã¿Querías usar legato?"
 
-#~msgid "Note name must be one of A, AÃ¢ÂÂ¯, BÃ¢ÂÂ­, B, C, CÃ¢ÂÂ¯, DÃ¢ÂÂ­, D, DÃ¢ÂÂ¯, EÃ¢ÂÂ­, E, F, FÃ¢ÂÂ¯, GÃ¢ÂÂ­, G, GÃ¢ÂÂ¯ or AÃ¢ÂÂ­."
-#~msgstr "El nombre de la nota debe ser A, AÃ¢ÂÂ¯, BÃ¢ÂÂ­, B, C, CÃ¢ÂÂ¯, DÃ¢ÂÂ­, D, DÃ¢ÂÂ¯, EÃ¢ÂÂ­, E, F, FÃ¢ÂÂ¯, GÃ¢ÂÂ­, G, GÃ¢ÂÂ¯ o AÃ¢ÂÂ­."
+#~msgid "Note name must be one of A, AÃ¢¯, BÃ¢­, B, C, CÃ¢¯, DÃ¢­, D, DÃ¢¯, EÃ¢­, E, F, FÃ¢¯, GÃ¢­, G, GÃ¢¯ or AÃ¢­."
+#~msgstr "El nombre de la nota debe ser A, AÃ¢¯, BÃ¢­, B, C, CÃ¢¯, DÃ¢­, D, DÃ¢¯, EÃ¢­, E, F, FÃ¢¯, GÃ¢­, G, GÃ¢¯ o AÃ¢­."
 
 #~msgid "This button opens a viewer for sharing projects and for finding example projects."
 #~msgstr "Este botón abre un visor para compartir proyectos y encontrar proyectos de ejemplo."

@@ -116,7 +116,7 @@ class Turtles {
                 ? infoDict["id"]
                 : Date.now();
 
-        const turtleName = blkInfoAvailable && "name" in infoDict ? infoDict["name"] : t("start");
+        const turtleName = blkInfoAvailable && "name" in infoDict ? infoDict["name"] : _("start");
 
         // Instantiate a new Turtle object
         const turtle = new Turtle(this.activity, id, turtleName, this, startBlock);
@@ -937,7 +937,7 @@ Turtles.TurtlesView = class {
                 CARTESIANBUTTON,
                 {
                     "name":"Grid",
-                    "label":t("Grid")
+                    "label":_("Grid")
                 },
                 this._w - 10 - 3 * 55,
                 70 + LEADING + 6
@@ -956,7 +956,7 @@ Turtles.TurtlesView = class {
                 CLEARBUTTON,
                 {
                     name: "Clear",
-                    label: t("Clear"),
+                    label: _("Clear"),
                 },
                 this._w - 5 - 2 * 55,
                 70 + LEADING + 6
@@ -977,7 +977,7 @@ Turtles.TurtlesView = class {
                 COLLAPSEBUTTON,
                 {
                     "name":"Collapse",
-                    "label":t("Collapse")
+                    "label":_("Collapse")
                 },
                 this._w - 55,
                 70 + LEADING + 6
@@ -1049,7 +1049,7 @@ Turtles.TurtlesView = class {
                 EXPANDBUTTON,
                 {
                     "name":"Expand",
-                    "label":t("Expand"),
+                    "label":_("Expand"),
                 },
                 this._w - 55,
                 70 + LEADING + 6

@@ -128,7 +128,7 @@ class PlanetInterface {
             }
 
             if (data === undefined) {
-                this.errorMsg(t("project undefined"));
+                this.errorMsg(_("project undefined"));
                 return;
             }
             this.activity.textMsg(this.getCurrentProjectName());
@@ -232,7 +232,7 @@ class PlanetInterface {
                     e.message === "Not enough space to save locally"
                 )
                     this.activity.textMsg(
-                        t(
+                        _(
                             "Error: Unable to save because you ran out of local storage. Try deleting some saved projects."
                         )
                     );

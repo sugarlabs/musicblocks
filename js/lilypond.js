@@ -602,18 +602,18 @@ const saveLilypondOutput = function (activity) {
 
     //.TRANS Animal names used in Lilypond output
     const RODENTS = [
-        t("mouse"),
-        t("brown rat"),
-        t("mole"),
-        t("chipmunk"),
-        t("red squirrel"),
-        t("guinea pig"),
-        t("capybara"),
-        t("coypu"),
-        t("black rat"),
-        t("grey squirrel"),
-        t("flying squirrel"),
-        t("bat")
+        _("mouse"),
+        _("brown rat"),
+        _("mole"),
+        _("chipmunk"),
+        _("red squirrel"),
+        _("guinea pig"),
+        _("capybara"),
+        _("coypu"),
+        _("black rat"),
+        _("grey squirrel"),
+        _("flying squirrel"),
+        _("bat")
     ];
 
     const CLEFS = ["treble", "bass", "bass_8", "percussion"];
@@ -729,7 +729,7 @@ const saveLilypondOutput = function (activity) {
             let shortInstrumentName = "";
 
             if (tNumber > startDrums - 1) {
-                instrumentName = t("drum") + NUMBERNAMES[tNumber - startDrums];
+                instrumentName = _("drum") + NUMBERNAMES[tNumber - startDrums];
                 instrumentName = instrumentName.replace(/ /g, "").replace(".", "");
                 activity.logo.notationOutput += instrumentName + " = {\n";
                 activity.logo.notationOutput += "\\drummode {\n";
@@ -746,7 +746,7 @@ const saveLilypondOutput = function (activity) {
                     // const turtleNumber = tNumber;
 
                     instrumentName = activity.turtles.getTurtle(t).name;
-                    if (instrumentName === t("start") || instrumentName === t("start drum")) {
+                    if (instrumentName === _("start") || instrumentName === _("start drum")) {
                         instrumentName = RODENTS[tNumber % 12];
                     } else if (instrumentName === tNumber.toString()) {
                         instrumentName = RODENTS[tNumber % 12];
@@ -894,23 +894,23 @@ const saveLilypondOutput = function (activity) {
             if (clef[tNumber] === CLEFS[c]) {
                 if (activity.logo.notation.notationStaging[t].length > 0) {
                     if (tNumber > startDrums - 1) {
-                        instrumentName = t("drum") + NUMBERNAMES[tNumber - startDrums];
+                        instrumentName = _("drum") + NUMBERNAMES[tNumber - startDrums];
                     } else {
                         if (t in activity.turtles.turtleList) {
                             instrumentName = activity.turtles.getTurtle(t).name;
                         } else if (tNumber in activity.turtles.turtleList) {
                             instrumentName = activity.turtles.getTurtle(tNumber).name;
                         } else {
-                            instrumentName = t("mouse");
+                            instrumentName = _("mouse");
                         }
 
                         // console.debug("Source: " + instrumentName);
 
                         if (instrumentName === "") {
-                            instrumentName = t("mouse");
+                            instrumentName = _("mouse");
                         }
 
-                        if (instrumentName === t("start") || instrumentName === t("start drum")) {
+                        if (instrumentName === _("start") || instrumentName === _("start drum")) {
                             instrumentName = RODENTS[tNumber % 12];
                         } else if (instrumentName === tNumber.toString()) {
                             instrumentName = RODENTS[tNumber % 12];
@@ -938,17 +938,17 @@ const saveLilypondOutput = function (activity) {
             if (clef[i] === CLEFS[c]) {
                 if (activity.logo.notation.notationStaging[t].length > 0) {
                     if (tNumber > startDrums - 1) {
-                        instrumentName = t("drum") + NUMBERNAMES[tNumber - startDrums];
+                        instrumentName = _("drum") + NUMBERNAMES[tNumber - startDrums];
                     } else {
                         if (t in activity.turtles.turtleList) {
                             instrumentName = activity.turtles.getTurtle(t).name;
                         } else if (tNumber in activity.turtles.turtleList) {
                             instrumentName = activity.turtles.getTurtle(tNumber).name;
                         } else {
-                            instrumentName = t("mouse");
+                            instrumentName = _("mouse");
                         }
 
-                        if (instrumentName === t("start") || instrumentName === t("start drum")) {
+                        if (instrumentName === _("start") || instrumentName === _("start drum")) {
                             instrumentName = RODENTS[tNumber % 12];
                         } else if (instrumentName === tNumber.toString()) {
                             instrumentName = RODENTS[tNumber % 12];

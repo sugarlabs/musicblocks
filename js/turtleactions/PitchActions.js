@@ -262,7 +262,7 @@ function setupPitchActions(activity) {
                     tur.singer.scalarTransposition + tur.singer.transposition !== 0
                 ) {
                     activity.errorMsg(
-                        t(
+                        _(
                             "Scalar transpositions are equal to Semitone transpositions for custom temperament."
                         )
                     );
@@ -320,10 +320,10 @@ function setupPitchActions(activity) {
             const i = ACCIDENTALNAMES.indexOf(accidental);
             if (i === -1) {
                 switch (accidental) {
-                    case t("sharp"):
+                    case _("sharp"):
                         value = 1;
                         return;
-                    case t("flat"):
+                    case _("flat"):
                         value = -1;
                         return;
                     default:
@@ -466,11 +466,11 @@ function setupPitchActions(activity) {
                 mode = mode % 2 === 0 ? "even" : "odd";
             }
 
-            if (mode === t("even")) {
+            if (mode === _("even")) {
                 mode = "even";
-            } else if (mode === t("odd")) {
+            } else if (mode === _("odd")) {
                 mode = "odd";
-            } else if (mode === t("scalar")) {
+            } else if (mode === _("scalar")) {
                 mode = "scalar";
             }
 

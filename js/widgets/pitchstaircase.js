@@ -116,7 +116,7 @@ class PitchStaircase {
                 stepTableRow,
                 "play-button.svg",
                 PitchStaircase.ICONSIZE,
-                t("Play")
+                _("Play")
             );
             playCell.className = "headcol"; // This cell is fixed horizontally.
             playCell.setAttribute("id", i);
@@ -575,7 +575,7 @@ class PitchStaircase {
         }
 
         this.activity.blocks.loadNewBlocks(newStack);
-        activity.textMsg(t("New action block generated."), 3000);
+        activity.textMsg(_("New action block generated."), 3000);
     }
 
     /**
@@ -619,7 +619,7 @@ class PitchStaircase {
         widgetWindow.addButton(
             "play-chord.svg",
             PitchStaircase.ICONSIZE,
-            t("Play chord")
+            _("Play chord")
         ).onclick = () => {
             this._playAll();
         };
@@ -627,7 +627,7 @@ class PitchStaircase {
         widgetWindow.addButton(
             "play-scale.svg",
             PitchStaircase.ICONSIZE,
-            t("Play scale")
+            _("Play scale")
         ).onclick = () => {
             this.playUpAndDown();
         };
@@ -636,7 +636,7 @@ class PitchStaircase {
         widgetWindow.addButton(
             "export-chunk.svg",
             PitchStaircase.ICONSIZE,
-            t("Save")
+            _("Save")
         ).onclick = () => {
             // Debounce button
             if (!this._get_save_lock()) {
@@ -673,7 +673,7 @@ class PitchStaircase {
         widgetWindow.addButton(
             "restore-button.svg",
             PitchStaircase.ICONSIZE,
-            t("Undo")
+            _("Undo")
         ).onclick = () => {
             this._undo();
         };
@@ -681,7 +681,7 @@ class PitchStaircase {
         widgetWindow.addButton(
             "erase-button.svg",
             PitchStaircase.ICONSIZE,
-            t("Clear")
+            _("Clear")
         ).onclick = () => {
             while (this._undo());
         };
@@ -691,7 +691,7 @@ class PitchStaircase {
         widgetWindow.getWidgetBody().append(this._pscTable);
         this._refresh();
 
-        activity.textMsg(t("Click on a note to create a new step."), 3000);
+        activity.textMsg(_("Click on a note to create a new step."), 3000);
 
         widgetWindow.onmaximize = () => {
             if (widgetWindow._maximized) {

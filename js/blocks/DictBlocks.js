@@ -59,7 +59,7 @@ function setupDictBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                t(
+                _(
                     "The Show-dictionary block displays the contents of the dictionary at the top of the screen."
                 ),
                 "documentation",
@@ -74,10 +74,10 @@ function setupDictBlocks(activity) {
              * @param {string[]} config.defaults - The default values for the arguments.
              */
             this.formBlock({
-                name: t("show dictionary"),
+                name: _("show dictionary"),
                 args: 1,
                 argTypes: ["anyin"],
-                defaults: [t("My Dictionary")]
+                defaults: [_("My Dictionary")]
             });
         }
 
@@ -126,7 +126,7 @@ function setupDictBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                t("The Dictionary block returns a dictionary."),
+                _("The Dictionary block returns a dictionary."),
                 "documentation",
                 ""
             ]);
@@ -139,10 +139,10 @@ function setupDictBlocks(activity) {
              * @param {string[]} config.defaults - The default values for the arguments.
              */
             this.formBlock({
-                name: t("dictionary"),
+                name: _("dictionary"),
                 args: 1,
                 argTypes: ["anyin"],
-                defaults: [t("My Dictionary")]
+                defaults: [_("My Dictionary")]
             });
         }
 
@@ -194,7 +194,7 @@ function setupDictBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                t("The Get-dict block returns a value in the dictionary for a specified key."),
+                _("The Get-dict block returns a value in the dictionary for a specified key."),
                 "documentation",
                 ""
             ]);
@@ -209,11 +209,11 @@ function setupDictBlocks(activity) {
              * @param {string[]} config.defaults - The default values for the arguments.
              */
             this.formBlock({
-                name: t("get value"),
+                name: _("get value"),
                 args: 2,
                 argTypes: ["anyin", "anyin"],
-                argLabels: [t("name"), this.lang === "ja" ? t("key2") : t("key")],
-                defaults: [t("My Dictionary"), this.lang === "ja" ? t("key2") : t("key")]
+                argLabels: [_("name"), this.lang === "ja" ? _("key2") : _("key")],
+                defaults: [_("My Dictionary"), this.lang === "ja" ? _("key2") : _("key")]
             });
         }
 
@@ -268,7 +268,7 @@ function setupDictBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                t("The Set-dict block sets a value in the dictionary for a specified key."),
+                _("The Set-dict block sets a value in the dictionary for a specified key."),
                 "documentation",
                 ""
             ]);
@@ -283,11 +283,11 @@ function setupDictBlocks(activity) {
              * @param {string[]} config.defaults - The default values for the arguments.
              */
             this.formBlock({
-                name: t("set value"),
+                name: _("set value"),
                 args: 3,
                 argTypes: ["anyin", "anyin", "anyin"],
-                argLabels: [t("name"), this.lang === "ja" ? t("key2") : t("key"), t("value")],
-                defaults: [t("My Dictionary"), this.lang === "ja" ? t("key2") : t("key"), 0]
+                argLabels: [_("name"), this.lang === "ja" ? _("key2") : _("key"), _("value")],
+                defaults: [_("My Dictionary"), this.lang === "ja" ? _("key2") : _("key"), 0]
             });
         }
 
@@ -336,7 +336,7 @@ function setupDictBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                t("The Get-dict block returns a value in the dictionary for a specified key."),
+                _("The Get-dict block returns a value in the dictionary for a specified key."),
                 "documentation",
                 ""
             ]);
@@ -351,10 +351,10 @@ function setupDictBlocks(activity) {
              */
             this.formBlock({
                 //.TRANS: retrieve a value from the dictionary with a given key
-                name: t("get value"),
+                name: _("get value"),
                 args: 1,
                 argTypes: ["anyin"],
-                defaults: [this.lang === "ja" ? t("key2") : t("key")]
+                defaults: [this.lang === "ja" ? _("key2") : _("key")]
             });
         }
 
@@ -408,7 +408,7 @@ function setupDictBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                t("The Set-dict block sets a value in the dictionary for a specified key."),
+                _("The Set-dict block sets a value in the dictionary for a specified key."),
                 "documentation",
                 ""
             ]);
@@ -424,11 +424,11 @@ function setupDictBlocks(activity) {
              */
             this.formBlock({
                 //.TRANS: set a value in the dictionary for a given key
-                name: t("set value"),
+                name: _("set value"),
                 args: 2,
                 argTypes: ["anyin", "anyin"],
-                argLabels: [this.lang === "ja" ? t("key2") : t("key"), t("value")],
-                defaults: [this.lang === "ja" ? t("key2") : t("key"), 0]
+                argLabels: [this.lang === "ja" ? _("key2") : _("key"), _("value")],
+                defaults: [this.lang === "ja" ? _("key2") : _("key"), 0]
             });
         }
 

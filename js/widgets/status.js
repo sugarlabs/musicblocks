@@ -140,12 +140,12 @@ class StatusMatrix {
                     label = this.activity.blocks.blockList[statusField[0]].privateData;
                     break;
                 case "heap":
-                    label = t("heap");
+                    label = _("heap");
                     break;
                 case "bpm":
                 case "bpmfactor":
                     if (localStorage.languagePreference === "ja") {
-                        label = t("beats per minute2");
+                        label = _("beats per minute2");
                     } else {
                         label = this.activity.blocks.blockList[statusField[0]].protoblock
                             .staticLabels[0];
@@ -183,7 +183,7 @@ class StatusMatrix {
             cell = row.insertCell();
             cell.style.fontSize =
                 Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
-            const str = t("note");
+            const str = _("note");
             const label = str.charAt(0).toUpperCase() + str.slice(1);
             cell.innerHTML = `&nbsp;<b>${label}</b>`;
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";

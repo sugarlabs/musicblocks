@@ -169,7 +169,7 @@ The color of the block is defined by the palette used.
 4. To designate a block for `beginnerMode`, add
 `this.beginnerBlock(true);` to the constructor.
 
-5. To add a help string, add `this.setHelpString([t('some block
+5. To add a help string, add `this.setHelpString([_('some block
 help'), 'documentation', null, 'macroname']);` to the constructor. The
 first element in the list is the help string itself. The second
 element is the subdirectory where the help artwork is found. The third
@@ -259,7 +259,7 @@ An arg block:
   class TranspositionFactorBlock extends ValueBlock {
     constructor() {
         //.TRANS: musical transposition (adjustment of pitch up or down)
-        super('transpositionfactor', t('transposition'));
+        super('transpositionfactor', _('transposition'));
         this.setPalette('pitch');
         this.hidden = true;
     }
@@ -307,7 +307,7 @@ class StartDrumBlock extends StartBlock {
         super();
         this.changeName('startdrum');
 
-        this.formBlock({ name: t('start drum') });
+        this.formBlock({ name: _('start drum') });
 
         this.makeMacro((x, y) => [
             [0, 'start', x, y, [null, 1, null]],
@@ -331,9 +331,9 @@ class StartDrumBlock extends StartBlock {
 
         //.TRANS: dispatch an event to trigger a listener
         this.formBlock({
-            name: t('broadcast'),
+            name: _('broadcast'),
             args: 1,
-            defaults: [t('event')],
+            defaults: [_('event')],
             argTypes: ['textin'],
         });
     }
@@ -362,7 +362,7 @@ class StartDrumBlock extends StartBlock {
         this.setPalette('graphics');
 
         this.formBlock({
-            name: this.lang === 'ja' ? t('x3') : t('x')
+            name: this.lang === 'ja' ? _('x3') : _('x')
         });
     }
 
@@ -391,7 +391,7 @@ class StartDrumBlock extends StartBlock {
 
 `formBlock` is a method of `BaseBlock`. This function takes a JSON-like object describing the visual appearance of the block, its arguments etc. The format of that object is as follows:
 
-1. `name` : This specifies the display name on the block. Typically it is of the format  `t('...')`.
+1. `name` : This specifies the display name on the block. Typically it is of the format  `_('...')`.
 
 Note: If the `name` is omitted or is set to an empty string, a second argument of `false` should be passed to `formBlock` or else it will resize the block to fit the non-existent text.
 
@@ -431,7 +431,7 @@ class MakeBlockBlock extends LeftBlock {
 
         this.formBlock({
             //.TRANS: Create a new block programmatically.
-            name: t('make block'),
+            name: _('make block'),
             args: 1,
 	    argTypes: ['anyin'],
             outType: 'numberout',
@@ -440,7 +440,7 @@ class MakeBlockBlock extends LeftBlock {
 		types: ['anyin'],
 		labels: ['']
             },
-            defaults: [t('note')]
+            defaults: [_('note')]
         });
     }
 }
@@ -509,7 +509,7 @@ In order to set up a new synth effect:
   [rubrics.js](https://github.com/sugarlabs/musicblocks/blob/master/js/rubrics.js)
 
 * As mentioned above, if you are adding user-facing strings, be sure
-  to add them in this format: `t('string')` This allows the string to
+  to add them in this format: `_('string')` This allows the string to
   be set up for translation into other languages.
 
 * Before processing the notes, you need to check if the argument is present

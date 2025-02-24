@@ -170,7 +170,7 @@ function setupVolumeActions(activity) {
         static setMasterVolume(volume, turtle, blk) {
             volume = Math.max(Math.min(volume, 100), 0);
 
-            if (volume === 0) activity.errorMsg(t("Setting volume to 0."), blk);
+            if (volume === 0) activity.errorMsg(_("Setting volume to 0."), blk);
 
             if(Singer.masterVolume.length === 2) {  
                 Singer.masterVolume.pop();
@@ -219,9 +219,9 @@ function setupVolumeActions(activity) {
             const firstConnection = activity.logo.blockList[blk].connections[0];
             const lastConnection = last(activity.logo.blockList[blk].connections);
 
-            if (synthname === DEFAULTVOICE || synthname === t(DEFAULTVOICE)) {
+            if (synthname === DEFAULTVOICE || synthname === _(DEFAULTVOICE)) {
                 synth = DEFAULTVOICE;
-            } else if (synthname === "custom" || synthname === t("custom")) {
+            } else if (synthname === "custom" || synthname === _("custom")) {
                 synth = "custom";
             }
 

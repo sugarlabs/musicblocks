@@ -27,7 +27,7 @@ function setupPenBlocks(activity) {
          * Constructor for creating a PurpleBlock.
          */
         constructor() {
-            super("purple", t("purple"));
+            super("purple", _("purple"));
             // Set the palette for the pen activity.
             this.setPalette("pen", activity);
             // Set the help string.
@@ -45,7 +45,7 @@ function setupPenBlocks(activity) {
      */
     class BlueBlock extends FlowBlock {
         constructor() {
-            super("blue", t("blue"));
+            super("blue", _("blue"));
             this.setPalette("pen", activity);
             this.setHelpString();
 
@@ -61,7 +61,7 @@ function setupPenBlocks(activity) {
      */
     class GreenBlock extends FlowBlock {
         constructor() {
-            super("green", t("green"));
+            super("green", _("green"));
             this.setPalette("pen", activity);
             this.setHelpString();
 
@@ -77,7 +77,7 @@ function setupPenBlocks(activity) {
      */
     class YellowBlock extends FlowBlock {
         constructor() {
-            super("yellow", t("yellow"));
+            super("yellow", _("yellow"));
             this.setPalette("pen", activity);
             this.setHelpString();
 
@@ -93,7 +93,7 @@ function setupPenBlocks(activity) {
      */
     class OrangeBlock extends FlowBlock {
         constructor() {
-            super("orange", t("orange"));
+            super("orange", _("orange"));
             this.setPalette("pen", activity);
             this.setHelpString();
 
@@ -109,7 +109,7 @@ function setupPenBlocks(activity) {
      */
     class RedBlock extends FlowBlock {
         constructor() {
-            super("red", t("red"));
+            super("red", _("red"));
             this.setPalette("pen", activity);
             this.setHelpString();
 
@@ -125,7 +125,7 @@ function setupPenBlocks(activity) {
      */
     class WhiteBlock extends FlowBlock {
         constructor() {
-            super("white", t("white"));
+            super("white", _("white"));
             this.setPalette("pen", activity);
             this.setHelpString();
 
@@ -141,7 +141,7 @@ function setupPenBlocks(activity) {
      */
     class BlackBlock extends FlowBlock {
         constructor() {
-            super("black", t("black"));
+            super("black", _("black"));
             this.setPalette("pen", activity);
             this.setHelpString();
 
@@ -160,7 +160,7 @@ function setupPenBlocks(activity) {
          * Constructor for creating a BeginFillBlock.
          */
         constructor() {
-            super("beginfill", t("begin fill"));
+            super("beginfill", _("begin fill"));
             // Set the palette for the pen activity.
             this.setPalette("pen", activity);
             // Set the help string.
@@ -185,7 +185,7 @@ function setupPenBlocks(activity) {
      */
     class EndFillBlock extends FlowBlock {
         constructor() {
-            super("endfill", t("end fill"));
+            super("endfill", _("end fill"));
             this.setPalette("pen", activity);
             this.setHelpString();
             this.hidden = true;
@@ -205,7 +205,7 @@ function setupPenBlocks(activity) {
          */
         constructor() {
             //.TRANS: set the background color
-            super("fillscreen", t("background"));
+            super("fillscreen", _("background"));
             // Set the palette for the pen activity.
             this.setPalette("pen", activity);
             // Set the help string.
@@ -250,7 +250,7 @@ function setupPenBlocks(activity) {
          * Constructor for creating a GreyBlock.
          */
         constructor() {
-            super("grey", t("grey"));
+            super("grey", _("grey"));
             // Set the palette for the pen activity.
             this.setPalette("pen", activity);
             // Indicates whether the block is a parameter.
@@ -258,7 +258,7 @@ function setupPenBlocks(activity) {
 
             // Set the help string for the block.
             this.setHelpString([
-                t("The Grey block returns the current pen grey value."),
+                _("The Grey block returns the current pen grey value."),
                 "documentation",
                 ""
             ]);
@@ -316,14 +316,14 @@ function setupPenBlocks(activity) {
          * Constructor for creating a ShadeBlock.
          */
         constructor() {
-            super("shade", t("shade"));
+            super("shade", _("shade"));
             // Set the palette for the pen activity.
             this.setPalette("pen", activity);
             // Indicates whether the block is a parameter.
             this.parameter = true;
             // Set the help string for the block.
             this.setHelpString([
-                t("The Shade block returns the current pen shade value."),
+                _("The Shade block returns the current pen shade value."),
                 "documentation",
                 ""
             ]);
@@ -381,7 +381,7 @@ function setupPenBlocks(activity) {
          * Constructor for creating a ColorBlock.
          */
         constructor() {
-            super("color", t("color"));
+            super("color", _("color"));
             // Set the palette for the pen activity.
             this.setPalette("pen", activity);
             // Marks the block as a beginner block.
@@ -391,7 +391,7 @@ function setupPenBlocks(activity) {
 
             // Set the help string for the block.
             this.setHelpString([
-                t("The Color block returns the current pen color."),
+                _("The Color block returns the current pen color."),
                 "documentation",
                 ""
             ]);
@@ -446,11 +446,11 @@ function setupPenBlocks(activity) {
      */
     class PenSizeBlock extends ValueBlock {
         constructor() {
-            super("pensize", t("pen size"));
+            super("pensize", _("pen size"));
             this.setPalette("pen", activity);
             this.parameter = true;
             this.setHelpString([
-                t("The Pen size block returns the current pen size value."),
+                _("The Pen size block returns the current pen size value."),
                 "documentation",
                 ""
             ]);
@@ -489,12 +489,12 @@ function setupPenBlocks(activity) {
          * Constructor for creating a SetFontBlock.
          */
         constructor() {
-            super("setfont", t("set font"));
+            super("setfont", _("set font"));
             // Set the palette for the pen activity.
             this.setPalette("pen", activity);
             // Set the help string for the block.
             this.setHelpString([
-                t("The Set font block sets the font used by the Show block."),
+                _("The Set font block sets the font used by the Show block."),
                 "documentation",
                 ""
             ]);
@@ -534,14 +534,14 @@ function setupPenBlocks(activity) {
          * Constructor for creating a BackgroundBlock.
          */
         constructor() {
-            super("background", t("background"));
+            super("background", _("background"));
             // Set the palette for the pen activity.
             this.setPalette("pen", activity);
             // Marks the block as a beginner block.
             this.beginnerBlock(true);
             // Set the help string for the block.
             this.setHelpString([
-                t("The Background block sets the window background color."),
+                _("The Background block sets the window background color."),
                 "documentation",
                 ""
             ]);
@@ -572,7 +572,7 @@ function setupPenBlocks(activity) {
             this.setPalette("pen", activity);
             // Set the help string for the block.
             this.setHelpString([
-                t("The Hollow line block creates a line with a hollow center."),
+                _("The Hollow line block creates a line with a hollow center."),
                 "documentation",
                 ""
             ]);
@@ -580,7 +580,7 @@ function setupPenBlocks(activity) {
             // Create a form block with name "hollow line".
             this.formBlock({
                 //.TRANS: draw a line logo has a hollow space down its center
-                name: t("hollow line")
+                name: _("hollow line")
             });
 
             // Create a macro for the block.
@@ -649,7 +649,7 @@ function setupPenBlocks(activity) {
 
             // Set the help string for the block.
             this.setHelpString([
-                t("The Fill block fills in a shape with a color."),
+                _("The Fill block fills in a shape with a color."),
                 "documentation",
                 null,
                 "fillhelp"
@@ -658,7 +658,7 @@ function setupPenBlocks(activity) {
             // Create a form block with name "fill".
             this.formBlock({
                 //.TRANS: fill in as a solid color
-                name: t("fill")
+                name: _("fill")
             });
 
             // Create a macro for the block.
@@ -735,14 +735,14 @@ function setupPenBlocks(activity) {
          */
         constructor() {
             //.TRANS: raise up the pen so logo it does not draw when it is moved
-            super("penup", t("pen up"));
+            super("penup", _("pen up"));
             // Set the palette for the pen activity.
             this.setPalette("pen", activity);
             // Marks the block as a beginner block.
             this.beginnerBlock(true);
             // Set the help string for the block.
             this.setHelpString([
-                t("The Pen-up block raises the pen so that it does not draw."),
+                _("The Pen-up block raises the pen so that it does not draw."),
                 "documentation",
                 ""
             ]);
@@ -776,7 +776,7 @@ function setupPenBlocks(activity) {
          */
         constructor() {
             //.TRANS: put down the pen so logo it draws when it is moved
-            super("pendown", t("pen down"));
+            super("pendown", _("pen down"));
             // Set the palette for the pen activity.
             this.setPalette("pen", activity);
             // Marks the block as a beginner block.
@@ -784,7 +784,7 @@ function setupPenBlocks(activity) {
 
             // Set the help string for the block.
             this.setHelpString([
-                t("The Pen-down block lowers the pen so that it draws."),
+                _("The Pen-down block lowers the pen so that it draws."),
                 "documentation",
                 ""
             ]);
@@ -818,7 +818,7 @@ function setupPenBlocks(activity) {
          */
         constructor() {
             //.TRANS: set the width of the line drawn by the pen
-            super("setpensize", t("set pen size"));
+            super("setpensize", _("set pen size"));
             // Set the palette for the pen activity.
             this.setPalette("pen", activity);
             // Define piemenu values for pen size.
@@ -828,7 +828,7 @@ function setupPenBlocks(activity) {
 
             // Set the help string for the block.
             this.setHelpString([
-                t("The Set-pen-size block changes the size of the pen."),
+                _("The Set-pen-size block changes the size of the pen."),
                 "documentation",
                 ""
             ]);
@@ -887,7 +887,7 @@ function setupPenBlocks(activity) {
          */
         constructor() {
             //.TRANS: set degree of translucence of the pen color
-            super("settranslucency", t("set translucency"));
+            super("settranslucency", _("set translucency"));
             // Set the palette for the pen activity.
             this.setPalette("pen", activity);
             // Define piemenu values for translucency.
@@ -895,7 +895,7 @@ function setupPenBlocks(activity) {
 
             // Set the help string for the block.
             this.setHelpString([
-                t("The Set translucency block changes the opacity of the pen."),
+                _("The Set translucency block changes the opacity of the pen."),
                 "documentation",
                 ""
             ]);
@@ -955,7 +955,7 @@ function setupPenBlocks(activity) {
          * Constructor for creating a SetHueBlock.
          */
         constructor() {
-            super("sethue", t("set hue"));
+            super("sethue", _("set hue"));
             // Set the palette for the pen activity.
             this.setPalette("pen", activity);
             // Define piemenu values for hue.
@@ -963,7 +963,7 @@ function setupPenBlocks(activity) {
 
             // Set the help string for the block.
             this.setHelpString([
-                t("The Set hue block changes the color of the pen."),
+                _("The Set hue block changes the color of the pen."),
                 "documentation",
                 ""
             ]);
@@ -1021,7 +1021,7 @@ function setupPenBlocks(activity) {
          * Constructor for creating a SetShadeBlock.
          */
         constructor() {
-            super("setshade", t("set shade"));
+            super("setshade", _("set shade"));
             // Set the palette for the pen activity.
             this.setPalette("pen", activity);
             // Define piemenu values for shade selection.
@@ -1031,7 +1031,7 @@ function setupPenBlocks(activity) {
 
             // Set the help string for the block.
             this.setHelpString([
-                t("The Set-shade block changes the pen color from dark to light."),
+                _("The Set-shade block changes the pen color from dark to light."),
                 "documentation",
                 ""
             ]);
@@ -1085,7 +1085,7 @@ function setupPenBlocks(activity) {
          */
         constructor() {
             //.TRANS: set the level of vividness of the pen color
-            super("setgrey", t("set grey"));
+            super("setgrey", _("set grey"));
             // Set the palette for the pen activity.
             this.setPalette("pen", activity);
             // Define piemenu values for grey level selection.
@@ -1093,7 +1093,7 @@ function setupPenBlocks(activity) {
 
             // Set the help string for the block.
             this.setHelpString([
-                t("The Set grey block changes the vividness of the pen color."),
+                _("The Set grey block changes the vividness of the pen color."),
                 "documentation",
                 ""
             ]);
@@ -1146,7 +1146,7 @@ function setupPenBlocks(activity) {
          * Constructor for creating a SetColorBlock.
          */
         constructor() {
-            super("setcolor", t("set color"));
+            super("setcolor", _("set color"));
             // Set the palette for the pen activity.
             this.setPalette("pen", activity);
             // Define piemenu values for color selection.
@@ -1156,7 +1156,7 @@ function setupPenBlocks(activity) {
 
             // Set the help string for the block.
             this.setHelpString([
-                t("The Set-color block changes the pen color."),
+                _("The Set-color block changes the pen color."),
                 "documentation",
                 ""
             ]);

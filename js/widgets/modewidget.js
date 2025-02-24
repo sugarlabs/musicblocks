@@ -74,7 +74,7 @@ class ModeWidget {
         this._playButton = this.widgetWindow.addButton(
             "play-button.svg",
             ModeWidget.ICONSIZE,
-            t("Play")
+            _("Play")
         );
         this._playButton.onclick = () => {
             this.activity.logo.resetSynth(0);
@@ -84,8 +84,8 @@ class ModeWidget {
                 this._playButton.innerHTML =
                     `&nbsp;&nbsp;<img 
                         src="header-icons/play-button.svg" 
-                        title="${t("Play all")}" 
-                        alt="${t("Play all")}" 
+                        title="${_("Play all")}" 
+                        alt="${_("Play all")}" 
                         height="${ModeWidget.ICONSIZE}" 
                         width="${ModeWidget.ICONSIZE}" 
                         vertical-align="middle"
@@ -96,8 +96,8 @@ class ModeWidget {
                 this._playButton.innerHTML =
                     `&nbsp;&nbsp;<img 
                         src="header-icons/stop-button.svg" 
-                        title="${t("Stop")}" 
-                        alt="${t("Stop")}" 
+                        title="${_("Stop")}" 
+                        alt="${_("Stop")}" 
                         height="${ModeWidget.ICONSIZE}" 
                         width="${ModeWidget.ICONSIZE}" 
                         vertical-align="middle"
@@ -110,37 +110,37 @@ class ModeWidget {
         this.widgetWindow.addButton(
             "export-chunk.svg",
             ModeWidget.ICONSIZE,
-            t("Save")
+            _("Save")
         ).onclick = this._save.bind(this);
 
         this.widgetWindow.addButton(
             "erase-button.svg",
             ModeWidget.ICONSIZE,
-            t("Clear")
+            _("Clear")
         ).onclick = this._clear.bind(this);
 
         this.widgetWindow.addButton(
             "rotate-left.svg",
             ModeWidget.ICONSIZE,
-            t("Rotate counter clockwise")
+            _("Rotate counter clockwise")
         ).onclick = this._rotateLeft.bind(this);
 
         this.widgetWindow.addButton(
             "rotate-right.svg",
             ModeWidget.ICONSIZE,
-            t("Rotate clockwise")
+            _("Rotate clockwise")
         ).onclick = this._rotateRight.bind(this);
 
         this.widgetWindow.addButton(
             "invert.svg",
             ModeWidget.ICONSIZE,
-            t("Invert")
+            _("Invert")
         ).onclick = this._invert.bind(this);
 
         this.widgetWindow.addButton(
             "restore-button.svg",
             ModeWidget.ICONSIZE,
-            t("Undo")
+            _("Undo")
         ).onclick = this._undo.bind(this);
 
         this._piemenuMode();
@@ -158,7 +158,7 @@ class ModeWidget {
         this._setMode();
 
         //.TRANS: A circle of notes represents the musical mode.
-        activity.textMsg(t("Click in the circle to select notes for the mode."), 3000);
+        activity.textMsg(_("Click in the circle to select notes for the mode."), 3000);
         setTimeout(this.widgetWindow.sendToCenter, 0);
     }
 
@@ -244,8 +244,8 @@ class ModeWidget {
         const table = docById("modeTable");
         const n = table.rows.length - 1;
 
-        // console.debug(t(currentModeName[1]));
-        const name = currentModeName[0] + " " + t(currentModeName[1]);
+        // console.debug(_(currentModeName[1]));
+        const name = currentModeName[0] + " " + _(currentModeName[1]);
         table.rows[n].cells[0].innerHTML = name;
         this.widgetWindow.updateTitle(name);
 
@@ -636,8 +636,8 @@ class ModeWidget {
                     this._playButton.innerHTML =
                         `&nbsp;&nbsp;<img 
                             src="header-icons/play-button.svg" 
-                            title="${t("Play all")}" 
-                            alt="${t("Play all")}" 
+                            title="${_("Play all")}" 
+                            alt="${_("Play all")}" 
                             height="${ModeWidget.ICONSIZE}" 
                             width="${ModeWidget.ICONSIZE}" 
                             vertical-align="middle"
@@ -705,8 +705,8 @@ class ModeWidget {
                     this._playButton.innerHTML =
                         `&nbsp;&nbsp;<img 
                             src="header-icons/play-button.svg" 
-                            title="${t("Play all")}" 
-                            alt="${t("Play all")}" 
+                            title="${_("Play all")}" 
+                            alt="${_("Play all")}" 
                             height="${ModeWidget.ICONSIZE}" 
                             width="${ModeWidget.ICONSIZE}" 
                             vertical-align="middle"
@@ -871,17 +871,17 @@ class ModeWidget {
                     for (const i in this.activity.blocks.blockList) {
                         if (this.activity.blocks.blockList[i].name == "modename") {
                             this.activity.blocks.blockList[i].value = mode;
-                            this.activity.blocks.blockList[i].text.text = t(mode);
+                            this.activity.blocks.blockList[i].text.text = _(mode);
                             this.activity.blocks.blockList[i].updateCache();
                         } else if (this.activity.blocks.blockList[i].name == "notename") {
                             this.activity.blocks.blockList[i].value = currentKey;
-                            this.activity.blocks.blockList[i].text.text = t(currentKey);
+                            this.activity.blocks.blockList[i].text.text = _(currentKey);
                         }
                     }
                     this.activity.refreshCanvas();
                 }
 
-                const name = currentKey + " " + t(mode);
+                const name = currentKey + " " + _(mode);
                 table.rows[n].cells[0].innerHTML = name;
                 this.widgetWindow.updateTitle(name);
                 return;
@@ -910,7 +910,7 @@ class ModeWidget {
 
         let modeName = table.rows[n].cells[0].innerHTML;
         if (modeName === "") {
-            modeName = t("custom");
+            modeName = _("custom");
         }
 
         // Save a stack of pitches to be used with the matrix.
@@ -1008,7 +1008,7 @@ class ModeWidget {
         // Create a new stack for the chunk.
         // console.debug(newStack);
         this.activity.blocks.loadNewBlocks(newStack);
-        activity.textMsg(t("New action block generated."), 3000);
+        activity.textMsg(_("New action block generated."), 3000);
 
         // And save a stack of pitchnumbers to be used with the define mode
         newStack = [

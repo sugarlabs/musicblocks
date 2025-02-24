@@ -40,7 +40,7 @@ let LOGODEFAULT;
 let LOGOJA1 = LOGODEFAULT;
 let LOGOJA = LOGODEFAULT;
 //.TRANS: put the URL to the guide here, e.g., https://github.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md
-let GUIDEURL = t("guide url");
+let GUIDEURL = _("guide url");
 let NUMBERBLOCKDEFAULT;
 let DEFAULTPALETTE;
 let DATAOBJS;
@@ -85,7 +85,7 @@ let MULTIPALETTEICONS;
 let MULTIPALETTENAMES;
 
 if (_THIS_IS_TURTLE_BLOCKS_) {
-    TITLESTRING = t("Turtle Blocks");
+    TITLESTRING = _("Turtle Blocks");
 
     // We don't include "extras" since we want to be able to delete
     // plugins from the extras palette.
@@ -118,32 +118,32 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
     ];
 
     BUILTINPALETTESFORL23N = [
-        t("search"),
-        t("rhythm"),
-        t("meter"),
-        t("pitch"),
-        t("intervals"),
-        t("tone"),
-        t("ornament"),
-        t("volume"),
-        t("drum"),
-        t("flow"),
-        t("action"),
-        t("boxes"),
-        t("widgets"),
-        t("graphics"),
-        t("pen"),
-        t("number"),
-        t("boolean"),
-        t("Media").toLowerCase(),
-        t("Sensors").toLowerCase(),
-        t("heap"),
-        t("dictionary"),
-        t("ensemble"),
-        t("extras"),
+        _("search"),
+        _("rhythm"),
+        _("meter"),
+        _("pitch"),
+        _("intervals"),
+        _("tone"),
+        _("ornament"),
+        _("volume"),
+        _("drum"),
+        _("flow"),
+        _("action"),
+        _("boxes"),
+        _("widgets"),
+        _("graphics"),
+        _("pen"),
+        _("number"),
+        _("boolean"),
+        _("Media").toLowerCase(),
+        _("Sensors").toLowerCase(),
+        _("heap"),
+        _("dictionary"),
+        _("ensemble"),
+        _("extras"),
         //.TRANS: program as in computer program
-        t("program"),
-        t("my blocks")
+        _("program"),
+        _("my blocks")
     ];
 
     // We put the palette buttons into groups.
@@ -185,9 +185,9 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
 
     // Icons used to select between multipalettes.
     MULTIPALETTEICONS = ["artwork", "logic", "music"];
-    MULTIPALETTENAMES = [t("artwork"), t("logic"), t("Music").toLowerCase()];
+    MULTIPALETTENAMES = [_("artwork"), _("logic"), _("Music").toLowerCase()];
 } else {
-    TITLESTRING = t("Music Blocks");
+    TITLESTRING = _("Music Blocks");
     // We don't include "extras" since we want to be able to delete
     // plugins from the extras palette.
     BUILTINPALETTES = [
@@ -219,31 +219,31 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
     ];
 
     BUILTINPALETTESFORL23N = [
-        t("search"),
-        t("rhythm"),
-        t("meter"),
-        t("pitch"),
-        t("intervals"),
-        t("tone"),
-        t("ornament"),
-        t("volume"),
-        t("drum"),
-        t("flow"),
-        t("action"),
-        t("boxes"),
-        t("widgets"),
-        t("graphics"),
-        t("pen"),
-        t("number"),
-        t("boolean"),
-        t("Media").toLowerCase(),
-        t("Sensors").toLowerCase(),
-        t("heap"),
-        t("dictionary"),
-        t("ensemble"),
-        t("extras"),
-        t("program"),
-        t("my blocks")
+        _("search"),
+        _("rhythm"),
+        _("meter"),
+        _("pitch"),
+        _("intervals"),
+        _("tone"),
+        _("ornament"),
+        _("volume"),
+        _("drum"),
+        _("flow"),
+        _("action"),
+        _("boxes"),
+        _("widgets"),
+        _("graphics"),
+        _("pen"),
+        _("number"),
+        _("boolean"),
+        _("Media").toLowerCase(),
+        _("Sensors").toLowerCase(),
+        _("heap"),
+        _("dictionary"),
+        _("ensemble"),
+        _("extras"),
+        _("program"),
+        _("my blocks")
     ];
 
     // We put the palette buttons into groups.
@@ -279,7 +279,7 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
 
     // Icons used to select between multipalettes.
     MULTIPALETTEICONS = ["music", "logic", "artwork"];
-    MULTIPALETTENAMES = [t("Music").toLowerCase(), t("logic"), t("artwork")];
+    MULTIPALETTENAMES = [_("Music").toLowerCase(), _("logic"), _("artwork")];
 }
 
 const getMainToolbarButtonNames = (name) => {
@@ -434,25 +434,25 @@ const createHelpContent = (activity) => {
     if (_THIS_IS_TURTLE_BLOCKS_) {
         HELPCONTENT = [
             [
-                t("Welcome to Turtle Blocks"),
-                t("Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks.") +
-                    t("The current version is") +
+                _("Welcome to Turtle Blocks"),
+                _("Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks.") +
+                    _("The current version is") +
                     " " +
                     VERSION,
                 "data:image/svg+xml;base64," +
                     window.btoa(base64Encode(LOGO))
             ],
             [
-                t("Play"),
-                t("Click the run button to run the project in fast mode."),
+                _("Play"),
+                _("Click the run button to run the project in fast mode."),
                 "data:image/svg+xml;base64," +
                     window.btoa(base64Encode(RUNBUTTON))
             ],
             [
-                t("Stop"),
-                t("Stop the turtle.") +
+                _("Stop"),
+                _("Stop the turtle.") +
                     " " +
-                    t("You can also type Alt-S to stop."),
+                    _("You can also type Alt-S to stop."),
                 "data:image/svg+xml;base64," +
                     window.btoa(base64Encode(STOPTURTLEBUTTON))
             ]
@@ -460,44 +460,44 @@ const createHelpContent = (activity) => {
     } else {
         HELPCONTENT = [
             [
-                t("Welcome to Music Blocks"),
-                t("Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way.") +
+                _("Welcome to Music Blocks"),
+                _("Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way.") +
                     " " +
-                    t("The current version is") +
+                    _("The current version is") +
                     " " +
                     VERSION,
                 "data:image/svg+xml;base64," +
                     window.btoa(base64Encode(LOGO))
             ],
             [
-                t("Meet Mr. Mouse!"),
-                t("Mr Mouse is our Music Blocks conductor.") +
+                _("Meet Mr. Mouse!"),
+                _("Mr Mouse is our Music Blocks conductor.") +
                     " " +
-                    t("Mr Mouse encourages you to explore Music Blocks.") +
+                    _("Mr Mouse encourages you to explore Music Blocks.") +
                     " " +
-                    t("Let us start our tour!"),
+                    _("Let us start our tour!"),
                 "data:image/svg+xml;base64," +
                     window.btoa(base64Encode(MOUSEPALETTEICON))
             ],            
             [
-                t("Guide"),
-                t("A detailed guide to Music Blocks is available."),
+                _("Guide"),
+                _("A detailed guide to Music Blocks is available."),
                 "data:image/svg+xml;base64," +
                     window.btoa(base64Encode(LOGO)),
                 GUIDEURL,
-                t("Music Blocks Guide")
+                _("Music Blocks Guide")
             ],
             [
-                t("Play"),
-                t("Click the run button to run the project in fast mode."),
+                _("Play"),
+                _("Click the run button to run the project in fast mode."),
                 "data:image/svg+xml;base64," +
                     window.btoa(base64Encode(RUNBUTTON))
             ],
             [
-                t("Stop"),
-                t("Stop the music (and the mice).") +
+                _("Stop"),
+                _("Stop the music (and the mice).") +
                     " " +
-                    t("You can also type Alt-S to stop."),
+                    _("You can also type Alt-S to stop."),
                 "data:image/svg+xml;base64," +
                     window.btoa(base64Encode(STOPTURTLEBUTTON))
             ]
@@ -505,134 +505,134 @@ const createHelpContent = (activity) => {
     }
     if (!activity.beginnerMode) {        
         HELPCONTENT.push([
-            t("Record"),
-            t("Record your project as video."),
+            _("Record"),
+            _("Record your project as video."),
             "data:image/svg+xml;base64," +
                 window.btoa(base64Encode(RECORDHELPBUTTON))
         ]);
     }
     HELPCONTENT.push([
-        t("Toggle Fullscreen"),
-        t("Toggle Fullscreen mode."),
+        _("Toggle Fullscreen"),
+        _("Toggle Fullscreen mode."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(FULLSCREENBUTTON))
     ]);
     HELPCONTENT.push([
-        t("New project"),
-        t("Initialize a new project."),
+        _("New project"),
+        _("Initialize a new project."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(NEWBUTTON))
     ]);
     HELPCONTENT.push([
-        t("Load project from file"),
-        t("You can also load projects from the file system."),
+        _("Load project from file"),
+        _("You can also load projects from the file system."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(LOADBUTTON))
     ]);
     if (activity.beginnerMode) {
         HELPCONTENT.push([
-            t("Save project"),
-            t("Save project as HTML") +
+            _("Save project"),
+            _("Save project as HTML") +
             "<br/>" +
-            t("Save mouse artwork as PNG"),
+            _("Save mouse artwork as PNG"),
             "data:image/svg+xml;base64," +
                 window.btoa(base64Encode(SAVEBUTTON))
         ]);
     } else {
         if (_THIS_IS_TURTLE_BLOCKS_) {
             HELPCONTENT.push([
-                t("Save"),
-                t("Save project") +
+                _("Save"),
+                _("Save project") +
                     ": " +
-                    t("Save your project to a file.") +
+                    _("Save your project to a file.") +
                     "<br/><br/>" +
-                    t("Save turtle artwork as SVG") +
+                    _("Save turtle artwork as SVG") +
                     ": " +
-                    t("Save graphics from your project to as SVG.") +
+                    _("Save graphics from your project to as SVG.") +
                     "<br/><br/>" +
-                    t("Save turtle artwork as PNG") +
+                    _("Save turtle artwork as PNG") +
                     ": " +
-                    t("Save graphics from your project as PNG.") +
+                    _("Save graphics from your project as PNG.") +
                     "<br/><br/>" +
-                    t("Save block artwork as SVG") +
+                    _("Save block artwork as SVG") +
                     ": " +
-                    t("Save block artwork as an SVG file."),
+                    _("Save block artwork as an SVG file."),
                 "data:image/svg+xml;base64," +
                     window.btoa(base64Encode(SAVEBUTTON))
             ]);
         } else {
             HELPCONTENT.push([
-                t("Save project"),
-                t("Save project as HTML") +
+                _("Save project"),
+                _("Save project as HTML") +
                 "<br/>" +
-                t("Save project as MIDI") +
+                _("Save project as MIDI") +
                 "<br/>" +
-                t("Save music as WAV") +
+                _("Save music as WAV") +
                 "<br/>" +
-                t("Save sheet music as ABC, Lilypond or MusicXML") +
+                _("Save sheet music as ABC, Lilypond or MusicXML") +
                 "<br/>" +
-                t("Save block artwork as SVG or PNG"),
+                _("Save block artwork as SVG or PNG"),
                 "data:image/svg+xml;base64," +
                     window.btoa(base64Encode(SAVEBUTTON))
             ]);
         }
     }
     HELPCONTENT.push([
-        t("Load samples from server"),
-        t("This button opens a viewer for loading example projects."),
+        _("Load samples from server"),
+        _("This button opens a viewer for loading example projects."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(PLANETBUTTON))
     ]);    
     HELPCONTENT.push([
-        t("Expand/collapse option toolbar"),
-        t("Click this button to expand or collapse the auxillary toolbar."),
+        _("Expand/collapse option toolbar"),
+        _("Click this button to expand or collapse the auxillary toolbar."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(MENUBUTTON))
     ]);    
     HELPCONTENT.push([
-        t("Help"),
-        t("Displays help messages for the main and auxiliary toolbar, right-click contextual menu for blocks and canvas, and palettes."),
+        _("Help"),
+        _("Displays help messages for the main and auxiliary toolbar, right-click contextual menu for blocks and canvas, and palettes."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(HELPBUTTON))
     ]);
     HELPCONTENT.push([
-        t("Run slowly"),
-        t("Click to run the project in slow mode."),
+        _("Run slowly"),
+        _("Click to run the project in slow mode."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(SLOWBUTTON))
     ]);
     HELPCONTENT.push([
-        t("Run step by step"),
-        t("Click to run the project step by step."),
+        _("Run step by step"),
+        _("Click to run the project step by step."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(STEPBUTTON))
     ]);
     if (!activity.beginnerMode) {
         HELPCONTENT.push([
-            t("Display statistics"),
-            t("Display statistics about your Music project."),
+            _("Display statistics"),
+            _("Display statistics about your Music project."),
             "data:image/svg+xml;base64," +
                 window.btoa(base64Encode(STATSBUTTON))
         ]);
         HELPCONTENT.push([
-            t("Load plugin"),
-            t("Load a selected plugin."),
+            _("Load plugin"),
+            _("Load a selected plugin."),
             "data:image/svg+xml;base64," +
                 window.btoa(
                     base64Encode(PLUGINSBUTTON))
 
         ]);
         HELPCONTENT.push([
-            t("Delete plugin"),
-            t("Delete a selected plugin."),
+            _("Delete plugin"),
+            _("Delete a selected plugin."),
             "data:image/svg+xml;base64," +
                 window.btoa(
                     base64Encode(PLUGINSDELETEBUTTON))
 
         ]);
         HELPCONTENT.push([
-            t("Enable scrolling"),
-            t("You can scroll the blocks on the canvas."),
+            _("Enable scrolling"),
+            _("You can scroll the blocks on the canvas."),
             "data:image/svg+xml;base64," +
                 window.btoa(
                     base64Encode(SCROLLUNLOCKBUTTON))
@@ -640,220 +640,220 @@ const createHelpContent = (activity) => {
         ]);        
     }
     HELPCONTENT.push([
-        t("Change theme"),
-        t("Switch between dark and light mode."),
+        _("Change theme"),
+        _("Switch between dark and light mode."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(DARKMODEBUTTON))
     ]);
     HELPCONTENT.push([
-        t("Merge with current project"),
-        t("Click to add another project into the current one."),
+        _("Merge with current project"),
+        _("Click to add another project into the current one."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(OPENMERGEBUTTON))
     ]);
     HELPCONTENT.push([
-        t("Wrap Turtle"),
-        t("Turn Turtle wrapping On or Off."),
+        _("Wrap Turtle"),
+        _("Turn Turtle wrapping On or Off."),
         "data:image/svg+xml;base64," +
             window.btoa(
                 base64Encode(WRAPTURTLEBUTTON))
 
     ]);
     HELPCONTENT.push([
-        t("Set Pitch Preview"),
-        t("Click to set the current pitch."),
+        _("Set Pitch Preview"),
+        _("Click to set the current pitch."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(PITCHPREVIEWHELPBUTTON))
     ]);
     if (!activity.beginnerMode) {
         HELPCONTENT.push([
-            t("JavaScript Editor"),
-            t("Converts Music Block programs to JavaScript."),
+            _("JavaScript Editor"),
+            _("Converts Music Block programs to JavaScript."),
             "data:image/svg+xml;base64," +
                 window.btoa(base64Encode(JAVASCRIPTBUTTON))
         ]);
     }
     HELPCONTENT.push([
-        t("Restore"),
-        t("Restore blocks from the trash."),
+        _("Restore"),
+        _("Restore blocks from the trash."),
         "data:image/svg+xml;base64," +
             window.btoa(
                 base64Encode(RESTORETRASHBUTTON))
                             
     ]);
     HELPCONTENT.push([
-        t("Switch mode"),
-        t("Switch between beginner and advance modes."),
+        _("Switch mode"),
+        _("Switch between beginner and advance modes."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(ADVANCEDBUTTON))
     ]);
     HELPCONTENT.push([
-        t("Select language"),
-        t("Select your language preference."),
+        _("Select language"),
+        _("Select your language preference."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(LANGUAGEBUTTON))
     ]); 
     HELPCONTENT.push([
-        t("Contextual Menu for Blocks"),
-        t("Right-click on a block to access common actions."),
+        _("Contextual Menu for Blocks"),
+        _("Right-click on a block to access common actions."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(BLOCKMENUBUTTON))
     ]);
     HELPCONTENT.push([
-        t("Delete"),
-        t("To delete a block, right-click on it. Then you will see the delete option"),
+        _("Delete"),
+        _("To delete a block, right-click on it. Then you will see the delete option"),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(EMPTYTRASHCONFIRMBUTTON))
     ]);
     HELPCONTENT.push([
-        t("Copy"),
-        t("To copy a block, right-click on it. Then you will see the copy option"),
+        _("Copy"),
+        _("To copy a block, right-click on it. Then you will see the copy option"),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(COPYBUTTON))
     ]);
     HELPCONTENT.push([
-        t("Extract"),
-        t("To extract a block, right-click on it. Then you will see the extract option"),
+        _("Extract"),
+        _("To extract a block, right-click on it. Then you will see the extract option"),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(EXTRACTBUTTON))
     ]);
     if (_THIS_IS_MUSIC_BLOCKS_) {
         HELPCONTENT.push([
-            t("Keyboard shortcuts"),
-            t("You can type d to create a do block and r to create a re block etc."),
+            _("Keyboard shortcuts"),
+            _("You can type d to create a do block and r to create a re block etc."),
             "data:image/svg+xml;base64," +
                 window.btoa(base64Encode(SHORTCUTSBUTTON))
         ]);
     }
     if (!activity.beginnerMode) {
         HELPCONTENT.push([
-            t("Contextual Menu for Canvas"),
-            t("Right-click on the canvas to perform additional canvas-related tasks."),
+            _("Contextual Menu for Canvas"),
+            _("Right-click on the canvas to perform additional canvas-related tasks."),
             "data:image/svg+xml;base64," +
                 window.btoa(base64Encode(CANVASMENUBUTTON))
         ]);
     }
     HELPCONTENT.push([
-        t("Grid"),
-        t("Turn on/off lines for cartesian or polar grids.") +
+        _("Grid"),
+        _("Turn on/off lines for cartesian or polar grids.") +
         "<br/>" +
-        t("Turn on/off music staffs."),
+        _("Turn on/off music staffs."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(CARTESIANBUTTON))
     ]);
     HELPCONTENT.push([
-        t("Clear"),
-        t("Clear the screen and return the mice to their initial positions."),
+        _("Clear"),
+        _("Clear the screen and return the mice to their initial positions."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(CLEARBUTTON))
     ]);
     HELPCONTENT.push([
-        t("Collapse"),
-        t("Collapse the graphics window."),
+        _("Collapse"),
+        _("Collapse the graphics window."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(COLLAPSEBUTTON))
     ]);
     HELPCONTENT.push([
-        t("Home"),
-        t("Return all blocks to the center of the screen."),
+        _("Home"),
+        _("Return all blocks to the center of the screen."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(GOHOMEBUTTON))
     ]);
     HELPCONTENT.push([
-        t("Show/hide blocks"),
-        t("Hide or show the blocks and the palettes."),
+        _("Show/hide blocks"),
+        _("Hide or show the blocks and the palettes."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(HIDEBLOCKSBUTTON))
     ]);
     HELPCONTENT.push([
-        t("Expand/collapse blocks"),
-        t("Expand or collapse start and action stacks."),
+        _("Expand/collapse blocks"),
+        _("Expand or collapse start and action stacks."),
         "data:image/svg+xml;base64," +
             window.btoa(
                 base64Encode(COLLAPSEBLOCKSBUTTON))
             
     ]);
     HELPCONTENT.push([
-        t("Decrease block size"),
-        t("Decrease the size of the blocks."),
+        _("Decrease block size"),
+        _("Decrease the size of the blocks."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(SMALLERBUTTON))
     ]);
     HELPCONTENT.push([
-        t("Increase block size"),
-        t("Increase the size of the blocks."),
+        _("Increase block size"),
+        _("Increase the size of the blocks."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(BIGGERBUTTON))
     ]);    
     if (!activity.beginnerMode) {
         HELPCONTENT.push([
-            t("Select"),
-            t("Left-click and drag on workspace to select multiple blocks."),
+            _("Select"),
+            _("Left-click and drag on workspace to select multiple blocks."),
             "data:image/svg+xml;base64," +
                 window.btoa(base64Encode(SELECTHELPBUTTON))
         ]);
     }
     if (_THIS_IS_MUSIC_BLOCKS_) {
         HELPCONTENT.push([
-            t("Palette buttons"),
-            t("This toolbar contains the palette buttons including Rhythm Pitch Tone Action and more.") +
+            _("Palette buttons"),
+            _("This toolbar contains the palette buttons including Rhythm Pitch Tone Action and more.") +
                 " " +
-                t("Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."),
+                _("Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."),
             "data:image/svg+xml;base64," +
                 window.btoa(base64Encode(RHYTHMPALETTEHELPICON))
         ]);
     }
     if (_THIS_IS_TURTLE_BLOCKS_) {
         HELPCONTENT.push([
-            t("Guide"),
-            t("A detailed guide to Turtle Blocks is available."),
+            _("Guide"),
+            _("A detailed guide to Turtle Blocks is available."),
             "data:image/svg+xml;base64," +
                 window.btoa(base64Encode(LOGO)),
             GUIDEURL,
-            t("Turtle Blocks Guide")
+            _("Turtle Blocks Guide")
         ]);
         HELPCONTENT.push([
-            t("About"),
-            t("Turtle Blocks is an open source collection of tools for exploring musical concepts.") +
+            _("About"),
+            _("Turtle Blocks is an open source collection of tools for exploring musical concepts.") +
                 " " +
-                t("A full list of contributors can be found in the Turtle Blocks GitHub repository.") +
+                _("A full list of contributors can be found in the Turtle Blocks GitHub repository.") +
                 " " +
-                t("Turtle Blocks is licensed under the AGPL.") +
+                _("Turtle Blocks is licensed under the AGPL.") +
                 " " +
-                t("The current version is") +
+                _("The current version is") +
                 " " +
                 VERSION,
             "data:image/svg+xml;base64," +
                 window.btoa(base64Encode(LOGO)),
             "https://github.com/sugarlabs/turtleblocksjs",
-            t("Turtle Blocks GitHub repository")
+            _("Turtle Blocks GitHub repository")
         ]);
         HELPCONTENT.push([
-            t("Congratulations."),
-            t("You have finished the tour. Please enjoy Turtle Blocks!"),
+            _("Congratulations."),
+            _("You have finished the tour. Please enjoy Turtle Blocks!"),
             "data:image/svg+xml;base64," +
                 window.btoa(base64Encode(LOGO))
         ]);
     } else {
         HELPCONTENT.push([
-            t("About"),
-            t("Music Blocks is an open source collection of tools for exploring musical concepts.") +
+            _("About"),
+            _("Music Blocks is an open source collection of tools for exploring musical concepts.") +
                 " " +
-                t("A full list of contributors can be found in the Music Blocks GitHub repository.") +
+                _("A full list of contributors can be found in the Music Blocks GitHub repository.") +
                 " " +
-                t("Music Blocks is licensed under the AGPL.") +
+                _("Music Blocks is licensed under the AGPL.") +
                 " " +
-                t("The current version is") +
+                _("The current version is") +
                 " " +
                 VERSION,
             "data:image/svg+xml;base64," +
                 window.btoa(base64Encode(LOGO)),
             "https://github.com/sugarlabs/musicblocks",
-            t("Music Blocks GitHub repository")
+            _("Music Blocks GitHub repository")
         ]);
         HELPCONTENT.push([
-            t("Congratulations!"),
-            t("You have finished the tour. Please enjoy Music Blocks!"),
+            _("Congratulations!"),
+            _("You have finished the tour. Please enjoy Music Blocks!"),
             "data:image/svg+xml;base64," +
                 window.btoa(base64Encode(LOGO))
         ]);

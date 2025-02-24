@@ -100,7 +100,7 @@ class PitchSlider {
             this.widgetWindow.addButton(
                 "up.svg",
                 PitchSlider.ICONSIZE,
-                t("Move up"),
+                _("Move up"),
                 toolBarDiv
             ).onclick = () => {
                 slider.value = Math.min(slider.value * PitchSlider.SEMITONE, max); //value is a string
@@ -111,7 +111,7 @@ class PitchSlider {
             this.widgetWindow.addButton(
                 "down.svg",
                 PitchSlider.ICONSIZE,
-                t("Move down"),
+                _("Move down"),
                 toolBarDiv
             ).onclick = () => {
                 slider.value = Math.max(slider.value / PitchSlider.SEMITONE, min); //value is a string
@@ -122,7 +122,7 @@ class PitchSlider {
             this.widgetWindow.addButton(
                 "export-chunk.svg",
                 PitchSlider.ICONSIZE,
-                t("Save"),
+                _("Save"),
                 toolBarDiv
             ).onclick = () => {
                 this._save(this.frequencies[id]);
@@ -133,7 +133,7 @@ class PitchSlider {
             MakeToolbar(id);
         }
 
-        activity.textMsg(t("Click on the slider to create a note block."), 3000);
+        activity.textMsg(_("Click on the slider to create a note block."), 3000);
         setTimeout(this.widgetWindow.sendToCenter, 0);
     }
 

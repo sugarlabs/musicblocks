@@ -520,17 +520,17 @@ const PALS = [
 ];
 
 const PALLABELS = [
-    t("rhythm"),
-    t("pitch"),
-    t("tone"),
-    t("mouse"),
-    t("pen"),
-    t("number"),
-    t("flow"),
-    t("action"),
-    t("Sensors").toLowerCase(),
-    t("Media").toLowerCase(),
-    t("mice")
+    _("rhythm"),
+    _("pitch"),
+    _("tone"),
+    _("mouse"),
+    _("pen"),
+    _("number"),
+    _("flow"),
+    _("action"),
+    _("Sensors").toLowerCase(),
+    _("Media").toLowerCase(),
+    _("mice")
 ];
 
 const analyzeProject = (activity) => {

@@ -76,7 +76,7 @@ class Oscilloscope {
         const step = 1.333;
         this.zoomFactor = 40.0;
         this.verticalOffset = 0;
-        const zoomInButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, t("Zoom In"));
+        const zoomInButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, _("Zoom In"));
 
         zoomInButton.onclick = () => {
             this.zoomFactor *= step;
@@ -85,7 +85,7 @@ class Oscilloscope {
             base64Encode(BIGGERBUTTON)
         )}`;
 
-        const zoomOutButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, t("Zoom Out"));
+        const zoomOutButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, _("Zoom Out"));
 
         zoomOutButton.onclick = () => {
             this.zoomFactor /= step;

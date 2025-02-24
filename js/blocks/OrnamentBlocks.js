@@ -29,7 +29,7 @@ function setupOrnamentBlocks(activity) {
          */
         constructor() {
             // Call the constructor of the parent class (ValueBlock)
-            super("staccatofactor", t("staccato factor"));
+            super("staccatofactor", _("staccato factor"));
 
             /**
              * Indicates that this block is a parameter.
@@ -105,7 +105,7 @@ function setupOrnamentBlocks(activity) {
          */
         constructor() {
             // Call the constructor of the parent class (ValueBlock)
-            super("slurfactor", t("slur factor"));
+            super("slurfactor", _("slur factor"));
 
             /**
              * Sets the palette for the block.
@@ -214,10 +214,10 @@ function setupOrnamentBlocks(activity) {
              */
             this.formBlock({
                 //.TRANS: the neighbor refers to a neighboring note, e.g., D is a neighbor of C
-                name: t("neighbor") + " (+/–)",
+                name: _("neighbor") + " (+/–)",
                 args: 2,
                 defaults: [1, 1 / 16],
-                argLabels: [t("semi-tone interval"), t("note value")]
+                argLabels: [_("semi-tone interval"), _("note value")]
             });
 
             /**
@@ -290,7 +290,7 @@ function setupOrnamentBlocks(activity) {
              * @param {string[]} [] - An empty array since the help string is not specified.
              */
             this.setHelpString([
-                t("The Neighbor block rapidly switches between neighboring pitches."),
+                _("The Neighbor block rapidly switches between neighboring pitches."),
                 "documentation",
                 null,
                 "neighbor2help"
@@ -306,10 +306,10 @@ function setupOrnamentBlocks(activity) {
              * } - The block formation parameters.
              */
             this.formBlock({
-                name: t("neighbor") + " (+/–)",
+                name: _("neighbor") + " (+/–)",
                 args: 2,
                 defaults: [1, 1 / 16],
-                argLabels: [t("scalar interval"), t("note value")]
+                argLabels: [_("scalar interval"), _("note value")]
             });
 
             /**
@@ -361,7 +361,7 @@ function setupOrnamentBlocks(activity) {
              * } - The block formation parameters.
              */
             this.formBlock({
-                name: t("glide"),
+                name: _("glide"),
                 args: 1,
                 defaults: [1 / 16]
             });
@@ -476,7 +476,7 @@ function setupOrnamentBlocks(activity) {
              * } - The block formation parameters.
              */
             this.formBlock({
-                name: t("slur"),
+                name: _("slur"),
                 args: 1,
                 defaults: [16]
             });
@@ -555,7 +555,7 @@ function setupOrnamentBlocks(activity) {
              * } - The block formation parameters.
              */
             this.formBlock({
-                name: t("staccato"),
+                name: _("staccato"),
                 args: 1,
                 defaults: [32]
             });
@@ -623,7 +623,7 @@ function setupOrnamentBlocks(activity) {
              * @param {string[]} [] - An array with help string information.
              */
             this.setHelpString([
-                t(
+                _(
                     "The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes."
                 ),
                 "documentation",
@@ -640,7 +640,7 @@ function setupOrnamentBlocks(activity) {
              * } - The block formation parameters.
              */
             this.formBlock({
-                name: t("slur"),
+                name: _("slur"),
                 args: 1,
                 defaults: [1 / 16]
             });
@@ -689,7 +689,7 @@ function setupOrnamentBlocks(activity) {
              * @param {string[]} [] - An array with help string information.
              */
             this.setHelpString([
-                t(
+                _(
                     "The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes."
                 ),
                 "documentation",
@@ -707,7 +707,7 @@ function setupOrnamentBlocks(activity) {
              */
             this.formBlock({
                 //.TRANS: play each note sharply detached from the others
-                name: t("staccato"),
+                name: _("staccato"),
                 args: 1,
                 defaults: [1 / 32]
             });

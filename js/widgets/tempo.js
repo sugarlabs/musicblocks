@@ -75,15 +75,15 @@ class Tempo {
             widgetWindow.destroy();
         };
 
-        const pauseBtn = widgetWindow.addButton("pause-button.svg", Tempo.ICONSIZE, t("Pause"));
+        const pauseBtn = widgetWindow.addButton("pause-button.svg", Tempo.ICONSIZE, _("Pause"));
         pauseBtn.onclick = () => {
             if (this.isMoving) {
                 this.pause();
                 pauseBtn.innerHTML =
                     `<img 
                         src="header-icons/play-button.svg" 
-                        title="${t("Play")}" 
-                        alt="${t("Play")}" 
+                        title="${_("Play")}" 
+                        alt="${_("Play")}" 
                         height="${Tempo.ICONSIZE}" 
                         width="${Tempo.ICONSIZE}" 
                         vertical-align="middle"
@@ -94,8 +94,8 @@ class Tempo {
                 pauseBtn.innerHTML =
                     `<img 
                         src="header-icons/pause-button.svg" 
-                        title="${t("Pause")}" 
-                        alt="${t("Pause")}" 
+                        title="${_("Pause")}" 
+                        alt="${_("Pause")}" 
                         height="${Tempo.ICONSIZE}" 
                         width="${Tempo.ICONSIZE}" 
                         vertical-align="middle"
@@ -108,7 +108,7 @@ class Tempo {
         widgetWindow.addButton(
             "export-chunk.svg",
             Tempo.ICONSIZE,
-            t("Save tempo"),
+            _("Save tempo"),
             ""
         ).onclick = () => {
             // Debounce button
@@ -139,13 +139,13 @@ class Tempo {
             widgetWindow.addButton(
                 "up.svg",
                 Tempo.ICONSIZE,
-                t("speed up"),
+                _("speed up"),
                 r1.insertCell()
             ).onclick = ((i) => () => this.speedUp(i))(i);
             widgetWindow.addButton(
                 "down.svg",
                 Tempo.ICONSIZE,
-                t("slow down"),
+                _("slow down"),
                 r2.insertCell()
             ).onclick = ((i) => () => this.slowDown(i))(i);
 
@@ -189,7 +189,7 @@ class Tempo {
             );
         }
 
-        activity.textMsg(t("Adjust the tempo with the buttons."),3000);
+        activity.textMsg(_("Adjust the tempo with the buttons."),3000);
         this.resume();
 
         widgetWindow.sendToCenter();
@@ -256,17 +256,17 @@ class Tempo {
         const input = this.BPMInputs[i].value;
 
         if (isNaN(input)) {
-            activity.errorMsg(t("Please enter a number between 30 and 1000"), 3000);
+            activity.errorMsg(_("Please enter a number between 30 and 1000"), 3000);
             return;
         }
         
         this.BPMs[i] = this.BPMInputs[i].value;
         if (this.BPMs[i] > 1000) {
             this.BPMs[i] = 1000;
-            activity.errorMsg(t("The beats per minute must be between 30 and 1000."), 3000);
+            activity.errorMsg(_("The beats per minute must be between 30 and 1000."), 3000);
         } else if (this.BPMs[i] < 30) {
             this.BPMs[i] = 30;
-            activity.errorMsg(t("The beats per minute must be between 30 and 1000."), 3000);
+            activity.errorMsg(_("The beats per minute must be between 30 and 1000."), 3000);
         }
 
         this._updateBPM(i);
@@ -282,7 +282,7 @@ class Tempo {
         this.BPMs[i] = parseFloat(this.BPMs[i]) + Math.round(0.1 * this.BPMs[i]);
 
         if (this.BPMs[i] > 1000) {
-            activity.errorMsg(t("The beats per minute must be below 1000."), 3000);
+            activity.errorMsg(_("The beats per minute must be below 1000."), 3000);
             this.BPMs[i] = 1000;
         }
 
@@ -298,7 +298,7 @@ class Tempo {
     slowDown(i) {
         this.BPMs[i] = parseFloat(this.BPMs[i]) - Math.round(0.1 * this.BPMs[i]);
         if (this.BPMs[i] < 30) {
-            activity.errorMsg(t("The beats per minute must be above 30"), 3000);
+            activity.errorMsg(_("The beats per minute must be above 30"), 3000);
             this.BPMs[i] = 30;
         }
 
@@ -409,7 +409,7 @@ class Tempo {
                 [5, ["vspace", {}], 0, 0, [0, null]]
             ];
             this.activity.blocks.loadNewBlocks(newStack);
-            activity.textMsg(t("New action block generated."), 3000);
+            activity.textMsg(_("New action block generated."), 3000);
         }, 200 * i);
     }
 

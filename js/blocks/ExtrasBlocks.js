@@ -30,10 +30,10 @@ function setupExtrasBlocks(activity) {
          * Creates an instance of FloatToStringBlock.
          */
         constructor() {
-            super("float2string", t("fraction"));
+            super("float2string", _("fraction"));
             this.setPalette("extras", activity);
             this.setHelpString([
-                t("Convert a float to a fraction") + " 0.5 -> 1/2",
+                _("Convert a float to a fraction") + " 0.5 -> 1/2",
                 "documentation",
                 null,
                 "float2string"
@@ -90,10 +90,10 @@ function setupExtrasBlocks(activity) {
             this.setHelpString();
 
             this.formBlock({
-                name: t("save as ABC"),
+                name: _("save as ABC"),
                 args: 1,
                 argTypes: ["textin"],
-                defaults: [t("title") + ".abc"]
+                defaults: [_("title") + ".abc"]
             });
             this.hidden = true;
             this.deprecated = true;
@@ -126,10 +126,10 @@ function setupExtrasBlocks(activity) {
             this.setHelpString();
 
             this.formBlock({
-                name: t("save as Lilypond"),
+                name: _("save as Lilypond"),
                 args: 1,
                 argTypes: ["textin"],
-                defaults: [t("title") + ".ly"]
+                defaults: [_("title") + ".ly"]
             });
             this.hidden = true;
             this.deprecated = true;
@@ -162,10 +162,10 @@ function setupExtrasBlocks(activity) {
             this.setHelpString();
 
             this.formBlock({
-                name: t("save as SVG"),
+                name: _("save as SVG"),
                 args: 1,
                 argTypes: ["textin"],
-                defaults: [t("title") + ".svg"]
+                defaults: [_("title") + ".svg"]
             });
             this.hidden = true;
             this.deprecated = true;
@@ -213,10 +213,10 @@ function setupExtrasBlocks(activity) {
          * Creates an instance of NoBackgroundBlock.
          */
         constructor() {
-            super("nobackground", t("no background"));
+            super("nobackground", _("no background"));
             this.setPalette("extras", activity);
             this.setHelpString([
-                t("The No background block eliminates the background from the saved SVG output."),
+                _("The No background block eliminates the background from the saved SVG output."),
                 "documentation",
                 "",
                 "makehelp"
@@ -244,9 +244,9 @@ function setupExtrasBlocks(activity) {
          * Creates an instance of ShowBlocksBlock.
          */
         constructor() {
-            super("showblocks", t("show blocks"));
+            super("showblocks", _("show blocks"));
             this.setPalette("extras", activity);
-            this.setHelpString([t("The Show blocks block shows the blocks."), "documentation", ""]);
+            this.setHelpString([_("The Show blocks block shows the blocks."), "documentation", ""]);
         }
 
         /**
@@ -271,9 +271,9 @@ function setupExtrasBlocks(activity) {
          * Creates an instance of HideBlocksBlock.
          */
         constructor() {
-            super("hideblocks", t("Hide blocks").toLowerCase());
+            super("hideblocks", _("Hide blocks").toLowerCase());
             this.setPalette("extras", activity);
-            this.setHelpString([t("The Hide blocks block hides the blocks."), "documentation", ""]);
+            this.setHelpString([_("The Hide blocks block hides the blocks."), "documentation", ""]);
         }
 
         /**
@@ -302,7 +302,7 @@ function setupExtrasBlocks(activity) {
             super("vspace", "↓");
             this.setPalette("extras", activity);
             this.setHelpString([
-                t("The Space block is used to add space between blocks."),
+                _("The Space block is used to add space between blocks."),
                 "documentation",
                 ""
             ]);
@@ -335,7 +335,7 @@ function setupExtrasBlocks(activity) {
             super("hspace", "←");
             this.setPalette("extras", activity);
             this.setHelpString([
-                t("The Space block is used to add space between blocks."),
+                _("The Space block is used to add space between blocks."),
                 "documentation",
                 ""
             ]);
@@ -373,10 +373,10 @@ function setupExtrasBlocks(activity) {
          * Creates an instance of WaitBlock.
          */
         constructor() {
-            super("wait", t("wait"));
+            super("wait", _("wait"));
             this.setPalette("extras", activity);
             this.setHelpString([
-                t("The Wait block pauses the program for a specified number of seconds."),
+                _("The Wait block pauses the program for a specified number of seconds."),
                 "documentation",
                 ""
             ]);
@@ -422,7 +422,7 @@ function setupExtrasBlocks(activity) {
             super("comment");
             this.setPalette("extras", activity);
             this.setHelpString([
-                t(
+                _(
                     "The Comment block prints a comment at the top of the screen when the program is running in slow mode."
                 ),
                 "documentation",
@@ -430,7 +430,7 @@ function setupExtrasBlocks(activity) {
             ]);
 
             this.formBlock({
-                name: t("comment"),
+                name: _("comment"),
                 args: 1,
                 defaults: ["Music Blocks"],
                 argTypes: ["anyin"]
@@ -466,14 +466,14 @@ function setupExtrasBlocks(activity) {
          * Creates an instance of PrintBlock.
          */
         constructor() {
-            super("print", t("print"));
+            super("print", _("print"));
             if (activity.beginnerMode) this.setPalette("media", activity);
             else this.setPalette("extras", activity);
 
             this.beginnerBlock(true);
 
             this.setHelpString([
-                t("The Print block displays text at the top of the screen."),
+                _("The Print block displays text at the top of the screen."),
                 "documentation",
                 ""
             ]);
@@ -556,7 +556,7 @@ function setupExtrasBlocks(activity) {
             this.setPalette("extras", activity);
             this.setHelpString();
 
-            this.formBlock({ name: t("start drum"), canCollapse: true });
+            this.formBlock({ name: _("start drum"), canCollapse: true });
             this.hidden = this.deprecated = true;
         }
 
@@ -582,12 +582,12 @@ function setupExtrasBlocks(activity) {
          * Creates an instance of DisplayGridBlock.
          */
         constructor() {
-            super("displaygrid", t("display grid"));
+            super("displaygrid", _("display grid"));
             this.setPalette("extras", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
-                t("The Display Grid Block changes the grid type"),
+                _("The Display Grid Block changes the grid type"),
                 "documentation",
                 null
             ]);
@@ -615,44 +615,44 @@ function setupExtrasBlocks(activity) {
             const act = activity.blocks.activity;
             activity.hideGrids();
             switch (args[0]) {
-                case t("Cartesian"):
+                case _("Cartesian"):
                 case "Cartesian":
                     act._showCartesian();
                     break;
-                case t("polar"):
+                case _("polar"):
                 case "polar":
                     act._showPolar();
                     break;
-                case t("Cartesian/Polar"):
+                case _("Cartesian/Polar"):
                 case "Cartesian/Polar":
                     act._showPolar();
                     act._showCartesian();
                     break;
-                case t("treble"):
+                case _("treble"):
                 case "treble":
                     act._showTreble();
                     break;
-                case t("grand staff"):
+                case _("grand staff"):
                 case "grand staff":
                     act._showGrand();
                     break;
-                case t("mezzo-soprano"):
+                case _("mezzo-soprano"):
                 case "mezzo-soprano":
                     act._showSoprano();
                     break;
-                case t("alto"):
+                case _("alto"):
                 case "alto":
                     act._showAlto();
                     break;
-                case t("tenor"):
+                case _("tenor"):
                 case "tenor":
                     act._showTenor();
                     break;
-                case t("bass"):
+                case _("bass"):
                 case "bass":
                     act._showBass();
                     break;
-                case t("none"):
+                case _("none"):
                 case "none":
                     break;
             }
@@ -689,7 +689,7 @@ function setupExtrasBlocks(activity) {
          * Creates an instance of NOPValueBlock.
          */
         constructor() {
-            super("nopValueBlock", t("unknown"));
+            super("nopValueBlock", _("unknown"));
             this.setPalette("extras", activity);
             this.setHelpString();
             this.formBlock({ outType: "anyout" });
@@ -708,7 +708,7 @@ function setupExtrasBlocks(activity) {
          * Creates an instance of NOPOneArgMathBlock.
          */
         constructor() {
-            super("nopOneArgMathBlock", t("unknown"));
+            super("nopOneArgMathBlock", _("unknown"));
             this.setPalette("extras", activity);
             this.setHelpString();
             this.formBlock({
@@ -731,7 +731,7 @@ function setupExtrasBlocks(activity) {
          * Creates an instance of NOPTwoArgMathBlock.
          */
         constructor() {
-            super("nopOneArgMathBlock", t("unknown"));
+            super("nopOneArgMathBlock", _("unknown"));
             this.setPalette("extras", activity);
             this.setHelpString();
             this.formBlock({
@@ -754,7 +754,7 @@ function setupExtrasBlocks(activity) {
          * Creates an instance of NOPZeroArgBlock.
          */
         constructor() {
-            super("nopZeroArgBlock", t("unknown"));
+            super("nopZeroArgBlock", _("unknown"));
             this.setPalette("extras", activity);
             this.setHelpString();
             this.hidden = true;
@@ -772,7 +772,7 @@ function setupExtrasBlocks(activity) {
          * Creates an instance of NOPOneArgBlock.
          */
         constructor() {
-            super("nopOneArgBlock", t("unknown"));
+            super("nopOneArgBlock", _("unknown"));
             this.setPalette("extras", activity);
             this.setHelpString();
             this.formBlock({ args: 1, argTypes: ["anyin"] });
@@ -791,7 +791,7 @@ function setupExtrasBlocks(activity) {
          * Creates an instance of NOPTwoArgBlock.
          */
         constructor() {
-            super("nopTwoArgBlock", t("unknown"));
+            super("nopTwoArgBlock", _("unknown"));
             this.setPalette("extras", activity);
             this.setHelpString();
             this.formBlock({ args: 2, argTypes: ["anyin", "anyin"] });
@@ -810,7 +810,7 @@ function setupExtrasBlocks(activity) {
          * Creates an instance of NOPThreeArgBlock.
          */
         constructor() {
-            super("nopThreeArgBlock", t("unknown"));
+            super("nopThreeArgBlock", _("unknown"));
             this.setPalette("extras", activity);
             this.setHelpString();
             this.formBlock({ args: 3, argTypes: ["anyin", "anyin", "anyin"] });
@@ -829,7 +829,7 @@ function setupExtrasBlocks(activity) {
          * Creates an instance of NOPFourArgBlock.
          */
         constructor() {
-            super("nopFourArgBlock", t("unknown"));
+            super("nopFourArgBlock", _("unknown"));
             this.setPalette("extras", activity);
             this.setHelpString();
             this.formBlock({

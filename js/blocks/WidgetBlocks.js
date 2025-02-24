@@ -78,7 +78,7 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             //.TRANS: sound envelope (ADSR)
-            super("envelope", t("Envelope").toLowerCase());
+            super("envelope", _("Envelope").toLowerCase());
             this.setPalette("widgets", activity);
             this.setHelpString();
             this.formBlock({
@@ -86,13 +86,13 @@ function setupWidgetBlocks(activity) {
                 defaults: [1, 50, 60, 1],
                 argLabels: [
                     //.TRANS: Attack time is the time taken for initial run-up of level from nil to peak, beginning when the key is first pressed.
-                    t("attack"),
+                    _("attack"),
                     //.TRANS: Decay time is the time taken for the subsequent run down from the attack level to the designated sustain level.
-                    t("decay"),
+                    _("decay"),
                     //.TRANS: Sustain level is the level during the main sequence of the sound's duration, until the key is released.
-                    t("sustain"),
+                    _("sustain"),
                     //.TRANS: Release time is the time taken for the level to decay from the sustain level to zero after the key is released.
-                    t("release")
+                    _("release")
                 ]
             });
             this.hidden = true;
@@ -110,16 +110,16 @@ function setupWidgetBlocks(activity) {
 
             if (args.length === 4 && typeof args[0] === "number") {
                 if (args[0] < 0 || args[0] > 100) {
-                    activity.errorMsg(t("Attack value should be from 0 to 100."));
+                    activity.errorMsg(_("Attack value should be from 0 to 100."));
                 }
                 if (args[1] < 0 || args[1] > 100) {
-                    activity.errorMsg(t("Decay value should be from 0 to 100."));
+                    activity.errorMsg(_("Decay value should be from 0 to 100."));
                 }
                 if (args[2] < 0 || args[2] > 100) {
-                    activity.errorMsg(t("Sustain value should be from 0 to 100."));
+                    activity.errorMsg(_("Sustain value should be from 0 to 100."));
                 }
                 if (args[3] < 0 || args[3] > 100) {
-                    activity.errorMsg(t("Release value should be from 0-100."));
+                    activity.errorMsg(_("Release value should be from 0-100."));
                 }
 
                 // Push envelope values to corresponding arrays
@@ -137,7 +137,7 @@ function setupWidgetBlocks(activity) {
                 logo.timbre.synthVals["envelope"]["release"] = last(tur.singer.release);
 
                 if (logo.timbre.env.length != 0) {
-                    activity.errorMsg(t("You are adding multiple envelope blocks."));
+                    activity.errorMsg(_("You are adding multiple envelope blocks."));
                 } else {
                     // Create the synth for the instrument.
                     logo.synth.createSynth(
@@ -168,18 +168,18 @@ function setupWidgetBlocks(activity) {
          */
         constructor() {
             //.TRANS: a filter removes some unwanted components from a signal
-            super("filter", t("Filter").toLowerCase());
+            super("filter", _("Filter").toLowerCase());
             this.setPalette("widgets", activity);
             this.setHelpString();
             this.formBlock({
                 args: 3,
-                defaults: [t("highpass"), -12, 392],
+                defaults: [_("highpass"), -12, 392],
                 argLabels: [
                     //.TRANS: type of filter, e.g., lowpass, highpass, etc.
-                    t("type"),
+                    _("type"),
                     //.TRANS: rolloff is the steepness of a change in frequency.
-                    t("rolloff"),
-                    t("frequency")
+                    _("rolloff"),
+                    _("frequency")
                 ],
                 argTypes: ["anyin", "numberin", "numberin"]
             });
@@ -210,7 +210,7 @@ function setupWidgetBlocks(activity) {
                 if (![-12, -24, -48, -96].includes(args[1])) {
                     //.TRANS: rolloff is the steepness of a change in frequency.
                     activity.errorMsg(
-                        t("Rolloff value should be either -12, -24, -48, or -96 decibels/octave.")
+                        _("Rolloff value should be either -12, -24, -48, or -96 decibels/octave.")
                     );
                 }
 
@@ -249,14 +249,14 @@ function setupWidgetBlocks(activity) {
             super("temperament");
             this.setPalette("widgets", activity);
             this.setHelpString([
-                t("The Temperament tool is used to define custom tuning."),
+                _("The Temperament tool is used to define custom tuning."),
                 "documentation",
                 null,
                 "temperament"
             ]);
             this.formBlock({
                 args: 1,
-                name: t("temperament"),
+                name: _("temperament"),
                 canCollapse: true
             });
             this.makeMacro((x, y) => [
@@ -329,14 +329,14 @@ function setupWidgetBlocks(activity) {
             this.beginnerBlock(false);
 
             this.setHelpString([
-                t("Upload a sample and adjust its pitch center."),
+                _("Upload a sample and adjust its pitch center."),
                 "documentation",
                 null,
                 "sampler"
             ]);
 
             //.TRANS: the speed at music is should be played.
-            this.formBlock({ name: t("sampler"), canCollapse: true });
+            this.formBlock({ name: _("sampler"), canCollapse: true });
             this.makeMacro((x, y) => [
                 [0, "sampler", x, y, [null, 1, 8]],
                 [1, "settimbre", 0, 0, [0, 2, 6, 7]],
@@ -394,14 +394,14 @@ function setupWidgetBlocks(activity) {
 
             this.formBlock({
                 //.TRANS: timbre is the character or quality of a musical sound
-                name: t("timbre"),
+                name: _("timbre"),
                 args: 1,
-                defaults: [t("custom")],
+                defaults: [_("custom")],
                 canCollapse: true
             });
             this.makeMacro((x, y) => [
                 [0, "timbre", x, y, [null, 1, 3, 2]],
-                [1, ["text", { value: t("custom") }], 0, 0, [0]],
+                [1, ["text", { value: _("custom") }], 0, 0, [0]],
                 [2, "hiddennoflow", 0, 0, [0, null]],
                 [3, "newnote", 0, 0, [0, 4, 7, 11]],
                 [4, "divide", 0, 0, [3, 5, 6]],
@@ -514,12 +514,12 @@ function setupWidgetBlocks(activity) {
             super("meterwidget");
             this.setPalette("widgets", activity);
             this.setHelpString([
-                t("The Meter block opens a tool to select strong beats for the meter."),
+                _("The Meter block opens a tool to select strong beats for the meter."),
                 "documentation",
                 null,
                 "meterwidget"
             ]);
-            this.formBlock({ name: t("meter"), canCollapse: true });
+            this.formBlock({ name: _("meter"), canCollapse: true });
             this.makeMacro((x, y) => [
                 [0, ["meterwidget", { collapsed: false }], x, y, [null, 1, 7]],
                 [1, "meter", 0, 0, [0, 2, 3, 6]],
@@ -570,12 +570,12 @@ function setupWidgetBlocks(activity) {
             super("oscilloscope");
             this.setPalette("widgets", activity);
             this.setHelpString([
-                t("The oscilloscope block opens a tool to visualize waveforms."),
+                _("The oscilloscope block opens a tool to visualize waveforms."),
                 "documentation",
                 null,
                 "oscilloscope"
             ]);
-            this.formBlock({ name: t("oscilloscope"), canCollapse: true });
+            this.formBlock({ name: _("oscilloscope"), canCollapse: true });
             const addPrintTurtle = (blocks, turtle, prev, last) => {
                 const len = blocks.length;
                 const next = last ? null : len + 2;
@@ -642,13 +642,13 @@ function setupWidgetBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                t("The Custom mode block opens a tool to explore musical mode (the spacing of the notes in a scale)."),
+                _("The Custom mode block opens a tool to explore musical mode (the spacing of the notes in a scale)."),
                 "documentation",
                 ""
             ]);
 
             //.TRANS: musical mode is the pattern of half-steps in an octave, e.g., Major or Minor modes
-            this.formBlock({ name: t("custom mode"), canCollapse: true });
+            this.formBlock({ name: _("custom mode"), canCollapse: true });
             this.makeMacro((x, y) => [
                 [0, "modewidget", x, y, [null, 1, 4]],
                 [1, "setkey2", 0, 0, [0, 2, 3, null]],
@@ -697,14 +697,14 @@ function setupWidgetBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                t("The Tempo block opens a metronome to visualize the beat."),
+                _("The Tempo block opens a metronome to visualize the beat."),
                 "documentation",
                 null,
                 "tempo"
             ]);
 
             //.TRANS: the speed at music is should be played.
-            this.formBlock({ name: t("tempo"), canCollapse: true });
+            this.formBlock({ name: _("tempo"), canCollapse: true });
             this.makeMacro((x, y) => [
                 [0, "tempo", x, y, [null, 1, 6]],
                 [1, "setmasterbpm2", 0, 0, [0, 2, 3, 7]],
@@ -759,13 +759,13 @@ function setupWidgetBlocks(activity) {
             super("arpeggiomatrix");
             this.setPalette("widgets", activity);
             this.setHelpString([
-                t("The Arpeggio Widget is used to compose chord sequences."),
+                _("The Arpeggio Widget is used to compose chord sequences."),
                 "documentation",
                 ""
             ]);
 
             this.formBlock({
-                name: t("arpeggio"),
+                name: _("arpeggio"),
                 canCollapse: true,
                 args: 1,
                 defaults: [4]
@@ -834,12 +834,12 @@ function setupWidgetBlocks(activity) {
             super("pitchdrummatrix");
             this.setPalette("widgets", activity);
             this.setHelpString([
-                t("The Pitch drum matrix is used to map pitches to drum sounds."),
+                _("The Pitch drum matrix is used to map pitches to drum sounds."),
                 "documentation",
                 ""
             ]);
             //.TRANS: makes a mapping between pitches and drum sounds
-            this.formBlock({ name: t("pitch-drum mapper"), canCollapse: true });
+            this.formBlock({ name: _("pitch-drum mapper"), canCollapse: true });
             this.makeMacro((x, y) => [
                 [0, "pitchdrummatrix", x, y, [null, 1, 16]],
                 [1, "pitch", 0, 0, [0, 2, 3, 4]],
@@ -888,7 +888,7 @@ function setupWidgetBlocks(activity) {
                     logo.pitchDrumMatrix.rowLabels.length === 0
                 ) {
                     activity.errorMsg(
-                        t("You must have at least one pitch block and one drum block in the matrix."),
+                        _("You must have at least one pitch block and one drum block in the matrix."),
                         blk
                     );
                 } else {
@@ -917,12 +917,12 @@ function setupWidgetBlocks(activity) {
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
             this.setHelpString([
-                t("The Pitch slider tool to is used to generate pitches at selected frequencies."),
+                _("The Pitch slider tool to is used to generate pitches at selected frequencies."),
                 "documentation",
                 ""
             ]);
             //.TRANS: widget to generate pitches using a slider
-            this.formBlock({ name: t("pitch slider"), canCollapse: true });
+            this.formBlock({ name: _("pitch slider"), canCollapse: true });
             this.makeMacro((x, y) => [
                 [0, "pitchslider", x, y, [null, 1, 3]],
                 [1, "hertz", 0, 0, [0, 2, null]],
@@ -974,7 +974,7 @@ function setupWidgetBlocks(activity) {
             this.setPalette("widgets", activity);
             this.setHelpString();
             this.formBlock({
-                name: t("chromatic keyboard"),
+                name: _("chromatic keyboard"),
                 canCollapse: true
             });
             this.makeMacro((x, y) => [
@@ -1008,7 +1008,7 @@ function setupWidgetBlocks(activity) {
             super("musickeyboard2");
             this.setPalette("widgets", activity);
             this.setHelpString();
-            this.formBlock({ name: t("music keyboard"), canCollapse: true });
+            this.formBlock({ name: _("music keyboard"), canCollapse: true });
             this.beginnerBlock(this.lang !== "ja");
             this.makeMacro((x, y) => [
                 [0, "setbpm3", 0, 0, [12, 1, 2, 5]],
@@ -1059,14 +1059,14 @@ function setupWidgetBlocks(activity) {
 
             if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    t("The Music keyboard block opens a piano keyboard that can be used to create notes."),
+                    _("The Music keyboard block opens a piano keyboard that can be used to create notes."),
                     "documentation",
                     null,
                     "musickeyboardja"
                 ]);
             } else {
                 this.setHelpString([
-                    t("The Music keyboard block opens a piano keyboard that can be used to create notes."),
+                    _("The Music keyboard block opens a piano keyboard that can be used to create notes."),
                     "documentation",
                     null,
                     "musickeyboard2"
@@ -1074,7 +1074,7 @@ function setupWidgetBlocks(activity) {
             }
 
             //.TRANS: widget to generate pitches using a slider
-            this.formBlock({ name: t("music keyboard"), canCollapse: true });
+            this.formBlock({ name: _("music keyboard"), canCollapse: true });
             this.hidden = true;
         }
 
@@ -1125,14 +1125,14 @@ function setupWidgetBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                t("The Pitch staircase tool to is used to generate pitches from a given ratio."),
+                _("The Pitch staircase tool to is used to generate pitches from a given ratio."),
                 "documentation",
                 null,
                 "pitchstaircase"
             ]);
 
             //.TRANS: generate a progressive sequence of pitches
-            this.formBlock({ name: t("pitch staircase"), canCollapse: true });
+            this.formBlock({ name: _("pitch staircase"), canCollapse: true });
             this.makeMacro((x, y) => [
                 [0, "pitchstaircase", x, y, [null, 1, 4]],
                 [1, "pitch", 0, 0, [0, 2, 3, null]],
@@ -1187,7 +1187,7 @@ function setupWidgetBlocks(activity) {
             this.setPalette("widgets", activity);
             this.setHelpString();
             //.TRANS: widget for subdividing a measure into distinct rhythmic elements
-            this.formBlock({ name: t("rhythm maker"), canCollapse: true });
+            this.formBlock({ name: _("rhythm maker"), canCollapse: true });
             this.beginnerBlock(true);
 
             this.makeMacro((x, y) => [
@@ -1219,13 +1219,13 @@ function setupWidgetBlocks(activity) {
             this.setPalette("widgets", activity);
 
             this.setHelpString([
-                t("The Rhythm Maker block opens a tool to create drum machines."),
+                _("The Rhythm Maker block opens a tool to create drum machines."),
                 "documentation",
                 null,
                 "rhythmruler2"
             ]);
 
-            this.formBlock({ name: t("rhythm maker"), canCollapse: true });
+            this.formBlock({ name: _("rhythm maker"), canCollapse: true });
             this.makeMacro((x, y) => [
                 [0, "rhythmruler2", x, y, [null, 1, 17]],
                 [1, "setdrum", 0, 0, [0, 2, 3, 8]],
@@ -1288,7 +1288,7 @@ function setupWidgetBlocks(activity) {
          * Creates a MatrixGMajorBlock instance.
          */
         constructor() {
-            super("matrixgmajor", t("G major scale"));
+            super("matrixgmajor", _("G major scale"));
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
@@ -1323,7 +1323,7 @@ function setupWidgetBlocks(activity) {
          * Creates a MatrixCMajorBlock instance.
          */
         constructor() {
-            super("matrixcmajor", t("C major scale"));
+            super("matrixcmajor", _("C major scale"));
             this.setPalette("widgets", activity);
             this.beginnerBlock(true);
 
@@ -1363,14 +1363,14 @@ function setupWidgetBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                t("The Phrase Maker block opens a tool to create musical phrases."),
+                _("The Phrase Maker block opens a tool to create musical phrases."),
                 "documentation",
                 null,
                 "matrix"
             ]);
 
             //.TRANS: assigns pitch to a sequence of beats to generate a melody
-            this.formBlock({ name: t("phrase maker"), canCollapse: true });
+            this.formBlock({ name: _("phrase maker"), canCollapse: true });
             this.makeMacro((x, y) => [
                 [0, "matrix", x, y, [null, 1, 33]],
                 [1, "pitch", 0, 0, [0, 2, 3, 4]],
@@ -1442,7 +1442,7 @@ function setupWidgetBlocks(activity) {
             const __listener = () => {
                 if (logo.tupletRhythms.length === 0 || logo.phraseMaker.rowLabels.length === 0) {
                     activity.errorMsg(
-                        t("You must have at least one pitch block and one rhythm block in the matrix."),
+                        _("You must have at least one pitch block and one rhythm block in the matrix."),
                         blk
                     );
                 } else {
@@ -1501,13 +1501,13 @@ function setupWidgetBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                t("The Status block opens a tool for inspecting the status of Music Blocks as it is running."),
+                _("The Status block opens a tool for inspecting the status of Music Blocks as it is running."),
                 "documentation",
                 null,
                 "status"
             ]);
 
-            this.formBlock({ name: t("status"), canCollapse: true });
+            this.formBlock({ name: _("status"), canCollapse: true });
             this.makeMacro((x, y) => [
                 [0, "status", x, y, [null, 1, 11]],
                 [1, "hidden", 0, 0, [0, 10]],
@@ -1571,14 +1571,14 @@ function setupWidgetBlocks(activity) {
                 this.beginnerBlock(false);
     
                 this.setHelpString([
-                    t("Upload a sample and adjust its pitch center."),
+                    _("Upload a sample and adjust its pitch center."),
                     "documentation",
                     null,
                     "aimusic"
                 ]);
     
                 //.TRANS: AI-generated music
-                this.formBlock({ name: t("AI Music"), canCollapse: true });
+                this.formBlock({ name: _("AI Music"), canCollapse: true });
                 this.makeMacro((x, y) => [
                     [0, "aimusic", x, y, [null, 1]],
                     

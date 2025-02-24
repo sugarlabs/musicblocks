@@ -160,8 +160,8 @@ function SampleWidget() {
         this.playBtn.innerHTML =
             `<img 
                 src="header-icons/play-button.svg" 
-                title="${t("Play")}" 
-                alt="${t("Play")}" 
+                title="${_("Play")}" 
+                alt="${_("Play")}" 
                 height="${ICONSIZE}" 
                 width="${ICONSIZE}" 
                 vertical-align="middle"
@@ -177,8 +177,8 @@ function SampleWidget() {
         this.playBtn.innerHTML =
             `<img 
                 src="header-icons/pause-button.svg" 
-                title="${t("Pause")}" 
-                alt="${t("Pause")}" 
+                title="${_("Pause")}" 
+                alt="${_("Pause")}" 
                 height="${ICONSIZE}" 
                 width="${ICONSIZE}" 
                 vertical-align="middle"
@@ -222,7 +222,7 @@ function SampleWidget() {
      */
     this.getSampleLength = function () {
         if (this.sampleData.length > 1333333) {
-            this.activity.errorMsg(t("Warning: Sample is bigger than 1MB."), this.timbreBlock);
+            this.activity.errorMsg(_("Warning: Sample is bigger than 1MB."), this.timbreBlock);
         }
     };
 
@@ -232,7 +232,7 @@ function SampleWidget() {
      * @returns {void}
      */
     this.displayRecordingStartMessage = function () {
-        activity.textMsg(t("Recording started"), 3000);
+        activity.textMsg(_("Recording started"), 3000);
     }
 
     /**
@@ -240,7 +240,7 @@ function SampleWidget() {
      * @returns {void}
      */
     this.displayRecordingStopMessage = function () {
-        activity.textMsg(t("Recording complete"), 3000);
+        activity.textMsg(_("Recording complete"), 3000);
     }
 
 
@@ -249,7 +249,7 @@ function SampleWidget() {
      * @returns {void}
      */
     this.showSampleTypeError = function () {
-        this.activity.errorMsg(t("Upload failed: Sample is not a .wav file."), this.timbreBlock);
+        this.activity.errorMsg(_("Upload failed: Sample is not a .wav file."), this.timbreBlock);
     };
 
     /**
@@ -278,7 +278,7 @@ function SampleWidget() {
             ];
 
             that.activity.blocks.loadNewBlocks(newStack);
-            activity.textMsg(t("A new sample block was generated."), 3000);
+            activity.textMsg(_("A new sample block was generated."), 3000);
         }, 1000);
     };
 
@@ -313,7 +313,7 @@ function SampleWidget() {
                     this.sampleName = sampleFile.name;
                     this._addSample();
                 } else {
-                    this.activity.errorMsg(t("Warning: Your sample cannot be loaded because it is >1MB."), this.timbreBlock);
+                    this.activity.errorMsg(_("Warning: Your sample cannot be loaded because it is >1MB."), this.timbreBlock);
                 }            
             } else {
                 this.showSampleTypeError();
@@ -400,7 +400,7 @@ function SampleWidget() {
 
         widgetWindow.onmaximize = this._scale.bind(this);
 
-        this.playBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, t("Play"));
+        this.playBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
         this.playBtn.onclick = () => {
             if (this.isMoving) {
                 this.pause();
@@ -415,7 +415,7 @@ function SampleWidget() {
         widgetWindow.addButton(
             "load-media.svg",
             ICONSIZE,
-            t("Upload sample"),
+            _("Upload sample"),
             ""
         ).onclick = function () {
             const fileChooser = docById("myOpenAll");
@@ -443,7 +443,7 @@ function SampleWidget() {
         widgetWindow.addButton(
             "export-chunk.svg",
             ICONSIZE,
-            t("Save sample"),
+            _("Save sample"),
             ""
         ).onclick = function () {
             // Debounce button
@@ -459,14 +459,14 @@ function SampleWidget() {
         this._recordBtn= widgetWindow.addButton(
             "mic.svg",
             ICONSIZE,
-            t("Toggle Mic"),
+            _("Toggle Mic"),
             ""
         );
 
         this._playbackBtn= widgetWindow.addButton(
             "playback.svg",
             ICONSIZE,
-            t("Playback"),
+            _("Playback"),
             "");
 
         this._playbackBtn.id="playbackBtn";
@@ -514,7 +514,7 @@ function SampleWidget() {
 
         this.setTimbre();
 
-        activity.textMsg(t("Upload a sample and adjust its pitch center."), 3000);
+        activity.textMsg(_("Upload a sample and adjust its pitch center."), 3000);
         this.pause();
 
         widgetWindow.sendToCenter();
@@ -721,7 +721,7 @@ function SampleWidget() {
         const drumLabels = [];
         let label;
         for (let i = 0; i < DRUMS.length; i++) {
-            label = t(DRUMS[i]);
+            label = _(DRUMS[i]);
             drumLabels.push(label);
         }
 
@@ -778,11 +778,11 @@ function SampleWidget() {
         this._accidentalsWheel.animatetime = 0; // 300;
         this._accidentalsWheel.createWheel(accidentalLabels);
         this._accidentalsWheel.setTooltips([
-            t("double sharp"),
-            t("sharp"),
-            t("natural"),
-            t("flat"),
-            t("double flat")
+            _("double sharp"),
+            _("sharp"),
+            _("natural"),
+            _("flat"),
+            _("double flat")
         ]);
 
         this._octavesWheel.colors = platformColor.octavesWheelcolors;
@@ -943,11 +943,11 @@ function SampleWidget() {
                 let oscText;
                 if (turtleIdx >= 0) {
                     //.TRANS: The sound sample that the user uploads.
-                    oscText = this.sampleName != "" ? this.sampleName : t("sample");
+                    oscText = this.sampleName != "" ? this.sampleName : _("sample");
                 }
                 canvasCtx.fillStyle = "#000000";
                 //.TRANS: The reference tone is a sound used for comparison.
-                canvasCtx.fillText(t("reference tone"), 10, 10);
+                canvasCtx.fillText(_("reference tone"), 10, 10);
                 canvasCtx.fillText(oscText, 10, canvas.height / 2 + 10);
 
                 for (let turtleIdx = 0; turtleIdx < 2; turtleIdx += 1) {

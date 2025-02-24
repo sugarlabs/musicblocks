@@ -32,7 +32,7 @@ function setupMediaBlocks(activity) {
          */
         constructor() {
             //.TRANS: right side of the screen
-            super("rightpos", t("right (screen)"));
+            super("rightpos", _("right (screen)"));
 
             // Set palette and activity for the block
             this.setPalette("media", activity);
@@ -42,9 +42,9 @@ function setupMediaBlocks(activity) {
             // Set help string for the block based on context
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    t("The Right block returns the position of the right of the canvas.") +
+                    _("The Right block returns the position of the right of the canvas.") +
                         " " +
-                        t(
+                        _(
                             "In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
                         ),
                     "documentation",
@@ -53,9 +53,9 @@ function setupMediaBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    t("The Right block returns the position of the right of the canvas.") +
+                    _("The Right block returns the position of the right of the canvas.") +
                         " " +
-                        t(
+                        _(
                             "In this example, the turtle moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
                         ),
                     "documentation",
@@ -94,7 +94,7 @@ function setupMediaBlocks(activity) {
          */
         constructor() {
             //.TRANS: left side of the screen
-            super("leftpos", t("left (screen)"));
+            super("leftpos", _("left (screen)"));
 
             // Set palette and activity for the block
             this.setPalette("media", activity);
@@ -104,9 +104,9 @@ function setupMediaBlocks(activity) {
             // Set help string for the block based on context
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    t("The Left block returns the position of the left of the canvas.") +
+                    _("The Left block returns the position of the left of the canvas.") +
                         " " +
-                        t(
+                        _(
                             "In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
                         ),
                     "documentation",
@@ -115,9 +115,9 @@ function setupMediaBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    t("The Left block returns the position of the left of the canvas.") +
+                    _("The Left block returns the position of the left of the canvas.") +
                         " " +
-                        t(
+                        _(
                             "In this example, the turtle moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
                         ),
                     "documentation",
@@ -155,7 +155,7 @@ function setupMediaBlocks(activity) {
          * @constructor
          */
         constructor() {
-            super("toppos", t("top (screen)"));
+            super("toppos", _("top (screen)"));
 
             // Set palette and activity for the block
             this.setPalette("media", activity);
@@ -165,9 +165,9 @@ function setupMediaBlocks(activity) {
             // Set help string for the block based on context
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    t("The Top block returns the position of the top of the canvas.") +
+                    _("The Top block returns the position of the top of the canvas.") +
                         " " +
-                        t(
+                        _(
                             "In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
                         ),
                     "documentation",
@@ -176,9 +176,9 @@ function setupMediaBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    t("The Top block returns the position of the top of the canvas.") +
+                    _("The Top block returns the position of the top of the canvas.") +
                         " " +
-                        t(
+                        _(
                             "In this example, the turtle moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
                         ),
                     "documentation",
@@ -216,7 +216,7 @@ function setupMediaBlocks(activity) {
          * @constructor
          */
         constructor() {
-            super("bottompos", t("bottom (screen)"));
+            super("bottompos", _("bottom (screen)"));
 
             // Set palette and activity for the block
             this.setPalette("media", activity);
@@ -226,9 +226,9 @@ function setupMediaBlocks(activity) {
             // Set help string for the block based on context
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    t("The Bottom block returns the position of the bottom of the canvas.") +
+                    _("The Bottom block returns the position of the bottom of the canvas.") +
                         " " +
-                        t(
+                        _(
                             "In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
                         ),
                     "documentation",
@@ -237,9 +237,9 @@ function setupMediaBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    t("The Bottom block returns the position of the bottom of the canvas.") +
+                    _("The Bottom block returns the position of the bottom of the canvas.") +
                         " " +
-                        t(
+                        _(
                             "In this example, the turtle moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
                         ),
                     "documentation",
@@ -279,7 +279,7 @@ function setupMediaBlocks(activity) {
          * @constructor
          */
         constructor() {
-            super("width", t("width"));
+            super("width", _("width"));
 
             // Set palette and activity for the block
             this.setPalette("media", activity);
@@ -288,7 +288,7 @@ function setupMediaBlocks(activity) {
 
             // Set help string for the block
             this.setHelpString([
-                t("The Width block returns the width of the canvas."),
+                _("The Width block returns the width of the canvas."),
                 "documentation",
                 ""
             ]);
@@ -322,7 +322,7 @@ function setupMediaBlocks(activity) {
          * @constructor
          */
         constructor() {
-            super("height", t("height"));
+            super("height", _("height"));
 
             // Set palette and activity for the block
             this.setPalette("media", activity);
@@ -331,7 +331,7 @@ function setupMediaBlocks(activity) {
 
             // Set help string for the block
             this.setHelpString([
-                t("The Height block returns the height of the canvas."),
+                _("The Height block returns the height of the canvas."),
                 "documentation",
                 ""
             ]);
@@ -366,7 +366,7 @@ function setupMediaBlocks(activity) {
          */
         constructor() {
             //.TRANS: stops playback of an audio recording
-            super("stopplayback", t("stop play"));
+            super("stopplayback", _("stop play"));
 
             // Set palette and activity for the block
             this.setPalette("media", activity);
@@ -401,12 +401,12 @@ function setupMediaBlocks(activity) {
          */
         constructor() {
             //.TRANS: Erases the images and text
-            super("erasemedia", t("erase media"));
+            super("erasemedia", _("erase media"));
 
             // Set palette and activity for the block
             this.setPalette("media", activity);
             this.setHelpString([
-                t("The Erase Media block erases text and images."),
+                _("The Erase Media block erases text and images."),
                 "documentation",
                 ""
             ]);
@@ -436,7 +436,7 @@ function setupMediaBlocks(activity) {
          */
         constructor() {
             //.TRANS: play an audio recording
-            super("playback", t("play back"));
+            super("playback", _("play back"));
 
             // Set palette and activity for the block
             this.setPalette("media", activity);
@@ -484,7 +484,7 @@ function setupMediaBlocks(activity) {
          * @constructor
          */
         constructor() {
-            super("speak", t("speak"));
+            super("speak", _("speak"));
 
             // Set palette and activity for the block
             this.setPalette("media", activity);
@@ -492,7 +492,7 @@ function setupMediaBlocks(activity) {
 
             // Set help string for the block
             this.setHelpString([
-                t("The Speak block outputs to the text-to-speech synthesizer"),
+                _("The Speak block outputs to the text-to-speech synthesizer"),
                 "documentation",
                 ""
             ]);
@@ -543,12 +543,12 @@ function setupMediaBlocks(activity) {
          * @constructor
          */
         constructor() {
-            super("camera", t("camera"));
+            super("camera", _("camera"));
 
             // Set palette and activity for the block
             this.setPalette("media", activity);
             this.setHelpString([
-                t("The Camera block connects a webcam to the Show block."),
+                _("The Camera block connects a webcam to the Show block."),
                 "documentation",
                 ""
             ]);
@@ -571,12 +571,12 @@ function setupMediaBlocks(activity) {
          * @constructor
          */
         constructor() {
-            super("video", t("video"));
+            super("video", _("video"));
 
             // Set palette and activity for the block
             this.setPalette("media", activity);
             this.setHelpString([
-                t("The Video block selects video for use with the Show block."),
+                _("The Video block selects video for use with the Show block."),
                 "documentation",
                 ""
             ]);
@@ -599,12 +599,12 @@ function setupMediaBlocks(activity) {
          * @constructor
          */
         constructor() {
-            super("loadFile", t("open file"));
+            super("loadFile", _("open file"));
 
             // Set palette and activity for the block
             this.setPalette("media", activity);
             this.setHelpString([
-                t("The Open file block opens a file for use with the Show block."),
+                _("The Open file block opens a file for use with the Show block."),
                 "documentation",
                 ""
             ]);
@@ -642,12 +642,12 @@ function setupMediaBlocks(activity) {
          * @constructor
          */
         constructor() {
-            super("stopvideocam", t("stop media"));
+            super("stopvideocam", _("stop media"));
 
             // Set palette and activity for the block
             this.setPalette("media", activity);
             this.setHelpString([
-                t("The Stop media block stops audio or video playback."),
+                _("The Stop media block stops audio or video playback."),
                 "documentation",
                 ""
             ]);
@@ -676,7 +676,7 @@ function setupMediaBlocks(activity) {
          * @constructor
          */
         constructor() {
-            super("tone", t("hertz"));
+            super("tone", _("hertz"));
 
             // Set palette and activity for the block
             this.setPalette("media", activity);
@@ -689,7 +689,7 @@ function setupMediaBlocks(activity) {
             this.formBlock({
                 args: 2,
                 defaults: [392, 1000 / 3],
-                argLabels: [t("frequency"), t("duration (MS)")]
+                argLabels: [_("frequency"), _("duration (MS)")]
             });
 
             // Form block with specified connections
@@ -725,7 +725,7 @@ function setupMediaBlocks(activity) {
          */
         constructor() {
             //.TRANS: translate a note into hertz, e.g., A4 -> 440HZ
-            super("tofrequency", t("note to frequency"));
+            super("tofrequency", _("note to frequency"));
 
             // Set palette and activity for the block
             this.setPalette("media", activity);
@@ -733,7 +733,7 @@ function setupMediaBlocks(activity) {
 
             // Set help string for the block
             this.setHelpString([
-                t("The To frequency block converts a pitch name and octave to Hertz."),
+                _("The To frequency block converts a pitch name and octave to Hertz."),
                 "documentation",
                 ""
             ]);
@@ -743,7 +743,7 @@ function setupMediaBlocks(activity) {
                 args: 2,
                 defaults: ["G", 4],
                 argTypes: ["notein", "anyin"],
-                argLabels: [this.lang === "ja" ? t("name2") : t("name"), t("octave")]
+                argLabels: [this.lang === "ja" ? _("name2") : _("name"), _("octave")]
             });
         }
 
@@ -800,7 +800,7 @@ function setupMediaBlocks(activity) {
          */
         constructor() {
             //.TRANS: Avatar is the image used to determine the appearance of the mouse.
-            super("turtleshell", t("avatar"));
+            super("turtleshell", _("avatar"));
 
             // Set palette and activity for the block
             this.setPalette("media", activity);
@@ -809,14 +809,14 @@ function setupMediaBlocks(activity) {
             // Set help string for the block
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    t("The Avatar block is used to change the appearance of the mouse."),
+                    _("The Avatar block is used to change the appearance of the mouse."),
                     "documentation",
                     null,
                     "turtleshell"
                 ]);
             } else {
                 this.setHelpString([
-                    t("The Avatar block is used to change the appearance of the turtle."),
+                    _("The Avatar block is used to change the appearance of the turtle."),
                     "documentation",
                     null,
                     "turtleshell"
@@ -828,7 +828,7 @@ function setupMediaBlocks(activity) {
                 args: 2,
                 defaults: [55, null],
                 argTypes: ["numberin", "anyin"],
-                argLabels: [t("size"), t("image")]
+                argLabels: [_("size"), _("image")]
             });
 
             // Make macro for the block
@@ -877,7 +877,7 @@ function setupMediaBlocks(activity) {
 
             // Set help string for the block
             this.setHelpString([
-                t("The Show block is used to display text or images on the canvas."),
+                _("The Show block is used to display text or images on the canvas."),
                 "documentation",
                 ""
             ]);
@@ -885,11 +885,11 @@ function setupMediaBlocks(activity) {
             // Form block with name, arguments, default values, and labels
             this.formBlock({
                 //.TRANS: show1 is show as in display an image or text on the screen.
-                name: this.lang === "ja" ? t("show1") : t("Show").toLowerCase(),
+                name: this.lang === "ja" ? _("show1") : _("Show").toLowerCase(),
                 //.TRANS: a media object
                 args: 2,
-                argLabels: [t("size"), t("obj")],
-                defaults: [24, t("text")],
+                argLabels: [_("size"), _("obj")],
+                defaults: [24, _("text")],
                 argTypes: ["numberin", "anyin"]
             });
         }
@@ -927,7 +927,7 @@ function setupMediaBlocks(activity) {
          * @constructor
          */
         constructor() {
-            super("media", t("Media").toLowerCase());
+            super("media", _("Media").toLowerCase());
 
             // Set palette and activity for the block
             this.setPalette("media", activity);
@@ -935,7 +935,7 @@ function setupMediaBlocks(activity) {
 
             // Set help string for the block
             this.setHelpString([
-                t("The Media block is used to import an image."),
+                _("The Media block is used to import an image."),
                 "documentation",
                 null,
                 "turtleshell"
@@ -960,7 +960,7 @@ function setupMediaBlocks(activity) {
          * @constructor
          */
         constructor() {
-            super("text", t("text"));
+            super("text", _("text"));
 
             // Set extra width for the block
             this.extraWidth = 30;
@@ -970,7 +970,7 @@ function setupMediaBlocks(activity) {
             this.beginnerBlock(true);
 
             // Set help string for the block
-            this.setHelpString([t("The Text block holds a text string."), "documentation", ""]);
+            this.setHelpString([_("The Text block holds a text string."), "documentation", ""]);
 
             // Form block with output type
             this.formBlock({

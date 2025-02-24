@@ -63,7 +63,7 @@ class ThemeBox {
 
     setPreference() {
         if (localStorage.getItem("themePreference") === this._theme) {
-            this.activity.textMsg(t("Music Blocks is already set to this theme."));
+            this.activity.textMsg(_("Music Blocks is already set to this theme."));
         } else {
             this.activity.storage.themePreference = this._theme;
             this.reload();

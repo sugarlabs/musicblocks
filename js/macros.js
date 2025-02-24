@@ -167,7 +167,7 @@ const getMacroExpansion = (activity, blkname, x, y) => {
         [28, ["solfege", { value: "sol" }], 0, 0, [27]],
         [29, ["number", { value: 4 }], 0, 0, [27]],
         [30, "hidden", 0, 0, [22, null]],
-        [31, ["text", { value: t("action") }], 0, 0, [0]]
+        [31, ["text", { value: _("action") }], 0, 0, [0]]
     ];
     const ARCHELP = [
         [0, "everybeatdo", x, y, [null, 1, null]],
@@ -263,8 +263,8 @@ const getMacroExpansion = (activity, blkname, x, y) => {
         [2, ["namedbox", { value: "box1" }], 0, 0, [11]],
         [3, "incrementOne", 0, 0, [10, 4, null]],
         [4, ["namedbox", { value: "box1" }], 0, 0, [3]],
-        [5, ["nameddo", { value: t("action") }], 0, 0, [10, null]],
-        [6, ["nameddo", { value: t("action") }], 0, 0, [8, null]],
+        [5, ["nameddo", { value: _("action") }], 0, 0, [10, null]],
+        [6, ["nameddo", { value: _("action") }], 0, 0, [8, null]],
         [7, "backward", 0, 0, [10, 8, 9]],
         [8, "hidden", 0, 0, [7, 6]],
         [9, "hidden", 0, 0, [7, null]],
@@ -273,7 +273,7 @@ const getMacroExpansion = (activity, blkname, x, y) => {
         [12, ["number", { value: 1 }], 0, 0, [11]]
     ];
     const BOX2HELP = [
-        [0, ["nameddo", { value: t("action") }], x, y, [1, null]],
+        [0, ["nameddo", { value: _("action") }], x, y, [1, null]],
         [1, "if", x, y + 100, [null, 7, 0, 2]],
         [2, "increment", 0, 0, [1, 3, 5, null]],
         [3, ["namedbox", { value: "box2" }], 0, 0, [2]],
@@ -708,7 +708,7 @@ const getMacroExpansion = (activity, blkname, x, y) => {
         [3, ["number", { value: 4 }], 0, 0, [1]],
         [4, "vspace", 0, 0, [0, 5]],
         [5, "playdrum", 0, 0, [4, 6, null]],
-        [6, ["drumname", { value: t("duck") }], 0, 0, [5]],
+        [6, ["drumname", { value: _("duck") }], 0, 0, [5]],
         [7, "hidden", 0, 0, [0, null]]
     ];
     const EIHELP = [
@@ -825,7 +825,7 @@ const getMacroExpansion = (activity, blkname, x, y) => {
     ];
     const FOREVERHELP = [
         [0, "forever", x, y, [null, 1, null]],
-        [1, ["nameddo", { value: t("action") }], 0, 0, [0, null]]
+        [1, ["nameddo", { value: _("action") }], 0, 0, [0, null]]
     ];
     const FORWARDHELP = [
         [0, "repeat", x, y, [null, 1, 6, null]],

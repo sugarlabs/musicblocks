@@ -668,7 +668,7 @@ class Singer {
     static setMasterVolume(logo, volume, blk) {
         const activity = logo.activity;
         const firstConnection = activity.logo.blockList[blk].connections[0];
-        const lastConnection = activity.logo.blockList[blk].connections.slice(-1)[0] || null;
+        const lastConnection = last(activity.logo.blockList[blk].connections);
         volume = Math.min(Math.max(volume, 0), 100);
         logo.synth.setMasterVolume(volume, firstConnection, lastConnection);
         for (const turtle of activity.turtles.turtleList) {
@@ -1362,7 +1362,7 @@ class Singer {
             if (partials.length === 0) {
                 //.TRANS: partials are weighted components in a harmonic series
                 activity.errorMsg(
-                    t("You must have at least one Partial block inside of a Weighted-partial block")
+                    _("You must have at least one Partial block inside of a Weighted-partial block")
                 );
             } else {
                 partials = last(tur.singer.partials);
@@ -1543,7 +1543,7 @@ class Singer {
                     if (!match) {
                         // If we don't have a match, then we need to play the previous note
                         activity.errorMsg(
-                            t(
+                            _(
                                 "You can only tie notes of the same pitch. Did you mean to use slur?"
                             ),
                             saveBlk
@@ -2078,7 +2078,7 @@ class Singer {
                                         activity.errorMsg(
                                             last(tur.singer.oscList[thisBlk]) +
                                                 ": " +
-                                                t("synth cannot play chords."),
+                                                _("synth cannot play chords."),
                                             blk
                                         );
                                     }

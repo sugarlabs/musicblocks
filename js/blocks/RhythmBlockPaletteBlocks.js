@@ -47,9 +47,9 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 name:
                     this.lang === "ja"
                         ? //.TRANS: rhythm block
-                          t("rhythm1")
+                          _("rhythm1")
                         : //.TRANS: an arrangement of notes based on duration
-                          t("rhythm"),
+                          _("rhythm"),
 
                 /**
                  * @type {number}
@@ -67,7 +67,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                  * @type {Array}
                  * @description Argument labels.
                  */
-                argLabels: [t("number of notes"), t("note value")],
+                argLabels: [_("number of notes"), _("note value")],
 
                 /**
                  * @type {Array}
@@ -123,7 +123,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 if (logo.rhythmRulerMeasure === null) {
                     logo.rhythmRulerMeasure = arg0 * arg1;
                 } else if (logo.rhythmRulerMeasure != arg0 * arg1) {
-                    activity.textMsg(t("polyphonic rhythm"));
+                    activity.textMsg(_("polyphonic rhythm"));
                 }
 
                 // Since there may be more than one instance of the
@@ -216,7 +216,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
             this.beginnerBlock(true);
             this.piemenuValuesC1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
             this.setHelpString([
-                t("The Rhythm block is used to generate rhythm patterns."),
+                _("The Rhythm block is used to generate rhythm patterns."),
                 "documentation",
                 null,
                 "rhythm2"
@@ -230,8 +230,8 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 name:
                     this.lang === "ja"
                         ? //.TRANS: translate "rhythm1" as rhythm
-                          t("rhythm1")
-                        : t("rhythm"),
+                          _("rhythm1")
+                        : _("rhythm"),
 
                 /**
                  * @type {number}
@@ -249,7 +249,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                  * @type {Array}
                  * @description Argument labels.
                  */
-                argLabels: [t("number of notes"), t("note value")],
+                argLabels: [_("number of notes"), _("note value")],
 
                 /**
                  * @type {Array}
@@ -278,12 +278,12 @@ function setupRhythmBlockPaletteBlocks(activity) {
          */
         constructor() {
             if (isAppleBrowser()) {
-                super("sixtyfourthNote", t("1/64 note"));
+                super("sixtyfourthNote", _("1/64 note"));
                 // Custom generator only needed for Apple devices
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("sixtyfourthNote", t("1/64 note") + " 𝅘𝅥𝅱");
+                super("sixtyfourthNote", _("1/64 note") + " 𝅘𝅥𝅱");
             }
 
             this.setPalette(rhythmBlockPalette, activity);
@@ -309,12 +309,12 @@ function setupRhythmBlockPaletteBlocks(activity) {
          */
         constructor() {
             if (isAppleBrowser()) {
-                super("thirtysecondNote", t("1/32 note"));
+                super("thirtysecondNote", _("1/32 note"));
                 // Custom generator only needed for Apple devices
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("thirtysecondNote", t("1/32 note") + " 𝅘𝅥𝅰");
+                super("thirtysecondNote", _("1/32 note") + " 𝅘𝅥𝅰");
             }
 
             // Set the palette and activity for the block
@@ -343,12 +343,12 @@ function setupRhythmBlockPaletteBlocks(activity) {
          */
         constructor() {
             if (isAppleBrowser()) {
-                super("sixteenthNote", t("1/16 note"));
+                super("sixteenthNote", _("1/16 note"));
                 // Custom generator only needed for Apple devices
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("sixteenthNote", t("1/16 note") + " 𝅘𝅥𝅯");
+                super("sixteenthNote", _("1/16 note") + " 𝅘𝅥𝅯");
             }
 
             // Set the palette and activity for the block
@@ -377,7 +377,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
          */
         constructor() {
             // TRANS: Do not modify the following line
-            super("eighthNote", t("eighth note") + " ♪");
+            super("eighthNote", _("eighth note") + " ♪");
 
             // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
@@ -405,7 +405,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
          */
         constructor() {
             // TRANS: Do not modify the following line
-            super("quarterNote", t("quarter note") + " ♩");
+            super("quarterNote", _("quarter note") + " ♩");
 
             // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
@@ -433,12 +433,12 @@ function setupRhythmBlockPaletteBlocks(activity) {
          */
         constructor() {
             if (isAppleBrowser()) {
-                super("halfNote", t("half note"));
+                super("halfNote", _("half note"));
                 // Custom generator only needed for Apple devices
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("halfNote", t("half note") + " 𝅗𝅥");
+                super("halfNote", _("half note") + " 𝅗𝅥");
             }
 
             // Set the palette and activity for the block
@@ -467,12 +467,12 @@ function setupRhythmBlockPaletteBlocks(activity) {
          */
         constructor() {
             if (isAppleBrowser()) {
-                super("wholeNote", t("whole note"));
+                super("wholeNote", _("whole note"));
                 // Custom generator only needed for Apple devices
                 this.appleNoteBlock();
             } else {
                 // TRANS: Do not modify the following line
-                super("wholeNote", t("whole note") + " 𝅝");
+                super("wholeNote", _("whole note") + " 𝅝");
             }
 
             // Set the palette and activity for the block
@@ -511,10 +511,10 @@ function setupRhythmBlockPaletteBlocks(activity) {
             // Form the block with specific parameters
             this.formBlock({
                 //.TRANS: A tuplet is a note value divided into irregular time values.
-                name: t("tuplet"),
+                name: _("tuplet"),
                 args: 2,
                 defaults: [1, 4],
-                argLabels: [t("number of notes"), t("note value")]
+                argLabels: [_("number of notes"), _("note value")]
             });
             this.hidden = true;
         }
@@ -580,10 +580,10 @@ function setupRhythmBlockPaletteBlocks(activity) {
             this.setHelpString();
             // Form the block with specific parameters
             this.formBlock({
-                name: t("tuplet"),
+                name: _("tuplet"),
                 args: 2,
                 defaults: [1, 4],
-                argLabels: [t("number of notes"), t("note value")]
+                argLabels: [_("number of notes"), _("note value")]
             });
             // Define the macro for creating the block
             this.makeMacro((x, y) => [
@@ -620,7 +620,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
             this.setPalette(rhythmBlockPalette, activity);
             // Set the help string for the block
             this.setHelpString([
-                t(
+                _(
                     "The Tuplet block is used to generate a group of notes played in a condensed amount of time."
                 ),
                 "documentation",
@@ -631,10 +631,10 @@ function setupRhythmBlockPaletteBlocks(activity) {
             this.extraWidth = 30;
             // Form the block with specific parameters
             this.formBlock({
-                name: t("tuplet"),
+                name: _("tuplet"),
                 args: 1,
                 defaults: [1 / 4],
-                argLabels: [t("note value")]
+                argLabels: [_("note value")]
             });
             // Define the macro for creating the block
             this.makeMacro((x, y) => [
@@ -797,7 +797,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
          */
         constructor() {
             // TRANS: Do not modify the following line
-            super("stuplet7", t("septuplet"));
+            super("stuplet7", _("septuplet"));
 
             // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
@@ -825,7 +825,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
          */
         constructor() {
             // TRANS: Do not modify the following line
-            super("stuplet5", t("quintuplet"));
+            super("stuplet5", _("quintuplet"));
 
             // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
@@ -853,7 +853,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
          */
         constructor() {
             // TRANS: A tuplet divided into 3 time values.
-            super("stuplet3", t("triplet"));
+            super("stuplet3", _("triplet"));
 
             // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
@@ -880,7 +880,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
          * Constructs a STupletBlock instance.
          */
         constructor() {
-            super("stuplet", t("simple tuplet"));
+            super("stuplet", _("simple tuplet"));
 
             // Set the palette and activity for the block
             this.setPalette(rhythmBlockPalette, activity);
@@ -890,9 +890,9 @@ function setupRhythmBlockPaletteBlocks(activity) {
             this.beginnerBlock(_THIS_IS_MUSIC_BLOCKS_);
             // Set the help string for the block
             this.setHelpString([
-                t("Tuplets are a collection of notes that get scaled to a specific duration.") +
+                _("Tuplets are a collection of notes that get scaled to a specific duration.") +
                     " " +
-                    t(
+                    _(
                         "Using tuplets makes it easy to create groups of notes that are not based on a power of 2."
                     ),
                 "documentation",
@@ -904,7 +904,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
             this.formBlock({
                 args: 2,
                 defaults: [3, 1 / 2],
-                argLabels: [t("number of notes"), t("note value")]
+                argLabels: [_("number of notes"), _("note value")]
             });
 
             // Define the macro for creating the block

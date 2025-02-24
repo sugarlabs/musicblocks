@@ -31,7 +31,7 @@ function setupMeterBlocks(activity) {
          */
         constructor() {
             //.TRANS: musical meter (time signature), e.g., 4:4
-            super("currentmeter", t("current meter"));
+            super("currentmeter", _("current meter"));
 
             // Set palette and activity for the block
             this.setPalette("meter", activity);
@@ -82,7 +82,7 @@ function setupMeterBlocks(activity) {
          */
         constructor() {
             //.TRANS: number of beats per minute
-            super("beatfactor", t("beat factor"));
+            super("beatfactor", _("beat factor"));
 
             // Set palette and activity for the block
             this.setPalette("meter", activity);
@@ -90,7 +90,7 @@ function setupMeterBlocks(activity) {
 
             // Set help string for the block
             this.setHelpString([
-                t(
+                _(
                     "The Beat factor block returns the ratio of the note value to the meter note value."
                 ),
                 "documentation",
@@ -158,7 +158,7 @@ function setupMeterBlocks(activity) {
 
             // Set help string for the block
             this.setHelpString([
-                t("The Beats per minute block returns the current beats per minute."),
+                _("The Beats per minute block returns the current beats per minute."),
                 "documentation",
                 ""
             ]);
@@ -167,7 +167,7 @@ function setupMeterBlocks(activity) {
             this.formBlock({
                 //.TRANS: number of beats played per minute
 		//.TRANS: in Japanese: "１分当たりの拍の数"
-                name: this.lang === "ja" ? t("beats per minute2") : t("beats per minute")
+                name: this.lang === "ja" ? _("beats per minute2") : _("beats per minute")
             });
         }
 
@@ -231,7 +231,7 @@ function setupMeterBlocks(activity) {
          */
         constructor() {
             //.TRANS: count of current musical measure in meter
-            super("measurevalue", t("measure count"));
+            super("measurevalue", _("measure count"));
 
             // Set palette and activity for the block
             this.setPalette("meter", activity);
@@ -239,7 +239,7 @@ function setupMeterBlocks(activity) {
 
             // Set help string for the block
             this.setHelpString([
-                t("The Measure count block returns the current measure."),
+                _("The Measure count block returns the current measure."),
                 "documentation",
                 ""
             ]);
@@ -288,7 +288,7 @@ function setupMeterBlocks(activity) {
          */
         constructor() {
             //.TRANS: count of current beat in the meter
-            super("beatvalue", t("beat count"));
+            super("beatvalue", _("beat count"));
 
             // Set palette and activity for the block
             this.setPalette("meter", activity);
@@ -298,9 +298,9 @@ function setupMeterBlocks(activity) {
             // Set help string for the block based on beginner mode and language
             if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    t("The Beat count block is the number of the current beat,") +
+                    _("The Beat count block is the number of the current beat,") +
                         " " +
-                        t(
+                        _(
                             "In the figure, it is used to take an action on the first beat of each measure."
                         ),
                     "documentation",
@@ -309,11 +309,11 @@ function setupMeterBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    t("The Beat count block is the number of the current beat,") +
+                    _("The Beat count block is the number of the current beat,") +
                         " " +
-                        t("eg 1, 2, 3, or 4.") +
+                        _("eg 1, 2, 3, or 4.") +
                         " " +
-                        t(
+                        _(
                             "In the figure, it is used to take an action on the first beat of each measure."
                         ),
                     "documentation",
@@ -366,7 +366,7 @@ function setupMeterBlocks(activity) {
          */
         constructor() {
             //.TRANS: count the number of notes
-            super("notecounter", t("sum note values"));
+            super("notecounter", _("sum note values"));
 
             // Set palette and activity for the block
             this.setPalette("meter", activity);
@@ -374,7 +374,7 @@ function setupMeterBlocks(activity) {
 
             // Set help string for the block
             this.setHelpString([
-                t("The Note counter block can be used to count the number of contained notes."),
+                _("The Note counter block can be used to count the number of contained notes."),
                 "documentation",
                 null,
                 "notecounterhelp"
@@ -430,7 +430,7 @@ function setupMeterBlocks(activity) {
          */
         constructor() {
             //.TRANS: count the number of notes
-            super("notecounter2", t("note counter"));
+            super("notecounter2", _("note counter"));
 
             // Set palette and activity for the block
             this.setPalette("meter", activity);
@@ -438,7 +438,7 @@ function setupMeterBlocks(activity) {
 
             // Set help string for the block
             this.setHelpString([
-                t("The Note counter block can be used to count the number of contained notes."),
+                _("The Note counter block can be used to count the number of contained notes."),
                 "documentation",
                 null,
                 "notecounterhelp"
@@ -494,7 +494,7 @@ function setupMeterBlocks(activity) {
          */
         constructor() {
             //.TRANS: number of whole notes that have been played
-            super("elapsednotes", t("whole notes played"));
+            super("elapsednotes", _("whole notes played"));
 
             // Set palette and activity for the block
             this.setPalette("meter", activity);
@@ -503,7 +503,7 @@ function setupMeterBlocks(activity) {
 
             // Set help string for the block
             this.setHelpString([
-                t("The Whole notes played block returns the total number of whole notes played."),
+                _("The Whole notes played block returns the total number of whole notes played."),
                 "documentation",
                 null,
                 "elapsedhelp"
@@ -553,7 +553,7 @@ function setupMeterBlocks(activity) {
          */
         constructor() {
             //.TRANS: number of notes that have been played
-            super("elapsednotes2", t("notes played"));
+            super("elapsednotes2", _("notes played"));
 
             // Set palette and activity for the block
             this.setPalette("meter", activity);
@@ -563,9 +563,9 @@ function setupMeterBlocks(activity) {
             // Set help string for the block based on beginner mode and language
             if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    t("The Beat count block is the number of the current beat,") +
+                    _("The Beat count block is the number of the current beat,") +
                         " " +
-                        t(
+                        _(
                             "In the figure, it is used to take an action on the first beat of each measure."
                         ),
                     "documentation",
@@ -574,11 +574,11 @@ function setupMeterBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    t("The Beat count block is the number of the current beat,") +
+                    _("The Beat count block is the number of the current beat,") +
                         " " +
-                        t("eg 1, 2, 3, or 4.") +
+                        _("eg 1, 2, 3, or 4.") +
                         " " +
-                        t(
+                        _(
                             "In the figure, it is used to take an action on the first beat of each measure."
                         ),
                     "documentation",
@@ -651,7 +651,7 @@ function setupMeterBlocks(activity) {
             // Set palette and activity for the block
             this.setPalette("meter", activity);
             this.setHelpString([
-                t("The No clock block decouples the notes from the master clock."),
+                _("The No clock block decouples the notes from the master clock."),
                 "documentation",
                 ""
             ]);
@@ -659,7 +659,7 @@ function setupMeterBlocks(activity) {
             // Form block with name "no clock"
             this.formBlock({
                 //.TRANS: don't lock notes to master clock
-                name: t("no clock")
+                name: _("no clock")
             });
 
             // Make a macro with hidden block
@@ -698,12 +698,12 @@ function setupMeterBlocks(activity) {
          */
         constructor() {
             // .TRANS: on musical 'offbeat' do some action
-            super("offbeatdo", t("on weak beat do"));
+            super("offbeatdo", _("on weak beat do"));
 
             // Set palette and activity for the block
             this.setPalette("meter", activity);
             this.setHelpString([
-                t("The On-weak-beat block lets you specify actions to take on weak (off) beats."),
+                _("The On-weak-beat block lets you specify actions to take on weak (off) beats."),
                 "documentation",
                 null,
                 "everybeathelp"
@@ -713,7 +713,7 @@ function setupMeterBlocks(activity) {
             this.formBlock({
                 args: 1,
                 argTypes: ["textin"],
-                defaults: [t("action")]
+                defaults: [_("action")]
             });
         }
 
@@ -748,7 +748,7 @@ function setupMeterBlocks(activity) {
          */
         constructor() {
             // .TRANS: 'on' musical 'beat' 'do' some action
-            super("onbeatdo", t("on strong beat"));
+            super("onbeatdo", _("on strong beat"));
 
             // Set palette, activity, and piemenuValuesC1 for the block
             this.setPalette("meter", activity);
@@ -756,7 +756,7 @@ function setupMeterBlocks(activity) {
 
             // Set help string for the block
             this.setHelpString([
-                t("The On-strong-beat block lets you specify actions to take on specified beats."),
+                _("The On-strong-beat block lets you specify actions to take on specified beats."),
                 "documentation",
                 null,
                 "everybeathelp"
@@ -766,8 +766,8 @@ function setupMeterBlocks(activity) {
             this.formBlock({
                 args: 2,
                 argTypes: ["numberin", "textin"],
-                defaults: [1, t("action")],
-                argLabels: [t("beat"), this.lang === "ja" ? t("do1") : t("do")]
+                defaults: [1, _("action")],
+                argLabels: [_("beat"), this.lang === "ja" ? _("do1") : _("do")]
             });
         }
 
@@ -811,7 +811,7 @@ function setupMeterBlocks(activity) {
          */
         constructor() {
             // .TRANS: on every beat, do some action
-            super("everybeatdonew", t("on every beat do"));
+            super("everybeatdonew", _("on every beat do"));
 
             // Set palette and activity for the block
             this.setPalette("meter", activity);
@@ -819,7 +819,7 @@ function setupMeterBlocks(activity) {
 
             // Set help string for the block
             this.setHelpString([
-                t("The On-every-beat block lets you specify actions to take on every beat."),
+                _("The On-every-beat block lets you specify actions to take on every beat."),
                 "documentation",
                 null,
                 "everybeathelp"
@@ -829,7 +829,7 @@ function setupMeterBlocks(activity) {
             this.formBlock({
                 args: 1,
                 argTypes: ["textin"],
-                defaults: [t("action")]
+                defaults: [_("action")]
             });
 
             // Make a macro with everybeatdonew block
@@ -872,7 +872,7 @@ function setupMeterBlocks(activity) {
          */
         constructor() {
             // .TRANS: on every note played, do some action
-            super("everybeatdo", t("on every note do"));
+            super("everybeatdo", _("on every note do"));
 
             // Set palette and activity for the block
             this.setPalette("meter", activity);
@@ -880,7 +880,7 @@ function setupMeterBlocks(activity) {
 
             // Set help string for the block
             this.setHelpString([
-                t("The On-every-note block lets you specify actions to take on every note."),
+                _("The On-every-note block lets you specify actions to take on every note."),
                 "documentation",
                 null,
                 "everybeathelp"
@@ -890,7 +890,7 @@ function setupMeterBlocks(activity) {
             this.formBlock({
                 args: 1,
                 argTypes: ["textin"],
-                defaults: [t("action")]
+                defaults: [_("action")]
             });
         }
 
@@ -926,7 +926,7 @@ function setupMeterBlocks(activity) {
          */
         constructor() {
             //.TRANS: sets tempo by defining a beat and beats per minute
-            super("setmasterbpm2", t("master beats per minute"));
+            super("setmasterbpm2", _("master beats per minute"));
 
             // Set palette, activity, piemenuValuesC1, and beginnerBlock for the block
             this.setPalette("meter", activity);
@@ -938,7 +938,7 @@ function setupMeterBlocks(activity) {
 
             // Set help string for the block
             this.setHelpString([
-                t(
+                _(
                     "The Master beats per minute block sets the number of 1/4 notes per minute for every voice."
                 ),
                 "documentation",
@@ -950,7 +950,7 @@ function setupMeterBlocks(activity) {
             this.formBlock({
                 args: 2,
                 defaults: [90, 1 / 4],
-                argLabels: [t("bpm"), t("beat value")]
+                argLabels: [_("bpm"), _("beat value")]
             });
 
             // Make a macro with setmasterbpm2 block
@@ -997,7 +997,7 @@ function setupMeterBlocks(activity) {
          * @constructor
          */
         constructor() {
-            super("setmasterbpm", t("master beats per minute"));
+            super("setmasterbpm", _("master beats per minute"));
 
             // Set palette and activity for the block
             this.setPalette("meter", activity);
@@ -1022,10 +1022,10 @@ function setupMeterBlocks(activity) {
         flow(args, logo, turtle, blk) {
             if (args.length === 1 && typeof args[0] === "number") {
                 if (args[0] < 30) {
-                    activity.errorMsg(t("Beats per minute must be > 30."), blk);
+                    activity.errorMsg(_("Beats per minute must be > 30."), blk);
                     Singer.masterBPM = 30;
                 } else if (args[0] > 1000) {
-                    activity.errorMsg(t("Maximum beats per minute is 1000."), blk);
+                    activity.errorMsg(_("Maximum beats per minute is 1000."), blk);
                     Singer.masterBPM = 1000;
                 } else {
                     Singer.masterBPM = args[0];
@@ -1054,7 +1054,7 @@ function setupMeterBlocks(activity) {
          */
         constructor() {
             //.TRANS: sets tempo by defining a beat and beats per minute
-            super("setbpm3", t("beats per minute"));
+            super("setbpm3", _("beats per minute"));
 
             // Set palette, piemenuValuesC1, beginnerBlock, and activity for the block
             this.setPalette("meter", activity);
@@ -1066,7 +1066,7 @@ function setupMeterBlocks(activity) {
 
             // Set help string for the block
             this.setHelpString([
-                t("The Beats per minute block sets the number of 1/4 notes per minute."),
+                _("The Beats per minute block sets the number of 1/4 notes per minute."),
                 "documentation",
                 null,
                 "bpmhelp"
@@ -1076,7 +1076,7 @@ function setupMeterBlocks(activity) {
             this.formBlock({
                 args: 2,
                 defaults: [90, 1 / 4],
-                argLabels: [t("bpm"), t("beat value")]
+                argLabels: [_("bpm"), _("beat value")]
             });
 
             // Make a macro with setbpm3 block
@@ -1131,9 +1131,9 @@ function setupMeterBlocks(activity) {
             // Form block with args type
             this.formBlock({
                 // .TRANS: sets tempo for notes contained in block
-                name: t("beats per minute"),
+                name: _("beats per minute"),
                 args: 2,
-                argLabels: [t("bpm"), t("beat value")],
+                argLabels: [_("bpm"), _("beat value")],
                 defaults: [90, 1 / 4]
             });
 
@@ -1165,10 +1165,10 @@ function setupMeterBlocks(activity) {
             if (args.length === 3 && typeof args[0] === "number" && typeof args[1] == "number") {
                 let bpm = (args[0] * args[1]) / 0.25;
                 if (args[0] < 30) {
-                    activity.errorMsg(t("Beats per minute must be > 30."));
+                    activity.errorMsg(_("Beats per minute must be > 30."));
                     bpm = 30;
                 } else if (args[0] > 1000) {
-                    activity.errorMsg(t("Maximum beats per minute is 1000."));
+                    activity.errorMsg(_("Maximum beats per minute is 1000."));
                     bpm = 1000;
                 }
 
@@ -1209,7 +1209,7 @@ function setupMeterBlocks(activity) {
             // Form block with args type
             this.formBlock({
                 // .TRANS: old block to set tempo using only bpm for notes contained in block
-                name: t("beats per minute"),
+                name: _("beats per minute"),
                 args: 1,
                 defaults: [90]
             });
@@ -1239,10 +1239,10 @@ function setupMeterBlocks(activity) {
             if (args.length === 2 && typeof args[0] === "number") {
                 let bpm;
                 if (args[0] < 30) {
-                    activity.errorMsg(t("Beats per minute must be > 30."), blk);
+                    activity.errorMsg(_("Beats per minute must be > 30."), blk);
                     bpm = 30;
                 } else if (args[0] > 1000) {
-                    activity.errorMsg(t("Maximum beats per minute is 1000."), blk);
+                    activity.errorMsg(_("Maximum beats per minute is 1000."), blk);
                     bpm = 1000;
                 } else {
                     bpm = args[0];
@@ -1277,14 +1277,14 @@ function setupMeterBlocks(activity) {
          */
         constructor() {
             //.TRANS: anacrusis
-            super("pickup", t("pickup"));
+            super("pickup", _("pickup"));
 
             // Set palette and activity for the block
             this.setPalette("meter", activity);
 
             // Set help string for the block
             this.setHelpString([
-                t(
+                _(
                     "The Pickup block is used to accommodate any notes that come in before the beat."
                 ),
                 "documentation",
@@ -1341,7 +1341,7 @@ function setupMeterBlocks(activity) {
          */
         constructor() {
             //.TRANS: musical meter (time signature), e.g., 4:4
-            super("meter", t("meter"));
+            super("meter", _("meter"));
 
             // Set palette, piemenuValuesC1, beginnerBlock, and activity for the block
             this.setPalette("meter", activity);
@@ -1350,7 +1350,7 @@ function setupMeterBlocks(activity) {
 
             // Set help string for the block
             this.setHelpString([
-                t(
+                _(
                     "The beat of the music is determined by the Meter block (by default, 4 1/4 notes per measure)."
                 ),
                 "documentation",
@@ -1365,7 +1365,7 @@ function setupMeterBlocks(activity) {
             this.formBlock({
                 args: 2,
                 defaults: [4, 1 / 4],
-                argLabels: [t("number of beats"), t("note value")]
+                argLabels: [_("number of beats"), _("note value")]
             });
 
             // Make a macro with meter block
