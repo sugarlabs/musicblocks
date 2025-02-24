@@ -2948,7 +2948,7 @@ class Activity {
                 [7, "hidden", 0, 0, [1, null]],
                 [8, "hiddennoflow", 0, 0, [0, null]]
             ];
-            return samplerStack;
+            this.blocks.loadNewBlocks(samplerStack);
         };
 
         /*
@@ -6490,6 +6490,8 @@ class Activity {
                             that.errorMsg(
                                 _("Cannot load project from the file. Please check the file type.")
                             );
+                        } else if (files[0].type === "audio/wav") {
+                            this.makeSamplerWidget(files[0].name, reader.result);
                         } else {
                             const cleanData = rawData.replace("\n", " ");
                             let obj;
@@ -6498,9 +6500,6 @@ class Activity {
                                     obj = JSON.parse(
                                         cleanData.match('<div class="code">(.+?)</div>')[1]
                                     );
-                                }
-                                else if (files[0].type === "audio/wav") {
-                                    obj = this.makeSamplerWidget(files[0].name, reader.result);
                                 }
                                 else {
                                     obj = JSON.parse(cleanData);
