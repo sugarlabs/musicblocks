@@ -130,44 +130,6 @@
     }
 }
 
-    /* Custom dropdown for play-only mode */
-.play-only #aux-dropdown {
-        display: none;
-        position: absolute;
-        top: 50px;
-        right: 10px;
-        background-color: white;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
-        padding: 10px;
-        z-index: 1000;
-    }
-
-.play-only #aux-dropdown.show-dropdown {
-    display: block;
-    opacity: 1; /* Make sure to override the default 0 opacity */
-    transition: opacity 0.3s ease-in-out; /* optional for a smooth fade-in */
-}
-      
-
-.play-only #aux-dropdown a {
-    display: block;
-    padding: 8px 12px;
-    text-decoration: none;
-    color: black;
-}
-
-.play-only #aux-dropdown a:hover {
-    background-color: #f2f2f2;
-}
-
-
-
-.play-only #aux-toolbar {
-    display: none !important;
-}
-
 /* Make the container background invisible without affecting child elements */
 .play-only #buttoncontainerBOTTOM {
     background: transparent !important;
@@ -182,14 +144,5 @@
 .play-only #Home\ \[HOME\] {
     display: flex !important;
     position: fixed !important;
-}
-
-.play-only .dropdown-content {
-    background: white !important;
-    box-shadow: none !important;
-}
-
-.play-only .dropdown-overlay {
-    display: none !important;
 }
 
