@@ -501,7 +501,7 @@ const SOLFEGECONVERSIONTABLE = {
     "B♭": "ti" + FLAT,
     "B": "ti",
     "B♯": "ti" + SHARP,
-    "R": _("rest")
+    "R": t("rest")
 };
 
 /**
@@ -641,7 +641,7 @@ const FIXEDSOLFEGE1 = {
     "ti": "B",
     "ti♯": "B" + SHARP,
     "ti𝄪": "C",
-    "R": _("rest")
+    "R": t("rest")
 };
 
 /**
@@ -684,28 +684,28 @@ const ALLNOTESTEP = {
  */
 
 const SEMITONETOINTERVALMAP = {
-    0: { 0: _("Perfect unison"), 1: _("Diminished second") },
-    1: { 1: _("Minor second"), 0: _("Augmented unison") },
-    2: { 1: _("Major second"), 2: _("Diminished third") },
-    3: { 2: _("Minor third"), 1: _("Augmented second") },
-    4: { 2: _("Major third"), 3: _("Diminished fourth") },
-    5: { 3: _("Perfect fourth"), 2: _("Augmented third") },
-    6: { 4: _("Diminished fifth"), 3: _("Augmented fourth") },
-    7: { 4: _("Perfect fifth"), 5: _("Diminished sixth") },
-    8: { 5: _("Minor sixth"), 4: _("Augmented fifth") },
-    9: { 5: _("Major sixth"), 6: _("Diminished seventh") },
-    10: { 6: _("Minor seventh"), 5: _("Augmented sixth") },
-    11: { 6: _("Major seventh"), 0: _("Diminished octave") },
-    12: { 0: _("Perfect octave"), 6: _("Augmented seventh") },
-    13: { 1: _("Minor ninth"), 0: _("Augmented octave") },
-    14: { 1: _("Major ninth"), 2: _("Diminished tenth") },
-    15: { 2: _("Minor tenth"), 1: _("Augmented ninth") },
-    16: { 2: _("Major tenth"), 3: _("Diminished eleventh") },
-    17: { 3: _("Perfect eleventh"), 2: _("Augmented tenth") },
-    18: { 4: _("Diminished twelfth"), 3: _("Augmented eleventh") },
-    19: { 4: _("Perfect twelfth"), 5: _("Diminished thirteenth") },
-    20: { 5: _("Minor thirteenth"), 4: _("Augmented fifth, plus an octave") },
-    21: { 5: _("Major thirteenth"), 6: _("Diminished seventh, plus an octave") }
+    0: { 0: t("Perfect unison"), 1: t("Diminished second") },
+    1: { 1: t("Minor second"), 0: t("Augmented unison") },
+    2: { 1: t("Major second"), 2: t("Diminished third") },
+    3: { 2: t("Minor third"), 1: t("Augmented second") },
+    4: { 2: t("Major third"), 3: t("Diminished fourth") },
+    5: { 3: t("Perfect fourth"), 2: t("Augmented third") },
+    6: { 4: t("Diminished fifth"), 3: t("Augmented fourth") },
+    7: { 4: t("Perfect fifth"), 5: t("Diminished sixth") },
+    8: { 5: t("Minor sixth"), 4: t("Augmented fifth") },
+    9: { 5: t("Major sixth"), 6: t("Diminished seventh") },
+    10: { 6: t("Minor seventh"), 5: t("Augmented sixth") },
+    11: { 6: t("Major seventh"), 0: t("Diminished octave") },
+    12: { 0: t("Perfect octave"), 6: t("Augmented seventh") },
+    13: { 1: t("Minor ninth"), 0: t("Augmented octave") },
+    14: { 1: t("Major ninth"), 2: t("Diminished tenth") },
+    15: { 2: t("Minor tenth"), 1: t("Augmented ninth") },
+    16: { 2: t("Major tenth"), 3: t("Diminished eleventh") },
+    17: { 3: t("Perfect eleventh"), 2: t("Augmented tenth") },
+    18: { 4: t("Diminished twelfth"), 3: t("Augmented eleventh") },
+    19: { 4: t("Perfect twelfth"), 5: t("Diminished thirteenth") },
+    20: { 5: t("Minor thirteenth"), 4: t("Augmented fifth, plus an octave") },
+    21: { 5: t("Major thirteenth"), 6: t("Diminished seventh, plus an octave") }
 };
 
 /**
@@ -835,7 +835,7 @@ const SOLFATTRS = [DOUBLESHARP, SHARP, NATURAL, FLAT, DOUBLEFLAT];
  * Ordinal numbers for degrees.
  * @constant {string}
  */
-const DEGREES = _("1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th");
+const DEGREES = t("1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th");
 
 /**
  * Number of semitones in an octave.
@@ -999,202 +999,202 @@ const NOTESYMBOLS = {
  */
 const SELECTORSTRINGS = [
     //.TRANS: unison is a music term related to intervals
-    _("unison"),
+    t("unison"),
     //.TRANS: augmented is a music term related to intervals
-    _("augmented"),
+    t("augmented"),
     //.TRANS: diminished is a music term related to intervals and mode
-    _("diminished"),
+    t("diminished"),
     //.TRANS: minor is a music term related to intervals and mode
-    _("minor"),
+    t("minor"),
     //.TRANS: major is a music term related to intervals and mode
-    _("major"),
+    t("major"),
     //.TRANS: perfect is a music term related to intervals
-    _("perfect"),
+    t("perfect"),
     //.TRANS: twelve semi-tone scale for music
-    _("chromatic"),
-    _("algerian"),
-    _("spanish"),
+    t("chromatic"),
+    t("algerian"),
+    t("spanish"),
     //.TRANS: modal scale in music
-    _("octatonic"),
+    t("octatonic"),
     //.TRANS: harmonic major scale in music
-    _("harmonic major"),
+    t("harmonic major"),
     //.TRANS: natural minor scales in music
-    _("natural minor"),
+    t("natural minor"),
     //.TRANS: harmonic minor scale in music
-    _("harmonic minor"),
+    t("harmonic minor"),
     //.TRANS: melodic minor scale in music
-    _("melodic minor"),
+    t("melodic minor"),
     //.TRANS: modal scale for music
-    _("ionian"),
+    t("ionian"),
     //.TRANS: modal scale for music
-    _("dorian"),
+    t("dorian"),
     //.TRANS: modal scale for music
-    _("phrygian"),
+    t("phrygian"),
     //.TRANS: modal scale for music
-    _("lydian"),
+    t("lydian"),
     //.TRANS: modal scale for music
-    _("mixolydian"),
+    t("mixolydian"),
     //.TRANS: modal scale for music
-    _("aeolian"),
+    t("aeolian"),
     //.TRANS: modal scale for music
-    _("locrian"),
+    t("locrian"),
     //.TRANS: minor jazz scale for music
-    _("jazz minor"),
+    t("jazz minor"),
     //.TRANS: bebop scale for music
-    _("bebop"),
-    _("arabic"),
-    _("byzantine"),
+    t("bebop"),
+    t("arabic"),
+    t("byzantine"),
     //.TRANS: musical scale for music by Verdi
-    _("enigmatic"),
-    _("ethiopian"),
+    t("enigmatic"),
+    t("ethiopian"),
     //.TRANS: Ethiopic scale for music
-    _("geez"),
-    _("hindu"),
-    _("hungarian"),
+    t("geez"),
+    t("hindu"),
+    t("hungarian"),
     //.TRANS: minor Romanian scale for music
-    _("romanian minor"),
-    _("spanish gypsy"),
+    t("romanian minor"),
+    t("spanish gypsy"),
     //.TRANS: musical scale for Mid-Eastern music
-    _("maqam"),
+    t("maqam"),
     //.TRANS: minor blues scale for music
-    _("minor blues"),
+    t("minor blues"),
     //.TRANS: major blues scale for music
-    _("major blues"),
-    _("whole tone"),
+    t("major blues"),
+    t("whole tone"),
     //.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "minor pentatonic"
-    _("minor pentatonic"),
+    t("minor pentatonic"),
     //.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "major pentatonic"
-    _("major pentatonic"),
-    _("chinese"),
-    _("egyptian"),
+    t("major pentatonic"),
+    t("chinese"),
+    t("egyptian"),
     //.TRANS: https://en.wikipedia.org/wiki/Hirajoshi_scale NOTE: There are three different versions of this scale
-    _("hirajoshi"),
-    _("Japan"),
+    t("hirajoshi"),
+    t("Japan"),
     //.TRANS: https://en.wikipedia.org/wiki/In_scale and https://en.wikipedia.org/wiki/Sakura_Sakura
-    _("in"),
+    t("in"),
     //.TRANS: https://en.wikipedia.org/wiki/Miny%C5%8D_scale
-    _("minyo"),
+    t("minyo"),
     //.TRANS: Italian mathematician
-    _("fibonacci"),
-    _("custom"),
+    t("fibonacci"),
+    t("custom"),
     //.TRANS: highpass filter
-    _("highpass"),
+    t("highpass"),
     //.TRANS: lowpass filter
-    _("lowpass"),
+    t("lowpass"),
     //.TRANS: bandpass filter
-    _("bandpass"),
+    t("bandpass"),
     //.TRANS: high-shelf filter
-    _("highshelf"),
+    t("highshelf"),
     //.TRANS: low-shelf filter
-    _("lowshelf"),
+    t("lowshelf"),
     //.TRANS: notch-shelf filter
-    _("notch"),
+    t("notch"),
     //.TRANS: all-pass filter
-    _("allpass"),
+    t("allpass"),
     //.TRANS: peaking filter
-    _("peaking"),
-    _("sine"),
-    _("square"),
-    _("triangle"),
-    _("sawtooth"),
+    t("peaking"),
+    t("sine"),
+    t("square"),
+    t("triangle"),
+    t("sawtooth"),
     //.TRANS: even numbers
-    _("even"),
+    t("even"),
     //.TRANS: odd numbers
-    _("odd"),
-    _("scalar"),
-    _("piano"),
-    _("violin"),
-    _("viola"),
-    _("xylophone"),
-    _("vibraphone"),
-    _("cello"),
-    _("bass"),
-    _("double bass"),
-    _("guitar"),
-    _("sitar"),
-    _("harmoiunm"),
-    _("acoustic guitar"),
-    _("flute"),
-    _("clarinet"),
-    _("saxophone"),
-    _("tuba"),
-    _("trumpet"),
-    _("oboe"),
-    _("trombone"),
-    _("electronic synth"),
-    _("simple 1"),
-    _("simple 2"),
-    _("simple 3"),
-    _("simple 4"),
-    _("white noise"),
-    _("brown noise"),
-    _("pink noise"),
-    _("custom"),
-    _("snare drum"),
-    _("kick drum"),
-    _("tom tom"),
-    _("floor tom"),
-    _("bass drum"),
-    _("cup drum"),
-    _("darbuka drum"),
-    _("hi hat"),
-    _("ride bell"),
-    _("cow bell"),
-    _("japanese drum"),
-    // _('japanese bell'),
-    _("triangle bell"),
-    _("finger cymbals"),
-    _("chime"),
-    _("gong"),
-    _("clang"),
-    _("crash"),
-    _("bottle"),
-    _("clap"),
-    _("slap"),
-    _("splash"),
-    _("bubbles"),
-    _("raindrop"),
-    _("cat"),
-    _("cricket"),
-    _("dog"),
-    _("duck"),
-    _("banjo"),
-    _("koto"),
-    _("dulcimer"),
-    _("electric guitar"),
-    _("bassoon"),
-    _("celeste"),
+    t("odd"),
+    t("scalar"),
+    t("piano"),
+    t("violin"),
+    t("viola"),
+    t("xylophone"),
+    t("vibraphone"),
+    t("cello"),
+    t("bass"),
+    t("double bass"),
+    t("guitar"),
+    t("sitar"),
+    t("harmoiunm"),
+    t("acoustic guitar"),
+    t("flute"),
+    t("clarinet"),
+    t("saxophone"),
+    t("tuba"),
+    t("trumpet"),
+    t("oboe"),
+    t("trombone"),
+    t("electronic synth"),
+    t("simple 1"),
+    t("simple 2"),
+    t("simple 3"),
+    t("simple 4"),
+    t("white noise"),
+    t("brown noise"),
+    t("pink noise"),
+    t("custom"),
+    t("snare drum"),
+    t("kick drum"),
+    t("tom tom"),
+    t("floor tom"),
+    t("bass drum"),
+    t("cup drum"),
+    t("darbuka drum"),
+    t("hi hat"),
+    t("ride bell"),
+    t("cow bell"),
+    t("japanese drum"),
+    // t('japanese bell'),
+    t("triangle bell"),
+    t("finger cymbals"),
+    t("chime"),
+    t("gong"),
+    t("clang"),
+    t("crash"),
+    t("bottle"),
+    t("clap"),
+    t("slap"),
+    t("splash"),
+    t("bubbles"),
+    t("raindrop"),
+    t("cat"),
+    t("cricket"),
+    t("dog"),
+    t("duck"),
+    t("banjo"),
+    t("koto"),
+    t("dulcimer"),
+    t("electric guitar"),
+    t("bassoon"),
+    t("celeste"),
     //.TRANS: musical temperament
-    _("equal"),
+    t("equal"),
     //.TRANS: musical temperament
-    _("Pythagorean"),
+    t("Pythagorean"),
     //.TRANS: musical temperament
-    _("just intonation"),
+    t("just intonation"),
     //.TRANS: musical temperament
-    _("Meantone").toLowerCase(),
-    _("custom"),
+    t("Meantone").toLowerCase(),
+    t("custom"),
     //.TRANS: double flat is a music term related to pitch
-    _("double flat"),
+    t("double flat"),
     //.TRANS: flat is a music term related to pitch
-    _("flat"),
+    t("flat"),
     //.TRANS: natural is a music term related to pitch
-    _("natural"),
+    t("natural"),
     //.TRANS: sharp is a music term related to pitch
-    _("sharp"),
+    t("sharp"),
     //.TRANS: double sharp is a music term related to pitch
-    _("double sharp"),
+    t("double sharp"),
     // Chord names
-    _("major"),
-    _("minor"),
-    _("augmented"),
-    _("diminished"),
-    _("major 7th"),
-    _("minor 7th"),
-    _("dominant 7th"),
-    _("minor-major 7th"),
-    _("fully-diminished 7th"),
-    _("half-diminished 7th"),
-    _("custom")
+    t("major"),
+    t("minor"),
+    t("augmented"),
+    t("diminished"),
+    t("major 7th"),
+    t("minor 7th"),
+    t("dominant 7th"),
+    t("minor-major 7th"),
+    t("fully-diminished 7th"),
+    t("half-diminished 7th"),
+    t("custom")
 ];
 
 /**
@@ -1202,11 +1202,11 @@ const SELECTORSTRINGS = [
  * @constant {Array<string>}
  */
 const ACCIDENTALLABELS = [
-    _("double sharp") + " " + DOUBLESHARP,
-    _("sharp") + " " + SHARP,
-    _("natural") + " " + NATURAL,
-    _("flat") + " " + FLAT,
-    _("double flat") + " " + DOUBLEFLAT
+    t("double sharp") + " " + DOUBLESHARP,
+    t("sharp") + " " + SHARP,
+    t("natural") + " " + NATURAL,
+    t("flat") + " " + FLAT,
+    t("double flat") + " " + DOUBLEFLAT
 ];
 
 /**
@@ -1355,9 +1355,9 @@ const setCustomChord = (chord) => {
  * @constant {Array<Array<string>>}
  */
 const INVERTMODES = [
-    [_("even"), "even"],
-    [_("odd"), "odd"],
-    [_("scalar"), "scalar"]
+    [t("even"), "even"],
+    [t("odd"), "odd"],
+    [t("scalar"), "scalar"]
 ];
 
 /**
@@ -1365,11 +1365,11 @@ const INVERTMODES = [
  * @constant {Array<Array<string>>}
  */
 const INTERVALS = [
-    [_("perfect"), "perfect", [1, 4, 5, 8]],
-    [_("minor"), "minor", [2, 3, 6, 7]],
-    [_("diminished"), "diminished", [2, 3, 4, 5, 6, 7, 8]],
-    [_("augmented"), "augmented", [1, 2, 3, 4, 5, 6, 7, 8]],
-    [_("major"), "major", [2, 3, 6, 7]]
+    [t("perfect"), "perfect", [1, 4, 5, 8]],
+    [t("minor"), "minor", [2, 3, 6, 7]],
+    [t("diminished"), "diminished", [2, 3, 4, 5, 6, 7, 8]],
+    [t("augmented"), "augmented", [1, 2, 3, 4, 5, 6, 7, 8]],
+    [t("major"), "major", [2, 3, 6, 7]]
 ];
 
 /**
@@ -1574,14 +1574,14 @@ const MAQAMTABLE = {
  * @constant {Array<Array<string>>}
  */
 const FILTERTYPES = [
-    [_("highpass"), "highpass"],
-    [_("lowpass"), "lowpass"],
-    [_("bandpass"), "bandpass"],
-    [_("highshelf"), "highshelf"],
-    [_("lowshelf"), "lowshelf"],
-    [_("notch"), "notch"],
-    [_("allpass"), "allpass"],
-    [_("peaking"), "peaking"]
+    [t("highpass"), "highpass"],
+    [t("lowpass"), "lowpass"],
+    [t("bandpass"), "bandpass"],
+    [t("highshelf"), "highshelf"],
+    [t("lowshelf"), "lowshelf"],
+    [t("notch"), "notch"],
+    [t("allpass"), "allpass"],
+    [t("peaking"), "peaking"]
 ];
 
 /**
@@ -1589,10 +1589,10 @@ const FILTERTYPES = [
  * @constant {Array<Array<string>>}
  */
 const OSCTYPES = [
-    [_("sine"), "sine"],
-    [_("square"), "square"],
-    [_("triangle"), "triangle"],
-    [_("sawtooth"), "sawtooth"]
+    [t("sine"), "sine"],
+    [t("square"), "square"],
+    [t("triangle"), "triangle"],
+    [t("sawtooth"), "sawtooth"]
 ];
 
 /**
@@ -1600,15 +1600,15 @@ const OSCTYPES = [
  * @constant {Array<Array<string>>}
  */
 const INITIALTEMPERAMENTS = [
-    [_("Equal (12EDO)"), "equal", "equal"],
-    [_("Equal (5EDO)"), "equal5", "equal5"],
-    [_("Equal (7EDO)"), "equal7", "equal7"],
-    [_("Equal (19EDO)"), "equal19", "equal19"],
-    [_("Equal (31EDO)"), "equal31", "equal31"],
-    [_("5-limit Just Intonation"), "just intonation", "just intonation"],
-    [_("Pythagorean (3-limit JI)"), "Pythagorean", "Pythagorean"],
-    [_("Meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
-    [_("Meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"]
+    [t("Equal (12EDO)"), "equal", "equal"],
+    [t("Equal (5EDO)"), "equal5", "equal5"],
+    [t("Equal (7EDO)"), "equal7", "equal7"],
+    [t("Equal (19EDO)"), "equal19", "equal19"],
+    [t("Equal (31EDO)"), "equal31", "equal31"],
+    [t("5-limit Just Intonation"), "just intonation", "just intonation"],
+    [t("Pythagorean (3-limit JI)"), "Pythagorean", "Pythagorean"],
+    [t("Meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
+    [t("Meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"]
 ];
 
 /**
@@ -1616,16 +1616,16 @@ const INITIALTEMPERAMENTS = [
  * @type {Array<Array<string>>}
  */
 let TEMPERAMENTS = [
-    [_("Equal (12EDO)"), "equal", "equal"],
-    [_("Equal (5EDO)"), "equal5", "equal5"],
-    [_("Equal (7EDO)"), "equal7", "equal7"],
-    [_("Equal (19EDO)"), "equal19", "equal19"],
-    [_("Equal (31EDO)"), "equal31", "equal31"],
-    [_("5-limit Just Intonation"), "just intonation", "just intonation"],
-    [_("Pythagorean (3-limit JI)"), "Pythagorean", "Pythagorean"],
-    [_("Meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
-    [_("Meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"],
-    [_("custom"), "custom", "custom"]
+    [t("Equal (12EDO)"), "equal", "equal"],
+    [t("Equal (5EDO)"), "equal5", "equal5"],
+    [t("Equal (7EDO)"), "equal7", "equal7"],
+    [t("Equal (19EDO)"), "equal19", "equal19"],
+    [t("Equal (31EDO)"), "equal31", "equal31"],
+    [t("5-limit Just Intonation"), "just intonation", "just intonation"],
+    [t("Pythagorean (3-limit JI)"), "Pythagorean", "Pythagorean"],
+    [t("Meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
+    [t("Meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"],
+    [t("custom"), "custom", "custom"]
 ];
 
 /**
@@ -2260,7 +2260,7 @@ const updateTemperaments = () => {
     TEMPERAMENTS = [...INITIALTEMPERAMENTS];
     for (const i in TEMPERAMENT) {
         if (!(i in PreDefinedTemperaments)) {
-            TEMPERAMENTS.push([_(i), i, i]);
+            TEMPERAMENTS.push([t(i), i, i]);
         }
     }
 };
@@ -4108,7 +4108,7 @@ function getNote(
                 // Reverse any i18n
                 // solfnotes_ is used in the interface for i18n
                 //.TRANS: the note names must be separated by single spaces
-                const solfnotes_ = _("ti la sol fa mi re do").split(" ");
+                const solfnotes_ = t("ti la sol fa mi re do").split(" ");
                 if (solfnotes_.includes(noteArg.substr(0, 1).toLowerCase())) {
                     solfegePart = SOLFNOTES[solfnotes_.indexOf(noteArg.substr(0, 2).toLowerCase())];
                 } else if (solfnotes_.includes(noteArg.substr(0, 2).toLowerCase())) {
@@ -5620,7 +5620,7 @@ const splitSolfege = (value) => {
  */
 const i18nSolfege = (note) => {
     // solfnotes_ is used in the interface for i18n
-    const solfnotes_ = _("ti la sol fa mi re do").split(" ");
+    const solfnotes_ = t("ti la sol fa mi re do").split(" ");
     const obj = splitSolfege(note);
 
     const i = SOLFNOTES.indexOf(obj[0]);
@@ -5734,13 +5734,13 @@ const calcOctave = (currentOctave, arg, lastNotePlayed, currentNote) => {
     }
 
     switch (arg) {
-        case _("current"):
+        case t("current"):
         case "current":
             return changedCurrent;
-        case _("next"):
+        case t("next"):
         case "next":
             return Math.min(changedCurrent + 1, 10);
-        case _("previous"):
+        case t("previous"):
         case "previous":
             return Math.max(changedCurrent - 1, 1);
         default:
@@ -5768,16 +5768,16 @@ const calcOctaveInterval = (arg) => {
     let value = 0;
     switch (arg) {
         case 1:
-        case _("next"):
+        case t("next"):
         case "next":
             value = 1;
             break;
         case -1:
-        case _("previous"):
+        case t("previous"):
         case "previous":
             value = -1;
             break;
-        case _("current"):
+        case t("current"):
         case "current":
         case 0:
             value = 0;

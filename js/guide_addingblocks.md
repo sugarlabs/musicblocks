@@ -60,7 +60,7 @@ block is defined.
      
      Here are some examples of properties you can add to the block:
      
-     * Add static labels to the block with `newblock.staticLabels.push(_('label'));` 
+     * Add static labels to the block with `newblock.staticLabels.push(t('label'));` 
      * Adjust width of block to label size with `newblock.adjustWidthToLabel()`
 
   You can check the available properties on
@@ -93,7 +93,7 @@ block is defined.
     blocks.protoBlockDict['square'] = newblock;
     newblock.hidden = true;
     //.TRANS: square wave
-    newblock.staticLabels.push(_('square'));
+    newblock.staticLabels.push(t('square'));
     newblock.adjustWidthToLabel();
     newblock.oneArgBlock();
     newblock.defaults.push(440);
@@ -159,7 +159,7 @@ push onto the heap.
                 if (turtle in that.turtleHeaps && that.turtleHeaps[turtle].length > 0) {
                     block.value = that.turtleHeaps[turtle].pop();
                 } else {
-                    that.errorMsg(_('empty heap'));
+                    that.errorMsg(t('empty heap'));
                     block.value = 0;
                 }
                 break;
@@ -226,7 +226,7 @@ If you want to add your Block to beginner mode you have to go to [turtledefs.js]
 
 You have to go to [turtledefs.js](https://github.com/sugarlabs/musicblocks/blob/master/js/turtledefs.js#L205) and in 'BLOCKHELP' you have to add:
 
-`'yourBlockName': [_('Your help for this block'), 'documentation', 'your example of usage of this block.svg'],`
+`'yourBlockName': [t('Your help for this block'), 'documentation', 'your example of usage of this block.svg'],`
 
 Remember to add it under the right `palette`.
 

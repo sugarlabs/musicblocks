@@ -50,15 +50,15 @@ function setupBoxesBlocks(activity) {
              */
             if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    _("The Add-to block is used to add to the value stored in a box."),
+                    t("The Add-to block is used to add to the value stored in a box."),
                     "documentation",
                     ""
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Add-to block is used to add to the value stored in a box.") +
+                    t("The Add-to block is used to add to the value stored in a box.") +
                         " " +
-                        _("It can also be used with other blocks such as Color and Pen size."),
+                        t("It can also be used with other blocks such as Color and Pen size."),
                     "documentation",
                     ""
                 ]);
@@ -70,9 +70,9 @@ function setupBoxesBlocks(activity) {
              * @param {string} config.name - The name of the block.
              */
             this.formBlock({
-                name: _("add"),
+                name: t("add"),
                 args: 2,
-                argLabels: [_("to"), this.lang === "ja" ? _("value1") : _("value")],
+                argLabels: [t("to"), this.lang === "ja" ? t("value1") : t("value")],
                 argTypes: ["anyin", "anyin"]
             });
         }
@@ -115,7 +115,7 @@ function setupBoxesBlocks(activity) {
                 try {
                     activity.blocks.blockSetter(logo, cblk, value, turtle);
                 } catch (e) {
-                    activity.errorMsg(_("Block does not support incrementing."), cblk);
+                    activity.errorMsg(t("Block does not support incrementing."), cblk);
                 }
             }
         }
@@ -149,7 +149,7 @@ function setupBoxesBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Add-1-to block adds one to the value stored in a box."),
+                t("The Add-1-to block adds one to the value stored in a box."),
                 "documentation",
                 ""
             ]);
@@ -160,7 +160,7 @@ function setupBoxesBlocks(activity) {
              * @param {string} config.name - The name of the block.
              */
             this.formBlock({
-                name: _("add 1 to"),
+                name: t("add 1 to"),
                 args: 1,
                 argTypes: ["anyin"],
                 argLabels: [""]
@@ -208,7 +208,7 @@ function setupBoxesBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Subtract-1-from block subtracts one from the value stored in a box."),
+                t("The Subtract-1-from block subtracts one from the value stored in a box."),
                 "documentation",
                 ""
             ]);
@@ -219,7 +219,7 @@ function setupBoxesBlocks(activity) {
              * @param {string} config.name - The name of the block.
              */
             this.formBlock({
-                name: _("subtract 1 from"),
+                name: t("subtract 1 from"),
                 args: 1,
                 argTypes: ["anyin"],
                 argLabels: [""]
@@ -267,7 +267,7 @@ function setupBoxesBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Box block returns the value stored in a box."),
+                t("The Box block returns the value stored in a box."),
                 "documentation",
                 null,
                 "box1help"
@@ -279,10 +279,10 @@ function setupBoxesBlocks(activity) {
              * @param {string} config.name - The name of the block.
              */
             this.formBlock({
-                name: _("box"),
+                name: t("box"),
                 outType: "anyout",
                 args: 1,
-                defaults: [_("box")],
+                defaults: [t("box")],
                 argTypes: ["anyin"]
             });
         }
@@ -384,7 +384,7 @@ function setupBoxesBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Box block returns the value stored in a box."),
+                t("The Box block returns the value stored in a box."),
                 "documentation",
                 ""
             ]);
@@ -402,7 +402,7 @@ function setupBoxesBlocks(activity) {
              * @param {string} config.outType - The type of output.
              */
             this.formBlock({
-                name: _("box"),
+                name: t("box"),
                 outType: "anyout"
             });
         }
@@ -497,7 +497,7 @@ function setupBoxesBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Store in block will store a value in a box."),
+                t("The Store in block will store a value in a box."),
                 "documentation",
                 ""
             ]);
@@ -511,7 +511,7 @@ function setupBoxesBlocks(activity) {
              * @param {number[]} config.defaults - The default values of arguments.
              */
             this.formBlock({
-                name: _("store in box"),
+                name: t("store in box"),
                 args: 1,
                 argTypes: ["anyin"],
                 defaults: [4]
@@ -573,7 +573,7 @@ function setupBoxesBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Store in block will store a value in a box."),
+                t("The Store in block will store a value in a box."),
                 "documentation",
                 ""
             ]);
@@ -588,11 +588,11 @@ function setupBoxesBlocks(activity) {
              * @param {string[]} config.argLabels - The labels for arguments.
              */
             this.formBlock({
-                name: _("store in"),
+                name: t("store in"),
                 args: 2,
                 argTypes: ["anyin", "anyin"],
-                defaults: [_("box"), 4],
-                argLabels: this.lang === "ja" ? [_("name1"), _("value1")] : [_("name"), _("value")]
+                defaults: [t("box"), 4],
+                argLabels: this.lang === "ja" ? [t("name1"), t("value1")] : [t("name"), t("value")]
             });
         }
 
@@ -649,7 +649,7 @@ function setupBoxesBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Box2 block returns the value stored in Box2."),
+                t("The Box2 block returns the value stored in Box2."),
                 "documentation",
                 null,
                 "box2help"
@@ -660,7 +660,7 @@ function setupBoxesBlocks(activity) {
              * @param {Object} config - The configuration object.
              * @param {string} config.name - The name of the block.
              */
-            this.formBlock({ name: _("box2") });
+            this.formBlock({ name: t("box2") });
 
             /**
              * Makes a macro for the block.
@@ -700,7 +700,7 @@ function setupBoxesBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Store in Box2 block is used to store a value in Box2."),
+                t("The Store in Box2 block is used to store a value in Box2."),
                 "documentation",
                 null,
                 "box2help"
@@ -712,7 +712,7 @@ function setupBoxesBlocks(activity) {
              * @param {string} config.name - The name of the block.
              */
             this.formBlock({
-                name: _("store in box2"),
+                name: t("store in box2"),
                 args: 1,
                 defaults: [4]
             });
@@ -758,7 +758,7 @@ function setupBoxesBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Box1 block returns the value stored in Box1."),
+                t("The Box1 block returns the value stored in Box1."),
                 "documentation",
                 null,
                 "box1help"
@@ -769,7 +769,7 @@ function setupBoxesBlocks(activity) {
              * @param {Object} config - The configuration object.
              * @param {string} config.name - The name of the block.
              */
-            this.formBlock({ name: _("box1") });
+            this.formBlock({ name: t("box1") });
 
             /**
              * Makes a macro for the block.
@@ -809,7 +809,7 @@ function setupBoxesBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Store in Box1 block is used to store a value in Box1."),
+                t("The Store in Box1 block is used to store a value in Box1."),
                 "documentation",
                 null,
                 "box1help"
@@ -823,7 +823,7 @@ function setupBoxesBlocks(activity) {
              * @param {string[]} config.defaults - The default values for the arguments.
              */
             this.formBlock({
-                name: _("store in box1"),
+                name: t("store in box1"),
                 args: 1,
                 defaults: [4]
             });

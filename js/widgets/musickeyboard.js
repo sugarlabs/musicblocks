@@ -697,7 +697,7 @@ function MusicKeyboard(activity) {
          * Button to play all musical notes.
          * @type {HTMLElement}
          */
-        this.playButton = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
+        this.playButton = widgetWindow.addButton("play-button.svg", ICONSIZE, t("Play"));
 
         this.playButton.onclick = () => {
             this.activity.logo.turtleDelay = 0;
@@ -709,7 +709,7 @@ function MusicKeyboard(activity) {
          * Button to export musical notes.
          * @type {HTMLElement}
          */
-        widgetWindow.addButton("export-chunk.svg", ICONSIZE, _("Save")).onclick = () => {
+        widgetWindow.addButton("export-chunk.svg", ICONSIZE, t("Save")).onclick = () => {
             this._save();
         };
 
@@ -717,7 +717,7 @@ function MusicKeyboard(activity) {
          * Button to clear all musical notes.
          * @type {HTMLElement}
          */
-        widgetWindow.addButton("erase-button.svg", ICONSIZE, _("Clear")).onclick = () => {
+        widgetWindow.addButton("erase-button.svg", ICONSIZE, t("Clear")).onclick = () => {
             this._notesPlayed = [];
             selectedNotes = [];
             // if (!that.keyboardShown) {
@@ -746,7 +746,7 @@ function MusicKeyboard(activity) {
          * Button to add a musical note.
          * @type {HTMLElement}
          */
-        const addNoteButton = widgetWindow.addButton("add2.svg", ICONSIZE, _("Add note"));
+        const addNoteButton = widgetWindow.addButton("add2.svg", ICONSIZE, t("Add note"));
         addNoteButton.setAttribute("id", "addnotes");
         addNoteButton.onclick = () => {
             this._createAddRowPieSubmenu();
@@ -756,7 +756,7 @@ function MusicKeyboard(activity) {
          * Button to access MIDI controls.
          * @type {HTMLElement}
          */
-        this.midiButton = widgetWindow.addButton("midi.svg", ICONSIZE, _("MIDI"));
+        this.midiButton = widgetWindow.addButton("midi.svg", ICONSIZE, t("MIDI"));
         this.midiButton.onclick = () => {
             this.doMIDI();
         };
@@ -765,7 +765,7 @@ function MusicKeyboard(activity) {
          * Button to toggle the metronome.
          * @type {HTMLElement}
          */
-        this.tickButton = widgetWindow.addButton("metronome.svg", ICONSIZE, _("Metronome"));
+        this.tickButton = widgetWindow.addButton("metronome.svg", ICONSIZE, t("Metronome"));
         this.tickButton.onclick = () => {
             if (this.metronomeInterval || this.metronomeON) {
                 // Turn off metronome
@@ -890,9 +890,9 @@ function MusicKeyboard(activity) {
                 '&nbsp;&nbsp;<img src="header-icons/' +
                 "stop-button.svg" +
                 '" title="' +
-                _("Stop") +
+                t("Stop") +
                 '" alt="' +
-                _("Stop") +
+                t("Stop") +
                 '" height="' +
                 ICONSIZE +
                 '" width="' +
@@ -947,8 +947,8 @@ function MusicKeyboard(activity) {
             playButtonCell.innerHTML =
                 `&nbsp;&nbsp;<img 
                     src="header-icons/play-button.svg" 
-                    title="${_("Play")}" 
-                    alt="${_("Play")}" 
+                    title="${t("Play")}" 
+                    alt="${t("Play")}" 
                     height="${ICONSIZE}" 
                     width="${ICONSIZE}" 
                     vertical-align="middle" 
@@ -1035,8 +1035,8 @@ function MusicKeyboard(activity) {
                 playButtonCell.innerHTML =
                     `&nbsp;&nbsp;<img 
                         src="header-icons/play-button.svg" 
-                        title="${_("Play")}" 
-                        alt="${_("Play")}" 
+                        title="${t("Play")}" 
+                        alt="${t("Play")}" 
                         height="${ICONSIZE}" 
                         width="${ICONSIZE}" 
                         vertical-align="middle" 
@@ -1627,7 +1627,7 @@ function MusicKeyboard(activity) {
         cell.style.minWidth = Math.floor(MATRIXSOLFEWIDTH * this._cellScale) * 1.5 + "px";
         cell.style.maxWidth = cell.style.minWidth;
         cell.className = "headcol"; // This cell is fixed horizontally.
-        cell.innerHTML = _("Note value");
+        cell.innerHTML = t("Note value");
         cell.style.position = "sticky";
         cell.style.left = "0px";
         cell.style.zIndex = "1";
@@ -1989,7 +1989,7 @@ function MusicKeyboard(activity) {
         let label;
         let creatingNewNote = false;
         for (let i = 0; i < VALUES.length; i++) {
-            label = _(VALUES[i]);
+            label = t(VALUES[i]);
             valueLabel.push(label);
         }
 
@@ -2014,8 +2014,8 @@ function MusicKeyboard(activity) {
 
         this._menuWheel.animatetime = 0;
         this._menuWheel.createWheel(valueLabel);
-        this._menuWheel.navItems[0].setTooltip(_("pitch"));
-        this._menuWheel.navItems[1].setTooltip(_("hertz"));
+        this._menuWheel.navItems[0].setTooltip(t("pitch"));
+        this._menuWheel.navItems[1].setTooltip(t("hertz"));
 
         this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
@@ -2428,11 +2428,11 @@ function MusicKeyboard(activity) {
             this._accidentalsWheel.animatetime = 0; // 300;
             this._accidentalsWheel.createWheel(accidentalLabels);
             this._accidentalsWheel.setTooltips([
-                _("double sharp"),
-                _("sharp"),
-                _("natural"),
-                _("flat"),
-                _("double flat")
+                t("double sharp"),
+                t("sharp"),
+                t("natural"),
+                t("flat"),
+                t("double flat")
             ]);
 
             this._octavesWheel.colors = platformColor.octavesWheelcolors;
@@ -2959,7 +2959,7 @@ function MusicKeyboard(activity) {
         newel.setAttribute("id", "rest");
         newel.setAttribute("alt", "R__");
         newel.innerHTML =
-            `<small>(${_("rest")})</small><br/>`;
+            `<small>(${t("rest")})</small><br/>`;
         newel.style.position = "relative";
         newel.style.zIndex = "100";
 
@@ -3059,7 +3059,7 @@ function MusicKeyboard(activity) {
             const newNotes = this._clusterNotes(currentSelectedNotes);
             const newStack = [
                 [0, ["action", { collapsed: false }], 100, 100, [null, 1, 2, null]],
-                [1, ["text", { value: _("action") + "" + actionGroup }], 0, 0, [0]],
+                [1, ["text", { value: t("action") + "" + actionGroup }], 0, 0, [0]],
                 [2, "hidden", 0, 0, [0, selectedNotes.length == 0 ? null : 3]]
             ];
 
@@ -3262,8 +3262,8 @@ function MusicKeyboard(activity) {
             this.activity.blocks.loadNewBlocks(newStack);
         }
 
-        if (actionGroups > 1) activity.textMsg(_("New action blocks generated."), 3000);
-        else activity.textMsg(_("New action block generated."), 3000);
+        if (actionGroups > 1) activity.textMsg(t("New action blocks generated."), 3000);
+        else activity.textMsg(t("New action block generated."), 3000);
     };
 
     /**
@@ -3446,7 +3446,7 @@ function MusicKeyboard(activity) {
             // re-init widget
             if (this.midiON) {
                 this.midiButton.style.background = "#00FF00";
-                activity.textMsg(_("MIDI device present."), 3000);
+                activity.textMsg(t("MIDI device present."), 3000);
                 return;
             }
             midiAccess.inputs.forEach((input) => {
@@ -3454,10 +3454,10 @@ function MusicKeyboard(activity) {
             });
             if (midiAccess.inputs.size) {
                 this.midiButton.style.background = "#00FF00";
-                activity.textMsg(_("MIDI device present."), 3000);
+                activity.textMsg(t("MIDI device present."), 3000);
                 this.midiON = true;
             } else {
-                activity.textMsg(_("No MIDI device found."), 3000);
+                activity.textMsg(t("No MIDI device found."), 3000);
             }
         };
 
@@ -3467,7 +3467,7 @@ function MusicKeyboard(activity) {
          * @memberof ClassName
          */
         const onMIDIFailure = () => {
-            activity.errorMsg(_("Failed to get MIDI access in browser."), 3000);
+            activity.errorMsg(t("Failed to get MIDI access in browser."), 3000);
             this.midiON = false;
         };
 

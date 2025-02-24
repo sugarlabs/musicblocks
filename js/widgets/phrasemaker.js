@@ -523,7 +523,7 @@ class PhraseMaker {
         this._playButton = widgetWindow.addButton(
             "play-button.svg",
             PhraseMaker.ICONSIZE,
-            _("Play")
+            t("Play")
         );
 
         this._playButton.onclick = () => {
@@ -534,8 +534,8 @@ class PhraseMaker {
                 this._playButton.innerHTML =
                     `&nbsp;&nbsp;<img 
                         src="header-icons/play-button.svg" 
-                        title="${_("Play")}" 
-                        alt="${_("Play")}" 
+                        title="${t("Play")}" 
+                        alt="${t("Play")}" 
                         height="${PhraseMaker.ICONSIZE}" 
                         width="${PhraseMaker.ICONSIZE}" 
                         vertical-align="middle"
@@ -544,8 +544,8 @@ class PhraseMaker {
                 this._playButton.innerHTML =
                     `&nbsp;&nbsp;<img 
                         src="header-icons/stop-button.svg" 
-                        title="${_("Stop")}" 
-                        alt="${_("Stop")}" 
+                        title="${t("Stop")}" 
+                        alt="${t("Stop")}" 
                         height="${PhraseMaker.ICONSIZE}" 
                         width="${PhraseMaker.ICONSIZE}" 
                         vertical-align="middle"
@@ -558,7 +558,7 @@ class PhraseMaker {
         widgetWindow.addButton(
             "export-chunk.svg",
             PhraseMaker.ICONSIZE,
-            _("Save")
+            t("Save")
         ).onclick = async () => {
             // Debounce the save button
             if (!this._get_save_lock()) {
@@ -575,24 +575,24 @@ class PhraseMaker {
         widgetWindow.addButton(
             "erase-button.svg",
             PhraseMaker.ICONSIZE,
-            _("Clear")
+            t("Clear")
         ).onclick = this._clear.bind(this);
 
         if (!localStorage.beginnerMode) {
             widgetWindow.addButton(
                 "export-button.svg",
                 PhraseMaker.ICONSIZE,
-                _("Export")
+                t("Export")
             ).onclick = this._export.bind(this);
         }
 
         widgetWindow.addButton(
             "sort.svg",
             PhraseMaker.ICONSIZE,
-            _("Sort")
+            t("Sort")
         ).onclick = this._sort.bind(this);
 
-        let cell = widgetWindow.addButton("add2.svg", PhraseMaker.ICONSIZE, _("Add note"));
+        let cell = widgetWindow.addButton("add2.svg", PhraseMaker.ICONSIZE, t("Add note"));
         cell.setAttribute("id", "addnotes");
         cell.onclick = this._createAddRowPieSubmenu.bind(this);
 
@@ -669,8 +669,8 @@ class PhraseMaker {
                 cell.innerHTML =
                     `&nbsp;&nbsp;<img 
                         src="${getDrumIcon(drumName)}" 
-                        title="${_(drumName)}" 
-                        alt="${_(drumName)}" 
+                        title="${t(drumName)}" 
+                        alt="${t(drumName)}" 
                         height="${iconSize}" 
                         width="${iconSize}" 
                         vertical-align="middle"
@@ -761,7 +761,7 @@ class PhraseMaker {
 
             if (this.rowLabels[i] === "print") break;
             else if (drumName != null) {
-                cell.innerHTML = _(drumName);
+                cell.innerHTML = t(drumName);
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
                 cell.setAttribute("alt", i + "__" + "drumblocks");
 
@@ -1036,7 +1036,7 @@ class PhraseMaker {
         this._tupletValueLabel = tempTable.insertRow().insertCell();
         this._noteValueLabel = tempTable.insertRow().insertCell();
 
-        this._noteValueLabel.innerHTML = _("note value");
+        this._noteValueLabel.innerHTML = t("note value");
         this._noteValueLabel.style.fontSize = this._cellScale * 75 + "%";
         this._noteValueLabel.style.height =
             Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
@@ -1069,7 +1069,7 @@ class PhraseMaker {
         }
 
         if (this.isInitial) {
-            activity.textMsg(_("Click on the table to add notes."), 3000);
+            activity.textMsg(t("Click on the table to add notes."), 3000);
             this.widgetWindow.sendToCenter();
             this.inInitial = false;
         }
@@ -1093,7 +1093,7 @@ class PhraseMaker {
         const valueLabel = [];
         let label;
         for (let i = 0; i < VALUES.length; i++) {
-            label = _(VALUES[i]);
+            label = t(VALUES[i]);
             valueLabel.push(label);
         }
 
@@ -1130,11 +1130,11 @@ class PhraseMaker {
 
         this._menuWheel.animatetime = 0; // 300;
         this._menuWheel.createWheel(valueLabel);
-        this._menuWheel.navItems[0].setTooltip(_("pitch"));
-        this._menuWheel.navItems[1].setTooltip(_("hertz"));
-        this._menuWheel.navItems[2].setTooltip(_("drum"));
-        this._menuWheel.navItems[3].setTooltip(_("graphics"));
-        this._menuWheel.navItems[4].setTooltip(_("pen"));
+        this._menuWheel.navItems[0].setTooltip(t("pitch"));
+        this._menuWheel.navItems[1].setTooltip(t("hertz"));
+        this._menuWheel.navItems[2].setTooltip(t("drum"));
+        this._menuWheel.navItems[3].setTooltip(t("graphics"));
+        this._menuWheel.navItems[4].setTooltip(t("pen"));
 
         this._exitWheel.colors = platformColor.exitWheelcolors;
         this._exitWheel.slicePathFunction = slicePath().DonutSlice;
@@ -1913,7 +1913,7 @@ class PhraseMaker {
         const drumLabels = [];
         let label;
         for (let i = 0; i < DRUMS.length; i++) {
-            label = _(DRUMS[i]);
+            label = t(DRUMS[i]);
             drumLabels.push(label);
         }
 
@@ -1999,11 +1999,11 @@ class PhraseMaker {
             this._accidentalsWheel.animatetime = 0; // 300;
             this._accidentalsWheel.createWheel(accidentalLabels);
             this._accidentalsWheel.setTooltips([
-                _("double sharp"),
-                _("sharp"),
-                _("natural"),
-                _("flat"),
-                _("double flat")
+                t("double sharp"),
+                t("sharp"),
+                t("natural"),
+                t("flat"),
+                t("double flat")
             ]);
 
             this._octavesWheel.colors = platformColor.octavesWheelcolors;
@@ -2187,8 +2187,8 @@ class PhraseMaker {
                 cell.innerHTML =
                     `&nbsp;&nbsp;<img 
                         src="${getDrumIcon(drumName)}" 
-                        title="${_(drumName)}" 
-                        alt="${_(drumName)}" 
+                        title="${t(drumName)}" 
+                        alt="${t(drumName)}" 
                         height="${iconSize}" 
                         width="${iconSize}" 
                         vertical-align="middle"
@@ -2211,7 +2211,7 @@ class PhraseMaker {
 
             cell = this._labelcols[index];
             if (drumName != null) {
-                cell.innerHTML = _(drumName);
+                cell.innerHTML = t(drumName);
                 cell.style.fontSize = Math.floor(this._cellScale * 14) + "px";
             } else if (
                 noteIsSolfege(this.rowLabels[i]) &&
@@ -2690,7 +2690,7 @@ class PhraseMaker {
 
             drumName = getDrumName(this.rowLabels[i]);
             if (drumName != null) {
-                exportLabel.innerHTML = _(drumName);
+                exportLabel.innerHTML = t(drumName);
                 exportLabel.style.fontSize = Math.floor(this._cellScale * 14) + "px";
             } else if (this.rowLabels[i].slice(0, 4) === "http") {
                 exportLabel.innerHTML = this.rowLabels[i];
@@ -2742,7 +2742,7 @@ class PhraseMaker {
             // Add the tuplet note value row.
             exportRow = header.insertRow();
             exportLabel = exportRow.insertCell();
-            exportLabel.innerHTML = _("note value");
+            exportLabel.innerHTML = t("note value");
             noteValueRow = this._tupletNoteValueRow;
             for (let i = 0; i < noteValueRow.cells.length; i++) {
                 exportCell = exportRow.insertCell();
@@ -2763,7 +2763,7 @@ class PhraseMaker {
             // Add the tuplet value row.
             exportRow = header.insertRow();
             exportLabel = exportRow.insertCell();
-            exportLabel.innerHTML = _("tuplet value");
+            exportLabel.innerHTML = t("tuplet value");
             noteValueRow = this._tupletValueRow;
             for (let i = 0; i < noteValueRow.cells.length; i++) {
                 exportCell = exportRow.insertCell();
@@ -2785,7 +2785,7 @@ class PhraseMaker {
         // Add the note value row.
         exportRow = header.insertRow();
         exportLabel = exportRow.insertCell();
-        exportLabel.innerHTML = _("note value");
+        exportLabel.innerHTML = t("note value");
         noteValueRow = this._noteValueRow;
         for (let i = 0; i < noteValueRow.cells.length; i++) {
             exportCell = exportRow.insertCell();
@@ -2890,7 +2890,7 @@ class PhraseMaker {
 
             // Load the labels
             labelCell = this._tupletNoteLabel;
-            labelCell.innerHTML = _("note value");
+            labelCell.innerHTML = t("note value");
             labelCell.style.fontSize = this._cellScale * 75 + "%";
             labelCell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
             labelCell.style.width = Math.floor(2 * MATRIXSOLFEWIDTH * this._cellScale) + "px";
@@ -2899,7 +2899,7 @@ class PhraseMaker {
             labelCell.style.backgroundColor = platformColor.labelColor;
 
             labelCell = this._tupletValueLabel;
-            labelCell.innerHTML = _("tuplet value");
+            labelCell.innerHTML = t("tuplet value");
             labelCell.style.fontSize = this._cellScale * 75 + "%";
             labelCell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
             labelCell.style.width = Math.floor(2 * MATRIXSOLFEWIDTH * this._cellScale) + "px";
@@ -4279,7 +4279,7 @@ class PhraseMaker {
         this.playingNow = !this.playingNow;
 
         if (this.playingNow) {
-            this.widgetWindow.modifyButton(0, "stop-button.svg", PhraseMaker.ICONSIZE, _("Stop"));
+            this.widgetWindow.modifyButton(0, "stop-button.svg", PhraseMaker.ICONSIZE, t("Stop"));
 
             this.activity.logo.synth.stop();
 
@@ -4381,7 +4381,7 @@ class PhraseMaker {
             this.__playNote(0, 0);
         } else {
             this._stopOrCloseClicked = true;
-            this.widgetWindow.modifyButton(0, "play-button.svg", PhraseMaker.ICONSIZE, _("Play"));
+            this.widgetWindow.modifyButton(0, "play-button.svg", PhraseMaker.ICONSIZE, t("Play"));
         }
     }
 
@@ -4609,14 +4609,14 @@ class PhraseMaker {
                     0,
                     "play-button.svg",
                     PhraseMaker.ICONSIZE,
-                    _("Play")
+                    t("Play")
                 );
                 this.playingNow = false;
                 this._playButton.innerHTML =
                     `&nbsp;&nbsp;<img 
                         src="header-icons/play-button.svg" 
-                        title="${_("Play")}" 
-                        alt="${_("Play")}" 
+                        title="${t("Play")}" 
+                        alt="${t("Play")}" 
                         height="${PhraseMaker.ICONSIZE}" 
                         width="${PhraseMaker.ICONSIZE}" 
                         vertical-align="middle"
@@ -4730,7 +4730,7 @@ class PhraseMaker {
                         0,
                         "play-button.svg",
                         PhraseMaker.ICONSIZE,
-                        _("Play")
+                        t("Play")
                     );
                 }
             }
@@ -5004,7 +5004,7 @@ class PhraseMaker {
 
         const newStack = [
             [0, ["action", { collapsed: true }], 100, 100, [null, 1, null, null]],
-            [1, ["text", { value: _("action") }], 0, 0, [0]]
+            [1, ["text", { value: t("action") }], 0, 0, [0]]
         ];
         let endOfStackIdx = 0;
 
@@ -5475,6 +5475,6 @@ class PhraseMaker {
 
         // Create a new stack for the chunk.
         this.activity.blocks.loadNewBlocks(newStack);
-        activity.textMsg(_("New action block generated."), 3000 );
+        activity.textMsg(t("New action block generated."), 3000 );
     }
 }

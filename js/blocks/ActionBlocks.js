@@ -55,7 +55,7 @@ function setupActionBlocks(activity) {
              * @param {Array} helpString - The help string to set for the block.
              */
             this.setHelpString([
-                _("The Return block will return a value from an action."),
+                t("The Return block will return a value from an action."),
                 "documentation",
                 ""
             ]);
@@ -72,7 +72,7 @@ function setupActionBlocks(activity) {
              * @param {Array} options.argTypes - The types of arguments.
              */
             this.formBlock({
-                name: _("return"),
+                name: t("return"),
                 args: 1,
                 defaults: [100],
                 argTypes: ["anyin"]
@@ -125,7 +125,7 @@ function setupActionBlocks(activity) {
              * @param {Array} helpString - The help string to set for the block.
              */
             this.setHelpString([
-                _("The Return to URL block will return a value to a webpage."),
+                t("The Return to URL block will return a value to a webpage."),
                 "documentation",
                 ""
             ]);
@@ -142,7 +142,7 @@ function setupActionBlocks(activity) {
              * @param {Array} options.argTypes - The types of arguments.
              */
             this.formBlock({
-                name: _("return to URL"),
+                name: t("return to URL"),
                 args: 1,
                 defaults: [100],
                 argTypes: ["anyin"]
@@ -230,7 +230,7 @@ function setupActionBlocks(activity) {
              * @param {Array} helpString - The help string to set for the block.
              */
             this.setHelpString([
-                _("The Calculate block returns a value calculated by an action."),
+                t("The Calculate block returns a value calculated by an action."),
                 "documentation",
                 ""
             ]);
@@ -248,10 +248,10 @@ function setupActionBlocks(activity) {
              * @param {Array} options.argTypes - The types of arguments.
              */
             this.formBlock({
-                name: _("calculate"),
+                name: t("calculate"),
                 outType: "anyout",
                 args: 1,
-                defaults: [_("action")],
+                defaults: [t("action")],
                 argTypes: ["anyin"]
             });
         }
@@ -287,7 +287,7 @@ function setupActionBlocks(activity) {
              * @param {Array} helpString - The help string to set for the block.
              */
             this.setHelpString([
-                _("The Calculate block returns a value calculated by an action."),
+                t("The Calculate block returns a value calculated by an action."),
                 "documentation",
                 ""
             ]);
@@ -304,7 +304,7 @@ function setupActionBlocks(activity) {
              * @param {string} options.name - The name of the block.
              */
             this.formBlock({
-                name: _("action")
+                name: t("action")
             });
         }
 
@@ -373,7 +373,7 @@ function setupActionBlocks(activity) {
              * @param {Array} helpString - The help string to set for the block.
              */
             this.setHelpString([
-                _("The Do block is used to initiate an action."),
+                t("The Do block is used to initiate an action."),
                 "documentation",
                 ""
             ]);
@@ -387,7 +387,7 @@ function setupActionBlocks(activity) {
              * @param {string} options.name - The name of the block.
              */
             this.formBlock({
-                name: this.lang === "ja" ? _("do1") : _("do"),
+                name: this.lang === "ja" ? t("do1") : t("do"),
                 flows: {
                     type: "arg",
                     types: ["anyin"]
@@ -498,7 +498,7 @@ function setupActionBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Calculate block returns a value calculated by an action."),
+                t("The Calculate block returns a value calculated by an action."),
                 "documentation",
                 ""
             ]);
@@ -514,7 +514,7 @@ function setupActionBlocks(activity) {
              * @param {string} config.outType - The output type.
              */
             this.formBlock({
-                name: _("calculate"),
+                name: t("calculate"),
                 flows: {
                     type: "arg",
                     types: ["anyin"],
@@ -590,7 +590,7 @@ function setupActionBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Do block is used to initiate an action."),
+                t("The Do block is used to initiate an action."),
                 "documentation",
                 ""
             ]);
@@ -607,14 +607,14 @@ function setupActionBlocks(activity) {
              * @param {string[]} config.defaults - The default values for arguments.
              */
             this.formBlock({
-                name: this.lang === "ja" ? _("do1") : _("do"),
+                name: this.lang === "ja" ? t("do1") : t("do"),
                 flows: {
                     type: "arg",
                     types: ["anyin"]
                 },
                 args: 1,
                 argTypes: ["anyin"],
-                defaults: [_("action")]
+                defaults: [t("action")]
             });
         }
 
@@ -685,7 +685,7 @@ function setupActionBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Calculate block returns a value calculated by an action."),
+                t("The Calculate block returns a value calculated by an action."),
                 "documentation",
                 ""
             ]);
@@ -704,7 +704,7 @@ function setupActionBlocks(activity) {
              * @param {string[]} config.defaults - The default values for arguments.
              */
             this.formBlock({
-                name: _("calculate"),
+                name: t("calculate"),
                 outType: "anyout",
                 flows: {
                     type: "arg",
@@ -713,7 +713,7 @@ function setupActionBlocks(activity) {
                 },
                 args: 1,
                 argTypes: ["anyin"],
-                defaults: [_("action")]
+                defaults: [t("action")]
             });
         }
 
@@ -788,7 +788,7 @@ function setupActionBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Arg block contains the value of an argument passed to an action."),
+                t("The Arg block contains the value of an argument passed to an action."),
                 "documentation",
                 ""
             ]);
@@ -803,7 +803,7 @@ function setupActionBlocks(activity) {
              * @param {string[]} config.argTypes - The allowed argument types.
              */
             this.formBlock({
-                name: _("arg"),
+                name: t("arg"),
                 outType: "anyout",
                 args: 1,
                 defaults: [1],
@@ -833,7 +833,7 @@ function setupActionBlocks(activity) {
                     const value = actionArgs[Number(name) - 1];
                     return value;
                 } else {
-                    activity.errorMsg(_("Invalid argument"), blk);
+                    activity.errorMsg(t("Invalid argument"), blk);
                     return 0;
                 }
             }
@@ -862,7 +862,7 @@ function setupActionBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Arg block contains the value of an argument passed to an action."),
+                t("The Arg block contains the value of an argument passed to an action."),
                 "documentation",
                 ""
             ]);
@@ -875,7 +875,7 @@ function setupActionBlocks(activity) {
              * @param {string} config.flows.type - The type of flow.
              */
             this.formBlock({
-                name: _("arg") + 1,
+                name: t("arg") + 1,
                 flows: {
                     type: "value"
                 }
@@ -897,7 +897,7 @@ function setupActionBlocks(activity) {
             // If an action block with an arg is clicked,
             // the arg will have no value.
             if (actionArgs === null) {
-                activity.errorMsg(_("Invalid argument"), blk);
+                activity.errorMsg(t("Invalid argument"), blk);
                 return 0;
             }
 
@@ -905,7 +905,7 @@ function setupActionBlocks(activity) {
                 const value = actionArgs[Number(name) - 1];
                 return value;
             } else {
-                activity.errorMsg(_("Invalid argument"), blk);
+                activity.errorMsg(t("Invalid argument"), blk);
                 return 0;
             }
         }
@@ -939,9 +939,9 @@ function setupActionBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Do block is used to initiate an action.") +
+                t("The Do block is used to initiate an action.") +
                     " " +
-                    _("In the example, it is used with the One of block to choose a random phase."),
+                    t("In the example, it is used with the One of block to choose a random phase."),
                 "documentation",
                 null,
                 "dohelp"
@@ -956,9 +956,9 @@ function setupActionBlocks(activity) {
              * @param {string[]} config.argTypes - The allowed argument types.
              */
             this.formBlock({
-                name: this.lang === "ja" ? _("do1") : _("do"),
+                name: this.lang === "ja" ? t("do1") : t("do"),
                 args: 1,
-                defaults: [_("action")],
+                defaults: [t("action")],
                 argTypes: ["anyin"]
             });
         }
@@ -1016,16 +1016,16 @@ function setupActionBlocks(activity) {
             if (this.lang === "ja") {
                 this.extraWidth = 15;
                 this.setHelpString([
-                    _("The Listen block is used to listen for an event such as a mouse click."),
+                    t("The Listen block is used to listen for an event such as a mouse click."),
                     "documentation",
                     null,
                     "broadcasthelp"
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Listen block is used to listen for an event such as a mouse click.") +
+                    t("The Listen block is used to listen for an event such as a mouse click.") +
                         " " +
-                        _("When the event happens, an action is taken."),
+                        t("When the event happens, an action is taken."),
                     "documentation",
                     null,
                     "broadcasthelp"
@@ -1042,11 +1042,11 @@ function setupActionBlocks(activity) {
              * @param {string[]} config.defaults - The default values for arguments.
              */
             this.formBlock({
-                name: _("on"),
+                name: t("on"),
                 args: 2,
                 argTypes: ["anyin", "anyin"],
-                argLabels: [_("event"), this.lang === "ja" ? _("do1") : _("do")],
-                defaults: [_("event"), _("action")]
+                argLabels: [t("event"), this.lang === "ja" ? t("do1") : t("do")],
+                defaults: [t("event"), t("action")]
             });
         }
 
@@ -1130,7 +1130,7 @@ function setupActionBlocks(activity) {
              * @param {Array} helpString - The help string to set for the block.
              */
             this.setHelpString([
-                _("The Broadcast block is used to trigger an event."),
+                t("The Broadcast block is used to trigger an event."),
                 "documentation",
                 null,
                 "broadcasthelp"
@@ -1148,9 +1148,9 @@ function setupActionBlocks(activity) {
              * @param {Array} options.argTypes - The types of arguments.
              */
             this.formBlock({
-                name: _("broadcast"),
+                name: t("broadcast"),
                 args: 1,
-                defaults: [_("event")],
+                defaults: [t("event")],
                 argTypes: ["anyin"]
             });
         }
@@ -1205,9 +1205,9 @@ function setupActionBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("Each Start block is a separate voice.") +
+                t("Each Start block is a separate voice.") +
                     " " +
-                    _(
+                    t(
                         "All of the Start blocks run at the same time when the Play button is pressed."
                     ),
                 "documentation",
@@ -1220,7 +1220,7 @@ function setupActionBlocks(activity) {
              * @param {string} config.name - The name of the block.
              * @param {boolean} config.canCollapse - Indicates if the block can be collapsed.
              */
-            this.formBlock({ name: _("start"), canCollapse: true });
+            this.formBlock({ name: t("start"), canCollapse: true });
         }
 
         /**
@@ -1253,7 +1253,7 @@ function setupActionBlocks(activity) {
              * @param {Object} config - The configuration object.
              * @param {string} config.name - The name of the block.
              */
-            this.formBlock({ name: _("start drum") });
+            this.formBlock({ name: t("start drum") });
 
             /**
              * Creates a macro for the block.
@@ -1297,11 +1297,11 @@ function setupActionBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _(
+                t(
                     "The Action block is used to group together blocks so that they can be used more than once."
                 ) +
                     " " +
-                    _("It is often used for storing a phrase of music that is repeated."),
+                    t("It is often used for storing a phrase of music that is repeated."),
                 "documentation",
                 null,
                 "actionhelp"
@@ -1319,10 +1319,10 @@ function setupActionBlocks(activity) {
              */
             this.formBlock({
                 canCollapse: true,
-                name: _("action"),
+                name: t("action"),
                 args: 1,
                 argLabels: [""],
-                defaults: [_("action")],
+                defaults: [t("action")],
                 argTypes: ["anyin"]
             });
 
@@ -1334,7 +1334,7 @@ function setupActionBlocks(activity) {
              */
             this.makeMacro((x, y) => [
                 [0, "action", x, y, [null, 1, 2, null]],
-                [1, ["text", { value: _("action") }], 0, 0, [0]],
+                [1, ["text", { value: t("action") }], 0, 0, [0]],
                 [2, "hidden", 0, 0, [0, null]]
             ]);
         }
@@ -1386,7 +1386,7 @@ function setupActionBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Do block is used to initiate an action."),
+                t("The Do block is used to initiate an action."),
                 "documentation",
                 ""
             ]);
@@ -1401,7 +1401,7 @@ function setupActionBlocks(activity) {
              * @param {Object} config - The configuration object.
              * @param {string} config.name - The name of the block.
              */
-            this.formBlock({ name: _("action") });
+            this.formBlock({ name: t("action") });
 
             /**
              * Indicates whether the block is hidden.
@@ -1492,7 +1492,7 @@ function setupActionBlocks(activity) {
              * @param {string[]} config.argTypes - The allowed argument types.
              */
             this.formBlock({
-                name: _("define temperament"),
+                name: t("define temperament"),
                 args: 1,
                 canCollapse: true,
                 argLabels: [""],

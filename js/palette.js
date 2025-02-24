@@ -304,7 +304,7 @@ class Palettes {
         img.style.boxSizing = "content-box";
         img.style.width = `${this.cellSize}px`;
         img.style.height = `${this.cellSize}px`;
-        label.textContent = toTitleCase(_(name));
+        label.textContent = toTitleCase(t(name));
         label.style.color = platformColor.paletteText;
         row.style.borderBottom = "1px solid #0CAFFF";
         label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
@@ -327,7 +327,7 @@ class Palettes {
         img.style.boxSizing = "content-box";
         img.style.width = `${this.cellSize}px`;
         img.style.height = `${this.cellSize}px`;
-        label.textContent = toTitleCase(_(name));
+        label.textContent = toTitleCase(t(name));
         label.style.color = platformColor.paletteText;
         label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
         label.style.padding = "4px";
@@ -589,7 +589,7 @@ class PaletteModel {
             case "namedbox":
                 if (block.defaults[0] === undefined) {
                     modname = "namedbox";
-                    arg = _("box");
+                    arg = t("box");
                 } else {
                     modname = block.defaults[0];
                     arg = block.defaults[0];
@@ -607,7 +607,7 @@ class PaletteModel {
             case "nameddo":
                 if (block.defaults[0] === undefined) {
                     modname = "nameddo";
-                    arg = _("action");
+                    arg = t("action");
                 } else {
                     modname = block.defaults[0];
                     arg = block.defaults[0];
@@ -616,7 +616,7 @@ class PaletteModel {
             case "nameddoArg":
                 if (block.defaults[0] === undefined) {
                     modname = "nameddoArg";
-                    arg = _("action");
+                    arg = t("action");
                 } else {
                     modname = block.defaults[0];
                     arg = block.defaults[0];
@@ -625,7 +625,7 @@ class PaletteModel {
             case "namedcalc":
                 if (block.defaults[0] === undefined) {
                     modname = "namedcalc";
-                    arg = _("action");
+                    arg = t("action");
                 } else {
                     modname = block.defaults[0];
                     arg = block.defaults[0];
@@ -634,7 +634,7 @@ class PaletteModel {
             case "namedcalcArg":
                 if (block.defaults[0] === undefined) {
                     modname = "namedcalcArg";
-                    arg = _("action");
+                    arg = t("action");
                 } else {
                     modname = block.defaults[0];
                     arg = block.defaults[0];
@@ -651,54 +651,54 @@ class PaletteModel {
         let label = "";
         switch (protoBlock.name) {
             case "grid":
-                label = _("Grid").toLowerCase();
+                label = t("Grid").toLowerCase();
                 break;
             case "text":
-                label = _("text");
+                label = t("text");
                 break;
             case "drumname":
-                label = _("drum");
+                label = t("drum");
                 break;
             case "effectsname":
-                label = _("effect");
+                label = t("effect");
                 break;
             case "solfege":
                 label = i18nSolfege("sol");
                 break;
             case "eastindiansolfege":
-                label = _("sargam");
+                label = t("sargam");
                 break;
             case "scaledegree2":
-                label = _("scale degree");
+                label = t("scale degree");
                 break;
             case "modename":
-                label = _("mode name");
+                label = t("mode name");
                 break;
             case "invertmode":
-                label = _("invert mode");
+                label = t("invert mode");
                 break;
             case "voicename":
-                label = _("voice name");
+                label = t("voice name");
                 break;
             case "customNote":
-                label = _("custom pitch");
+                label = t("custom pitch");
                 break;
             case "temperamentname":
                 //TRANS: https://en.wikipedia.org/wiki/Musical_temperament
-                label = _("temperament");
+                label = t("temperament");
                 break;
             case "accidentalname":
                 //TRANS: accidental refers to sharps, flats, etc.
-                label = _("accidental");
+                label = t("accidental");
                 break;
             case "notename":
                 label = "G";
                 break;
             case "intervalname":
-                label = _("interval name");
+                label = t("interval name");
                 break;
             case "boolean":
-                label = _("true");
+                label = t("true");
                 break;
             case "number":
                 label = NUMBERBLOCKDEFAULT.toString();
@@ -706,25 +706,25 @@ class PaletteModel {
             case "less":
             case "greater":
             case "equal":
-                // Label should be inside _() when defined.
+                // Label should be inside t() when defined.
                 label = protoBlock.staticLabels[0];
                 break;
             case "namedarg":
                 label = "arg " + arg;
                 break;
             case "outputtools":
-                label = _("pitch converter");
+                label = t("pitch converter");
                 break;
             default:
                 if (blkname != modname) {
                     // Override label for do, storein, box, and namedarg
-                    if (blkname === "storein" && block.defaults[0] === _("box")) {
-                        label = _("store in");
+                    if (blkname === "storein" && block.defaults[0] === t("box")) {
+                        label = t("store in");
                     } else if (blkname === "storein2") {
-                        if (block.staticLabels[0] === _("store in box")) {
-                            label = _("store in box");
+                        if (block.staticLabels[0] === t("store in box")) {
+                            label = t("store in box");
                         } else {
-                            label = _("store in") + " " + block.staticLabels[0];
+                            label = t("store in") + " " + block.staticLabels[0];
                         }
                     } else {
                         label = block.defaults[0];
@@ -733,7 +733,7 @@ class PaletteModel {
                     label = protoBlock.staticLabels[0];
                     if (label === "") {
                         if (blkname === "loadFile") {
-                            label = _("open file");
+                            label = t("open file");
                         } else {
                             label = blkname;
                         }
@@ -928,7 +928,7 @@ class Palette {
             header.appendChild(labelImg);
 
             const label = document.createElement("span");
-            label.textContent = toTitleCase(_(this.name));
+            label.textContent = toTitleCase(t(this.name));
             label.style.fontWeight = "bold";
             label.style.color = platformColor.textColor;
             header.appendChild(label);
@@ -1124,7 +1124,7 @@ class Palette {
                 break;
             } else if (
                 ["storein"].includes(this.model.blocks[i].blkname) &&
-                this.model.blocks[i].modname === _("store in") + " " + name
+                this.model.blocks[i].modname === t("store in") + " " + name
             ) {
                 this.model.blocks.splice(i, 1);
                 break;
@@ -1188,7 +1188,7 @@ class Palette {
                 // Use the name of the box in the label
                 if (protoblk.defaults[0] === undefined) {
                     blkname = "namedbox";
-                    arg = _("box");
+                    arg = t("box");
                 } else {
                     // eslint-disable-next-line no-console
                     console.debug(protoblk.defaults[0]);
@@ -1212,7 +1212,7 @@ class Palette {
                 // Use the name of the action in the label
                 if (protoblk.defaults[0] === undefined) {
                     blkname = "nameddo";
-                    arg = _("action");
+                    arg = t("action");
                 } else {
                     blkname = protoblk.defaults[0];
                     arg = protoblk.defaults[0];
@@ -1223,7 +1223,7 @@ class Palette {
                 // Use the name of the action in the label
                 if (protoblk.defaults[0] === undefined) {
                     blkname = "nameddoArg";
-                    arg = _("action");
+                    arg = t("action");
                 } else {
                     blkname = protoblk.defaults[0];
                     arg = protoblk.defaults[0];
@@ -1234,7 +1234,7 @@ class Palette {
                 // Use the name of the action in the label
                 if (protoblk.defaults[0] === undefined) {
                     blkname = "namedcalc";
-                    arg = _("action");
+                    arg = t("action");
                 } else {
                     blkname = protoblk.defaults[0];
                     arg = protoblk.defaults[0];
@@ -1245,7 +1245,7 @@ class Palette {
                 // Use the name of the action in the label
                 if (protoblk.defaults[0] === undefined) {
                     blkname = "namedcalcArg";
-                    arg = _("action");
+                    arg = t("action");
                 } else {
                     blkname = protoblk.defaults[0];
                     arg = protoblk.defaults[0];
@@ -1264,7 +1264,7 @@ class Palette {
                 break;
             default:
                 if (blkname === "nameddo") {
-                    arg = _("action");
+                    arg = t("action");
                 } else {
                     arg = "__NOARG__";
                 }

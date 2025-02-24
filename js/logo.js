@@ -58,7 +58,7 @@ const ZERODIVIDEERRORMSG = "Cannot divide by zero.";
 const EMPTYHEAPERRORMSG = "empty heap.";
 const POSNUMBER = "Argument must be a positive number";
 
-const INVALIDPITCH = _("Not a valid pitch name");
+const INVALIDPITCH = t("Not a valid pitch name");
 
 const NOTATIONNOTE = 0;
 const NOTATIONDURATION = 1;
@@ -508,7 +508,7 @@ class Logo {
             if (arg1) {
                 requiredTurtle.doShowText(arg0, arg1[1]);
             } else {
-                this.activity.errorMsg(_("You must select a file."));
+                this.activity.errorMsg(t("You must select a file."));
             }
         } else {
             requiredTurtle.doShowText(arg0, arg1);
@@ -1186,7 +1186,7 @@ class Logo {
         ===========================================================================
         */
         if (this.activity.turtles.turtleCount() === 0) {
-            this.activity.errorMsg(NOACTIONERRORMSG, null, _("start"));
+            this.activity.errorMsg(NOACTIONERRORMSG, null, t("start"));
         } else if (startHere != null) {
             // If a block to start from was passed, find its associated
             // turtle, i.e., which turtle should we use?
@@ -1702,7 +1702,7 @@ class Logo {
                     else if (tur.singer.suppressOutput) {
                         // console.debug("finishing compiling");
                         if (!logo.recording) {
-                            logo.activity.errorMsg(_("Playback is ready."));
+                            logo.activity.errorMsg(t("Playback is ready."));
                         }
                     }
 

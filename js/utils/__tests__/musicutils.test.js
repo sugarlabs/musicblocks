@@ -94,27 +94,27 @@ describe("musicutils", () => {
 
 describe("Temperament Functions", () => {
     global.TEMPERAMENTS = [
-        [_("Equal (12EDO)"), "equal", "equal"],
-        [_("Equal (5EDO)"), "equal5", "equal5"],
-        [_("Equal (7EDO)"), "equal7", "equal7"],
-        [_("Equal (19EDO)"), "equal19", "equal19"],
-        [_("Equal (31EDO)"), "equal31", "equal31"],
-        [_("5-limit Just Intonation"), "just intonation", "just intonation"],
-        [_("Pythagorean (3-limit JI)"), "Pythagorean", "Pythagorean"],
-        [_("Meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
-        [_("Meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"],
-        [_("custom"), "custom", "custom"]
+        [t("Equal (12EDO)"), "equal", "equal"],
+        [t("Equal (5EDO)"), "equal5", "equal5"],
+        [t("Equal (7EDO)"), "equal7", "equal7"],
+        [t("Equal (19EDO)"), "equal19", "equal19"],
+        [t("Equal (31EDO)"), "equal31", "equal31"],
+        [t("5-limit Just Intonation"), "just intonation", "just intonation"],
+        [t("Pythagorean (3-limit JI)"), "Pythagorean", "Pythagorean"],
+        [t("Meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
+        [t("Meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"],
+        [t("custom"), "custom", "custom"]
     ];
     global.INITIALTEMPERAMENTS = [
-        [_("Equal (12EDO)"), "equal", "equal"],
-        [_("Equal (5EDO)"), "equal5", "equal5"],
-        [_("Equal (7EDO)"), "equal7", "equal7"],
-        [_("Equal (19EDO)"), "equal19", "equal19"],
-        [_("Equal (31EDO)"), "equal31", "equal31"],
-        [_("5-limit Just Intonation"), "just intonation", "just intonation"],
-        [_("Pythagorean (3-limit JI)"), "Pythagorean", "Pythagorean"],
-        [_("Meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
-        [_("Meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"]
+        [t("Equal (12EDO)"), "equal", "equal"],
+        [t("Equal (5EDO)"), "equal5", "equal5"],
+        [t("Equal (7EDO)"), "equal7", "equal7"],
+        [t("Equal (19EDO)"), "equal19", "equal19"],
+        [t("Equal (31EDO)"), "equal31", "equal31"],
+        [t("5-limit Just Intonation"), "just intonation", "just intonation"],
+        [t("Pythagorean (3-limit JI)"), "Pythagorean", "Pythagorean"],
+        [t("Meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
+        [t("Meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"]
     ];
     
     global.PreDefinedTemperaments = {
@@ -132,16 +132,16 @@ describe("Temperament Functions", () => {
     
         it("getTemperamentsList should return the list of temperaments", () => {
             expect(getTemperamentsList()).toEqual([
-                [_("Equal (12EDO)"), "equal", "equal"],
-                [_("Equal (5EDO)"), "equal5", "equal5"],
-                [_("Equal (7EDO)"), "equal7", "equal7"],
-                [_("Equal (19EDO)"), "equal19", "equal19"],
-                [_("Equal (31EDO)"), "equal31", "equal31"],
-                [_("5-limit Just Intonation"), "just intonation", "just intonation"],
-                [_("Pythagorean (3-limit JI)"), "Pythagorean", "Pythagorean"],
-                [_("Meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
-                [_("Meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"],
-                [_("custom"), "custom", "custom"]
+                [t("Equal (12EDO)"), "equal", "equal"],
+                [t("Equal (5EDO)"), "equal5", "equal5"],
+                [t("Equal (7EDO)"), "equal7", "equal7"],
+                [t("Equal (19EDO)"), "equal19", "equal19"],
+                [t("Equal (31EDO)"), "equal31", "equal31"],
+                [t("5-limit Just Intonation"), "just intonation", "just intonation"],
+                [t("Pythagorean (3-limit JI)"), "Pythagorean", "Pythagorean"],
+                [t("Meantone") + " (1/3)", "1/3 comma meantone", "meantone (1/3)"],
+                [t("Meantone") + " (1/4)", "1/4 comma meantone", "meantone (1/4)"],
+                [t("custom"), "custom", "custom"]
             ]);
         });
     
@@ -1606,7 +1606,7 @@ describe("noteIsSolfege", () => {
       "B♭": "ti" + FLAT,
       "B": "ti",
       "B♯": "ti" + SHARP,
-      "R": _("rest"), 
+      "R": t("rest"), 
     };
   
     it("should return false for standard note without solfege conversion", () => {
@@ -1651,7 +1651,7 @@ describe("getSolfege", () => {
       "B♭": "ti" + FLAT,
       "B": "ti",
       "B♯": "ti" + SHARP,
-      "R": _("rest"),
+      "R": t("rest"),
     };
   
     it("should return the note itself if it is already a solfege note", () => {
@@ -1785,7 +1785,7 @@ describe("getSolfege", () => {
   const DOUBLEFLAT = "𝄫";
   
     global.SOLFEGENAMES1 = [ "do", "do" + SHARP, "do" + DOUBLESHARP, "re" + DOUBLEFLAT, "re" + FLAT, "re", "re" + SHARP, "re" + DOUBLESHARP, "mi" + DOUBLEFLAT, "mi" + FLAT, "mi", "fa", "fa" + SHARP, "fa" + DOUBLESHARP, "sol" + DOUBLEFLAT, "sol" + FLAT, "sol", "sol" + SHARP, "sol" + DOUBLESHARP, "la", "la" + DOUBLEFLAT, "la" + FLAT, "la" + SHARP, "la" + DOUBLESHARP, "ti" + DOUBLEFLAT, "ti" + FLAT, "ti" ];
-    global.FIXEDSOLFEGE1 = { "do𝄫": "B", "do♭": "C" + FLAT, "do": "C", "do♯": "C" + SHARP, "do𝄪": "D", "re𝄫": "C", "re♭": "D" + FLAT, "re": "D", "re♯": "D" + SHARP, "re𝄪": "E", "mi𝄫": "D", "mi♭": "E" + FLAT, "mi": "E", "mi♯": "E" + SHARP, "mi𝄪": "G", "fa𝄫": "E" + FLAT, "fa♭": "F" + FLAT, "fa": "F", "fa♯": "F" + SHARP, "fa𝄪": "G" + SHARP, "sol𝄫": "E", "sol♭": "G" + FLAT, "sol": "G", "sol♯": "G" + SHARP, "sol𝄪": "A", "la𝄫": "G", "la♭": "A" + FLAT, "la": "A", "la♯": "A" + SHARP, "la𝄪": "B", "ti𝄫": "A", "ti♭": "B" + FLAT, "ti": "B", "ti♯": "B" + SHARP, "ti𝄪": "C", "R": _("rest") };
+    global.FIXEDSOLFEGE1 = { "do𝄫": "B", "do♭": "C" + FLAT, "do": "C", "do♯": "C" + SHARP, "do𝄪": "D", "re𝄫": "C", "re♭": "D" + FLAT, "re": "D", "re♯": "D" + SHARP, "re𝄪": "E", "mi𝄫": "D", "mi♭": "E" + FLAT, "mi": "E", "mi♯": "E" + SHARP, "mi𝄪": "G", "fa𝄫": "E" + FLAT, "fa♭": "F" + FLAT, "fa": "F", "fa♯": "F" + SHARP, "fa𝄪": "G" + SHARP, "sol𝄫": "E", "sol♭": "G" + FLAT, "sol": "G", "sol♯": "G" + SHARP, "sol𝄪": "A", "la𝄫": "G", "la♭": "A" + FLAT, "la": "A", "la♯": "A" + SHARP, "la𝄪": "B", "ti𝄫": "A", "ti♭": "B" + FLAT, "ti": "B", "ti♯": "B" + SHARP, "ti𝄪": "C", "R": t("rest") };
 
     it("should return correct octave for a numeric argument", () => {
       expect(calcOctave(4, 5, null, "C")).toBe(5); 
@@ -1814,17 +1814,17 @@ describe("getSolfege", () => {
 
     it("should return correct octave value for argument 'next'", () => {
       expect(calcOctaveInterval("next")).toBe(1);
-      expect(calcOctaveInterval(_("next"))).toBe(1); 
+      expect(calcOctaveInterval(t("next"))).toBe(1); 
     });
   
     it("should return correct octave value for argument 'previous'", () => {
       expect(calcOctaveInterval("previous")).toBe(-1);
-      expect(calcOctaveInterval(_("previous"))).toBe(-1); 
+      expect(calcOctaveInterval(t("previous"))).toBe(-1); 
     });
   
     it("should return correct octave value for argument 'current'", () => {
       expect(calcOctaveInterval("current")).toBe(0);
-      expect(calcOctaveInterval(_("current"))).toBe(0); 
+      expect(calcOctaveInterval(t("current"))).toBe(0); 
     });
   
     it("should return correct octave value for numeric arguments", () => {
@@ -1905,7 +1905,7 @@ describe("getSolfege", () => {
         "ti": "B",
         "ti♯": "B" + SHARP,
         "ti𝄪": "C",
-        "R": _("rest")
+        "R": t("rest")
     };
     global.EQUIVALENTNATURALS = { "E♯": "F", "B♯": "C", "C♭": "B", "F♭": "E" };
     const testCases = [
@@ -1914,7 +1914,7 @@ describe("getSolfege", () => {
       { input: "do♯", expected: "C♯" },
       { input: "re♯", expected: "D♯" },
       { input: "E♯", expected: "F" },
-      { input: "R", expected: _("rest") },  
+      { input: "R", expected: t("rest") },  
     ];
   
     testCases.forEach(({ input, expected }) => {

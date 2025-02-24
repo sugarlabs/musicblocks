@@ -25,13 +25,13 @@ function setupNumberBlocks(activity) {
             super("int");
             this.setPalette("number", activity);
             this.setHelpString([
-                _("The Int block returns an integer."),
+                t("The Int block returns an integer."),
                 "documentation",
                 ""
             ]);
 
             this.formBlock({
-                name: _("int"),
+                name: t("int"),
                 args: 1,
                 argTypes: ["anyin"],
                 defaults: [100]
@@ -70,13 +70,13 @@ function setupNumberBlocks(activity) {
             super("mod");
             this.setPalette("number", activity);
             this.setHelpString([
-                _("The Mod block returns the remainder from a division."),
+                t("The Mod block returns the remainder from a division."),
                 "documentation",
                 ""
             ]);
 
             this.formBlock({
-                name: _("mod"),
+                name: t("mod"),
                 args: 2,
                 defaults: [100, 12]
             });
@@ -138,7 +138,7 @@ function setupNumberBlocks(activity) {
             super("power");
             this.setPalette("number", activity);
             this.setHelpString([
-                _("The Power block calculates a power function."),
+                t("The Power block calculates a power function."),
                 "documentation",
                 ""
             ]);
@@ -193,13 +193,13 @@ function setupNumberBlocks(activity) {
             super("sqrt");
             this.setPalette("number", activity);
             this.setHelpString([
-                _("The Sqrt block returns the square root."),
+                t("The Sqrt block returns the square root."),
                 "documentation",
                 ""
             ]);
 
             this.formBlock({
-                name: _("sqrt"),
+                name: t("sqrt"),
                 args: 1,
                 defaults: [64]
             });
@@ -245,13 +245,13 @@ function setupNumberBlocks(activity) {
             super("abs");
             this.setPalette("number", activity);
             this.setHelpString([
-                _("The Abs block returns the absolute value."),
+                t("The Abs block returns the absolute value."),
                 "documentation",
                 ""
             ]);
 
             this.formBlock({
-                name: _("abs"),
+                name: t("abs"),
                 args: 1
             });
         }
@@ -292,13 +292,13 @@ function setupNumberBlocks(activity) {
             super("distance");
             this.setPalette("number", activity);
             this.setHelpString([
-                _("The Distance block returns the distance between two points. For example, between the mouse and the center of the screen."),
+                t("The Distance block returns the distance between two points. For example, between the mouse and the center of the screen."),
                 "documentation",
                 ""
             ]);
 
             this.formBlock({
-                name: _("distance"),
+                name: t("distance"),
                 args: 4,
                 defaults: [0, 0, 100, 100],
                 argTypes: ["anyin", "anyin", "anyin", "anyin"],
@@ -358,7 +358,7 @@ function setupNumberBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Divide block is used to divide."),
+                t("The Divide block is used to divide."),
                 "documentation",
                 null,
                 "note1"
@@ -438,7 +438,7 @@ function setupNumberBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Multiply block is used to multiply."),
+                t("The Multiply block is used to multiply."),
                 "documentation",
                 ""
             ]);
@@ -609,7 +609,7 @@ function setupNumberBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Minus block is used to subtract."),
+                t("The Minus block is used to subtract."),
                 "documentation",
                 ""
             ]);
@@ -720,7 +720,7 @@ function setupNumberBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Plus block is used to add."),
+                t("The Plus block is used to add."),
                 "documentation",
                 ""
             ]);
@@ -846,16 +846,16 @@ function setupNumberBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The One-of block returns one of two choices."),
+                t("The One-of block returns one of two choices."),
                 "documentation",
                 null,
                 "oneofhelp"
             ]);
 
             this.formBlock({
-                name: _("one of"),
+                name: t("one of"),
                 args: 2,
-                argLabels: [_("this"), _("that")],
+                argLabels: [t("this"), t("that")],
                 outType: "anyout",
                 argTypes: ["anyin", "anyin"],
                 defaults: [-90, 90]
@@ -910,16 +910,16 @@ function setupNumberBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Random block returns a random number."),
+                t("The Random block returns a random number."),
                 "documentation",
                 null,
                 "randomhelp"
             ]);
 
             this.formBlock({
-                name: _("random"),
+                name: t("random"),
                 args: 2,
-                argLabels: [_("min"), _("max")],
+                argLabels: [t("min"), t("max")],
                 argTypes: ["anyin", "anyin"],
                 defaults: [0, 12]
             });
@@ -978,12 +978,12 @@ function setupNumberBlocks(activity) {
 
     class NumberBlock extends ValueBlock {
         constructor() {
-            super("number", _("number"));
+            super("number", t("number"));
             this.setPalette("number", activity);
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Number block holds a number."),
+                t("The Number block holds a number."),
                 "documentation",
                 ""
             ]);

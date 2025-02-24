@@ -50,16 +50,16 @@ Note: If you want to customise an existing theme, just put your changes in the d
 
     ```javascript
     string = [[...],
-        ["light", _("Light Mode")],
-        ["dark", _("Dark Mode")],
-        ["custom", _("Custom Theme")]];
+        ["light", t("Light Mode")],
+        ["dark", t("Dark Mode")],
+        ["custom", t("Custom Theme")]];
     ```
 
     ```javascript
-    string = [_(...),
-    _("Light Mode"),
-    _("Dark Mode"),
-    _("Custom Theme")];
+    string = [t(...),
+    t("Light Mode"),
+    t("Dark Mode"),
+    t("Custom Theme")];
     ```
 
     There will be two same arrays in the else statement, repeat the process. This is to display your theme's name in the dropdown menu item you created in Step 1.

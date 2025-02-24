@@ -57,7 +57,7 @@ function setupIntervalsActions(activity) {
         static GetModename(mode) {
             let modename = "major";
             for (const _mode in MUSICALMODES) {
-                if (_mode === mode || _(_mode) === mode) {
+                if (_mode === mode || t(_mode) === mode) {
                     modename = _mode;
                     break;
                 }
@@ -110,25 +110,25 @@ function setupIntervalsActions(activity) {
 
             let totalIntervals = this.GetIntervalNumber(turtle);
             
-            const numberToStringMap = [_('one'), _('two'), _('three'), _('four'), _('five'), _('six'), _('seven'), _('eight'), _('nine')]
-            const plural = (Math.abs(octave) > 1) ? _('octaves') : _('octave');
+            const numberToStringMap = [t('one'), t('two'), t('three'), t('four'), t('five'), t('six'), t('seven'), t('eight'), t('nine')]
+            const plural = (Math.abs(octave) > 1) ? t('octaves') : t('octave');
             
             let os = numberToStringMap[Math.abs(octave) - 1] || Math.abs(octave);
             if (totalIntervals % 12 === 0 && letterGap === 0) {
                 if (octave < 0) {
                     if (octave === -1) os = ""
-                    const a = os + " " + _("perfect") + " " + plural + " " + _("below");
+                    const a = os + " " + t("perfect") + " " + plural + " " + t("below");
                     return a.charAt(0).toUpperCase() + a.slice(1);
                 }
                 if (octave > 1) {
-                    const a = os + " " + _("perfect") + " " + plural + " " + _("above");
+                    const a = os + " " + t("perfect") + " " + plural + " " + t("above");
                     return a.charAt(0).toUpperCase() + a.slice(1);
                 }
             }
             
             if (totalIntervals > 21) {
                 if (octave >= 1) {
-                    lastWord = ", " + _("plus") + " " + os + " " + plural;
+                    lastWord = ", " + t("plus") + " " + os + " " + plural;
                 }    
                 while (totalIntervals > 12) totalIntervals -= 12;
             }
@@ -137,7 +137,7 @@ function setupIntervalsActions(activity) {
                 letterGap = (letterGap !== 0) ? NOTENAMES.length - letterGap : letterGap;
                 if (octave < -1) lastWord = `,  ${os} ${plural}`;
                 lastWord += " "
-		lastWord += _("below")
+		lastWord += t("below")
             }
             
             let interval = (totalIntervals % 12 === 0 && letterGap === 0) ? SEMITONETOINTERVALMAP[totalIntervals][letterGap] : SEMITONETOINTERVALMAP[totalIntervals][letterGap] + lastWord;
@@ -255,7 +255,7 @@ function setupIntervalsActions(activity) {
                 MUSICALMODES[modeName] = [];
                 if (!tur.singer.defineMode.includes(0)) {
                     tur.singer.defineMode.push(0);
-                    activity.errorMsg(_("Adding missing pitch number 0."));
+                    activity.errorMsg(t("Adding missing pitch number 0."));
                 }
 
                 const pitchNumbers = tur.singer.defineMode.sort((a, b) => a[0] - b[0]);
@@ -263,13 +263,13 @@ function setupIntervalsActions(activity) {
                 for (let i = 0; i < pitchNumbers.length; i++) {
                     if (pitchNumbers[i] < 0 || pitchNumbers[i] > 11) {
                         activity.errorMsg(
-                            _("Ignoring pitch numbers less than zero or greater than eleven.")
+                            t("Ignoring pitch numbers less than zero or greater than eleven.")
                         );
                         continue;
                     }
 
                     if (i > 0 && pitchNumbers[i] === pitchNumbers[i - 1]) {
-                        activity.errorMsg(_("Ignoring duplicate pitch numbers."));
+                        activity.errorMsg(t("Ignoring duplicate pitch numbers."));
                         continue;
                     }
 

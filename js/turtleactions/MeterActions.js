@@ -98,7 +98,7 @@ function setupMeterActions(activity) {
                         "/" +
                         obj[1] +
                         " " +
-                        _("beats per minute must be greater than") +
+                        t("beats per minute must be greater than") +
                         " " +
                         target,
                     blk
@@ -108,13 +108,13 @@ function setupMeterActions(activity) {
                 obj = rationalToFraction(beatValue);
                 target = (1000 * 0.25) / beatValue;
                 activity.errorMsg(
-                    _("maximum") +
+                    t("maximum") +
                         " " +
                         obj[0] +
                         "/" +
                         obj[1] +
                         " " +
-                        _("beats per minute is") +
+                        t("beats per minute is") +
                         " " +
                         target,
                     blk
@@ -136,7 +136,7 @@ function setupMeterActions(activity) {
                         "/" +
                         obj[1] +
                         " " +
-                        _("beats per minute must be greater than") +
+                        t("beats per minute must be greater than") +
                         " " +
                         target,
                     blk
@@ -146,13 +146,13 @@ function setupMeterActions(activity) {
                 obj = rationalToFraction(beatValue);
                 target = (1000 * 0.25) / beatValue;
                 activity.errorMsg(
-                    _("maximum") +
+                    t("maximum") +
                         " " +
                         obj[0] +
                         "/" +
                         obj[1] +
                         " " +
-                        _("beats per minute is") +
+                        t("beats per minute is") +
                         " " +
                         target,
                     blk

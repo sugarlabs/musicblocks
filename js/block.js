@@ -1220,7 +1220,7 @@ class Block {
                 block_label = this.overrideName;
             }
         } else if (this.protoblock.staticLabels.length > 0 && !this.protoblock.image) {
-            // Label should be defined inside _().
+            // Label should be defined inside t().
             if (SPECIALINPUTS.includes(this.name)) {
                 block_label = "";
             } else {
@@ -1384,7 +1384,7 @@ class Block {
             } else if (this.name === "outputtools") {
                 label = this.overrideName;
             } else if (this.name === "grid") {
-                label = _(this.value);
+                label = t(this.value);
             } else {
                 if (this.value !== null) {
                     label = this.value.toString();
@@ -1566,140 +1566,140 @@ class Block {
                 switch (that.name) {
                     case "action":
                         that.collapseText = new createjs.Text(
-                            _("action"),
+                            t("action"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );
                         break;
                     case "temperament1":
                         that.collapseText = new createjs.Text(
-                            _("temperament"),
+                            t("temperament"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );
                         break;
                     case "start":
                         that.collapseText = new createjs.Text(
-                            _("start"),
+                            t("start"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );
                         break;
                     case "matrix":
                         that.collapseText = new createjs.Text(
-                            _("matrix"),
+                            t("matrix"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );
                         break;
                     case "status":
                         that.collapseText = new createjs.Text(
-                            _("status"),
+                            t("status"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );
                         break;
                     case "pitchdrummatrix":
                         that.collapseText = new createjs.Text(
-                            _("drum mapper"),
+                            t("drum mapper"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );
                         break;
                     case "rhythmruler":
                         that.collapseText = new createjs.Text(
-                            _("ruler"),
+                            t("ruler"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );
                         break;
                     case "timbre":
                         that.collapseText = new createjs.Text(
-                            _("timbre"),
+                            t("timbre"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );
                         break;
                     case "pitchstaircase":
                         that.collapseText = new createjs.Text(
-                            _("stair"),
+                            t("stair"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );
                         break;
                     case "tempo":
                         that.collapseText = new createjs.Text(
-                            _("tempo"),
+                            t("tempo"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );
                         break;
                     case "modewidget":
                         that.collapseText = new createjs.Text(
-                            _("mode"),
+                            t("mode"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );
                         break;
                     case "pitchslider":
                         that.collapseText = new createjs.Text(
-                            _("slider"),
+                            t("slider"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );
                         break;
                     case "musickeyboard":
                         that.collapseText = new createjs.Text(
-                            _("keyboard"),
+                            t("keyboard"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );
                         break;
                     case "drum":
                         that.collapseText = new createjs.Text(
-                            _("drum"),
+                            t("drum"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );
                         break;
                     case "rhythmruler2":
                         that.collapseText = new createjs.Text(
-                            _("rhythm maker"),
+                            t("rhythm maker"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );
                         break;
                     case "newnote":
                         that.collapseText = new createjs.Text(
-                            _("note value"),
+                            t("note value"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );
                         break;
                     case "interval":
                         that.collapseText = new createjs.Text(
-                            _("scalar interval"),
+                            t("scalar interval"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );
                         break;
                     case "osctime":
                         that.collapseText = new createjs.Text(
-                            _("milliseconds"),
+                            t("milliseconds"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );
                         break;
                     case "temperament":
                         that.collapseText = new createjs.Text(
-                            _("temperament"),
+                            t("temperament"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );
                         break;
                     case "definemode":
                         that.collapseText = new createjs.Text(
-                            _("mode"),
+                            t("mode"),
                             fontSize + "px Sans",
                             platformColor.blockText
                         );
@@ -2305,7 +2305,7 @@ class Block {
         let v = "";
         const nblk = this.blocks.findNoteBlock(lastIntervalBlock);
         if (nblk === null) {
-            this.collapseText.text = _("scalar interval") + itext;
+            this.collapseText.text = t("scalar interval") + itext;
         } else {
             c = this.blocks.blockList[nblk].connections[1];
             if (c !== null) {
@@ -2328,7 +2328,7 @@ class Block {
             c = this.blocks.findFirstPitchBlock(this.blocks.blockList[nblk].connections[2]);
             const p = this._getPitch(c);
             if (c === null || p === "") {
-                this.collapseText.text = _("scalar interval") + itext;
+                this.collapseText.text = t("scalar interval") + itext;
             } else {
                 // Are there more pitch blocks in this note?
                 c = this.blocks.findFirstPitchBlock(last(this.blocks.blockList[c].connections));
@@ -2378,11 +2378,11 @@ class Block {
                     v = v.replace(NSYMBOLS[vi], RSYMBOLS[vi]);
                 }
             }
-            this.collapseText.text = _("silence") + " | " + v;
+            this.collapseText.text = t("silence") + " | " + v;
         } else if (p === "" && v === "") {
-            this.collapseText.text = _("note value");
+            this.collapseText.text = t("note value");
         } else {
-            if (p === _("silence")) {
+            if (p === t("silence")) {
                 if (vi !== null) {
                     if (vi in NSYMBOLS) {
                         v = v.replace(NSYMBOLS[vi], RSYMBOLS[vi]);
@@ -2435,9 +2435,9 @@ class Block {
         c = this.blocks.findFirstPitchBlock(c);
         const p = this._getPitch(c);
         if (c === null) {
-            this.collapseText.text = _("silence") + " | " + v;
+            this.collapseText.text = t("silence") + " | " + v;
         } else if (p === "" && v === "") {
-            this.collapseText.text = _("note value");
+            this.collapseText.text = t("note value");
         } else {
             // Are there more pitch blocks in this note?
             c = this.blocks.findFirstPitchBlock(last(this.blocks.blockList[c].connections));
@@ -2471,7 +2471,7 @@ class Block {
                 c2 = this.blocks.blockList[c].connections[2];
                 if (this.blocks.blockList[c2].name === "number") {
                     if (this.blocks.blockList[c1].name === "solfege") {
-                        const solfnotes_ = _("ti la sol fa mi re do").split(" ");
+                        const solfnotes_ = t("ti la sol fa mi re do").split(" ");
                         const stripped = this.blocks.blockList[c1].value
                             .replace(SHARP, "")
                             .replace(FLAT, "")
@@ -2539,19 +2539,19 @@ class Block {
                     this.blocks.blockList[c1].value < 0
                 ) {
                     //.TRANS: scalar step
-                    return _("down") + " " + Math.abs(this.blocks.blockList[c1].value);
-                } else return _("up") + " " + this.blocks.blockList[c1].value;
+                    return t("down") + " " + Math.abs(this.blocks.blockList[c1].value);
+                } else return t("up") + " " + this.blocks.blockList[c1].value;
             case "pitchnumber":
                 c1 = this.blocks.blockList[c].connections[1];
                 if (this.blocks.blockList[c1].name === "number") {
                     //.TRANS: pitch number
-                    return _("pitch") + " " + this.blocks.blockList[c1].value;
+                    return t("pitch") + " " + this.blocks.blockList[c1].value;
                 }
                 break;
             case "playdrum":
-                return _("drum");
+                return t("drum");
             case "rest2":
-                return _("silence");
+                return t("silence");
             default:
                 return "";
         }
@@ -2960,7 +2960,7 @@ class Block {
             let block = that.blocks.blockList[that.connections[1]];
             while (block != undefined) {
                 if (block?.name === "rest2") {
-                    this.activity.errorMsg(_("Silence block cannot be removed."), block);
+                    this.activity.errorMsg(t("Silence block cannot be removed."), block);
                     return;
                 }
                 block = block?.blocks.blockList[block.connections[1]];
@@ -3132,7 +3132,7 @@ class Block {
                 if (this.activity.trashcan.isVisible) {
                     this.blocks.sendStackToTrash(this);
                     this.activity.textMsg(
-                        _("You can restore deleted blocks from the trash with the Restore From Trash button."), 3000
+                        t("You can restore deleted blocks from the trash with the Restore From Trash button."), 3000
                     );
                 }
             } else {
@@ -3430,7 +3430,7 @@ class Block {
             obj = splitSolfege(this.value);
             // solfnotes_ is used in the interface for internationalization.
             //.TRANS: the note names must be separated by single spaces
-            const solfnotes_ = _("ti la sol fa mi re do").split(" ");
+            const solfnotes_ = t("ti la sol fa mi re do").split(" ");
 
             if (this.piemenuOKtoLaunch()) {
                 piemenuPitches(this, solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
@@ -3447,7 +3447,7 @@ class Block {
                 // custom temperament is supposed to be equal
                 // temperament.
                 obj = splitSolfege(this.value);
-                const solfnotes_ = _("ti la sol fa mi re do").split(" ");
+                const solfnotes_ = t("ti la sol fa mi re do").split(" ");
 
                 if (this.piemenuOKtoLaunch()) {
                     piemenuPitches(this, solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
@@ -3555,7 +3555,7 @@ class Block {
             const invertValues = [];
 
             for (let i = 0; i < INVERTMODES.length; i++) {
-                invertLabels.push(_(INVERTMODES[i][1]));
+                invertLabels.push(t(INVERTMODES[i][1]));
                 invertValues.push(INVERTMODES[i][1]);
             }
 
@@ -3575,7 +3575,7 @@ class Block {
             const categoriesList = [];
             for (let i = 0; i < DRUMNAMES.length; i++) {
                 if (!EFFECTSNAMES.includes(DRUMNAMES[i][1])) {
-                    const label = _(DRUMNAMES[i][1]);
+                    const label = t(DRUMNAMES[i][1]);
                     if (getTextWidth(label, "bold 30pt Sans") > 400) {
                         drumLabels.push(label.substr(0, 8) + "...");
                     } else {
@@ -3606,7 +3606,7 @@ class Block {
             const effectcategoriesList = [];
             for (let i = 0; i < DRUMNAMES.length; i++) {
                 if (EFFECTSNAMES.includes(DRUMNAMES[i][1])) {
-                    const label = _(DRUMNAMES[i][1]);
+                    const label = t(DRUMNAMES[i][1]);
                     if (getTextWidth(label, "Bold 30pt Sans") > 400) {
                         effectLabels.push(label.substr(0, 8) + "...");
                     } else {
@@ -3634,7 +3634,7 @@ class Block {
             const filterLabels = [];
             const filterValues = [];
             for (let i = 0; i < FILTERTYPES.length; i++) {
-                filterLabels.push(_(FILTERTYPES[i][0]));
+                filterLabels.push(t(FILTERTYPES[i][0]));
                 filterValues.push(FILTERTYPES[i][1]);
             }
 
@@ -3655,7 +3655,7 @@ class Block {
             const oscLabels = [];
             const oscValues = [];
             for (let i = 0; i < OSCTYPES.length; i++) {
-                oscLabels.push(_(OSCTYPES[i][1]));
+                oscLabels.push(t(OSCTYPES[i][1]));
                 oscValues.push(OSCTYPES[i][1]);
             }
 
@@ -3677,7 +3677,7 @@ class Block {
                     continue;
                 }
 
-                const label = _(VOICENAMES[i][1]);
+                const label = t(VOICENAMES[i][1]);
                 if (getTextWidth(label, "bold 30pt Sans") > 400) {
                     voiceLabels.push(label.substr(0, 8) + "...");
                 } else {
@@ -3762,7 +3762,7 @@ class Block {
                 selectedValue = true;
             }
 
-            const booleanLabels = [_("true"), _("false")];
+            const booleanLabels = [t("true"), t("false")];
             const booleanValues = [true, false];
 
             piemenuBoolean(this, booleanLabels, booleanValues, selectedValue);
@@ -3773,10 +3773,10 @@ class Block {
             let gridValues = [];
             if (_THIS_IS_TURTLE_BLOCKS_) {
                 gridLabels = [
-                    _("Cartesian"),
-                    _("polar"),
-                    _("Cartesian/Polar"),
-                    _("none")
+                    t("Cartesian"),
+                    t("polar"),
+                    t("Cartesian/Polar"),
+                    t("none")
                 ];
                 gridValues = [
                     "Cartesian",
@@ -3786,16 +3786,16 @@ class Block {
                 ];
             } else {
                 gridLabels = [
-                    _("Cartesian"),
-                    _("polar"),
-                    _("Cartesian/Polar"),
-                    _("treble"),
-                    _("grand staff"),
-                    _("mezzo-soprano"),
-                    _("alto"),
-                    _("tenor"),
-                    _("bass"),
-                    _("none")
+                    t("Cartesian"),
+                    t("polar"),
+                    t("Cartesian/Polar"),
+                    t("treble"),
+                    t("grand staff"),
+                    t("mezzo-soprano"),
+                    t("alto"),
+                    t("tenor"),
+                    t("bass"),
+                    t("none")
                 ];
                 gridValues = [
                     "Cartesian",
@@ -3839,13 +3839,13 @@ class Block {
 
             const WRAPMODES = [
                 // .TRANS: on2 should be translated as "on" as in on and off
-                [_("on2"), "on"],
+                [t("on2"), "on"],
                 // .TRANS: off should be translated as "off" as in on and off
-                [_("off"), "off"]
+                [t("off"), "off"]
             ];
 
             for (let i = 0; i < WRAPMODES.length; i++) {
-                wrapLabels.push(_(WRAPMODES[i][1]));
+                wrapLabels.push(t(WRAPMODES[i][1]));
                 wrapValues.push(WRAPMODES[i][1]);
             }
             piemenuBasic(this, wrapLabels, wrapValues, selectedWrap);
@@ -4408,14 +4408,14 @@ class Block {
 
             if (isNaN(this.value)) {
                 const thisBlock = this.blocks.blockList.indexOf(this);
-                this.activity.errorMsg(newValue + ": " + _("Not a number"), thisBlock);
+                this.activity.errorMsg(newValue + ": " + t("Not a number"), thisBlock);
                 this.activity.refreshCanvas();
                 this.value = oldValue;
             }
             
             if(cblk1 != null && this.blocks.blockList[cblk1].name === "pitch" && (this.value > 8 || this.value < 1)) {
                 const thisBlock = this.blocks.blockList.indexOf(this);
-                this.activity.errorMsg(_("Octave value must be between 1 and 8."), thisBlock);
+                this.activity.errorMsg(t("Octave value must be between 1 and 8."), thisBlock);
                 this.activity.refreshCanvas();
                 this.label.value = oldValue;
                 this.value = oldValue;
@@ -4423,7 +4423,7 @@ class Block {
 
             if(String(this.value).length > 10) {
                 const thisBlock = this.blocks.blockList.indexOf(this);
-                this.activity.errorMsg(_("Numbers can have at most 10 digits."), thisBlock);
+                this.activity.errorMsg(t("Numbers can have at most 10 digits."), thisBlock);
                 this.activity.refreshCanvas();
                 this.label.value = oldValue;
                 this.value = oldValue;
@@ -4497,7 +4497,7 @@ class Block {
                     // Rename both do <- name and nameddo blocks.
                     this.blocks.renameDos(oldValue, newValue);
 
-                    if (oldValue === _("action")) {
+                    if (oldValue === t("action")) {
                         this.blocks.newNameddoBlock(
                             newValue,
                             this.blocks.actionHasReturn(c),
@@ -4515,7 +4515,7 @@ class Block {
                     const blockPalette = this.blocks.palettes.dict["action"];
                     for (let blk = 0; blk < blockPalette.protoList.length; blk++) {
                         const block = blockPalette.protoList[blk];
-                        if (oldValue === _("action")) {
+                        if (oldValue === t("action")) {
                             if (block.name === "nameddo" && block.defaults.length === 0) {
                                 block.hidden = true;
                             }
@@ -4526,7 +4526,7 @@ class Block {
                         }
                     }
 
-                    if (oldValue === _("action")) {
+                    if (oldValue === t("action")) {
                         this.blocks.newNameddoBlock(
                             newValue,
                             this.blocks.actionHasReturn(c),

@@ -1189,8 +1189,8 @@ class Painter {
         this.turtle.container.y = turtles.turtleY2screenY(this.turtle.y);
 
         if (resetSkin) {
-            if (this.turtle.name !== _("start")) {
-                this.turtle.rename(_("start"));
+            if (this.turtle.name !== t("start")) {
+                this.turtle.rename(t("start"));
             }
 
             if (this.turtle.skinChanged) {

@@ -132,8 +132,8 @@ function AIWidget() {
         this.playBtn.innerHTML =
             `<img
                 src="header-icons/pause-button.svg" 
-                title="${_("Pause")}" 
-                alt="${_("Pause")}" 
+                title="${t("Pause")}" 
+                alt="${t("Pause")}" 
                 height="${ICONSIZE}" 
                 width="${ICONSIZE}" 
                 vertical-align="middle"
@@ -176,7 +176,7 @@ function AIWidget() {
      */
     this.getSampleLength = function () {
         if (this.sampleData.length > 1333333) {
-            this.activity.errorMsg(_("Warning: Sample is bigger than 1MB."), this.timbreBlock);
+            this.activity.errorMsg(t("Warning: Sample is bigger than 1MB."), this.timbreBlock);
         }
     };
     function adjustPitch(note, keySignature) {
@@ -535,9 +535,9 @@ function AIWidget() {
       this.activity.blocks.loadNewBlocks(finalBlock);
   
 
-  this.activity.textMsg(_("New start block generated"));
+  this.activity.textMsg(t("New start block generated"));
 
-        // // logo.textMsg(_("MIDI loading. This may take some time depending upon the number of notes in the track"));
+        // // logo.textMsg(t("MIDI loading. This may take some time depending upon the number of notes in the track"));
         // this.blocks.loadNewBlocks(combined_array);
         return null;
 
@@ -547,7 +547,7 @@ function AIWidget() {
      * @returns {void}
      */
     this.showSampleTypeError = function () {
-        this.activity.errorMsg(_("Upload failed: Sample is not a .wav file."), this.timbreBlock);
+        this.activity.errorMsg(t("Upload failed: Sample is not a .wav file."), this.timbreBlock);
     };
    
     /**
@@ -643,7 +643,7 @@ function AIWidget() {
 
         widgetWindow.onmaximize = this._scale.bind(this);
 
-        this.playBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
+        this.playBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, t("Play"));
         this.playBtn.onclick = () => {
             console.log(abcNotationSong)
             if (this.isMoving) {
@@ -651,8 +651,8 @@ function AIWidget() {
                 this.playBtn.innerHTML =
                     `<img 
                         src="header-icons/play-button.svg" 
-                        title="${_("Play")}" 
-                        alt="${_("Play")}" 
+                        title="${t("Play")}" 
+                        alt="${t("Play")}" 
                         height="${ICONSIZE}" 
                         width="${ICONSIZE}"
                         vertical-align="middle"
@@ -674,7 +674,7 @@ function AIWidget() {
         widgetWindow.addButton(
             "export-chunk.svg",
             ICONSIZE,
-            _("Save sample"),
+            t("Save sample"),
             ""
         ).onclick = function () {
             // Debounce button
@@ -696,7 +696,7 @@ function AIWidget() {
 
 
 
-        this.activity.textMsg(_("AI Music"));
+        this.activity.textMsg(t("AI Music"));
         this.pause();
 
         widgetWindow.sendToCenter();

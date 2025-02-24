@@ -43,7 +43,7 @@ function setupGraphicsBlocks(activity) {
          */
         constructor() {
             // Call the constructor of the parent class
-            super("heading", _("heading"));
+            super("heading", t("heading"));
 
             // Set the palette, activity, and beginner block for the heading block
             this.setPalette("graphics", activity);
@@ -53,13 +53,13 @@ function setupGraphicsBlocks(activity) {
             // Set the help string for the heading block based on the context
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _("The Heading block returns the orientation of the mouse."),
+                    t("The Heading block returns the orientation of the mouse."),
                     "documentation",
                     ""
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Heading block returns the orientation of the turtle."),
+                    t("The Heading block returns the orientation of the turtle."),
                     "documentation",
                     ""
                 ]);
@@ -130,14 +130,14 @@ function setupGraphicsBlocks(activity) {
             // Set the help string for the Y block based on the context
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _("The Y block returns the vertical position of the mouse."),
+                    t("The Y block returns the vertical position of the mouse."),
                     "documentation",
                     null,
                     "xyhelp"
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Y block returns the vertical position of the turtle."),
+                    t("The Y block returns the vertical position of the turtle."),
                     "documentation",
                     null,
                     "xyhelp"
@@ -146,7 +146,7 @@ function setupGraphicsBlocks(activity) {
 
             // Form the block with specific parameters
             this.formBlock({
-                name: this.lang === "ja" ? _("y3") : _("y")
+                name: this.lang === "ja" ? t("y3") : t("y")
             });
         }
 
@@ -216,14 +216,14 @@ function setupGraphicsBlocks(activity) {
             // Set the help string for the X block based on the context
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _("The X block returns the horizontal position of the mouse."),
+                    t("The X block returns the horizontal position of the mouse."),
                     "documentation",
                     null,
                     "xyhelp"
                 ]);
             } else {
                 this.setHelpString([
-                    _("The X block returns the horizontal position of the turtle."),
+                    t("The X block returns the horizontal position of the turtle."),
                     "documentation",
                     null,
                     "xyhelp"
@@ -232,7 +232,7 @@ function setupGraphicsBlocks(activity) {
 
             // Form the block with specific parameters
             this.formBlock({
-                name: this.lang === "ja" ? _("x3") : _("x")
+                name: this.lang === "ja" ? t("x3") : t("x")
             });
         }
 
@@ -292,7 +292,7 @@ function setupGraphicsBlocks(activity) {
          */
         constructor() {
             // Call the constructor of the parent class
-            super("scrollxy", _("scroll xy"));
+            super("scrollxy", t("scroll xy"));
 
             // Set the palette, activity, and beginner block for the Scroll XY block
             this.setPalette("graphics", activity);
@@ -300,7 +300,7 @@ function setupGraphicsBlocks(activity) {
 
             // Set the help string for the Scroll XY block
             this.setHelpString([
-                _("The Scroll XY block moves the canvas."),
+                t("The Scroll XY block moves the canvas."),
                 "documentation",
                 null,
                 "everybeathelp"
@@ -310,7 +310,7 @@ function setupGraphicsBlocks(activity) {
             this.formBlock({
                 args: 2,
                 defaults: [100, 0],
-                argLabels: this.lang === "ja" ? [_("x2"), _("y2")] : [_("x"), _("y")]
+                argLabels: this.lang === "ja" ? [t("x2"), t("y2")] : [t("x"), t("y")]
             });
         }
 
@@ -361,7 +361,7 @@ function setupGraphicsBlocks(activity) {
          */
         constructor() {
             // Call the constructor of the parent class
-            super("clear", _("Clear").toLowerCase());
+            super("clear", t("Clear").toLowerCase());
 
             // Set the palette and activity for the Clear block
             this.setPalette("graphics", activity);
@@ -414,17 +414,17 @@ function setupGraphicsBlocks(activity) {
             // Set the palette, activity, and help string for the Control-point 2 block
             this.setPalette("graphics", activity);
             this.setHelpString([
-                _("The Control-point 2 block sets the second control point for the Bezier curve."),
+                t("The Control-point 2 block sets the second control point for the Bezier curve."),
                 "documentation",
                 ""
             ]);
 
             // Form the block with specific parameters
             this.formBlock({
-                name: _("control point 2"),
+                name: t("control point 2"),
                 args: 2,
                 defaults: [100, 25],
-                argLabels: this.lang === "ja" ? [_("x1"), _("y1")] : [_("x"), _("y")]
+                argLabels: this.lang === "ja" ? [t("x1"), t("y1")] : [t("x"), t("y")]
             });
         }
 
@@ -465,17 +465,17 @@ function setupGraphicsBlocks(activity) {
             // Set the palette, activity, and help string for the Control-point 1 block
             this.setPalette("graphics", activity);
             this.setHelpString([
-                _("The Control-point 1 block sets the first control point for the Bezier curve."),
+                t("The Control-point 1 block sets the first control point for the Bezier curve."),
                 "documentation",
                 ""
             ]);
 
             // Form the block with specific parameters
             this.formBlock({
-                name: _("control point 1"),
+                name: t("control point 1"),
                 args: 2,
                 defaults: [100, 75],
-                argLabels: this.lang === "ja" ? [_("x1"), _("y1")] : [_("x"), _("y")]
+                argLabels: this.lang === "ja" ? [t("x1"), t("y1")] : [t("x"), t("y")]
             });
         }
 
@@ -515,14 +515,14 @@ function setupGraphicsBlocks(activity) {
 
             // Set the palette, activity, and help string for the Bezier block
             this.setPalette("graphics", activity);
-            this.setHelpString([_("The Bezier block draws a Bezier curve."), "documentation", ""]);
+            this.setHelpString([t("The Bezier block draws a Bezier curve."), "documentation", ""]);
 
             // Form the block with specific parameters
             this.formBlock({
-                name: _("bezier"),
+                name: t("bezier"),
                 args: 2,
                 defaults: [0, 100],
-                argLabels: this.lang === "ja" ? [_("x1"), _("y1")] : [_("x"), _("y")]
+                argLabels: this.lang === "ja" ? [t("x1"), t("y1")] : [t("x"), t("y")]
             });
         }
 
@@ -580,7 +580,7 @@ function setupGraphicsBlocks(activity) {
 
             // Set the help string for the Arc block
             this.setHelpString([
-                _("The Arc block moves the turtle in an arc."),
+                t("The Arc block moves the turtle in an arc."),
                 "documentation",
                 null,
                 "archelp"
@@ -588,10 +588,10 @@ function setupGraphicsBlocks(activity) {
 
             // Form the block with specific parameters
             this.formBlock({
-                name: _("arc"),
+                name: t("arc"),
                 args: 2,
                 defaults: [90, 100],
-                argLabels: [_("angle"), _("radius")]
+                argLabels: [t("angle"), t("radius")]
             });
         }
 
@@ -608,9 +608,9 @@ function setupGraphicsBlocks(activity) {
 
             if (args.length === 2) {
                 if ((args[1] > 5000 || args[1] < -5000) && (isWrap == false || isWrap == null)) {
-                    activity.errorMsg(_("Value must be within -5000 to 5000 when Wrap Mode is off."), blk);
+                    activity.errorMsg(t("Value must be within -5000 to 5000 when Wrap Mode is off."), blk);
                 } else if ((args[1] > 20000 || args[1] < -20000) && isWrap == true) {
-                    activity.errorMsg(_("Value must be within -20000 to 20000 when Wrap Mode is on."), blk);
+                    activity.errorMsg(t("Value must be within -20000 to 20000 when Wrap Mode is on."), blk);
                 } else {
                     if (typeof args[0] === "string" || typeof args[1] === "string") {
                         activity.errorMsg(NANERRORMSG, blk);
@@ -648,7 +648,7 @@ function setupGraphicsBlocks(activity) {
          */
         constructor() {
             // Call the constructor of the parent class
-            super("setheading", _("set heading"));
+            super("setheading", t("set heading"));
 
             // Set the palette, activity, and beginner block for the Set Heading block
             this.setPalette("graphics", activity);
@@ -661,7 +661,7 @@ function setupGraphicsBlocks(activity) {
 
             // Set the help string for the Set Heading block
             this.setHelpString([
-                _("The Set heading block sets the heading of the turtle."),
+                t("The Set heading block sets the heading of the turtle."),
                 "documentation",
                 ""
             ]);
@@ -721,13 +721,13 @@ function setupGraphicsBlocks(activity) {
             // Set the help string for the Set XY block
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _("The Set XY block moves the mouse to a specific position on the screen."),
+                    t("The Set XY block moves the mouse to a specific position on the screen."),
                     "documentation",
                     ""
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Set XY block moves the turtle to a specific position on the screen."),
+                    t("The Set XY block moves the turtle to a specific position on the screen."),
                     "documentation",
                     ""
                 ]);
@@ -735,10 +735,10 @@ function setupGraphicsBlocks(activity) {
 
             // Form the block with specific parameters
             this.formBlock({
-                name: _("set xy"),
+                name: t("set xy"),
                 args: 2,
                 defaults: [0, 0],
-                argLabels: this.lang === "ja" ? [_("x1"), _("y1")] : [_("x"), _("y")]
+                argLabels: this.lang === "ja" ? [t("x1"), t("y1")] : [t("x"), t("y")]
             });
         }
 
@@ -755,9 +755,9 @@ function setupGraphicsBlocks(activity) {
 
             if (args.length === 2) {
                 if ((args[0] > 5000 || args[1] > 5000 || args[0] < -5000 || args[1] < -5000) && (isWrap == false || isWrap == null)) {
-                    activity.errorMsg(_("Value must be within -5000 to 5000 when Wrap Mode is off."), blk);
+                    activity.errorMsg(t("Value must be within -5000 to 5000 when Wrap Mode is off."), blk);
                 } else if ((args[0] > 20000 || args[1] > 20000 || args[0] < -20000 || args[1] < -20000) && isWrap == true) {
-                    activity.errorMsg(_("Value must be within -20000 to 20000 when Wrap Mode is on."), blk);
+                    activity.errorMsg(t("Value must be within -20000 to 20000 when Wrap Mode is on."), blk);
                 } else {
                     if (typeof args[0] === "string" || typeof args[1] === "string") {
                         activity.errorMsg(NANERRORMSG, blk);
@@ -807,14 +807,14 @@ function setupGraphicsBlocks(activity) {
             // Set the help string for the Right block
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _("The Right block turns the mouse to the right."),
+                    t("The Right block turns the mouse to the right."),
                     "documentation",
                     null,
                     "forwardhelp"
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Right block turns the turtle to the right."),
+                    t("The Right block turns the turtle to the right."),
                     "documentation",
                     null,
                     "forwardhelp"
@@ -823,7 +823,7 @@ function setupGraphicsBlocks(activity) {
 
             // Form the block with specific parameters
             this.formBlock({
-                name: this.lang === "ja" ? _("right1") : _("right"),
+                name: this.lang === "ja" ? t("right1") : t("right"),
                 args: 1,
                 defaults: [90]
             });
@@ -887,14 +887,14 @@ function setupGraphicsBlocks(activity) {
             // Set the help string for the Left block
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _("The Left block turns the mouse to the left."),
+                    t("The Left block turns the mouse to the left."),
                     "documentation",
                     null,
                     "forwardhelp"
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Left block turns the turtle to the left."),
+                    t("The Left block turns the turtle to the left."),
                     "documentation",
                     null,
                     "forwardhelp"
@@ -903,7 +903,7 @@ function setupGraphicsBlocks(activity) {
 
             // Form the block with specific parameters
             this.formBlock({
-                name: this.lang === "ja" ? _("left1") : _("left"),
+                name: this.lang === "ja" ? t("left1") : t("left"),
                 args: 1,
                 defaults: [90]
             });
@@ -955,7 +955,7 @@ function setupGraphicsBlocks(activity) {
          */
         constructor() {
             // Call the constructor of the parent class
-            super("back", _("back"));
+            super("back", t("back"));
 
             // Set the palette, activity, and beginner block for the Back block
             this.setPalette("graphics", activity);
@@ -964,14 +964,14 @@ function setupGraphicsBlocks(activity) {
             // Set the help string for the Back block
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _("The Back block moves the mouse backward."),
+                    t("The Back block moves the mouse backward."),
                     "documentation",
                     null,
                     "forwardhelp"
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Back block moves the turtle backward."),
+                    t("The Back block moves the turtle backward."),
                     "documentation",
                     null,
                     "forwardhelp"
@@ -998,9 +998,9 @@ function setupGraphicsBlocks(activity) {
 
             if (args.length === 1) {
                 if ((args[0] > 5000 || args[0] < -5000) && (isWrap ==  false || isWrap == null)) {
-                    activity.errorMsg(_("Value must be within -5000 to 5000 when Wrap Mode is off."), blk);
+                    activity.errorMsg(t("Value must be within -5000 to 5000 when Wrap Mode is off."), blk);
                 } else if ((args[0] > 20000 || args[0] < -20000) && isWrap ==  true) {
-                    activity.errorMsg(_("Value must be within -20000 to 20000 when Wrap Mode is on."), blk);
+                    activity.errorMsg(t("Value must be within -20000 to 20000 when Wrap Mode is on."), blk);
                 } else {
                     if (typeof args[0] === "string") {
                         activity.errorMsg(NANERRORMSG, blk);
@@ -1038,7 +1038,7 @@ function setupGraphicsBlocks(activity) {
          */
         constructor() {
             // Call the constructor of the parent class
-            super("forward", _("forward"));
+            super("forward", t("forward"));
 
             // Set the palette, activity, and beginner block for the Forward block
             this.setPalette("graphics", activity);
@@ -1047,14 +1047,14 @@ function setupGraphicsBlocks(activity) {
             // Set the help string for the Forward block
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _("The Forward block moves the mouse forward."),
+                    t("The Forward block moves the mouse forward."),
                     "documentation",
                     null,
                     "forwardhelp"
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Forward block moves the turtle forward."),
+                    t("The Forward block moves the turtle forward."),
                     "documentation",
                     null,
                     "forwardhelp"
@@ -1081,9 +1081,9 @@ function setupGraphicsBlocks(activity) {
 
             if (args.length === 1) {
                 if ((args[0] > 5000 || args[0] < -5000) && (isWrap ==  false || isWrap == null)) {
-                   activity.errorMsg(_("Value must be within -5000 to 5000 when Wrap Mode is off."), blk); 
+                   activity.errorMsg(t("Value must be within -5000 to 5000 when Wrap Mode is off."), blk); 
                 } else if ((args[0] > 20000 || args[0] < -20000) && isWrap ==  true) {
-                    activity.errorMsg(_("Value must be within -20000 to 20000 when Wrap Mode is on."), blk);
+                    activity.errorMsg(t("Value must be within -20000 to 20000 when Wrap Mode is on."), blk);
                 } else {
                     if (typeof args[0] === "string") {
                         activity.errorMsg(NANERRORMSG, blk);
@@ -1142,7 +1142,7 @@ function setupGraphicsBlocks(activity) {
          */
         constructor() {
             // Call the constructor of the parent class
-            super("wrap", _("wrap"));
+            super("wrap", t("wrap"));
 
             // Set the palette, activity, and beginner block for the Wrap block
             this.setPalette("graphics", activity);
@@ -1150,7 +1150,7 @@ function setupGraphicsBlocks(activity) {
 
             // Set the help string for the Wrap block
             this.setHelpString([
-                _(
+                t(
                     "The Wrap block enables or disables screen wrapping for the graphics actions within it."
                 ),
                 "documentation",
@@ -1160,7 +1160,7 @@ function setupGraphicsBlocks(activity) {
 
             // Form the block with specific parameters
             this.formBlock({
-                name: _("wrap"),
+                name: t("wrap"),
                 args: 1,
                 defaults: ["on"],
                 argTypes: ["textin"]

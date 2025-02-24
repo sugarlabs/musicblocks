@@ -92,7 +92,7 @@ class HelpWidget {
         let leftArrow, rightArrow;
         if (!useActiveBlock) {
             if (page == 0) {
-                this.widgetWindow.updateTitle(_("Take a tour"));
+                this.widgetWindow.updateTitle(t("Take a tour"));
             }
             else {
                 this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
@@ -122,7 +122,7 @@ class HelpWidget {
                         page = page - 1;
                         leftArrow.classList.remove('disabled');
                         if (page == 0) {
-                            this.widgetWindow.updateTitle(_("Take a tour"));
+                            this.widgetWindow.updateTitle(t("Take a tour"));
                         }
                         else {
                             this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
@@ -143,7 +143,7 @@ class HelpWidget {
                     page = 0;
                 }
                 if (page == 0) {
-                    this.widgetWindow.updateTitle(_("Take a tour"));
+                    this.widgetWindow.updateTitle(t("Take a tour"));
                 }
                 else {
                     this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
@@ -155,7 +155,7 @@ class HelpWidget {
                 const label = this.activity.blocks.blockList[this.activity.blocks.activeBlock]
                     .protoblock.staticLabels[0];
                     if (page == 0) {
-                        this.widgetWindow.updateTitle(_("Take a tour"));
+                        this.widgetWindow.updateTitle(t("Take a tour"));
                     }
                     else {
                         this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
@@ -332,11 +332,11 @@ class HelpWidget {
         let body = "";
         if (
             [
-                _("Welcome to Music Blocks"),
-                _("Meet Mr. Mouse!"),
-                _("Guide"),
-                _("About"),
-                _("Congratulations.")
+                t("Welcome to Music Blocks"),
+                t("Meet Mr. Mouse!"),
+                t("Guide"),
+                t("About"),
+                t("Congratulations.")
             ].includes(HELPCONTENT[page][0])
         ) {
             // body = body + '<p>&nbsp;<img src="' + HELPCONTENT[page][2] + '"></p>';
@@ -358,7 +358,7 @@ class HelpWidget {
             body += `<p><a href="${link}" target="_blank">${HELPCONTENT[page][4]}</a></p>` ;
         }
 
-        if ([_("Congratulations.")].includes(HELPCONTENT[page][0])) {
+        if ([t("Congratulations.")].includes(HELPCONTENT[page][0])) {
             const cell = docById("right-arrow");
 
             cell.onclick = () => {
@@ -375,7 +375,7 @@ class HelpWidget {
                     page = 0;
                 }
                 if (page == 0) {
-                    this.widgetWindow.updateTitle(_("Take a tour"));
+                    this.widgetWindow.updateTitle(t("Take a tour"));
                 }
                 else {
                     this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
@@ -390,7 +390,7 @@ class HelpWidget {
                         page = page - 1;
                         leftArrow.classList.remove('disabled');
                         if (page == 0) {
-                            this.widgetWindow.updateTitle(_("Take a tour"));
+                            this.widgetWindow.updateTitle(t("Take a tour"));
                         }
                         else {
                             this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
@@ -510,7 +510,7 @@ class HelpWidget {
         };
         if (block.name !== null) {
             const label = block.staticLabels[0];
-            this.widgetWindow.updateTitle(_(label));
+            this.widgetWindow.updateTitle(t(label));
         }
          
         if (block.name !== null) {

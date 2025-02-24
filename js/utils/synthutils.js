@@ -55,11 +55,11 @@ const POLYCOUNT = 3;
  */
 const NOISENAMES = [
     //.TRANS: white noise synthesizer
-    [_("white noise"), "noise1", "images/synth.svg", "electronic"],
+    [t("white noise"), "noise1", "images/synth.svg", "electronic"],
     //.TRANS: brown noise synthesizer
-    [_("brown noise"), "noise2", "images/synth.svg", "electronic"],
+    [t("brown noise"), "noise2", "images/synth.svg", "electronic"],
     //.TRANS: pink noise synthesizer
-    [_("pink noise"), "noise3", "images/synth.svg", "electronic"]
+    [t("pink noise"), "noise3", "images/synth.svg", "electronic"]
 ];
 
 /**
@@ -69,75 +69,75 @@ const NOISENAMES = [
  */
 const VOICENAMES = [
     //.TRANS: musical instrument
-    [_("piano"), "piano", "images/voices.svg", "string"],
+    [t("piano"), "piano", "images/voices.svg", "string"],
     //.TRANS: musical instrument
-    [_("violin"), "violin", "images/voices.svg", "string"],
+    [t("violin"), "violin", "images/voices.svg", "string"],
     //.TRANS: viola musical instrument
-    [_("viola"), "viola", "images/voices.svg", "string"],
+    [t("viola"), "viola", "images/voices.svg", "string"],
     //.TRANS: musical instrument
-    [_("cello"), "cello", "images/voices.svg", "string"],
+    [t("cello"), "cello", "images/voices.svg", "string"],
     //.TRANS: musical instrument
-    [_("bass"), "bass", "images/voices.svg", "string"],
+    [t("bass"), "bass", "images/voices.svg", "string"],
     //.TRANS: viola musical instrument
-    [_("double bass"), "double bass", "images/voices.svg", "string"],
+    [t("double bass"), "double bass", "images/voices.svg", "string"],
     //.TRANS: sitar musical instrument
-    [_("sitar"), "sitar", "images/synth.svg", "string"],
+    [t("sitar"), "sitar", "images/synth.svg", "string"],
     //.TRANS: harmonium musical instrument
-    [_("harmonium"), "harmonium", "images/voices.svg", "string"],
+    [t("harmonium"), "harmonium", "images/voices.svg", "string"],
     //.TRANS: musical instrument
-    [_("guitar"), "guitar", "images/voices.svg", "string"],
+    [t("guitar"), "guitar", "images/voices.svg", "string"],
     //.TRANS: musical instrument
-    [_("acoustic guitar"), "acoustic guitar", "images/voices.svg", "string"],
+    [t("acoustic guitar"), "acoustic guitar", "images/voices.svg", "string"],
     //.TRANS: musical instrument
-    [_("flute"), "flute", "images/voices.svg", "wind"],
+    [t("flute"), "flute", "images/voices.svg", "wind"],
     //.TRANS: musical instrument
-    [_("clarinet"), "clarinet", "images/voices.svg", "wind"],
+    [t("clarinet"), "clarinet", "images/voices.svg", "wind"],
     //.TRANS: musical instrument
-    [_("saxophone"), "saxophone", "images/voices.svg", "wind"],
+    [t("saxophone"), "saxophone", "images/voices.svg", "wind"],
     //.TRANS: musical instrument
-    [_("tuba"), "tuba", "images/voices.svg", "wind"],
+    [t("tuba"), "tuba", "images/voices.svg", "wind"],
     //.TRANS: musical instrument
-    [_("trumpet"), "trumpet", "images/voices.svg", "wind"],
+    [t("trumpet"), "trumpet", "images/voices.svg", "wind"],
     //.TRANS: musical instrument
-    [_("oboe"), "oboe", "images/voices.svg", "wind"],
+    [t("oboe"), "oboe", "images/voices.svg", "wind"],
     //.TRANS: musical instrument
-    [_("trombone"), "trombone", "images/voices.svg", "wind"],
+    [t("trombone"), "trombone", "images/voices.svg", "wind"],
     //.TRANS: musical instrument
-    [_("banjo"), "banjo", "images/voices.svg", "string"],
+    [t("banjo"), "banjo", "images/voices.svg", "string"],
     //.TRANS: musical instrument
-    [_("koto"), "koto", "images/voices.svg", "string"],
+    [t("koto"), "koto", "images/voices.svg", "string"],
     //.TRANS: musical instrument
-    [_("dulcimer"), "dulcimer", "images/voices.svg", "string"],
+    [t("dulcimer"), "dulcimer", "images/voices.svg", "string"],
     //.TRANS: musical instrument
-    [_("electric guitar"), "electric guitar", "images/voices.svg", "string"],
+    [t("electric guitar"), "electric guitar", "images/voices.svg", "string"],
     //.TRANS: musical instrument
-    [_("bassoon"), "bassoon", "images/voices.svg", "string"],
+    [t("bassoon"), "bassoon", "images/voices.svg", "string"],
     //.TRANS: musical instrument
-    [_("celeste"), "celeste", "images/voices.svg", "string"],
+    [t("celeste"), "celeste", "images/voices.svg", "string"],
     //.TRANS: xylophone musical instrument
-    [_("xylophone"), "xylophone", "images/8_bellset_key_6.svg", "precussion"],
+    [t("xylophone"), "xylophone", "images/8_bellset_key_6.svg", "precussion"],
     //.TRANS: polytone synthesizer
-    [_("electronic synth"), "electronic synth", "images/synth.svg", "electronic"],
+    [t("electronic synth"), "electronic synth", "images/synth.svg", "electronic"],
     //.TRANS: simple monotone synthesizer
-    // [_('simple 1'), 'simple 1', 'images/synth.svg', 'electronic'],
+    // [t('simple 1'), 'simple 1', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
-    // [_('simple-2'), 'simple 2', 'images/synth.svg', 'electronic'],
+    // [t('simple-2'), 'simple 2', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
-    // [_('simple-3'), 'simple 3', 'images/synth.svg', 'electronic'],
+    // [t('simple-3'), 'simple 3', 'images/synth.svg', 'electronic'],
     //.TRANS: simple monotone synthesizer
-    // [_('simple-4'), 'simple 4', 'images/synth.svg', 'electronic'],
+    // [t('simple-4'), 'simple 4', 'images/synth.svg', 'electronic'],
     //.TRANS: sine wave
-    [_("sine"), "sine", "images/synth.svg", "electronic"],
+    [t("sine"), "sine", "images/synth.svg", "electronic"],
     //.TRANS: square wave
-    [_("square"), "square", "images/synth.svg", "electronic"],
+    [t("square"), "square", "images/synth.svg", "electronic"],
     //.TRANS: sawtooth wave
-    [_("sawtooth"), "sawtooth", "images/synth.svg", "electronic"],
+    [t("sawtooth"), "sawtooth", "images/synth.svg", "electronic"],
     //.TRANS: triangle wave
-    [_("triangle"), "triangle", "images/synth.svg", "electronic"],
+    [t("triangle"), "triangle", "images/synth.svg", "electronic"],
     //.TRANS: customize voice
-    [_("custom"), "custom", "images/synth.svg", "electronic"],
+    [t("custom"), "custom", "images/synth.svg", "electronic"],
     //.TRANS: vibraphone musical instrument
-    [_("vibraphone"), "vibraphone", "images/synth.svg", "electronic"]
+    [t("vibraphone"), "vibraphone", "images/synth.svg", "electronic"]
 ];
 
 // drum symbols are from
@@ -149,61 +149,61 @@ const VOICENAMES = [
  */
 const DRUMNAMES = [
     //.TRANS: musical instrument
-    [_("snare drum"), "snare drum", "images/snaredrum.svg", "sn", "drum"],
+    [t("snare drum"), "snare drum", "images/snaredrum.svg", "sn", "drum"],
     //.TRANS: musical instrument
-    [_("kick drum"), "kick drum", "images/kick.svg", "hh", "drum"],
+    [t("kick drum"), "kick drum", "images/kick.svg", "hh", "drum"],
     //.TRANS: musical instrument
-    [_("tom tom"), "tom tom", "images/tom.svg", "tomml", "drum"],
+    [t("tom tom"), "tom tom", "images/tom.svg", "tomml", "drum"],
     //.TRANS: musical instrument
-    [_("floor tom"), "floor tom", "images/floortom.svg", "tomfl", "drum"],
+    [t("floor tom"), "floor tom", "images/floortom.svg", "tomfl", "drum"],
     //.TRANS: musical instrument
-    [_("bass drum"), "bass drum", "images/kick.svg", "tomfl", "drum"],
+    [t("bass drum"), "bass drum", "images/kick.svg", "tomfl", "drum"],
     //.TRANS: a drum made from an inverted cup
-    [_("cup drum"), "cup drum", "images/cup.svg", "hh", "drum"],
+    [t("cup drum"), "cup drum", "images/cup.svg", "hh", "drum"],
     //.TRANS: musical instrument
-    [_("darbuka drum"), "darbuka drum", "images/darbuka.svg", "hh", "drum"],
+    [t("darbuka drum"), "darbuka drum", "images/darbuka.svg", "hh", "drum"],
     //.TRANS: musical instrument
-    [_("taiko"), "japanese drum", "images/tom.svg", "hh", "drum"],
+    [t("taiko"), "japanese drum", "images/tom.svg", "hh", "drum"],
     //.TRANS: musical instrument
-    [_("hi hat"), "hi hat", "images/hihat.svg", "hh", "bell"],
+    [t("hi hat"), "hi hat", "images/hihat.svg", "hh", "bell"],
     //.TRANS: a small metal bell
-    [_("ride bell"), "ride bell", "images/ridebell.svg", "rb", "bell"],
+    [t("ride bell"), "ride bell", "images/ridebell.svg", "rb", "bell"],
     //.TRANS: musical instrument
-    [_("cow bell"), "cow bell", "images/cowbell.svg", "cb", "bell"],
+    [t("cow bell"), "cow bell", "images/cowbell.svg", "cb", "bell"],
     //.TRANS: musical instrument
-    [_("triangle bell"), "triangle bell", "images/trianglebell.svg", "tri", "bell"],
+    [t("triangle bell"), "triangle bell", "images/trianglebell.svg", "tri", "bell"],
     //.TRANS: musical instrument
-    [_("finger cymbals"), "finger cymbals", "images/fingercymbals.svg", "cymca", "bell"],
+    [t("finger cymbals"), "finger cymbals", "images/fingercymbals.svg", "cymca", "bell"],
     //.TRANS: musical instrument
-    // [_('japanese bell'), 'japanese bell', 'images/cowbell.svg', 'hh', 'bell'],
+    // [t('japanese bell'), 'japanese bell', 'images/cowbell.svg', 'hh', 'bell'],
     //.TRANS: a musically tuned set of bells
-    [_("chime"), "chime", "images/chime.svg", "cymca", "bell"],
+    [t("chime"), "chime", "images/chime.svg", "cymca", "bell"],
     //.TRANS: a musical instrument
-    [_("gong"), "gong", "images/gong.svg", "cymca", "bell"],
+    [t("gong"), "gong", "images/gong.svg", "cymca", "bell"],
     //.TRANS: sound effect
-    [_("clang"), "clang", "images/clang.svg", "cymca", "effect"],
+    [t("clang"), "clang", "images/clang.svg", "cymca", "effect"],
     //.TRANS: sound effect
-    [_("crash"), "crash", "images/crash.svg", "cymca", "effect"],
+    [t("crash"), "crash", "images/crash.svg", "cymca", "effect"],
     //.TRANS: sound effect
-    [_("bottle"), "bottle", "images/bottle.svg", "hh", "effect"],
+    [t("bottle"), "bottle", "images/bottle.svg", "hh", "effect"],
     //.TRANS: sound effect
-    [_("clap"), "clap", "images/clap.svg", "hc", "effect"],
+    [t("clap"), "clap", "images/clap.svg", "hc", "effect"],
     //.TRANS: sound effect
-    [_("slap"), "slap", "images/slap.svg", "vibs", "effect"],
+    [t("slap"), "slap", "images/slap.svg", "vibs", "effect"],
     //.TRANS: sound effect
-    [_("splash"), "splash", "images/splash.svg", "hh", "effect"],
+    [t("splash"), "splash", "images/splash.svg", "hh", "effect"],
     //.TRANS: sound effect
-    [_("bubbles"), "bubbles", "images/bubbles.svg", "hh", "effect"],
+    [t("bubbles"), "bubbles", "images/bubbles.svg", "hh", "effect"],
     //.TRANS: sound effect
-    [_("raindrop"), "raindrop", "images/bubbles.svg", "hh", "effect"],
+    [t("raindrop"), "raindrop", "images/bubbles.svg", "hh", "effect"],
     //.TRANS: animal sound effect
-    [_("cat"), "cat", "images/cat.svg", "hh", "animal"],
+    [t("cat"), "cat", "images/cat.svg", "hh", "animal"],
     //.TRANS: animal sound effect
-    [_("cricket"), "cricket", "images/cricket.svg", "hh", "animal"],
+    [t("cricket"), "cricket", "images/cricket.svg", "hh", "animal"],
     //.TRANS: animal sound effect
-    [_("dog"), "dog", "images/dog.svg", "hh", "animal"],
+    [t("dog"), "dog", "images/dog.svg", "hh", "animal"],
     //.TRANS: animal sound effect
-    [_("duck"), "duck", "images/duck.svg", "hh", "animal"]
+    [t("duck"), "duck", "images/duck.svg", "hh", "animal"]
 ];
 
 /**
@@ -1354,6 +1354,7 @@ function Synth() {
         synthOptions = validateAndSetParams(synthOptions, params);
 
         let tempSynth;
+        console.log(sourceName,'AMANANANAN');
         if (sourceName.toLowerCase() === "amsynth") {
             tempSynth = new Tone.AMSynth(synthOptions);
         } else if (sourceName.toLowerCase() === "fmsynth") {
@@ -1378,7 +1379,6 @@ function Synth() {
      */
     this.__createSynth = (turtle, instrumentName, sourceName, params) => {
         // Ensure the structure is initialized
-
         this._loadSample(sourceName);
         if (sourceName in this.samples.voice || sourceName in this.samples.drum) {
             if (!instruments[turtle][instrumentName]) {
@@ -1408,6 +1408,7 @@ function Synth() {
             }
 
             if (!instruments[turtle][instrumentName]) {
+            console.log("AYNCHAM3",sourceName);
 
                 instruments[turtle][instrumentName] = this._createCustomSynth(
                     sourceName,
@@ -1417,6 +1418,7 @@ function Synth() {
 
             instrumentsSource[instrumentName] = [0, "poly"];
         } else if (sourceName in CUSTOMSAMPLES) {
+
             if (instruments[turtle] && instruments[turtle][instrumentName]) {
                 delete instruments[turtle][instrumentName];
             }

@@ -218,7 +218,7 @@ function setupRhythmActions(activity) {
             if (value >= 0) {
                 tur.singer.dotCount += value;
             } else if (value === -1) {
-                activity.errorMsg(_("An argument of -1 results in a note value of 0."), blk);
+                activity.errorMsg(t("An argument of -1 results in a note value of 0."), blk);
                 value = 0;
             } else {
                 tur.singer.dotCount += 1 / value;

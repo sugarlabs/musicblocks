@@ -87,7 +87,7 @@ class Arpeggio {
         this.playButton = widgetWindow.addButton(
             "play-button.svg",
             Arpeggio.ICONSIZE,
-            _("Play")
+            t("Play")
         );
 
         this.playButton.onclick = () => {
@@ -100,7 +100,7 @@ class Arpeggio {
         widgetWindow.addButton(
             "export-chunk.svg",
             Arpeggio.ICONSIZE,
-            _("Save")
+            t("Save")
         ).onclick = () => {
             // Debounce button
             if (!this._get_save_lock()) {
@@ -115,7 +115,7 @@ class Arpeggio {
         widgetWindow.addButton(
             "erase-button.svg",
             Arpeggio.ICONSIZE,
-            _("Clear")
+            t("Clear")
         ).onclick = () => {
             this._clear();
         };
@@ -238,7 +238,7 @@ class Arpeggio {
         };
 
         this.makeClickable();
-        activity.textMsg(_("Click in the grid to add steps to the arpeggio."), 3000);
+        activity.textMsg(t("Click in the grid to add steps to the arpeggio."), 3000);
     }
 
     /**
@@ -530,8 +530,8 @@ class Arpeggio {
             icon.innerHTML =
                 `&nbsp;&nbsp;<img 
                     src="header-icons/stop-button.svg" 
-                    title="${_("Stop")}" 
-                    alt="${_("Stop")}" 
+                    title="${t("Stop")}" 
+                    alt="${t("Stop")}" 
                     height="${Arpeggio.ICONSIZE}" 
                     width="${Arpeggio.ICONSIZE}" 
                     vertical-align="middle" 
@@ -541,8 +541,8 @@ class Arpeggio {
             icon.innerHTML =
                 `&nbsp;&nbsp;<img 
                     src="header-icons/play-button.svg" 
-                    title="${_("Play")}" 
-                    alt="${_("Play")}" 
+                    title="${t("Play")}" 
+                    alt="${t("Play")}" 
                     height="${Arpeggio.ICONSIZE}" 
                     width="${Arpeggio.ICONSIZE}" 
                     vertical-align="middle" 
@@ -636,8 +636,8 @@ class Arpeggio {
             icon.innerHTML =
                 `&nbsp;&nbsp;<img 
                     src="header-icons/play-button.svg" 
-                    title="${_("Play")}" 
-                    alt="${_("Play")}" 
+                    title="${t("Play")}" 
+                    alt="${t("Play")}" 
                     height="${Arpeggio.ICONSIZE}" 
                     width="${Arpeggio.ICONSIZE}" 
                     vertical-align="middle" 

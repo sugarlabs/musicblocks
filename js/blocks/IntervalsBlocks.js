@@ -42,7 +42,7 @@ function setupIntervalsBlocks(activity) {
          */
         constructor() {
             // Call the constructor of the parent class
-            super("settemperament", _("set temperament"));
+            super("settemperament", t("set temperament"));
 
             // Set the palette, activity, and beginner block for the SetTemperament block
             this.setPalette("intervals", activity);
@@ -50,7 +50,7 @@ function setupIntervalsBlocks(activity) {
 
             // Set the help string for the SetTemperament block
             this.setHelpString([
-                _(
+                t(
                     "The Set temperament block is used to choose the tuning system used by Music Blocks."
                 ),
                 "documentation",
@@ -60,7 +60,7 @@ function setupIntervalsBlocks(activity) {
             // Form the block with specific parameters
             this.formBlock({
                 args: 3,
-                argLabels: [_("temperament"), _("pitch"), _("octave")]
+                argLabels: [t("temperament"), t("pitch"), t("octave")]
             });
 
             // Make the block a macro with specific structure
@@ -91,12 +91,12 @@ function setupIntervalsBlocks(activity) {
          */
         constructor() {
             // Call the constructor of the parent class
-            super("temperamentname", _("temperament name"));
+            super("temperamentname", t("temperament name"));
 
             // Set the palette, activity, extra width, and form the block with specific parameters
             this.setPalette("tone", activity);
             this.setHelpString([
-                _("The Temperament name block is used to select a tuning method."),
+                t("The Temperament name block is used to select a tuning method."),
                 "documentation",
                 ""
             ]);
@@ -158,12 +158,12 @@ function setupIntervalsBlocks(activity) {
          */
         constructor() {
             // Call the constructor of the parent class
-            super("doubly", _("doubly"));
+            super("doubly", t("doubly"));
 
             // Set the palette, activity, help string, and form the block with specific parameters
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _("The Doubly block will double the size of an interval."),
+                t("The Doubly block will double the size of an interval."),
                 "documentation",
                 null,
                 "doublyhelp"
@@ -259,12 +259,12 @@ function setupIntervalsBlocks(activity) {
          */
         constructor() {
             // Call the constructor of the parent class
-            super("intervalnumber", _("interval number"));
+            super("intervalnumber", t("interval number"));
 
             // Set the palette, activity, help string, beginner block, hidden status, and form the block with specific parameters
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _(
+                t(
                     "The Interval number block returns the number of scalar steps in the current interval."
                 ),
                 "documentation",
@@ -314,12 +314,12 @@ function setupIntervalsBlocks(activity) {
          */
         constructor() {
             // Call the constructor of the parent class
-            super("currentinterval", _("current interval"));
+            super("currentinterval", t("current interval"));
 
             // Set the palette, activity, help string, beginner block, hidden status, and form the block with specific parameters
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _(
+                t(
                     "The Current interval block returns the name of scalar steps in the current interval."
                 ),
                 "documentation",
@@ -376,7 +376,7 @@ function setupIntervalsBlocks(activity) {
             // Set the palette, activity, help string, and form the block with specific parameters
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _(
+                t(
                     "The Semi-tone interval block measures the distance between two notes in semi-tones."
                 ),
                 "documentation",
@@ -384,7 +384,7 @@ function setupIntervalsBlocks(activity) {
             ]);
             this.formBlock({
                 //.TRANS: measure the distance between two pitches in semi-tones
-                name: _("semi-tone interval measure"),
+                name: t("semi-tone interval measure"),
                 flows: { labels: [""], type: "flow" }
             });
         }
@@ -451,7 +451,7 @@ function setupIntervalsBlocks(activity) {
                 tur.singer.lastPitch.pop();
             } else {
                 distance = 0;
-                activity.errorMsg(_("You must use two pitch blocks when measuring an interval."));
+                activity.errorMsg(t("You must use two pitch blocks when measuring an interval."));
             }
 
             tur.singer.notesPlayed = saveNoteCount;
@@ -493,13 +493,13 @@ function setupIntervalsBlocks(activity) {
             // Set the palette, activity, help string, and form the block with specific parameters
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _("The Scalar interval block measures the distance between two notes in the current key and mode."),
+                t("The Scalar interval block measures the distance between two notes in the current key and mode."),
                 "documentation",
                 ""
             ]);
             this.formBlock({
                 //.TRANS: measure the distance between two pitches in steps of musical scale
-                name: _("scalar interval measure"),
+                name: t("scalar interval measure"),
                 flows: { labels: [""], type: "flow" }
             });
         }
@@ -567,7 +567,7 @@ function setupIntervalsBlocks(activity) {
                 tur.singer.lastPitch.pop();
             } else {
                 distance = 0;
-                activity.errorMsg(_("You must use two pitch blocks when measuring an interval."));
+                activity.errorMsg(t("You must use two pitch blocks when measuring an interval."));
             }
 
             tur.singer.notesPlayed = saveNoteCount;
@@ -612,7 +612,7 @@ function setupIntervalsBlocks(activity) {
             constructor(type, value, isDown) {
                 super(
                     (isDown ? "down" : "") + type + value,
-                    _((isDown ? "down " : "") + type) + " " + value
+                    t((isDown ? "down " : "") + type) + " " + value
                 );
                 this.setPalette("intervals", activity);
                 this.setHelpString();
@@ -646,7 +646,7 @@ function setupIntervalsBlocks(activity) {
             this.setPalette("intervals", activity);
             this.setHelpString();
             this.formBlock({
-                name: _("perfect"),
+                name: t("perfect"),
                 args: 1,
                 defaults: [5]
             });
@@ -671,17 +671,17 @@ function setupIntervalsBlocks(activity) {
                 11, 12
             ];
             this.setHelpString([
-                _(
+                t(
                     "The Semi-tone interval block calculates a relative interval based on half steps."
                 ) +
                     " " +
-                    _("In the figure, we add sol# to sol."),
+                    t("In the figure, we add sol# to sol."),
                 "documentation",
                 ""
             ]);
             this.formBlock({
                 //.TRANS: calculate a relative step between notes based on semi-tones
-                name: _("semi-tone interval") + " (+/–)",
+                name: t("semi-tone interval") + " (+/–)",
                 args: 1,
                 defaults: [5]
             });
@@ -726,18 +726,18 @@ function setupIntervalsBlocks(activity) {
             super("arpeggio");
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _(
+                t(
                     "The Arpeggio block will run each note block multiple times, adding a transposition based on the specified chord."
                 ) +
                     " " +
-                    _("The output of the example is: do, mi, sol, sol, ti, mi"),
+                    t("The output of the example is: do, mi, sol, sol, ti, mi"),
                 "documentation",
                 null,
                 ""
             ]);
 
             this.formBlock({
-                name: _("arpeggio"),
+                name: t("arpeggio"),
                 argTypes: ["textin"],
                 args: 1,
                 defaults: [DEFAULTCHORD]
@@ -928,14 +928,14 @@ function setupIntervalsBlocks(activity) {
             super("chordinterval");
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _("The Chord block calculates common chords.") +
+                t("The Chord block calculates common chords.") +
                     " " +
-                    _("In the figure, we generate a C-major chord."),
+                    t("In the figure, we generate a C-major chord."),
                 "documentation",
                 ""
             ]);
             this.formBlock({
-                name: _("chord"),
+                name: t("chord"),
                 args: 1,
                 argTypes: ["textin"],
                 defaults: [DEFAULTCHORD]
@@ -987,12 +987,12 @@ function setupIntervalsBlocks(activity) {
             super("ratiointerval");
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _("The Ratio Interval block calculates an interval based on a ratio."),
+                t("The Ratio Interval block calculates an interval based on a ratio."),
                 "documentation",
                 ""
             ]);
             this.formBlock({
-                name: _("ratio interval"),
+                name: t("ratio interval"),
                 args: 1,
                 argTypes: ["anyin"],
                 defaults: [3 / 2] // fifth
@@ -1057,18 +1057,18 @@ function setupIntervalsBlocks(activity) {
             this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.beginnerBlock(true);
             this.setHelpString([
-                _(
+                t(
                     "The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode."
                 ) +
                     " " +
-                    _("In the figure, we add la to sol."),
+                    t("In the figure, we add la to sol."),
                 "documentation",
                 null,
                 "intervalhelp"
             ]);
             this.formBlock({
                 //.TRANS: calculate a relative step between notes based on semi-tones
-                name: _("scalar interval") + " (+/–)",
+                name: t("scalar interval") + " (+/–)",
                 args: 1,
                 defaults: [5]
             });
@@ -1108,7 +1108,7 @@ function setupIntervalsBlocks(activity) {
             super("definemode");
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _(
+                t(
                     "The Define mode block allows you to define a custom mode by specifying pitch numbers."
                 ),
                 "documentation",
@@ -1117,11 +1117,11 @@ function setupIntervalsBlocks(activity) {
             ]);
             this.formBlock({
                 //.TRANS: define a custom mode
-                name: _("define mode"),
+                name: t("define mode"),
                 args: 1,
                 canCollapse: true,
                 argTypes: ["textin"],
-                defaults: _("custom")
+                defaults: t("custom")
             });
             this.makeMacro((x, y) => [
                 [0, "definemode", x, y, [null, 1, 2, 16]],
@@ -1170,15 +1170,15 @@ function setupIntervalsBlocks(activity) {
          * Constructs a new MovableBlock.
          */
         constructor() {
-            super("movable", _("movable Do")); // legacy typo
+            super("movable", t("movable Do")); // legacy typo
             this.setPalette("intervals", activity);
             this.beginnerBlock(true);
             this.setHelpString([
-                _(
+                t(
                     "When Movable do is false, the solfege note names are always tied to specific pitches,"
                 ) +
                     " " +
-                    _(
+                    t(
                         'eg "do" is always "C-natural" when Movable do is true, the solfege note names are assigned to scale degrees "do" is always the first degree of the major scale.'
                     ),
                 "documentation",
@@ -1221,7 +1221,7 @@ function setupIntervalsBlocks(activity) {
          */
         constructor() {
             //.TRANS: mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
-            super("modelength", _("mode length"));
+            super("modelength", t("mode length"));
 
             // Set palette and activity for the block
             this.setPalette("intervals", activity);
@@ -1230,9 +1230,9 @@ function setupIntervalsBlocks(activity) {
 
             // Set help string for the block
             this.setHelpString([
-                _("The Mode length block is the number of notes in the current scale.") +
+                t("The Mode length block is the number of notes in the current scale.") +
                     " " +
-                    _("Most Western scales have 7 notes."),
+                    t("Most Western scales have 7 notes."),
                 "documentation",
                 ""
             ]);
@@ -1281,7 +1281,7 @@ function setupIntervalsBlocks(activity) {
          */
         constructor() {
             //.TRANS: the mode in music is 'major', 'minor', etc.
-            super("currentmode", _("current mode"));
+            super("currentmode", t("current mode"));
 
             // Set palette and activity for the block
             this.setPalette("intervals", activity);
@@ -1334,7 +1334,7 @@ function setupIntervalsBlocks(activity) {
          */
         constructor() {
             //.TRANS: the key is a group of pitches with which a music composition is created
-            super("key", _("current key"));
+            super("key", t("current key"));
 
             // Set palette and activity for the block
             this.setPalette("intervals", activity);
@@ -1386,7 +1386,7 @@ function setupIntervalsBlocks(activity) {
          * @constructor
          */
         constructor() {
-            super("setkey", _("set key"));
+            super("setkey", t("set key"));
 
             // Set palette and activity for the block
             this.setPalette("intervals", activity);
@@ -1431,7 +1431,7 @@ function setupIntervalsBlocks(activity) {
          */
         constructor() {
             //.TRANS: set the key and mode, e.g. C Major
-            super("setkey2", _("set key"));
+            super("setkey2", t("set key"));
 
             // Set palette and activity for the block
             this.setPalette("intervals", activity);
@@ -1440,13 +1440,13 @@ function setupIntervalsBlocks(activity) {
             // Set help string for the block based on beginner mode and language
             if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    _("The Set key block is used to set the key and mode,"),
+                    t("The Set key block is used to set the key and mode,"),
                     "documentation",
                     ""
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Set key block is used to set the key and mode,") + " " + _("eg C Major"),
+                    t("The Set key block is used to set the key and mode,") + " " + t("eg C Major"),
                     "documentation",
                     null,
                     "movablehelp"
@@ -1459,9 +1459,9 @@ function setupIntervalsBlocks(activity) {
                 argTypes: ["anyin", "anyin"],
                 argLabels: [
                     //.TRANS: key, e.g., C in C Major
-                    _("key"),
+                    t("key"),
                     //.TRANS: mode, e.g., Major in C Major
-                    _("mode")
+                    t("mode")
                 ]
             });
 

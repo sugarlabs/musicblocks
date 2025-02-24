@@ -29,7 +29,7 @@ function setupDrumBlocks(activity) {
          */
         constructor() {
             // Call the constructor of the parent class (ValueBlock)
-            super("noisename", _("noise name"));
+            super("noisename", t("noise name"));
 
             /**
              * Sets the palette for the block.
@@ -56,7 +56,7 @@ function setupDrumBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Noise name block is used to select a noise synthesizer."),
+                t("The Noise name block is used to select a noise synthesizer."),
                 "documentation",
                 ""
             ]);
@@ -72,7 +72,7 @@ function setupDrumBlocks(activity) {
          */
         constructor() {
             // Call the constructor of the parent class (ValueBlock)
-            super("drumname", _("drum name"));
+            super("drumname", t("drum name"));
 
             /**
              * Sets the palette for the block.
@@ -99,7 +99,7 @@ function setupDrumBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Drum name block is used to select a drum."),
+                t("The Drum name block is used to select a drum."),
                 "documentation",
                 null,
                 "note4"
@@ -116,7 +116,7 @@ function setupDrumBlocks(activity) {
          */
         constructor() {
             // Call the constructor of the parent class (ValueBlock)
-            super("effectsname", _("effects name"));
+            super("effectsname", t("effects name"));
 
             /**
              * Sets the palette for the block.
@@ -143,7 +143,7 @@ function setupDrumBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Effects name block is used to select a sound effect."),
+                t("The Effects name block is used to select a sound effect."),
                 "documentation",
                 null,
                 "effectshelp"
@@ -160,7 +160,7 @@ function setupDrumBlocks(activity) {
          */
         constructor() {
             // Call the constructor of the parent class (FlowBlock)
-            super("playnoise", _("noise"));
+            super("playnoise", t("noise"));
 
             /**
              * Sets the palette for the block.
@@ -174,7 +174,7 @@ function setupDrumBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Play noise block will generate white, pink, or brown noise."),
+                t("The Play noise block will generate white, pink, or brown noise."),
                 "documentation",
                 ""
             ]);
@@ -188,7 +188,7 @@ function setupDrumBlocks(activity) {
              */
             this.formBlock({
                 args: 1,
-                defaults: [_("white noise")],
+                defaults: [t("white noise")],
                 argTypes: ["anyin"]
             });
 
@@ -240,9 +240,9 @@ function setupDrumBlocks(activity) {
             constructor(name, displayName, isDrum, drumName) {
                 // Call the constructor of the parent class (FlowBlock)
                 if (displayName === undefined) {
-                    super(name, _(name));
+                    super(name, t(name));
                 } else {
-                    super(name, _(displayName));
+                    super(name, t(displayName));
                 }
 
                 /**
@@ -314,7 +314,7 @@ function setupDrumBlocks(activity) {
              */
             this.setPalette("drum", activity);
             this.setHelpString([
-                _("Replace every instance of a pitch with a drum sound."),
+                t("Replace every instance of a pitch with a drum sound."),
                 "documentation",
                 null,
                 "mapdrumhelp"
@@ -325,7 +325,7 @@ function setupDrumBlocks(activity) {
              */
             this.formBlock({
                 //.TRANS: map a pitch to a drum sound
-                name: _("map pitch to drum"),
+                name: t("map pitch to drum"),
                 args: 1,
                 argTypes: ["anyin"]
             });
@@ -379,7 +379,7 @@ function setupDrumBlocks(activity) {
              */
             if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    _(
+                    t(
                         "The Set drum block will select a drum sound to replace the pitch of any contained notes."
                     ),
                     "documentation",
@@ -388,11 +388,11 @@ function setupDrumBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    _(
+                    t(
                         "The Set drum block will select a drum sound to replace the pitch of any contained notes."
                     ) +
                         " " +
-                        _("In the example above, a kick drum sound will be played instead of sol."),
+                        t("In the example above, a kick drum sound will be played instead of sol."),
                     "documentation",
                     null,
                     "setdrumhelp"
@@ -404,7 +404,7 @@ function setupDrumBlocks(activity) {
              */
             this.formBlock({
                 //.TRANS: set the current drum sound for playback
-                name: _("set drum"),
+                name: t("set drum"),
                 args: 1,
                 argTypes: ["anyin"]
             });
@@ -448,7 +448,7 @@ function setupDrumBlocks(activity) {
          * Create a PlayEffectBlock.
          */
         constructor() {
-            super("playeffect", _("sound effect"));
+            super("playeffect", t("sound effect"));
 
             /**
              * Set the palette, configure as a beginner block, and form the block.
@@ -474,7 +474,7 @@ function setupDrumBlocks(activity) {
          * Create a PlayDrumBlock.
          */
         constructor() {
-            super("playdrum", _("drum"));
+            super("playdrum", t("drum"));
 
             /**
              * Set the palette, configure as a beginner block, and form the block.
@@ -486,7 +486,7 @@ function setupDrumBlocks(activity) {
              * Set the help string for the block.
              */
             this.setHelpString([
-                _("You can use multiple Drum blocks within a Note block."),
+                t("You can use multiple Drum blocks within a Note block."),
                 "documentation",
                 null,
                 "note4"

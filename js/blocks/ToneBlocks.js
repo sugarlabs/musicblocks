@@ -31,17 +31,17 @@ function setupToneBlocks(activity) {
          * Creates an instance of OscillatorBlock.
          */
         constructor() {
-            super("oscillator", _("Oscillator").toLowerCase());
+            super("oscillator", t("Oscillator").toLowerCase());
             this.setPalette("tone", activity);
             this.setHelpString();
             this.formBlock({
                 args: 2,
-                defaults: [_("triangle"), 6],
+                defaults: [t("triangle"), 6],
                 argLabels: [
                     //.TRANS: there are different types (sine, triangle, square...) of oscillators.
-                    _("type"),
+                    t("type"),
                     //.TRANS: Partials refers to the number of sine waves combined into the sound.
-                    _("partials")
+                    t("partials")
                 ],
                 argTypes: ["anyin", "numberin"]
             });
@@ -73,7 +73,7 @@ function setupToneBlocks(activity) {
 
             if (logo.inTimbre) {
                 if (logo.timbre.osc.length != 0) {
-                    activity.errorMsg(_("You are adding multiple oscillator blocks."));
+                    activity.errorMsg(t("You are adding multiple oscillator blocks."));
                 } else {
                     logo.timbre.oscParams = [];
                     logo.synth.createSynth(
@@ -141,12 +141,12 @@ function setupToneBlocks(activity) {
          */
         constructor() {
             //.TRANS: a duo synthesizer combines a synth with a sequencer
-            super("duosynth", _("duo synth"));
+            super("duosynth", t("duo synth"));
             this.setPalette("tone", activity);
             this.piemenuValuesC1 = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             this.piemenuValuesC2 = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             this.setHelpString([
-                _("The Duo synth block is a duo-frequency modulator used to define a timbre."),
+                t("The Duo synth block is a duo-frequency modulator used to define a timbre."),
                 "documentation",
                 null,
                 "duosynthhelp"
@@ -154,7 +154,7 @@ function setupToneBlocks(activity) {
             this.formBlock({
                 args: 2,
                 defaults: [10, 5],
-                argLabels: [_("vibrato rate"), _("vibrato intensity")]
+                argLabels: [t("vibrato rate"), t("vibrato intensity")]
             });
         }
 
@@ -182,11 +182,11 @@ function setupToneBlocks(activity) {
          */
         constructor() {
             //.TRANS: AM (amplitude modulation) synthesizer
-            super("amsynth", _("AM synth"));
+            super("amsynth", t("AM synth"));
             this.setPalette("tone", activity);
             this.piemenuValuesC1 = [1, 2];
             this.setHelpString([
-                _("The AM synth block is an amplitude modulator used to define a timbre."),
+                t("The AM synth block is an amplitude modulator used to define a timbre."),
                 "documentation",
                 null,
                 "amsynthhelp"
@@ -221,11 +221,11 @@ function setupToneBlocks(activity) {
          */
         constructor() {
             //.TRANS: FM (frequency modulation) synthesizer
-            super("fmsynth", _("FM synth"));
+            super("fmsynth", t("FM synth"));
             this.setPalette("tone", activity);
             this.piemenuValuesC1 = [1, 5, 10, 15, 20, 25];
             this.setHelpString([
-                _("The FM synth block is a frequency modulator used to define a timbre."),
+                t("The FM synth block is a frequency modulator used to define a timbre."),
                 "documentation",
                 null,
                 "fmsynthhelp"
@@ -259,10 +259,10 @@ function setupToneBlocks(activity) {
          * Creates an instance of PartialBlock.
          */
         constructor() {
-            super("partial", _("partial"));
+            super("partial", t("partial"));
             this.setPalette("tone", activity);
             this.setHelpString([
-                _("The Partial block is used to specify a weight for a specific partial harmonic."),
+                t("The Partial block is used to specify a weight for a specific partial harmonic."),
                 "documentation",
                 ""
             ]);
@@ -281,7 +281,7 @@ function setupToneBlocks(activity) {
         flow(args, logo, turtle) {
             if (typeof args[0] !== "number" || args[0] > 1 || args[0] < 0) {
                 //.TRANS: partials are weighted components in a harmonic series
-                activity.errorMsg(_("Partial weight must be between 0 and 1."));
+                activity.errorMsg(t("Partial weight must be between 0 and 1."));
                 logo.stopTurtle = true;
                 return;
             }
@@ -294,7 +294,7 @@ function setupToneBlocks(activity) {
             } else {
                 //.TRANS: partials are weighted components in a harmonic series
                 activity.errorMsg(
-                    _("Partial block should be used inside of a Weighted-partials block.")
+                    t("Partial block should be used inside of a Weighted-partials block.")
                 );
             }
         }
@@ -314,7 +314,7 @@ function setupToneBlocks(activity) {
             super("harmonic");
             this.setPalette("tone", activity);
             this.setHelpString([
-                _(
+                t(
                     "The Weighted partials block is used to specify the partials associated with a timbre."
                 ),
                 "documentation",
@@ -322,7 +322,7 @@ function setupToneBlocks(activity) {
             ]);
             this.formBlock({
                 //.TRANS: partials are weighted components in a harmonic series
-                name: _("weighted partials")
+                name: t("weighted partials")
             });
             this.makeMacro((x, y) => [
                 [0, "harmonic", x, y, [null, 2, 1]],
@@ -380,14 +380,14 @@ function setupToneBlocks(activity) {
             this.piemenuValuesC1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
             this.setPalette("tone", activity);
             this.setHelpString([
-                _("The Harmonic block will add harmonics to the contained notes."),
+                t("The Harmonic block will add harmonics to the contained notes."),
                 "documentation",
                 null,
                 "harmonichelp"
             ]);
             this.formBlock({
                 //.TRANS: A harmonic is an overtone.
-                name: _("harmonic"),
+                name: t("harmonic"),
                 args: 1,
                 defaults: [1]
             });
@@ -428,14 +428,14 @@ function setupToneBlocks(activity) {
             this.setPalette("tone", activity);
             this.piemenuValuesC1 = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             this.setHelpString([
-                _("The Distortion block adds distortion to the pitch."),
+                t("The Distortion block adds distortion to the pitch."),
                 "documentation",
                 null,
                 "dishelp"
             ]);
             this.formBlock({
                 //.TRANS: distortion is an alteration in the sound
-                name: _("distortion"),
+                name: t("distortion"),
                 args: 1,
                 defaults: [40]
             });
@@ -484,7 +484,7 @@ function setupToneBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Tremolo block adds a wavering effect."),
+                t("The Tremolo block adds a wavering effect."),
                 "documentation",
                 null,
                 "tremolohelp"
@@ -492,14 +492,14 @@ function setupToneBlocks(activity) {
 
             this.formBlock({
                 //.TRANS: a wavering effect in a musical tone
-                name: _("tremolo"),
+                name: t("tremolo"),
                 args: 2,
                 defaults: [10, 50],
                 argLabels: [
                     //.TRANS: rate at which tremolo wavers
-                    _("rate"),
+                    t("rate"),
                     //.TRANS: amplitude of tremolo waver
-                    _("depth")
+                    t("depth")
                 ]
             });
             this.makeMacro((x, y) => [
@@ -556,17 +556,17 @@ function setupToneBlocks(activity) {
                 220, 247, 262, 294, 330, 349, 392, 440, 494, 523, 587, 659, 698, 783, 880
             ];
             this.setHelpString([
-                _("The Phaser block adds a sweeping sound."),
+                t("The Phaser block adds a sweeping sound."),
                 "documentation",
                 null,
                 "phaserhelp"
             ]);
             this.formBlock({
                 //.TRANS: alter the phase of the sound
-                name: _("phaser"),
+                name: t("phaser"),
                 args: 3,
                 defaults: [0.5, 3, 392],
-                argLabels: [_("rate"), _("octaves"), _("base frequency")]
+                argLabels: [t("rate"), t("octaves"), t("base frequency")]
             });
         }
 
@@ -616,7 +616,7 @@ function setupToneBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Chorus block adds a chorus effect."),
+                t("The Chorus block adds a chorus effect."),
                 "documentation",
                 null,
                 "chorushelp"
@@ -624,10 +624,10 @@ function setupToneBlocks(activity) {
 
             this.formBlock({
                 //.TRANS: musical effect to simulate a choral sound
-                name: _("chorus"),
+                name: t("chorus"),
                 args: 3,
                 defaults: [1.5, 3.5, 70],
-                argLabels: [_("rate"), _("delay (MS)"), _("depth")]
+                argLabels: [t("rate"), t("delay (MS)"), t("depth")]
             });
         }
 
@@ -675,7 +675,7 @@ function setupToneBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Vibrato block adds a rapid, slight variation in pitch."),
+                t("The Vibrato block adds a rapid, slight variation in pitch."),
                 "documentation",
                 null,
                 "vibratohelp"
@@ -683,10 +683,10 @@ function setupToneBlocks(activity) {
 
             this.formBlock({
                 //.TRANS: a rapid, slight variation in pitch
-                name: _("vibrato"),
+                name: t("vibrato"),
                 args: 2,
                 defaults: [5, 1 / 16],
-                argLabels: [_("intensity"), _("rate")]
+                argLabels: [t("intensity"), t("rate")]
             });
             this.makeMacro((x, y) => [
                 [0, "vibrato", x, y, [null, 1, 3, 2, 6]],
@@ -730,7 +730,7 @@ function setupToneBlocks(activity) {
             this.setHelpString();
             this.formBlock({
                 //.TRANS: select synthesizer
-                name: _("set synth"),
+                name: t("set synth"),
                 args: 1,
                 argTypes: ["textin"],
                 defaults: ["violin"]
@@ -801,7 +801,7 @@ function setupToneBlocks(activity) {
          * Creates an instance of SynthNameBlock.
          */
         constructor() {
-            super("synthname", _("synth name"));
+            super("synthname", t("synth name"));
             this.setPalette("tone", activity);
             this.setHelpString();
             this.formBlock({ outType: "textout" });
@@ -839,10 +839,10 @@ function setupToneBlocks(activity) {
          * Creates an instance of SetDefaultVoiceBlock.
          */
         constructor() {
-            super("setdefaultinstrument", _("set default instrument"));
+            super("setdefaultinstrument", t("set default instrument"));
             this.setPalette("tone", activity);
             this.setHelpString([
-                _(
+                t(
                     "The set default instrument block changes the default instrument from electronic synth to the instrument of your choice."
                 ),
                 "documentation",
@@ -892,12 +892,12 @@ function setupToneBlocks(activity) {
          * Creates an instance of VoiceNameBlock.
          */
         constructor() {
-            super("voicename", _("set instrument"));
+            super("voicename", t("set instrument"));
             this.setPalette("tone", activity);
             this.setHelpString([
-                _("The Set instrument block selects a voice for the synthesizer,") +
+                t("The Set instrument block selects a voice for the synthesizer,") +
                     " " +
-                    _("eg guitar piano violin or cello."),
+                    t("eg guitar piano violin or cello."),
                 "documentation",
                 ""
             ]);
@@ -923,15 +923,15 @@ function setupToneBlocks(activity) {
 
             if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    _("The Set instrument block selects a voice for the synthesizer,"),
+                    t("The Set instrument block selects a voice for the synthesizer,"),
                     "documentation",
                     ""
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Set instrument block selects a voice for the synthesizer,") +
+                    t("The Set instrument block selects a voice for the synthesizer,") +
                         " " +
-                        _("eg guitar piano violin or cello."),
+                        t("eg guitar piano violin or cello."),
                     "documentation",
                     null,
                     "settimbrehelp"
@@ -940,10 +940,10 @@ function setupToneBlocks(activity) {
 
             this.formBlock({
                 //.TRANS: set the characteristics of a custom instrument
-                name: _("set instrument"),
+                name: t("set instrument"),
                 args: 1,
                 argTypes: ["anyin"],
-                defaults: [_("custom")]
+                defaults: [t("custom")]
             });
             this.makeMacro((x, y) => [
                 [0, "settimbre", x, y, [null, 1, null, 2]],
@@ -1007,12 +1007,12 @@ function setupToneBlocks(activity) {
          * Creates an instance of CustomSampleBlock.
          */
         constructor() {
-            super("customsample", _("sample"));
+            super("customsample", t("sample"));
             this.setPalette("tone", activity);
             this.beginnerBlock(false);
 
             this.setHelpString([
-                _("Import a sound file to use as an instrument and set its pitch center."),
+                t("Import a sound file to use as an instrument and set its pitch center."),
                 "documentation",
                 null,
                 "turtleshell"
@@ -1022,7 +1022,7 @@ function setupToneBlocks(activity) {
                 outType: "textout",
                 args: 3,
                 argTypes: ["anyin", "anyin", "anyin"],
-                argLabels: [_("file"), _("name"), _("octave")]
+                argLabels: [t("file"), t("name"), t("octave")]
             });
             this.parameter = true;
 
@@ -1107,7 +1107,7 @@ function setupToneBlocks(activity) {
             this.beginnerBlock(false);
 
             this.setHelpString([
-                _("Upload a sound file to connect with the sample block."),
+                t("Upload a sound file to connect with the sample block."),
                 "documentation",
                 ""
             ]);

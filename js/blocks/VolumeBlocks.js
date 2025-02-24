@@ -32,11 +32,11 @@ function setupVolumeBlocks(activity) {
          */
         constructor() {
             // The volume for this synth
-            super("synthvolumefactor", _("synth volume"));
+            super("synthvolumefactor", t("synth volume"));
             this.setPalette("volume", activity);
             this.parameter = true;
             this.setHelpString([
-                _("The Synth volume block returns the current volume of the current synthesizer."),
+                t("The Synth volume block returns the current volume of the current synthesizer."),
                 "documentation",
                 ""
             ]);
@@ -44,7 +44,7 @@ function setupVolumeBlocks(activity) {
             this.formBlock({
                 args: 1,
                 argTypes: ["anyin"],
-                defaults: [_("piano")]
+                defaults: [t("piano")]
             });
 
             this.makeMacro((x, y) => [
@@ -102,11 +102,11 @@ function setupVolumeBlocks(activity) {
          */
         constructor() {
             // The volume at which notes are played
-            super("notevolumefactor", _("master volume"));
+            super("notevolumefactor", t("master volume"));
             this.setPalette("volume", activity);
             this.parameter = true;
             this.setHelpString([
-                _("The Master volume block returns the master volume."),
+                t("The Master volume block returns the master volume."),
                 "documentation",
                 ""
             ]);
@@ -352,14 +352,14 @@ function setupVolumeBlocks(activity) {
          * Creates an instance of SetSynthVolume2Block.
          */
         constructor() {
-            super("setsynthvolume2", _("set synth volume"));
+            super("setsynthvolume2", t("set synth volume"));
             this.setPalette("volume", activity);
             this.setHelpString();
             this.formBlock({
                 args: 2,
                 defaults: [DEFAULTVOICE, 50],
                 argTypes: ["textin", "numberin"],
-                argLabels: [_("synth"), _("volume")]
+                argLabels: [t("synth"), t("volume")]
             });
             this.hidden = true;
         }
@@ -400,15 +400,15 @@ function setupVolumeBlocks(activity) {
                 }
 
                 if (arg1 === 0) {
-                    activity.errorMsg(_("Setting volume to 0."), blk);
+                    activity.errorMsg(t("Setting volume to 0."), blk);
                 }
             }
 
             let synth = null;
 
-            if (arg0 === DEFAULTVOICE || arg0 === _(DEFAULTVOICE)) {
+            if (arg0 === DEFAULTVOICE || arg0 === t(DEFAULTVOICE)) {
                 synth = DEFAULTVOICE;
-            } else if (arg0 === "custom" || args[0] === _("custom")) {
+            } else if (arg0 === "custom" || args[0] === t("custom")) {
                 synth = "custom";
             }
 
@@ -437,7 +437,7 @@ function setupVolumeBlocks(activity) {
             }
 
             if (synth === null) {
-                activity.errorMsg(_("Synth not found"), blk);
+                activity.errorMsg(t("Synth not found"), blk);
                 synth = DEFAULTVOICE;
             }
 
@@ -491,7 +491,7 @@ function setupVolumeBlocks(activity) {
          */
         constructor() {
             // .TRANS: set the loudness level
-            super("setdrumvolume", _("set drum volume"));
+            super("setdrumvolume", t("set drum volume"));
             this.setPalette("volume", activity);
             this.beginnerBlock(true);
 
@@ -499,7 +499,7 @@ function setupVolumeBlocks(activity) {
                 args: 2,
                 defaults: [DEFAULTDRUM, 50],
                 argTypes: ["textin", "numberin"],
-                argLabels: [_("drum"), _("volume")]
+                argLabels: [t("drum"), t("volume")]
             });
 
             this.makeMacro((x, y) => [
@@ -521,19 +521,19 @@ function setupVolumeBlocks(activity) {
          * Creates an instance of SetSynthVolumeBlock.
          */
         constructor() {
-            super("setsynthvolume", _("set synth volume"));
+            super("setsynthvolume", t("set synth volume"));
             this.setPalette("volume", activity);
             this.piemenuValuesC2 = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Set synth volume block will change the volume of a particular synth,") +
+                t("The Set synth volume block will change the volume of a particular synth,") +
                     " " +
-                    _("eg guitar violin snare drum etc.") +
+                    t("eg guitar violin snare drum etc.") +
                     " " +
-                    _("The default volume is 50.") +
+                    t("The default volume is 50.") +
                     " " +
-                    _("The range is 0 for silence to 100 for full volume."),
+                    t("The range is 0 for silence to 100 for full volume."),
                 "documentation",
                 ""
             ]);
@@ -542,7 +542,7 @@ function setupVolumeBlocks(activity) {
                 args: 2,
                 defaults: [DEFAULTVOICE, 50],
                 argTypes: ["textin", "numberin"],
-                argLabels: [_("synth"), _("volume")]
+                argLabels: [t("synth"), t("volume")]
             });
 
             this.makeMacro((x, y) => [
@@ -574,7 +574,7 @@ function setupVolumeBlocks(activity) {
                 arg1 = Math.max(Math.min(args[1], 100), 0);
 
                 if (arg1 === 0) {
-                    activity.errorMsg(_("Setting volume to 0."), blk);
+                    activity.errorMsg(t("Setting volume to 0."), blk);
                 }
             }
 
@@ -594,13 +594,13 @@ function setupVolumeBlocks(activity) {
          */
         constructor() {
             // .TRANS: set the distribution of volume
-            super("setpanning", _("set panning"));
+            super("setpanning", t("set panning"));
             this.setPalette("volume", activity);
             this.piemenuValuesC1 = [100, 80, 60, 40, 20, 0, -20, -40, -60, -80, -100];
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Set Panning block sets the panning for all synthesizers."),
+                t("The Set Panning block sets the panning for all synthesizers."),
                 "documentation",
                 ""
             ]);
@@ -622,7 +622,7 @@ function setupVolumeBlocks(activity) {
                 } else {
                     if (args[0] === 100 || args[0] === -100) {
                         activity.errorMsg(
-                            _("Warning: Sound is coming out from only the left or right side."),
+                            t("Warning: Sound is coming out from only the left or right side."),
                             blk
                         );
                     }
@@ -644,13 +644,13 @@ function setupVolumeBlocks(activity) {
          */
         constructor() {
             // .TRANS: set the loudness level
-            super("setnotevolume", _("set master volume"));
+            super("setnotevolume", t("set master volume"));
             this.setPalette("volume", activity);
             this.piemenuValuesC1 = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Set master volume block sets the volume for all synthesizers."),
+                t("The Set master volume block sets the volume for all synthesizers."),
                 "documentation",
                 ""
             ]);
@@ -692,7 +692,7 @@ function setupVolumeBlocks(activity) {
             this.setHelpString();
             this.formBlock({
                 // .TRANS: set the loudness level
-                name: _("set master volume"),
+                name: t("set master volume"),
                 args: 1,
                 defaults: [50]
             });
@@ -737,7 +737,7 @@ function setupVolumeBlocks(activity) {
                 }
 
                 if (arg === 0) {
-                    activity.errorMsg(_("Setting volume to 0."), blk);
+                    activity.errorMsg(t("Setting volume to 0."), blk);
                 }
             }
 
@@ -781,14 +781,14 @@ function setupVolumeBlocks(activity) {
             this.setPalette("volume", activity);
             this.piemenuValuesC1 = [-25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25];
             this.setHelpString([
-                _("The Set relative volume block changes the volume of the contained notes."),
+                t("The Set relative volume block changes the volume of the contained notes."),
                 "documentation",
                 null,
                 "articulationhelp"
             ]);
             this.formBlock({
                 // .TRANS: set an articulation (change in volume)
-                name: _("set relative volume"),
+                name: t("set relative volume"),
                 args: 1,
                 defaults: [50]
             });
@@ -840,11 +840,11 @@ function setupVolumeBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
+                t(
                     "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
                 ) +
                     " " +
-                    _(
+                    t(
                         "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
                     ),
                 "documentation",
@@ -854,7 +854,7 @@ function setupVolumeBlocks(activity) {
 
             this.formBlock({
                 // .TRANS: a gradual increase in loudness
-                name: _("decrescendo"),
+                name: t("decrescendo"),
                 args: 1,
                 defaults: [5]
             });
@@ -904,11 +904,11 @@ function setupVolumeBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _(
+                t(
                     "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
                 ) +
                     " " +
-                    _(
+                    t(
                         "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
                     ),
                 "documentation",
@@ -918,7 +918,7 @@ function setupVolumeBlocks(activity) {
 
             this.formBlock({
                 // .TRANS: a gradual increase in loudness
-                name: _("crescendo"),
+                name: t("crescendo"),
                 args: 1,
                 defaults: [5]
             });

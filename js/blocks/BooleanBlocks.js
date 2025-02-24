@@ -41,7 +41,7 @@ function setupBooleanBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Not block is the logical not operator."),
+                t("The Not block is the logical not operator."),
                 "documentation",
                 ""
             ]);
@@ -59,7 +59,7 @@ function setupBooleanBlocks(activity) {
              * @param {string[]} config.argTypes - The allowed argument types.
              */
             this.formBlock({
-                name: _("not"),
+                name: t("not"),
                 args: 1,
                 argTypes: ["booleanin"]
             });
@@ -74,9 +74,9 @@ function setupBooleanBlocks(activity) {
          */
         updateParameter(logo, turtle, blk) {
             if (activity.blocks.blockList[blk].value) {
-                return _("true");
+                return t("true");
             } else {
-                return _("false");
+                return t("false");
             }
         }
 
@@ -131,7 +131,7 @@ function setupBooleanBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The And block is the logical and operator."),
+                t("The And block is the logical and operator."),
                 "documentation",
                 ""
             ]);
@@ -149,7 +149,7 @@ function setupBooleanBlocks(activity) {
              * @param {string[]} config.argTypes - The allowed argument types.
              */
             this.formBlock({
-                name: _("and"),
+                name: t("and"),
                 args: 2,
                 argTypes: ["booleanin", "booleanin"]
             });
@@ -164,9 +164,9 @@ function setupBooleanBlocks(activity) {
          */
         updateParameter(logo, turtle, blk) {
             if (activity.blocks.blockList[blk].value) {
-                return _("true");
+                return t("true");
             } else {
-                return _("false");
+                return t("false");
             }
         }
 
@@ -215,7 +215,7 @@ function setupBooleanBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Or block is the logical or operator."),
+                t("The Or block is the logical or operator."),
                 "documentation",
                 ""
             ]);
@@ -233,7 +233,7 @@ function setupBooleanBlocks(activity) {
              * @param {string[]} config.argTypes - The allowed argument types.
              */
             this.formBlock({
-                name: _("or"),
+                name: t("or"),
                 args: 2,
                 argTypes: ["booleanin", "booleanin"]
             });
@@ -248,9 +248,9 @@ function setupBooleanBlocks(activity) {
          */
         updateParameter(logo, turtle, blk) {
             if (activity.blocks.blockList[blk].value) {
-                return _("true");
+                return t("true");
             } else {
-                return _("false");
+                return t("false");
             }
         }
 
@@ -299,7 +299,7 @@ function setupBooleanBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The XOR block is the logical XOR operator."),
+                t("The XOR block is the logical XOR operator."),
                 "documentation",
                 ""
             ]);
@@ -317,7 +317,7 @@ function setupBooleanBlocks(activity) {
              * @param {string[]} config.argTypes - The allowed argument types.
              */
             this.formBlock({
-                name: _("xor"),
+                name: t("xor"),
                 args: 2,
                 argTypes: ["booleanin", "booleanin"]
             });
@@ -332,9 +332,9 @@ function setupBooleanBlocks(activity) {
          */
         updateParameter(logo, turtle, blk) {
             if (activity.blocks.blockList[blk].value) {
-                return _("true");
+                return t("true");
             } else {
-                return _("false");
+                return t("false");
             }
         }
 
@@ -389,7 +389,7 @@ function setupBooleanBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _(
+                t(
                     "The Greater-than block returns True if the top number is greater than the bottom number."
                 ),
                 "documentation",
@@ -430,9 +430,9 @@ function setupBooleanBlocks(activity) {
          */
         updateParameter(logo, turtle, blk) {
             if (activity.blocks.blockList[blk].value) {
-                return _("true");
+                return t("true");
             } else {
-                return _("false");
+                return t("false");
             }
         }
 
@@ -495,7 +495,7 @@ function setupBooleanBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _(
+                t(
                     "The Less-than block returns True if the top number is less than the bottom number."
                 ),
                 "documentation",
@@ -536,9 +536,9 @@ function setupBooleanBlocks(activity) {
          */
         updateParameter(logo, turtle, blk) {
             if (activity.blocks.blockList[blk].value) {
-                return _("true");
+                return t("true");
             } else {
-                return _("false");
+                return t("false");
             }
         }
 
@@ -596,7 +596,7 @@ function setupBooleanBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _(
+                t(
                     "The Less-than-or-equal-to block returns True if the top number is less than or equal to the bottom number."
                 ),
                 "documentation",
@@ -637,9 +637,9 @@ function setupBooleanBlocks(activity) {
          */
         updateParameter(logo, turtle, blk) {
             if (activity.blocks.blockList[blk].value) {
-                return _("true");
+                return t("true");
             } else {
-                return _("false");
+                return t("false");
             }
         }
 
@@ -697,7 +697,7 @@ function setupBooleanBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _(
+                t(
                     "The Greater-than-or-equal-to block returns True if the top number is greater than or equal to the bottom number."
                 ),
                 "documentation",
@@ -738,9 +738,9 @@ function setupBooleanBlocks(activity) {
          */
         updateParameter(logo, turtle, blk) {
             if (activity.blocks.blockList[blk].value) {
-                return _("true");
+                return t("true");
             } else {
-                return _("false");
+                return t("false");
             }
         }
 
@@ -805,7 +805,7 @@ function setupBooleanBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Equal block returns True if the two numbers are equal."),
+                t("The Equal block returns True if the two numbers are equal."),
                 "documentation",
                 ""
             ]);
@@ -844,9 +844,9 @@ function setupBooleanBlocks(activity) {
          */
         updateParameter(logo, turtle, blk) {
             if (activity.blocks.blockList[blk].value) {
-                return _("true");
+                return t("true");
             } else {
-                return _("false");
+                return t("false");
             }
         }
 
@@ -906,7 +906,7 @@ function setupBooleanBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Not-equal-to block returns True if the two numbers are not equal to each other."),
+                t("The Not-equal-to block returns True if the two numbers are not equal to each other."),
                 "documentation",
                 ""
             ]);
@@ -945,9 +945,9 @@ function setupBooleanBlocks(activity) {
          */
         updateParameter(logo, turtle, blk) {
             if (activity.blocks.blockList[blk].value) {
-                return _("true");
+                return t("true");
             } else {
-                return _("false");
+                return t("false");
             }
         }
 
@@ -1005,7 +1005,7 @@ function setupBooleanBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Boolean block is used to specify true or false."),
+                t("The Boolean block is used to specify true or false."),
                 "documentation",
                 ""
             ]);
@@ -1030,7 +1030,7 @@ function setupBooleanBlocks(activity) {
         arg(logo, turtle, blk) {
             if (typeof activity.blocks.blockList[blk].value === "string") {
                 return (
-                    activity.blocks.blockList[blk].value === _("true") ||
+                    activity.blocks.blockList[blk].value === t("true") ||
                     activity.blocks.blockList[blk].value === "true"
                 );
             }

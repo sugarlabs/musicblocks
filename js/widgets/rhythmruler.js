@@ -454,7 +454,7 @@ class RhythmRuler {
          * @private
          * @type {HTMLElement}
          */
-        this._playAllCell = widgetWindow.addButton("play-button.svg", iconSize, _("Play all"));
+        this._playAllCell = widgetWindow.addButton("play-button.svg", iconSize, t("Play all"));
         /**
          * Callback function for the click event of the play all button.
          * @private
@@ -483,7 +483,7 @@ class RhythmRuler {
         widgetWindow.addButton(
             "export-chunk.svg",
             iconSize,
-            _("Save rhythms")
+            t("Save rhythms")
         ).onclick = async () => {
             // this._save(0);
             // Debounce button
@@ -509,7 +509,7 @@ class RhythmRuler {
         widgetWindow.addButton(
             "export-drums.svg",
             iconSize,
-            _("Save drum machine")
+            t("Save drum machine")
         ).onclick = async () => {
             // Debounce button
             if (!this._get_save_lock()) {
@@ -575,7 +575,7 @@ class RhythmRuler {
          * @private
          * @returns {void}
          */
-        widgetWindow.addButton("restore-button.svg", iconSize, _("Undo")).onclick = () => {
+        widgetWindow.addButton("restore-button.svg", iconSize, t("Undo")).onclick = () => {
             this._undo();
         };
 
@@ -586,7 +586,7 @@ class RhythmRuler {
          * @private
          * @returns {void}
          */
-        this._tapButton = widgetWindow.addButton("tap-button.svg", iconSize, _("Tap a rhythm"));
+        this._tapButton = widgetWindow.addButton("tap-button.svg", iconSize, t("Tap a rhythm"));
         this._tapButton.onclick = () => {
             this._tap();
         };
@@ -598,7 +598,7 @@ class RhythmRuler {
          * @private
          * @returns {void}
          */
-        widgetWindow.addButton("erase-button.svg", iconSize, _("Clear")).onclick = () => {
+        widgetWindow.addButton("erase-button.svg", iconSize, t("Clear")).onclick = () => {
             this._clear();
         };
 
@@ -635,8 +635,8 @@ class RhythmRuler {
                 drumcell.innerHTML =
                     `<img 
                         src="header-icons/play-button.svg" 
-                        title="${_("Play")}" 
-                        alt="${_("Play")}" 
+                        title="${t("Play")}" 
+                        alt="${t("Play")}" 
                         height="${iconSize}" 
                         width="${iconSize}" 
                     />`;
@@ -649,8 +649,8 @@ class RhythmRuler {
                                 drumcell.innerHTML =
                                     `<img 
                                         src="header-icons/play-button.svg" 
-                                        title="${_("Play")}" 
-                                        alt="${_("Play")}" 
+                                        title="${t("Play")}" 
+                                        alt="${t("Play")}" 
                                         height="${iconSize}" 
                                         width="${iconSize}" 
                                         vertical-align="middle"
@@ -676,8 +676,8 @@ class RhythmRuler {
                             drumcell.innerHTML =
                                 `<img 
                                     src="header-icons/pause-button.svg" 
-                                    title="${_("Pause")}" 
-                                    alt="${_("Pause")}" 
+                                    title="${t("Pause")}" 
+                                    alt="${t("Pause")}" 
                                     height="${iconSize}" 
                                     width="${iconSize}" 
                                     vertical-align="middle"
@@ -810,7 +810,7 @@ class RhythmRuler {
             }
         }
 
-        activity.textMsg(_("Click on the ruler to divide it."), 3000);
+        activity.textMsg(t("Click on the ruler to divide it."), 3000);
         // this._piemenuRuler(this._rulerSelected);
     }
 
@@ -944,8 +944,8 @@ class RhythmRuler {
                     this._tapButton.innerHTML =
                         `<img 
                             src="header-icons/tap-button.svg" 
-                            title="${_("tap a rhythm")}" 
-                            alt="${_("tap a rhythm")}" 
+                            title="${t("tap a rhythm")}" 
+                            alt="${t("tap a rhythm")}" 
                             height="${RhythmRuler.ICONSIZE}" 
                             width="${RhythmRuler.ICONSIZE}" 
                             vertical-align="middle"
@@ -1145,8 +1145,8 @@ class RhythmRuler {
         this._tapButton.innerHTML =
             `<img 
                 src="header-icons/tap-button.svg" 
-                title="${_("tap a rhythm")}" 
-                alt="${_("tap a rhythm")}" 
+                title="${t("tap a rhythm")}" 
+                alt="${t("tap a rhythm")}" 
                 height="${RhythmRuler.ICONSIZE}" 
                 width="${RhythmRuler.ICONSIZE}" 
                 vertical-align="middle"
@@ -1174,7 +1174,7 @@ class RhythmRuler {
             let obj;
             if (noteValue < 0) {
                 obj = rationalToFraction(Math.abs(Math.abs(-1 / noteValue)));
-                cell.innerHTML = `${calcNoteValueToDisplay(obj[1], obj[0])} ${_("silence")}}`;
+                cell.innerHTML = `${calcNoteValueToDisplay(obj[1], obj[0])} ${t("silence")}}`;
             } else {
                 obj = rationalToFraction(Math.abs(Math.abs(1 / noteValue)));
                 cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
@@ -1320,7 +1320,7 @@ class RhythmRuler {
                 const noteValue = noteValues[cell.cellIndex];
                 if (noteValue < 0) {
                     obj = rationalToFraction(Math.abs(Math.abs(-1 / noteValue)));
-                    cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]) + " " + _("silence");
+                    cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]) + " " + t("silence");
                 } else {
                     obj = rationalToFraction(Math.abs(Math.abs(1 / noteValue)));
                     cell.innerHTML = calcNoteValueToDisplay(obj[1], obj[0]);
@@ -1450,7 +1450,7 @@ class RhythmRuler {
 
             const noteValue = noteValues[newCellIndex];
             if (inputNum * noteValue > 256) {
-                this.activity.logo.errorMsg(_("Maximum value of 256 has been exceeded."));
+                this.activity.logo.errorMsg(t("Maximum value of 256 has been exceeded."));
                 return;
             } else {
                 this.activity.hideMsgs();
@@ -1757,8 +1757,8 @@ class RhythmRuler {
         this._tapButton.innerHTML =
             `<img 
                 src="header-icons/tap-active-button.svg" 
-                title="${_("tap a rhythm")}" 
-                alt="${_("tap a rhythm")}" 
+                title="${t("tap a rhythm")}" 
+                alt="${t("tap a rhythm")}" 
                 height="${iconSize}" 
                 width="${iconSize}" 
                 vertical-align="middle"
@@ -1781,8 +1781,8 @@ class RhythmRuler {
         this._playAllCell.innerHTML =
             `<img 
                 src="header-icons/play-button.svg" 
-                title="${_("Play all")}" 
-                alt="${_("Play all")}" 
+                title="${t("Play all")}" 
+                alt="${t("Play all")}" 
                 height="${RhythmRuler.ICONSIZE}" 
                 width="${RhythmRuler.ICONSIZE}" 
                 vertical-align="middle"
@@ -1806,8 +1806,8 @@ class RhythmRuler {
         this._playAllCell.innerHTML =
             `<img 
                 src="header-icons/play-button.svg" 
-                title="${_("Play all")}" 
-                alt="${_("Play all")}" 
+                title="${t("Play all")}" 
+                alt="${t("Play all")}" 
                 height="${RhythmRuler.ICONSIZE}" 
                 width="${RhythmRuler.ICONSIZE}" 
                 vertical-align="middle"
@@ -1853,8 +1853,8 @@ class RhythmRuler {
         this._playAllCell.innerHTML =
             `<img 
                 src="header-icons/pause-button.svg" 
-                title="${_("Pause")}" 
-                alt="${_("Pause")}" 
+                title="${t("Pause")}" 
+                alt="${t("Pause")}" 
                 height="${RhythmRuler.ICONSIZE}" 
                 width="${RhythmRuler.ICONSIZE}" 
                 vertical-align="middle"
@@ -2044,14 +2044,14 @@ class RhythmRuler {
             // and add 'rhythm'.
             let stack_value;
             if (this.Drums[selectedRuler] === null) {
-                stack_value = _("snare drum") + " " + _("rhythm");
+                stack_value = t("snare drum") + " " + t("rhythm");
             } else {
                 stack_value =
                     this.activity.blocks.blockList[
                         this.activity.blocks.blockList[this.Drums[selectedRuler]].connections[1]
                     ].value.split(" ")[0] +
                     " " +
-                    _("rhythm");
+                    t("rhythm");
             }
             const delta = selectedRuler * 42;
             const newStack = [
@@ -2120,14 +2120,14 @@ class RhythmRuler {
             const noteValues = this.Rulers[selectedRuler][0];
             let stack_value;
             if (this.Drums[selectedRuler] === null) {
-                stack_value = _("rhythm");
+                stack_value = t("rhythm");
             } else {
                 stack_value =
                     this.activity.blocks.blockList[
                         this.activity.blocks.blockList[this.Drums[selectedRuler]].connections[1]
                     ].value.split(" ")[0] +
                     " " +
-                    _("rhythm");
+                    t("rhythm");
             }
             const delta = selectedRuler * 42;
             const newStack = [
@@ -2206,7 +2206,7 @@ class RhythmRuler {
 
         this.activity.refreshCanvas();
 
-        const stack_value = _("rhythm");
+        const stack_value = t("rhythm");
         const delta = 42;
         const newStack = [
             [0, ["action", { collapsed: true }], 100 + delta, 100 + delta, [null, 1, 2, null]],
@@ -2241,7 +2241,7 @@ class RhythmRuler {
         }
 
         this.activity.blocks.loadNewBlocks(newStack);
-        activity.textMsg(_("New action block generated."), 3000);
+        activity.textMsg(t("New action block generated."), 3000);
     }
 
     /**
@@ -2306,14 +2306,14 @@ class RhythmRuler {
             // newStack.push([1, 'forever', 0, 0, [0, 2, null]]);
             let action_name;
             if (this.Drums[selectedRuler] === null) {
-                action_name = _("snare drum") + " " + _("action");
+                action_name = t("snare drum") + " " + t("action");
             } else {
                 action_name =
                     this.activity.blocks.blockList[
                         this.activity.blocks.blockList[this.Drums[selectedRuler]].connections[1]
                     ].value.split(" ")[0] +
                     " " +
-                    _("action");
+                    t("action");
             }
 
             const newStack = [
@@ -2459,7 +2459,7 @@ class RhythmRuler {
             }
 
             this.activity.blocks.loadNewBlocks(newStack);
-            activity.textMsg(_("New action block generated."), 3000);
+            activity.textMsg(t("New action block generated."), 3000);
             if (selectedRuler > this.Rulers.length - 2) {
                 return;
             } else {
@@ -2498,14 +2498,14 @@ class RhythmRuler {
             // This should never happen.
             let action_name;
             if (this.Drums[selectedRuler] === null) {
-                action_name = _("guitar") + " " + _("action");
+                action_name = t("guitar") + " " + t("action");
             } else {
                 action_name =
                     this.activity.blocks.blockList[
                         this.activity.blocks.blockList[this.Drums[selectedRuler]].connections[1]
                     ].value.split(" ")[0] +
                     "_" +
-                    _("action");
+                    t("action");
             }
 
             const newStack = [

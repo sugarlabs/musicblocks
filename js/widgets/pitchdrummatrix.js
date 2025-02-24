@@ -144,7 +144,7 @@ class PitchDrumMatrix {
         this.playButton = widgetWindow.addButton(
             "play-button.svg",
             PitchDrumMatrix.ICONSIZE,
-            _("Play")
+            t("Play")
         );
 
         this.playButton.onclick = () => {
@@ -163,7 +163,7 @@ class PitchDrumMatrix {
         widgetWindow.addButton(
             "export-chunk.svg",
             PitchDrumMatrix.ICONSIZE,
-            _("Save")
+            t("Save")
         ).onclick = () => {
             // Debounce button
             if (!this._get_save_lock()) {
@@ -178,7 +178,7 @@ class PitchDrumMatrix {
         widgetWindow.addButton(
             "erase-button.svg",
             PitchDrumMatrix.ICONSIZE,
-            _("Clear")
+            t("Clear")
         ).onclick = () => {
             this._clear();
         };
@@ -225,7 +225,7 @@ class PitchDrumMatrix {
         let pdmRow;
         let pdmCellTable;
         for (let i = 0; i < this.rowLabels.length; i++) {
-            if (this.rowLabels[i].toLowerCase() === _("rest")) {
+            if (this.rowLabels[i].toLowerCase() === t("rest")) {
                 // In case there are rest notes included.
                 this._rests += 1;
                 continue;
@@ -353,7 +353,7 @@ class PitchDrumMatrix {
             }
         };
 
-        activity.textMsg(_("Click in the grid to map notes to drums."), 3000);
+        activity.textMsg(t("Click in the grid to map notes to drums."), 3000);
     }
 
     /**
@@ -665,8 +665,8 @@ class PitchDrumMatrix {
             icon.innerHTML =
                 `&nbsp;&nbsp;<img 
                     src="header-icons/stop-button.svg" 
-                    title="${_("Stop")}" 
-                    alt="${_("Stop")}" 
+                    title="${t("Stop")}" 
+                    alt="${t("Stop")}" 
                     height="${PitchDrumMatrix.ICONSIZE}" 
                     width="${PitchDrumMatrix.ICONSIZE}" 
                     vertical-align="middle" 
@@ -676,8 +676,8 @@ class PitchDrumMatrix {
             icon.innerHTML =
                 `&nbsp;&nbsp;<img 
                     src="header-icons/play-button.svg" 
-                    title="${_("Play")}" 
-                    alt="${_("Play")}" 
+                    title="${t("Play")}" 
+                    alt="${t("Play")}" 
                     height="${PitchDrumMatrix.ICONSIZE}" 
                     width="${PitchDrumMatrix.ICONSIZE}" 
                     vertical-align="middle" 
@@ -728,8 +728,8 @@ class PitchDrumMatrix {
                 icon.innerHTML =
                     `&nbsp;&nbsp;<img 
                         src="header-icons/play-button.svg" 
-                        title="${_("Play")}" 
-                        alt="${_("Play")}" 
+                        title="${t("Play")}" 
+                        alt="${t("Play")}" 
                         height="${PitchDrumMatrix.ICONSIZE}" 
                         width="${PitchDrumMatrix.ICONSIZE}" 
                         vertical-align="middle" 
@@ -738,13 +738,13 @@ class PitchDrumMatrix {
             }, pairs.length * 1000);
         } else {
             if (!this.widgetWindow._maximized) {
-                activity.textMsg(_("Click in the grid to map notes to drums."), 3000);
+                activity.textMsg(t("Click in the grid to map notes to drums."), 3000);
             }
             icon.innerHTML =
                 `&nbsp;&nbsp;<img 
                     src="header-icons/play-button.svg" 
-                    title="${_("Play")}" 
-                    alt="${_("Play")}" 
+                    title="${t("Play")}" 
+                    alt="${t("Play")}" 
                     height="${PitchDrumMatrix.ICONSIZE}" 
                     width="${PitchDrumMatrix.ICONSIZE}" 
                     vertical-align="middle" 
@@ -772,8 +772,8 @@ class PitchDrumMatrix {
             icon.innerHTML =
                 `&nbsp;&nbsp;<img 
                     src="header-icons/play-button.svg" 
-                    title="${_("Play")}" 
-                    alt="${_("Play")}" 
+                    title="${t("Play")}" 
+                    alt="${t("Play")}" 
                     height="${PitchDrumMatrix.ICONSIZE}" 
                     width="${PitchDrumMatrix.ICONSIZE}" 
                     vertical-align="middle" 

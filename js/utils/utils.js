@@ -58,13 +58,13 @@ const changeImage = (imgElement, from, to) => {
 };
 
 /**
- * Enhanced _() method to handle case variations for translations
+ * Enhanced t() method to handle case variations for translations
  * prioritize exact matches and preserve the case of the input text.
  * @function
  * @param {string} text - The input text to be translated.
  * @returns {string} The translated text.
  */
-function _(text) {
+function t(text) {
     if (text === null || text === undefined) {
         // console.debug("null string passed to _");
         return "";
@@ -105,29 +105,30 @@ function _(text) {
         replaced = replaced.replace(/ /g, "-");
 
         if (localStorage.kanaPreference === "kana") {
-            const lang = document.webL10n.getLanguage();
+            const lang = i18next.language;
             if (lang === "ja") {
                 replaced = "kana-" + replaced;
             }
         }
 
+
         // first, we actually tried to find out if there was an existing translation with SAME case
-        let translated = document.webL10n.get(text);
+        let translated = i18next.t(text);
 
         // Takes, for example
         if ((!translated || translated === text) && replaced !== text) {
-            translated = document.webL10n.get(replaced);
+            translated = i18next.t(replaced);
         }
 
         // If still no translation is found, try the lowercase version
         if (!translated || translated === text) {
-            translated = document.webL10n.get(text.toLowerCase());
+            translated = i18next.t(text.toLowerCase());
         }
 
         //if still no translation is found, try the initial caps translation too
         if (!translated || translated === text) {
             const initialCaps = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
-            translated = document.webL10n.get(initialCaps);
+            translated = i18next.t(initialCaps);
         }
 
         //function returns the ORIGINAL case without any translation if no translation exists
@@ -175,8 +176,8 @@ let format = (str, data) => {
         return x;
     });
 
-    return str.replace(/{_([a-zA-Z0-9]+)}/g, (match, item) => {
-        return _(item);
+    return str.replace(/{t([a-zA-Z0-9]+)}/g, (match, item) => {
+        return t(item);
     });
 };
 

@@ -46,7 +46,7 @@ function setupHeapBlocks(activity) {
              * Sets the help string for the HeapBlock.
              * @param {string[]} [] - An array with help string information.
              */
-            this.setHelpString([_("The Heap block returns the heap."), "documentation", ""]);
+            this.setHelpString([t("The Heap block returns the heap."), "documentation", ""]);
 
             /**
              * Forms the block with specified parameters.
@@ -56,7 +56,7 @@ function setupHeapBlocks(activity) {
              * } - The block formation parameters.
              */
             this.formBlock({
-                name: _("heap"),
+                name: t("heap"),
                 outType: "numberout"
             });
         }
@@ -115,7 +115,7 @@ function setupHeapBlocks(activity) {
              * @param {string[]} [] - An array with help string information.
              */
             this.setHelpString([
-                _(
+                t(
                     "The Show-heap block displays the contents of the heap at the top of the screen."
                 ),
                 "documentation",
@@ -130,7 +130,7 @@ function setupHeapBlocks(activity) {
              */
             this.formBlock({
                 // .TRANS: Display the heap contents
-                name: _("show heap")
+                name: t("show heap")
             });
         }
 
@@ -178,7 +178,7 @@ function setupHeapBlocks(activity) {
              * @param {string[]} [] - An array with help string information.
              */
             this.setHelpString([
-                _("The Heap-length block returns the length of the heap."),
+                t("The Heap-length block returns the length of the heap."),
                 "documentation",
                 ""
             ]);
@@ -192,7 +192,7 @@ function setupHeapBlocks(activity) {
              */
             this.formBlock({
                 // .TRANS: How many entries are in the heap?
-                name: _("heap length"),
+                name: t("heap length"),
                 outType: "numberout"
             });
         }
@@ -251,7 +251,7 @@ function setupHeapBlocks(activity) {
              * @param {string[]} [] - An array with help string information.
              */
             this.setHelpString([
-                _("The Heap-empty? block returns true if the heap is empty."),
+                t("The Heap-empty? block returns true if the heap is empty."),
                 "documentation",
                 ""
             ]);
@@ -265,7 +265,7 @@ function setupHeapBlocks(activity) {
              */
             this.formBlock({
                 //.TRANS: Is the heap empty?
-                name: _("heap empty?"),
+                name: t("heap empty?"),
                 outType: "booleanout"
             });
         }
@@ -314,7 +314,7 @@ function setupHeapBlocks(activity) {
              * Sets the help string for the EmptyHeapBlock.
              * @param {string[]} [] - An array with help string information.
              */
-            this.setHelpString([_("The Empty-heap block empties the heap."), "documentation", ""]);
+            this.setHelpString([t("The Empty-heap block empties the heap."), "documentation", ""]);
 
             /**
              * Forms the block with specified parameters.
@@ -324,7 +324,7 @@ function setupHeapBlocks(activity) {
              */
             this.formBlock({
                 //.TRANS: empty the heap
-                name: _("empty heap")
+                name: t("empty heap")
             });
         }
 
@@ -368,7 +368,7 @@ function setupHeapBlocks(activity) {
              * @param {string[]} [] - An array with help string information.
              */
             this.setHelpString([
-                _("The Reverse-heap block reverses the order of the heap."),
+                t("The Reverse-heap block reverses the order of the heap."),
                 "documentation",
                 ""
             ]);
@@ -381,7 +381,7 @@ function setupHeapBlocks(activity) {
              */
             this.formBlock({
                 //.TRANS: reverse the order of the heap
-                name: _("reverse heap")
+                name: t("reverse heap")
             });
         }
 
@@ -425,7 +425,7 @@ function setupHeapBlocks(activity) {
              * @param {string[]} [] - An array with help string information.
              */
             this.setHelpString([
-                _("The Index-heap block returns a value in the heap at a specified location."),
+                t("The Index-heap block returns a value in the heap at a specified location."),
                 "documentation",
                 ""
             ]);
@@ -440,7 +440,7 @@ function setupHeapBlocks(activity) {
              */
             this.formBlock({
                 //.TRANS: retrieve a value from the heap at index position in the heap
-                name: _("index heap"),
+                name: t("index heap"),
                 args: 1,
                 defaults: [1]
             });
@@ -471,12 +471,12 @@ function setupHeapBlocks(activity) {
                     a = logo.turtleHeaps[turtle].length;
                 } else if (a < 1) {
                     a = 1;
-                    activity.errorMsg(_("Index must be > 0."));
+                    activity.errorMsg(t("Index must be > 0."));
                 }
 
                 if (a > 1000) {
                     a = 1000;
-                    activity.errorMsg(_("Maximum heap size is 1000."));
+                    activity.errorMsg(t("Maximum heap size is 1000."));
                 }
 
                 // If index > heap length, grow the heap.
@@ -520,7 +520,7 @@ function setupHeapBlocks(activity) {
              * @param {string[]} [] - An array with help string information.
              */
             this.setHelpString([
-                _("The Set-heap entry block sets a value in he heap at the specified location."),
+                t("The Set-heap entry block sets a value in he heap at the specified location."),
                 "documentation",
                 ""
             ]);
@@ -536,12 +536,12 @@ function setupHeapBlocks(activity) {
              * } - The block formation parameters.
              */
             this.formBlock({
-                name: _("set heap"),
+                name: t("set heap"),
                 args: 2,
                 argTypes: ["numberin", "anyin"],
                 defaults: [1, 100],
                 //.TRANS: value1 is a numeric value (JAPANESE ONLY)
-                argLabels: [_("index"), this.lang === "ja" ? _("value1") : _("value")]
+                argLabels: [t("index"), this.lang === "ja" ? t("value1") : t("value")]
             });
         }
 
@@ -569,12 +569,12 @@ function setupHeapBlocks(activity) {
 
             let idx = Math.floor(args[0]);
             if (idx < 1) {
-                activity.errorMsg(_("Index must be > 0."));
+                activity.errorMsg(t("Index must be > 0."));
                 idx = 1;
             }
 
             if (idx > 1000) {
-                activity.errorMsg(_("Maximum heap size is 1000."));
+                activity.errorMsg(t("Maximum heap size is 1000."));
                 idx = 1000;
             }
 
@@ -616,7 +616,7 @@ function setupHeapBlocks(activity) {
              * @param {string[]} [] - An array with help string information.
              */
             this.setHelpString([
-                _("The Pop block removes the value at the top of the heap."),
+                t("The Pop block removes the value at the top of the heap."),
                 "documentation",
                 ""
             ]);
@@ -630,7 +630,7 @@ function setupHeapBlocks(activity) {
              */
             this.formBlock({
                 //.TRANS: pop a value off the top of the heap
-                name: _("pop")
+                name: t("pop")
             });
         }
 
@@ -644,7 +644,7 @@ function setupHeapBlocks(activity) {
             if (turtle in logo.turtleHeaps && logo.turtleHeaps[turtle].length > 0) {
                 return logo.turtleHeaps[turtle].pop();
             }
-            activity.errorMsg(_("empty heap"));
+            activity.errorMsg(t("empty heap"));
             return 0;
         }
     }
@@ -677,7 +677,7 @@ function setupHeapBlocks(activity) {
              * @param {string[]} [] - An array with help string information.
              */
             this.setHelpString([
-                _("The Push block adds a value to the top of the heap."),
+                t("The Push block adds a value to the top of the heap."),
                 "documentation",
                 ""
             ]);
@@ -693,7 +693,7 @@ function setupHeapBlocks(activity) {
              */
             this.formBlock({
                 //.TRANS: push a value onto the top of the heap
-                name: _("push"),
+                name: t("push"),
                 args: 1,
                 argTypes: ["anyin"],
                 defaults: [1]

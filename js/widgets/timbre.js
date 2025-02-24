@@ -412,9 +412,9 @@ class TimbreWidget {
                 '&nbsp;&nbsp;<img src="header-icons/' +
                 "stop-button.svg" +
                 '" title="' +
-                _("Stop") +
+                t("Stop") +
                 '" alt="' +
-                _("Stop") +
+                t("Stop") +
                 '" height="' +
                 TimbreWidget.ICONSIZE +
                 '" width="' +
@@ -426,8 +426,8 @@ class TimbreWidget {
             cell.innerHTML =
                 `&nbsp;&nbsp;<img 
                     src="header-icons/play-button.svg" 
-                    title="${_("Play")}" 
-                    alt="${_("Play")}" 
+                    title="${t("Play")}" 
+                    alt="${t("Play")}" 
                     height="${TimbreWidget.ICONSIZE}" 
                     width="${TimbreWidget.ICONSIZE}" 
                     vertical-align="middle" 
@@ -457,8 +457,8 @@ class TimbreWidget {
                 cell.innerHTML =
                     `&nbsp;&nbsp;<img 
                         src="header-icons/play-button.svg" 
-                        title="${_("Play")}" 
-                        alt="${_("Play")}" 
+                        title="${t("Play")}" 
+                        alt="${t("Play")}" 
                         height="${TimbreWidget.ICONSIZE}" 
                         width="${TimbreWidget.ICONSIZE}" 
                         vertical-align="middle" 
@@ -737,7 +737,7 @@ class TimbreWidget {
         this.playButton = widgetWindow.addButton(
             "play-button.svg",
             TimbreWidget.ICONSIZE,
-            _("Play")
+            t("Play")
         );
 
         this.playButton.onclick = () => {
@@ -747,7 +747,7 @@ class TimbreWidget {
         widgetWindow.addButton(
             "export-chunk.svg",
             TimbreWidget.ICONSIZE,
-            _("Save")
+            t("Save")
         ).onclick = () => {
             this._save();
         };
@@ -757,7 +757,7 @@ class TimbreWidget {
         const synthButtonCell = widgetWindow.addButton(
             "synth.svg",
             TimbreWidget.ICONSIZE,
-            _("Synthesizer")
+            t("Synthesizer")
         );
         synthButtonCell.id = "synthButtonCell";
         this.isActive["synth"] = false;
@@ -773,14 +773,14 @@ class TimbreWidget {
             if (this.osc.length === 0) {
                 this._synth();
             } else {
-                activity.errorMsg(_("Unable to use synth due to existing oscillator"), 3000);
+                activity.errorMsg(t("Unable to use synth due to existing oscillator"), 3000);
             }
         };
 
         const oscillatorButtonCell = widgetWindow.addButton(
             "oscillator.svg",
             TimbreWidget.ICONSIZE,
-            _("Oscillator")
+            t("Oscillator")
         );
         oscillatorButtonCell.id = "oscillatorButtonCell";
         this.isActive["oscillator"] = false;
@@ -831,7 +831,7 @@ class TimbreWidget {
         const envelopeButtonCell = widgetWindow.addButton(
             "envelope.svg",
             TimbreWidget.ICONSIZE,
-            _("Envelope")
+            t("Envelope")
         );
         envelopeButtonCell.id = "envelopeButtonCell";
         this.isActive["envelope"] = false;
@@ -877,7 +877,7 @@ class TimbreWidget {
         const effectsButtonCell = widgetWindow.addButton(
             "effects.svg",
             TimbreWidget.ICONSIZE,
-            _("Effects")
+            t("Effects")
         );
         effectsButtonCell.id = "effectsButtonCell";
         this.isActive["effects"] = false;
@@ -895,7 +895,7 @@ class TimbreWidget {
         const filterButtonCell = widgetWindow.addButton(
             "filter.svg",
             TimbreWidget.ICONSIZE,
-            _("Filter")
+            t("Filter")
         );
         filterButtonCell.id = "filterButtonCell";
         this.isActive["filter"] = false;
@@ -937,7 +937,7 @@ class TimbreWidget {
         const addFilterButtonCell = widgetWindow.addButton(
             "filter+.svg",
             TimbreWidget.ICONSIZE,
-            _("Add filter")
+            t("Add filter")
         );
         addFilterButtonCell.style.backgroundColor = "#808080";
 
@@ -954,12 +954,12 @@ class TimbreWidget {
         widgetWindow.addButton(
             "restore-button.svg",
             TimbreWidget.ICONSIZE,
-            _("Undo")
+            t("Undo")
         ).onclick = () => {
             this._undo();
         };
 
-        // let cell = this._addButton(row, 'close-button.svg', TimbreWidget.ICONSIZE, _('Close'));
+        // let cell = this._addButton(row, 'close-button.svg', TimbreWidget.ICONSIZE, t('Close'));
 
         // cell.onclick = function () {
         //     docById('timbreDiv').style.visibility = 'hidden';
@@ -978,7 +978,7 @@ class TimbreWidget {
             filterButtonCell.style.backgroundColor = platformColor.selectorBackground;
         };
 
-        activity.textMsg(_("Click on buttons to open the timbre design tools."), 3000);
+        activity.textMsg(t("Click on buttons to open the timbre design tools."), 3000);
         widgetWindow.sendToCenter();
     }
 
@@ -1212,9 +1212,9 @@ class TimbreWidget {
         const mainDiv = docById("synth0");
         mainDiv.innerHTML =
             `<p>
-                <input type="radio" name="synthsName" value="AMSynth"/>${_("AM synth")}<br>
-                <input type="radio" name="synthsName" value="FMSynth"/>${_("FM synth")}<br>
-                <input type="radio" name="synthsName" value="DuoSynth"/>${_("duo synth")}<br>
+                <input type="radio" name="synthsName" value="AMSynth"/>${t("AM synth")}<br>
+                <input type="radio" name="synthsName" value="FMSynth"/>${t("FM synth")}<br>
+                <input type="radio" name="synthsName" value="DuoSynth"/>${t("duo synth")}<br>
             </p>`;
 
         const subDiv = docById("synth1");
@@ -1262,7 +1262,7 @@ class TimbreWidget {
 
                     subHtmlElements +=
                         '<div id="wrapperS0"><div id="sS0"><span>' +
-                        _("harmonicity") +
+                        t("harmonicity") +
                         '</span></div><div class="insideDivSynth"><input type="range" id="myRangeS0" class="sliders" style="margin-top:20px" value="' +
                         parseFloat(this.AMSynthParams[0]) +
                         '"><span id="myspanS0" class="rangeslidervalue">' +
@@ -1329,7 +1329,7 @@ class TimbreWidget {
 
                     subHtmlElements +=
                         '<div id="wrapperS0"><div id="sS0"><span>' +
-                        _("modulation index") +
+                        t("modulation index") +
                         '</span></div><div class="insideDivSynth"><input type="range" id="myRangeS0" class="sliders" style="margin-top:20px" value="' +
                         parseFloat(this.FMSynthParams[0]) +
                         '"><span id="myspanS0" class="rangeslidervalue">' +
@@ -1395,7 +1395,7 @@ class TimbreWidget {
 
                     subHtmlElements +=
                         '<div id="wrapperS0"><div id="sS0"><span>' +
-                        _("modulation index") +
+                        t("modulation index") +
                         '</span></div><div class="insideDivSynth"><input type="range" id="myRangeS0" class="sliders" style="margin-top:20px" value="' +
                         this.NoiseSynthParams[0] +
                         '"><span id="myspanS0" class="rangeslidervalue">' +
@@ -1465,7 +1465,7 @@ class TimbreWidget {
 
                     subHtmlElements +=
                         '<div id="wrapperS0"><div id="sS0"><span>' +
-                        _("vibrato rate") +
+                        t("vibrato rate") +
                         '</span></div><div class="insideDivSynth"><input type="range" id="myRangeS0" class="sliders" style="margin-top:20px" value="' +
                         parseFloat(this.duoSynthParams[0]) +
                         '"><span id="myspanS0" class="rangeslidervalue">' +
@@ -1473,7 +1473,7 @@ class TimbreWidget {
                         "</span></div></div>";
                     subHtmlElements +=
                         '<div id="wrapperS1"><div id="sS1"><span>' +
-                        _("vibrato amount") +
+                        t("vibrato amount") +
                         '</span></div><div class="insideDivSynth"><input type="range" id="myRangeS1" class="sliders" style="margin-top:20px" value="' +
                         parseFloat(this.duoSynthParams[1]) +
                         '"><span id="myspanS1" class="rangeslidervalue">' +
@@ -1547,11 +1547,11 @@ class TimbreWidget {
         const env = docById("timbreTable");
         let htmlElements =
             '<div id="wrapperOsc0"><div id="sOsc0"><span>' +
-            _("type") +
+            t("type") +
             '</span></div><div id="selOsc"></div></div>';
         htmlElements +=
             '<div id="wrapperOsc1"><div id="sOsc1"><span>' +
-            _("partials") +
+            t("partials") +
             '</span></div><div class="insideDivOsc"><input type="range" id="myRangeO0" class="sliders" style="margin-top:20px" min="0" max="20" value="' +
             parseFloat(this.oscParams[1]) +
             '"><span id="myspanO0" class="rangeslidervalue">' +
@@ -1797,7 +1797,7 @@ class TimbreWidget {
             '"><div class="s" id="s' +
             wrapperIDs[0] +
             '"><span>' +
-            _("type") +
+            t("type") +
             '</span></div><div class="filterselector" id="' +
             selectorID +
             '"></div></div>';
@@ -1807,7 +1807,7 @@ class TimbreWidget {
             '"><div class="s" id="s' +
             wrapperIDs[1] +
             '"><span>' +
-            _("rolloff") +
+            t("rolloff") +
             '</span></div><div class="insideDivFilter"><p><input id="radio' +
             radioIDs[0] +
             '" type="radio" name="rolloff' +
@@ -1831,7 +1831,7 @@ class TimbreWidget {
             '"><div class="s" id="s' +
             wrapperIDs[2] +
             '"><span>' +
-            _("frequency") +
+            t("frequency") +
             '</span></div><div class="insideDivFilter"><input type="range" id="myRangeF' +
             f +
             '" class="sliders" style="margin-top:20px" max="7050" value="' +
@@ -1908,7 +1908,7 @@ class TimbreWidget {
                 (el) => el.filterType === elem.value
             );
             if (error.length > 1) {
-                activity.errorMsg(_("Filter already present."), 3000);
+                activity.errorMsg(t("Filter already present."), 3000);
             }
             this._playNote("G4", 1 / 8);
         };
@@ -2081,11 +2081,11 @@ class TimbreWidget {
         const mainDiv = docById("effect0");
         mainDiv.innerHTML =
             `<p>
-                <input type="radio" name="effectsName" value="Tremolo"/>${_("tremolo")}<br>
-                <input type="radio" name="effectsName" value="Vibrato"/>${_("vibrato")}<br>
-                <input type="radio" name="effectsName" value="Chorus"/>${_("chorus")}<br>
-                <input type="radio" name="effectsName" value="Phaser"/>${_("phaser")}<br>
-                <input type="radio" name="effectsName" value="Distortion"/>${_("distortion")}<br>
+                <input type="radio" name="effectsName" value="Tremolo"/>${t("tremolo")}<br>
+                <input type="radio" name="effectsName" value="Vibrato"/>${t("vibrato")}<br>
+                <input type="radio" name="effectsName" value="Chorus"/>${t("chorus")}<br>
+                <input type="radio" name="effectsName" value="Phaser"/>${t("phaser")}<br>
+                <input type="radio" name="effectsName" value="Distortion"/>${t("distortion")}<br>
             </p>`;
 
         const subDiv = docById("effect1");
@@ -2119,10 +2119,10 @@ class TimbreWidget {
                     }
 
                     subDiv.innerHTML = subHtmlElements;
-                    docById("sFx0").textContent = _("rate");
+                    docById("sFx0").textContent = t("rate");
                     docById("myRangeFx0").value = 10;
                     docById("myspanFx0").textContent = "10";
-                    docById("sFx1").textContent = _("depth");
+                    docById("sFx1").textContent = t("depth");
                     docById("myRangeFx1").value = 50;
                     docById("myspanFx1").textContent = "50";
 
@@ -2206,8 +2206,8 @@ class TimbreWidget {
 
                     // Set slider values
                     subDiv.innerHTML = subHtmlElements;
-                    docById("sFx0").textContent = _("intensity");
-                    docById("sFx1").textContent = _("rate");
+                    docById("sFx0").textContent = t("intensity");
+                    docById("sFx1").textContent = t("rate");
 
                     if (this.vibratoEffect.length > 0) {
                         docById("myRangeFx0").value = parseFloat(this.vibratoParams[0]);
@@ -2302,18 +2302,18 @@ class TimbreWidget {
                     }
 
                     subDiv.innerHTML = subHtmlElements;
-                    docById("sFx0").textContent = _("rate");
+                    docById("sFx0").textContent = t("rate");
                     docById("myRangeFx0").value = 2;
                     docById("myspanFx0").textContent = "2";
                     instrumentsEffects[0][this.instrumentName]["chorusRate"] = 2;
 
-                    docById("sFx1").textContent = _("delay (MS)");
+                    docById("sFx1").textContent = t("delay (MS)");
                     docById("myRangeFx1").value = 4;
                     docById("myspanFx1").textContent = "4";
                     instrumentsEffects[0][this.instrumentName]["delayTime"] = 4;
 
 
-                    docById("sFx2").textContent = _("depth");
+                    docById("sFx2").textContent = t("depth");
                     docById("myRangeFx2").value = 70;
                     docById("myspanFx2").textContent = "70";
                     instrumentsEffects[0][this.instrumentName]["chorusDepth"] = 4;
@@ -2404,13 +2404,13 @@ class TimbreWidget {
                     }
 
                     subDiv.innerHTML = subHtmlElements;
-                    docById("sFx0").textContent = _("rate");
+                    docById("sFx0").textContent = t("rate");
                     docById("myRangeFx0").value = 5;
                     docById("myspanFx0").textContent = "5";
-                    docById("sFx1").textContent = _("octaves");
+                    docById("sFx1").textContent = t("octaves");
                     docById("myRangeFx1").value = 3;
                     docById("myspanFx1").textContent = "3";
-                    docById("sFx2").textContent = _("base frequency");
+                    docById("sFx2").textContent = t("base frequency");
                     docById("myRangeFx2").value = 350;
                     docById("myspanFx2").textContent = "350";
 
@@ -2492,7 +2492,7 @@ class TimbreWidget {
 
                     subDiv.innerHTML = subHtmlElements;
 
-                    docById("sFx0").textContent = _("distortion amount");
+                    docById("sFx0").textContent = t("distortion amount");
                     docById("myRangeFx0").value = 40;
                     docById("myspanFx0").textContent = "40";
 

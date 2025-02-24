@@ -409,12 +409,12 @@ class Activity {
 
             this.searchWidget = docById("search");
             this.searchWidget.style.visibility = "hidden";
-            this.searchWidget.placeholder = _("Search for blocks");
+            this.searchWidget.placeholder = t("Search for blocks");
 
             this.helpfulSearchWidget = document.createElement("input");
             this.helpfulSearchWidget.setAttribute("id", "helpfulSearch");
             this.helpfulSearchWidget.style.visibility = "hidden";
-            this.helpfulSearchWidget.placeholder = _("Search for blocks");
+            this.helpfulSearchWidget.placeholder = t("Search for blocks");
             this.helpfulSearchWidget.classList.add("ui-autocomplete");
             this.progressBar = docById("myProgress");
             this.progressBar.style.visibility = "hidden";
@@ -580,7 +580,7 @@ class Activity {
             wheel.navItems[0].selected = false;
 
             wheelItems.forEach((ele, i) => {
-                wheel.navItems[i].setTooltip(_(ele.label));
+                wheel.navItems[i].setTooltip(t(ele.label));
                 wheel.navItems[i].navigateFunction = () => ele.fn(this);
             })
             const closeHelpfulWheel = (e) => {
@@ -1196,7 +1196,7 @@ class Activity {
                         } else if (p === 5) {
                             // Add block value to SVG between tspans
                             if (typeof this.blocks.blockList[i].value === "string") {
-                                svg += parts[p] + ">" + _(this.blocks.blockList[i].value) + "<";
+                                svg += parts[p] + ">" + t(this.blocks.blockList[i].value) + "<";
                             } else {
                                 svg += parts[p] + ">" + this.blocks.blockList[i].value + "<";
                             }
@@ -1356,7 +1356,7 @@ class Activity {
             title.style.margin = "0 0 16px 0";
             modal.appendChild(title);
             const message = document.createElement("p");
-            message.textContent = _("Are you sure you want to clear the workspace?");
+            message.textContent = t("Are you sure you want to clear the workspace?");
             message.style.color = platformColor.textColor;
             message.style.fontSize = "16px";
             message.style.marginBottom = "24px";
@@ -1575,9 +1575,9 @@ class Activity {
                     }
                 );
 
-                const filename = window.prompt(_("Enter file name"));
+                const filename = window.prompt(t("Enter file name"));
                 if (filename === null || filename.trim() === "") {
-                    alert(_("File save canceled"));
+                    alert(t("File save canceled"));
                     flag = 0;
                     recording();
                     doRecordButton();
@@ -1596,7 +1596,7 @@ class Activity {
                 // eslint-disable-next-line no-use-before-define
                 recording();
                 doRecordButton();
-                that.textMsg(_("Click on stop saving"));
+                that.textMsg(t("Click on stop saving"));
             }
             /**
              * Stops the recording process.
@@ -1881,15 +1881,15 @@ class Activity {
         this.doLoadAnimation = () => {
             const messages = {
                 load_messages: [
-                    _("Catching mice"),
-                    _("Cleaning the instruments"),
-                    _("Testing key pieces"),
-                    _("Sight-reading"),
-                    _("Combining math and music"),
-                    _("Generating more blocks"),
-                    _("Do Re Mi Fa Sol La Ti Do"),
-                    _("Tuning string instruments"),
-                    _("Pressing random keys")
+                    t("Catching mice"),
+                    t("Cleaning the instruments"),
+                    t("Testing key pieces"),
+                    t("Sight-reading"),
+                    t("Combining math and music"),
+                    t("Generating more blocks"),
+                    t("Do Re Mi Fa Sol La Ti Do"),
+                    t("Tuning string instruments"),
+                    t("Pressing random keys")
                 ]
             };
 
@@ -2071,7 +2071,7 @@ class Activity {
 
                 this.storage.plugins = JSON.stringify(obj);
                 this.textMsg(
-                    this.palettes.activePalette + " " + _("plugins will be removed upon restart.")
+                    this.palettes.activePalette + " " + t("plugins will be removed upon restart.")
                 );
             }
         };
@@ -2080,7 +2080,7 @@ class Activity {
          * Hides all grids (Cartesian/polar/treble/et al.)
          */
         this.hideGrids = () => {
-            this.turtles.setGridLabel(_("show Cartesian"));
+            this.turtles.setGridLabel(t("show Cartesian"));
             this._hideCartesian();
             this._hidePolar();
             if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -2599,67 +2599,67 @@ class Activity {
                     } else {
                         if (blockLabel.length === 0) {
                             // Swap in a preferred name when there is no label.
-                            let label = _(block.name);
+                            let label = t(block.name);
                             switch(block.name) {
                                 case "scaledegree2":
-                                    label = _("scale degree");
+                                    label = t("scale degree");
                                     break;
                                 case "voicename":
-                                    label = _("voice name");
+                                    label = t("voice name");
                                     break;
                                 case "invertmode":
-                                    label = _("invert mode");
+                                    label = t("invert mode");
                                     break;
                                 case "outputtools":
-                                    label = _("output tools");
+                                    label = t("output tools");
                                     break;
                                 case "customNote":
-                                    label = _("custom note");
+                                    label = t("custom note");
                                     break;
                                 case "accidentalname":
-                                    label = _("accidental name");
+                                    label = t("accidental name");
                                     break;
                                 case "eastindiansolfege":
-                                    label = _("east indian solfege");
+                                    label = t("east indian solfege");
                                     break;
                                 case "notename":
-                                    label = _("note name");
+                                    label = t("note name");
                                     break;
                                 case "temperamentname":
-                                    label = _("temperament name");
+                                    label = t("temperament name");
                                     break;
                                 case "modename":
-                                    label = _("mode name");
+                                    label = t("mode name");
                                     break;
                                 case "chordname":
-                                    label = _("chord name");
+                                    label = t("chord name");
                                     break;
                                 case "intervalname":
-                                    label = _("interval name");
+                                    label = t("interval name");
                                     break;
                                 case "filtertype":
-                                    label = _("filter type");
+                                    label = t("filter type");
                                     break;
                                 case "oscillatortype":
-                                    label = _("oscillator type");
+                                    label = t("oscillator type");
                                     break;
                                 case "audiofile":
-                                    label = _("audio file");
+                                    label = t("audio file");
                                     break;
                                 case "noisename":
-                                    label = _("noise name");
+                                    label = t("noise name");
                                     break;
                                 case "drumname":
-                                    label = _("drum name");
+                                    label = t("drum name");
                                     break;
                                 case "effectsname":
-                                    label = _("effects name");
+                                    label = t("effects name");
                                     break;
                                 case "wrapmode":
-                                    label = _("wrap mode");
+                                    label = t("wrap mode");
                                     break;
                                 case "loadFile":
-                                    label = _("load file");
+                                    label = t("load file");
                                     break;
                             }
                             this.searchSuggestions.push({
@@ -2829,9 +2829,9 @@ class Activity {
                 this.searchBlockPosition[0] += STANDARDBLOCKHEIGHT;
                 this.searchBlockPosition[1] += STANDARDBLOCKHEIGHT;
             } else if (this.deprecatedBlockNames.indexOf(searchInput) > -1) {
-                this.errorMsg(_("This block is deprecated."));
+                this.errorMsg(t("This block is deprecated."));
             } else {
-                this.errorMsg(_("Block cannot be found."));
+                this.errorMsg(t("Block cannot be found."));
             }
 
             this.searchWidget.value = "";
@@ -3040,22 +3040,22 @@ class Activity {
             if ((event.altKey && !disableKeys) || (event.keyCode == 13) || (event.key == '/') || (event.key == '\\') ) {
                 switch (event.keyCode) {
                     case 66: // 'B'
-                        this.textMsg("Alt-B " + _("Saving block artwork"));
+                        this.textMsg("Alt-B " + t("Saving block artwork"));
                         this.save.saveBlockArtwork();
                         break;
                     case 67: // 'C'
-                        this.textMsg("Alt-C " + _("Copy"));
+                        this.textMsg("Alt-C " + t("Copy"));
                         this.blocks.prepareStackForCopy();
                         break;
                     case 68: // 'D'
                         this.palettes.dict["myblocks"].promptMacrosDelete();
                         break;
                     case 69: // 'E'
-                        this.textMsg("Alt-E " + _("Erase"));
+                        this.textMsg("Alt-E " + t("Erase"));
                         this._allClear(false);
                         break;
                     case 82: // 'R or ENTER'
-                        this.textMsg("Alt-R " + _("Play"));
+                        this.textMsg("Alt-R " + t("Play"));
                         let stopbtn = document.getElementById("stop");
                         if (stopbtn) {
                             stopbtn.style.color = platformColor.stopIconcolor;
@@ -3071,7 +3071,7 @@ class Activity {
 			    docById("paste").style.visibility = "hidden";
                             return;
                         }
-                        this.textMsg("Enter " + _("Play"));
+                        this.textMsg("Enter " + t("Play"));
                         let stopbt = document.getElementById("stop");
                         if (stopbt) {
                             stopbt.style.color = platformColor.stopIconcolor;
@@ -3079,15 +3079,15 @@ class Activity {
                         this._doFastButton();
                         break;
                     case 83: // 'S'
-                        this.textMsg("Alt-S " + _("Stop"));
+                        this.textMsg("Alt-S " + t("Stop"));
                         this.logo.doStopTurtles();
                         break;
                     case 86: // 'V'
-                        // this.textMsg("Alt-V " + _("Paste"));
+                        // this.textMsg("Alt-V " + t("Paste"));
                         this.blocks.pasteStack();
                         break;
                     case 72: // 'H' save block help
-                        this.textMsg("Alt-H " + _("Save block help"));
+                        this.textMsg("Alt-H " + t("Save block help"));
                         this._saveHelpBlocks();
                         break;
                     case 191:
@@ -3105,7 +3105,7 @@ class Activity {
             } else if (event.ctrlKey) {
                 switch (event.keyCode) {
                     case V:
-                        // this.textMsg("Ctl-V " + _("Paste"));
+                        // this.textMsg("Ctl-V " + t("Paste"));
                         this.pasteBox.createBox(this.turtleBlocksScale, 200, 200);
                         this.pasteBox.show();
                         docById("paste").style.left =
@@ -3118,7 +3118,7 @@ class Activity {
                         break;
                 }
             } else if (event.shiftKey && !disableKeys) {
-                const solfnotes_ = _("ti la sol fa mi re do").split(" ");
+                const solfnotes_ = t("ti la sol fa mi re do").split(" ");
                 switch (event.keyCode) {
                     case KEYCODE_D:
                         if (_THIS_IS_MUSIC_BLOCKS_) {
@@ -3169,26 +3169,26 @@ class Activity {
                         this.pasted();
                     }
                 } else if (!disableKeys) {
-                    const solfnotes_ = _("ti la sol fa mi re do").split(" ");
+                    const solfnotes_ = t("ti la sol fa mi re do").split(" ");
                     switch (event.keyCode) {
                         case END:
-                            this.textMsg("END " + _("Jumping to the bottom of the page."));
+                            this.textMsg("END " + t("Jumping to the bottom of the page."));
                             this.blocksContainer.y =
                                 -this.blocks.bottomMostBlock() + this.canvas.height / 2;
                             this.stage.update();
                             break;
                         case PAGE_UP:
-                            this.textMsg("PAGE_UP " + _("Scrolling up."));
+                            this.textMsg("PAGE_UP " + t("Scrolling up."));
                             this.blocksContainer.y += this.canvas.height / 2;
                             this.stage.update();
                             break;
                         case PAGE_DOWN:
-                            this.textMsg("PAGE_DOWN " + _("Scrolling down."));
+                            this.textMsg("PAGE_DOWN " + t("Scrolling down."));
                             this.blocksContainer.y -= this.canvas.height / 2;
                             this.stage.update();
                             break;
                         case DEL:
-                            this.textMsg("DEL " + _("Extracting block"));
+                            this.textMsg("DEL " + t("Extracting block"));
                             this.blocks.extract();
                             break;
                         case KEYCODE_UP:
@@ -3196,7 +3196,7 @@ class Activity {
                                 this.logo.tempo.speedUp(0);
                             } else {
                                 if (this.blocks.activeBlock !== null) {
-                                    this.textMsg("UP ARROW " + _("Moving block up."));
+                                    this.textMsg("UP ARROW " + t("Moving block up."));
                                     this.blocks.moveStackRelative(
                                         this.blocks.activeBlock,
                                         0,
@@ -3217,7 +3217,7 @@ class Activity {
                                 this.logo.tempo.slowDown(0);
                             } else {
                                 if (this.blocks.activeBlock !== null) {
-                                    this.textMsg("DOWN ARROW " + _("Moving block down."));
+                                    this.textMsg("DOWN ARROW " + t("Moving block down."));
                                     this.blocks.moveStackRelative(
                                         this.blocks.activeBlock,
                                         0,
@@ -3238,7 +3238,7 @@ class Activity {
                         case KEYCODE_LEFT:
                             if (!this.inTempoWidget) {
                                 if (this.blocks.activeBlock !== null) {
-                                    this.textMsg("LEFT ARROW " + _("Moving block left."));
+                                    this.textMsg("LEFT ARROW " + t("Moving block left."));
                                     this.blocks.moveStackRelative(
                                         this.blocks.activeBlock,
                                         -STANDARDBLOCKHEIGHT / 2,
@@ -3255,7 +3255,7 @@ class Activity {
                         case KEYCODE_RIGHT:
                             if (!this.inTempoWidget) {
                                 if (this.blocks.activeBlock !== null) {
-                                    this.textMsg("RIGHT ARROW " + _("Moving block right."));
+                                    this.textMsg("RIGHT ARROW " + t("Moving block right."));
                                     this.blocks.moveStackRelative(
                                         this.blocks.activeBlock,
                                         STANDARDBLOCKHEIGHT / 2,
@@ -3270,7 +3270,7 @@ class Activity {
                             }
                             break;
                         case HOME:
-                            this.textMsg("HOME " + _("Jump to home position."));
+                            this.textMsg("HOME " + t("Jump to home position."));
                             if (this.palettes.mouseOver) {
                                 const dy = Math.max(55 - this.palettes.buttons["rhythm"].y, 0);
                                 this.palettes.menuScrollEvent(1, dy);
@@ -3297,12 +3297,12 @@ class Activity {
                             break;
                         case ESC:
                             if (this.searchWidget.style.visibility === "visible") {
-                                this.textMsg("ESC " + _("Hide blocks"));
+                                this.textMsg("ESC " + t("Hide blocks"));
                                 this.searchWidget.style.visibility = "hidden";
                             }
                             break;
                         case RETURN:
-                            this.textMsg("Return " + _("Play"));
+                            this.textMsg("Return " + t("Play"));
                             if (this.inTempoWidget) {
                                 if (this.logo.tempo.isMoving) {
                                     this.logo.tempo.pause();
@@ -3656,7 +3656,7 @@ class Activity {
         const restoreTrash = (activity) => {
             if (!activity.blocks || !activity.blocks.trashStacks || activity.blocks.trashStacks.length === 0) {
                 activity.textMsg(
-                    _("Trash can is empty."),
+                    t("Trash can is empty."),
                     3000 
                 );
                 return;
@@ -3671,14 +3671,14 @@ class Activity {
         const restoreTrashPop = (activity) => {
             if (!activity.blocks || !activity.blocks.trashStacks || activity.blocks.trashStacks.length === 0) {
                 activity.textMsg(
-                    _("Trash can is empty."),
+                    t("Trash can is empty."),
                     3000 
                 );
                 return;
             }
             this._restoreTrashById(this.blocks.trashStacks[this.blocks.trashStacks.length - 1]);
             activity.textMsg(
-                _("Item restored from the trash."),
+                t("Item restored from the trash."),
                 3000
             );
 
@@ -3759,7 +3759,7 @@ class Activity {
                 }
             }
             activity.textMsg(
-                _("Item restored from the trash."),
+                t("Item restored from the trash."),
                 3000 
             );
         
@@ -3817,8 +3817,8 @@ class Activity {
                 }
                 trashView.classList.add('hidden');
             });
-            restoreLastIcon.setAttribute("title", _("Restore last item"));
-            restoreAllIcon.setAttribute("title", _("Restore all items"));
+            restoreLastIcon.setAttribute("title", t("Restore last item"));
+            restoreAllIcon.setAttribute("title", t("Restore all items"));
         
             buttonContainer.appendChild(restoreLastIcon);
             buttonContainer.appendChild(restoreAllIcon);
@@ -4376,7 +4376,7 @@ class Activity {
                             that.turtles.getTurtle(turtle).painter.doClear(true, true, false);
                         }
 
-                        that.textMsg(_("Click the run button to run the project."));
+                        that.textMsg(t("Click the run button to run the project."));
 
                         if (show) {
                             that._changeBlockVisibility();
@@ -4761,7 +4761,7 @@ class Activity {
 
             // Use the planet New Project mechanism if it is available,
             // but only if the current project has a name.
-            if (that.planet !== undefined && that.planet.getCurrentProjectName() !== _("My Project")) {
+            if (that.planet !== undefined && that.planet.getCurrentProjectName() !== t("My Project")) {
                 that.planet.saveLocally();
                 that.planet.initialiseNewProject();
                 loadStart(that);
@@ -5561,7 +5561,7 @@ class Activity {
             document.body.appendChild(ButtonHolder);
 
             this.homeButtonContainer = createButton(GOHOMEFADEDBUTTON,
-                _("Home") + " [" + _("Home").toUpperCase() + "]",
+                t("Home") + " [" + t("Home").toUpperCase() + "]",
                 findBlocks
             );
             this.boundary.hide();
@@ -5569,25 +5569,25 @@ class Activity {
             if (!this.helpfulWheelItems.find(ele => ele.label === "Home [HOME]"))
                 this.helpfulWheelItems.push({label: "Home [HOME]", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(GOHOMEFADEDBUTTON)), display: true, fn: findBlocks});
 
-            this.hideBlocksContainer = createButton(SHOWBLOCKSBUTTON, _("Show/hide blocks"),
+            this.hideBlocksContainer = createButton(SHOWBLOCKSBUTTON, t("Show/hide blocks"),
                 changeBlockVisibility);
 
             if (!this.helpfulWheelItems.find(ele => ele.label === "Show/hide blocks"))
                 this.helpfulWheelItems.push({label: "Show/hide blocks", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SHOWBLOCKSBUTTON)), display: true, fn: changeBlockVisibility});
 
-            this.collapseBlocksContainer = createButton(COLLAPSEBLOCKSBUTTON, _("Expand/collapse blocks"),
+            this.collapseBlocksContainer = createButton(COLLAPSEBLOCKSBUTTON, t("Expand/collapse blocks"),
                 toggleCollapsibleStacks);
 
             if (!this.helpfulWheelItems.find(ele => ele.label === "Expand/collapse blocks"))
                 this.helpfulWheelItems.push({label: "Expand/collapse blocks", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBLOCKSBUTTON)), display: true, fn: toggleCollapsibleStacks});
 
-            this.smallerContainer = createButton(SMALLERBUTTON, _("Decrease block size"),
+            this.smallerContainer = createButton(SMALLERBUTTON, t("Decrease block size"),
                 doSmallerBlocks);
 
             if (!this.helpfulWheelItems.find(ele => ele.label === "Decrease block size"))
                 this.helpfulWheelItems.push({label: "Decrease block size", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SMALLERBUTTON)), display: true, fn: doSmallerBlocks});
 
-            this.largerContainer = createButton(BIGGERBUTTON, _("Increase block size"),
+            this.largerContainer = createButton(BIGGERBUTTON, t("Increase block size"),
                 doLargerBlocks);
 
             if (!this.helpfulWheelItems.find(ele => ele.label === "Increase block size"))
@@ -5728,9 +5728,9 @@ class Activity {
                 this.searchBlockPosition[0] += STANDARDBLOCKHEIGHT;
                 this.searchBlockPosition[1] += STANDARDBLOCKHEIGHT;
             } else if (this.deprecatedBlockNames.indexOf(searchInput) > -1) {
-                this.errorMsg(_("This block is deprecated."));
+                this.errorMsg(t("This block is deprecated."));
             } else {
-                this.errorMsg(_("Block cannot be found."));
+                this.errorMsg(t("Block cannot be found."));
             }
 
             this.helpfulSearchWidget.value = "";
@@ -5853,7 +5853,7 @@ class Activity {
             try {
                 obj = JSON.parse(cleanData);
             } catch (e) {
-                this.errorMsg(_("Could not parse JSON input."));
+                this.errorMsg(t("Could not parse JSON input."));
                 return;
             }
 
@@ -5984,7 +5984,7 @@ class Activity {
         this.selectMode = () => {
             this.moving = false;
             this.isSelecting = !this.isSelecting;
-            (this.isSelecting) ? this.textMsg(_("Select is enabled.")) : this.textMsg(_("Select is disabled."));
+            (this.isSelecting) ? this.textMsg(t("Select is enabled.")) : this.textMsg(t("Select is disabled."));
         }
 
         this._create2Ddrag = () => {
@@ -6366,7 +6366,7 @@ class Activity {
                             const rawData = reader.result;
                             if (rawData === null || rawData === "") {
                                 that.errorMsg(
-                                    _("Cannot load project from the file. Please check the file type.")
+                                    t("Cannot load project from the file. Please check the file type.")
                                 );
                             } else {
                                 const cleanData = rawData.replace("\n", " ");
@@ -6418,7 +6418,7 @@ class Activity {
                                     that.refreshCanvas();
                                 } catch (e) {
                                     that.errorMsg(
-                                        _(
+                                        t(
                                             "Cannot load project from the file. Please check the file type."
                                         )
                                     );
@@ -6472,7 +6472,7 @@ class Activity {
                         const rawData = reader.result;
                         if (rawData === null || rawData === "") {
                             that.errorMsg(
-                                _("Cannot load project from the file. Please check the file type.")
+                                t("Cannot load project from the file. Please check the file type.")
                             );
                         } else {
                             const cleanData = rawData.replace("\n", " ");
@@ -6523,7 +6523,7 @@ class Activity {
                                 // eslint-disable-next-line no-console
                                 console.error(e);
                                 that.errorMsg(
-                                    _("Cannot load project from the file. Please check the file type.")
+                                    t("Cannot load project from the file. Please check the file type.")
                                 );
                                 document.body.style.cursor = "default";
                                 that.loading = false;
@@ -6809,7 +6809,7 @@ class Activity {
                                     url = args[1];
                                     break;
                                 default:
-                                    this.errorMsg(_("Invalid parameters"));
+                                    this.errorMsg(t("Invalid parameters"));
                                     break;
                             }
                         }
@@ -6960,7 +6960,7 @@ class Activity {
         } catch (e) {
             // eslint-disable-next-line no-console
             console.error('Error regenerating palettes:', e);
-            this.errorMsg(_('Error regenerating palettes. Please refresh the page.'));
+            this.errorMsg(t('Error regenerating palettes. Please refresh the page.'));
         }
     }
 }

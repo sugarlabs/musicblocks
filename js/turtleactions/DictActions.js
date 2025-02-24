@@ -64,29 +64,29 @@ function setupDictActions(activity) {
             const targetTur = activity.turtles.ithTurtle(target);
 
             // This is the internal turtle dictionary that includes the turtle status.
-            if (key === _("color")) {
+            if (key === t("color")) {
                 return targetTur.painter.color;
-            } else if (key === _("shade")) {
+            } else if (key === t("shade")) {
                 return targetTur.painter.value;
-            } else if (key === _("grey")) {
+            } else if (key === t("grey")) {
                 return targetTur.painter.chroma;
-            } else if (key === _("pen size")) {
+            } else if (key === t("pen size")) {
                 return targetTur.painter.pensize;
-            } else if (key === _("font")) {
+            } else if (key === t("font")) {
                 return targetTur.painter.font;
-            } else if (key === _("heading")) {
+            } else if (key === t("heading")) {
                 return targetTur.painter.turtle.orientation;
             } else if (key === "x") {
                 return activity.turtles.screenX2turtleX(targetTur.container.x);
             } else if (key === "y") {
                 return activity.turtles.screenY2turtleY(targetTur.container.y);
-            } else if (key === _("notes played")) {
+            } else if (key === t("notes played")) {
                 return targetTur.singer.notesPlayed[0] / targetTur.singer.notesPlayed[1];
-            } else if (key === _("note value")) {
+            } else if (key === t("note value")) {
                 return Singer.RhythmActions.getNoteValue(target);
-            } else if (key === _("current pitch")) {
+            } else if (key === t("current pitch")) {
                 return targetTur.singer.lastNotePlayed[0];
-            } else if (key === _("pitch number")) {
+            } else if (key === t("pitch number")) {
                 let obj;
                 if (targetTur.singer.lastNotePlayed !== null) {
                     const len = targetTur.singer.lastNotePlayed[0].length;
@@ -131,17 +131,17 @@ function setupDictActions(activity) {
             const targetTur = activity.turtles.ithTurtle(target);
 
             // This is the internal turtle dictionary that includes the turtle status.
-            if (key === _("color")) {
+            if (key === t("color")) {
                 targetTur.painter.doSetColor(value);
-            } else if (key === _("shade")) {
+            } else if (key === t("shade")) {
                 targetTur.painter.doSetValue(value);
-            } else if (key === _("grey")) {
+            } else if (key === t("grey")) {
                 targetTur.painter.doSetChroma(value);
-            } else if (key === _("pen size")) {
+            } else if (key === t("pen size")) {
                 targetTur.painter.doSetPensize(value);
-            } else if (key === _("font")) {
+            } else if (key === t("font")) {
                 targetTur.painter.doSetFont(value);
-            } else if (key === _("heading")) {
+            } else if (key === t("heading")) {
                 targetTur.painter.doSetHeading(value);
             } else if (key === "y") {
                 const x = activity.turtles.screenX2turtleX(targetTur.container.x);
@@ -165,12 +165,12 @@ function setupDictActions(activity) {
 
             // This is the internal turtle dictionary that includes the turtle status.
             const this_dict = {};
-            this_dict[_("color")] = targetTur.painter.color;
-            this_dict[_("shade")] = targetTur.painter.value;
-            this_dict[_("grey")] = targetTur.painter.chroma;
-            this_dict[_("pen size")] = targetTur.painter.stroke;
-            this_dict[_("font")] = targetTur.painter.font;
-            this_dict[_("heading")] = targetTur.painter.orientation;
+            this_dict[t("color")] = targetTur.painter.color;
+            this_dict[t("shade")] = targetTur.painter.value;
+            this_dict[t("grey")] = targetTur.painter.chroma;
+            this_dict[t("pen size")] = targetTur.painter.stroke;
+            this_dict[t("font")] = targetTur.painter.font;
+            this_dict[t("heading")] = targetTur.painter.orientation;
             this_dict["y"] = activity.turtles.screenY2turtleY(targetTur.container.y);
             this_dict["x"] = activity.turtles.screenX2turtleX(targetTur.container.x);
 
@@ -252,11 +252,11 @@ function setupDictActions(activity) {
          */
         static getValue(dict, key, turtle, blk) {
               if( ! (dict in activity.logo.turtleDicts[turtle]) ){
-                var msg=_("Dictionary with this name does not exist");
+                var msg=t("Dictionary with this name does not exist");
                 return msg;
               }
               else if(! (key in activity.logo.turtleDicts[turtle][dict])){
-                  var msg=_("Key with this name does not exist in ") + dict;
+                  var msg=t("Key with this name does not exist in ") + dict;
                 return msg;
               }
 

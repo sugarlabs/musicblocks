@@ -30,12 +30,12 @@ function setupRhythmBlocks(activity) {
          */
         constructor() {
             //.TRANS: the value (e.g., 1/4 note) of the note being played.
-            super("mynotevalue", _("note value"));
+            super("mynotevalue", t("note value"));
             this.setPalette("rhythm", activity);
             this.parameter = true;
             this.beginnerBlock(true);
             this.setHelpString([
-                _(
+                t(
                     "The Note value block is the value of the duration of the note currently being played."
                 ),
                 "documentation",
@@ -136,7 +136,7 @@ function setupRhythmBlocks(activity) {
             super("osctime");
             this.setPalette("rhythm", activity);
             this.setHelpString([
-                _(
+                t(
                     "The Milliseconds block is similar to a Note block except that it uses time (in MS) to specify the note duration."
                 ),
                 "documentation",
@@ -145,7 +145,7 @@ function setupRhythmBlocks(activity) {
             ]);
 
             this.formBlock({
-                name: _("milliseconds"),
+                name: t("milliseconds"),
                 args: 1,
                 defaults: [200],
                 canCollapse: true
@@ -179,7 +179,7 @@ function setupRhythmBlocks(activity) {
 
             if (args[0] === null || typeof args[0] !== "number")
                 activity.errorMsg(NOINPUTERRORMSG, blk);
-            else if (args[0] <= 0) activity.errorMsg(_("Note value must be greater than 0."), blk);
+            else if (args[0] <= 0) activity.errorMsg(t("Note value must be greater than 0."), blk);
             const value =
                 args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
@@ -212,7 +212,7 @@ function setupRhythmBlocks(activity) {
             this.setHelpString();
 
             this.formBlock({
-                name: _("swing"),
+                name: t("swing"),
                 args: 1,
                 defaults: [32]
             });
@@ -275,7 +275,7 @@ function setupRhythmBlocks(activity) {
 
             this.formBlock({
                 //.TRANS: swing is a rhythmic variation that emphasises the offbeat
-                name: _("swing"),
+                name: t("swing"),
                 args: 1,
                 defaults: [1 / 24]
             });
@@ -338,7 +338,7 @@ function setupRhythmBlocks(activity) {
             super("newswing2");
             this.setPalette("rhythm", activity);
             this.setHelpString([
-                _(
+                t(
                     "The Swing block works on pairs of notes (specified by note value), adding some duration (specified by swing value) to the first note and taking the same amount from the second note."
                 ),
                 "documentation",
@@ -347,13 +347,13 @@ function setupRhythmBlocks(activity) {
             ]);
 
             this.formBlock({
-                name: _("swing"),
+                name: t("swing"),
                 args: 2,
                 defaults: [1 / 24, 1 / 8],
                 argLabels: [
                     //.TRANS: the amount to shift to the offbeat note
-                    _("swing value"),
-                    _("note value")
+                    t("swing value"),
+                    t("note value")
                 ],
                 canCollapse: true
             });
@@ -416,7 +416,7 @@ function setupRhythmBlocks(activity) {
             super("skipnotes");
             this.setPalette("rhythm", activity);
             this.setHelpString([
-                _("The Skip notes block will cause notes to be skipped."),
+                t("The Skip notes block will cause notes to be skipped."),
                 "documentation",
                 null,
                 "skiphelp"
@@ -424,7 +424,7 @@ function setupRhythmBlocks(activity) {
 
             this.formBlock({
                 //.TRANS: substitute rests on notes being skipped
-                name: _("skip notes"),
+                name: t("skip notes"),
                 args: 1,
                 defaults: [2],
                 canCollapse: true
@@ -476,7 +476,7 @@ function setupRhythmBlocks(activity) {
             super("multiplybeatfactor");
             this.setPalette("rhythm", activity);
             this.setHelpString([
-                _(
+                t(
                     "The Multiply note value block changes the duration of notes by changing their note values."
                 ),
                 "documentation",
@@ -486,7 +486,7 @@ function setupRhythmBlocks(activity) {
 
             this.formBlock({
                 //.TRANS: speed up note duration by some factor, e.g. convert 1/4 to 1/8 notes by using a factor of 2
-                name: _("multiply note value"),
+                name: t("multiply note value"),
                 args: 1,
                 defaults: [2],
                 canCollapse: true
@@ -539,7 +539,7 @@ function setupRhythmBlocks(activity) {
 
             this.beginnerBlock(true);
             this.setHelpString([
-                _("The Tie block works on pairs of notes, combining them into one note."),
+                t("The Tie block works on pairs of notes, combining them into one note."),
                 "documentation",
                 null,
                 "tiehelp"
@@ -547,7 +547,7 @@ function setupRhythmBlocks(activity) {
 
             this.formBlock({
                 //.TRANS: tie notes together into one longer note
-                name: _("tie"),
+                name: t("tie"),
                 canCollapse: true
             });
             this.makeMacro((x, y) => [
@@ -588,7 +588,7 @@ function setupRhythmBlocks(activity) {
             this.setHelpString();
 
             this.formBlock({
-                name: _("dot"),
+                name: t("dot"),
                 canCollapse: true
             });
             this.makeMacro((x, y) => [
@@ -616,7 +616,7 @@ function setupRhythmBlocks(activity) {
             if (arg >= 0) {
                 tur.singer.dotCount += arg;
             } else if (arg === -1) {
-                activity.errorMsg(_("An argument of -1 results in a note value of 0."), blk);
+                activity.errorMsg(t("An argument of -1 results in a note value of 0."), blk);
                 arg = 0;
             } else {
                 tur.singer.dotCount += 1 / arg;
@@ -658,9 +658,9 @@ function setupRhythmBlocks(activity) {
             this.setPalette("rhythm", activity);
             this.piemenuValuesC1 = [1, 2, 3];
             this.setHelpString([
-                _("The Dot block extends the duration of a note by 50%.") +
+                t("The Dot block extends the duration of a note by 50%.") +
                     " " +
-                    _("Eg a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat."),
+                    t("Eg a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat."),
                 "documentation",
                 null,
                 "dothelp"
@@ -668,7 +668,7 @@ function setupRhythmBlocks(activity) {
 
             this.formBlock({
                 //.TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
-                name: _("dot"),
+                name: t("dot"),
                 args: 1,
                 defaults: [1],
                 canCollapse: true
@@ -709,11 +709,11 @@ function setupRhythmBlocks(activity) {
          * Creates an instance of Rest2Block.
          */
         constructor() {
-            super("rest2", _("silence"));
+            super("rest2", t("silence"));
             this.setPalette("rhythm", activity);
             this.beginnerBlock(true);
             this.setHelpString([
-                _(
+                t(
                     "A rest of the specified note value duration can be constructed using a Silence block."
                 ),
                 "documentation",
@@ -762,8 +762,8 @@ function setupRhythmBlocks(activity) {
                 name:
                     this.lang === "ja"
                         ? //.TRANS: Japanese only: note value block for drum
-                          _("note value drum")
-                        : _("note value") + " " + _("drum"),
+                          t("note value drum")
+                        : t("note value") + " " + t("drum"),
                 args: 1,
                 canCollapse: true
             });
@@ -803,7 +803,7 @@ function setupRhythmBlocks(activity) {
             this.setHelpString();
 
             this.formBlock({
-                name: _("note value") + " " + value,
+                name: t("note value") + " " + value,
                 args: 1,
                 canCollapse: true
             });
@@ -826,7 +826,7 @@ function setupRhythmBlocks(activity) {
          * Creates an instance of Note3Block.
          */
         constructor() {
-            super("note3", _("392 hertz"));
+            super("note3", t("392 hertz"));
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "newnote", x, y, [null, 1, 4, 7]],
@@ -920,7 +920,7 @@ function setupRhythmBlocks(activity) {
          * Creates an instance of Note8Block.
          */
         constructor() {
-            super("note8", _("scale degree"));
+            super("note8", t("scale degree"));
             this.setHelpString();
             this.makeMacro((x, y) => [
                 [0, "newnote", x, y, [null, 1, 4, 8]],
@@ -1083,7 +1083,7 @@ function setupRhythmBlocks(activity) {
 
             if (args[0] === null || typeof args[0] !== "number")
                 activity.errorMsg(NOINPUTERRORMSG, blk);
-            else if (args[0] <= 0) activity.errorMsg(_("Note value must be greater than 0."), blk);
+            else if (args[0] <= 0) activity.errorMsg(t("Note value must be greater than 0."), blk);
             const value =
                 args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
 
@@ -1116,18 +1116,18 @@ function setupRhythmBlocks(activity) {
             this.setPalette("rhythm", activity);
             this.beginnerBlock(true);
             this.setHelpString([
-                _("The Note block is a container for one or more Pitch blocks.") +
+                t("The Note block is a container for one or more Pitch blocks.") +
                     " " +
-                    _("The Note block specifies the duration (note value) of its contents."),
+                    t("The Note block specifies the duration (note value) of its contents."),
                 "documentation",
                 null,
                 "note1"
             ]);
 
             this.formBlock({
-                name: _("note"),
+                name: t("note"),
                 args: 1,
-                argLabels: [this.lang === "ja" ? _("value2") : _("value")],
+                argLabels: [this.lang === "ja" ? t("value2") : t("value")],
                 defaults: [1 / 4],
                 canCollapse: true
             });
@@ -1159,7 +1159,7 @@ function setupRhythmBlocks(activity) {
 
             if (args[0] === null || typeof args[0] !== "number")
                 activity.errorMsg(NOINPUTERRORMSG, blk);
-            else if (args[0] <= 0) activity.errorMsg(_("Note value must be greater than 0."), blk);
+            else if (args[0] <= 0) activity.errorMsg(t("Note value must be greater than 0."), blk);
 
             const value =
                 args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
@@ -1197,7 +1197,7 @@ function setupRhythmBlocks(activity) {
             this.setHelpString();
 
             this.formBlock({
-                name: _("define frequency"),
+                name: t("define frequency"),
                 args: 1
             });
             this.hidden = true;
@@ -1215,7 +1215,7 @@ function setupRhythmBlocks(activity) {
          * Creates an instance of OctaveSpaceBlock.
          */
         constructor() {
-            super("octavespace", _("octave space"));
+            super("octavespace", t("octave space"));
             this.setPalette("rhythm", activity);
             this.setHelpString();
 

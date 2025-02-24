@@ -30,7 +30,7 @@ function setupProgramBlocks(activity) {
             super("loadHeapFromApp");
             this.setPalette("program", activity);
             this.setHelpString([
-                _("The Load-heap-from-app block loads the heap from a web page."),
+                t("The Load-heap-from-app block loads the heap from a web page."),
                 "documentation",
                 ""
             ]);
@@ -41,7 +41,7 @@ function setupProgramBlocks(activity) {
                  * @type {string}
                  */
                 //.TRANS: load the heap contents from a URL
-                name: _("load heap from App"),
+                name: t("load heap from App"),
 
                 /**
                  * The number of arguments expected by the block.
@@ -92,12 +92,12 @@ function setupProgramBlocks(activity) {
                 } catch (e) {
                     // eslint-disable-next-line no-console
                     console.debug(e);
-                    activity.errorMsg(_("Error parsing JSON data:") + e);
+                    activity.errorMsg(t("Error parsing JSON data:") + e);
                 }
             } else if (xmlHttp.readyState === 4 && xmlHttp.status !== 200) {
                 // eslint-disable-next-line no-console
                 console.debug("fetched the wrong page or network error...");
-                activity.errorMsg(_("404: Page not found"));
+                activity.errorMsg(t("404: Page not found"));
                 return;
             } else {
                 activity.errorMsg("xmlHttp.readyState: " + xmlHttp.readyState);
@@ -130,7 +130,7 @@ function setupProgramBlocks(activity) {
             super("saveHeapToApp");
             this.setPalette("program", activity);
             this.setHelpString([
-                _("The Save-heap-to-app block saves the heap to a web page."),
+                t("The Save-heap-to-app block saves the heap to a web page."),
                 "documentation",
                 ""
             ]);
@@ -141,7 +141,7 @@ function setupProgramBlocks(activity) {
                  * @type {string}
                  */
                 //.TRANS: save the heap contents to a URL
-                name: _("save heap to App"),
+                name: t("save heap to App"),
 
                 /**
                  * The number of arguments expected by the block.
@@ -186,7 +186,7 @@ function setupProgramBlocks(activity) {
                 xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
                 xmlHttp.send(data);
             } else {
-                activity.errorMsg(_("Cannot find a valid heap for") + " " + name);
+                activity.errorMsg(t("Cannot find a valid heap for") + " " + name);
             }
         }
     }
@@ -203,7 +203,7 @@ function setupProgramBlocks(activity) {
             super("loadHeap");
             this.setPalette("program", activity);
             this.setHelpString([
-                _("The Load-heap block loads the heap from a file."),
+                t("The Load-heap block loads the heap from a file."),
                 "documentation",
                 ""
             ]);
@@ -214,7 +214,7 @@ function setupProgramBlocks(activity) {
                  * @type {string}
                  */
                 //.TRANS: load the heap from a file
-                name: _("load heap"),
+                name: t("load heap"),
 
                 /**
                  * The number of arguments expected by the block.
@@ -255,7 +255,7 @@ function setupProgramBlocks(activity) {
             const c = block.connections[1];
             if (c != null && activity.blocks.blockList[c].name === "loadFile") {
                 if (args.length !== 1) {
-                    activity.errorMsg(_("You must select a file."));
+                    activity.errorMsg(t("You must select a file."));
                 } else {
                     try {
                         logo.turtleHeaps[turtle] = JSON.parse(
@@ -267,12 +267,12 @@ function setupProgramBlocks(activity) {
                     } catch (e) {
                         logo.turtleHeaps[turtle] = oldHeap;
                         activity.errorMsg(
-                            _("The file you selected does not contain a valid heap.")
+                            t("The file you selected does not contain a valid heap.")
                         );
                     }
                 }
             } else {
-                activity.errorMsg(_("The loadHeap block needs a loadFile block."));
+                activity.errorMsg(t("The loadHeap block needs a loadFile block."));
             }
         }
     }
@@ -288,7 +288,7 @@ function setupProgramBlocks(activity) {
         constructor() {
             super("setHeap");
             this.setPalette("program", activity);
-            this.setHelpString([_("The Set-heap block loads the heap."), "documentation", ""]);
+            this.setHelpString([t("The Set-heap block loads the heap."), "documentation", ""]);
 
             this.formBlock({
                 /**
@@ -296,7 +296,7 @@ function setupProgramBlocks(activity) {
                  * @type {string}
                  */
                 //.TRANS: load the heap from a JSON encoding
-                name: _("set heap"),
+                name: t("set heap"),
 
                 /**
                  * The number of arguments expected by the block.
@@ -337,10 +337,10 @@ function setupProgramBlocks(activity) {
                     }
                 } catch (e) {
                     logo.turtleHeaps[turtle] = oldHeap;
-                    activity.errorMsg(_("The block you selected does not contain a valid heap."));
+                    activity.errorMsg(t("The block you selected does not contain a valid heap."));
                 }
             } else {
-                activity.errorMsg(_("The Set heap block needs a heap."));
+                activity.errorMsg(t("The Set heap block needs a heap."));
             }
         }
     }
@@ -357,7 +357,7 @@ function setupProgramBlocks(activity) {
             super("loadDict");
             this.setPalette("program", activity);
             this.setHelpString([
-                _("The Load-dictionary block loads a dictionary from a file."),
+                t("The Load-dictionary block loads a dictionary from a file."),
                 "documentation",
                 ""
             ]);
@@ -369,7 +369,7 @@ function setupProgramBlocks(activity) {
                  * @type {string}
                  */
                 //.TRANS: load a dictionary from a file
-                name: _("load dictionary"),
+                name: t("load dictionary"),
 
                 /**
                  * The number of arguments expected by the block.
@@ -387,13 +387,13 @@ function setupProgramBlocks(activity) {
                  * The labels for the arguments.
                  * @type {string[]}
                  */
-                argLabels: [_("name"), _("file")],
+                argLabels: [t("name"), t("file")],
 
                 /**
                  * The default values for arguments.
                  * @type {Array}
                  */
-                defaults: [_("My Dictionary"), [null, null]]
+                defaults: [t("My Dictionary"), [null, null]]
             });
         }
 
@@ -424,7 +424,7 @@ function setupProgramBlocks(activity) {
             const c = block.connections[2];
             if (c != null && activity.blocks.blockList[c].name === "loadFile") {
                 if (args.length !== 2) {
-                    activity.errorMsg(_("You must select a file."));
+                    activity.errorMsg(t("You must select a file."));
                 } else {
                     try {
                         const d = JSON.parse(activity.blocks.blockList[c].value[1]);
@@ -441,12 +441,12 @@ function setupProgramBlocks(activity) {
                         }
                     } catch (e) {
                         activity.errorMsg(
-                            _("The file you selected does not contain a valid dictionary.")
+                            t("The file you selected does not contain a valid dictionary.")
                         );
                     }
                 }
             } else {
-                activity.errorMsg(_("The load dictionary block needs a load file block."));
+                activity.errorMsg(t("The load dictionary block needs a load file block."));
             }
         }
     }
@@ -463,7 +463,7 @@ function setupProgramBlocks(activity) {
             super("setDictionary");
             this.setPalette("program", activity);
             this.setHelpString([
-                _("The Set-dictionary block loads a dictionary."),
+                t("The Set-dictionary block loads a dictionary."),
                 "documentation",
                 ""
             ]);
@@ -474,7 +474,7 @@ function setupProgramBlocks(activity) {
                  * @type {string}
                  */
                 //.TRANS: load a dictionary from a JSON
-                name: _("set dictionary"),
+                name: t("set dictionary"),
 
                 /**
                  * The number of arguments expected by the block.
@@ -492,13 +492,13 @@ function setupProgramBlocks(activity) {
                  * The labels for the arguments.
                  * @type {string[]}
                  */
-                argLabels: [_("name"), _("dictionary")],
+                argLabels: [t("name"), t("dictionary")],
 
                 /**
                  * The default values for arguments.
                  * @type {Array}
                  */
-                defaults: [_("My Dictionary")]
+                defaults: [t("My Dictionary")]
             });
         }
 
@@ -543,11 +543,11 @@ function setupProgramBlocks(activity) {
                     }
                 } catch (e) {
                     activity.errorMsg(
-                        _("The block you selected does not contain a valid dictionary.")
+                        t("The block you selected does not contain a valid dictionary.")
                     );
                 }
             } else {
-                activity.errorMsg(_("The set dictionary block needs a dictionary."));
+                activity.errorMsg(t("The set dictionary block needs a dictionary."));
             }
         }
     }
@@ -564,7 +564,7 @@ function setupProgramBlocks(activity) {
             super("saveHeap");
             this.setPalette("program", activity);
             this.setHelpString([
-                _("The Save-heap block saves the heap to a file."),
+                t("The Save-heap block saves the heap to a file."),
                 "documentation",
                 ""
             ]);
@@ -575,7 +575,7 @@ function setupProgramBlocks(activity) {
                  * @type {string}
                  */
                 //.TRANS: save the heap to a file
-                name: _("save heap"),
+                name: t("save heap"),
 
                 /**
                  * The number of arguments expected by the block.
@@ -626,7 +626,7 @@ function setupProgramBlocks(activity) {
             super("saveDict");
             this.setPalette("program", activity);
             this.setHelpString([
-                _("The Save-dictionary block saves a dictionary to a file."),
+                t("The Save-dictionary block saves a dictionary to a file."),
                 "documentation",
                 ""
             ]);
@@ -637,7 +637,7 @@ function setupProgramBlocks(activity) {
                  * @type {string}
                  */
                 //.TRANS: save a dictionary to a file
-                name: _("save dictionary"),
+                name: t("save dictionary"),
 
                 /**
                  * The number of arguments expected by the block.
@@ -655,13 +655,13 @@ function setupProgramBlocks(activity) {
                  * The labels for the arguments.
                  * @type {string[]}
                  */
-                argLabels: [_("name"), _("file")],
+                argLabels: [t("name"), t("file")],
 
                 /**
                  * The default values for arguments.
                  * @type {Array}
                  */
-                defaults: [_("My Dictionary"), "dictionary.json"]
+                defaults: [t("My Dictionary"), "dictionary.json"]
             });
         }
 
@@ -717,14 +717,14 @@ function setupProgramBlocks(activity) {
         constructor() {
             super("openpalette");
             this.setPalette("program", activity);
-            this.setHelpString([_("The Open palette block opens a palette."), "documentation", ""]);
+            this.setHelpString([t("The Open palette block opens a palette."), "documentation", ""]);
 
             this.formBlock({
                 /**
                  * The name of the block.
                  * @type {string}
                  */
-                name: _("open palette"),
+                name: t("open palette"),
 
                 /**
                  * The number of arguments expected by the block.
@@ -742,7 +742,7 @@ function setupProgramBlocks(activity) {
                  * The default values for arguments.
                  * @type {string[]}
                  */
-                defaults: [_("rhythm")]
+                defaults: [t("rhythm")]
             });
         }
 
@@ -760,7 +760,7 @@ function setupProgramBlocks(activity) {
             }
 
             for (const p in activity.blocks.palettes.dict) {
-                if (_(activity.blocks.palettes.dict[p].name) === args[0].toLowerCase()) {
+                if (t(activity.blocks.palettes.dict[p].name) === args[0].toLowerCase()) {
                     activity.blocks.palettes.hide();
                     activity.blocks.palettes.dict[p].show();
                     activity.blocks.palettes.show();
@@ -782,7 +782,7 @@ function setupProgramBlocks(activity) {
             super("deleteblock");
             this.setPalette("program", activity);
             this.setHelpString([
-                _("The Delete block block removes a block."),
+                t("The Delete block block removes a block."),
                 "documentation",
                 "",
                 "deletehelp"
@@ -794,7 +794,7 @@ function setupProgramBlocks(activity) {
                  * @type {string}
                  */
                 //.TRANS: Move this block to the trash.
-                name: _("delete block"),
+                name: t("delete block"),
 
                 /**
                  * The number of arguments expected by the block.
@@ -858,7 +858,7 @@ function setupProgramBlocks(activity) {
         constructor() {
             super("moveblock");
             this.setPalette("program", activity);
-            this.setHelpString([_("The Move block block moves a block."), "documentation", ""]);
+            this.setHelpString([t("The Move block block moves a block."), "documentation", ""]);
 
             this.formBlock({
                 /**
@@ -866,7 +866,7 @@ function setupProgramBlocks(activity) {
                  * @type {string}
                  */
                 //.TRANS: Move the position of a block on the screen.
-                name: _("move block"),
+                name: t("move block"),
 
                 /**
                  * The number of arguments expected by the block.
@@ -878,7 +878,7 @@ function setupProgramBlocks(activity) {
                  * The labels for the arguments.
                  * @type {string[]}
                  */
-                argLabels: [_("block number"), _("x"), _("y")]
+                argLabels: [t("block number"), t("x"), t("y")]
             });
         }
 
@@ -919,7 +919,7 @@ function setupProgramBlocks(activity) {
             super("runblock");
             this.setPalette("program", activity);
             this.setHelpString([
-                _(
+                t(
                     "The Run block block runs a block. It accepts two types of arguments: block number or block name."
                 ),
                 "documentation",
@@ -932,7 +932,7 @@ function setupProgramBlocks(activity) {
                  * @type {string}
                  */
                 //.TRANS: Run program beginning at this block.
-                name: _("run block"),
+                name: t("run block"),
 
                 /**
                  * The number of arguments expected by the block.
@@ -1022,7 +1022,7 @@ function setupProgramBlocks(activity) {
             super("dockblock");
             this.setPalette("program", activity);
             this.setHelpString([
-                _("The Dock block block connections two blocks."),
+                t("The Dock block block connections two blocks."),
                 "documentation",
                 ""
             ]);
@@ -1033,7 +1033,7 @@ function setupProgramBlocks(activity) {
                  * @type {string}
                  */
                 //.TRANS: We can connect a block to another block.
-                name: _("connect blocks"),
+                name: t("connect blocks"),
 
                 /**
                  * The number of arguments expected by the block.
@@ -1045,7 +1045,7 @@ function setupProgramBlocks(activity) {
                  * The labels for the arguments.
                  * @type {string[]}
                  */
-                argLabels: [_("target block"), _("connection number"), _("block number")]
+                argLabels: [t("target block"), t("connection number"), t("block number")]
             });
         }
 
@@ -1137,7 +1137,7 @@ function setupProgramBlocks(activity) {
             super("makeblock");
             this.setPalette("program", activity);
             this.setHelpString([
-                _("The Make block block creates a new block."),
+                t("The Make block block creates a new block."),
                 "documentation",
                 "",
                 "makehelp"
@@ -1149,7 +1149,7 @@ function setupProgramBlocks(activity) {
                  * @type {string}
                  */
                 //.TRANS: Create a new block
-                name: _("make block"),
+                name: t("make block"),
 
                 /**
                  * The number of arguments expected by the block.
@@ -1183,7 +1183,7 @@ function setupProgramBlocks(activity) {
                  * The default values for the arguments.
                  * @type {Array}
                  */
-                defaults: [_("note")]
+                defaults: [t("note")]
             });
         }
 
@@ -1224,7 +1224,7 @@ function setupProgramBlocks(activity) {
 
             // We special case note blocks.
             //.TRANS: a musical note consisting of pitch and duration
-            if (name === _("note")) {
+            if (name === t("note")) {
                 let p, o, v;
                 switch (blockArgs.length) {
                     case 1:
@@ -1264,13 +1264,13 @@ function setupProgramBlocks(activity) {
                 // eslint-disable-next-line no-console
                 console.debug("BLOCKNUMBER " + blockNumber);
                 return blockNumber;
-            } else if (name === _("start")) {
+            } else if (name === t("start")) {
                 const newBlock = [[0, "start", x, y, [null, null, null]]];
                 activity.blocks.loadNewBlocks(newBlock);
                 // eslint-disable-next-line no-console
                 console.debug("BLOCKNUMBER " + blockNumber);
                 return blockNumber;
-            } else if (name === _("silence")) {
+            } else if (name === t("silence")) {
                 // FIXME: others too
                 const newBlock = [[0, "rest2", x, y, [null, null]]];
                 activity.blocks.loadNewBlocks(newBlock);
@@ -1282,7 +1282,7 @@ function setupProgramBlocks(activity) {
                 const protoblk = obj[0];
                 const protoName = obj[2];
                 if (protoblk === null) {
-                    activity.errorMsg(_("Cannot find block") + " " + name);
+                    activity.errorMsg(t("Cannot find block") + " " + name);
                     // eslint-disable-next-line no-console
                     console.debug("Cannot find block " + name);
                     return 0;
@@ -1301,7 +1301,7 @@ function setupProgramBlocks(activity) {
                                         activity.blocks.protoBlockDict[protoblk].dockTypes[i]
                                     )
                                 ) {
-                                    activity.errorMsg(_("Warning: block argument type mismatch"));
+                                    activity.errorMsg(t("Warning: block argument type mismatch"));
                                 }
                                 newBlock.push([i, ["number", { value: blockArgs[i] }], 0, 0, [0]]);
                             } else if (typeof blockArgs[i] === "string") {
@@ -1310,7 +1310,7 @@ function setupProgramBlocks(activity) {
                                         activity.blocks.protoBlockDict[protoblk].dockTypes[i]
                                     )
                                 ) {
-                                    activity.errorMsg(_("Warning: block argument type mismatch"));
+                                    activity.errorMsg(t("Warning: block argument type mismatch"));
                                 }
                                 newBlock.push([i, ["string", { value: blockArgs[i] }], 0, 0, [0]]);
                             } else {
@@ -1344,7 +1344,7 @@ function setupProgramBlocks(activity) {
             super("openProject");
             this.setPalette("program", activity);
             this.setHelpString([
-                _("The Open project block is used to open a project from a web page."),
+                t("The Open project block is used to open a project from a web page."),
                 "documentation",
                 ""
             ]);
@@ -1354,7 +1354,7 @@ function setupProgramBlocks(activity) {
                  * The name of the block.
                  * @type {string}
                  */
-                name: _("open project"),
+                name: t("open project"),
 
                 /**
                  * The number of arguments expected by the block.
@@ -1407,7 +1407,7 @@ function setupProgramBlocks(activity) {
                     "i"
                 ); // fragment locator
                 if (!pattern.test(str)) {
-                    activity.errorMsg(_("Please enter a valid URL."));
+                    activity.errorMsg(t("Please enter a valid URL."));
                     return false;
                 } else {
                     return true;

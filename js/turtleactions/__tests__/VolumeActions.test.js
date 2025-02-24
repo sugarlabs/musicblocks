@@ -105,7 +105,7 @@ describe('setupVolumeActions', () => {
         expect(activity.errorMsg).not.toHaveBeenCalled();
         Singer.VolumeActions.setMasterVolume(-10, 0, 1);
         expect(Singer.masterVolume).toContain(0);
-        expect(activity.errorMsg).toHaveBeenCalledWith(_('Setting volume to 0.'), 1);
+        expect(activity.errorMsg).toHaveBeenCalledWith(t('Setting volume to 0.'), 1);
     });
 
     it('should set synth volume correctly', () => {

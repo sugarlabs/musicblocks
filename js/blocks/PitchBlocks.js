@@ -36,7 +36,7 @@ function setupPitchBlocks(activity) {
 
     class SquareBlock extends FlowBlock {
         constructor() {
-            super("square", _("square"));
+            super("square", t("square"));
             this.setPalette("pitch", activity);
             this.formBlock({ args: 1, defaults: [440] });
             this.makeMacro((x, y) => [
@@ -59,7 +59,7 @@ function setupPitchBlocks(activity) {
 
     class TriangleBlock extends FlowBlock {
         constructor() {
-            super("triangle", _("triangle"));
+            super("triangle", t("triangle"));
             this.setPalette("pitch", activity);
             this.formBlock({ args: 1, defaults: [440] });
             this.makeMacro((x, y) => [
@@ -82,7 +82,7 @@ function setupPitchBlocks(activity) {
 
     class SineBlock extends FlowBlock {
         constructor() {
-            super("sine", _("sine"));
+            super("sine", t("sine"));
             this.setPalette("pitch", activity);
             this.formBlock({ args: 1, defaults: [440] });
             this.makeMacro((x, y) => [
@@ -105,7 +105,7 @@ function setupPitchBlocks(activity) {
 
     class SawtoothBlock extends FlowBlock {
         constructor() {
-            super("sawtooth", _("sawtooth"));
+            super("sawtooth", t("sawtooth"));
             this.setPalette("pitch", activity);
             this.formBlock({ args: 1, defaults: [440] });
             this.makeMacro((x, y) => [
@@ -138,7 +138,7 @@ function setupPitchBlocks(activity) {
     class TranspositionFactorBlock extends ValueBlock {
         constructor() {
             //.TRANS: musical transposition (adjustment of pitch up or down)
-            super("transpositionfactor", _("transposition"));
+            super("transpositionfactor", t("transposition"));
             this.setPalette("pitch", activity);
             this.hidden = true;
             this.parameter = true;
@@ -165,11 +165,11 @@ function setupPitchBlocks(activity) {
     class ConsonantStepSizeDownBlock extends ValueBlock {
         constructor() {
             //.TRANS: step down one note in current musical scale
-            super("consonantstepsizedown", _("scalar step down"));
+            super("consonantstepsizedown", t("scalar step down"));
             this.setPalette("pitch", activity);
             this.parameter = true;
             this.setHelpString([
-                _("The Scalar step down block returns the number of semi-tones down to the previous note in the current key and mode."),
+                t("The Scalar step down block returns the number of semi-tones down to the previous note in the current key and mode."),
                 "documentation",
                 ""
             ]);
@@ -187,11 +187,11 @@ function setupPitchBlocks(activity) {
     class ConsonantStepSizeUpBlock extends ValueBlock {
         constructor() {
             //.TRANS: step up one note in current musical scale
-            super("consonantstepsizeup", _("scalar step up"));
+            super("consonantstepsizeup", t("scalar step up"));
             this.setPalette("pitch", activity);
             this.parameter = true;
             this.setHelpString([
-                _("The Scalar step up block returns the number of semi-tones up to the next note in the current key and mode."),
+                t("The Scalar step up block returns the number of semi-tones up to the next note in the current key and mode."),
                 "documentation",
                 ""
             ]);
@@ -209,11 +209,11 @@ function setupPitchBlocks(activity) {
     class DeltaPitchBlock extends ValueBlock {
         constructor(name, displayName) {
             //.TRANS: the change measured in half-steps between the current pitch and the previous pitch
-            super(name || "deltapitch", displayName || _("change in pitch"));
+            super(name || "deltapitch", displayName || t("change in pitch"));
             this.setPalette("pitch", activity);
             this.parameter = true;
             this.setHelpString([
-                _("The Change in pitch block is the difference (in half steps) between the current pitch being played and the previous pitch played."),
+                t("The Change in pitch block is the difference (in half steps) between the current pitch being played and the previous pitch played."),
                 "documentation",
                 null,
                 "deltapitchhelp"
@@ -240,20 +240,20 @@ function setupPitchBlocks(activity) {
     class DeltaPitch2Block extends DeltaPitchBlock {
         constructor() {
             //.TRANS: the change measured in scale-steps between the current pitch and the previous pitch
-            super("deltapitch2", _("scalar change in pitch"));
+            super("deltapitch2", t("scalar change in pitch"));
         }
     }
 
     class MyPitchBlock extends ValueBlock {
         constructor() {
             //.TRANS: convert current note to piano key (1-88)
-            super("mypitch", _("pitch number"));
+            super("mypitch", t("pitch number"));
             this.setPalette("pitch", activity);
             this.beginnerBlock(true);
             this.parameter = true;
             this.hidden = true;
             this.setHelpString([
-                _("The Pitch number block is the value of the pitch of the note currently being played."),
+                t("The Pitch number block is the value of the pitch of the note currently being played."),
                 "documentation",
                 null,
                 "everybeathelp"
@@ -326,12 +326,12 @@ function setupPitchBlocks(activity) {
     class PitchInHertzBlock extends ValueBlock {
         constructor() {
             //.TRANS: the current pitch expressed in Hertz
-            super("pitchinhertz", _("pitch in hertz"));
+            super("pitchinhertz", t("pitch in hertz"));
             this.setPalette("pitch", activity);
             this.parameter = true;
             this.hidden = true;
             this.setHelpString([
-                _("The Pitch in Hertz block is the value in Hertz of the pitch of the note currently being played."),
+                t("The Pitch in Hertz block is the value in Hertz of the pitch of the note currently being played."),
                 "documentation",
                 ""
             ]);
@@ -364,13 +364,13 @@ function setupPitchBlocks(activity) {
 
     class CurrentPitchBlock extends ValueBlock {
         constructor() {
-            super("currentpitch", _("current pitch"));
+            super("currentpitch", t("current pitch"));
             this.setPalette("pitch", activity);
             this.beginnerBlock(true);
             this.parameter = true;
             this.formBlock({ outType: "pitchout" });
             this.setHelpString([
-                _("The Current Pitch block is used with the Pitch Converter block. In the example above, current pitch, sol 4, is displayed as 392 hertz."),
+                t("The Current Pitch block is used with the Pitch Converter block. In the example above, current pitch, sol 4, is displayed as 392 hertz."),
                 "documentation",
                 null,
                 "currentpitchhelp"
@@ -402,12 +402,12 @@ function setupPitchBlocks(activity) {
 
     class OutputToolsBlocks extends LeftBlock {
         constructor() {
-            super("outputtools", _("pitch converter"));
+            super("outputtools", t("pitch converter"));
             this.setPalette("pitch", activity);
             this.beginnerBlock(true);
             this.extraWidth = 50;
             this.setHelpString([
-                _("This block converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al."),
+                t("This block converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al."),
                 "documentation",
                 null,
                 "outputtoolshelp"
@@ -429,20 +429,20 @@ function setupPitchBlocks(activity) {
             ];
             // Ensure that these string are included for translation.
             this.piemenuLabels = [
-                _("pitch number"),
-                _("pitch in hertz"),
-                _("alphabet"),
+                t("pitch number"),
+                t("pitch in hertz"),
+                t("alphabet"),
                 //.TRANS: Translate as "alphabet class"
-                _("letter class"),
-                _("solfege class"),
-                _("staff y"),
-                _("solfege syllable"),
-                _("pitch class"),
-                _("scalar class"),
-                _("scale degree"),
-                _("nth degree"),
-                _("pitch to shade"),
-                _("pitch to color")
+                t("letter class"),
+                t("solfege class"),
+                t("staff y"),
+                t("solfege syllable"),
+                t("pitch class"),
+                t("scalar class"),
+                t("scale degree"),
+                t("nth degree"),
+                t("pitch to shade"),
+                t("pitch to color")
             ];
             this.formBlock({
                 args: 1,
@@ -613,7 +613,7 @@ function setupPitchBlocks(activity) {
 
     class OneOfPitchBlock extends ValueBlock {
         constructor() {
-            super("oneOfPitchBlock", _("one of"));
+            super("oneOfPitchBlock", t("one of"));
             this.setPalette("pitch", activity);
             this.makeMacro((x, y) => [
                 [0, "oneOf", x, y, [null, 1, 2, null]],
@@ -626,7 +626,7 @@ function setupPitchBlocks(activity) {
     class MIDIBlock extends FlowBlock {
         constructor() {
             //.TRANS: MIDI is a technical standard for electronic music
-            super("midi", _("MIDI"));
+            super("midi", t("MIDI"));
             this.setPalette("pitch", activity);
             this.makeMacro((x, y) => [
                 [0, "setpitchnumberoffset", x, y, [null, 1, 2, null]],
@@ -639,10 +639,10 @@ function setupPitchBlocks(activity) {
     class SetPitchNumberOffsetBlock extends FlowBlock {
         constructor() {
             //.TRANS: set an offset associated with the numeric piano keyboard mapping
-            super("setpitchnumberoffset", _("set pitch number offset"));
+            super("setpitchnumberoffset", t("set pitch number offset"));
             this.setPalette("pitch", activity);
             this.setHelpString([
-                _("The Set pitch number offset block is used to set the offset for mapping pitch numbers to pitch and octave."),
+                t("The Set pitch number offset block is used to set the offset for mapping pitch numbers to pitch and octave."),
                 "documentation",
                 null,
                 "pitchnumberhelp"
@@ -653,8 +653,8 @@ function setupPitchBlocks(activity) {
                 argTypes: ["anyin", "anyin"],
                 argLabels: [
                     //.TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
-                    this.lang === "ja" ? _("name2") : _("name"),
-                    _("octave")
+                    this.lang === "ja" ? t("name2") : t("name"),
+                    t("octave")
                 ]
             });
             this.makeMacro((x, y) => [
@@ -676,10 +676,10 @@ function setupPitchBlocks(activity) {
     class Number2PitchBlock extends LeftBlock {
         constructor(name, displayName) {
             //.TRANS: convert piano key number (1-88) to pitch
-            super(name || "number2pitch", displayName || _("number to pitch"));
+            super(name || "number2pitch", displayName || t("number to pitch"));
             this.setPalette("pitch", activity);
             this.setHelpString([
-                _("The Number to pitch block will convert a pitch number to a pich name."),
+                t("The Number to pitch block will convert a pitch number to a pich name."),
                 "documentation",
                 ""
             ]);
@@ -712,9 +712,9 @@ function setupPitchBlocks(activity) {
     class Number2OctaveBlock extends Number2PitchBlock {
         constructor() {
             //.TRANS: convert piano key number (1-88) to octave
-            super("number2octave", _("number to octave"));
+            super("number2octave", t("number to octave"));
             this.setHelpString([
-                _("The Number to octave block will convert a pitch number to an octave."),
+                t("The Number to octave block will convert a pitch number to an octave."),
                 "documentation",
                 ""
             ]);
@@ -723,10 +723,10 @@ function setupPitchBlocks(activity) {
 
     class StaffYToPitch extends LeftBlock {
         constructor() {
-            super("ytopitch", _("y to pitch"));
+            super("ytopitch", t("y to pitch"));
             this.setPalette("pitch", activity);
             this.setHelpString([
-                _("Y to pitch block will convert a staff y position to corresponding pitch notation."),
+                t("Y to pitch block will convert a staff y position to corresponding pitch notation."),
                 "documentation",
                 ""
             ]);
@@ -838,10 +838,10 @@ function setupPitchBlocks(activity) {
 
     class AccidentalNameBlock extends ValueBlock {
         constructor() {
-            super("accidentalname", _("accidental selector"));
+            super("accidentalname", t("accidental selector"));
             this.setPalette("pitch", activity);
             this.setHelpString([
-                _("The Accidental selector block is used to choose between double-sharp, sharp, natural, flat, and double-flat."),
+                t("The Accidental selector block is used to choose between double-sharp, sharp, natural, flat, and double-flat."),
                 "documentation",
                 ""
             ]);
@@ -852,10 +852,10 @@ function setupPitchBlocks(activity) {
 
     class EastIndianSolfegeBlock extends ValueBlock {
         constructor() {
-            super("eastindiansolfege", _("east indian solfege"));
+            super("eastindiansolfege", t("east indian solfege"));
             this.setPalette("pitch", activity);
             this.setHelpString([
-                _("Pitch can be specified in terms of ni dha pa ma ga re sa."),
+                t("Pitch can be specified in terms of ni dha pa ma ga re sa."),
                 "documentation",
                 null,
                 "eihelp"
@@ -866,10 +866,10 @@ function setupPitchBlocks(activity) {
 
     class NoteNameBlock extends ValueBlock {
         constructor() {
-            super("notename", _("note name"));
+            super("notename", t("note name"));
             this.setPalette("pitch", activity);
             this.setHelpString([
-                _("Pitch can be specified in terms of C D E F G A B."),
+                t("Pitch can be specified in terms of C D E F G A B."),
                 "documentation",
                 null,
                 "note2"
@@ -881,10 +881,10 @@ function setupPitchBlocks(activity) {
 
     class SolfegeBlock extends ValueBlock {
         constructor() {
-            super("solfege", _("solfege"));
+            super("solfege", t("solfege"));
             this.setPalette("pitch", activity);
             this.setHelpString([
-                _("Pitch can be specified in terms of do re mi fa sol la ti."),
+                t("Pitch can be specified in terms of do re mi fa sol la ti."),
                 "documentation",
                 null,
                 "note1"
@@ -919,22 +919,22 @@ function setupPitchBlocks(activity) {
             super("invert1");
             this.setPalette("pitch", activity);
             this.setHelpString([
-                _("The Invert block rotates any contained notes around a target note."),
+                t("The Invert block rotates any contained notes around a target note."),
                 "documentation",
                 null,
                 "inverthelp"
             ]);
             this.formBlock({
                 //.TRANS: pitch inversion rotates a pitch around another pitch
-                name: _("Invert").toLowerCase(),
+                name: t("Invert").toLowerCase(),
                 args: 3,
-                defaults: ["sol", 4, _("even")],
+                defaults: ["sol", 4, t("even")],
                 argTypes: ["solfegein", "anyin", "anyin"],
                 argLabels: [
-                    this.lang === "ja" ? _("name2") : _("name"),
-                    _("octave"),
+                    this.lang === "ja" ? t("name2") : t("name"),
+                    t("octave"),
                     //.TRANS: invert based on even or odd number or musical scale
-                    _("even") + "/" + _("odd") + "/" + _("scalar")
+                    t("even") + "/" + t("odd") + "/" + t("scalar")
                 ]
             });
             this.makeMacro((x, y) => [
@@ -965,13 +965,13 @@ function setupPitchBlocks(activity) {
     class Invert2Block extends FlowClampBlock {
         constructor(name, displayName) {
             //.TRANS: pitch inversion rotates a pitch around another pitch (odd number)
-            super(name || "invert2", displayName || _("invert (odd)"));
+            super(name || "invert2", displayName || t("invert (odd)"));
             this.setPalette("pitch", activity);
             this.formBlock({
                 args: 2,
                 defaults: ["sol", 4],
                 argTypes: ["solfegein", "anyin"],
-                argLabels: [_("note"), _("octave")]
+                argLabels: [t("note"), t("octave")]
             });
             this.hidden = this.deprecated = true;
         }
@@ -998,13 +998,13 @@ function setupPitchBlocks(activity) {
     class InvertBlock extends Invert2Block {
         constructor() {
             //.TRANS: pitch inversion rotates a pitch around another pitch (even number)
-            super("invert", _("invert (even)"));
+            super("invert", t("invert (even)"));
             this.setPalette("pitch", activity);
             this.formBlock({
                 args: 2,
                 defaults: ["sol", 4],
                 argTypes: ["solfegein", "anyin"],
-                argLabels: [_("note"), _("octave")]
+                argLabels: [t("note"), t("octave")]
             });
             this.makeMacro((x, y) => [
                 [0, "invert", x, y, [null, 1, 2, null, 3]],
@@ -1019,11 +1019,11 @@ function setupPitchBlocks(activity) {
     class RegisterBlock extends FlowBlock {
         constructor() {
             //.TRANS: register is the octave of the current pitch
-            super("register", _("register"));
+            super("register", t("register"));
             this.setPalette("pitch", activity);
             this.piemenuValuesC1 = [-3, -2, -1, 0, 1, 2, 3];
             this.setHelpString([
-                _("The Register block provides an easy way to modify the register (octave) of the notes that follow it."),
+                t("The Register block provides an easy way to modify the register (octave) of the notes that follow it."),
                 "documentation",
                 null,
                 "registerhelp"
@@ -1044,7 +1044,7 @@ function setupPitchBlocks(activity) {
     class FiftyCentsBlock extends FlowBlock {
         constructor() {
             //.TRANS: cents are units used to specify the ratio between pitches. There are 100 cents between successive notes.
-            super("50cents", _("50 cents"));
+            super("50cents", t("50 cents"));
             this.setPalette("pitch", activity);
             this.makeMacro((x, y) => [
                 [0, "settransposition", x, y, [null, 12, 1, 2]],
@@ -1099,15 +1099,15 @@ function setupPitchBlocks(activity) {
                 12
             ];
             this.setHelpString([
-                _("The Semi-tone transposition block will shift the pitches contained inside Note blocks up (or down) by half steps.") +
+                t("The Semi-tone transposition block will shift the pitches contained inside Note blocks up (or down) by half steps.") +
                     " " +
-                    _("In the example shown above, sol is shifted up to sol#."),
+                    t("In the example shown above, sol is shifted up to sol#."),
                 "documentation",
                 ""
             ]);
             this.formBlock({
                 //.TRANS: adjust the amount of shift (up or down) of a pitch
-                name: _("semi-tone transpose"),
+                name: t("semi-tone transpose"),
                 args: 1,
                 defaults: ["1"]
             });
@@ -1140,13 +1140,13 @@ function setupPitchBlocks(activity) {
             super("setratio");
             this.setPalette("pitch", activity);
             this.setHelpString([
-                _("The Transpose by Ratio block will shift the pitches contained inside Note blocks up (or down) by a ratio"),
+                t("The Transpose by Ratio block will shift the pitches contained inside Note blocks up (or down) by a ratio"),
                 "documentation",
                 ""
             ]);
             this.formBlock({
                 //.TRANS: adjust the amount of shift (up or down) of a pitch
-                name: _("transpose by ratio"),
+                name: t("transpose by ratio"),
                 args: 1,
                 defaults: [3 / 2]
             });
@@ -1191,7 +1191,7 @@ function setupPitchBlocks(activity) {
     class OctaveBlock extends FlowBlock {
         constructor() {
             //.TRANS: adjusts the shift up or down by one octave (twelve half-steps in the interval between two notes, one having twice or half the frequency in Hz of the other.)
-            super("octave", _("octave"));
+            super("octave", t("octave"));
             this.setPalette("pitch", activity);
             this.makeMacro((x, y) => [
                 [0, "settransposition", x, y, [null, 1, 4, 5]],
@@ -1206,7 +1206,7 @@ function setupPitchBlocks(activity) {
 
     class CustomPitchBlock extends FlowBlock {
         constructor() {
-            super("custompitch", _("custom pitch"));
+            super("custompitch", t("custom pitch"));
             this.setPalette("pitch", activity);
             this.makeMacro((x, y) => [
                 [0, "pitch", x, y, [null, 1, 2, null]],
@@ -1229,7 +1229,7 @@ function setupPitchBlocks(activity) {
     class DownSixthBlock extends FlowBlock {
         constructor() {
             //.TRANS: down sixth means the note is five scale degrees below current note
-            super("downsixth", _("down sixth"));
+            super("downsixth", t("down sixth"));
             this.setPalette("pitch", activity);
             this.makeMacro((x, y) => [
                 [0, "setscalartransposition", x, y, [null, 1, 6, 8]],
@@ -1248,7 +1248,7 @@ function setupPitchBlocks(activity) {
     class DownThirdBlock extends FlowBlock {
         constructor() {
             //.TRANS: down third means the note is two scale degrees below current note
-            super("downthird", _("down third"));
+            super("downthird", t("down third"));
             this.setPalette("pitch", activity);
             this.makeMacro((x, y) => [
                 [0, "setscalartransposition", x, y, [null, 1, 6, 8]],
@@ -1267,7 +1267,7 @@ function setupPitchBlocks(activity) {
     class SeventhBlock extends FlowBlock {
         constructor() {
             //.TRANS: seventh means the note is the six scale degrees above current note
-            super("seventh", _("seventh"));
+            super("seventh", t("seventh"));
             this.setPalette("pitch", activity);
             this.makeMacro((x, y) => [
                 [0, "setscalartransposition", x, y, [null, 1, 6, 8]],
@@ -1286,7 +1286,7 @@ function setupPitchBlocks(activity) {
     class SixthBlock extends FlowBlock {
         constructor() {
             //.TRANS: sixth means the note is the five scale degrees above current note
-            super("sixth", _("sixth"));
+            super("sixth", t("sixth"));
             this.setPalette("pitch", activity);
             this.makeMacro((x, y) => [
                 [0, "setscalartransposition", x, y, [null, 1, 6, 8]],
@@ -1305,7 +1305,7 @@ function setupPitchBlocks(activity) {
     class FifthBlock extends FlowBlock {
         constructor() {
             //.TRANS: fifth means the note is the four scale degrees above current note
-            super("fifth", _("fifth"));
+            super("fifth", t("fifth"));
             this.setPalette("pitch", activity);
             this.beginnerBlock(true);
             this.makeMacro((x, y) => [
@@ -1325,7 +1325,7 @@ function setupPitchBlocks(activity) {
     class FourthBlock extends FlowBlock {
         constructor() {
             //.TRANS: fourth means the note is three scale degrees above current note
-            super("fourth", _("fourth"));
+            super("fourth", t("fourth"));
             this.setPalette("pitch", activity);
             this.beginnerBlock(true);
             this.makeMacro((x, y) => [
@@ -1344,7 +1344,7 @@ function setupPitchBlocks(activity) {
     class ThirdBlock extends FlowBlock {
         constructor() {
             //.TRANS: third means the note is two scale degrees above current note
-            super("third", _("third"));
+            super("third", t("third"));
             this.setPalette("pitch", activity);
             this.makeMacro((x, y) => [
                 [0, "setscalartransposition", x, y, [null, 1, 6, 8]],
@@ -1363,7 +1363,7 @@ function setupPitchBlocks(activity) {
     class SecondBlock extends FlowBlock {
         constructor() {
             //.TRANS: second means the note is one scale degree above current note
-            super("second", _("second"));
+            super("second", t("second"));
             this.setPalette("pitch", activity);
             this.makeMacro((x, y) => [
                 [0, "setscalartransposition", x, y, [null, 1, 6, 8]],
@@ -1382,7 +1382,7 @@ function setupPitchBlocks(activity) {
     class UnisonBlock extends FlowBlock {
         constructor() {
             //.TRANS: unison means the note is the same as the current note
-            super("unison", _("unison"));
+            super("unison", t("unison"));
             this.setPalette("pitch", activity);
             this.makeMacro((x, y) => [
                 [0, "setscalartransposition", x, y, [null, 1, 6, 8]],
@@ -1404,16 +1404,16 @@ function setupPitchBlocks(activity) {
             this.setPalette("pitch", activity);
             this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.setHelpString([
-                _("The Scalar transposition block will shift the pitches contained inside Note blocks up (or down) the scale.") +
+                t("The Scalar transposition block will shift the pitches contained inside Note blocks up (or down) the scale.") +
                     " " +
-                    _("In the example shown above, sol is shifted up to la."),
+                    t("In the example shown above, sol is shifted up to la."),
                 "documentation",
                 null,
                 "scalartranshelp"
             ]);
             this.formBlock({
                 //.TRANS: adjust the amount of shift (up or down) of a pitch by musical scale (scalar) steps
-                name: _("scalar transpose") + " (+/–)",
+                name: t("scalar transpose") + " (+/–)",
                 args: 1,
                 defaults: ["1"]
             });
@@ -1448,14 +1448,14 @@ function setupPitchBlocks(activity) {
             super("accidental");
             this.setPalette("pitch", activity);
             this.setHelpString([
-                _("The Accidental block is used to create sharps and flats"),
+                t("The Accidental block is used to create sharps and flats"),
                 "documentation",
                 null,
                 "accidental"
             ]);
             this.formBlock({
                 //.TRANS: An accidental is a modification to a pitch, e.g., sharp or flat.
-                name: _("accidental override"),
+                name: t("accidental override"),
                 args: 1,
                 argTypes:["anyin"]
             });
@@ -1495,7 +1495,7 @@ function setupPitchBlocks(activity) {
             super("flat");
             this.setPalette("pitch", activity);
             //.TRANS: flat is a half-step down in pitch
-            this.formBlock({ name: _("flat") + " ♭" });
+            this.formBlock({ name: t("flat") + " ♭" });
             this.makeMacro((x, y) => [
                 [0, "accidental", x, y, [null, 11, 1, 10]],
                 [1, "newnote", x, y, [0, 2, 5, 9]],
@@ -1536,7 +1536,7 @@ function setupPitchBlocks(activity) {
             super("sharp");
             this.setPalette("pitch", activity);
             //.TRANS: sharp is a half-step up in pitch
-            this.formBlock({ name: _("sharp") + " ♯" });
+            this.formBlock({ name: t("sharp") + " ♯" });
             this.makeMacro((x, y) => [
                 [0, "accidental", x, y, [null, 11, 1, 10]],
                 [1, "newnote", x, y, [0, 2, 5, 9]],
@@ -1574,11 +1574,11 @@ function setupPitchBlocks(activity) {
     class HertzBlock extends FlowBlock {
         constructor() {
             //.TRANS: a measure of frequency: one cycle per second
-            super("hertz", _("hertz"));
+            super("hertz", t("hertz"));
             this.setPalette("pitch", activity);
             this.beginnerBlock(true);
             this.setHelpString([
-                _("The Hertz block (in combination with a Number block) will play a sound at the specified frequency."),
+                t("The Hertz block (in combination with a Number block) will play a sound at the specified frequency."),
                 "documentation",
                 null,
                 "note3"
@@ -1664,11 +1664,11 @@ function setupPitchBlocks(activity) {
     class PitchNumberBlock extends FlowBlock {
         constructor() {
             //.TRANS: a mapping of pitch to the 88 piano keys
-            super("pitchnumber", _("pitch number"));
+            super("pitchnumber", t("pitch number"));
             this.setPalette("pitch", activity);
             this.beginnerBlock(true);
             this.setHelpString([
-                _("The Pitch Number block will play a pitch associated by its number, e.g. 0 for C and 7 for G."),
+                t("The Pitch Number block will play a pitch associated by its number, e.g. 0 for C and 7 for G."),
                 "documentation",
                 null,
                 "note5"
@@ -1700,12 +1700,12 @@ function setupPitchBlocks(activity) {
     class ScaleDegreeBlock extends FlowBlock {
         constructor() {
             //.TRANS: a numeric mapping of the notes in an octave based on the musical mode
-            super("scaledegree", _("nth modal pitch"));
+            super("scaledegree", t("nth modal pitch"));
             this.setPalette("pitch", activity);
             this.setHelpString([
-                _("nth Modal Pitch takes the pattern of pitches in semitones for a mode and makes each point a degree of the mode,") +
+                t("nth Modal Pitch takes the pattern of pitches in semitones for a mode and makes each point a degree of the mode,") +
                     " " +
-                    _("starting from 1 and regardless of tonal framework (i.e. not always 8 notes in the octave)"),
+                    t("starting from 1 and regardless of tonal framework (i.e. not always 8 notes in the octave)"),
                 "documentation",
                 ""
             ]);
@@ -1714,7 +1714,7 @@ function setupPitchBlocks(activity) {
             this.formBlock({
                 args: 2,
                 defaults: [4, 4], // 4 is G in C Major
-                argLabels: [_("number"), _("octave")],
+                argLabels: [t("number"), t("octave")],
                 argTypes: ["numberin", "anyin"]
             });
         }
@@ -1742,20 +1742,20 @@ function setupPitchBlocks(activity) {
     class NthModalPitchBlock extends FlowBlock {
         constructor() {
             //.TRANS: a numeric mapping of the notes in an octave based on the musical mode
-            super("nthmodalpitch", _("nth modal pitch"));
+            super("nthmodalpitch", t("nth modal pitch"));
             this.setPalette("pitch", activity);
             this.piemenuValuesC1 = [7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7];
             this.setHelpString([
-                _("Nth Modal Pitch takes a number as an input as the nth degree for the given mode. 0 is the first position, 1 is the second, -1 is the note before the first etc.") +
+                t("Nth Modal Pitch takes a number as an input as the nth degree for the given mode. 0 is the first position, 1 is the second, -1 is the note before the first etc.") +
                     " " +
-                    _("The pitches change according to the mode specified without any need for respellings."),
+                    t("The pitches change according to the mode specified without any need for respellings."),
                 "documentation",
                 ""
             ]);
             this.formBlock({
                 args: 2,
                 defaults: [4, 4], // 4 is G in C Major
-                argLabels: [_("number"), _("octave")],
+                argLabels: [t("number"), t("octave")],
                 argTypes: ["numberin", "anyin"]
             });
         }
@@ -1783,13 +1783,13 @@ function setupPitchBlocks(activity) {
     class ScaleDegree2Block extends ValueBlock {
         constructor() {
             //.TRANS: a numeric mapping of the notes in an octave based on the musical mode
-            super("scaledegree2", _("scale degree"));
+            super("scaledegree2", t("scale degree"));
             this.setPalette("pitch", activity);
             this.extraWidth = 10;
             this.setHelpString([
-                _("Scale Degree is a common convention in music. Scale Degree offers seven possible positions in the scale (1-7) and can be modified via accidentals.") +
+                t("Scale Degree is a common convention in music. Scale Degree offers seven possible positions in the scale (1-7) and can be modified via accidentals.") +
                     " " +
-                    _("Scale Degree 1 is always the first pitch in a given scale, regardless of octave."),
+                    t("Scale Degree 1 is always the first pitch in a given scale, regardless of octave."),
                 "documentation",
                 ""
             ]);
@@ -1811,14 +1811,14 @@ function setupPitchBlocks(activity) {
     class StepPitchBlock extends FlowBlock {
         constructor() {
             //.TRANS: step some number of notes in current musical scale
-            super("steppitch", _("scalar step") + " (+/–)");
+            super("steppitch", t("scalar step") + " (+/–)");
             this.setPalette("pitch", activity);
             this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.beginnerBlock(true);
             this.setHelpString([
-                _("The Scalar Step block (in combination with a Number block) will play the next pitch in a scale,") +
+                t("The Scalar Step block (in combination with a Number block) will play the next pitch in a scale,") +
                     " " +
-                    _("eg if the last note played was sol, Scalar Step 1 will play la."),
+                    t("eg if the last note played was sol, Scalar Step 1 will play la."),
                 "documentation",
                 ""
             ]);
@@ -1836,7 +1836,7 @@ function setupPitchBlocks(activity) {
 
     class Pitch2Block extends FlowBlock {
         constructor() {
-            super("pitch2", _("pitch") + " " + "G4");
+            super("pitch2", t("pitch") + " " + "G4");
             this.setPalette("pitch", activity);
             this.makeMacro((x, y) => [
                 [0, "pitch", x, y, [null, 1, 2, null]],
@@ -1850,11 +1850,11 @@ function setupPitchBlocks(activity) {
     class PitchBlock extends FlowBlock {
         constructor() {
             //.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
-            super("pitch", _("pitch"));
+            super("pitch", t("pitch"));
             this.setPalette("pitch", activity);
             this.beginnerBlock(true);
             this.setHelpString([
-                _("The Pitch block specifies the pitch name and octave of a note that together determine the frequency of the note."),
+                t("The Pitch block specifies the pitch name and octave of a note that together determine the frequency of the note."),
                 "documentation",
                 null,
                 "note1"
@@ -1863,7 +1863,7 @@ function setupPitchBlocks(activity) {
                 args: 2,
                 defaults: ["sol", 4],
                 argTypes: ["solfegein", "anyin"],
-                argLabels: [this.lang === "ja" ? _("name2") : _("name"), _("octave")]
+                argLabels: [this.lang === "ja" ? t("name2") : t("name"), t("octave")]
             });
         }
 

@@ -33,7 +33,7 @@ function setupSensorsBlocks(activity) {
             this.setPalette("sensors", activity);
             this.parameter = true;
             this.setHelpString([
-                _("The Input block prompts for keyboard input."),
+                t("The Input block prompts for keyboard input."),
                 "documentation",
                 ""
             ]);
@@ -43,7 +43,7 @@ function setupSensorsBlocks(activity) {
                  * The name of the block.
                  * @type {string}
                  */
-                name: _("input"),
+                name: t("input"),
 
                 /**
                  * The number of arguments expected by the block.
@@ -61,7 +61,7 @@ function setupSensorsBlocks(activity) {
                  * The default values for the arguments.
                  * @type {Array}
                  */
-                defaults: [_("Input a value")]
+                defaults: [t("Input a value")]
             });
         }
 
@@ -123,12 +123,12 @@ function setupSensorsBlocks(activity) {
          * Constructs a new InputValueBlock instance.
          */
         constructor() {
-            super("inputvalue", _("input value"));
+            super("inputvalue", t("input value"));
             this.setPalette("sensors", activity);
             this.parameter = true;
 
             this.setHelpString([
-                _("The Input-value block stores the input."),
+                t("The Input-value block stores the input."),
                 "documentation",
                 null,
                 "input"
@@ -175,7 +175,7 @@ function setupSensorsBlocks(activity) {
          * Constructs a new PitchnessBlock instance.
          */
         constructor() {
-            super("pitchness", _("pitch"));
+            super("pitchness", t("pitch"));
             this.setPalette("sensors", activity);
             this.parameter = true;
         }
@@ -235,14 +235,14 @@ function setupSensorsBlocks(activity) {
          * Constructs a new LoudnessBlock instance.
          */
         constructor() {
-            super("loudness", _("loudness"));
+            super("loudness", t("loudness"));
             this.setPalette("sensors", activity);
             this.parameter = true;
             // Put this block on the beginner palette except in Japanese.
             this.beginnerBlock(!(this.lang === "ja"));
 
             this.setHelpString([
-                _("The Loudness block returns the volume detected by the microphone."),
+                t("The Loudness block returns the volume detected by the microphone."),
                 "documentation",
                 ""
             ]);
@@ -297,20 +297,20 @@ function setupSensorsBlocks(activity) {
          * Constructs a new MyClickBlock instance.
          */
         constructor() {
-            super("myclick", _("click"));
+            super("myclick", t("click"));
             this.setPalette("sensors", activity);
             this.beginnerBlock(true);
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _("The Click block triggers an event if a mouse has been clicked."),
+                    t("The Click block triggers an event if a mouse has been clicked."),
                     "documentation",
                     null,
                     "clickhelp"
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Click block triggers an event if a turtle has been clicked."),
+                    t("The Click block triggers an event if a turtle has been clicked."),
                     "documentation",
                     null,
                     "clickhelp"
@@ -339,12 +339,12 @@ function setupSensorsBlocks(activity) {
          */
         constructor() {
             // TRANS: The mouse cursor is over the mouse icon
-            super("mycursorover", _("cursor over"));
+            super("mycursorover", t("cursor over"));
             this.setPalette("sensors", activity);
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _(
+                    t(
                         "The Cursor over block triggers an event when the cursor is moved over a mouse."
                     ),
                     "documentation",
@@ -353,7 +353,7 @@ function setupSensorsBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    _(
+                    t(
                         "The Cursor over block triggers an event when the cursor is moved over a turtle."
                     ),
                     "documentation",
@@ -384,13 +384,13 @@ function setupSensorsBlocks(activity) {
          */
         constructor() {
             // TRANS: The cursor is "out" -- it is no longer over the mouse.
-            super("mycursorout", _("cursor out"));
+            super("mycursorout", t("cursor out"));
             this.setPalette("sensors", activity);
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
                     // TRANS: hover
-                    _(
+                    t(
                         "The Cursor out block triggers an event when the cursor is moved off of a mouse."
                     ),
                     "documentation",
@@ -400,7 +400,7 @@ function setupSensorsBlocks(activity) {
             } else {
                 this.setHelpString([
                     // TRANS: hover
-                    _(
+                    t(
                         "The Cursor out block triggers an event when the cursor is moved off of a turtle."
                     ),
                     "documentation",
@@ -430,12 +430,12 @@ function setupSensorsBlocks(activity) {
          * Constructs a new MyCursordownBlock instance.
          */
         constructor() {
-            super("mycursordown", _("cursor button down"));
+            super("mycursordown", t("cursor button down"));
             this.setPalette("sensors", activity);
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _(
+                    t(
                         "The Cursor button down block triggers an event when the cursor button is pressed on a mouse."
                     ),
                     "documentation",
@@ -444,7 +444,7 @@ function setupSensorsBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    _(
+                    t(
                         "The Cursor button down block triggers an event when the cursor button is pressed on a turtle."
                     ),
                     "documentation",
@@ -474,12 +474,12 @@ function setupSensorsBlocks(activity) {
          * Constructs a new MyCursorupBlock instance.
          */
         constructor() {
-            super("mycursorup", _("cursor button up"));
+            super("mycursorup", t("cursor button up"));
             this.setPalette("sensors", activity);
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _(
+                    t(
                         "The Cursor button up block triggers an event when the cursor button is released while over a mouse."
                     ),
                     "documentation",
@@ -488,7 +488,7 @@ function setupSensorsBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    _(
+                    t(
                         "The Cursor button up block triggers an event when the cursor button is released while over a turtle."
                     ),
                     "documentation",
@@ -518,12 +518,12 @@ function setupSensorsBlocks(activity) {
          * Constructs a new GetBlueBlock instance.
          */
         constructor() {
-            super("getblue", _("blue"));
+            super("getblue", t("blue"));
             this.setPalette("sensors", activity);
             this.parameter = true;
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _(
+                    t(
                         "The Get blue block returns the blue component of the pixel under the mouse."
                     ),
                     "documentation",
@@ -531,7 +531,7 @@ function setupSensorsBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    _(
+                    t(
                         "The Get blue block returns the blue component of the pixel under the turtle."
                     ),
                     "documentation",
@@ -574,12 +574,12 @@ function setupSensorsBlocks(activity) {
          * Constructs a new GetGreenBlock instance.
          */
         constructor() {
-            super("getgreen", _("green"));
+            super("getgreen", t("green"));
             this.setPalette("sensors", activity);
             this.parameter = true;
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _(
+                    t(
                         "The Get green block returns the green component of the pixel under the mouse."
                     ),
                     "documentation",
@@ -587,7 +587,7 @@ function setupSensorsBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    _(
+                    t(
                         "The Get green block returns the green component of the pixel under the turtle."
                     ),
                     "documentation",
@@ -630,18 +630,18 @@ function setupSensorsBlocks(activity) {
          * Constructs a new GetRedBlock instance.
          */
         constructor() {
-            super("getred", _("red"));
+            super("getred", t("red"));
             this.setPalette("sensors", activity);
             this.parameter = true;
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _("The Get red block returns the red component of the pixel under the mouse."),
+                    t("The Get red block returns the red component of the pixel under the mouse."),
                     "documentation",
                     ""
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Get red block returns the red component of the pixel under the turtle."),
+                    t("The Get red block returns the red component of the pixel under the turtle."),
                     "documentation",
                     ""
                 ]);
@@ -682,18 +682,18 @@ function setupSensorsBlocks(activity) {
          * Constructs a new GetColorPixelBlock instance.
          */
         constructor() {
-            super("getcolorpixel", _("pixel color"));
+            super("getcolorpixel", t("pixel color"));
             this.setPalette("sensors", activity);
             this.parameter = true;
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _("The Get pixel block returns the color of the pixel under the mouse."),
+                    t("The Get pixel block returns the color of the pixel under the mouse."),
                     "documentation",
                     ""
                 ]);
             } else {
                 this.setHelpString([
-                    _("The Get pixel block returns the color of the pixel under the turtle."),
+                    t("The Get pixel block returns the color of the pixel under the turtle."),
                     "documentation",
                     ""
                 ]);
@@ -756,14 +756,14 @@ function setupSensorsBlocks(activity) {
          * Constructs a new TimeBlock instance.
          */
         constructor() {
-            super("time", _("time"));
+            super("time", t("time"));
             this.setPalette("sensors", activity);
             this.parameter = true;
             // Put this block on the beginner palette except in Japanese.
             this.beginnerBlock(!(this.lang === "ja"));
 
             this.setHelpString([
-                _(
+                t(
                     "The Time block returns the number of seconds that the program has been running."
                 ),
                 "documentation",
@@ -802,12 +802,12 @@ function setupSensorsBlocks(activity) {
          * Constructs a new MouseYBlock instance.
          */
         constructor() {
-            super("mousey", _("cursor y"));
+            super("mousey", t("cursor y"));
             this.setPalette("sensors", activity);
             this.beginnerBlock(true);
             this.parameter = true;
             this.setHelpString([
-                _("The Cursor Y block returns the vertical position of the mouse."),
+                t("The Cursor Y block returns the vertical position of the mouse."),
                 "documentation",
                 null,
                 "mousebuttonhelp"
@@ -843,12 +843,12 @@ function setupSensorsBlocks(activity) {
          * Constructs a new MouseXBlock instance.
          */
         constructor() {
-            super("mousex", _("cursor x"));
+            super("mousex", t("cursor x"));
             this.setPalette("sensors", activity);
             this.beginnerBlock(true);
             this.parameter = true;
             this.setHelpString([
-                _("The Cursor X block returns the horizontal position of the mouse."),
+                t("The Cursor X block returns the horizontal position of the mouse."),
                 "documentation",
                 null,
                 "mousebuttonhelp"
@@ -884,9 +884,9 @@ function setupSensorsBlocks(activity) {
          * Constructs a new MouseButtonBlock instance.
          */
         constructor() {
-            super("mousebutton", _("mouse button"));
+            super("mousebutton", t("mouse button"));
             this.setHelpString([
-                _("The Mouse-button block returns True if the mouse button is pressed."),
+                t("The Mouse-button block returns True if the mouse button is pressed."),
                 "documentation",
                 null,
                 "mousebuttonhelp"
@@ -908,9 +908,9 @@ function setupSensorsBlocks(activity) {
          */
         updateParameter(logo, turtle, blk) {
             if (activity.blocks.blockList[blk].value) {
-                return _("true");
+                return t("true");
             } else {
-                return _("false");
+                return t("false");
             }
         }
 
@@ -932,11 +932,11 @@ function setupSensorsBlocks(activity) {
          * Constructs a new ToASCIIBlock instance.
          */
         constructor() {
-            super("toascii", _("to ASCII"));
+            super("toascii", t("to ASCII"));
             this.setPalette("sensors", activity);
             this.parameter = true;
             this.setHelpString([
-                _("The To ASCII block converts numbers to letters."),
+                t("The To ASCII block converts numbers to letters."),
                 "documentation",
                 ""
             ]);
@@ -999,11 +999,11 @@ function setupSensorsBlocks(activity) {
          * Constructs a new KeyboardBlock instance.
          */
         constructor() {
-            super("keyboard", _("keyboard"));
+            super("keyboard", t("keyboard"));
             this.setPalette("sensors", activity);
             this.parameter = true;
             this.setHelpString([
-                _("The Keyboard block returns computer keyboard input."),
+                t("The Keyboard block returns computer keyboard input."),
                 "documentation",
                 ""
             ]);
