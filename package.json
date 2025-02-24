@@ -21,13 +21,15 @@
     "lint": "eslint js/**/*.js",
     "serve": "python3 -c \"import os, sys; os.system('python3 -m SimpleHTTPServer 3000 --bind 127.0.0.1') if sys.version_info.major==2 else os.system('python3 -m http.server 3000 --bind 127.0.0.1');\"",
     "winserve": "py -c \"import os, sys; os.system('py -m SimpleHTTPServer 3000') if sys.version_info.major==2 else os.system('py -m http.server 3000 --bind 127.0.0.1');\"",
-    "test": "jest"
+    "test": "jest",
+    "cypress:run": "cypress run"   
   },
   "devDependencies": {
     "@babel/core": "^7.11.1",
     "@babel/preset-env": "^7.11.0",
     "babel-eslint": "^10.1.0",
     "clean-css": "^4.2.4",
+    "cypress": "^14.0.2",
     "eslint": "^7.6.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-config-standard": "^14.1.1",
