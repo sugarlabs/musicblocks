@@ -104,6 +104,17 @@
   color: white;
 }
 
+.dark .dropdown-content li > a {
+  background-color: #1c1c1c;
+  color: #3fe0d1;
+}
 
+.dark .dropdown-content li > a:hover {
+  background-color: #333;
+}
+
+.dark .dropdown-content {
+  background-color: #1c1c1c;
+}
 
 /* Your Custom Theme can go here if you don't want to modify the existing dark mode */

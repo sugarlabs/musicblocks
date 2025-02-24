@@ -82,6 +82,8 @@ const VOICENAMES = [
     [_("double bass"), "double bass", "images/voices.svg", "string"],
     //.TRANS: sitar musical instrument
     [_("sitar"), "sitar", "images/synth.svg", "string"],
+    //.TRANS: harmonium musical instrument
+    [_("harmonium"), "harmonium", "images/voices.svg", "string"],
     //.TRANS: musical instrument
     [_("guitar"), "guitar", "images/voices.svg", "string"],
     //.TRANS: musical instrument
@@ -267,7 +269,8 @@ const SOUNDSAMPLESDEFINES = [
     "samples/oboe",
     "samples/trombone",
     "samples/doublebass",
-    "samples/sitar"
+    "samples/sitar",
+    "samples/harmonium"
 ];
 
 // Some samples have a default volume other than 50 (See #1697)
@@ -304,7 +307,8 @@ const DEFAULTSYNTHVOLUME = {
     "vibraphone": 100,
     "xylophone": 100,
     "japanese drum": 90,
-    "sitar": 100
+    "sitar": 100,
+    "harmonium": 100
 };
 
 /**
@@ -337,7 +341,8 @@ const SAMPLECENTERNO = {
     "xylophone": ["C4", 39], // pitchToNumber('C', 4, 'C Major')],
     "viola": ["D4", 53], // pitchToNumber('D', 4, 'D Major')],
     "double bass": ["C4", 39], // pitchToNumber('C', 4, 'C Major')],
-    "sitar": ["C4", 39] // pitchToNumber('C', 4, 'C Major')]
+    "sitar": ["C4", 39], // pitchToNumber('C', 4, 'C Major')]
+    "harmonium": ["C4", 39] // pitchToNumber('C', 4, 'C Major')]
 };
 
 
@@ -360,8 +365,7 @@ const percussionInstruments = ["koto", "banjo", "dulcimer", "xylophone", "celest
  * @constant
  * @type {Array<string>}
  */
-const stringInstruments = ["piano","sitar", "guitar", "acoustic guitar", "electric guitar"];
-
+const stringInstruments = ["piano", "harmonium", "sitar", "guitar", "acoustic guitar", "electric guitar"];
 /**
  * Validates and sets parameters for an instrument.
  * @function
@@ -834,7 +838,8 @@ function Synth() {
                 { name: "celeste", data: CELESTE_SAMPLE },
                 { name: "vibraphone", data: VIBRAPHONE_SAMPLE },
                 { name: "xylophone", data: XYLOPHONE_SAMPLE },
-                { name: "sitar", data: SITAR_SAMPLE }
+                { name: "sitar", data: SITAR_SAMPLE },
+                { name: "harmonium", data: HARMONIUM_SAMPLE }
             ],
             drum: [
                 { name: "bottle", data: BOTTLE_SAMPLE },
@@ -1372,6 +1377,7 @@ function Synth() {
      * @param {Object} params - Additional parameters for synth configuration.
      */
     this.__createSynth = (turtle, instrumentName, sourceName, params) => {
+        // Ensure the structure is initialized
 
         this._loadSample(sourceName);
         if (sourceName in this.samples.voice || sourceName in this.samples.drum) {
@@ -1384,6 +1390,10 @@ function Synth() {
                 )
             }
         } else if (sourceName in BUILTIN_SYNTHS) {
+            if (instruments[turtle] && instruments[turtle][instrumentName]) {
+                delete instruments[turtle][instrumentName];
+            }
+
             if (!instruments[turtle][instrumentName]) {
                 instruments[turtle][instrumentName] = this._createBuiltinSynth(
                     turtle,
@@ -1393,7 +1403,12 @@ function Synth() {
                 );
             }
         } else if (sourceName in CUSTOM_SYNTHS) {
+            if (instruments[turtle] && instruments[turtle][instrumentName]) {
+                delete instruments[turtle][instrumentName];
+            }
+
             if (!instruments[turtle][instrumentName]) {
+
                 instruments[turtle][instrumentName] = this._createCustomSynth(
                     sourceName,
                     params
@@ -1402,6 +1417,10 @@ function Synth() {
 
             instrumentsSource[instrumentName] = [0, "poly"];
         } else if (sourceName in CUSTOMSAMPLES) {
+            if (instruments[turtle] && instruments[turtle][instrumentName]) {
+                delete instruments[turtle][instrumentName];
+            }
+
             if (!instruments[turtle][instrumentName]) {
                 instruments[turtle][instrumentName] = this._createSampleSynth(
                     turtle,
@@ -1953,6 +1972,21 @@ function Synth() {
 
         synth.volume.linearRampToValueAtTime(db, Tone.now() + rampTime);
     };
+
+    /**
+     * new Addtion
+     * Gets the volume for a specific instrument.
+     * @param {string} turtle - The name of the turtle (e.g., "turtle1").
+     * @param {string} instrumentName - The name of the instrument (e.g., "flute").
+     * @returns {number} The volume level in decibels or 50 if not found.
+     */
+    this.getVolume = (turtle, instrumentName) => {
+        if (instruments[turtle] && instruments[turtle][instrumentName]) {
+            return instruments[turtle][instrumentName].volume.value;
+        }
+        console.debug("instrument not found");
+        return 50;  // Default volume
+    }
     
     /**
      * Sets the volume of a specific instrument for a given turtle.
