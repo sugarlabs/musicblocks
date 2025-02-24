@@ -43,7 +43,6 @@
     "jest-environment-jsdom": "^29.7.0"
   },
   "dependencies": {
-    "@tonejs/midi": "^2.0.28",
     "autoprefixer": "^10.4.16",
     "cssnano": "^6.0.1",
     "gulp-concat": "^2.6.1",
@@ -52,8 +51,6 @@
     "gulp-sass": "^5.1.0",
     "gulp-sourcemaps": "^2.6.5",
     "http-server": "^14.1.1",
-    "i18next": "^24.2.2",
-    "i18next-http-backend": "^3.0.2",
     "lodash.template": "^4.5.0",
     "node-static": "^0.7.11",
     "tone": "^15.0.4"
