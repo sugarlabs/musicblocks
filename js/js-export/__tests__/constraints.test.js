@@ -84,24 +84,24 @@ describe('JSInterface._methodArgConstraints', () => {
     });
 
     it('should validate onEveryNoteDo arguments', () => {
-        expect(() => validateConstraints('onEveryNoteDo', ['C'])).not.toThrow();
+        expect(() => validateConstraints('onEveryNoteDo', ["action"])).not.toThrow();
         expect(() => validateConstraints('onEveryNoteDo', [123])).toThrow();
     });
 
     it('should validate onEveryBeatDo arguments', () => {
-        expect(() => validateConstraints('onEveryBeatDo', ['C'])).not.toThrow();
+        expect(() => validateConstraints('onEveryBeatDo', ["action"])).not.toThrow();
         expect(() => validateConstraints('onEveryBeatDo', [123])).toThrow();
     });
 
     it('should validate onStrongBeatDo arguments', () => {
-        expect(() => validateConstraints('onStrongBeatDo', [8, 'C'])).not.toThrow();
-        expect(() => validateConstraints('onStrongBeatDo', [0, 'C'])).toThrow();
-        expect(() => validateConstraints('onStrongBeatDo', [17, 'C'])).toThrow();
+        expect(() => validateConstraints('onStrongBeatDo', [8, "action"])).not.toThrow();
+        expect(() => validateConstraints('onStrongBeatDo', [0, "action"])).toThrow();
+        expect(() => validateConstraints('onStrongBeatDo', [17, "action"])).toThrow();
         expect(() => validateConstraints('onStrongBeatDo', [8, 123])).toThrow();
     });
 
     it('should validate onWeakBeatDo arguments', () => {
-        expect(() => validateConstraints('onWeakBeatDo', ['C'])).not.toThrow();
+        expect(() => validateConstraints('onWeakBeatDo', ["action"])).not.toThrow();
         expect(() => validateConstraints('onWeakBeatDo', [123])).toThrow();
     });
 
@@ -112,9 +112,9 @@ describe('JSInterface._methodArgConstraints', () => {
     });
 
     it('should validate playPitch arguments', () => {
-        expect(() => validateConstraints('playPitch', ['C', 4])).not.toThrow();
+        expect(() => validateConstraints('playPitch', ["action", 4])).not.toThrow();
         expect(() => validateConstraints('playPitch', [123, 4])).toThrow();
-        expect(() => validateConstraints('playPitch', ['C', 0])).toThrow();
+        expect(() => validateConstraints('playPitch', ["action", 0])).toThrow();
     });
 
     it('should validate stepPitch arguments', () => {
