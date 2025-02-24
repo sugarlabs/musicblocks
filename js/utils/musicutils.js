@@ -49,7 +49,7 @@
   durationToNoteValue, noteToFrequency, getSolfege, splitScaleDegree,
   getNumNote, calcOctave, calcOctaveInterval, isInt,
   convertFromSolfege, getPitchInfo, MATRIXBUTTONCOLOR, i18nSolfege,
-  convertFactor, getOctaveRatio, setOctaveRatio, getTemperamentsList,
+  convertFactor, getReverseDrumMidi, getOctaveRatio, setOctaveRatio, getTemperamentsList,
   addTemperamentToList, getTemperament, deleteTemperamentFromList,
   addTemperamentToDictionary, buildScale, CHORDNAMES, CHORDVALUES,
   DEFAULTCHORD, DEFAULTVOICE, setCustomChord, EQUIVALENTACCIDENTALS,
@@ -815,6 +815,8 @@ const GRAPHICS = [
     "set translucency",
     "set pen size"
 ];
+
+
 
 //The "original solfege" https://en.wikipedia.org/wiki/Solf%C3%A8ge#Origin
 // const ARETINIANSOLFNOTES = ['si', 'la', 'sol', 'fa', 'mi', 're', 'ut'];
@@ -2057,6 +2059,109 @@ const TEMPERAMENT = {
         ]
     }
 };
+
+const MIDI_INSTRUMENTS = {
+    default: 0,   // Acoustic Grand Piano
+    piano: 0,
+    violin: 40,
+    viola: 41,
+    cello: 42,
+    "double bass": 43,
+    bass: 32,
+    sitar: 104,
+    guitar: 24,
+    "acoustic guitar": 25,
+    "electric guitar": 27,
+    flute: 73,
+    clarinet: 71,
+    saxophone: 65,
+    tuba: 58,
+    trumpet: 56,
+    oboe: 68,
+    trombone: 57,
+    banjo: 105,
+    koto: 107,
+    dulcimer: 15,
+    bassoon: 70,
+    celeste: 8,
+    xylophone: 13,
+    "electronic synth": 81,
+    sine: 81,  // Approximate with Lead 2 (Sawtooth)
+    square: 80,
+    sawtooth: 81,
+    triangle: 81,  // Approximate with Lead 2 (Sawtooth)
+    vibraphone: 11
+};
+
+const DRUM_MIDI_MAP = {
+    "snare drum": 38,
+    "kick drum": 36,
+    "tom tom": 41,
+    "floor tom tom": 43,
+    "cup drum": 47, // Closest: Low-Mid Tom
+    "darbuka drum": 50, // Closest: High Tom
+    "japanese drum": 56, // Closest: Cowbell or Tambourine
+    "hi hat": 42,
+    "ride bell": 53,
+    "cow bell": 56,
+    "triangle bell": 81,
+    "finger cymbals": 69, // Closest: Open Hi-Hat
+    "chime": 82, // Closest: Shaker
+    "gong": 52, // Closest: Chinese Cymbal
+    "clang": 55, // Closest: Splash Cymbal
+    "crash": 49,
+    "clap": 39,
+    "slap": 40,
+    "raindrop": 88  // Custom mapping (not in GM), can use melodic notes
+};
+
+const REVERSE_DRUM_MIDI_MAP = {
+    38: ["snare drum"],
+    36: ["kick drum"],
+    41: ["tom tom"],
+    43: ["floor tom tom"],
+    47: ["cup drum"],
+    50: ["darbuka drum"],
+    56: ["japanese drum", "cow bell"],
+    42: ["hi hat"],
+    53: ["ride bell"],
+    81: ["triangle bell"],
+    69: ["finger cymbals"],
+    82: ["chime"],
+    52: ["gong"],
+    55: ["clang"],
+    49: ["crash"],
+    39: ["clap"],
+    40: ["slap"],
+    88: ["raindrop"]
+};
+
+/**
+ * Get midi map for Instruments.
+ * @function
+ * @returns {Object}
+ */
+const getMidiInstrument = () => {
+    return MIDI_INSTRUMENTS;
+}
+
+/**
+ * Get midi map for Drums.
+ * @function
+ * @returns {Object}
+ */
+const getMidiDrum = () => {
+    return DRUM_MIDI_MAP;
+}
+
+/**
+ * Get reversed midi map for drum.
+ * @function
+ * @returns {Object}
+ */
+const getReverseDrumMidi = () => {
+    return REVERSE_DRUM_MIDI_MAP;
+}
 
 /**
  * Set the global octave ratio.

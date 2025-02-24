@@ -634,3 +634,7 @@ class JSInterface {
         return finalArgs;
     }
 }
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = JSInterface;
+  }
+  
