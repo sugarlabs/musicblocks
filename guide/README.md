@@ -2347,6 +2347,9 @@ You can import sound samples (.WAV files) and use them with the *Set
 Instrument" block. The *Sampler* widget lets you set the center pitch
 of your sample so that it can be tuned.
 
+### How to import sound samples ?
+By clicking the upload samples icon or by perfoming a drag and drop to sample canvas.  
+
 ![widget](./sampler1.svg "Sampler Widget")
 
 You can then use the *Sample* block as you would any input to the *Set

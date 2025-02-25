@@ -150,7 +150,7 @@ msgstr "קוד זה מאחסן נתונים על הבלוקים בפרויקט."
 #: js/blocks.js:5091
 #: js/blocks/MediaBlocks.js:888
 msgid "Show"
-msgstr ""לְהַרְאוֹ"
+msgstr "לְהַרְאוֹ"
 
 #: js/SaveInterface.js:91
 msgid "Hide"

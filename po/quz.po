@@ -3992,7 +3992,7 @@ msgstr "campaneo"
 #.TRANS: a musical instrument
 #.TRANS: gong
 msgid "gong"
-msgstr ""                        "
+msgstr ""
 
 #: js/utils/musicutils.js:1146
 #: js/utils/synthutils.js:182

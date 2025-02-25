@@ -23,8 +23,8 @@
    createHelpContent, createjs, DATAOBJS, DEFAULTBLOCKSCALE,
    DEFAULTDELAY, define, doBrowserCheck, doBrowserCheck, docByClass,
    docById, doSVG, EMPTYHEAPERRORMSG, EXPANDBUTTON, FILLCOLORS,
-   getMacroExpansion, getOctaveRatio, getTemperament, GOHOMEBUTTON,
-   GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
+   getMacroExpansion, getOctaveRatio, getTemperament, transcribeMidi,
+   GOHOMEBUTTON, GOHOMEFADEDBUTTON, GRAND, HelpWidget, HIDEBLOCKSFADEDBUTTON,
    hideDOMLabel, initBasicProtoBlocks, initPalettes,
    INLINECOLLAPSIBLES, jQuery, JSEditor, LanguageBox, ThemeBox, Logo, MSGBLOCK,
    NANERRORMSG, NOACTIONERRORMSG, NOBOXERRORMSG, NOINPUTERRORMSG,
@@ -173,6 +173,7 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         "widgets/sampler",
         "activity/lilypond",
         "activity/abc",
+        "activity/midi",
         "activity/mxml"
     ];
     MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
@@ -2933,6 +2934,22 @@ class Activity {
             // note block to the active block.
             this.blocks.activeBlock = this.blocks.blockList.length - 1;
         };
+        
+        //To create a sampler widget
+        this.makeSamplerWidget = (sampleName, sampleData) => {
+            let samplerStack = [
+                [0, "sampler", 300 - this.blocksContainer.x, 300 - this.blocksContainer.y, [null, 1, 8]],
+                [1, "settimbre", 0, 0, [0, 2, 6, 7]],
+                [2, ["customsample", { value: ["", "", "do", 4] }], 0, 0, [1, 3, 4, 5]],
+                [3, ["audiofile", { value: [sampleName, sampleData] }], 0, 0, [2]],
+                [4, ["solfege", { value: "do" }], 0, 0, [2]],
+                [5, ["number", { value: 4 }], 0, 0, [2]],
+                [6, "vspace", 0, 0, [1, null]],
+                [7, "hidden", 0, 0, [1, null]],
+                [8, "hiddennoflow", 0, 0, [0, null]]
+            ];
+            this.blocks.loadNewBlocks(samplerStack);
+        };
 
         /*
          * Handles keyboard shortcuts in MB
@@ -4226,645 +4243,6 @@ class Activity {
 
             return closest.value.split('/').map(Number);
         }
-
-        this.transcribeMidi = async function(midi) {
-            let currentMidi = midi;
-            let jsONON = [] ;
-            let actionBlockCounter = 0; // Counter for action blocks
-            let actionBlockNames = []; // Array to store action block names
-            let totalnoteblockCount = 0; // Initialize noteblock counter
-            let noteblockCount = 0;
-            let MAX_NOTEBLOCKS = 100;
-            let shortestNoteDenominator = 0;
-            let offset = 100;
-            let stopProcessing = false;
-            let trackCount = 0;
-            let actionBlockPerTrack = [];
-            let instruments = [];
-            let defaultTempo=90;
-            let currentMidiTempoBpm = currentMidi.header.tempos;
-            if (currentMidiTempoBpm && currentMidiTempoBpm.length > 0) {
-                currentMidiTempoBpm = Math.round(currentMidiTempoBpm[0].bpm);
-            } else {
-                currentMidiTempoBpm = defaultTempo;
-            }
-
-            let defaultTimeSignature = [4, 4];
-            let currentMidiTimeSignature = currentMidi.header.timeSignatures;
-            if (currentMidiTimeSignature && currentMidiTimeSignature.length > 0) {
-                currentMidiTimeSignature = currentMidiTimeSignature[0].timeSignature;
-            } else {
-                currentMidiTimeSignature = defaultTimeSignature;
-            }
-
-            let precurssionFlag = false;
-            const isPercussion=[];
-            // console.log("tempoBpm is: ", currentMidiTempoBpm);
-            // console.log("tempo is : ",currentMidi.header.tempos);
-            // console.log("time signatures are: ", currentMidi.header.timeSignatures);
-            currentMidi.tracks.forEach((track, trackIndex) => {
-                let k = 0;
-                if (stopProcessing) return; // Exit if flag is set
-                let isPercussionTrack =(track.instrument.percussion && (track.channel===9 || track.channel===10))
-                isPercussion.push(isPercussionTrack);
-                if (!track.notes.length) return;
-                let r = jsONON.length;
-                // console.log("notes: ",track.notes);
-                if(track.instrument.percussion && (track.channel==9 || track.channel==10) && precurssionFlag==false){
-                    jsONON.push(
-                       [0,"mapdrum",1120,-296,[194,1,3,2]],
-                       [1,["drumname",{"value":"bass drum"}],1297,-296,[0]],
-                       [2,"hidden",1120,-170,[0,195]],
-                       [3,"pitch",1134,-264,[0,4,5,null]],
-                       [4,["notename",{"value":"B"}],1208,-264,[3]],
-                       [5,["number",{"value":1}],1208,-232,[3]],
-                       [6,"mapdrum",1120,397,[86,7,14,11]],
-                       [7,["drumname",{"value":"tom tom"}],1297,397,[6]],
-                       [8,"pitch",1134,681,[12,9,10,180]],
-                       [9,["notename",{"value":"F"}],1208,681,[8]],
-                       [10,["number",{"value":2}],1208,713,[8]],
-                       [11,"hidden",1120,649,[6,12]],
-                       [12,"mapdrum",1120,649,[11,13,8,17]],
-                       [13,["drumname",{"value":"floor tom"}],1297,649,[12]],
-                       [14,"pitch",1134,429,[6,15,16,174]],
-                       [15,["notename",{"value":"B"}],1208,429,[14]],
-                       [16,["number",{"value":2}],1208,461,[14]],
-                       [17,"hidden",1120,901,[12,42]],
-                       [18,"mapdrum",1120,-44,[197,19,20,23]],
-                       [19,["drumname",{"value":"cup drum"}],1297,-44,[18]],
-                       [20,"pitch",1134,-12,[18,21,22,null]],
-                       [21,["notename",{"value":"C♯"}],1208,-12,[20]],
-                       [22,["number",{"value":2}],1208,20,[20]],
-                       [23,"hidden",1120,82,[18,63]],
-                       [24,"mapdrum",1120,2665,[77,25,26,29]],
-                       [25,["drumname",{"value":"clang"}],1297,2665,[24]],
-                       [26,"pitch",1134,2697,[24,27,28,null]],
-                       [27,["notename",{"value":"A♯"}],1208,2697,[26]],
-                       [28,["number",{"value":4}],1208,2729,[26]],
-                       [29,"hidden",1120,2791,[24,93]],
-                       [30,"mapdrum",1120,1657,[41,31,32,35]],
-                       [31,["drumname",{"value":"cow bell"}],1297,1657,[30]],
-                       [32,"pitch",1134,1689,[30,33,34,null]],
-                       [33,["notename",{"value":"G♯"}],1208,1689,[32]],
-                       [34,["number",{"value":3}],1208,1721,[32]],
-                       [35,"hidden",1120,1783,[30,105]],
-                       [36,"mapdrum",1120,1531,[92,37,38,41]],
-                       [37,["drumname",{"value":"ride bell"}],1297,1531,[36]],
-                       [38,"pitch",1134,1563,[36,39,40,null]],
-                       [39,["notename",{"value":"F"}],1208,1563,[38]],
-                       [40,["number",{"value":3}],1208,1595,[38]],
-                       [41,"hidden",1120,1657,[36,30]],
-                       [42,"mapdrum",1120,901,[17,43,44,47]],
-                       [43,["drumname",{"value":"hi hat"}],1297,901,[42]],
-                       [44,"pitch",1134,933,[42,45,46,168]],
-                       [45,["notename",{"value":"F♯"}],1208,933,[44]],
-                       [46,["number",{"value":2}],1208,965,[44]],
-                       [47,"hidden",1120,1153,[42,87]],
-                       [48,"mapdrum",1120,2224,[59,49,150,53]],
-                       [49,["drumname",{"value":"japanese drum"}],1297,2224,[48]],
-                       [50,"pitch",1134,1941,[54,51,52,156]],
-                       [51,["notename",{"value":"C"}],1208,1941,[50]],
-                       [52,["number",{"value":4}],1208,1973,[50]],
-                       [53,"hidden",1120,2476,[48,72]],
-                       [54,"mapdrum",1120,1909,[110,55,50,59]],
-                       [55,["drumname",{"value":"darbuka drum"}],1297,1909,[54]],
-                       [56,"pitch",1134,2067,[156,57,58,147]],
-                       [57,["notename",{"value":"D♯"}],1208,2067,[56]],
-                       [58,["number",{"value":4}],1208,2099,[56]],
-                       [59,"hidden",1120,2224,[54,48]],
-                       [60,"mapdrum",1120,2980,[98,61,141,62]],
-                       [61,["drumname",{"value":"cup drum"}],1297,2980,[60]],
-                       [62,"hidden",1120,3106,[60,78]],
-                       [63,"mapdrum",1120,82,[23,64,65,68]],
-                       [64,["drumname",{"value":"snare drum"}],1297,82,[63]],
-                       [65,"pitch",1134,114,[63,66,67,183]],
-                       [66,["notename",{"value":"D"}],1208,114,[65]],
-                       [67,["number",{"value":2}],1208,146,[65]],
-                       [68,"hidden",1120,271,[63,81]],
-                       [69,"pitch",1134,-138,[195,70,71,null]],
-                       [70,["notename",{"value":"C"}],1208,-138,[69]],
-                       [71,["number",{"value":2}],1208,-106,[69]],
-                       [72,"mapdrum",1120,2476,[53,73,129,77]],
-                       [73,["drumname",{"value":"raindrop"}],1297,2476,[72]],
-                       [74,"pitch",1134,2571,[129,75,76,null]],
-                       [75,["notename",{"value":"A"}],1208,2571,[74]],
-                       [76,["number",{"value":4}],1208,2603,[74]],
-                       [77,"hidden",1120,2665,[72,24]],
-                       [78,"mapdrum",1120,3106,[62,79,138,80]],
-                       [79,["drumname",{"value":"slap"}],1297,3106,[78]],
-                       [80,"hidden",1120,3295,[78,99]],
-                       [81,"mapdrum",1120,271,[68,82,83,86]],
-                       [82,["drumname",{"value":"clap"}],1297,271,[81]],
-                       [83,"pitch",1134,303,[81,84,85,null]],
-                       [84,["notename",{"value":"D♯"}],1208,303,[83]],
-                       [85,["number",{"value":2}],1208,335,[83]],
-                       [86,"hidden",1120,397,[81,6]],
-                       [87,"mapdrum",1120,1153,[47,88,89,92]],
-                       [88,["drumname",{"value":"crash"}],1297,1153,[87]],
-                       [89,"pitch",1134,1185,[87,90,91,159]],
-                       [90,["notename",{"value":"C♯"}],1208,1185,[89]],
-                       [91,["number",{"value":3}],1208,1217,[89]],
-                       [92,"hidden",1120,1531,[87,36]],
-                       [93,"mapdrum",1120,2791,[29,94,95,98]],
-                       [94,["drumname",{"value":"gong"}],1297,2791,[93]],
-                       [95,"pitch",1134,2823,[93,96,97,117]],
-                       [96,["notename",{"value":"B"}],1208,2823,[95]],
-                       [97,["number",{"value":4}],1208,2855,[95]],
-                       [98,"hidden",1120,2980,[93,60]],
-                       [99,"mapdrum",1120,3295,[80,100,189,104]],
-                       [100,["drumname",{"value":"chime"}],1297,3295,[99]],
-                       [101,"pitch",1134,3453,[186,102,103,132]],
-                       [102,["notename",{"value":"F♯"}],1208,3453,[101]],
-                       [103,["number",{"value":5}],1208,3485,[101]],
-                       [104,"hidden",1120,3610,[99,111]],
-                       [105,"mapdrum",1120,1783,[35,106,107,110]],
-                       [106,["drumname",{"value":"finger cymbals"}],1297,1783,[105]],
-                       [107,"pitch",1134,1815,[105,108,109,null]],
-                       [108,["notename",{"value":"E"}],1208,1815,[107]],
-                       [109,["number",{"value":3}],1208,1847,[107]],
-                       [110,"hidden",1120,1909,[105,54]],[111,"mapdrum",1120,3610,[104,112,113,116]],
-                       [112,["drumname",{"value":"triangle bell"}],1297,3610,[111]],
-                       [113,"pitch",1134,3642,[111,114,115,162]],
-                       [114,["notename",{"value":"A"}],1208,3642,[113]],
-                       [115,["number",{"value":5}],1208,3674,[113]],
-                       [116,"hidden",1120,3799,[111,null]],
-                       [117,"pitch",1134,2886,[95,118,119,null]],
-                       [118,["notename",{"value":"C"}],1208,2886,[117]],
-                       [119,["number",{"value":5}],1208,2918,[117]],
-                       [120,"pitch",1134,1374,[126,121,122,123]],
-                       [121,["notename",{"value":"A"}],1208,1374,[120]],
-                       [122,["number",{"value":3}],1208,1406,[120]],
-                       [123,"pitch",1134,1437,[120,124,125,null]],
-                       [124,["notename",{"value":"B"}],1208,1437,[123]],
-                       [125,["number",{"value":3}],1208,1469,[123]],
-                       [126,"pitch",1134,1311,[159,127,128,120]],
-                       [127,["notename",{"value":"G"}],1208,1311,[126]],
-                       [128,["number",{"value":3}],1208,1343,[126]],
-                       [129,"pitch",1134,2508,[72,130,131,74]],
-                       [130,["notename",{"value":"G"}],1208,2508,[129]],
-                       [131,["number",{"value":4}],1208,2540,[129]],
-                       [132,"pitch",1134,3516,[101,133,134,null]],
-                       [133,["notename",{"value":"G"}],1208,3516,[132]],
-                       [134,["number",{"value":5}],1208,3548,[132]],
-                       [135,"pitch",1134,3201,[138,136,137,null]],
-                       [136,["notename",{"value":"F"}],1208,3201,[135]],
-                       [137,["number",{"value":5}],1208,3233,[135]],
-                       [138,"pitch",1134,3138,[78,139,140,135]],
-                       [139,["notename",{"value":"E"}],1208,3138,[138]],
-                       [140,["number",{"value":5}],1208,3170,[138]],
-                       [141,"pitch",1134,3012,[60,142,143,null]],
-                       [142,["notename",{"value":"C♯"}],1208,3012,
-                       [141]],[143,["number",{"value":5}],1208,3044,[141]],
-                       [144,"pitch",1134,2319,[150,145,146,153]],
-                       [145,["notename",{"value":"F♯"}],1208,2319,[144]],
-                       [146,["number",{"value":4}],1208,2351,[144]],
-                       [147,"pitch",1134,2130,[56,148,149,null]],
-                       [148,["notename",{"value":"F"}],1208,2130,[147]],
-                       [149,["number",{"value":4}],1208,2162,[147]],
-                       [150,"pitch",1134,2256,[48,151,152,144]],
-                       [151,["notename",{"value":"E"}],1208,2256,[150]],
-                       [152,["number",{"value":4}],1208,2288,[150]],
-                       [153,"pitch",1134,2382,[144,154,155,null]],
-                       [154,["notename",{"value":"G♯"}],1208,2382,[153]],
-                       [155,["number",{"value":4}],1208,2414,[153]],
-                       [156,"pitch",1134,2004,[50,157,158,56]],
-                       [157,["notename",{"value":"D"}],1208,2004,[156]],
-                       [158,["number",{"value":4}],1208,2036,[156]],
-                       [159,"pitch",1134,1248,[89,160,161,126]],
-                       [160,["notename",{"value":"D♯"}],1208,1248,[159]],
-                       [161,["number",{"value":3}],1208,1280,[159]],
-                       [162,"pitch",1134,3705,[113,163,164,null]],
-                       [163,["notename",{"value":"G♯"}],1208,3705,[162]],
-                       [164,["number",{"value":5}],1208,3737,[162]],
-                       [165,"pitch",1134,1059,[168,166,167,null]],
-                       [166,["notename",{"value":"A♯"}],1208,1059,[165]],
-                       [167,["number",{"value":2}],1208,1091,[165]],
-                       [168,"pitch",1134,996,[44,169,170,165]],
-                       [169,["notename",{"value":"G♯"}],1208,996,[168]],
-                       [170,["number",{"value":2}],1208,1028,[168]],
-                       [171,"pitch",1134,555,[174,172,173,null]],
-                       [172,["notename",{"value":"D"}],1208,555,[171]],
-                       [173,["number",{"value":3}],1208,587,[171]],
-                       [174,"pitch",1134,492,[14,175,176,171]],
-                       [175,["notename",{"value":"C"}],1208,492,[174]],
-                       [176,["number",{"value":3}],1208,524,[174]],
-                       [177,"pitch",1134,807,[180,178,179,null]],
-                       [178,["notename",{"value":"A"}],1208,807,[177]],
-                       [179,["number",{"value":2}],1208,839,[177]],
-                       [180,"pitch",1134,744,[8,181,182,177]],
-                       [181,["notename",{"value":"G"}],1208,744,[180]],
-                       [182,["number",{"value":2}],1208,776,[180]],
-                       [183,"pitch",1134,177,[65,184,185,null]],
-                       [184,["notename",{"value":"E"}],1208,177,[183]],
-                       [185,["number",{"value":2}],1208,209,[183]],
-                       [186,"pitch",1134,3390,[189,187,188,101]],
-                       [187,["notename",{"value":"A♯"}],1208,3390,[186]],
-                       [188,["number",{"value":3}],1208,3422,[186]],
-                       [189,"pitch",1134,3327,[99,190,191,186]],
-                       [190,["notename",{"value":"F♯"}],1208,3327,[189]],
-                       [191,["number",{"value":3}],1208,3359,[189]],
-                       [192,["action",{"collapsed":false}],1106,-337, [null,193,194,null]],
-                       [193,["text",{"value":"MIDI-conversion"}],1238,-328,[192]],
-                       [194,"hidden",1120,-296,[192,0]],
-                       [195,"mapdrum",1120,-170,[2,196,69,197]],
-                       [196,["drumname",{"value":"kick drum"}],1297,-170,[195]],
-                       [197,"hidden",1120,-44,[195,18]],
-                    )
-                    precurssionFlag=true;
-                    r+=198;
-                }
-                // find matching instrument
-                let instrument = "electronic synth";
-                if (track.instrument.name) {
-                    for (let voices of VOICENAMES) {
-                        if (track.instrument.name.indexOf(voices[1]) > -1) {
-                            instrument = voices[0];
-                        }
-                    }
-                }
-                actionBlockPerTrack[trackCount] = 0;
-                instruments[trackCount] = instrument;
-
-                let actionBlockName = `track${trackCount}chunk${actionBlockCounter}`;
-
-                jsONON.push(
-                    [r, ["action", { collapsed: false }], 150, 100, [null, r+1, r+2, null]],
-                    [r+1, ["text", { value: actionBlockName }], 0, 0, [r]]
-                );
-
-                let sched = [];
-                for (let noteIndex in track.notes) {
-                    let note = track.notes[noteIndex];
-                    let name = note.name;
-                    let first = sched.length == 0;
-                    let start =Math.round(note.time*100)/100;
-                    let end = Math.round((note.duration + note.time)*100)/100;
-                    if (note.duration == 0) continue;
-                    if (first) {
-                        if (note.time > 0) {
-                            sched.push({
-                                start: 0,
-                                end: start,
-                                notes: ["R"]
-                            });
-                        }
-                        sched.push({
-                            start: start,
-                            end: end,
-                            notes: [name]
-                        });
-                        continue;
-                    }
-                    let lastNotes=[];
-                    let lastNote = sched[sched.length - 1];
-                    // let secondLastNote = sched.length > 1 ? sched[sched.length - 2] : null;
-
-                    if (sched[sched.length - 1].start === start && sched[sched.length - 1].end === end) {
-                        sched[sched.length - 1].notes.push(name);
-                    }
-                    else if (lastNote.start > start) {
-                        while(lastNote.start >= start){
-                        lastNotes.push(sched[sched.length-1]);
-                        sched.pop();
-                        lastNote = sched[sched.length - 1];
-                        }
-                        lastNote = sched[sched.length - 1];
-                        // let secondLastNote = sched.length > 1 ? sched[sched.length - 2] : null;
-                        if (lastNote) {
-                            let oldEnd2 = lastNote.end;
-                            let prevNotes2 = [...lastNote.notes];
-                            let newNotes2 = [...prevNotes2];
-                            newNotes2.push(name);
-                            lastNote.end = start;
-
-                            if (start < oldEnd2) {
-                                sched.push({
-                                    start: start,
-                                    end: oldEnd2,
-                                    notes: newNotes2
-                                });
-                            }
-                        }
-                        while (lastNotes.length>0) {
-                            let prevNotes = [...lastNotes[lastNotes.length-1].notes];
-                            let oldEnd = lastNotes[lastNotes.length-1].end;
-                            let oldStart = lastNotes[lastNotes.length-1].start;
-                            let newNotes = [...prevNotes];
-                            newNotes.push(name);
-
-                            if (lastNotes[lastNotes.length-1].end <= end) {
-                                sched.push(
-                                    {
-                                        start: oldStart,
-                                        end: oldEnd,
-                                        notes: newNotes
-                                    }
-                                );
-                                if (end > oldEnd && lastNotes.length==1) {
-                                    sched.push(
-                                        {
-                                            start: oldEnd,
-                                            end: end,
-                                            notes: [name]
-                                        }
-                                    );
-                                }
-                                lastNotes.pop();
-                            } else if (lastNotes[lastNotes.length-1].end > end) {
-                                sched.push(
-                                    {
-                                        start: oldStart,
-                                        end: end,
-                                        notes: newNotes
-                                    }
-                                );
-                                if (oldEnd > end && lastNotes.length==1) {
-                                    sched.push(
-                                        {
-                                            start: end,
-                                            end: oldEnd,
-                                            notes: prevNotes
-                                        }
-                                    );
-                                }
-                                lastNotes.pop();
-                            }
-                        }
-                    } else if ( lastNote.start < start && lastNote.end > start && lastNote.end >= end) {
-                        let prevNotes = [...lastNote.notes];
-                        let oldEnd = lastNote.end;
-                        lastNote.end = start;
-                        let newNotes = [...prevNotes];
-                        newNotes.push(name);
-                        sched.push(
-                            {
-                                start: start,
-                                end: end,
-                                notes: newNotes
-                            }
-                        );
-                        if (oldEnd > end) {
-                            sched.push(
-                                {
-                                    start: end,
-                                    end: oldEnd,
-                                    notes: prevNotes
-                                }
-                            );
-                        }
-                    } else if (lastNote.start < start  && lastNote.end > start && lastNote.end <= end) {
-                        let prevNotes = [...lastNote.notes];
-                        let oldEnd = lastNote.end;
-                        sched[sched.length - 1].end = start;
-                        let newNotes = [...prevNotes];
-                        newNotes.push(name);
-                        if (start < oldEnd) {
-                            sched.push(
-                                {
-                                    start: start,
-                                    end: oldEnd,
-                                    notes: newNotes
-                                }
-                            );
-                        }
-                        if (end > oldEnd) {
-                            sched.push(
-                                {
-                                    start: oldEnd,
-                                    end: end,
-                                    notes: [name]
-                                }
-                            );
-                        }
-                    } else if (lastNote.end <= start) {
-                        if (start > lastNote.end) {
-                            let integerPart = Math.floor(start - lastNote.end);
-                            for (let c = 0; c < integerPart; c += 2) {
-                                sched.push(
-                                    {
-                                        start: lastNote.end,
-                                        end: lastNote.end + 2,
-                                        notes: ["R"]
-                                    }
-                                );
-                                lastNote.end += 2;
-                            }
-                        }
-                        sched.push(
-                            {
-                                start: start,
-                                end: end,
-                                notes: [name]
-                            }
-                        );
-                    }
-                }
-
-                let noteSum = 0;
-                let currentActionBlock = [];
-
-                let addNewActionBlock = (isLastBlock=false) => {
-                    let r = jsONON.length;
-                    let actionBlockName = `track${trackCount}chunk${actionBlockCounter}`;
-                    actionBlockNames.push(actionBlockName);
-                    actionBlockPerTrack[trackCount]++;
-                    if (k == 0) {
-                        jsONON.push(
-                            ...currentActionBlock
-                        );
-                        k = 1;
-                    } else {
-                        let settimbreIndex = r;
-                        // Adjust the first note block's top connection to settimbre
-                        currentActionBlock[0][4][0] = settimbreIndex;
-                        jsONON.push(
-                            [r, ["action", { collapsed: false }], 100+offset, 100+offset, [null, r+1, settimbreIndex+2, null]],
-                            [r+1, ["text", { value: actionBlockName }], 0, 0, [r]],
-                            ...currentActionBlock
-                        );
-
-                    }
-                    if (isLastBlock) {
-                        let lastIndex = jsONON.length - 1;
-                        // Set the last hidden block's second value to null
-                        jsONON[lastIndex][4][1] = null;
-                    }
-
-                    currentActionBlock = [];
-                    actionBlockCounter++; // Increment the action block counter
-                    offset+=100;
-                };
-                //Using for loop for finding the shortest note value
-                for (let j in sched) {
-                    let st = sched[j].start;
-                    let ed= sched[j].end;
-                    let dur = ed - st;
-                    let temp = this.getClosestStandardNoteValue(dur * 3 / 8);
-                    shortestNoteDenominator=Math.max(shortestNoteDenominator,temp[1]);
-                }
-
-                for (let i in sched) {
-                    if (stopProcessing) break; // Exit inner loop if flag is set
-                    let notes = sched[i].notes;
-                    let start = sched[i].start;
-                    let end = sched[i].end;
-                    let duration = end - start;
-                    noteSum += duration;
-                    let isLastNoteInBlock = (noteSum >= 16) || (noteblockCount > 0 && noteblockCount % 24 === 0);
-                    if (isLastNoteInBlock) {
-                        totalnoteblockCount+=noteblockCount;
-                        noteblockCount = 0;
-                        noteSum = 0;
-                    }
-                    let isLastNoteInSched = (i == sched.length - 1);
-                    let last = isLastNoteInBlock || isLastNoteInSched;
-                    let first = (i == 0);
-                    let val = jsONON.length + currentActionBlock.length;
-                    let getPitch = (x, notes, prev) => {
-                        let ar = [];
-                        if (notes[0] == "R") {
-                            ar.push(
-                                [x, "rest2", 0, 0, [prev, null]]
-                            );
-                        } else {
-                            for (let na in notes) {
-                                let name = notes[na];
-                                let first = na == 0;
-                                let last = na == notes.length - 1;
-                                ar.push(
-                                    [x, "pitch", 0, 0, [first ? prev : x-3, x+1, x+2, last ? null : x+3]],
-                                    [x+1, ["notename", {"value": name.substring(0, name.length-1)}], 0, 0, [x]],
-                                    [x+2, ["number", {"value": parseInt(name[name.length-1])}], 0, 0, [x]]
-                                );
-                                x += 3;
-                            }
-                        }
-                        return ar;
-                    };
-                    let obj = this.getClosestStandardNoteValue(duration * 3 / 8);
-                    // let scalingFactor=1;
-                    // if(shortestNoteDenominator>32)
-                    // scalingFactor=shortestNoteDenominator/32;
-
-                    // if(obj[1]>=scalingFactor)
-                    // obj[1]=obj[1]/scalingFactor;
-                    // else
-                    // obj[0]=obj[0]*scalingFactor;
-
-                    // To get the reduced fraction for 4/2 to 2/1
-                    obj=this.getClosestStandardNoteValue(obj[0]/obj[1]);
-
-                    // Since we are going to add action block in the front later
-                    if (k != 0) val = val + 2;
-                    let pitches = getPitch(val + 5, notes, val);
-                    currentActionBlock.push(
-                        [val, ["newnote", {"collapsed": true}], 0, 0, [first ? val-2 : val-1, val+1, val+4, val+pitches.length+5]],
-                        [val + 1, "divide", 0, 0, [val, val+2, val+3]],
-                        [val + 2, ["number", { value: obj[0] }], 0, 0, [val + 1]],
-                        [val + 3, ["number", { value: obj[1] }], 0, 0, [val + 1]],
-                        [val + 4, "vspace", 0, 0, [val, val + 5]],
-                    );
-                    noteblockCount++;
-                    pitches[0][4][0] = val + 4;
-                    currentActionBlock = currentActionBlock.concat(pitches);
-
-                    let newLen = jsONON.length + currentActionBlock.length;
-                    if (k != 0) newLen = newLen + 2;
-                    currentActionBlock.push(
-                        [newLen, "hidden", 0, 0, [val, last ? null : newLen + 1]]
-                    );
-                    if (isLastNoteInBlock || isLastNoteInSched ) {
-                        addNewActionBlock(isLastNoteInSched);
-                    }
-
-                    if (totalnoteblockCount >= MAX_NOTEBLOCKS) {
-                        this.textMsg("MIDI file is too large.. Generating only 100 noteblocks");
-                        stopProcessing = true;
-                        break;
-                    }
-                }
-
-                if (currentActionBlock.length > 0) {
-                    addNewActionBlock(true);
-                }
-
-                trackCount++;
-                // console.log("current action block: ", currentActionBlock);
-                // console.log("current json: ", jsONON);
-                // console.log("noteblockCount: ", noteblockCount);
-                // console.debug('finished when you see: "block loading finished "');
-                document.body.style.cursor = "wait";
-            });
-
-            let len = jsONON.length;
-            let m = 0;
-            let actionIndex = 0;
-
-            for (let i = 0; i < trackCount; i++) {
-                 let vspaceIndex=len+m+6;
-                 let startIndex=len+m;
-                 let flag=true;
-                if(isPercussion[i])
-                {
-                    jsONON.push(
-                        [len + m, ["start", { collapsed: false }], 300 + offset, 100, [null, len + m + 14+actionBlockPerTrack[i], null]],
-                        [len + m +1,"meter",0,0,[len + m +14 + actionBlockPerTrack[i],len + m +2,len + m +3,len + m + 6]],
-                        [len + m + 2, ["number",{value: currentMidiTimeSignature[0]}],0,0,[len+m+1]],
-                        [len + m + 3,"divide",0,0,[len + m +1,len + m + 4,len + m + 5]],
-                        [len + m + 4,["number", {value : 1}],0,0,[len+m+3]],
-                        [len + m + 5,["number", {value : currentMidiTimeSignature[1]}],0,0,[len+m+3]],
-                        [len + m + 6,"vspace",0,0,[len + m + 1,len + m + 8 + actionBlockPerTrack[i]]],
-                        [len + m + 7, ["nameddo", { value: "MIDI-conversion" }], 0, 0, [len + m +13 +actionBlockPerTrack[i], len + m + 8]],
-                    );
-                    flag=false;
-                    m+=8;
-                }
-                else{
-                jsONON.push(
-                    [len + m, ["start", { collapsed: false }], 300 + offset, 100, [null, len + m+16+actionBlockPerTrack[i], null]],
-                    [len + m +1,"meter",0,0,[len + m+16+actionBlockPerTrack[i],len + m +2,len + m +3,len + m + 6]],
-                    [len + m + 2, ["number",{value: currentMidiTimeSignature[0]}],0,0,[len+m+1]],
-                    [len + m + 3,"divide",0,0,[len + m +1,len + m + 4,len + m + 5]],
-                    [len + m + 4,["number", {value : 1}],0,0,[len+m+3]],
-                    [len + m + 5,["number", {value : currentMidiTimeSignature[1]}],0,0,[len+m+3]],
-                    [len + m + 6,"vspace",0,0,[len + m + 1,len + m + 10 + actionBlockPerTrack[i]]],
-                    [len + m + 7, "settimbre", 0, 0, [len + m +15 +actionBlockPerTrack[i], len + m + 8, len + m + 10, len + m + 9]],
-                    [len + m + 8, ["voicename", { value: instruments[i] }], 0, 0, [len + m + 7]],
-                    [len + m + 9, "hidden", 0, 0, [len + m + 7, null]]
-                );
-                m += 10;
-                }
-                for (let j = 0; j < actionBlockPerTrack[i]; j++) {
-                    jsONON.push(
-                        [len + m, ["nameddo", { value: actionBlockNames[actionIndex] }], 0, 0, [flag?len+m-3:len + m - 1, len + m + 1]]
-                    );
-                    m++;
-                    flag=false;
-                    actionIndex++;
-                }
-                jsONON[len + m - 1][4][1] = null;
-                let setBpmIndex=jsONON.length;
-                jsONON.push(
-                    [setBpmIndex, ["setbpm3"], 0, 0, [vspaceIndex, setBpmIndex + 1, setBpmIndex + 2, setBpmIndex + 5]],
-                    [setBpmIndex + 1, ["number", { value: currentMidiTempoBpm}], 0, 0, [setBpmIndex]],
-                    [setBpmIndex + 2, "divide", 0, 0, [setBpmIndex, setBpmIndex + 3, setBpmIndex + 4]],
-                    [setBpmIndex + 3, ["number", { value: 1 }], 0, 0, [setBpmIndex + 2]],
-                    [setBpmIndex + 4, ["number", { value: currentMidiTimeSignature[1] }], 0, 0, [setBpmIndex + 2]],
-                    [setBpmIndex + 5, "vspace", 0, 0, [setBpmIndex, vspaceIndex + 1]],
-                );
-                m+=6;
-                jsONON.push(
-                    [len + m, "setturtlename2", 0, 0, [startIndex, len + m + 1,startIndex+1]],
-                    [len + m + 1, ["text", { value: `track${i}` }], 0, 0, [len + m]]
-                );
-                m+=2;
-
-            }
-
-            this.blocks.loadNewBlocks(jsONON);
-            // this.textMsg("MIDI import is not currently precise. Consider changing the speed with the Beats Per Minute block or modifying note value with the Multiply Note Value block");
-            return null;
-        };
 
         /**
          * Loads MB project from Planet.
@@ -7073,7 +6451,7 @@ class Activity {
                         const midi = new Midi(e.target.result);
                         // eslint-disable-next-line no-console
                         console.debug(midi);
-                        this.transcribeMidi(midi);
+                        transcribeMidi(midi);
                     };
 
                     const file = that.fileChooser.files[0];
@@ -7112,6 +6490,8 @@ class Activity {
                             that.errorMsg(
                                 _("Cannot load project from the file. Please check the file type.")
                             );
+                        } else if (files[0].type === "audio/wav") {
+                            this.makeSamplerWidget(files[0].name, reader.result);
                         } else {
                             const cleanData = rawData.replace("\n", " ");
                             let obj;
@@ -7173,7 +6553,7 @@ class Activity {
                     const midi = new Midi(e.target.result)
                     // eslint-disable-next-line no-console
                     console.debug(midi);
-                    this.transcribeMidi(midi);
+                    transcribeMidi(midi);
                 }
 
                 // Music Block Parser from abc to MB
@@ -7228,6 +6608,12 @@ class Activity {
                         abcReader.readAsText(files[0]);
                         return;
                     }
+
+                    if (files[0].type === "audio/wav") {
+                        reader.readAsDataURL(files[0]);
+                        return;
+                    }
+                    
                     reader.readAsText(files[0]);
                     reader.readAsText(files[0]);
                     window.scroll(0, 0);
