@@ -52,7 +52,7 @@ requirejs(['i18next', 'i18nextHttpBackend'], function(i18next, i18nextHttpBacken
             i18next
                 .use(i18nextHttpBackend)
                 .init({
-                    lng: 'hi',
+                    lng: 'en',
                     fallbackLng: 'en',
                     keySeparator: false,
                     nsSeparator: false,
@@ -107,15 +107,22 @@ requirejs(['i18next', 'i18nextHttpBackend'], function(i18next, i18nextHttpBacken
         }
     }
 
-    main();
+    main().then(() => {
+    requirejs(["utils/utils", "activity/activity"]);
+    });
+
+    i18next.changeLanguage(lang, (err, t) => {
+        if (err) {
+            console.error('Error changing language:', err);
+            return;
+        }
+        console.log('Language changed to:', lang);
+        updateContent();
+    });
 
     i18next.on('languageChanged', function() {
         updateContent();
     });
 });
 
-
-
-
-
-requirejs(["utils/utils", "activity/activity"]);
+// requirejs(["utils/utils", "activity/activity"]);
