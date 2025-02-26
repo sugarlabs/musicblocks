@@ -456,3 +456,6 @@ function setupDictBlocks(activity) {
     new SetDictBlock2().setup(activity);
     new GetDictBlock2().setup(activity);
 }
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupDictBlocks };
+}
