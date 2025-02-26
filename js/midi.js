@@ -17,6 +17,32 @@
 const MAX_NOTEBLOCKS = 200;
 const defaultTempo = 90;
 
+const standardDurations = [
+    { value: "1/1", duration: 1 },
+    { value: "1/2", duration: 0.5 },
+    { value: "1/4", duration: 0.25 },
+    { value: "1/8", duration: 0.125 },
+    { value: "1/16", duration: 0.0625 },
+    { value: "1/32", duration: 0.03125 },
+    { value: "1/64", duration: 0.015625 },
+    { value: "1/128", duration: 0.0078125 }
+];
+
+const getClosestStandardNoteValue = (duration) => {
+    let closest = standardDurations[0];
+    let minDiff = Math.abs(duration - closest.duration);
+
+    for (let i = 1; i < standardDurations.length; i++) {
+        let diff = Math.abs(duration - standardDurations[i].duration);
+        if (diff < minDiff) {
+            closest = standardDurations[i];
+            minDiff = diff;
+        }
+    }
+
+    return closest.value.split('/').map(Number);
+}
+
 const transcribeMidi = async (midi) => {
     const currentMidi = midi;
     const drumMidi = getReverseDrumMidi();
@@ -155,7 +181,7 @@ const transcribeMidi = async (midi) => {
         //Using for loop for finding the shortest note value
         for (let j in sched) {
             let dur = sched[j].end - sched[j].start;;
-            let temp = activity.getClosestStandardNoteValue(dur * 3 / 8);
+            let temp = getClosestStandardNoteValue(dur * 3 / 8);
             shortestNoteDenominator = Math.max(shortestNoteDenominator, temp[1]);
         }
 
@@ -202,7 +228,7 @@ const transcribeMidi = async (midi) => {
                 }
                 return ar;
             };
-            let obj = activity.getClosestStandardNoteValue(duration * 3 / 8);
+            let obj = getClosestStandardNoteValue(duration * 3 / 8);
             // let scalingFactor=1;
             // if(shortestNoteDenominator>32)
             // scalingFactor=shortestNoteDenominator/32;
@@ -213,7 +239,7 @@ const transcribeMidi = async (midi) => {
             // obj[0]=obj[0]*scalingFactor;
 
             // To get the reduced fraction for 4/2 to 2/1
-            obj = activity.getClosestStandardNoteValue(obj[0] / obj[1]);
+            obj = getClosestStandardNoteValue(obj[0] / obj[1]);
 
             // Since we are going to add action block in the front later
             if (k != 0) val = val + 2;
@@ -326,3 +352,7 @@ const transcribeMidi = async (midi) => {
     // this.textMsg("MIDI import is not currently precise. Consider changing the speed with the Beats Per Minute block or modifying note value with the Multiply Note Value block");
     return null;
 };
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { getClosestStandardNoteValue, transcribeMidi };
+}
