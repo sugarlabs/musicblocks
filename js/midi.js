@@ -14,7 +14,7 @@
 /* exported  transcribeMidi*/
 
 
-const MAX_NOTEBLOCKS = 200;
+const MAX_NOTEBLOCKS = 100;
 const defaultTempo = 90;
 
 const standardDurations = [
