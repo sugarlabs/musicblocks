@@ -1,20 +1,14 @@
-const { Midi } = require('@tonejs/midi');
-// Mocking the @tonejs/midi library
-jest.mock('@tonejs/midi', () => {
-    return {
-        Midi: jest.fn().mockImplementation(() => ({
-            header: { ticksPerBeat: 480 },
-            addTrack: jest.fn(() => ({
-                addNote: jest.fn(),
-                name: '',
-                instrument: { number: 0 },
-                channel: 0
-            })),
-            toArray: jest.fn(() => new Uint8Array([1, 2, 3]))
-        }))
-    };
-})
-global.Midi = Midi;
+global.Midi = jest.fn().mockImplementation(() => ({
+    header: { ticksPerBeat: 480 },
+    addTrack: jest.fn(() => ({
+        addNote: jest.fn(),
+        name: '',
+        instrument: { number: 0 },
+        channel: 0
+    })),
+    toArray: jest.fn(() => new Uint8Array([1, 2, 3]))
+}));
+
 global.jQuery = jest.fn(() => ({
     on: jest.fn(),
     trigger: jest.fn(),
