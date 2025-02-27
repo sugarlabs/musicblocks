@@ -426,6 +426,7 @@ class Activity {
             this.toolbarHeight = document.getElementById("toolbars").offsetHeight;
 
             this.helpfulWheelItems = [];
+            this.helpfulSearchDiv = docById("helpfulSearchDiv");
 
             this.setHelpfulSearchDiv();
         };
@@ -434,47 +435,45 @@ class Activity {
          * creates helpfulSearchDiv for search
          */
         this.setHelpfulSearchDiv = () => {
-            if (docById("helpfulSearchDiv")) {
-                docById("helpfulSearchDiv").parentNode.removeChild(
-                    docById("helpfulSearchDiv")
-                );
+            if (this.helpfulSearchDiv) {
+                this.helpfulSearchDiv.remove();
+                this.helpfulSearchDiv = null;
             }
             this.helpfulSearchDiv = document.createElement("div");
-            this.helpfulSearchDiv.setAttribute("id", "helpfulSearchDiv");
-
-            document.body.appendChild(this.helpfulSearchDiv);
+            this.helpfulSearchDiv.id = "helpfulSearchDiv";
 
             // Create the div for the close button (cross button)
             const closeButtonDiv = document.createElement("div");
-            closeButtonDiv.style.cssText =
-                "position: absolute;" +
-                "top: 10px;" +
-                "right: 10px;" +
-                "cursor: pointer;";
+            closeButtonDiv.style.position = "absolute";
+            closeButtonDiv.style.top = "10px";
+            closeButtonDiv.style.right = "10px";
+            closeButtonDiv.style.cursor = "pointer";
 
             // Create the cross button itself
+            // fix me: apply css
             const closeButton = document.createElement("button");
             closeButton.textContent = "×";
             closeButton.id = "crossButton";
-            document.body.appendChild(closeButton);
 
             closeButtonDiv.appendChild(closeButton);
-
             this.helpfulSearchDiv.appendChild(closeButtonDiv);
+
+            if (this.helpfulSearchWidget) {
+                this.helpfulSearchDiv.appendChild(this.helpfulSearchWidget);
+            }
 
             // Add event listener to remove the search div from the DOM
             const modeButton = docById("begIconText");
             closeButton.addEventListener("click", this._hideHelpfulSearchWidget);
-            modeButton.addEventListener("click", this._hideHelpfulSearchWidget);
-
-            this.helpfulSearchDiv.appendChild(this.helpfulSearchWidget);
+            if (modeButton) modeButton.addEventListener("click", this._hideHelpfulSearchWidget);
+            document.body.appendChild(this.helpfulSearchDiv);
         }
 
         /*
          * displays helpfulSearchDiv on canvas
          */
         this._displayHelpfulSearchDiv = () => {
-            if (!docById("helpfulSearchDiv")) {
+            if (!this.helpfulSearchDiv) {
                 this.setHelpfulSearchDiv();  // Re-create and append the div if it's not found
             }
             this.helpfulSearchDiv.style.left = docById("helpfulWheelDiv").offsetLeft + 80 * this.getStageScale() + "px";
@@ -505,6 +504,7 @@ class Activity {
                 }
                 if (this.helpfulSearchDiv && this.helpfulSearchDiv.parentNode) {
                     this.helpfulSearchDiv.parentNode.removeChild(this.helpfulSearchDiv);
+                    this.helpfulSearchDiv = null;
                 }
                 that.__tick();
         }
