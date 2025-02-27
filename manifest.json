@@ -1,9 +1,7 @@
 {
-    "name": "MusicBlocks",
+    "name": "Music Blocks",
     "short_name": "Music Blocks",
-    "version": "2.3",
-    "manifest_version": 2,
-    "author": "Sugar Labs",
+    "id": "com.sugarlabs.musicblocks",
     "description": "Learn to program music with snap-together blocks.",
     "icons": [
         {
@@ -43,23 +41,32 @@
             "density": "4.0"
         },
         {
-            "src": "/activity/activity-icon-color-512.png",
+            "src": "activity/activity-icon-color-512.png",
             "type": "image/png",
             "sizes": "512x512",
-            "purpose": "any maskable"
+            "purpose": "any"
+        },
+        {
+            "src": "activity/activity-icon-maskable.png",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "maskable"
         }
     ],
-    "start_url": "index.html",
+    "start_url": "https://musicblocks.sugarlabs.org/",
+    "scope": "https://musicblocks.sugarlabs.org/",
     "background_color": "#F9F9F9",
     "theme_color": "#2196F3",
     "display": "standalone",
-    "orientation": "portrait",
-    "background": {
-        "scripts": ["js/background.js"]
+    "orientation": "landscape",
+    "dir": "ltr",
+    "lang": "en",
+    "categories": ["code", "education"],
+    "launch_handler": {
+        "client_mode": "focus-existing"
     },
-    "web_accessible_resources": ["index.html"],
-    "permissions": ["clipboardWrite", "storage", "unlimitedStorage"],
-    "browser_action": {
-        "default_icon": "/activity/activity-icon-color-128.png"
-    }
+    "iarc_rating_id": "e10+",
+    "prefer_related_applications": false,
+    "related_applications": [],
+    "permissions": ["clipboardWrite", "storage", "unlimitedStorage"]
 }

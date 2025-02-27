@@ -48,7 +48,7 @@ class SaveInterface {
          * @member {number}
          */
         this.timeLastSaved = -100;
-        
+
         /**
          * HTML template for saving projects.
          * @member {string}
@@ -265,8 +265,120 @@ class SaveInterface {
     }
 
     /**
+     * Save MIDI file.
+     *
+     * This method generates required MIDI data.
+     *
+     * @param {SaveInterface} activity - The activity object to save.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
+    saveMIDI(activity) {
+        // Suppress music and turtle output when generating
+        activity.logo.runningMIDI = true;
+        activity.logo.runLogoCommands();
+        document.body.style.cursor = "wait";
+    }
+
+    /**
+     * Perform actions after generating MIDI data.
+     *
+     * This method generates a MIDI file using _midiData.
+     *
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
+    afterSaveMIDI() {
+        const instrumentMIDI = getMidiInstrument();
+        const drumMIDI = getMidiDrum();
+        const generateMidi = (data) => {
+            const normalizeNote = (note) => {
+                return note.replace("♯", "#").replace("♭", "b");
+            };
+
+            const midi = new Midi();
+            midi.header.ticksPerBeat = 480;
+
+            Object.entries(data).forEach(([blockIndex, notes]) => {
+
+                const mainTrack = midi.addTrack();
+                mainTrack.name = `Track ${parseInt(blockIndex) + 1}`;
+
+                let trackMap = new Map();
+                let globalTime = 0;
+
+                notes.forEach((noteData) => {
+                    if (!noteData.note || noteData.note.length === 0) return;
+                    const duration = ((1 / noteData.duration) * 60 * 4) / noteData.bpm;
+                    const instrument = noteData.instrument || "default";
+
+                    if (noteData.drum) {
+                        const drum = noteData.drum || false;
+                        if (!trackMap.has(drum)) {
+                            const drumTrack = midi.addTrack();
+                            drumTrack.name = `Track ${parseInt(blockIndex) + 1} - ${drum}`;
+                            drumTrack.channel = 9; // Drums must be on Channel 10
+                            trackMap.set(drum, drumTrack);
+                        }
+
+                        const drumTrack = trackMap.get(drum);
+
+                        const midiNumber = drumMIDI[drum] || 36; // default to Bass Drum
+                        drumTrack.addNote({
+                            midi: midiNumber,
+                            time: globalTime,
+                            duration: duration,
+                            velocity: 0.9,
+                        });
+
+                    } else {
+                        if (!trackMap.has(instrument)) {
+                            const instrumentTrack = midi.addTrack();
+                            instrumentTrack.name = `Track ${parseInt(blockIndex) + 1} - ${instrument}`;
+                            instrumentTrack.instrument.number = instrumentMIDI[instrument] ?? instrumentMIDI["default"];
+                            trackMap.set(instrument, instrumentTrack);
+                        }
+
+                        const instrumentTrack = trackMap.get(instrument);
+
+                        noteData.note.forEach((pitch) => {
+
+                            if (!pitch.includes("R")) {
+                                instrumentTrack.addNote({
+                                    name: normalizeNote(pitch),
+                                    time: globalTime,
+                                    duration: duration,
+                                    velocity: 0.8
+                                });
+                            }
+                        });
+                    }
+                    globalTime += duration;
+                });
+                globalTime = 0;
+            });
+
+            // Generate the MIDI file and trigger download.
+            const midiData = midi.toArray();
+            const blob = new Blob([midiData], { type: "audio/midi" });
+            const url = URL.createObjectURL(blob);
+            activity.save.download("midi", url, null);
+        };
+        const data = activity.logo._midiData;
+        setTimeout(() => {
+            generateMidi(data);
+            activity.logo._midiData = {};
+            document.body.style.cursor = "default";
+        }, 500);
+    }
+
+    /**
      * This method is to save SVG representation of an activity
-     * 
+     *
      * @param {SaveInterface} activity -The activity object to save
      * @returns {void}
      * @method
@@ -306,12 +418,12 @@ class SaveInterface {
      * @returns {void}
      * @method
      * @instance
-     */   
+     */
     saveBlockArtwork(activity) {
         const svg = "data:image/svg+xml;utf8," + activity.printBlockSVG();
         activity.save.download("svg", svg, null);
     }
-   
+
     /**
      * This method is to save BlockArtwork and download the PNG representation of block artwork from the provided activity.
      * 
@@ -319,10 +431,10 @@ class SaveInterface {
      * @returns {void}
      * @method
      * @instance
-     */ 
+     */
     saveBlockArtworkPNG(activity) {
         activity.printBlockPNG().then((pngDataUrl) => {
-        activity.save.download("png", pngDataUrl, null);
+            activity.save.download("png", pngDataUrl, null);
         })
     }
 
@@ -587,7 +699,7 @@ class SaveInterface {
             tmp.remove();
             this.activity.textMsg(
                 _("The Lilypond code is copied to clipboard. You can paste it here: ") +
-                    "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a> "
+                "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a> "
             );
         }
         this.download("ly", "data:text;utf8," + encodeURIComponent(lydata), filename);
@@ -645,7 +757,7 @@ class SaveInterface {
         this.activity.logo.runLogoCommands();
     }
 
-    /** 
+    /**
     * Perform actions after saving an MXML file.
     *
     * This method handles post-processing steps after saving an MXML file.
@@ -662,4 +774,9 @@ class SaveInterface {
         this.download("xml", "data:text;utf8," + encodeURIComponent(data), filename);
         this.activity.logo.runningMxml = false;
     }
+}
+
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { SaveInterface };
 }

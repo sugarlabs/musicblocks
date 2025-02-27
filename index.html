@@ -69,6 +69,7 @@
         <meta id="theme-color" name="theme-color" content="#2196F3" />
 
         <link type="text/css" href="fonts/material-icons.css" rel="stylesheet"/>
+        <link rel="preload" href="/fonts/material-icons.woff2" as="font" type="font/woff2" crossorigin="anonymous">
         <link rel="stylesheet" href="lib/materialize-iso.css" />
         <link rel="stylesheet" href="css/themes.css" />
 
@@ -675,9 +676,8 @@
                                         id="menu"
                                         class="animated-icon material-icons md-48 "
                                         >menu</i
-                                    ></a
-                                >
-                            </li>
+                                    ></a>
+                            </li>  
                             <li>
                                 <a
                                     id="helpIcon"
@@ -780,6 +780,7 @@
                                   class="tooltipped dropdown-trigger"
                                   data-position="left"
                                   data-activates="themedropdown"
+                                  data-tooltip="Select Theme"
                                   ><i class="material-icons md-48">brightness_7</i></a
                                 >
                                 </li>
@@ -836,6 +837,7 @@
                                         id="restoreIcon"
                                         class="tooltipped"
                                         data-position="bottom"
+                                        data-tooltip="Restore"
                                         ><i class="material-icons md-48"
                                             >restore_from_trash</i
                                         ></a
@@ -872,6 +874,7 @@
                                         class="tooltipped dropdown-trigger"
                                         data-position="left"
                                         data-activates="languagedropdown"
+                                        data-tooltip="Select Language"
                                         ><i class="material-icons md-48"
                                             >translate</i
                                         ></a
@@ -889,6 +892,7 @@
 
                 <ul id="saveddropdown" class="dropdown-content">
                     <li><a id="save-html"></a></li>
+                    <li><a id="save-midi"></a></li>
                     <li><a id="save-svg"></a></li>
                     <li><a id="save-png"></a></li>
                     <li><a id="save-wav"></a></li>
@@ -987,6 +991,96 @@
           </script>
         </div>
         </div>
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+              let persistentNotification = null; 
+            
+              function showPersistentNotification() {
+                if (!persistentNotification) {
+                  persistentNotification = document.createElement("div");
+                  persistentNotification.id = "persistentNotification";
+                  persistentNotification.innerHTML = "Play only mode enabled. For full Music Blocks experience, use a larger display.";
+                  document.body.appendChild(persistentNotification);
+                }
+              }
+            
+              function removePersistentNotification() {
+                if (persistentNotification) {
+                  persistentNotification.remove();
+                  persistentNotification = null;
+                }
+              }
+            
+              function hideElementById(elementId) {
+                const elem = document.getElementById(elementId);
+                if (elem) {
+                  elem.style.display = "none";
+                }
+              }
+            
+              function showElementById(elementId) {
+                const elem = document.getElementById(elementId);
+                if (elem) {
+                  elem.style.display = "";
+                }
+              }
+            
+              function togglePlayOnlyMode() {
+                const isSmallScreen = (window.innerWidth < 768) || (window.innerHeight < 600);
+                const body = document.body;
+                const homeButton = document.getElementById("Home [HOME]");
+                const buttonContainer = document.getElementById("buttoncontainerBOTTOM");
+            
+                if (isSmallScreen) {
+                  // Enable play-only mode
+                  body.classList.add("play-only");
+                  showPersistentNotification();
+            
+                  if (buttonContainer) {
+                    buttonContainer.style.display = "flex";
+                    buttonContainer.style.justifyContent = "flex-end";
+                    buttonContainer.style.alignItems = "center";
+                  }
+                  if (homeButton) {
+                    homeButton.style.display = "flex";
+                    homeButton.style.position = "fixed";
+                    homeButton.style.right = "15px";
+                    homeButton.style.bottom = "15px";
+                    homeButton.style.zIndex = "10000";
+                  }
+            
+                  // Hide certain elements
+                  hideElementById("Show/hide blocks");
+                  hideElementById("Expand/collapse blocks");
+                  hideElementById("Decrease block size");
+                  hideElementById("Increase block size");
+                  hideElementById("grid");     
+                  hideElementById("palette"); 
+            
+                } else {
+                  // Disable play-only mode
+                  body.classList.remove("play-only");
+                  removePersistentNotification();
+            
+                  if (homeButton) homeButton.style = "";
+                  if (buttonContainer) buttonContainer.style = "";
+            
+                  showElementById("Show/hide blocks");
+                  showElementById("Expand/collapse blocks");
+                  showElementById("Decrease block size");
+                  showElementById("Increase block size");
+                  showElementById("grid");
+                  showElementById("palette");
+                }
+              }
+            
+              togglePlayOnlyMode();
+            
+              window.addEventListener("resize", togglePlayOnlyMode);
+            });
+            </script>
+            
         <div id="searchBar" tabindex="-1">
             <input
                 type="text"

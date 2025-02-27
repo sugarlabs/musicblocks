@@ -80,6 +80,7 @@ class Toolbar {
                 ["save-html-beg", _("Save project as HTML"), "innerHTML"],
                 ["save-png-beg", _("Save mouse artwork as PNG"), "innerHTML"],
                 ["save-html", _("Save project as HTML"), "innerHTML"],
+                ["save-midi", _("Save project as MIDI"), "innerHTML"],
                 ["save-svg", _("Save mouse artwork as SVG"), "innerHTML"],
                 ["save-png", _("Save mouse artwork as PNG"), "innerHTML"],
                 ["save-wav", _("Save music as WAV"), "innerHTML"],
@@ -144,6 +145,7 @@ class Toolbar {
                 _("Switch to advanced mode"),
                 _("Select language"),
                 _("Save project as HTML"),
+                _("Save project as MIDI"),
                 _("Save mouse artwork as SVG"),
                 _("Save mouse artwork as PNG"),
                 _("Save music as WAV"),
@@ -577,6 +579,7 @@ class Toolbar {
      * 
      * @public
      * @param  {Function} html_onclick - The onclick handler for HTML.
+     * @param  {Function} midi_onclick - The onclick handler for MIDI.
      * @param  {Function} doSVG_onclick - The onclick handler for SVG.
      * @param  {Function} svg_onclick - The onclick handler for SVG.
      * @param  {Function} png_onclick - The onclick handler for PNG.
@@ -591,6 +594,7 @@ class Toolbar {
         html_onclick,
         doSVG_onclick,
         svg_onclick,
+        midi_onclick,
         png_onclick,
         wave_onclick,
         ly_onclick,
@@ -685,6 +689,11 @@ class Toolbar {
                 }
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
+                    const saveMIDI = docById("save-midi");
+                    saveMIDI.onclick = () => {
+                        midi_onclick(this.activity);
+                    };
+
                     const saveWAV = docById('save-wav');
                      saveWAV.onclick = () => {
                         wave_onclick(this.activity);
@@ -936,6 +945,19 @@ class Toolbar {
             const saveButtonAdvanced = docById('saveButtonAdvanced');
             if (saveButton) saveButton.style.display = this.activity.beginnerMode ? "block" : "none";
             if (saveButtonAdvanced) saveButtonAdvanced.style.display = this.activity.beginnerMode ? "none" : "block";
+            activity.toolbar.renderSaveIcons(
+                activity.save.saveHTML.bind(activity.save),
+                doSVG,
+                activity.save.saveSVG.bind(activity.save),
+                activity.save.saveMIDI.bind(activity.save),
+                activity.save.savePNG.bind(activity.save),
+                activity.save.saveWAV.bind(activity.save),
+                activity.save.saveLilypond.bind(activity.save),
+                activity.save.saveAbc.bind(activity.save),
+                activity.save.saveMxml.bind(activity.save),
+                activity.save.saveBlockArtwork.bind(activity.save),
+                activity.save.saveBlockArtworkPNG.bind(activity.save)
+            );
         };
 
         // Handle mode switching
@@ -1113,12 +1135,19 @@ class Toolbar {
 function renderNewProjectConfirmation() {
     const modalContainer = document.getElementById("modal-container");
     const newDropdown = document.getElementById("newdropdown");
+    const isDarkMode = document.body.classList.contains("dark");
+    newDropdown.style.backgroundColor = isDarkMode ? "#424242" : "#ffffff";
+    newDropdown.style.border = isDarkMode ? "1px solid #444444" : "1px solid #cccccc";
+    newDropdown.style.color = isDarkMode ? "#ffffff" : "#000000";
+    newDropdown.style.padding = "24px";
     newDropdown.innerHTML = '';
     const title = document.createElement("div");
-    title.innerHTML = `<h2 style="color: #0066FF; font-size: 24px; text-align: left; margin: 0;">${_("New project")}</h2>`;
+    title.innerHTML = `<h2 style="font-size: 24px; text-align: left; margin: 0; color: #2196F3;">${_("New project")}</h2>`;
     newDropdown.appendChild(title);
     const confirmationMessage = document.createElement("div");
-    confirmationMessage.innerHTML = `<div id="confirmation-message" style="color: #666666; font-size: 16px; margin-bottom: 24px; text-align: left;">${_("Are you sure you want to create a new project?")}</div>`;
+    confirmationMessage.innerHTML = `<div id="confirmation-message" style="font-size: 16px; margin-bottom: 24px; text-align: left; ${
+        isDarkMode ? "color: #ffffff;" : "color: #666666;"
+    }">${_("Are you sure you want to create a new project?")}</div>`;
     newDropdown.appendChild(confirmationMessage);
     const confirmationButtonLi = document.createElement("li");
     confirmationButtonLi.style.textAlign = "center";
@@ -1129,7 +1158,7 @@ function renderNewProjectConfirmation() {
     confirmationButton.style.backgroundColor = platformColor.blueButton;
     confirmationButton.style.color = "white";
     confirmationButton.style.textDecoration = "none";
-    confirmationButton.style.borderRadius = "4px";
+    confirmationButton.style.borderRadius = "0px";
     confirmationButton.style.fontWeight = "bold";
     confirmationButton.innerHTML = _("Confirm");
     confirmationButtonLi.appendChild(confirmationButton);
