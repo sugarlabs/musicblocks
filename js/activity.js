@@ -2934,6 +2934,22 @@ class Activity {
             // note block to the active block.
             this.blocks.activeBlock = this.blocks.blockList.length - 1;
         };
+        
+        //To create a sampler widget
+        this.makeSamplerWidget = (sampleName, sampleData) => {
+            let samplerStack = [
+                [0, "sampler", 300 - this.blocksContainer.x, 300 - this.blocksContainer.y, [null, 1, 8]],
+                [1, "settimbre", 0, 0, [0, 2, 6, 7]],
+                [2, ["customsample", { value: ["", "", "do", 4] }], 0, 0, [1, 3, 4, 5]],
+                [3, ["audiofile", { value: [sampleName, sampleData] }], 0, 0, [2]],
+                [4, ["solfege", { value: "do" }], 0, 0, [2]],
+                [5, ["number", { value: 4 }], 0, 0, [2]],
+                [6, "vspace", 0, 0, [1, null]],
+                [7, "hidden", 0, 0, [1, null]],
+                [8, "hiddennoflow", 0, 0, [0, null]]
+            ];
+            this.blocks.loadNewBlocks(samplerStack);
+        };
 
         /*
          * Handles keyboard shortcuts in MB
@@ -6474,6 +6490,8 @@ class Activity {
                             that.errorMsg(
                                 _("Cannot load project from the file. Please check the file type.")
                             );
+                        } else if (files[0].type === "audio/wav") {
+                            this.makeSamplerWidget(files[0].name, reader.result);
                         } else {
                             const cleanData = rawData.replace("\n", " ");
                             let obj;
@@ -6590,6 +6608,12 @@ class Activity {
                         abcReader.readAsText(files[0]);
                         return;
                     }
+
+                    if (files[0].type === "audio/wav") {
+                        reader.readAsDataURL(files[0]);
+                        return;
+                    }
+                    
                     reader.readAsText(files[0]);
                     reader.readAsText(files[0]);
                     window.scroll(0, 0);

@@ -1,0 +1,148 @@
+.play-only #palette {
+    display: none !important; 
+    visibility: hidden !important; 
+    height: 0 !important; 
+    width: 0 !important; 
+    pointer-events: none !important; 
+    overflow: hidden !important;
+}   
+
+.play-only #Grid {
+    display: none !important; 
+    visibility: hidden !important; 
+    height: 0 !important; 
+    width: 0 !important; 
+    pointer-events: none !important; 
+    overflow: hidden !important; 
+}
+
+.play-only #Clear {
+    display: none !important; 
+    visibility: hidden !important; 
+    height: 0 !important; 
+    width: 0 !important; 
+    pointer-events: none !important; 
+    overflow: hidden !important; 
+}
+
+.play-only #Collapse {
+    display: none !important; 
+    visibility: hidden !important; 
+    height: 0 !important; 
+    width: 0 !important; 
+    pointer-events: none !important; 
+    overflow: hidden !important;
+}
+
+.play-only [id="Show/hide blocks"] {
+    display: none !important; 
+    visibility: hidden !important; 
+    height: 0 !important; 
+    width: 0 !important; 
+    pointer-events: none !important; 
+    overflow: hidden !important;
+}
+
+.play-only [id="Expand/collapse blocks"] {
+    display: none !important; 
+    visibility: hidden !important; 
+    height: 0 !important; 
+    width: 0 !important; 
+    pointer-events: none !important; 
+    overflow: hidden !important; 
+}
+
+.play-only [id="Decrease block size"]{
+    display: none !important; 
+    visibility: hidden !important; 
+    height: 0 !important; 
+    width: 0 !important; 
+    pointer-events: none !important; 
+    overflow: hidden !important; 
+}
+
+.play-only [id="Increase block size"] {
+    display: none !important; 
+    visibility: hidden !important; 
+    height: 0 !important; 
+    width: 0 !important; 
+    pointer-events: none !important; 
+    overflow: hidden !important; 
+}
+
+.play-only #buttoncontainerBOTTOM {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    width: 100% !important;
+    position: fixed !important;
+    bottom: 10px !important;
+    left: 0 !important;
+    padding: 5px 10px !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    z-index: 9999 !important;
+}
+
+.play-only #Home\ \[HOME\] {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    position: fixed !important;
+    right: 15px !important; 
+    bottom: 15px !important; 
+    width: auto !important;
+    height: auto !important;
+    z-index: 10000 !important; 
+    background-color: rgba(255, 255, 255, 0.9) !important; 
+    padding: 5px !important;
+    border-radius: 5px !important;
+}
+
+@media only screen and (max-width: 400px) {
+    .play-only ul.main.right {
+      margin-top: 0px !important; 
+      position: relative !important;
+      display: flex !important;
+      flex-wrap: wrap !important;
+      justify-content: center !important;
+      align-items: center !important;
+      gap: 10px !important;
+    }
+  
+    .play-only nav {
+      min-height: 50px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+  }
+
+@media (max-width: 768px), (max-height: 600px) {
+    /* Enable the auxiliary button */
+    .play-only #toggleAuxBtn {
+        pointer-events: auto !important;
+        opacity: 1 !important;  
+    }
+
+    /* Hide the full auxiliary toolbar */
+    .play-only #aux-toolbar {
+        display: none !important;
+    }
+}
+
+/* Make the container background invisible without affecting child elements */
+.play-only #buttoncontainerBOTTOM {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: auto !important;
+    box-shadow: none !important;
+}
+
+/* Ensure the Home button remains visible */
+.play-only #Home\ \[HOME\] {
+    display: flex !important;
+    position: fixed !important;
+}
+

@@ -757,7 +757,7 @@ class SaveInterface {
         this.activity.logo.runLogoCommands();
     }
 
-    /** 
+    /**
     * Perform actions after saving an MXML file.
     *
     * This method handles post-processing steps after saving an MXML file.
@@ -774,4 +774,9 @@ class SaveInterface {
         this.download("xml", "data:text;utf8," + encodeURIComponent(data), filename);
         this.activity.logo.runningMxml = false;
     }
+}
+
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { SaveInterface };
 }
