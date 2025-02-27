@@ -4217,33 +4217,6 @@ class Activity {
             }, 5000);
         };
 
-
-        const standardDurations = [
-            { value: "1/1", duration: 1 },
-            { value: "1/2", duration: 0.5 },
-            { value: "1/4", duration: 0.25 },
-            { value: "1/8", duration: 0.125 },
-            { value: "1/16", duration: 0.0625 },
-            { value: "1/32", duration: 0.03125 },
-            { value: "1/64", duration: 0.015625 },
-            { value: "1/128", duration: 0.0078125 }
-        ];
-
-        this.getClosestStandardNoteValue = function(duration) {
-            let closest = standardDurations[0];
-            let minDiff = Math.abs(duration - closest.duration);
-
-            for (let i = 1; i < standardDurations.length; i++) {
-                let diff = Math.abs(duration - standardDurations[i].duration);
-                if (diff < minDiff) {
-                    closest = standardDurations[i];
-                    minDiff = diff;
-                }
-            }
-
-            return closest.value.split('/').map(Number);
-        }
-
         /**
          * Loads MB project from Planet.
          * @param  projectID {Planet project ID}
