@@ -5749,7 +5749,7 @@ class Activity {
 
             this.helpfulSearchWidget.value = "";
             // Hide search div after search is complete.
-            this.helpfulSearchDivZ.style.display = "none";
+            this.helpfulSearchDiv.style.display = "none";
             this.update = true;
         };
 
