@@ -241,7 +241,6 @@ For further details on how to use these toolbars effectively, you can refer to t
 |----------------------------|-----------------------------|---------------------------------------------------------|
 | `Alt + B`                 | `Option + B`               | Save the current block artwork.                        |
 | `Alt + C`                 | `Option + C`               | Copy the selected blocks.                              |
-| `Alt + D`                 | `Option + D`               | Prompt to delete custom macros.                        |
 | `Alt + E`                 | `Option + E`               | Clear all elements.                                    |
 | `Alt + R` or `Enter`      | `Option + R` or `Return`   | Play the project. Activates the play button.           |
 | `Alt + S`                 | `Option + S`               | Stop all running processes (e.g., turtles).            |
