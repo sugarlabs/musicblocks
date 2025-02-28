@@ -55,4 +55,5 @@ jobs:
         run: |
           git add .
           git commit -m "Deploy updates from $(date)" || echo "No changes to commit"
-          git push origin gh-pages
+          git pull origin gh-pages || true
+          git push origin gh-pages || true
