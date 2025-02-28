@@ -14,36 +14,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository
-      - name: Checkout Repository
+      #  Checkout the repository
+      - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-    #   Github setup
-      - name: Set up Git
+      #  Configure Git for GitHub Actions
+      - name: Configure Git
         run: |
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           git config --global user.name "GitHub Actions"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-      
-    #    Deploying
-      - name: Deploy to GitHub Pages
+
+      #  Prepare the deployment directory
+      - name: Prepare deployment directory
         run: |
-          # Switch to gh-pages branch or create a new orphan branch
-          git fetch origin gh-pages
+          mkdir -p ../deploy  # Create a temporary deployment directory
+          cp -r * ../deploy/  # Copy all files to the temporary directory
+
+      #  Switch to the 'gh-pages' branch
+      - name: Switch to gh-pages branch
+        run: |
           git checkout gh-pages || git checkout --orphan gh-pages
+          git rm -rf . || true  # Remove all files in the current branch
+          git clean -fxd  # Clean untracked files
 
-          # Remove old files and copy new files
-          git reset --hard
-          git clean -fdx
-          cp -r $(ls -A | grep -v .git) ../temp-deploy
-          rm -rf *
-          cp -r ../temp-deploy/* .
-          rm -rf ../temp-deploy
+      # Copy deployment files to the 'gh-pages' branch
+      - name: Copy files to gh-pages
+        run: |
+          cp -r ../deploy/* .  # Copy files from the temporary directory to the current branch
+          rm -rf ../deploy  # Remove the temporary directory
 
-          # Commit and push changes
+      #  Commit and push changes to GitHub Pages
+      - name: Commit and push changes
+        run: |
           git add .
-          if git diff-index --quiet HEAD; then
-            echo "No changes to deploy."
-          else
-            git commit -m "Deploy updates from $(date)"
-            git push -f origin gh-pages
-          fi
+          git commit -m "Deploy updates from $(date)" || echo "No changes to commit"
+          git push origin gh-pages
