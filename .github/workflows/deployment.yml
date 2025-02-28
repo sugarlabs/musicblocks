@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     
     # Run only when the repository is the main repository
-    if: ${{ github.repository == 'Fareed95/musicblocks' && github.event.pull_request.merged == true }}
+    if: ${{ github.repository == 'Fareed95/musicblocks'}}
 
     steps:
       # 1. Checkout the repository
