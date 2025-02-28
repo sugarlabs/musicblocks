@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy to GitHub Pages
 
 on:
   push:
@@ -14,26 +14,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      # Step 1: Checkout the repository
+      - name: Checkout Repository
         uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
+    #   Github setup
       - name: Set up Git
         run: |
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           git config --global user.name "GitHub Actions"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        
+      
+    #    Deploying
       - name: Deploy to GitHub Pages
         run: |
-          mkdir -p ../deploy
-          cp -r * ../deploy/
+          # Switch to gh-pages branch or create a new orphan branch
+          git fetch origin gh-pages
           git checkout gh-pages || git checkout --orphan gh-pages
-          git rm -rf . > /dev/null 2>&1 || true
-          git clean -fxd
-          cp -r ../deploy/* .
-          rm -rf ../deploy
+
+          # Remove old files and copy new files
+          git reset --hard
+          git clean -fdx
+          cp -r $(ls -A | grep -v .git) ../temp-deploy
+          rm -rf *
+          cp -r ../temp-deploy/* .
+          rm -rf ../temp-deploy
+
+          # Commit and push changes
           git add .
-          git commit -m "Deploy updates from $(date)" || echo "No changes to commit"
-          git push origin gh-pages
+          if git diff-index --quiet HEAD; then
+            echo "No changes to deploy."
+          else
+            git commit -m "Deploy updates from $(date)"
+            git push -f origin gh-pages
+          fi
