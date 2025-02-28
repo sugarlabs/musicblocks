@@ -1376,6 +1376,13 @@ class Activity {
             confirmBtn.style.fontWeight = "bold";
             confirmBtn.style.cursor = "pointer";
             confirmBtn.style.marginRight = "16px";
+            confirmBtn.style.transition = "background-color 0.2s ease"; 
+            confirmBtn.addEventListener("mouseover", () => {
+                confirmBtn.style.backgroundColor = "#023a76"; 
+            });
+            confirmBtn.addEventListener("mouseout", () => {
+                confirmBtn.style.backgroundColor = platformColor.blueButton; 
+            });
             confirmBtn.addEventListener("click", () => {
                 document.body.removeChild(modal);
                 clearCanvasAction();
@@ -1390,6 +1397,13 @@ class Activity {
             cancelBtn.style.padding = "8px 16px";
             cancelBtn.style.fontWeight = "bold";
             cancelBtn.style.cursor = "pointer";
+            cancelBtn.style.transition = "background-color 0.2s ease"; 
+            cancelBtn.addEventListener("mouseover", () => {
+                cancelBtn.style.backgroundColor = "#afafaf"; 
+            });
+            cancelBtn.addEventListener("mouseout", () => {
+                cancelBtn.style.backgroundColor = "#f1f1f1"; 
+            });
             cancelBtn.addEventListener("click", () => {
                 document.body.removeChild(modal);
             });
