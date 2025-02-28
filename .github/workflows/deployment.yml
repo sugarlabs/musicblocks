@@ -1,17 +1,20 @@
 name: Deploy to GitHub Pages
 
 on:
+  # Trigger only on push to master branch
   push:
     branches:
       - master
-  pull_request:
-    branches:
-      - master
+
+  # Allow manual trigger if needed
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    
+    # Run only when the repository is the main repository
+    if: ${{ github.repository == 'Fareed95/musicblocks' && github.event.pull_request.merged == true }}
 
     steps:
       # 1. Checkout the repository
@@ -30,28 +33,26 @@ jobs:
       # 3. Prepare the deployment directory
       - name: Prepare deployment directory
         run: |
-          mkdir -p ../deploy  # Create a temporary deployment directory
-          cp -r * ../deploy/  # Copy all files to the temporary directory
+          mkdir -p ../deploy
+          cp -r * ../deploy/
 
       # 4. Switch to the 'gh-pages' branch and pull latest changes
       - name: Switch to gh-pages and pull latest changes
         run: |
           git checkout gh-pages || git checkout --orphan gh-pages
-          git pull origin gh-pages || true  # Pull latest changes to avoid conflicts
-          git rm -rf . || true  # Remove all files in the current branch
-          git clean -fxd  # Clean untracked files
+          git pull origin gh-pages || true
+          git rm -rf . || true
+          git clean -fxd
 
       # 5. Copy deployment files to the 'gh-pages' branch
       - name: Copy files to gh-pages
         run: |
-          cp -r ../deploy/* .  # Copy files from the temporary directory to the current branch
-          rm -rf ../deploy  # Remove the temporary directory
+          cp -r ../deploy/* .
+          rm -rf ../deploy
 
       # 6. Commit and push changes to GitHub Pages
       - name: Commit and push changes
         run: |
           git add .
           git commit -m "Deploy updates from $(date)" || echo "No changes to commit"
-          git pull origin gh-pages || true  # Pull latest changes to avoid conflicts
-
-          git push origin gh-pages || true 
+          git push origin gh-pages
