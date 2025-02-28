@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     
     # Run only when the repository is the main repository
-    if: ${{ github.repository == 'Fareed95/musicblocks'}}
+    if: ${{ github.repository == 'sugarlabs/musicblocks'}}
 
     steps:
       # 1. Checkout the repository
