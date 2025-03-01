@@ -531,7 +531,7 @@ describe("Utility Functions (logic-only)", () => {
         });
 
         test("should handle edge case with volume set to 0 with connections", () => {
-            setMasterVolume(0,"c0","c1");
+            setMasterVolume(0, 87, 64);
 
             const expectedDb = Tone.gainToDb(0); // 0/100
             expect(Tone.gainToDb).toHaveBeenCalledWith(0);
@@ -539,7 +539,7 @@ describe("Utility Functions (logic-only)", () => {
         });
 
         test("should handle edge case with volume set to 100 with connections", () => {
-            setMasterVolume(100,"c0","c1");
+            setMasterVolume(100, 87, 64);
 
             const expectedDb = Tone.gainToDb(1); // 100/100
             expect(Tone.gainToDb).toHaveBeenCalledWith(1);
