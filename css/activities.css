@@ -12,8 +12,24 @@
 }
 */
 
+@import url("play-only-mode.css");
+
 *:focus {
   outline: none;
+}
+
+body:not(.dark) #helpfulSearch,
+body:not(.dark) .ui-autocomplete {
+    background-color: #fff !important;
+    color: #000 !important;
+}
+
+body:not(.dark) .ui-autocomplete li:hover {
+    background-color: #ddd !important;
+}
+
+body:not(.dark) #helpfulSearchDiv {
+    background-color: #f9f9f9 !important;
 }
 
 .modal {
@@ -29,11 +45,27 @@
 }
 
 .modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  padding: 24px;
   background-color: #fefefe;
-  margin: 15% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 50%;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px;
+  border-radius: 8px;
+  z-index: 10000;
+  text-align: left;
+}
+
+#submitLilypond {
+  background-color: rgb(0, 102, 255);
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-right: 16px;
 }
 
 .close {
@@ -76,7 +108,7 @@
   display: block !important;
   position: absolute;
   background-color: #f0f0f0;
-  padding: 5px;
+  padding: 2px;
   border: 1px solid #ccc;
   width: 230px;
   z-index: 1;
@@ -88,6 +120,83 @@
   width: 220px;
   height: 20px;
   font-size: large;
+}
+
+#crossButton {
+  position: absolute;
+  top: 50%;
+  right: -30px;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  font-size: large;
+  cursor: pointer;
+}
+
+.trash-view {
+  position: relative;
+  background-color: white;
+  max-width: 396px;
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 16px;
+  color: black;
+  border: 2px solid #87cefa;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.button-container {
+  position: sticky;
+  display: flex;
+  justify-content: space-between;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  gap: 10px;
+  background: #2196F3;
+  margin: 0;
+  padding: 5px;
+  border-bottom: 1px solid #d9d9d9;
+}
+
+.trash-item {
+  padding: 2px 12px;
+  margin: 1px 0;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.trash-item.hover {
+  background-color: #d9d9d9;
+}
+
+.trash-item-icon {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+#restoreLastIcon, #restoreAllIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  cursor: pointer; 
+}
+
+
+.material-icons.md-48 {
+  font-size: 32px;
+}
+
+
+.hidden {
+  display: none;
 }
 
 .ui-menu {
@@ -421,7 +530,7 @@ img.icon:hover {
 }
 
 #loading-image-container {
-  z-index: 99999;
+  z-index: 89999;
 }
 
 body {
@@ -527,6 +636,8 @@ table {
 
 #canvas {
   overflow-y: visible;
+  background-color: #FFFFFF; 
+  width: 100%;
 }
 
 #statusDiv {
@@ -982,6 +1093,7 @@ table {
 #helpBodyDiv .message {
   text-align: center;
   line-height: 1.2;
+  margin: auto;
 }
 
 #helpBodyDiv .icon-container {
@@ -1768,4 +1880,41 @@ table {
     display: block;
     clear: both;
   }
+}
+.logo-container{
+  position: absolute;
+  bottom: 1px; /* Distance from the bottom */
+  right: 23px;  /* Distance from the right */
+  padding: 0px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+#link-to-sugarLabs:link ,
+#link-to-sugarLabs:visited ,
+#link-to-sugarLabs:hover ,
+#link-to-sugarLabs:active  {
+  color: #000;
+}
+.color-change {
+  fill : #033CD2;
+  stroke : #78E600;
+  stroke-width: 3;
+}
+
+#persistentNotification {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1E88E5; 
+  color: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  font-size: 14px;
+  font-weight: bold;
+  z-index: 1000;
+  text-align: center;
+  min-width: 250px;
+  max-width: 80%;
 }

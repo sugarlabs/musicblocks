@@ -27,6 +27,8 @@ You can run it from
 
 1. [Getting Started](#1-getting-started)
 2. [Toolbars](#2-toolbars)
+    1. [Main Toolbar](#1-main-toolbar)
+    2. [Secondary Toolbar](#2-secondary-toolbar)
 3. [Context Menus](#3-context-menus)
     1. [Contextual Menu for Blocks](#1-contextual-menu-for-blocks)
     2. [Contextual Menu for Background](#2-contextual-menu-for-background)
@@ -100,6 +102,7 @@ The **Main** toolbar is located across the top of the screen. It contains severa
 
 -   **Play Button**: Starts playing the project.
 -   **Stop Button**: Stops the current project playback.
+-   **Fullscreen Button**: Toggles fullscreen mode on or off.
 -   **New Project Button**: Creates a new project from scratch.
 -   **Load Project from File Button**: Opens an existing project file.
 -   **Save Project Button**: Saves the current project.
@@ -115,6 +118,7 @@ The **Secondary** toolbar appears when you click the **hamburger button** (three
 
 -   **Run Slowly**: Executes the program slowly to allow you to follow the process step by step.
 -   **Run Step by Step**: Runs the program one step at a time, ideal for debugging and analysis.
+-   **Change theme**: Switch between light and dark mode for a customized workspace.
 -   **Merge with Current Project**: Combines the current project with another, promoting collaboration and reusability.
 -   **Turtle Wrap**: Enables wrapping of the turtle's position to seamlessly continue from the opposite edge of the canvas.
 -   **Set Pitch Preview**: Lets users preview pitches while composing, providing instant feedback.
@@ -126,7 +130,7 @@ The **Secondary** toolbar appears when you click the **hamburger button** (three
         3. *Delete Plugin*: Allows the removal of plugins that are no longer needed.<br>
         4. *Horizontal Scrolling*: Enables horizontal navigation for easier handling of large projects.<br>
         5. *JavaScript Editor*: Includes an editor for writing and embedding custom JavaScript code.<br>
-        6.*Record*: Adds a "Record" button to the main palette, enabling users to record their compositions directly.
+        6. *Record*: Adds a "Record" button to the main palette, enabling users to record their compositions directly.
 
 -   **Select Language**: Offers a multilingual interface, allowing users to change the language as per their preference.
 
@@ -185,7 +189,7 @@ When you **right-click on a block**, the following options are available:
 
 ![Duplicate](./duplicate.png "Duplicate")
 
-**Help**: The Help option displays a detailed help screen for the selected block. This screen provides valuable information about the block’s functionality, purpose, and usage instructions, making it easier for users to understand and effectively incorporate the block into their projects.
+**Help**: The Help option displays a detailed help screen for the selected block. This screen provides valuable information about the block’s functionality, purpose, and usage instructions, making it easier for users to understand and effectively incorporate the block into their projects. Additionally, the help screen allows you to insert blocks from the help examples directly into your program by clicking on the download icon (labeled "Load this block" in the image below).
 
 ![Help](./help.png "Help")
 
@@ -229,21 +233,54 @@ For further details on how to use these toolbars effectively, you can refer to t
 [Back to Table of Contents](#table-of-contents)
 
 
-There are several keyboard shortcuts:
+# Keyboard Shortcuts Guide
 
-_PgUp_ and _PgDn_ will scroll the screen vertically. This is useful for
-creating long stacks of blocks.
+## General Shortcuts
 
-You can use the arrow keys to move blocks and the _Delete_ key to
-remove an individual block from a stack.
+| Key Combination (Windows) | Key Combination (Mac)       | Description                                             |
+|----------------------------|-----------------------------|---------------------------------------------------------|
+| `Alt + B`                 | `Option + B`               | Save the current block artwork.                        |
+| `Alt + C`                 | `Option + C`               | Copy the selected blocks.                              |
+| `Alt + E`                 | `Option + E`               | Clear all elements.                                    |
+| `Alt + R` or `Enter`      | `Option + R` or `Return`   | Play the project. Activates the play button.           |
+| `Alt + S`                 | `Option + S`               | Stop all running processes (e.g., turtles).            |
+| `Alt + H`                 | `Option + H`               | Save help blocks - Generate and save artwork for each block.|
+| `Ctrl + V`                | `Command + V`              | Open the paste box.                                    |
+| `Space`                   | `Space`                   | Toggle the zoom level of the stage.                    |
+| `ESC`                     | `ESC`                     | Hide widgets or stop ongoing processes.                |
 
-_Enter_ is the equivalent of clicking the _Run_ button.
+## Navigation Shortcuts
 
-_Alt-C_ is copy and _Alt-V_ is paste. Be sure that the cursor is
-highlighting the block(s) you want to copy.
+| Key (Windows)      | Key (Mac)                            | Description                                             |
+|---------------------|--------------------------------------|---------------------------------------------------------|
+| `HOME`             | `Fn + Left Arrow`                   | Jump to the home position for blocks or palettes.       |
+| `END`              | `Fn + Right Arrow`                  | Scroll to the bottom of the page.                       |
+| `PAGE UP`          | `Fn + Up Arrow`                     | Scroll up by half the screen height.                   |
+| `PAGE DOWN`        | `Fn + Down Arrow`                   | Scroll down by half the screen height.                 |
+| `Arrow Up`         | `Arrow Up`                          | Move the active block or scroll up.                    |
+| `Arrow Down`       | `Arrow Down`                        | Move the active block or scroll down.                  |
+| `Arrow Left`       | `Arrow Left`                        | Move the active block or scroll left (In Horizontal mode).|
+| `Arrow Right`      | `Arrow Right`                       | Move the active block or scroll right (In Horizontal mode).|
 
-You can directly type notes using _d_ for `Do`, _r_ for `Re`, _m_ for
-`Mi`, _f_ for `Fa`, _s_ for `Sol`, _l_ for `La`, and _t_ for `Ti`.
+## Music Note Creation
+
+| Key (Windows) | Key (Mac)     | Description               |
+|---------------|---------------|---------------------------|
+| `D`           | `D`           | Create a "Do" note.       |
+| `R`           | `R`           | Create a "Re" note.       |
+| `M`           | `M`           | Create a "Mi" note.       |
+| `F`           | `F`           | Create a "Fa" note.       |
+| `S`           | `S`           | Create a "Sol" note.      |
+| `L`           | `L`           | Create a "La" note.       |
+| `T`           | `T`           | Create a "Ti" note.       |
+
+## Special Block Manipulations
+
+| Key (Windows) | Key (Mac) | Description                                                 |
+|----------------------------|-----------------------|-------------------------------------------------------------|
+| `/`                        | `/`                  | Scroll blocks container to the right (In Horizontal mode).  |
+| `\`                        | `\`                  | Scroll blocks container to the left (In Horizontal mode).   |
+| `DEL`                      | `Delete`             | Extract the selected block.                                 |
 
 
 ## 5. Block Palettes

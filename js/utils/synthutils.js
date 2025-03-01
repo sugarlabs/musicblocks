@@ -80,6 +80,10 @@ const VOICENAMES = [
     [_("bass"), "bass", "images/voices.svg", "string"],
     //.TRANS: viola musical instrument
     [_("double bass"), "double bass", "images/voices.svg", "string"],
+    //.TRANS: sitar musical instrument
+    [_("sitar"), "sitar", "images/synth.svg", "string"],
+    //.TRANS: harmonium musical instrument
+    [_("harmonium"), "harmonium", "images/voices.svg", "string"],
     //.TRANS: musical instrument
     [_("guitar"), "guitar", "images/voices.svg", "string"],
     //.TRANS: musical instrument
@@ -264,7 +268,9 @@ const SOUNDSAMPLESDEFINES = [
     "samples/viola",
     "samples/oboe",
     "samples/trombone",
-    "samples/doublebass" // "samples/japanese_bell",
+    "samples/doublebass",
+    "samples/sitar",
+    "samples/harmonium"
 ];
 
 // Some samples have a default volume other than 50 (See #1697)
@@ -300,7 +306,9 @@ const DEFAULTSYNTHVOLUME = {
     "slap": 60,
     "vibraphone": 100,
     "xylophone": 100,
-    "japanese drum": 90
+    "japanese drum": 90,
+    "sitar": 100,
+    "harmonium": 100
 };
 
 /**
@@ -327,12 +335,14 @@ const SAMPLECENTERNO = {
     "koto": ["C5", 51], // pitchToNumber('C', 5, 'C Major')],
     "dulcimer": ["C4", 39], // pitchToNumber('C', 4, 'C Major')],
     "electric guitar": ["C3", 27], // pitchToNumber('C', 3, 'C Major')],
-    "bassoon": ["D4", 41], // pitchToNumber('C', 5, 'C Major')],
+    "bassoon": ["D4", 41], // pitchToNumber('D', 4, 'D Major')],
     "celeste": ["C3", 27], // pitchToNumber('C', 3, 'C Major')],
-    "vibraphone": ["C5", 51],
-    "xylophone": ["C4", 39],
-    "viola": ["D4", 53],
-    "double bass": ["C4", 39]
+    "vibraphone": ["C5", 51], // pitchToNumber('C', 5, 'C Major')],
+    "xylophone": ["C4", 39], // pitchToNumber('C', 4, 'C Major')],
+    "viola": ["D4", 53], // pitchToNumber('D', 4, 'D Major')],
+    "double bass": ["C4", 39], // pitchToNumber('C', 4, 'C Major')],
+    "sitar": ["C4", 39], // pitchToNumber('C', 4, 'C Major')]
+    "harmonium": ["C4", 39] // pitchToNumber('C', 4, 'C Major')]
 };
 
 
@@ -355,8 +365,7 @@ const percussionInstruments = ["koto", "banjo", "dulcimer", "xylophone", "celest
  * @constant
  * @type {Array<string>}
  */
-const stringInstruments = ["piano", "guitar", "acoustic guitar", "electric guitar"];
-
+const stringInstruments = ["piano", "harmonium", "sitar", "guitar", "acoustic guitar", "electric guitar"];
 /**
  * Validates and sets parameters for an instrument.
  * @function
@@ -828,7 +837,9 @@ function Synth() {
                 { name: "bassoon", data: BASSOON_SAMPLE },
                 { name: "celeste", data: CELESTE_SAMPLE },
                 { name: "vibraphone", data: VIBRAPHONE_SAMPLE },
-                { name: "xylophone", data: XYLOPHONE_SAMPLE }
+                { name: "xylophone", data: XYLOPHONE_SAMPLE },
+                { name: "sitar", data: SITAR_SAMPLE },
+                { name: "harmonium", data: HARMONIUM_SAMPLE }
             ],
             drum: [
                 { name: "bottle", data: BOTTLE_SAMPLE },
@@ -966,7 +977,13 @@ function Synth() {
             }
             chunks = [];
             const url = URL.createObjectURL(blob);
-            download(url, "");
+                // Prompt the user for the file name
+            const fileName = window.prompt("Enter file name", "recording");
+            if (fileName) {
+                download(url, fileName + (platform.FF ? ".wav" : ".ogg"));
+            } else {
+                alert("Download cancelled.");
+            }
         };
         // this.recorder.start();
         // setTimeout(()=>{this.recorder.stop();},5000);
@@ -1360,35 +1377,58 @@ function Synth() {
      * @param {Object} params - Additional parameters for synth configuration.
      */
     this.__createSynth = (turtle, instrumentName, sourceName, params) => {
+        // Ensure the structure is initialized
 
         this._loadSample(sourceName);
         if (sourceName in this.samples.voice || sourceName in this.samples.drum) {
-            instruments[turtle][instrumentName] = this._createSampleSynth(
-                turtle,
-                instrumentName,
-                sourceName,
-                params
-            ).toDestination();
+            if (!instruments[turtle][instrumentName]) {
+                instruments[turtle][instrumentName] = this._createSampleSynth(
+                    turtle,
+                    instrumentName,
+                    sourceName,
+                    params
+                )
+            }
         } else if (sourceName in BUILTIN_SYNTHS) {
-            instruments[turtle][instrumentName] = this._createBuiltinSynth(
-                turtle,
-                instrumentName,
-                sourceName,
-                params
-            ).toDestination();
+            if (instruments[turtle] && instruments[turtle][instrumentName]) {
+                delete instruments[turtle][instrumentName];
+            }
+
+            if (!instruments[turtle][instrumentName]) {
+                instruments[turtle][instrumentName] = this._createBuiltinSynth(
+                    turtle,
+                    instrumentName,
+                    sourceName,
+                    params
+                );
+            }
         } else if (sourceName in CUSTOM_SYNTHS) {
-            instruments[turtle][instrumentName] = this._createCustomSynth(
-                sourceName,
-                params
-            ).toDestination();
+            if (instruments[turtle] && instruments[turtle][instrumentName]) {
+                delete instruments[turtle][instrumentName];
+            }
+
+            if (!instruments[turtle][instrumentName]) {
+
+                instruments[turtle][instrumentName] = this._createCustomSynth(
+                    sourceName,
+                    params
+                )
+            }
+
             instrumentsSource[instrumentName] = [0, "poly"];
         } else if (sourceName in CUSTOMSAMPLES) {
-            instruments[turtle][instrumentName] = this._createSampleSynth(
-                turtle,
-                instrumentName,
-                sourceName,
-                params
-            ).toDestination();
+            if (instruments[turtle] && instruments[turtle][instrumentName]) {
+                delete instruments[turtle][instrumentName];
+            }
+
+            if (!instruments[turtle][instrumentName]) {
+                instruments[turtle][instrumentName] = this._createSampleSynth(
+                    turtle,
+                    instrumentName,
+                    sourceName,
+                    params
+                )
+            }
         } else {
             if (sourceName.length >= 4) {
                 if (sourceName.slice(0, 4) === "http") {
@@ -1442,18 +1482,12 @@ function Synth() {
      */
     this.loadSynth = (turtle, sourceName) => {
         /* eslint-disable */
-        if (sourceName in instruments[turtle]) {
-            if (sourceName.substring(0,13) === "customsample_") {
-                console.debug("loading custom " + sourceName);
-                this.createSynth(turtle, sourceName, sourceName, null);
-            // } else {
-            //     console.debug(sourceName + " already loaded");
-            }
-
+        if (sourceName.substring(0, 13) === "customsample_") {
+            console.debug("loading custom " + sourceName);
         } else {
             console.debug("loading " + sourceName);
-            this.createSynth(turtle, sourceName, sourceName, null);
         }
+        this.createSynth(turtle, sourceName, sourceName, null);
         this.setVolume(turtle, sourceName, last(Singer.masterVolume));
 
         if (sourceName in instruments[turtle]) {
@@ -1938,6 +1972,21 @@ function Synth() {
 
         synth.volume.linearRampToValueAtTime(db, Tone.now() + rampTime);
     };
+
+    /**
+     * new Addtion
+     * Gets the volume for a specific instrument.
+     * @param {string} turtle - The name of the turtle (e.g., "turtle1").
+     * @param {string} instrumentName - The name of the instrument (e.g., "flute").
+     * @returns {number} The volume level in decibels or 50 if not found.
+     */
+    this.getVolume = (turtle, instrumentName) => {
+        if (instruments[turtle] && instruments[turtle][instrumentName]) {
+            return instruments[turtle][instrumentName].volume.value;
+        }
+        console.debug("instrument not found");
+        return 50;  // Default volume
+    }
     
     /**
      * Sets the volume of a specific instrument for a given turtle.
@@ -1969,25 +2018,6 @@ function Synth() {
             instruments[turtle][instrumentName].volume.value = db;
         }
     };
-
-    /**
-     * Gets the volume of a specific instrument for a given turtle.
-     * @function
-     * @memberof Synth
-     * @param {string} turtle - The name of the turtle.
-     * @param {string} instrumentName - The name of the instrument.
-     * @returns {number} The volume level.
-     * @deprecated This method is currently unused and may not return correct values.
-     */
-    this.getVolume = (turtle, instrumentName) => {
-        if (instrumentName in instruments[turtle]) {
-            return instruments[turtle][instrumentName].volume.value;
-        } else {
-            // eslint-disable-next-line no-console
-            console.debug("instrument not found");
-            return 50;
-        }
-    };
     
     /**
      * Sets the master volume for all instruments.
@@ -1995,9 +2025,24 @@ function Synth() {
      * @memberof Synth
      * @param {number} volume - The master volume level (0 to 100).
      */
-    this.setMasterVolume = volume => {
-        const db = Tone.gainToDb(volume / 100);
-        Tone.Destination.volume.rampTo(db, 0.01);
+    this.setMasterVolume = (volume, firstConnection, lastConnection) => {
+        if (!instruments[0]["electronic synth"]) {
+            this.createDefaultSynth(0);
+        }
+        this.setVolume(0, "electronic synth", volume);
+
+
+        if (firstConnection === null && lastConnection === null) {
+            // Reset volume to default (0 dB) first
+             Tone.Destination.volume.rampTo(0, 0.01); 
+            setTimeout(()=>{
+                this.trigger(0, "G4", 1 / 4, "electronic synth", null, null, false);
+            },200)
+        }
+        else{
+            const db = Tone.gainToDb(volume / 100);
+            Tone.Destination.volume.rampTo(db, 0.01);
+        } 
     };
 
     /**

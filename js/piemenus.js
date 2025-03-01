@@ -1080,9 +1080,7 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
     // enable changing values while pie-menu is open
     const labelElem = docById("labelDiv");
     labelElem.innerHTML =
-        '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' +
-        note +
-        '" />';
+        `<input id="numberLabel" style="position: absolute; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;" class="number" type="number" value="${note}" />`;
     labelElem.classList.add("hasKeyboard");
 
     block.label = docById("numberLabel");
@@ -1522,9 +1520,7 @@ const piemenuNoteValue = (block, noteValue) => {
 
     const labelElem = docById("labelDiv");
     labelElem.innerHTML =
-        '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' +
-        noteValue +
-        '" />';
+        `<input id="numberLabel" style="position: absolute; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;" class="number" type="number" value="${noteValue}" />`;
     labelElem.classList.add("hasKeyboard");
     block.label = docById("numberLabel");
 
@@ -1755,9 +1751,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
 
     const labelElem = docById("labelDiv");
     labelElem.innerHTML =
-        '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' +
-        selectedValue +
-        '" />';
+        `<input id="numberLabel" style="position: absolute; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;" class="number" type="number" value="${selectedValue}" />`;
     labelElem.classList.add("hasKeyboard");
     block.label = docById("numberLabel");
 
@@ -2041,9 +2035,7 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
 
     const labelElem = docById("labelDiv");
     labelElem.innerHTML =
-        '<input id="numberLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="number" type="number" value="' +
-        selectedValue +
-        '" />';
+        `<input id="numberLabel" style="position: absolute; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;" class="number" type="number" value="${selectedValue}" />`;
     labelElem.classList.add("hasKeyboard");
     block.label = docById("numberLabel");
 
@@ -2602,7 +2594,6 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
         }
 
         setTimeout(() => {
-            that.activity.logo.synth.setMasterVolume(DEFAULTVOLUME);
             Singer.setSynthVolume(that.activity.logo, 0, voice, DEFAULTVOLUME);
             that.activity.logo.synth.trigger(0, "G4", 1 / 4, voice, null, null, false);
             that.activity.logo.synth.start();
@@ -3590,12 +3581,15 @@ const piemenuGrid = (activity) => {
     activity.turtles.gridWheel.clockwise = false;
     activity.turtles.gridWheel.initWheel(grids);
     activity.turtles.gridWheel.createWheel();
-    activity.turtles.gridWheel.navigateWheel(
-        activity.turtles.currentGrid ? activity.turtles.currentGrid : 0
-    );
-
+    const storedGrid = activity.turtles.currentGrid ?? 0;
+    activity.turtles.gridWheel.navigateWheel(storedGrid);
+      
     for (let i = 0; i < gridLabels.length; i++) {
-        activity.turtles.gridWheel.navItems[i].navigateFunction = activity.turtles.doGrid;
+        activity.turtles.gridWheel.navItems[i].navigateFunction = function () {
+            activity.hideGrids();
+            activity.turtles.currentGrid = i;
+            activity.turtles.doGrid(i);
+        };
         activity.turtles.gridWheel.navItems[i].setTooltip(gridLabels[i]);
     }
 

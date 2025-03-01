@@ -26,9 +26,10 @@ requirejs.config({
         twewn: "../lib/tweenjs",
         prefixfree: "../bower_components/prefixfree/prefixfree.min",
         samples: "../sounds/samples",
-        planet: "../js/planet"
+        planet: "../js/planet",
+        tonejsMidi: "../node_modules/@tonejs/midi/dist/Midi"
     },
     packages: []
 });
 
-requirejs(["activity/activity"]);
+requirejs(["utils/utils", "activity/activity"]);

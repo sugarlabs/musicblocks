@@ -150,3 +150,15 @@ class Planet {
     };
 
 }
+
+// sync the dark mode of the planet with the main page and themePreference
+document.addEventListener("DOMContentLoaded", function () {
+    let themes = ["light", "dark"];
+    for (let i = 0; i < themes.length; i++) {
+        if (themes[i] === localStorage.getItem("themePreference")) {
+            document.body.classList.add(themes[i]);
+        } else {
+            document.body.classList.remove(themes[i]);
+        }
+    }
+});

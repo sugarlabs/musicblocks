@@ -73,7 +73,7 @@ function setupGraphicsBlocks(activity) {
          * @param {object} turtle - The turtle object.
          */
         setter(logo, value, turtle) {
-            const turtleObj = activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)];
+            const turtleObj = activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle));
             turtleObj.painter.doSetHeading(value);
         }
 
@@ -85,7 +85,7 @@ function setupGraphicsBlocks(activity) {
          */
         updateParameter(logo, turtle) {
             return toFixed2(
-                activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].orientation
+                activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).orientation
             );
         }
 
@@ -104,7 +104,7 @@ function setupGraphicsBlocks(activity) {
             ) {
                 logo.statusFields.push([blk, "heading"]);
             } else {
-                return activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)]
+                return activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle))
                     .orientation;
             }
         }
@@ -157,7 +157,7 @@ function setupGraphicsBlocks(activity) {
          * @param {object} turtle - The turtle object.
          */
         setter(logo, value, turtle) {
-            const turtleObj = activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)];
+            const turtleObj = activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle));
             turtleObj.painter.doSetXY(turtleObj.x, value);
         }
 
@@ -169,7 +169,7 @@ function setupGraphicsBlocks(activity) {
          */
         updateParameter(logo, turtle) {
             return toFixed2(
-                activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].y
+                activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).y
             );
         }
 
@@ -189,7 +189,7 @@ function setupGraphicsBlocks(activity) {
                 logo.statusFields.push([blk, "y"]);
             } else {
                 return activity.turtles.screenY2turtleY(
-                    activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].container
+                    activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).container
                         .y
                 );
             }
@@ -243,7 +243,7 @@ function setupGraphicsBlocks(activity) {
          * @param {object} turtle - The turtle object.
          */
         setter(logo, value, turtle) {
-            const turtleObj = activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)];
+            const turtleObj = activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle));
             turtleObj.painter.doSetXY(value, turtleObj.y);
         }
 
@@ -255,7 +255,7 @@ function setupGraphicsBlocks(activity) {
          */
         updateParameter(logo, turtle) {
             return toFixed2(
-                activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].x
+                activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).x
             );
         }
 
@@ -275,7 +275,7 @@ function setupGraphicsBlocks(activity) {
                 logo.statusFields.push([blk, "x"]);
             } else {
                 return activity.turtles.screenX2turtleX(
-                    activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)].container
+                    activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle)).container
                         .x
                 );
             }
@@ -337,23 +337,14 @@ function setupGraphicsBlocks(activity) {
                 } else if (tur.singer.inNoteBlock.length > 0) {
                     tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
                 } else {
+                    const requiredTurtle =  activity.turtles.getTurtle(activity.turtles.companionTurtle(turtle));
                     if (tur.singer.suppressOutput) {
-                        const savedPenState =
-                            activity.turtles.turtleList[activity.turtles.companionTurtle(turtle)]
-                                .painter.penState;
-                        activity.turtles.turtleList[
-                            activity.turtles.companionTurtle(turtle)
-                        ].painter.penState = false;
-                        activity.turtles.turtleList[
-                            activity.turtles.companionTurtle(turtle)
-                        ].painter.doScrollXY(args[0], args[1]);
-                        activity.turtles.turtleList[
-                            activity.turtles.companionTurtle(turtle)
-                        ].painter.penState = savedPenState;
+                        const savedPenState = requiredTurtle.painter.penState;
+                        requiredTurtle.painter.penState = false;
+                        requiredTurtle.painter.doScrollXY(args[0], args[1]);
+                        requiredTurtle.painter.penState = savedPenState;
                     } else {
-                        activity.turtles.turtleList[
-                            activity.turtles.companionTurtle(turtle)
-                        ].painter.doScrollXY(args[0], args[1]);
+                        requiredTurtle.painter.doScrollXY(args[0], args[1]);
                     }
                 }
             }

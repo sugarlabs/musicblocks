@@ -518,11 +518,13 @@ class JSInterface {
                     } else if (props["constraints"]["type"] === "synth") {
                         const instruments = [
                             "piano",
+                            "harmonuium",
                             "violin",
                             "viola",
                             "cello",
                             "bass",
                             "double bass",
+                            "sitar",
                             "guitar",
                             "acoustic guitar",
                             "flute",
@@ -632,3 +634,7 @@ class JSInterface {
         return finalArgs;
     }
 }
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = JSInterface;
+  }
+  

@@ -67,6 +67,9 @@ class Toolbar {
                 ["delPluginIcon", _("Delete plugin")],
                 ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
                 ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
+                ["themeSelectIcon", _("Change theme")],
+                ["light", _("Light Mode")],
+                ["dark", _("Dark Mode")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["chooseKeyIcon", _("Set Pitch Preview")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
@@ -77,6 +80,7 @@ class Toolbar {
                 ["save-html-beg", _("Save project as HTML"), "innerHTML"],
                 ["save-png-beg", _("Save mouse artwork as PNG"), "innerHTML"],
                 ["save-html", _("Save project as HTML"), "innerHTML"],
+                ["save-midi", _("Save project as MIDI"), "innerHTML"],
                 ["save-svg", _("Save mouse artwork as SVG"), "innerHTML"],
                 ["save-png", _("Save mouse artwork as PNG"), "innerHTML"],
                 ["save-wav", _("Save music as WAV"), "innerHTML"],
@@ -84,6 +88,7 @@ class Toolbar {
                 ["save-ly", _("Save sheet music as Lilypond"), "innerHTML"],
                 ["save-mxml", _("Save sheet music as MusicXML"), "innerHTML"],
                 ["save-blockartwork-svg", _("Save block artwork as SVG"), "innerHTML"],
+                ["save-blockartwork-png", _("Save block artwork as PNG"), "innerHTML"],
                 ["new-project", _("Confirm"), "innerHTML"],
                 ["enUS", _("English (United States)"), "innerHTML"],
                 ["enUK", _("English (United Kingdom)"), "innerHTML"],
@@ -101,7 +106,8 @@ class Toolbar {
                 ["ibo", _("igbo"), "innerHTML"],
                 ["ar", _("عربى"), "innerHTML"],
                 ["te", _("తెలుగు"), "innerHTML"],
-                ["he", _("עִברִית"), "innerHTML"]
+                ["he", _("עִברִית"), "innerHTML"],
+                ["ur", _("اردو"), "innerHTML"]
             ];
 
             // Workaround for FF
@@ -128,6 +134,9 @@ class Toolbar {
                 _("Delete plugin"),
                 _("Enable horizontal scrolling"),
                 _("Disable horizontal scrolling"),
+                _("Change theme"),               
+                _("Light Mode"),
+                _("Dark Mode"),
                 _("Merge with current project"),
                 _("Set Pitch Preview"),
                 _("JavaScript Editor"),
@@ -136,12 +145,14 @@ class Toolbar {
                 _("Switch to advanced mode"),
                 _("Select language"),
                 _("Save project as HTML"),
+                _("Save project as MIDI"),
                 _("Save mouse artwork as SVG"),
                 _("Save mouse artwork as PNG"),
                 _("Save music as WAV"),
                 _("Save sheet music as ABC"),
                 _("Save sheet music as Lilypond"),
                 _("Save block artwork as SVG"),
+                _("Save block artwork as PNG"),              
                 _("Confirm"),
                 _("Select language"),
                 _("Save project as HTML"),
@@ -150,6 +161,7 @@ class Toolbar {
                 _("Save turtle artwork as SVG"),
                 _("Save turtle artwork as PNG"),
                 _("Save block artwork as SVG"),
+                _("Save block artwork as PNG"),
                 _("Confirm"),
                 _("English (United States)"),
                 _("English (United Kingdom)"),
@@ -167,7 +179,8 @@ class Toolbar {
                 _("తెలుగు"),
                 _("igbo"),
                 _("عربى"),
-                _("עִברִית")
+                _("עִברִית"),
+                _("اردو")
             ];
         } else {
             strings = [
@@ -193,6 +206,9 @@ class Toolbar {
                 ["delPluginIcon", _("Delete plugin")],
                 ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
                 ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
+                ["themeSelectIcon", _("Change theme")],
+                ["light", _("Light Mode")],
+                ["dark", _("Dark Mode")],
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
                 ["restoreIcon", _("Restore")],
@@ -205,6 +221,7 @@ class Toolbar {
                 ["save-svg", _("Save turtle artwork as SVG"), "innerHTML"],
                 ["save-png", _("Save turtle artwork as PNG"), "innerHTML"],
                 ["save-blockartwork-svg", _("Save block artwork as SVG"), "innerHTML"],
+                ["save-blockartwork-png", _("Save block artwork as PNG"), "innerHTML"],
                 ["new-project", _("Confirm"), "innerHTML"],
                 ["enUS", _("English (United States)"), "innerHTML"],
                 ["enUK", _("English (United Kingdom)"), "innerHTML"],
@@ -222,7 +239,8 @@ class Toolbar {
                 ["ibo", _("igbo"), "innerHTML"],
                 ["ar", _("عربى"), "innerHTML"],
                 ["te", _("తెలుగు"), "innerHTML"],
-                ["he", _("עִברִית"), "innerHTML"]
+                ["he", _("עִברִית"), "innerHTML"],
+                ["ur", _("اردو"), "innerHTML"]
             ];
 
             // Workaround for FF
@@ -249,6 +267,9 @@ class Toolbar {
                 _("Delete plugin"),
                 _("Enable horizontal scrolling"),
                 _("Disable horizontal scrolling"),
+                _("Change theme"),               
+                _("Light Mode"),
+                _("Dark Mode"),
                 _("Merge with current project"),
                 _("JavaScript Editor"),
                 _("Restore"),
@@ -261,6 +282,7 @@ class Toolbar {
                 _("Save turtle artwork as SVG"),
                 _("Save turtle artwork as PNG"),
                 _("Save block artwork as SVG"),
+                _("Save block artwork as PNG"), 
                 _("Confirm"),
                 _("English (United States)"),
                 _("English (United Kingdom)"),
@@ -278,7 +300,8 @@ class Toolbar {
                 _("తెలుగు"),
                 _("igbo"),
                 _("عربى"),
-                _("עִברִית")
+                _("עִברִית"),
+                _("اردو")
             ];
         }
 
@@ -329,7 +352,7 @@ class Toolbar {
     renderLogoIcon(onclick) {
         const logoIcon = docById("mb-logo");
         if (this.language === "ja") {
-            logoIcon.innerHTML = '<img style="width: 100%;" src="images/logo-ja.svg">';
+            logoIcon.innerHTML = '<img style="width: 100%; transform: scale(0.85);" src="images/logo-ja.svg">';
         }
 
         logoIcon.onmouseenter = () => {
@@ -433,7 +456,7 @@ class Toolbar {
 
     /**
      * Renders the load icon with the provided onclick handler.
-     * 
+     *
      * @public
      * @param {Function} onclick - The onclick handler for the load icon.
      * @returns {void}
@@ -443,6 +466,22 @@ class Toolbar {
 
         loadIcon.onclick = () => {
             onclick(this.activity);
+        };
+    }
+
+    renderThemeSelectIcon(themeBox, themes) {
+        const icon = document.getElementById("themeSelectIcon")
+        themes.forEach((theme) =>{
+            if(localStorage.themePreference === theme){
+                icon.innerHTML = document.getElementById(theme).innerHTML;
+            }
+        })
+        const themeSelectIcon = docById("themeSelectIcon");
+        let themeList = themes;
+        themeSelectIcon.onclick = () => {
+            themeList.forEach((theme) => {
+                docById(theme).onclick = () => themeBox[`${theme}_onclick`](this.activity);
+            });
         };
     }
 
@@ -540,6 +579,7 @@ class Toolbar {
      * 
      * @public
      * @param  {Function} html_onclick - The onclick handler for HTML.
+     * @param  {Function} midi_onclick - The onclick handler for MIDI.
      * @param  {Function} doSVG_onclick - The onclick handler for SVG.
      * @param  {Function} svg_onclick - The onclick handler for SVG.
      * @param  {Function} png_onclick - The onclick handler for PNG.
@@ -554,12 +594,14 @@ class Toolbar {
         html_onclick,
         doSVG_onclick,
         svg_onclick,
+        midi_onclick,
         png_onclick,
         wave_onclick,
         ly_onclick,
         abc_onclick,
         mxml_onclick,
-        blockartworksvg_onclick
+        blockartworksvg_onclick,
+        blockartworkpng_onclick
     ) {
         const saveButton = docById('saveButton');
         const saveButtonAdvanced = docById('saveButtonAdvanced');
@@ -647,6 +689,11 @@ class Toolbar {
                 }
 
                 if (_THIS_IS_MUSIC_BLOCKS_) {
+                    const saveMIDI = docById("save-midi");
+                    saveMIDI.onclick = () => {
+                        midi_onclick(this.activity);
+                    };
+
                     const saveWAV = docById('save-wav');
                      saveWAV.onclick = () => {
                         wave_onclick(this.activity);
@@ -668,6 +715,10 @@ class Toolbar {
                 const saveArtworkSVG = docById('save-blockartwork-svg');
                 saveArtworkSVG.onclick = () => {
                     blockartworksvg_onclick(this.activity);
+                };
+                const saveArtworkPNG = docById('save-blockartwork-png');
+                saveArtworkPNG.onclick = () => {
+                    blockartworkpng_onclick(this.activity);
                 };
             }
         }
@@ -894,6 +945,19 @@ class Toolbar {
             const saveButtonAdvanced = docById('saveButtonAdvanced');
             if (saveButton) saveButton.style.display = this.activity.beginnerMode ? "block" : "none";
             if (saveButtonAdvanced) saveButtonAdvanced.style.display = this.activity.beginnerMode ? "none" : "block";
+            activity.toolbar.renderSaveIcons(
+                activity.save.saveHTML.bind(activity.save),
+                doSVG,
+                activity.save.saveSVG.bind(activity.save),
+                activity.save.saveMIDI.bind(activity.save),
+                activity.save.savePNG.bind(activity.save),
+                activity.save.saveWAV.bind(activity.save),
+                activity.save.saveLilypond.bind(activity.save),
+                activity.save.saveAbc.bind(activity.save),
+                activity.save.saveMxml.bind(activity.save),
+                activity.save.saveBlockArtwork.bind(activity.save),
+                activity.save.saveBlockArtworkPNG.bind(activity.save)
+            );
         };
 
         // Handle mode switching
@@ -960,7 +1024,6 @@ class Toolbar {
 
         runStepByStepIcon.onclick = () => {
             onclick(this.activity);
-            docById("stop").style.color = this.stopIconColorWhenPlaying;
         };
     }
 
@@ -1033,7 +1096,7 @@ class Toolbar {
         const languageSelectIcon = docById("languageSelectIcon");
         const languages = [
             "enUS", "enUK", "es", "pt", "ko", "ja", "kana", "zhCN", "th",
-            "ayc", "quz", "gug", "hi", "ibo", "ar", "te", "he"
+            "ayc", "quz", "gug", "hi", "ibo", "ar", "te", "he", "ur"
         ];
     
         languageSelectIcon.onclick = () => {
@@ -1072,12 +1135,19 @@ class Toolbar {
 function renderNewProjectConfirmation() {
     const modalContainer = document.getElementById("modal-container");
     const newDropdown = document.getElementById("newdropdown");
+    const isDarkMode = document.body.classList.contains("dark");
+    newDropdown.style.backgroundColor = isDarkMode ? "#424242" : "#ffffff";
+    newDropdown.style.border = isDarkMode ? "1px solid #444444" : "1px solid #cccccc";
+    newDropdown.style.color = isDarkMode ? "#ffffff" : "#000000";
+    newDropdown.style.padding = "24px";
     newDropdown.innerHTML = '';
     const title = document.createElement("div");
-    title.innerHTML = `<h2 style="color: #0066FF; font-size: 24px; text-align: left; margin: 0;">${_("New project")}</h2>`;
+    title.innerHTML = `<h2 style="font-size: 24px; text-align: left; margin: 0; color: #2196F3;">${_("New project")}</h2>`;
     newDropdown.appendChild(title);
     const confirmationMessage = document.createElement("div");
-    confirmationMessage.innerHTML = `<div id="confirmation-message" style="color: #666666; font-size: 16px; margin-bottom: 24px; text-align: left;">${_("Are you sure you want to create a new project?")}</div>`;
+    confirmationMessage.innerHTML = `<div id="confirmation-message" style="font-size: 16px; margin-bottom: 24px; text-align: left; ${
+        isDarkMode ? "color: #ffffff;" : "color: #666666;"
+    }">${_("Are you sure you want to create a new project?")}</div>`;
     newDropdown.appendChild(confirmationMessage);
     const confirmationButtonLi = document.createElement("li");
     confirmationButtonLi.style.textAlign = "center";
@@ -1085,10 +1155,10 @@ function renderNewProjectConfirmation() {
     const confirmationButton = document.createElement("a");
     confirmationButton.id = "new-project";
     confirmationButton.style.display = "inline-block";
-    confirmationButton.style.backgroundColor = "#2196F3";
+    confirmationButton.style.backgroundColor = platformColor.blueButton;
     confirmationButton.style.color = "white";
     confirmationButton.style.textDecoration = "none";
-    confirmationButton.style.borderRadius = "4px";
+    confirmationButton.style.borderRadius = "0px";
     confirmationButton.style.fontWeight = "bold";
     confirmationButton.innerHTML = _("Confirm");
     confirmationButtonLi.appendChild(confirmationButton);
