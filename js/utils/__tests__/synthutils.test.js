@@ -530,16 +530,16 @@ describe("Utility Functions (logic-only)", () => {
             expect(Tone.Destination.volume.rampTo).toHaveBeenCalledWith(expectedDb, 0.01);
         });
 
-        test("should handle edge case with volume set to 0", () => {
-            setMasterVolume(0);
+        test("should handle edge case with volume set to 0 with connections", () => {
+            setMasterVolume(0,"c0","c1");
 
             const expectedDb = Tone.gainToDb(0); // 0/100
             expect(Tone.gainToDb).toHaveBeenCalledWith(0);
             expect(Tone.Destination.volume.rampTo).toHaveBeenCalledWith(expectedDb, 0.01);
         });
 
-        test("should handle edge case with volume set to 100", () => {
-            setMasterVolume(100);
+        test("should handle edge case with volume set to 100 with connections", () => {
+            setMasterVolume(100,"c0","c1");
 
             const expectedDb = Tone.gainToDb(1); // 100/100
             expect(Tone.gainToDb).toHaveBeenCalledWith(1);
