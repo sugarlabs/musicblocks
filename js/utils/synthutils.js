@@ -2029,12 +2029,11 @@ function Synth() {
         if (!instruments[0]["electronic synth"]) {
             this.createDefaultSynth(0);
         }
-        this.setVolume(0, "electronic synth", volume);
-
 
         if (firstConnection === null && lastConnection === null) {
             // Reset volume to default (0 dB) first
              Tone.Destination.volume.rampTo(0, 0.01); 
+             this.setVolume(0, "electronic synth", volume);
             setTimeout(()=>{
                 this.trigger(0, "G4", 1 / 4, "electronic synth", null, null, false);
             },200)

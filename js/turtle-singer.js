@@ -663,6 +663,7 @@ class Singer {
      * @static
      * @param {Object} logo
      * @param {Number} volume
+     * @param {Number} [blk] - corresponding Block index in blocks.blockList
      * @returns {void}
      */
     static setMasterVolume(logo, volume, blk) {
@@ -690,6 +691,7 @@ class Singer {
      * @param {Object} turtle
      * @param {Number} synth
      * @param {Number} volume
+     * @param {Number} [blk] - corresponding Block index in blocks.blockList
      * @returns {void}
      */
     static setSynthVolume(logo, turtle, synth, volume, blk) {
