@@ -1,15 +1,9 @@
-// Create a mock setup for pitch blocks testing
-// This file should be saved as mock-setup.js
-
-// Mock translation function
 global._ = function(text) {
   return text;
 };
 
-// Constants
 global.NOINPUTERRORMSG = "Missing input";
 
-// Mock Turtle namespace with PitchActions
 global.Turtle = {
   PitchActions: {
     setKey: jest.fn(),
@@ -20,7 +14,6 @@ global.Turtle = {
   }
 };
 
-// Mock required block classes if they're not already defined
 if (!global.ValueBlock) {
   global.ValueBlock = class ValueBlock {
     constructor(name, label) {
@@ -69,7 +62,6 @@ if (!global.FlowClampBlock) {
   };
 }
 
-// Mock the LeftBlock class
 global.LeftBlock = class LeftBlock {
   constructor(name, label) {
     this.name = name;
@@ -104,7 +96,6 @@ global.LeftBlock = class LeftBlock {
   }
 };
 
-// Create a function to generate mock activity instances
 global.createMockActivity = function() {
   const activity = {
     blocks: {
@@ -122,18 +113,11 @@ global.createMockActivity = function() {
   return activity;
 };
 
-// Do not overwrite FlowBlock with Block
-// global.FlowBlock = global.Block;
-
-// Add these to your mock-setup.js file
-
-// Base method for all block setup functions
 const setupBlockMethod = function(activity) {
   this.setPalette("pitch", activity);
   return this;
 };
 
-// ConsonantStepSizeDownBlock
 global.ConsonantStepSizeDownBlock = class ConsonantStepSizeDownBlock extends global.FlowBlock {
   constructor() {
     super("consonantstepsizedown");
@@ -144,7 +128,6 @@ global.ConsonantStepSizeDownBlock = class ConsonantStepSizeDownBlock extends glo
   }
 };
 
-// ConsonantStepSizeUpBlock
 global.ConsonantStepSizeUpBlock = class ConsonantStepSizeUpBlock extends global.FlowBlock {
   constructor() {
     super("consonantstepsizeup");
@@ -155,7 +138,6 @@ global.ConsonantStepSizeUpBlock = class ConsonantStepSizeUpBlock extends global.
   }
 };
 
-// RestBlock
 global.RestBlock = class RestBlock extends global.FlowBlock {
   constructor() {
     super("rest");
@@ -166,7 +148,6 @@ global.RestBlock = class RestBlock extends global.FlowBlock {
   }
 };
 
-// SquareBlock
 global.SquareBlock = class SquareBlock extends global.FlowBlock {
   constructor() {
     super("square");
@@ -176,6 +157,3 @@ global.SquareBlock = class SquareBlock extends global.FlowBlock {
     return setupBlockMethod.call(this, activity);
   }
 };
-
-// You'll likely need to add similar definitions for any other block classes 
-// that might be instantiated in setupPitchBlocks
