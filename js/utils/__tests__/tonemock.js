@@ -1,3 +1,21 @@
+/*
+ * @license
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 class Sampler {
   constructor(noteDict) {
     this.noteDict = noteDict;
@@ -7,9 +25,9 @@ class Sampler {
     this.stop = jest.fn().mockReturnThis();
     this.triggerAttack = jest.fn().mockReturnThis();
     this.volume = {
-      value: 0, 
+      value: 0,
       linearRampToValueAtTime: jest.fn().mockImplementation()
-    }
+    };
     this.triggerRelease = jest.fn().mockReturnThis();
     this.triggerAttackRelease = jest.fn().mockReturnThis();
     this.chain = jest.fn().mockReturnThis();
@@ -44,7 +62,7 @@ class DuoSynth {
 
 class PluckSynth {
   constructor(synthOptions) {
-    this.synthOptions = synthOptions
+    this.synthOptions = synthOptions;
     this.triggerAttackRelease = jest.fn().mockReturnThis();
   }
   toDestination() {
@@ -54,10 +72,10 @@ class PluckSynth {
 
 class Synth {
   constructor(synthOptions) {
-    this.synthOptions = synthOptions
+    this.synthOptions = synthOptions;
     this.triggerAttackRelease = jest.fn().mockReturnThis();
     this.stop = jest.fn().mockReturnThis();
-    this.triggerAttack = jest.fn().mockReturnThis(); 
+    this.triggerAttack = jest.fn().mockReturnThis();
     this.triggerRelease = jest.fn().mockReturnThis();
     this.start = jest.fn().mockReturnThis();
     this.chain = jest.fn().mockReturnThis();
@@ -72,7 +90,7 @@ class Synth {
 }
 class NoiseSynth {
   constructor(synthOptions) {
-    this.synthOptions = synthOptions
+    this.synthOptions = synthOptions;
   }
   toDestination() {
     return this;
@@ -96,7 +114,7 @@ class PolySynth {
     return this;
   }
   connect() {
-    return this
+    return this;
   }
 }
 
@@ -114,7 +132,7 @@ class Transport {
 
 class ToneAudioBuffer {
   static async loaded() {
-    return this
+    return this;
   }
 }
 
@@ -134,19 +152,19 @@ const Tone = {
   Frequency: jest.fn(() => {
     return {
       toFrequency: jest.fn().mockReturnThis()
-    }
+    };
   }),
   getContext: jest.fn(() => {
     return {
       createMediaStreamDestination: jest.fn().mockReturnThis()
-    }
+    };
   }),
   gainToDb: jest.fn(() => {
-    return 4
+    return 4;
   }),
   start: jest.fn(),
   now: jest.fn(() => {
-    return new Date().getTime()
+    return new Date().getTime();
   }),
   Context: jest.fn().mockReturnThis(),
   Loop: jest.fn((callback, interval) => ({
@@ -166,7 +184,7 @@ const Tone = {
   Buffer: jest.fn(() => {
     return {
       onload: jest.fn().mockReturnThis()
-    }
+    };
   })
 };
 

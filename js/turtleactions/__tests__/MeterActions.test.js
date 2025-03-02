@@ -1,3 +1,21 @@
+/*
+ * @license
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 const setupMeterActions = require('../MeterActions');
 
 describe('setupMeterActions', () => {
@@ -8,14 +26,14 @@ describe('setupMeterActions', () => {
         global.Singer = {
             MeterActions: {},
             RhythmActions: {
-                getNoteValue: jest.fn(() => 1), 
+                getNoteValue: jest.fn(() => 1),
             },
         };
         global.TONEBPM = 240;
         global.Queue = jest.fn((action, duration, blk) => ({ action, duration, blk }));
         global.last = jest.fn((array) => array[array.length - 1]);
         global._ = jest.fn((msg) => msg);
-        global.rationalToFraction = jest.fn((value) => [value * 4, 4]); 
+        global.rationalToFraction = jest.fn((value) => [value * 4, 4]);
     });
     
 
@@ -102,10 +120,10 @@ describe('setupMeterActions', () => {
     });
 
     it('should set a listener for every beat', () => {
-        activity.turtles.turtleList = [{ companionTurtle: null }]; 
+        activity.turtles.turtleList = [{ companionTurtle: null }];
         activity.turtles.addTurtle = jest.fn();
         activity.logo.prepSynths = jest.fn();
-        targetTurtle.id = 0; 
+        targetTurtle.id = 0;
     
         Singer.MeterActions.onEveryBeatDo('testAction', false, null, 0, 1);
     
@@ -151,7 +169,7 @@ describe('setupMeterActions', () => {
         targetTurtle.singer.beatsPerMeasure = 4;
         targetTurtle.singer.noteValuePerBeat = 1;
         
-        const meter = Singer.MeterActions.getCurrentMeter(0);  
-        expect(meter).toBe('4:1');  
-    });   
+        const meter = Singer.MeterActions.getCurrentMeter(0);
+        expect(meter).toBe('4:1');
+    });
 });

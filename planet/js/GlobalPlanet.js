@@ -1,13 +1,22 @@
-// Copyright (c) 2017 Euan Ong
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the The GNU Affero General Public
-// License as published by the Free Software Foundation; either
-// version 3 of the License, or (at your option) any later version.
-//
-// You should have received a copy of the GNU Affero General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+/*
+ * @license
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 
 
 /*
@@ -106,7 +115,7 @@ class GlobalPlanet {
         const tagids = [];
 
         for (let i = 0; i < this.tags.length; i++)
-            if (this.tags[i].specialTag === false && this.tags[i].selected === true) 
+            if (this.tags[i].specialTag === false && this.tags[i].selected === true)
                 tagids.push(this.tags[i].id);
 
         if (tagids.length === 0)
@@ -163,7 +172,7 @@ class GlobalPlanet {
     };
     
     loadMoreProjects() {
-        const Planet = this.Planet ; 
+        const Planet = this.Planet ;
 
         this.showLoading();
         this.hideLoadMore();
@@ -176,7 +185,7 @@ class GlobalPlanet {
                 this.index + this.page + 1,
                 this.afterRefreshProjects.bind(this)
             );
-        } 
+        }
         else {
             Planet.ServerInterface.downloadProjectList(
                 this.searchMode,
@@ -189,14 +198,14 @@ class GlobalPlanet {
     };
 
     search() {
-        const Planet = this.Planet ; 
+        const Planet = this.Planet ;
 
         if (!this.searching) {
             if (this.searchString === "") {
                 this.oldSearchString = "";
                 this.searching = false;
                 this.showTags();
-            } 
+            }
             else {
                 this.searching = true;
                 this.hideTags();
@@ -294,7 +303,7 @@ class GlobalPlanet {
 
             if (this.loadCount <= 0)
                 callback();
-        } 
+        }
         else this.throwOfflineError();
     };
 
@@ -309,7 +318,7 @@ class GlobalPlanet {
             this.cache[id] = data.data;
             this.cache[id].ProjectData = null;
             callback();
-        } 
+        }
         
         else this.throwOfflineError();
     };
@@ -445,7 +454,7 @@ class GlobalPlanet {
     };
 
     openGlobalProject (id, error) {
-        const Planet = this.Planet ; 
+        const Planet = this.Planet ;
 
         if (error === undefined)
             error = null;
@@ -478,7 +487,7 @@ class GlobalPlanet {
     };
 
     mergeGlobalProject (id, error) {
-        const Planet = this.Planet ; 
+        const Planet = this.Planet ;
 
         if (error === undefined)
             error = null;
@@ -571,12 +580,12 @@ class GlobalPlanet {
 
             document.getElementById("global-tab").addEventListener("click", (evt) => {
                 document.getElementById("searchcontainer-one").style.display = "block";
-            })
+            });
 
             document.getElementById("local-tab").addEventListener("click", (evt) => {
                 document.getElementById("searchcontainer-one").style.display = "none";
                 // document.getElementById("two_header").style.display = "none";
-            })
+            });
             
             document.body.onscroll = () => {
                 const currentUserScrollPos = window.pageYOffset ||

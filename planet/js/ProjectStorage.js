@@ -1,13 +1,22 @@
-// Copyright (c) 2017 Euan Ong
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the The GNU Affero General Public
-// License as published by the Free Software Foundation; either
-// version 3 of the License, or (at your option) any later version.
-//
-// You should have received a copy of the GNU Affero General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+/*
+ * @license
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 
 /*
    global
@@ -80,19 +89,19 @@ class ProjectStorage {
 
     async getCurrentProjectData() {
         await this.dataLoaded;
-        const c = this.data.CurrentProject; 
+        const c = this.data.CurrentProject;
         return this.data.Projects[c]?.ProjectData ?? null ;
     };
 
     getCurrentProjectName() {
         const c = this.data.CurrentProject;
-        return this.data.Projects[c]?.ProjectName ?? this.defaultProjectName ; 
+        return this.data.Projects[c]?.ProjectName ?? this.defaultProjectName ;
     };
 
     getCurrentProjectDescription(){
         const c = this.data.CurrentProject;
 
-        if (this.data.Projects[c]!=undefined && 
+        if (this.data.Projects[c]!=undefined &&
             this.data.Projects[c].PublishedData !== null)
                 return this.data.Projects[c].PublishedData.ProjectDescription;
 
@@ -102,16 +111,16 @@ class ProjectStorage {
     getCurrentProjectImage() {
         const c = this.data.CurrentProject;
 
-        if (this.data.Projects[c] !== undefined && 
+        if (this.data.Projects[c] !== undefined &&
             this.data.Projects[c].ProjectImage !== null)
                 return this.data.Projects[c].ProjectImage;
 
         return this.ImageDataURL;
     };
 
-    initialiseNewProject (name, data, image) { 
+    initialiseNewProject (name, data, image) {
         name  = name ?? this.defaultProjectName ;
-        data  = data ?? null ; 
+        data  = data ?? null ;
         image = image ?? null ;
 
         const c = this.generateID();
@@ -158,7 +167,7 @@ class ProjectStorage {
     };
 
     isLiked(id) {
-        return this.data.LikedProjects[id] === true ; 
+        return this.data.LikedProjects[id] === true ;
     };
 
     like(id,like) {
@@ -167,7 +176,7 @@ class ProjectStorage {
     };
 
     isReported(id) {
-        return this.data.ReportedProjects[id] === true ; 
+        return this.data.ReportedProjects[id] === true ;
     };
 
     report (id, report) {
@@ -194,7 +203,7 @@ class ProjectStorage {
 
         try {
             return JSON.parse(jsonobj);
-        } 
+        }
         catch (e) {
             // eslint-disable-next-line no-console
             console.log(e);
@@ -211,7 +220,7 @@ class ProjectStorage {
         const currentData = await this.get(this.LocalStorageKey);
 
         try {
-            this.data = (typeof currentData === "string") ? 
+            this.data = (typeof currentData === "string") ?
                 JSON.parse(currentData) : currentData ;
         }
         catch (e) {

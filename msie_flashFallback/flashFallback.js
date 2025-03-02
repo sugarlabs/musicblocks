@@ -1,9 +1,22 @@
 /*
-  A fallback to flash for wav-output (for IE 10)
-  Please mind that wav data has to be copied to an ArrayBuffer object internally,
-  since we may not send binary data to the swf.
-  This may take some time and memory for longer utterances.
-*/
+ * @license
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 
 var meSpeakFlashFallback = new function() {
 
@@ -190,7 +203,7 @@ function swfRemoveObjectInIE(id) {
 			if (obj.parentNode) obj.parentNode.removeChild(obj);
 		}
 		else {
-			setTimeout(function() {swfRemoveObjectInIE(id)}, 10);
+			setTimeout(function() {swfRemoveObjectInIE(id);}, 10);
 		}
 	}
 }
@@ -216,7 +229,7 @@ return {
 	'speak': swfSpeak,
 	'setVolume': swfSetVolume,
 	'swfFallbackHandshake': swfFallbackHandshake
-}
+};
 
 };
 

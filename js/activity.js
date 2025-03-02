@@ -1,18 +1,22 @@
-// Copyright (c) 2014-22 Walter Bender
-// Copyright (c) Yash Khandelwal, GSoC'15
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the The GNU Affero General Public
-// License as published by the Free Software Foundation; either
-// version 3 of the License, or (at your option) any later version.
-//
-// You should have received a copy of the GNU Affero General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
-//
-// Note: This code is inspired by the Python Turtle Blocks project
-// (https://github.com/walterbender/turtleart), but implemented from
-// scratch. -- Walter Bender, October 2014.
+/*
+ * @license
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 
 /*
    globals
@@ -468,7 +472,7 @@ class Activity {
             modeButton.addEventListener("click", this._hideHelpfulSearchWidget);
 
             this.helpfulSearchDiv.appendChild(this.helpfulSearchWidget);
-        }
+        };
 
         /*
          * displays helpfulSearchDiv on canvas
@@ -495,7 +499,7 @@ class Activity {
 
             this.showHelpfulSearchWidget();
             this.isHelpfulSearchWidgetOn = true;
-        }
+        };
 
         // hides helpfulSearchDiv on canvas
 
@@ -507,7 +511,7 @@ class Activity {
                     this.helpfulSearchDiv.parentNode.removeChild(this.helpfulSearchDiv);
                 }
                 that.__tick();
-        }
+        };
 
 
         /*
@@ -582,7 +586,7 @@ class Activity {
             wheelItems.forEach((ele, i) => {
                 wheel.navItems[i].setTooltip(_(ele.label));
                 wheel.navItems[i].navigateFunction = () => ele.fn(this);
-            })
+            });
             const closeHelpfulWheel = (e) => {
                 const isClickInside = helpfulWheelDiv.contains(e.target);
                 if (!isClickInside) {
@@ -592,7 +596,7 @@ class Activity {
             };
 
             document.addEventListener("click", closeHelpfulWheel);
-        }
+        };
 
         /**
         * Sets up plugin and palette boilerplate.
@@ -691,7 +695,7 @@ class Activity {
             Object.values(activity.blocks.blockList).forEach(block => {
                 if (!processedBlocks.has(block.id)) {
                     
-                    activity.blocks.findDragGroup(block.id); 
+                    activity.blocks.findDragGroup(block.id);
 
                     if (activity.blocks.dragGroup.length > 0) {
                         dragGroups.push([...activity.blocks.dragGroup]); // Store the group into dragGroups
@@ -702,7 +706,7 @@ class Activity {
         
             // Repositioning of dragGroups according to horizontal resizing
             dragGroups.forEach(group => {
-                let referenceBlock = activity.blocks.blockList[group[0]]; 
+                let referenceBlock = activity.blocks.blockList[group[0]];
         
                 // Store initial positions
                 if (!referenceBlock.initialPosition) {
@@ -1856,7 +1860,7 @@ class Activity {
                         ele.display = false;
                     else if (ele.label === "Disable horizontal scrolling")
                         ele.display = true;
-                })
+                });
                 activity.textMsg(("Horizontal scrolling enabled."), 3000);
 
             } else {
@@ -1868,7 +1872,7 @@ class Activity {
                         ele.display = true;
                     else if (ele.label === "Disable horizontal scrolling")
                         ele.display = false;
-                })
+                });
                 activity.textMsg(("Horizontal scrolling disabled."), 3000);
 
             }
@@ -3673,7 +3677,7 @@ class Activity {
             if (!activity.blocks || !activity.blocks.trashStacks || activity.blocks.trashStacks.length === 0) {
                 activity.textMsg(
                     _("Trash can is empty."),
-                    3000 
+                    3000
                 );
                 return;
             }
@@ -3688,7 +3692,7 @@ class Activity {
             if (!activity.blocks || !activity.blocks.trashStacks || activity.blocks.trashStacks.length === 0) {
                 activity.textMsg(
                     _("Trash can is empty."),
-                    3000 
+                    3000
                 );
                 return;
             }
@@ -3703,7 +3707,7 @@ class Activity {
                 activity.__tick();
             }
         
-        }
+        };
 
         this._restoreTrashById = (blockId) => {
             const blockIndex = this.blocks.trashStacks.indexOf(blockId);
@@ -3729,7 +3733,7 @@ class Activity {
                 this.blocks.blockList[blk].show();
             }
         
-            this.blocks.raiseStackToTop(blockId);       
+            this.blocks.raiseStackToTop(blockId);
             const restoredBlock = this.blocks.blockList[blockId];
         
             if (restoredBlock.name === 'start' || restoredBlock.name === 'drum') {
@@ -3776,16 +3780,16 @@ class Activity {
             }
             activity.textMsg(
                 _("Item restored from the trash."),
-                3000 
+                3000
             );
         
             this.refreshCanvas();
-        }; 
+        };
 
         // Add event listener for trash icon click
         document.getElementById('restoreIcon').addEventListener('click', () => {
             this._renderTrashView();
-        }); 
+        });
 
         // function to hide trashView from canvas
         function handleClickOutsideTrashView(trashView) {
@@ -3877,7 +3881,7 @@ class Activity {
             } else {
                 trashList.appendChild(trashView);
             }
-        };  
+        };
 
         /*
          * Open aux menu
@@ -3935,7 +3939,7 @@ class Activity {
 
                 this.turtles.deltaY(-dy);
                 this.palettes.deltaY(-dy);
-                this.blocksContainer.y -= dy
+                this.blocksContainer.y -= dy;
                 this.changeTopButtonsPosition(-dy);
 
                 this.cartesianBitmap.y -= dy;
@@ -4418,7 +4422,7 @@ class Activity {
             pitchDuration = toFraction(pitchDuration);
             const adjustedNote = _adjustPitch(pitch.name , keySignature).toUpperCase();
             if (triplet !== undefined && triplet !== null){
-                pitchDuration[1] = meterDen * triplet
+                pitchDuration[1] = meterDen * triplet;
             }
 
             actionBlock.push(
@@ -4462,9 +4466,9 @@ class Activity {
         this.parseABC = async function (tune) {
             let musicBlocksJSON = [];
             let staffBlocksMap = {};
-            let organizeBlock={}
+            let organizeBlock={};
             let blockId = 0;
-            let tripletFinder = null
+            let tripletFinder = null;
             const title = (tune.metaText?.title ?? "title").toString().toLowerCase();
             const instruction = (tune.metaText?.instruction ?? "guitar").toString().toLowerCase();
 
@@ -4477,7 +4481,7 @@ class Activity {
 
                     }
 
-                   organizeBlock[staffIndex].arrangedBlocks.push(staff)
+                   organizeBlock[staffIndex].arrangedBlocks.push(staff);
                 });
             });
             for (const lineId in organizeBlock) {
@@ -4514,10 +4518,10 @@ class Activity {
                         };
 
                         // For adding 17 blocks above
-                        blockId += 17
+                        blockId += 17;
                     }
 
-                    let actionBlock=[]
+                    let actionBlock=[];
                     staff.voices.forEach(voice => {
                         voice.forEach(element => {
                             if (element.el_type === "note") {
@@ -4535,7 +4539,7 @@ class Activity {
                                 blockId = blockId + 9;
                             } else if(element.el_type === "bar") {
                                 if (element.type === "bar_left_repeat") {
-                                    staffBlocksMap[lineId].repeatArray.push({start: staffBlocksMap[lineId].baseBlocks.length, end: -1})
+                                    staffBlocksMap[lineId].repeatArray.push({start: staffBlocksMap[lineId].baseBlocks.length, end: -1});
                                 } else if (element.type === "bar_right_repeat") {
                                     const endBlockSearch = staffBlocksMap[lineId].repeatArray;
 
@@ -4652,8 +4656,8 @@ class Activity {
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0][secondnammedo][4][0] = blockId;
                         }
                     }
-                        staffBlocksMap[staffIndex].baseBlocks[0][0][firstnammedo][4][0] =blockId
-                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][endnammedo][4][1] = null
+                        staffBlocksMap[staffIndex].baseBlocks[0][0][firstnammedo][4][0] =blockId;
+                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][endnammedo][4][1] = null;
 
                         blockId += 2;
                     } else {
@@ -4705,7 +4709,7 @@ class Activity {
             }
             this.blocks.loadNewBlocks(finalBlock);
             return null;
-        }
+        };
 
         /**
          * Calculate time such that no matter how long it takes to load the program, the loading
@@ -5582,7 +5586,7 @@ class Activity {
             if (!this.helpfulWheelItems.find(ele => ele.label === "Increase block size"))
                 this.helpfulWheelItems.push({label: "Increase block size", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(BIGGERBUTTON)), display: true, fn: doLargerBlocks});
 
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Restore")) 
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Restore"))
                 this.helpfulWheelItems.push({label: "Restore", icon: "imgsrc:header-icons/restore-from-trash.svg", display: true, fn: restoreTrashPop});
 
             if (!this.helpfulWheelItems.find(ele => ele.label === "Turtle Wrap Off"))
@@ -5965,7 +5969,7 @@ class Activity {
         this.deselectSelectedBlocks = () => {
             this.unhighlightSelectedBlocks(false);
             this.setSelectionMode(false);
-        }
+        };
 
         // end the drag on navbar
         document.getElementById("toolbars").addEventListener("mouseover", () => {this.isDragging = false;});
@@ -5974,7 +5978,7 @@ class Activity {
             this.moving = false;
             this.isSelecting = !this.isSelecting;
             (this.isSelecting) ? this.textMsg(_("Select is enabled.")) : this.textMsg(_("Select is disabled."));
-        }
+        };
 
         this._create2Ddrag = () => {
             this.dragArea = {};
@@ -6004,7 +6008,7 @@ class Activity {
                         this.blocks.setSelectedBlocks(this.selectedBlocks);
                     }
                 }
-            })
+            });
 
             document.addEventListener("mouseup", (event) => {
                // event.preventDefault();
@@ -6018,7 +6022,7 @@ class Activity {
                 setTimeout(() => {
                     this.hasMouseMoved = false;
                 }, 100);
-            })
+            });
 
         };
 
@@ -6060,7 +6064,7 @@ class Activity {
                 rect1.y + rect1.height > rect2.y &&
                 rect1.y < rect2.y + rect2.height
             );
-        }
+        };
 
         // Select the blocks that overlap the dragged area.
 
@@ -6079,9 +6083,9 @@ class Activity {
                 if (this.rectanglesOverlap(this.blockRect, this.dragRect)){
                     selectedBlocks.push(block);
                 }
-            })
+            });
             return selectedBlocks;
-        }
+        };
 
         // Unhighlight the selected blocks
 
@@ -6098,7 +6102,7 @@ class Activity {
                     }
                 }
             }
-        }
+        };
 
         // Check if two blocks are same or not.
 
@@ -6139,7 +6143,7 @@ class Activity {
                 this.selectionModeOn = selection;
                 this.blocks.setSelection(this.selectionModeOn);
             }
-        }
+        };
 
 
         /*
@@ -6523,11 +6527,11 @@ class Activity {
                     }, 200);
                 };
                 midiReader.onload = (e) => {
-                    const midi = new Midi(e.target.result)
+                    const midi = new Midi(e.target.result);
                     // eslint-disable-next-line no-console
                     console.debug(midi);
                     transcribeMidi(midi);
-                }
+                };
 
                 // Music Block Parser from abc to MB
                 abcReader.onload = (event) => {
@@ -6537,7 +6541,7 @@ class Activity {
 
                     const tunebook = new ABCJS.parseOnly(abcData);
                     // eslint-disable-next-line no-console
-                    console.log(tunebook)
+                    console.log(tunebook);
                     tunebook.forEach(tune => {
                         //call parseABC to parse abcdata to MB json
                         this.parseABC(tune);
@@ -6555,7 +6559,7 @@ class Activity {
 
                     const tunebook = new ABCJS.parseOnly(abcData);
                     // eslint-disable-next-line no-console
-                    console.log(tunebook)
+                    console.log(tunebook);
                     tunebook.forEach(tune => {
                         //call parseABC to parse abcdata to MB json
                         this.parseABC(tune);

@@ -1,6 +1,24 @@
+/*
+ * @license
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 const fs = require('fs');
 const path = require('path');
-const { TextEncoder, TextDecoder } = require("util")
+const { TextEncoder, TextDecoder } = require("util");
 jest.mock('tone');
 
 describe("Utility Functions (logic-only)", () => {
@@ -37,7 +55,7 @@ describe("Utility Functions (logic-only)", () => {
         setVolume,
         getVolume,
         setMasterVolume,
-        Synth
+        Synth;
 
     const turtle = "turtle1";
 
@@ -45,7 +63,7 @@ describe("Utility Functions (logic-only)", () => {
         global.TextEncoder = TextEncoder;
         global.TextDecoder = TextDecoder;
         global.MediaRecorder = jest.fn();
-        global.AudioBuffer = jest.fn()
+        global.AudioBuffer = jest.fn();
         global.module = module;
         global.Tone = require("./tonemock.js");
 
@@ -63,10 +81,10 @@ describe("Utility Functions (logic-only)", () => {
         codeFiles.forEach(filePath => {
             const fileCode = fs.readFileSync(path.join(__dirname, filePath), "utf8");
             wrapperCode += `\n${fileCode}`;
-        })
+        });
 
-        const dirPath = path.join(__dirname, "../../../sounds/samples")
-        const sounds = fs.readdirSync(dirPath, 'utf8')
+        const dirPath = path.join(__dirname, "../../../sounds/samples");
+        const sounds = fs.readdirSync(dirPath, 'utf8');
         sounds.forEach(fileName => {
             if (!fileName.endsWith(".js")) return;
             const filePath = path.join(dirPath, fileName);
@@ -99,34 +117,34 @@ describe("Utility Functions (logic-only)", () => {
         SAMPLECENTERNO = results.SAMPLECENTERNO;
         instrumentsSource = results.instrumentsSource;
         createDefaultSynth = Synth.createDefaultSynth;
-        whichTemperament = Synth.whichTemperament
-        temperamentChanged = Synth.temperamentChanged
-        getFrequency = Synth.getFrequency
-        _getFrequency = Synth._getFrequency
-        getCustomFrequency = Synth.getCustomFrequency
-        resume = Synth.resume
-        loadSamples = Synth.loadSamples
-        _loadSample = Synth._loadSample
-        setupRecorder = Synth.setupRecorder
-        getDefaultParamValues = Synth.getDefaultParamValues
-        _createSampleSynth = Synth._createSampleSynth
-        _parseSampleCenterNo = Synth._parseSampleCenterNo
-        _createBuiltinSynth = Synth._createBuiltinSynth
-        _createCustomSynth = Synth._createCustomSynth
-        __createSynth = Synth.__createSynth
-        createSynth = Synth.createSynth
-        loadSynth = Synth.loadSynth
-        _performNotes = Synth._performNotes
-        startSound = Synth.startSound
-        trigger = Synth.trigger
-        stopSound = Synth.stopSound
-        loop = Synth.loop
-        start = Synth.start
-        stop = Synth.stop
-        rampTo = Synth.rampTo
-        setVolume = Synth.setVolume
-        getVolume = Synth.getVolume
-        setMasterVolume = Synth.setMasterVolume
+        whichTemperament = Synth.whichTemperament;
+        temperamentChanged = Synth.temperamentChanged;
+        getFrequency = Synth.getFrequency;
+        _getFrequency = Synth._getFrequency;
+        getCustomFrequency = Synth.getCustomFrequency;
+        resume = Synth.resume;
+        loadSamples = Synth.loadSamples;
+        _loadSample = Synth._loadSample;
+        setupRecorder = Synth.setupRecorder;
+        getDefaultParamValues = Synth.getDefaultParamValues;
+        _createSampleSynth = Synth._createSampleSynth;
+        _parseSampleCenterNo = Synth._parseSampleCenterNo;
+        _createBuiltinSynth = Synth._createBuiltinSynth;
+        _createCustomSynth = Synth._createCustomSynth;
+        __createSynth = Synth.__createSynth;
+        createSynth = Synth.createSynth;
+        loadSynth = Synth.loadSynth;
+        _performNotes = Synth._performNotes;
+        startSound = Synth.startSound;
+        trigger = Synth.trigger;
+        stopSound = Synth.stopSound;
+        loop = Synth.loop;
+        start = Synth.start;
+        stop = Synth.stop;
+        rampTo = Synth.rampTo;
+        setVolume = Synth.setVolume;
+        getVolume = Synth.getVolume;
+        setMasterVolume = Synth.setMasterVolume;
 
     });
 
@@ -155,7 +173,7 @@ describe("Utility Functions (logic-only)", () => {
     describe("createDefaultSynth", () => {
         it("it should creates the default poly/default/custom synth for the specified turtle", () => {
             createDefaultSynth(turtle);
-            expect(instruments[turtle]["electronic synth"]).toBeTruthy()
+            expect(instruments[turtle]["electronic synth"]).toBeTruthy();
             expect(instruments[turtle]["custom"]).toBeTruthy();
             expect(instrumentsSource["electronic synth"]).toEqual([0, "electronic synth"]);
             expect(instrumentsSource["custom"]).toEqual([0, "custom"]);
@@ -165,17 +183,17 @@ describe("Utility Functions (logic-only)", () => {
     describe("_createBuiltinSynth", () => {
         it("it should creates a synth using builtin synths from Tone.js.", () => {
             const result = _createBuiltinSynth(turtle, "guitar", "sine", {});
-            expect(result).toBeInstanceOf(Tone.Synth)
+            expect(result).toBeInstanceOf(Tone.Synth);
         });
         it("it should creates a synth using builtin synths from Tone.js.", () => {
             const result = _createBuiltinSynth(turtle, "guitar", "pluck", {});
-            expect(result).toBeInstanceOf(Tone.PluckSynth)
+            expect(result).toBeInstanceOf(Tone.PluckSynth);
         });
         it("it should creates a synth using builtin synths from Tone.js.", () => {
             const result = _createBuiltinSynth(turtle, "guitar", "noise3", {});
-            expect(result).toBeInstanceOf(Tone.NoiseSynth)
+            expect(result).toBeInstanceOf(Tone.NoiseSynth);
         });
-    })
+    });
 
     describe("_createCustomSynth", () => {
         it("it should creates an amsynth using Tone.js methods like AMSynth, FMSynth, etc.", () => {
@@ -194,55 +212,55 @@ describe("Utility Functions (logic-only)", () => {
             const result = _createCustomSynth("testsynth", {});
             expect(result).toBeInstanceOf(Tone.PolySynth);
         });
-    })
+    });
 
     describe("__createSynth", () => {
         beforeAll(() => {
-            loadSamples()
-        })
+            loadSamples();
+        });
         it("it should creates a PolySynth based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
             __createSynth(turtle, "guitar", "guitar", {});
-            expect(instruments[turtle]["electronic synth"]).toBeInstanceOf(Tone.PolySynth)
+            expect(instruments[turtle]["electronic synth"]).toBeInstanceOf(Tone.PolySynth);
         });
         it("it should creates a PolySynth based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
             __createSynth(turtle, "guitar", "sine", {});
-            expect(instruments[turtle]["electronic synth"]).toBeInstanceOf(Tone.PolySynth)
+            expect(instruments[turtle]["electronic synth"]).toBeInstanceOf(Tone.PolySynth);
         });
         it("it should creates a amsynth based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
-            let instrumentName = "poly"
+            let instrumentName = "poly";
             __createSynth(turtle, instrumentName, "amsynth", {});
-            expect(instruments[turtle][instrumentName]).toBeInstanceOf(Tone.AMSynth)
+            expect(instruments[turtle][instrumentName]).toBeInstanceOf(Tone.AMSynth);
         });
 
         it("it should creates a CUSTOMSAMPLES based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
             CUSTOMSAMPLES['pianoC4'] = "pianoC4";
             CUSTOMSAMPLES['drumKick'] = "drumKick";
-            let instrumentName = "piano"
+            let instrumentName = "piano";
             __createSynth(turtle, instrumentName, "pianoC4", {});
-            expect(instruments[turtle][instrumentName]).toBeInstanceOf(Tone.Sampler)
+            expect(instruments[turtle][instrumentName]).toBeInstanceOf(Tone.Sampler);
         });
 
         it("it should creates a CUSTOMSAMPLES based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
-            let instrumentName = "drumKick"
-            let sourceName = "http://example.com/drumKick.wav"
+            let instrumentName = "drumKick";
+            let sourceName = "http://example.com/drumKick.wav";
             __createSynth(turtle, instrumentName, sourceName, {});
-            expect(instruments[turtle][sourceName]["noteDict"]).toBe(sourceName)
-            expect(instrumentsSource[instrumentName]).toStrictEqual([1, 'drum'])
+            expect(instruments[turtle][sourceName]["noteDict"]).toBe(sourceName);
+            expect(instrumentsSource[instrumentName]).toStrictEqual([1, 'drum']);
         });
         it("it should creates a CUSTOMSAMPLES based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
-            let instrumentName = "guitar"
-            let sourceName = "file://testing.wav"
+            let instrumentName = "guitar";
+            let sourceName = "file://testing.wav";
             __createSynth(turtle, instrumentName, sourceName, {});
-            expect(instruments[turtle][sourceName]["noteDict"]).toBe(sourceName)
-            expect(instrumentsSource[instrumentName]).toStrictEqual([1, 'drum'])
+            expect(instruments[turtle][sourceName]["noteDict"]).toBe(sourceName);
+            expect(instrumentsSource[instrumentName]).toStrictEqual([1, 'drum']);
         });
         it("it should creates a CUSTOMSAMPLES based on the specified parameters, either using samples, built-in synths, or custom synths", () => {
-            let instrumentName = "snare drum"
-            let sourceName = "drum"
+            let instrumentName = "snare drum";
+            let sourceName = "drum";
             __createSynth(turtle, instrumentName, sourceName, {});
-            expect(instrumentsSource[instrumentName]).toStrictEqual([1, 'drum'])
+            expect(instrumentsSource[instrumentName]).toStrictEqual([1, 'drum']);
         });
-    })
+    });
 
     describe("loadSynth", () => {
         it("it should loads a synth based on the user's input, creating and setting volume for the specified turtle.", () => {
@@ -762,7 +780,7 @@ describe("Utility Functions (logic-only)", () => {
             start();
             stop();
             start();
-            stop()
+            stop();
 
             expect(startSpy).toHaveBeenCalledTimes(2);
             expect(stopSpy).toHaveBeenCalledTimes(2);
@@ -774,12 +792,12 @@ describe("Utility Functions (logic-only)", () => {
 
     describe("_createSampleSynth", () => {
         it("creates voice synth correctly", () => {
-            loadSamples()
-            _loadSample("guitar")
+            loadSamples();
+            _loadSample("guitar");
             const result = _createSampleSynth("turtle1", "electronic synth", "guitar");
             expect(result).toBeInstanceOf(Tone.Sampler);
         });
-    })
+    });
 
     describe("startSound", () => {
         it("it should start the sound", () => {
@@ -998,19 +1016,19 @@ describe("Utility Functions (logic-only)", () => {
             expect(getDefaultParamValues("sine")).toStrictEqual({
                 oscillator: { type: 'sine' },
                 envelope: { attack: 0.03, decay: 0.001, sustain: 1, release: 0.03 }
-            })
+            });
             expect(getDefaultParamValues("square")).toStrictEqual({
                 oscillator: { type: 'square' },
                 envelope: { attack: 0.03, decay: 0.001, sustain: 1, release: 0.03 }
-            })
+            });
             expect(getDefaultParamValues("triangle")).toStrictEqual({
                 oscillator: { type: 'triangle' },
                 envelope: { attack: 0.03, decay: 0.001, sustain: 1, release: 0.03 }
-            })
+            });
             expect(getDefaultParamValues("sawtooth")).toStrictEqual({
                 oscillator: { type: 'sawtooth' },
                 envelope: { attack: 0.03, decay: 0.001, sustain: 1, release: 0.03 }
-            })
+            });
         });
     });
 

@@ -1,4 +1,22 @@
-/* eslint-disable max-len */
+/*
+ * @license
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 // Copyright (c) 2014-23 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
@@ -635,7 +653,7 @@ const piemenuPitches = (
         // Update the block's displayed text with the note and accidental
         if (selectedAccidental === "♮" || selectedAccidental === "") {
             // Natural or no accidental: display only the note
-            that.text.text = selectedNote; 
+            that.text.text = selectedNote;
         } else {
             // Combine note and accidental for display
             that.text.text = selectedNote + selectedAccidental;
@@ -3455,7 +3473,7 @@ const piemenuBlockContext = (block) => {
         // prompting a notification on deleting any block 
         activity.textMsg(
             _("You can restore deleted blocks from the trash with the Restore From Trash button."), 3000
-        );       
+        );
     };
 
     wheel.navItems[3].navigateFunction = () => {

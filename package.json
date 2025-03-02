@@ -22,7 +22,7 @@
     "serve": "python3 -c \"import os, sys; os.system('python3 -m SimpleHTTPServer 3000 --bind 127.0.0.1') if sys.version_info.major==2 else os.system('python3 -m http.server 3000 --bind 127.0.0.1');\"",
     "winserve": "py -c \"import os, sys; os.system('py -m SimpleHTTPServer 3000') if sys.version_info.major==2 else os.system('py -m http.server 3000 --bind 127.0.0.1');\"",
     "test": "jest",
-    "cypress:run": "cypress run"   
+    "cypress:run": "cypress run"
   },
   "devDependencies": {
     "@babel/core": "^7.11.1",
@@ -33,6 +33,7 @@
     "eslint": "^7.6.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-header": "^3.1.1",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",

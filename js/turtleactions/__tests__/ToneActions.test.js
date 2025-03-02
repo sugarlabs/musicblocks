@@ -1,3 +1,21 @@
+/*
+ * @license
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 const setupToneActions = require('../ToneActions');
 
 describe('setupToneActions', () => {
@@ -24,7 +42,7 @@ describe('setupToneActions', () => {
         global.CUSTOMSAMPLES = {};
         global.DEFAULTVOICE = 'default-voice';
         global.last = jest.fn(array => array[array.length - 1]);
-        global._ = jest.fn(msg => msg); 
+        global._ = jest.fn(msg => msg);
         global.instrumentsEffects = {};
     });
 
@@ -49,7 +67,7 @@ describe('setupToneActions', () => {
                 notation: {
                     notationSwing: jest.fn(),
                     notationVoices: jest.fn(),
-                    notationBeginHarmonics: jest.fn(), 
+                    notationBeginHarmonics: jest.fn(),
                     notationEndHarmonics: jest.fn(),
                 },
                 timbre: {
@@ -57,7 +75,7 @@ describe('setupToneActions', () => {
                     FMSynthParams: [],
                     AMSynthParams: [],
                     duoSynthParams: [],
-                    osc: [], 
+                    osc: [],
                     fmSynthParamvals: {},
                     amSynthParamvals: {},
                     duoSynthParamVals: {},
@@ -65,9 +83,9 @@ describe('setupToneActions', () => {
                     AMSynthesizer: [],
                     duoSynthesizer: [],
                     vibratoEffect: [],
-                    vibratoParams: [], 
+                    vibratoParams: [],
                 },
-                inTimbre: true, 
+                inTimbre: true,
                 stopTurtle: false,
             },
             errorMsg: jest.fn(),

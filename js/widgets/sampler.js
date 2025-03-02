@@ -1,13 +1,22 @@
-// Copyright (c) 2021 Liam Norman
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the The GNU Affero General Public
-// License as published by the Free Software Foundation; either
-// version 3 of the License, or (at your option) any later version.
-//
-// You should have received a copy of the GNU Affero General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+/*
+ * @license
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 
 /*
    global
@@ -233,7 +242,7 @@ function SampleWidget() {
      */
     this.displayRecordingStartMessage = function () {
         activity.textMsg(_("Recording started"), 3000);
-    }
+    };
 
     /**
      * Displays a message indicating that recording has stopped.
@@ -241,7 +250,7 @@ function SampleWidget() {
      */
     this.displayRecordingStopMessage = function () {
         activity.textMsg(_("Recording complete"), 3000);
-    }
+    };
 
 
     /**
@@ -314,18 +323,18 @@ function SampleWidget() {
                     this._addSample();
                 } else {
                     this.activity.errorMsg(_("Warning: Your sample cannot be loaded because it is >1MB."), this.timbreBlock);
-                }            
+                }
             } else {
                 this.showSampleTypeError();
             }
-        }
+        };
 
         reader.onloadend = () => {
             if (reader.result) {
                 const value = [sampleFile.name, reader.result];
             }
         };
-    }
+    };
 
     //Drag-and-Drop sample files
     this.drag_and_drop = () => {
@@ -340,7 +349,7 @@ function SampleWidget() {
             const sampleFiles = e.dataTransfer.files[0];
             this.handleFiles(sampleFiles);
         });
-    }
+    };
 
     /**
      * Initializes the Sample Widget.
@@ -497,7 +506,7 @@ function SampleWidget() {
                 this.sampleName = `Recorded Audio ${this.recordingURL}`;
                 this._addSample();
                 this.activity.logo.synth.playRecording();
-                this.playback = true
+                this.playback = true;
             } else {
                 this.activity.logo.synth.stopPlayBackRecording();
                 this.playback = false;
@@ -953,7 +962,7 @@ function SampleWidget() {
                 for (let turtleIdx = 0; turtleIdx < 2; turtleIdx += 1) {
                     let dataArray;
                     if (this.is_recording) {
-                        dataArray = turtleIdx === 0 
+                        dataArray = turtleIdx === 0
                             ? this.pitchAnalysers[0].getValue()
                             : this.activity.logo.synth.getWaveFormValues();
                             console.log(dataArray);

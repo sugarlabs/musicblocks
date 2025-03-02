@@ -1,4 +1,22 @@
-const LanguageBox = require("../languagebox"); 
+/*
+ * @license
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+const LanguageBox = require("../languagebox");
 
 const mockActivity = {
     storage: {
@@ -10,20 +28,20 @@ const mockActivity = {
 
 Object.defineProperty(global, "localStorage", {
     value: {
-        getItem: jest.fn(), 
-        setItem: jest.fn(), 
+        getItem: jest.fn(),
+        setItem: jest.fn(),
     },
     writable: true,
 });
 
-delete global.window.location; 
+delete global.window.location;
 global.window.location = {
-    reload: jest.fn(), 
+    reload: jest.fn(),
 };
 
 document.querySelectorAll = jest.fn(() => []);
 
-global._ = jest.fn((str) => str); 
+global._ = jest.fn((str) => str);
 
 describe("LanguageBox Class", () => {
     let languageBox;

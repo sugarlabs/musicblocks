@@ -1,3 +1,21 @@
+/*
+ * @license
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 const { interpColor, getMunsellColor, getcolor, searchColors } = require('../munsell');
 
 global.createjs = {
@@ -17,7 +35,7 @@ describe('munsell', () => {
             ).toBe('rgba(127, 0, 127, 1)'); // purple
             expect(
                 interpColor('#00ff00', '#000000', 0.75)
-            ).toBe('rgba(0, 191, 0, 1)'); 
+            ).toBe('rgba(0, 191, 0, 1)');
         });
 
         it('should return the first color if p = 1', () => {
@@ -61,7 +79,7 @@ describe('munsell', () => {
             const color = getcolor(50);
             expect(Array.isArray(color)).toBe(true);
             expect(color.length).toBe(3);
-            expect(typeof color[0]).toBe('number'); 
+            expect(typeof color[0]).toBe('number');
             expect(typeof color[1]).toBe('number');
             expect(color[2]).toMatch(/^#[0-9a-fA-F]{6}$/); // Ensure RGB component is a valid hex color
         });

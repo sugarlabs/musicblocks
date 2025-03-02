@@ -1,4 +1,22 @@
-global.base64Encode = jest.fn((str) => str); 
+/*
+ * @license
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+global.base64Encode = jest.fn((str) => str);
 global.createjs = {
     Container: jest.fn(() => ({
         children: [],
@@ -10,7 +28,7 @@ global.createjs = {
 };
 
 global.window = {
-    btoa: jest.fn((str) => Buffer.from(str).toString("base64")), 
+    btoa: jest.fn((str) => Buffer.from(str).toString("base64")),
 };
 
 global.BOUNDARY = `
@@ -19,7 +37,7 @@ global.BOUNDARY = `
 </svg>
 `;
 
-const Boundary = require('../boundary'); 
+const Boundary = require('../boundary');
 
 describe('Boundary Class', () => {
     let stage;
@@ -35,7 +53,7 @@ describe('Boundary Class', () => {
     });
 
     afterEach(() => {
-        jest.clearAllMocks(); 
+        jest.clearAllMocks();
     });
 
     it('should initialize with a container and add it to the stage', () => {
@@ -54,11 +72,11 @@ describe('Boundary Class', () => {
     });
 
     it('should correctly determine if a point is off-screen', () => {
-        boundary.create(800, 600, 2); 
+        boundary.create(800, 600, 2);
 
-        expect(boundary.offScreen(50, 50)).toBe(true); 
-        expect(boundary.offScreen(boundary.x + 1, boundary.y + 1)).toBe(false); 
-        expect(boundary.offScreen(boundary.x + boundary.dx + 1, boundary.y + boundary.dy + 1)).toBe(true); 
+        expect(boundary.offScreen(50, 50)).toBe(true);
+        expect(boundary.offScreen(boundary.x + 1, boundary.y + 1)).toBe(false);
+        expect(boundary.offScreen(boundary.x + boundary.dx + 1, boundary.y + boundary.dy + 1)).toBe(true);
     });
 
     it('should hide and show the container', () => {
@@ -85,6 +103,6 @@ describe('Boundary Class', () => {
 
         expect(mockImage.onload).not.toBeNull();
         expect(mockImage.src).toContain('data:image/svg+xml;base64,');
-        imgMock.mockRestore(); 
+        imgMock.mockRestore();
     });
 });

@@ -1,3 +1,21 @@
+/*
+ * @license
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 const { TextEncoder } = require('util');
 global.TextEncoder = TextEncoder;
 global._ = jest.fn((str) => str);
@@ -169,7 +187,7 @@ describe("Temperament Functions", () => {
         describe("getTemperamentKeys", () => {
             it("should return an array with the correct length", () => {
                 const keys = getTemperamentKeys();
-                expect(keys.length).toBe(10); 
+                expect(keys.length).toBe(10);
             });
     
             it('should return an array containing all keys', () => {
@@ -208,9 +226,9 @@ describe("Temperament Functions", () => {
           describe('addTemperamentToDictionary',()=>{
             it("add the new entry to temparment",()=>{
            addTemperamentToDictionary("music","blocks");
-           expect(TEMPERAMENT["music"]).toBe('blocks')
-            })
-          })
+           expect(TEMPERAMENT["music"]).toBe('blocks');
+            });
+          });
     
     describe('deleteTemperamentFromList', () => {
         it('removes an entry from TEMPERAMENT by key', () => {
@@ -233,7 +251,7 @@ describe("Temperament Functions", () => {
             });
     
         });
-    })  
+    });
     });
     
 
@@ -302,7 +320,7 @@ jest.mock('../musicutils', () => {
         ...actualModule,
         getDrumIndex: jest.fn(),
         getDrumName: jest.fn(),
-        getDrumSymbol: jest.fn() 
+        getDrumSymbol: jest.fn()
     };
 });
 
@@ -438,7 +456,7 @@ describe('getDrum', () => {
             expect(getDrumSymbol('SNARE DRUM')).toBe('sn');
             expect(getDrumSymbol('KICK DRUM')).toBe('hh');
         });
-    }); 
+    });
 });
 
 describe('getFilterTypes',() => {
@@ -499,7 +517,7 @@ describe('getDrumIcon', () => {
         it('should return default drum icon for invalid drum names', () => {
             expect(getDrumIcon('invalid drum')).toBe('images/drum.svg');
             expect(getDrumIcon('123')).toBe('images/drum.svg');
-        });  
+        });
 });
 
 describe('getDrumSynthName', () => {
@@ -521,7 +539,7 @@ describe('getDrumSynthName', () => {
         });
         it('should return null for null',()=>{
             expect(getDrumSynthName(null)).toBeNull();
-        })
+        });
 });
 
 describe('getNoiseName', () => {
@@ -530,7 +548,7 @@ describe('getNoiseName', () => {
             ["white noise", "noise1", "images/noise1.svg"],
             ["brown noise", "noise2", "images/noise2.svg"],
             ["pink noise", "noise3", "images/noise3.svg"],
-            ["", "custom noise", "images/custom.svg"]  
+            ["", "custom noise", "images/custom.svg"]
         ];
         global.DEFAULTNOISE = "noise1";
     });
@@ -541,7 +559,7 @@ describe('getNoiseName', () => {
         it('should return corresponding display name for valid identifiers', () => {
             expect(getNoiseName('noise1')).toBe('white noise');
             expect(getNoiseName('noise3')).toBe('pink noise');
-        });     
+        });
 });
 
 describe('getNoiseIcon', () => {
@@ -550,7 +568,7 @@ describe('getNoiseIcon', () => {
             ["white noise", "noise1", "images/noise1.svg"],
             ["brown noise", "noise2", "images/noise2.svg"],
             ["pink noise", "noise3", "images/noise3.svg"],
-            ["", "custom noise", "images/custom.svg"]  
+            ["", "custom noise", "images/custom.svg"]
         ];
         global.DEFAULTNOISE = "noise1";
     });
@@ -582,7 +600,7 @@ describe('getNoiseSynthName', () => {
             ["white noise", "noise1", "images/noise1.svg"],
             ["brown noise", "noise2", "images/noise2.svg"],
             ["pink noise", "noise3", "images/noise3.svg"],
-            ["", "custom noise", "images/custom.svg"]  
+            ["", "custom noise", "images/custom.svg"]
         ];
         global.DEFAULTNOISE = "noise1";
     });
@@ -608,7 +626,7 @@ describe('getVoiceName', () => {
             ["piano", "piano", "images/piano.svg"],
             ["violin", "violin", "images/violin.svg"],
             ["guitar", "guitar", "images/guitar.svg"],
-            ["", "custom voice", "images/custom.svg"],  
+            ["", "custom voice", "images/custom.svg"],
             ["electronic synth", "synth", "images/synth.svg"]
         ];
         global.DEFAULTVOICE = "electronic synth";
@@ -626,7 +644,7 @@ describe('getVoiceName', () => {
             expect(getVoiceName('guitar')).toBe('guitar');
         });
         it('should be case sensitive', () => {
-            expect(getVoiceName('PIANO')).toBe('electronic synth'); 
+            expect(getVoiceName('PIANO')).toBe('electronic synth');
         });
 });
 
@@ -642,7 +660,7 @@ describe('Voice and Temperament Functions', () => {
             ["custom_sample1", "sample1", "images/sample1.svg"],
             ["custom_sample2", "sample2", "images/sample2.svg"]
         ];
-        global.DEFAULTVOICE = "electronic synth";        
+        global.DEFAULTVOICE = "electronic synth";
         global.PreDefinedTemperaments = {
             "equal": true,
             "just intonation": true
@@ -726,9 +744,9 @@ describe('noteToObj', () => {
 
 describe('frequencyToPitch', () => {
     beforeEach(() => {
-        global.A0 = 27.5;  
-        global.C8 = 4186.01;  
-        global.TWELVEHUNDRETHROOT2 = Math.pow(2, 1/1200); 
+        global.A0 = 27.5;
+        global.C8 = 4186.01;
+        global.TWELVEHUNDRETHROOT2 = Math.pow(2, 1/1200);
         global.PITCHES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
     });
 
@@ -742,16 +760,16 @@ describe('frequencyToPitch', () => {
     });
     it('should handle frequencies with cents deviation', () => {
         const result = frequencyToPitch(442);
-        expect(result[0]).toBe("A");  
-        expect(result[1]).toBe(4);    
+        expect(result[0]).toBe("A");
+        expect(result[1]).toBe(4);
         const result2 = frequencyToPitch(438);
-        expect(result2[0]).toBe("A");  
-        expect(result2[2]).toBeLessThan(0);  
+        expect(result2[0]).toBe("A");
+        expect(result2[2]).toBeLessThan(0);
     });
     it('should map intermediate frequencies to nearest note', () => {
         const intermediateFreq = A0 * Math.pow(2, 1/3);
         const result = frequencyToPitch(intermediateFreq);
-        expect(result[0]).toBe("D♭");  
+        expect(result[0]).toBe("D♭");
         expect(result[1]).toBe(1);
     });
 });
@@ -787,7 +805,7 @@ describe('keySignatureToMode', () => {
         global.NOTESFLAT = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
         global.MUSICALMODES = {
             'major': [2, 2, 1, 2, 2, 2, 1],
-            'minor': [2, 1, 2, 2, 1, 2, 2] 
+            'minor': [2, 1, 2, 2, 1, 2, 2]
         };
     });
 
@@ -800,8 +818,8 @@ describe('keySignatureToMode', () => {
         expect(keySignatureToMode('D major')).toEqual(['D', 'major']);
     });
     it('should handle full minor key names', () => {
-        expect(keySignatureToMode('A minor')).toEqual(['A', 'minor']);  
-        expect(keySignatureToMode('E minor')).toEqual(['E', 'minor']);  
+        expect(keySignatureToMode('A minor')).toEqual(['A', 'minor']);
+        expect(keySignatureToMode('E minor')).toEqual(['E', 'minor']);
     });
 });
 
@@ -855,13 +873,13 @@ describe('modeMapper', () => {
             expect(modeMapper('D', 'ionian')).toEqual(['d', 'major']);
         });
         it('should handle flats in Dorian mode', () => {
-            expect(modeMapper('E♭', 'dorian')).toEqual(['e♭', 'minor']); 
+            expect(modeMapper('E♭', 'dorian')).toEqual(['e♭', 'minor']);
             expect(modeMapper('B♭', 'dorian')).toEqual(['f', 'minor']);
         });
         it('should handle flats in Locrian mode', () => {
-            expect(modeMapper('E♭', 'locrian')).toEqual(['d♭', 'minor']);  
+            expect(modeMapper('E♭', 'locrian')).toEqual(['d♭', 'minor']);
             expect(modeMapper('B♭', 'locrian')).toEqual(['d♭', 'minor']);
-        });   
+        });
 });
 
 describe('getSharpFlatPreference', () => {
@@ -877,7 +895,7 @@ describe('getSharpFlatPreference', () => {
         it('should return "natural" for C major and keys not in sharp/flat preferences', () => {
             expect(getSharpFlatPreference('C')).toBe('natural');
             expect(getSharpFlatPreference('Am')).toBe('natural');
-        });  
+        });
 });
 
 describe('getCustomNote', () => {
@@ -1165,27 +1183,27 @@ describe("getNote", () => {
   
     it("should return the correct note for C4 in C major", () => {
       const result = getNote("C", 4, 0, "C major");
-      expect(result).toEqual(["C", 4, 0]); 
+      expect(result).toEqual(["C", 4, 0]);
     });
   
     it("should return the correct note for C4 with transposition in C major", () => {
       const result = getNote("C", 4, 2, "C major");
-      expect(result).toEqual(["D", 4, 0]); 
+      expect(result).toEqual(["D", 4, 0]);
     });
   
     it("should return the correct note for F4 in F major", () => {
       const result = getNote("F", 4, 0, "F major");
-      expect(result).toEqual(["F", 4, 0]); 
+      expect(result).toEqual(["F", 4, 0]);
     });
   
     it("should return the correct note for F♯4 in F major", () => {
       const result = getNote("F♯", 4, 0, "F major");
-      expect(result).toEqual(["F♯", 4, 0]); 
+      expect(result).toEqual(["F♯", 4, 0]);
     });
   
     it("should return the correct note for G♯4 in G major", () => {
       const result = getNote("G♯", 4, 0, "G major");
-      expect(result).toEqual(["G♯", 4, 0]); 
+      expect(result).toEqual(["G♯", 4, 0]);
     });
   });
  
@@ -1202,15 +1220,15 @@ describe("buildScale", () => {
         {
             keySignature: "F♭ major",
             expected: [
-                ["F♭", "G♭", "A♭", "B𝄫", "C♭", "D♭", "E♭", "F♭"],  
-                [2, 2, 1, 2, 2, 2, 1],  
+                ["F♭", "G♭", "A♭", "B𝄫", "C♭", "D♭", "E♭", "F♭"],
+                [2, 2, 1, 2, 2, 2, 1],
             ],
         },
         {
             keySignature:"D major",
             expected: [
-                [ "D","E","F♯","G","A","B","C♯","D",],  
-                [2, 2, 1, 2, 2, 2, 1],  
+                [ "D","E","F♯","G","A","B","C♯","D",],
+                [2, 2, 1, 2, 2, 2, 1],
             ],
         }
         ,
@@ -1218,43 +1236,43 @@ describe("buildScale", () => {
         {
             keySignature: "C major",
             expected: [
-                ["C", "D", "E", "F", "G", "A", "B", "C"],  
-                [2, 2, 1, 2, 2, 2, 1],  
+                ["C", "D", "E", "F", "G", "A", "B", "C"],
+                [2, 2, 1, 2, 2, 2, 1],
             ],
         },
         {
             keySignature: "G major",
             expected: [
-                ["G", "A", "B", "C", "D", "E", "F♯", "G"],  
-                [2, 2, 1, 2, 2, 2, 1],  
+                ["G", "A", "B", "C", "D", "E", "F♯", "G"],
+                [2, 2, 1, 2, 2, 2, 1],
             ],
         },
         {
             keySignature: "A minor",
             expected: [
-                ["A", "B", "C", "D", "E", "F", "G", "A"],  
-                [2, 1, 2, 2, 1, 2, 2],  
+                ["A", "B", "C", "D", "E", "F", "G", "A"],
+                [2, 1, 2, 2, 1, 2, 2],
             ],
         },
         {
             keySignature: "F♯ major",
             expected: [
-                ["F♯", "G♯", "A♯", "B", "C♯", "D♯", "E♯", "F♯"],  
-                [2, 2, 1, 2, 2, 2, 1],  
+                ["F♯", "G♯", "A♯", "B", "C♯", "D♯", "E♯", "F♯"],
+                [2, 2, 1, 2, 2, 2, 1],
             ],
         },
         {
             keySignature: "Bb major",
             expected: [
-                ["B♭", "C", "D", "E♭", "F", "G", "A", "B♭"],  
-                [2, 2, 1, 2, 2, 2, 1],  
+                ["B♭", "C", "D", "E♭", "F", "G", "A", "B♭"],
+                [2, 2, 1, 2, 2, 2, 1],
             ],
         },
         {
             keySignature: "E major",
             expected: [
-                ["E", "F♯", "G♯", "A", "B", "C♯", "D♯", "E"],  
-                [2, 2, 1, 2, 2, 2, 1],  
+                ["E", "F♯", "G♯", "A", "B", "C♯", "D♯", "E"],
+                [2, 2, 1, 2, 2, 2, 1],
             ],
         },
     ];
@@ -1290,24 +1308,24 @@ describe("getStepSize", () => {
     
     it('should return the correct step size for "F" in "F major" going up', () => {
         const result = _getStepSize("F major", "F", "up", 0, "equal");
-        expect(result).toBe(2); 
+        expect(result).toBe(2);
     });
 
     
     it('should return the correct step size for "F" in "F major" going down', () => {
         const result = _getStepSize("F major", "F", "down", 0, "equal");
-        expect(result).toBe(-1); 
+        expect(result).toBe(-1);
     });
 
     
     it('should return the correct step size for "G" in "G major" going up', () => {
         const result = _getStepSize("G major", "G", "up", 0, "equal");
-        expect(result).toBe(2); 
+        expect(result).toBe(2);
     });
 
     it('should return the correct step size for "G" in "G major" going down', () => {
         const result = _getStepSize("G major", "G", "down", 0, "equal");
-        expect(result).toBe(-1); 
+        expect(result).toBe(-1);
     });
 
     it('should return the correct step size for "F#" in "F# major" going up', () => {
@@ -1317,7 +1335,7 @@ describe("getStepSize", () => {
 
     it('should return the correct step size for "G#" in "G# major" going down', () => {
         const result = _getStepSize("G# major", "G#", "down", 0, "equal");
-        expect(result).toBe(0); 
+        expect(result).toBe(0);
     });
 
     it('should return 0 for "C" going down in a key without a lower note', () => {
@@ -1327,13 +1345,13 @@ describe("getStepSize", () => {
 
     it('should return an error or appropriate value for invalid key signature', () => {
         const result = _getStepSize("Invalid key", "C", "up", 0, "equal");
-        expect(result).toBe(2); 
+        expect(result).toBe(2);
     });
 
     // Test for a non-standard temperament
     it('should return the correct step size for "C" in "C major" with a non-standard temperament', () => {
         const result = _getStepSize("C major", "C", "up", 0, "just");
-        expect(result).toBe(0); 
+        expect(result).toBe(0);
     });
 
 });
@@ -1342,12 +1360,12 @@ describe("getModeLength",()=>{
     it("should return length",()=>{
         const modeLength = getModeLength("");
         expect(modeLength).toBe(7);
-    })
+    });
     it("should return length",()=>{
         const modeLength = getModeLength("E major");
         expect(modeLength).toBe(7);
-    })
-})
+    });
+});
 
 describe("nthDegreeToPitch", () => {
     it("should return the correct note for the 2nd scale degree in C major", () => {
@@ -1356,8 +1374,8 @@ describe("nthDegreeToPitch", () => {
     });
 
     it("should handle a scale degree larger than the scale length (wrapping case)", () => {
-        const result = nthDegreeToPitch("C major", 8); 
-        expect(result).toBe("D"); 
+        const result = nthDegreeToPitch("C major", 8);
+        expect(result).toBe("D");
     });
 
     it("should return the root note for scale degree 0 in C major", () => {
@@ -1367,17 +1385,17 @@ describe("nthDegreeToPitch", () => {
 
     it("should return the correct note for the 5th scale degree in A minor", () => {
         const result = nthDegreeToPitch("A minor", 5);
-        expect(result).toBe("F"); 
+        expect(result).toBe("F");
     });
 
     it("should handle negative scale degrees (reverse wrapping)", () => {
-        const result = nthDegreeToPitch("C major", -1); 
+        const result = nthDegreeToPitch("C major", -1);
         expect(result).toBeUndefined();
     });
 
     it("should return undefined for a scale degree when the scale is empty", () => {
         const result = nthDegreeToPitch("Unknown", 2);//default keysignature will be C major
-        expect(result).toBe("E"); 
+        expect(result).toBe("E");
     });
 });
 
@@ -1388,17 +1406,17 @@ describe("getInterval", () => {
     });
     it("should wrap around when pitch is not in the current scale", () => {
         const result = getInterval(5, "C major", "B");
-        expect(result).toBe(8); 
+        expect(result).toBe(8);
     });
 
     it("should return 0 for a pitch not found in equivalent mappings", () => {
         const result = getInterval(2, "C major", "Z");
-        expect(result).toBe(0); 
+        expect(result).toBe(0);
     });
 
     it("should correctly shift pitches up or down if they are not in the consonant scale", () => {
         const resultUp = getInterval(1, "C major", "B");
-        expect(resultUp).toBe(1); 
+        expect(resultUp).toBe(1);
 
         const resultDown = getInterval(-1, "C major", "Cb");
         expect(resultDown).toBe(-2);
@@ -1432,11 +1450,11 @@ describe("toFraction",()=>{
     it("should return array with numerator and denomrator from floating point number",()=>{
      expect(toFraction(2.2)).toEqual([11,5]);
      expect(toFraction(0.1)).toEqual([1,10]);
-    })
+    });
     it("should return array with numerator and denomrator from floating point number",()=>{
      expect(toFraction(0.0)).toEqual( [ 0, 2 ]);
-    })
-})
+    });
+});
 
 
 describe('calcNoteValueToDisplay', () => {
@@ -1492,23 +1510,23 @@ global.POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
     });
 
     it('should correctly convert a duration to a note value with two dots', () => {
-        const result = durationToNoteValue(1.75); 
+        const result = durationToNoteValue(1.75);
         expect(result).toEqual([1, 0, [3.5,0.5],1]);
     });
 
     it('should round down durations that do not match exact note values in POWER2', () => {
-        const result = durationToNoteValue(0.3); 
+        const result = durationToNoteValue(0.3);
         expect(result).toEqual([1, 0, [0.6, 0.5],1]);
     });
 
     
     it('should correctly return the note value for durations in POWER2', () => {
-        const result = durationToNoteValue(2); 
+        const result = durationToNoteValue(2);
         expect(result).toEqual([2, 0, null]);
     });
 
     it('should return the default rounded value for durations without an exact tuplet factor', () => {
-        const result = durationToNoteValue(0.5); 
+        const result = durationToNoteValue(0.5);
         expect(result).toEqual([1, 0, [1,0.5],1]);
     });
 });
@@ -1580,7 +1598,7 @@ describe('noteToFrequency', () => {
   it('handles invalid note input gracefully', () => {
     expect(noteToFrequency('X9', 'C')).toBe(A0 * Math.pow(TWELTHROOT2, 99));
   });
-})
+});
 
 describe("noteIsSolfege", () => {
     const SHARP = "♯";
@@ -1606,26 +1624,26 @@ describe("noteIsSolfege", () => {
       "B♭": "ti" + FLAT,
       "B": "ti",
       "B♯": "ti" + SHARP,
-      "R": _("rest"), 
+      "R": _("rest"),
     };
   
     it("should return false for standard note without solfege conversion", () => {
-      expect(noteIsSolfege("C")).toBe(false); 
+      expect(noteIsSolfege("C")).toBe(false);
     });
   
     it("should return false for a rest note", () => {
-      expect(noteIsSolfege("R")).toBe(false); 
+      expect(noteIsSolfege("R")).toBe(false);
     });
   
     it("should return true for a note with an unrecognized sharp (e.g., E♯)", () => {
-      expect(noteIsSolfege("E♯")).toBe(true); 
+      expect(noteIsSolfege("E♯")).toBe(true);
     });
   });
   
 
 describe("getSolfege",()=>{
 
-})
+});
 
 describe("getSolfege", () => {
     const SHARP = "♯";
@@ -1655,13 +1673,13 @@ describe("getSolfege", () => {
     };
   
     it("should return the note itself if it is already a solfege note", () => {
-      expect(getSolfege("C")).toBe("do"); 
-      expect(getSolfege("R")).toBe("rest"); 
+      expect(getSolfege("C")).toBe("do");
+      expect(getSolfege("R")).toBe("rest");
     });
   
     it("should return the correct solfege for standard notes", () => {
-      expect(getSolfege("C♭")).toBe("do" + FLAT); 
-      expect(getSolfege("D")).toBe("re"); 
+      expect(getSolfege("C♭")).toBe("do" + FLAT);
+      expect(getSolfege("D")).toBe("re");
     });
   
     it("should return the correct solfege for sharp and flat notes", () => {
@@ -1670,7 +1688,7 @@ describe("getSolfege", () => {
     });
   
     it("should return undefined for invalid notes not present in the conversion table", () => {
-      expect(getSolfege("X")).toBe("X"); 
+      expect(getSolfege("X")).toBe("X");
     });
   });
   
@@ -1685,7 +1703,7 @@ describe("getSolfege", () => {
   
     it("should correctly split solfege notes with sharp (♯) or flat (♭) attributes", () => {
       expect(splitSolfege("do♯")).toEqual(["do", "♯"]);
-      expect(splitSolfege("ti♯")).toEqual(["ti", "♯"]);  
+      expect(splitSolfege("ti♯")).toEqual(["ti", "♯"]);
       expect(splitSolfege("do♭")).toEqual(["do", "♭"]);
     });
   
@@ -1734,7 +1752,7 @@ describe("getSolfege", () => {
   
     it("should split a scale degree into note and attributes", () => {
       expect(splitScaleDegree("C")).toEqual(["C", ""]);
-      expect(splitScaleDegree("C♯")).toEqual(["C", "♯"]);  
+      expect(splitScaleDegree("C♯")).toEqual(["C", "♯"]);
       expect(splitScaleDegree("B♭")).toEqual(["B", "♭"]);
     });
   
@@ -1750,7 +1768,7 @@ describe("getSolfege", () => {
   });
   
   describe("getNumNote", () => {
-    const SHARP = "♯"; 
+    const SHARP = "♯";
      global.NOTESTABLE = {
       1: "do",
       2: "do" + SHARP,
@@ -1780,15 +1798,15 @@ describe("getSolfege", () => {
 
   describe("calcOctave", () => {
     const SHARP = "♯";
-  const FLAT = "♭"; 
-  const DOUBLESHARP = "𝄪"; 
+  const FLAT = "♭";
+  const DOUBLESHARP = "𝄪";
   const DOUBLEFLAT = "𝄫";
   
     global.SOLFEGENAMES1 = [ "do", "do" + SHARP, "do" + DOUBLESHARP, "re" + DOUBLEFLAT, "re" + FLAT, "re", "re" + SHARP, "re" + DOUBLESHARP, "mi" + DOUBLEFLAT, "mi" + FLAT, "mi", "fa", "fa" + SHARP, "fa" + DOUBLESHARP, "sol" + DOUBLEFLAT, "sol" + FLAT, "sol", "sol" + SHARP, "sol" + DOUBLESHARP, "la", "la" + DOUBLEFLAT, "la" + FLAT, "la" + SHARP, "la" + DOUBLESHARP, "ti" + DOUBLEFLAT, "ti" + FLAT, "ti" ];
     global.FIXEDSOLFEGE1 = { "do𝄫": "B", "do♭": "C" + FLAT, "do": "C", "do♯": "C" + SHARP, "do𝄪": "D", "re𝄫": "C", "re♭": "D" + FLAT, "re": "D", "re♯": "D" + SHARP, "re𝄪": "E", "mi𝄫": "D", "mi♭": "E" + FLAT, "mi": "E", "mi♯": "E" + SHARP, "mi𝄪": "G", "fa𝄫": "E" + FLAT, "fa♭": "F" + FLAT, "fa": "F", "fa♯": "F" + SHARP, "fa𝄪": "G" + SHARP, "sol𝄫": "E", "sol♭": "G" + FLAT, "sol": "G", "sol♯": "G" + SHARP, "sol𝄪": "A", "la𝄫": "G", "la♭": "A" + FLAT, "la": "A", "la♯": "A" + SHARP, "la𝄪": "B", "ti𝄫": "A", "ti♭": "B" + FLAT, "ti": "B", "ti♯": "B" + SHARP, "ti𝄪": "C", "R": _("rest") };
 
     it("should return correct octave for a numeric argument", () => {
-      expect(calcOctave(4, 5, null, "C")).toBe(5); 
+      expect(calcOctave(4, 5, null, "C")).toBe(5);
     });
   
     it("should return correct octave based on currentNote and lastNotePlayed", () => {
@@ -1799,9 +1817,9 @@ describe("getSolfege", () => {
   
    
     it("should correctly calculate octave based on half-steps between notes", () => {
-      expect(calcOctave(4, "current", ["C"], "G")).toBe(3); 
-      expect(calcOctave(4, "next", ["C"], "B")).toBe(4);    
-      expect(calcOctave(4, "previous", ["C"], "A")).toBe(2); 
+      expect(calcOctave(4, "current", ["C"], "G")).toBe(3);
+      expect(calcOctave(4, "next", ["C"], "B")).toBe(4);
+      expect(calcOctave(4, "previous", ["C"], "A")).toBe(2);
     });
   
     it("should be able to handle default case", () => {
@@ -1814,17 +1832,17 @@ describe("getSolfege", () => {
 
     it("should return correct octave value for argument 'next'", () => {
       expect(calcOctaveInterval("next")).toBe(1);
-      expect(calcOctaveInterval(_("next"))).toBe(1); 
+      expect(calcOctaveInterval(_("next"))).toBe(1);
     });
   
     it("should return correct octave value for argument 'previous'", () => {
       expect(calcOctaveInterval("previous")).toBe(-1);
-      expect(calcOctaveInterval(_("previous"))).toBe(-1); 
+      expect(calcOctaveInterval(_("previous"))).toBe(-1);
     });
   
     it("should return correct octave value for argument 'current'", () => {
       expect(calcOctaveInterval("current")).toBe(0);
-      expect(calcOctaveInterval(_("current"))).toBe(0); 
+      expect(calcOctaveInterval(_("current"))).toBe(0);
     });
   
     it("should return correct octave value for numeric arguments", () => {
@@ -1868,7 +1886,7 @@ describe("getSolfege", () => {
   
   describe("convertFromSolfege", () => {
     const SHARP = "♯";
-  const FLAT = "♭"; 
+  const FLAT = "♭";
     global.FIXEDSOLFEGE1 = {
         "do𝄫": "B",
         "do♭": "C" + FLAT,
@@ -1914,7 +1932,7 @@ describe("getSolfege", () => {
       { input: "do♯", expected: "C♯" },
       { input: "re♯", expected: "D♯" },
       { input: "E♯", expected: "F" },
-      { input: "R", expected: _("rest") },  
+      { input: "R", expected: _("rest") },
     ];
   
     testCases.forEach(({ input, expected }) => {
@@ -1968,7 +1986,7 @@ describe("getSolfege", () => {
 
     it('maps scale degree to pitch with movable do', () => {
         const result = scaleDegreeToPitchMapping('C major', 1, true, null);
-        expect(result).toBe('C'); 
+        expect(result).toBe('C');
     });
 
     it('maps pitch to scale degree with movable do', () => {
@@ -1988,7 +2006,7 @@ describe("getSolfege", () => {
 
     it('handles invalid pitch input gracefully', () => {
         const result = scaleDegreeToPitchMapping('C major', null, true, 'Z');
-        expect(result).toEqual([]); 
+        expect(result).toEqual([]);
     });
 
 

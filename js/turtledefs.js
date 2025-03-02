@@ -1,14 +1,22 @@
-// Copyright (c) 2016-2023 Walter Bender
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the The GNU Affero General Public
-// License as published by the Free Software Foundation; either
-// version 3 of the License, or (at your option) any later version.
-//
-// You should have received a copy of the GNU Affero General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
-//
+/*
+ * @license
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 
 /*
    global
@@ -478,7 +486,7 @@ const createHelpContent = (activity) => {
                     _("Let us start our tour!"),
                 "data:image/svg+xml;base64," +
                     window.btoa(base64Encode(MOUSEPALETTEICON))
-            ],            
+            ],
             [
                 _("Guide"),
                 _("A detailed guide to Music Blocks is available."),
@@ -503,7 +511,7 @@ const createHelpContent = (activity) => {
             ]
         ];
     }
-    if (!activity.beginnerMode) {        
+    if (!activity.beginnerMode) {
         HELPCONTENT.push([
             _("Record"),
             _("Record your project as video."),
@@ -582,13 +590,13 @@ const createHelpContent = (activity) => {
         _("This button opens a viewer for loading example projects."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(PLANETBUTTON))
-    ]);    
+    ]);
     HELPCONTENT.push([
         _("Expand/collapse option toolbar"),
         _("Click this button to expand or collapse the auxillary toolbar."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(MENUBUTTON))
-    ]);    
+    ]);
     HELPCONTENT.push([
         _("Help"),
         _("Displays help messages for the main and auxiliary toolbar, right-click contextual menu for blocks and canvas, and palettes."),
@@ -637,7 +645,7 @@ const createHelpContent = (activity) => {
                 window.btoa(
                     base64Encode(SCROLLUNLOCKBUTTON))
 
-        ]);        
+        ]);
     }
     HELPCONTENT.push([
         _("Change theme"),
@@ -692,7 +700,7 @@ const createHelpContent = (activity) => {
         _("Select your language preference."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(LANGUAGEBUTTON))
-    ]); 
+    ]);
     HELPCONTENT.push([
         _("Contextual Menu for Blocks"),
         _("Right-click on a block to access common actions."),
@@ -784,7 +792,7 @@ const createHelpContent = (activity) => {
         _("Increase the size of the blocks."),
         "data:image/svg+xml;base64," +
             window.btoa(base64Encode(BIGGERBUTTON))
-    ]);    
+    ]);
     if (!activity.beginnerMode) {
         HELPCONTENT.push([
             _("Select"),
@@ -866,5 +874,5 @@ if (typeof module !== "undefined" && module.exports) {
         NUMBERBLOCKDEFAULT,
         DEFAULTPALETTE,
         TITLESTRING
-      }
+      };
 }

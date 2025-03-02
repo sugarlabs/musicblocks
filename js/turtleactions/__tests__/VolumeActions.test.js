@@ -1,3 +1,21 @@
+/*
+ * @license
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 const setupVolumeActions = require('../VolumeActions');
 
 describe('setupVolumeActions', () => {
@@ -12,14 +30,14 @@ describe('setupVolumeActions', () => {
             masterVolume: [],
         };
         global.instruments = {
-            0: { synth1: { connect: jest.fn() } }, 
+            0: { synth1: { connect: jest.fn() } },
         };
         global.Tone = {
             Panner: jest.fn(() => ({
                 toDestination: jest.fn(),
                 pan: { value: 0 },
             })),
-        }; 
+        };
         global.last = jest.fn(array => array[array.length - 1]);
         global._ = jest.fn(msg => msg);
         global.VOICENAMES = { Piano: ['Piano', 'piano'] };
@@ -131,7 +149,7 @@ describe('setupVolumeActions', () => {
     
     it('should set panning correctly', () => {
         Singer.VolumeActions.setPanning(50, 0);
-        expect(targetTurtle.singer.panner.pan.value).toBe(0.5); 
+        expect(targetTurtle.singer.panner.pan.value).toBe(0.5);
         expect(Tone.Panner).toHaveBeenCalled();
     });
 
@@ -234,5 +252,5 @@ describe('setupVolumeActions', () => {
         activity.logo.blockList['testBlock'] = { connections: [{}] };
         Singer.VolumeActions.setSynthVolume('null', 50, 0, 'testBlock');
         expect(errorMsgSpy).toHaveBeenCalledWith('nullnot found');
-    });  
+    });
 });

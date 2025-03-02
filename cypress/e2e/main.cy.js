@@ -1,3 +1,21 @@
+/*
+ * @license
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 Cypress.on("uncaught:exception", (err, runnable) => {
     return false;
 });
@@ -81,9 +99,9 @@ describe("MusicBlocks Application", () => {
         it('should click the New File button and verify "New Project" appears', () => {
             cy.get('#newFile > .material-icons')
               .should('exist')
-              .and('be.visible');    
+              .and('be.visible');
             cy.get('#newFile > .material-icons').click();
-            cy.wait(500);    
+            cy.wait(500);
             cy.contains('New project').should('be.visible');
         });
     });
@@ -112,18 +130,18 @@ describe("MusicBlocks Application", () => {
         
             sidebarElements.forEach(selector => {
               cy.get(selector)
-                .should('exist')  
-                .and('be.visible')  
-                .click(); 
+                .should('exist')
+                .and('be.visible')
+                .click();
             });
         });
 
         it('should verify that Grid, Clear, and Collapse elements exist and are visible', () => {
             const elements = [
-              '#Grid > img',     
-              '#Clear',          
-              '#Collapse > img'  
-            ];    
+              '#Grid > img',
+              '#Clear',
+              '#Collapse > img'
+            ];
             elements.forEach(selector => {
               cy.get(selector).should('exist').and('be.visible');
             });
@@ -132,8 +150,8 @@ describe("MusicBlocks Application", () => {
         it('should verify that all nth-child elements from 1 to 6 exist', () => {
             for (let i = 1; i <= 6; i++) {
               cy.get(`[width="126"] > tbody > :nth-child(${i})`)
-                .should('exist')  
-                .and('be.visible'); 
+                .should('exist')
+                .and('be.visible');
             }
         });
     });
@@ -143,7 +161,7 @@ describe("MusicBlocks Application", () => {
             cy.get('#planetIcon > .material-icons')
               .should('exist')
               .and('be.visible')
-              .click();    
+              .click();
             cy.get('#planet-iframe')
               .should('be.visible');
         });

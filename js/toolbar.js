@@ -1,13 +1,22 @@
-// COPYRIGHT (c) 2018,19 Austin George
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the The GNU Affero General Public
-// License as published by the Free Software Foundation; either
-// version 3 of the License, or (at your option) any later version.
-//
-// You should have received a copy of the GNU Affero General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+/*
+ * @license
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 
 /*
   global _, jQuery, _THIS_IS_MUSIC_BLOCKS_, docById, doSVG, fnBrowserDetect,
@@ -134,7 +143,7 @@ class Toolbar {
                 _("Delete plugin"),
                 _("Enable horizontal scrolling"),
                 _("Disable horizontal scrolling"),
-                _("Change theme"),               
+                _("Change theme"),
                 _("Light Mode"),
                 _("Dark Mode"),
                 _("Merge with current project"),
@@ -152,7 +161,7 @@ class Toolbar {
                 _("Save sheet music as ABC"),
                 _("Save sheet music as Lilypond"),
                 _("Save block artwork as SVG"),
-                _("Save block artwork as PNG"),              
+                _("Save block artwork as PNG"),
                 _("Confirm"),
                 _("Select language"),
                 _("Save project as HTML"),
@@ -267,7 +276,7 @@ class Toolbar {
                 _("Delete plugin"),
                 _("Enable horizontal scrolling"),
                 _("Disable horizontal scrolling"),
-                _("Change theme"),               
+                _("Change theme"),
                 _("Light Mode"),
                 _("Dark Mode"),
                 _("Merge with current project"),
@@ -282,7 +291,7 @@ class Toolbar {
                 _("Save turtle artwork as SVG"),
                 _("Save turtle artwork as PNG"),
                 _("Save block artwork as SVG"),
-                _("Save block artwork as PNG"), 
+                _("Save block artwork as PNG"),
                 _("Confirm"),
                 _("English (United States)"),
                 _("English (United Kingdom)"),
@@ -470,12 +479,12 @@ class Toolbar {
     }
 
     renderThemeSelectIcon(themeBox, themes) {
-        const icon = document.getElementById("themeSelectIcon")
+        const icon = document.getElementById("themeSelectIcon");
         themes.forEach((theme) =>{
             if(localStorage.themePreference === theme){
                 icon.innerHTML = document.getElementById(theme).innerHTML;
             }
-        })
+        });
         const themeSelectIcon = docById("themeSelectIcon");
         let themeList = themes;
         themeSelectIcon.onclick = () => {
@@ -609,7 +618,7 @@ class Toolbar {
             if (this.language === "ja") {
                 saveButton.onclick = () => {
                     html_onclick(this.activity);
-                }
+                };
             }
             else {
                 saveButton.style.display = 'block';
@@ -624,11 +633,11 @@ class Toolbar {
                     const savePNG = docById('save-png-beg');
                     console.debug(savePNG);
                     const svgData = doSVG_onclick(
-                        this.activity.canvas, 
-                        this.activity.logo, 
-                        this.activity.turtles, 
-                        this.activity.canvas.width, 
-                        this.activity.canvas.height, 
+                        this.activity.canvas,
+                        this.activity.logo,
+                        this.activity.turtles,
+                        this.activity.canvas.width,
+                        this.activity.canvas.height,
                         1.0
                     );
                     
@@ -641,11 +650,11 @@ class Toolbar {
                         savePNG.onclick = () => {
                             png_onclick(this.activity);
                         };
-                    }  
+                    }
                 };
             }
         } else {
-            console.debug('ADVANCED MODE BUTTONS')
+            console.debug('ADVANCED MODE BUTTONS');
             saveButton.style.display = 'none';
             saveButtonAdvanced.style.display = 'block';
             saveButtonAdvanced.onclick = () => {
@@ -659,11 +668,11 @@ class Toolbar {
                 const savePNG = docById('save-png');
                 console.debug(savePNG);
                 const svgData = doSVG_onclick(
-                    this.activity.canvas, 
-                    this.activity.logo, 
-                    this.activity.turtles, 
-                    this.activity.canvas.width, 
-                    this.activity.canvas.height, 
+                    this.activity.canvas,
+                    this.activity.logo,
+                    this.activity.turtles,
+                    this.activity.canvas.width,
+                    this.activity.canvas.height,
                     1.0
                 );
 
@@ -720,7 +729,7 @@ class Toolbar {
                 saveArtworkPNG.onclick = () => {
                     blockartworkpng_onclick(this.activity);
                 };
-            }
+            };
         }
     }
 
@@ -730,7 +739,7 @@ class Toolbar {
      * @public 
      * @param {Function} rec_onclick
      * @returns {void}
-     */  
+     */
     updateRecordButton(rec_onclick) {
         const Record = docById("record");
         const browser = fnBrowserDetect();
@@ -916,7 +925,7 @@ class Toolbar {
                 // Hide all advanced icons in beginner mode
                 const advancedIcons = [
                     "displayStatsIcon",
-                    "loadPluginIcon", 
+                    "loadPluginIcon",
                     "delPluginIcon",
                     "enableHorizScrollIcon",
                     "disableHorizScrollIcon",

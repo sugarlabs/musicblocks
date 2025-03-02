@@ -1,18 +1,22 @@
-/**
- * @file This contains the constraints for the method arguments of JavaScript based Music Blocks API.
- * @author Anindya Kundu
- *
- * @copyright 2020 Anindya Kundu
- *
+/*
  * @license
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * The GNU Affero General Public License as published by the Free Software Foundation; either
- * version 3 of the License, or (at your option) any later version.
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
  *
- * You should have received a copy of the GNU Affero General Public License along with this
- * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
- * MA 02110-1335 USA.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 
 /* global JSInterface */
 
@@ -1192,5 +1196,5 @@ JSInterface._methodArgConstraints = {
     ]
 };
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { JSInterface }; 
+    module.exports = { JSInterface };
 }

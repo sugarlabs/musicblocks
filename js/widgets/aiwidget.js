@@ -1,13 +1,22 @@
-// Copyright (c) 2024 Abhijeet Singh
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the The GNU Affero General Public
-// License as published by the Free Software Foundation; either
-// version 3 of the License, or (at your option) any later version.
-//
-// You should have received a copy of the GNU Affero General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+/*
+ * @license
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 
 /*
    global
@@ -41,8 +50,8 @@ function AIWidget() {
     // Oscilloscope constants
     const SAMPLEANALYSERSIZE = 8192;
     const SAMPLEOSCCOLORS = ["#3030FF", "#FF3050"];
-    let abcNotationSong=""
-    var midiBuffer
+    let abcNotationSong="";
+    var midiBuffer;
     /**
      * Reference to the timbre block.
      * @type {number | null}
@@ -121,7 +130,7 @@ function AIWidget() {
      * @returns {void}
      */
     this.pause = function () {
-        midiBuffer.stop()
+        midiBuffer.stop();
     };
 
     /**
@@ -196,7 +205,7 @@ function AIWidget() {
     function abcToStandardValue(pitchValue) {
        
         
-        const octave = Math.floor(pitchValue/ 7) + 4; 
+        const octave = Math.floor(pitchValue/ 7) + 4;
         return  octave;
     }
     //creates  pitch which consist of note pitch notename you could see them in the function
@@ -204,16 +213,16 @@ function AIWidget() {
         const blocks = [];
         
         const pitch = pitches;
-        pitchDuration = toFraction(pitchDuration);          
+        pitchDuration = toFraction(pitchDuration);
         const adjustedNote = adjustPitch(pitch.name , keySignature).toUpperCase();
         if(triplet!==undefined&&triplet!==null){
-            console.log('For the Pitch')
-            console.log(pitch)
-            console.log('below is the meter Den')
+            console.log('For the Pitch');
+            console.log(pitch);
+            console.log('below is the meter Den');
             console.log(meterDen);
-            console.log('below is the triplet')
-            console.log(triplet)
-            pitchDuration[1]=meterDen*triplet
+            console.log('below is the triplet');
+            console.log(triplet);
+            pitchDuration[1]=meterDen*triplet;
         }
       
         actionBlock.push(
@@ -252,10 +261,10 @@ function AIWidget() {
         let musicBlocksJSON = [];
         
         let staffBlocksMap = {};
-        let organizeBlock={}
+        let organizeBlock={};
         let blockId = 0;
 
-        let tripletFinder = null
+        let tripletFinder = null;
         const title = (tune.metaText?.title ?? "title").toString().toLowerCase();
         const instruction = (tune.metaText?.instruction ?? "guitar").toString().toLowerCase();
         
@@ -271,13 +280,13 @@ function AIWidget() {
                
                 }
 
-               organizeBlock[staffIndex].arrangedBlocks.push(staff)
+               organizeBlock[staffIndex].arrangedBlocks.push(staff);
     
 
             });
         });
-        console.log('below is the arranged blocks')
-        console.log(organizeBlock)
+        console.log('below is the arranged blocks');
+        console.log(organizeBlock);
         for (const lineId in organizeBlock) {
             organizeBlock[lineId].arrangedBlocks?.forEach((staff) => {
                 if (!staffBlocksMap.hasOwnProperty(lineId)) {
@@ -314,12 +323,12 @@ function AIWidget() {
                  
 
                     //for adding above 17 blocks above 
-                    blockId=blockId+17
+                    blockId=blockId+17;
                 }
 
-                let actionBlock=[]
+                let actionBlock=[];
                 staff.voices.forEach(voice => {
-                    console.log(voice)
+                    console.log(voice);
                  
               
                     voice.forEach(element => {
@@ -332,8 +341,8 @@ function AIWidget() {
                             
                             // Check and set tripletFinder to null if element?.endTriplets exists
                       
-                            console.log('pitches are below')
-                            console.log(element)
+                            console.log('pitches are below');
+                            console.log(element);
                             createPitchBlocks(element.pitches[0], blockId,element.duration,staff.key,actionBlock,tripletFinder,staffBlocksMap[lineId].meterDen);
                             if (element?.endTriplet!== null &&element?.endTriplet!== undefined) {
                                 tripletFinder = null;
@@ -344,17 +353,17 @@ function AIWidget() {
                         //check repeat start and end block 
                         else if(element.el_type==="bar"){
                             if(element.type==="bar_left_repeat"){
-                                staffBlocksMap[lineId].repeatArray.push({start : staffBlocksMap[lineId].baseBlocks.length ,end:-1})
+                                staffBlocksMap[lineId].repeatArray.push({start : staffBlocksMap[lineId].baseBlocks.length ,end:-1});
                             }
                             else if (element.type ==="bar_right_repeat"){
-                                const endBlockSearch =    staffBlocksMap[lineId].repeatArray
+                                const endBlockSearch =    staffBlocksMap[lineId].repeatArray;
 
                                 for(const repeatbar in endBlockSearch){
-                                    console.log('endBlockSearch[repeatbar].end'+ endBlockSearch[repeatbar].end)
+                                    console.log('endBlockSearch[repeatbar].end'+ endBlockSearch[repeatbar].end);
                                     if(endBlockSearch[repeatbar].end==-1){
-                                        staffBlocksMap[lineId].repeatArray[repeatbar].end=staffBlocksMap[lineId].baseBlocks.length
+                                        staffBlocksMap[lineId].repeatArray[repeatbar].end=staffBlocksMap[lineId].baseBlocks.length;
                                     }
-                                }                     
+                                }
 
                             }
 
@@ -362,18 +371,18 @@ function AIWidget() {
                     });
                     
                     //update the newnote connection with hidden
-                    actionBlock[0][4][0]=blockId+3
-                     actionBlock[actionBlock.length-1][4][1]=null
+                    actionBlock[0][4][0]=blockId+3;
+                     actionBlock[actionBlock.length-1][4][1]=null;
                     
                         //update the namedo block if not first nameddo block appear
-                    if(staffBlocksMap[lineId].baseBlocks.length!=0){                          
-                    staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0][staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0].length-4][4][1] =blockId
-                    }   
+                    if(staffBlocksMap[lineId].baseBlocks.length!=0){
+                    staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0][staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0].length-4][4][1] =blockId;
+                    }
                     //add the nameddo action text and hidden block for each line
                     actionBlock.push ( [blockId, ["nameddo", {value: `V: ${parseInt(lineId)+1} Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1}`}], 0, 0, [staffBlocksMap[lineId].baseBlocks.length === 0 ? null : staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0][staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0].length-4][0], null]],
                     [blockId + 1, ["action", {collapsed: false}], 100, 100, [null, blockId + 2, blockId + 3, null]],
                     [blockId + 2, ["text", {value: `V: ${parseInt(lineId)+1} Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1}`}], 0, 0, [blockId + 1]],
-                    [blockId + 3, "hidden", 0, 0, [blockId + 1, actionBlock[0][0]]] )// blockid of topaction block
+                    [blockId + 3, "hidden", 0, 0, [blockId + 1, actionBlock[0][0]]] );// blockid of topaction block
                     
                     if (!staffBlocksMap[lineId].nameddoArray) {
                         staffBlocksMap[lineId].nameddoArray = {};
@@ -385,11 +394,11 @@ function AIWidget() {
                     }
                     
                     staffBlocksMap[lineId].nameddoArray[lineId].push(blockId);
-                    blockId=blockId+4
+                    blockId=blockId+4;
 
-                    musicBlocksJSON.push(actionBlock)
+                    musicBlocksJSON.push(actionBlock);
 
-                    console.log('below is the repeat checker'+lineId)
+                    console.log('below is the repeat checker'+lineId);
                     staffBlocksMap[lineId].baseBlocks.push([actionBlock]);
                  
 
@@ -399,8 +408,8 @@ function AIWidget() {
         }
      
         let finalBlock = [];
-        console.log('below is the staff Block map')
-        console.log(staffBlocksMap)
+        console.log('below is the staff Block map');
+        console.log(staffBlocksMap);
 
 
         //Some Error are here need to be fixed 
@@ -419,34 +428,34 @@ function AIWidget() {
             console.log(staffBlocksMap[staffIndex].baseBlocks[0][0][staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4]);
         
 
-            let repeatBlock =[]
+            let repeatBlock =[];
     
-            let repeatblockids=staffBlocksMap[staffIndex].repeatArray
+            let repeatblockids=staffBlocksMap[staffIndex].repeatArray;
             for(const repeatId of repeatblockids){
                 if (repeatId.start==0){
                     
                     
                     
-                    staffBlocksMap[staffIndex].repeatBlock.push([blockId,"repeat",0,0,[ staffBlocksMap[staffIndex].startBlock[staffBlocksMap[staffIndex].startBlock.length - 3][0]/*setribmre*/,blockId+1,staffBlocksMap[staffIndex].nameddoArray[staffIndex][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end+1] === null ? null :staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end+1]]])
-                    staffBlocksMap[staffIndex].repeatBlock.push([blockId + 1, ["number", {value: 2}], 100, 100, [blockId]])
+                    staffBlocksMap[staffIndex].repeatBlock.push([blockId,"repeat",0,0,[ staffBlocksMap[staffIndex].startBlock[staffBlocksMap[staffIndex].startBlock.length - 3][0]/*setribmre*/,blockId+1,staffBlocksMap[staffIndex].nameddoArray[staffIndex][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end+1] === null ? null :staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end+1]]]);
+                    staffBlocksMap[staffIndex].repeatBlock.push([blockId + 1, ["number", {value: 2}], 100, 100, [blockId]]);
 
                     //Update the settrimbre block
-                    staffBlocksMap[staffIndex].startBlock[staffBlocksMap[staffIndex].startBlock.length - 3][4][2]=blockId
-                    console.log('Following are the nameddo Array')
-                    console.log(staffBlocksMap[staffIndex].nameddoArray)
-                    let firstnammedo=searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[0][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][0])
-                    let endnammedo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end])
-                    console.log('below is the firstnammedo')
-                    console.log( firstnammedo)  
-                    console.log('below and below is the error for you ')
+                    staffBlocksMap[staffIndex].startBlock[staffBlocksMap[staffIndex].startBlock.length - 3][4][2]=blockId;
+                    console.log('Following are the nameddo Array');
+                    console.log(staffBlocksMap[staffIndex].nameddoArray);
+                    let firstnammedo=searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[0][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][0]);
+                    let endnammedo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end]);
+                    console.log('below is the firstnammedo');
+                    console.log( firstnammedo);
+                    console.log('below and below is the error for you ');
                     
-                    console.log(staffBlocksMap[staffIndex].baseBlocks[0][0])
+                    console.log(staffBlocksMap[staffIndex].baseBlocks[0][0]);
                     //because its [0]is the first nammeddo block obviously
 
                     // Check if staffBlocksMap[staffIndex].baseBlocks[repeatId.end+1] exists and has a [0] element
                 if (staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1] && staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0]) {
                     let secondnammedo = searchIndexForMusicBlock(
-                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0], 
+                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0],
                         staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end + 1]
                     );
 
@@ -454,58 +463,58 @@ function AIWidget() {
                         staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0][secondnammedo][4][0] = blockId;
                     }
                 }
-                staffBlocksMap[staffIndex].baseBlocks[0][0][firstnammedo][4][0]=blockId
-                staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][endnammedo][4][1]=null
+                staffBlocksMap[staffIndex].baseBlocks[0][0][firstnammedo][4][0]=blockId;
+                staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][endnammedo][4][1]=null;
 
-                blockId=blockId+2
+                blockId=blockId+2;
             
                 }
                 else{
            
                   
                 
-                    const currentnammeddo =searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.start])
+                    const currentnammeddo =searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.start]);
 
-                    let prevnameddo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.start-1][0],staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0])
-                    let afternamedo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0],staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][1])
-                    let prevrepeatnameddo=-1
+                    let prevnameddo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.start-1][0],staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0]);
+                    let afternamedo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0],staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][1]);
+                    let prevrepeatnameddo=-1;
                     if(prevnameddo==-1){
-                        prevrepeatnameddo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].repeatBlock,staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0])
+                        prevrepeatnameddo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].repeatBlock,staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0]);
                     }
                     
               
-                    const prevBlockId=staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0]
-                    console.log('prevBlockID')
-                    console.log(prevBlockId)
-                    const currentBlockId=staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][0]
+                    const prevBlockId=staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0];
+                    console.log('prevBlockID');
+                    console.log(prevBlockId);
+                    const currentBlockId=staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][0];
 
                     //needs null checking optmizie
-                let nextBlockId=staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end+1]
+                let nextBlockId=staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end+1];
                 
-                  staffBlocksMap[staffIndex].repeatBlock.push([blockId,"repeat",0,0,[staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0],blockId+1, currentBlockId,nextBlockId === null ? null : nextBlockId]])
-                  staffBlocksMap[staffIndex].repeatBlock.push([blockId + 1, ["number", {value: 2}], 100, 100, [blockId]])
+                  staffBlocksMap[staffIndex].repeatBlock.push([blockId,"repeat",0,0,[staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0],blockId+1, currentBlockId,nextBlockId === null ? null : nextBlockId]]);
+                  staffBlocksMap[staffIndex].repeatBlock.push([blockId + 1, ["number", {value: 2}], 100, 100, [blockId]]);
 
                if(prevnameddo!=-1){
-                staffBlocksMap[staffIndex].baseBlocks[repeatId.start-1][0][prevnameddo][4][1]=blockId
+                staffBlocksMap[staffIndex].baseBlocks[repeatId.start-1][0][prevnameddo][4][1]=blockId;
                }else{
-                staffBlocksMap[staffIndex].repeatBlock[prevrepeatnameddo][4][3]=blockId
+                staffBlocksMap[staffIndex].repeatBlock[prevrepeatnameddo][4][3]=blockId;
                }
                if(afternamedo!=-1){
-                staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][afternamedo][4][1]=null
+                staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][afternamedo][4][1]=null;
                }
                 
 
-                staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0]=blockId
+                staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0]=blockId;
                
                 if(nextBlockId!=null){
-                    console.log('below is the repeat next block id '+ repeatId)
-                    console.log(staffBlocksMap[staffIndex].baseBlocks)
-                    const nextnameddo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.end+1][0],nextBlockId)
-                    staffBlocksMap[staffIndex].baseBlocks[repeatId.end+1][0][nextnameddo][4][0]=blockId
+                    console.log('below is the repeat next block id '+ repeatId);
+                    console.log(staffBlocksMap[staffIndex].baseBlocks);
+                    const nextnameddo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.end+1][0],nextBlockId);
+                    staffBlocksMap[staffIndex].baseBlocks[repeatId.end+1][0][nextnameddo][4][0]=blockId;
                 }
              
      
-                blockId=blockId+2
+                blockId=blockId+2;
                 }
                     
                 }
@@ -516,7 +525,7 @@ function AIWidget() {
             
                 finalBlock.push(...staffBlocksMap[staffIndex].startBlock);
                 finalBlock.push(...flattenedLineBlock);
-                finalBlock.push(...staffBlocksMap[staffIndex].repeatBlock)
+                finalBlock.push(...staffBlocksMap[staffIndex].repeatBlock);
                 console.log('Below is the combined block:');
                 console.log(combinedBlock);
             }
@@ -525,12 +534,12 @@ function AIWidget() {
        
         
 
-        console.log('below is the staff Block map')
+        console.log('below is the staff Block map');
         console.log(staffBlocksMap);
 
         
-        console.log('test block is ')
-        console.log(finalBlock)
+        console.log('test block is ');
+        console.log(finalBlock);
 
       this.activity.blocks.loadNewBlocks(finalBlock);
   
@@ -541,7 +550,7 @@ function AIWidget() {
         // this.blocks.loadNewBlocks(combined_array);
         return null;
 
-    }
+    };
     /**
      * Displays an error message when the uploaded sample is not a .wav file.
      * @returns {void}
@@ -557,11 +566,11 @@ function AIWidget() {
      */
     this.__save = function () {
         const tunebook = new ABCJS.parseOnly(abcNotationSong);
-        console.log(tunebook)
+        console.log(tunebook);
         tunebook.forEach(tune => {
             //call parseABC to parse abcdata to MB json
             this._parseABC(tune);
-            console.log(tune)
+            console.log(tune);
         
         });
         
@@ -645,7 +654,7 @@ function AIWidget() {
 
         this.playBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
         this.playBtn.onclick = () => {
-            console.log(abcNotationSong)
+            console.log(abcNotationSong);
             if (this.isMoving) {
                 this.pause();
                 this.playBtn.innerHTML =
@@ -661,7 +670,7 @@ function AIWidget() {
                 
             } else {
                 if (!(abcNotationSong =="")) {
-                    console.log(abcNotationSong)
+                    console.log(abcNotationSong);
                     this.resume();
                     this._playABCSong();
                 }
@@ -723,9 +732,9 @@ function AIWidget() {
      * @returns {void}
      */
     this._playABCSong = function () {
-       var abc = abcNotationSong
+       var abc = abcNotationSong;
        var stopAudioButton = document.querySelector(".stop-audio");
-       console.log('abcd',abcNotationSong)
+       console.log('abcd',abcNotationSong);
 
         var visualObj = ABCJS.renderAbc("*", abc, {
             responsive: "resize" })[0];
@@ -755,7 +764,7 @@ function AIWidget() {
                         audioContext: audioContext,
                         millisecondsPerMeasure: visualObj.millisecondsPerMeasure()
                     }).then(function (response) {
-                        console.log("Notes loaded: ", response)
+                        console.log("Notes loaded: ", response);
                       
                         // midiBuffer.prime actually builds the output buffer.
                         return midiBuffer.prime();
@@ -950,7 +959,7 @@ function AIWidget() {
             hint.textContent = hintText;
             hint.style.marginRight = "20px";
             hint.style.cursor = "pointer";
-            hint.style.marginRight="4px"
+            hint.style.marginRight="4px";
             hint.style.fontSize = "20px";
             hint.style.color = "blue";
             hint.style.backgroundColor = "rgb(227 162 162 / 80%)"; // Light white background

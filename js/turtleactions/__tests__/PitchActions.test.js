@@ -1,3 +1,21 @@
+/*
+ * @license
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 const setupPitchActions = require('../PitchActions');
 
 describe('setupPitchActions', () => {
@@ -11,8 +29,8 @@ describe('setupPitchActions', () => {
             processPitch: jest.fn(),
             addScalarTransposition: jest.fn(() => ['C', 4]),
         };
-        global.keySignatureToMode = jest.fn(() => ['C', 'major']); 
-        global.isCustomTemperament = jest.fn(() => false); 
+        global.keySignatureToMode = jest.fn(() => ['C', 'major']);
+        global.isCustomTemperament = jest.fn(() => false);
         global.ACCIDENTALNAMES = ['sharp', 'flat'];
         global.ACCIDENTALVALUES = [1, -1];
         global.NANERRORMSG = 'Not a number error';
@@ -23,7 +41,7 @@ describe('setupPitchActions', () => {
             major: [2, 2, 1, 2, 2, 2, 1],
             minor: [2, 1, 2, 2, 1, 2, 2],
         };
-        global.FLAT = 'b'; 
+        global.FLAT = 'b';
         global.SHARP = '#';
         global.nthDegreeToPitch = jest.fn(() => 'C');
         global.pitchToNumber = jest.fn(() => 0);
@@ -58,7 +76,7 @@ describe('setupPitchActions', () => {
         targetTurtle = {
             singer: {
                 justCounting: [],
-                pitchNumberOffset: 0, 
+                pitchNumberOffset: 0,
                 currentOctave: 4,
                 lastNotePlayed: ['C4', 4],
                 inNoteBlock: [],
@@ -66,7 +84,7 @@ describe('setupPitchActions', () => {
                 pitchNumberOffset: 0,
                 scalarTransposition: 0,
                 transposition: 0,
-                scalarTranspositionValues: [], 
+                scalarTranspositionValues: [],
                 transpositionValues: [],
                 invertList: [],
             },

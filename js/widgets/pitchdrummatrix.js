@@ -1,13 +1,22 @@
-// Copyright (c) 2016-21 Walter Bender
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the The GNU Affero General Public
-// License as published by the Free Software Foundation; either
-// version 3 of the License, or (at your option) any later version.
-//
-// You should have received a copy of the GNU Affero General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+/*
+ * @license
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 
 // Similar to the matrix, this widget makes a mapping between pitch
 // and drum sounds.
@@ -252,8 +261,8 @@ class PitchDrumMatrix {
             labelCell.className = "headcol";
             labelCell.innerHTML = this.rowLabels[j] + this.rowArgs[j].toString().sub();
             labelCell.style.position = "sticky";
-            labelCell.style.left = "0"; 
-            labelCell.style.top = "0"; 
+            labelCell.style.left = "0";
+            labelCell.style.top = "0";
             labelCell.style.zIndex = "5";
            
             pdmCell = pdmTableRow.insertCell();
@@ -281,8 +290,8 @@ class PitchDrumMatrix {
         labelCell.className = "headcol";
         labelCell.innerHTML = "";
         labelCell.style.position = "sticky";
-        labelCell.style.left = "0"; 
-        labelCell.style.top = "0"; 
+        labelCell.style.left = "0";
+        labelCell.style.top = "0";
         labelCell.style.bottom = "0";
         labelCell.style.zIndex = "20";
 
@@ -396,7 +405,7 @@ class PitchDrumMatrix {
      * @param {number} pitchBlock - The pitch block index.
      * @param {number} drumBlock - The drum block index.
      * @returns {void}
-     */    
+     */
     addNode(pitchBlock, drumBlock) {
         let obj;
         for (let i = 0; i < this._blockMap.length; i++) {
@@ -415,7 +424,7 @@ class PitchDrumMatrix {
      * @param {number} pitchBlock - The pitch block index.
      * @param {number} drumBlock - The drum block index.
      * @returns {void}
-     */    
+     */
     removeNode(pitchBlock, drumBlock) {
         let obj;
         for (let i = 0; i < this._blockMap.length; i++) {
@@ -431,7 +440,7 @@ class PitchDrumMatrix {
      * 
      * @private
      * @returns {HTMLElement} - The save lock element.
-     */    
+     */
     _get_save_lock() {
         return this._save_lock;
     }

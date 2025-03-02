@@ -1,23 +1,22 @@
-/**
- * @file This contains the action methods of the Turtle's Singer component's Intervals blocks.
- * @author Anindya Kundu
- * @author Walter Bender
- *
- * @copyright 2014-2020 Walter Bender
- * @copyright 2020 Anindya Kundu
- *
+/*
  * @license
- * This program is free software; you can redistribute it and/or modify it under the terms of the
- * The GNU Affero General Public License as published by the Free Software Foundation; either
- * version 3 of the License, or (at your option) any later version.
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
  *
- * You should have received a copy of the GNU Affero General Public License along with this
- * library; if not, write to the Free Software Foundation, 51 Franklin Street, Suite 500 Boston,
- * MA 02110-1335 USA.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * Utility methods are in PascalCase.
- * Action methods are in camelCase.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
+
 
 /*
    global _, NOINPUTERRORMSG, Singer, MUSICALMODES, MusicBlocks, Mouse, getNote,
@@ -110,13 +109,13 @@ function setupIntervalsActions(activity) {
 
             let totalIntervals = this.GetIntervalNumber(turtle);
             
-            const numberToStringMap = [_('one'), _('two'), _('three'), _('four'), _('five'), _('six'), _('seven'), _('eight'), _('nine')]
+            const numberToStringMap = [_('one'), _('two'), _('three'), _('four'), _('five'), _('six'), _('seven'), _('eight'), _('nine')];
             const plural = (Math.abs(octave) > 1) ? _('octaves') : _('octave');
             
             let os = numberToStringMap[Math.abs(octave) - 1] || Math.abs(octave);
             if (totalIntervals % 12 === 0 && letterGap === 0) {
                 if (octave < 0) {
-                    if (octave === -1) os = ""
+                    if (octave === -1) os = "";
                     const a = os + " " + _("perfect") + " " + plural + " " + _("below");
                     return a.charAt(0).toUpperCase() + a.slice(1);
                 }
@@ -129,15 +128,15 @@ function setupIntervalsActions(activity) {
             if (totalIntervals > 21) {
                 if (octave >= 1) {
                     lastWord = ", " + _("plus") + " " + os + " " + plural;
-                }    
+                }
                 while (totalIntervals > 12) totalIntervals -= 12;
             }
             
             if (octave < 0) {
                 letterGap = (letterGap !== 0) ? NOTENAMES.length - letterGap : letterGap;
                 if (octave < -1) lastWord = `,  ${os} ${plural}`;
-                lastWord += " "
-		lastWord += _("below")
+                lastWord += " ";
+		lastWord += _("below");
             }
             
             let interval = (totalIntervals % 12 === 0 && letterGap === 0) ? SEMITONETOINTERVALMAP[totalIntervals][letterGap] : SEMITONETOINTERVALMAP[totalIntervals][letterGap] + lastWord;

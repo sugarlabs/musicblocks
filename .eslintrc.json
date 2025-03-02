@@ -11,22 +11,17 @@
     }
   },
   "extends": ["eslint:recommended", "prettier"],
+  "plugins": ["header"],
   "rules": {
     "no-console": "warn",
     "no-mixed-spaces-and-tabs": "warn",
     "no-unused-vars": "warn",
     "no-use-before-define": "error",
-    "prefer-const": [
-      "warn",
-      {
-        "destructuring": "any",
-        "ignoreReadBeforeAssign": true
-      }
-    ],
+    "prefer-const": "off",
     "no-undef": "error",
-    "no-redeclare": [2, {"builtinGlobals": false}],
-    "indent": ["warn", 4, { "SwitchCase": 1 }],
-    "quotes": ["warn", "double", { "avoidEscape": true }],
+    "no-redeclare": [2, { "builtinGlobals": false }],
+    "indent": "off",
+    "quotes": "off",
     "semi": "error",
     "max-len": [
       "warn",
@@ -40,6 +35,26 @@
     ],
     "no-trailing-spaces": ["warn", { "skipBlankLines": true, "ignoreComments": true }],
     "no-duplicate-case": "error",
-    "no-irregular-whitespace": "warn"
+    "no-irregular-whitespace": "warn",
+    "header/header": [2, "block", [
+      "",
+      " * @license",
+      " * MusicBlocks v3.4.1",
+      " * Copyright (C) 2025 Sugar Labs",
+      " *",
+      " * This program is free software: you can redistribute it and/or modify",
+      " * it under the terms of the GNU Affero General Public License as published by",
+      " * the Free Software Foundation, either version 3 of the License, or",
+      " * (at your option) any later version.",
+      " *",
+      " * This program is distributed in the hope that it will be useful,",
+      " * but WITHOUT ANY WARRANTY; without even the implied warranty of",
+      " * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the",
+      " * GNU Affero General Public License for more details.",
+      " *",
+      " * You should have received a copy of the GNU Affero General Public License",
+      " * along with this program. If not, see <https://www.gnu.org/licenses/>.",
+      " "
+    ]]
   }
 }

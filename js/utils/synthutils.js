@@ -1,13 +1,22 @@
-// Copyright (c) 2016-21 Walter Bender
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the The GNU Affero General Public
-// License as published by the Free Software Foundation; either
-// version 3 of the License, or (at your option) any later version.
-//
-// You should have received a copy of the GNU Affero General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+/*
+ * @license
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Sugar Labs
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 
 /*
    global
@@ -1387,7 +1396,7 @@ function Synth() {
                     instrumentName,
                     sourceName,
                     params
-                )
+                );
             }
         } else if (sourceName in BUILTIN_SYNTHS) {
             if (instruments[turtle] && instruments[turtle][instrumentName]) {
@@ -1412,7 +1421,7 @@ function Synth() {
                 instruments[turtle][instrumentName] = this._createCustomSynth(
                     sourceName,
                     params
-                )
+                );
             }
 
             instrumentsSource[instrumentName] = [0, "poly"];
@@ -1427,7 +1436,7 @@ function Synth() {
                     instrumentName,
                     sourceName,
                     params
-                )
+                );
             }
         } else {
             if (sourceName.length >= 4) {
@@ -1682,14 +1691,14 @@ function Synth() {
                             synth.voices[i].setNote(notes);
                         }
                     }
-                } else {  
+                } else {
                     Tone.ToneAudioBuffer.loaded().then(() => {
                         synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
                     }).catch((e) => {
                     console.debug(e);
-                    })
+                    });
 
-                }   
+                }
             }
 
             setTimeout(() => {
@@ -1986,7 +1995,7 @@ function Synth() {
         }
         console.debug("instrument not found");
         return 50;  // Default volume
-    }
+    };
     
     /**
      * Sets the volume of a specific instrument for a given turtle.
@@ -2034,15 +2043,15 @@ function Synth() {
 
         if (firstConnection === null && lastConnection === null) {
             // Reset volume to default (0 dB) first
-             Tone.Destination.volume.rampTo(0, 0.01); 
+             Tone.Destination.volume.rampTo(0, 0.01);
             setTimeout(()=>{
                 this.trigger(0, "G4", 1 / 4, "electronic synth", null, null, false);
-            },200)
+            },200);
         }
         else{
             const db = Tone.gainToDb(volume / 100);
             Tone.Destination.volume.rampTo(db, 0.01);
-        } 
+        }
     };
 
     /**
@@ -2063,7 +2072,7 @@ function Synth() {
         .catch((error) => {
             console.log(error);
         });
-    }
+    };
 
     /**
      * Stops Recording
@@ -2075,7 +2084,7 @@ function Synth() {
         this.mic.close();
         this.audioURL = URL.createObjectURL(this.recording);
         return this.audioURL;
-    }
+    };
 
     /**
      * Plays Recording
@@ -2084,9 +2093,9 @@ function Synth() {
      */
     this.playRecording = async () => {
         this.player = new Tone.Player().toDestination();
-        await this.player.load(this.audioURL)
+        await this.player.load(this.audioURL);
         this.player.start();
-    }
+    };
 
     /**
      * Stops Recording
@@ -2095,7 +2104,7 @@ function Synth() {
      */
     this.stopPlayBackRecording = () => {
         this.player.stop();
-    }
+    };
 
     /**
      * Analyzing the audio
@@ -2105,7 +2114,7 @@ function Synth() {
     this.LiveWaveForm = () => {
         this.analyser = new Tone.Analyser('waveform', 8192);
         this.mic.connect(this.analyser);
-    }
+    };
 
     /**
     * Gets real-time waveform values
