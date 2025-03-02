@@ -115,10 +115,10 @@ let platformThemes = {
             "#66BB6A"
         ],
         gridWheelcolors: {
-            wheel: ["#1C1C1C"],
+            wheel: ["#D6D6D6"],
             selected: {
-                fill: "#303030",
-                stroke: "#757575"
+                fill: "#858585",
+                stroke: "#777"
             }
         },
         drumWheelcolors: ["#008BA3", "#00ACC1"],
