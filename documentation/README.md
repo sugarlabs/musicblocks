@@ -33,7 +33,11 @@ You can run it from
     1. [Contextual Menu for Blocks](#1-contextual-menu-for-blocks)
     2. [Contextual Menu for Background](#2-contextual-menu-for-background)
     3. [Pie Menus](#3-pie-menus)
-4. [Keyboard Shortcuts](#4-keyboard-shortcuts)
+4. [Keyboard Shortcuts Guide](#4-keyboard-shortcuts-guide)
+    1. [General Shortcuts](#1-general-shortcuts)
+    2. [Navigation Shortcuts](#2-navigation-shortcuts)
+    3. [Music Note Creation](#3-music-note-creation)
+    4. [Special Block Manipulations](#4-special-block-manipulations)
 5. [Block Palettes](#5-block-palettes)
     1. [Defining a Note](#1-defining-a-note)
     2. [A Quick Tour of Selected Blocks](#2-a-quick-tour-of-selected-blocks)
@@ -227,15 +231,11 @@ For further details on how to use these toolbars effectively, you can refer to t
 
 ---
 
-## 4. Keyboard shortcuts
-
+## 4. Keyboard Shortcuts Guide
 
 [Back to Table of Contents](#table-of-contents)
 
-
-# Keyboard Shortcuts Guide
-
-## General Shortcuts
+### 1. General Shortcuts
 
 | Key Combination (Windows) | Key Combination (Mac)       | Description                                             |
 |----------------------------|-----------------------------|---------------------------------------------------------|
@@ -249,7 +249,7 @@ For further details on how to use these toolbars effectively, you can refer to t
 | `Space`                   | `Space`                   | Toggle the zoom level of the stage.                    |
 | `ESC`                     | `ESC`                     | Hide widgets or stop ongoing processes.                |
 
-## Navigation Shortcuts
+### 2. Navigation Shortcuts
 
 | Key (Windows)      | Key (Mac)                            | Description                                             |
 |---------------------|--------------------------------------|---------------------------------------------------------|
@@ -262,7 +262,7 @@ For further details on how to use these toolbars effectively, you can refer to t
 | `Arrow Left`       | `Arrow Left`                        | Move the active block or scroll left (In Horizontal mode).|
 | `Arrow Right`      | `Arrow Right`                       | Move the active block or scroll right (In Horizontal mode).|
 
-## Music Note Creation
+### 3. Music Note Creation
 
 | Key (Windows) | Key (Mac)     | Description               |
 |---------------|---------------|---------------------------|
@@ -274,7 +274,7 @@ For further details on how to use these toolbars effectively, you can refer to t
 | `L`           | `L`           | Create a "La" note.       |
 | `T`           | `T`           | Create a "Ti" note.       |
 
-## Special Block Manipulations
+### 4. Special Block Manipulations
 
 | Key (Windows) | Key (Mac) | Description                                                 |
 |----------------------------|-----------------------|-------------------------------------------------------------|
