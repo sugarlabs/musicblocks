@@ -563,14 +563,12 @@ class Activity {
             }
             const selectedBlocksCount = this.blocks.selectedBlocks.filter(block => !block.trash).length;
             
-            if(selectedBlocksCount){
+            if (selectedBlocksCount) {
                 this.helpfulWheelItems.find(ele => ele.label === "Move to trash").display = true;
                 this.helpfulWheelItems.find(ele => ele.label === "Duplicate").display = true;
-                console.log("set to true")
-            }else{
+            } else {
                 this.helpfulWheelItems.find(ele => ele.label === "Move to trash").display = false;
                 this.helpfulWheelItems.find(ele => ele.label === "Duplicate").display = false;
-                console.log("set to false")
             }
 
             docById("helpfulWheelDiv").style.display = "";
@@ -5987,8 +5985,8 @@ class Activity {
         // end the drag on navbar
         document.getElementById("toolbars").addEventListener("mouseover", () => {this.isDragging = false;});
 
-        this.deleteMultipleBlocks = ()=>{
-            if (this.blocks.selectionModeOn){
+        this.deleteMultipleBlocks = () => {
+            if (this.blocks.selectionModeOn) {
                 const blocksArray = this.blocks.selectedBlocks;
                 // figure out which of the blocks in selectedBlocks are clamp blocks and nonClamp blocks.
                 const clampBlocks = [];
@@ -6016,18 +6014,19 @@ class Activity {
             }
         } 
          
-        this.copyMultipleBlocks = ()=>{
-            if(this.blocks.selectionModeOn&&this.blocks.selectedBlocks.length){
+        this.copyMultipleBlocks = () => {
+            if (this.blocks.selectionModeOn&&this.blocks.selectedBlocks.length) {
                 const blocksArray = this.blocks.selectedBlocks;
                 let pasteDx = 0,pasteDy=0;
                 const map = new Map()
-                 for(let i=0;i<blocksArray.length;i++){
+                 for (let i=0;i<blocksArray.length;i++) {
                     const idx = this.blocks.blockList.indexOf(blocksArray[i]);
                     map.set(idx,blocksArray[i].connections.filter(blk=>(blk!==null)));
-                    if(blocksArray[i].connections.some(blkno=>{const a = map.get(blkno);
+                    if (blocksArray[i].connections.some(blkno=>{
+                        const a = map.get(blkno);
                         if(!a)return false;
                         return a.some(b=>b===idx);
-                    }) || blocksArray[i].trash)continue;                     
+                    }) || blocksArray[i].trash) continue;                     
                     this.blocks.activeBlock = idx;
                     this.blocks.pasteDx = pasteDx;
                     this.blocks.pasteDy = pasteDy;
