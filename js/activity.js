@@ -561,6 +561,17 @@ class Activity {
             if (helpfulWheelTop + 350 > windowHeight) {
                 docById("helpfulWheelDiv").style.top = (windowHeight - 350) + "px";
             }
+            const selectedBlocksCount = this.blocks.selectedBlocks.filter(block => !block.trash).length;
+            
+            if(selectedBlocksCount){
+                this.helpfulWheelItems.find(ele => ele.label === "Move to trash").display = true;
+                this.helpfulWheelItems.find(ele => ele.label === "Duplicate").display = true;
+                console.log("set to true")
+            }else{
+                this.helpfulWheelItems.find(ele => ele.label === "Move to trash").display = false;
+                this.helpfulWheelItems.find(ele => ele.label === "Duplicate").display = false;
+                console.log("set to false")
+            }
 
             docById("helpfulWheelDiv").style.display = "";
 
@@ -5607,10 +5618,10 @@ class Activity {
                 this.helpfulWheelItems.push({label: "Select", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SELECTBUTTON)), display: true, fn: this.selectMode });
          
             if (!this.helpfulWheelItems.find(ele => ele.label === "Move to trash"))
-                this.helpfulWheelItems.push({label: "Move to trash", icon: "imgsrc:header-icons/empty-trash-button.svg", display: true, fn: this.deleteMultipleBlocks });
+                this.helpfulWheelItems.push({label: "Move to trash", icon: "imgsrc:header-icons/empty-trash-button.svg", display: false, fn: this.deleteMultipleBlocks });
             
             if (!this.helpfulWheelItems.find(ele => ele.label === "Duplicate"))
-                this.helpfulWheelItems.push({label: "Duplicate", icon: "imgsrc:header-icons/copy-button.svg" , display: true, fn: this.copyMultipleBlocks});
+                this.helpfulWheelItems.push({label: "Duplicate", icon: "imgsrc:header-icons/copy-button.svg" , display: false, fn: this.copyMultipleBlocks});
             
             if (!this.helpfulWheelItems.find(ele => ele.label === "Clear"))
                 this.helpfulWheelItems.push({label: "Clear", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CLEARBUTTON)), display: true, fn: () => this._allClear(false)});
@@ -6026,7 +6037,10 @@ class Activity {
                     pasteDy += 21;
                  }
                   
-                 this.blocks.setSelectionToActivity(false);
+                 this.setSelectionMode(false);
+                 this.selectedBlocks = [];
+                 this.unhighlightSelectedBlocks(false, false);
+                 this.blocks.setSelectedBlocks(this.selectedBlocks);
                  this.refreshCanvas();
                  docById("helpfulWheelDiv").style.display = "none";
                 }
