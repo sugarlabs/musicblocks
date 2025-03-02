@@ -214,12 +214,18 @@ function setupVolumeActions(activity) {
          * @param {String} synthname - type of synth
          * @param {Number} volume
          * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number} [blk] - corresponding Block index in blocks.blockList
          * @returns {void}
          */
         static setSynthVolume(synthname, volume, turtle, blk) {
             let synth = null;
-            const firstConnection = activity.logo.blockList[blk].connections[0];
-            const lastConnection = last(activity.logo.blockList[blk].connections);
+            let firstConnection = null;
+            let lastConnection = null;
+    
+            if (activity.logo.blockList && activity.logo.blockList[blk]) {
+                firstConnection = activity.logo.blockList[blk].connections[0];
+                lastConnection = last(activity.logo.blockList[blk].connections);
+            }
 
             if (synthname === DEFAULTVOICE || synthname === _(DEFAULTVOICE)) {
                 synth = DEFAULTVOICE;
