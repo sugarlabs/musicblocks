@@ -6015,18 +6015,19 @@ class Activity {
         } 
          
         this.copyMultipleBlocks = () => {
-            if (this.blocks.selectionModeOn&&this.blocks.selectedBlocks.length) {
+            if (this.blocks.selectionModeOn && this.blocks.selectedBlocks.length) {
                 const blocksArray = this.blocks.selectedBlocks;
-                let pasteDx = 0,pasteDy=0;
+                let pasteDx = 0 , pasteDy = 0;
                 const map = new Map()
-                 for (let i=0;i<blocksArray.length;i++) {
+                 for (let i = 0; i < blocksArray.length; i++) {
                     const idx = this.blocks.blockList.indexOf(blocksArray[i]);
-                    map.set(idx,blocksArray[i].connections.filter(blk=>(blk!==null)));
-                    if (blocksArray[i].connections.some(blkno=>{
+                    map.set(idx , blocksArray[i].connections.filter(blk => (blk !== null)));
+
+                    if (blocksArray[i].connections.some(blkno => {
                         const a = map.get(blkno);
-                        if(!a)return false;
-                        return a.some(b=>b===idx);
-                    }) || blocksArray[i].trash) continue;                     
+                        return a && a.some(b => b === idx);
+                    }) || blocksArray[i].trash) continue;
+
                     this.blocks.activeBlock = idx;
                     this.blocks.pasteDx = pasteDx;
                     this.blocks.pasteDy = pasteDy;
