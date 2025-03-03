@@ -1378,10 +1378,10 @@ class Activity {
             confirmBtn.style.marginRight = "16px";
             confirmBtn.style.transition = "background-color 0.2s ease"; 
             confirmBtn.addEventListener("mouseover", () => {
-                confirmBtn.style.backgroundColor = "#023a76"; 
+                confirmBtn.style.backgroundColor = platformColor.blueButtonHover;
             });
             confirmBtn.addEventListener("mouseout", () => {
-                confirmBtn.style.backgroundColor = platformColor.blueButton; 
+                confirmBtn.style.backgroundColor = platformColor.blueButton;
             });
             confirmBtn.addEventListener("click", () => {
                 document.body.removeChild(modal);
@@ -1399,10 +1399,10 @@ class Activity {
             cancelBtn.style.cursor = "pointer";
             cancelBtn.style.transition = "background-color 0.2s ease"; 
             cancelBtn.addEventListener("mouseover", () => {
-                cancelBtn.style.backgroundColor = "#afafaf"; 
+                cancelBtn.style.backgroundColor = platformColor.cancelButtonHover;
             });
             cancelBtn.addEventListener("mouseout", () => {
-                cancelBtn.style.backgroundColor = "#f1f1f1"; 
+                cancelBtn.style.backgroundColor = platformColor.cancelButton;
             });
             cancelBtn.addEventListener("click", () => {
                 document.body.removeChild(modal);
