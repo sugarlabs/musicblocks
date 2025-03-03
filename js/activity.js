@@ -561,6 +561,15 @@ class Activity {
             if (helpfulWheelTop + 350 > windowHeight) {
                 docById("helpfulWheelDiv").style.top = (windowHeight - 350) + "px";
             }
+            const selectedBlocksCount = this.blocks.selectedBlocks.filter(block => !block.trash).length;
+            
+            if (selectedBlocksCount) {
+                this.helpfulWheelItems.find(ele => ele.label === "Move to trash").display = true;
+                this.helpfulWheelItems.find(ele => ele.label === "Duplicate").display = true;
+            } else {
+                this.helpfulWheelItems.find(ele => ele.label === "Move to trash").display = false;
+                this.helpfulWheelItems.find(ele => ele.label === "Duplicate").display = false;
+            }
 
             docById("helpfulWheelDiv").style.display = "";
 
@@ -5619,7 +5628,13 @@ class Activity {
 
             if (!this.helpfulWheelItems.find(ele => ele.label === "Select"))
                 this.helpfulWheelItems.push({label: "Select", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SELECTBUTTON)), display: true, fn: this.selectMode });
-
+         
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Move to trash"))
+                this.helpfulWheelItems.push({label: "Move to trash", icon: "imgsrc:header-icons/empty-trash-button.svg", display: false, fn: this.deleteMultipleBlocks });
+            
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Duplicate"))
+                this.helpfulWheelItems.push({label: "Duplicate", icon: "imgsrc:header-icons/copy-button.svg" , display: false, fn: this.copyMultipleBlocks});
+            
             if (!this.helpfulWheelItems.find(ele => ele.label === "Clear"))
                 this.helpfulWheelItems.push({label: "Clear", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CLEARBUTTON)), display: true, fn: () => this._allClear(false)});
 
@@ -5984,10 +5999,73 @@ class Activity {
         // end the drag on navbar
         document.getElementById("toolbars").addEventListener("mouseover", () => {this.isDragging = false;});
 
+        this.deleteMultipleBlocks = () => {
+            if (this.blocks.selectionModeOn) {
+                const blocksArray = this.blocks.selectedBlocks;
+                // figure out which of the blocks in selectedBlocks are clamp blocks and nonClamp blocks.
+                const clampBlocks = [];
+                const nonClampBlocks = [];
+    
+                for (let i = 0; i < blocksArray.length; i++) {
+                    if (this.blocks.selectedBlocks[i].isClampBlock()) {
+                        clampBlocks.push(this.blocks.selectedBlocks[i]);
+                    } else if (this.blocks.selectedBlocks[i].isDisconnected()) {
+                        nonClampBlocks.push(this.blocks.selectedBlocks[i]);
+                    }
+                }
+                
+                for (let i = 0; i < clampBlocks.length; i++) {
+                    this.blocks.sendStackToTrash(clampBlocks[i]);
+                }
+    
+                for (let i = 0; i < nonClampBlocks.length; i++) {
+                    this.blocks.sendStackToTrash(nonClampBlocks[i]);
+                }
+                // set selection mode to false
+                this.blocks.setSelectionToActivity(false);
+                this.refreshCanvas();
+                docById("helpfulWheelDiv").style.display = "none";
+            }
+        } 
+         
+        this.copyMultipleBlocks = () => {
+            if (this.blocks.selectionModeOn && this.blocks.selectedBlocks.length) {
+                const blocksArray = this.blocks.selectedBlocks;
+                let pasteDx = 0 , pasteDy = 0;
+                const map = new Map()
+                 for (let i = 0; i < blocksArray.length; i++) {
+                    const idx = this.blocks.blockList.indexOf(blocksArray[i]);
+                    map.set(idx , blocksArray[i].connections.filter(blk => (blk !== null)));
+
+                    if (blocksArray[i].connections.some(blkno => {
+                        const a = map.get(blkno);
+                        return a && a.some(b => b === idx);
+                    }) || blocksArray[i].trash) continue;
+
+                    this.blocks.activeBlock = idx;
+                    this.blocks.pasteDx = pasteDx;
+                    this.blocks.pasteDy = pasteDy;
+                    this.blocks.prepareStackForCopy();
+                    this.blocks.pasteStack();
+                    pasteDx += 21;
+                    pasteDy += 21;
+                 }
+                  
+                 this.setSelectionMode(false);
+                 this.selectedBlocks = [];
+                 this.unhighlightSelectedBlocks(false, false);
+                 this.blocks.setSelectedBlocks(this.selectedBlocks);
+                 this.refreshCanvas();
+                 docById("helpfulWheelDiv").style.display = "none";
+                }
+        }
+
+
         this.selectMode = () => {
             this.moving = false;
             this.isSelecting = !this.isSelecting;
             (this.isSelecting) ? this.textMsg(_("Select is enabled.")) : this.textMsg(_("Select is disabled."));
+            docById("helpfulWheelDiv").style.display = "none";
         }
 
         this._create2Ddrag = () => {
