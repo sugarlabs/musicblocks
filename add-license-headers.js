@@ -21,13 +21,11 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-/*************  ✨ Codeium Command ⭐  *************/
 /**
  * Retrieves information about the given file from Git.
  * @param {string} filePath - The path to the file.
  * @returns {{year: number, author: string}} - The year and author of the most recent commit.
  */
-/******  a2dcfcad-f5eb-4279-8696-b530959d08c3  *******/
 function getGitInfo(filePath) {
   try {
     const gitLogCommand = `git log --follow --format="%ad|%an" --date=format:"%Y" --reverse "${filePath}"`;
@@ -64,13 +62,11 @@ const licenseTemplate = `/**
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */`;
 
-/*************  ✨ Codeium Command ⭐  *************/
 /**
  * Adds a license header to a file, taking into account special handling
  * for certain files (SaveInterface.js, js/blocks/*.js, js/js-export/API/*)
  * @param {string} filePath - The path to the file
  */
-/******  6134758f-292e-4d66-98cf-483ccebf2050  *******/
 function addLicenseToFile(filePath) {
   if (filePath.includes('/tests/') || filePath.includes('\\tests\\')) {
     console.log(`Skipping test file: ${filePath}`);
@@ -133,7 +129,6 @@ function addLicenseToFile(filePath) {
   }
 }
 
-/*************  ✨ Codeium Command ⭐  *************/
 /**
  * Recursively processes all files in a directory that match the given extensions.
  * Skips 'node_modules', 'test', and 'tests' directories.
@@ -141,7 +136,6 @@ function addLicenseToFile(filePath) {
  * @param {string} dirPath The path to the directory to process.
  * @param {string[]} [extensions=['.js']] The extensions of files to process.
  */
-/******  c5e08a83-b862-4db4-9f87-f07fee824389  *******/
 function processDirectory(dirPath, extensions = ['.js']) {
   const files = fs.readdirSync(dirPath);
   
