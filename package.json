@@ -19,8 +19,9 @@
   },
   "scripts": {
     "lint": "eslint js/**/*.js",
-    "serve": "python3 -c \"import os, sys; os.system('python3 -m SimpleHTTPServer 3000 --bind 127.0.0.1') if sys.version_info.major==2 else os.system('python3 -m http.server 3000 --bind 127.0.0.1');\"",
-    "winserve": "py -c \"import os, sys; os.system('py -m SimpleHTTPServer 3000') if sys.version_info.major==2 else os.system('py -m http.server 3000 --bind 127.0.0.1');\"",
+    "serve": "http-server -a 127.0.0.1 -p 3000 --gzip --brotli",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
     "test": "jest",
     "cypress:run": "cypress run"
   },
@@ -42,12 +43,15 @@
     "gulp-prettier": "^3.0.0",
     "gulp-uglify": "^3.0.2",
     "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0"
+    "jest-environment-jsdom": "^29.7.0",
+    "nodemon": "^3.1.9"
   },
   "dependencies": {
     "@tonejs/midi": "^2.0.28",
     "autoprefixer": "^10.4.16",
+    "compression": "^1.8.0",
     "cssnano": "^6.0.1",
+    "express": "^4.21.2",
     "gulp-concat": "^2.6.1",
     "gulp-postcss": "^9.0.1",
     "gulp-replace": "^1.0.0",
