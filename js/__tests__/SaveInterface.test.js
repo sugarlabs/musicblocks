@@ -1,20 +1,33 @@
-const { Midi } = require('@tonejs/midi');
-// Mocking the @tonejs/midi library
-jest.mock('@tonejs/midi', () => {
-    return {
-        Midi: jest.fn().mockImplementation(() => ({
-            header: { ticksPerBeat: 480 },
-            addTrack: jest.fn(() => ({
-                addNote: jest.fn(),
-                name: '',
-                instrument: { number: 0 },
-                channel: 0
-            })),
-            toArray: jest.fn(() => new Uint8Array([1, 2, 3]))
-        }))
-    };
-})
-global.Midi = Midi;
+/**
+ * @license
+ * MusicBlocks v3.4.1
+ * Copyright (C) 2025 Diwangshu Kakoty
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+global.Midi = jest.fn().mockImplementation(() => ({
+    header: { ticksPerBeat: 480 },
+    addTrack: jest.fn(() => ({
+        addNote: jest.fn(),
+        name: '',
+        instrument: { number: 0 },
+        channel: 0
+    })),
+    toArray: jest.fn(() => new Uint8Array([1, 2, 3]))
+}));
+
 global.jQuery = jest.fn(() => ({
     on: jest.fn(),
     trigger: jest.fn(),
