@@ -308,14 +308,17 @@ class Activity {
             let lang = "en";
             if (this.storage.languagePreference !== undefined) {
                 lang = this.storage.languagePreference;
-                document.webL10n.setLanguage(lang);
+                console.log("lang");
+                console.log(lang);
+                i18next.changeLanguage(lang);
             } else {
                 lang = navigator.language;
                 if (lang.includes("-")) {
                     lang = lang.slice(0, lang.indexOf("-"));
-                    document.webL10n.setLanguage(lang);
                 }
+                i18next.changeLanguage(lang);
             }
+
         } catch (e) {
             // eslint-disable-next-line no-console
             console.error(e);
