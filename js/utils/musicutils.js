@@ -779,6 +779,7 @@ const EASTINDIANSOLFNOTES = ["ni", "dha", "pa", "ma", "ga", "re", "sa"];
 const DRUMS = [
     "snare drum",
     "kick drum",
+    "duff",
     "tom tom",
     "floor tom",
     "bass drum",
@@ -1132,6 +1133,7 @@ const SELECTORSTRINGS = [
     _("custom"),
     _("snare drum"),
     _("kick drum"),
+    _("duff"),
     _("tom tom"),
     _("floor tom"),
     _("bass drum"),
@@ -2096,6 +2098,7 @@ const MIDI_INSTRUMENTS = {
 const DRUM_MIDI_MAP = {
     "snare drum": 38,
     "kick drum": 36,
+    "duff": 36,
     "tom tom": 41,
     "floor tom tom": 43,
     "cup drum": 47, // Closest: Low-Mid Tom
@@ -2118,6 +2121,7 @@ const DRUM_MIDI_MAP = {
 const REVERSE_DRUM_MIDI_MAP = {
     38: ["snare drum"],
     36: ["kick drum"],
+    36: ["duff"],
     41: ["tom tom"],
     43: ["floor tom tom"],
     47: ["cup drum"],
