@@ -82,7 +82,7 @@ function _(text) {
             }
         }
 
-                // Helper function to get translation with case matching
+        // Helper function to get translation with case matching
         function getTranslationWithCase(inputText, caseType) {
             let translatedText = document.webL10n.get(inputText);
             if (!translatedText || translatedText === inputText) {
