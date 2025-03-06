@@ -209,8 +209,8 @@ develop and maintain this project given its scale. After the core is
 built, we'll be porting features from this application to it.
 
 Refer to the repository
-[**sugarlabs/musicblocks-2**](https://github.com/sugarlabs/musicblocks-2)
-for more information about the new project &mdash; _Music Blocks 2.0_.
+[**sugarlabs/musicblocks-v4**](https://github.com/sugarlabs/musicblocks-v4)
+for more information about the new project &mdash; _Music Blocks 4.0_.
 
 ### Tech Stack
 
