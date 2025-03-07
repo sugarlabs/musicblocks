@@ -82,9 +82,7 @@ the functionality can be accessed by launching the
 [index.html](./index.html) file in the browser using
 `file:///absolute/path/to/index.html`.
 
-However, doing so, some functionality will be unavailable. On top of
-that, some web browsers (e.g., Firefox v68) have restrictions that
-prevent Music Blocks from running using `file:///`.  Therefore, it is
+However, doing so, some functionality will be unavailable. Therefore, it is
 best to launch a _local web server_ from the directory of Music
 Blocks.
 
