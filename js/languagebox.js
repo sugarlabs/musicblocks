@@ -59,7 +59,7 @@ class LanguageBox {
      * @returns {void}
      */
     ja_onclick() {
-        this._language = "ja";
+        this._language = "ja-kanji";
         this.activity.storage.kanaPreference = "kanji";
         this.hide();
     }
@@ -69,7 +69,7 @@ class LanguageBox {
      * @returns {void}
      */
     kana_onclick() {
-        this._language = "ja";
+        this._language = "ja-kana";
         this.activity.storage.kanaPreference = "kana";
         this.hide();
     }
@@ -226,13 +226,26 @@ class LanguageBox {
             ur:"اپنی زبان کی ترجیح کو تبدیل کرنے کے لئے اپنے براؤزر کو تازہ دم کریں۔"
         };
         if (localStorage.getItem("languagePreference") === this._language) {
+            if(this._language.includes('ja'))
+            {
+                this._language=this._language.split('-')[0];   
+            }
+
+            localStorage.setItem("languagePreference",this._language);
             this.activity.textMsg(_("Music Blocks is already set to this language."));
         }
         else{
             this.activity.storage.languagePreference = this._language;
+
             if (this._language === "ja" && this.activity.storage.kanaPreference === "kana") {
                 this.activity.textMsg(MSGPrefix + MSG["kana"] + MSGSuffix);
             } else {
+
+                if(this._language.includes('ja'))
+                {
+                    this._language=this._language.split('-')[0];   
+                }
+
                 this.activity.textMsg(MSGPrefix + MSG[this._language] + MSGSuffix);
             }
         }
