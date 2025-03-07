@@ -1633,9 +1633,9 @@ class Activity {
              */
             function createRecorder (stream, mimeType) {
                 flag = 1;
-                recInside.classList.add("blink");
                 let recordedChunks = [];
                 const mediaRecorder = new MediaRecorder(stream);
+                
                 stream.oninactive = function () {
                     // eslint-disable-next-line no-console
                     stopRec();
@@ -1656,6 +1656,8 @@ class Activity {
                 };
 
                 mediaRecorder.start(200);
+                recInside.classList.add("blink");
+                recInside.setAttribute("fill", "red");
                 start.addEventListener("click", stopRec);
                 return mediaRecorder;
             }
@@ -1679,7 +1681,6 @@ class Activity {
                             this.removeEventListener("click",handler);
                         }
             
-                        recInside.setAttribute("fill", "red");
                     }
                 );
             }
