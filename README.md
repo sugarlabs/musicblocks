@@ -209,8 +209,8 @@ develop and maintain this project given its scale. After the core is
 built, we'll be porting features from this application to it.
 
 Refer to the repository
-[**sugarlabs/musicblocks-2**](https://github.com/sugarlabs/musicblocks-2)
-for more information about the new project &mdash; _Music Blocks 2.0_.
+[**sugarlabs/musicblocks-v4**](https://github.com/sugarlabs/musicblocks-v4)
+for more information about the new project &mdash; _Music Blocks 4.0_.
 
 ### Tech Stack
 
@@ -229,6 +229,39 @@ following resources:
 
 Programmers, please follow these general [guidelines for
 contributions](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md).
+
+### License Header
+
+Music Blocks is licensed under the [AGPL](https://www.gnu.org/licenses/agpl-3.0.en.html).
+If you add a new file to the Music Blocks code base, please be
+sure to include a license header as per below:
+
+```js
+/**
+ * MusicBlocks v3.6.2 (ADD THE UP-TO-DATE VERSION)
+ *
+ * @author Walter Bender (MODIFY THE AUTHOR AS NEEDED)
+ *
+ * @copyright 2025 Walter Bender (MODIFY THE AUTHOR AND YEAR AS NEEDED)
+ *
+ * @license
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+```
+
+This header must be added at the top of **all source code files** to ensure compliance
+with the project's open-source license.
 
 ### Translators
 
