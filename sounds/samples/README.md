@@ -47,6 +47,9 @@ on one line.
    var SOUNDSAMPLESDEFINES = [
     "samples/piano",
 
+   const DEFAULTSYNTHVOLUME = {
+    "piano": 100, 
+
    const SAMPLECENTERNO = {
     'piano': ['C4', 39], // pitchToNumber('C', 4, 'C Major')],
 
@@ -56,9 +59,6 @@ on one line.
                {'name': 'piano', 'data': PIANO_SAMPLE},
    ```
 
-
-
-
 * Add your new sample name to the list of string that need translation
 in `js/utils/musicutils.js`
 
@@ -67,3 +67,11 @@ in `js/utils/musicutils.js`
    const SELECTORSTRINGS = [
        _('piano'),
    ```
+
+-   Ensure that your new instrument is recognized in the interface in `js/js-export/interface.js`
+
+    ```javascript
+    else if (props["constraints"]["type"] === "synth") {
+       const instruments = [
+           "piano",
+    ````
