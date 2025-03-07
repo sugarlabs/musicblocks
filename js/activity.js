@@ -1602,7 +1602,6 @@ class Activity {
                     alert(_("File save canceled"));
                     flag = 0;
                     recording();
-                    // doRecordButton();
                     return; // Exit without saving the file
                 }
 
@@ -1617,8 +1616,6 @@ class Activity {
                 flag = 0;
                 // eslint-disable-next-line no-use-before-define
                 recording();
-                // doRecordButton();
-                // that.textMsg(_("Click on stop saving"));
             }
             /**
              * Stops the recording process.
@@ -1626,9 +1623,6 @@ class Activity {
             function stopRec() {
                 flag = 0;
                 mediaRecorder.stop();
-                const node = document.createElement("p");
-                node.textContent = "Stopped recording";
-                document.body.appendChild(node);
             }
 
             /**
@@ -1640,16 +1634,10 @@ class Activity {
             function createRecorder (stream, mimeType) {
                 flag = 1;
                 recInside.classList.add("blink");
-                // start.removeEventListener(
-                //     "click",
-                //     createRecorder,
-                //     true
-                // );
                 let recordedChunks = [];
                 const mediaRecorder = new MediaRecorder(stream);
                 stream.oninactive = function () {
                     // eslint-disable-next-line no-console
-                    // console.log("Recording is ready to save");
                     stopRec();
                     flag = 0;
                 };
@@ -1669,11 +1657,6 @@ class Activity {
 
                 mediaRecorder.start(200);
                 start.addEventListener("click", stopRec);
-                // setTimeout(() => {
-                //     // eslint-disable-next-line no-console
-                //     console.log("Resizing for Record", that.canvas.height);
-                //     that._onResize();
-                // }, 500);
                 return mediaRecorder;
             }
 
@@ -1695,9 +1678,7 @@ class Activity {
                         if (flag == 1) {
                             this.removeEventListener("click",handler);
                         }
-                        // const node = document.createElement("p");
-                        // node.textContent = "Started recording";
-                        // document.body.appendChild(node);
+            
                         recInside.setAttribute("fill", "red");
                     }
                 );
