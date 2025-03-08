@@ -66,7 +66,7 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             note = pitchObj[0] + pitchObj[1];
         }
 
-    const replacements = {
+        const replacements = {
             '♮': '!', '♯': 'is', '♭': 'es', '10': "''''''''",
             '1': ',, ', '2': ', ', '3': '', '4': "'", '5': "''",
             '6': "'''", '7': "''''", '8': "''''''", '9': "'''''''"
@@ -986,5 +986,5 @@ const saveLilypondOutput = function (activity) {
 };
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { LILYPONDHEADER };
+    module.exports = { LILYPONDHEADER, getLilypondHeader, processLilypondNotes, saveLilypondOutput };
 }
