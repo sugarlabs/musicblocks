@@ -82,9 +82,7 @@ the functionality can be accessed by launching the
 [index.html](./index.html) file in the browser using
 `file:///absolute/path/to/index.html`.
 
-However, doing so, some functionality will be unavailable. On top of
-that, some web browsers (e.g., Firefox v68) have restrictions that
-prevent Music Blocks from running using `file:///`.  Therefore, it is
+However, doing so, some functionality will be unavailable. Therefore, it is
 best to launch a _local web server_ from the directory of Music
 Blocks.
 
@@ -96,46 +94,17 @@ CLI_), on your local machine.
 2. In a terminal, `cd` to the directory where you downloaded/cloned
 Music Blocks, using `cd path/to/musicblocks/`.
 
-3. If you do not have [_Python_](https://www.python.org) installed,
-you'll need to install it.  You can test for Python in a terminal
-using `python`. Type `exit()` to exit Python. (Note that on some older
-Linux systems, the `python3` command is not bound to python. You may
-need to perform a `sudo apt install python-is-python3` on Debian-like
-distros, or equivalent on others.)
-
-4. After cloning the musicblocks repository, you can choose one of two methods to start a local server: using Python or using npm
-
-   **Using Python**
-
-   for _Linux_ and _macOS_:
+3. After you are in `path/to/musicblocks/` directory, install the dependencies using the following command
 
     ```bash
-    python -c "import os, sys; os.system('python -m SimpleHTTPServer 3000 --bind 127.0.0.1') if sys.version_info.major==2 else os.system('python -m http.server 3000 --bind 127.0.0.1')"
+    npm install
     ```
 
-    for _Windows_:
+4. After cloning the musicblocks repository, you can start a local server using npm
 
     ```bash
-    python -c "import os, sys; os.system('python -m SimpleHTTPServer 3000') if sys.version_info.major==2 else os.system('python -m http.server 3000 --bind 127.0.0.1')"
+    npm run dev
     ```
-
-
-    **Using npm**
-
-    for _Linux_ and _macOS_:
-
-    ```bash
-    npm run serve
-    ```
-
-    for _Windows_:
-
-    ```bash
-    npm run winserve
-    ```
-
-    **NOTE:** _Make sure you can run either `python` or `py` from your
-    terminal, to launch the Python prompt._
 
 6. You should see a message `Serving HTTP on 127.0.0.1 port 3000
 (http://127.0.0.1:3000/) ...` since the HTTP Server is set to start
@@ -238,8 +207,8 @@ develop and maintain this project given its scale. After the core is
 built, we'll be porting features from this application to it.
 
 Refer to the repository
-[**sugarlabs/musicblocks-2**](https://github.com/sugarlabs/musicblocks-2)
-for more information about the new project &mdash; _Music Blocks 2.0_.
+[**sugarlabs/musicblocks-v4**](https://github.com/sugarlabs/musicblocks-v4)
+for more information about the new project &mdash; _Music Blocks 4.0_.
 
 ### Tech Stack
 
@@ -258,6 +227,39 @@ following resources:
 
 Programmers, please follow these general [guidelines for
 contributions](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md).
+
+### License Header
+
+Music Blocks is licensed under the [AGPL](https://www.gnu.org/licenses/agpl-3.0.en.html).
+If you add a new file to the Music Blocks code base, please be
+sure to include a license header as per below:
+
+```js
+/**
+ * MusicBlocks v3.6.2 (ADD THE UP-TO-DATE VERSION)
+ *
+ * @author Walter Bender (MODIFY THE AUTHOR AS NEEDED)
+ *
+ * @copyright 2025 Walter Bender (MODIFY THE AUTHOR AND YEAR AS NEEDED)
+ *
+ * @license
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+```
+
+This header must be added at the top of **all source code files** to ensure compliance
+with the project's open-source license.
 
 ### Translators
 
