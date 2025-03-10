@@ -1349,7 +1349,7 @@ class Activity {
             const modal = document.createElement("div");
             modal.classList.add("modalBox");
             const title = document.createElement("h2");
-            title.textContent = "Clear Workspace";
+            title.textContent = _("Clear Workspace");
             title.classList.add("modal-title");
 
             modal.appendChild(title);
