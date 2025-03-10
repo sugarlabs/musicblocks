@@ -117,4 +117,13 @@
   background-color: #1c1c1c;
 }
 
+.dark .modalBox {
+  background-color: #1C1C1C;
+}
+
+.dark .modal-message{
+  color: #e2e2e2;
+  background-color: #1C1C1C;
+}
+
 /* Your Custom Theme can go here if you don't want to modify the existing dark mode */

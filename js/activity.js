@@ -1347,72 +1347,32 @@ class Activity {
         const renderClearConfirmation = (clearCanvasAction) => {
             // Create a custom modal for confirmation
             const modal = document.createElement("div");
-            modal.style.position = "fixed";
-            modal.style.top = "50%";
-            modal.style.left = "50%";
-            modal.style.transform = "translate(-50%, -50%)";
-            modal.style.width = "400px";
-            modal.style.padding = "24px";
-            modal.style.backgroundColor = platformColor.dialogueBox;
-            modal.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
-            modal.style.borderRadius = "8px";
-            modal.style.zIndex = "10000";
-            modal.style.textAlign = "left";
+            modal.classList.add("modalBox");
             const title = document.createElement("h2");
             title.textContent = "Clear Workspace";
-            title.style.color = platformColor.blueButton;
-            title.style.fontSize = "24px";
-            title.style.margin = "0 0 16px 0";
+            title.classList.add("modal-title");
+
             modal.appendChild(title);
             const message = document.createElement("p");
             message.textContent = _("Are you sure you want to clear the workspace?");
-            message.style.color = platformColor.textColor;
-            message.style.fontSize = "16px";
-            message.style.marginBottom = "24px";
+            message.classList.add("modal-message");
+
             modal.appendChild(message);
             // Add buttons
             const buttonContainer = document.createElement("div");
-            buttonContainer.style.display = "flex";
-            buttonContainer.style.justifyContent = "flex-start";
+            buttonContainer.classList.add("clear-button-container");
 
             const confirmBtn = document.createElement("button");
+            confirmBtn.classList.add("confirm-button");
             confirmBtn.textContent = "Confirm";
-            confirmBtn.style.backgroundColor = platformColor.blueButton;
-            confirmBtn.style.color = "white";
-            confirmBtn.style.border = "none";
-            confirmBtn.style.borderRadius = "4px";
-            confirmBtn.style.padding = "8px 16px";
-            confirmBtn.style.fontWeight = "bold";
-            confirmBtn.style.cursor = "pointer";
-            confirmBtn.style.marginRight = "16px";
-            confirmBtn.style.transition = "background-color 0.2s ease"; 
-            confirmBtn.addEventListener("mouseover", () => {
-                confirmBtn.style.backgroundColor = platformColor.blueButtonHover;
-            });
-            confirmBtn.addEventListener("mouseout", () => {
-                confirmBtn.style.backgroundColor = platformColor.blueButton;
-            });
             confirmBtn.addEventListener("click", () => {
                 document.body.removeChild(modal);
                 clearCanvasAction();
             });
 
             const cancelBtn = document.createElement("button");
+            cancelBtn.classList.add("cancel-button");
             cancelBtn.textContent = "Cancel";
-            cancelBtn.style.backgroundColor = "#f1f1f1";
-            cancelBtn.style.color = "black";
-            cancelBtn.style.border = "none";
-            cancelBtn.style.borderRadius = "4px";
-            cancelBtn.style.padding = "8px 16px";
-            cancelBtn.style.fontWeight = "bold";
-            cancelBtn.style.cursor = "pointer";
-            cancelBtn.style.transition = "background-color 0.2s ease"; 
-            cancelBtn.addEventListener("mouseover", () => {
-                cancelBtn.style.backgroundColor = platformColor.cancelButtonHover;
-            });
-            cancelBtn.addEventListener("mouseout", () => {
-                cancelBtn.style.backgroundColor = platformColor.cancelButton;
-            });
             cancelBtn.addEventListener("click", () => {
                 document.body.removeChild(modal);
             });
