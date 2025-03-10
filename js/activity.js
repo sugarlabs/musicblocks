@@ -179,6 +179,17 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
     MYDEFINES = MYDEFINES.concat(MUSICBLOCKS_EXTRAS);
 }
 
+class Activity {
+    async init() {
+        this.initAudioContext();
+
+        this.synth = new Synth();
+        this.logo = new Logo();
+        this.turtles = new Turtles();
+        this.palettes = new Palettes();
+        this.blocks = new Blocks();
+    }
+}
 // Create a global variable from the Activity obj to provide access to
 // blocks, logo, palettes, and turtles for plugins and js-export.
 let globalActivity;

@@ -1,3 +1,15 @@
+if (typeof Tone === 'undefined') {
+    throw new Error('Tone.js library not loaded. Please include Tone.js before synth utilities');
+}
+
+class Synth {
+    constructor() {
+        this.synth = new Tone.Synth().toDestination();
+        // ... rest of constructor ...
+    }
+}
+
+
 // Copyright (c) 2016-21 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
