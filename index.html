@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 
@@ -29,7 +28,6 @@
     <link rel="preload" href="dist/css/keyboard.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="dist/css/windows.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="lib/materialize-iso.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="css/darkmode.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" as="video" href="loading-animation.webm" type="video/webm">
     <link rel="preload" as="video" href="loading-animation.mp4" type="video/mp4">
     <link rel="preload" as="image" href="loading-animation-ja.svg">
@@ -110,22 +108,8 @@
     </script>
 
     <script>
-        if ("serviceWorker" in navigator) {
-            if (navigator.serviceWorker.controller) {
-                console.debug(
-                    "[PWA Builder] active service worker found, no need to register"
-                );
-            } else {
-                // Register the service worker
-                navigator.serviceWorker
-                    .register("/sw.js")
-                    .then(function (reg) {
-                        console.debug(
-                            "[PWA Builder] Service worker has been registered for scope: " +
-                            reg.scope
-                        );
-                    });
-            }
+        if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+            navigator.serviceWorker.register('/sw.js');
         }
     </script>
     <script type="text/javascript">
@@ -133,6 +117,28 @@
             doSearch();
         });
     </script>
+
+    <!-- Add search function script here -->
+    <script>
+        function doSearch() {
+            $('#search').on('input', function() {
+                const query = $(this).val().toLowerCase();
+                const results = $('#searchResults').empty();
+                
+                // Search through blocks - example implementation
+                $('.block').each(function() {
+                    const blockName = $(this).data('name').toLowerCase();
+                    if (blockName.includes(query)) {
+                        results.append(`<li>${$(this).data('name')}</li>`);
+                    }
+                });
+            });
+        }
+    </script>
+
+    <noscript>
+        <link rel="stylesheet" href="css/darkmode.css">
+    </noscript>
 </head>
 
 <!-- #96D3F3-->
@@ -593,7 +599,8 @@
                                     id="menu"
                                     class="animated-icon material-icons md-48 "
                                     >menu</i
-                                ></a>
+                                ></a
+                            >
                         </li>
                         <li>
                             <a
@@ -1009,6 +1016,13 @@
             />
             <ul class="matches" id="searchResults"></ul>
         </div>
+
+        <!-- Load p5.js first -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+<!-- Then load p5.sound.js -->
+<script src="lib/p5.sound.min.js"></script>
+
+<button id="start-audio" class="audio-control">Enable Audio</button>
 
 </body>
 

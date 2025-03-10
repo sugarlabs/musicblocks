@@ -1192,5 +1192,11 @@ JSInterface._methodArgConstraints = {
     ]
 };
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { JSInterface }; 
+    module.exports = JSInterface ? { JSInterface } : {}; 
+}
+
+// Add fallback for browser environment
+if (typeof window !== 'undefined') {
+    window.JSInterface = window.JSInterface || {};
+    window.JSInterface._methodArgConstraints = JSInterface._methodArgConstraints;
 }

@@ -20,11 +20,16 @@ self.addEventListener("install", function (event) {
     console.log("[PWA Builder] Skip waiting on install");
     self.skipWaiting();
 
+    // Filter out chrome-extension URLs
+    const validPrecacheFiles = precacheFiles.filter(url => 
+        !url.startsWith('chrome-extension://')
+    );
+
     event.waitUntil(
         caches.open(CACHE).then(function (cache) {
             // eslint-disable-next-line no-console
             console.log("[PWA Builder] Caching pages during install");
-            return cache.addAll(precacheFiles);
+            return cache.addAll(validPrecacheFiles);
         })
     );
 });
@@ -37,8 +42,8 @@ self.addEventListener("activate", function (event) {
 });
 
 function updateCache(request, response) {
-    if (response.status === 206) {
-        console.log("Partial response is unsupported for caching.");
+    if (response.status === 206 || request.url.startsWith('chrome-extension://')) {
+        console.log("Unsupported caching attempt:", request.url);
         return Promise.resolve();
     }
     return caches.open(CACHE).then(function (cache) {
@@ -64,6 +69,10 @@ function fromCache(request) {
 // If any fetch fails, it will look for the request in the cache and
 // serve it from there first
 self.addEventListener("fetch", function (event) {
+    // Add protocol safety check
+    if (event.request.url.startsWith('chrome-extension://')) {
+        return;
+    }
     if (event.request.method !== "GET") return;
 
     event.respondWith(
@@ -116,13 +125,20 @@ self.addEventListener("beforeinstallprompt", (event) => {
 // update the offline page
 self.addEventListener("refreshOffline", function () {
     const offlinePageRequest = new Request(offlineFallbackPage);
+    
+    // Add protocol check
+    if (offlinePageRequest.url.startsWith('chrome-extension://')) {
+        console.warn('Skipping unsupported protocol cache attempt');
+        return;
+    }
 
     return fetch(offlineFallbackPage).then(function (response) {
         return caches.open(CACHE).then(function (cache) {
-            // eslint-disable-next-line no-console
-            console.log("[PWA Builder] Offline page updated from refreshOffline event: " + response.url);
+            console.log("[PWA Builder] Offline page updated: " + response.url);
             return cache.put(offlinePageRequest, response);
         });
+    }).catch(error => {
+        console.error('Cache update failed:', error);
     });
 });
 
