@@ -2464,6 +2464,12 @@ support for interactivity and animation (See
 https://en.wikipedia.org/wiki/Scalable_Vector_Graphics). You can
 also save your artwork as SVG.
 
+**MIDI** (Musical Instrument Digital Interface) is a technical standard
+for communicating musical performance data between electronic instruments,
+computers, and other devices. It does not store actual sound but encodes
+note, pitch, velocity, and instrument information, making it widely used
+for digital music composition and playback (See <https://en.wikipedia.org/wiki/MIDI>).
+
 Note that artwork saved as PNG or SVG can subsequently be imported
 into Music Blocks to be used with either the *Show* or *Avatar*
 blocks.
