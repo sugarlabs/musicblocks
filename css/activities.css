@@ -49,6 +49,13 @@ body:not(.dark) #helpfulSearchDiv {
   margin: 0 auto;
 }
 
+.new-project-title {
+  line-height: normal;
+  font-size: 24px;
+  text-align: left;
+  color: #0066FF;
+}
+
 #confirmation-message {
   font-size: 16px;
   text-align: left;

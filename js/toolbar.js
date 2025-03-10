@@ -1138,7 +1138,8 @@ function renderNewProjectConfirmation() {
 
     newDropdown.innerHTML = '';
     const title = document.createElement("div");
-    title.innerHTML = `<h2 style="font-size: 24px; text-align: left; margin: 0; color: #0066FF;">${_("New project")}</h2>`;
+    title.classList.add("new-project-title");
+    title.textContent = _("New project");
     newDropdown.appendChild(title);
 
     const confirmationMessage = document.createElement("div");
