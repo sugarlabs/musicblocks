@@ -1135,34 +1135,25 @@ class Toolbar {
 function renderNewProjectConfirmation() {
     const modalContainer = document.getElementById("modal-container");
     const newDropdown = document.getElementById("newdropdown");
-    const isDarkMode = document.body.classList.contains("dark");
-    newDropdown.style.backgroundColor = isDarkMode ? "#424242" : "#ffffff";
-    newDropdown.style.border = isDarkMode ? "1px solid #444444" : "1px solid #cccccc";
-    newDropdown.style.color = isDarkMode ? "#ffffff" : "#000000";
-    newDropdown.style.padding = "24px";
+
     newDropdown.innerHTML = '';
     const title = document.createElement("div");
-    title.innerHTML = `<h2 style="font-size: 24px; text-align: left; margin: 0; color: #2196F3;">${_("New project")}</h2>`;
+    title.innerHTML = `<h2 style="font-size: 24px; text-align: left; margin: 0; color: #0066FF;">${_("New project")}</h2>`;
     newDropdown.appendChild(title);
+
     const confirmationMessage = document.createElement("div");
-    confirmationMessage.innerHTML = `<div id="confirmation-message" style="font-size: 16px; margin-bottom: 24px; text-align: left; ${
-        isDarkMode ? "color: #ffffff;" : "color: #666666;"
-    }">${_("Are you sure you want to create a new project?")}</div>`;
+    confirmationMessage.id = "confirmation-message";
+    confirmationMessage.textContent = _("Are you sure you want to create a new project?");
     newDropdown.appendChild(confirmationMessage);
+
     const confirmationButtonLi = document.createElement("li");
-    confirmationButtonLi.style.textAlign = "center";
-    confirmationButtonLi.style.width = "fit-content";
-    const confirmationButton = document.createElement("a");
+    const confirmationButton = document.createElement("div");
+    confirmationButton.classList.add("confirm-button");
     confirmationButton.id = "new-project";
-    confirmationButton.style.display = "inline-block";
-    confirmationButton.style.backgroundColor = platformColor.blueButton;
-    confirmationButton.style.color = "white";
-    confirmationButton.style.textDecoration = "none";
-    confirmationButton.style.borderRadius = "0px";
-    confirmationButton.style.fontWeight = "bold";
-    confirmationButton.innerHTML = _("Confirm");
+    confirmationButton.textContent = _("Confirm");
     confirmationButtonLi.appendChild(confirmationButton);
     newDropdown.appendChild(confirmationButtonLi);
+
     modalContainer.style.display = "flex";
     confirmationButton.onclick = () => {
         modalContainer.style.display = "none";

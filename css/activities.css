@@ -32,6 +32,29 @@ body:not(.dark) #helpfulSearchDiv {
     background-color: #f9f9f9 !important;
 }
 
+#newdropdown {
+  font-size: 16px;
+  background-color: #fff;
+  border: 1px solid #cccccc;
+  color: #000000;
+  padding: 24px;
+  width: 400px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+#newdropdown li {
+  text-align: center;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+#confirmation-message {
+  font-size: 16px;
+  text-align: left;
+  color: black;
+}
+
 .modalBox {
   position: fixed;
   top: 50%;
@@ -118,16 +141,6 @@ body:not(.dark) #helpfulSearchDiv {
   border-radius: 8px;
   z-index: 10000;
   text-align: left;
-}
-
-#submitLilypond {
-  background-color: rgb(0, 102, 255);
-  border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-right: 16px;
 }
 
 .close {
