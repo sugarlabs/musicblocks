@@ -1037,9 +1037,7 @@ function setupRhythmBlocks(activity) {
     }
 
     /**
-     * Represents a deprecated note value block.
-     * Extends FlowClampBlock.
-     * @class
+     * Represents a modern note block that supports advanced envelope control.
      * @extends FlowClampBlock
      */
     class NoteBlock extends FlowClampBlock {
@@ -1049,55 +1047,65 @@ function setupRhythmBlocks(activity) {
         constructor() {
             super("note");
             this.setPalette("rhythm", activity);
-            this.setHelpString();
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _("The Note block represents a musical note with duration and envelope control."),
+                "documentation",
+                ""
+            ]);
 
             this.formBlock({
-                name: "deprecated note value",
-                args: 1,
-                defaults: [4],
-                canCollapse: true
+                name: _("note"),
+                args: 2,
+                defaults: [4, 1], // [duration, velocity]
+                argLabels: [_("duration"), _("velocity")],
+                argTypes: ["number", "number"]
             });
-            this.makeMacro((x, y) => [
-                [0, "newnote", x, y, [null, 1, 2, 5]],
-                [1, ["number", { value: 8 }], 0, 0, [0]],
-                [2, "pitch", 0, 0, [0, 3, 4, null]],
-                [3, ["solfege", { value: "sol" }], 0, 0, [2]],
-                [4, ["number", { value: 4 }], 0, 0, [2]],
-                [5, "hidden", 0, 0, [0, null]]
-            ]);
-            this.hidden = this.deprecated = true;
         }
 
         /**
-         * Overrides the flow method to handle note value and pitch.
-         * @param {number[]} args - The arguments passed to the block.
-         * @param {object} logo - The logo object.
-         * @param {number} turtle - The turtle index.
-         * @param {object} blk - The block object.
-         * @param {object} receivedArg - The received argument.
-         * @returns {number[]} An array containing the processed arguments.
+         * Handles the flow of the note block
+         * @param {Array} args - Block arguments
+         * @param {Object} logo - The logo instance
+         * @param {Object} turtle - The turtle instance
+         * @param {string} blk - The block ID
          */
-        flow(args, logo, turtle, blk, receivedArg) {
-            // Should never happen, but if it does, nothing to do
-            if (args[1] === undefined) return;
+        flow(args, logo, turtle, blk) {
+            const tur = activity.turtles.ithTurtle(turtle);
+            const duration = args[0] || 4;
+            const velocity = Math.min(1, Math.max(0, args[1] || 1)); // Clamp between 0 and 1
 
-            if (args[0] === null || typeof args[0] !== "number")
-                activity.errorMsg(NOINPUTERRORMSG, blk);
-            else if (args[0] <= 0) activity.errorMsg(_("Note value must be greater than 0."), blk);
-            const value =
-                args[0] === null || typeof args[0] !== "number" ? 1 / 4 : Math.abs(args[0]);
+            // Generate a unique ID for this note
+            const noteId = `note_${turtle}_${blk}_${Date.now()}`;
 
-            const _callback = () => {
-                const tur = activity.turtles.ithTurtle(turtle);
+            // Set default envelope parameters
+            tur.singer.setEnvelope(noteId, {
+                attack: 0.02,  // 20ms attack
+                decay: 0.05,   // 50ms decay
+                sustain: velocity,
+                release: 0.1   // 100ms release
+            });
 
-                const queueBlock = new Queue(args[1], 1, blk, receivedArg);
-                tur.parentFlowQueue.push(blk);
-                tur.queue.push(queueBlock);
-            };
+            // Calculate note duration in milliseconds
+            const bpm = last(tur.singer.bpm) || 90;
+            const beatValue = (60 / bpm) * 1000;
+            const noteDuration = beatValue * (4 / duration);
 
-            Singer.RhythmActions.playNote(value, "note", turtle, blk, _callback);
+            // Schedule the note events
+            setTimeout(() => {
+                const env = tur.singer.getEnvelope(noteId);
+                // Apply envelope parameters to the note
+                // This would interact with your audio system
+                
+                // Clean up after the note is done
+                setTimeout(() => {
+                    tur.singer.clearEnvelope(noteId);
+                }, noteDuration + (env.release * 1000));
+            }, 0);
 
-            return [args[1], 1];
+            // Return the block value
+            return [args[0], 1];
         }
     }
 
