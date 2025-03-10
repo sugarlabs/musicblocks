@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 
@@ -109,28 +108,32 @@
     </script>
 
     <script>
-        if ("serviceWorker" in navigator) {
-            if (navigator.serviceWorker.controller) {
-                console.debug(
-                    "[PWA Builder] active service worker found, no need to register"
-                );
-            } else {
-                // Register the service worker
-                navigator.serviceWorker
-                    .register("/sw.js")
-                    .then(function (reg) {
-                        console.debug(
-                            "[PWA Builder] Service worker has been registered for scope: " +
-                            reg.scope
-                        );
-                    });
-            }
+        if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+            navigator.serviceWorker.register('/sw.js');
         }
     </script>
     <script type="text/javascript">
         $(document).ready(function () {
             doSearch();
         });
+    </script>
+
+    <!-- Add search function script here -->
+    <script>
+        function doSearch() {
+            $('#search').on('input', function() {
+                const query = $(this).val().toLowerCase();
+                const results = $('#searchResults').empty();
+                
+                // Search through blocks - example implementation
+                $('.block').each(function() {
+                    const blockName = $(this).data('name').toLowerCase();
+                    if (blockName.includes(query)) {
+                        results.append(`<li>${$(this).data('name')}</li>`);
+                    }
+                });
+            });
+        }
     </script>
 </head>
 
@@ -1008,6 +1011,13 @@
             />
             <ul class="matches" id="searchResults"></ul>
         </div>
+
+        <!-- Load p5.js first -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+<!-- Then load p5.sound.js -->
+<script src="lib/p5.sound.min.js"></script>
+
+<button id="start-audio" class="audio-control">Enable Audio</button>
 
 </body>
 
