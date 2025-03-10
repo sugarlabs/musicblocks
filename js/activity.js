@@ -1345,6 +1345,7 @@ class Activity {
          * Clears "canvas"
          */
         const renderClearConfirmation = (clearCanvasAction) => {
+            if (document.getElementsByClassName("modalBox").length > 0) return;
             // Create a custom modal for confirmation
             const modal = document.createElement("div");
             modal.classList.add("modalBox");
