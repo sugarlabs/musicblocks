@@ -69,11 +69,13 @@ class Singer {
         this.turtle = turtle;
         this.turtles = turtle.turtles;
 
-        // Parameters used by envelope block
-        /** @deprecated */ this.attack = [];
-        /** @deprecated */ this.decay = [];
-        /** @deprecated */ this.sustain = [];
-        /** @deprecated */ this.release = [];
+        // Modern envelope system
+        this.envelope = {
+            attack: new Map(),
+            decay: new Map(),
+            sustain: new Map(),
+            release: new Map()
+        };
 
         // Parameters used by pitch
         this.scalarTransposition = 0;
@@ -1935,41 +1937,41 @@ class Singer {
                                         }
                                     }
                                 }
-                            }
-                        } else if (tur.singer.tieCarryOver > 0) {
-                            if (tur.singer.justCounting.length === 0) {
-                                if (courtesy[i]) {
-                                    if (!chordNotes.includes(note)) {
-                                        chordNotes.push(note);
-                                    }
-                                } else {
-                                    if (!chordNotes.includes(note)) {
-                                        chordNotes.push(note);
-                                    }
-                                }
-                            }
-                        }
-
-                        if (i === tur.singer.notePitches[thisBlk].length - 1) {
-                            let d;
-                            if (duration > 0) {
-                                if (carry > 0) {
-                                    d = 1 / (1 / duration - 1 / carry);
-                                } else {
-                                    d = duration;
-                                }
                             } else if (tur.singer.tieCarryOver > 0) {
-                                d = tur.singer.tieCarryOver;
+                                if (tur.singer.justCounting.length === 0) {
+                                    if (courtesy[i]) {
+                                        if (!chordNotes.includes(note)) {
+                                            chordNotes.push(note);
+                                        }
+                                    } else {
+                                        if (!chordNotes.includes(note)) {
+                                            chordNotes.push(note);
+                                        }
+                                    }
+                                }
                             }
 
-                            if (
-                                activity.logo.runningLilypond ||
-                                activity.logo.runningMxml ||
-                                activity.logo.runningAbc ||
-                                activity.logo.runningMIDI
-                            ) {
-                                activity.logo.notationMIDI(chordNotes, chordDrums, d, turtle, bpmValue || 90, last(tur.singer.instrumentNames));
-                                activity.logo.updateNotation(chordNotes, d, turtle, -1, chordDrums);
+                            if (i === tur.singer.notePitches[thisBlk].length - 1) {
+                                let d;
+                                if (duration > 0) {
+                                    if (carry > 0) {
+                                        d = 1 / (1 / duration - 1 / carry);
+                                    } else {
+                                        d = duration;
+                                    }
+                                } else if (tur.singer.tieCarryOver > 0) {
+                                    d = tur.singer.tieCarryOver;
+                                }
+
+                                if (
+                                    activity.logo.runningLilypond ||
+                                    activity.logo.runningMxml ||
+                                    activity.logo.runningAbc ||
+                                    activity.logo.runningMIDI
+                                ) {
+                                    activity.logo.notationMIDI(chordNotes, chordDrums, d, turtle, bpmValue || 90, last(tur.singer.instrumentNames));
+                                    activity.logo.updateNotation(chordNotes, d, turtle, -1, chordDrums);
+                                }
                             }
                         }
                     }
@@ -2397,6 +2399,47 @@ class Singer {
         }
 
         activity.stage.update();
+    }
+
+    /**
+     * Sets the envelope parameters for a specific note
+     * @param {string} noteId - Unique identifier for the note
+     * @param {Object} params - Envelope parameters
+     * @param {number} params.attack - Attack time in seconds
+     * @param {number} params.decay - Decay time in seconds
+     * @param {number} params.sustain - Sustain level (0-1)
+     * @param {number} params.release - Release time in seconds
+     */
+    setEnvelope(noteId, params) {
+        this.envelope.attack.set(noteId, params.attack);
+        this.envelope.decay.set(noteId, params.decay);
+        this.envelope.sustain.set(noteId, params.sustain);
+        this.envelope.release.set(noteId, params.release);
+    }
+
+    /**
+     * Gets the envelope parameters for a specific note
+     * @param {string} noteId - Unique identifier for the note
+     * @returns {Object} Envelope parameters
+     */
+    getEnvelope(noteId) {
+        return {
+            attack: this.envelope.attack.get(noteId) || 0,
+            decay: this.envelope.decay.get(noteId) || 0,
+            sustain: this.envelope.sustain.get(noteId) || 1,
+            release: this.envelope.release.get(noteId) || 0
+        };
+    }
+
+    /**
+     * Clears envelope parameters for a specific note
+     * @param {string} noteId - Unique identifier for the note
+     */
+    clearEnvelope(noteId) {
+        this.envelope.attack.delete(noteId);
+        this.envelope.decay.delete(noteId);
+        this.envelope.sustain.delete(noteId);
+        this.envelope.release.delete(noteId);
     }
 }
 
