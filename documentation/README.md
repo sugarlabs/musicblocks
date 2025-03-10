@@ -33,7 +33,11 @@ You can run it from
     1. [Contextual Menu for Blocks](#1-contextual-menu-for-blocks)
     2. [Contextual Menu for Background](#2-contextual-menu-for-background)
     3. [Pie Menus](#3-pie-menus)
-4. [Keyboard Shortcuts](#4-keyboard-shortcuts)
+4. [Keyboard Shortcuts Guide](#4-keyboard-shortcuts-guide)
+    1. [General Shortcuts](#1-general-shortcuts)
+    2. [Navigation Shortcuts](#2-navigation-shortcuts)
+    3. [Music Note Creation](#3-music-note-creation)
+    4. [Special Block Manipulations](#4-special-block-manipulations)
 5. [Block Palettes](#5-block-palettes)
     1. [Defining a Note](#1-defining-a-note)
     2. [A Quick Tour of Selected Blocks](#2-a-quick-tour-of-selected-blocks)
@@ -130,7 +134,7 @@ The **Secondary** toolbar appears when you click the **hamburger button** (three
         3. *Delete Plugin*: Allows the removal of plugins that are no longer needed.<br>
         4. *Horizontal Scrolling*: Enables horizontal navigation for easier handling of large projects.<br>
         5. *JavaScript Editor*: Includes an editor for writing and embedding custom JavaScript code.<br>
-        6. *Record*: Adds a "Record" button to the main palette, enabling users to record their compositions directly.
+        6. *Record*: Adds a "Record" button to the main palette, enabling users to record their compositions directly (Not supported on Firefox and Safari browsers).
 
 -   **Select Language**: Offers a multilingual interface, allowing users to change the language as per their preference.
 
@@ -227,27 +231,56 @@ For further details on how to use these toolbars effectively, you can refer to t
 
 ---
 
-## 4. Keyboard shortcuts
-
+## 4. Keyboard Shortcuts Guide
 
 [Back to Table of Contents](#table-of-contents)
 
+### 1. General Shortcuts
 
-There are several keyboard shortcuts:
+| Key Combination (Windows) | Key Combination (Mac)       | Description                                             |
+|----------------------------|-----------------------------|---------------------------------------------------------|
+| `Alt + B`                 | `Option + B`               | Save the current block artwork.                        |
+| `Alt + C`                 | `Option + C`               | Copy the selected blocks.                              |
+| `Alt + E`                 | `Option + E`               | Clear all elements.                                    |
+| `Alt + R` or `Enter`      | `Option + R` or `Return`   | Play the project. Activates the play button.           |
+| `Alt + S`                 | `Option + S`               | Stop all running processes (e.g., turtles).            |
+| `Alt + H`                 | `Option + H`               | Save help blocks - Generate and save artwork for each block.|
+| `Ctrl + V`                | `Command + V`              | Open the paste box.                                    |
+| `Space`                   | `Space`                   | Toggle the zoom level of the stage.                    |
+| `ESC`                     | `ESC`                     | Hide widgets or stop ongoing processes.                |
 
-_PgUp_ and _PgDn_ will scroll the screen vertically. This is useful for
-creating long stacks of blocks.
+### 2. Navigation Shortcuts
 
-You can use the arrow keys to move blocks and the _Delete_ key to
-remove an individual block from a stack.
+| Key (Windows)      | Key (Mac)                            | Description                                             |
+|---------------------|--------------------------------------|---------------------------------------------------------|
+| `HOME`             | `Fn + Left Arrow`                   | Jump to the home position for blocks or palettes.       |
+| `END`              | `Fn + Right Arrow`                  | Scroll to the bottom of the page.                       |
+| `PAGE UP`          | `Fn + Up Arrow`                     | Scroll up by half the screen height.                   |
+| `PAGE DOWN`        | `Fn + Down Arrow`                   | Scroll down by half the screen height.                 |
+| `Arrow Up`         | `Arrow Up`                          | Move the active block or scroll up.                    |
+| `Arrow Down`       | `Arrow Down`                        | Move the active block or scroll down.                  |
+| `Arrow Left`       | `Arrow Left`                        | Move the active block or scroll left (In Horizontal mode).|
+| `Arrow Right`      | `Arrow Right`                       | Move the active block or scroll right (In Horizontal mode).|
 
-_Enter_ is the equivalent of clicking the _Run_ button.
+### 3. Music Note Creation
 
-_Alt-C_ is copy and _Alt-V_ is paste. Be sure that the cursor is
-highlighting the block(s) you want to copy.
+| Key (Windows) | Key (Mac)     | Description               |
+|---------------|---------------|---------------------------|
+| `D`           | `D`           | Create a "Do" note.       |
+| `R`           | `R`           | Create a "Re" note.       |
+| `M`           | `M`           | Create a "Mi" note.       |
+| `F`           | `F`           | Create a "Fa" note.       |
+| `S`           | `S`           | Create a "Sol" note.      |
+| `L`           | `L`           | Create a "La" note.       |
+| `T`           | `T`           | Create a "Ti" note.       |
 
-You can directly type notes using _d_ for `Do`, _r_ for `Re`, _m_ for
-`Mi`, _f_ for `Fa`, _s_ for `Sol`, _l_ for `La`, and _t_ for `Ti`.
+### 4. Special Block Manipulations
+
+| Key (Windows) | Key (Mac) | Description                                                 |
+|----------------------------|-----------------------|-------------------------------------------------------------|
+| `/`                        | `/`                  | Scroll blocks container to the right (In Horizontal mode).  |
+| `\`                        | `\`                  | Scroll blocks container to the left (In Horizontal mode).   |
+| `DEL`                      | `Delete`             | Extract the selected block.                                 |
 
 
 ## 5. Block Palettes
