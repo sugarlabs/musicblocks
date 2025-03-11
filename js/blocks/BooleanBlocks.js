@@ -1050,3 +1050,6 @@ function setupBooleanBlocks(activity) {
     new EqualBlock().setup(activity);
     new StaticBooleanBlock().setup(activity);
 }
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupBooleanBlocks };
+}
