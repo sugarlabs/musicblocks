@@ -1665,14 +1665,13 @@ class Activity {
             /**
              * Handles the recording process.
              */
-            async function recording() {
+            function recording() {
 
                 start.addEventListener(
                     "click",
                     async function handler() {
                         if (!stream || stream.active == false) {
                             stream = await recordScreen();
-                            return;
                         }
 
                         const mimeType = "video/webm";
