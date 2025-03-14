@@ -426,59 +426,66 @@ class Activity {
             this.toolbarHeight = document.getElementById("toolbars").offsetHeight;
 
             this.helpfulWheelItems = [];
+            this.helpfulSearchDiv = docById("helpfulSearchDiv");
 
             this.setHelpfulSearchDiv();
         };
+        this.helpfulWheelDiv = docById("helpfulWheelDiv");
 
         /*
          * creates helpfulSearchDiv for search
          */
         this.setHelpfulSearchDiv = () => {
-            if (docById("helpfulSearchDiv")) {
-                docById("helpfulSearchDiv").parentNode.removeChild(
-                    docById("helpfulSearchDiv")
-                );
+            if (this.helpfulSearchDiv) {
+                this.helpfulSearchDiv.remove();
+                this.helpfulSearchDiv = null;
             }
             this.helpfulSearchDiv = document.createElement("div");
-            this.helpfulSearchDiv.setAttribute("id", "helpfulSearchDiv");
-
-            document.body.appendChild(this.helpfulSearchDiv);
+            this.helpfulSearchDiv.id = "helpfulSearchDiv";
 
             // Create the div for the close button (cross button)
             const closeButtonDiv = document.createElement("div");
-            closeButtonDiv.style.cssText =
-                "position: absolute;" +
-                "top: 10px;" +
-                "right: 10px;" +
-                "cursor: pointer;";
+            closeButtonDiv.style.position = "absolute";
+            closeButtonDiv.style.top = "10px";
+            closeButtonDiv.style.right = "10px";
+            closeButtonDiv.style.cursor = "pointer";
 
             // Create the cross button itself
+            // fix me: apply css
             const closeButton = document.createElement("button");
             closeButton.textContent = "×";
             closeButton.id = "crossButton";
-            document.body.appendChild(closeButton);
 
             closeButtonDiv.appendChild(closeButton);
-
             this.helpfulSearchDiv.appendChild(closeButtonDiv);
+
+            if (this.helpfulSearchWidget) {
+                this.helpfulSearchDiv.appendChild(this.helpfulSearchWidget);
+            }
 
             // Add event listener to remove the search div from the DOM
             const modeButton = docById("begIconText");
             closeButton.addEventListener("click", this._hideHelpfulSearchWidget);
-            modeButton.addEventListener("click", this._hideHelpfulSearchWidget);
-
-            this.helpfulSearchDiv.appendChild(this.helpfulSearchWidget);
+            if (modeButton) modeButton.addEventListener("click", this._hideHelpfulSearchWidget);
+            document.body.appendChild(this.helpfulSearchDiv);
         }
 
         /*
          * displays helpfulSearchDiv on canvas
          */
         this._displayHelpfulSearchDiv = () => {
-            if (!docById("helpfulSearchDiv")) {
+            if (!this.helpfulSearchDiv) {
                 this.setHelpfulSearchDiv();  // Re-create and append the div if it's not found
             }
-            this.helpfulSearchDiv.style.left = docById("helpfulWheelDiv").offsetLeft + 80 * this.getStageScale() + "px";
-            this.helpfulSearchDiv.style.top = docById("helpfulWheelDiv").offsetTop + 110 * this.getStageScale() + "px";
+
+            const stageScale = this.getStageScale();
+            const offsetX = 80 * stageScale;
+            const offsetY = 110 * stageScale;
+
+            Object.assign(this.helpfulSearchDiv.style, {
+                left: `${this.helpfulWheelDiv.offsetLeft + offsetX}px`,
+                top: `${this.helpfulWheelDiv.offsetTop + offsetY}px`
+            });
 
             const windowWidth = window.innerWidth;
             const windowHeight = window.innerHeight;
@@ -500,11 +507,12 @@ class Activity {
         // hides helpfulSearchDiv on canvas
 
         this._hideHelpfulSearchWidget = (e) => {
-                if (docById("helpfulWheelDiv").style.display !== "none") {
-                    docById("helpfulWheelDiv").style.display = "none";
+                if (this.helpfulWheelDiv.style.display !== "none") {
+                    this.helpfulWheelDiv.style.display = "none";
                 }
                 if (this.helpfulSearchDiv && this.helpfulSearchDiv.parentNode) {
                     this.helpfulSearchDiv.parentNode.removeChild(this.helpfulSearchDiv);
+                    this.helpfulSearchDiv = null;
                 }
                 that.__tick();
         }
@@ -537,7 +545,7 @@ class Activity {
          * displays helpfulWheel on canvas on right click
          */
         this._displayHelpfulWheel = (event) => {
-            docById("helpfulWheelDiv").style.position = "absolute";
+            this.helpfulWheelDiv.style.position = "absolute";
 
             const x = event.clientX;
             const y = event.clientY;
@@ -548,18 +556,18 @@ class Activity {
             const helpfulWheelLeft = Math.max(Math.round(x * this.getStageScale() + canvasLeft) - 150, canvasLeft);
             const helpfulWheelTop = Math.max(Math.round(y * this.getStageScale() + canvasTop) - 150, canvasTop);
 
-            docById("helpfulWheelDiv").style.left = helpfulWheelLeft + "px";
+            this.helpfulWheelDiv.style.left = helpfulWheelLeft + "px";
 
-            docById("helpfulWheelDiv").style.top = helpfulWheelTop + "px";
+            this.helpfulWheelDiv.style.top = helpfulWheelTop + "px";
 
             const windowWidth = window.innerWidth - 20;
             const windowHeight = window.innerHeight - 20;
 
             if (helpfulWheelLeft + 350 > windowWidth) {
-                docById("helpfulWheelDiv").style.left = (windowWidth - 350) + "px";
+                this.helpfulWheelDiv.style.left = (windowWidth - 350) + "px";
             }
             if (helpfulWheelTop + 350 > windowHeight) {
-                docById("helpfulWheelDiv").style.top = (windowHeight - 350) + "px";
+                this.helpfulWheelDiv.style.top = (windowHeight - 350) + "px";
             }
             const selectedBlocksCount = this.blocks.selectedBlocks.filter(block => !block.trash).length;
             
@@ -571,7 +579,7 @@ class Activity {
                 this.helpfulWheelItems.find(ele => ele.label === "Duplicate").display = false;
             }
 
-            docById("helpfulWheelDiv").style.display = "";
+            this.helpfulWheelDiv.style.display = "";
 
             const wheel = new wheelnav("helpfulWheelDiv", null, 300, 300);
             wheel.colors = platformColor.wheelcolors;
@@ -677,8 +685,8 @@ class Activity {
         */
         const findBlocks = (activity) => {
             activity._findBlocks();
-            if (docById("helpfulWheelDiv").style.display !== "none") {
-                docById("helpfulWheelDiv").style.display = "none";
+            if (this.helpfulWheelDiv.style.display !== "none") {
+                this.helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -1465,8 +1473,8 @@ class Activity {
                     table.remove();
                 }
 
-                if (docById("helpfulWheelDiv").style.display !== "none") {
-                    docById("helpfulWheelDiv").style.display = "none";
+                if (this.helpfulWheelDiv.style.display !== "none") {
+                    this.helpfulWheelDiv.style.display = "none";
                     this.__tick();
                 }
             };
@@ -1855,8 +1863,8 @@ class Activity {
         const setScroller = (activity) => {
             activity._setScroller();
             activity._setupBlocksContainerEvents();
-            if (docById("helpfulWheelDiv").style.display !== "none") {
-                docById("helpfulWheelDiv").style.display = "none";
+            if (this.helpfulWheelDiv.style.display !== "none") {
+                this.helpfulWheelDiv.style.display = "none";
             }
         };
 
@@ -1941,8 +1949,8 @@ class Activity {
          */
         const doLargerBlocks = async(activity) => {
             await activity._doLargerBlocks();
-            if (docById("helpfulWheelDiv").style.display !== "none") {
-                docById("helpfulWheelDiv").style.display = "none";
+            if (this.helpfulWheelDiv.style.display !== "none") {
+                this.helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -1976,8 +1984,8 @@ class Activity {
          */
         const doSmallerBlocks = async(activity) => {
             await activity._doSmallerBlocks();
-            if (docById("helpfulWheelDiv").style.display !== "none") {
-                docById("helpfulWheelDiv").style.display = "none";
+            if (this.helpfulWheelDiv.style.display !== "none") {
+                this.helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -2344,7 +2352,7 @@ class Activity {
                 that.refreshCanvas();
             };
 
-            docById("myCanvas").addEventListener("wheel", __wheelHandler, false);
+           this.canvas.addEventListener("wheel", __wheelHandler, false);
 
             /**
              * Handles stage mouse up event.
@@ -2734,12 +2742,17 @@ class Activity {
          * Shows search widget
          */
         this.showSearchWidget = () => {
+            const search = docById("search");
+            const uiId1 = docById("ui-id-1");
+
             // Bring widget to top.
-            this.searchWidget.style.zIndex = 1001;
-            this.searchWidget.style.border = "2px solid lightblue";
-            if (this.helpfulSearchDiv) {
-                this._hideHelpfulSearchWidget();
-            }
+            Object.assign(this.searchWidget.style, {
+                zIndex: 1001,
+                border: "2px solid lightblue"
+            });
+
+            if (this.helpfulSearchDiv) this._hideHelpfulSearchWidget();
+
             if (this.searchWidget.style.visibility === "visible") {
                 this.hideSearchWidget();
             } else {
@@ -2761,13 +2774,13 @@ class Activity {
                 const that = this;
                 const closeListener = (e) => {
                     if (
-                        docById("search").style.visibility === "visible" &&
-                        (e.target === docById("search") || docById("search").contains(e.target))
+                        search.style.visibility === "visible" &&
+                        (e.target === search || search.contains(e.target))
                     ) {
                         //do nothing when clicked in the input field
                     } else if (
-                        docById("ui-id-1") && docById("ui-id-1").style.display === "block" &&
-                        (e.target === docById("ui-id-1") || docById("ui-id-1").contains(e.target))
+                        uiId1 && uiId1.style.display === "block" &&
+                        (e.target === uiId1 || uiId1.contains(e.target))
                     ) {
                         //do nothing when clicked on the menu
                     } else if (document.getElementsByTagName("tr")[2].contains(e.target)) {
@@ -2978,6 +2991,14 @@ class Activity {
          * Handles keyboard shortcuts in MB
          */
         this.__keyPressed = (event) => {
+            const BPMInput = docById("BPMInput");
+            const musicratio1 = docById("musicratio1");
+            const musicratio2 = docById("musicratio2");
+            const dissectNumber = docById("dissectNumber");
+            const timbreName = docById("timbreName");
+
+            const paste = docById("paste");
+
             if (window.widgetWindows.isOpen("JavaScript Editor") === true) return;
 
             if (!this.keyboardEnableFlag) {
@@ -2988,36 +3009,36 @@ class Activity {
             }
             if (this.keyboardEnableFlag) {
                 if (
-                    docById("BPMInput") !== null &&
-                    docById("BPMInput").classList.contains("hasKeyboard")
+                    BPMInput !== null &&
+                    BPMInput.classList.contains("hasKeyboard")
                 ) {
                     return;
                 }
 
                 if (
-                    docById("musicratio1") !== null &&
-                    docById("musicratio1").classList.contains("hasKeyboard")
+                    musicratio1 !== null &&
+                    musicratio1.classList.contains("hasKeyboard")
                 ) {
                     return;
                 }
 
                 if (
-                    docById("musicratio2") !== null &&
-                    docById("musicratio2").classList.contains("hasKeyboard")
+                    musicratio2 !== null &&
+                    musicratio2.classList.contains("hasKeyboard")
                 ) {
                     return;
                 }
 
                 if (
-                    docById("dissectNumber") !== null &&
-                    docById("dissectNumber").classList.contains("hasKeyboard")
+                    dissectNumber !== null &&
+                    dissectNumber.classList.contains("hasKeyboard")
                 ) {
                     return;
                 }
 
                 if (
-                    docById("timbreName") !== null &&
-                    docById("timbreName").classList.contains("hasKeyboard")
+                    timbreName !== null &&
+                    timbreName.classList.contains("hasKeyboard")
                 ) {
                     return;
                 }
@@ -3064,7 +3085,7 @@ class Activity {
                 this.helpfulSearchWidget.style.visibility === "visible" ||
                 this.isInputON ||
                 docById("planet-iframe").style.display === "" ||
-                docById("paste").style.visibility === "visible" ||
+                paste.style.visibility === "visible" ||
                 docById("wheelDiv").style.display === "" ||
                 this.turtles.running();
 
@@ -3105,9 +3126,9 @@ class Activity {
                         if (this.searchWidget.style.visibility === 'visible') {
                             return;
                         }
-                        if (docById("paste").style.visibility === "visible") {
+                        if (paste.style.visibility === "visible") {
                             this.pasted();
-			    docById("paste").style.visibility = "hidden";
+                            paste.style.visibility = "hidden";
                             return;
                         }
                         this.textMsg("Enter " + _("Play"));
@@ -3147,12 +3168,12 @@ class Activity {
                         // this.textMsg("Ctl-V " + _("Paste"));
                         this.pasteBox.createBox(this.turtleBlocksScale, 200, 200);
                         this.pasteBox.show();
-                        docById("paste").style.left =
+                        paste.style.left =
                             (this.pasteBox.getPos()[0] + 10) * this.turtleBlocksScale + "px";
-                        docById("paste").style.top =
+                            paste.style.top =
                             (this.pasteBox.getPos()[1] + 10) * this.turtleBlocksScale + "px";
-                        docById("paste").focus();
-                        docById("paste").style.visibility = "visible";
+                            paste.focus();
+                            paste.style.visibility = "visible";
                         this.update = true;
                         break;
                 }
@@ -3203,8 +3224,8 @@ class Activity {
                         break;
                 }
             } else {
-                if (docById("paste").style.visibility === "visible" && event.keyCode === RETURN) {
-                    if (docById("paste").value.length > 0) {
+                if (paste.style.visibility === "visible" && event.keyCode === RETURN) {
+                    if (paste.value.length > 0) {
                         this.pasted();
                     }
                 } else if (!disableKeys) {
@@ -3700,9 +3721,9 @@ class Activity {
                 );
                 return;
             }
-        
-            if (docById("helpfulWheelDiv").style.display !== "none") {
-                docById("helpfulWheelDiv").style.display = "none";
+
+            if (this.helpfulWheelDiv.style.display !== "none") {
+                this.helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -3721,8 +3742,8 @@ class Activity {
                 3000
             );
 
-            if (docById("helpfulWheelDiv").style.display !== "none") {
-                docById("helpfulWheelDiv").style.display = "none";
+            if (this.helpfulWheelDiv.style.display !== "none") {
+                this.helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         
@@ -4057,8 +4078,8 @@ class Activity {
          */
         const changeBlockVisibility = (activity) => {
             activity._changeBlockVisibility();
-            if (docById("helpfulWheelDiv").style.display !== "none") {
-                docById("helpfulWheelDiv").style.display = "none";
+            if (this.helpfulWheelDiv.style.display !== "none") {
+                this.helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -4091,8 +4112,8 @@ class Activity {
          */
         const toggleCollapsibleStacks = (activity) => {
             activity._toggleCollapsibleStacks();
-            if (docById("helpfulWheelDiv").style.display !== "none") {
-                docById("helpfulWheelDiv").style.display = "none";
+            if (this.helpfulWheelDiv.style.display !== "none") {
+                this.helpfulWheelDiv.style.display = "none";
                 activity.__tick();
             }
         };
@@ -4175,13 +4196,17 @@ class Activity {
         };
 
         this._doOpenSamples = () => {
-            if (docById("palette").style.display !== "none") docById("palette").style.display = "none";
+            let palette = docById("palette")
+            let buttoncontainerBOTTOM = docById("buttoncontainerBOTTOM");
+            let buttoncontainerTOP = docById("buttoncontainerTOP");
+
+            if (palette.style.display !== "none") palette.style.display = "none";
             this.toolbar.closeAuxToolbar(showHideAuxMenu);
             this.planet.openPlanet();
-            if (docById("buttoncontainerBOTTOM").style.display !== "none")
-                docById("buttoncontainerBOTTOM").style.display = "none";
-            if (docById("buttoncontainerTOP").style.display !== "none")
-                docById("buttoncontainerTOP").style.display = "none";
+            if (buttoncontainerBOTTOM.style.display !== "none")
+                buttoncontainerBOTTOM.style.display = "none";
+            if (buttoncontainerTOP.style.display !== "none")
+                buttoncontainerTOP.style.display = "none";
         };
 
         /*
@@ -4196,8 +4221,8 @@ class Activity {
          */
         const chooseKeyMenu = (that) => {
             piemenuKey(that);
-            if (docById("helpfulWheelDiv").style.display !== "none") {
-                docById("helpfulWheelDiv").style.display = "none";
+            if (this.helpfulWheelDiv.style.display !== "none") {
+                this.helpfulWheelDiv.style.display = "none";
             }
         };
 
@@ -5682,7 +5707,7 @@ class Activity {
                     that.doHelpfulSearch();
                 }, 500);
 
-                docById("helpfulWheelDiv").style.display = "none";
+                this.helpfulWheelDiv.style.display = "none";
             }
         };
 
@@ -5753,7 +5778,7 @@ class Activity {
 
             this.helpfulSearchWidget.value = "";
             // Hide search div after search is complete.
-            docById("helpfulSearchDiv").style.display = "none";
+            this.helpfulSearchDiv.style.display = "none";
             this.update = true;
         };
 
