@@ -23,7 +23,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "jest",
-    "cypress:run": "cypress run"   
+    "cypress:run": "cypress run"
   },
   "devDependencies": {
     "@babel/core": "^7.11.1",
