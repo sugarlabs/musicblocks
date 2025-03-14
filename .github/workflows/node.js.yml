@@ -28,12 +28,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Cache npm dependencies
-      uses: actions/cache@v3
-      with:
-        path: ~/.npm
-        key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-        restore-keys: npm-${{ runner.os }}-
     - run: npm ci
     - run: npm run build --if-present
 
