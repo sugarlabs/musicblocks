@@ -75,31 +75,7 @@ body:
       description: Enter Organisation Name
       multiple: false
       options:
-        - Bandhu
-        - Belongg
-        - Blockster Global (CREDBEL)
-        - Civis
-        - Dhwani
-        - Dhiway
-        - EGov
-        - EkShop Marketplace
-        - FIDE
-        - If Me
-        - Key Education Foundation
-        - Norwegian Meteorological Institute
-        - Planet Read
-        - Project Second Chance
-        - Reap Benefit
-        - SamagraX
-        - ShikshaLokam
-        - Tech4Dev
-        - Tekdi
-        - The Mifos Initiative
-        - Tibil
-        - Ushahidi
-        - Arghyam
-        - Piramal Swasthya Management Research Institute
-        - Belongg AI
+        - Sugar Labs
     validations:
       required: true
 
@@ -108,16 +84,10 @@ body:
     attributes:
       label: Domain
       options:
-        - ⁠Healthcare 
         - ⁠Education
-        - Financial Inclusion
-        - ⁠Livelihoods
         - ⁠Skilling 
         - ⁠Learning & Development
-        - ⁠Agriculture
-        - ⁠Service Delivery
         - Open Source Library
-        - Water
     validations:
       required: true
 
