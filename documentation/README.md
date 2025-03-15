@@ -134,7 +134,7 @@ The **Secondary** toolbar appears when you click the **hamburger button** (three
         3. *Delete Plugin*: Allows the removal of plugins that are no longer needed.<br>
         4. *Horizontal Scrolling*: Enables horizontal navigation for easier handling of large projects.<br>
         5. *JavaScript Editor*: Includes an editor for writing and embedding custom JavaScript code.<br>
-        6. *Record*: Adds a "Record" button to the main palette, enabling users to record their compositions directly.
+        6. *Record*: Adds a "Record" button to the main palette, enabling users to record their compositions directly (Not supported on Firefox and Safari browsers).
 
 -   **Select Language**: Offers a multilingual interface, allowing users to change the language as per their preference.
 

@@ -209,13 +209,13 @@ class JSEditor {
         styleBtn.onclick = this._changeStyle.bind(this);
         menuRight.appendChild(styleBtn);
         menubar.appendChild(menuRight);
-        this._editor.appendChild(menubar);
         generateTooltip(styleBtn, "Change theme", "left");
+        this._editor.appendChild(menubar);
 
         const editorContainer = document.createElement("div");
         editorContainer.id = "editor_container";
         editorContainer.style.width = "100%";
-        editorContainer.style.height = "calc(100% - 11rem)";
+        editorContainer.style.flex = "2 1 auto";
         editorContainer.style.position = "relative";
         editorContainer.style.background = "#1e88e5";
         editorContainer.style.color = "white";
@@ -261,14 +261,19 @@ class JSEditor {
         editorContainer.appendChild(codebox);
         this._editor.appendChild(editorContainer);
 
-        codebox.onscroll = () => {
-            codeLines.scrollTop = codebox.scrollTop;
-        };
+        const divider = document.createElement("div");
+        divider.id = "editor_divider";
+        divider.style.width = "100%";
+        divider.style.height = "5px";
+        divider.style.cursor = "row-resize";
+        divider.style.background = "gray";
+        divider.style.position = "relative";
+        this._editor.appendChild(divider);
 
         const consolelabel = document.createElement("div");
         consolelabel.id = "console_label";
         consolelabel.style.width = "100%";
-        consolelabel.style.height = "2rem";
+        consolelabel.style.flex = "0 0 auto";
         consolelabel.style.boxSizing = "border-box";
         consolelabel.style.borderTop = "1px solid gray";
         consolelabel.style.borderBottom = "1px solid gray";
@@ -276,7 +281,6 @@ class JSEditor {
         consolelabel.style.fontFamily = '"PT Mono", monospace';
         consolelabel.style.fontSize = "14px";
         consolelabel.style.fontWeight = "700";
-        consolelabel.style.letterSpacing = "normal";
         consolelabel.style.lineHeight = "20px";
         consolelabel.style.color = "indigo";
         consolelabel.style.background = "white";
@@ -284,23 +288,6 @@ class JSEditor {
         consolelabel.style.justifyContent = "space-between";
         consolelabel.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;CONSOLE";
         this._editor.appendChild(consolelabel);
-
-        const editorconsole = document.createElement("div");
-        editorconsole.id = "editorConsole";
-        editorconsole.style.width = "100%";
-        editorconsole.style.height = "8.25rem";
-        editorconsole.style.overflow = "auto";
-        editorconsole.style.boxSizing = "border-box";
-        editorconsole.style.padding = ".25rem";
-        editorconsole.style.fontFamily = '"PT Mono", monospace';
-        editorconsole.style.fontSize = "14px";
-        editorconsole.style.fontWeight = "400";
-        editorconsole.style.letterSpacing = "normal";
-        editorconsole.style.lineHeight = "20px";
-        codebox.style.resize = "none !important";
-        editorconsole.style.background = "lightcyan";
-        editorconsole.style.cursor = "text";
-        this._editor.appendChild(editorconsole);
 
         const arrowBtn = document.createElement("span");
         arrowBtn.id = "editor_console_btn";
@@ -315,6 +302,21 @@ class JSEditor {
         consolelabel.appendChild(arrowBtn);
         generateTooltip(arrowBtn, "Toggle Console","left");
 
+        const editorconsole = document.createElement("div");
+        editorconsole.id = "editorConsole";
+        editorconsole.style.width = "100%";
+        editorconsole.style.flex = "1 1 auto";
+        editorconsole.style.overflow = "auto";
+        editorconsole.style.boxSizing = "border-box";
+        editorconsole.style.padding = ".25rem";
+        editorconsole.style.fontFamily = '"PT Mono", monospace';
+        editorconsole.style.fontSize = "14px";
+        editorconsole.style.fontWeight = "400";
+        editorconsole.style.lineHeight = "20px";
+        editorconsole.style.background = "lightcyan";
+        editorconsole.style.cursor = "text";
+        this._editor.appendChild(editorconsole);
+
         const highlight = (editor) => {
             // editor.textContent = editor.textContent;
             hljs.highlightBlock(editor);
@@ -324,7 +326,6 @@ class JSEditor {
 
         this._generateCode();
 
-        codebox.className = "editor language-js";
         this._jar.updateCode(this._code);
         this._jar.updateOptions({
             tab: " ".repeat(4), // default is '\t'
@@ -340,6 +341,48 @@ class JSEditor {
         this.widgetWindow.getWidgetBody().append(this._editor);
 
         this.widgetWindow.takeFocus();
+
+        this._setupDividerResize(divider, editorContainer, editorconsole, consolelabel);
+    }
+
+    /**
+     * Setup the draggable divider for resizing the editor and console areas.
+     * @param {HTMLElement} divider
+     * @param {HTMLElement} editorContainer
+     * @param {HTMLElement} editorconsole
+     * @param {HTMLElement} consolelabel
+     */
+    _setupDividerResize(divider, editorContainer, editorconsole, consolelabel) {
+        let isResizing = false;
+    
+        const onMouseMove = (e) => {
+            if (!isResizing) return;
+            const parentRect = this._editor.getBoundingClientRect();
+            const menubarHeight = this._menubar ? this._menubar.offsetHeight : 0;
+            const availableHeight = this._editor.clientHeight - menubarHeight;
+            const dynamicTop = parentRect.top + menubarHeight;
+    
+            const newEditorHeight = e.clientY - dynamicTop;
+            const dividerHeight = divider.offsetHeight;
+            const consoleHeaderHeight = consolelabel.offsetHeight;
+            const newConsoleHeight = availableHeight - newEditorHeight - dividerHeight - consoleHeaderHeight;
+    
+            editorContainer.style.flexBasis = `${newEditorHeight}px`;
+            editorconsole.style.flexBasis = `${newConsoleHeight}px`;
+        };
+    
+        const onMouseUp = () => {
+            isResizing = false;
+            document.removeEventListener("mousemove", onMouseMove);
+            document.removeEventListener("mouseup", onMouseUp);
+        };
+    
+        divider.addEventListener("mousedown", (e) => {
+            isResizing = true;
+            document.addEventListener("mousemove", onMouseMove);
+            document.addEventListener("mouseup", onMouseUp);
+            e.preventDefault();
+        });
     }
 
     /**
@@ -486,21 +529,15 @@ class JSEditor {
      * @returns {void}
      */
     _toggleConsole() {
-        const consoleContainer = docById("editorConsole");
-        const consoleLabel = docById("console_label");
-        const editorContainer = docById("editor_container");
+        const editorconsole = docById("editorConsole");
         const arrowBtn = docById("editor_console_btn");
         if (this.isOpen) {
             this.isOpen = false;
-            consoleContainer.style.display = "none";
-            consoleLabel.style.bottom = "0";
-            editorContainer.style.height = "calc(100% - 2.75rem)";
+            editorconsole.style.display = "none";
             if (arrowBtn) arrowBtn.innerHTML = "keyboard_arrow_up";
         } else {
             this.isOpen = true;
-            consoleContainer.style.display = "block";
-            consoleLabel.style.display = "flex";
-            editorContainer.style.height = "calc(100% - 11rem)";
+            editorconsole.style.display = "block";
             if (arrowBtn) arrowBtn.innerHTML = "keyboard_arrow_down";
         }
     }
