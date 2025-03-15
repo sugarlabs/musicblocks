@@ -25,6 +25,166 @@ class LanguageBox {
     constructor(activity) {
         this.activity = activity;
         this._language = activity.storage.languagePreference;
+        
+        // Map of language codes to display names for search functionality
+        this.languageMap = {
+            "enUS": "English (US)",
+            "enUK": "English (UK)",
+            "ko": "Korean",
+            "ja": "Japanese",
+            "kana": "Japanese (Kana)",
+            "es": "Spanish",
+            "pt": "Portuguese",
+            "zhCN": "Chinese",
+            "th": "Thai",
+            "hi": "Hindi",
+            "ibo": "Igbo",
+            "ar": "Arabic",
+            "he": "Hebrew",
+            "te": "Telugu",
+            "ayc": "Aymara",
+            "quz": "Quechua",
+            "gug": "Guarani",
+            "ur": "Urdu"
+        };
+        
+        // Initialize search functionality after dropdown is rendered
+        this.initSearchBar();
+    }
+    
+    /**
+     * @public
+     * @returns {void}
+     */
+    initSearchBar() {
+        // Initialize after a short delay to ensure DOM is ready
+        setTimeout(() => {
+            this._createSearchBar();
+            this._setupDropdownBehavior();
+        }, 500);
+    }
+
+    /**
+     * @private
+     * @returns {void}
+     */
+    _createSearchBar() {
+        // Create search container
+        const searchContainer = document.createElement("li");
+        searchContainer.className = "language-search-container";
+        searchContainer.style.padding = "10px";
+        
+        // Create search input
+        const searchInput = document.createElement("input");
+        searchInput.type = "text";
+        searchInput.id = "language-search-input";
+        searchInput.placeholder = "Search languages...";
+        searchInput.className = "language-search-input";
+        searchInput.style.width = "100%";
+        searchInput.style.padding = "8px";
+        searchInput.style.boxSizing = "border-box";
+        searchInput.style.border = "1px solid #ccc";
+        searchInput.style.borderRadius = "4px";
+        
+        // Add event listener for input changes
+        searchInput.addEventListener("input", (e) => this._filterLanguages(e.target.value));
+        
+        // Add click event that stops propagation to prevent dropdown from closing
+        searchInput.addEventListener("click", (e) => {
+            e.stopPropagation();
+        });
+        
+        // Append search input to container
+        searchContainer.appendChild(searchInput);
+        
+        // Find the language dropdown
+        const languageDropdown = document.getElementById("languagedropdown");
+        
+        if (languageDropdown) {
+            // Insert search container at the top of the dropdown
+            languageDropdown.insertBefore(searchContainer, languageDropdown.firstChild);
+        } else {
+            console.warn("Could not find language dropdown element");
+        }
+    }
+    
+    /**
+     * @private
+     * @returns {void}
+     */
+    _setupDropdownBehavior() {
+        // Get the language select icon
+        const languageSelectIcon = document.getElementById("languageSelectIcon");
+        if (!languageSelectIcon) return;
+        
+        // Override MaterializeCSS dropdown behavior
+        if (typeof M !== 'undefined' && M.Dropdown) {
+            // If MaterializeCSS is already initialized
+            const dropdownInstance = M.Dropdown.getInstance(languageSelectIcon);
+            
+            if (dropdownInstance) {
+                // Configure existing dropdown
+                dropdownInstance.options.closeOnClick = false;
+                dropdownInstance.options.constrainWidth = false;
+            } else {
+                // Initialize with custom options
+                M.Dropdown.init(languageSelectIcon, {
+                    closeOnClick: false,
+                    constrainWidth: false,
+                    coverTrigger: false
+                });
+            }
+        }
+        
+        // Add event listeners to prevent dropdown from closing when clicking on search
+        const languageDropdown = document.getElementById("languagedropdown");
+        if (languageDropdown) {
+            languageDropdown.addEventListener("click", (e) => {
+                if (e.target.id === "language-search-input" || 
+                    e.target.closest(".language-search-container")) {
+                    e.stopPropagation();
+                }
+            });
+        }
+    }
+    
+    /**
+     * @private
+     * @param {string} query - The search query
+     * @returns {void}
+     */
+    _filterLanguages(query) {
+        query = query.toLowerCase();
+        
+        // Get the language dropdown
+        const languageDropdown = document.getElementById("languagedropdown");
+        if (!languageDropdown) return;
+        
+        // Get all language option elements (li > a)
+        const languageOptions = languageDropdown.querySelectorAll("li");
+        
+        languageOptions.forEach(li => {
+            // Skip the search container itself
+            if (li.className === "language-search-container") return;
+            
+            const a = li.querySelector("a");
+            if (!a) return;
+            
+            // Get the language code from the anchor id
+            const languageCode = a.id;
+            if (!languageCode) return;
+            
+            // Get language display name
+            const languageName = this.languageMap[languageCode] || languageCode;
+            
+            // Check if the language name or code contains the query
+            if (languageName.toLowerCase().includes(query) || 
+                languageCode.toLowerCase().includes(query)) {
+                li.style.display = "block";
+            } else {
+                li.style.display = "none";
+            }
+        });
     }
 
     /**
@@ -243,6 +403,7 @@ class LanguageBox {
          });
     }
 }
+
 if (typeof module !== "undefined" && module.exports) {
     module.exports = LanguageBox;
 }
