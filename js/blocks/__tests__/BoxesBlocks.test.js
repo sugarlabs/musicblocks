@@ -22,10 +22,8 @@
 
 const { setupBoxesBlocks } = require('../BoxesBlocks');
 
-// Object to record instances by block name.
 let createdBlocks = {};
 
-// Dummy implementations for global classes.
 class DummyFlowBlock {
     constructor(name, displayName) {
         this.name = name;
@@ -44,7 +42,6 @@ class DummyFlowBlock {
         return this;
     }
     setup(activity) { return this; }
-    // Provide a default (empty) flow; blocks with custom flow methods should override this.
     flow() { }
 }
 
@@ -94,23 +91,19 @@ global.ValueBlock = DummyValueBlock;
 global.LeftBlock = DummyLeftBlock;
 global._ = jest.fn((str) => str);
 
-// Global constants
 global.NOINPUTERRORMSG = "No input provided";
 global.NOBOXERRORMSG = "No box error";
 global.SOLFEGENAMES = ["do", "re", "mi", "fa", "so", "la", "ti", "do"];
 
 describe('setupBoxesBlocks', () => {
     let activity, logo;
-    const blkId = 100; // dummy block id
+    const blkId = 100;
 
     beforeEach(() => {
-        // Reset created blocks before each test.
         createdBlocks = {};
 
-        // Dummy activity object.
         activity = {
             errorMsg: jest.fn(),
-            // Dummy blockSetter: stores the value in logo.boxes using key from block config.
             blocks: {
                 blockList: {}
             },
@@ -121,32 +114,26 @@ describe('setupBoxesBlocks', () => {
             beginnerMode: false
         };
 
-        // Dummy logo object.
         logo = {
             boxes: {},
             statusFields: [],
             updatingStatusMatrix: false,
             inStatusMatrix: false,
-            // Dummy parseArg: returns the provided receivedArg.
             parseArg: jest.fn((logo, turtle, cblk, blk, receivedArg) => receivedArg),
             receivedArg: undefined
         };
 
-        // Call setupBoxesBlocks to create all boxes-related blocks.
         setupBoxesBlocks(activity);
     });
 
     describe('IncrementBlock', () => {
         let incrementBlock;
         beforeEach(() => {
-            // The default IncrementBlock is created with name "increment"
             incrementBlock = createdBlocks["increment"];
-            // Prepare a dummy block entry for the block that calls IncrementBlock.flow.
             activity.blocks.blockList[blkId] = { connections: [null, 200] };
         });
 
         test('should update box value when connection is "text"', () => {
-            // Setup a block connection with name "text" and a value key.
             activity.blocks.blockList[200] = { name: "text", value: "myBox" };
             logo.boxes["myBox"] = 5;
             incrementBlock.flow([10, 2], logo, "turtle0", blkId);
@@ -157,7 +144,6 @@ describe('setupBoxesBlocks', () => {
             activity.blocks.blockList[200] = { name: "namedbox", value: "do" };
             activity.blocks.blockSetter = jest.fn();
             incrementBlock.flow([10, 2], logo, "turtle0", blkId);
-            // "do" index is 0; 0+2 => SOLFEGENAMES[2] which is "mi"
             expect(activity.blocks.blockSetter).toHaveBeenCalledWith(logo, 200, "mi", "turtle0");
         });
 
@@ -354,7 +340,6 @@ describe('setupBoxesBlocks', () => {
         beforeEach(() => {
             storeBox2Block = createdBlocks["storebox2"];
             activity.blocks.blockList[testBlk] = { privateData: "box2Key" };
-            // Patch the flow method to simulate storing a value.
             storeBox2Block.flow = function (args, logo, turtle, blk) {
                 if (args.length !== 1) return;
                 const privateData = activity.blocks.blockList[blk].privateData;
@@ -390,7 +375,6 @@ describe('setupBoxesBlocks', () => {
         beforeEach(() => {
             storeBox1Block = createdBlocks["storebox1"];
             activity.blocks.blockList[testBlk] = { privateData: "box1Key" };
-            // Patch flow method to simulate storing a value.
             storeBox1Block.flow = function (args, logo, turtle, blk) {
                 if (args.length !== 1) return;
                 const privateData = activity.blocks.blockList[blk].privateData;
