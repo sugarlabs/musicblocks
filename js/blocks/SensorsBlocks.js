@@ -728,13 +728,12 @@ function setupSensorsBlocks(activity) {
                 activity.refreshCanvas();
 
                 const pixelData = this.getPixelData(x, y);
-                let color = this.detectColor(pixelData);
+                const color = this.detectColor(pixelData);
 
                 requiredTurtle.container.visible = originalVisibility;
                 return color;
             } catch (error) {
-                console.warn(`Failed to detect pixel color for turtle ${turtle}: ${error.message}`);
-                requiredTurtle.container.visible = originalVisibility; 
+                requiredTurtle.container.visible = originalVisibility;
                 return this.getFallbackColor();
             }
         }
