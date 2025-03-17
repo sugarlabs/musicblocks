@@ -475,7 +475,7 @@ function SampleWidget() {
             ICONSIZE,
             _("Tuner"),
             ""
-        )
+        );
 
         this._playbackBtn.id="playbackBtn";
         this._playbackBtn.classList.add("disabled");
@@ -522,84 +522,84 @@ function SampleWidget() {
             tunerContainer.style.alignItems = "center";
 
             const tunerSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-            tunerSvg.style.width = 350 + "px"
-            tunerSvg.style.height = 170 + "px"
+            tunerSvg.style.width = 350 + "px";
+            tunerSvg.style.height = 170 + "px";
 
-            tunerContainer.appendChild(tunerSvg)
+            tunerContainer.appendChild(tunerSvg);
 
-            const tuner1 = document.createElementNS("http://www.w3.org/2000/svg", "path")
-            tuner1.setAttribute("d", "M5.0064 173.531C2.24508 173.507 0.0184649 171.249 0.121197 168.49C0.579513 156.179 2.33654 143.951 5.36299 132.009C6.04138 129.332 8.81378 127.792 11.4701 128.546L57.9638 141.754C60.6202 142.508 62.1508 145.271 61.5107 147.958C59.8652 154.863 58.8534 161.905 58.488 168.995C58.3459 171.752 56.0992 173.973 53.3379 173.949L5.0064 173.531Z")
-            tuner1.setAttribute("fill", "#a50e0e")
+            const tuner1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            tuner1.setAttribute("d", "M5.0064 173.531C2.24508 173.507 0.0184649 171.249 0.121197 168.49C0.579513 156.179 2.33654 143.951 5.36299 132.009C6.04138 129.332 8.81378 127.792 11.4701 128.546L57.9638 141.754C60.6202 142.508 62.1508 145.271 61.5107 147.958C59.8652 154.863 58.8534 161.905 58.488 168.995C58.3459 171.752 56.0992 173.973 53.3379 173.949L5.0064 173.531Z");
+            tuner1.setAttribute("fill", "#a50e0e");
 
-            tunerSvg.appendChild(tuner1)
+            tunerSvg.appendChild(tuner1);
 
-            const tuner2 = document.createElementNS("http://www.w3.org/2000/svg", "path")
-            tuner2.setAttribute("d", "M12.3057 125.699C9.66293 124.899 8.16276 122.104 9.03876 119.486C12.9468 107.802 18.0776 96.5645 24.3458 85.959C25.7508 83.5817 28.8448 82.885 31.181 84.3574L72.0707 110.128C74.4068 111.601 75.0971 114.683 73.7261 117.08C70.2017 123.243 67.2471 129.714 64.8991 136.414C63.9858 139.02 61.2047 140.517 58.5619 139.716L12.3057 125.699Z")
-            tuner2.setAttribute("fill", "#d93025")
+            const tuner2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            tuner2.setAttribute("d", "M12.3057 125.699C9.66293 124.899 8.16276 122.104 9.03876 119.486C12.9468 107.802 18.0776 96.5645 24.3458 85.959C25.7508 83.5817 28.8448 82.885 31.181 84.3574L72.0707 110.128C74.4068 111.601 75.0971 114.683 73.7261 117.08C70.2017 123.243 67.2471 129.714 64.8991 136.414C63.9858 139.02 61.2047 140.517 58.5619 139.716L12.3057 125.699Z");
+            tuner2.setAttribute("fill", "#d93025");
 
-            tunerSvg.appendChild(tuner2)
+            tunerSvg.appendChild(tuner2);
 
-            const tuner3 = document.createElementNS("http://www.w3.org/2000/svg", "path")
-            tuner3.setAttribute("d", "M32.7848 81.8612C30.4747 80.3483 29.8225 77.2446 31.4008 74.9787C38.442 64.8698 46.5309 55.5326 55.5331 47.1225C57.551 45.2374 60.7159 45.4406 62.5426 47.5115L94.5158 83.7582C96.3425 85.8291 96.1364 88.981 94.1457 90.8948C89.0279 95.8148 84.3698 101.192 80.2295 106.958C78.619 109.202 75.5286 109.855 73.2186 108.342L32.7848 81.8612Z")
-            tuner3.setAttribute("fill", "#e37400")
+            const tuner3 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            tuner3.setAttribute("d", "M32.7848 81.8612C30.4747 80.3483 29.8225 77.2446 31.4008 74.9787C38.442 64.8698 46.5309 55.5326 55.5331 47.1225C57.551 45.2374 60.7159 45.4406 62.5426 47.5115L94.5158 83.7582C96.3425 85.8291 96.1364 88.981 94.1457 90.8948C89.0279 95.8148 84.3698 101.192 80.2295 106.958C78.619 109.202 75.5286 109.855 73.2186 108.342L32.7848 81.8612Z");
+            tuner3.setAttribute("fill", "#e37400");
 
-            tunerSvg.appendChild(tuner3)
+            tunerSvg.appendChild(tuner3);
 
-            const tuner4 = document.createElementNS("http://www.w3.org/2000/svg", "path")
-            tuner4.setAttribute("d", "M64.7847 45.5682C62.9944 43.4658 63.243 40.3041 65.3958 38.5746C74.9997 30.8588 85.3915 24.1786 96.3984 18.6454C98.8656 17.4051 101.845 18.4917 103.014 20.9933L123.481 64.7795C124.65 67.2812 123.564 70.2473 121.115 71.5228C114.819 74.8016 108.834 78.6484 103.237 83.0152C101.06 84.7138 97.9107 84.4699 96.1204 82.3675L64.7847 45.5682Z")
-            tuner4.setAttribute("fill", "#f29900")
+            const tuner4 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            tuner4.setAttribute("d", "M64.7847 45.5682C62.9944 43.4658 63.243 40.3041 65.3958 38.5746C74.9997 30.8588 85.3915 24.1786 96.3984 18.6454C98.8656 17.4051 101.845 18.4917 103.014 20.9933L123.481 64.7795C124.65 67.2812 123.564 70.2473 121.115 71.5228C114.819 74.8016 108.834 78.6484 103.237 83.0152C101.06 84.7138 97.9107 84.4699 96.1204 82.3675L64.7847 45.5682Z");
+            tuner4.setAttribute("fill", "#f29900");
 
-            tunerSvg.appendChild(tuner4)
+            tunerSvg.appendChild(tuner4);
 
-            const tuner5 = document.createElementNS("http://www.w3.org/2000/svg", "path")
-            tuner5.setAttribute("d", "M105.713 19.7604C104.588 17.2388 105.717 14.2752 108.27 13.2222C119.658 8.52459 131.511 5.04268 143.631 2.83441C146.348 2.33942 148.9 4.22142 149.318 6.95115L156.62 54.7298C157.037 57.4595 155.159 59.9997 152.45 60.5334C145.485 61.9056 138.659 63.9106 132.058 66.5236C129.491 67.54 126.538 66.4188 125.412 63.8972L105.713 19.7604Z")
-            tuner5.setAttribute("fill", "#fbbc04")
+            const tuner5 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            tuner5.setAttribute("d", "M105.713 19.7604C104.588 17.2388 105.717 14.2752 108.27 13.2222C119.658 8.52459 131.511 5.04268 143.631 2.83441C146.348 2.33942 148.9 4.22142 149.318 6.95115L156.62 54.7298C157.037 57.4595 155.159 59.9997 152.45 60.5334C145.485 61.9056 138.659 63.9106 132.058 66.5236C129.491 67.54 126.538 66.4188 125.412 63.8972L105.713 19.7604Z");
+            tuner5.setAttribute("fill", "#fbbc04");
 
-            tunerSvg.appendChild(tuner5)
+            tunerSvg.appendChild(tuner5);
 
-            const tuner6 = document.createElementNS("http://www.w3.org/2000/svg", "path")
-            tuner6.setAttribute("d", "M152.254 6.52852C151.885 3.79193 153.803 1.26651 156.549 0.975363C168.8 -0.323498 181.154 -0.325115 193.405 0.97054C196.151 1.26096 198.07 3.78589 197.701 6.52258L191.247 54.423C190.878 57.1597 188.361 59.0681 185.611 58.8169C178.542 58.1712 171.428 58.1722 164.358 58.8197C161.608 59.0716 159.091 57.1639 158.721 54.4273L152.254 6.52852Z")
-            tuner6.setAttribute("fill", "#008000")
+            const tuner6 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            tuner6.setAttribute("d", "M152.254 6.52852C151.885 3.79193 153.803 1.26651 156.549 0.975363C168.8 -0.323498 181.154 -0.325115 193.405 0.97054C196.151 1.26096 198.07 3.78589 197.701 6.52258L191.247 54.423C190.878 57.1597 188.361 59.0681 185.611 58.8169C178.542 58.1712 171.428 58.1722 164.358 58.8197C161.608 59.0716 159.091 57.1639 158.721 54.4273L152.254 6.52852Z");
+            tuner6.setAttribute("fill", "#008000");
 
-            tunerSvg.appendChild(tuner6)
+            tunerSvg.appendChild(tuner6);
 
-            const tuner7 = document.createElementNS("http://www.w3.org/2000/svg", "path")
-            tuner7.setAttribute("d", "M200.638 6.94443C201.055 4.21459 203.607 2.33193 206.324 2.82621C218.444 5.0313 230.298 8.51011 241.688 13.2047C244.241 14.257 245.371 17.2203 244.246 19.7423L224.559 63.8842C223.434 66.4062 220.481 67.5281 217.913 66.5124C211.312 63.9011 204.486 61.8978 197.52 60.5275C194.811 59.9945 192.933 57.4548 193.349 54.7249L200.638 6.94443Z")
-            tuner7.setAttribute("fill", "#fbbc04")
+            const tuner7 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            tuner7.setAttribute("d", "M200.638 6.94443C201.055 4.21459 203.607 2.33193 206.324 2.82621C218.444 5.0313 230.298 8.51011 241.688 13.2047C244.241 14.257 245.371 17.2203 244.246 19.7423L224.559 63.8842C223.434 66.4062 220.481 67.5281 217.913 66.5124C211.312 63.9011 204.486 61.8978 197.52 60.5275C194.811 59.9945 192.933 57.4548 193.349 54.7249L200.638 6.94443Z");
+            tuner7.setAttribute("fill", "#fbbc04");
 
-            tunerSvg.appendChild(tuner7)
+            tunerSvg.appendChild(tuner7);
 
-            const tuner8 = document.createElementNS("http://www.w3.org/2000/svg", "path")
-            tuner8.setAttribute("d", "M246.945 20.9745C248.114 18.4725 251.093 17.3851 253.561 18.6248C264.569 24.1552 274.963 30.8326 284.569 38.5459C286.722 40.2748 286.971 43.4365 285.181 45.5394L253.855 82.3468C252.066 84.4497 248.916 84.6944 246.739 82.9964C241.14 78.6311 235.155 74.7859 228.858 71.5087C226.408 70.2339 225.322 67.268 226.49 64.766L246.945 20.9745Z")
-            tuner8.setAttribute("fill", "#f29900")
+            const tuner8 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            tuner8.setAttribute("d", "M246.945 20.9745C248.114 18.4725 251.093 17.3851 253.561 18.6248C264.569 24.1552 274.963 30.8326 284.569 38.5459C286.722 40.2748 286.971 43.4365 285.181 45.5394L253.855 82.3468C252.066 84.4497 248.916 84.6944 246.739 82.9964C241.14 78.6311 235.155 74.7859 228.858 71.5087C226.408 70.2339 225.322 67.268 226.49 64.766L246.945 20.9745Z");
+            tuner8.setAttribute("fill", "#f29900");
 
-            tunerSvg.appendChild(tuner8)
+            tunerSvg.appendChild(tuner8);
 
-            const tuner9 = document.createElementNS("http://www.w3.org/2000/svg", "path")
-            tuner9.setAttribute("d", "M287.424 47.482C289.25 45.4107 292.415 45.2066 294.433 47.0913C303.438 55.499 311.529 64.8341 318.573 74.9411C320.152 77.2066 319.501 80.3105 317.191 81.824L276.764 108.315C274.454 109.829 271.364 109.176 269.753 106.934C265.611 101.168 260.951 95.7923 255.832 90.8736C253.841 88.9604 253.634 85.8085 255.46 83.7371L287.424 47.482Z")
-            tuner9.setAttribute("fill", "#e37400")
+            const tuner9 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            tuner9.setAttribute("d", "M287.424 47.482C289.25 45.4107 292.415 45.2066 294.433 47.0913C303.438 55.499 311.529 64.8341 318.573 74.9411C320.152 77.2066 319.501 80.3105 317.191 81.824L276.764 108.315C274.454 109.829 271.364 109.176 269.753 106.934C265.611 101.168 260.951 95.7923 255.832 90.8736C253.841 88.9604 253.634 85.8085 255.46 83.7371L287.424 47.482Z");
+            tuner9.setAttribute("fill", "#e37400");
 
-            tunerSvg.appendChild(tuner9)
+            tunerSvg.appendChild(tuner9);
 
-            const tuner10 = document.createElementNS("http://www.w3.org/2000/svg", "path")
-            tuner10.setAttribute("d", "M318.795 84.3198C321.131 82.8468 324.225 83.5427 325.631 85.9196C331.902 96.5235 337.036 107.76 340.947 119.442C341.823 122.061 340.324 124.855 337.681 125.657L291.429 139.686C288.786 140.487 286.005 138.991 285.091 136.385C282.741 129.686 279.785 123.215 276.259 117.054C274.887 114.657 275.577 111.574 277.912 110.101L318.795 84.3198Z")
-            tuner10.setAttribute("fill", "#d93025")
+            const tuner10 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            tuner10.setAttribute("d", "M318.795 84.3198C321.131 82.8468 324.225 83.5427 325.631 85.9196C331.902 96.5235 337.036 107.76 340.947 119.442C341.823 122.061 340.324 124.855 337.681 125.657L291.429 139.686C288.786 140.487 286.005 138.991 285.091 136.385C282.741 129.686 279.785 123.215 276.259 117.054C274.887 114.657 275.577 111.574 277.912 110.101L318.795 84.3198Z");
+            tuner10.setAttribute("fill", "#d93025");
 
-            tunerSvg.appendChild(tuner10)
+            tunerSvg.appendChild(tuner10);
 
-            const tuner11 = document.createElementNS("http://www.w3.org/2000/svg", "path")
-            tuner11.setAttribute("d", "M338.518 128.503C341.174 127.748 343.947 129.288 344.626 131.964C347.655 143.905 349.416 156.133 349.877 168.444C349.981 171.203 347.755 173.462 344.993 173.487L296.662 173.917C293.901 173.942 291.653 171.722 291.51 168.964C291.143 161.875 290.13 154.833 288.482 147.928C287.841 145.242 289.371 142.478 292.027 141.723L338.518 128.503Z")
-            tuner11.setAttribute("fill", "#a50e0e")
+            const tuner11 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            tuner11.setAttribute("d", "M338.518 128.503C341.174 127.748 343.947 129.288 344.626 131.964C347.655 143.905 349.416 156.133 349.877 168.444C349.981 171.203 347.755 173.462 344.993 173.487L296.662 173.917C293.901 173.942 291.653 171.722 291.51 168.964C291.143 161.875 290.13 154.833 288.482 147.928C287.841 145.242 289.371 142.478 292.027 141.723L338.518 128.503Z");
+            tuner11.setAttribute("fill", "#a50e0e");
 
-            tunerSvg.appendChild(tuner11)
+            tunerSvg.appendChild(tuner11);
 
-            const startTuningBtn = document.createElement("button")
-            startTuningBtn.textContent = "Start Tuning"
-            startTuningBtn.style.marginTop = "30px"
-            startTuningBtn.style.padding = "5px 7px"
-            startTuningBtn.style.cursor = "pointer"
+            const startTuningBtn = document.createElement("button");
+            startTuningBtn.textContent = "Start Tuning";
+            startTuningBtn.style.marginTop = "30px";
+            startTuningBtn.style.padding = "5px 7px";
+            startTuningBtn.style.cursor = "pointer";
 
-            tunerContainer.appendChild(startTuningBtn)
+            tunerContainer.appendChild(startTuningBtn);
 
             this.widgetWindow.getWidgetBody().appendChild(tunerContainer);
         }
