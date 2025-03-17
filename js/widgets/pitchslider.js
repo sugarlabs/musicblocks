@@ -33,6 +33,7 @@ class PitchSlider {
         this._delta = 0;
         this.sliders = {};
         this._cellScale = 0;
+        this.isActive = false; // Flag to indicate if the slider is active
     }
 
     /**
@@ -52,10 +53,35 @@ class PitchSlider {
 
         this._cellScale = 1.0;
         this.widgetWindow = window.widgetWindows.windowFor(this, "pitch slider", "slider", true);
+        
+        // Set global flag that pitch slider is active
+        this.isActive = true;
+        
+        // Store reference to this pitch slider in the logo object for global access
+        activity.logo.pitchSlider = this;
+        
         this.widgetWindow.onclose = () => {
             for (const osc of oscillators) osc.triggerRelease();
+            this.isActive = false; // Reset flag when widget is closed
+            activity.logo.pitchSlider = null; // Remove reference
             this.widgetWindow.destroy();
         };
+
+        // Add global keyboard event listener with the highest capture priority
+        const keyHandler = (event) => {
+            if (!this.isActive) return;
+            
+            if (event.key === 'ArrowUp' || event.key === 'ArrowDown' || 
+                event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+                event.preventDefault();
+                event.stopPropagation();
+                return false;
+            }
+        };
+        
+        // Add the handler to various elements to ensure it's captured
+        this.widgetWindow.getWidgetBody().addEventListener('keydown', keyHandler, true);
+        document.addEventListener('keydown', keyHandler, true);
 
         const MakeToolbar = (id) => {
             const toolBarDiv = document.createElement("div");
@@ -71,6 +97,16 @@ class PitchSlider {
                 max,
                 "pitchSlider"
             );
+
+            // Specifically prevent arrow keys from affecting the slider
+            slider.addEventListener('keydown', (event) => {
+                if (event.key === 'ArrowUp' || event.key === 'ArrowDown' || 
+                    event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    return false;
+                }
+            }, true);
 
             // label for frequency
             const freqLabel = document.createElement("div");
@@ -133,6 +169,7 @@ class PitchSlider {
             MakeToolbar(id);
         }
 
+        activity.textMsg(_("Use the up/down buttons to change pitch. Arrow keys are disabled."), 3000);
         activity.textMsg(_("Click on the slider to create a note block."), 3000);
         setTimeout(this.widgetWindow.sendToCenter, 0);
     }
