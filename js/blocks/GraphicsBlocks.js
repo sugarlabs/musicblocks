@@ -1081,7 +1081,7 @@ function setupGraphicsBlocks(activity) {
 
             if (args.length === 1) {
                 if ((args[0] > 5000 || args[0] < -5000) && (isWrap ==  false || isWrap == null)) {
-                   activity.errorMsg(_("Value must be within -5000 to 5000 when Wrap Mode is off."), blk); 
+                    activity.errorMsg(_("Value must be within -5000 to 5000 when Wrap Mode is off."), blk);
                 } else if ((args[0] > 20000 || args[0] < -20000) && isWrap ==  true) {
                     activity.errorMsg(_("Value must be within -20000 to 20000 when Wrap Mode is on."), blk);
                 } else {

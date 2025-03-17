@@ -58,6 +58,6 @@ class IntervalsBlocksAPI {
         return this.runCommand("setTemperament", [args[0], args[1], args[2]]);
     }
 }
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
     module.exports = IntervalsBlocksAPI;
 }

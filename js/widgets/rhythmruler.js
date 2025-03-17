@@ -205,7 +205,7 @@ class RhythmRuler {
          * Index of the cell tapped.
          * @type {number | null}
          * @private
-         */        
+         */
         this._tapCell = null;
 
         /**
@@ -338,7 +338,7 @@ class RhythmRuler {
          * Flag indicating whether the widget is expanded.
          * @type {boolean}
          * @private
-         */    
+         */
         this._expanded = false;
 
         // If there are no drums, add one.
@@ -375,7 +375,7 @@ class RhythmRuler {
          * Size of the icons.
          * @type {number}
          * @const
-         */        
+         */
         const iconSize = RhythmRuler.ICONSIZE;
 
         /**
@@ -387,7 +387,7 @@ class RhythmRuler {
          * The widget window associated with the rhythm maker.
          * @type {WidgetWindow}
          * @private
-         */        
+         */
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
@@ -397,7 +397,7 @@ class RhythmRuler {
          * Callback function for the close event of the widget window.
          * @type {function}
          * @private
-         */        
+         */
         widgetWindow.onclose = () => {
             // If the piemenu was open, close it.
             // docById('wheelDiv').style.display = 'none';
@@ -447,7 +447,7 @@ class RhythmRuler {
          * Handles the maximize event of the widget window, scaling the widget.
          * @private
          * @returns {void}
-         */        
+         */
         this.widgetWindow.onmaximize = this._scale.bind(this);
         /**
          * Represents the play all button.
@@ -459,7 +459,7 @@ class RhythmRuler {
          * Callback function for the click event of the play all button.
          * @private
          * @returns {void}
-         */        
+         */
         this._playAllCell.onclick = () => {
             if (this._playing) {
                 this.__pause();
@@ -1302,7 +1302,7 @@ class RhythmRuler {
             const noteValues = this.Rulers[this._rulerSelected][0];
             const noteValue = noteValues[cell.cellIndex];
 
-        /**
+            /**
          * Handles the mouseover event for the rhythm cell.
          * @param {Event} event - The mouseover event.
          * @returns {void}

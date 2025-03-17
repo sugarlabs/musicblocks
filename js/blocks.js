@@ -1333,7 +1333,7 @@ class Blocks {
                 thisBlockobj?.name === "vspace" &&
                 this.blockList[thisBlockobj.connections[1]]?.name === "rest2" &&
                 this.blockList[thisBlockobj.connections[0]]?.name === "vspace"
-              ) {
+            ) {
                 return;
             }
 
@@ -4463,7 +4463,7 @@ class Blocks {
                     if (this.blockList[blk].name === "forever") {
                         if (this._isConnectedToNoteValue(cblk)) {
                             this.activity.errorMsg(_("Forever loop detected inside a note value block. Unexpected things may happen."));
-                            return null; 
+                            return null;
                         }
                     }
                     /** If it is the last connection, keep searching. */
@@ -5088,7 +5088,7 @@ class Blocks {
                     if (["show", "turtleshell", "customsample"].includes(blockObjs[i][1])) {
                         switch (blockObjs[i][1]) {
                             case "show":
-                            name = _("Show").toLowerCase() + "-" + MathUtility.doRandom(0, 1000);
+                                name = _("Show").toLowerCase() + "-" + MathUtility.doRandom(0, 1000);
                                 break;
                             case "turtleshell":
                                 name = _("avatar") + "-" + MathUtility.doRandom(0, 1000);
@@ -7050,9 +7050,9 @@ class Blocks {
                 
                 const blockX = block.container.x;
                 const blockY = block.container.y;
-                return x >= blockX && 
+                return x >= blockX &&
                     x <= blockX + block.width &&
-                    y >= blockY && 
+                    y >= blockY &&
                     y <= blockY + block.height;
             });
         };

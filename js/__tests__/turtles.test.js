@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const Turtles = require('../turtles'); 
+const Turtles = require("../turtles");
 
 global.createjs = {
     Container: jest.fn().mockImplementation(() => ({
@@ -58,7 +58,7 @@ global.Turtle = jest.fn().mockImplementation(() => ({
     },
 }));
 
-describe('Turtles Class', () => {
+describe("Turtles Class", () => {
     let activityMock;
     let turtles;
 
@@ -92,19 +92,19 @@ describe('Turtles Class', () => {
         document.body.innerHTML = '<div id="loader"></div>';
     });
 
-    test('should initialize properly', () => {
+    test("should initialize properly", () => {
         expect(turtles.activity).not.toBeUndefined();
         expect(global.importMembers).toHaveBeenCalledWith(turtles, "", [activityMock]);
     });
 
-    test('should call initActions on construction', () => {
-        const spy = jest.spyOn(turtles, 'initActions');
+    test("should call initActions on construction", () => {
+        const spy = jest.spyOn(turtles, "initActions");
         turtles.initActions();
         expect(spy).toHaveBeenCalled();
     });
 
-    test('should add a turtle properly', () => {
-        turtles.addTurtle({}, { id: 1, name: 'TestTurtle' });
+    test("should add a turtle properly", () => {
+        turtles.addTurtle({}, { id: 1, name: "TestTurtle" });
 
         expect(turtles.getTurtleCount).toHaveBeenCalled();
         expect(turtles.pushTurtle).toHaveBeenCalled();
@@ -115,7 +115,7 @@ describe('Turtles Class', () => {
         expect(turtles.isShrunk).toHaveBeenCalled();
     });
 
-    test('should toggle running state correctly', () => {
+    test("should toggle running state correctly", () => {
         turtles.markAllAsStopped();
         expect(activityMock.refreshCanvas).toHaveBeenCalled();
     });

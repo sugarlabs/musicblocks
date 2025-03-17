@@ -6858,7 +6858,7 @@ let searchColors = (r, g, b) => {
 
     return nearestColor;
 };
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
     module.exports = {interpColor, getMunsellColor, getcolor, searchColors};
 }
 // /**

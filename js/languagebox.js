@@ -186,7 +186,7 @@ class LanguageBox {
      * @returns {void}
      */
     ur_onclick() {
-        this._language = "ur"; 
+        this._language = "ur";
         this.hide();
     }
     
@@ -196,7 +196,7 @@ class LanguageBox {
      * @returns {void}
      */
     OnClick() {
-        window.location.reload();    
+        window.location.reload();
     }
     hide() {
         const MSGPrefix =
@@ -237,10 +237,10 @@ class LanguageBox {
             }
         }
 
-         const languageLinks = document.querySelectorAll('.language-link');
-         languageLinks.forEach(link => {
-             link.addEventListener('click', () => this.OnClick());
-         });
+        const languageLinks = document.querySelectorAll(".language-link");
+        languageLinks.forEach(link => {
+            link.addEventListener("click", () => this.OnClick());
+        });
     }
 }
 if (typeof module !== "undefined" && module.exports) {
