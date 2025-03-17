@@ -1,11 +1,14 @@
 {
   "env": {
     "es6": true,
-    "browser": true
+    "browser": true,
+    "node": true,
+    "jest": true
   },
-  "parser": "babel-eslint",
+  "parser": "@babel/eslint-parser",
   "parserOptions": {
     "sourceType": "script",
+    "requireConfigFile": false,
     "ecmaFeatures": {
       "globalReturn": false
     }
@@ -14,7 +17,13 @@
   "rules": {
     "no-console": "warn",
     "no-mixed-spaces-and-tabs": "warn",
-    "no-unused-vars": "warn",
+    "no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }
+    ],
     "no-use-before-define": "error",
     "prefer-const": [
       "warn",
@@ -24,7 +33,7 @@
       }
     ],
     "no-undef": "error",
-    "no-redeclare": [2, {"builtinGlobals": false}],
+    "no-redeclare": [2, { "builtinGlobals": false }],
     "indent": ["warn", 4, { "SwitchCase": 1 }],
     "quotes": ["warn", "double", { "avoidEscape": true }],
     "semi": "error",
