@@ -6038,7 +6038,6 @@ if (typeof module !== "undefined" && module.exports) {
         deleteTemperamentFromList,
         addTemperamentToDictionary,
         updateTemperaments,
-    
         DEFAULTINVERT,
         DEFAULTMODE,
         customMode,

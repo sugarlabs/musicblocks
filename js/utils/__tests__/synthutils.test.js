@@ -929,7 +929,8 @@ describe("Utility Functions (logic-only)", () => {
                 if (paramsEffects === null && paramsFilters === null) {
                     try {
                         expect(_performNotes(tempSynth, "A", 1, null, null, true, 10)).toBe(undefined);
-                    } catch (error) {
+                    }
+                    catch (error) {
                         throw error;
                     }
                 }

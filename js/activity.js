@@ -3054,7 +3054,7 @@ class Activity {
                         this.textMsg("Alt-E " + _("Erase"));
                         this._allClear(false);
                         break;
-                    case 82: // 'R or ENTER'
+                    case 82: { // 'R or ENTER'
                         this.textMsg("Alt-R " + _("Play"));
                         const stopbtn = document.getElementById("stop");
                         if (stopbtn) {
@@ -3062,13 +3062,14 @@ class Activity {
                         }
                         this._doFastButton();
                         break;
-                    case 13: // 'R or ENTER'
+                    }
+                    case 13: { // 'R or ENTER'
                         if (this.searchWidget.style.visibility === "visible") {
                             return;
                         }
                         if (docById("paste").style.visibility === "visible") {
                             this.pasted();
-			    docById("paste").style.visibility = "hidden";
+                            docById("paste").style.visibility = "hidden";
                             return;
                         }
                         this.textMsg("Enter " + _("Play"));
@@ -3078,6 +3079,7 @@ class Activity {
                         }
                         this._doFastButton();
                         break;
+                    }
                     case 83: // 'S'
                         this.textMsg("Alt-S " + _("Stop"));
                         this.logo.doStopTurtles();
@@ -3095,6 +3097,7 @@ class Activity {
                             this.blocksContainer.x += this.canvas.width / 10;
                             this.stage.update();
                         }
+                        // fall through
                     case 220:
                         if (event.key=="\\" && (!this.beginnerMode) && (disableHorizScrollIcon.style.display == "block")) {
                             this.blocksContainer.x -= this.canvas.width / 10;
@@ -5625,7 +5628,9 @@ class Activity {
             if ($j("#helpfulSearch")) {
                 try {
                     $j("#helpfulSearch").autocomplete("destroy");
-                } catch {}
+                } catch {
+                    //
+                }
             }
             this.helpfulSearchWidget.style.zIndex = 1001;
             this.helpfulSearchWidget.idInput_custom = "";
