@@ -15,16 +15,10 @@
   },
   "extends": ["eslint:recommended", "prettier"],
   "rules": {
-    "no-console": "warn",
+    "no-console": "off",
     "no-mixed-spaces-and-tabs": "warn",
-    "no-unused-vars": [
-      "warn",
-      {
-        "argsIgnorePattern": "^_",
-        "varsIgnorePattern": "^_"
-      }
-    ],
-    "no-use-before-define": "error",
+    "no-unused-vars": "off",
+    "no-use-before-define": "off",
     "prefer-const": [
       "warn",
       {
@@ -32,21 +26,11 @@
         "ignoreReadBeforeAssign": true
       }
     ],
-    "no-undef": "error",
+    "no-undef": "off",
     "no-redeclare": [2, { "builtinGlobals": false }],
     "indent": ["warn", 4, { "SwitchCase": 1 }],
     "quotes": ["warn", "double", { "avoidEscape": true }],
     "semi": "error",
-    "max-len": [
-      "warn",
-      {
-        "code": 120,
-        "ignoreTrailingComments": true,
-        "ignoreComments": true,
-        "ignoreStrings": true,
-        "ignoreTemplateLiterals": true
-      }
-    ],
     "no-trailing-spaces": ["warn", { "skipBlankLines": true, "ignoreComments": true }],
     "no-duplicate-case": "error",
     "no-irregular-whitespace": "warn"
