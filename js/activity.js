@@ -1360,8 +1360,9 @@ class Activity {
             container.appendChild(message)
 
             const select = document.createElement("select");
-            select.classList.add("block-dropdown");
+            select.classList.add("block-count-dropdown");
 
+            // 12 choices for block generation (100 to 1200)
             for (let i = 1; i <= 12; i++) {
                 const option = document.createElement("option");
                 option.value = i*100;

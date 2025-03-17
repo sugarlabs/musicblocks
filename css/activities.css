@@ -150,7 +150,7 @@ body:not(.dark) #helpfulSearchDiv {
   text-align: left;
 }
 
-.block-dropdown {
+.block-count-dropdown {
   padding: 4px !important;
   font-size: 16px;
   border: 2px solid #ccc;
@@ -161,7 +161,7 @@ body:not(.dark) #helpfulSearchDiv {
   text-align: center;
 }
 
-.block-dropdown.expanded {
+.block-count-dropdown.expanded {
   max-height: 200px;
   overflow-y: auto;
 }
