@@ -264,7 +264,6 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
             }
 
             if (totalnoteblockCount >= maxNoteBlocks) {
-                // eslint-disable-next-line indent
                 activity.textMsg(`MIDI file is too large. Generating only ${maxNoteBlocks} noteblocks`);
                 stopProcessing = true;
                 break;
