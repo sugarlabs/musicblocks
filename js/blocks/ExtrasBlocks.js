@@ -865,3 +865,7 @@ function setupExtrasBlocks(activity) {
     new NOPThreeArgBlock().setup(activity);
     new NOPFourArgBlock().setup(activity);
 }
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupExtrasBlocks };
+}
+
