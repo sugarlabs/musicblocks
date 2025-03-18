@@ -518,14 +518,30 @@ function SampleWidget() {
 
             const tunerContainer = document.createElement("div");
             tunerContainer.style.display = "flex";
-            tunerContainer.style.flexDirection = "column"
-            tunerContainer.style.alignItems = "center";
+            tunerContainer.style.gap = "10px";
+            tunerContainer.style.marginTop = "30px";
+
+            const accidetalFlat = document.createElement("img");
+            accidetalFlat.setAttribute("src", "../header-icons/accidental-flat.svg");
+            accidetalFlat.style.height = 40 + "px";
+            accidetalFlat.style.width = 40 + "px";
+            accidetalFlat.style.marginTop = "auto";
+
+            tunerContainer.appendChild(accidetalFlat);
 
             const tunerSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
             tunerSvg.style.width = 350 + "px";
             tunerSvg.style.height = 170 + "px";
 
             tunerContainer.appendChild(tunerSvg);
+
+            const sharpSymbol = document.createElement("img");
+            sharpSymbol.setAttribute("src", "../header-icons/sharp.svg");
+            sharpSymbol.style.height = 40 + "px";
+            sharpSymbol.style.width = 40 + "px";
+            sharpSymbol.style.marginTop = "auto";
+
+            tunerContainer.appendChild(sharpSymbol);
 
             const tuner1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
             tuner1.setAttribute("d", "M5.0064 173.531C2.24508 173.507 0.0184649 171.249 0.121197 168.49C0.579513 156.179 2.33654 143.951 5.36299 132.009C6.04138 129.332 8.81378 127.792 11.4701 128.546L57.9638 141.754C60.6202 142.508 62.1508 145.271 61.5107 147.958C59.8652 154.863 58.8534 161.905 58.488 168.995C58.3459 171.752 56.0992 173.973 53.3379 173.949L5.0064 173.531Z");
@@ -595,13 +611,13 @@ function SampleWidget() {
 
             const startTuningBtn = document.createElement("button");
             startTuningBtn.textContent = "Start Tuning";
-            startTuningBtn.style.marginTop = "30px";
+            startTuningBtn.style.margin = "30px auto 0px auto";
             startTuningBtn.style.padding = "5px 7px";
             startTuningBtn.style.cursor = "pointer";
-
-            tunerContainer.appendChild(startTuningBtn);
+            startTuningBtn.style.display = "block";
 
             this.widgetWindow.getWidgetBody().appendChild(tunerContainer);
+            this.widgetWindow.getWidgetBody().appendChild(startTuningBtn);
         }
     
         widgetWindow.sendToCenter();
