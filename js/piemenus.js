@@ -1935,6 +1935,133 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     }
 };
 
+const piemenuNumber2 = (that, wheelValues, selectedValue) => {
+    // if (that.blocks.stageClick) return;
+
+    that._dissectNumber.oninput = () => {
+        that._dissectNumber.value = Math.max(Math.min(that._dissectNumber.value, 128), 2);
+    };
+
+
+    const values = wheelValues;
+    const menuDiv = docById('wheelDiv');
+    menuDiv.innerHTML = '';
+    menuDiv.style.display = '';
+
+    const x = event.clientX - 50;
+    const y = event.clientY - 50;
+    menuDiv.style.position = 'absolute';
+    menuDiv.style.left = Math.min(activity.canvas.width - 200, Math.max(0, x)) + 'px';
+    menuDiv.style.top = Math.min(activity.canvas.height - 250, Math.max(0, y)) + 'px';
+    menuDiv.style.width = '154px';
+    menuDiv.style.height = '155px';
+
+    const wheelNav = new wheelnav('wheelDiv', null, 154, 155);
+
+    wheelNav.colors = platformColor.wheelcolors;
+    wheelNav.slicePathFunction = slicePath().DonutSlice;
+    wheelNav.slicePathCustom = slicePath().DonutSliceCustomization();
+    wheelNav.sliceSelectedPathCustom = wheelNav.slicePathCustom;
+    wheelNav.sliceInitPathCustom = wheelNav.slicePathCustom;
+    wheelNav.clickModeRotate = false;
+    wheelNav.navItemsSize = 30;
+
+    const exitMenu = () => {
+        menuDiv.style.display = 'none';
+        document.removeEventListener('click', handleOutside);
+        document.removeEventListener('keydown', handleKeydown);
+        if (wheelNav) {
+            wheelNav.removeWheel();
+        }
+    };
+
+    // Click outside to close
+    const handleOutside = (e) => {
+        if (!menuDiv.contains(e.target) && e.target !== that._dissectNumber) {
+            exitMenu();
+        }
+    };
+    setTimeout(() => {
+        document.addEventListener('click', handleOutside);
+    }, 0);
+
+    // Manual entry input
+    const inputDiv = document.createElement('div');
+    inputDiv.style.position = 'absolute';
+    inputDiv.style.top = '50%';
+    inputDiv.style.left = '50%';
+    inputDiv.style.transform = 'translate(-50%, -50%)';
+    inputDiv.style.width = '55px';
+    inputDiv.style.height = '20px';
+    inputDiv.style.display = 'flex';
+    inputDiv.style.alignItems = 'center';
+    inputDiv.style.justifyContent = 'center';
+
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.min = '2';
+    input.max = '128';
+    input.value = that._dissectNumber.value;
+    input.style.width = '100%';
+    input.style.height = '100%';
+    input.style.textAlign = 'center';
+    input.style.fontSize = '16px';
+    input.style.border = '1px solid #ccc';
+    input.style.borderRadius = '5px';
+    input.style.display = 'flex';
+    input.style.alignItems = 'center';
+    input.style.justifyContent = 'center';
+
+    input.oninput = () => {
+        if (input.value.length > 3) {
+            input.value = input.value.slice(0, 3);
+        }
+        let value = parseInt(input.value);
+        if (value < 2) input.value = '2';
+        if (value > 128) input.value = '128';
+    };
+
+    input.onchange = () => {
+        that._dissectNumber.value = input.value;
+        exitMenu();
+    };
+
+    inputDiv.appendChild(input);
+    menuDiv.appendChild(inputDiv);
+
+
+    // Enter key closes menu
+    const handleKeydown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            input.blur();
+            exitMenu();
+        }
+    };
+    document.addEventListener('keydown', handleKeydown);
+
+    // Configure center button for close
+    wheelNav.centerButton = true;
+    wheelNav.centerButtonRadius = 25;
+    wheelNav.centerButtonHover = true;
+    wheelNav.centerButtonClickable = true;
+    wheelNav.centerButtonCallback = exitMenu;
+    wheelNav.centerButtonContent = '×';
+
+    const labels = values.map(v => v.toString());
+    wheelNav.initWheel(labels);
+    wheelNav.createWheel();
+
+    // Add click handlers for numbers
+    for (let i = 0; i < values.length; i++) {
+        wheelNav.navItems[i].navigateFunction = () => {
+            that._dissectNumber.value = values[i];
+            exitMenu();
+        };
+    }
+
+};
+
 const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     // input form and  wheelNav pie menu for setcolor selection
 
