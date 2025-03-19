@@ -95,7 +95,7 @@ global.NOINPUTERRORMSG = "No input provided";
 global.NOBOXERRORMSG = "No box error";
 global.SOLFEGENAMES = ["do", "re", "mi", "fa", "so", "la", "ti", "do"];
 
-describe('setupBoxesBlocks', () => {
+describe("setupBoxesBlocks", () => {
     let activity, logo;
     const blkId = 100;
 
@@ -126,7 +126,7 @@ describe('setupBoxesBlocks', () => {
         setupBoxesBlocks(activity);
     });
 
-    describe('IncrementBlock', () => {
+    describe("IncrementBlock", () => {
         let incrementBlock;
         beforeEach(() => {
             incrementBlock = createdBlocks["increment"];
@@ -147,14 +147,14 @@ describe('setupBoxesBlocks', () => {
             expect(activity.blocks.blockSetter).toHaveBeenCalledWith(logo, 200, "mi", "turtle0");
         });
 
-        test('should call blockSetter with default increment if no special case applies', () => {
+        test("should call blockSetter with default increment if no special case applies", () => {
             activity.blocks.blockList[200] = { name: "other", value: "unused" };
             activity.blocks.blockSetter = jest.fn();
             incrementBlock.flow([10, 3], logo, "turtle0", blkId);
             expect(activity.blocks.blockSetter).toHaveBeenCalledWith(logo, 200, 13, "turtle0");
         });
 
-        test('should catch error and call errorMsg when blockSetter throws', () => {
+        test("should catch error and call errorMsg when blockSetter throws", () => {
             activity.blocks.blockList[200] = { name: "other", value: "unused" };
             activity.blocks.blockSetter = jest.fn(() => { throw new Error("fail"); });
             incrementBlock.flow([10, 2], logo, "turtle0", blkId);
@@ -162,7 +162,7 @@ describe('setupBoxesBlocks', () => {
         });
     });
 
-    describe('IncrementOneBlock', () => {
+    describe("IncrementOneBlock", () => {
         let incrementOneBlock;
         const testBlk = 110;
         beforeEach(() => {
@@ -172,13 +172,13 @@ describe('setupBoxesBlocks', () => {
             activity.blocks.blockSetter = jest.fn();
         });
 
-        test('should set second argument to 1 and call parent flow', () => {
+        test("should set second argument to 1 and call parent flow", () => {
             incrementOneBlock.flow([10], logo, "turtle0", testBlk);
             expect(activity.blocks.blockSetter).toHaveBeenCalledWith(logo, 210, 11, "turtle0");
         });
     });
 
-    describe('DecrementOneBlock', () => {
+    describe("DecrementOneBlock", () => {
         let decrementOneBlock;
         const testBlk = 120;
         beforeEach(() => {
@@ -188,13 +188,13 @@ describe('setupBoxesBlocks', () => {
             activity.blocks.blockSetter = jest.fn();
         });
 
-        test('should set second argument to -1 and call parent flow', () => {
+        test("should set second argument to -1 and call parent flow", () => {
             decrementOneBlock.flow([10], logo, "turtle0", testBlk);
             expect(activity.blocks.blockSetter).toHaveBeenCalledWith(logo, 220, 9, "turtle0");
         });
     });
 
-    describe('BoxBlock', () => {
+    describe("BoxBlock", () => {
         let boxBlock;
         const testBlk = 130;
         beforeEach(() => {
@@ -205,43 +205,43 @@ describe('setupBoxesBlocks', () => {
             logo.boxes["boxKey"] = 99;
         });
 
-        test('updateParameter should return the box value if exists', () => {
+        test("updateParameter should return the box value if exists", () => {
             const result = boxBlock.updateParameter(logo, "turtle0", testBlk);
             expect(result).toBe(99);
         });
 
-        test('updateParameter should call errorMsg and return 0 if box missing', () => {
+        test("updateParameter should call errorMsg and return 0 if box missing", () => {
             delete logo.boxes["boxKey"];
             const result = boxBlock.updateParameter(logo, "turtle0", testBlk);
             expect(activity.errorMsg).toHaveBeenCalledWith("No box error", testBlk, "boxKey");
             expect(result).toBe(0);
         });
 
-        test('setter should update box value if box exists', () => {
+        test("setter should update box value if box exists", () => {
             boxBlock.setter(logo, 123, "turtle0", testBlk);
             expect(logo.boxes["boxKey"]).toBe(123);
         });
 
-        test('setter should call errorMsg if box missing', () => {
+        test("setter should call errorMsg if box missing", () => {
             delete logo.boxes["boxKey"];
             boxBlock.setter(logo, 456, "turtle0", testBlk);
             expect(activity.errorMsg).toHaveBeenCalledWith("No box error", testBlk, "boxKey");
         });
 
-        test('arg should call errorMsg and return 0 if connection is null', () => {
+        test("arg should call errorMsg and return 0 if connection is null", () => {
             activity.blocks.blockList[testBlk] = { connections: [null, null] };
             const result = boxBlock.arg(logo, "turtle0", testBlk, "boxKey");
             expect(activity.errorMsg).toHaveBeenCalledWith("No input provided", testBlk);
             expect(result).toBe(0);
         });
 
-        test('arg should return box value if exists', () => {
+        test("arg should return box value if exists", () => {
             activity.blocks.blockList[testBlk] = { connections: [null, 300] };
             const result = boxBlock.arg(logo, "turtle0", testBlk, "boxKey");
             expect(result).toBe(99);
         });
 
-        test('arg should call errorMsg and return 0 if box missing', () => {
+        test("arg should call errorMsg and return 0 if box missing", () => {
             delete logo.boxes["boxKey"];
             const result = boxBlock.arg(logo, "turtle0", testBlk, "boxKey");
             expect(activity.errorMsg).toHaveBeenCalledWith("No box error", testBlk, "boxKey");
@@ -249,7 +249,7 @@ describe('setupBoxesBlocks', () => {
         });
     });
 
-    describe('NamedBoxBlock', () => {
+    describe("NamedBoxBlock", () => {
         let namedBoxBlock;
         const testBlk = 140;
         beforeEach(() => {
@@ -258,29 +258,29 @@ describe('setupBoxesBlocks', () => {
             logo.boxes["namedBoxKey"] = 77;
         });
 
-        test('updateParameter should return the named box value if exists', () => {
+        test("updateParameter should return the named box value if exists", () => {
             const result = namedBoxBlock.updateParameter(logo, "turtle0", testBlk);
             expect(result).toBe(77);
         });
 
-        test('updateParameter should call errorMsg and return 0 if missing', () => {
+        test("updateParameter should call errorMsg and return 0 if missing", () => {
             delete logo.boxes["namedBoxKey"];
             const result = namedBoxBlock.updateParameter(logo, "turtle0", testBlk);
             expect(activity.errorMsg).toHaveBeenCalledWith("No box error", testBlk, "namedBoxKey");
             expect(result).toBe(0);
         });
 
-        test('setter should update the named box value if exists', () => {
+        test("setter should update the named box value if exists", () => {
             namedBoxBlock.setter(logo, 88, "turtle0", testBlk);
             expect(logo.boxes["namedBoxKey"]).toBe(88);
         });
 
-        test('arg should return the named box value when not in status matrix', () => {
+        test("arg should return the named box value when not in status matrix", () => {
             const result = namedBoxBlock.arg(logo, "turtle0", testBlk);
             expect(result).toBe(77);
         });
 
-        test('arg should call errorMsg and return 0 if box missing', () => {
+        test("arg should call errorMsg and return 0 if box missing", () => {
             delete logo.boxes["namedBoxKey"];
             const result = namedBoxBlock.arg(logo, "turtle0", testBlk);
             expect(activity.errorMsg).toHaveBeenCalledWith("No box error", testBlk, "namedBoxKey");
@@ -288,7 +288,7 @@ describe('setupBoxesBlocks', () => {
         });
     });
 
-    describe('StoreIn2Block', () => {
+    describe("StoreIn2Block", () => {
         let storeIn2Block;
         const testBlk = 150;
         beforeEach(() => {
@@ -296,30 +296,30 @@ describe('setupBoxesBlocks', () => {
             activity.blocks.blockList[testBlk] = { privateData: "storeKey" };
         });
 
-        test('flow should store the given value in logo.boxes using privateData', () => {
+        test("flow should store the given value in logo.boxes using privateData", () => {
             storeIn2Block.flow([999], logo, "turtle0", testBlk);
             expect(logo.boxes["storeKey"]).toBe(999);
         });
     });
 
-    describe('StoreInBlock', () => {
+    describe("StoreInBlock", () => {
         let storeInBlock;
         beforeEach(() => {
             storeInBlock = createdBlocks["storein"];
         });
 
-        test('flow should store the value in logo.boxes using the first argument as key', () => {
+        test("flow should store the value in logo.boxes using the first argument as key", () => {
             storeInBlock.flow(["myBox", 555], logo);
             expect(logo.boxes["myBox"]).toBe(555);
         });
 
-        test('flow should do nothing if args length is not 2', () => {
+        test("flow should do nothing if args length is not 2", () => {
             storeInBlock.flow([1], logo);
             expect(Object.keys(logo.boxes).length).toBe(0);
         });
     });
 
-    describe('Box2Block', () => {
+    describe("Box2Block", () => {
         let box2Block;
         const testBlk = 160;
         beforeEach(() => {
@@ -327,14 +327,14 @@ describe('setupBoxesBlocks', () => {
             box2Block.macro = jest.fn((x, y) => [[0, ["namedbox", { value: "box2" }], x, y, [null]]]);
         });
 
-        test('should create a macro returning expected configuration', () => {
+        test("should create a macro returning expected configuration", () => {
             const macroConfig = box2Block.macro(10, 20);
             expect(macroConfig[0][1][0]).toBe("namedbox");
             expect(macroConfig[0][1][1].value).toBe("box2");
         });
     });
 
-    describe('StoreBox2Block', () => {
+    describe("StoreBox2Block", () => {
         let storeBox2Block;
         const testBlk = 170;
         beforeEach(() => {
@@ -348,13 +348,13 @@ describe('setupBoxesBlocks', () => {
             };
         });
 
-        test('flow should store the value in logo.boxes for Box2', () => {
+        test("flow should store the value in logo.boxes for Box2", () => {
             storeBox2Block.flow([888], logo, "turtle0", testBlk);
             expect(logo.boxes["box2Key"]).toBe(888);
         });
     });
 
-    describe('Box1Block', () => {
+    describe("Box1Block", () => {
         let box1Block;
         const testBlk = 180;
         beforeEach(() => {
@@ -362,14 +362,14 @@ describe('setupBoxesBlocks', () => {
             box1Block.macro = jest.fn((x, y) => [[0, ["namedbox", { value: "box1" }], x, y, [null]]]);
         });
 
-        test('should create a macro returning expected configuration', () => {
+        test("should create a macro returning expected configuration", () => {
             const macroConfig = box1Block.macro(5, 15);
             expect(macroConfig[0][1][0]).toBe("namedbox");
             expect(macroConfig[0][1][1].value).toBe("box1");
         });
     });
 
-    describe('StoreBox1Block', () => {
+    describe("StoreBox1Block", () => {
         let storeBox1Block;
         const testBlk = 190;
         beforeEach(() => {
@@ -383,7 +383,7 @@ describe('setupBoxesBlocks', () => {
             };
         });
 
-        test('flow should store the value in logo.boxes for Box1', () => {
+        test("flow should store the value in logo.boxes for Box1", () => {
             storeBox1Block.flow([777], logo, "turtle0", testBlk);
             expect(logo.boxes["box1Key"]).toBe(777);
         });
