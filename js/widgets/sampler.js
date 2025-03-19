@@ -108,6 +108,8 @@ function SampleWidget() {
      */
     this.pitchAnalysers = {};
 
+    this.isTunerON = false;
+
     /**
      * Updates the blocks related to the sample.
      * @private
@@ -469,7 +471,21 @@ function SampleWidget() {
             _("Playback"),
             "");
 
-        this._playbackBtn.id="playbackBtn";
+        this._tunerBtn = widgetWindow.addButton(
+            "tuner.svg",
+            ICONSIZE,
+            _("Tuner"),
+            ""
+        ).onclick = () => {
+            if (this.isTunerON) {
+                this.isTunerON = false;
+            } else {
+                this.isTunerON = true;
+            }
+            this._scale();
+        }
+
+        this._playbackBtn.id = "playbackBtn";
         this._playbackBtn.classList.add("disabled");
         
         this.is_recording = false;
@@ -899,7 +915,11 @@ function SampleWidget() {
     this._scale = function () {
         let width, height;
         const canvas = document.getElementsByClassName("samplerCanvas");
+        const tuner = document.getElementsByClassName("tuner-container");
         Array.prototype.forEach.call(canvas, (ele) => {
+            this.widgetWindow.getWidgetBody().removeChild(ele);
+        });
+        Array.prototype.forEach.call(tuner, (ele) => {
             this.widgetWindow.getWidgetBody().removeChild(ele);
         });
         if (!this.widgetWindow.isMaximized()) {
@@ -910,9 +930,179 @@ function SampleWidget() {
             height = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 70;
         }
         document.getElementsByTagName("canvas")[0].innerHTML = "";
-        this.makeCanvas(width, height, 0, true);
+        if (this.isTunerON) {
+            this.makeTuner(width, height);
+        } else {
+            this.makeCanvas(width, height, 0, true);
+        }
         this.reconnectSynthsToAnalyser();
     };
+
+
+    // YIN Pitch Detection Algorithm
+    const YIN = (sampleRate, bufferSize = 2048, threshold = 0.1) => {
+
+        // Low-Pass Filter to remove high-frequency noise
+        const lowPassFilter = (buffer, cutoff = 500) => {
+            const alpha = 2 * Math.PI * cutoff / sampleRate;
+            return buffer.map((sample, i, arr) =>
+                i > 0 ? (alpha * sample + (1 - alpha) * arr[i - 1]) : sample
+            );
+        };
+
+        // Autocorrelation Function
+        const autocorrelation = (buffer) =>
+            buffer.map((_, lag) =>
+                buffer.slice(0, buffer.length - lag).reduce(
+                    (sum, value, index) => sum + value * buffer[index + lag], 0
+                )
+            );
+
+        // Difference Function
+        const difference = (buffer) => {
+            const autocorr = autocorrelation(buffer);
+            return autocorr.map((_, tau) => autocorr[0] + autocorr[tau] - 2 * autocorr[tau]);
+        };
+
+        // Cumulative Mean Normalized Difference Function
+        const cumulativeMeanNormalizedDifference = (diff) => {
+            let runningSum = 0;
+            return diff.map((value, tau) => {
+                runningSum += value;
+                return tau === 0 ? 1 : value / (runningSum / tau);
+            });
+        };
+
+        // Absolute Threshold Function
+        const absoluteThreshold = (cmnDiff) => {
+            for (let tau = 2; tau < cmnDiff.length; tau++) {
+                if (cmnDiff[tau] < threshold) {
+                    while (tau + 1 < cmnDiff.length && cmnDiff[tau + 1] < cmnDiff[tau]) {
+                        tau++;
+                    }
+                    return tau;
+                }
+            }
+            return -1;
+        };
+
+        // Parabolic Interpolation (More precision)
+        const parabolicInterpolation = (cmnDiff, tau) => {
+            const x0 = tau < 1 ? tau : tau - 1;
+            const x2 = tau + 1 < cmnDiff.length ? tau + 1 : tau;
+
+            if (x0 === tau) return cmnDiff[tau] <= cmnDiff[x2] ? tau : x2;
+            if (x2 === tau) return cmnDiff[tau] <= cmnDiff[x0] ? tau : x0;
+
+            const s0 = cmnDiff[x0], s1 = cmnDiff[tau], s2 = cmnDiff[x2];
+            const adjustment = ((x2 - x0) * (s0 - s2)) / (2 * (s0 - 2 * s1 + s2));
+
+            return tau + adjustment;
+        };
+
+        // Main Pitch Detection Function
+        return (buffer) => {
+            buffer = lowPassFilter(buffer, 300);
+            const diff = difference(buffer);
+            const cmnDiff = cumulativeMeanNormalizedDifference(diff);
+            const tau = absoluteThreshold(cmnDiff);
+
+            if (tau === -1) return -1;
+
+            const tauInterp = parabolicInterpolation(cmnDiff, tau);
+            return sampleRate / tauInterp;
+        };
+    };
+
+    const startPitchDetection = async () => {
+        const audioContext = new AudioContext();
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const source = audioContext.createMediaStreamSource(stream);
+
+        const analyser = audioContext.createAnalyser();
+        analyser.fftSize = 4096;
+        source.connect(analyser);
+
+        const bufferSize = 2048;
+        const sampleRate = audioContext.sampleRate;
+        const buffer = new Float32Array(bufferSize);
+        const detectPitch = YIN(sampleRate, bufferSize);
+
+        const updatePitch = () => {
+            analyser.getFloatTimeDomainData(buffer);
+            const pitch = detectPitch(buffer);
+
+            if (pitch > 0) {
+                const { note, cents } = frequencyToNote(pitch);
+                document.getElementById("pitch").textContent = pitch.toFixed(2);
+                document.getElementById("note").textContent = cents === 0 ? ` ${note} (Perfect)` : ` ${note}, off by ${cents} cents`;
+            } else {
+                document.getElementById("pitch").textContent = "---";
+                document.getElementById("note").textContent = "---";
+            }
+
+            requestAnimationFrame(updatePitch);
+        };
+
+        updatePitch();
+    };
+
+    const frequencyToNote = (frequency) => {
+        if (frequency <= 0) return { note: "---", cents: 0 };
+
+        const A4 = 440;
+        const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+
+        const midiNote = 69 + 12 * Math.log2(frequency / A4);
+        const roundedMidi = Math.round(midiNote);
+
+        const noteIndex = roundedMidi % 12;
+        const octave = Math.floor(roundedMidi / 12) - 1;
+        const noteName = noteNames[noteIndex] + octave;
+
+        const nearestFreq = A4 * Math.pow(2, (roundedMidi - 69) / 12);
+        const centsOffset = Math.round(1200 * Math.log2(frequency / nearestFreq));
+
+        return { note: noteName, cents: centsOffset };
+    };
+
+    this.makeTuner = (width, height) => {
+        const container = document.createElement("div");
+        container.className = "tuner-container";
+        container.height = height;
+        container.width = width;
+
+        const heading = document.createElement('h1');
+        heading.textContent = 'Tuner';
+
+        const startButton = document.createElement('button');
+        startButton.id = 'start';
+        startButton.textContent = 'Start';
+
+        const pitchParagraph = document.createElement('p');
+        pitchParagraph.textContent = 'Detected Pitch: ';
+        const pitchSpan = document.createElement('span');
+        pitchSpan.id = 'pitch';
+        pitchSpan.textContent = '---';
+
+        const noteParagraph = document.createElement('p');
+        noteParagraph.textContent = 'Note: ';
+        const noteSpan = document.createElement('span');
+        noteSpan.id = 'note';
+        noteSpan.textContent = '---';
+
+        pitchParagraph.appendChild(pitchSpan);
+        noteParagraph.appendChild(noteSpan);
+
+        container.appendChild(heading);
+        container.appendChild(startButton);
+        container.appendChild(pitchParagraph);
+        container.appendChild(noteParagraph);
+        this.widgetWindow.getWidgetBody().appendChild(container);
+
+        document.getElementById("start").addEventListener("click", startPitchDetection);
+    };
+
 
     /**
      * Creates a canvas element and draws visual representations of sample data and reference tones.
@@ -985,6 +1175,8 @@ function SampleWidget() {
                 }
             }
         };
-        draw();
+        if (!this.isTunerON) {
+            draw();
+        }
     };
 }
