@@ -515,17 +515,17 @@ class Singer {
 
         // Restore previous state
         if (saveBoxes == undefined) {
-            logo.boxes = {}
+            logo.boxes = {};
         } else {
             logo.boxes = JSON.parse(saveBoxes);
         }
         if (saveTurtleHeaps == undefined) {
-            logo.turtleHeaps = {}
+            logo.turtleHeaps = {};
         } else {
             logo.turtleHeaps[turtle] = JSON.parse(saveTurtleHeaps);
         }
         if (saveTurtleDicts == undefined) {
-            logo.turtleDicts = {}
+            logo.turtleDicts = {};
         } else {
             logo.turtleDicts[turtle] = JSON.parse(saveTurtleDicts);
         }
@@ -1252,7 +1252,7 @@ class Singer {
         const tur = activity.turtles.ithTurtle(turtle);
         const bpmFactor =
             TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
-        let bpmValue = Number(last(tur.singer.bpm));
+        const bpmValue = Number(last(tur.singer.bpm));
 
         let noteBeatValue = isOsc
             ? noteValue === 0

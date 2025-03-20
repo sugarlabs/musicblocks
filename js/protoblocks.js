@@ -2121,7 +2121,7 @@ class BaseBlock extends ProtoBlock {
         }
 
         // Insert the note symbol after the text
-        const blockWithNote = block.replace('</svg>', `${noteSymbol}</svg>`);
+        const blockWithNote = block.replace("</svg>", `${noteSymbol}</svg>`);
 
         return [
             blockWithNote,

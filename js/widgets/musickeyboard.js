@@ -196,7 +196,7 @@ function MusicKeyboard(activity) {
     // Each element in the array is [start time, note, id, duration, voice].
     this._notesPlayed = [];
 
-     /**
+    /**
      * Adds a row block to the keyboard.
      * @param {number} rowBlock - The row block to add.
      */
@@ -296,7 +296,7 @@ function MusicKeyboard(activity) {
             } else if (HERTZKEYS.includes(key)) {
                 id = `hertzRow${HERTZKEYS.indexOf(key)}`;
             } else if (key === SPACE) {
-                id = 'rest';
+                id = "rest";
             }
 
             return id;
@@ -2662,9 +2662,9 @@ function MusicKeyboard(activity) {
         mkbKeyboardDiv.style.width = "100%";
         mkbKeyboardDiv.style.top = "0px";
         mkbKeyboardDiv.style.overflow = "auto";
-        mkbKeyboardDiv.style.userSelect = 'none';
-        mkbKeyboardDiv.style.webkitUserSelect = 'none'; // Safari/Chrome
-        mkbKeyboardDiv.style.msUserSelect = 'none'; // Edge
+        mkbKeyboardDiv.style.userSelect = "none";
+        mkbKeyboardDiv.style.webkitUserSelect = "none"; // Safari/Chrome
+        mkbKeyboardDiv.style.msUserSelect = "none"; // Edge
         mkbKeyboardDiv.innerHTML = "";
         mkbKeyboardDiv.innerHTML =
             ' <div id="keyboardHolder2"><table class="white"><tbody><tr id="myrow"></tr></tbody></table><table class="black"><tbody><tr id="myrow2"></tr></tbody></table></div>';
@@ -3051,7 +3051,7 @@ function MusicKeyboard(activity) {
         var actionGroups = parseInt(selectedNotes.length / actionGroupInterval) + 1;
 
         for (let actionGroup = 0; actionGroup < actionGroups; actionGroup++) {
-            let currentSelectedNotes = selectedNotes.slice(
+            const currentSelectedNotes = selectedNotes.slice(
                 actionGroup * actionGroupInterval,
                 (actionGroup + 1) * actionGroupInterval
             );

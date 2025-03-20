@@ -166,7 +166,7 @@ function setupMeterBlocks(activity) {
             // Form block with name for the beats per minute
             this.formBlock({
                 //.TRANS: number of beats played per minute
-		//.TRANS: in Japanese: "１分当たりの拍の数"
+                //.TRANS: in Japanese: "１分当たりの拍の数"
                 name: this.lang === "ja" ? _("beats per minute2") : _("beats per minute")
             });
         }

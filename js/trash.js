@@ -107,7 +107,7 @@ class Trashcan {
             "data:image/svg+xml;base64," +
             window.btoa(
                 base64Encode(BORDER.replace("stroke_color", platformColor.trashBorder))
-                );
+            );
     }
 
     /**
@@ -132,7 +132,7 @@ class Trashcan {
             "data:image/svg+xml;base64," +
             window.btoa(
                 base64Encode(TRASHICON.replace(/fill_color/g, platformColor.trashBorder))
-                );
+            );
     }
 
     /**

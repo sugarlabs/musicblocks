@@ -17,25 +17,25 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const Painter = require("../turtle-painter"); 
-global.WRAP = true;  
+const Painter = require("../turtle-painter");
+global.WRAP = true;
 const mockTurtle = {
-    turtles: { 
-        screenX2turtleX: jest.fn(), 
-        screenY2turtleY: jest.fn(), 
-        turtleX2screenX: jest.fn(), 
-        turtleY2screenY: jest.fn(), 
-        scale: 1 
+    turtles: {
+        screenX2turtleX: jest.fn(),
+        screenY2turtleY: jest.fn(),
+        turtleX2screenX: jest.fn(),
+        turtleY2screenY: jest.fn(),
+        scale: 1
     },
     activity: { refreshCanvas: jest.fn() },
     container: { x: 0, y: 0, rotation: 0 },
-    ctx: { 
-        beginPath: jest.fn(), 
-        clearRect: jest.fn(), 
-        stroke: jest.fn(), 
-        closePath: jest.fn(), 
-        moveTo: jest.fn(), 
-        lineTo: jest.fn(), 
+    ctx: {
+        beginPath: jest.fn(),
+        clearRect: jest.fn(),
+        stroke: jest.fn(),
+        closePath: jest.fn(),
+        moveTo: jest.fn(),
+        lineTo: jest.fn(),
         arc: jest.fn(),
         canvas: { width: 800, height: 600 }
     },

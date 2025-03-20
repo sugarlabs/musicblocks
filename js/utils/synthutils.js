@@ -982,7 +982,7 @@ function Synth() {
             }
             chunks = [];
             const url = URL.createObjectURL(blob);
-                // Prompt the user for the file name
+            // Prompt the user for the file name
             const fileName = window.prompt("Enter file name", "recording");
             if (fileName) {
                 download(url, fileName + (platform.FF ? ".wav" : ".ogg"));
@@ -1392,7 +1392,7 @@ function Synth() {
                     instrumentName,
                     sourceName,
                     params
-                )
+                );
             }
         } else if (sourceName in BUILTIN_SYNTHS) {
             if (instruments[turtle] && instruments[turtle][instrumentName]) {
@@ -1417,7 +1417,7 @@ function Synth() {
                 instruments[turtle][instrumentName] = this._createCustomSynth(
                     sourceName,
                     params
-                )
+                );
             }
 
             instrumentsSource[instrumentName] = [0, "poly"];
@@ -1432,7 +1432,7 @@ function Synth() {
                     instrumentName,
                     sourceName,
                     params
-                )
+                );
             }
         } else {
             if (sourceName.length >= 4) {
@@ -1687,14 +1687,14 @@ function Synth() {
                             synth.voices[i].setNote(notes);
                         }
                     }
-                } else {  
+                } else {
                     Tone.ToneAudioBuffer.loaded().then(() => {
                         synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
                     }).catch((e) => {
-                    console.debug(e);
-                    })
+                        console.debug(e);
+                    });
 
-                }   
+                }
             }
 
             setTimeout(() => {
@@ -1991,7 +1991,7 @@ function Synth() {
         }
         console.debug("instrument not found");
         return 50;  // Default volume
-    }
+    };
     
     /**
      * Sets the volume of a specific instrument for a given turtle.
@@ -2037,16 +2037,16 @@ function Synth() {
 
         if (firstConnection === null && lastConnection === null) {
             // Reset volume to default (0 dB) first
-             Tone.Destination.volume.rampTo(0, 0.01); 
-             this.setVolume(0, "electronic synth", volume);
+            Tone.Destination.volume.rampTo(0, 0.01);
+            this.setVolume(0, "electronic synth", volume);
             setTimeout(()=>{
                 this.trigger(0, "G4", 1 / 4, "electronic synth", null, null, false);
-            },200)
+            },200);
         }
         else{
             const db = Tone.gainToDb(volume / 100);
             Tone.Destination.volume.rampTo(db, 0.01);
-        } 
+        }
     };
 
     /**
@@ -2059,15 +2059,15 @@ function Synth() {
         this.mic = new Tone.UserMedia();
         this.recorder = new Tone.Recorder();
         await this.mic.open()
-        .then(() => {
-            console.log("Mic opened");
-            this.mic.connect(this.recorder);
-            this.recorder.start();
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-    }
+            .then(() => {
+                console.log("Mic opened");
+                this.mic.connect(this.recorder);
+                this.recorder.start();
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
 
     /**
      * Stops Recording
@@ -2079,7 +2079,7 @@ function Synth() {
         this.mic.close();
         this.audioURL = URL.createObjectURL(this.recording);
         return this.audioURL;
-    }
+    };
 
     /**
      * Plays Recording
@@ -2088,9 +2088,9 @@ function Synth() {
      */
     this.playRecording = async () => {
         this.player = new Tone.Player().toDestination();
-        await this.player.load(this.audioURL)
+        await this.player.load(this.audioURL);
         this.player.start();
-    }
+    };
 
     /**
      * Stops Recording
@@ -2099,7 +2099,7 @@ function Synth() {
      */
     this.stopPlayBackRecording = () => {
         this.player.stop();
-    }
+    };
 
     /**
      * Analyzing the audio
@@ -2107,9 +2107,9 @@ function Synth() {
      * @memberof Synth
      */
     this.LiveWaveForm = () => {
-        this.analyser = new Tone.Analyser('waveform', 8192);
+        this.analyser = new Tone.Analyser("waveform", 8192);
         this.mic.connect(this.analyser);
-    }
+    };
 
     /**
     * Gets real-time waveform values

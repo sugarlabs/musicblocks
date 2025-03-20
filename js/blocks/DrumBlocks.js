@@ -296,7 +296,7 @@ function setupDrumBlocks(activity) {
 
         drumConfigs.forEach(config => {
             new PlayDrumMacroBlock(...config).setup(activity);
-});
+        });
 
     }
     /**

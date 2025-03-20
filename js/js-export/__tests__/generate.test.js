@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const { JSGenerate } = require('../generate');
+const { JSGenerate } = require("../generate");
 global.last = jest.fn((array) => array[array.length - 1]);
 const globalActivity = {
     blocks: {
@@ -33,7 +33,7 @@ global.console = {
     warn: jest.fn(),
 };
 const ASTUtils = {
-    BAREBONE_AST: { type: 'Program', body: [] },
+    BAREBONE_AST: { type: "Program", body: [] },
     getMethodAST: jest.fn(),
     getMouseAST: jest.fn(),
 };
@@ -44,7 +44,7 @@ const astring = {
 global.ASTUtils = ASTUtils;
 global.astring = astring;
 
-describe('JSGenerate Class', () => {
+describe("JSGenerate Class", () => {
     beforeEach(() => {
         jest.clearAllMocks();
         JSGenerate.startBlocks = [];
@@ -52,42 +52,42 @@ describe('JSGenerate Class', () => {
         JSGenerate.startTrees = [];
         JSGenerate.actionTrees = [];
         JSGenerate.actionNames = [];
-        JSGenerate.AST = { type: 'Program', body: [] };
+        JSGenerate.AST = { type: "Program", body: [] };
         JSGenerate.code = "";
         JSGenerate.generateFailed = false;
     });
 
-    test('should generate correct AST structure', () => {
-        JSGenerate.actionTrees = [[['action', null, null]]];
-        JSGenerate.actionNames = ['action1'];
-        JSGenerate.startTrees = [[['start', null, null]]];
+    test("should generate correct AST structure", () => {
+        JSGenerate.actionTrees = [[["action", null, null]]];
+        JSGenerate.actionNames = ["action1"];
+        JSGenerate.startTrees = [[["start", null, null]]];
 
         const expectedAST = {
-            type: 'Program',
+            type: "Program",
             body: [
-                { type: 'Method' },
-                { type: 'Mouse' },
+                { type: "Method" },
+                { type: "Mouse" },
             ],
         };
 
-        ASTUtils.getMethodAST.mockReturnValue({ type: 'Method' });
-        ASTUtils.getMouseAST.mockReturnValue({ type: 'Mouse' });
-        astring.generate.mockReturnValue('generated code');
+        ASTUtils.getMethodAST.mockReturnValue({ type: "Method" });
+        ASTUtils.getMouseAST.mockReturnValue({ type: "Mouse" });
+        astring.generate.mockReturnValue("generated code");
 
         JSGenerate.generateCode();
 
         expect(JSGenerate.AST).toEqual(expectedAST);
-        expect(JSGenerate.code).toBe('generated code');
+        expect(JSGenerate.code).toBe("generated code");
         expect(JSGenerate.generateFailed).toBe(false);
     });
 
-    test('should handle code generation failure', () => {
-        JSGenerate.actionTrees = [[['action', null, null]]];
-        JSGenerate.actionNames = ['action1'];
-        JSGenerate.startTrees = [[['start', null, null]]];
+    test("should handle code generation failure", () => {
+        JSGenerate.actionTrees = [[["action", null, null]]];
+        JSGenerate.actionNames = ["action1"];
+        JSGenerate.startTrees = [[["start", null, null]]];
 
         ASTUtils.getMethodAST.mockImplementation(() => {
-            throw new Error('Failed to generate AST');
+            throw new Error("Failed to generate AST");
         });
 
         JSGenerate.generateCode();
@@ -100,10 +100,10 @@ describe('JSGenerate Class', () => {
         expect(JSGenerate.code).toBe(astring.generate(ASTUtils.BAREBONE_AST));
     });
 
-    test('should print stacks tree', () => {
-        JSGenerate.startTrees = [[['start', null, null]]];
-        JSGenerate.actionTrees = [[['action', null, null]]];
-        JSGenerate.actionNames = ['action1'];
+    test("should print stacks tree", () => {
+        JSGenerate.startTrees = [[["start", null, null]]];
+        JSGenerate.actionTrees = [[["action", null, null]]];
+        JSGenerate.actionNames = ["action1"];
 
         JSGenerate.printStacksTree();
 
@@ -117,7 +117,7 @@ describe('JSGenerate Class', () => {
         );
     });
 
-    test('should handle empty start and action trees', () => {
+    test("should handle empty start and action trees", () => {
         JSGenerate.startTrees = [];
         JSGenerate.actionTrees = [];
 
@@ -127,12 +127,12 @@ describe('JSGenerate Class', () => {
         expect(console.log).toHaveBeenCalledWith("%cno action trees generated", "color: tomato");
     });
 
-    test('should handle invalid action name', () => {
+    test("should handle invalid action name", () => {
         globalActivity.blocks.stackList = [1];
         globalActivity.blocks.blockList = {
-            1: { name: 'action', trash: false, connections: [null, 2, 3] },
-            2: { name: 'namedbox', value: null, connections: [null] },
-            3: { name: 'value', value: 'arg1', connections: [null] },
+            1: { name: "action", trash: false, connections: [null, 2, 3] },
+            2: { name: "namedbox", value: null, connections: [null] },
+            3: { name: "value", value: "arg1", connections: [null] },
         };
 
         JSGenerate.generateStacksTree();
@@ -140,10 +140,10 @@ describe('JSGenerate Class', () => {
         expect(JSGenerate.actionNames).toEqual([]);
     });
 
-    test('should handle invalid block connections', () => {
+    test("should handle invalid block connections", () => {
         globalActivity.blocks.stackList = [1];
         globalActivity.blocks.blockList = {
-            1: { name: 'start', trash: false, connections: [] },
+            1: { name: "start", trash: false, connections: [] },
         };
 
         JSGenerate.generateStacksTree();
@@ -151,14 +151,14 @@ describe('JSGenerate Class', () => {
         expect(JSGenerate.startTrees).toEqual([[]]);
     });
 
-    test('should run code generator with print options', () => {
-        JSGenerate.actionTrees = [[['action', null, null]]];
-        JSGenerate.actionNames = ['action1'];
-        JSGenerate.startTrees = [[['start', null, null]]];
+    test("should run code generator with print options", () => {
+        JSGenerate.actionTrees = [[["action", null, null]]];
+        JSGenerate.actionNames = ["action1"];
+        JSGenerate.startTrees = [[["start", null, null]]];
 
-        ASTUtils.getMethodAST.mockReturnValue({ type: 'Method' });
-        ASTUtils.getMouseAST.mockReturnValue({ type: 'Mouse' });
-        astring.generate.mockReturnValue('generated code');
+        ASTUtils.getMethodAST.mockReturnValue({ type: "Method" });
+        ASTUtils.getMouseAST.mockReturnValue({ type: "Mouse" });
+        astring.generate.mockReturnValue("generated code");
 
         JSGenerate.run(true, true);
 
@@ -170,6 +170,6 @@ describe('JSGenerate Class', () => {
             "\n   %c CODE ",
             "background: greenyellow; color: midnightblue; font-weight: bold"
         );
-        expect(console.log).toHaveBeenCalledWith('generated code');
+        expect(console.log).toHaveBeenCalledWith("generated code");
     });
 });

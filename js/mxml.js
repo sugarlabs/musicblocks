@@ -163,7 +163,7 @@ saveMxmlOutput = (logo) => {
                     divisionsLeft -= dur;
                 }
 
-                let alter = p[1] === "\u266d" ? -1 : p[1] === "\u266F" ? 1 : 0;
+                const alter = p[1] === "\u266d" ? -1 : p[1] === "\u266F" ? 1 : 0;
 
                 add("<note>");
                 indent++;

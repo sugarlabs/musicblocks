@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-global._ = jest.fn((str) => str); 
+global._ = jest.fn((str) => str);
 const ThemeBox = require("../themebox");
 
 describe("ThemeBox", () => {
