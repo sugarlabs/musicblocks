@@ -1341,14 +1341,68 @@ class Activity {
             });
         };
 
+        const midiImportBlocks = (midi) => {
+            if (docById("import-midi")) return;
+
+            const modal = document.createElement("div");
+            modal.classList.add("modalBox");
+            modal.id = "import-midi";
+            const title = document.createElement("h2");
+            title.textContent = _("Import MIDI");
+            title.classList.add("modal-title");
+            modal.appendChild(title);
+
+            const container = document.createElement("div");
+            container.classList.add("message-container");
+            const message = document.createElement("p");
+            message.textContent = _("Set the max blocks to generate :");
+            message.classList.add("modal-message");
+            container.appendChild(message)
+
+            const select = document.createElement("select");
+            select.classList.add("block-count-dropdown");
+
+            // 12 choices for block generation (100 to 1200)
+            for (let i = 1; i <= 12; i++) {
+                const option = document.createElement("option");
+                option.value = i*100;
+                option.textContent = i*100;
+                select.appendChild(option);
+            }
+
+            container.appendChild(select);
+            modal.appendChild(container);
+
+            const importConfirm = document.createElement("button");
+            importConfirm.classList.add("confirm-button");
+            importConfirm.textContent = "Confirm";
+            importConfirm.addEventListener("click", () => {
+                const maxNoteBlocks = select.value;
+                transcribeMidi(midi, maxNoteBlocks);
+                document.body.removeChild(modal);
+            });
+            modal.appendChild(importConfirm);
+
+            const cancelBtn = document.createElement("button");
+            cancelBtn.classList.add("cancel-button");
+            cancelBtn.textContent = "Cancel";
+            cancelBtn.addEventListener("click", () => {
+                document.body.removeChild(modal);
+            });
+            modal.appendChild(cancelBtn);
+
+            document.body.appendChild(modal);
+        }
+
         /*
          * Clears "canvas"
          */
         const renderClearConfirmation = (clearCanvasAction) => {
-            if (document.getElementsByClassName("modalBox").length > 0) return;
+            if (docById("clear-confirm")) return;
             // Create a custom modal for confirmation
             const modal = document.createElement("div");
             modal.classList.add("modalBox");
+            modal.id = "clear-confirm";
             const title = document.createElement("h2");
             title.textContent = _("Clear Workspace");
             title.classList.add("modal-title");
@@ -1357,9 +1411,8 @@ class Activity {
             const message = document.createElement("p");
             message.textContent = _("Are you sure you want to clear the workspace?");
             message.classList.add("modal-message");
-
             modal.appendChild(message);
-            // Add buttons
+
             const buttonContainer = document.createElement("div");
             buttonContainer.classList.add("clear-button-container");
 
@@ -6477,7 +6530,7 @@ class Activity {
                         const midi = new Midi(e.target.result);
                         // eslint-disable-next-line no-console
                         console.debug(midi);
-                        transcribeMidi(midi);
+                        midiImportBlocks(midi);
                     };
 
                     const file = that.fileChooser.files[0];
@@ -6579,7 +6632,7 @@ class Activity {
                     const midi = new Midi(e.target.result)
                     // eslint-disable-next-line no-console
                     console.debug(midi);
-                    transcribeMidi(midi);
+                    midiImportBlocks(midi);
                 }
 
                 // Music Block Parser from abc to MB
