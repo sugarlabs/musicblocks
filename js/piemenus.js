@@ -1935,36 +1935,35 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     }
 };
 
-const piemenuNumber2 = (that, wheelValues, selectedValue) => {
-    // if (that.blocks.stageClick) return;
-
+const piemenuNumberRhytm = (that, wheelValues, selectedValue) => {
     that._dissectNumber.oninput = () => {
         that._dissectNumber.value = Math.max(Math.min(that._dissectNumber.value, 128), 2);
     };
-
 
     const values = wheelValues;
     const menuDiv = docById('wheelDiv');
     menuDiv.innerHTML = '';
     menuDiv.style.display = '';
 
-    const x = event.clientX - 50;
-    const y = event.clientY - 50;
+    const offsetX = 30;
+    const offsetY = 30;
+    const x = event.clientX + offsetX;
+    const y = event.clientY + offsetY;
+
     menuDiv.style.position = 'absolute';
-    menuDiv.style.left = Math.min(activity.canvas.width - 200, Math.max(0, x)) + 'px';
-    menuDiv.style.top = Math.min(activity.canvas.height - 250, Math.max(0, y)) + 'px';
-    menuDiv.style.width = '154px';
-    menuDiv.style.height = '155px';
+    menuDiv.style.left = Math.min(activity.canvas.width - 220, Math.max(0, x)) + 'px';
+    menuDiv.style.top = Math.min(activity.canvas.height - 220, Math.max(0, y)) + 'px';
+    menuDiv.style.width = '200px';
+    menuDiv.style.height = '200px';
 
-    const wheelNav = new wheelnav('wheelDiv', null, 154, 155);
-
+    const wheelNav = new wheelnav('wheelDiv', null, 200, 200);
     wheelNav.colors = platformColor.wheelcolors;
     wheelNav.slicePathFunction = slicePath().DonutSlice;
     wheelNav.slicePathCustom = slicePath().DonutSliceCustomization();
     wheelNav.sliceSelectedPathCustom = wheelNav.slicePathCustom;
     wheelNav.sliceInitPathCustom = wheelNav.slicePathCustom;
     wheelNav.clickModeRotate = false;
-    wheelNav.navItemsSize = 30;
+    wheelNav.navItemsSize = 35;
 
     const exitMenu = () => {
         menuDiv.style.display = 'none';
@@ -1975,9 +1974,8 @@ const piemenuNumber2 = (that, wheelValues, selectedValue) => {
         }
     };
 
-    // Click outside to close
     const handleOutside = (e) => {
-        if (!menuDiv.contains(e.target) && e.target !== that._dissectNumber) {
+        if (!menuDiv.contains(e.target)) {
             exitMenu();
         }
     };
@@ -1985,82 +1983,106 @@ const piemenuNumber2 = (that, wheelValues, selectedValue) => {
         document.addEventListener('click', handleOutside);
     }, 0);
 
-    // Manual entry input
-    const inputDiv = document.createElement('div');
-    inputDiv.style.position = 'absolute';
-    inputDiv.style.top = '50%';
-    inputDiv.style.left = '50%';
-    inputDiv.style.transform = 'translate(-50%, -50%)';
-    inputDiv.style.width = '55px';
-    inputDiv.style.height = '20px';
-    inputDiv.style.display = 'flex';
-    inputDiv.style.alignItems = 'center';
-    inputDiv.style.justifyContent = 'center';
+    const innerDiv = document.createElement('div');
+    innerDiv.style.position = 'absolute';
+    innerDiv.style.top = '50%';
+    innerDiv.style.left = '50%';
+    innerDiv.style.transform = 'translate(-50%, -50%)';
+    innerDiv.style.width = '80px';
+    innerDiv.style.height = '80px';
+    innerDiv.style.borderRadius = '50%';
+    innerDiv.style.overflow = 'hidden';
+    innerDiv.style.background = '#fff';
+    innerDiv.style.display = 'flex';
+    innerDiv.style.justifyContent = 'center';
+    innerDiv.style.alignItems = 'center';
+    innerDiv.style.boxShadow = '0 0 5px rgba(0,0,0,0.3)';
 
-    const input = document.createElement('input');
-    input.type = 'number';
-    input.min = '2';
-    input.max = '128';
-    input.value = that._dissectNumber.value;
-    input.style.width = '100%';
-    input.style.height = '100%';
-    input.style.textAlign = 'center';
-    input.style.fontSize = '16px';
-    input.style.border = '1px solid #ccc';
-    input.style.borderRadius = '5px';
-    input.style.display = 'flex';
-    input.style.alignItems = 'center';
-    input.style.justifyContent = 'center';
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("width", "80");
+    svg.setAttribute("height", "80");
+    svg.setAttribute("viewBox", "0 0 80 80");
 
-    input.oninput = () => {
-        if (input.value.length > 3) {
-            input.value = input.value.slice(0, 3);
+    const createSlice = (d, color, text, x, y, onClick) => {
+        const group = document.createElementNS(svgNS, "g");
+        const slice = document.createElementNS(svgNS, "path");
+        slice.setAttribute("d", d);
+        slice.setAttribute("fill", color);
+        slice.style.cursor = "pointer";
+        slice.addEventListener("click", onClick);
+        group.appendChild(slice);
+        const textEl = document.createElementNS(svgNS, "text");
+        textEl.setAttribute("x", x)
+        textEl.setAttribute("y", y);
+        textEl.setAttribute("text-anchor", "middle");
+        textEl.setAttribute("dominant-baseline", "middle");
+        textEl.setAttribute("fill", "#333");
+        textEl.setAttribute("font-size", "16px");
+        textEl.setAttribute("font-weight", "bold");
+        textEl.textContent = text;
+        group.appendChild(textEl);
+        return group;
+    };
+    
+    const plusSlice = createSlice(
+        "M40,40 L40,0 A40,40 0 0,1 80,40 Z", 
+        "rgba(144, 238, 144, 0.8)", 
+        "+",
+        60, 27, 
+        () => {
+            let value = parseInt(that._dissectNumber.value);
+            that._dissectNumber.value = Math.min(value + 1, 128);
         }
-        let value = parseInt(input.value);
-        if (value < 2) input.value = '2';
-        if (value > 128) input.value = '128';
-    };
+    );
+    
+    const minusSlice = createSlice(
+        "M40,40 L0,40 A40,40 0 0,1 40,0 Z", 
+        "rgba(173, 216, 230, 0.8)", 
+        "-",
+        20, 25,  
+        () => {
+            let value = parseInt(that._dissectNumber.value);
+            that._dissectNumber.value = Math.max(value - 1, 2);
+        }
+    );
+    
+    const exitSlice = createSlice(
+        "M40,40 L40,80 A40,4 0 0,1 80,40 Z",
+        "rgba(255, 182, 193, 0.8)", 
+        "×",
+        20, 60,  
+        exitMenu
+    );
+    
+    svg.appendChild(plusSlice);
+    svg.appendChild(minusSlice);
+    svg.appendChild(exitSlice);
 
-    input.onchange = () => {
-        that._dissectNumber.value = input.value;
-        exitMenu();
-    };
+    innerDiv.appendChild(svg);
+    menuDiv.appendChild(innerDiv);
 
-    inputDiv.appendChild(input);
-    menuDiv.appendChild(inputDiv);
-
-
-    // Enter key closes menu
     const handleKeydown = (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
-            input.blur();
             exitMenu();
         }
     };
     document.addEventListener('keydown', handleKeydown);
 
-    // Configure center button for close
-    wheelNav.centerButton = true;
-    wheelNav.centerButtonRadius = 25;
-    wheelNav.centerButtonHover = true;
-    wheelNav.centerButtonClickable = true;
-    wheelNav.centerButtonCallback = exitMenu;
-    wheelNav.centerButtonContent = '×';
-
+    wheelNav.centerButton = false;
     const labels = values.map(v => v.toString());
     wheelNav.initWheel(labels);
     wheelNav.createWheel();
 
-    // Add click handlers for numbers
     for (let i = 0; i < values.length; i++) {
         wheelNav.navItems[i].navigateFunction = () => {
             that._dissectNumber.value = values[i];
             exitMenu();
         };
     }
-
 };
+
 
 const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     // input form and  wheelNav pie menu for setcolor selection

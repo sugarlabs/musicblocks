@@ -564,7 +564,7 @@ class RhythmRuler {
         this._dissectNumber.onclick = () => {
             // Put a limit on the size (2 <--> 128).
             const values = activity.beginnerMode ? [2, 3, 4] : [2, 3, 4, 5, 7];
-            piemenuNumber2(this, values, this._dissectNumber.value);
+            piemenuNumberRhytm(this, values, this._dissectNumber.value);
             
             this._dissectNumber.onmouseout = () => {
                 this._dissectNumber.value = Math.max(this._dissectNumber.value, 2);
