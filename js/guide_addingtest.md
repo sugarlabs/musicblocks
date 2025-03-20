@@ -40,7 +40,8 @@ npm test -- --verbose
 - All test files **must be placed inside the `_tests_` folder of the respective directory**.  
 - Follow the naming convention: **`<filename>.test.js`**.  
 - Ensure **100% function coverage** when adding tests.  
-- **Mock dependencies** where necessary to isolate unit tests.  
+- **Mock dependencies** where necessary to isolate unit tests.
+- **Whenever a function is added or its functionality is changed, ensure that the corresponding test cases are added, updated, or refactored.** This ensures that the test suite remains accurate and reliable.  
 
 ### 🔄 Import/Export Conventions  
 - The Music Blocks repository **strictly follows `const` for imports and exports**.  
@@ -81,7 +82,8 @@ describe('My Function Tests', () => {
 ❌ Placing test files **outside** `_tests_` (always keep them inside).  
 ❌ Using `var` or `let` for imports (always use `const`).  
 ❌ Forgetting to mock dependencies when needed.  
-❌ Not handling async tests properly (use `async/await` or `done`).  
+❌ Not handling async tests properly (use `async/await` or `done`). 
+❌ **Neglecting to update or refactor test cases when adding or modifying functions.**
 
 ## 🚀 Running Specific Tests  
 To run a specific test file:  
@@ -107,4 +109,5 @@ npm test -- -u
 - Ensure all tests pass before creating a PR.  
 - Maintain code readability and add comments where needed.  
 - Adhere to the **import/export conventions** stated above.  
-- **Do not merge** without proper test coverage.  
+- **Do not merge** without proper test coverage.
+- **Always update or refactor test cases when adding or modifying functions to ensure the test suite remains accurate and reliable.**
