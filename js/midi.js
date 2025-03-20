@@ -14,7 +14,6 @@
 /* exported  transcribeMidi*/
 
 
-const MAX_NOTEBLOCKS = 100;
 const defaultTempo = 90;
 
 const standardDurations = [
@@ -43,7 +42,7 @@ const getClosestStandardNoteValue = (duration) => {
     return closest.value.split("/").map(Number);
 };
 
-const transcribeMidi = async (midi) => {
+const transcribeMidi = async (midi, maxNoteBlocks) => {
     const currentMidi = midi;
     const drumMidi = getReverseDrumMidi();
     const isPercussion = [];
@@ -264,8 +263,8 @@ const transcribeMidi = async (midi) => {
                 addNewActionBlock(isLastNoteInSched);
             }
 
-            if (totalnoteblockCount >= MAX_NOTEBLOCKS) {
-                activity.textMsg("MIDI file is too large.. Generating only 100 noteblocks");
+            if (totalnoteblockCount >= maxNoteBlocks) {
+                activity.textMsg(`MIDI file is too large. Generating only ${maxNoteBlocks} noteblocks`);
                 stopProcessing = true;
                 break;
             }

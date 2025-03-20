@@ -2097,6 +2097,9 @@ function TemperamentWidget() {
         if ((this._playing && currentTime - this.lastClickTime > Singer.defaultBPMFactor * 1000 * duration) || (this.inbetween)) {
             that.playbackForward = true;
             this.inbetween = false;
+            for (let i = 0; i <= this.pitchNumber; i++) {
+                docById("pitchNumber_" + i).style.background = platformColor.selectorBackground;
+            }
             __playLoop(0);
         }
         this.lastClickTime = currentTime;

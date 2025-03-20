@@ -150,6 +150,28 @@ body:not(.dark) #helpfulSearchDiv {
   text-align: left;
 }
 
+.block-count-dropdown {
+  padding: 4px !important;
+  font-size: 16px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background: #dedededd;
+  cursor: pointer;
+  width: fit-content;
+  text-align: center;
+}
+
+.block-count-dropdown.expanded {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.message-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .close {
   color: #aaa;
   float: right;
