@@ -35,7 +35,7 @@ describe("RhythmBlocksAPI", () => {
         rhythmBlocksAPI = new RhythmBlocksAPI();
         rhythmBlocksAPI.turIndex = 0;
         rhythmBlocksAPI.runCommand = jest.fn();
-        rhythmBlocksAPI.ENDFLOWCOMMAND = 'END';
+        rhythmBlocksAPI.ENDFLOWCOMMAND = "END";
     });
 
     afterEach(() => {

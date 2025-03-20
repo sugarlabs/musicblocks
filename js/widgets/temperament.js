@@ -62,7 +62,7 @@ function TemperamentWidget() {
 
     let temperamentCell = null;
 
-     /**
+    /**
      * Current temperament.
      * @type {string|null}
      */
@@ -80,13 +80,13 @@ function TemperamentWidget() {
      */
     this.notes = [];
 
-     /**
+    /**
      * Array of frequencies.
      * @type {number[]}
      */
     this.frequencies = [];
 
-     /**
+    /**
      * Array of intervals.
      * @type {number[]}
      */
@@ -128,7 +128,7 @@ function TemperamentWidget() {
      */
     this.circleIsVisible = true;
 
-     /**
+    /**
      * Flag indicating the playback direction.
      * @type {boolean}
      */

@@ -635,7 +635,7 @@ const piemenuPitches = (
         // Update the block's displayed text with the note and accidental
         if (selectedAccidental === "♮" || selectedAccidental === "") {
             // Natural or no accidental: display only the note
-            that.text.text = selectedNote; 
+            that.text.text = selectedNote;
         } else {
             // Combine note and accidental for display
             that.text.text = selectedNote + selectedAccidental;
@@ -3429,7 +3429,7 @@ const piemenuBlockContext = (block) => {
         // prompting a notification on deleting any block 
         activity.textMsg(
             _("You can restore deleted blocks from the trash with the Restore From Trash button."), 3000
-        );       
+        );
     };
 
     wheel.navItems[3].navigateFunction = () => {

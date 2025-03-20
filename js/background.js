@@ -34,7 +34,7 @@ if (navigator.userAgent.search("Firefox") !== -1) {
         window.open(chrome.runtime.getURL("index.html"));
     });
 }
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         isFirefox: navigator.userAgent.search("Firefox") !== -1,
         browserAction: navigator.userAgent.search("Firefox") !== -1 ? browser.browserAction : chrome.browserAction,

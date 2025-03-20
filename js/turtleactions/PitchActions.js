@@ -153,7 +153,7 @@ function setupPitchActions(activity) {
             );
 
             Singer.processPitch(activity, noteObj[0], noteObj[1], cents, turtle, blk);
-            return;            
+            return;
         }
 
         /**
@@ -642,6 +642,6 @@ function setupPitchActions(activity) {
         }
     };
 }
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
     module.exports = setupPitchActions;
 }

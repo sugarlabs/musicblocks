@@ -34,8 +34,8 @@ describe("OrnamentBlocksAPI", () => {
 
     beforeEach(() => {
         ornamentBlocksAPI = new OrnamentBlocksAPI();
-        ornamentBlocksAPI.turIndex = 0; 
-        ornamentBlocksAPI.runCommand = jest.fn(); 
+        ornamentBlocksAPI.turIndex = 0;
+        ornamentBlocksAPI.runCommand = jest.fn();
         ornamentBlocksAPI.ENDFLOWCOMMAND = "endFlow";
     });
 

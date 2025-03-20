@@ -83,7 +83,7 @@ global.last = jest.fn((array) => array[array.length - 1]);
 global.Image = jest.fn(() => {
     const img = {};
     img.onload = jest.fn();
-    Object.defineProperty(img, 'src', {
+    Object.defineProperty(img, "src", {
         set: function () {
             img.onload(); // Simulate the onload when src is set
         },

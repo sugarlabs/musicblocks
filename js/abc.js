@@ -444,6 +444,6 @@ const saveAbcOutput = function(activity) {
     return activity.logo.notationOutput;
 };
 
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
     module.exports = { getABCHeader, processABCNotes, saveAbcOutput, ACCIDENTAL_MAP, OCTAVE_NOTATION_MAP };
 }

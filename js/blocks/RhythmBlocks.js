@@ -762,7 +762,7 @@ function setupRhythmBlocks(activity) {
                 name:
                     this.lang === "ja"
                         ? //.TRANS: Japanese only: note value block for drum
-                          _("note value drum")
+                        _("note value drum")
                         : _("note value") + " " + _("drum"),
                 args: 1,
                 canCollapse: true

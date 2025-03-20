@@ -20,9 +20,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const { setupHeapBlocks } = require('../HeapBlocks');
+const { setupHeapBlocks } = require("../HeapBlocks");
 
-describe('setupHeapBlocks', () => {
+describe("setupHeapBlocks", () => {
     let activity, logo, createdBlocks;
 
     class DummyValueBlock {
@@ -102,8 +102,8 @@ describe('setupHeapBlocks', () => {
         logo.turtleHeaps[turtle] = heapArray;
     }
 
-    describe('HeapBlock', () => {
-        it('should return JSON string of the turtle heap when not in status matrix', () => {
+    describe("HeapBlock", () => {
+        it("should return JSON string of the turtle heap when not in status matrix", () => {
             const turtle = 0;
             setTurtleHeap(turtle, [1, 2, 3]);
             const heapBlock = createdBlocks["heap"];
@@ -112,7 +112,7 @@ describe('setupHeapBlocks', () => {
             expect(result).toEqual(JSON.stringify([1, 2, 3]));
         });
 
-        it('should push to statusFields when in status matrix and connected to print', () => {
+        it("should push to statusFields when in status matrix and connected to print", () => {
             const turtle = 0;
             setTurtleHeap(turtle, [4, 5]);
             const heapBlock = createdBlocks["heap"];
@@ -271,37 +271,37 @@ describe('setupHeapBlocks', () => {
             setTurtleHeap(0, [1, 2, 3]);
         });
 
-        it('should call errorMsg if any argument is null', () => {
+        it("should call errorMsg if any argument is null", () => {
             setHeapEntryBlock.flow([null, 99], logo, 0, blk);
             expect(activity.errorMsg).toHaveBeenCalledWith("No input provided", blk);
         });
 
-        it('should call errorMsg if arguments are not numbers', () => {
+        it("should call errorMsg if arguments are not numbers", () => {
             setHeapEntryBlock.flow(["a", 99], logo, 0, blk);
             expect(activity.errorMsg).toHaveBeenCalledWith("Not a number", blk);
         });
 
-        it('should adjust index < 1 and set the value at index 1', () => {
+        it("should adjust index < 1 and set the value at index 1", () => {
             setHeapEntryBlock.flow([0, 55], logo, 0, blk);
             expect(activity.errorMsg).toHaveBeenCalledWith("Index must be > 0.");
             expect(logo.turtleHeaps[0][0]).toEqual(55);
         });
 
-        it('should adjust index > 1000 and set the value at index 1000', () => {
+        it("should adjust index > 1000 and set the value at index 1000", () => {
             setHeapEntryBlock.flow([1500, 77], logo, 0, blk);
             expect(activity.errorMsg).toHaveBeenCalledWith("Maximum heap size is 1000.");
             expect(logo.turtleHeaps[0].length).toEqual(1000);
             expect(logo.turtleHeaps[0][999]).toEqual(77);
         });
 
-        it('should set the heap entry for valid input', () => {
+        it("should set the heap entry for valid input", () => {
             setHeapEntryBlock.flow([2, 88], logo, 0, blk);
             expect(logo.turtleHeaps[0][1]).toEqual(88);
         });
     });
 
-    describe('PopBlock', () => {
-        it('should pop and return the top value from the heap if nonempty', () => {
+    describe("PopBlock", () => {
+        it("should pop and return the top value from the heap if nonempty", () => {
             setTurtleHeap(0, [100, 200, 300]);
             const popBlock = createdBlocks["pop"];
             const result = popBlock.arg(logo, 0);
@@ -309,7 +309,7 @@ describe('setupHeapBlocks', () => {
             expect(logo.turtleHeaps[0]).toEqual([100, 200]);
         });
 
-        it('should call errorMsg and return 0 if the heap is empty', () => {
+        it("should call errorMsg and return 0 if the heap is empty", () => {
             setTurtleHeap(0, []);
             const popBlock = createdBlocks["pop"];
             const result = popBlock.arg(logo, 0);
@@ -318,15 +318,15 @@ describe('setupHeapBlocks', () => {
         });
     });
 
-    describe('PushBlock', () => {
-        it('should push a value onto the heap', () => {
+    describe("PushBlock", () => {
+        it("should push a value onto the heap", () => {
             setTurtleHeap(0, [5]);
             const pushBlock = createdBlocks["push"];
             pushBlock.flow([42], logo, 0, 70);
             expect(logo.turtleHeaps[0]).toEqual([5, 42]);
         });
 
-        it('should call errorMsg if the value to push is null', () => {
+        it("should call errorMsg if the value to push is null", () => {
             setTurtleHeap(0, [5]);
             const pushBlock = createdBlocks["push"];
             pushBlock.flow([null], logo, 0, 70);

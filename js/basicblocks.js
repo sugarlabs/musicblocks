@@ -117,7 +117,7 @@ const initBasicProtoBlocks = (activity) => {
         }
     }
 };
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         initBasicProtoBlocks,
         BACKWARDCOMPATIBILIYDICT,

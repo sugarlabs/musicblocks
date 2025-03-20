@@ -51,6 +51,6 @@ class DictBlocksAPI {
         return this.runCommand("getValue", [args[1], args[0], this.turIndex]);
     }
 }
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
     module.exports = DictBlocksAPI;
 }
