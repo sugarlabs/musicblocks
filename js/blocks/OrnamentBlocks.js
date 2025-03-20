@@ -744,3 +744,7 @@ function setupOrnamentBlocks(activity) {
     new NewSlurBlock().setup(activity);
     new NewStaccatoBlock().setup(activity);
 }
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupOrnamentBlocks };
+}
