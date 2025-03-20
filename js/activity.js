@@ -5726,7 +5726,9 @@ class Activity {
         };
 
         const doAnalytics = (activity) => {
-            activity.statsWindow = new StatsWindow(activity);
+            if (!activity.statsWindow || !activity.statsWindow.isOpen) {
+                activity.statsWindow = new StatsWindow(activity);
+            }
         };
 
         /*
