@@ -1357,7 +1357,7 @@ class Activity {
             const message = document.createElement("p");
             message.textContent = _("Set the max blocks to generate :");
             message.classList.add("modal-message");
-            container.appendChild(message)
+            container.appendChild(message);
 
             const select = document.createElement("select");
             select.classList.add("block-count-dropdown");
@@ -1392,7 +1392,7 @@ class Activity {
             modal.appendChild(cancelBtn);
 
             document.body.appendChild(modal);
-        }
+        };
 
         /*
          * Clears "canvas"
@@ -6638,7 +6638,7 @@ class Activity {
                     // eslint-disable-next-line no-console
                     console.debug(midi);
                     midiImportBlocks(midi);
-                }
+                };
 
                 // Music Block Parser from abc to MB
                 abcReader.onload = (event) => {
