@@ -2143,7 +2143,7 @@ const REVERSE_DRUM_MIDI_MAP = {
  */
 const getMidiInstrument = () => {
     return MIDI_INSTRUMENTS;
-}
+};
 
 /**
  * Get midi map for Drums.
@@ -2152,7 +2152,7 @@ const getMidiInstrument = () => {
  */
 const getMidiDrum = () => {
     return DRUM_MIDI_MAP;
-}
+};
 
 /**
  * Get reversed midi map for drum.
@@ -2161,7 +2161,7 @@ const getMidiDrum = () => {
  */
 const getReverseDrumMidi = () => {
     return REVERSE_DRUM_MIDI_MAP;
-}
+};
 
 /**
  * Set the global octave ratio.
@@ -3858,9 +3858,9 @@ const GetNotesForInterval = (tur) => {
  * @returns {string} - The Base64 encoded string.
  */
 function base64Encode(str) {
-    let encoder = new TextEncoder();
-    let uint8Array = encoder.encode(str);
-    let binaryString = String.fromCharCode(...uint8Array);
+    const encoder = new TextEncoder();
+    const uint8Array = encoder.encode(str);
+    const binaryString = String.fromCharCode(...uint8Array);
     return binaryString;
 }
 
@@ -5994,7 +5994,7 @@ const getPitchInfo = (activity, type, currentNote, tur) => {
         console.debug("Waiting for note to play");
     }
 };
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
     module.exports = {
         updateTemperaments,
         scaleDegreeToPitchMapping,
@@ -6038,7 +6038,6 @@ if (typeof module !== 'undefined' && module.exports) {
         deleteTemperamentFromList,
         addTemperamentToDictionary,
         updateTemperaments,
-    
         DEFAULTINVERT,
         DEFAULTMODE,
         customMode,

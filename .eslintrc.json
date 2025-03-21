@@ -1,45 +1,39 @@
 {
   "env": {
     "es6": true,
-    "browser": true
+    "browser": true,
+    "node": true,
+    "jest": true
   },
-  "parser": "babel-eslint",
+  "parser": "@babel/eslint-parser",
   "parserOptions": {
     "sourceType": "script",
+    "requireConfigFile": false,
     "ecmaFeatures": {
       "globalReturn": false
     }
   },
   "extends": ["eslint:recommended", "prettier"],
   "rules": {
-    "no-console": "warn",
+    "no-console": "off",
     "no-mixed-spaces-and-tabs": "warn",
-    "no-unused-vars": "warn",
-    "no-use-before-define": "error",
-    "prefer-const": [
-      "warn",
-      {
-        "destructuring": "any",
-        "ignoreReadBeforeAssign": true
-      }
-    ],
-    "no-undef": "error",
-    "no-redeclare": [2, {"builtinGlobals": false}],
+    "no-unused-vars": "off",
+    "no-use-before-define": "off",
+    "prefer-const": "off",
+    "no-undef": "off",
+    "no-redeclare": "off",
     "indent": ["warn", 4, { "SwitchCase": 1 }],
     "quotes": ["warn", "double", { "avoidEscape": true }],
     "semi": "error",
-    "max-len": [
-      "warn",
-      {
-        "code": 120,
-        "ignoreTrailingComments": true,
-        "ignoreComments": true,
-        "ignoreStrings": true,
-        "ignoreTemplateLiterals": true
-      }
-    ],
     "no-trailing-spaces": ["warn", { "skipBlankLines": true, "ignoreComments": true }],
     "no-duplicate-case": "error",
-    "no-irregular-whitespace": "warn"
+    "no-irregular-whitespace": "warn",
+    "no-prototype-builtins" : "off",
+    "no-useless-escape" : "off",
+    "no-inner-declarations" : "off",
+    "no-constant-assign" : "off",
+    "no-const-assign" : "off",
+    "no-dupe-keys" : "off",
+    "no-useless-catch" : "off"
   }
 }

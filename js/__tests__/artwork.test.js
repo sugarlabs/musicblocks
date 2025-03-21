@@ -17,8 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-global._THIS_IS_TURTLE_BLOCKS_ = true;  
-const { showMaterialHighlight, hideButtonHighlight, hidePaletteNameDisplay, COLLAPSEBUTTONXOFF, STANDARDBLOCKHEIGHT, FILLCOLORS, TURTLESVG } = require('../artwork');
+global._THIS_IS_TURTLE_BLOCKS_ = true;
+const { showMaterialHighlight, hideButtonHighlight, hidePaletteNameDisplay, COLLAPSEBUTTONXOFF, STANDARDBLOCKHEIGHT, FILLCOLORS, TURTLESVG } = require("../artwork");
 
 global.createjs = {
     Shape: jest.fn(() => ({
@@ -35,7 +35,7 @@ global.createjs = {
     Ease: { circInOut: jest.fn() }
 };
 
-describe('artwork.js Test Suite', () => {
+describe("artwork.js Test Suite", () => {
     let mockStage;
 
     beforeEach(() => {
@@ -45,16 +45,16 @@ describe('artwork.js Test Suite', () => {
         };
     });
 
-    test('showMaterialHighlight creates highlight and active shapes', () => {
+    test("showMaterialHighlight creates highlight and active shapes", () => {
         const event = { rawX: 100, rawY: 100 };
         const scale = 1;
         const result = showMaterialHighlight(50, 50, 10, event, scale, mockStage);
-        expect(result).toHaveProperty('highlight');
-        expect(result).toHaveProperty('active');
+        expect(result).toHaveProperty("highlight");
+        expect(result).toHaveProperty("active");
         expect(mockStage.addChild).toHaveBeenCalledWith(result.highlight, result.active);
     });
 
-    test('hideButtonHighlight removes highlight properly', () => {
+    test("hideButtonHighlight removes highlight properly", () => {
         jest.useFakeTimers();
         const circles = { highlight: {}, active: {} };
         hideButtonHighlight(circles, mockStage);
@@ -63,7 +63,7 @@ describe('artwork.js Test Suite', () => {
         jest.useRealTimers();
     });
 
-    test('hidePaletteNameDisplay removes palette text after delay', () => {
+    test("hidePaletteNameDisplay removes palette text after delay", () => {
         jest.useFakeTimers();
         const paletteText = {};
         hidePaletteNameDisplay(paletteText, mockStage);
@@ -72,10 +72,10 @@ describe('artwork.js Test Suite', () => {
         jest.useRealTimers();
     });
 
-    test('Constants are correctly defined', () => {
-        expect(typeof COLLAPSEBUTTONXOFF).toBe('number');
-        expect(typeof STANDARDBLOCKHEIGHT).toBe('number');
+    test("Constants are correctly defined", () => {
+        expect(typeof COLLAPSEBUTTONXOFF).toBe("number");
+        expect(typeof STANDARDBLOCKHEIGHT).toBe("number");
         expect(Array.isArray(FILLCOLORS)).toBe(true);
-        expect(typeof TURTLESVG).toBe('string');
+        expect(typeof TURTLESVG).toBe("string");
     });
 });

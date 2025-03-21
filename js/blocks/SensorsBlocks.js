@@ -718,7 +718,7 @@ function setupSensorsBlocks(activity) {
          * @returns {number} - The argument value representing the color.
          */
         arg(logo, turtle) {
-            const requiredTurtle = activity.turtles.getTurtle(turtle); ; 
+            const requiredTurtle = activity.turtles.getTurtle(turtle); ;
             const wasVisible = requiredTurtle.container.visible;
             requiredTurtle.container.visible = false;
             const x = requiredTurtle.container.x;

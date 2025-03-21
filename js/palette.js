@@ -111,7 +111,7 @@ class Palettes {
             const element = document.createElement("div");
             element.id = "palette";
             element.setAttribute("class", "disable_highlighting");
-            element.classList.add('flex-palette')
+            element.classList.add("flex-palette");
             element.setAttribute(
                 "style",
                 "position: absolute; z-index: 1000; left :0px; top:" + this.top + "px"
@@ -336,10 +336,10 @@ class Palettes {
         row.style.alignItems = "center";
         row.style.width = "126px";
         row.style.backgroundColor = platformColor.paletteBackground;
-        row.addEventListener('mouseover', () => {
+        row.addEventListener("mouseover", () => {
             row.style.backgroundColor = platformColor.hoverColor;
         });
-        row.addEventListener('mouseout', () => {
+        row.addEventListener("mouseout", () => {
             row.style.backgroundColor = platformColor.paletteBackground;
         });
 
@@ -410,7 +410,7 @@ class Palettes {
             for (const name in this.dict) {
                 if (this.dict.hasOwnProperty(name)) {
                     const palette = this.dict[name];
-                    if (palette && typeof palette.hideMenu === 'function') {
+                    if (palette && typeof palette.hideMenu === "function") {
                         palette.hideMenu();
                     }
                 }
@@ -432,7 +432,7 @@ class Palettes {
             const element = document.createElement("div");
             element.id = "palette";
             element.setAttribute("class", "disable_highlighting");
-            element.classList.add('flex-palette');
+            element.classList.add("flex-palette");
             element.setAttribute(
                 "style",
                 `position: fixed; z-index: 1000; left: 0px; top: ${60+this.top}px; overflow-y: auto;`
@@ -458,7 +458,7 @@ class Palettes {
             document.body.appendChild(element);
 
         } catch (e) {
-            console.error('Error clearing palettes:', e);
+            console.error("Error clearing palettes:", e);
         }
     }
 

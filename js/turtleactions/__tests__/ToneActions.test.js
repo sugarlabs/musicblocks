@@ -17,9 +17,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const setupToneActions = require('../ToneActions');
+const setupToneActions = require("../ToneActions");
 
-describe('setupToneActions', () => {
+describe("setupToneActions", () => {
     let activity;
     let targetTurtle;
 
@@ -29,7 +29,7 @@ describe('setupToneActions', () => {
         };
         global.instrumentsEffects = {
             0: {
-                'default-voice': {
+                "default-voice": {
                     vibratoActive: false,
                     vibratoIntensity: [],
                     vibratoFrequency: 0,
@@ -37,13 +37,13 @@ describe('setupToneActions', () => {
             },
         };
         global.VOICENAMES = {
-            Piano: ['piano', 'grand-piano'],
-            Violin: ['violin', 'acoustic-violin'],
+            Piano: ["piano", "grand-piano"],
+            Violin: ["violin", "acoustic-violin"],
         };
         global.CUSTOMSAMPLES = {};
-        global.DEFAULTVOICE = 'default-voice';
+        global.DEFAULTVOICE = "default-voice";
         global.last = jest.fn(array => array[array.length - 1]);
-        global._ = jest.fn(msg => msg); 
+        global._ = jest.fn(msg => msg);
         global.instrumentsEffects = {};
     });
 
@@ -68,15 +68,15 @@ describe('setupToneActions', () => {
                 notation: {
                     notationSwing: jest.fn(),
                     notationVoices: jest.fn(),
-                    notationBeginHarmonics: jest.fn(), 
+                    notationBeginHarmonics: jest.fn(),
                     notationEndHarmonics: jest.fn(),
                 },
                 timbre: {
-                    instrumentName: 'default-voice',
+                    instrumentName: "default-voice",
                     FMSynthParams: [],
                     AMSynthParams: [],
                     duoSynthParams: [],
-                    osc: [], 
+                    osc: [],
                     fmSynthParamvals: {},
                     amSynthParamvals: {},
                     duoSynthParamVals: {},
@@ -84,9 +84,9 @@ describe('setupToneActions', () => {
                     AMSynthesizer: [],
                     duoSynthesizer: [],
                     vibratoEffect: [],
-                    vibratoParams: [], 
+                    vibratoParams: [],
                 },
-                inTimbre: true, 
+                inTimbre: true,
                 stopTurtle: false,
             },
             errorMsg: jest.fn(),
@@ -95,8 +95,8 @@ describe('setupToneActions', () => {
         targetTurtle = {
             singer: {
                 instrumentNames: [],
-                synthVolume: { 'default-voice': [1] },
-                crescendoInitialVolume: { 'default-voice': [1] },
+                synthVolume: { "default-voice": [1] },
+                crescendoInitialVolume: { "default-voice": [1] },
                 vibratoIntensity: [],
                 vibratoRate: [],
                 chorusRate: [],
@@ -115,7 +115,7 @@ describe('setupToneActions', () => {
 
         global.instrumentsEffects = {
             0: {
-                'default-voice': {
+                "default-voice": {
                     vibratoActive: false,
                     vibratoIntensity: [],
                     vibratoFrequency: [],
@@ -126,20 +126,20 @@ describe('setupToneActions', () => {
         setupToneActions(activity);
     });
 
-    it('should set timbre correctly', () => {
-        Singer.ToneActions.setTimbre('piano', 0, 1);
-        expect(targetTurtle.singer.instrumentNames).toContain('grand-piano');
-        expect(activity.logo.synth.loadSynth).toHaveBeenCalledWith(0, 'grand-piano');
+    it("should set timbre correctly", () => {
+        Singer.ToneActions.setTimbre("piano", 0, 1);
+        expect(targetTurtle.singer.instrumentNames).toContain("grand-piano");
+        expect(activity.logo.synth.loadSynth).toHaveBeenCalledWith(0, "grand-piano");
     });
 
-    it('should handle custom sample timbres correctly', () => {
-        const customSample = ['custom1', 'sample1', 'sample2', 'sample3'];
+    it("should handle custom sample timbres correctly", () => {
+        const customSample = ["custom1", "sample1", "sample2", "sample3"];
         Singer.ToneActions.setTimbre(customSample, 0, 1);
-        expect(global.CUSTOMSAMPLES['customsample_custom1']).toEqual(['sample1', 'sample2', 'sample3']);
-        expect(targetTurtle.singer.instrumentNames).toContain('customsample_custom1');
+        expect(global.CUSTOMSAMPLES["customsample_custom1"]).toEqual(["sample1", "sample2", "sample3"]);
+        expect(targetTurtle.singer.instrumentNames).toContain("customsample_custom1");
     });
 
-    it('should apply vibrato correctly', () => {
+    it("should apply vibrato correctly", () => {
         const intensity = 50;
         const rate = 10;
         const blk = 1;
@@ -150,41 +150,41 @@ describe('setupToneActions', () => {
         expect(targetTurtle.singer.vibratoRate).toContain(1 / rate);
         expect(activity.logo.timbre.vibratoEffect).toContain(blk); // Ensure vibratoEffect is updated
         expect(activity.logo.timbre.vibratoParams).toContain(intensity); // Ensure vibratoParams is updated
-        expect(global.instrumentsEffects[0]['default-voice'].vibratoActive).toBe(true); // Ensure vibratoActive is true
+        expect(global.instrumentsEffects[0]["default-voice"].vibratoActive).toBe(true); // Ensure vibratoActive is true
     });
 
-    it('should show error for invalid vibrato intensity', () => {
+    it("should show error for invalid vibrato intensity", () => {
         Singer.ToneActions.doVibrato(150, 5, 0, 1);
-        expect(activity.errorMsg).toHaveBeenCalledWith('Vibrato intensity must be between 1 and 100.', 1);
+        expect(activity.errorMsg).toHaveBeenCalledWith("Vibrato intensity must be between 1 and 100.", 1);
         expect(activity.logo.stopTurtle).toBe(true);
     });
 
-    it('should apply chorus effect correctly', () => {
+    it("should apply chorus effect correctly", () => {
         Singer.ToneActions.doChorus(1.5, 20, 50, 0, 1);
         expect(targetTurtle.singer.chorusRate).toContain(1.5);
         expect(targetTurtle.singer.delayTime).toContain(20);
         expect(targetTurtle.singer.chorusDepth).toContain(0.5);
     });
 
-    it('should apply phaser effect correctly', () => {
+    it("should apply phaser effect correctly", () => {
         Singer.ToneActions.doPhaser(2, 3, 100, 0, 1);
         expect(targetTurtle.singer.rate).toContain(2);
         expect(targetTurtle.singer.octaves).toContain(3);
         expect(targetTurtle.singer.baseFrequency).toContain(100);
     });
 
-    it('should apply tremolo effect correctly', () => {
+    it("should apply tremolo effect correctly", () => {
         Singer.ToneActions.doTremolo(5, 50, 0, 1);
         expect(targetTurtle.singer.tremoloFrequency).toContain(5);
         expect(targetTurtle.singer.tremoloDepth).toContain(0.5);
     });
 
-    it('should apply distortion effect correctly', () => {
+    it("should apply distortion effect correctly", () => {
         Singer.ToneActions.doDistortion(50, 0, 1);
         expect(targetTurtle.singer.distortionAmount).toContain(0.5);
     });
     
-    it('should apply harmonic effect correctly', () => {
+    it("should apply harmonic effect correctly", () => {
         const blk = 1;
         const harmonic = 2; // Adjust the harmonic to match the expected output
     
@@ -198,17 +198,17 @@ describe('setupToneActions', () => {
     
     
 
-    it('should define FM synth correctly', () => {
+    it("should define FM synth correctly", () => {
         Singer.ToneActions.defFMSynth(10, 0, 1);
         expect(activity.logo.timbre.FMSynthParams).toContain(10);
     });
 
-    it('should define AM synth correctly', () => {
+    it("should define AM synth correctly", () => {
         Singer.ToneActions.defAMSynth(5, 0, 1);
         expect(activity.logo.timbre.AMSynthParams).toContain(5);
     });
 
-    it('should define Duo synth correctly', () => {
+    it("should define Duo synth correctly", () => {
         Singer.ToneActions.defDuoSynth(10, 20, 0, 1);
         expect(activity.logo.timbre.duoSynthParams).toContain(10);
         expect(activity.logo.timbre.duoSynthParams).toContain(0.2);

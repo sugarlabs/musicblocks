@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const { getClosestStandardNoteValue, transcribeMidi } = require('../midi');
+const { getClosestStandardNoteValue, transcribeMidi } = require("../midi");
 
 const mockMidi = {
     header: {
@@ -27,41 +27,41 @@ const mockMidi = {
     },
     tracks: [
         {
-            instrument: { name: 'acoustic grand piano', family: 'piano', number: 0, percussion: false },
+            instrument: { name: "acoustic grand piano", family: "piano", number: 0, percussion: false },
             channel: 1,
             notes: [
-                { name: 'C4', midi: 60, time: 0, duration: 0.5, velocity: 0.8 },
-                { name: 'E4', midi: 64, time: 0.5, duration: 0.75, velocity: 0.9 },
-                { name: 'G4', midi: 67, time: 1.25, duration: 0.5, velocity: 0.85 }
+                { name: "C4", midi: 60, time: 0, duration: 0.5, velocity: 0.8 },
+                { name: "E4", midi: 64, time: 0.5, duration: 0.75, velocity: 0.9 },
+                { name: "G4", midi: 67, time: 1.25, duration: 0.5, velocity: 0.85 }
             ]
         },
         {
-            instrument: { name: 'acoustic guitar (nylon)', family: 'guitar', number: 24, percussion: false },
+            instrument: { name: "acoustic guitar (nylon)", family: "guitar", number: 24, percussion: false },
             channel: 2,
             notes: [
-                { name: 'G3', midi: 55, time: 0, duration: 0.6, velocity: 0.7 },
-                { name: 'C4', midi: 60, time: 0.6, duration: 0.8, velocity: 0.75 }
+                { name: "G3", midi: 55, time: 0, duration: 0.6, velocity: 0.7 },
+                { name: "C4", midi: 60, time: 0.6, duration: 0.8, velocity: 0.75 }
             ]
         },
         {
-            instrument: { name: 'drums', family: 'percussion', number: 128, percussion: true },
+            instrument: { name: "drums", family: "percussion", number: 128, percussion: true },
             channel: 9,
             notes: [
-                { name: 'Snare Drum', midi: 38, time: 0, duration: 0.3, velocity: 0.9 },
-                { name: 'Kick Drum', midi: 36, time: 0.5, duration: 0.3, velocity: 0.8 }
+                { name: "Snare Drum", midi: 38, time: 0, duration: 0.3, velocity: 0.9 },
+                { name: "Kick Drum", midi: 36, time: 0.5, duration: 0.3, velocity: 0.8 }
             ]
         }
     ]
 };
 
-describe('getClosestStandardNoteValue', () => {
-    it('should return the closest standard note duration for a given input', () => {
+describe("getClosestStandardNoteValue", () => {
+    it("should return the closest standard note duration for a given input", () => {
         expect(getClosestStandardNoteValue(1)).toEqual([1, 1]);
         expect(getClosestStandardNoteValue(0.0078125)).toEqual([1, 128]);
     });
 });
 
-describe('transcribeMidi', () => {
+describe("transcribeMidi", () => {
     let loadNewBlocksSpy;
 
     beforeEach(() => {
@@ -87,14 +87,14 @@ describe('transcribeMidi', () => {
         };
 
         // Spy on loadNewBlocks
-        loadNewBlocksSpy = jest.spyOn(activity.blocks, 'loadNewBlocks');
+        loadNewBlocksSpy = jest.spyOn(activity.blocks, "loadNewBlocks");
     });
 
     afterEach(() => {
         jest.clearAllMocks();
     });
 
-    it('should process all tracks and generate blocks', async () => {
+    it("should process all tracks and generate blocks", async () => {
         await transcribeMidi(mockMidi);
         expect(loadNewBlocksSpy).toHaveBeenCalled();
         const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
@@ -102,7 +102,7 @@ describe('transcribeMidi', () => {
         expect(loadedBlocks.length).toBeGreaterThan(0);
     });
 
-    it('should handle default tempo correctly', async () => {
+    it("should handle default tempo correctly", async () => {
         const midiWithoutTempo = {
             ...mockMidi,
             header: {
@@ -115,7 +115,7 @@ describe('transcribeMidi', () => {
         expect(loadNewBlocksSpy).toHaveBeenCalled();
         const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
         const bpmBlock = loadedBlocks.find(block =>
-            Array.isArray(block[1]) && block[1][0] === 'setbpm3'
+            Array.isArray(block[1]) && block[1][0] === "setbpm3"
         );
         expect(bpmBlock).toBeDefined();
         const tempoValueBlock = loadedBlocks.find(block =>
@@ -125,7 +125,7 @@ describe('transcribeMidi', () => {
         expect(tempoValueBlock[1][1].value).toBe(90);
     });
 
-    it('should skip tracks with no notes', async () => {
+    it("should skip tracks with no notes", async () => {
         const emptyTrackMidi = {
             ...mockMidi,
             tracks: [{ ...mockMidi.tracks[0], notes: [] }]
@@ -135,28 +135,28 @@ describe('transcribeMidi', () => {
         expect(loadNewBlocksSpy).toHaveBeenCalled();
         const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
         const trackBlocks = loadedBlocks.filter(block =>
-            Array.isArray(block[1]) && block[1][0] === 'setturtlename2'
+            Array.isArray(block[1]) && block[1][0] === "setturtlename2"
         );
         expect(trackBlocks.length).toBe(0);
     });
 
-    it('should handle percussion instruments correctly', async () => {
+    it("should handle percussion instruments correctly", async () => {
         await transcribeMidi(mockMidi);
         expect(loadNewBlocksSpy).toHaveBeenCalled();
         const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
         const drumBlocks = loadedBlocks.filter(block =>
-            block[1] === 'playdrum'
+            block[1] === "playdrum"
         );
         expect(drumBlocks.length).toBeGreaterThan(0);
     });
 
-    it('should assign correct instruments to tracks', async () => {
+    it("should assign correct instruments to tracks", async () => {
         await transcribeMidi(mockMidi);
         expect(loadNewBlocksSpy).toHaveBeenCalled();
 
         const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
         const instrumentBlocks = loadedBlocks.filter(block =>
-            Array.isArray(block[1]) && block[1][0] === 'settimbre'
+            Array.isArray(block[1]) && block[1][0] === "settimbre"
         );
         const nonPercussionTracks = mockMidi.tracks.filter(track => !track.instrument.percussion);
         instrumentBlocks.forEach((block, index) => {
@@ -165,13 +165,13 @@ describe('transcribeMidi', () => {
         });
     });
 
-    it('should generate correct note durations', async () => {
+    it("should generate correct note durations", async () => {
         await transcribeMidi(mockMidi);
         expect(loadNewBlocksSpy).toHaveBeenCalled();
 
         const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
         const noteBlocks = loadedBlocks.filter(block =>
-            Array.isArray(block[1]) && block[1][0] === 'newnote'
+            Array.isArray(block[1]) && block[1][0] === "newnote"
         );
 
         noteBlocks.forEach(block => {
@@ -188,12 +188,12 @@ describe('transcribeMidi', () => {
         });
     });
 
-    it('should generate rest notes for gaps between notes', async () => {
+    it("should generate rest notes for gaps between notes", async () => {
         await transcribeMidi(mockMidi);
         expect(loadNewBlocksSpy).toHaveBeenCalled();
         const loadedBlocks = loadNewBlocksSpy.mock.calls[0][0];
         const restBlocks = loadedBlocks.filter(block =>
-            block[1] === 'rest2'
+            block[1] === "rest2"
         );
         expect(restBlocks.length).toBeGreaterThan(0);
     });

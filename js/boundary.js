@@ -92,15 +92,15 @@ class Boundary {
                 "data:image/svg+xml;base64," +
                 window.btoa(
                     base64Encode(
-                            BOUNDARY.replace("HEIGHT", this.h)
-                                .replace("WIDTH", this.w)
-                                .replace("Y", this.y)
-                                .replace("X", this.x)
-                                .replace("DY", this.dy)
-                                .replace("DX", this.dx)
-                                .replace("stroke_color", "#e08080")
-                        )
-                    );
+                        BOUNDARY.replace("HEIGHT", this.h)
+                            .replace("WIDTH", this.w)
+                            .replace("Y", this.y)
+                            .replace("X", this.x)
+                            .replace("DY", this.dy)
+                            .replace("DX", this.dx)
+                            .replace("stroke_color", "#e08080")
+                    )
+                );
         };
 
         __makeBoundary();
@@ -122,6 +122,6 @@ class Boundary {
         this._container.visible = true;
     }
 }
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
     module.exports = Boundary;
 }
