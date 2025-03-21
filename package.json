@@ -10,13 +10,6 @@
     "url": "https://github.com/sugarlabs/musicblocks/issues"
   },
   "amd": {},
-  "volo": {
-    "baseUrl": "lib",
-    "dependencies": {
-      "domReady": "github:requirejs/domReady/2.0.1",
-      "webL10n": "github:sugarlabs/webL10n/master"
-    }
-  },
   "scripts": {
     "lint": "eslint js/**/*.js",
     "serve": "http-server -a 127.0.0.1 -p 3000 --gzip --brotli",
