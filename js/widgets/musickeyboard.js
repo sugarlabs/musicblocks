@@ -825,7 +825,7 @@ function MusicKeyboard(activity) {
                 clearInterval(this.metronomeInterval);
                 this.metronomeInterval = null;
             }
-        }
+        };
 
         this.tickButton.onclick = () => {
             if (this.metronomeInterval || this.metronomeON) {
