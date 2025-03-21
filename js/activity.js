@@ -2994,9 +2994,11 @@ class Activity {
         this.__keyPressed = (event) => {
             // First, check if the pitch slider is open
             if (window.widgetWindows.isOpen("slider") === true) {
-                // If the event is an arrow key, don't process it at all
+                // If the event is an arrow key, let the PitchSlider handle it
                 if (event.keyCode === 37 || event.keyCode === 38 || 
                     event.keyCode === 39 || event.keyCode === 40) {
+                    // Simply prevent default behavior here
+                    // The actual pitch slider handling is done in the PitchSlider class
                     event.preventDefault();
                     event.stopPropagation();
                     return false;
@@ -3093,7 +3095,7 @@ class Activity {
                     break;
                 }
             }
-
+        
             if ((event.altKey && !disableKeys) || (event.keyCode == 13) || (event.key == "/") || (event.key == "\\") ) {
                 switch (event.keyCode) {
                     case 66: // 'B'

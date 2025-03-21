@@ -33,7 +33,8 @@ class PitchSlider {
         this._delta = 0;
         this.sliders = {};
         this._cellScale = 0;
-        this.isActive = false; // Flag to indicate if the slider is active
+        this.isActive = false; 
+        this.activeSlider = null; 
     }
 
     /**
@@ -54,33 +55,56 @@ class PitchSlider {
         this._cellScale = 1.0;
         this.widgetWindow = window.widgetWindows.windowFor(this, "pitch slider", "slider", true);
         
-        // Set global flag that pitch slider is active
+        
         this.isActive = true;
         
-        // Store reference to this pitch slider in the logo object for global access
+        
         activity.logo.pitchSlider = this;
         
         this.widgetWindow.onclose = () => {
             for (const osc of oscillators) osc.triggerRelease();
-            this.isActive = false; // Reset flag when widget is closed
-            activity.logo.pitchSlider = null; // Remove reference
+            this.isActive = false; 
+            activity.logo.pitchSlider = null; 
             this.widgetWindow.destroy();
         };
 
-        // Add global keyboard event listener with the highest capture priority
+        
         const keyHandler = (event) => {
             if (!this.isActive) return;
             
             if (event.key === 'ArrowUp' || event.key === 'ArrowDown' || 
                 event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+                
                 event.preventDefault();
                 event.stopPropagation();
+                
+                
+                const sliderToUse = this.activeSlider !== null ? this.activeSlider : 0;
+                
+                if (this.sliders[sliderToUse]) {
+                    const slider = this.sliders[sliderToUse];
+                    const min = parseFloat(slider.min);
+                    const max = parseFloat(slider.max);
+                    const currentValue = parseFloat(slider.value);
+                    
+                    if (event.key === 'ArrowUp' || event.key === 'ArrowRight') {
+                        // Move up by a semitone
+                        slider.value = Math.min(currentValue * PitchSlider.SEMITONE, max);
+                    } else if (event.key === 'ArrowDown' || event.key === 'ArrowLeft') {
+                        // Move down by a semitone
+                        slider.value = Math.max(currentValue / PitchSlider.SEMITONE, min);
+                    }
+                    
+                    
+                    const inputEvent = new Event('input', { bubbles: true });
+                    slider.dispatchEvent(inputEvent);
+                }
+                
                 return false;
             }
         };
         
-        // Add the handler to various elements to ensure it's captured
-        this.widgetWindow.getWidgetBody().addEventListener('keydown', keyHandler, true);
+        
         document.addEventListener('keydown', keyHandler, true);
 
         const MakeToolbar = (id) => {
@@ -98,17 +122,17 @@ class PitchSlider {
                 "pitchSlider"
             );
 
-            // Specifically prevent arrow keys from affecting the slider
-            slider.addEventListener('keydown', (event) => {
-                if (event.key === 'ArrowUp' || event.key === 'ArrowDown' || 
-                    event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    return false;
-                }
-            }, true);
+            // Set the leftmost slider as active by default
+            if (id == 0) {
+                this.activeSlider = id;
+            }
 
-            // label for frequency
+            
+            slider.addEventListener('mousedown', () => {
+                this.activeSlider = id;
+            });
+
+            
             const freqLabel = document.createElement("div");
             freqLabel.className = "wfbtItem";
             toolBarDiv.appendChild(freqLabel);
@@ -116,7 +140,7 @@ class PitchSlider {
 
             this.sliders[id] = slider;
             const changeFreq = () => {
-                this.frequencies[id] = this.sliders[id].value;
+                this.frequencies[id] = parseFloat(this.sliders[id].value);
                 oscillators[id].frequency.linearRampToValueAtTime(
                     this.frequencies[id],
                     Tone.now() + 0.05
@@ -139,7 +163,7 @@ class PitchSlider {
                 _("Move up"),
                 toolBarDiv
             ).onclick = () => {
-                slider.value = Math.min(slider.value * PitchSlider.SEMITONE, max); //value is a string
+                slider.value = Math.min(parseFloat(slider.value) * PitchSlider.SEMITONE, max);
                 changeFreq();
                 oscillators[id].triggerAttackRelease(this.frequencies[id], "4n");
             };
@@ -150,7 +174,7 @@ class PitchSlider {
                 _("Move down"),
                 toolBarDiv
             ).onclick = () => {
-                slider.value = Math.max(slider.value / PitchSlider.SEMITONE, min); //value is a string
+                slider.value = Math.max(parseFloat(slider.value) / PitchSlider.SEMITONE, min);
                 changeFreq();
                 oscillators[id].triggerAttackRelease(this.frequencies[id], "4n");
             };
@@ -169,7 +193,7 @@ class PitchSlider {
             MakeToolbar(id);
         }
 
-        activity.textMsg(_("Use the up/down buttons to change pitch. Arrow keys are disabled."), 3000);
+        activity.textMsg(_("Use the up/down buttons or arrow keys to change pitch."), 3000);
         activity.textMsg(_("Click on the slider to create a note block."), 3000);
         setTimeout(this.widgetWindow.sendToCenter, 0);
     }
