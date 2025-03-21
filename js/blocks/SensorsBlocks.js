@@ -1057,3 +1057,8 @@ function setupSensorsBlocks(activity) {
     new MouseYBlock().setup(activity);
     new MouseXBlock().setup(activity);
 }
+
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupSensorsBlocks };
+}
