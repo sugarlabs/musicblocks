@@ -40,7 +40,7 @@ class ProjectViewer {
         const Planet = this.Planet ;
         this.id = id;
         const proj = this.ProjectCache[id];
-        const options = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+        const options = { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "numeric" };
         const last_updated_timestamp = proj.ProjectLastUpdated;
         const formatted_LastUpdated = new Date(last_updated_timestamp).toLocaleString(undefined, options);
         const created_timestamp = proj.ProjectCreatedDate;

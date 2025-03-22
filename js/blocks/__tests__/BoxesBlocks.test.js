@@ -20,7 +20,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const { setupBoxesBlocks } = require('../BoxesBlocks');
+const { setupBoxesBlocks } = require("../BoxesBlocks");
 
 let createdBlocks = {};
 

@@ -134,7 +134,7 @@ $(document).ready(() => {
     // eslint-disable-next-line no-unused-vars
     document.getElementById("global-search").addEventListener("input", (evt) => {
         document.getElementById("search-close")
-                .style.display = this.value === "" ? "none" : "initial" ;
+            .style.display = this.value === "" ? "none" : "initial" ;
     });
     // eslint-disable-next-line no-unused-vars
     document.getElementById("local-tab").addEventListener("click", (evt) => {
