@@ -719,14 +719,22 @@ function setupSensorsBlocks(activity) {
          * @throws {Error} - If the turtle or canvas context cannot be accessed.
          */
         arg(logo, turtle) {
+            let requiredTurtle;
 
             try {
-                const requiredTurtle = activity.turtles.getTurtle(turtle);
-                if (!requiredTurtle.container) {
-                    throw new Error("Turtle container unavailable");
-                }
-                const { x, y } = requiredTurtle.container;
-                const originalVisibility = requiredTurtle.container.visible;
+                requiredTurtle = activity.turtles.getTurtle(turtle);
+            } catch (error) {
+                return this.getFallbackColor(); // Turtle not found, no visibility to restore
+            }
+
+            if (!requiredTurtle.container) {
+                return this.getFallbackColor(); // Container not found, no visibility to restore
+            }
+
+            const { x, y } = requiredTurtle.container;
+            const originalVisibility = requiredTurtle.container.visible;
+
+            try {
                 requiredTurtle.container.visible = false;
                 activity.refreshCanvas();
 
