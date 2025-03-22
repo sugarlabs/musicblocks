@@ -953,6 +953,10 @@
                 if (isSmallScreen) {
                   // Enable play-only mode
                   body.classList.add("play-only");
+                  if (typeof activity !== "undefined" && activity._setScroller) {
+                    activity._setScroller();
+                }
+
                   showPersistentNotification();
 
                   if (buttonContainer) {
