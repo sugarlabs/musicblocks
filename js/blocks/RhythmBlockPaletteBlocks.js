@@ -1038,3 +1038,7 @@ function isAppleBrowser() {
     const isChrome = userAgent.includes("Chrome");
     return (isMac || isIPad) && (isSafari || isChrome);
 }
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupRhythmBlockPaletteBlocks };
+}
