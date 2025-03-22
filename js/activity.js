@@ -2992,14 +2992,27 @@ class Activity {
          * Handles keyboard shortcuts in MB
          */
         this.__keyPressed = (event) => {
+            // First, check if the pitch slider is open
+            if (window.widgetWindows.isOpen("slider") === true) {
+                // If the event is an arrow key, let the PitchSlider handle it
+                if (event.keyCode === 37 || event.keyCode === 38 || 
+                    event.keyCode === 39 || event.keyCode === 40) {
+                    // Simply prevent default behavior here
+                    // The actual pitch slider handling is done in the PitchSlider class
+                    event.preventDefault();
+                    event.stopPropagation();
+                    return false;
+                }
+            }
+        
             if (window.widgetWindows.isOpen("JavaScript Editor") === true) return;
-
             if (!this.keyboardEnableFlag) {
                 return;
             }
             if (docById("labelDiv").classList.contains("hasKeyboard")) {
                 return;
             }
+
             if (this.keyboardEnableFlag) {
                 if (
                     docById("BPMInput") !== null &&
@@ -3007,28 +3020,24 @@ class Activity {
                 ) {
                     return;
                 }
-
                 if (
                     docById("musicratio1") !== null &&
                     docById("musicratio1").classList.contains("hasKeyboard")
                 ) {
                     return;
                 }
-
                 if (
                     docById("musicratio2") !== null &&
                     docById("musicratio2").classList.contains("hasKeyboard")
                 ) {
                     return;
                 }
-
                 if (
                     docById("dissectNumber") !== null &&
                     docById("dissectNumber").classList.contains("hasKeyboard")
                 ) {
                     return;
                 }
-
                 if (
                     docById("timbreName") !== null &&
                     docById("timbreName").classList.contains("hasKeyboard")
@@ -3036,16 +3045,13 @@ class Activity {
                     return;
                 }
             }
-
             // const BACKSPACE = 8;
             const TAB = 9;
-
             if (event.keyCode === TAB) {
                 // Prevent browser from grabbing TAB key
                 event.preventDefault();
                 return false;
             }
-
             const ESC = 27;
             // const ALT = 18;
             // const CTRL = 17;
@@ -3062,7 +3068,6 @@ class Activity {
             const KEYCODE_DOWN = 40;
             const DEL = 46;
             const V = 86;
-
             // Shortcuts for creating new notes
             const KEYCODE_D = 68; // do
             const KEYCODE_R = 82; // re
@@ -3071,7 +3076,6 @@ class Activity {
             const KEYCODE_S = 83; // so
             const KEYCODE_L = 76; // la
             const KEYCODE_T = 84; // ti
-
             const disableKeys =
                 docById("lilypondModal").style.display === "block" ||
                 this.searchWidget.style.visibility === "visible" ||
@@ -3081,7 +3085,6 @@ class Activity {
                 docById("paste").style.visibility === "visible" ||
                 docById("wheelDiv").style.display === "" ||
                 this.turtles.running();
-
             const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
                 if (widgetTitle[i].innerHTML === "tempo") {
@@ -3089,7 +3092,6 @@ class Activity {
                     break;
                 }
             }
-
             if ((event.altKey && !disableKeys) || (event.keyCode == 13) || (event.key == "/") || (event.key == "\\") ) {
                 switch (event.keyCode) {
                     case 66: // 'B'
