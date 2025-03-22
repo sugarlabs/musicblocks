@@ -382,6 +382,25 @@ block `re` is lowered by one half step; on the right, both *Pitch*
 blocks are raised by one half step. (You can also use a double-sharp
 or double-flat accidental.) [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733231694757697&run=True)
 
+![double sharp and double flat](./double-sharp-flat.svg "Using Double Sharp and Double Flat blocks")
+
+
+Double sharps and flats have a special place in music theory. They are used to maintain diatonic structure in music, which means for the key, each letter is used once.
+
+For example, in the C major scale, it goes C - D - E - F - G - A - B. Now for C# major, it's the same thing, with C# - D# - E# - F# - G# - A# - B#. If you want to simplify the amount of sharps in this, you can write C# – D# – F – F#- G# – A# – C, which has two F's and 2 C's, which makes it more confusing to read. To prevent this, we use a diatonic structure.
+
+Now for the G# major scale, we have G#, A#, B#, C#, D#, E#, Fx, where Fx represents double sharp. We can write the enharmonic for Fx, making it G#, A#, B#, C#, D#, E#, G, however this makes a repeated G, breaking the diatonic structure of G# major. To prevent this, we use the Fx.
+
+For similar reasons, double sharps are used in the D# major with D♯ – E♯ – Fx – G♯ – A♯ – B♯ – Cx and double flat is used in F♭ major with – G♭ – A♭ – B𝄫 – C♭ – D♭ – E♭.
+
+Another situation where you see this is while preserving chord spellings. For example, a B triad is made up of a B - D - F. A B major triad is B - D# - F#. Now if we augment this, we raise the fifth, making it B - D# - Fx. We can write this as B - D# - G, however this doesn't preserve the chord's conventions. Also, if we just use G, it doesn't "spell" a raised fifth, but rather a new note.
+
+Sources and Further Readings:
+
+[YouTube Video: Understanding Double Sharps and Double Flats](https://www.youtube.com/watch?v=uZs8vwF8-gs)
+
+[On the Track Official: Why Do We Use Double Sharps and Double Flats?](https://onthetrackofficial.com/why-do-we-use-double-sharps-and-double-flats/)
+
 #### <a name="ADJUST-TRANSPOSITION">3.2.3 Adjusting Transposition</a>
 
 ![transposition](./transform2.svg "Adjusting transpositions")
