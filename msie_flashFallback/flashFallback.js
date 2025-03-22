@@ -69,7 +69,7 @@ var meSpeakFlashFallback = new function() {
         if (swfHasLoaded && window.meSpeak) {
             var obj=document.getElementById(swfElementId);
             if (obj) {
-                if (!typeof options != "object") options={};
+                if (typeof options !== "object") options = {};
                 options.rawdata="array";
                 obj.play( meSpeak.speak(txt, options) );
             }
