@@ -55,9 +55,7 @@ class PitchSlider {
         this._cellScale = 1.0;
         this.widgetWindow = window.widgetWindows.windowFor(this, "pitch slider", "slider", true);
         
-        
         this.isActive = true;
-        
         
         activity.logo.pitchSlider = this;
         
@@ -68,7 +66,6 @@ class PitchSlider {
             this.widgetWindow.destroy();
         };
 
-        
         const keyHandler = (event) => {
             if (!this.isActive) return;
             
@@ -77,7 +74,6 @@ class PitchSlider {
                 
                 event.preventDefault();
                 event.stopPropagation();
-                
                 
                 const sliderToUse = this.activeSlider !== null ? this.activeSlider : 0;
                 
@@ -95,7 +91,6 @@ class PitchSlider {
                         slider.value = Math.max(currentValue / PitchSlider.SEMITONE, min);
                     }
                     
-                    
                     const inputEvent = new Event("input", { bubbles: true });
                     slider.dispatchEvent(inputEvent);
                 }
@@ -103,7 +98,6 @@ class PitchSlider {
                 return false;
             }
         };
-        
         
         document.addEventListener("keydown", keyHandler, true);
 
@@ -127,12 +121,10 @@ class PitchSlider {
                 this.activeSlider = id;
             }
 
-            
             slider.addEventListener("mousedown", () => {
                 this.activeSlider = id;
             });
 
-            
             const freqLabel = document.createElement("div");
             freqLabel.className = "wfbtItem";
             toolBarDiv.appendChild(freqLabel);

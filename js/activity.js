@@ -3012,7 +3012,7 @@ class Activity {
             if (docById("labelDiv").classList.contains("hasKeyboard")) {
                 return;
             }
-            
+
             if (this.keyboardEnableFlag) {
                 if (
                     docById("BPMInput") !== null &&
@@ -3045,7 +3045,6 @@ class Activity {
                     return;
                 }
             }
-            
             // const BACKSPACE = 8;
             const TAB = 9;
             if (event.keyCode === TAB) {
@@ -3077,7 +3076,6 @@ class Activity {
             const KEYCODE_S = 83; // so
             const KEYCODE_L = 76; // la
             const KEYCODE_T = 84; // ti
-            
             const disableKeys =
                 docById("lilypondModal").style.display === "block" ||
                 this.searchWidget.style.visibility === "visible" ||
@@ -3087,7 +3085,6 @@ class Activity {
                 docById("paste").style.visibility === "visible" ||
                 docById("wheelDiv").style.display === "" ||
                 this.turtles.running();
-            
             const widgetTitle = document.getElementsByClassName("wftTitle");
             for (let i = 0; i < widgetTitle.length; i++) {
                 if (widgetTitle[i].innerHTML === "tempo") {
@@ -3095,7 +3092,6 @@ class Activity {
                     break;
                 }
             }
-        
             if ((event.altKey && !disableKeys) || (event.keyCode == 13) || (event.key == "/") || (event.key == "\\") ) {
                 switch (event.keyCode) {
                     case 66: // 'B'
