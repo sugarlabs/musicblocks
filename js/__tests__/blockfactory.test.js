@@ -17,8 +17,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const { SVG } = require('../blockfactory');
-const { platformColor } = require('../utils/platformstyle');
+const { SVG } = require("../blockfactory");
+const { platformColor } = require("../utils/platformstyle");
 global.platformColor = platformColor;
 
 jest.mock("../utils/platformstyle", () => ({

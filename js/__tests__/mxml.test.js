@@ -25,7 +25,7 @@ describe("saveMxmlOutput", () => {
             notation: {
                 notationStaging: {
                     "0": [
-                        [["C"], 4, 0], 
+                        [["C"], 4, 0],
                     ],
                     "1": []
                 }
@@ -72,7 +72,7 @@ describe("saveMxmlOutput", () => {
             notation: {
                 notationStaging: {
                     "0": [
-                        "voice one", 
+                        "voice one",
                         [["C"], 4, 0],
                         "voice two"
                     ]
@@ -92,7 +92,7 @@ describe("saveMxmlOutput", () => {
             notation: {
                 notationStaging: {
                     "0": [
-                        "tempo", 120, 4, 
+                        "tempo", 120, 4,
                         [["C"], 4, 0]
                     ]
                 }

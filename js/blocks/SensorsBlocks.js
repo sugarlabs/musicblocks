@@ -719,6 +719,7 @@ function setupSensorsBlocks(activity) {
          * @throws {Error} - If the turtle or canvas context cannot be accessed.
          */
         arg(logo, turtle) {
+
             try {
                 const requiredTurtle = activity.turtles.getTurtle(turtle);
                 if (!requiredTurtle.container) {
@@ -1099,4 +1100,9 @@ function setupSensorsBlocks(activity) {
     new MouseButtonBlock().setup(activity);
     new MouseYBlock().setup(activity);
     new MouseXBlock().setup(activity);
+}
+
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupSensorsBlocks };
 }

@@ -28,9 +28,9 @@
  * @returns {string} - The Base64 encoded string.
  */
 function base64Encode(str) {
-    let encoder = new TextEncoder();
-    let uint8Array = encoder.encode(str);
-    let binaryString = String.fromCharCode(...uint8Array);
+    const encoder = new TextEncoder();
+    const uint8Array = encoder.encode(str);
+    const binaryString = String.fromCharCode(...uint8Array);
     return btoa(binaryString); // Proper Base64 encoding
 }
 
@@ -40,12 +40,12 @@ function base64Encode(str) {
  * @returns {string} - The decoded string.
  */
 function base64Decode(str) {
-    let binaryString = window.atob(str);
-    let uint8Array = new Uint8Array(binaryString.split('').map(char => char.charCodeAt(0)));
-    let decoder = new TextDecoder();
+    const binaryString = window.atob(str);
+    const uint8Array = new Uint8Array(binaryString.split("").map(char => char.charCodeAt(0)));
+    const decoder = new TextDecoder();
     return decoder.decode(uint8Array);
 }
 
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
     module.exports = { base64Encode, base64Decode };
 }

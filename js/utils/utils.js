@@ -84,9 +84,9 @@ function _(text) {
 
         // Helper function to get translation with case matching
         function getTranslationWithCase(inputText, caseType) {
-            let translatedText = document.webL10n.get(inputText);
+            const translatedText = document.webL10n.get(inputText);
             if (!translatedText || translatedText === inputText) {
-                        return null; // No translation found
+                return null; // No translation found
             }
         
             switch (caseType) {
@@ -98,8 +98,8 @@ function _(text) {
                     return translatedText.charAt(0).toUpperCase() + translatedText.slice(1).toLowerCase();
                 default:
                     return translatedText;
-                    }
             }
+        }
 
         // Try translations in order of priority
         const translations = [
@@ -1162,7 +1162,7 @@ readable-fractions/681534#681534
 
     let df = 1.0;
     let top = 1;
-    let iterations = 0
+    let iterations = 0;
     const maxIterations = 10000;
     let bot = 1;
 

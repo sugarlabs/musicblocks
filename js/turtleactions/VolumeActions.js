@@ -172,7 +172,7 @@ function setupVolumeActions(activity) {
 
             if (volume === 0) activity.errorMsg(_("Setting volume to 0."), blk);
 
-            if(Singer.masterVolume.length === 2) {  
+            if(Singer.masterVolume.length === 2) {
                 Singer.masterVolume.pop();
             }
 
@@ -278,7 +278,7 @@ function setupVolumeActions(activity) {
                 if(firstConnection === null && lastConnection === null) {
                     setTimeout(()=>{
                         activity.logo.synth.trigger(0, "G4", 1 / 4, synthname, null, null, false);
-                    },250)
+                    },250);
                 }
              
             }
@@ -311,6 +311,6 @@ function setupVolumeActions(activity) {
         }
     };
 }
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
     module.exports = setupVolumeActions;
 }

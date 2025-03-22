@@ -304,7 +304,7 @@ function setupIntervalsBlocks(activity) {
         }
     }
 
-      /**
+    /**
      * Represents a block for retrieving the current interval in Music Blocks.
      * @extends {ValueBlock}
      */
@@ -758,7 +758,7 @@ function setupIntervalsBlocks(activity) {
          * @param {boolean} receivedArg - Whether an argument is received.
          */
         flow(args, logo, turtle, blk, receivedArg) {
-(args[0]);
+            (args[0]);
             if (args[1] === undefined) return;
 
             let i = CHORDNAMES.indexOf(args[0]);

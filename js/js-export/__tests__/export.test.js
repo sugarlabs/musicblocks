@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const { Mouse, MusicBlocks } = require('../export.js');
+const { Mouse, MusicBlocks } = require("../export.js");
 global.importMembers = jest.fn();
 global.JSInterface = {
     validateArgs: jest.fn((method, args) => args),
@@ -87,7 +87,7 @@ global.Singer = {
     },
 };
 
-describe('Mouse Class', () => {
+describe("Mouse Class", () => {
     let mouse;
     const mockFlow = jest.fn();
 
@@ -101,32 +101,32 @@ describe('Mouse Class', () => {
         mouse = new Mouse(mockFlow);
     });
 
-    test('should create a new Mouse instance', () => {
+    test("should create a new Mouse instance", () => {
         expect(mouse).toBeInstanceOf(Mouse);
         expect(Mouse.MouseList).toContain(mouse);
         expect(Mouse.TurtleMouseMap[1]).toBe(mouse);
     });
 
-    test('should get Mouse from Turtle', () => {
+    test("should get Mouse from Turtle", () => {
         const turtle = { id: 1 };
         const result = Mouse.getMouseFromTurtle(turtle);
         expect(result).toBe(mouse);
     });
 
-    test('should return null if Turtle is not in map', () => {
+    test("should return null if Turtle is not in map", () => {
         const turtle = { id: 2 };
         const result = Mouse.getMouseFromTurtle(turtle);
         expect(result).toBeNull();
     });
 
-    test('should run the flow', () => {
+    test("should run the flow", () => {
         mouse.run();
         expect(mouse.turtle.doWait).toHaveBeenCalledWith(0);
         expect(mockFlow).toHaveBeenCalledWith(mouse.MB);
     });
 });
 
-describe('MusicBlocks Class', () => {
+describe("MusicBlocks Class", () => {
     let musicBlocks;
     let mouse;
 
@@ -143,176 +143,176 @@ describe('MusicBlocks Class', () => {
         musicBlocks = new MusicBlocks(mouse);
     });
 
-    test('should create a new MusicBlocks instance', () => {
+    test("should create a new MusicBlocks instance", () => {
         expect(musicBlocks).toBeInstanceOf(MusicBlocks);
         expect(musicBlocks.mouse).toBe(mouse);
         expect(musicBlocks.turtle).toBe(mouse.turtle);
     });
 
-    test('should run all mice', () => {
+    test("should run all mice", () => {
         Mouse.MouseList.push(mouse);
         MusicBlocks.run();
         expect(globalActivity.logo.prepSynths).toHaveBeenCalled();
         expect(mouse.run).toHaveBeenCalled();
     });
 
-    test('should handle ENDFLOW', async () => {
+    test("should handle ENDFLOW", async () => {
         const result = await musicBlocks.ENDFLOW;
         expect(result).toBeUndefined();
     });
 
-    test('should handle ENDFLOWCOMMAND', async () => {
+    test("should handle ENDFLOWCOMMAND", async () => {
         musicBlocks.turtle.waitTime = 100;
         musicBlocks.turtle.doWait = jest.fn();
-        musicBlocks.listeners.push('testSignal');
+        musicBlocks.listeners.push("testSignal");
 
         await musicBlocks.ENDFLOWCOMMAND;
-        expect(globalActivity.stage.dispatchEvent).toHaveBeenCalledWith('testSignal');
+        expect(globalActivity.stage.dispatchEvent).toHaveBeenCalledWith("testSignal");
         expect(musicBlocks.turtle.doWait).toHaveBeenCalledWith(0);
     });
 
-    test('should print a message', () => {
-        musicBlocks.print('test message');
+    test("should print a message", () => {
+        musicBlocks.print("test message");
         expect(JSEditor.logConsole).toHaveBeenCalled();
-        expect(globalActivity.textMsg).toHaveBeenCalledWith('test message');
+        expect(globalActivity.textMsg).toHaveBeenCalledWith("test message");
     });
 
-    test('should handle undefined message', () => {
+    test("should handle undefined message", () => {
         musicBlocks.print(undefined);
-        expect(globalActivity.textMsg).toHaveBeenCalledWith('undefined');
+        expect(globalActivity.textMsg).toHaveBeenCalledWith("undefined");
     });
 
-    test('should handle null message', () => {
+    test("should handle null message", () => {
         musicBlocks.print(null);
-        expect(globalActivity.textMsg).toHaveBeenCalledWith('null');
+        expect(globalActivity.textMsg).toHaveBeenCalledWith("null");
     });
 
-    test('should get X coordinate', () => {
+    test("should get X coordinate", () => {
         globalActivity.turtles.screenX2turtleX.mockReturnValue(10);
         expect(musicBlocks.X).toBe(10);
     });
 
-    test('should get Y coordinate', () => {
+    test("should get Y coordinate", () => {
         globalActivity.turtles.screenY2turtleY.mockReturnValue(20);
         expect(musicBlocks.Y).toBe(20);
     });
 
-    test('should get HEADING', () => {
+    test("should get HEADING", () => {
         musicBlocks.turtle.orientation = 90;
         expect(musicBlocks.HEADING).toBe(90);
     });
 
-    test('should get PENSIZE', () => {
+    test("should get PENSIZE", () => {
         musicBlocks.turtle.painter = { stroke: 5 };
         expect(musicBlocks.PENSIZE).toBe(5);
     });
 
-    test('should get COLOR', () => {
-        musicBlocks.turtle.painter = { color: 'red' };
-        expect(musicBlocks.COLOR).toBe('red');
+    test("should get COLOR", () => {
+        musicBlocks.turtle.painter = { color: "red" };
+        expect(musicBlocks.COLOR).toBe("red");
     });
 
-    test('should get SHADE', () => {
+    test("should get SHADE", () => {
         musicBlocks.turtle.painter = { value: 50 };
         expect(musicBlocks.SHADE).toBe(50);
     });
 
-    test('should get GREY', () => {
+    test("should get GREY", () => {
         musicBlocks.turtle.painter = { chroma: 75 };
         expect(musicBlocks.GREY).toBe(75);
     });
 
-    test('should get NOTEVALUE', () => {
+    test("should get NOTEVALUE", () => {
         Singer.RhythmActions.getNoteValue.mockReturnValue(1);
         expect(musicBlocks.NOTEVALUE).toBe(1);
     });
 
-    test('should set PICKUP', () => {
+    test("should set PICKUP", () => {
         musicBlocks.PICKUP = 2;
         expect(Singer.MeterActions.setPickup).toHaveBeenCalledWith(2, musicBlocks.turIndex);
     });
 
-    test('should get WHOLENOTESPLAYED', () => {
+    test("should get WHOLENOTESPLAYED", () => {
         Singer.MeterActions.getWholeNotesPlayed.mockReturnValue(4);
         expect(musicBlocks.WHOLENOTESPLAYED).toBe(4);
     });
 
-    test('should get BEATCOUNT', () => {
+    test("should get BEATCOUNT", () => {
         Singer.MeterActions.getBeatCount.mockReturnValue(16);
         expect(musicBlocks.BEATCOUNT).toBe(16);
     });
 
-    test('should get MEASURECOUNT', () => {
+    test("should get MEASURECOUNT", () => {
         Singer.MeterActions.getMeasureCount.mockReturnValue(4);
         expect(musicBlocks.MEASURECOUNT).toBe(4);
     });
 
-    test('should get BPM', () => {
+    test("should get BPM", () => {
         Singer.MeterActions.getBPM.mockReturnValue(120);
         expect(musicBlocks.BPM).toBe(120);
     });
 
-    test('should get BEATFACTOR', () => {
+    test("should get BEATFACTOR", () => {
         Singer.MeterActions.getBeatFactor.mockReturnValue(1.5);
         expect(musicBlocks.BEATFACTOR).toBe(1.5);
     });
 
-    test('should get CURRENTMETER', () => {
-        Singer.MeterActions.getCurrentMeter.mockReturnValue('4/4');
-        expect(musicBlocks.CURRENTMETER).toBe('4/4');
+    test("should get CURRENTMETER", () => {
+        Singer.MeterActions.getCurrentMeter.mockReturnValue("4/4");
+        expect(musicBlocks.CURRENTMETER).toBe("4/4");
     });
 
-    test('should get SCALARCHANGEINPITCH', () => {
+    test("should get SCALARCHANGEINPITCH", () => {
         Singer.PitchActions.deltaPitch.mockReturnValue(2);
         expect(musicBlocks.SCALARCHANGEINPITCH).toBe(2);
     });
 
-    test('should get CHANGEINPITCH', () => {
+    test("should get CHANGEINPITCH", () => {
         Singer.PitchActions.deltaPitch.mockReturnValue(1);
         expect(musicBlocks.CHANGEINPITCH).toBe(1);
     });
 
-    test('should get SCALARSTEPUP', () => {
+    test("should get SCALARSTEPUP", () => {
         Singer.PitchActions.consonantStepSize.mockReturnValue(1);
         expect(musicBlocks.SCALARSTEPUP).toBe(1);
     });
 
-    test('should get SCALARSTEPDOWN', () => {
+    test("should get SCALARSTEPDOWN", () => {
         Singer.PitchActions.consonantStepSize.mockReturnValue(-1);
         expect(musicBlocks.SCALARSTEPDOWN).toBe(-1);
     });
 
-    test('should set MOVABLEDO', () => {
+    test("should set MOVABLEDO", () => {
         musicBlocks.MOVABLEDO = true;
         expect(Singer.IntervalsActions.setMovableDo).toHaveBeenCalledWith(true, musicBlocks.turIndex);
     });
 
-    test('should get CURRENTKEY', () => {
-        Singer.IntervalsActions.getCurrentKey.mockReturnValue('C');
-        expect(musicBlocks.CURRENTKEY).toBe('C');
+    test("should get CURRENTKEY", () => {
+        Singer.IntervalsActions.getCurrentKey.mockReturnValue("C");
+        expect(musicBlocks.CURRENTKEY).toBe("C");
     });
 
-    test('should get CURRENTMODE', () => {
-        Singer.IntervalsActions.getCurrentMode.mockReturnValue('major');
-        expect(musicBlocks.CURRENTMODE).toBe('major');
+    test("should get CURRENTMODE", () => {
+        Singer.IntervalsActions.getCurrentMode.mockReturnValue("major");
+        expect(musicBlocks.CURRENTMODE).toBe("major");
     });
 
-    test('should get MODELENGTH', () => {
+    test("should get MODELENGTH", () => {
         Singer.IntervalsActions.getModeLength.mockReturnValue(7);
         expect(musicBlocks.MODELENGTH).toBe(7);
     });
 
-    test('should set PANNING', () => {
+    test("should set PANNING", () => {
         musicBlocks.PANNING = 0.5;
         expect(Singer.VolumeActions.setPanning).toHaveBeenCalledWith(0.5, musicBlocks.turIndex);
     });
 
-    test('should set MASTERVOLUME', () => {
+    test("should set MASTERVOLUME", () => {
         musicBlocks.MASTERVOLUME = 0.8;
         expect(Singer.VolumeActions.setMasterVolume).toHaveBeenCalledWith(0.8, musicBlocks.turIndex);
     });
 
-    test('should get MASTERVOLUME', () => {
+    test("should get MASTERVOLUME", () => {
         expect(musicBlocks.MASTERVOLUME).toBe(1.0);
     });
 });
