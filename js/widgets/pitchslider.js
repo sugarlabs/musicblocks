@@ -33,8 +33,8 @@ class PitchSlider {
         this._delta = 0;
         this.sliders = {};
         this._cellScale = 0;
-        this.isActive = false; 
-        this.activeSlider = null; 
+        this.isActive = false;
+        this.activeSlider = null;
     }
 
     /**
@@ -63,8 +63,8 @@ class PitchSlider {
         
         this.widgetWindow.onclose = () => {
             for (const osc of oscillators) osc.triggerRelease();
-            this.isActive = false; 
-            activity.logo.pitchSlider = null; 
+            this.isActive = false;
+            activity.logo.pitchSlider = null;
             this.widgetWindow.destroy();
         };
 
@@ -72,8 +72,8 @@ class PitchSlider {
         const keyHandler = (event) => {
             if (!this.isActive) return;
             
-            if (event.key === 'ArrowUp' || event.key === 'ArrowDown' || 
-                event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+            if (event.key === "ArrowUp" || event.key === "ArrowDown" ||
+                event.key === "ArrowLeft" || event.key === "ArrowRight") {
                 
                 event.preventDefault();
                 event.stopPropagation();
@@ -87,16 +87,16 @@ class PitchSlider {
                     const max = parseFloat(slider.max);
                     const currentValue = parseFloat(slider.value);
                     
-                    if (event.key === 'ArrowUp' || event.key === 'ArrowRight') {
+                    if (event.key === "ArrowUp" || event.key === "ArrowRight") {
                         // Move up by a semitone
                         slider.value = Math.min(currentValue * PitchSlider.SEMITONE, max);
-                    } else if (event.key === 'ArrowDown' || event.key === 'ArrowLeft') {
+                    } else if (event.key === "ArrowDown" || event.key === "ArrowLeft") {
                         // Move down by a semitone
                         slider.value = Math.max(currentValue / PitchSlider.SEMITONE, min);
                     }
                     
                     
-                    const inputEvent = new Event('input', { bubbles: true });
+                    const inputEvent = new Event("input", { bubbles: true });
                     slider.dispatchEvent(inputEvent);
                 }
                 
@@ -105,7 +105,7 @@ class PitchSlider {
         };
         
         
-        document.addEventListener('keydown', keyHandler, true);
+        document.addEventListener("keydown", keyHandler, true);
 
         const MakeToolbar = (id) => {
             const toolBarDiv = document.createElement("div");
@@ -128,7 +128,7 @@ class PitchSlider {
             }
 
             
-            slider.addEventListener('mousedown', () => {
+            slider.addEventListener("mousedown", () => {
                 this.activeSlider = id;
             });
 
