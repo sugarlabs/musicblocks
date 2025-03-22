@@ -80,21 +80,21 @@ class ProjectStorage {
 
     async getCurrentProjectData() {
         await this.dataLoaded;
-        const c = this.data.CurrentProject; 
+        const c = this.data.CurrentProject;
         return this.data.Projects[c]?.ProjectData ?? null ;
     };
 
     getCurrentProjectName() {
         const c = this.data.CurrentProject;
-        return this.data.Projects[c]?.ProjectName ?? this.defaultProjectName ; 
+        return this.data.Projects[c]?.ProjectName ?? this.defaultProjectName ;
     };
 
     getCurrentProjectDescription(){
         const c = this.data.CurrentProject;
 
-        if (this.data.Projects[c]!=undefined && 
+        if (this.data.Projects[c]!=undefined &&
             this.data.Projects[c].PublishedData !== null)
-                return this.data.Projects[c].PublishedData.ProjectDescription;
+            return this.data.Projects[c].PublishedData.ProjectDescription;
 
         return null;
     };
@@ -102,16 +102,16 @@ class ProjectStorage {
     getCurrentProjectImage() {
         const c = this.data.CurrentProject;
 
-        if (this.data.Projects[c] !== undefined && 
+        if (this.data.Projects[c] !== undefined &&
             this.data.Projects[c].ProjectImage !== null)
-                return this.data.Projects[c].ProjectImage;
+            return this.data.Projects[c].ProjectImage;
 
         return this.ImageDataURL;
     };
 
-    initialiseNewProject (name, data, image) { 
+    initialiseNewProject (name, data, image) {
         name  = name ?? this.defaultProjectName ;
-        data  = data ?? null ; 
+        data  = data ?? null ;
         image = image ?? null ;
 
         const c = this.generateID();
@@ -158,7 +158,7 @@ class ProjectStorage {
     };
 
     isLiked(id) {
-        return this.data.LikedProjects[id] === true ; 
+        return this.data.LikedProjects[id] === true ;
     };
 
     like(id,like) {
@@ -167,7 +167,7 @@ class ProjectStorage {
     };
 
     isReported(id) {
-        return this.data.ReportedProjects[id] === true ; 
+        return this.data.ReportedProjects[id] === true ;
     };
 
     report (id, report) {
@@ -194,7 +194,7 @@ class ProjectStorage {
 
         try {
             return JSON.parse(jsonobj);
-        } 
+        }
         catch (e) {
             // eslint-disable-next-line no-console
             console.log(e);
@@ -211,7 +211,7 @@ class ProjectStorage {
         const currentData = await this.get(this.LocalStorageKey);
 
         try {
-            this.data = (typeof currentData === "string") ? 
+            this.data = (typeof currentData === "string") ?
                 JSON.parse(currentData) : currentData ;
         }
         catch (e) {

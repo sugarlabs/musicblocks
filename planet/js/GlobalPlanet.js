@@ -106,7 +106,7 @@ class GlobalPlanet {
         const tagids = [];
 
         for (let i = 0; i < this.tags.length; i++)
-            if (this.tags[i].specialTag === false && this.tags[i].selected === true) 
+            if (this.tags[i].specialTag === false && this.tags[i].selected === true)
                 tagids.push(this.tags[i].id);
 
         if (tagids.length === 0)
@@ -163,7 +163,7 @@ class GlobalPlanet {
     };
     
     loadMoreProjects() {
-        const Planet = this.Planet ; 
+        const Planet = this.Planet ;
 
         this.showLoading();
         this.hideLoadMore();
@@ -176,7 +176,7 @@ class GlobalPlanet {
                 this.index + this.page + 1,
                 this.afterRefreshProjects.bind(this)
             );
-        } 
+        }
         else {
             Planet.ServerInterface.downloadProjectList(
                 this.searchMode,
@@ -189,14 +189,14 @@ class GlobalPlanet {
     };
 
     search() {
-        const Planet = this.Planet ; 
+        const Planet = this.Planet ;
 
         if (!this.searching) {
             if (this.searchString === "") {
                 this.oldSearchString = "";
                 this.searching = false;
                 this.showTags();
-            } 
+            }
             else {
                 this.searching = true;
                 this.hideTags();
@@ -294,7 +294,7 @@ class GlobalPlanet {
 
             if (this.loadCount <= 0)
                 callback();
-        } 
+        }
         else this.throwOfflineError();
     };
 
@@ -309,7 +309,7 @@ class GlobalPlanet {
             this.cache[id] = data.data;
             this.cache[id].ProjectData = null;
             callback();
-        } 
+        }
         
         else this.throwOfflineError();
     };
@@ -445,7 +445,7 @@ class GlobalPlanet {
     };
 
     openGlobalProject (id, error) {
-        const Planet = this.Planet ; 
+        const Planet = this.Planet ;
 
         if (error === undefined)
             error = null;
@@ -454,20 +454,20 @@ class GlobalPlanet {
             let remixedName;
             let language = localStorage.languagePreference;
             if (id in this.cache) {
-		if (language === "ja") {
+                if (language === "ja") {
                     remixedName = `「${this.cache[id].ProjectName}」${this.remixPrefix}`;
-		} else {
-		    remixedName = `${this.remixPrefix} ${this.cache[id].ProjectName}`;
-		}
+                } else {
+                    remixedName = `${this.remixPrefix} ${this.cache[id].ProjectName}`;
+                }
                 Planet.ProjectStorage.initialiseNewProject(
                     remixedName, data, this.cache[id].ProjectImage
                 );
             } else {
-		if (language === "ja") {
+                if (language === "ja") {
                     remixedName = `「${_("My Project")}」${this.remixPrefix}` ;
-		} else {
+                } else {
                     remixedName = `${this.remixPrefix}  ${_("My Project")}` ;
-		}
+                }
                 Planet.ProjectStorage.initialiseNewProject(
                     remixedName, data, null
                 );
@@ -478,7 +478,7 @@ class GlobalPlanet {
     };
 
     mergeGlobalProject (id, error) {
-        const Planet = this.Planet ; 
+        const Planet = this.Planet ;
 
         if (error === undefined)
             error = null;
@@ -571,12 +571,12 @@ class GlobalPlanet {
 
             document.getElementById("global-tab").addEventListener("click", (evt) => {
                 document.getElementById("searchcontainer-one").style.display = "block";
-            })
+            });
 
             document.getElementById("local-tab").addEventListener("click", (evt) => {
                 document.getElementById("searchcontainer-one").style.display = "none";
                 // document.getElementById("two_header").style.display = "none";
-            })
+            });
             
             document.body.onscroll = () => {
                 const currentUserScrollPos = window.pageYOffset ||
