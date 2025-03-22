@@ -266,7 +266,7 @@ describe("setupSensorsBlocks", () => {
             });
     
             it("should return fallback color if turtle is not found", () => {
-                const color = block.arg(logo, 999); 
+                const color = block.arg(logo, 999);
                 expect(color).toBe("rgb(128,128,128)");
             });
     
