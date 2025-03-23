@@ -2097,9 +2097,9 @@ function TemperamentWidget() {
         if ((this._playing && currentTime - this.lastClickTime > Singer.defaultBPMFactor * 1000 * duration) || (this.inbetween)) {
             that.playbackForward = true;
             this.inbetween = false;
-            if(this.circleIsVisible){
+            if (this.circleIsVisible) {
                 for (let i = 0; i <= this.pitchNumber; i++) {
-                    const pitchElement = docById("pitchNumber_" + i); 
+                    const pitchElement = docById("pitchNumber_" + i);
                     pitchElement.style.background = platformColor.selectorBackground;
                 }
             }
