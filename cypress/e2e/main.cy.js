@@ -79,73 +79,73 @@ describe("MusicBlocks Application", () => {
         });
 
         it('should click the New File button and verify "New Project" appears', () => {
-            cy.get('#newFile > .material-icons')
-              .should('exist')
-              .and('be.visible');    
-            cy.get('#newFile > .material-icons').click();
-            cy.wait(500);    
-            cy.contains('New project').should('be.visible');
+            cy.get("#newFile > .material-icons")
+                .should("exist")
+                .and("be.visible");
+            cy.get("#newFile > .material-icons").click();
+            cy.wait(500);
+            cy.contains("New project").should("be.visible");
         });
     });
 
     describe("UI Elements", () => {
-        it('should verify that bottom bar elements exist and are visible', () => {
+        it("should verify that bottom bar elements exist and are visible", () => {
             const bottomBarElements = [
-              '#Home\\ \\[HOME\\] > img',
-              '#Show\\/hide\\ blocks > img',
-              '#Expand\\/collapse\\ blocks > img',
-              '#Decrease\\ block\\ size > img',
-              '#Increase\\ block\\ size > img'
+                "#Home\\ \\[HOME\\] > img",
+                "#Show\\/hide\\ blocks > img",
+                "#Expand\\/collapse\\ blocks > img",
+                "#Decrease\\ block\\ size > img",
+                "#Increase\\ block\\ size > img"
             ];
         
             bottomBarElements.forEach(selector => {
-              cy.get(selector).should('exist').and('be.visible');
+                cy.get(selector).should("exist").and("be.visible");
             });
         });
 
-        it('should verify sidebar elements exist, are visible, and clickable', () => {
+        it("should verify sidebar elements exist, are visible, and clickable", () => {
             const sidebarElements = [
-              'thead > tr > :nth-child(1) > img',
-              'tr > :nth-child(2) > img',
-              'tr > :nth-child(3) > img'
+                "thead > tr > :nth-child(1) > img",
+                "tr > :nth-child(2) > img",
+                "tr > :nth-child(3) > img"
             ];
         
             sidebarElements.forEach(selector => {
-              cy.get(selector)
-                .should('exist')  
-                .and('be.visible')  
-                .click(); 
+                cy.get(selector)
+                    .should("exist")
+                    .and("be.visible")
+                    .click();
             });
         });
 
-        it('should verify that Grid, Clear, and Collapse elements exist and are visible', () => {
+        it("should verify that Grid, Clear, and Collapse elements exist and are visible", () => {
             const elements = [
-              '#Grid > img',     
-              '#Clear',          
-              '#Collapse > img'  
-            ];    
+                "#Grid > img",
+                "#Clear",
+                "#Collapse > img"
+            ];
             elements.forEach(selector => {
-              cy.get(selector).should('exist').and('be.visible');
+                cy.get(selector).should("exist").and("be.visible");
             });
         });
 
-        it('should verify that all nth-child elements from 1 to 6 exist', () => {
+        it("should verify that all nth-child elements from 1 to 6 exist", () => {
             for (let i = 1; i <= 6; i++) {
-              cy.get(`[width="126"] > tbody > :nth-child(${i})`)
-                .should('exist')  
-                .and('be.visible'); 
+                cy.get(`[width="126"] > tbody > :nth-child(${i})`)
+                    .should("exist")
+                    .and("be.visible");
             }
         });
     });
 
     describe("Planet Page Interaction", () => {
-        it('should load the Planet page and return to the main page when clicking the close button', () => {
-            cy.get('#planetIcon > .material-icons')
-              .should('exist')
-              .and('be.visible')
-              .click();    
-            cy.get('#planet-iframe')
-              .should('be.visible');
+        it("should load the Planet page and return to the main page when clicking the close button", () => {
+            cy.get("#planetIcon > .material-icons")
+                .should("exist")
+                .and("be.visible")
+                .click();
+            cy.get("#planet-iframe")
+                .should("be.visible");
         });
     });
 

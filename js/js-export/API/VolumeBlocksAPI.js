@@ -58,6 +58,6 @@ class VolumeBlocksAPI {
         return Singer.VolumeActions.getSynthVolume(args[0], this.turIndex);
     }
 }
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
     module.exports = VolumeBlocksAPI;
 }

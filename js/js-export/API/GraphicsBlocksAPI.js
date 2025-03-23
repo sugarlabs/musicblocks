@@ -86,6 +86,6 @@ class GraphicsBlocksAPI {
         return this.runCommand("doScrollXY", [args[0], args[1]]);
     }
 }
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
     module.exports = GraphicsBlocksAPI;
 }

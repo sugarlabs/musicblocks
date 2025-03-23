@@ -43,7 +43,7 @@
  * @exports PitchDrumMatrix
  */
 class PitchDrumMatrix {
-     /**
+    /**
      * Width of the button division.
      * 
      * @type {number}
@@ -76,7 +76,7 @@ class PitchDrumMatrix {
      * @type {number}
      */
     static BUTTONSIZE = 53;
-     /**
+    /**
      * Size of the icons.
      * 
      * @type {number}
@@ -252,8 +252,8 @@ class PitchDrumMatrix {
             labelCell.className = "headcol";
             labelCell.innerHTML = this.rowLabels[j] + this.rowArgs[j].toString().sub();
             labelCell.style.position = "sticky";
-            labelCell.style.left = "0"; 
-            labelCell.style.top = "0"; 
+            labelCell.style.left = "0";
+            labelCell.style.top = "0";
             labelCell.style.zIndex = "5";
            
             pdmCell = pdmTableRow.insertCell();
@@ -281,8 +281,8 @@ class PitchDrumMatrix {
         labelCell.className = "headcol";
         labelCell.innerHTML = "";
         labelCell.style.position = "sticky";
-        labelCell.style.left = "0"; 
-        labelCell.style.top = "0"; 
+        labelCell.style.left = "0";
+        labelCell.style.top = "0";
         labelCell.style.bottom = "0";
         labelCell.style.zIndex = "20";
 
@@ -396,7 +396,7 @@ class PitchDrumMatrix {
      * @param {number} pitchBlock - The pitch block index.
      * @param {number} drumBlock - The drum block index.
      * @returns {void}
-     */    
+     */
     addNode(pitchBlock, drumBlock) {
         let obj;
         for (let i = 0; i < this._blockMap.length; i++) {
@@ -415,7 +415,7 @@ class PitchDrumMatrix {
      * @param {number} pitchBlock - The pitch block index.
      * @param {number} drumBlock - The drum block index.
      * @returns {void}
-     */    
+     */
     removeNode(pitchBlock, drumBlock) {
         let obj;
         for (let i = 0; i < this._blockMap.length; i++) {
@@ -431,7 +431,7 @@ class PitchDrumMatrix {
      * 
      * @private
      * @returns {HTMLElement} - The save lock element.
-     */    
+     */
     _get_save_lock() {
         return this._save_lock;
     }

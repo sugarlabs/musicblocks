@@ -950,3 +950,7 @@ function setupVolumeBlocks(activity) {
     new DecrescendoBlock().setup(activity);
     new CrescendoBlock().setup(activity);
 }
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupVolumeBlocks };
+}

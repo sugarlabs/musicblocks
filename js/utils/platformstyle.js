@@ -32,7 +32,7 @@ window.platform = {
 platform.androidWebkit = platform.android && !platform.FF;
 platform.FFOS = platform.FF && (platform.mobile || platform.tablet) && !platform.android;
 
-let platformThemes = {
+const platformThemes = {
     dark: {
         textColor: "#E2E2E2",
         blockText: "#E2E2E2",
@@ -40,9 +40,9 @@ let platformThemes = {
         strokeColor: "#E2E2E2",
         fillColor: "#F9F9F9",
         blueButton: "#0066FF",
-        blueButtonHover: "#023a76", 
-        cancelButton: "#f1f1f1",     
-        cancelButtonHover: "#afafaf", 
+        blueButtonHover: "#023a76",
+        cancelButton: "#f1f1f1",
+        cancelButtonHover: "#afafaf",
         hoverColor: "#808080",
         paletteColors: {
             widgets: ["#2E7D32", "#1B5E20", "#388E3C", "#81C784"],
@@ -194,8 +194,8 @@ let platformThemes = {
         strokeColor: "#E2E2E2",
         fillColor: "#F9F9F9",
         blueButton: "#0066FF",
-        blueButtonHover: "#023a76", 
-        cancelButton: "#f1f1f1",     
+        blueButtonHover: "#023a76",
+        cancelButton: "#f1f1f1",
         cancelButtonHover: "#afafaf",
         hoverColor: "#E0E0E0",
         paletteColors: {
@@ -346,7 +346,7 @@ let platformThemes = {
         wheelcolors: ["#808080", "#909090", "#808080", "#909090", "#707070"]
     },
     // custom: {Your styling},
-}
+};
 
 for (const theme in platformThemes) {
     if (themePreference === theme) {

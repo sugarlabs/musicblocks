@@ -96,7 +96,7 @@ function SampleWidget() {
      */
     this.octaveCenter = 4;
 
-     /**
+    /**
      * Sample length.
      * @type {number}
      */
@@ -216,7 +216,7 @@ function SampleWidget() {
     };
 
 
-     /**
+    /**
      * Gets the length of the sample and displays a warning if it exceeds 1MB.
      * @returns {void}
      */
@@ -227,13 +227,13 @@ function SampleWidget() {
     };
 
 
-     /**
+    /**
      * Displays a message indicating that recording has started.
      * @returns {void}
      */
     this.displayRecordingStartMessage = function () {
         activity.textMsg(_("Recording started"), 3000);
-    }
+    };
 
     /**
      * Displays a message indicating that recording has stopped.
@@ -241,7 +241,7 @@ function SampleWidget() {
      */
     this.displayRecordingStopMessage = function () {
         activity.textMsg(_("Recording complete"), 3000);
-    }
+    };
 
 
     /**
@@ -314,18 +314,18 @@ function SampleWidget() {
                     this._addSample();
                 } else {
                     this.activity.errorMsg(_("Warning: Your sample cannot be loaded because it is >1MB."), this.timbreBlock);
-                }            
+                }
             } else {
                 this.showSampleTypeError();
             }
-        }
+        };
 
         reader.onloadend = () => {
             if (reader.result) {
                 const value = [sampleFile.name, reader.result];
             }
         };
-    }
+    };
 
     //Drag-and-Drop sample files
     this.drag_and_drop = () => {
@@ -340,7 +340,7 @@ function SampleWidget() {
             const sampleFiles = e.dataTransfer.files[0];
             this.handleFiles(sampleFiles);
         });
-    }
+    };
 
     /**
      * Initializes the Sample Widget.
@@ -479,13 +479,13 @@ function SampleWidget() {
             if (!this.is_recording) {
                 await this.activity.logo.synth.startRecording();
                 this.is_recording = true;
-                this._recordBtn.getElementsByTagName('img')[0].src = "header-icons/record.svg";
+                this._recordBtn.getElementsByTagName("img")[0].src = "header-icons/record.svg";
                 this.displayRecordingStartMessage();
                 this.activity.logo.synth.LiveWaveForm();
             } else {
                 this.recordingURL = await this.activity.logo.synth.stopRecording();
                 this.is_recording = false;
-                this._recordBtn.getElementsByTagName('img')[0].src = "header-icons/mic.svg";
+                this._recordBtn.getElementsByTagName("img")[0].src = "header-icons/mic.svg";
                 this.displayRecordingStopMessage();
                 this._playbackBtn.classList.remove("disabled");
             }
@@ -497,7 +497,7 @@ function SampleWidget() {
                 this.sampleName = `Recorded Audio ${this.recordingURL}`;
                 this._addSample();
                 this.activity.logo.synth.playRecording();
-                this.playback = true
+                this.playback = true;
             } else {
                 this.activity.logo.synth.stopPlayBackRecording();
                 this.playback = false;
@@ -892,7 +892,7 @@ function SampleWidget() {
         this.pitchBtn.value = this.pitchName;
     };
 
-     /**
+    /**
      * Scales the widget window and canvas based on the window's state.
      * @returns {void}
      */
@@ -953,10 +953,10 @@ function SampleWidget() {
                 for (let turtleIdx = 0; turtleIdx < 2; turtleIdx += 1) {
                     let dataArray;
                     if (this.is_recording) {
-                        dataArray = turtleIdx === 0 
+                        dataArray = turtleIdx === 0
                             ? this.pitchAnalysers[0].getValue()
                             : this.activity.logo.synth.getWaveFormValues();
-                            console.log(dataArray);
+                        console.log(dataArray);
                     } else {
                         dataArray = this.pitchAnalysers[turtleIdx].getValue();
                     }

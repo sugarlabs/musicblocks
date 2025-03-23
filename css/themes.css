@@ -26,7 +26,7 @@
 }
 
 .dark #canvas {
-  background-color: #1c1c1c;
+  background-color: #1c1c1c !important;
 }
 
 .dark .blue.darken-1 {

@@ -732,3 +732,7 @@ function setupHeapBlocks(activity) {
     new PopBlock().setup(activity);
     new PushBlock().setup(activity);
 }
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupHeapBlocks };
+}

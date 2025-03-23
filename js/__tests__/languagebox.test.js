@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const LanguageBox = require("../languagebox"); 
+const LanguageBox = require("../languagebox");
 
 const mockActivity = {
     storage: {
@@ -29,20 +29,20 @@ const mockActivity = {
 
 Object.defineProperty(global, "localStorage", {
     value: {
-        getItem: jest.fn(), 
-        setItem: jest.fn(), 
+        getItem: jest.fn(),
+        setItem: jest.fn(),
     },
     writable: true,
 });
 
-delete global.window.location; 
+delete global.window.location;
 global.window.location = {
-    reload: jest.fn(), 
+    reload: jest.fn(),
 };
 
 document.querySelectorAll = jest.fn(() => []);
 
-global._ = jest.fn((str) => str); 
+global._ = jest.fn((str) => str);
 
 describe("LanguageBox Class", () => {
     let languageBox;
