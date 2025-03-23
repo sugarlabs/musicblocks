@@ -1,0 +1,42 @@
+# Exclude Node.js dependencies
+node_modules/
+*.log
+package-lock.json
+yarn.lock
+
+# Exclude version control metadata
+.git/
+.gitignore
+
+# Exclude documentation and markdown files
+docs/
+*.md
+
+# Exclude development configuration files
+.env
+.env.*
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Exclude test files and artifacts
+tests/
+__tests__/
+coverage/
+*.test.js
+*.spec.js
+*.snap
+screenshots/
+
+# Exclude build artifacts and temporary files
+dist/
+build/
+out/
+*.bak
+*.tmp
+*.cache
+
+# Exclude OS-specific files
+.DS_Store
+Thumbs.db
