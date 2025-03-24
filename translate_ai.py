@@ -4,38 +4,47 @@ from googletrans import Translator
 from bs4 import BeautifulSoup
 import time
 
+# Initialize translator
 translator = Translator()
 
-json_dir = './locales'
+# Directory containing JSON files
+json_dir = './json_files'  # Replace with your directory
 
-base_file = os.path.join(json_dir, 'en.json')
+# Mapping for base language files
+base_language_map = {
+    "quz": "es.json",  # Quechua
+    "ayc": "es.json",  # Aymara
+    "gug": "es.json"   # Guarani
+}
 
+# Function to get base file dynamically
+def get_base_file(target_lang):
+    return os.path.join(json_dir, base_language_map.get(target_lang, 'en.json'))
+
+# Check if directory exists
 print(f"Checking directory: {os.path.abspath(json_dir)}")
 if not os.path.exists(json_dir):
     print(f"Directory does not exist: {json_dir}")
     exit()
 
-if not os.path.exists(base_file):
-    print(f"Base file does not exist: {base_file}")
-    exit()
-
-
+# Function to extract text from HTML
 def extract_text(html):
-
+    # Parse HTML
     soup = BeautifulSoup(html, "html.parser")
-    
+    # Get only text content
     return soup.get_text() if soup.get_text().strip() else html
 
+# Function to rebuild HTML with translated text
 def rebuild_html(original_html, translated_text):
-   
+    # Replace the text inside HTML tags with translated text
     soup = BeautifulSoup(original_html, "html.parser")
     if soup.string:
         soup.string.replace_with(translated_text)
     return str(soup)
 
-
+# Function to translate text with exponential backoff
 def translate_with_backoff(text, target_lang, max_retries=5):
-    delay = 1  
+    delay = 1  # Start with 1 second delay
     for attempt in range(max_retries):
         try:
             translation = translator.translate(text, src='en', dest=target_lang)
@@ -45,12 +54,13 @@ def translate_with_backoff(text, target_lang, max_retries=5):
         except Exception as e:
             print(f"Attempt {attempt + 1}: Error for text '{text}': {e}")
         time.sleep(delay)
-        delay *= 2  
-    return text  
+        delay *= 2  # Exponential backoff
+    return text  # Return original text if all retries fail
 
-
+# Function to create a new JSON file for a non-existent language
 def create_new_language_file(target_lang):
-    print(f"Creating new file for language: {target_lang}")
+    base_file = get_base_file(target_lang)
+    print(f"Creating new file for language: {target_lang} using base file: {base_file}")
     try:
         with open(base_file, 'r', encoding='utf-8') as f:
             data = json.load(f)
@@ -71,7 +81,7 @@ def create_new_language_file(target_lang):
         translated_data[key] = rebuild_html(key, translation)
         print(f"Progress: {idx}/{total_keys} ({(idx / total_keys) * 100:.2f}%)")
 
-   
+    # Create new file with translations
     new_file_path = os.path.join(json_dir, f'{target_lang}.json')
 
     with open(new_file_path, 'w', encoding='utf-8') as f:
@@ -87,7 +97,7 @@ def create_new_language_file(target_lang):
     else:
         print("\nAll keys were translated successfully!")
 
-
+# Function to translate missing keys for regular JSON files
 def translate_missing(file_path, target_lang):
     print(f"Translating missing keys for {file_path}")
     try:
@@ -122,7 +132,7 @@ def translate_missing(file_path, target_lang):
 
     print(f"Updated missing translations in {file_path}")
 
-  
+    # Report failed translations
     if failed_translations:
         print("\nFailed to translate the following keys:")
         for key in failed_translations:
@@ -130,7 +140,7 @@ def translate_missing(file_path, target_lang):
     else:
         print("\nAll missing keys were translated successfully!")
 
-
+# Iterate over JSON files
 existing_files = [f for f in os.listdir(json_dir) if f.endswith('.json')]
 print(f"Existing JSON files: {existing_files}")
 
@@ -140,7 +150,7 @@ if not existing_files:
 language_codes = [f.split('.')[0] for f in existing_files]
 
 print("Prompting for target language...")
-target_language = input("Enter the target language code (e.g., 'it', 'ko'): ")
+target_language = input("Enter the target language code (e.g., 'it', 'ko'): ").replace("_", "-")
 
 if f"{target_language}.json" not in existing_files:
     create_new_language_file(target_language)
