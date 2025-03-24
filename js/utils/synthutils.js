@@ -84,6 +84,8 @@ const VOICENAMES = [
     [_("sitar"), "sitar", "images/synth.svg", "string"],
     //.TRANS: harmonium musical instrument
     [_("harmonium"), "harmonium", "images/voices.svg", "string"],
+    //.TRANS: mandolin musical instrument
+    [_("mandolin"), "mandolin", "images/voices.svg", "string"],
     //.TRANS: musical instrument
     [_("guitar"), "guitar", "images/voices.svg", "string"],
     //.TRANS: musical instrument
@@ -270,7 +272,8 @@ const SOUNDSAMPLESDEFINES = [
     "samples/trombone",
     "samples/doublebass",
     "samples/sitar",
-    "samples/harmonium"
+    "samples/harmonium",
+    "samples/mandolin"
 ];
 
 // Some samples have a default volume other than 50 (See #1697)
@@ -308,7 +311,8 @@ const DEFAULTSYNTHVOLUME = {
     "xylophone": 100,
     "japanese drum": 90,
     "sitar": 100,
-    "harmonium": 100
+    "harmonium": 100,
+    "mandolin": 100,
 };
 
 /**
@@ -345,6 +349,15 @@ const SAMPLECENTERNO = {
     "harmonium": ["C4", 39] // pitchToNumber('C', 4, 'C Major')]
 };
 
+/**
+ * The sample has multiple pitch which is subsequently transposed.
+ * This object defines the starting pitch for different samples.
+ * @constant
+ * @type {Object.<string, Array<string>>}
+ */
+const MULTIPITCH = {
+    "mandolin": ["A4", "A5", "A6"]
+};
 
 /**
  * Array to store custom samples.
@@ -839,7 +852,8 @@ function Synth() {
                 { name: "vibraphone", data: VIBRAPHONE_SAMPLE },
                 { name: "xylophone", data: XYLOPHONE_SAMPLE },
                 { name: "sitar", data: SITAR_SAMPLE },
-                { name: "harmonium", data: HARMONIUM_SAMPLE }
+                { name: "harmonium", data: HARMONIUM_SAMPLE },
+                { name: "mandolin", data: MANDOLIN_SAMPLE }
             ],
             drum: [
                 { name: "bottle", data: BOTTLE_SAMPLE },
@@ -1213,6 +1227,11 @@ function Synth() {
             const noteDict = {};
             if (sourceName in SAMPLECENTERNO) {
                 noteDict[SAMPLECENTERNO[sourceName][0]] = this.samples.voice[sourceName];
+            } else if (sourceName in MULTIPITCH) {
+                for (let i = 0; i < MULTIPITCH[sourceName].length; i++) {
+                    noteDict[MULTIPITCH[sourceName][i]] = this.samples.voice[sourceName][i];
+                }
+                tempSynth = new Tone.Sampler(noteDict);
             } else {
                 noteDict["C4"] = this.samples.voice[sourceName];
             }
