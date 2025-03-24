@@ -3103,6 +3103,9 @@ class Activity {
                         this.blocks.prepareStackForCopy();
                         break;
                     case 68: // 'D'
+                        if (!this.palettes.dict["myblocks"].promptMacrosDelete) {
+                            return; // Skip execution if the function is not defined
+                        }
                         this.palettes.dict["myblocks"].promptMacrosDelete();
                         break;
                     case 69: // 'E'
