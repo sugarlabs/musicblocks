@@ -64,6 +64,9 @@ class DummyValueBlock {
         return this;
     }
     setup(activity) { return this; }
+    arg(logo, turtle, blk) {
+        return global.activity.blocks.blockList[blk].value;
+    }
 }
 
 class DummyLeftBlock {
@@ -84,6 +87,9 @@ class DummyLeftBlock {
         return this;
     }
     setup(activity) { return this; }
+    arg(logo, turtle, blk) {
+        return global.activity.blocks.blockList[blk].value;
+    }
 }
 
 global.FlowBlock = DummyFlowBlock;
@@ -112,7 +118,13 @@ global.MathUtility = {
     },
     doMultiply: (a, b) => Number(a) * Number(b),
     doNegate: (a) => -Number(a),
-    doPlus: (a, b) => Number(a) + Number(b),
+    doPlus: (a, b) => {
+        if (!isNaN(a) && !isNaN(b)) {
+            return Number(a) + Number(b);
+        } else {
+            return "" + a + b;
+        }
+    },
     doOneOf: (a, b) => a,
     doRandom: (a, b, octave) => a,
     doMinus: (a, b) => Number(a) - Number(b)
@@ -175,6 +187,7 @@ describe("setupNumberBlocks", () => {
         dummyActivity.blocks.blockList = {};
         dummyActivity.turtles.turtleObjs = {};
         activity = dummyActivity;
+        global.activity = activity;
         logo = { ...dummyLogo };
         turtleIndex = 0;
         setupNumberBlocks(activity);
@@ -366,17 +379,51 @@ describe("setupNumberBlocks", () => {
             const result = plusBlock.arg(logo, turtleIndex, 200, null);
             expect(result).toEqual(3 + 7);
         });
-        it("should handle string values by converting them", () => {
+        it("should handle numeric strings by converting them", () => {
             activity.blocks.blockList[200] = { connections: [null, "c1", "c2"] };
             logo.parseArg = jest.fn(() => "5");
             const plusBlock = createdBlocks["plus"];
             const result = plusBlock.arg(logo, turtleIndex, 200, null);
             expect(result).toEqual(10);
         });
+        it("should concatenate two strings", () => {
+            activity.blocks.blockList[200] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn((l, t, c, blk, r) => {
+                if (c === "c1") return "Hello ";
+                if (c === "c2") return "world";
+            });
+            global.MathUtility.doPlus = (a, b) => {
+                if (!isNaN(a) && !isNaN(b)) {
+                    return Number(a) + Number(b);
+                } else {
+                    return "" + a + b;
+                }
+            };
+            const plusBlock = createdBlocks["plus"];
+            const result = plusBlock.arg(logo, turtleIndex, 200, null);
+            expect(result).toEqual("Hello world");
+        });
+        it("should handle mixed string and number concatenation", () => {
+            activity.blocks.blockList[200] = { connections: [null, "c1", "c2"] };
+            logo.parseArg = jest.fn((l, t, c, blk, r) => {
+                if (c === "c1") return "Count: ";
+                if (c === "c2") return 5;
+            });
+            global.MathUtility.doPlus = (a, b) => {
+                if (!isNaN(a) && !isNaN(b)) {
+                    return Number(a) + Number(b);
+                } else {
+                    return "" + a + b;
+                }
+            };
+            const plusBlock = createdBlocks["plus"];
+            const result = plusBlock.arg(logo, turtleIndex, 200, null);
+            expect(result).toEqual("Count: 5");
+        });
     });
 
     describe("OneOfBlock", () => {
-        it("should return the first of two values", () => {
+        it("should return one of the two values", () => {
             activity.blocks.blockList[210] = { connections: [null, "c1", "c2"] };
             logo.parseArg = jest.fn((l, t, c, blk, r) => {
                 if (c === "c1") return 100;
@@ -384,7 +431,7 @@ describe("setupNumberBlocks", () => {
             });
             const oneOfBlock = createdBlocks["oneOf"];
             const result = oneOfBlock.arg(logo, turtleIndex, 210, null);
-            expect(result).toEqual(100);
+            expect([100, 200]).toContain(result);
         });
     });
 
