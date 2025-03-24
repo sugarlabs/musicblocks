@@ -6,7 +6,7 @@ import time
 
 translator = Translator()
 
-json_dir = './locales_new' 
+json_dir = './locales' 
 
 base_language_map = {
     "quz": "es.json",  
