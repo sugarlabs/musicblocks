@@ -71,82 +71,50 @@ function _(text) {
     }
 
     try {
-        // Replace certain characters from the input text
-        const replace = [
-            ",",
-            "(",
-            ")",
-            "?",
-            "¿",
-            "<",
-            ">",
-            ".",
-            "\n",
-            '"',
-            ":",
-            "%s",
-            "%d",
-            "/",
-            "'",
-            ";",
-            "×",
-            "!",
-            "¡"
-        ];
-
-        let replaced = text;
-
-        // to remove unwanted characters
-        for (let p = 0; p < replace.length; p++) {
-            replaced = replaced.split(replace[p]).join(""); // Efficient replacement
-        }
-        
-        //the replaced version is the version WITHOUT the unwanted characters.
-        replaced = replaced.replace(/ /g, "-");
+        // Remove unwanted characters using a single regex
+        const unwantedChars = /[,\()?¿<>.\n":%s%d\/';×!¡]/g;
+        const cleanedText = text.replace(unwantedChars, "").replace(/ /g, "-");
 
         if (localStorage.kanaPreference === "kana") {
             const lang = document.webL10n.getLanguage();
             if (lang === "ja") {
-                replaced = "kana-" + replaced;
+                cleanedText = "kana-" + cleanedText;
             }
         }
 
-        // first, we actually tried to find out if there was an existing translation with SAME case
-        let translated = document.webL10n.get(text);
-
-        // Takes, for example
-        if ((!translated || translated === text) && replaced !== text) {
-            translated = document.webL10n.get(replaced);
+        // Helper function to get translation with case matching
+        function getTranslationWithCase(inputText, caseType) {
+            const translatedText = document.webL10n.get(inputText);
+            if (!translatedText || translatedText === inputText) {
+                return null; // No translation found
+            }
+        
+            switch (caseType) {
+                case "upper":
+                    return translatedText.toUpperCase();
+                case "lower":
+                    return translatedText.toLowerCase();
+                case "title":
+                    return translatedText.charAt(0).toUpperCase() + translatedText.slice(1).toLowerCase();
+                default:
+                    return translatedText;
+            }
         }
 
-        // If still no translation is found, try the lowercase version
-        if (!translated || translated === text) {
-            translated = document.webL10n.get(text.toLowerCase());
-        }
+        // Try translations in order of priority
+        const translations = [
+            getTranslationWithCase(text, "original"), // Original case
+            getTranslationWithCase(cleanedText, "original"), // Cleaned text
+            getTranslationWithCase(text.toLowerCase(), "lower"), // Lowercase
+            getTranslationWithCase(
+                text.charAt(0).toUpperCase() + text.slice(1).toLowerCase(),
+                "title" // Title case
+            ),
+        ];
 
-        //if still no translation is found, try the initial caps translation too
-        if (!translated || translated === text) {
-            const initialCaps = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
-            translated = document.webL10n.get(initialCaps);
-        }
+        const validTranslation = translations.find(t => t !== null);
+        return validTranslation || text;
 
-        //function returns the ORIGINAL case without any translation if no translation exists
-        translated = translated || text;
-
-        // this if ensures Correct LETTER CASING, for example, "Search" -> "Buscar" and "SEARCH" -> "BUSCAR" and "search" -> "buscar"
-        if (text === text.toUpperCase()) {
-            //if the input is all uppercase, then we will return the translation in uppercase
-            return translated.toUpperCase();
-        } else if (text === text.toLowerCase()) {
-            //if the input is all lowercase,then return the translation in lowercase
-            return translated.toLowerCase();
-        } else if (text.charAt(0).toUpperCase() + text.slice(1).toLowerCase() === text) {
-            //if the input is in title case, then return the translation in title case
-            return translated.charAt(0).toUpperCase() + translated.slice(1).toLowerCase();
-        }
-
-        // return the translation as is if any of the case does not match
-        return translated;
     } catch (e) {
         // console.debug("i18n error: " + text);
         return text;
@@ -1194,7 +1162,7 @@ readable-fractions/681534#681534
 
     let df = 1.0;
     let top = 1;
-    let iterations = 0
+    let iterations = 0;
     const maxIterations = 10000;
     let bot = 1;
 

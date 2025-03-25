@@ -1476,5 +1476,5 @@ class Painter {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-module.exports = Painter;
+    module.exports = Painter;
 }

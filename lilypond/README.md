@@ -15,38 +15,7 @@ We will use Music Blocks to create the music and then convert that to sheet musi
 * Curiosity about [sheet music](https://en.wikipedia.org/wiki/Sheet_music)
 
 ## Downloading LilyPond
-Open the [LilyPond download page](http://www.lilypond.org/download.html) and download the software "For Users" as per your operating system.
-
-## Installing LilyPond
-### Installation for GNU/Linux and FreeBSD
-[Read GNU/Linux Installation on the Lilypond webpage](http://www.lilypond.org/unix.html)
-
-1. Right click the link and save it as `filename.sh` (for example save as `lilypond-2.18.2-1.linux-64.sh`)
-2. Open a terminal and go to the directory into which the `.sh` file was downloaded (by default ~/Downloads), e.g.,
-```
-cd ~/Downloads
-chmod +x lilypond-2.16.2-1.linux-64.sh
-sudo ./lilypond-2.16.2-1.linux-64.sh
-```
-
-### Installation for Windows
-[Read Windows Installation on the Lilypond webpage](http://www.lilypond.org/windows.html)
-
-Download the `.exe` file and run it to launch the installation process.
-
-### Installation for Mac OS
-1. Open the `.tar.bz2` file once it gets downloaded.
- <img src="\images\ly_mac_1.png"></img>
-2. Clicking it will, open the `Archive Utility` and extract it's contents.
- <img src="\images\ly_mac_2.png"></img>
-3. After they have been extracted, you will see a `LilyPond application` file in the directory that pops up.
-4. Drag and drop this file to the `Applications` on the left pane.
- <img src="\images\ly_mac_3.png"></img>
-5. This will now enable you to see the "LilyPond" in your applications, i.e. It will get installed and you can drag and drop it from there to your dock, in order to have a shortcut for `LilyPond` in the dock.
-6. You can double-click it to run the program.
- <img src="\images\ly_mac_4.png"></img>
-7. Alternatively, run it from a [terminal](http://guides.macrumors.com/Terminal) with the command `open -a LilyPond`.
- <img src="\images\ly_mac_5.png"></img>
+Lilypond may be downloaded for Windows, Mac, and GNU/Linux from [LilyPond download page](http://www.lilypond.org/download.html)
 
 ## Generating LilyPond files from Music Blocks
 <img src='https://rawgit.com/Daksh/guides/master/lywithmb//images/save_as_ly_bt.svg'></img>

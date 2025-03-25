@@ -173,7 +173,7 @@ class PhraseMaker {
          */
         this._matrixHasTuplets = false;
 
-         /**
+        /**
          * Counter for the number of notes in the PhraseMaker.
          * @type {number}
          * @private
@@ -283,13 +283,13 @@ class PhraseMaker {
          */
         var screenHeight = window.innerHeight;
 
-         /**
+        /**
           * Container element for floating windows.
           * @type {HTMLElement}
           */
         var floatingWindowsDiv = document.getElementById("floatingWindows");
 
-         /**
+        /**
           * Collection of window frame elements.
           * @type {NodeListOf<Element>}
           */
@@ -1893,10 +1893,10 @@ class PhraseMaker {
                 }
             }
         }
-            if (lastIndex !== null && this._pitchWheel.navItems[lastIndex]) {
-                this._pitchWheel.navigateWheel(lastIndex);
-            }
-}
+        if (lastIndex !== null && this._pitchWheel.navItems[lastIndex]) {
+            this._pitchWheel.navigateWheel(lastIndex);
+        }
+    }
 
     /**
      * Creates a pie submenu for modifying column blocks based on the provided condition.
@@ -2806,7 +2806,7 @@ class PhraseMaker {
         const saveDocument = exportDocument;
         const uriData = saveDocument.documentElement.outerHTML;
         exportDocument.body.innerHTML +=
-            `<br><a id="downloadb1" style="background: #C374E9; border-radius: 5%; padding: 0.3em; text-decoration: none; margin: 0.5em; color: white;" download>Download Matrix</a>`;
+            "<br><a id=\"downloadb1\" style=\"background: #C374E9; border-radius: 5%; padding: 0.3em; text-decoration: none; margin: 0.5em; color: white;\" download>Download Matrix</a>";
         exportDocument.getElementById("downloadb1").download = "MusicMatrix";
         exportDocument.getElementById("downloadb1").href = this._generateDataURI(uriData);
         exportDocument.close();

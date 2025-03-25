@@ -74,7 +74,7 @@ class MeterBlocksAPI {
         return Singer.MeterActions.getNotesPlayed(args[0], this.turIndex);
     }
 }
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
     module.exports = MeterBlocksAPI;
 }
 

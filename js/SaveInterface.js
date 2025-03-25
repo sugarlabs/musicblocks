@@ -106,7 +106,7 @@ class SaveInterface {
             }
 
             if (
-                typeof this.PlanetInterface !== 'undefined' &&
+                typeof this.PlanetInterface !== "undefined" &&
                 this.PlanetInterface.getTimeLastSaved() !== this.timeLastSaved
             ) {
                 event.preventDefault();
@@ -308,7 +308,7 @@ class SaveInterface {
                 const mainTrack = midi.addTrack();
                 mainTrack.name = `Track ${parseInt(blockIndex) + 1}`;
 
-                let trackMap = new Map();
+                const trackMap = new Map();
                 let globalTime = 0;
 
                 notes.forEach((noteData) => {
@@ -435,7 +435,7 @@ class SaveInterface {
     saveBlockArtworkPNG(activity) {
         activity.printBlockPNG().then((pngDataUrl) => {
             activity.save.download("png", pngDataUrl, null);
-        })
+        });
     }
 
     /**
@@ -777,6 +777,6 @@ class SaveInterface {
 }
 
 
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
     module.exports = { SaveInterface };
 }

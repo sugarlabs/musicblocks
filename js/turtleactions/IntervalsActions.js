@@ -90,7 +90,7 @@ function setupIntervalsActions(activity) {
             return totalIntervals;
         }
 
-         /**
+        /**
          * @static
          * @param {number} turtle
          * @returns {String}
@@ -110,13 +110,13 @@ function setupIntervalsActions(activity) {
 
             let totalIntervals = this.GetIntervalNumber(turtle);
             
-            const numberToStringMap = [_('one'), _('two'), _('three'), _('four'), _('five'), _('six'), _('seven'), _('eight'), _('nine')]
-            const plural = (Math.abs(octave) > 1) ? _('octaves') : _('octave');
+            const numberToStringMap = [_("one"), _("two"), _("three"), _("four"), _("five"), _("six"), _("seven"), _("eight"), _("nine")];
+            const plural = (Math.abs(octave) > 1) ? _("octaves") : _("octave");
             
             let os = numberToStringMap[Math.abs(octave) - 1] || Math.abs(octave);
             if (totalIntervals % 12 === 0 && letterGap === 0) {
                 if (octave < 0) {
-                    if (octave === -1) os = ""
+                    if (octave === -1) os = "";
                     const a = os + " " + _("perfect") + " " + plural + " " + _("below");
                     return a.charAt(0).toUpperCase() + a.slice(1);
                 }
@@ -129,18 +129,18 @@ function setupIntervalsActions(activity) {
             if (totalIntervals > 21) {
                 if (octave >= 1) {
                     lastWord = ", " + _("plus") + " " + os + " " + plural;
-                }    
+                }
                 while (totalIntervals > 12) totalIntervals -= 12;
             }
             
             if (octave < 0) {
                 letterGap = (letterGap !== 0) ? NOTENAMES.length - letterGap : letterGap;
                 if (octave < -1) lastWord = `,  ${os} ${plural}`;
-                lastWord += " "
-		lastWord += _("below")
+                lastWord += " ";
+                lastWord += _("below");
             }
             
-            let interval = (totalIntervals % 12 === 0 && letterGap === 0) ? SEMITONETOINTERVALMAP[totalIntervals][letterGap] : SEMITONETOINTERVALMAP[totalIntervals][letterGap] + lastWord;
+            const interval = (totalIntervals % 12 === 0 && letterGap === 0) ? SEMITONETOINTERVALMAP[totalIntervals][letterGap] : SEMITONETOINTERVALMAP[totalIntervals][letterGap] + lastWord;
             return interval;
         }
         

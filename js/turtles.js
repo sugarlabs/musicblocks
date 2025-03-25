@@ -425,7 +425,11 @@ Turtles.TurtlesModel = class {
      * @returns {Object} The turtle object at the specified index.
      */
     getTurtle(index) {
-        return this._turtleList[index];
+        const turtle = this._turtleList[index];
+        if (!turtle) {
+            throw new Error(`Turtle ${index} not found`);
+        }
+        return turtle;
     }
 
     /**

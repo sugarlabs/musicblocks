@@ -163,7 +163,7 @@ class Publisher {
 
     initSubmit() {
         document.getElementById("publisher-submit")
-                .addEventListener("click", this.publishProject.bind(this));
+            .addEventListener("click", this.publishProject.bind(this));
     };
 
     open(id, IsShareLink) {

@@ -14,7 +14,6 @@
 /* exported  transcribeMidi*/
 
 
-const MAX_NOTEBLOCKS = 100;
 const defaultTempo = 90;
 
 const standardDurations = [
@@ -33,31 +32,31 @@ const getClosestStandardNoteValue = (duration) => {
     let minDiff = Math.abs(duration - closest.duration);
 
     for (let i = 1; i < standardDurations.length; i++) {
-        let diff = Math.abs(duration - standardDurations[i].duration);
+        const diff = Math.abs(duration - standardDurations[i].duration);
         if (diff < minDiff) {
             closest = standardDurations[i];
             minDiff = diff;
         }
     }
 
-    return closest.value.split('/').map(Number);
-}
+    return closest.value.split("/").map(Number);
+};
 
-const transcribeMidi = async (midi) => {
+const transcribeMidi = async (midi, maxNoteBlocks) => {
     const currentMidi = midi;
     const drumMidi = getReverseDrumMidi();
     const isPercussion = [];
-    let jsONON = [];
+    const jsONON = [];
     let actionBlockCounter = 0; // Counter for action blocks
-    let actionBlockNames = []; // Array to store action block names
+    const actionBlockNames = []; // Array to store action block names
     let totalnoteblockCount = 0; // Initialize noteblock counter
     let noteblockCount = 0;
     let shortestNoteDenominator = 0;
     let offset = 100;
     let stopProcessing = false;
     let trackCount = 0;
-    let actionBlockPerTrack = [];
-    let instruments = [];
+    const actionBlockPerTrack = [];
+    const instruments = [];
     let currentMidiTempoBpm = currentMidi.header.tempos;
     if (currentMidiTempoBpm && currentMidiTempoBpm.length > 0) {
         currentMidiTempoBpm = Math.round(currentMidiTempoBpm[0].bpm);
@@ -65,7 +64,7 @@ const transcribeMidi = async (midi) => {
         currentMidiTempoBpm = defaultTempo;
     }
 
-    let defaultTimeSignature = [4, 4];
+    const defaultTimeSignature = [4, 4];
     let currentMidiTimeSignature = currentMidi.header.timeSignatures;
     if (currentMidiTimeSignature && currentMidiTimeSignature.length > 0) {
         currentMidiTimeSignature = currentMidiTimeSignature[0].timeSignature;
@@ -81,10 +80,10 @@ const transcribeMidi = async (midi) => {
         let k = 0;
         if (stopProcessing) return; // Exit if flag is set
         if (!track.notes.length) return;
-        let r = jsONON.length;
+        const r = jsONON.length;
         let instrument = "electronic synth";
         if (track.instrument.name && !track.instrument.percussion) {
-            for (let voices of VOICENAMES) {
+            for (const voices of VOICENAMES) {
                 if (track.instrument.name.indexOf(voices[1]) > -1) {
                     instrument = voices[0];
                 }
@@ -95,24 +94,24 @@ const transcribeMidi = async (midi) => {
         actionBlockPerTrack[trackCount] = 0;
         instruments[trackCount] = instrument;
 
-        let actionBlockName = `track${trackCount}chunk${actionBlockCounter}`;
+        const actionBlockName = `track${trackCount}chunk${actionBlockCounter}`;
 
         jsONON.push(
             [r, ["action", { collapsed: false }], 150, 100, [null, r + 1, r + 2, null]],
             [r + 1, ["text", { value: actionBlockName }], 0, 0, [r]]
         );
 
-        let sched = [];
+        const sched = [];
         isPercussion.push(track.instrument.percussion && (track.channel === 9 || track.channel === 10));
 
         track.notes.forEach((note, index) => {
-            let name = note.name;
-            let start = Math.round(note.time * 100) / 100;
-            let end = Math.round((note.time + note.duration) * 100) / 100;
+            const name = note.name;
+            const start = Math.round(note.time * 100) / 100;
+            const end = Math.round((note.time + note.duration) * 100) / 100;
 
             if (note.duration === 0) return;
 
-            let lastNote = sched[sched.length - 1];
+            const lastNote = sched[sched.length - 1];
 
             if (index === 0 && start > 0) {
                 sched.push({ start: 0, end: start, notes: ["R"] });
@@ -124,8 +123,8 @@ const transcribeMidi = async (midi) => {
             }
 
             if (lastNote && lastNote.start <= start && lastNote.end > start) {
-                let prevNotes = [...lastNote.notes];
-                let oldEnd = lastNote.end;
+                const prevNotes = [...lastNote.notes];
+                const oldEnd = lastNote.end;
 
                 lastNote.end = start;
 
@@ -148,8 +147,8 @@ const transcribeMidi = async (midi) => {
         let currentActionBlock = [];
 
         const addNewActionBlock = (isLastBlock = false) => {
-            let r = jsONON.length;
-            let actionBlockName = `track${trackCount}chunk${actionBlockCounter}`;
+            const r = jsONON.length;
+            const actionBlockName = `track${trackCount}chunk${actionBlockCounter}`;
             actionBlockNames.push(actionBlockName);
             actionBlockPerTrack[trackCount]++;
             if (k == 0) {
@@ -158,7 +157,7 @@ const transcribeMidi = async (midi) => {
                 );
                 k = 1;
             } else {
-                let settimbreIndex = r;
+                const settimbreIndex = r;
                 // Adjust the first note block's top connection to settimbre
                 currentActionBlock[0][4][0] = settimbreIndex;
                 jsONON.push(
@@ -169,7 +168,7 @@ const transcribeMidi = async (midi) => {
 
             }
             if (isLastBlock) {
-                let lastIndex = jsONON.length - 1;
+                const lastIndex = jsONON.length - 1;
                 // Set the last hidden block's second value to null
                 jsONON[lastIndex][4][1] = null;
             }
@@ -179,45 +178,45 @@ const transcribeMidi = async (midi) => {
             offset += 100;
         };
         //Using for loop for finding the shortest note value
-        for (let j in sched) {
-            let dur = sched[j].end - sched[j].start;;
-            let temp = getClosestStandardNoteValue(dur * 3 / 8);
+        for (const j in sched) {
+            const dur = sched[j].end - sched[j].start;;
+            const temp = getClosestStandardNoteValue(dur * 3 / 8);
             shortestNoteDenominator = Math.max(shortestNoteDenominator, temp[1]);
         }
 
-        for (let i in sched) {
+        for (const i in sched) {
             if (stopProcessing) break; // Exit inner loop if flag is set
-            let { notes, start, end } = sched[i];
-            let duration = end - start;
+            const { notes, start, end } = sched[i];
+            const duration = end - start;
             noteSum += duration;
-            let isLastNoteInBlock = (noteSum >= 16) || (noteblockCount > 0 && noteblockCount % 24 === 0);
+            const isLastNoteInBlock = (noteSum >= 16) || (noteblockCount > 0 && noteblockCount % 24 === 0);
             if (isLastNoteInBlock) {
                 totalnoteblockCount += noteblockCount;
                 noteblockCount = 0;
                 noteSum = 0;
             }
-            let isLastNoteInSched = (i == sched.length - 1);
-            let last = isLastNoteInBlock || isLastNoteInSched;
-            let first = (i == 0);
+            const isLastNoteInSched = (i == sched.length - 1);
+            const last = isLastNoteInBlock || isLastNoteInSched;
+            const first = (i == 0);
             let val = jsONON.length + currentActionBlock.length;
             const getPitch = (x, notes, prev) => {
-                let ar = [];
+                const ar = [];
                 if (notes[0] == "R") {
                     ar.push(
                         [x, "rest2", 0, 0, [prev, null]]
                     );
                 } else if (precurssionFlag) {
-                    let drumname = drumMidi[track.notes[0].midi][0] || "kick drum";
+                    const drumname = drumMidi[track.notes[0].midi][0] || "kick drum";
                     ar.push(
                         [x, "playdrum", 0, 0, [first ? prev : x - 1, x + 1, null]],
                         [x + 1, ["drumname", { "value": drumname }], 0, 0, [x]],
                     );
                     x += 2;
                 } else {
-                    for (let na in notes) {
-                        let name = notes[na];
-                        let first = na == 0;
-                        let last = na == notes.length - 1;
+                    for (const na in notes) {
+                        const name = notes[na];
+                        const first = na == 0;
+                        const last = na == notes.length - 1;
                         ar.push(
                             [x, "pitch", 0, 0, [first ? prev : x - 3, x + 1, x + 2, last ? null : x + 3]],
                             [x + 1, ["notename", { "value": name.substring(0, name.length - 1) }], 0, 0, [x]],
@@ -243,7 +242,7 @@ const transcribeMidi = async (midi) => {
 
             // Since we are going to add action block in the front later
             if (k != 0) val = val + 2;
-            let pitches = getPitch(val + 5, notes, val);
+            const pitches = getPitch(val + 5, notes, val);
             currentActionBlock.push(
                 [val, ["newnote", { "collapsed": true }], 0, 0, [first ? val - 2 : val - 1, val + 1, val + 4, val + pitches.length + 5]],
                 [val + 1, "divide", 0, 0, [val, val + 2, val + 3]],
@@ -264,8 +263,8 @@ const transcribeMidi = async (midi) => {
                 addNewActionBlock(isLastNoteInSched);
             }
 
-            if (totalnoteblockCount >= MAX_NOTEBLOCKS) {
-                activity.textMsg("MIDI file is too large.. Generating only 100 noteblocks");
+            if (totalnoteblockCount >= maxNoteBlocks) {
+                activity.textMsg(`MIDI file is too large. Generating only ${maxNoteBlocks} noteblocks`);
                 stopProcessing = true;
                 break;
             }
@@ -283,13 +282,13 @@ const transcribeMidi = async (midi) => {
         document.body.style.cursor = "wait";
     });
 
-    let len = jsONON.length;
+    const len = jsONON.length;
     let m = 0;
     let actionIndex = 0;
 
     for (let i = 0; i < trackCount; i++) {
-        let vspaceIndex = len + m + 6;
-        let startIndex = len + m;
+        const vspaceIndex = len + m + 6;
+        const startIndex = len + m;
         let flag = true;
 
         if (isPercussion[i]) {
@@ -330,7 +329,7 @@ const transcribeMidi = async (midi) => {
             actionIndex++;
         }
         jsONON[len + m - 1][4][1] = null;
-        let setBpmIndex = jsONON.length;
+        const setBpmIndex = jsONON.length;
         jsONON.push(
             [setBpmIndex, ["setbpm3"], 0, 0, [vspaceIndex, setBpmIndex + 1, setBpmIndex + 2, setBpmIndex + 5]],
             [setBpmIndex + 1, ["number", { value: currentMidiTempoBpm }], 0, 0, [setBpmIndex]],
@@ -353,6 +352,6 @@ const transcribeMidi = async (midi) => {
     return null;
 };
 
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
     module.exports = { getClosestStandardNoteValue, transcribeMidi };
 }

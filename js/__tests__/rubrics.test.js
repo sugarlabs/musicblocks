@@ -29,26 +29,26 @@ const {
     getChartOptions,
     runAnalytics,
     getStatsFromNotation
-} = require('../rubrics');
-const { isCustomTemperament } = require('../utils/musicutils');
+} = require("../rubrics");
+const { isCustomTemperament } = require("../utils/musicutils");
 
 global.last = jest.fn();
 global.isCustomTemperament = isCustomTemperament;
-global.TextEncoder = require('util').TextEncoder;
-global.TextDecoder = require('util').TextDecoder;
+global.TextEncoder = require("util").TextEncoder;
+global.TextDecoder = require("util").TextDecoder;
 
-jest.mock('../utils/musicutils', () => ({
+jest.mock("../utils/musicutils", () => ({
     isCustomTemperament: jest.fn(() => false),
     getTemperament: jest.fn(() => [])
 }));
-jest.mock('../utils/utils.js', () => ({
+jest.mock("../utils/utils.js", () => ({
     _: jest.fn((str) => str)
 }));
 
-describe('rubrics.js test suite', () => {
+describe("rubrics.js test suite", () => {
     
-    describe('analyzeProject', () => {
-        it('should return an array of scores', () => {
+    describe("analyzeProject", () => {
+        it("should return an array of scores", () => {
             const activity = {
                 blocks: {
                     blockList: [
@@ -63,7 +63,7 @@ describe('rubrics.js test suite', () => {
             expect(result.length).toBe(PALS.length);
         });
 
-        it('should ignore blocks in trash', () => {
+        it("should ignore blocks in trash", () => {
             const activity = {
                 blocks: {
                     blockList: [
@@ -77,33 +77,33 @@ describe('rubrics.js test suite', () => {
         });
     });
 
-    describe('scoreToChartData', () => {
-        it('should return a properly formatted chart data object', () => {
+    describe("scoreToChartData", () => {
+        it("should return a properly formatted chart data object", () => {
             const scores = [10, 20, 30, 40, 50];
             const chartData = scoreToChartData(scores);
 
-            expect(chartData).toHaveProperty('labels');
-            expect(chartData).toHaveProperty('datasets');
+            expect(chartData).toHaveProperty("labels");
+            expect(chartData).toHaveProperty("datasets");
             expect(Array.isArray(chartData.labels)).toBe(true);
             expect(chartData.datasets).toHaveLength(1);
-            expect(chartData.datasets[0]).toHaveProperty('data');
+            expect(chartData.datasets[0]).toHaveProperty("data");
             expect(chartData.datasets[0].data.length).toBe(scores.length);
         });
     });
 
-    describe('getChartOptions', () => {
-        it('should return an object with correct chart settings', () => {
+    describe("getChartOptions", () => {
+        it("should return an object with correct chart settings", () => {
             const callback = jest.fn();
             const options = getChartOptions(callback);
 
-            expect(options).toHaveProperty('onAnimationComplete', callback);
-            expect(options).toHaveProperty('scaleShowLine', true);
-            expect(options).toHaveProperty('datasetFill', true);
+            expect(options).toHaveProperty("onAnimationComplete", callback);
+            expect(options).toHaveProperty("scaleShowLine", true);
+            expect(options).toHaveProperty("datasetFill", true);
         });
     });
 
-    describe('runAnalytics', () => {
-        it('should set correct properties on logo object', () => {
+    describe("runAnalytics", () => {
+        it("should set correct properties on logo object", () => {
             const activity = {
                 logo: {
                     runningLilypond: false,
@@ -120,8 +120,8 @@ describe('rubrics.js test suite', () => {
                     ],
                     getTurtleCount: jest.fn(() => 1),
                     getTurtle: jest.fn((id) => ({
-                    painter: { doClear: jest.fn() }
-                }))
+                        painter: { doClear: jest.fn() }
+                    }))
                 }
             };
 
@@ -133,8 +133,8 @@ describe('rubrics.js test suite', () => {
         });
     });
 
-    describe('getStatsFromNotation', () => {
-        it('should return an object with musical statistics', () => {
+    describe("getStatsFromNotation", () => {
+        it("should return an object with musical statistics", () => {
             const activity = {
                 logo: {
                     notation: {
@@ -155,10 +155,10 @@ describe('rubrics.js test suite', () => {
 
             const stats = getStatsFromNotation(activity);
 
-            expect(stats).toHaveProperty('numberOfNotes');
+            expect(stats).toHaveProperty("numberOfNotes");
             expect(stats.numberOfNotes).toBeGreaterThan(0);
-            expect(stats).toHaveProperty('rests', 1);
-            expect(stats).toHaveProperty('ornaments', 1);
+            expect(stats).toHaveProperty("rests", 1);
+            expect(stats).toHaveProperty("ornaments", 1);
         });
     });
 

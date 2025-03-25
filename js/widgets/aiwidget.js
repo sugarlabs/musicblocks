@@ -41,8 +41,8 @@ function AIWidget() {
     // Oscilloscope constants
     const SAMPLEANALYSERSIZE = 8192;
     const SAMPLEOSCCOLORS = ["#3030FF", "#FF3050"];
-    let abcNotationSong=""
-    var midiBuffer
+    let abcNotationSong="";
+    var midiBuffer;
     /**
      * Reference to the timbre block.
      * @type {number | null}
@@ -102,7 +102,7 @@ function AIWidget() {
      */
     this.octaveCenter = 4;
 
-     /**
+    /**
      * Sample length.
      * @type {number}
      */
@@ -121,7 +121,7 @@ function AIWidget() {
      * @returns {void}
      */
     this.pause = function () {
-        midiBuffer.stop()
+        midiBuffer.stop();
     };
 
     /**
@@ -181,8 +181,8 @@ function AIWidget() {
     };
     function adjustPitch(note, keySignature) {
         const accidental = keySignature.accidentals.find(acc => {
-            const noteToCompare = acc.note.toUpperCase().replace(',', '');
-            note = note.replace(',', '');
+            const noteToCompare = acc.note.toUpperCase().replace(",", "");
+            note = note.replace(",", "");
             return noteToCompare.toLowerCase() === note.toLowerCase();
         });
     
@@ -196,7 +196,7 @@ function AIWidget() {
     function abcToStandardValue(pitchValue) {
        
         
-        const octave = Math.floor(pitchValue/ 7) + 4; 
+        const octave = Math.floor(pitchValue/ 7) + 4;
         return  octave;
     }
     //creates  pitch which consist of note pitch notename you could see them in the function
@@ -204,16 +204,16 @@ function AIWidget() {
         const blocks = [];
         
         const pitch = pitches;
-        pitchDuration = toFraction(pitchDuration);          
+        pitchDuration = toFraction(pitchDuration);
         const adjustedNote = adjustPitch(pitch.name , keySignature).toUpperCase();
         if(triplet!==undefined&&triplet!==null){
-            console.log('For the Pitch')
-            console.log(pitch)
-            console.log('below is the meter Den')
+            console.log("For the Pitch");
+            console.log(pitch);
+            console.log("below is the meter Den");
             console.log(meterDen);
-            console.log('below is the triplet')
-            console.log(triplet)
-            pitchDuration[1]=meterDen*triplet
+            console.log("below is the triplet");
+            console.log(triplet);
+            pitchDuration[1]=meterDen*triplet;
         }
       
         actionBlock.push(
@@ -249,13 +249,13 @@ function AIWidget() {
     }
 
     this._parseABC = async function (tune) {
-        let musicBlocksJSON = [];
+        const musicBlocksJSON = [];
         
-        let staffBlocksMap = {};
-        let organizeBlock={}
+        const staffBlocksMap = {};
+        const organizeBlock={};
         let blockId = 0;
 
-        let tripletFinder = null
+        let tripletFinder = null;
         const title = (tune.metaText?.title ?? "title").toString().toLowerCase();
         const instruction = (tune.metaText?.instruction ?? "guitar").toString().toLowerCase();
         
@@ -266,18 +266,18 @@ function AIWidget() {
                 
                 if (!organizeBlock.hasOwnProperty(staffIndex)) {
                     organizeBlock[staffIndex] = {
-                     arrangedBlocks:[]
+                        arrangedBlocks:[]
                     };
                
                 }
 
-               organizeBlock[staffIndex].arrangedBlocks.push(staff)
+                organizeBlock[staffIndex].arrangedBlocks.push(staff);
     
 
             });
         });
-        console.log('below is the arranged blocks')
-        console.log(organizeBlock)
+        console.log("below is the arranged blocks");
+        console.log(organizeBlock);
         for (const lineId in organizeBlock) {
             organizeBlock[lineId].arrangedBlocks?.forEach((staff) => {
                 if (!staffBlocksMap.hasOwnProperty(lineId)) {
@@ -314,16 +314,16 @@ function AIWidget() {
                  
 
                     //for adding above 17 blocks above 
-                    blockId=blockId+17
+                    blockId=blockId+17;
                 }
 
-                let actionBlock=[]
+                const actionBlock=[];
                 staff.voices.forEach(voice => {
-                    console.log(voice)
+                    console.log(voice);
                  
               
                     voice.forEach(element => {
-                        console.log('hello');
+                        console.log("hello");
                         if (element.el_type === "note") {
                             //check if triplet exists 
                             if (element?.startTriplet !== null&&element?.startTriplet !== undefined) {
@@ -332,8 +332,8 @@ function AIWidget() {
                             
                             // Check and set tripletFinder to null if element?.endTriplets exists
                       
-                            console.log('pitches are below')
-                            console.log(element)
+                            console.log("pitches are below");
+                            console.log(element);
                             createPitchBlocks(element.pitches[0], blockId,element.duration,staff.key,actionBlock,tripletFinder,staffBlocksMap[lineId].meterDen);
                             if (element?.endTriplet!== null &&element?.endTriplet!== undefined) {
                                 tripletFinder = null;
@@ -344,17 +344,17 @@ function AIWidget() {
                         //check repeat start and end block 
                         else if(element.el_type==="bar"){
                             if(element.type==="bar_left_repeat"){
-                                staffBlocksMap[lineId].repeatArray.push({start : staffBlocksMap[lineId].baseBlocks.length ,end:-1})
+                                staffBlocksMap[lineId].repeatArray.push({start : staffBlocksMap[lineId].baseBlocks.length ,end:-1});
                             }
                             else if (element.type ==="bar_right_repeat"){
-                                const endBlockSearch =    staffBlocksMap[lineId].repeatArray
+                                const endBlockSearch =    staffBlocksMap[lineId].repeatArray;
 
                                 for(const repeatbar in endBlockSearch){
-                                    console.log('endBlockSearch[repeatbar].end'+ endBlockSearch[repeatbar].end)
+                                    console.log("endBlockSearch[repeatbar].end"+ endBlockSearch[repeatbar].end);
                                     if(endBlockSearch[repeatbar].end==-1){
-                                        staffBlocksMap[lineId].repeatArray[repeatbar].end=staffBlocksMap[lineId].baseBlocks.length
+                                        staffBlocksMap[lineId].repeatArray[repeatbar].end=staffBlocksMap[lineId].baseBlocks.length;
                                     }
-                                }                     
+                                }
 
                             }
 
@@ -362,18 +362,18 @@ function AIWidget() {
                     });
                     
                     //update the newnote connection with hidden
-                    actionBlock[0][4][0]=blockId+3
-                     actionBlock[actionBlock.length-1][4][1]=null
+                    actionBlock[0][4][0]=blockId+3;
+                    actionBlock[actionBlock.length-1][4][1]=null;
                     
-                        //update the namedo block if not first nameddo block appear
-                    if(staffBlocksMap[lineId].baseBlocks.length!=0){                          
-                    staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0][staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0].length-4][4][1] =blockId
-                    }   
+                    //update the namedo block if not first nameddo block appear
+                    if(staffBlocksMap[lineId].baseBlocks.length!=0){
+                        staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0][staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0].length-4][4][1] =blockId;
+                    }
                     //add the nameddo action text and hidden block for each line
                     actionBlock.push ( [blockId, ["nameddo", {value: `V: ${parseInt(lineId)+1} Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1}`}], 0, 0, [staffBlocksMap[lineId].baseBlocks.length === 0 ? null : staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0][staffBlocksMap[lineId].baseBlocks[staffBlocksMap[lineId].baseBlocks.length - 1][0].length-4][0], null]],
-                    [blockId + 1, ["action", {collapsed: false}], 100, 100, [null, blockId + 2, blockId + 3, null]],
-                    [blockId + 2, ["text", {value: `V: ${parseInt(lineId)+1} Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1}`}], 0, 0, [blockId + 1]],
-                    [blockId + 3, "hidden", 0, 0, [blockId + 1, actionBlock[0][0]]] )// blockid of topaction block
+                        [blockId + 1, ["action", {collapsed: false}], 100, 100, [null, blockId + 2, blockId + 3, null]],
+                        [blockId + 2, ["text", {value: `V: ${parseInt(lineId)+1} Line ${staffBlocksMap[lineId]?.baseBlocks?.length + 1}`}], 0, 0, [blockId + 1]],
+                        [blockId + 3, "hidden", 0, 0, [blockId + 1, actionBlock[0][0]]] );// blockid of topaction block
                     
                     if (!staffBlocksMap[lineId].nameddoArray) {
                         staffBlocksMap[lineId].nameddoArray = {};
@@ -385,11 +385,11 @@ function AIWidget() {
                     }
                     
                     staffBlocksMap[lineId].nameddoArray[lineId].push(blockId);
-                    blockId=blockId+4
+                    blockId=blockId+4;
 
-                    musicBlocksJSON.push(actionBlock)
+                    musicBlocksJSON.push(actionBlock);
 
-                    console.log('below is the repeat checker'+lineId)
+                    console.log("below is the repeat checker"+lineId);
                     staffBlocksMap[lineId].baseBlocks.push([actionBlock]);
                  
 
@@ -398,9 +398,9 @@ function AIWidget() {
             });
         }
      
-        let finalBlock = [];
-        console.log('below is the staff Block map')
-        console.log(staffBlocksMap)
+        const finalBlock = [];
+        console.log("below is the staff Block map");
+        console.log(staffBlocksMap);
 
 
         //Some Error are here need to be fixed 
@@ -419,129 +419,129 @@ function AIWidget() {
             console.log(staffBlocksMap[staffIndex].baseBlocks[0][0][staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4]);
         
 
-            let repeatBlock =[]
+            const repeatBlock =[];
     
-            let repeatblockids=staffBlocksMap[staffIndex].repeatArray
+            const repeatblockids=staffBlocksMap[staffIndex].repeatArray;
             for(const repeatId of repeatblockids){
                 if (repeatId.start==0){
                     
                     
                     
-                    staffBlocksMap[staffIndex].repeatBlock.push([blockId,"repeat",0,0,[ staffBlocksMap[staffIndex].startBlock[staffBlocksMap[staffIndex].startBlock.length - 3][0]/*setribmre*/,blockId+1,staffBlocksMap[staffIndex].nameddoArray[staffIndex][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end+1] === null ? null :staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end+1]]])
-                    staffBlocksMap[staffIndex].repeatBlock.push([blockId + 1, ["number", {value: 2}], 100, 100, [blockId]])
+                    staffBlocksMap[staffIndex].repeatBlock.push([blockId,"repeat",0,0,[ staffBlocksMap[staffIndex].startBlock[staffBlocksMap[staffIndex].startBlock.length - 3][0]/*setribmre*/,blockId+1,staffBlocksMap[staffIndex].nameddoArray[staffIndex][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end+1] === null ? null :staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end+1]]]);
+                    staffBlocksMap[staffIndex].repeatBlock.push([blockId + 1, ["number", {value: 2}], 100, 100, [blockId]]);
 
                     //Update the settrimbre block
-                    staffBlocksMap[staffIndex].startBlock[staffBlocksMap[staffIndex].startBlock.length - 3][4][2]=blockId
-                    console.log('Following are the nameddo Array')
-                    console.log(staffBlocksMap[staffIndex].nameddoArray)
-                    let firstnammedo=searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[0][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][0])
-                    let endnammedo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end])
-                    console.log('below is the firstnammedo')
-                    console.log( firstnammedo)  
-                    console.log('below and below is the error for you ')
+                    staffBlocksMap[staffIndex].startBlock[staffBlocksMap[staffIndex].startBlock.length - 3][4][2]=blockId;
+                    console.log("Following are the nameddo Array");
+                    console.log(staffBlocksMap[staffIndex].nameddoArray);
+                    const firstnammedo=searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[0][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][0]);
+                    const endnammedo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end]);
+                    console.log("below is the firstnammedo");
+                    console.log( firstnammedo);
+                    console.log("below and below is the error for you ");
                     
-                    console.log(staffBlocksMap[staffIndex].baseBlocks[0][0])
+                    console.log(staffBlocksMap[staffIndex].baseBlocks[0][0]);
                     //because its [0]is the first nammeddo block obviously
 
                     // Check if staffBlocksMap[staffIndex].baseBlocks[repeatId.end+1] exists and has a [0] element
-                if (staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1] && staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0]) {
-                    let secondnammedo = searchIndexForMusicBlock(
-                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0], 
-                        staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end + 1]
-                    );
+                    if (staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1] && staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0]) {
+                        const secondnammedo = searchIndexForMusicBlock(
+                            staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0],
+                            staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end + 1]
+                        );
 
-                    if (secondnammedo != -1) {
-                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0][secondnammedo][4][0] = blockId;
+                        if (secondnammedo != -1) {
+                            staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0][secondnammedo][4][0] = blockId;
+                        }
                     }
-                }
-                staffBlocksMap[staffIndex].baseBlocks[0][0][firstnammedo][4][0]=blockId
-                staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][endnammedo][4][1]=null
+                    staffBlocksMap[staffIndex].baseBlocks[0][0][firstnammedo][4][0]=blockId;
+                    staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][endnammedo][4][1]=null;
 
-                blockId=blockId+2
+                    blockId=blockId+2;
             
                 }
                 else{
            
                   
                 
-                    const currentnammeddo =searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.start])
+                    const currentnammeddo =searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0],staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.start]);
 
-                    let prevnameddo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.start-1][0],staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0])
-                    let afternamedo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0],staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][1])
-                    let prevrepeatnameddo=-1
+                    const prevnameddo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.start-1][0],staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0]);
+                    const afternamedo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0],staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][1]);
+                    let prevrepeatnameddo=-1;
                     if(prevnameddo==-1){
-                        prevrepeatnameddo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].repeatBlock,staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0])
+                        prevrepeatnameddo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].repeatBlock,staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0]);
                     }
                     
               
-                    const prevBlockId=staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0]
-                    console.log('prevBlockID')
-                    console.log(prevBlockId)
-                    const currentBlockId=staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][0]
+                    const prevBlockId=staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0];
+                    console.log("prevBlockID");
+                    console.log(prevBlockId);
+                    const currentBlockId=staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][0];
 
                     //needs null checking optmizie
-                let nextBlockId=staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end+1]
+                    const nextBlockId=staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end+1];
                 
-                  staffBlocksMap[staffIndex].repeatBlock.push([blockId,"repeat",0,0,[staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0],blockId+1, currentBlockId,nextBlockId === null ? null : nextBlockId]])
-                  staffBlocksMap[staffIndex].repeatBlock.push([blockId + 1, ["number", {value: 2}], 100, 100, [blockId]])
+                    staffBlocksMap[staffIndex].repeatBlock.push([blockId,"repeat",0,0,[staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0],blockId+1, currentBlockId,nextBlockId === null ? null : nextBlockId]]);
+                    staffBlocksMap[staffIndex].repeatBlock.push([blockId + 1, ["number", {value: 2}], 100, 100, [blockId]]);
 
-               if(prevnameddo!=-1){
-                staffBlocksMap[staffIndex].baseBlocks[repeatId.start-1][0][prevnameddo][4][1]=blockId
-               }else{
-                staffBlocksMap[staffIndex].repeatBlock[prevrepeatnameddo][4][3]=blockId
-               }
-               if(afternamedo!=-1){
-                staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][afternamedo][4][1]=null
-               }
+                    if(prevnameddo!=-1){
+                        staffBlocksMap[staffIndex].baseBlocks[repeatId.start-1][0][prevnameddo][4][1]=blockId;
+                    }else{
+                        staffBlocksMap[staffIndex].repeatBlock[prevrepeatnameddo][4][3]=blockId;
+                    }
+                    if(afternamedo!=-1){
+                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][afternamedo][4][1]=null;
+                    }
                 
 
-                staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0]=blockId
+                    staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0]=blockId;
                
-                if(nextBlockId!=null){
-                    console.log('below is the repeat next block id '+ repeatId)
-                    console.log(staffBlocksMap[staffIndex].baseBlocks)
-                    const nextnameddo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.end+1][0],nextBlockId)
-                    staffBlocksMap[staffIndex].baseBlocks[repeatId.end+1][0][nextnameddo][4][0]=blockId
-                }
+                    if(nextBlockId!=null){
+                        console.log("below is the repeat next block id "+ repeatId);
+                        console.log(staffBlocksMap[staffIndex].baseBlocks);
+                        const nextnameddo = searchIndexForMusicBlock(staffBlocksMap[staffIndex].baseBlocks[repeatId.end+1][0],nextBlockId);
+                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end+1][0][nextnameddo][4][0]=blockId;
+                    }
              
      
-                blockId=blockId+2
+                    blockId=blockId+2;
                 }
                     
-                }
-               
-                let lineBlock = staffBlocksMap[staffIndex].baseBlocks.reduce((acc, curr) => acc.concat(curr), []);
-                let flattenedLineBlock = lineBlock.flat(); // Flatten the multidimensional array
-                let combinedBlock = [...staffBlocksMap[staffIndex].startBlock, ...flattenedLineBlock];
-            
-                finalBlock.push(...staffBlocksMap[staffIndex].startBlock);
-                finalBlock.push(...flattenedLineBlock);
-                finalBlock.push(...staffBlocksMap[staffIndex].repeatBlock)
-                console.log('Below is the combined block:');
-                console.log(combinedBlock);
             }
+               
+            const lineBlock = staffBlocksMap[staffIndex].baseBlocks.reduce((acc, curr) => acc.concat(curr), []);
+            const flattenedLineBlock = lineBlock.flat(); // Flatten the multidimensional array
+            const combinedBlock = [...staffBlocksMap[staffIndex].startBlock, ...flattenedLineBlock];
+            
+            finalBlock.push(...staffBlocksMap[staffIndex].startBlock);
+            finalBlock.push(...flattenedLineBlock);
+            finalBlock.push(...staffBlocksMap[staffIndex].repeatBlock);
+            console.log("Below is the combined block:");
+            console.log(combinedBlock);
+        }
             
         
        
         
 
-        console.log('below is the staff Block map')
+        console.log("below is the staff Block map");
         console.log(staffBlocksMap);
 
         
-        console.log('test block is ')
-        console.log(finalBlock)
+        console.log("test block is ");
+        console.log(finalBlock);
 
-      this.activity.blocks.loadNewBlocks(finalBlock);
+        this.activity.blocks.loadNewBlocks(finalBlock);
   
 
-  this.activity.textMsg(_("New start block generated"));
+        this.activity.textMsg(_("New start block generated"));
 
         // // logo.textMsg(_("MIDI loading. This may take some time depending upon the number of notes in the track"));
         // this.blocks.loadNewBlocks(combined_array);
         return null;
 
-    }
+    };
     /**
      * Displays an error message when the uploaded sample is not a .wav file.
      * @returns {void}
@@ -557,11 +557,11 @@ function AIWidget() {
      */
     this.__save = function () {
         const tunebook = new ABCJS.parseOnly(abcNotationSong);
-        console.log(tunebook)
+        console.log(tunebook);
         tunebook.forEach(tune => {
             //call parseABC to parse abcdata to MB json
             this._parseABC(tune);
-            console.log(tune)
+            console.log(tune);
         
         });
         
@@ -645,7 +645,7 @@ function AIWidget() {
 
         this.playBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
         this.playBtn.onclick = () => {
-            console.log(abcNotationSong)
+            console.log(abcNotationSong);
             if (this.isMoving) {
                 this.pause();
                 this.playBtn.innerHTML =
@@ -661,7 +661,7 @@ function AIWidget() {
                 
             } else {
                 if (!(abcNotationSong =="")) {
-                    console.log(abcNotationSong)
+                    console.log(abcNotationSong);
                     this.resume();
                     this._playABCSong();
                 }
@@ -723,61 +723,61 @@ function AIWidget() {
      * @returns {void}
      */
     this._playABCSong = function () {
-       var abc = abcNotationSong
-       var stopAudioButton = document.querySelector(".stop-audio");
-       console.log('abcd',abcNotationSong)
+        var abc = abcNotationSong;
+        var stopAudioButton = document.querySelector(".stop-audio");
+        console.log("abcd",abcNotationSong);
 
         var visualObj = ABCJS.renderAbc("*", abc, {
             responsive: "resize" })[0];
 
-            if (ABCJS.synth.supportsAudio()) {
+        if (ABCJS.synth.supportsAudio()) {
               
 
-                // An audio context is needed - this can be passed in for two reasons:
-                // 1) So that you can share this audio context with other elements on your page.
-                // 2) So that you can create it during a user interaction so that the browser doesn't block the sound.
-                // Setting this is optional - if you don't set an audioContext, then abcjs will create one.
-                window.AudioContext = window.AudioContext ||
+            // An audio context is needed - this can be passed in for two reasons:
+            // 1) So that you can share this audio context with other elements on your page.
+            // 2) So that you can create it during a user interaction so that the browser doesn't block the sound.
+            // Setting this is optional - if you don't set an audioContext, then abcjs will create one.
+            window.AudioContext = window.AudioContext ||
                     window.webkitAudioContext ||
                     navigator.mozAudioContext ||
                     navigator.msAudioContext;
-                var audioContext = new window.AudioContext();
-                audioContext.resume().then(function () {
+            var audioContext = new window.AudioContext();
+            audioContext.resume().then(function () {
                  
-                    // In theory the AC shouldn't start suspended because it is being initialized in a click handler, but iOS seems to anyway.
+                // In theory the AC shouldn't start suspended because it is being initialized in a click handler, but iOS seems to anyway.
 
-                    // This does a bare minimum so this object could be created in advance, or whenever convenient.
-                     midiBuffer = new ABCJS.synth.CreateSynth();
+                // This does a bare minimum so this object could be created in advance, or whenever convenient.
+                midiBuffer = new ABCJS.synth.CreateSynth();
 
-                    // midiBuffer.init preloads and caches all the notes needed. There may be significant network traffic here.
-                    return midiBuffer.init({
-                        visualObj: visualObj,
-                        audioContext: audioContext,
-                        millisecondsPerMeasure: visualObj.millisecondsPerMeasure()
-                    }).then(function (response) {
-                        console.log("Notes loaded: ", response)
+                // midiBuffer.init preloads and caches all the notes needed. There may be significant network traffic here.
+                return midiBuffer.init({
+                    visualObj: visualObj,
+                    audioContext: audioContext,
+                    millisecondsPerMeasure: visualObj.millisecondsPerMeasure()
+                }).then(function (response) {
+                    console.log("Notes loaded: ", response);
                       
-                        // midiBuffer.prime actually builds the output buffer.
-                        return midiBuffer.prime();
-                    }).then(function (response) {
+                    // midiBuffer.prime actually builds the output buffer.
+                    return midiBuffer.prime();
+                }).then(function (response) {
                       
-                        // At this point, everything slow has happened. midiBuffer.start will return very quickly and will start playing very quickly without lag.
-                        midiBuffer.start();
+                    // At this point, everything slow has happened. midiBuffer.start will return very quickly and will start playing very quickly without lag.
+                    midiBuffer.start();
                         
-                        return Promise.resolve();
-                    }).catch(function (error) {
-                        if (error.status === "NotSupported") {
-                            stopAudioButton.setAttribute("style", "display:none;");
-                            var audioError = document.querySelector(".audio-error");
-                            audioError.setAttribute("style", "");
-                        } else
-                            console.warn("synth error", error);
-                    });
+                    return Promise.resolve();
+                }).catch(function (error) {
+                    if (error.status === "NotSupported") {
+                        stopAudioButton.setAttribute("style", "display:none;");
+                        var audioError = document.querySelector(".audio-error");
+                        audioError.setAttribute("style", "");
+                    } else
+                        console.warn("synth error", error);
                 });
-            } else {
-                var audioError = document.querySelector(".audio-error");
-                audioError.setAttribute("style", "");
-            }
+            });
+        } else {
+            var audioError = document.querySelector(".audio-error");
+            audioError.setAttribute("style", "");
+        }
    
     };
 
@@ -876,7 +876,7 @@ function AIWidget() {
 
 
 
-     /**
+    /**
      * Scales the widget window and canvas based on the window's state.
      * @returns {void}
      */
@@ -950,7 +950,7 @@ function AIWidget() {
             hint.textContent = hintText;
             hint.style.marginRight = "20px";
             hint.style.cursor = "pointer";
-            hint.style.marginRight="4px"
+            hint.style.marginRight="4px";
             hint.style.fontSize = "20px";
             hint.style.color = "blue";
             hint.style.backgroundColor = "rgb(227 162 162 / 80%)"; // Light white background
@@ -981,7 +981,7 @@ function AIWidget() {
         container.appendChild(inputField);
         
        
-        inputField.addEventListener('click', function () {
+        inputField.addEventListener("click", function () {
             inputField.focus();
         });
     
@@ -1001,7 +1001,7 @@ function AIWidget() {
                 return;
             }
             
-            const apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
+            const apiUrl = "https://api.groq.com/openai/v1/chat/completions";
             const prompt_eng = `
             Generate an ABC notation song based on the following description:
             
@@ -1045,18 +1045,18 @@ function AIWidget() {
             textarea.value = "Loading...";
             
             fetch(apiUrl, {
-                method: 'POST',
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${env.GROQ_API_KEY}` // Replace with your actual API key
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${env.GROQ_API_KEY}` // Replace with your actual API key
                 },
                 body: requestBody
             })
                 .then(response => response.json())
                 .then(data => {
-                    console.log('API Response:', data);
+                    console.log("API Response:", data);
                 
-                    let responseText = data.choices[0].message?.content || "";
+                    const responseText = data.choices[0].message?.content || "";
                     const abcStartIndex = responseText.indexOf("X:");
                    
                     let abcNotation = responseText.substring(abcStartIndex);
@@ -1068,29 +1068,29 @@ function AIWidget() {
                         console.warn("No closing brace found in the response.");
                     }
                 
-                    abcNotation = abcNotation.replace(/"|\}/g, '').trim();
+                    abcNotation = abcNotation.replace(/"|\}/g, "").trim();
                 
-                    abcNotation = abcNotation.replace(/(X:|T:|M:|L:|Q:|K:)/g, '\n$1').replace(/\n\s+/g, '\n').trim();
+                    abcNotation = abcNotation.replace(/(X:|T:|M:|L:|Q:|K:)/g, "\n$1").replace(/\n\s+/g, "\n").trim();
                     console.log(abcNotation);
                 
-                    let lines = abcNotation.split('\n').map(line => line.trim());
+                    const lines = abcNotation.split("\n").map(line => line.trim());
                 
-                    let formattedNotation = lines.map(line => {
-                        if (line.startsWith('X:') || line.startsWith('T:') || line.startsWith('M:') ||
-                            line.startsWith('L:') || line.startsWith('Q:') || line.startsWith('K:')) {
-                            return line + '\n';
+                    const formattedNotation = lines.map(line => {
+                        if (line.startsWith("X:") || line.startsWith("T:") || line.startsWith("M:") ||
+                            line.startsWith("L:") || line.startsWith("Q:") || line.startsWith("K:")) {
+                            return line + "\n";
                         }
                         return line;
-                    }).join('');
+                    }).join("");
                 
                     console.log(formattedNotation);
                     abcNotationSong = formattedNotation;
-                    console.log('Updated abcNotationSong:', abcNotationSong);
+                    console.log("Updated abcNotationSong:", abcNotationSong);
                 
                     textarea.value = abcNotationSong;
                 })
                 .catch(error => {
-                    console.error('Error:', error);
+                    console.error("Error:", error);
                     textarea.value = "An error occurred: " + error.message;
                 })
                 .finally(() => {
@@ -1100,9 +1100,9 @@ function AIWidget() {
         
         
         // Update abcNotationSong whenever the textarea content changes
-        textarea.addEventListener('input', function () {
+        textarea.addEventListener("input", function () {
             abcNotationSong = textarea.value;
-            console.log('abcNotationSong updated to:', abcNotationSong);
+            console.log("abcNotationSong updated to:", abcNotationSong);
         });
     };
     
