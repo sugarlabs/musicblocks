@@ -1,5 +1,5 @@
 const acorn = require('acorn');
-const { AST2BlockList } = require('./ast2blocklist');
+const { AST2BlockList } = require('../ast2blocklist');
 
 describe('AST2BlockList Class', () => {
     beforeEach(() => {
