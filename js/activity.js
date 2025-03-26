@@ -3102,9 +3102,6 @@ class Activity {
                         this.textMsg("Alt-C " + _("Copy"));
                         this.blocks.prepareStackForCopy();
                         break;
-                    case 68: // 'D'
-                        this.palettes.dict["myblocks"].promptMacrosDelete();
-                        break;
                     case 69: // 'E'
                         this.textMsg("Alt-E " + _("Erase"));
                         this._allClear(false);
