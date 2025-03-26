@@ -893,7 +893,7 @@ function AIWidget() {
             width = this.widgetWindow.getWidgetBody().getBoundingClientRect().width;
             height = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 70;
         }
-        document.getElementsByTagName("canvas")[0].innerHTML = "";
+        const canvasElement =  document.getElementsByTagName("canvas")[0].innerHTML = "";
         this.makeCanvas(width, height, 0, true);
         this.reconnectSynthsToAnalyser();
     };
