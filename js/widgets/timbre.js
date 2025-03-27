@@ -47,6 +47,7 @@ class TimbreWidget {
         this.notesToPlay = [];
         this.env = [];
         this.ENVs = [];
+        this._eventListeners = {}; // Store event listeners for cleanup
         this.synthVals = {
             oscillator: {
                 type: "sine6",
@@ -730,6 +731,8 @@ class TimbreWidget {
         widgetWindow.getWidgetBody().style.overflowY = "auto";
 
         widgetWindow.onclose = () => {
+            // Clean up all event listeners
+            this._cleanupEventListeners();
             this.activity.hideMsgs();
             widgetWindow.destroy();
         };
@@ -1764,7 +1767,8 @@ class TimbreWidget {
             this._createFilter(f, env);
         }
 
-        this._addFilterListeners();
+        //event delegation
+        this._setupEventDelegation();
         this._updateFilters();
     }
 
@@ -1778,110 +1782,152 @@ class TimbreWidget {
     _createFilter(f, env) {
         const wrapperIDs = [f * 3, f * 3 + 1, f * 3 + 2];
         const radioIDs = [f * 4, f * 4 + 1, f * 4 + 2, f * 4 + 3];
-
-        let htmlElements;
+    
+        const fragment = document.createDocumentFragment();
+        
+        const containerDiv = document.createElement("div");
         if (f % 2 === 1) {
-            htmlElements = '<div class="rectangle"><p>&nbsp;</p>';
+            containerDiv.className = "rectangle";
+            const spacer = document.createElement("p");
+            spacer.innerHTML = "&nbsp;";
+            containerDiv.appendChild(spacer);
         } else if (f > 0) {
-            htmlElements = "<div><p>&nbsp;</p>";
-        } else {
-            htmlElements = "<div>";
+            const spacer = document.createElement("p");
+            spacer.innerHTML = "&nbsp;";
+            containerDiv.appendChild(spacer);
         }
-
+        
+        const typeWrapper = document.createElement("div");
+        typeWrapper.className = "wrapper";
+        typeWrapper.id = "wrapper" + wrapperIDs[0];
+        
+        const typeLabel = document.createElement("div");
+        typeLabel.className = "s";
+        typeLabel.id = "s" + wrapperIDs[0];
+        
+        const typeSpan = document.createElement("span");
+        typeSpan.textContent = _("type");
+        typeLabel.appendChild(typeSpan);
+        
         const selectorID = "selector" + f;
         const selID = "sel" + f;
-
-        htmlElements +=
-            '<div class="wrapper" id="wrapper' +
-            wrapperIDs[0] +
-            '"><div class="s" id="s' +
-            wrapperIDs[0] +
-            '"><span>' +
-            _("type") +
-            '</span></div><div class="filterselector" id="' +
-            selectorID +
-            '"></div></div>';
-        htmlElements +=
-            '<div class="wrapper" id="wrapper' +
-            wrapperIDs[1] +
-            '"><div class="s" id="s' +
-            wrapperIDs[1] +
-            '"><span>' +
-            _("rolloff") +
-            '</span></div><div class="insideDivFilter"><p><input id="radio' +
-            radioIDs[0] +
-            '" type="radio" name="rolloff' +
-            f +
-            '" value="-12" checked="checked"/>-12<input  id="radio' +
-            radioIDs[1] +
-            '" type="radio" name="rolloff' +
-            f +
-            '" value="-24"/>-24<input id="radio' +
-            radioIDs[2] +
-            '" type="radio" name="rolloff' +
-            f +
-            '" value="-48"/>-48<input id="radio' +
-            radioIDs[3] +
-            '" type="radio" name="rolloff' +
-            f +
-            '" value="-96"/>-96</p></div></div>';
-        htmlElements +=
-            '<div class="wrapper" id="wrapper' +
-            wrapperIDs[2] +
-            '"><div class="s" id="s' +
-            wrapperIDs[2] +
-            '"><span>' +
-            _("frequency") +
-            '</span></div><div class="insideDivFilter"><input type="range" id="myRangeF' +
-            f +
-            '" class="sliders" style="margin-top:20px" max="7050" value="' +
-            parseFloat(this.filterParams[f * 3 + 2]) +
-            '"><span id="myspanF' +
-            f +
-            '" class="rangeslidervalue">' +
-            this.filterParams[f * 3 + 2] +
-            "</span></div></div>";
-        htmlElements += "</div>";
-        env.innerHTML += htmlElements;
-
-        const myDiv = docById(selectorID);
-        let selectOpt = '<select class="sel" id="' + selID + '">';
-        let selectedFilter = null;
-        for (let i = 0; i < FILTERTYPES.length; i++) {
-            // work around some weird i18n bug
-            if (FILTERTYPES[i][0].length === 0) {
-                if (FILTERTYPES[i][1] === this.filterParams[f * 3]) {
-                    selectOpt +=
-                        '<option value="' +
-                        FILTERTYPES[i][1] +
-                        '" selected>' +
-                        FILTERTYPES[i][1] +
-                        "</option>";
-                    selectedFilter = FILTERTYPES[i][1];
-                } else {
-                    selectOpt +=
-                        '<option value="' +
-                        FILTERTYPES[i][1] +
-                        '">' +
-                        FILTERTYPES[i][1] +
-                        "</option>";
-                }
-            } else if (FILTERTYPES[i][0] === this.filterParams[f * 3]) {
-                selectOpt +=
-                    '<option value="' +
-                    FILTERTYPES[i][0] +
-                    '" selected>' +
-                    FILTERTYPES[i][0] +
-                    "</option>";
-                selectedFilter = FILTERTYPES[i][0];
-            } else {
-                selectOpt +=
-                    '<option value="' + FILTERTYPES[i][0] + '">' + FILTERTYPES[i][0] + "</option>";
+        
+        const filterSelector = document.createElement("div");
+        filterSelector.className = "filterselector";
+        filterSelector.id = selectorID;
+        
+        typeWrapper.appendChild(typeLabel);
+        typeWrapper.appendChild(filterSelector);
+        containerDiv.appendChild(typeWrapper);
+        
+        // wrapper
+        const rolloffWrapper = document.createElement("div");
+        rolloffWrapper.className = "wrapper";
+        rolloffWrapper.id = "wrapper" + wrapperIDs[1];
+        
+        const rolloffLabel = document.createElement("div");
+        rolloffLabel.className = "s";
+        rolloffLabel.id = "s" + wrapperIDs[1];
+        
+        const rolloffSpan = document.createElement("span");
+        rolloffSpan.textContent = _("rolloff");
+        rolloffLabel.appendChild(rolloffSpan);
+        
+        const insideDivRolloff = document.createElement("div");
+        insideDivRolloff.className = "insideDivFilter";
+        
+        const rolloffP = document.createElement("p");
+        
+        const radioValues = ["-12", "-24", "-48", "-96"];
+        for (let i = 0; i < 4; i++) {
+            const radio = document.createElement("input");
+            radio.type = "radio";
+            radio.id = "radio" + radioIDs[i];
+            radio.name = "rolloff" + f;
+            radio.value = radioValues[i];
+            if (i === 0) {
+                radio.checked = true;
             }
+            
+            rolloffP.appendChild(radio);
+            rolloffP.appendChild(document.createTextNode(radioValues[i]));
         }
-
-        selectOpt += "</select>";
-        myDiv.innerHTML = selectOpt;
+        
+        insideDivRolloff.appendChild(rolloffP);
+        rolloffWrapper.appendChild(rolloffLabel);
+        rolloffWrapper.appendChild(insideDivRolloff);
+        containerDiv.appendChild(rolloffWrapper);
+        
+        // wrapper
+        const freqWrapper = document.createElement("div");
+        freqWrapper.className = "wrapper";
+        freqWrapper.id = "wrapper" + wrapperIDs[2];
+        
+        const freqLabel = document.createElement("div");
+        freqLabel.className = "s";
+        freqLabel.id = "s" + wrapperIDs[2];
+        
+        const freqSpan = document.createElement("span");
+        freqSpan.textContent = _("frequency");
+        freqLabel.appendChild(freqSpan);
+        
+        const insideDivFreq = document.createElement("div");
+        insideDivFreq.className = "insideDivFilter";
+        
+        const slider = document.createElement("input");
+        slider.type = "range";
+        slider.id = "myRangeF" + f;
+        slider.className = "sliders";
+        slider.style.marginTop = "20px";
+        slider.max = "7050";
+        slider.value = parseFloat(this.filterParams[f * 3 + 2]);
+        
+        const sliderValue = document.createElement("span");
+        sliderValue.id = "myspanF" + f;
+        sliderValue.className = "rangeslidervalue";
+        sliderValue.textContent = this.filterParams[f * 3 + 2];
+        
+        insideDivFreq.appendChild(slider);
+        insideDivFreq.appendChild(sliderValue);
+        freqWrapper.appendChild(freqLabel);
+        freqWrapper.appendChild(insideDivFreq);
+        containerDiv.appendChild(freqWrapper);
+        
+        fragment.appendChild(containerDiv);
+        
+        env.appendChild(fragment);
+        
+        const select = document.createElement("select");
+        select.className = "sel";
+        select.id = selID;
+        
+        let selectedFilter = null;
+        
+        for (let i = 0; i < FILTERTYPES.length; i++) {
+            const option = document.createElement("option");
+            
+            if (FILTERTYPES[i][0].length === 0) {
+                option.value = FILTERTYPES[i][1];
+                option.textContent = FILTERTYPES[i][1];
+                
+                if (FILTERTYPES[i][1] === this.filterParams[f * 3]) {
+                    option.selected = true;
+                    selectedFilter = FILTERTYPES[i][1];
+                }
+            } else {
+                option.value = FILTERTYPES[i][0];
+                option.textContent = FILTERTYPES[i][0];
+                
+                if (FILTERTYPES[i][0] === this.filterParams[f * 3]) {
+                    option.selected = true;
+                    selectedFilter = FILTERTYPES[i][0];
+                }
+            }
+            
+            select.appendChild(option);
+        }
+        const selectorDiv = docById(selectorID);
+        selectorDiv.appendChild(select);
 
         if (instrumentsFilters[0][this.instrumentName].length - 1 < f) {
             instrumentsFilters[0][this.instrumentName].push({
@@ -1897,60 +1943,125 @@ class TimbreWidget {
      * @private
      * @returns {void}
      */
-    _addFilterListeners() {
-        const __filterNameEvent = (event) => {
-            docById("filterButtonCell").style.backgroundColor = "#C8C8C0";
-            const elem = event.target;
-            const m = elem.id.slice(-1);
-            instrumentsFilters[0][this.instrumentName][m]["filterType"] = elem.value;
-            this._update(m, elem.value, 0);
-            const error = instrumentsFilters[0][this.instrumentName].filter(
-                (el) => el.filterType === elem.value
-            );
-            if (error.length > 1) {
-                activity.errorMsg(_("Filter already present."), 3000);
+    /**
+     * Sets up event delegation for all widget sections
+     * @private
+     * @returns {void}
+     */
+    _setupEventDelegation() {
+        const timbreTable = docById("timbreTable");
+        
+        // Clean up
+        this._cleanupEventListeners();
+        
+        // Cache button
+        const filterButtonCell = docById("filterButtonCell");
+        const synthButtonCell = docById("synthButtonCell");
+        const oscillatorButtonCell = docById("oscillatorButtonCell");
+        const envelopeButtonCell = docById("envelopeButtonCell");
+        const effectsButtonCell = docById("effectsButtonCell");
+        
+        // single event handler
+        this._eventHandler = (event) => {
+            const target = event.target;
+            const targetId = target.id || '';
+            
+            if (targetId.startsWith("sel") && event.type === "change") {
+                filterButtonCell.style.backgroundColor = "#C8C8C0";
+                const m = targetId.slice(-1);
+                instrumentsFilters[0][this.instrumentName][m]["filterType"] = target.value;
+                this._update(m, target.value, 0);
+                
+                const error = instrumentsFilters[0][this.instrumentName].filter(
+                    (el) => el.filterType === target.value
+                );
+                if (error.length > 1) {
+                    activity.errorMsg(_("Filter already present."), 3000);
+                }
+                this._playNote("G4", 1 / 8);
             }
-            this._playNote("G4", 1 / 8);
-        };
-
-        const __radioEvent = (event) => {
-            const elem = event.target;
-            const m = Number(elem.id.replace("radio", ""));
-            instrumentsFilters[0][this.instrumentName][Math.floor(m / 4)][
-                "filterRolloff"
-            ] = parseFloat(elem.value);
-            this._update(Math.floor(m / 4), elem.value, 1);
-            this._playNote("G4", 1 / 8);
-        };
-
-        const __sliderEvent = (event) => {
-            docById("filterButtonCell").style.backgroundColor = "#C8C0C8";
-            const elem = event.target;
-            const m = elem.id.slice(-1);
-            docById("myRangeF" + m).value = parseFloat(elem.value);
-            docById("myspanF" + m).textContent = elem.value;
-            instrumentsFilters[0][this.instrumentName][m]["filterFrequency"] = parseFloat(
-                elem.value
-            );
-            this._update(m, elem.value, 2);
-            this._playNote("G4", 1 / 8);
-        };
-
-        for (let f = 0; f < this.fil.length; f++) {
-            const radioIDs = [f * 4, f * 4 + 1, f * 4 + 2, f * 4 + 3];
-
-            docById("sel" + f).removeEventListener("change", __filterNameEvent);
-            docById("sel" + f).addEventListener("change", __filterNameEvent);
-
-            for (let i = 0; i < radioIDs.length; i++) {
-                const radioButton = docById("radio" + radioIDs[i]);
-                radioButton.removeEventListener("click", __radioEvent);
-                radioButton.addEventListener("click", __radioEvent);
+            else if (targetId.startsWith("radio") && event.type === "click") {
+                const m = Number(targetId.replace("radio", ""));
+                instrumentsFilters[0][this.instrumentName][Math.floor(m / 4)][
+                    "filterRolloff"
+                ] = parseFloat(target.value);
+                this._update(Math.floor(m / 4), target.value, 1);
+                this._playNote("G4", 1 / 8);
             }
-
-            docById("myRangeF" + f).removeEventListener("change", __sliderEvent);
-            docById("myRangeF" + f).addEventListener("change", __sliderEvent);
+            else if (targetId.startsWith("myRangeF") && (event.type === "change" || event.type === "input")) {
+                filterButtonCell.style.backgroundColor = "#C8C0C8";
+                const m = targetId.slice(-1);
+                const spanElement = docById("myspanF" + m);
+                if (spanElement) {
+                    spanElement.textContent = target.value;
+                }
+                
+                instrumentsFilters[0][this.instrumentName][m]["filterFrequency"] = parseFloat(
+                    target.value
+                );
+                this._update(m, target.value, 2);
+                this._playNote("G4", 1 / 8);
+            }
+            
+            else if (targetId.startsWith("wrapperS") && event.type === "change") {
+                synthButtonCell.style.backgroundColor = "#C8C8C8";
+                this._playNote("G4", 1 / 8);
+            }
+            
+            else if (targetId.startsWith("wrapperOsc") && event.type === "change") {
+                oscillatorButtonCell.style.backgroundColor = "#C8C8C8";
+                this._playNote("G4", 1 / 8);
+            }
+            
+            else if (targetId.startsWith("wrapperEnv") && event.type === "change") {
+                envelopeButtonCell.style.backgroundColor = "#C8C8C8";
+                this._playNote("G4", 1 / 8);
+            }
+            
+            else if (targetId.startsWith("wrapperFx") && event.type === "change") {
+                effectsButtonCell.style.backgroundColor = "#C8C8C8";
+                this._playNote("G4", 1 / 8);
+            }
+        };
+        
+        timbreTable.addEventListener("change", this._eventHandler);
+        timbreTable.addEventListener("click", this._eventHandler);
+        timbreTable.addEventListener("input", this._eventHandler);
+        
+        this._eventListeners = {
+            element: timbreTable,
+            listeners: [
+                { type: "change", handler: this._eventHandler },
+                { type: "click", handler: this._eventHandler },
+                { type: "input", handler: this._eventHandler }
+            ]
+        };
+    }
+    
+    /**
+     * Cleans up all event listeners
+     * @private
+     * @returns {void}
+     */
+    _cleanupEventListeners() {
+        if (this._eventListeners && this._eventListeners.element) {
+            this._eventListeners.listeners.forEach(listener => {
+                this._eventListeners.element.removeEventListener(
+                    listener.type,
+                    listener.handler
+                );
+            });
+            this._eventListeners = {};
         }
+    }
+    
+    /**
+     * event delegation
+     * @private
+     * @returns {void}
+     */
+    _addFilterListeners() {
+        this._setupEventDelegation();
     }
 
     /**
@@ -2038,7 +2149,7 @@ class TimbreWidget {
         this._createFilter(this.fil.length - 1, env);
         this._playNote("G4", 1 / 8);
 
-        this._addFilterListeners();
+        // No need addFilterListeners() using event delega
         this._updateFilters();
     }
 
