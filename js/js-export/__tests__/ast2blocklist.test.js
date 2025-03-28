@@ -1,7 +1,7 @@
 const acorn = require('acorn');
-const { AST2BlockList } = require('../ast2blocklist');
+const { ast2blocklist } = require('../ast2blocklist');
 
-describe('AST2BlockList Class', () => {
+describe('ast2blocklist Class', () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
@@ -87,8 +87,8 @@ describe('AST2BlockList Class', () => {
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
-        let startTrees = AST2BlockList.toStartTrees(AST);
-        let blockList = AST2BlockList.toBlockList(startTrees[0]);
+        let startTrees = ast2blocklist.toStartTrees(AST);
+        let blockList = ast2blocklist.toBlockList(startTrees[0]);
 
         expect(startTrees[0]).toEqual(expectedStartTree);
         expect(blockList).toEqual(expectedBlockList);
@@ -176,8 +176,8 @@ describe('AST2BlockList Class', () => {
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
-        let startTrees = AST2BlockList.toStartTrees(AST);
-        let blockList = AST2BlockList.toBlockList(startTrees[0]);
+        let startTrees = ast2blocklist.toStartTrees(AST);
+        let blockList = ast2blocklist.toBlockList(startTrees[0]);
 
         expect(startTrees[0]).toEqual(expectedStartTree);
         expect(blockList).toEqual(expectedBlockList);
