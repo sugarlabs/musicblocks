@@ -28,6 +28,8 @@ describe('AST2BlockList Class', () => {
         jest.clearAllMocks();
     });
 
+    // Test a single note inside of settimbre.
+    // Support number expressions, including built-in math functions, for note and solfege.
     test('should generate correct blockList for a single note', () => {
         const code = `
         new Mouse(async mouse => {
@@ -41,55 +43,6 @@ describe('AST2BlockList Class', () => {
             return mouse.ENDMOUSE;
         });
         MusicBlocks.run();`
-
-        const expectedStartTree = {
-            "name": "start",
-            "children": [
-                {
-                    "name": "settimbre",
-                    "args": ["guitar"],
-                    "children": [
-                        {
-                            "name": "newnote",
-                            "args": [
-                                {
-                                    "name": "multiply",
-                                    "args": [
-                                        {
-                                            "name": "abs",
-                                            "args": [
-                                                {
-                                                    "name": "neg",
-                                                    "args": [2]
-                                                }
-                                            ]
-                                        },
-                                        1
-                                    ]
-                                }
-                            ],
-                            "children": [
-                                {
-                                    "name": "pitch",
-                                    "args": [
-                                        "mi",
-                                        {
-                                            "name": "abs",
-                                            "args": [
-                                                {
-                                                    "name": "neg",
-                                                    "args": [2]
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        };
 
         const expectedBlockList = [
             [0,"start",200,200,[null,1,null]],
@@ -109,13 +62,13 @@ describe('AST2BlockList Class', () => {
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
-        let startTrees = AST2BlockList.toStartTrees(AST);
-        let blockList = AST2BlockList.toBlockList(startTrees[0]);
-
-        expect(startTrees[0]).toEqual(expectedStartTree);
+        let trees = AST2BlockList.toTrees(AST);
+        let blockList = AST2BlockList.toBlockList(trees);
         expect(blockList).toEqual(expectedBlockList);
     });
 
+    // Test repeat statement.
+    // Support number expressions, including built-in math functions, for number of repeats.
     test('should generate correct blockList for repeat', () => {
         const code = `
         new Mouse(async mouse => {
@@ -131,52 +84,6 @@ describe('AST2BlockList Class', () => {
             return mouse.ENDMOUSE;
         });
         MusicBlocks.run();`
-
-        const expectedStartTree = {
-            "name": "start",
-            "children": [
-              {
-                "name": "settimbre",
-                "args": [
-                  "clarinet"
-                ],
-                "children": [
-                  {
-                    "name": "repeat",
-                    "args": [
-                      {
-                        "name": "random",
-                        "args": [1,5]
-                      }
-                    ],
-                    "children": [
-                      {
-                        "name": "newnote",
-                        "args": [
-                          {
-                            "name": "divide",
-                            "args": [1,4]
-                          }
-                        ],
-                        "children": [
-                          {
-                            "name": "pitch",
-                            "args": [
-                              "fa",
-                              {
-                                "name": "multiply",
-                                "args": [2,2]
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          };
 
         const expectedBlockList = [
             [0,"start",200,200,[null,1,null]], 
@@ -198,17 +105,17 @@ describe('AST2BlockList Class', () => {
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
-        let startTrees = AST2BlockList.toStartTrees(AST);
-        let blockList = AST2BlockList.toBlockList(startTrees[0]);
-
-        expect(startTrees[0]).toEqual(expectedStartTree);
+        let trees = AST2BlockList.toTrees(AST);
+        let blockList = AST2BlockList.toBlockList(trees);
         expect(blockList).toEqual(expectedBlockList);
     });
 
+    // Test if statement.
+    // Support boolean expressions, including built-in math functions, for if condition.
     test('should generate correct blockList for if', () => {
         const code = `
         new Mouse(async mouse => {
-            if (true) {
+            if (!(MathUtility.doRandom(0, 1) == 1)) {
                 await mouse.setInstrument("electronic synth", async () => {
                     await mouse.playNote(1 / 4, async () => {
                         await mouse.playPitch("sol", 4);
@@ -221,59 +128,89 @@ describe('AST2BlockList Class', () => {
         });
         MusicBlocks.run();`
 
-        const expectedStartTree = {
-            "name": "start",
-            "children": [
-              {
-                "name": "if",
-                "args": [true],
-                "children": [
-                  {
-                    "name": "settimbre",
-                    "args": ["electronic synth"],
-                    "children": [
-                      {
-                        "name": "newnote",
-                        "args": [
-                          {
-                            "name": "divide",
-                            "args": [1,4]
-                          }
-                        ],
-                        "children": [
-                          {
-                            "name": "pitch",
-                            "args": ["sol",4]
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]        
-          };
-
         const expectedBlockList = [
             [0,"start",200,200,[null,1,null]],
-            [1,"if",0,0,[0,2,3,null]],
-            [2,["boolean",{"value":true}],0,0,[1]],
-            [3,"settimbre",0,0,[1,4,5,null]],
-            [4,["voicename",{"value":"electronic synth"}],0,0,[3]],
-            [5,"newnote",0,0,[3,6,9,null]],
-            [6,"divide",0,0,[5,7,8]],
-            [7,["number",{"value":1}],0,0,[6]],
-            [8,["number",{"value":4}],0,0,[6]],
-            [9,"pitch",0,0,[5,10,11,null]],
-            [10,["solfege",{"value":"sol"}],0,0,[9]],
-            [11,["number",{"value":4}],0,0,[9]]
+            [1,"if",0,0,[0,2,8,null]],
+            [2,"not",0,0,[1,3]],
+            [3,"equal",0,0,[2,4,7]],
+            [4,"random",0,0,[3,5,6]],
+            [5,["number",{"value":0}],0,0,[4]],
+            [6,["number",{"value":1}],0,0,[4]],
+            [7,["number",{"value":1}],0,0,[3]],
+            [8,"settimbre",0,0,[1,9,10,null]],
+            [9,["voicename",{"value":"electronic synth"}],0,0,[8]],
+            [10,"newnote",0,0,[8,11,14,null]],
+            [11,"divide",0,0,[10,12,13]],
+            [12,["number",{"value":1}],0,0,[11]],
+            [13,["number",{"value":4}],0,0,[11]],
+            [14,"pitch",0,0,[10,15,16,null]],
+            [15,["solfege",{"value":"sol"}],0,0,[14]],
+            [16,["number",{"value":4}],0,0,[14]]
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
-        let startTrees = AST2BlockList.toStartTrees(AST);
-        let blockList = AST2BlockList.toBlockList(startTrees[0]);
+        let trees = AST2BlockList.toTrees(AST);
+        let blockList = AST2BlockList.toBlockList(trees);
+        expect(blockList).toEqual(expectedBlockList);
+    });
 
-        expect(startTrees[0]).toEqual(expectedStartTree);
+    // Test action with recursion.
+    // Support using box value to control termination of recursion.
+    test('should generate correct blockList for action with recursion', () => {
+        const code = `
+        let playSol = async mouse => {
+            await mouse.playNote(1 / 4, async () => {
+                await mouse.playPitch("sol", 2);
+                return mouse.ENDFLOW;
+            });
+            box1 = box1 - 1;
+            if (box1 > 0) {
+                await playSol(mouse);
+            }
+            return mouse.ENDFLOW;
+        };
+        new Mouse(async mouse => {
+            var box1 = Math.abs(-2) * 3;
+            await mouse.setInstrument("electronic synth", async () => {
+                await playSol(mouse);
+                return mouse.ENDFLOW;
+            });
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`
+
+        const expectedBlockList = [
+            [0,"action",200,200,[null,1,2,null]],
+            [1,["text",{"value":"playSol"}],0,0,[0]],
+            [2,"newnote",0,0,[0,3,6,9]],
+            [3,"divide",0,0,[2,4,5]],
+            [4,["number",{"value":1}],0,0,[3]],
+            [5,["number",{"value":4}],0,0,[3]],
+            [6,"pitch",0,0,[2,7,8,null]],
+            [7,["solfege",{"value":"sol"}],0,0,[6]],
+            [8,["number",{"value":2}],0,0,[6]],
+            [9,"decrementOne",0,0,[2,10,11]],
+            [10,["namedbox",{"value":"box1"}],0,0,[9]],
+            [11,"if",0,0,[9,12,15,null]],
+            [12,"greater",0,0,[11,13,14]],
+            [13,["namedbox",{"value":"box1"}],0,0,[12]],
+            [14,["number",{"value":0}],0,0,[12]],
+            [15,["nameddo",{"value":"playSol"}],0,0,[11,null]],
+            [16,"start",500,200,[null,17,null]],
+            [17,["storein2",{"value":"box1"}],0,0,[16,18,23]],
+            [18,"multiply",0,0,[17,19,22]],
+            [19,"abs",0,0,[18,20]],
+            [20,"neg",0,0,[19,21]],
+            [21,["number",{"value":2}],0,0,[20]],
+            [22,["number",{"value":3}],0,0,[18]],
+            [23,"settimbre",0,0,[17,24,25,null]],
+            [24,["voicename",{"value":"electronic synth"}],0,0,[23]],
+            [25,["nameddo",{"value":"playSol"}],0,0,[23,null]]
+        ];
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        let trees = AST2BlockList.toTrees(AST);
+        let blockList = AST2BlockList.toBlockList(trees);
         expect(blockList).toEqual(expectedBlockList);
     });
 });

@@ -26,13 +26,13 @@
  * which can be loaded into the musicblocks UI by calling `blocks.loadNewBlocks(blockList)`.
  * 
  * Usage:
- *   let startTrees = AST2BlockList.toStartTrees(AST);
- *   let blockList = AST2BlockList.toBlockList(startTrees[0]);
+ *   let trees = AST2BlockList.toTrees(AST);
+ *   let blockList = AST2BlockList.toBlockList(trees);
  */
 class AST2BlockList {
     /**
-     * Given a musicblocks AST ('type': "Program"), return an array of start trees.
-     * Each AST contains one to multiple start blocks, each to be converted to a start tree.
+     * Given a musicblocks AST ('type': "Program"), return an array of trees.
+     * Each AST contains one to multiple top level blocks, each to be converted to a tree.
      * For example:
      *   {
      *     name: "start",
@@ -57,38 +57,117 @@ class AST2BlockList {
      *   }
      * The entire block is to play a whole note Sol on guitar in the third octave.
      * 
-     * @param {Object} AST - AST generated from JavaScript code, see example above
-     * @returns {Array} start trees, see example above
+     * @param {Object} AST - AST generated from JavaScript code
+     * @returns {Array} trees, see example above
      */
-    static toStartTrees(AST) {
+    static toTrees(AST) {
         // A map from the statement type to three getters:
         //   nameGetter finds the name in the AST node of the statement and returns it;
         //   argsGetter returns an array of AST nodes that contain the arguments of the statement;
         //   childrenGetter returns an array of AST nodes that contain the children of the statement.
         // The AST structures for different statement types are different. Therefore, a new entry
         // needs to be added to the map in order to support a new statement type.
+        // First, change _typeOf function to return a new statement type for a new AST structure.
+        // Then, add the getters in this map with the new type as the key.
         const _getterLookup = {
-            "ExpressionStatement": {
-                "nameGetter": _expressionNameGetter,
-                "argsGetter": _expressionArgsGetter,
-                "childrenGetter": _expressionChildrenGetter,
+            NewExpression: {
+                nameGetter: () => { return "start"; },
+                argsGetter: () => { return []; },
+                childrenGetter: (bodyAST) => {
+                    for (const arg of bodyAST.expression.arguments) {
+                        if (arg.type == "ArrowFunctionExpression") {
+                            return arg.body.body;
+                        }
+                    }
+                    return [];
+                },
             },
-            "ForStatement": {
-                "nameGetter": () => { return "repeat"; },
-                "argsGetter": (bodyAST) => { return [bodyAST.test.right]; },
-                "childrenGetter": (bodyAST) => { return bodyAST.body.body; }
+            AssignmentExpression: {
+                nameGetter: (bodyAST) => {
+                    if (bodyAST.expression.right.type == "BinaryExpression"
+                        && bodyAST.expression.left.name == bodyAST.expression.right.left.name) {
+                        // box1 = box1 - 1;
+                        if (bodyAST.expression.right.operator == "-"
+                            && bodyAST.expression.right.right.value == 1) {
+                            return "decrementOne";
+                        }
+                        // box1 = box1 + 3; or
+                        // box1 = box1 + -3;
+                        if (bodyAST.expression.right.operator == "+") {
+                            return "increment";
+                        }
+                    }
+                    console.error("Unsupported AssignmentExpression: ", bodyAST.expression);
+                },
+                argsGetter: (bodyAST) => {
+                    if (bodyAST.expression.right.type == "BinaryExpression"
+                        && bodyAST.expression.left.name == bodyAST.expression.right.left.name) {
+                        if (bodyAST.expression.right.operator == "-"
+                            && bodyAST.expression.right.right.value == 1) {
+                            return [bodyAST.expression.left];
+                        }
+                        if (bodyAST.expression.right.operator == "+") {
+                            return [bodyAST.expression.left, bodyAST.expression.right.right];;
+                        }
+                    }
+                    console.error("Unsupported AssignmentExpression: ", bodyAST.expression);
+                },
+                childrenGetter: () => { return []; },
             },
-            "IfStatement": {
-                "nameGetter": () => { return "if"; },
-                "argsGetter": (bodyAST) => { return [bodyAST.test]; },
-                "childrenGetter": (bodyAST) => { return bodyAST.consequent.body; }
-            }
+            AsyncActionCallExpression: {
+                nameGetter: (bodyAST) => {
+                    return {nameddo: bodyAST.expression.argument.callee.name};
+                },
+                argsGetter: () => { return []; },
+                childrenGetter: () => { return []; },
+            },
+            AsyncMemberCallExpression: {
+                nameGetter: (bodyAST) => {
+                    let member = bodyAST.expression.argument.callee.property.name;
+                    if (member in _memberLookup) {
+                        return _memberLookup[member];
+                    }
+                    console.error("Unsupported AsyncMemberCallExpression name: ", member);
+                    return null;
+                },
+                argsGetter: (bodyAST) => { return bodyAST.expression.argument.arguments; },
+                childrenGetter: (bodyAST) => {
+                    for (const arg of bodyAST.expression.argument.arguments) {
+                        if (arg.type == "ArrowFunctionExpression") {
+                            return arg.body.body;
+                        }
+                    }
+                    return [];
+                },
+            },
+            ActionDeclaration: {
+                nameGetter: () => { return "action"; },
+                argsGetter: (bodyAST) => { return [bodyAST.declarations[0].id]; },
+                childrenGetter: (bodyAST) => { return bodyAST.declarations[0].init.body.body; },
+            },
+            VariableDeclaration: {
+                nameGetter: (bodyAST) => {
+                    return {storein2: bodyAST.declarations[0].id.name};
+                },
+                argsGetter: (bodyAST) => { return [bodyAST.declarations[0].init]; },
+                childrenGetter: () => { return []; },
+            },
+            ForStatement: {
+                nameGetter: () => { return "repeat"; },
+                argsGetter: (bodyAST) => { return [bodyAST.test.right]; },
+                childrenGetter: (bodyAST) => { return bodyAST.body.body; }
+            },
+            IfStatement: {
+                nameGetter: () => { return "if"; },
+                argsGetter: (bodyAST) => { return [bodyAST.test]; },
+                childrenGetter: (bodyAST) => { return bodyAST.consequent.body; }
+            },
         };
 
-        // A map from expression name in AST to block name.
-        // Expression names are function names used in JavaScript, while block names are
+        // A map from member name in AST to block name.
+        // Member names are mouse function names used in JavaScript, while block names are
         // recognizable by musicblocks.
-        const _expressionLookup = {
+        const _memberLookup = {
             setInstrument: "settimbre",
             playNote: "newnote",
             playPitch: "pitch"
@@ -129,30 +208,79 @@ class AST2BlockList {
             "sqrt": "sqrt"
         };
 
-        // Implementation of toStartTrees(AST).
+        // Implementation of toTrees(AST).
         let root = {};
-        _createNodeAndAddToTree(AST.body[0], root);
-        let startTrees = root["children"];
-        for (let startTree of startTrees) {
-            if (startTree["name"] == null) {
-                startTree["name"] = "start";
+        for (let body of AST.body) {
+            // Ignore MusicBlocks.run()
+            if (_typeOf(body) == "MemberCallExpression"
+                && body.expression.callee.object.name == "MusicBlocks"
+                && body.expression.callee.property.name == "run") {
+                continue;
             }
+            _createNodeAndAddToTree(body, root);
         }
-        return startTrees;
+        return root["children"];
 
         //
         // Helper functions
         //
 
-        function _getOrNull(json, properties) {
-            let val = json;
-            for (const property of properties) {
-                val = val[property];
-                if (val === undefined) {
+        function _typeOf(bodyAST) {
+            if (bodyAST.type == "ExpressionStatement") {
+                if (bodyAST.expression.type == "NewExpression") {
+                    return "NewExpression";
+                }
+                if (bodyAST.expression.type == "AssignmentExpression") {
+                    return "AssignmentExpression";
+                }
+                if (bodyAST.expression.type == "CallExpression") {
+                    if (bodyAST.expression.callee.type == "Identifier") {
+                        return "ActionCallExpression";
+                    }
+                    if (bodyAST.expression.callee.type == "MemberExpression") {
+                        return "MemberCallExpression";
+                    }
+                    console.error("Unsupported CallExpression callee type: ", bodyAST.expression.callee.type);
                     return null;
                 }
+                if (bodyAST.expression.type == "AwaitExpression") {
+                    if (bodyAST.expression.argument.type == "CallExpression") {
+                        if (bodyAST.expression.argument.callee.type == "Identifier") {
+                            return "AsyncActionCallExpression";
+                        }
+                        if (bodyAST.expression.argument.callee.type == "MemberExpression") {
+                            return "AsyncMemberCallExpression";
+                        }
+                        console.error("Unsupported Async CallExpression callee type: ", bodyAST.expression.argument.callee.type);
+                        return null;
+                    }
+                    console.error("Unsupported AwaitExpression argument type: ", bodyAST.expression.type);
+                    return null;
+                }
+                console.error("Unsupported ExpressionStatement expression type: ", bodyAST.expression.type);
+                return null;
             }
-            return val;
+            if (bodyAST.type == "ForStatement") {
+                return "ForStatement";
+            }
+            if (bodyAST.type == "IfStatement") {
+                return "IfStatement";
+            }
+            if (bodyAST.type == "VariableDeclaration") {
+                if (bodyAST.declarations[0].init.type == "Literal"  // var v = 6;
+                    || bodyAST.declarations[0].init.type == "BinaryExpression"  // var v = 2 * 3;
+                    || bodyAST.declarations[0].init.type == "CallExpression"  // var v = Math.abs(-6);
+                    || bodyAST.declarations[0].init.type == "UnaryExpression") {  // var v = -6;
+                    return "VariableDeclaration";
+                }
+                if (bodyAST.declarations[0].init.type == "ArrowFunctionExpression") {
+                    return "ActionDeclaration";
+                }
+                console.error("Unsupported VariableDeclaration init type:", bodyAST.declarations[0].init.type);
+                return null;
+            }
+            console.error("Unsupported AST body type: ", bodyAST.type);
+            return null;
         }
 
         /**
@@ -165,23 +293,28 @@ class AST2BlockList {
          * @returns {Void}
          */
         function _createNodeAndAddToTree(bodyAST, parent) {
+            let type = _typeOf(bodyAST);
+            if (type == null) {
+                return;
+            }
+            if (!(type in _getterLookup)) {
+                console.error("Unsupported AST node type: ", type, "in AST: ", bodyAST);
+                return;
+            }
+
             let node = {};
-            if (bodyAST.type in _getterLookup) {
-                // Set block name
-                node["name"] = _getterLookup[bodyAST.type].nameGetter(bodyAST);
-                // Set arguments
-                let args = _createArgNode(_getterLookup[bodyAST.type].argsGetter(bodyAST));
-                if (args.length > 0) {
-                    node["args"] = args;
+            // Set block name
+            node["name"] = _getterLookup[type].nameGetter(bodyAST);
+            // Set arguments
+            let args = _createArgNode(_getterLookup[type].argsGetter(bodyAST));
+            if (args.length > 0) {
+                node["args"] = args;
+            }
+            // Set children
+            for (const child of _getterLookup[type].childrenGetter(bodyAST)) {
+                if (child.type != "ReturnStatement") {
+                    _createNodeAndAddToTree(child, node);
                 }
-                // Set children
-                for (const child of _getterLookup[bodyAST.type].childrenGetter(bodyAST)) {
-                    if (child.type != "ReturnStatement") {
-                        _createNodeAndAddToTree(child, node);
-                    }
-                }
-            } else {
-                console.error("Unsupported AST node type: ", bodyAST.type);
             }
 
             // Add the node to the children list of the parent.
@@ -191,59 +324,30 @@ class AST2BlockList {
             parent["children"].push(node);
         }
 
-        function _expressionNameGetter(bodyAST) {
-            const name = _getOrNull(bodyAST, ["expression", "argument", "callee", "property", "name"]);
-            if (name == null) {
-                return null;
-            }
-            if (name in _expressionLookup) {
-                return _expressionLookup[name];
-            }
-            else {
-                console.error("Unsupported expression name: ", name);
-                return null;
-            }
-        }
-
-        function _expressionArgsGetter(bodyAST) {
-            let args = _getOrNull(bodyAST, ["expression", "arguments"]);  // For Start
-            if (args === null) {
-                args = _getOrNull(bodyAST, ["expression", "argument", "arguments"]);
-            }
-            return args === null ? [] : args;
-        }
-
-        function _expressionChildrenGetter(bodyAST) {
-            for (const arg of _getterLookup[bodyAST.type].argsGetter(bodyAST)) {
-                let children = _getOrNull(arg, ["body", "body"]);
-                if (children !== null) {
-                    return children;
-                }
-            }
-            return [];
-        }
-
         /**
-         * Create and return a tree node for the given array of AST nodes for arguments.
-         * For exmple, two Literal AST nodes with value 1 and 2 will result in a tree node [1, 2];
-         * One binary AST node "1 / 2" will result in a tree node [{'name': 'divide', 'args': [1, 2]}].
+         * Create and return an array for the given array of AST nodes for arguments.
+         * For exmple, two Literal AST nodes with value 1 and 2 will result in an array [1, 2];
+         * One binary AST node "1 / 2" will result in an array [{'name': 'divide', 'args': [1, 2]}].
          * 
          * @param {Array} argASTNodes - an arry of AST nodes for arguments
-         * @returns {Object} a tree node represents all the arguments, note that an argument can be another node
+         * @returns {Array} an array of all the arguments, note that an argument can be another node
          */
         function _createArgNode(argASTNodes) {
-            let node = [];
+            let argNodes = [];
             for (const arg of argASTNodes) {
                 switch (arg.type) {
                     case "ArrowFunctionExpression":
-                        // Ignore
+                        // Ignore the type, it's for children
+                        break;
+                    case "Identifier":
+                        argNodes.push( { identifier: arg.name } );
                         break;
                     case "Literal":
-                        node.push(arg.value);
+                        argNodes.push(arg.value);
                         break;
                     case "BinaryExpression":
                         if (arg.operator in _binaryOperatorLookup) {
-                            node.push({
+                            argNodes.push({
                                 "name": _binaryOperatorLookup[arg.operator],
                                 "args": _createArgNode([arg.left, arg.right])
                             });
@@ -253,7 +357,7 @@ class AST2BlockList {
                         break;
                     case "CallExpression":
                         if (arg.callee.property.name in _functionLookup) {
-                            node.push({
+                            argNodes.push({
                                 "name": _functionLookup[arg.callee.property.name],
                                 "args": _createArgNode(arg.arguments)
                             });
@@ -263,7 +367,7 @@ class AST2BlockList {
                         break;
                     case "UnaryExpression":
                         if (arg.operator in _unaryOperatorLookup) {
-                            node.push({
+                            argNodes.push({
                                 "name": _unaryOperatorLookup[arg.operator],
                                 "args": _createArgNode([arg.argument])
                             });
@@ -275,39 +379,52 @@ class AST2BlockList {
                         console.error("Unsupported argument type: ", arg.type);
                 }
             }
-            return node;
+            return argNodes;
         }
     }
 
     /**
-     * @param {Object} tree - a start tree generated from JavaScript AST by toStartTrees(AST)
+     * @param {Object} trees - trees generated from JavaScript AST by toTrees(AST)
      * @returns {Array} a blockList that can loaded by musicblocks by calling `blocks.loadNewBlocks(blockList)`
      */
-    static toBlockList(tree) {
+    static toBlockList(trees) {
         // A map from block name to its argument handling function.
         const _argHandlers = {
-            "settimbre": _settimbreArgHandler,
-            "newnote": _addValueArgsToBlockList,
-            "pitch": _pitchArgHandler,
-            "repeat": _addValueArgsToBlockList,
-            "if": _addValueArgsToBlockList
+            "action": _actionArgHandler,           // A string literal for action name
+            "settimbre": _settimbreArgHandler,     // A string literal for instrument name
+            "decrementOne": _variableArgHandler,   // A string identifier for variable
+            "pitch": _pitchArgHandler,             // A note and a number expression
+            "increment": _incrementArgHandler,     // A string identifier for variable and a number expression
+            "newnote": _addValueArgsToBlockList,   // A number expression
+            "repeat": _addValueArgsToBlockList,    // A number expression
+            "if": _addValueArgsToBlockList,        // A boolean expression
+            "storein2": _addValueArgsToBlockList,  // A string identifier for variable
         };
 
         // A map from block name to the definition of its connections.
         const _connDescriptors = {
             "start": { "prev": 0, "child": 1, "next": 2 },
+            "action": { "prev": 0, "args": 1, "child": 2, "next": 3 },
             "settimbre": { "prev": 0, "args": 1, "child": 2, "next": 3 },
-            "newnote": { "prev": 0, "args": 1, "child": 2, "next": 3 },
+            "decrementOne": { "prev": 0, "args": 1, "next": 2 },
             "pitch": { "prev": 0, "args": 1, "child": 2, "next": 3 },
+            "increment": { "prev": 0, "args": 1, "next": 3 },
+            "newnote": { "prev": 0, "args": 1, "child": 2, "next": 3 },
             "repeat": { "prev": 0, "args": 1, "child": 2, "next": 3 },
-            "if": { "prev": 0, "args": 1, "child": 2, "next": 3 }
+            "if": { "prev": 0, "args": 1, "child": 2, "next": 3 },
+            "storein2": { "prev": 0, "args": 1, "next": 2 },
+            "nameddo": { "prev": 0, "next": 1 },
         };
 
         let blockList = [];
-        _createBlockAndAddToList(tree, blockList);
-        // Set (x, y) for the start block.
-        blockList[0][2] = 200;
-        blockList[0][3] = 200;
+        let x = 200;
+        for (let tree of trees) {
+            let blockNumber = _createBlockAndAddToList(tree, blockList);
+            // Set (x, y) for the top level blocks.
+            blockList[blockNumber][2] = x;
+            blockList[blockNumber][3] = 200;
+            x += 300;
+        }
         return blockList;
 
         /**
@@ -332,11 +449,16 @@ class AST2BlockList {
             let blockNumber = blockList.length;
             block.push(blockNumber);
             blockList.push(block);
-            block.push(node["name"]);
+            if ((typeof node.name) === "object") {
+                let blockName = Object.keys(node.name)[0];
+                block.push([blockName, { "value": node.name[blockName] }]);
+            } else {
+                block.push(node.name);
+            }
             block.push(0);  // x
             block.push(0);  // y
 
-            let connDesc = _connDescriptors[node["name"]];
+            let connDesc = _connectionDescriptorOf(block);
             let connections = new Array(Object.keys(connDesc).length).fill(null);
             block.push(connections);
 
@@ -352,36 +474,42 @@ class AST2BlockList {
                 // Set the first child block number for this block
                 connections[connDesc["child"]] = childBlockNumbers[0];
                 // Set parent block number for the first child to this block
-                block = blockList[childBlockNumbers[0]];
-                connDesc = _connDescriptors[block[1]];  // block[1] is name
-                block[4][connDesc["prev"]] = blockNumber;
+                let childBlock = blockList[childBlockNumbers[0]];
+                connDesc = _connectionDescriptorOf(childBlock);
+                childBlock[4][connDesc["prev"]] = blockNumber;
                 // Parent of other children is their previous sibling
                 for (let i = 1; i < childBlockNumbers.length; i++) {
-                    block = blockList[childBlockNumbers[i]];
-                    connDesc = _connDescriptors[block[1]];  // block[1] is name
-                    block[4][connDesc["prev"]] = childBlockNumbers[i - 1];
+                    childBlock = blockList[childBlockNumbers[i]];
+                    connDesc = _connectionDescriptorOf(childBlock);
+                    childBlock[4][connDesc["prev"]] = childBlockNumbers[i - 1];
                 }
                 // Set the next sibling block number for the children, except the last one
                 for (let i = 0; i < childBlockNumbers.length - 1; i++) {
-                    block = blockList[childBlockNumbers[i]];
-                    connDesc = _connDescriptors[block[1]];  // block[1] is name
-                    block[4][connDesc["next"]] = childBlockNumbers[i + 1];
+                    childBlock = blockList[childBlockNumbers[i]];
+                    connDesc = _connectionDescriptorOf(childBlock);
+                    childBlock[4][connDesc["next"]] = childBlockNumbers[i + 1];
                 }
             }
             return blockNumber;
         }
 
+        // [1,"settimbre",0,0,[0,2,3,null]] or
+        // [21,["namedbox",{"value":"box1"}],421,82,[20]]
+        function _connectionDescriptorOf(block) {
+            return _connDescriptors[Array.isArray(block[1]) ? block[1][0] : block[1]];
+        }
+
         function _createArgBlockAndAddToList(node, blockList, parentBlockNumber) {
-            let args = node["args"];
-            if (args === undefined || args.length == 0) {
+            if (node.args === undefined || node.args.length == 0) {
                 return;
             }
-            let argHandler = _argHandlers[node["name"]];
+            let argHandlerKey = (typeof node.name) === "object" ? Object.keys(node.name)[0] : node.name;
+            let argHandler = _argHandlers[argHandlerKey];
             if (argHandler === undefined) {
-                console.error("Cannot find argument handler for block: ", node["name"]);
+                console.error("Cannot find argument handler for: ", argHandlerKey);
                 return;
             }
-            argHandler(node["args"], blockList, parentBlockNumber);
+            argHandler(node.args, blockList, parentBlockNumber);
         }
 
         /**
@@ -400,6 +528,94 @@ class AST2BlockList {
             block.push([parentBlockNumber]);  // connections
             let parentConnections = blockList[parentBlockNumber][4];
             parentConnections[1] = blockNumber;
+        }
+
+        /**
+         * @param {Object} args - the args property of an action tree node, for example, ["identifier": "chunk1"]
+         * @param {Array} blockList - a new block [2,["text",{"value":"chunck1"}],0,0,[1]] for the above example will be added to the blockList
+         * @param {Number} parentBlockNumber - the number of the action (parent) block of this argument block
+         */
+        function _actionArgHandler(args, blockList, parentBlockNumber) {
+            let block = [];
+            let blockNumber = blockList.length;
+            block.push(blockNumber);
+            blockList.push(block);
+            block.push(["text", { "value": args[0].identifier }]);
+            block.push(0);  // x
+            block.push(0);  // y
+            block.push([parentBlockNumber]);  // connections
+            let parentConnections = blockList[parentBlockNumber][4];
+            parentConnections[1] = blockNumber;
+        }
+
+        /**
+         * @param {Object} args - the args property of an increment or decrementOne tree node, for example, ["identifier": "box1"]
+         * @param {Array} blockList - a new block [2,["namedbox",{"value":"box1"}],0,0,[1]] for the above example will be added to the blockList
+         * @param {Number} parentBlockNumber - the number of the increment or decrementOne (parent) block of this argument block
+         */
+        function _variableArgHandler(args, blockList, parentBlockNumber) {
+            let block = [];
+            let blockNumber = blockList.length;
+            block.push(blockNumber);
+            blockList.push(block);
+            block.push(["namedbox", { "value": args[0].identifier }]);
+            block.push(0);  // x
+            block.push(0);  // y
+            block.push([parentBlockNumber]);  // connections
+            let parentConnections = blockList[parentBlockNumber][4];
+            parentConnections[1] = blockNumber;
+        }
+
+        /**
+         * Example:
+         * args: ['sol', 4] =>
+         *   [10,["solfege",{"value":"sol"}],1864,237,[9]],
+         *   [11,["number",{"value":4}],1864,269,[9]]
+         * 
+         * @param {Object} args - the args property of a pitch tree node
+         * @param {Array} blockList - the blockList to which the new argument blocks will be added
+         * @param {Number} parentBlockNumber - the number of the parent block of the new argument blocks
+          */
+        function _pitchArgHandler(args, blockList, parentBlockNumber) {
+            let block = [];
+            let blockNumber = blockList.length;
+            block.push(blockNumber);
+            blockList.push(block);
+            block.push(["solfege", { "value": args[0] }]);
+            block.push(0);  // x
+            block.push(0);  // y
+            block.push([parentBlockNumber]);  // connections
+            let parentConnections = blockList[parentBlockNumber][4];
+            parentConnections[1] = blockNumber;
+
+            blockNumber = _addValueArgToBlockList(args[1], blockList, parentBlockNumber);
+            parentConnections[2] = blockNumber;
+        }
+
+        /**
+         * Example:
+         * args: [{"identifier": "box1"}, 4] =>
+         *   [10,["namedbox",{"value":"box1"}],1864,237,[9]],
+         *   [11,["number",{"value":4}],1864,269,[9]]
+         * 
+         * @param {Object} args - the args property of an increment tree node
+         * @param {Array} blockList - the blockList to which the new argument blocks will be added
+         * @param {Number} parentBlockNumber - the number of the parent block of the new argument blocks
+          */
+        function _incrementArgHandler(args, blockList, parentBlockNumber) {
+            let block = [];
+            let blockNumber = blockList.length;
+            block.push(blockNumber);
+            blockList.push(block);
+            block.push(["namedbox", { "value": args[0].identifier }]);
+            block.push(0);  // x
+            block.push(0);  // y
+            block.push([parentBlockNumber]);  // connections
+            let parentConnections = blockList[parentBlockNumber][4];
+            parentConnections[1] = blockNumber;
+
+            blockNumber = _addValueArgToBlockList(args[1], blockList, parentBlockNumber);
+            parentConnections[2] = blockNumber;
         }
 
         /**
@@ -439,13 +655,15 @@ class AST2BlockList {
             block.push(blockNumber);
             blockList.push(block);
             let type = typeof arg;
-            if (type === 'number' || type === 'boolean') {
-                block.push([type, { "value": arg }]);
+            if (type === 'number' || type === 'boolean'
+                || (type === 'object' && arg.identifier !== undefined)) {
+                // variables can be in number or boolean expressions
+                block.push(type === 'object' ? ["namedbox", { "value": arg.identifier }] : [type, { "value": arg }]);
                 block.push(0);  // x
                 block.push(0);  // y
                 // Initialize connections with just the parent.
                 block.push([parentBlockNumber]);
-            } else {
+            } else if (type === 'object') {
                 block.push(arg.name);
                 block.push(0);  // x
                 block.push(0);  // y
@@ -453,34 +671,10 @@ class AST2BlockList {
                 connections[0] = parentBlockNumber;
                 block.push(connections);
                 _addValueArgsToBlockList(arg.args, blockList, blockNumber);
+            } else {
+                console.error("Unsupported value argument: ", arg);
             }
             return blockNumber;
-        }
-
-        /**
-         * Example:
-         * args: ['sol', 4] =>
-         *   [10,["solfege",{"value":"sol"}],1864,237,[9]],
-         *   [11,["number",{"value":4}],1864,269,[9]]
-         * 
-         * @param {Object} args - the args property of a pitch tree node
-         * @param {Array} blockList - the blockList to which the new argument blocks will be added
-         * @param {Number} parentBlockNumber - the number of the parent block of the new argument blocks
-          */
-        function _pitchArgHandler(args, blockList, parentBlockNumber) {
-            let block = [];
-            let blockNumber = blockList.length;
-            block.push(blockNumber);
-            blockList.push(block);
-            block.push(["solfege", { "value": args[0] }]);
-            block.push(0);  // x
-            block.push(0);  // y
-            block.push([parentBlockNumber]);  // connections
-            let parentConnections = blockList[parentBlockNumber][4];
-            parentConnections[1] = blockNumber;
-
-            blockNumber = _addValueArgToBlockList(args[1], blockList, parentBlockNumber);
-            parentConnections[2] = blockNumber;
         }
     }
 }
@@ -506,9 +700,9 @@ function main() {
         }
         const AST = acorn.parse(data, { ecmaVersion: 2020 });
         console.log(JSON.stringify(AST, null, 2));
-        let startTrees = AST2BlockList.toStartTrees(AST);
-        console.log(JSON.stringify(startTrees, null, 2));
-        let blockList = AST2BlockList.toBlockList(startTrees[0]);
+        let trees = AST2BlockList.toTrees(AST);
+        console.log(JSON.stringify(trees, null, 2));
+        let blockList = AST2BlockList.toBlockList(trees);
         console.log(toString(blockList));
     });
 }
