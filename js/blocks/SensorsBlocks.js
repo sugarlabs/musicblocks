@@ -713,6 +713,7 @@ function setupSensorsBlocks(activity) {
 
         /**
          * Retrieves the color value of the pixel under the turtle.
+         * Includes images displayed by the Show block.
          * @param {Object} logo - The logo object managing the runtime state.
          * @param {number} turtle - The identifier of the turtle.
          * @returns {number} - The color index from searchColors, or a fallback value if detection fails.
@@ -720,51 +721,110 @@ function setupSensorsBlocks(activity) {
          */
         arg(logo, turtle) {
             let requiredTurtle;
-
+        
             try {
                 requiredTurtle = activity.turtles.getTurtle(turtle);
             } catch (error) {
-                return this.getFallbackColor(); // Turtle not found, no visibility to restore
+                console.error("Turtle not found:", error);
+                return this.getFallbackColor();
             }
-
+        
             if (!requiredTurtle.container) {
-                return this.getFallbackColor(); // Container not found, no visibility to restore
+                console.error("Turtle container not found.");
+                return this.getFallbackColor();
             }
-
-            const { x, y } = requiredTurtle.container;
+        
+            let { x, y } = requiredTurtle.container;
             const originalVisibility = requiredTurtle.container.visible;
-
+        
             try {
+                // Hide the turtle temporarily to get an accurate color reading
                 requiredTurtle.container.visible = false;
                 activity.refreshCanvas();
-
-                const pixelData = this.getPixelData(x, y);
-                const color = this.detectColor(pixelData);
-
+        
+                // Convert turtle coordinates to global page coordinates
+                const globalCoords = this.convertToPageCoordinates(x, y);
+        
+                // Get all canvases inside canvasHolder (including ShowBlock images)
+                const canvases = Array.from(document.getElementById("canvasHolder").getElementsByTagName("canvas"));
+        
+                let detectedColor = null;
+        
+                // Loop from topmost to bottom canvas (top layers first)
+                for (let i = canvases.length - 1; i >= 0; i--) {
+                    const pixelData = this.getPixelData(globalCoords.x, globalCoords.y, canvases[i]);
+        
+                    // If we find a visible (non-transparent) pixel, save it
+                    if (pixelData[3] !== 0) {
+                        detectedColor = pixelData;
+                        break;  // Stop once we find the first solid color
+                    }
+                }
+        
+                // Restore the turtle's visibility
                 requiredTurtle.container.visible = originalVisibility;
-                return color;
+        
+                if (!detectedColor) {
+                    console.warn("No non-transparent pixels found, using fallback color.");
+                    return this.getFallbackColor();
+                }
+        
+                console.log("Final Detected Color:", detectedColor);
+                return searchColors(detectedColor[0], detectedColor[1], detectedColor[2]);
+        
             } catch (error) {
+                console.error("Error in color detection:", error);
                 requiredTurtle.container.visible = originalVisibility;
                 return this.getFallbackColor();
             }
         }
+        
 
         /**
-         * Extracts pixel data from the canvas at the specified coordinates.
-         * @param {number} x - The x-coordinate of the pixel.
-         * @param {number} y - The y-coordinate of the pixel.
-         * @returns {Uint8ClampedArray} - The RGBA values of the pixel.
-         * @throws {Error} - If the canvas context is unavailable.
+         * Converts turtle coordinates to match absolute page coordinates.
+         * @param {number} x - The turtle's x-coordinate.
+         * @param {number} y - The turtle's y-coordinate.
+         * @returns {{x: number, y: number}} - Transformed coordinates.
          */
-        getPixelData(x, y) {
-            const canvas = docById("overlayCanvas");
-            const ctx = canvas?.getContext("2d");
-            if (!ctx) {
-                throw new Error("Canvas context unavailable");
+        convertToPageCoordinates(x, y) {
+            const canvasHolder = document.getElementById("canvasHolder");
+            if (!canvasHolder) {
+                console.error("Canvas holder not found.");
+                return { x, y };
             }
-            return ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
+
+            const rect = canvasHolder.getBoundingClientRect();
+            return {
+                x: Math.floor(x - rect.left),
+                y: Math.floor(y - rect.top),
+            };
         }
 
+        /**
+         * Reads pixel data from a given canvas.
+         * @param {number} x - The x-coordinate.
+         * @param {number} y - The y-coordinate.
+         * @param {HTMLCanvasElement} canvas - The canvas element.
+         * @returns {Uint8ClampedArray} - The RGBA values of the pixel.
+         */
+        getPixelData(x, y, canvas) {
+            if (!canvas) {
+                console.error("Canvas not found.");
+                return new Uint8ClampedArray([0, 0, 0, 0]); // Default to transparent
+            }
+
+            const ctx = canvas.getContext("2d", { willReadFrequently: true });
+            if (!ctx) {
+                throw new Error(`Canvas context unavailable`);
+            }
+
+            // Clamp coordinates to prevent out-of-bounds errors
+            const safeX = Math.max(0, Math.min(x, canvas.width - 1));
+            const safeY = Math.max(0, Math.min(y, canvas.height - 1));
+
+            return ctx.getImageData(safeX, safeY, 1, 1).data;
+        }
+        
         /**
          * Determines the color based on pixel data.
          * @param {Uint8ClampedArray} pixelData - The RGBA values of the pixel.
