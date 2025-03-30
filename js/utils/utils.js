@@ -64,17 +64,15 @@ const changeImage = (imgElement, from, to) => {
  * @param {string} text - The input text to be translated.
  * @returns {string} The translated text.
  */
-function _(text) {
+function _(text, options = {}) {
     if (!text) return "";
 
     try {
-        // Characters to remove
         const removeChars = [
             ",", "(", ")", "?", "¿", "<", ">", ".", "\n", '"',
             ":", "%s", "%d", "/", "'", ";", "×", "!", "¡"
         ];
         
-        // Remove unwanted characters from `text`
         let cleanedText = text;
         for (let char of removeChars) {
             cleanedText = cleanedText.split(char).join("");
@@ -86,48 +84,39 @@ function _(text) {
 
         if (lang.includes("kanji") || lang.includes("kana")) {
             subLang = lang.includes("kana") ? "=)kana" : "=)kanji";
-            translated = i18next.t(`${text}${subLang}`);
+            translated = i18next.t(`${text}${subLang}`, options);
             if (translated === `${text}${subLang}`) {
-                translated = i18next.t(text);
+                translated = i18next.t(text, options);
             }
         }
-        else
-        {
-        translated = i18next.t(text);            
+        else {
+            translated = i18next.t(text, options);            
         }
-
-
 
         if (translated && translated === text) {
             return translated;
         }
 
-        // Try cleaned text (without special characters, but still with spaces)
         if (!translated || translated === text) {
-            translated = i18next.t(cleanedText);
+            translated = i18next.t(cleanedText, options);
         }
 
-        // Try lowercase
         if (!translated || translated === text) {
-            translated = i18next.t(text.toLowerCase());
+            translated = i18next.t(text.toLowerCase(), options);
         }
 
-        // Try title case
         if (!translated || translated === text) {
             const titleCase = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
-            translated = i18next.t(titleCase);
+            translated = i18next.t(titleCase, options);
         }
 
-        // Only as a LAST RESORT, try replacing spaces with hyphens
         let hyphenatedText = cleanedText.replace(/ /g, "-");
         if (!translated || translated === text) {
-            translated = i18next.t(hyphenatedText);
+            translated = i18next.t(hyphenatedText, options);
         }
 
-        // If no translation is found, return the original text
         translated = translated || text;
 
-        // Maintain correct letter casing
         if (text === text.toUpperCase()) {
             return translated.toUpperCase();
         } else if (text === text.toLowerCase()) {
@@ -141,6 +130,7 @@ function _(text) {
         return text;
     }
 }
+
 
 
 
@@ -1185,7 +1175,7 @@ readable-fractions/681534#681534
 
     let df = 1.0;
     let top = 1;
-    let iterations = 0;
+    let iterations = 0
     const maxIterations = 10000;
     let bot = 1;
 
