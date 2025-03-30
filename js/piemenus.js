@@ -715,42 +715,17 @@ const piemenuCustomNotes = (
     block._cusNoteWheel.slicePathCustom = slicePath().DonutSliceCustomization();
     block._cusNoteWheel.slicePathCustom.minRadiusPercent = 0.5;
     block._cusNoteWheel.slicePathCustom.maxRadiusPercent = 0.85;
-    //block._cusNoteWheel.titleRotateAngle = 0;
+    block._cusNoteWheel.titleRotateAngle = 90;
     block._cusNoteWheel.titleFont = "100 24px Impact, sans-serif";
     block._cusNoteWheel.sliceSelectedPathCustom = block._cusNoteWheel.slicePathCustom;
     block._cusNoteWheel.sliceInitPathCustom = block._cusNoteWheel.slicePathCustom;
 
-    if (hasOctaveWheel) {
-        block._octavesWheel.colors = platformColor.octavesWheelcolors;
-        block._octavesWheel.slicePathFunction = slicePath().DonutSlice;
-        block._octavesWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-        block._octavesWheel.slicePathCustom.minRadiusPercent = 0.85;
-        block._octavesWheel.slicePathCustom.maxRadiusPercent = 1;
-        block._octavesWheel.sliceSelectedPathCustom = block._octavesWheel.slicePathCustom;
-        block._octavesWheel.sliceInitPathCustom = block._octavesWheel.slicePathCustom;
-        const octaveLabels = [
-            "8",
-            "7",
-            "6",
-            "5",
-            "4",
-            "3",
-            "2",
-            "1",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        ];
-        block._octavesWheel.animatetime = 0; // 300;
-        block._octavesWheel.createWheel(octaveLabels);
-    }
+    // Modified: Make title colors different for selected vs non-selected items
+    block._cusNoteWheel.titleAttr = { font: "100 24px Impact, sans-serif", fill: "#000000" };
+    block._cusNoteWheel.titleSelectedAttr = { font: "100 24px Impact, sans-serif", fill: "#FFFFFF" }; // Changed to white
+    block._cusNoteWheel.titleHoverAttr = { font: "100 24px Impact, sans-serif", fill: "#000000" };
 
-    //Disable rotation, set navAngle and create the menus
-    block._cusNoteWheel.clickModeRotate = false;
-    block._cusNoteWheel.titleRotateAngle = 180;
+    block._cusNoteWheel.clickModeRotate = true;
     block._cusNoteWheel.animatetime = 0; // 300;
     const labelsDict = {};
     let labels = [];
@@ -800,7 +775,6 @@ const piemenuCustomNotes = (
             labels.push("");
         }
     }
-    block._cusNoteWheel.navAngle = -(180 / customLabels.length) + 180 / labels.length;
     block._cusNoteWheel.createWheel(labels);
 
     block._exitWheel.colors = platformColor.exitWheelcolors;
@@ -818,6 +792,34 @@ const piemenuCustomNotes = (
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
     block._exitWheel.createWheel();
+
+    if (hasOctaveWheel) {
+        block._octavesWheel.colors = platformColor.octavesWheelcolors;
+        block._octavesWheel.slicePathFunction = slicePath().DonutSlice;
+        block._octavesWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        block._octavesWheel.slicePathCustom.minRadiusPercent = 0.85;
+        block._octavesWheel.slicePathCustom.maxRadiusPercent = 1;
+        block._octavesWheel.sliceSelectedPathCustom = block._octavesWheel.slicePathCustom;
+        block._octavesWheel.sliceInitPathCustom = block._octavesWheel.slicePathCustom;
+        const octaveLabels = [
+            "8",
+            "7",
+            "6",
+            "5",
+            "4",
+            "3",
+            "2",
+            "1",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ];
+        block._octavesWheel.animatetime = 0; // 300;
+        block._octavesWheel.createWheel(octaveLabels);
+    }
 
     const that = block;
 
