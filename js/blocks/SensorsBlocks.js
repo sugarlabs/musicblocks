@@ -812,19 +812,17 @@ function setupSensorsBlocks(activity) {
                 console.error("Canvas not found.");
                 return new Uint8ClampedArray([0, 0, 0, 0]); // Default to transparent
             }
-
             const ctx = canvas.getContext("2d", { willReadFrequently: true });
             if (!ctx) {
                 throw new Error(`Canvas context unavailable`);
             }
-
             // Clamp coordinates to prevent out-of-bounds errors
             const safeX = Math.max(0, Math.min(x, canvas.width - 1));
             const safeY = Math.max(0, Math.min(y, canvas.height - 1));
 
             return ctx.getImageData(safeX, safeY, 1, 1).data;
         }
-        
+
         /**
          * Determines the color based on pixel data.
          * @param {Uint8ClampedArray} pixelData - The RGBA values of the pixel.
