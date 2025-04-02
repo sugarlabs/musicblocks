@@ -628,16 +628,20 @@ function setupPitchActions(activity) {
                 return stepType === "up"
                     ? getStepSizeUp(
                         tur.singer.keySignature,
-                        tur.singer.lastNotePlayed[0].slice(0, len - 1)
+                        tur.singer.lastNotePlayed[0].slice(0, len - 1),
+                        null,
+                        activity.logo.synth.inTemperament
                     )
                     : getStepSizeDown(
                         tur.singer.keySignature,
-                        tur.singer.lastNotePlayed[0].slice(0, len - 1)
+                        tur.singer.lastNotePlayed[0].slice(0, len - 1),
+                        null,
+                        activity.logo.synth.inTemperament
                     );
             } else {
                 return stepType === "up"
-                    ? getStepSizeUp(tur.singer.keySignature, "G")
-                    : getStepSizeDown(tur.singer.keySignature, "G");
+                    ? getStepSizeUp(tur.singer.keySignature, "G", null, activity.logo.synth.inTemperament)
+                    : getStepSizeDown(tur.singer.keySignature, "G", null, activity.logo.synth.inTemperament);
             }
         }
     };
