@@ -647,9 +647,9 @@ class PitchStaircase {
                 }, 1000);
             }
         };
-        document.getElementsByClassName("wfbWidget")[0].style.maxHeight =
-            10 * PitchStaircase.BUTTONSIZE + "px";
-        document.getElementsByClassName("wfbWidget")[0].style.overflowY = "scroll";
+        const wfbWidget = document.getElementsByClassName("wfbWidget")[0];
+        wfbWidget.style.maxHeight = 10 * PitchStaircase.BUTTONSIZE + "px";
+        wfbWidget.style.overflowY = "scroll";
         this._musicRatio1 = widgetWindow.addInputButton("3");
         widgetWindow.addDivider();
         this._musicRatio2 = widgetWindow.addInputButton("2");
@@ -695,13 +695,9 @@ class PitchStaircase {
 
         widgetWindow.onmaximize = () => {
             if (widgetWindow._maximized) {
-                document.getElementsByClassName("wfbWidget")[0].style.maxHeight =
-                    16 * PitchStaircase.BUTTONSIZE + "px";
-                document.getElementsByClassName("wfbWidget")[0].style.overflowY = "scroll";
+                wfbWidget.style.maxHeight = 16 * PitchStaircase.BUTTONSIZE + "px";
             } else {
-                document.getElementsByClassName("wfbWidget")[0].style.maxHeight =
-                    10 * PitchStaircase.BUTTONSIZE + "px";
-                document.getElementsByClassName("wfbWidget")[0].style.overflowY = "scroll";
+                wfbWidget.style.maxHeight = 10 * PitchStaircase.BUTTONSIZE + "px";
             }
         };
     }
