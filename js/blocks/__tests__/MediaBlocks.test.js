@@ -97,13 +97,13 @@ global.NANERRORMSG = "Not a number error";
 
 // Turtle factory function
 const createDummyTurtle = () => ({
-    singer: { 
-        inNoteBlock: [], 
-        suppressOutput: false, 
-        embeddedGraphics: {}, 
-        currentOctave: 4, 
-        lastNotePlayed: null, 
-        keySignature: "C Major" 
+    singer: {
+        inNoteBlock: [],
+        suppressOutput: false,
+        embeddedGraphics: {},
+        currentOctave: 4,
+        lastNotePlayed: null,
+        keySignature: "C Major"
     },
     painter: { doClearMedia: jest.fn() },
     doTurtleShell: jest.fn()
