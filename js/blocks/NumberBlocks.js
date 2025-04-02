@@ -1015,3 +1015,7 @@ function setupNumberBlocks(activity) {
     new RandomBlock().setup(activity);
     new NumberBlock().setup(activity);
 }
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupNumberBlocks };
+}
