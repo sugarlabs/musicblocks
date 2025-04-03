@@ -1397,7 +1397,7 @@ msgstr ""
 #: js/toolbar.js:272
 #: js/turtledefs.js:669
 msgid "JavaScript Editor"
-msgstr ""
+msgstr "JavaScript 編輯器"
 
 #: js/toolbar.js:76
 #: js/toolbar.js:142

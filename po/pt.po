@@ -1401,7 +1401,7 @@ msgstr ""
 #: js/toolbar.js:272
 #: js/turtledefs.js:669
 msgid "JavaScript Editor"
-msgstr ""
+msgstr "Editor de JavaScript"
 
 #: js/toolbar.js:76
 #: js/toolbar.js:142

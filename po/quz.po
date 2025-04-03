@@ -1988,7 +1988,7 @@ msgstr ""
 #: js/turtledefs.js:669
 #.TRANS: Editor de Javascript
 msgid "JavaScript Editor"
-msgstr ""
+msgstr "JavaScript Llamk'apusqa"
 
 #: js/toolbar.js:76
 #: js/toolbar.js:142

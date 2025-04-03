@@ -1398,7 +1398,7 @@ msgstr "変化記号を設定"
 #: js/toolbar.js:272
 #: js/turtledefs.js:669
 msgid "JavaScript Editor"
-msgstr "ジャバスクリプト エディタ"
+msgstr "JavaScript エディタ"
 
 #: js/toolbar.js:76
 #: js/toolbar.js:142
