@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 
@@ -223,17 +222,24 @@
                     const loadingText = document.getElementById("loadingText");
                     const texts = [_("Do, Re, Mi, Fa, Sol, La, Ti, Do"), _("Loading Music Blocks..."), _("Reading Music...")];
                     let index = 0;
+                    let progress = 0;
+                    const progressBar = document.createElement("div");
+                    progressBar.style.width = "0%";
+                    progressBar.style.height = "10px";
+                    progressBar.style.background = "#2196F3";
+                    loadingText.after(progressBar);
 
                     const intervalId = setInterval(function () {
                         loadingText.textContent = texts[index];
+                        progress += 33;
+                        progressBar.style.width = `${progress}%`;
                         index = (index + 1) % texts.length;
                     }, 1500);
 
-                    // Stop changing text and finalize loading after 6 seconds
                     setTimeout(function () {
                         clearInterval(intervalId);
                         loadingText.textContent = _("Loading Complete!");
-                        loadingText.style.opacity = 1;
+                        progressBar.style.width = "100%";
                     }, 6000);
                 }, 3000);
             });
@@ -464,7 +470,7 @@
                 <div id="guitarText"></div>
                 <input type="checkbox" id="guitarCheck" tabindex="-1" />
                 <p></p>
-                <p><button class = "confirm-button" id="submitLilypond"></button></p>
+                <p><button class="confirm-button" id="submitLilypond"></button></p>
                 <!-- <button id="submitPDF"></button></p> -->
             </div>
         </div>
@@ -472,330 +478,144 @@
         <div class="materialize-iso" tabindex="-1">
             <nav id="toolbars" class="nav-wrapper" role="navigation">
                 <div class="blue nav-wrapper" tabindex="-1">
-                    <div
-                        id="mb-logo"
-                        class="logo left tooltipped"
+                    <div id="mb-logo" class="logo left tooltipped"
                         style="display: flex; align-items: center; line-height: 0; height: 100%; padding-right: 0;"
-                        data-position="bottom"
-                    >
-                        <amp-img
-                        alt="logo"
-                        width="100%"
-                        src="images/logo.svg"
-                        >
+                        data-position="bottom">
+                        <amp-img alt="logo" width="100%" src="images/logo.svg">
                         </amp-img>
                     </div>
                     <ul class="main left">
                         <li>
-                            <a id="play" class="left tooltipped"
-                                ><i class="material-icons main"
-                                    >play_circle_filled</i
-                                ></a
-                            >
+                            <a id="play" class="left tooltipped"><i
+                                    class="material-icons main">play_circle_filled</i></a>
                         </li>
                         <li>
-                            <a id="stop" class="left tooltipped"
-                                ><i class="material-icons main">stop</i></a
-                            >
+                            <a id="stop" class="left tooltipped"><i class="material-icons main">stop</i></a>
                         </li>
                         <li>
-                          <a id="record" class="left tooltipped" data-tooltip="Record">
+                            <a id="record" class="left tooltipped" data-tooltip="Record">
                             </a>
                         </li>
                     </ul>
 
                     <ul class="main right">
                         <li>
-                            <a
-                                id="FullScreen"
-                                class="FullScreen tooltipped dropdown-trigger"
-                                data-position="bottom"
-                                onclick="setIcon()"
-                                ><i class="material-icons"
-                                    id="FullScrIcon"
-                                    >&#xe5d0;</i
-                                ></a
-                            >
+                            <a id="FullScreen" class="FullScreen tooltipped dropdown-trigger" data-position="bottom"
+                                onclick="setIcon()"><i class="material-icons" id="FullScrIcon">&#xe5d0;</i></a>
                         </li>
                         <li>
-                            <a
-                                id="newFile"
-                                class="tooltipped dropdown-trigger"
-                                data-position="left"
-                                data-activates="newdropdown"
-                                ><i class="material-icons md-48"
-                                    >note_add</i
-                                ></a
-                            >
+                            <a id="newFile" class="tooltipped dropdown-trigger" data-position="left"
+                                data-activates="newdropdown"><i class="material-icons md-48">note_add</i></a>
                         </li>
                         <li>
-                            <a
-                                id="load"
-                                class="tooltipped"
-                                data-position="bottom"
-                                ><i class="material-icons md-48"
-                                    >folder</i
-                                ></a
-                            >
+                            <a id="load" class="tooltipped" data-position="bottom"><i
+                                    class="material-icons md-48">folder</i></a>
                         </li>
                         <li>
-                            <a
-                                id="saveButton"
-                                class="tooltipped dropdown-trigger"
-                                data-position="left"
-                                data-activates="saveddropdownbeg"
-                                ><i id="save" class="material-icons md-48"
-                                    >save_alt</i
-                                ></a
-                            >
+                            <a id="saveButton" class="tooltipped dropdown-trigger" data-position="left"
+                                data-activates="saveddropdownbeg"><i id="save"
+                                    class="material-icons md-48">save_alt</i></a>
                         </li>
                         <li>
-                            <a
-                                style="display: none;"
-                                id="saveButtonAdvanced"
-                                class="tooltipped dropdown-trigger"
-                                data-position="left"
-                                data-activates="saveddropdown"
-                                ><i id="save" class="material-icons md-48"
-                                    >save_alt</i
-                                ></a
-                            >
+                            <a style="display: none;" id="saveButtonAdvanced" class="tooltipped dropdown-trigger"
+                                data-position="left" data-activates="saveddropdown"><i id="save"
+                                    class="material-icons md-48">save_alt</i></a>
                         </li>
                         <li>
-                            <a
-                                id="planetIcon"
-                                class="tooltipped"
-                                data-position="bottom"
-                                ><i class="material-icons md-48"
-                                    >public</i
-                                ></a
-                            >
+                            <a id="planetIcon" class="tooltipped" data-position="bottom"><i
+                                    class="material-icons md-48">public</i></a>
                         </li>
                         <li>
-                            <a
-                                style="display: none;"
-                                id="planetIconDisabled"
-                                class="tooltipped"
-                                data-position="bottom"
-                                ><i
-                                    style="color: #a5acba;"
-                                    class="material-icons md-48"
-                                    >public</i
-                                ></a
-                            >
+                            <a style="display: none;" id="planetIconDisabled" class="tooltipped"
+                                data-position="bottom"><i style="color: #a5acba;"
+                                    class="material-icons md-48">public</i></a>
                         </li>
                         <li>
-                            <a
-                                id="toggleAuxBtn"
-                                class="tooltipped"
-                                data-position="left"
-                                ><i
-                                    id="menu"
-                                    class="animated-icon material-icons md-48 "
-                                    >menu</i
-                                ></a>
+                            <a id="toggleAuxBtn" class="tooltipped" data-position="left"><i id="menu"
+                                    class="animated-icon material-icons md-48 ">menu</i></a>
                         </li>
                         <li>
-                            <a
-                                id="helpIcon"
-                                class="tooltipped"
-                                data-position="bottom"
-                                ><i class="material-icons md-48">help</i></a
-                            >
+                            <a id="helpIcon" class="tooltipped" data-position="bottom"><i
+                                    class="material-icons md-48">help</i></a>
                         </li>
                     </ul>
                 </div>
-                <div
-                    class="nav-wrapper"
-                    id="aux-toolbar"
-                    style="display: none;"
-                    tabindex="-1"
-                >
+                <div class="nav-wrapper" id="aux-toolbar" style="display: none;" tabindex="-1">
                     <div class="blue darken-1 nav-wrapper" tabindex="-1">
                         <ul class="aux left">
                             <li>
-                                <a
-                                    id="runSlowlyIcon"
-                                    class="tooltipped"
-                                    data-position="bottom"
-                                    data-delay="10"
-                                    ><i class="material-icons md-48"
-                                        >play_circle_outline</i
-                                    ></a
-                                >
+                                <a id="runSlowlyIcon" class="tooltipped" data-position="bottom" data-delay="10"><i
+                                        class="material-icons md-48">play_circle_outline</i></a>
                             </li>
                             <li>
-                                <a
-                                    id="runStepByStepIcon"
-                                    class="tooltipped"
-                                    data-position="bottom"
-                                    data-delay="10"
-                                    ><i class="material-icons md-48"
-                                        >video_library</i
-                                    ></a
-                                >
+                                <a id="runStepByStepIcon" class="tooltipped" data-position="bottom" data-delay="10"><i
+                                        class="material-icons md-48">video_library</i></a>
                             </li>
                         </ul>
                         <ul class="aux right">
                             <li>
-                                <a
-                                    id="displayStatsIcon"
-                                    class="tooltipped"
-                                    data-position="bottom"
-                                    data-delay="10"
-                                    ><i class="material-icons md-48"
-                                        >poll</i
-                                    ></a
-                                >
+                                <a id="displayStatsIcon" class="tooltipped" data-position="bottom" data-delay="10"><i
+                                        class="material-icons md-48">poll</i></a>
                             </li>
                             <li>
-                                <a
-                                    id="loadPluginIcon"
-                                    class="tooltipped"
-                                    data-position="bottom"
-                                    data-delay="10"
-                                    ><i class="material-icons md-48"
-                                        >add_circle</i
-                                    ></a
-                                >
+                                <a id="loadPluginIcon" class="tooltipped" data-position="bottom" data-delay="10"><i
+                                        class="material-icons md-48">add_circle</i></a>
                             </li>
                             <li>
-                                <a
-                                    id="delPluginIcon"
-                                    class="tooltipped"
-                                    data-position="bottom"
-                                    data-delay="10"
-                                    ><i class="material-icons md-48"
-                                        >remove_circle</i
-                                    ></a
-                                >
+                                <a id="delPluginIcon" class="tooltipped" data-position="bottom" data-delay="10"><i
+                                        class="material-icons md-48">remove_circle</i></a>
                             </li>
                             <li>
-                                <a
-                                    id="enableHorizScrollIcon"
-                                    class="tooltipped"
-                                    data-position="bottom"
-                                    ><i class="material-icons md-48"
-                                        >compare_arrows</i
-                                    ></a
-                                >
+                                <a id="enableHorizScrollIcon" class="tooltipped" data-position="bottom"><i
+                                        class="material-icons md-48">compare_arrows</i></a>
                             </li>
                             <li>
-                                <a
-                                    style="display: none;"
-                                    id="disableHorizScrollIcon"
-                                    class="tooltipped"
-                                    data-position="bottom"
-                                    ><i class="material-icons md-48"
-                                        >lock</i
-                                    ></a
-                                >
+                                <a style="display: none;" id="disableHorizScrollIcon" class="tooltipped"
+                                    data-position="bottom"><i class="material-icons md-48">lock</i></a>
                             </li>
                             <li>
-                              <a
-                              id="themeSelectIcon"
-                              class="tooltipped dropdown-trigger"
-                              data-position="left"
-                              data-activates="themedropdown"
-                              data-tooltip="Select Theme"
-                              ><i class="material-icons md-48">brightness_7</i></a
-                            >
+                                <a id="themeSelectIcon" class="tooltipped dropdown-trigger" data-position="left"
+                                    data-activates="themedropdown" data-tooltip="Select Theme"><i
+                                        class="material-icons md-48">brightness_7</i></a>
                             </li>
                             <li>
-                                <a
-                                    id="mergeWithCurrentIcon"
-                                    class="tooltipped"
-                                    data-position="bottom"
-                                    ><i class="material-icons md-48"
-                                        >merge_type</i
-                                    ></a
-                                >
+                                <a id="mergeWithCurrentIcon" class="tooltipped" data-position="bottom"><i
+                                        class="material-icons md-48">merge_type</i></a>
                             </li>
                             <li>
-                                <a
-                                    id="wrapTurtle"
-                                    class="tooltipped"
-                                    data-position="bottom"
-                                    ><i class="material-icons md-48"
-                                        >wrap_text</i
-                                    ></a
-                                >
+                                <a id="wrapTurtle" class="tooltipped" data-position="bottom"><i
+                                        class="material-icons md-48">wrap_text</i></a>
                             </li>
                             <li>
-                                <a
-                                    id="chooseKeyIcon"
-                                    class="tooltipped"
-                                    data-position="left"
-                                    ><i class="material-icons md-48"
-                                        >music_note</i
-                                    ></a
-                                >
+                                <a id="chooseKeyIcon" class="tooltipped" data-position="left"><i
+                                        class="material-icons md-48">music_note</i></a>
                             </li>
                             <li>
-                                <a
-                                    id="toggleJavaScriptIcon"
-                                    class="tooltipped"
-                                    data-position="bottom"
-                                    ><i class="material-icons md-48"
-                                        >code</i
-                                    ></a
-                                >
+                                <a id="toggleJavaScriptIcon" class="tooltipped" data-position="bottom"><i
+                                        class="material-icons md-48">code</i></a>
                             </li>
-                            <li
-                                class="filler"
-                                id="aligns_merge_under_load"
-                                style="user-select: none; visibility: hidden;"
-                            >
+                            <li class="filler" id="aligns_merge_under_load"
+                                style="user-select: none; visibility: hidden;">
                                 <a style="color: transparent;">space&nbsp;&nbsp;&nbsp;</a>
                             </li>
 
                             <li>
-                                <a
-                                    id="restoreIcon"
-                                    class="tooltipped"
-                                    data-position="bottom"
-                                    data-tooltip="Restore"
-                                    ><i class="material-icons md-48"
-                                        >restore_from_trash</i
-                                    ></a
-                                >
+                                <a id="restoreIcon" class="tooltipped" data-position="bottom" data-tooltip="Restore"><i
+                                        class="material-icons md-48">restore_from_trash</i></a>
                                 <div id="trashList"></div>
                             </li>
                             <li>
-                                <a
-                                    id="beginnerMode"
-                                    class="tooltipped"
-                                    data-position="bottom"
-                                    ><i
-                                        id="begIconText"
-                                        class="material-icons md-48"
-                                        >star</i
-                                    ></a
-                                >
+                                <a id="beginnerMode" class="tooltipped" data-position="bottom"><i id="begIconText"
+                                        class="material-icons md-48">star</i></a>
                             </li>
                             <li>
-                                <a
-                                    id="advancedMode"
-                                    class="tooltipped"
-                                    data-position="bottom"
-                                    ><i
-                                        id="advIconText"
-                                        class="material-icons md-48"
-                                        >star_border</i
-                                    ></a
-                                >
+                                <a id="advancedMode" class="tooltipped" data-position="bottom"><i id="advIconText"
+                                        class="material-icons md-48">star_border</i></a>
                             </li>
                             <li>
-                                <a
-                                    id="languageSelectIcon"
-                                    class="tooltipped dropdown-trigger"
-                                    data-position="left"
-                                    data-activates="languagedropdown"
-                                    data-tooltip="Select Language"
-                                    ><i class="material-icons md-48"
-                                        >translate</i
-                                    ></a
-                                >
+                                <a id="languageSelectIcon" class="tooltipped dropdown-trigger" data-position="left"
+                                    data-activates="languagedropdown" data-tooltip="Select Language"><i
+                                        class="material-icons md-48">translate</i></a>
                             </li>
                         </ul>
                     </div>
@@ -881,7 +701,7 @@
                 }
                 var count = 0;
                 function setIcon() {
-                    var property = document.getElementById(FullScreen);
+                    var property = document.getElementById("FullScreen");
                     var iconCode = document.querySelector('#FullScrIcon');
                     //Calling full Screen
                     if (count == 0) {
@@ -908,107 +728,101 @@
                 }
             </script>
         </div>
-        </div>
+    </div>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-              let persistentNotification = null;
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let persistentNotification = null;
 
-                function showPersistentNotification() {
+            function showPersistentNotification() {
                 if (!persistentNotification) {
-                  persistentNotification = document.createElement("div");
-                  persistentNotification.id = "persistentNotification";
-                  persistentNotification.innerHTML = "Play only mode enabled. For full Music Blocks experience, use a larger display.";
-                  document.body.appendChild(persistentNotification);
+                    persistentNotification = document.createElement("div");
+                    persistentNotification.id = "persistentNotification";
+                    persistentNotification.innerHTML = "Play only mode enabled. For full Music Blocks experience, use a larger display.";
+                    document.body.appendChild(persistentNotification);
                 }
-              }
+            }
 
-              function removePersistentNotification() {
+            function removePersistentNotification() {
                 if (persistentNotification) {
-                  persistentNotification.remove();
-                  persistentNotification = null;
+                    persistentNotification.remove();
+                    persistentNotification = null;
                 }
-              }
+            }
 
-              function hideElementById(elementId) {
+            function hideElementById(elementId) {
                 const elem = document.getElementById(elementId);
                 if (elem) {
-                  elem.style.display = "none";
+                    elem.style.display = "none";
                 }
-              }
+            }
 
-              function showElementById(elementId) {
+            function showElementById(elementId) {
                 const elem = document.getElementById(elementId);
                 if (elem) {
-                  elem.style.display = "";
+                    elem.style.display = "";
                 }
-              }
+            }
 
-              function togglePlayOnlyMode() {
+            function togglePlayOnlyMode() {
                 const isSmallScreen = (window.innerWidth < 768) || (window.innerHeight < 600);
                 const body = document.body;
                 const homeButton = document.getElementById("Home [HOME]");
                 const buttonContainer = document.getElementById("buttoncontainerBOTTOM");
 
                 if (isSmallScreen) {
-                  // Enable play-only mode
-                  body.classList.add("play-only");
-                  showPersistentNotification();
+                    // Enable play-only mode
+                    body.classList.add("play-only");
+                    showPersistentNotification();
 
-                  if (buttonContainer) {
-                    buttonContainer.style.display = "flex";
-                    buttonContainer.style.justifyContent = "flex-end";
-                    buttonContainer.style.alignItems = "center";
-                  }
-                  if (homeButton) {
-                    homeButton.style.display = "flex";
-                    homeButton.style.position = "fixed";
-                    homeButton.style.right = "15px";
-                    homeButton.style.bottom = "15px";
-                    homeButton.style.zIndex = "10000";
-                  }
+                    if (buttonContainer) {
+                        buttonContainer.style.display = "flex";
+                        buttonContainer.style.justifyContent = "flex-end";
+                        buttonContainer.style.alignItems = "center";
+                    }
+                    if (homeButton) {
+                        homeButton.style.display = "flex";
+                        homeButton.style.position = "fixed";
+                        homeButton.style.right = "15px";
+                        homeButton.style.bottom = "15px";
+                        homeButton.style.zIndex = "10000";
+                    }
 
-                  // Hide certain elements
-                  hideElementById("Show/hide blocks");
-                  hideElementById("Expand/collapse blocks");
-                  hideElementById("Decrease block size");
-                  hideElementById("Increase block size");
-                  hideElementById("grid");
-                  hideElementById("palette");
+                    // Hide certain elements
+                    hideElementById("Show/hide blocks");
+                    hideElementById("Expand/collapse blocks");
+                    hideElementById("Decrease block size");
+                    hideElementById("Increase block size");
+                    hideElementById("grid");
+                    hideElementById("palette");
                 } else {
-                  // Disable play-only mode
-                  body.classList.remove("play-only");
-                  removePersistentNotification();
+                    // Disable play-only mode
+                    body.classList.remove("play-only");
+                    removePersistentNotification();
 
-                  if (homeButton) homeButton.style = "";
-                  if (buttonContainer) buttonContainer.style = "";
+                    if (homeButton) homeButton.style = "";
+                    if (buttonContainer) buttonContainer.style = "";
 
-                  showElementById("Show/hide blocks");
-                  showElementById("Expand/collapse blocks");
-                  showElementById("Decrease block size");
-                  showElementById("Increase block size");
-                  showElementById("grid");
-                  showElementById("palette");
+                    showElementById("Show/hide blocks");
+                    showElementById("Expand/collapse blocks");
+                    showElementById("Decrease block size");
+                    showElementById("Increase block size");
+                    showElementById("grid");
+                    showElementById("palette");
                 }
-              }
+            }
 
-              togglePlayOnlyMode();
+            togglePlayOnlyMode();
 
-              window.addEventListener("resize", togglePlayOnlyMode);
-            });
-            </script>
+            window.addEventListener("resize", togglePlayOnlyMode);
+        });
+    </script>
 
-        <div id="searchBar" tabindex="-1">
-            <input
-                type="text"
-                name="search"
-                id="search"
-                class="ui-autocomplete"
-                placeholder="Search for Blocks"
-                tabindex="-1"
-            />
-            <ul class="matches" id="searchResults"></ul>
-        </div>
+    <div id="searchBar" tabindex="-1">
+        <input type="text" name="search" id="search" class="ui-autocomplete" placeholder="Search for Blocks"
+            tabindex="-1" />
+        <ul class="matches" id="searchResults"></ul>
+    </div>
 
 </body>
 
