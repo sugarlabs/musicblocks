@@ -167,7 +167,7 @@ const piemenuPitches = (
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.initWheel(["×", " "]);
+    block._exitWheel.initWheel(["✓", " "]);
     block._exitWheel.navItems[1].enabled = false;
     block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
@@ -599,7 +599,7 @@ const piemenuPitches = (
         // Store the selected accidental in the block for later use.
         prevAccidental = selection["attr"];
         block.prevAccidental = prevAccidental;
-       
+
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
         __pitchPreview();
@@ -626,11 +626,11 @@ const piemenuPitches = (
     block._exitWheel.navItems[0].navigateFunction = () => {
         that._piemenuExitTime = new Date().getTime();
         const selectedNote =
-        that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+            that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
         const selectedAccidental =
-        !custom && that._accidentalsWheel
-            ? that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title
-            : "";
+            !custom && that._accidentalsWheel
+                ? that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title
+                : "";
 
         // Update the block's displayed text with the note and accidental
         if (selectedAccidental === "♮" || selectedAccidental === "") {
@@ -766,7 +766,7 @@ const piemenuCustomNotes = (
         labelsDict[t] = [];
         for (const k in noteLabels[t]) {
             if (k !== "pitchNumber" && k !== "interval") {
-                if (typeof(noteLabels[t][k]) === "number") {
+                if (typeof (noteLabels[t][k]) === "number") {
                     // labels.push(k);
                     labelsDict[t].push(k);
                     blockCustom++;
@@ -811,7 +811,7 @@ const piemenuCustomNotes = (
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.initWheel(["×", " "]);
+    block._exitWheel.initWheel(["✓", " "]);
     block._exitWheel.navItems[1].enabled = false;
     block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
@@ -1043,7 +1043,7 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.initWheel(["×", " "]);
+    block._exitWheel.initWheel(["✓", " "]);
     block._exitWheel.navItems[1].enabled = false;
     block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
@@ -1302,7 +1302,7 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.initWheel(["×", " "]);
+    block._exitWheel.initWheel(["✓", " "]);
     block._exitWheel.navItems[1].enabled = false;
     block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
@@ -1458,7 +1458,7 @@ const piemenuNoteValue = (block, noteValue) => {
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.initWheel(["×", " "]);
+    block._exitWheel.initWheel(["✓", " "]);
     block._exitWheel.navItems[1].enabled = false;
     block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
@@ -1711,7 +1711,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.initWheel(["×", "-", "+"]);
+    block._exitWheel.initWheel(["✓", "-", "+"]);
     block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
@@ -2006,7 +2006,7 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.initWheel(["×", " "]);
+    block._exitWheel.initWheel(["✓", " "]);
     block._exitWheel.navItems[1].enabled = false;
     block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
@@ -2125,7 +2125,7 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     if (block.name === "outputtools" || block.name === "grid") {
         // slightly larger menu
         size = 1000;
-    }else if ( block.name === "temperamentname"){
+    } else if (block.name === "temperamentname") {
         // slightly larger wheel size for the Temperament Menu
         size = 1200;
     }
@@ -2164,7 +2164,7 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.initWheel(["×", " "]);
+    block._exitWheel.initWheel(["✓", " "]);
     block._exitWheel.navItems[1].enabled = false;
     block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
@@ -2374,7 +2374,7 @@ const piemenuChords = (block, selectedChord) => {
     wheelnav.cssMode = true;
 
     block._chordWheel.keynavigateEnabled = false;
-    
+
     block._chordWheel.colors = platformColor.modeWheelcolors;
     block._chordWheel.slicePathFunction = slicePath().DonutSlice;
     block._chordWheel.slicePathCustom = slicePath().DonutSliceCustomization();
@@ -2399,7 +2399,7 @@ const piemenuChords = (block, selectedChord) => {
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.initWheel(["×", " "]);
+    block._exitWheel.initWheel(["✓", " "]);
     block._exitWheel.navItems[1].enabled = false;
     block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
@@ -2539,7 +2539,7 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.initWheel(["×", " "]);
+    block._exitWheel.initWheel(["✓", " "]);
     block._exitWheel.navItems[1].enabled = false;
     block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
@@ -2726,7 +2726,7 @@ const piemenuIntervals = (block, selectedInterval) => {
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.initWheel(["×", " "]);
+    block._exitWheel.initWheel(["✓", " "]);
     block._exitWheel.navItems[1].enabled = false;
     block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
@@ -2955,7 +2955,7 @@ const piemenuModes = (block, selectedMode) => {
     block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
     block._exitWheel.clickModeRotate = false;
-    block._exitWheel.initWheel(["×", "▶"]); // imgsrc:header-icons/play-button.svg']);
+    block._exitWheel.initWheel(["✓", "▶"]); // imgsrc:header-icons/play-button.svg']);
     block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
     block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
     block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
@@ -3388,7 +3388,7 @@ const piemenuBlockContext = (block) => {
 
     wheel.navItems[0].selected = false;
 
-    const stackPasting = function() {
+    const stackPasting = function () {
         that.blocks.activeBlock = blockBlock;
         that.blocks.prepareStackForCopy();
         that.blocks.pasteDx = pasteDx;
@@ -3557,7 +3557,7 @@ const piemenuGrid = (activity) => {
     activity.turtles.gridWheel.createWheel();
     const storedGrid = activity.turtles.currentGrid ?? 0;
     activity.turtles.gridWheel.navigateWheel(storedGrid);
-      
+
     for (let i = 0; i < gridLabels.length; i++) {
         activity.turtles.gridWheel.navItems[i].navigateFunction = function () {
             activity.hideGrids();
@@ -3573,10 +3573,10 @@ const piemenuGrid = (activity) => {
     activity.turtles._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
     activity.turtles._exitWheel.slicePathCustom.maxRadiusPercent = 0.3;
     activity.turtles._exitWheel.sliceSelectedPathCustom =
-    activity.turtles._exitWheel.slicePathCustom;
+        activity.turtles._exitWheel.slicePathCustom;
     activity.turtles._exitWheel.sliceInitPathCustom = activity.turtles._exitWheel.slicePathCustom;
     activity.turtles._exitWheel.clickModeRotate = false;
-    activity.turtles._exitWheel.createWheel(["×", " "]);
+    activity.turtles._exitWheel.createWheel(["✓", " "]);
 
     activity.turtles._exitWheel.navItems[0].navigateFunction = () => {
         hidePiemenu(activity);
@@ -3673,7 +3673,7 @@ const piemenuKey = (activity) => {
     exitWheel.clickModeRotate = false;
     exitWheel.colors = platformColor.exitWheelcolors;
     exitWheel.animatetime = 0;
-    exitWheel.createWheel(["×", " "]);
+    exitWheel.createWheel(["✓", " "]);
 
     const x = event.clientX;
     const y = event.clientY;
@@ -3773,9 +3773,9 @@ const piemenuKey = (activity) => {
                         activity.KeySignatureEnv[1];
                     activity.textMsg(
                         _("You have chosen key for your pitch preview.") +
-                            activity.KeySignatureEnv[0] +
-                            " " +
-                            activity.KeySignatureEnv[1]
+                        activity.KeySignatureEnv[0] +
+                        " " +
+                        activity.KeySignatureEnv[1]
                     );
                 }
             }
