@@ -1,0 +1,58 @@
+# Version control
+.git/
+.github/
+.gitignore
+.gitmodules
+
+# Development environments
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Testing
+cypress/
+jest.config.js
+.coverage
+htmlcov/
+.tox/
+.pytest_cache/
+screenshots/
+
+# Build artifacts
+dist/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Documentation that doesn't need to be in the image
+README*.md
+CREDITS.md
+FAQ
+NEWS
+Debugging.md
+documentation*/
+guide*/
+usermanual/
+WhyMusicBlocks.md
+Music_Blocks_for_Snap_Users.md
+
+# Configuration files not needed at runtime
+.eslintrc.json
+.prettierrc.json
+gulpfile.js
+setup.py
+
+# Other
+.well-known/
+*.log
+*.bak
