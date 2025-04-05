@@ -1808,9 +1808,26 @@ function TemperamentWidget() {
                     [idx + 3]
                 ]);
                 newStack.push([idx + 6, "vspace", 0, 0, [idx, idx + 7]]);
-                newStack.push([idx + 7, ["pitch"], 0, 0, [idx + 6, idx + 8, idx + 9, null]]);
-
-                if (!isCustomTemperament(this.inTemperament)) {
+                
+                if (isCustomTemperament(this.inTemperament)) {
+                    // Always use custom pitch blocks for custom temperaments
+                    newStack.push([idx + 7, ["custompitch"], 0, 0, [idx + 6, idx + 8, idx + 9, null]]);
+                    newStack.push([
+                        idx + 8,
+                        ["customNote", { value: this.notes[i].substring(0, this.notes[i].length - 1) }],
+                        0,
+                        0,
+                        [idx + 7]
+                    ]);
+                    newStack.push([
+                        idx + 9,
+                        ["number", { value: this.notes[i].slice(-1) }],
+                        0,
+                        0,
+                        [idx + 7]
+                    ]);
+                } else {
+                    newStack.push([idx + 7, ["pitch"], 0, 0, [idx + 6, idx + 8, idx + 9, null]]);
                     newStack.push([
                         idx + 8,
                         ["notename", { value: this.ratiosNotesPair[i][1][0] }],
@@ -1821,26 +1838,6 @@ function TemperamentWidget() {
                     newStack.push([
                         idx + 9,
                         ["number", { value: this.ratiosNotesPair[i][1][1] }],
-                        0,
-                        0,
-                        [idx + 7]
-                    ]);
-                } else {
-                    newStack.push([
-                        idx + 8,
-                        [
-                            "text",
-                            {
-                                value: this.notes[i].substring(0, this.notes[i].length - 1)
-                            }
-                        ],
-                        0,
-                        0,
-                        [idx + 7]
-                    ]);
-                    newStack.push([
-                        idx + 9,
-                        ["number", { value: this.notes[i].slice(-1) }],
                         0,
                         0,
                         [idx + 7]

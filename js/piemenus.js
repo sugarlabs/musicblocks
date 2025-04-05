@@ -61,23 +61,11 @@
 */
 
 const setWheelSize = (i) => {
-    const wheelDiv = document.getElementById("wheelDiv");
-    const screenWidth = window.innerWidth;
+    docById("wheelDiv").style.height = i * 1.1 + "px"; // Add extra padding
+    docById("wheelDiv").style.width = i * 1.1 + "px"; // Add extra padding
 
-    wheelDiv.style.position = "absolute";
-
-    if (screenWidth >= 1200) {
-        wheelDiv.style.width = i + "px";
-        wheelDiv.style.height = i + "px";
-    } else if (screenWidth >= 768) {
-        wheelDiv.style.width = (i - 50) + "px";
-        wheelDiv.style.height = (i - 50) + "px";
-    } else {
-        wheelDiv.style.width = (i - 100) + "px";
-        wheelDiv.style.height = (i - 100) + "px";
-    }
-
-    wheelDiv.style.height = wheelDiv.style.width;
+    // Set a higher z-index to ensure it appears on top of everything
+    docById("wheelDiv").style.zIndex = "10000"; // Higher z-index to prevent overlap issues
 };
 
 // Call the function initially and whenever the window is resized
@@ -102,6 +90,15 @@ const piemenuPitches = (
 
     if (custom === undefined) {
         custom = false;
+    }
+
+    // Check if this is a custom pitch block
+    const isCustomPitchBlock = block.blocks.blockList[block.connections[0]] && 
+                              block.blocks.blockList[block.connections[0]].name === "custompitch";
+    
+    // If this is a custom pitch block, we should not change its type
+    if (isCustomPitchBlock) {
+        custom = true;
     }
 
     // Some blocks have both pitch and octave, so we can modify
@@ -373,6 +370,10 @@ const piemenuPitches = (
      * @private
      */
     const __pitchPreview = () => {
+        // Check if this is a custom pitch block
+        const isCustomPitchBlock = block.blocks.blockList[block.connections[0]] && 
+                                block.blocks.blockList[block.connections[0]].name === "custompitch";
+        
         const label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
         const i = noteLabels.indexOf(label);
 
@@ -478,7 +479,7 @@ const piemenuPitches = (
         }
 
         that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
-        Singer.setSynthVolume(that.activity.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
+        Singer.setSynthVolume(that.activity, 0, DEFAULTVOICE, PREVIEWVOLUME);
 
         if (!that._triggerLock) {
             that._triggerLock = true;
@@ -491,9 +492,16 @@ const piemenuPitches = (
     };
 
     const __selectionChangedSolfege = () => {
+        // Check if this is a custom pitch block - if so, we shouldn't change text/value
+        const isCustomPitchBlock = block.blocks.blockList[block.connections[0]] && 
+                                block.blocks.blockList[block.connections[0]].name === "custompitch";
+        
         selection["note"] = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
         const i = noteLabels.indexOf(selection["note"]);
-        that.value = noteValues[i];
+        
+        if (!isCustomPitchBlock) {
+            that.value = noteValues[i];
+        }
 
         // Auto-selection of sharps and flats in fixed solfege handles
         // the case of opening the pie-menu, not whilst in the
@@ -550,14 +558,17 @@ const piemenuPitches = (
                     break;
             }
         }
-        that.text.text = selection["note"];
-        if (selection["attr"] !== "♮") {
-            that.text.text += selection["attr"];
-        }
+        
+        if (!isCustomPitchBlock) {
+            that.text.text = selection["note"];
+            if (selection["attr"] !== "♮") {
+                that.text.text += selection["attr"];
+            }
 
-        // Make sure text is on top.
-        that.container.setChildIndex(that.text, that.container.children.length - 1);
-        that.updateCache();
+            // Make sure text is on top.
+            that.container.setChildIndex(that.text, that.container.children.length - 1);
+            that.updateCache();
+        }
 
         if (hasOctaveWheel) {
             // Set the octave of the pitch block, if available.
@@ -625,27 +636,35 @@ const piemenuPitches = (
     // Hide the widget when the exit button is clicked.
     block._exitWheel.navItems[0].navigateFunction = () => {
         that._piemenuExitTime = new Date().getTime();
-        const selectedNote =
-        that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
-        const selectedAccidental =
-        !custom && that._accidentalsWheel
-            ? that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title
-            : "";
+        
+        // Check if this is a custom pitch block - if so, we shouldn't change it
+        const isCustomPitchBlock = block.blocks.blockList[block.connections[0]] && 
+                                block.blocks.blockList[block.connections[0]].name === "custompitch";
+        
+        if (!isCustomPitchBlock) {
+            const selectedNote =
+            that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+            const selectedAccidental =
+            !custom && that._accidentalsWheel
+                ? that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title
+                : "";
 
-        // Update the block's displayed text with the note and accidental
-        if (selectedAccidental === "♮" || selectedAccidental === "") {
-            // Natural or no accidental: display only the note
-            that.text.text = selectedNote;
-        } else {
-            // Combine note and accidental for display
-            that.text.text = selectedNote + selectedAccidental;
+            // Update the block's displayed text with the note and accidental
+            if (selectedAccidental === "♮" || selectedAccidental === "") {
+                // Natural or no accidental: display only the note
+                that.text.text = selectedNote;
+            } else {
+                // Combine note and accidental for display
+                that.text.text = selectedNote + selectedAccidental;
+            }
+            // Update the block value and refresh the cache
+            that.value = selectedNote + (selectedAccidental === "♮" ? "" : selectedAccidental);
+            // Ensure proper layering of the text element
+            that.container.setChildIndex(that.text, that.container.children.length - 1);
+            // Refresh the block's cache
+            that.updateCache();
         }
-        // Update the block value and refresh the cache
-        that.value = selectedNote + (selectedAccidental === "♮" ? "" : selectedAccidental);
-        // Ensure proper layering of the text element
-        that.container.setChildIndex(that.text, that.container.children.length - 1);
-        // Refresh the block's cache
-        that.updateCache();
+        
         // Hide the pie menu and remove the wheels 
         docById("wheelDiv").style.display = "none";
         that._pitchWheel.removeWheel();
@@ -707,23 +726,40 @@ const piemenuCustomNotes = (
     block._customWheel.sliceInitPathCustom = block._customWheel.slicePathCustom;
     block._customWheel.titleRotateAngle = 0;
     block._customWheel.animatetime = 0; // 300;
-    block._customWheel.clickModeRotate = false;
-    block._customWheel.createWheel(customLabels);
+    block._customWheel.clickModeRotate = true; // Enable rotation of wheel to center selected item
+    
+    // Store the original connection - this will help us preserve custom pitch blocks
+    if (block.connections[0] !== null) {
+        block._originalConnection = block.connections[0];
+    }
+    
+    // Rename customLabels to add "custom N" prefix if needed
+    const renamedCustomLabels = [];
+    for (let i = 0; i < customLabels.length; i++) {
+        // If the label doesn't already start with "custom", add "custom N"
+        if (customLabels[i].toLowerCase().indexOf("custom") === -1) {
+            renamedCustomLabels.push("custom " + (i+1));
+        } else {
+            renamedCustomLabels.push(customLabels[i]);
+        }
+    }
+    
+    block._customWheel.createWheel(renamedCustomLabels);
 
     block._cusNoteWheel.colors = platformColor.intervalWheelcolors;
     block._cusNoteWheel.slicePathFunction = slicePath().DonutSlice;
     block._cusNoteWheel.slicePathCustom = slicePath().DonutSliceCustomization();
     block._cusNoteWheel.slicePathCustom.minRadiusPercent = 0.5;
     block._cusNoteWheel.slicePathCustom.maxRadiusPercent = 0.85;
-    block._cusNoteWheel.titleRotateAngle = 90;
-    block._cusNoteWheel.titleFont = "100 24px Impact, sans-serif";
+    block._cusNoteWheel.titleRotateAngle = 0; // Keep text upright
+    block._cusNoteWheel.titleFont = "100 20px Arial, sans-serif"; // Smaller font and better readability
     block._cusNoteWheel.sliceSelectedPathCustom = block._cusNoteWheel.slicePathCustom;
     block._cusNoteWheel.sliceInitPathCustom = block._cusNoteWheel.slicePathCustom;
 
     // Modified: Make title colors different for selected vs non-selected items
-    block._cusNoteWheel.titleAttr = { font: "100 24px Impact, sans-serif", fill: "#000000" };
-    block._cusNoteWheel.titleSelectedAttr = { font: "100 24px Impact, sans-serif", fill: "#FFFFFF" }; // Changed to white
-    block._cusNoteWheel.titleHoverAttr = { font: "100 24px Impact, sans-serif", fill: "#000000" };
+    block._cusNoteWheel.titleAttr = { font: "100 20px Arial, sans-serif", fill: "#000000" };
+    block._cusNoteWheel.titleSelectedAttr = { font: "100 20px Arial, sans-serif", fill: "#FFFFFF" }; // Changed to white
+    block._cusNoteWheel.titleHoverAttr = { font: "100 20px Arial, sans-serif", fill: "#000000" };
 
     block._cusNoteWheel.clickModeRotate = true;
     block._cusNoteWheel.animatetime = 0; // 300;
@@ -864,12 +900,24 @@ const piemenuCustomNotes = (
     // Add function to each main menu for show/hide sub menus
     const __setupAction = (i) => {
         that._customWheel.navItems[i].navigateFunction = () => {
-            that.customID =
-                that._customWheel.navItems[that._customWheel.selectedNavItemIndex].title;
+            // Check if we need to restore custom pitch block connection
+            if (block._originalConnection !== undefined && 
+                block.blocks.blockList[block._originalConnection] && 
+                block.blocks.blockList[block._originalConnection].name === "custompitch") {
+                // Make sure we preserve the connection to the custom pitch block
+                if (block.connections[0] !== block._originalConnection) {
+                    block.connections[0] = block._originalConnection;
+                }
+            }
+            
+            // Get the original temperament name without the "custom N" prefix
+            const origTemperament = customLabels[i];
+            that.customID = origTemperament;
+            
             labels = [];
             for (let ii = 0; ii < max; ii++) {
-                if (ii < labelsDict[that._customWheel.navItems[i].title].length) {
-                    labels.push(labelsDict[that._customWheel.navItems[i].title][ii]);
+                if (ii < labelsDict[origTemperament].length) {
+                    labels.push(labelsDict[origTemperament][ii]);
                 } else {
                     labels.push("");
                 }
@@ -903,7 +951,6 @@ const piemenuCustomNotes = (
     }
 
     // navigate to a specific starting point
-
     let ii;
     for (ii = 0; ii < customLabels.length; ii++) {
         if (selectedCustom === customLabels[ii]) {
@@ -931,14 +978,49 @@ const piemenuCustomNotes = (
 
     const __exitMenu = () => {
         that._piemenuExitTime = new Date().getTime();
+        
+        // Ensure that the connection to the custom pitch block is preserved
+        if (block._originalConnection !== undefined && 
+            block.blocks.blockList[block._originalConnection] && 
+            block.blocks.blockList[block._originalConnection].name === "custompitch") {
+            // Make sure we preserve the connection to the custom pitch block
+            if (block.connections[0] !== block._originalConnection) {
+                block.connections[0] = block._originalConnection;
+            }
+        }
+        
         docById("wheelDiv").style.display = "none";
+        
+        // Cleanup wheels
+        that._customWheel.removeWheel();
+        that._cusNoteWheel.removeWheel();
+        that._exitWheel.removeWheel();
+        if (hasOctaveWheel) {
+            that._octavesWheel.removeWheel();
+        }
     };
 
     const __selectionChanged = () => {
+        // Check if this is a custom pitch block - if so, we shouldn't change block name
+        const isCustomPitchBlock = block.blocks.blockList[block.connections[0]] && 
+                                block.blocks.blockList[block.connections[0]].name === "custompitch";
+        
+        // Check if we need to restore custom pitch block connection that might have been disconnected
+        if (!isCustomPitchBlock && block._originalConnection !== undefined && 
+            block.blocks.blockList[block._originalConnection] && 
+            block.blocks.blockList[block._originalConnection].name === "custompitch") {
+            // Restore the connection to the custom pitch block
+            block.connections[0] = block._originalConnection;
+        }
+        
         const label = that._customWheel.navItems[that._customWheel.selectedNavItemIndex].title;
         const note = that._cusNoteWheel.navItems[that._cusNoteWheel.selectedNavItemIndex].title;
-        that.value = note;
-        that.text.text = note;
+        
+        if (!isCustomPitchBlock) {
+            that.value = note;
+            that.text.text = note;
+        }
+        
         let octave = 4;
 
         if (hasOctaveWheel) {
@@ -950,10 +1032,16 @@ const piemenuCustomNotes = (
         }
 
         // Make sure text is on top.
-        that.container.setChildIndex(that.text, that.container.children.length - 1);
-        that.updateCache();
+        if (!isCustomPitchBlock) {
+            that.container.setChildIndex(that.text, that.container.children.length - 1);
+            that.updateCache();
+        }
 
-        const obj = getNote(note, octave, 0, "C major", false, null, that.activity.errorMsg, label);
+        // Get the actual temperament ID (without the "custom N" prefix)
+        const selectedIndex = that._customWheel.selectedNavItemIndex;
+        const tempID = customLabels[selectedIndex];
+        
+        const obj = getNote(note, octave, 0, "C major", false, null, that.activity.errorMsg, tempID);
         const tur = that.activity.turtles.ithTurtle(0);
 
         if (
@@ -961,7 +1049,7 @@ const piemenuCustomNotes = (
             !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
-            that.activity.logo.synth.createDefaultSynth(0);
+         
             that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
 
@@ -971,7 +1059,7 @@ const piemenuCustomNotes = (
         if (!that._triggerLock) {
             that._triggerLock = true;
             // Get the frequency of the custom note for the preview.
-            const no = that.activity.logo.synth.getCustomFrequency([note + obj[1]], that.customID);
+            const no = that.activity.logo.synth.getCustomFrequency([note + obj[1]], tempID);
             if (no !== undefined && no !== "undefined") {
                 instruments[0][DEFAULTVOICE].triggerAttackRelease(no, 1 / 8);
             }
