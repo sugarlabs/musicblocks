@@ -42,6 +42,8 @@ class Tempo {
         this.BPMInputs = [];
         this.BPMBlocks = [];
         this.tempoCanvases = [];
+        // Pre-create canvas contexts array to avoid repeated lookups
+        this._canvasContexts = [];
     }
 
     init(activity) {
@@ -49,15 +51,21 @@ class Tempo {
         this._directions = [];
         this._widgetFirstTimes = [];
         this._widgetNextTimes = [];
-        this._firstClickTimes = null;
+        this._firstClickTime = null;
         this._intervals = [];
         this.isMoving = true;
+        
+        // Cache frequently accessed objects
+        this._blockList = this.activity.blocks ? this.activity.blocks.blockList : null;
+        this._logo = this.activity.logo;
+        
+        // Clear interval if already exists
         if (this._intervalID != undefined && this._intervalID != null) {
             clearInterval(this._intervalID);
         }
 
         this._intervalID = null;
-        this.activity.logo.synth.loadSynth(0, getDrumSynthName(Tempo.TEMPOSYNTH));
+        this._logo.synth.loadSynth(0, getDrumSynthName(Tempo.TEMPOSYNTH));
 
         if (this._intervalID != null) {
             clearInterval(this._intervalID);
@@ -75,15 +83,21 @@ class Tempo {
             widgetWindow.destroy();
         };
 
-        const pauseBtn = widgetWindow.addButton("pause-button.svg", Tempo.ICONSIZE, _("Pause"));
+        // Cache image paths and common strings to avoid recreation
+        const playImgPath = "header-icons/play-button.svg";
+        const pauseImgPath = "header-icons/pause-button.svg";
+        const playText = _("Play");
+        const pauseText = _("Pause");
+        
+        const pauseBtn = widgetWindow.addButton("pause-button.svg", Tempo.ICONSIZE, pauseText);
         pauseBtn.onclick = () => {
             if (this.isMoving) {
                 this.pause();
                 pauseBtn.innerHTML =
                     `<img 
-                        src="header-icons/play-button.svg" 
-                        title="${_("Play")}" 
-                        alt="${_("Play")}" 
+                        src="${playImgPath}" 
+                        title="${playText}" 
+                        alt="${playText}" 
                         height="${Tempo.ICONSIZE}" 
                         width="${Tempo.ICONSIZE}" 
                         vertical-align="middle"
@@ -93,9 +107,9 @@ class Tempo {
                 this.resume();
                 pauseBtn.innerHTML =
                     `<img 
-                        src="header-icons/pause-button.svg" 
-                        title="${_("Pause")}" 
-                        alt="${_("Pause")}" 
+                        src="${pauseImgPath}" 
+                        title="${pauseText}" 
+                        alt="${pauseText}" 
                         height="${Tempo.ICONSIZE}" 
                         width="${Tempo.ICONSIZE}" 
                         vertical-align="middle"
@@ -112,7 +126,7 @@ class Tempo {
             ""
         ).onclick = () => {
             // Debounce button
-            if (!this._get_save_lock()) {
+            if (!this._save_lock) {
                 this._save_lock = true;
                 this._saveTempo();
                 setTimeout(() => (this._save_lock = false), 1000);
@@ -123,9 +137,17 @@ class Tempo {
         this.widgetWindow.getWidgetBody().appendChild(this.bodyTable);
 
         let r1, r2, r3, tcCell;
+        // Create a canvas style template to reuse
+        const canvasStyleTemplate = {
+            width: Tempo.TEMPOWIDTH + "px",
+            height: Tempo.TEMPOHEIGHT + "px",
+            margin: "1px",
+            background: "rgba(255, 255, 255, 1)"
+        };
+        
         for (let i = 0; i < this.BPMs.length; i++) {
             this._directions.push(1);
-            this._widgetFirstTimes.push(this.activity.logo.firstNoteTime);
+            this._widgetFirstTimes.push(this._logo.firstNoteTime);
             if (this.BPMs[i] <= 0) {
                 this.BPMs[i] = 30;
             }
@@ -151,33 +173,19 @@ class Tempo {
 
             this.BPMInputs[i] = widgetWindow.addInputButton(this.BPMs[i], r3.insertCell());
             this.tempoCanvases[i] = document.createElement("canvas");
-            this.tempoCanvases[i].style.width = Tempo.TEMPOWIDTH + "px";
-            this.tempoCanvases[i].style.height = Tempo.TEMPOHEIGHT + "px";
-            this.tempoCanvases[i].style.margin = "1px";
-            this.tempoCanvases[i].style.background = "rgba(255, 255, 255, 1)";
+            
+            // Apply the pre-defined styles efficiently
+            Object.assign(this.tempoCanvases[i].style, canvasStyleTemplate);
+            
             tcCell = r1.insertCell();
             tcCell.appendChild(this.tempoCanvases[i]);
             tcCell.setAttribute("rowspan", "3");
 
+            // Pre-create and cache the canvas context for later use
+            this._canvasContexts[i] = this.tempoCanvases[i].getContext("2d");
+
             // The tempo can be set from the interval between successive clicks on the canvas.
-            this.tempoCanvases[i].onclick = ((id) => () => {
-                const d = new Date();
-                let newBPM, BPMInput;
-                if (this._firstClickTime == null) {
-                    this._firstClickTime = d.getTime();
-                } else {
-                    newBPM = parseInt((60 * 1000) / (d.getTime() - this._firstClickTime));
-                    if (newBPM > 29 && newBPM < 1001) {
-                        this.BPMs[id] = newBPM;
-                        this._updateBPM(id);
-                        BPMInput = this.BPMInputs[id];
-                        BPMInput.value = this.BPMs[id];
-                        this._firstClickTime = null;
-                    } else {
-                        this._firstClickTime = d.getTime();
-                    }
-                }
-            })(i);
+            this.tempoCanvases[i].onclick = this._createCanvasClickHandler(i);
 
             this.BPMInputs[i].addEventListener(
                 "keyup",
@@ -196,6 +204,33 @@ class Tempo {
     }
 
     /**
+     * Creates a click handler for a tempo canvas
+     * @private
+     * @param {number} id - The canvas index
+     * @returns {Function} The click handler function
+     */
+    _createCanvasClickHandler(id) {
+        return () => {
+            const currentTime = new Date().getTime();
+            let newBPM;
+            
+            if (this._firstClickTime == null) {
+                this._firstClickTime = currentTime;
+            } else {
+                newBPM = parseInt((60 * 1000) / (currentTime - this._firstClickTime));
+                if (newBPM > 29 && newBPM < 1001) {
+                    this.BPMs[id] = newBPM;
+                    this._updateBPM(id);
+                    this.BPMInputs[id].value = this.BPMs[id];
+                    this._firstClickTime = null;
+                } else {
+                    this._firstClickTime = currentTime;
+                }
+            }
+        };
+    }
+
+    /**
      * @private
      * @param {number} i
      * @returns {void}
@@ -204,12 +239,12 @@ class Tempo {
         this._intervals[i] = (60 / this.BPMs[i]) * 1000;
 
         let blockNumber;
-        if (this.BPMBlocks[i] != null) {
-            blockNumber = this.activity.blocks.blockList[this.BPMBlocks[i]].connections[1];
+        if (this.BPMBlocks[i] != null && this._blockList) {
+            blockNumber = this._blockList[this.BPMBlocks[i]].connections[1];
             if (blockNumber != null) {
-                this.activity.blocks.blockList[blockNumber].value = parseFloat(this.BPMs[i]);
-                this.activity.blocks.blockList[blockNumber].text.text = this.BPMs[i];
-                this.activity.blocks.blockList[blockNumber].updateCache();
+                this._blockList[blockNumber].value = parseFloat(this.BPMs[i]);
+                this._blockList[blockNumber].text.text = this.BPMs[i];
+                this._blockList[blockNumber].updateCache();
                 this.activity.refreshCanvas();
                 this.activity.saveLocally();
             }
@@ -230,9 +265,9 @@ class Tempo {
      */
     resume() {
         // Reset widget time since we are restarting. We will no longer keep synch with the turtles.
-        const d = new Date();
+        const currentTime = new Date().getTime();
         for (let i = 0; i < this.BPMs.length; i++) {
-            this._widgetFirstTimes[i] = d.getTime();
+            this._widgetFirstTimes[i] = currentTime;
             this._widgetNextTimes[i] = this._widgetFirstTimes[i] + this._intervals[i];
             this._directions[i] = 1;
         }
@@ -307,38 +342,38 @@ class Tempo {
     }
 
     /**
+     * Draws the tempo indicator on each canvas
      * @private
      * @returns {void}
      */
     _draw() {
         // First thing to do is figure out where we are supposed to be based on the elapsed time.
-        const d = new Date();
-        let tempoCanvas, deltaTime, dx, x, ctx;
+        const currentTime = new Date().getTime();
+        let tempoCanvas, ctx, deltaTime, dx, x;
+        
         for (let i = 0; i < this.BPMs.length; i++) {
             tempoCanvas = this.tempoCanvases[i];
-            if (!tempoCanvas) continue;
+            ctx = this._canvasContexts[i]; // Use cached context
+            
+            if (!tempoCanvas || !ctx) continue;
 
             // We start the music clock as the first note is being played.
             if (this._widgetFirstTimes[i] == null) {
-                this._widgetFirstTimes[i] = d.getTime();
+                this._widgetFirstTimes[i] = currentTime;
                 this._widgetNextTimes[i] = this._widgetFirstTimes[i] + this._intervals[i];
             }
 
             // How much time has gone by?
-            deltaTime = this._widgetNextTimes[i] - d.getTime();
+            deltaTime = this._widgetNextTimes[i] - currentTime;
 
             // Are we done yet?
-            if (d.getTime() > this._widgetNextTimes[i]) {
+            if (currentTime > this._widgetNextTimes[i]) {
                 // Play a tone.
-                this.activity.logo.synth.trigger(0, ["C2"], 0.0625, Tempo.TEMPOSYNTH, null, null, false);
+                this._logo.synth.trigger(0, ["C2"], 0.0625, Tempo.TEMPOSYNTH, null, null, false);
                 this._widgetNextTimes[i] += this._intervals[i];
 
                 // Ensure we are at the edge.
-                if (this._directions[i] === -1) {
-                    this._directions[i] = 1;
-                } else {
-                    this._directions[i] = -1;
-                }
+                this._directions[i] = this._directions[i] === -1 ? 1 : -1;
             } else {
                 // Determine new x position based on delta time.
                 if (this._intervals[i] !== 0) {
@@ -357,23 +392,15 @@ class Tempo {
                 }
 
                 // Set x based on dx and direction
-                if (this._directions[i] === -1) {
-                    x = tempoCanvas.width - dx;
-                } else {
-                    x = dx;
-                }
+                x = this._directions[i] === -1 ? tempoCanvas.width - dx : dx;
             }
 
             // Set x value if it is undefined
             if (x === undefined) {
-                if (this._directions[i] === -1) {
-                    x = 0;
-                } else {
-                    x = tempoCanvas.width;
-                }
+                x = this._directions[i] === -1 ? 0 : tempoCanvas.width;
             }
 
-            ctx = tempoCanvas.getContext("2d");
+            // Clear and draw the ellipse
             ctx.clearRect(0, 0, tempoCanvas.width, tempoCanvas.height);
             ctx.beginPath();
             ctx.fillStyle = "rgba(0,0,0,1)";
@@ -398,7 +425,6 @@ class Tempo {
      */
     __save(i) {
         setTimeout(() => {
-            // console.debug("saving a BPM block for " + this.BPMs[i]);
             const delta = i * 42;
             const newStack = [
                 [0, ["setbpm3", {}], 100 + delta, 100 + delta, [null, 1, 2, 5]],
@@ -426,7 +452,7 @@ class Tempo {
 
     /**
      * @private
-     * @returns {HTMLElement}
+     * @returns {boolean}
      */
     _get_save_lock() {
         return this._save_lock;
