@@ -13,6 +13,7 @@
   "scripts": {
     "lint": "eslint js/**/*.js",
     "serve": "http-server -a 127.0.0.1 -p 3000 --gzip --brotli",
+    "winserve": "http-server . -a localhost -p 3000",
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "jest",

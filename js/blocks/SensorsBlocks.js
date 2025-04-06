@@ -711,14 +711,6 @@ function setupSensorsBlocks(activity) {
             return toFixed2(activity.blocks.blockList[blk].value);
         }
 
-        /**
-         * Retrieves the color value of the pixel under the turtle.
-         * Includes images displayed by the Show block.
-         * @param {Object} logo - The logo object managing the runtime state.
-         * @param {number} turtle - The identifier of the turtle.
-         * @returns {number} - The color index from searchColors, or a fallback value if detection fails.
-         * @throws {Error} - If the turtle or canvas context cannot be accessed.
-         */
         arg(logo, turtle) {
             let requiredTurtle;
         
@@ -734,51 +726,60 @@ function setupSensorsBlocks(activity) {
                 return this.getFallbackColor();
             }
         
-            let { x, y } = requiredTurtle.container;
+            const { x, y } = requiredTurtle.container;
             const originalVisibility = requiredTurtle.container.visible;
         
             try {
-                // Hide the turtle temporarily to get an accurate color reading
                 requiredTurtle.container.visible = false;
                 activity.refreshCanvas();
         
-                // Convert turtle coordinates to global page coordinates
                 const globalCoords = this.convertToPageCoordinates(x, y);
+                console.log("Global coordinates:", globalCoords);
         
-                // Get all canvases inside canvasHolder (including ShowBlock images)
                 const canvases = Array.from(document.getElementById("canvasHolder").getElementsByTagName("canvas"));
+                console.log("Found canvases:", canvases.length);
         
                 let detectedColor = null;
         
-                // Loop from topmost to bottom canvas (top layers first)
                 for (let i = canvases.length - 1; i >= 0; i--) {
-                    const pixelData = this.getPixelData(globalCoords.x, globalCoords.y, canvases[i]);
+                    const canvas = canvases[i];
+                    const context = canvas.getContext("2d");
         
-                    // If we find a visible (non-transparent) pixel, save it
-                    if (pixelData[3] !== 0) {
+                    // Convert global page coordinates to canvas-relative
+                    const rect = canvas.getBoundingClientRect();
+                    const localX = globalCoords.x - rect.left;
+                    const localY = globalCoords.y - rect.top;
+        
+                    // Skip if outside bounds
+                    if (localX < 0 || localY < 0 || localX >= canvas.width || localY >= canvas.height) continue;
+        
+                    const pixelData = context.getImageData(localX, localY, 1, 1).data;
+                    console.log(`Canvas ${i}: RGBA =`, pixelData);
+        
+                    if (pixelData[3] !== 0) {  // Found non-transparent pixel
                         detectedColor = pixelData;
-                        break;  // Stop once we find the first solid color
+                        break;
                     }
                 }
         
-                // Restore the turtle's visibility
                 requiredTurtle.container.visible = originalVisibility;
         
                 if (!detectedColor) {
-                    console.warn("No non-transparent pixels found, using fallback color.");
+                    console.warn("No solid pixel found; returning fallback.");
                     return this.getFallbackColor();
                 }
         
-                console.log("Final Detected Color:", detectedColor);
-                return searchColors(detectedColor[0], detectedColor[1], detectedColor[2]);
+                const [r, g, b] = detectedColor;
+                console.log("Detected final RGB:", r, g, b);
+        
+                return searchColors(r, g, b);
         
             } catch (error) {
-                console.error("Error in color detection:", error);
+                console.error("Color detection failed:", error);
                 requiredTurtle.container.visible = originalVisibility;
                 return this.getFallbackColor();
             }
         }
-        
 
         /**
          * Converts turtle coordinates to match absolute page coordinates.
@@ -863,7 +864,7 @@ function setupSensorsBlocks(activity) {
      */
     class TimeBlock extends ValueBlock {
         /**
-         * Constructs a new TimeBlock instance.
+         * Constructs a new TimeBlock instance. 
          */
         constructor() {
             super("time", _("time"));
