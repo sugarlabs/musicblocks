@@ -1935,6 +1935,155 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     }
 };
 
+const piemenuNumberRhytm = (that, wheelValues, selectedValue) => {
+    that._dissectNumber.oninput = () => {
+        that._dissectNumber.value = Math.max(Math.min(that._dissectNumber.value, 128), 2);
+    };
+
+    const values = wheelValues;
+    const menuDiv = docById('wheelDiv');
+    menuDiv.innerHTML = '';
+    menuDiv.style.display = '';
+
+    const offsetX = 30;
+    const offsetY = 30;
+    const x = event.clientX + offsetX;
+    const y = event.clientY + offsetY;
+
+    menuDiv.style.position = 'absolute';
+    menuDiv.style.left = Math.min(activity.canvas.width - 220, Math.max(0, x)) + 'px';
+    menuDiv.style.top = Math.min(activity.canvas.height - 220, Math.max(0, y)) + 'px';
+    menuDiv.style.width = '200px';
+    menuDiv.style.height = '200px';
+
+    const wheelNav = new wheelnav('wheelDiv', null, 200, 200);
+    wheelNav.colors = platformColor.wheelcolors;
+    wheelNav.slicePathFunction = slicePath().DonutSlice;
+    wheelNav.slicePathCustom = slicePath().DonutSliceCustomization();
+    wheelNav.sliceSelectedPathCustom = wheelNav.slicePathCustom;
+    wheelNav.sliceInitPathCustom = wheelNav.slicePathCustom;
+    wheelNav.clickModeRotate = false;
+    wheelNav.navItemsSize = 35;
+
+    const exitMenu = () => {
+        menuDiv.style.display = 'none';
+        document.removeEventListener('click', handleOutside);
+        document.removeEventListener('keydown', handleKeydown);
+        if (wheelNav) {
+            wheelNav.removeWheel();
+        }
+    };
+
+    const handleOutside = (e) => {
+        if (!menuDiv.contains(e.target)) {
+            exitMenu();
+        }
+    };
+    setTimeout(() => {
+        document.addEventListener('click', handleOutside);
+    }, 0);
+
+    const innerDiv = document.createElement('div');
+    innerDiv.style.position = 'absolute';
+    innerDiv.style.top = '50%';
+    innerDiv.style.left = '50%';
+    innerDiv.style.transform = 'translate(-50%, -50%)';
+    innerDiv.style.width = '80px';
+    innerDiv.style.height = '80px';
+    innerDiv.style.borderRadius = '50%';
+    innerDiv.style.overflow = 'hidden';
+    innerDiv.style.background = '#fff';
+    innerDiv.style.display = 'flex';
+    innerDiv.style.justifyContent = 'center';
+    innerDiv.style.alignItems = 'center';
+    innerDiv.style.boxShadow = '0 0 5px rgba(0,0,0,0.3)';
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("width", "80");
+    svg.setAttribute("height", "80");
+    svg.setAttribute("viewBox", "0 0 80 80");
+
+    const createSlice = (d, color, text, x, y, onClick) => {
+        const group = document.createElementNS(svgNS, "g");
+        const slice = document.createElementNS(svgNS, "path");
+        slice.setAttribute("d", d);
+        slice.setAttribute("fill", color);
+        slice.style.cursor = "pointer";
+        slice.addEventListener("click", onClick);
+        group.appendChild(slice);
+        const textEl = document.createElementNS(svgNS, "text");
+        textEl.setAttribute("x", x)
+        textEl.setAttribute("y", y);
+        textEl.setAttribute("text-anchor", "middle");
+        textEl.setAttribute("dominant-baseline", "middle");
+        textEl.setAttribute("fill", "#333");
+        textEl.setAttribute("font-size", "16px");
+        textEl.setAttribute("font-weight", "bold");
+        textEl.textContent = text;
+        group.appendChild(textEl);
+        return group;
+    };
+    
+    const plusSlice = createSlice(
+        "M40,40 L40,0 A40,40 0 0,1 80,40 Z", 
+        "rgba(144, 238, 144, 0.8)", 
+        "+",
+        60, 27, 
+        () => {
+            let value = parseInt(that._dissectNumber.value);
+            that._dissectNumber.value = Math.min(value + 1, 128);
+        }
+    );
+    
+    const minusSlice = createSlice(
+        "M40,40 L0,40 A40,40 0 0,1 40,0 Z", 
+        "rgba(173, 216, 230, 0.8)", 
+        "-",
+        20, 25,  
+        () => {
+            let value = parseInt(that._dissectNumber.value);
+            that._dissectNumber.value = Math.max(value - 1, 2);
+        }
+    );
+    
+    const exitSlice = createSlice(
+        "M40,40 L40,80 A40,4 0 0,1 80,40 Z",
+        "rgba(255, 182, 193, 0.8)", 
+        "×",
+        20, 60,  
+        exitMenu
+    );
+    
+    svg.appendChild(plusSlice);
+    svg.appendChild(minusSlice);
+    svg.appendChild(exitSlice);
+
+    innerDiv.appendChild(svg);
+    menuDiv.appendChild(innerDiv);
+
+    const handleKeydown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            exitMenu();
+        }
+    };
+    document.addEventListener('keydown', handleKeydown);
+
+    wheelNav.centerButton = false;
+    const labels = values.map(v => v.toString());
+    wheelNav.initWheel(labels);
+    wheelNav.createWheel();
+
+    for (let i = 0; i < values.length; i++) {
+        wheelNav.navItems[i].navigateFunction = () => {
+            that._dissectNumber.value = values[i];
+            exitMenu();
+        };
+    }
+};
+
+
 const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     // input form and  wheelNav pie menu for setcolor selection
 
