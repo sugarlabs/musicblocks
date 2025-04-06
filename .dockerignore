@@ -1,0 +1,61 @@
+# Exclude Node.js dependencies and logs
+node_modules/
+npm-debug.log*
+yarn-error.log*
+*.log
+package-lock.json
+yarn.lock
+
+# Exclude Bower dependencies (legacy)
+bower_components/
+
+# Exclude version control metadata
+.git/
+.gitignore
+.gitmodules
+.svn/
+.hg/
+
+# Exclude documentation, guides, and manuals
+docs/
+documentation*/
+guide*/
+usermanual/
+*.md
+*.markdown
+README*
+
+# Exclude development and configuration files
+.env
+.env.*
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Exclude test files and artifacts
+tests/
+coverage/
+cypress/
+__tests__/
+*.test.js
+*.spec.js
+*.snap
+screenshots/
+
+# Exclude build artifacts, temporary files, and caches
+dist/
+build/
+out/
+tmp/
+*.bak
+*.tmp
+*.cache
+
+# Exclude localization files (if not required at runtime)
+po/
+localization.ini
