@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg1837"
+   version="1.1"
+   height="94.5"
+   width="247.5">
+  <metadata
+     id="metadata1843">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs1841" />
+  <g
+     id="g116">
+    <g
+       id="g114"
+       transform="scale(1.5)">
+      <path
+         id="path108"
+         style="fill:#ffbf00;fill-opacity:1;stroke:#daaf30;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 9 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -4 a 5,5 90 0 0 -5,5 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 5,5 90 0 0 5,5 h 4 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -10 -4 a 4,4 90 0 1 -4,-4 v -4 -42 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z" />
+      <text
+         id="text112"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+        <tspan
+           id="tspan110"
+           y="15"
+           x="12">calcular</tspan>
+      </text>
+    </g>
+  </g>
+  <g
+     id="g126"
+     transform="translate(99)">
+    <g
+       id="g124"
+       transform="scale(1.5)">
+      <path
+         id="path118"
+         style="fill:#ff664b;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+      <text
+         id="text122"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+        <tspan
+           id="tspan120"
+           y="14"
+           x="13">acción</tspan>
+      </text>
+    </g>
+  </g>
+</svg>

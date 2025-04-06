@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg262"
+   version="1.1"
+   height="81.5"
+   width="246.5">
+  <metadata
+     id="metadata268">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs266" />
+  <g
+     id="g62">
+    <g
+       id="g60"
+       transform="scale(1.5)">
+      <path
+         id="path50"
+         style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 46 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -46 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+      <text
+         id="text54"
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"><tspan
+           id="tspan52"
+           y="14"
+           x="62">set name</tspan></text>
+      <text
+         id="text58"
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"><tspan
+           id="tspan56"
+           y="12"
+           x="62" /></text>
+    </g>
+  </g>
+  <g
+     id="g72"
+     transform="translate(98)">
+    <g
+       id="g70"
+       transform="scale(1.5)">
+      <path
+         id="path64"
+         style="fill:#ff664b;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+      <text
+         id="text68"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"><tspan
+           id="tspan66"
+           y="14"
+           x="13">my name</tspan></text>
+    </g>
+  </g>
+  <g
+     id="g260"
+     transform="translate(2,50)">
+    <g
+       id="g258"
+       transform="scale(1.5)">
+      <path
+         id="path252"
+         style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 h 104 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+      <text
+         id="text256"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"><tspan
+           id="tspan254"
+           y="14"
+           x="13">mouse name</tspan></text>
+    </g>
+  </g>
+</svg>

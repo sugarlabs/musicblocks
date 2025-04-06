@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg3870"
+   version="1.1"
+   height="34.5"
+   width="300.5">
+  <metadata
+     id="metadata3876">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs3874" />
+  <g
+     id="g140">
+    <g
+       id="g138"
+       transform="scale(1.5)">
+      <path
+         id="path128"
+         style="fill:#c4c4c4;fill-opacity:1;stroke:#a0a0a0;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 82 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -82 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z" />
+      <text
+         id="text132"
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828">
+        <tspan
+           id="tspan130"
+           y="14"
+           x="98">abierto proyecto</tspan>
+      </text>
+      <text
+         id="text136"
+         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828">
+        <tspan
+           id="tspan134"
+           y="12"
+           x="98" />
+      </text>
+    </g>
+  </g>
+  <g
+     id="g150"
+     transform="translate(152)">
+    <g
+       id="g148"
+       transform="scale(1.5)">
+      <path
+         id="path142"
+         style="fill:#ff664b;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+      <text
+         id="text146"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828">
+        <tspan
+           id="tspan144"
+           y="14"
+           x="13">url</tspan>
+      </text>
+    </g>
+  </g>
+</svg>

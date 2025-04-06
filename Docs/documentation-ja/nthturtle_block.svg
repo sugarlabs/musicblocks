@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="svg2108"
+   version="1.1"
+   height="31.5"
+   width="271.5"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <metadata
+     id="metadata2114">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs2112" />
+  <path
+     id="path2084"
+     style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     d="M 12.75,12.75 V 6.7500001 C 12.75,3.4362915 15.436291,0.75 18.75,0.75 h 6 15 127.73095 6 c 3.31371,0 6,2.6862915 6,6.0000001 V 12.75 h -6 v -4.5 h -6 v 15.000001 h 6 v -4.5 h 6 v 6 c 0,3.313708 -2.68629,6 -6,6 h -6 H 39.75 h -15 -6 c -3.313708,0 -5.999999,-2.686292 -5.999999,-6 v -6 -1.5 H 3.75 v 4.5 h -3 V 9.75 h 3 v 4.5 h 9.000001 z" />
+  <text
+     id="text2088"
+     style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     x="16"
+     y="-5.6348267e-07"><tspan
+       id="tspan2086"
+       y="19.5"
+       x="164.5"
+       style="stroke-width:1.5">何匹目のネズミの名前</tspan></text>
+  <text
+     id="text2092"
+     style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     x="-4.5367432e-07"
+     y="-5.6348267e-07"><tspan
+       id="tspan2090"
+       y="18"
+       x="148.5"
+       style="stroke-width:1.5" /></text>
+  <g
+     id="g2106"
+     transform="translate(168)">
+    <g
+       id="g2104"
+       transform="scale(1.5)">
+      <path
+         id="path2098"
+         style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z" />
+      <text
+         id="text2102"
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"><tspan
+           id="tspan2100"
+           y="14"
+           x="13">1</tspan></text>
+    </g>
+  </g>
+</svg>

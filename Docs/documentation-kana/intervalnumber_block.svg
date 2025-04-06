@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="210.5"
+   height="31.5"
+   version="1.1"
+   id="svg2"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs2" />
+  <g
+     id="g2">
+    <g
+       transform="scale(1.5)"
+       id="g1">
+      <path
+         d="m 8.5,0.5 h 131.33333 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+         id="text1"><tspan
+           x="13"
+           y="14"
+           id="tspan1">おんていを かずで ひょうじ</tspan></text>
+    </g>
+  </g>
+</svg>
