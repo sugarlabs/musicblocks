@@ -2116,5 +2116,17 @@ function Synth() {
         return values;
     };
 
+    this.startTuner = async () => {
+        await Tone.start();
+        this.tunerMic = new Tone.UserMedia();
+        await this.tunerMic.open();
+        console.log("Mic opened");
+    };
+
+    this.stopTuner = () => {
+        this.tunerMic.close();
+        console.log("Mic closed")
+    };
+    
     return this;
 }
