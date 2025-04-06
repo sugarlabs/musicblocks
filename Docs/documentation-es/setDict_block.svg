@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="270.5"
+   height="97.5"
+   version="1.1"
+   id="svg1195"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1199" />
+  <g
+     id="g1163">
+    <g
+       transform="scale(1.5)"
+       id="g1161">
+      <path
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 62.260742 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -42 z"
+         style="fill:#d98a43;fill-opacity:1;stroke:#b7651a;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1143" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text1147"><tspan
+           x="79"
+           y="21"
+           id="tspan1145">valor ajustado</tspan></text>
+      <text
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text1151"><tspan
+           x="79"
+           y="12"
+           id="tspan1149">nombre</tspan></text>
+      <text
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text1155"><tspan
+           x="79"
+           y="33"
+           id="tspan1153">clave</tspan></text>
+      <text
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text1159"><tspan
+           x="79"
+           y="54"
+           id="tspan1157">valor</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(122)"
+     id="g1173">
+    <g
+       transform="scale(1.5)"
+       id="g1171">
+      <path
+         d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#ff664b;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1165" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+         id="text1169"><tspan
+           x="13"
+           y="14"
+           id="tspan1167">mi diccionario</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(122,32)"
+     id="g1183">
+    <g
+       transform="scale(1.5)"
+       id="g1181">
+      <path
+         d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#ff664b;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1175" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+         id="text1179"><tspan
+           x="13"
+           y="14"
+           id="tspan1177">clave</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(122,63)"
+     id="g1193">
+    <g
+       transform="scale(1.5)"
+       id="g1191">
+      <path
+         d="m 8.5,0.5 h 63.90625 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path1185" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+         id="text1189"><tspan
+           x="13"
+           y="14"
+           id="tspan1187">0</tspan></text>
+    </g>
+  </g>
+</svg>
