@@ -1152,3 +1152,8 @@ function setupToneBlocks(activity) {
     new VoiceNameBlock().setup(activity);
     new SetTimbreBlock().setup(activity);
 }
+
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupSensorsBlocks };
+}
