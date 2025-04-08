@@ -66,6 +66,7 @@ let MYDEFINES = [
     // 'mespeak',
     "Chart",
     "utils/utils",
+    "utils/keyboardNav",
     "activity/artwork",
     "widgets/status",
     "widgets/help",
