@@ -1155,5 +1155,5 @@ function setupToneBlocks(activity) {
 
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { setupSensorsBlocks };
+    module.exports = { setupToneBlocks };
 }
