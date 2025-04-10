@@ -68,7 +68,7 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
 
     if (GUIDEURL === "guide url" || GUIDEURL === "") {
         GUIDEURL =
-            "../guide/guide.html";
+            "/guide";
     }
 
     NUMBERBLOCKDEFAULT = 4;
