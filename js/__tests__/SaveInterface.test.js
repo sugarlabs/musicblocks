@@ -36,7 +36,6 @@ global.jQuery.noConflict = jest.fn(() => global.jQuery);
 global._ = jest.fn((str) => str);
 global._THIS_IS_TURTLE_BLOCKS_ = true;
 global.TITLESTRING = "Music Blocks";
-global.GUIDEURL = "../guide/guide.html";
 global.fileExt = jest.fn((file) => {
     if (!file) { // This covers both null and undefined
         return "";
