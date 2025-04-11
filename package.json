@@ -22,12 +22,13 @@
     "serve": "python3 -c \"import os, sys; os.system('python3 -m SimpleHTTPServer 3000 --bind 127.0.0.1') if sys.version_info.major==2 else os.system('python3 -m http.server 3000 --bind 127.0.0.1');\"",
     "winserve": "py -c \"import os, sys; os.system('py -m SimpleHTTPServer 3000') if sys.version_info.major==2 else os.system('py -m http.server 3000 --bind 127.0.0.1');\"",
     "test": "jest",
-    "cypress:run": "cypress run"   
+    "cypress:run": "cypress run"
   },
   "devDependencies": {
     "@babel/core": "^7.11.1",
     "@babel/preset-env": "^7.11.0",
     "babel-eslint": "^10.1.0",
+    "browserify": "^17.0.1",
     "clean-css": "^4.2.4",
     "cypress": "^14.0.2",
     "eslint": "^7.6.0",
@@ -48,6 +49,7 @@
     "@tonejs/midi": "^2.0.28",
     "autoprefixer": "^10.4.16",
     "cssnano": "^6.0.1",
+    "gifler": "^0.1.0",
     "gulp-concat": "^2.6.1",
     "gulp-postcss": "^9.0.1",
     "gulp-replace": "^1.0.0",

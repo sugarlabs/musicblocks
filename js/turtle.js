@@ -21,7 +21,7 @@
    globals
 
    createjs, DEFAULTVOLUME, delayExecution, importMembers, Painter, Singer,
-   DEFAULTVOICE
+   DEFAULTVOICE , gifler
  */
 /* exported Turtle */
 /**
@@ -696,39 +696,64 @@ Turtle.TurtleView = class {
 
     /**
      * Adds an image object to the canvas (shows an image).
-     *
+     * If the image is a GIF, use gifler to render it as animated on canvas
+
      * @param size - size of image
      * @param myImage - image path
      */
     doShowImage(size, myImage) {
-        // Is there a JS test for a valid image path?
         if (myImage === null) {
             return;
         }
-
-        const image = new Image();
-
-        image.onload = () => {
-            const bitmap = new createjs.Bitmap(image);
-            this.imageContainer.addChild(bitmap);
-            this._media.push(bitmap);
-            bitmap.scaleX = Number(size) / image.width;
-            bitmap.scaleY = bitmap.scaleX;
-            bitmap.scale = bitmap.scaleX;
-            bitmap.x = this.container.x;
-            bitmap.y = this.container.y;
-            bitmap.regX = image.width / 2;
-            bitmap.regY = image.height / 2;
-            bitmap.rotation = this.orientation;
-            this.activity.refreshCanvas();
-        };
-
-        image.src = myImage;
+    
+        const isGif = myImage.endsWith(".gif");
+        const turtle = this;
+    
+        if (isGif) {
+            gifler(myImage).get((anim) => {
+                const gifCanvas = document.createElement("canvas");
+                anim.animateInCanvas(gifCanvas);
+    
+                const bitmap = new createjs.Bitmap(gifCanvas);
+                turtle.imageContainer.addChild(bitmap);
+                turtle._media.push(bitmap);
+                bitmap.scaleX = Number(size) / anim.width;
+                bitmap.scaleY = bitmap.scaleX;
+                bitmap.scale = bitmap.scaleX;
+                bitmap.x = turtle.container.x;
+                bitmap.y = turtle.container.y;
+                bitmap.regX = anim.width / 2;
+                bitmap.regY = anim.height / 2;
+                bitmap.rotation = turtle.orientation;
+                turtle.activity.refreshCanvas();
+            });
+        } else {
+            const image = new Image();
+    
+            image.onload = () => {
+                const bitmap = new createjs.Bitmap(image);
+                turtle.imageContainer.addChild(bitmap);
+                turtle._media.push(bitmap);
+                bitmap.scaleX = Number(size) / image.width;
+                bitmap.scaleY = bitmap.scaleX;
+                bitmap.scale = bitmap.scaleX;
+                bitmap.x = turtle.container.x;
+                bitmap.y = turtle.container.y;
+                bitmap.regX = image.width / 2;
+                bitmap.regY = image.height / 2;
+                bitmap.rotation = turtle.orientation;
+                turtle.activity.refreshCanvas();
+            };
+    
+            image.src = myImage;
+        }
     }
+    
 
     /**
      * Adds an image object from a URL to the canvas (shows an image).
-     *
+     * If the image is a GIF, use gifler to render it as animated on canvas
+
      * @param size - size of image
      * @param myImage - URL of image (image address)
      */
@@ -736,25 +761,49 @@ Turtle.TurtleView = class {
         if (myURL === null) {
             return;
         }
-        const image = new Image();
-        image.src = myURL;
+    
+        const isGif = myURL.endsWith(".gif");
         const turtle = this;
-
-        image.onload = () => {
-            const bitmap = new createjs.Bitmap(image);
-            turtle.imageContainer.addChild(bitmap);
-            turtle._media.push(bitmap);
-            bitmap.scaleX = Number(size) / image.width;
-            bitmap.scaleY = bitmap.scaleX;
-            bitmap.scale = bitmap.scaleX;
-            bitmap.x = turtle.container.x;
-            bitmap.y = turtle.container.y;
-            bitmap.regX = image.width / 2;
-            bitmap.regY = image.height / 2;
-            bitmap.rotation = turtle.orientation;
-            turtle.activity.refreshCanvas();
-        };
+    
+        if (isGif) {
+            gifler(myURL).get((anim) => {
+                const gifCanvas = document.createElement("canvas");
+                anim.animateInCanvas(gifCanvas);
+    
+                const bitmap = new createjs.Bitmap(gifCanvas);
+                turtle.imageContainer.addChild(bitmap);
+                turtle._media.push(bitmap);
+                bitmap.scaleX = Number(size) / anim.width;
+                bitmap.scaleY = bitmap.scaleX;
+                bitmap.scale = bitmap.scaleX;
+                bitmap.x = turtle.container.x;
+                bitmap.y = turtle.container.y;
+                bitmap.regX = anim.width / 2;
+                bitmap.regY = anim.height / 2;
+                bitmap.rotation = turtle.orientation;
+                turtle.activity.refreshCanvas();
+            });
+        } else {
+            const image = new Image();
+            image.src = myURL;
+    
+            image.onload = () => {
+                const bitmap = new createjs.Bitmap(image);
+                turtle.imageContainer.addChild(bitmap);
+                turtle._media.push(bitmap);
+                bitmap.scaleX = Number(size) / image.width;
+                bitmap.scaleY = bitmap.scaleX;
+                bitmap.scale = bitmap.scaleX;
+                bitmap.x = turtle.container.x;
+                bitmap.y = turtle.container.y;
+                bitmap.regX = image.width / 2;
+                bitmap.regY = image.height / 2;
+                bitmap.rotation = turtle.orientation;
+                turtle.activity.refreshCanvas();
+            };
+        }
     }
+    
 
     /**
      * Adds an image object to the turtle.
