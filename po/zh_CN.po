@@ -1024,19 +1024,19 @@ msgstr "减小模块大小"
 #: js/activity.js:6227
 #: js/turtledefs.js:782
 msgid "Increase block size"
-msgstr ""
+msgstr "增加模块大小"
 
 #: js/activity.js:6493
 msgid "Could not parse JSON input."
-msgstr ""
+msgstr "无法解析 JSON 输入"
 
 #: js/activity.js:6624
 msgid "Select is enabled."
-msgstr ""
+msgstr "选择已启用"
 
 #: js/activity.js:6624
 msgid "Select is disabled."
-msgstr ""
+msgstr "选择已禁用"
 
 #: js/activity.js:7005
 #: js/activity.js:7111
@@ -1046,11 +1046,11 @@ msgstr "无法从文件加载项目。请检查文件类型。"
 
 #: js/activity.js:7448
 msgid "Invalid parameters"
-msgstr ""
+msgstr "参数无效"
 
 #: js/activity.js:7599
 msgid "Error regenerating palettes. Please refresh the page."
-msgstr ""
+msgstr "重新生成调色板时出错。请刷新页面"
 
 #: js/block.js:1576
 #: js/block.js:1695
@@ -1058,7 +1058,7 @@ msgstr ""
 #: js/blocks/IntervalsBlocks.js:63
 #: js/blocks/WidgetBlocks.js:259
 msgid "temperament"
-msgstr ""
+msgstr "音律"
 
 #: js/block.js:1583
 #: js/lilypond.js:749
@@ -1075,21 +1075,21 @@ msgstr "开始"
 
 #: js/block.js:1590
 msgid "matrix"
-msgstr ""
+msgstr " 矩阵"
 
 #: js/block.js:1597
 #: js/blocks/WidgetBlocks.js:1510
 #: plugins/rodi.rtp:324
 msgid "status"
-msgstr ""
+msgstr "状态"
 
 #: js/block.js:1604
 msgid "drum mapper"
-msgstr ""
+msgstr "鼓映射器"
 
 #: js/block.js:1611
 msgid "ruler"
-msgstr "尺"
+msgstr "尺子"
 
 #: js/block.js:1618
 #: js/blocks/WidgetBlocks.js:397
@@ -1099,7 +1099,7 @@ msgstr "音色"
 
 #: js/block.js:1625
 msgid "stair"
-msgstr ""
+msgstr "楼梯"
 
 #: js/block.js:1632
 #: js/blocks/WidgetBlocks.js:707
@@ -1116,7 +1116,7 @@ msgstr "调式"
 
 #: js/block.js:1646
 msgid "slider"
-msgstr ""
+msgstr "滑块"
 
 #: js/block.js:1653
 #: js/blocks/SensorsBlocks.js:1002
@@ -1143,7 +1143,7 @@ msgstr "鼓"
 #: js/blocks/WidgetBlocks.js:1228
 #.TRANS: widget for subdividing a measure into distinct rhythmic elements
 msgid "rhythm maker"
-msgstr ""
+msgstr "节奏制作器"
 
 #: js/block.js:1674
 #: js/block.js:2383
@@ -1168,7 +1168,7 @@ msgstr ""
 #: js/widgets/phrasemaker.js:2882
 #.TRANS: the value (e.g., 1/4 note) of the note being played.
 msgid "note value"
-msgstr ""
+msgstr "音符时值"
 
 #: js/block.js:1681
 #: js/block.js:2308
@@ -1177,12 +1177,12 @@ msgstr ""
 #: js/blocks/OrnamentBlocks.js:312
 #.TRANS: calculate a relative step between notes based on semi-tones
 msgid "scalar interval"
-msgstr ""
+msgstr "音阶音程"
 
 #: js/block.js:1688
 #: js/blocks/RhythmBlocks.js:148
 msgid "milliseconds"
-msgstr ""
+msgstr "毫秒"
 
 #: js/block.js:2381
 #: js/block.js:2385
@@ -1193,16 +1193,16 @@ msgstr ""
 #: js/widgets/rhythmruler.js:1177
 #: js/widgets/rhythmruler.js:1323
 msgid "silence"
-msgstr ""
+msgstr "沉默"
 
 #: js/block.js:2542
 #.TRANS: scalar step
 msgid "down"
-msgstr ""
+msgstr "向下"
 
 #: js/block.js:2543
 msgid "up"
-msgstr ""
+msgstr "向上"
 
 #: js/block.js:2548
 #: js/rubrics.js:524
@@ -1221,12 +1221,12 @@ msgstr "音高"
 
 #: js/block.js:2963
 msgid "Silence block cannot be removed."
-msgstr ""
+msgstr "无法移除静音模块"
 
 #: js/block.js:3135
 #: js/piemenus.js:3457
 msgid "You can restore deleted blocks from the trash with the Restore From Trash button."
-msgstr ""
+msgstr "您可以通过“从垃圾桶恢复”按钮恢复已删除的模块"
 
 #: js/block.js:3765
 #: js/blocks.js:2607
@@ -1245,7 +1245,7 @@ msgstr ""
 #: js/blocks/BooleanBlocks.js:1033
 #: js/blocks/SensorsBlocks.js:911
 msgid "true"
-msgstr ""
+msgstr "真"
 
 #: js/block.js:3765
 #: js/blocks.js:2609
@@ -1262,7 +1262,7 @@ msgstr ""
 #: js/blocks/BooleanBlocks.js:950
 #: js/blocks/SensorsBlocks.js:913
 msgid "false"
-msgstr ""
+msgstr "假"
 
 #: js/block.js:3776
 #: js/block.js:3789
@@ -1274,44 +1274,44 @@ msgstr "笛卡爾"
 #: js/block.js:3790
 #: js/blocks/ExtrasBlocks.js:622
 msgid "polar"
-msgstr ""
+msgstr "极坐标"
 
 #: js/block.js:3778
 #: js/block.js:3791
 #: js/blocks/ExtrasBlocks.js:626
 msgid "Cartesian/Polar"
-msgstr ""
+msgstr "笛卡尔/极坐标"
 
 #: js/block.js:3779
 #: js/block.js:3798
 #: js/blocks/ExtrasBlocks.js:655
 msgid "none"
-msgstr ""
+msgstr "无"
 
 #: js/block.js:3792
 #: js/blocks/ExtrasBlocks.js:631
 msgid "treble"
-msgstr ""
+msgstr "高音"
 
 #: js/block.js:3793
 #: js/blocks/ExtrasBlocks.js:635
 msgid "grand staff"
-msgstr ""
+msgstr "大五线谱"
 
 #: js/block.js:3794
 #: js/blocks/ExtrasBlocks.js:639
 msgid "mezzo-soprano"
-msgstr ""
+msgstr "中高音"
 
 #: js/block.js:3795
 #: js/blocks/ExtrasBlocks.js:643
 msgid "alto"
-msgstr ""
+msgstr " 女低音"
 
 #: js/block.js:3796
 #: js/blocks/ExtrasBlocks.js:647
 msgid "tenor"
-msgstr ""
+msgstr "男高音"
 
 #: js/block.js:3797
 #: js/utils/musicutils.js:1109
@@ -1319,31 +1319,31 @@ msgstr ""
 #: js/blocks/ExtrasBlocks.js:651
 #.TRANS: musical instrument
 msgid "bass"
-msgstr ""
+msgstr 低音""
 
 #: js/block.js:3842
 #: js/blocks.js:2600
 #: js/blocks.js:3211
-msgid "on2"
-msgstr ""
+msgid "on"
+msgstr "开"
 
 #: js/block.js:3844
 #: js/blocks.js:2602
 #: js/blocks.js:3213
 msgid "off"
-msgstr ""
+msgstr "关闭"
 
 #: js/block.js:4411
 msgid "Not a number"
-msgstr ""
+msgstr "不是数字"
 
 #: js/block.js:4418
 msgid "Octave value must be between 1 and 8."
-msgstr ""
+msgstr "八度值必须在1到8之间"
 
 #: js/block.js:4426
 msgid "Numbers can have at most 10 digits."
-msgstr ""
+msgstr "数字最多只能有10位"
 
 #: js/blocks.js:1212
 #: js/blocks.js:3444
@@ -1364,27 +1364,27 @@ msgstr "盒子"
 
 #: js/blocks.js:1713
 msgid "Consider breaking this stack into parts."
-msgstr ""
+msgstr "考虑将这个堆栈拆分成几个部分"
 
 #: js/blocks.js:2472
 #: js/palette.js:736
 #: js/blocks/MediaBlocks.js:602
 msgid "open file"
-msgstr "打开文件"
+msgstr "打开文件."
 
 #: js/blocks.js:3247
 #: js/palette.js:657
 #: js/blocks/MediaBlocks.js:892
 #: js/blocks/MediaBlocks.js:963
 msgid "text"
-msgstr "文本"
+msgstr "文本."
 
 #: js/blocks.js:3443
 #: js/palette.js:724
 #: js/palette.js:725
 #: js/blocks/BoxesBlocks.js:514
 msgid "store in box"
-msgstr ""
+msgstr " 存储在盒子里"
 
 #: js/blocks.js:3448
 #: js/blocks.js:3888
@@ -1394,7 +1394,7 @@ msgstr ""
 #: js/blocks.js:5883
 #: js/blocks/BoxesBlocks.js:772
 msgid "box1"
-msgstr ""
+msgstr "盒子1"
 
 #: js/blocks.js:3450
 #: js/blocks.js:3890
@@ -1404,7 +1404,7 @@ msgstr ""
 #: js/blocks.js:5885
 #: js/blocks/BoxesBlocks.js:663
 msgid "box2"
-msgstr ""
+msgstr "盒子2"
 
 #: js/blocks.js:4122
 #: js/palette.js:722
@@ -1429,7 +1429,7 @@ msgstr "放入"
 #: js/blocks/EnsembleBlocks.js:404
 #: js/blocks/MediaBlocks.js:746
 msgid "name"
-msgstr ""
+msgstr "名称"
 
 #: js/blocks.js:4122
 #: js/blocks/BoxesBlocks.js:75
@@ -1443,24 +1443,24 @@ msgstr "值"
 
 #: js/blocks.js:4465
 msgid "Forever loop detected inside a note value block. Unexpected things may happen."
-msgstr ""
+msgstr "在音符时值模块中检测到永久循环。可能会发生意外情况"
 
 #: js/blocks.js:4988
 msgid "There is no block selected."
-msgstr ""
+msgstr "没有选择任何模块"
 
 #: js/blocks.js:5094
 #: js/blocks/MediaBlocks.js:803
 #.TRANS: Avatar is the image used to determine the appearance of the mouse.
 msgid "avatar"
-msgstr ""
+msgstr "头像"
 
 #: js/blocks.js:5097
 #: js/blocks/ToneBlocks.js:1010
 #: js/widgets/sampler.js:929
 #.TRANS: The sound sample that the user uploads.
 msgid "sample"
-msgstr ""
+msgstr "样本"
 
 #: js/lilypond.js:605
 #: js/lilypond.js:904
@@ -1468,51 +1468,51 @@ msgstr ""
 #: js/lilypond.js:948
 #: js/rubrics.js:526
 msgid "mouse"
-msgstr ""
+msgstr "鼠标"
 
 #: js/lilypond.js:606
 msgid "brown rat"
-msgstr ""
+msgstr "棕色老鼠"
 
 #: js/lilypond.js:607
 msgid "mole"
-msgstr ""
+msgstr " 鼹鼠"
 
 #: js/lilypond.js:608
 msgid "chipmunk"
-msgstr ""
+msgstr "花栗鼠"
 
 #: js/lilypond.js:609
 msgid "red squirrel"
-msgstr ""
+msgstr "红松鼠"
 
 #: js/lilypond.js:610
 msgid "guinea pig"
-msgstr ""
+msgstr "豚鼠"
 
 #: js/lilypond.js:611
 msgid "capybara"
-msgstr ""
+msgstr "水豚"
 
 #: js/lilypond.js:612
 msgid "coypu"
-msgstr ""
+msgstr " 豪猪"
 
 #: js/lilypond.js:613
 msgid "black rat"
-msgstr ""
+msgstr "黑色老鼠"
 
 #: js/lilypond.js:614
 msgid "grey squirrel"
-msgstr ""
+msgstr "灰松鼠"
 
 #: js/lilypond.js:615
 msgid "flying squirrel"
-msgstr ""
+msgstr "飞鼠"
 
 #: js/lilypond.js:616
 msgid "bat"
-msgstr ""
+msgstr "蝙蝠"
 
 #: js/lilypond.js:749
 #: js/lilypond.js:913
@@ -1520,7 +1520,7 @@ msgstr ""
 #: js/blocks/ActionBlocks.js:1256
 #: js/blocks/ExtrasBlocks.js:559
 msgid "start drum"
-msgstr ""
+msgstr "开始鼓声"
 
 #: js/rubrics.js:523
 #: js/turtledefs.js:122
@@ -1535,20 +1535,20 @@ msgstr ""
 #: js/widgets/rhythmruler.js:2209
 #.TRANS: an arrangement of notes based on duration
 msgid "rhythm"
-msgstr ""
+msgstr "节奏"
 
 #: js/rubrics.js:525
 #: js/turtledefs.js:126
 #: js/turtledefs.js:227
 msgid "tone"
-msgstr ""
+msgstr "音调"
 
 #: js/rubrics.js:527
 #: js/turtledefs.js:135
 #: js/turtledefs.js:236
 #: js/widgets/phrasemaker.js:1126
 msgid "pen"
-msgstr ""
+msgstr "钢笔"
 
 #: js/rubrics.js:528
 #: js/turtledefs.js:136
@@ -1563,7 +1563,7 @@ msgstr "數字"
 #: js/turtledefs.js:130
 #: js/turtledefs.js:231
 msgid "flow"
-msgstr ""
+msgstr "流动"
 
 #: js/rubrics.js:531
 #: js/turtledefs.js:139
@@ -1571,7 +1571,7 @@ msgstr ""
 #: planet/js/GlobalTag.js:48
 #.TRANS: On the Planet, we use labels to tag projects.
 msgid "Sensors"
-msgstr ""
+msgstr "传感器"
 
 #: js/rubrics.js:532
 #: js/turtledefs.js:138
@@ -1589,7 +1589,7 @@ msgstr ""
 #: js/toolbar.js:48
 #: js/toolbar.js:114
 msgid "About Music Blocks"
-msgstr ""
+msgstr "关于音乐模块"
 
 #: js/toolbar.js:51
 #: js/toolbar.js:117
@@ -1597,7 +1597,7 @@ msgstr ""
 #: js/toolbar.js:249
 #: js/turtledefs.js:509
 msgid "Record"
-msgstr ""
+msgstr "录音"
 
 #: js/toolbar.js:52
 #: js/toolbar.js:53
@@ -1608,7 +1608,7 @@ msgstr ""
 #: js/toolbar.js:250
 #: js/toolbar.js:251
 msgid "Full screen"
-msgstr ""
+msgstr "全屏"
 
 #: js/toolbar.js:54
 #: js/toolbar.js:120
@@ -1616,7 +1616,7 @@ msgstr ""
 #: js/toolbar.js:252
 #: js/turtledefs.js:516
 msgid "Toggle Fullscreen"
-msgstr ""
+msgstr "切换全屏"
 
 #: js/toolbar.js:55
 #: js/toolbar.js:121
@@ -1626,7 +1626,7 @@ msgstr ""
 #: js/turtledefs.js:522
 #: planet/js/StringHelper.js:33
 msgid "New project"
-msgstr ""
+msgstr "新项目"
 
 #: js/toolbar.js:56
 #: js/toolbar.js:122
@@ -1634,7 +1634,7 @@ msgstr ""
 #: js/toolbar.js:254
 #: js/turtledefs.js:528
 msgid "Load project from file"
-msgstr ""
+msgstr "从文件加载项目"
 
 #: js/toolbar.js:57
 #: js/toolbar.js:123
@@ -1645,7 +1645,7 @@ msgstr ""
 #: js/turtledefs.js:546
 #: js/turtledefs.js:566
 msgid "Save project"
-msgstr ""
+msgstr "保存项目"
 
 #: js/toolbar.js:58
 #: js/toolbar.js:80
@@ -1662,28 +1662,28 @@ msgstr ""
 #: js/turtledefs.js:536
 #: js/turtledefs.js:567
 msgid "Save project as HTML"
-msgstr ""
+msgstr "将项目保存为HTML"
 
 #: js/toolbar.js:59
 #: js/toolbar.js:125
 #: js/toolbar.js:196
 #: js/toolbar.js:257
 msgid "Find and share projects"
-msgstr ""
+msgstr "查找并分享项目"
 
 #: js/toolbar.js:60
 #: js/toolbar.js:126
 #: js/toolbar.js:197
 #: js/toolbar.js:258
 msgid "Offline. Sharing is unavailable"
-msgstr ""
+msgstr " 离线。共享不可用"
 
 #: js/toolbar.js:61
 #: js/toolbar.js:127
 #: js/toolbar.js:198
 #: js/toolbar.js:259
 msgid "Auxiliary menu"
-msgstr ""
+msgstr "辅助菜单"
 
 #: js/toolbar.js:62
 #: js/toolbar.js:128
@@ -1700,7 +1700,7 @@ msgstr "幫助"
 #: js/toolbar.js:261
 #: js/turtledefs.js:598
 msgid "Run slowly"
-msgstr ""
+msgstr "慢速运行"
 
 #: js/toolbar.js:64
 #: js/toolbar.js:130
@@ -1708,7 +1708,7 @@ msgstr ""
 #: js/toolbar.js:262
 #: js/turtledefs.js:604
 msgid "Run step by step"
-msgstr ""
+msgstr "逐步运行"
 
 #: js/toolbar.js:65
 #: js/toolbar.js:131
@@ -1716,7 +1716,7 @@ msgstr ""
 #: js/toolbar.js:263
 #: js/turtledefs.js:611
 msgid "Display statistics"
-msgstr ""
+msgstr "显示统计信息"
 
 #: js/toolbar.js:66
 #: js/toolbar.js:132
@@ -1724,7 +1724,7 @@ msgstr ""
 #: js/toolbar.js:264
 #: js/turtledefs.js:617
 msgid "Load plugin"
-msgstr ""
+msgstr "加载插件"
 
 #: js/toolbar.js:67
 #: js/toolbar.js:133
@@ -1732,21 +1732,21 @@ msgstr ""
 #: js/toolbar.js:265
 #: js/turtledefs.js:625
 msgid "Delete plugin"
-msgstr ""
+msgstr "删除插件"
 
 #: js/toolbar.js:68
 #: js/toolbar.js:134
 #: js/toolbar.js:205
 #: js/toolbar.js:266
 msgid "Enable horizontal scrolling"
-msgstr ""
+msgstr "启用横向滚动"
 
 #: js/toolbar.js:69
 #: js/toolbar.js:135
 #: js/toolbar.js:206
 #: js/toolbar.js:267
 msgid "Disable horizontal scrolling"
-msgstr ""
+msgstr "禁用横向滚动"
 
 #: js/toolbar.js:70
 #: js/toolbar.js:136
@@ -1754,21 +1754,21 @@ msgstr ""
 #: js/toolbar.js:268
 #: js/turtledefs.js:642
 msgid "Change theme"
-msgstr ""
+msgstr "更改主题"
 
 #: js/toolbar.js:71
 #: js/toolbar.js:137
 #: js/toolbar.js:208
 #: js/toolbar.js:269
 msgid "Light Mode"
-msgstr ""
+msgstr "浅色模式"
 
 #: js/toolbar.js:72
 #: js/toolbar.js:138
 #: js/toolbar.js:209
 #: js/toolbar.js:270
 msgid "Dark Mode"
-msgstr ""
+msgstr "深色模式"
 
 #: js/toolbar.js:73
 #: js/toolbar.js:139
@@ -1778,13 +1778,13 @@ msgstr ""
 #: planet/js/LocalCard.js:54
 #: planet/js/StringHelper.js:71
 msgid "Merge with current project"
-msgstr ""
+msgstr "与当前项目合并"
 
 #: js/toolbar.js:74
 #: js/toolbar.js:140
 #: js/turtledefs.js:662
 msgid "Set Pitch Preview"
-msgstr ""
+msgstr "设置音高预览"
 
 #: js/toolbar.js:75
 #: js/toolbar.js:141
@@ -1800,21 +1800,21 @@ msgstr "JavaScript 编辑器"
 #: js/toolbar.js:273
 #: js/turtledefs.js:676
 msgid "Restore"
-msgstr ""
+msgstr "恢复"
 
 #: js/toolbar.js:77
 #: js/toolbar.js:143
 #: js/toolbar.js:213
 #: js/toolbar.js:274
 msgid "Switch to beginner mode"
-msgstr ""
+msgstr "切换到初学者模式"
 
 #: js/toolbar.js:78
 #: js/toolbar.js:144
 #: js/toolbar.js:214
 #: js/toolbar.js:275
 msgid "Switch to advanced mode"
-msgstr ""
+msgstr "切换到高级模式"
 
 #: js/toolbar.js:79
 #: js/toolbar.js:145
@@ -1823,39 +1823,39 @@ msgstr ""
 #: js/toolbar.js:276
 #: js/turtledefs.js:690
 msgid "Select language"
-msgstr ""
+msgstr "选择语言"
 
 #: js/toolbar.js:81
 #: js/toolbar.js:84
 #: js/toolbar.js:148
 #: js/turtledefs.js:538
 msgid "Save mouse artwork as PNG"
-msgstr ""
+msgstr "将鼠标图像保存为PNG"
 
 #: js/toolbar.js:83
 #: js/toolbar.js:147
 msgid "Save mouse artwork as SVG"
-msgstr ""
+msgstr "将鼠标图像保存为SVG"
 
 #: js/toolbar.js:85
 #: js/toolbar.js:149
 #: js/turtledefs.js:569
 msgid "Save music as WAV"
-msgstr ""
+msgstr "将音乐保存为WAV"
 
 #: js/toolbar.js:86
 #: js/toolbar.js:150
 msgid "Save sheet music as ABC"
-msgstr ""
+msgstr "将乐谱保存为ABC"
 
 #: js/toolbar.js:87
 #: js/toolbar.js:151
 msgid "Save sheet music as Lilypond"
-msgstr ""
+msgstr "将乐谱保存为LilyPond"
 
 #: js/toolbar.js:88
 msgid "Save sheet music as MusicXML"
-msgstr ""
+msgstr "将乐谱保存为MusicXML"
 
 #: js/toolbar.js:89
 #: js/toolbar.js:152
@@ -1864,7 +1864,7 @@ msgstr ""
 #: js/toolbar.js:282
 #: js/turtledefs.js:558
 msgid "Save block artwork as SVG"
-msgstr ""
+msgstr "将块图形保存为SVG"
 
 #: js/toolbar.js:90
 #: js/toolbar.js:153
@@ -1872,7 +1872,7 @@ msgstr ""
 #: js/toolbar.js:222
 #: js/toolbar.js:283
 msgid "Save block artwork as PNG"
-msgstr ""
+msgstr "将块图形保存为PNG"
 
 #: js/toolbar.js:91
 #: js/toolbar.js:154
@@ -1881,21 +1881,21 @@ msgstr ""
 #: js/toolbar.js:284
 #: js/toolbar.js:1134
 msgid "Confirm"
-msgstr ""
+msgstr "确认"
 
 #: js/toolbar.js:92
 #: js/toolbar.js:164
 #: js/toolbar.js:224
 #: js/toolbar.js:285
 msgid "English (United States)"
-msgstr ""
+msgstr "English (United States)"
 
 #: js/toolbar.js:93
 #: js/toolbar.js:165
 #: js/toolbar.js:225
 #: js/toolbar.js:286
 msgid "English (United Kingdom)"
-msgstr ""
+msgstr "English (United Kingdom)"
 
 #: js/toolbar.js:94
 #: js/toolbar.js:166
@@ -2014,14 +2014,14 @@ msgstr ""
 #: js/toolbar.js:281
 #: js/turtledefs.js:554
 msgid "Save turtle artwork as PNG"
-msgstr ""
+msgstr "将海龟图形保存为PNG"
 
 #: js/toolbar.js:159
 #: js/toolbar.js:219
 #: js/toolbar.js:280
 #: js/turtledefs.js:550
 msgid "Save turtle artwork as SVG"
-msgstr ""
+msgstr "将海龟图形保存为SVG"
 
 #: js/toolbar.js:167
 #: js/toolbar.js:227
@@ -2032,26 +2032,26 @@ msgstr ""
 #: js/toolbar.js:185
 #: js/toolbar.js:246
 msgid "About Turtle Blocks"
-msgstr ""
+msgstr "关于海龟图形块"
 
 #: js/toolbar.js:494
 #: js/toolbar.js:505
 #: js/toolbar.js:545
 msgid "Turtle Wrap Off"
-msgstr ""
+msgstr "关闭海龟包装"
 
 #: js/toolbar.js:514
 #: js/toolbar.js:554
 msgid "Turtle Wrap On"
-msgstr ""
+msgstr "开启海龟包装"
 
 #: js/toolbar.js:1121
 msgid "Are you sure you want to create a new project?"
-msgstr ""
+msgstr "您确定要创建一个新项目吗？"
 
 #: js/logo.js:61
 msgid "Not a valid pitch name"
-msgstr ""
+msgstr "无效的音高名称"
 
 #: js/logo.js:507
 #: js/blocks/ProgramBlocks.js:258
@@ -2061,7 +2061,7 @@ msgstr "你必须选择一个文件"
 
 #: js/logo.js:1688
 msgid "Playback is ready."
-msgstr ""
+msgstr "播放准备好了。"
 
 #: js/piemenus.js:200
 #: js/utils/musicutils.js:1182
@@ -2071,7 +2071,7 @@ msgstr ""
 #: js/widgets/phrasemaker.js:1991
 #.TRANS: double sharp is a music term related to pitch
 msgid "double sharp"
-msgstr ""
+msgstr "双升音符"
 
 #: js/piemenus.js:201
 #: js/utils/musicutils.js:1180
@@ -2094,7 +2094,7 @@ msgstr "升号"
 #: js/widgets/phrasemaker.js:1993
 #.TRANS: natural is a music term related to pitch
 msgid "natural"
-msgstr ""
+msgstr "还原音符"
 
 #: js/piemenus.js:203
 #: js/utils/musicutils.js:1176
@@ -2117,7 +2117,7 @@ msgstr "降号"
 #: js/widgets/phrasemaker.js:1995
 #.TRANS: double flat is a music term related to pitch
 msgid "double flat"
-msgstr ""
+msgstr "双降音符"
 
 #: js/piemenus.js:2827
 #: js/utils/musicutils.js:1000
@@ -2125,7 +2125,7 @@ msgstr ""
 #.TRANS: unison is a music term related to intervals
 #.TRANS: unison means the note is the same as the current note
 msgid "unison"
-msgstr ""
+msgstr "同音"
 
 #: js/piemenus.js:2981
 #: js/piemenus.js:3054
@@ -2162,16 +2162,16 @@ msgstr "伊奥利安调式"
 #: js/piemenus.js:3373
 #: js/blocks/FlowBlocks.js:136
 msgid "Duplicate"
-msgstr ""
+msgstr "复制"
 
 #: js/piemenus.js:3374
 #: js/turtledefs.js:714
 msgid "Extract"
-msgstr ""
+msgstr "提取"
 
 #: js/piemenus.js:3375
 msgid "Move to trash"
-msgstr ""
+msgstr "移到垃圾桶"
 
 #: js/piemenus.js:3376
 #: js/widgets/temperament.js:454
@@ -2181,28 +2181,28 @@ msgstr ""
 #: js/widgets/timbre.js:962
 #: planet/js/StringHelper.js:69
 msgid "Close"
-msgstr ""
+msgstr "关闭"
 
 #: js/piemenus.js:3382
 msgid "Save stack"
-msgstr ""
+msgstr "保存堆栈"
 
 #: js/piemenus.js:3412
 msgid "In order to copy a sample, you must reload the widget, import the sample again, and export it."
-msgstr ""
+msgstr "为了复制样本，您必须重新加载小部件，重新导入样本，然后再导出。"
 
 #: js/piemenus.js:3801
 msgid "You have chosen key for your pitch preview."
-msgstr ""
+msgstr "您已选择音调预览的音调。"
 
 #: js/turtle-singer.js:1364
 #.TRANS: partials are weighted components in a harmonic series
 msgid "You must have at least one Partial block inside of a Weighted-partial block"
-msgstr ""
+msgstr "您必须在加权部分块内至少包含一个部分块"
 
 #: js/turtle-singer.js:2078
 msgid "synth cannot play chords."
-msgstr ""
+msgstr "合成器无法播放和弦"
 
 #: js/turtledefs.js:43
 #.TRANS: put the URL to the guide here, e.g., https://github.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md
