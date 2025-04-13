@@ -434,8 +434,32 @@ function SampleWidget() {
             window.scroll(0, 0);
         };
 
-        this.pitchBtn = widgetWindow.addInputButton("C4", "");
-        this.pitchBtn.onclick = () => {
+        // Create a container for the pitch button and frequency display
+        this.pitchBtnContainer = document.createElement("div");
+        this.pitchBtnContainer.className = "wfbtItem";
+        this.pitchBtnContainer.style.display = "flex";
+        this.pitchBtnContainer.style.flexDirection = "column";
+        this.pitchBtnContainer.style.alignItems = "center";
+        this.pitchBtnContainer.style.cursor = "pointer"; // Add pointer cursor to indicate clickable
+        
+        // Add the container to the toolbar
+        widgetWindow._toolbar.appendChild(this.pitchBtnContainer);
+        
+        // Create the pitch button
+        this.pitchBtn = document.createElement("input");
+        this.pitchBtn.value = "C4";
+        this.pitchBtnContainer.appendChild(this.pitchBtn);
+        
+        // Create the frequency display
+        this.frequencyDisplay = document.createElement("div");
+        this.frequencyDisplay.style.fontSize = "smaller";
+        this.frequencyDisplay.style.textAlign = "center";
+        this.frequencyDisplay.style.color = platformColor.textColor;
+        this.frequencyDisplay.textContent = "261 Hz";
+        this.pitchBtnContainer.appendChild(this.frequencyDisplay);
+        
+        // Add click event to the container (includes both the button and frequency display)
+        this.pitchBtnContainer.onclick = () => {
             this._createPieMenu();
         };
 
@@ -562,6 +586,24 @@ function SampleWidget() {
         }
         this.accidentalCenter = lev + 2;
         this.octaveCenter = this.sampleOctave;
+    };
+
+    /**
+     * Calculates the frequency in Hz for the current pitch.
+     * @returns {number} The frequency in Hz
+     */
+    this._calculateFrequency = function () {
+        let semitones = 0;
+        
+        semitones += isNaN(this.octaveCenter) ? 0 : this.octaveCenter * 12;
+        semitones += isNaN(this.pitchCenter) ? 0 : MAJORSCALE[this.pitchCenter];
+        semitones += isNaN(this.accidentalCenter) ? 0 : this.accidentalCenter - 2;
+        
+        // A4 = 440Hz at semitone position 57
+        const netChange = semitones - 57;
+        const frequency = Math.floor(440 * Math.pow(2, netChange / 12));
+        
+        return frequency;
     };
 
     /**
@@ -879,8 +921,9 @@ function SampleWidget() {
     };
 
     /**
-     * Retrieves the name of the current pitch.
-     * @returns {void}
+     * Gets the pitch name based on the current pitch, accidental, and octave.
+     * Also updates the pitch button display.
+     * @returns {string} The pitch name.
      */
     this.getPitchName = function () {
         let name = "";
@@ -889,7 +932,16 @@ function SampleWidget() {
         name += this.octaveCenter.toString();
         this.pitchName = name;
 
+        // Calculate frequency
+        const frequency = this._calculateFrequency();
+        
+        // Update the pitch button value
         this.pitchBtn.value = this.pitchName;
+        
+        // Update the frequency display text
+        this.frequencyDisplay.textContent = frequency + " Hz";
+        
+        return this.pitchName;
     };
 
     /**
