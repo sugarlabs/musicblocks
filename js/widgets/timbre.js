@@ -1936,10 +1936,6 @@ class TimbreWidget {
         
         // Cache button
         const filterButtonCell = docById("filterButtonCell");
-        const synthButtonCell = docById("synthButtonCell");
-        const oscillatorButtonCell = docById("oscillatorButtonCell");
-        const envelopeButtonCell = docById("envelopeButtonCell");
-        const effectsButtonCell = docById("effectsButtonCell");
         
         // single event handler
         this._eventHandler = (event) => {
