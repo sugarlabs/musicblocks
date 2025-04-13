@@ -44,6 +44,9 @@ const platformThemes = {
         cancelButton: "#f1f1f1",
         cancelButtonHover: "#afafaf",
         hoverColor: "#808080",
+        widgetButton: "#225A91",
+        widgetButtonSelect: "#979797",
+        widgetBackground: "#454545",
         paletteColors: {
             widgets: ["#2E7D32", "#1B5E20", "#388E3C", "#81C784"],
             pitch: ["#2E7D32", "#1B5E20", "#388E3C", "#81C784"],
@@ -198,6 +201,9 @@ const platformThemes = {
         cancelButton: "#f1f1f1",
         cancelButtonHover: "#afafaf",
         hoverColor: "#E0E0E0",
+        widgetBackground: "#ccc",
+        widgetButton: "#8cc6ff",
+        widgetButtonSelect: "#C8C8C8",
         paletteColors: {
             widgets: ["#7CD622", "#57AD02", "#77C428", "#B4EB7D"],
             pitch: ["#7CD622", "#57AD02", "#77C428", "#B4EB7D"],
