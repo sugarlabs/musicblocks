@@ -1944,7 +1944,7 @@ class TimbreWidget {
         // single event handler
         this._eventHandler = (event) => {
             const target = event.target;
-            const targetId = target.id || '';
+            const targetId = target.id || "";
             
             if (targetId.startsWith("sel") && event.type === "change") {
                 filterButtonCell.style.backgroundColor = "#C8C8C0";
