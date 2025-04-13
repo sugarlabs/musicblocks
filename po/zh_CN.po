@@ -2207,16 +2207,16 @@ msgstr "合成器无法播放和弦"
 #: js/turtledefs.js:43
 #.TRANS: put the URL to the guide here, e.g., https://github.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md
 msgid "guide url"
-msgstr ""
+msgstr "指南网址"
 
 #: js/turtledefs.js:88
 msgid "Turtle Blocks"
-msgstr ""
+msgstr "海龟图形块"
 
 #: js/turtledefs.js:121
 #: js/turtledefs.js:222
 msgid "search"
-msgstr ""
+msgstr "搜索"
 
 #: js/turtledefs.js:123
 #: js/turtledefs.js:224
@@ -2224,17 +2224,17 @@ msgstr ""
 #: js/blocks/WidgetBlocks.js:522
 #.TRANS: musical meter (time signature), e.g., 4:4
 msgid "meter"
-msgstr ""
+msgstr "节拍"
 
 #: js/turtledefs.js:125
 #: js/turtledefs.js:226
 msgid "intervals"
-msgstr ""
+msgstr "音程"
 
 #: js/turtledefs.js:127
 #: js/turtledefs.js:228
 msgid "ornament"
-msgstr ""
+msgstr "装饰音"
 
 #: js/turtledefs.js:128
 #: js/turtledefs.js:229
@@ -2242,170 +2242,170 @@ msgstr ""
 #: js/blocks/VolumeBlocks.js:502
 #: js/blocks/VolumeBlocks.js:545
 msgid "volume"
-msgstr ""
+msgstr "音量"
 
 #: js/turtledefs.js:132
 #: js/turtledefs.js:233
 msgid "boxes"
-msgstr ""
+msgstr "框框"
 
 #: js/turtledefs.js:133
 #: js/turtledefs.js:234
 msgid "widgets"
-msgstr ""
+msgstr "小部件"
 
 #: js/turtledefs.js:134
 #: js/turtledefs.js:235
 #: js/widgets/phrasemaker.js:1125
 msgid "graphics"
-msgstr ""
+msgstr "图像"
 
 #: js/turtledefs.js:137
 #: js/turtledefs.js:238
 msgid "boolean"
-msgstr ""
+msgstr "布尔值"
 
 #: js/turtledefs.js:140
 #: js/turtledefs.js:241
 #: js/blocks/HeapBlocks.js:59
 #: js/widgets/status.js:143
 msgid "heap"
-msgstr ""
+msgstr "堆积"
 
 #: js/turtledefs.js:141
 #: js/turtledefs.js:242
 #: js/blocks/DictBlocks.js:142
 #: js/blocks/ProgramBlocks.js:495
 msgid "dictionary"
-msgstr ""
+msgstr "字典"
 
 #: js/turtledefs.js:142
 #: js/turtledefs.js:243
 msgid "ensemble"
-msgstr ""
+msgstr "乐团 "
 
 #: js/turtledefs.js:143
 #: js/turtledefs.js:244
 msgid "extras"
-msgstr ""
+msgstr "额外内容"
 
 #: js/turtledefs.js:145
 #: js/turtledefs.js:246
 #.TRANS: program as in computer program
 #.TRANS: program as in computer program
 msgid "program"
-msgstr ""
+msgstr "程序"
 
 #: js/turtledefs.js:146
 #: js/turtledefs.js:247
 msgid "my blocks"
-msgstr ""
+msgstr "我的块"
 
 #: js/turtledefs.js:188
 #: js/turtledefs.js:283
 msgid "artwork"
-msgstr ""
+msgstr "艺术作品"
 
 #: js/turtledefs.js:188
 #: js/turtledefs.js:283
 msgid "logic"
-msgstr ""
+msgstr "逻辑"
 
 #: js/turtledefs.js:188
 #: js/turtledefs.js:283
 #: planet/js/GlobalTag.js:34
 #.TRANS: On the Planet, we use labels to tag projects.
 msgid "Music"
-msgstr ""
+msgstr "音乐"
 
 #: js/turtledefs.js:190
 msgid "Music Blocks"
-msgstr ""
+msgstr "音乐块"
 
 #: js/turtledefs.js:438
 msgid "Welcome to Turtle Blocks"
-msgstr ""
+msgstr "欢迎来到海龟图形块"
 
 #: js/turtledefs.js:439
 msgid "Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks."
-msgstr ""
+msgstr "海龟图形块是一个受Logo启发的海龟，它通过拼接的可视编程块绘制色彩斑斓的图画。"
 
 #: js/turtledefs.js:440
 #: js/turtledefs.js:467
 #: js/turtledefs.js:822
 #: js/turtledefs.js:845
 msgid "The current version is"
-msgstr ""
+msgstr "当前版本是"
 
 #: js/turtledefs.js:448
 #: js/turtledefs.js:493
 msgid "Click the run button to run the project in fast mode."
-msgstr ""
+msgstr "点击运行按钮以在快速模式下运行项目"
 
 #: js/turtledefs.js:454
 msgid "Stop the turtle."
-msgstr ""
+msgstr "停止海龟"
 
 #: js/turtledefs.js:456
 #: js/turtledefs.js:501
 msgid "You can also type Alt-S to stop."
-msgstr ""
+msgstr "您也可以按 Alt-S 停止。"
 
 #: js/turtledefs.js:464
 #: js/widgets/help.js:335
 msgid "Welcome to Music Blocks"
-msgstr ""
+msgstr "欢迎来到音乐块"
 
 #: js/turtledefs.js:465
 msgid "Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way."
-msgstr ""
+msgstr "音乐块是一个工具集，用于以有趣的方式探索基本的音乐概念。"
 
 #: js/turtledefs.js:474
 #: js/widgets/help.js:336
 msgid "Meet Mr. Mouse!"
-msgstr ""
+msgstr "会面 Mr. Mouse!"
 
 #: js/turtledefs.js:475
 msgid "Mr Mouse is our Music Blocks conductor."
-msgstr ""
+msgstr "Mr Mouse 是我们的音乐块指挥。"
 
 #: js/turtledefs.js:477
 msgid "Mr Mouse encourages you to explore Music Blocks."
-msgstr ""
+msgstr "Mr Mouse 鼓励您探索音乐块。"
 
 #: js/turtledefs.js:479
 msgid "Let us start our tour!"
-msgstr ""
+msgstr "让我们开始我们的旅程！"
 
 #: js/turtledefs.js:484
 #: js/turtledefs.js:807
 #: js/widgets/help.js:337
 msgid "Guide"
-msgstr ""
+msgstr "指南"
 
 #: js/turtledefs.js:485
 msgid "A detailed guide to Music Blocks is available."
-msgstr ""
+msgstr "提供了详细的音乐块指南。"
 
 #: js/turtledefs.js:499
 msgid "Stop the music (and the mice)."
-msgstr ""
+msgstr "停止音乐 (and the mice)"
 
 #: js/turtledefs.js:510
 msgid "Record your project as video."
-msgstr ""
+msgstr "将您的项目录制为视频"
 
 #: js/turtledefs.js:517
 msgid "Toggle Fullscreen mode."
-msgstr ""
+msgstr "切换全屏模式"
 
 #: js/turtledefs.js:523
 msgid "Initialize a new project."
-msgstr ""
+msgstr "初始化一个新项目"
 
 #: js/turtledefs.js:529
 msgid "You can also load projects from the file system."
-msgstr ""
+msgstr "您也可以从文件系统加载项目"
 
 #: js/turtledefs.js:545
 #: js/widgets/arpeggio.js:103
@@ -2423,170 +2423,170 @@ msgstr ""
 
 #: js/turtledefs.js:548
 msgid "Save your project to a file."
-msgstr ""
+msgstr "将您的项目保存到文件"
 
 #: js/turtledefs.js:552
 msgid "Save graphics from your project to as SVG."
-msgstr ""
+msgstr "将项目中的图形保存为SVG"
 
 #: js/turtledefs.js:556
 msgid "Save graphics from your project as PNG."
-msgstr ""
+msgstr "将项目中的图形保存为PNG"
 
 #: js/turtledefs.js:560
 msgid "Save block artwork as an SVG file."
-msgstr ""
+msgstr "将块图形保存为SVG文件"
 
 #: js/turtledefs.js:571
 msgid "Save sheet music as ABC, Lilypond or MusicXML"
-msgstr ""
+msgstr "将乐谱保存为ABC、LilyPond或MusicXML格式"
 
 #: js/turtledefs.js:573
 msgid "Save block artwork as SVG or PNG"
-msgstr ""
+msgstr "将块图形保存为SVG或PNG"
 
 #: js/turtledefs.js:580
 msgid "Load samples from server"
-msgstr ""
+msgstr "从服务器加载样本"
 
 #: js/turtledefs.js:581
 msgid "This button opens a viewer for loading example projects."
-msgstr ""
+msgstr "此按钮打开一个查看器，用于加载示例项目"
 
 #: js/turtledefs.js:586
 msgid "Expand/collapse option toolbar"
-msgstr ""
+msgstr "展开/收起选项工具栏"
 
 #: js/turtledefs.js:587
 msgid "Click this button to expand or collapse the auxillary toolbar."
-msgstr ""
+msgstr "点击此按钮以展开或收起辅助工具栏"
 
 #: js/turtledefs.js:593
 msgid "Displays help messages for the main and auxiliary toolbar, right-click contextual menu for blocks and canvas, and palettes."
-msgstr ""
+msgstr "显示主工具栏和辅助工具栏的帮助信息，块和画布的右键上下文菜单，以及调色板的帮助信息"
 
 #: js/turtledefs.js:599
 msgid "Click to run the project in slow mode."
-msgstr ""
+msgstr "点击以在慢速模式下运行项目"
 
 #: js/turtledefs.js:605
 msgid "Click to run the project step by step."
-msgstr ""
+msgstr "点击按步骤运行项目"
 
 #: js/turtledefs.js:612
 msgid "Display statistics about your Music project."
-msgstr ""
+msgstr "显示有关您音乐项目的统计信息"
 
 #: js/turtledefs.js:618
 msgid "Load a selected plugin."
-msgstr ""
+msgstr "加载选定的插件"
 
 #: js/turtledefs.js:626
 msgid "Delete a selected plugin."
-msgstr ""
+msgstr "删除选定的插件"
 
 #: js/turtledefs.js:633
 msgid "Enable scrolling"
-msgstr ""
+msgstr "启用滚动"
 
 #: js/turtledefs.js:634
 msgid "You can scroll the blocks on the canvas."
-msgstr ""
+msgstr "您可以在画布上滚动这些块"
 
 #: js/turtledefs.js:643
 msgid "Switch between dark and light mode."
-msgstr ""
+msgstr "在暗模式和亮模式之间切换"
 
 #: js/turtledefs.js:649
 msgid "Click to add another project into the current one."
-msgstr ""
+msgstr "点击将另一个项目添加到当前项目中"
 
 #: js/turtledefs.js:654
 msgid "Wrap Turtle"
-msgstr ""
+msgstr "包裹海龟"
 
 #: js/turtledefs.js:655
 msgid "Turn Turtle wrapping On or Off."
-msgstr ""
+msgstr "开启或关闭海龟包裹"
 
 #: js/turtledefs.js:663
 msgid "Click to set the current pitch."
-msgstr ""
+msgstr "点击设置当前音高"
 
 #: js/turtledefs.js:670
 msgid "Converts Music Block programs to JavaScript."
-msgstr ""
+msgstr "将音乐块程序转换为JavaScript"
 
 #: js/turtledefs.js:677
 msgid "Restore blocks from the trash."
-msgstr ""
+msgstr "从垃圾桶恢复块"
 
 #: js/turtledefs.js:684
 msgid "Switch mode"
-msgstr ""
+msgstr "切换模式"
 
 #: js/turtledefs.js:685
 msgid "Switch between beginner and advance modes."
-msgstr ""
+msgstr "在初学者模式和高级模式之间切换"
 
 #: js/turtledefs.js:691
 msgid "Select your language preference."
-msgstr ""
+msgstr "选择您的语言偏好"
 
 #: js/turtledefs.js:696
 msgid "Contextual Menu for Blocks"
-msgstr ""
+msgstr "块的上下文菜单"
 
 #: js/turtledefs.js:697
 msgid "Right-click on a block to access common actions."
-msgstr ""
+msgstr "右键点击一个块以访问常见操作"
 
 #: js/turtledefs.js:702
 #: planet/js/StringHelper.js:46
 msgid "Delete"
-msgstr ""
+msgstr "删除"
 
 #: js/turtledefs.js:703
 msgid "To delete a block, right-click on it. You will see the delete option."
-msgstr ""
+msgstr "要删除一个模块，请右键点击它。你会看到“删除”选项。"
 
 #: js/turtledefs.js:709
 msgid "To copy a block, right-click on it. You will see the copy option."
-msgstr ""
+msgstr "要复制一个模块，请右键点击它。你会看到“复制”选项。"
 
 #: js/turtledefs.js:715
 msgid "To extract a block, right-click on it. You will see the extract option."
-msgstr ""
+msgstr "要提取一个模块，请右键点击它。你会看到“提取”选项。"
 
 #: js/turtledefs.js:721
 msgid "Keyboard shortcuts"
-msgstr ""
+msgstr "键盘快捷键"
 
 #: js/turtledefs.js:722
 msgid "You can type d to create a do block and r to create a re block etc."
-msgstr ""
+msgstr "你可以输入 d 来创建一个 do 模块，输入 r 来创建一个 re 模块，等等。"
 
 #: js/turtledefs.js:729
 msgid "Contextual Menu for Canvas"
-msgstr ""
+msgstr "画布的上下文菜单"
 
 #: js/turtledefs.js:730
 msgid "Right-click on the canvas to perform additional canvas-related tasks."
-msgstr ""
+msgstr "右键点击画布以执行更多与画布相关的操作。"
 
 #: js/turtledefs.js:736
 #: js/turtles.js:940
 #: js/palette.js:654
 msgid "Grid"
-msgstr ""
+msgstr "网格"
 
 #: js/turtledefs.js:737
 msgid "Turn on/off lines for cartesian or polar grids."
-msgstr ""
+msgstr "打开或关闭笛卡尔网格或极坐标网格的线条。"
 
 #: js/turtledefs.js:739
 msgid "Turn on/off music staffs."
-msgstr ""
+msgstr "打开或关闭五线谱。"
 
 #: js/turtledefs.js:744
 #: js/turtles.js:959
@@ -2602,264 +2602,264 @@ msgstr ""
 #: js/widgets/phrasemaker.js:578
 #.TRANS: clear all subdivisions from the ruler.
 msgid "Clear"
-msgstr ""
+msgstr "清除"
 
 #: js/turtledefs.js:745
 msgid "Clear the screen and return the mice to their initial positions."
-msgstr ""
+msgstr "清除屏幕并将鼠标返回到初始位置。"
 
 #: js/turtledefs.js:750
 #: js/turtles.js:980
 msgid "Collapse"
-msgstr ""
+msgstr "折叠"
 
 #: js/turtledefs.js:751
 msgid "Collapse the graphics window."
-msgstr ""
+msgstr ""折叠图形窗口。
 
 #: js/turtledefs.js:757
 msgid "Return all blocks to the center of the screen."
-msgstr ""
+msgstr "将所有模块返回到屏幕中心。"
 
 #: js/turtledefs.js:763
 msgid "Hide or show the blocks and the palettes."
-msgstr ""
+msgstr "隐藏或显示模块和调色板。"
 
 #: js/turtledefs.js:769
 msgid "Expand or collapse start and action stacks."
-msgstr ""
+msgstr "展开或折叠开始和动作堆栈。"
 
 #: js/turtledefs.js:777
 msgid "Decrease the size of the blocks."
-msgstr ""
+msgstr "减小模块的大小。"
 
 #: js/turtledefs.js:783
 msgid "Increase the size of the blocks."
-msgstr ""
+msgstr "增大模块的大小。"
 
 #: js/turtledefs.js:789
 msgid "Select"
-msgstr ""
+msgstr "选择"
 
 #: js/turtledefs.js:790
 msgid "Left-click and drag on workspace to select multiple blocks."
-msgstr ""
+msgstr "左键点击并拖动工作区以选择多个模块。"
 
 #: js/turtledefs.js:797
 msgid "Palette buttons"
-msgstr ""
+msgstr "调色板按钮"
 
 #: js/turtledefs.js:798
 msgid "This toolbar contains the palette buttons including Rhythm Pitch Tone Action and more."
-msgstr ""
+msgstr "此工具栏包含调色板按钮，包括节奏、音高、音调、动作等。"
 
 #: js/turtledefs.js:800
 msgid "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-msgstr ""
+msgstr "点击显示模块调色板，将模块从调色板拖到画布上使用。"
 
 #: js/turtledefs.js:808
 msgid "A detailed guide to Turtle Blocks is available."
-msgstr ""
+msgstr "提供了 Turtle Blocks 的详细指南。"
 
 #: js/turtledefs.js:812
 msgid "Turtle Blocks Guide"
-msgstr ""
+msgstr "Turtle Blocks 指南"
 
 #: js/turtledefs.js:815
 #: js/turtledefs.js:838
 #: js/widgets/help.js:338
 msgid "About"
-msgstr ""
+msgstr "关于"
 
 #: js/turtledefs.js:816
 msgid "Turtle Blocks is an open source collection of tools for exploring musical concepts."
-msgstr ""
+msgstr "Turtle Blocks 是一个开源工具集，用于探索音乐概念。"
 
 #: js/turtledefs.js:818
 msgid "A full list of contributors can be found in the Turtle Blocks GitHub repository."
-msgstr ""
+msgstr "完整的贡献者列表可以在 Turtle Blocks 的 GitHub 仓库中找到。"
 
 #: js/turtledefs.js:820
 msgid "Turtle Blocks is licensed under the AGPL."
-msgstr ""
+msgstr "Turtle Blocks 授权使用 AGPL 许可协议。"
 
 #: js/turtledefs.js:828
 msgid "Turtle Blocks GitHub repository"
-msgstr ""
+msgstr "Turtle Blocks GitHub 仓库"
 
 #: js/turtledefs.js:831
 #: js/widgets/help.js:339
 #: js/widgets/help.js:361
 msgid "Congratulations."
-msgstr ""
+msgstr "恭喜"
 
 #: js/turtledefs.js:832
 msgid "You have finished the tour. Please enjoy Turtle Blocks!"
-msgstr ""
+msgstr "您已完成导览。请尽情享受 Turtle Blocks！"
 
 #: js/turtledefs.js:839
 msgid "Music Blocks is an open source collection of tools for exploring musical concepts."
-msgstr ""
+msgstr "Music Blocks 是一个开源工具集，用于探索音乐概念。"
 
 #: js/turtledefs.js:841
 msgid "A full list of contributors can be found in the Music Blocks GitHub repository."
-msgstr ""
+msgstr "完整的贡献者列表可以在 Music Blocks 的 GitHub 仓库中找到。"
 
 #: js/turtledefs.js:843
 msgid "Music Blocks is licensed under the AGPL."
-msgstr ""
+msgstr "Music Blocks 授权使用 AGPL 许可协议。"
 
 #: js/turtledefs.js:851
 msgid "Music Blocks GitHub repository"
-msgstr ""
+msgstr "Music Blocks GitHub 仓库"
 
 #: js/turtledefs.js:854
 msgid "Congratulations!"
-msgstr ""
+msgstr "恭喜"
 
 #: js/turtledefs.js:855
 msgid "You have finished the tour. Please enjoy Music Blocks!"
-msgstr ""
+msgstr "您已完成导览。请尽情享受 Music Blocks！"
 
 #: js/turtles.js:1052
 msgid "Expand"
-msgstr ""
+msgstr "展开"
 
 #: js/palette.js:663
 msgid "effect"
-msgstr ""
+msgstr "效果"
 
 #: js/palette.js:669
 msgid "sargam"
-msgstr ""
+msgstr "萨尔甘"
 
 #: js/palette.js:684
 #: js/blocks/PitchBlocks.js:1209
 msgid "custom pitch"
-msgstr ""
+msgstr "自定义音高"
 
 #: js/palette.js:692
 msgid "accidental"
-msgstr ""
+msgstr "意外音符"
 
 #: js/palette.js:716
 #: js/blocks/PitchBlocks.js:405
 msgid "pitch converter"
-msgstr ""
+msgstr "音高转换器"
 
 #: js/utils/musicutils.js:504
 #: js/utils/musicutils.js:644
 #: js/widgets/musickeyboard.js:2906
 #: js/widgets/pitchdrummatrix.js:228
 msgid "rest"
-msgstr ""
+msgstr "休止符"
 
 #: js/utils/musicutils.js:687
 msgid "Perfect unison"
-msgstr ""
+msgstr "完全同音"
 
 #: js/utils/musicutils.js:687
 msgid "Diminished second"
-msgstr ""
+msgstr "减二度"
 
 #: js/utils/musicutils.js:688
 msgid "Minor second"
-msgstr ""
+msgstr "小二度"
 
 #: js/utils/musicutils.js:688
 msgid "Augmented unison"
-msgstr ""
+msgstr "增同音"
 
 #: js/utils/musicutils.js:689
 msgid "Major second"
-msgstr ""
+msgstr "大二度"
 
 #: js/utils/musicutils.js:689
 msgid "Diminished third"
-msgstr ""
+msgstr "减三度"
 
 #: js/utils/musicutils.js:690
 msgid "Minor third"
-msgstr ""
+msgstr "小三度"
 
 #: js/utils/musicutils.js:690
 msgid "Augmented second"
-msgstr ""
+msgstr "增二度"
 
 #: js/utils/musicutils.js:691
 msgid "Major third"
-msgstr ""
+msgstr "大三度"
 
 #: js/utils/musicutils.js:691
 msgid "Diminished fourth"
-msgstr ""
+msgstr "减四度"
 
 #: js/utils/musicutils.js:692
 msgid "Perfect fourth"
-msgstr ""
+msgstr "完全四度"
 
 #: js/utils/musicutils.js:692
 msgid "Augmented third"
-msgstr ""
+msgstr "增三度"
 
 #: js/utils/musicutils.js:693
 msgid "Diminished fifth"
-msgstr ""
+msgstr "减五度"
 
 #: js/utils/musicutils.js:693
 msgid "Augmented fourth"
-msgstr ""
+msgstr "增四度"
 
 #: js/utils/musicutils.js:694
 msgid "Perfect fifth"
-msgstr ""
+msgstr "完全五度"
 
 #: js/utils/musicutils.js:694
 msgid "Diminished sixth"
-msgstr ""
+msgstr "减六度"
 
 #: js/utils/musicutils.js:695
 msgid "Minor sixth"
-msgstr ""
+msgstr "小六度"
 
 #: js/utils/musicutils.js:695
 msgid "Augmented fifth"
-msgstr ""
+msgstr "增五度"
 
 #: js/utils/musicutils.js:696
 msgid "Major sixth"
-msgstr ""
+msgstr "大六度"
 
 #: js/utils/musicutils.js:696
 msgid "Diminished seventh"
-msgstr ""
+msgstr "减七度"
 
 #: js/utils/musicutils.js:697
 msgid "Minor seventh"
-msgstr ""
+msgstr "小七度"
 
 #: js/utils/musicutils.js:697
 msgid "Augmented sixth"
-msgstr ""
+msgstr "增六度"
 
 #: js/utils/musicutils.js:698
 msgid "Major seventh"
-msgstr ""
+msgstr "大七度"
 
 #: js/utils/musicutils.js:698
 msgid "Diminished octave"
-msgstr ""
+msgstr "减八度"
 
 #: js/utils/musicutils.js:699
 msgid "Perfect octave"
-msgstr ""
+msgstr "完全八度"
 
 #: js/utils/musicutils.js:699
-msgid "Augmented seventh"
-msgstr ""
+msgid " perfect octave"
+msgstr "完全八度"
 
 #: js/utils/musicutils.js:700
-msgid "Minor ninth"
+msgid "完全八度"
 msgstr ""
 
 #: js/utils/musicutils.js:700
