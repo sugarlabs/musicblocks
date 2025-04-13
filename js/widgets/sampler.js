@@ -440,7 +440,7 @@ function SampleWidget() {
         this.pitchBtnContainer.style.display = "flex";
         this.pitchBtnContainer.style.flexDirection = "column";
         this.pitchBtnContainer.style.alignItems = "center";
-        this.pitchBtnContainer.style.cursor = "pointer";
+        this.pitchBtnContainer.style.cursor = "pointer"; // Add pointer cursor to indicate clickable
         
         // Add the container to the toolbar
         widgetWindow._toolbar.appendChild(this.pitchBtnContainer);
@@ -448,27 +448,19 @@ function SampleWidget() {
         // Create the pitch button
         this.pitchBtn = document.createElement("input");
         this.pitchBtn.value = "C4";
-        this.pitchBtn.readOnly = true;
-        this.pitchBtn.style.cursor = "pointer";
-        this.pitchBtn.style.textAlign = "center";
         this.pitchBtnContainer.appendChild(this.pitchBtn);
         
         // Create the frequency display
         this.frequencyDisplay = document.createElement("div");
         this.frequencyDisplay.style.fontSize = "smaller";
         this.frequencyDisplay.style.textAlign = "center";
-        this.frequencyDisplay.style.color = "#333333";
+        this.frequencyDisplay.style.color = platformColor.textColor;
         this.frequencyDisplay.textContent = "261 Hz";
         this.pitchBtnContainer.appendChild(this.frequencyDisplay);
         
-        // Add click event to both the container and the pitch button for better click coverage
+        // Add click event to the container (includes both the button and frequency display)
         this.pitchBtnContainer.onclick = () => {
             this._createPieMenu();
-        };
-        
-        this.pitchBtn.onclick = (event) => {
-            this._createPieMenu();
-            event.stopPropagation();
         };
 
         this._save_lock = false;
@@ -861,10 +853,8 @@ function SampleWidget() {
         this._octavesWheel.animatetime = 0; // 300;
         this._octavesWheel.createWheel(octaveLabels);
 
-        // Get the position of the entire container for better positioning
-        const containerRect = this.pitchBtnContainer.getBoundingClientRect();
-        const x = containerRect.x + containerRect.width / 2; // Use the center of the container
-        const y = containerRect.y + containerRect.height / 2;
+        const x = this.pitchBtn.getBoundingClientRect().x;
+        const y = this.pitchBtn.getBoundingClientRect().y;
 
         docById("wheelDivptm").style.position = "absolute";
         docById("wheelDivptm").style.height = "300px";
