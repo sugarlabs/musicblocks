@@ -420,9 +420,33 @@ class JSEditor {
         try {
             MusicBlocks.init(true);
             new Function(this._code)();
+            let enableCodeToBlocks = false;  // ONLY ENABLE FOR LOCAL TESTING
+            if (enableCodeToBlocks) {
+                this._updateCanvas();
+            }
         } catch (e) {
             JSEditor.logConsole(e, "maroon");
         }
+    }
+
+    /**
+     * Update the blocks on canvas based on the JS code in editor.
+     * 
+     * @returns {Void}
+     */
+    _updateCanvas() {
+        let ast = acorn.parse(this._code, { ecmaVersion: 2020 });
+        let trees = AST2BlockList.toTrees(ast);
+        let blockList = AST2BlockList.toBlockList(trees);
+        const activity = this.activity;
+        // Wait for the old blocks to be removed.
+        const __listener = (event) => {
+            activity.blocks.loadNewBlocks(blockList);
+            activity.stage.removeAllEventListeners("trashsignal");
+        };
+        activity.stage.removeAllEventListeners("trashsignal");
+        activity.stage.addEventListener("trashsignal", __listener, false);
+        activity.sendAllToTrash(false, false);
     }
 
     /**
