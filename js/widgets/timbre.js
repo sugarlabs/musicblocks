@@ -766,7 +766,7 @@ class TimbreWidget {
         this.isActive["synth"] = false;
 
         synthButtonCell.onclick = () => {
-            _unhighlightButtons();
+            _unhighlightButtons(synthButtonCell);
             for (let i = 0; i < this.activeParams.length; i++) {
                 this.isActive[this.activeParams[i]] = false;
             }
@@ -789,7 +789,7 @@ class TimbreWidget {
         this.isActive["oscillator"] = false;
 
         oscillatorButtonCell.onclick = async () => {
-            _unhighlightButtons();
+            _unhighlightButtons(oscillatorButtonCell);
             for (let i = 0; i < this.activeParams.length; i++) {
                 this.isActive[this.activeParams[i]] = false;
             }
@@ -840,7 +840,7 @@ class TimbreWidget {
         this.isActive["envelope"] = false;
 
         envelopeButtonCell.onclick = async () => {
-            _unhighlightButtons();
+            _unhighlightButtons(envelopeButtonCell);
             for (let i = 0; i < this.activeParams.length; i++) {
                 this.isActive[this.activeParams[i]] = false;
             }
@@ -886,7 +886,7 @@ class TimbreWidget {
         this.isActive["effects"] = false;
 
         effectsButtonCell.onclick = () => {
-            _unhighlightButtons();
+            _unhighlightButtons(effectsButtonCell);
             for (let i = 0; i < this.activeParams.length; i++) {
                 this.isActive[this.activeParams[i]] = false;
             }
@@ -904,7 +904,7 @@ class TimbreWidget {
         this.isActive["filter"] = false;
 
         filterButtonCell.onclick = async () => {
-            _unhighlightButtons();
+            _unhighlightButtons(filterButtonCell);
             for (let i = 0; i < this.activeParams.length; i++) {
                 this.isActive[this.activeParams[i]] = false;
             }
@@ -972,13 +972,14 @@ class TimbreWidget {
         //     this.activity.logo.hideMsgs();
         // };
 
-        _unhighlightButtons = () => {
-            addFilterButtonCell.style.backgroundColor = "#808080";
-            synthButtonCell.style.backgroundColor = platformColor.selectorBackground;
-            oscillatorButtonCell.style.backgroundColor = platformColor.selectorBackground;
-            envelopeButtonCell.style.backgroundColor = platformColor.selectorBackground;
-            effectsButtonCell.style.backgroundColor = platformColor.selectorBackground;
-            filterButtonCell.style.backgroundColor = platformColor.selectorBackground;
+        _unhighlightButtons = (button) => {
+            addFilterButtonCell.style.backgroundColor = platformColor.widgetButton;
+            synthButtonCell.style.backgroundColor = platformColor.widgetButton;
+            oscillatorButtonCell.style.backgroundColor = platformColor.widgetButton;
+            envelopeButtonCell.style.backgroundColor = platformColor.widgetButton;
+            effectsButtonCell.style.backgroundColor = platformColor.widgetButton;
+            filterButtonCell.style.backgroundColor = platformColor.widgetButton;
+            button.style.backgroundColor = platformColor.widgetButtonSelect;
         };
 
         activity.textMsg(_("Click on buttons to open the timbre design tools."), 3000);
@@ -1185,9 +1186,6 @@ class TimbreWidget {
     _synth = () => {
         let blockValue = 0;
 
-        docById("synthButtonCell").style.backgroundColor = "#C8C8C8";
-        docById("synthButtonCell").onmouseover = () => {};
-        docById("synthButtonCell").onmouseout = () => {};
 
         this.timbreTableDiv.style.display = "inline";
         this.timbreTableDiv.style.visibility = "visible";
@@ -1206,7 +1204,7 @@ class TimbreWidget {
         env.innerHTML = htmlElements;
         const envAppend = document.createElement("div");
         envAppend.id = "envAppend";
-        envAppend.style.backgroundColor = platformColor.selectorBackground;
+        envAppend.style.backgroundColor = platformColor.widgetBackground;
         envAppend.style.height = "30px";
         envAppend.style.marginTop = "40px";
         envAppend.style.overflow = "auto";
@@ -1283,7 +1281,6 @@ class TimbreWidget {
                     }
 
                     document.getElementById("wrapperS0").addEventListener("change", (event) => {
-                        docById("synthButtonCell").style.backgroundColor = "#C8C8C8";
                         const elem = event.target;
                         docById("myRangeS0").value = parseFloat(elem.value);
                         this.amSynthParamvals["harmonicity"] = parseFloat(elem.value);
@@ -1350,7 +1347,6 @@ class TimbreWidget {
                     }
 
                     document.getElementById("wrapperS0").addEventListener("change", (event) => {
-                        docById("synthButtonCell").style.backgroundColor = "#C8C8C8";
                         const elem = event.target;
                         docById("myRangeS0").value = parseFloat(elem.value);
                         docById("myspanS0").textContent = elem.value;
@@ -1416,7 +1412,6 @@ class TimbreWidget {
                     }
 
                     document.getElementById("wrapperS0").addEventListener("change", (event) => {
-                        docById("synthButtonCell").style.backgroundColor = "#C8C8C8";
                         const elem = event.target;
                         docById("myRangeS0").value = parseFloat(elem.value);
                         docById("myspanS0").textContent = elem.value;
@@ -1495,7 +1490,6 @@ class TimbreWidget {
                         document
                             .getElementById("wrapperS" + i)
                             .addEventListener("change", (event) => {
-                                docById("synthButtonCell").style.backgroundColor = "#C8C8C8";
                                 const elem = event.target;
                                 const m = elem.id.slice(-1);
                                 docById("myRangeS" + m).value = parseFloat(elem.value);
@@ -1535,10 +1529,6 @@ class TimbreWidget {
             blockValue = this.osc.length - 1;
         }
 
-        docById("oscillatorButtonCell").style.backgroundColor = "#C8C8C8";
-        docById("oscillatorButtonCell").onmouseover = () => {};
-        docById("oscillatorButtonCell").onmouseout = () => {};
-
         this.timbreTableDiv.style.display = "inline";
         this.timbreTableDiv.style.visibility = "visible";
         this.timbreTableDiv.style.border = "0px";
@@ -1564,7 +1554,7 @@ class TimbreWidget {
         env.innerHTML = htmlElements;
         const envAppend = document.createElement("div");
         envAppend.id = "envAppend";
-        envAppend.style.backgroundColor = platformColor.selectorBackground;
+        envAppend.style.backgroundColor = platformColor.widgetBackground;
         envAppend.style.height = "30px";
         envAppend.style.marginTop = "40px";
         envAppend.style.overflow = "auto";
@@ -1607,7 +1597,6 @@ class TimbreWidget {
         myDiv.innerHTML = selectOpt;
 
         document.getElementById("wrapperOsc0").addEventListener("change", (event) => {
-            docById("oscillatorButtonCell").style.backgroundColor = "#C8C8C8";
             const elem = event.target;
             this.oscParams[0] = elem.value;
             this.synthVals["oscillator"]["type"] = elem.value + this.oscParams[1].toString();
@@ -1623,7 +1612,6 @@ class TimbreWidget {
         });
 
         document.getElementById("wrapperOsc1").addEventListener("change", (event) => {
-            docById("oscillatorButtonCell").style.backgroundColor = "#C8C8C8";
             const elem = event.target;
             this.oscParams[1] = parseFloat(elem.value);
             this.synthVals["oscillator"]["type"] = this.oscParams[0] + parseFloat(elem.value);
@@ -1668,10 +1656,6 @@ class TimbreWidget {
             blockValue = this.env.length - 1;
         }
 
-        docById("envelopeButtonCell").style.backgroundColor = "#C8C8C8";
-        docById("envelopeButtonCell").onmouseover = () => {};
-        docById("envelopeButtonCell").onmouseout = () => {};
-
         this.timbreTableDiv.style.display = "inline";
         this.timbreTableDiv.style.visibility = "visible";
         this.timbreTableDiv.style.border = "0px";
@@ -1702,7 +1686,7 @@ class TimbreWidget {
         env.innerHTML = htmlElements;
         const envAppend = document.createElement("div");
         envAppend.id = "envAppend";
-        envAppend.style.backgroundColor = platformColor.selectorBackground;
+        envAppend.style.backgroundColor = platformColor.widgetBackground;
         envAppend.style.height = "30px";
         envAppend.style.marginTop = "40px";
         envAppend.style.overflow = "auto";
@@ -1715,7 +1699,6 @@ class TimbreWidget {
 
         for (let i = 0; i < 4; i++) {
             document.getElementById("wrapperEnv" + i).addEventListener("change", (event) => {
-                docById("envelopeButtonCell").style.backgroundColor = "#C8C8C8";
                 const elem = event.target;
                 const m = elem.id.slice(-1);
                 docById("myRange" + m).value = parseFloat(elem.value);
@@ -1748,9 +1731,6 @@ class TimbreWidget {
      * Adds and updates filters
      */
     _filter() {
-        docById("filterButtonCell").style.backgroundColor = "#C8C8C8";
-        docById("filterButtonCell").onmouseover = () => {};
-        docById("filterButtonCell").onmouseout = () => {};
 
         this.timbreTableDiv.style.display = "inline";
         this.timbreTableDiv.style.visibility = "visible";
@@ -1956,15 +1936,11 @@ class TimbreWidget {
         
         // Cache button
         const filterButtonCell = docById("filterButtonCell");
-        const synthButtonCell = docById("synthButtonCell");
-        const oscillatorButtonCell = docById("oscillatorButtonCell");
-        const envelopeButtonCell = docById("envelopeButtonCell");
-        const effectsButtonCell = docById("effectsButtonCell");
         
         // single event handler
         this._eventHandler = (event) => {
             const target = event.target;
-            const targetId = target.id || '';
+            const targetId = target.id || "";
             
             if (targetId.startsWith("sel") && event.type === "change") {
                 filterButtonCell.style.backgroundColor = "#C8C8C0";
@@ -2004,22 +1980,18 @@ class TimbreWidget {
             }
             
             else if (targetId.startsWith("wrapperS") && event.type === "change") {
-                synthButtonCell.style.backgroundColor = "#C8C8C8";
                 this._playNote("G4", 1 / 8);
             }
             
             else if (targetId.startsWith("wrapperOsc") && event.type === "change") {
-                oscillatorButtonCell.style.backgroundColor = "#C8C8C8";
                 this._playNote("G4", 1 / 8);
             }
             
             else if (targetId.startsWith("wrapperEnv") && event.type === "change") {
-                envelopeButtonCell.style.backgroundColor = "#C8C8C8";
                 this._playNote("G4", 1 / 8);
             }
             
             else if (targetId.startsWith("wrapperFx") && event.type === "change") {
-                effectsButtonCell.style.backgroundColor = "#C8C8C8";
                 this._playNote("G4", 1 / 8);
             }
         };
@@ -2162,10 +2134,6 @@ class TimbreWidget {
     _effects = () => {
         let blockValue = 0;
 
-        docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
-        docById("effectsButtonCell").onmouseover = () => {};
-        docById("effectsButtonCell").onmouseout = () => {};
-
         this.timbreTableDiv.style.display = "inline";
         this.timbreTableDiv.style.visibility = "visible";
         this.timbreTableDiv.style.border = "0px";
@@ -2183,7 +2151,7 @@ class TimbreWidget {
         env.innerHTML = htmlElements;
         const envAppend = document.createElement("div");
         envAppend.id = "envAppend";
-        envAppend.style.backgroundColor = platformColor.selectorBackground;
+        envAppend.style.backgroundColor = platformColor.widgetBackground;
         envAppend.style.height = "30px";
         envAppend.style.marginTop = "40px";
         envAppend.style.overflow = "auto";
@@ -2273,7 +2241,6 @@ class TimbreWidget {
                         document
                             .getElementById("wrapperFx" + i)
                             .addEventListener("change", (event) => {
-                                docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
                                 const elem = event.target;
                                 const m = elem.id.slice(-1);
                                 docById("myRangeFx" + m).value = parseFloat(elem.value);
@@ -2366,7 +2333,6 @@ class TimbreWidget {
 
                     // Add the listeners for the sliders.
                     document.getElementById("wrapperFx0").addEventListener("change", (event) => {
-                        docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
                         const elem = event.target;
                         docById("myRangeFx0").value = parseFloat(elem.value);
                         docById("myspanFx0").textContent = elem.value;
@@ -2378,7 +2344,6 @@ class TimbreWidget {
                     });
 
                     document.getElementById("wrapperFx1").addEventListener("change", (event) => {
-                        docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
                         const elem = event.target;
                         docById("myRangeFx1").value = parseFloat(elem.value);
                         const obj = oneHundredToFraction(elem.value);
@@ -2465,7 +2430,6 @@ class TimbreWidget {
                         document
                             .getElementById("wrapperFx" + i)
                             .addEventListener("change", (event) => {
-                                docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
                                 const elem = event.target;
                                 const m = elem.id.slice(-1);
                                 docById("myRangeFx" + m).value = parseFloat(elem.value);
@@ -2561,7 +2525,6 @@ class TimbreWidget {
                         document
                             .getElementById("wrapperFx" + i)
                             .addEventListener("change", (event) => {
-                                docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
                                 const elem = event.target;
                                 const m = elem.id.slice(-1);
                                 docById("myRangeFx" + m).value = parseFloat(elem.value);
@@ -2634,7 +2597,6 @@ class TimbreWidget {
                     }
 
                     document.getElementById("wrapperFx0").addEventListener("change", (event) => {
-                        docById("effectsButtonCell").style.backgroundColor = "#C8C8C8";
                         const elem = event.target;
                         docById("myRangeFx0").value = parseFloat(elem.value);
                         docById("myspanFx0").textContent = elem.value;
