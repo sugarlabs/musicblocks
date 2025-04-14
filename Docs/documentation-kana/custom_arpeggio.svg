@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="311.35938"
+   height="381"
+   version="1.1"
+   id="svg434"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs438" />
+  <path
+     d="m 14.75,44.75 v -6 a 6,6 0 0 1 6,-6 h 6 v 3 h 15 v -3 h 13.5 60 6 a 6,6 0 0 1 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 a 6,6 0 0 1 -6,6 h -6 -60 -1.5 v 3 h -12 v -3 h -1.5 -6 a 7.5,7.5 0 0 0 -7.5,7.5 v 6 6 63 6 a 7.5,7.5 0 0 0 7.5,7.5 h 6 v 3 h 15 v -3 h 12 v 9 9 6 a 6,6 0 0 1 -6,6 h -6 -13.5 -1.5 v 3 h -12 v -3 h -1.5 -6 a 6,6 0 0 1 -6,-6 v -6 z"
+     style="fill:#ff8700;fill-opacity:1;stroke:#e86b0e;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path50" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text54"
+     x="14"
+     y="32"><tspan
+       x="44"
+       y="54.5"
+       id="tspan52"
+       style="stroke-width:1.5">おんぷ</tspan></text>
+  <text
+     style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text58"
+     x="14"
+     y="32"><tspan
+       x="111.5"
+       y="50"
+       id="tspan56"
+       style="stroke-width:1.5">あたい</tspan></text>
+  <rect
+     width="21"
+     height="21"
+     rx="2.5"
+     ry="2.5"
+     style="opacity:0.4;isolation:isolate;mix-blend-mode:multiply;fill:#292929;stroke-width:0.5"
+     id="rect64"
+     x="14"
+     y="36" />
+  <path
+     d="m 29.28,50.9 -2.085,-2.08 h 1.13 a 0.5175,0.5175 0 1 0 0,-1.035 H 25.97 a 0.54,0.54 0 0 0 -0.555,0.5 v 0 c 0,0 0,0 0,0.03 v 2.32 0 a 0.52,0.52 0 1 0 1.04,0 V 49.54 l 2.095,2.095 a 0.5,0.5 0 0 0 0.73,0 0.5,0.5 0 0 0 0,-0.735 z"
+     style="isolation:isolate;fill:#ffffff;stroke-width:0.5"
+     id="path66" />
+  <path
+     d="M 23.585,48.3 A 0.54,0.54 0 0 0 23.03,47.8 h -2.355 a 0.5175,0.5175 0 1 0 0,1.035 H 21.8 L 19.72,50.9 a 0.5197235,0.5197235 0 0 0 0.735,0.735 l 2.09,-2.095 v 1.13 a 0.52,0.52 0 1 0 1.04,0 v -2.32 c 0,0 0,0 0,-0.03 a 0.04,0.04 0 0 1 0,-0.02 z"
+     style="isolation:isolate;fill:#ffffff;stroke-width:0.5"
+     id="path68" />
+  <path
+     d="m 25.97,46.25 h 2.35 a 0.52,0.52 0 1 0 0,-1.04 h -1.125 l 2.085,-2.08 a 0.5,0.5 0 0 0 0,-0.735 0.5,0.5 0 0 0 -0.73,0 L 26.455,44.5 v -1.14 a 0.52,0.52 0 1 0 -1.04,0 v 2.32 a 0.215,0.215 0 0 0 0,0.025 v 0.025 a 0.545,0.545 0 0 0 0.555,0.52 z"
+     style="isolation:isolate;fill:#ffffff;stroke-width:0.5"
+     id="path70" />
+  <path
+     d="m 23.065,42.81 a 0.54,0.54 0 0 0 -0.5,0.545 V 44.5 l -2.09,-2.095 a 0.5,0.5 0 0 0 -0.735,0 0.5,0.5 0 0 0 0,0.73 l 2.08,2.085 h -1.145 a 0.52,0.52 0 1 0 0,1.04 h 2.355 a 0.545,0.545 0 0 0 0.555,-0.5 c 0,0 0,0 0,-0.03 v -2.375 a 0.535,0.535 0 0 0 -0.52,-0.545 z"
+     style="isolation:isolate;fill:#ffffff;stroke-width:0.5"
+     id="path72" />
+  <path
+     d="m 128.75,44.75 v -6 a 6,6 0 0 1 6,-6 h 6 15 45 6 a 6,6 0 0 1 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 25.5 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 a 6,6 0 0 1 -6,6 h -6 -45 -15 -6 a 6,6 0 0 1 -6,-6 v -6 -31.5 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path84" />
+  <text
+     style="font-size:13.5px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text88"
+     x="116"
+     y="32"><tspan
+       x="197"
+       y="66.5"
+       id="tspan86"
+       style="stroke-width:1.5">/</tspan></text>
+  <text
+     style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text92"
+     x="116"
+     y="32"><tspan
+       x="197"
+       y="50"
+       id="tspan90"
+       style="stroke-width:1.5" /></text>
+  <text
+     style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text96"
+     x="116"
+     y="32"><tspan
+       x="197"
+       y="81.5"
+       id="tspan94"
+       style="stroke-width:1.5" /></text>
+  <path
+     d="m 214.75,32.75 h 95.85937 v 30 H 214.75 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path102" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text106"
+     x="202"
+     y="32"><tspan
+       x="221.5"
+       y="53"
+       id="tspan104"
+       style="stroke-width:1.5">1</tspan></text>
+  <path
+     d="m 214.75,64.75 h 95.85937 v 30 H 214.75 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path112" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text116"
+     x="202"
+     y="64"><tspan
+       x="221.5"
+       y="85"
+       id="tspan114"
+       style="stroke-width:1.5">12</tspan></text>
+  <path
+     d="m 28.75,76.75 v -6 a 6,6 0 0 1 6,-6 h 6 v 3 h 15 v -3 h 30 6 a 6,6 0 0 1 6,6 v 6 6 6 a 6,6 0 0 1 -6,6 h -6 -30 -1.5 v 3 h -12 v -3 h -1.5 -6 a 6,6 0 0 1 -6,-6 v -6 z"
+     style="fill:#c4c4c4;fill-opacity:1;stroke:#a0a0a0;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path122" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text126"
+     x="28"
+     y="64"><tspan
+       x="82"
+       y="85"
+       id="tspan124"
+       style="stroke-width:1.5">↓</tspan></text>
+  <path
+     d="m 28.75,108.75 v -6 c 0,-3.313708 2.686292,-6 6,-6 h 6 v 3 h 15 v -3 h 69 6 c 3.31371,0 6,2.686292 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 25.5 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 c 0,3.31371 -2.68629,6 -6,6 h -6 -69 -1.5 v 3 h -12 v -3 h -1.5 -6 c -3.313708,0 -6,-2.68629 -6,-6 v -6 -31.5 z"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path132" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text136"
+     x="52"
+     y="96"><tspan
+       x="121"
+       y="132"
+       id="tspan134"
+       style="stroke-width:1.5">おとの たかさ</tspan></text>
+  <text
+     style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text140"
+     x="52"
+     y="96"><tspan
+       x="121"
+       y="114"
+       id="tspan138"
+       style="stroke-width:1.5">なまえ</tspan></text>
+  <text
+     style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text144"
+     x="52"
+     y="96"><tspan
+       x="121"
+       y="145.5"
+       id="tspan142"
+       style="stroke-width:1.5">オクターヴの たかさ</tspan></text>
+  <path
+     d="m 138.75,96.75 h 93.36914 v 30 H 138.75 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path150" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text154"
+     x="126"
+     y="96"><tspan
+       x="145.5"
+       y="117"
+       id="tspan152"
+       style="stroke-width:1.5">do</tspan></text>
+  <path
+     d="m 138.75,128.75 h 95.85937 v 30 H 138.75 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path160" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text164"
+     x="126"
+     y="128"><tspan
+       x="145.5"
+       y="149"
+       id="tspan162"
+       style="stroke-width:1.5">4</tspan></text>
+  <path
+     d="m 14.75,202.75 v -6 a 6,6 0 0 1 6,-6 h 6 v 3 h 15 v -3 h 13.5 60 6 a 6,6 0 0 1 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 a 6,6 0 0 1 -6,6 h -6 -60 -1.5 v 3 h -12 v -3 h -1.5 -6 a 7.5,7.5 0 0 0 -7.5,7.5 v 6 6 63 6 a 7.5,7.5 0 0 0 7.5,7.5 h 6 v 3 h 15 v -3 h 12 v 9 9 6 a 6,6 0 0 1 -6,6 h -6 -13.5 -1.5 v 3 h -12 v -3 h -1.5 -6 a 6,6 0 0 1 -6,-6 v -6 z"
+     style="fill:#ff8700;fill-opacity:1;stroke:#e86b0e;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path170" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text174"
+     x="14"
+     y="190"><tspan
+       x="44"
+       y="212.5"
+       id="tspan172"
+       style="stroke-width:1.5">おんぷ</tspan></text>
+  <text
+     style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text178"
+     x="14"
+     y="190"><tspan
+       x="111.5"
+       y="208"
+       id="tspan176"
+       style="stroke-width:1.5">あたい</tspan></text>
+  <rect
+     width="21"
+     height="21"
+     rx="2.5"
+     ry="2.5"
+     style="opacity:0.4;isolation:isolate;mix-blend-mode:multiply;fill:#292929;stroke-width:0.5"
+     id="rect184"
+     x="14"
+     y="194" />
+  <path
+     d="m 29.28,208.9 -2.085,-2.08 h 1.13 a 0.5175,0.5175 0 1 0 0,-1.035 H 25.97 a 0.54,0.54 0 0 0 -0.555,0.5 v 0 c 0,0 0,0 0,0.03 v 2.32 0 a 0.52,0.52 0 1 0 1.04,0 v -1.095 l 2.095,2.095 a 0.5,0.5 0 0 0 0.73,0 0.5,0.5 0 0 0 0,-0.735 z"
+     style="isolation:isolate;fill:#ffffff;stroke-width:0.5"
+     id="path186" />
+  <path
+     d="m 23.585,206.3 a 0.54,0.54 0 0 0 -0.555,-0.5 h -2.355 a 0.5175,0.5175 0 1 0 0,1.035 H 21.8 l -2.08,2.065 a 0.5197235,0.5197235 0 0 0 0.735,0.735 l 2.09,-2.095 v 1.13 a 0.52,0.52 0 1 0 1.04,0 v -2.32 c 0,0 0,0 0,-0.03 a 0.04,0.04 0 0 1 0,-0.02 z"
+     style="isolation:isolate;fill:#ffffff;stroke-width:0.5"
+     id="path188" />
+  <path
+     d="m 25.97,204.25 h 2.35 a 0.52,0.52 0 1 0 0,-1.04 h -1.125 l 2.085,-2.08 a 0.5,0.5 0 0 0 0,-0.735 0.5,0.5 0 0 0 -0.73,0 l -2.095,2.105 v -1.14 a 0.52,0.52 0 1 0 -1.04,0 v 2.32 a 0.215,0.215 0 0 0 0,0.025 v 0.025 a 0.545,0.545 0 0 0 0.555,0.52 z"
+     style="isolation:isolate;fill:#ffffff;stroke-width:0.5"
+     id="path190" />
+  <path
+     d="m 23.065,200.81 a 0.54,0.54 0 0 0 -0.5,0.545 v 1.145 l -2.09,-2.095 a 0.5,0.5 0 0 0 -0.735,0 0.5,0.5 0 0 0 0,0.73 l 2.08,2.085 h -1.145 a 0.52,0.52 0 1 0 0,1.04 h 2.355 a 0.545,0.545 0 0 0 0.555,-0.5 c 0,0 0,0 0,-0.03 v -2.375 a 0.535,0.535 0 0 0 -0.52,-0.545 z"
+     style="isolation:isolate;fill:#ffffff;stroke-width:0.5"
+     id="path192" />
+  <path
+     d="m 128.75,202.75 v -6 a 6,6 0 0 1 6,-6 h 6 15 45 6 a 6,6 0 0 1 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 25.5 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 a 6,6 0 0 1 -6,6 h -6 -45 -15 -6 a 6,6 0 0 1 -6,-6 v -6 -31.5 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path204" />
+  <text
+     style="font-size:13.5px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text208"
+     x="116"
+     y="190"><tspan
+       x="197"
+       y="224.5"
+       id="tspan206"
+       style="stroke-width:1.5">/</tspan></text>
+  <text
+     style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text212"
+     x="116"
+     y="190"><tspan
+       x="197"
+       y="208"
+       id="tspan210"
+       style="stroke-width:1.5" /></text>
+  <text
+     style="font-size:9px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text216"
+     x="116"
+     y="190"><tspan
+       x="197"
+       y="239.5"
+       id="tspan214"
+       style="stroke-width:1.5" /></text>
+  <path
+     d="m 214.75,190.75 h 95.85937 v 30 H 214.75 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path222" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text226"
+     x="202"
+     y="190"><tspan
+       x="221.5"
+       y="211"
+       id="tspan224"
+       style="stroke-width:1.5">1</tspan></text>
+  <path
+     d="m 214.75,222.75 h 95.85937 v 30 H 214.75 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path232" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text236"
+     x="202"
+     y="222"><tspan
+       x="221.5"
+       y="243"
+       id="tspan234"
+       style="stroke-width:1.5">12</tspan></text>
+  <path
+     d="m 28.75,234.75 v -6 a 6,6 0 0 1 6,-6 h 6 v 3 h 15 v -3 h 30 6 a 6,6 0 0 1 6,6 v 6 6 6 a 6,6 0 0 1 -6,6 h -6 -30 -1.5 v 3 h -12 v -3 h -1.5 -6 a 6,6 0 0 1 -6,-6 v -6 z"
+     style="fill:#c4c4c4;fill-opacity:1;stroke:#a0a0a0;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path242" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text246"
+     x="28"
+     y="222"><tspan
+       x="82"
+       y="243"
+       id="tspan244"
+       style="stroke-width:1.5">↓</tspan></text>
+  <path
+     d="m 28.75,266.75 v -6 c 0,-3.31371 2.686292,-6 6,-6 h 6 v 3 h 15 v -3 h 67 6 c 3.31371,0 6,2.68629 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 25.5 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 c 0,3.31371 -2.68629,6 -6,6 h -6 -67 -1.5 v 3 h -12 v -3 h -1.5 -6 c -3.313708,0 -6,-2.68629 -6,-6 v -6 -31.5 z"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path252" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text256"
+     x="52"
+     y="254"><tspan
+       x="121"
+       y="290"
+       id="tspan254"
+       style="stroke-width:1.5">おとの たかさ</tspan></text>
+  <text
+     style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text260"
+     x="52"
+     y="254"><tspan
+       x="121"
+       y="272"
+       id="tspan258"
+       style="stroke-width:1.5">なまえ</tspan></text>
+  <text
+     style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text264"
+     x="52"
+     y="254"><tspan
+       x="121"
+       y="303.5"
+       id="tspan262"
+       style="stroke-width:1.5">オクターヴの たかさ</tspan></text>
+  <path
+     d="m 136.75,254.75 h 93.36914 v 30 H 136.75 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path270" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text274"
+     x="124"
+     y="254"><tspan
+       x="143.5"
+       y="275"
+       id="tspan272"
+       style="stroke-width:1.5">sol</tspan></text>
+  <path
+     d="m 136.75,286.75 h 95.85937 v 30 H 136.75 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path280" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text284"
+     x="124"
+     y="286"><tspan
+       x="143.5"
+       y="307"
+       id="tspan282"
+       style="stroke-width:1.5">4</tspan></text>
+  <path
+     d="m 0.75,12.75 v -6 a 6,6 0 0 1 6,-6 h 6 v 3 h 15 v -3 h 13.5 73.38135 6 a 6,6 0 0 1 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 a 6,6 0 0 1 -6,6 h -6 H 41.25 39.75 v 3 h -12 v -3 h -1.5 -6 a 7.5,7.5 0 0 0 -7.5,7.5 v 6 6 283.5 6 a 7.5,7.5 0 0 0 7.5,7.5 h 6 v 3 h 15 v -3 h 12 v 9 9 6 a 6,6 0 0 1 -6,6 h -6 -13.5 -1.5 v 3 h -12 v -3 h -1.5 -6 a 6,6 0 0 1 -6,-6 v -6 z"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path290" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text294"><tspan
+       x="7.5"
+       y="22.5"
+       id="tspan292"
+       style="stroke-width:1.5">アルペジオ</tspan></text>
+  <text
+     style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"
+     id="text298"><tspan
+       x="111"
+       y="18"
+       id="tspan296"
+       style="stroke-width:1.5" /></text>
+  <path
+     d="m 127.75,0.75 h 165 v 30 h -165 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path304" />
+  <text
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"
+     id="text308"
+     x="115"><tspan
+       x="134.5"
+       y="21"
+       id="tspan306"
+       style="stroke-width:1.5">オリジナル</tspan></text>
+</svg>

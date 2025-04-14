@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="74.215622mm"
+   height="9.1281252mm"
+   viewBox="0 0 74.215622 9.1281252"
+   version="1.1"
+   id="svg2662">
+  <defs
+     id="defs2656" />
+  <metadata
+     id="metadata2659">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     transform="translate(238.19115,36.314062)">
+    <g
+       id="g344"
+       transform="matrix(0.26458333,0,0,0.26458333,-238.19115,-36.314062)">
+      <g
+         transform="scale(1.5)"
+         id="g342">
+        <path
+           d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 68.920898 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+           style="fill:#d98a43;fill-opacity:1;stroke:#b7651a;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path332" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text336"><tspan
+             x="85"
+             y="14"
+             id="tspan334">show dictionary</tspan></text>
+        <text
+           style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+           id="text340"><tspan
+             x="85"
+             y="12"
+             id="tspan338" /></text>
+      </g>
+    </g>
+    <g
+       transform="matrix(0.26458333,0,0,0.26458333,-203.26615,-36.314062)"
+       id="g354">
+      <g
+         transform="scale(1.5)"
+         id="g352">
+        <path
+           d="m 8.5,0.5 h 90 v 20 h -90 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+           style="fill:#ff664b;fill-opacity:1;stroke:#ea4326;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+           id="path346" />
+        <text
+           style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+           id="text350"><tspan
+             x="13"
+             y="14"
+             id="tspan348">My Dictionary</tspan></text>
+      </g>
+    </g>
+  </g>
+</svg>

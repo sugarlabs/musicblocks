@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="svg305"
+   version="1.1"
+   height="34.5"
+   width="271.5"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <metadata
+     id="metadata311">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs309" />
+  <path
+     id="svg_3"
+     style="fill:#c4c4c4;fill-opacity:1;stroke:#a0a0a0;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     d="m 0.75,12.75 v -6 c 0,-3.313708 2.68629,-6 6,-6 h 6 v 3 h 14.99999 v -3 h 113.8716 6 c 3.31371,0 6,2.686292 6,6 v 6 h -6 v -4.5 h -6 v 15 h 6 v -4.5 h 6 v 6 c 0,3.31371 -2.68629,6 -6,6 h -6 -113.8716 -1.5 v 3 h -12 v -3 H 12.75 h -6 c -3.31371,0 -6,-2.68629 -6,-6 v -6 z" />
+  <text
+     x="38"
+     y="0"
+     id="svg_4"
+     style="font-size:15px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5"><tspan
+       id="svg_5"
+       y="21"
+       x="138.5"
+       style="stroke-width:1.5">グリッドをひょうじ</tspan></text>
+  <text
+     x="38"
+     y="-78"
+     id="svg_6"
+     style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828;stroke-width:1.5" />
+  <path
+     id="svg_10"
+     style="fill:#c4c4c4;fill-opacity:1;stroke:#a0a0a0;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     d="m 154.75,0.75 h 116 v 30 h -116 v -12 -1.5 h -9 v 4.5 h -3 v -12 h 3 v 4.5 h 9 v -1.5 z" />
+  <text
+     x="142"
+     y="0"
+     id="svg_11"
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#282828;stroke-width:1.5"><tspan
+       id="svg_12"
+       y="21"
+       x="161.5"
+       style="stroke-width:1.5">トレブルきごう</tspan></text>
+</svg>

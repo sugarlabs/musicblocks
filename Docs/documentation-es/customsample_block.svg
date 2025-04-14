@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="467.5"
+   height="176.34308"
+   version="1.1"
+   id="svg136"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs140" />
+  <g
+     transform="translate(0,0.42153745)"
+     id="g58">
+    <g
+       transform="scale(1.5)"
+       id="g56">
+      <path
+         d="m 0.5,14.5 v -4 a 4,4 90 0 1 4,-4 h 4 l 5,-6 5,6 h 9 127.28516 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 l -5,6 -5,-6 h -4 a 4,4 90 0 1 -4,-4 v -4 z"
+         style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path50" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+         id="text54"><tspan
+           x="20"
+           y="22"
+           id="tspan52">muestreador de audio</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(14,41.421537)"
+     id="g72">
+    <g
+       transform="scale(1.5)"
+       id="g70">
+      <path
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 81.1377 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -81.1377 -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+         style="fill:#3edcdd;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path60" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+         id="text64"><tspan
+           x="5"
+           y="15"
+           id="tspan62">fijar instrumento</tspan></text>
+      <text
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text68"><tspan
+           x="106"
+           y="12"
+           id="tspan66" /></text>
+    </g>
+  </g>
+  <g
+     transform="translate(178,41.421537)"
+     id="g94">
+    <g
+       transform="scale(1.5)"
+       id="g92">
+      <path
+         d="m 8.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 10 77.27051 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 26.5 h -10 -4 a 4,4 90 0 1 -4,-4 v -4 -42 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 z"
+         style="fill:#3edcdd;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path74" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text78"><tspan
+           x="102"
+           y="20"
+           id="tspan76">muestra de audio</tspan></text>
+      <text
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text82"><tspan
+           x="102"
+           y="12"
+           id="tspan80">archivo</tspan></text>
+      <text
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text86"><tspan
+           x="102"
+           y="33"
+           id="tspan84">nombre</tspan></text>
+      <text
+         style="font-size:6.66667px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text90"><tspan
+           x="102"
+           y="54"
+           id="tspan88">octava</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(334,41.421537)"
+     id="g104">
+    <g
+       transform="scale(1.5)"
+       id="g102">
+      <path
+         d="m 8.5,0.5 h 80 v 20 h -80 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#3edcdd;fill-opacity:1;stroke:#1dbcbd;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path96" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+         id="text100"><tspan
+           x="13"
+           y="14"
+           id="tspan98" /></text>
+    </g>
+  </g>
+  <g
+     transform="translate(334,73.421537)"
+     id="g114">
+    <g
+       transform="scale(1.5)"
+       id="g112">
+      <path
+         d="m 8.5,0.5 h 62.246094 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path106" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+         id="text110"><tspan
+           x="13"
+           y="14"
+           id="tspan108">hacer</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(334,104.42154)"
+     id="g124">
+    <g
+       transform="scale(1.5)"
+       id="g122">
+      <path
+         d="m 8.5,0.5 h 63.90625 v 20 H 8.5 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
+         style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path116" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+         id="text120"><tspan
+           x="13"
+           y="14"
+           id="tspan118">4</tspan></text>
+    </g>
+  </g>
+  <g
+     transform="translate(28,73.421537)"
+     id="g134">
+    <g
+       transform="scale(1.5)"
+       id="g132">
+      <path
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
+         style="fill:#c4c4c4;fill-opacity:1;stroke:#a0a0a0;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path126" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#282828"
+         id="text130"><tspan
+           x="36"
+           y="14"
+           id="tspan128">↓</tspan></text>
+    </g>
+  </g>
+</svg>

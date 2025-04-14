@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="120"
+   height="94.5"
+   version="1.1"
+   id="svg12"
+   sodipodi:docname="notecounter2_block.svg"
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)">
+  <metadata
+     id="metadata18">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs16" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1051"
+     id="namedview14"
+     showgrid="false"
+     inkscape:zoom="9.3121693"
+     inkscape:cx="60"
+     inkscape:cy="28.35"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg12" />
+  <g
+     transform="translate(0, 0)"
+     id="g10">
+    <g
+       transform="scale(1.5, 1.5)"
+       id="g8">
+      <path
+         d="m8.5 8.5 L 8.5 4.5 A 4 4 90 0 1 12.5 0.5 L 16.5 0.5 L 26.5 0.5 L 35.5 0.5 L 71.5 0.5 L 75.5 0.5 A 4 4 90 0 1 79.5 4.5 L 79.5 8.5 L 79.5 12.5 L 79.5 16.5 A 4 4 90 0 1 75.5 20.5 L 71.5 20.5 L 35.5 20.5 L 31.5 20.5 A 5 5 90 0 0 26.5 25.5 L 26.5 29.5 L 22.5 29.5 L 22.5 26.5 L 18.5 26.5 L 18.5 36.5 L 22.5 36.5 L 22.5 33.5 L 26.5 33.5 L 26.5 37.5 A 5 5 90 0 0 31.5 42.5 L 35.5 42.5 L 43.5 42.5 L 43.5 48.5 L 43.5 54.5 L 43.5 58.5 A 4 4 90 0 1 39.5 62.5 L 35.5 62.5 L 26.5 62.5 L 16.5 62.5 L 12.5 62.5 A 4 4 90 0 1 8.5 58.5 L 8.5 54.5 L 8.5 12.5 L 8.5 11.5 L 2.5 11.5 L 2.5 14.5 L 0.5 14.5 L 0.5 6.5 L 2.5 6.5 L 2.5 9.5 L 8.5 9.5 L 8.5 8.5 z"
+         style="fill:#e8940d;fill-opacity:1;stroke:#e86a0d;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
+         id="path2" />
+      <text
+         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#282828"
+         id="text6"><tspan
+           x="12"
+           y="15"
+           id="tspan4">note counter</tspan></text>
+    </g>
+  </g>
+</svg>
