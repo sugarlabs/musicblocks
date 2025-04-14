@@ -2347,6 +2347,8 @@ You can import sound samples (.WAV files) and use them with the *Set
 Instrument" block. The *Sampler* widget lets you set the center pitch
 of your sample so that it can be tuned.
 
+The pitch selector displays both the note name (such as C4) and its corresponding frequency in Hertz (Hz). This helps you understand the mathematical relationship between musical notes and sound frequencies - each octave represents a doubling of frequency (e.g., C4 is 261.6 Hz while C5 is 523.2 Hz).
+
 ### How to import sound samples ?
 By clicking the upload samples icon or by perfoming a drag and drop to sample canvas.  
 
