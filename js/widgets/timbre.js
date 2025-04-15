@@ -2134,12 +2134,16 @@ class TimbreWidget {
     _effects = () => {
         let blockValue = 0;
 
-        this.timbreTableDiv.style.display = "inline";
-        this.timbreTableDiv.style.visibility = "visible";
-        this.timbreTableDiv.style.border = "0px";
-        this.timbreTableDiv.style.overflow = "auto";
-        this.timbreTableDiv.style.backgroundColor = "white";
-        this.timbreTableDiv.style.height = "300px";
+        // Use a single assignment to update multiple style properties
+        Object.assign(this.timbreTableDiv.style, {
+            display: "inline",
+            visibility: "visible",
+            border: "0px",
+            overflow: "auto",
+            backgroundColor: "white",
+            height: "300px"
+        });
+
         this.timbreTableDiv.innerHTML = '<div id="timbreTable"></div>';
 
         const env = docById("timbreTable");
@@ -2158,14 +2162,13 @@ class TimbreWidget {
         env.append(envAppend);
 
         const mainDiv = docById("effect0");
-        mainDiv.innerHTML =
-            `<p>
-                <input type="radio" name="effectsName" value="Tremolo"/>${_("tremolo")}<br>
-                <input type="radio" name="effectsName" value="Vibrato"/>${_("vibrato")}<br>
-                <input type="radio" name="effectsName" value="Chorus"/>${_("chorus")}<br>
-                <input type="radio" name="effectsName" value="Phaser"/>${_("phaser")}<br>
-                <input type="radio" name="effectsName" value="Distortion"/>${_("distortion")}<br>
-            </p>`;
+        const effects = ["Tremolo", "Vibrato", "Chorus", "Phaser", "Distortion"];
+        const effectsHtml = effects
+            .map(effect => 
+            `<input type="radio" name="effectsName" value="${effect}"/>${_(effect.toLowerCase())}<br>`
+            )
+            .join("");
+        mainDiv.innerHTML = `<p>${effectsHtml}</p>`;
 
         const subDiv = docById("effect1");
         const effectsName = docByName("effectsName");
@@ -2184,7 +2187,7 @@ class TimbreWidget {
 
                     instrumentsEffects[0][this.instrumentName]["tremoloActive"] = true;
 
-                    for (let j = 0; j < 2; i++) {
+                    for (let j = 0; j < 2; j++) {
                         subHtmlElements +=
                             '<div id="wrapperFx' +
                             j +
@@ -2257,7 +2260,7 @@ class TimbreWidget {
                                         parseFloat(elem.value) / 100;
                                 }
 
-                                this._update(blockValue, elem.value, Number(m));
+                                this._update(blockValue, parseFloat(elem.value), Number(m));
                                 this._playNote("G4", 1 / 8);
                             });
                     }
@@ -2465,6 +2468,12 @@ class TimbreWidget {
 
                     instrumentsEffects[0][this.instrumentName]["phaserActive"] = true;
 
+                    // Default values
+                    instrumentsEffects[0][this.instrumentName]["rate"] = 5;
+                    instrumentsEffects[0][this.instrumentName]["octaves"] = 3;
+                    instrumentsEffects[0][this.instrumentName]["baseFrequency"] = 100;
+                    
+
                     for (let i = 0; i < 3; i++) {
                         subHtmlElements +=
                             '<div id="wrapperFx' +
@@ -2486,8 +2495,8 @@ class TimbreWidget {
                     docById("myRangeFx1").value = 3;
                     docById("myspanFx1").textContent = "3";
                     docById("sFx2").textContent = _("base frequency");
-                    docById("myRangeFx2").value = 350;
-                    docById("myspanFx2").textContent = "350";
+                    docById("myRangeFx2").value = 100;
+                    docById("myspanFx2").textContent = "100";
 
                     if (this.phaserEffect.length !== 0) {
                         blockValue = this.phaserEffect.length - 1;
@@ -2507,7 +2516,7 @@ class TimbreWidget {
                             [0, ["phaser", {}], 0, 0, [null, 1, 2, 3, null, 4]],
                             [1, ["number", { value: 5 }], 0, 0, [0]],
                             [2, ["number", { value: 3 }], 0, 0, [0]],
-                            [3, ["number", { value: 350 }], 0, 0, [0]],
+                            [3, ["number", { value: 100 }], 0, 0, [0]],
                             [4, "hidden", 0, 0, [0, null]]
                         ];
                         this.activity.blocks.loadNewBlocks(PHASEROBJ);
@@ -2548,7 +2557,7 @@ class TimbreWidget {
                                     ] = parseFloat(elem.value);
                                 }
 
-                                this._update(blockValue, elem.value, Number(m));
+                                this._update(blockValue, parseFloat(elem.value), Number(m));
                                 this._playNote("G4", 1 / 8);
                             });
                     }
