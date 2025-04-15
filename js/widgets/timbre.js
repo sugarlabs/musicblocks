@@ -2134,7 +2134,6 @@ class TimbreWidget {
     _effects = () => {
         let blockValue = 0;
 
-        // Use a single assignment to update multiple style properties
         Object.assign(this.timbreTableDiv.style, {
             display: "inline",
             visibility: "visible",
