@@ -672,7 +672,6 @@ function setupSensorsBlocks(activity) {
             return parseInt(Number(obj[0]) / 2.55);
         }
     }
-
     /**
      * Represents a block that returns the color of the pixel under the mouse or turtle.
      * @extends {ValueBlock}
@@ -710,7 +709,7 @@ function setupSensorsBlocks(activity) {
         updateParameter(logo, turtle, blk) {
             return toFixed2(activity.blocks.blockList[blk].value);
         }
-
+        
         arg(logo, turtle) {
             let requiredTurtle;
         
@@ -730,38 +729,71 @@ function setupSensorsBlocks(activity) {
             const originalVisibility = requiredTurtle.container.visible;
         
             try {
+                // Hide turtle temporarily
                 requiredTurtle.container.visible = false;
                 activity.refreshCanvas();
         
-                const globalCoords = this.convertToPageCoordinates(x, y);
-                console.log("Global coordinates:", globalCoords);
-        
-                const canvases = Array.from(document.getElementById("canvasHolder").getElementsByTagName("canvas"));
+                // Get canvas holder
+                const canvasHolder = document.getElementById("canvasHolder");
+                if (!canvasHolder) {
+                    throw new Error("Canvas holder not found");
+                }
+                
+                // Get all canvases
+                const canvases = Array.from(canvasHolder.getElementsByTagName("canvas"));
                 console.log("Found canvases:", canvases.length);
-        
+                
+                // Get the bounding rectangle of canvas holder
+                const holderRect = canvasHolder.getBoundingClientRect();
+                
+                // Get global coordinates (adjusted for platform differences)
+                const globalCoords = this.getPlatformAdjustedCoordinates(x, y, holderRect);
+                console.log("Platform-adjusted global coordinates:", globalCoords);
+                
                 let detectedColor = null;
         
+                // Iterate through canvases from top to bottom
                 for (let i = canvases.length - 1; i >= 0; i--) {
                     const canvas = canvases[i];
-                    const context = canvas.getContext("2d");
+                    const context = canvas.getContext("2d", { willReadFrequently: true });
         
-                    // Convert global page coordinates to canvas-relative
-                    const rect = canvas.getBoundingClientRect();
-                    const localX = globalCoords.x - rect.left;
-                    const localY = globalCoords.y - rect.top;
+                    // Get canvas position relative to viewport
+                    const canvasRect = canvas.getBoundingClientRect();
+                    
+                    // Calculate local coordinates within this canvas
+                    // Adjust calculation based on platform detection
+                    const localCoords = this.calculateLocalCoordinates(globalCoords, canvasRect);
+                    const localX = localCoords.x;
+                    const localY = localCoords.y;
+                    
+                    console.log(`Canvas ${i} local coordinates:`, localX, localY);
+                    
+                    // Skip if outside canvas bounds
+                    if (localX < 0 || localY < 0 || localX >= canvas.width || localY >= canvas.height) {
+                        console.log(`Canvas ${i}: Out of bounds`);
+                        continue;
+                    }
         
-                    // Skip if outside bounds
-                    if (localX < 0 || localY < 0 || localX >= canvas.width || localY >= canvas.height) continue;
+                    try {
+                        // Get pixel data - handle slight differences between platforms
+                        const safeX = Math.floor(Math.max(0, Math.min(localX, canvas.width - 1)));
+                        const safeY = Math.floor(Math.max(0, Math.min(localY, canvas.height - 1)));
+                        
+                        const pixelData = context.getImageData(safeX, safeY, 1, 1).data;
+                        console.log(`Canvas ${i}: RGBA =`, pixelData);
         
-                    const pixelData = context.getImageData(localX, localY, 1, 1).data;
-                    console.log(`Canvas ${i}: RGBA =`, pixelData);
-        
-                    if (pixelData[3] !== 0) {  // Found non-transparent pixel
-                        detectedColor = pixelData;
-                        break;
+                        if (pixelData[3] !== 0) {  // Found non-transparent pixel
+                            detectedColor = pixelData;
+                            break;
+                        }
+                    } catch (pixelError) {
+                        console.warn(`Error getting pixel data from canvas ${i}:`, pixelError);
+                        // Continue to next canvas if this one fails
+                        continue;
                     }
                 }
         
+                // Restore turtle visibility
                 requiredTurtle.container.visible = originalVisibility;
         
                 if (!detectedColor) {
@@ -782,59 +814,88 @@ function setupSensorsBlocks(activity) {
         }
 
         /**
-         * Converts turtle coordinates to match absolute page coordinates.
-         * @param {number} x - The turtle's x-coordinate.
-         * @param {number} y - The turtle's y-coordinate.
-         * @returns {{x: number, y: number}} - Transformed coordinates.
+         * Detects the platform and returns appropriate coordinates
+         * @param {number} x - The turtle's x-coordinate
+         * @param {number} y - The turtle's y-coordinate
+         * @param {DOMRect} holderRect - The bounding rectangle of canvas holder
+         * @returns {{x: number, y: number}} - Platform-adjusted coordinates
          */
-        convertToPageCoordinates(x, y) {
-            const canvasHolder = document.getElementById("canvasHolder");
-            if (!canvasHolder) {
-                console.error("Canvas holder not found.");
-                return { x, y };
+        getPlatformAdjustedCoordinates(x, y, holderRect) {
+            // Detect the platform
+            const platform = this.detectPlatform();
+            console.log("Detected platform:", platform);
+            
+            // Center of canvas holder
+            const centerX = holderRect.width / 2;
+            const centerY = holderRect.height / 2;
+            
+            // Platform-specific adjustments
+            switch (platform) {
+                case 'macOS':
+                    // For macOS, we need to adjust relative to the center
+                    return {
+                        x: holderRect.left + centerX + x,
+                        y: holderRect.top + centerY + y
+                    };
+                case 'Linux':
+                    // Linux might need additional offset adjustments
+                    return {
+                        x: holderRect.left + centerX + x,
+                        y: holderRect.top + centerY + y
+                    };
+                case 'Windows':
+                default:
+                    // Keep original Windows calculation
+                    return {
+                        x: Math.floor(x + holderRect.left),
+                        y: Math.floor(y + holderRect.top)
+                    };
             }
-
-            const rect = canvasHolder.getBoundingClientRect();
-            return {
-                x: Math.floor(x - rect.left),
-                y: Math.floor(y - rect.top),
-            };
+        }
+        
+        /**
+         * Calculate local coordinates within a specific canvas
+         * @param {Object} globalCoords - Global coordinates
+         * @param {DOMRect} canvasRect - Canvas bounding rectangle
+         * @returns {{x: number, y: number}} - Local coordinates
+         */
+        calculateLocalCoordinates(globalCoords, canvasRect) {
+            const platform = this.detectPlatform();
+            
+            // Basic calculation that works on all platforms
+            let localX = globalCoords.x - canvasRect.left;
+            let localY = globalCoords.y - canvasRect.top;
+            
+            // Platform-specific adjustments for coordinates
+            if (platform === 'macOS') {
+                // macOS might need pixel density adjustment
+                const pixelRatio = window.devicePixelRatio || 1;
+                localX = localX * pixelRatio;
+                localY = localY * pixelRatio;
+            } else if (platform === 'Linux') {
+                // Linux might need different adjustment
+                // This might need fine-tuning based on testing
+            }
+            
+            return { x: localX, y: localY };
         }
 
         /**
-         * Reads pixel data from a given canvas.
-         * @param {number} x - The x-coordinate.
-         * @param {number} y - The y-coordinate.
-         * @param {HTMLCanvasElement} canvas - The canvas element.
-         * @returns {Uint8ClampedArray} - The RGBA values of the pixel.
+         * Detects the operating system platform
+         * @returns {string} - The detected platform ('Windows', 'macOS', 'Linux', or 'Unknown')
          */
-        getPixelData(x, y, canvas) {
-            if (!canvas) {
-                console.error("Canvas not found.");
-                return new Uint8ClampedArray([0, 0, 0, 0]); // Default to transparent
+        detectPlatform() {
+            const userAgent = navigator.userAgent.toLowerCase();
+            
+            if (userAgent.indexOf('mac') !== -1) {
+                return 'macOS';
+            } else if (userAgent.indexOf('win') !== -1) {
+                return 'Windows';
+            } else if (userAgent.indexOf('linux') !== -1) {
+                return 'Linux';
+            } else {
+                return 'Unknown';
             }
-            const ctx = canvas.getContext("2d", { willReadFrequently: true });
-            if (!ctx) {
-                throw new Error(`Canvas context unavailable`);
-            }
-            // Clamp coordinates to prevent out-of-bounds errors
-            const safeX = Math.max(0, Math.min(x, canvas.width - 1));
-            const safeY = Math.max(0, Math.min(y, canvas.height - 1));
-
-            return ctx.getImageData(safeX, safeY, 1, 1).data;
-        }
-
-        /**
-         * Determines the color based on pixel data.
-         * @param {Uint8ClampedArray} pixelData - The RGBA values of the pixel.
-         * @returns {number} - The color index from searchColors.
-         */
-        detectColor(pixelData) {
-            if (pixelData.length !== 4) {
-                throw new Error("Invalid pixel data");
-            }
-            const [r, g, b, a] = pixelData;
-            return a === 0 ? this.getBackgroundColor() : searchColors(r, g, b);
         }
 
         /**
@@ -842,11 +903,21 @@ function setupSensorsBlocks(activity) {
          * @returns {number} - The background color index.
          */
         getBackgroundColor() {
-            const [r, g, b] = platformColor.background
-                .match(/\(([^)]+)\)/)[1]
-                .split(/,\s*/)
-                .map(Number);
-            return searchColors(r, g, b);
+            try {
+                const bgColor = platformColor.background;
+                const matches = bgColor.match(/\(([^)]+)\)/);
+                
+                if (matches && matches[1]) {
+                    const [r, g, b] = matches[1].split(/,\s*/).map(Number);
+                    return searchColors(r, g, b);
+                } else {
+                    // Fallback if the regex fails
+                    return this.getFallbackColor();
+                }
+            } catch (error) {
+                console.error("Error parsing background color:", error);
+                return this.getFallbackColor();
+            }
         }
 
         /**
@@ -857,7 +928,6 @@ function setupSensorsBlocks(activity) {
             return searchColors(128, 128, 128);
         }
     }
-
     /**
      * Represents a block that returns the number of seconds that the program has been running.
      * @extends {ValueBlock}
