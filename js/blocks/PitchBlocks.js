@@ -26,11 +26,57 @@
 /* exported setupPitchBlocks */
 
 function setupPitchBlocks(activity) {
+    /**
+     * Represents a rest in music notation.
+     * @extends ValueBlock
+     */
     class RestBlock extends ValueBlock {
         constructor() {
             super("rest");
             this.setPalette("pitch", activity);
-            this.hidden = this.deprecated = true;
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _("The Rest block represents a musical rest."),
+                "documentation",
+                ""
+            ]);
+
+            this.formBlock({
+                name: _("rest"),
+                args: 1,
+                defaults: [1],
+                argTypes: ["number"]
+            });
+        }
+
+        /**
+         * Updates the parameter for the rest duration
+         * @param {Object} logo - The logo instance
+         * @param {Object} turtle - The turtle instance
+         * @param {string} blk - The block ID
+         */
+        updateParameter(logo, turtle, blk) {
+            return logo.blocks.blockList[blk].value;
+        }
+
+        /**
+         * Returns the rest duration value
+         * @param {Object} logo - The logo instance
+         * @param {Object} turtle - The turtle instance
+         * @param {string} blk - The block ID
+         * @returns {number} The rest duration
+         */
+        arg(logo, turtle, blk) {
+            if (
+                logo.inStatusMatrix &&
+                logo.blocks.blockList[blk].connections[0] !== null &&
+                logo.blocks.blockList[logo.blocks.blockList[blk].connections[0]].name === "print"
+            ) {
+                return logo.blocks.blockList[blk].value;
+            } else {
+                return 0;
+            }
         }
     }
 
