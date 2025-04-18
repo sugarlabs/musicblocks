@@ -1839,9 +1839,7 @@ const TEMPERAMENT = {
         "double diminished 5": Math.pow(2, 30 / 31),
         "perfect 8": Math.pow(2, 31 / 31),
         "octave": Math.pow(2, 31 / 31),
-
         "pitchNumber": 31,
-
         "interval": [
             "perfect 1",
             "diminished 2",
