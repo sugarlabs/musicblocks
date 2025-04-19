@@ -464,7 +464,7 @@
                 <div id="guitarText"></div>
                 <input type="checkbox" id="guitarCheck" tabindex="-1" />
                 <p></p>
-                <p><button id="submitLilypond"></button></p>
+                <p><button class = "confirm-button" id="submitLilypond"></button></p>
                 <!-- <button id="submitPDF"></button></p> -->
             </div>
         </div>
@@ -912,7 +912,14 @@
 
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-              let persistentNotification = null;
+                $('.dropdown-trigger[data-activates="themedropdown"]').dropdown({
+      constrainWidth: false,   // allow the dropdown to be wider than the trigger
+      coverTrigger: false,      // drop below the trigger instead of covering it
+      alignment: 'right'        // align right edge of dropdown to the trigger
+      // belowOrigin: true     // older versions of M.Dropdown call this    
+      });
+
+                let persistentNotification = null;
 
                 function showPersistentNotification() {
                 if (!persistentNotification) {
@@ -953,9 +960,15 @@
                 if (isSmallScreen) {
                   // Enable play-only mode
                   body.classList.add("play-only");
-                }
-
                   showPersistentNotification();
+
+                  if (typeof activity !== "undefined"
+                  && typeof activity._setScroller === "function"
+                  && !activity.scrollBlockContainer
+                ) {
+                    // flip scrollBlockContainer to true
+                    activity._setScroller();
+                }
 
                   if (buttonContainer) {
                     buttonContainer.style.display = "flex";
@@ -984,6 +997,13 @@
 
                   if (homeButton) homeButton.style = "";
                   if (buttonContainer) buttonContainer.style = "";
+                  if (
+                    typeof activity !== "undefined" &&
+                    typeof activity._setScroller === "function" &&
+                    activity.scrollBlockContainer
+                ) {
+                    activity._setScroller();
+                }
 
                   showElementById("Show/hide blocks");
                   showElementById("Expand/collapse blocks");
