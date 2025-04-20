@@ -913,11 +913,10 @@
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 $('.dropdown-trigger[data-activates="themedropdown"]').dropdown({
-      constrainWidth: false,   // allow the dropdown to be wider than the trigger
-      coverTrigger: false,      // drop below the trigger instead of covering it
-      alignment: 'right'        // align right edge of dropdown to the trigger
-      // belowOrigin: true     // older versions of M.Dropdown call this    
-      });
+                    constrainWidth: false,   
+                    coverTrigger: false,      
+                    alignment: 'right'       
+                });
 
                 let persistentNotification = null;
 

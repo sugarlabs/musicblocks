@@ -1915,6 +1915,6 @@ table {
   font-weight: bold;
   z-index: 1000;
   text-align: center;
-  min-width: 250px;
-  max-width: 80%;
+  min-width: 350px;
+  max-width: 90%;
 }
