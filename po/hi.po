@@ -1612,7 +1612,8 @@ msgstr "माउस आर्टवर्क को PNG के रूप मे
 #: js/toolbar.js:148
 #: js/turtledefs.js:568
 msgid "Save project as MIDI"
-msgstr ""
+msgstr "प्रोजेक्ट को MIDI के रूप में सहेजें"
+
 
 #: js/toolbar.js:84
 #: js/toolbar.js:149
@@ -1654,7 +1655,7 @@ msgstr "ब्लॉक आर्टवर्क को SVG के रूप म
 #: js/toolbar.js:224
 #: js/toolbar.js:285
 msgid "Save block artwork as PNG"
-msgstr ""
+msgstr "ब्लॉक आर्टवर्क को PNG के रूप में सहेजें"
 
 #: js/toolbar.js:92
 #: js/toolbar.js:156
@@ -1670,123 +1671,123 @@ msgstr "पुष्टि करें"
 #: js/toolbar.js:226
 #: js/toolbar.js:287
 msgid "English (United States)"
-msgstr "अंग्रेज़ी (संयुक्त राज्य)"
+msgstr ""
 
 #: js/toolbar.js:94
 #: js/toolbar.js:167
 #: js/toolbar.js:227
 #: js/toolbar.js:288
 msgid "English (United Kingdom)"
-msgstr "अंग्रेज़ी (यूनाइटेड किंगडम)"
+msgstr ""
 
 #: js/toolbar.js:95
 #: js/toolbar.js:168
 #: js/toolbar.js:228
 #: js/toolbar.js:289
 msgid "日本語"
-msgstr "जापानी"
+msgstr ""
 
 #: js/toolbar.js:96
 msgid "한국어"
-msgstr "कोरियाई"
+msgstr ""
 
 #: js/toolbar.js:97
 #: js/toolbar.js:170
 #: js/toolbar.js:230
 #: js/toolbar.js:291
 msgid "español"
-msgstr "स्पैनिश"
+msgstr ""
 
 #: js/toolbar.js:98
 #: js/toolbar.js:171
 #: js/toolbar.js:231
 #: js/toolbar.js:292
 msgid "português"
-msgstr "पुर्तगाली"
+msgstr ""
 
 #: js/toolbar.js:99
 #: js/toolbar.js:172
 #: js/toolbar.js:232
 #: js/toolbar.js:293
 msgid "にほんご"
-msgstr "जापानी"
+msgstr ""
 
 #: js/toolbar.js:100
 #: js/toolbar.js:173
 #: js/toolbar.js:233
 #: js/toolbar.js:294
 msgid "中文"
-msgstr "चीनी"
+msgstr ""
 
 #: js/toolbar.js:101
 #: js/toolbar.js:174
 #: js/toolbar.js:234
 #: js/toolbar.js:295
 msgid "ภาษาไทย"
-msgstr "थाई"
+msgstr ""
 
 #: js/toolbar.js:102
 #: js/toolbar.js:175
 #: js/toolbar.js:235
 #: js/toolbar.js:296
 msgid "aymara"
-msgstr "आयमारा"
+msgstr ""
 
 #: js/toolbar.js:103
 #: js/toolbar.js:176
 #: js/toolbar.js:236
 #: js/toolbar.js:297
 msgid "quechua"
-msgstr "केचुआ"
+msgstr ""
 
 #: js/toolbar.js:104
 #: js/toolbar.js:177
 #: js/toolbar.js:237
 #: js/toolbar.js:298
 msgid "guarani"
-msgstr "गुआरानी"
+msgstr ""
 
 #: js/toolbar.js:105
 #: js/toolbar.js:178
 #: js/toolbar.js:238
 #: js/toolbar.js:299
 msgid "हिंदी"
-msgstr "हिंदी"
+msgstr ""
 
 #: js/toolbar.js:106
 #: js/toolbar.js:180
 #: js/toolbar.js:239
 #: js/toolbar.js:301
 msgid "igbo"
-msgstr "इग्बो"
+msgstr ""
 
 #: js/toolbar.js:107
 #: js/toolbar.js:181
 #: js/toolbar.js:240
 #: js/toolbar.js:302
 msgid "عربى"
-msgstr "अरबी"
+msgstr ""
 
 #: js/toolbar.js:108
 #: js/toolbar.js:179
 #: js/toolbar.js:241
 #: js/toolbar.js:300
 msgid "తెలుగు"
-msgstr "तेलुगू"
+msgstr ""
 
 #: js/toolbar.js:109
 #: js/toolbar.js:182
 #: js/toolbar.js:242
 #: js/toolbar.js:303
 msgid "עִברִית"
-msgstr "हिब्रू"
+msgstr ""
 
 #: js/toolbar.js:110
 #: js/toolbar.js:183
 #: js/toolbar.js:243
 #: js/toolbar.js:304
 msgid "اردو"
-msgstr "उर्दू"
+msgstr ""
 
 #: js/toolbar.js:159
 #: js/toolbar.js:162
@@ -1829,7 +1830,7 @@ msgstr "टर्टल रैप चालू"
 
 #: js/toolbar.js:1143
 msgid "Are you sure you want to create a new project?"
-msgstr ""
+msgstr "क्या आप वाकई एक नया प्रोजेक्ट बनाना चाहते हैं?"
 
 #: js/turtle-singer.js:1365
 #.TRANS: partials are weighted components in a harmonic series
@@ -7955,12 +7956,12 @@ msgstr "सरकाय"
 #: js/turtles.js:900
 
 #~msgid "Clear Workspace"
-#~msgstr ""
+#~msgstr "कार्यस्थान साफ़ करें"
 
 #: js/turtles.js:905
 
 #~msgid "Are you sure you want to clear the workspace ?"
-#~msgstr ""
+#~msgstr "क्या आप वाकई कार्यस्थान साफ़ करना चाहते हैं?"
 
 #: js/utils/musicutils.js:1176
 
@@ -7970,7 +7971,7 @@ msgstr "सरकाय"
 #: js/utils/musicutils.js:1582
 
 #~msgid "Custom"
-#~msgstr ""
+#~msgstr "कस्टम"
 
 #: js/blocks/ExtrasBlocks.js:274
 
@@ -8006,7 +8007,8 @@ msgstr "सरकाय"
 #: js/blocks/MediaBlocks.js:692
 
 #~msgid "duration (ms)"
-#~msgstr ""
+#~msgstr "अवधि (मिलीसेकंड में)"
+
 
 #: js/blocks/GraphicsBlocks.js:373
 
@@ -8055,7 +8057,7 @@ msgstr "सरकाय"
 #: js/blocks/WidgetBlocks.js:1580
 
 #~msgid "aimusic"
-#~msgstr ""
+#~msgstr "एआई संगीत"
 
 #: js/turtleactions/IntervalsActions.js:119
 
