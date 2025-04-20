@@ -105,6 +105,7 @@ let MYDEFINES = [
     "activity/js-export/constraints",
     "activity/js-export/ASTutils",
     "activity/js-export/generate",
+    "activity/js-export/ast2blocklist",
     "activity/js-export/API/GraphicsBlocksAPI",
     "activity/js-export/API/PenBlocksAPI",
     "activity/js-export/API/RhythmBlocksAPI",
