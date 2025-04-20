@@ -41,9 +41,10 @@ describe("Palettes Class", () => {
     let mockActivity;
     let palettes;
 
+ 
     beforeEach(() => {
         const paletteMock = {
-            style: { visibility: "visible" },
+            style: { visibility: "visible", top: "100px" },
             children: [
                 {
                     children: [
@@ -61,7 +62,7 @@ describe("Palettes Class", () => {
                 }
             ]
         };
-
+        
         global.docById = jest.fn((id) => {
             if (id === "PaletteBody") {
                 return { parentNode: { removeChild: jest.fn() } };
@@ -76,12 +77,24 @@ describe("Palettes Class", () => {
             }
             return { style: {}, appendChild: jest.fn(), removeChild: jest.fn() };
         });
+
+        global.document.getElementById = global.docById;
     
         mockActivity = {
             cellSize: 50,
-            blocks: { protoBlockDict: {}, makeBlock: jest.fn(() => ({})) },
+            blocks: {
+                protoBlockDict: {
+                    "myDo_testAction": {},
+                    "myCalc_testAction": {},
+                    "myDoArg_testAction": {},
+                    "myCalcArg_testAction": {}
+                },
+                makeBlock: jest.fn(() => ({}))
+            },
             hideSearchWidget: jest.fn(),
             showSearchWidget: jest.fn(),
+            _hideMenus: jest.fn(),
+            showPalette: jest.fn(),
             palettes: {},
         };
         
@@ -110,6 +123,66 @@ describe("Palettes Class", () => {
         expect(spyHideMenus).toHaveBeenCalled();
     });
 
+    test("setSearch updates blaw", () => {
+        let paletteSearch = palettes.setSearch("show","hide");
+        expect(paletteSearch.activity.hideSearchWidget).toBe("hide");
+        expect(paletteSearch.activity.showSearchWidget).toBe("show");
+    });
+    test("getSearchPos updates", () => {
+        let searchPos = palettes.getSearchPos();
+        expect(searchPos).toStrictEqual([palettes.cellSize,palettes.top + palettes.cellSize * 1.75]);
+    });
+    test("getPluginMacroExpansion updates coordinates and returns the macro object", () => {
+
+        palettes.pluginMacros = {
+            myBlock: [
+                ["some", "macro", 0, 0]
+            ]
+        };
+      
+        const result = palettes.getPluginMacroExpansion("myBlock", 42, 99);
+      
+        expect(result).toEqual([["some", "macro", 42, 99]]);
+    });
+      
+    test("countProtoBlocks returns the number of protoblocks in the specified palette", () => {
+
+        mockActivity.blocks.protoBlockDict = {
+            blockA: { palette: { name: "alpha" } },
+            blockB: { palette: { name: "beta" } },
+            blockC: { palette: { name: "alpha" } },
+            blockD: { palette: null }
+        };
+
+        expect(palettes.countProtoBlocks("alpha")).toBe(2);
+    });
+    test("getProtoNameAndPalette returns correct block info when block is visible", () => {
+        palettes.activity = {
+            blocks: {
+                protoBlockDict: {
+                    foo: {
+                        name: "foo",
+                        hidden: false,
+                        palette: { name: "custom" }
+                    }
+                }
+            }
+        };
+      
+        const result = palettes.getProtoNameAndPalette("foo");
+      
+        expect(result).toEqual(["foo", "custom", "foo"]);
+    });
+    test("setBlocks sets the blocks and returns the instance", () => {
+        
+        const mockBlocks = [{ name: "block1" }, { name: "block2" }];
+      
+        const result = palettes.setBlocks(mockBlocks);
+      
+        expect(palettes.blocks).toEqual(mockBlocks);
+        expect(result).toBe(palettes);
+    });
+      
     test("getProtoNameAndPalette returns correct values", () => {
         mockActivity.blocks.protoBlockDict = {
             testBlock: { name: "testBlock", palette: { name: "testPalette" }, hidden: false }
@@ -125,7 +198,103 @@ describe("Palettes Class", () => {
         console.log("Visibility after show:", docById("palette").style.visibility);
         expect(docById("palette").style.visibility).toBe("visible");
     });
+    test("add name function check", () => {
+        const newPalette = palettes.add("User");
+        expect(newPalette.dict.User.name).toBe("User");
+    });
+    test("_loadPaletteButtonHandler sets event handlers for row", () => {
+        palettes.showPalette = jest.fn();
+        palettes._hideMenus = jest.fn();
+
+        const mockRow = {
+            onmouseover: null,
+            onmouseout: null,
+            onclick: null,
+            onmouseup: null,
+            onmouseleave: null,
+        };
+
+        mockRow.addEventListener = jest.fn((event, handler) => {
+            mockRow[event] = handler;
+        });
+
+        palettes._loadPaletteButtonHandler("search", mockRow);
+
+        mockRow.onmouseover();
+        expect(document.body.style.cursor).toBe("text");
+
+        mockRow.onclick();
+        expect(palettes._hideMenus).toHaveBeenCalled();
+        expect(mockActivity.showSearchWidget).toHaveBeenCalled();
+
+        palettes._loadPaletteButtonHandler("palette1", mockRow);
+        mockRow.onmouseover();
+        expect(document.body.style.cursor).toBe("pointer");
+
+        mockRow.onclick();
+        expect(palettes.showPalette).toHaveBeenCalledWith("palette1");
+
+        mockRow.onmouseup();
+        expect(document.body.style.cursor).toBe("default");
+
+        mockRow.onmouseleave();
+        expect(document.body.style.cursor).toBe("default");
+    });
+
+    test("removeActionPrototype removes the correct action block and updates palettes", () => {
+
+        const mockRemove = jest.fn();
+        palettes.dict = {
+            "action": {
+                protoList: [
+                    { name: "nameddo", defaults: ["testAction"] },
+                    { name: "namedcalc", defaults: ["otherAction"] }
+                ],
+                remove: mockRemove
+            }
+        };
+    
+
+        palettes.updatePalettes = jest.fn();
+    
+
+        palettes.removeActionPrototype("testAction");
+    
+
+        expect(mockRemove).toHaveBeenCalledWith(
+            { name: "nameddo", defaults: ["testAction"] },
+            "testAction"
+        );
+    
+
+
+        expect(mockActivity.blocks.protoBlockDict["myDo_testAction"]).toBe(undefined);
+        expect(mockActivity.blocks.protoBlockDict["myCalc_testAction"]).toStrictEqual({});
+        expect(mockActivity.blocks.protoBlockDict["myDoArg_testAction"]).toStrictEqual({});
+        expect(mockActivity.blocks.protoBlockDict["myCalcArg_testAction"]).toStrictEqual({});
+    
+
+        expect(palettes.updatePalettes).toHaveBeenCalledWith("action");
+    });
+    test("deltaY Method Updates Palette Position Correctly", () => {
+        const mockStyle = { top: "100px" };
+        global.docById = jest.fn((id) => {
+            if (id === "palette") {
+                return { style: mockStyle };
+            }
+            return null;
+        });
+
+        global.document.getElementById = global.docById;
+    
+        palettes.deltaY(30);
+    
+        expect(docById("palette").style.top).toBe("130px");
+    });
+
+    
 });
+
 
 describe("initPalettes function", () => {
     let palettes;
