@@ -1,3 +1,13 @@
+// Copyright (c) 2024 Walter Bender
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the The GNU Affero General Public
+// License as published by the Free Software Foundation; either
+// version 3 of the License, or (at your option) any later version.
+//
+// You should have received a copy of the GNU Affero General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
 /**
  * Keyboard navigation module for Music Blocks
@@ -22,7 +32,6 @@ class KeyboardNav {
         this.selectedBlockIndex = -1;
         this.visibleBlocks = [];
         this.isEnabled = false;
-        this.highlightColor = "#ff8c00"; // Orange highlight color
         this.lastSelectedBlock = null;
 
         // Key codes for navigation
@@ -30,6 +39,9 @@ class KeyboardNav {
         this.KEYCODE_UP = 38;
         this.KEYCODE_RIGHT = 39;
         this.KEYCODE_DOWN = 40;
+        this.KEYCODE_ENTER = 13;
+        this.KEYCODE_SPACE = 32;
+        this.KEYCODE_DELETE = 46;
         this.KEYCODE_ESC = 27;
 
         // Initialize keyboard event listeners
@@ -74,7 +86,7 @@ class KeyboardNav {
         
         if (this.isEnabled) {
             this.refreshVisibleBlocks();
-            this.activity.textMsg(_("Keyboard navigation enabled. Use arrow keys to navigate between blocks."));
+            this.activity.textMsg(_("Keyboard navigation enabled. Use arrow keys to navigate between blocks. Enter to click, Space to collapse, Ctrl+Delete to remove."));
             
             // Select the first block if none is selected
             if (this.selectedBlockIndex === -1 && this.visibleBlocks.length > 0) {
@@ -121,6 +133,13 @@ class KeyboardNav {
             return;
         }
 
+        // Get current block if one is selected
+        let currentBlock = null;
+        if (this.selectedBlockIndex !== -1) {
+            const blockIndex = this.visibleBlocks[this.selectedBlockIndex];
+            currentBlock = this.blocks.blockList[blockIndex];
+        }
+
         switch (event.keyCode) {
             case this.KEYCODE_RIGHT:
                 this.navigateNextBlock();
@@ -140,6 +159,27 @@ class KeyboardNav {
             case this.KEYCODE_DOWN:
                 this.navigateNextBlock();
                 event.preventDefault();
+                break;
+                
+            case this.KEYCODE_ENTER:
+                if (currentBlock) {
+                    this.activateBlock(currentBlock);
+                }
+                event.preventDefault();
+                break;
+                
+            case this.KEYCODE_SPACE:
+                if (currentBlock && currentBlock.isCollapsible()) {
+                    currentBlock.collapseToggle();
+                }
+                event.preventDefault();
+                break;
+                
+            case this.KEYCODE_DELETE:
+                if (currentBlock && event.ctrlKey) {
+                    this.deleteBlock(currentBlock);
+                    event.preventDefault();
+                }
                 break;
                 
             case this.KEYCODE_ESC:
@@ -188,7 +228,7 @@ class KeyboardNav {
     }
 
     /**
-     * Highlight the currently selected block
+     * Highlight the currently selected block using the built-in highlight mechanism
      */
     highlightSelectedBlock() {
         if (this.selectedBlockIndex === -1 || this.selectedBlockIndex >= this.visibleBlocks.length) {
@@ -205,11 +245,14 @@ class KeyboardNav {
         // Save the current block for reference
         this.lastSelectedBlock = block;
         
-        // Add visual highlight
-        block.container.addChild(this.createHighlightBox(block));
+        // Use the built-in highlight method
+        block.highlight();
         
         // Move block to foreground
         this.blocks.raiseStackToTop(blockIndex);
+        
+        // Ensure the block is visible in the viewport
+        this.scrollToBlock(block);
         
         // Update the blocks.activeBlock
         this.blocks.activeBlock = blockIndex;
@@ -219,50 +262,126 @@ class KeyboardNav {
     }
 
     /**
-     * Create a highlight box around the selected block
-     * @param {object} block - The block to highlight
-     * @returns {object} - The highlight shape
-     */
-    createHighlightBox(block) {
-        // Create highlight
-        const highlight = new createjs.Shape();
-        highlight.name = "highlight";
-        
-        // Calculate bounds
-        const bounds = block.container.getBounds();
-        if (!bounds) {
-            return highlight;
-        }
-        
-        // Draw highlight rectangle
-        highlight.graphics
-            .setStrokeStyle(3)
-            .beginStroke(this.highlightColor)
-            .drawRect(
-                bounds.x - 5,
-                bounds.y - 5,
-                bounds.width + 10,
-                bounds.height + 10
-            );
-        
-        return highlight;
-    }
-
-    /**
      * Remove highlight from the selected block
      */
     unhighlightSelectedBlock() {
-        if (this.lastSelectedBlock && this.lastSelectedBlock.container) {
-            // Find and remove highlight
-            const highlight = this.lastSelectedBlock.container.children.find(
-                child => child.name === "highlight"
-            );
+        if (this.lastSelectedBlock) {
+            // Use the built-in unhighlight method
+            this.lastSelectedBlock.unhighlight();
+            this.activity.refreshCanvas();
+        }
+    }
+
+    /**
+     * Ensure the block is visible by scrolling if necessary
+     * @param {object} block - The block to scroll to
+     */
+    scrollToBlock(block) {
+        if (!block.container) {
+            return;
+        }
+        
+        const blockX = block.container.x;
+        const blockY = block.container.y;
+        const containerX = this.activity.blocksContainer.x;
+        const containerY = this.activity.blocksContainer.y;
+        const canvasWidth = this.activity.canvas.width;
+        const canvasHeight = this.activity.canvas.height;
+        
+        // Calculate block dimensions (approximated)
+        const blockWidth = block.width || 200;
+        const blockHeight = block.height || 100;
+        
+        // Calculate visible area boundaries
+        const leftBoundary = -containerX;
+        const rightBoundary = -containerX + canvasWidth;
+        const topBoundary = -containerY;
+        const bottomBoundary = -containerY + canvasHeight;
+        
+        let newContainerX = containerX;
+        let newContainerY = containerY;
+        
+        // Check if block is outside visible area horizontally
+        if (blockX < leftBoundary + 50) {
+            newContainerX = -blockX + 50;
+        } else if (blockX + blockWidth > rightBoundary - 50) {
+            newContainerX = -(blockX + blockWidth - canvasWidth + 50);
+        }
+        
+        // Check if block is outside visible area vertically
+        if (blockY < topBoundary + 50) {
+            newContainerY = -blockY + 50;
+        } else if (blockY + blockHeight > bottomBoundary - 50) {
+            newContainerY = -(blockY + blockHeight - canvasHeight + 50);
+        }
+        
+        // Apply new position if changed
+        if (newContainerX !== containerX || newContainerY !== containerY) {
+            this.activity.blocksContainer.x = newContainerX;
+            this.activity.blocksContainer.y = newContainerY;
+        }
+    }
+
+    /**
+     * Simulate a click or action on a block
+     * @param {object} block - The block to activate
+     */
+    activateBlock(block) {
+        if (!block) {
+            return;
+        }
+        
+        // Toggle the block's collapsed state if it's collapsible
+        if (block.isCollapsible()) {
+            block.collapseToggle();
+        } else {
+            // For blocks that have special actions
+            if (block.name === "start" || block.name === "drum") {
+                this.activity._doFastButton();
+            }
             
-            if (highlight) {
-                this.lastSelectedBlock.container.removeChild(highlight);
-                this.activity.refreshCanvas();
+            // Simulate a click at the center of the block
+            if (block.container) {
+                // Update the run button state if needed
+                this.activity.setPlaybackStatus();
             }
         }
+    }
+
+    /**
+     * Delete a block and its connected blocks
+     * @param {object} block - The block to delete
+     */
+    deleteBlock(block) {
+        if (!block) {
+            return;
+        }
+        
+        // Find the block index
+        const blockIndex = this.blocks.blockList.indexOf(block);
+        if (blockIndex === -1) {
+            return;
+        }
+        
+        // Store the previous selection
+        const currentSelection = this.selectedBlockIndex;
+        
+        // Send the block to trash
+        this.blocks.sendStackToTrash(blockIndex);
+        
+        // Refresh the block list
+        this.refreshVisibleBlocks();
+        
+        // Try to select a nearby block
+        if (this.visibleBlocks.length > 0) {
+            this.selectedBlockIndex = Math.min(currentSelection, this.visibleBlocks.length - 1);
+            this.highlightSelectedBlock();
+        } else {
+            this.selectedBlockIndex = -1;
+        }
+        
+        // Notify user
+        this.activity.textMsg(_("Block moved to trash."));
     }
 }
 
@@ -270,12 +389,12 @@ class KeyboardNav {
 if (typeof window !== 'undefined') {
     window.KeyboardNav = KeyboardNav;
     
-    // Simple initialization when activity is ready
+    // Initialize when activity is ready
     window.addEventListener('load', () => {
         setTimeout(() => {
             if (window.activity && window.activity.blocks) {
                 window.activity.keyboardNav = new KeyboardNav(window.activity, window.activity.blocks);
-                console.log('Basic keyboard navigation initialized. Press Alt+K to enable.');
+                console.log('Keyboard navigation initialized. Press Alt+K to enable.');
             }
         }, 2000);
     });
