@@ -457,3 +457,5 @@ function setupRhythmActions(activity) {
         }
     };
 }
+
+module.exports = { setupRhythmActions };

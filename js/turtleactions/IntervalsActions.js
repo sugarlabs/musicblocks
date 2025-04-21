@@ -192,7 +192,13 @@ function setupIntervalsActions(activity) {
          * @returns {String}
          */
         static getCurrentMode(turtle) {
-            return activity.turtles.ithTurtle(turtle).singer.keySignature.split(" ")[1];
+            const keySignature = activity.turtles.ithTurtle(turtle).singer.keySignature;
+            // guard against null/undefined/non‐string
+            if (!keySignature || typeof keySignature !== "string") {
+                return "";
+            }
+            const parts = keySignature.split(" ");
+            return parts.slice(1).join(" ") || "";
         }
 
         /**
@@ -457,3 +463,5 @@ function setupIntervalsActions(activity) {
         }
     };
 }
+
+module.exports = setupIntervalsActions;

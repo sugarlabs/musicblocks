@@ -322,13 +322,13 @@ function setupPitchActions(activity) {
                 switch (accidental) {
                     case _("sharp"):
                         value = 1;
-                        return;
+                        break;
                     case _("flat"):
                         value = -1;
-                        return;
+                        break;
                     default:
                         value = 0;
-                        return;
+                        break;
                 }
             } else {
                 value = ACCIDENTALVALUES[i];

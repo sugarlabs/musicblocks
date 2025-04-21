@@ -174,9 +174,11 @@ function setupDictActions(activity) {
             this_dict["y"] = activity.turtles.screenY2turtleY(targetTur.container.y);
             this_dict["x"] = activity.turtles.screenX2turtleX(targetTur.container.x);
 
-            if (target in activity.logo.turtleDicts[turtle]) {
-                for (const key in activity.logo.turtleDicts[turtle][target]) {
-                    this_dict[key] = activity.logo.turtleDicts[turtle][target][key];
+            // Safely handle when no custom dicts have been set for this turtle
+            const tdicts = activity.logo.turtleDicts[turtle] || {};
+            if (target in tdicts) {
+                for (const key in tdicts[target]) {
+                    this_dict[key] = tdicts[target][key];
                 }
             }
             return JSON.stringify(this_dict);

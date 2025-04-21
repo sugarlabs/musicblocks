@@ -965,7 +965,7 @@ function Synth() {
             link.click();
             document.body.removeChild(link);
             // eslint-disable-next-line no-delete-var
-            delete link;
+            link = null;
         };
         this.recorder.onstop = () => {
             if (!chunks.length) return;

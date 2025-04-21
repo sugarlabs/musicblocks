@@ -18,84 +18,286 @@
  */
 
 const setupOrnamentActions = require("../OrnamentActions");
+
 describe("OrnamentActions", () => {
-    let activity, turtleMock;
+    let activity, turtle, dispatchCalls, listenerCalls, beginSlurCalls, endSlurCalls, mouseMB, listenerFunctions;
 
     beforeEach(() => {
-        global.Singer = {
-            OrnamentActions: null,
-        };
+        // Setup test data and state tracking variables
+        dispatchCalls = [];
+        listenerCalls = [];
+        beginSlurCalls = [];
+        endSlurCalls = [];
+        listenerFunctions = {};
+        mouseMB = { listeners: [] };
+        
+        global.Singer = { OrnamentActions: null };
 
-        turtleMock = {
+        turtle = {
             singer: {
                 staccato: [],
                 justCounting: [],
                 inNeighbor: [],
                 neighborStepPitch: [],
                 neighborNoteValue: [],
-            },
+            }
         };
 
         activity = {
             turtles: {
-                ithTurtle: jest.fn(() => turtleMock),
+                ithTurtle: function(index) {
+                    return turtle;
+                }
             },
             blocks: {
-                blockList: { 1: {} },
+                blockList: { 1: {}, 2: {} }
             },
             logo: {
-                setDispatchBlock: jest.fn(),
-                setTurtleListener: jest.fn(),
-                notation: {
-                    notationBeginSlur: jest.fn(),
-                    notationEndSlur: jest.fn(),
+                setDispatchBlock: function(blk, turtleIndex, listenerName) {
+                    dispatchCalls.push({ blk, turtleIndex, listenerName });
                 },
-            },
+                setTurtleListener: function(turtleIndex, listenerName, listener) {
+                    listenerCalls.push({ turtleIndex, listenerName });
+                    listenerFunctions[listenerName] = listener;
+                },
+                notation: {
+                    notationBeginSlur: function(turtleIndex) {
+                        beginSlurCalls.push(turtleIndex);
+                    },
+                    notationEndSlur: function(turtleIndex) {
+                        endSlurCalls.push(turtleIndex);
+                    }
+                }
+            }
         };
 
         global.MusicBlocks = { isRun: true };
         global.Mouse = {
-            getMouseFromTurtle: jest.fn(() => ({
-                MB: { listeners: [] },
-            })),
+            getMouseFromTurtle: function(t) {
+                return { MB: mouseMB };
+            }
         };
+        
         setupOrnamentActions(activity);
     });
 
-    test("setStaccato sets up staccato properly", () => {
+    // Test setStaccato method
+    test("setStaccato with block defined", () => {
+        // Call the method
         Singer.OrnamentActions.setStaccato(2, 0, 1);
-        expect(turtleMock.singer.staccato).toContain(1 / 2);
-        expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_staccato_0");
-        expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
-            0,
-            "_staccato_0",
-            expect.any(Function)
-        );
+        
+        // Verify state
+        expect(turtle.singer.staccato).toEqual([0.5]);
+        expect(dispatchCalls).toEqual([{ blk: 1, turtleIndex: 0, listenerName: "_staccato_0" }]);
+        expect(listenerCalls).toEqual([{ turtleIndex: 0, listenerName: "_staccato_0" }]);
+        
+        // Call the listener function to test it
+        const listener = listenerFunctions["_staccato_0"];
+        listener();
+        
+        // Verify updated state
+        expect(turtle.singer.staccato).toEqual([]);
+    });
+    
+    test("setStaccato with block undefined and MusicBlocks.isRun true", () => {
+        // Call the method
+        Singer.OrnamentActions.setStaccato(2, 0, undefined);
+        
+        // Verify state
+        expect(turtle.singer.staccato).toEqual([0.5]);
+        expect(dispatchCalls).toEqual([]);
+        expect(listenerCalls).toEqual([{ turtleIndex: 0, listenerName: "_staccato_0" }]);
+        expect(mouseMB.listeners).toContain("_staccato_0");
+        
+        // Call the listener function to test it
+        const listener = listenerFunctions["_staccato_0"];
+        listener();
+        
+        // Verify updated state
+        expect(turtle.singer.staccato).toEqual([]);
+    });
+    
+    test("setStaccato with null mouse", () => {
+        // Setup Mouse object to return null
+        const originalGetMouse = global.Mouse.getMouseFromTurtle;
+        global.Mouse.getMouseFromTurtle = function() { return null; };
+        
+        // Call the method
+        Singer.OrnamentActions.setStaccato(2, 0, undefined);
+        
+        // Verify state
+        expect(turtle.singer.staccato).toEqual([0.5]);
+        expect(dispatchCalls).toEqual([]);
+        expect(listenerCalls).toEqual([{ turtleIndex: 0, listenerName: "_staccato_0" }]);
+        
+        // Call the listener function to test it
+        const listener = listenerFunctions["_staccato_0"];
+        listener();
+        
+        // Verify updated state
+        expect(turtle.singer.staccato).toEqual([]);
+        
+        // Restore original function
+        global.Mouse.getMouseFromTurtle = originalGetMouse;
     });
 
-    test("setSlur sets up slur properly", () => {
+    // Test setSlur method
+    test("setSlur with block defined", () => {
+        // Call the method
         Singer.OrnamentActions.setSlur(2, 0, 1);
-        expect(turtleMock.singer.staccato).toContain(-1 / 2);
-        expect(activity.logo.notation.notationBeginSlur).toHaveBeenCalledWith(0);
-        expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_staccato_0");
-        expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
-            0,
-            "_staccato_0",
-            expect.any(Function)
-        );
+        
+        // Verify state
+        expect(turtle.singer.staccato).toEqual([-0.5]);
+        expect(beginSlurCalls).toEqual([0]);
+        expect(dispatchCalls).toEqual([{ blk: 1, turtleIndex: 0, listenerName: "_staccato_0" }]);
+        expect(listenerCalls).toEqual([{ turtleIndex: 0, listenerName: "_staccato_0" }]);
+        
+        // Call the listener function to test it
+        const listener = listenerFunctions["_staccato_0"];
+        listener();
+        
+        // Verify updated state
+        expect(turtle.singer.staccato).toEqual([]);
+        expect(endSlurCalls).toEqual([0]);
+    });
+    
+    test("setSlur with block undefined and MusicBlocks.isRun true", () => {
+        // Call the method
+        Singer.OrnamentActions.setSlur(2, 0, undefined);
+        
+        // Verify state
+        expect(turtle.singer.staccato).toEqual([-0.5]);
+        expect(beginSlurCalls).toEqual([0]);
+        expect(dispatchCalls).toEqual([]);
+        expect(listenerCalls).toEqual([{ turtleIndex: 0, listenerName: "_staccato_0" }]);
+        expect(mouseMB.listeners).toContain("_staccato_0");
+        
+        // Call the listener function to test it
+        const listener = listenerFunctions["_staccato_0"];
+        listener();
+        
+        // Verify updated state
+        expect(turtle.singer.staccato).toEqual([]);
+        expect(endSlurCalls).toEqual([0]);
+    });
+    
+    test("setSlur with null mouse", () => {
+        // Setup Mouse object to return null
+        const originalGetMouse = global.Mouse.getMouseFromTurtle;
+        global.Mouse.getMouseFromTurtle = function() { return null; };
+        
+        // Call the method
+        Singer.OrnamentActions.setSlur(2, 0, undefined);
+        
+        // Verify state
+        expect(turtle.singer.staccato).toEqual([-0.5]);
+        expect(beginSlurCalls).toEqual([0]);
+        expect(dispatchCalls).toEqual([]);
+        expect(listenerCalls).toEqual([{ turtleIndex: 0, listenerName: "_staccato_0" }]);
+        
+        // Call the listener function to test it
+        const listener = listenerFunctions["_staccato_0"];
+        listener();
+        
+        // Verify updated state
+        expect(turtle.singer.staccato).toEqual([]);
+        expect(endSlurCalls).toEqual([0]);
+        
+        // Restore original function
+        global.Mouse.getMouseFromTurtle = originalGetMouse;
+    });
+    
+    test("setSlur with justCounting not empty", () => {
+        // Setup justCounting
+        turtle.singer.justCounting = [1];
+        
+        // Call the method
+        Singer.OrnamentActions.setSlur(2, 0, 1);
+        
+        // Verify state
+        expect(turtle.singer.staccato).toEqual([-0.5]);
+        expect(beginSlurCalls).toEqual([]);
+        expect(dispatchCalls).toEqual([{ blk: 1, turtleIndex: 0, listenerName: "_staccato_0" }]);
+        expect(listenerCalls).toEqual([{ turtleIndex: 0, listenerName: "_staccato_0" }]);
+        
+        // Call the listener function to test it
+        const listener = listenerFunctions["_staccato_0"];
+        listener();
+        
+        // Verify updated state
+        expect(turtle.singer.staccato).toEqual([]);
+        expect(endSlurCalls).toEqual([]);
     });
 
-    test("doNeighbor sets up neighbor action properly", () => {
+    // Test doNeighbor method
+    test("doNeighbor with block defined", () => {
+        // Call the method
         Singer.OrnamentActions.doNeighbor(3, 4, 0, 1);
-        expect(turtleMock.singer.inNeighbor).toContain(1);
-        expect(turtleMock.singer.neighborStepPitch).toContain(3);
-        expect(turtleMock.singer.neighborNoteValue).toContain(4);
-        expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, "_neighbor_0_1");
-        expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
-            0,
-            "_neighbor_0_1",
-            expect.any(Function)
-        );
+        
+        // Verify state
+        expect(turtle.singer.inNeighbor).toEqual([1]);
+        expect(turtle.singer.neighborStepPitch).toEqual([3]);
+        expect(turtle.singer.neighborNoteValue).toEqual([4]);
+        expect(dispatchCalls).toEqual([{ blk: 1, turtleIndex: 0, listenerName: "_neighbor_0_1" }]);
+        expect(listenerCalls).toEqual([{ turtleIndex: 0, listenerName: "_neighbor_0_1" }]);
+        
+        // Call the listener function to test it
+        const listener = listenerFunctions["_neighbor_0_1"];
+        listener();
+        
+        // Verify updated state
+        expect(turtle.singer.inNeighbor).toEqual([]);
+        expect(turtle.singer.neighborStepPitch).toEqual([]);
+        expect(turtle.singer.neighborNoteValue).toEqual([]);
+    });
+    
+    test("doNeighbor with block undefined and MusicBlocks.isRun true", () => {
+        // Call the method
+        Singer.OrnamentActions.doNeighbor(3, 4, 0, undefined);
+        
+        // Verify state
+        expect(turtle.singer.inNeighbor).toEqual([undefined]);
+        expect(turtle.singer.neighborStepPitch).toEqual([3]);
+        expect(turtle.singer.neighborNoteValue).toEqual([4]);
+        expect(dispatchCalls).toEqual([]);
+        expect(listenerCalls).toEqual([{ turtleIndex: 0, listenerName: "_neighbor_0_undefined" }]);
+        expect(mouseMB.listeners).toContain("_neighbor_0_undefined");
+        
+        // Call the listener function to test it
+        const listener = listenerFunctions["_neighbor_0_undefined"];
+        listener();
+        
+        // Verify updated state
+        expect(turtle.singer.inNeighbor).toEqual([]);
+        expect(turtle.singer.neighborStepPitch).toEqual([]);
+        expect(turtle.singer.neighborNoteValue).toEqual([]);
+    });
+    
+    test("doNeighbor with null mouse", () => {
+        // Setup Mouse object to return null
+        const originalGetMouse = global.Mouse.getMouseFromTurtle;
+        global.Mouse.getMouseFromTurtle = function() { return null; };
+        
+        // Call the method
+        Singer.OrnamentActions.doNeighbor(3, 4, 0, undefined);
+        
+        // Verify state
+        expect(turtle.singer.inNeighbor).toEqual([undefined]);
+        expect(turtle.singer.neighborStepPitch).toEqual([3]);
+        expect(turtle.singer.neighborNoteValue).toEqual([4]);
+        expect(dispatchCalls).toEqual([]);
+        expect(listenerCalls).toEqual([{ turtleIndex: 0, listenerName: "_neighbor_0_undefined" }]);
+        
+        // Call the listener function to test it
+        const listener = listenerFunctions["_neighbor_0_undefined"];
+        listener();
+        
+        // Verify updated state
+        expect(turtle.singer.inNeighbor).toEqual([]);
+        expect(turtle.singer.neighborStepPitch).toEqual([]);
+        expect(turtle.singer.neighborNoteValue).toEqual([]);
+        
+        // Restore original function
+        global.Mouse.getMouseFromTurtle = originalGetMouse;
     });
 });
-
