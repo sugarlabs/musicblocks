@@ -107,49 +107,19 @@ describe("setupDictActions", () => {
     });
 
     describe("_GetDict", () => {
-        it("should get the turtle color correctly", () => {
-            const color = Turtle.DictActions._GetDict(0, turtle, "color");
-            expect(color).toBe("red");
-        });
-        
-        it("should get the turtle shade correctly", () => {
-            const shade = Turtle.DictActions._GetDict(0, turtle, "shade");
-            expect(shade).toBe(10);
-        });
-        
-        it("should get the turtle grey correctly", () => {
-            const grey = Turtle.DictActions._GetDict(0, turtle, "grey");
-            expect(grey).toBe(0.5);
-        });
-        
-        it("should get the turtle pen size correctly", () => {
-            const penSize = Turtle.DictActions._GetDict(0, turtle, "pen size");
-            expect(penSize).toBe(2);
-        });
-        
-        it("should get the turtle font correctly", () => {
-            const font = Turtle.DictActions._GetDict(0, turtle, "font");
-            expect(font).toBe("Arial");
-        });
-        
-        it("should get the turtle heading correctly", () => {
-            const heading = Turtle.DictActions._GetDict(0, turtle, "heading");
-            expect(heading).toBe(90);
-        });
-        
-        it("should get the turtle x position correctly", () => {
-            const x = Turtle.DictActions._GetDict(0, turtle, "x");
-            expect(x).toBe(100);
-        });
-        
-        it("should get the turtle y position correctly", () => {
-            const y = Turtle.DictActions._GetDict(0, turtle, "y");
-            expect(y).toBe(200);
-        });
-        
-        it("should get the notes played correctly", () => {
-            const notesPlayed = Turtle.DictActions._GetDict(0, turtle, "notes played");
-            expect(notesPlayed).toBe(0.5);
+        const simpleGetTests = [
+            ["color", "red"],
+            ["shade", 10],
+            ["grey", 0.5],
+            ["pen size", 2],
+            ["font", "Arial"],
+            ["heading", 90],
+            ["x", 100],
+            ["y", 200],
+            ["notes played", 0.5]
+        ];
+        test.each(simpleGetTests)("should get %s correctly", (key, expected) => {
+            expect(Turtle.DictActions._GetDict(0, turtle, key)).toBe(expected);
         });
         
         it("should get the note value correctly", () => {
@@ -191,44 +161,19 @@ describe("setupDictActions", () => {
     });
 
     describe("SetDictValue", () => {
-        it("should set the turtle color correctly", () => {
-            Turtle.DictActions.SetDictValue(0, turtle, "color", "blue");
-            expect(targetTurtle.painter.doSetColor).toHaveBeenCalledWith("blue");
-        });
-        
-        it("should set the turtle shade correctly", () => {
-            Turtle.DictActions.SetDictValue(0, turtle, "shade", 20);
-            expect(targetTurtle.painter.doSetValue).toHaveBeenCalledWith(20);
-        });
-        
-        it("should set the turtle grey correctly", () => {
-            Turtle.DictActions.SetDictValue(0, turtle, "grey", 0.7);
-            expect(targetTurtle.painter.doSetChroma).toHaveBeenCalledWith(0.7);
-        });
-        
-        it("should set the turtle pen size correctly", () => {
-            Turtle.DictActions.SetDictValue(0, turtle, "pen size", 5);
-            expect(targetTurtle.painter.doSetPensize).toHaveBeenCalledWith(5);
-        });
-        
-        it("should set the turtle font correctly", () => {
-            Turtle.DictActions.SetDictValue(0, turtle, "font", "Times New Roman");
-            expect(targetTurtle.painter.doSetFont).toHaveBeenCalledWith("Times New Roman");
-        });
-        
-        it("should set the turtle heading correctly", () => {
-            Turtle.DictActions.SetDictValue(0, turtle, "heading", 180);
-            expect(targetTurtle.painter.doSetHeading).toHaveBeenCalledWith(180);
-        });
-        
-        it("should set the turtle x position correctly", () => {
-            Turtle.DictActions.SetDictValue(0, turtle, "x", 150);
-            expect(targetTurtle.painter.doSetXY).toHaveBeenCalledWith(150, 200);
-        });
-        
-        it("should set the turtle y position correctly", () => {
-            Turtle.DictActions.SetDictValue(0, turtle, "y", 250);
-            expect(targetTurtle.painter.doSetXY).toHaveBeenCalledWith(100, 250);
+        const setValueTests = [
+            ["color", "blue", "doSetColor", ["blue"]],
+            ["shade", 20, "doSetValue", [20]],
+            ["grey", 0.7, "doSetChroma", [0.7]],
+            ["pen size", 5, "doSetPensize", [5]],
+            ["font", "Times New Roman", "doSetFont", ["Times New Roman"]],
+            ["heading", 180, "doSetHeading", [180]],
+            ["x", 150, "doSetXY", [150, 200]],
+            ["y", 250, "doSetXY", [100, 250]]
+        ];
+        test.each(setValueTests)("should set %s correctly", (key, value, method, args) => {
+            Turtle.DictActions.SetDictValue(0, turtle, key, value);
+            expect(targetTurtle.painter[method]).toHaveBeenCalledWith(...args);
         });
     });
 
