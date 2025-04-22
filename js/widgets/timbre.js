@@ -2481,7 +2481,7 @@ class TimbreWidget {
                             i +
                             '"><span></span></div><div class="insideDivEffects"><input type="range" id="myRangeFx' +
                             i +
-                            '" class="sliders" style="margin-top:20px" value="2"><span id="myspanFx' +
+                            '" class="sliders" style="margin-top:20px" min="0" max="1000" value="2"><span id="myspanFx' +
                             i +
                             '" class="rangeslidervalue">2</span></div></div>';
                     }
@@ -2494,8 +2494,8 @@ class TimbreWidget {
                     docById("myRangeFx1").value = 3;
                     docById("myspanFx1").textContent = "3";
                     docById("sFx2").textContent = _("base frequency");
-                    docById("myRangeFx2").value = 100;
-                    docById("myspanFx2").textContent = "100";
+                    docById("myRangeFx2").value = 1000;
+                    docById("myspanFx2").textContent = "1000";
 
                     if (this.phaserEffect.length !== 0) {
                         blockValue = this.phaserEffect.length - 1;
