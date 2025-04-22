@@ -21,11 +21,16 @@ const Notation = require("../notation");
 const { durationToNoteValue, convertFactor } = require("../utils/musicutils");
 global.convertFactor = convertFactor;
 global.durationToNoteValue = durationToNoteValue;
+global.toFixed2 = jest.fn(n => n.toFixed(2));
+global.getDrumSymbol = jest.fn(drum => `DRUM_${drum}`);
+global.last = jest.fn(arr => arr[arr.length - 1]);
+global.rationalToFraction = jest.fn().mockReturnValue([1, 4]);
 
 jest.mock("../utils/musicutils.js", function() {
     return {
         durationToNoteValue: jest.fn().mockReturnValue([1, 1, 1, 1]),
         convertFactor: jest.fn().mockReturnValue(4),
+        getDrumSymbol: jest.fn(drum => `DRUM_${drum}`)
     };
 });
 
@@ -48,8 +53,12 @@ describe("Notation Class", () => {
         notation = new Notation(mockActivity);
         notation._notationStaging = [[]];
         notation._notationStaging["turtle1"] = [];
+        notation._notationDrumStaging = {};
         notation._notationDrumStaging["turtle1"] = [];
+        notation._markup = {};
+        notation._pickupPOW2 = {};
         notation._pickupPOW2["turtle1"] = false;
+        notation._pickupPoint = {};
         notation._pickupPoint["turtle1"] = null;
     });
 
@@ -145,6 +154,191 @@ describe("Notation Class", () => {
             const factor = 0;
             notation.notationPickup(turtle, factor);
             expect(notation._notationStaging[turtle].length).toBe(0);
+        });
+    });
+
+    describe("Slur and Articulation Methods", () => {
+        it("should handle begin and end slur", () => {
+            const turtle = "turtle1";
+            
+            notation.notationBeginSlur(turtle);
+            expect(notation._notationStaging[turtle]).toEqual(["begin slur"]);
+            expect(notation._pickupPoint[turtle]).toBeNull();
+            
+            notation.notationEndSlur(turtle);
+            expect(notation._notationStaging[turtle]).toEqual(["begin slur", "end slur"]);
+            expect(notation._pickupPoint[turtle]).toBeNull();
+        });
+
+        it("should handle tie insertion and removal", () => {
+            const turtle = "turtle1";
+            
+            notation.notationInsertTie(turtle);
+            expect(notation._notationStaging[turtle]).toEqual(["tie"]);
+            
+            notation.notationRemoveTie(turtle);
+            expect(notation._notationStaging[turtle]).toEqual([]);
+        });
+
+        it("should handle begin and end articulation", () => {
+            const turtle = "turtle1";
+            
+            notation.notationBeginArticulation(turtle);
+            expect(notation._notationStaging[turtle]).toEqual(["begin articulation"]);
+            
+            notation.notationEndArticulation(turtle);
+            expect(notation._notationStaging[turtle]).toEqual(["begin articulation", "end articulation"]);
+        });
+    });
+
+    describe("Crescendo and Harmonics Methods", () => {
+        it("should handle begin and end crescendo", () => {
+            const turtle = "turtle1";
+            
+            notation.notationBeginCrescendo(turtle, 1);
+            expect(notation._notationStaging[turtle]).toEqual(["begin crescendo"]);
+            
+            notation.notationEndCrescendo(turtle, 1);
+            expect(notation._notationStaging[turtle]).toEqual(["begin crescendo", "end crescendo"]);
+        });
+
+        it("should handle begin and end decrescendo", () => {
+            const turtle = "turtle1";
+            
+            notation.notationBeginCrescendo(turtle, -1);
+            expect(notation._notationStaging[turtle]).toEqual(["begin decrescendo"]);
+            
+            notation.notationEndCrescendo(turtle, -1);
+            expect(notation._notationStaging[turtle]).toEqual(["begin decrescendo", "end decrescendo"]);
+        });
+
+        it("should handle begin and end harmonics", () => {
+            const turtle = "turtle1";
+            
+            notation.notationBeginHarmonics(turtle);
+            expect(notation._notationStaging[turtle]).toEqual(["begin harmonics"]);
+            
+            notation.notationEndHarmonics(turtle);
+            expect(notation._notationStaging[turtle]).toEqual(["begin harmonics", "end harmonics"]);
+        });
+    });
+
+    describe("Key and Line Break Methods", () => {
+        it("should set key and mode in notation", () => {
+            const turtle = "turtle1";
+            const key = "C";
+            const mode = "major";
+            
+            notation.notationKey(turtle, key, mode);
+            expect(notation._notationStaging[turtle]).toEqual(["key", "C", "major"]);
+            expect(notation._pickupPoint[turtle]).toBeNull();
+        });
+
+        it("should handle line breaks", () => {
+            const turtle = "turtle1";
+            const prevPickupPoint = notation._pickupPoint[turtle];
+            
+            notation.notationLineBreak(turtle);
+            // Line break doesn't add to the notation staging, but nullifies pickup point
+            expect(notation._pickupPoint[turtle]).toBeNull();
+        });
+    });
+
+    describe("Voice Methods", () => {
+        it("should add all possible voices", () => {
+            const turtle = "turtle1";
+            
+            notation.notationVoices(turtle, 1);
+            expect(notation._notationStaging[turtle]).toContain("voice one");
+            notation._notationStaging[turtle] = [];
+            
+            notation.notationVoices(turtle, 2);
+            expect(notation._notationStaging[turtle]).toContain("voice two");
+            notation._notationStaging[turtle] = [];
+            
+            notation.notationVoices(turtle, 3);
+            expect(notation._notationStaging[turtle]).toContain("voice three");
+            notation._notationStaging[turtle] = [];
+            
+            notation.notationVoices(turtle, 4);
+            expect(notation._notationStaging[turtle]).toContain("voice four");
+            notation._notationStaging[turtle] = [];
+            
+            notation.notationVoices(turtle, 5); // Invalid voice number
+            expect(notation._notationStaging[turtle]).toContain("one voice");
+        });
+    });
+
+    describe("Complex Notation Scenarios", () => {
+        it("should handle meter setting with pickup point", () => {
+            const turtle = "turtle1";
+            
+            // First set pickup point to a non-null value
+            notation._pickupPoint[turtle] = 2;
+            notation._notationStaging[turtle] = ["note1", "note2", "note3", "note4"];
+            
+            notation.notationMeter(turtle, 4, 4);
+            
+            // After setting meter, the notation staging should have meter before the pickup elements
+            expect(notation._notationStaging[turtle]).toContainEqual("meter");
+            expect(notation._pickupPoint[turtle]).toBeNull();
+        });
+
+        it("should handle doUpdateNotation with markup", () => {
+            const turtle = "turtle1";
+            const note = ["C4", "E4", "G4"]; // Object (array) for a chord
+            const duration = 4;
+            const insideChord = false;
+            const drum = [];
+            
+            // Add some markup
+            notation._markup[turtle] = [440, "accent"];
+            
+            // Spy on _notationMarkup method
+            jest.spyOn(notation, "_notationMarkup");
+            
+            notation.doUpdateNotation(note, duration, turtle, insideChord, drum);
+            
+            // Should have called _notationMarkup for each markup item
+            expect(notation._notationMarkup).toHaveBeenCalled();
+            expect(notation._markup[turtle]).toEqual([]);
+        });
+    });
+
+    describe("Additional Edge Cases", () => {
+        it("should handle doUpdateNotation with drum", () => {
+            const turtle = "turtle1";
+            const note = "C4";
+            const duration = 4;
+            const insideChord = false;
+            const drum = ["kick"]; // A drum to be added
+            
+            notation.doUpdateNotation(note, duration, turtle, insideChord, drum);
+            
+            // Should have added the drum to _notationDrumStaging
+            expect(notation._notationDrumStaging[turtle].length).toBe(1);
+        });
+
+        it("should handle notationTempo with null beat value", () => {
+            const turtle = "turtle1";
+            const bpm = 120;
+            
+            // Mock convertFactor to return null
+            require("../utils/musicutils").convertFactor.mockReturnValueOnce(null);
+            
+            notation.notationTempo(turtle, bpm, 3);
+            
+            // Should not add anything to notation staging with null beat
+            expect(notation._notationStaging[turtle].length).toBe(0);
+        });
+
+        it("should handle __notationHarmonic method", () => {
+            const turtle = "turtle1";
+            
+            notation.__notationHarmonic(turtle);
+            
+            // __notationHarmonic pushes to _notationStaging without turtle index
+            expect(notation._notationStaging).toContain("harmonic");
         });
     });
 });
