@@ -405,17 +405,16 @@ describe("setupMeterActions", () => {
         expect(result).toBe(3);
     });
 
-    /* Consolidated getBPM tests */
     test.each([
         [[], 80, 80],
         [[80, 120], undefined, 120]
     ])('getBPM with singer.bpm %p and masterBPM %p returns %p', (bpmArray, _, expected) => {
         targetTurtle.singer.bpm = bpmArray;
-        Singer.masterBPM = 80; // set a default masterBPM
+        Singer.masterBPM = 80;
         const result = Singer.MeterActions.getBPM(0);
         expect(result).toBe(expected);
     });
-    /* End consolidated getBPM tests */
+
 
     it("should return the correct beat factor", () => {
         targetTurtle.singer.noteValuePerBeat = 0.25;
@@ -440,7 +439,6 @@ describe("setupMeterActions", () => {
             delete activity.turtles.ithTurtle(0).companionTurtle;
         });
 
-        /* Consolidated invalid setMeter default behavior */
         test.each([
             [0, 1/4, 'beatsPerMeasure', 4],
             [4, 0, 'noteValuePerBeat', 4]
@@ -448,7 +446,6 @@ describe("setupMeterActions", () => {
             Singer.MeterActions.setMeter(beats, noteValue, 0);
             expect(targetTurtle.singer[prop]).toBe(expected);
         });
-        /* End consolidated invalid setMeter tests */
 
         it("immediately dispatches the beat event once", () => {
             Singer.MeterActions.onEveryBeatDo("testAction", false, null, 0, 1);
