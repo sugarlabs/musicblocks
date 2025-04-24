@@ -382,6 +382,25 @@ block `re` is lowered by one half step; on the right, both *Pitch*
 blocks are raised by one half step. (You can also use a double-sharp
 or double-flat accidental.) [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733231694757697&run=True)
 
+## Understanding Double Sharps and Double Flats
+
+Here are some examples:
+
+### G♯ Major Scale:
+G♯, A♯, B♯, C♯, D♯, E♯, **F𝄪**
+
+### D♯ Major Scale:
+D♯, E♯, **F𝄪**, G♯, A♯, B♯, **C𝄪**
+
+### F♭ Major Scale:
+F♭, G♭, A♭, **B𝄫**, C♭, D♭, E♭
+
+### Bartók's Example:
+Mikrokosmos No. 136 contains double-flats.  
+See: [Wikipedia – Mikrokosmos](https://en.wikipedia.org/wiki/Mikrokosmos_(Bart%C3%B3k))
+
+
+
 #### <a name="ADJUST-TRANSPOSITION">3.2.3 Adjusting Transposition</a>
 
 ![transposition](./transform2.svg "Adjusting transpositions")
