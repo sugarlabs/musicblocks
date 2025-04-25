@@ -6077,7 +6077,17 @@ if (typeof module !== "undefined" && module.exports) {
         getNoteFromInterval,
         numberToPitch,
         GetNotesForInterval,
-        base64Encode
+        base64Encode,
+        getStepSizeUp,
+        getStepSizeDown,
+        ACCIDENTALNAMES,
+        ACCIDENTALVALUES,
+        NOTESFLAT,
+        NOTESSHARP,
+        NOTESTEP,
+        MUSICALMODES,
+        SHARP,
+        FLAT
     };
 }
 
