@@ -382,6 +382,15 @@ block `re` is lowered by one half step; on the right, both *Pitch*
 blocks are raised by one half step. (You can also use a double-sharp
 or double-flat accidental.) [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733231694757697&run=True)
 
+## Why Use Double-Sharps and Double-Flats?
+
+In musical notation, each note in a scale should have a unique letter name (A to G). Double-sharps (𝄪) and double-flats (𝄫) are used to maintain this structure and avoid repeating letters within a scale.
+For example:
+
+In G♯ Major, instead of ending on G again, we write F𝄪 to preserve the one-letter-per-note pattern.
+
+In D♯ Major, we use C𝄪 instead of D for the same reason. Though enharmonically equivalent (F𝄪 = G), using double-sharps ensures that music theory and notation rules are followed.
+
 ## Understanding Double Sharps and Double Flats
 
 Here are some examples:
