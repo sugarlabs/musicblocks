@@ -25,7 +25,6 @@ global.getDrumSymbol = getDrumSymbol;
 global._ = require("lodash");
 global.last = (arr) => arr[arr.length - 1];
 global.toFixed2 = (n) => parseFloat(n.toFixed(2));
-
 global.rationalToFraction = jest.fn().mockReturnValue([1, 2]);
 
 jest.mock("../utils/musicutils.js", function() {
