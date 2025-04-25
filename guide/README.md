@@ -282,6 +282,66 @@ program music. Note that you can program with chunks you create by
 hand or use [*The Phrase Maker*](#42-generating-chunks-of-notes)
 widget to help you get started.
 
+### <a name="PROGRAM-BLOCKS">6.3 Program Blocks</a>
+
+### <a name="PROGRAM-BLOCKS">6.3 Program Blocks</a>
+
+The Program palette contains advanced blocks for data storage, file operations, and project interactions. These blocks are useful for saving/loading state, managing values across sessions, and enabling more complex behavior.
+
+---
+
+#### 🧱 `set heap`
+Initializes a heap (list-like structure) that can store multiple values. Useful for stacking or queuing data.
+
+---
+
+#### 🧱 `load heap`
+Loads a previously saved heap from the project storage. Use this to reuse or restore previously stored data.
+
+---
+
+#### 🧱 `save heap`
+Saves the current heap data into the project file, so it can be restored later using `load heap`.
+
+---
+
+#### 🧱 `set dictionary`
+Sets a named dictionary. A dictionary is a key–value pair structure, similar to JSON or maps in other languages.  
+Use this block to assign values to keys for flexible data storage.
+
+---
+
+#### 🧱 `load dictionary`
+Loads a dictionary from a file or the app storage, using the given name. The values can then be accessed using other dictionary blocks.
+
+---
+
+#### 🧱 `save dictionary`
+Saves the current dictionary to a file. This is useful when working on data-driven projects or loading configurations.
+
+---
+
+#### 🧱 `save heap to App`
+Stores the heap in the Music Blocks application’s local storage. Useful for persisting state across sessions without requiring a file download.
+
+---
+
+#### 🧱 `load heap from App`
+Loads heap data from the local App storage (previously saved via `save heap to App`). This allows you to resume a project or dataset easily.
+
+---
+
+#### 🧱 `open palette`
+Opens a specific block palette programmatically. For example, this can be used in a guided tutorial to focus on a certain category.
+
+---
+
+#### 🧱 `open project`
+Loads and opens a different Music Blocks project. Can be used to create menu-based or modular projects that jump between files.
+
+---
+
+
 ### <a name="ACTIONS">3.1 Actions</a>
 
 ![action](./chunk-2.svg "working of action stack")
