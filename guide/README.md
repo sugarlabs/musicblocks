@@ -384,12 +384,16 @@ or double-flat accidental.) [RUN LIVE](https://musicblocks.sugarlabs.org/index.h
 
 ## Why Use Double-Sharps and Double-Flats?
 
-In musical notation, each note in a scale should have a unique letter name (A to G). Double-sharps (𝄪) and double-flats (𝄫) are used to maintain this structure and avoid repeating letters within a scale.
+## Why Use Double-Sharps and Double-Flats?
+
+In music, we try to give each note in a scale its own letter name (A to G) so it's easy to read and follow. Sometimes, we use double-sharps (𝄪) or double-flats (𝄫) to keep this rule, even if the note sounds the same as a more common one.
+
 For example:
+- In the **G♯ Major** scale, the last note is written as **F𝄪** instead of repeating **G**. This helps each step in the scale use a different letter.
+- In the **D♯ Major** scale, we write **C𝄪** instead of **D** for the same reason.
 
-In G♯ Major, instead of ending on G again, we write F𝄪 to preserve the one-letter-per-note pattern.
+Even though **F𝄪** and **G** sound the same on a keyboard, writing them differently helps show where you are in the scale and how the music is built.
 
-In D♯ Major, we use C𝄪 instead of D for the same reason. Though enharmonically equivalent (F𝄪 = G), using double-sharps ensures that music theory and notation rules are followed.
 
 ## Understanding Double Sharps and Double Flats
 
