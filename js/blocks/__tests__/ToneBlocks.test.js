@@ -378,7 +378,7 @@ describe("setupToneBlocks", () => {
             const tur = activity.turtles.ithTurtle(turtle);
             tur.singer.rate = [0.5];
             tur.singer.octaves = [3];
-            tur.signer = { baseFrequency: [392] };
+            tur.singer.baseFrequency = [392];
             logo.inTimbre = true;
             const ret = phaser.flow(args, logo, turtle, "phaserBlk");
             expect(Singer.ToneActions.doPhaser).toHaveBeenCalledWith(
