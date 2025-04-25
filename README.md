@@ -142,17 +142,29 @@ Before you begin, ensure you have Docker installed on your machine. You can down
    ```bash
    docker build -t musicblocks .
    ```
-## Running Music Blocks
+Running Music Blocks
 
-1. Run the Docker container using the built image:
+1. Basic Run (No Live Updates)
 
-   ```bash
-   docker run -p 3000:3000 musicblocks
-   ```
+```bash
+docker run -p 3000:3000 musicblocks
+```
 
-   This command will start a Docker container running Music Blocks and expose it on port 3000.
+This will start a Docker container running Music Blocks and expose it on port 3000.
+You can access it in your browser at http://localhost:3000.
 
-2. Access Music Blocks in your web browser by navigating to `http://localhost:3000`.
+2. Run with Live Code Updates (Recommended for Development)
+If you're making changes to the code and want them to reflect in real-time inside the Docker container, use volume mounting:
+
+```bash
+docker run -v $(pwd):/app -p 3000:3000 musicblocks
+```
+
+This mounts your local project folder into the container, allowing changes to reflect immediately without rebuilding the image.
+
+
+Without volume mounting, changes might not sync properly due to Docker layer caching—even after rebuilding the image.
+
 
 ## Stopping the Docker container
 
