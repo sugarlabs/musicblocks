@@ -1627,20 +1627,20 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
 };
 
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = {
-    _, 
-    last,
-    fileExt,
-    fileBasename,
-    toTitleCase,
-    safeSVG,
-    toFixed2,
-    mixedNumber,
-    nearestBeat,
-    oneHundredToFraction,
-    rationalToFraction,
-    rgbToHex,
-    hexToRGB,
-    hex2rgb
-  };
+    module.exports = {
+        _,
+        last,
+        fileExt,
+        fileBasename,
+        toTitleCase,
+        safeSVG,
+        toFixed2,
+        mixedNumber,
+        nearestBeat,
+        oneHundredToFraction,
+        rationalToFraction,
+        rgbToHex,
+        hexToRGB,
+        hex2rgb
+    };
 }
