@@ -18,19 +18,20 @@
  */
 
 const Notation = require("../notation");
-const { durationToNoteValue, convertFactor } = require("../utils/musicutils");
+const { durationToNoteValue, convertFactor, getDrumSymbol } = require("../utils/musicutils");
 global.convertFactor = convertFactor;
 global.durationToNoteValue = durationToNoteValue;
-global.toFixed2 = jest.fn(n => n.toFixed(2));
-global.getDrumSymbol = jest.fn(drum => `DRUM_${drum}`);
-global.last = jest.fn(arr => arr[arr.length - 1]);
-global.rationalToFraction = jest.fn().mockReturnValue([1, 4]);
+global.toFixed2 = (n) => parseFloat(n.toFixed(2));
+global.getDrumSymbol = getDrumSymbol;
+global._ = require("lodash");
+global.last = (arr) => arr[arr.length - 1];
+global.rationalToFraction = jest.fn().mockReturnValue([1, 2]);
 
 jest.mock("../utils/musicutils.js", function() {
     return {
         durationToNoteValue: jest.fn().mockReturnValue([1, 1, 1, 1]),
         convertFactor: jest.fn().mockReturnValue(4),
-        getDrumSymbol: jest.fn(drum => `DRUM_${drum}`)
+        getDrumSymbol: jest.fn().mockReturnValue("drums")
     };
 });
 
@@ -56,6 +57,7 @@ describe("Notation Class", () => {
         notation._notationDrumStaging = {};
         notation._notationDrumStaging["turtle1"] = [];
         notation._markup = {};
+        notation._markup["turtle1"] = [];
         notation._pickupPOW2 = {};
         notation._pickupPOW2["turtle1"] = false;
         notation._pickupPoint = {};
