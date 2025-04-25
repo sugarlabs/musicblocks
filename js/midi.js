@@ -42,6 +42,15 @@ const getClosestStandardNoteValue = (duration) => {
     return closest.value.split("/").map(Number);
 };
 
+const simplifyFraction = (numerator, denominator) => {
+    const findGCD = (a, b) => {
+        return b === 0 ? a : findGCD(b, a % b);
+    };
+    
+    const gcd = findGCD(numerator, denominator);
+    return [numerator / gcd, denominator / gcd];
+};
+
 const processChunk = async (options) => {
     const {
         track,

@@ -589,7 +589,7 @@ function setupToneBlocks(activity) {
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["rate"] = args[0];
                 logo.timbre.phaserParams.push(last(tur.singer.octaves));
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["octaves"] = args[1];
-                logo.timbre.phaserParams.push(last(tur.singer.baseFrequency));
+                logo.timbre.phaserParams.push(args[2]);
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["baseFrequency"] = args[2];
             }
 
