@@ -42,21 +42,274 @@ const getClosestStandardNoteValue = (duration) => {
     return closest.value.split("/").map(Number);
 };
 
-const transcribeMidi = async (midi, maxNoteBlocks) => {
+const processChunk = async (options) => {
+    const {
+        track,
+        trackIndex,
+        jsONON,
+        actionBlockCounter,
+        actionBlockNames,
+        instruments,
+        actionBlockPerTrack,
+        isPercussion,
+        offset,
+        trackCount,
+        maxNoteBlocks,
+        progressCallback
+    } = options;
+
+    return new Promise(resolve => {
+        setTimeout(() => {
+            const drumMidi = getReverseDrumMidi();
+            let k = 0;
+            let noteblockCount = 0;
+            let totalnoteblockCount = 0;
+            let shortestNoteDenominator = 0;
+            let r = jsONON.length;
+            let stopProcessing = false;
+            let precurssionFlag = track.instrument.percussion;
+            let noteSum = 0;
+            
+            let instrument = "electronic synth";
+            if (track.instrument.name && !track.instrument.percussion) {
+                for (const voices of VOICENAMES) {
+                    if (track.instrument.name.indexOf(voices[1]) > -1) {
+                        instrument = voices[0];
+                    }
+                }
+            }
+            
+            actionBlockPerTrack[trackCount] = 0;
+            instruments[trackCount] = instrument;
+
+            const actionBlockName = `track${trackCount}chunk${actionBlockCounter.value}`;
+
+            jsONON.push(
+                [r, ["action", { collapsed: false }], 150, 100, [null, r + 1, r + 2, null]],
+                [r + 1, ["text", { value: actionBlockName }], 0, 0, [r]]
+            );
+
+            const sched = [];
+            isPercussion.push(track.instrument.percussion && (track.channel === 9 || track.channel === 10));
+
+            track.notes.forEach((note, index) => {
+                const name = note.name;
+                const start = Math.round(note.time * 100) / 100;
+                const end = Math.round((note.time + note.duration) * 100) / 100;
+
+                if (note.duration === 0) return;
+
+                const lastNote = sched[sched.length - 1];
+
+                if (index === 0 && start > 0) {
+                    sched.push({ start: 0, end: start, notes: ["R"] });
+                }
+
+                if (lastNote && lastNote.start === start && lastNote.end === end) {
+                    lastNote.notes.push(name);
+                    return;
+                }
+
+                if (lastNote && lastNote.start <= start && lastNote.end > start) {
+                    const prevNotes = [...lastNote.notes];
+                    const oldEnd = lastNote.end;
+
+                    lastNote.end = start;
+
+                    sched.push({ start: start, end: end, notes: [...prevNotes, name] });
+
+                    if (oldEnd > end) {
+                        sched.push({ start: end, end: oldEnd, notes: prevNotes });
+                    }
+                    return;
+                }
+
+                if (lastNote && lastNote.end < start) {
+                    sched.push({ start: lastNote.end, end: start, notes: ["R"] });
+                }
+
+                sched.push({ start: start, end: end, notes: [name] });
+            });
+
+            let currentActionBlock = [];
+
+            const addNewActionBlock = (isLastBlock = false) => {
+                const r = jsONON.length;
+                const actionBlockName = `track${trackCount}chunk${actionBlockCounter.value}`;
+                actionBlockNames.push(actionBlockName);
+                actionBlockPerTrack[trackCount]++;
+                
+                if (k == 0) {
+                    jsONON.push(...currentActionBlock);
+                    k = 1;
+                } else {
+                    const settimbreIndex = r;
+                    if (currentActionBlock.length > 0) {
+                        currentActionBlock[0][4][0] = settimbreIndex;
+                    }
+                    jsONON.push(
+                        [r, ["action", { collapsed: false }], 100 + offset.value, 100 + offset.value, [null, r + 1, settimbreIndex + 2, null]],
+                        [r + 1, ["text", { value: actionBlockName }], 0, 0, [r]],
+                        ...currentActionBlock
+                    );
+                }
+                
+                if (isLastBlock && currentActionBlock.length > 0) {
+                    const lastIndex = jsONON.length - 1;
+                    jsONON[lastIndex][4][1] = null;
+                }
+
+                currentActionBlock = [];
+                actionBlockCounter.value++;
+                offset.value += 100;
+            };
+
+            for (const j in sched) {
+                const dur = sched[j].end - sched[j].start;
+                const temp = getClosestStandardNoteValue(dur * 3 / 8);
+                shortestNoteDenominator = Math.max(shortestNoteDenominator, temp[1]);
+            }
+            for (const i in sched) {
+                if (stopProcessing) break;
+                
+                const { notes, start, end } = sched[i];
+                const duration = end - start;
+                noteSum += duration;
+                
+                const isLastNoteInBlock = (noteSum >= 16) || (noteblockCount > 0 && noteblockCount % 24 === 0);
+                if (isLastNoteInBlock) {
+                    totalnoteblockCount += noteblockCount;
+                    noteblockCount = 0;
+                    noteSum = 0;
+                }
+                
+                const isLastNoteInSched = (i == sched.length - 1);
+                const last = isLastNoteInBlock || isLastNoteInSched;
+                const first = (i == 0);
+                let val = jsONON.length + currentActionBlock.length;
+                
+                const getPitch = (x, notes, prev) => {
+                    const ar = [];
+                    if (notes[0] == "R") {
+                        ar.push([x, "rest2", 0, 0, [prev, null]]);
+                    } else if (precurssionFlag) {
+                        const drumname = (drumMidi[track.notes[0]?.midi] || ["kick drum"])[0];
+                        ar.push(
+                            [x, "playdrum", 0, 0, [first ? prev : x - 1, x + 1, null]],
+                            [x + 1, ["drumname", { "value": drumname }], 0, 0, [x]],
+                        );
+                        x += 2;
+                    } else {
+                        for (const na in notes) {
+                            const name = notes[na];
+                            const first = na == 0;
+                            const last = na == notes.length - 1;
+                            ar.push(
+                                [x, "pitch", 0, 0, [first ? prev : x - 3, x + 1, x + 2, last ? null : x + 3]],
+                                [x + 1, ["notename", { "value": name.substring(0, name.length - 1) }], 0, 0, [x]],
+                                [x + 2, ["number", { "value": parseInt(name[name.length - 1]) }], 0, 0, [x]]
+                            );
+                            x += 3;
+                        }
+                    }
+                    return ar;
+                };
+                
+                let obj = getClosestStandardNoteValue(duration * 3 / 8);
+                
+                obj = simplifyFraction(obj[0], obj[1]);
+                
+                if (k != 0) val = val + 2;
+                
+                const pitches = getPitch(val + 5, notes, val);
+                currentActionBlock.push(
+                    [val, ["newnote", { "collapsed": true }], 0, 0, [first ? val - 2 : val - 1, val + 1, val + 4, val + pitches.length + 5]],
+                    [val + 1, "divide", 0, 0, [val, val + 2, val + 3]],
+                    [val + 2, ["number", { value: obj[0] }], 0, 0, [val + 1]],
+                    [val + 3, ["number", { value: obj[1] }], 0, 0, [val + 1]],
+                    [val + 4, "vspace", 0, 0, [val, val + 5]],
+                );
+                
+                noteblockCount++;
+                
+                if (pitches.length > 0) {
+                    pitches[0][4][0] = val + 4;
+                }
+                
+                currentActionBlock = currentActionBlock.concat(pitches);
+
+                let newLen = jsONON.length + currentActionBlock.length;
+                if (k != 0) newLen = newLen + 2;
+                
+                currentActionBlock.push(
+                    [newLen, "hidden", 0, 0, [val, last ? null : newLen + 1]]
+                );
+                
+                if (isLastNoteInBlock || isLastNoteInSched) {
+                    addNewActionBlock(isLastNoteInSched);
+                }
+
+                if (totalnoteblockCount >= maxNoteBlocks) {
+                    if (typeof activity !== "undefined") {
+                        activity.textMsg(`MIDI file is too large. Generating only ${maxNoteBlocks} noteblocks`);
+                    }
+                    stopProcessing = true;
+                    break;
+                }
+                
+                if (parseInt(i) % 10 === 0 && progressCallback) {
+                    progressCallback(parseInt(i), sched.length, trackIndex, track.notes.length);
+                }
+            }
+
+            if (currentActionBlock.length > 0) {
+                addNewActionBlock(true);
+            }
+            
+            resolve({
+                isPercussion: isPercussion,
+                actionBlockPerTrack: actionBlockPerTrack,
+                instruments: instruments
+            });
+        }, 0);
+    });
+};
+
+const transcribeMidi = async (midi, maxNoteBlocks = 10000) => {
+    if (typeof document !== "undefined") {
+        document.body.style.cursor = "wait";
+
+        if (!document.getElementById("midi-import-progress")) {
+            const progressContainer = document.createElement("div");
+            progressContainer.id = "midi-import-progress-container";
+            progressContainer.style.position = "fixed";
+            progressContainer.style.top = "10px";
+            progressContainer.style.right = "10px";
+            progressContainer.style.backgroundColor = "rgba(0,0,0,0.7)";
+            progressContainer.style.color = "white";
+            progressContainer.style.padding = "10px";
+            progressContainer.style.borderRadius = "5px";
+            progressContainer.style.zIndex = "9999";
+
+            const progressText = document.createElement("div");
+            progressText.id = "midi-import-progress";
+            progressText.innerText = "Preparing MIDI import...";
+
+            progressContainer.appendChild(progressText);
+            document.body.appendChild(progressContainer);
+        }
+    }
+
     const currentMidi = midi;
-    const drumMidi = getReverseDrumMidi();
     const isPercussion = [];
     const jsONON = [];
-    let actionBlockCounter = 0; // Counter for action blocks
-    const actionBlockNames = []; // Array to store action block names
-    let totalnoteblockCount = 0; // Initialize noteblock counter
-    let noteblockCount = 0;
-    let shortestNoteDenominator = 0;
-    let offset = 100;
-    let stopProcessing = false;
-    let trackCount = 0;
+    const actionBlockCounter = { value: 0 };
+    const actionBlockNames = [];
     const actionBlockPerTrack = [];
     const instruments = [];
+    const offset = { value: 100 };
+    let trackCount = 0;
+
     let currentMidiTempoBpm = currentMidi.header.tempos;
     if (currentMidiTempoBpm && currentMidiTempoBpm.length > 0) {
         currentMidiTempoBpm = Math.round(currentMidiTempoBpm[0].bpm);
@@ -72,215 +325,46 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
         currentMidiTimeSignature = defaultTimeSignature;
     }
 
-    let precurssionFlag = false;
-    // console.log("tempoBpm is: ", currentMidiTempoBpm);
-    // console.log("tempo is : ",currentMidi.header.tempos);
-    // console.log("time signatures are: ", currentMidi.header.timeSignatures);
-    currentMidi.tracks.forEach((track, trackIndex) => {
-        let k = 0;
-        if (stopProcessing) return; // Exit if flag is set
-        if (!track.notes.length) return;
-        const r = jsONON.length;
-        let instrument = "electronic synth";
-        if (track.instrument.name && !track.instrument.percussion) {
-            for (const voices of VOICENAMES) {
-                if (track.instrument.name.indexOf(voices[1]) > -1) {
-                    instrument = voices[0];
-                }
+    const tracksWithNotes = currentMidi.tracks.filter(track => track.notes.length > 0);
+
+    for (let trackIndex = 0; trackIndex < tracksWithNotes.length; trackIndex++) {
+        const track = tracksWithNotes[trackIndex];
+
+        if (typeof document !== "undefined") {
+            const progressEl = document.getElementById("midi-import-progress");
+            if (progressEl) {
+                progressEl.innerText = `Processing track ${trackIndex + 1} of ${tracksWithNotes.length}`;
             }
-        } else if (track.instrument.percussion) {
-            precurssionFlag = true;
-        }
-        actionBlockPerTrack[trackCount] = 0;
-        instruments[trackCount] = instrument;
-
-        const actionBlockName = `track${trackCount}chunk${actionBlockCounter}`;
-
-        jsONON.push(
-            [r, ["action", { collapsed: false }], 150, 100, [null, r + 1, r + 2, null]],
-            [r + 1, ["text", { value: actionBlockName }], 0, 0, [r]]
-        );
-
-        const sched = [];
-        isPercussion.push(track.instrument.percussion && (track.channel === 9 || track.channel === 10));
-
-        track.notes.forEach((note, index) => {
-            const name = note.name;
-            const start = Math.round(note.time * 100) / 100;
-            const end = Math.round((note.time + note.duration) * 100) / 100;
-
-            if (note.duration === 0) return;
-
-            const lastNote = sched[sched.length - 1];
-
-            if (index === 0 && start > 0) {
-                sched.push({ start: 0, end: start, notes: ["R"] });
-            }
-
-            if (lastNote && lastNote.start === start && lastNote.end === end) {
-                lastNote.notes.push(name);
-                return;
-            }
-
-            if (lastNote && lastNote.start <= start && lastNote.end > start) {
-                const prevNotes = [...lastNote.notes];
-                const oldEnd = lastNote.end;
-
-                lastNote.end = start;
-
-                sched.push({ start: start, end: end, notes: [...prevNotes, name] });
-
-                if (oldEnd > end) {
-                    sched.push({ start: end, end: oldEnd, notes: prevNotes });
-                }
-                return;
-            }
-
-            if (lastNote && lastNote.end < start) {
-                sched.push({ start: lastNote.end, end: start, notes: ["R"] });
-            }
-
-            sched.push({ start: start, end: end, notes: [name] });
-        });
-
-        let noteSum = 0;
-        let currentActionBlock = [];
-
-        const addNewActionBlock = (isLastBlock = false) => {
-            const r = jsONON.length;
-            const actionBlockName = `track${trackCount}chunk${actionBlockCounter}`;
-            actionBlockNames.push(actionBlockName);
-            actionBlockPerTrack[trackCount]++;
-            if (k == 0) {
-                jsONON.push(
-                    ...currentActionBlock
-                );
-                k = 1;
-            } else {
-                const settimbreIndex = r;
-                // Adjust the first note block's top connection to settimbre
-                currentActionBlock[0][4][0] = settimbreIndex;
-                jsONON.push(
-                    [r, ["action", { collapsed: false }], 100 + offset, 100 + offset, [null, r + 1, settimbreIndex + 2, null]],
-                    [r + 1, ["text", { value: actionBlockName }], 0, 0, [r]],
-                    ...currentActionBlock
-                );
-
-            }
-            if (isLastBlock) {
-                const lastIndex = jsONON.length - 1;
-                // Set the last hidden block's second value to null
-                jsONON[lastIndex][4][1] = null;
-            }
-
-            currentActionBlock = [];
-            actionBlockCounter++;
-            offset += 100;
-        };
-        //Using for loop for finding the shortest note value
-        for (const j in sched) {
-            const dur = sched[j].end - sched[j].start;;
-            const temp = getClosestStandardNoteValue(dur * 3 / 8);
-            shortestNoteDenominator = Math.max(shortestNoteDenominator, temp[1]);
         }
 
-        for (const i in sched) {
-            if (stopProcessing) break; // Exit inner loop if flag is set
-            const { notes, start, end } = sched[i];
-            const duration = end - start;
-            noteSum += duration;
-            const isLastNoteInBlock = (noteSum >= 16) || (noteblockCount > 0 && noteblockCount % 24 === 0);
-            if (isLastNoteInBlock) {
-                totalnoteblockCount += noteblockCount;
-                noteblockCount = 0;
-                noteSum = 0;
-            }
-            const isLastNoteInSched = (i == sched.length - 1);
-            const last = isLastNoteInBlock || isLastNoteInSched;
-            const first = (i == 0);
-            let val = jsONON.length + currentActionBlock.length;
-            const getPitch = (x, notes, prev) => {
-                const ar = [];
-                if (notes[0] == "R") {
-                    ar.push(
-                        [x, "rest2", 0, 0, [prev, null]]
-                    );
-                } else if (precurssionFlag) {
-                    const drumname = drumMidi[track.notes[0].midi][0] || "kick drum";
-                    ar.push(
-                        [x, "playdrum", 0, 0, [first ? prev : x - 1, x + 1, null]],
-                        [x + 1, ["drumname", { "value": drumname }], 0, 0, [x]],
-                    );
-                    x += 2;
-                } else {
-                    for (const na in notes) {
-                        const name = notes[na];
-                        const first = na == 0;
-                        const last = na == notes.length - 1;
-                        ar.push(
-                            [x, "pitch", 0, 0, [first ? prev : x - 3, x + 1, x + 2, last ? null : x + 3]],
-                            [x + 1, ["notename", { "value": name.substring(0, name.length - 1) }], 0, 0, [x]],
-                            [x + 2, ["number", { "value": parseInt(name[name.length - 1]) }], 0, 0, [x]]
-                        );
-                        x += 3;
+        await processChunk({
+            track,
+            trackIndex,
+            jsONON,
+            actionBlockCounter,
+            actionBlockNames,
+            instruments,
+            actionBlockPerTrack,
+            isPercussion,
+            currentMidiTimeSignature,
+            currentMidiTempoBpm,
+            offset,
+            trackCount,
+            maxNoteBlocks,
+            progressCallback: (noteIndex, totalNotes, trackIdx, trackNotes) => {
+                if (typeof document !== "undefined") {
+                    const progressEl = document.getElementById("midi-import-progress");
+                    if (progressEl) {
+                        const trackProgress = Math.round((noteIndex / totalNotes) * 100);
+                        const totalProgress = Math.round(((trackIdx + (noteIndex / totalNotes)) / tracksWithNotes.length) * 100);
+                        progressEl.innerText = `Processing track ${trackIdx + 1} of ${tracksWithNotes.length} (${trackProgress}%)\n                                               Overall progress: ${totalProgress}%`;
                     }
                 }
-                return ar;
-            };
-            let obj = getClosestStandardNoteValue(duration * 3 / 8);
-            // let scalingFactor=1;
-            // if(shortestNoteDenominator>32)
-            // scalingFactor=shortestNoteDenominator/32;
-
-            // if(obj[1]>=scalingFactor)
-            // obj[1]=obj[1]/scalingFactor;
-            // else
-            // obj[0]=obj[0]*scalingFactor;
-
-            // To get the reduced fraction for 4/2 to 2/1
-            obj = getClosestStandardNoteValue(obj[0] / obj[1]);
-
-            // Since we are going to add action block in the front later
-            if (k != 0) val = val + 2;
-            const pitches = getPitch(val + 5, notes, val);
-            currentActionBlock.push(
-                [val, ["newnote", { "collapsed": true }], 0, 0, [first ? val - 2 : val - 1, val + 1, val + 4, val + pitches.length + 5]],
-                [val + 1, "divide", 0, 0, [val, val + 2, val + 3]],
-                [val + 2, ["number", { value: obj[0] }], 0, 0, [val + 1]],
-                [val + 3, ["number", { value: obj[1] }], 0, 0, [val + 1]],
-                [val + 4, "vspace", 0, 0, [val, val + 5]],
-            );
-            noteblockCount++;
-            pitches[0][4][0] = val + 4;
-            currentActionBlock = currentActionBlock.concat(pitches);
-
-            let newLen = jsONON.length + currentActionBlock.length;
-            if (k != 0) newLen = newLen + 2;
-            currentActionBlock.push(
-                [newLen, "hidden", 0, 0, [val, last ? null : newLen + 1]]
-            );
-            if (isLastNoteInBlock || isLastNoteInSched) {
-                addNewActionBlock(isLastNoteInSched);
             }
-
-            if (totalnoteblockCount >= maxNoteBlocks) {
-                activity.textMsg(`MIDI file is too large. Generating only ${maxNoteBlocks} noteblocks`);
-                stopProcessing = true;
-                break;
-            }
-        }
-
-        if (currentActionBlock.length > 0) {
-            addNewActionBlock(true);
-        }
+        });
 
         trackCount++;
-        // console.log("current action block: ", currentActionBlock);
-        // console.log("current json: ", jsONON);
-        // console.log("noteblockCount: ", noteblockCount);
-        // console.debug('finished when you see: "block loading finished "');
-        document.body.style.cursor = "wait";
-    });
+    }
 
     const len = jsONON.length;
     let m = 0;
@@ -344,14 +428,75 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
             [len + m + 1, ["text", { value: `track${i}` }], 0, 0, [len + m]]
         );
         m += 2;
-
     }
 
-    activity.blocks.loadNewBlocks(jsONON);
-    // this.textMsg("MIDI import is not currently precise. Consider changing the speed with the Beats Per Minute block or modifying note value with the Multiply Note Value block");
-    return null;
+    if (typeof document !== "undefined") {
+        const progressContainer = document.getElementById("midi-import-progress-container");
+        if (progressContainer) {
+            progressContainer.remove();
+        }
+        document.body.style.cursor = "default";
+    }
+
+    if (typeof activity !== "undefined" && activity.blocks) {
+        activity.blocks.loadNewBlocks(jsONON);
+    }
+
+    return jsONON;
+};
+
+const getReverseDrumMidi = () => {
+    return {
+        35: ["acoustic bass drum"],
+        36: ["bass drum"],
+        37: ["side stick"],
+        38: ["acoustic snare"],
+        39: ["hand clap"],
+        40: ["electric snare"],
+        41: ["low floor tom"],
+        42: ["closed hi hat"],
+        43: ["high floor tom"],
+        44: ["pedal hi hat"],
+        45: ["low tom"],
+        46: ["open hi hat"],
+        47: ["low-mid tom"],
+        48: ["hi-mid tom"],
+        49: ["crash cymbal"],
+        50: ["high tom"],
+        51: ["ride cymbal"],
+        52: ["chinese cymbal"],
+        53: ["ride bell"],
+        54: ["tambourine"],
+        55: ["splash cymbal"],
+        56: ["cowbell"],
+        57: ["crash cymbal 2"],
+        58: ["vibraslap"],
+        59: ["ride cymbal 2"],
+        60: ["hi bongo"],
+        61: ["low bongo"],
+        62: ["mute hi conga"],
+        63: ["open hi conga"],
+        64: ["low conga"],
+        65: ["high timbale"],
+        66: ["low timbale"],
+        67: ["high agogo"],
+        68: ["low agogo"],
+        69: ["cabasa"],
+        70: ["maracas"],
+        71: ["short whistle"],
+        72: ["long whistle"],
+        73: ["short guiro"],
+        74: ["long guiro"],
+        75: ["claves"],
+        76: ["hi wood block"],
+        77: ["low wood block"],
+        78: ["mute cuica"],
+        79: ["open cuica"],
+        80: ["mute triangle"],
+        81: ["open triangle"]
+    };
 };
 
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = { getClosestStandardNoteValue, transcribeMidi };
+    module.exports = { getClosestStandardNoteValue, transcribeMidi, processChunk, simplifyFraction };
 }
