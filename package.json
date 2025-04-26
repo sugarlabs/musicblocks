@@ -46,6 +46,7 @@
     "compression": "^1.8.0",
     "cssnano": "^6.0.1",
     "express": "^4.21.2",
+    "gifler": "^0.1.0",
     "gulp-concat": "^2.6.1",
     "gulp-postcss": "^9.0.1",
     "gulp-replace": "^1.0.0",

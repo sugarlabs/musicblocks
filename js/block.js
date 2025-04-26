@@ -927,47 +927,63 @@ class Block {
      * @returns {void}
      */
     _addImage() {
-        const image = new Image();
         const that = this;
-
-        /**
-         * The loader.
-         * @private
-         * @returns {void}
-         */
-        image.onload = () => {
-            const bitmap = new createjs.Bitmap(image);
-            // Don't override the image on a media block.
-            if (that.name === "media") {
-                for (let i = 0; i < that.container.children.length; i++) {
-                    if (that.container.children[i].name === "media") {
-                        return;
+        const imageUrl = this.image;
+    
+        if (!imageUrl) return;
+    
+        const isGif = imageUrl.toLowerCase().endsWith('.gif') || imageUrl.startsWith('blob:');
+    
+        if (isGif) {
+            // Handle GIF with gifler
+            gifler(imageUrl).get((anim) => {
+                anim.name = "media";
+    
+                if (that.name === "media") {
+                    for (let i = 0; i < that.container.children.length; i++) {
+                        if (that.container.children[i].name === "media") {
+                            return;
+                        }
                     }
                 }
-            }
-            bitmap.name = "media";
-            that.container.addChild(bitmap);
-            that._positionMedia(bitmap, image.width, image.height, that.protoblock.scale);
-            /*
-            that._positionMedia(
-                bitmap,
-                image.width,
-                image.height,
-                that.protoblock.scale
-            );
-            */
-            that.imageBitmap = bitmap;
-            that.updateCache();
-        };
-
-        if (this.image.search("xmlns") !== -1) {
-            image.src =
-                "data:image/svg+xml;base64," + window.btoa(window.base64Encode(this.image));
+    
+                that.container.addChild(anim);
+                anim.x = 0;
+                anim.y = 0;
+                anim.scaleX = anim.scaleY = that.protoblock.scale;
+                that.imageBitmap = anim;
+                that.updateCache();
+            });
         } else {
-            image.src = this.image;
+            // Handle normal PNG/JPG loading
+            const image = new Image();
+            image.onload = () => {
+                const bitmap = new createjs.Bitmap(image);
+    
+                if (that.name === "media") {
+                    for (let i = 0; i < that.container.children.length; i++) {
+                        if (that.container.children[i].name === "media") {
+                            return;
+                        }
+                    }
+                }
+                bitmap.name = "media";
+                that.container.addChild(bitmap);
+                that._positionMedia(bitmap, image.width, image.height, that.protoblock.scale);
+                that.imageBitmap = bitmap;
+                that.updateCache();
+            };
+    
+            if (this.image.search("xmlns") !== -1) {
+                image.src = "data:image/svg+xml;base64," + window.btoa(window.base64Encode(this.image));
+            } else {
+                image.src = this.image;
+            }
         }
     }
-
+    
+    
+    
     /**
      * Sometimes (in the case of namedboxes and nameddos) we need to regenerate the artwork
      * associated with a block.

@@ -43,6 +43,10 @@
  * Unused methods' names begin with double underscore '__'.
  * Internal functions' names are in PascalCase.
  */
+import gifler from  'gifler';
+
+console.log(gifler); 
+
 class Turtle {
     /**
      * @constructor
@@ -674,6 +678,9 @@ Turtle.TurtleModel = class {
  * (of the Model), which it can do by calling methods of the Model, also
  * through Turtle (controller).
  */
+
+
+
 Turtle.TurtleView = class {
     /**
      * @constructor
@@ -700,31 +707,64 @@ Turtle.TurtleView = class {
      * @param size - size of image
      * @param myImage - image path
      */
-    doShowImage(size, myImage) {
-        // Is there a JS test for a valid image path?
+     doShowImage(size, myImage) {
         if (myImage === null) {
             return;
         }
-
-        const image = new Image();
-
-        image.onload = () => {
-            const bitmap = new createjs.Bitmap(image);
-            this.imageContainer.addChild(bitmap);
-            this._media.push(bitmap);
-            bitmap.scaleX = Number(size) / image.width;
-            bitmap.scaleY = bitmap.scaleX;
-            bitmap.scale = bitmap.scaleX;
-            bitmap.x = this.container.x;
-            bitmap.y = this.container.y;
-            bitmap.regX = image.width / 2;
-            bitmap.regY = image.height / 2;
-            bitmap.rotation = this.orientation;
-            this.activity.refreshCanvas();
-        };
-
-        image.src = myImage;
+    
+        const isGif = myImage.endsWith(".gif");
+        const turtle = this;
+    
+        // For GIFs, use gifler to animate
+        if (isGif) {
+            gifler(myImage).get((anim) => {
+                const gifCanvas = document.createElement("canvas");
+                anim.animateInCanvas(gifCanvas); // Ensure this properly animates the GIF on the canvas.
+    
+                const bitmap = new createjs.Bitmap(gifCanvas);
+                turtle.imageContainer.addChild(bitmap);
+                turtle._media.push(bitmap);
+    
+                bitmap.scaleX = Number(size) / anim.width;
+                bitmap.scaleY = bitmap.scaleX;
+                bitmap.scale = bitmap.scaleX;
+    
+                bitmap.x = turtle.container.x;
+                bitmap.y = turtle.container.y;
+    
+                bitmap.regX = anim.width / 2;
+                bitmap.regY = anim.height / 2;
+    
+                bitmap.rotation = turtle.orientation;
+                turtle.activity.refreshCanvas(); // Redraws canvas if needed.
+            });
+        } else {
+            // For other images (PNG/JPG), use createjs.Bitmap
+            const image = new Image();
+            image.onload = () => {
+                const bitmap = new createjs.Bitmap(image);
+                turtle.imageContainer.addChild(bitmap);
+                turtle._media.push(bitmap);
+    
+                bitmap.scaleX = Number(size) / image.width;
+                bitmap.scaleY = bitmap.scaleX;
+                bitmap.scale = bitmap.scaleX;
+    
+                bitmap.x = turtle.container.x;
+                bitmap.y = turtle.container.y;
+    
+                bitmap.regX = image.width / 2;
+                bitmap.regY = image.height / 2;
+    
+                bitmap.rotation = turtle.orientation;
+                turtle.activity.refreshCanvas(); // Redraws canvas if needed.
+            };
+    
+            image.src = myImage; // Load the image source.
+        }
     }
+    
+    
 
     /**
      * Adds an image object from a URL to the canvas (shows an image).
@@ -736,25 +776,75 @@ Turtle.TurtleView = class {
         if (myURL === null) {
             return;
         }
-        const image = new Image();
-        image.src = myURL;
+        
+        const isGif = myURL.endsWith(".gif");
         const turtle = this;
-
-        image.onload = () => {
-            const bitmap = new createjs.Bitmap(image);
-            turtle.imageContainer.addChild(bitmap);
-            turtle._media.push(bitmap);
-            bitmap.scaleX = Number(size) / image.width;
-            bitmap.scaleY = bitmap.scaleX;
-            bitmap.scale = bitmap.scaleX;
-            bitmap.x = turtle.container.x;
-            bitmap.y = turtle.container.y;
-            bitmap.regX = image.width / 2;
-            bitmap.regY = image.height / 2;
-            bitmap.rotation = turtle.orientation;
-            turtle.activity.refreshCanvas();
-        };
+    
+        // For GIFs, use gifler to animate the GIF
+        if (isGif) {
+            gifler(myURL).get((anim) => {
+                // Create a canvas element to render the GIF animation
+                const gifCanvas = document.createElement("canvas");
+                anim.animateInCanvas(gifCanvas);  // Animate the GIF on the canvas
+    
+                // Create a createjs bitmap from the canvas
+                const bitmap = new createjs.Bitmap(gifCanvas);
+                turtle.imageContainer.addChild(bitmap);  // Add the bitmap to the image container
+                turtle._media.push(bitmap);  // Track the bitmap if needed
+    
+                // Scale the GIF to the desired size
+                bitmap.scaleX = Number(size) / anim.width;
+                bitmap.scaleY = bitmap.scaleX;  // Maintain aspect ratio
+                bitmap.scale = bitmap.scaleX;
+    
+                // Position the GIF on the canvas
+                bitmap.x = turtle.container.x;
+                bitmap.y = turtle.container.y;
+    
+                // Set the registration point to the center of the GIF
+                bitmap.regX = anim.width / 2;
+                bitmap.regY = anim.height / 2;
+    
+                // Set the rotation if needed (optional)
+                bitmap.rotation = turtle.orientation;
+    
+                // Refresh the canvas after adding the bitmap
+                turtle.activity.refreshCanvas();
+            });
+        } else {
+            // For static images (PNG/JPG), use createjs.Bitmap
+            const image = new Image();
+            image.src = myURL;
+    
+            image.onload = () => {
+                // Create a bitmap from the image
+                const bitmap = new createjs.Bitmap(image);
+                turtle.imageContainer.addChild(bitmap);  // Add the bitmap to the image container
+                turtle._media.push(bitmap);  // Track the bitmap if needed
+    
+                // Scale the image to the desired size
+                bitmap.scaleX = Number(size) / image.width;
+                bitmap.scaleY = bitmap.scaleX;  // Maintain aspect ratio
+                bitmap.scale = bitmap.scaleX;
+    
+                // Position the image on the canvas
+                bitmap.x = turtle.container.x;
+                bitmap.y = turtle.container.y;
+    
+                // Set the registration point to the center of the image
+                bitmap.regX = image.width / 2;
+                bitmap.regY = image.height / 2;
+    
+                // Set the rotation if needed (optional)
+                bitmap.rotation = turtle.orientation;
+    
+                // Refresh the canvas after adding the bitmap
+                turtle.activity.refreshCanvas();
+            };
+        }
     }
+    
+    
 
     /**
      * Adds an image object to the turtle.
@@ -766,60 +856,119 @@ Turtle.TurtleView = class {
         if (myImage === null) {
             return;
         }
-
+    
         const shellSize = Number(size);
-        const image = new Image();
-        image.src = myImage;
-
-        image.onload = () => {
-            this.container.removeChild(this._bitmap);
-            this._bitmap = new createjs.Bitmap(image);
-            this.container.addChild(this._bitmap);
-            this._bitmap.scaleX = shellSize / image.width;
-            this._bitmap.scaleY = this._bitmap.scaleX;
-            this._bitmap.scale = this._bitmap.scaleX;
-            this._bitmap.x = 0;
-            this._bitmap.y = 0;
-            this._bitmap.regX = image.width / 2;
-            this._bitmap.regY = image.height / 2;
-            this._bitmap.rotation = this.orientation;
-            this._skinChanged = true;
-
-            this.container.uncache();
-            const bounds = this.container.getBounds();
-            this.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-
-            // Recalculate the hit area as well
-            const hitArea = new createjs.Shape();
-            hitArea.graphics.beginFill("#FFF").drawRect(0, 0, bounds.width, bounds.height);
-            hitArea.x = -bounds.width / 2;
-            hitArea.y = -bounds.height / 2;
-            this.container.hitArea = hitArea;
-
-            const startBlock = this._startBlock;
-            if (startBlock != null) {
-                startBlock.container.removeChild(this._decorationBitmap);
-                this._decorationBitmap = new createjs.Bitmap(myImage);
-                startBlock.container.addChild(this._decorationBitmap);
-                this._decorationBitmap.name = "decoration";
-
-                const width = startBlock.width;
-                // FIXME: Why is the position off? Does it need a scale factor?
-                this._decorationBitmap.x = width - (30 * startBlock.protoblock.scale) / 2;
-                this._decorationBitmap.y = (20 * startBlock.protoblock.scale) / 2;
-                this._decorationBitmap.scaleX =
-                    ((27.5 / image.width) * startBlock.protoblock.scale) / 2;
-                this._decorationBitmap.scaleY =
-                    ((27.5 / image.height) * startBlock.protoblock.scale) / 2;
-                this._decorationBitmap.scale =
-                    ((27.5 / image.width) * startBlock.protoblock.scale) / 2;
-                startBlock.updateCache();
-            }
-
-            this.activity.refreshCanvas();
-        };
+        const isGif = myImage.endsWith(".gif");
+        const turtle = this;
+    
+        if (isGif) {
+            // Handle GIF using gifler
+            gifler(myImage).get((anim) => {
+                const gifCanvas = document.createElement("canvas");
+                anim.animateInCanvas(gifCanvas);  // Animate the GIF on the canvas
+    
+                // Remove previous bitmap if any
+                this.container.removeChild(this._bitmap);
+                this._bitmap = new createjs.Bitmap(gifCanvas); // Use the gifCanvas as bitmap
+                this.container.addChild(this._bitmap);
+                this._bitmap.scaleX = shellSize / anim.width;
+                this._bitmap.scaleY = this._bitmap.scaleX;
+                this._bitmap.scale = this._bitmap.scaleX;
+                this._bitmap.x = 0;
+                this._bitmap.y = 0;
+                this._bitmap.regX = anim.width / 2;
+                this._bitmap.regY = anim.height / 2;
+                this._bitmap.rotation = this.orientation;
+                this._skinChanged = true;
+    
+                // Recalculate cache and hit area
+                this.container.uncache();
+                const bounds = this.container.getBounds();
+                this.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+    
+                const hitArea = new createjs.Shape();
+                hitArea.graphics.beginFill("#FFF").drawRect(0, 0, bounds.width, bounds.height);
+                hitArea.x = -bounds.width / 2;
+                hitArea.y = -bounds.height / 2;
+                this.container.hitArea = hitArea;
+    
+                // Handle decoration if necessary
+                const startBlock = this._startBlock;
+                if (startBlock != null) {
+                    startBlock.container.removeChild(this._decorationBitmap);
+                    this._decorationBitmap = new createjs.Bitmap(myImage);
+                    startBlock.container.addChild(this._decorationBitmap);
+                    this._decorationBitmap.name = "decoration";
+    
+                    const width = startBlock.width;
+                    this._decorationBitmap.x = width - (30 * startBlock.protoblock.scale) / 2;
+                    this._decorationBitmap.y = (20 * startBlock.protoblock.scale) / 2;
+                    this._decorationBitmap.scaleX =
+                        ((27.5 / anim.width) * startBlock.protoblock.scale) / 2;
+                    this._decorationBitmap.scaleY =
+                        ((27.5 / anim.height) * startBlock.protoblock.scale) / 2;
+                    this._decorationBitmap.scale =
+                        ((27.5 / anim.width) * startBlock.protoblock.scale) / 2;
+                    startBlock.updateCache();
+                }
+    
+                this.activity.refreshCanvas();
+            });
+        } else {
+            // Handle static image (PNG/JPG)
+            const image = new Image();
+            image.src = myImage;
+    
+            image.onload = () => {
+                this.container.removeChild(this._bitmap);
+                this._bitmap = new createjs.Bitmap(image);
+                this.container.addChild(this._bitmap);
+                this._bitmap.scaleX = shellSize / image.width;
+                this._bitmap.scaleY = this._bitmap.scaleX;
+                this._bitmap.scale = this._bitmap.scaleX;
+                this._bitmap.x = 0;
+                this._bitmap.y = 0;
+                this._bitmap.regX = image.width / 2;
+                this._bitmap.regY = image.height / 2;
+                this._bitmap.rotation = this.orientation;
+                this._skinChanged = true;
+    
+                // Recalculate cache and hit area
+                this.container.uncache();
+                const bounds = this.container.getBounds();
+                this.container.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+    
+                const hitArea = new createjs.Shape();
+                hitArea.graphics.beginFill("#FFF").drawRect(0, 0, bounds.width, bounds.height);
+                hitArea.x = -bounds.width / 2;
+                hitArea.y = -bounds.height / 2;
+                this.container.hitArea = hitArea;
+    
+                // Handle decoration if necessary
+                const startBlock = this._startBlock;
+                if (startBlock != null) {
+                    startBlock.container.removeChild(this._decorationBitmap);
+                    this._decorationBitmap = new createjs.Bitmap(myImage);
+                    startBlock.container.addChild(this._decorationBitmap);
+                    this._decorationBitmap.name = "decoration";
+    
+                    const width = startBlock.width;
+                    this._decorationBitmap.x = width - (30 * startBlock.protoblock.scale) / 2;
+                    this._decorationBitmap.y = (20 * startBlock.protoblock.scale) / 2;
+                    this._decorationBitmap.scaleX =
+                        ((27.5 / image.width) * startBlock.protoblock.scale) / 2;
+                    this._decorationBitmap.scaleY =
+                        ((27.5 / image.height) * startBlock.protoblock.scale) / 2;
+                    this._decorationBitmap.scale =
+                        ((27.5 / image.width) * startBlock.protoblock.scale) / 2;
+                    startBlock.updateCache();
+                }
+    
+                this.activity.refreshCanvas();
+            };
+        }
     }
-
+    
     /**
      * Resizes decoration by width and scale.
      *
@@ -887,38 +1036,76 @@ Turtle.TurtleView = class {
      * @returns {void}
      */
     makeTurtleBitmap(data, activity, useTurtleArtwork) {
-        // Works with Chrome, Safari, Firefox (untested on IE)
+        // Check if the data represents a GIF or an SVG
+        const isGif = data.includes("gif");
         const img = new Image();
-
+    
         img.onload = () => {
-            const bitmap = new createjs.Bitmap(img);
-
-            this._bitmap = bitmap;
-            this._bitmap.regX = 27 | 0;
-            this._bitmap.regY = 27 | 0;
-            this._bitmap.cursor = "pointer";
-            this.container.addChild(this._bitmap);
-            this._createCache();
-
-            const startBlock = this._startBlock;
-            if (useTurtleArtwork && startBlock != null) {
-                startBlock.updateCache();
-                this._decorationBitmap = this._bitmap.clone();
-                startBlock.container.addChild(this._decorationBitmap);
-                this._decorationBitmap.name = "decoration";
-                const width = startBlock.width;
-                const offset = 40;
-
-                this._decorationBitmap.x = width - (offset * startBlock.protoblock.scale) / 2;
-                this._decorationBitmap.y = (35 * startBlock.protoblock.scale) / 2;
-                this._decorationBitmap.scaleX = this._decorationBitmap.scaleY = this._decorationBitmap.scale =
-                    (0.5 * startBlock.protoblock.scale) / 2;
-                startBlock.updateCache();
+            if (isGif) {
+                // If it's a GIF, handle it with gifler
+                gifler(data).get((anim) => {
+                    const gifCanvas = document.createElement("canvas");
+                    anim.animateInCanvas(gifCanvas); // Animate the GIF on the canvas
+    
+                    const bitmap = new createjs.Bitmap(gifCanvas);
+                    this._bitmap = bitmap;
+                    this._bitmap.regX = gifCanvas.width / 2;
+                    this._bitmap.regY = gifCanvas.height / 2;
+                    this._bitmap.cursor = "pointer";
+                    this.container.addChild(this._bitmap);
+                    this._createCache();
+    
+                    const startBlock = this._startBlock;
+                    if (useTurtleArtwork && startBlock != null) {
+                        startBlock.updateCache();
+                        this._decorationBitmap = this._bitmap.clone();
+                        startBlock.container.addChild(this._decorationBitmap);
+                        this._decorationBitmap.name = "decoration";
+                        const width = startBlock.width;
+                        const offset = 40;
+    
+                        this._decorationBitmap.x = width - (offset * startBlock.protoblock.scale) / 2;
+                        this._decorationBitmap.y = (35 * startBlock.protoblock.scale) / 2;
+                        this._decorationBitmap.scaleX = this._decorationBitmap.scaleY = this._decorationBitmap.scale =
+                            (0.5 * startBlock.protoblock.scale) / 2;
+                        startBlock.updateCache();
+                    }
+    
+                    activity.refreshCanvas();
+                });
+            } else {
+                // If it's an SVG or static image, handle it normally
+                this._bitmap = new createjs.Bitmap(img);
+                this._bitmap.regX = 27 | 0;
+                this._bitmap.regY = 27 | 0;
+                this._bitmap.cursor = "pointer";
+                this.container.addChild(this._bitmap);
+                this._createCache();
+    
+                const startBlock = this._startBlock;
+                if (useTurtleArtwork && startBlock != null) {
+                    startBlock.updateCache();
+                    this._decorationBitmap = this._bitmap.clone();
+                    startBlock.container.addChild(this._decorationBitmap);
+                    this._decorationBitmap.name = "decoration";
+                    const width = startBlock.width;
+                    const offset = 40;
+    
+                    this._decorationBitmap.x = width - (offset * startBlock.protoblock.scale) / 2;
+                    this._decorationBitmap.y = (35 * startBlock.protoblock.scale) / 2;
+                    this._decorationBitmap.scaleX = this._decorationBitmap.scaleY = this._decorationBitmap.scale =
+                        (0.5 * startBlock.protoblock.scale) / 2;
+                    startBlock.updateCache();
+                }
+    
+                activity.refreshCanvas();
             }
-
-            activity.refreshCanvas();
         };
-
-        img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data));
-    }
-};
+    
+        // If it's a GIF, use the base64 encoded data, else use the standard SVG data
+        if (isGif) {
+            img.src = data; // For GIF, we use the raw data
+        } else {
+            img.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(data)); // Base64 encode the SVG data
+        }
+    } 
