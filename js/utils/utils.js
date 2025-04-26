@@ -1625,3 +1625,22 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
     // Add members of View (class type has to be controller's name + "View")
     addMembers(obj, eval(cname + "." + cname + "View"), viewArgs);
 };
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        _,
+        last,
+        fileExt,
+        fileBasename,
+        toTitleCase,
+        safeSVG,
+        toFixed2,
+        mixedNumber,
+        nearestBeat,
+        oneHundredToFraction,
+        rationalToFraction,
+        rgbToHex,
+        hexToRGB,
+        hex2rgb
+    };
+}
