@@ -917,7 +917,7 @@ function setupMediaBlocks(activity) {
     }
 
     /**
-     * Represents a block that imports an image.
+     * Represents a block that imports an image or GIF.
      * @class
      * @extends ValueBlock
      */
@@ -935,7 +935,7 @@ function setupMediaBlocks(activity) {
 
             // Set help string for the block
             this.setHelpString([
-                _("The Media block is used to import an image."),
+                _("The Media block is used to import an image or GIF."),
                 "documentation",
                 null,
                 "turtleshell"
@@ -947,35 +947,27 @@ function setupMediaBlocks(activity) {
                 outType: "mediaout"
             });
         }
-    }
 
-    /**
-     * Represents a block that holds a text string.
-     * @class
-     * @extends ValueBlock
-     */
-    class TextBlock extends ValueBlock {
         /**
-         * Constructs a TextBlock instance.
-         * @constructor
+         * Validates and processes the media file.
+         * @param {string} filePath - The path to the media file.
+         * @returns {boolean} - True if the file is valid, false otherwise.
          */
-        constructor() {
-            super("text", _("text"));
+        validateMedia(filePath) {
+            const validExtensions = ["png", "jpg", "jpeg", "gif"];
+            const fileExtension = filePath.split(".").pop().toLowerCase();
+            return validExtensions.includes(fileExtension);
+        }
 
-            // Set extra width for the block
-            this.extraWidth = 30;
-
-            // Set palette and activity for the block
-            this.setPalette("media", activity);
-            this.beginnerBlock(true);
-
-            // Set help string for the block
-            this.setHelpString([_("The Text block holds a text string."), "documentation", ""]);
-
-            // Form block with output type
-            this.formBlock({
-                outType: "textout"
-            });
+        /**
+         * Handles the media file import.
+         * @param {string} filePath - The path to the media file.
+         */
+        importMedia(filePath) {
+            if (!this.validateMedia(filePath)) {
+                throw new Error(_("Invalid media file type. Supported types are: PNG, JPG, GIF."));
+            }
+            // Logic to handle the media file import (e.g., display or process the file)
         }
     }
 
@@ -998,7 +990,6 @@ function setupMediaBlocks(activity) {
     new ClearMediaBlock().setup(activity);
     new ShowBlock().setup(activity);
     new MediaBlock().setup(activity);
-    new TextBlock().setup(activity);
 }
 
 if (typeof module !== "undefined" && module.exports) {

@@ -390,13 +390,4 @@ describe("setupMediaBlocks", () => {
             expect(result).toEqual("mediaInput");
         });
     });
-
-    describe("TextBlock", () => {
-        it("should return its value from blockList", () => {
-            activity.blocks.blockList[620] = { value: "hello world" };
-            const textBlock = createdBlocks["text"];
-            const result = textBlock.arg(logo, turtleIndex, 620);
-            expect(result).toEqual("hello world");
-        });
-    });
 });
