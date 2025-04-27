@@ -161,7 +161,7 @@ class JSEditor {
         helpBtn.innerHTML = "help_outline";
         helpBtn.onclick = this._toggleHelp.bind(this);
         menuLeft.appendChild(helpBtn);
-        generateTooltip(helpBtn, "Help");
+        generateTooltip(helpBtn, _("Help"));
 
         const generateBtn = document.createElement("span");
         generateBtn.classList.add("material-icons");
@@ -174,7 +174,7 @@ class JSEditor {
         generateBtn.innerHTML = "autorenew";
         generateBtn.onclick = this._generateCode.bind(this);
         menuLeft.appendChild(generateBtn);
-        generateTooltip(generateBtn, "Reset Code");
+        generateTooltip(generateBtn, _("Reset Code"));
 
         const runBtn = document.createElement("span");
         runBtn.classList.add("material-icons");
@@ -188,7 +188,7 @@ class JSEditor {
         runBtn.onclick = this._runCode.bind(this);
         menuLeft.appendChild(runBtn);
         menubar.appendChild(menuLeft);
-        generateTooltip(runBtn, "Play");
+        generateTooltip(runBtn, _("Play"));
 
         const convertBtn = document.createElement("span");
         convertBtn.classList.add("material-icons");
@@ -202,7 +202,7 @@ class JSEditor {
         convertBtn.onclick = this._codeToBlocks.bind(this);
         menuLeft.appendChild(convertBtn);
         menubar.appendChild(menuLeft);
-        generateTooltip(convertBtn, "Convert JavaScript to Blocks");
+        generateTooltip(convertBtn, _("Convert JavaScript to Blocks"));
 
         const menuRight = document.createElement("div");
         menuRight.style.height = "3rem";
@@ -223,7 +223,7 @@ class JSEditor {
         styleBtn.onclick = this._changeStyle.bind(this);
         menuRight.appendChild(styleBtn);
         menubar.appendChild(menuRight);
-        generateTooltip(styleBtn, "Change theme", "left");
+        generateTooltip(styleBtn, _("Change theme"), _("left"));
         this._editor.appendChild(menubar);
 
         const editorContainer = document.createElement("div");
@@ -314,7 +314,7 @@ class JSEditor {
         arrowBtn.innerHTML = "keyboard_arrow_down";
         arrowBtn.onclick = this._toggleConsole.bind(this);
         consolelabel.appendChild(arrowBtn);
-        generateTooltip(arrowBtn, "Toggle Console","left");
+        generateTooltip(arrowBtn, _("Toggle Console"),_("left"));
 
         const editorconsole = document.createElement("div");
         editorconsole.id = "editorConsole";
