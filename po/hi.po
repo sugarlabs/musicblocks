@@ -4,7 +4,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-12-05 00:30-0500\n"
 "PO-Revision-Date: 2011-12-04 06:20+0200\n"
-"Last-Translator: sarvesh charpe <sarveshcharpe27@gmail.com>\n"
+"Last-Translator: Ganasekhar Kalla <ganasekharkalla@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: hi\n"
 "MIME-Version: 1.0\n"
@@ -105,7 +105,7 @@ msgstr "बतख"
 
 #: js/themebox.js:66
 msgid "Music Blocks is already set to this theme."
-msgstr ""
+msgstr "संगीत ब्लॉक पहले से ही इस थीम पर सेट है।"
 
 #: js/SaveInterface.js:59
 #: js/SaveInterface.js:61
@@ -243,19 +243,19 @@ msgstr "ब्लॉक्स के लिए खोजें"
 
 #: js/activity.js:1359
 msgid "Are you sure you want to clear the workspace?"
-msgstr ""
+msgstr "क्या आप वाकई कार्यस्थान खाली करना चाहते हैं?"
 
 #: js/activity.js:1578
 msgid "Enter file name"
-msgstr ""
+msgstr "फ़ाइल नाम दर्ज करें"
 
 #: js/activity.js:1580
 msgid "File save canceled"
-msgstr ""
+msgstr "फ़ाइल सहेजना रद्द"
 
 #: js/activity.js:1599
 msgid "Click on stop saving"
-msgstr ""
+msgstr "सेव करना बंद करें पर क्लिक करें"
 
 #: js/activity.js:1884
 msgid "Catching mice"
@@ -584,20 +584,20 @@ msgstr "ब्लॉक छुपाएँ"
 #: js/activity.js:3659
 #: js/activity.js:3674
 msgid "Trash can is empty."
-msgstr ""
+msgstr "कूड़ेदान खाली है|"
 
 #: js/activity.js:3681
 #: js/activity.js:3762
 msgid "Item restored from the trash."
-msgstr ""
+msgstr "आइटम को कचरे से पुनः स्थापित किया गया।"
 
 #: js/activity.js:3820
 msgid "Restore last item"
-msgstr ""
+msgstr "अंतिम आइटम पुनर्स्थापित करें"
 
 #: js/activity.js:3821
 msgid "Restore all items"
-msgstr ""
+msgstr "सभी आइटम पुनर्स्थापित करें"
 
 #: js/activity.js:4379
 msgid "Click the run button to run the project."
@@ -634,11 +634,11 @@ msgstr "JSON इनपुट को पार्स नहीं कर सक�
 
 #: js/activity.js:5987
 msgid "Select is enabled."
-msgstr ""
+msgstr "चयन सक्षम है|"
 
 #: js/activity.js:5987
 msgid "Select is disabled."
-msgstr ""
+msgstr "चयन अक्षम है|"
 
 #: js/activity.js:6369
 #: js/activity.js:6475
@@ -652,7 +652,7 @@ msgstr "अमान्य पैरामीटर्स"
 
 #: js/activity.js:6963
 msgid "Error regenerating palettes. Please refresh the page."
-msgstr ""
+msgstr "पैलेट पुनः बनाने में त्रुटि हुई। कृपया पृष्ठ को ताज़ा करें।"
 
 #: js/block.js:1576
 #: js/block.js:1695
@@ -828,7 +828,7 @@ msgstr "मौन अवरोध हटाया नहीं जा सकत�
 #: js/block.js:3135
 #: js/piemenus.js:3457
 msgid "You can restore deleted blocks from the trash with the Restore From Trash button."
-msgstr ""
+msgstr "आप ट्रैश से पुनर्स्थापित करें बटन का उपयोग करके ट्रैश से हटाए गए ब्लॉकों को पुनर्स्थापित कर सकते हैं।"
 
 #: js/block.js:3765
 #: js/blocks.js:2607
@@ -941,11 +941,11 @@ msgstr "एक संख्या नहीं"
 
 #: js/block.js:4418
 msgid "Octave value must be between 1 and 8."
-msgstr ""
+msgstr "अष्टक मान 1 से 8 के बीच होना चाहिए|"
 
 #: js/block.js:4426
 msgid "Numbers can have at most 10 digits."
-msgstr ""
+msgstr "संख्याएँ अधिकतम 10 अंक की हो सकती हैं।"
 
 #: js/blocks.js:1212
 #: js/blocks.js:3444
@@ -1045,7 +1045,7 @@ msgstr "मान"
 
 #: js/blocks.js:4465
 msgid "Forever loop detected inside a note value block. Unexpected things may happen."
-msgstr ""
+msgstr "नोट वैल्यू ब्लॉक के अंदर फॉरएवर लूप का पता चला है। अप्रत्याशित चीजें हो सकती हैं।"
 
 #: js/blocks.js:4988
 msgid "There is no block selected."
@@ -1301,11 +1301,11 @@ msgstr "मदद"
 
 #: js/piemenus.js:3412
 msgid "In order to copy a sample, you must reload the widget, import the sample again, and export it."
-msgstr ""
+msgstr "किसी नमूने की प्रतिलिपि बनाने के लिए, आपको विजेट को पुनः लोड करना होगा, नमूने को पुनः आयात करना होगा, तथा उसे निर्यात करना होगा।"
 
 #: js/piemenus.js:3801
 msgid "You have chosen key for your pitch preview."
-msgstr ""
+msgstr "आपने अपनी पिच पूर्वावलोकन के लिए कुंजी चुन ली है।"
 
 #: js/rubrics.js:523
 #: js/turtledefs.js:122
@@ -1530,21 +1530,21 @@ msgstr "क्षैतिज स्क्रोलिंग अक्षम क
 #: js/toolbar.js:270
 #: js/turtledefs.js:643
 msgid "Change theme"
-msgstr ""
+msgstr "विषय को परिवर्तित करें"
 
 #: js/toolbar.js:71
 #: js/toolbar.js:138
 #: js/toolbar.js:210
 #: js/toolbar.js:271
 msgid "Light Mode"
-msgstr ""
+msgstr "लाइट मोड"
 
 #: js/toolbar.js:72
 #: js/toolbar.js:139
 #: js/toolbar.js:211
 #: js/toolbar.js:272
 msgid "Dark Mode"
-msgstr ""
+msgstr "डार्क मोड"
 
 #: js/toolbar.js:73
 #: js/toolbar.js:140
@@ -1612,7 +1612,7 @@ msgstr "माउस आर्टवर्क को PNG के रूप मे
 #: js/toolbar.js:148
 #: js/turtledefs.js:568
 msgid "Save project as MIDI"
-msgstr ""
+msgstr "प्रोजेक्ट को MIDI के रूप में सहेजें"
 
 #: js/toolbar.js:84
 #: js/toolbar.js:149
@@ -1654,7 +1654,7 @@ msgstr "ब्लॉक आर्टवर्क को SVG के रूप म
 #: js/toolbar.js:224
 #: js/toolbar.js:285
 msgid "Save block artwork as PNG"
-msgstr ""
+msgstr "ब्लॉक आर्टवर्क को PNG के रूप में सहेजें"
 
 #: js/toolbar.js:92
 #: js/toolbar.js:156
@@ -1670,14 +1670,14 @@ msgstr "पुष्टि करें"
 #: js/toolbar.js:226
 #: js/toolbar.js:287
 msgid "English (United States)"
-msgstr ""
+msgstr "(अमेरीकन) अंग्रेजी"
 
 #: js/toolbar.js:94
 #: js/toolbar.js:167
 #: js/toolbar.js:227
 #: js/toolbar.js:288
 msgid "English (United Kingdom)"
-msgstr ""
+msgstr "अंग्रेजी (एकजुट किंगडम)"
 
 #: js/toolbar.js:95
 #: js/toolbar.js:168
@@ -1702,7 +1702,7 @@ msgstr ""
 #: js/toolbar.js:231
 #: js/toolbar.js:292
 msgid "português"
-msgstr ""
+msgstr "पुर्तगाली"
 
 #: js/toolbar.js:99
 #: js/toolbar.js:172
@@ -1829,7 +1829,7 @@ msgstr "टर्टल रैप चालू"
 
 #: js/toolbar.js:1143
 msgid "Are you sure you want to create a new project?"
-msgstr ""
+msgstr "क्या आप वाकई एक नया प्रोजेक्ट बनाना चाहते हैं?"
 
 #: js/turtle-singer.js:1365
 #.TRANS: partials are weighted components in a harmonic series
@@ -2074,11 +2074,11 @@ msgstr "ब्लॉक कला को एसवीजी फ़ाइल क�
 
 #: js/turtledefs.js:572
 msgid "Save sheet music as ABC, Lilypond or MusicXML"
-msgstr ""
+msgstr "शीट संगीत को ABC, Lilypond या MusicXML के रूप में सहेजें"
 
 #: js/turtledefs.js:574
 msgid "Save block artwork as SVG or PNG"
-msgstr ""
+msgstr "ब्लॉक आर्टवर्क को SVG या PNG के रूप में सहेजें"
 
 #: js/turtledefs.js:581
 msgid "Load samples from server"
@@ -2098,7 +2098,7 @@ msgstr "सहायक उपकरण पट्टी को विस्त�
 
 #: js/turtledefs.js:594
 msgid "Displays help messages for the main and auxiliary toolbar, right-click contextual menu for blocks and canvas, and palettes."
-msgstr ""
+msgstr "मुख्य और सहायक टूलबार के लिए सहायता संदेश प्रदर्शित करता है, ब्लॉक और कैनवास, और पैलेट के लिए राइट-क्लिक प्रासंगिक मेनू प्रदर्शित करता है।"
 
 #: js/turtledefs.js:600
 msgid "Click to run the project in slow mode."
@@ -2114,7 +2114,7 @@ msgstr "अपने संगीत प्रोजेक्ट के आँ�
 
 #: js/turtledefs.js:619
 msgid "Load a selected plugin."
-msgstr ""
+msgstr "चयनित प्लगइन लोड करें|"
 
 #: js/turtledefs.js:627
 msgid "Delete a selected plugin."
@@ -2130,11 +2130,11 @@ msgstr "आप कैनवास पर ब्लॉक्स को स्क�
 
 #: js/turtledefs.js:644
 msgid "Switch between dark and light mode."
-msgstr ""
+msgstr "डार्क और लाइट मोड के बीच स्विच करें|"
 
 #: js/turtledefs.js:650
 msgid "Click to add another project into the current one."
-msgstr ""
+msgstr "वर्तमान परियोजना में एक अन्य परियोजना जोड़ने के लिए क्लिक करें।"
 
 #: js/turtledefs.js:655
 msgid "Wrap Turtle"
@@ -2146,11 +2146,11 @@ msgstr "टर्टल लपेटें को चालू या बंद 
 
 #: js/turtledefs.js:664
 msgid "Click to set the current pitch."
-msgstr ""
+msgstr "वर्तमान पिच सेट करने के लिए क्लिक करें।"
 
 #: js/turtledefs.js:671
 msgid "Converts Music Block programs to JavaScript."
-msgstr ""
+msgstr "संगीत ब्लॉक प्रोग्राम को जावास्क्रिप्ट में परिवर्तित करता है।"
 
 #: js/turtledefs.js:678
 msgid "Restore blocks from the trash."
@@ -2170,11 +2170,11 @@ msgstr "अपनी भाषा प्राथमिकता का चय�
 
 #: js/turtledefs.js:697
 msgid "Contextual Menu for Blocks"
-msgstr ""
+msgstr "ब्लॉक के लिए प्रासंगिक मेनू"
 
 #: js/turtledefs.js:698
 msgid "Right-click on a block to access common actions."
-msgstr ""
+msgstr "सामान्य क्रियाओं तक पहुंचने के लिए किसी ब्लॉक पर राइट-क्लिक करें।"
 
 #: js/turtledefs.js:703
 #: planet/js/StringHelper.js:46
@@ -2183,15 +2183,15 @@ msgstr "हटाएं"
 
 #: js/turtledefs.js:704
 msgid "To delete a block, right-click on it. Then you will see the delete option"
-msgstr ""
+msgstr "किसी ब्लॉक को डिलीट करने के लिए उस पर राइट क्लिक करें। फिर आपको डिलीट ऑप्शन दिखाई देगा"
 
 #: js/turtledefs.js:710
 msgid "To copy a block, right-click on it. Then you will see the copy option"
-msgstr ""
+msgstr "किसी ब्लॉक को कॉपी करने के लिए उस पर राइट क्लिक करें। फिर आपको कॉपी ऑप्शन दिखाई देगा"
 
 #: js/turtledefs.js:716
 msgid "To extract a block, right-click on it. Then you will see the extract option"
-msgstr ""
+msgstr "किसी ब्लॉक को एक्सट्रेक्ट करने के लिए उस पर राइट क्लिक करें। फिर आपको एक्सट्रेक्ट ऑप्शन दिखाई देगा"
 
 #: js/turtledefs.js:722
 msgid "Keyboard shortcuts"
@@ -2203,19 +2203,19 @@ msgstr "आप डू ब्लॉक बनाने के लिए डी �
 
 #: js/turtledefs.js:730
 msgid "Contextual Menu for Canvas"
-msgstr ""
+msgstr "कैनवास के लिए प्रासंगिक मेनू"
 
 #: js/turtledefs.js:731
 msgid "Right-click on the canvas to perform additional canvas-related tasks."
-msgstr ""
+msgstr "कैनवास से संबंधित अतिरिक्त कार्य करने के लिए कैनवास पर राइट-क्लिक करें।"
 
 #: js/turtledefs.js:738
 msgid "Turn on/off lines for cartesian or polar grids."
-msgstr ""
+msgstr "कार्तीय या ध्रुवीय ग्रिड के लिए लाइनों को चालू/बंद करें।"
 
 #: js/turtledefs.js:740
 msgid "Turn on/off music staffs."
-msgstr ""
+msgstr "संगीत स्टाफ़ चालू/बंद करें|"
 
 #: js/turtledefs.js:745
 #: js/turtles.js:959
