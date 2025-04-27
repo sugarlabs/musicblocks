@@ -948,26 +948,27 @@ function setupMediaBlocks(activity) {
             });
         }
 
-        /**
-         * Validates and processes the media file.
-         * @param {string} filePath - The path to the media file.
-         * @returns {boolean} - True if the file is valid, false otherwise.
-         */
-        validateMedia(filePath) {
-            const validExtensions = ["png", "jpg", "jpeg", "gif"];
-            const fileExtension = filePath.split(".").pop().toLowerCase();
-            return validExtensions.includes(fileExtension);
-        }
+        // Override the loadThumbnail method to handle GIFs
+        loadThumbnail(imagePath) {
+            const that = this;
+            const image = new Image();
 
-        /**
-         * Handles the media file import.
-         * @param {string} filePath - The path to the media file.
-         */
-        importMedia(filePath) {
-            if (!this.validateMedia(filePath)) {
-                throw new Error(_("Invalid media file type. Supported types are: PNG, JPG, GIF."));
-            }
-            // Logic to handle the media file import (e.g., display or process the file)
+            image.onload = () => {
+                const bitmap = new createjs.Bitmap(image);
+                if (imagePath.endsWith(".gif")) {
+                    // Handle GIF playback using a library like gif.js or similar
+                    const gif = new SuperGif({ gif: image });
+                    gif.load(() => {
+                        that.value = gif.get_canvas().toDataURL();
+                        that.blocks.updateBlockText(thisBlock);
+                    });
+                } else {
+                    that.value = imagePath;
+                    that.blocks.updateBlockText(thisBlock);
+                }
+            };
+
+            image.src = imagePath;
         }
     }
 
