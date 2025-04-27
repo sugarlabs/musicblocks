@@ -61,112 +61,252 @@ class AST2BlockList {
      * @returns {Array} trees, see example above
      */
     static toTrees(AST) {
-        // A map from the statement type to three getters:
-        //   nameGetter finds the name in the AST node of the statement and returns it;
-        //   argsGetter returns an array of AST nodes that contain the arguments of the statement;
-        //   childrenGetter returns an array of AST nodes that contain the children of the statement.
+        // An array of predicate and visitor pairs - use the visitor to get information from
+        // a body AST node if the predicate evaluates to true. Each visitor defines three getters:
+        //   getName finds the name in the AST node of the statement and returns it
+        //   getArguments returns an array of AST nodes that contain the arguments of the statement
+        //   getChildren returns an array of AST nodes that contain the children of the statement
         // The AST structures for different statement types are different. Therefore, a new entry
-        // needs to be added to the map in order to support a new statement type.
-        // First, change _typeOf function to return a new statement type for a new AST structure.
-        // Then, add the getters in this map with the new type as the key.
-        const _getterLookup = {
-            NewExpression: {
-                nameGetter: () => { return "start"; },
-                argsGetter: () => { return []; },
-                childrenGetter: (bodyAST) => {
-                    for (const arg of bodyAST.expression.arguments) {
-                        if (arg.type == "ArrowFunctionExpression") {
-                            return arg.body.body;
-                        }
-                    }
-                    return [];
+        // needs to be added to the array in order to support a new statement type.
+        const _bodyVisitors = [
+            // Action Palette, Start block
+            {
+                pred: (bodyAST) => {
+                    return bodyAST.type == "ExpressionStatement" &&
+                        bodyAST.expression.type == "NewExpression";
                 },
-            },
-            AssignmentExpression: {
-                nameGetter: (bodyAST) => {
-                    if (bodyAST.expression.right.type == "BinaryExpression"
-                        && bodyAST.expression.left.name == bodyAST.expression.right.left.name) {
-                        // box1 = box1 - 1;
-                        if (bodyAST.expression.right.operator == "-"
-                            && bodyAST.expression.right.right.value == 1) {
-                            return "decrementOne";
+                visitor: {
+                    getName: () => { return "start"; },
+                    getArguments: () => { return []; },
+                    getChildren: (bodyAST) => {
+                        for (const arg of bodyAST.expression.arguments) {
+                            if (arg.type == "ArrowFunctionExpression") {
+                                return arg.body.body;
+                            }
                         }
-                        // box1 = box1 + 3; or
-                        // box1 = box1 + -3;
-                        if (bodyAST.expression.right.operator == "+") {
-                            return "increment";
+                        return [];
+                    },
+                }
+            },
+
+            // Action Palette, Action block (Action Declaration)
+            {
+                pred: (bodyAST) => {
+                    return bodyAST.type == "VariableDeclaration" &&
+                        bodyAST.declarations[0].init.type == "ArrowFunctionExpression";
+                },
+                visitor: {
+                    getName: () => { return "action"; },
+                    getArguments: (bodyAST) => { return [bodyAST.declarations[0].id]; },
+                    getChildren: (bodyAST) => { return bodyAST.declarations[0].init.body.body; },
+                }
+            },
+
+            // Action Palette, Async call: await action(...)
+            {
+                pred: (bodyAST) => {
+                    return bodyAST.type == "ExpressionStatement" &&
+                        bodyAST.expression.type == "AwaitExpression" &&
+                        bodyAST.expression.argument.type == "CallExpression" &&
+                        bodyAST.expression.argument.callee.type == "Identifier";
+                },
+                visitor: {
+                    getName: (bodyAST) => { return { nameddo: bodyAST.expression.argument.callee.name }; },
+                    getArguments: () => { return []; },
+                    getChildren: () => { return []; },
+                }
+            },
+
+            // Async call: await mouse.playNote(...)
+            {
+                pred: (bodyAST) => {
+                    return bodyAST.type == "ExpressionStatement" &&
+                        bodyAST.expression.type == "AwaitExpression" &&
+                        bodyAST.expression.argument.type == "CallExpression" &&
+                        bodyAST.expression.argument.callee.type == "MemberExpression";
+                },
+                visitor: {
+                    getName: (bodyAST) => {
+                        let obj = bodyAST.expression.argument.callee.object.name;
+                        let member = bodyAST.expression.argument.callee.property.name;
+                        let numArgs = bodyAST.expression.argument.arguments.length;
+                        if (obj in _memberLookup && member in _memberLookup[obj]) {
+                            let name = _memberLookup[obj][member];
+                            if (typeof name === 'object') {
+                                name = name[numArgs];
+                            }
+                            return name;
                         }
-                    }
-                    console.error("Unsupported AssignmentExpression: ", bodyAST.expression);
-                },
-                argsGetter: (bodyAST) => {
-                    if (bodyAST.expression.right.type == "BinaryExpression"
-                        && bodyAST.expression.left.name == bodyAST.expression.right.left.name) {
-                        if (bodyAST.expression.right.operator == "-"
-                            && bodyAST.expression.right.right.value == 1) {
-                            return [bodyAST.expression.left];
+                        throw new Error(`Unsupported AsyncCallExpression: ${obj}.${member}`);
+                    },
+                    getArguments: (bodyAST) => { return bodyAST.expression.argument.arguments; },
+                    getChildren: (bodyAST) => {
+                        for (const arg of bodyAST.expression.argument.arguments) {
+                            if (arg.type == "ArrowFunctionExpression") {
+                                return arg.body.body;
+                            }
                         }
-                        if (bodyAST.expression.right.operator == "+") {
-                            return [bodyAST.expression.left, bodyAST.expression.right.right];;
+                        return [];
+                    },
+                }
+            },
+
+            // Flow Palette, Repeat block
+            {
+                pred: (bodyAST) => {
+                    return bodyAST.type == "ForStatement";
+                },
+                visitor: {
+                    getName: () => { return "repeat"; },
+                    getArguments: (bodyAST) => { return [bodyAST.test.right]; },
+                    getChildren: (bodyAST) => { return bodyAST.body.body; },
+                }
+            },
+
+            // Flow Palette, If block
+            {
+                pred: (bodyAST) => {
+                    return bodyAST.type == "IfStatement";
+                },
+                visitor: {
+                    getName: () => { return "if"; },
+                    getArguments: (bodyAST) => { return [bodyAST.test]; },
+                    getChildren: (bodyAST) => { return bodyAST.consequent.body; },
+                }
+            },
+
+            // Boxes Palette, Store in box block (Variable Declaration)
+            {
+                pred: (bodyAST) => {
+                    return bodyAST.type == "VariableDeclaration" &&
+                        (bodyAST.declarations[0].init.type == "Literal" ||              // var v = 6;
+                            bodyAST.declarations[0].init.type == "BinaryExpression" ||  // var v = 2 * 3;
+                            bodyAST.declarations[0].init.type == "CallExpression" ||    // var v = Math.abs(-6);
+                            bodyAST.declarations[0].init.type == "UnaryExpression");    // var v = -6;
+                },
+                visitor: {
+                    getName: (bodyAST) => { return { storein2: bodyAST.declarations[0].id.name }; },
+                    getArguments: (bodyAST) => { return [bodyAST.declarations[0].init]; },
+                    getChildren: () => { return []; },
+                }
+            },
+
+            // Boxes Palette, Add / Subtract block (Assignment)
+            {
+                pred: (bodyAST) => {
+                    return bodyAST.type == "ExpressionStatement" &&
+                        bodyAST.expression.type == "AssignmentExpression";
+                },
+                visitor: {
+                    getName: (bodyAST) => {
+                        if (bodyAST.expression.right.type == "BinaryExpression" &&
+                            bodyAST.expression.left.name == bodyAST.expression.right.left.name) {
+                            // box1 = box1 - 1;
+                            if (bodyAST.expression.right.operator == "-" &&
+                                bodyAST.expression.right.right.value == 1) {
+                                return "decrementOne";
+                            }
+                            // box1 = box1 + 3; or
+                            // box1 = box1 + -3;
+                            if (bodyAST.expression.right.operator == "+") {
+                                return "increment";
+                            }
                         }
-                    }
-                    console.error("Unsupported AssignmentExpression: ", bodyAST.expression);
-                },
-                childrenGetter: () => { return []; },
-            },
-            AsyncActionCallExpression: {
-                nameGetter: (bodyAST) => {
-                    return { nameddo: bodyAST.expression.argument.callee.name };
-                },
-                argsGetter: () => { return []; },
-                childrenGetter: () => { return []; },
-            },
-            AsyncMemberCallExpression: {
-                nameGetter: (bodyAST) => {
-                    let obj = bodyAST.expression.argument.callee.object.name;
-                    let member = bodyAST.expression.argument.callee.property.name;
-                    let numArgs = bodyAST.expression.argument.arguments.length;
-                    if (obj in _memberLookup && member in _memberLookup[obj]) {
-                        let name = _memberLookup[obj][member];
-                        if (typeof name === 'object') {
-                            name = name[numArgs];
+                        throw new Error(`Unsupported AssignmentExpression: ${JSON.stringify(bodyAST.expression, null, 2)}`);
+                    },
+                    getArguments: (bodyAST) => {
+                        if (bodyAST.expression.right.type == "BinaryExpression" &&
+                            bodyAST.expression.left.name == bodyAST.expression.right.left.name) {
+                            if (bodyAST.expression.right.operator == "-" &&
+                                bodyAST.expression.right.right.value == 1) {
+                                return [bodyAST.expression.left];
+                            }
+                            if (bodyAST.expression.right.operator == "+") {
+                                return [bodyAST.expression.left, bodyAST.expression.right.right];;
+                            }
                         }
-                        return name;
-                    }
-                    console.error("Unsupported AsyncMemberCallExpression: ", obj, ".", member);
-                    return null;
+                        throw new Error(`Unsupported AssignmentExpression: ${JSON.stringify(bodyAST.expression, null, 2)}`);
+                    },
+                    getChildren: () => { return []; },
+                }
+            },
+
+            // Ignore MusicBlocks.run()
+            {
+                pred: (bodyAST) => {
+                    return bodyAST.type == "ExpressionStatement" &&
+                        bodyAST.expression.type == "CallExpression" &&
+                        bodyAST.expression.callee.type == "MemberExpression" &&
+                        bodyAST.expression.callee.object.name == "MusicBlocks" &&
+                        bodyAST.expression.callee.property.name == "run";
                 },
-                argsGetter: (bodyAST) => { return bodyAST.expression.argument.arguments; },
-                childrenGetter: (bodyAST) => {
-                    for (const arg of bodyAST.expression.argument.arguments) {
-                        if (arg.type == "ArrowFunctionExpression") {
-                            return arg.body.body;
-                        }
-                    }
-                    return [];
-                },
+                visitor: null
             },
-            ActionDeclaration: {
-                nameGetter: () => { return "action"; },
-                argsGetter: (bodyAST) => { return [bodyAST.declarations[0].id]; },
-                childrenGetter: (bodyAST) => { return bodyAST.declarations[0].init.body.body; },
+        ];
+
+        // A map from argument AST node types to builders that build tree nodes for
+        // argument AST nodes with the corresponding types.
+        // The AST structures for different argument types are different. Therefore, a new entry
+        // needs to be added to the map in order to support a new argument type.
+        const _argNodeBuilders = {
+            "Identifier": (argAST) => {
+                return { identifier: argAST.name };
             },
-            VariableDeclaration: {
-                nameGetter: (bodyAST) => {
-                    return { storein2: bodyAST.declarations[0].id.name };
-                },
-                argsGetter: (bodyAST) => { return [bodyAST.declarations[0].init]; },
-                childrenGetter: () => { return []; },
+
+            "Literal": (argAST) => {
+                return argAST.value;
             },
-            ForStatement: {
-                nameGetter: () => { return "repeat"; },
-                argsGetter: (bodyAST) => { return [bodyAST.test.right]; },
-                childrenGetter: (bodyAST) => { return bodyAST.body.body; }
+
+            "BinaryExpression": (argAST) => {
+                if (!(argAST.operator in _binaryOperatorLookup)) {
+                    throw new Error(`Unsupported binary operator: ${argAST.operator}`);
+                }
+                return {
+                    "name": _binaryOperatorLookup[argAST.operator],
+                    "args": _createArgNode([argAST.left, argAST.right])
+                };
             },
-            IfStatement: {
-                nameGetter: () => { return "if"; },
-                argsGetter: (bodyAST) => { return [bodyAST.test]; },
-                childrenGetter: (bodyAST) => { return bodyAST.consequent.body; }
+
+            "CallExpression": (argAST) => {
+                let obj = argAST.callee.object.name;
+                let member = argAST.callee.property.name;
+                let numArgs = argAST.arguments.length;
+                if (!(obj in _memberLookup && member in _memberLookup[obj])) {
+                    throw new Error(`Unsupported Call function: ${obj}.${member}`);
+                }
+                let name = _memberLookup[obj][member];
+                if (typeof name === 'object') {
+                    name = name[numArgs];
+                }
+                let args = argAST.arguments;
+                if (name == "getDict") {
+                    // For getValue(Key, Dictionary Name),
+                    // make sure the order is [Dictionary Name, Key]
+                    args = [argAST.arguments[1], argAST.arguments[0]];
+                }
+                return {
+                    "name": name,
+                    "args": _createArgNode(args)
+                };
+            },
+
+            "UnaryExpression": (argAST) => {
+                if (!(argAST.operator in _unaryOperatorLookup)) {
+                    throw new Error(`Unsupported unary operator: ${argAST.operator}`);
+                }
+                return {
+                    "name": _unaryOperatorLookup[argAST.operator],
+                    "args": _createArgNode([argAST.argument])
+                };
+            },
+
+            "AwaitExpression": (argAST) => {
+                return _createArgNode([argAST.argument])[0];
+            },
+
+            "ArrowFunctionExpression": () => {
+                // Ignore the type, it's for children
+                return null;
             },
         };
 
@@ -174,24 +314,24 @@ class AST2BlockList {
         // Member functions are function names used in JavaScript, while block names are
         // recognizable by musicblocks.
         const _memberLookup = {
-            mouse: {
-                setInstrument: "settimbre",
-                playNote: "newnote",
-                playPitch: "pitch",
+            "mouse": {
+                "setInstrument": "settimbre",
+                "playNote": "newnote",
+                "playPitch": "pitch",
                 // Handle function overloading with different number of arguments
-                setValue: { 3: "setDict", 2: "setDict2" },
-                getValue: { 2: "getDict", 1: "getDict2" },
+                "setValue": { 3: "setDict", 2: "setDict2" },
+                "getValue": { 2: "getDict", 1: "getDict2" },
             },
-            Math: {
-                abs: "abs",
-                floor: "int",
-                pow: "power",
-                sqrt: "sqrt",
+            "Math": {
+                "abs": "abs",
+                "floor": "int",
+                "pow": "power",
+                "sqrt": "sqrt",
             },
-            MathUtility: {
-                doCalculateDistance: "distance",
-                doOneOf: "oneOf",
-                doRandom: "random",
+            "MathUtility": {
+                "doCalculateDistance": "distance",
+                "doOneOf": "oneOf",
+                "doRandom": "random",
             },
         };
 
@@ -222,12 +362,6 @@ class AST2BlockList {
         // Implementation of toTrees(AST).
         let root = {};
         for (let body of AST.body) {
-            // Ignore MusicBlocks.run()
-            if (_typeOf(body) == "MemberCallExpression"
-                && body.expression.callee.object.name == "MusicBlocks"
-                && body.expression.callee.property.name == "run") {
-                continue;
-            }
             _createNodeAndAddToTree(body, root);
         }
         return root["children"];
@@ -235,64 +369,6 @@ class AST2BlockList {
         //
         // Helper functions
         //
-
-        function _typeOf(bodyAST) {
-            if (bodyAST.type == "ExpressionStatement") {
-                if (bodyAST.expression.type == "NewExpression") {
-                    return "NewExpression";
-                }
-                if (bodyAST.expression.type == "AssignmentExpression") {
-                    return "AssignmentExpression";
-                }
-                if (bodyAST.expression.type == "CallExpression") {
-                    if (bodyAST.expression.callee.type == "Identifier") {
-                        return "ActionCallExpression";
-                    }
-                    if (bodyAST.expression.callee.type == "MemberExpression") {
-                        return "MemberCallExpression";
-                    }
-                    console.error("Unsupported CallExpression callee type: ", bodyAST.expression.callee.type);
-                    return null;
-                }
-                if (bodyAST.expression.type == "AwaitExpression") {
-                    if (bodyAST.expression.argument.type == "CallExpression") {
-                        if (bodyAST.expression.argument.callee.type == "Identifier") {
-                            return "AsyncActionCallExpression";
-                        }
-                        if (bodyAST.expression.argument.callee.type == "MemberExpression") {
-                            return "AsyncMemberCallExpression";
-                        }
-                        console.error("Unsupported Async CallExpression callee type: ", bodyAST.expression.argument.callee.type);
-                        return null;
-                    }
-                    console.error("Unsupported AwaitExpression argument type: ", bodyAST.expression.type);
-                    return null;
-                }
-                console.error("Unsupported ExpressionStatement expression type: ", bodyAST.expression.type);
-                return null;
-            }
-            if (bodyAST.type == "ForStatement") {
-                return "ForStatement";
-            }
-            if (bodyAST.type == "IfStatement") {
-                return "IfStatement";
-            }
-            if (bodyAST.type == "VariableDeclaration") {
-                if (bodyAST.declarations[0].init.type == "Literal"  // var v = 6;
-                    || bodyAST.declarations[0].init.type == "BinaryExpression"  // var v = 2 * 3;
-                    || bodyAST.declarations[0].init.type == "CallExpression"  // var v = Math.abs(-6);
-                    || bodyAST.declarations[0].init.type == "UnaryExpression") {  // var v = -6;
-                    return "VariableDeclaration";
-                }
-                if (bodyAST.declarations[0].init.type == "ArrowFunctionExpression") {
-                    return "ActionDeclaration";
-                }
-                console.error("Unsupported VariableDeclaration init type:", bodyAST.declarations[0].init.type);
-                return null;
-            }
-            console.error("Unsupported AST body type: ", bodyAST.type);
-            return null;
-        }
 
         /**
          * Create a tree node starting at the give AST node and add it to parent, which is also a tree node.
@@ -304,35 +380,45 @@ class AST2BlockList {
          * @returns {Void}
          */
         function _createNodeAndAddToTree(bodyAST, parent) {
-            let type = _typeOf(bodyAST);
-            if (type == null) {
-                return;
-            }
-            if (!(type in _getterLookup)) {
-                console.error("Unsupported AST node type: ", type, "in AST: ", bodyAST);
-                return;
-            }
-
-            let node = {};
-            // Set block name
-            node["name"] = _getterLookup[type].nameGetter(bodyAST);
-            // Set arguments
-            let args = _createArgNode(_getterLookup[type].argsGetter(bodyAST));
-            if (args.length > 0) {
-                node["args"] = args;
-            }
-            // Set children
-            for (const child of _getterLookup[type].childrenGetter(bodyAST)) {
-                if (child.type != "ReturnStatement") {
-                    _createNodeAndAddToTree(child, node);
+            let visitor = undefined;
+            for (const entry of _bodyVisitors) {
+                if (entry.pred(bodyAST)) {
+                    visitor = entry.visitor;
+                    break;
                 }
             }
-
-            // Add the node to the children list of the parent.
-            if (parent["children"] === undefined) {
-                parent["children"] = [];
+            if (visitor === undefined) {
+                console.error("Unsupported AST:", bodyAST);
+                return;
             }
-            parent["children"].push(node);
+            if (visitor === null) {
+                return;
+            }
+
+            try {
+                let node = {};
+                // Set block name
+                node["name"] = visitor.getName(bodyAST);
+                // Set arguments
+                let args = _createArgNode(visitor.getArguments(bodyAST));
+                if (args.length > 0) {
+                    node["args"] = args;
+                }
+                // Set children
+                for (const child of visitor.getChildren(bodyAST)) {
+                    if (child.type != "ReturnStatement") {
+                        _createNodeAndAddToTree(child, node);
+                    }
+                }
+
+                // Add the node to the children list of the parent.
+                if (parent["children"] === undefined) {
+                    parent["children"] = [];
+                }
+                parent["children"].push(node);
+            } catch (error) {
+                console.error(error.message);
+            }
         }
 
         /**
@@ -346,64 +432,13 @@ class AST2BlockList {
         function _createArgNode(argASTNodes) {
             let argNodes = [];
             for (const arg of argASTNodes) {
-                switch (arg.type) {
-                    case "ArrowFunctionExpression":
-                        // Ignore the type, it's for children
-                        break;
-                    case "Identifier":
-                        argNodes.push({ identifier: arg.name });
-                        break;
-                    case "Literal":
-                        argNodes.push(arg.value);
-                        break;
-                    case "BinaryExpression":
-                        if (arg.operator in _binaryOperatorLookup) {
-                            argNodes.push({
-                                "name": _binaryOperatorLookup[arg.operator],
-                                "args": _createArgNode([arg.left, arg.right])
-                            });
-                        } else {
-                            console.error("Unsupported binary operator: ", arg.operator);
-                        }
-                        break;
-                    case "CallExpression":
-                        let obj = arg.callee.object.name;
-                        let member = arg.callee.property.name;
-                        let numArgs = arg.arguments.length;
-                        if (obj in _memberLookup && member in _memberLookup[obj]) {
-                            let name = _memberLookup[obj][member];
-                            if (typeof name === 'object') {
-                                name = name[numArgs];
-                            }
-                            let args = arg.arguments;
-                            if (name == "getDict") {
-                                // For getValue(Key, Dictionary Name),
-                                // make sure the order is [Dictionary Name, Key]
-                                args = [arg.arguments[1], arg.arguments[0]];
-                            }
-                            argNodes.push({
-                                "name": name,
-                                "args": _createArgNode(args)
-                            });
-                        } else {
-                            console.error("Unsupported Call function: ", obj, ".", member);
-                        }
-                        break;
-                    case "UnaryExpression":
-                        if (arg.operator in _unaryOperatorLookup) {
-                            argNodes.push({
-                                "name": _unaryOperatorLookup[arg.operator],
-                                "args": _createArgNode([arg.argument])
-                            });
-                        } else {
-                            console.error("Unsupported unary operator: ", arg.operator);
-                        }
-                        break;
-                    case "AwaitExpression":
-                        argNodes.push(_createArgNode([arg.argument])[0]);
-                        break;
-                    default:
-                        console.error("Unsupported argument type: ", arg.type);
+                const argNodeBuilder = _argNodeBuilders[arg.type];
+                if (argNodeBuilder === null) {
+                    throw new Error(`Unsupported argument type: ${arg.type}`);
+                }
+                const argNode = argNodeBuilder(arg);
+                if (argNode !== null) {
+                    argNodes.push(argNode);
                 }
             }
             return argNodes;
@@ -416,37 +451,180 @@ class AST2BlockList {
      */
     static toBlockList(trees) {
         // A map from block name to its argument handling function.
+        // Keys do not include the blocks that do not take arguments (e.g., start block or action call block)
+        // or can only be used as arguments - any block with a connector on its left side.
         const _argHandlers = {
-            "action": _actionArgHandler,           // A string literal for action name
-            "settimbre": _settimbreArgHandler,     // A string literal for instrument name
-            "decrementOne": _variableArgHandler,   // A string identifier for variable
-            "pitch": _pitchArgHandler,             // A note and a number expression
-            "increment": _incrementArgHandler,     // A string identifier for variable and a number expression
-            "newnote": _addValueArgsToBlockList,   // A number expression
-            "repeat": _addValueArgsToBlockList,    // A number expression
-            "if": _addValueArgsToBlockList,        // A boolean expression
-            "storein2": _addValueArgsToBlockList,  // A number / boolean expression
-            "setDict": _setDictArgHandler,         // A string for the name of the dictionary, a string for the key, and a value
-            "setDict2": _setDictArgHandler,        // A string for the key, and a value
+            // Action Palette, Action block (Action Declaration) takes a string literal for action name
+            // Example: let chunk1 = async mouse => {...}
+            // args: [{"identifier": "chunk1"}] =>
+            //   [2,["text",{"value":"chunck1"}],0,0,[1]]
+            "action": (args, blockList, parentBlockNumber) => {
+                _addNthArgToBlockList(["text", { "value": args[0].identifier }], 1, blockList, parentBlockNumber);
+            },
+
+            // Tone Palette, set instrument block takes a string literal for instrument name
+            // Example: mouse.setInstrument("guitar", async () => {...});
+            // args: ["guitar"] =>
+            //   [2,["voicename",{"value":"guitar"}],0,0,[1]]
+            "settimbre": (args, blockList, parentBlockNumber) => {
+                _addNthArgToBlockList(["voicename", { "value": args[0] }], 1, blockList, parentBlockNumber);
+            },
+
+            // Pitch Palette, pitch block takes a note name and a number expression for octave
+            // Example: mouse.playPitch("sol", 4);
+            // args: ['sol', 4] =>
+            //   [10,["solfege",{"value":"sol"}],0,0,[9]],
+            //   [11,["number",{"value":4}],0,0,[9]]
+            // args: ['G', 4] =>
+            //   [10,["notename",{"value":"G"}],0,0,[9]],
+            //   [11,["number",{"value":4}],0,0,[9]]
+            "pitch": (args, blockList, parentBlockNumber) => {
+                const notes = new Set(['A', 'B', 'C', 'D', 'E', 'F', 'G']);
+                // Add the 1st argument - note name
+                _addNthArgToBlockList(
+                    [notes.has(args[0].charAt(0)) ? "notename" : "solfege", { "value": args[0] }],
+                    1, blockList, parentBlockNumber);
+                // Add the 2nd argument - a number expression for octave
+                _addNthValueArgToBlockList(args[1], 2, blockList, parentBlockNumber);
+            },
+
+            // Rhythm Palette, note block takes a number expression that evaluates to 1, 1/2, 1/4, etc.
+            // Example: mouse.playNote(1 / 4, async () => {...});
+            // args: [{"name": "divide"}, "args": [1, 4]] =>
+            //   [8, "divide", 0, 0, [7, 9, 10]],
+            //   [9, ["number", { "value": 1 }], 0, 0, [8]],
+            //   [10, ["number", { "value": 4 }], 0, 0, [8]],
+            "newnote": _addValueArgsToBlockList,
+
+            // Boxes Palette, subtract 1 from block takes a string identifier for variable
+            // Example: box1 = box1 - 1;
+            // args: [{"identifier": "box1"}]
+            //   [2,["namedbox",{"value":"box1"}],0,0,[1]]
+            "decrementOne": (args, blockList, parentBlockNumber) => {
+                _addNthArgToBlockList(["namedbox", { "value": args[0].identifier }], 1, blockList, parentBlockNumber);
+            },
+
+            // Boxes Palette, add block takes a string identifier for variable and a number expression
+            // Example: box1 = box1 + 2;
+            // args: [{"identifier": "box1"}, 2] =>
+            //   [10,["namedbox",{"value":"box1"}],0,0,[9]],
+            //   [11,["number",{"value":2}],0,0,[9]]
+            "increment": (args, blockList, parentBlockNumber) => {
+                // Add the 1st argument - variable name
+                _addNthArgToBlockList(["namedbox", { "value": args[0].identifier }], 1, blockList, parentBlockNumber);
+                // Add the 2nd argument - a number expression
+                _addNthValueArgToBlockList(args[1], 2, blockList, parentBlockNumber);
+            },
+
+            // Boxes Palette, store in box block takes a number or boolean expression
+            // Example: var box1 = 2 * 5;
+            // args: [{"name": "multiply"}, "args": [2, 5]] =>
+            //   [8, "multiply", 0, 0, [7, 9, 10]],
+            //   [9, ["number", { "value": 2 }], 0, 0, [8]],
+            //   [10, ["number", { "value": 5 }], 0, 0, [8]],
+            "storein2": _addValueArgsToBlockList,
+
+            // Dictionary Palette, set value block takes a string for the name of the dictionary, a string for the key, and a value
+            // Example: mouse.setValue("times", 3, "dict");
+            // args: ["times", 3, "dict"] =>
+            //   [8,["text",{"value":"dict"}],0,0,[7]],
+            //   [9,["text",{"value":"times"}],0,0,[7]],
+            //   [10,["number",{"value":3}],0,0,[7]]
+            "setDict": (args, blockList, parentBlockNumber) => {
+                // Add the 1st argument - Dictionary name
+                _addNthArgToBlockList(["text", { "value": args[2] }], 1, blockList, parentBlockNumber);
+                // Add the 2nd argument - Key
+                _addNthArgToBlockList(["text", { "value": args[0] }], 2, blockList, parentBlockNumber);
+                // Add the 3rd argument - Value
+                _addNthValueArgToBlockList(args[1], 3, blockList, parentBlockNumber);
+            },
+
+            // Dictionary Palette, set value block takes a string for the key, and a value
+            // Example: mouse.setValue("times", 3);
+            // args: ["times", 3] =>
+            //   [8,["text",{"value":"times"}],0,0,[7]],
+            //   [9,["number",{"value":3}],0,0,[7]]
+            "setDict2": (args, blockList, parentBlockNumber) => {
+                // Add the 1st argument - Key
+                _addNthArgToBlockList(["text", { "value": args[0] }], 1, blockList, parentBlockNumber);
+                // Add the 2nd argument - Value
+                _addNthValueArgToBlockList(args[1], 2, blockList, parentBlockNumber);
+            },
+
+            // Flow Palette, repeat block takes a number expression
+            "repeat": _addValueArgsToBlockList,
+
+            // Flow Palette, if block takes a boolean expression
+            "if": _addValueArgsToBlockList,
         };
 
-        // A map from block name to the definition of its connections.
+        // A map from block name to the descriptor of its connections.
+        // Keys do not include the blocks that can only be used as arguments - any block with
+        // a connector on its left side.
         const _connDescriptors = {
-            "start": { "prev": 0, "child": 1, "next": 2 },
-            "action": { "prev": 0, "args": 1, "child": 2, "next": 3 },
-            "settimbre": { "prev": 0, "args": 1, "child": 2, "next": 3 },
-            "decrementOne": { "prev": 0, "args": 1, "next": 2 },
-            "pitch": { "prev": 0, "args": 1, "child": 2, "next": 3 },
-            "increment": { "prev": 0, "args": 1, "next": 3 },
-            "newnote": { "prev": 0, "args": 1, "child": 2, "next": 3 },
-            "repeat": { "prev": 0, "args": 1, "child": 2, "next": 3 },
-            "if": { "prev": 0, "args": 1, "child": 2, "next": 3 },
-            "storein2": { "prev": 0, "args": 1, "next": 2 },
-            "nameddo": { "prev": 0, "next": 1 },
-            "setDict": { "prev": 0, "next": 4 },
-            "setDict2": { "prev": 0, "next": 3 },
+            "start": {
+                // null, child, null
+                count: 3, "child": 1
+            },
+            "action": {
+                // Action declaration
+                // null, arg (action name), child, null
+                count: 4, "child": 2
+            },
+            "nameddo": {
+                // Action call
+                // prev, next
+                count: 2, "prev": 0, "next": 1
+            },
+            "settimbre": {
+                // prev, arg (instrument name), child, next
+                count: 4, "prev": 0, "child": 2, "next": 3
+            },
+            "pitch": {
+                // prev, arg1 (solfege), arg2 (octave), next
+                count: 4, "prev": 0, "next": 3
+            },
+            "newnote": {
+                // prev, arg (note), child, next
+                count: 4, "prev": 0, "child": 2, "next": 3
+            },
+            "decrementOne": {
+                // prev, arg (variable name), next
+                count: 3, "prev": 0, "next": 2
+            },
+            "increment": {
+                // prev, arg1 (variable name), arg2 (value), next
+                count: 4, "prev": 0, "next": 3
+            },
+            "storein2": {
+                // prev, arg (variable name), next
+                count: 3, "prev": 0, "next": 2
+            },
+            "setDict": {
+                // prev, arg1 (dictionary name), arg2 (key), arg3 (value), next
+                count: 5, "prev": 0, "next": 4
+            },
+            "setDict2": {
+                // prev, arg1 (key), arg2 (value), next
+                count: 4, "prev": 0, "next": 3
+            },
+            "repeat": {
+                // prev, arg (repeat counts), child, next
+                count: 4, "prev": 0, "child": 2, "next": 3
+            },
+            "if": {
+                // prev, arg (condition), child, next
+                count: 4, "prev": 0, "child": 2, "next": 3
+            },
         };
 
+        // [1,"settimbre",0,0,[0,2,3,null]] or
+        // [21,["nameddo",{"value":"action"}],421,82,[20]]
+        function _connDescriptorOf(block) {
+            return _connDescriptors[Array.isArray(block[1]) ? block[1][0] : block[1]];
+        }
+
+        // Implementation of toBlockList(trees).
         let blockList = [];
         let x = 200;
         for (let tree of trees) {
@@ -489,8 +667,8 @@ class AST2BlockList {
             block.push(0);  // x
             block.push(0);  // y
 
-            let connDesc = _connectionDescriptorOf(block);
-            let connections = new Array(Object.keys(connDesc).length).fill(null);
+            let connDesc = _connDescriptorOf(block);
+            let connections = new Array(connDesc.count).fill(null);
             block.push(connections);
 
             // Process arguments
@@ -506,28 +684,22 @@ class AST2BlockList {
                 connections[connDesc["child"]] = childBlockNumbers[0];
                 // Set parent block number for the first child to this block
                 let childBlock = blockList[childBlockNumbers[0]];
-                connDesc = _connectionDescriptorOf(childBlock);
+                connDesc = _connDescriptorOf(childBlock);
                 childBlock[4][connDesc["prev"]] = blockNumber;
                 // Parent of other children is their previous sibling
                 for (let i = 1; i < childBlockNumbers.length; i++) {
                     childBlock = blockList[childBlockNumbers[i]];
-                    connDesc = _connectionDescriptorOf(childBlock);
+                    connDesc = _connDescriptorOf(childBlock);
                     childBlock[4][connDesc["prev"]] = childBlockNumbers[i - 1];
                 }
                 // Set the next sibling block number for the children, except the last one
                 for (let i = 0; i < childBlockNumbers.length - 1; i++) {
                     childBlock = blockList[childBlockNumbers[i]];
-                    connDesc = _connectionDescriptorOf(childBlock);
+                    connDesc = _connDescriptorOf(childBlock);
                     childBlock[4][connDesc["next"]] = childBlockNumbers[i + 1];
                 }
             }
             return blockNumber;
-        }
-
-        // [1,"settimbre",0,0,[0,2,3,null]] or
-        // [21,["namedbox",{"value":"box1"}],421,82,[20]]
-        function _connectionDescriptorOf(block) {
-            return _connDescriptors[Array.isArray(block[1]) ? block[1][0] : block[1]];
         }
 
         function _createArgBlockAndAddToList(node, blockList, parentBlockNumber) {
@@ -537,8 +709,7 @@ class AST2BlockList {
             let argHandlerKey = (typeof node.name) === "object" ? Object.keys(node.name)[0] : node.name;
             let argHandler = _argHandlers[argHandlerKey];
             if (argHandler === undefined) {
-                console.error("Cannot find argument handler for: ", argHandlerKey);
-                return;
+                throw new Error(`Cannot find argument handler for: ${argHandlerKey}`);
             }
             argHandler(node.args, blockList, parentBlockNumber);
         }
@@ -553,86 +724,6 @@ class AST2BlockList {
             block.push(0);  // x
             block.push(0);  // y
             block.push([parentBlockNumber]);  // connections
-            let parentConnections = blockList[parentBlockNumber][4];
-            parentConnections[nth] = blockNumber;
-        }
-
-        /**
-         * @param {Object} args - the args property of a settimbre tree node, for example, ["guitar"]
-         * @param {Array} blockList - a new block [2,["voicename",{"value":"guitar"}],0,0,[1]] for the above example will be added to the blockList
-         * @param {Number} parentBlockNumber - the number of the settimbre (parent) block of this argument block
-         */
-        function _settimbreArgHandler(args, blockList, parentBlockNumber) {
-            _addNthArgToBlockList(["voicename", { "value": args[0] }], 1, blockList, parentBlockNumber);
-        }
-
-        /**
-         * @param {Object} args - the args property of an action tree node, for example, ["identifier": "chunk1"]
-         * @param {Array} blockList - a new block [2,["text",{"value":"chunck1"}],0,0,[1]] for the above example will be added to the blockList
-         * @param {Number} parentBlockNumber - the number of the action (parent) block of this argument block
-         */
-        function _actionArgHandler(args, blockList, parentBlockNumber) {
-            _addNthArgToBlockList(["text", { "value": args[0].identifier }], 1, blockList, parentBlockNumber);
-        }
-
-        /**
-         * @param {Object} args - the args property of an increment or decrementOne tree node, for example, ["identifier": "box1"]
-         * @param {Array} blockList - a new block [2,["namedbox",{"value":"box1"}],0,0,[1]] for the above example will be added to the blockList
-         * @param {Number} parentBlockNumber - the number of the increment or decrementOne (parent) block of this argument block
-         */
-        function _variableArgHandler(args, blockList, parentBlockNumber) {
-            _addNthArgToBlockList(["namedbox", { "value": args[0].identifier }], 1, blockList, parentBlockNumber);
-        }
-
-        /**
-         * Example:
-         * args: ['sol', 4] =>
-         *   [10,["solfege",{"value":"sol"}],0,0,[9]],
-         *   [11,["number",{"value":4}],0,0,[9]]
-         * 
-         * @param {Object} args - the args property of a pitch tree node
-         * @param {Array} blockList - the blockList to which the new argument blocks will be added
-         * @param {Number} parentBlockNumber - the number of the parent block of the new argument blocks
-          */
-        function _pitchArgHandler(args, blockList, parentBlockNumber) {
-            _addNthArgToBlockList(["solfege", { "value": args[0] }], 1, blockList, parentBlockNumber);
-
-            let blockNumber = _addValueArgToBlockList(args[1], blockList, parentBlockNumber);
-            let parentConnections = blockList[parentBlockNumber][4];
-            parentConnections[2] = blockNumber;
-        }
-
-        /**
-         * Example:
-         * args: [{"identifier": "box1"}, 4] =>
-         *   [10,["namedbox",{"value":"box1"}],0,0,[9]],
-         *   [11,["number",{"value":4}],0,0,[9]]
-         * 
-         * @param {Object} args - the args property of an increment tree node
-         * @param {Array} blockList - the blockList to which the new argument blocks will be added
-         * @param {Number} parentBlockNumber - the number of the parent block of the new argument blocks
-          */
-        function _incrementArgHandler(args, blockList, parentBlockNumber) {
-            _addNthArgToBlockList(["namedbox", { "value": args[0].identifier }], 1, blockList, parentBlockNumber);
-
-            let blockNumber = _addValueArgToBlockList(args[1], blockList, parentBlockNumber);
-            let parentConnections = blockList[parentBlockNumber][4];
-            parentConnections[2] = blockNumber;
-        }
-
-        function _setDictArgHandler(args, blockList, parentBlockNumber) {
-            let nth = 1;
-
-            // Dictionary name, optional
-            if (args.length == 3) {
-                _addNthArgToBlockList(["text", { "value": args[2] }], nth++, blockList, parentBlockNumber);
-            }
-
-            // Key
-            _addNthArgToBlockList(["text", { "value": args[0] }], nth++, blockList, parentBlockNumber);
-
-            // Value
-            let blockNumber = _addValueArgToBlockList(args[1], blockList, parentBlockNumber);
             let parentConnections = blockList[parentBlockNumber][4];
             parentConnections[nth] = blockNumber;
         }
@@ -661,14 +752,12 @@ class AST2BlockList {
          * @param {Number} parentBlockNumber - the number of the parent block of the new argument blocks
          */
         function _addValueArgsToBlockList(args, blockList, parentBlockNumber) {
-            let parentConnectionArgStartIndex = 1;
-            for (let arg of args) {
-                let parentConnections = blockList[parentBlockNumber][4];
-                parentConnections[parentConnectionArgStartIndex++] = _addValueArgToBlockList(arg, blockList, parentBlockNumber);
+            for (let i = 0; i < args.length; i++) {
+                _addNthValueArgToBlockList(args[i], i + 1, blockList, parentBlockNumber);
             }
         }
 
-        function _addValueArgToBlockList(arg, blockList, parentBlockNumber) {
+        function _addNthValueArgToBlockList(arg, nth, blockList, parentBlockNumber) {
             let block = [];
             let blockNumber = blockList.length;
             block.push(blockNumber);
@@ -677,8 +766,8 @@ class AST2BlockList {
             if (type === 'string') {
                 type = 'text';
             }
-            if (type === 'number' || type === 'boolean' || type === 'text'
-                || (type === 'object' && arg.identifier !== undefined)) {
+            if (type === 'number' || type === 'boolean' || type === 'text' ||
+                (type === 'object' && arg.identifier !== undefined)) {
                 // variables can be in number or boolean expressions
                 block.push(type === 'object' ? ["namedbox", { "value": arg.identifier }] : [type, { "value": arg }]);
                 block.push(0);  // x
@@ -694,9 +783,10 @@ class AST2BlockList {
                 block.push(connections);
                 _addValueArgsToBlockList(arg.args, blockList, blockNumber);
             } else {
-                console.error("Unsupported value argument: ", arg);
+                throw new Error(`Unsupported value argument: ${arg}`);
             }
-            return blockNumber;
+            let parentConnections = blockList[parentBlockNumber][4];
+            parentConnections[nth] = blockNumber;
         }
     }
 }

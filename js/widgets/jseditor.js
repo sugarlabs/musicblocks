@@ -190,6 +190,20 @@ class JSEditor {
         menubar.appendChild(menuLeft);
         generateTooltip(runBtn, "Play");
 
+        const convertBtn = document.createElement("span");
+        convertBtn.classList.add("material-icons");
+        convertBtn.style.borderRadius = "50%";
+        convertBtn.style.padding = ".25rem";
+        convertBtn.style.marginLeft = ".75rem";
+        convertBtn.style.fontSize = "2rem";
+        convertBtn.style.background = "#2196f3";
+        convertBtn.style.cursor = "pointer";
+        convertBtn.innerHTML = "transform";
+        convertBtn.onclick = this._codeToBlocks.bind(this);
+        menuLeft.appendChild(convertBtn);
+        menubar.appendChild(menuLeft);
+        generateTooltip(convertBtn, "Convert JavaScript to Blocks");
+
         const menuRight = document.createElement("div");
         menuRight.style.height = "3rem";
         menuRight.style.display = "flex";
@@ -420,10 +434,6 @@ class JSEditor {
         try {
             MusicBlocks.init(true);
             new Function(this._code)();
-            let enableCodeToBlocks = false;  // ONLY ENABLE FOR LOCAL TESTING
-            if (enableCodeToBlocks) {
-                this._updateCanvas();
-            }
         } catch (e) {
             JSEditor.logConsole(e, "maroon");
         }
@@ -434,19 +444,20 @@ class JSEditor {
      * 
      * @returns {Void}
      */
-    _updateCanvas() {
+    _codeToBlocks() {
         let ast = acorn.parse(this._code, { ecmaVersion: 2020 });
         let trees = AST2BlockList.toTrees(ast);
         let blockList = AST2BlockList.toBlockList(trees);
         const activity = this.activity;
-        // Wait for the old blocks to be removed.
+        // Wait for the old blocks to be removed, then load new blocks.
         const __listener = (event) => {
             activity.blocks.loadNewBlocks(blockList);
             activity.stage.removeAllEventListeners("trashsignal");
         };
         activity.stage.removeAllEventListeners("trashsignal");
         activity.stage.addEventListener("trashsignal", __listener, false);
-        activity.sendAllToTrash(false, false);
+        // Clear the canvas but leave the JS editor open
+        activity.sendAllToTrash(false, false, false);
     }
 
     /**

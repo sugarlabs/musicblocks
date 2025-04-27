@@ -4005,8 +4005,9 @@ class Activity {
          * Hide the palettes before update, then deletes everything/sends all to trash.
          * @param {boolean} addStartBlock {if true adds a new start block to new project instance}
          * @param {boolean} doNotSave     {if true discards any changes to project}
+         * @param {boolean} closeAllWidgets  {if true close all open widgets}
          */
-        this.sendAllToTrash = (addStartBlock, doNotSave) => {
+        this.sendAllToTrash = (addStartBlock, doNotSave, closeAllWidgets = true) => {
             // Return to home position after loading new blocks.
             this.blocksContainer.x = 0;
             this.blocksContainer.y = 0;
@@ -4066,7 +4067,9 @@ class Activity {
             this.update = true;
 
             // Close any open widgets.
-            closeWidgets();
+            if (closeAllWidgets) {
+                closeWidgets();
+            }
         };
 
         /*

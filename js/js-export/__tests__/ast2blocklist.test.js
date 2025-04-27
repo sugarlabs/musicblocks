@@ -35,7 +35,7 @@ describe('AST2BlockList Class', () => {
         new Mouse(async mouse => {
             await mouse.setInstrument("guitar", async () => {
                 await mouse.playNote(Math.abs(-2) * 1, async () => {
-                    await mouse.playPitch("mi", Math.abs(-2));
+                    await mouse.playPitch("G♭", Math.abs(-2));
                     return mouse.ENDFLOW;
                 });
                 return mouse.ENDFLOW;
@@ -55,7 +55,7 @@ describe('AST2BlockList Class', () => {
             [7, ["number", { "value": 2 }], 0, 0, [6]],
             [8, ["number", { "value": 1 }], 0, 0, [4]],
             [9, "pitch", 0, 0, [3, 10, 11, null]],
-            [10, ["solfege", { "value": "mi" }], 0, 0, [9]],
+            [10, ["notename", { "value": "G♭" }], 0, 0, [9]],
             [11, "abs", 0, 0, [9, 12]],
             [12, "neg", 0, 0, [11, 13]],
             [13, ["number", { "value": 2 }], 0, 0, [12]]
