@@ -998,7 +998,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                     }
 
                     __rhythmPlayNote(
-                        noteBeatValue * arg0,
+                        noteBeatValue,
                         blk,
                         turtle,
                         __callback,
