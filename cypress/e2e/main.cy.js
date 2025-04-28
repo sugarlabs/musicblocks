@@ -155,7 +155,7 @@ describe("MusicBlocks Application", () => {
             });
 
             cy.window().then((win) => {
-                win.document.getElementById("planet-iframe").style.display = 'block';
+                win.document.getElementById("planet-iframe").style.display = "block";
             });
         });
     });
