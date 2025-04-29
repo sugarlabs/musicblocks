@@ -155,6 +155,8 @@ const DRUMNAMES = [
     //.TRANS: musical instrument
     [_("kick drum"), "kick drum", "images/kick.svg", "hh", "drum"],
     //.TRANS: musical instrument
+    [_("duff"), "duff", "images/kick.svg", "hh", "drum"],
+    //.TRANS: musical instrument
     [_("tom tom"), "tom tom", "images/tom.svg", "tomml", "drum"],
     //.TRANS: musical instrument
     [_("floor tom"), "floor tom", "images/floortom.svg", "tomfl", "drum"],
@@ -239,6 +241,7 @@ const SOUNDSAMPLESDEFINES = [
     "samples/cowbell",
     "samples/dog",
     "samples/kick",
+    "samples/duff",
     "samples/tom",
     "samples/cat",
     "samples/crash",
@@ -866,6 +869,7 @@ function Synth() {
                 { name: "cow bell", data: COWBELL_SAMPLE },
                 { name: "dog", data: DOG_SAMPLE },
                 { name: "kick drum", data: KICK_SAMPLE },
+                { name: "duff", data: DUFF_SAMPLE },
                 { name: "tom tom", data: TOM_SAMPLE },
                 { name: "cat", data: CAT_SAMPLE },
                 { name: "crash", data: CRASH_SAMPLE },
