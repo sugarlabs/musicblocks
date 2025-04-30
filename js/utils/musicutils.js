@@ -1813,7 +1813,7 @@ const TEMPERAMENT = {
         "minor 3": Math.pow(2, 8 / 31),
         "mid 3": Math.pow(2, 9 / 31),
         "major 3": Math.pow(2, 10 / 31),
-        "upmajor 3": Math.pow(2, 11 / 31),
+        "up-major 3": Math.pow(2, 11 / 31),
         "down 4": Math.pow(2, 12 / 31),
         "perfect 4": Math.pow(2, 13 / 31),
         "up 4": Math.pow(2, 14 / 31),
@@ -1848,7 +1848,7 @@ const TEMPERAMENT = {
             "minor 3",
             "mid 3",
             "major 3",
-            "upmajor 3",
+            "up-major 3",
             "down 4",
             "perfect 4",
             "up 4",
@@ -3820,17 +3820,12 @@ const getNoteFromInterval = (pitch, interval) => {
         // Handle "up-major" intervals (raised major)
         else if (
             interval === "up-major 2" ||
-            interval === "upmajor 3" ||
+            interval === "up-major 3" ||
             interval === "up-major 6" ||
             interval === "up-major 7"
         ) {
             let intervalNum;
-            if (interval === "upmajor 3") {
-                intervalNum = "3";
-            } else {
-                intervalNum = interval.split(" ")[1];
-            }
-            
+            intervalNum = interval.split(" ")[1];     
             majorNote = findMajorInterval("major " + intervalNum);
             accidental = majorNote[0].substring(1, majorNote[0].length);
             index1 = priorAttrs.indexOf(accidental);
