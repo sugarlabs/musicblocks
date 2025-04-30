@@ -1430,7 +1430,7 @@ function setupWidgetBlocks(activity) {
                 [20, "right", 0, 0, [18, 21, 22]],
                 [21, ["number", { value: 90 }], 0, 0, [20]],
                 [22, "print", 0, 0, [20, 23, 24]],
-                [23, ["text", { "value": _("Lyrics") }], 0, 0, [22]],
+                [23, ["text", { "value": _("lyrics") }], 0, 0, [22]],
                 [24, "rhythm2", 0, 0, [22, 25, 26, 29]],
                 [25, ["number", { value: 6 }], 0, 0, [24]],
                 [26, "divide", 0, 0, [24, 27, 28]],
