@@ -941,7 +941,8 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 arg1 = args[1];
             }
 
-            const noteBeatValue = (1 / arg1) * activity.turtles.ithTurtle(turtle).singer.beatFactor;
+            const totalDuration = (1 / arg1) * activity.turtles.ithTurtle(turtle).singer.beatFactor;
+            const noteBeatValue = totalDuration / arg0;
             if (logo.inMatrix || logo.tuplet) {
                 logo.phraseMaker.addColBlock(blk, arg0);
                 if (logo.tuplet) {
@@ -977,7 +978,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 const bpmFactor =
                     TONEBPM / tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
 
-                const beatValue = bpmFactor / noteBeatValue / arg0;
+                const beatValue = noteBeatValue;
 
                 const __rhythmPlayNote = (thisBeat, blk, turtle, callback, timeout) => {
                     setTimeout(
@@ -996,6 +997,8 @@ function setupRhythmBlockPaletteBlocks(activity) {
                     } else {
                         __callback = null;
                     }
+
+                    const delay = i * beatValue * 1000;  
 
                     __rhythmPlayNote(
                         noteBeatValue,
