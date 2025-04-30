@@ -1371,7 +1371,7 @@ function setupWidgetBlocks(activity) {
 
             //.TRANS: assigns pitch to a sequence of beats to generate a melody
             this.formBlock({ name: _("phrase maker"), canCollapse: true });
-            this.makeMacro((x, y) => [
+            activity.beginnerMode ? this.makeMacro((x, y) => [
                 [0, "matrix", x, y, [null, 1, 33]],
                 [1, "pitch", 0, 0, [0, 2, 3, 4]],
                 [2, ["solfege", { value: "ti" }], 0, 0, [1]],
@@ -1406,6 +1406,43 @@ function setupWidgetBlocks(activity) {
                 [31, ["number", { value: 1 }], 0, 0, [30]],
                 [32, ["number", { value: 2 }], 0, 0, [30]],
                 [33, "hiddennoflow", 0, 0, [0, null]]
+            ]) : this.makeMacro((x, y) => [
+                [0, "matrix", x, y, [null, 1, 35]],
+                [1, "pitch", 0, 0, [0, 2, 3, 4]],
+                [2, ["solfege", { value: "ti" }], 0, 0, [1]],
+                [3, ["number", { value: 4 }], 0, 0, [1]],
+                [4, "pitch", 0, 0, [1, 5, 6, 7]],
+                [5, ["solfege", { value: "la" }], 0, 0, [4]],
+                [6, ["number", { value: 4 }], 0, 0, [4]],
+                [7, "pitch", 0, 0, [4, 8, 9, 10]],
+                [8, ["solfege", { value: "sol" }], 0, 0, [7]],
+                [9, ["number", { value: 4 }], 0, 0, [7]],
+                [10, "pitch", 0, 0, [7, 11, 12, 13]],
+                [11, ["solfege", { value: "mi" }], 0, 0, [10]],
+                [12, ["number", { value: 4 }], 0, 0, [10]],
+                [13, "pitch", 0, 0, [10, 14, 15, 16]],
+                [14, ["solfege", { value: "re" }], 0, 0, [13]],
+                [15, ["number", { value: 4 }], 0, 0, [13]],
+                [16, "playdrum", 0, 0, [13, 17, 18]],
+                [17, ["drumname", { value: "snare drum" }], 0, 0, [16]],
+                [18, "forward", 0, 0, [16, 19, 20]],
+                [19, ["number", { value: 100 }], 0, 0, [18]],
+                [20, "right", 0, 0, [18, 21, 22]],
+                [21, ["number", { value: 90 }], 0, 0, [20]],
+                [22, "print", 0, 0, [20, 23, 24]],
+                [23, ["text", { "value": _("lyrics") }], 0, 0, [22]],
+                [24, "rhythm2", 0, 0, [22, 25, 26, 29]],
+                [25, ["number", { value: 6 }], 0, 0, [24]],
+                [26, "divide", 0, 0, [24, 27, 28]],
+                [27, ["number", { value: 1 }], 0, 0, [26]],
+                [28, ["number", { value: 4 }], 0, 0, [26]],
+                [29, "vspace", 0, 0, [24, 30]],
+                [30, "rhythm2", 0, 0, [29, 31, 32, null]],
+                [31, ["number", { value: 1 }], 0, 0, [30]],
+                [32, "divide", 0, 0, [30, 33, 34]],
+                [33, ["number", { value: 1 }], 0, 0, [32]],
+                [34, ["number", { value: 2 }], 0, 0, [32]],
+                [35, "hiddennoflow", 0, 0, [0, null]]
             ]);
         }
 
