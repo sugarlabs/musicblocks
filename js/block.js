@@ -1508,7 +1508,14 @@ class Block {
                 }
 
                 that.collapseButtonBitmap.visible = !that.collapsed;
-
+                //changes made here
+                that.collapseButtonBitmap.on("click", () => {
+                    that.collapsed = true;
+                    that.show(); // Refresh block view
+                
+                    // Immediately update sidebar
+                    that.blocks.expandOrCollapseSidebars?.(); // Optional chaining if function exists
+                });
                 __finishCollapse(that);
             };
 
@@ -1533,6 +1540,13 @@ class Block {
 
                 that.container.addChild(that.expandButtonBitmap);
                 that.expandButtonBitmap.visible = that.collapsed;
+                that.expandButtonBitmap.on("click", () => {
+                    that.collapsed = false;
+                    that.show(); // Refresh block view
+                
+                    // Immediately update sidebar
+                    that.blocks.expandOrCollapseSidebars?.();
+                });
 
                 that.expandButtonBitmap.x = 2 * that.protoblock.scale;
                 if (that.isInlineCollapsible()) {
