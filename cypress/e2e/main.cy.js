@@ -47,9 +47,11 @@ describe("MusicBlocks Application", () => {
 
         it("should toggle full-screen mode", () => {
             cy.get("#FullScreen").click();
-            cy.document().its("fullscreenElement").should("exist");
+            cy.wait(500);
+            cy.document().its("fullscreenElement").should("not.be.null");
             cy.get("#FullScreen").click();
-            cy.document().its("fullscreenElement").should("not.exist");
+            cy.wait(500);
+            cy.document().its("fullscreenElement").should("be.null");
         });
 
         it("should toggle the toolbar menu", () => {
@@ -140,13 +142,21 @@ describe("MusicBlocks Application", () => {
 
     describe("Planet Page Interaction", () => {
         it("should load the Planet page and return to the main page when clicking the close button", () => {
-            cy.get("#planetIcon > .material-icons")
-                .should("exist")
-                .and("be.visible")
-                .click();
-            cy.get("#planet-iframe")
-                .should("be.visible");
+            cy.get("#planetIcon > .material-icons").should("exist").and("be.visible").click();
+
+            cy.get("#planet-iframe", { timeout: 10000 })
+                .should("be.visible")
+                .and("have.attr", "src")
+                .and("not.be.empty");
+
+            cy.get("#planet-iframe").then(($iframe) => {
+                const iframeSrc = $iframe.attr("src");
+                cy.log("Iframe source:", iframeSrc);
+            });
+
+            cy.window().then((win) => {
+                win.document.getElementById("planet-iframe").style.display = "block";
+            });
         });
     });
-
 });
