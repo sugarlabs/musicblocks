@@ -137,7 +137,11 @@ class AST2BlockList {
                             }
                             return name;
                         }
-                        throw new Error(`Unsupported AsyncCallExpression: ${obj}.${member}`);
+                        throw {
+                            message: `Unsupported AsyncCallExpression: ${obj}.${member}`,
+                            start: bodyAST.expression.argument.callee.start,
+                            end: bodyAST.expression.argument.callee.end
+                        };
                     },
                     getArguments: (bodyAST) => { return bodyAST.expression.argument.arguments; },
                     getChildren: (bodyAST) => {
@@ -212,7 +216,11 @@ class AST2BlockList {
                                 return "increment";
                             }
                         }
-                        throw new Error(`Unsupported AssignmentExpression: ${JSON.stringify(bodyAST.expression, null, 2)}`);
+                        throw {
+                            prefix: "Unsupported AssignmentExpression: ",
+                            start: bodyAST.expression.start,
+                            end: bodyAST.expression.end
+                        };
                     },
                     getArguments: (bodyAST) => {
                         if (bodyAST.expression.right.type == "BinaryExpression" &&
@@ -225,7 +233,11 @@ class AST2BlockList {
                                 return [bodyAST.expression.left, bodyAST.expression.right.right];;
                             }
                         }
-                        throw new Error(`Unsupported AssignmentExpression: ${JSON.stringify(bodyAST.expression, null, 2)}`);
+                        throw {
+                            prefix: "Unsupported AssignmentExpression: ",
+                            start: bodyAST.expression.start,
+                            end: bodyAST.expression.end
+                        };
                     },
                     getChildren: () => { return []; },
                 }
@@ -259,7 +271,11 @@ class AST2BlockList {
 
             "BinaryExpression": (argAST) => {
                 if (!(argAST.operator in _binaryOperatorLookup)) {
-                    throw new Error(`Unsupported binary operator: ${argAST.operator}`);
+                    throw {
+                        message: `Unsupported binary operator: ${argAST.operator}`,
+                        start: argAST.start,
+                        end: argAST.end
+                    };
                 }
                 return {
                     "name": _binaryOperatorLookup[argAST.operator],
@@ -272,7 +288,11 @@ class AST2BlockList {
                 let member = argAST.callee.property.name;
                 let numArgs = argAST.arguments.length;
                 if (!(obj in _memberLookup && member in _memberLookup[obj])) {
-                    throw new Error(`Unsupported Call function: ${obj}.${member}`);
+                    throw {
+                        message: `Unsupported function call: ${obj}.${member}`,
+                        start: argAST.callee.start,
+                        end: argAST.callee.end
+                    };
                 }
                 let name = _memberLookup[obj][member];
                 if (typeof name === 'object') {
@@ -292,7 +312,11 @@ class AST2BlockList {
 
             "UnaryExpression": (argAST) => {
                 if (!(argAST.operator in _unaryOperatorLookup)) {
-                    throw new Error(`Unsupported unary operator: ${argAST.operator}`);
+                    throw {
+                        message: `Unsupported unary operator: ${argAST.operator}`,
+                        start: argAST.start,
+                        end: argAST.end
+                    };
                 }
                 return {
                     "name": _unaryOperatorLookup[argAST.operator],
@@ -388,37 +412,36 @@ class AST2BlockList {
                 }
             }
             if (visitor === undefined) {
-                console.error("Unsupported AST:", bodyAST);
-                return;
+                throw {
+                    prefix: "Unsupported statement: ",
+                    start: bodyAST.start,
+                    end: bodyAST.end
+                };
             }
             if (visitor === null) {
                 return;
             }
 
-            try {
-                let node = {};
-                // Set block name
-                node["name"] = visitor.getName(bodyAST);
-                // Set arguments
-                let args = _createArgNode(visitor.getArguments(bodyAST));
-                if (args.length > 0) {
-                    node["args"] = args;
-                }
-                // Set children
-                for (const child of visitor.getChildren(bodyAST)) {
-                    if (child.type != "ReturnStatement") {
-                        _createNodeAndAddToTree(child, node);
-                    }
-                }
-
-                // Add the node to the children list of the parent.
-                if (parent["children"] === undefined) {
-                    parent["children"] = [];
-                }
-                parent["children"].push(node);
-            } catch (error) {
-                console.error(error.message);
+            let node = {};
+            // Set block name
+            node["name"] = visitor.getName(bodyAST);
+            // Set arguments
+            let args = _createArgNode(visitor.getArguments(bodyAST));
+            if (args.length > 0) {
+                node["args"] = args;
             }
+            // Set children
+            for (const child of visitor.getChildren(bodyAST)) {
+                if (child.type != "ReturnStatement") {
+                    _createNodeAndAddToTree(child, node);
+                }
+            }
+
+            // Add the node to the children list of the parent.
+            if (parent["children"] === undefined) {
+                parent["children"] = [];
+            }
+            parent["children"].push(node);
         }
 
         /**
@@ -433,8 +456,12 @@ class AST2BlockList {
             let argNodes = [];
             for (const arg of argASTNodes) {
                 const argNodeBuilder = _argNodeBuilders[arg.type];
-                if (argNodeBuilder === null) {
-                    throw new Error(`Unsupported argument type: ${arg.type}`);
+                if (argNodeBuilder === undefined) {
+                    throw {
+                        prefix: `Unsupported argument type ${arg.type}: `,
+                        start: arg.start,
+                        end: arg.end
+                    };
                 }
                 const argNode = argNodeBuilder(arg);
                 if (argNode !== null) {
@@ -453,13 +480,17 @@ class AST2BlockList {
         // A map from block name to its argument handling function.
         // Keys do not include the blocks that do not take arguments (e.g., start block or action call block)
         // or can only be used as arguments - any block with a connector on its left side.
+        // Each value is a function to add blocks for the arguments and return the number of vertical spaces
+        // that the argument blocks will take. For example, an action definition with name for the action will
+        // take 1 vertical space for its argument. playPitch(1/4, ...) will have its argument blocks take 2
+        // vertical spaces. With this information, the code can decide how many vspacers to add.
         const _argHandlers = {
             // Action Palette, Action block (Action Declaration) takes a string literal for action name
             // Example: let chunk1 = async mouse => {...}
             // args: [{"identifier": "chunk1"}] =>
             //   [2,["text",{"value":"chunck1"}],0,0,[1]]
             "action": (args, blockList, parentBlockNumber) => {
-                _addNthArgToBlockList(["text", { "value": args[0].identifier }], 1, blockList, parentBlockNumber);
+                return _addNthArgToBlockList(["text", { "value": args[0].identifier }], 1, blockList, parentBlockNumber);
             },
 
             // Tone Palette, set instrument block takes a string literal for instrument name
@@ -467,7 +498,7 @@ class AST2BlockList {
             // args: ["guitar"] =>
             //   [2,["voicename",{"value":"guitar"}],0,0,[1]]
             "settimbre": (args, blockList, parentBlockNumber) => {
-                _addNthArgToBlockList(["voicename", { "value": args[0] }], 1, blockList, parentBlockNumber);
+                return _addNthArgToBlockList(["voicename", { "value": args[0] }], 1, blockList, parentBlockNumber);
             },
 
             // Pitch Palette, pitch block takes a note name and a number expression for octave
@@ -481,11 +512,12 @@ class AST2BlockList {
             "pitch": (args, blockList, parentBlockNumber) => {
                 const notes = new Set(['A', 'B', 'C', 'D', 'E', 'F', 'G']);
                 // Add the 1st argument - note name
-                _addNthArgToBlockList(
+                let vspaces = _addNthArgToBlockList(
                     [notes.has(args[0].charAt(0)) ? "notename" : "solfege", { "value": args[0] }],
                     1, blockList, parentBlockNumber);
                 // Add the 2nd argument - a number expression for octave
-                _addNthValueArgToBlockList(args[1], 2, blockList, parentBlockNumber);
+                vspaces += _addNthValueArgToBlockList(args[1], 2, blockList, parentBlockNumber);
+                return vspaces;
             },
 
             // Rhythm Palette, note block takes a number expression that evaluates to 1, 1/2, 1/4, etc.
@@ -501,7 +533,7 @@ class AST2BlockList {
             // args: [{"identifier": "box1"}]
             //   [2,["namedbox",{"value":"box1"}],0,0,[1]]
             "decrementOne": (args, blockList, parentBlockNumber) => {
-                _addNthArgToBlockList(["namedbox", { "value": args[0].identifier }], 1, blockList, parentBlockNumber);
+                return _addNthArgToBlockList(["namedbox", { "value": args[0].identifier }], 1, blockList, parentBlockNumber);
             },
 
             // Boxes Palette, add block takes a string identifier for variable and a number expression
@@ -511,9 +543,10 @@ class AST2BlockList {
             //   [11,["number",{"value":2}],0,0,[9]]
             "increment": (args, blockList, parentBlockNumber) => {
                 // Add the 1st argument - variable name
-                _addNthArgToBlockList(["namedbox", { "value": args[0].identifier }], 1, blockList, parentBlockNumber);
+                let vspaces = _addNthArgToBlockList(["namedbox", { "value": args[0].identifier }], 1, blockList, parentBlockNumber);
                 // Add the 2nd argument - a number expression
-                _addNthValueArgToBlockList(args[1], 2, blockList, parentBlockNumber);
+                vspaces += _addNthValueArgToBlockList(args[1], 2, blockList, parentBlockNumber);
+                return vspaces;
             },
 
             // Boxes Palette, store in box block takes a number or boolean expression
@@ -532,11 +565,12 @@ class AST2BlockList {
             //   [10,["number",{"value":3}],0,0,[7]]
             "setDict": (args, blockList, parentBlockNumber) => {
                 // Add the 1st argument - Dictionary name
-                _addNthArgToBlockList(["text", { "value": args[2] }], 1, blockList, parentBlockNumber);
+                let vspaces = _addNthArgToBlockList(["text", { "value": args[2] }], 1, blockList, parentBlockNumber);
                 // Add the 2nd argument - Key
-                _addNthArgToBlockList(["text", { "value": args[0] }], 2, blockList, parentBlockNumber);
+                vspaces += _addNthArgToBlockList(["text", { "value": args[0] }], 2, blockList, parentBlockNumber);
                 // Add the 3rd argument - Value
-                _addNthValueArgToBlockList(args[1], 3, blockList, parentBlockNumber);
+                vspaces += _addNthValueArgToBlockList(args[1], 3, blockList, parentBlockNumber);
+                return vspaces;
             },
 
             // Dictionary Palette, set value block takes a string for the key, and a value
@@ -546,9 +580,10 @@ class AST2BlockList {
             //   [9,["number",{"value":3}],0,0,[7]]
             "setDict2": (args, blockList, parentBlockNumber) => {
                 // Add the 1st argument - Key
-                _addNthArgToBlockList(["text", { "value": args[0] }], 1, blockList, parentBlockNumber);
+                let vspaces = _addNthArgToBlockList(["text", { "value": args[0] }], 1, blockList, parentBlockNumber);
                 // Add the 2nd argument - Value
-                _addNthValueArgToBlockList(args[1], 2, blockList, parentBlockNumber);
+                vspaces += _addNthValueArgToBlockList(args[1], 2, blockList, parentBlockNumber);
+                return vspaces;
             },
 
             // Flow Palette, repeat block takes a number expression
@@ -558,77 +593,102 @@ class AST2BlockList {
             "if": _addValueArgsToBlockList,
         };
 
-        // A map from block name to the descriptor of its connections.
+        // A map from block name to its properties including:
+        // 1. An object that describes its connections such as the number of connections,
+        // the indices of its first child block, next sibling block, etc.
+        // 2. For blocks that may have children, the vertical spaces allowed for its arguments
+        // before extra v-spacers are needed in order to prevent its argument blocks from
+        // covering its child blocks.
+        // 3. For blocks that don't have children, the vertical spaces allowed for its arguments
+        // before extra v-spacers are needed in order to prevent its argument blocks from
+        // covering its sibling blocks.
         // Keys do not include the blocks that can only be used as arguments - any block with
         // a connector on its left side.
-        const _connDescriptors = {
+        const _blockProperties = {
             "start": {
                 // null, child, null
-                count: 3, "child": 1
+                connections: { count: 3, "child": 1 },
+                argVSpaces: 1,
             },
             "action": {
                 // Action declaration
                 // null, arg (action name), child, null
-                count: 4, "child": 2
+                connections: { count: 4, "child": 2 },
+                argVSpaces: 1,
             },
             "nameddo": {
                 // Action call
                 // prev, next
-                count: 2, "prev": 0, "next": 1
+                connections: { count: 2, "prev": 0, "next": 1 },
+                vspaces: 1,
             },
             "settimbre": {
                 // prev, arg (instrument name), child, next
-                count: 4, "prev": 0, "child": 2, "next": 3
+                connections: { count: 4, "prev": 0, "child": 2, "next": 3 },
+                argVSpaces: 1,
             },
             "pitch": {
                 // prev, arg1 (solfege), arg2 (octave), next
-                count: 4, "prev": 0, "next": 3
+                connections: { count: 4, "prev": 0, "next": 3 },
+                vspaces: 2,
             },
             "newnote": {
                 // prev, arg (note), child, next
-                count: 4, "prev": 0, "child": 2, "next": 3
+                connections: { count: 4, "prev": 0, "child": 2, "next": 3 },
+                argVSpaces: 1,
             },
             "decrementOne": {
                 // prev, arg (variable name), next
-                count: 3, "prev": 0, "next": 2
+                connections: { count: 3, "prev": 0, "next": 2 },
+                vspaces: 1,
             },
             "increment": {
                 // prev, arg1 (variable name), arg2 (value), next
-                count: 4, "prev": 0, "next": 3
+                connections: { count: 4, "prev": 0, "next": 3 },
+                vspaces: 2,
             },
             "storein2": {
                 // prev, arg (variable name), next
-                count: 3, "prev": 0, "next": 2
+                connections: { count: 3, "prev": 0, "next": 2 },
+                vspaces: 1,
             },
             "setDict": {
                 // prev, arg1 (dictionary name), arg2 (key), arg3 (value), next
-                count: 5, "prev": 0, "next": 4
+                connections: { count: 5, "prev": 0, "next": 4 },
+                vspaces: 3,
             },
             "setDict2": {
                 // prev, arg1 (key), arg2 (value), next
-                count: 4, "prev": 0, "next": 3
+                connections: { count: 4, "prev": 0, "next": 3 },
+                vspaces: 2,
             },
             "repeat": {
                 // prev, arg (repeat counts), child, next
-                count: 4, "prev": 0, "child": 2, "next": 3
+                connections: { count: 4, "prev": 0, "child": 2, "next": 3 },
+                argVSpaces: 1,
             },
             "if": {
                 // prev, arg (condition), child, next
-                count: 4, "prev": 0, "child": 2, "next": 3
+                connections: { count: 4, "prev": 0, "child": 2, "next": 3 },
+                argVSpaces: 2,
+            },
+            "vspace": {
+                // prev, next
+                connections: { count: 2, "prev": 0, "next": 1 }
             },
         };
 
         // [1,"settimbre",0,0,[0,2,3,null]] or
         // [21,["nameddo",{"value":"action"}],421,82,[20]]
-        function _connDescriptorOf(block) {
-            return _connDescriptors[Array.isArray(block[1]) ? block[1][0] : block[1]];
+        function _propertyOf(block) {
+            return _blockProperties[Array.isArray(block[1]) ? block[1][0] : block[1]];
         }
 
         // Implementation of toBlockList(trees).
         let blockList = [];
         let x = 200;
         for (let tree of trees) {
-            let blockNumber = _createBlockAndAddToList(tree, blockList);
+            let blockNumber = _createBlockAndAddToList(tree, blockList)["blockNumber"];
             // Set (x, y) for the top level blocks.
             blockList[blockNumber][2] = x;
             blockList[blockNumber][3] = 200;
@@ -667,51 +727,79 @@ class AST2BlockList {
             block.push(0);  // x
             block.push(0);  // y
 
-            let connDesc = _connDescriptorOf(block);
-            let connections = new Array(connDesc.count).fill(null);
+            let property = _propertyOf(block);
+            let connections = new Array(property.connections.count).fill(null);
             block.push(connections);
 
             // Process arguments
-            _createArgBlockAndAddToList(node, blockList, blockNumber);
+            let argVSpaces = _createArgBlockAndAddToList(node, blockList, blockNumber);
+            let vspaces = Math.max(1, argVSpaces);  // A node takes at least 1 vertical space
 
             // Process children
             if (node["children"] !== undefined && node["children"].length > 0) {
                 let childBlockNumbers = [];
+                // Add vertical spacers if the arguments take too much vertical spaces
+                for (let i = 0; i < argVSpaces - property.argVSpaces; i++) {
+                    childBlockNumbers.push(_addVSpacer(blockList));
+                }
+                // Add the children
                 for (const child of node["children"]) {
-                    childBlockNumbers.push(_createBlockAndAddToList(child, blockList));
+                    let ret = _createBlockAndAddToList(child, blockList);
+                    childBlockNumbers.push(ret["blockNumber"]);
+                    vspaces += ret["vspaces"];
+                    // Add vertical spacers to push down next siblings if the block takes
+                    // too much vertical spaces
+                    let childProperty = _propertyOf(blockList[ret["blockNumber"]]);
+                    for (let i = 0; i < ret["vspaces"] - childProperty.vspaces; i++) {
+                        childBlockNumbers.push(_addVSpacer(blockList));
+                    }
                 }
                 // Set the first child block number for this block
-                connections[connDesc["child"]] = childBlockNumbers[0];
+                connections[property.connections["child"]] = childBlockNumbers[0];
                 // Set parent block number for the first child to this block
                 let childBlock = blockList[childBlockNumbers[0]];
-                connDesc = _connDescriptorOf(childBlock);
-                childBlock[4][connDesc["prev"]] = blockNumber;
+                property = _propertyOf(childBlock);
+                childBlock[4][property.connections["prev"]] = blockNumber;
                 // Parent of other children is their previous sibling
                 for (let i = 1; i < childBlockNumbers.length; i++) {
                     childBlock = blockList[childBlockNumbers[i]];
-                    connDesc = _connDescriptorOf(childBlock);
-                    childBlock[4][connDesc["prev"]] = childBlockNumbers[i - 1];
+                    property = _propertyOf(childBlock);
+                    childBlock[4][property.connections["prev"]] = childBlockNumbers[i - 1];
                 }
                 // Set the next sibling block number for the children, except the last one
                 for (let i = 0; i < childBlockNumbers.length - 1; i++) {
                     childBlock = blockList[childBlockNumbers[i]];
-                    connDesc = _connDescriptorOf(childBlock);
-                    childBlock[4][connDesc["next"]] = childBlockNumbers[i + 1];
+                    property = _propertyOf(childBlock);
+                    childBlock[4][property.connections["next"]] = childBlockNumbers[i + 1];
                 }
+                // For blocks with children, add 1 to vspaces for the end of the clamp.
+                vspaces += 1;
             }
+            return { "blockNumber": blockNumber, "vspaces": vspaces };
+        }
+
+        function _addVSpacer(blockList) {
+            let block = [];  // A block for the vertical spacer
+            let blockNumber = blockList.length;
+            block.push(blockNumber);
+            blockList.push(block);
+            block.push("vspace");
+            block.push(0);  // x
+            block.push(0);  // y
+            block.push([null, null]);  // connections, prev and next
             return blockNumber;
         }
 
         function _createArgBlockAndAddToList(node, blockList, parentBlockNumber) {
             if (node.args === undefined || node.args.length == 0) {
-                return;
+                return 0;
             }
             let argHandlerKey = (typeof node.name) === "object" ? Object.keys(node.name)[0] : node.name;
             let argHandler = _argHandlers[argHandlerKey];
             if (argHandler === undefined) {
                 throw new Error(`Cannot find argument handler for: ${argHandlerKey}`);
             }
-            argHandler(node.args, blockList, parentBlockNumber);
+            return argHandler(node.args, blockList, parentBlockNumber);
         }
 
         // Add a new block to the blockList for the nth argument (1-indexed) of the parent block.
@@ -726,6 +814,7 @@ class AST2BlockList {
             block.push([parentBlockNumber]);  // connections
             let parentConnections = blockList[parentBlockNumber][4];
             parentConnections[nth] = blockNumber;
+            return 1;  // vspaces
         }
 
         /**
@@ -752,12 +841,15 @@ class AST2BlockList {
          * @param {Number} parentBlockNumber - the number of the parent block of the new argument blocks
          */
         function _addValueArgsToBlockList(args, blockList, parentBlockNumber) {
+            let vspaces = 0;
             for (let i = 0; i < args.length; i++) {
-                _addNthValueArgToBlockList(args[i], i + 1, blockList, parentBlockNumber);
+                vspaces += _addNthValueArgToBlockList(args[i], i + 1, blockList, parentBlockNumber);
             }
+            return vspaces;
         }
 
         function _addNthValueArgToBlockList(arg, nth, blockList, parentBlockNumber) {
+            let vspaces = 0;
             let block = [];
             let blockNumber = blockList.length;
             block.push(blockNumber);
@@ -774,6 +866,7 @@ class AST2BlockList {
                 block.push(0);  // y
                 // Initialize connections with just the parent.
                 block.push([parentBlockNumber]);
+                vspaces = 1;
             } else if (type === 'object') {
                 block.push(arg.name);
                 block.push(0);  // x
@@ -781,58 +874,17 @@ class AST2BlockList {
                 let connections = new Array(1 + arg.args.length).fill(null);
                 connections[0] = parentBlockNumber;
                 block.push(connections);
-                _addValueArgsToBlockList(arg.args, blockList, blockNumber);
+                vspaces = _addValueArgsToBlockList(arg.args, blockList, blockNumber);
             } else {
                 throw new Error(`Unsupported value argument: ${arg}`);
             }
             let parentConnections = blockList[parentBlockNumber][4];
             parentConnections[nth] = blockNumber;
+            return vspaces;
         }
     }
 }
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { AST2BlockList };
-}
-
-function main() {
-    const acorn = require('acorn');
-    const fs = require('node:fs');
-
-    if (process.argv.length <= 2) {
-        console.error("node ast2blocklist.test.js [music_block_js_file]");
-        return;
-    }
-    let jsFile = process.argv[2];
-
-    fs.readFile(jsFile, 'utf8', (err, data) => {
-        if (err) {
-            console.error(err);
-            return;
-        }
-        const AST = acorn.parse(data, { ecmaVersion: 2020 });
-        console.log(JSON.stringify(AST, null, 2));
-        let trees = AST2BlockList.toTrees(AST);
-        console.log(JSON.stringify(trees, null, 2));
-        let blockList = AST2BlockList.toBlockList(trees);
-        console.log(toString(blockList));
-    });
-}
-
-function toString(blockList) {
-    if (!Array.isArray(blockList)) {
-        return String(blockList); // Handle non-array inputs
-    }
-
-    return blockList.map(item => {
-        if (typeof item === 'object' && item !== null) {
-            return JSON.stringify(item); // Expand objects
-        } else {
-            return String(item); // Convert other items to strings
-        }
-    }).join(', ');
-}
-
-if (require.main === module) {
-    main();
 }

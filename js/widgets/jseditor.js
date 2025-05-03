@@ -131,12 +131,10 @@ class JSEditor {
                 tooltip.style.whiteSpace = "nowrap";
                 tooltip.textContent = tooltipText;
 
-                tooltip.style.top = `${
-                    rect.bottom + window.scrollY + (positionOfTooltip !== "bottom" ? -30 : 20)
-                }px`;
-                tooltip.style.left = `${
-                    rect.left + window.scrollX + (positionOfTooltip !== "bottom" ? -135 : 0)
-                }px`;
+                tooltip.style.top = `${rect.bottom + window.scrollY + (positionOfTooltip !== "bottom" ? -30 : 20)
+                    }px`;
+                tooltip.style.left = `${rect.left + window.scrollX + (positionOfTooltip !== "bottom" ? -135 : 0)
+                    }px`;
             });
 
             targetButton.addEventListener("mouseout", () => {
@@ -223,7 +221,7 @@ class JSEditor {
         styleBtn.onclick = this._changeStyle.bind(this);
         menuRight.appendChild(styleBtn);
         menubar.appendChild(menuRight);
-        generateTooltip(styleBtn, _("Change theme"), _("left"));
+        generateTooltip(styleBtn, _("Change theme"), "left");
         this._editor.appendChild(menubar);
 
         const editorContainer = document.createElement("div");
@@ -314,7 +312,7 @@ class JSEditor {
         arrowBtn.innerHTML = "keyboard_arrow_down";
         arrowBtn.onclick = this._toggleConsole.bind(this);
         consolelabel.appendChild(arrowBtn);
-        generateTooltip(arrowBtn, _("Toggle Console"),_("left"));
+        generateTooltip(arrowBtn, _("Toggle Console"), "left");
 
         const editorconsole = document.createElement("div");
         editorconsole.id = "editorConsole";
@@ -368,29 +366,29 @@ class JSEditor {
      */
     _setupDividerResize(divider, editorContainer, editorconsole, consolelabel) {
         let isResizing = false;
-    
+
         const onMouseMove = (e) => {
             if (!isResizing) return;
             const parentRect = this._editor.getBoundingClientRect();
             const menubarHeight = this._menubar ? this._menubar.offsetHeight : 0;
             const availableHeight = this._editor.clientHeight - menubarHeight;
             const dynamicTop = parentRect.top + menubarHeight;
-    
+
             const newEditorHeight = e.clientY - dynamicTop;
             const dividerHeight = divider.offsetHeight;
             const consoleHeaderHeight = consolelabel.offsetHeight;
             const newConsoleHeight = availableHeight - newEditorHeight - dividerHeight - consoleHeaderHeight;
-    
+
             editorContainer.style.flexBasis = `${newEditorHeight}px`;
             editorconsole.style.flexBasis = `${newConsoleHeight}px`;
         };
-    
+
         const onMouseUp = () => {
             isResizing = false;
             document.removeEventListener("mousemove", onMouseMove);
             document.removeEventListener("mouseup", onMouseUp);
         };
-    
+
         divider.addEventListener("mousedown", (e) => {
             isResizing = true;
             document.addEventListener("mousemove", onMouseMove);
@@ -420,6 +418,12 @@ class JSEditor {
         console.log("%c" + message, `color: ${color}`);
     }
 
+    static clearConsole() {
+        if (docById("editorConsole")) {
+            docById("editorConsole").innerHTML = "";
+        }
+    }
+
     /**
      * Triggerred when the "run" button on the widget is pressed.
      * Runs the JavaScript code that is in the editor.
@@ -429,7 +433,7 @@ class JSEditor {
     _runCode() {
         if (this._showingHelp) return;
 
-        if (docById("editorConsole")) docById("editorConsole").innerHTML = "";
+        JSEditor.clearConsole();
 
         try {
             MusicBlocks.init(true);
@@ -445,19 +449,25 @@ class JSEditor {
      * @returns {Void}
      */
     _codeToBlocks() {
-        let ast = acorn.parse(this._code, { ecmaVersion: 2020 });
-        let trees = AST2BlockList.toTrees(ast);
-        let blockList = AST2BlockList.toBlockList(trees);
-        const activity = this.activity;
-        // Wait for the old blocks to be removed, then load new blocks.
-        const __listener = (event) => {
-            activity.blocks.loadNewBlocks(blockList);
+        JSEditor.clearConsole();
+
+        try {
+            let ast = acorn.parse(this._code, { ecmaVersion: 2020 });
+            let trees = AST2BlockList.toTrees(ast);
+            let blockList = AST2BlockList.toBlockList(trees);
+            const activity = this.activity;
+            // Wait for the old blocks to be removed, then load new blocks.
+            const __listener = (event) => {
+                activity.blocks.loadNewBlocks(blockList);
+                activity.stage.removeAllEventListeners("trashsignal");
+            };
             activity.stage.removeAllEventListeners("trashsignal");
-        };
-        activity.stage.removeAllEventListeners("trashsignal");
-        activity.stage.addEventListener("trashsignal", __listener, false);
-        // Clear the canvas but leave the JS editor open
-        activity.sendAllToTrash(false, false, false);
+            activity.stage.addEventListener("trashsignal", __listener, false);
+            // Clear the canvas but leave the JS editor open
+            activity.sendAllToTrash(false, false, false);
+        } catch (e) {
+            JSEditor.logConsole("message" in e ? e.message : e.prefix + this._code.substring(e.start, e.end), "red");
+        }
     }
 
     /**
