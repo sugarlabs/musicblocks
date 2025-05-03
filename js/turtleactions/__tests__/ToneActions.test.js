@@ -67,13 +67,13 @@ describe("setupToneActions", () => {
 
         activity = {
             turtles: {
-                ithTurtle: (turtle) => targetTurtle,
+                ithTurtle: () => targetTurtle,
             },
             blocks: {
                 blockList: { 1: {}, 2: {} },
             },
             logo: {
-                setDispatchBlock: jest.fn((blk, turtle, _name) => {}),
+                setDispatchBlock: jest.fn((_name) => {}),
                 setTurtleListener: jest.fn((_, _name, callback) => {
                     listenerCallbacks[_name] = callback;
                 }),
