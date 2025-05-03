@@ -33,7 +33,7 @@
          PREVIEWVOLUME, TONEBPM
 */
 
- /**
+/**
  * MeterWidget class for creating and managing a pie menu meter for strong beats.
  *
  * @class

@@ -96,7 +96,7 @@ function SampleWidget() {
      */
     this.octaveCenter = 4;
 
-     /**
+    /**
      * Sample length.
      * @type {number}
      */
@@ -216,7 +216,7 @@ function SampleWidget() {
     };
 
 
-     /**
+    /**
      * Gets the length of the sample and displays a warning if it exceeds 1MB.
      * @returns {void}
      */
@@ -227,13 +227,13 @@ function SampleWidget() {
     };
 
 
-     /**
+    /**
      * Displays a message indicating that recording has started.
      * @returns {void}
      */
     this.displayRecordingStartMessage = function () {
         activity.textMsg(_("Recording started"), 3000);
-    }
+    };
 
     /**
      * Displays a message indicating that recording has stopped.
@@ -241,7 +241,7 @@ function SampleWidget() {
      */
     this.displayRecordingStopMessage = function () {
         activity.textMsg(_("Recording complete"), 3000);
-    }
+    };
 
 
     /**
@@ -314,18 +314,18 @@ function SampleWidget() {
                     this._addSample();
                 } else {
                     this.activity.errorMsg(_("Warning: Your sample cannot be loaded because it is >1MB."), this.timbreBlock);
-                }            
+                }
             } else {
                 this.showSampleTypeError();
             }
-        }
+        };
 
         reader.onloadend = () => {
             if (reader.result) {
                 const value = [sampleFile.name, reader.result];
             }
         };
-    }
+    };
 
     //Drag-and-Drop sample files
     this.drag_and_drop = () => {
@@ -340,7 +340,7 @@ function SampleWidget() {
             const sampleFiles = e.dataTransfer.files[0];
             this.handleFiles(sampleFiles);
         });
-    }
+    };
 
     /**
      * Initializes the Sample Widget.
@@ -434,8 +434,32 @@ function SampleWidget() {
             window.scroll(0, 0);
         };
 
-        this.pitchBtn = widgetWindow.addInputButton("C4", "");
-        this.pitchBtn.onclick = () => {
+        // Create a container for the pitch button and frequency display
+        this.pitchBtnContainer = document.createElement("div");
+        this.pitchBtnContainer.className = "wfbtItem";
+        this.pitchBtnContainer.style.display = "flex";
+        this.pitchBtnContainer.style.flexDirection = "column";
+        this.pitchBtnContainer.style.alignItems = "center";
+        this.pitchBtnContainer.style.cursor = "pointer"; // Add pointer cursor to indicate clickable
+        
+        // Add the container to the toolbar
+        widgetWindow._toolbar.appendChild(this.pitchBtnContainer);
+        
+        // Create the pitch button
+        this.pitchBtn = document.createElement("input");
+        this.pitchBtn.value = "C4";
+        this.pitchBtnContainer.appendChild(this.pitchBtn);
+        
+        // Create the frequency display
+        this.frequencyDisplay = document.createElement("div");
+        this.frequencyDisplay.style.fontSize = "smaller";
+        this.frequencyDisplay.style.textAlign = "center";
+        this.frequencyDisplay.style.color = platformColor.textColor;
+        this.frequencyDisplay.textContent = "261 Hz";
+        this.pitchBtnContainer.appendChild(this.frequencyDisplay);
+        
+        // Add click event to the container (includes both the button and frequency display)
+        this.pitchBtnContainer.onclick = () => {
             this._createPieMenu();
         };
 
@@ -479,13 +503,13 @@ function SampleWidget() {
             if (!this.is_recording) {
                 await this.activity.logo.synth.startRecording();
                 this.is_recording = true;
-                this._recordBtn.getElementsByTagName('img')[0].src = "header-icons/record.svg";
+                this._recordBtn.getElementsByTagName("img")[0].src = "header-icons/record.svg";
                 this.displayRecordingStartMessage();
                 this.activity.logo.synth.LiveWaveForm();
             } else {
                 this.recordingURL = await this.activity.logo.synth.stopRecording();
                 this.is_recording = false;
-                this._recordBtn.getElementsByTagName('img')[0].src = "header-icons/mic.svg";
+                this._recordBtn.getElementsByTagName("img")[0].src = "header-icons/mic.svg";
                 this.displayRecordingStopMessage();
                 this._playbackBtn.classList.remove("disabled");
             }
@@ -497,7 +521,7 @@ function SampleWidget() {
                 this.sampleName = `Recorded Audio ${this.recordingURL}`;
                 this._addSample();
                 this.activity.logo.synth.playRecording();
-                this.playback = true
+                this.playback = true;
             } else {
                 this.activity.logo.synth.stopPlayBackRecording();
                 this.playback = false;
@@ -562,6 +586,24 @@ function SampleWidget() {
         }
         this.accidentalCenter = lev + 2;
         this.octaveCenter = this.sampleOctave;
+    };
+
+    /**
+     * Calculates the frequency in Hz for the current pitch.
+     * @returns {number} The frequency in Hz
+     */
+    this._calculateFrequency = function () {
+        let semitones = 0;
+        
+        semitones += isNaN(this.octaveCenter) ? 0 : this.octaveCenter * 12;
+        semitones += isNaN(this.pitchCenter) ? 0 : MAJORSCALE[this.pitchCenter];
+        semitones += isNaN(this.accidentalCenter) ? 0 : this.accidentalCenter - 2;
+        
+        // A4 = 440Hz at semitone position 57
+        const netChange = semitones - 57;
+        const frequency = Math.floor(440 * Math.pow(2, netChange / 12));
+        
+        return frequency;
     };
 
     /**
@@ -879,8 +921,9 @@ function SampleWidget() {
     };
 
     /**
-     * Retrieves the name of the current pitch.
-     * @returns {void}
+     * Gets the pitch name based on the current pitch, accidental, and octave.
+     * Also updates the pitch button display.
+     * @returns {string} The pitch name.
      */
     this.getPitchName = function () {
         let name = "";
@@ -889,10 +932,19 @@ function SampleWidget() {
         name += this.octaveCenter.toString();
         this.pitchName = name;
 
+        // Calculate frequency
+        const frequency = this._calculateFrequency();
+        
+        // Update the pitch button value
         this.pitchBtn.value = this.pitchName;
+        
+        // Update the frequency display text
+        this.frequencyDisplay.textContent = frequency + " Hz";
+        
+        return this.pitchName;
     };
 
-     /**
+    /**
      * Scales the widget window and canvas based on the window's state.
      * @returns {void}
      */
@@ -953,10 +1005,10 @@ function SampleWidget() {
                 for (let turtleIdx = 0; turtleIdx < 2; turtleIdx += 1) {
                     let dataArray;
                     if (this.is_recording) {
-                        dataArray = turtleIdx === 0 
+                        dataArray = turtleIdx === 0
                             ? this.pitchAnalysers[0].getValue()
                             : this.activity.logo.synth.getWaveFormValues();
-                            console.log(dataArray);
+                        console.log(dataArray);
                     } else {
                         dataArray = this.pitchAnalysers[turtleIdx].getValue();
                     }

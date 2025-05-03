@@ -53,20 +53,20 @@ global.DOUBLEFLAT = "𝄫";
 global._ = jest.fn((str) => str);
 global.last = jest.fn((array) => array[array.length - 1]);
 
-const { getLilypondHeader, processLilypondNotes, saveLilypondOutput } = require('../lilypond');
+const { getLilypondHeader, processLilypondNotes, saveLilypondOutput } = require("../lilypond");
 
-describe('getLilypondHeader', () => {
-    test('should return the LilyPond header as a string', () => {
+describe("getLilypondHeader", () => {
+    test("should return the LilyPond header as a string", () => {
         const result = getLilypondHeader();
-        expect(typeof result).toBe('string');
+        expect(typeof result).toBe("string");
         expect(result).toContain('\\version "2.18.2"');
-        expect(result).toContain('Made with LilyPond and Music Blocks');
-        expect(result).toContain('Creative Commons Attribution ShareAlike 3.0');
+        expect(result).toContain("Made with LilyPond and Music Blocks");
+        expect(result).toContain("Creative Commons Attribution ShareAlike 3.0");
     });
 });
 
 
-describe('processLilypondNotes', () => {
+describe("processLilypondNotes", () => {
     let logo;
     let turtle;
     let lilypond;
@@ -105,7 +105,7 @@ describe('processLilypondNotes', () => {
         expect(logo.notationNotes[turtle]).toContain(" \\time 4/4\n");
     });
 
-    test('should process a note object correctly', () => {
+    test("should process a note object correctly", () => {
         logo.notation.notationStaging[turtle] = [
             [
                 ["G4"],
@@ -122,7 +122,7 @@ describe('processLilypondNotes', () => {
         expect(logo.notationNotes[turtle]).toContain("4");
     });
 
-    test('should process a key signature correctly', () => {
+    test("should process a key signature correctly", () => {
         logo.notation.notationStaging[turtle] = [
             "key",
             "C",
@@ -132,7 +132,7 @@ describe('processLilypondNotes', () => {
         expect(logo.notationNotes[turtle]).toContain("\\key c \\major");
     });
 
-    test('should process a tempo change correctly', () => {
+    test("should process a tempo change correctly", () => {
         logo.notation.notationStaging[turtle] = [
             "tempo",
             120,
@@ -142,7 +142,7 @@ describe('processLilypondNotes', () => {
         expect(logo.notationNotes[turtle]).toContain("\\tempo Allegro = 120");
     });
 
-    test('should process a slur correctly', () => {
+    test("should process a slur correctly", () => {
         logo.notation.notationStaging[turtle] = [
             "begin slur",
             [
@@ -160,7 +160,7 @@ describe('processLilypondNotes', () => {
         expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "g'4 (  )  ");
     });
 
-    test('should process a crescendo correctly', () => {
+    test("should process a crescendo correctly", () => {
         logo.notation.notationStaging[turtle] = [
             "begin crescendo",
             [
@@ -178,7 +178,7 @@ describe('processLilypondNotes', () => {
         expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "  g'4 \\< \\! ");
     });
 
-    test('should process a decrescendo correctly', () => {
+    test("should process a decrescendo correctly", () => {
         logo.notation.notationStaging[turtle] = [
             "begin decrescendo",
             [
@@ -196,7 +196,7 @@ describe('processLilypondNotes', () => {
         expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "  g'4 \\> \\! ");
     });
 
-    test('should process a tuplet correctly', () => {
+    test("should process a tuplet correctly", () => {
         logo.notation.notationStaging[turtle] = [
             [
                 ["G4"],
@@ -212,7 +212,7 @@ describe('processLilypondNotes', () => {
         expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "\\tuplet Infinity/1 { g' 0} ");
     });
 
-    test('should process a markup command correctly', () => {
+    test("should process a markup command correctly", () => {
         logo.notation.notationStaging[turtle] = [
             "markup",
             "Test Markup"
@@ -221,7 +221,7 @@ describe('processLilypondNotes', () => {
         expect(logo.notationNotes[turtle]).toContain("^\\markup { \\abs-fontsize #6 { Test Markup } } ");
     });
 
-    test('should process a markdown command correctly', () => {
+    test("should process a markdown command correctly", () => {
         logo.notation.notationStaging[turtle] = [
             "markdown",
             "Test Markdown"
@@ -230,7 +230,7 @@ describe('processLilypondNotes', () => {
         expect(logo.notationNotes[turtle]).toContain("_\\markup { Test Markdown } ");
     });
 
-    test('should process a break command correctly', () => {
+    test("should process a break command correctly", () => {
         logo.notation.notationStaging[turtle] = [
             [
                 ["G4"],
@@ -256,7 +256,7 @@ describe('processLilypondNotes', () => {
         expect(logo.notationNotes[turtle]).toContain("\n");
     });
 
-    test('should process articulation commands correctly', () => {
+    test("should process articulation commands correctly", () => {
         logo.notation.notationStaging[turtle] = [
             "begin articulation",
             [
@@ -274,7 +274,7 @@ describe('processLilypondNotes', () => {
         expect(logo.notationNotes[turtle]).toContain("->");
     });
 
-    test('should process a pickup command correctly', () => {
+    test("should process a pickup command correctly", () => {
         logo.notation.notationStaging[turtle] = [
             "pickup",
             4,
@@ -292,7 +292,7 @@ describe('processLilypondNotes', () => {
         expect(logo.notationNotes[turtle]).toContain("\\partial 4\n");
     });
 
-    test('should process voice commands correctly', () => {
+    test("should process voice commands correctly", () => {
         logo.notation.notationStaging[turtle] = [
             "voice one",
             [
@@ -322,7 +322,7 @@ describe('processLilypondNotes', () => {
         expect(logo.notationNotes[turtle]).toContain("}\n>> \\oneVoice\n");
     });
 
-    test('should process a tie command correctly', () => {
+    test("should process a tie command correctly", () => {
         logo.notation.notationStaging[turtle] = [
             "tie"
         ];
@@ -330,7 +330,7 @@ describe('processLilypondNotes', () => {
         expect(logo.notationNotes[turtle]).toContain("~");
     });
 
-    test('should append unrecognized command as is', () => {
+    test("should append unrecognized command as is", () => {
         logo.notation.notationStaging[turtle] = [
             "unrecognized"
         ];
@@ -338,7 +338,7 @@ describe('processLilypondNotes', () => {
         expect(logo.notationNotes[turtle]).toContain("unrecognized");
     });
 
-    test('should process note object with dot notation', () => {
+    test("should process note object with dot notation", () => {
         logo.notation.notationStaging[turtle] = [
             [
                 ["G4"],
@@ -354,7 +354,7 @@ describe('processLilypondNotes', () => {
         expect(logo.notationNotes[turtle]).toContain("4..");
     });
 
-    test('should process note object with staccato', () => {
+    test("should process note object with staccato", () => {
         logo.notation.notationStaging[turtle] = [
             [
                 ["G4"],
@@ -370,7 +370,7 @@ describe('processLilypondNotes', () => {
         expect(logo.notationNotes[turtle]).toContain("\\staccato ");
     });
 
-    test('should insert newline after 8 notes', () => {
+    test("should insert newline after 8 notes", () => {
         const notesArray = [];
         for (let i = 0; i < 9; i++) {
             notesArray.push([
@@ -388,7 +388,7 @@ describe('processLilypondNotes', () => {
         expect(logo.notationNotes[turtle]).toContain("\n");
     });
 
-    test('should handle incomplete tuplet gracefully', () => {
+    test("should handle incomplete tuplet gracefully", () => {
         logo.notation.notationStaging[turtle] = [
             [
                 ["G4"],
@@ -405,7 +405,7 @@ describe('processLilypondNotes', () => {
     });
 });
 
-describe('saveLilypondOutput', () => {
+describe("saveLilypondOutput", () => {
     let activity;
 
     beforeEach(() => {
@@ -471,7 +471,7 @@ describe('saveLilypondOutput', () => {
         };
     });
 
-    test('should generate LilyPond output correctly', () => {
+    test("should generate LilyPond output correctly", () => {
         const result = saveLilypondOutput(activity);
         expect(result).toContain("% You can change the MIDI instruments below to anything on this list:");
         expect(result).toContain("\\score {");
@@ -480,7 +480,7 @@ describe('saveLilypondOutput', () => {
         expect(result).toContain('{"project":"data"}');
     });
 
-    test('should handle drum staging correctly', () => {
+    test("should handle drum staging correctly", () => {
         activity.logo.notation.notationDrumStaging = {
             "0": [
                 [
@@ -498,7 +498,7 @@ describe('saveLilypondOutput', () => {
         expect(result).toContain("\\drummode {");
     });
 
-    test('should handle empty drum staging correctly', () => {
+    test("should handle empty drum staging correctly", () => {
         activity.logo.notation.notationDrumStaging = {
             "0": []
         };
@@ -506,13 +506,13 @@ describe('saveLilypondOutput', () => {
         expect(result).not.toContain("\\drummode {");
     });
 
-    test('should handle multiple turtles correctly', () => {
+    test("should handle multiple turtles correctly", () => {
         const result = saveLilypondOutput(activity);
         expect(result).toContain("Turtle0 = {");
         expect(result).toContain("Turtle1 = {");
     });
 
-    test('should handle unique short instrument names correctly', () => {
+    test("should handle unique short instrument names correctly", () => {
         activity.turtles.turtleList = {
             "0": { name: "Turtle 0" },
             "1": { name: "Turtle 1" },
@@ -522,7 +522,7 @@ describe('saveLilypondOutput', () => {
         expect(result).toContain('shortInstrumentName = "Tu"');
     });
 
-    test('should handle empty notation staging correctly', () => {
+    test("should handle empty notation staging correctly", () => {
         activity.logo.notation.notationStaging = {};
         const result = saveLilypondOutput(activity);
         const expected = "% You can change the MIDI instruments below to anything on this list:\n" +
@@ -535,24 +535,24 @@ describe('saveLilypondOutput', () => {
             "% Below is the code for the Music Blocks project that generated this Lilypond file.\n" +
             "%{\n\n" +
             "{\"project\":\"data\"}\n" +
-            "%}\n\n"
+            "%}\n\n";
         expect(result).not.toContain(expected);
     });
 
-    test('should handle empty notation output correctly', () => {
+    test("should handle empty notation output correctly", () => {
         activity.logo.notationOutput = "";
         const result = saveLilypondOutput(activity);
         expect(result).toContain("% You can change the MIDI instruments below to anything on this list:");
     });
 
-    test('should fallback to RODENTS names if instrument name is empty', () => {
+    test("should fallback to RODENTS names if instrument name is empty", () => {
         activity.turtles.getTurtle = jest.fn((t) => ({ name: "" }));
         activity.turtles.turtleList = { "0": {} };
         saveLilypondOutput(activity);
         expect(activity.logo.notationOutput).toContain(RODENTS[0]);
     });
 
-    test('should handle multiple turtles with different clefs correctly', () => {
+    test("should handle multiple turtles with different clefs correctly", () => {
         activity.logo.notationNotes = {
             "0": "\\note0",
             "1": "\\note1"
@@ -571,7 +571,7 @@ describe('saveLilypondOutput', () => {
         expect(result).toContain("Turtle1Voice = \\new Staff \\with {");
     });
 
-    test('should ensure last turtle adds a bar', () => {
+    test("should ensure last turtle adds a bar", () => {
         activity.logo.notationNotes["0"] = "g'4 ";
         activity.logo.notation.notationStaging["0"] = ["note"];
         turtleCount = 1;
@@ -580,7 +580,7 @@ describe('saveLilypondOutput', () => {
         expect(result).toContain(' \\bar "|."');
     });
 
-    test('should correctly handle score block generation', () => {
+    test("should correctly handle score block generation", () => {
         activity.logo.notationNotes["0"] = "\\note0";
         activity.logo.notation.notationStaging["0"] = ["note"];
         activity.logo.notationNotes["1"] = "\\note1";
@@ -592,20 +592,20 @@ describe('saveLilypondOutput', () => {
         expect(result).toContain("\\layout {}");
     });
 
-    test('should handle music blocks code correctly', () => {
+    test("should handle music blocks code correctly", () => {
         activity.prepareExport = jest.fn(() => '{"musicBlocks": ["block1", "block2"]}');
         const result = saveLilypondOutput(activity);
         expect(result).toContain("% MUSIC BLOCKS CODE");
         expect(result).toContain('{"musicBlocks": ["block1", "block2"]}');
     });
 
-    test('should handle custom mode definitions correctly', () => {
+    test("should handle custom mode definitions correctly", () => {
         activity.logo.notation.notationStaging["0"].push("custom mode");
         const result = saveLilypondOutput(activity);
         expect(result).toContain("custom mode");
     });
 
-    test('should properly format guitar tab output', () => {
+    test("should properly format guitar tab output", () => {
         activity.logo.guitarOutputHead = "% Guitar Output Head\n";
         activity.logo.guitarOutputEnd = "% Guitar Output End\n";
         activity.logo.notationNotes = { "0": "\\note0" };
@@ -616,7 +616,7 @@ describe('saveLilypondOutput', () => {
         expect(result).toContain("% Guitar Output End");
     });
 
-    test('should handle MIDI output correctly', () => {
+    test("should handle MIDI output correctly", () => {
         activity.logo.MIDIOutput = "% MIDI Output";
         const result = saveLilypondOutput(activity);
         expect(result).toContain("% MIDI Output");

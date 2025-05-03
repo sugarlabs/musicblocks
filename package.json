@@ -10,23 +10,17 @@
     "url": "https://github.com/sugarlabs/musicblocks/issues"
   },
   "amd": {},
-  "volo": {
-    "baseUrl": "lib",
-    "dependencies": {
-      "domReady": "github:requirejs/domReady/2.0.1",
-      "webL10n": "github:sugarlabs/webL10n/master"
-    }
-  },
   "scripts": {
     "lint": "eslint js/**/*.js",
     "serve": "http-server -a 127.0.0.1 -p 3000 --gzip --brotli",
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "jest",
-    "cypress:run": "cypress run"   
+    "cypress:run": "cypress run"
   },
   "devDependencies": {
     "@babel/core": "^7.11.1",
+    "@babel/eslint-parser": "^7.26.10",
     "@babel/preset-env": "^7.11.0",
     "babel-eslint": "^10.1.0",
     "clean-css": "^4.2.4",

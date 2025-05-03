@@ -38,7 +38,7 @@ class Mouse {
      * @param {Function} flow - flow function associated with the Mouse
      */
     constructor(flow) {
-        const numberOfTurtles = globalActivity.turtles.getTurtleCount() ; 
+        const numberOfTurtles = globalActivity.turtles.getTurtleCount() ;
         if (Mouse.MouseList.length < numberOfTurtles) {
             this.turtle = globalActivity.turtles.getTurtle(Mouse.MouseList.length);
         } else {
@@ -209,7 +209,7 @@ class MusicBlocks {
             for (const listener in mouse.turtle.listeners) {
                 if (globalActivity.logo.stage && mouse.turtle.listeners.hasOwnProperty(listener)) {
                     globalActivity.logo.stage.removeEventListener(
-                    listener, mouse.turtle.listeners[listener], false);
+                        listener, mouse.turtle.listeners[listener], false);
                 }
             }
             mouse.turtle.listeners = {};
@@ -435,6 +435,6 @@ class MusicBlocks {
         return Singer.VolumeActions.masterVolume;
     }
 }
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
     module.exports = {Mouse, MusicBlocks};
 }

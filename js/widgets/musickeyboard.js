@@ -196,7 +196,7 @@ function MusicKeyboard(activity) {
     // Each element in the array is [start time, note, id, duration, voice].
     this._notesPlayed = [];
 
-     /**
+    /**
      * Adds a row block to the keyboard.
      * @param {number} rowBlock - The row block to add.
      */
@@ -277,6 +277,9 @@ function MusicKeyboard(activity) {
         const temp1 = {};
         const temp2 = {};
         const current = new Set();
+        let chordBuffer = {};
+        let extraNoteCount = 0;
+        let startTimeNotes = 0;
 
         /**
          * Gets the ID of the musical note associated with a keyboard event.
@@ -296,7 +299,7 @@ function MusicKeyboard(activity) {
             } else if (HERTZKEYS.includes(key)) {
                 id = `hertzRow${HERTZKEYS.indexOf(key)}`;
             } else if (key === SPACE) {
-                id = 'rest';
+                id = "rest";
             }
 
             return id;
@@ -331,6 +334,18 @@ function MusicKeyboard(activity) {
 
                 if (id == "rest") {
                     return;
+                }
+
+                // Check if it is a chord
+                if (Object.keys(chordBuffer).length === 0) {
+                    chordBuffer[id] = temp2[id];
+                    startTimeNotes = Math.floor(startTime[id] / 100);
+                } else if (startTimeNotes === Math.floor(startTime[id] / 100)) {
+                    chordBuffer[id] = temp2[id];
+                    extraNoteCount++;
+                } else {
+                    extraNoteCount = 0;
+                    chordBuffer = {};
                 }
 
                 this.activity.logo.synth.trigger(
@@ -415,15 +430,37 @@ function MusicKeyboard(activity) {
                     });
                 } else {
                     this.activity.logo.synth.stopSound(0, this.instrumentMapper[id], temp2[id]);
-                    this._notesPlayed.push({
-                        startTime: startTime[id],
-                        noteOctave: temp2[id],
-                        objId: id,
-                        duration: processedDuration,
-                        voice: this.instrumentMapper[id],
-                        blockNumber: this.blockNumberMapper[id]
-                    });
+                    // Handle Chord
+                    if (id in chordBuffer) {
+                        Object.entries(chordBuffer).forEach(([id, noteOctave]) => {
+                            this._notesPlayed.push({
+                                startTime: startTimeNotes * 100,
+                                noteOctave: noteOctave,
+                                objId: id,
+                                duration: processedDuration,
+                                voice: this.instrumentMapper[id],
+                                blockNumber: this.blockNumberMapper[id]
+                            });
+                            delete chordBuffer[id];
+                        });
+                    }
+                    else if (extraNoteCount > 0) {
+                        extraNoteCount--;
+                    }
+                    // Handle Single Notes
+                    else {
+                        this._notesPlayed.push({
+                            startTime: startTime[id],
+                            noteOctave: temp2[id],
+                            objId: id,
+                            duration: processedDuration,
+                            voice: this.instrumentMapper[id],
+                            blockNumber: this.blockNumberMapper[id]
+                        });
+                        chordBuffer = {};
+                    }
                 }
+
                 this._createTable();
                 if (this.widgetWindow._maximized) {
                     this.widgetWindow.getWidgetBody().style.position = "absolute";
@@ -450,6 +487,7 @@ function MusicKeyboard(activity) {
                     docById("mkbInnerDiv").style.height = "100%";
                 }
                 this.endTime = noteEndTime;
+                startTimeNotes = 0;
                 delete startTime[id];
                 delete temp1[id];
                 delete temp2[id];
@@ -700,6 +738,9 @@ function MusicKeyboard(activity) {
         this.playButton = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
 
         this.playButton.onclick = () => {
+            if (this.metronomeInterval || this.metronomeON) {
+                this.stopMetronome();
+            }
             this.activity.logo.turtleDelay = 0;
             this.processSelected();
             this.playAll();
@@ -766,27 +807,29 @@ function MusicKeyboard(activity) {
          * @type {HTMLElement}
          */
         this.tickButton = widgetWindow.addButton("metronome.svg", ICONSIZE, _("Metronome"));
+
+        // Turn off metronome
+        this.stopMetronome = () => {
+            this.tickButton.style.removeProperty("background");
+            if (this.tick && this.loopTick) {
+                this.loopTick.stop();
+            }
+            this.tick = false;
+            this.firstNote = false;
+            this.metronomeON = false;
+            const countdownContainer = docById("countdownContainer");
+            if (countdownContainer) {
+                countdownContainer.remove();
+            }
+            if (this.metronomeInterval) {
+                clearInterval(this.metronomeInterval);
+                this.metronomeInterval = null;
+            }
+        };
+
         this.tickButton.onclick = () => {
             if (this.metronomeInterval || this.metronomeON) {
-                // Turn off metronome
-                this.tickButton.style.removeProperty("background");
-
-                if (this.tick && this.loopTick) {
-                    this.loopTick.stop();
-                }
-                this.tick = false;
-                this.firstNote = false;
-                this.metronomeON = false;
-
-                const countdownContainer = docById("countdownContainer");
-                if (countdownContainer) {
-                    countdownContainer.remove();
-                }
-                if (this.metronomeInterval) {
-                    clearInterval(this.metronomeInterval);
-                    this.metronomeInterval = null;
-                }
-
+                this.stopMetronome();
             } else {
                 // Turn on metronome
                 this.metronomeON = true;
@@ -2662,9 +2705,9 @@ function MusicKeyboard(activity) {
         mkbKeyboardDiv.style.width = "100%";
         mkbKeyboardDiv.style.top = "0px";
         mkbKeyboardDiv.style.overflow = "auto";
-        mkbKeyboardDiv.style.userSelect = 'none';
-        mkbKeyboardDiv.style.webkitUserSelect = 'none'; // Safari/Chrome
-        mkbKeyboardDiv.style.msUserSelect = 'none'; // Edge
+        mkbKeyboardDiv.style.userSelect = "none";
+        mkbKeyboardDiv.style.webkitUserSelect = "none"; // Safari/Chrome
+        mkbKeyboardDiv.style.msUserSelect = "none"; // Edge
         mkbKeyboardDiv.innerHTML = "";
         mkbKeyboardDiv.innerHTML =
             ' <div id="keyboardHolder2"><table class="white"><tbody><tr id="myrow"></tr></tbody></table><table class="black"><tbody><tr id="myrow2"></tr></tbody></table></div>';
@@ -3051,7 +3094,7 @@ function MusicKeyboard(activity) {
         var actionGroups = parseInt(selectedNotes.length / actionGroupInterval) + 1;
 
         for (let actionGroup = 0; actionGroup < actionGroups; actionGroup++) {
-            let currentSelectedNotes = selectedNotes.slice(
+            const currentSelectedNotes = selectedNotes.slice(
                 actionGroup * actionGroupInterval,
                 (actionGroup + 1) * actionGroupInterval
             );

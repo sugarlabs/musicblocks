@@ -29,16 +29,16 @@ global.NOTATIONSTACCATO = 6;
 global.frequencyToPitch = jest.fn((freq) => ["G♯", "4"]);
 global.toFraction = jest.fn((num) => [1, 1]);
 
-const { getABCHeader, processABCNotes, saveAbcOutput, ACCIDENTAL_MAP, OCTAVE_NOTATION_MAP } = require('../abc');
+const { getABCHeader, processABCNotes, saveAbcOutput, ACCIDENTAL_MAP, OCTAVE_NOTATION_MAP } = require("../abc");
 
-describe('getABCHeader', () => {
-    it('should return the correct ABC header', () => {
+describe("getABCHeader", () => {
+    it("should return the correct ABC header", () => {
         const expectedHeader = "X:1\nT:Music Blocks composition\nC:Mr. Mouse\nL:1/16\nM:C\n";
         expect(getABCHeader()).toBe(expectedHeader);
     });
 });
 
-describe('processABCNotes', () => {
+describe("processABCNotes", () => {
     let logo;
 
     beforeEach(() => {
@@ -56,13 +56,13 @@ describe('processABCNotes', () => {
         };
     });
 
-    it('should process notes and update notationNotes correctly', () => {
+    it("should process notes and update notationNotes correctly", () => {
         processABCNotes(logo, "0");
         expect(logo.notationNotes["0"]).toBe("G^4 G^4 F4 F4 G^2 G^8 ");
     });
 });
 
-describe('saveAbcOutput', () => {
+describe("saveAbcOutput", () => {
     let activity;
 
     beforeEach(() => {
@@ -90,7 +90,7 @@ describe('saveAbcOutput', () => {
         };
     });
 
-    it('should generate the correct ABC notation output', () => {
+    it("should generate the correct ABC notation output", () => {
         const expectedOutput ="X:1\n"+
                                "T:Music Blocks composition\n"+
                                "C:Mr. Mouse\n"+
@@ -104,8 +104,8 @@ describe('saveAbcOutput', () => {
     });
 });
 
-describe('processABCNotes - Tuplet Handling', () => {
-    it('should process tuplets correctly', () => {
+describe("processABCNotes - Tuplet Handling", () => {
+    it("should process tuplets correctly", () => {
         const logo = {
             notationNotes: { "0": "" },
             notation: {

@@ -853,3 +853,7 @@ function setupBoxesBlocks(activity) {
     new Box1Block().setup(activity);
     new StoreBox1Block().setup(activity);
 }
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupBoxesBlocks };
+}

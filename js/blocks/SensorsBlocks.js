@@ -712,38 +712,90 @@ function setupSensorsBlocks(activity) {
         }
 
         /**
-         * Retrieves the argument value of the block.
-         * @param {Object} logo - The logo object.
+         * Retrieves the color value of the pixel under the turtle.
+         * @param {Object} logo - The logo object managing the runtime state.
          * @param {number} turtle - The identifier of the turtle.
-         * @returns {number} - The argument value representing the color.
+         * @returns {number} - The color index from searchColors, or a fallback value if detection fails.
+         * @throws {Error} - If the turtle or canvas context cannot be accessed.
          */
         arg(logo, turtle) {
-            const requiredTurtle = activity.turtles.getTurtle(turtle); ; 
-            const wasVisible = requiredTurtle.container.visible;
-            requiredTurtle.container.visible = false;
-            const x = requiredTurtle.container.x;
-            const y = requiredTurtle.container.y;
-            activity.refreshCanvas();
+            let requiredTurtle;
 
+            try {
+                requiredTurtle = activity.turtles.getTurtle(turtle);
+            } catch (error) {
+                return this.getFallbackColor(); // Turtle not found, no visibility to restore
+            }
+
+            if (!requiredTurtle.container) {
+                return this.getFallbackColor(); // Container not found, no visibility to restore
+            }
+
+            const { x, y } = requiredTurtle.container;
+            const originalVisibility = requiredTurtle.container.visible;
+
+            try {
+                requiredTurtle.container.visible = false;
+                activity.refreshCanvas();
+
+                const pixelData = this.getPixelData(x, y);
+                const color = this.detectColor(pixelData);
+
+                requiredTurtle.container.visible = originalVisibility;
+                return color;
+            } catch (error) {
+                requiredTurtle.container.visible = originalVisibility;
+                return this.getFallbackColor();
+            }
+        }
+
+        /**
+         * Extracts pixel data from the canvas at the specified coordinates.
+         * @param {number} x - The x-coordinate of the pixel.
+         * @param {number} y - The y-coordinate of the pixel.
+         * @returns {Uint8ClampedArray} - The RGBA values of the pixel.
+         * @throws {Error} - If the canvas context is unavailable.
+         */
+        getPixelData(x, y) {
             const canvas = docById("overlayCanvas");
-            const ctx = canvas.getContext("2d");
-            const imgData = ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
-            let color = searchColors(imgData[0], imgData[1], imgData[2]);
-
-            if (imgData[3] === 0) {
-                color = platformColor.background
-                    .substring(
-                        platformColor.background.indexOf("(") + 1,
-                        platformColor.background.lastIndexOf(")")
-                    )
-                    .split(/,\s*/);
-                color = searchColors(color[0], color[1], color[2]);
+            const ctx = canvas?.getContext("2d");
+            if (!ctx) {
+                throw new Error("Canvas context unavailable");
             }
+            return ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
+        }
 
-            if (wasVisible) {
-                activity.turtles.getTurtle(turtle).container.visible = true;
+        /**
+         * Determines the color based on pixel data.
+         * @param {Uint8ClampedArray} pixelData - The RGBA values of the pixel.
+         * @returns {number} - The color index from searchColors.
+         */
+        detectColor(pixelData) {
+            if (pixelData.length !== 4) {
+                throw new Error("Invalid pixel data");
             }
-            return color;
+            const [r, g, b, a] = pixelData;
+            return a === 0 ? this.getBackgroundColor() : searchColors(r, g, b);
+        }
+
+        /**
+         * Retrieves the background color as a fallback.
+         * @returns {number} - The background color index.
+         */
+        getBackgroundColor() {
+            const [r, g, b] = platformColor.background
+                .match(/\(([^)]+)\)/)[1]
+                .split(/,\s*/)
+                .map(Number);
+            return searchColors(r, g, b);
+        }
+
+        /**
+         * Provides a default color value in case of failure.
+         * @returns {number} - A default color index (e.g., gray).
+         */
+        getFallbackColor() {
+            return searchColors(128, 128, 128);
         }
     }
 
@@ -1056,4 +1108,9 @@ function setupSensorsBlocks(activity) {
     new MouseButtonBlock().setup(activity);
     new MouseYBlock().setup(activity);
     new MouseXBlock().setup(activity);
+}
+
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupSensorsBlocks };
 }
