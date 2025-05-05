@@ -132,9 +132,9 @@ class JSEditor {
                 tooltip.textContent = tooltipText;
 
                 tooltip.style.top = `${rect.bottom + window.scrollY + (positionOfTooltip !== "bottom" ? -30 : 20)
-                    }px`;
+                }px`;
                 tooltip.style.left = `${rect.left + window.scrollX + (positionOfTooltip !== "bottom" ? -135 : 0)
-                    }px`;
+                }px`;
             });
 
             targetButton.addEventListener("mouseout", () => {

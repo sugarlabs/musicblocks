@@ -20,16 +20,16 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const acorn = require('../../../lib/acorn.min');
-const { AST2BlockList } = require('../ast2blocklist');
+const acorn = require("../../../lib/acorn.min");
+const { AST2BlockList } = require("../ast2blocklist");
 
-describe('AST2BlockList Class', () => {
+describe("AST2BlockList Class", () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
     // Test calling unsupported function should throw an error.
-    test('should throw error for unsupported call', () => {
+    test("should throw error for unsupported call", () => {
         const code = `
         new Mouse(async mouse => {
             await mouse.setMusicInstrument("guitar", async () => {
@@ -41,14 +41,14 @@ describe('AST2BlockList Class', () => {
             });
             return mouse.ENDMOUSE;
         });
-        MusicBlocks.run();`
+        MusicBlocks.run();`;
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
         expect(() => AST2BlockList.toTrees(AST)).toThrow("Unsupported AsyncCallExpression: mouse.setMusicInstrument");
     });
 
     // Test unsupported assignment expression should throw an error.
-    test('should throw error for unsupported assignment expression', () => {
+    test("should throw error for unsupported assignment expression", () => {
         const code = `
         new Mouse(async mouse => {
             await mouse.setInstrument("guitar", async () => {
@@ -61,7 +61,7 @@ describe('AST2BlockList Class', () => {
             });
             return mouse.ENDMOUSE;
         });
-        MusicBlocks.run();`
+        MusicBlocks.run();`;
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
         try {
@@ -72,7 +72,7 @@ describe('AST2BlockList Class', () => {
     });
 
     // Test unsupported binary operator should throw an error.
-    test('should throw error for unsupported binary operator', () => {
+    test("should throw error for unsupported binary operator", () => {
         const code = `
         new Mouse(async mouse => {
             await mouse.setInstrument("guitar", async () => {
@@ -84,14 +84,14 @@ describe('AST2BlockList Class', () => {
             });
             return mouse.ENDMOUSE;
         });
-        MusicBlocks.run();`
+        MusicBlocks.run();`;
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
         expect(() => AST2BlockList.toTrees(AST)).toThrow("Unsupported binary operator: <<");
     });
 
     // Test unsupported unary operator should throw an error.
-    test('should throw error for unsupported unary operator', () => {
+    test("should throw error for unsupported unary operator", () => {
         const code = `
         new Mouse(async mouse => {
             await mouse.setInstrument("guitar", async () => {
@@ -103,14 +103,14 @@ describe('AST2BlockList Class', () => {
             });
             return mouse.ENDMOUSE;
         });
-        MusicBlocks.run();`
+        MusicBlocks.run();`;
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
         expect(() => AST2BlockList.toTrees(AST)).toThrow("Unsupported unary operator: ~");
     });
 
     // Test calling unsupported function should throw an error.
-    test('should throw error for unsupported function call', () => {
+    test("should throw error for unsupported function call", () => {
         const code = `
         new Mouse(async mouse => {
             await mouse.setInstrument("guitar", async () => {
@@ -122,14 +122,14 @@ describe('AST2BlockList Class', () => {
             });
             return mouse.ENDMOUSE;
         });
-        MusicBlocks.run();`
+        MusicBlocks.run();`;
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
         expect(() => AST2BlockList.toTrees(AST)).toThrow("Unsupported function call: Math.unsupported");
     });
 
     // Test unsupported argument type should throw an error.
-    test('should throw error for unsupported argument type', () => {
+    test("should throw error for unsupported argument type", () => {
         const code = `
         new Mouse(async mouse => {
             await mouse.setInstrument("guitar", async () => {
@@ -141,31 +141,31 @@ describe('AST2BlockList Class', () => {
             });
             return mouse.ENDMOUSE;
         });
-        MusicBlocks.run();`
+        MusicBlocks.run();`;
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
         try {
             AST2BlockList.toTrees(AST);
         } catch (e) {
-            expect(e.prefix + code.substring(e.start, e.end)).toEqual(`Unsupported argument type ArrayExpression: [1]`);
+            expect(e.prefix + code.substring(e.start, e.end)).toEqual("Unsupported argument type ArrayExpression: [1]");
         }
     });
 
     // Test unsupported statement should throw an error.
-    test('should throw error for unsupported statement', () => {
-        const code = `console.log("test");`
+    test("should throw error for unsupported statement", () => {
+        const code = "console.log('test');";
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
         try {
             AST2BlockList.toTrees(AST);
         } catch (e) {
-            expect(e.prefix + code.substring(e.start, e.end)).toEqual(`Unsupported statement: console.log("test");`);
+            expect(e.prefix + code.substring(e.start, e.end)).toEqual("Unsupported statement: console.log('test');");
         }
     });
 
     // Test a single note inside of settimbre.
     // Support number expressions, including built-in math functions, for note and pitch.
-    test('should generate correct blockList for a single note', () => {
+    test("should generate correct blockList for a single note", () => {
         const code = `
         new Mouse(async mouse => {
             await mouse.setInstrument("guitar", async () => {
@@ -177,7 +177,7 @@ describe('AST2BlockList Class', () => {
             });
             return mouse.ENDMOUSE;
         });
-        MusicBlocks.run();`
+        MusicBlocks.run();`;
 
         const expectedBlockList = [
             [0, "start", 200, 200, [null, 1, null]],
@@ -205,7 +205,7 @@ describe('AST2BlockList Class', () => {
 
     // Test repeat statement.
     // Support number expressions, including built-in math functions, for number of repeats.
-    test('should generate correct blockList for repeat', () => {
+    test("should generate correct blockList for repeat", () => {
         const code = `
         new Mouse(async mouse => {
             await mouse.setInstrument("clarinet", async () => {
@@ -219,7 +219,7 @@ describe('AST2BlockList Class', () => {
             });
             return mouse.ENDMOUSE;
         });
-        MusicBlocks.run();`
+        MusicBlocks.run();`;
 
         const expectedBlockList = [
             [0, "start", 200, 200, [null, 1, null]],
@@ -251,7 +251,7 @@ describe('AST2BlockList Class', () => {
 
     // Test if statement.
     // Support boolean expressions, including built-in math functions, for if condition.
-    test('should generate correct blockList for if', () => {
+    test("should generate correct blockList for if", () => {
         const code = `
         new Mouse(async mouse => {
             if (!(1 == MathUtility.doRandom(0, 1))) {
@@ -265,7 +265,7 @@ describe('AST2BlockList Class', () => {
             }
             return mouse.ENDMOUSE;
         });
-        MusicBlocks.run();`
+        MusicBlocks.run();`;
 
         const expectedBlockList = [
             [0, "start", 200, 200, [null, 1, null]],
@@ -297,7 +297,7 @@ describe('AST2BlockList Class', () => {
 
     // Test action with recursion.
     // Support using box value to control termination of recursion.
-    test('should generate correct blockList for action with recursion', () => {
+    test("should generate correct blockList for action with recursion", () => {
         const code = `
         let playSol = async mouse => {
             await mouse.playNote(1 / 4, async () => {
@@ -318,7 +318,7 @@ describe('AST2BlockList Class', () => {
             });
             return mouse.ENDMOUSE;
         });
-        MusicBlocks.run();`
+        MusicBlocks.run();`;
 
         const expectedBlockList = [
             [0, "action", 200, 200, [null, 1, 2, null]],
@@ -359,7 +359,7 @@ describe('AST2BlockList Class', () => {
 
     // Test action, note, pitch, and repeat with Frere Jacques, an example here:
     // https://musicblocks.sugarlabs.org/index.html?id=1725791527821787&run=True
-    test('should generate correct blockList for action with recursion', () => {
+    test("should generate correct blockList for action with recursion", () => {
         const code = `
         let chunk0 = async mouse => {
             await mouse.playNote(1 / 4, async () => {
@@ -452,7 +452,7 @@ describe('AST2BlockList Class', () => {
             }
             return mouse.ENDMOUSE;
         });
-        MusicBlocks.run();`
+        MusicBlocks.run();`;
 
         const expectedBlockList = [
             [0, "action", 200, 200, [null, 1, 2, null]],
@@ -615,7 +615,7 @@ describe('AST2BlockList Class', () => {
     // Test Dictionary.
     // Support setValue and getValue.
     // Also support function overloading - setValue and getValue can take different number of arguments.
-    test('should generate correct blockList for dictionary operations', () => {
+    test("should generate correct blockList for dictionary operations", () => {
         const code = `
         new Mouse(async mouse => {
             await mouse.setValue("key", 2);
@@ -641,7 +641,7 @@ describe('AST2BlockList Class', () => {
             });
             return mouse.ENDMOUSE;
         });
-        MusicBlocks.run();`
+        MusicBlocks.run();`;
 
         const expectedBlockList = [
             [0, "start", 200, 200, [null, 1, null]],

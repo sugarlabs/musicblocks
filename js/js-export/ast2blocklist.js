@@ -31,14 +31,14 @@
  */
 class AST2BlockList {
     /**
-     * Given a musicblocks AST ('type': "Program"), return an array of trees.
+     * Given a musicblocks AST ("type": "Program"), return an array of trees.
      * Each AST contains one to multiple top level blocks, each to be converted to a tree.
      * For example:
      *   {
      *     name: "start",
      *     children: [ {
-     *       name: 'settimbre',
-     *       args: ['guitar'],
+     *       name: "settimbre",
+     *       args: ["guitar"],
      *       children: [
      *         child1,
      *         child2 ]
@@ -132,7 +132,7 @@ class AST2BlockList {
                         let numArgs = bodyAST.expression.argument.arguments.length;
                         if (obj in _memberLookup && member in _memberLookup[obj]) {
                             let name = _memberLookup[obj][member];
-                            if (typeof name === 'object') {
+                            if (typeof name === "object") {
                                 name = name[numArgs];
                             }
                             return name;
@@ -230,7 +230,7 @@ class AST2BlockList {
                                 return [bodyAST.expression.left];
                             }
                             if (bodyAST.expression.right.operator == "+") {
-                                return [bodyAST.expression.left, bodyAST.expression.right.right];;
+                                return [bodyAST.expression.left, bodyAST.expression.right.right];
                             }
                         }
                         throw {
@@ -295,7 +295,7 @@ class AST2BlockList {
                     };
                 }
                 let name = _memberLookup[obj][member];
-                if (typeof name === 'object') {
+                if (typeof name === "object") {
                     name = name[numArgs];
                 }
                 let args = argAST.arguments;
@@ -397,7 +397,7 @@ class AST2BlockList {
         /**
          * Create a tree node starting at the give AST node and add it to parent, which is also a tree node.
          * A tree node is an associated array with one to three elements, for example:
-         * {name: 'settimbre', args: ['guitar'], children: [child1, child2]}.
+         * {name: "settimbre", args: ["guitar"], children: [child1, child2]}.
          * 
          * @param {Object} bodyAST - an element in a 'body' array in the AST
          * @param {Object} parent - parent node for the new node created by this method
@@ -447,7 +447,7 @@ class AST2BlockList {
         /**
          * Create and return an array for the given array of AST nodes for arguments.
          * For exmple, two Literal AST nodes with value 1 and 2 will result in an array [1, 2];
-         * One binary AST node "1 / 2" will result in an array [{'name': 'divide', 'args': [1, 2]}].
+         * One binary AST node "1 / 2" will result in an array [{"name": "divide", "args": [1, 2]}].
          * 
          * @param {Array} argASTNodes - an arry of AST nodes for arguments
          * @returns {Array} an array of all the arguments, note that an argument can be another node
@@ -503,14 +503,14 @@ class AST2BlockList {
 
             // Pitch Palette, pitch block takes a note name and a number expression for octave
             // Example: mouse.playPitch("sol", 4);
-            // args: ['sol', 4] =>
+            // args: ["sol", 4] =>
             //   [10,["solfege",{"value":"sol"}],0,0,[9]],
             //   [11,["number",{"value":4}],0,0,[9]]
-            // args: ['G', 4] =>
+            // args: ["G", 4] =>
             //   [10,["notename",{"value":"G"}],0,0,[9]],
             //   [11,["number",{"value":4}],0,0,[9]]
             "pitch": (args, blockList, parentBlockNumber) => {
-                const notes = new Set(['A', 'B', 'C', 'D', 'E', 'F', 'G']);
+                const notes = new Set(["A", "B", "C", "D", "E", "F", "G"]);
                 // Add the 1st argument - note name
                 let vspaces = _addNthArgToBlockList(
                     [notes.has(args[0].charAt(0)) ? "notename" : "solfege", { "value": args[0] }],
@@ -823,15 +823,15 @@ class AST2BlockList {
          * args: [2] =>
          *   [5,["number",{"value":2}],0,0,[4]],
          *
-         * args: [{'name': 'divide', 
-         *         'args': [1,4]}] =>
+         * args: [{"name": "divide", 
+         *         "args": [1,4]}] =>
          *   [5,"divide",0,0,[4,6,7]],
          *   [6,["number",{"value":1}],0,0,[5]],
          *   [7,["number",{"value":4}],0,0,[5]]
          *
-         * args: [{'name': 'abs',
-         *         'args': [{'name': 'neg', 
-         *                   'args': [1]}]}] =>
+         * args: [{"name": "abs",
+         *         "args": [{"name": "neg", 
+         *                   "args": [1]}]}] =>
          *   [5,"abs",0,0,[4,6,7]],
          *   [6,["neg",0,0,[5,7]],
          *   [7,["number",{"value":1}],0,0,[6]]
@@ -855,19 +855,19 @@ class AST2BlockList {
             block.push(blockNumber);
             blockList.push(block);
             let type = typeof arg;
-            if (type === 'string') {
-                type = 'text';
+            if (type === "string") {
+                type = "text";
             }
-            if (type === 'number' || type === 'boolean' || type === 'text' ||
-                (type === 'object' && arg.identifier !== undefined)) {
+            if (type === "number" || type === "boolean" || type === "text" ||
+                (type === "object" && arg.identifier !== undefined)) {
                 // variables can be in number or boolean expressions
-                block.push(type === 'object' ? ["namedbox", { "value": arg.identifier }] : [type, { "value": arg }]);
+                block.push(type === "object" ? ["namedbox", { "value": arg.identifier }] : [type, { "value": arg }]);
                 block.push(0);  // x
                 block.push(0);  // y
                 // Initialize connections with just the parent.
                 block.push([parentBlockNumber]);
                 vspaces = 1;
-            } else if (type === 'object') {
+            } else if (type === "object") {
                 block.push(arg.name);
                 block.push(0);  // x
                 block.push(0);  // y
@@ -885,6 +885,6 @@ class AST2BlockList {
     }
 }
 
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
     module.exports = { AST2BlockList };
 }
