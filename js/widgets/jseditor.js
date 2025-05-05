@@ -131,11 +131,9 @@ class JSEditor {
                 tooltip.style.whiteSpace = "nowrap";
                 tooltip.textContent = tooltipText;
 
-                tooltip.style.top = `${
-                    rect.bottom + window.scrollY + (positionOfTooltip !== "bottom" ? -30 : 20)
+                tooltip.style.top = `${rect.bottom + window.scrollY + (positionOfTooltip !== "bottom" ? -30 : 20)
                 }px`;
-                tooltip.style.left = `${
-                    rect.left + window.scrollX + (positionOfTooltip !== "bottom" ? -135 : 0)
+                tooltip.style.left = `${rect.left + window.scrollX + (positionOfTooltip !== "bottom" ? -135 : 0)
                 }px`;
             });
 
@@ -161,7 +159,7 @@ class JSEditor {
         helpBtn.innerHTML = "help_outline";
         helpBtn.onclick = this._toggleHelp.bind(this);
         menuLeft.appendChild(helpBtn);
-        generateTooltip(helpBtn, "Help");
+        generateTooltip(helpBtn, _("Help"));
 
         const generateBtn = document.createElement("span");
         generateBtn.classList.add("material-icons");
@@ -174,7 +172,7 @@ class JSEditor {
         generateBtn.innerHTML = "autorenew";
         generateBtn.onclick = this._generateCode.bind(this);
         menuLeft.appendChild(generateBtn);
-        generateTooltip(generateBtn, "Reset Code");
+        generateTooltip(generateBtn, _("Reset Code"));
 
         const runBtn = document.createElement("span");
         runBtn.classList.add("material-icons");
@@ -188,7 +186,21 @@ class JSEditor {
         runBtn.onclick = this._runCode.bind(this);
         menuLeft.appendChild(runBtn);
         menubar.appendChild(menuLeft);
-        generateTooltip(runBtn, "Play");
+        generateTooltip(runBtn, _("Play"));
+
+        const convertBtn = document.createElement("span");
+        convertBtn.classList.add("material-icons");
+        convertBtn.style.borderRadius = "50%";
+        convertBtn.style.padding = ".25rem";
+        convertBtn.style.marginLeft = ".75rem";
+        convertBtn.style.fontSize = "2rem";
+        convertBtn.style.background = "#2196f3";
+        convertBtn.style.cursor = "pointer";
+        convertBtn.innerHTML = "transform";
+        convertBtn.onclick = this._codeToBlocks.bind(this);
+        menuLeft.appendChild(convertBtn);
+        menubar.appendChild(menuLeft);
+        generateTooltip(convertBtn, _("Convert JavaScript to Blocks"));
 
         const menuRight = document.createElement("div");
         menuRight.style.height = "3rem";
@@ -209,7 +221,7 @@ class JSEditor {
         styleBtn.onclick = this._changeStyle.bind(this);
         menuRight.appendChild(styleBtn);
         menubar.appendChild(menuRight);
-        generateTooltip(styleBtn, "Change theme", "left");
+        generateTooltip(styleBtn, _("Change theme"), "left");
         this._editor.appendChild(menubar);
 
         const editorContainer = document.createElement("div");
@@ -300,7 +312,7 @@ class JSEditor {
         arrowBtn.innerHTML = "keyboard_arrow_down";
         arrowBtn.onclick = this._toggleConsole.bind(this);
         consolelabel.appendChild(arrowBtn);
-        generateTooltip(arrowBtn, "Toggle Console","left");
+        generateTooltip(arrowBtn, _("Toggle Console"), "left");
 
         const editorconsole = document.createElement("div");
         editorconsole.id = "editorConsole";
@@ -354,29 +366,29 @@ class JSEditor {
      */
     _setupDividerResize(divider, editorContainer, editorconsole, consolelabel) {
         let isResizing = false;
-    
+
         const onMouseMove = (e) => {
             if (!isResizing) return;
             const parentRect = this._editor.getBoundingClientRect();
             const menubarHeight = this._menubar ? this._menubar.offsetHeight : 0;
             const availableHeight = this._editor.clientHeight - menubarHeight;
             const dynamicTop = parentRect.top + menubarHeight;
-    
+
             const newEditorHeight = e.clientY - dynamicTop;
             const dividerHeight = divider.offsetHeight;
             const consoleHeaderHeight = consolelabel.offsetHeight;
             const newConsoleHeight = availableHeight - newEditorHeight - dividerHeight - consoleHeaderHeight;
-    
+
             editorContainer.style.flexBasis = `${newEditorHeight}px`;
             editorconsole.style.flexBasis = `${newConsoleHeight}px`;
         };
-    
+
         const onMouseUp = () => {
             isResizing = false;
             document.removeEventListener("mousemove", onMouseMove);
             document.removeEventListener("mouseup", onMouseUp);
         };
-    
+
         divider.addEventListener("mousedown", (e) => {
             isResizing = true;
             document.addEventListener("mousemove", onMouseMove);
@@ -406,6 +418,12 @@ class JSEditor {
         console.log("%c" + message, `color: ${color}`);
     }
 
+    static clearConsole() {
+        if (docById("editorConsole")) {
+            docById("editorConsole").innerHTML = "";
+        }
+    }
+
     /**
      * Triggerred when the "run" button on the widget is pressed.
      * Runs the JavaScript code that is in the editor.
@@ -415,13 +433,40 @@ class JSEditor {
     _runCode() {
         if (this._showingHelp) return;
 
-        if (docById("editorConsole")) docById("editorConsole").innerHTML = "";
+        JSEditor.clearConsole();
 
         try {
             MusicBlocks.init(true);
             new Function(this._code)();
         } catch (e) {
             JSEditor.logConsole(e, "maroon");
+        }
+    }
+
+    /**
+     * Update the blocks on canvas based on the JS code in editor.
+     * 
+     * @returns {Void}
+     */
+    _codeToBlocks() {
+        JSEditor.clearConsole();
+
+        try {
+            let ast = acorn.parse(this._code, { ecmaVersion: 2020 });
+            let trees = AST2BlockList.toTrees(ast);
+            let blockList = AST2BlockList.toBlockList(trees);
+            const activity = this.activity;
+            // Wait for the old blocks to be removed, then load new blocks.
+            const __listener = (event) => {
+                activity.blocks.loadNewBlocks(blockList);
+                activity.stage.removeAllEventListeners("trashsignal");
+            };
+            activity.stage.removeAllEventListeners("trashsignal");
+            activity.stage.addEventListener("trashsignal", __listener, false);
+            // Clear the canvas but leave the JS editor open
+            activity.sendAllToTrash(false, false, false);
+        } catch (e) {
+            JSEditor.logConsole("message" in e ? e.message : e.prefix + this._code.substring(e.start, e.end), "red");
         }
     }
 

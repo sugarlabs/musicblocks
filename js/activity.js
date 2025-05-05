@@ -105,6 +105,7 @@ let MYDEFINES = [
     "activity/js-export/constraints",
     "activity/js-export/ASTutils",
     "activity/js-export/generate",
+    "activity/js-export/ast2blocklist",
     "activity/js-export/API/GraphicsBlocksAPI",
     "activity/js-export/API/PenBlocksAPI",
     "activity/js-export/API/RhythmBlocksAPI",
@@ -2995,7 +2996,7 @@ class Activity {
             // First, check if the pitch slider is open
             if (window.widgetWindows.isOpen("slider") === true) {
                 // If the event is an arrow key, let the PitchSlider handle it
-                if (event.keyCode === 37 || event.keyCode === 38 || 
+                if (event.keyCode === 37 || event.keyCode === 38 ||
                     event.keyCode === 39 || event.keyCode === 40) {
                     // Simply prevent default behavior here
                     // The actual pitch slider handling is done in the PitchSlider class
@@ -4004,8 +4005,9 @@ class Activity {
          * Hide the palettes before update, then deletes everything/sends all to trash.
          * @param {boolean} addStartBlock {if true adds a new start block to new project instance}
          * @param {boolean} doNotSave     {if true discards any changes to project}
+         * @param {boolean} closeAllWidgets  {if true close all open widgets}
          */
-        this.sendAllToTrash = (addStartBlock, doNotSave) => {
+        this.sendAllToTrash = (addStartBlock, doNotSave, closeAllWidgets = true) => {
             // Return to home position after loading new blocks.
             this.blocksContainer.x = 0;
             this.blocksContainer.y = 0;
@@ -4065,7 +4067,9 @@ class Activity {
             this.update = true;
 
             // Close any open widgets.
-            closeWidgets();
+            if (closeAllWidgets) {
+                closeWidgets();
+            }
         };
 
         /*
