@@ -119,10 +119,8 @@ describe("Palettes Class", () => {
 
     test("hide and show functions modify visibility", () => {
         palettes.hide();
-        console.log("Visibility after hide:", docById("palette").style.visibility);
         expect(docById("palette").style.visibility).toBe("hidden");
         palettes.show();
-        console.log("Visibility after show:", docById("palette").style.visibility);
         expect(docById("palette").style.visibility).toBe("visible");
     });
 });
