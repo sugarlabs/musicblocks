@@ -381,6 +381,25 @@ lower by one half step. In the example, on the left, just the *Pitch*
 block `re` is lowered by one half step; on the right, both *Pitch*
 blocks are raised by one half step. (You can also use a double-sharp
 or double-flat accidental.) [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733231694757697&run=True)
+##### Examples of Double-Sharp and Double-Flat Usage
+
+Double-sharps (𝄪) and double-flats (𝄫) are used in certain keys and advanced compositions to preserve correct scale structure or harmonic context. Here are a few examples:
+
+1. **G♯ Major Scale**  
+   - Notes: G♯, A♯, B♯, C♯, D♯, E♯, F𝄪  
+   - F𝄪 is used instead of G to preserve stepwise motion in the scale.
+
+2. **D♯ Major Scale**  
+   - Notes: D♯, E♯, F𝄪, G♯, A♯, B♯, C𝄪  
+   - F𝄪 and C𝄪 are enharmonic to G and D, respectively, but keep the scale consistent.
+
+3. **F♭ Major Scale**  
+   - Notes: F♭, G♭, A♭, B𝄫, C♭, D♭, E♭  
+   - B𝄫 helps maintain the correct intervallic relationships.
+
+4. **Béla Bartók’s Mikrokosmos No. 136 – "Whole-tone Scale"**  
+   - This piece uses double-flats to maintain theoretical clarity in whole-tone passages.  
+   - Reference: [Mikrokosmos on Wikipedia](https://en.wikipedia.org/wiki/Mikrokosmos_(Bart%C3%B3k))
 
 #### <a name="ADJUST-TRANSPOSITION">3.2.3 Adjusting Transposition</a>
 
