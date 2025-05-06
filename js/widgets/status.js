@@ -35,12 +35,19 @@ class StatusMatrix {
         this.isMaximized = false;
         this._cellScale = window.innerWidth / 1200;
         let iconSize = StatusMatrix.ICONSIZE * this._cellScale;
+        
+        // Cache DOM elements and frequently used values
+        this._cachedTurtleList = this.activity.turtles.turtleList;
+        this._cachedFontSize = Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
+        this._cachedButtonHeight = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
+        this._cachedRowHeight = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
+        
+        // Store row references for faster access during updates
+        this._cellMap = [];
 
         this.widgetWindow = window.widgetWindows.windowFor(this, "status", "status");
         this.widgetWindow.clear();
         this.widgetWindow.show();
-        // For the button callbacks
-        let cell;
 
         // The status table
         this._statusTable = document.createElement("table");
@@ -56,19 +63,22 @@ class StatusMatrix {
         // The first row contains the mice icons.
         const header = this._statusTable.createTHead();
         const row = header.insertRow();
+        let cell;
 
         iconSize = Math.floor(this._cellScale * 24);
 
         cell = row.insertCell();
         cell.style.backgroundColor = "#FFFFFF";
         cell.className = "headcol";
-        cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
-        // cell.style.width = StatusMatrix.BUTTONSIZE * this._cellScale*2 + "px";
+        cell.style.height = this._cachedButtonHeight;
         cell.style.width = "212.5px";
-
         cell.innerHTML = "&nbsp;";
+        
+        // Create an array to store header cells for better reference
+        const headerCells = [];
+        
         // One column per mouse/turtle
-        for (const turtle of this.activity.turtles.turtleList) {
+        for (const turtle of this._cachedTurtleList) {
             if (turtle.inTrash) {
                 continue;
             }
@@ -96,33 +106,37 @@ class StatusMatrix {
                     >&nbsp;&nbsp;`;
             }
             cell.style.width = "212.5px";
-            this.widgetWindow.onmaximize = () => {
-                this.isMaximized = !this.isMaximized;
-                cell.style.width = "100vw";
-                cell.style.paddingLeft = "30px";
-                cell.style.fontSize =
-                    Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
-                if (!this.isMaximized) {
-                    cell.style.width = "212.5px";
-                }
-            };
-            // cell.style.width = StatusMatrix.BUTTONSIZE * this._cellScale*2 + "px";
-            cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
+            headerCells.push(cell);
+            
+            cell.style.height = this._cachedRowHeight;
             cell.className = "headcol";
         }
-
-        // console.debug("active turtles: " + turtles.turtleList.length);
+        
+        // Define onmaximize once instead of for each turtle
+        this.widgetWindow.onmaximize = () => {
+            this.isMaximized = !this.isMaximized;
+            const newWidth = this.isMaximized ? "100vw" : "212.5px";
+            
+            // Update all header cells at once
+            headerCells.forEach(cell => {
+                cell.style.width = newWidth;
+                if (this.isMaximized) {
+                    cell.style.paddingLeft = "30px";
+                    cell.style.fontSize = this._cachedFontSize;
+                }
+            });
+        };
 
         // One row per field, one column per mouse (plus the labels)
         let label;
+        let rowIndex = 1; // Track row index for cell mapping
+        
         for (const statusField of this.activity.logo.statusFields) {
             const row = header.insertRow();
+            this._cellMap[rowIndex] = []; // Initialize row in cell map
 
-            cell = row.insertCell(); // i + 1);
-            cell.style.fontSize =
-                Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
-
-            // console.debug(statusField[1]);
+            cell = row.insertCell();
+            cell.style.fontSize = this._cachedFontSize;
 
             switch (statusField[1]) {
                 case "plus":
@@ -150,7 +164,6 @@ class StatusMatrix {
                         label = this.activity.blocks.blockList[statusField[0]].protoblock
                             .staticLabels[0];
                     }
-                    // console.debug(label);
                     break;
                 case "outputtools":
                     label = this.activity.blocks.blockList[statusField[0]].privateData;
@@ -162,41 +175,53 @@ class StatusMatrix {
             }
             let str = label;
             str = label.charAt(0).toUpperCase() + label.slice(1);
-            // console.log(str);
             cell.innerHTML = `&nbsp;<b>${str}</b>`;
-            cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
+            cell.style.height = this._cachedButtonHeight;
             cell.style.backgroundColor = platformColor.selectorBackground;
             cell.style.paddingLeft = "10px";
-            this.activity.turtles.turtleList.forEach(() => {
+            
+            let cellIndex = 1; // Track cell index within row for mapping
+            this._cachedTurtleList.forEach(() => {
                 cell = row.insertCell();
                 cell.style.backgroundColor = platformColor.selectorBackground;
-                cell.style.fontSize =
-                    Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
+                cell.style.fontSize = this._cachedFontSize;
                 cell.innerHTML = "";
-                cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
+                cell.style.height = this._cachedRowHeight;
                 cell.style.textAlign = "center";
+                
+                // Store cell reference in the map for faster access during updates
+                this._cellMap[rowIndex][cellIndex] = cell;
+                cellIndex++;
             });
+            
+            rowIndex++;
         }
 
         if (_THIS_IS_MUSIC_BLOCKS_) {
             const row = header.insertRow();
+            this._cellMap[rowIndex] = []; // Initialize row in cell map for notes
+            
             cell = row.insertCell();
-            cell.style.fontSize =
-                Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
+            cell.style.fontSize = this._cachedFontSize;
             const str = _("note");
             const label = str.charAt(0).toUpperCase() + str.slice(1);
             cell.innerHTML = `&nbsp;<b>${label}</b>`;
-            cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
+            cell.style.height = this._cachedButtonHeight;
             cell.style.backgroundColor = platformColor.selectorBackground;
             cell.style.paddingLeft = "10px";
-            this.activity.turtles.turtleList.forEach(() => {
+            
+            let cellIndex = 1;
+            this._cachedTurtleList.forEach(() => {
                 cell = row.insertCell();
                 cell.style.backgroundColor = platformColor.selectorBackground;
-                cell.style.fontSize =
-                    Math.floor(this._cellScale * StatusMatrix.FONTSCALEFACTOR) * 0.9 + "%";
+                cell.style.fontSize = this._cachedFontSize;
                 cell.innerHTML = "";
-                cell.style.height = Math.floor(MATRIXSOLFEHEIGHT * this._cellScale) + "px";
+                cell.style.height = this._cachedRowHeight;
                 cell.style.textAlign = "center";
+                
+                // Store cell reference in the map for note row
+                this._cellMap[rowIndex][cellIndex] = cell;
+                cellIndex++;
             });
         }
         this.widgetWindow.sendToCenter();
@@ -211,9 +236,10 @@ class StatusMatrix {
         this.activity.logo.updatingStatusMatrix = true;
 
         let activeTurtles = 0;
-        let cell;
         let t = 0;
-        for (const turtle of this.activity.turtles.turtleList) {
+        const blockList = this.activity.blocks.blockList;
+        
+        for (const turtle of this._cachedTurtleList) {
             const tur = this.activity.turtles.ithTurtle(t);
 
             if (turtle.inTrash) {
@@ -228,23 +254,24 @@ class StatusMatrix {
             let noteValue;
             let freq;
             let i = 0;
+            
             for (const statusField of this.activity.logo.statusFields) {
                 saveStatus = this.activity.logo.inStatusMatrix;
                 this.activity.logo.inStatusMatrix = false;
 
                 this.activity.logo.parseArg(this.activity.logo, t, statusField[0]);
-                switch (this.activity.blocks.blockList[statusField[0]].name) {
+                switch (blockList[statusField[0]].name) {
                     case "x":
                     case "y":
                     case "heading":
-                        value = this.activity.blocks.blockList[statusField[0]].value.toFixed(0);
+                        value = blockList[statusField[0]].value.toFixed(0);
                         break;
                     case "mynotevalue":
-                        value = mixedNumber(this.activity.blocks.blockList[statusField[0]].value);
+                        value = mixedNumber(blockList[statusField[0]].value);
                         break;
                     case "elapsednotes2":
                         blk = statusField[0];
-                        cblk = this.activity.blocks.blockList[blk].connections[1];
+                        cblk = blockList[blk].connections[1];
                         noteValue = this.activity.logo.parseArg(
                             this.activity.logo,
                             t,
@@ -253,15 +280,15 @@ class StatusMatrix {
                             null
                         );
                         value =
-                            mixedNumber(this.activity.blocks.blockList[statusField[0]].value) +
+                            mixedNumber(blockList[statusField[0]].value) +
                             " × " +
                             mixedNumber(noteValue);
                         break;
                     case "elapsednotes":
-                        value = mixedNumber(this.activity.blocks.blockList[statusField[0]].value);
+                        value = mixedNumber(blockList[statusField[0]].value);
                         break;
                     case "namedbox":
-                        name = this.activity.blocks.blockList[statusField[0]].privateData;
+                        name = blockList[statusField[0]].privateData;
                         if (name in this.activity.logo.boxes) {
                             value = this.activity.logo.boxes[name];
                         } else {
@@ -295,16 +322,17 @@ class StatusMatrix {
                         }
                         break;
                     case "heap":
-                        value = this.activity.blocks.blockList[statusField[0]].value;
+                        value = blockList[statusField[0]].value;
                         break;
                     default:
-                        value = this.activity.blocks.blockList[statusField[0]].value;
+                        value = blockList[statusField[0]].value;
                         break;
                 }
 
                 this.activity.logo.inStatusMatrix = saveStatus;
 
-                cell = this._statusTable.rows[i + 1].cells[activeTurtles + 1];
+                // Use the cell map for faster access
+                const cell = this._cellMap[i + 1][activeTurtles + 1];
                 if (cell != null) {
                     cell.innerHTML = value;
                 }
@@ -333,7 +361,8 @@ class StatusMatrix {
                     note += obj[1] + "/" + obj[0];
                 }
 
-                cell = this._statusTable.rows[i + 1].cells[activeTurtles + 1];
+                // Use the cell map for faster access to note row
+                const cell = this._cellMap[i + 1][activeTurtles + 1];
                 if (cell != null) {
                     cell.innerHTML = note.replace(/#/g, "♯").replace(/b/g, "♭");
                 }
