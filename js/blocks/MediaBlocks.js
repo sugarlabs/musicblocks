@@ -917,7 +917,7 @@ function setupMediaBlocks(activity) {
     }
 
     /**
-     * Represents a block that imports an image.
+     * Represents a block that imports an image or GIF.
      * @class
      * @extends ValueBlock
      */
@@ -935,7 +935,7 @@ function setupMediaBlocks(activity) {
 
             // Set help string for the block
             this.setHelpString([
-                _("The Media block is used to import an image."),
+                _("The Media block is used to import an image or GIF."),
                 "documentation",
                 null,
                 "turtleshell"
@@ -947,35 +947,28 @@ function setupMediaBlocks(activity) {
                 outType: "mediaout"
             });
         }
-    }
 
-    /**
-     * Represents a block that holds a text string.
-     * @class
-     * @extends ValueBlock
-     */
-    class TextBlock extends ValueBlock {
-        /**
-         * Constructs a TextBlock instance.
-         * @constructor
-         */
-        constructor() {
-            super("text", _("text"));
+        // Override the loadThumbnail method to handle GIFs
+        loadThumbnail(imagePath) {
+            const that = this;
+            const image = new Image();
 
-            // Set extra width for the block
-            this.extraWidth = 30;
+            image.onload = () => {
+                const bitmap = new createjs.Bitmap(image);
+                if (imagePath.endsWith(".gif")) {
+                    // Handle GIF playback using a library like gif.js or similar
+                    const gif = new SuperGif({ gif: image });
+                    gif.load(() => {
+                        that.value = gif.get_canvas().toDataURL();
+                        that.blocks.updateBlockText(thisBlock);
+                    });
+                } else {
+                    that.value = imagePath;
+                    that.blocks.updateBlockText(thisBlock);
+                }
+            };
 
-            // Set palette and activity for the block
-            this.setPalette("media", activity);
-            this.beginnerBlock(true);
-
-            // Set help string for the block
-            this.setHelpString([_("The Text block holds a text string."), "documentation", ""]);
-
-            // Form block with output type
-            this.formBlock({
-                outType: "textout"
-            });
+            image.src = imagePath;
         }
     }
 
@@ -998,7 +991,6 @@ function setupMediaBlocks(activity) {
     new ClearMediaBlock().setup(activity);
     new ShowBlock().setup(activity);
     new MediaBlock().setup(activity);
-    new TextBlock().setup(activity);
 }
 
 if (typeof module !== "undefined" && module.exports) {
