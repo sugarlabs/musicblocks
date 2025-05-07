@@ -12,7 +12,7 @@
 /*
    globals
 
-   _, TITLESTRING, GUIDEURL, jQuery, docById, docByClass, doSVG,
+   _, TITLESTRING, jQuery, docById, docByClass, doSVG,
    fileExt, ABCHEADER, LILYPONDHEADER, platform, saveAbcOutput,
    saveLilypondOutput, saveMxmlOutput
  */
@@ -70,9 +70,7 @@ class SaveInterface {
             ' <a href="https://github.com/sugarlabs/musicblocks" target="_blank">https://github.com/sugarlabs/musicblocks</a>.' +
             " " +
             _("For more information, please consult the") +
-            ' <a href="' +
-            GUIDEURL +
-            '" target="_blank">' +
+            ' <a href="https://musicblocks.sugarlabs.org/guide" target="_blank">' +
             _("Music Blocks Guide") +
             "</a>." +
             "</p><p>" +
