@@ -519,7 +519,6 @@ class JSInterface {
                         const instruments = [
                             "piano",
                             "harmonuium",
-                            "mandolin",
                             "violin",
                             "viola",
                             "cello",
