@@ -755,10 +755,9 @@ function setupIntervalsBlocks(activity) {
          * @param {Logo} logo - The logo interpreter.
          * @param {Turtle} turtle - The turtle associated with the block.
          * @param {Block} blk - The block instance.
-         * @param {boolean} receivedArg - Whether an argument is received.
+         * @returns {Array} - An array containing the result of the flow.
          */
-        flow(args, logo, turtle, blk, receivedArg) {
-            (args[0]);
+        flow(args, logo, turtle, blk) {
             if (args[1] === undefined) return;
 
             let i = CHORDNAMES.indexOf(args[0]);
@@ -1499,6 +1498,54 @@ function setupIntervalsBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a block that outputs the cardinality of the current temperament system.
+     * @class
+     * @extends ValueBlock
+     */
+    class TemperamentLengthBlock extends ValueBlock {
+        /**
+         * Constructs a TemperamentLengthBlock instance.
+         */
+        constructor() {
+            super("temperamentlength", _("temperament length"));
+
+            // Set palette and activity for the block
+            this.setPalette("intervals", activity);
+            this.beginnerBlock(true);
+            this.parameter = true;
+
+            // Set help string for the block
+            this.setHelpString([
+                _("The Temperament Length block outputs the number of pitches in the current temperament system."),
+                "documentation",
+                ""
+            ]);
+        }
+
+        /**
+         * Updates the parameter of the block.
+         * @param {Logo} logo - The logo object.
+         * @param {number} turtle - The turtle identifier.
+         * @param {string} blk - The block identifier.
+         * @returns {number} - The updated parameter value.
+         */
+        updateParameter(logo, turtle, blk) {
+            return Singer.IntervalsActions.getTemperamentLength(turtle);
+        }
+
+        /**
+         * Returns the argument value for the block.
+         * @param {Logo} logo - The logo object.
+         * @param {number} turtle - The turtle identifier.
+         * @param {string} blk - The block identifier.
+         * @returns {number} - The argument value.
+         */
+        arg(logo, turtle, blk) {
+            return Singer.IntervalsActions.getTemperamentLength(turtle);
+        }
+    }
+
     new SetTemperamentBlock().setup(activity);
     new TemperamentNameBlock().setup(activity);
     new ChordNameBlock().setup(activity);
@@ -1524,4 +1571,16 @@ function setupIntervalsBlocks(activity) {
     new KeyBlock().setup(activity);
     new SetKeyBlock().setup(activity);
     new SetKey2Block().setup(activity);
+    new TemperamentLengthBlock().setup(activity);
 }
+
+DefineModeBlock.prototype.flow = function (args, logo, turtle, blk) {
+    if (args[1] === undefined) return;
+
+    const temperamentLength = Singer.IntervalsActions.getTemperamentLength(turtle);
+    const adjustedArgs = args.map(arg => (typeof arg === "number" ? arg % temperamentLength : arg));
+
+    Singer.IntervalsActions.defineMode(adjustedArgs[0], turtle, blk);
+
+    return [adjustedArgs[1], 1];
+};
