@@ -193,6 +193,26 @@ class Tempo {
         this.resume();
 
         widgetWindow.sendToCenter();
+
+        // Apply improved styles
+    this.bodyTable.style.padding = "10px";
+    this.bodyTable.style.borderSpacing = "10px";
+    this.bodyTable.style.width = "100%";
+
+    this.BPMInputs.forEach((input) => {
+        input.style.padding = "5px";
+        input.style.fontSize = "16px";
+        input.style.textAlign = "center";
+        input.style.borderRadius = "6px";
+        input.style.border = "1px solid #ccc";
+});
+
+    this.tempoCanvases.forEach((canvas) => {
+        canvas.style.border = "1px solid #ccc";
+        canvas.style.borderRadius = "8px";
+        canvas.style.backgroundColor = "#f9f9f9";
+});
+
     }
 
     /**
