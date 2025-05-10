@@ -381,6 +381,84 @@ lower by one half step. In the example, on the left, just the *Pitch*
 block `re` is lowered by one half step; on the right, both *Pitch*
 blocks are raised by one half step. (You can also use a double-sharp
 or double-flat accidental.) [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1733231694757697&run=True)
+## Understanding Double-Sharps and Double-Flats in Music Notation
+
+Musicians and learners often find double-sharps (𝄪) and double-flats (𝄫) confusing, as these symbols do not appear in everyday major or minor keys. However, they play an important role in certain keys and advanced compositions. This section explains when and why double-sharps and double-flats are used, with real examples from theory and notable compositions.
+
+---
+
+### 🔁 What Are Double-Sharps and Double-Flats?
+
+- A **double-sharp** (𝄪) raises a note by two semitones (one whole step).
+  - Example: F𝄪 sounds the same as G, but functions as an altered F in the context of the key.
+- A **double-flat** (𝄫) lowers a note by two semitones.
+  - Example: B𝄫 sounds the same as A, but functions as a lowered B.
+
+These symbols are used to maintain correct **spelling** of scales and chords according to the key signature and voice leading rules.
+
+---
+
+### 🎼 Common Theoretical Examples
+
+#### 1. G♯ Major Scale
+G♯ major has 8 sharps, requiring the use of a double-sharp.
+
+**Notes**: G♯, A♯, B♯, C♯, D♯, E♯, **F𝄪**
+
+> F𝄪 is enharmonically equivalent to G, but keeps the integrity of the scale.
+
+---
+
+#### 2. D♯ Major Scale
+D♯ major has 9 sharps (theoretical key), with two double-sharps.
+
+**Notes**: D♯, E♯, F𝄪, G♯, A♯, B♯, **C𝄪**
+
+> Both F𝄪 and C𝄪 appear to maintain the proper sequence of scale degrees.
+
+---
+
+#### 3. F♭ Major Scale
+F♭ major contains B𝄫 to preserve the correct intervals.
+
+**Notes**: F♭, G♭, A♭, B𝄫, C♭, D♭, E♭
+
+> B𝄫 is used instead of A to keep the scale degree names consistent.
+
+---
+
+### 🎹 Real-World Compositional Examples
+
+#### Bartók – *Mikrokosmos No. 136 ("Whole-tone Scale")*
+This piece includes **double-flats** and unusual scale usage to create whole-tone sonorities.
+
+**Example**: The sixth measure contains a B𝄫 (enharmonic to A), used intentionally for theoretical clarity and tension.
+
+#### Other Notable Uses in Mikrokosmos:
+
+- **No. 113 ("Boating")** – chromatic and whole-tone runs may involve theoretical spellings like E𝄪.
+- **No. 142 ("From the Island of Bali")** – modal harmonies use accidentals including double-sharps.
+- **No. 144 ("Minor and Major")** – explores enharmonic relationships between modes and keys.
+
+
+### 💡 Why Use These Instead of Their Enharmonic Equivalents?
+
+Using double-sharps or double-flats ensures that:
+- Each **scale degree** has a unique letter name.
+- Chords and intervals are spelled according to correct **voice-leading** practices.
+- Musicians can better interpret **modulations** and complex **harmonies**.
+
+---
+
+### 🧠 Tip for Learners
+
+If you see a double-sharp or double-flat, ask yourself:
+> "What letter is this note modifying, and what function does it serve in the scale?"
+
+Instead of replacing it with its enharmonic equivalent, understanding *why* it’s written that way helps deepen your grasp of key structure and harmony.
+
+---
+
 
 #### <a name="ADJUST-TRANSPOSITION">3.2.3 Adjusting Transposition</a>
 
