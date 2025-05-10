@@ -1,0 +1,43 @@
+<!-- activity/sample-generator.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Sound Generator</title>
+</head>
+<body>
+  <h2>AI-Powered Sound Generator</h2>
+
+  <label>Upload audio file:</label><br>
+  <input type="file" id="upload-audio"><br><br>
+
+  <label>Enter prompt (e.g. "electric cello with distortion"):</label><br>
+  <input type="text" id="sound-prompt" size="50"><br><br>
+
+  <button onclick="sendToAIGenerator()">Generate Sound</button>
+
+  <h3>Response:</h3>
+  <audio id="audio-result" controls></audio>
+
+  <script>
+    async function sendToAIGenerator() {
+      const prompt = document.getElementById('sound-prompt').value;
+      const fileInput = document.getElementById('upload-audio');
+      const formData = new FormData();
+
+      formData.append('prompt', prompt);
+      if (fileInput.files.length > 0) {
+        formData.append('audio', fileInput.files[0]);
+      }
+
+      const res = await fetch("http://localhost:8000/generate-sound", {
+        method: "POST",
+        body: formData
+      });
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      document.getElementById('audio-result').src = url;
+    }
+  </script>
+</body>
+</html>
