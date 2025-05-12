@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head><title>Git Widget</title></head>
+<body>
+  <h2>Commit to Git</h2>
+  <form id="commitForm">
+    <input type="file" name="file" required />
+    <input type="text" name="message" placeholder="Commit message" required />
+    <button type="submit">Commit</button>
+  </form>
+
+  <h2>History</h2>
+  <button onclick="fetchLog()">Refresh Log</button>
+  <ul id="logList"></ul>
+
+  <script>
+    document.getElementById('commitForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const res = await fetch('http://localhost:8000/commit', { method: 'POST', body: formData });
+      const data = await res.json();
+      alert(data.message);
+    });
+
+    async function fetchLog() {
+      const res = await fetch('http://localhost:8000/log');
+      const data = await res.json();
+      const logList = document.getElementById('logList');
+      logList.innerHTML = '';
+      data.commits.forEach(c => {
+        const li = document.createElement('li');
+        li.textContent = `${c.date} - ${c.message}`;
+        logList.appendChild(li);
+      });
+    }
+  </script>
+</body>
+</html>
