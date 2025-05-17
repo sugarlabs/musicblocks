@@ -387,15 +387,15 @@ Double-sharps (𝄪) and double-flats (𝄫) are used in certain keys and advanc
 
 1. **G♯ Major Scale**  
    - Notes: G♯, A♯, B♯, C♯, D♯, E♯, F𝄪  
-   - F𝄪 is used instead of G to preserve stepwise motion in the scale.
+   - F𝄪 is used instead of G to keep the pattern of moving from one note to the next closest note in the scale.
 
 2. **D♯ Major Scale**  
    - Notes: D♯, E♯, F𝄪, G♯, A♯, B♯, C𝄪  
-   - F𝄪 and C𝄪 are enharmonic to G and D, respectively, but keep the scale consistent.
+   - F𝄪 and C𝄪 sound the same as G and D, respectively, but are written differently to maintain the scale's logical structure.
 
 3. **F♭ Major Scale**  
    - Notes: F♭, G♭, A♭, B𝄫, C♭, D♭, E♭  
-   - B𝄫 helps maintain the correct intervallic relationships.
+   - B𝄫 helps maintain the correct distances between notes in the scale.
 
 4. **Béla Bartók’s Mikrokosmos No. 136 – "Whole-tone Scale"**  
    - This piece uses double-flats to maintain theoretical clarity in whole-tone passages.  
