@@ -393,6 +393,91 @@ This sequence allows your program to initialize a variable, update it, save it t
 
 > **Tip:** Use the heap for temporary storage during loops or complex sequences, and boxes for named variables you want to access anytime.
 
+Advanced Example: Music Note Recorder
+Here's a more complex example showing how to implement a music note recorder using heap blocks and variables:
+
+// Initialize our note recorder
+function initRecorder() {
+    set heap "isRecording" to false
+    set heap "recordedNotes" to []
+    set heap "startTime" to 0
+}
+
+// Start recording notes
+function startRecording() {
+    set heap "isRecording" to true
+    set heap "recordedNotes" to []
+    set heap "startTime" to currentTimeMillis()
+    
+    // Visual indicator that recording has started
+    setLED(RED)
+    displayText("Recording...")
+}
+
+// Record a note when it's played
+function recordNote(note, duration) {
+    if (load heap "isRecording") {
+        var currentTime = currentTimeMillis()
+        var timestamp = currentTime - (load heap "startTime")
+        
+        // Save the note data (timestamp, note value, and duration)
+        var noteData = {
+            "time": timestamp,
+            "note": note,
+            "duration": duration
+        }
+        
+        // Add to our recorded notes array
+        var notes = load heap "recordedNotes"
+        notes.push(noteData)
+        set heap "recordedNotes" to notes
+        
+        // Visual feedback
+        flashLED(GREEN)
+    }
+}
+
+// Stop recording and prepare for playback
+function stopRecording() {
+    set heap "isRecording" to false
+    
+    // Visual indication that recording has stopped
+    setLED(OFF)
+    displayText("Recording stopped. Ready to play!")
+}
+
+// Play back the recorded notes
+function playRecordedNotes() {
+    var notes = load heap "recordedNotes"
+    
+    if (notes.length === 0) {
+        displayText("No notes recorded!")
+        return
+    }
+    
+displayText("Playing back recording...")
+    
+    // For each recorded note, play it at the correct time
+    var startTime = currentTimeMillis()
+    
+    for (var i = 0; i < notes.length; i++) {
+        var note = notes[i]
+        var waitTime = note.time - (currentTimeMillis() - startTime)
+        
+        // Wait until the correct time to play this note
+        if (waitTime > 0) {
+            wait(waitTime)
+        }
+        
+        // Play the note
+        playNote(note.note, note.duration)
+        flashLED(BLUE)
+    }
+    
+    displayText("Playback complete!")
+}
+
+This example demonstrates how heap blocks can be used to create more complex musical applications like a note recorder that captures and plays back musical sequences.
 
 ### <a name="PITCH-TRANSFORMATION">3.2 Pitch Transformations</a>
 
