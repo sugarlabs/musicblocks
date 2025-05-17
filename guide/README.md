@@ -342,6 +342,57 @@ notation well enough to guess the outcome? Are you familiar with the
 song we created?)
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725791527821787&run=True)
 
+### 3.1.1 Heap and Program Blocks
+
+Music Blocks provides special programming blocks that allow you to store, retrieve, and manipulate data during your musical programs. These blocks enable more complex and dynamic compositions by managing values in a stack-like structure called the **heap** and using **boxes** as variables.
+
+#### Heap Blocks
+
+- **Set Heap**  
+  Stores a value onto the heap. The heap works like a stack (last-in, first-out), so the most recently stored value is retrieved first.
+
+- **Load Heap**  
+  Retrieves the most recently stored value from the heap without removing it.
+
+- **Push**  
+  Adds a value onto the heap, increasing its size.
+
+- **Pop**  
+  Removes the most recently added value from the heap.
+
+#### Boxes (Variables)
+
+- **Store in Box**  
+  Stores a value in a named box (similar to a variable).
+
+- **Box**  
+  Retrieves the value stored in a named box.
+
+- **Add One / Change By**  
+  Increments or changes the value stored in a box by a specified amount.
+
+#### Example Usage
+
+Imagine you want to keep track of a score or a counter in your music program. You can use boxes and heap blocks to store and update these values dynamically.
+
+For example, consider the following sequence of blocks:
+
+1. **Store in Box "score" 0**  
+   Initialize the score to zero.
+
+2. **Add One to Box "score"**  
+   Increment the score by one.
+
+3. **Set Heap (Box "score")**  
+   Push the current score value onto the heap.
+
+4. **Load Heap**  
+   Retrieve the last stored score from the heap.
+
+This sequence allows your program to initialize a variable, update it, save it temporarily, and retrieve it later, enabling dynamic and interactive musical programs.
+
+> **Tip:** Use the heap for temporary storage during loops or complex sequences, and boxes for named variables you want to access anytime.
+
 
 ### <a name="PITCH-TRANSFORMATION">3.2 Pitch Transformations</a>
 
