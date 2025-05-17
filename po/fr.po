@@ -118,7 +118,7 @@ msgstr "cane"
 
 #: js/themebox.js:66
 msgid "Music Blocks is already set to this theme."
-msgstr ""
+msgstr "le bloc de musique est deja defini sur ce theme"
 
 #: js/SaveInterface.js:59
 #: js/SaveInterface.js:61
@@ -260,15 +260,15 @@ msgstr "Êtes-vous sûr de vouloir effacer l'espace de travail ?"
 
 #: js/activity.js:1577
 msgid "Enter file name"
-msgstr ""
+msgstr "Entrez le nom du fitchier"
 
 #: js/activity.js:1579
 msgid "File save canceled"
-msgstr ""
+msgstr "Enregistrement du fichier annule"
 
 #: js/activity.js:1598
 msgid "Click on stop saving"
-msgstr ""
+msgstr "Cliquez sur Arreter l' enregistrement"
 
 #: js/activity.js:1882
 msgid "Catching mice"
@@ -597,20 +597,19 @@ msgstr "Masquer les blocs"
 #: js/activity.js:3657
 #: js/activity.js:3672
 msgid "Trash can is empty."
-msgstr ""
+msgstr "La corbeille est vide"
 
 #: js/activity.js:3679
 #: js/activity.js:3760
 msgid "Item restored from the trash."
 msgstr "Élément restauré de la corbeille."
-
 #: js/activity.js:3818
 msgid "Restore last item"
-msgstr ""
+msgstr "Restaurer la derniere version"
 
 #: js/activity.js:3819
 msgid "Restore all items"
-msgstr ""
+msgstr "Restaurer tous les elements"
 
 #: js/activity.js:5016
 msgid "Click the run button to run the project."
@@ -999,7 +998,7 @@ msgstr "texte"
 #: js/palette.js:725
 #: js/blocks/BoxesBlocks.js:514
 msgid "store in box"
-msgstr ""
+msgstr "stocker dans la boite"
 
 #: js/blocks.js:3448
 #: js/blocks.js:3888
@@ -1009,7 +1008,7 @@ msgstr ""
 #: js/blocks.js:5883
 #: js/blocks/BoxesBlocks.js:772
 msgid "box1"
-msgstr ""
+msgstr "boite1"
 
 #: js/blocks.js:3450
 #: js/blocks.js:3890
@@ -1019,7 +1018,7 @@ msgstr ""
 #: js/blocks.js:5885
 #: js/blocks/BoxesBlocks.js:663
 msgid "box2"
-msgstr ""
+msgstr "boite2"
 
 #: js/blocks.js:4122
 #: js/palette.js:722
@@ -1369,21 +1368,21 @@ msgstr "Désactiver le défilement horizontal"
 #: js/toolbar.js:268
 #: js/turtledefs.js:642
 msgid "Change theme"
-msgstr ""
+msgstr "Changer le theme"
 
 #: js/toolbar.js:71
 #: js/toolbar.js:137
 #: js/toolbar.js:208
 #: js/toolbar.js:269
 msgid "Light Mode"
-msgstr ""
+msgstr "Mode clair"
 
 #: js/toolbar.js:72
 #: js/toolbar.js:138
 #: js/toolbar.js:209
 #: js/toolbar.js:270
 msgid "Dark Mode"
-msgstr ""
+msgstr "Mode sombre"
 
 #: js/toolbar.js:73
 #: js/toolbar.js:139
@@ -1487,7 +1486,7 @@ msgstr "Enregistrer l'œuvre de bloc sous forme de SVG"
 #: js/toolbar.js:222
 #: js/toolbar.js:283
 msgid "Save block artwork as PNG"
-msgstr ""
+msgstr "Enregistrer le dessin des blocs en PNG"
 
 #: js/toolbar.js:91
 #: js/toolbar.js:154
@@ -11446,7 +11445,7 @@ msgstr "mouvement"
 #~msgstr "Pour copier une pile dans le presse-papiers, faites un \"appui long\" sur la pile. Le bouton Coller sera surligné."
 
 #~msgid "hspace"
-#~msgstr ""
+#~msgstr "espace horizontal"
 
 #: js/activity.js:2789
 
@@ -11961,7 +11960,9 @@ msgstr "mouvement"
 #: js/turtledefs.js:165
 
 #~msgid "Play music"
-#~msgstr "Jouer de la musique"
+#~msgstr "Jouer de la musique" 
+
+
 
 #: js/samplesviewer.js:91
 
@@ -12250,7 +12251,7 @@ msgstr "mouvement"
 #: js/logo.js:5092
 
 #~msgid "Partial block should be used inside of a Weighted-partisls block."
-#~msgstr ""
+#~msgstr "Le bloc partiel doit ^etre utilise` a l' interieur d'un bloc de ponderations partielles."
 
 #: js/turtledefs.js:428
 
