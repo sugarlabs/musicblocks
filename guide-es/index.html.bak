@@ -319,13 +319,17 @@ individual notes (or chords if you click on more than one cell in a
 column). In the figure, three quarter notes are selected (black
 cells). First <code>Re 4</code>, followed by <code>Mi 4</code>, followed by <code>Sol 4</code>.</p>
 <p><a href="img
+src=&#39;https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/play-button.svg&#39;
 height=&quot;36&quot;&lt;/img">img
+src=&#39;https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/play-button.svg&#39;
 height=&quot;36&quot;&lt;/img</a></p>
 <p>If you click on the <em>Play</em> button (found in the top row of the grid),
 you will hear a sequence of notes played (from left to right): <code>Re 4</code>,
 <code>Mi 4</code>, <code>Sol 4</code>.</p>
 <p><a href="img
+src=&#39;https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/export-chunk.svg&#39;
 height=&quot;36&quot;&lt;/img">img
+src=&#39;https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/export-chunk.svg&#39;
 height=&quot;36&quot;&lt;/img</a></p>
 <p>Once you have a group of notes (a &quot;chunk&quot;) that you like, click on the
 <em>Save</em> button (just to the right of the <em>Play</em> button). This will
@@ -334,17 +338,23 @@ programmatically. (More on that below.)</p>
 <p>You can rearrange the selected notes in the grid and safe other chunks
 as well.</p>
 <p><a href="img
+src=&#39;https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/sort.svg&#39;
 height=&quot;36&quot;&lt;/img">img
+src=&#39;https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/sort.svg&#39;
 height=&quot;36&quot;&lt;/img</a></p>
 <p>The <em>Sort</em> button will reorder the pitches in the matrix from highest
 to lowest and eliminate any duplicate <em>Pitch</em> blocks.</p>
 <p><a href="img
+src=&#39;https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/close-button.svg&#39;
 height=&quot;36&quot;&lt;/img">img
+src=&#39;https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/close-button.svg&#39;
 height=&quot;36&quot;&lt;/img</a></p>
 <p>Or hide the matrix by clicking on the <em>Close</em> button (the right-most
 button in the top row of the grid.)</p>
 <p><a href="img
+src=&#39;https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/erase-button.svg&#39;
 height=&quot;36&quot;&lt;/img">img
+src=&#39;https://rawgithub.com/sugarlabs/musicblocks/master/header-icons/erase-button.svg&#39;
 height=&quot;36&quot;&lt;/img</a></p>
 <p>There is also an Erase button that will clear the grid.</p>
 <p>Don&#39;t worry. You can reopen the matrix at anytime (it will remember
