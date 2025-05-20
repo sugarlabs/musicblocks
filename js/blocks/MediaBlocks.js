@@ -917,37 +917,90 @@ function setupMediaBlocks(activity) {
     }
 
     /**
-     * Represents a block that imports an image.
-     * @class
-     * @extends ValueBlock
+ * Represents a block that imports an image or GIF.
+ * @class
+ * @extends ValueBlock
+ */
+class MediaBlock extends ValueBlock {
+    /**
+     * Constructs a MediaBlock instance.
+     * @constructor
      */
-    class MediaBlock extends ValueBlock {
-        /**
-         * Constructs a MediaBlock instance.
-         * @constructor
-         */
-        constructor() {
-            super("media", _("Media").toLowerCase());
+    constructor() {
+        super("media", _("Media").toLowerCase());
 
-            // Set palette and activity for the block
-            this.setPalette("media", activity);
-            this.beginnerBlock(true);
+        this.setPalette("media", activity);
+        this.beginnerBlock(true);
 
-            // Set help string for the block
-            this.setHelpString([
-                _("The Media block is used to import an image."),
-                "documentation",
-                null,
-                "turtleshell"
-            ]);
+        this.setHelpString([
+            _("The Media block is used to import an image (PNG, JPG) or an animated GIF."),
+            "documentation",
+            null,
+            "turtleshell"
+        ]);
 
-            // Form block with image and output type
-            this.formBlock({
-                image: "images/load-media.svg",
-                outType: "mediaout"
-            });
+        // Set the form and output type
+        this.formBlock({
+            image: "images/load-media.svg",
+            outType: "mediaout"
+        });
+
+        // Default value
+        this.mediaURL = null;
+
+        // Trigger media selection when block is added or clicked (if supported in your environment)
+        this.createMediaSelector();
+    }
+
+    /**
+     * Creates a hidden file input to select media files (including GIFs)
+     */
+    createMediaSelector() {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".png,.jpg,.jpeg,.gif";
+        input.style.display = "none";
+
+        document.body.appendChild(input);
+
+        input.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                this.mediaURL = url;
+                this.updateMediaPreview(url); // Optional: show preview
+            }
+        });
+
+        // Store input for triggering elsewhere (e.g., on click)
+        this.mediaInput = input;
+    }
+
+    /**
+     * Triggers the media file picker
+     */
+    triggerMediaSelection() {
+        if (this.mediaInput) {
+            this.mediaInput.click();
         }
     }
+
+    /**
+     * Optional: Updates block UI with a preview or label
+     */
+    updateMediaPreview(url) {
+        // You can add code here to update block preview with <img src=url>
+        console.log("Media loaded:", url);
+    }
+
+    /**
+     * Return the media URL when the block is evaluated (if used this way)
+     */
+    getValue() {
+        return this.mediaURL;
+    }
+}
+
 
     /**
      * Represents a block that holds a text string.
