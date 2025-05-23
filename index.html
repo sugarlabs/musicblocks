@@ -234,31 +234,32 @@
                 </div>
             </footer>
 
-            <dialog id="lilypondModal" class="modal" tabindex="-1">
-                <!-- Modal content for Lilypond save dialog -->
-                <div class="modal-content" tabindex="-1">
-                    <span class="close">&times;</span>
-                    <div id="fileNameText"></div>
-                    <input type="text" id="fileName" tabindex="-1">
-                    <p></p>
-                    <div id="titleText"></div>
-                    <input type="text" id="title" tabindex="-1">
-                    <p></p>
-                    <div id="authorText"></div>
-                    <input type="text" id="author" tabindex="-1">
-                    <p></p>
-                    <div id="MIDIText"></div>
-                    <input type="checkbox" id="MIDICheck" tabindex="-1">
-                    <p></p>
-                    <div id="guitarText"></div>
-                    <input type="checkbox" id="guitarCheck" tabindex="-1">
-                    <p></p>
-                    <p><button class="confirm-button" id="submitLilypond"></button></p>
-                    <!-- <button id="submitPDF"></button></p> -->
-                </div>
-            </dialog>
-            <div class="materialize-iso" tabindex="-1">
-                <nav id="toolbars" class="nav-wrapper">
+        <div id="lilypondModal" class="modal" tabindex="-1">
+            <!-- Modal content for Lilypond save dialog -->
+            <div class="modal-content" tabindex="-1">
+                <span class="close">&times;</span>
+                <div id="fileNameText"></div>
+                <input type="text" id="fileName" tabindex="-1" />
+                <p></p>
+                <div id="titleText"></div>
+                <input type="text" id="title" tabindex="-1" />
+                <p></p>
+                <div id="authorText"></div>
+                <input type="text" id="author" tabindex="-1" />
+                <p></p>
+                <div id="MIDIText"></div>
+                <input type="checkbox" id="MIDICheck" tabindex="-1" />
+                <p></p>
+                <div id="guitarText"></div>
+                <input type="checkbox" id="guitarCheck" tabindex="-1" />
+                <p></p>
+                <p><button id="submitLilypond"></button></p>
+                <!-- <button id="submitPDF"></button></p> -->
+            </div>
+        </div>
+
+        <div class="materialize-iso" tabindex="-1">
+            <nav id="toolbars" class="nav-wrapper" role="navigation">
                 <div class="blue nav-wrapper" tabindex="-1">
                         <div id="mb-logo" class="logo left tooltipped"
                             style="display: flex; align-items: center; line-height: 0; height: 100%; padding-right: 0;"
@@ -698,9 +699,9 @@
         }
     </script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            let persistentNotification = null;
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+              let persistentNotification = null;
 
             function showPersistentNotification() {
                 if (!persistentNotification) {
@@ -739,9 +740,9 @@
                 const buttonContainer = document.getElementById("buttoncontainerBOTTOM");
 
                 if (isSmallScreen) {
-                    // Enable play-only mode
-                    body.classList.add("play-only");
-                    showPersistentNotification();
+                  // Enable play-only mode
+                  body.classList.add("play-only");
+                  showPersistentNotification();
 
                     if (buttonContainer) {
                         buttonContainer.style.display = "flex";
@@ -768,8 +769,8 @@
                     body.classList.remove("play-only");
                     removePersistentNotification();
 
-                    if (homeButton) homeButton.style = "";
-                    if (buttonContainer) buttonContainer.style = "";
+                  if (homeButton) homeButton.style = "";
+                  if (buttonContainer) buttonContainer.style = "";
 
                     showElementById("Show/hide blocks");
                     showElementById("Expand/collapse blocks");
