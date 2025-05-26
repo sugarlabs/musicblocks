@@ -41,3 +41,20 @@ If you need to view or modify the original source code, it's best to refer to th
 | 29  | `wheelnav.js`                         | [wheelnav](https://github.com/softwaretailoring/wheelnav)                                            |
 
 <!-- TODO: Add a separate column for description for libs -->
+
+## Deprecation Policy
+
+To keep the codebase clean and efficient, deprecated files or packages should be removed when:
+
+- A modern alternative exists
+- The item is unmaintained, unused, insecure, or adds technical debt
+- There's a clear migration path for its functionality
+
+### Steps to Deprecate
+
+- Open an issue/discussion for major removals  
+- Refactor or replace any dependencies  
+- Remove the deprecated file/library from the codebase 
+- Update related docs/comments  
+- Use a clear commit message
+- Add to changelog or release notes if relevant
