@@ -133,6 +133,11 @@ class AST2BlockList {
                         if (obj in _memberLookup && member in _memberLookup[obj]) {
                             let name = _memberLookup[obj][member];
                             if (typeof name === "object") {
+                                if (!(numArgs in name)) {
+                                    throw {
+                                        //TODO
+                                    };
+                                }
                                 name = name[numArgs];
                             }
                             return name;
@@ -167,15 +172,93 @@ class AST2BlockList {
                 }
             },
 
-            // Flow Palette, If block
+            // Flow Palette, While and Forever block
+            {
+                pred: (bodyAST) => {
+                    return bodyAST.type == "WhileStatement";
+                },
+                visitor: {
+                    getName: (bodyAST) => { return bodyAST.test.value ? "forever" : "while"; },
+                    getArguments: (bodyAST) => { return bodyAST.test.value ? [] : [bodyAST.test]; },
+                    getChildren: (bodyAST) => { return bodyAST.body.body; },
+                }
+            },
+
+            // Flow Palette, DoWhile (until) block
+            {
+                pred: (bodyAST) => {
+                    return bodyAST.type == "DoWhileStatement";
+                },
+                visitor: {
+                    getName: () => { return "until"; },
+                    getArguments: (bodyAST) => { return [bodyAST.test]; },
+                    getChildren: (bodyAST) => { return bodyAST.body.body; },
+                }
+            },
+
+            // Flow Palette, If/Ifelse block
             {
                 pred: (bodyAST) => {
                     return bodyAST.type == "IfStatement";
                 },
                 visitor: {
-                    getName: () => { return "if"; },
+                    getName: (bodyAST) => { return bodyAST.alternate ? "ifthenelse" : "if"; },
                     getArguments: (bodyAST) => { return [bodyAST.test]; },
-                    getChildren: (bodyAST) => { return bodyAST.consequent.body; },
+                    getChildren: (bodyAST) => {
+                        if (bodyAST.alternate) {
+                            return bodyAST.consequent.body.concat([{ "type": null, }], bodyAST.alternate.body);
+                        } else {
+                            return bodyAST.consequent.body;
+                        }
+                    },
+                }
+            },
+
+            // Special case for else section of ifelse block
+            {
+                pred: (bodyAST) => {
+                    return bodyAST.type == null;
+                },
+                visitor: {
+                    getName: () => { return "else"; },
+                    getArguments: () => { return []; },
+                    getChildren: () => { return []; },
+                }
+            },
+
+            // Flow Palette, Switch block
+            {
+                pred: (bodyAST) => {
+                    return bodyAST.type == "SwitchStatement";
+                },
+                visitor: {
+                    getName: () => { return "switch"; },
+                    getArguments: (bodyAST) => { return [bodyAST.discriminant]; },
+                    getChildren: (bodyAST) => { return bodyAST.cases; },
+                }
+            },
+
+            // Flow Palette, Case/Default block
+            {
+                pred: (bodyAST) => {
+                    return bodyAST.type == "SwitchCase";
+                },
+                visitor: {
+                    getName: (bodyAST) => { return bodyAST.test != null ? "case" : "defaultcase"; },
+                    getArguments: (bodyAST) => { return bodyAST.test != null ? [bodyAST.test] : []; },
+                    getChildren: (bodyAST) => { return bodyAST.consequent; },
+                }
+            },
+
+            // Flow Palette, break statement
+            {
+                pred: (bodyAST) => {
+                    return bodyAST.type == "BreakStatement";
+                },
+                visitor: {
+                    getName: (bodyAST) => { return "break"; },
+                    getArguments: (bodyAST) => { return []; },
+                    getChildren: (bodyAST) => { return []; },
                 }
             },
 
@@ -342,6 +425,13 @@ class AST2BlockList {
                 "setInstrument": "settimbre",
                 "playNote": "newnote",
                 "playPitch": "pitch",
+                "playRest": "rest2",
+                "dot": "rhythmicdot2",
+                "tie": "tie",
+                "multiplyNoteValue": "multiplybeatfactor",
+                "swing": "newswing2",
+                "playNoteMillis": "osctime",
+                "playHertz": "hertz",
                 // Handle function overloading with different number of arguments
                 "setValue": { 3: "setDict", 2: "setDict2" },
                 "getValue": { 2: "getDict", 1: "getDict2" },
@@ -528,6 +618,31 @@ class AST2BlockList {
             //   [10, ["number", { "value": 4 }], 0, 0, [8]],
             "newnote": _addValueArgsToBlockList,
 
+            // Dot block takes in a whole number
+            // Example: mouse.dot(3, async () => {...});
+            // args: [3]
+            "rhythmicdot2": _addValueArgsToBlockList,
+
+            // Multiply note value block takes in a number expression that evaluates to 1, 1/2, 1/4, etc.
+            // Example: mouse.multiplyNoteValue(1 / 4, async () => {...});
+            // args: [{"name": "divide"}, "args": [1, 4]] =>
+            //   [7, "divide", 0, 0, [6, 8, 9]],
+            //   [8, ["number", { "value": 1 }], 0, 0, [7]],
+            //   [9, ["number", { "value": 4 }], 0, 0, [7]],
+            "multiplybeatfactor": _addValueArgsToBlockList,
+
+            // Swing block takes two args, a number expression as swing value, and another expression as note value
+            // Example: mouse.swing(1 / 24, 1 / 8, async () => {...});
+            "newswing2": _addValueArgsToBlockList,
+
+            // Milliseconds note block takes in a number expression that evaluates to 1, 1/2, 1/4, etc.
+            // Example: mouse.playNoteMillis(1000 / (3 / 2), async () => {...});
+            "osctime": _addValueArgsToBlockList,
+
+            // Hertz block takes in a whole number 
+            // Example: mouse.playHertz(392);
+            "hertz": _addValueArgsToBlockList,
+
             // Boxes Palette, subtract 1 from block takes a string identifier for variable
             // Example: box1 = box1 - 1;
             // args: [{"identifier": "box1"}]
@@ -589,8 +704,23 @@ class AST2BlockList {
             // Flow Palette, repeat block takes a number expression
             "repeat": _addValueArgsToBlockList,
 
+            // Flow Palette, while block takes a condition
+            "while": _addValueArgsToBlockList,
+
+            // Flow Palette, until block takes a condition
+            "until": _addValueArgsToBlockList,
+
             // Flow Palette, if block takes a boolean expression
             "if": _addValueArgsToBlockList,
+
+            // Flow Palette, if block takes a boolean expression
+            "ifthenelse": _addValueArgsToBlockList,
+
+            // Flow Palette, switch block takes a numerical expression
+            "switch": _addValueArgsToBlockList,
+
+            // Flow Palette, case block takes a numerical expression
+            "case": _addValueArgsToBlockList,
         };
 
         // A map from block name to its properties including:
@@ -632,6 +762,41 @@ class AST2BlockList {
                 connections: { count: 4, "prev": 0, "next": 3 },
                 vspaces: 2,
             },
+            "rest2": {
+                // prev, next
+                connections: { count: 2, "prev": 0, "next": 1 },
+                vspaces: 1,
+            },
+            "rhythmicdot2": {
+                // prev, arg (duration), child, next
+                connections: { count: 4, "prev": 0, "child": 2, "next": 3 },
+                argVSpaces: 1,
+            },
+            "tie": {
+                // prev, child, next
+                connections: { count: 3, "prev": 0, "child": 1, "next": 2 },
+                argVSpaces: 0,
+            },
+            "multiplybeatfactor": {
+                // prev, arg (duration), child, next
+                connections: { count: 4, "prev": 0, "child": 2, "next": 3 },
+                argVSpaces: 1,
+            },
+            "newswing2": {
+                // prev, arg1 (swing), arg2 (note), child, next
+                connections: { count: 5, "prev": 0, "child": 3, "next": 4 },
+                argVSpaces: 2,
+            },
+            "osctime": {
+                // prev, arg (duration), child, next
+                connections: { count: 4, "prev": 0, "child": 2, "next": 3 },
+                argVSpaces: 1,
+            },
+            "hertz": {
+                // prev, child, next
+                connections: { count: 4, "prev": 0, "child": 1, "next": 2 },
+                argVSpaces: 1,
+            },
             "newnote": {
                 // prev, arg (note), child, next
                 connections: { count: 4, "prev": 0, "child": 2, "next": 3 },
@@ -667,10 +832,50 @@ class AST2BlockList {
                 connections: { count: 4, "prev": 0, "child": 2, "next": 3 },
                 argVSpaces: 1,
             },
+            "while": {
+                // prev, arg (condition), child, next
+                connections: { count: 4, "prev": 0, "child": 2, "next": 3 },
+                argVSpaces: 2,
+            },
+            "forever": {
+                // prev, child, next
+                connections: { count: 3, "prev": 0, "child": 1, "next": 2 },
+                argVSpaces: 0,
+            },
+            "until": {
+                // prev, arg (condition), child, next
+                connections: { count: 3, "prev": 0, "child": 2, "next": 3 },
+                argVSpaces: 0,
+            },
             "if": {
                 // prev, arg (condition), child, next
                 connections: { count: 4, "prev": 0, "child": 2, "next": 3 },
                 argVSpaces: 2,
+            },
+            "ifthenelse": {
+                // prev, arg (condition), child (if and else cases), next
+                connections: { count: 5, "prev": 0, "child": 2, "next": 4 },
+                argVSpaces: 2,
+            },
+            "switch": {
+                // prev, arg (variable), child, next
+                connections: { count: 4, "prev": 0, "child": 2, "next": 3 },
+                argVSpaces: 1,
+            },
+            "case": {
+                // prev, arg (condition), child, next
+                connections: { count: 4, "prev": 0, "child": 2, "next": 3 },
+                argVSpaces: 1,
+            },
+            "defaultcase": {
+                // prev, child, next
+                connections: { count: 4, "prev": 0, "child": 1, "next": 2 },
+                argVSpaces: 0,
+            },
+            "break": {
+                // prev, next
+                connections: { count: 4, "prev": 0, "next": 1 },
+                vspaces: 1,
             },
             "vspace": {
                 // prev, next
@@ -713,6 +918,7 @@ class AST2BlockList {
          * @param {Array} blockList - where the new block is going to be added to
          * @returns {Number} the number (index in blockList) of the newly created block
          */
+
         function _createBlockAndAddToList(node, blockList) {
             let block = [];
             let blockNumber = blockList.length;
@@ -721,7 +927,7 @@ class AST2BlockList {
             if ((typeof node.name) === "object") {
                 let blockName = Object.keys(node.name)[0];
                 block.push([blockName, { "value": node.name[blockName] }]);
-            } else {
+            } else if (node.name !== "else") {
                 block.push(node.name);
             }
             block.push(0);  // x
@@ -737,45 +943,76 @@ class AST2BlockList {
 
             // Process children
             if (node["children"] !== undefined && node["children"].length > 0) {
-                let childBlockNumbers = [];
-                // Add vertical spacers if the arguments take too much vertical spaces
-                for (let i = 0; i < argVSpaces - property.argVSpaces; i++) {
-                    childBlockNumbers.push(_addVSpacer(blockList));
-                }
-                // Add the children
-                for (const child of node["children"]) {
-                    let ret = _createBlockAndAddToList(child, blockList);
-                    childBlockNumbers.push(ret["blockNumber"]);
-                    vspaces += ret["vspaces"];
-                    // Add vertical spacers to push down next siblings if the block takes
-                    // too much vertical spaces
-                    let childProperty = _propertyOf(blockList[ret["blockNumber"]]);
-                    for (let i = 0; i < ret["vspaces"] - childProperty.vspaces; i++) {
-                        childBlockNumbers.push(_addVSpacer(blockList));
-                    }
-                }
-                // Set the first child block number for this block
-                connections[property.connections["child"]] = childBlockNumbers[0];
-                // Set parent block number for the first child to this block
-                let childBlock = blockList[childBlockNumbers[0]];
+                let elseIndex = node.children.findIndex(child => child.name === "else");
+
+                // Split children into if/else groups if applies (most cases first group will contain all children)
+                let firstGroup = (elseIndex !== -1) ? node.children.slice(0, elseIndex) : node.children;
+                let secondGroup = (elseIndex !== -1) ? node.children.slice(elseIndex + 1) : [];
+
+                // Process first children group
+                let ret = _processChildren(firstGroup, argVSpaces - property.argVSpaces, blockList);
+                vspaces += ret.vspaces;
+
+                // Set child-parent connection for first group
+                connections[property.connections["child"]] = ret.firstChildBlockNumber;
+                let childBlock = blockList[ret.firstChildBlockNumber];
                 property = _propertyOf(childBlock);
                 childBlock[4][property.connections["prev"]] = blockNumber;
-                // Parent of other children is their previous sibling
-                for (let i = 1; i < childBlockNumbers.length; i++) {
-                    childBlock = blockList[childBlockNumbers[i]];
+
+                // Process second children group (else case in ifelse block)
+                if (elseIndex !== -1) {
+                    let ret = _processChildren(secondGroup, 0, blockList);
+                    vspaces += ret.vspaces;
+                    // Set child-parent connection for second group
+                    connections[property.connections["child"] + 1] = ret.firstChildBlockNumber;
+                    let childBlock = blockList[ret.firstChildBlockNumber];
                     property = _propertyOf(childBlock);
-                    childBlock[4][property.connections["prev"]] = childBlockNumbers[i - 1];
-                }
-                // Set the next sibling block number for the children, except the last one
-                for (let i = 0; i < childBlockNumbers.length - 1; i++) {
-                    childBlock = blockList[childBlockNumbers[i]];
-                    property = _propertyOf(childBlock);
-                    childBlock[4][property.connections["next"]] = childBlockNumbers[i + 1];
+                    childBlock[4][property.connections["prev"]] = blockNumber;
                 }
                 // For blocks with children, add 1 to vspaces for the end of the clamp.
                 vspaces += 1;
             }
+
             return { "blockNumber": blockNumber, "vspaces": vspaces };
+        }
+
+        // Helper to process a group of children (create and establish connections between them)
+        function _processChildren(children, padding, blockList) {
+            let childBlockNumbers = [];
+            let vspaces = 0;
+
+            // Add vertical spacers if the arguments take too much vertical spaces
+            for (let i = 0; i < padding; i++) {
+                childBlockNumbers.push(_addVSpacer(blockList));
+                vspaces++;
+            }
+
+            // Add the children
+            for (const child of children) {
+                let ret = _createBlockAndAddToList(child, blockList);
+                childBlockNumbers.push(ret.blockNumber);
+                vspaces += ret.vspaces;
+
+                let childProperty = _propertyOf(blockList[ret.blockNumber]);
+                for (let i = 0; i < ret.vspaces - childProperty.vspaces; i++) {
+                    childBlockNumbers.push(_addVSpacer(blockList));
+                }
+            }
+
+            // Establish connections between children
+            // Parent of children is their previous sibling, except the first one
+            for (let i = 1; i < childBlockNumbers.length; i++) {
+                let childBlock = blockList[childBlockNumbers[i]];
+                let property = _propertyOf(childBlock);
+                childBlock[4][property.connections["prev"]] = childBlockNumbers[i - 1];
+            }
+            // Set the next sibling block number for the children, except the last one
+            for (let i = 0; i < childBlockNumbers.length - 1; i++) {
+                let childBlock = blockList[childBlockNumbers[i]];
+                let property = _propertyOf(childBlock);
+                childBlock[4][property.connections["next"]] = childBlockNumbers[i + 1];
+            }
+            return { "firstChildBlockNumber": childBlockNumbers[0], "vspaces": vspaces };
         }
 
         function _addVSpacer(blockList) {
