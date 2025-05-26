@@ -1324,7 +1324,7 @@ msgstr 低音""
 #: js/block.js:3842
 #: js/blocks.js:2600
 #: js/blocks.js:3211
-msgid "on"
+msgid "on2"
 msgstr "开"
 
 #: js/block.js:3844
