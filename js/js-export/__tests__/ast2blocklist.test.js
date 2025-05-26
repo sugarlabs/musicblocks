@@ -716,4 +716,365 @@ describe("AST2BlockList Class", () => {
         let blockList = AST2BlockList.toBlockList(trees);
         expect(blockList).toEqual(expectedBlockList);
     });
+
+    // Test all Rhythm Blocks.
+    test("should generate correct blockList for all rhythm blocks", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.playNote(1 / 4, async () => {
+                await mouse.playPitch("sol", 4);
+                return mouse.ENDFLOW;
+            });
+            await mouse.playNote(1 / 4, async () => {
+                await mouse.playPitch("G", 4);
+                return mouse.ENDFLOW;
+            });
+            await mouse.playNote(1 / 4, async () => {
+                await mouse.playPitch("5", 4);
+                return mouse.ENDFLOW;
+            });
+            await mouse.playNote(1 / 4, async () => {
+                await mouse.playHertz(392);
+                return mouse.ENDFLOW;
+            });
+            await mouse.playNote(1 / 4, async () => {
+                await mouse.playRest();
+                return mouse.ENDFLOW;
+            });
+            await mouse.dot(1, async () => {
+                await mouse.playNote(1 / 4, async () => {
+                    await mouse.playPitch("sol", 4);
+                    return mouse.ENDFLOW;
+                });
+                return mouse.ENDFLOW;
+            });
+            await mouse.tie(async () => {
+                await mouse.playNote(1 / 4, async () => {
+                    await mouse.playPitch("sol", 4);
+                    return mouse.ENDFLOW;
+                });
+                await mouse.playNote(1 / 4, async () => {
+                    await mouse.playPitch("sol", 4);
+                    return mouse.ENDFLOW;
+                });
+                return mouse.ENDFLOW;
+            });
+            await mouse.multiplyNoteValue(1 / 2, async () => {
+                await mouse.playNote(1 / 4, async () => {
+                    await mouse.playPitch("sol", 4);
+                    return mouse.ENDFLOW;
+                });
+                return mouse.ENDFLOW;
+            });
+            await mouse.swing(1 / 24, 1 / 8, async () => {
+                await mouse.playNote(1 / 4, async () => {
+                    await mouse.playPitch("sol", 4);
+                    return mouse.ENDFLOW;
+                });
+                await mouse.playNote(1 / 4, async () => {
+                    await mouse.playPitch("sol", 4);
+                    return mouse.ENDFLOW;
+                });
+                return mouse.ENDFLOW;
+            });
+            await mouse.playNoteMillis(1000 / (3 / 2), async () => {
+                await mouse.playHertz(392);
+                return mouse.ENDFLOW;
+            });
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const expectedBlockList = [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "newnote", 0, 0, [0, 2, 5, 9]],
+            [2, "divide", 0, 0, [1, 3, 4]],
+            [3, ["number", { "value": 1 }], 0, 0, [2]],
+            [4, ["number", { "value": 4 }], 0, 0, [2]],
+            [5, "vspace", 0, 0, [1, 6]],
+            [6, "pitch", 0, 0, [5, 7, 8, null]],
+            [7, ["solfege", { "value": "sol" }], 0, 0, [6]],
+            [8, ["number", { "value": 4 }], 0, 0, [6]],
+            [9, "newnote", 0, 0, [1, 10, 13, 17]],
+            [10, "divide", 0, 0, [9, 11, 12]],
+            [11, ["number", { "value": 1 }], 0, 0, [10]],
+            [12, ["number", { "value": 4 }], 0, 0, [10]],
+            [13, "vspace", 0, 0, [9, 14]],
+            [14, "pitch", 0, 0, [13, 15, 16, null]],
+            [15, ["notename", { "value": "G" }], 0, 0, [14]],
+            [16, ["number", { "value": 4 }], 0, 0, [14]],
+            [17, "newnote", 0, 0, [9, 18, 21, 25]],
+            [18, "divide", 0, 0, [17, 19, 20]],
+            [19, ["number", { "value": 1 }], 0, 0, [18]],
+            [20, ["number", { "value": 4 }], 0, 0, [18]],
+            [21, "vspace", 0, 0, [17, 22]],
+            [22, "pitch", 0, 0, [21, 23, 24, null]],
+            [23, ["solfege", { "value": "5" }], 0, 0, [22]],
+            [24, ["number", { "value": 4 }], 0, 0, [22]],
+            [25, "newnote", 0, 0, [17, 26, 29, 32]],
+            [26, "divide", 0, 0, [25, 27, 28]],
+            [27, ["number", { "value": 1 }], 0, 0, [26]],
+            [28, ["number", { "value": 4 }], 0, 0, [26]],
+            [29, "vspace", 0, 0, [25, 30]],
+            [30, "hertz", 0, 0, [29, 31, null, null]],
+            [31, ["number", { "value": 392 }], 0, 0, [30]],
+            [32, "newnote", 0, 0, [25, 33, 36, 38]],
+            [33, "divide", 0, 0, [32, 34, 35]],
+            [34, ["number", { "value": 1 }], 0, 0, [33]],
+            [35, ["number", { "value": 4 }], 0, 0, [33]],
+            [36, "vspace", 0, 0, [32, 37]],
+            [37, "rest2", 0, 0, [36, null]],
+            [38, "rhythmicdot2", 0, 0, [32, 39, 40, 48]],
+            [39, ["number", { "value": 1 }], 0, 0, [38]],
+            [40, "newnote", 0, 0, [38, 41, 44, null]],
+            [41, "divide", 0, 0, [40, 42, 43]],
+            [42, ["number", { "value": 1 }], 0, 0, [41]],
+            [43, ["number", { "value": 4 }], 0, 0, [41]],
+            [44, "vspace", 0, 0, [40, 45]],
+            [45, "pitch", 0, 0, [44, 46, 47, null]],
+            [46, ["solfege", { "value": "sol" }], 0, 0, [45]],
+            [47, ["number", { "value": 4 }], 0, 0, [45]],
+            [48, "tie", 0, 0, [38, 49, 65]],
+            [49, "newnote", 0, 0, [48, 50, 53, 57]],
+            [50, "divide", 0, 0, [49, 51, 52]],
+            [51, ["number", { "value": 1 }], 0, 0, [50]],
+            [52, ["number", { "value": 4 }], 0, 0, [50]],
+            [53, "vspace", 0, 0, [49, 54]],
+            [54, "pitch", 0, 0, [53, 55, 56, null]],
+            [55, ["solfege", { "value": "sol" }], 0, 0, [54]],
+            [56, ["number", { "value": 4 }], 0, 0, [54]],
+            [57, "newnote", 0, 0, [49, 58, 61, null]],
+            [58, "divide", 0, 0, [57, 59, 60]],
+            [59, ["number", { "value": 1 }], 0, 0, [58]],
+            [60, ["number", { "value": 4 }], 0, 0, [58]],
+            [61, "vspace", 0, 0, [57, 62]],
+            [62, "pitch", 0, 0, [61, 63, 64, null]],
+            [63, ["solfege", { "value": "sol" }], 0, 0, [62]],
+            [64, ["number", { "value": 4 }], 0, 0, [62]],
+            [65, "multiplybeatfactor", 0, 0, [48, 66, 69, 78]],
+            [66, "divide", 0, 0, [65, 67, 68]],
+            [67, ["number", { "value": 1 }], 0, 0, [66]],
+            [68, ["number", { "value": 2 }], 0, 0, [66]],
+            [69, "vspace", 0, 0, [65, 70]],
+            [70, "newnote", 0, 0, [69, 71, 74, null]],
+            [71, "divide", 0, 0, [70, 72, 73]],
+            [72, ["number", { "value": 1 }], 0, 0, [71]],
+            [73, ["number", { "value": 4 }], 0, 0, [71]],
+            [74, "vspace", 0, 0, [70, 75]],
+            [75, "pitch", 0, 0, [74, 76, 77, null]],
+            [76, ["solfege", { "value": "sol" }], 0, 0, [75]],
+            [77, ["number", { "value": 4 }], 0, 0, [75]],
+            [78, "newswing2", 0, 0, [65, 79, 82, 85, 103]],
+            [79, "divide", 0, 0, [78, 80, 81]],
+            [80, ["number", { "value": 1 }], 0, 0, [79]],
+            [81, ["number", { "value": 24 }], 0, 0, [79]],
+            [82, "divide", 0, 0, [78, 83, 84]],
+            [83, ["number", { "value": 1 }], 0, 0, [82]],
+            [84, ["number", { "value": 8 }], 0, 0, [82]],
+            [85, "vspace", 0, 0, [78, 86]],
+            [86, "vspace", 0, 0, [85, 87]],
+            [87, "newnote", 0, 0, [86, 88, 91, 95]],
+            [88, "divide", 0, 0, [87, 89, 90]],
+            [89, ["number", { "value": 1 }], 0, 0, [88]],
+            [90, ["number", { "value": 4 }], 0, 0, [88]],
+            [91, "vspace", 0, 0, [87, 92]],
+            [92, "pitch", 0, 0, [91, 93, 94, null]],
+            [93, ["solfege", { "value": "sol" }], 0, 0, [92]],
+            [94, ["number", { "value": 4 }], 0, 0, [92]],
+            [95, "newnote", 0, 0, [87, 96, 99, null]],
+            [96, "divide", 0, 0, [95, 97, 98]],
+            [97, ["number", { "value": 1 }], 0, 0, [96]],
+            [98, ["number", { "value": 4 }], 0, 0, [96]],
+            [99, "vspace", 0, 0, [95, 100]],
+            [100, "pitch", 0, 0, [99, 101, 102, null]],
+            [101, ["solfege", { "value": "sol" }], 0, 0, [100]],
+            [102, ["number", { "value": 4 }], 0, 0, [100]],
+            [103, "osctime", 0, 0, [78, 104, 109, null]],
+            [104, "divide", 0, 0, [103, 105, 106]],
+            [105, ["number", { "value": 1000 }], 0, 0, [104]],
+            [106, "divide", 0, 0, [104, 107, 108]],
+            [107, ["number", { "value": 3 }], 0, 0, [106]],
+            [108, ["number", { "value": 2 }], 0, 0, [106]],
+            [109, "vspace", 0, 0, [103, 110]],
+            [110, "vspace", 0, 0, [109, 111]],
+            [111, "hertz", 0, 0, [110, 112, null, null]],
+            [112, ["number", { "value": 392 }], 0, 0, [111]]
+        ];
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        let trees = AST2BlockList.toTrees(AST);
+        let blockList = AST2BlockList.toBlockList(trees);
+        expect(blockList).toEqual(expectedBlockList);
+    });
+
+    // Test all Flow Blocks.
+    test("should generate correct blockList for all flow blocks", () => {
+        const code = `
+        new Mouse(async mouse => {
+            if (true) {
+                await mouse.playNote(1 / 4, async () => {
+                    await mouse.playPitch("sol", 4);
+                    return mouse.ENDFLOW;
+                });
+                await mouse.playNote(1 / 4, async () => {
+                    await mouse.playPitch("sol", 4);
+                    return mouse.ENDFLOW;
+                });
+                await mouse.playNote(1 / 4, async () => {
+                    await mouse.playPitch("sol", 4);
+                    return mouse.ENDFLOW;
+                });
+            } else {
+                await mouse.playNote(1 / 4, async () => {
+                    await mouse.playPitch("sol", 4);
+                    return mouse.ENDFLOW;
+                });
+                await mouse.playNote(1 / 6, async () => {
+                    await mouse.playPitch("sol", 4);
+                    return mouse.ENDFLOW;
+                });
+            }
+            while (1000) {
+                await mouse.playNote(1 / 4, async () => {
+                    await mouse.playPitch("sol", 4);
+                    return mouse.ENDFLOW;
+                });
+                break;
+            }
+            while (1000) {
+                await mouse.playNote(1 / 4, async () => {
+                    await mouse.playPitch("sol", 4);
+                    return mouse.ENDFLOW;
+                });
+            }
+            do {
+                await mouse.playNote(1 / 4, async () => {
+                    await mouse.playPitch("sol", 4);
+                    return mouse.ENDFLOW;
+                });
+            } while (true);
+            switch (1) {
+                case 1:
+                    await mouse.playNote(1 / 4, async () => {
+                        await mouse.playPitch("sol", 4);
+                        return mouse.ENDFLOW;
+                    });
+                    break;
+                    break;
+                    break;
+                default:
+                    await mouse.playNote(1 / 4, async () => {
+                        await mouse.playPitch("5", 4);
+                        return mouse.ENDFLOW;
+                    });
+            }
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
+
+        const expectedBlockList = [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "ifthenelse", 0, 0, [0, 2, 3, 27, 43]],
+            [2, ["boolean", { "value": true }], 0, 0, [1]],
+            [3, "newnote", 0, 0, [1, 4, 7, 11]],
+            [4, "divide", 0, 0, [3, 5, 6]],
+            [5, ["number", { "value": 1 }], 0, 0, [4]],
+            [6, ["number", { "value": 4 }], 0, 0, [4]],
+            [7, "vspace", 0, 0, [3, 8]],
+            [8, "pitch", 0, 0, [7, 9, 10, null]],
+            [9, ["solfege", { "value": "sol" }], 0, 0, [8]],
+            [10, ["number", { "value": 4 }], 0, 0, [8]],
+            [11, "newnote", 0, 0, [3, 12, 15, 19]],
+            [12, "divide", 0, 0, [11, 13, 14]],
+            [13, ["number", { "value": 1 }], 0, 0, [12]],
+            [14, ["number", { "value": 4 }], 0, 0, [12]],
+            [15, "vspace", 0, 0, [11, 16]],
+            [16, "pitch", 0, 0, [15, 17, 18, null]],
+            [17, ["solfege", { "value": "sol" }], 0, 0, [16]],
+            [18, ["number", { "value": 4 }], 0, 0, [16]],
+            [19, "newnote", 0, 0, [11, 20, 23, null]],
+            [20, "divide", 0, 0, [19, 21, 22]],
+            [21, ["number", { "value": 1 }], 0, 0, [20]],
+            [22, ["number", { "value": 4 }], 0, 0, [20]],
+            [23, "vspace", 0, 0, [19, 24]],
+            [24, "pitch", 0, 0, [23, 25, 26, null]],
+            [25, ["solfege", { "value": "sol" }], 0, 0, [24]],
+            [26, ["number", { "value": 4 }], 0, 0, [24]],
+            [27, "newnote", 0, 0, [1, 28, 31, 35]],
+            [28, "divide", 0, 0, [27, 29, 30]],
+            [29, ["number", { "value": 1 }], 0, 0, [28]],
+            [30, ["number", { "value": 4 }], 0, 0, [28]],
+            [31, "vspace", 0, 0, [27, 32]],
+            [32, "pitch", 0, 0, [31, 33, 34, null]],
+            [33, ["solfege", { "value": "sol" }], 0, 0, [32]],
+            [34, ["number", { "value": 4 }], 0, 0, [32]],
+            [35, "newnote", 0, 0, [27, 36, 39, null]],
+            [36, "divide", 0, 0, [35, 37, 38]],
+            [37, ["number", { "value": 1 }], 0, 0, [36]],
+            [38, ["number", { "value": 6 }], 0, 0, [36]],
+            [39, "vspace", 0, 0, [35, 40]],
+            [40, "pitch", 0, 0, [39, 41, 42, null]],
+            [41, ["solfege", { "value": "sol" }], 0, 0, [40]],
+            [42, ["number", { "value": 4 }], 0, 0, [40]],
+            [43, "forever", 0, 0, [1, 44, 53]],
+            [44, "newnote", 0, 0, [43, 45, 48, 52]],
+            [45, "divide", 0, 0, [44, 46, 47]],
+            [46, ["number", { "value": 1 }], 0, 0, [45]],
+            [47, ["number", { "value": 4 }], 0, 0, [45]],
+            [48, "vspace", 0, 0, [44, 49]],
+            [49, "pitch", 0, 0, [48, 50, 51, null]],
+            [50, ["solfege", { "value": "sol" }], 0, 0, [49]],
+            [51, ["number", { "value": 4 }], 0, 0, [49]],
+            [52, "break", 0, 0, [44, null, null, null]],
+            [53, "forever", 0, 0, [43, 54, 62]],
+            [54, "newnote", 0, 0, [53, 55, 58, null]],
+            [55, "divide", 0, 0, [54, 56, 57]],
+            [56, ["number", { "value": 1 }], 0, 0, [55]],
+            [57, ["number", { "value": 4 }], 0, 0, [55]],
+            [58, "vspace", 0, 0, [54, 59]],
+            [59, "pitch", 0, 0, [58, 60, 61, null]],
+            [60, ["solfege", { "value": "sol" }], 0, 0, [59]],
+            [61, ["number", { "value": 4 }], 0, 0, [59]],
+            [62, "until", 0, 0, [53, 63, 64, 73]],
+            [63, ["boolean", { "value": true }], 0, 0, [62]],
+            [64, "vspace", 0, 0, [62, 65]],
+            [65, "newnote", 0, 0, [64, 66, 69, null]],
+            [66, "divide", 0, 0, [65, 67, 68]],
+            [67, ["number", { "value": 1 }], 0, 0, [66]],
+            [68, ["number", { "value": 4 }], 0, 0, [66]],
+            [69, "vspace", 0, 0, [65, 70]],
+            [70, "pitch", 0, 0, [69, 71, 72, null]],
+            [71, ["solfege", { "value": "sol" }], 0, 0, [70]],
+            [72, ["number", { "value": 4 }], 0, 0, [70]],
+            [73, "switch", 0, 0, [62, 74, 75, null]],
+            [74, ["number", { "value": 1 }], 0, 0, [73]],
+            [75, "case", 0, 0, [73, 76, 77, 88]],
+            [76, ["number", { "value": 1 }], 0, 0, [75]],
+            [77, "newnote", 0, 0, [75, 78, 81, 85]],
+            [78, "divide", 0, 0, [77, 79, 80]],
+            [79, ["number", { "value": 1 }], 0, 0, [78]],
+            [80, ["number", { "value": 4 }], 0, 0, [78]],
+            [81, "vspace", 0, 0, [77, 82]],
+            [82, "pitch", 0, 0, [81, 83, 84, null]],
+            [83, ["solfege", { "value": "sol" }], 0, 0, [82]],
+            [84, ["number", { "value": 4 }], 0, 0, [82]],
+            [85, "break", 0, 0, [77, 86, null, null]],
+            [86, "break", 0, 0, [85, 87, null, null]],
+            [87, "break", 0, 0, [86, null, null, null]],
+            [88, "defaultcase", 0, 0, [75, 89, null, null]],
+            [89, "newnote", 0, 0, [88, 90, 93, null]],
+            [90, "divide", 0, 0, [89, 91, 92]],
+            [91, ["number", { "value": 1 }], 0, 0, [90]],
+            [92, ["number", { "value": 4 }], 0, 0, [90]],
+            [93, "vspace", 0, 0, [89, 94]],
+            [94, "pitch", 0, 0, [93, 95, 96, null]],
+            [95, ["solfege", { "value": "5" }], 0, 0, [94]],
+            [96, ["number", { "value": 4 }], 0, 0, [94]]
+        ];
+
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        let trees = AST2BlockList.toTrees(AST);
+        let blockList = AST2BlockList.toBlockList(trees);
+        expect(blockList).toEqual(expectedBlockList);
+    });
 });
