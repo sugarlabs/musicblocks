@@ -7093,3 +7093,76 @@ define(MYDEFINES, (compatibility) =>{
     activity.doContextMenus();
     activity.doPluginsAndPaletteCols();
 });
+
+// Create Start Button
+const startBtn = document.createElement("button");
+startBtn.textContent = "🎥 Start Recording";
+startBtn.style.position = "absolute";
+startBtn.style.top = "10px";
+startBtn.style.right = "160px";
+startBtn.style.zIndex = 9999;
+startBtn.onclick = startRecording;
+document.body.appendChild(startBtn);
+
+// Create Stop Button
+const stopBtn = document.createElement("button");
+stopBtn.textContent = "⏹️ Stop Recording";
+stopBtn.style.position = "absolute";
+stopBtn.style.top = "10px";
+stopBtn.style.right = "20px";
+stopBtn.style.zIndex = 9999;
+stopBtn.onclick = stopRecording;
+document.body.appendChild(stopBtn);
+
+//add recording functions
+let mediaRecorder;
+let recordedChunks = [];
+
+function startRecording() {
+  const canvas = document.querySelector("canvas");
+  const audioContext = window.audioContext || new AudioContext();
+
+  if (!canvas || !audioContext) {
+    alert("Canvas or AudioContext not found!");
+    return;
+  }
+
+  const canvasStream = canvas.captureStream(30);
+  const audioStream = audioContext.destination.stream;
+
+  const combinedStream = new MediaStream([
+    ...canvasStream.getVideoTracks(),
+    ...audioStream.getAudioTracks(),
+  ]);
+
+  mediaRecorder = new MediaRecorder(combinedStream);
+
+  mediaRecorder.ondataavailable = function (e) {
+    if (e.data.size > 0) {
+      recordedChunks.push(e.data);
+    }
+  };
+
+  mediaRecorder.onstop = function () {
+    const blob = new Blob(recordedChunks, { type: "video/webm" });
+    recordedChunks = [];
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "musicblocks_recording.webm";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  mediaRecorder.start();
+  console.log("🎬 Recording started...");
+}
+
+function stopRecording() {
+  if (mediaRecorder && mediaRecorder.state !== "inactive") {
+    mediaRecorder.stop();
+    console.log("🛑 Recording stopped.");
+  }
+}
+
+
