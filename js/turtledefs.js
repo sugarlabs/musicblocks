@@ -28,7 +28,7 @@
 
 /* exported
 
-   createDefaultStack, createHelpContent, LOGOJA1, NUMBERBLOCKDEFAULT,
+   createDefaultStack, createHelpContent, GUIDEURL, LOGOJA1, NUMBERBLOCKDEFAULT,
    DEFAULTPALETTE, BUILTINPALETTES, MULTIPALETTES, SKIPPALETTES,
    MULTIPALETTEICONS, MULTIPALETTENAMES, HELPCONTENT, DATAOBJS,
    BUILTINPALETTESFORL23N, getMainToolbarButtonNames,
@@ -68,7 +68,7 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
 
     if (GUIDEURL === "guide url" || GUIDEURL === "") {
         GUIDEURL =
-            "../guide/guide.html";
+            "/guide";
     }
 
     NUMBERBLOCKDEFAULT = 4;
