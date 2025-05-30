@@ -693,15 +693,16 @@
         document.addEventListener('MSFullscreenChange', handleFullscreenChange);
 
         function handleFullscreenChange() {
-            var iconCode = document.querySelector('#FullScrIcon');
-            count = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement ? 1 : 0;
-            iconCode.textContent = count ? '\ue5d1' : '\ue5d0';
+            // Add a timeout to ensure viewport dimensions are updated
+            setTimeout(() => {
+                togglePlayOnlyMode();
+            }, 100); // Delay to allow viewport dimensions to stabilize
         }
     </script>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-              let persistentNotification = null;
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let persistentNotification = null;
 
             function showPersistentNotification() {
                 if (!persistentNotification) {
@@ -734,22 +735,25 @@
             }
 
             function togglePlayOnlyMode() {
-                const isSmallScreen = (window.innerWidth < 768) || (window.innerHeight < 600);
+                const isSmallScreen = (window.innerWidth < 768) || (window.innerHeight < 600); // Use viewport dimensions
                 const body = document.body;
                 const homeButton = document.getElementById("Home [HOME]");
                 const buttonContainer = document.getElementById("buttoncontainerBOTTOM");
+                const canvas = document.getElementById("canvas");
 
                 if (isSmallScreen) {
-                  // Enable play-only mode
-                  body.classList.add("play-only");
-                  showPersistentNotification();
+                    // Enable play-only mode
+                    body.classList.add("play-only");
+                    showPersistentNotification();
 
                     if (buttonContainer) {
                         buttonContainer.style.display = "flex";
                         buttonContainer.style.justifyContent = "flex-end";
                         buttonContainer.style.alignItems = "center";
                     }
-                    if (homeButton) {
+
+                    // Only show the home button if the canvas is visible
+                    if (homeButton && canvas && canvas.style.display !== "none") {
                         homeButton.style.display = "flex";
                         homeButton.style.position = "fixed";
                         homeButton.style.right = "15px";
@@ -769,9 +773,10 @@
                     body.classList.remove("play-only");
                     removePersistentNotification();
 
-                  if (homeButton) homeButton.style = "";
-                  if (buttonContainer) buttonContainer.style = "";
+                    if (homeButton) homeButton.style = "";
+                    if (buttonContainer) buttonContainer.style = "";
 
+                    // Show certain elements
                     showElementById("Show/hide blocks");
                     showElementById("Expand/collapse blocks");
                     showElementById("Decrease block size");
@@ -781,9 +786,22 @@
                 }
             }
 
+            function handleFullscreenChange() {
+                // Add a timeout to ensure viewport dimensions are updated
+                setTimeout(() => {
+                    togglePlayOnlyMode();
+                }, 100); // Delay to allow viewport dimensions to stabilize
+            }
+
             togglePlayOnlyMode();
 
             window.addEventListener("resize", togglePlayOnlyMode);
+
+            // Add fullscreenchange event listener to re-evaluate play-only mode
+            document.addEventListener("fullscreenchange", handleFullscreenChange);
+            document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+            document.addEventListener("mozfullscreenchange", handleFullscreenChange);
+            document.addEventListener("MSFullscreenChange", handleFullscreenChange);
         });
     </script>
 
