@@ -911,12 +911,14 @@ msgstr ""
 #: js/block.js:3842
 #: js/blocks.js:2600
 #: js/blocks.js:3211
+#.TRANS: on2 should be translated as "on" as in on and off
 msgid "on2"
 msgstr ""
 
 #: js/block.js:3844
 #: js/blocks.js:2602
 #: js/blocks.js:3213
+#.TRANS: off should be translated as "off" as in on and off
 msgid "off"
 msgstr ""
 
