@@ -234,31 +234,32 @@
                 </div>
             </footer>
 
-            <dialog id="lilypondModal" class="modal" tabindex="-1">
-                <!-- Modal content for Lilypond save dialog -->
-                <div class="modal-content" tabindex="-1">
-                    <span class="close">&times;</span>
-                    <div id="fileNameText"></div>
-                    <input type="text" id="fileName" tabindex="-1">
-                    <p></p>
-                    <div id="titleText"></div>
-                    <input type="text" id="title" tabindex="-1">
-                    <p></p>
-                    <div id="authorText"></div>
-                    <input type="text" id="author" tabindex="-1">
-                    <p></p>
-                    <div id="MIDIText"></div>
-                    <input type="checkbox" id="MIDICheck" tabindex="-1">
-                    <p></p>
-                    <div id="guitarText"></div>
-                    <input type="checkbox" id="guitarCheck" tabindex="-1">
-                    <p></p>
-                    <p><button class="confirm-button" id="submitLilypond"></button></p>
-                    <!-- <button id="submitPDF"></button></p> -->
-                </div>
-            </dialog>
-            <div class="materialize-iso" tabindex="-1">
-                <nav id="toolbars" class="nav-wrapper">
+        <div id="lilypondModal" class="modal" tabindex="-1">
+            <!-- Modal content for Lilypond save dialog -->
+            <div class="modal-content" tabindex="-1">
+                <span class="close">&times;</span>
+                <div id="fileNameText"></div>
+                <input type="text" id="fileName" tabindex="-1" />
+                <p></p>
+                <div id="titleText"></div>
+                <input type="text" id="title" tabindex="-1" />
+                <p></p>
+                <div id="authorText"></div>
+                <input type="text" id="author" tabindex="-1" />
+                <p></p>
+                <div id="MIDIText"></div>
+                <input type="checkbox" id="MIDICheck" tabindex="-1" />
+                <p></p>
+                <div id="guitarText"></div>
+                <input type="checkbox" id="guitarCheck" tabindex="-1" />
+                <p></p>
+                <p><button id="submitLilypond"></button></p>
+                <!-- <button id="submitPDF"></button></p> -->
+            </div>
+        </div>
+
+        <div class="materialize-iso" tabindex="-1">
+            <nav id="toolbars" class="nav-wrapper" role="navigation">
                 <div class="blue nav-wrapper" tabindex="-1">
                         <div id="mb-logo" class="logo left tooltipped"
                             style="display: flex; align-items: center; line-height: 0; height: 100%; padding-right: 0;"
@@ -692,14 +693,15 @@
         document.addEventListener('MSFullscreenChange', handleFullscreenChange);
 
         function handleFullscreenChange() {
-            var iconCode = document.querySelector('#FullScrIcon');
-            count = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement ? 1 : 0;
-            iconCode.textContent = count ? '\ue5d1' : '\ue5d0';
+            // Add a timeout to ensure viewport dimensions are updated
+            setTimeout(() => {
+                togglePlayOnlyMode();
+            }, 100); // Delay to allow viewport dimensions to stabilize
         }
     </script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             let persistentNotification = null;
 
             function showPersistentNotification() {
@@ -733,10 +735,11 @@
             }
 
             function togglePlayOnlyMode() {
-                const isSmallScreen = (window.innerWidth < 768) || (window.innerHeight < 600);
+                const isSmallScreen = (window.innerWidth < 768) || (window.innerHeight < 600); // Use viewport dimensions
                 const body = document.body;
                 const homeButton = document.getElementById("Home [HOME]");
                 const buttonContainer = document.getElementById("buttoncontainerBOTTOM");
+                const canvas = document.getElementById("canvas");
 
                 if (isSmallScreen) {
                     // Enable play-only mode
@@ -748,7 +751,9 @@
                         buttonContainer.style.justifyContent = "flex-end";
                         buttonContainer.style.alignItems = "center";
                     }
-                    if (homeButton) {
+
+                    // Only show the home button if the canvas is visible
+                    if (homeButton && canvas && canvas.style.display !== "none") {
                         homeButton.style.display = "flex";
                         homeButton.style.position = "fixed";
                         homeButton.style.right = "15px";
@@ -771,6 +776,7 @@
                     if (homeButton) homeButton.style = "";
                     if (buttonContainer) buttonContainer.style = "";
 
+                    // Show certain elements
                     showElementById("Show/hide blocks");
                     showElementById("Expand/collapse blocks");
                     showElementById("Decrease block size");
@@ -780,9 +786,22 @@
                 }
             }
 
+            function handleFullscreenChange() {
+                // Add a timeout to ensure viewport dimensions are updated
+                setTimeout(() => {
+                    togglePlayOnlyMode();
+                }, 100); // Delay to allow viewport dimensions to stabilize
+            }
+
             togglePlayOnlyMode();
 
             window.addEventListener("resize", togglePlayOnlyMode);
+
+            // Add fullscreenchange event listener to re-evaluate play-only mode
+            document.addEventListener("fullscreenchange", handleFullscreenChange);
+            document.addEventListener("webkitfullscreenchange", handleFullscreenChange);
+            document.addEventListener("mozfullscreenchange", handleFullscreenChange);
+            document.addEventListener("MSFullscreenChange", handleFullscreenChange);
         });
     </script>
 
