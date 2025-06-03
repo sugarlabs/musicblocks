@@ -1,0 +1,396 @@
+[
+    {
+        "comments": "Binary expression such as 'a + b', 'a | b'",
+        "ast": {
+            "identifiers": [
+                {
+                    "property": "type",
+                    "value": "BinaryExpression"
+                }
+            ],
+            "name_property": "operator",
+            "argument_properties": [
+                "left",
+                "right"
+            ]
+        },
+        "block": {
+            "type": "argument",
+            "connections": {
+                "count": 3,
+                "prev": 0
+            },
+            "vspaces": 2
+        }
+    },
+    {
+        "comments": "run is ignored",
+        "ast": {
+            "identifiers": [
+                {
+                    "property": "type",
+                    "value": "ExpressionStatement"
+                },
+                {
+                    "property": "expression.type",
+                    "value": "CallExpression"
+                },
+                {
+                    "property": "expression.callee.type",
+                    "value": "MemberExpression"
+                },
+                {
+                    "property": "expression.callee.object.name",
+                    "value": "MusicBlocks"
+                },
+                {
+                    "property": "expression.callee.property.name",
+                    "value": "run"
+                }
+            ]
+        }
+    },
+    {
+        "comments": "Boxes palette variable declaration",
+        "ast": {
+            "identifiers": [
+                {
+                    "property": "type",
+                    "value": "VariableDeclaration"
+                },
+                {
+                    "property": "declarations[0].init.type",
+                    "value": "Literal"
+                }
+            ],
+            "argument_properties": [
+                "declarations[0].init"
+            ],
+            "name_property": "declarations[0].id.name",
+            "name": "storein2"
+        },
+        "block": {
+            "type": "custom",
+            "name": "storein2",
+            "connections": {
+                "count": 3,
+                "prev": 0,
+                "next": 2
+            },
+            "vspaces": 1
+        }
+    },
+    {
+        "comments": "set instrument block",
+        "ast": {
+            "identifiers": [
+                {
+                    "property": "type",
+                    "value": "ExpressionStatement"
+                },
+                {
+                    "property": "expression.type",
+                    "value": "AwaitExpression"
+                },
+                {
+                    "property": "expression.argument.type",
+                    "value": "CallExpression"
+                },
+                {
+                    "property": "expression.argument.callee.type",
+                    "value": "MemberExpression"
+                },
+                {
+                    "property": "expression.argument.callee.property.name",
+                    "value": "setInstrument"
+                }
+            ],
+            "argument_properties": [
+                "expression.argument.arguments[0]"
+            ],
+            "children_properties": [
+                "expression.argument.arguments[1].body.body"
+            ]
+        },
+        "block": {
+            "type": "block",
+            "name": "settimbre",
+            "connections": {
+                "count": 4,
+                "prev": 0,
+                "child": 2,
+                "next": 3
+            },
+            "argument_v_spaces": 1
+        }
+    },
+    {
+        "comments": "note block",
+        "ast": {
+            "identifiers": [
+                {
+                    "property": "type",
+                    "value": "ExpressionStatement"
+                },
+                {
+                    "property": "expression.type",
+                    "value": "AwaitExpression"
+                },
+                {
+                    "property": "expression.argument.type",
+                    "value": "CallExpression"
+                },
+                {
+                    "property": "expression.argument.callee.type",
+                    "value": "MemberExpression"
+                },
+                {
+                    "property": "expression.argument.callee.property.name",
+                    "value": "playNote"
+                }
+            ],
+            "argument_properties": [
+                "expression.argument.arguments[0]"
+            ],
+            "children_properties": [
+                "expression.argument.arguments[1].body.body"
+            ]
+        },
+        "block": {
+            "type": "block",
+            "name": "newnote",
+            "connections": {
+                "count": 4,
+                "prev": 0,
+                "child": 2,
+                "next": 3
+            },
+            "argument_v_spaces": 1
+        }
+    },
+    {
+        "comments": "pitch block",
+        "ast": {
+            "identifiers": [
+                {
+                    "property": "type",
+                    "value": "ExpressionStatement"
+                },
+                {
+                    "property": "expression.type",
+                    "value": "AwaitExpression"
+                },
+                {
+                    "property": "expression.argument.type",
+                    "value": "CallExpression"
+                },
+                {
+                    "property": "expression.argument.callee.type",
+                    "value": "MemberExpression"
+                },
+                {
+                    "property": "expression.argument.callee.property.name",
+                    "value": "playPitch"
+                }
+            ],
+            "argument_properties": [
+                "expression.argument.arguments[0]",
+                "expression.argument.arguments[1]"
+            ]
+        },
+        "block": {
+            "type": "block",
+            "name": "pitch",
+            "connections": {
+                "count": 4,
+                "prev": 0,
+                "next": 3
+            },
+            "vspaces": 2
+        }
+    },
+    {
+        "comments": "Action palette, async block",
+        "ast": {
+            "identifiers": [
+                {
+                    "property": "type",
+                    "value": "ExpressionStatement"
+                },
+                {
+                    "property": "expression.type",
+                    "value": "AwaitExpression"
+                },
+                {
+                    "property": "expression.argument.type",
+                    "value": "CallExpression"
+                },
+                {
+                    "property": "expression.argument.callee.type",
+                    "value": "identifiers"
+                }
+            ],
+            "name_property": "expression.argument.callee.name"
+        },
+        "block": {
+            "type": "custom",
+            "name": "nameddo",
+            "connections": {
+                "count": 2,
+                "prev": 0,
+                "next": 1
+            },
+            "vspaces": 1
+        }
+    },
+    {
+        "comments": "start block",
+        "ast": {
+            "identifiers": [
+                {
+                    "property": "type",
+                    "value": "ExpressionStatement"
+                },
+                {
+                    "property": "expression.type",
+                    "value": "NewExpression"
+                }
+            ],
+            "children_properties": [
+                "expression.arguments[0].body.body"
+            ]
+        },
+        "block": {
+            "type": "block",
+            "name": "start",
+            "connections": {
+                "count": 3,
+                "child": 1
+            },
+            "argument_v_spaces": 1
+        }
+    },
+    {
+        "comments": "action block",
+        "ast": {
+            "identifiers": [
+                {
+                    "property": "type",
+                    "value": "VariableDeclaration"
+                },
+                {
+                    "property": "declarations[0].init.type",
+                    "value": "ArrowFunctionExpression"
+                }
+            ],
+            "argument_properties": [
+                "declarations[0].id"
+            ],
+            "children_properties": [
+                "declarations[0].init.body.body"
+            ]
+        },
+        "block": {
+            "type": "block",
+            "name": "action",
+            "connections": {
+                "count": 4,
+                "child": 2
+            },
+            "argument_v_spaces": 1
+        }
+    },
+    {
+        "comments": "repeat block",
+        "ast": {
+            "identifiers": [
+                {
+                    "property": "type",
+                    "value": "ForStatement"
+                }
+            ],
+            "argument_properties": [
+                "test.right"
+            ],
+            "children_properties": [
+                "body.body"
+            ]
+        },
+        "block": {
+            "type": "block",
+            "name": "repeat",
+            "connections": {
+                "count": 4,
+                "prev": 0,
+                "child": 2,
+                "next": 3
+            },
+            "argument_v_spaces": 1
+        }
+    },
+    {
+        "comments": "basic if block",
+        "ast": {
+            "identifiers": [
+                {
+                    "property": "type",
+                    "value": "IfStatement"
+                },
+                {
+                    "property": "alternate",
+                    "has_value": false
+                }
+            ],
+            "argument_properties": [
+                "test"
+            ],
+            "children_properties": [
+                "consequent.body"
+            ]
+        },
+        "block": {
+            "type": "block",
+            "name": "if",
+            "connections": {
+                "count": 4,
+                "prev": 0,
+                "child": 2,
+                "next": 3
+            },
+            "argument_v_spaces": 2
+        }
+    },
+    {
+        "comments": "if then else block",
+        "ast": {
+            "identifiers": [
+                {
+                    "property": "type",
+                    "value": "IfStatement"
+                },
+                {
+                    "property": "alternate",
+                    "has_value": true
+                }
+            ],
+            "argument_properties": [
+                "test"
+            ],
+            "children_properties": [
+                "consequent.body",
+                "alternate.body"
+            ]
+        },
+        "block": {
+            "type": "block",
+            "name": "ifthenelse",
+            "connections": {
+                "count": 5,
+                "prev": 0,
+                "child": 2,
+                "next": 4
+            },
+            "argument_v_spaces": 2
+        }
+    }
+]
