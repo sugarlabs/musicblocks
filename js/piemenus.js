@@ -478,7 +478,7 @@ const piemenuPitches = (
         }
 
         that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
-        Singer.setSynthVolume(that.activity.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
+        Singer.setSynthVolume(that.activity, 0, DEFAULTVOICE, PREVIEWVOLUME);
 
         if (!that._triggerLock) {
             that._triggerLock = true;
@@ -2477,82 +2477,77 @@ const piemenuChords = (block, selectedChord) => {
 
 
 const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotate) => {
-    // wheelNav pie menu for voice selection
-
     if (block.blocks.stageClick) {
         return;
     }
 
-    const COLORS = platformColor.piemenuVoicesColors;
-    const colors = [];
+    const BASE_COLOR = "#00ACC1";
+    const HOVER_COLOR = "#008BA3";
+    const SELECTED_COLOR = "#4CAF50";
 
-    for (let i = 0; i < voiceLabels.length; i++) {
-        colors.push(COLORS[categories[i] % COLORS.length]);
+    // Create a completely new div for instrument selection instead of using the shared wheelDiv
+    if (docById("instrumentSelectDiv") !== null) {
+        docById("instrumentSelectDiv").remove();
     }
+    
+    const instrumentSelectDiv = document.createElement("div");
+    instrumentSelectDiv.setAttribute("id", "instrumentSelectDiv");
+    instrumentSelectDiv.style.position = "absolute";
+    instrumentSelectDiv.style.backgroundColor = "white";
+    instrumentSelectDiv.style.borderRadius = "10px";
+    instrumentSelectDiv.style.border = "2px solid " + BASE_COLOR;
+    instrumentSelectDiv.style.boxShadow = "0px 0px 20px rgba(0, 0, 0, 0.2)";
+    instrumentSelectDiv.style.overflow = "hidden";
+    instrumentSelectDiv.style.zIndex = "1000";
+    document.body.appendChild(instrumentSelectDiv);
+    
+    const titleBar = document.createElement("div");
+    titleBar.setAttribute("id", "titleBar");
+    titleBar.style.backgroundColor = BASE_COLOR;
+    titleBar.style.color = "white";
+    titleBar.style.padding = "10px";
+    titleBar.style.textAlign = "center";
+    titleBar.style.fontWeight = "bold";
+    titleBar.style.fontSize = "16px";
+    titleBar.innerHTML = _("Select Instrument");
+    instrumentSelectDiv.appendChild(titleBar);
 
-    docById("wheelDiv").style.display = "";
+    const exitButton = document.createElement("div");
+    exitButton.setAttribute("id", "exitButton");
+    exitButton.innerHTML = "×";
+    exitButton.style.position = "absolute";
+    exitButton.style.top = "5px";
+    exitButton.style.right = "10px";
+    exitButton.style.fontSize = "24px";
+    exitButton.style.color = "white";
+    exitButton.style.cursor = "pointer";
+    exitButton.style.fontWeight = "bold";
+    titleBar.appendChild(exitButton);
 
-    // the voice selector
-    if (localStorage.kanaPreference === "kana") {
-        block._voiceWheel = new wheelnav("wheelDiv", null, 1200, 1200);
-    } else {
-        block._voiceWheel = new wheelnav("wheelDiv", null, 800, 800);
+    const instrumentGrid = document.createElement("div");
+    instrumentGrid.setAttribute("id", "instrumentGrid");
+    instrumentGrid.style.display = "grid";
+    instrumentGrid.style.gridTemplateColumns = "repeat(4, 1fr)";
+    instrumentGrid.style.gridGap = "10px";
+    instrumentGrid.style.padding = "15px";
+    instrumentGrid.style.paddingBottom = "30px"; // Add more padding at the bottom
+    instrumentGrid.style.maxHeight = "400px";
+    instrumentGrid.style.overflowY = "auto";
+    instrumentGrid.style.backgroundColor = "white";
+    instrumentSelectDiv.appendChild(instrumentGrid);
+
+    let currentInstrument = null;
+    for (let i = 0; i < voiceValues.length; i++) {
+        if (voiceValues[i] === voice) {
+            currentInstrument = voiceLabels[i];
+            break;
+        }
     }
-
-    // exit button
-    block._exitWheel = new wheelnav("_exitWheel", block._voiceWheel.raphael);
-
-    wheelnav.cssMode = true;
-
-    block._voiceWheel.keynavigateEnabled = false;
-
-    block._voiceWheel.colors = colors;
-    block._voiceWheel.slicePathFunction = slicePath().DonutSlice;
-    block._voiceWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-    block._voiceWheel.slicePathCustom.minRadiusPercent = 0.2;
-    block._voiceWheel.slicePathCustom.maxRadiusPercent = 1;
-    block._voiceWheel.sliceSelectedPathCustom = block._voiceWheel.slicePathCustom;
-    block._voiceWheel.sliceInitPathCustom = block._voiceWheel.slicePathCustom;
-    if (rotate === undefined) {
-        block._voiceWheel.titleRotateAngle = 0;
-    } else {
-        block._voiceWheel.titleRotateAngle = rotate;
-    }
-
-    block._voiceWheel.animatetime = 0; // 300;
-    block._voiceWheel.createWheel(voiceLabels);
-
-    // Special case for Japanese
-    // const language = localStorage.languagePreference;
-    // if (language === 'ja') {
-    for (let i = 0; i < block._voiceWheel.navItems.length; i++) {
-        block._voiceWheel.navItems[i].titleAttr.font = "30 30px sans-serif";
-        block._voiceWheel.navItems[i].titleSelectedAttr.font = "30 30px sans-serif";
-    }
-    // }
-
-    block._exitWheel.colors = platformColor.exitWheelcolors;
-    block._exitWheel.slicePathFunction = slicePath().DonutSlice;
-    block._exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
-    block._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
-    block._exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
-    block._exitWheel.sliceSelectedPathCustom = block._exitWheel.slicePathCustom;
-    block._exitWheel.sliceInitPathCustom = block._exitWheel.slicePathCustom;
-    block._exitWheel.clickModeRotate = false;
-    block._exitWheel.initWheel(["×", " "]);
-    block._exitWheel.navItems[1].enabled = false;
-    block._exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
-    block._exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
-    block._exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
-    block._exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
-    block._exitWheel.createWheel();
 
     const that = block;
 
-    const __selectionChanged = () => {
-        const label = that._voiceWheel.navItems[that._voiceWheel.selectedNavItemIndex].title;
-        const i = voiceLabels.indexOf(label);
-        that.value = voiceValues[i];
+    const __selectionChanged = (label, voice) => {
+        that.value = voice;
         that.text.text = label;
 
         if (getDrumName(that.value) === null) {
@@ -2561,22 +2556,12 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
             that.activity.logo.synth.loadSynth(0, getDrumSynthName(that.value));
         }
 
-        // Make sure text is on top.
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
     };
 
-    /*
-     * Preview voice
-     * @return{void}
-     * @private
-     */
-    const __voicePreview = () => {
-        const label = that._voiceWheel.navItems[that._voiceWheel.selectedNavItemIndex].title;
-        const i = voiceLabels.indexOf(label);
-        const voice = voiceValues[i];
+    const __voicePreview = (label, voice) => {
         let timeout = 0;
-
         const tur = that.activity.turtles.ithTurtle(0);
 
         if (
@@ -2589,7 +2574,6 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
             }
 
             that.activity.logo.synth.loadSynth(0, voice);
-            // give the synth time to load
             timeout = 500;
         }
 
@@ -2599,21 +2583,117 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
             that.activity.logo.synth.start();
         }, timeout);
 
-        __selectionChanged();
+        currentInstrument = label;
+        __selectionChanged(label, voice);
     };
 
-    // position widget
+    const __exitMenu = () => {
+        that._piemenuExitTime = new Date().getTime();
+        instrumentSelectDiv.remove();
+    };
+
+    const requiredInstruments = [
+        "violin", "viola", "cello", "bass", "double bass", "guitar", "acoustic guitar",
+        "flute", "clarinet", "saxophone", "tuba", "trumpet", "oboe", "trombone", 
+        "banjo", "koto", "dulcimer", "electric guitar", "bassoon", "celeste", 
+        "xylophone", "electronic synth", "sine", "square", "sawtooth", "triangle", "vibraphone"
+    ];
+    
+    const allInstruments = [];
+    for (let i = 0; i < voiceLabels.length; i++) {
+        allInstruments.push({
+            label: voiceLabels[i],
+            value: voiceValues[i]
+        });
+    }
+    
+    requiredInstruments.forEach(requiredInstrument => {
+        const found = allInstruments.some(instrument => 
+            instrument.label.toLowerCase() === requiredInstrument.toLowerCase()
+        );
+        
+        if (!found) {
+            allInstruments.push({
+                label: requiredInstrument,
+                value: requiredInstrument
+            });
+        }
+    });
+
+    allInstruments.sort((a, b) => a.label.localeCompare(b.label));
+    
+    allInstruments.forEach(instrument => {
+        const button = document.createElement("div");
+        button.innerHTML = instrument.label;
+        
+        const isSelected = instrument.label === currentInstrument;
+        button.style.backgroundColor = isSelected ? SELECTED_COLOR : "#f0f0f0";
+        button.style.color = isSelected ? "white" : "#333";
+        button.style.padding = "10px 5px";
+        button.style.textAlign = "center";
+        button.style.borderRadius = "5px";
+        button.style.cursor = "pointer";
+        button.style.transition = "all 0.2s ease";
+        button.style.fontWeight = isSelected ? "bold" : "normal";
+        button.style.boxShadow = "0px 2px 5px rgba(0, 0, 0, 0.1)";
+        button.style.overflow = "hidden";
+        button.style.textOverflow = "ellipsis";
+        button.title = instrument.label;
+        
+        button.addEventListener("mouseover", function() {
+            if (instrument.label !== currentInstrument) {
+                this.style.backgroundColor = "#e0e0e0";
+            }
+        });
+        
+        button.addEventListener("mouseout", function() {
+            if (instrument.label !== currentInstrument) {
+                this.style.backgroundColor = "#f0f0f0";
+            } else {
+                this.style.backgroundColor = SELECTED_COLOR;
+                this.style.color = "white";
+            }
+        });
+        
+        button.addEventListener("click", function() {
+            const allButtons = instrumentGrid.querySelectorAll("div[role='button']");
+            for (let i = 0; i < allButtons.length; i++) {
+                allButtons[i].style.backgroundColor = "#f0f0f0";
+                allButtons[i].style.color = "#333";
+                allButtons[i].style.fontWeight = "normal";
+            }
+            
+            this.style.backgroundColor = SELECTED_COLOR;
+            this.style.color = "white";
+            this.style.fontWeight = "bold";
+            
+            __voicePreview(instrument.label, instrument.value);
+        });
+        
+        button.setAttribute("role", "button");
+        instrumentGrid.appendChild(button);
+    });
+    
+    exitButton.addEventListener("click", __exitMenu);
+    
     const x = block.container.x;
     const y = block.container.y;
 
     const canvasLeft = block.activity.canvas.offsetLeft + 28 * block.blocks.blockScale;
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.blocks.blockScale;
 
-    docById("wheelDiv").style.position = "absolute";
-    setWheelSize(400);
-    docById("wheelDiv").style.left =
+    // Dynamically calculate height based on number of instruments
+    // Each row is about 40px high (10px padding + ~20px text + 10px padding)
+    // Plus grid gap of 10px between rows
+    // 4 instruments per row with our grid layout
+    const rowCount = Math.ceil(allInstruments.length / 4);
+    const gridHeight = rowCount * 50; // 40px per button + 10px gap
+    const maxGridHeight = 400; // Maximum grid height
+    
+    instrumentSelectDiv.style.width = "500px";
+    instrumentSelectDiv.style.left =
         Math.min(
-            block.blocks.turtles._canvas.width - 400,
+            block.blocks.turtles._canvas.width - 500,
             Math.max(
                 0,
                 Math.round(
@@ -2621,35 +2701,16 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
                 ) - 200
             )
         ) + "px";
-    docById("wheelDiv").style.top =
+    instrumentSelectDiv.style.top =
         Math.min(
-            block.blocks.turtles._canvas.height - 450,
+            block.blocks.turtles._canvas.height - 470, // Fixed height with plenty of space
             Math.max(
                 0,
                 Math.round(
                     (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
-                ) - 200
+                ) - 100
             )
         ) + "px";
-
-    // navigate to a specific starting point
-    let i = voiceValues.indexOf(voice);
-    if (i === -1) {
-        i = 0;
-    }
-
-    block._voiceWheel.navigateWheel(i);
-
-    // Set up handlers for voice preview.
-    for (let i = 0; i < voiceValues.length; i++) {
-        block._voiceWheel.navItems[i].navigateFunction = __voicePreview;
-    }
-
-    // Hide the widget when the exit button is clicked.
-    block._exitWheel.navItems[0].navigateFunction = () => {
-        that._piemenuExitTime = new Date().getTime();
-        docById("wheelDiv").style.display = "none";
-    };
 };
 
 const piemenuIntervals = (block, selectedInterval) => {
