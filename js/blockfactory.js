@@ -726,7 +726,11 @@ class SVG {
     _doSlot() {
         // let x;
         if (this._slot) {
-            this.docks.push([(this._x + this._slotX / 2.0) * this._scale, (this._y + 0.125) * this._scale]);
+            if (this._scale == 1.5) {
+                this.docks.push([(this._x + this._slotX / 2.0) * this._scale, Math.floor(this._y * this._scale)]);
+            } else {
+                this.docks.push([(this._x + this._slotX / 2.0) * this._scale, this._y * this._scale]);
+            }
             return (
                 this._rLineTo(0, this._slotY) +
                 this._rLineTo(this._slotX, 0) +
@@ -769,10 +773,17 @@ class SVG {
         if (this._outie) {
             return this._rLineTo(-this._slotX, 0);
         }
-        this.docks.push([
-            (this._x - (this._slotX / 2.0)) * this._scale,
-            (this._y + this._strokeWidth + 0.125) * this._scale
-        ]);
+        if (this._scale == 1.5) {
+            this.docks.push([
+                (this._x - (this._slotX / 2.0)) * this._scale,
+                Math.floor((this._y + this._strokeWidth) * this._scale)
+            ]);
+        } else {
+            this.docks.push([
+                (this._x - (this._slotX / 2.0)) * this._scale,
+                (this._y + this._strokeWidth) * this._scale
+            ]);
+        }
         return (
             this._rLineTo(-this._strokeWidth, 0) +
             this._rLineTo(0, this._slotY) +
@@ -1445,6 +1456,12 @@ class SVG {
                 svg += this._rLineTo(0, (this._slotSize) * (this._clampSlots[clamp] - 1));
             }
             svg += this._rLineTo(0, this._expandY2);
+            // When the scale is non-integer, we introduce a rounding
+            // error since we are only able to position blocks on
+            // pixel boundaries.
+            if (this._scale == 1.5) {
+                svg += this._rLineTo(0, this._clampSlots[clamp] * 0.0625);
+            }
             svg += this._iCorner(1, 1, 90, 0, 0, true, true);
             const saveSlot = this._slot;
             this._slot = true;
