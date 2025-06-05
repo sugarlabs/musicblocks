@@ -81,6 +81,38 @@
         }
     },
     {
+        "comments": "do random block",
+        "ast": {
+            "identifiers": [
+                {
+                    "property": "type",
+                    "value": "MemberExpression"
+                },
+                {
+                    "property": "object.name",
+                    "value": "MathUtility"
+                },
+                {
+                    "property": "property.name",
+                    "value": "doRandom"
+                }
+            ],
+            "argument_properties": [
+                "arguments[0]",
+                "arguments[1]"
+            ]
+        },
+        "block": {
+            "type": "argument",
+            "name": "random",
+            "connections": {
+                "count": 3,
+                "prev": 0
+            },
+            "vpspaces": 2
+        }
+    },
+    {
         "comments": "set instrument block",
         "ast": {
             "identifiers": [
@@ -210,6 +242,32 @@
         }
     },
     {
+        "comments": "Box palette, variable declarator block",
+        "ast": {
+            "identifiers": [
+                {
+                    "property": "type",
+                    "value": "VariableDeclaration"
+                },
+                {
+                    "property": "declarations.type",
+                    "value": "VariableDeclarator"
+                }
+            ],
+            "name_property": "declarations[0].id.name"
+        },
+        "block": {
+            "type": "custom",
+            "name": "namedbox",
+            "connections": {
+                "count": 3,
+                "prev": 0,
+                "next": 2
+            },
+            "vspaces": 1
+        }
+    },
+    {
         "comments": "Action palette, async block",
         "ast": {
             "identifiers": [
@@ -227,7 +285,7 @@
                 },
                 {
                     "property": "expression.argument.callee.type",
-                    "value": "identifiers"
+                    "value": "Identifier"
                 }
             ],
             "name_property": "expression.argument.callee.name"

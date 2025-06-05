@@ -232,50 +232,50 @@ describe("AST2BlockList Class", () => {
         expect(blockList).toEqual(expectedBlockList);
     });
 
-    // // Test repeat statement.
-    // // Support number expressions, including built-in math functions, for number of repeats.
-    // test("should generate correct blockList for repeat", () => {
-    //     const code = `
-    //     new Mouse(async mouse => {
-    //         await mouse.setInstrument("clarinet", async () => {
-    //             for (let i0 = 0; i0 < MathUtility.doRandom(1, 5); i0++) {
-    //                 await mouse.playNote(1 / 4, async () => {
-    //                     await mouse.playPitch("fa", 2 * 2);
-    //                     return mouse.ENDFLOW;
-    //                 });
-    //             }
-    //             return mouse.ENDFLOW;
-    //         });
-    //         return mouse.ENDMOUSE;
-    //     });
-    //     MusicBlocks.run();`;
+    // Test repeat statement.
+    // Support number expressions, including built-in math functions, for number of repeats.
+    test("should generate correct blockList for repeat", () => {
+        const code = `
+        new Mouse(async mouse => {
+            await mouse.setInstrument("clarinet", async () => {
+                for (let i0 = 0; i0 < MathUtility.doRandom(1, 5); i0++) {
+                    await mouse.playNote(1 / 4, async () => {
+                        await mouse.playPitch("fa", 2 * 2);
+                        return mouse.ENDFLOW;
+                    });
+                }
+                return mouse.ENDFLOW;
+            });
+            return mouse.ENDMOUSE;
+        });
+        MusicBlocks.run();`;
 
-    //     const expectedBlockList = [
-    //         [0, "start", 200, 200, [null, 1, null]],
-    //         [1, "settimbre", 0, 0, [0, 2, 3, null]],
-    //         [2, ["voicename", { "value": "clarinet" }], 0, 0, [1]],
-    //         [3, "repeat", 0, 0, [1, 4, 7, null]],
-    //         [4, "random", 0, 0, [3, 5, 6]],
-    //         [5, ["number", { "value": 1 }], 0, 0, [4]],
-    //         [6, ["number", { "value": 5 }], 0, 0, [4]],
-    //         [7, "vspace", 0, 0, [3, 8]],
-    //         [8, "newnote", 0, 0, [7, 9, 12, null]],
-    //         [9, "divide", 0, 0, [8, 10, 11]],
-    //         [10, ["number", { "value": 1 }], 0, 0, [9]],
-    //         [11, ["number", { "value": 4 }], 0, 0, [9]],
-    //         [12, "vspace", 0, 0, [8, 13]],
-    //         [13, "pitch", 0, 0, [12, 14, 15, 18]],
-    //         [14, ["solfege", { "value": "fa" }], 0, 0, [13]],
-    //         [15, "multiply", 0, 0, [13, 16, 17]],
-    //         [16, ["number", { "value": 2 }], 0, 0, [15]],
-    //         [17, ["number", { "value": 2 }], 0, 0, [15]],
-    //         [18, "vspace", 0, 0, [13, null]]
-    //     ];
+        const expectedBlockList = [
+            [0, "start", 200, 200, [null, 1, null]],
+            [1, "settimbre", 0, 0, [0, 2, 3, null]],
+            [2, ["voicename", { "value": "clarinet" }], 0, 0, [1]],
+            [3, "repeat", 0, 0, [1, 4, 7, null]],
+            [4, "random", 0, 0, [3, 5, 6]],
+            [5, ["number", { "value": 1 }], 0, 0, [4]],
+            [6, ["number", { "value": 5 }], 0, 0, [4]],
+            [7, "vspace", 0, 0, [3, 8]],
+            [8, "newnote", 0, 0, [7, 9, 12, null]],
+            [9, "divide", 0, 0, [8, 10, 11]],
+            [10, ["number", { "value": 1 }], 0, 0, [9]],
+            [11, ["number", { "value": 4 }], 0, 0, [9]],
+            [12, "vspace", 0, 0, [8, 13]],
+            [13, "pitch", 0, 0, [12, 14, 15, 18]],
+            [14, ["solfege", { "value": "fa" }], 0, 0, [13]],
+            [15, "multiply", 0, 0, [13, 16, 17]],
+            [16, ["number", { "value": 2 }], 0, 0, [15]],
+            [17, ["number", { "value": 2 }], 0, 0, [15]],
+            [18, "vspace", 0, 0, [13, null]]
+        ];
 
-    //     const AST = acorn.parse(code, { ecmaVersion: 2020 });
-    //     let blockList = AST2BlockList.ASTtoBlockList(AST);
-    //     expect(blockList).toEqual(expectedBlockList);
-    // });
+        const AST = acorn.parse(code, { ecmaVersion: 2020 });
+        let blockList = AST2BlockList.ASTtoBlockList(AST);
+        expect(blockList).toEqual(expectedBlockList);
+    });
 
     // // Test if statement.
     // // Support boolean expressions, including built-in math functions, for if condition.
