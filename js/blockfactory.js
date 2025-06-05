@@ -677,7 +677,7 @@ class SVG {
     _doInnie() {
         this.docks.push([
             (this._x + this._strokeWidth) * this._scale,
-            (this._y + this._innieY2) * this._scale
+            (this._y + this._innieY2 + 0.25) * this._scale
         ]);
         if (this.margins[2] === 0) {
             this.margins[1] = (this._y - this._innieY1) * this._scale;
@@ -705,7 +705,7 @@ class SVG {
             return this._rLineTo(0, -this._innieY2);
         }
         // Outie needs to be the first dock element.
-        this.docks.unshift([(this._x) * this._scale, (this._y - 0.25) * this._scale]);
+        this.docks.unshift([(this._x) * this._scale, (this._y + 0.25) * this._scale]);
         return (
             this._rLineTo(0, -this._strokeWidth) +
             this._rLineTo(-this._innieX1 - 2 * this._strokeWidth, 0) +
@@ -726,7 +726,7 @@ class SVG {
     _doSlot() {
         // let x;
         if (this._slot) {
-            this.docks.push([(this._x + this._slotX / 2.0) * this._scale, this._y * this._scale]);
+            this.docks.push([(this._x + this._slotX / 2.0) * this._scale, (this._y + 0.125) * this._scale]);
             return (
                 this._rLineTo(0, this._slotY) +
                 this._rLineTo(this._slotX, 0) +
@@ -771,7 +771,7 @@ class SVG {
         }
         this.docks.push([
             (this._x - (this._slotX / 2.0)) * this._scale,
-            (this._y + this._strokeWidth) * this._scale
+            (this._y + this._strokeWidth + 0.125) * this._scale
         ]);
         return (
             this._rLineTo(-this._strokeWidth, 0) +
@@ -1442,9 +1442,9 @@ class SVG {
             svg += this._iCorner(-1, 1, 90, 0, 0, true, true);
             svg += this._rLineTo(0, this._padding);
             if (this._clampSlots[clamp] > 1) {
-                svg += this._rLineTo(0, this._slotSize * (this._clampSlots[clamp] - 1));
+                svg += this._rLineTo(0, (this._slotSize) * (this._clampSlots[clamp] - 1));
             }
-            svg += this._rLineTo(0, this._expandY2 + (0.25 * this._clampSlots[clamp]));
+            svg += this._rLineTo(0, this._expandY2);
             svg += this._iCorner(1, 1, 90, 0, 0, true, true);
             const saveSlot = this._slot;
             this._slot = true;
