@@ -1,4 +1,4 @@
-// Copyright (c) 2015-20 Walter Bender
+// Copyright (c) 2015-25 Walter Bender
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -705,7 +705,7 @@ class SVG {
             return this._rLineTo(0, -this._innieY2);
         }
         // Outie needs to be the first dock element.
-        this.docks.unshift([this._x * this._scale, this._y * this._scale]);
+        this.docks.unshift([(this._x) * this._scale, (this._y - 0.25) * this._scale]);
         return (
             this._rLineTo(0, -this._strokeWidth) +
             this._rLineTo(-this._innieX1 - 2 * this._strokeWidth, 0) +
@@ -770,7 +770,7 @@ class SVG {
             return this._rLineTo(-this._slotX, 0);
         }
         this.docks.push([
-            (this._x - this._slotX / 2.0) * this._scale,
+            (this._x - (this._slotX / 2.0)) * this._scale,
             (this._y + this._strokeWidth) * this._scale
         ]);
         return (
@@ -1444,7 +1444,7 @@ class SVG {
             if (this._clampSlots[clamp] > 1) {
                 svg += this._rLineTo(0, this._slotSize * (this._clampSlots[clamp] - 1));
             }
-            svg += this._rLineTo(0, this._expandY2);
+            svg += this._rLineTo(0, this._expandY2 + (0.25 * this._clampSlots[clamp]));
             svg += this._iCorner(1, 1, 90, 0, 0, true, true);
             const saveSlot = this._slot;
             this._slot = true;
