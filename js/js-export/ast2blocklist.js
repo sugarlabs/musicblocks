@@ -75,8 +75,7 @@ class AST2BlockList {
             // Implementation of toTrees(AST).
             let root = {};
             for (let body of AST.body) {
-                let pair = _matchAST(body);
-                _createNodeAndAddToTree(body, pair, root);
+                _createNodeAndAddToTree(body, root);
             }
             return root["children"];
 
@@ -102,7 +101,7 @@ class AST2BlockList {
                 return current;
             }
 
-            function _matchAST(bodyAST) {
+            function _matchBody(bodyAST) {
                 for (const entry of Map.body) {
                     if (!("ast" in entry)) continue;
                     let ast = entry.ast;
@@ -128,7 +127,27 @@ class AST2BlockList {
                 return null;
             }
 
-            function _createNodeAndAddToTree(bodyAST, pair, parent) {
+            function _matchArgument(arg) {
+                for (const entry of argConfigs) {
+                    let arg_type = entry.ast;
+                    let matched = true;
+                    for (const identifier of arg_type.identifiers) {
+                        let value = _getPropertyValue(arg, identifier.property);
+                        if (value !== identifier.value) {
+                            matched = false;
+                            break;
+                        }
+                    }
+                    if (matched) {
+                        return entry;
+                    }
+                }
+                // TODO: error handling
+                return null;
+            }
+
+            function _createNodeAndAddToTree(bodyAST, parent) {
+                let pair = _matchBody(bodyAST);
                 if (pair === null) {
                     throw {
                         prefix: "Unsupported statement: ",
@@ -142,10 +161,10 @@ class AST2BlockList {
 
                 let node = {};
                 // Set block name
-                if ("name" in pair.block) {
-                    node["name"] = pair.block.name;
+                if (pair.block.name === "nameddo") {
+                    node["name"] = { "nameddo":  _getPropertyValue(bodyAST, pair.ast.name_property) };
                 } else {
-                    node["name"] = pair.ast.name_property;
+                    node["name"] = pair.block.name;
                 }
 
                 // Set arguments
@@ -159,12 +178,13 @@ class AST2BlockList {
                         node["arguments"] = args;
                     }
                 }
+
                 // Set children
+                
                 if (pair.ast.children_properties !== undefined) {
                     for (const child of _getPropertyValue(bodyAST, pair.ast.children_properties[0])) {
                         if (child.type != "ReturnStatement") {
-                            let childPair = _matchAST(child);
-                            _createNodeAndAddToTree(child, childPair, node);
+                            _createNodeAndAddToTree(child, node);
                         }
                     }
                 }
@@ -182,21 +202,7 @@ class AST2BlockList {
 
                     // Find matching configuration for this argument type
                     let config = null;
-                    for (const arg_type of argConfigs) {
-                        if (!arg_type.ast || !arg_type.ast.identifiers) continue;
-                        let matched = true;
-                        for (const identifier of arg_type.ast.identifiers) {
-                            let value = _getPropertyValue(arg, identifier.property);
-                            if (value !== identifier.value) {
-                                matched = false;
-                                break;
-                            }
-                        }
-                        if (matched) {
-                            config = arg_type;
-                            break;
-                        }
-                    }
+                    config = _matchArgument(arg);
                     if (!config) {
                         throw {
                             prefix: `Unsupported argument type ${arg.type}: `,
@@ -204,42 +210,36 @@ class AST2BlockList {
                             end: arg.end
                         };
                     }
-
-                    try {
-                        if (config.ast.value_property) {
-                            argNode = _getPropertyValue(arg, config.ast.value_property);
-                        } else if (config.ast.arguments_property) {
-                            const operator = _getPropertyValue(arg, config.ast.operator_property);
-
-                            if (operator in config.operator_map) {
-                                argNode = {
-                                    "name": config.operator_map[operator],
-                                    "arguments": _createArgNode(_getPropertyValue(arg, config.ast.arguments_property))
-                                };
+                    if ("value_property" in config.ast) {
+                        argNode = _getPropertyValue(arg, config.ast.value_property);
+                    } else if (config.ast.identifier_property) {
+                        argNode = { "identifier": _getPropertyValue(arg, config.ast.identifier_property) };
+                    } else {
+                        const name = _getPropertyValue(arg, config.ast.name_property);
+                        if (name in config.name_map) {
+                            let blockName = config.name_map[name];
+                            let args = [];
+                            if ("arguments_property" in config.ast) {
+                                args = _getPropertyValue(arg, config.ast.arguments_property);
                             } else {
-                                const argCount = _getPropertyValue(arg, config.ast.arguments_property).length.toString();
-
+                                for (const property of config.ast.argument_properties) {
+                                    args.push(_getPropertyValue(arg, property));
+                                }
+                            }
+                            if (typeof blockName === "object") {
+                                blockName = blockName[args.length];
+                            }
+                            if (blockName === undefined) {
+                                // TODO: handle error
+                            } else {
                                 argNode = {
-                                    "name": config.operator_map[operator][argCount],
-                                    "arguments": _createArgNode(_getPropertyValue(arg, config.ast.arguments_property))
+                                    "name": blockName,
+                                    "arguments": _createArgNode(args)
                                 };
                             }
-                        } else if (config.ast.operator_property) {
-                            const operator = _getPropertyValue(arg, config.ast.operator_property);
-
-                            argNode = {
-                                "name": config.operator_map[operator],
-                                "arguments": _createArgNode(config.ast.argument_properties.map(prop => _getPropertyValue(arg, prop)))
-                            };
                         } else {
-                            throw new Error(`Unsupported argument configuration for type ${arg.type}`);
+                            // TODO: handle error
                         }
-                    } catch (e) {
-                        throw {
-                            prefix: `Failed to process argument of type ${arg.type}: `,
-                            start: arg.start,
-                            end: arg.end
-                        };
                     }
 
                     if (argNode !== null) {

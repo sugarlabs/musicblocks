@@ -8,7 +8,7 @@
                         "value": "Identifier"
                     }
                 ],
-                "value_property": "name"
+                "identifier_property": "name"
             }
         },
         {
@@ -19,13 +19,13 @@
                         "value": "BinaryExpression"
                     }
                 ],
-                "operator_property": "operator",
+                "name_property": "operator",
                 "argument_properties": [
                     "left",
                     "right"
                 ]
             },
-            "operator_map": {
+            "name_map": {
                 "+": "plus",
                 "-": "minus",
                 "*": "multiply",
@@ -50,12 +50,12 @@
                         "value": "UnaryExpression"
                     }
                 ],
-                "operator_property": "operator",
+                "name_property": "operator",
                 "argument_properties": [
                     "argument"
                 ]
             },
-            "operator_map": {
+            "name_map": {
                 "-": "neg",
                 "!": "not"
             }
@@ -91,10 +91,10 @@
                         "value": "Identifier"
                     }
                 ],
-                "operator_property": "argument.callee.property.name",
+                "name_property": "argument.callee.property.name",
                 "arguments_property": "arguments"
             },
-            "operator_map": {
+            "name_map": {
                 "setValue": {
                     "3": "setDict",
                     "2": "setDict2"
@@ -135,10 +135,10 @@
                         "value": "Math"
                     }
                 ],
-                "operator_property": "callee.property.name",
+                "name_property": "callee.property.name",
                 "arguments_property": "arguments"
             },
-            "operator_map": {
+            "name_map": {
                 "abs": "abs",
                 "floor": "int",
                 "pow": "power",
@@ -165,10 +165,10 @@
                         "value": "MathUtility"
                     }
                 ],
-                "operator_property": "callee.property.name",
+                "name_property": "callee.property.name",
                 "arguments_property": "arguments"
             },
-            "operator_map": {
+            "name_map": {
                 "doCalculateDistance": "distance",
                 "doOneOf": "oneOf",
                 "doRandom": "random"
@@ -225,44 +225,17 @@
             "block": {
                 "type": "custom",
                 "name": "storein2",
+                "arguments": [
+                    {
+                        "type": "value_expression"
+                    }
+                ],
                 "connections": {
                     "count": 3,
                     "prev": 0,
                     "next": 2
                 },
                 "vspaces": 1
-            }
-        },
-        {
-            "comments": "do random block",
-            "ast": {
-                "identifiers": [
-                    {
-                        "property": "type",
-                        "value": "MemberExpression"
-                    },
-                    {
-                        "property": "object.name",
-                        "value": "MathUtility"
-                    },
-                    {
-                        "property": "property.name",
-                        "value": "doRandom"
-                    }
-                ],
-                "argument_properties": [
-                    "arguments[0]",
-                    "arguments[1]"
-                ]
-            },
-            "block": {
-                "type": "argument",
-                "name": "random",
-                "connections": {
-                    "count": 3,
-                    "prev": 0
-                },
-                "vpspaces": 2
             }
         },
         {
@@ -300,6 +273,11 @@
             "block": {
                 "type": "block",
                 "name": "settimbre",
+                "arguments": [
+                    {
+                        "type": "voicename"
+                    }
+                ],
                 "connections": {
                     "count": 4,
                     "prev": 0,
@@ -344,6 +322,11 @@
             "block": {
                 "type": "block",
                 "name": "newnote",
+                "arguments": [
+                    {
+                        "type": "number_expression"
+                    }
+                ],
                 "connections": {
                     "count": 4,
                     "prev": 0,
@@ -386,6 +369,14 @@
             "block": {
                 "type": "block",
                 "name": "pitch",
+                "arguments": [
+                    {
+                        "type": "note_or_solfege"
+                    },
+                    {
+                        "type": "number_expression"
+                    }
+                ],
                 "connections": {
                     "count": 4,
                     "prev": 0,
@@ -478,6 +469,11 @@
             "block": {
                 "type": "block",
                 "name": "action",
+                "arguments": [
+                    {
+                        "type": "text"
+                    }
+                ],
                 "connections": {
                     "count": 4,
                     "child": 2
@@ -504,6 +500,11 @@
             "block": {
                 "type": "block",
                 "name": "repeat",
+                "arguments": [
+                    {
+                        "type": "number_expression"
+                    }
+                ],
                 "connections": {
                     "count": 4,
                     "prev": 0,
@@ -536,6 +537,11 @@
             "block": {
                 "type": "block",
                 "name": "if",
+                "arguments": [
+                    {
+                        "type": "boolean_expression"
+                    }
+                ],
                 "connections": {
                     "count": 4,
                     "prev": 0,
@@ -569,6 +575,11 @@
             "block": {
                 "type": "block",
                 "name": "ifthenelse",
+                "arguments": [
+                    {
+                        "type": "boolean_expression"
+                    }
+                ],
                 "connections": {
                     "count": 5,
                     "prev": 0,
