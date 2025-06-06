@@ -32,44 +32,6 @@
 class AST2BlockList {
     static ASTtoBlockList(AST) {
         const Map = require('./ast2blocks.json');
-        // A map from binary operators in JavaScript to operators recognizable by musicblocks.
-        const _binaryOperatorLookup = {
-            "+": "plus",
-            "-": "minus",
-            "*": "multiply",
-            "/": "divide",
-            "%": "mod",
-            "==": "equal",
-            "!=": "not_equal_to",
-            "<": "less",
-            ">": "greater",
-            "<=": "less_than_or_equal_to",
-            ">=": "greater_than_or_equal_to",
-            "|": "or",
-            "&": "and",
-            "^": "xor"
-        };
-        // A map from unary operators in JavaScript to operators recognizable by musicblocks.
-        const _unaryOperatorLookup = {
-            "-": "neg",
-            "!": "not"
-        };
-
-        const _memberOperatorLookup = {
-            "doCalculateDistance": "distance",
-            "doOneOf": "oneOf",
-            "doRandom": "random",
-            "abs": "abs",
-            "floor": "int",
-            "pow": "power",
-            "sqrt": "sqrt",
-        };
-
-        const _lookups = {
-            "_binaryOperatorLookup": _binaryOperatorLookup,
-            "_unaryOperatorLookup": _unaryOperatorLookup,
-            "_memberOperatorLookup": _memberOperatorLookup
-        };
         // console.log(Map);
         let trees = _ASTtoTree(AST, Map);
         console.log(JSON.stringify(trees, null, 2));
@@ -108,7 +70,7 @@ class AST2BlockList {
          */
         function _ASTtoTree(AST, Map) {
             // Load argument properties configuration
-            const argProperties = require('./argument_properties.json');
+            const argConfigs = Map.arguments;
 
             // Implementation of toTrees(AST).
             let root = {};
@@ -141,7 +103,8 @@ class AST2BlockList {
             }
 
             function _matchAST(bodyAST) {
-                for (const entry of Map) {
+                for (const entry of Map.body) {
+                    if (!("ast" in entry)) continue;
                     let ast = entry.ast;
                     let matched = true;
                     for (const identifier of ast.identifiers) {
@@ -218,7 +181,22 @@ class AST2BlockList {
                     let argNode = null;
 
                     // Find matching configuration for this argument type
-                    const config = argProperties.find(p => p.type === arg.type);
+                    let config = null;
+                    for (const arg_type of argConfigs) {
+                        if (!arg_type.ast || !arg_type.ast.identifiers) continue;
+                        let matched = true;
+                        for (const identifier of arg_type.ast.identifiers) {
+                            let value = _getPropertyValue(arg, identifier.property);
+                            if (value !== identifier.value) {
+                                matched = false;
+                                break;
+                            }
+                        }
+                        if (matched) {
+                            config = arg_type;
+                            break;
+                        }
+                    }
                     if (!config) {
                         throw {
                             prefix: `Unsupported argument type ${arg.type}: `,
@@ -227,53 +205,45 @@ class AST2BlockList {
                         };
                     }
 
-                    // Process each handler for this type
-                    for (const handler of config.handlers) {
-                        try {
-                            switch (handler.type) {
-                                case "value":
-                                    if (typeof handler.value === "string") {
-                                        // Direct value property
-                                        argNode = _getPropertyValue(arg, handler.value);
-                                    } else if (Array.isArray(handler.value)) {
-                                        // Array of properties to process
-                                        argNode = _createArgNode(handler.value.map(prop => _getPropertyValue(arg, prop)))[0];
-                                    }
-                                    break;
-                                case "operator": {
-                                    const operatorLookup = _lookups[handler.operator_map];
-                                    if (!(arg.operator in operatorLookup)) {
-                                        throw new Error(`Unsupported operator: ${arg.operator}`);
-                                    }
-                                    argNode = {
-                                        "name": operatorLookup[arg.operator],
-                                        "arguments": _createArgNode(handler.arguments.map(prop => _getPropertyValue(arg, prop)))
-                                    };
-                                }
-                                    break;
-                                case "identifier":
-                                    argNode = {
-                                        "name": "namedbox",
-                                        "value": _getPropertyValue(arg, handler.value)
-                                    };
-                                    break;
-                                case "block":
-                                    // For block types like ArrowFunctionExpression
-                                    argNode = _getPropertyValue(arg, handler.value);
-                                    break;
-                                default:
-                                    throw new Error(`Unsupported handler type: ${handler.type}`);
+                    try {
+                        if (config.ast.value_property) {
+                            argNode = _getPropertyValue(arg, config.ast.value_property);
+                        } else if (config.ast.arguments_property) {
+                            const operator = _getPropertyValue(arg, config.ast.operator_property);
+
+                            if (operator in config.operator_map) {
+                                argNode = {
+                                    "name": config.operator_map[operator],
+                                    "arguments": _createArgNode(_getPropertyValue(arg, config.ast.arguments_property))
+                                };
+                            } else {
+                                const argCount = _getPropertyValue(arg, config.ast.arguments_property).length.toString();
+
+                                argNode = {
+                                    "name": config.operator_map[operator][argCount],
+                                    "arguments": _createArgNode(_getPropertyValue(arg, config.ast.arguments_property))
+                                };
                             }
-                            if (argNode !== null) break;
-                        } catch (e) {
-                            continue;
+                        } else if (config.ast.operator_property) {
+                            const operator = _getPropertyValue(arg, config.ast.operator_property);
+
+                            argNode = {
+                                "name": config.operator_map[operator],
+                                "arguments": _createArgNode(config.ast.argument_properties.map(prop => _getPropertyValue(arg, prop)))
+                            };
+                        } else {
+                            throw new Error(`Unsupported argument configuration for type ${arg.type}`);
                         }
+                    } catch (e) {
+                        throw {
+                            prefix: `Failed to process argument of type ${arg.type}: `,
+                            start: arg.start,
+                            end: arg.end
+                        };
                     }
 
                     if (argNode !== null) {
                         argNodes.push(argNode);
-                    } else {
-                        throw new Error(`Failed to process argument of type ${arg.type}`);
                     }
                 }
                 return argNodes;
@@ -290,7 +260,7 @@ class AST2BlockList {
             // [21,["nameddo",{"value":"action"}],421,82,[20]]
             function _propertyOf(block) {
                 const block_name = Array.isArray(block[1]) ? block[1][0] : block[1];
-                for (const entry of Map) {
+                for (const entry of Map.body) {
                     if (!("block" in entry)) continue;
                     if ("name" in entry.block && entry.block.name === block_name) {
                         return entry.block;
