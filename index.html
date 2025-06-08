@@ -66,7 +66,12 @@
     <link rel="stylesheet" href="css/themes.css">
     <script src="lib/easeljs.min.js" defer></script>
     <script src="lib/tweenjs.min.js" defer></script>
-
+    <script>
+        let ast2blocklist_config;
+        fetch("js/js-export/ast2blocks.json")
+            .then(response => response.json())
+            .then(data => { ast2blocklist_config = data })
+    </script>
 </head>
 
 <body id="body" onload="init();" data-title="index" style="background: #f9f9f9;">
