@@ -182,8 +182,10 @@ class ProjectStorage {
         await this.LocalStorage.setItem(key, jsonobj);
         const savedjsonobj = await this.LocalStorage.getItem(key);
 
-        if(savedjsonobj !== jsonobj)
-            throw new Error("Not enough space to save locally");
+        //  prevent unnecessary crashing
+        
+        if(savedjsonobj == null)
+            throw new Error("Failed to save project data");
     };
 
     async get (key) {
