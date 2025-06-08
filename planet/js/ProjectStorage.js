@@ -169,11 +169,11 @@ class ProjectStorage {
     isReported(id) {
         return this.data.ReportedProjects[id] === true ;
     };
-
+ 
     report (id, report) {
         this.data.ReportedProjects[id] = report;
         this.save();
-    };
+    };  
 
     // Ancillary Functions
 
@@ -183,7 +183,7 @@ class ProjectStorage {
         const savedjsonobj = await this.LocalStorage.getItem(key);
 
         //  prevent unnecessary crashing
-        
+
         if(savedjsonobj == null)
             throw new Error("Failed to save project data");
     };
