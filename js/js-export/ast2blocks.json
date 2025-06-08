@@ -295,7 +295,7 @@
             "comments": "Decrement by one block in the Boxes palette 'box1 = box1 - 1;'",
             "arguments": [
                 {
-                    "type": "text"
+                    "type": "namedbox"
                 }
             ],
             "ast": {
@@ -339,7 +339,7 @@
             "comments": "Increment block in the Boxes palette 'box1 = box1 + 3;'",
             "arguments": [
                 {
-                    "type": "text"
+                    "type": "namedbox"
                 },
                 {
                     "type": "NumberExpression"

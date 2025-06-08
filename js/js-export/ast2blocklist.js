@@ -26,8 +26,7 @@
  * which can be loaded into the musicblocks UI by calling `blocks.loadNewBlocks(blockList)`.
  * 
  * Usage:
- *   let trees = AST2BlockList.toTrees(AST);
- *   let blockList = AST2BlockList.toBlockList(trees);
+ *   let blockList = AST2BlockList.toBlockList(AST, config);
  */
 class AST2BlockList {
     static toBlockList(AST, config) {

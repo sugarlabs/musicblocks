@@ -22,16 +22,16 @@
 
 const acorn = require("../../../lib/acorn.min");
 const { AST2BlockList } = require("../ast2blocklist");
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 describe("AST2BlockList Class", () => {
     let config;
 
     beforeAll(() => {
         // Load the config file from parent directory
-        const configPath = path.join(__dirname, '..', 'ast2blocks.json');
-        const configContent = fs.readFileSync(configPath, 'utf8');
+        const configPath = path.join(__dirname, "..", "ast2blocks.json");
+        const configContent = fs.readFileSync(configPath, "utf8");
         config = JSON.parse(configContent);
     });
 
@@ -58,6 +58,7 @@ describe("AST2BlockList Class", () => {
         try {
             AST2BlockList.toBlockList(AST, config);
         } catch (e) {
+            //TODO: error message should isolate to smallest scope
             expect(e.prefix).toEqual("Unsupported statement: ");
         }
     });
@@ -186,7 +187,6 @@ describe("AST2BlockList Class", () => {
         try {
             AST2BlockList.toBlockList(AST, config);
         } catch (e) {
-            console.log(e);
             expect(e.prefix + code.substring(e.start, e.end)).toEqual("Unsupported statement: console.log('test');");
         }
     });
@@ -330,6 +330,7 @@ describe("AST2BlockList Class", () => {
                 return mouse.ENDFLOW;
             });
             box1 = box1 - 1;
+            box1 = box1 + 1;
             if (box1 > 0) {
                 await playSol(mouse);
             }
@@ -357,23 +358,26 @@ describe("AST2BlockList Class", () => {
             [8, ["solfege", { "value": "sol" }], 0, 0, [7]],
             [9, ["number", { "value": 2 }], 0, 0, [7]],
             [10, "decrementOne", 0, 0, [2, 11, 12]],
-            [11, ["text", { "value": "box1" }], 0, 0, [10]],
-            [12, "if", 0, 0, [10, 13, 16, null]],
-            [13, "greater", 0, 0, [12, 14, 15]],
-            [14, ["namedbox", { "value": "box1" }], 0, 0, [13]],
-            [15, ["number", { "value": 0 }], 0, 0, [13]],
-            [16, ["nameddo", { "value": "playSol" }], 0, 0, [12, null]],
-            [17, "start", 500, 200, [null, 18, null]],
-            [18, ["storein2", { "value": "box1" }], 0, 0, [17, 19, 24]],
-            [19, "multiply", 0, 0, [18, 20, 23]],
-            [20, "abs", 0, 0, [19, 21]],
-            [21, "neg", 0, 0, [20, 22]],
-            [22, ["number", { "value": 2 }], 0, 0, [21]],
-            [23, ["number", { "value": 3 }], 0, 0, [19]],
-            [24, "vspace", 0, 0, [18, 25]],
-            [25, "settimbre", 0, 0, [24, 26, 27, null]],
-            [26, ["voicename", { "value": "electronic synth" }], 0, 0, [25]],
-            [27, ["nameddo", { "value": "playSol" }], 0, 0, [25, null]]
+            [11, ["namedbox", { "value": "box1" }], 0, 0, [10]],
+            [12, "increment", 0, 0, [10, 13, 14, 15]],
+            [13, ["namedbox", { "value": "box1" }], 0, 0, [12]],
+            [14, ["number", { "value": 1 }], 0, 0, [12]],
+            [15, "if", 0, 0, [12, 16, 19, null]],
+            [16, "greater", 0, 0, [15, 17, 18]],
+            [17, ["namedbox", { "value": "box1" }], 0, 0, [16]],
+            [18, ["number", { "value": 0 }], 0, 0, [16]],
+            [19, ["nameddo", { "value": "playSol" }], 0, 0, [15, null]],
+            [20, "start", 500, 200, [null, 21, null]],
+            [21, ["storein2", { "value": "box1" }], 0, 0, [20, 22, 27]],
+            [22, "multiply", 0, 0, [21, 23, 26]],
+            [23, "abs", 0, 0, [22, 24]],
+            [24, "neg", 0, 0, [23, 25]],
+            [25, ["number", { "value": 2 }], 0, 0, [24]],
+            [26, ["number", { "value": 3 }], 0, 0, [22]],
+            [27, "vspace", 0, 0, [21, 28]],
+            [28, "settimbre", 0, 0, [27, 29, 30, null]],
+            [29, ["voicename", { "value": "electronic synth" }], 0, 0, [28]],
+            [30, ["nameddo", { "value": "playSol" }], 0, 0, [28, null]]
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
