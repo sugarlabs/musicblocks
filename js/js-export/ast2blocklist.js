@@ -30,12 +30,9 @@
  *   let blockList = AST2BlockList.toBlockList(trees);
  */
 class AST2BlockList {
-    static ASTtoBlockList(AST) {
-        const Map = require('./ast2blocks.json');
-        // console.log(Map);
-        let trees = _ASTtoTree(AST, Map);
-        console.log(JSON.stringify(trees, null, 2));
-        return _TreetoBlockList(trees, Map);
+    static toBlockList(AST, config) {
+        let trees = _astToTree(AST, config);
+        return _treeToBlockList(trees, config);
 
         /**
          * Given a musicblocks AST ("type": "Program"), return an array of trees.
@@ -65,12 +62,12 @@ class AST2BlockList {
          * The entire block is to play a whole note Sol on guitar in the third octave.
          * 
          * @param {Object} AST - AST generated from JavaScript code
-         * @param {Array} Map - JSON config that maps AST to corresponding blocks
+         * @param {Array} config - JSON config that maps AST to corresponding blocks
          * @returns {Array} trees, see example above
          */
-        function _ASTtoTree(AST, Map) {
+        function _astToTree(AST, config) {
             // Load argument properties configuration
-            const argConfigs = Map.arguments;
+            const argConfigs = config.argument_blocks;
 
             // Implementation of toTrees(AST).
             let root = {};
@@ -102,19 +99,40 @@ class AST2BlockList {
             }
 
             function _matchBody(bodyAST) {
-                for (const entry of Map.body) {
+                for (const entry of config.body_blocks) {
                     if (!("ast" in entry)) continue;
-                    let ast = entry.ast;
+
+                    // Group identifiers by property path
+                    const propertyGroups = {};
+                    for (const identifier of entry.ast.identifiers) {
+                        if (!propertyGroups[identifier.property]) {
+                            propertyGroups[identifier.property] = [];
+                        }
+                        propertyGroups[identifier.property].push(identifier);
+                    }
+                    // Check if all property groups match
                     let matched = true;
-                    for (const identifier of ast.identifiers) {
-                        let value = _getPropertyValue(bodyAST, identifier.property);
-                        if ("value" in identifier) {
-                            if (value !== identifier.value) {
-                                matched = false;
+                    for (const [property, identifiers] of Object.entries(propertyGroups)) {
+                        const value = _getPropertyValue(bodyAST, property);
+                        let groupMatched = false;
+
+                        // Check if any identifier in this group matches
+                        for (const identifier of identifiers) {
+                            if ("value" in identifier) {
+                                if (value === identifier.value) {
+                                    groupMatched = true;
+                                    break;
+                                }
+                            } else if ("has_value" in identifier && ((!identifier.has_value && value == null) ||
+                                (identifier.has_value && value != null))) {
+                                groupMatched = true;
+                                break;
+                            } else if (!("has_value" in identifier) && identifier.size === value.length) {
+                                groupMatched = true;
                                 break;
                             }
-                        } else if ((!identifier.has_value && value != null)
-                            || (identifier.has_value && value == null)) {
+                        }
+                        if (!groupMatched) {
                             matched = false;
                             break;
                         }
@@ -123,7 +141,6 @@ class AST2BlockList {
                         return entry;
                     }
                 }
-                // TODO: error handling
                 return null;
             }
 
@@ -133,7 +150,12 @@ class AST2BlockList {
                     let matched = true;
                     for (const identifier of arg_type.identifiers) {
                         let value = _getPropertyValue(arg, identifier.property);
-                        if (value !== identifier.value) {
+                        if ("size" in identifier) {
+                            if (value.length !== identifier.size) {
+                                matched = false;
+                                break;
+                            }
+                        } else if (value !== identifier.value) {
                             matched = false;
                             break;
                         }
@@ -142,7 +164,6 @@ class AST2BlockList {
                         return entry;
                     }
                 }
-                // TODO: error handling
                 return null;
             }
 
@@ -155,20 +176,20 @@ class AST2BlockList {
                         end: bodyAST.end
                     };
                 }
-                if (pair.block === undefined) {
+                if (!("name" in pair)) {
                     return;
                 }
 
                 let node = {};
                 // Set block name
-                if (pair.block.name === "nameddo") {
-                    node["name"] = { "nameddo":  _getPropertyValue(bodyAST, pair.ast.name_property) };
+                if ("name_property" in pair.ast) {
+                    node["name"] = { [pair.name]: _getPropertyValue(bodyAST, pair.ast.name_property) };
                 } else {
-                    node["name"] = pair.block.name;
+                    node["name"] = pair.name;
                 }
 
                 // Set arguments
-                if (pair.ast.argument_properties !== undefined) {
+                if (pair.arguments !== undefined) {
                     let argArray = [];
                     for (const argPath of pair.ast.argument_properties) {
                         argArray.push(_getPropertyValue(bodyAST, argPath));
@@ -178,13 +199,19 @@ class AST2BlockList {
                         node["arguments"] = args;
                     }
                 }
-
                 // Set children
-                
                 if (pair.ast.children_properties !== undefined) {
                     for (const child of _getPropertyValue(bodyAST, pair.ast.children_properties[0])) {
                         if (child.type != "ReturnStatement") {
                             _createNodeAndAddToTree(child, node);
+                        }
+                    }
+                    if (pair.ast.children_properties.length > 1) {
+                        node["children"].push({ "name": "else" });
+                        for (const child of _getPropertyValue(bodyAST, pair.ast.children_properties[1])) {
+                            if (child.type != "ReturnStatement") {
+                                _createNodeAndAddToTree(child, node);
+                            }
                         }
                     }
                 }
@@ -201,28 +228,28 @@ class AST2BlockList {
                     let argNode = null;
 
                     // Find matching configuration for this argument type
-                    let config = null;
-                    config = _matchArgument(arg);
-                    if (!config) {
+                    let argConfig = _matchArgument(arg);
+                    if (!argConfig) {
                         throw {
                             prefix: `Unsupported argument type ${arg.type}: `,
                             start: arg.start,
                             end: arg.end
                         };
                     }
-                    if ("value_property" in config.ast) {
-                        argNode = _getPropertyValue(arg, config.ast.value_property);
-                    } else if (config.ast.identifier_property) {
-                        argNode = { "identifier": _getPropertyValue(arg, config.ast.identifier_property) };
+
+                    if ("value_property" in argConfig.ast) {
+                        argNode = _getPropertyValue(arg, argConfig.ast.value_property);
+                    } else if (argConfig.ast.identifier_property) {
+                        argNode = { "identifier": _getPropertyValue(arg, argConfig.ast.identifier_property) };
                     } else {
-                        const name = _getPropertyValue(arg, config.ast.name_property);
-                        if (name in config.name_map) {
-                            let blockName = config.name_map[name];
+                        const name = _getPropertyValue(arg, argConfig.ast.name_property);
+                        if (name in argConfig.name_map) {
+                            let blockName = argConfig.name_map[name];
                             let args = [];
-                            if ("arguments_property" in config.ast) {
-                                args = _getPropertyValue(arg, config.ast.arguments_property);
+                            if ("arguments_property" in argConfig.ast) {
+                                args = _getPropertyValue(arg, argConfig.ast.arguments_property);
                             } else {
-                                for (const property of config.ast.argument_properties) {
+                                for (const property of argConfig.ast.argument_properties) {
                                     args.push(_getPropertyValue(arg, property));
                                 }
                             }
@@ -230,15 +257,22 @@ class AST2BlockList {
                                 blockName = blockName[args.length];
                             }
                             if (blockName === undefined) {
-                                // TODO: handle error
-                            } else {
-                                argNode = {
-                                    "name": blockName,
-                                    "arguments": _createArgNode(args)
+                                throw {
+                                    prefix: `Unsupported argument count for ${name}: `,
+                                    start: arg.start,
+                                    end: arg.end
                                 };
                             }
+                            argNode = {
+                                "name": blockName,
+                                "arguments": _createArgNode(args)
+                            };
                         } else {
-                            // TODO: handle error
+                            throw {
+                                prefix: `Unsupported operator ${name}: `,
+                                start: arg.start,
+                                end: arg.end
+                            };
                         }
                     }
 
@@ -252,18 +286,43 @@ class AST2BlockList {
 
         /**
          * @param {Object} trees - trees generated from JavaScript AST by toTrees(AST)
-         * @param {Array} Map - JSON config that maps AST to corresponding blocks
+         * @param {Array} config - JSON config that maps AST to corresponding blocks
          * @returns {Array} a blockList that can loaded by musicblocks by calling `blocks.loadNewBlocks(blockList)`
          */
-        function _TreetoBlockList(trees, Map) {
+        function _treeToBlockList(trees, config) {
             // [1,"settimbre",0,0,[0,2,3,null]] or
             // [21,["nameddo",{"value":"action"}],421,82,[20]]
             function _propertyOf(block) {
                 const block_name = Array.isArray(block[1]) ? block[1][0] : block[1];
-                for (const entry of Map.body) {
-                    if (!("block" in entry)) continue;
-                    if ("name" in entry.block && entry.block.name === block_name) {
-                        return entry.block;
+                for (const entry of config.body_blocks) {
+                    if (!("blocklist_connections" in entry)) continue;
+                    if ("name" in entry && entry.name === block_name) {
+                        const connections = {
+                            count: entry.blocklist_connections.length
+                        };
+
+                        // Only add connection indices that exist
+                        const prevIndex = entry.blocklist_connections.indexOf("parent_or_previous_sibling");
+                        if (prevIndex !== -1) connections.prev = prevIndex;
+
+                        const childIndex = entry.blocklist_connections.indexOf("first_child");
+                        if (childIndex !== -1) connections.child = childIndex;
+
+                        const nextIndex = entry.blocklist_connections.indexOf("next_sibling");
+                        if (nextIndex !== -1) connections.next = nextIndex;
+
+                        const secondChildIndex = entry.blocklist_connections.indexOf("second_child");
+                        if (secondChildIndex !== -1) connections.second_child = secondChildIndex;
+
+                        return "body" in entry.default_vspaces ? {
+                            type: "block",
+                            connections: connections,
+                            vspaces: entry.default_vspaces.body
+                        } : {
+                            type: "block",
+                            connections: connections,
+                            argument_v_spaces: entry.default_vspaces.argument
+                        };
                     }
                 }
                 // doesn't match means it is a vspace block
@@ -340,28 +399,33 @@ class AST2BlockList {
                     let secondGroup = (elseIndex !== -1) ? node.children.slice(elseIndex + 1) : [];
 
                     // Process first children group
-                    console.log(property.connections);
                     let ret = _processChildren(firstGroup, argVSpaces - property.argument_v_spaces, blockList);
                     vspaces += ret.vspaces;
 
                     // Set child-parent connection for first group
-                    connections[property.connections["child"]] = ret.firstChildBlockNumber;
-                    let childBlock = blockList[ret.firstChildBlockNumber];
-                    property = _propertyOf(childBlock);
-                    childBlock[4][property.connections["prev"]] = blockNumber;
+                    if (property.connections.child !== undefined) {
+                        connections[property.connections.child] = ret.firstChildBlockNumber;
+                        let childBlock = blockList[ret.firstChildBlockNumber];
+                        let childProperty = _propertyOf(childBlock);
+                        if (childProperty.connections.prev !== undefined) {
+                            childBlock[4][childProperty.connections.prev] = blockNumber;
+                        }
+                    }
 
                     // Process second children group (else case in ifelse block)
                     if (elseIndex !== -1) {
                         let ret = _processChildren(secondGroup, 0, blockList);
                         vspaces += ret.vspaces;
                         // Set child-parent connection for second group
-                        connections[property.connections["child"] + 1] = ret.firstChildBlockNumber;
-                        let childBlock = blockList[ret.firstChildBlockNumber];
-                        property = _propertyOf(childBlock);
-                        childBlock[4][property.connections["prev"]] = blockNumber;
+                        if (property.connections.second_child !== undefined) {
+                            connections[property.connections.second_child] = ret.firstChildBlockNumber;
+                            let childBlock = blockList[ret.firstChildBlockNumber];
+                            let childProperty = _propertyOf(childBlock);
+                            if (childProperty.connections.prev !== undefined) {
+                                childBlock[4][childProperty.connections.prev] = blockNumber;
+                            }
+                        }
                     }
-                    // For blocks with children, add 1 to vspaces for the end of the clamp.
-                    vspaces += 1;
                 }
 
                 return { "blockNumber": blockNumber, "vspaces": vspaces };
@@ -395,13 +459,17 @@ class AST2BlockList {
                 for (let i = 1; i < childBlockNumbers.length; i++) {
                     let childBlock = blockList[childBlockNumbers[i]];
                     let property = _propertyOf(childBlock);
-                    childBlock[4][property.connections["prev"]] = childBlockNumbers[i - 1];
+                    if (property.connections.prev !== undefined) {
+                        childBlock[4][property.connections.prev] = childBlockNumbers[i - 1];
+                    }
                 }
                 // Set the next sibling block number for the children, except the last one
                 for (let i = 0; i < childBlockNumbers.length - 1; i++) {
                     let childBlock = blockList[childBlockNumbers[i]];
                     let property = _propertyOf(childBlock);
-                    childBlock[4][property.connections["next"]] = childBlockNumbers[i + 1];
+                    if (property.connections.next !== undefined) {
+                        childBlock[4][property.connections.next] = childBlockNumbers[i + 1];
+                    }
                 }
                 return { "firstChildBlockNumber": childBlockNumbers[0], "vspaces": vspaces };
             }
@@ -427,10 +495,39 @@ class AST2BlockList {
                 let property = _propertyOf(block);
                 let vspaces = 0;
 
-                // Process each argument with its corresponding handler
+                // Find the block configuration
+                const block_name = Array.isArray(block[1]) ? block[1][0] : block[1];
+                let blockConfig = null;
+                for (const entry of config.body_blocks) {
+                    if (entry.name === block_name) {
+                        blockConfig = entry;
+                        break;
+                    }
+                }
+
+                if (!blockConfig || !blockConfig.arguments) {
+                    throw new Error(`Cannot find argument configuration for: ${block_name}`);
+                }
+
+                // Process each argument with its corresponding configuration
                 for (let i = 0; i < node.arguments.length; i++) {
                     const arg = node.arguments[i];
-                    vspaces += _addNthValueArgToBlockList(arg, i + 1, blockList, parentBlockNumber);
+                    const argConfig = blockConfig.arguments[i];
+                    if (argConfig.type === "note_or_solfege") {
+                        // Handle pitch notes (solfege or note names)
+                        const notes = new Set(["A", "B", "C", "D", "E", "F", "G"]);
+                        vspaces += _addNthArgToBlockList(
+                            [notes.has(arg.charAt(0)) ? "notename" : "solfege", { "value": arg }],
+                            i + 1, blockList, parentBlockNumber);
+                    } else if (argConfig.type === "ValueExpression") {
+                        // Handle value expressions (like storein2)
+                        vspaces += _addNthValueArgToBlockList(arg, i + 1, blockList, parentBlockNumber);
+                    } else if (argConfig.type === "NumberExpression" || argConfig.type === "BooleanExpression") {
+                        // Handle number/boolean expressions
+                        vspaces += _addNthValueArgToBlockList(arg, i + 1, blockList, parentBlockNumber);
+                    } else {
+                        vspaces += _addNthArgToBlockList([argConfig.type, { "value": typeof arg === "object" ? arg.identifier : arg }], i + 1, blockList, parentBlockNumber);
+                    }
                 }
                 return vspaces;
             }

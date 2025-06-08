@@ -453,7 +453,7 @@ class JSEditor {
 
         try {
             let ast = acorn.parse(this._code, { ecmaVersion: 2020 });
-            let blockList = AST2BlockList.ASTtoBlockList(ast);
+            let blockList = AST2BlockList.toBlockList(ast, ast2blocklist_config);
             const activity = this.activity;
             // Wait for the old blocks to be removed, then load new blocks.
             const __listener = (event) => {

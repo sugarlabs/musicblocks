@@ -1,6 +1,7 @@
 {
-    "arguments": [
+    "argument_blocks": [
         {
+            "comment": "Variable name like 'box1' in the Boxes palette or action name like 'action' in the Action palette",
             "ast": {
                 "identifiers": [
                     {
@@ -12,6 +13,7 @@
             }
         },
         {
+            "comment": "Number expression like '1 / 4' in the Number palette or boolean expressions like 'box1 >= 0' in the Boolean palette",
             "ast": {
                 "identifiers": [
                     {
@@ -43,6 +45,7 @@
             }
         },
         {
+            "comment": "Unary expressions such as ! in boolean palette or - in number palette",
             "ast": {
                 "identifiers": [
                     {
@@ -61,6 +64,7 @@
             }
         },
         {
+            "comment": "Literals such as numbers or booleans or strings",
             "ast": {
                 "identifiers": [
                     {
@@ -72,6 +76,7 @@
             }
         },
         {
+            "comment": "Dictionary get function for 2 arguments",
             "ast": {
                 "identifiers": [
                     {
@@ -87,25 +92,60 @@
                         "value": "MemberExpression"
                     },
                     {
-                        "property": "argument.callee.object.type",
-                        "value": "Identifier"
+                        "property": "argument.callee.property.name",
+                        "value": "getValue"
+                    },
+                    {
+                        "property": "argument.arguments",
+                        "size": 2
                     }
                 ],
                 "name_property": "argument.callee.property.name",
-                "arguments_property": "arguments"
+                "argument_properties": [
+                    "argument.arguments[1]",
+                    "argument.arguments[0]"
+                ]
             },
             "name_map": {
-                "setValue": {
-                    "3": "setDict",
-                    "2": "setDict2"
-                },
-                "getValue": {
-                    "2": "getDict",
-                    "1": "getDict2"
-                }
+                "getValue": "getDict"
             }
         },
         {
+            "comment": "Dictionary get function for 1 argument",
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "argument.callee.property.name",
+                        "value": "getValue"
+                    },
+                    {
+                        "property": "argument.arguments",
+                        "size": 1
+                    }
+                ],
+                "name_property": "argument.callee.property.name",
+                "argument_properties": [
+                    "argument.arguments[0]"
+                ]
+            },
+            "name_map": {
+                "getValue": "getDict2"
+            }
+        },
+        {
+            "comment": "Skip, this is for children",
             "ast": {
                 "identifiers": [
                     {
@@ -116,6 +156,7 @@
             }
         },
         {
+            "comment": "Math operators such as absolute value or square",
             "ast": {
                 "identifiers": [
                     {
@@ -146,6 +187,7 @@
             }
         },
         {
+            "comment": "Math utility operators such as distance or random",
             "ast": {
                 "identifiers": [
                     {
@@ -175,7 +217,7 @@
             }
         }
     ],
-    "body": [
+    "body_blocks": [
         {
             "comments": "run is ignored",
             "ast": {
@@ -204,7 +246,13 @@
             }
         },
         {
-            "comments": "Boxes palette variable declaration",
+            "name": "storein2",
+            "comments": "Variable assignment in the Boxes palette like 'var box1 = 2 * 5;'",
+            "arguments": [
+                {
+                    "type": "ValueExpression"
+                }
+            ],
             "ast": {
                 "identifiers": [
                     {
@@ -214,32 +262,131 @@
                     {
                         "property": "declarations[0].init.type",
                         "value": "Literal"
+                    },
+                    {
+                        "property": "declarations[0].init.type",
+                        "value": "BinaryExpression"
+                    },
+                    {
+                        "property": "declarations[0].init.type",
+                        "value": "UnaryExpression"
+                    },
+                    {
+                        "property": "declarations[0].init.type",
+                        "value": "CallExpression"
                     }
-                ],
-                "argument_properties": [
-                    "declarations[0].init"
                 ],
                 "name_property": "declarations[0].id.name",
-                "name": "storein2"
+                "argument_properties": [
+                    "declarations[0].init"
+                ]
             },
-            "block": {
-                "type": "custom",
-                "name": "storein2",
-                "arguments": [
-                    {
-                        "type": "value_expression"
-                    }
-                ],
-                "connections": {
-                    "count": 3,
-                    "prev": 0,
-                    "next": 2
-                },
-                "vspaces": 1
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "body": 1
             }
         },
         {
-            "comments": "set instrument block",
+            "name": "decrementOne",
+            "comments": "Decrement by one block in the Boxes palette 'box1 = box1 - 1;'",
+            "arguments": [
+                {
+                    "type": "text"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AssignmentExpression"
+                    },
+                    {
+                        "property": "expression.right.type",
+                        "value": "BinaryExpression"
+                    },
+                    {
+                        "property": "expression.right.operator",
+                        "value": "-"
+                    },
+                    {
+                        "property": "expression.right.right.value",
+                        "value": 1
+                    }
+                ],
+                "argument_properties": [
+                    "expression.left"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "body": 1
+            }
+        },
+        {
+            "name": "increment",
+            "comments": "Increment block in the Boxes palette 'box1 = box1 + 3;'",
+            "arguments": [
+                {
+                    "type": "text"
+                },
+                {
+                    "type": "NumberExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AssignmentExpression"
+                    },
+                    {
+                        "property": "expression.right.type",
+                        "value": "BinaryExpression"
+                    },
+                    {
+                        "property": "expression.right.operator",
+                        "value": "+"
+                    }
+                ],
+                "argument_properties": [
+                    "expression.left",
+                    "expression.right.right"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "argument",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "body": 2
+            }
+        },
+        {
+            "name": "settimbre",
+            "comments": "Set instrument block",
+            "arguments": [
+                {
+                    "type": "voicename"
+                }
+            ],
             "ast": {
                 "identifiers": [
                     {
@@ -270,25 +417,24 @@
                     "expression.argument.arguments[1].body.body"
                 ]
             },
-            "block": {
-                "type": "block",
-                "name": "settimbre",
-                "arguments": [
-                    {
-                        "type": "voicename"
-                    }
-                ],
-                "connections": {
-                    "count": 4,
-                    "prev": 0,
-                    "child": 2,
-                    "next": 3
-                },
-                "argument_v_spaces": 1
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "first_child",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "argument": 1
             }
         },
         {
-            "comments": "note block",
+            "name": "newnote",
+            "comments": "Note block in the Rhythm palette",
+            "arguments": [
+                {
+                    "type": "NumberExpression"
+                }
+            ],
             "ast": {
                 "identifiers": [
                     {
@@ -319,25 +465,263 @@
                     "expression.argument.arguments[1].body.body"
                 ]
             },
-            "block": {
-                "type": "block",
-                "name": "newnote",
-                "arguments": [
-                    {
-                        "type": "number_expression"
-                    }
-                ],
-                "connections": {
-                    "count": 4,
-                    "prev": 0,
-                    "child": 2,
-                    "next": 3
-                },
-                "argument_v_spaces": 1
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "first_child",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "argument": 1
             }
         },
         {
-            "comments": "pitch block",
+            "name": "rhythmicdot2",
+            "comments": "Dot block in the Rhythm palette",
+            "arguments": [
+                {
+                    "type": "NumberExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "dot"
+                    }
+                ],
+                "argument_properties": [
+                    "expression.argument.arguments[0]"
+                ],
+                "children_properties": [
+                    "expression.argument.arguments[1].body.body"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "first_child",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "argument": 1
+            }
+        },
+        {
+            "name": "tie",
+            "comments": "Tie block in the Rhythm palette",
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "tie"
+                    }
+                ],
+                "children_properties": [
+                    "expression.argument.arguments[0].body.body"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "first_child",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "argument": 0
+            }
+        },
+        {
+            "name": "multiplybeatfactor",
+            "comments": "Multiply note value block in the Rhythm palette",
+            "arguments": [
+                {
+                    "type": "NumberExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "multiplyNoteValue"
+                    }
+                ],
+                "argument_properties": [
+                    "expression.argument.arguments[0]"
+                ],
+                "children_properties": [
+                    "expression.argument.arguments[1].body.body"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "first_child",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "argument": 1
+            }
+        },
+        {
+            "name": "newswing2",
+            "comments": "Swing block in the Rhythm palette",
+            "arguments": [
+                {
+                    "type": "NumberExpression"
+                },
+                {
+                    "type": "NumberExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "swing"
+                    }
+                ],
+                "argument_properties": [
+                    "expression.argument.arguments[0]",
+                    "expression.argument.arguments[1]"
+                ],
+                "children_properties": [
+                    "expression.argument.arguments[2].body.body"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "argument",
+                "first_child",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "argument": 2
+            }
+        },
+        {
+            "name": "osctime",
+            "comments": "Millisecond note block in the Rhythm palette",
+            "arguments": [
+                {
+                    "type": "NumberExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "playNoteMillis"
+                    }
+                ],
+                "argument_properties": [
+                    "expression.argument.arguments[0]"
+                ],
+                "children_properties": [
+                    "expression.argument.arguments[1].body.body"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "first_child",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "argument": 1
+            }
+        },
+        {
+            "name": "pitch",
+            "comments": "Pitch block",
+            "arguments": [
+                {
+                    "type": "note_or_solfege"
+                },
+                {
+                    "type": "NumberExpression"
+                }
+            ],
             "ast": {
                 "identifiers": [
                     {
@@ -366,26 +750,98 @@
                     "expression.argument.arguments[1]"
                 ]
             },
-            "block": {
-                "type": "block",
-                "name": "pitch",
-                "arguments": [
-                    {
-                        "type": "note_or_solfege"
-                    },
-                    {
-                        "type": "number_expression"
-                    }
-                ],
-                "connections": {
-                    "count": 4,
-                    "prev": 0,
-                    "next": 3
-                },
-                "vspaces": 2
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "argument",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "body": 2
             }
         },
         {
+            "name": "hertz",
+            "comments": "Hertz block",
+            "arguments": [
+                {
+                    "type": "NumberExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "playHertz"
+                    }
+                ],
+                "argument_properties": [
+                    "expression.argument.arguments[0]"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "argument",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "body": 1
+            }
+        },
+        {
+            "name": "rest2",
+            "comments": "Rest block",
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "playRest"
+                    }
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "body": 1
+            }
+        },
+        {
+            "name": "nameddo",
             "comments": "Action palette, async block",
             "ast": {
                 "identifiers": [
@@ -408,19 +864,17 @@
                 ],
                 "name_property": "expression.argument.callee.name"
             },
-            "block": {
-                "type": "custom",
-                "name": "nameddo",
-                "connections": {
-                    "count": 2,
-                    "prev": 0,
-                    "next": 1
-                },
-                "vspaces": 1
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "body": 1
             }
         },
         {
-            "comments": "start block",
+            "name": "start",
+            "comments": "Start block in the Flow palette",
             "ast": {
                 "identifiers": [
                     {
@@ -436,18 +890,23 @@
                     "expression.arguments[0].body.body"
                 ]
             },
-            "block": {
-                "type": "block",
-                "name": "start",
-                "connections": {
-                    "count": 3,
-                    "child": 1
-                },
-                "argument_v_spaces": 1
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "first_child",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "argument": 1
             }
         },
         {
-            "comments": "action block",
+            "name": "action",
+            "comments": "Action block in the Action palette",
+            "arguments": [
+                {
+                    "type": "text"
+                }
+            ],
             "ast": {
                 "identifiers": [
                     {
@@ -466,23 +925,24 @@
                     "declarations[0].init.body.body"
                 ]
             },
-            "block": {
-                "type": "block",
-                "name": "action",
-                "arguments": [
-                    {
-                        "type": "text"
-                    }
-                ],
-                "connections": {
-                    "count": 4,
-                    "child": 2
-                },
-                "argument_v_spaces": 1
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "first_child",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "argument": 1
             }
         },
         {
-            "comments": "repeat block",
+            "name": "repeat",
+            "comments": "Repeat block in the Flow palette",
+            "arguments": [
+                {
+                    "type": "NumberExpression"
+                }
+            ],
             "ast": {
                 "identifiers": [
                     {
@@ -497,25 +957,229 @@
                     "body.body"
                 ]
             },
-            "block": {
-                "type": "block",
-                "name": "repeat",
-                "arguments": [
-                    {
-                        "type": "number_expression"
-                    }
-                ],
-                "connections": {
-                    "count": 4,
-                    "prev": 0,
-                    "child": 2,
-                    "next": 3
-                },
-                "argument_v_spaces": 1
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "first_child",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "argument": 1
             }
         },
         {
-            "comments": "basic if block",
+            "name": "forever",
+            "comments": "Forever block in the Flow palette",
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "WhileStatement"
+                    },
+                    {
+                        "property": "test.raw",
+                        "value": "1000"
+                    }
+                ],
+                "children_properties": [
+                    "body.body"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "first_child",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "argument": 1
+            }
+        },
+        {
+            "name": "while",
+            "comments": "While block in the Flow palette",
+            "arguments": [
+                {
+                    "type": "BooleanExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "WhileStatement"
+                    }
+                ],
+                "argument_properties": [
+                    "test"
+                ],
+                "children_properties": [
+                    "body.body"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "first_child",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "argument": 2
+            }
+        },
+        {
+            "name": "until",
+            "comments": "Do While block in the Flow palette",
+            "arguments": [
+                {
+                    "type": "BooleanExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "DoWhileStatement"
+                    }
+                ],
+                "argument_properties": [
+                    "test"
+                ],
+                "children_properties": [
+                    "body.body"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "first_child",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "argument": 2
+            }
+        },
+        {
+            "name": "switch",
+            "comments": "Switch block in the Flow palette",
+            "arguments": [
+                {
+                    "type": "NumberExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "SwitchStatement"
+                    }
+                ],
+                "argument_properties": [
+                    "discriminant"
+                ],
+                "children_properties": [
+                    "cases"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "first_child",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "argument": 1
+            }
+        },
+        {
+            "name": "defaultcase",
+            "comments": "Default case block in the Flow palette",
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "SwitchCase"
+                    },
+                    {
+                        "property": "test",
+                        "has_value": false
+                    }
+                ],
+                "children_properties": [
+                    "consequent"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "first_child",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "argument": 1
+            }
+        },
+        {
+            "name": "case",
+            "comments": "Case block in the Flow palette",
+            "arguments": [
+                {
+                    "type": "NumberExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "SwitchCase"
+                    },
+                    {
+                        "property": "test.type",
+                        "value": "Literal"
+                    }
+                ],
+                "argument_properties": [
+                    "test"
+                ],
+                "children_properties": [
+                    "consequent"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "first_child",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "argument": 1
+            }
+        },
+        {
+            "name": "break",
+            "comments": "Break block in the Flow palette",
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "BreakStatement"
+                    }
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "body": 1
+            }
+        },
+        {
+            "name": "if",
+            "comments": "Basic if block in the Flow palette",
+            "arguments": [
+                {
+                    "type": "BooleanExpression"
+                }
+            ],
             "ast": {
                 "identifiers": [
                     {
@@ -534,25 +1198,24 @@
                     "consequent.body"
                 ]
             },
-            "block": {
-                "type": "block",
-                "name": "if",
-                "arguments": [
-                    {
-                        "type": "boolean_expression"
-                    }
-                ],
-                "connections": {
-                    "count": 4,
-                    "prev": 0,
-                    "child": 2,
-                    "next": 3
-                },
-                "argument_v_spaces": 2
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "first_child",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "argument": 2
             }
         },
         {
-            "comments": "if then else block",
+            "name": "ifthenelse",
+            "comments": "If-then-else block in the Flow palette",
+            "arguments": [
+                {
+                    "type": "BooleanExpression"
+                }
+            ],
             "ast": {
                 "identifiers": [
                     {
@@ -572,21 +1235,174 @@
                     "alternate.body"
                 ]
             },
-            "block": {
-                "type": "block",
-                "name": "ifthenelse",
-                "arguments": [
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "first_child",
+                "second_child",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "argument": 2
+            }
+        },
+        {
+            "name": "crescendo",
+            "comments": "Crescendo block in the Volume palette",
+            "arguments": [
+                {
+                    "type": "NumberExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
                     {
-                        "type": "boolean_expression"
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "doCrescendo"
                     }
                 ],
-                "connections": {
-                    "count": 5,
-                    "prev": 0,
-                    "child": 2,
-                    "next": 4
+                "argument_properties": [
+                    "expression.argument.arguments[0]"
+                ],
+                "children_properties": [
+                    "expression.argument.arguments[1].body.body"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "first_child",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "argument": 1
+            }
+        },
+        {
+            "name": "setDict",
+            "comment": "Set value block for dictionary, with specific dictionary",
+            "arguments": [
+                {
+                    "type": "text"
                 },
-                "argument_v_spaces": 2
+                {
+                    "type": "text"
+                },
+                {
+                    "type": "NumberExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "setValue"
+                    },
+                    {
+                        "property": "expression.argument.arguments",
+                        "size": 3
+                    }
+                ],
+                "argument_properties": [
+                    "expression.argument.arguments[2]",
+                    "expression.argument.arguments[0]",
+                    "expression.argument.arguments[1]"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "argument",
+                "argument",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "body": 3
+            }
+        },
+        {
+            "name": "setDict2",
+            "comment": "Dictionary blocks, the set functions",
+            "arguments": [
+                {
+                    "type": "text"
+                },
+                {
+                    "type": "NumberExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "setValue"
+                    },
+                    {
+                        "property": "expression.argument.arguments",
+                        "size": 2
+                    }
+                ],
+                "argument_properties": [
+                    "expression.argument.arguments[0]",
+                    "expression.argument.arguments[1]"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "argument",
+                "next_sibling"
+            ],
+            "default_vspaces": {
+                "body": 2
             }
         }
     ]
