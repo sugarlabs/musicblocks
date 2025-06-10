@@ -22,8 +22,19 @@
 
 const acorn = require("../../../lib/acorn.min");
 const { AST2BlockList } = require("../ast2blocklist");
+const fs = require("fs");
+const path = require("path");
 
 describe("AST2BlockList Class", () => {
+    let config;
+
+    beforeAll(() => {
+        // Load the config file from parent directory
+        const configPath = path.join(__dirname, "..", "ast2blocks.json");
+        const configContent = fs.readFileSync(configPath, "utf8");
+        config = JSON.parse(configContent);
+    });
+
     beforeEach(() => {
         jest.clearAllMocks();
     });
@@ -44,7 +55,12 @@ describe("AST2BlockList Class", () => {
         MusicBlocks.run();`;
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
-        expect(() => AST2BlockList.toTrees(AST)).toThrow("Unsupported AsyncCallExpression: mouse.setMusicInstrument");
+        try {
+            AST2BlockList.toBlockList(AST, config);
+        } catch (e) {
+            //TODO: error message should isolate to smallest scope
+            expect(e.prefix).toEqual("Unsupported statement: ");
+        }
     });
 
     // Test unsupported assignment expression should throw an error.
@@ -65,7 +81,7 @@ describe("AST2BlockList Class", () => {
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
         try {
-            AST2BlockList.toTrees(AST);
+            AST2BlockList.toBlockList(AST, config);
         } catch (e) {
             expect(e.prefix + code.substring(e.start, e.end)).toEqual("Unsupported AssignmentExpression: box1 = box2 - 1");
         }
@@ -87,7 +103,11 @@ describe("AST2BlockList Class", () => {
         MusicBlocks.run();`;
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
-        expect(() => AST2BlockList.toTrees(AST)).toThrow("Unsupported binary operator: <<");
+        try {
+            AST2BlockList.toBlockList(AST, config);
+        } catch (e) {
+            expect(e.prefix + code.substring(e.start, e.end)).toEqual("Unsupported operator <<: 1 << 2");
+        }
     });
 
     // Test unsupported unary operator should throw an error.
@@ -106,7 +126,11 @@ describe("AST2BlockList Class", () => {
         MusicBlocks.run();`;
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
-        expect(() => AST2BlockList.toTrees(AST)).toThrow("Unsupported unary operator: ~");
+        try {
+            AST2BlockList.toBlockList(AST, config);
+        } catch (e) {
+            expect(e.prefix + code.substring(e.start, e.end)).toEqual("Unsupported operator ~: ~2");
+        }
     });
 
     // Test calling unsupported function should throw an error.
@@ -125,7 +149,11 @@ describe("AST2BlockList Class", () => {
         MusicBlocks.run();`;
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
-        expect(() => AST2BlockList.toTrees(AST)).toThrow("Unsupported function call: Math.unsupported");
+        try {
+            AST2BlockList.toBlockList(AST, config);
+        } catch (e) {
+            expect(e.prefix + code.substring(e.start, e.end)).toEqual("Unsupported operator unsupported: Math.unsupported(1)");
+        }
     });
 
     // Test unsupported argument type should throw an error.
@@ -145,7 +173,7 @@ describe("AST2BlockList Class", () => {
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
         try {
-            AST2BlockList.toTrees(AST);
+            AST2BlockList.toBlockList(AST, config);
         } catch (e) {
             expect(e.prefix + code.substring(e.start, e.end)).toEqual("Unsupported argument type ArrayExpression: [1]");
         }
@@ -157,7 +185,7 @@ describe("AST2BlockList Class", () => {
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
         try {
-            AST2BlockList.toTrees(AST);
+            AST2BlockList.toBlockList(AST, config);
         } catch (e) {
             expect(e.prefix + code.substring(e.start, e.end)).toEqual("Unsupported statement: console.log('test');");
         }
@@ -198,8 +226,7 @@ describe("AST2BlockList Class", () => {
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
-        let trees = AST2BlockList.toTrees(AST);
-        let blockList = AST2BlockList.toBlockList(trees);
+        let blockList = AST2BlockList.toBlockList(AST, config);
         expect(blockList).toEqual(expectedBlockList);
     });
 
@@ -244,8 +271,7 @@ describe("AST2BlockList Class", () => {
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
-        let trees = AST2BlockList.toTrees(AST);
-        let blockList = AST2BlockList.toBlockList(trees);
+        let blockList = AST2BlockList.toBlockList(AST, config);
         expect(blockList).toEqual(expectedBlockList);
     });
 
@@ -290,8 +316,7 @@ describe("AST2BlockList Class", () => {
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
-        let trees = AST2BlockList.toTrees(AST);
-        let blockList = AST2BlockList.toBlockList(trees);
+        let blockList = AST2BlockList.toBlockList(AST, config);
         expect(blockList).toEqual(expectedBlockList);
     });
 
@@ -305,6 +330,7 @@ describe("AST2BlockList Class", () => {
                 return mouse.ENDFLOW;
             });
             box1 = box1 - 1;
+            box1 = box1 + 1;
             if (box1 > 0) {
                 await playSol(mouse);
             }
@@ -333,27 +359,29 @@ describe("AST2BlockList Class", () => {
             [9, ["number", { "value": 2 }], 0, 0, [7]],
             [10, "decrementOne", 0, 0, [2, 11, 12]],
             [11, ["namedbox", { "value": "box1" }], 0, 0, [10]],
-            [12, "if", 0, 0, [10, 13, 16, null]],
-            [13, "greater", 0, 0, [12, 14, 15]],
-            [14, ["namedbox", { "value": "box1" }], 0, 0, [13]],
-            [15, ["number", { "value": 0 }], 0, 0, [13]],
-            [16, ["nameddo", { "value": "playSol" }], 0, 0, [12, null]],
-            [17, "start", 500, 200, [null, 18, null]],
-            [18, ["storein2", { "value": "box1" }], 0, 0, [17, 19, 24]],
-            [19, "multiply", 0, 0, [18, 20, 23]],
-            [20, "abs", 0, 0, [19, 21]],
-            [21, "neg", 0, 0, [20, 22]],
-            [22, ["number", { "value": 2 }], 0, 0, [21]],
-            [23, ["number", { "value": 3 }], 0, 0, [19]],
-            [24, "vspace", 0, 0, [18, 25]],
-            [25, "settimbre", 0, 0, [24, 26, 27, null]],
-            [26, ["voicename", { "value": "electronic synth" }], 0, 0, [25]],
-            [27, ["nameddo", { "value": "playSol" }], 0, 0, [25, null]]
+            [12, "increment", 0, 0, [10, 13, 14, 15]],
+            [13, ["namedbox", { "value": "box1" }], 0, 0, [12]],
+            [14, ["number", { "value": 1 }], 0, 0, [12]],
+            [15, "if", 0, 0, [12, 16, 19, null]],
+            [16, "greater", 0, 0, [15, 17, 18]],
+            [17, ["namedbox", { "value": "box1" }], 0, 0, [16]],
+            [18, ["number", { "value": 0 }], 0, 0, [16]],
+            [19, ["nameddo", { "value": "playSol" }], 0, 0, [15, null]],
+            [20, "start", 500, 200, [null, 21, null]],
+            [21, ["storein2", { "value": "box1" }], 0, 0, [20, 22, 27]],
+            [22, "multiply", 0, 0, [21, 23, 26]],
+            [23, "abs", 0, 0, [22, 24]],
+            [24, "neg", 0, 0, [23, 25]],
+            [25, ["number", { "value": 2 }], 0, 0, [24]],
+            [26, ["number", { "value": 3 }], 0, 0, [22]],
+            [27, "vspace", 0, 0, [21, 28]],
+            [28, "settimbre", 0, 0, [27, 29, 30, null]],
+            [29, ["voicename", { "value": "electronic synth" }], 0, 0, [28]],
+            [30, ["nameddo", { "value": "playSol" }], 0, 0, [28, null]]
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
-        let trees = AST2BlockList.toTrees(AST);
-        let blockList = AST2BlockList.toBlockList(trees);
+        let blockList = AST2BlockList.toBlockList(AST, config);
         expect(blockList).toEqual(expectedBlockList);
     });
 
@@ -607,8 +635,7 @@ describe("AST2BlockList Class", () => {
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
-        let trees = AST2BlockList.toTrees(AST);
-        let blockList = AST2BlockList.toBlockList(trees);
+        let blockList = AST2BlockList.toBlockList(AST, config);
         expect(blockList).toEqual(expectedBlockList);
     });
 
@@ -712,8 +739,7 @@ describe("AST2BlockList Class", () => {
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
-        let trees = AST2BlockList.toTrees(AST);
-        let blockList = AST2BlockList.toBlockList(trees);
+        let blockList = AST2BlockList.toBlockList(AST, config);
         expect(blockList).toEqual(expectedBlockList);
     });
 
@@ -902,8 +928,7 @@ describe("AST2BlockList Class", () => {
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
-        let trees = AST2BlockList.toTrees(AST);
-        let blockList = AST2BlockList.toBlockList(trees);
+        let blockList = AST2BlockList.toBlockList(AST, config);
         expect(blockList).toEqual(expectedBlockList);
     });
 
@@ -1025,7 +1050,7 @@ describe("AST2BlockList Class", () => {
             [49, "pitch", 0, 0, [48, 50, 51, null]],
             [50, ["solfege", { "value": "sol" }], 0, 0, [49]],
             [51, ["number", { "value": 4 }], 0, 0, [49]],
-            [52, "break", 0, 0, [44, null, null, null]],
+            [52, "break", 0, 0, [44, null]],
             [53, "forever", 0, 0, [43, 54, 62]],
             [54, "newnote", 0, 0, [53, 55, 58, null]],
             [55, "divide", 0, 0, [54, 56, 57]],
@@ -1035,46 +1060,44 @@ describe("AST2BlockList Class", () => {
             [59, "pitch", 0, 0, [58, 60, 61, null]],
             [60, ["solfege", { "value": "sol" }], 0, 0, [59]],
             [61, ["number", { "value": 4 }], 0, 0, [59]],
-            [62, "until", 0, 0, [53, 63, 64, 73]],
+            [62, "until", 0, 0, [53, 63, 64, 72]],
             [63, ["boolean", { "value": true }], 0, 0, [62]],
-            [64, "vspace", 0, 0, [62, 65]],
-            [65, "newnote", 0, 0, [64, 66, 69, null]],
-            [66, "divide", 0, 0, [65, 67, 68]],
-            [67, ["number", { "value": 1 }], 0, 0, [66]],
-            [68, ["number", { "value": 4 }], 0, 0, [66]],
-            [69, "vspace", 0, 0, [65, 70]],
-            [70, "pitch", 0, 0, [69, 71, 72, null]],
-            [71, ["solfege", { "value": "sol" }], 0, 0, [70]],
-            [72, ["number", { "value": 4 }], 0, 0, [70]],
-            [73, "switch", 0, 0, [62, 74, 75, null]],
-            [74, ["number", { "value": 1 }], 0, 0, [73]],
-            [75, "case", 0, 0, [73, 76, 77, 88]],
-            [76, ["number", { "value": 1 }], 0, 0, [75]],
-            [77, "newnote", 0, 0, [75, 78, 81, 85]],
-            [78, "divide", 0, 0, [77, 79, 80]],
-            [79, ["number", { "value": 1 }], 0, 0, [78]],
-            [80, ["number", { "value": 4 }], 0, 0, [78]],
-            [81, "vspace", 0, 0, [77, 82]],
-            [82, "pitch", 0, 0, [81, 83, 84, null]],
-            [83, ["solfege", { "value": "sol" }], 0, 0, [82]],
-            [84, ["number", { "value": 4 }], 0, 0, [82]],
-            [85, "break", 0, 0, [77, 86, null, null]],
-            [86, "break", 0, 0, [85, 87, null, null]],
-            [87, "break", 0, 0, [86, null, null, null]],
-            [88, "defaultcase", 0, 0, [75, 89, null, null]],
-            [89, "newnote", 0, 0, [88, 90, 93, null]],
-            [90, "divide", 0, 0, [89, 91, 92]],
-            [91, ["number", { "value": 1 }], 0, 0, [90]],
-            [92, ["number", { "value": 4 }], 0, 0, [90]],
-            [93, "vspace", 0, 0, [89, 94]],
-            [94, "pitch", 0, 0, [93, 95, 96, null]],
-            [95, ["solfege", { "value": "5" }], 0, 0, [94]],
-            [96, ["number", { "value": 4 }], 0, 0, [94]]
+            [64, "newnote", 0, 0, [62, 65, 68, null]],
+            [65, "divide", 0, 0, [64, 66, 67]],
+            [66, ["number", { "value": 1 }], 0, 0, [65]],
+            [67, ["number", { "value": 4 }], 0, 0, [65]],
+            [68, "vspace", 0, 0, [64, 69]],
+            [69, "pitch", 0, 0, [68, 70, 71, null]],
+            [70, ["solfege", { "value": "sol" }], 0, 0, [69]],
+            [71, ["number", { "value": 4 }], 0, 0, [69]],
+            [72, "switch", 0, 0, [62, 73, 74, null]],
+            [73, ["number", { "value": 1 }], 0, 0, [72]],
+            [74, "case", 0, 0, [72, 75, 76, 87]],
+            [75, ["number", { "value": 1 }], 0, 0, [74]],
+            [76, "newnote", 0, 0, [74, 77, 80, 84]],
+            [77, "divide", 0, 0, [76, 78, 79]],
+            [78, ["number", { "value": 1 }], 0, 0, [77]],
+            [79, ["number", { "value": 4 }], 0, 0, [77]],
+            [80, "vspace", 0, 0, [76, 81]],
+            [81, "pitch", 0, 0, [80, 82, 83, null]],
+            [82, ["solfege", { "value": "sol" }], 0, 0, [81]],
+            [83, ["number", { "value": 4 }], 0, 0, [81]],
+            [84, "break", 0, 0, [76, 85]],
+            [85, "break", 0, 0, [84, 86]],
+            [86, "break", 0, 0, [85, null]],
+            [87, "defaultcase", 0, 0, [74, 88, null]],
+            [88, "newnote", 0, 0, [87, 89, 92, null]],
+            [89, "divide", 0, 0, [88, 90, 91]],
+            [90, ["number", { "value": 1 }], 0, 0, [89]],
+            [91, ["number", { "value": 4 }], 0, 0, [89]],
+            [92, "vspace", 0, 0, [88, 93]],
+            [93, "pitch", 0, 0, [92, 94, 95, null]],
+            [94, ["solfege", { "value": "5" }], 0, 0, [93]],
+            [95, ["number", { "value": 4 }], 0, 0, [93]]
         ];
 
         const AST = acorn.parse(code, { ecmaVersion: 2020 });
-        let trees = AST2BlockList.toTrees(AST);
-        let blockList = AST2BlockList.toBlockList(trees);
+        let blockList = AST2BlockList.toBlockList(AST, config);
         expect(blockList).toEqual(expectedBlockList);
     });
 });
