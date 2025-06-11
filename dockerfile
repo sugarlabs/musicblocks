@@ -1,23 +1,40 @@
 # First stage: Build stage
-FROM python:3.9-slim AS build
+FROM node:18-slim AS build
 
 WORKDIR /app
 
-RUN useradd -m appuser
+# Install dependencies
+COPY package*.json ./
+RUN npm install
 
+# Copy source code
 COPY . .
 
-# Second stage: Final stage
-FROM python:3.9-slim
+# Run linting and tests
+RUN npm run lint
+RUN npm run test
 
-RUN useradd -m appuser
+# Second stage: Production stage
+FROM node:18-slim
 
 WORKDIR /app
 
+# Create non-root user
+RUN useradd -m appuser
+
+# Copy package files and install production dependencies
+COPY package*.json ./
+RUN npm install --production
+
+# Copy application files
 COPY --from=build /app /app
+
+# Set proper permissions
+RUN chown -R appuser:appuser /app
 
 USER appuser
 
 EXPOSE 3000
 
-CMD ["python", "-m", "http.server", "3000", "--bind", "0.0.0.0"]
+# Use the serve script which uses http-server
+CMD ["npm", "run", "serve"]
