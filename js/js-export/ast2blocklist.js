@@ -294,33 +294,38 @@ class AST2BlockList {
             function _propertyOf(block) {
                 const block_name = Array.isArray(block[1]) ? block[1][0] : block[1];
                 for (const entry of config.body_blocks) {
-                    if (!("blocklist_connections" in entry)) continue;
                     if ("name" in entry && entry.name === block_name) {
+                        // Use default_connections if blocklist_connections is not specified
                         const connections = {
-                            count: entry.blocklist_connections.length
+                            count: entry.blocklist_connections ? entry.blocklist_connections.length : config.default_connections.length
                         };
 
+                        // Get the connections array to use
+                        const connectionsArray = entry.blocklist_connections || config.default_connections;
+
                         // Only add connection indices that exist
-                        const prevIndex = entry.blocklist_connections.indexOf("parent_or_previous_sibling");
+                        const prevIndex = connectionsArray.indexOf("parent_or_previous_sibling");
                         if (prevIndex !== -1) connections.prev = prevIndex;
 
-                        const childIndex = entry.blocklist_connections.indexOf("first_child");
+                        const childIndex = connectionsArray.indexOf("first_child");
                         if (childIndex !== -1) connections.child = childIndex;
 
-                        const nextIndex = entry.blocklist_connections.indexOf("next_sibling");
+                        const nextIndex = connectionsArray.indexOf("next_sibling");
                         if (nextIndex !== -1) connections.next = nextIndex;
 
-                        const secondChildIndex = entry.blocklist_connections.indexOf("second_child");
+                        const secondChildIndex = connectionsArray.indexOf("second_child");
                         if (secondChildIndex !== -1) connections.second_child = secondChildIndex;
 
-                        return "body" in entry.default_vspaces ? {
+                        // Use default_vspaces if not specified in the block
+                        const vspaces = entry.default_vspaces || config.default_vspaces || { body: 1 };
+                        return "body" in vspaces ? {
                             type: "block",
                             connections: connections,
-                            vspaces: entry.default_vspaces.body
+                            vspaces: vspaces.body
                         } : {
                             type: "block",
                             connections: connections,
-                            argument_v_spaces: entry.default_vspaces.argument
+                            argument_v_spaces: vspaces.argument
                         };
                     }
                 }
