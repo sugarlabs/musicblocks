@@ -3920,9 +3920,9 @@ class Activity {
         };
         function HandleShortcutKey(event) {
             if ((event.ctrlKey || event.metaKey) && event.key === "z") {
-                console.log("button clicked")
+                console.log("button clicked");
                 event.preventDefault();
-                console.log("button clicked event.ctrlKey ${ event.key ")
+                console.log("button clicked event.ctrlKey ${ event.key ");
                 if (
                     activity.blocks &&
                     activity.blocks.trashStacks &&
@@ -3931,7 +3931,7 @@ class Activity {
                     // Restore the last trashed item
                     const lastBlockId = activity.blocks.trashStacks[activity.blocks.trashStacks.length - 1];
                     activity._restoreTrashById(lastBlockId);
-                    console.log(lastBlockId)
+                    console.log(lastBlockId);
 
                 } else {
                     activity.textMsg(_("Trash can is empty."), 3000);
@@ -3939,7 +3939,7 @@ class Activity {
             }
         }
 
-        document.addEventListener("keydown", HandleShortcutKey)
+        document.addEventListener("keydown", HandleShortcutKey);
 
         /*
          * Open aux menu
