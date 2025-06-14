@@ -1,6 +1,0 @@
-<?xml version="1.0" ?><!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.1//EN'  'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd' [
-	<!ENTITY stroke_color "#010101">
-	<!ENTITY fill_color "#FFFFFF">
-]><svg enable-background="new 0 0 55 55" height="55px" version="1.1" viewBox="0 0 55 55" width="55px" x="0px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" y="0px"><g display="block" id="zoom-groups">
-	<path d="M27.5,5C15.074,5,5,15.074,5,27.5S15.074,50,27.5,50   S50,39.926,50,27.5S39.926,5,27.5,5z M18.759,37.955c-2.618,0-4.745-2.127-4.745-4.746c0-2.621,2.125-4.745,4.745-4.745   s4.748,2.124,4.748,4.745C23.506,35.828,21.379,37.955,18.759,37.955z M27.5,22.625c-2.621,0-4.746-2.125-4.746-4.747   c0-2.618,2.125-4.742,4.746-4.742c2.623,0,4.748,2.123,4.748,4.742C32.246,20.501,30.121,22.625,27.5,22.625z M36.238,37.953   c-2.619,0-4.744-2.125-4.744-4.744c0-2.621,2.125-4.746,4.744-4.746c2.623,0,4.748,2.125,4.748,4.746   C40.986,35.828,38.861,37.953,36.238,37.953z" display="inline" fill="&fill_color;" id="zoom-groups_2_"/>
-</g></svg>
