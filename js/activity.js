@@ -3069,6 +3069,7 @@ class Activity {
             const KEYCODE_DOWN = 40;
             const DEL = 46;
             const V = 86;
+            const Z = 90;
             // Shortcuts for creating new notes
             const KEYCODE_D = 68; // do
             const KEYCODE_R = 82; // re
@@ -3171,6 +3172,15 @@ class Activity {
                         docById("paste").focus();
                         docById("paste").style.visibility = "visible";
                         this.update = true;
+                        break;
+                    case Z:
+                        if (this.blocks && this.blocks.trashStacks && this.blocks.trashStacks.length > 0) {
+                            const lastBlockId = this.blocks.trashStacks[this.blocks.trashStacks.length - 1];
+                            this._restoreTrashById(lastBlockId)
+                            console.log("button clicked", lastBlockId)
+                        } else {
+                            this.textMsg(_("Trash can is empty."), 3000)}
+                            console.log("block is empty")
                         break;
                 }
             } else if (event.shiftKey && !disableKeys) {
@@ -3918,28 +3928,6 @@ class Activity {
                 trashList.appendChild(trashView);
             }
         };
-        function HandleShortcutKey(event) {
-            if ((event.ctrlKey || event.metaKey) && event.key === "z") {
-                console.log("button clicked");
-                event.preventDefault();
-                console.log("button clicked event.ctrlKey ${ event.key ");
-                if (
-                    activity.blocks &&
-                    activity.blocks.trashStacks &&
-                    activity.blocks.trashStacks.length > 0
-                ) {
-                    // Restore the last trashed item
-                    const lastBlockId = activity.blocks.trashStacks[activity.blocks.trashStacks.length - 1];
-                    activity._restoreTrashById(lastBlockId);
-                    console.log(lastBlockId);
-
-                } else {
-                    activity.textMsg(_("Trash can is empty."), 3000);
-                }
-            }
-        }
-
-        document.addEventListener("keydown", HandleShortcutKey);
 
         /*
          * Open aux menu
