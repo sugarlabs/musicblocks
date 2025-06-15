@@ -3176,11 +3176,11 @@ class Activity {
                     case Z:
                         if (this.blocks && this.blocks.trashStacks && this.blocks.trashStacks.length > 0) {
                             const lastBlockId = this.blocks.trashStacks[this.blocks.trashStacks.length - 1];
-                            this._restoreTrashById(lastBlockId)
-                            console.log("button clicked", lastBlockId)
+                            this._restoreTrashById(lastBlockId);
+                            console.log("button clicked", lastBlockId);
                         } else {
-                            this.textMsg(_("Trash can is empty."), 3000)}
-                            console.log("block is empty")
+                            this.textMsg(_("Trash can is empty."), 3000);};
+                        console.log("block is empty");
                         break;
                 }
             } else if (event.shiftKey && !disableKeys) {
