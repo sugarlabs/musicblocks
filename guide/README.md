@@ -335,13 +335,59 @@ name `chunk0`, followed by `chunk1` twice, and then `chunk0` again.
 
 ![actions](./chunk-8.svg "creating a song using actions")
 
-![repeat](./chunk-7.svg "usage of Repeat block in a song")
+![multiple actions](./chunk-7.svg "usage of Repeat block in a song")
 
 A few more chunks and we can make a song. (Can you read the block
 notation well enough to guess the outcome? Are you familiar with the
 song we created?)
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725791527821787&run=True)
 
+### <a name="Heaps">3.1.1 Heaps</a>
+
+![step pitch](./Actions.svg, "How does heap perform function")
+
+A heap in Music Blocks is just like a stack of pancakes. Imagine you are making pancakes for breakfast. You make one
+pancake and place it on a plate. Then you make another one and stack it right on top of the first. Then you make a
+third
+pancake and put that one on top of the second. Now you have a tall stack of three pancakes — one on top of the other.
+
+When it’s time to eat, you don’t start from the bottom pancake. That would be really messy! Instead, you take the top
+pancake first, because it’s the easiest to grab. After you eat that, you take the next one underneath, and finally the
+last one at the bottom.
+
+That’s exactly how a heap works in Music Blocks. It remembers the things you put in it, like notes or numbers, but it
+always gives you back the last thing you added — just like how you eat the top pancake first. For example, if you push
+note 60 into a heap, then 62, then 64 — and then start popping them out — you’ll get 64 first, then 62, then 60.
+
+So, a heap is like your musical pancake stack: the last note you added is always the first one to play when you take
+it
+out. It's a fun and easy way to build backwards patterns or save notes for later. Just remember: heaps serve your
+notes
+like pancakes — from the top down!
+
+![repeat](./Heap.svg, "Used to get the latest element from the stack")
+
+Here, we are pushing each item onto the stack one by one. At the end of the process, we retrieve all the items from
+the stack. Each time this operation is executed, it ensures that both the previously stored items and the newly added
+ones are preserved. This behavior guarantees consistent stacking, allowing for cumulative data manipulation across
+multiple runs.
+
+
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1750094269803224&run=True)
+
+### <a name="box">3.1.2 Box</a>
+
+Boxes are parts inside a block that store the block’s data or connect it to other blocks.
+
+Every block in Music Blocks does something — like playing a note, repeating an action, or setting a value. But to do
+its
+job, a block often needs extra information (like how many times to repeat, which note to play, etc.).
+
+![action](./box.svg, "Illustration of boxes workflow in mb")
+
+In summary, the example illustrates the use of boxes as fundamental units for storing and manipulating data, with operations like push and print acting on them. This concept mirrors real-world programming, where variables and data structures are used to organize and process information efficiently. The simplicity of the example makes it a clear introduction to how boxes function in a computational context.
+
+[RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1750095844379975&run=True)
 
 ### <a name="PITCH-TRANSFORMATION">3.2 Pitch Transformations</a>
 
