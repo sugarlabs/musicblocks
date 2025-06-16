@@ -365,7 +365,7 @@ out. It's a fun and easy way to build backwards patterns or save notes for later
 notes
 like pancakes — from the top down!
 
-![repeat](./Heaps.svg, "Used to get the latest element from the stack")
+![repeat](./Heap.svg "Used to get the latest element from the stack")
 
 Here, we are pushing each item onto the stack one by one. At the end of the process, we retrieve all the items from
 the stack. Each time this operation is executed, it ensures that both the previously stored items and the newly added
