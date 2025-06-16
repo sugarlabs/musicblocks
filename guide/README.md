@@ -335,7 +335,7 @@ name `chunk0`, followed by `chunk1` twice, and then `chunk0` again.
 
 ![actions](./chunk-8.svg "creating a song using actions")
 
-![multiple actions](./chunk-7.svg "usage of Repeat block in a song")
+![repeat](./chunk-7.svg "usage of Repeat block in a song")
 
 A few more chunks and we can make a song. (Can you read the block
 notation well enough to guess the outcome? Are you familiar with the
@@ -365,7 +365,7 @@ out. It's a fun and easy way to build backwards patterns or save notes for later
 notes
 like pancakes — from the top down!
 
-![repeat](./Heap.svg, "Used to get the latest element from the stack")
+![repeat](./Heaps.svg, "Used to get the latest element from the stack")
 
 Here, we are pushing each item onto the stack one by one. At the end of the process, we retrieve all the items from
 the stack. Each time this operation is executed, it ensures that both the previously stored items and the newly added
@@ -2836,5 +2836,4 @@ Looking for a block? The tables below (one for beginner mode and one for advance
 | | 1/32 note | 
 | | 1/64 note |
 | | custom mode |
-
 [Back to Table of Contents](#table-of-contents)
