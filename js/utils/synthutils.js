@@ -2135,5 +2135,400 @@ function Synth() {
         return values;
     };
 
+    /**
+     * Starts the tuner by initializing microphone input
+     * @returns {Promise<void>}
+     */
+    this.startTuner = async () => {
+        await Tone.start();
+        this.tunerMic = new Tone.UserMedia();
+        await this.tunerMic.open();
+        
+        const analyser = new Tone.Analyser("waveform", 2048);
+        this.tunerMic.connect(analyser);
+        
+        const YIN = (sampleRate, bufferSize = 2048, threshold = 0.1) => {
+            // Low-Pass Filter to remove high-frequency noise
+            const lowPassFilter = (buffer, cutoff = 500) => {
+                const alpha = 2 * Math.PI * cutoff / sampleRate;
+                return buffer.map((sample, i, arr) =>
+                    i > 0 ? (alpha * sample + (1 - alpha) * arr[i - 1]) : sample
+                );
+            };
+
+            // Autocorrelation Function
+            const autocorrelation = (buffer) =>
+                buffer.map((_, lag) =>
+                    buffer.slice(0, buffer.length - lag).reduce(
+                        (sum, value, index) => sum + value * buffer[index + lag], 0
+                    )
+                );
+
+            // Difference Function
+            const difference = (buffer) => {
+                const autocorr = autocorrelation(buffer);
+                return autocorr.map((_, tau) => autocorr[0] + autocorr[tau] - 2 * autocorr[tau]);
+            };
+
+            // Cumulative Mean Normalized Difference Function
+            const cumulativeMeanNormalizedDifference = (diff) => {
+                let runningSum = 0;
+                return diff.map((value, tau) => {
+                    runningSum += value;
+                    return tau === 0 ? 1 : value / (runningSum / tau);
+                });
+            };
+
+            // Absolute Threshold Function
+            const absoluteThreshold = (cmnDiff) => {
+                for (let tau = 2; tau < cmnDiff.length; tau++) {
+                    if (cmnDiff[tau] < threshold) {
+                        while (tau + 1 < cmnDiff.length && cmnDiff[tau + 1] < cmnDiff[tau]) {
+                            tau++;
+                        }
+                        return tau;
+                    }
+                }
+                return -1;
+            };
+
+            // Parabolic Interpolation (More precision)
+            const parabolicInterpolation = (cmnDiff, tau) => {
+                const x0 = tau < 1 ? tau : tau - 1;
+                const x2 = tau + 1 < cmnDiff.length ? tau + 1 : tau;
+
+                if (x0 === tau) return cmnDiff[tau] <= cmnDiff[x2] ? tau : x2;
+                if (x2 === tau) return cmnDiff[tau] <= cmnDiff[x0] ? tau : x0;
+
+                const s0 = cmnDiff[x0], s1 = cmnDiff[tau], s2 = cmnDiff[x2];
+                const adjustment = ((x2 - x0) * (s0 - s2)) / (2 * (s0 - 2 * s1 + s2));
+
+                return tau + adjustment;
+            };
+
+            // Main Pitch Detection Function
+            return (buffer) => {
+                buffer = lowPassFilter(buffer, 300);
+                const diff = difference(buffer);
+                const cmnDiff = cumulativeMeanNormalizedDifference(diff);
+                const tau = absoluteThreshold(cmnDiff);
+
+                if (tau === -1) return -1;
+
+                const tauInterp = parabolicInterpolation(cmnDiff, tau);
+                return sampleRate / tauInterp;
+            };
+        };
+
+        const detectPitch = YIN(Tone.context.sampleRate);
+        let tunerMode = 'chromatic'; // Add mode state
+        let targetPitch = { note: 'A4', frequency: 440 }; // Default target pitch
+
+        const updatePitch = () => {
+            const buffer = analyser.getValue();
+            const pitch = detectPitch(buffer);
+
+            if (pitch > 0) {
+                let note, cents;
+                
+                if (tunerMode === 'chromatic') {
+                    // Chromatic mode - use nearest note
+                    ({ note, cents } = frequencyToNote(pitch));
+                } else {
+                    // Target pitch mode - always compare to A4
+                    note = targetPitch.note;
+                    const centsFromA4 = 1200 * Math.log2(pitch / targetPitch.frequency);
+                    cents = Math.round(centsFromA4);
+                }
+                
+                // Debug logging
+                console.log({
+                    frequency: pitch.toFixed(1),
+                    detectedNote: note,
+                    centsDeviation: cents,
+                    mode: tunerMode
+                });
+                
+                // Initialize display elements if they don't exist
+                let noteDisplayContainer = document.getElementById("noteDisplayContainer");
+                const tunerContainer = document.getElementById("tunerContainer");
+                
+                if (!noteDisplayContainer && tunerContainer) {
+                    // Create container
+                    noteDisplayContainer = document.createElement("div");
+                    noteDisplayContainer.id = "noteDisplayContainer";
+                    noteDisplayContainer.style.position = "absolute";
+                    noteDisplayContainer.style.top = "35%";
+                    noteDisplayContainer.style.left = "50%";
+                    noteDisplayContainer.style.transform = "translate(-50%, -50%)";
+                    noteDisplayContainer.style.textAlign = "center";
+                    noteDisplayContainer.style.fontFamily = "Arial, sans-serif";
+                    noteDisplayContainer.style.zIndex = "1000";
+                    
+                    // Create mode toggle button
+                    const modeToggle = document.createElement("div");
+                    modeToggle.id = "modeToggle";
+                    modeToggle.style.position = "absolute";
+                    modeToggle.style.top = "10px";
+                    modeToggle.style.right = "10px";
+                    modeToggle.style.padding = "8px 12px";
+                    modeToggle.style.backgroundColor = "#4CAF50";
+                    modeToggle.style.color = "white";
+                    modeToggle.style.borderRadius = "20px";
+                    modeToggle.style.cursor = "pointer";
+                    modeToggle.style.fontSize = "14px";
+                    modeToggle.style.transition = "background-color 0.3s";
+                    modeToggle.textContent = "Chromatic Mode";
+                    
+                    // Add click handler for mode toggle
+                    modeToggle.addEventListener('click', () => {
+                        tunerMode = tunerMode === 'chromatic' ? 'target' : 'chromatic';
+                        modeToggle.textContent = `${tunerMode === 'chromatic' ? 'Chromatic' : 'Target Pitch'} Mode`;
+                        modeToggle.style.backgroundColor = tunerMode === 'chromatic' ? '#4CAF50' : '#2196F3';
+                    });
+                    
+                    tunerContainer.appendChild(modeToggle);
+                    
+                    // Create note display
+                    const noteText = document.createElement("div");
+                    noteText.id = "noteText";
+                    noteText.style.fontSize = "64px";
+                    noteText.style.fontWeight = "bold";
+                    noteText.style.marginBottom = "5px";
+                    
+                    // Create cents deviation display
+                    const centsText = document.createElement("div");
+                    centsText.id = "centsText";
+                    centsText.style.fontSize = "14px";
+                    centsText.style.color = "#666666";
+                    centsText.style.marginBottom = "5px";
+                    
+                    // Create tune direction display
+                    const tuneDirection = document.createElement("div");
+                    tuneDirection.id = "tuneDirection";
+                    tuneDirection.style.fontSize = "18px";
+                    tuneDirection.style.color = "#FF4500";
+                    
+                    // Append all elements
+                    noteDisplayContainer.appendChild(noteText);
+                    noteDisplayContainer.appendChild(centsText);
+                    noteDisplayContainer.appendChild(tuneDirection);
+                    tunerContainer.appendChild(noteDisplayContainer);
+                }
+                
+                // Update displays if they exist
+                if (noteDisplayContainer) {
+                    const noteText = document.getElementById("noteText");
+                    const centsText = document.getElementById("centsText");
+                    const tuneDirection = document.getElementById("tuneDirection");
+                    
+                    if (noteText) noteText.textContent = note;
+                    if (centsText) centsText.textContent = `${cents > 0 ? '+' : ''}${cents.toFixed(2)} cents`;
+                    
+                    if (tuneDirection) {
+                        if (Math.abs(cents) <= 5) {
+                            tuneDirection.textContent = "In tune";
+                            tuneDirection.style.color = "#00FF00";
+                        } else if (cents < 0) {
+                            tuneDirection.textContent = "Tune up";
+                            tuneDirection.style.color = "#FF4500";
+                        } else {
+                            tuneDirection.textContent = "Tune down";
+                            tuneDirection.style.color = "#FF4500";
+                        }
+                    }
+                }
+                
+                // Update tuner segments
+                const tunerSegments = document.querySelectorAll("#tunerContainer svg path");
+                
+                // Define colors for the gradient
+                const colors = {
+                    deepRed: "#FF0000",
+                    redOrange: "#FF4500",
+                    orange: "#FFA500",
+                    yellowOrange: "#FFB833",
+                    yellowGreen: "#9ACD32",
+                    brightGreen: "#00FF00",
+                    inactive: "#D3D3D3"  // Light gray
+                };
+
+                // Update tuner display
+                tunerSegments.forEach((segment, i) => {
+                    const segmentCents = (i - 5) * 10; // Each segment represents 10 cents
+                    
+                    // Default to inactive color
+                    let segmentColor = colors.inactive;
+                    
+                    // Calculate how far this segment is from the current cents value
+                    const absSegmentCents = Math.abs(segmentCents);
+                    const absCents = Math.abs(cents);
+                    
+                    // Determine if segment should be lit based on current cents value
+                    const shouldLight = cents < 0 ? 
+                        (segmentCents <= 0 && Math.abs(segmentCents) <= Math.abs(cents)) : // Flat side
+                        (segmentCents >= 0 && segmentCents <= cents); // Sharp side
+
+                    if (shouldLight || Math.abs(cents - segmentCents) <= 5) {
+                        // Center segment
+                        if (i === 5) {
+                            segmentColor = Math.abs(cents) <= 5 ? colors.brightGreen : colors.inactive;
+                        }
+                        // Flat side (segments 0-4)
+                        else if (i < 5) {
+                            switch(i) {
+                                case 0: segmentColor = colors.deepRed; break;
+                                case 1: segmentColor = colors.redOrange; break;
+                                case 2: segmentColor = colors.orange; break;
+                                case 3: segmentColor = colors.yellowOrange; break;
+                                case 4: segmentColor = colors.yellowGreen; break;
+                            }
+                        }
+                        // Sharp side (segments 6-10)
+                        else {
+                            switch(i) {
+                                case 6: segmentColor = colors.yellowGreen; break;
+                                case 7: segmentColor = colors.yellowOrange; break;
+                                case 8: segmentColor = colors.orange; break;
+                                case 9: segmentColor = colors.redOrange; break;
+                                case 10: segmentColor = colors.deepRed; break;
+                            }
+                        }
+                    }
+
+                    // Add transition effect for smooth color changes
+                    segment.style.transition = 'fill 0.1s ease-in-out';
+                    segment.setAttribute("fill", segmentColor);
+                });
+            }
+            
+            requestAnimationFrame(updatePitch);
+        };
+
+        updatePitch();
+    };
+
+    this.stopTuner = () => {
+        if (this.tunerMic) {
+            this.tunerMic.close();
+        }
+    };
+
+    const frequencyToNote = (frequency) => {
+        if (frequency <= 0) return { note: "---", cents: 0 };
+
+        const A4 = 440;
+        const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+
+        // Calculate how many half steps away from A4 (69 midi note)
+        const midiNote = 69 + 12 * Math.log2(frequency / A4);
+        
+        // Get the nearest note's MIDI number
+        let roundedMidi = Math.round(midiNote);
+        
+        // Calculate cents before rounding to nearest note
+        const cents = Math.round(100 * (midiNote - roundedMidi));
+        
+        // Adjust for edge cases where cents calculation puts us closer to the next note
+        if (cents > 50) {
+            roundedMidi++;
+        } else if (cents < -50) {
+            roundedMidi--;
+        }
+
+        // Get note name and octave
+        const noteIndex = ((roundedMidi % 12) + 12) % 12;
+        const octave = Math.floor((roundedMidi - 12) / 12);
+        const noteName = noteNames[noteIndex] + octave;
+
+        return { note: noteName, cents: cents };
+    };
+
+    /**
+     * Gets the current frequency from the tuner
+     * @returns {number} The detected frequency in Hz
+     */
+    this.getTunerFrequency = () => {
+        if (!this.tunerAnalyser) return 440; // Default to A4 if no analyser
+
+        const buffer = this.tunerAnalyser.getValue();
+        // TODO: Implement actual pitch detection algorithm
+        // For now, return a default value
+        return 440;
+    };
+
+    // Test function to verify tuner accuracy
+    this.testTuner = () => {
+        if (!window.AudioContext) {
+            console.error('Web Audio API not supported');
+            return;
+        }
+
+        const audioContext = new AudioContext();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        gainNode.gain.value = 0.1; // Low volume
+
+        // Test frequencies
+        const testCases = [
+            { freq: 440, expected: "A4" },    // A4 (in tune)
+            { freq: 442, expected: "A4" },    // A4 (sharp)
+            { freq: 438, expected: "A4" },    // A4 (flat)
+            { freq: 261.63, expected: "C4" }, // C4 (in tune)
+            { freq: 329.63, expected: "E4" }, // E4 (in tune)
+        ];
+
+        let currentTest = 0;
+        
+        const runTest = () => {
+            if (currentTest >= testCases.length) {
+                oscillator.stop();
+                console.log("Tuner tests completed");
+                return;
+            }
+
+            const test = testCases[currentTest];
+            console.log(`Testing frequency: ${test.freq}Hz (Expected: ${test.expected})`);
+            
+            oscillator.frequency.setValueAtTime(test.freq, audioContext.currentTime);
+            
+            currentTest++;
+            setTimeout(runTest, 2000); // Test each frequency for 2 seconds
+        };
+
+        oscillator.start();
+        runTest();
+    };
+
+    // Function to test specific frequencies
+    this.testSpecificFrequency = (frequency) => {
+        if (!window.AudioContext) {
+            console.error('Web Audio API not supported');
+            return;
+        }
+
+        const audioContext = new AudioContext();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        gainNode.gain.value = 0.1; // Low volume
+
+        oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+        oscillator.start();
+        
+        console.log(`Testing frequency: ${frequency}Hz`);
+        
+        // Stop after 3 seconds
+        setTimeout(() => {
+            oscillator.stop();
+            console.log("Test completed");
+        }, 3000);
+    };
+
     return this;
 }
