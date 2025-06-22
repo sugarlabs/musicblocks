@@ -43,7 +43,7 @@ TunerDisplay.prototype.draw = function() {
     
     // Draw the cents deviation
     ctx.font = '24px Arial';
-    ctx.fillText(this.cents + '¢', width / 2, height / 2 + 30);
+    ctx.fillText((this.cents >= 0 ? '+' : '') + Math.round(this.cents) + '¢', width / 2, height / 2 + 30);
     
     // Draw the frequency
     ctx.font = '18px Arial';

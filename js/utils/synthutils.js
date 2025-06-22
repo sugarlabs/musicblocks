@@ -2323,19 +2323,11 @@ function Synth() {
                     const tuneDirection = document.getElementById("tuneDirection");
                     
                     if (noteText) noteText.textContent = note;
-                    if (centsText) centsText.textContent = `${cents > 0 ? '+' : ''}${cents.toFixed(2)} cents`;
+                    if (centsText) centsText.textContent = `${cents > 0 ? '+' : ''}${Math.round(cents)} cents`;
                     
                     if (tuneDirection) {
-                        if (Math.abs(cents) <= 5) {
-                            tuneDirection.textContent = "In tune";
-                            tuneDirection.style.color = "#00FF00";
-                        } else if (cents < 0) {
-                            tuneDirection.textContent = "Tune up";
-                            tuneDirection.style.color = "#FF4500";
-                        } else {
-                            tuneDirection.textContent = "Tune down";
-                            tuneDirection.style.color = "#FF4500";
-                        }
+                        tuneDirection.textContent = "";
+                        tuneDirection.style.color = Math.abs(cents) <= 5 ? "#00FF00" : "#FF4500";
                     }
                 }
                 
