@@ -2787,7 +2787,8 @@ class Activity {
                         //do nothing when clicked on the menu
                     } else if (document.getElementsByTagName("tr")[2].contains(e.target)) {
                         //do nothing when clicked on the search row
-                    } else if (e.target.id === "myCanvas") {
+                    } else {
+                        // this will hide the search bar if someone clicks on menu items 
                         that.hideSearchWidget();
                         document.removeEventListener("mousedown", closeListener);
                     }
