@@ -398,6 +398,16 @@ function SampleWidget() {
 
             this.running = false;
 
+            // Close the pie menu if it's open
+            const wheelDiv = docById("wheelDiv");
+            if (wheelDiv && wheelDiv.style.display !== "none") {
+                wheelDiv.style.display = "none";
+                if (this._pitchWheel) this._pitchWheel.removeWheel();
+                if (this._exitWheel) this._exitWheel.removeWheel();
+                if (this._accidentalsWheel) this._accidentalsWheel.removeWheel();
+                if (this._octavesWheel) this._octavesWheel.removeWheel();
+            }
+
             docById("wheelDivptm").style.display = "none";
             if (!this.pitchWheel === undefined) {
                 this._pitchWheel.removeWheel();
@@ -564,7 +574,7 @@ function SampleWidget() {
                 tunerContainer.style.display = "flex";
                 tunerContainer.id = "tunerContainer";
                 tunerContainer.style.gap = "10px";
-                tunerContainer.style.marginTop = "30px";
+                tunerContainer.style.marginTop = "100px";
 
                 const accidetalFlat = document.createElement("img");
                 accidetalFlat.setAttribute("src", "../header-icons/accidental-flat.svg");
