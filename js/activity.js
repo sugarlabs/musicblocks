@@ -6479,9 +6479,15 @@ class Activity {
                                 let obj;
                                 try {
                                     if (cleanData.includes("html")) {
-                                        obj = JSON.parse(
-                                            cleanData.match('<div class="code">(.+?)</div>')[1]
-                                        );
+					try {
+					    obj = JSON.parse(
+						cleanData.match('<div class="code" id="codeBlock">(.+?)</div>')[1]
+                                            );
+					} catch (e) {
+					    obj = JSON.parse(
+						cleanData.match('<div class="code">(.+?)</div>')[1]
+                                            );
+					}
                                     } else {
                                         obj = JSON.parse(cleanData);
                                     }
