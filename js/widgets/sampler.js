@@ -639,8 +639,10 @@ function SampleWidget() {
             ""
         );
 
+        // Keep the button but remove the slider functionality for now
         this.centsSliderBtn.onclick = () => {
-            this.toggleCentsSlider();
+            // TODO: Implement pie menu for cents adjustment
+            console.log('Cents adjustment pie menu to be implemented');
         };
 
         widgetWindow.sendToCenter();
@@ -1245,21 +1247,7 @@ function SampleWidget() {
      * @returns {void}
      */
     this.toggleCentsSlider = function () {
-        this.sliderVisible = !this.sliderVisible;
-        
-        if (this.sliderVisible) {
-            this.centsSliderBtn.getElementsByTagName("img")[0].src = "header-icons/slider-active.svg";
-            
-            // If tuner is visible, hide it
-            if (this.isTunerON) {
-                this._tunerBtn.click();
-            }
-            
-            this.createCentsSlider();
-        } else {
-            this.centsSliderBtn.getElementsByTagName("img")[0].src = "header-icons/slider.svg";
-            this.removeCentsSlider();
-        }
+        // Functionality removed - will be replaced with pie menu
     };
 
     /**
@@ -1267,58 +1255,7 @@ function SampleWidget() {
      * @returns {void}
      */
     this.createCentsSlider = function () {
-        if (this.sliderDiv) {
-            this.removeCentsSlider();
-        }
-        
-        this.sliderDiv = document.createElement('div');
-        this.sliderDiv.id = 'centsSliderDiv';
-        this.sliderDiv.style.position = 'absolute';
-        this.sliderDiv.style.bottom = '10px';
-        this.sliderDiv.style.left = '10px';
-        this.sliderDiv.style.width = (SAMPLEWIDTH - 20) + 'px';
-        this.sliderDiv.style.height = '50px';
-        this.sliderDiv.style.backgroundColor = '#f0f0f0';
-        this.sliderDiv.style.borderRadius = '5px';
-        this.sliderDiv.style.padding = '10px';
-        this.sliderDiv.style.display = 'flex';
-        this.sliderDiv.style.flexDirection = 'column';
-        this.sliderDiv.style.alignItems = 'center';
-        this.widgetWindow.getWidgetBody().appendChild(this.sliderDiv);
-        
-        // Create label for cents adjustment
-        const sliderLabel = document.createElement('div');
-        sliderLabel.textContent = _("Cents Adjustment: ") + this.centsValue + "¢";
-        sliderLabel.id = 'centsSliderLabel';
-        this.sliderDiv.appendChild(sliderLabel);
-        
-        // Create slider for cents adjustment
-        const slider = document.createElement('input');
-        slider.type = 'range';
-        slider.min = '-50';
-        slider.max = '50';
-        slider.value = this.centsValue;
-        slider.step = '1';
-        slider.style.width = '100%';
-        slider.addEventListener('input', (e) => {
-            this.centsValue = parseInt(e.target.value);
-            sliderLabel.textContent = _("Cents Adjustment: ") + this.centsValue + "¢";
-            this.applyCentsAdjustment();
-        });
-        
-        this.sliderDiv.appendChild(slider);
-        
-        // Add reset button
-        const resetBtn = document.createElement('button');
-        resetBtn.textContent = _("Reset");
-        resetBtn.style.marginTop = '5px';
-        resetBtn.addEventListener('click', () => {
-            slider.value = 0;
-            this.centsValue = 0;
-            sliderLabel.textContent = _("Cents Adjustment: ") + this.centsValue + "¢";
-            this.applyCentsAdjustment();
-        });
-        this.sliderDiv.appendChild(resetBtn);
+        // Functionality removed - will be replaced with pie menu
     };
 
     /**
@@ -1326,10 +1263,7 @@ function SampleWidget() {
      * @returns {void}
      */
     this.removeCentsSlider = function () {
-        if (this.sliderDiv && this.sliderDiv.parentNode) {
-            this.sliderDiv.parentNode.removeChild(this.sliderDiv);
-        }
-        this.sliderDiv = null;
+        // Functionality removed - will be replaced with pie menu
     };
     
     /**
@@ -1337,23 +1271,7 @@ function SampleWidget() {
      * @returns {void}
      */
     this.applyCentsAdjustment = function () {
-        if (this.sampleName) {
-            const instrumentName = "customsample_" + this.originalSampleName;
-            if (instruments[0][instrumentName]) {
-                // Calculate playback rate based on cents
-                // 100 cents = 1 semitone, so divide by 1200 to get the power of 2
-                const playbackRate = Math.pow(2, this.centsValue / 1200);
-                instruments[0][instrumentName].playbackRate.value = playbackRate;
-                
-                // Update sample pitch values to reflect cents adjustment
-                this._updateSamplePitchValues();
-                
-                // If currently playing, restart the playback to apply the new rate
-                if (this.isMoving) {
-                    this._playSample();
-                }
-            }
-        }
+        // Functionality removed - will be replaced with pie menu
     };
 
     /**
