@@ -561,6 +561,7 @@ class JSInterface {
                         const drums = [
                             "snare drum",
                             "kick drum",
+                            "duff",
                             "tom tom",
                             "floor tom tom",
                             "cup drum",
