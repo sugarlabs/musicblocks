@@ -342,6 +342,142 @@ notation well enough to guess the outcome? Are you familiar with the
 song we created?)
 [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1725791527821787&run=True)
 
+### 3.1.1 Heap and Program Blocks
+
+Music Blocks provides special programming blocks that allow you to store, retrieve, and manipulate data during your musical programs. These blocks enable more complex and dynamic compositions by managing values in a stack-like structure called the **heap** and using **boxes** as variables.
+
+#### Heap Blocks
+
+- **Set Heap**  
+  Stores a value onto the heap. The heap works like a stack (last-in, first-out), so the most recently stored value is retrieved first.
+
+- **Load Heap**  
+  Retrieves the most recently stored value from the heap without removing it.
+
+- **Push**  
+  Adds a value onto the heap, increasing its size.
+
+- **Pop**  
+  Removes the most recently added value from the heap.
+
+#### Boxes (Variables)
+
+- **Store in Box**  
+  Stores a value in a named box (similar to a variable).
+
+- **Box**  
+  Retrieves the value stored in a named box.
+
+- **Add One / Change By**  
+  Increments or changes the value stored in a box by a specified amount.
+
+#### Example Usage
+
+Imagine you want to keep track of a score or a counter in your music program. You can use boxes and heap blocks to store and update these values dynamically.
+
+For example, consider the following sequence of blocks:
+
+1. **Store in Box "score" 0**  
+   Initialize the score to zero.
+
+2. **Add One to Box "score"**  
+   Increment the score by one.
+
+3. **Set Heap (Box "score")**  
+   Push the current score value onto the heap.
+
+4. **Load Heap**  
+   Retrieve the last stored score from the heap.
+
+This sequence allows your program to initialize a variable, update it, save it temporarily, and retrieve it later, enabling dynamic and interactive musical programs.
+
+> **Tip:** Use the heap for temporary storage during loops or complex sequences, and boxes for named variables you want to access anytime.
+
+Advanced Example: Music Note Recorder
+Here's a more complex example showing how to implement a music note recorder using heap blocks and variables:
+
+// Initialize our note recorder
+function initRecorder() {
+    set heap "isRecording" to false
+    set heap "recordedNotes" to []
+    set heap "startTime" to 0
+}
+
+// Start recording notes
+function startRecording() {
+    set heap "isRecording" to true
+    set heap "recordedNotes" to []
+    set heap "startTime" to currentTimeMillis()
+    
+    // Visual indicator that recording has started
+    setLED(RED)
+    displayText("Recording...")
+}
+
+// Record a note when it's played
+function recordNote(note, duration) {
+    if (load heap "isRecording") {
+        var currentTime = currentTimeMillis()
+        var timestamp = currentTime - (load heap "startTime")
+        
+        // Save the note data (timestamp, note value, and duration)
+        var noteData = {
+            "time": timestamp,
+            "note": note,
+            "duration": duration
+        }
+        
+        // Add to our recorded notes array
+        var notes = load heap "recordedNotes"
+        notes.push(noteData)
+        set heap "recordedNotes" to notes
+        
+        // Visual feedback
+        flashLED(GREEN)
+    }
+}
+
+// Stop recording and prepare for playback
+function stopRecording() {
+    set heap "isRecording" to false
+    
+    // Visual indication that recording has stopped
+    setLED(OFF)
+    displayText("Recording stopped. Ready to play!")
+}
+
+// Play back the recorded notes
+function playRecordedNotes() {
+    var notes = load heap "recordedNotes"
+    
+    if (notes.length === 0) {
+        displayText("No notes recorded!")
+        return
+    }
+    
+displayText("Playing back recording...")
+    
+    // For each recorded note, play it at the correct time
+    var startTime = currentTimeMillis()
+    
+    for (var i = 0; i < notes.length; i++) {
+        var note = notes[i]
+        var waitTime = note.time - (currentTimeMillis() - startTime)
+        
+        // Wait until the correct time to play this note
+        if (waitTime > 0) {
+            wait(waitTime)
+        }
+        
+        // Play the note
+        playNote(note.note, note.duration)
+        flashLED(BLUE)
+    }
+    
+    displayText("Playback complete!")
+}
+
+This example demonstrates how heap blocks can be used to create more complex musical applications like a note recorder that captures and plays back musical sequences.
 
 ### <a name="PITCH-TRANSFORMATION">3.2 Pitch Transformations</a>
 
