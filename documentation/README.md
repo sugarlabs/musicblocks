@@ -45,6 +45,7 @@ You can run it from
 7. [Widget Palette](#7-widget-palette)
 8. [Stats](#8-stats)
 9. [Planet View](#9-planet-view)
+10. [Play Only Mode](#10-play-only-mode)
 
 ## <a>1. Getting Started</a>
 
@@ -697,3 +698,20 @@ can download.
 ![Planet](./planet-4.png)
 
 [Back to Table of Contents](#table-of-contents)
+
+## 10. Play Only Mode
+
+[Back to Table of Contents](#table-of-contents)
+
+This document outlines the behavior of Music Blocks' Play-Only Mode based on different screen sizes.
+
+### Screen Size Behavior Table
+
+| Screen Size                             | Behavior Summary  |
+|-----------------------------------------|-------------------|
+| <h4>Below 768px width OR below 600px height</h4>  ("Play-Only Mode") | - **Aux Menu Disabled**: The full auxiliary toolbar is hidden.  <br> - **Notification Shown**: A persistent banner notifies the user to use a larger display for the full experience.  <br> - **Horizontal Scrolling**: Enabled by default to accommodate smaller layouts.  <br> - **Hidden Elements**: Certain editing controls (e.g., block size, palette, grid) are hidden or collapsed.  |
+| <h4>Above 768px width OR below 600px height</h4> ("Full Desktop Layout") | - **Full Menus**: All toolbar items, palettes, and advanced features are visible.  <br> - **Horizontal Scrolling**: Off by default (unless user manually toggles).  <br> - **No Play-Only Banner**: Notification is not shown at large resolutions. |
+
+### Notes
+- The exact breakpoints (e.g., `X` for a larger desktop threshold) can be adjusted as needed.
+- Currently, `768px width` or `600px height` is the key cutoff for triggering Play-Only Mode.
