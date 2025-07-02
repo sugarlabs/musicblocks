@@ -107,7 +107,8 @@ class Toolbar {
                 ["ar", _("عربى"), "innerHTML"],
                 ["te", _("తెలుగు"), "innerHTML"],
                 ["he", _("עִברִית"), "innerHTML"],
-                ["ur", _("اردو"), "innerHTML"]
+                ["ur", _("اردو"), "innerHTML"],
+		["tr", _("Türkçe"), "innerHTML"]
             ];
 
             // Workaround for FF
@@ -180,7 +181,8 @@ class Toolbar {
                 _("igbo"),
                 _("عربى"),
                 _("עִברִית"),
-                _("اردو")
+                _("اردو"),
+		_("Türkçe")
             ];
         } else {
             strings = [
@@ -240,7 +242,8 @@ class Toolbar {
                 ["ar", _("عربى"), "innerHTML"],
                 ["te", _("తెలుగు"), "innerHTML"],
                 ["he", _("עִברִית"), "innerHTML"],
-                ["ur", _("اردو"), "innerHTML"]
+                ["ur", _("اردو"), "innerHTML"],
+		["tr", _("Türkçe"), "innerHTML"]
             ];
 
             // Workaround for FF
@@ -301,7 +304,8 @@ class Toolbar {
                 _("igbo"),
                 _("عربى"),
                 _("עִברִית"),
-                _("اردو")
+                _("اردو"),
+		_("Türkçe")
             ];
         }
 
@@ -1118,7 +1122,7 @@ class Toolbar {
         const languageSelectIcon = docById("languageSelectIcon");
         const languages = [
             "enUS", "enUK", "es", "pt", "ko", "ja", "kana", "zhCN", "th",
-            "ayc", "quz", "gug", "hi", "ibo", "ar", "te", "he", "ur"
+            "ayc", "quz", "gug", "hi", "ibo", "ar", "te", "he", "ur", "tr"
         ];
     
         languageSelectIcon.onclick = () => {

@@ -190,6 +190,15 @@ class LanguageBox {
         this.hide();
     }
     
+    /**
+     * @public
+     * @returns {void}
+     */
+    tr_onclick() {
+        this._language = "tr";
+        this.hide();
+    }
+    
     
     /**
      * @public
