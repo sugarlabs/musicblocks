@@ -863,6 +863,7 @@ class Palette {
         this.fadedUpButton = null;
         this.fadedDownButton = null;
         this.count = 0;
+        this._outsideClickListener = null;
     }
 
     hide() {
@@ -948,6 +949,25 @@ class Palette {
         }
 
         this._showMenuItems();
+
+        // Close palette menu on outside click
+        if (this._outsideClickListener) {
+            // Remove any existing listener before attaching a new one
+            document.removeEventListener("click", this._outsideClickListener);
+        }
+
+        this._outsideClickListener = (event) => {
+            if (!this.menuContainer.contains(event.target)) {
+                this.hideMenu(); // Calls your existing hideMenu() → _hideMenuItems()
+                document.removeEventListener("click", this._outsideClickListener);
+                this._outsideClickListener = null;
+            }
+        };
+
+        // Delay listener to avoid capturing the click that opened the menu
+        setTimeout(() => {
+            document.addEventListener("click", this._outsideClickListener);
+        }, 0);
     }
 
     _hideMenuItems() {
