@@ -1319,7 +1319,7 @@ msgstr "男高音"
 #: js/blocks/ExtrasBlocks.js:651
 #.TRANS: musical instrument
 msgid "bass"
-msgstr 低音""
+msgstr "低音"
 
 #: js/block.js:3842
 #: js/blocks.js:2600
