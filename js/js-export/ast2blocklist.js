@@ -73,6 +73,7 @@ class AST2BlockList {
             for (let body of AST.body) {
                 _createNodeAndAddToTree(body, root);
             }
+            console.log(JSON.stringify(root["children"], null, 2));
             return root["children"];
 
             //
@@ -137,6 +138,14 @@ class AST2BlockList {
                         }
                     }
                     if (matched) {
+                        // If there's no name property but there is a name_map, try to get the name from the map
+                        if (entry.name_map) {
+                            const calleePropertyName = _getPropertyValue(bodyAST, "expression.argument.callee.property.name");
+                            if (calleePropertyName && entry.name_map[calleePropertyName]) {
+                                console.log(entry.name_map[calleePropertyName]);
+                                entry.name = entry.name_map[calleePropertyName];
+                            }
+                        }
                         return entry;
                     }
                 }
@@ -294,7 +303,7 @@ class AST2BlockList {
             function _propertyOf(block) {
                 const block_name = Array.isArray(block[1]) ? block[1][0] : block[1];
                 for (const entry of config.body_blocks) {
-                    if ("name" in entry && entry.name === block_name) {
+                    if (("name" in entry && entry.name === block_name) || ("name_map" in entry && Object.values(entry.name_map).includes(block_name))) {
                         // Use default_connections if blocklist_connections is not specified
                         const connections = {
                             count: entry.blocklist_connections ? entry.blocklist_connections.length : config.default_connections.length
@@ -315,7 +324,7 @@ class AST2BlockList {
 
                         const secondChildIndex = connectionsArray.indexOf("second_child");
                         if (secondChildIndex !== -1) connections.second_child = secondChildIndex;
-
+                        
                         // Use default_vspaces if not specified in the block
                         const vspaces = entry.default_vspaces || config.default_vspaces || { body: 1 };
                         return "body" in vspaces ? {
@@ -506,6 +515,14 @@ class AST2BlockList {
                     if (entry.name === block_name) {
                         blockConfig = entry;
                         break;
+                    } else if (entry.name_map) {
+                        for (const name in entry.name_map) {
+                            if (block_name === entry.name_map[name]) {
+                                blockConfig = entry;
+                                console.log(entry);
+                                console.log(block_name);
+                            }
+                        }
                     }
                 }
 
@@ -609,6 +626,9 @@ class AST2BlockList {
                     connections[0] = parentBlockNumber;
                     block.push(connections);
                     vspaces = _addValueArgsToBlockList(arg.arguments, blockList, blockNumber);
+                    if (arg.arguments.length === 0) {
+                        vspaces += 1;
+                    }
                 } else {
                     throw new Error(`Unsupported value argument: ${arg}`);
                 }

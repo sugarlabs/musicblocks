@@ -253,6 +253,28 @@ class JSEditor {
         codeLines.style.textAlign = "right";
         editorContainer.appendChild(codeLines);
 
+        const debugButtons = document.createElement("div");
+        debugButtons.id = "debugButtons";
+        debugButtons.style.width = "1.5rem";
+        debugButtons.style.height = "100%";
+        debugButtons.style.position = "absolute";
+        debugButtons.style.top = "0";
+        debugButtons.style.left = "2rem";
+        debugButtons.style.zIndex = "98";
+        debugButtons.style.overflow = "hidden";
+        debugButtons.style.boxSizing = "border-box";
+        debugButtons.style.padding = ".25rem .25rem";
+        debugButtons.style.fontFamily = '"PT Mono", monospace';
+        debugButtons.style.fontSize = "12px";
+        debugButtons.style.fontWeight = "400";
+        debugButtons.style.letterSpacing = "normal";
+        debugButtons.style.lineHeight = "20px";
+        debugButtons.style.background = "rgba(255, 255, 255, 0.05)";
+        debugButtons.style.color = "rgba(255, 255, 255, 0.5)";
+        debugButtons.style.textAlign = "center";
+        debugButtons.style.pointerEvents = "none";
+        editorContainer.appendChild(debugButtons);
+
         const codebox = document.createElement("div");
         codebox.classList.add("editor");
         codebox.classList.add("language-js");
@@ -262,7 +284,7 @@ class JSEditor {
         codebox.style.top = "0";
         codebox.style.left = "0";
         codebox.style.boxSizing = "border-box";
-        codebox.style.padding = ".25rem .25rem .25rem 2.75rem";
+        codebox.style.padding = ".25rem .25rem .25rem 4.25rem";
         codebox.style.fontFamily = '"PT Mono", monospace';
         codebox.style.fontSize = "14px";
         codebox.style.fontWeight = "400";
@@ -355,6 +377,10 @@ class JSEditor {
         this.widgetWindow.takeFocus();
 
         this._setupDividerResize(divider, editorContainer, editorconsole, consolelabel);
+        
+        window.jsEditor = this;
+        
+        this._setupScrollSync();
     }
 
     /**
@@ -395,6 +421,23 @@ class JSEditor {
             document.addEventListener("mouseup", onMouseUp);
             e.preventDefault();
         });
+    }
+
+    /**
+     * Sets up scroll synchronization between line numbers and debug buttons
+     * @returns {void}
+     */
+    _setupScrollSync() {
+        const codebox = document.querySelector(".editor");
+        const codeLines = docById("editorLines");
+        const debugButtons = docById("debugButtons");
+        
+        if (codebox && codeLines && debugButtons) {
+            codebox.addEventListener("scroll", () => {
+                codeLines.scrollTop = codebox.scrollTop;
+                debugButtons.scrollTop = codebox.scrollTop;
+            });
+        }
     }
 
     /**
@@ -502,6 +545,103 @@ class JSEditor {
             text += `${i}\n`;
         }
         docById("editorLines").innerText = text;
+
+        // Update debug buttons
+        this._updateDebugButtons(code);
+    }
+
+    /**
+     * Updates debug buttons for each line of code
+     * 
+     * @param {String} code - the code to create debug buttons for
+     * @returns {void}
+     */
+    _updateDebugButtons(code) {
+        if (!docById("debugButtons")) return;
+        const lines = code.replace(/\n+$/, "\n").split("\n");
+        let buttonsHTML = "";
+        for (let i = 0; i < lines.length; i++) {
+            const lineNumber = i;
+            const lineContent = lines[i].trim();
+            const hasDebugger = lineContent === "debugger;" || lineContent.includes("debugger;");
+            if (lineContent === "") {
+                buttonsHTML += "<div style='height: 20px; line-height: 20px;'>&nbsp;</div>";
+            } else if (hasDebugger) {
+                buttonsHTML += `<div style="height: 20px; line-height: 20px; cursor: pointer; opacity: 1; pointer-events: auto; border-radius: 4px;" \
+                    onclick="window.jsEditor._removeDebuggerFromLine(${lineNumber})" \
+                    title="Remove debugger from line ${lineNumber + 1}">🔴</div>`;
+            } else {
+                buttonsHTML += `<div style="height: 20px; line-height: 20px; cursor: pointer; opacity: 0; transition: opacity 0.2s ease-in-out; pointer-events: auto;" \
+                    onmouseenter="this.style.opacity='1'" \
+                    onmouseleave="this.style.opacity='0'"\
+                    onclick="window.jsEditor._addDebuggerToLine(${lineNumber})" \
+                    title="Add breakpoint to line ${lineNumber + 1}">🔴</div>`;
+            }
+        }
+        docById("debugButtons").innerHTML = buttonsHTML;
+    }
+
+    /**
+     * Adds a debugger statement to a specific line
+     * 
+     * @param {Number} lineNumber - the line number to add debugger to
+     * @returns {void}
+     */
+    _addDebuggerToLine(lineNumber) {
+        const lines = this._code.split("\n");
+        const insertIndex = lineNumber - 1;
+        
+        // Check if the line ends with '{' or ';'
+        const currentLine = lines[insertIndex].trim();
+        if (!currentLine.endsWith("{") && !currentLine.endsWith(";")) {
+            JSEditor.logConsole(`Cannot add breakpoint to line ${lineNumber + 1}. Breakpoints can only be added after lines ending with '{' or ';'`, "red");
+            return;
+        }
+
+        // Prevent adding two breakpoints right next to each other
+        if ((lines[insertIndex] && lines[insertIndex].trim() === "debugger;") ||
+            (lines[insertIndex + 1] && lines[insertIndex + 1].trim() === "debugger;")) {
+            JSEditor.logConsole(`Cannot add breakpoint to line ${lineNumber + 1} because there is already a breakpoint on an adjacent line.`, "red");
+            return;
+        }
+
+        let indent = "";
+        let extraIndent = "";
+        if (insertIndex >= 0 && lines[insertIndex]) {
+            const match = lines[insertIndex].match(/^(\s*)/);
+            if (match) indent = match[1];
+            if (lines[insertIndex].trim().endsWith("{")) {
+                extraIndent = "\t";
+            }
+        } else if (lines.length > 0) {
+            const match = lines[0].match(/^(\s*)/);
+            if (match) indent = match[1];
+        }
+        // Insert debugger statement after the specified line, with matching indentation
+        lines.splice(insertIndex + 1, 0, indent + extraIndent + "debugger;");
+        this._code = lines.join("\n");
+        this._jar.updateCode(this._code);
+        this._setLinesCount(this._code);
+        JSEditor.logConsole(`Debugger added to line ${lineNumber + 1}`, "green");
+    }
+
+    /**
+     * Removes a debugger statement from a specific line
+     * 
+     * @param {Number} lineNumber - the line number to remove debugger from
+     * @returns {void}
+     */
+    _removeDebuggerFromLine(lineNumber) {
+        // Allow removing breakpoints at any time
+        const lines = this._code.split("\n");
+        const currentLine = lines[lineNumber].trim();
+        if (currentLine === "debugger;") {
+            lines.splice(lineNumber, 1);
+        }
+        this._code = lines.join("\n");
+        this._jar.updateCode(this._code);
+        this._setLinesCount(this._code);
+        JSEditor.logConsole(`Debugger removed from line ${lineNumber + 1}`, "orange");
     }
 
     /**
@@ -584,5 +724,29 @@ class JSEditor {
             editorconsole.style.display = "block";
             if (arrowBtn) arrowBtn.innerHTML = "keyboard_arrow_down";
         }
+    }
+
+    /**
+     * Triggered when the status button is pressed.
+     * Opens the status window.
+     *
+     * @returns {void}
+     */
+    _triggerStatusWindow() {
+        // Check if status window is already open
+        if (window.widgetWindows.isOpen("status")) {
+            JSEditor.logConsole("Status window is already open.", "blue");
+            return;
+        }
+
+        if (this.activity.logo.statusMatrix === null) {
+            this.activity.logo.statusMatrix = new StatusMatrix();
+        }
+        
+        this.activity.logo.statusMatrix.init(this.activity);
+        // this.activity.logo.statusFields = [];
+        this.activity.logo.inStatusMatrix = true;
+        
+        JSEditor.logConsole("Status window opened.", "green");
     }
 }

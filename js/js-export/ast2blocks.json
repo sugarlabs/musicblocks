@@ -235,7 +235,8 @@
                         "value": "mouse"
                     }
                 ],
-                "identifier_property": "property.name"
+                "name_property": "property.name",
+                "argument_properties": []
             },
             "name_map": {
                 "MODELENGTH": "modelength",
@@ -249,54 +250,12 @@
                 "SHADE": "shade",
                 "PENSIZE": "pensize",
                 "COLOR": "color",
-                "BEATCOUNT": "beatcount",
-                "MEASURECOUNT": "measurecount",
-                "BPM": "bpm",
-                "BEATFACTOR": "beatfactor"
-            }
-        },
-        {
-            "comment": "Number to octave conversion",
-            "ast": {
-                "identifiers": [
-                    {
-                        "property": "type",
-                        "value": "CallExpression"
-                    },
-                    {
-                        "property": "callee.name",
-                        "value": "numToOctave"
-                    }
-                ],
-                "name_property": "callee.name",
-                "argument_properties": [
-                    "arguments[0]"
-                ]
-            },
-            "name_map": {
-                "numToOctave": "number2octave"
-            }
-        },
-        {
-            "comment": "Number to pitch conversion",
-            "ast": {
-                "identifiers": [
-                    {
-                        "property": "type",
-                        "value": "CallExpression"
-                    },
-                    {
-                        "property": "callee.name",
-                        "value": "numToPitch"
-                    }
-                ],
-                "name_property": "callee.name",
-                "argument_properties": [
-                    "arguments[0]"
-                ]
-            },
-            "name_map": {
-                "numToPitch": "number2pitch"
+                "BEATCOUNT": "nopValueBlock",
+                "MEASURECOUNT": "nopValueBlock",
+                "BPM": "nopValueBlock",
+                "WHOLENOTESPLAYED": "elapsednotes",
+                "BEATFACTOR": "beatfactor",
+                "NOTEVALUE": "notevalue"
             }
         },
         {
@@ -319,6 +278,25 @@
             },
             "name_map": {
                 "getSynthVolume": "synthvolumefactor"
+            }
+        },
+        {
+            "comment": "Number to pitch/octave conversion",
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "CallExpression"
+                    }
+                ],
+                "name_property": "callee.name",
+                "argument_properties": [
+                    "arguments[0]"
+                ]
+            },
+            "name_map": {
+                "numToOctave": "number2octave",
+                "numToPitch": "number2pitch"
             }
         }
     ],
@@ -521,90 +499,6 @@
             }
         },
         {
-            "name": "newnote",
-            "comment": "Note block in the Rhythm palette",
-            "arguments": [
-                {
-                    "type": "NumberExpression"
-                }
-            ],
-            "ast": {
-                "identifiers": [
-                    {
-                        "property": "type",
-                        "value": "ExpressionStatement"
-                    },
-                    {
-                        "property": "expression.type",
-                        "value": "AwaitExpression"
-                    },
-                    {
-                        "property": "expression.argument.type",
-                        "value": "CallExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.type",
-                        "value": "MemberExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.property.name",
-                        "value": "playNote"
-                    }
-                ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ],
-                "children_properties": [
-                    "expression.argument.arguments[1].body.body"
-                ]
-            },
-            "default_vspaces": {
-                "argument": 1
-            }
-        },
-        {
-            "name": "rhythmicdot2",
-            "comment": "Dot block in the Rhythm palette",
-            "arguments": [
-                {
-                    "type": "NumberExpression"
-                }
-            ],
-            "ast": {
-                "identifiers": [
-                    {
-                        "property": "type",
-                        "value": "ExpressionStatement"
-                    },
-                    {
-                        "property": "expression.type",
-                        "value": "AwaitExpression"
-                    },
-                    {
-                        "property": "expression.argument.type",
-                        "value": "CallExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.type",
-                        "value": "MemberExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.property.name",
-                        "value": "dot"
-                    }
-                ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ],
-                "children_properties": [
-                    "expression.argument.arguments[1].body.body"
-                ]
-            },
-            "default_vspaces": {
-                "argument": 1
-            }
-        },
-        {
             "name": "tie",
             "comment": "Tie block in the Rhythm palette",
             "ast": {
@@ -641,48 +535,6 @@
             ],
             "default_vspaces": {
                 "argument": 0
-            }
-        },
-        {
-            "name": "multiplybeatfactor",
-            "comment": "Multiply note value block in the Rhythm palette",
-            "arguments": [
-                {
-                    "type": "NumberExpression"
-                }
-            ],
-            "ast": {
-                "identifiers": [
-                    {
-                        "property": "type",
-                        "value": "ExpressionStatement"
-                    },
-                    {
-                        "property": "expression.type",
-                        "value": "AwaitExpression"
-                    },
-                    {
-                        "property": "expression.argument.type",
-                        "value": "CallExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.type",
-                        "value": "MemberExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.property.name",
-                        "value": "multiplyNoteValue"
-                    }
-                ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ],
-                "children_properties": [
-                    "expression.argument.arguments[1].body.body"
-                ]
-            },
-            "default_vspaces": {
-                "argument": 1
             }
         },
         {
@@ -736,48 +588,6 @@
             ],
             "default_vspaces": {
                 "argument": 2
-            }
-        },
-        {
-            "name": "osctime",
-            "comment": "Millisecond note block in the Rhythm palette",
-            "arguments": [
-                {
-                    "type": "NumberExpression"
-                }
-            ],
-            "ast": {
-                "identifiers": [
-                    {
-                        "property": "type",
-                        "value": "ExpressionStatement"
-                    },
-                    {
-                        "property": "expression.type",
-                        "value": "AwaitExpression"
-                    },
-                    {
-                        "property": "expression.argument.type",
-                        "value": "CallExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.type",
-                        "value": "MemberExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.property.name",
-                        "value": "playNoteMillis"
-                    }
-                ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ],
-                "children_properties": [
-                    "expression.argument.arguments[1].body.body"
-                ]
-            },
-            "default_vspaces": {
-                "argument": 1
             }
         },
         {
@@ -1258,48 +1068,6 @@
             ],
             "default_vspaces": {
                 "argument": 2
-            }
-        },
-        {
-            "name": "crescendo",
-            "comment": "Crescendo block in the Volume palette",
-            "arguments": [
-                {
-                    "type": "NumberExpression"
-                }
-            ],
-            "ast": {
-                "identifiers": [
-                    {
-                        "property": "type",
-                        "value": "ExpressionStatement"
-                    },
-                    {
-                        "property": "expression.type",
-                        "value": "AwaitExpression"
-                    },
-                    {
-                        "property": "expression.argument.type",
-                        "value": "CallExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.type",
-                        "value": "MemberExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.property.name",
-                        "value": "doCrescendo"
-                    }
-                ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ],
-                "children_properties": [
-                    "expression.argument.arguments[1].body.body"
-                ]
-            },
-            "default_vspaces": {
-                "argument": 1
             }
         },
         {
@@ -2028,48 +1796,6 @@
             }
         },
         {
-            "name": "settransposition",
-            "comment": "Set semitone transposition block",
-            "arguments": [
-                {
-                    "type": "NumberExpression"
-                }
-            ],
-            "ast": {
-                "identifiers": [
-                    {
-                        "property": "type",
-                        "value": "ExpressionStatement"
-                    },
-                    {
-                        "property": "expression.type",
-                        "value": "AwaitExpression"
-                    },
-                    {
-                        "property": "expression.argument.type",
-                        "value": "CallExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.type",
-                        "value": "MemberExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.property.name",
-                        "value": "setSemitoneTranspose"
-                    }
-                ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ],
-                "children_properties": [
-                    "expression.argument.arguments[1].body.body"
-                ]
-            },
-            "default_vspaces": {
-                "argument": 1
-            }
-        },
-        {
             "name": "register",
             "comment": "Set register block",
             "arguments": [
@@ -2264,48 +1990,6 @@
             ],
             "default_vspaces": {
                 "body": 2
-            }
-        },
-        {
-            "name": "interval",
-            "comment": "Set scalar interval block",
-            "arguments": [
-                {
-                    "type": "NumberExpression"
-                }
-            ],
-            "ast": {
-                "identifiers": [
-                    {
-                        "property": "type",
-                        "value": "ExpressionStatement"
-                    },
-                    {
-                        "property": "expression.type",
-                        "value": "AwaitExpression"
-                    },
-                    {
-                        "property": "expression.argument.type",
-                        "value": "CallExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.type",
-                        "value": "MemberExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.property.name",
-                        "value": "setScalarInterval"
-                    }
-                ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ],
-                "children_properties": [
-                    "expression.argument.arguments[1].body.body"
-                ]
-            },
-            "default_vspaces": {
-                "argument": 1
             }
         },
         {
@@ -2627,174 +2311,6 @@
             }
         },
         {
-            "name": "dis",
-            "comment": "Distortion effect block",
-            "arguments": [
-                {
-                    "type": "NumberExpression"
-                }
-            ],
-            "ast": {
-                "identifiers": [
-                    {
-                        "property": "type",
-                        "value": "ExpressionStatement"
-                    },
-                    {
-                        "property": "expression.type",
-                        "value": "AwaitExpression"
-                    },
-                    {
-                        "property": "expression.argument.type",
-                        "value": "CallExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.type",
-                        "value": "MemberExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.property.name",
-                        "value": "doDistortion"
-                    }
-                ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ],
-                "children_properties": [
-                    "expression.argument.arguments[1].body.body"
-                ]
-            },
-            "default_vspaces": {
-                "argument": 1
-            }
-        },
-        {
-            "name": "harmonic2",
-            "comment": "Harmonic effect block",
-            "arguments": [
-                {
-                    "type": "NumberExpression"
-                }
-            ],
-            "ast": {
-                "identifiers": [
-                    {
-                        "property": "type",
-                        "value": "ExpressionStatement"
-                    },
-                    {
-                        "property": "expression.type",
-                        "value": "AwaitExpression"
-                    },
-                    {
-                        "property": "expression.argument.type",
-                        "value": "CallExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.type",
-                        "value": "MemberExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.property.name",
-                        "value": "doHarmonic"
-                    }
-                ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ],
-                "children_properties": [
-                    "expression.argument.arguments[1].body.body"
-                ]
-            },
-            "default_vspaces": {
-                "argument": 1
-            }
-        },
-        {
-            "name": "newstaccato",
-            "comment": "Set staccato block",
-            "arguments": [
-                {
-                    "type": "NumberExpression"
-                }
-            ],
-            "ast": {
-                "identifiers": [
-                    {
-                        "property": "type",
-                        "value": "ExpressionStatement"
-                    },
-                    {
-                        "property": "expression.type",
-                        "value": "AwaitExpression"
-                    },
-                    {
-                        "property": "expression.argument.type",
-                        "value": "CallExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.type",
-                        "value": "MemberExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.property.name",
-                        "value": "setStaccato"
-                    }
-                ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ],
-                "children_properties": [
-                    "expression.argument.arguments[1].body.body"
-                ]
-            },
-            "default_vspaces": {
-                "argument": 1
-            }
-        },
-        {
-            "name": "newslur",
-            "comment": "Set slur block",
-            "arguments": [
-                {
-                    "type": "NumberExpression"
-                }
-            ],
-            "ast": {
-                "identifiers": [
-                    {
-                        "property": "type",
-                        "value": "ExpressionStatement"
-                    },
-                    {
-                        "property": "expression.type",
-                        "value": "AwaitExpression"
-                    },
-                    {
-                        "property": "expression.argument.type",
-                        "value": "CallExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.type",
-                        "value": "MemberExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.property.name",
-                        "value": "setSlur"
-                    }
-                ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ],
-                "children_properties": [
-                    "expression.argument.arguments[1].body.body"
-                ]
-            },
-            "default_vspaces": {
-                "argument": 1
-            }
-        },
-        {
             "name": "neighbor2",
             "comment": "Neighbor tone block",
             "arguments": [
@@ -2845,90 +2361,6 @@
             ],
             "default_vspaces": {
                 "argument": 2
-            }
-        },
-        {
-            "name": "decrescendo",
-            "comment": "Decrescendo block",
-            "arguments": [
-                {
-                    "type": "NumberExpression"
-                }
-            ],
-            "ast": {
-                "identifiers": [
-                    {
-                        "property": "type",
-                        "value": "ExpressionStatement"
-                    },
-                    {
-                        "property": "expression.type",
-                        "value": "AwaitExpression"
-                    },
-                    {
-                        "property": "expression.argument.type",
-                        "value": "CallExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.type",
-                        "value": "MemberExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.property.name",
-                        "value": "doDecrescendo"
-                    }
-                ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ],
-                "children_properties": [
-                    "expression.argument.arguments[1].body.body"
-                ]
-            },
-            "default_vspaces": {
-                "argument": 1
-            }
-        },
-        {
-            "name": "articulation",
-            "comment": "Set relative volume block",
-            "arguments": [
-                {
-                    "type": "NumberExpression"
-                }
-            ],
-            "ast": {
-                "identifiers": [
-                    {
-                        "property": "type",
-                        "value": "ExpressionStatement"
-                    },
-                    {
-                        "property": "expression.type",
-                        "value": "AwaitExpression"
-                    },
-                    {
-                        "property": "expression.argument.type",
-                        "value": "CallExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.type",
-                        "value": "MemberExpression"
-                    },
-                    {
-                        "property": "expression.argument.callee.property.name",
-                        "value": "setRelativeVolume"
-                    }
-                ],
-                "argument_properties": [
-                    "expression.argument.arguments[0]"
-                ],
-                "children_properties": [
-                    "expression.argument.arguments[1].body.body"
-                ]
-            },
-            "default_vspaces": {
-                "argument": 1
             }
         },
         {
@@ -4225,6 +3657,121 @@
                 "argument",
                 "next_sibling"
             ]
+        },
+        {
+            "name": "print",
+            "comment": "print block",
+            "arguments": [
+                {
+                    "type": "ValueExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.property.name",
+                        "value": "print"
+                    }
+                ],
+                "argument_properties": [
+                    "expression.argument.arguments[0]"
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "next_sibling"
+            ]
+        },
+        {
+            "name": "debugger",
+            "comment": "Debugger block",
+            "arguments": [
+                {
+                    "type": "BooleanExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "DebuggerStatement"
+                    }
+                ]
+            },
+            "blocklist_connections": [
+                "parent_or_previous_sibling",
+                "argument",
+                "next_sibling"
+            ]
+        },
+        {
+            "name_map": {
+                "playNote": "newnote",
+                "dot": "rhythmicdot2",
+                "multiplyNoteValue": "multiplybeatfactor",
+                "playNoteMillis": "osctime",
+                "doCrescendo": "crescendo",
+                "doDecrescendo": "decrescendo",
+                "setSemitoneTranspose": "settransposition",
+                "setScalarInterval": "interval",
+                "doDistortion": "dis",
+                "doHarmonic": "harmonic2",
+                "setStaccato": "newstaccato",
+                "setSlur": "newslur",
+                "setRelativeVolume": "articulation"
+            },
+            "comment": "Flow blocks with one number argument",
+            "arguments": [
+                {
+                    "type": "NumberExpression"
+                }
+            ],
+            "ast": {
+                "identifiers": [
+                    {
+                        "property": "type",
+                        "value": "ExpressionStatement"
+                    },
+                    {
+                        "property": "expression.type",
+                        "value": "AwaitExpression"
+                    },
+                    {
+                        "property": "expression.argument.type",
+                        "value": "CallExpression"
+                    },
+                    {
+                        "property": "expression.argument.callee.type",
+                        "value": "MemberExpression"
+                    }
+                ],
+                "argument_properties": [
+                    "expression.argument.arguments[0]"
+                ],
+                "children_properties": [
+                    "expression.argument.arguments[1].body.body"
+                ]
+            },
+            "default_vspaces": {
+                "argument": 1
+            }
         }
     ]
 }

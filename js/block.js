@@ -2846,6 +2846,8 @@ class Block {
                     if (!that.blocks.getLongPressStatus() && !that.blocks.stageClick) {
                         topBlk = that.blocks.findTopBlock(thisBlock);
 
+                        that.activity.runMode = "click";
+                        that.activity.logo.turtleDelay = that.activity.DEFAULTDELAY;
                         that.activity.logo.synth.resume();
 
                         if (that.activity.turtles.running()) {
@@ -2863,6 +2865,8 @@ class Block {
                 if (!that.blocks.getLongPressStatus() && !that.blocks.stageClick) {
                     topBlk = that.blocks.findTopBlock(thisBlock);
 
+                    that.activity.runMode = "click";
+                    that.activity.logo.turtleDelay = that.activity.DEFAULTDELAY;
                     that.activity.logo.synth.resume();
 
                     if (that.activity.turtles.running()) {
