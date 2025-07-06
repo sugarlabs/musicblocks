@@ -2565,6 +2565,7 @@
           Music Blocks to enhance your experience.
         </p>
         <p>Every widget has a menu with at least two buttons.</p>
+        <p><img src="../header-icons/close-button.svg" title="close button" alt="widget" /></p>
         <p>You can hide the widget by clicking on the <em>Close</em> button.</p>
         <p>You can move the widget by dragging its containing the window.</p>
         <h3 id="41-status"><a name="status">4.1 Status</a></h3>
@@ -2633,11 +2634,13 @@ block"
           selected (black cells). First <code>Re 4</code>, followed by <code>Mi 4</code>, followed
           by <code>Sol 4</code>.
         </p>
+        <p><img src="../header-icons/play-button.svg" title="play button" alt="widget" /></p>
         <p>
           If you click on the <em>Play</em> button (found in the top row of the grid), you will hear
           a sequence of notes played (from left to right): <code>Re 4</code>, <code>Mi 4</code>,
           <code>Sol 4</code>.
         </p>
+        <p><img src="../header-icons/export-chunk.svg" title="save button" alt="widget" /></p>
         <p>
           Once you have a group of notes (a "chunk") that you like, click on the
           <em>Save</em> button (just to the right of the <em>Play</em> button). This will create a
@@ -2645,10 +2648,12 @@ block"
           below.)
         </p>
         <p>You can rearrange the selected notes in the grid and save other chunks as well.</p>
+        <p><img src="../header-icons/sort.svg" title="sort button" alt="widget" /></p>
         <p>
           The <em>Sort</em> button will reorder the pitches in the matrix from highest to lowest and
           eliminate any duplicate <em>Pitch</em> blocks.
         </p>
+        <p><img src="../header-icons/erase-button.svg" title="erase button" alt="widget" /></p>
         <p>There is also an Erase button that will clear the grid.</p>
         <p>
           Don't worry. You can reopen the matrix at anytime (it will remember its previous state)
