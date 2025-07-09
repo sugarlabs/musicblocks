@@ -65,9 +65,186 @@ class JSEditor {
             return link;
         });
         this._styles[this._currentStyle].removeAttribute("disabled");
+        this._addErrorStyles();
 
         this._setup();
         this._setLinesCount(this._code);
+    }
+
+    /**
+     * Adds CSS styles for error highlighting
+     * @returns {void}
+     */
+    _addErrorStyles() {
+        if (document.getElementById("js-error-styles")) {
+            return;
+        }
+
+        const style = document.createElement("style");
+        style.id = "js-error-styles";
+        style.textContent = `
+            .error {
+                background-color: #ff4444 !important;
+                color: white !important;
+                border-radius: 2px;
+                padding: 1px 2px;
+                position: relative;
+            }
+            
+            .hljs-keyword {
+                color: #007acc !important;
+                font-weight: bold;
+            }
+            
+            .hljs-built_in {
+                color: #00d4aa !important;
+            }
+            
+            .hljs-title.function_ {
+                color: #ffcc00 !important;
+            }
+            
+            .hljs-number {
+                color: #4ec9b0 !important;
+            }
+            
+            .hljs-string {
+                color: #ff8c00 !important;
+            }
+            
+            .hljs-subst {
+                color: #ff8c00 !important;
+                background-color: rgba(255, 140, 0, 0.1) !important;
+            }
+            
+            .hljs-comment {
+                color: #57a64a !important;
+                font-style: italic;
+            }
+            
+            .hljs-title.class_ {
+                color: #c586c0 !important;
+            }
+            
+            .hljs-variable {
+                color: #4fc1ff !important;
+            }
+            
+            .hljs-params {
+                color: #4fc1ff !important;
+            }
+            
+            .hljs-property {
+                color: #ff79c6 !important;
+            }
+            
+            .hljs-literal {
+                color: #007acc !important;
+            }
+            
+            .hljs-type {
+                color: #00d4aa !important;
+            }
+            
+            .hljs-operator {
+                color: #ffffff !important;
+            }
+            
+            .hljs-punctuation {
+                color: #cccccc !important;
+            }
+            
+            .hljs-regexp {
+                color: #ff5555 !important;
+            }
+            
+            .hljs-symbol {
+                color: #ffcc00 !important;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    /**
+     * Highlights syntax errors in the editor
+     * @param {HTMLElement} editor - the editor element
+     * @returns {void}
+     */
+    _highlightErrors(editor) {
+        const existingErrors = editor.querySelectorAll(".error");
+        existingErrors.forEach(el => {
+            const text = el.textContent;
+            el.replaceWith(text);
+        });
+
+        try {
+            const code = editor.textContent;
+            acorn.parse(code, { ecmaVersion: 2020 });
+        } catch (error) {
+            if (error.pos !== undefined) {
+                this._markErrorAtPosition(editor, error.pos, error.message);
+            }
+            
+            JSEditor.logConsole(`Syntax Error at position ${error.pos}: ${error.message}`);
+        }
+    }
+
+    /**
+     * Marks an error at a specific position in the editor
+     * @param {HTMLElement} editor - the editor element
+     * @param {Number} position - the character position of the error
+     * @param {String} message - the error message
+     * @returns {void}
+     */
+    _markErrorAtPosition(editor, position, message) {
+        const text = editor.textContent;
+        
+        let errorStart = position;
+        let errorEnd = position;
+        
+        while (errorStart > 0) {
+            const char = text.charAt(errorStart - 1);
+            if (char === " " || char === "\n" || char === "\t" || char === ";" || char === "{" || char === "}" || char === "(" || char === ")" || char === ",") {
+                break;
+            }
+            errorStart--;
+        }
+        
+        while (errorEnd < text.length) {
+            const char = text.charAt(errorEnd);
+            if (char === " " || char === "\n" || char === "\t" || char === ";" || char === "{" || char === "}" || char === "(" || char === ")" || char === ",") {
+                break;
+            }
+            errorEnd++;
+        }
+        
+        if (errorStart === errorEnd) {
+            errorEnd = Math.min(errorStart + 1, text.length);
+        }
+        
+        this._markErrorSpan(editor, errorStart, errorEnd, message);
+    }
+
+    /**
+     * Marks an error span in the editor with a simple approach
+     * @param {HTMLElement} editor - the editor element
+     * @param {Number} start - the start position of the error
+     * @param {Number} end - the end position of the error
+     * @param {String} message - the error message
+     * @returns {void}
+     */
+    _markErrorSpan(editor, start, end, message) {
+        const text = editor.textContent;
+        const errorText = text.substring(start, end);
+        
+        const beforeError = text.substring(0, start);
+        const afterError = text.substring(end);
+        
+        const highlightedHTML = beforeError +
+            `<span class="error" title="${message}">${errorText}</span>` +
+            afterError;
+        
+        editor.innerHTML = highlightedHTML;
     }
 
     /**
@@ -277,7 +454,7 @@ class JSEditor {
 
         const codebox = document.createElement("div");
         codebox.classList.add("editor");
-        codebox.classList.add("language-js");
+        codebox.classList.add("language-javascript");
         codebox.style.width = "100%";
         codebox.style.height = "100%";
         codebox.style.position = "absolute";
@@ -352,8 +529,16 @@ class JSEditor {
         this._editor.appendChild(editorconsole);
 
         const highlight = (editor) => {
-            // editor.textContent = editor.textContent;
-            hljs.highlightBlock(editor);
+            // Configure highlight.js for JavaScript
+            hljs.configure({
+                languages: ["javascript"]
+            });
+            
+            // Apply highlight.js syntax highlighting for JavaScript
+            hljs.highlightElement(editor);
+            
+            // Add error highlighting
+            this._highlightErrors(editor);
         };
 
         this._jar = new CodeJar(codebox, highlight);
@@ -479,10 +664,21 @@ class JSEditor {
         JSEditor.clearConsole();
 
         try {
+            acorn.parse(this._code, { ecmaVersion: 2020 });
+        } catch (e) {
+            JSEditor.logConsole(`Syntax Error: ${e.message}`, "red");
+            return;
+        }
+
+        try {
             MusicBlocks.init(true);
             new Function(this._code)();
+            JSEditor.logConsole("Code executed successfully!", "green");
         } catch (e) {
-            JSEditor.logConsole(e, "maroon");
+            JSEditor.logConsole(`Runtime Error: ${e.message}`, "maroon");
+            if (e.stack) {
+                JSEditor.logConsole(`Stack trace: ${e.stack}`, "maroon");
+            }
         }
     }
 
