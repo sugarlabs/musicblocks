@@ -2097,12 +2097,12 @@ class Block {
                     if (that.name === "media") {
                         that.value = reader.result;
                         that.loadThumbnail(null);
-                        fileChooser.value = '';
+                        fileChooser.value = "";
                         return;
                     }
                     that.value = [fileChooser.files[0].name, reader.result];
                     that.blocks.updateBlockText(thisBlock);
-                    fileChooser.value = '';
+                    fileChooser.value = "";
                 }
             };
             if (that.name === "media") {
@@ -2846,6 +2846,8 @@ class Block {
                     if (!that.blocks.getLongPressStatus() && !that.blocks.stageClick) {
                         topBlk = that.blocks.findTopBlock(thisBlock);
 
+                        that.activity.runMode = "click";
+                        that.activity.logo.turtleDelay = that.activity.DEFAULTDELAY;
                         that.activity.logo.synth.resume();
 
                         if (that.activity.turtles.running()) {
@@ -2863,6 +2865,8 @@ class Block {
                 if (!that.blocks.getLongPressStatus() && !that.blocks.stageClick) {
                     topBlk = that.blocks.findTopBlock(thisBlock);
 
+                    that.activity.runMode = "click";
+                    that.activity.logo.turtleDelay = that.activity.DEFAULTDELAY;
                     that.activity.logo.synth.resume();
 
                     if (that.activity.turtles.running()) {

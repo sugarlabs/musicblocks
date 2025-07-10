@@ -32,6 +32,98 @@ body:not(.dark) #helpfulSearchDiv {
     background-color: #f9f9f9 !important;
 }
 
+#newdropdown {
+  font-size: 16px;
+  background-color: #fff;
+  border: 1px solid #cccccc;
+  color: #000000;
+  padding: 24px;
+  width: 400px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+#newdropdown li {
+  text-align: center;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.new-project-title {
+  line-height: normal;
+  font-size: 24px;
+  text-align: left;
+  color: #0066FF;
+}
+
+#confirmation-message {
+  font-size: 16px;
+  text-align: left;
+  color: black;
+}
+
+.modalBox {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  padding: 24px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  z-index: 10000;
+  text-align: left;
+}
+
+.modal-title {
+  color: #0066FF;
+  font-size: 24px;
+  margin: 0 0 16px 0;
+}
+
+.modal-message {
+  color: black;
+  font-size: 16px;
+  margin-bottom: 24px;
+}
+
+.clear-button-container {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.confirm-button {
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: #0066FF;
+  color: white;
+  margin-right: 16px;
+  transition: background-color 0.2s ease;
+}
+
+.confirm-button:hover {
+  background-color: #023a76;
+}
+
+.cancel-button {
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  background-color: #f1f1f1;
+  color: black;
+}
+
+.cancel-button:hover {
+  background-color: #afafaf;
+}
+
 .modal {
   display: none;
   position: fixed;
@@ -58,14 +150,26 @@ body:not(.dark) #helpfulSearchDiv {
   text-align: left;
 }
 
-#submitLilypond {
-  background-color: rgb(0, 102, 255);
-  border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
-  font-weight: bold;
+.block-count-dropdown {
+  padding: 4px !important;
+  font-size: 16px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background: #dedededd;
   cursor: pointer;
-  margin-right: 16px;
+  width: fit-content;
+  text-align: center;
+}
+
+.block-count-dropdown.expanded {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.message-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .close {
@@ -636,8 +740,6 @@ table {
 
 #canvas {
   overflow-y: visible;
-  background-color: #FFFFFF; 
-  width: 100%;
 }
 
 #statusDiv {

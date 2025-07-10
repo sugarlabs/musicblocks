@@ -38,7 +38,7 @@ class Converter {
     
     afterly2pdf (data, callback) {
         (!data.success) ? callback(false, data.error) :
-            callback(true, this.getDataURL(data.data.contenttype, data.data.blob)) ;            
+            callback(true, this.getDataURL(data.data.contenttype, data.data.blob)) ;
     };
 
     // Ancillary Functions

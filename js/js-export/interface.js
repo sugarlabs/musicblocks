@@ -519,6 +519,7 @@ class JSInterface {
                         const instruments = [
                             "piano",
                             "harmonuium",
+                            "mandolin",
                             "violin",
                             "viola",
                             "cello",
@@ -634,7 +635,7 @@ class JSInterface {
         return finalArgs;
     }
 }
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
     module.exports = JSInterface;
-  }
+}
   

@@ -155,6 +155,7 @@ class Logo {
         this._prematureRestart = false;
         this._runningBlock = null;
         this._ignoringBlock = null;
+        this._currentlyHighlightedBlock = null;
 
         this.time = 0;
         this.firstNoteTime = null;
@@ -1438,9 +1439,16 @@ class Logo {
         let childFlowCount = 0;
         const actionArgs = [];
 
+        // Highlight only the current executing block
         if (logo.activity.blocks.visible) {
             if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
+                // Unhighlight any previously highlighted block
+                if (logo._currentlyHighlightedBlock !== null && logo._currentlyHighlightedBlock !== blk) {
+                    logo.activity.blocks.unhighlight(logo._currentlyHighlightedBlock);
+                }
+                // Highlight the current block
                 logo.activity.blocks.highlight(blk, false);
+                logo._currentlyHighlightedBlock = blk;
             }
         }
 
@@ -1574,6 +1582,10 @@ class Logo {
                         setTimeout(() => {
                             if (logo.activity.blocks.visible) {
                                 logo.activity.blocks.unhighlight(blk);
+                                // Clear the currently highlighted block if it was this one
+                                if (logo._currentlyHighlightedBlock === blk) {
+                                    logo._currentlyHighlightedBlock = null;
+                                }
                             }
                         }, logo.turtleDelay + tur.waitTime);
                     }
@@ -1602,7 +1614,12 @@ class Logo {
                         // The child flow is finally complete, so unhighlight.
                         setTimeout(() => {
                             if (logo.activity.blocks.visible) {
-                                logo.activity.blocks.unhighlight(tur.unhighlightQueue.pop());
+                                const unhighlightBlock = tur.unhighlightQueue.pop();
+                                logo.activity.blocks.unhighlight(unhighlightBlock);
+                                // Clear the currently highlighted block if it was this one
+                                if (logo._currentlyHighlightedBlock === unhighlightBlock) {
+                                    logo._currentlyHighlightedBlock = null;
+                                }
                             } else {
                                 tur.unhighlightQueue.pop();
                             }
@@ -1719,97 +1736,12 @@ class Logo {
                         tur.singer.runningFromEvent = false;
                         if (tur.singer.suppressOutput && logo.recording) {
                             tur.singer.suppressOutput = false;
-                            logo._checkingCompletionState = false;
-                            logo.activity.saveLocally();
-                        } else {
-                            tur.singer.suppressOutput = false;
-                            logo._checkingCompletionState = false;
-
-                            // Reset the cursor.
-                            document.body.style.cursor = "default";
-                            logo.activity.saveLocally();
                         }
-                        if (this.synth.recorder && this.synth.recorder.state == "recording")
-                            this.synth.recorder.stop();
                     }, 1000);
-                } else if (tur.singer.suppressOutput) {
-                    setTimeout(() => __checkCompletionState(), 250);
                 }
             };
 
-            if (
-                !logo.activity.turtles.running() &&
-                queueStart === 0 &&
-                tur.singer.justCounting.length === 0
-            ) {
-                if (!logo._checkingCompletionState) {
-                    logo._checkingCompletionState = true;
-                    setTimeout(() => __checkCompletionState(), 250);
-                }
-            }
-
-            if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
-                // Nothing else to do. Clean up.
-                if (
-                    logo.activity.turtles.getTurtle(turtle).queue.length === 0 ||
-                    blk !== last(logo.activity.turtles.getTurtle(turtle).queue).parentBlk
-                ) {
-                    setTimeout(() => {
-                        if (logo.activity.blocks.visible) {
-                            logo.activity.blocks.unhighlight(blk);
-                        }
-                    }, logo.turtleDelay);
-                }
-
-                // Unhighlight any parent blocks still highlighted.
-                for (const b in tur.parentFlowQueue) {
-                    if (logo.activity.blocks.visible) {
-                        logo.activity.blocks.unhighlight(tur.parentFlowQueue[b]);
-                    }
-                }
-
-                // Make sure the turtles are on top.
-                const i = logo.activity.stage.children.length - 1;
-                logo.activity.stage.setChildIndex(
-                    logo.activity.turtles.getTurtle(turtle).container,
-                    i
-                );
-                logo.activity.refreshCanvas();
-            }
-
-            for (const arg in logo.evalOnStopList) {
-                eval(logo.evalOnStopList[arg]);
-            }
-
-            if (!logo.activity.turtles.running() && queueStart === 0) {
-                if (logo.activity.showBlocksAfterRun) {
-                    // If this is a status or oscilloscope stack, do
-                    // not run showBlocks.
-                    if (
-                        blk !== null &&
-                        logo.blockList[blk].connections[0] !== null &&
-                        ["status", "oscilloscope"].includes(
-                            logo.blockList[
-                                logo.blockList[blk].connections[0]
-                            ].name
-                        )
-                    ) {
-                        // console.debug("running status/oscilloscope block");
-                    } else {
-                        logo.activity.blocks.showBlocks();
-                        logo.activity.showBlocksAfterRun = false;
-                    }
-                }
-                document.getElementById("stop").style.color = "white";
-                const saveButton = docById('saveButton');
-                const saveButtonAdvanced = docById('saveButtonAdvanced');
-                const recordButton = docById("record");
-                saveButton.disabled = false;
-                saveButtonAdvanced.disabled = false;
-                saveButton.className = "";
-                saveButtonAdvanced.className = "";
-                recordButton.className = "";
-            }
+            setTimeout(__checkCompletionState, 100);
         }
     }
 

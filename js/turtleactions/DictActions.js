@@ -149,7 +149,7 @@ function setupDictActions(activity) {
             } else if (key === "x") {
                 const y = activity.turtles.screenY2turtleY(targetTur.container.y);
                 targetTur.painter.doSetXY(value, y);
-            } 
+            }
         }
 
         /**
@@ -232,11 +232,11 @@ function setupDictActions(activity) {
             if (!(turtle in activity.logo.turtleDicts)) {
                 activity.logo.turtleDicts[turtle] = {};
             }
-                if (!(dict in activity.logo.turtleDicts[turtle])) {
-                    activity.logo.turtleDicts[turtle][dict] = {};
-                }
-                 activity.logo.turtleDicts[turtle][dict][key] = value;
-                 console.log(activity.logo.turtleDicts[turtle]);
+            if (!(dict in activity.logo.turtleDicts[turtle])) {
+                activity.logo.turtleDicts[turtle][dict] = {};
+            }
+            activity.logo.turtleDicts[turtle][dict][key] = value;
+            console.log(activity.logo.turtleDicts[turtle]);
             
         }
 
@@ -251,19 +251,19 @@ function setupDictActions(activity) {
          * @returns {String|Number}
          */
         static getValue(dict, key, turtle, blk) {
-              if( ! (dict in activity.logo.turtleDicts[turtle]) ){
+            if( ! (dict in activity.logo.turtleDicts[turtle]) ){
                 var msg=_("Dictionary with this name does not exist");
                 return msg;
-              }
-              else if(! (key in activity.logo.turtleDicts[turtle][dict])){
-                  var msg=_("Key with this name does not exist in ") + dict;
+            }
+            else if(! (key in activity.logo.turtleDicts[turtle][dict])){
+                var msg=_("Key with this name does not exist in ") + dict;
                 return msg;
-              }
+            }
 
             return activity.logo.turtleDicts[turtle][dict][key];
         }
     };
 }
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
     module.exports = setupDictActions;
 }

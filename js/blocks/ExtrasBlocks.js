@@ -13,7 +13,7 @@
    global
    _, last, FlowBlock, ValueBlock, LeftBlock, NOINPUTERRORMSG,
    NANERRORMSG, mixedNumber, TONEBPM, DEFAULTDELAY, Singer,
-   StackClampBlock, platformColor
+   StackClampBlock, platformColor, StatusMatrix
 */
 
 /* exported setupExtrasBlocks */
@@ -840,6 +840,51 @@ function setupExtrasBlocks(activity) {
         }
     }
 
+    /**
+     * Represents a DebuggerBlock.
+     * Extends FlowBlock.
+     * @class
+     * @extends FlowBlock
+     */
+    class DebuggerBlock extends FlowBlock {
+        /**
+         * Creates an instance of DebuggerBlock.
+         */
+        constructor() {
+            super("debugger", _("debugger"));
+            this.setPalette("extras", activity);
+            this.setHelpString([
+                _("The Debug block adds a debug point in your code. When reached, execution will pause and you can inspect variables."),
+                "documentation",
+                "",
+                "debugger"
+            ]);
+
+            this.formBlock({
+                name: _("debugger")
+            });
+        }
+
+        /**
+         * Handles the flow of the DebuggerBlock.
+         * @param {Array} args - The arguments passed to the block.
+         * @param {Logo} logo - The Logo interpreter instance.
+         * @param {number} turtle - The turtle associated with the block.
+         * @param {Block} blk - The block instance.
+         */
+        flow(args, logo, turtle, blk) {
+            const mode = activity.runMode;
+
+            // Only run debugger statement if normal playmode (final product)
+            // All other run methods are for debugging only and should be used as such
+            if (mode !== "slow" && mode !== "step" && mode !== "click") {
+                return;
+            }
+            // Stop all turtles and pause execution
+            activity.logo.turtleDelay = -1;
+        }
+    }
+
     new SaveABCBlock().setup(activity);
     new SaveLilypondBlock().setup(activity);
     new SaveSVGBlock().setup(activity);
@@ -855,6 +900,7 @@ function setupExtrasBlocks(activity) {
     new WaitBlock().setup(activity);
     new CommentBlock().setup(activity);
     new PrintBlock().setup(activity);
+    new DebuggerBlock().setup(activity);
     // NOP blocks
     new NOPValueBlock().setup(activity);
     new NOPOneArgMathBlock().setup(activity);
@@ -865,3 +911,7 @@ function setupExtrasBlocks(activity) {
     new NOPThreeArgBlock().setup(activity);
     new NOPFourArgBlock().setup(activity);
 }
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupExtrasBlocks };
+}
+

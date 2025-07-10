@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const { initBasicProtoBlocks, BACKWARDCOMPATIBILIYDICT } = require('../basicblocks');
+const { initBasicProtoBlocks, BACKWARDCOMPATIBILIYDICT } = require("../basicblocks");
 
 const mockActivity = {
     blocks: {
@@ -32,38 +32,38 @@ const mockActivity = {
 };
 
 const setupFunctions = [
-    'setupRhythmBlockPaletteBlocks', 'setupRhythmBlocks', 'setupMeterBlocks',
-    'setupPitchBlocks', 'setupIntervalsBlocks', 'setupToneBlocks',
-    'setupOrnamentBlocks', 'setupVolumeBlocks', 'setupDrumBlocks',
-    'setupWidgetBlocks', 'setupFlowBlocks', 'setupNumberBlocks',
-    'setupActionBlocks', 'setupBoxesBlocks', 'setupBooleanBlocks',
-    'setupHeapBlocks', 'setupDictBlocks', 'setupExtrasBlocks',
-    'setupProgramBlocks', 'setupGraphicsBlocks', 'setupPenBlocks',
-    'setupMediaBlocks', 'setupSensorsBlocks', 'setupEnsembleBlocks'
+    "setupRhythmBlockPaletteBlocks", "setupRhythmBlocks", "setupMeterBlocks",
+    "setupPitchBlocks", "setupIntervalsBlocks", "setupToneBlocks",
+    "setupOrnamentBlocks", "setupVolumeBlocks", "setupDrumBlocks",
+    "setupWidgetBlocks", "setupFlowBlocks", "setupNumberBlocks",
+    "setupActionBlocks", "setupBoxesBlocks", "setupBooleanBlocks",
+    "setupHeapBlocks", "setupDictBlocks", "setupExtrasBlocks",
+    "setupProgramBlocks", "setupGraphicsBlocks", "setupPenBlocks",
+    "setupMediaBlocks", "setupSensorsBlocks", "setupEnsembleBlocks"
 ];
 
 setupFunctions.forEach(fnName => {
     global[fnName] = jest.fn();
 });
 
-describe('initBasicProtoBlocks', () => {
+describe("initBasicProtoBlocks", () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    it('should assign palettes to activity.blocks.palettes', () => {
+    it("should assign palettes to activity.blocks.palettes", () => {
         initBasicProtoBlocks(mockActivity);
         expect(mockActivity.blocks.palettes).toBe(mockActivity.palettes);
     });
 
-    it('should call all setup functions with activity', () => {
+    it("should call all setup functions with activity", () => {
         initBasicProtoBlocks(mockActivity);
         setupFunctions.forEach(fnName => {
             expect(global[fnName]).toHaveBeenCalledWith(mockActivity);
         });
     });
 
-    it('should add blocks with palettes to their respective palettes', () => {
+    it("should add blocks with palettes to their respective palettes", () => {
         initBasicProtoBlocks(mockActivity);
 
         expect(mockActivity.blocks.protoBlockDict.block1.palette.add).toHaveBeenCalledWith(
@@ -76,15 +76,15 @@ describe('initBasicProtoBlocks', () => {
     });
 });
 
-describe('BACKWARDCOMPATIBILIYDICT', () => {
-    it('should be defined and not empty', () => {
+describe("BACKWARDCOMPATIBILIYDICT", () => {
+    it("should be defined and not empty", () => {
         expect(BACKWARDCOMPATIBILIYDICT).toBeDefined();
         expect(Object.keys(BACKWARDCOMPATIBILIYDICT).length).toBeGreaterThan(0);
     });
 
-    it('should correctly map old block names to new block names', () => {
-        expect(BACKWARDCOMPATIBILIYDICT.fullscreen).toBe('vspace');
-        expect(BACKWARDCOMPATIBILIYDICT.seth).toBe('setheading');
-        expect(BACKWARDCOMPATIBILIYDICT.random2).toBe('random');
+    it("should correctly map old block names to new block names", () => {
+        expect(BACKWARDCOMPATIBILIYDICT.fullscreen).toBe("vspace");
+        expect(BACKWARDCOMPATIBILIYDICT.seth).toBe("setheading");
+        expect(BACKWARDCOMPATIBILIYDICT.random2).toBe("random");
     });
 });

@@ -57,7 +57,7 @@ class SaveInterface {
         this.htmlSaveTemplate =
             '<!DOCTYPE html><html lang="en"><head> <meta charset="utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge"> <meta name="description" content="{{ project_description }}"> <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"> <title>{{ project_name }}</title> <meta property="og:site_name" content="Music Blocks"/> <meta property="og:type" content="website"/> <meta property="og:title" content="' +
             _("Music Blocks Project") +
-            ' - {{ project_name }}"/> <meta property="og:description" content="{{ project_description }}"/> <style>body{background-color: #dbf0fb;}#main{background-color: white; padding: 5%; position: fixed; width: 80vw; height: max-content; margin: auto; top: 0; left: 0; bottom: 0; right: 0; display: flex; flex-direction: column; justify-content: center; text-align: center; color: #424242; box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23); font-family: "Roboto", "Helvetica","Arial",sans-serif;}h3{font-weight: 400; font-size: 36px; margin-top: 10px;}hr{border-top: 0px solid #ccc; margin: 1em;}.btn{border: solid; border-color: #96D3F3; padding: 5px 10px; line-height: 50px; color: #0a3e58;}.btn:hover{transition: 0.4s; -webkit-transition: 0.3s; -moz-transition: 0.3s; background-color: #96D3F3;}.code{word-break: break-all; height: 15vh; background: #f6f8fa; color: #494949; text-align: justify; margin-right: 10vw; margin-left: 10vw; padding: 16px; overflow: auto; line-height: 1.45; background-color: #f6f8fa; border-radius: 3px; font-family: "SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace;}.image{border-radius: 2px 2px 0 0; position: relative; background-color: #96D3F3;}.image-div{margin-bottom: 10px;}.moreinfo-div{margin-top: 20px;}h4{font-weight: 500; font-size: 1.4em; margin-top: 10px; margin-bottom: 10px;}.tbcode{margin-bottom: 10px;}</style></head><body> <div id="main"> <div class="image-div"><img class="image" id="project-image" src="{{ project_image }}"></div><h3 id="title">' +
+            ' - {{ project_name }}"/> <meta property="og:description" content="{{ project_description }}"/> <style>body{background-color: #dbf0fb;}#main{background-color: white; padding: 5%; position: fixed; width: 80vw; height: max-content; margin: auto; top: 0; left: 0; bottom: 0; right: 0; display: flex; flex-direction: column; justify-content: center; text-align: center; color: #424242; box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23); font-family: "Roboto", "Helvetica","Arial",sans-serif;}h3{font-weight: 400; font-size: 36px; margin-top: 10px;}hr{border-top: 0px solid #ccc; margin: 1em;}.btn {display: inline-block; margin-left: 10px; cursor: pointer; font-size: 14px; border-radius: 12px; border: 1px solid #1678ad; padding: 3px 5px; line-height: 20px; color: #181818;}.btn:hover {transition: 0.4s; -webkit-transition: 0.3s; -moz-transition: 0.3s; background-color: #3eb7e7;}.code{word-break: break-all; height: 15vh; background: #f6f8fa; color: #494949; text-align: justify; margin-right: 10vw; margin-left: 10vw; padding: 16px; overflow: auto; line-height: 1.45; background-color: #f6f8fa; border-radius: 3px; font-family: "SFMono-Regular",Consolas,"Liberation Mono",Menlo,Courier,monospace;}.image{border-radius: 2px 2px 0 0; position: relative; background-color: #96D3F3;}.image-div{margin-bottom: 10px;}.moreinfo-div{margin-top: 20px;}h4{font-weight: 500; font-size: 1.4em; margin-top: 10px; margin-bottom: 10px;}.tbcode{margin-bottom: 10px;}</style></head><body> <div id="main"> <div class="image-div"><img class="image" id="project-image" src="{{ project_image }}"></div><h3 id="title">' +
             _("Music Blocks Project") +
             ' - {{ project_name }}</h3> <p>{{ project_description }}</p><hr> <div> <div style="color: #9E9E9E"><p>' +
             _("This project was created in Music Blocks") +
@@ -85,17 +85,40 @@ class SaveInterface {
             _("Project Code") +
             "</h4>" +
             _("This code stores data about the blocks in a project.") +
-            ' <a href="javascript:toggle();" id="showhide">' +
+            '<a href="javascript:toggle();" id="showhide">' +
             _("Show") +
-            '</a></div> <div class="code">{{ data }}</div></div></div></div><script type="text/javascript">function toggle(){if (document.getElementsByClassName("code")[0].style.display=="none"){document.getElementsByClassName("code")[0].style.display="flex";document.getElementById("showhide").textContent = "' +
-            _("Hide") +
-            '";} else {document.getElementsByClassName("code")[0].style.display="none";document.getElementById("showhide").textContent = "Show";}} var name=decodeURIComponent(window.location.pathname.split("/").pop().slice(0, -5)); var prefix="' +
-            _("Music Blocks Project") +
-            ' - "; var title=prefix+name; document.querySelector(' +
-            "'" +
-            'meta[property="og:title"]' +
-            "'" +
-            ').content=title; document.title=name; document.getElementById("title").textContent=title; document.getElementsByClassName("code")[0].style.display = "none";</script></body></html>';
+            "</a>" +
+            '<button class="btn" onclick="copyCode()" style="margin-left: 10px;">' +
+            _("Copy to Clipboard") +
+            "</button>" +
+            '</div> <div class="code" id="codeBlock">{{ data }}</div></div></div></div>' +
+            '<script type="text/javascript">' +
+            "function toggle() {" +
+            '  var codeBlock = document.getElementsByClassName("code")[0];' +
+            '  var showHideButton = document.getElementById("showhide");' +
+            '  if (codeBlock.style.display === "none") {' +
+            '    codeBlock.style.display = "flex";' +
+            '    showHideButton.textContent = "' + _("Hide") + '";' +
+            "  } else {" +
+            '    codeBlock.style.display = "none";' +
+            '    showHideButton.textContent = "' + _("Show") + '";' +
+            "  }" +
+            "}" +
+            "window.onload = function() {" +
+            '  var codeBlock = document.getElementById("codeBlock");' +
+            '  var showHideButton = document.getElementById("showhide");' +
+            '  codeBlock.style.display = "none";' +
+            '  showHideButton.textContent = "' + _("Show") + '";' +
+            "};" +
+            "function copyCode() {" +
+            '  var text = document.getElementById("codeBlock").innerText;' +
+            "  navigator.clipboard.writeText(text).then(function() {" +
+            '    alert("' + _("Project code copied to clipboard!") + '");' +
+            "  }).catch(function() {" +
+            '    alert("' + _("Failed to copy.") + '");' +
+            "  });" +
+            "}" +
+            "</script>";
 
         this.timeLastSaved = -100;
         const $j = jQuery.noConflict();
@@ -106,7 +129,7 @@ class SaveInterface {
             }
 
             if (
-                typeof this.PlanetInterface !== 'undefined' &&
+                typeof this.PlanetInterface !== "undefined" &&
                 this.PlanetInterface.getTimeLastSaved() !== this.timeLastSaved
             ) {
                 event.preventDefault();
@@ -118,12 +141,12 @@ class SaveInterface {
     }
 
     /**
-    * Download a file to the user's computer.
-    * @param {string} extension - The file extension (including the dot).
-    * @param {string} dataurl - The base64 data url of the file.
-    * @param {string} defaultfilename - The default filename to be used.
-    * @returns {void}
-    */
+     * Download a file to the user's computer.
+     * @param {string} extension - The file extension (including the dot).
+     * @param {string} dataurl - The base64 data url of the file.
+     * @param {string} defaultfilename - The default filename to be used.
+     * @returns {void}
+     */
     download(extension, dataurl, defaultfilename) {
         let filename = null;
         if (defaultfilename === undefined || defaultfilename === null) {
@@ -304,11 +327,10 @@ class SaveInterface {
             midi.header.ticksPerBeat = 480;
 
             Object.entries(data).forEach(([blockIndex, notes]) => {
-
                 const mainTrack = midi.addTrack();
                 mainTrack.name = `Track ${parseInt(blockIndex) + 1}`;
 
-                let trackMap = new Map();
+                const trackMap = new Map();
                 let globalTime = 0;
 
                 notes.forEach((noteData) => {
@@ -332,21 +354,22 @@ class SaveInterface {
                             midi: midiNumber,
                             time: globalTime,
                             duration: duration,
-                            velocity: 0.9,
+                            velocity: 0.9
                         });
-
                     } else {
                         if (!trackMap.has(instrument)) {
                             const instrumentTrack = midi.addTrack();
-                            instrumentTrack.name = `Track ${parseInt(blockIndex) + 1} - ${instrument}`;
-                            instrumentTrack.instrument.number = instrumentMIDI[instrument] ?? instrumentMIDI["default"];
+                            instrumentTrack.name = `Track ${
+                                parseInt(blockIndex) + 1
+                            } - ${instrument}`;
+                            instrumentTrack.instrument.number =
+                                instrumentMIDI[instrument] ?? instrumentMIDI["default"];
                             trackMap.set(instrument, instrumentTrack);
                         }
 
                         const instrumentTrack = trackMap.get(instrument);
 
                         noteData.note.forEach((pitch) => {
-
                             if (!pitch.includes("R")) {
                                 instrumentTrack.addNote({
                                     name: normalizeNote(pitch),
@@ -400,7 +423,7 @@ class SaveInterface {
 
     /**
      * This method is to save PNG representation of an activity
-     * 
+     *
      * @param {SaveInterface} activity -The activity object to save
      * @returns {void}
      * @method
@@ -413,7 +436,7 @@ class SaveInterface {
 
     /**
      * This method is to save BlockArtwork and download the SVG representation of block artwork from the provided activity.
-     * 
+     *
      * @param {SaveInterface} activity - The activity object containing block artwork to save.
      * @returns {void}
      * @method
@@ -426,7 +449,7 @@ class SaveInterface {
 
     /**
      * This method is to save BlockArtwork and download the PNG representation of block artwork from the provided activity.
-     * 
+     *
      * @param {SaveInterface} activity - The activity object containing block artwork to save.
      * @returns {void}
      * @method
@@ -435,20 +458,20 @@ class SaveInterface {
     saveBlockArtworkPNG(activity) {
         activity.printBlockPNG().then((pngDataUrl) => {
             activity.save.download("png", pngDataUrl, null);
-        })
+        });
     }
 
     /**
-    * Save audio recording in WAV format.
-    *
-    * This method initiates the process of recording audio in WAV format within the provided activity.
-    *
-    * @param {SaveInterface} activity - The activity object for which audio recording is to be saved.
-    * @returns {void}
-    * @memberof SaveInterface
-    * @method
-    * @instance
-    */
+     * Save audio recording in WAV format.
+     *
+     * This method initiates the process of recording audio in WAV format within the provided activity.
+     *
+     * @param {SaveInterface} activity - The activity object for which audio recording is to be saved.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
     saveWAV(activity) {
         document.body.style.cursor = "wait";
         activity.logo.recording = true;
@@ -777,6 +800,6 @@ class SaveInterface {
 }
 
 
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
     module.exports = { SaveInterface };
 }

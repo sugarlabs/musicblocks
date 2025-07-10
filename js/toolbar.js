@@ -134,7 +134,7 @@ class Toolbar {
                 _("Delete plugin"),
                 _("Enable horizontal scrolling"),
                 _("Disable horizontal scrolling"),
-                _("Change theme"),               
+                _("Change theme"),
                 _("Light Mode"),
                 _("Dark Mode"),
                 _("Merge with current project"),
@@ -152,7 +152,7 @@ class Toolbar {
                 _("Save sheet music as ABC"),
                 _("Save sheet music as Lilypond"),
                 _("Save block artwork as SVG"),
-                _("Save block artwork as PNG"),              
+                _("Save block artwork as PNG"),
                 _("Confirm"),
                 _("Select language"),
                 _("Save project as HTML"),
@@ -267,7 +267,7 @@ class Toolbar {
                 _("Delete plugin"),
                 _("Enable horizontal scrolling"),
                 _("Disable horizontal scrolling"),
-                _("Change theme"),               
+                _("Change theme"),
                 _("Light Mode"),
                 _("Dark Mode"),
                 _("Merge with current project"),
@@ -282,7 +282,7 @@ class Toolbar {
                 _("Save turtle artwork as SVG"),
                 _("Save turtle artwork as PNG"),
                 _("Save block artwork as SVG"),
-                _("Save block artwork as PNG"), 
+                _("Save block artwork as PNG"),
                 _("Confirm"),
                 _("English (United States)"),
                 _("English (United Kingdom)"),
@@ -403,9 +403,9 @@ class Toolbar {
             stopIcon.style.color = this.stopIconColorWhenPlaying;
             saveButton.disabled = true;
             saveButtonAdvanced.disabled = true;
-           saveButton.className = "grey-text inactiveLink";
-           saveButtonAdvanced.className = "grey-text inactiveLink";
-           recordButton.className = "grey-text inactiveLink";
+            saveButton.className = "grey-text inactiveLink";
+            saveButtonAdvanced.className = "grey-text inactiveLink";
+            recordButton.className = "grey-text inactiveLink";
             isPlayIconRunning = true;
             play_button_debounce_timeout = setTimeout(function() { handleClick(); }, 2000);
 
@@ -447,9 +447,31 @@ class Toolbar {
      * @returns {void}
      */
     renderNewProjectIcon(onclick) {
-        const newProjectIcon = docById("new-project");
+        const modalContainer = docById("modal-container");
+        const newDropdown = docById("newdropdown");
 
-        newProjectIcon.onclick = () => {
+        newDropdown.innerHTML = "";
+        const title = document.createElement("div");
+        title.classList.add("new-project-title");
+        title.textContent = _("New project");
+        newDropdown.appendChild(title);
+
+        const confirmationMessage = document.createElement("div");
+        confirmationMessage.id = "confirmation-message";
+        confirmationMessage.textContent = _("Are you sure you want to create a new project?");
+        newDropdown.appendChild(confirmationMessage);
+
+        const confirmationButtonLi = document.createElement("li");
+        const confirmationButton = document.createElement("div");
+        confirmationButton.classList.add("confirm-button");
+        confirmationButton.id = "new-project";
+        confirmationButton.textContent = _("Confirm");
+        confirmationButtonLi.appendChild(confirmationButton);
+        newDropdown.appendChild(confirmationButtonLi);
+
+        modalContainer.style.display = "flex";
+        confirmationButton.onclick = () => {
+            modalContainer.style.display = "none";
             onclick(this.activity);
         };
     }
@@ -470,14 +492,14 @@ class Toolbar {
     }
 
     renderThemeSelectIcon(themeBox, themes) {
-        const icon = document.getElementById("themeSelectIcon")
+        const icon = document.getElementById("themeSelectIcon");
         themes.forEach((theme) =>{
             if(localStorage.themePreference === theme){
                 icon.innerHTML = document.getElementById(theme).innerHTML;
             }
-        })
+        });
         const themeSelectIcon = docById("themeSelectIcon");
-        let themeList = themes;
+        const themeList = themes;
         themeSelectIcon.onclick = () => {
             themeList.forEach((theme) => {
                 docById(theme).onclick = () => themeBox[`${theme}_onclick`](this.activity);
@@ -603,72 +625,72 @@ class Toolbar {
         blockartworksvg_onclick,
         blockartworkpng_onclick
     ) {
-        const saveButton = docById('saveButton');
-        const saveButtonAdvanced = docById('saveButtonAdvanced');
+        const saveButton = docById("saveButton");
+        const saveButtonAdvanced = docById("saveButtonAdvanced");
         if (this.activity.beginnerMode) {
             if (this.language === "ja") {
                 saveButton.onclick = () => {
                     html_onclick(this.activity);
-                }
+                };
             }
             else {
-                saveButton.style.display = 'block';
-                saveButtonAdvanced.style.display = 'none';
+                saveButton.style.display = "block";
+                saveButtonAdvanced.style.display = "none";
                 saveButton.onclick = () => {
-                    const saveHTML = docById('save-html-beg');
+                    const saveHTML = docById("save-html-beg");
                     console.debug(saveHTML);
                     saveHTML.onclick = () => {
                         html_onclick(this.activity);
                     };
 
-                    const savePNG = docById('save-png-beg');
+                    const savePNG = docById("save-png-beg");
                     console.debug(savePNG);
                     const svgData = doSVG_onclick(
-                        this.activity.canvas, 
-                        this.activity.logo, 
-                        this.activity.turtles, 
-                        this.activity.canvas.width, 
-                        this.activity.canvas.height, 
+                        this.activity.canvas,
+                        this.activity.logo,
+                        this.activity.turtles,
+                        this.activity.canvas.width,
+                        this.activity.canvas.height,
                         1.0
                     );
                     
-                    if (svgData == '') {
+                    if (svgData == "") {
                         savePNG.disabled = true;
-                        savePNG.className = 'grey-text inactiveLink';
+                        savePNG.className = "grey-text inactiveLink";
                     } else {
                         savePNG.disabled = false;
-                        savePNG.className = '';
+                        savePNG.className = "";
                         savePNG.onclick = () => {
                             png_onclick(this.activity);
                         };
-                    }  
+                    }
                 };
             }
         } else {
-            console.debug('ADVANCED MODE BUTTONS')
-            saveButton.style.display = 'none';
-            saveButtonAdvanced.style.display = 'block';
+            console.debug("ADVANCED MODE BUTTONS");
+            saveButton.style.display = "none";
+            saveButtonAdvanced.style.display = "block";
             saveButtonAdvanced.onclick = () => {
-                const saveHTML = docById('save-html');
+                const saveHTML = docById("save-html");
                 //console.debug(saveHTML);
 
                 saveHTML.onclick = () => {
                     html_onclick(this.activity);
                 };
-                const saveSVG = docById('save-svg');
-                const savePNG = docById('save-png');
+                const saveSVG = docById("save-svg");
+                const savePNG = docById("save-png");
                 console.debug(savePNG);
                 const svgData = doSVG_onclick(
-                    this.activity.canvas, 
-                    this.activity.logo, 
-                    this.activity.turtles, 
-                    this.activity.canvas.width, 
-                    this.activity.canvas.height, 
+                    this.activity.canvas,
+                    this.activity.logo,
+                    this.activity.turtles,
+                    this.activity.canvas.width,
+                    this.activity.canvas.height,
                     1.0
                 );
 
                 // if there is no mouse artwork to save then grey out
-                if (svgData == '') {
+                if (svgData == "") {
                     saveSVG.disabled = true;
                     savePNG.disabled = true;
                     saveSVG.className = "grey-text inactiveLink";
@@ -694,33 +716,33 @@ class Toolbar {
                         midi_onclick(this.activity);
                     };
 
-                    const saveWAV = docById('save-wav');
-                     saveWAV.onclick = () => {
+                    const saveWAV = docById("save-wav");
+                    saveWAV.onclick = () => {
                         wave_onclick(this.activity);
                     };
 
-                    const saveLY = docById('save-ly');
+                    const saveLY = docById("save-ly");
                     saveLY.onclick = () => {
                         ly_onclick(this.activity);
                     };
-                    const saveABC = docById('save-abc');
+                    const saveABC = docById("save-abc");
                     saveABC.onclick = () => {
                         abc_onclick(this.activity);
                     };
-                    const saveMXML = docById('save-mxml');
+                    const saveMXML = docById("save-mxml");
                     saveMXML.onclick = () => {
                         mxml_onclick(this.activity);
                     };
                 }
-                const saveArtworkSVG = docById('save-blockartwork-svg');
+                const saveArtworkSVG = docById("save-blockartwork-svg");
                 saveArtworkSVG.onclick = () => {
                     blockartworksvg_onclick(this.activity);
                 };
-                const saveArtworkPNG = docById('save-blockartwork-png');
+                const saveArtworkPNG = docById("save-blockartwork-png");
                 saveArtworkPNG.onclick = () => {
                     blockartworkpng_onclick(this.activity);
                 };
-            }
+            };
         }
     }
 
@@ -730,7 +752,7 @@ class Toolbar {
      * @public 
      * @param {Function} rec_onclick
      * @returns {void}
-     */  
+     */
     updateRecordButton(rec_onclick) {
         const Record = docById("record");
         const browser = fnBrowserDetect();
@@ -916,7 +938,7 @@ class Toolbar {
                 // Hide all advanced icons in beginner mode
                 const advancedIcons = [
                     "displayStatsIcon",
-                    "loadPluginIcon", 
+                    "loadPluginIcon",
                     "delPluginIcon",
                     "enableHorizScrollIcon",
                     "disableHorizScrollIcon",
@@ -941,22 +963,22 @@ class Toolbar {
             }
 
             // Update save buttons
-            const saveButton = docById('saveButton');
-            const saveButtonAdvanced = docById('saveButtonAdvanced');
+            const saveButton = docById("saveButton");
+            const saveButtonAdvanced = docById("saveButtonAdvanced");
             if (saveButton) saveButton.style.display = this.activity.beginnerMode ? "block" : "none";
             if (saveButtonAdvanced) saveButtonAdvanced.style.display = this.activity.beginnerMode ? "none" : "block";
-            activity.toolbar.renderSaveIcons(
-                activity.save.saveHTML.bind(activity.save),
+            this.activity.toolbar.renderSaveIcons(
+                this.activity.save.saveHTML.bind(this.activity.save),
                 doSVG,
-                activity.save.saveSVG.bind(activity.save),
-                activity.save.saveMIDI.bind(activity.save),
-                activity.save.savePNG.bind(activity.save),
-                activity.save.saveWAV.bind(activity.save),
-                activity.save.saveLilypond.bind(activity.save),
-                activity.save.saveAbc.bind(activity.save),
-                activity.save.saveMxml.bind(activity.save),
-                activity.save.saveBlockArtwork.bind(activity.save),
-                activity.save.saveBlockArtworkPNG.bind(activity.save)
+                this.activity.save.saveSVG.bind(this.activity.save),
+                this.activity.save.saveMIDI.bind(this.activity.save),
+                this.activity.save.savePNG.bind(this.activity.save),
+                this.activity.save.saveWAV.bind(this.activity.save),
+                this.activity.save.saveLilypond.bind(this.activity.save),
+                this.activity.save.saveAbc.bind(this.activity.save),
+                this.activity.save.saveMxml.bind(this.activity.save),
+                this.activity.save.saveBlockArtwork.bind(this.activity.save),
+                this.activity.save.saveBlockArtworkPNG.bind(this.activity.save)
             );
         };
 
@@ -1132,40 +1154,7 @@ class Toolbar {
         }
     };
 }
-function renderNewProjectConfirmation() {
-    const modalContainer = document.getElementById("modal-container");
-    const newDropdown = document.getElementById("newdropdown");
-    const isDarkMode = document.body.classList.contains("dark");
-    newDropdown.style.backgroundColor = isDarkMode ? "#424242" : "#ffffff";
-    newDropdown.style.border = isDarkMode ? "1px solid #444444" : "1px solid #cccccc";
-    newDropdown.style.color = isDarkMode ? "#ffffff" : "#000000";
-    newDropdown.style.padding = "24px";
-    newDropdown.innerHTML = '';
-    const title = document.createElement("div");
-    title.innerHTML = `<h2 style="font-size: 24px; text-align: left; margin: 0; color: #2196F3;">${_("New project")}</h2>`;
-    newDropdown.appendChild(title);
-    const confirmationMessage = document.createElement("div");
-    confirmationMessage.innerHTML = `<div id="confirmation-message" style="font-size: 16px; margin-bottom: 24px; text-align: left; ${
-        isDarkMode ? "color: #ffffff;" : "color: #666666;"
-    }">${_("Are you sure you want to create a new project?")}</div>`;
-    newDropdown.appendChild(confirmationMessage);
-    const confirmationButtonLi = document.createElement("li");
-    confirmationButtonLi.style.textAlign = "center";
-    confirmationButtonLi.style.width = "fit-content";
-    const confirmationButton = document.createElement("a");
-    confirmationButton.id = "new-project";
-    confirmationButton.style.display = "inline-block";
-    confirmationButton.style.backgroundColor = platformColor.blueButton;
-    confirmationButton.style.color = "white";
-    confirmationButton.style.textDecoration = "none";
-    confirmationButton.style.borderRadius = "0px";
-    confirmationButton.style.fontWeight = "bold";
-    confirmationButton.innerHTML = _("Confirm");
-    confirmationButtonLi.appendChild(confirmationButton);
-    newDropdown.appendChild(confirmationButtonLi);
-    modalContainer.style.display = "flex";
-    confirmationButton.onclick = () => {
-        modalContainer.style.display = "none";
-    };
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Toolbar;
 }
-renderNewProjectConfirmation();

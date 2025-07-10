@@ -111,7 +111,7 @@ class Palettes {
             const element = document.createElement("div");
             element.id = "palette";
             element.setAttribute("class", "disable_highlighting");
-            element.classList.add('flex-palette')
+            element.classList.add("flex-palette");
             element.setAttribute(
                 "style",
                 "position: absolute; z-index: 1000; left :0px; top:" + this.top + "px"
@@ -336,10 +336,10 @@ class Palettes {
         row.style.alignItems = "center";
         row.style.width = "126px";
         row.style.backgroundColor = platformColor.paletteBackground;
-        row.addEventListener('mouseover', () => {
+        row.addEventListener("mouseover", () => {
             row.style.backgroundColor = platformColor.hoverColor;
         });
-        row.addEventListener('mouseout', () => {
+        row.addEventListener("mouseout", () => {
             row.style.backgroundColor = platformColor.paletteBackground;
         });
 
@@ -410,7 +410,7 @@ class Palettes {
             for (const name in this.dict) {
                 if (this.dict.hasOwnProperty(name)) {
                     const palette = this.dict[name];
-                    if (palette && typeof palette.hideMenu === 'function') {
+                    if (palette && typeof palette.hideMenu === "function") {
                         palette.hideMenu();
                     }
                 }
@@ -432,7 +432,7 @@ class Palettes {
             const element = document.createElement("div");
             element.id = "palette";
             element.setAttribute("class", "disable_highlighting");
-            element.classList.add('flex-palette');
+            element.classList.add("flex-palette");
             element.setAttribute(
                 "style",
                 `position: fixed; z-index: 1000; left: 0px; top: ${60+this.top}px; overflow-y: auto;`
@@ -458,7 +458,7 @@ class Palettes {
             document.body.appendChild(element);
 
         } catch (e) {
-            console.error('Error clearing palettes:', e);
+            console.error("Error clearing palettes:", e);
         }
     }
 
@@ -863,6 +863,7 @@ class Palette {
         this.fadedUpButton = null;
         this.fadedDownButton = null;
         this.count = 0;
+        this._outsideClickListener = null;
     }
 
     hide() {
@@ -948,6 +949,25 @@ class Palette {
         }
 
         this._showMenuItems();
+
+        // Close palette menu on outside click
+        if (this._outsideClickListener) {
+            // Remove any existing listener before attaching a new one
+            document.removeEventListener("click", this._outsideClickListener);
+        }
+
+        this._outsideClickListener = (event) => {
+            if (!this.menuContainer.contains(event.target)) {
+                this.hideMenu(); // Calls your existing hideMenu() → _hideMenuItems()
+                document.removeEventListener("click", this._outsideClickListener);
+                this._outsideClickListener = null;
+            }
+        };
+
+        // Delay listener to avoid capturing the click that opened the menu
+        setTimeout(() => {
+            document.addEventListener("click", this._outsideClickListener);
+        }, 0);
     }
 
     _hideMenuItems() {
@@ -1321,7 +1341,154 @@ class Palette {
             this.draggingProtoBlock = false;
 
             let macroExpansion = null;
-            if (
+
+            if (protoblk.name === "status") {
+                // Check if a status block already exists
+                for (let blk = 0; blk < this.activity.blocks.blockList.length; blk++) {
+                    const block = this.activity.blocks.blockList[blk];
+                    if (block.name === "status" && !block.trash) {
+                        console.log("Status block already exists, preventing creation of another one");
+                        return;
+                    }
+                }
+
+                if (this.activity.logo.statusMatrix === null) {
+                    this.activity.logo.statusMatrix = new StatusMatrix();
+                }
+                // Clear existing status fields
+                if (this.activity.logo.statusFields) {
+                    this.activity.logo.statusFields = [];
+                }
+
+                // Find all status variables in blockList and add them to status fields
+                const statusVariables = [
+                    "modelength",
+                    "deltapitch2",
+                    "deltapitch",
+                    "currentkey",
+                    "currentmode",
+                    "x",
+                    "y",
+                    "grey",
+                    "shade",
+                    "pensize",
+                    "color",
+                    "elapsednotes",
+                    "beatfactor",
+                    "notevalue",
+                    "beatvalue",
+                    "measurevalue",
+                    "bpmfactor",
+                    "currentpitch"
+                ];
+
+                const foundVariables = [];
+                const foundTypes = new Set();
+                for (let blk = 0; blk < this.activity.blocks.blockList.length; blk++) {
+                    const block = this.activity.blocks.blockList[blk];
+                    if (!block.trash) {
+                        for (const blockType of statusVariables) {
+                            if (block.name === blockType && !foundTypes.has(blockType)) {
+                                if (this.activity.logo.statusFields) {
+                                    this.activity.logo.statusFields.push([blk, blockType]);
+                                }
+                                foundVariables.push([blk, blockType]);
+                                foundTypes.add(blockType);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // Find all box blocks and add them to status fields
+                const boxBlocks = [];
+                const boxNames = new Set();
+                for (let blk = 0; blk < this.activity.blocks.blockList.length; blk++) {
+                    const block = this.activity.blocks.blockList[blk];
+                    if (block.name === "namedbox" && !block.trash && block.overrideName && !boxNames.has(block.overrideName)) {
+                        if (this.activity.logo.statusFields) {
+                            this.activity.logo.statusFields.push([blk, "namedbox"]);
+                        }
+                        boxBlocks.push(blk);
+                        boxNames.add(block.overrideName);
+                    }
+                }
+
+                // Create base status block structure
+                const statusBlocks = [
+                    [0, "status", saveX, saveY, [null, 1, 2]],
+                    [1, "hidden", 0, 0, [0, foundVariables.length > 0 || boxBlocks.length > 0 ? 3 : null]],
+                    [2, "hiddennoflow", 0, 0, [0, null]]
+                ];
+
+                // Add variables and boxes to status block
+                let lastBlockIndex = 2;
+                let lastConnection = 1; // Start from the hidden block
+
+                // Add variables first
+                for (let i = 0; i < foundVariables.length; i++) {
+                    const [blockId, blockType] = foundVariables[i];
+                    const block = activity.blocks.blockList[blockId];
+                    const isLastVar = i === foundVariables.length - 1;
+                    const hasBoxes = boxBlocks.length > 0;
+
+                    statusBlocks.push([
+                        lastBlockIndex + 1,
+                        "print",
+                        0,
+                        0,
+                        [lastConnection, lastBlockIndex + 2, (!isLastVar || hasBoxes) ? lastBlockIndex + 3 : null]
+                    ]);
+                    lastConnection = lastBlockIndex + 1;
+
+                    // Add variable value block
+                    statusBlocks.push([
+                        lastBlockIndex + 2,
+                        [blockType, { "value": block.value }],
+                        0,
+                        0,
+                        [lastBlockIndex + 1]
+                    ]);
+                    lastBlockIndex += 2;
+                }
+
+                // Then add box blocks
+                for (let i = 0; i < boxBlocks.length; i++) {
+                    const boxBlockId = boxBlocks[i];
+                    const boxBlock = activity.blocks.blockList[boxBlockId];
+                    console.log("Adding box block to status:", boxBlock);
+
+                    statusBlocks.push([
+                        lastBlockIndex + 1,
+                        "print",
+                        0,
+                        0,
+                        [lastConnection, lastBlockIndex + 2, i < boxBlocks.length - 1 ? lastBlockIndex + 3 : null]
+                    ]);
+                    lastConnection = lastBlockIndex + 1;
+
+                    // Add box value block
+                    statusBlocks.push([
+                        lastBlockIndex + 2,
+                        ["namedbox", { "value": boxBlock.overrideName }],
+                        0,
+                        0,
+                        [lastBlockIndex + 1]
+                    ]);
+                    lastBlockIndex += 2;
+                }
+                console.log("blocks");
+                macroExpansion = statusBlocks;
+
+                // Initialize the status matrix
+                this.activity.logo.statusMatrix.init(this.activity);
+
+                // Set up the status matrix to update periodically
+                this.activity.logo.inStatusMatrix = false;
+
+                // Update the status display
+                this.activity.logo.statusMatrix.updateAll();
+            } else if (
                 !["namedbox", "nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].includes(
                     protoblk.name
                 )

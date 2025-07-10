@@ -296,7 +296,7 @@ function setupDrumBlocks(activity) {
 
         drumConfigs.forEach(config => {
             new PlayDrumMacroBlock(...config).setup(activity);
-});
+        });
 
     }
     /**
@@ -592,4 +592,7 @@ function setupDrumBlocks(activity) {
     new SetDrumBlock().setup(activity);
     new PlayEffectBlock().setup(activity);
     new PlayDrumBlock().setup(activity);
+}
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupDrumBlocks };
 }

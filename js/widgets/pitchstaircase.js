@@ -144,11 +144,11 @@ class PitchStaircase {
                 "data:image/svg+xml;base64," +
                 window.btoa(
                     base64Encode(
-                            SYNTHSVG.replace(/SVGWIDTH/g, svgWidth)
-                                .replace(/XSCALE/g, svgScale)
-                                .replace(/STOKEWIDTH/g, svgStrokeWidth)
-                        )
-                    );
+                        SYNTHSVG.replace(/SVGWIDTH/g, svgWidth)
+                            .replace(/XSCALE/g, svgScale)
+                            .replace(/STOKEWIDTH/g, svgStrokeWidth)
+                    )
+                );
             stepCell.style.backgroundImage = "url(" + svgData + ")";
             stepCell.style.backgroundRepeat = "no-repeat";
             stepCell.style.backgroundPosition = "center center";
@@ -647,9 +647,9 @@ class PitchStaircase {
                 }, 1000);
             }
         };
-        document.getElementsByClassName("wfbWidget")[0].style.maxHeight =
-            10 * PitchStaircase.BUTTONSIZE + "px";
-        document.getElementsByClassName("wfbWidget")[0].style.overflowY = "scroll";
+        const wfbWidget = document.getElementsByClassName("wfbWidget")[0];
+        wfbWidget.style.maxHeight = 10 * PitchStaircase.BUTTONSIZE + "px";
+        wfbWidget.style.overflowY = "scroll";
         this._musicRatio1 = widgetWindow.addInputButton("3");
         widgetWindow.addDivider();
         this._musicRatio2 = widgetWindow.addInputButton("2");
@@ -695,13 +695,9 @@ class PitchStaircase {
 
         widgetWindow.onmaximize = () => {
             if (widgetWindow._maximized) {
-                document.getElementsByClassName("wfbWidget")[0].style.maxHeight =
-                    16 * PitchStaircase.BUTTONSIZE + "px";
-                document.getElementsByClassName("wfbWidget")[0].style.overflowY = "scroll";
+                wfbWidget.style.maxHeight = 16 * PitchStaircase.BUTTONSIZE + "px";
             } else {
-                document.getElementsByClassName("wfbWidget")[0].style.maxHeight =
-                    10 * PitchStaircase.BUTTONSIZE + "px";
-                document.getElementsByClassName("wfbWidget")[0].style.overflowY = "scroll";
+                wfbWidget.style.maxHeight = 10 * PitchStaircase.BUTTONSIZE + "px";
             }
         };
     }

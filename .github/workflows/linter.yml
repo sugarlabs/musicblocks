@@ -5,48 +5,37 @@ on:
     branches: [master]
 
 jobs:
-  build:
+  lint:
     name: Lint updated JavaScript files with ESLint
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - name: Use Node.js
-        uses: actions/setup-node@v1
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 12.x
+          node-version: 20.x
 
-      - name: Get changed files
-        id: getfile
+      - name: Get changed JavaScript files
+        id: get_files
         run: |
-          CHANGED_FILES="$(git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} | xargs)"
-          export CHANGED_FILES  # the export command will fail if the inner shell expansion failed
-          echo "files=$CHANGED_FILES" >> $GITHUB_OUTPUT
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} -- '*.js')
+          echo "files<<EOF" >> $GITHUB_ENV
+          echo "$CHANGED_FILES" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
-      - name: Install ESLint
+      - name: Install dependencies
         run: npm install eslint
 
-      - name: Lint changed files using ESLint
+      - name: Run ESLint on changed files
+        if: env.files != ''
         run: |
-          for i in ${{ steps.getfile.outputs.files }}
-          do
-            if [[ "$i" == "D" ]]
-            then
-              ignore=1
-            elif [[ ( "$i" == "M" ) || ( "$i" == "A" ) || ( "$i" == "R" ) || ( "$i" == "C" ) || ( "$i" == "U" ) ]]
-            then
-              ignore=0
-            fi
-            echo "file $i $ignore"
-            if [[ "$i" == *".js" && $ignore == 0 ]]
-            then
-              echo "linting $i"
-              npx eslint $i
-            fi
-          done
+          echo "Linting the following files:"
+          echo "$files"
+          echo "$files" | xargs npx eslint

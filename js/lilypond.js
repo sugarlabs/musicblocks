@@ -66,10 +66,10 @@ const processLilypondNotes = (lilypond, logo, turtle) => {
             note = pitchObj[0] + pitchObj[1];
         }
 
-    const replacements = {
-            '♮': '!', '♯': 'is', '♭': 'es', '10': "''''''''",
-            '1': ',, ', '2': ', ', '3': '', '4': "'", '5': "''",
-            '6': "'''", '7': "''''", '8': "''''''", '9': "'''''''"
+        const replacements = {
+            "♮": "!", "♯": "is", "♭": "es", "10": "''''''''",
+            "1": ",, ", "2": ", ", "3": "", "4": "'", "5": "''",
+            "6": "'''", "7": "''''", "8": "''''''", "9": "'''''''"
         };
 
         return note.replace(/[♮♯♭]|10|[1-9]/g, match => replacements[match]).toLowerCase();
@@ -985,6 +985,6 @@ const saveLilypondOutput = function (activity) {
     return activity.logo.notationOutput;
 };
 
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { LILYPONDHEADER };
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { LILYPONDHEADER, getLilypondHeader, processLilypondNotes, saveLilypondOutput };
 }

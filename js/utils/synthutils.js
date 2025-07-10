@@ -84,6 +84,8 @@ const VOICENAMES = [
     [_("sitar"), "sitar", "images/synth.svg", "string"],
     //.TRANS: harmonium musical instrument
     [_("harmonium"), "harmonium", "images/voices.svg", "string"],
+    //.TRANS: mandolin musical instrument
+    [_("mandolin"), "mandolin", "images/voices.svg", "string"],
     //.TRANS: musical instrument
     [_("guitar"), "guitar", "images/voices.svg", "string"],
     //.TRANS: musical instrument
@@ -270,7 +272,8 @@ const SOUNDSAMPLESDEFINES = [
     "samples/trombone",
     "samples/doublebass",
     "samples/sitar",
-    "samples/harmonium"
+    "samples/harmonium",
+    "samples/mandolin"
 ];
 
 // Some samples have a default volume other than 50 (See #1697)
@@ -308,7 +311,8 @@ const DEFAULTSYNTHVOLUME = {
     "xylophone": 100,
     "japanese drum": 90,
     "sitar": 100,
-    "harmonium": 100
+    "harmonium": 100,
+    "mandolin": 100,
 };
 
 /**
@@ -345,6 +349,15 @@ const SAMPLECENTERNO = {
     "harmonium": ["C4", 39] // pitchToNumber('C', 4, 'C Major')]
 };
 
+/**
+ * The sample has multiple pitch which is subsequently transposed.
+ * This object defines the starting pitch for different samples.
+ * @constant
+ * @type {Object.<string, Array<string>>}
+ */
+const MULTIPITCH = {
+    "mandolin": ["A4", "A5", "A6"]
+};
 
 /**
  * Array to store custom samples.
@@ -839,7 +852,8 @@ function Synth() {
                 { name: "vibraphone", data: VIBRAPHONE_SAMPLE },
                 { name: "xylophone", data: XYLOPHONE_SAMPLE },
                 { name: "sitar", data: SITAR_SAMPLE },
-                { name: "harmonium", data: HARMONIUM_SAMPLE }
+                { name: "harmonium", data: HARMONIUM_SAMPLE },
+                { name: "mandolin", data: MANDOLIN_SAMPLE }
             ],
             drum: [
                 { name: "bottle", data: BOTTLE_SAMPLE },
@@ -977,7 +991,7 @@ function Synth() {
             }
             chunks = [];
             const url = URL.createObjectURL(blob);
-                // Prompt the user for the file name
+            // Prompt the user for the file name
             const fileName = window.prompt("Enter file name", "recording");
             if (fileName) {
                 download(url, fileName + (platform.FF ? ".wav" : ".ogg"));
@@ -1213,6 +1227,11 @@ function Synth() {
             const noteDict = {};
             if (sourceName in SAMPLECENTERNO) {
                 noteDict[SAMPLECENTERNO[sourceName][0]] = this.samples.voice[sourceName];
+            } else if (sourceName in MULTIPITCH) {
+                for (let i = 0; i < MULTIPITCH[sourceName].length; i++) {
+                    noteDict[MULTIPITCH[sourceName][i]] = this.samples.voice[sourceName][i];
+                }
+                tempSynth = new Tone.Sampler(noteDict);
             } else {
                 noteDict["C4"] = this.samples.voice[sourceName];
             }
@@ -1387,7 +1406,7 @@ function Synth() {
                     instrumentName,
                     sourceName,
                     params
-                )
+                );
             }
         } else if (sourceName in BUILTIN_SYNTHS) {
             if (instruments[turtle] && instruments[turtle][instrumentName]) {
@@ -1412,7 +1431,7 @@ function Synth() {
                 instruments[turtle][instrumentName] = this._createCustomSynth(
                     sourceName,
                     params
-                )
+                );
             }
 
             instrumentsSource[instrumentName] = [0, "poly"];
@@ -1427,7 +1446,7 @@ function Synth() {
                     instrumentName,
                     sourceName,
                     params
-                )
+                );
             }
         } else {
             if (sourceName.length >= 4) {
@@ -1682,14 +1701,14 @@ function Synth() {
                             synth.voices[i].setNote(notes);
                         }
                     }
-                } else {  
+                } else {
                     Tone.ToneAudioBuffer.loaded().then(() => {
                         synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
                     }).catch((e) => {
-                    console.debug(e);
-                    })
+                        console.debug(e);
+                    });
 
-                }   
+                }
             }
 
             setTimeout(() => {
@@ -1986,7 +2005,7 @@ function Synth() {
         }
         console.debug("instrument not found");
         return 50;  // Default volume
-    }
+    };
     
     /**
      * Sets the volume of a specific instrument for a given turtle.
@@ -2032,16 +2051,16 @@ function Synth() {
 
         if (firstConnection === null && lastConnection === null) {
             // Reset volume to default (0 dB) first
-             Tone.Destination.volume.rampTo(0, 0.01); 
-             this.setVolume(0, "electronic synth", volume);
+            Tone.Destination.volume.rampTo(0, 0.01);
+            this.setVolume(0, "electronic synth", volume);
             setTimeout(()=>{
                 this.trigger(0, "G4", 1 / 4, "electronic synth", null, null, false);
-            },200)
+            },200);
         }
         else{
             const db = Tone.gainToDb(volume / 100);
             Tone.Destination.volume.rampTo(db, 0.01);
-        } 
+        }
     };
 
     /**
@@ -2054,15 +2073,15 @@ function Synth() {
         this.mic = new Tone.UserMedia();
         this.recorder = new Tone.Recorder();
         await this.mic.open()
-        .then(() => {
-            console.log("Mic opened");
-            this.mic.connect(this.recorder);
-            this.recorder.start();
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-    }
+            .then(() => {
+                console.log("Mic opened");
+                this.mic.connect(this.recorder);
+                this.recorder.start();
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
 
     /**
      * Stops Recording
@@ -2074,7 +2093,7 @@ function Synth() {
         this.mic.close();
         this.audioURL = URL.createObjectURL(this.recording);
         return this.audioURL;
-    }
+    };
 
     /**
      * Plays Recording
@@ -2083,9 +2102,9 @@ function Synth() {
      */
     this.playRecording = async () => {
         this.player = new Tone.Player().toDestination();
-        await this.player.load(this.audioURL)
+        await this.player.load(this.audioURL);
         this.player.start();
-    }
+    };
 
     /**
      * Stops Recording
@@ -2094,7 +2113,7 @@ function Synth() {
      */
     this.stopPlayBackRecording = () => {
         this.player.stop();
-    }
+    };
 
     /**
      * Analyzing the audio
@@ -2102,9 +2121,9 @@ function Synth() {
      * @memberof Synth
      */
     this.LiveWaveForm = () => {
-        this.analyser = new Tone.Analyser('waveform', 8192);
+        this.analyser = new Tone.Analyser("waveform", 8192);
         this.mic.connect(this.analyser);
-    }
+    };
 
     /**
     * Gets real-time waveform values

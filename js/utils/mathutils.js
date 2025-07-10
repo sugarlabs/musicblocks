@@ -38,7 +38,7 @@
  * NumberBlocks.js
  */
 class MathUtility {
-   /**
+    /**
      * Returns a random integer in a range.
      *
      * @static
@@ -229,7 +229,7 @@ class MathUtility {
         }
     }
 
-     /**
+    /**
      * Calculates Euclidean distance between (cursor x, cursor y) and (mouse 'x' and mouse 'y').
      *
      * @static
@@ -257,7 +257,7 @@ class MathUtility {
         }
     }
 
-   /**
+    /**
      * Returns a to the power of b.
      *
      * @static
@@ -290,7 +290,7 @@ class MathUtility {
         }
     }
 
-   /**
+    /**
      * Returns negative value (if number) or string in reverse (if string).
      *
      * @static
@@ -326,6 +326,6 @@ class MathUtility {
     }
 }
 // Ensure mathutils.js exports the MathUtility class
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
     module.exports = MathUtility;
 }

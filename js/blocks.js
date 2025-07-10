@@ -1333,7 +1333,7 @@ class Blocks {
                 thisBlockobj?.name === "vspace" &&
                 this.blockList[thisBlockobj.connections[1]]?.name === "rest2" &&
                 this.blockList[thisBlockobj.connections[0]]?.name === "vspace"
-              ) {
+            ) {
                 return;
             }
 
@@ -2144,6 +2144,12 @@ class Blocks {
             this.isBlockMoving = false;
             this.adjustExpandableClampBlock();
             this.activity.refreshCanvas();
+
+            if (this.activity.turtles.running()) {
+                this.activity.logo.doStopTurtles();
+                const stopBtn = document.getElementById("stop");
+                if (stopBtn) stopBtn.style.color = "white";
+            }
         };
 
         /**
@@ -4463,7 +4469,7 @@ class Blocks {
                     if (this.blockList[blk].name === "forever") {
                         if (this._isConnectedToNoteValue(cblk)) {
                             this.activity.errorMsg(_("Forever loop detected inside a note value block. Unexpected things may happen."));
-                            return null; 
+                            return null;
                         }
                     }
                     /** If it is the last connection, keep searching. */
@@ -5088,7 +5094,7 @@ class Blocks {
                     if (["show", "turtleshell", "customsample"].includes(blockObjs[i][1])) {
                         switch (blockObjs[i][1]) {
                             case "show":
-                            name = _("Show").toLowerCase() + "-" + MathUtility.doRandom(0, 1000);
+                                name = _("Show").toLowerCase() + "-" + MathUtility.doRandom(0, 1000);
                                 break;
                             case "turtleshell":
                                 name = _("avatar") + "-" + MathUtility.doRandom(0, 1000);
@@ -6960,16 +6966,24 @@ class Blocks {
                     }
                 }
 
-                if (typeof value === "string") {
+                // Comprehensive safety check for all value types
+                if (value === null || value === undefined) {
+                    this.blockList[blk].text.text = "";
+                } else if (typeof value === "string") {
                     if (value.length > 6) {
                         value = value.substr(0, 5) + "...";
                     }
-
                     this.blockList[blk].text.text = value;
                 } else if (name === "divide") {
                     this.blockList[blk].text.text = mixedNumber(value);
                 } else {
-                    this.blockList[blk].text.text = value.toString();
+                    // Safe toString conversion
+                    try {
+                        this.blockList[blk].text.text = value.toString();
+                    } catch (error) {
+                        console.warn("Error converting value to string:", value, error);
+                        this.blockList[blk].text.text = "";
+                    }
                 }
 
                 this.blockList[blk].container.updateCache();
@@ -7050,9 +7064,9 @@ class Blocks {
                 
                 const blockX = block.container.x;
                 const blockY = block.container.y;
-                return x >= blockX && 
+                return x >= blockX &&
                     x <= blockX + block.width &&
-                    y >= blockY && 
+                    y >= blockY &&
                     y <= blockY + block.height;
             });
         };
