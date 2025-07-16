@@ -1248,7 +1248,21 @@ function Synth() {
             instrumentsSource[instrumentName] = [2, sourceName];
             const noteDict = {};
             const params = CUSTOMSAMPLES[sourceName];
+            
+            // Get the base center note
             const center = this._parseSampleCenterNo(params[1], params[2]);
+            
+            // Check if there's a cent adjustment (stored as the fifth parameter)
+            const centAdjustment = params[4] || 0;
+            
+            // Store the cent adjustment for later use
+            if (centAdjustment !== 0) {
+                if (!this.sampleCentAdjustments) {
+                    this.sampleCentAdjustments = {};
+                }
+                this.sampleCentAdjustments[sourceName] = centAdjustment;
+            }
+            
             noteDict[center] = params[0];
             tempSynth = new Tone.Sampler(noteDict);
         } else {
@@ -1830,6 +1844,17 @@ function Synth() {
                 flag = instrumentsSource[instrumentName][0];
                 if (flag === 1 || flag === 2) {
                     const sampleName = instrumentsSource[instrumentName][1];
+                    
+                    // Check if there's a cent adjustment for this sample
+                    if (flag === 2 && this.sampleCentAdjustments && this.sampleCentAdjustments[sampleName]) {
+                        const centAdjustment = this.sampleCentAdjustments[sampleName];
+                        // Apply cent adjustment to playback rate
+                        // Formula: playbackRate = 2^(cents/1200)
+                        const playbackRate = Math.pow(2, centAdjustment/1200);
+                        if (tempSynth && tempSynth.playbackRate) {
+                            tempSynth.playbackRate.value = playbackRate;
+                        }
+                    }
                 }
             }
 
@@ -2331,17 +2356,17 @@ function Synth() {
                     if (pitch > 0 && targetPitch.frequency > 0) {
                         // Calculate cents from target frequency
                         const centsFromTarget = 1200 * Math.log2(pitch / targetPitch.frequency);
-                        
-                        // Calculate octaves and semitones when far off
+                    
+                    // Calculate octaves and semitones when far off
                         const totalSemitones = Math.round(centsFromTarget / 100);
-                        const octaves = Math.floor(Math.abs(totalSemitones) / 12);
-                        const remainingSemitones = Math.abs(totalSemitones) % 12;
-                        
+                    const octaves = Math.floor(Math.abs(totalSemitones) / 12);
+                    const remainingSemitones = Math.abs(totalSemitones) % 12;
+                    
                         if (Math.abs(centsFromTarget) >= 100) {
-                            // More than a semitone off - show octaves and semitones
+                        // More than a semitone off - show octaves and semitones
                             const direction = centsFromTarget > 0 ? '+' : '-';
                             cents = Math.round(centsFromTarget);
-                            
+                        
                             // Store the display text for the grey text display
                             let displayText = direction;
                             if (octaves > 0) {
@@ -2352,10 +2377,10 @@ function Synth() {
                                 displayText += remainingSemitones + ' semitone' + (remainingSemitones > 1 ? 's' : '');
                             }
                             this.displayText = displayText;
-                        } else {
-                            // Less than a semitone off - show cents
+                    } else {
+                        // Less than a semitone off - show cents
                             cents = Math.round(centsFromTarget);
-                            this.displayText = `${cents > 0 ? '+' : ''}${cents} cents`;
+                        this.displayText = `${cents > 0 ? '+' : ''}${cents} cents`;
                         }
                     } else {
                         // If we don't have valid frequencies, set defaults
@@ -2705,65 +2730,87 @@ function Synth() {
                     modeToggle.style.top = "30px";
                     modeToggle.style.left = "50%";
                     modeToggle.style.transform = "translateX(-50%)";
-                    modeToggle.style.padding = "8px 16px";
-                    modeToggle.style.backgroundColor = "#99CCFF";
-                    modeToggle.style.color = "white";
-                    modeToggle.style.borderRadius = "25px";
-                    modeToggle.style.cursor = "pointer";
-                    modeToggle.style.fontSize = "14px";
-                    modeToggle.style.transition = "all 0.3s ease";
-                    modeToggle.style.border = "none"; // Changed from "2px solid white" to "none"
-                    modeToggle.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
-                    modeToggle.style.fontWeight = "500";
-                    modeToggle.style.width = "200px";
-                    modeToggle.style.height = "36px";
                     modeToggle.style.display = "flex";
-                    modeToggle.style.alignItems = "center";
-                    modeToggle.style.justifyContent = "space-between";
-                    modeToggle.style.padding = "0 4px";
-                    
-                    // Create text spans
-                    const chromaticText = document.createElement("span");
-                    chromaticText.textContent = "Chromatic";
-                    chromaticText.style.padding = "0 8px";
-                    chromaticText.style.zIndex = "1";
-                    
-                    const targetText = document.createElement("span");
-                    targetText.textContent = "Target Pitch";
-                    targetText.style.padding = "0 8px";
-                    targetText.style.zIndex = "1";
-                    
-                    modeToggle.appendChild(chromaticText);
-                    modeToggle.appendChild(targetText);
-                    
-                    // Create inner span for sliding effect
-                    const toggleInner = document.createElement("span");
-                    toggleInner.style.position = "absolute";
-                    toggleInner.style.left = "2px";
-                    toggleInner.style.top = "2px";
-                    toggleInner.style.width = "50%";
-                    toggleInner.style.height = "calc(100% - 4px)";
-                    toggleInner.style.backgroundColor = "white";
-                    toggleInner.style.borderRadius = "22px";
-                    toggleInner.style.transition = "transform 0.3s ease";
-                    modeToggle.appendChild(toggleInner);
+                    modeToggle.style.backgroundColor = "#FFFFFF";
+                    modeToggle.style.borderRadius = "25px";  // Increased pill shape radius
+                    modeToggle.style.padding = "3px";  // Slightly more padding
+                    modeToggle.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+                    modeToggle.style.width = "120px";  // Increased width
+                    modeToggle.style.height = "44px";  // Increased height
+                    modeToggle.style.cursor = "pointer";  // Added cursor pointer
 
-                    // Add click handler for mode toggle
-                    modeToggle.addEventListener('click', () => {
-                        tunerMode = tunerMode === 'chromatic' ? 'target' : 'chromatic';
-                        toggleInner.style.transform = tunerMode === 'chromatic' ? 'translateX(0)' : 'translateX(96%)';
-                        modeToggle.style.backgroundColor = '#99CCFF';
-                        
-                        // Update text colors
-                        if (tunerMode === 'chromatic') {
-                            chromaticText.style.color = '#99CCFF';
-                            targetText.style.color = 'white';
+                    // Create chromatic mode button
+                    const chromaticButton = document.createElement("div");
+                    chromaticButton.style.flex = "1";
+                    chromaticButton.style.display = "flex";
+                    chromaticButton.style.alignItems = "center";
+                    chromaticButton.style.justifyContent = "center";
+                    chromaticButton.style.borderRadius = "22px";  // Increased radius
+                    chromaticButton.style.cursor = "pointer";
+                    chromaticButton.style.transition = "all 0.2s ease";  // Faster transition
+                    chromaticButton.style.userSelect = "none";  // Prevent text selection
+                    chromaticButton.title = "Chromatic";
+
+                    // Create target pitch mode button
+                    const targetPitchButton = document.createElement("div");
+                    targetPitchButton.style.flex = "1";
+                    targetPitchButton.style.display = "flex";
+                    targetPitchButton.style.alignItems = "center";
+                    targetPitchButton.style.justifyContent = "center";
+                    targetPitchButton.style.borderRadius = "22px";  // Increased radius
+                    targetPitchButton.style.cursor = "pointer";
+                    targetPitchButton.style.transition = "all 0.2s ease";  // Faster transition
+                    targetPitchButton.style.userSelect = "none";  // Prevent text selection
+                    targetPitchButton.title = "Target pitch";
+
+                    // Create icons
+                    const chromaticIcon = document.createElement("img");
+                    chromaticIcon.src = "header-icons/chromatic-mode.svg";
+                    chromaticIcon.style.width = "32px";  // Increased icon size further
+                    chromaticIcon.style.height = "32px";
+                    chromaticIcon.style.filter = "brightness(0)";  // Make icon black
+                    chromaticIcon.style.pointerEvents = "none";  // Prevent icon from interfering with clicks
+
+                    const targetIcon = document.createElement("img");
+                    targetIcon.src = "header-icons/target-pitch-mode.svg";
+                    targetIcon.style.width = "32px";  // Increased icon size further
+                    targetIcon.style.height = "32px";
+                    targetIcon.style.filter = "brightness(0)";  // Make icon black
+                    targetIcon.style.pointerEvents = "none";  // Prevent icon from interfering with clicks
+
+                    // Function to update button styles
+                    const updateButtonStyles = () => {
+                        if (tunerMode === "chromatic") {
+                            chromaticButton.style.backgroundColor = "#A6CEFF";  // Blue for active
+                            targetPitchButton.style.backgroundColor = "#FFFFFF";  // White for inactive
                         } else {
-                            chromaticText.style.color = 'white';
-                            targetText.style.color = '#99CCFF';
+                            chromaticButton.style.backgroundColor = "#FFFFFF";  // White for inactive
+                            targetPitchButton.style.backgroundColor = "#A6CEFF";  // Blue for active
                         }
-                    });
-                    
+                    };
+
+                    // Add click handlers with debounce to prevent double clicks
+                    let isClickable = true;
+                    const handleClick = (mode) => {
+                        if (!isClickable) return;
+                        isClickable = false;
+                        tunerMode = mode;
+                        updateButtonStyles();
+                        setTimeout(() => { isClickable = true; }, 200);  // Re-enable after 200ms
+                    };
+
+                    chromaticButton.onclick = () => handleClick("chromatic");
+                    targetPitchButton.onclick = () => handleClick("target");
+
+                    // Assemble the toggle
+                    chromaticButton.appendChild(chromaticIcon);
+                    targetPitchButton.appendChild(targetIcon);
+                    modeToggle.appendChild(chromaticButton);
+                    modeToggle.appendChild(targetPitchButton);
+
+                    // Initial style update
+                    updateButtonStyles();
+
                     tunerContainer.appendChild(modeToggle);
                     
                     // Create note display
@@ -2846,7 +2893,7 @@ function Synth() {
                         const shouldLight = cents < 0 ? 
                             (segmentCents <= 0 && Math.abs(segmentCents) <= Math.abs(cents)) : // Flat side
                             (segmentCents >= 0 && segmentCents <= cents); // Sharp side
-                            
+
                         if (shouldLight || Math.abs(cents - segmentCents) <= 5) {
                             // Center segment
                             if (i === 5) {
@@ -3054,6 +3101,173 @@ function Synth() {
             console.log("Test completed");
         }, 3000);
     };
+
+    /**
+     * Creates and displays the cents adjustment interface
+     * @returns {void}
+     */
+    this.createCentsSlider = function () {
+        const widgetBody = this.widgetWindow.getWidgetBody();
+        
+        // Store the current content to restore later
+        this.previousContent = widgetBody.innerHTML;
+        
+        // Clear the widget body
+        widgetBody.innerHTML = '';
+        
+        // Create the cents adjustment interface
+        const centsInterface = document.createElement("div");
+        Object.assign(centsInterface.style, {
+            width: "100%",
+            height: "100%",
+            backgroundColor: "#A6CEFF",  // Light blue header section
+            display: "flex",
+            flexDirection: "column"
+        });
+
+        // Create header section
+        const header = document.createElement("div");
+        Object.assign(header.style, {
+            width: "100%",
+            padding: "15px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            boxSizing: "border-box"
+        });
+
+        const title = document.createElement("div");
+        title.textContent = _("Cents Adjustment");
+        Object.assign(title.style, {
+            fontWeight: "bold",
+            fontSize: "16px"
+        });
+
+        const valueDisplay = document.createElement("div");
+        valueDisplay.textContent = (this.centsValue >= 0 ? "+" : "") + (this.centsValue || 0) + "¢";
+        Object.assign(valueDisplay.style, {
+            fontSize: "16px"
+        });
+
+        header.appendChild(title);
+        header.appendChild(valueDisplay);
+        centsInterface.appendChild(header);
+
+        // Create main content area with grey background
+        const mainContent = document.createElement("div");
+        Object.assign(mainContent.style, {
+            flex: 1,
+            backgroundColor: "#E8E8E8",  // Default grey background
+            padding: "20px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px"
+        });
+
+        // Create reference tone label
+        const referenceLabel = document.createElement("div");
+        referenceLabel.textContent = _("reference tone");
+        Object.assign(referenceLabel.style, {
+            fontSize: "14px",
+            color: "#666666"
+        });
+        mainContent.appendChild(referenceLabel);
+
+        // Create slider container
+        const sliderContainer = document.createElement("div");
+        Object.assign(sliderContainer.style, {
+            width: "100%",
+            padding: "10px 0"
+        });
+
+        // Create the slider
+        const slider = document.createElement("input");
+        Object.assign(slider, {
+            type: "range",
+            min: -50,
+            max: 50,
+            value: this.centsValue || 0,
+            step: 1
+        });
+        Object.assign(slider.style, {
+            width: "100%",
+            height: "20px",
+            margin: "10px 0",
+            backgroundColor: "#4CAF50",  // Green color for the slider track
+            borderRadius: "10px",
+            appearance: "none",
+            outline: "none"
+        });
+
+        sliderContainer.appendChild(slider);
+        mainContent.appendChild(sliderContainer);
+
+        // Create sample label
+        const sampleLabel = document.createElement("div");
+        sampleLabel.textContent = _("sample");
+        Object.assign(sampleLabel.style, {
+            fontSize: "14px",
+            color: "#666666",
+            marginTop: "auto"  // Push to bottom
+        });
+        mainContent.appendChild(sampleLabel);
+
+        centsInterface.appendChild(mainContent);
+        widgetBody.appendChild(centsInterface);
+
+        // Add event listener for slider changes
+        slider.oninput = () => {
+            const value = parseInt(slider.value);
+            valueDisplay.textContent = (value >= 0 ? "+" : "") + value + "¢";
+            this.centsValue = value;
+            // Update tuner display if it exists
+            if (this.tunerDisplay) {
+                const noteObj = TunerUtils.frequencyToPitch(this._calculateFrequency());
+                this.tunerDisplay.update(noteObj[0], this.centsValue, noteObj[2]);
+            }
+            // Apply the cents adjustment
+            this.applyCentsAdjustment();
+        };
+
+        this.sliderDiv = centsInterface;
+        this.sliderVisible = true;
+
+        // Update button appearance
+        this.centsSliderBtn.getElementsByTagName("img")[0].style.filter = "brightness(0) invert(1)";
+        this.centsSliderBtn.style.backgroundColor = platformColor.selectorSelected;
+    };
+
+    /**
+     * Removes the cents adjustment interface
+     * @returns {void}
+     */
+    this.removeCentsSlider = function () {
+        if (this.sliderDiv && this.sliderDiv.parentNode) {
+            // Restore the previous content
+            this.widgetWindow.getWidgetBody().innerHTML = this.previousContent;
+            this.previousContent = null;
+        }
+        this.sliderVisible = false;
+        this.centsSliderBtn.getElementsByTagName("img")[0].style.filter = "";
+        this.centsSliderBtn.style.backgroundColor = "";
+    };
+
+    this.tone = null;
+    this.noteFrequencies = {};
+    this.startingPitch = "C4";
+    this.startingPitchOctave = 4;
+    this.octaveTranspose = 0;
+    this.inTemperament = "equal";
+    this.changeInTemperament = "equal";
+    this.inTransposition = 0;
+    this.transposition = 2;
+    this.playbackRate = 1;
+    this.defaultBPMFactor = 1;
+    this.recorder = null;
+    this.samples = null;
+    this.samplesManifest = null;
+    this.sampleCentAdjustments = {}; // Initialize the sampleCentAdjustments object
+    this.mic = null;
 
     return this;
 }
