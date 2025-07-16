@@ -119,6 +119,15 @@ function SampleWidget() {
     this.sliderVisible = false;
     this.sliderDiv = null;
 
+    // Manual cent adjustment properties
+    this.centAdjustmentWindow = null;
+    this.centAdjustmentVisible = false;
+    this.centAdjustmentSlider = null;
+    this.centAdjustmentValue = 0;
+    this.centAdjustmentOn = false;
+    this.currentNoteObj = null;
+    this.player = null;
+
     /**
      * Updates the blocks related to the sample.
      * @private
@@ -129,7 +138,8 @@ function SampleWidget() {
         let audiofileBlock;
         let solfegeBlock;
         let octaveBlock;
-        this.sampleArray = [this.sampleName, this.sampleData, this.samplePitch, this.sampleOctave];
+        // Include cent adjustment in the sample array
+        this.sampleArray = [this.sampleName, this.sampleData, this.samplePitch, this.sampleOctave, this.centAdjustmentValue || 0];
         if (this.timbreBlock != null) {
             mainSampleBlock = this.activity.blocks.blockList[this.timbreBlock].connections[1];
             if (mainSampleBlock != null) {
@@ -155,6 +165,19 @@ function SampleWidget() {
                     this.activity.blocks.blockList[octaveBlock].value = this.sampleOctave;
                     this.activity.blocks.blockList[octaveBlock].text.text = this.sampleOctave;
                     this.activity.blocks.blockList[octaveBlock].updateCache();
+                }
+                
+                // Update the block display to show cent adjustment if applicable
+                if (this.centAdjustmentValue && this.centAdjustmentValue !== 0) {
+                    const centText = (this.centAdjustmentValue > 0 ? "+" : "") + this.centAdjustmentValue + "¢";
+                    if (this.activity.blocks.blockList[mainSampleBlock].text && 
+                        this.activity.blocks.blockList[mainSampleBlock].text.text) {
+                        // Append cent adjustment to the block text if possible
+                        const currentText = this.activity.blocks.blockList[mainSampleBlock].text.text;
+                        if (!currentText.includes("¢")) {
+                            this.activity.blocks.blockList[mainSampleBlock].text.text += " " + centText;
+                        }
+                    }
                 }
 
                 this.activity.refreshCanvas();
@@ -273,11 +296,14 @@ function SampleWidget() {
         setTimeout(function () {
             that._addSample();
 
+            // Include the cent adjustment value in the sample block
+            const centAdjustment = that.centAdjustmentValue || 0;
+
             var newStack = [
                 [0,"settimbre",100,100,[null,1,null,5]],
                 [
                     1,
-                    ["customsample", { value: [that.sampleName, that.sampleData, "do", 4] }],
+                    ["customsample", { value: [that.sampleName, that.sampleData, that.samplePitch, that.sampleOctave, centAdjustment] }],
                     100,
                     100,
                     [0, 2, 3, 4]
@@ -354,40 +380,26 @@ function SampleWidget() {
     };
 
     /**
-     * Initializes the Sample Widget.
-     * @param {object} activity - The activity object.
+     * Initializes the sampler widget.
+     * @param {Activity} activity - The activity instance.
+     * @param {number} timbreBlock - The timbre block number.
      * @returns {void}
      */
-    this.init = function (activity) {
+    this.init = function (activity, timbreBlock) {
         this.activity = activity;
-        this._directions = [];
-        this._widgetFirstTimes = [];
-        this._widgetNextTimes = [];
-        this._firstClickTimes = null;
-        this.isMoving = false;
-        this.pitchAnalysers = {};
-
-        this.activity.logo.synth.loadSynth(0, getVoiceSynthName(DEFAULTSAMPLE));
-        this.reconnectSynthsToAnalyser();
-
-        this.pitchAnalysers = {};
-
+        this.timbreBlock = timbreBlock;
         this.running = true;
-        if (this.drawVisualIDs) {
-            for (const id of Object.keys(this.drawVisualIDs)) {
-                cancelAnimationFrame(this.drawVisualIDs[id]);
-            }
-        }
-
+        this.originalSampleName = "";
+        this.isMoving = false;
         this.drawVisualIDs = {};
-        const widgetWindow = window.widgetWindows.windowFor(this, "sample");
-        this.widgetWindow = widgetWindow;
-        this.divisions = [];
-        widgetWindow.clear();
-        widgetWindow.show();
 
-        // For the button callbacks
-        var that = this;
+        const widgetWindow = window.widgetWindows.windowFor(this, "sampler", "Sampler");
+        const that = this;
+
+        // For the widget buttons
+        widgetWindow.onmaximize = function () {
+            that._scale();
+        };
 
         widgetWindow.onclose = () => {
             if (this.drawVisualIDs) {
@@ -423,6 +435,7 @@ function SampleWidget() {
 
         this.playBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
         this.playBtn.onclick = () => {
+            stopTuner();
             if (this.isMoving) {
                 this.pause();
             } else {
@@ -439,6 +452,7 @@ function SampleWidget() {
             _("Upload sample"),
             ""
         ).onclick = function () {
+            stopTuner();
             const fileChooser = docById("myOpenAll");
 
             // eslint-disable-next-line no-unused-vars
@@ -481,6 +495,7 @@ function SampleWidget() {
         
         // Add click event to the container (includes both the button and frequency display)
         this.pitchBtnContainer.onclick = () => {
+            stopTuner();
             this._createPieMenu();
         };
 
@@ -491,6 +506,7 @@ function SampleWidget() {
             _("Save sample"),
             ""
         ).onclick = function () {
+            stopTuner();
             // Debounce button
             if (!that._get_save_lock()) {
                 that._save_lock = true;
@@ -522,6 +538,7 @@ function SampleWidget() {
         this.playback = false;
 
         this._recordBtn.onclick = async () => {
+            stopTuner();
             if (!this.is_recording) {
                 await this.activity.logo.synth.startRecording();
                 this.is_recording = true;
@@ -538,6 +555,7 @@ function SampleWidget() {
         };
 
         this._playbackBtn.onclick = () => {
+            stopTuner();
             if (!this.playback) {
                 this.sampleData = this.recordingURL;
                 this.sampleName = `Recorded Audio ${this.recordingURL}`;
@@ -559,9 +577,29 @@ function SampleWidget() {
 
         let tunerOn = false;
 
+        // Helper function to stop tuner
+        const stopTuner = () => {
+            if (tunerOn) {
+                activity.textMsg(_("Tuner stopped"), 3000);
+                this.activity.logo.synth.stopTuner();
+                tunerOn = false;
+                const tunerContainer = docById("tunerContainer");
+                if (tunerContainer) {
+                    tunerContainer.remove();
+                }
+            }
+        };
+
         this._tunerBtn.onclick = async () => {
             if (docById("tunerContainer") && !tunerOn) {
                 docById("tunerContainer").remove();
+            }
+
+            // Close the cent adjustment window if it's open
+            const centAdjustmentContainer = docById("centAdjustmentContainer");
+            if (centAdjustmentContainer) {
+                centAdjustmentContainer.remove();
+                this.centAdjustmentOn = false;
             }
 
             if (!tunerOn) {
@@ -620,6 +658,99 @@ function SampleWidget() {
                     tunerSvg.appendChild(segment);
                 });
 
+                // Create mode toggle button
+                const modeToggle = document.createElement("div");
+                modeToggle.id = "modeToggle";
+                modeToggle.style.position = "absolute";
+                modeToggle.style.top = "30px";
+                modeToggle.style.left = "50%";
+                modeToggle.style.transform = "translateX(-50%)";
+                modeToggle.style.display = "flex";
+                modeToggle.style.backgroundColor = "#FFFFFF";
+                modeToggle.style.borderRadius = "25px";
+                modeToggle.style.padding = "3px";
+                modeToggle.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+                modeToggle.style.width = "120px";
+                modeToggle.style.height = "44px";
+                modeToggle.style.cursor = "pointer";
+
+                // Create chromatic mode button
+                const chromaticButton = document.createElement("div");
+                chromaticButton.style.flex = "1";
+                chromaticButton.style.display = "flex";
+                chromaticButton.style.alignItems = "center";
+                chromaticButton.style.justifyContent = "center";
+                chromaticButton.style.borderRadius = "22px";
+                chromaticButton.style.cursor = "pointer";
+                chromaticButton.style.transition = "all 0.2s ease";
+                chromaticButton.style.userSelect = "none";
+                chromaticButton.title = _("Chromatic");
+
+                // Create target pitch mode button
+                const targetPitchButton = document.createElement("div");
+                targetPitchButton.style.flex = "1";
+                targetPitchButton.style.display = "flex";
+                targetPitchButton.style.alignItems = "center";
+                targetPitchButton.style.justifyContent = "center";
+                targetPitchButton.style.borderRadius = "22px";
+                targetPitchButton.style.cursor = "pointer";
+                targetPitchButton.style.transition = "all 0.2s ease";
+                targetPitchButton.style.userSelect = "none";
+                targetPitchButton.title = _("Target pitch");
+
+                // Create icons
+                const chromaticIcon = document.createElement("img");
+                chromaticIcon.src = "header-icons/chromatic-mode.svg";
+                chromaticIcon.style.width = "32px";
+                chromaticIcon.style.height = "32px";
+                chromaticIcon.style.filter = "brightness(0)";
+                chromaticIcon.style.pointerEvents = "none";
+
+                const targetIcon = document.createElement("img");
+                targetIcon.src = "header-icons/target-pitch-mode.svg";
+                targetIcon.style.width = "32px";
+                targetIcon.style.height = "32px";
+                targetIcon.style.filter = "brightness(0)";
+                targetIcon.style.pointerEvents = "none";
+
+                // Initial mode state
+                let tunerMode = 'chromatic';
+
+                // Function to update button styles
+                const updateButtonStyles = () => {
+                    if (tunerMode === "chromatic") {
+                        chromaticButton.style.backgroundColor = "#A6CEFF";
+                        targetPitchButton.style.backgroundColor = "#FFFFFF";
+                    } else {
+                        chromaticButton.style.backgroundColor = "#FFFFFF";
+                        targetPitchButton.style.backgroundColor = "#A6CEFF";
+                    }
+                };
+
+                // Add click handlers with debounce
+                let isClickable = true;
+                const handleClick = (mode) => {
+                    if (!isClickable) return;
+                    isClickable = false;
+                    tunerMode = mode;
+                    updateButtonStyles();
+                    setTimeout(() => { isClickable = true; }, 200);
+                };
+
+                chromaticButton.onclick = () => handleClick("chromatic");
+                targetPitchButton.onclick = () => handleClick("target");
+
+                // Assemble the toggle
+                chromaticButton.appendChild(chromaticIcon);
+                targetPitchButton.appendChild(targetIcon);
+                modeToggle.appendChild(chromaticButton);
+                modeToggle.appendChild(targetPitchButton);
+
+                // Initial style update
+                updateButtonStyles();
+
+                tunerContainer.appendChild(modeToggle);
+
                 this.widgetWindow.getWidgetBody().appendChild(tunerContainer);
 
                 await this.activity.logo.synth.startTuner();
@@ -639,10 +770,195 @@ function SampleWidget() {
             ""
         );
 
-        // Keep the button but remove the slider functionality for now
+        // Update the cents slider button to toggle the cents adjustment section
         this.centsSliderBtn.onclick = () => {
-            // TODO: Implement pie menu for cents adjustment
-            console.log('Cents adjustment pie menu to be implemented');
+            stopTuner();
+            // Hide the cent adjustment window if it's already open
+            const existingCentAdjustmentContainer = docById("centAdjustmentContainer");
+            if (existingCentAdjustmentContainer) {
+                existingCentAdjustmentContainer.remove();
+                this.centAdjustmentOn = false;
+                
+                // Show the sampler canvas
+                const samplerCanvas = docByClass("samplerCanvas")[0];
+                if (samplerCanvas) {
+                    samplerCanvas.style.display = "block";
+                }
+                return;
+            }
+            
+            // Close the tuner window if it's open
+            const tunerContainer = docById("tunerContainer");
+            if (tunerContainer) {
+                tunerContainer.remove();
+                this.activity.logo.synth.stopTuner();
+                tunerOn = false;
+            }
+            
+            if (!this.centAdjustmentOn) {
+                this.centAdjustmentOn = true;
+                
+                // Hide the sampler canvas
+                const samplerCanvas = docByClass("samplerCanvas")[0];
+                if (samplerCanvas) {
+                    samplerCanvas.style.display = "none";
+                }
+                
+                // Create the cent adjustment container
+                const centAdjustmentContainer = document.createElement("div");
+                centAdjustmentContainer.id = "centAdjustmentContainer";
+                centAdjustmentContainer.style.position = "absolute";
+                centAdjustmentContainer.style.top = "0";
+                centAdjustmentContainer.style.left = "0";
+                centAdjustmentContainer.style.width = "100%";
+                centAdjustmentContainer.style.height = "100%";
+                centAdjustmentContainer.style.backgroundColor = "#d8d8d8"; // Grey color to match tuner
+                centAdjustmentContainer.style.zIndex = "1000";
+                
+                // Create the value display (centered at top)
+                const valueDisplay = document.createElement("div");
+                valueDisplay.id = "centValueDisplay";
+                valueDisplay.textContent = (this.centAdjustmentValue >= 0 ? "+" : "") + (this.centAdjustmentValue || 0) + "¢";
+                valueDisplay.style.fontSize = "24px";
+                valueDisplay.style.fontWeight = "bold";
+                valueDisplay.style.textAlign = "center";
+                valueDisplay.style.marginTop = "30px";
+                valueDisplay.style.marginBottom = "30px";
+                
+                centAdjustmentContainer.appendChild(valueDisplay);
+                
+                // Create the slider container
+                const sliderContainer = document.createElement("div");
+                sliderContainer.style.width = "80%";
+                sliderContainer.style.margin = "0 auto";
+                
+                // Create the HTML5 range slider
+                const slider = document.createElement("input");
+                Object.assign(slider, {
+                    type: "range",
+                    min: -50,
+                    max: 50,
+                    value: this.centAdjustmentValue || 0,
+                    step: 1
+                });
+                
+                Object.assign(slider.style, {
+                    width: "100%",
+                    height: "20px",
+                    WebkitAppearance: "none",
+                    background: "#4CAF50",
+                    outline: "none",
+                    borderRadius: "10px",
+                    cursor: "pointer",
+                    opacity: "0.8"
+                });
+                
+                // Add slider thumb styling
+                const thumbStyle = `
+                    input[type=range]::-webkit-slider-thumb {
+                        -webkit-appearance: none;
+                        width: 25px;
+                        height: 25px;
+                        background: #2196F3;
+                        border-radius: 50%;
+                        cursor: pointer;
+                        transition: all .2s ease-in-out;
+                    }
+                    input[type=range]::-webkit-slider-thumb:hover {
+                        transform: scale(1.1);
+                    }
+                    input[type=range]::-moz-range-thumb {
+                        width: 25px;
+                        height: 25px;
+                        background: #2196F3;
+                        border-radius: 50%;
+                        cursor: pointer;
+                        border: none;
+                        transition: all .2s ease-in-out;
+                    }
+                    input[type=range]::-moz-range-thumb:hover {
+                        transform: scale(1.1);
+                    }
+                `;
+                
+                // Add the styles to the document
+                const styleSheet = document.createElement("style");
+                styleSheet.textContent = thumbStyle;
+                document.head.appendChild(styleSheet);
+                
+                sliderContainer.appendChild(slider);
+                centAdjustmentContainer.appendChild(sliderContainer);
+                
+                // Add labels for min and max values
+                const labelsDiv = document.createElement("div");
+                labelsDiv.style.width = "80%";
+                labelsDiv.style.display = "flex";
+                labelsDiv.style.justifyContent = "space-between";
+                labelsDiv.style.margin = "10px auto";
+                
+                const minLabel = document.createElement("span");
+                minLabel.textContent = "-50¢";
+                minLabel.style.fontWeight = "bold";
+                
+                const maxLabel = document.createElement("span");
+                maxLabel.textContent = "+50¢";
+                maxLabel.style.fontWeight = "bold";
+                
+                labelsDiv.appendChild(minLabel);
+                labelsDiv.appendChild(maxLabel);
+                centAdjustmentContainer.appendChild(labelsDiv);
+                
+                // Add reset button
+                const resetButtonContainer = document.createElement("div");
+                resetButtonContainer.style.textAlign = "center";
+                resetButtonContainer.style.marginTop = "30px";
+                
+                const resetButton = document.createElement("button");
+                resetButton.textContent = _("Reset");
+                resetButton.style.padding = "10px 20px";
+                resetButton.style.backgroundColor = "#808080";
+                resetButton.style.color = "white";
+                resetButton.style.border = "none";
+                resetButton.style.borderRadius = "5px";
+                resetButton.style.cursor = "pointer";
+                resetButton.style.fontSize = "16px";
+                
+                resetButton.onclick = () => {
+                    this.centAdjustmentValue = 0;
+                    valueDisplay.textContent = "0¢";
+                    slider.value = 0;
+                    this.applyCentAdjustment(0);
+                };
+                
+                resetButtonContainer.appendChild(resetButton);
+                centAdjustmentContainer.appendChild(resetButtonContainer);
+                
+                // Add the container to the widget body
+                this.widgetWindow.getWidgetBody().appendChild(centAdjustmentContainer);
+                
+                // Add event listener for slider changes
+                slider.oninput = () => {
+                    const value = parseInt(slider.value);
+                    this.centAdjustmentValue = value;
+                    valueDisplay.textContent = (value >= 0 ? "+" : "") + value + "¢";
+                    this.applyCentAdjustment(value);
+                };
+                
+            } else {
+                this.centAdjustmentOn = false;
+                
+                // Remove the cent adjustment container
+                const centAdjustmentContainer = docById("centAdjustmentContainer");
+                if (centAdjustmentContainer) {
+                    centAdjustmentContainer.remove();
+                }
+                
+                // Show the sampler canvas
+                const samplerCanvas = docByClass("samplerCanvas")[0];
+                if (samplerCanvas) {
+                    samplerCanvas.style.display = "block";
+                }
+            }
         };
 
         widgetWindow.sendToCenter();
@@ -669,10 +985,13 @@ function SampleWidget() {
     this._addSample = function () {
         for (let i = 0; i < CUSTOMSAMPLES.length; i++) {
             if (CUSTOMSAMPLES[i][0] == this.sampleName) {
+                // Update existing sample with new data and cent adjustment
+                CUSTOMSAMPLES[i] = [this.sampleName, this.sampleData, this.samplePitch, this.sampleOctave, this.centAdjustmentValue || 0];
                 return;
             }
         }
-        CUSTOMSAMPLES.push([this.sampleName, this.sampleData]);
+        // Add new sample with cent adjustment
+        CUSTOMSAMPLES.push([this.sampleName, this.sampleData, this.samplePitch, this.sampleOctave, this.centAdjustmentValue || 0]);
     };
 
     /**
@@ -784,11 +1103,35 @@ function SampleWidget() {
         if (this.sampleName != null && this.sampleName != "") {
             this.reconnectSynthsToAnalyser();
 
+            // Store the current note object for the cent adjustment
+            const frequency = this._calculateFrequency();
+            this.currentNoteObj = TunerUtils.frequencyToPitch(frequency);
+
+            // Get a reference to the player
+            const instrumentName = "customsample_" + this.originalSampleName;
+            
+            // Ensure the instrument exists
+            if (!instruments[0][instrumentName]) {
+                // Create the instrument if it doesn't exist
+                this.activity.logo.synth.loadSynth(0, instrumentName);
+            }
+            
+            if (instruments[0][instrumentName]) {
+                this.player = instruments[0][instrumentName];
+            }
+
+            // Calculate adjusted frequency for cent adjustment
+            let playbackFrequency = CENTERPITCHHERTZ;
+            if (this.centAdjustmentValue !== 0) {
+                const playbackRate = Math.pow(2, this.centAdjustmentValue/1200);
+                playbackFrequency = CENTERPITCHHERTZ * playbackRate;
+            }
+
             this.activity.logo.synth.trigger(
                 0,
-                [CENTERPITCHHERTZ],
+                [playbackFrequency],
                 this.sampleLength / 1000.0,
-                "customsample_" + this.originalSampleName,
+                instrumentName,
                 null,
                 null,
                 false
@@ -1198,7 +1541,7 @@ function SampleWidget() {
                             const pitch = detectPitch(dataArray);
                             if (pitch > 0) {
                                 const { note, cents } = frequencyToNote(pitch);
-                                this.tunerDisplay.update(note, cents, pitch);
+                                this.tunerDisplay.update(note, cents, this.centsValue);
                                 
                                 // Update segments
                                 const tunerSegments = document.querySelectorAll("#tunerContainer svg path");
@@ -1230,10 +1573,6 @@ function SampleWidget() {
         
         if (this.tunerEnabled) {
             this._tunerBtn.getElementsByTagName("img")[0].src = "header-icons/tuner-active.svg";
-            // If turning on tuner, hide the cents slider if it's visible
-            if (this.sliderVisible) {
-                this.toggleCentsSlider();
-            }
         } else {
             this._tunerBtn.getElementsByTagName("img")[0].src = "header-icons/tuner.svg";
         }
@@ -1241,37 +1580,19 @@ function SampleWidget() {
         // Redraw the canvas with the tuner display
         this._scale();
     };
-
-    /**
-     * Toggles the visibility of the cents adjustment slider
-     * @returns {void}
-     */
-    this.toggleCentsSlider = function () {
-        // Functionality removed - will be replaced with pie menu
-    };
-
-    /**
-     * Creates and displays the cents adjustment slider
-     * @returns {void}
-     */
-    this.createCentsSlider = function () {
-        // Functionality removed - will be replaced with pie menu
-    };
-
-    /**
-     * Removes the cents adjustment slider
-     * @returns {void}
-     */
-    this.removeCentsSlider = function () {
-        // Functionality removed - will be replaced with pie menu
-    };
     
     /**
      * Applies the cents adjustment to the sample playback rate
      * @returns {void}
      */
     this.applyCentsAdjustment = function () {
-        // Functionality removed - will be replaced with pie menu
+        if (this.sampleName && this.sampleName !== "") {
+            const playbackRate = TunerUtils.calculatePlaybackRate(0, this.centsValue);
+            // Apply the playback rate to the sample
+            if (instruments[0]["customsample_" + this.originalSampleName]) {
+                instruments[0]["customsample_" + this.originalSampleName].playbackRate.value = playbackRate;
+            }
+        }
     };
 
     /**
@@ -1470,6 +1791,45 @@ function SampleWidget() {
         this.widgetWindow.getWidgetBody().appendChild(container);
 
         document.getElementById("start").addEventListener("click", startPitchDetection);
+    };
+
+
+
+    /**
+     * Applies the cent adjustment to the sample
+     * @param {number} value - The cent adjustment value
+     * @returns {void}
+     */
+    this.applyCentAdjustment = function(value) {
+        this.centAdjustmentValue = value;
+        
+        // Calculate the playback rate adjustment based on cents
+        // Formula: playbackRate = 2^(cents/1200)
+        const playbackRate = Math.pow(2, value/1200);
+        
+        // Apply the playback rate to the current sample if it exists
+        if (this.sampleName && this.sampleName !== "" && this.originalSampleName) {
+            const instrumentName = "customsample_" + this.originalSampleName;
+            
+            // Check if instruments object exists and the specific instrument exists
+            if (typeof instruments !== 'undefined' && 
+                instruments[0] && 
+                instruments[0][instrumentName] && 
+                instruments[0][instrumentName].playbackRate) {
+                instruments[0][instrumentName].playbackRate.value = playbackRate;
+            } else {
+                // If the instrument doesn't exist yet, we'll apply the adjustment when playing
+                console.log("Instrument not found, will apply cent adjustment during playback");
+            }
+        }
+        
+        // If we're currently playing, restart with the new adjustment
+        if (this.isMoving) {
+            this.pause();
+            setTimeout(() => {
+                this._playReferencePitch();
+            }, 100);
+        }
     };
 }
 
