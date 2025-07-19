@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Music Blocks AI Debugger</title>
+</head>
+<body>
+  <h2>Ask the AI</h2>
+  <input id="question" placeholder="Ask your question..." size="50">
+  <button onclick="askBot()">Ask</button>
+  <pre id="response"></pre>
+
+  <script>
+    function askBot() {
+      const question = document.getElementById("question").value;
+      fetch("http://localhost:8000/query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("response").innerText = data.response;
+      });
+    }
+  </script>
+</body>
+</html>
