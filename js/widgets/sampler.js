@@ -399,6 +399,43 @@ function SampleWidget() {
         // For the widget buttons
         widgetWindow.onmaximize = function () {
             that._scale();
+            that._updateContainerPositions();
+        };
+
+        widgetWindow.onrestore = function() {
+            that._scale();
+            that._updateContainerPositions();
+        };
+
+        // Function to update container positions based on window state
+        this._updateContainerPositions = function() {
+            const tunerContainer = docById("tunerContainer");
+            const centAdjustmentContainer = docById("centAdjustmentContainer");
+            const valueDisplay = docById("centValueDisplay");
+            
+            if (tunerContainer) {
+                if (this.widgetWindow.isMaximized()) {
+                    tunerContainer.style.marginTop = "150px";
+                    tunerContainer.style.marginLeft = "auto";
+                    tunerContainer.style.marginRight = "auto";
+                    tunerContainer.style.justifyContent = "center";
+                } else {
+                    tunerContainer.style.marginTop = "100px";
+                    tunerContainer.style.marginLeft = "";
+                    tunerContainer.style.marginRight = "";
+                    tunerContainer.style.justifyContent = "";
+                }
+            }
+            
+            if (valueDisplay) {
+                if (this.widgetWindow.isMaximized()) {
+                    valueDisplay.style.marginTop = "50px";
+                    valueDisplay.style.marginBottom = "50px";
+                } else {
+                    valueDisplay.style.marginTop = "30px";
+                    valueDisplay.style.marginBottom = "30px";
+                }
+            }
         };
 
         widgetWindow.onclose = () => {
@@ -430,8 +467,6 @@ function SampleWidget() {
             this.pitchAnalysers = {};
             widgetWindow.destroy();
         };
-
-        widgetWindow.onmaximize = this._scale.bind(this);
 
         this.playBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
         this.playBtn.onclick = () => {
@@ -612,7 +647,16 @@ function SampleWidget() {
                 tunerContainer.style.display = "flex";
                 tunerContainer.id = "tunerContainer";
                 tunerContainer.style.gap = "10px";
-                tunerContainer.style.marginTop = "100px";
+                
+                // Adjust positioning based on whether the window is maximized
+                if (this.widgetWindow.isMaximized()) {
+                    tunerContainer.style.marginTop = "150px";
+                    tunerContainer.style.marginLeft = "auto";
+                    tunerContainer.style.marginRight = "auto";
+                    tunerContainer.style.justifyContent = "center";
+                } else {
+                    tunerContainer.style.marginTop = "100px";
+                }
 
                 const accidetalFlat = document.createElement("img");
                 accidetalFlat.setAttribute("src", "../header-icons/accidental-flat.svg");
@@ -822,15 +866,29 @@ function SampleWidget() {
                 valueDisplay.style.fontSize = "24px";
                 valueDisplay.style.fontWeight = "bold";
                 valueDisplay.style.textAlign = "center";
-                valueDisplay.style.marginTop = "30px";
-                valueDisplay.style.marginBottom = "30px";
+                
+                // Adjust positioning based on whether the window is maximized
+                if (this.widgetWindow.isMaximized()) {
+                    valueDisplay.style.marginTop = "50px";
+                    valueDisplay.style.marginBottom = "50px";
+                } else {
+                    valueDisplay.style.marginTop = "30px";
+                    valueDisplay.style.marginBottom = "30px";
+                }
                 
                 centAdjustmentContainer.appendChild(valueDisplay);
                 
                 // Create the slider container
                 const sliderContainer = document.createElement("div");
-                sliderContainer.style.width = "80%";
-                sliderContainer.style.margin = "0 auto";
+                
+                // Adjust width and margins based on whether the window is maximized
+                if (this.widgetWindow.isMaximized()) {
+                    sliderContainer.style.width = "60%";
+                    sliderContainer.style.margin = "0 auto 30px auto";
+                } else {
+                    sliderContainer.style.width = "80%";
+                    sliderContainer.style.margin = "0 auto";
+                }
                 
                 // Create the HTML5 range slider
                 const slider = document.createElement("input");
@@ -891,7 +949,14 @@ function SampleWidget() {
                 
                 // Add labels for min and max values
                 const labelsDiv = document.createElement("div");
-                labelsDiv.style.width = "80%";
+                
+                // Adjust width based on whether the window is maximized
+                if (this.widgetWindow.isMaximized()) {
+                    labelsDiv.style.width = "60%";
+                } else {
+                    labelsDiv.style.width = "80%";
+                }
+                
                 labelsDiv.style.display = "flex";
                 labelsDiv.style.justifyContent = "space-between";
                 labelsDiv.style.margin = "10px auto";
