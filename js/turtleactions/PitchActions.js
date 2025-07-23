@@ -157,6 +157,111 @@ function setupPitchActions(activity) {
         }
 
         /**
+         * Gets the current temperament for the turtle.
+         * 
+         * @param {Object} turtle - Turtle object
+         * @returns {String} temperament name (e.g. "eqaul", "just", "pythagorean", "meantone")
+         */
+        static getTemperament(turtle) {
+            return turtle.singer.temperament || "equal";
+        }
+
+        /**
+         * Gets the current the key signature for the turtle.
+         * 
+         * @param {Object} turtle - Turtle object
+         * @returns {String} key signature (e.g. "C Major")
+         */
+        static getKeySignature(turtle) {
+            return turtle.singer.keySignature || "C Major";
+        }
+
+        /**
+         * Gets the last played pitch for the turtle.
+         * 
+         * @param {Object} turtle - Turtle object
+         * @returns {Array} [note, octave]
+         */
+        static getCurrentPitch(turtle) {
+            return turtle.singer.lastNotePlayed || ["C", 4];
+        }
+
+        /**
+         * Sets the last played pitch for the turtle.
+         * 
+         * @param {String} note - Note name (e.g. "C", "G", "A")
+         * @param {Number} octave - Octave number
+         * @param {Object} turtle - Turtle object
+         */
+        static setCurrentPitch(note, octave, turtle) {
+            turtle.singer.lastNotePlayed = [note, octave];
+        }
+
+        /**
+         * Calculates the frequency for a note using temperament-specific logic.
+         * 
+         * @param {String} note - Note name
+         * @param {Number} octave - Octave number
+         * @param {String} temperament - Temperament name
+         * @param {String} keySignature - key signature
+         * @returns {Array} [note, octave, frequency]
+         */
+        static calculateTemperamentFrequency(note, octave, temperament, keySignature, step) {
+            let frequency = 0;
+            if(temperament === "equal") {
+                frequency = pitchToFrequency(note, octave, keySignature, "equal");
+            } else if(temperament == "just") {
+                frequency = pitchToFrequency(note, octave, keySignature, "just");
+            } else if(temperament === "pythagorean") {
+                frequency = pitchToFrequency(note, octave, keySignature, "pythagorean");
+            } else if(temperament === "meantone") {
+                frequency = pitchToFrequency(note, octave, keySignature, "meantone");
+            } else {
+                frequency = pitchToFrequency(note, octave, keySignature, "equal");
+            }
+            return [note, octave, frequency];
+        }
+
+        /**
+         * Steps by Scalar degree using temperament-aware logic.
+         * 
+         * @param {Number} step - number of scale degrees to step
+         * @param {Number} turtle - Turtle index in turtles.turtleList
+         * @param {Number|String} blk - corresponding Block object index in block.blockList or custom blockName
+         * @returns {*} result of playPitch
+         */
+        static stepPitchTemperamentAware(step, turtle, blk) {
+            const temperament = this.getTemperament(activity.turtles.ithTurtle(turtle));
+            const keySignature = this.getKeySignature(activity.turtles.ithTurtle(turtle));
+            const [currentNote, currentOctave] = this.getCurrentPitch(activity.turtles.ithTurtle(turtle));
+
+            const scale = buildScale(keySignature)[0];
+            let idx = scale.indexOf(currentNote);
+            if (idx === -1) idx = 0;
+
+            let newIdx = idx + step;
+            let octaveShift = 0;
+            while(newIdx < 0) {
+                newIdx += scale.length;
+                octaveShift -= 1;
+            }
+            while(newIdx >= scale.length) {
+                newIdx -= scale.length;
+                octaveShift += 1;
+            }
+            const newNote = scale[newIdx];
+            const newOctave = currentOctave + octaveShift;
+
+            const [note, octave, frequency] = this.calculateTemperamentFrequency(
+                newNote, newOctave, temperament, keySignature, step
+            );
+
+            this.setCurrentPitch(note, octave, activity.turtles.ithTurtle(turtle));
+
+            return this.playPitch(note, octave, 0, turtle, blk);
+        }
+
+        /**
          * Plays a nth modal pitch block.
          *
          * @param {Number} number - number of modal pitch

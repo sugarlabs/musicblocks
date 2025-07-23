@@ -1810,27 +1810,25 @@ function setupPitchBlocks(activity) {
 
     class StepPitchBlock extends FlowBlock {
         constructor() {
-            //.TRANS: step some number of notes in current musical scale
-            super("steppitch", _("scalar step") + " (+/–)");
+            super("steppitch", _("scalar step") + " (+/-)");
             this.setPalette("pitch", activity);
             this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.beginnerBlock(true);
             this.setHelpString([
-                _("The Scalar Step block (in combination with a Number block) will play the next pitch in a scale,") +
-                    " " +
+                _("The Scalar Step block (in combination with a Number block) will play the next pitch in a scale.") +   " "  +
                     _("eg if the last note played was sol, Scalar Step 1 will play la."),
                 "documentation",
                 ""
             ]);
             this.formBlock({
                 args: 1,
-                defaults: [1],
+                default: [1],
                 argTypes: ["anyin"]
             });
         }
 
         flow(args, logo, turtle, blk) {
-            return Singer.PitchActions.stepPitch(args[0], turtle, blk);
+            return Singer.PitchActions.stepPitchTemperamentAware(args[0], turtle, blk);
         }
     }
 
