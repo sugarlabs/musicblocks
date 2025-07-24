@@ -451,9 +451,31 @@ class Toolbar {
      * @returns {void}
      */
     renderNewProjectIcon(onclick) {
-        const newProjectIcon = docById("new-project");
+        const modalContainer = docById("modal-container");
+        const newDropdown = docById("newdropdown");
 
-        newProjectIcon.onclick = () => {
+        newDropdown.innerHTML = "";
+        const title = document.createElement("div");
+        title.classList.add("new-project-title");
+        title.textContent = _("New project");
+        newDropdown.appendChild(title);
+
+        const confirmationMessage = document.createElement("div");
+        confirmationMessage.id = "confirmation-message";
+        confirmationMessage.textContent = _("Are you sure you want to create a new project?");
+        newDropdown.appendChild(confirmationMessage);
+
+        const confirmationButtonLi = document.createElement("li");
+        const confirmationButton = document.createElement("div");
+        confirmationButton.classList.add("confirm-button");
+        confirmationButton.id = "new-project";
+        confirmationButton.textContent = _("Confirm");
+        confirmationButtonLi.appendChild(confirmationButton);
+        newDropdown.appendChild(confirmationButtonLi);
+
+        modalContainer.style.display = "flex";
+        confirmationButton.onclick = () => {
+            modalContainer.style.display = "none";
             onclick(this.activity);
         };
     }
@@ -949,18 +971,18 @@ class Toolbar {
             const saveButtonAdvanced = docById("saveButtonAdvanced");
             if (saveButton) saveButton.style.display = this.activity.beginnerMode ? "block" : "none";
             if (saveButtonAdvanced) saveButtonAdvanced.style.display = this.activity.beginnerMode ? "none" : "block";
-            activity.toolbar.renderSaveIcons(
-                activity.save.saveHTML.bind(activity.save),
+            this.activity.toolbar.renderSaveIcons(
+                this.activity.save.saveHTML.bind(this.activity.save),
                 doSVG,
-                activity.save.saveSVG.bind(activity.save),
-                activity.save.saveMIDI.bind(activity.save),
-                activity.save.savePNG.bind(activity.save),
-                activity.save.saveWAV.bind(activity.save),
-                activity.save.saveLilypond.bind(activity.save),
-                activity.save.saveAbc.bind(activity.save),
-                activity.save.saveMxml.bind(activity.save),
-                activity.save.saveBlockArtwork.bind(activity.save),
-                activity.save.saveBlockArtworkPNG.bind(activity.save)
+                this.activity.save.saveSVG.bind(this.activity.save),
+                this.activity.save.saveMIDI.bind(this.activity.save),
+                this.activity.save.savePNG.bind(this.activity.save),
+                this.activity.save.saveWAV.bind(this.activity.save),
+                this.activity.save.saveLilypond.bind(this.activity.save),
+                this.activity.save.saveAbc.bind(this.activity.save),
+                this.activity.save.saveMxml.bind(this.activity.save),
+                this.activity.save.saveBlockArtwork.bind(this.activity.save),
+                this.activity.save.saveBlockArtworkPNG.bind(this.activity.save)
             );
         };
 
@@ -1136,32 +1158,7 @@ class Toolbar {
         }
     };
 }
-function renderNewProjectConfirmation() {
-    const modalContainer = document.getElementById("modal-container");
-    const newDropdown = document.getElementById("newdropdown");
 
-    newDropdown.innerHTML = "";
-    const title = document.createElement("div");
-    title.classList.add("new-project-title");
-    title.textContent = _("New project");
-    newDropdown.appendChild(title);
-
-    const confirmationMessage = document.createElement("div");
-    confirmationMessage.id = "confirmation-message";
-    confirmationMessage.textContent = _("Are you sure you want to create a new project?");
-    newDropdown.appendChild(confirmationMessage);
-
-    const confirmationButtonLi = document.createElement("li");
-    const confirmationButton = document.createElement("div");
-    confirmationButton.classList.add("confirm-button");
-    confirmationButton.id = "new-project";
-    confirmationButton.textContent = _("Confirm");
-    confirmationButtonLi.appendChild(confirmationButton);
-    newDropdown.appendChild(confirmationButtonLi);
-
-    modalContainer.style.display = "flex";
-    confirmationButton.onclick = () => {
-        modalContainer.style.display = "none";
-    };
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = Toolbar;
 }
-renderNewProjectConfirmation();

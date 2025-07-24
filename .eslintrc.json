@@ -14,6 +14,7 @@
     }
   },
   "extends": ["eslint:recommended", "prettier"],
+  "ignorePatterns": ["lib/**"],
   "rules": {
     "no-console": "off",
     "no-mixed-spaces-and-tabs": "warn",

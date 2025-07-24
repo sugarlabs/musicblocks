@@ -2093,13 +2093,39 @@ function TemperamentWidget() {
             } else {
                 that.inbetween = true;
             }
+            if(!that.playbackForward && i == -1){
+                cell.innerHTML =
+                    `&nbsp;&nbsp;<img 
+                        src="header-icons/play-button.svg" 
+                        title="${_("Play")}" 
+                        alt="${_("Play")}" 
+                        height="${ICONSIZE}" 
+                        width="${ICONSIZE}" 
+                        vertical-align="middle" 
+                        align-content="center"
+                    >&nbsp;&nbsp;`;
+                that._playing = false;
+                that.playbackForward = true;
+                this.inbetween = false;
+                setTimeout(function () {
+                    that.notesCircle.navItems[0].fillAttr = "#c8C8C8";
+                    that.notesCircle.navItems[0].sliceHoverAttr.fill = "#c8C8C8";
+                    that.notesCircle.navItems[0].slicePathAttr.fill = "#c8C8C8";
+                    that.notesCircle.navItems[0].sliceSelectedAttr.fill = "#c8C8C8";
+                    that.notesCircle.refreshWheel();
+                }, Singer.defaultBPMFactor * 1000 * duration);
+            }
         };
         if ((this._playing && currentTime - this.lastClickTime > Singer.defaultBPMFactor * 1000 * duration) || (this.inbetween)) {
             that.playbackForward = true;
             this.inbetween = false;
-            for (let i = 0; i <= this.pitchNumber; i++) {
-                docById("pitchNumber_" + i).style.background = platformColor.selectorBackground;
+            if (this.circleIsVisible) {
+                for (let i = 0; i <= this.pitchNumber; i++) {
+                    const pitchElement = docById("pitchNumber_" + i);
+                    pitchElement.style.background = platformColor.selectorBackground;
+                }
             }
+
             __playLoop(0);
         }
         this.lastClickTime = currentTime;
