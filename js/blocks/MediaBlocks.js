@@ -1000,3 +1000,7 @@ function setupMediaBlocks(activity) {
     new MediaBlock().setup(activity);
     new TextBlock().setup(activity);
 }
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupMediaBlocks };
+}

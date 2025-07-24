@@ -589,7 +589,7 @@ function setupToneBlocks(activity) {
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["rate"] = args[0];
                 logo.timbre.phaserParams.push(last(tur.singer.octaves));
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["octaves"] = args[1];
-                logo.timbre.phaserParams.push(last(tur.signer.baseFrequency));
+                logo.timbre.phaserParams.push(last(tur.singer.baseFrequency));
                 instrumentsEffects[turtle][logo.timbre.instrumentName]["baseFrequency"] = args[2];
             }
 
@@ -1151,4 +1151,9 @@ function setupToneBlocks(activity) {
     new SynthNameBlock().setup(activity);
     new VoiceNameBlock().setup(activity);
     new SetTimbreBlock().setup(activity);
+}
+
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupToneBlocks };
 }

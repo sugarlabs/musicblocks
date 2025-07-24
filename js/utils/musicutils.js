@@ -1113,6 +1113,7 @@ const SELECTORSTRINGS = [
     _("guitar"),
     _("sitar"),
     _("harmoiunm"),
+    _("mandolin"),
     _("acoustic guitar"),
     _("flute"),
     _("clarinet"),
@@ -1803,50 +1804,71 @@ const TEMPERAMENT = {
     "equal31": {
         // Equal 31EDO Temperament: 31 Equal Divisions of the Octave
         "perfect 1": Math.pow(2, 0 / 31),
-        "minor 2": Math.pow(2, 3 / 31),
+        "diminished 2": Math.pow(2, 1 / 31),
         "augmented 1": Math.pow(2, 2 / 31),
+        "minor 2": Math.pow(2, 3 / 31),
+        "mid 2": Math.pow(2, 4 / 31),
         "major 2": Math.pow(2, 5 / 31),
-        "augmented 2": Math.pow(2, 6 / 31),
+        "up-major 2": Math.pow(2, 6 / 31),
+        "down-minor 3": Math.pow(2, 7 / 31),
         "minor 3": Math.pow(2, 8 / 31),
+        "mid 3": Math.pow(2, 9 / 31),
         "major 3": Math.pow(2, 10 / 31),
-        "augmented 3": Math.pow(2, 11 / 31),
-        "diminished 4": Math.pow(2, 12 / 31),
+        "up-major 3": Math.pow(2, 11 / 31),
+        "down 4": Math.pow(2, 12 / 31),
         "perfect 4": Math.pow(2, 13 / 31),
-        "augmented 4": Math.pow(2, 15 / 31),
-        "diminished 5": Math.pow(2, 16 / 31),
+        "up 4": Math.pow(2, 14 / 31),
+        "down-diminished 5": Math.pow(2, 15 / 31),
+        "up-augmented 4": Math.pow(2, 16 / 31),
+        "down 5": Math.pow(2, 17 / 31),
         "perfect 5": Math.pow(2, 18 / 31),
-        "augmented 5": Math.pow(2, 19 / 31),
+        "up 5": Math.pow(2, 19 / 31),
+        "down-minor 6": Math.pow(2, 20 / 31),
         "minor 6": Math.pow(2, 21 / 31),
+        "mid 6": Math.pow(2, 22 / 31),
         "major 6": Math.pow(2, 23 / 31),
-        "augmented 6": Math.pow(2, 24 / 31),
+        "up-major 6": Math.pow(2, 24 / 31),
+        "down-minor 7": Math.pow(2, 25 / 31),
         "minor 7": Math.pow(2, 26 / 31),
+        "mid 7": Math.pow(2, 27 / 31),
         "major 7": Math.pow(2, 28 / 31),
-        "augmented 7": Math.pow(2, 29 / 31),
-        "diminished 8": Math.pow(2, 30 / 31),
+        "up-major 7": Math.pow(2, 29 / 31),
+        "down 8": Math.pow(2, 30 / 31),
         "perfect 8": Math.pow(2, 31 / 31),
-        "pitchNumber": 21,
+        "octave": Math.pow(2, 31 / 31),
+        "pitchNumber": 31,
         "interval": [
             "perfect 1",
+            "diminished 2",
             "augmented 1",
             "minor 2",
+            "mid 2",
             "major 2",
-            "augmented 2",
+            "up-major 2",
+            "down-minor 3",
             "minor 3",
+            "mid 3",
             "major 3",
-            "augmented 3",
-            "diminished 4",
+            "up-major 3",
+            "down 4",
             "perfect 4",
-            "augmented 4",
-            "diminished 5",
+            "up 4",
+            "down-diminished 5",
+            "up-augmented 4",
+            "down 5",
             "perfect 5",
-            "augmented 5",
+            "up 5",
+            "down-minor 6",
             "minor 6",
+            "mid 6",
             "major 6",
-            "augmented 6",
+            "up-major 6",
+            "down-minor 7",
             "minor 7",
+            "mid 7",
             "major 7",
-            "augmented 7",
-            "diminished 8",
+            "up-major 7",
+            "down 8",
             "perfect 8"
         ]
     },
@@ -3584,7 +3606,6 @@ const getNoteFromInterval = (pitch, interval) => {
     const number = pitchToNumber(note1, octave1, "C major");
     const pitches = ["C", "D", "E", "F", "G", "A", "B"];
     const priorAttrs = [DOUBLEFLAT, FLAT, "", SHARP, DOUBLESHARP];
-    // let majorintervalNote;
 
     /**
      * Find the note that corresponds to a major interval.
@@ -3608,7 +3629,7 @@ const getNoteFromInterval = (pitch, interval) => {
         let note = numberToPitch(number + halfSteps);
         const num = interval.split(" ");
         const pitchIndex = pitches.indexOf(pitch1);
-        let index = pitchIndex + Number(num[1]) - 1;
+        let index = pitchIndex + Number(num[num.length - 1]) - 1;
         let octave = octave1;
         if (index > 6) {
             index = index - 7;
@@ -3642,7 +3663,7 @@ const getNoteFromInterval = (pitch, interval) => {
         let majorNote;
         let accidental;
         let index1;
-
+  
         if (
             interval === "minor 2" ||
             interval === "minor 3" ||
@@ -3650,7 +3671,7 @@ const getNoteFromInterval = (pitch, interval) => {
             interval === "minor 7"
         ) {
             //Major intervals lowered by a half step become minor.
-            majorNote = findMajorInterval("major " + num[1]);
+            majorNote = findMajorInterval("major " + num[num.length - 1]);
             accidental = majorNote[0].substring(1, majorNote[0].length);
             index1 = priorAttrs.indexOf(accidental);
             if (index1 === 0) {
@@ -3659,14 +3680,23 @@ const getNoteFromInterval = (pitch, interval) => {
                 accidental = priorAttrs[index1 - 1];
             }
         }
-
-        if (
-            interval === "diminished 4" ||
-            interval === "diminished 5" ||
-            interval === "diminished 8"
+        
+        // Diminished intervals for perfect intervals (lowered by half step)
+        else if (
+            interval === "down 4" ||
+            interval === "down 5" ||
+            interval === "down 8"
         ) {
-            //Perfect intervals lowered by a half step are called diminished.
-            majorNote = findMajorInterval("perfect " + num[1]);
+            // Mapping to the corresponding perfect interval
+            if (interval === "down 4") {
+                majorNote = findMajorInterval("perfect 4");
+            } else if (interval === "down 5") {
+                majorNote = findMajorInterval("perfect 5");
+            } else if (interval === "down 8") {
+                majorNote = findMajorInterval("perfect 8");
+            }
+            
+            // Lowering by one half step
             accidental = majorNote[0].substring(1, majorNote[0].length);
             index1 = priorAttrs.indexOf(accidental);
             if (index1 === 0) {
@@ -3675,32 +3705,110 @@ const getNoteFromInterval = (pitch, interval) => {
                 accidental = priorAttrs[index1 - 1];
             }
         }
-
-        if (
+        
+        // Special case: doubly diminished 5th (very diminished)
+        else if (interval === "down-diminished 5") {
+            majorNote = findMajorInterval("perfect 5");
+            accidental = majorNote[0].substring(1, majorNote[0].length);
+            index1 = priorAttrs.indexOf(accidental);
+            
+            // Lowering by Two half steps for "very diminished"
+            if (index1 <= 1) {
+                // If already at flat or double flat, add another flat
+                accidental = priorAttrs[0] + FLAT;
+            } else {
+                // Go down two accidentals in the array
+                accidental = priorAttrs[index1 - 2];
+            }
+        }
+        
+        // Special case: diminished 2nd (from unison)
+        else if (interval === "diminished 2") {
+            majorNote = findMajorInterval("perfect 1");
+            accidental = majorNote[0].substring(1, majorNote[0].length);
+            index1 = priorAttrs.indexOf(accidental);
+            if (index1 === 0) {
+                accidental = priorAttrs[index1] + FLAT;
+            } else {
+                accidental = priorAttrs[index1 - 1];
+            }
+        }
+        
+        // Handle standard diminished intervals not covered by microtonal cases
+        else if (interval.startsWith("diminished ")) {
+            const intervalNum = interval.split(" ")[1];
+            let baseInterval;
+            if (["4", "5", "8"].includes(intervalNum)) { // Perfect-based
+                baseInterval = "perfect " + intervalNum;
+            } else { // Major-based
+                baseInterval = "major " + intervalNum;
+            }
+            
+            majorNote = findMajorInterval(baseInterval);
+            accidental = majorNote[0].substring(1, majorNote[0].length);
+            index1 = priorAttrs.indexOf(accidental);
+            
+            // Lower by one half-step from the base interval
+            if (index1 === 0) {
+                accidental = priorAttrs[index1] + FLAT;
+            } else {
+                accidental = priorAttrs[index1 - 1];
+            }
+        }
+        
+        // Augmented intervals for perfect intervals (raised by half step)
+        else if (
+            interval === "up 4" ||
+            interval === "up 5" ||
+            interval === "up-augmented 4"
+        ) {
+            // Mapping to the corresponding perfect interval
+            if (interval === "up 4" || interval === "up-augmented 4") {
+                majorNote = findMajorInterval("perfect 4");
+            } else if (interval === "up 5") {
+                majorNote = findMajorInterval("perfect 5");
+            }
+            
+            // Raise by one half step
+            accidental = majorNote[0].substring(1, majorNote[0].length);
+            index1 = priorAttrs.indexOf(accidental);
+            if (index1 === 4) {
+                accidental = priorAttrs[index1] + SHARP;
+            } else {
+                accidental = priorAttrs[index1 + 1];
+            }
+        }
+        
+        // Special case: augmented unison
+        else if (interval === "augmented 1") {
+            majorNote = findMajorInterval("perfect 1");
+            accidental = majorNote[0].substring(1, majorNote[0].length);
+            index1 = priorAttrs.indexOf(accidental);
+            if (index1 === 4) {
+                accidental = priorAttrs[index1] + SHARP;
+            } else {
+                accidental = priorAttrs[index1 + 1];
+            }
+        }
+        
+        // Standard augmented intervals
+        else if (
             interval === "augmented 2" ||
             interval === "augmented 3" ||
-            interval === "augmented 6" ||
-            interval === "augmented 7"
-        ) {
-            //Major intervals raised by a half step are called augmented.
-            majorNote = findMajorInterval("major " + num[1]);
-            accidental = majorNote[0].substring(1, majorNote[0].length);
-            index1 = priorAttrs.indexOf(accidental);
-            if (index1 === 4) {
-                accidental = priorAttrs[index1] + SHARP;
-            } else {
-                accidental = priorAttrs[index1 + 1];
-            }
-        }
-
-        if (
-            interval === "augmented 1" ||
             interval === "augmented 4" ||
             interval === "augmented 5" ||
+            interval === "augmented 6" ||
+            interval === "augmented 7" ||
             interval === "augmented 8"
         ) {
-            //Perfect intervals raised by a half step are called augmented.
-            majorNote = findMajorInterval("perfect " + num[1]);
+            const intervalNum = interval.split(" ")[1];
+            if (["1", "4", "5", "8"].includes(intervalNum)) {
+                // Perfect-based augmented intervals
+                majorNote = findMajorInterval("perfect " + intervalNum);
+            } else {
+                // Major-based augmented intervals
+                majorNote = findMajorInterval("major " + intervalNum);
+            }
             accidental = majorNote[0].substring(1, majorNote[0].length);
             index1 = priorAttrs.indexOf(accidental);
             if (index1 === 4) {
@@ -3709,7 +3817,63 @@ const getNoteFromInterval = (pitch, interval) => {
                 accidental = priorAttrs[index1 + 1];
             }
         }
-
+        
+        // Handle "up-major" intervals (raised major)
+        else if (
+            interval === "up-major 2" ||
+            interval === "up-major 3" ||
+            interval === "up-major 6" ||
+            interval === "up-major 7"
+        ) {
+            let intervalNum;
+            intervalNum = interval.split(" ")[1];     
+            majorNote = findMajorInterval("major " + intervalNum);
+            accidental = majorNote[0].substring(1, majorNote[0].length);
+            index1 = priorAttrs.indexOf(accidental);
+            if (index1 === 4) {
+                accidental = priorAttrs[index1] + SHARP;
+            } else {
+                accidental = priorAttrs[index1 + 1];
+            }
+        }
+        
+        // Handle "down-minor" intervals (lowered minor - like diminished)
+        else if (
+            interval === "down-minor 3" ||
+            interval === "down-minor 6" ||
+            interval === "down-minor 7"
+        ) {
+            const intervalNum = interval.split(" ")[1];
+            majorNote = findMajorInterval("major " + intervalNum);
+            accidental = majorNote[0].substring(1, majorNote[0].length);
+            index1 = priorAttrs.indexOf(accidental);
+            
+            // Lower by an additional half step (total of two half steps below major)
+            if (index1 <= 1) {
+                accidental = priorAttrs[0] + FLAT;
+            } else {
+                accidental = priorAttrs[index1 - 2]; // Go down two accidentals
+            }
+        }
+        
+        // Handle neutral/mid intervals (between major and minor)
+        else if (
+            interval === "mid 2" ||
+            interval === "mid 3" ||
+            interval === "mid 6" ||
+            interval === "mid 7"
+        ) {
+            const intervalNum = interval.split(" ")[1];
+            majorNote = findMajorInterval("major " + intervalNum);
+            accidental = majorNote[0].substring(1, majorNote[0].length);
+            index1 = priorAttrs.indexOf(accidental);
+            if (index1 === 0) {
+                accidental = priorAttrs[index1] + FLAT;
+            } else {
+                accidental = priorAttrs[index1 - 1];
+            }
+        }
+        
         return [majorNote[0].substring(0, 1) + accidental + "", majorNote[1]];
     };
 
@@ -6076,7 +6240,17 @@ if (typeof module !== "undefined" && module.exports) {
         getNoteFromInterval,
         numberToPitch,
         GetNotesForInterval,
-        base64Encode
+        base64Encode,
+        getStepSizeUp,
+        getStepSizeDown,
+        ACCIDENTALNAMES,
+        ACCIDENTALVALUES,
+        NOTESFLAT,
+        NOTESSHARP,
+        NOTESTEP,
+        MUSICALMODES,
+        SHARP,
+        FLAT
     };
 }
 

@@ -105,6 +105,7 @@ let MYDEFINES = [
     "activity/js-export/constraints",
     "activity/js-export/ASTutils",
     "activity/js-export/generate",
+    "activity/js-export/ast2blocklist",
     "activity/js-export/API/GraphicsBlocksAPI",
     "activity/js-export/API/PenBlocksAPI",
     "activity/js-export/API/RhythmBlocksAPI",
@@ -252,6 +253,7 @@ class Activity {
 
         this.firstTimeUser = false;
         this.beginnerMode = false;
+        this.runMode = "normal";
 
         // Flag to disable keyboard during loading of MB
         this.keyboardEnableFlag;
@@ -1502,6 +1504,7 @@ class Activity {
          * @param env {specifies environment}
          */
         const doFastButton = (activity, env) => {
+            activity.runMode = "normal";
             activity._doFastButton(env);
         };
 
@@ -1737,6 +1740,7 @@ class Activity {
          * Runs Music Blocks at a slower rate
          */
         const doSlowButton = (activity) => {
+            activity.runMode = "slow";
             activity._doSlowButton();
         };
 
@@ -1763,6 +1767,7 @@ class Activity {
          * Runs music blocks step by step
          */
         const doStepButton = (activity) => {
+            activity.runMode = "step";
             activity._doStepButton();
         };
 
@@ -2792,7 +2797,8 @@ class Activity {
                         //do nothing when clicked on the menu
                     } else if (document.getElementsByTagName("tr")[2].contains(e.target)) {
                         //do nothing when clicked on the search row
-                    } else if (e.target.id === "myCanvas") {
+                    } else {
+                        // this will hide the search bar if someone clicks on menu items 
                         that.hideSearchWidget();
                         document.removeEventListener("mousedown", closeListener);
                     }
@@ -3109,9 +3115,6 @@ class Activity {
                     case 67: // 'C'
                         this.textMsg("Alt-C " + _("Copy"));
                         this.blocks.prepareStackForCopy();
-                        break;
-                    case 68: // 'D'
-                        this.palettes.dict["myblocks"].promptMacrosDelete();
                         break;
                     case 69: // 'E'
                         this.textMsg("Alt-E " + _("Erase"));
@@ -4015,8 +4018,9 @@ class Activity {
          * Hide the palettes before update, then deletes everything/sends all to trash.
          * @param {boolean} addStartBlock {if true adds a new start block to new project instance}
          * @param {boolean} doNotSave     {if true discards any changes to project}
+         * @param {boolean} closeAllWidgets  {if true close all open widgets}
          */
-        this.sendAllToTrash = (addStartBlock, doNotSave) => {
+        this.sendAllToTrash = (addStartBlock, doNotSave, closeAllWidgets = true) => {
             // Return to home position after loading new blocks.
             this.blocksContainer.x = 0;
             this.blocksContainer.y = 0;
@@ -4076,7 +4080,9 @@ class Activity {
             this.update = true;
 
             // Close any open widgets.
-            closeWidgets();
+            if (closeAllWidgets) {
+                closeWidgets();
+            }
         };
 
         /*
@@ -6509,9 +6515,15 @@ class Activity {
                                 let obj;
                                 try {
                                     if (cleanData.includes("html")) {
-                                        obj = JSON.parse(
-                                            cleanData.match('<div class="code">(.+?)</div>')[1]
-                                        );
+                                        if (cleanData.includes("id=\"codeBlock\"")) {
+                                            obj = JSON.parse(
+                                                cleanData.match('<div class="code" id="codeBlock">(.+?)</div>')[1]
+                                            );
+                                        } else {
+                                            obj = JSON.parse(
+                                                cleanData.match('<div class="code">(.+?)</div>')[1]
+                                            );
+                                        }
                                     } else {
                                         obj = JSON.parse(cleanData);
                                     }
