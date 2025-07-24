@@ -308,10 +308,6 @@ class Activity {
             let lang = "en";
             if (this.storage.languagePreference !== undefined) {
                 lang = this.storage.languagePreference;
-                // If Japanese is selected, append the kanaPreference for proper lookup
-                if (lang === "ja" && this.storage.kanaPreference) {
-                    lang += "-" + this.storage.kanaPreference; // e.g., "ja-kanji" or "ja-kana"
-                }
                 i18next.changeLanguage(lang);
             } else {
                 lang = navigator.language;

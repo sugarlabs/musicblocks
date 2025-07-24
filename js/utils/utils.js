@@ -64,74 +64,62 @@ const changeImage = (imgElement, from, to) => {
  * @param {string} text - The input text to be translated.
  * @returns {string} The translated text.
  */
-function _(text, options = {}) {
-    if (!text) return "";
+function _(text) {
+    if (text === null || text === undefined) {
+        // console.debug("null string passed to _");
+        return "";
+    }
 
     try {
-        const removeChars = [
-            ",", "(", ")", "?", "¿", "<", ">", ".", "\n", '"',
-            ":", "%s", "%d", "/", "'", ";", "×", "!", "¡"
-        ];
-        
-        let cleanedText = text;
-        for (let char of removeChars) {
-            cleanedText = cleanedText.split(char).join("");
-        }
+        // Remove unwanted characters using a single regex
+        const unwantedChars = /[,\()?¿<>.\n":%s%d\/';×!¡]/g;
+        const cleanedText = text.replace(unwantedChars, "").replace(/ /g, "-");
 
-        let translated = '';
-        const lang = i18next.language;
-        let subLang = '';
-
-        if (lang.includes("kanji") || lang.includes("kana")) {
-            subLang = lang.includes("kana") ? "=)kana" : "=)kanji";
-            translated = i18next.t(`${text}${subLang}`, options);
-            if (translated === `${text}${subLang}`) {
-                translated = i18next.t(text, options);
+        if (localStorage.kanaPreference === "kana") {
+            const lang = document.webL10n.getLanguage();
+            if (lang === "ja") {
+                cleanedText = "kana-" + cleanedText;
             }
         }
-        else {
-            translated = i18next.t(text, options);            
+
+        // Helper function to get translation with case matching
+        function getTranslationWithCase(inputText, caseType) {
+            const translatedText = document.webL10n.get(inputText);
+            if (!translatedText || translatedText === inputText) {
+                return null; // No translation found
+            }
+        
+            switch (caseType) {
+                case "upper":
+                    return translatedText.toUpperCase();
+                case "lower":
+                    return translatedText.toLowerCase();
+                case "title":
+                    return translatedText.charAt(0).toUpperCase() + translatedText.slice(1).toLowerCase();
+                default:
+                    return translatedText;
+            }
         }
 
-        if (translated && translated === text) {
-            return translated;
-        }
+        // Try translations in order of priority
+        const translations = [
+            getTranslationWithCase(text, "original"), // Original case
+            getTranslationWithCase(cleanedText, "original"), // Cleaned text
+            getTranslationWithCase(text.toLowerCase(), "lower"), // Lowercase
+            getTranslationWithCase(
+                text.charAt(0).toUpperCase() + text.slice(1).toLowerCase(),
+                "title" // Title case
+            ),
+        ];
 
-        if (!translated || translated === text) {
-            translated = i18next.t(cleanedText, options);
-        }
+        const validTranslation = translations.find(t => t !== null);
+        return validTranslation || text;
 
-        if (!translated || translated === text) {
-            translated = i18next.t(text.toLowerCase(), options);
-        }
-
-        if (!translated || translated === text) {
-            const titleCase = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
-            translated = i18next.t(titleCase, options);
-        }
-
-        let hyphenatedText = cleanedText.replace(/ /g, "-");
-        if (!translated || translated === text) {
-            translated = i18next.t(hyphenatedText, options);
-        }
-
-        translated = translated || text;
-
-        if (text === text.toUpperCase()) {
-            return translated.toUpperCase();
-        } else if (text === text.toLowerCase()) {
-            return translated.toLowerCase();
-        } else if (text.charAt(0).toUpperCase() + text.slice(1).toLowerCase() === text) {
-            return translated.charAt(0).toUpperCase() + translated.slice(1).toLowerCase();
-        }
-
-        return translated;
     } catch (e) {
+        // console.debug("i18n error: " + text);
         return text;
     }
 }
-
-
 
 
 /**

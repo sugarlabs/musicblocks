@@ -64,7 +64,7 @@ requirejs(['i18next', 'i18nextHttpBackend'], function(i18next, i18nextHttpBacken
                         escapeValue: false
                     },
                     backend: {
-                        loadPath: '../locales/{{lng}}.json'
+                        loadPath: 'locales/{{lng}}.json?v='+Date.now()
                     }
                 }, function(err, t) {
                     if (err) {
