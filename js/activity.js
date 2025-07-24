@@ -6119,9 +6119,6 @@ class Activity {
             this.moving = false;
             this.isSelecting = !this.isSelecting;
             (this.isSelecting) ? this.textMsg(_("Select is enabled.")) : this.textMsg(_("Select is disabled."));
-
-        }
-
             docById("helpfulWheelDiv").style.display = "none";
         };
 

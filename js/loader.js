@@ -34,10 +34,6 @@ requirejs.config({
     packages: []
 });
 
-require.config({
-    urlArgs: "bust=" + (new Date()).getTime()
-});
-
 requirejs(['i18next', 'i18nextHttpBackend'], function(i18next, i18nextHttpBackend) {
 
     function updateContent() {
@@ -58,8 +54,8 @@ requirejs(['i18next', 'i18nextHttpBackend'], function(i18next, i18nextHttpBacken
                 .init({
                     lng: 'en',
                     fallbackLng: 'en',
-                    keySeparator: '=)',
-                    nsSeparator: 'false',
+                    keySeparator: false,
+                    nsSeparator: false,
                     interpolation: {
                         escapeValue: false
                     },
