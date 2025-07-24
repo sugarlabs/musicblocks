@@ -3003,7 +3003,7 @@ class Activity {
             // First, check if the pitch slider is open
             if (window.widgetWindows.isOpen("slider") === true) {
                 // If the event is an arrow key, let the PitchSlider handle it
-                if (event.keyCode === 37 || event.keyCode === 38 || 
+                if (event.keyCode === 37 || event.keyCode === 38 ||
                     event.keyCode === 39 || event.keyCode === 40) {
                     // Simply prevent default behavior here
                     // The actual pitch slider handling is done in the PitchSlider class
@@ -4291,8 +4291,8 @@ class Activity {
                 }
             }
 
-            return closest.value.split('/').map(Number);
-        }
+            return closest.value.split("/").map(Number);
+        };
 
         /**
          * Loads MB project from Planet.

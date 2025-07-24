@@ -78,9 +78,9 @@ function _(text, options = {}) {
             cleanedText = cleanedText.split(char).join("");
         }
 
-        let translated = '';
+        let translated = "";
         const lang = i18next.language;
-        let subLang = '';
+        let subLang = "";
 
         if (lang.includes("kanji") || lang.includes("kana")) {
             subLang = lang.includes("kana") ? "=)kana" : "=)kanji";
@@ -90,7 +90,7 @@ function _(text, options = {}) {
             }
         }
         else {
-            translated = i18next.t(text, options);            
+            translated = i18next.t(text, options);
         }
 
         if (translated && translated === text) {
@@ -1164,7 +1164,7 @@ readable-fractions/681534#681534
 
     let df = 1.0;
     let top = 1;
-    let iterations = 0
+    let iterations = 0;
     const maxIterations = 10000;
     let bot = 1;
 

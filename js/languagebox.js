@@ -226,7 +226,7 @@ class LanguageBox {
             th: "รีเฟรชเบราเซอร์เพื่อเปลี่ยนการตั้งค่าภาษาของคุณ",
             hi: "अपनी भाषा की वरीयता बदलने के लिए अपना ब्राउज़र ताज़ा करें",
             te: "మీ భాష ప్రాధాన్యతను మార్చడానికి మీ బ్రౌజర్‌ని రిఫ్రెష్ చేయండి.",
-	        tr: "dil tercihinizi değiştirmek için tarayıcınızı yenileyin",
+            tr: "dil tercihinizi değiştirmek için tarayıcınızı yenileyin",
             ibo: "Mee ka nchọgharị gị gbanwee mmasị asụsụ gị.",
             ar: "حدث المتصفح لتغيير تفضيلات اللغة.",
             he: "רענן את הדפדפן כדי לשנות את העדפת השפה שלך.",
@@ -236,9 +236,9 @@ class LanguageBox {
             ur:"اپنی زبان کی ترجیح کو تبدیل کرنے کے لئے اپنے براؤزر کو تازہ دم کریں۔"
         };
         if (localStorage.getItem("languagePreference") === this._language) {
-            if(this._language.includes('ja'))
+            if(this._language.includes("ja"))
             {
-                this._language=this._language.split('-')[0];   
+                this._language=this._language.split("-")[0];
             }
 
             localStorage.setItem("languagePreference",this._language);
@@ -251,9 +251,9 @@ class LanguageBox {
                 this.activity.textMsg(MSGPrefix + MSG["kana"] + MSGSuffix);
             } else {
 
-                if(this._language.includes('ja'))
+                if(this._language.includes("ja"))
                 {
-                    this._language=this._language.split('-')[0];   
+                    this._language=this._language.split("-")[0];
                 }
 
                 this.activity.textMsg(MSGPrefix + MSG[this._language] + MSGSuffix);
