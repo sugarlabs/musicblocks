@@ -1,3 +1,14 @@
+"""
+This script converts GNU gettext .po translation files into JSON format.
+It extracts only `msgid` and `msgstr` pairs, skipping metadata and comments,
+and writes them to language-specific .json files for use in localization.
+
+Usage:
+- Place .po files inside a directory (e.g., ./po)
+- The script will convert all .po files in that directory into .json
+  and save them to the specified output directory (e.g., ./locales)
+"""
+
 import os
 import json
 import re
@@ -39,4 +50,4 @@ def convert_all_po_files(po_dir, output_dir):
             if file.endswith(".po"):
                 convert_po_to_json(os.path.join(root, file), output_dir)
 
-convert_all_po_files("./po_old", "./locales")
+convert_all_po_files("./po", "./locales")
