@@ -1,13 +1,17 @@
-"""
-This script converts GNU gettext .po translation files into JSON format.
-It extracts only `msgid` and `msgstr` pairs, skipping metadata and comments,
-and writes them to language-specific .json files for use in localization.
-
-Usage:
-- Place .po files inside a directory (e.g., ./po)
-- The script will convert all .po files in that directory into .json
-  and save them to the specified output directory (e.g., ./locales)
-"""
+# Copyright (c) 2025 Walter Bender
+# Copyright (c) 2025 Aman Chadha, DMP'25
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the The GNU Affero General Public
+# License as published by the Free Software Foundation; either
+# version 3 of the License, or (at your option) any later version.
+#
+# You should have received a copy of the GNU Affero General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+#
+# Note: This script converts .po translation files into JSON format,
+# following the i18n infrastructure used in Music Blocks. -- Aman Chadha, July 2025
 
 import os
 import json
