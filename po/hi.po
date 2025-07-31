@@ -105,7 +105,7 @@ msgstr "बतख"
 
 #: js/themebox.js:66
 msgid "Music Blocks is already set to this theme."
-msgstr ""
+msgstr "म्यूजिक ब्लॉक्स पहले से ही इस थीम पर सेट है।"
 
 #: js/SaveInterface.js:59
 #: js/SaveInterface.js:61
