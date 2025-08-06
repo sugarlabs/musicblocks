@@ -877,7 +877,7 @@ function setupExtrasBlocks(activity) {
 
             // Only run debugger statement if normal playmode (final product)
             // All other run methods are for debugging only and should be used as such
-            if (mode !== "slow" && mode !== "step" && mode !== "click") {
+            if (mode !== "slow" && mode !== "step") {
                 return;
             }
             // Stop all turtles and pause execution
