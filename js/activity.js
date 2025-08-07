@@ -310,18 +310,18 @@ class Activity {
             let lang = "en";
             if (this.storage.languagePreference !== undefined) {
                 lang = this.storage.languagePreference;
-                document.webL10n.setLanguage(lang);
+                i18next.changeLanguage(lang);
             } else {
                 lang = navigator.language;
                 if (lang.includes("-")) {
                     lang = lang.slice(0, lang.indexOf("-"));
-                    document.webL10n.setLanguage(lang);
                 }
+                i18next.changeLanguage(lang);
             }
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.error(e);
         }
+
 
         this.KeySignatureEnv = ["C", "major", false];
         try {
@@ -562,15 +562,6 @@ class Activity {
             }
             if (helpfulWheelTop + 350 > windowHeight) {
                 docById("helpfulWheelDiv").style.top = (windowHeight - 350) + "px";
-            }
-            const selectedBlocksCount = this.blocks.selectedBlocks.filter(block => !block.trash).length;
-            
-            if (selectedBlocksCount) {
-                this.helpfulWheelItems.find(ele => ele.label === "Move to trash").display = true;
-                this.helpfulWheelItems.find(ele => ele.label === "Duplicate").display = true;
-            } else {
-                this.helpfulWheelItems.find(ele => ele.label === "Move to trash").display = false;
-                this.helpfulWheelItems.find(ele => ele.label === "Duplicate").display = false;
             }
 
             docById("helpfulWheelDiv").style.display = "";
@@ -1421,6 +1412,14 @@ class Activity {
             const confirmBtn = document.createElement("button");
             confirmBtn.classList.add("confirm-button");
             confirmBtn.textContent = "Confirm";
+            confirmBtn.style.backgroundColor = platformColor.blueButton;
+            confirmBtn.style.color = "white";
+            confirmBtn.style.border = "none";
+            confirmBtn.style.borderRadius = "4px";
+            confirmBtn.style.padding = "8px 16px";
+            confirmBtn.style.fontWeight = "bold";
+            confirmBtn.style.cursor = "pointer";
+            confirmBtn.style.marginRight = "16px";
             confirmBtn.addEventListener("click", () => {
                 document.body.removeChild(modal);
                 clearCanvasAction();
@@ -1429,6 +1428,13 @@ class Activity {
             const cancelBtn = document.createElement("button");
             cancelBtn.classList.add("cancel-button");
             cancelBtn.textContent = "Cancel";
+            cancelBtn.style.backgroundColor = "#f1f1f1";
+            cancelBtn.style.color = "black";
+            cancelBtn.style.border = "none";
+            cancelBtn.style.borderRadius = "4px";
+            cancelBtn.style.padding = "8px 16px";
+            cancelBtn.style.fontWeight = "bold";
+            cancelBtn.style.cursor = "pointer";
             cancelBtn.addEventListener("click", () => {
                 document.body.removeChild(modal);
             });
@@ -2977,6 +2983,7 @@ class Activity {
             // note block to the active block.
             this.blocks.activeBlock = this.blocks.blockList.length - 1;
         };
+
         
         //To create a sampler widget
         this.makeSamplerWidget = (sampleName, sampleData) => {
@@ -2993,6 +3000,7 @@ class Activity {
             ];
             this.blocks.loadNewBlocks(samplerStack);
         };
+
 
         /*
          * Handles keyboard shortcuts in MB
@@ -4263,6 +4271,33 @@ class Activity {
                 that._changeBlockVisibility();
                 that._doFastButton(env);
             }, 5000);
+        };
+
+
+        const standardDurations = [
+            { value: "1/1", duration: 1 },
+            { value: "1/2", duration: 0.5 },
+            { value: "1/4", duration: 0.25 },
+            { value: "1/8", duration: 0.125 },
+            { value: "1/16", duration: 0.0625 },
+            { value: "1/32", duration: 0.03125 },
+            { value: "1/64", duration: 0.015625 },
+            { value: "1/128", duration: 0.0078125 }
+        ];
+
+        this.getClosestStandardNoteValue = function(duration) {
+            let closest = standardDurations[0];
+            let minDiff = Math.abs(duration - closest.duration);
+
+            for (let i = 1; i < standardDurations.length; i++) {
+                let diff = Math.abs(duration - standardDurations[i].duration);
+                if (diff < minDiff) {
+                    closest = standardDurations[i];
+                    minDiff = diff;
+                }
+            }
+
+            return closest.value.split("/").map(Number);
         };
 
         /**
@@ -5653,13 +5688,7 @@ class Activity {
 
             if (!this.helpfulWheelItems.find(ele => ele.label === "Select"))
                 this.helpfulWheelItems.push({label: "Select", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(SELECTBUTTON)), display: true, fn: this.selectMode });
-         
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Move to trash"))
-                this.helpfulWheelItems.push({label: "Move to trash", icon: "imgsrc:header-icons/empty-trash-button.svg", display: false, fn: this.deleteMultipleBlocks });
-            
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Duplicate"))
-                this.helpfulWheelItems.push({label: "Duplicate", icon: "imgsrc:header-icons/copy-button.svg" , display: false, fn: this.copyMultipleBlocks});
-            
+
             if (!this.helpfulWheelItems.find(ele => ele.label === "Clear"))
                 this.helpfulWheelItems.push({label: "Clear", icon: "imgsrc:data:image/svg+xml;base64," + window.btoa(base64Encode(CLEARBUTTON)), display: true, fn: () => this._allClear(false)});
 
@@ -6028,6 +6057,7 @@ class Activity {
         // end the drag on navbar
         document.getElementById("toolbars").addEventListener("mouseover", () => {this.isDragging = false;});
 
+
         this.deleteMultipleBlocks = () => {
             if (this.blocks.selectionModeOn) {
                 const blocksArray = this.blocks.selectedBlocks;
@@ -6090,12 +6120,14 @@ class Activity {
         };
 
 
+
         this.selectMode = () => {
             this.moving = false;
             this.isSelecting = !this.isSelecting;
             (this.isSelecting) ? this.textMsg(_("Select is enabled.")) : this.textMsg(_("Select is disabled."));
             docById("helpfulWheelDiv").style.display = "none";
         };
+
 
         this._create2Ddrag = () => {
             this.dragArea = {};
@@ -6590,8 +6622,6 @@ class Activity {
                             that.errorMsg(
                                 _("Cannot load project from the file. Please check the file type.")
                             );
-                        } else if (files[0].type === "audio/wav") {
-                            this.makeSamplerWidget(files[0].name, reader.result);
                         } else {
                             const cleanData = rawData.replace("\n", " ");
                             let obj;
@@ -6708,12 +6738,6 @@ class Activity {
                         abcReader.readAsText(files[0]);
                         return;
                     }
-
-                    if (files[0].type === "audio/wav") {
-                        reader.readAsDataURL(files[0]);
-                        return;
-                    }
-                    
                     reader.readAsText(files[0]);
                     reader.readAsText(files[0]);
                     window.scroll(0, 0);
