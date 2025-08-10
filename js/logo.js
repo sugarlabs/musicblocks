@@ -1295,7 +1295,7 @@ class Logo {
         tur.doWait(0);
 
         if (!logo.stopTurtle) {
-            if (0) { // Disabled turtle step
+            if (logo.turtleDelay === TURTLESTEP) {
                 // Step mode
                 if (!(turtle in logo.stepQueue)) {
                     logo.stepQueue[turtle] = [];
@@ -1576,7 +1576,7 @@ class Logo {
             if (parentBlk !== blk) {
                 // The wait block waits _waitTimes longer than other
                 // blocks before it is unhighlighted.
-                if (0) { // Disabled turtle step
+                if (logo.turtleDelay === TURTLESTEP) {
                     logo._unhighlightStepQueue[turtle] = blk;
                 } else {
                     if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {
