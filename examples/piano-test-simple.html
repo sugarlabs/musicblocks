@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Piano Test</title>
+        <script src="../js/utils/mathutils.js"></script>
+        <script src="../js/utils/musicutils.js"></script>
+        <script src="../lib/tone.min.js"></script>
+        <script src="../sounds/samples/piano.js"></script>
+        <script src="../sounds/samples/piano_multi.js"></script>
+        <script>
+            // Simple test to compare regular piano vs multi-sample piano
+            window.onload = function() {
+                // Create a regular piano sampler
+                const regularPianoDict = {
+                    "C4": PIANO_SAMPLE()
+                };
+                const regularPiano = new Tone.Sampler(regularPianoDict).toDestination();
+                
+                // Create a multi-sample piano sampler
+                const multiPianoDict = {
+                    "C2": PIANO_C2_SAMPLE(),
+                    "C4": PIANO_C4_SAMPLE(),
+                    "C6": PIANO_C6_SAMPLE()
+                };
+                const multiPiano = new Tone.Sampler(multiPianoDict).toDestination();
+                
+                // Play regular piano
+                document.getElementById('playRegularC2').addEventListener('click', function() {
+                    regularPiano.triggerAttackRelease('C2', '2n');
+                });
+                
+                document.getElementById('playRegularC4').addEventListener('click', function() {
+                    regularPiano.triggerAttackRelease('C4', '2n');
+                });
+                
+                document.getElementById('playRegularC6').addEventListener('click', function() {
+                    regularPiano.triggerAttackRelease('C6', '2n');
+                });
+                
+                // Play multi-sample piano
+                document.getElementById('playMultiC2').addEventListener('click', function() {
+                    multiPiano.triggerAttackRelease('C2', '2n');
+                });
+                
+                document.getElementById('playMultiC4').addEventListener('click', function() {
+                    multiPiano.triggerAttackRelease('C4', '2n');
+                });
+                
+                document.getElementById('playMultiC6').addEventListener('click', function() {
+                    multiPiano.triggerAttackRelease('C6', '2n');
+                });
+            };
+        </script>
+    </head>
+    <body>
+        <h1>Piano Test: Regular vs Multi-Sample</h1>
+        <p>This page compares the regular piano sample with the new multi-sample piano implementation.</p>
+        
+        <div style="margin-top: 20px;">
+            <h2>Regular Piano (Single Sample)</h2>
+            <button id="playRegularC2">Play C2 (Low)</button>
+            <button id="playRegularC4">Play C4 (Middle)</button>
+            <button id="playRegularC6">Play C6 (High)</button>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <h2>Multi-Sample Piano</h2>
+            <button id="playMultiC2">Play C2 (Low)</button>
+            <button id="playMultiC4">Play C4 (Middle)</button>
+            <button id="playMultiC6">Play C6 (High)</button>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <p>Expected differences:</p>
+            <ul>
+                <li>The regular piano uses a single sample (C4) transposed for all notes</li>
+                <li>The multi-sample piano uses different samples for different registers:
+                    <ul>
+                        <li>C2 for low register</li>
+                        <li>C4 for middle register</li>
+                        <li>C6 for high register</li>
+                    </ul>
+                </li>
+                <li>The multi-sample piano should sound more natural, especially at the extremes</li>
+            </ul>
+        </div>
+    </body>
+</html>
