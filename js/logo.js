@@ -1,3 +1,4 @@
+
 // Copyright (c) 2014-2021 Walter Bender
 // Copyright (c) 2015 Yash Khandelwal
 // Copyright (c) 2020 Anindya Kundu
@@ -1294,7 +1295,7 @@ class Logo {
         tur.doWait(0);
 
         if (!logo.stopTurtle) {
-            if (logo.turtleDelay === TURTLESTEP) {
+            if (0) { // Disabled turtle step
                 // Step mode
                 if (!(turtle in logo.stepQueue)) {
                     logo.stepQueue[turtle] = [];
@@ -1575,7 +1576,7 @@ class Logo {
             if (parentBlk !== blk) {
                 // The wait block waits _waitTimes longer than other
                 // blocks before it is unhighlighted.
-                if (logo.turtleDelay === TURTLESTEP) {
+                if (0) { // Disabled turtle step
                     logo._unhighlightStepQueue[turtle] = blk;
                 } else {
                     if (!tur.singer.suppressOutput && tur.singer.justCounting.length === 0) {

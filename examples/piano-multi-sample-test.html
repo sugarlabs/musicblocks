@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Piano Multi-Sample Test</title>
+        <script src="../lib/tone.min.js"></script>
+        <script src="../sounds/samples/piano_multi.js"></script>
+        <script>
+            // Simple test to play different register piano notes
+            window.onload = function() {
+                // Create a dictionary of samples for different registers
+                const noteDict = {
+                    "C2": PIANO_C2_SAMPLE(),
+                    "C4": PIANO_C4_SAMPLE(),
+                    "C6": PIANO_C6_SAMPLE()
+                };
+                
+                // Create a sampler with our samples
+                const sampler = new Tone.Sampler(noteDict).toDestination();
+                
+                // Create buttons to play different notes
+                document.getElementById('playC2').addEventListener('click', function() {
+                    sampler.triggerAttackRelease('C2', '2n');
+                });
+                
+                document.getElementById('playC3').addEventListener('click', function() {
+                    sampler.triggerAttackRelease('C3', '2n');
+                });
+                
+                document.getElementById('playC4').addEventListener('click', function() {
+                    sampler.triggerAttackRelease('C4', '2n');
+                });
+                
+                document.getElementById('playC5').addEventListener('click', function() {
+                    sampler.triggerAttackRelease('C5', '2n');
+                });
+                
+                document.getElementById('playC6').addEventListener('click', function() {
+                    sampler.triggerAttackRelease('C6', '2n');
+                });
+                
+                document.getElementById('playC7').addEventListener('click', function() {
+                    sampler.triggerAttackRelease('C7', '2n');
+                });
+            };
+        </script>
+    </head>
+    <body>
+        <h1>Piano Multi-Sample Test</h1>
+        <p>This page tests the multi-sample piano implementation. Each button plays a different register note.</p>
+        <p>The sampler should automatically select the closest sample for each note.</p>
+        
+        <div>
+            <button id="playC2">Play C2 (Low)</button>
+            <button id="playC3">Play C3</button>
+            <button id="playC4">Play C4 (Middle)</button>
+            <button id="playC5">Play C5</button>
+            <button id="playC6">Play C6 (High)</button>
+            <button id="playC7">Play C7</button>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <p>Expected behavior:</p>
+            <ul>
+                <li>C2 and C3 should use the C2 sample (transposed for C3)</li>
+                <li>C4 and C5 should use the C4 sample (transposed for C5)</li>
+                <li>C6 and C7 should use the C6 sample (transposed for C7)</li>
+            </ul>
+        </div>
+    </body>
+</html>

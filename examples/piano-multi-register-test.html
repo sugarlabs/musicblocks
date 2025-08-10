@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Piano Multi-Register Test</title>
+        <script src="../lib/tone.min.js"></script>
+        <script src="../sounds/samples/piano_multi.js"></script>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+            h1 {
+                color: #333;
+                text-align: center;
+            }
+            .controls {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                margin-bottom: 20px;
+            }
+            .register-group {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-bottom: 10px;
+                padding: 15px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+            .register-group h3 {
+                width: 100%;
+                margin-top: 0;
+                color: #333;
+            }
+            .register-group.low {
+                background-color: #f8f8ff;
+                border-left: 5px solid #3f51b5;
+            }
+            .register-group.mid {
+                background-color: #fff8f8;
+                border-left: 5px solid #e91e63;
+            }
+            .register-group.high {
+                background-color: #f8fff8;
+                border-left: 5px solid #4caf50;
+            }
+            button {
+                padding: 10px 15px;
+                font-size: 16px;
+                cursor: pointer;
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 4px;
+            }
+            button:hover {
+                background-color: #45a049;
+            }
+            button.low {
+                background-color: #3f51b5;
+            }
+            button.mid {
+                background-color: #e91e63;
+            }
+            button.high {
+                background-color: #4caf50;
+            }
+            .log {
+                height: 300px;
+                overflow-y: auto;
+                border: 1px solid #ccc;
+                padding: 10px;
+                background-color: #f9f9f9;
+                font-family: monospace;
+                margin-top: 20px;
+            }
+            .info {
+                margin-top: 20px;
+                padding: 15px;
+                background-color: #f0f8ff;
+                border-left: 5px solid #007bff;
+            }
+            .results {
+                margin-top: 20px;
+                padding: 15px;
+                background-color: #f9f9f9;
+                border-left: 5px solid #ff9800;
+                display: none;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+            }
+            table, th, td {
+                border: 1px solid #ddd;
+            }
+            th, td {
+                padding: 8px;
+                text-align: left;
+            }
+            th {
+                background-color: #f2f2f2;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Piano Multi-Register Test</h1>
+        
+        <div class="info">
+            <h2>Multi-Sample Piano Test</h2>
+            <p>This page tests if your piano_multi implementation correctly uses different samples for different note registers:</p>
+            <ul>
+                <li><strong>Low Register (C2-B3):</strong> Uses the C2 sample</li>
+                <li><strong>Middle Register (C4-B5):</strong> Uses the C4 sample</li>
+                <li><strong>High Register (C6-C8):</strong> Uses the C6 sample</li>
+            </ul>
+            <p>Play notes from each register and watch the console to see which sample is being used.</p>
+            <button onclick="verifyPianoMultiSamples()">Run Sample Verification</button>
+        </div>
+
+        <div class="results" id="results">
+            <h2>Test Results</h2>
+            <div id="resultsContent"></div>
+        </div>
+
+        <div class="controls">
+            <div class="register-group low">
+                <h3>Low Register (C2-B3) - Should use C2 sample</h3>
+                <button class="low" onclick="playNote('C2')">C2</button>
+                <button class="low" onclick="playNote('E2')">E2</button>
+                <button class="low" onclick="playNote('G2')">G2</button>
+                <button class="low" onclick="playNote('C3')">C3</button>
+                <button class="low" onclick="playNote('E3')">E3</button>
+                <button class="low" onclick="playNote('A3')">A3</button>
+                <button class="low" onclick="playNote('B3')">B3</button>
+                <button class="low" onclick="playScale('C2', 'B3')">Play Scale C2-B3</button>
+            </div>
+            
+            <div class="register-group mid">
+                <h3>Middle Register (C4-B5) - Should use C4 sample</h3>
+                <button class="mid" onclick="playNote('C4')">C4</button>
+                <button class="mid" onclick="playNote('E4')">E4</button>
+                <button class="mid" onclick="playNote('G4')">G4</button>
+                <button class="mid" onclick="playNote('C5')">C5</button>
+                <button class="mid" onclick="playNote('E5')">E5</button>
+                <button class="mid" onclick="playNote('A5')">A5</button>
+                <button class="mid" onclick="playNote('B5')">B5</button>
+                <button class="mid" onclick="playScale('C4', 'B5')">Play Scale C4-B5</button>
+            </div>
+            
+            <div class="register-group high">
+                <h3>High Register (C6-C8) - Should use C6 sample</h3>
+                <button class="high" onclick="playNote('C6')">C6</button>
+                <button class="high" onclick="playNote('E6')">E6</button>
+                <button class="high" onclick="playNote('G6')">G6</button>
+                <button class="high" onclick="playNote('C7')">C7</button>
+                <button class="high" onclick="playNote('E7')">E7</button>
+                <button class="high" onclick="playNote('A7')">A7</button>
+                <button class="high" onclick="playNote('C8')">C8</button>
+                <button class="high" onclick="playScale('C6', 'C8')">Play Scale C6-C8</button>
+            </div>
+            
+            <button onclick="playAllRegisters()">Play All Registers (C2, C4, C6)</button>
+        </div>
+        
+        <div class="log" id="log"></div>
+        
+        <script>
+            // Initialize Tone.js
+            document.addEventListener('click', async function() {
+                if (Tone.context.state !== 'running') {
+                    await Tone.start();
+                    log("Audio context started");
+                }
+            });
+            
+            // Create a sampler with our multi-samples
+            const noteDict = {
+                "C2": PIANO_C2_SAMPLE(),
+                "C4": PIANO_C4_SAMPLE(),
+                "C6": PIANO_C6_SAMPLE()
+            };
+            
+            const sampler = new Tone.Sampler(noteDict).toDestination();
+            
+            // Tracking which samples have been used
+            const samplesUsed = {
+                "C2": { used: false, hash: null },
+                "C4": { used: false, hash: null },
+                "C6": { used: false, hash: null }
+            };
+            
+            // Function to play a note and log which sample is used
+            function playNote(note) {
+                const noteNum = Tone.Frequency(note).toMidi();
+                let sampleUsed;
+                
+                if (noteNum < 48) { // Notes below C3
+                    sampleUsed = "C2";
+                } else if (noteNum < 72) { // Notes below C5
+                    sampleUsed = "C4";
+                } else { // Notes C5 and above
+                    sampleUsed = "C6";
+                }
+                
+                // Mark this sample as used
+                samplesUsed[sampleUsed].used = true;
+                
+                // Calculate a simple hash of the sample
+                if (!samplesUsed[sampleUsed].hash) {
+                    const sample = noteDict[sampleUsed];
+                    samplesUsed[sampleUsed].hash = simpleHash(sample.substring(0, 1000));
+                }
+                
+                // Log which sample is being used
+                log(`Playing ${note} (MIDI: ${noteNum}) - Using ${sampleUsed} sample (Hash: ${samplesUsed[sampleUsed].hash})`);
+                
+                // Play the note
+                sampler.triggerAttackRelease(note, "2n");
+                
+                // Check if we've used all samples
+                checkAllSamplesUsed();
+            }
+            
+            // Function to play a scale between two notes
+            function playScale(startNote, endNote) {
+                const startMidi = Tone.Frequency(startNote).toMidi();
+                const endMidi = Tone.Frequency(endNote).toMidi();
+                
+                log(`Playing scale from ${startNote} to ${endNote}`);
+                
+                // Play each note in the scale with a delay
+                for (let i = startMidi; i <= endMidi; i++) {
+                    const note = Tone.Frequency(i, "midi").toNote();
+                    setTimeout(() => {
+                        playNote(note);
+                    }, (i - startMidi) * 300);
+                }
+            }
+            
+            // Function to play notes from all registers
+            function playAllRegisters() {
+                log("Playing notes from all registers to verify different samples are used");
+                
+                setTimeout(() => playNote("C2"), 0);
+                setTimeout(() => playNote("C4"), 1000);
+                setTimeout(() => playNote("C6"), 2000);
+                
+                // After all notes have played, show the results
+                setTimeout(showResults, 3000);
+            }
+            
+            // Function to check if all samples have been used
+            function checkAllSamplesUsed() {
+                const allUsed = Object.values(samplesUsed).every(s => s.used);
+                
+                if (allUsed) {
+                    showResults();
+                }
+            }
+            
+            // Function to show the results
+            function showResults() {
+                const resultsDiv = document.getElementById("results");
+                const resultsContent = document.getElementById("resultsContent");
+                
+                // Check if samples are different
+                const hashes = Object.values(samplesUsed).map(s => s.hash);
+                const uniqueHashes = new Set(hashes.filter(h => h !== null));
+                const samplesAreDifferent = uniqueHashes.size > 1;
+                
+                let html = "";
+                
+                if (samplesAreDifferent) {
+                    html += `<p style="color: green; font-weight: bold;">✅ SUCCESS: Different samples are being used for different registers!</p>`;
+                } else {
+                    html += `<p style="color: red; font-weight: bold;">❌ WARNING: Samples appear to be identical or not all samples have been used.</p>`;
+                }
+                
+                // Create a table showing the sample hashes
+                html += `<table>
+                    <tr>
+                        <th>Register</th>
+                        <th>Sample Used</th>
+                        <th>Hash</th>
+                    </tr>`;
+                
+                for (const [sample, data] of Object.entries(samplesUsed)) {
+                    html += `<tr>
+                        <td>${sample}</td>
+                        <td>${data.used ? "Yes" : "No"}</td>
+                        <td>${data.hash !== null ? data.hash : "Not calculated"}</td>
+                    </tr>`;
+                }
+                
+                html += `</table>`;
+                
+                resultsContent.innerHTML = html;
+                resultsDiv.style.display = "block";
+            }
+            
+            // Helper function to log messages
+            function log(message) {
+                const logDiv = document.getElementById("log");
+                logDiv.innerHTML += `<div>${message}</div>`;
+                logDiv.scrollTop = logDiv.scrollHeight;
+                console.log(message);
+            }
+            
+            // Helper function to calculate a simple hash
+            function simpleHash(str) {
+                let hash = 0;
+                for (let i = 0; i < Math.min(str.length, 1000); i++) {
+                    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                    hash = hash & hash; // Convert to 32bit integer
+                }
+                return hash;
+            }
+        </script>
+    </body>
+</html>
