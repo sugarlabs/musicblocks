@@ -55,9 +55,13 @@ class Planet {
     };
 
     open(image) {
-        this.LocalPlanet.setCurrentProjectImage(image);
-        this.LocalPlanet.updateProjects();
-        this.oldCurrentProjectID = this.ProjectStorage.getCurrentProjectID();
+        if (this.LocalPlanet === null) {
+            console.log("Local Planet unavailable");
+        } else {
+            this.LocalPlanet.setCurrentProjectImage(image);
+            this.LocalPlanet.updateProjects();
+            this.oldCurrentProjectID = this.ProjectStorage.getCurrentProjectID();
+        }
     };
 
     saveLocally(data, image) {
