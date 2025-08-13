@@ -60,6 +60,9 @@
     MusicKeyboard
    - js/widgets/pitchstaircase.js
     PitchStaircase
+   - js/widgets/aidebugger.js
+    AIDebuggerWidget
+
  */
 
 /* exported setupWidgetBlocks */
@@ -1636,6 +1639,57 @@ function setupWidgetBlocks(activity) {
             return [args[0], 1];
         }
     }
+
+    class AIDebugger extends StackClampBlock {
+        constructor() {
+            super("aidebugger");
+            this.setPalette("widgets", activity);
+            this.parameter = true;
+            this.beginnerBlock(false);
+    
+            this.setHelpString([
+                _("Debugg your music blocks project with new possibilities and more understandings."),
+                "documentation",
+                null,
+                "aidebugger"
+            ]);
+    
+            this.formBlock({ name: _("Debugger"), canCollapse: true });
+            this.makeMacro((x, y) => [
+                [0, "aidebugger", x, y, [null, 1]],
+                [1, "print", 0, 0, [0,2,null]],
+                [2, ["text",{"value":"Debugger Initiated"}], 0, 0, [1]]
+            ]);
+        }
+    
+        /**
+             * Handles the flow of data for the sampler block.
+             * @param {any[]} args - The arguments passed to the block.
+             * @param {object} logo - The logo object.
+             * @param {object} turtle - The turtle object.
+             * @param {object} blk - The block object.
+             * @returns {number[]} - The output values.
+             */
+        flow(args, logo, turtle, blk) {
+            if (logo.sample === null) {
+                logo.sample = new AIDebuggerWidget();
+            }
+            logo.inSample = true;
+            logo.sample = new AIDebuggerWidget();
+    
+            const listenerName = "_sampler_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+    
+            const __listener = event => {
+                logo.sample.init(activity);
+            };
+    
+            logo.setTurtleListener(turtle, listenerName, __listener);
+    
+            return [args[0], 1];
+        }
+    }
+
     // Set up blocks if this is Music Blocks environment
     if (_THIS_IS_MUSIC_BLOCKS_) {
         new EnvelopeBlock().setup(activity);
@@ -1660,6 +1714,7 @@ function setupWidgetBlocks(activity) {
         new MatrixGMajorBlock().setup(activity);
         new MatrixCMajorBlock().setup(activity);
         new MatrixBlock().setup(activity);
+        new AIDebugger().setup(activity);
     }
     // Instantiate and set up the StatusBlock
     new StatusBlock().setup(activity);
