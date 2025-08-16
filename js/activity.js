@@ -162,6 +162,7 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         "widgets/phrasemaker",
         "widgets/arpeggio",
         "widgets/aiwidget",
+        "widgets/aidebugger",
         "widgets/pitchdrummatrix",
         "widgets/rhythmruler",
         "widgets/pitchstaircase",
