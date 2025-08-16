@@ -1645,10 +1645,10 @@ function setupWidgetBlocks(activity) {
             super("aidebugger");
             this.setPalette("widgets", activity);
             this.parameter = true;
-            this.beginnerBlock(false);
+            this.beginnerBlock(true);
     
             this.setHelpString([
-                _("Debugg your music blocks project with new possibilities and more understandings."),
+                _("Debug your music blocks project with new possibilities and more understanding."),
                 "documentation",
                 null,
                 "aidebugger"
@@ -1714,8 +1714,9 @@ function setupWidgetBlocks(activity) {
         new MatrixGMajorBlock().setup(activity);
         new MatrixCMajorBlock().setup(activity);
         new MatrixBlock().setup(activity);
-        new AIDebugger().setup(activity);
     }
+    // Set up AIDebugger for both Music Blocks and Turtle Blocks
+    new AIDebugger().setup(activity);
     // Instantiate and set up the StatusBlock
     new StatusBlock().setup(activity);
 }
