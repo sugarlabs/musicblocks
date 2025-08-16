@@ -266,7 +266,9 @@ function AIDebuggerWidget() {
     this._addWelcomeMessage = function() {
         const welcomeMessage = {
             type: "system",
-            content: "Welcome to Music Blocks Debugger! I can help you with music composition, Music Blocks programming, and general music theory questions.",
+            content: _THIS_IS_MUSIC_BLOCKS_ ?
+                "Welcome to Music Blocks Debugger! I can help you with music composition, Music Blocks programming, and general music theory questions." :
+                "Welcome to Turtle Blocks Debugger! I can help you with programming, turtle graphics, and general coding questions.",
             timestamp: new Date().toISOString()
         };
         this._addMessageToUI(welcomeMessage);
@@ -355,7 +357,7 @@ function AIDebuggerWidget() {
             projectData = rawProjectData;
         } catch (error) {
             console.error("Error getting project data:", error);
-            this.activity.textMsg(_("Debugger error: Could not prepare project data"));
+            this.activity.textMsg(_("Debugger error: Could not prepare project data."));
             projectData = "[]";
         }
         
@@ -400,7 +402,7 @@ function AIDebuggerWidget() {
                     this._addMessageToUI(botResponse);
                     this._updateMessageCount();
                 } else {
-                    this.activity.textMsg(_("Server error: Invalid response from AI backend"));
+                    this.activity.textMsg(_("Server error: Invalid response from AI backend."));
                     throw new Error("No response from backend");
                 }
             })
@@ -408,7 +410,7 @@ function AIDebuggerWidget() {
                 this._hideTypingIndicator();
                 console.error("Backend connection error:", error.message);
                 
-                this.activity.textMsg(_("Server error: Unable to connect to AI backend"));
+                this.activity.textMsg(_("Server error: Unable to connect to AI backend."));
                 
                 if (error instanceof TypeError && error.message.includes("fetch")) {
                     console.error("Network/CORS error. Backend connection failed");
@@ -486,30 +488,42 @@ function AIDebuggerWidget() {
      */
     this._loadProjectAndInitialize = function() {
         try {
+            // Get current project data as JSON
             const projectData = this.activity.prepareExport();
+            
             try {
                 const parsedData = JSON.parse(projectData);
             } catch (parseError) {
                 console.error("Error parsing project data:", parseError);
-                this.activity.textMsg(_("Debugger error: Invalid project data format"));
+                this.activity.textMsg(_("Debugger error: Invalid project data format."));
             }
+            
+            // Show loading message
             const loadingMessage = {
                 type: "system",
                 content: "Loading your current project and initializing AI assistant...",
                 timestamp: new Date().toISOString()
             };
             this._addMessageToUI(loadingMessage);
+            
+            // Send project data to backend for initialization
             this._initializeBackendWithProject(projectData);
             
         } catch (error) {
             console.error("Error loading project data:", error);
-            this.activity.textMsg(_("Debugger error: Could not load project data"));
+            
+            // Show error message to user
+            this.activity.textMsg(_("Debugger error: Could not load project data."));
+            
+            // Show error message and fall back to simple welcome
             const errorMessage = {
                 type: "system",
                 content: "Could not load project data. Starting with basic assistant...",
                 timestamp: new Date().toISOString()
             };
             this._addMessageToUI(errorMessage);
+            
+            // Fallback to simple welcome
             this._addWelcomeMessage();
         }
     };
@@ -565,14 +579,14 @@ function AIDebuggerWidget() {
                     this._updateMessageCount();
                     this.promptCount = 1; // Set initial prompt count
                 } else {
-                    this.activity.textMsg(_("Server error: No initial response from AI backend"));
+                    this.activity.textMsg(_("Server error: No initial response from AI backend."));
                     throw new Error("No initial response from backend");
                 }
             })
             .catch(error => {
                 this._hideTypingIndicator();
                 console.error("Backend initialization error:", error.message);
-                this.activity.textMsg(_("Server error: Failed to initialize AI debugger"));
+                this.activity.textMsg(_("Server error: Failed to initialize AI debugger."));
                 
                 if (error instanceof TypeError && error.message.includes("fetch")) {
                     console.error("Network/CORS error. Backend connection failed");
@@ -601,7 +615,7 @@ function AIDebuggerWidget() {
         
         this._loadProjectAndInitialize();
         this._updateMessageCount();
-        this.activity.textMsg(_("Conversation reset"));
+        this.activity.textMsg(_("Conversation reset."));
     };
 
     /**
@@ -610,7 +624,7 @@ function AIDebuggerWidget() {
      */
     this._exportChat = function() {
         if (this.chatHistory.length === 0) {
-            this.activity.textMsg(_("No conversation to export"));
+            this.activity.textMsg(_("No conversation to export."));
             return;
         }
         
@@ -625,18 +639,19 @@ function AIDebuggerWidget() {
             }
         } catch (error) {
             console.error("Error getting project data for export:", error);
-            this.activity.textMsg(_("Debugger error: Could not retrieve project data for export"));
+            this.activity.textMsg(_("Debugger error: Could not retrieve project data for export."));
             convertedText = "Could not convert project to readable format";
         }
         
-        let exportContent = "Music Blocks Debugger Chat Export\n";
+        const appName = _THIS_IS_MUSIC_BLOCKS_ ? "Music Blocks" : "Turtle Blocks";
+        let exportContent = `${appName} Debugger Chat Export\n`;
         exportContent += "Generated at: " + new Date().toLocaleString() + "\n\n";
         exportContent += "Project Code (Human Readable Format):\n";
         exportContent += convertedText + "\n\n";
         exportContent += "Chat History:\n\n";
         
         this.chatHistory.forEach((message) => {
-            const role = message.type === "user" ? "User" : "Music Blocks Debugger";
+            const role = message.type === "user" ? "User" : `${appName} Debugger`;
             exportContent += role + ":\n";
             exportContent += message.content + "\n\n";
         });
@@ -651,7 +666,7 @@ function AIDebuggerWidget() {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         
-        this.activity.textMsg(_("Chat exported successfully"));
+        this.activity.textMsg(_("Chat exported successfully."));
     };
 
     /**
@@ -699,7 +714,7 @@ function AIDebuggerWidget() {
      */
     this._clearChat = function() {
         this.chatLog.innerHTML = "";
-        this.activity.textMsg(_("Chat cleared"));
+        this.activity.textMsg(_("Chat cleared."));
     };
 
     /**
