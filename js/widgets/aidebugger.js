@@ -139,7 +139,7 @@ function AIDebuggerWidget() {
         };
 
         this._exportButton = widgetWindow.addButton(
-            "export-button.svg",
+            "download.svg",
             ICONSIZE,
             _("Export chat")
         );
