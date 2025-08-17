@@ -493,6 +493,306 @@ function SampleWidget() {
             _("Playback"),
             "");
 
+        this._promptBtn = widgetWindow.addButton(
+            "prompt.svg",
+            ICONSIZE,
+            _("Prompt"),
+            ""
+        );
+
+        this._trimBtn = widgetWindow.addButton(
+            "trim.svg",
+            ICONSIZE,
+            _("Trim"),
+            ""
+        );
+
+        this._promptBtn.onclick = () => {
+
+            this.widgetWindow.clearScreen();
+            let width, height;
+            if (!this.widgetWindow.isMaximized()) {
+                width = SAMPLEWIDTH;
+                height = SAMPLEHEIGHT;
+            } else {
+                width = this.widgetWindow.getWidgetBody().getBoundingClientRect().width;
+                height = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 70;
+            }
+
+            const randomDigit = Math.floor(Math.random() * 10);
+
+            const promptList = [
+                "a",
+                "b",
+                "c",
+                "d",
+                "e",
+                "f",
+                "g",
+                "h",
+                "i",
+                "j"
+            ]
+
+            const randomPrompt = promptList[randomDigit]
+
+            const container = document.createElement("div");
+            container.id = "samplerPrompt";
+            this.widgetWindow.getWidgetBody().appendChild(container);
+
+            container.style.height = height + "px";
+            container.style.width = width + "px";
+            container.style.display = "flex";
+            container.style.flexDirection = "column";
+            container.style.alignItems = "center";
+            container.style.justifyContent = "center";
+            container.style.gap = "20px";
+
+            const h1 = document.createElement("h1");
+            h1.innerHTML = "AI Sample Generation";
+            h1.style.fontSize = "40px";
+            h1.style.marginTop = "0";
+            h1.style.marginBottom = "0px";
+            h1.style.fontWeight = "200";
+
+            const textArea = document.createElement("textarea");
+            textArea.style.height = "200px";
+            textArea.style.width = "650px";
+            textArea.style.fontSize = "30px";
+            textArea.style.resize = "none";
+            textArea.style.borderRadius = "10px";
+            textArea.style.border = "none"
+            textArea.style.padding = "15px";
+            textArea.placeholder = randomPrompt;
+
+            const buttonDiv = document.createElement("div");
+            buttonDiv.style.display = "flex";
+            buttonDiv.style.justifyContent = "space-between";
+            buttonDiv.style.width = "650px";
+
+            const submit = document.createElement("button");
+            submit.style.width = "152px";
+            submit.style.height = "61px";
+            submit.style.fontSize = "32px";
+            submit.style.borderRadius = "10px";
+            submit.style.border = "none"
+            submit.style.cursor = "pointer";
+            submit.innerHTML = "Submit";
+            submit.onclick = async function () {
+                const prompt = textArea.value;
+                const encodedPrompt = encodeURIComponent(prompt);
+                const url = `http://localhost:8000/generate?prompt=${encodedPrompt}`;
+
+                try {
+
+                    activity.textMsg(_("Generating Audio..."), 2500)
+
+                    let blinkInterval = setInterval(() => {
+                        activity.textMsg(_("Generating Audio..."), 1000);
+                    }, 5000);
+
+                    const response = await fetch(url);
+                    const result = await response.json();
+
+                    clearInterval(blinkInterval);
+
+                    if (result.status === "success") {
+                        activity.textMsg(_("Audio ready!"), 3000);
+                        preview.disabled = false;
+                        save.disabled = false;
+                    } else {
+                        activity.textMsg(_("Failed to generate audio"), 3000);
+                    }
+                } catch (error) {
+                    activity.textMsg(_("Error occurred"), 3000);
+                }
+            };
+
+            const preview = document.createElement("button");
+            preview.style.width = "152px";
+            preview.style.height = "61px";
+            preview.style.fontSize = "32px";
+            preview.style.borderRadius = "10px";
+            preview.style.border = "none"
+            preview.style.cursor = "pointer";
+            preview.innerHTML = "Preview";
+            preview.disabled = true;
+            preview.onclick = function (){
+                const audioURL = `http://localhost:8000/preview`;
+                const audio = new Audio(audioURL);
+                audio.play();
+            }
+
+            const save = document.createElement("button");
+            save.style.width = "152px";
+            save.style.height = "61px";
+            save.style.fontSize = "32px";
+            save.style.borderRadius = "10px";
+            save.style.border = "none"
+            save.style.cursor = "pointer";
+            save.innerHTML = "Save";
+            save.disabled = true;
+            save.onclick = function (){
+                const audioURL = `http://localhost:8000/save`;
+                const link = document.createElement('a');
+                link.href = audioURL;
+                link.download = 'output.wav';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+            buttonDiv.appendChild(submit);
+            buttonDiv.appendChild(preview);
+            buttonDiv.appendChild(save);
+
+
+            container.appendChild(h1)
+            container.appendChild(textArea);
+            container.appendChild(buttonDiv);
+        };
+
+        this._trimBtn.onclick = () => {
+
+            this.widgetWindow.clearScreen();
+            let width, height;
+            if (!this.widgetWindow.isMaximized()) {
+                width = SAMPLEWIDTH;
+                height = SAMPLEHEIGHT;
+            } else {
+                width = this.widgetWindow.getWidgetBody().getBoundingClientRect().width;
+                height = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 70;
+            }
+
+            const container = document.createElement("div");
+            container.id = "samplerPrompt";
+            this.widgetWindow.getWidgetBody().appendChild(container);
+
+            container.style.height = height + "px";
+            container.style.width = width + "px";
+            container.style.display = "flex";
+            container.style.flexDirection = "column";
+            container.style.alignItems = "center";
+            container.style.justifyContent = "center";
+            container.style.gap = "20px";
+
+            const h1 = document.createElement("h1");
+            h1.innerHTML = "Audio Trimmer";
+            h1.style.fontSize = "40px";
+            h1.style.marginTop = "0";
+            h1.style.marginBottom = "0px";
+            h1.style.fontWeight = "200";
+
+            const divUploadSample = document.createElement("div");
+            divUploadSample.style.backgroundColor = "#8cc6ff";
+            divUploadSample.style.width = "50px";
+            divUploadSample.style.height = "50px";
+            divUploadSample.style.display = "flex";
+            divUploadSample.style.cursor = "pointer";
+            divUploadSample.style.justifyContent = "center";
+            divUploadSample.style.alignItems = "center";
+
+            const uploadSample = document.createElement("img");
+            uploadSample.setAttribute("src", "../header-icons/load-media.svg");
+            uploadSample.style.height = "32px";
+            uploadSample.style.width = "32px";
+
+            divUploadSample.appendChild(uploadSample)
+
+            const fileChooser = document.createElement("input");
+            fileChooser.type = "file";
+
+            divUploadSample.onclick = function () {
+                fileChooser.click();
+            };
+
+            fileChooser.onchange = function () {
+                const file = fileChooser.files[0];
+
+                const audioPlayer = document.createElement("audio");
+
+                audioPlayer.controls = true;
+
+                const fileURL = URL.createObjectURL(file);
+                audioPlayer.src = fileURL;
+
+                container.replaceChild(audioPlayer, divUploadSample);
+
+            };
+
+            const inputDiv = document.createElement("div");
+            inputDiv.style.width = "400px";
+            inputDiv.style.display = "flex";
+            inputDiv.style.justifyContent = "space-between";
+
+            const fromInputBox = document.createElement("input");
+            fromInputBox.type = "text";
+            fromInputBox.placeholder = "0.00";
+            fromInputBox.style.width = "152px";
+            fromInputBox.style.height = "61px";
+            fromInputBox.style.backgroundColor = "#FFFFFF";
+            fromInputBox.style.color = "#766C6C";
+            fromInputBox.style.fontSize = "32px";
+            fromInputBox.style.font = "Inter";
+            fromInputBox.style.borderRadius = "10px"
+            fromInputBox.style.border = "none"
+            fromInputBox.style.padding = "8px";
+            fromInputBox.style.textAlign = "center";
+            fromInputBox.type = "number";
+
+            const toInputBox = document.createElement("input");
+            toInputBox.type = "text";
+            toInputBox.placeholder = "10.00";
+            toInputBox.style.width = "152px";
+            toInputBox.style.height = "61px";
+            toInputBox.style.backgroundColor = "#FFFFFF";
+            toInputBox.style.color = "#766C6C";
+            toInputBox.style.fontSize = "32px";
+            toInputBox.style.font = "Inter";
+            toInputBox.style.borderRadius = "10px";
+            toInputBox.style.border = "none";
+            toInputBox.style.padding = "8px";
+            toInputBox.style.textAlign = "center";
+            toInputBox.type = "number";
+            
+
+            inputDiv.appendChild(fromInputBox);
+            inputDiv.appendChild(toInputBox);
+
+
+            const buttonDiv = document.createElement("div");
+            buttonDiv.style.width = "400px";
+            buttonDiv.style.display = "flex";
+            buttonDiv.style.justifyContent = "space-between";
+
+            const preview = document.createElement("button");
+            preview.style.width = "152px";
+            preview.style.height = "61px";
+            preview.style.fontSize = "32px";
+            preview.style.borderRadius = "10px";
+            preview.style.border = "none"
+            preview.style.cursor = "pointer";
+            preview.innerHTML = "Preview";
+
+            const save = document.createElement("button");
+            save.style.width = "152px";
+            save.style.height = "61px";
+            save.style.fontSize = "32px";
+            save.style.borderRadius = "10px";
+            save.style.border = "none"
+            save.style.cursor = "pointer";
+            save.innerHTML = "Save";
+
+            buttonDiv.appendChild(preview);
+            buttonDiv.appendChild(save);
+
+            container.appendChild(h1);
+            container.appendChild(divUploadSample);
+            container.appendChild(inputDiv);
+            container.appendChild(buttonDiv);
+
+        };
+
         this._playbackBtn.id="playbackBtn";
         this._playbackBtn.classList.add("disabled");
         
