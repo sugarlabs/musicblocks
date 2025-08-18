@@ -173,6 +173,8 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         "widgets/timbre",
         "widgets/oscilloscope",
         "widgets/sampler",
+        "widgets/midiWidget",
+        "widgets/apiKeyManager",
         "activity/lilypond",
         "activity/abc",
         "activity/midi",
@@ -5792,6 +5794,18 @@ class Activity {
             new JSEditor(activity);
         };
 
+        /**
+         * Toggles display of MIDI widget.
+         */
+        const toggleMidiWidget = (activity) => {
+            new MidiWidget(activity);
+        };
+
+        const toggleAPIKey = (activity) => {
+            const apiKeyManager = new APIKeyManager(activity);
+            apiKeyManager.show();
+        };
+
         const doAnalytics = (activity) => {
             if (!activity.statsWindow || !activity.statsWindow.isOpen) {
                 activity.statsWindow = new StatsWindow(activity);
@@ -6418,6 +6432,8 @@ class Activity {
                 this.toolbar.renderChooseKeyIcon(chooseKeyMenu);
             }
             this.toolbar.renderJavaScriptIcon(toggleJSWindow);
+            this.toolbar.renderMidiWidgetIcon(toggleMidiWidget);
+        this.toolbar.renderAPIKeyIcon(toggleAPIKey);
             this.toolbar.renderLanguageSelectIcon(this.languageBox);
             this.toolbar.renderWrapIcon();
 
