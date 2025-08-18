@@ -73,6 +73,8 @@ class Toolbar {
                 ["mergeWithCurrentIcon", _("Merge with current project")],
                 ["chooseKeyIcon", _("Set Pitch Preview")],
                 ["toggleJavaScriptIcon", _("JavaScript Editor")],
+                ["toggleMidiWidgetIcon", _("MIDI Widget")],
+        ["toggleAPIKeyIcon", _("API Settings")],
                 ["restoreIcon", _("Restore")],
                 ["beginnerMode", _("Switch to beginner mode")],
                 ["advancedMode", _("Switch to advanced mode")],
@@ -1105,6 +1107,57 @@ class Toolbar {
      */
     renderJavaScriptIcon(onclick) {
         docById("toggleJavaScriptIcon").onclick = () => onclick(this.activity);
+    }
+
+    /**
+     * Renders the MIDI widget icon with the provided onclick handler.
+     * 
+     * @public
+     * @param {Function} onclick - The onclick handler for the MIDI widget icon.
+     * @returns {void}
+     */
+    renderMidiWidgetIcon(onclick) {
+        const midiWidgetIcon = docById("toggleMidiWidgetIcon");
+        if (midiWidgetIcon) {
+            midiWidgetIcon.onclick = () => onclick(this.activity);
+            
+            // Set up tooltip for the new button
+            midiWidgetIcon.setAttribute("data-tooltip", _("MIDI Widget"));
+            
+            // Re-initialize tooltips to include the new button
+            if (typeof jQuery !== 'undefined') {
+                jQuery.noConflict()(".tooltipped").tooltip({
+                    html: true,
+                    delay: 100
+                });
+            }
+            
+            console.log("MIDI widget icon initialized successfully");
+        } else {
+            console.error("MIDI widget icon element not found");
+        }
+    }
+
+    renderAPIKeyIcon(onclick) {
+        const apiKeyIcon = docById("toggleAPIKeyIcon");
+        if (apiKeyIcon) {
+            apiKeyIcon.onclick = () => onclick(this.activity);
+            
+            // Set up tooltip for the new button
+            apiKeyIcon.setAttribute("data-tooltip", _("API Settings"));
+            
+            // Re-initialize tooltips to include the new button
+            if (typeof jQuery !== 'undefined') {
+                jQuery.noConflict()(".tooltipped").tooltip({
+                    html: true,
+                    delay: 100
+                });
+            }
+            
+            console.log("API Key icon initialized successfully");
+        } else {
+            console.error("API Key icon element not found");
+        }
     }
 
     /**
