@@ -16,6 +16,11 @@ The code corresponding to the JavaScript Editor widget is in
 * `generate.js` — contains the utilities for generating code from the
   block stacks.
 
+* `ast2blocklist.js` - contains the utilities for generating blocks from the code in the editor
+
+* `ast2blocks.json` - contains the block configurations for code to block conversion.
+  For detailed information on how to add blocks for code to block support see `./conversion_config_guide.md`
+
 * `ASTutils.js` — contains the utilities for generating the *Abstract
   Syntax Tree* (*AST*) in `ESTree` specification, for the corresponding
   code to the block stacks. Used by `JSGenerate` class in `generate.js`.

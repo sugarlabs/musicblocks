@@ -2146,6 +2146,12 @@ class Blocks {
             this.isBlockMoving = false;
             this.adjustExpandableClampBlock();
             this.activity.refreshCanvas();
+
+            if (this.activity.turtles.running()) {
+                this.activity.logo.doStopTurtles();
+                const stopBtn = document.getElementById("stop");
+                if (stopBtn) stopBtn.style.color = "white";
+            }
         };
 
         /**
@@ -6962,16 +6968,24 @@ class Blocks {
                     }
                 }
 
-                if (typeof value === "string") {
+                // Comprehensive safety check for all value types
+                if (value === null || value === undefined) {
+                    this.blockList[blk].text.text = "";
+                } else if (typeof value === "string") {
                     if (value.length > 6) {
                         value = value.substr(0, 5) + "...";
                     }
-
                     this.blockList[blk].text.text = value;
                 } else if (name === "divide") {
                     this.blockList[blk].text.text = mixedNumber(value);
                 } else {
-                    this.blockList[blk].text.text = value.toString();
+                    // Safe toString conversion
+                    try {
+                        this.blockList[blk].text.text = value.toString();
+                    } catch (error) {
+                        console.warn("Error converting value to string:", value, error);
+                        this.blockList[blk].text.text = "";
+                    }
                 }
 
                 this.blockList[blk].container.updateCache();

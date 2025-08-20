@@ -52,7 +52,13 @@
     <script src="lib/wheelnav.js" defer></script>
     <script src="lib/abc.min.js" defer></script>
     <script src="lib/codejar/codejar.min.js" defer></script>
-    <script src="lib/codejar/highlight.pack.js" defer></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script>
+        hljs.highlightAll();
+        <code class="language-javascript">
+        </code>
+    </script>
     <script src="lib/astring.min.js" defer></script>
 
     <script src="lib/acorn.min.js" defer></script>
@@ -66,7 +72,12 @@
     <link rel="stylesheet" href="css/themes.css">
     <script src="lib/easeljs.min.js" defer></script>
     <script src="lib/tweenjs.min.js" defer></script>
-
+    <script>
+        let ast2blocklist_config;
+        fetch("js/js-export/ast2blocks.min.json")
+            .then(response => response.json())
+            .then(data => { ast2blocklist_config = data })
+    </script>
 </head>
 
 <body id="body" onload="init();" data-title="index" style="background: #f9f9f9;">
