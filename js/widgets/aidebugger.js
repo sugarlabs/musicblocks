@@ -22,18 +22,7 @@ function AIDebuggerWidget() {
     const CHATHEIGHT = 600;
     
     const BACKEND_CONFIG = {
-        BASE_URL: (() => {
-
-            if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-                return "http://localhost:8000";
-            }
-            else if (window.location.hostname.includes("musicblocks.sugarlabs.org")) {
-                return `${window.location.protocol}//api.musicblocks.sugarlabs.org`;
-            }
-            else {
-                return `${window.location.protocol}//${window.location.hostname}:8000`;
-            }
-        })(),
+        BASE_URL: "http://13.49.246.243:8000",
         ENDPOINTS: {
             ANALYZE: "/analyze"
         },
