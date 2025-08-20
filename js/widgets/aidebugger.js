@@ -22,6 +22,7 @@ function AIDebuggerWidget() {
     const CHATHEIGHT = 600;
     
     const BACKEND_CONFIG = {
+        // This URL points to the FastAPI server running on the EC2 instance.
         BASE_URL: "http://13.49.246.243:8000",
         ENDPOINTS: {
             ANALYZE: "/analyze"
