@@ -233,7 +233,7 @@ class Singer {
 
                 logo.phraseMaker.rowLabels.push(activity.logo.blocks.blockList[blk].name);
                 logo.phraseMaker.rowArgs.push(args[0]);
-            } else if (logo.inLegoWidget) {
+            } else if (logo.inLegoWidget && !logo.inMatrix) {
                 logo.legoWidget.addRowBlock(blk);
                 if (!logo.pitchBlocks.includes(blk)) {
                     logo.pitchBlocks.push(blk);
@@ -918,7 +918,7 @@ class Singer {
                     activity.logo.phraseMaker.rowArgs.push(noteObj[1]);
                 }
             }
-        } else if (activity.logo.inLegoWidget) {
+        } else if (activity.logo.inLegoWidget && !activity.logo.inMatrix) {
             if (note.toLowerCase() !== "rest") {
                 activity.logo.legoWidget.addRowBlock(blk);
                 if (!activity.logo.pitchBlocks.includes(blk)) {
@@ -1537,7 +1537,8 @@ class Singer {
                     );
                 }
             }
-        } else if (activity.logo.inLegoWidget) {
+            // Note: tupletRhythms will be populated by the rhythm blocks themselves
+        } else if (activity.logo.inLegoWidget && !activity.logo.inMatrix) {
             // For LEGO widget, we don't need to handle rhythm blocks currently
             // Just store the note information
             if (tur.singer.inNoteBlock.length > 0) {
