@@ -111,6 +111,7 @@ class Logo {
 
         // Widgets
         this.phraseMaker = null;
+        this.legoWidget = null;
         this.pitchDrumMatrix = null;
         this.arpeggio = null;
         this.rhythmRuler = null;
@@ -125,6 +126,7 @@ class Logo {
         this.oscilloscopeTurtles = [];
         this.meterWidget = null;
         this.statusMatrix = null;
+        this.legobricks = null;
 
         this.evalFlowDict = {};
         this.evalArgDict = {};
@@ -182,6 +184,7 @@ class Logo {
 
         // pitch-rhythm matrix
         this.inMatrix = false;
+        this.inLegoWidget = false;
         this.tupletRhythms = [];
         this.addingNotesToTuplet = false;
         this.drumBlocks = [];
@@ -1062,6 +1065,7 @@ class Logo {
 
         this.inPitchDrumMatrix = false;
         this.inMatrix = false;
+        this.inLegoWidget = false;
         this.inMusicKeyboard = false;
         this.inTimbre = false;
         this.inArpeggio = false;

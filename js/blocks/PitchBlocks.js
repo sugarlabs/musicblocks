@@ -1614,6 +1614,17 @@ function setupPitchBlocks(activity) {
                 // convert hertz to note/octave
                 const note = obj;
                 tur.singer.lastNotePlayed = [note[0] + note[1], 4];
+            } else if (logo.inLegoWidget) {
+                logo.legoWidget.addRowBlock(blk);
+                if (!logo.pitchBlocks.includes(blk)) {
+                    logo.pitchBlocks.push(blk);
+                }
+
+                logo.legoWidget.rowLabels.push(activity.blocks.blockList[blk].name);
+                logo.legoWidget.rowArgs.push(arg.toFixed(0));
+                // convert hertz to note/octave
+                const note = obj;
+                tur.singer.lastNotePlayed = [note[0] + note[1], 4];
             } else if (logo.inMusicKeyboard) {
                 logo.musicKeyboard.instruments.push(last(tur.singer.instrumentNames));
                 logo.musicKeyboard.noteNames.push("hertz");

@@ -233,6 +233,14 @@ class Singer {
 
                 logo.phraseMaker.rowLabels.push(activity.logo.blocks.blockList[blk].name);
                 logo.phraseMaker.rowArgs.push(args[0]);
+            } else if (logo.inLegoWidget) {
+                logo.legoWidget.addRowBlock(blk);
+                if (!logo.pitchBlocks.includes(blk)) {
+                    logo.pitchBlocks.push(blk);
+                }
+
+                logo.legoWidget.rowLabels.push(activity.logo.blocks.blockList[blk].name);
+                logo.legoWidget.rowArgs.push(args[0]);
             } else if (logo.inPitchSlider) {
                 logo.pitchSlider.frequency = args[0];
             } else {
@@ -910,6 +918,56 @@ class Singer {
                     activity.logo.phraseMaker.rowArgs.push(noteObj[1]);
                 }
             }
+        } else if (activity.logo.inLegoWidget) {
+            if (note.toLowerCase() !== "rest") {
+                activity.logo.legoWidget.addRowBlock(blk);
+                if (!activity.logo.pitchBlocks.includes(blk)) {
+                    activity.logo.pitchBlocks.push(blk);
+                }
+            }
+
+            const duplicateFactor =
+                tur.singer.duplicateFactor.length > 0 ? tur.singer.duplicateFactor : 1;
+
+            for (let i = 0; i < duplicateFactor; i++) {
+                // Apply transpositions
+                const transposition = 2 * delta + tur.singer.transposition;
+                const alen = tur.singer.arpeggio.length;
+                let atrans = transposition + cents;
+                if (alen > 0 && i < alen) {
+                    atrans += tur.singer.arpeggio[i];
+                }
+                const noteObj = getNote(
+                    note,
+                    octave,
+                    atrans,  // transposition,
+                    tur.singer.keySignature,
+                    tur.singer.movable,
+                    null,
+                    activity.errorMsg,
+                    activity.logo.synth.inTemperament
+                );
+                tur.singer.previousNotePlayed = tur.singer.lastNotePlayed;
+                tur.singer.lastNotePlayed = [noteObj[0] + noteObj[1], 4];
+
+                if (
+                    tur.singer.keySignature[0] === "C" &&
+                    tur.singer.keySignature[1].toLowerCase() === "major" &&
+                    noteIsSolfege(note)
+                ) {
+                    noteObj[0] = getSolfege(noteObj[0]);
+                }
+
+                // If we are in a setdrum clamp, override the pitch.
+                if (tur.singer.drumStyle.length > 0) {
+                    activity.logo.legoWidget.rowLabels.push(last(tur.singer.drumStyle));
+                    activity.logo.legoWidget.rowArgs.push(-1);
+                } else {
+                    // Don't bother with the name conversions.
+                    activity.logo.legoWidget.rowLabels.push(noteObj[0]);
+                    activity.logo.legoWidget.rowArgs.push(noteObj[1]);
+                }
+            }
         } else if (tur.singer.inNoteBlock.length > 0) {
             // maybe of interest
             tur.singer.inverted = tur.singer.invertList.length > 0;
@@ -1478,6 +1536,12 @@ class Singer {
                         mat_block
                     );
                 }
+            }
+        } else if (activity.logo.inLegoWidget) {
+            // For LEGO widget, we don't need to handle rhythm blocks currently
+            // Just store the note information
+            if (tur.singer.inNoteBlock.length > 0) {
+                // Could add timing information here if needed in the future
             }
 
             noteBeatValue *= tur.singer.beatFactor;
