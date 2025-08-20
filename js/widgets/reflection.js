@@ -42,7 +42,7 @@ class ReflectionMatrix {
             widgetWindow.destroy();
         };
 
-        // retrieve string from indexDB
+        // retrieve string from localStorage
         this.summary = this.readReport() || "No reports available";
 
         this.chatInterface = document.createElement("div");
