@@ -506,6 +506,8 @@ function SampleWidget() {
             _("Trim"),
             ""
         );
+        
+        let generating = false;
 
         this._promptBtn.onclick = () => {
 
@@ -564,6 +566,18 @@ function SampleWidget() {
             textArea.style.border = "none"
             textArea.style.padding = "15px";
             textArea.placeholder = randomPrompt;
+            textArea.addEventListener("input", function() {
+
+                if (generating) {
+                    submit.disabled = true;
+                    preview.disabled = true;
+                    save.disabled = true;
+                } else {
+                    submit.disabled = false;
+                    preview.disabled = true;
+                    save.disabled = true;
+                }
+            })
 
             const buttonDiv = document.createElement("div");
             buttonDiv.style.display = "flex";
@@ -579,11 +593,16 @@ function SampleWidget() {
             submit.style.cursor = "pointer";
             submit.innerHTML = "Submit";
             submit.onclick = async function () {
+
+                submit.disabled = true;
+
                 const prompt = textArea.value;
                 const encodedPrompt = encodeURIComponent(prompt);
                 const url = `http://localhost:8000/generate?prompt=${encodedPrompt}`;
 
                 try {
+
+                    generating = true;
 
                     activity.textMsg(_("Generating Audio..."), 2500)
 
@@ -597,13 +616,16 @@ function SampleWidget() {
                     clearInterval(blinkInterval);
 
                     if (result.status === "success") {
+                        generating = false;
                         activity.textMsg(_("Audio ready!"), 3000);
                         preview.disabled = false;
                         save.disabled = false;
                     } else {
+                        generating = false;
                         activity.textMsg(_("Failed to generate audio"), 3000);
                     }
                 } catch (error) {
+                    generating = false;
                     activity.textMsg(_("Error occurred"), 3000);
                 }
             };
@@ -693,7 +715,7 @@ function SampleWidget() {
             divUploadSample.style.alignItems = "center";
 
             const uploadSample = document.createElement("img");
-            uploadSample.setAttribute("src", "../header-icons/load-media.svg");
+            uploadSample.setAttribute("src", "/header-icons/load-media.svg");
             uploadSample.style.height = "32px";
             uploadSample.style.width = "32px";
 
@@ -774,6 +796,18 @@ function SampleWidget() {
             preview.style.cursor = "pointer";
             preview.innerHTML = "Preview";
 
+            preview.onclick = async function() {
+                const from = fromInputBox.value
+                const to = toInputBox.value
+
+                const audioURL = `http://localhost:8000/trim-preview?start=${from}&end=${to}`;
+
+                const audio = new Audio(audioURL);
+                audio.play();
+                save.disabled = false;
+
+            }
+
             const save = document.createElement("button");
             save.style.width = "152px";
             save.style.height = "61px";
@@ -782,6 +816,16 @@ function SampleWidget() {
             save.style.border = "none"
             save.style.cursor = "pointer";
             save.innerHTML = "Save";
+            save.disabled = true;
+            save.onclick = function (){
+                const audioURL = `http://localhost:8000/trim-save`;
+                const link = document.createElement('a');
+                link.href = audioURL;
+                link.download = 'trimmed-output.wav';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
 
             buttonDiv.appendChild(preview);
             buttonDiv.appendChild(save);
