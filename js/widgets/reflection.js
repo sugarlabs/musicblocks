@@ -19,14 +19,30 @@
 
 class ReflectionMatrix {
     static BUTTONDIVWIDTH = 535;
-    static OUTERWINDOWWIDTH = 858;
+    static OUTERWINDOWWIDTH = "858px";
+    static OUTERWINDOWHEIGHT = "550px";
     static INNERWINDOWWIDTH = 730;
     static BUTTONSIZE = 53;
     static ICONSIZE = 32;
 
     constructor() {
+
+        /**
+         * Chat history array to store the conversation
+         * @type {Array}
+         */
         this.chatHistory = [];
+
+        /**
+         * Default AI mentor
+         * @type {string}
+         */
         this.AImentor = "meta";
+        
+        /**
+         * Map to display mentor names
+         * @type {Object}
+         */
         this.mentorsMap = {
             user: "YOU",
             meta: "ROHAN",
@@ -34,7 +50,16 @@ class ReflectionMatrix {
             code: "STEVE"
         };
 
+        /**
+         * Flag to check if init function has been called once
+         * @type {boolean}
+         */
         this.triggerFirst = false;
+
+        /**
+         * Project algorithm string
+         * @type {string}
+         */
         this.projectAlgorithm = "";
     }
 
@@ -52,8 +77,8 @@ class ReflectionMatrix {
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
-        widgetWindow.getWidgetBody().style.height = "550px";
-        widgetWindow.getWidgetBody().style.width = "900px";
+        widgetWindow.getWidgetBody().style.height = ReflectionMatrix.OUTERWINDOWHEIGHT;
+        widgetWindow.getWidgetBody().style.width = ReflectionMatrix.OUTERWINDOWWIDTH;
 
         widgetWindow.onclose = () => {
             this.isOpen = false;
@@ -68,18 +93,18 @@ class ReflectionMatrix {
         this.chatInterface.className = "chatInterface";
         widgetWindow.getWidgetBody().append(this.chatInterface);
 
-        widgetWindow.addButton("notes_icon.svg", 32, _("Summary")).onclick = () =>
+        widgetWindow.addButton("notes_icon.svg", ReflectionMatrix.ICONSIZE, _("Summary")).onclick = () =>
             this.getAnalysis();
-        widgetWindow.addButton("save-button-dark.svg", 32, _("Save")).onclick = () =>
+        widgetWindow.addButton("save-button-dark.svg", ReflectionMatrix.ICONSIZE, _("Save")).onclick = () =>
             this.downloadAsTxt(this.chatHistory); // text download
 
-        this.metaButton = widgetWindow.addButton("general_mentor.svg", 32, _("Talk with Rohan"));
+        this.metaButton = widgetWindow.addButton("general_mentor.svg", ReflectionMatrix.ICONSIZE, _("Talk with Rohan"));
         this.metaButton.onclick = () => this.changeMentor("meta");
 
-        this.codeButton = widgetWindow.addButton("code.svg", 32, _("Talk with Steve"));
+        this.codeButton = widgetWindow.addButton("code.svg", ReflectionMatrix.ICONSIZE, _("Talk with Steve"));
         this.codeButton.onclick = () => this.changeMentor("code");
 
-        this.musicButton = widgetWindow.addButton("music.svg", 32, _("Talk with Beethoven"));
+        this.musicButton = widgetWindow.addButton("music.svg", ReflectionMatrix.ICONSIZE, _("Talk with Beethoven"));
         this.musicButton.onclick = () => this.changeMentor("music");
 
         this.changeMentor(this.AImentor);
@@ -122,6 +147,10 @@ class ReflectionMatrix {
         }
     }
 
+    /**
+     * Changes the current mentor.
+     * @param {string} mentor - The mentor to switch to.
+     */
     changeMentor(mentor) {
         this.AImentor = mentor;
         console.log(this.chatHistory);
@@ -145,6 +174,10 @@ class ReflectionMatrix {
         }
     }
 
+    /**
+     * Starts the chat session by sending the project code to the server.
+     *  @returns {Promise<void>}
+     */
     async startChatSession() {
         if (this.triggerFirst == true) return;
         this.triggerFirst = true;
@@ -159,6 +192,11 @@ class ReflectionMatrix {
         this.projectAlgorithm = data.algorithm;
     }
 
+    /**
+     * Sends the project code to the server and retrieves the algorithm.
+     * @param {string} code - The project code.
+     * @returns {Promise<Object>} - The server response containing the algorithm.
+     */
     async generateAlgorithm(code) {
         try {
             const response = await fetch(`${this.PORT}/projectcode`, {
@@ -176,6 +214,14 @@ class ReflectionMatrix {
         }
     }
 
+    /**
+     * Sends a message to the server and retrieves the bot's reply.
+     *  @param {string} message - The user's message.
+     *  @param {Array} chatHistory - The chat history.
+     *  @param {string} mentor - The current mentor.
+     *  @param {string} algorithm - The project algorithm.
+     *  @returns {Promise<Object>} - The server response containing the bot's reply.
+     */
     async generateBotReply(message, chatHistory, mentor, algorithm) {
         try {
             const response = await fetch(`${this.PORT}/chat`, {
@@ -196,16 +242,23 @@ class ReflectionMatrix {
         }
     }
 
+    /**
+     * Fetches analysis from the server and updates the chat log.
+     * @returns {Promise<void>}
+     */
     async getAnalysis() {
-        if (!this.chatHistory.length > 10) return;
+        if (this.chatHistory.length < 10) return;
         const data = await this.generateAnalysis();
-        console.log(data);
         if (data) {
             this.botReplyDiv(data, false);
         }
         await this.saveReport(data);
     }
 
+    /**
+     * Sends the chat history and summary to the server to get analysis.
+     *  @returns {Promise<Object>} - The server response containing the analysis.
+     */
     async generateAnalysis() {
         try {
             const response = await fetch(`${this.PORT}/analysis`, {
@@ -224,6 +277,12 @@ class ReflectionMatrix {
         }
     }
 
+    /**
+     * Appends the bot's reply to the chat log.
+     * @param {string} message - The bot's reply message.
+     * @param {boolean} user_query - Flag indicating if the message is from the user.
+     * @returns {Promise<void>}
+     */
     async botReplyDiv(message, user_query = true) {
         let reply;
         // check if message is from user or bot
@@ -264,6 +323,10 @@ class ReflectionMatrix {
         this.chatLog.scrollTop = this.chatLog.scrollHeight;
     }
 
+    /**
+     * Handles sending user messages.
+     * @returns {void}
+     */
     sendMessage() {
         const text = this.input.value.trim();
         if (text === "") return;
@@ -296,6 +359,10 @@ class ReflectionMatrix {
         this.chatLog.scrollTop = this.chatLog.scrollHeight;
     }
 
+    /**
+     * Renders the chat history in the chat log.
+     * @returns {void}
+     */
     renderChatHistory() {
         this.chatLog.innerHTML = "";
 
@@ -329,6 +396,11 @@ class ReflectionMatrix {
         this.chatLog.scrollTop = this.chatLog.scrollHeight;
     }
 
+    /**
+     * Saves the analysis report to localStorage.
+     * @param {Object} data - The analysis data to save.
+     * @returns {Promise<void>}
+     */
     saveReport(data) {
         const key = "musicblocks_analysis";
         const conversation = {
@@ -338,12 +410,19 @@ class ReflectionMatrix {
         console.log("Conversation saved in localStorage.");
     }
 
+    /** Reads the analysis report from localStorage.
+     * @returns {Object|null} - The retrieved analysis data or null if not found.
+     */
     readReport() {
         const key = "musicblocks_analysis";
         const data = localStorage.getItem(key);
         return data ? JSON.parse(data) : null;
     }
 
+    /** Downloads the conversation as a text file.
+     * @param {Array} conversationData - The chat history to download.
+     * @returns {void}
+     */
     downloadAsTxt(conversationData) {
 
         const transcript = conversationData
