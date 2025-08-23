@@ -16,7 +16,6 @@
  * @constructor
  */
 
-
 class ReflectionMatrix {
     static BUTTONDIVWIDTH = 535;
     static OUTERWINDOWWIDTH = "858px";
@@ -26,7 +25,6 @@ class ReflectionMatrix {
     static ICONSIZE = 32;
 
     constructor() {
-
         /**
          * Chat history array to store the conversation
          * @type {Array}
@@ -38,7 +36,7 @@ class ReflectionMatrix {
          * @type {string}
          */
         this.AImentor = "meta";
-        
+
         /**
          * Map to display mentor names
          * @type {Object}
@@ -93,18 +91,36 @@ class ReflectionMatrix {
         this.chatInterface.className = "chatInterface";
         widgetWindow.getWidgetBody().append(this.chatInterface);
 
-        widgetWindow.addButton("notes_icon.svg", ReflectionMatrix.ICONSIZE, _("Summary")).onclick = () =>
-            this.getAnalysis();
-        widgetWindow.addButton("save-button-dark.svg", ReflectionMatrix.ICONSIZE, _("Save")).onclick = () =>
-            this.downloadAsTxt(this.chatHistory); // text download
+        widgetWindow.addButton(
+            "notes_icon.svg",
+            ReflectionMatrix.ICONSIZE,
+            _("Summary")
+        ).onclick = () => this.getAnalysis();
+        widgetWindow.addButton(
+            "save-button-dark.svg",
+            ReflectionMatrix.ICONSIZE,
+            _("Save")
+        ).onclick = () => this.downloadAsTxt(this.chatHistory); // text download
 
-        this.metaButton = widgetWindow.addButton("general_mentor.svg", ReflectionMatrix.ICONSIZE, _("Talk with Rohan"));
+        this.metaButton = widgetWindow.addButton(
+            "general_mentor.svg",
+            ReflectionMatrix.ICONSIZE,
+            _("Talk with Rohan")
+        );
         this.metaButton.onclick = () => this.changeMentor("meta");
 
-        this.codeButton = widgetWindow.addButton("code.svg", ReflectionMatrix.ICONSIZE, _("Talk with Steve"));
+        this.codeButton = widgetWindow.addButton(
+            "code.svg",
+            ReflectionMatrix.ICONSIZE,
+            _("Talk with Steve")
+        );
         this.codeButton.onclick = () => this.changeMentor("code");
 
-        this.musicButton = widgetWindow.addButton("music.svg", ReflectionMatrix.ICONSIZE, _("Talk with Beethoven"));
+        this.musicButton = widgetWindow.addButton(
+            "music.svg",
+            ReflectionMatrix.ICONSIZE,
+            _("Talk with Beethoven")
+        );
         this.musicButton.onclick = () => this.changeMentor("music");
 
         this.changeMentor(this.AImentor);
@@ -148,6 +164,47 @@ class ReflectionMatrix {
     }
 
     /**
+     * Displays a typing indicator with animated dots.
+     * @returns {void}
+     */
+    showTypingIndicator() {
+        if (this.typingDiv) return;
+
+        this.typingDiv = document.createElement("div");
+        this.typingDiv.className = "typing-indicator";
+
+        const textElement = document.createElement("span");
+        textElement.textContent = "Thinking";
+        this.typingDiv.appendChild(textElement);
+
+        this.dotsContainer = document.createElement("span");
+        this.typingDiv.appendChild(this.dotsContainer);
+
+        this.chatLog.appendChild(this.typingDiv);
+        this.chatLog.scrollTop = this.chatLog.scrollHeight;
+
+        // Start animation
+        let dotCount = 0;
+        const maxDots = 3;
+        this.dotsInterval = setInterval(() => {
+            dotCount = (dotCount + 1) % (maxDots + 1);
+            this.dotsContainer.textContent = ".".repeat(dotCount);
+        }, 500);
+    }
+
+    /**
+     * Hides the typing indicator and stops the animation.
+     * @returns {void}
+     */
+    hideTypingIndicator() {
+        if (this.typingDiv) {
+            clearInterval(this.dotsInterval);
+            this.typingDiv.remove();
+            this.typingDiv = null;
+        }
+    }
+
+    /**
      * Changes the current mentor.
      * @param {string} mentor - The mentor to switch to.
      */
@@ -181,8 +238,12 @@ class ReflectionMatrix {
     async startChatSession() {
         if (this.triggerFirst == true) return;
         this.triggerFirst = true;
+        setTimeout(() => {
+            this.showTypingIndicator();
+        }, 1000);
         const code = await this.activity.prepareExport();
         const data = await this.generateAlgorithm(code);
+        this.hideTypingIndicator();
         if (data && !data.error) {
             this.inputContainer.style.display = "flex";
             this.botReplyDiv(data, false);
@@ -224,6 +285,7 @@ class ReflectionMatrix {
      */
     async generateBotReply(message, chatHistory, mentor, algorithm) {
         try {
+            this.showTypingIndicator();
             const response = await fetch(`${this.PORT}/chat`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -234,6 +296,7 @@ class ReflectionMatrix {
                     algorithm: algorithm
                 })
             });
+            this.hideTypingIndicator();
             const data = await response.json();
             return data;
         } catch (error) {
@@ -248,7 +311,9 @@ class ReflectionMatrix {
      */
     async getAnalysis() {
         if (this.chatHistory.length < 10) return;
+        this.showTypingIndicator();
         const data = await this.generateAnalysis();
+        this.hideTypingIndicator();
         if (data) {
             this.botReplyDiv(data, false);
         }
@@ -424,9 +489,15 @@ class ReflectionMatrix {
      * @returns {void}
      */
     downloadAsTxt(conversationData) {
-
+        if (conversationData.length === 0) {
+            this.activity.errorMsg(_("No conversation to save."), 2000);
+            return;
+        }
         const transcript = conversationData
-            .map((item) => `${this.mentorsMap[item.role] || item.role.toUpperCase()}: ${item.content}`)
+            .map(
+                (item) =>
+                    `${this.mentorsMap[item.role] || item.role.toUpperCase()}: ${item.content}`
+            )
             .join("\n\n");
 
         const blob = new Blob([transcript], { type: "text/plain" });
