@@ -1,4 +1,5 @@
 /**
+ * Copyright (c) 2025 Anvita Prasad DMP'25
  * TunerDisplay class for visualizing pitch detection
  */
 function TunerDisplay(canvas, width, height) {

@@ -1,4 +1,5 @@
 // Copyright (c) 2021 Liam Norman
+// Copyright (c) 2025 Anvita Prasad DMP'25
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -641,7 +642,7 @@ function SampleWidget() {
                 tunerOn = true;
 
                 const samplerCanvas = docByClass("samplerCanvas")[0];
-                    samplerCanvas.style.display = "none";
+                samplerCanvas.style.display = "none";
 
                 const tunerContainer = document.createElement("div");
                 tunerContainer.style.display = "flex";
@@ -659,7 +660,7 @@ function SampleWidget() {
                 }
 
                 const accidetalFlat = document.createElement("img");
-                accidetalFlat.setAttribute("src", "../header-icons/accidental-flat.svg");
+                accidetalFlat.setAttribute("src", "header-icons/accidental-flat.svg");
                 accidetalFlat.style.height = 40 + "px";
                 accidetalFlat.style.width = 40 + "px";
                 accidetalFlat.style.marginTop = "auto";
@@ -673,7 +674,7 @@ function SampleWidget() {
                 tunerContainer.appendChild(tunerSvg);
 
                 const sharpSymbol = document.createElement("img");
-                sharpSymbol.setAttribute("src", "../header-icons/sharp.svg");
+                sharpSymbol.setAttribute("src", "header-icons/sharp.svg");
                 sharpSymbol.style.height = 40 + "px";
                 sharpSymbol.style.width = 40 + "px";
                 sharpSymbol.style.marginTop = "auto";
