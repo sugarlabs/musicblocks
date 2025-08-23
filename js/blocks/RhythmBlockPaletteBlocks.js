@@ -112,6 +112,11 @@ function setupRhythmBlockPaletteBlocks(activity) {
             if (logo.inMatrix || logo.tuplet) {
                 if (logo.inMatrix) {
                     logo.phraseMaker.addColBlock(blk, arg0);
+                    
+                    // Add individual entries for each beat to avoid extra × blocks
+                    for (let i = 0; i < arg0; i++) {
+                        logo.tupletRhythms.push(["individual", 1, noteBeatValue]);
+                    }
                 }
 
                 for (let i = 0; i < args[0]; i++) {
