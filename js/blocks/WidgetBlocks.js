@@ -1663,7 +1663,7 @@ function setupWidgetBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Reflection block opens a tool for reflecting on your learning."),
+                _("The Reflection block opens a space for you to think about your learning."),
                 null,
                 "reflection"
             ]);
