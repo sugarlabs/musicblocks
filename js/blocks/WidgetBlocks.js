@@ -1670,7 +1670,7 @@ function setupWidgetBlocks(activity) {
 
             this.formBlock({ name: _("reflection"), canCollapse: true });
             this.makeMacro((x, y) => [
-                [0, "reflection", x, y, [null, 1]],   
+                [0, "reflection", x, y, [null, 1]],
                 [1, "print", 0, 0, [0,2,null]],
                 [2, ["text",{"value":"Reflective Learning"}], 0, 0, [1]]
             ]);
