@@ -524,16 +524,16 @@ function SampleWidget() {
             const randomDigit = Math.floor(Math.random() * 10);
 
             const promptList = [
-                "a",
-                "b",
-                "c",
-                "d",
-                "e",
-                "f",
-                "g",
-                "h",
-                "i",
-                "j"
+                "Birds chirping in the morning",
+                "Rain falling on a window",
+                "Waves crashing on some rocks",
+                "Cat meowing near a door",
+                "Dog barking in a park",
+                "Horse galloping in a field",
+                "Children laughing at a playground",
+                "Footsteps walking on wooden floor",
+                "Car honking on the street",
+                "Clock ticking in a quiet room"
             ]
 
             const randomPrompt = promptList[randomDigit]
