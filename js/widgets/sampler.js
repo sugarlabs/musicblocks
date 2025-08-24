@@ -567,7 +567,6 @@ function SampleWidget() {
             textArea.style.padding = "15px";
             textArea.placeholder = randomPrompt;
             textArea.addEventListener("input", function() {
-
                 if (generating) {
                     submit.disabled = true;
                     preview.disabled = true;
@@ -593,17 +592,12 @@ function SampleWidget() {
             submit.style.cursor = "pointer";
             submit.innerHTML = "Submit";
             submit.onclick = async function () {
-
                 submit.disabled = true;
-
                 const prompt = textArea.value;
                 const encodedPrompt = encodeURIComponent(prompt);
                 const url = `http://localhost:8000/generate?prompt=${encodedPrompt}`;
-
                 try {
-
                     generating = true;
-
                     activity.textMsg(_("Generating Audio..."), 2500);
 
                     let blinkInterval = setInterval(() => {
@@ -668,7 +662,6 @@ function SampleWidget() {
             buttonDiv.appendChild(preview);
             buttonDiv.appendChild(save);
 
-
             container.appendChild(h1)
             container.appendChild(textArea);
             container.appendChild(buttonDiv);
@@ -730,16 +723,11 @@ function SampleWidget() {
 
             fileChooser.onchange = function () {
                 const file = fileChooser.files[0];
-
                 const audioPlayer = document.createElement("audio");
-
                 audioPlayer.controls = true;
-
                 const fileURL = URL.createObjectURL(file);
                 audioPlayer.src = fileURL;
-
                 container.replaceChild(audioPlayer, divUploadSample);
-
             };
 
             const inputDiv = document.createElement("div");
@@ -778,11 +766,9 @@ function SampleWidget() {
             toInputBox.style.padding = "8px";
             toInputBox.style.textAlign = "center";
             toInputBox.type = "number";
-            
 
             inputDiv.appendChild(fromInputBox);
             inputDiv.appendChild(toInputBox);
-
 
             const buttonDiv = document.createElement("div");
             buttonDiv.style.width = "400px";
@@ -801,13 +787,10 @@ function SampleWidget() {
             preview.onclick = async function() {
                 const from = fromInputBox.value
                 const to = toInputBox.value
-
                 const audioURL = `http://localhost:8000/trim-preview?start=${from}&end=${to}`;
-
                 const audio = new Audio(audioURL);
                 audio.play();
                 save.disabled = false;
-
             };
 
             const save = document.createElement("button");
@@ -836,7 +819,6 @@ function SampleWidget() {
             container.appendChild(divUploadSample);
             container.appendChild(inputDiv);
             container.appendChild(buttonDiv);
-
         };
 
         this._playbackBtn.id="playbackBtn";
