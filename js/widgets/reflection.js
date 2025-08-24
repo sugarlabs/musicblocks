@@ -64,6 +64,10 @@ class ReflectionMatrix {
     /**
      * Initializes the reflection widget.
      */
+
+    // download current summary
+    // download analysis as text file
+    // .md to html conversion
     init(activity) {
         this.activity = activity;
         this.isOpen = true;
@@ -146,6 +150,12 @@ class ReflectionMatrix {
         this.input.style.marginLeft = "10px";
         this.inputContainer.appendChild(this.input);
 
+        this.input.onkeydown = (e) => {
+            if (e.key === "Enter") {
+                this.sendMessage();
+            }
+        };
+
         const sendBtn = document.createElement("button");
         sendBtn.className = "confirm-button";
         sendBtn.style.marginRight = "10px";
@@ -161,6 +171,8 @@ class ReflectionMatrix {
         } else {
             this.startChatSession();
         }
+
+        activity.textMsg(_("Reflect on your project."), 3000);
     }
 
     /**
@@ -210,7 +222,6 @@ class ReflectionMatrix {
      */
     changeMentor(mentor) {
         this.AImentor = mentor;
-        console.log(this.chatHistory);
 
         if (mentor === "meta") {
             this.metaButton.style.background = "orange";
@@ -237,13 +248,17 @@ class ReflectionMatrix {
      */
     async startChatSession() {
         if (this.triggerFirst == true) return;
+
         this.triggerFirst = true;
         setTimeout(() => {
             this.showTypingIndicator();
         }, 1000);
+
         const code = await this.activity.prepareExport();
         const data = await this.generateAlgorithm(code);
+
         this.hideTypingIndicator();
+
         if (data && !data.error) {
             this.inputContainer.style.display = "flex";
             this.botReplyDiv(data, false);
@@ -313,6 +328,7 @@ class ReflectionMatrix {
         if (this.chatHistory.length < 10) return;
         this.showTypingIndicator();
         const data = await this.generateAnalysis();
+        console.log(data.analysis);
         this.hideTypingIndicator();
         if (data) {
             this.botReplyDiv(data, false);
@@ -326,6 +342,7 @@ class ReflectionMatrix {
      */
     async generateAnalysis() {
         try {
+            console.log(this.summary);
             const response = await fetch(`${this.PORT}/analysis`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -362,6 +379,12 @@ class ReflectionMatrix {
             reply = message;
         }
 
+        if (reply.error) {
+            this.hideTypingIndicator();
+            this.activity.errorMsg(_("Failed to send message"), 3000);
+            return;
+        }
+
         this.chatHistory.push({
             role: this.AImentor,
             content: reply.response
@@ -379,7 +402,7 @@ class ReflectionMatrix {
         senderName.innerText = this.mentorsMap[this.AImentor];
 
         const botReply = document.createElement("div");
-        botReply.innerText = reply.response || reply.error;
+        botReply.innerText = reply.response;
 
         messageContainer.appendChild(senderName);
         messageContainer.appendChild(botReply);
@@ -468,20 +491,17 @@ class ReflectionMatrix {
      */
     saveReport(data) {
         const key = "musicblocks_analysis";
-        const conversation = {
-            analysis: data
-        };
-        localStorage.setItem(key, JSON.stringify(conversation));
+        localStorage.setItem(key, data.response);
         console.log("Conversation saved in localStorage.");
     }
 
     /** Reads the analysis report from localStorage.
-     * @returns {Object|null} - The retrieved analysis data or null if not found.
+     * @returns {String|null} - The retrieved analysis data or null if not found.
      */
     readReport() {
         const key = "musicblocks_analysis";
         const data = localStorage.getItem(key);
-        return data ? JSON.parse(data) : null;
+        return data;
     }
 
     /** Downloads the conversation as a text file.
