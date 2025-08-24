@@ -184,7 +184,7 @@ class ProjectStorage {
 
         //  prevent unnecessary crashing
 
-        if (savedjsonob == null)
+        if (savedjsonobj == null)
             throw new Error("Failed to save project data");
     };
 

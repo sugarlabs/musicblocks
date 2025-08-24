@@ -162,6 +162,7 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         "widgets/phrasemaker",
         "widgets/arpeggio",
         "widgets/aiwidget",
+        "widgets/aidebugger",
         "widgets/pitchdrummatrix",
         "widgets/rhythmruler",
         "widgets/pitchstaircase",
@@ -254,6 +255,7 @@ class Activity {
 
         this.firstTimeUser = false;
         this.beginnerMode = false;
+        this.runMode = "normal";
 
         // Flag to disable keyboard during loading of MB
         this.keyboardEnableFlag;
@@ -1498,6 +1500,7 @@ class Activity {
          * @param env {specifies environment}
          */
         const doFastButton = (activity, env) => {
+            activity.runMode = "normal";
             activity._doFastButton(env);
         };
 
@@ -1733,6 +1736,7 @@ class Activity {
          * Runs Music Blocks at a slower rate
          */
         const doSlowButton = (activity) => {
+            activity.runMode = "slow";
             activity._doSlowButton();
         };
 
@@ -1759,6 +1763,7 @@ class Activity {
          * Runs music blocks step by step
          */
         const doStepButton = (activity) => {
+            activity.runMode = "step";
             activity._doStepButton();
         };
 
