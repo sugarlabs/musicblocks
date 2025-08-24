@@ -9,7 +9,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
-/* */
+/* This widget provides a chat interface for users to interact with AI mentors for project reflection and analysis.*/
 
 /**
  * Represents Reflection Widget.
@@ -338,7 +338,7 @@ class ReflectionMatrix {
      */
     async generateAnalysis() {
         try {
-            console.log(this.summary);
+            console.log("Summary stored", this.summary);
             const response = await fetch(`${this.PORT}/analysis`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -361,7 +361,7 @@ class ReflectionMatrix {
      * @param {boolean} user_query - Flag indicating if the message is from the user.
      * @returns {Promise<void>}
      */
-    async botReplyDiv(message, user_query = true, md = false, download = false) {
+    async botReplyDiv(message, user_query = true, md = false) {
         let reply;
         // check if message is from user or bot
         if (user_query === true) {
@@ -533,6 +533,11 @@ class ReflectionMatrix {
         URL.revokeObjectURL(url);
     }
 
+    /**
+     * Converts Markdown text to HTML.
+     * @param {string} md - The Markdown text.
+     * @returns {string} - The converted HTML text.
+     */
     mdToHTML(md) {
         let html = md;
 
