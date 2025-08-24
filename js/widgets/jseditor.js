@@ -65,9 +65,186 @@ class JSEditor {
             return link;
         });
         this._styles[this._currentStyle].removeAttribute("disabled");
+        this._addErrorStyles();
 
         this._setup();
         this._setLinesCount(this._code);
+    }
+
+    /**
+     * Adds CSS styles for error highlighting
+     * @returns {void}
+     */
+    _addErrorStyles() {
+        if (document.getElementById("js-error-styles")) {
+            return;
+        }
+
+        const style = document.createElement("style");
+        style.id = "js-error-styles";
+        style.textContent = `
+            .error {
+                background-color: #ff4444 !important;
+                color: white !important;
+                border-radius: 2px;
+                padding: 1px 2px;
+                position: relative;
+            }
+            
+            .hljs-keyword {
+                color: #007acc !important;
+                font-weight: bold;
+            }
+            
+            .hljs-built_in {
+                color: #00d4aa !important;
+            }
+            
+            .hljs-title.function_ {
+                color: #ffcc00 !important;
+            }
+            
+            .hljs-number {
+                color: #4ec9b0 !important;
+            }
+            
+            .hljs-string {
+                color: #ff8c00 !important;
+            }
+            
+            .hljs-subst {
+                color: #ff8c00 !important;
+                background-color: rgba(255, 140, 0, 0.1) !important;
+            }
+            
+            .hljs-comment {
+                color: #57a64a !important;
+                font-style: italic;
+            }
+            
+            .hljs-title.class_ {
+                color: #c586c0 !important;
+            }
+            
+            .hljs-variable {
+                color: #4fc1ff !important;
+            }
+            
+            .hljs-params {
+                color: #4fc1ff !important;
+            }
+            
+            .hljs-property {
+                color: #ff79c6 !important;
+            }
+            
+            .hljs-literal {
+                color: #007acc !important;
+            }
+            
+            .hljs-type {
+                color: #00d4aa !important;
+            }
+            
+            .hljs-operator {
+                color: #ffffff !important;
+            }
+            
+            .hljs-punctuation {
+                color: #cccccc !important;
+            }
+            
+            .hljs-regexp {
+                color: #ff5555 !important;
+            }
+            
+            .hljs-symbol {
+                color: #ffcc00 !important;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    /**
+     * Highlights syntax errors in the editor
+     * @param {HTMLElement} editor - the editor element
+     * @returns {void}
+     */
+    _highlightErrors(editor) {
+        const existingErrors = editor.querySelectorAll(".error");
+        existingErrors.forEach(el => {
+            const text = el.textContent;
+            el.replaceWith(text);
+        });
+
+        try {
+            const code = editor.textContent;
+            acorn.parse(code, { ecmaVersion: 2020 });
+        } catch (error) {
+            if (error.pos !== undefined) {
+                this._markErrorAtPosition(editor, error.pos, error.message);
+            }
+            
+            JSEditor.logConsole(`Syntax Error at position ${error.pos}: ${error.message}`);
+        }
+    }
+
+    /**
+     * Marks an error at a specific position in the editor
+     * @param {HTMLElement} editor - the editor element
+     * @param {Number} position - the character position of the error
+     * @param {String} message - the error message
+     * @returns {void}
+     */
+    _markErrorAtPosition(editor, position, message) {
+        const text = editor.textContent;
+        
+        let errorStart = position;
+        let errorEnd = position;
+        
+        while (errorStart > 0) {
+            const char = text.charAt(errorStart - 1);
+            if (char === " " || char === "\n" || char === "\t" || char === ";" || char === "{" || char === "}" || char === "(" || char === ")" || char === ",") {
+                break;
+            }
+            errorStart--;
+        }
+        
+        while (errorEnd < text.length) {
+            const char = text.charAt(errorEnd);
+            if (char === " " || char === "\n" || char === "\t" || char === ";" || char === "{" || char === "}" || char === "(" || char === ")" || char === ",") {
+                break;
+            }
+            errorEnd++;
+        }
+        
+        if (errorStart === errorEnd) {
+            errorEnd = Math.min(errorStart + 1, text.length);
+        }
+        
+        this._markErrorSpan(editor, errorStart, errorEnd, message);
+    }
+
+    /**
+     * Marks an error span in the editor with a simple approach
+     * @param {HTMLElement} editor - the editor element
+     * @param {Number} start - the start position of the error
+     * @param {Number} end - the end position of the error
+     * @param {String} message - the error message
+     * @returns {void}
+     */
+    _markErrorSpan(editor, start, end, message) {
+        const text = editor.textContent;
+        const errorText = text.substring(start, end);
+        
+        const beforeError = text.substring(0, start);
+        const afterError = text.substring(end);
+        
+        const highlightedHTML = beforeError +
+            `<span class="error" title="${message}">${errorText}</span>` +
+            afterError;
+        
+        editor.innerHTML = highlightedHTML;
     }
 
     /**
@@ -253,16 +430,38 @@ class JSEditor {
         codeLines.style.textAlign = "right";
         editorContainer.appendChild(codeLines);
 
+        const debugButtons = document.createElement("div");
+        debugButtons.id = "debugButtons";
+        debugButtons.style.width = "1.5rem";
+        debugButtons.style.height = "100%";
+        debugButtons.style.position = "absolute";
+        debugButtons.style.top = "0";
+        debugButtons.style.left = "2rem";
+        debugButtons.style.zIndex = "98";
+        debugButtons.style.overflow = "hidden";
+        debugButtons.style.boxSizing = "border-box";
+        debugButtons.style.padding = ".25rem .25rem";
+        debugButtons.style.fontFamily = '"PT Mono", monospace';
+        debugButtons.style.fontSize = "12px";
+        debugButtons.style.fontWeight = "400";
+        debugButtons.style.letterSpacing = "normal";
+        debugButtons.style.lineHeight = "20px";
+        debugButtons.style.background = "rgba(255, 255, 255, 0.05)";
+        debugButtons.style.color = "rgba(255, 255, 255, 0.5)";
+        debugButtons.style.textAlign = "center";
+        debugButtons.style.pointerEvents = "none";
+        editorContainer.appendChild(debugButtons);
+
         const codebox = document.createElement("div");
         codebox.classList.add("editor");
-        codebox.classList.add("language-js");
+        codebox.classList.add("language-javascript");
         codebox.style.width = "100%";
         codebox.style.height = "100%";
         codebox.style.position = "absolute";
         codebox.style.top = "0";
         codebox.style.left = "0";
         codebox.style.boxSizing = "border-box";
-        codebox.style.padding = ".25rem .25rem .25rem 2.75rem";
+        codebox.style.padding = ".25rem .25rem .25rem 4.25rem";
         codebox.style.fontFamily = '"PT Mono", monospace';
         codebox.style.fontSize = "14px";
         codebox.style.fontWeight = "400";
@@ -330,8 +529,16 @@ class JSEditor {
         this._editor.appendChild(editorconsole);
 
         const highlight = (editor) => {
-            // editor.textContent = editor.textContent;
-            hljs.highlightBlock(editor);
+            // Configure highlight.js for JavaScript
+            hljs.configure({
+                languages: ["javascript"]
+            });
+            
+            // Apply highlight.js syntax highlighting for JavaScript
+            hljs.highlightElement(editor);
+            
+            // Add error highlighting
+            this._highlightErrors(editor);
         };
 
         this._jar = new CodeJar(codebox, highlight);
@@ -355,6 +562,10 @@ class JSEditor {
         this.widgetWindow.takeFocus();
 
         this._setupDividerResize(divider, editorContainer, editorconsole, consolelabel);
+        
+        window.jsEditor = this;
+        
+        this._setupScrollSync();
     }
 
     /**
@@ -398,6 +609,23 @@ class JSEditor {
     }
 
     /**
+     * Sets up scroll synchronization between line numbers and debug buttons
+     * @returns {void}
+     */
+    _setupScrollSync() {
+        const codebox = document.querySelector(".editor");
+        const codeLines = docById("editorLines");
+        const debugButtons = docById("debugButtons");
+        
+        if (codebox && codeLines && debugButtons) {
+            codebox.addEventListener("scroll", () => {
+                codeLines.scrollTop = codebox.scrollTop;
+                debugButtons.scrollTop = codebox.scrollTop;
+            });
+        }
+    }
+
+    /**
      * Logs a message to the console of the JSEditor widget.
      *
      * @static
@@ -436,10 +664,21 @@ class JSEditor {
         JSEditor.clearConsole();
 
         try {
+            acorn.parse(this._code, { ecmaVersion: 2020 });
+        } catch (e) {
+            JSEditor.logConsole(`Syntax Error: ${e.message}`, "red");
+            return;
+        }
+
+        try {
             MusicBlocks.init(true);
             new Function(this._code)();
+            JSEditor.logConsole("Code executed successfully!", "green");
         } catch (e) {
-            JSEditor.logConsole(e, "maroon");
+            JSEditor.logConsole(`Runtime Error: ${e.message}`, "maroon");
+            if (e.stack) {
+                JSEditor.logConsole(`Stack trace: ${e.stack}`, "maroon");
+            }
         }
     }
 
@@ -502,6 +741,103 @@ class JSEditor {
             text += `${i}\n`;
         }
         docById("editorLines").innerText = text;
+
+        // Update debug buttons
+        this._updateDebugButtons(code);
+    }
+
+    /**
+     * Updates debug buttons for each line of code
+     * 
+     * @param {String} code - the code to create debug buttons for
+     * @returns {void}
+     */
+    _updateDebugButtons(code) {
+        if (!docById("debugButtons")) return;
+        const lines = code.replace(/\n+$/, "\n").split("\n");
+        let buttonsHTML = "";
+        for (let i = 0; i < lines.length; i++) {
+            const lineNumber = i;
+            const lineContent = lines[i].trim();
+            const hasDebugger = lineContent === "debugger;" || lineContent.includes("debugger;");
+            if (lineContent === "") {
+                buttonsHTML += "<div style='height: 20px; line-height: 20px;'>&nbsp;</div>";
+            } else if (hasDebugger) {
+                buttonsHTML += `<div style="height: 20px; line-height: 20px; cursor: pointer; opacity: 1; pointer-events: auto; border-radius: 4px;" \
+                    onclick="window.jsEditor._removeDebuggerFromLine(${lineNumber})" \
+                    title="Remove debugger from line ${lineNumber + 1}">🔴</div>`;
+            } else {
+                buttonsHTML += `<div style="height: 20px; line-height: 20px; cursor: pointer; opacity: 0; transition: opacity 0.2s ease-in-out; pointer-events: auto;" \
+                    onmouseenter="this.style.opacity='1'" \
+                    onmouseleave="this.style.opacity='0'"\
+                    onclick="window.jsEditor._addDebuggerToLine(${lineNumber})" \
+                    title="Add breakpoint to line ${lineNumber + 1}">🔴</div>`;
+            }
+        }
+        docById("debugButtons").innerHTML = buttonsHTML;
+    }
+
+    /**
+     * Adds a debugger statement to a specific line
+     * 
+     * @param {Number} lineNumber - the line number to add debugger to
+     * @returns {void}
+     */
+    _addDebuggerToLine(lineNumber) {
+        const lines = this._code.split("\n");
+        const insertIndex = lineNumber - 1;
+        
+        // Check if the line ends with '{' or ';'
+        const currentLine = lines[insertIndex].trim();
+        if (!currentLine.endsWith("{") && !currentLine.endsWith(";")) {
+            JSEditor.logConsole(`Cannot add breakpoint to line ${lineNumber + 1}. Breakpoints can only be added after lines ending with '{' or ';'`, "red");
+            return;
+        }
+
+        // Prevent adding two breakpoints right next to each other
+        if ((lines[insertIndex] && lines[insertIndex].trim() === "debugger;") ||
+            (lines[insertIndex + 1] && lines[insertIndex + 1].trim() === "debugger;")) {
+            JSEditor.logConsole(`Cannot add breakpoint to line ${lineNumber + 1} because there is already a breakpoint on an adjacent line.`, "red");
+            return;
+        }
+
+        let indent = "";
+        let extraIndent = "";
+        if (insertIndex >= 0 && lines[insertIndex]) {
+            const match = lines[insertIndex].match(/^(\s*)/);
+            if (match) indent = match[1];
+            if (lines[insertIndex].trim().endsWith("{")) {
+                extraIndent = "\t";
+            }
+        } else if (lines.length > 0) {
+            const match = lines[0].match(/^(\s*)/);
+            if (match) indent = match[1];
+        }
+        // Insert debugger statement after the specified line, with matching indentation
+        lines.splice(insertIndex + 1, 0, indent + extraIndent + "debugger;");
+        this._code = lines.join("\n");
+        this._jar.updateCode(this._code);
+        this._setLinesCount(this._code);
+        JSEditor.logConsole(`Debugger added to line ${lineNumber + 1}`, "green");
+    }
+
+    /**
+     * Removes a debugger statement from a specific line
+     * 
+     * @param {Number} lineNumber - the line number to remove debugger from
+     * @returns {void}
+     */
+    _removeDebuggerFromLine(lineNumber) {
+        // Allow removing breakpoints at any time
+        const lines = this._code.split("\n");
+        const currentLine = lines[lineNumber].trim();
+        if (currentLine === "debugger;") {
+            lines.splice(lineNumber, 1);
+        }
+        this._code = lines.join("\n");
+        this._jar.updateCode(this._code);
+        this._setLinesCount(this._code);
+        JSEditor.logConsole(`Debugger removed from line ${lineNumber + 1}`, "orange");
     }
 
     /**
@@ -584,5 +920,29 @@ class JSEditor {
             editorconsole.style.display = "block";
             if (arrowBtn) arrowBtn.innerHTML = "keyboard_arrow_down";
         }
+    }
+
+    /**
+     * Triggered when the status button is pressed.
+     * Opens the status window.
+     *
+     * @returns {void}
+     */
+    _triggerStatusWindow() {
+        // Check if status window is already open
+        if (window.widgetWindows.isOpen("status")) {
+            JSEditor.logConsole("Status window is already open.", "blue");
+            return;
+        }
+
+        if (this.activity.logo.statusMatrix === null) {
+            this.activity.logo.statusMatrix = new StatusMatrix();
+        }
+        
+        this.activity.logo.statusMatrix.init(this.activity);
+        // this.activity.logo.statusFields = [];
+        this.activity.logo.inStatusMatrix = true;
+        
+        JSEditor.logConsole("Status window opened.", "green");
     }
 }
