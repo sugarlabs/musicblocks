@@ -65,9 +65,6 @@ class ReflectionMatrix {
      * Initializes the reflection widget.
      */
 
-    // download current summary
-    // download analysis as text file
-    // .md to html conversion
     init(activity) {
         this.activity = activity;
         this.isOpen = true;
@@ -261,7 +258,7 @@ class ReflectionMatrix {
 
         if (data && !data.error) {
             this.inputContainer.style.display = "flex";
-            this.botReplyDiv(data, false);
+            this.botReplyDiv(data, false, false);
         } else {
             this.activity.errorMsg(_(data.error), 3000);
         }
@@ -328,10 +325,9 @@ class ReflectionMatrix {
         if (this.chatHistory.length < 10) return;
         this.showTypingIndicator();
         const data = await this.generateAnalysis();
-        console.log(data.analysis);
         this.hideTypingIndicator();
         if (data) {
-            this.botReplyDiv(data, false);
+            this.botReplyDiv(data, false, true);
         }
         await this.saveReport(data);
     }
@@ -365,7 +361,7 @@ class ReflectionMatrix {
      * @param {boolean} user_query - Flag indicating if the message is from the user.
      * @returns {Promise<void>}
      */
-    async botReplyDiv(message, user_query = true) {
+    async botReplyDiv(message, user_query = true, md = false, download = false) {
         let reply;
         // check if message is from user or bot
         if (user_query === true) {
@@ -402,8 +398,13 @@ class ReflectionMatrix {
         senderName.innerText = this.mentorsMap[this.AImentor];
 
         const botReply = document.createElement("div");
-        botReply.innerText = reply.response;
 
+        if (md) {
+            botReply.innerHTML = this.mdToHTML(reply.response);
+        } else {
+            botReply.innerText = reply.response;
+        }
+        
         messageContainer.appendChild(senderName);
         messageContainer.appendChild(botReply);
 
@@ -530,5 +531,29 @@ class ReflectionMatrix {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+    }
+
+    mdToHTML(md) {
+        let html = md;
+
+        // Headings
+        html = html.replace(/^###### (.*$)/gim, "<h6>$1</h6>");
+        html = html.replace(/^##### (.*$)/gim, "<h5>$1</h5>");
+        html = html.replace(/^#### (.*$)/gim, "<h4>$1</h4>");
+        html = html.replace(/^### (.*$)/gim, "<h3>$1</h3>");
+        html = html.replace(/^## (.*$)/gim, "<h2>$1</h2>");
+        html = html.replace(/^# (.*$)/gim, "<h1>$1</h1>");
+
+        // Bold & Italic
+        html = html.replace(/\*\*(.*?)\*\*/gim, "<b>$1</b>");
+        html = html.replace(/\*(.*?)\*/gim, "<i>$1</i>");
+
+        // Links
+        html = html.replace(/\[(.*?)\]\((.*?)\)/gim, "<a href='$2' target='_blank'>$1</a>");
+
+        // Line breaks
+        html = html.replace(/\n/gim, "<br>");
+
+        return html.trim();
     }
 }
