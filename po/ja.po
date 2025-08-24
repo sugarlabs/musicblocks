@@ -14,10 +14,10 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.0.1\n"
 
-#js/toolbar.js:111
-#js/toolbar.js:230
-#js/turtledefs.js:504
-#js/turtledefs.js:505
+#: js/toolbar.js:111
+#: js/toolbar.js:230
+#: js/turtledefs.js:504
+#: js/turtledefs.js:505
 #: js/SaveInterface.js:59
 #: js/SaveInterface.js:61
 #: js/SaveInterface.js:93
@@ -103,7 +103,7 @@ msgstr "アクション"
 #: js/macros.js:711
 #: js/utils/musicutils.js:1157
 #: js/utils/synthutils.js:204
-#.TRANS: animal sound effect
+#. TRANS: animal sound effect
 msgid "duck"
 msgstr "あひる"
 
@@ -170,7 +170,7 @@ msgstr "プロジェクトのコードを非表示にする"
 #: planet/js/GlobalPlanet.js:469
 #: planet/js/GlobalPlanet.js:495
 #: planet/js/ProjectStorage.js:27
-#.TRANS: default project title when saving as Lilypond
+#. TRANS: default project title when saving as Lilypond
 msgid "My Project"
 msgstr "自分のプロジェクト"
 
@@ -184,33 +184,33 @@ msgid "Your recording is in progress."
 msgstr "録音中"
 
 #: js/SaveInterface.js:415
-#.TRANS: File name prompt for save as Lilypond
+#. TRANS: File name prompt for save as Lilypond
 msgid "File name"
 msgstr "ファイル名"
 
 #: js/SaveInterface.js:417
 #: planet/js/StringHelper.js:39
-#.TRANS: Project title prompt for save as Lilypond
+#. TRANS: Project title prompt for save as Lilypond
 msgid "Project title"
 msgstr "曲名"
 
 #: js/SaveInterface.js:419
-#.TRANS: Project title prompt for save as Lilypond
+#. TRANS: Project title prompt for save as Lilypond
 msgid "Project author"
 msgstr "作曲家"
 
 #: js/SaveInterface.js:421
-#.TRANS: MIDI prompt for save as Lilypond
+#. TRANS: MIDI prompt for save as Lilypond
 msgid "Include MIDI output?"
 msgstr "MIDIのアウトプットがくふにもまとめましょうか？"
 
 #: js/SaveInterface.js:423
-#.TRANS: Guitar prompt for save as Lilypond
+#. TRANS: Guitar prompt for save as Lilypond
 msgid "Include guitar tablature output?"
 msgstr "ギターのTABもがくふにまとめましょうか？"
 
 #: js/SaveInterface.js:425
-#.TRANS: Lilypond is a scripting language for generating sheet music
+#. TRANS: Lilypond is a scripting language for generating sheet music
 msgid "Save as Lilypond"
 msgstr "Lilypondがくふのフォーマットでほぞん"
 
@@ -232,7 +232,7 @@ msgstr "Lilypondがくふのフォーマットでほぞん"
 #: js/blocks/EnsembleBlocks.js:944
 #: js/blocks/EnsembleBlocks.js:1215
 #: js/blocks/EnsembleBlocks.js:1283
-#.TRANS: default project author when saving as Lilypond
+#. TRANS: default project author when saving as Lilypond
 msgid "Mr. Mouse"
 msgstr "ミスター・マウス"
 
@@ -310,7 +310,7 @@ msgstr "ほうがん（ざひょう）を表示"
 #: js/blocks/RhythmBlocks.js:923
 #: js/blocks/PitchBlocks.js:442
 #: js/blocks/PitchBlocks.js:1786
-#.TRANS: a numeric mapping of the notes in an octave based on the musical mode
+#. TRANS: a numeric mapping of the notes in an octave based on the musical mode
 msgid "scale degree"
 msgstr "音度"
 
@@ -539,8 +539,8 @@ msgstr "ブロックの ヘルプを 保存"
 #: js/block.js:3450
 #: js/utils/musicutils.js:4005
 #: js/utils/musicutils.js:5517
-#.TRANS: the note names must be separated by single spaces
-#.TRANS: the note names must be separated by single spaces
+#. TRANS: the note names must be separated by single spaces
+#. TRANS: the note names must be separated by single spaces
 msgid "ti la sol fa mi re do"
 msgstr "シ ラ ソ ファ ミ レ ド"
 
@@ -699,7 +699,7 @@ msgstr "リズムメーカー"
 
 #: js/block.js:1618
 #: js/blocks/WidgetBlocks.js:397
-#.TRANS: timbre is the character or quality of a musical sound
+#. TRANS: timbre is the character or quality of a musical sound
 msgid "timbre"
 msgstr "音色"
 
@@ -709,14 +709,14 @@ msgstr "階段"
 
 #: js/block.js:1632
 #: js/blocks/WidgetBlocks.js:707
-#.TRANS: the speed at music is should be played.
+#. TRANS: the speed at music is should be played.
 msgid "tempo"
 msgstr "メトロノーム"
 
 #: js/block.js:1639
 #: js/block.js:1702
 #: js/blocks/IntervalsBlocks.js:1464
-#.TRANS: mode, e.g., Major in C Major
+#. TRANS: mode, e.g., Major in C Major
 msgid "mode"
 msgstr "モード（音階）"
 
@@ -747,7 +747,7 @@ msgstr "ドラム"
 #: js/block.js:1667
 #: js/blocks/WidgetBlocks.js:1190
 #: js/blocks/WidgetBlocks.js:1228
-#.TRANS: widget for subdividing a measure into distinct rhythmic elements
+#. TRANS: widget for subdividing a measure into distinct rhythmic elements
 msgid "rhythm maker"
 msgstr "リズムメーカー"
 
@@ -772,7 +772,7 @@ msgstr "リズムメーカー"
 #: js/widgets/phrasemaker.js:2734
 #: js/widgets/phrasemaker.js:2777
 #: js/widgets/phrasemaker.js:2882
-#.TRANS: the value (e.g., 1/4 note) of the note being played.
+#. TRANS: the value (e.g., 1/4 note) of the note being played.
 msgid "note value"
 msgstr "音の長さ"
 
@@ -781,7 +781,7 @@ msgstr "音の長さ"
 #: js/block.js:2331
 #: js/blocks/IntervalsBlocks.js:1071
 #: js/blocks/OrnamentBlocks.js:312
-#.TRANS: calculate a relative step between notes based on semi-tones
+#. TRANS: calculate a relative step between notes based on semi-tones
 msgid "scalar interval"
 msgstr "音階の上下"
 
@@ -802,7 +802,7 @@ msgid "silence"
 msgstr "休符"
 
 #: js/block.js:2542
-#.TRANS: scalar step
+#. TRANS: scalar step
 msgid "down"
 msgstr "下"
 
@@ -820,8 +820,8 @@ msgstr "上"
 #: js/blocks/SensorsBlocks.js:178
 #: js/widgets/musickeyboard.js:1961
 #: js/widgets/phrasemaker.js:1122
-#.TRANS: pitch number
-#.TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
+#. TRANS: pitch number
+#. TRANS: we specify pitch in terms of a name and an octave. The name can be CDEFGAB or Do Re Mi Fa Sol La Ti. Octave is a number between 1 and 8.
 msgid "pitch"
 msgstr "音の高さ"
 
@@ -923,7 +923,7 @@ msgstr "テノール記号"
 #: js/utils/musicutils.js:1109
 #: js/utils/synthutils.js:80
 #: js/blocks/ExtrasBlocks.js:651
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "bass"
 msgstr "コントラバス"
 
@@ -1057,14 +1057,14 @@ msgstr "ブロックが選ばれていません"
 
 #: js/blocks.js:5094
 #: js/blocks/MediaBlocks.js:803
-#.TRANS: Avatar is the image used to determine the appearance of the mouse.
+#. TRANS: Avatar is the image used to determine the appearance of the mouse.
 msgid "avatar"
 msgstr "ネズミへんこう"
 
 #: js/blocks.js:5097
 #: js/blocks/ToneBlocks.js:1010
 #: js/widgets/sampler.js:929
-#.TRANS: The sound sample that the user uploads.
+#. TRANS: The sound sample that the user uploads.
 msgid "sample"
 msgstr "音色サンプル"
 
@@ -1139,7 +1139,7 @@ msgstr "ドラム・スタート"
 #: js/widgets/rhythmruler.js:2123
 #: js/widgets/rhythmruler.js:2130
 #: js/widgets/rhythmruler.js:2209
-#.TRANS: an arrangement of notes based on duration
+#. TRANS: an arrangement of notes based on duration
 msgid "rhythm"
 msgstr "音符"
 
@@ -1175,7 +1175,7 @@ msgstr "実行手順"
 #: js/turtledefs.js:139
 #: js/turtledefs.js:240
 #: planet/js/GlobalTag.js:48
-#.TRANS: On the Planet, we use labels to tag projects.
+#. TRANS: On the Planet, we use labels to tag projects.
 msgid "Sensors"
 msgstr "センサー"
 
@@ -1184,7 +1184,7 @@ msgstr "センサー"
 #: js/turtledefs.js:239
 #: js/blocks/MediaBlocks.js:930
 #: planet/js/GlobalTag.js:46
-#.TRANS: On the Planet, we use labels to tag projects.
+#. TRANS: On the Planet, we use labels to tag projects.
 msgid "Media"
 msgstr "メディア"
 
@@ -1675,7 +1675,7 @@ msgstr "コンパイル完了"
 #: js/widgets/musickeyboard.js:2375
 #: js/widgets/sampler.js:764
 #: js/widgets/phrasemaker.js:1991
-#.TRANS: double sharp is a music term related to pitch
+#. TRANS: double sharp is a music term related to pitch
 msgid "double sharp"
 msgstr "ダブルシャープ"
 
@@ -1687,8 +1687,8 @@ msgstr "ダブルシャープ"
 #: js/widgets/musickeyboard.js:2376
 #: js/widgets/sampler.js:765
 #: js/widgets/phrasemaker.js:1992
-#.TRANS: sharp is a music term related to pitch
-#.TRANS: sharp is a half-step up in pitch
+#. TRANS: sharp is a music term related to pitch
+#. TRANS: sharp is a half-step up in pitch
 msgid "sharp"
 msgstr "シャープ"
 
@@ -1698,7 +1698,7 @@ msgstr "シャープ"
 #: js/widgets/musickeyboard.js:2377
 #: js/widgets/sampler.js:766
 #: js/widgets/phrasemaker.js:1993
-#.TRANS: natural is a music term related to pitch
+#. TRANS: natural is a music term related to pitch
 msgid "natural"
 msgstr "ナチュラル"
 
@@ -1710,8 +1710,8 @@ msgstr "ナチュラル"
 #: js/widgets/musickeyboard.js:2378
 #: js/widgets/sampler.js:767
 #: js/widgets/phrasemaker.js:1994
-#.TRANS: flat is a music term related to pitch
-#.TRANS: flat is a half-step down in pitch
+#. TRANS: flat is a music term related to pitch
+#. TRANS: flat is a half-step down in pitch
 msgid "flat"
 msgstr "フラット"
 
@@ -1721,15 +1721,15 @@ msgstr "フラット"
 #: js/widgets/musickeyboard.js:2379
 #: js/widgets/sampler.js:768
 #: js/widgets/phrasemaker.js:1995
-#.TRANS: double flat is a music term related to pitch
+#. TRANS: double flat is a music term related to pitch
 msgid "double flat"
 msgstr "ダブルフラット"
 
 #: js/piemenus.js:2827
 #: js/utils/musicutils.js:1000
 #: js/blocks/PitchBlocks.js:1385
-#.TRANS: unison is a music term related to intervals
-#.TRANS: unison means the note is the same as the current note
+#. TRANS: unison is a music term related to intervals
+#. TRANS: unison means the note is the same as the current note
 msgid "unison"
 msgstr "ユニゾン（同度）"
 
@@ -1738,14 +1738,14 @@ msgstr "ユニゾン（同度）"
 #: js/utils/musicutils.js:1008
 #: js/utils/musicutils.js:1184
 #: js/utils/musicutils.js:1369
-#.TRANS: major is a music term related to intervals and mode
+#. TRANS: major is a music term related to intervals and mode
 msgid "major"
 msgstr "メジャー"
 
 #: js/piemenus.js:2981
 #: js/piemenus.js:3054
 #: js/utils/musicutils.js:1026
-#.TRANS: modal scale for music
+#. TRANS: modal scale for music
 msgid "ionian"
 msgstr "アイオニアン音階"
 
@@ -1754,14 +1754,14 @@ msgstr "アイオニアン音階"
 #: js/utils/musicutils.js:1006
 #: js/utils/musicutils.js:1185
 #: js/utils/musicutils.js:1366
-#.TRANS: minor is a music term related to intervals and mode
+#. TRANS: minor is a music term related to intervals and mode
 msgid "minor"
 msgstr "マイナー（短）"
 
 #: js/piemenus.js:2983
 #: js/piemenus.js:3058
 #: js/utils/musicutils.js:1036
-#.TRANS: modal scale for music
+#. TRANS: modal scale for music
 msgid "aeolian"
 msgstr "エオリアン音階"
 
@@ -1802,7 +1802,7 @@ msgid "You have chosen key for your pitch preview."
 msgstr ""
 
 #: js/turtle-singer.js:1364
-#.TRANS: partials are weighted components in a harmonic series
+#. TRANS: partials are weighted components in a harmonic series
 msgid "You must have at least one Partial block inside of a Weighted-partial block"
 msgstr "「倍音ウェート」ブロックの中に一つ以上の倍音ブロックが入っている必要があります。"
 
@@ -1811,7 +1811,7 @@ msgid "synth cannot play chords."
 msgstr "このシンセでは和音ができません"
 
 #: js/turtledefs.js:43
-#.TRANS: put the URL to the guide here, e.g., https://github.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md
+#. TRANS: put the URL to the guide here, e.g., https://github.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md
 msgid "guide url"
 msgstr "https://github.com/sugarlabs/musicblocks/tree/master/guide-ja/music_blocks_operation_manual.pdf"
 
@@ -1828,7 +1828,7 @@ msgstr "検索"
 #: js/turtledefs.js:224
 #: js/blocks/MeterBlocks.js:1344
 #: js/blocks/WidgetBlocks.js:522
-#.TRANS: musical meter (time signature), e.g., 4:4
+#. TRANS: musical meter (time signature), e.g., 4:4
 msgid "meter"
 msgstr "拍子"
 
@@ -1897,8 +1897,8 @@ msgstr "その他"
 
 #: js/turtledefs.js:145
 #: js/turtledefs.js:246
-#.TRANS: program as in computer program
-#.TRANS: program as in computer program
+#. TRANS: program as in computer program
+#. TRANS: program as in computer program
 msgid "program"
 msgstr "プログラム"
 
@@ -1920,7 +1920,7 @@ msgstr "論理"
 #: js/turtledefs.js:188
 #: js/turtledefs.js:283
 #: planet/js/GlobalTag.js:34
-#.TRANS: On the Planet, we use labels to tag projects.
+#. TRANS: On the Planet, we use labels to tag projects.
 msgid "Music"
 msgstr "音楽"
 
@@ -2206,7 +2206,7 @@ msgstr ""
 #: js/widgets/temperament.js:317
 #: js/widgets/temperament.js:345
 #: js/widgets/phrasemaker.js:578
-#.TRANS: clear all subdivisions from the ruler.
+#. TRANS: clear all subdivisions from the ruler.
 msgid "Clear"
 msgstr "もとにもどす"
 
@@ -2537,21 +2537,21 @@ msgid "Diminished seventh, plus an octave"
 msgstr "減14度"
 
 #: js/utils/musicutils.js:836
-#.TRANS: ordinal number. Please keep exactly one space between each number.
+#. TRANS: ordinal number. Please keep exactly one space between each number.
 msgid "1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th"
 msgstr "１度 2度 3度 4度 5度 6度 7度 8度 9度 10度 11度 12度"
 
 #: js/utils/musicutils.js:1002
 #: js/utils/musicutils.js:1186
 #: js/utils/musicutils.js:1368
-#.TRANS: augmented is a music term related to intervals
+#. TRANS: augmented is a music term related to intervals
 msgid "augmented"
 msgstr "オーギュメント（増）"
 
 #: js/utils/musicutils.js:1004
 #: js/utils/musicutils.js:1187
 #: js/utils/musicutils.js:1367
-#.TRANS: diminished is a music term related to intervals and mode
+#. TRANS: diminished is a music term related to intervals and mode
 msgid "diminished"
 msgstr "ディミニッシュ（減）"
 
@@ -2560,12 +2560,12 @@ msgstr "ディミニッシュ（減）"
 #: js/blocks/IntervalsBlocks.js:649
 #: js/turtleactions/IntervalsActions.js:120
 #: js/turtleactions/IntervalsActions.js:124
-#.TRANS: perfect is a music term related to intervals
+#. TRANS: perfect is a music term related to intervals
 msgid "perfect"
 msgstr "パーフェクト（完全）"
 
 #: js/utils/musicutils.js:1012
-#.TRANS: twelve semi-tone scale for music
+#. TRANS: twelve semi-tone scale for music
 msgid "chromatic"
 msgstr "クロマティック音階"
 
@@ -2578,62 +2578,62 @@ msgid "spanish"
 msgstr "スペイン音階"
 
 #: js/utils/musicutils.js:1016
-#.TRANS: modal scale in music
+#. TRANS: modal scale in music
 msgid "octatonic"
 msgstr "オクタトニック・スケール"
 
 #: js/utils/musicutils.js:1018
-#.TRANS: harmonic major scale in music
+#. TRANS: harmonic major scale in music
 msgid "harmonic major"
 msgstr "ハーモニック・メジャー（和声長音階）"
 
 #: js/utils/musicutils.js:1020
-#.TRANS: natural minor scales in music
+#. TRANS: natural minor scales in music
 msgid "natural minor"
 msgstr "自然短音階"
 
 #: js/utils/musicutils.js:1022
-#.TRANS: harmonic minor scale in music
+#. TRANS: harmonic minor scale in music
 msgid "harmonic minor"
 msgstr "和声短音階"
 
 #: js/utils/musicutils.js:1024
-#.TRANS: melodic minor scale in music
+#. TRANS: melodic minor scale in music
 msgid "melodic minor"
 msgstr "旋律短音階"
 
 #: js/utils/musicutils.js:1028
-#.TRANS: modal scale for music
+#. TRANS: modal scale for music
 msgid "dorian"
 msgstr "ドリアン音階"
 
 #: js/utils/musicutils.js:1030
-#.TRANS: modal scale for music
+#. TRANS: modal scale for music
 msgid "phrygian"
 msgstr "フリジアン音階"
 
 #: js/utils/musicutils.js:1032
-#.TRANS: modal scale for music
+#. TRANS: modal scale for music
 msgid "lydian"
 msgstr "リディアン音階"
 
 #: js/utils/musicutils.js:1034
-#.TRANS: modal scale for music
+#. TRANS: modal scale for music
 msgid "mixolydian"
 msgstr "ミクソリディアン音階"
 
 #: js/utils/musicutils.js:1038
-#.TRANS: modal scale for music
+#. TRANS: modal scale for music
 msgid "locrian"
 msgstr "ロクリアン音階"
 
 #: js/utils/musicutils.js:1040
-#.TRANS: minor jazz scale for music
+#. TRANS: minor jazz scale for music
 msgid "jazz minor"
 msgstr "オルタード音階"
 
 #: js/utils/musicutils.js:1042
-#.TRANS: bebop scale for music
+#. TRANS: bebop scale for music
 msgid "bebop"
 msgstr "ビバップ音階"
 
@@ -2646,7 +2646,7 @@ msgid "byzantine"
 msgstr "ビザンティン"
 
 #: js/utils/musicutils.js:1046
-#.TRANS: musical scale for music by Verdi
+#. TRANS: musical scale for music by Verdi
 msgid "enigmatic"
 msgstr "ヴェルディの音階"
 
@@ -2655,7 +2655,7 @@ msgid "ethiopian"
 msgstr "エチオピア音階"
 
 #: js/utils/musicutils.js:1049
-#.TRANS: Ethiopic scale for music
+#. TRANS: Ethiopic scale for music
 msgid "geez"
 msgstr "ゲエズ音階"
 
@@ -2668,7 +2668,7 @@ msgid "hungarian"
 msgstr "ハンガリー音階"
 
 #: js/utils/musicutils.js:1053
-#.TRANS: minor Romanian scale for music
+#. TRANS: minor Romanian scale for music
 msgid "romanian minor"
 msgstr "ルーマニア・マイナー音階"
 
@@ -2677,17 +2677,17 @@ msgid "spanish gypsy"
 msgstr "スパニッシュ・ジプシー音階"
 
 #: js/utils/musicutils.js:1056
-#.TRANS: musical scale for Mid-Eastern music
+#. TRANS: musical scale for Mid-Eastern music
 msgid "maqam"
 msgstr "マカーム音階"
 
 #: js/utils/musicutils.js:1058
-#.TRANS: minor blues scale for music
+#. TRANS: minor blues scale for music
 msgid "minor blues"
 msgstr "マイナー・ブルース音階"
 
 #: js/utils/musicutils.js:1060
-#.TRANS: major blues scale for music
+#. TRANS: major blues scale for music
 msgid "major blues"
 msgstr "メジャー・ブルース音階"
 
@@ -2696,12 +2696,12 @@ msgid "whole tone"
 msgstr "ホールトーン音階"
 
 #: js/utils/musicutils.js:1063
-#.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "minor pentatonic"
+#. TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "minor pentatonic"
 msgid "minor pentatonic"
 msgstr "マイナー・ペンタトニック音階"
 
 #: js/utils/musicutils.js:1065
-#.TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "major pentatonic"
+#. TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "major pentatonic"
 msgid "major pentatonic"
 msgstr "メジャー・ペンタトニック音階"
 
@@ -2714,7 +2714,7 @@ msgid "egyptian"
 msgstr "エジプト音階"
 
 #: js/utils/musicutils.js:1069
-#.TRANS: https://en.wikipedia.org/wiki/Hirajoshi_scale NOTE: There are three different versions of this scale
+#. TRANS: https://en.wikipedia.org/wiki/Hirajoshi_scale NOTE: There are three different versions of this scale
 msgid "hirajoshi"
 msgstr "平調子"
 
@@ -2723,17 +2723,17 @@ msgid "Japan"
 msgstr "日本"
 
 #: js/utils/musicutils.js:1072
-#.TRANS: https://en.wikipedia.org/wiki/In_scale and https://en.wikipedia.org/wiki/Sakura_Sakura
+#. TRANS: https://en.wikipedia.org/wiki/In_scale and https://en.wikipedia.org/wiki/Sakura_Sakura
 msgid "in"
 msgstr "陰音階"
 
 #: js/utils/musicutils.js:1074
-#.TRANS: https://en.wikipedia.org/wiki/Miny%C5%8D_scale
+#. TRANS: https://en.wikipedia.org/wiki/Miny%C5%8D_scale
 msgid "minyo"
 msgstr "民謡音階"
 
 #: js/utils/musicutils.js:1076
-#.TRANS: Italian mathematician
+#. TRANS: Italian mathematician
 msgid "fibonacci"
 msgstr "フィボナッチ音階"
 
@@ -2750,56 +2750,56 @@ msgstr "フィボナッチ音階"
 #: js/blocks/VolumeBlocks.js:411
 #: js/turtleactions/VolumeActions.js:224
 #: js/widgets/modewidget.js:913
-#.TRANS: customize voice
+#. TRANS: customize voice
 msgid "custom"
 msgstr "オリジナル"
 
 #: js/utils/musicutils.js:1079
 #: js/utils/musicutils.js:1574
 #: js/blocks/WidgetBlocks.js:176
-#.TRANS: highpass filter
+#. TRANS: highpass filter
 msgid "highpass"
 msgstr "ハイパス・フィルター"
 
 #: js/utils/musicutils.js:1081
 #: js/utils/musicutils.js:1575
-#.TRANS: lowpass filter
+#. TRANS: lowpass filter
 msgid "lowpass"
 msgstr "ローパス・フィルター"
 
 #: js/utils/musicutils.js:1083
 #: js/utils/musicutils.js:1576
-#.TRANS: bandpass filter
+#. TRANS: bandpass filter
 msgid "bandpass"
 msgstr "バンドパス・フィルター"
 
 #: js/utils/musicutils.js:1085
 #: js/utils/musicutils.js:1577
-#.TRANS: high-shelf filter
+#. TRANS: high-shelf filter
 msgid "highshelf"
 msgstr "ハイシェルフ・フィルター"
 
 #: js/utils/musicutils.js:1087
 #: js/utils/musicutils.js:1578
-#.TRANS: low-shelf filter
+#. TRANS: low-shelf filter
 msgid "lowshelf"
 msgstr "ローシェルフ・フィルター"
 
 #: js/utils/musicutils.js:1089
 #: js/utils/musicutils.js:1579
-#.TRANS: notch-shelf filter
+#. TRANS: notch-shelf filter
 msgid "notch"
 msgstr "ノッチ・フィルター"
 
 #: js/utils/musicutils.js:1091
 #: js/utils/musicutils.js:1580
-#.TRANS: all-pass filter
+#. TRANS: all-pass filter
 msgid "allpass"
 msgstr "オールパスフィルター"
 
 #: js/utils/musicutils.js:1093
 #: js/utils/musicutils.js:1581
-#.TRANS: peaking filter
+#. TRANS: peaking filter
 msgid "peaking"
 msgstr "ピーク・フィルタ"
 
@@ -2807,7 +2807,7 @@ msgstr "ピーク・フィルタ"
 #: js/utils/musicutils.js:1589
 #: js/utils/synthutils.js:128
 #: js/blocks/PitchBlocks.js:85
-#.TRANS: sine wave
+#. TRANS: sine wave
 msgid "sine"
 msgstr "サイン波"
 
@@ -2815,7 +2815,7 @@ msgstr "サイン波"
 #: js/utils/musicutils.js:1590
 #: js/utils/synthutils.js:130
 #: js/blocks/PitchBlocks.js:39
-#.TRANS: square wave
+#. TRANS: square wave
 msgid "square"
 msgstr "四角の波"
 
@@ -2824,7 +2824,7 @@ msgstr "四角の波"
 #: js/utils/synthutils.js:134
 #: js/blocks/PitchBlocks.js:62
 #: js/blocks/ToneBlocks.js:39
-#.TRANS: triangle wave
+#. TRANS: triangle wave
 msgid "triangle"
 msgstr "三角の波"
 
@@ -2832,7 +2832,7 @@ msgstr "三角の波"
 #: js/utils/musicutils.js:1592
 #: js/utils/synthutils.js:132
 #: js/blocks/PitchBlocks.js:108
-#.TRANS: sawtooth wave
+#. TRANS: sawtooth wave
 msgid "sawtooth"
 msgstr "ぎざぎざの波"
 
@@ -2841,8 +2841,8 @@ msgstr "ぎざぎざの波"
 #: js/blocks/PitchBlocks.js:931
 #: js/blocks/PitchBlocks.js:937
 #: js/turtleactions/PitchActions.js:469
-#.TRANS: even numbers
-#.TRANS: invert based on even or odd number or musical scale
+#. TRANS: even numbers
+#. TRANS: invert based on even or odd number or musical scale
 msgid "even"
 msgstr "偶数"
 
@@ -2850,7 +2850,7 @@ msgstr "偶数"
 #: js/utils/musicutils.js:1356
 #: js/blocks/PitchBlocks.js:937
 #: js/turtleactions/PitchActions.js:471
-#.TRANS: odd numbers
+#. TRANS: odd numbers
 msgid "odd"
 msgstr "奇数"
 
@@ -2864,116 +2864,116 @@ msgstr "音階的"
 #: js/utils/musicutils.js:1103
 #: js/utils/synthutils.js:72
 #: js/blocks/VolumeBlocks.js:47
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "piano"
 msgstr "ピアノ"
 
 #: js/utils/musicutils.js:1104
 #: js/utils/synthutils.js:74
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "violin"
 msgstr "バイオリン"
 
 #: js/utils/musicutils.js:1105
 #: js/utils/synthutils.js:76
-#.TRANS: viola musical instrument
+#. TRANS: viola musical instrument
 msgid "viola"
 msgstr "ビオラ"
 
 #: js/utils/musicutils.js:1106
 #: js/utils/synthutils.js:116
-#.TRANS: xylophone musical instrument
+#. TRANS: xylophone musical instrument
 msgid "xylophone"
 msgstr "木琴"
 
 #: js/utils/musicutils.js:1107
 #: js/utils/synthutils.js:138
-#.TRANS: vibraphone musical instrument
+#. TRANS: vibraphone musical instrument
 msgid "vibraphone"
 msgstr "鉄琴"
 
 #: js/utils/musicutils.js:1108
 #: js/utils/synthutils.js:78
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "cello"
 msgstr "チェロ"
 
 #: js/utils/musicutils.js:1110
 #: js/utils/synthutils.js:82
-#.TRANS: viola musical instrument
+#. TRANS: viola musical instrument
 msgid "double bass"
 msgstr "ダブルベース"
 
 #: js/utils/musicutils.js:1111
 #: js/utils/synthutils.js:86
 #: js/widgets/rhythmruler.js:2501
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "guitar"
 msgstr "ギター"
 
 #: js/utils/musicutils.js:1112
 #: js/utils/synthutils.js:84
-#.TRANS: sitar musical instrument
+#. TRANS: sitar musical instrument
 msgid "sitar"
 msgstr ""
 
 #: js/utils/musicutils.js:1113
 #: js/utils/synthutils.js:88
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "acoustic guitar"
 msgstr "アコースティック"
 
 #: js/utils/musicutils.js:1114
 #: js/utils/synthutils.js:90
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "flute"
 msgstr "フルート"
 
 #: js/utils/musicutils.js:1115
 #: js/utils/synthutils.js:92
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "clarinet"
 msgstr "クラリネット"
 
 #: js/utils/musicutils.js:1116
 #: js/utils/synthutils.js:94
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "saxophone"
 msgstr "サクソフォン"
 
 #: js/utils/musicutils.js:1117
 #: js/utils/synthutils.js:96
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "tuba"
 msgstr "チューバ"
 
 #: js/utils/musicutils.js:1118
 #: js/utils/synthutils.js:98
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "trumpet"
 msgstr "トランペット"
 
 #: js/utils/musicutils.js:1119
 #: js/utils/synthutils.js:100
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "oboe"
 msgstr "オーボエ"
 
 #: js/utils/musicutils.js:1120
 #: js/utils/synthutils.js:102
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "trombone"
 msgstr "トロンボーン"
 
 #: js/utils/musicutils.js:1121
 #: js/utils/synthutils.js:118
-#.TRANS: polytone synthesizer
+#. TRANS: polytone synthesizer
 msgid "electronic synth"
 msgstr "シンセサイザー"
 
 #: js/utils/musicutils.js:1122
 #: js/utils/synthutils.js:120
-#.TRANS: simple monotone synthesizer
+#. TRANS: simple monotone synthesizer
 msgid "simple 1"
 msgstr "シンプル１"
 
@@ -2992,19 +2992,19 @@ msgstr "シンプル４"
 #: js/utils/musicutils.js:1126
 #: js/utils/synthutils.js:58
 #: js/blocks/DrumBlocks.js:191
-#.TRANS: white noise synthesizer
+#. TRANS: white noise synthesizer
 msgid "white noise"
 msgstr "ホワイトノイズ"
 
 #: js/utils/musicutils.js:1127
 #: js/utils/synthutils.js:60
-#.TRANS: brown noise synthesizer
+#. TRANS: brown noise synthesizer
 msgid "brown noise"
 msgstr "ブラウンノイズ"
 
 #: js/utils/musicutils.js:1128
 #: js/utils/synthutils.js:62
-#.TRANS: pink noise synthesizer
+#. TRANS: pink noise synthesizer
 msgid "pink noise"
 msgstr "ピンクノイズ"
 
@@ -3012,61 +3012,61 @@ msgstr "ピンクノイズ"
 #: js/utils/synthutils.js:150
 #: js/widgets/rhythmruler.js:2047
 #: js/widgets/rhythmruler.js:2309
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "snare drum"
 msgstr "スネアドラム"
 
 #: js/utils/musicutils.js:1131
 #: js/utils/synthutils.js:152
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "kick drum"
 msgstr "キックドラム"
 
 #: js/utils/musicutils.js:1132
 #: js/utils/synthutils.js:154
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "tom tom"
 msgstr "タムタム"
 
 #: js/utils/musicutils.js:1133
 #: js/utils/synthutils.js:156
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "floor tom"
 msgstr "フロアタム"
 
 #: js/utils/musicutils.js:1134
 #: js/utils/synthutils.js:158
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "bass drum"
 msgstr "バスドラム"
 
 #: js/utils/musicutils.js:1135
 #: js/utils/synthutils.js:160
-#.TRANS: a drum made from an inverted cup
+#. TRANS: a drum made from an inverted cup
 msgid "cup drum"
 msgstr "カップドラム"
 
 #: js/utils/musicutils.js:1136
 #: js/utils/synthutils.js:162
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "darbuka drum"
 msgstr "ダブカドラム"
 
 #: js/utils/musicutils.js:1137
 #: js/utils/synthutils.js:166
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "hi hat"
 msgstr "ハイハット"
 
 #: js/utils/musicutils.js:1138
 #: js/utils/synthutils.js:168
-#.TRANS: a small metal bell
+#. TRANS: a small metal bell
 msgid "ride bell"
 msgstr "ライドベル"
 
 #: js/utils/musicutils.js:1139
 #: js/utils/synthutils.js:170
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "cow bell"
 msgstr "カウベル"
 
@@ -3076,149 +3076,149 @@ msgstr "太鼓"
 
 #: js/utils/musicutils.js:1141
 #: js/utils/synthutils.js:176
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "japanese bell"
 msgstr "鉦"
 
 #: js/utils/musicutils.js:1142
 #: js/utils/synthutils.js:172
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "triangle bell"
 msgstr "トライアングル"
 
 #: js/utils/musicutils.js:1143
 #: js/utils/synthutils.js:174
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "finger cymbals"
 msgstr "フィンガーシンバル"
 
 #: js/utils/musicutils.js:1144
 #: js/utils/synthutils.js:178
-#.TRANS: a musically tuned set of bells
+#. TRANS: a musically tuned set of bells
 msgid "chime"
 msgstr "チャイム"
 
 #: js/utils/musicutils.js:1145
 #: js/utils/synthutils.js:180
-#.TRANS: a musical instrument
+#. TRANS: a musical instrument
 msgid "gong"
 msgstr "ドラ"
 
 #: js/utils/musicutils.js:1146
 #: js/utils/synthutils.js:182
-#.TRANS: sound effect
+#. TRANS: sound effect
 msgid "clang"
 msgstr "カチャカチャ"
 
 #: js/utils/musicutils.js:1147
 #: js/utils/synthutils.js:184
-#.TRANS: sound effect
+#. TRANS: sound effect
 msgid "crash"
 msgstr "クラッシュ"
 
 #: js/utils/musicutils.js:1148
 #: js/utils/synthutils.js:186
-#.TRANS: sound effect
+#. TRANS: sound effect
 msgid "bottle"
 msgstr "空きびん"
 
 #: js/utils/musicutils.js:1149
 #: js/utils/synthutils.js:188
-#.TRANS: sound effect
+#. TRANS: sound effect
 msgid "clap"
 msgstr "てびょうし"
 
 #: js/utils/musicutils.js:1150
 #: js/utils/synthutils.js:190
-#.TRANS: sound effect
+#. TRANS: sound effect
 msgid "slap"
 msgstr "ピシャリ"
 
 #: js/utils/musicutils.js:1151
 #: js/utils/synthutils.js:192
-#.TRANS: sound effect
+#. TRANS: sound effect
 msgid "splash"
 msgstr "しぶき"
 
 #: js/utils/musicutils.js:1152
 #: js/utils/synthutils.js:194
-#.TRANS: sound effect
+#. TRANS: sound effect
 msgid "bubbles"
 msgstr "あわ"
 
 #: js/utils/musicutils.js:1153
 #: js/utils/synthutils.js:196
-#.TRANS: sound effect
+#. TRANS: sound effect
 msgid "raindrop"
 msgstr "雨のしずく"
 
 #: js/utils/musicutils.js:1154
 #: js/utils/synthutils.js:198
-#.TRANS: animal sound effect
+#. TRANS: animal sound effect
 msgid "cat"
 msgstr "ねこ"
 
 #: js/utils/musicutils.js:1155
 #: js/utils/synthutils.js:200
-#.TRANS: animal sound effect
+#. TRANS: animal sound effect
 msgid "cricket"
 msgstr "こおろぎ"
 
 #: js/utils/musicutils.js:1156
 #: js/utils/synthutils.js:202
-#.TRANS: animal sound effect
+#. TRANS: animal sound effect
 msgid "dog"
 msgstr "いぬ"
 
 #: js/utils/musicutils.js:1158
 #: js/utils/synthutils.js:104
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "banjo"
 msgstr "バンジョー"
 
 #: js/utils/musicutils.js:1159
 #: js/utils/synthutils.js:106
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "koto"
 msgstr "こと"
 
 #: js/utils/musicutils.js:1160
 #: js/utils/synthutils.js:108
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "dulcimer"
 msgstr "ダルシマー"
 
 #: js/utils/musicutils.js:1161
 #: js/utils/synthutils.js:110
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "electric guitar"
 msgstr "エレキギター"
 
 #: js/utils/musicutils.js:1162
 #: js/utils/synthutils.js:112
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "bassoon"
 msgstr "バスーン"
 
 #: js/utils/musicutils.js:1163
 #: js/utils/synthutils.js:114
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "celeste"
 msgstr "セレスタ"
 
 #: js/utils/musicutils.js:1165
 #: js/widgets/temperament.js:757
-#.TRANS: musical temperament
+#. TRANS: musical temperament
 msgid "equal"
 msgstr "平均律"
 
 #: js/utils/musicutils.js:1167
-#.TRANS: musical temperament
+#. TRANS: musical temperament
 msgid "Pythagorean"
 msgstr "ピタゴラス音律 "
 
 #: js/utils/musicutils.js:1169
-#.TRANS: musical temperament
+#. TRANS: musical temperament
 msgid "just intonation"
 msgstr "純正律"
 
@@ -3227,7 +3227,7 @@ msgstr "純正律"
 #: js/utils/musicutils.js:1608
 #: js/utils/musicutils.js:1623
 #: js/utils/musicutils.js:1624
-#.TRANS: musical temperament
+#. TRANS: musical temperament
 msgid "Meantone"
 msgstr "中全音律"
 
@@ -3306,22 +3306,22 @@ msgid "previous"
 msgstr "この前の"
 
 #: js/utils/synthutils.js:122
-#.TRANS: simple monotone synthesizer
+#. TRANS: simple monotone synthesizer
 msgid "simple-2"
 msgstr "シンプル・シンセ２"
 
 #: js/utils/synthutils.js:124
-#.TRANS: simple monotone synthesizer
+#. TRANS: simple monotone synthesizer
 msgid "simple-3"
 msgstr "シンプル・シンセ３"
 
 #: js/utils/synthutils.js:126
-#.TRANS: simple monotone synthesizer
+#. TRANS: simple monotone synthesizer
 msgid "simple-4"
 msgstr "シンプル・シンセ４"
 
 #: js/utils/synthutils.js:164
-#.TRANS: musical instrument
+#. TRANS: musical instrument
 msgid "taiko"
 msgstr "太鼓"
 
@@ -3478,7 +3478,7 @@ msgstr ""
 
 #: js/blocks/DictBlocks.js:212
 #: js/blocks/DictBlocks.js:354
-#.TRANS: retrieve a value from the dictionary with a given key
+#. TRANS: retrieve a value from the dictionary with a given key
 msgid "get value"
 msgstr "数価を表す"
 
@@ -3500,7 +3500,7 @@ msgstr "キーワード"
 #: js/blocks/DictBlocks.js:430
 #: js/blocks/DictBlocks.js:431
 #: js/blocks/IntervalsBlocks.js:1462
-#.TRANS: key, e.g., C in C Major
+#. TRANS: key, e.g., C in C Major
 msgid "key"
 msgstr "調"
 
@@ -3511,7 +3511,7 @@ msgstr ""
 
 #: js/blocks/DictBlocks.js:286
 #: js/blocks/DictBlocks.js:427
-#.TRANS: set a value in the dictionary for a given key
+#. TRANS: set a value in the dictionary for a given key
 msgid "set value"
 msgstr "値を設定"
 
@@ -3540,7 +3540,7 @@ msgid "Replace every instance of a pitch with a drum sound."
 msgstr ""
 
 #: js/blocks/DrumBlocks.js:328
-#.TRANS: map a pitch to a drum sound
+#. TRANS: map a pitch to a drum sound
 msgid "map pitch to drum"
 msgstr "音符をドラムに変える"
 
@@ -3549,7 +3549,7 @@ msgid "In the example above, a kick drum sound will be played instead of sol."
 msgstr "例の画像に<em>ソル</em>の代わりに<em>キックドラム</em>が鳴らします。"
 
 #: js/blocks/DrumBlocks.js:407
-#.TRANS: set the current drum sound for playback
+#. TRANS: set the current drum sound for playback
 msgid "set drum"
 msgstr "ドラムをせってい"
 
@@ -3582,7 +3582,7 @@ msgid "The Heap-empty? block returns true if the heap is empty."
 msgstr ""
 
 #: js/blocks/HeapBlocks.js:268
-#.TRANS: Is the heap empty?
+#. TRANS: Is the heap empty?
 msgid "heap empty?"
 msgstr "ヒープは空ですか？"
 
@@ -3592,7 +3592,7 @@ msgstr ""
 
 #: js/blocks/HeapBlocks.js:327
 #: js/blocks/HeapBlocks.js:647
-#.TRANS: empty the heap
+#. TRANS: empty the heap
 msgid "empty heap"
 msgstr "空のヒープ"
 
@@ -3601,7 +3601,7 @@ msgid "The Reverse-heap block reverses the order of the heap."
 msgstr ""
 
 #: js/blocks/HeapBlocks.js:384
-#.TRANS: reverse the order of the heap
+#. TRANS: reverse the order of the heap
 msgid "reverse heap"
 msgstr "ヒープを逆にする"
 
@@ -3610,7 +3610,7 @@ msgid "The Index-heap block returns a value in the heap at a specified location.
 msgstr ""
 
 #: js/blocks/HeapBlocks.js:443
-#.TRANS: retrieve a value from the heap at index position in the heap
+#. TRANS: retrieve a value from the heap at index position in the heap
 msgid "index heap"
 msgstr "ヒープに番号をふる"
 
@@ -3633,13 +3633,13 @@ msgstr ""
 
 #: js/blocks/HeapBlocks.js:539
 #: js/blocks/ProgramBlocks.js:299
-#.TRANS: load the heap from a JSON encoding
+#. TRANS: load the heap from a JSON encoding
 msgid "set heap"
 msgstr "ヒープを設定する"
 
 #: js/blocks/HeapBlocks.js:544
 #: js/blocks/EnsembleBlocks.js:96
-#.TRANS: value1 is a numeric value (JAPANESE ONLY)
+#. TRANS: value1 is a numeric value (JAPANESE ONLY)
 msgid "index"
 msgstr "インデックス"
 
@@ -3648,7 +3648,7 @@ msgid "The Pop block removes the value at the top of the heap."
 msgstr ""
 
 #: js/blocks/HeapBlocks.js:633
-#.TRANS: pop a value off the top of the heap
+#. TRANS: pop a value off the top of the heap
 msgid "pop"
 msgstr "ポップ"
 
@@ -3657,7 +3657,7 @@ msgid "The Push block adds a value to the top of the heap."
 msgstr ""
 
 #: js/blocks/HeapBlocks.js:696
-#.TRANS: push a value onto the top of the heap
+#. TRANS: push a value onto the top of the heap
 msgid "push"
 msgstr "プッシュ"
 
@@ -3677,7 +3677,7 @@ msgstr "音律をせってい"
 #: js/blocks/ToneBlocks.js:1025
 #: js/blocks/MediaBlocks.js:746
 #: js/turtleactions/IntervalsActions.js:114
-#.TRANS: adjusts the shift up or down by one octave (twelve half-steps in the interval between two notes, one having twice or half the frequency in Hz of the other.)
+#. TRANS: adjusts the shift up or down by one octave (twelve half-steps in the interval between two notes, one having twice or half the frequency in Hz of the other.)
 msgid "octave"
 msgstr "オクターヴの高さ"
 
@@ -3702,7 +3702,7 @@ msgid "current interval"
 msgstr "現在の音階"
 
 #: js/blocks/IntervalsBlocks.js:387
-#.TRANS: measure the distance between two pitches in semi-tones
+#. TRANS: measure the distance between two pitches in semi-tones
 msgid "semi-tone interval measure"
 msgstr "半音階的音程で計る"
 
@@ -3716,7 +3716,7 @@ msgid "The Scalar interval block measures the distance between two notes in the 
 msgstr ""
 
 #: js/blocks/IntervalsBlocks.js:502
-#.TRANS: measure the distance between two pitches in steps of musical scale
+#. TRANS: measure the distance between two pitches in steps of musical scale
 msgid "scalar interval measure"
 msgstr "全音階的音程で計る"
 
@@ -3726,7 +3726,7 @@ msgstr "例の画像には<em>ソル</em>が<em>ソル#</em>になります。"
 
 #: js/blocks/IntervalsBlocks.js:684
 #: js/blocks/OrnamentBlocks.js:220
-#.TRANS: calculate a relative step between notes based on semi-tones
+#. TRANS: calculate a relative step between notes based on semi-tones
 msgid "semi-tone interval"
 msgstr "半音階的音程"
 
@@ -3764,7 +3764,7 @@ msgid "In the figure, we add la to sol."
 msgstr "<br><br>上の図では、ソの「音符（おんぷ）ブロック」をきじゅんにして、「音階の上下ブロック」のすうちを２にせっていしているので、ソと、ソから２音あがったシの音が同時にえんそうされる。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。"
 
 #: js/blocks/IntervalsBlocks.js:1120
-#.TRANS: define a custom mode
+#. TRANS: define a custom mode
 msgid "define mode"
 msgstr "モードを定義する"
 
@@ -3773,7 +3773,7 @@ msgid "movable Do"
 msgstr "移動ド"
 
 #: js/blocks/IntervalsBlocks.js:1224
-#.TRANS: mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
+#. TRANS: mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
 msgid "mode length"
 msgstr "音階の音数"
 
@@ -3786,18 +3786,18 @@ msgid "Most Western scales have 7 notes."
 msgstr "西洋のほとんどの音階は、7つの音をもつ。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。"
 
 #: js/blocks/IntervalsBlocks.js:1284
-#.TRANS: the mode in music is 'major', 'minor', etc.
+#. TRANS: the mode in music is 'major', 'minor', etc.
 msgid "current mode"
 msgstr "現代の音階"
 
 #: js/blocks/IntervalsBlocks.js:1337
-#.TRANS: the key is a group of pitches with which a music composition is created
+#. TRANS: the key is a group of pitches with which a music composition is created
 msgid "current key"
 msgstr "現代の調"
 
 #: js/blocks/IntervalsBlocks.js:1389
 #: js/blocks/IntervalsBlocks.js:1434
-#.TRANS: set the key and mode, e.g. C Major
+#. TRANS: set the key and mode, e.g. C Major
 msgid "set key"
 msgstr "調をせってい"
 
@@ -3918,7 +3918,7 @@ msgstr "スラーの長さファクター"
 
 #: js/blocks/OrnamentBlocks.js:217
 #: js/blocks/OrnamentBlocks.js:309
-#.TRANS: the neighbor refers to a neighboring note, e.g., D is a neighbor of C
+#. TRANS: the neighbor refers to a neighboring note, e.g., D is a neighbor of C
 msgid "neighbor"
 msgstr "音を加える"
 
@@ -3937,7 +3937,7 @@ msgstr "スラー"
 
 #: js/blocks/OrnamentBlocks.js:558
 #: js/blocks/OrnamentBlocks.js:710
-#.TRANS: play each note sharply detached from the others
+#. TRANS: play each note sharply detached from the others
 msgid "staccato"
 msgstr "スタッカート"
 
@@ -3946,7 +3946,7 @@ msgid "The Load-heap-from-app block loads the heap from a web page."
 msgstr ""
 
 #: js/blocks/ProgramBlocks.js:44
-#.TRANS: load the heap contents from a URL
+#. TRANS: load the heap contents from a URL
 msgid "load heap from App"
 msgstr "アプリからヒープをロード"
 
@@ -3963,7 +3963,7 @@ msgid "The Save-heap-to-app block saves the heap to a web page."
 msgstr ""
 
 #: js/blocks/ProgramBlocks.js:144
-#.TRANS: save the heap contents to a URL
+#. TRANS: save the heap contents to a URL
 msgid "save heap to App"
 msgstr "アプリにヒープを保存"
 
@@ -3976,7 +3976,7 @@ msgid "The Load-heap block loads the heap from a file."
 msgstr ""
 
 #: js/blocks/ProgramBlocks.js:217
-#.TRANS: load the heap from a file
+#. TRANS: load the heap from a file
 msgid "load heap"
 msgstr "ヒープをロードする"
 
@@ -4005,7 +4005,7 @@ msgid "The Load-dictionary block loads a dictionary from a file."
 msgstr ""
 
 #: js/blocks/ProgramBlocks.js:372
-#.TRANS: load a dictionary from a file
+#. TRANS: load a dictionary from a file
 msgid "load dictionary"
 msgstr "辞書をロード"
 
@@ -4028,7 +4028,7 @@ msgid "The Set-dictionary block loads a dictionary."
 msgstr ""
 
 #: js/blocks/ProgramBlocks.js:477
-#.TRANS: load a dictionary from a JSON
+#. TRANS: load a dictionary from a JSON
 msgid "set dictionary"
 msgstr "辞書を設定"
 
@@ -4045,7 +4045,7 @@ msgid "The Save-heap block saves the heap to a file."
 msgstr ""
 
 #: js/blocks/ProgramBlocks.js:578
-#.TRANS: save the heap to a file
+#. TRANS: save the heap to a file
 msgid "save heap"
 msgstr "ヒープを保存する"
 
@@ -4054,7 +4054,7 @@ msgid "The Save-dictionary block saves a dictionary to a file."
 msgstr ""
 
 #: js/blocks/ProgramBlocks.js:640
-#.TRANS: save a dictionary to a file
+#. TRANS: save a dictionary to a file
 msgid "save dictionary"
 msgstr "辞書を保存"
 
@@ -4071,7 +4071,7 @@ msgid "The Delete block block removes a block."
 msgstr ""
 
 #: js/blocks/ProgramBlocks.js:797
-#.TRANS: Move this block to the trash.
+#. TRANS: Move this block to the trash.
 msgid "delete block"
 msgstr "ブロックを消す"
 
@@ -4080,7 +4080,7 @@ msgid "The Move block block moves a block."
 msgstr ""
 
 #: js/blocks/ProgramBlocks.js:869
-#.TRANS: Move the position of a block on the screen.
+#. TRANS: Move the position of a block on the screen.
 msgid "move block"
 msgstr "ブロックを動かす"
 
@@ -4114,7 +4114,7 @@ msgid "y"
 msgstr "yざひょう（たて）"
 
 #: js/blocks/ProgramBlocks.js:935
-#.TRANS: Run program beginning at this block.
+#. TRANS: Run program beginning at this block.
 msgid "run block"
 msgstr "ブロックを再生"
 
@@ -4123,7 +4123,7 @@ msgid "The Dock block block connections two blocks."
 msgstr ""
 
 #: js/blocks/ProgramBlocks.js:1036
-#.TRANS: We can connect a block to another block.
+#. TRANS: We can connect a block to another block.
 msgid "connect blocks"
 msgstr "ブロックを繋ぐ"
 
@@ -4140,7 +4140,7 @@ msgid "The Make block block creates a new block."
 msgstr ""
 
 #: js/blocks/ProgramBlocks.js:1152
-#.TRANS: Create a new block
+#. TRANS: Create a new block
 msgid "make block"
 msgstr "ブロックを作る"
 
@@ -4155,7 +4155,7 @@ msgstr "ブロックを作る"
 #: js/widgets/temperament.js:484
 #: js/widgets/temperament.js:589
 #: plugins/rodi.rtp:192
-#.TRANS: a musical note consisting of pitch and duration
+#. TRANS: a musical note consisting of pitch and duration
 msgid "note"
 msgstr "音符"
 
@@ -4189,12 +4189,12 @@ msgstr "音の長さは、0より大きいあたいをせっていしてくだ�
 #: js/blocks/RhythmBlocks.js:215
 #: js/blocks/RhythmBlocks.js:278
 #: js/blocks/RhythmBlocks.js:350
-#.TRANS: swing is a rhythmic variation that emphasises the offbeat
+#. TRANS: swing is a rhythmic variation that emphasises the offbeat
 msgid "swing"
 msgstr "スイング"
 
 #: js/blocks/RhythmBlocks.js:355
-#.TRANS: the amount to shift to the offbeat note
+#. TRANS: the amount to shift to the offbeat note
 msgid "swing value"
 msgstr "スイングの数値"
 
@@ -4203,12 +4203,12 @@ msgid "The Skip notes block will cause notes to be skipped."
 msgstr ""
 
 #: js/blocks/RhythmBlocks.js:427
-#.TRANS: substitute rests on notes being skipped
+#. TRANS: substitute rests on notes being skipped
 msgid "skip notes"
 msgstr "音符の省略"
 
 #: js/blocks/RhythmBlocks.js:489
-#.TRANS: speed up note duration by some factor, e.g. convert 1/4 to 1/8 notes by using a factor of 2
+#. TRANS: speed up note duration by some factor, e.g. convert 1/4 to 1/8 notes by using a factor of 2
 msgid "multiply note value"
 msgstr "音価を～倍にするファクター"
 
@@ -4217,13 +4217,13 @@ msgid "The Tie block works on pairs of notes, combining them into one note."
 msgstr "<h2>タイブロック</h2><br>２つの音をつなげて１つの音にする。「音の高さブロック」を入れて使う。同じ高さの音だけ、つなぐことができる。"
 
 #: js/blocks/RhythmBlocks.js:550
-#.TRANS: tie notes together into one longer note
+#. TRANS: tie notes together into one longer note
 msgid "tie"
 msgstr "タイ"
 
 #: js/blocks/RhythmBlocks.js:591
 #: js/blocks/RhythmBlocks.js:671
-#.TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
+#. TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
 msgid "dot"
 msgstr "付点音符"
 
@@ -4241,7 +4241,7 @@ msgid "Eg a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat."
 msgstr ""
 
 #: js/blocks/RhythmBlocks.js:765
-#.TRANS: Japanese only: note value block for drum
+#. TRANS: Japanese only: note value block for drum
 msgid "note value drum"
 msgstr "音符（ドラム）"
 
@@ -4273,8 +4273,8 @@ msgstr "オクターヴ・スペース"
 
 #: js/blocks/RhythmBlockPaletteBlocks.js:50
 #: js/blocks/RhythmBlockPaletteBlocks.js:233
-#.TRANS: rhythm block
-#.TRANS: translate "rhythm1" as rhythm
+#. TRANS: rhythm block
+#. TRANS: translate "rhythm1" as rhythm
 msgid "rhythm1"
 msgstr "連符（かけ算）"
 
@@ -4330,7 +4330,7 @@ msgstr "全音符"
 #: js/blocks/RhythmBlockPaletteBlocks.js:514
 #: js/blocks/RhythmBlockPaletteBlocks.js:583
 #: js/blocks/RhythmBlockPaletteBlocks.js:634
-#.TRANS: A tuplet is a note value divided into irregular time values.
+#. TRANS: A tuplet is a note value divided into irregular time values.
 msgid "tuplet"
 msgstr "～連符（タプル）"
 
@@ -4487,12 +4487,12 @@ msgid "duplicate factor"
 msgstr "複製ファクター"
 
 #: js/blocks/MeterBlocks.js:34
-#.TRANS: musical meter (time signature), e.g., 4:4
+#. TRANS: musical meter (time signature), e.g., 4:4
 msgid "current meter"
 msgstr "現代の拍子"
 
 #: js/blocks/MeterBlocks.js:85
-#.TRANS: number of beats per minute
+#. TRANS: number of beats per minute
 msgid "beat factor"
 msgstr "拍を～倍にするファクター"
 
@@ -4502,8 +4502,8 @@ msgstr ""
 
 #: js/blocks/MeterBlocks.js:170
 #: js/widgets/status.js:148
-#.TRANS: number of beats played per minute
-#.TRANS: in Japanese: "１分当たりの拍の数"
+#. TRANS: number of beats played per minute
+#. TRANS: in Japanese: "１分当たりの拍の数"
 msgid "beats per minute2"
 msgstr "１分当たりの拍の数"
 
@@ -4511,12 +4511,12 @@ msgstr "１分当たりの拍の数"
 #: js/blocks/MeterBlocks.js:1057
 #: js/blocks/MeterBlocks.js:1134
 #: js/blocks/MeterBlocks.js:1212
-#.TRANS: sets tempo by defining a beat and beats per minute
+#. TRANS: sets tempo by defining a beat and beats per minute
 msgid "beats per minute"
 msgstr "スピードを決める"
 
 #: js/blocks/MeterBlocks.js:234
-#.TRANS: count of current musical measure in meter
+#. TRANS: count of current musical measure in meter
 msgid "measure count"
 msgstr "小節の数"
 
@@ -4525,7 +4525,7 @@ msgid "The Measure count block returns the current measure."
 msgstr ""
 
 #: js/blocks/MeterBlocks.js:291
-#.TRANS: count of current beat in the meter
+#. TRANS: count of current beat in the meter
 msgid "beat count"
 msgstr "拍の位置"
 
@@ -4542,7 +4542,7 @@ msgid "eg 1, 2, 3, or 4."
 msgstr "<br>図の例では、それぞれの小節の１拍（ぱく）目に、特定のアクション・イベントを起こしている。"
 
 #: js/blocks/MeterBlocks.js:369
-#.TRANS: count the number of notes
+#. TRANS: count the number of notes
 msgid "sum note values"
 msgstr "音の長さを足す"
 
@@ -4552,12 +4552,12 @@ msgid "The Note counter block can be used to count the number of contained notes
 msgstr ""
 
 #: js/blocks/MeterBlocks.js:433
-#.TRANS: count the number of notes
+#. TRANS: count the number of notes
 msgid "note counter"
 msgstr "音符の合計数"
 
 #: js/blocks/MeterBlocks.js:497
-#.TRANS: number of whole notes that have been played
+#. TRANS: number of whole notes that have been played
 msgid "whole notes played"
 msgstr "さいせいされた全音符の数"
 
@@ -4567,7 +4567,7 @@ msgstr ""
 
 #: js/blocks/MeterBlocks.js:556
 #: js/turtleactions/DictActions.js:83
-#.TRANS: number of notes that have been played
+#. TRANS: number of notes that have been played
 msgid "notes played"
 msgstr "全体の拍の数"
 
@@ -4576,7 +4576,7 @@ msgid "The No clock block decouples the notes from the master clock."
 msgstr "<em>クロックなし</em>ブロックはそれぞれの動作の順番をリズムより優先します。"
 
 #: js/blocks/MeterBlocks.js:662
-#.TRANS: don't lock notes to master clock
+#. TRANS: don't lock notes to master clock
 msgid "no clock"
 msgstr "クロックなし"
 
@@ -4626,7 +4626,7 @@ msgstr ""
 
 #: js/blocks/MeterBlocks.js:929
 #: js/blocks/MeterBlocks.js:1000
-#.TRANS: sets tempo by defining a beat and beats per minute
+#. TRANS: sets tempo by defining a beat and beats per minute
 msgid "master beats per minute"
 msgstr "全体のスピードを決める"
 
@@ -4659,7 +4659,7 @@ msgid "The Beats per minute block sets the number of 1/4 notes per minute."
 msgstr "<h2>スピードを決めるブロック</h2><br>１分あたりの拍（はく）の数をせっていすることで、曲のスピードを決める。ひょうじゅんは４分音符（おんぷ）９０こ。<br><br>★拍（はく）とは<br>くり返されるリズムのこと。"
 
 #: js/blocks/MeterBlocks.js:1280
-#.TRANS: anacrusis
+#. TRANS: anacrusis
 msgid "pickup"
 msgstr "ピックアップ"
 
@@ -4668,12 +4668,12 @@ msgid "number of beats"
 msgstr "拍の数"
 
 #: js/blocks/PitchBlocks.js:141
-#.TRANS: musical transposition (adjustment of pitch up or down)
+#. TRANS: musical transposition (adjustment of pitch up or down)
 msgid "transposition"
 msgstr "移調"
 
 #: js/blocks/PitchBlocks.js:168
-#.TRANS: step down one note in current musical scale
+#. TRANS: step down one note in current musical scale
 msgid "scalar step down"
 msgstr "音階内で~度下がる:"
 
@@ -4682,7 +4682,7 @@ msgid "The Scalar step down block returns the number of semi-tones down to the p
 msgstr ""
 
 #: js/blocks/PitchBlocks.js:190
-#.TRANS: step up one note in current musical scale
+#. TRANS: step up one note in current musical scale
 msgid "scalar step up"
 msgstr "音階内で~度上がる:"
 
@@ -4691,7 +4691,7 @@ msgid "The Scalar step up block returns the number of semi-tones up to the next 
 msgstr ""
 
 #: js/blocks/PitchBlocks.js:212
-#.TRANS: the change measured in half-steps between the current pitch and the previous pitch
+#. TRANS: the change measured in half-steps between the current pitch and the previous pitch
 msgid "change in pitch"
 msgstr "音程の違い"
 
@@ -4700,7 +4700,7 @@ msgid "The Change in pitch block is the difference (in half steps) between the c
 msgstr "<em>音程の違い</em>ブロックは現在に鳴らされている音高と現在のちょうど前に鳴らされている音高（半音の値で）の違いです。"
 
 #: js/blocks/PitchBlocks.js:243
-#.TRANS: the change measured in scale-steps between the current pitch and the previous pitch
+#. TRANS: the change measured in scale-steps between the current pitch and the previous pitch
 msgid "scalar change in pitch"
 msgstr "音階のよって音程の違い"
 
@@ -4711,8 +4711,8 @@ msgstr "音階のよって音程の違い"
 #: js/widgets/temperament.js:582
 #: js/widgets/temperament.js:586
 #: js/widgets/temperament.js:824
-#.TRANS: convert current note to piano key (1-88)
-#.TRANS: a mapping of pitch to the 88 piano keys
+#. TRANS: convert current note to piano key (1-88)
+#. TRANS: a mapping of pitch to the 88 piano keys
 msgid "pitch number"
 msgstr "音の高さを数で表示"
 
@@ -4722,7 +4722,7 @@ msgstr "<h2>音の高さを数で表示ブロック</h2><br>音の高さを数�
 
 #: js/blocks/PitchBlocks.js:329
 #: js/blocks/PitchBlocks.js:433
-#.TRANS: the current pitch expressed in Hertz
+#. TRANS: the current pitch expressed in Hertz
 msgid "pitch in hertz"
 msgstr "音の高さをヘルツで表示"
 
@@ -4748,7 +4748,7 @@ msgid "alphabet"
 msgstr "アルファベット"
 
 #: js/blocks/PitchBlocks.js:436
-#.TRANS: Translate as "alphabet class"
+#. TRANS: Translate as "alphabet class"
 msgid "letter class"
 msgstr "アルファベット・クラス"
 
@@ -4786,12 +4786,12 @@ msgstr "音の高さを色に"
 
 #: js/blocks/PitchBlocks.js:629
 #: js/widgets/musickeyboard.js:753
-#.TRANS: MIDI is a technical standard for electronic music
+#. TRANS: MIDI is a technical standard for electronic music
 msgid "MIDI"
 msgstr ""
 
 #: js/blocks/PitchBlocks.js:642
-#.TRANS: set an offset associated with the numeric piano keyboard mapping
+#. TRANS: set an offset associated with the numeric piano keyboard mapping
 msgid "set pitch number offset"
 msgstr "音高の数字を初期化"
 
@@ -4803,12 +4803,12 @@ msgstr ""
 #: js/blocks/PitchBlocks.js:934
 #: js/blocks/PitchBlocks.js:1866
 #: js/blocks/MediaBlocks.js:746
-#.TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
+#. TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
 msgid "name2"
 msgstr "名前"
 
 #: js/blocks/PitchBlocks.js:679
-#.TRANS: convert piano key number (1-88) to pitch
+#. TRANS: convert piano key number (1-88) to pitch
 msgid "number to pitch"
 msgstr "数字を音名へ"
 
@@ -4817,7 +4817,7 @@ msgid "The Number to pitch block will convert a pitch number to a pich name."
 msgstr ""
 
 #: js/blocks/PitchBlocks.js:715
-#.TRANS: convert piano key number (1-88) to octave
+#. TRANS: convert piano key number (1-88) to octave
 msgid "number to octave"
 msgstr "数値をオクターヴ表記へ"
 
@@ -4863,22 +4863,22 @@ msgstr ""
 
 #: js/blocks/PitchBlocks.js:929
 #: js/widgets/modewidget.js:137
-#.TRANS: pitch inversion rotates a pitch around another pitch
+#. TRANS: pitch inversion rotates a pitch around another pitch
 msgid "Invert"
 msgstr "転回を"
 
 #: js/blocks/PitchBlocks.js:968
-#.TRANS: pitch inversion rotates a pitch around another pitch (odd number)
+#. TRANS: pitch inversion rotates a pitch around another pitch (odd number)
 msgid "invert (odd)"
 msgstr "転回を （奇数）"
 
 #: js/blocks/PitchBlocks.js:1001
-#.TRANS: pitch inversion rotates a pitch around another pitch (even number)
+#. TRANS: pitch inversion rotates a pitch around another pitch (even number)
 msgid "invert (even)"
 msgstr "転回を （偶数）"
 
 #: js/blocks/PitchBlocks.js:1022
-#.TRANS: register is the octave of the current pitch
+#. TRANS: register is the octave of the current pitch
 msgid "register"
 msgstr "登録"
 
@@ -4887,7 +4887,7 @@ msgid "The Register block provides an easy way to modify the register (octave) o
 msgstr ""
 
 #: js/blocks/PitchBlocks.js:1047
-#.TRANS: cents are units used to specify the ratio between pitches. There are 100 cents between successive notes.
+#. TRANS: cents are units used to specify the ratio between pitches. There are 100 cents between successive notes.
 msgid "50 cents"
 msgstr ""
 
@@ -4900,7 +4900,7 @@ msgid "In the example shown above, sol is shifted up to sol#."
 msgstr "例の画像に<em>ソル</em>が<em>ソル#</em>に上に移動されています。"
 
 #: js/blocks/PitchBlocks.js:1110
-#.TRANS: adjust the amount of shift (up or down) of a pitch
+#. TRANS: adjust the amount of shift (up or down) of a pitch
 msgid "semi-tone transpose"
 msgstr "半音で移調"
 
@@ -4909,47 +4909,47 @@ msgid "The Transpose by Ratio block will shift the pitches contained inside Note
 msgstr "「比で移動」ブロックは 音符の中のピッチを比で移動させる。"
 
 #: js/blocks/PitchBlocks.js:1149
-#.TRANS: adjust the amount of shift (up or down) of a pitch
+#. TRANS: adjust the amount of shift (up or down) of a pitch
 msgid "transpose by ratio"
 msgstr "比で移動"
 
 #: js/blocks/PitchBlocks.js:1232
-#.TRANS: down sixth means the note is five scale degrees below current note
+#. TRANS: down sixth means the note is five scale degrees below current note
 msgid "down sixth"
 msgstr "音階で6度下"
 
 #: js/blocks/PitchBlocks.js:1251
-#.TRANS: down third means the note is two scale degrees below current note
+#. TRANS: down third means the note is two scale degrees below current note
 msgid "down third"
 msgstr "音階で3度下"
 
 #: js/blocks/PitchBlocks.js:1270
-#.TRANS: seventh means the note is the six scale degrees above current note
+#. TRANS: seventh means the note is the six scale degrees above current note
 msgid "seventh"
 msgstr "7度の音"
 
 #: js/blocks/PitchBlocks.js:1289
-#.TRANS: sixth means the note is the five scale degrees above current note
+#. TRANS: sixth means the note is the five scale degrees above current note
 msgid "sixth"
 msgstr "6度の音"
 
 #: js/blocks/PitchBlocks.js:1308
-#.TRANS: fifth means the note is the four scale degrees above current note
+#. TRANS: fifth means the note is the four scale degrees above current note
 msgid "fifth"
 msgstr "5度の音"
 
 #: js/blocks/PitchBlocks.js:1328
-#.TRANS: fourth means the note is three scale degrees above current note
+#. TRANS: fourth means the note is three scale degrees above current note
 msgid "fourth"
 msgstr "４度の音"
 
 #: js/blocks/PitchBlocks.js:1347
-#.TRANS: third means the note is two scale degrees above current note
+#. TRANS: third means the note is two scale degrees above current note
 msgid "third"
 msgstr "3度の音"
 
 #: js/blocks/PitchBlocks.js:1366
-#.TRANS: second means the note is one scale degree above current note
+#. TRANS: second means the note is one scale degree above current note
 msgid "second"
 msgstr "2度の音"
 
@@ -4962,7 +4962,7 @@ msgid "In the example shown above, sol is shifted up to la."
 msgstr "<br><br>図の例では、ソがラに、ラがシに、シがドに…と置きかえられている。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。<br>★調とは<br>中心的な役わりをはたす音と、音階の種類によって決まる、曲の感じ。中心的な役わりをはたす音だけを指すこともある。"
 
 #: js/blocks/PitchBlocks.js:1416
-#.TRANS: adjust the amount of shift (up or down) of a pitch by musical scale (scalar) steps
+#. TRANS: adjust the amount of shift (up or down) of a pitch by musical scale (scalar) steps
 msgid "scalar transpose"
 msgstr "調を変える"
 
@@ -4971,7 +4971,7 @@ msgid "The Accidental block is used to create sharps and flats"
 msgstr "<em>変化記号</em>ブロックは <em>シャープ(嬰)</em>と<em>フラット(変)</em>を決める機能です。"
 
 #: js/blocks/PitchBlocks.js:1458
-#.TRANS: An accidental is a modification to a pitch, e.g., sharp or flat.
+#. TRANS: An accidental is a modification to a pitch, e.g., sharp or flat.
 msgid "accidental override"
 msgstr "変化記号無視"
 
@@ -4979,7 +4979,7 @@ msgstr "変化記号無視"
 #: js/blocks/MediaBlocks.js:679
 #: js/widgets/musickeyboard.js:1962
 #: js/widgets/phrasemaker.js:1123
-#.TRANS: a measure of frequency: one cycle per second
+#. TRANS: a measure of frequency: one cycle per second
 msgid "hertz"
 msgstr "ヘルツ"
 
@@ -4993,8 +4993,8 @@ msgstr ""
 
 #: js/blocks/PitchBlocks.js:1703
 #: js/blocks/PitchBlocks.js:1745
-#.TRANS: a numeric mapping of the notes in an octave based on the musical mode
-#.TRANS: a numeric mapping of the notes in an octave based on the musical mode
+#. TRANS: a numeric mapping of the notes in an octave based on the musical mode
+#. TRANS: a numeric mapping of the notes in an octave based on the musical mode
 msgid "nth modal pitch"
 msgstr "ピッチ度"
 
@@ -5023,7 +5023,7 @@ msgid "Scale Degree 1 is always the first pitch in a given scale, regardless of 
 msgstr ""
 
 #: js/blocks/PitchBlocks.js:1814
-#.TRANS: step some number of notes in current musical scale
+#. TRANS: step some number of notes in current musical scale
 msgid "scalar step"
 msgstr "音階内を上る／下りる"
 
@@ -5048,14 +5048,14 @@ msgstr "オシレータ―"
 #: js/blocks/WidgetBlocks.js:179
 #: js/widgets/timbre.js:1550
 #: js/widgets/timbre.js:1800
-#.TRANS: there are different types (sine, triangle, square...) of oscillators.
-#.TRANS: type of filter, e.g., lowpass, highpass, etc.
+#. TRANS: there are different types (sine, triangle, square...) of oscillators.
+#. TRANS: type of filter, e.g., lowpass, highpass, etc.
 msgid "type"
 msgstr "種類"
 
 #: js/blocks/ToneBlocks.js:44
 #: js/widgets/timbre.js:1554
-#.TRANS: Partials refers to the number of sine waves combined into the sound.
+#. TRANS: Partials refers to the number of sine waves combined into the sound.
 msgid "partials"
 msgstr "倍音"
 
@@ -5065,7 +5065,7 @@ msgstr "複数のオシレーターブロックを追加しています。"
 
 #: js/blocks/ToneBlocks.js:144
 #: js/widgets/timbre.js:1217
-#.TRANS: a duo synthesizer combines a synth with a sequencer
+#. TRANS: a duo synthesizer combines a synth with a sequencer
 msgid "duo synth"
 msgstr "シーケンサー込みシンセ"
 
@@ -5084,7 +5084,7 @@ msgstr "ビブラートエフェクタの強度"
 
 #: js/blocks/ToneBlocks.js:185
 #: js/widgets/timbre.js:1215
-#.TRANS: AM (amplitude modulation) synthesizer
+#. TRANS: AM (amplitude modulation) synthesizer
 msgid "AM synth"
 msgstr "AM シンセ"
 
@@ -5094,7 +5094,7 @@ msgstr ""
 
 #: js/blocks/ToneBlocks.js:224
 #: js/widgets/timbre.js:1216
-#.TRANS: FM (frequency modulation) synthesizer
+#. TRANS: FM (frequency modulation) synthesizer
 msgid "FM synth"
 msgstr "FM シンセ"
 
@@ -5111,17 +5111,17 @@ msgid "The Partial block is used to specify a weight for a specific partial harm
 msgstr ""
 
 #: js/blocks/ToneBlocks.js:284
-#.TRANS: partials are weighted components in a harmonic series
+#. TRANS: partials are weighted components in a harmonic series
 msgid "Partial weight must be between 0 and 1."
 msgstr "倍音のウェートは０と１の間である必要があります。"
 
 #: js/blocks/ToneBlocks.js:297
-#.TRANS: partials are weighted components in a harmonic series
+#. TRANS: partials are weighted components in a harmonic series
 msgid "Partial block should be used inside of a Weighted-partials block."
 msgstr "倍音ブロックが「倍音ウェートブロック」の中にある必要があります。"
 
 #: js/blocks/ToneBlocks.js:325
-#.TRANS: partials are weighted components in a harmonic series
+#. TRANS: partials are weighted components in a harmonic series
 msgid "weighted partials"
 msgstr "ウェート倍音"
 
@@ -5130,7 +5130,7 @@ msgid "The Harmonic block will add harmonics to the contained notes."
 msgstr ""
 
 #: js/blocks/ToneBlocks.js:390
-#.TRANS: A harmonic is an overtone.
+#. TRANS: A harmonic is an overtone.
 msgid "harmonic"
 msgstr "ハーモニックス"
 
@@ -5140,7 +5140,7 @@ msgstr ""
 
 #: js/blocks/ToneBlocks.js:438
 #: js/widgets/timbre.js:2088
-#.TRANS: distortion is an alteration in the sound
+#. TRANS: distortion is an alteration in the sound
 msgid "distortion"
 msgstr "ディストーション"
 
@@ -5150,7 +5150,7 @@ msgstr "<h2>トレモロブロック</h2><br>ゆれるような音のひびき�
 
 #: js/blocks/ToneBlocks.js:495
 #: js/widgets/timbre.js:2084
-#.TRANS: a wavering effect in a musical tone
+#. TRANS: a wavering effect in a musical tone
 msgid "tremolo"
 msgstr "トレモロ"
 
@@ -5162,7 +5162,7 @@ msgstr "トレモロ"
 #: js/widgets/timbre.js:2210
 #: js/widgets/timbre.js:2305
 #: js/widgets/timbre.js:2407
-#.TRANS: rate at which tremolo wavers
+#. TRANS: rate at which tremolo wavers
 msgid "rate"
 msgstr "はやさ"
 
@@ -5170,7 +5170,7 @@ msgstr "はやさ"
 #: js/blocks/ToneBlocks.js:630
 #: js/widgets/timbre.js:2125
 #: js/widgets/timbre.js:2316
-#.TRANS: amplitude of tremolo waver
+#. TRANS: amplitude of tremolo waver
 msgid "depth"
 msgstr "大きさ"
 
@@ -5180,7 +5180,7 @@ msgstr ""
 
 #: js/blocks/ToneBlocks.js:566
 #: js/widgets/timbre.js:2087
-#.TRANS: alter the phase of the sound
+#. TRANS: alter the phase of the sound
 msgid "phaser"
 msgstr "フェーザー"
 
@@ -5201,7 +5201,7 @@ msgstr "<h2>コーラスブロック</h2><br>広がりのある音のひびき�
 
 #: js/blocks/ToneBlocks.js:627
 #: js/widgets/timbre.js:2086
-#.TRANS: musical effect to simulate a choral sound
+#. TRANS: musical effect to simulate a choral sound
 msgid "chorus"
 msgstr "コーラス"
 
@@ -5216,7 +5216,7 @@ msgstr "<h2>ビブラートブロック</h2><br>音の高さに小きざみな�
 
 #: js/blocks/ToneBlocks.js:686
 #: js/widgets/timbre.js:2085
-#.TRANS: a rapid, slight variation in pitch
+#. TRANS: a rapid, slight variation in pitch
 msgid "vibrato"
 msgstr "ビブラート"
 
@@ -5226,7 +5226,7 @@ msgid "intensity"
 msgstr "大きさ"
 
 #: js/blocks/ToneBlocks.js:733
-#.TRANS: select synthesizer
+#. TRANS: select synthesizer
 msgid "set synth"
 msgstr "シンセを設定"
 
@@ -5240,7 +5240,7 @@ msgstr "音色標準を設定"
 
 #: js/blocks/ToneBlocks.js:895
 #: js/blocks/ToneBlocks.js:943
-#.TRANS: set the characteristics of a custom instrument
+#. TRANS: set the characteristics of a custom instrument
 msgid "set instrument"
 msgstr "音色をせってい"
 
@@ -5296,7 +5296,7 @@ msgstr "計算する"
 #: js/blocks/ActionBlocks.js:593
 #: js/blocks/ActionBlocks.js:942
 #: js/blocks/ActionBlocks.js:1389
-#.TRANS: do is the do something or take an action.
+#. TRANS: do is the do something or take an action.
 msgid "The Do block is used to initiate an action."
 msgstr "<h2>アクションブロック（指定）</h2><br>指定したアクションブロックを実行する。"
 
@@ -5474,7 +5474,7 @@ msgid "Cannot find start block"
 msgstr "「スタート」ブロックが見つかりません。"
 
 #: js/blocks/EnsembleBlocks.js:294
-#.TRANS: pen color for this mouse
+#. TRANS: pen color for this mouse
 msgid "mouse color"
 msgstr "ネズミの色"
 
@@ -5483,7 +5483,7 @@ msgid "The Mouse color block returns the pen color of the specified mouse."
 msgstr ""
 
 #: js/blocks/EnsembleBlocks.js:308
-#.TRANS: pen color for this turtle
+#. TRANS: pen color for this turtle
 msgid "turtle color"
 msgstr "タートルの色"
 
@@ -5492,7 +5492,7 @@ msgid "The Turtle color block returns the pen color of the specified turtle."
 msgstr ""
 
 #: js/blocks/EnsembleBlocks.js:340
-#.TRANS: heading (compass direction) for this mouse
+#. TRANS: heading (compass direction) for this mouse
 msgid "mouse heading"
 msgstr "ネズミの進む角度"
 
@@ -5501,7 +5501,7 @@ msgid "The Mouse heading block returns the heading of the specified mouse."
 msgstr ""
 
 #: js/blocks/EnsembleBlocks.js:354
-#.TRANS: heading (compass direction) for this turtle
+#. TRANS: heading (compass direction) for this turtle
 msgid "turtle heading"
 msgstr "タートルの進む角度"
 
@@ -5511,13 +5511,13 @@ msgstr ""
 
 #: js/blocks/EnsembleBlocks.js:386
 #: js/blocks/EnsembleBlocks.js:441
-#.TRANS: set xy position for this mouse
+#. TRANS: set xy position for this mouse
 msgid "set mouse"
 msgstr "ネズミを設定"
 
 #: js/blocks/EnsembleBlocks.js:397
 #: js/blocks/EnsembleBlocks.js:454
-#.TRANS: set xy position for this turtle
+#. TRANS: set xy position for this turtle
 msgid "set turtle"
 msgstr "タートルを設定"
 
@@ -5530,7 +5530,7 @@ msgid "The Set turtle block sends a stack of blocks to be run by the specified t
 msgstr ""
 
 #: js/blocks/EnsembleBlocks.js:482
-#.TRANS: y position for this mouse
+#. TRANS: y position for this mouse
 msgid "mouse y"
 msgstr "ネズミのy座標"
 
@@ -5539,7 +5539,7 @@ msgid "The Y mouse block returns the Y position of the specified mouse."
 msgstr ""
 
 #: js/blocks/EnsembleBlocks.js:496
-#.TRANS: y position for this turtle
+#. TRANS: y position for this turtle
 msgid "turtle y"
 msgstr "タートルのy座標"
 
@@ -5548,7 +5548,7 @@ msgid "The Y turtle block returns the Y position of the specified turtle."
 msgstr ""
 
 #: js/blocks/EnsembleBlocks.js:528
-#.TRANS: x position for this mouse
+#. TRANS: x position for this mouse
 msgid "mouse x"
 msgstr "ネズミのx座標"
 
@@ -5557,7 +5557,7 @@ msgid "The X mouse block returns the X position of the specified mouse."
 msgstr ""
 
 #: js/blocks/EnsembleBlocks.js:542
-#.TRANS: x position for this turtle
+#. TRANS: x position for this turtle
 msgid "turtle x"
 msgstr "タートルのx座標"
 
@@ -5566,7 +5566,7 @@ msgid "The X turtle block returns the X position of the specified turtle."
 msgstr ""
 
 #: js/blocks/EnsembleBlocks.js:575
-#.TRANS: notes played by this mouse
+#. TRANS: notes played by this mouse
 msgid "mouse notes played"
 msgstr "ネズミの演奏した音符の数"
 
@@ -5575,7 +5575,7 @@ msgid "The Mouse elapse notes block returns the number of notes played by the sp
 msgstr ""
 
 #: js/blocks/EnsembleBlocks.js:589
-#.TRANS: notes played by this turtle
+#. TRANS: notes played by this turtle
 msgid "turtle notes played"
 msgstr "タートルの演奏した音符の数"
 
@@ -5584,7 +5584,7 @@ msgid "The Turtle elapse notes block returns the number of notes played by the s
 msgstr ""
 
 #: js/blocks/EnsembleBlocks.js:629
-#.TRANS: convert current note for this turtle to piano key (1-88)
+#. TRANS: convert current note for this turtle to piano key (1-88)
 msgid "mouse pitch number"
 msgstr "ネズミの音高数字"
 
@@ -5593,7 +5593,7 @@ msgid "The Mouse pitch block returns the current pitch number being played by th
 msgstr ""
 
 #: js/blocks/EnsembleBlocks.js:643
-#.TRANS: convert current note for this turtle to piano key (1-88)
+#. TRANS: convert current note for this turtle to piano key (1-88)
 msgid "turtle pitch number"
 msgstr "タートルの音高数字"
 
@@ -5603,17 +5603,17 @@ msgstr ""
 
 #: js/blocks/EnsembleBlocks.js:749
 #: js/blocks/EnsembleBlocks.js:821
-#.TRANS: note value is the duration of the note played by this mouse
+#. TRANS: note value is the duration of the note played by this mouse
 msgid "mouse note value"
 msgstr "ネズミの音価"
 
 #: js/blocks/EnsembleBlocks.js:759
-#.TRANS: note value is the duration of the note played by this turtle
+#. TRANS: note value is the duration of the note played by this turtle
 msgid "turtle note value"
 msgstr "タートルの音価"
 
 #: js/blocks/EnsembleBlocks.js:832
-#.TRANS: sync is short for synchronization
+#. TRANS: sync is short for synchronization
 msgid "mouse sync"
 msgstr "ネズミを同期させる"
 
@@ -5622,7 +5622,7 @@ msgid "The Mouse sync block aligns the beat count between mice."
 msgstr ""
 
 #: js/blocks/EnsembleBlocks.js:846
-#.TRANS: sync is short for synchronization
+#. TRANS: sync is short for synchronization
 msgid "turtle sync"
 msgstr "タートルを同期させる"
 
@@ -6049,7 +6049,7 @@ msgid "wrap"
 msgstr "巻きつける"
 
 #: js/blocks/MediaBlocks.js:35
-#.TRANS: right side of the screen
+#. TRANS: right side of the screen
 msgid "right (screen)"
 msgstr "ざひょうち（右）"
 
@@ -6059,7 +6059,7 @@ msgid "The Right block returns the position of the right of the canvas."
 msgstr "<h2>すうちブロック（カンバス）</h2><br>カンバスの右のｘざひょうち。プラスのすうち。カンバスのじょうほうを持つすうちブロックは、カンバスのたてはば、よこはば、ざひょうち（上）、ざひょうち（下）、ざひょうち（左）、ざひょうち（右）などの６種類がある。"
 
 #: js/blocks/MediaBlocks.js:97
-#.TRANS: left side of the screen
+#. TRANS: left side of the screen
 msgid "left (screen)"
 msgstr "ざひょうち（左）"
 
@@ -6103,12 +6103,12 @@ msgid "The Height block returns the height of the canvas."
 msgstr "<h2>すうちブロック（カンバス）</h2><br>カンバスのたてはばのすうちを表す。カンバスのじょうほうを持つすうちブロックは、カンバスのたてはば、よこはば、ざひょうち（上）、ざひょうち（下）、ざひょうち（左）、ざひょうち（右）などの６種類がある。"
 
 #: js/blocks/MediaBlocks.js:369
-#.TRANS: stops playback of an audio recording
+#. TRANS: stops playback of an audio recording
 msgid "stop play"
 msgstr "再生を停止"
 
 #: js/blocks/MediaBlocks.js:404
-#.TRANS: Erases the images and text
+#. TRANS: Erases the images and text
 msgid "erase media"
 msgstr "メディアを消す"
 
@@ -6117,7 +6117,7 @@ msgid "The Erase Media block erases text and images."
 msgstr "「メディアを消す」のブロックは文字と画像を消します。"
 
 #: js/blocks/MediaBlocks.js:439
-#.TRANS: play an audio recording
+#. TRANS: play an audio recording
 msgid "play back"
 msgstr "プレーバック"
 
@@ -6174,7 +6174,7 @@ msgid "duration (MS)"
 msgstr ""
 
 #: js/blocks/MediaBlocks.js:728
-#.TRANS: translate a note into hertz, e.g., A4 -> 440HZ
+#. TRANS: translate a note into hertz, e.g., A4 -> 440HZ
 msgid "note to frequency"
 msgstr "音符の高さを周波数表示へ"
 
@@ -6192,7 +6192,7 @@ msgstr ""
 
 #: js/blocks/MediaBlocks.js:831
 #: js/blocks/MediaBlocks.js:891
-#.TRANS: a media object
+#. TRANS: a media object
 msgid "size"
 msgstr "大きさ"
 
@@ -6205,7 +6205,7 @@ msgid "The Show block is used to display text or images on the canvas."
 msgstr "<h2>表示ブロック（スタンプ）</h2><br>スタンプは、実行するとネズミの位置に指定した文字またはがぞうを表示する。ネズミの体の下に表れるので、小さい文字やがぞうだとネズミが移動しないと見えない場合がある。"
 
 #: js/blocks/MediaBlocks.js:888
-#.TRANS: show1 is show as in display an image or text on the screen.
+#. TRANS: show1 is show as in display an image or text on the screen.
 msgid "show1"
 msgstr "スタンプ"
 
@@ -6270,7 +6270,7 @@ msgstr "記入を終わらせる"
 
 #: js/blocks/PenBlocks.js:208
 #: js/blocks/PenBlocks.js:537
-#.TRANS: set the background color
+#. TRANS: set the background color
 msgid "background"
 msgstr "背景"
 
@@ -6335,7 +6335,7 @@ msgid "The Hollow line block creates a line with a hollow center."
 msgstr ""
 
 #: js/blocks/PenBlocks.js:583
-#.TRANS: draw a line logo has a hollow space down its center
+#. TRANS: draw a line logo has a hollow space down its center
 msgid "hollow line"
 msgstr "（中空の）線"
 
@@ -6344,12 +6344,12 @@ msgid "The Fill block fills in a shape with a color."
 msgstr "<h2>ペンブロック</h2><br>ネズミがえがいた図形の内がわをぬりつぶす。"
 
 #: js/blocks/PenBlocks.js:661
-#.TRANS: fill in as a solid color
+#. TRANS: fill in as a solid color
 msgid "fill"
 msgstr "ぬりつぶす"
 
 #: js/blocks/PenBlocks.js:738
-#.TRANS: raise up the pen so logo it does not draw when it is moved
+#. TRANS: raise up the pen so logo it does not draw when it is moved
 msgid "pen up"
 msgstr "ペンを上げる"
 
@@ -6358,7 +6358,7 @@ msgid "The Pen-up block raises the pen so that it does not draw."
 msgstr "<h2>ペンブロック</h2><br>ネズミの動きに合わせて線をえがくことをやめる。"
 
 #: js/blocks/PenBlocks.js:779
-#.TRANS: put down the pen so logo it draws when it is moved
+#. TRANS: put down the pen so logo it draws when it is moved
 msgid "pen down"
 msgstr "ペンを下ろす"
 
@@ -6367,7 +6367,7 @@ msgid "The Pen-down block lowers the pen so that it draws."
 msgstr "<h2>ペンブロック</h2><br>ネズミの動きに合わせて線をえがく。"
 
 #: js/blocks/PenBlocks.js:821
-#.TRANS: set the width of the line drawn by the pen
+#. TRANS: set the width of the line drawn by the pen
 msgid "set pen size"
 msgstr "太さをせってい"
 
@@ -6376,7 +6376,7 @@ msgid "The Set-pen-size block changes the size of the pen."
 msgstr "<h2>ペンブロック</h2><br>ネズミがえがく線の太さをせっていする。太さには、0より大きいあたいを使う。"
 
 #: js/blocks/PenBlocks.js:890
-#.TRANS: set degree of translucence of the pen color
+#. TRANS: set degree of translucence of the pen color
 msgid "set translucency"
 msgstr "透明度を設定"
 
@@ -6401,7 +6401,7 @@ msgid "The Set-shade block changes the pen color from dark to light."
 msgstr "<h2>ペンブロック</h2><br>ネズミがえがく線の色のこさをせっていする。"
 
 #: js/blocks/PenBlocks.js:1088
-#.TRANS: set the level of vividness of the pen color
+#. TRANS: set the level of vividness of the pen color
 msgid "set grey"
 msgstr "灰色を設定"
 
@@ -6536,27 +6536,27 @@ msgstr ""
 
 #: js/blocks/WidgetBlocks.js:81
 #: js/widgets/timbre.js:834
-#.TRANS: sound envelope (ADSR)
+#. TRANS: sound envelope (ADSR)
 msgid "Envelope"
 msgstr "エンベロープ"
 
 #: js/blocks/WidgetBlocks.js:89
-#.TRANS: Attack time is the time taken for initial run-up of level from nil to peak, beginning when the key is first pressed.
+#. TRANS: Attack time is the time taken for initial run-up of level from nil to peak, beginning when the key is first pressed.
 msgid "attack"
 msgstr "アタック"
 
 #: js/blocks/WidgetBlocks.js:91
-#.TRANS: Decay time is the time taken for the subsequent run down from the attack level to the designated sustain level.
+#. TRANS: Decay time is the time taken for the subsequent run down from the attack level to the designated sustain level.
 msgid "decay"
 msgstr "ディケイ"
 
 #: js/blocks/WidgetBlocks.js:93
-#.TRANS: Sustain level is the level during the main sequence of the sound's duration, until the key is released.
+#. TRANS: Sustain level is the level during the main sequence of the sound's duration, until the key is released.
 msgid "sustain"
 msgstr "サステイン"
 
 #: js/blocks/WidgetBlocks.js:95
-#.TRANS: Release time is the time taken for the level to decay from the sustain level to zero after the key is released.
+#. TRANS: Release time is the time taken for the level to decay from the sustain level to zero after the key is released.
 msgid "release"
 msgstr "リリース"
 
@@ -6582,18 +6582,18 @@ msgstr "封筒ブロックを複数追加しています。"
 
 #: js/blocks/WidgetBlocks.js:171
 #: js/widgets/timbre.js:898
-#.TRANS: a filter removes some unwanted components from a signal
+#. TRANS: a filter removes some unwanted components from a signal
 msgid "Filter"
 msgstr "フィルター"
 
 #: js/blocks/WidgetBlocks.js:181
 #: js/widgets/timbre.js:1810
-#.TRANS: rolloff is the steepness of a change in frequency.
+#. TRANS: rolloff is the steepness of a change in frequency.
 msgid "rolloff"
 msgstr "ロールオフ"
 
 #: js/blocks/WidgetBlocks.js:213
-#.TRANS: rolloff is the steepness of a change in frequency.
+#. TRANS: rolloff is the steepness of a change in frequency.
 msgid "Rolloff value should be either -12, -24, -48, or -96 decibels/octave."
 msgstr "ロールオフ値は -12, -24, -48, -98 デシベル / オクターヴである必要があります。"
 
@@ -6608,7 +6608,7 @@ msgid "Upload a sample and adjust its pitch center."
 msgstr ""
 
 #: js/blocks/WidgetBlocks.js:339
-#.TRANS: the speed at music is should be played.
+#. TRANS: the speed at music is should be played.
 msgid "sampler"
 msgstr "サンプラー"
 
@@ -6629,7 +6629,7 @@ msgid "The Custom mode block opens a tool to explore musical mode (the spacing o
 msgstr "<h2>モード（音階）ブロック</h2><br>いろいろな音階をさがすツールを表示する。音階は、音と音のかんかくを決めながらさがすことができる。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。"
 
 #: js/blocks/WidgetBlocks.js:651
-#.TRANS: musical mode is the pattern of half-steps in an octave, e.g., Major or Minor modes
+#. TRANS: musical mode is the pattern of half-steps in an octave, e.g., Major or Minor modes
 msgid "custom mode"
 msgstr "音階"
 
@@ -6646,7 +6646,7 @@ msgid "The Pitch drum matrix is used to map pitches to drum sounds."
 msgstr ""
 
 #: js/blocks/WidgetBlocks.js:842
-#.TRANS: makes a mapping between pitches and drum sounds
+#. TRANS: makes a mapping between pitches and drum sounds
 msgid "pitch-drum mapper"
 msgstr "音高-ドラム・マッパー"
 
@@ -6659,7 +6659,7 @@ msgid "The Pitch slider tool to is used to generate pitches at selected frequenc
 msgstr "<h2>ヘルツスライダーブロック</h2><br>スライダーを上下にうごかすことで、違う周波数（ヘルツのすうち）の音を聞くことができる。作った音をデータ化することができる。また、ヘルツの初期せっていちは、自由に変えられる。<br><br>★ヘルツとは音の高さを表す周波数。<br>★周波数とは音が１秒間に何回しんどうするかを表すすうち。周波数が高い（すうちが大きい）ほど、音が高くなる。"
 
 #: js/blocks/WidgetBlocks.js:925
-#.TRANS: widget to generate pitches using a slider
+#. TRANS: widget to generate pitches using a slider
 msgid "pitch slider"
 msgstr "ヘルツスライダー"
 
@@ -6669,7 +6669,7 @@ msgstr "クロマティック・キーボード"
 
 #: js/blocks/WidgetBlocks.js:1011
 #: js/blocks/WidgetBlocks.js:1077
-#.TRANS: widget to generate pitches using a slider
+#. TRANS: widget to generate pitches using a slider
 msgid "music keyboard"
 msgstr "キーボード"
 
@@ -6683,7 +6683,7 @@ msgid "The Pitch staircase tool to is used to generate pitches from a given rati
 msgstr ""
 
 #: js/blocks/WidgetBlocks.js:1135
-#.TRANS: generate a progressive sequence of pitches
+#. TRANS: generate a progressive sequence of pitches
 msgid "pitch staircase"
 msgstr "音高の数列を作る"
 
@@ -6704,7 +6704,7 @@ msgid "The Phrase Maker block opens a tool to create musical phrases."
 msgstr "<h2>フレーズメーカーブロック</h2><br>フレーズを作るためのテーブルを表示する。作ったフレーズをデータ化することができる。<br><br>★フレーズとは<br>ひとまとまりの音楽。<br><br>"
 
 #: js/blocks/WidgetBlocks.js:1373
-#.TRANS: assigns pitch to a sequence of beats to generate a melody
+#. TRANS: assigns pitch to a sequence of beats to generate a melody
 msgid "phrase maker"
 msgstr "フレーズメーカー"
 
@@ -6718,7 +6718,7 @@ msgstr "<h2>実行じょうきょうブロック</h2><br>ブロックの実行�
 
 #: js/blocks/WidgetBlocks.js:1581
 #: js/widgets/aiwidget.js:699
-#.TRANS: AI-generated music
+#. TRANS: AI-generated music
 msgid "AI Music"
 msgstr "AI音楽"
 
@@ -6905,7 +6905,7 @@ msgstr "ビブラートのはやさは、0より大きいあたいをせって�
 
 #: js/turtleactions/ToneActions.js:192
 #: js/turtleactions/ToneActions.js:265
-#.TRANS: Depth is the intesity of the tremolo or chorus effect.
+#. TRANS: Depth is the intesity of the tremolo or chorus effect.
 msgid "Depth is out of range."
 msgstr "（エフェクタの）深さの数字が変域外です。"
 
@@ -6914,7 +6914,7 @@ msgid "Distortion must be from 0 to 100."
 msgstr "ディストーションは、0から100までのはんいでせっていしてください。"
 
 #: js/turtleactions/ToneActions.js:332
-#.TRANS: partials components in a harmonic series
+#. TRANS: partials components in a harmonic series
 msgid "Partial must be greater than or equal to 0."
 msgstr "倍音が０以上である必要があります。"
 
@@ -7036,7 +7036,7 @@ msgid "Undo"
 msgstr "１つもどす"
 
 #: js/widgets/modewidget.js:161
-#.TRANS: A circle of notes represents the musical mode.
+#. TRANS: A circle of notes represents the musical mode.
 msgid "Click in the circle to select notes for the mode."
 msgstr "クリックで音の高さを選んで音階を設定できます。"
 
@@ -7119,7 +7119,7 @@ msgid "Save drum machine"
 msgstr "ドラムとしてほぞん"
 
 #: js/widgets/rhythmruler.js:589
-#.TRANS: user can tap out a rhythm by clicking on a ruler.
+#. TRANS: user can tap out a rhythm by clicking on a ruler.
 msgid "Tap a rhythm"
 msgstr "リズムをタップする"
 
@@ -7169,7 +7169,7 @@ msgid "Playback"
 msgstr "再生"
 
 #: js/widgets/sampler.js:933
-#.TRANS: The reference tone is a sound used for comparison.
+#. TRANS: The reference tone is a sound used for comparison.
 msgid "reference tone"
 msgstr "参照ピッチ"
 
@@ -7286,7 +7286,7 @@ msgstr "シンセサイザー"
 
 #: js/widgets/timbre.js:880
 #: planet/js/GlobalTag.js:50
-#.TRANS: On the Planet, we use labels to tag projects.
+#. TRANS: On the Planet, we use labels to tag projects.
 msgid "Effects"
 msgstr "音響効果"
 
@@ -7365,48 +7365,48 @@ msgid "Cannot connect to server"
 msgstr "サーバに接続できません"
 
 #: planet/js/GlobalTag.js:28
-#.TRANS: On the Planet, we use labels to tag projects.
+#. TRANS: On the Planet, we use labels to tag projects.
 msgid "All Projects"
 msgstr "全てのプロジェクト"
 
 #: planet/js/GlobalTag.js:30
 #: planet/js/StringHelper.js:37
-#.TRANS: On the Planet, we use labels to tag projects.
+#. TRANS: On the Planet, we use labels to tag projects.
 msgid "My Projects"
 msgstr "自分のプロジェクト"
 
 #: planet/js/GlobalTag.js:32
-#.TRANS: On the Planet, we use labels to tag projects.
+#. TRANS: On the Planet, we use labels to tag projects.
 msgid "Examples"
 msgstr "プロジェクトの見本"
 
 #: planet/js/GlobalTag.js:36
-#.TRANS: On the Planet, we use labels to tag projects.
+#. TRANS: On the Planet, we use labels to tag projects.
 msgid "Art"
 msgstr "アート"
 
 #: planet/js/GlobalTag.js:38
-#.TRANS: On the Planet, we use labels to tag projects.
+#. TRANS: On the Planet, we use labels to tag projects.
 msgid "Math"
 msgstr "算数"
 
 #: planet/js/GlobalTag.js:40
-#.TRANS: On the Planet, we use labels to tag projects.
+#. TRANS: On the Planet, we use labels to tag projects.
 msgid "Interactive"
 msgstr "インタラクティブ"
 
 #: planet/js/GlobalTag.js:42
-#.TRANS: On the Planet, we use labels to tag projects.
+#. TRANS: On the Planet, we use labels to tag projects.
 msgid "Design"
 msgstr "デザイン"
 
 #: planet/js/GlobalTag.js:44
-#.TRANS: On the Planet, we use labels to tag projects.
+#. TRANS: On the Planet, we use labels to tag projects.
 msgid "Game"
 msgstr "ゲーム"
 
 #: planet/js/GlobalTag.js:52
-#.TRANS: On the Planet, we use labels to tag projects.
+#. TRANS: On the Planet, we use labels to tag projects.
 msgid "Code Snippet"
 msgstr "短いコード"
 
@@ -7839,38 +7839,38 @@ msgstr "動き出し"
 
 #: js/activity.js:3323
 
-#~msgid "Nothing in the trash to restore."
-#~msgstr ""
+#~ msgid "Nothing in the trash to restore."
+#~ msgstr ""
 
 #: js/turtledefs.js:584
 
-#~msgid "Save audio from your project as WAV."
-#~msgstr "プロジェクトの音をWAVで保存"
+#~ msgid "Save audio from your project as WAV."
+#~ msgstr "プロジェクトの音をWAVで保存"
 
 #: js/turtledefs.js:588
 
-#~msgid "Save your project to as an ABC file."
-#~msgstr "プロジェクトをABCで保存"
+#~ msgid "Save your project to as an ABC file."
+#~ msgstr "プロジェクトをABCで保存"
 
 #: js/turtledefs.js:592
 
-#~msgid "Save your project to as a Lilypond file."
-#~msgstr "作成した音楽を、コンピューター上でがくふをえがくファイル（Lilypondファイル）に変えてほぞんする。"
+#~ msgid "Save your project to as a Lilypond file."
+#~ msgstr "作成した音楽を、コンピューター上でがくふをえがくファイル（Lilypondファイル）に変えてほぞんする。"
 
 #: js/turtledefs.js:620
 
-#~msgid "Show or hide a coordinate grid."
-#~msgstr "カンバス上にほうがん（ざひょう）や中心の角度を表示したり、かくしたりできる。"
+#~ msgid "Show or hide a coordinate grid."
+#~ msgstr "カンバス上にほうがん（ざひょう）や中心の角度を表示したり、かくしたりできる。"
 
 #: js/turtledefs.js:649
 
-#~msgid "Expand/collapse collapsable blocks"
-#~msgstr "ブロックを広げる/折りたたむ"
+#~ msgid "Expand/collapse collapsable blocks"
+#~ msgstr "ブロックを広げる/折りたたむ"
 
 #: js/turtledefs.js:752
 
-#~msgid "Show these messages."
-#~msgstr "ミスター・マウスによる、ミュージック・ブロックスの説明を表示する。"
+#~ msgid "Show these messages."
+#~ msgstr "ミスター・マウスによる、ミュージック・ブロックスの説明を表示する。"
 
 #: js/rubrics.js:531
 
@@ -7878,8 +7878,8 @@ msgstr "動き出し"
 
 #: js/turtledefs.js:237
 
-#~msgid "sensors"
-#~msgstr "センサー"
+#~ msgid "sensors"
+#~ msgstr "センサー"
 
 #: js/rubrics.js:532
 
@@ -7889,8 +7889,8 @@ msgstr "動き出し"
 
 #: js/blocks/MediaBlocks.js:930
 
-#~msgid "media"
-#~msgstr "他のメディア"
+#~ msgid "media"
+#~ msgstr "他のメディア"
 
 #: js/block-verbose.js:3837
 
@@ -7902,35 +7902,35 @@ msgstr "動き出し"
 
 #: js/blocks/ExtrasBlocks.js:623
 
-#~msgid "Cartesian+polar"
-#~msgstr "右岸座標と極座標を表示"
+#~ msgid "Cartesian+polar"
+#~ msgstr "右岸座標と極座標を表示"
 
 #: js/blocks.js:5091
 
 #: js/blocks/MediaBlocks.js:888
 
-#~msgid "show"
-#~msgstr "表示する"
+#~ msgid "show"
+#~ msgstr "表示する"
 
 #: js/activity.js:5680
 
-#~msgid "Show/hide block"
-#~msgstr "ブロックを表示する/かくす"
+#~ msgid "Show/hide block"
+#~ msgstr "ブロックを表示する/かくす"
 
 #: js/palette.js:619
 
-#~msgid "grid"
-#~msgstr "グリッド"
+#~ msgid "grid"
+#~ msgstr "グリッド"
 
 #: js/piemenus.js:3854
 
-#~msgid "You have chosen key "
-#~msgstr "変化記号は"
+#~ msgid "You have chosen key "
+#~ msgstr "変化記号は"
 
 #: js/piemenus.js:3858
 
-#~msgid " for your pitch preview."
-#~msgstr "の音階によって設定しています。"
+#~ msgid " for your pitch preview."
+#~ msgstr "の音階によって設定しています。"
 
 #: js/toolbar.js:113
 
@@ -7944,69 +7944,69 @@ msgstr "動き出し"
 
 #: js/toolbar.js:235
 
-#~msgid "Full Screen"
-#~msgstr "フルスクリーン"
+#~ msgid "Full Screen"
+#~ msgstr "フルスクリーン"
 
 #: js/toolbar.js:1060
 
-#~msgid "New Project"
-#~msgstr "新しいプロジェクト"
+#~ msgid "New Project"
+#~ msgstr "新しいプロジェクト"
 
 #: js/turtledefs.js:185
 
 #: js/turtledefs.js:280
 
-#~msgid "music"
-#~msgstr "音楽"
+#~ msgid "music"
+#~ msgstr "音楽"
 
 #: js/turtledefs.js:548
 
 #: js/turtledefs.js:569
 
-#~msgid "save"
-#~msgstr "保存する"
+#~ msgid "save"
+#~ msgstr "保存する"
 
 #: js/turtledefs.js:625
 
 #: js/turtles.js:953
 
-#~msgid "Clean"
-#~msgstr "ネズミとペンをもどす"
+#~ msgid "Clean"
+#~ msgstr "ネズミとペンをもどす"
 
 #: js/turtledefs.js:675
 
-#~msgid "Run slow"
-#~msgstr "ゆっくり実行する"
+#~ msgid "Run slow"
+#~ msgstr "ゆっくり実行する"
 
 #: js/turtles.js:900
 
-#~msgid "Clear Workspace"
-#~msgstr ""
+#~ msgid "Clear Workspace"
+#~ msgstr ""
 
 #: js/turtles.js:905
 
-#~msgid "Are you sure you want to clear the workspace ?"
-#~msgstr ""
+#~ msgid "Are you sure you want to clear the workspace ?"
+#~ msgstr ""
 
 #: js/utils/musicutils.js:1176
 
-#~msgid "meantone"
-#~msgstr "中全音律"
+#~ msgid "meantone"
+#~ msgstr "中全音律"
 
 #: js/utils/musicutils.js:1582
 
-#~msgid "Custom"
-#~msgstr "オリジナル"
+#~ msgid "Custom"
+#~ msgstr "オリジナル"
 
 #: js/blocks/ExtrasBlocks.js:274
 
-#~msgid "hide blocks"
-#~msgstr "ブロックを非表示"
+#~ msgid "hide blocks"
+#~ msgstr "ブロックを非表示"
 
 #: js/blocks/FlowBlocks.js:136
 
-#~msgid "duplicate"
-#~msgstr "複製する"
+#~ msgid "duplicate"
+#~ msgstr "複製する"
 
 #: js/blocks/FlowBlocks.js:604
 
@@ -8026,13 +8026,13 @@ msgstr "動き出し"
 
 #: plugins/rodi.rtp:413
 
-#~msgid "stop"
-#~msgstr "止める"
+#~ msgid "stop"
+#~ msgstr "止める"
 
 #: js/blocks/MediaBlocks.js:692
 
-#~msgid "duration (ms)"
-#~msgstr "長さ（ミリ秒）"
+#~ msgid "duration (ms)"
+#~ msgstr "長さ（ミリ秒）"
 
 #: js/blocks/GraphicsBlocks.js:373
 
@@ -8040,58 +8040,58 @@ msgstr "動き出し"
 
 #: js/widgets/temperament.js:347
 
-#~msgid "clear"
-#~msgstr "もとにもどす"
+#~ msgid "clear"
+#~ msgstr "もとにもどす"
 
 #: js/blocks/PitchBlocks.js:929
 
-#~msgid "invert"
-#~msgstr "両方向にずれる"
+#~ msgid "invert"
+#~ msgstr "両方向にずれる"
 
 #: js/blocks/PitchBlocks.js:1706
 
-#~msgid "n^th Modal Pitch takes the pattern of pitches in semitones for a mode and makes each point a degree of the mode,"
-#~msgstr ""
+#~ msgid "n^th Modal Pitch takes the pattern of pitches in semitones for a mode and makes each point a degree of the mode,"
+#~ msgstr ""
 
 #: js/blocks/PitchBlocks.js:1749
 
-#~msgid "N^th Modal Pitch takes a number as an input as the n^th degree for the given mode. 0 is the first position, 1 is the second, -1 is the note before the first etc."
-#~msgstr ""
+#~ msgid "N^th Modal Pitch takes a number as an input as the n^th degree for the given mode. 0 is the first position, 1 is the second, -1 is the note before the first etc."
+#~ msgstr ""
 
 #: js/blocks/ToneBlocks.js:34
 
-#~msgid "oscillator"
-#~msgstr "オシレータ―"
+#~ msgid "oscillator"
+#~ msgstr "オシレータ―"
 
 #: js/blocks/ToneBlocks.js:630
 
-#~msgid "delay"
-#~msgstr "ずれ"
+#~ msgid "delay"
+#~ msgstr "ずれ"
 
 #: js/blocks/WidgetBlocks.js:81
 
-#~msgid "envelope"
-#~msgstr "エンベロープ"
+#~ msgid "envelope"
+#~ msgstr "エンベロープ"
 
 #: js/blocks/WidgetBlocks.js:171
 
-#~msgid "filter"
-#~msgstr "フィルター"
+#~ msgid "filter"
+#~ msgstr "フィルター"
 
 #: js/blocks/WidgetBlocks.js:1580
 
-#~msgid "aimusic"
-#~msgstr "AI音楽"
+#~ msgid "aimusic"
+#~ msgstr "AI音楽"
 
 #: js/turtleactions/IntervalsActions.js:119
 
-#~msgid "a"
-#~msgstr ""
+#~ msgid "a"
+#~ msgstr ""
 
 #: js/turtleactions/IntervalsActions.js:139
 
-#~msgid " below"
-#~msgstr "下"
+#~ msgid " below"
+#~ msgstr "下"
 
 #: js/widgets/modewidget.js:1017
 
@@ -8107,25 +8107,25 @@ msgstr "動き出し"
 
 #: js/widgets/temperament.js:1929
 
-#~msgid "New action block generated!"
-#~msgstr "新しいアクションを作りました！"
+#~ msgid "New action block generated!"
+#~ msgstr "新しいアクションを作りました！"
 
 #: js/widgets/sampler.js:237
 
-#~msgid "Recording started..."
-#~msgstr "録音中"
+#~ msgid "Recording started..."
+#~ msgstr "録音中"
 
 #: js/widgets/sampler.js:245
 
-#~msgid "Recording complete..."
-#~msgstr "録音完了"
+#~ msgid "Recording complete..."
+#~ msgstr "録音完了"
 
 #: js/widgets/musickeyboard.js:1549
 
 #: plugins/rodi.rtp:193
 
-#~msgid "duration"
-#~msgstr "期間の設定"
+#~ msgid "duration"
+#~ msgstr "期間の設定"
 
 #: js/widgets/temperament.js:454
 
@@ -8135,1118 +8135,1118 @@ msgstr "動き出し"
 
 #: js/widgets/temperament.js:1495
 
-#~msgid "close"
-#~msgstr "とじる"
+#~ msgid "close"
+#~ msgstr "とじる"
 
 #: planet/js/StringHelper.js:38
 
-#~msgid "Publish Project"
-#~msgstr "プロジェクトを公開する"
+#~ msgid "Publish Project"
+#~ msgstr "プロジェクトを公開する"
 
 #: plugins/rodi.rtp:191
 
-#~msgid "play"
-#~msgstr "実行"
+#~ msgid "play"
+#~ msgstr "実行"
 
 #: js/notation.js:353
 
-#~msgid "Lilypond cannot process pickup of "
-#~msgstr "Lilypondではこのピックアップを対応できません："
+#~ msgid "Lilypond cannot process pickup of "
+#~ msgstr "Lilypondではこのピックアップを対応できません："
 
 #: js/activity.js:1413
 
-#~msgid "Refresh your browser to change to advanced mode."
-#~msgstr "高度モードにするには、ブラウザをこうしんして下さい。"
+#~ msgid "Refresh your browser to change to advanced mode."
+#~ msgstr "高度モードにするには、ブラウザをこうしんして下さい。"
 
 #: js/activity.js:1418
 
-#~msgid "Refresh your browser to change to beginner mode."
-#~msgstr "はってんモードにするには、ブラウザをこうしんしてください。"
+#~ msgid "Refresh your browser to change to beginner mode."
+#~ msgstr "はってんモードにするには、ブラウザをこうしんしてください。"
 
 #: js/widgets/musickeyboard.js:3179
 
-#~msgid "New action blocks generated"
-#~msgstr "新しいアクションを作りました"
+#~ msgid "New action blocks generated"
+#~ msgstr "新しいアクションを作りました"
 
 #: js/widgets/musickeyboard.js:3180
 
-#~msgid "New action block generated"
-#~msgstr "新しいアクションを作りました"
+#~ msgid "New action block generated"
+#~ msgstr "新しいアクションを作りました"
 
-#~msgid "Toggle JavaScript Editor"
-#~msgstr "JavaScript編集をオン／オフ"
+#~ msgid "Toggle JavaScript Editor"
+#~ msgstr "JavaScript編集をオン／オフ"
 
-#~msgid "The Scalar Step Block must be used inside of a Note Block."
-#~msgstr "音階内を上る／下りるブロックは、音符ブロックの中に入れて使ってください。"
+#~ msgid "The Scalar Step Block must be used inside of a Note Block."
+#~ msgstr "音階内を上る／下りるブロックは、音符ブロックの中に入れて使ってください。"
 
-#~msgid "The Scalar Step Block must be preceded by a Pitch Block."
-#~msgstr "音階内を上る／下りるブロックは、音の高さブロックの後に使ってください。"
+#~ msgid "The Scalar Step Block must be preceded by a Pitch Block."
+#~ msgstr "音階内を上る／下りるブロックは、音の高さブロックの後に使ってください。"
 
-#~msgid "Using tuplets makes it easy to create groups of notes that are not based on a power of 2."
-#~msgstr "<br><br>３連符（れんぷ）や５連符（れんぷ）など、２の倍数ではない音符（おんぷ）の数でグループを作りやすくなる。"
+#~ msgid "Using tuplets makes it easy to create groups of notes that are not based on a power of 2."
+#~ msgstr "<br><br>３連符（れんぷ）や５連符（れんぷ）など、２の倍数ではない音符（おんぷ）の数でグループを作りやすくなる。"
 
-#~msgid "The Set temperament block is used to choose the tuning system used by Music Blocks."
-#~msgstr "<h2>音律（おんりつ）をせっていブロック</h2><br>ミュージック・ブロックスで用いる音階の調律（ちょうりつ）のしかたをせっていする。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。<br>★調律（ちょうりつ）とは<br>楽器の音の高さを、音律（おんりつ）にしたがって整えること。<br>★音律（おんりつ）とは<br>音程（おんてい）（音どうしのへだたり）の決め方。同じ音階でも、音律（おんりつ）によって音の高さが変わる。<br>★オクターヴの高さとは<br>同じ名前でも高さがちがう音を表すすうち。<br>"
+#~ msgid "The Set temperament block is used to choose the tuning system used by Music Blocks."
+#~ msgstr "<h2>音律（おんりつ）をせっていブロック</h2><br>ミュージック・ブロックスで用いる音階の調律（ちょうりつ）のしかたをせっていする。<br><br>★音階とは<br>順番に並んだ音のまとまり。たとえば、「ド」を始まりの音にしたときの「ドレミファソラシド」、「ソ」を始まりの音にしたときの「ソラシドレミ（♯ファ）ソ」のこと。<br>★調律（ちょうりつ）とは<br>楽器の音の高さを、音律（おんりつ）にしたがって整えること。<br>★音律（おんりつ）とは<br>音程（おんてい）（音どうしのへだたり）の決め方。同じ音階でも、音律（おんりつ）によって音の高さが変わる。<br>★オクターヴの高さとは<br>同じ名前でも高さがちがう音を表すすうち。<br>"
 
-#~msgid "The Interval number block returns the number of scalar steps in the current interval."
-#~msgstr "「音程を数で表示」ブロックは音階の数を経産して表示する"
+#~ msgid "The Interval number block returns the number of scalar steps in the current interval."
+#~ msgstr "「音程を数で表示」ブロックは音階の数を経産して表示する"
 
-#~msgid "The Semi-tone interval block calculates a relative interval based on half steps."
-#~msgstr "<em>半音階的音程</em>ブロックは音階を無視、半音で新しい音高を計算して鳴らします。"
+#~ msgid "The Semi-tone interval block calculates a relative interval based on half steps."
+#~ msgstr "<em>半音階的音程</em>ブロックは音階を無視、半音で新しい音高を計算して鳴らします。"
 
-#~msgid "The Arpeggio block will run each note block multiple times, adding a transposition based on the specified chord."
-#~msgstr "「アルペジオ」ブロックは 「音符」ブロックを回数 再生して、コードによって 変更します。"
+#~ msgid "The Arpeggio block will run each note block multiple times, adding a transposition based on the specified chord."
+#~ msgstr "「アルペジオ」ブロックは 「音符」ブロックを回数 再生して、コードによって 変更します。"
 
-#~msgid "The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode."
-#~msgstr "<h2>音階の上下ブロック</h2><br>中に組み入れる「音符（おんぷ）ブロック」の音をきじゅんにして、別の音をつけ加える。"
+#~ msgid "The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode."
+#~ msgstr "<h2>音階の上下ブロック</h2><br>中に組み入れる「音符（おんぷ）ブロック」の音をきじゅんにして、別の音をつけ加える。"
 
-#~msgid "The Action block is used to group together blocks so that they can be used more than once."
-#~msgstr "<h2>アクションブロック</h2><br>ふくすうのブロックを１つのグループとしてまとめ、実行する。グループとなったプログラムは、１つの「アクション」として自由に名前をつけることができる。"
+#~ msgid "The Action block is used to group together blocks so that they can be used more than once."
+#~ msgstr "<h2>アクションブロック</h2><br>ふくすうのブロックを１つのグループとしてまとめ、実行する。グループとなったプログラムは、１つの「アクション」として自由に名前をつけることができる。"
 
-#~msgid "The Greater-than block returns True if the top number is greater than the bottom number."
-#~msgstr "<h2>しんぎブロック（大なり）</h2><br>２つのすうちをくらべて、すうちの大小をはんていする。「＞」は上のすうちが下のすうちよりも大きければ「真（しん）」、下のすうちと同じか小さければ「偽（ぎ）」という結果になる。<br><br>★しんぎブロックとは<br>「もし～ならば」などのじょうけんブロックを動かすために必要なブロック。<br>「もし～ならば」は、せいかくに表現すると、「もし～というじょうけんが正しいならば、次のブロックを実行する」という意味である。しんぎブロックは不等式などによるひかくが「正しい（真）」か、「正しくない（偽）」かの結果を表し、「もし～ならば」に続くブロックを実行するかどうか決める。"
+#~ msgid "The Greater-than block returns True if the top number is greater than the bottom number."
+#~ msgstr "<h2>しんぎブロック（大なり）</h2><br>２つのすうちをくらべて、すうちの大小をはんていする。「＞」は上のすうちが下のすうちよりも大きければ「真（しん）」、下のすうちと同じか小さければ「偽（ぎ）」という結果になる。<br><br>★しんぎブロックとは<br>「もし～ならば」などのじょうけんブロックを動かすために必要なブロック。<br>「もし～ならば」は、せいかくに表現すると、「もし～というじょうけんが正しいならば、次のブロックを実行する」という意味である。しんぎブロックは不等式などによるひかくが「正しい（真）」か、「正しくない（偽）」かの結果を表し、「もし～ならば」に続くブロックを実行するかどうか決める。"
 
-#~msgid "The Less-than block returns True if the top number is less than the bottom number."
-#~msgstr "<h2>しんぎブロック（小なり）</h2><br>２つのすうちをくらべて、すうちの大小をはんていする。「＜」は上のすうちが下のすうちよりも小さければ「真（しん）」、下のすうちと同じか大きければ「偽（ぎ）」という結果になる。<br><br>★しんぎブロックとは<br>「もし～ならば」などのじょうけんブロックを動かすために必要なブロック。<br>「もし～ならば」は、せいかくに表現すると、「もし～というじょうけんが正しいならば、次のブロックを実行する」という意味である。しんぎブロックは不等式などによるひかくが「正しい（真）」か、「正しくない（偽）」かの結果を表し、「もし～ならば」に続くブロックを実行するかどうか決める。"
+#~ msgid "The Less-than block returns True if the top number is less than the bottom number."
+#~ msgstr "<h2>しんぎブロック（小なり）</h2><br>２つのすうちをくらべて、すうちの大小をはんていする。「＜」は上のすうちが下のすうちよりも小さければ「真（しん）」、下のすうちと同じか大きければ「偽（ぎ）」という結果になる。<br><br>★しんぎブロックとは<br>「もし～ならば」などのじょうけんブロックを動かすために必要なブロック。<br>「もし～ならば」は、せいかくに表現すると、「もし～というじょうけんが正しいならば、次のブロックを実行する」という意味である。しんぎブロックは不等式などによるひかくが「正しい（真）」か、「正しくない（偽）」かの結果を表し、「もし～ならば」に続くブロックを実行するかどうか決める。"
 
-#~msgid "In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
-#~msgstr "<br>図の例では、右向きに進み続けるネズミがカンバスの右からはみ出ると、カンバスの左から出てくる。"
+#~ msgid "In this example, the mouse moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
+#~ msgstr "<br>図の例では、右向きに進み続けるネズミがカンバスの右からはみ出ると、カンバスの左から出てくる。"
 
-#~msgid "In this example, the turtle moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
-#~msgstr "<br>図の例では、右向きに進み続けるタートルがカンバスの右からはみ出ると、カンバスの左から出てくる。"
+#~ msgid "In this example, the turtle moves right until it reaches the right edge of the canvas; then it reappears at the left of the canvas."
+#~ msgstr "<br>図の例では、右向きに進み続けるタートルがカンバスの右からはみ出ると、カンバスの左から出てくる。"
 
-#~msgid "In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
-#~msgstr "<br>図の例では、上向きに進み続けるネズミがカンバスの上からはみ出ると、カンバスの下から出てくる。"
+#~ msgid "In this example, the mouse moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
+#~ msgstr "<br>図の例では、上向きに進み続けるネズミがカンバスの上からはみ出ると、カンバスの下から出てくる。"
 
-#~msgid "In this example, the turtle moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
-#~msgstr "<br>図の例では、上向きに進み続けるタートルがカンバスの上からはみ出ると、カンバスの下から出てくる。"
+#~ msgid "In this example, the turtle moves upward until it reaches the top edge of the canvas; then it reappears at the bottom of the canvas."
+#~ msgstr "<br>図の例では、上向きに進み続けるタートルがカンバスの上からはみ出ると、カンバスの下から出てくる。"
 
-#~msgid "video material"
-#~msgstr "がぞうそざい"
+#~ msgid "video material"
+#~ msgstr "がぞうそざい"
 
-#~msgid "The Set drum block will select a drum sound to replace the pitch of any contained notes."
-#~msgstr "<h2>ドラムをせっていブロック</h2><br>「音符（おんぷ）ブロック」内の音を、ドラムの音に置きかえる。<br>図の例では、ソの音のかわりに、キックドラムの音がえんそうされる。"
+#~ msgid "The Set drum block will select a drum sound to replace the pitch of any contained notes."
+#~ msgstr "<h2>ドラムをせっていブロック</h2><br>「音符（おんぷ）ブロック」内の音を、ドラムの音に置きかえる。<br>図の例では、ソの音のかわりに、キックドラムの音がえんそうされる。"
 
-#~msgid "The Note value block is the value of the duration of the note currently being played."
-#~msgstr "<h2>音の長さブロック</h2><br>音の長さを表示する。<br>"
+#~ msgid "The Note value block is the value of the duration of the note currently being played."
+#~ msgstr "<h2>音の長さブロック</h2><br>音の長さを表示する。<br>"
 
-#~msgid "A rest of the specified note value duration can be constructed using a Silence block."
-#~msgstr "<h2>休符（きゅうふ）ブロック</h2><br>音がない部分に使われる。<br><br>★休符（きゅうふ）とは<br>休みの長さ。"
+#~ msgid "A rest of the specified note value duration can be constructed using a Silence block."
+#~ msgstr "<h2>休符（きゅうふ）ブロック</h2><br>音がない部分に使われる。<br><br>★休符（きゅうふ）とは<br>休みの長さ。"
 
-#~msgid "Conditionals lets your program take different actions depending on the condition."
-#~msgstr "<h2>じょうけんブロック</h2><br>じょうけんブロックを使うと、じょうけんによってちがうはたらきをするプログラムを作ることができる。"
+#~ msgid "Conditionals lets your program take different actions depending on the condition."
+#~ msgstr "<h2>じょうけんブロック</h2><br>じょうけんブロックを使うと、じょうけんによってちがうはたらきをするプログラムを作ることができる。"
 
-#~msgid "In this example if the mouse button is pressed a snare drum will play, else a kick drum will play."
-#~msgstr "<br><br>図の例では、もし、パソコンのマウスを長おししていれば「キックドラム」ブロックをえんそうする。長おししていなければ（そうでなければ）「キックドラム」ブロックをえんそうする。"
+#~ msgid "In this example if the mouse button is pressed a snare drum will play, else a kick drum will play."
+#~ msgstr "<br><br>図の例では、もし、パソコンのマウスを長おししていれば「キックドラム」ブロックをえんそうする。長おししていなければ（そうでなければ）「キックドラム」ブロックをえんそうする。"
 
-#~msgid "In this example of a simple drum machine a kick drum will play 1/4 notes forever."
-#~msgstr "<br><br>図の例は「アクション」の実行をくり返す。"
+#~ msgid "In this example of a simple drum machine a kick drum will play 1/4 notes forever."
+#~ msgstr "<br><br>図の例は「アクション」の実行をくり返す。"
 
-#~msgid "The Arc block moves the mouse in a arc."
-#~msgstr "<h2>いどうブロック</h2><br>ネズミの位置を、指定した大きさと角度の円をえがいていどうさせる。角度のすうちは、プラスだと右回り、マイナスだと左回りになる。"
+#~ msgid "The Arc block moves the mouse in a arc."
+#~ msgstr "<h2>いどうブロック</h2><br>ネズミの位置を、指定した大きさと角度の円をえがいていどうさせる。角度のすうちは、プラスだと右回り、マイナスだと左回りになる。"
 
-#~msgid "The Arc block moves the turtle in a arc."
-#~msgstr "<h2>いどうブロック</h2><br>タートルの位置を、指定した大きさと角度の円をえがいていどうさせる。角度のすうちは、プラスだと右回り、マイナスだと左回りになる。"
+#~ msgid "The Arc block moves the turtle in a arc."
+#~ msgstr "<h2>いどうブロック</h2><br>タートルの位置を、指定した大きさと角度の円をえがいていどうさせる。角度のすうちは、プラスだと右回り、マイナスだと左回りになる。"
 
-#~msgid "The Set heading block sets the heading of the mouse."
-#~msgstr "<h2>いどうブロック</h2><br>ネズミの向きを、指定したすうちの角度に変える。"
+#~ msgid "The Set heading block sets the heading of the mouse."
+#~ msgstr "<h2>いどうブロック</h2><br>ネズミの向きを、指定したすうちの角度に変える。"
 
-#~msgid "The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes."
-#~msgstr "<h2>スラーブロック</h2><br>音と次の音をなめらかにつなげる。ただし、「音符（おんぷ）ブロック」でせっていした音の長さは変わらない。<br><br>"
+#~ msgid "The Slur block lengthens the sustain of notes while maintaining the specified rhythmic value of the notes."
+#~ msgstr "<h2>スラーブロック</h2><br>音と次の音をなめらかにつなげる。ただし、「音符（おんぷ）ブロック」でせっていした音の長さは変わらない。<br><br>"
 
-#~msgid "The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes."
-#~msgstr "<h2>スタッカートブロック</h2><br>音を短かく切る。ただし、「音符（おんぷ）ブロック」でせっていした音の長さは変わらない。<br><br>"
+#~ msgid "The Staccato block shortens the length of the actual note while maintaining the specified rhythmic value of the notes."
+#~ msgstr "<h2>スタッカートブロック</h2><br>音を短かく切る。ただし、「音符（おんぷ）ブロック」でせっていした音の長さは変わらない。<br><br>"
 
-#~msgid "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
-#~msgstr "<h2>デクレシェンドブロック</h2><br>音量をだんだん小さくする。"
+#~ msgid "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
+#~ msgstr "<h2>デクレシェンドブロック</h2><br>音量をだんだん小さくする。"
 
-#~msgid "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
-#~msgstr "<br>たとえば、７つの音にすうちが５の「デクレシェンドブロック」を使うと、１音ごとにさいしょの音の音量の５パーセントずつ音量がへり、さいごの音はさいしょの音よりも３５パーセント音量が小さくなる。"
+#~ msgid "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
+#~ msgstr "<br>たとえば、７つの音にすうちが５の「デクレシェンドブロック」を使うと、１音ごとにさいしょの音の音量の５パーセントずつ音量がへり、さいごの音はさいしょの音よりも３５パーセント音量が小さくなる。"
 
-#~msgid "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
-#~msgstr "<h2>クレシェンドブロック</h2><br>音量をだんだん大きくする。"
+#~ msgid "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
+#~ msgstr "<h2>クレシェンドブロック</h2><br>音量をだんだん大きくする。"
 
-#~msgid "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
-#~msgstr "<br>たとえば、７つの音に、すうちが５の「クレシェンドブロック」を使うと、１音ごとにさいしょの音の音量の５パーセントずつ音量がふえ、さいごの音はさいしょの音よりも３５パーセント音量が大きくなる。<br><br> "
+#~ msgid "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
+#~ msgstr "<br>たとえば、７つの音に、すうちが５の「クレシェンドブロック」を使うと、１音ごとにさいしょの音の音量の５パーセントずつ音量がふえ、さいごの音はさいしょの音よりも３５パーセント音量が大きくなる。<br><br> "
 
-#~msgid "The set default instrument block changes the default instrument from electronic synth to the instrument of your choice."
-#~msgstr "「音色標準を設定」ブロックは音色のデフォルトを「シンセサイザー」からお好みの楽器に設定します。"
+#~ msgid "The set default instrument block changes the default instrument from electronic synth to the instrument of your choice."
+#~ msgstr "「音色標準を設定」ブロックは音色のデフォルトを「シンセサイザー」からお好みの楽器に設定します。"
 
-#~msgid "In the figure, it is used to take an action on the first beat of each measure."
-#~msgstr "<br><br>★拍（はく）とは<br>くり返されるリズムのこと。<br>★小節（しょうせつ）とは<br>楽譜（がくふ）の、たての線で区切られた部分。小節（しょうせつ）の中の拍（はく）は、拍子（ひょうし）と同じ数になる。"
+#~ msgid "In the figure, it is used to take an action on the first beat of each measure."
+#~ msgstr "<br><br>★拍（はく）とは<br>くり返されるリズムのこと。<br>★小節（しょうせつ）とは<br>楽譜（がくふ）の、たての線で区切られた部分。小節（しょうせつ）の中の拍（はく）は、拍子（ひょうし）と同じ数になる。"
 
-#~msgid "(By default, it counts quarter notes.)"
-#~msgstr "<br><br>★拍（はく）とは<br>くり返されるリズムのこと。"
+#~ msgid "(By default, it counts quarter notes.)"
+#~ msgstr "<br><br>★拍（はく）とは<br>くり返されるリズムのこと。"
 
-#~msgid "More Details"
-#~msgstr "詳細"
+#~ msgid "More Details"
+#~ msgstr "詳細"
 
-#~msgid "Share project"
-#~msgstr "プロジェクトをシェアする"
+#~ msgid "Share project"
+#~ msgstr "プロジェクトをシェアする"
 
-#~msgid "Copy link to clipboard"
-#~msgstr "リンクをクリップボードにコピーする"
+#~ msgid "Copy link to clipboard"
+#~ msgstr "リンクをクリップボードにコピーする"
 
-#~msgid "Run project on startup."
-#~msgstr "スタートしたらプロジェクトを再生する"
+#~ msgid "Run project on startup."
+#~ msgstr "スタートしたらプロジェクトを再生する"
 
-#~msgid "Show code blocks on startup."
-#~msgstr "スタートしたら、コードブロックを表示する"
+#~ msgid "Show code blocks on startup."
+#~ msgstr "スタートしたら、コードブロックを表示する"
 
-#~msgid "Collapse code blocks on startup."
-#~msgstr "スタートしたら、コードブロックを消す"
+#~ msgid "Collapse code blocks on startup."
+#~ msgstr "スタートしたら、コードブロックを消す"
 
-#~msgid "Advanced Options"
-#~msgstr "上級オプション"
+#~ msgid "Advanced Options"
+#~ msgstr "上級オプション"
 
-#~msgid "Warning: Sound is only coming out from one side."
-#~msgstr "音は右か左の一つだけのスピーカから今なっています。"
+#~ msgid "Warning: Sound is only coming out from one side."
+#~ msgstr "音は右か左の一つだけのスピーカから今なっています。"
 
-#~msgid "Hertz Block: Did you mean to use a Note block?"
-#~msgstr "ヘルツブロック：音符ブロックを使いますか？"
+#~ msgid "Hertz Block: Did you mean to use a Note block?"
+#~ msgstr "ヘルツブロック：音符ブロックを使いますか？"
 
-#~msgid "triad (root position)"
-#~msgstr "三和音 (基本形)"
+#~ msgid "triad (root position)"
+#~ msgstr "三和音 (基本形)"
 
-#~msgid "triad (1st inversion)"
-#~msgstr "三和音 (第1転回形)"
+#~ msgid "triad (1st inversion)"
+#~ msgstr "三和音 (第1転回形)"
 
-#~msgid "triad (2nd inversion)"
-#~msgstr "三和音 (第2転回形)"
+#~ msgid "triad (2nd inversion)"
+#~ msgstr "三和音 (第2転回形)"
 
-#~msgid "seventh (root position)"
-#~msgstr "七の和音 (基本形)"
+#~ msgid "seventh (root position)"
+#~ msgstr "七の和音 (基本形)"
 
-#~msgid "seventh (1st inversion)"
-#~msgstr "七の和音 (第1転回形)"
+#~ msgid "seventh (1st inversion)"
+#~ msgstr "七の和音 (第1転回形)"
 
-#~msgid "seventh (2nd inversion)"
-#~msgstr "七の和音 (第2転回形)"
+#~ msgid "seventh (2nd inversion)"
+#~ msgstr "七の和音 (第2転回形)"
 
-#~msgid "seventh (3rd inversion)"
-#~msgstr "七の和音 (第3転回形)"
+#~ msgid "seventh (3rd inversion)"
+#~ msgstr "七の和音 (第3転回形)"
 
-#~msgid "ninth (root position)"
-#~msgstr "九の和音 (基本形)"
+#~ msgid "ninth (root position)"
+#~ msgstr "九の和音 (基本形)"
 
-#~msgid "thirteenth (root position)"
-#~msgstr "十三の和音 (基本形)"
+#~ msgid "thirteenth (root position)"
+#~ msgstr "十三の和音 (基本形)"
 
-#~msgid "Like project"
-#~msgstr "プロジェクトに「いいね」をする"
+#~ msgid "Like project"
+#~ msgstr "プロジェクトに「いいね」をする"
 
-#~msgid "Republish Project"
-#~msgstr "プロジェクトを再度公開する"
+#~ msgid "Republish Project"
+#~ msgstr "プロジェクトを再度公開する"
 
-#~msgid "dominant seventh"
-#~msgstr "セブンス"
+#~ msgid "dominant seventh"
+#~ msgstr "セブンス"
 
-#~msgid "minor seventh"
-#~msgstr "マイナー・セブンス"
+#~ msgid "minor seventh"
+#~ msgstr "マイナー・セブンス"
 
-#~msgid "major seventh"
-#~msgstr "メジャー・セブンス"
+#~ msgid "major seventh"
+#~ msgstr "メジャー・セブンス"
 
-#~msgid "Warning: Note value greater than 2."
-#~msgstr "注意：音の長さは2より大きいです。"
+#~ msgid "Warning: Note value greater than 2."
+#~ msgstr "注意：音の長さは2より大きいです。"
 
-#~msgid "chord5"
-#~msgstr "５度の和音"
+#~ msgid "chord5"
+#~ msgstr "５度の和音"
 
-#~msgid "chord4"
-#~msgstr "4度の和音"
+#~ msgid "chord4"
+#~ msgstr "4度の和音"
 
-#~msgid "chord1"
-#~msgstr "1度の和音"
+#~ msgid "chord1"
+#~ msgstr "1度の和音"
 
-#~msgid "Run fast"
-#~msgstr "実行"
+#~ msgid "Run fast"
+#~ msgstr "実行"
 
-#~msgid "Expand/collapse collapsible blocks"
-#~msgstr "膨らむブロックを 表示/非表示"
+#~ msgid "Expand/collapse collapsible blocks"
+#~ msgstr "膨らむブロックを 表示/非表示"
 
-#~msgid "The Nth-Mouse name block returns the name of the nth mice."
-#~msgstr "「何匹目のネズミの名前」のブロックは数字によってそのネズミの名前を表す。"
+#~ msgid "The Nth-Mouse name block returns the name of the nth mice."
+#~ msgstr "「何匹目のネズミの名前」のブロックは数字によってそのネズミの名前を表す。"
 
-#~msgid "search for blocks"
-#~msgstr "ブロックをさがす"
+#~ msgid "search for blocks"
+#~ msgstr "ブロックをさがす"
 
-#~msgid "Please set browser zoom level to 100%"
-#~msgstr "ブラウザ表示を100%に設定してください。"
+#~ msgid "Please set browser zoom level to 100%"
+#~ msgstr "ブラウザ表示を100%に設定してください。"
 
-#~msgid "To run this project, open Music Blocks in a web browser and drag and drop this file into the browser window."
-#~msgstr "このプロジェクトをひらくには、ミュージック・ブロックスにアクセスし、このファイルをアプリケーションのウィンドウにドラッグするか、"
+#~ msgid "To run this project, open Music Blocks in a web browser and drag and drop this file into the browser window."
+#~ msgstr "このプロジェクトをひらくには、ミュージック・ブロックスにアクセスし、このファイルをアプリケーションのウィンドウにドラッグするか、"
 
-#~msgid "You must always have at least one start block."
-#~msgstr "スタートブロックは、１つ以上残しておいてください。"
+#~ msgid "You must always have at least one start block."
+#~ msgstr "スタートブロックは、１つ以上残しておいてください。"
 
-#~msgid "pitch up"
-#~msgstr "音の高さを上げる"
+#~ msgid "pitch up"
+#~ msgstr "音の高さを上げる"
 
-#~msgid "pitch down"
-#~msgstr "音の高さを下げる"
+#~ msgid "pitch down"
+#~ msgstr "音の高さを下げる"
 
-#~msgid "currency"
-#~msgstr "通貨"
+#~ msgid "currency"
+#~ msgstr "通貨"
 
-#~msgid "from"
-#~msgstr "から"
+#~ msgid "from"
+#~ msgstr "から"
 
-#~msgid "stock price"
-#~msgstr "株価"
+#~ msgid "stock price"
+#~ msgstr "株価"
 
-#~msgid "translate"
-#~msgstr "翻訳"
+#~ msgid "translate"
+#~ msgstr "翻訳"
 
-#~msgid "hello"
-#~msgstr "こんにちは"
+#~ msgid "hello"
+#~ msgstr "こんにちは"
 
-#~msgid "detect lang"
-#~msgstr "言語を検出"
+#~ msgid "detect lang"
+#~ msgstr "言語を検出"
 
-#~msgid "set lang"
-#~msgstr "言語を設定"
+#~ msgid "set lang"
+#~ msgstr "言語を設定"
 
-#~msgid "city latitude"
-#~msgstr "市の緯度"
+#~ msgid "city latitude"
+#~ msgstr "市の緯度"
 
-#~msgid "city longitude"
-#~msgstr "市の経度"
+#~ msgid "city longitude"
+#~ msgstr "市の経度"
 
-#~msgid "Coordinate data not available."
-#~msgstr "座標データが見つかりません"
+#~ msgid "Coordinate data not available."
+#~ msgstr "座標データが見つかりません"
 
-#~msgid "Google map"
-#~msgstr "グーグルマップ"
+#~ msgid "Google map"
+#~ msgstr "グーグルマップ"
 
-#~msgid "coordinates"
-#~msgstr "座標"
+#~ msgid "coordinates"
+#~ msgstr "座標"
 
-#~msgid "zoom factor"
-#~msgstr "ズームファクター"
+#~ msgid "zoom factor"
+#~ msgstr "ズームファクター"
 
-#~msgid "zoom"
-#~msgstr "ズーム"
+#~ msgid "zoom"
+#~ msgstr "ズーム"
 
-#~msgid "latitude"
-#~msgstr "緯度"
+#~ msgid "latitude"
+#~ msgstr "緯度"
 
-#~msgid "longitude"
-#~msgstr "経度"
+#~ msgid "longitude"
+#~ msgstr "経度"
 
-#~msgid "degrees"
-#~msgstr "温度"
+#~ msgid "degrees"
+#~ msgstr "温度"
 
-#~msgid "radians"
-#~msgstr "ラジアン"
+#~ msgid "radians"
+#~ msgstr "ラジアン"
 
-#~msgid "define"
-#~msgstr "定義"
+#~ msgid "define"
+#~ msgstr "定義"
 
-#~msgid "bitcoin"
-#~msgstr "ビットコイン"
+#~ msgid "bitcoin"
+#~ msgstr "ビットコイン"
 
-#~msgid "You need to select a file."
-#~msgstr "ファイルを選ぶ必要があります"
+#~ msgid "You need to select a file."
+#~ msgstr "ファイルを選ぶ必要があります"
 
-#~msgid "accidental-override"
-#~msgstr "変化記号を無効"
+#~ msgid "accidental-override"
+#~ msgstr "変化記号を無効"
 
-#~msgid "show treble"
-#~msgstr "トレブル記号を表示"
+#~ msgid "show treble"
+#~ msgstr "トレブル記号を表示"
 
-#~msgid "hide Polar"
-#~msgstr "中心の角度をかくす"
+#~ msgid "hide Polar"
+#~ msgstr "中心の角度をかくす"
 
-#~msgid "show bass"
-#~msgstr "バス記号を表示"
+#~ msgid "show bass"
+#~ msgstr "バス記号を表示"
 
-#~msgid "show mezzo-soprano"
-#~msgstr "メゾソプラノを表示"
+#~ msgid "show mezzo-soprano"
+#~ msgstr "メゾソプラノを表示"
 
-#~msgid "show alto"
-#~msgstr "アルト記号を表示"
+#~ msgid "show alto"
+#~ msgstr "アルト記号を表示"
 
-#~msgid "show tenor"
-#~msgstr "テノール記号を表示"
+#~ msgid "show tenor"
+#~ msgstr "テノール記号を表示"
 
-#~msgid "hide bass"
-#~msgstr "バス記号を隠す"
+#~ msgid "hide bass"
+#~ msgstr "バス記号を隠す"
 
-#~msgid "show Polar"
-#~msgstr "ほうがんと角度を表示"
+#~ msgid "show Polar"
+#~ msgstr "ほうがんと角度を表示"
 
-#~msgid "hide Cartesian"
-#~msgstr "ほうがん（ざひょう）をかくす"
+#~ msgid "hide Cartesian"
+#~ msgstr "ほうがん（ざひょう）をかくす"
 
-#~msgid "Lilypond cannot process tempo of "
-#~msgstr "Lilypondではこのテンポを対応できません："
+#~ msgid "Lilypond cannot process tempo of "
+#~ msgstr "Lilypondではこのテンポを対応できません："
 
-#~msgid "Save as PDF"
-#~msgstr "PDFでほぞん"
+#~ msgid "Save as PDF"
+#~ msgstr "PDFでほぞん"
 
-#~msgid "Lilypond ignoring mode"
-#~msgstr "Lilypondはこの音階を無視します"
+#~ msgid "Lilypond ignoring mode"
+#~ msgstr "Lilypondはこの音階を無視します"
 
-#~msgid "Do you want to save your project?"
-#~msgstr "プロジェクトをほぞんしますか"
+#~ msgid "Do you want to save your project?"
+#~ msgstr "プロジェクトをほぞんしますか"
 
-#~msgid "Click to select a block."
-#~msgstr "クリックしてブロックを選んで下さい"
+#~ msgid "Click to select a block."
+#~ msgstr "クリックしてブロックを選んで下さい"
 
-#~msgid "hide"
-#~msgstr "隠す"
+#~ msgid "hide"
+#~ msgstr "隠す"
 
-#~msgid "show2"
-#~msgstr "表示する"
+#~ msgid "show2"
+#~ msgstr "表示する"
 
-#~msgid "popout"
-#~msgstr "ポップアップ"
+#~ msgid "popout"
+#~ msgstr "ポップアップ"
 
-#~msgid "myblocks"
-#~msgstr "自分のブロック"
+#~ msgid "myblocks"
+#~ msgstr "自分のブロック"
 
-#~msgid "Drum Block: Did you mean to use a Note block?"
-#~msgstr "ドラムブロック：音符ブロックを使いますか？"
+#~ msgid "Drum Block: Did you mean to use a Note block?"
+#~ msgstr "ドラムブロック：音符ブロックを使いますか？"
 
-#~msgid "save rhythms"
-#~msgstr "リズムだけをほぞん"
+#~ msgid "save rhythms"
+#~ msgstr "リズムだけをほぞん"
 
-#~msgid "Pitch Block: Did you mean to use a Note block?"
-#~msgstr "音高ブロック：音符ブロックと一緒に使いますか?"
+#~ msgid "Pitch Block: Did you mean to use a Note block?"
+#~ msgstr "音高ブロック：音符ブロックと一緒に使いますか?"
 
-#~msgid "The Click block returns True if a mouse has been clicked."
-#~msgstr "<h2>しんぎブロック（クリック）</h2><br>マウスがクリックされたかどうかはんていする。クリックとはおされたマウスボタンが、離されたときのことを示す。クリックされていれば「真（しん）」、されていなければ「偽（ぎ）」という値になる。"
+#~ msgid "The Click block returns True if a mouse has been clicked."
+#~ msgstr "<h2>しんぎブロック（クリック）</h2><br>マウスがクリックされたかどうかはんていする。クリックとはおされたマウスボタンが、離されたときのことを示す。クリックされていれば「真（しん）」、されていなければ「偽（ぎ）」という値になる。"
 
-#~msgid "The box2 block returns the value stored in box2."
-#~msgstr "<h2>数値ブロック</h2><br>数値ブロックとして、箱２の数値を使う。"
+#~ msgid "The box2 block returns the value stored in box2."
+#~ msgstr "<h2>数値ブロック</h2><br>数値ブロックとして、箱２の数値を使う。"
 
-#~msgid "The box1 block returns the value stored in box1."
-#~msgstr "<h2>数値ブロック</h2><br>数値ブロックとして、箱１の数値を使う。"
+#~ msgid "The box1 block returns the value stored in box1."
+#~ msgstr "<h2>数値ブロック</h2><br>数値ブロックとして、箱１の数値を使う。"
 
-#~msgid "Cannot be further decreased"
-#~msgstr "これより小さくできない"
+#~ msgid "Cannot be further decreased"
+#~ msgstr "これより小さくできない"
 
-#~msgid "Cannot be further increased"
-#~msgstr "これより大きくできない"
+#~ msgid "Cannot be further increased"
+#~ msgstr "これより大きくできない"
 
-#~msgid "Turning off mouse blink; setting FPS to 10."
-#~msgstr "ネズミの点滅をオフにされ、FPSを１０にされている"
+#~ msgid "Turning off mouse blink; setting FPS to 10."
+#~ msgstr "ネズミの点滅をオフにされ、FPSを１０にされている"
 
-#~msgid "Turning on mouse blink; setting FPS to 30."
-#~msgstr "ネズミの点滅をオンにされ、FPSを３０にされている；"
+#~ msgid "Turning on mouse blink; setting FPS to 30."
+#~ msgstr "ネズミの点滅をオンにされ、FPSを３０にされている；"
 
-#~msgid "You can only tie notes of the same pitch. Did you mean to use slur?"
-#~msgstr "タイブロックは、同じ高さの音しかつなげません。スラーブロックを使いますか？"
+#~ msgid "You can only tie notes of the same pitch. Did you mean to use slur?"
+#~ msgstr "タイブロックは、同じ高さの音しかつなげません。スラーブロックを使いますか？"
 
-#~msgid "Note name must be one of A, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ or A♭."
-#~msgstr "音名はA, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ or A♭の中から必要があります。"
+#~ msgid "Note name must be one of A, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ or A♭."
+#~ msgstr "音名はA, A♯, B♭, B, C, C♯, D♭, D, D♯, E♭, E, F, F♯, G♭, G, G♯ or A♭の中から必要があります。"
 
-#~msgid "Do you want to remove all the stacks from your \"%s\" palette?"
-#~msgstr "自分のブロックスを全て消しますか？"
+#~ msgid "Do you want to remove all the stacks from your \"%s\" palette?"
+#~ msgstr "自分のブロックスを全て消しますか？"
 
-#~msgid "This button opens a viewer for sharing projects and for finding example projects."
-#~msgstr "インターネットの「プラネット（わくせい）」というページから、ほかの人が作ったプロジェクトを選んで、読みこむことができる。"
+#~ msgid "This button opens a viewer for sharing projects and for finding example projects."
+#~ msgstr "インターネットの「プラネット（わくせい）」というページから、ほかの人が作ったプロジェクトを選んで、読みこむことができる。"
 
-#~msgid "Click this button to expand or collapse the auxiliary toolbar."
-#~msgstr "このボタンをクリックするとオプションツールバーを表示/非表示"
+#~ msgid "Click this button to expand or collapse the auxiliary toolbar."
+#~ msgstr "このボタンをクリックするとオプションツールバーを表示/非表示"
 
-#~msgid "The beat of the music is determined by the Meter block (by default, 4 1/4 notes per measure)."
-#~msgstr "<h2>拍子（ひょうし）ブロック</h2><br>拍子（ひょうし）をせっていする。ひょうじゅんは４分の４拍子（びょうし）。<br><br>★拍子（ひょうし）とは<br>拍がいくつかまとまったもの。<br>★４分の４拍子（びょうし）とは<br>４分音符（おんぷ）が４つでひとまとまりになった拍子（ひょうし）。<br>★拍（はく）とは<br>くり返されるリズムのこと。"
+#~ msgid "The beat of the music is determined by the Meter block (by default, 4 1/4 notes per measure)."
+#~ msgstr "<h2>拍子（ひょうし）ブロック</h2><br>拍子（ひょうし）をせっていする。ひょうじゅんは４分の４拍子（びょうし）。<br><br>★拍子（ひょうし）とは<br>拍がいくつかまとまったもの。<br>★４分の４拍子（びょうし）とは<br>４分音符（おんぷ）が４つでひとまとまりになった拍子（ひょうし）。<br>★拍（はく）とは<br>くり返されるリズムのこと。"
 
-#~msgid "The Master beats per minute block sets the number of 1/4 notes per minute for every voice."
-#~msgstr "<h2>全体のスピードを決めるブロック</h2><br>１分あたりの拍（はく）の数をせっていすることで、曲全体のスピードを決める。ひょうじゅんは４分音符（おんぷ）９０こ。<br><br>★拍（はく）とはくり返されるリズムのこと。"
+#~ msgid "The Master beats per minute block sets the number of 1/4 notes per minute for every voice."
+#~ msgstr "<h2>全体のスピードを決めるブロック</h2><br>１分あたりの拍（はく）の数をせっていすることで、曲全体のスピードを決める。ひょうじゅんは４分音符（おんぷ）９０こ。<br><br>★拍（はく）とはくり返されるリズムのこと。"
 
-#~msgid "The On-every-note block let you specify actions to take on every note."
-#~msgstr "<h2>全ての音符（おんぷ）にアクション実行</h2><br>すべての音符（おんぷ）にせっていするときに使う。<br><br>"
+#~ msgid "The On-every-note block let you specify actions to take on every note."
+#~ msgstr "<h2>全ての音符（おんぷ）にアクション実行</h2><br>すべての音符（おんぷ）にせっていするときに使う。<br><br>"
 
-#~msgid "The Notes played block is the number of notes that have been played."
-#~msgstr "<h2>全体の拍（はく）の数ブロック</h2><br>全体の拍（はく）の数を表示する。ひょうじゅんは拍（はく）は４分音符（おんぷ）を意味するため、げんそくは、曲全体の４分音符（おんぷ）の数を表す。"
+#~ msgid "The Notes played block is the number of notes that have been played."
+#~ msgstr "<h2>全体の拍（はく）の数ブロック</h2><br>全体の拍（はく）の数を表示する。ひょうじゅんは拍（はく）は４分音符（おんぷ）を意味するため、げんそくは、曲全体の４分音符（おんぷ）の数を表す。"
 
-#~msgid "The Pitch Number block will play a pitch associated by its number eg 0 for C and 7 for G."
-#~msgstr "<h2>音の高さを数で表示ブロック</h2><br>音の高さを数で表示する。たとえば、オクターヴ４の「ド」の音は０、オクターヴ４の「ソ」の音は７、オクターヴ３の「シ」の音は-１と表示される。"
+#~ msgid "The Pitch Number block will play a pitch associated by its number eg 0 for C and 7 for G."
+#~ msgstr "<h2>音の高さを数で表示ブロック</h2><br>音の高さを数で表示する。たとえば、オクターヴ４の「ド」の音は０、オクターヴ４の「ソ」の音は７、オクターヴ３の「シ」の音は-１と表示される。"
 
-#~msgid "The Pitch-slider block opens a tool to generate arbitray pitches."
-#~msgstr "<h2>ヘルツスライダーブロック</h2><br>スライダーを上下にうごかすことで、違う周波数（ヘルツのすうち）の音を聞くことができる。作った音をデータ化することができる。ヘルツの初期せっていちは、自由に変えられる。<br><br>★ヘルツとは<br>音の高さを表す周波数。<br>★周波数とは<br>音が１秒間に何回しんどうするかを表すすうち。周波数が高い（すうちが大きい）ほど、音が高くなる。"
+#~ msgid "The Pitch-slider block opens a tool to generate arbitray pitches."
+#~ msgstr "<h2>ヘルツスライダーブロック</h2><br>スライダーを上下にうごかすことで、違う周波数（ヘルツのすうち）の音を聞くことができる。作った音をデータ化することができる。ヘルツの初期せっていちは、自由に変えられる。<br><br>★ヘルツとは<br>音の高さを表す周波数。<br>★周波数とは<br>音が１秒間に何回しんどうするかを表すすうち。周波数が高い（すうちが大きい）ほど、音が高くなる。"
 
-#~msgid "All of the Start blocks run at the same time when the Play button is pressed."
-#~msgstr "<br><br>プログラムには、少なくとも１つのスタートブロックが置かれていないと実行できない。ふくすうのスタートブロックがあるときは、実行ボタンがおされると、ふくすうのスタートブロックが同時に実行される。１つ１つのスタートブロックは別々のえんそう者と考えることができる。"
+#~ msgid "All of the Start blocks run at the same time when the Play button is pressed."
+#~ msgstr "<br><br>プログラムには、少なくとも１つのスタートブロックが置かれていないと実行できない。ふくすうのスタートブロックがあるときは、実行ボタンがおされると、ふくすうのスタートブロックが同時に実行される。１つ１つのスタートブロックは別々のえんそう者と考えることができる。"
 
-#~msgid "The Store in box1 block is used to store a value in box1."
-#~msgstr "<h2>数の箱（あたいを入れる）</h2><br>箱１に指定したすうちを入れる。"
+#~ msgid "The Store in box1 block is used to store a value in box1."
+#~ msgstr "<h2>数の箱（あたいを入れる）</h2><br>箱１に指定したすうちを入れる。"
 
-#~msgid "The Store in box2 block is used to store a value in box2."
-#~msgstr "<h2>数の箱（あたいを入れる）</h2><br>箱２に指定したすうちを入れる。"
+#~ msgid "The Store in box2 block is used to store a value in box2."
+#~ msgstr "<h2>数の箱（あたいを入れる）</h2><br>箱２に指定したすうちを入れる。"
 
-#~msgid "The Shell block is used to change the appearance of the mouse."
-#~msgstr "<h2>表示ブロック（ネズミ）</h2><br>ネズミの見た目を、指定したがぞうに変える。"
+#~ msgid "The Shell block is used to change the appearance of the mouse."
+#~ msgstr "<h2>表示ブロック（ネズミ）</h2><br>ネズミの見た目を、指定したがぞうに変える。"
 
-#~msgid "The On-strong-beat block let you specify actions to take on specified beats."
-#~msgstr "<em>強拍に</em>ブロックは決められている拍子に対する強拍だけに特定されているアクションをします。"
+#~ msgid "The On-strong-beat block let you specify actions to take on specified beats."
+#~ msgstr "<em>強拍に</em>ブロックは決められている拍子に対する強拍だけに特定されているアクションをします。"
 
-#~msgid "The On-weak-beat block let you specify actions to take on weak (off) beats."
-#~msgstr "<em>弱拍</em>ブロックは決められている拍子に対する弱拍だけに特定されているアクションをします。"
+#~ msgid "The On-weak-beat block let you specify actions to take on weak (off) beats."
+#~ msgstr "<em>弱拍</em>ブロックは決められている拍子に対する弱拍だけに特定されているアクションをします。"
 
-#~msgid "down minor"
-#~msgstr "短３度下"
+#~ msgid "down minor"
+#~ msgstr "短３度下"
 
-#~msgid "down major"
-#~msgstr "長３度下"
+#~ msgid "down major"
+#~ msgstr "長３度下"
 
-#~msgid "eval"
-#~msgstr "評価"
+#~ msgid "eval"
+#~ msgstr "評価"
 
-#~msgid "100"
-#~msgstr "百"
+#~ msgid "100"
+#~ msgstr "百"
 
-#~msgid "Drag"
-#~msgstr "ドラッグ"
+#~ msgid "Drag"
+#~ msgstr "ドラッグ"
 
-#~msgid "playback music"
-#~msgstr "コンパイルされた音楽"
+#~ msgid "playback music"
+#~ msgstr "コンパイルされた音楽"
 
-#~msgid "pause playback"
-#~msgstr "コンパイルされた音楽を停止"
+#~ msgid "pause playback"
+#~ msgstr "コンパイルされた音楽を停止"
 
-#~msgid "restart playback"
-#~msgstr "コンパイルされた音楽を再生"
+#~ msgid "restart playback"
+#~ msgstr "コンパイルされた音楽を再生"
 
-#~msgid "prepare music for playback"
-#~msgstr "プレイバック用の音楽を準備（コンパイル）します"
+#~ msgid "prepare music for playback"
+#~ msgstr "プレイバック用の音楽を準備（コンパイル）します"
 
-#~msgid "decimal to fraction"
-#~msgstr "小数を分数に直す"
+#~ msgid "decimal to fraction"
+#~ msgstr "小数を分数に直す"
 
-#~msgid "The Set timbre block selects a voice for the synthesizer,"
-#~msgstr "<h2>音色をせっていブロック</h2><br>中に入っている「音符（おんぷ）ブロック」の音色を設定する。音色は、ギターやピアノなどの中から選ぶことができる。<br><br> "
+#~ msgid "The Set timbre block selects a voice for the synthesizer,"
+#~ msgstr "<h2>音色をせっていブロック</h2><br>中に入っている「音符（おんぷ）ブロック」の音色を設定する。音色は、ギターやピアノなどの中から選ぶことができる。<br><br> "
 
-#~msgid "set timbre"
-#~msgstr "音色をせってい"
+#~ msgid "set timbre"
+#~ msgstr "音色をせってい"
 
-#~msgid "right2"
-#~msgstr "ざひょうち（右）"
+#~ msgid "right2"
+#~ msgstr "ざひょうち（右）"
 
-#~msgid "left2"
-#~msgstr "ざひょうち（左）"
+#~ msgid "left2"
+#~ msgstr "ざひょうち（左）"
 
-#~msgid "expand"
-#~msgstr "テーブルを広げる"
+#~ msgid "expand"
+#~ msgstr "テーブルを広げる"
 
-#~msgid "collapse"
-#~msgstr "テーブルをちぢめる"
+#~ msgid "collapse"
+#~ msgstr "テーブルをちぢめる"
 
-#~msgid "Stop the current project."
-#~msgstr "プロジェクトを止めます"
+#~ msgid "Stop the current project."
+#~ msgstr "プロジェクトを止めます"
 
-#~msgid "japanese"
-#~msgstr "日本音階"
+#~ msgid "japanese"
+#~ msgstr "日本音階"
 
-#~msgid "7th"
-#~msgstr "７度"
+#~ msgid "7th"
+#~ msgstr "７度"
 
-#~msgid "chord' + ' ' + 'I"
-#~msgstr "１度' + ' ' + 'の和音"
+#~ msgid "chord' + ' ' + 'I"
+#~ msgstr "１度' + ' ' + 'の和音"
 
-#~msgid "set volume"
-#~msgstr "音量を設定"
+#~ msgid "set volume"
+#~ msgstr "音量を設定"
 
-#~msgid "hours ago"
-#~msgstr "時間前"
+#~ msgid "hours ago"
+#~ msgstr "時間前"
 
-#~msgid "play scale"
-#~msgstr "音階を再生する"
+#~ msgid "play scale"
+#~ msgstr "音階を再生する"
 
-#~msgid "ml"
-#~msgstr "モ"
+#~ msgid "ml"
+#~ msgstr "モ"
 
-#~msgid "play backward"
-#~msgstr "逆に再生"
+#~ msgid "play backward"
+#~ msgstr "逆に再生"
 
-#~msgid "Merge project from file"
-#~msgstr "ファイルからプロジェクトをマージする"
+#~ msgid "Merge project from file"
+#~ msgstr "ファイルからプロジェクトをマージする"
 
-#~msgid "eatme"
-#~msgstr "私を食べろ"
+#~ msgid "eatme"
+#~ msgstr "私を食べろ"
 
-#~msgid "movable"
-#~msgstr "移動の「ド、レ、ミ」"
+#~ msgid "movable"
+#~ msgstr "移動の「ド、レ、ミ」"
 
-#~msgid "triangle-bell"
-#~msgstr "トライアングル"
+#~ msgid "triangle-bell"
+#~ msgstr "トライアングル"
 
-#~msgid "Hide grid"
-#~msgstr "中心の角度をかくす"
+#~ msgid "Hide grid"
+#~ msgstr "中心の角度をかくす"
 
-#~msgid "effects"
-#~msgstr "音響効果"
+#~ msgid "effects"
+#~ msgstr "音響効果"
 
-#~msgid "Share on Facebook"
-#~msgstr "フェースブックでシェア"
+#~ msgid "Share on Facebook"
+#~ msgstr "フェースブックでシェア"
 
-#~msgid "rs"
-#~msgstr "赤"
+#~ msgid "rs"
+#~ msgstr "赤"
 
-#~msgid "divide note value"
-#~msgstr "音価を割る"
+#~ msgid "divide note value"
+#~ msgstr "音価を割る"
 
-#~msgid "extra-long press to run music slowly"
-#~msgstr "より長押しで、よりスロー再生になります"
+#~ msgid "extra-long press to run music slowly"
+#~ msgstr "より長押しで、よりスロー再生になります"
 
-#~msgid "save drum machine"
-#~msgstr "ドラムとしてほぞん"
+#~ msgid "save drum machine"
+#~ msgstr "ドラムとしてほぞん"
 
-#~msgid "whole note 𝅝"
-#~msgstr "全音符 𝅝"
+#~ msgid "whole note 𝅝"
+#~ msgstr "全音符 𝅝"
 
-#~msgid "To copy a stack to the clipboard, right-click on the stack."
-#~msgstr "コードスタックをコピーするため、右クリック"
+#~ msgid "To copy a stack to the clipboard, right-click on the stack."
+#~ msgstr "コードスタックをコピーするため、右クリック"
 
-#~msgid "note volume"
-#~msgstr "音符の音量"
+#~ msgid "note volume"
+#~ msgstr "音符の音量"
 
-#~msgid "top"
-#~msgstr "ざひょうち（上）"
+#~ msgid "top"
+#~ msgstr "ざひょうち（上）"
 
-#~msgid "Open a panel for configuring Music Blocks."
-#~msgstr "ミュージック・ブロックスの設定メニューを開く。"
+#~ msgid "Open a panel for configuring Music Blocks."
+#~ msgstr "ミュージック・ブロックスの設定メニューを開く。"
 
-#~msgid "The Planet is unavailable."
-#~msgstr "「プラネット」サーバは今使えません"
+#~ msgid "The Planet is unavailable."
+#~ msgstr "「プラネット」サーバは今使えません"
 
-#~msgid "You can use multiple <em>Drum</em> blocks within a <em>Note</em> block."
-#~msgstr "<h2>ドラムブロック</h2><br>「音符（おんぷ）ブロック」のなかに入れて使う。色々なドラムの音色を選ぶことができる。１つの「音符（おんぷ）ブロック」の中でふくすうの音色のドラムを組み合わせて使うことができる。<br><br> "
+#~ msgid "You can use multiple <em>Drum</em> blocks within a <em>Note</em> block."
+#~ msgstr "<h2>ドラムブロック</h2><br>「音符（おんぷ）ブロック」のなかに入れて使う。色々なドラムの音色を選ぶことができる。１つの「音符（おんぷ）ブロック」の中でふくすうの音色のドラムを組み合わせて使うことができる。<br><br> "
 
-#~msgid "You can also use Alt+V to paste a stack of blocks. "
-#~msgstr "Alt+Vでブロックスを貼り付けることもできます。"
+#~ msgid "You can also use Alt+V to paste a stack of blocks. "
+#~ msgstr "Alt+Vでブロックスを貼り付けることもできます。"
 
-#~msgid "The save-stack button saves a stack onto a custom palette."
-#~msgstr "スタックほぞんボタンを押すと、スタックはカスタムパレットの下にほぞんされます。"
+#~ msgid "The save-stack button saves a stack onto a custom palette."
+#~ msgstr "スタックほぞんボタンを押すと、スタックはカスタムパレットの下にほぞんされます。"
 
-#~msgid "The paste button is enabled when there are blocks copied onto the clipboard."
-#~msgstr "ブロックスがクリップボードにコピーされると、ペーストボタンが使えるようになります。"
+#~ msgid "The paste button is enabled when there are blocks copied onto the clipboard."
+#~ msgstr "ブロックスがクリップボードにコピーされると、ペーストボタンが使えるようになります。"
 
-#~msgid "denominator"
-#~msgstr "分母"
+#~ msgid "denominator"
+#~ msgstr "分母"
 
-#~msgid "Extra-long press the run button to run the music in slow mode."
-#~msgstr "より長押しすると、よりスロー再生となります。"
+#~ msgid "Extra-long press the run button to run the music in slow mode."
+#~ msgstr "より長押しすると、よりスロー再生となります。"
 
-#~msgid "Run"
-#~msgstr "再生"
+#~ msgid "Run"
+#~ msgstr "再生"
 
-#~msgid "You can load new blocks from the file system."
-#~msgstr "新しいブロックをファイルシステムからロードできます。"
+#~ msgid "You can load new blocks from the file system."
+#~ msgstr "新しいブロックをファイルシステムからロードできます。"
 
-#~msgid "Settings"
-#~msgstr "せってい"
+#~ msgid "Settings"
+#~ msgstr "せってい"
 
-#~msgid "move down"
-#~msgstr "下げる"
+#~ msgid "move down"
+#~ msgstr "下げる"
 
-#~msgid "consonant step up"
-#~msgstr "コンソナントステップアップ"
+#~ msgid "consonant step up"
+#~ msgstr "コンソナントステップアップ"
 
-#~msgid "View More"
-#~msgstr "もっと見る"
+#~ msgid "View More"
+#~ msgstr "もっと見る"
 
-#~msgid "collpase"
-#~msgstr "縮む"
+#~ msgid "collpase"
+#~ msgstr "縮む"
 
-#~msgid "The <em>Step pitch</em> block (in combination with a <em>Number</em> block) will play the next pitch in a scale, e.g., if the last note played was <em>sol</em>, <em>Step pitch 1</em> will play <em>la</em>."
-#~msgstr "<em>ステップピッチ</em>ブロックはメロディーの音符を音階的に上/下に動かすことができます。(例えば、もし<em>ステップピッチ</em>の前のブロックは<em>ソル</em>だったら<em>ステップピッチ＝１</em>は<em>ラ</em>を鳴らします。"
+#~ msgid "The <em>Step pitch</em> block (in combination with a <em>Number</em> block) will play the next pitch in a scale, e.g., if the last note played was <em>sol</em>, <em>Step pitch 1</em> will play <em>la</em>."
+#~ msgstr "<em>ステップピッチ</em>ブロックはメロディーの音符を音階的に上/下に動かすことができます。(例えば、もし<em>ステップピッチ</em>の前のブロックは<em>ソル</em>だったら<em>ステップピッチ＝１</em>は<em>ラ</em>を鳴らします。"
 
-#~msgid "Run music slowly"
-#~msgstr "音楽をゆっくりに演奏する"
+#~ msgid "Run music slowly"
+#~ msgstr "音楽をゆっくりに演奏する"
 
-#~msgid "You can search for blocks by name."
-#~msgstr "ブロックスを名前で検索できます"
+#~ msgid "You can search for blocks by name."
+#~ msgstr "ブロックスを名前で検索できます"
 
-#~msgid "finger-cymbals"
-#~msgstr "指のシンバル"
+#~ msgid "finger-cymbals"
+#~ msgstr "指のシンバル"
 
-#~msgid "Tuplet Block: Did you mean to use a Matrix block?"
-#~msgstr "タプル・ブロック：音高・時刻行列ブロックを使うつもりですか？"
+#~ msgid "Tuplet Block: Did you mean to use a Matrix block?"
+#~ msgstr "タプル・ブロック：音高・時刻行列ブロックを使うつもりですか？"
 
-#~msgid "set beats per minute"
-#~msgstr "BPM(一分あたりの拍数)を設定"
+#~ msgid "set beats per minute"
+#~ msgstr "BPM(一分あたりの拍数)を設定"
 
-#~msgid "Delete all"
-#~msgstr "ブロックを全部捨てる"
+#~ msgid "Delete all"
+#~ msgstr "ブロックを全部捨てる"
 
-#~msgid "UID"
-#~msgstr "ユーザの名前"
+#~ msgid "UID"
+#~ msgstr "ユーザの名前"
 
-#~msgid "rotate clockwise"
-#~msgstr "右回りにずれる"
+#~ msgid "rotate clockwise"
+#~ msgstr "右回りにずれる"
 
-#~msgid "Input to Minor Block must be 2, 3, 6, or 7"
-#~msgstr "「短（マイナー）」ブロックには 2, 3, 6, 7いずれかの数をいれて下さい。"
+#~ msgid "Input to Minor Block must be 2, 3, 6, or 7"
+#~ msgstr "「短（マイナー）」ブロックには 2, 3, 6, 7いずれかの数をいれて下さい。"
 
-#~msgid "bottom"
-#~msgstr "ざひょうち（下）"
+#~ msgid "bottom"
+#~ msgstr "ざひょうち（下）"
 
-#~msgid "numerator"
-#~msgstr "分子"
+#~ msgid "numerator"
+#~ msgstr "分子"
 
-#~msgid "eighth note ♪"
-#~msgstr "８分音符 ♪"
+#~ msgid "eighth note ♪"
+#~ msgstr "８分音符 ♪"
 
-#~msgid "Input to Augmented Block must be 1, 2, 3, 4, 5, 6, 7, or 8"
-#~msgstr "オーギュメントブロックには 1, 2, 3, 4, 5, 6, 7, 8 のいずれかの数をいれて下さい。"
+#~ msgid "Input to Augmented Block must be 1, 2, 3, 4, 5, 6, 7, or 8"
+#~ msgstr "オーギュメントブロックには 1, 2, 3, 4, 5, 6, 7, 8 のいずれかの数をいれて下さい。"
 
-#~msgid "cup-drum"
-#~msgstr "カップドラム"
+#~ msgid "cup-drum"
+#~ msgstr "カップドラム"
 
-#~msgid "hi-hat"
-#~msgstr "ハイハット"
+#~ msgid "hi-hat"
+#~ msgstr "ハイハット"
 
-#~msgid "untitled"
-#~msgstr "無題"
+#~ msgid "untitled"
+#~ msgstr "無題"
 
-#~msgid "Click here to paste."
-#~msgstr "貼り付けるにはここをクリック"
+#~ msgid "Click here to paste."
+#~ msgstr "貼り付けるにはここをクリック"
 
-#~msgid "relative interval"
-#~msgstr "相対的な音と音の間の間隔"
+#~ msgid "relative interval"
+#~ msgstr "相対的な音と音の間の間隔"
 
-#~msgid "on beat"
-#~msgstr "強拍にて"
+#~ msgid "on beat"
+#~ msgstr "強拍にて"
 
-#~msgid "Pitch can be specified in terms of <em>do re mi fa sol la ti<em>."
-#~msgstr "ソルフェージュの名前が<em>「ド、レ、ミ、ファ、ソ、ラ、シ」</em>から選ぶことができます。"
+#~ msgid "Pitch can be specified in terms of <em>do re mi fa sol la ti<em>."
+#~ msgstr "ソルフェージュの名前が<em>「ド、レ、ミ、ファ、ソ、ラ、シ」</em>から選ぶことができます。"
 
-#~msgid "This toolbar contains the palette buttons, including Rhythm Pitch Tone Turtle and more."
-#~msgstr "このツールバーには、リズム、ピッチ、音色、タートル、その他のパレットボタンがあります。"
+#~ msgid "This toolbar contains the palette buttons, including Rhythm Pitch Tone Turtle and more."
+#~ msgstr "このツールバーには、リズム、ピッチ、音色、タートル、その他のパレットボタンがあります。"
 
-#~msgid "block artwork"
-#~msgstr "ブロックのアート"
+#~ msgid "block artwork"
+#~ msgstr "ブロックのアート"
 
-#~msgid "1st"
-#~msgstr "１度"
+#~ msgid "1st"
+#~ msgstr "１度"
 
-#~msgid "Could not find turtle"
-#~msgstr "タートルが見つかりませんでした。"
+#~ msgid "Could not find turtle"
+#~ msgstr "タートルが見つかりませんでした。"
 
-#~msgid "play chord"
-#~msgstr "和音を再生する"
+#~ msgid "play chord"
+#~ msgstr "和音を再生する"
 
-#~msgid "Optimize feedback"
-#~msgstr "フィードバックを最大限にする"
+#~ msgid "Optimize feedback"
+#~ msgstr "フィードバックを最大限にする"
 
-#~msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\"
-#~msgstr "ミスター・マウスは私たちのミュージック・ブロックスの指揮者です。ミスター・マウスは、あなたのミュージック・ブロックスにおけるさまざまな探究に力を貸してくれます。さぁ、私達のミュージックブロックスツアーを始めましょう！ "
+#~ msgid "Mr. Mouse is our Music Blocks conductor. Mr. Mouse encourages you to explore the Musical Blocks, the Matrix, and the Performance/Notation possibilities of Music Blocks. \"Let\'s start our tour!\"
+#~ msgstr "ミスター・マウスは私たちのミュージック・ブロックスの指揮者です。ミスター・マウスは、あなたのミュージック・ブロックスにおけるさまざまな探究に力を貸してくれます。さぁ、私達のミュージックブロックスツアーを始めましょう！ "
 
-#~msgid "Save your project to a server."
-#~msgstr "サーバーにプロジェクトをほぞん"
+#~ msgid "Save your project to a server."
+#~ msgstr "サーバーにプロジェクトをほぞん"
 
-#~msgid "4th"
-#~msgstr "４度"
+#~ msgid "4th"
+#~ msgstr "４度"
 
-#~msgid "Click to run just the music in slow mode."
-#~msgstr "音楽をゆっくり再生したい時は、ここをクリック。"
+#~ msgid "Click to run just the music in slow mode."
+#~ msgstr "音楽をゆっくり再生したい時は、ここをクリック。"
 
-#~msgid "6th"
-#~msgstr "６度"
+#~ msgid "6th"
+#~ msgstr "６度"
 
-#~msgid "Run fast / long press to run slowly / extra-long press to run music slowly"
-#~msgstr "速いスピードで再生します／長押しでスロー再生／より長押しでさらにスロー再生"
+#~ msgid "Run fast / long press to run slowly / extra-long press to run music slowly"
+#~ msgstr "速いスピードで再生します／長押しでスロー再生／より長押しでさらにスロー再生"
 
-#~msgid "Alternatively, you can hit the ENTER or RETURN key."
-#~msgstr "ENTERまたRETURNでも可能です"
+#~ msgid "Alternatively, you can hit the ENTER or RETURN key."
+#~ msgstr "ENTERまたRETURNでも可能です"
 
-#~msgid "turtle"
-#~msgstr "タートル"
+#~ msgid "turtle"
+#~ msgstr "タートル"
 
-#~msgid "3rd"
-#~msgstr "３度"
+#~ msgid "3rd"
+#~ msgstr "３度"
 
-#~msgid "Optimize performance"
-#~msgstr "パーフォマンスを最大限にする"
+#~ msgid "Optimize performance"
+#~ msgstr "パーフォマンスを最大限にする"
 
-#~msgid "simple-1"
-#~msgstr "シンプル・シンセ１"
+#~ msgid "simple-1"
+#~ msgstr "シンプル・シンセ１"
 
-#~msgid "consonant step down"
-#~msgstr "コンソナントステップダウン"
+#~ msgid "consonant step down"
+#~ msgstr "コンソナントステップダウン"
 
-#~msgid "ride-bell"
-#~msgstr "ライド"
+#~ msgid "ride-bell"
+#~ msgstr "ライド"
 
-#~msgid "Music Blocks is a collection of tools for exploring musical concepts."
-#~msgstr "ミュージック・ブロックス：音楽と算数とコーディングの関係を発見するツール"
+#~ msgid "Music Blocks is a collection of tools for exploring musical concepts."
+#~ msgstr "ミュージック・ブロックス：音楽と算数とコーディングの関係を発見するツール"
 
-#~msgid "Cannot read pixel color"
-#~msgstr "ピクセルの色が読めません"
+#~ msgid "Cannot read pixel color"
+#~ msgstr "ピクセルの色が読めません"
 
-#~msgid "floor-tom-tom"
-#~msgstr "フロアタムタム"
+#~ msgid "floor-tom-tom"
+#~ msgstr "フロアタムタム"
 
-#~msgid "Publish"
-#~msgstr "サーバにアップロードして発表する"
+#~ msgid "Publish"
+#~ msgstr "サーバにアップロードして発表する"
 
-#~msgid "Worldwide"
-#~msgstr "世界中のプロジェクト"
+#~ msgid "Worldwide"
+#~ msgstr "世界中のプロジェクト"
 
-#~msgid "long press to run slowly"
-#~msgstr "長押しでスロー再生"
+#~ msgid "long press to run slowly"
+#~ msgstr "長押しでスロー再生"
 
-#~msgid "1/64 note 𝅘𝅥𝅱"
-#~msgstr "６４分音符 𝅘𝅥𝅱"
+#~ msgid "1/64 note 𝅘𝅥𝅱"
+#~ msgstr "６４分音符 𝅘𝅥𝅱"
 
-#~msgid "Previous page"
-#~msgstr "前のページ"
+#~ msgid "Previous page"
+#~ msgstr "前のページ"
 
-#~msgid "end hollow line"
-#~msgstr "（中空の）線を終わらせる"
+#~ msgid "end hollow line"
+#~ msgstr "（中空の）線を終わらせる"
 
-#~msgid "Open"
-#~msgstr "開く"
+#~ msgid "Open"
+#~ msgstr "開く"
 
-#~msgid "tom-tom"
-#~msgstr "タムタム"
+#~ msgid "tom-tom"
+#~ msgstr "タムタム"
 
-#~msgid "ch"
-#~msgstr "リ"
+#~ msgid "ch"
+#~ msgstr "リ"
 
-#~msgid "add pitches"
-#~msgstr "音高を足す"
+#~ msgid "add pitches"
+#~ msgstr "音高を足す"
 
-#~msgid "cb"
-#~msgstr "カ"
+#~ msgid "cb"
+#~ msgstr "カ"
 
-#~msgid "reference pitch"
-#~msgstr "参考音高"
+#~ msgid "reference pitch"
+#~ msgstr "参考音高"
 
-#~msgid "Click to run the music note by note."
-#~msgstr "音符を一つずつ再生するにはここをクリック。"
+#~ msgid "Click to run the music note by note."
+#~ msgstr "音符を一つずつ再生するにはここをクリック。"
 
-#~msgid "poly"
-#~msgstr "ポリリズム"
+#~ msgid "poly"
+#~ msgstr "ポリリズム"
 
-#~msgid "move up"
-#~msgstr "上げる"
+#~ msgid "move up"
+#~ msgstr "上げる"
 
-#~msgid "Show or hide a Cartesian-coordinate grid."
-#~msgstr "直交座標を表示する/隠す"
+#~ msgid "Show or hide a Cartesian-coordinate grid."
+#~ msgstr "直交座標を表示する/隠す"
 
-#~msgid "field"
-#~msgstr "場"
+#~ msgid "field"
+#~ msgstr "場"
 
-#~msgid "m"
-#~msgstr "鼠"
+#~ msgid "m"
+#~ msgstr "鼠"
 
-#~msgid "gs"
-#~msgstr "灰"
+#~ msgid "gs"
+#~ msgstr "灰"
 
-#~msgid "graphical notation matrix"
-#~msgstr "簡単なビジュアル・マトリックス"
+#~ msgid "graphical notation matrix"
+#~ msgstr "簡単なビジュアル・マトリックス"
 
-#~msgid "Save as HTML"
-#~msgstr "HTMLをほぞん"
+#~ msgid "Save as HTML"
+#~ msgstr "HTMLをほぞん"
 
-#~msgid "Load project from files"
-#~msgstr "ファイルからロードする"
+#~ msgid "Load project from files"
+#~ msgstr "ファイルからロードする"
 
-#~msgid "Hide or show the block palettes."
-#~msgstr "ブロックのパレットを表示する / 隠す"
+#~ msgid "Hide or show the block palettes."
+#~ msgstr "ブロックのパレットを表示する / 隠す"
 
-#~msgid "Run fast / long press to run slowly"
-#~msgstr "速いスピードで再生します・長押しでスロー再生"
+#~ msgid "Run fast / long press to run slowly"
+#~ msgstr "速いスピードで再生します・長押しでスロー再生"
 
-#~msgid "snare-drum"
-#~msgstr "スネアドラム"
+#~ msgid "snare-drum"
+#~ msgstr "スネアドラム"
 
-#~msgid "1/32 note 𝅘𝅥𝅰"
-#~msgstr "32分音符 𝅘𝅥𝅰"
+#~ msgid "1/32 note 𝅘𝅥𝅰"
+#~ msgstr "32分音符 𝅘𝅥𝅰"
 
-#~msgid "The Dispatch block is used to trigger an event."
-#~msgstr "<h2>イベントブロック（発生）</h2><br>指定した名前のイベントをすべてのネズミに送る。<br>イベントの発生は、各スクリプトが【イベントの時にアクション】で指定したアクションの引きがねとしてはたらく。"
+#~ msgid "The Dispatch block is used to trigger an event."
+#~ msgstr "<h2>イベントブロック（発生）</h2><br>指定した名前のイベントをすべてのネズミに送る。<br>イベントの発生は、各スクリプトが【イベントの時にアクション】で指定したアクションの引きがねとしてはたらく。"
 
-#~msgid "Search"
-#~msgstr "検索"
+#~ msgid "Search"
+#~ msgstr "検索"
 
-#~msgid "previous page"
-#~msgstr "前のページ"
+#~ msgid "previous page"
+#~ msgstr "前のページ"
 
-#~msgid "cow-bell"
-#~msgstr "カウベル"
+#~ msgid "cow-bell"
+#~ msgstr "カウベル"
 
-#~msgid "2nd"
-#~msgstr "２度"
+#~ msgid "2nd"
+#~ msgstr "２度"
 
-#~msgid "Offline. Sharing is unavailable."
-#~msgstr "オフライン。シェア機能が使えません"
+#~ msgid "Offline. Sharing is unavailable."
+#~ msgstr "オフライン。シェア機能が使えません"
 
-#~msgid "fs"
-#~msgstr "鼯"
+#~ msgid "fs"
+#~ msgstr "鼯"
 
-#~msgid "1/16 note ♬"
-#~msgstr "16分音符 ♬"
+#~ msgid "1/16 note ♬"
+#~ msgstr "16分音符 ♬"
 
-#~msgid "food"
-#~msgstr "食べ物"
+#~ msgid "food"
+#~ msgstr "食べ物"
 
-#~msgid "osctime"
-#~msgstr "オシレータータイム"
+#~ msgid "osctime"
+#~ msgstr "オシレータータイム"
 
-#~msgid "blues"
-#~msgstr "ブルース"
+#~ msgid "blues"
+#~ msgstr "ブルース"
 
-#~msgid "More"
-#~msgstr "その他"
+#~ msgid "More"
+#~ msgstr "その他"
 
-#~msgid "maths"
-#~msgstr "数学"
+#~ msgid "maths"
+#~ msgstr "数学"
 
-#~msgid "This toolbar contains the palette buttons Matrix Notes Tone Turtle and more."
-#~msgstr "このツールバーには、パレットボタンやリズム、ピッチなどが含まれています。"
+#~ msgid "This toolbar contains the palette buttons Matrix Notes Tone Turtle and more."
+#~ msgstr "このツールバーには、パレットボタンやリズム、ピッチなどが含まれています。"
 
-#~msgid "kick-drum"
-#~msgstr "キックドラム"
+#~ msgid "kick-drum"
+#~ msgstr "キックドラム"
 
-#~msgid "5th"
-#~msgstr "５度"
+#~ msgid "5th"
+#~ msgstr "５度"
 
-#~msgid "Rhythm"
-#~msgstr "音符"
+#~ msgid "Rhythm"
+#~ msgstr "音符"
 
-#~msgid "Long press on block(s) to copy. Click here to paste."
-#~msgstr "ブロックを長押しするとコピーできます。貼り付けるにはここをクリック。"
+#~ msgid "Long press on block(s) to copy. Click here to paste."
+#~ msgstr "ブロックを長押しするとコピーできます。貼り付けるにはここをクリック。"
 
-#~msgid "This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-#~msgstr "このツールバーには、音高・時刻行列、チャンク、演奏、音色、タートル、その他を含むパレットボタンがあります。ここをクリックすると、ブロックスのパレットが表示されます。パレットからブロックスをキャンバスへドラッグすると、ブロックスを使うことができます。"
+#~ msgid "This toolbar contains the palette buttons Matrix, Chunk, Perform, Tone, Turtle, and more. Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+#~ msgstr "このツールバーには、音高・時刻行列、チャンク、演奏、音色、タートル、その他を含むパレットボタンがあります。ここをクリックすると、ブロックスのパレットが表示されます。パレットからブロックスをキャンバスへドラッグすると、ブロックスを使うことができます。"
 
-#~msgid "Click this button to expand or collapse the auxilary toolbar."
-#~msgstr "ここをクリックして、オプションツールバーを表示"
+#~ msgid "Click this button to expand or collapse the auxilary toolbar."
+#~ msgstr "ここをクリックして、オプションツールバーを表示"
 
-#~msgid "Expand/collapse toolbar"
-#~msgstr "ツールバーを開く/隠す"
+#~ msgid "Expand/collapse toolbar"
+#~ msgstr "ツールバーを開く/隠す"
 
-#~msgid "Long press the run button to run the project in slow mode."
-#~msgstr "長押しでスロー再生になります。"
+#~ msgid "Long press the run button to run the project in slow mode."
+#~ msgstr "長押しでスロー再生になります。"
 
-#~msgid "Show or hide a polar-coordinate grid."
-#~msgstr "カンバス上にほうがん（ざひょう）や中心の角度を表示したり、かくしたりできる。"
+#~ msgid "Show or hide a polar-coordinate grid."
+#~ msgstr "カンバス上にほうがん（ざひょう）や中心の角度を表示したり、かくしたりできる。"
 
-#~msgid "Copy this link to share your project."
-#~msgstr "あなたのプロジェクトをシェアしたい時は、このリンクをコピーしてください。"
+#~ msgid "Copy this link to share your project."
+#~ msgstr "あなたのプロジェクトをシェアしたい時は、このリンクをコピーしてください。"
 
-#~msgid "Clear the screen and return the turtles to their initial positions."
-#~msgstr "画面にあるものを全部消して、初期状態に戻します。"
+#~ msgid "Clear the screen and return the turtles to their initial positions."
+#~ msgstr "画面にあるものを全部消して、初期状態に戻します。"
 
-#~msgid "The Step Pitch Block must be used inside of a Note Block."
-#~msgstr "ステップ音高ブロックは音符ブロックの中にある必要があります。"
+#~ msgid "The Step Pitch Block must be used inside of a Note Block."
+#~ msgstr "ステップ音高ブロックは音符ブロックの中にある必要があります。"
 
-#~msgid "begin hollow line"
-#~msgstr "（中空の）線を始める"
+#~ msgid "begin hollow line"
+#~ msgstr "（中空の）線を始める"
 
-#~msgid "Pitch can be specified in terms of <em>C D E F G A B</em>."
-#~msgstr "ピッチ・アルファベットの名前が<em>「C D E F G A B」</em>から選ぶことができます。"
+#~ msgid "Pitch can be specified in terms of <em>C D E F G A B</em>."
+#~ msgstr "ピッチ・アルファベットの名前が<em>「C D E F G A B」</em>から選ぶことができます。"
 
-#~msgid "step pitch"
-#~msgstr "ステップ音高"
+#~ msgid "step pitch"
+#~ msgstr "ステップ音高"
 
-#~msgid "Stop the music (and the turtles)."
-#~msgstr "音楽とネズミの動きを止めます。"
+#~ msgid "Stop the music (and the turtles)."
+#~ msgstr "音楽とネズミの動きを止めます。"
 
-#~msgid "bk"
-#~msgstr "黒"
+#~ msgid "bk"
+#~ msgstr "黒"
 
-#~msgid "bt"
-#~msgstr "蝙"
+#~ msgid "bt"
+#~ msgstr "蝙"
 
-#~msgid "Could not find mouse"
-#~msgstr "ネズミが見つかりません"
+#~ msgid "Could not find mouse"
+#~ msgstr "ネズミが見つかりません"
 
-#~msgid "br"
-#~msgstr "茶"
+#~ msgid "br"
+#~ msgstr "茶"
 
-#~msgid "multiply beat"
-#~msgstr "拍を倍に"
+#~ msgid "multiply beat"
+#~ msgstr "拍を倍に"
 
-#~msgid "Save Project"
-#~msgstr "プロジェクトをほぞん"
+#~ msgid "Save Project"
+#~ msgstr "プロジェクトをほぞん"
 
-#~msgid "rotate counter clockwise"
-#~msgstr "左回りにずれる"
+#~ msgid "rotate counter clockwise"
+#~ msgstr "左回りにずれる"
 
-#~msgid "etc."
-#~msgstr "<br>"
+#~ msgid "etc."
+#~ msgstr "<br>"
 
-#~msgid "sort"
-#~msgstr "ならべなおす"
+#~ msgid "sort"
+#~ msgstr "ならべなおす"
 
-#~msgid "Pitch Block: Did you mean to use a Note block2?"
-#~msgstr "ピッチ・ブロック：音符ブロックと一緒に使いますか？"
+#~ msgid "Pitch Block: Did you mean to use a Note block2?"
+#~ msgstr "ピッチ・ブロック：音符ブロックと一緒に使いますか？"
 
-#~msgid "Polar"
-#~msgstr "中心の角度とほうがん（ざひょう）を表示"
+#~ msgid "Polar"
+#~ msgstr "中心の角度とほうがん（ざひょう）を表示"
 
-#~msgid "current pitch name"
-#~msgstr "現在の音高の名前"
+#~ msgid "current pitch name"
+#~ msgstr "現在の音高の名前"
 
-#~msgid "confirm"
-#~msgstr "確認する"
+#~ msgid "confirm"
+#~ msgstr "確認する"
 
-#~msgid "gp"
-#~msgstr "ギ"
+#~ msgid "gp"
+#~ msgstr "ギ"
 
-#~msgid "Upload to Planet"
-#~msgstr "プラネットにアップロード"
+#~ msgid "Upload to Planet"
+#~ msgstr "プラネットにアップロード"
 
-#~msgid "Load plugin from file"
-#~msgstr "プラグインを読みこむ"
+#~ msgid "Load plugin from file"
+#~ msgstr "プラグインを読みこむ"
 
-#~msgid "degree"
-#~msgstr "温度記号"
+#~ msgid "degree"
+#~ msgstr "温度記号"
 
-#~msgid "sing"
-#~msgstr "歌う"
+#~ msgid "sing"
+#~ msgstr "歌う"
 
-#~msgid "Play music"
-#~msgstr "音楽を再生"
+#~ msgid "Play music"
+#~ msgstr "音楽を再生"
 
-#~msgid "Download"
-#~msgstr "ダウンロード"
+#~ msgid "Download"
+#~ msgstr "ダウンロード"
 
-#~msgid "darbuka-drum"
-#~msgstr "ダラブッカ"
+#~ msgid "darbuka-drum"
+#~ msgstr "ダラブッカ"
 
-#~msgid "cloud"
-#~msgstr "クラウド"
+#~ msgid "cloud"
+#~ msgstr "クラウド"
 
-#~msgid "quarter note ♩"
-#~msgstr "4分音符 ♩"
+#~ msgid "quarter note ♩"
+#~ msgstr "4分音符 ♩"
 
-#~msgid "add filter"
-#~msgstr "フィルターを加える"
+#~ msgid "add filter"
+#~ msgstr "フィルターを加える"
 
-#~msgid "Show/hide palettes"
-#~msgstr "パレットを表示する / 隠す"
+#~ msgid "Show/hide palettes"
+#~ msgstr "パレットを表示する / 隠す"
 
-#~msgid "fetch"
-#~msgstr "フェッチ"
+#~ msgid "fetch"
+#~ msgstr "フェッチ"
 
-#~msgid "rodi"
-#~msgstr "ロデイ"
+#~ msgid "rodi"
+#~ msgstr "ロデイ"
 
-#~msgid "pentatonic"
-#~msgstr "五音音階（ペンタトニック）"
+#~ msgid "pentatonic"
+#~ msgstr "五音音階（ペンタトニック）"
 
-#~msgid "blocks"
-#~msgstr "ブロックス"
+#~ msgid "blocks"
+#~ msgstr "ブロックス"
 
-#~msgid "Input to Major Block must be 2, 3, 6, or 7"
-#~msgstr "メジャーブロックには 2, 3, 6, 7いずれかの数をいれて下さい。"
+#~ msgid "Input to Major Block must be 2, 3, 6, or 7"
+#~ msgstr "メジャーブロックには 2, 3, 6, 7いずれかの数をいれて下さい。"
 
-#~msgid "Advanced options"
-#~msgstr "上級オプション"
+#~ msgid "Advanced options"
+#~ msgstr "上級オプション"
 
-#~msgid "undo"
-#~msgstr "１つもどす"
+#~ msgid "undo"
+#~ msgstr "１つもどす"
 
-#~msgid "adjust transposition"
-#~msgstr "移調を変える"
+#~ msgid "adjust transposition"
+#~ msgstr "移調を変える"
 
-#~msgid "Click to run the project in fast mode."
-#~msgstr "速いスピードで再生するためにはここをクリック。"
+#~ msgid "Click to run the project in fast mode."
+#~ msgstr "速いスピードで再生するためにはここをクリック。"
 
-#~msgid "Run note by note"
-#~msgstr "音符を一つずつ再生"
+#~ msgid "Run note by note"
+#~ msgstr "音符を一つずつ再生"
 
-#~msgid "Next page"
-#~msgstr "次のページ"
+#~ msgid "Next page"
+#~ msgstr "次のページ"
 
-#~msgid "Long press on blocks to copy."
-#~msgstr "ブロック長押しでコピー"
+#~ msgid "Long press on blocks to copy."
+#~ msgstr "ブロック長押しでコピー"
 
-#~msgid "on offbeat do"
-#~msgstr "弱拍にて～する"
+#~ msgid "on offbeat do"
+#~ msgstr "弱拍にて～する"
 
-#~msgid "Hard stop"
-#~msgstr "すぐストップ"
+#~ msgid "Hard stop"
+#~ msgstr "すぐストップ"
 
-#~msgid "free time"
-#~msgstr "クロックなし"
+#~ msgid "free time"
+#~ msgstr "クロックなし"
 
-#~msgid "You can also use Alt+C to copy a stack of blocks."
-#~msgstr "Alt+Cでブロックスをコピーすることもできます。"
+#~ msgid "You can also use Alt+C to copy a stack of blocks."
+#~ msgstr "Alt+Cでブロックスをコピーすることもできます。"
 
-#~msgid "Click here to paste"
-#~msgstr "貼り付けるため、ここでクリック"
+#~ msgid "Click here to paste"
+#~ msgstr "貼り付けるため、ここでクリック"
 
-#~msgid "This button opens and closes the primary toolbar."
-#~msgstr "ツールバーを開いたり閉じたりするにはこのボタンをクリックしてください"
+#~ msgid "This button opens and closes the primary toolbar."
+#~ msgstr "ツールバーを開いたり閉じたりするにはこのボタンをクリックしてください"
 
-#~msgid "Run music step by step"
-#~msgstr "音楽を音符ずつ演奏する"
+#~ msgid "Run music step by step"
+#~ msgstr "音楽を音符ずつ演奏する"
 
-#~msgid "It appears after a long press on a stack."
-#~msgstr "スタックを長押しすると現れます。"
+#~ msgid "It appears after a long press on a stack."
+#~ msgstr "スタックを長押しすると現れます。"
 
-#~msgid "Input to Perfect Block must be 1, 4, 5, or 8"
-#~msgstr "完全ブロックには 1, 4, 5, 8 いずれかの数をいれて下さい"
+#~ msgid "Input to Perfect Block must be 1, 4, 5, or 8"
+#~ msgstr "完全ブロックには 1, 4, 5, 8 いずれかの数をいれて下さい"
 
-#~msgid "table"
-#~msgstr "グラフ"
+#~ msgid "table"
+#~ msgstr "グラフ"
 
-#~msgid "cp"
-#~msgstr "ヌ"
+#~ msgid "cp"
+#~ msgstr "ヌ"
 
-#~msgid "vspace"
-#~msgstr "縦のスペース"
+#~ msgid "vspace"
+#~ msgstr "縦のスペース"
 
-#~msgid "The Paste Button will highlight."
-#~msgstr "ペーストボタンが光ります。"
+#~ msgid "The Paste Button will highlight."
+#~ msgstr "ペーストボタンが光ります。"
 
-#~msgid "Remove all content on the canvas, including the blocks."
-#~msgstr "画面上に表示されているもの（ブロックスを含む）を全て消します。"
+#~ msgid "Remove all content on the canvas, including the blocks."
+#~ msgstr "画面上に表示されているもの（ブロックスを含む）を全て消します。"
 
-#~msgid "next page"
-#~msgstr "次のページ"
+#~ msgid "next page"
+#~ msgstr "次のページ"
 
-#~msgid "On my device"
-#~msgstr "自分のPCにあるファイル"
+#~ msgid "On my device"
+#~ msgstr "自分のPCにあるファイル"
 
-#~msgid "Input to Diminished Block must be 1, 2, 3, 4, 5, 6, 7, or 8"
-#~msgstr "ディミニッシュブロックには 1, 2, 3, 4, 5, 6, 7, 8 いずれかの数をいれて下さい"
+#~ msgid "Input to Diminished Block must be 1, 2, 3, 4, 5, 6, 7, or 8"
+#~ msgstr "ディミニッシュブロックには 1, 2, 3, 4, 5, 6, 7, 8 いずれかの数をいれて下さい"
 
-#~msgid "Run music slow"
-#~msgstr "音楽をスロー再生"
+#~ msgid "Run music slow"
+#~ msgstr "音楽をスロー再生"
 
-#~msgid "To copy a stack to the clipboard, do a long press on the stack."
-#~msgstr "スタック上で長押しすると、スタックをクリップボードにコピーできます。"
+#~ msgid "To copy a stack to the clipboard, do a long press on the stack."
+#~ msgstr "スタック上で長押しすると、スタックをクリップボードにコピーできます。"
 
-#~msgid "export"
-#~msgstr "テーブルをほぞん"
+#~ msgid "export"
+#~ msgstr "テーブルをほぞん"
 
-#~msgid "synthesizer"
-#~msgstr "シンセサイザー"
+#~ msgid "synthesizer"
+#~ msgstr "シンセサイザー"
 
-#~msgid "Disable scrolling"
-#~msgstr "スクロールを無効にする"
+#~ msgid "Disable scrolling"
+#~ msgstr "スクロールを無効にする"
 
-#~msgid "Rhythm Block: Did you mean to use a Matrix block?"
-#~msgstr "リズムブロックと：音高・時刻行列と一緒に使いますか？"
+#~ msgid "Rhythm Block: Did you mean to use a Matrix block?"
+#~ msgstr "リズムブロックと：音高・時刻行列と一緒に使いますか？"
 
-#~msgid "My Music Blocks Creation"
-#~msgstr "私のミュージック・ブロックス作品"
+#~ msgid "My Music Blocks Creation"
+#~ msgstr "私のミュージック・ブロックス作品"
 
-#~msgid "current pitch octave"
-#~msgstr "今の音が属するオクターヴ"
+#~ msgid "current pitch octave"
+#~ msgstr "今の音が属するオクターヴ"
 
-#~msgid "half note 𝅗𝅥"
-#~msgstr "半音符 𝅗𝅥"
+#~ msgid "half note 𝅗𝅥"
+#~ msgstr "半音符 𝅗𝅥"
 
-#~msgid "Solfege pitch preview"
-#~msgstr "ソルフェージュで音の高さのプレビュー"
+#~ msgid "Solfege pitch preview"
+#~ msgstr "ソルフェージュで音の高さのプレビュー"
 
-#~msgid "Moveable Do"
-#~msgstr "移動ド"
+#~ msgid "Moveable Do"
+#~ msgstr "移動ド"
 
-#~msgid "Fixed Do"
-#~msgstr "固定ド"
+#~ msgid "Fixed Do"
+#~ msgstr "固定ド"
 
-#~msgid "Fullscreen"
-#~msgstr "フルスクリーン"
+#~ msgid "Fullscreen"
+#~ msgstr "フルスクリーン"
 
