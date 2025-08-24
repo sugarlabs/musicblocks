@@ -171,7 +171,7 @@ function SampleWidget() {
                 // Update the block display to show cent adjustment if applicable
                 if (this.centAdjustmentValue && this.centAdjustmentValue !== 0) {
                     const centText = (this.centAdjustmentValue > 0 ? "+" : "") + this.centAdjustmentValue + "¢";
-                    if (this.activity.blocks.blockList[mainSampleBlock].text && 
+                    if (this.activity.blocks.blockList[mainSampleBlock].text &&
                         this.activity.blocks.blockList[mainSampleBlock].text.text) {
                         // Append cent adjustment to the block text if possible
                         const currentText = this.activity.blocks.blockList[mainSampleBlock].text.text;
@@ -674,7 +674,7 @@ function SampleWidget() {
                 tunerContainer.appendChild(tunerSvg);
 
                 const sharpSymbol = document.createElement("img");
-                sharpSymbol.setAttribute("src", "header-icons/sharp.svg");
+                sharpSymbol.setAttribute("src", "header-icons/accidental-sharp.svg");
                 sharpSymbol.style.height = 40 + "px";
                 sharpSymbol.style.width = 40 + "px";
                 sharpSymbol.style.marginTop = "auto";
@@ -759,7 +759,7 @@ function SampleWidget() {
                 targetIcon.style.pointerEvents = "none";
 
                 // Initial mode state
-                let tunerMode = 'chromatic';
+                let tunerMode = "chromatic";
 
                 // Function to update button styles
                 const updateButtonStyles = () => {
@@ -801,7 +801,7 @@ function SampleWidget() {
                 await this.activity.logo.synth.startTuner();
                 activity.textMsg(_("Tuner started"), 3000);
 
-                                } else {
+            } else {
                 activity.textMsg(_("Tuner stopped"), 3000);
                 this.activity.logo.synth.stopTuner();
                     tunerOn = false;

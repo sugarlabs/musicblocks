@@ -781,68 +781,6 @@ describe("Utility Functions (logic-only)", () => {
         });
     });
 
-
-    describe("_performNotes", () => {
-        let mockSynth;
-        let mockTone;
-        let instance;
-        mockSynth = {
-            triggerAttackRelease: jest.fn(),
-            chain: jest.fn(),
-            connect: jest.fn(),
-            setNote: jest.fn(),
-            oscillator: { partials: [] }
-        };
-
-        beforeEach(() => {
-            mockTone = {
-                now: jest.fn(() => 0),
-                Destination: {},
-                Filter: jest.fn(),
-                Vibrato: jest.fn(),
-                Distortion: jest.fn(),
-                Tremolo: jest.fn(),
-                Phaser: jest.fn(),
-                Chorus: jest.fn(),
-                Part: jest.fn(),
-                ToneAudioBuffer: {
-                    loaded: jest.fn().mockResolvedValue(true)
-                }
-            };
-            global.Tone = mockTone;
-
-            // Mock synth
-            mockSynth = {
-                triggerAttackRelease: jest.fn(),
-                chain: jest.fn(),
-                connect: jest.fn(),
-                setNote: jest.fn(),
-                oscillator: { partials: [] }
-            };
-
-            // Create instance with required properties
-            instance = {
-                inTemperament: "equal",
-                _performNotes,
-                _getFrequency: jest.fn(),
-                getCustomFrequency: jest.fn()
-            };
-
-            // Bind the provided function to our instance
-            instance._performNotes = instance._performNotes.bind(instance);
-
-            // Mock timers
-            jest.useFakeTimers();
-        });
-
-
-
-
-
-
-
-    });
-
     describe("whichTemperament", () => {
         it("should get the temperament", () => {
             expect(whichTemperament()).toBe("equal");
