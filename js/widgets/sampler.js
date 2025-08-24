@@ -534,9 +534,9 @@ function SampleWidget() {
                 "Footsteps walking on wooden floor",
                 "Car honking on the street",
                 "Clock ticking in a quiet room"
-            ]
+            ];
 
-            const randomPrompt = promptList[randomDigit]
+            const randomPrompt = promptList[randomDigit];
 
             const container = document.createElement("div");
             container.id = "samplerPrompt";
@@ -563,7 +563,7 @@ function SampleWidget() {
             textArea.style.fontSize = "30px";
             textArea.style.resize = "none";
             textArea.style.borderRadius = "10px";
-            textArea.style.border = "none"
+            textArea.style.border = "none";
             textArea.style.padding = "15px";
             textArea.placeholder = randomPrompt;
             textArea.addEventListener("input", function() {
@@ -577,7 +577,7 @@ function SampleWidget() {
                     preview.disabled = true;
                     save.disabled = true;
                 }
-            })
+            });
 
             const buttonDiv = document.createElement("div");
             buttonDiv.style.display = "flex";
@@ -589,7 +589,7 @@ function SampleWidget() {
             submit.style.height = "61px";
             submit.style.fontSize = "32px";
             submit.style.borderRadius = "10px";
-            submit.style.border = "none"
+            submit.style.border = "none";
             submit.style.cursor = "pointer";
             submit.innerHTML = "Submit";
             submit.onclick = async function () {
@@ -604,7 +604,7 @@ function SampleWidget() {
 
                     generating = true;
 
-                    activity.textMsg(_("Generating Audio..."), 2500)
+                    activity.textMsg(_("Generating Audio..."), 2500);
 
                     let blinkInterval = setInterval(() => {
                         activity.textMsg(_("Generating Audio..."), 1000);
@@ -635,7 +635,7 @@ function SampleWidget() {
             preview.style.height = "61px";
             preview.style.fontSize = "32px";
             preview.style.borderRadius = "10px";
-            preview.style.border = "none"
+            preview.style.border = "none";
             preview.style.cursor = "pointer";
             preview.innerHTML = "Preview";
             preview.disabled = true;
@@ -643,14 +643,14 @@ function SampleWidget() {
                 const audioURL = `http://localhost:8000/preview`;
                 const audio = new Audio(audioURL);
                 audio.play();
-            }
+            };
 
             const save = document.createElement("button");
             save.style.width = "152px";
             save.style.height = "61px";
             save.style.fontSize = "32px";
             save.style.borderRadius = "10px";
-            save.style.border = "none"
+            save.style.border = "none";
             save.style.cursor = "pointer";
             save.innerHTML = "Save";
             save.disabled = true;
@@ -662,7 +662,7 @@ function SampleWidget() {
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-            }
+            };
 
             buttonDiv.appendChild(submit);
             buttonDiv.appendChild(preview);
@@ -719,7 +719,7 @@ function SampleWidget() {
             uploadSample.style.height = "32px";
             uploadSample.style.width = "32px";
 
-            divUploadSample.appendChild(uploadSample)
+            divUploadSample.appendChild(uploadSample);
 
             const fileChooser = document.createElement("input");
             fileChooser.type = "file";
@@ -794,7 +794,7 @@ function SampleWidget() {
             preview.style.height = "61px";
             preview.style.fontSize = "32px";
             preview.style.borderRadius = "10px";
-            preview.style.border = "none"
+            preview.style.border = "none";
             preview.style.cursor = "pointer";
             preview.innerHTML = "Preview";
 
@@ -808,14 +808,14 @@ function SampleWidget() {
                 audio.play();
                 save.disabled = false;
 
-            }
+            };
 
             const save = document.createElement("button");
             save.style.width = "152px";
             save.style.height = "61px";
             save.style.fontSize = "32px";
             save.style.borderRadius = "10px";
-            save.style.border = "none"
+            save.style.border = "none";
             save.style.cursor = "pointer";
             save.innerHTML = "Save";
             save.disabled = true;
@@ -827,7 +827,7 @@ function SampleWidget() {
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-            }
+            };
 
             buttonDiv.appendChild(preview);
             buttonDiv.appendChild(save);
