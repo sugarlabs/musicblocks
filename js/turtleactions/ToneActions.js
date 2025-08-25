@@ -59,15 +59,32 @@ function setupToneActions(activity) {
 
             let accounted = false;
             let synth = instrument;
-            for (const voice in VOICENAMES) {
-                if (VOICENAMES[voice][0] === instrument) {
-                    synth = VOICENAMES[voice][1];
-                    accounted = true;
-                    break;
-                } else if (VOICENAMES[voice][1] === instrument) {
-                    synth = instrument;
-                    accounted = true;
-                    break;
+            
+            // Special case for piano - use piano_multi instead
+            if (instrument === "piano") {
+                synth = "piano_multi";
+                accounted = true;
+                console.log("%c🎹 Using multi-sample piano instead of regular piano 🎹", 
+                    "background: #FF5722; color: white; font-size: 14px; padding: 4px;");
+            }
+            // Special case for violin - use violin_multi instead
+            else if (instrument === "violin") {
+                synth = "violin_multi";
+                accounted = true;
+                console.log("%c🎻 Using multi-sample violin instead of regular violin 🎻", 
+                    "background: #4CAF50; color: white; font-size: 14px; padding: 4px;");
+            } else {
+                // Regular instrument lookup
+                for (const voice in VOICENAMES) {
+                    if (VOICENAMES[voice][0] === instrument) {
+                        synth = VOICENAMES[voice][1];
+                        accounted = true;
+                        break;
+                    } else if (VOICENAMES[voice][1] === instrument) {
+                        synth = instrument;
+                        accounted = true;
+                        break;
+                    }
                 }
             }
 

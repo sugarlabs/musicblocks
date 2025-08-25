@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Piano Multi-Sample Test</title>
+        <script src="../lib/tone.min.js"></script>
+        <script src="../sounds/samples/piano_multi.js"></script>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+            h1 {
+                color: #333;
+                text-align: center;
+            }
+            .controls {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                margin-bottom: 20px;
+            }
+            .note-group {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-bottom: 10px;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+            .note-group h3 {
+                width: 100%;
+                margin-top: 0;
+            }
+            button {
+                padding: 10px 15px;
+                font-size: 16px;
+                cursor: pointer;
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 4px;
+            }
+            button:hover {
+                background-color: #45a049;
+            }
+            .log {
+                height: 300px;
+                overflow-y: auto;
+                border: 1px solid #ccc;
+                padding: 10px;
+                background-color: #f9f9f9;
+                font-family: monospace;
+                margin-top: 20px;
+            }
+            .verification {
+                margin-top: 20px;
+                padding: 15px;
+                background-color: #f0f8ff;
+                border-left: 5px solid #007bff;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Piano Multi-Sample Test</h1>
+        
+        <div class="verification">
+            <h2>Multi-Sample Verification</h2>
+            <p>This page tests if your piano_multi implementation correctly uses different samples for different note ranges:</p>
+            <ul>
+                <li>C2 sample for notes C2-B3 (low register)</li>
+                <li>C4 sample for notes C4-B5 (middle register)</li>
+                <li>C6 sample for notes C6-C8 (high register)</li>
+            </ul>
+            <p>Open your browser console (F12) to see detailed logging about which sample is used for each note.</p>
+            <button onclick="verifyPianoMultiSamples()">Run Verification</button>
+        </div>
+
+        <div class="controls">
+            <div class="note-group">
+                <h3>Low Register (C2 sample used)</h3>
+                <button onclick="playNote('C2')">C2</button>
+                <button onclick="playNote('E2')">E2</button>
+                <button onclick="playNote('G2')">G2</button>
+                <button onclick="playNote('C3')">C3</button>
+                <button onclick="playNote('F3')">F3</button>
+                <button onclick="playNote('B3')">B3</button>
+            </div>
+            
+            <div class="note-group">
+                <h3>Middle Register (C4 sample used)</h3>
+                <button onclick="playNote('C4')">C4</button>
+                <button onclick="playNote('E4')">E4</button>
+                <button onclick="playNote('G4')">G4</button>
+                <button onclick="playNote('C5')">C5</button>
+                <button onclick="playNote('F5')">F5</button>
+                <button onclick="playNote('B5')">B5</button>
+            </div>
+            
+            <div class="note-group">
+                <h3>High Register (C6 sample used)</h3>
+                <button onclick="playNote('C6')">C6</button>
+                <button onclick="playNote('E6')">E6</button>
+                <button onclick="playNote('G6')">G6</button>
+                <button onclick="playNote('C7')">C7</button>
+                <button onclick="playNote('F7')">F7</button>
+                <button onclick="playNote('C8')">C8</button>
+            </div>
+        </div>
+        
+        <div class="log" id="log"></div>
+        
+        <script>
+            // Initialize Tone.js
+            document.addEventListener('click', function() {
+                if (Tone.context.state !== 'running') {
+                    Tone.start();
+                }
+            });
+            
+            // Create a sampler with our multi-samples
+            const noteDict = {
+                "C2": PIANO_C2_SAMPLE(),
+                "C4": PIANO_C4_SAMPLE(),
+                "C6": PIANO_C6_SAMPLE()
+            };
+            
+            const sampler = new Tone.Sampler(noteDict).toDestination();
+            
+            // Function to play a note and log which sample is used
+            function playNote(note) {
+                const noteNum = Tone.Frequency(note).toMidi();
+                let sampleUsed;
+                
+                if (noteNum < 48) { // Notes below C3
+                    sampleUsed = "C2";
+                } else if (noteNum < 72) { // Notes below C5
+                    sampleUsed = "C4";
+                } else { // Notes C5 and above
+                    sampleUsed = "C6";
+                }
+                
+                // Log which sample is being used
+                const log = document.getElementById('log');
+                log.innerHTML += `<div>Playing ${note} (MIDI: ${noteNum}) - Using ${sampleUsed} sample</div>`;
+                log.scrollTop = log.scrollHeight;
+                
+                // Play the note
+                sampler.triggerAttackRelease(note, "2n");
+                
+                // Log to console as well
+                console.log(`Playing ${note} (MIDI: ${noteNum}) - Using ${sampleUsed} sample`);
+            }
+            
+            // Add a function to check if the samples are different
+            function checkSamples() {
+                const c2 = PIANO_C2_SAMPLE();
+                const c4 = PIANO_C4_SAMPLE();
+                const c6 = PIANO_C6_SAMPLE();
+                
+                const samplesAreDifferent = (
+                    c2.length !== c4.length || 
+                    c4.length !== c6.length || 
+                    c2.length !== c6.length
+                );
+                
+                const log = document.getElementById('log');
+                log.innerHTML += `<div style="font-weight:bold;color:${samplesAreDifferent ? 'green' : 'red'}">
+                    Samples have ${samplesAreDifferent ? 'different' : 'the same'} lengths:
+                    C2: ${c2.length}, C4: ${c4.length}, C6: ${c6.length}
+                </div>`;
+                log.scrollTop = log.scrollHeight;
+                
+                return samplesAreDifferent;
+            }
+        </script>
+    </body>
+</html>

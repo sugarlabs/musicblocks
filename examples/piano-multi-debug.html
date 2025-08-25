@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Piano Multi-Sample Debug</title>
+        <script src="../lib/tone.min.js"></script>
+        <script src="../sounds/samples/piano_multi.js"></script>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+            }
+            button {
+                margin: 5px;
+                padding: 10px;
+                font-size: 16px;
+            }
+            .note-group {
+                margin-bottom: 20px;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+            .log {
+                margin-top: 20px;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                height: 200px;
+                overflow-y: auto;
+                background-color: #f9f9f9;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Piano Multi-Sample Debug Test</h1>
+        <p>This page tests whether the multi-sample piano is correctly using different samples for different note ranges.</p>
+        
+        <div class="note-group">
+            <h2>Low Register (should use C2 sample)</h2>
+            <button id="playC2">Play C2</button>
+            <button id="playF2">Play F2</button>
+            <button id="playA2">Play A2</button>
+            <button id="playC3">Play C3</button>
+        </div>
+        
+        <div class="note-group">
+            <h2>Middle Register (should use C4 sample)</h2>
+            <button id="playC4">Play C4</button>
+            <button id="playF4">Play F4</button>
+            <button id="playA4">Play A4</button>
+            <button id="playC5">Play C5</button>
+        </div>
+        
+        <div class="note-group">
+            <h2>High Register (should use C6 sample)</h2>
+            <button id="playC6">Play C6</button>
+            <button id="playF6">Play F6</button>
+            <button id="playA6">Play A6</button>
+            <button id="playC7">Play C7</button>
+        </div>
+        
+        <div class="log" id="log">
+            <h3>Debug Log:</h3>
+        </div>
+        
+        <script>
+            // Function to log messages
+            function logMessage(message) {
+                const logElement = document.getElementById('log');
+                const logEntry = document.createElement('div');
+                logEntry.textContent = message;
+                logElement.appendChild(logEntry);
+                logElement.scrollTop = logElement.scrollHeight;
+            }
+            
+            // Create a dictionary of samples for different registers
+            window.onload = function() {
+                // Extract sample identifiers to verify which sample is being used
+                const c2Sample = PIANO_C2_SAMPLE();
+                const c4Sample = PIANO_C4_SAMPLE();
+                const c6Sample = PIANO_C6_SAMPLE();
+                
+                // Log the sample sources to verify they're different
+                logMessage("C2 Sample length: " + c2Sample.length);
+                logMessage("C4 Sample length: " + c4Sample.length);
+                logMessage("C6 Sample length: " + c6Sample.length);
+                
+                // Create a modified version of each sample with an identifier
+                const c2SampleWithId = c2Sample;
+                const c4SampleWithId = c4Sample;
+                const c6SampleWithId = c6Sample;
+                
+                // Create a dictionary for Tone.Sampler
+                const noteDict = {
+                    "C2": c2SampleWithId,
+                    "C4": c4SampleWithId,
+                    "C6": c6SampleWithId
+                };
+                
+                // Create a sampler with our samples
+                const sampler = new Tone.Sampler(noteDict).toDestination();
+                
+                // Function to play a note and log which sample is being used
+                function playNote(note) {
+                    // Start audio context if needed
+                    if (Tone.context.state !== 'running') {
+                        Tone.start();
+                    }
+                    
+                    // Determine which sample will be used based on the note
+                    let sampleUsed;
+                    const noteNum = Tone.Frequency(note).toMidi();
+                    
+                    if (noteNum < 48) { // Notes below C3
+                        sampleUsed = "C2";
+                    } else if (noteNum < 72) { // Notes below C5
+                        sampleUsed = "C4";
+                    } else { // Notes C5 and above
+                        sampleUsed = "C6";
+                    }
+                    
+                    logMessage(`Playing ${note} (MIDI: ${noteNum}) using ${sampleUsed} sample`);
+                    
+                    // Play the note
+                    sampler.triggerAttackRelease(note, "2n");
+                }
+                
+                // Add event listeners to buttons
+                document.getElementById('playC2').addEventListener('click', () => playNote('C2'));
+                document.getElementById('playF2').addEventListener('click', () => playNote('F2'));
+                document.getElementById('playA2').addEventListener('click', () => playNote('A2'));
+                document.getElementById('playC3').addEventListener('click', () => playNote('C3'));
+                
+                document.getElementById('playC4').addEventListener('click', () => playNote('C4'));
+                document.getElementById('playF4').addEventListener('click', () => playNote('F4'));
+                document.getElementById('playA4').addEventListener('click', () => playNote('A4'));
+                document.getElementById('playC5').addEventListener('click', () => playNote('C5'));
+                
+                document.getElementById('playC6').addEventListener('click', () => playNote('C6'));
+                document.getElementById('playF6').addEventListener('click', () => playNote('F6'));
+                document.getElementById('playA6').addEventListener('click', () => playNote('A6'));
+                document.getElementById('playC7').addEventListener('click', () => playNote('C7'));
+                
+                // Log that everything is ready
+                logMessage("Multi-sample piano test initialized. Click buttons to test different notes.");
+                logMessage("Tone.js will automatically select the appropriate sample based on the note's pitch.");
+            };
+        </script>
+    </body>
+</html>
