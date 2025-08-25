@@ -2020,3 +2020,53 @@ table {
   min-width: 250px;
   max-width: 80%;
 }
+
+.chatInterface{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: "10px";
+  background-color: white;
+}
+
+.chatLog {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.select-mentor {
+  width: 80px;
+  background: white;
+  border-width: 1px;
+  border-style: solid;
+  border-color: black;
+}
+
+.input-query {
+  flex: 1;
+  padding: 10px;
+  margin-right: 10px;
+}
+
+.message-container {
+  align-self: flex-start;
+  background: #dfdfdf;
+  color: #000;
+  padding: 10px;
+  border-radius: 12px;
+  max-width: 60%;
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  word-wrap: break-word;
+}
+
+.message-container.user {
+  align-self: flex-end;
+  background-color: #DCF8C6;
+}
