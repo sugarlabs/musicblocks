@@ -1,4 +1,5 @@
 // Copyright (c) 2021 Liam Norman
+// Copyright (c) 2025 Anvita Prasad DMP'25
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
@@ -108,6 +109,26 @@ function SampleWidget() {
      */
     this.pitchAnalysers = {};
 
+    // Add tuner related properties
+    this.tunerEnabled = false;
+    this.tunerAnalyser = null;
+    this.tunerMic = null;
+    this.tunerCanvas = null;
+    this.tunerContext = null;
+    this.tunerAnimationFrame = null;
+    this.centsValue = 0;
+    this.sliderVisible = false;
+    this.sliderDiv = null;
+
+    // Manual cent adjustment properties
+    this.centAdjustmentWindow = null;
+    this.centAdjustmentVisible = false;
+    this.centAdjustmentSlider = null;
+    this.centAdjustmentValue = 0;
+    this.centAdjustmentOn = false;
+    this.currentNoteObj = null;
+    this.player = null;
+
     /**
      * Updates the blocks related to the sample.
      * @private
@@ -118,7 +139,8 @@ function SampleWidget() {
         let audiofileBlock;
         let solfegeBlock;
         let octaveBlock;
-        this.sampleArray = [this.sampleName, this.sampleData, this.samplePitch, this.sampleOctave];
+        // Include cent adjustment in the sample array
+        this.sampleArray = [this.sampleName, this.sampleData, this.samplePitch, this.sampleOctave, this.centAdjustmentValue || 0];
         if (this.timbreBlock != null) {
             mainSampleBlock = this.activity.blocks.blockList[this.timbreBlock].connections[1];
             if (mainSampleBlock != null) {
@@ -144,6 +166,19 @@ function SampleWidget() {
                     this.activity.blocks.blockList[octaveBlock].value = this.sampleOctave;
                     this.activity.blocks.blockList[octaveBlock].text.text = this.sampleOctave;
                     this.activity.blocks.blockList[octaveBlock].updateCache();
+                }
+                
+                // Update the block display to show cent adjustment if applicable
+                if (this.centAdjustmentValue && this.centAdjustmentValue !== 0) {
+                    const centText = (this.centAdjustmentValue > 0 ? "+" : "") + this.centAdjustmentValue + "¢";
+                    if (this.activity.blocks.blockList[mainSampleBlock].text &&
+                        this.activity.blocks.blockList[mainSampleBlock].text.text) {
+                        // Append cent adjustment to the block text if possible
+                        const currentText = this.activity.blocks.blockList[mainSampleBlock].text.text;
+                        if (!currentText.includes("¢")) {
+                            this.activity.blocks.blockList[mainSampleBlock].text.text += " " + centText;
+                        }
+                    }
                 }
 
                 this.activity.refreshCanvas();
@@ -262,11 +297,14 @@ function SampleWidget() {
         setTimeout(function () {
             that._addSample();
 
+            // Include the cent adjustment value in the sample block
+            const centAdjustment = that.centAdjustmentValue || 0;
+
             var newStack = [
                 [0,"settimbre",100,100,[null,1,null,5]],
                 [
                     1,
-                    ["customsample", { value: [that.sampleName, that.sampleData, "do", 4] }],
+                    ["customsample", { value: [that.sampleName, that.sampleData, that.samplePitch, that.sampleOctave, centAdjustment] }],
                     100,
                     100,
                     [0, 2, 3, 4]
@@ -343,40 +381,63 @@ function SampleWidget() {
     };
 
     /**
-     * Initializes the Sample Widget.
-     * @param {object} activity - The activity object.
+     * Initializes the sampler widget.
+     * @param {Activity} activity - The activity instance.
+     * @param {number} timbreBlock - The timbre block number.
      * @returns {void}
      */
-    this.init = function (activity) {
+    this.init = function (activity, timbreBlock) {
         this.activity = activity;
-        this._directions = [];
-        this._widgetFirstTimes = [];
-        this._widgetNextTimes = [];
-        this._firstClickTimes = null;
-        this.isMoving = false;
-        this.pitchAnalysers = {};
-
-        this.activity.logo.synth.loadSynth(0, getVoiceSynthName(DEFAULTSAMPLE));
-        this.reconnectSynthsToAnalyser();
-
-        this.pitchAnalysers = {};
-
+        this.timbreBlock = timbreBlock;
         this.running = true;
-        if (this.drawVisualIDs) {
-            for (const id of Object.keys(this.drawVisualIDs)) {
-                cancelAnimationFrame(this.drawVisualIDs[id]);
-            }
-        }
-
+        this.originalSampleName = "";
+        this.isMoving = false;
         this.drawVisualIDs = {};
-        const widgetWindow = window.widgetWindows.windowFor(this, "sample");
-        this.widgetWindow = widgetWindow;
-        this.divisions = [];
-        widgetWindow.clear();
-        widgetWindow.show();
 
-        // For the button callbacks
-        var that = this;
+        const widgetWindow = window.widgetWindows.windowFor(this, "sampler", "Sampler");
+        const that = this;
+
+        // For the widget buttons
+        widgetWindow.onmaximize = function () {
+            that._scale();
+            that._updateContainerPositions();
+        };
+
+        widgetWindow.onrestore = function() {
+            that._scale();
+            that._updateContainerPositions();
+        };
+
+        // Function to update container positions based on window state
+        this._updateContainerPositions = function() {
+            const tunerContainer = docById("tunerContainer");
+            const centAdjustmentContainer = docById("centAdjustmentContainer");
+            const valueDisplay = docById("centValueDisplay");
+            
+            if (tunerContainer) {
+                if (this.widgetWindow.isMaximized()) {
+                    tunerContainer.style.marginTop = "150px";
+                    tunerContainer.style.marginLeft = "auto";
+                    tunerContainer.style.marginRight = "auto";
+                    tunerContainer.style.justifyContent = "center";
+                } else {
+                    tunerContainer.style.marginTop = "100px";
+                    tunerContainer.style.marginLeft = "";
+                    tunerContainer.style.marginRight = "";
+                    tunerContainer.style.justifyContent = "";
+                }
+            }
+            
+            if (valueDisplay) {
+                if (this.widgetWindow.isMaximized()) {
+                    valueDisplay.style.marginTop = "50px";
+                    valueDisplay.style.marginBottom = "50px";
+                } else {
+                    valueDisplay.style.marginTop = "30px";
+                    valueDisplay.style.marginBottom = "30px";
+                }
+            }
+        };
 
         widgetWindow.onclose = () => {
             if (this.drawVisualIDs) {
@@ -386,6 +447,16 @@ function SampleWidget() {
             }
 
             this.running = false;
+
+            // Close the pie menu if it's open
+            const wheelDiv = docById("wheelDiv");
+            if (wheelDiv && wheelDiv.style.display !== "none") {
+                wheelDiv.style.display = "none";
+                if (this._pitchWheel) this._pitchWheel.removeWheel();
+                if (this._exitWheel) this._exitWheel.removeWheel();
+                if (this._accidentalsWheel) this._accidentalsWheel.removeWheel();
+                if (this._octavesWheel) this._octavesWheel.removeWheel();
+            }
 
             docById("wheelDivptm").style.display = "none";
             if (!this.pitchWheel === undefined) {
@@ -398,10 +469,9 @@ function SampleWidget() {
             widgetWindow.destroy();
         };
 
-        widgetWindow.onmaximize = this._scale.bind(this);
-
         this.playBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
         this.playBtn.onclick = () => {
+            stopTuner();
             if (this.isMoving) {
                 this.pause();
             } else {
@@ -418,6 +488,7 @@ function SampleWidget() {
             _("Upload sample"),
             ""
         ).onclick = function () {
+            stopTuner();
             const fileChooser = docById("myOpenAll");
 
             // eslint-disable-next-line no-unused-vars
@@ -460,6 +531,7 @@ function SampleWidget() {
         
         // Add click event to the container (includes both the button and frequency display)
         this.pitchBtnContainer.onclick = () => {
+            stopTuner();
             this._createPieMenu();
         };
 
@@ -470,6 +542,7 @@ function SampleWidget() {
             _("Save sample"),
             ""
         ).onclick = function () {
+            stopTuner();
             // Debounce button
             if (!that._get_save_lock()) {
                 that._save_lock = true;
@@ -491,7 +564,8 @@ function SampleWidget() {
             "playback.svg",
             ICONSIZE,
             _("Playback"),
-            "");
+            ""
+        );
 
         this._playbackBtn.id="playbackBtn";
         this._playbackBtn.classList.add("disabled");
@@ -500,6 +574,7 @@ function SampleWidget() {
         this.playback = false;
 
         this._recordBtn.onclick = async () => {
+            stopTuner();
             if (!this.is_recording) {
                 await this.activity.logo.synth.startRecording();
                 this.is_recording = true;
@@ -516,6 +591,7 @@ function SampleWidget() {
         };
 
         this._playbackBtn.onclick = () => {
+            stopTuner();
             if (!this.playback) {
                 this.sampleData = this.recordingURL;
                 this.sampleName = `Recorded Audio ${this.recordingURL}`;
@@ -525,6 +601,429 @@ function SampleWidget() {
             } else {
                 this.activity.logo.synth.stopPlayBackRecording();
                 this.playback = false;
+            }
+        };
+
+        this._tunerBtn = widgetWindow.addButton(
+            "tuner.svg",
+            ICONSIZE,
+            _("Tuner"),
+            ""
+        );
+
+        let tunerOn = false;
+
+        // Helper function to stop tuner
+        const stopTuner = () => {
+            if (tunerOn) {
+                activity.textMsg(_("Tuner stopped"), 3000);
+                this.activity.logo.synth.stopTuner();
+                tunerOn = false;
+                const tunerContainer = docById("tunerContainer");
+                if (tunerContainer) {
+                    tunerContainer.remove();
+                }
+            }
+        };
+
+        this._tunerBtn.onclick = async () => {
+            if (docById("tunerContainer") && !tunerOn) {
+                docById("tunerContainer").remove();
+            }
+
+            // Close the cent adjustment window if it's open
+            const centAdjustmentContainer = docById("centAdjustmentContainer");
+            if (centAdjustmentContainer) {
+                centAdjustmentContainer.remove();
+                this.centAdjustmentOn = false;
+            }
+
+            if (!tunerOn) {
+                tunerOn = true;
+
+                const samplerCanvas = docByClass("samplerCanvas")[0];
+                samplerCanvas.style.display = "none";
+
+                const tunerContainer = document.createElement("div");
+                tunerContainer.style.display = "flex";
+                tunerContainer.id = "tunerContainer";
+                tunerContainer.style.gap = "10px";
+                
+                // Adjust positioning based on whether the window is maximized
+                if (this.widgetWindow.isMaximized()) {
+                    tunerContainer.style.marginTop = "150px";
+                    tunerContainer.style.marginLeft = "auto";
+                    tunerContainer.style.marginRight = "auto";
+                    tunerContainer.style.justifyContent = "center";
+                } else {
+                    tunerContainer.style.marginTop = "100px";
+                }
+
+                const accidetalFlat = document.createElement("img");
+                accidetalFlat.setAttribute("src", "header-icons/accidental-flat.svg");
+                accidetalFlat.style.height = 40 + "px";
+                accidetalFlat.style.width = 40 + "px";
+                accidetalFlat.style.marginTop = "auto";
+
+                tunerContainer.appendChild(accidetalFlat);
+
+                const tunerSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                tunerSvg.style.width = 350 + "px";
+                tunerSvg.style.height = 170 + "px";
+
+                tunerContainer.appendChild(tunerSvg);
+
+                const sharpSymbol = document.createElement("img");
+                sharpSymbol.setAttribute("src", "header-icons/accidental-sharp.svg");
+                sharpSymbol.style.height = 40 + "px";
+                sharpSymbol.style.width = 40 + "px";
+                sharpSymbol.style.marginTop = "auto";
+
+                tunerContainer.appendChild(sharpSymbol);
+
+                // Add tuner segments
+                const segments = [
+                    "M5.0064 173.531C2.24508 173.507 0.0184649 171.249 0.121197 168.49C0.579513 156.179 2.33654 143.951 5.36299 132.009C6.04138 129.332 8.81378 127.792 11.4701 128.546L57.9638 141.754C60.6202 142.508 62.1508 145.271 61.5107 147.958C59.8652 154.863 58.8534 161.905 58.488 168.995C58.3459 171.752 56.0992 173.973 53.3379 173.949L5.0064 173.531Z",
+                    "M12.3057 125.699C9.66293 124.899 8.16276 122.104 9.03876 119.486C12.9468 107.802 18.0776 96.5645 24.3458 85.959C25.7508 83.5817 28.8448 82.885 31.181 84.3574L72.0707 110.128C74.4068 111.601 75.0971 114.683 73.7261 117.08C70.2017 123.243 67.2471 129.714 64.8991 136.414C63.9858 139.02 61.2047 140.517 58.5619 139.716L12.3057 125.699Z",
+                    "M32.7848 81.8612C30.4747 80.3483 29.8225 77.2446 31.4008 74.9787C38.442 64.8698 46.5309 55.5326 55.5331 47.1225C57.551 45.2374 60.7159 45.4406 62.5426 47.5115L94.5158 83.7582C96.3425 85.8291 96.1364 88.981 94.1457 90.8948C89.0279 95.8148 84.3698 101.192 80.2295 106.958C78.619 109.202 75.5286 109.855 73.2186 108.342L32.7848 81.8612Z",
+                    "M64.7847 45.5682C62.9944 43.4658 63.243 40.3041 65.3958 38.5746C74.9997 30.8588 85.3915 24.1786 96.3984 18.6454C98.8656 17.4051 101.845 18.4917 103.014 20.9933L123.481 64.7795C124.65 67.2812 123.564 70.2473 121.115 71.5228C114.819 74.8016 108.834 78.6484 103.237 83.0152C101.06 84.7138 97.9107 84.4699 96.1204 82.3675L64.7847 45.5682Z",
+                    "M105.713 19.7604C104.588 17.2388 105.717 14.2752 108.27 13.2222C119.658 8.52459 131.511 5.04268 143.631 2.83441C146.348 2.33942 148.9 4.22142 149.318 6.95115L156.62 54.7298C157.037 57.4595 155.159 59.9997 152.45 60.5334C145.485 61.9056 138.659 63.9106 132.058 66.5236C129.491 67.54 126.538 66.4188 125.412 63.8972L105.713 19.7604Z",
+                    "M152.254 6.52852C151.885 3.79193 153.803 1.26651 156.549 0.975363C168.8 -0.323498 181.154 -0.325115 193.405 0.97054C196.151 1.26096 198.07 3.78589 197.701 6.52258L191.247 54.423C190.878 57.1597 188.361 59.0681 185.611 58.8169C178.542 58.1712 171.428 58.1722 164.358 58.8197C161.608 59.0716 159.091 57.1639 158.721 54.4273L152.254 6.52852Z",
+                    "M200.638 6.94443C201.055 4.21459 203.607 2.33193 206.324 2.82621C218.444 5.0313 230.298 8.51011 241.688 13.2047C244.241 14.257 245.371 17.2203 244.246 19.7423L224.559 63.8842C223.434 66.4062 220.481 67.5281 217.913 66.5124C211.312 63.9011 204.486 61.8978 197.52 60.5275C194.811 59.9945 192.933 57.4548 193.349 54.7249L200.638 6.94443Z",
+                    "M246.945 20.9745C248.114 18.4725 251.093 17.3851 253.561 18.6248C264.569 24.1552 274.963 30.8326 284.569 38.5459C286.722 40.2748 286.971 43.4365 285.181 45.5394L253.855 82.3468C252.066 84.4497 248.916 84.6944 246.739 82.9964C241.14 78.6311 235.155 74.7859 228.858 71.5087C226.408 70.2339 225.322 67.268 226.49 64.766L246.945 20.9745Z",
+                    "M287.424 47.482C289.25 45.4107 292.415 45.2066 294.433 47.0913C303.438 55.499 311.529 64.8341 318.573 74.9411C320.152 77.2066 319.501 80.3105 317.191 81.824L276.764 108.315C274.454 109.829 271.364 109.176 269.753 106.934C265.611 101.168 260.951 95.7923 255.832 90.8736C253.841 88.9604 253.634 85.8085 255.46 83.7371L287.424 47.482Z",
+                    "M318.795 84.3198C321.131 82.8468 324.225 83.5427 325.631 85.9196C331.902 96.5235 337.036 107.76 340.947 119.442C341.823 122.061 340.324 124.855 337.681 125.657L291.429 139.686C288.786 140.487 286.005 138.991 285.091 136.385C282.741 129.686 279.785 123.215 276.259 117.054C274.887 114.657 275.577 111.574 277.912 110.101L318.795 84.3198Z",
+                    "M338.518 128.503C341.174 127.748 343.947 129.288 344.626 131.964C347.655 143.905 349.416 156.133 349.877 168.444C349.981 171.203 347.755 173.462 344.993 173.487L296.662 173.917C293.901 173.942 291.653 171.722 291.51 168.964C291.143 161.875 290.13 154.833 288.482 147.928C287.841 145.242 289.371 142.478 292.027 141.723L338.518 128.503Z"
+                ];
+
+                segments.forEach((d, i) => {
+                    const segment = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    segment.setAttribute("d", d);
+                    segment.setAttribute("fill", "#808080");
+                    tunerSvg.appendChild(segment);
+                });
+
+                // Create mode toggle button
+                const modeToggle = document.createElement("div");
+                modeToggle.id = "modeToggle";
+                modeToggle.style.position = "absolute";
+                modeToggle.style.top = "30px";
+                modeToggle.style.left = "50%";
+                modeToggle.style.transform = "translateX(-50%)";
+                modeToggle.style.display = "flex";
+                modeToggle.style.backgroundColor = "#FFFFFF";
+                modeToggle.style.borderRadius = "25px";
+                modeToggle.style.padding = "3px";
+                modeToggle.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+                modeToggle.style.width = "120px";
+                modeToggle.style.height = "44px";
+                modeToggle.style.cursor = "pointer";
+
+                // Create chromatic mode button
+                const chromaticButton = document.createElement("div");
+                chromaticButton.style.flex = "1";
+                chromaticButton.style.display = "flex";
+                chromaticButton.style.alignItems = "center";
+                chromaticButton.style.justifyContent = "center";
+                chromaticButton.style.borderRadius = "22px";
+                chromaticButton.style.cursor = "pointer";
+                chromaticButton.style.transition = "all 0.2s ease";
+                chromaticButton.style.userSelect = "none";
+                chromaticButton.title = _("Chromatic");
+
+                // Create target pitch mode button
+                const targetPitchButton = document.createElement("div");
+                targetPitchButton.style.flex = "1";
+                targetPitchButton.style.display = "flex";
+                targetPitchButton.style.alignItems = "center";
+                targetPitchButton.style.justifyContent = "center";
+                targetPitchButton.style.borderRadius = "22px";
+                targetPitchButton.style.cursor = "pointer";
+                targetPitchButton.style.transition = "all 0.2s ease";
+                targetPitchButton.style.userSelect = "none";
+                targetPitchButton.title = _("Target pitch");
+
+                // Create icons
+                const chromaticIcon = document.createElement("img");
+                chromaticIcon.src = "header-icons/chromatic-mode.svg";
+                chromaticIcon.style.width = "32px";
+                chromaticIcon.style.height = "32px";
+                chromaticIcon.style.filter = "brightness(0)";
+                chromaticIcon.style.pointerEvents = "none";
+
+                const targetIcon = document.createElement("img");
+                targetIcon.src = "header-icons/target-pitch-mode.svg";
+                targetIcon.style.width = "32px";
+                targetIcon.style.height = "32px";
+                targetIcon.style.filter = "brightness(0)";
+                targetIcon.style.pointerEvents = "none";
+
+                // Initial mode state
+                let tunerMode = "chromatic";
+
+                // Function to update button styles
+                const updateButtonStyles = () => {
+                    if (tunerMode === "chromatic") {
+                        chromaticButton.style.backgroundColor = "#A6CEFF";
+                        targetPitchButton.style.backgroundColor = "#FFFFFF";
+                    } else {
+                        chromaticButton.style.backgroundColor = "#FFFFFF";
+                        targetPitchButton.style.backgroundColor = "#A6CEFF";
+                    }
+                };
+
+                // Add click handlers with debounce
+                let isClickable = true;
+                const handleClick = (mode) => {
+                    if (!isClickable) return;
+                    isClickable = false;
+                    tunerMode = mode;
+                    updateButtonStyles();
+                    setTimeout(() => { isClickable = true; }, 200);
+                };
+
+                chromaticButton.onclick = () => handleClick("chromatic");
+                targetPitchButton.onclick = () => handleClick("target");
+
+                // Assemble the toggle
+                chromaticButton.appendChild(chromaticIcon);
+                targetPitchButton.appendChild(targetIcon);
+                modeToggle.appendChild(chromaticButton);
+                modeToggle.appendChild(targetPitchButton);
+
+                // Initial style update
+                updateButtonStyles();
+
+                tunerContainer.appendChild(modeToggle);
+
+                this.widgetWindow.getWidgetBody().appendChild(tunerContainer);
+
+                await this.activity.logo.synth.startTuner();
+                activity.textMsg(_("Tuner started"), 3000);
+
+            } else {
+                activity.textMsg(_("Tuner stopped"), 3000);
+                this.activity.logo.synth.stopTuner();
+                tunerOn = false;
+            }
+        };
+
+        this.centsSliderBtn = widgetWindow.addButton(
+            "slider.svg",
+            ICONSIZE,
+            _("Cents Adjustment"),
+            ""
+        );
+
+        // Update the cents slider button to toggle the cents adjustment section
+        this.centsSliderBtn.onclick = () => {
+            stopTuner();
+            // Hide the cent adjustment window if it's already open
+            const existingCentAdjustmentContainer = docById("centAdjustmentContainer");
+            if (existingCentAdjustmentContainer) {
+                existingCentAdjustmentContainer.remove();
+                this.centAdjustmentOn = false;
+                
+                // Show the sampler canvas
+                const samplerCanvas = docByClass("samplerCanvas")[0];
+                if (samplerCanvas) {
+                    samplerCanvas.style.display = "block";
+                }
+                return;
+            }
+            
+            // Close the tuner window if it's open
+            const tunerContainer = docById("tunerContainer");
+            if (tunerContainer) {
+                tunerContainer.remove();
+                this.activity.logo.synth.stopTuner();
+                tunerOn = false;
+            }
+            
+            if (!this.centAdjustmentOn) {
+                this.centAdjustmentOn = true;
+                
+                // Hide the sampler canvas
+                const samplerCanvas = docByClass("samplerCanvas")[0];
+                if (samplerCanvas) {
+                    samplerCanvas.style.display = "none";
+                }
+                
+                // Create the cent adjustment container
+                const centAdjustmentContainer = document.createElement("div");
+                centAdjustmentContainer.id = "centAdjustmentContainer";
+                centAdjustmentContainer.style.position = "absolute";
+                centAdjustmentContainer.style.top = "0";
+                centAdjustmentContainer.style.left = "0";
+                centAdjustmentContainer.style.width = "100%";
+                centAdjustmentContainer.style.height = "100%";
+                centAdjustmentContainer.style.backgroundColor = "#d8d8d8"; // Grey color to match tuner
+                centAdjustmentContainer.style.zIndex = "1000";
+                
+                // Create the value display (centered at top)
+                const valueDisplay = document.createElement("div");
+                valueDisplay.id = "centValueDisplay";
+                valueDisplay.textContent = (this.centAdjustmentValue >= 0 ? "+" : "") + (this.centAdjustmentValue || 0) + "¢";
+                valueDisplay.style.fontSize = "24px";
+                valueDisplay.style.fontWeight = "bold";
+                valueDisplay.style.textAlign = "center";
+                
+                // Adjust positioning based on whether the window is maximized
+                if (this.widgetWindow.isMaximized()) {
+                    valueDisplay.style.marginTop = "50px";
+                    valueDisplay.style.marginBottom = "50px";
+                } else {
+                    valueDisplay.style.marginTop = "30px";
+                    valueDisplay.style.marginBottom = "30px";
+                }
+                
+                centAdjustmentContainer.appendChild(valueDisplay);
+                
+                // Create the slider container
+                const sliderContainer = document.createElement("div");
+                
+                // Adjust width and margins based on whether the window is maximized
+                if (this.widgetWindow.isMaximized()) {
+                    sliderContainer.style.width = "60%";
+                    sliderContainer.style.margin = "0 auto 30px auto";
+                } else {
+                    sliderContainer.style.width = "80%";
+                    sliderContainer.style.margin = "0 auto";
+                }
+                
+                // Create the HTML5 range slider
+                const slider = document.createElement("input");
+                Object.assign(slider, {
+                    type: "range",
+                    min: -50,
+                    max: 50,
+                    value: this.centAdjustmentValue || 0,
+                    step: 1
+                });
+                
+                Object.assign(slider.style, {
+                    width: "100%",
+                    height: "20px",
+                    WebkitAppearance: "none",
+                    background: "#4CAF50",
+                    outline: "none",
+                    borderRadius: "10px",
+                    cursor: "pointer",
+                    opacity: "0.8"
+                });
+                
+                // Add slider thumb styling
+                const thumbStyle = `
+                    input[type=range]::-webkit-slider-thumb {
+                        -webkit-appearance: none;
+                        width: 25px;
+                        height: 25px;
+                        background: #2196F3;
+                        border-radius: 50%;
+                        cursor: pointer;
+                        transition: all .2s ease-in-out;
+                    }
+                    input[type=range]::-webkit-slider-thumb:hover {
+                        transform: scale(1.1);
+                    }
+                    input[type=range]::-moz-range-thumb {
+                        width: 25px;
+                        height: 25px;
+                        background: #2196F3;
+                        border-radius: 50%;
+                        cursor: pointer;
+                        border: none;
+                        transition: all .2s ease-in-out;
+                    }
+                    input[type=range]::-moz-range-thumb:hover {
+                        transform: scale(1.1);
+                    }
+                `;
+                
+                // Add the styles to the document
+                const styleSheet = document.createElement("style");
+                styleSheet.textContent = thumbStyle;
+                document.head.appendChild(styleSheet);
+                
+                sliderContainer.appendChild(slider);
+                centAdjustmentContainer.appendChild(sliderContainer);
+                
+                // Add labels for min and max values
+                const labelsDiv = document.createElement("div");
+                
+                // Adjust width based on whether the window is maximized
+                if (this.widgetWindow.isMaximized()) {
+                    labelsDiv.style.width = "60%";
+                } else {
+                    labelsDiv.style.width = "80%";
+                }
+                
+                labelsDiv.style.display = "flex";
+                labelsDiv.style.justifyContent = "space-between";
+                labelsDiv.style.margin = "10px auto";
+                
+                const minLabel = document.createElement("span");
+                minLabel.textContent = "-50¢";
+                minLabel.style.fontWeight = "bold";
+                
+                const maxLabel = document.createElement("span");
+                maxLabel.textContent = "+50¢";
+                maxLabel.style.fontWeight = "bold";
+                
+                labelsDiv.appendChild(minLabel);
+                labelsDiv.appendChild(maxLabel);
+                centAdjustmentContainer.appendChild(labelsDiv);
+                
+                // Add reset button
+                const resetButtonContainer = document.createElement("div");
+                resetButtonContainer.style.textAlign = "center";
+                resetButtonContainer.style.marginTop = "30px";
+                
+                const resetButton = document.createElement("button");
+                resetButton.textContent = _("Reset");
+                resetButton.style.padding = "10px 20px";
+                resetButton.style.backgroundColor = "#808080";
+                resetButton.style.color = "white";
+                resetButton.style.border = "none";
+                resetButton.style.borderRadius = "5px";
+                resetButton.style.cursor = "pointer";
+                resetButton.style.fontSize = "16px";
+                
+                resetButton.onclick = () => {
+                    this.centAdjustmentValue = 0;
+                    valueDisplay.textContent = "0¢";
+                    slider.value = 0;
+                    this.applyCentAdjustment(0);
+                };
+                
+                resetButtonContainer.appendChild(resetButton);
+                centAdjustmentContainer.appendChild(resetButtonContainer);
+                
+                // Add the container to the widget body
+                this.widgetWindow.getWidgetBody().appendChild(centAdjustmentContainer);
+                
+                // Add event listener for slider changes
+                slider.oninput = () => {
+                    const value = parseInt(slider.value);
+                    this.centAdjustmentValue = value;
+                    valueDisplay.textContent = (value >= 0 ? "+" : "") + value + "¢";
+                    this.applyCentAdjustment(value);
+                };
+                
+            } else {
+                this.centAdjustmentOn = false;
+                
+                // Remove the cent adjustment container
+                const centAdjustmentContainer = docById("centAdjustmentContainer");
+                if (centAdjustmentContainer) {
+                    centAdjustmentContainer.remove();
+                }
+                
+                // Show the sampler canvas
+                const samplerCanvas = docByClass("samplerCanvas")[0];
+                if (samplerCanvas) {
+                    samplerCanvas.style.display = "block";
+                }
             }
         };
 
@@ -552,10 +1051,13 @@ function SampleWidget() {
     this._addSample = function () {
         for (let i = 0; i < CUSTOMSAMPLES.length; i++) {
             if (CUSTOMSAMPLES[i][0] == this.sampleName) {
+                // Update existing sample with new data and cent adjustment
+                CUSTOMSAMPLES[i] = [this.sampleName, this.sampleData, this.samplePitch, this.sampleOctave, this.centAdjustmentValue || 0];
                 return;
             }
         }
-        CUSTOMSAMPLES.push([this.sampleName, this.sampleData]);
+        // Add new sample with cent adjustment
+        CUSTOMSAMPLES.push([this.sampleName, this.sampleData, this.samplePitch, this.sampleOctave, this.centAdjustmentValue || 0]);
     };
 
     /**
@@ -667,11 +1169,35 @@ function SampleWidget() {
         if (this.sampleName != null && this.sampleName != "") {
             this.reconnectSynthsToAnalyser();
 
+            // Store the current note object for the cent adjustment
+            const frequency = this._calculateFrequency();
+            this.currentNoteObj = TunerUtils.frequencyToPitch(frequency);
+
+            // Get a reference to the player
+            const instrumentName = "customsample_" + this.originalSampleName;
+            
+            // Ensure the instrument exists
+            if (!instruments[0][instrumentName]) {
+                // Create the instrument if it doesn't exist
+                this.activity.logo.synth.loadSynth(0, instrumentName);
+            }
+            
+            if (instruments[0][instrumentName]) {
+                this.player = instruments[0][instrumentName];
+            }
+
+            // Calculate adjusted frequency for cent adjustment
+            let playbackFrequency = CENTERPITCHHERTZ;
+            if (this.centAdjustmentValue !== 0) {
+                const playbackRate = Math.pow(2, this.centAdjustmentValue/1200);
+                playbackFrequency = CENTERPITCHHERTZ * playbackRate;
+            }
+
             this.activity.logo.synth.trigger(
                 0,
-                [CENTERPITCHHERTZ],
+                [playbackFrequency],
                 this.sampleLength / 1000.0,
-                "customsample_" + this.originalSampleName,
+                instrumentName,
                 null,
                 null,
                 false
@@ -982,6 +1508,43 @@ function SampleWidget() {
         this.widgetWindow.getWidgetBody().appendChild(canvas);
         const canvasCtx = canvas.getContext("2d");
         canvasCtx.clearRect(0, 0, width, height);
+        
+        // If tuner is enabled, create a separate tuner display
+        if (this.tunerEnabled) {
+            // Create a dedicated tuner canvas
+            const tunerCanvas = document.createElement("canvas");
+            tunerCanvas.height = Math.min(200, height * 0.4);
+            tunerCanvas.width = Math.min(200, width * 0.8);
+            tunerCanvas.className = "tunerCanvas";
+            tunerCanvas.style.position = "absolute";
+            tunerCanvas.style.top = "10px";
+            tunerCanvas.style.left = (width - tunerCanvas.width) / 2 + "px";
+            this.widgetWindow.getWidgetBody().appendChild(tunerCanvas);
+            
+            // Initialize or update the tuner display
+            if (!this.tunerDisplay) {
+                this.tunerDisplay = new TunerDisplay(tunerCanvas, tunerCanvas.width, tunerCanvas.height);
+            } else {
+                this.tunerDisplay.canvas = tunerCanvas;
+                this.tunerDisplay.width = tunerCanvas.width;
+                this.tunerDisplay.height = tunerCanvas.height;
+            }
+            
+            // Set initial note display
+            const noteObj = TunerUtils.frequencyToPitch(A0 * Math.pow(2, (pitchToNumber(SOLFEGENAMES[this.pitchCenter] + EXPORTACCIDENTALNAMES[this.accidentalCenter], this.octaveCenter) - 57) / 12));
+            this.tunerDisplay.update(noteObj[0], noteObj[1], this.centsValue);
+            
+            // Reduce the main canvas height to make room for the tuner
+            canvas.height = height - tunerCanvas.height - 20;
+            canvas.style.marginTop = (tunerCanvas.height + 20) + "px";
+        } else if (this.tunerDisplay) {
+            // Remove the tuner canvas if it exists
+            const tunerCanvas = document.getElementsByClassName("tunerCanvas")[0];
+            if (tunerCanvas) {
+                tunerCanvas.parentNode.removeChild(tunerCanvas);
+            }
+            this.tunerDisplay = null;
+        }
 
         const draw = () => {
             this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
@@ -1008,7 +1571,6 @@ function SampleWidget() {
                         dataArray = turtleIdx === 0
                             ? this.pitchAnalysers[0].getValue()
                             : this.activity.logo.synth.getWaveFormValues();
-                        console.log(dataArray);
                     } else {
                         dataArray = this.pitchAnalysers[turtleIdx].getValue();
                     }
@@ -1035,8 +1597,339 @@ function SampleWidget() {
                     canvasCtx.stroke();
                     this.verticalOffset = canvas.height / 4;
                 }
+                
+                // Update the tuner display if enabled
+                if (this.tunerEnabled && this.tunerDisplay) {
+                    // Get pitch data from analyzer if available
+                    if (this.pitchAnalysers[1] && this.sampleName) {
+                        const dataArray = this.pitchAnalysers[1].getValue();
+                        if (dataArray && dataArray.length > 0) {
+                            const pitch = detectPitch(dataArray);
+                            if (pitch > 0) {
+                                const { note, cents } = frequencyToNote(pitch);
+                                this.tunerDisplay.update(note, cents, this.centsValue);
+                                
+                                // Update segments
+                                const tunerSegments = document.querySelectorAll("#tunerContainer svg path");
+                                tunerSegments.forEach((segment, i) => {
+                                    const segmentCents = (i - 5) * 10;
+                                    if (Math.abs(cents - segmentCents) <= 5) {
+                                        segment.setAttribute("fill", "#00ff00"); // In tune (green)
+                                    } else if (cents < segmentCents) {
+                                        segment.setAttribute("fill", "#ff0000"); // Flat (red)
+                                    } else {
+                                        segment.setAttribute("fill", "#0000ff"); // Sharp (blue)
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
             }
         };
         draw();
     };
+
+    /**
+     * Toggles the visibility of the tuner display
+     * @returns {void}
+     */
+    this.toggleTuner = function () {
+        this.tunerEnabled = !this.tunerEnabled;
+        
+        if (this.tunerEnabled) {
+            this._tunerBtn.getElementsByTagName("img")[0].src = "header-icons/tuner-active.svg";
+        } else {
+            this._tunerBtn.getElementsByTagName("img")[0].src = "header-icons/tuner.svg";
+        }
+        
+        // Redraw the canvas with the tuner display
+        this._scale();
+    };
+    
+    /**
+     * Applies the cents adjustment to the sample playback rate
+     * @returns {void}
+     */
+    this.applyCentsAdjustment = function () {
+        if (this.sampleName && this.sampleName !== "") {
+            const playbackRate = TunerUtils.calculatePlaybackRate(0, this.centsValue);
+            // Apply the playback rate to the sample
+            if (instruments[0]["customsample_" + this.originalSampleName]) {
+                instruments[0]["customsample_" + this.originalSampleName].playbackRate.value = playbackRate;
+            }
+        }
+    };
+
+    /**
+     * YIN Pitch Detection Algorithm
+     */
+    const YIN = (sampleRate, bufferSize = 2048, threshold = 0.1) => {
+        // Low-Pass Filter to remove high-frequency noise
+        const lowPassFilter = (buffer, cutoff = 500) => {
+            const alpha = 2 * Math.PI * cutoff / sampleRate;
+            return buffer.map((sample, i, arr) =>
+                i > 0 ? (alpha * sample + (1 - alpha) * arr[i - 1]) : sample
+            );
+        };
+
+        // Autocorrelation Function
+        const autocorrelation = (buffer) =>
+            buffer.map((_, lag) =>
+                buffer.slice(0, buffer.length - lag).reduce(
+                    (sum, value, index) => sum + value * buffer[index + lag], 0
+                )
+            );
+
+        // Difference Function
+        const difference = (buffer) => {
+            const autocorr = autocorrelation(buffer);
+            return autocorr.map((_, tau) => autocorr[0] + autocorr[tau] - 2 * autocorr[tau]);
+        };
+
+        // Cumulative Mean Normalized Difference Function
+        const cumulativeMeanNormalizedDifference = (diff) => {
+            let runningSum = 0;
+            return diff.map((value, tau) => {
+                runningSum += value;
+                return tau === 0 ? 1 : value / (runningSum / tau);
+            });
+        };
+
+        // Absolute Threshold Function
+        const absoluteThreshold = (cmnDiff) => {
+            for (let tau = 2; tau < cmnDiff.length; tau++) {
+                if (cmnDiff[tau] < threshold) {
+                    while (tau + 1 < cmnDiff.length && cmnDiff[tau + 1] < cmnDiff[tau]) {
+                        tau++;
+                    }
+                    return tau;
+                }
+            }
+            return -1;
+        };
+
+        // Parabolic Interpolation (More precision)
+        const parabolicInterpolation = (cmnDiff, tau) => {
+            const x0 = tau < 1 ? tau : tau - 1;
+            const x2 = tau + 1 < cmnDiff.length ? tau + 1 : tau;
+
+            if (x0 === tau) return cmnDiff[tau] <= cmnDiff[x2] ? tau : x2;
+            if (x2 === tau) return cmnDiff[tau] <= cmnDiff[x0] ? tau : x0;
+
+            const s0 = cmnDiff[x0], s1 = cmnDiff[tau], s2 = cmnDiff[x2];
+            const adjustment = ((x2 - x0) * (s0 - s2)) / (2 * (s0 - 2 * s1 + s2));
+
+            return tau + adjustment;
+        };
+
+        // Main Pitch Detection Function
+        return (buffer) => {
+            buffer = lowPassFilter(buffer, 300);
+            const diff = difference(buffer);
+            const cmnDiff = cumulativeMeanNormalizedDifference(diff);
+            const tau = absoluteThreshold(cmnDiff);
+
+            if (tau === -1) return -1;
+
+            const tauInterp = parabolicInterpolation(cmnDiff, tau);
+            return sampleRate / tauInterp;
+        };
+    };
+
+    /**
+     * Convert frequency to note and cents
+     */
+    const frequencyToNote = (frequency) => {
+        if (frequency <= 0) return { note: "---", cents: 0 };
+
+        const A4 = 440;
+        const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+
+        const midiNote = 69 + 12 * Math.log2(frequency / A4);
+        const roundedMidi = Math.round(midiNote);
+
+        const noteIndex = roundedMidi % 12;
+        const octave = Math.floor(roundedMidi / 12) - 1;
+        const noteName = noteNames[noteIndex] + octave;
+
+        const nearestFreq = A4 * Math.pow(2, (roundedMidi - 69) / 12);
+        const centsOffset = Math.round(1200 * Math.log2(frequency / nearestFreq));
+
+        return { note: noteName, cents: centsOffset };
+    };
+
+    /**
+     * Start pitch detection
+     */
+    const startPitchDetection = async () => {
+        try {
+            const audioContext = new AudioContext();
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const source = audioContext.createMediaStreamSource(stream);
+
+            const analyser = audioContext.createAnalyser();
+            analyser.fftSize = 4096;
+            source.connect(analyser);
+
+            const bufferSize = 2048;
+            const sampleRate = audioContext.sampleRate;
+            const buffer = new Float32Array(bufferSize);
+            const detectPitch = YIN(sampleRate, bufferSize);
+
+            const updatePitch = () => {
+                analyser.getFloatTimeDomainData(buffer);
+                const pitch = detectPitch(buffer);
+
+                if (pitch > 0) {
+                    const { note, cents } = frequencyToNote(pitch);
+                    document.getElementById("pitch").textContent = pitch.toFixed(2);
+                    document.getElementById("note").textContent = cents === 0 ?
+                        ` ${note} (Perfect)` :
+                        ` ${note}, off by ${cents} cents`;
+                } else {
+                    document.getElementById("pitch").textContent = "---";
+                    document.getElementById("note").textContent = "---";
+                }
+
+                requestAnimationFrame(updatePitch);
+            };
+
+            updatePitch();
+        } catch (err) {
+            console.error(`${err.name}: ${err.message}`);
+            alert("Microphone access failed: " + err.message);
+        }
+    };
+
+    /**
+     * Create tuner UI
+     */
+    this.makeTuner = (width, height) => {
+        const container = document.createElement("div");
+        container.className = "tuner-container";
+        container.style.height = height + "px";
+        container.style.width = width + "px";
+        container.style.position = "relative";
+        container.style.backgroundColor = "#f5f5f5";
+        container.style.borderRadius = "8px";
+        container.style.padding = "20px";
+        container.style.boxSizing = "border-box";
+
+        const heading = document.createElement("h1");
+        heading.textContent = "Tuner";
+        heading.style.textAlign = "center";
+        heading.style.marginBottom = "20px";
+
+        const startButton = document.createElement("button");
+        startButton.id = "start";
+        startButton.textContent = "Start";
+        startButton.style.display = "block";
+        startButton.style.margin = "0 auto 20px";
+        startButton.style.padding = "10px 20px";
+        startButton.style.fontSize = "16px";
+        startButton.style.cursor = "pointer";
+
+        const pitchParagraph = document.createElement("p");
+        pitchParagraph.textContent = "Detected Pitch: ";
+        pitchParagraph.style.textAlign = "center";
+        pitchParagraph.style.fontSize = "18px";
+        const pitchSpan = document.createElement("span");
+        pitchSpan.id = "pitch";
+        pitchSpan.textContent = "---";
+
+        const noteParagraph = document.createElement("p");
+        noteParagraph.textContent = "Note: ";
+        noteParagraph.style.textAlign = "center";
+        noteParagraph.style.fontSize = "18px";
+        const noteSpan = document.createElement("span");
+        noteSpan.id = "note";
+        noteSpan.textContent = "---";
+
+        pitchParagraph.appendChild(pitchSpan);
+        noteParagraph.appendChild(noteSpan);
+
+        container.appendChild(heading);
+        container.appendChild(startButton);
+        container.appendChild(pitchParagraph);
+        container.appendChild(noteParagraph);
+
+        this.widgetWindow.getWidgetBody().appendChild(container);
+
+        document.getElementById("start").addEventListener("click", startPitchDetection);
+    };
+
+
+
+    /**
+     * Applies the cent adjustment to the sample
+     * @param {number} value - The cent adjustment value
+     * @returns {void}
+     */
+    this.applyCentAdjustment = function(value) {
+        this.centAdjustmentValue = value;
+        
+        // Calculate the playback rate adjustment based on cents
+        // Formula: playbackRate = 2^(cents/1200)
+        const playbackRate = Math.pow(2, value/1200);
+        
+        // Apply the playback rate to the current sample if it exists
+        if (this.sampleName && this.sampleName !== "" && this.originalSampleName) {
+            const instrumentName = "customsample_" + this.originalSampleName;
+            
+            // Check if instruments object exists and the specific instrument exists
+            if (typeof instruments !== "undefined" &&
+                instruments[0] &&
+                instruments[0][instrumentName] &&
+                instruments[0][instrumentName].playbackRate) {
+                instruments[0][instrumentName].playbackRate.value = playbackRate;
+            } else {
+                // If the instrument doesn't exist yet, we'll apply the adjustment when playing
+                console.log("Instrument not found, will apply cent adjustment during playback");
+            }
+        }
+        
+        // If we're currently playing, restart with the new adjustment
+        if (this.isMoving) {
+            this.pause();
+            setTimeout(() => {
+                this._playReferencePitch();
+            }, 100);
+        }
+    };
+}
+
+// Add smoothing for pitch detection
+class PitchSmoother {
+    constructor(smoothingSize = 5) {
+        this.pitchHistory = [];
+        this.smoothingSize = smoothingSize;
+    }
+
+    addPitch(pitch) {
+        if (pitch > 0) {
+            this.pitchHistory.push(pitch);
+            if (this.pitchHistory.length > this.smoothingSize) {
+                this.pitchHistory.shift();
+            }
+        }
+    }
+
+    getSmoothedPitch() {
+        if (this.pitchHistory.length === 0) return -1;
+        
+        // Remove outliers
+        const sorted = [...this.pitchHistory].sort((a, b) => a - b);
+        const q1 = sorted[Math.floor(sorted.length / 4)];
+        const q3 = sorted[Math.floor(3 * sorted.length / 4)];
+        const iqr = q3 - q1;
+        const validPitches = this.pitchHistory.filter(p => p >= q1 - 1.5 * iqr && p <= q3 + 1.5 * iqr);
+        
+        if (validPitches.length === 0) return -1;
+        return validPitches.reduce((a, b) => a + b) / validPitches.length;
+    }
+
+    reset() {
+        this.pitchHistory = [];
+    }
 }
