@@ -804,7 +804,7 @@ function SampleWidget() {
             } else {
                 activity.textMsg(_("Tuner stopped"), 3000);
                 this.activity.logo.synth.stopTuner();
-                    tunerOn = false;
+                tunerOn = false;
             }
         };
 
@@ -1743,7 +1743,7 @@ function SampleWidget() {
     const frequencyToNote = (frequency) => {
         if (frequency <= 0) return { note: "---", cents: 0 };
 
-    const A4 = 440;
+        const A4 = 440;
         const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
         const midiNote = 69 + 12 * Math.log2(frequency / A4);
@@ -1784,8 +1784,8 @@ function SampleWidget() {
                 if (pitch > 0) {
                     const { note, cents } = frequencyToNote(pitch);
                     document.getElementById("pitch").textContent = pitch.toFixed(2);
-                    document.getElementById("note").textContent = cents === 0 ? 
-                        ` ${note} (Perfect)` : 
+                    document.getElementById("note").textContent = cents === 0 ?
+                        ` ${note} (Perfect)` :
                         ` ${note}, off by ${cents} cents`;
                 } else {
                     document.getElementById("pitch").textContent = "---";
@@ -1793,12 +1793,12 @@ function SampleWidget() {
                 }
 
                 requestAnimationFrame(updatePitch);
-    };
+            };
 
             updatePitch();
         } catch (err) {
             console.error(`${err.name}: ${err.message}`);
-            alert('Microphone access failed: ' + err.message);
+            alert("Microphone access failed: " + err.message);
         }
     };
 
@@ -1816,35 +1816,35 @@ function SampleWidget() {
         container.style.padding = "20px";
         container.style.boxSizing = "border-box";
 
-        const heading = document.createElement('h1');
-        heading.textContent = 'Tuner';
-        heading.style.textAlign = 'center';
-        heading.style.marginBottom = '20px';
+        const heading = document.createElement("h1");
+        heading.textContent = "Tuner";
+        heading.style.textAlign = "center";
+        heading.style.marginBottom = "20px";
 
-        const startButton = document.createElement('button');
-        startButton.id = 'start';
-        startButton.textContent = 'Start';
-        startButton.style.display = 'block';
-        startButton.style.margin = '0 auto 20px';
-        startButton.style.padding = '10px 20px';
-        startButton.style.fontSize = '16px';
-        startButton.style.cursor = 'pointer';
+        const startButton = document.createElement("button");
+        startButton.id = "start";
+        startButton.textContent = "Start";
+        startButton.style.display = "block";
+        startButton.style.margin = "0 auto 20px";
+        startButton.style.padding = "10px 20px";
+        startButton.style.fontSize = "16px";
+        startButton.style.cursor = "pointer";
 
-        const pitchParagraph = document.createElement('p');
-        pitchParagraph.textContent = 'Detected Pitch: ';
-        pitchParagraph.style.textAlign = 'center';
-        pitchParagraph.style.fontSize = '18px';
-        const pitchSpan = document.createElement('span');
-        pitchSpan.id = 'pitch';
-        pitchSpan.textContent = '---';
+        const pitchParagraph = document.createElement("p");
+        pitchParagraph.textContent = "Detected Pitch: ";
+        pitchParagraph.style.textAlign = "center";
+        pitchParagraph.style.fontSize = "18px";
+        const pitchSpan = document.createElement("span");
+        pitchSpan.id = "pitch";
+        pitchSpan.textContent = "---";
 
-        const noteParagraph = document.createElement('p');
-        noteParagraph.textContent = 'Note: ';
-        noteParagraph.style.textAlign = 'center';
-        noteParagraph.style.fontSize = '18px';
-        const noteSpan = document.createElement('span');
-        noteSpan.id = 'note';
-        noteSpan.textContent = '---';
+        const noteParagraph = document.createElement("p");
+        noteParagraph.textContent = "Note: ";
+        noteParagraph.style.textAlign = "center";
+        noteParagraph.style.fontSize = "18px";
+        const noteSpan = document.createElement("span");
+        noteSpan.id = "note";
+        noteSpan.textContent = "---";
 
         pitchParagraph.appendChild(pitchSpan);
         noteParagraph.appendChild(noteSpan);
@@ -1878,9 +1878,9 @@ function SampleWidget() {
             const instrumentName = "customsample_" + this.originalSampleName;
             
             // Check if instruments object exists and the specific instrument exists
-            if (typeof instruments !== 'undefined' && 
-                instruments[0] && 
-                instruments[0][instrumentName] && 
+            if (typeof instruments !== "undefined" &&
+                instruments[0] &&
+                instruments[0][instrumentName] &&
                 instruments[0][instrumentName].playbackRate) {
                 instruments[0][instrumentName].playbackRate.value = playbackRate;
             } else {

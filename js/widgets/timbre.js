@@ -2163,8 +2163,8 @@ class TimbreWidget {
         const mainDiv = docById("effect0");
         const effects = ["Tremolo", "Vibrato", "Chorus", "Phaser", "Distortion"];
         const effectsHtml = effects
-            .map(effect => 
-            `<input type="radio" name="effectsName" value="${effect}"/>${_(effect.toLowerCase())}<br>`
+            .map(effect =>
+                `<input type="radio" name="effectsName" value="${effect}"/>${_(effect.toLowerCase())}<br>`
             )
             .join("");
         mainDiv.innerHTML = `<p>${effectsHtml}</p>`;

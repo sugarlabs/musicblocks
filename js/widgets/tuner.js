@@ -6,76 +6,76 @@ function TunerDisplay(canvas, width, height) {
     this.canvas = canvas;
     this.width = width;
     this.height = height;
-    this.ctx = canvas.getContext('2d');
-    this.note = 'A';
+    this.ctx = canvas.getContext("2d");
+    this.note = "A";
     this.cents = 0;
     this.frequency = 440;
     this.chromaticMode = true; // Default to chromatic mode
     
     // Create mode toggle container
-    this.modeContainer = document.createElement('div');
+    this.modeContainer = document.createElement("div");
     Object.assign(this.modeContainer.style, {
-        position: 'absolute',
-        top: '20px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        display: 'flex',
-        backgroundColor: '#FFFFFF',
-        borderRadius: '20px',
-        padding: '4px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+        position: "absolute",
+        top: "20px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        display: "flex",
+        backgroundColor: "#FFFFFF",
+        borderRadius: "20px",
+        padding: "4px",
+        boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
     });
     canvas.parentElement.appendChild(this.modeContainer);
 
     // Create mode buttons wrapper
-    const buttonsWrapper = document.createElement('div');
+    const buttonsWrapper = document.createElement("div");
     Object.assign(buttonsWrapper.style, {
-        display: 'flex',
-        gap: '4px',
-        position: 'relative'
+        display: "flex",
+        gap: "4px",
+        position: "relative"
     });
     this.modeContainer.appendChild(buttonsWrapper);
 
     // Create chromatic mode button
-    this.chromaticButton = document.createElement('div');
+    this.chromaticButton = document.createElement("div");
     Object.assign(this.chromaticButton.style, {
-        width: '40px',
-        height: '32px',
-        borderRadius: '16px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'pointer',
-        transition: 'all 0.3s ease'
+        width: "40px",
+        height: "32px",
+        borderRadius: "16px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer",
+        transition: "all 0.3s ease"
     });
-    const chromaticIcon = document.createElement('img');
+    const chromaticIcon = document.createElement("img");
     Object.assign(chromaticIcon, {
-        src: 'header-icons/chromatic-mode.svg',
-        width: '20',
-        height: '20',
-        alt: ''
+        src: "header-icons/chromatic-mode.svg",
+        width: "20",
+        height: "20",
+        alt: ""
     });
     this.chromaticButton.appendChild(chromaticIcon);
     buttonsWrapper.appendChild(this.chromaticButton);
 
     // Create target pitch mode button
-    this.targetPitchButton = document.createElement('div');
+    this.targetPitchButton = document.createElement("div");
     Object.assign(this.targetPitchButton.style, {
-        width: '40px',
-        height: '32px',
-        borderRadius: '16px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        cursor: 'pointer',
-        transition: 'all 0.3s ease'
+        width: "40px",
+        height: "32px",
+        borderRadius: "16px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer",
+        transition: "all 0.3s ease"
     });
-    const targetIcon = document.createElement('img');
+    const targetIcon = document.createElement("img");
     Object.assign(targetIcon, {
-        src: 'header-icons/target-pitch-mode.svg',
-        width: '20',
-        height: '20',
-        alt: ''
+        src: "header-icons/target-pitch-mode.svg",
+        width: "20",
+        height: "20",
+        alt: ""
     });
     this.targetPitchButton.appendChild(targetIcon);
     buttonsWrapper.appendChild(this.targetPitchButton);
@@ -101,14 +101,14 @@ function TunerDisplay(canvas, width, height) {
 TunerDisplay.prototype.updateButtonStyles = function() {
     if (this.chromaticMode) {
         this.chromaticButton.style.backgroundColor = platformColor.selectorBackground;
-        this.chromaticButton.querySelector('img').style.filter = 'brightness(0) invert(1)';
-        this.targetPitchButton.style.backgroundColor = 'transparent';
-        this.targetPitchButton.querySelector('img').style.filter = 'none';
+        this.chromaticButton.querySelector("img").style.filter = "brightness(0) invert(1)";
+        this.targetPitchButton.style.backgroundColor = "transparent";
+        this.targetPitchButton.querySelector("img").style.filter = "none";
     } else {
         this.targetPitchButton.style.backgroundColor = platformColor.selectorBackground;
-        this.targetPitchButton.querySelector('img').style.filter = 'brightness(0) invert(1)';
-        this.chromaticButton.style.backgroundColor = 'transparent';
-        this.chromaticButton.querySelector('img').style.filter = 'none';
+        this.targetPitchButton.querySelector("img").style.filter = "brightness(0) invert(1)";
+        this.chromaticButton.style.backgroundColor = "transparent";
+        this.chromaticButton.querySelector("img").style.filter = "none";
     }
 };
 
@@ -143,32 +143,32 @@ TunerDisplay.prototype.draw = function() {
     const meterY = height - 80;  // Base position of meter
     
     // Draw the tuning meter background
-    ctx.fillStyle = '#e0e0e0';
+    ctx.fillStyle = "#e0e0e0";
     ctx.fillRect(meterX, meterY, meterWidth, meterHeight);
     
     // Draw the center line
-    ctx.fillStyle = '#000000';
+    ctx.fillStyle = "#000000";
     ctx.fillRect(meterX + meterWidth / 2 - 1, meterY, 2, meterHeight);
     
     // Draw the indicator
     const indicatorX = meterX + (meterWidth / 2) + (this.cents / 50) * (meterWidth / 2);
-    ctx.fillStyle = '#ff0000';
+    ctx.fillStyle = "#ff0000";
     ctx.fillRect(indicatorX - 2, meterY - 5, 4, meterHeight + 10);
 
     // Position text much lower in the canvas
     // Draw the note
-    ctx.font = 'bold 48px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#000000';
+    ctx.font = "bold 48px Arial";
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#000000";
     ctx.fillText(this.note, width / 2, height - 200);  // Much lower position
     
     // Draw the cents deviation
-    ctx.font = '24px Arial';
-    ctx.fillText((this.cents >= 0 ? '+' : '') + Math.round(this.cents) + '¢', width / 2, height - 160);  // Much lower position
+    ctx.font = "24px Arial";
+    ctx.fillText((this.cents >= 0 ? "+" : "") + Math.round(this.cents) + "¢", width / 2, height - 160);  // Much lower position
     
     // Draw the frequency
-    ctx.font = '18px Arial';
-    ctx.fillText(this.frequency.toFixed(1) + ' Hz', width / 2, height - 40);  // Near bottom
+    ctx.font = "18px Arial";
+    ctx.fillText(this.frequency.toFixed(1) + " Hz", width / 2, height - 40);  // Near bottom
 };
 
 /**
@@ -183,10 +183,10 @@ const TunerUtils = {
     frequencyToPitch: function(frequency) {
         const A4 = 440;
         const C0 = A4 * Math.pow(2, -4.75);
-        const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
         
         if (frequency < C0) {
-            return ['C', 0, C0];
+            return ["C", 0, C0];
         }
         
         const h = Math.round(12 * Math.log2(frequency / C0));
@@ -206,4 +206,4 @@ const TunerUtils = {
     calculatePlaybackRate: function(baseCents, adjustment) {
         return Math.pow(2, (baseCents + adjustment) / 1200);
     }
-}; 
+};
