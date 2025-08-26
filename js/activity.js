@@ -173,6 +173,7 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         "widgets/timbre",
         "widgets/oscilloscope",
         "widgets/sampler",
+        "widgets/reflection",
         "activity/lilypond",
         "activity/abc",
         "activity/midi",
@@ -3123,6 +3124,8 @@ class Activity {
                         break;
                     }
                     case 13: { // 'R or ENTER'
+                        if (this.isInputON) return;
+                        
                         if (this.searchWidget.style.visibility === "visible") {
                             return;
                         }
