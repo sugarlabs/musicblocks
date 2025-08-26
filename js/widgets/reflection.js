@@ -286,18 +286,23 @@ class ReflectionMatrix {
             console.log("No changes in code detected.");
             return; // No changes in code
         }
+
         this.showTypingIndicator("Reading code");
-        const data = await this.generateNewAlgorithm(this.projectAlgorithm, code);
+        const data = await this.generateNewAlgorithm(code);
         this.hideTypingIndicator();
 
         if (data && !data.error) {
-            this.projectAlgorithm = data.algorithm; // update algorithm
-            this.code = code;
+            if (data.algorithm !== "unchanged") {
+                this.projectAlgorithm = data.algorithm; // update algorithm
+                this.code = code;
+            } else {
+                console.log("No changes in algorithm detected.");
+            }
             this.botReplyDiv(data, false, false);
-            this.activity.textMsg(_("Project code updated."), 3000);
         } else {
             this.activity.errorMsg(_(data.error), 3000);
         }
+
         this.projectAlgorithm = data.algorithm;
     }
 
@@ -329,13 +334,13 @@ class ReflectionMatrix {
      * @param {string} code - The new project code.
      * @returns {Promise<Object>} - The server response containing the updated algorithm.
      */
-    async generateNewAlgorithm(previousAlgorithm, code) {
+    async generateNewAlgorithm(code) {
         try {
             const response = await fetch(`${this.PORT}/updatecode`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    oldcode: previousAlgorithm,
+                    oldcode: this.code,
                     newcode: code
                 })
             });
