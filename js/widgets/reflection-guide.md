@@ -8,7 +8,7 @@ Backend Code for the widget : [musicblocks_reflection_fastapi](https://github.co
 
 ## Key Features
 
--   **Multi-mentor Chat:** Switch between AI mentors (Meta/Rohan, Music/Beethoven, Code/Steve).
+-   **Multi-mentor Chat:** Switch between AI mentors (Meta/Rohan, Music/Beethoven, Code/Alan).
 -   **Chat History:** Stores and renders conversation history.
 -   **Typing Indicator:** Shows animated "Thinking..." while awaiting responses.
 -   **Markdown Rendering:** Converts Markdown responses to HTML for display.
@@ -92,14 +92,14 @@ Backend Code for the widget : [musicblocks_reflection_fastapi](https://github.co
         "code": "<project code string>"
     }
     ```
--   **Response:**  
+-   **Response:**
     ```json
     {
         "algorithm": "<algorithm string>",
         "message": "<first message>"
     }
     ```
-    or  
+    or
     ```json
     {
         "error": "<error message>"
@@ -164,6 +164,27 @@ Backend Code for the widget : [musicblocks_reflection_fastapi](https://github.co
 
 ---
 
+### 4. `/updatecode`
+
+-   **Method:** `POST`
+-   **Purpose:** Sends updated project code to the backend to refresh the algorithmic summary.
+-   **Payload:**
+    ```json
+    {
+        "oldcode": "<existing project code string>",
+        "newcode": "<new project code string>"
+    }
+    ```
+-   **Response:**
+    ```json
+    {
+        "algorithm": "<new algorithm string>",
+        "message": "<response message>"
+    }
+    ```
+
+---
+
 **All endpoints expect and return JSON.**  
 **The backend is expected to run locally while development.**
 
@@ -171,12 +192,37 @@ Backend Code for the widget : [musicblocks_reflection_fastapi](https://github.co
 
 ### API testing
 
+code :
+
 ```bash
-curl -X POST http://localhost:PORT/projectcode \
+curl -X GET http://localhost:8000/
+```
+
+output :
+
+```json
+{
+    "message": "Hello, Music Blocks!"
+}
+```
+
+Test `/projectcode` endpoint with sample project code:
+
+```bash
+curl -X POST http://localhost:8000/projectcode \
      -H "Content-Type: application/json" \
      -d '{
-           "code": "MUSICBLOCKS_PROJECT_CODE_HERE"
+           "code": "[[0,[\"start\",{\"id\":123,\"collapsed\":false}],244,80,[null,18,null]],[1,\"plus\",392,440,[10,16,8]]]"
          }'
+```
+
+Output:
+
+```json
+{
+    "algorithm": "1. Start the program.\n2. Perform an addition operation.",
+    "response": "This looks like a very basic program designed to add two numbers. Is that correct?"
+}
 ```
 
 **Note** : Save your Music Blocks project as an HTML file. Open the file to locate the embedded JSON code, and make sure to stringify the JSON before using it for testing.
