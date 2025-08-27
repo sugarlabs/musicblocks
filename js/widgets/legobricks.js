@@ -37,9 +37,10 @@ function LegoWidget() {
     this.isPlaying = false;
     this.isDragging = false;
     this.currentZoom = 1;
-    this.verticalSpacing = 50; // Default vertical column spacing in pixels
+    this.verticalSpacing = 50; 
     this.imageWrapper = null;
-    this.synth = null; // Audio synthesizer
+    this.synth = null; 
+    this.selectedInstrument = "electronic synth"; 
 
     // Pitch block handling properties (similar to PhraseMaker)
     this.blockNo = null;
@@ -84,10 +85,8 @@ function LegoWidget() {
         // Clear existing matrix data
         this.matrixData.rows = [];
         
-        // Debug: Log the received pitch blocks
-        console.log("LEGO Widget: Generating rows from", this.rowLabels.length, "pitch blocks:");
-        console.log("Row labels:", this.rowLabels);
-        console.log("Row args:", this.rowArgs);
+        // Create a list of pitch entries for sorting
+        const pitchEntries = [];
         
         // Generate rows based on the pitch blocks
         for (let i = 0; i < this.rowLabels.length; i++) {
@@ -110,7 +109,22 @@ function LegoWidget() {
                 else if (pitchName === "ti") displayName = "Ti";
                 else displayName = pitchName.toUpperCase();
                 
-                this.matrixData.rows.push({
+                // Calculate frequency for sorting (same as phrasemaker)
+                let frequency = 0;
+                try {
+                    if (typeof noteToFrequency !== 'undefined') {
+                        frequency = noteToFrequency(noteLabel, this.activity.turtles.ithTurtle(0).singer.keySignature);
+                    } else {
+                        // Fallback frequency calculation if noteToFrequency is not available
+                        frequency = this._calculateFallbackFrequency(pitchName, octave);
+                    }
+                } catch (e) {
+                    // Fallback frequency calculation
+                    frequency = this._calculateFallbackFrequency(pitchName, octave);
+                }
+                
+                pitchEntries.push({
+                    frequency: frequency,
                     type: 'pitch',
                     label: displayName + ' (' + octave + ')',
                     icon: 'pitch.svg',
@@ -122,6 +136,12 @@ function LegoWidget() {
             }
         }
         
+        // Sort pitch entries by frequency (highest first, like phrasemaker)
+        pitchEntries.sort((a, b) => b.frequency - a.frequency);
+        
+        // Add sorted pitch entries to matrix data
+        this.matrixData.rows = pitchEntries;
+        
         // Add a control row at the end
         this.matrixData.rows.push({
             type: 'control',
@@ -130,18 +150,38 @@ function LegoWidget() {
             color: 'control-row'
         });
         
-        // If no pitch blocks were provided, add some default rows for testing
+        // If no pitch blocks were provided, add some default rows for testing (already sorted)
         if (this.rowLabels.length === 0) {
-            console.log("LEGO Widget: No pitch blocks found, using default rows");
             this.matrixData.rows = [
-                { type: 'pitch', label: 'C4 (Middle C)', icon: 'pitch.svg', color: 'pitch-row', note: 'C4' },
-                { type: 'pitch', label: 'D4 (Re)', icon: 'pitch.svg', color: 'pitch-row', note: 'D4' },
                 { type: 'pitch', label: 'E4 (Mi)', icon: 'pitch.svg', color: 'pitch-row', note: 'E4' },
+                { type: 'pitch', label: 'D4 (Re)', icon: 'pitch.svg', color: 'pitch-row', note: 'D4' },
+                { type: 'pitch', label: 'C4 (Middle C)', icon: 'pitch.svg', color: 'pitch-row', note: 'C4' },
                 { type: 'control', label: 'Zoom Controls', icon: 'zoom.svg', color: 'control-row' }
             ];
         }
+    };
+
+    /**
+     * Calculates frequency for a pitch name and octave as fallback when noteToFrequency is not available.
+     * @private
+     * @param {string} pitchName - The pitch name (e.g., "do", "C", "re", "D")
+     * @param {number} octave - The octave number
+     * @returns {number} The calculated frequency
+     */
+    this._calculateFallbackFrequency = function(pitchName, octave) {
+        // Handle both letter names and solfege
+        const noteFreqs = {
+            'C': 261.63, 'do': 261.63,
+            'D': 293.66, 're': 293.66, 
+            'E': 329.63, 'mi': 329.63,
+            'F': 349.23, 'fa': 349.23,
+            'G': 392.00, 'sol': 392.00,
+            'A': 440.00, 'la': 440.00,
+            'B': 493.88, 'ti': 493.88
+        };
         
-        console.log("LEGO Widget: Final rows generated:", this.matrixData.rows.length, "rows");
+        const baseFreq = noteFreqs[pitchName.toLowerCase()] || noteFreqs[pitchName.toUpperCase()] || noteFreqs['C'];
+        return baseFreq * Math.pow(2, octave - 4);
     };
 
     /**
@@ -215,7 +255,7 @@ function LegoWidget() {
         this._initializeRowHeaders();
         
         this._scale();
-        this.activity.textMsg(_("LEGO Bricks - Phrase Maker with " + this.rowLabels.length + " pitch rows"));
+        this.activity.textMsg(_("LEGO Bricks - Phrase Maker with " + this.rowLabels.length + " pitch rows (sorted by frequency, Instrument: " + this.selectedInstrument + ")"));
     }
 
     /**
@@ -227,8 +267,8 @@ function LegoWidget() {
         this.synth = new Synth();
         this.synth.loadSamples();
         
-        // Create a default piano synth for all pitch playback
-        this.synth.createSynth(0, "piano", "piano", null);
+        // Create the default electronic synth for all pitch playback
+        this.synth.createSynth(0, this.selectedInstrument, this.selectedInstrument, null);
     };
 
     /**
@@ -241,8 +281,8 @@ function LegoWidget() {
         if (!this.synth) return;
         
         try {
-            // Play the note using the piano synth
-            this.synth.trigger(0, note, duration, "piano", null, null, false, 0);
+            // Play the note using the selected instrument
+            this.synth.trigger(0, note, duration, this.selectedInstrument, null, null, false, 0);
         } catch (e) {
             console.error("Error playing note:", e);
         }
@@ -450,6 +490,53 @@ function LegoWidget() {
         this.zoomControls.style.gap = "8px";
         this.zoomControls.style.zIndex = "20"; // Ensure it's above the grid
 
+        // Instrument selector
+        const instrumentLabel = document.createElement("span");
+        instrumentLabel.textContent = "Instrument:";
+        instrumentLabel.style.fontSize = "12px";
+        instrumentLabel.style.fontWeight = "bold";
+
+        this.instrumentSelect = document.createElement("select");
+        this.instrumentSelect.style.fontSize = "12px";
+        this.instrumentSelect.style.marginRight = "16px";
+        
+        // Add instrument options
+        const instruments = [
+            "electronic synth",
+            "piano",
+            "guitar",
+            "acoustic guitar", 
+            "electric guitar",
+            "violin",
+            "viola",
+            "cello",
+            "bass",
+            "flute",
+            "clarinet",
+            "saxophone",
+            "trumpet",
+            "trombone",
+            "oboe",
+            "tuba",
+            "banjo",
+            "sine",
+            "square",
+            "sawtooth",
+            "triangle"
+        ];
+        
+        instruments.forEach(instrument => {
+            const option = document.createElement("option");
+            option.value = instrument;
+            option.textContent = instrument.charAt(0).toUpperCase() + instrument.slice(1);
+            if (instrument === this.selectedInstrument) {
+                option.selected = true;
+            }
+            this.instrumentSelect.appendChild(option);
+        });
+        
+        this.instrumentSelect.onchange = () => this._changeInstrument();
+
         const zoomLabel = document.createElement("span");
         zoomLabel.textContent = "Zoom:";
         zoomLabel.style.fontSize = "12px";
@@ -493,7 +580,7 @@ function LegoWidget() {
 
         this.spacingSlider = document.createElement("input");
         this.spacingSlider.type = "range";
-        this.spacingSlider.min = "20";
+        this.spacingSlider.min = "2";
         this.spacingSlider.max = "200";
         this.spacingSlider.step = "1";
         this.spacingSlider.value = "50";
@@ -509,6 +596,8 @@ function LegoWidget() {
         this.spacingValue.style.fontSize = "12px";
         this.spacingValue.style.minWidth = "40px";
 
+        this.zoomControls.appendChild(instrumentLabel);
+        this.zoomControls.appendChild(this.instrumentSelect);
         this.zoomControls.appendChild(zoomLabel);
         this.zoomControls.appendChild(zoomOut);
         this.zoomControls.appendChild(this.zoomSlider);
@@ -640,8 +729,6 @@ function LegoWidget() {
                 denominator = Math.round(1 / note.noteValue);
             }
             
-            console.log(`Note ${i}: Duration ${note.duration}ms → ${numerator}/${denominator} note`);
-            
             newStack.push([idx + 2, "divide", 0, 0, [idx, idx + 3, idx + 4]]);
             newStack.push([idx + 3, ["number", { value: numerator }], 0, 0, [idx + 2]]);
             newStack.push([idx + 4, ["number", { value: denominator }], 0, 0, [idx + 2]]);
@@ -738,10 +825,6 @@ function LegoWidget() {
             else if (duration < 1500) noteValue = 4;   // quarter note (750-1500ms)
             else if (duration < 3000) noteValue = 2;   // half note (1500-3000ms)
             else noteValue = 1;                        // whole note (3000ms+)
-            
-            console.log(`Column ${colIndex}: ${duration}ms → 1/${noteValue} note (350-750ms=1/8, 750-1500ms=1/4, 1500-3000ms=1/2, 3000+ms=1)`);
-
-            const pitches = [];
             let hasNonGreenColor = false;
 
             // Check each row for non-green colors in this time range
@@ -774,8 +857,7 @@ function LegoWidget() {
                                     }
                                 }
                             } else if (segment.color !== 'green') {
-                                // Log when we ignore small overlaps
-                                console.log(`Ignoring small ${segment.color} overlap: ${Math.round(overlapDuration)}ms in column ${colIndex} for ${rowData.label}`);
+                                // Ignore small overlaps without logging
                             }
                         }
                         
@@ -824,10 +906,6 @@ function LegoWidget() {
             // If we filtered out everything, add the final boundary to create one long segment
             filteredBoundaries.push(boundaries[boundaries.length - 1]);
         }
-        
-        console.log(`Filtered boundaries (350ms min): ${boundaries.length} → ${filteredBoundaries.length} segments`);
-        console.log(`Original boundaries:`, boundaries);
-        console.log(`Filtered boundaries:`, filteredBoundaries);
         
         return filteredBoundaries;
     };
@@ -1232,7 +1310,6 @@ this._rgbToHsl = function(r, g, b) {
         // Check if row is completely outside image bounds (underflow/overflow)
         if (rowBottomInOverlay <= imageTop || rowTopInOverlay >= imageBottom) {
             // Row is outside image - return green for empty canvas areas
-            console.log(`Row ${line.rowIndex} is outside image bounds (row: ${rowTopInOverlay}-${rowBottomInOverlay}, image: ${imageTop}-${imageBottom}), using green`);
             return this._getColorFamilyByName('green');
         }
         
@@ -1280,7 +1357,7 @@ this._rgbToHsl = function(r, g, b) {
      */
     this._adjustVerticalSpacing = function(delta) {
         let newVal = parseFloat(this.spacingSlider.value) + delta;
-        newVal = Math.max(20, Math.min(200, newVal));
+        newVal = Math.max(2, Math.min(200, newVal));
         this.spacingSlider.value = newVal.toString();
         this._handleVerticalSpacing();
     };
@@ -1295,6 +1372,23 @@ this._rgbToHsl = function(r, g, b) {
         this.spacingValue.textContent = this.verticalSpacing + 'px';
         
         setTimeout(() => this._drawGridLines(), 50);
+    };
+
+    /**
+     * Changes the selected instrument for playback.
+     * @private
+     * @returns {void}
+     */
+    this._changeInstrument = function() {
+        this.selectedInstrument = this.instrumentSelect.value;
+        
+        // Recreate the synth with the new instrument
+        if (this.synth) {
+            this.synth.createSynth(0, this.selectedInstrument, this.selectedInstrument, null);
+        }
+        
+        // Show a message indicating the instrument change
+        this.activity.textMsg(_("Instrument changed to: ") + this.selectedInstrument);
     };
 
 
@@ -1451,7 +1545,6 @@ this._playPhrase = function() {
         
         // Skip if this row is completely outside canvas bounds
         if (clampedTopPos >= canvasHeight || clampedBottomPos <= 0) {
-            console.log(`Row ${index} (${row.label}) is outside canvas bounds, filling with green`);
             // Fill this row with green color for the entire duration
             this.colorData[this.colorData.length - 1].colorSegments.push({
                 color: 'green',
@@ -1562,7 +1655,6 @@ this._animateLines = function() {
     
     if (allLinesCompleted) {
         this._stopPlayback();
-        console.log("Color scanning results:", this.colorData);
     } else {
         requestAnimationFrame(() => this._animateLines());
     }
@@ -1597,7 +1689,6 @@ this._isLineBeyondImageHorizontally = function(line) {
     const lineX = line.currentX;
     
     if (lineX >= imageRight) {
-        console.log(`Row ${line.rowIndex} scanning line reached image right edge at X=${Math.round(lineX)}, stopping detection`);
         return true;
     }
     
@@ -1636,8 +1727,6 @@ this._stopPlayback = function() {
         this._generateColorVisualization();
         this._drawColumnLinesOnCanvas(); // Draw column lines on the overlay
     }, 100); // Small delay to ensure all data is processed
-    
-    console.log("Color scanning results:", this.colorData);
 };
 
 
@@ -1795,8 +1884,6 @@ this._sampleAndDetectColor = function(line, now) {
             line.currentColor = dominantColor;
             line.colorStartTime = now;
             line.lastColorChangeTime = now;
-            
-            console.log(`Row ${line.rowIndex} (${this.matrixData.rows[line.rowIndex].label}): ${dominantColor.name} at X=${Math.round(line.currentX)}`);
         }
     }
 };
@@ -1891,8 +1978,6 @@ this._drawColumnLinesOnCanvas = function() {
             this.gridOverlay.appendChild(vline);
         }
     });
-    
-    console.log(`Drew ${filteredBoundaries.length - 1} filtered column lines on overlay`);
 };
 
 /**
@@ -1930,8 +2015,6 @@ this._drawColumnLines = function(ctx, canvasWidth, canvasHeight, startX, availab
             ctx.stroke();
         }
     });
-    
-    console.log(`Drew ${filteredBoundaries.length - 1} filtered column edge lines in PNG export`);
 };
 
 /**
@@ -1940,7 +2023,6 @@ this._drawColumnLines = function(ctx, canvasWidth, canvasHeight, startX, availab
  */
 this._generateColorVisualization = function() {
     if (!this.colorData || this.colorData.length === 0) {
-        console.log("No color data to visualize");
         return;
     }
     
@@ -2071,22 +2153,7 @@ this._generateColorVisualization = function() {
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
-        
-        console.log('Color visualization PNG downloaded!');
     }, 'image/png');
-    
-    // Also log summary to console
-    console.log('=== COLOR DETECTION SUMMARY ===');
-    this.colorData.forEach((rowData, index) => {
-        if (rowData.colorSegments && rowData.colorSegments.length > 0) {
-            console.log(`${rowData.label}: ${rowData.colorSegments.length} segments`);
-            rowData.colorSegments.forEach((segment, i) => {
-                console.log(`  ${i+1}. ${segment.color} (${Math.round(segment.duration)}ms)`);
-            });
-        } else {
-            console.log(`${rowData.label}: No colors detected`);
-        }
-    });
 
     // Play the music after visualization is generated
     this.playColorMusicPolyphonic(this.colorData);
@@ -2138,8 +2205,7 @@ this.playColorMusicPolyphonic = async function(colorData) {
                             hasNonGreenColor = true;
                             break;
                         } else if (overlapDuration <= 350 && segment.color !== 'green') {
-                            // Log when we ignore small overlaps during playback
-                            console.log(`Playback: Ignoring small ${segment.color} overlap: ${Math.round(overlapDuration)}ms for ${rowData.label}`);
+                            // Ignore small overlaps during playback
                         }
                     }
                     currentTime += segment.duration;
@@ -2171,8 +2237,6 @@ this.playColorMusicPolyphonic = async function(colorData) {
     let playingNotes = new Set();
     let lastTime = 0;
 
-    console.log(`Playing music with ${events.length/2} filtered note events`);
-
     for (let i = 0; i < events.length; i++) {
         const evt = events[i];
         const waitTime = evt.time - lastTime;
@@ -2183,21 +2247,19 @@ this.playColorMusicPolyphonic = async function(colorData) {
         if (evt.type === "on") {
             // Start note (if not already playing)
             if (!playingNotes.has(evt.note)) {
-                this.synth.trigger(0, evt.note, 999, "piano", null, null, false, 0); // Long duration, will stop manually
+                this.synth.trigger(0, evt.note, 999, this.selectedInstrument, null, null, false, 0); // Long duration, will stop manually
                 playingNotes.add(evt.note);
-                console.log(`Note ON: ${evt.note} at time ${evt.time}ms`);
             }
         } else if (evt.type === "off") {
             // Stop note
-            this.synth.stopSound(0, "piano", evt.note);
+            this.synth.stopSound(0, this.selectedInstrument, evt.note);
             playingNotes.delete(evt.note);
-            console.log(`Note OFF: ${evt.note} at time ${evt.time}ms`);
         }
         lastTime = evt.time;
     }
     // Ensure all notes are stopped at the end
     playingNotes.forEach(note => {
-        this.synth.stopSound(0, "piano", note);
+        this.synth.stopSound(0, this.selectedInstrument, note);
     });
 };
 
