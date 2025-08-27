@@ -1,23 +1,23 @@
 # Reflection Widget - User Guide
 
-The Reflection Widget lets you chat with AI mentors to reflect on and analyze your Music Blocks project. Using this tool you can learn fast and improve your coding and music skills.
+The Reflection Widget lets you chat with AI mentors to reflect on and analyze your Music Blocks project. Using this tool, you can learn quickly and improve your coding and music skills.
 
 ## Getting Started
 
 1. **Open the Reflection Widget**  
-    - You will find the reflection block in the widget palette (available in both beginner and advance modes).
-    - Drag it to your workspace and click it to open the widget.
+  - You will find the reflection block in the widget palette (available in both beginner and advanced modes).
+  - Drag it to your workspace and click it to open the widget.
 
-2. **Meet your AI Mentors**  
+2. **Meet Your AI Mentors**  
 
-    We have three AI mentors in the widget:
-    - **Rohan** (Meta) for general project reflection. He is expert at helping you think about your project as a whole. He will discuss your goals, challenges and learning.
+  There are three AI mentors in the widget:
+  - **Rohan** (Meta) for general project reflection. He is an expert at helping you think about your project as a whole. He will discuss your goals, challenges, and learning.
 
-    - **Beethoven** (Music) for music-specific advice. The famous composer Ludwig van Beethoven is here to help you improve your music compositions and knowledge.
+  - **Beethoven** (Music) for music-specific advice. The famous composer Ludwig van Beethoven is here to help you improve your music compositions and knowledge.
 
-    - **Alan** (Code) for coding help. Alan Kay, a pioneer in computer science, will assist you with coding concepts. He may ask critical questions to think about your code structure and logic.
+  - **Alan** (Code) for coding help. Alan Kay, a pioneer in computer science, will assist you with coding concepts. He may ask critical questions to help you think about your code structure and logic.
 
-    Click the mentor’s icon to change who you’re chatting with. You can switch mentors at any time.
+  Click the mentor’s icon to change who you’re chatting with. You can switch mentors at any time.
 
 ## Sending Messages
 
@@ -30,9 +30,9 @@ The Reflection Widget lets you chat with AI mentors to reflect on and analyze yo
 ## Tips
 
 - The best way to use this tool is to have a detailed and long conversation with your mentor. The more you share, the better the feedback.
-- Let your mentors ask the questions, you can just sit back and answer them thoughtfully.
+- Let your mentors ask the questions; you can just sit back and answer them thoughtfully.
 - If your mentors are done asking questions, they will ask you if you want to continue the conversation or end it. It is up to you!
-- When you feel satisfied with the conversation, you can generate an analysis report. This report is based on your interactions with the mentors and the previous report. It will talk about your learning outcomes, areas for improvement and next steps.
+- When you feel satisfied with the conversation, you can generate an analysis report. This report is based on your interactions with the mentors and the previous report. It will discuss your learning outcomes, areas for improvement, and next steps.
 
 ## Widget Features
 
