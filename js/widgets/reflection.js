@@ -45,7 +45,7 @@ class ReflectionMatrix {
             user: "YOU",
             meta: "ROHAN",
             music: "BEETHOVEN",
-            code: "STEVE"
+            code: "ALAN"
         };
 
         /**
@@ -59,6 +59,12 @@ class ReflectionMatrix {
          * @type {string}
          */
         this.projectAlgorithm = "";
+
+        /**
+         * MusicBlocks code
+         * @type {string}
+         */
+        this.code = "";
     }
 
     /**
@@ -70,7 +76,7 @@ class ReflectionMatrix {
         this.isOpen = true;
         this.isMaximized = false;
         this.activity.isInputON = true;
-        this.PORT = "http://52.65.37.66:8000";
+        this.PORT = "http://52.65.37.66:8000"; // http://127.0.0.1:8000
 
         const widgetWindow = window.widgetWindows.windowFor(this, "reflection", "reflection");
         this.widgetWindow = widgetWindow;
@@ -92,11 +98,8 @@ class ReflectionMatrix {
         this.chatInterface.className = "chatInterface";
         widgetWindow.getWidgetBody().append(this.chatInterface);
 
-        widgetWindow.addButton(
-            "notes_icon.svg",
-            ReflectionMatrix.ICONSIZE,
-            _("Summary")
-        ).onclick = () => this.getAnalysis();
+        widgetWindow.addButton("notes_icon.svg", ReflectionMatrix.ICONSIZE, _("Summary")).onclick =
+            () => this.getAnalysis();
         widgetWindow.addButton(
             "save-button-dark.svg",
             ReflectionMatrix.ICONSIZE,
@@ -113,7 +116,7 @@ class ReflectionMatrix {
         this.codeButton = widgetWindow.addButton(
             "code.svg",
             ReflectionMatrix.ICONSIZE,
-            _("Talk with Steve")
+            _("Talk with Alan")
         );
         this.codeButton.onclick = () => this.changeMentor("code");
 
@@ -123,6 +126,13 @@ class ReflectionMatrix {
             _("Talk with Beethoven")
         );
         this.musicButton.onclick = () => this.changeMentor("music");
+
+        this.reloadButton = widgetWindow.addButton(
+            "reload.svg",
+            ReflectionMatrix.ICONSIZE,
+            _("Refresh")
+        );
+        this.reloadButton.onclick = () => this.updateProjectCode();
 
         this.changeMentor(this.AImentor);
 
@@ -176,14 +186,14 @@ class ReflectionMatrix {
      * Displays a typing indicator with animated dots.
      * @returns {void}
      */
-    showTypingIndicator() {
+    showTypingIndicator(action) {
         if (this.typingDiv) return;
 
         this.typingDiv = document.createElement("div");
         this.typingDiv.className = "typing-indicator";
 
         const textElement = document.createElement("span");
-        textElement.textContent = "Thinking";
+        textElement.textContent = action ? action : "Thinking";
         this.typingDiv.appendChild(textElement);
 
         this.dotsContainer = document.createElement("span");
@@ -248,7 +258,7 @@ class ReflectionMatrix {
 
         this.triggerFirst = true;
         setTimeout(() => {
-            this.showTypingIndicator();
+            this.showTypingIndicator("Reading code");
         }, 1000);
 
         const code = await this.activity.prepareExport();
@@ -259,9 +269,40 @@ class ReflectionMatrix {
         if (data && !data.error) {
             this.inputContainer.style.display = "flex";
             this.botReplyDiv(data, false, false);
+            this.projectAlgorithm = data.algorithm;
+            this.code = code;
         } else {
             this.activity.errorMsg(_(data.error), 3000);
         }
+    }
+
+    /**
+     * Updates the project code and retrieves the new algorithm from the server.
+     * @returns {Promise<void>}
+     */
+    async updateProjectCode() {
+        const code = await this.activity.prepareExport();
+        if (code === this.code) {
+            console.log("No changes in code detected.");
+            return; // No changes in code
+        }
+
+        this.showTypingIndicator("Reading code");
+        const data = await this.generateNewAlgorithm(code);
+        this.hideTypingIndicator();
+
+        if (data && !data.error) {
+            if (data.algorithm !== "unchanged") {
+                this.projectAlgorithm = data.algorithm; // update algorithm
+                this.code = code;
+            } else {
+                console.log("No changes in algorithm detected.");
+            }
+            this.botReplyDiv(data, false, false);
+        } else {
+            this.activity.errorMsg(_(data.error), 3000);
+        }
+
         this.projectAlgorithm = data.algorithm;
     }
 
@@ -277,6 +318,30 @@ class ReflectionMatrix {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     code: code
+                })
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error("Error :", error);
+            return { error: "Failed to send message" };
+        }
+    }
+
+    /**
+     * Sends the previous algorithm and new code to the server to get an updated algorithm.
+     * @param {string} previousAlgorithm - The previous project algorithm.
+     * @param {string} code - The new project code.
+     * @returns {Promise<Object>} - The server response containing the updated algorithm.
+     */
+    async generateNewAlgorithm(code) {
+        try {
+            const response = await fetch(`${this.PORT}/updatecode`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    oldcode: this.code,
+                    newcode: code
                 })
             });
             const data = await response.json();
@@ -323,7 +388,7 @@ class ReflectionMatrix {
      */
     async getAnalysis() {
         if (this.chatHistory.length < 10) return;
-        this.showTypingIndicator();
+        this.showTypingIndicator("Analyzing");
         const data = await this.generateAnalysis();
         this.hideTypingIndicator();
         if (data) {
@@ -404,7 +469,7 @@ class ReflectionMatrix {
         } else {
             botReply.innerText = reply.response;
         }
-        
+
         messageContainer.appendChild(senderName);
         messageContainer.appendChild(botReply);
 
