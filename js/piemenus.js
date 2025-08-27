@@ -65,6 +65,7 @@ const setWheelSize = (i) => {
     const screenWidth = window.innerWidth;
 
     wheelDiv.style.position = "absolute";
+    wheelDiv.style.zIndex = "20000"; // Set z-index higher than floating windows (10000)
 
     if (screenWidth >= 1200) {
         wheelDiv.style.width = i + "px";
@@ -122,7 +123,9 @@ const piemenuPitches = (
         noteValues = ["C", "G", "D", "A", "E", "B", "F"];
     }
 
-    docById("wheelDiv").style.display = "";
+    const wheelDiv = docById("wheelDiv");
+    wheelDiv.style.display = ""; // Show the div but keep it invisible initially
+    wheelDiv.style.opacity = "0";
 
     // The pitch selector
     block._pitchWheel = new wheelnav("wheelDiv", null, 600, 600);
@@ -204,6 +207,7 @@ const piemenuPitches = (
             _("double flat")
         ]);
     }
+
     if (hasOctaveWheel) {
         block._octavesWheel.colors = platformColor.octavesWheelcolors;
         block._octavesWheel.slicePathFunction = slicePath().DonutSlice;
@@ -360,6 +364,12 @@ const piemenuPitches = (
         // const prevOctave = 8 - pitchOctave;
     }
 
+    // Now that everything is set up, make the wheel visible with a smooth transition
+    wheelDiv.style.transition = "opacity 0.15s ease-in";
+    setTimeout(() => {
+        wheelDiv.style.opacity = "1";
+    }, 50);
+
     // Set up event handlers.
     const that = block;
     const selection = {
@@ -372,122 +382,161 @@ const piemenuPitches = (
      * @return{void}
      * @private
      */
-    const __pitchPreview = () => {
-        const label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
-        const i = noteLabels.indexOf(label);
+    const __pitchPreview = async () => {
+        try {
+            // Ensure audio context is initialized first
+            await setupAudioContext();
 
-        // Are we wrapping across C? We need to compare with the previous pitch
-        if (prevPitch === null) {
-            prevPitch = i;
-        }
-
-        const deltaPitch = i - prevPitch;
-        let delta;
-        if (deltaPitch > 3) {
-            delta = deltaPitch - 7;
-        } else if (deltaPitch < -3) {
-            delta = deltaPitch + 7;
-        } else {
-            delta = deltaPitch;
-        }
-
-        // If we wrapped across C, we need to adjust the octave.
-        let deltaOctave = 0;
-        if (prevPitch + delta > 6) {
-            deltaOctave = -1;
-        } else if (prevPitch + delta < 0) {
-            deltaOctave = 1;
-        }
-        let attr;
-        prevPitch = i;
-        let note = noteValues[i];
-        if (!custom) {
-            attr =
-                that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
-            if (label === " ") {
-                return;
-            } else if (attr !== "♮") {
-                note += attr;
+            // Ensure synth is initialized before proceeding
+            if (!that.activity.logo.synth) {
+                console.debug('Creating synth in logo');
+                that.activity.logo.synth = new Synth();
             }
+            
+            // Always ensure tone is initialized
+            if (!that.activity.logo.synth.tone) {
+                that.activity.logo.synth.newTone();
+            }
+
+            const label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+            const i = noteLabels.indexOf(label);
+
+            // Are we wrapping across C? We need to compare with the previous pitch
+            if (prevPitch === null) {
+                prevPitch = i;
+            }
+
+            const deltaPitch = i - prevPitch;
+            let delta;
+            if (deltaPitch > 3) {
+                delta = deltaPitch - 7;
+            } else if (deltaPitch < -3) {
+                delta = deltaPitch + 7;
+            } else {
+                delta = deltaPitch;
+            }
+
+            // If we wrapped across C, we need to adjust the octave.
+            let deltaOctave = 0;
+            if (prevPitch + delta > 6) {
+                deltaOctave = -1;
+            } else if (prevPitch + delta < 0) {
+                deltaOctave = 1;
+            }
+            let attr;
+            prevPitch = i;
+            let note = noteValues[i];
+            if (!custom) {
+                attr =
+                    that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
+                if (label === " ") {
+                    return;
+                } else if (attr !== "♮") {
+                    note += attr;
+                }
+            }
+
+            let octave;
+            if (hasOctaveWheel) {
+                // Always use the current octave from the wheel
+                octave = Number(
+                    that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title
+                );
+            } else {
+                octave = 4;
+            }
+
+            octave += deltaOctave;
+            if (octave < 1) {
+                octave = 1;
+            } else if (octave > 8) {
+                octave = 8;
+            }
+            
+            // Store the final octave back in selection
+            selection["octave"] = octave;
+
+            if (hasOctaveWheel && deltaOctave !== 0) {
+                that._octavesWheel.navigateWheel(8 - octave);
+                that.blocks.setPitchOctave(that.connections[0], octave);
+            }
+
+            const keySignature =
+                block.activity.KeySignatureEnv[0] + " " + block.activity.KeySignatureEnv[1];
+
+            let obj;
+            if (that.name == "scaledegree2") {
+                note = note.replace(attr, "");
+                note = SOLFEGENAMES[note - 1];
+                note += attr;
+                obj = getNote(
+                    note,
+                    octave,
+                    0,
+                    keySignature,
+                    true,
+                    null,
+                    that.activity.errorMsg,
+                    that.activity.logo.synth.inTemperament
+                );
+            } else {
+                obj = getNote(
+                    note,
+                    octave,
+                    0,
+                    keySignature,
+                    block.activity.KeySignatureEnv[2],
+                    null,
+                    that.activity.errorMsg,
+                    that.activity.logo.synth.inTemperament
+                );
+            }
+            if (!custom) {
+                obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
+            }
+
+            // Create and load synth if needed
+            if (!instruments[0] || !instruments[0][DEFAULTVOICE]) {
+                try {
+                    that.activity.logo.synth.createDefaultSynth(0);
+                    await that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
+                } catch (e) {
+                    console.debug('Error initializing synth:', e);
+                    return;
+                }
+            }
+
+            // Ensure synth is properly initialized
+            if (!that.activity.logo.synth.tone) {
+                that.activity.logo.synth.newTone();
+            }
+
+            // Set volume
+            try {
+                that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
+                that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
+            } catch (e) {
+                console.debug('Error setting volume:', e);
+                return;
+            }
+
+            // Trigger note with proper error handling
+            if (!that._triggerLock) {
+                that._triggerLock = true;
+                try {
+                    await that.activity.logo.synth.trigger(0, [obj[0] + obj[1]], 1/8, DEFAULTVOICE, null, null, false);
+                } catch (e) {
+                    console.debug('Error triggering note:', e);
+                } finally {
+                    // Ensure trigger lock is released after a delay
+                    setTimeout(() => {
+                        that._triggerLock = false;
+                    }, 125); // 1/8 second in milliseconds
+                }
+            }
+        } catch (e) {
+            console.error('Error in pitch preview:', e);
         }
-
-        let octave;
-        if (hasOctaveWheel) {
-            octave = Number(
-                that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title
-            );
-        } else {
-            octave = 4;
-        }
-
-        octave += deltaOctave;
-        if (octave < 1) {
-            octave = 1;
-        } else if (octave > 8) {
-            octave = 8;
-        }
-
-        if (hasOctaveWheel && deltaOctave !== 0) {
-            that._octavesWheel.navigateWheel(8 - octave);
-            that.blocks.setPitchOctave(that.connections[0], octave);
-        }
-
-        const keySignature =
-            block.activity.KeySignatureEnv[0] + " " + block.activity.KeySignatureEnv[1];
-
-        let obj;
-        if (that.name == "scaledegree2") {
-            note = note.replace(attr, "");
-            note = SOLFEGENAMES[note - 1];
-            note += attr;
-            obj = getNote(
-                note,
-                octave,
-                0,
-                keySignature,
-                true,
-                null,
-                that.activity.errorMsg,
-                that.activity.logo.synth.inTemperament
-            );
-        } else {
-            obj = getNote(
-                note,
-                octave,
-                0,
-                keySignature,
-                block.activity.KeySignatureEnv[2],
-                null,
-                that.activity.errorMsg,
-                that.activity.logo.synth.inTemperament
-            );
-        }
-        if (!custom) {
-            obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
-        }
-
-        const tur = that.activity.turtles.ithTurtle(0);
-
-        if (
-            tur.singer.instrumentNames.length === 0 ||
-            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
-        ) {
-            tur.singer.instrumentNames.push(DEFAULTVOICE);
-            that.activity.logo.synth.createDefaultSynth(0);
-            that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
-        }
-
-        that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
-        Singer.setSynthVolume(that.activity.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
-
-        if (!that._triggerLock) {
-            that._triggerLock = true;
-            that.activity.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 8, DEFAULTVOICE, null, null);
-        }
-
-        setTimeout(() => {
-            that._triggerLock = false;
-        }, 1 / 8);
     };
 
     const __selectionChangedSolfege = () => {
@@ -565,6 +614,8 @@ const piemenuPitches = (
                 that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title
             );
             that.blocks.setPitchOctave(that.connections[0], octave);
+            // Update the state with the current octave
+            selection["octave"] = octave;
         }
 
         if (
@@ -574,7 +625,6 @@ const piemenuPitches = (
             // We may need to update the mode widget.
             that.activity.logo.modeBlock = that.blocks.blockList.indexOf(that);
         }
-        __pitchPreview();
     };
 
     const __selectionChangedOctave = () => {
@@ -582,7 +632,9 @@ const piemenuPitches = (
             that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title
         );
         that.blocks.setPitchOctave(that.connections[0], octave);
-        __pitchPreview();
+        
+        // Update the state before preview
+        selection["octave"] = octave;
     };
 
     const __selectionChangedAccidental = () => {
@@ -592,9 +644,10 @@ const piemenuPitches = (
 
         if (selection["attr"] === "♮") {
             that.text.text = selection["note"];
+            that.value = selection["note"];
         } else {
-            that.value += selection["attr"];
-            that.text.text = selection["note"] + selection["attr"];
+            that.value = selection["note"] + selection["attr"];
+            that.text.text = that.value;
         }
         // Store the selected accidental in the block for later use.
         prevAccidental = selection["attr"];
@@ -602,23 +655,59 @@ const piemenuPitches = (
        
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
-        __pitchPreview();
+
+        // Ensure we have the current octave
+        if (hasOctaveWheel) {
+            selection["octave"] = Number(
+                that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title
+            );
+        }
     };
 
     // Set up handlers for pitch preview.
+    const setupAudioContext = async () => {
+        try {
+            await Tone.start();
+            console.debug('Audio context started');
+        } catch (e) {
+            console.debug('Error starting audio context:', e);
+        }
+    };
+
+    const __selectionChangedSolfegeWithAudio = async () => {
+        __selectionChangedSolfege();
+    };
+
+    const __selectionChangedOctaveWithAudio = async () => {
+        __selectionChangedOctave();
+    };
+
+    const __selectionChangedAccidentalWithAudio = async () => {
+        __selectionChangedAccidental();
+    };
+
+    // Set up handlers for pitch preview.
+    const __previewWrapper = async () => {
+        await setupAudioContext();
+        if (!that.activity.logo.synth.tone) {
+            that.activity.logo.synth.newTone();
+        }
+        await __pitchPreview();
+    };
+
     for (let i = 0; i < noteValues.length; i++) {
-        block._pitchWheel.navItems[i].navigateFunction = __selectionChangedSolfege;
+        block._pitchWheel.navItems[i].navigateFunction = __previewWrapper;
     }
 
     if (!custom) {
         for (let i = 0; i < accidentals.length; i++) {
-            block._accidentalsWheel.navItems[i].navigateFunction = __selectionChangedAccidental;
+            block._accidentalsWheel.navItems[i].navigateFunction = __previewWrapper;
         }
     }
 
     if (hasOctaveWheel) {
         for (let i = 0; i < 8; i++) {
-            block._octavesWheel.navItems[i].navigateFunction = __selectionChangedOctave;
+            block._octavesWheel.navItems[i].navigateFunction = __previewWrapper;
         }
     }
 
@@ -955,16 +1044,14 @@ const piemenuCustomNotes = (
         const tur = that.activity.turtles.ithTurtle(0);
 
         if (
-            tur.singer.instrumentNames.length === 0 ||
             !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
-            tur.singer.instrumentNames.push(DEFAULTVOICE);
             that.activity.logo.synth.createDefaultSynth(0);
             that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
 
         that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
-        Singer.setSynthVolume(that.activity.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
+        that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
 
         if (!that._triggerLock) {
             that._triggerLock = true;
@@ -977,7 +1064,7 @@ const piemenuCustomNotes = (
 
         setTimeout(() => {
             that._triggerLock = false;
-        }, 1 / 8);
+        }, 125); // 1/8 second in milliseconds
     };
 
     if (hasOctaveWheel) {
@@ -1208,16 +1295,14 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
         const tur = that.activity.turtles.ithTurtle(0);
 
         if (
-            tur.singer.instrumentNames.length === 0 ||
             !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
-            tur.singer.instrumentNames.push(DEFAULTVOICE);
             that.activity.logo.synth.createDefaultSynth(0);
             that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
 
         that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
-        Singer.setSynthVolume(that.activity.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
+        that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
 
         //Play sample note and prevent extra sounds from playing
         if (!that._triggerLock) {
@@ -1234,7 +1319,7 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
 
         setTimeout(() => {
             that._triggerLock = false;
-        }, 1 / 8);
+        }, 125); // 1/8 second in milliseconds
 
         __selectionChanged();
     };
@@ -1856,15 +1941,13 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         const actualPitch = numberToPitch(wheelValues[i] + 3);
         const tur = that.activity.turtles.ithTurtle(0);
         if (
-            tur.singer.instrumentNames.length === 0 ||
             !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
-            tur.singer.instrumentNames.push(DEFAULTVOICE);
             that.activity.logo.synth.createDefaultSynth(0);
             that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
         that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
-        Singer.setSynthVolume(that.activity.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
+        that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
         actualPitch[0] = actualPitch[0].replace(SHARP, "#").replace(FLAT, "b");
         if (!that._triggerLock) {
             that._triggerLock = true;
@@ -1879,7 +1962,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         }
         setTimeout(() => {
             that._triggerLock = false;
-        }, 1 / 8);
+        }, 125); // 1/8 second in milliseconds
 
         __selectionChanged();
     };
@@ -1890,15 +1973,13 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         const actualPitch = frequencyToPitch(wheelValues[i]);
         const tur = that.activity.turtles.ithTurtle(0);
         if (
-            tur.singer.instrumentNames.length === 0 ||
             !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
-            tur.singer.instrumentNames.push(DEFAULTVOICE);
             that.activity.logo.synth.createDefaultSynth(0);
             that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
         that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
-        Singer.setSynthVolume(that.activity.logo, 0, DEFAULTVOICE, PREVIEWVOLUME);
+        that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
         actualPitch[0] = actualPitch[0].replace(SHARP, "#").replace(FLAT, "b");
         if (!that._triggerLock) {
             that._triggerLock = true;
@@ -1913,7 +1994,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         }
         setTimeout(() => {
             that._triggerLock = false;
-        }, 1 / 8);
+        }, 125); // 1/8 second in milliseconds
         __selectionChanged();
     };
     // Handler for pitchnumber preview. Block is to ensure that
@@ -2580,7 +2661,6 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
         const tur = that.activity.turtles.ithTurtle(0);
 
         if (
-            tur.singer.instrumentNames.length === 0 ||
             !tur.singer.instrumentNames.includes(voice)
         ) {
             tur.singer.instrumentNames.push(voice);
@@ -2839,10 +2919,8 @@ const piemenuIntervals = (block, selectedInterval) => {
         const tur = that.activity.turtles.ithTurtle(0);
 
         if (
-            tur.singer.instrumentNames.length === 0 ||
             !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
-            tur.singer.instrumentNames.push(DEFAULTVOICE);
             that.activity.logo.synth.createDefaultSynth(0);
             that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
@@ -2865,7 +2943,7 @@ const piemenuIntervals = (block, selectedInterval) => {
 
         setTimeout(() => {
             that._triggerLock = false;
-        }, 1 / 8);
+        }, 125); // 1/8 second in milliseconds
     };
 
     // Set up handlers for preview.
@@ -3157,16 +3235,14 @@ const piemenuModes = (block, selectedMode) => {
         const tur = that.activity.turtles.ithTurtle(0);
 
         if (
-            tur.singer.instrumentNames.length === 0 ||
             !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
-            tur.singer.instrumentNames.push(DEFAULTVOICE);
             that.activity.logo.synth.createDefaultSynth(0);
             that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
 
         that.activity.logo.synth.setMasterVolume(DEFAULTVOLUME);
-        Singer.setSynthVolume(that.activity.logo, 0, DEFAULTVOICE, DEFAULTVOLUME);
+        that.activity.logo.synth.setVolume(0, DEFAULTVOICE, DEFAULTVOLUME);
         that.activity.logo.synth.trigger(0, [obj[0] + obj[1]], 1 / 12, DEFAULTVOICE, null, null);
     };
 
@@ -3814,7 +3890,6 @@ const piemenuKey = (activity) => {
 
         const tur = activity.turtles.ithTurtle(0);
         if (
-            tur.singer.instrumentNames.length === 0 ||
             !tur.singer.instrumentNames.includes(DEFAULTVOICE)
         ) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);

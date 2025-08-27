@@ -110,6 +110,7 @@ class Logo {
         this._meSpeak = this.activity.meSpeak;
 
         // Widgets
+        this.reflection = null;
         this.phraseMaker = null;
         this.legoWidget = null;
         this.pitchDrumMatrix = null;

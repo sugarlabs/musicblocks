@@ -1642,6 +1642,61 @@ function setupWidgetBlocks(activity) {
         }
     }
     
+    class ReflectionBlock extends StackClampBlock {
+        /**
+         * Creates a ReflectionBlock instance.
+         */
+        constructor() {
+            super("reflection");
+            this.setPalette("widgets", activity);
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _("The Reflection block opens a space for you to think about your learning."),
+                null,
+                "reflection"
+            ]);
+
+            this.formBlock({ name: _("reflection"), canCollapse: true });
+            this.makeMacro((x, y) => [
+                [0, "reflection", x, y, [null, 1]],
+                [1, "print", 0, 0, [0,2,null]],
+                [2, ["text",{"value":"Reflective Learning"}], 0, 0, [1]]
+            ]);
+        }
+
+        /**
+         * Handles the flow of data for the status block.
+         * @param {any[]} args - The arguments passed to the block.
+         * @param {object} logo - The logo object.
+         * @param {object} turtle - The turtle object.
+         * @param {object} blk - The block object.
+         */
+        flow(args, logo, turtle, blk) {
+            if (logo.reflection === null) {
+                logo.reflection = new ReflectionMatrix();
+            }
+
+            logo.reflection.init(activity);
+            logo.statusFields = [];
+
+            logo.inReflectionMatrix = true;
+
+            const listenerName = "_reflection_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            const __listener = () => {
+                logo.reflection.init(activity);
+                logo.inReflectionMatrix = false;
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            if (args.length === 1) return [args[0], 1];
+        }
+    }
+
+        
 /**
  * Represents a block for controlling LEGO brick parameters and visualization.
  * @extends StackClampBlock
@@ -1726,6 +1781,8 @@ class LegoBricksBlock extends StackClampBlock {
         if (args.length === 1) return [args[0], 1];
     }
 }
+
+
     class AIDebugger extends StackClampBlock {
         constructor() {
             super("aidebugger");
@@ -1791,6 +1848,7 @@ class LegoBricksBlock extends StackClampBlock {
         new PitchSliderBlock().setup(activity);
         new ChromaticBlock().setup(activity);
         new LegoBricksBlock().setup(activity);
+        new ReflectionBlock().setup(activity);
         // new AIMusicBlocks().setup(activity);
         new MusicKeyboard2Block().setup(activity);
         new MusicKeyboardBlock().setup(activity);

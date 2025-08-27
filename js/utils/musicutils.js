@@ -3826,7 +3826,7 @@ const getNoteFromInterval = (pitch, interval) => {
             interval === "up-major 7"
         ) {
             let intervalNum;
-            intervalNum = interval.split(" ")[1];     
+            intervalNum = interval.split(" ")[1];
             majorNote = findMajorInterval("major " + intervalNum);
             accidental = majorNote[0].substring(1, majorNote[0].length);
             index1 = priorAttrs.indexOf(accidental);
