@@ -15,17 +15,17 @@ function LegoWidget() {
     // Matrix data structure with pitch mappings
     this.matrixData = {
         rows: [
-            { type: 'pitch', label: 'High C (Do)', icon: 'HighC.png', color: 'pitch-row', note: 'C5' },
-            { type: 'pitch', label: 'B (Ti)', icon: 'B.png', color: 'pitch-row', note: 'B4' },
-            { type: 'pitch', label: 'A (La)', icon: 'A.png', color: 'pitch-row', note: 'A4' },
-            { type: 'pitch', label: 'G (So)', icon: 'G.png', color: 'pitch-row', note: 'G4' },
-            { type: 'pitch', label: 'F (Fa)', icon: 'F.png', color: 'pitch-row', note: 'F4' },
-            { type: 'pitch', label: 'E (Mi)', icon: 'E.png', color: 'pitch-row', note: 'E4' },
-            { type: 'pitch', label: 'D (Re)', icon: 'D.png', color: 'pitch-row', note: 'D4' },
-            { type: 'pitch', label: 'Middle C (Do)', icon: 'MiddleC.png', color: 'pitch-row', note: 'C4' },
-            { type: 'pitch', label: 'B (Low Ti)', icon: 'LowB.png', color: 'pitch-row', note: 'B3' },
-            { type: 'pitch', label: 'Low C (Low Do)', icon: 'LowC.png', color: 'pitch-row', note: 'C3' },
-            { type: 'pitch', label: 'Zoom Controls', icon: 'LowC.png', color: 'pitch-row' }
+            { type: "pitch", label: "High C (Do)", icon: "HighC.png", color: "pitch-row", note: "C5" },
+            { type: "pitch", label: "B (Ti)", icon: "B.png", color: "pitch-row", note: "B4" },
+            { type: "pitch", label: "A (La)", icon: "A.png", color: "pitch-row", note: "A4" },
+            { type: "pitch", label: "G (So)", icon: "G.png", color: "pitch-row", note: "G4" },
+            { type: "pitch", label: "F (Fa)", icon: "F.png", color: "pitch-row", note: "F4" },
+            { type: "pitch", label: "E (Mi)", icon: "E.png", color: "pitch-row", note: "E4" },
+            { type: "pitch", label: "D (Re)", icon: "D.png", color: "pitch-row", note: "D4" },
+            { type: "pitch", label: "Middle C (Do)", icon: "MiddleC.png", color: "pitch-row", note: "C4" },
+            { type: "pitch", label: "B (Low Ti)", icon: "LowB.png", color: "pitch-row", note: "B3" },
+            { type: "pitch", label: "Low C (Low Do)", icon: "LowC.png", color: "pitch-row", note: "C3" },
+            { type: "pitch", label: "Zoom Controls", icon: "LowC.png", color: "pitch-row" }
         ],
         columns: 8,
         selectedCells: new Set()
@@ -37,10 +37,10 @@ function LegoWidget() {
     this.isPlaying = false;
     this.isDragging = false;
     this.currentZoom = 1;
-    this.verticalSpacing = 50; 
+    this.verticalSpacing = 50;
     this.imageWrapper = null;
-    this.synth = null; 
-    this.selectedInstrument = "electronic synth"; 
+    this.synth = null;
+    this.selectedInstrument = "electronic synth";
 
     // Pitch block handling properties (similar to PhraseMaker)
     this.blockNo = null;
@@ -112,7 +112,7 @@ function LegoWidget() {
                 // Calculate frequency for sorting (same as phrasemaker)
                 let frequency = 0;
                 try {
-                    if (typeof noteToFrequency !== 'undefined') {
+                    if (typeof noteToFrequency !== "undefined") {
                         frequency = noteToFrequency(noteLabel, this.activity.turtles.ithTurtle(0).singer.keySignature);
                     } else {
                         // Fallback frequency calculation if noteToFrequency is not available
@@ -125,10 +125,10 @@ function LegoWidget() {
                 
                 pitchEntries.push({
                     frequency: frequency,
-                    type: 'pitch',
-                    label: displayName + ' (' + octave + ')',
-                    icon: 'pitch.svg',
-                    color: 'pitch-row',
+                    type: "pitch",
+                    label: displayName + " (" + octave + ")",
+                    icon: "pitch.svg",
+                    color: "pitch-row",
                     note: noteLabel,
                     pitch: pitchName,
                     octave: octave
@@ -144,19 +144,19 @@ function LegoWidget() {
         
         // Add a control row at the end
         this.matrixData.rows.push({
-            type: 'control',
-            label: 'Zoom Controls',
-            icon: 'zoom.svg',
-            color: 'control-row'
+            type: "control",
+            label: "Zoom Controls",
+            icon: "zoom.svg",
+            color: "control-row"
         });
         
         // If no pitch blocks were provided, add some default rows for testing (already sorted)
         if (this.rowLabels.length === 0) {
             this.matrixData.rows = [
-                { type: 'pitch', label: 'E4 (Mi)', icon: 'pitch.svg', color: 'pitch-row', note: 'E4' },
-                { type: 'pitch', label: 'D4 (Re)', icon: 'pitch.svg', color: 'pitch-row', note: 'D4' },
-                { type: 'pitch', label: 'C4 (Middle C)', icon: 'pitch.svg', color: 'pitch-row', note: 'C4' },
-                { type: 'control', label: 'Zoom Controls', icon: 'zoom.svg', color: 'control-row' }
+                { type: "pitch", label: "E4 (Mi)", icon: "pitch.svg", color: "pitch-row", note: "E4" },
+                { type: "pitch", label: "D4 (Re)", icon: "pitch.svg", color: "pitch-row", note: "D4" },
+                { type: "pitch", label: "C4 (Middle C)", icon: "pitch.svg", color: "pitch-row", note: "C4" },
+                { type: "control", label: "Zoom Controls", icon: "zoom.svg", color: "control-row" }
             ];
         }
     };
@@ -171,16 +171,16 @@ function LegoWidget() {
     this._calculateFallbackFrequency = function(pitchName, octave) {
         // Handle both letter names and solfege
         const noteFreqs = {
-            'C': 261.63, 'do': 261.63,
-            'D': 293.66, 're': 293.66, 
-            'E': 329.63, 'mi': 329.63,
-            'F': 349.23, 'fa': 349.23,
-            'G': 392.00, 'sol': 392.00,
-            'A': 440.00, 'la': 440.00,
-            'B': 493.88, 'ti': 493.88
+            "C": 261.63, "do": 261.63,
+            "D": 293.66, "re": 293.66,
+            "E": 329.63, "mi": 329.63,
+            "F": 349.23, "fa": 349.23,
+            "G": 392.00, "sol": 392.00,
+            "A": 440.00, "la": 440.00,
+            "B": 493.88, "ti": 493.88
         };
         
-        const baseFreq = noteFreqs[pitchName.toLowerCase()] || noteFreqs[pitchName.toUpperCase()] || noteFreqs['C'];
+        const baseFreq = noteFreqs[pitchName.toLowerCase()] || noteFreqs[pitchName.toUpperCase()] || noteFreqs["C"];
         return baseFreq * Math.pow(2, octave - 4);
     };
 
@@ -256,7 +256,7 @@ function LegoWidget() {
         
         this._scale();
         this.activity.textMsg(_("LEGO Bricks - Phrase Maker with " + this.rowLabels.length + " pitch rows (sorted by frequency, Instrument: " + this.selectedInstrument + ")"));
-    }
+    };
 
     /**
      * Initializes the audio synthesizer.
@@ -294,32 +294,32 @@ function LegoWidget() {
      * @returns {void}
      */
     this._initializeRowHeaders = function() {
-        this.rowHeaderTable.innerHTML = '';
-        this.rowHeaderTable.style.margin = '0';
-        this.rowHeaderTable.style.padding = '0';
-        this.rowHeaderTable.style.borderSpacing = '0';
+        this.rowHeaderTable.innerHTML = "";
+        this.rowHeaderTable.style.margin = "0";
+        this.rowHeaderTable.style.padding = "0";
+        this.rowHeaderTable.style.borderSpacing = "0";
         
         this.matrixData.rows.forEach((rowData, rowIndex) => {
             const row = this.rowHeaderTable.insertRow();
             row.style.height = "40px"; // ROW_HEIGHT + "px";
-            row.style.margin = '0';
-            row.style.padding = '0';
-            row.style.position = 'relative'; // Needed for absolute positioning of line
+            row.style.margin = "0";
+            row.style.padding = "0";
+            row.style.position = "relative"; // Needed for absolute positioning of line
             
             const labelCell = row.insertCell();
             labelCell.style.display = "flex";
             labelCell.style.alignItems = "center";
             labelCell.style.padding = "0 8px";
-            labelCell.style.margin = '0';
+            labelCell.style.margin = "0";
             labelCell.style.fontSize = "13px";
             labelCell.style.fontWeight = "bold";
             labelCell.style.border = "none"; // Remove default borders
-            labelCell.style.backgroundColor = rowData.type === 'pitch' ? "#77C428" : "#87ceeb";
+            labelCell.style.backgroundColor = rowData.type === "pitch" ? "#77C428" : "#87ceeb";
             labelCell.style.gap = "8px";
             labelCell.style.height = "40px"; // ROW_HEIGHT + "px";
             labelCell.style.lineHeight = "40px"; // ROW_HEIGHT + "px";
             labelCell.style.boxSizing = "border-box";
-            labelCell.style.cursor = rowData.note ? 'pointer' : 'default';
+            labelCell.style.cursor = rowData.note ? "pointer" : "default";
 
             // Add click handler for pitch rows
             if (rowData.note) {
@@ -329,18 +329,18 @@ function LegoWidget() {
                 
                 // Visual feedback on click
                 labelCell.onmousedown = () => {
-                    labelCell.style.transform = 'scale(0.98)';
-                    labelCell.style.boxShadow = 'inset 0 0 8px rgba(0,0,0,0.2)';
+                    labelCell.style.transform = "scale(0.98)";
+                    labelCell.style.boxShadow = "inset 0 0 8px rgba(0,0,0,0.2)";
                 };
                 
                 labelCell.onmouseup = () => {
-                    labelCell.style.transform = '';
-                    labelCell.style.boxShadow = '';
+                    labelCell.style.transform = "";
+                    labelCell.style.boxShadow = "";
                 };
                 
                 labelCell.onmouseleave = () => {
-                    labelCell.style.transform = '';
-                    labelCell.style.boxShadow = '';
+                    labelCell.style.transform = "";
+                    labelCell.style.boxShadow = "";
                 };
             }
             
@@ -358,14 +358,14 @@ function LegoWidget() {
             
             // Add red line at the bottom of each row (except last)
             if (rowIndex < this.matrixData.rows.length - 1) {
-                const line = document.createElement('div');
-                line.style.position = 'absolute';
-                line.style.left = '0';
-                line.style.right = '0';
-                line.style.bottom = '0';
-                line.style.height = '2px';
-                line.style.backgroundColor = 'red';
-                line.style.zIndex = '5';
+                const line = document.createElement("div");
+                line.style.position = "absolute";
+                line.style.left = "0";
+                line.style.right = "0";
+                line.style.bottom = "0";
+                line.style.height = "2px";
+                line.style.backgroundColor = "red";
+                line.style.zIndex = "5";
                 row.appendChild(line);
             }
         });
@@ -505,7 +505,7 @@ function LegoWidget() {
             "electronic synth",
             "piano",
             "guitar",
-            "acoustic guitar", 
+            "acoustic guitar",
             "electric guitar",
             "violin",
             "viola",
@@ -617,7 +617,7 @@ function LegoWidget() {
      * @returns {void}
      */
     this._initializeMatrix = function() {
-        this.matrixTable.innerHTML = '';
+        this.matrixTable.innerHTML = "";
         
         this.matrixData.rows.forEach((rowData, rowIndex) => {
             const row = this.matrixTable.insertRow();
@@ -636,7 +636,7 @@ function LegoWidget() {
             labelCell.style.left = "0";
             labelCell.style.zIndex = "10";
             labelCell.style.gap = "8px";
-            labelCell.style.backgroundColor = rowData.type === 'pitch' ? "#77C428" : "#87ceeb";
+            labelCell.style.backgroundColor = rowData.type === "pitch" ? "#77C428" : "#87ceeb";
             
             // Create icon (placeholder since we don't have actual icons)
             const icon = document.createElement("div");
@@ -847,7 +847,7 @@ function LegoWidget() {
                             // This prevents spillovers <350ms across blue lines from creating duplicate notes
                             if (overlapDuration > 350) {
                                 // Check if color is not green (meaning note should play)
-                                if (segment.color !== 'green') {
+                                if (segment.color !== "green") {
                                     hasNonGreenColor = true;
                                     
                                     // Convert row data to pitch information
@@ -856,7 +856,7 @@ function LegoWidget() {
                                         pitches.push(pitch);
                                     }
                                 }
-                            } else if (segment.color !== 'green') {
+                            } else if (segment.color !== "green") {
                                 // Ignore small overlaps without logging
                             }
                         }
@@ -961,21 +961,21 @@ function LegoWidget() {
         
         // Convert note name to solfege
         const noteToSolfege = {
-            'C': 'do',
-            'C#': 'do♯', 'Db': 're♭',
-            'D': 're',
-            'D#': 're♯', 'Eb': 'mi♭',
-            'E': 'mi',
-            'F': 'fa',
-            'F#': 'fa♯', 'Gb': 'sol♭',
-            'G': 'sol',
-            'G#': 'sol♯', 'Ab': 'la♭',
-            'A': 'la',
-            'A#': 'la♯', 'Bb': 'ti♭',
-            'B': 'ti'
+            "C": "do",
+            "C#": "do♯", "Db": "re♭",
+            "D": "re",
+            "D#": "re♯", "Eb": "mi♭",
+            "E": "mi",
+            "F": "fa",
+            "F#": "fa♯", "Gb": "sol♭",
+            "G": "sol",
+            "G#": "sol♯", "Ab": "la♭",
+            "A": "la",
+            "A#": "la♯", "Bb": "ti♭",
+            "B": "ti"
         };
         
-        const solfege = noteToSolfege[noteName] || 'do';
+        const solfege = noteToSolfege[noteName] || "do";
         
         return {
             solfege: solfege,
@@ -1004,10 +1004,10 @@ function LegoWidget() {
      */
     this._clearPhrase = function() {
         this.matrixData.selectedCells.clear();
-        const selectedCells = this.matrixTable.querySelectorAll('[data-cell-id]');
+        const selectedCells = this.matrixTable.querySelectorAll("[data-cell-id]");
         selectedCells.forEach(cell => {
             cell.style.backgroundColor = "";
-            const dot = cell.querySelector('.cell-dot');
+            const dot = cell.querySelector(".cell-dot");
             if (dot) cell.removeChild(dot);
         });
         this.activity.textMsg(_("Phrase cleared"));
@@ -1030,25 +1030,25 @@ function LegoWidget() {
      */
     this._handleImageUpload = function(event) {
         const file = event.target.files[0];
-        if (file && file.type.startsWith('image/')) {
+        if (file && file.type.startsWith("image/")) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                this.imageDisplayArea.innerHTML = '';
+                this.imageDisplayArea.innerHTML = "";
                 
-                this.imageWrapper = document.createElement('div');
-                this.imageWrapper.style.position = 'absolute';
-                this.imageWrapper.style.left = '0px';
-                this.imageWrapper.style.top = '0px';
-                this.imageWrapper.style.transformOrigin = 'top left';
-                this.imageWrapper.style.cursor = 'grab';
+                this.imageWrapper = document.createElement("div");
+                this.imageWrapper.style.position = "absolute";
+                this.imageWrapper.style.left = "0px";
+                this.imageWrapper.style.top = "0px";
+                this.imageWrapper.style.transformOrigin = "top left";
+                this.imageWrapper.style.cursor = "grab";
                 
-                const img = document.createElement('img');
+                const img = document.createElement("img");
                 img.src = e.target.result;
-                img.style.maxWidth = '100%';
-                img.style.maxHeight = '100%';
-                img.style.objectFit = 'contain';
-                img.style.borderRadius = '8px';
-                img.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+                img.style.maxWidth = "100%";
+                img.style.maxHeight = "100%";
+                img.style.objectFit = "contain";
+                img.style.borderRadius = "8px";
+                img.style.boxShadow = "0 2px 8px rgba(0,0,0,0.2)";
                 
                 this.imageWrapper.appendChild(img);
                 this.imageDisplayArea.appendChild(this.imageWrapper);
@@ -1069,20 +1069,20 @@ function LegoWidget() {
      * @returns {void}
      */
     this._startWebcam = function() {
-        this.imageDisplayArea.innerHTML = '';
+        this.imageDisplayArea.innerHTML = "";
         
-        this.imageWrapper = document.createElement('div');
-        this.imageWrapper.style.position = 'absolute';
-        this.imageWrapper.style.left = '0px';
-        this.imageWrapper.style.top = '0px';
-        this.imageWrapper.style.transformOrigin = 'top left';
-        this.imageWrapper.style.cursor = 'grab';
+        this.imageWrapper = document.createElement("div");
+        this.imageWrapper.style.position = "absolute";
+        this.imageWrapper.style.left = "0px";
+        this.imageWrapper.style.top = "0px";
+        this.imageWrapper.style.transformOrigin = "top left";
+        this.imageWrapper.style.cursor = "grab";
         
-        this.webcamVideo = document.createElement('video');
+        this.webcamVideo = document.createElement("video");
         this.webcamVideo.autoplay = true;
         this.webcamVideo.playsInline = true;
-        this.webcamVideo.style.maxWidth = '100%';
-        this.webcamVideo.style.maxHeight = '100%';
+        this.webcamVideo.style.maxWidth = "100%";
+        this.webcamVideo.style.maxHeight = "100%";
         
         this.imageWrapper.appendChild(this.webcamVideo);
         this.imageDisplayArea.appendChild(this.imageWrapper);
@@ -1123,9 +1123,9 @@ function LegoWidget() {
         let startX, startY, initialX, initialY;
 
         // Set fixed dimensions for the wrapper
-        wrapper.style.width = '100%';
-        wrapper.style.height = '100%';
-        wrapper.style.overflow = 'hidden';
+        wrapper.style.width = "100%";
+        wrapper.style.height = "100%";
+        wrapper.style.overflow = "hidden";
 
         wrapper.onmousedown = (e) => {
             isDragging = true;
@@ -1133,7 +1133,7 @@ function LegoWidget() {
             startY = e.clientY;
             initialX = parseFloat(wrapper.style.left) || 0;
             initialY = parseFloat(wrapper.style.top) || 0;
-            wrapper.style.cursor = 'grabbing';
+            wrapper.style.cursor = "grabbing";
             e.preventDefault();
         };
 
@@ -1148,41 +1148,41 @@ function LegoWidget() {
         document.onmouseup = () => {
             if (isDragging) {
                 isDragging = false;
-                wrapper.style.cursor = 'grab';
+                wrapper.style.cursor = "grab";
             }
         };
     };
 
-/**
+    /**
  * Converts RGB values to a named color category.
  * @private
  */
-this._getColorFamily = function(r, g, b) {
-    const hsl = this._rgbToHsl(r, g, b);
-    const [hue, saturation, lightness] = hsl;
+    this._getColorFamily = function(r, g, b) {
+        const hsl = this._rgbToHsl(r, g, b);
+        const [hue, saturation, lightness] = hsl;
 
-    let name = 'unknown';
-    if (lightness < 20) name = 'black';
-    else if (lightness > 80 && saturation < 20) name = 'white';
-    else if (saturation < 25) name = 'gray';
-    else if (hue >= 0 && hue < 30) name = 'red';
-    else if (hue >= 30 && hue < 60) name = 'orange';
-    else if (hue >= 60 && hue < 90) name = 'yellow';
-    else if (hue >= 90 && hue < 150) name = 'green';  // FIXED: Added green detection!
-    else if (hue >= 150 && hue < 210) name = 'cyan';
-    else if (hue >= 210 && hue < 270) name = 'blue';
-    else if (hue >= 270 && hue < 330) name = 'magenta';
-    else if (hue >= 330 && hue <= 360) name = 'red';
+        let name = "unknown";
+        if (lightness < 20) name = "black";
+        else if (lightness > 80 && saturation < 20) name = "white";
+        else if (saturation < 25) name = "gray";
+        else if (hue >= 0 && hue < 30) name = "red";
+        else if (hue >= 30 && hue < 60) name = "orange";
+        else if (hue >= 60 && hue < 90) name = "yellow";
+        else if (hue >= 90 && hue < 150) name = "green";  // FIXED: Added green detection!
+        else if (hue >= 150 && hue < 210) name = "cyan";
+        else if (hue >= 210 && hue < 270) name = "blue";
+        else if (hue >= 270 && hue < 330) name = "magenta";
+        else if (hue >= 330 && hue <= 360) name = "red";
 
-    return {
-        name: name,
-        hue: hue,
-        saturation: saturation,
-        lightness: lightness
+        return {
+            name: name,
+            hue: hue,
+            saturation: saturation,
+            lightness: lightness
+        };
     };
-};
 
-/**
+    /**
  * Gets color family from HSL values
  * @private
  * @param {number} h - Hue (0-360)
@@ -1190,79 +1190,79 @@ this._getColorFamily = function(r, g, b) {
  * @param {number} l - Lightness (0-100)
  * @returns {object} Color family object
  */
-this._getColorFamily = function(h, s, l) {
+    this._getColorFamily = function(h, s, l) {
     // Handle grayscale first
-    if (s < 15) { // Low saturation = grayscale
-        if (l > 85) return { name: 'white', hue: 0 };
-        if (l < 15) return { name: 'black', hue: 0 };
-        return { name: 'gray', hue: 0 };
-    }
+        if (s < 15) { // Low saturation = grayscale
+            if (l > 85) return { name: "white", hue: 0 };
+            if (l < 15) return { name: "black", hue: 0 };
+            return { name: "gray", hue: 0 };
+        }
     
-    // For saturated colors, determine by hue
-    if (h >= 345 || h < 15) return { name: 'red', hue: 0 };
-    if (h >= 15 && h < 45) return { name: 'orange', hue: 30 };
-    if (h >= 45 && h < 75) return { name: 'yellow', hue: 60 };
-    if (h >= 75 && h < 165) return { name: 'green', hue: 120 }; // FIXED: Proper green range!
-    if (h >= 165 && h < 195) return { name: 'cyan', hue: 180 };
-    if (h >= 195 && h < 255) return { name: 'blue', hue: 240 };
-    if (h >= 255 && h < 285) return { name: 'purple', hue: 270 };
-    if (h >= 285 && h < 315) return { name: 'magenta', hue: 300 };
-    if (h >= 315 && h < 345) return { name: 'pink', hue: 330 };
+        // For saturated colors, determine by hue
+        if (h >= 345 || h < 15) return { name: "red", hue: 0 };
+        if (h >= 15 && h < 45) return { name: "orange", hue: 30 };
+        if (h >= 45 && h < 75) return { name: "yellow", hue: 60 };
+        if (h >= 75 && h < 165) return { name: "green", hue: 120 }; // FIXED: Proper green range!
+        if (h >= 165 && h < 195) return { name: "cyan", hue: 180 };
+        if (h >= 195 && h < 255) return { name: "blue", hue: 240 };
+        if (h >= 255 && h < 285) return { name: "purple", hue: 270 };
+        if (h >= 285 && h < 315) return { name: "magenta", hue: 300 };
+        if (h >= 315 && h < 345) return { name: "pink", hue: 330 };
     
-    return { name: 'unknown', hue: h };
-};
+        return { name: "unknown", hue: h };
+    };
 
-/**
+    /**
  * Gets color family by name
  * @private
  * @param {string} colorName - The color name
  * @returns {object} Color family object
  */
-this._getColorFamilyByName = function(colorName) {
-    const colorFamilies = {
-        'red': { name: 'red', hue: 0 },
-        'orange': { name: 'orange', hue: 30 },
-        'yellow': { name: 'yellow', hue: 60 },
-        'green': { name: 'green', hue: 120 },     // FIXED: Added green!
-        'cyan': { name: 'cyan', hue: 180 },      // FIXED: Added cyan!
-        'blue': { name: 'blue', hue: 240 },
-        'purple': { name: 'purple', hue: 270 },
-        'magenta': { name: 'magenta', hue: 300 }, // FIXED: Added magenta!
-        'pink': { name: 'pink', hue: 330 },
-        'white': { name: 'white', hue: 0 },      // FIXED: Added white!
-        'black': { name: 'black', hue: 0 },      // FIXED: Added black!
-        'gray': { name: 'gray', hue: 0 }         // FIXED: Added gray!
+    this._getColorFamilyByName = function(colorName) {
+        const colorFamilies = {
+            "red": { name: "red", hue: 0 },
+            "orange": { name: "orange", hue: 30 },
+            "yellow": { name: "yellow", hue: 60 },
+            "green": { name: "green", hue: 120 },     // FIXED: Added green!
+            "cyan": { name: "cyan", hue: 180 },      // FIXED: Added cyan!
+            "blue": { name: "blue", hue: 240 },
+            "purple": { name: "purple", hue: 270 },
+            "magenta": { name: "magenta", hue: 300 }, // FIXED: Added magenta!
+            "pink": { name: "pink", hue: 330 },
+            "white": { name: "white", hue: 0 },      // FIXED: Added white!
+            "black": { name: "black", hue: 0 },      // FIXED: Added black!
+            "gray": { name: "gray", hue: 0 }         // FIXED: Added gray!
+        };
+        return colorFamilies[colorName] || null;
     };
-    return colorFamilies[colorName] || null;
-};
 
-/**
+    /**
  * Converts RGB to HSL.
  * @private
  */
-this._rgbToHsl = function(r, g, b) {
-    r /= 255;
-    g /= 255;
-    b /= 255;
+    this._rgbToHsl = function(r, g, b) {
+        r /= 255;
+        g /= 255;
+        b /= 255;
     
-    const max = Math.max(r, g, b), min = Math.min(r, g, b);
-    let h = 0, s = 0, l = (max + min) / 2;
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        let h = 0, s = 0, l = (max + min) / 2;
 
-    if (max !== min) {
-        const d = max - min;
-        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        if (max !== min) {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
         
-        switch (max) {
-            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-            case g: h = (b - r) / d + 2; break;
-            case b: h = (r - g) / d + 4; break;
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+
+            h *= 60;
         }
 
-        h *= 60;
-    }
-
-    return [Math.round(h), Math.round(s * 100), Math.round(l * 100)];
-};
+        return [Math.round(h), Math.round(s * 100), Math.round(l * 100)];
+    };
 
     
     /**
@@ -1279,8 +1279,8 @@ this._rgbToHsl = function(r, g, b) {
         if (color1.name === color2.name) return true;
         
         // Black/white/gray similarities
-        if ((color1.name === 'black' && color2.name === 'gray' && color2.lightness < 60) ||
-            (color2.name === 'black' && color1.name === 'gray' && color1.lightness < 60)) {
+        if ((color1.name === "black" && color2.name === "gray" && color2.lightness < 60) ||
+            (color2.name === "black" && color1.name === "gray" && color1.lightness < 60)) {
             return true;
         }
         
@@ -1310,7 +1310,7 @@ this._rgbToHsl = function(r, g, b) {
         // Check if row is completely outside image bounds (underflow/overflow)
         if (rowBottomInOverlay <= imageTop || rowTopInOverlay >= imageBottom) {
             // Row is outside image - return green for empty canvas areas
-            return this._getColorFamilyByName('green');
+            return this._getColorFamilyByName("green");
         }
         
         // Row is within or partially within image bounds - continue with normal color sampling
@@ -1331,7 +1331,7 @@ this._rgbToHsl = function(r, g, b) {
         
         // Initialize vertical spacing controls
         this.spacingSlider.value = this.verticalSpacing.toString();
-        this.spacingValue.textContent = this.verticalSpacing + 'px';
+        this.spacingValue.textContent = this.verticalSpacing + "px";
         
         // No need to redraw lines here since zoom controls are absolutely positioned
     };
@@ -1369,7 +1369,7 @@ this._rgbToHsl = function(r, g, b) {
      */
     this._handleVerticalSpacing = function() {
         this.verticalSpacing = parseFloat(this.spacingSlider.value);
-        this.spacingValue.textContent = this.verticalSpacing + 'px';
+        this.spacingValue.textContent = this.verticalSpacing + "px";
         
         setTimeout(() => this._drawGridLines(), 50);
     };
@@ -1401,11 +1401,11 @@ this._rgbToHsl = function(r, g, b) {
         if (this.imageWrapper) {
             this.currentZoom = parseFloat(this.zoomSlider.value);
             this.imageWrapper.style.transform = `scale(${this.currentZoom})`;
-            this.zoomValue.textContent = Math.round(this.currentZoom * 100) + '%';
+            this.zoomValue.textContent = Math.round(this.currentZoom * 100) + "%";
             
             // Ensure the image wrapper maintains its dimensions
-            this.imageWrapper.style.width = '100%';
-            this.imageWrapper.style.height = '100%';
+            this.imageWrapper.style.width = "100%";
+            this.imageWrapper.style.height = "100%";
             
             setTimeout(() => this._drawGridLines(), 50);
         }
@@ -1419,19 +1419,19 @@ this._rgbToHsl = function(r, g, b) {
     this._drawGridLines = function() {
         if (!this.rowHeaderTable.rows.length || !this.gridOverlay) return;
 
-        this.gridOverlay.innerHTML = '';
+        this.gridOverlay.innerHTML = "";
         
         const numRows = this.matrixData.rows.length;
         
         // Draw horizontal lines at each row boundary
         for (let i = 0; i < numRows; i++) {
-            const line = document.createElement('div');
-            line.style.position = 'absolute';
-            line.style.left = '0px';
-            line.style.right = '0px';
-            line.style.height = '2px';
-            line.style.backgroundColor = 'red';
-            line.style.zIndex = '5';
+            const line = document.createElement("div");
+            line.style.position = "absolute";
+            line.style.left = "0px";
+            line.style.right = "0px";
+            line.style.height = "2px";
+            line.style.backgroundColor = "red";
+            line.style.zIndex = "5";
             
             // Position line at the bottom of each row
             const position = (i + 1) * ROW_HEIGHT;
@@ -1448,13 +1448,13 @@ this._rgbToHsl = function(r, g, b) {
             const numVerticalLines = Math.floor(overlayWidth / this.verticalSpacing);
             
             for (let i = 1; i <= numVerticalLines; i++) {
-                const vline = document.createElement('div');
-                vline.style.position = 'absolute';
-                vline.style.top = '0px';
-                vline.style.bottom = '0px';
-                vline.style.width = '2px';
-                vline.style.backgroundColor = 'blue';
-                vline.style.zIndex = '5';
+                const vline = document.createElement("div");
+                vline.style.position = "absolute";
+                vline.style.top = "0px";
+                vline.style.bottom = "0px";
+                vline.style.width = "2px";
+                vline.style.backgroundColor = "blue";
+                vline.style.zIndex = "5";
                 
                 // Position vertical line
                 const position = i * this.verticalSpacing;
@@ -1498,489 +1498,489 @@ this._rgbToHsl = function(r, g, b) {
         }
     };
 
-/**
+    /**
  * Plays the current musical phrase with vertical scanning lines.
  * @private
  */
-this._playPhrase = function() {
+    this._playPhrase = function() {
     // Clear any existing animation
-    this._stopPlayback();
-    this.activity.textMsg(_("Scanning image with vertical lines..."));
+        this._stopPlayback();
+        this.activity.textMsg(_("Scanning image with vertical lines..."));
     
-    // Get all grid lines (sorted by position)
-    const gridLines = Array.from(this.gridOverlay.querySelectorAll('div'))
-                        .filter(el => el.style.backgroundColor === 'red')
-                        .sort((a, b) => {
-                            const aTop = parseFloat(a.style.top);
-                            const bTop = parseFloat(b.style.top);
-                            return aTop - bTop;
-                        });
-    
-    // Create scanning lines for each musical note row
-    this.scanningLines = [];
-    this.colorData = [];
-    
-    // Get the actual canvas/overlay dimensions
-    const overlayRect = this.gridOverlay.getBoundingClientRect();
-    const canvasHeight = overlayRect.height || (this.matrixData.rows.length * ROW_HEIGHT);
-    const totalNoteRows = this.matrixData.rows.filter(row => row.note).length;
-    
-    // Create entries and scanning lines for each musical note
-    this.matrixData.rows.forEach((row, index) => {
-        if (!row.note) return; // Skip non-note rows
-        
-        this.colorData.push({
-            note: row.note,
-            label: row.label,
-            colorSegments: []
-        });
-        
-        // Calculate vertical position for this note - fixed to canvas grid
-        const topPos = index * ROW_HEIGHT;
-        const bottomPos = (index + 1) * ROW_HEIGHT;
-        
-        // Ensure we don't go beyond canvas boundaries
-        const clampedTopPos = Math.max(0, Math.min(topPos, canvasHeight));
-        const clampedBottomPos = Math.max(0, Math.min(bottomPos, canvasHeight));
-        
-        // Skip if this row is completely outside canvas bounds
-        if (clampedTopPos >= canvasHeight || clampedBottomPos <= 0) {
-            // Fill this row with green color for the entire duration
-            this.colorData[this.colorData.length - 1].colorSegments.push({
-                color: 'green',
-                duration: 5000, // Default scan duration
-                timestamp: performance.now()
+        // Get all grid lines (sorted by position)
+        const gridLines = Array.from(this.gridOverlay.querySelectorAll("div"))
+            .filter(el => el.style.backgroundColor === "red")
+            .sort((a, b) => {
+                const aTop = parseFloat(a.style.top);
+                const bTop = parseFloat(b.style.top);
+                return aTop - bTop;
             });
-            return;
-        }
+    
+        // Create scanning lines for each musical note row
+        this.scanningLines = [];
+        this.colorData = [];
+    
+        // Get the actual canvas/overlay dimensions
+        const overlayRect = this.gridOverlay.getBoundingClientRect();
+        const canvasHeight = overlayRect.height || (this.matrixData.rows.length * ROW_HEIGHT);
+        const totalNoteRows = this.matrixData.rows.filter(row => row.note).length;
+    
+        // Create entries and scanning lines for each musical note
+        this.matrixData.rows.forEach((row, index) => {
+            if (!row.note) return; // Skip non-note rows
         
-        // Create vertical scanning line
-        const line = document.createElement('div');
-        line.style.position = 'absolute';
-        line.style.width = '3px'; // Slightly thicker line for better visibility
-        line.style.height = (clampedBottomPos - clampedTopPos) + 'px';
-        line.style.backgroundColor = 'rgba(255, 0, 0, 0.7)';
-        line.style.zIndex = '20';
-        line.style.left = '0px';
-        line.style.top = clampedTopPos + 'px';
-        line.dataset.lineId = index;
-        this.gridOverlay.appendChild(line);
+            this.colorData.push({
+                note: row.note,
+                label: row.label,
+                colorSegments: []
+            });
         
-        this.scanningLines.push({
-            element: line,
-            topPos: clampedTopPos,
-            bottomPos: clampedBottomPos,
-            currentX: 0,
-            currentColor: null,
-            colorStartTime: null,
-            lastSignificantColor: null,
-            completed: false,
-            rowIndex: index
+            // Calculate vertical position for this note - fixed to canvas grid
+            const topPos = index * ROW_HEIGHT;
+            const bottomPos = (index + 1) * ROW_HEIGHT;
+        
+            // Ensure we don't go beyond canvas boundaries
+            const clampedTopPos = Math.max(0, Math.min(topPos, canvasHeight));
+            const clampedBottomPos = Math.max(0, Math.min(bottomPos, canvasHeight));
+        
+            // Skip if this row is completely outside canvas bounds
+            if (clampedTopPos >= canvasHeight || clampedBottomPos <= 0) {
+            // Fill this row with green color for the entire duration
+                this.colorData[this.colorData.length - 1].colorSegments.push({
+                    color: "green",
+                    duration: 5000, // Default scan duration
+                    timestamp: performance.now()
+                });
+                return;
+            }
+        
+            // Create vertical scanning line
+            const line = document.createElement("div");
+            line.style.position = "absolute";
+            line.style.width = "3px"; // Slightly thicker line for better visibility
+            line.style.height = (clampedBottomPos - clampedTopPos) + "px";
+            line.style.backgroundColor = "rgba(255, 0, 0, 0.7)";
+            line.style.zIndex = "20";
+            line.style.left = "0px";
+            line.style.top = clampedTopPos + "px";
+            line.dataset.lineId = index;
+            this.gridOverlay.appendChild(line);
+        
+            this.scanningLines.push({
+                element: line,
+                topPos: clampedTopPos,
+                bottomPos: clampedBottomPos,
+                currentX: 0,
+                currentColor: null,
+                colorStartTime: null,
+                lastSignificantColor: null,
+                completed: false,
+                rowIndex: index
+            });
         });
-    });
     
-    // Animation variables
-    this.isPlaying = true;
-    this.startTime = performance.now();
-    this.lastFrameTime = this.startTime;
+        // Animation variables
+        this.isPlaying = true;
+        this.startTime = performance.now();
+        this.lastFrameTime = this.startTime;
     
-    // Start animation
-    this._animateLines();
-};
+        // Start animation
+        this._animateLines();
+    };
 
-/**
+    /**
  * Animates all scanning lines with improved color detection
  * @private
  */
-this._animateLines = function() {
-    if (!this.isPlaying) return;
+    this._animateLines = function() {
+        if (!this.isPlaying) return;
     
-    const now = performance.now();
-    const deltaTime = (now - this.lastFrameTime) / 1000;
-    this.lastFrameTime = now;
+        const now = performance.now();
+        const deltaTime = (now - this.lastFrameTime) / 1000;
+        this.lastFrameTime = now;
     
-    const containerRect = this.gridOverlay.getBoundingClientRect();
-    // Keep consistent time between vertical blue lines (column spacing)
-    // Target: 500ms between each vertical line for instructor predictability
-    const timeBetweenColumns = 0.5; // seconds per column spacing
-    const scanSpeed = this.verticalSpacing / timeBetweenColumns; // pixels per second
+        const containerRect = this.gridOverlay.getBoundingClientRect();
+        // Keep consistent time between vertical blue lines (column spacing)
+        // Target: 500ms between each vertical line for instructor predictability
+        const timeBetweenColumns = 0.5; // seconds per column spacing
+        const scanSpeed = this.verticalSpacing / timeBetweenColumns; // pixels per second
     
-    let allLinesCompleted = true;
+        let allLinesCompleted = true;
     
-    this.scanningLines.forEach(line => {
-        if (line.completed) return;
+        this.scanningLines.forEach(line => {
+            if (line.completed) return;
         
-        // Update horizontal position
-        line.currentX += scanSpeed * deltaTime;
-        const maxX = containerRect.width;
+            // Update horizontal position
+            line.currentX += scanSpeed * deltaTime;
+            const maxX = containerRect.width;
         
-        // Check if we've reached the container boundary
-        if (line.currentX > maxX) {
-            line.completed = true;
-            // Record final color segment if it existed
-            if (line.lastSignificantColor && line.colorStartTime) {
-                const duration = (now - line.colorStartTime) / 1000;
-                this.colorData[line.rowIndex].colorSegments.push({
-                    color: line.lastSignificantColor.name,
-                    duration: duration,
-                    endTime: now - this.startTime
-                });
+            // Check if we've reached the container boundary
+            if (line.currentX > maxX) {
+                line.completed = true;
+                // Record final color segment if it existed
+                if (line.lastSignificantColor && line.colorStartTime) {
+                    const duration = (now - line.colorStartTime) / 1000;
+                    this.colorData[line.rowIndex].colorSegments.push({
+                        color: line.lastSignificantColor.name,
+                        duration: duration,
+                        endTime: now - this.startTime
+                    });
+                }
+                return;
             }
-            return;
-        }
         
-        // Check if we've reached the right edge of the actual image
-        if (this._isLineBeyondImageHorizontally(line)) {
-            line.completed = true;
-            // Record final color segment if it existed
-            if (line.lastSignificantColor && line.colorStartTime) {
-                const duration = (now - line.colorStartTime) / 1000;
-                this.colorData[line.rowIndex].colorSegments.push({
-                    color: line.lastSignificantColor.name,
-                    duration: duration,
-                    endTime: now - this.startTime
-                });
+            // Check if we've reached the right edge of the actual image
+            if (this._isLineBeyondImageHorizontally(line)) {
+                line.completed = true;
+                // Record final color segment if it existed
+                if (line.lastSignificantColor && line.colorStartTime) {
+                    const duration = (now - line.colorStartTime) / 1000;
+                    this.colorData[line.rowIndex].colorSegments.push({
+                        color: line.lastSignificantColor.name,
+                        duration: duration,
+                        endTime: now - this.startTime
+                    });
+                }
+                return;
             }
-            return;
-        }
         
-        allLinesCompleted = false;
+            allLinesCompleted = false;
         
-        // Update line position
-        line.element.style.left = line.currentX + 'px';
+            // Update line position
+            line.element.style.left = line.currentX + "px";
         
-        // Sample colors across the entire vertical line
-        this._sampleAndDetectColor(line, now);
-    });
+            // Sample colors across the entire vertical line
+            this._sampleAndDetectColor(line, now);
+        });
     
-    if (allLinesCompleted) {
-        this._stopPlayback();
-    } else {
-        requestAnimationFrame(() => this._animateLines());
-    }
-};
+        if (allLinesCompleted) {
+            this._stopPlayback();
+        } else {
+            requestAnimationFrame(() => this._animateLines());
+        }
+    };
 
-/**
+    /**
  * Checks if the scanning line has moved beyond the right edge of the actual image
  * @private
  * @param {object} line - The scanning line object
  * @returns {boolean} True if line is beyond image's right edge
  */
-this._isLineBeyondImageHorizontally = function(line) {
+    this._isLineBeyondImageHorizontally = function(line) {
     // Get the image or video element
-    let mediaElement = null;
-    if (this.imageWrapper) {
-        mediaElement = this.imageWrapper.querySelector('img') || this.imageWrapper.querySelector('video');
-    }
+        let mediaElement = null;
+        if (this.imageWrapper) {
+            mediaElement = this.imageWrapper.querySelector("img") || this.imageWrapper.querySelector("video");
+        }
     
-    if (!mediaElement) {
-        return false; // If no image, let it continue scanning the container
-    }
+        if (!mediaElement) {
+            return false; // If no image, let it continue scanning the container
+        }
     
-    // Get the actual image display area
-    const imageRect = mediaElement.getBoundingClientRect();
-    const overlayRect = this.gridOverlay.getBoundingClientRect();
+        // Get the actual image display area
+        const imageRect = mediaElement.getBoundingClientRect();
+        const overlayRect = this.gridOverlay.getBoundingClientRect();
     
-    // Calculate image position relative to overlay (account for positioning/dragging)
-    const imageLeft = imageRect.left - overlayRect.left;
-    const imageRight = imageLeft + imageRect.width;
+        // Calculate image position relative to overlay (account for positioning/dragging)
+        const imageLeft = imageRect.left - overlayRect.left;
+        const imageRight = imageLeft + imageRect.width;
     
-    // Check if the scanning line is beyond the right edge of the image
-    const lineX = line.currentX;
+        // Check if the scanning line is beyond the right edge of the image
+        const lineX = line.currentX;
     
-    if (lineX >= imageRight) {
-        return true;
-    }
+        if (lineX >= imageRight) {
+            return true;
+        }
     
-    return false;
-};
+        return false;
+    };
 
-/**
+    /**
  * Stops the current playback animation.
  * @private
  */
-this._stopPlayback = function() {
-    this.isPlaying = false;
+    this._stopPlayback = function() {
+        this.isPlaying = false;
     
-    // Save final color segments for all lines
-    if (this.scanningLines) {
-        const now = performance.now();
-        this.scanningLines.forEach(line => {
+        // Save final color segments for all lines
+        if (this.scanningLines) {
+            const now = performance.now();
+            this.scanningLines.forEach(line => {
             // Save the final color segment if it exists
-            if (line.currentColor && line.colorStartTime) {
-                const duration = now - line.colorStartTime;
-                if (duration > 350) { // Save final segment if long enough (updated to match new minimum)
-                    this._addColorSegment(line.rowIndex, line.currentColor, duration);
+                if (line.currentColor && line.colorStartTime) {
+                    const duration = now - line.colorStartTime;
+                    if (duration > 350) { // Save final segment if long enough (updated to match new minimum)
+                        this._addColorSegment(line.rowIndex, line.currentColor, duration);
+                    }
                 }
-            }
             
-            // Remove the scanning line element
-            if (line.element && line.element.parentNode) {
-                line.element.parentNode.removeChild(line.element);
-            }
-        });
-        this.scanningLines = null;
-    }
+                // Remove the scanning line element
+                if (line.element && line.element.parentNode) {
+                    line.element.parentNode.removeChild(line.element);
+                }
+            });
+            this.scanningLines = null;
+        }
     
-    // Generate color visualization PNG
-    setTimeout(() => {
-        this._generateColorVisualization();
-        this._drawColumnLinesOnCanvas(); // Draw column lines on the overlay
-    }, 100); // Small delay to ensure all data is processed
-};
+        // Generate color visualization PNG
+        setTimeout(() => {
+            this._generateColorVisualization();
+            this._drawColumnLinesOnCanvas(); // Draw column lines on the overlay
+        }, 100); // Small delay to ensure all data is processed
+    };
 
 
-/**
+    /**
  * Samples and detects colors along a vertical line
  * @private
  * @param {object} line - The scanning line object
  * @param {number} now - Current timestamp
  */
-this._sampleAndDetectColor = function(line, now) {
+    this._sampleAndDetectColor = function(line, now) {
     // Get the image or video element
-    let mediaElement = null;
-    if (this.imageWrapper) {
-        mediaElement = this.imageWrapper.querySelector('img') || this.imageWrapper.querySelector('video');
-    }
+        let mediaElement = null;
+        if (this.imageWrapper) {
+            mediaElement = this.imageWrapper.querySelector("img") || this.imageWrapper.querySelector("video");
+        }
     
-    if (!mediaElement) {
-        console.warn('No image or video element found for color sampling');
-        return;
-    }
+        if (!mediaElement) {
+            console.warn("No image or video element found for color sampling");
+            return;
+        }
     
-    // Check if this row is outside image bounds - if so, use green
-    const boundColor = this._getColorForCanvasRow(line, mediaElement);
-    if (boundColor) {
+        // Check if this row is outside image bounds - if so, use green
+        const boundColor = this._getColorForCanvasRow(line, mediaElement);
+        if (boundColor) {
         // Row is outside image bounds, force green color
-        if (!line.currentColor || line.currentColor.name !== boundColor.name) {
+            if (!line.currentColor || line.currentColor.name !== boundColor.name) {
+                const timeSinceLastChange = line.lastColorChangeTime ? (now - line.lastColorChangeTime) : 1000;
+                if (timeSinceLastChange > 150) {
+                    if (line.currentColor && line.colorStartTime) {
+                        const duration = now - line.colorStartTime;
+                        if (duration > 350) { // Updated to match new minimum note duration
+                            this._addColorSegment(line.rowIndex, line.currentColor, duration);
+                        }
+                    }
+                    line.currentColor = boundColor;
+                    line.colorStartTime = now;
+                    line.lastColorChangeTime = now;
+                }
+            }
+            return; // Don't sample pixels, just use the bound color
+        }
+    
+        // Create a temporary canvas to sample pixel data
+        const tempCanvas = document.createElement("canvas");
+        const ctx = tempCanvas.getContext("2d");
+    
+        // Set canvas size to match the media element's display size
+        const mediaRect = mediaElement.getBoundingClientRect();
+        const overlayRect = this.gridOverlay.getBoundingClientRect();
+    
+        tempCanvas.width = mediaElement.naturalWidth || mediaElement.videoWidth || mediaRect.width;
+        tempCanvas.height = mediaElement.naturalHeight || mediaElement.videoHeight || mediaRect.height;
+    
+        // Draw the media element to the canvas
+        try {
+            ctx.drawImage(mediaElement, 0, 0, tempCanvas.width, tempCanvas.height);
+        } catch (e) {
+            console.error("Error drawing image to canvas:", e);
+            return;
+        }
+    
+        // Get overlay and image positioning
+        const imageRect = mediaElement.getBoundingClientRect();
+    
+        // Calculate image position relative to overlay
+        const imageOffsetX = imageRect.left - overlayRect.left;
+        const imageOffsetY = imageRect.top - overlayRect.top;
+    
+        // Convert overlay coordinates to image coordinates
+        const overlayX = line.currentX;
+        const overlayY1 = line.topPos;
+        const overlayY2 = line.bottomPos;
+    
+        // Check if sampling area is within image bounds horizontally
+        const imageX = overlayX - imageOffsetX;
+        const imageY1 = overlayY1 - imageOffsetY;
+        const imageY2 = overlayY2 - imageOffsetY;
+    
+        // Early return if we're outside the horizontal image bounds
+        // (The animation loop will handle stopping the line when it reaches the edge)
+        if (imageX < 0 || imageX >= imageRect.width) {
+        // We're outside the image horizontally - no need to sample
+            return;
+        }
+    
+        // Calculate canvas coordinates with proper scaling
+        const scaleX = tempCanvas.width / imageRect.width;
+        const scaleY = tempCanvas.height / imageRect.height;
+    
+        const canvasX = Math.floor(imageX * scaleX);
+        const canvasY1 = Math.max(0, Math.floor(imageY1 * scaleY));
+        const canvasY2 = Math.min(tempCanvas.height, Math.floor(imageY2 * scaleY));
+    
+        // Sample multiple points along the vertical line
+        const samplePoints = 32;
+        const colorCounts = {};
+        let totalSamples = 0;
+    
+        for (let i = 0; i < samplePoints; i++) {
+            const y = canvasY1 + (i * (canvasY2 - canvasY1) / (samplePoints - 1));
+        
+            if (canvasX >= 0 && canvasX < tempCanvas.width && y >= 0 && y < tempCanvas.height) {
+                try {
+                    const imageData = ctx.getImageData(canvasX, y, 1, 1);
+                    const [r, g, b] = imageData.data;
+                
+                    // Skip very transparent pixels
+                    if (imageData.data[3] < 128) continue;
+                
+                    // Convert RGB to HSL and get color family
+                    const [h, s, l] = this._rgbToHsl(r, g, b);
+                    const colorFamily = this._getColorFamily(h, s, l);
+                
+                    // FIXED: Include ALL colors - don't filter out ANY colors!
+                    if (colorFamily && colorFamily.name !== "unknown") {
+                        colorCounts[colorFamily.name] = (colorCounts[colorFamily.name] || 0) + 1;
+                        totalSamples++;
+                    }
+                } catch (e) {
+                    console.error("Error sampling pixel data:", e);
+                }
+            }
+        }
+    
+        // Only proceed if we have enough color samples
+        if (totalSamples < 1) return;
+    
+        // Find dominant color (must be at least 25% of samples)
+        let dominantColor = null;
+        let maxCount = 0;
+        const minThreshold = Math.max(1, Math.floor(totalSamples * 0.25));
+    
+        for (const [colorName, count] of Object.entries(colorCounts)) {
+            if (count > maxCount && count >= minThreshold) {
+                maxCount = count;
+                dominantColor = this._getColorFamilyByName(colorName);
+            }
+        }
+    
+        // Only record significant color changes
+        if (dominantColor && (!line.currentColor || !this._colorsAreSimilar(line.currentColor, dominantColor))) {
+        // Require a minimum time gap between color changes (reduces noise)
             const timeSinceLastChange = line.lastColorChangeTime ? (now - line.lastColorChangeTime) : 1000;
+        
             if (timeSinceLastChange > 150) {
+            // Color changed - save previous segment if it existed
                 if (line.currentColor && line.colorStartTime) {
                     const duration = now - line.colorStartTime;
                     if (duration > 350) { // Updated to match new minimum note duration
                         this._addColorSegment(line.rowIndex, line.currentColor, duration);
                     }
                 }
-                line.currentColor = boundColor;
+            
+                // Start new color segment
+                line.currentColor = dominantColor;
                 line.colorStartTime = now;
                 line.lastColorChangeTime = now;
             }
         }
-        return; // Don't sample pixels, just use the bound color
-    }
-    
-    // Create a temporary canvas to sample pixel data
-    const tempCanvas = document.createElement('canvas');
-    const ctx = tempCanvas.getContext('2d');
-    
-    // Set canvas size to match the media element's display size
-    const mediaRect = mediaElement.getBoundingClientRect();
-    const overlayRect = this.gridOverlay.getBoundingClientRect();
-    
-    tempCanvas.width = mediaElement.naturalWidth || mediaElement.videoWidth || mediaRect.width;
-    tempCanvas.height = mediaElement.naturalHeight || mediaElement.videoHeight || mediaRect.height;
-    
-    // Draw the media element to the canvas
-    try {
-        ctx.drawImage(mediaElement, 0, 0, tempCanvas.width, tempCanvas.height);
-    } catch (e) {
-        console.error('Error drawing image to canvas:', e);
-        return;
-    }
-    
-    // Get overlay and image positioning
-    const imageRect = mediaElement.getBoundingClientRect();
-    
-    // Calculate image position relative to overlay
-    const imageOffsetX = imageRect.left - overlayRect.left;
-    const imageOffsetY = imageRect.top - overlayRect.top;
-    
-    // Convert overlay coordinates to image coordinates
-    const overlayX = line.currentX;
-    const overlayY1 = line.topPos;
-    const overlayY2 = line.bottomPos;
-    
-    // Check if sampling area is within image bounds horizontally
-    const imageX = overlayX - imageOffsetX;
-    const imageY1 = overlayY1 - imageOffsetY;
-    const imageY2 = overlayY2 - imageOffsetY;
-    
-    // Early return if we're outside the horizontal image bounds
-    // (The animation loop will handle stopping the line when it reaches the edge)
-    if (imageX < 0 || imageX >= imageRect.width) {
-        // We're outside the image horizontally - no need to sample
-        return;
-    }
-    
-    // Calculate canvas coordinates with proper scaling
-    const scaleX = tempCanvas.width / imageRect.width;
-    const scaleY = tempCanvas.height / imageRect.height;
-    
-    const canvasX = Math.floor(imageX * scaleX);
-    const canvasY1 = Math.max(0, Math.floor(imageY1 * scaleY));
-    const canvasY2 = Math.min(tempCanvas.height, Math.floor(imageY2 * scaleY));
-    
-    // Sample multiple points along the vertical line
-    const samplePoints = 32;
-    const colorCounts = {};
-    let totalSamples = 0;
-    
-    for (let i = 0; i < samplePoints; i++) {
-        const y = canvasY1 + (i * (canvasY2 - canvasY1) / (samplePoints - 1));
-        
-        if (canvasX >= 0 && canvasX < tempCanvas.width && y >= 0 && y < tempCanvas.height) {
-            try {
-                const imageData = ctx.getImageData(canvasX, y, 1, 1);
-                const [r, g, b] = imageData.data;
-                
-                // Skip very transparent pixels
-                if (imageData.data[3] < 128) continue;
-                
-                // Convert RGB to HSL and get color family
-                const [h, s, l] = this._rgbToHsl(r, g, b);
-                const colorFamily = this._getColorFamily(h, s, l);
-                
-                // FIXED: Include ALL colors - don't filter out ANY colors!
-                if (colorFamily && colorFamily.name !== 'unknown') {
-                    colorCounts[colorFamily.name] = (colorCounts[colorFamily.name] || 0) + 1;
-                    totalSamples++;
-                }
-            } catch (e) {
-                console.error('Error sampling pixel data:', e);
-            }
-        }
-    }
-    
-    // Only proceed if we have enough color samples
-    if (totalSamples < 1) return;
-    
-    // Find dominant color (must be at least 25% of samples)
-    let dominantColor = null;
-    let maxCount = 0;
-    const minThreshold = Math.max(1, Math.floor(totalSamples * 0.25));
-    
-    for (const [colorName, count] of Object.entries(colorCounts)) {
-        if (count > maxCount && count >= minThreshold) {
-            maxCount = count;
-            dominantColor = this._getColorFamilyByName(colorName);
-        }
-    }
-    
-    // Only record significant color changes
-    if (dominantColor && (!line.currentColor || !this._colorsAreSimilar(line.currentColor, dominantColor))) {
-        // Require a minimum time gap between color changes (reduces noise)
-        const timeSinceLastChange = line.lastColorChangeTime ? (now - line.lastColorChangeTime) : 1000;
-        
-        if (timeSinceLastChange > 150) {
-            // Color changed - save previous segment if it existed
-            if (line.currentColor && line.colorStartTime) {
-                const duration = now - line.colorStartTime;
-                if (duration > 350) { // Updated to match new minimum note duration
-                    this._addColorSegment(line.rowIndex, line.currentColor, duration);
-                }
-            }
-            
-            // Start new color segment
-            line.currentColor = dominantColor;
-            line.colorStartTime = now;
-            line.lastColorChangeTime = now;
-        }
-    }
-};
+    };
 
-/**
+    /**
  * Gets color family by name
  * @private
  * @param {string} colorName - The color name
  * @returns {object} Color family object
  */
-this._getColorFamilyByName = function(colorName) {
-    const colorFamilies = {
-        'red': { name: 'red', hue: 0 },
-        'orange': { name: 'orange', hue: 30 },
-        'yellow': { name: 'yellow', hue: 60 },
-        'green': { name: 'green', hue: 120 },     // FIXED: Added green!
-        'cyan': { name: 'cyan', hue: 180 },      // FIXED: Added cyan!
-        'blue': { name: 'blue', hue: 240 },
-        'purple': { name: 'purple', hue: 270 },
-        'magenta': { name: 'magenta', hue: 300 }, // FIXED: Added magenta!
-        'pink': { name: 'pink', hue: 330 },
-        'white': { name: 'white', hue: 0 },      // FIXED: Added white!
-        'black': { name: 'black', hue: 0 },      // FIXED: Added black!
-        'gray': { name: 'gray', hue: 0 }         // FIXED: Added gray!
+    this._getColorFamilyByName = function(colorName) {
+        const colorFamilies = {
+            "red": { name: "red", hue: 0 },
+            "orange": { name: "orange", hue: 30 },
+            "yellow": { name: "yellow", hue: 60 },
+            "green": { name: "green", hue: 120 },     // FIXED: Added green!
+            "cyan": { name: "cyan", hue: 180 },      // FIXED: Added cyan!
+            "blue": { name: "blue", hue: 240 },
+            "purple": { name: "purple", hue: 270 },
+            "magenta": { name: "magenta", hue: 300 }, // FIXED: Added magenta!
+            "pink": { name: "pink", hue: 330 },
+            "white": { name: "white", hue: 0 },      // FIXED: Added white!
+            "black": { name: "black", hue: 0 },      // FIXED: Added black!
+            "gray": { name: "gray", hue: 0 }         // FIXED: Added gray!
+        };
+        return colorFamilies[colorName] || null;
     };
-    return colorFamilies[colorName] || null;
-};
 
-/**
+    /**
  * Adds a color segment to the data
  * @private
  * @param {number} rowIndex - Row index
  * @param {object} color - Color object
  * @param {number} duration - Duration in milliseconds
  */
-this._addColorSegment = function(rowIndex, color, duration) {
-    if (!this.colorData[rowIndex]) {
-        this.colorData[rowIndex] = {
-            note: this.this.matrixData.rows[rowIndex].note,
-            label: this.this.matrixData.rows[rowIndex].label,
-            colorSegments: []
-        };
-    }
+    this._addColorSegment = function(rowIndex, color, duration) {
+        if (!this.colorData[rowIndex]) {
+            this.colorData[rowIndex] = {
+                note: this.this.matrixData.rows[rowIndex].note,
+                label: this.this.matrixData.rows[rowIndex].label,
+                colorSegments: []
+            };
+        }
     
-    this.colorData[rowIndex].colorSegments.push({
-        color: color.name,
-        duration: duration,
-        timestamp: performance.now()
-    });
-};
+        this.colorData[rowIndex].colorSegments.push({
+            color: color.name,
+            duration: duration,
+            timestamp: performance.now()
+        });
+    };
 
-/**
+    /**
  * Draws column edge lines on the overlay canvas during scanning
  * @private
  */
-this._drawColumnLinesOnCanvas = function() {
-    if (!this.colorData || this.colorData.length === 0) return;
+    this._drawColumnLinesOnCanvas = function() {
+        if (!this.colorData || this.colorData.length === 0) return;
     
-    // Find existing column lines to avoid duplicates
-    const existingColumnLines = this.gridOverlay.querySelectorAll('.column-line');
-    existingColumnLines.forEach(line => line.remove());
+        // Find existing column lines to avoid duplicates
+        const existingColumnLines = this.gridOverlay.querySelectorAll(".column-line");
+        existingColumnLines.forEach(line => line.remove());
     
-    // Get filtered column boundaries (same as used for note export)
-    const columnBoundaries = this._analyzeColumnBoundaries();
-    const filteredBoundaries = this._filterSmallSegments(columnBoundaries);
+        // Get filtered column boundaries (same as used for note export)
+        const columnBoundaries = this._analyzeColumnBoundaries();
+        const filteredBoundaries = this._filterSmallSegments(columnBoundaries);
     
-    const overlayRect = this.gridOverlay.getBoundingClientRect();
-    const availableWidth = overlayRect.width || 800;
+        const overlayRect = this.gridOverlay.getBoundingClientRect();
+        const availableWidth = overlayRect.width || 800;
     
-    // Calculate total duration for proportional positioning
-    const totalDuration = filteredBoundaries[filteredBoundaries.length - 1] - filteredBoundaries[0];
+        // Calculate total duration for proportional positioning
+        const totalDuration = filteredBoundaries[filteredBoundaries.length - 1] - filteredBoundaries[0];
     
-    // Draw blue vertical lines at filtered boundary positions
-    filteredBoundaries.forEach((boundaryTime, index) => {
-        if (index === 0) return; // Skip the first boundary (start)
+        // Draw blue vertical lines at filtered boundary positions
+        filteredBoundaries.forEach((boundaryTime, index) => {
+            if (index === 0) return; // Skip the first boundary (start)
         
-        // Calculate position based on time proportion
-        const timeFromStart = boundaryTime - filteredBoundaries[0];
-        const x = Math.round((timeFromStart / totalDuration) * availableWidth);
+            // Calculate position based on time proportion
+            const timeFromStart = boundaryTime - filteredBoundaries[0];
+            const x = Math.round((timeFromStart / totalDuration) * availableWidth);
         
-        if (x > 0 && x < availableWidth) {
-            const vline = document.createElement('div');
-            vline.className = 'column-line';
-            vline.style.position = 'absolute';
-            vline.style.top = '0px';
-            vline.style.bottom = '0px';
-            vline.style.width = '2px';
-            vline.style.backgroundColor = '#0066FF';
-            vline.style.zIndex = '15'; // Above grid lines but below scanning lines
-            vline.style.left = `${x}px`;
+            if (x > 0 && x < availableWidth) {
+                const vline = document.createElement("div");
+                vline.className = "column-line";
+                vline.style.position = "absolute";
+                vline.style.top = "0px";
+                vline.style.bottom = "0px";
+                vline.style.width = "2px";
+                vline.style.backgroundColor = "#0066FF";
+                vline.style.zIndex = "15"; // Above grid lines but below scanning lines
+                vline.style.left = `${x}px`;
             
-            this.gridOverlay.appendChild(vline);
-        }
-    });
-};
+                this.gridOverlay.appendChild(vline);
+            }
+        });
+    };
 
-/**
+    /**
  * Detects column edges across all rows and draws vertical lines on the canvas
  * @private
  * @param {CanvasRenderingContext2D} ctx - Canvas context
@@ -1989,278 +1989,278 @@ this._drawColumnLinesOnCanvas = function() {
  * @param {number} startX - X position where segments start (after labels)
  * @param {number} availableWidth - Available width for segments
  */
-this._drawColumnLines = function(ctx, canvasWidth, canvasHeight, startX, availableWidth) {
+    this._drawColumnLines = function(ctx, canvasWidth, canvasHeight, startX, availableWidth) {
     // Get filtered column boundaries (same as used for note export and overlay)
-    const columnBoundaries = this._analyzeColumnBoundaries();
-    const filteredBoundaries = this._filterSmallSegments(columnBoundaries);
+        const columnBoundaries = this._analyzeColumnBoundaries();
+        const filteredBoundaries = this._filterSmallSegments(columnBoundaries);
     
-    // Calculate total duration for proportional positioning
-    const totalDuration = filteredBoundaries[filteredBoundaries.length - 1] - filteredBoundaries[0];
+        // Calculate total duration for proportional positioning
+        const totalDuration = filteredBoundaries[filteredBoundaries.length - 1] - filteredBoundaries[0];
     
-    // Draw blue vertical lines at filtered boundary positions
-    ctx.strokeStyle = '#0066FF';
-    ctx.lineWidth = 3; // Slightly thicker for PNG visibility
+        // Draw blue vertical lines at filtered boundary positions
+        ctx.strokeStyle = "#0066FF";
+        ctx.lineWidth = 3; // Slightly thicker for PNG visibility
     
-    filteredBoundaries.forEach((boundaryTime, index) => {
-        if (index === 0) return; // Skip the first boundary (start)
+        filteredBoundaries.forEach((boundaryTime, index) => {
+            if (index === 0) return; // Skip the first boundary (start)
         
-        // Calculate X position based on time proportion
-        const timeFromStart = boundaryTime - filteredBoundaries[0];
-        const x = startX + Math.round((timeFromStart / totalDuration) * availableWidth);
+            // Calculate X position based on time proportion
+            const timeFromStart = boundaryTime - filteredBoundaries[0];
+            const x = startX + Math.round((timeFromStart / totalDuration) * availableWidth);
         
-        if (x >= startX && x <= startX + availableWidth) {
-            ctx.beginPath();
-            ctx.moveTo(x, 0);
-            ctx.lineTo(x, canvasHeight);
-            ctx.stroke();
-        }
-    });
-};
+            if (x >= startX && x <= startX + availableWidth) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvasHeight);
+                ctx.stroke();
+            }
+        });
+    };
 
-/**
+    /**
  * Generates a PNG image visualization of detected color data (for testing)
  * @private
  */
-this._generateColorVisualization = function() {
-    if (!this.colorData || this.colorData.length === 0) {
-        return;
-    }
-    
-    // Canvas dimensions
-    const canvasWidth = 800;
-    const rowHeight = 50;
-    const canvasHeight = this.colorData.length * rowHeight;
-    
-    // Create canvas
-    const canvas = document.createElement('canvas');
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
-    const ctx = canvas.getContext('2d');
-    
-    // Fill background
-    ctx.fillStyle = '#f0f0f0';
-    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-    
-    // Color mapping
-    const colorMap = {
-        'red': '#FF0000',
-        'orange': '#FFA500',
-        'yellow': '#FFFF00',
-        'green': '#00FF00',
-        'blue': '#0000FF',
-        'purple': '#800080',
-        'pink': '#FFC0CB',
-        'cyan': '#00FFFF',
-        'magenta': '#FF00FF',
-        'white': '#FFFFFF',
-        'black': '#000000',
-        'gray': '#808080',
-        'unknown': '#C0C0C0'
-    };
-    
-    // Draw each row
-    this.colorData.forEach((rowData, rowIndex) => {
-        const y = rowIndex * rowHeight;
-        
-        // Draw row background
-        ctx.fillStyle = rowIndex % 2 === 0 ? '#ffffff' : '#f8f8f8';
-        ctx.fillRect(0, y, canvasWidth, rowHeight);
-        
-        // Draw row label
-        ctx.fillStyle = '#000000';
-        ctx.font = '12px Arial';
-        ctx.textAlign = 'left';
-        ctx.fillText(`${rowData.label} (${rowData.note})`, 10, y + 20);
-        
-        // Draw color segments
-        if (rowData.colorSegments && rowData.colorSegments.length > 0) {
-            let currentX = 150; // Start after label
-            const segmentHeight = 30;
-            const segmentY = y + 10;
-            const availableWidth = canvasWidth - 150 - 20; // Space for segments
-            
-            // Calculate total duration for proportional sizing
-            const totalDuration = rowData.colorSegments.reduce((sum, segment) => sum + segment.duration, 0);
-            
-            rowData.colorSegments.forEach((segment, segmentIndex) => {
-                // Calculate segment width proportional to its duration
-                const segmentWidth = Math.max(20, (segment.duration / totalDuration) * availableWidth);
-                
-                // Draw color segment
-                ctx.fillStyle = colorMap[segment.color] || colorMap['unknown'];
-                ctx.fillRect(currentX, segmentY, segmentWidth, segmentHeight);
-                
-                // Draw segment border
-                ctx.strokeStyle = '#333333';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(currentX, segmentY, segmentWidth, segmentHeight);
-                
-                // Draw color name if segment is wide enough
-                if (segmentWidth > 40) {
-                    ctx.fillStyle = segment.color === 'white' || segment.color === 'yellow' ? '#000000' : '#ffffff';
-                    ctx.font = '10px Arial';
-                    ctx.textAlign = 'center';
-                    ctx.fillText(segment.color, currentX + segmentWidth/2, segmentY + segmentHeight/2 + 3);
-                }
-                
-                // Draw duration text below
-                ctx.fillStyle = '#666666';
-                ctx.font = '8px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText(`${Math.round(segment.duration)}ms`, currentX + segmentWidth/2, segmentY + segmentHeight + 12);
-                
-                currentX += segmentWidth + 2; // Small gap between segments
-            });
-
-        } else {
-
-            // No colors detected
-            ctx.fillStyle =  '#cccccc';
-            ctx.font =   '12px Arial';
-            ctx.textAlign =  'left';
-            ctx.fillText('No colors were detected', 150, y + 25);
+    this._generateColorVisualization = function() {
+        if (!this.colorData || this.colorData.length === 0) {
+            return;
         }
+    
+        // Canvas dimensions
+        const canvasWidth = 800;
+        const rowHeight = 50;
+        const canvasHeight = this.colorData.length * rowHeight;
+    
+        // Create canvas
+        const canvas = document.createElement("canvas");
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+        const ctx = canvas.getContext("2d");
+    
+        // Fill background
+        ctx.fillStyle = "#f0f0f0";
+        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    
+        // Color mapping
+        const colorMap = {
+            "red": "#FF0000",
+            "orange": "#FFA500",
+            "yellow": "#FFFF00",
+            "green": "#00FF00",
+            "blue": "#0000FF",
+            "purple": "#800080",
+            "pink": "#FFC0CB",
+            "cyan": "#00FFFF",
+            "magenta": "#FF00FF",
+            "white": "#FFFFFF",
+            "black": "#000000",
+            "gray": "#808080",
+            "unknown": "#C0C0C0"
+        };
+    
+        // Draw each row
+        this.colorData.forEach((rowData, rowIndex) => {
+            const y = rowIndex * rowHeight;
         
-        // Draw the red lines
-        ctx.strokeStyle = '#dddddd';
+            // Draw row background
+            ctx.fillStyle = rowIndex % 2 === 0 ? "#ffffff" : "#f8f8f8";
+            ctx.fillRect(0, y, canvasWidth, rowHeight);
         
-        ctx.lineWidth = 1;
+            // Draw row label
+            ctx.fillStyle = "#000000";
+            ctx.font = "12px Arial";
+            ctx.textAlign = "left";
+            ctx.fillText(`${rowData.label} (${rowData.note})`, 10, y + 20);
+        
+            // Draw color segments
+            if (rowData.colorSegments && rowData.colorSegments.length > 0) {
+                let currentX = 150; // Start after label
+                const segmentHeight = 30;
+                const segmentY = y + 10;
+                const availableWidth = canvasWidth - 150 - 20; // Space for segments
+            
+                // Calculate total duration for proportional sizing
+                const totalDuration = rowData.colorSegments.reduce((sum, segment) => sum + segment.duration, 0);
+            
+                rowData.colorSegments.forEach((segment, segmentIndex) => {
+                // Calculate segment width proportional to its duration
+                    const segmentWidth = Math.max(20, (segment.duration / totalDuration) * availableWidth);
+                
+                    // Draw color segment
+                    ctx.fillStyle = colorMap[segment.color] || colorMap["unknown"];
+                    ctx.fillRect(currentX, segmentY, segmentWidth, segmentHeight);
+                
+                    // Draw segment border
+                    ctx.strokeStyle = "#333333";
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(currentX, segmentY, segmentWidth, segmentHeight);
+                
+                    // Draw color name if segment is wide enough
+                    if (segmentWidth > 40) {
+                        ctx.fillStyle = segment.color === "white" || segment.color === "yellow" ? "#000000" : "#ffffff";
+                        ctx.font = "10px Arial";
+                        ctx.textAlign = "center";
+                        ctx.fillText(segment.color, currentX + segmentWidth/2, segmentY + segmentHeight/2 + 3);
+                    }
+                
+                    // Draw duration text below
+                    ctx.fillStyle = "#666666";
+                    ctx.font = "8px Arial";
+                    ctx.textAlign = "center";
+                    ctx.fillText(`${Math.round(segment.duration)}ms`, currentX + segmentWidth/2, segmentY + segmentHeight + 12);
+                
+                    currentX += segmentWidth + 2; // Small gap between segments
+                });
 
-        ctx.beginPath();
+            } else {
 
-        ctx.moveTo(0, y + rowHeight);
+                // No colors detected
+                ctx.fillStyle =  "#cccccc";
+                ctx.font =   "12px Arial";
+                ctx.textAlign =  "left";
+                ctx.fillText("No colors were detected", 150, y + 25);
+            }
+        
+            // Draw the red lines
+            ctx.strokeStyle = "#dddddd";
+        
+            ctx.lineWidth = 1;
 
-        ctx.lineTo(canvasWidth, y + rowHeight);
-        ctx.stroke();
-    });
+            ctx.beginPath();
+
+            ctx.moveTo(0, y + rowHeight);
+
+            ctx.lineTo(canvasWidth, y + rowHeight);
+            ctx.stroke();
+        });
     
-    // Draw column edge lines after all rows are drawn
-    this._drawColumnLines(ctx, canvasWidth, canvasHeight, 150, canvasWidth - 150 - 20);
+        // Draw column edge lines after all rows are drawn
+        this._drawColumnLines(ctx, canvasWidth, canvasHeight, 150, canvasWidth - 150 - 20);
     
-    // Add title
-    ctx.fillStyle = '#000000';
-    ctx.font = 'bold 16px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('Color Detection Visualization', canvasWidth/2, -10);
+        // Add title
+        ctx.fillStyle = "#000000";
+        ctx.font = "bold 16px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("Color Detection Visualization", canvasWidth/2, -10);
     
-    // Convert canvas to PNG and download
-    canvas.toBlob((blob) => {
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `color_detection_${new Date().getTime()}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    }, 'image/png');
+        // Convert canvas to PNG and download
+        canvas.toBlob((blob) => {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `color_detection_${new Date().getTime()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }, "image/png");
 
-    // Play the music after visualization is generated
-    this.playColorMusicPolyphonic(this.colorData);
-};
+        // Play the music after visualization is generated
+        this.playColorMusicPolyphonic(this.colorData);
+    };
 
-/**
+    /**
  * Plays all detected notes simultaneously, using filtered column boundaries.
  * Only plays when color is NOT green.
  * Updated to use same filtering logic as export (350ms minimum).
  * @param {Array} colorData - The colorData array from scanning.
  */
-this.playColorMusicPolyphonic = async function(colorData) {
-    if (!this.synth) this._initAudio();
+    this.playColorMusicPolyphonic = async function(colorData) {
+        if (!this.synth) this._initAudio();
     
-    // Use the same boundary analysis and filtering as export
-    const columnBoundaries = this._analyzeColumnBoundaries();
-    const filteredBoundaries = this._filterSmallSegments(columnBoundaries);
+        // Use the same boundary analysis and filtering as export
+        const columnBoundaries = this._analyzeColumnBoundaries();
+        const filteredBoundaries = this._filterSmallSegments(columnBoundaries);
     
-    // Build timeline using filtered boundaries instead of raw segments
-    let events = [];
+        // Build timeline using filtered boundaries instead of raw segments
+        let events = [];
     
-    // For each filtered time column, check which notes should play
-    for (let colIndex = 0; colIndex < filteredBoundaries.length - 1; colIndex++) {
-        const startTime = filteredBoundaries[colIndex];
-        const endTime = filteredBoundaries[colIndex + 1];
-        const duration = endTime - startTime;
+        // For each filtered time column, check which notes should play
+        for (let colIndex = 0; colIndex < filteredBoundaries.length - 1; colIndex++) {
+            const startTime = filteredBoundaries[colIndex];
+            const endTime = filteredBoundaries[colIndex + 1];
+            const duration = endTime - startTime;
         
-        // Check each row for non-green colors in this time range
-        colorData.forEach((rowData, rowIndex) => {
-            if (rowData.colorSegments && rowData.note) {
-                let currentTime = 0;
-                let hasNonGreenColor = false;
+            // Check each row for non-green colors in this time range
+            colorData.forEach((rowData, rowIndex) => {
+                if (rowData.colorSegments && rowData.note) {
+                    let currentTime = 0;
+                    let hasNonGreenColor = false;
                 
-                // Check if this time column overlaps with any non-green segments
-                for (const segment of rowData.colorSegments) {
-                    const segmentStart = currentTime;
-                    const segmentEnd = currentTime + segment.duration;
+                    // Check if this time column overlaps with any non-green segments
+                    for (const segment of rowData.colorSegments) {
+                        const segmentStart = currentTime;
+                        const segmentEnd = currentTime + segment.duration;
                     
-                    // Check if this segment overlaps with our time column
-                    if (segmentStart < endTime && segmentEnd > startTime) {
+                        // Check if this segment overlaps with our time column
+                        if (segmentStart < endTime && segmentEnd > startTime) {
                         // Calculate the actual overlap duration
-                        const overlapStart = Math.max(segmentStart, startTime);
-                        const overlapEnd = Math.min(segmentEnd, endTime);
-                        const overlapDuration = overlapEnd - overlapStart;
+                            const overlapStart = Math.max(segmentStart, startTime);
+                            const overlapEnd = Math.min(segmentEnd, endTime);
+                            const overlapDuration = overlapEnd - overlapStart;
                         
-                        // Only count as significant if overlap is substantial (>350ms)
-                        // This prevents spillovers <350ms across blue lines from creating duplicate notes
-                        if (overlapDuration > 350 && segment.color !== 'green') {
-                            hasNonGreenColor = true;
-                            break;
-                        } else if (overlapDuration <= 350 && segment.color !== 'green') {
+                            // Only count as significant if overlap is substantial (>350ms)
+                            // This prevents spillovers <350ms across blue lines from creating duplicate notes
+                            if (overlapDuration > 350 && segment.color !== "green") {
+                                hasNonGreenColor = true;
+                                break;
+                            } else if (overlapDuration <= 350 && segment.color !== "green") {
                             // Ignore small overlaps during playback
+                            }
                         }
+                        currentTime += segment.duration;
                     }
-                    currentTime += segment.duration;
-                }
                 
-                // If we found non-green color, add note on/off events
-                if (hasNonGreenColor) {
-                    events.push({
-                        time: startTime,
-                        type: "on",
-                        note: rowData.note,
-                        rowIdx: rowIndex
-                    });
-                    events.push({
-                        time: endTime,
-                        type: "off",
-                        note: rowData.note,
-                        rowIdx: rowIndex
-                    });
+                    // If we found non-green color, add note on/off events
+                    if (hasNonGreenColor) {
+                        events.push({
+                            time: startTime,
+                            type: "on",
+                            note: rowData.note,
+                            rowIdx: rowIndex
+                        });
+                        events.push({
+                            time: endTime,
+                            type: "off",
+                            note: rowData.note,
+                            rowIdx: rowIndex
+                        });
+                    }
                 }
-            }
-        });
-    }
+            });
+        }
 
-    // Sort events by time
-    events.sort((a, b) => a.time - b.time);
+        // Sort events by time
+        events.sort((a, b) => a.time - b.time);
 
-    // Track which notes are currently playing
-    let playingNotes = new Set();
-    let lastTime = 0;
+        // Track which notes are currently playing
+        let playingNotes = new Set();
+        let lastTime = 0;
 
-    for (let i = 0; i < events.length; i++) {
-        const evt = events[i];
-        const waitTime = evt.time - lastTime;
-        if (waitTime > 0) {
+        for (let i = 0; i < events.length; i++) {
+            const evt = events[i];
+            const waitTime = evt.time - lastTime;
+            if (waitTime > 0) {
             // Wait for the time until the next event
-            await new Promise(resolve => setTimeout(resolve, waitTime));
-        }
-        if (evt.type === "on") {
-            // Start note (if not already playing)
-            if (!playingNotes.has(evt.note)) {
-                this.synth.trigger(0, evt.note, 999, this.selectedInstrument, null, null, false, 0); // Long duration, will stop manually
-                playingNotes.add(evt.note);
+                await new Promise(resolve => setTimeout(resolve, waitTime));
             }
-        } else if (evt.type === "off") {
+            if (evt.type === "on") {
+            // Start note (if not already playing)
+                if (!playingNotes.has(evt.note)) {
+                    this.synth.trigger(0, evt.note, 999, this.selectedInstrument, null, null, false, 0); // Long duration, will stop manually
+                    playingNotes.add(evt.note);
+                }
+            } else if (evt.type === "off") {
             // Stop note
-            this.synth.stopSound(0, this.selectedInstrument, evt.note);
-            playingNotes.delete(evt.note);
+                this.synth.stopSound(0, this.selectedInstrument, evt.note);
+                playingNotes.delete(evt.note);
+            }
+            lastTime = evt.time;
         }
-        lastTime = evt.time;
-    }
-    // Ensure all notes are stopped at the end
-    playingNotes.forEach(note => {
-        this.synth.stopSound(0, this.selectedInstrument, note);
-    });
-};
+        // Ensure all notes are stopped at the end
+        playingNotes.forEach(note => {
+            this.synth.stopSound(0, this.selectedInstrument, note);
+        });
+    };
 
 }
