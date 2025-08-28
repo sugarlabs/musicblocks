@@ -596,11 +596,14 @@ function SampleWidget() {
                 const prompt = textArea.value;
                 const encodedPrompt = encodeURIComponent(prompt);
                 const url = `http://localhost:8000/generate?prompt=${encodedPrompt}`;
+
+                let blinkInterval;
+
                 try {
                     generating = true;
                     activity.textMsg(_("Generating Audio..."), 2500);
 
-                    let blinkInterval = setInterval(() => {
+                    blinkInterval = setInterval(() => {
                         activity.textMsg(_("Generating Audio..."), 1000);
                     }, 5000);
 
@@ -620,7 +623,9 @@ function SampleWidget() {
                     }
                 } catch (error) {
                     generating = false;
+                    clearInterval(blinkInterval);
                     activity.textMsg(_("Error occurred"), 3000);
+                    submit.disabled = false;
                 }
             };
 
