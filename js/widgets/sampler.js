@@ -742,7 +742,7 @@ function SampleWidget() {
 
             const fromInputBox = document.createElement("input");
             fromInputBox.type = "text";
-            fromInputBox.title = "Enter start time (in minutes)";
+            fromInputBox.title = "Enter start time (in seconds)";
             fromInputBox.placeholder = "0.00";
             fromInputBox.style.width = "152px";
             fromInputBox.style.height = "61px";
@@ -758,7 +758,7 @@ function SampleWidget() {
 
             const toInputBox = document.createElement("input");
             toInputBox.type = "text";
-            toInputBox.title = "Enter end time (in minutes)";
+            toInputBox.title = "Enter end time (in seconds)";
             toInputBox.placeholder = "10.00";
             toInputBox.style.width = "152px";
             toInputBox.style.height = "61px";
