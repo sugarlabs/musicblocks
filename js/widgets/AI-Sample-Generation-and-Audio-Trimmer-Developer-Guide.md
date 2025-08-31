@@ -76,8 +76,8 @@ this._trimBtn   = widgetWindow.addButton("trim.svg", ICONSIZE, _("Trim"), "");
         - File chooser to upload an audio file.
         - After upload, replaces the file chooser with an audio player for playback.
     - **Adds Input Fields**
-        - **From Input** → Start time (in minutes).  
-        - **To Input** → End time (in minutes).
+        - **From Input** → Start time (in seconds).  
+        - **To Input** → End time (in seconds).
     - **Adds Buttons**
         - **Preview**
           - Sends start and end times to `/trim-preview`.
