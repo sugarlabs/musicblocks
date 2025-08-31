@@ -174,6 +174,7 @@ if (_THIS_IS_MUSIC_BLOCKS_) {
         "widgets/oscilloscope",
         "widgets/sampler",
         "widgets/reflection",
+        "widgets/legobricks",
         "activity/lilypond",
         "activity/abc",
         "activity/midi",

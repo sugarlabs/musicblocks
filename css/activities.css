@@ -2021,6 +2021,8 @@ table {
   max-width: 80%;
 }
 
+
+
 .chatInterface{
   display: flex;
   flex-direction: column;
@@ -2070,3 +2072,17 @@ table {
   align-self: flex-end;
   background-color: #DCF8C6;
 }
+
+
+.lego-brick {
+    display: inline-block;
+    background-color: #FF0000;
+    border: 1px solid #880000;
+    margin: 2px;
+}
+
+.lego-size-1 { width: 20px; height: 10px; }
+.lego-size-2 { width: 40px; height: 10px; }
+/* ... more sizes ... */
+
+

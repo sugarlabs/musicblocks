@@ -19,7 +19,7 @@
    RhythmRuler, FILTERTYPES, instrumentsFilters, DEFAULTFILTERTYPE,
    TemperamentWidget, TimbreWidget, ModeWidget, PitchSlider,
    MusicKeyboard, PitchStaircase, SampleWidget, _THIS_IS_MUSIC_BLOCKS_,
-   Arpeggio
+   Arpeggio, LegoWidget
  */
 
 /*
@@ -60,8 +60,10 @@
     MusicKeyboard
    - js/widgets/pitchstaircase.js
     PitchStaircase
-   - js/widgets/aidebugger.js
+    - js/widgets/aidebugger.js
     AIDebuggerWidget
+   - js/widgets/legobricks.js
+    LegoWidget
 
  */
 
@@ -1639,8 +1641,7 @@ function setupWidgetBlocks(activity) {
             return [args[0], 1];
         }
     }
-
-
+    
     class ReflectionBlock extends StackClampBlock {
         /**
          * Creates a ReflectionBlock instance.
@@ -1695,7 +1696,93 @@ function setupWidgetBlocks(activity) {
         }
     }
 
-            
+        
+    /**
+ * Represents a block for controlling LEGO brick parameters and visualization.
+ * @extends StackClampBlock
+ */
+    class LegoBricksBlock extends StackClampBlock {
+        constructor() {
+            super("legobricks");
+            this.setPalette("widgets", activity);
+            this.parameter = true;
+            this.beginnerBlock(true);
+
+            this.setHelpString([
+                _("The LEGO Bricks block opens a widget for designing virtual LEGO creations."),
+                "documentation",
+                null,
+                "legobricks"
+            ]);
+
+            //.TRANS: LEGO bricks designer
+            this.formBlock({ name: _("LEGO Bricks"), canCollapse: true });
+            this.makeMacro((x, y) => [
+                [0, "legobricks", x, y, [null, 1, 18]],
+                [1, "pitch", 0, 0, [0, 2, 3, 4]],
+                [2, ["solfege", { value: "do" }], 0, 0, [1]],
+                [3, ["number", { value: 4 }], 0, 0, [1]],
+                [4, "pitch", 0, 0, [1, 5, 6, 7]],
+                [5, ["solfege", { value: "re" }], 0, 0, [4]],
+                [6, ["number", { value: 4 }], 0, 0, [4]],
+                [7, "pitch", 0, 0, [4, 8, 9, 10]],
+                [8, ["solfege", { value: "mi" }], 0, 0, [7]],
+                [9, ["number", { value: 4 }], 0, 0, [7]],
+                [10, "pitch", 0, 0, [7, 11, 12, 13]],
+                [11, ["solfege", { value: "fa" }], 0, 0, [10]],
+                [12, ["number", { value: 4 }], 0, 0, [10]],
+                [13, "pitch", 0, 0, [10, 14, 15, 16]],
+                [14, ["solfege", { value: "sol" }], 0, 0, [13]],
+                [15, ["number", { value: 4 }], 0, 0, [13]],
+                [16, "playdrum", 0, 0, [13, 17, null]],
+                [17, ["drumname", { value: "kick drum" }], 0, 0, [16]],
+                [18, "hiddennoflow", 0, 0, [0, null]]
+            ]);
+        }
+
+        /**
+     * Handles the flow of data for the LEGO bricks block.
+     * @param {any[]} args - The arguments passed to the block.
+     * @param {object} logo - The logo object.
+     * @param {object} turtle - The turtle object.
+     * @param {object} blk - The block object.
+     * @returns {number[]} - The output values.
+     */
+        flow(args, logo, turtle, blk) {
+            logo.inLegoWidget = true;
+
+            if (logo.legoWidget === null) {
+                logo.legoWidget = new LegoWidget();
+            }
+            logo.legoWidget.blockNo = blk;
+
+            logo.legoWidget.rowLabels = [];
+            logo.legoWidget.rowArgs = [];
+            logo.legoWidget.clearBlocks();
+
+            const listenerName = "_legobricks_" + turtle;
+            logo.setDispatchBlock(blk, turtle, listenerName);
+
+            const __listener = () => {
+                if (logo.legoWidget.rowLabels.length === 0) {
+                    activity.errorMsg(
+                        _("You must have at least one pitch block in the LEGO bricks widget."),
+                        blk
+                    );
+                } else {
+                    logo.legoWidget.blockNo = blk;
+                    logo.legoWidget.init(activity);
+                }
+                logo.inLegoWidget = false;
+            };
+
+            logo.setTurtleListener(turtle, listenerName, __listener);
+
+            if (args.length === 1) return [args[0], 1];
+        }
+    }
+
+
     class AIDebugger extends StackClampBlock {
         constructor() {
             super("aidebugger");
@@ -1745,8 +1832,6 @@ function setupWidgetBlocks(activity) {
             return [args[0], 1];
         }
     }
-
-
     // Set up blocks if this is Music Blocks environment
     if (_THIS_IS_MUSIC_BLOCKS_) {
         new EnvelopeBlock().setup(activity);
@@ -1762,6 +1847,7 @@ function setupWidgetBlocks(activity) {
         new oscilloscopeWidgetBlock().setup(activity);
         new PitchSliderBlock().setup(activity);
         new ChromaticBlock().setup(activity);
+        new LegoBricksBlock().setup(activity);
         new ReflectionBlock().setup(activity);
         // new AIMusicBlocks().setup(activity);
         new MusicKeyboard2Block().setup(activity);
