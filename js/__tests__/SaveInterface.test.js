@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * MusicBlocks v3.4.1
  * Copyright (C) 2025 Diwangshu Kakoty
@@ -36,7 +36,7 @@ global.jQuery.noConflict = jest.fn(() => global.jQuery);
 global._ = jest.fn((str) => str);
 global._THIS_IS_TURTLE_BLOCKS_ = true;
 global.TITLESTRING = "Music Blocks";
-global.GUIDEURL = "../guide/guide.html";
+global.GUIDEURL = "../Docs/guide/guide.html";
 global.fileExt = jest.fn((file) => {
     if (!file) { // This covers both null and undefined
         return "";
@@ -499,7 +499,7 @@ describe("saveLilypond Methods", () => {
         document.body.innerHTML = `
             <div id="lilypondModal" style="display: none;">
                 <div class="modal-content" tabindex="-1">
-                    <span class="close">×</span>
+                    <span class="close">Ã—</span>
                     <div id="fileNameText">File name</div>
                     <input type="text" id="fileName" value="TestProject.ly" tabindex="-1">
                     <p></p>
@@ -810,3 +810,4 @@ describe("MXML Methods", () => {
     });
 
 });
+

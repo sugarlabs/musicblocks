@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Help Widget Test</title>
+</head>
+<body>
+    <h1>Help Widget Accessibility Test</h1>
+    <div id="result"></div>
+    
+    <script>
+        // Test if documentation files are accessible
+        function testDocumentationAccess() {
+            const resultDiv = document.getElementById('result');
+            
+            // Test access to a documentation file
+            fetch('Docs/documentation/action_block.svg')
+                .then(response => {
+                    if (response.ok) {
+                        resultDiv.innerHTML = '<p style="color: green;">? Documentation files are accessible</p>';
+                        console.log('? Help widget can access documentation files');
+                    } else {
+                        resultDiv.innerHTML = '<p style="color: red;">? Cannot access documentation files</p>';
+                        console.log('? Help widget cannot access documentation files');
+                    }
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = '<p style="color: red;">? Error accessing documentation: ' + error + '</p>';
+                    console.log('? Error accessing documentation:', error);
+                });
+        }
+        
+        // Run the test when page loads
+        window.onload = testDocumentationAccess;
+    </script>
+</body>
+</html>

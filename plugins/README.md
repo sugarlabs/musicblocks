@@ -1,4 +1,4 @@
-Plugins
+﻿Plugins
 =======
 
 How to get plugins
@@ -16,7 +16,7 @@ How to load plugins
 
 The Load Plugin button is found on the Secondary Toolbar (click the "hamburger" menu if it is not expanded) you will see this option:
 
-![Load Plugin Button](https://github.com/sugarlabs/musicblocks/raw/master/documentation/load-plugin-button.png)
+![Load Plugin Button](https://github.com/sugarlabs/musicblocks/raw/master/Docs/documentation/load-plugin-button.png)
 
 Click it and a file chooser will appear. 
 
@@ -204,3 +204,4 @@ Example plugins
 ---------------
 
 [nutrition.json](https://github.com/sugarlabs/turtleblocksjs/blob/master/plugins/nutrition.json), [roti.json](https://github.com/sugarlabs/turtleblocksjs/blob/master/plugins/roti.json), [maths.rtp](https://github.com/sugarlabs/turtleblocksjs/blob/master/plugins/maths.rtp)
+

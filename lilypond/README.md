@@ -1,4 +1,4 @@
-# LilyPond with Music Blocks software
+﻿# LilyPond with Music Blocks software
 
 [LilyPond](http://www.lilypond.org/) is a music engraving program, devoted to producing the highest-quality sheet music possible. It brings the aesthetics of traditionally engraved music to computer printouts. LilyPond is Free/Libre Software (part of the [GNU Project](https://en.wikipedia.org/wiki/GNU_Project)). We use it with [Music Blocks software](sugarlabs.github.io/musicblocks/) in order to export the user-generated music to sheet music.
 
@@ -136,19 +136,19 @@ Optionally, you can install `frescobaldi` a Graphical User Interface [(GUI)](htt
 3. To install Frescobaldi, open a [Terminal](http://guides.macrumors.com/Terminal) and enter the command for the package manager you installed:
     1. Homebrew: `brew install frescobaldi --without-lilypond` (if you omit `--without-lilypond`, Homebrew will install also a copy of LilyPond, but this is not recommended).
     2. MacPorts: `sudo port install frescobaldi`
-    3. After the installation, Frescobaldi’s launcher script will be in your `$PATH`, so you’ll be able to launch Frescobaldi by entering `frescobaldi` in a Terminal.
+    3. After the installation, Frescobaldiâ€™s launcher script will be in your `$PATH`, so youâ€™ll be able to launch Frescobaldi by entering `frescobaldi` in a Terminal.
  
 #####Application bundle
 The installation process generates also the application bundle Frescobaldi.app, that can be used to launch Frescobaldi.
-* Homebrew: you’ll see a couple of commands at the end of the installation process, that you can copy and paste in order to link the application bundle into your `~/Applications` or `/Applications` directory.
+* Homebrew: youâ€™ll see a couple of commands at the end of the installation process, that you can copy and paste in order to link the application bundle into your `~/Applications` or `/Applications` directory.
 * MacPorts: you can find the application bundle inside the `/Applications/MacPorts` directory.
 
-If you don’t want the application bundle, you should install with the command:
+If you donâ€™t want the application bundle, you should install with the command:
 * Homebrew: `brew install frescobaldi --without-lilypond --without-launcher`
 * MacPorts: `sudo port install frescobaldi -app`
 
 #### LilyPond and Frescobaldi
-If you installed LilyPond in the usual location, i.e. you copied the application bundle `LilyPond.app` into the `/Applications` directory, Frescobaldi should automatically recognize it and you should be able to compile your LilyPond source files right away. If for some reasons this doesn’t happen, you need to point Frescobaldi to the correct location: go to “LilyPond Preferences” in Frescobaldi’s preferences, click “Add…” and either click the directory icon and select LilyPond’s application bundle or directly insert its path (the typical value is `/Applications/LilyPond.app`).
+If you installed LilyPond in the usual location, i.e. you copied the application bundle `LilyPond.app` into the `/Applications` directory, Frescobaldi should automatically recognize it and you should be able to compile your LilyPond source files right away. If for some reasons this doesnâ€™t happen, you need to point Frescobaldi to the correct location: go to â€œLilyPond Preferencesâ€ in Frescobaldiâ€™s preferences, click â€œAddâ€¦â€ and either click the directory icon and select LilyPondâ€™s application bundle or directly insert its path (the typical value is `/Applications/LilyPond.app`).
 
 ### How Frescobaldi and Lilypond work together
 [Frescobaldi](http://frescobaldi.org/uguide.html) is a lightweight, yet powerful, music and text editor with many features added and enhanced particularly for LilyPond. Major features include point-and-click links between the code and music views, detailed score wizards, built in LilyPond documentation browser, syntax highlighting and automatic completion. Frescobaldi is written in [Python](https://wiki.python.org/moin/), with [PyQt4](https://wiki.python.org/moin/PyQt4) for its user interface. It acts as a front-end for the Lilypond software, as it helps in editing the input file given to be processed and helps to check the output `pdf` simultaneously. The conversion at the back of Frescobaldi, is done with LilyPond itself.
@@ -168,14 +168,14 @@ You can customize your LilyPond output by adding your own name, the title of you
 }
 ```
 ### Editing other fields
-Similarly, you can change the meter, add [MIDI instruments](http://lilypond.org/doc/v2.18/documentation/notation/midi-instruments), add a Guitar Tab Section, and add MIDI Section.
+Similarly, you can change the meter, add [MIDI instruments](http://lilypond.org/doc/v2.18/Docs/documentation/notation/midi-instruments), add a Guitar Tab Section, and add MIDI Section.
 **Note**: Comments in `.ly` files are made by using a `%` at the start of a line of text.
 
 ### References
 More customization details are found in the .ly file. Further references include:
 * [Text Input](http://lilypond.org/text-input.html)
-* [Learning Manual](http://lilypond.org/doc/v2.18/Documentation/learning/index.html)
-* [Music Glossary](http://www.lilypond.org/doc/v2.19/Documentation/music-glossary/)
+* [Learning Manual](http://lilypond.org/doc/v2.18/Docs/documentation/learning/index.html)
+* [Music Glossary](http://www.lilypond.org/doc/v2.19/Docs/documentation/music-glossary/)
 * [Freely sharable music notation generated with LilyPond](http://www.mutopiaproject.org/)
 * [Lilypond output in a web browser](https://www.tunefl.com/)
 
@@ -310,3 +310,4 @@ This work is licensed under the [Creative Commons Attribution 4.0 International 
 
 ### Contributors:
 Daksh Shah - 2015
+

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * MusicBlocks v3.4.1
  * Copyright (C) 2025 Diwangshu Kakoty
@@ -44,11 +44,11 @@ global.NOTATIONSTACCATO = NOTATIONSTACCATO;
 global.NOTATIONTUPLETVALUE = NOTATIONTUPLETVALUE;
 global.NOTATIONDOTCOUNT = NOTATIONDOTCOUNT;
 
-global.SHARP = "♯";
-global.FLAT = "♭";
-global.NATURAL = "♮";
-global.DOUBLESHARP = "𝄪";
-global.DOUBLEFLAT = "𝄫";
+global.SHARP = "â™¯";
+global.FLAT = "â™­";
+global.NATURAL = "â™®";
+global.DOUBLESHARP = "ð„ª";
+global.DOUBLEFLAT = "ð„«";
 
 global._ = jest.fn((str) => str);
 global.last = jest.fn((array) => array[array.length - 1]);
@@ -526,7 +526,7 @@ describe("saveLilypondOutput", () => {
         activity.logo.notation.notationStaging = {};
         const result = saveLilypondOutput(activity);
         const expected = "% You can change the MIDI instruments below to anything on this list:\n" +
-            "% (http://lilypond.org/doc/v2.18/documentation/notation/midi-instruments)\n\n" +
+            "% (http://lilypond.org/doc/v2.18/Docs/documentation/notation/midi-instruments)\n\n" +
             "\\score {\n" +
             " <<\n\n" +
             " >>" +

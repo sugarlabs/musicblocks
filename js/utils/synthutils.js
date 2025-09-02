@@ -1,4 +1,4 @@
-// Copyright (c) 2016-21 Walter Bender
+﻿// Copyright (c) 2016-21 Walter Bender
 // Copyright (c) 2025 Anvita Prasad DMP'25
 //
 // This program is free software; you can redistribute it and/or
@@ -149,7 +149,7 @@ const VOICENAMES = [
 ];
 
 // drum symbols are from
-// http://lilypond.org/doc/v2.18/Documentation/notation/percussion-notes
+// http://lilypond.org/doc/v2.18/Docs/documentation/notation/percussion-notes
 /**
  * Array of names and details for various drum instruments.
  * @constant
@@ -1701,11 +1701,11 @@ function Synth() {
                         const obj = [];
                         for (let i = 0; i < paramsEffects["neighborArgNote1"].length; i++) {
                             const note1 = paramsEffects["neighborArgNote1"][i]
-                                .replace("♯", "#")
-                                .replace("♭", "b");
+                                .replace("â™¯", "#")
+                                .replace("â™­", "b");
                             const note2 = paramsEffects["neighborArgNote2"][i]
-                                .replace("♯", "#")
-                                .replace("♭", "b");
+                                .replace("â™¯", "#")
+                                .replace("â™­", "b");
                             obj.push(
                                 { time: 0, note: note1, duration: firstTwoBeats },
                                 { time: firstTwoBeats, note: note2, duration: firstTwoBeats },
@@ -2455,17 +2455,17 @@ function Synth() {
                             // Setup parameters for piemenuPitches
                             const SOLFNOTES = ["ti", "la", "sol", "fa", "mi", "re", "do"];
                             const NOTENOTES = ["B", "A", "G", "F", "E", "D", "C"];
-                            const SOLFATTRS = ["𝄪", "♯", "♮", "♭", "𝄫"];
+                            const SOLFATTRS = ["ð„ª", "â™¯", "â™®", "â™­", "ð„«"];
                             
                             // Get current note and accidental
                             let selectedNote = targetPitch.note[0];
-                            let selectedAttr = targetPitch.note.length > 1 ? targetPitch.note.substring(1) : "♮";
+                            let selectedAttr = targetPitch.note.length > 1 ? targetPitch.note.substring(1) : "â™®";
                             
                             // Convert letter note to solfege for initial selection
                             let selectedSolfege = SOLFNOTES[NOTENOTES.indexOf(selectedNote)];
                             
                             if (selectedAttr === "") {
-                                selectedAttr = "♮";
+                                selectedAttr = "â™®";
                             }
 
                             try {
@@ -2513,7 +2513,7 @@ function Synth() {
                                         y: targetNoteSelector.offsetTop,
                                         setChildIndex: () => {}
                                     },
-                                    prevAccidental: "♮",
+                                    prevAccidental: "â™®",
                                     name: "pitch", // This is needed for pitch preview
                                     _triggerLock: false // This is needed for pitch preview
                                 };
@@ -2625,10 +2625,10 @@ function Synth() {
                                     
                                     // Convert accidental symbols to notation
                                     let noteWithAccidental = selectionState.note;
-                                    if (selectionState.accidental === "♯") noteWithAccidental += "#";
-                                    else if (selectionState.accidental === "♭") noteWithAccidental += "b";
-                                    else if (selectionState.accidental === "𝄪") noteWithAccidental += "##";
-                                    else if (selectionState.accidental === "𝄫") noteWithAccidental += "bb";
+                                    if (selectionState.accidental === "â™¯") noteWithAccidental += "#";
+                                    else if (selectionState.accidental === "â™­") noteWithAccidental += "b";
+                                    else if (selectionState.accidental === "ð„ª") noteWithAccidental += "##";
+                                    else if (selectionState.accidental === "ð„«") noteWithAccidental += "bb";
                                     
                                     const noteWithOctave = noteWithAccidental + selectionState.octave;
                                     
@@ -3145,7 +3145,7 @@ function Synth() {
         });
 
         const valueDisplay = document.createElement("div");
-        valueDisplay.textContent = (this.centsValue >= 0 ? "+" : "") + (this.centsValue || 0) + "¢";
+        valueDisplay.textContent = (this.centsValue >= 0 ? "+" : "") + (this.centsValue || 0) + "Â¢";
         Object.assign(valueDisplay.style, {
             fontSize: "16px"
         });
@@ -3219,7 +3219,7 @@ function Synth() {
         // Add event listener for slider changes
         slider.oninput = () => {
             const value = parseInt(slider.value);
-            valueDisplay.textContent = (value >= 0 ? "+" : "") + value + "¢";
+            valueDisplay.textContent = (value >= 0 ? "+" : "") + value + "Â¢";
             this.centsValue = value;
             // Update tuner display if it exists
             if (this.tunerDisplay) {
@@ -3272,3 +3272,4 @@ function Synth() {
 
     return this;
 }
+

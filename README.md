@@ -1,4 +1,4 @@
-<a href="https://github.com//sugarlabs/musicblocks/graphs/contributors" alt="Contributors">
+﻿<a href="https://github.com//sugarlabs/musicblocks/graphs/contributors" alt="Contributors">
     <img src="https://img.shields.io/github/contributors/sugarlabs/musicblocks" />
 </a>
 
@@ -8,10 +8,10 @@
 
 # Music Blocks
 
-“_All musicians are subconsciously mathematicians._” — Monk
+â€œ_All musicians are subconsciously mathematicians._â€ â€” Monk
 
-“_Music is a hidden arithmetic exercise of the soul, which does not
-know that it is counting._” — Leibniz
+â€œ_Music is a hidden arithmetic exercise of the soul, which does not
+know that it is counting._â€ â€” Leibniz
 
 Music Blocks is a _Visual Programming Language_ and collection of
 _manipulative tools_ for exploring musical and mathematical concepts
@@ -68,7 +68,7 @@ Music Blocks is available under the _GNU Affero General Public License
 Music Blocks is designed to run on a web browser. The ideal way to run
 Music Blocks is to visit the URL
 [_musicblocks.sugarlabs.org_](https://musicblocks.sugarlabs.org) in
-your browser — _Google Chrome_ (or _Chromium_), _Microsoft Edge_
+your browser â€” _Google Chrome_ (or _Chromium_), _Microsoft Edge_
 (_Chromium-based_), _Mozilla Firefox_, and _Opera_ work best.
 
 To run from the most recent master branch (experimental), visit
@@ -169,14 +169,14 @@ This documentation provides a basic setup for running Music Blocks locally using
 ## <a name="USING_MUSIC_BLOCKS"></a>Using Music Blocks
 
 Once Music Blocks is running, you'll want suggestions on how to use
-it. Follow [Using Music Blocks](./documentation/README.md) and [Music
-Blocks Guide](./guide/README.md).
+it. Follow [Using Music Blocks](./Docs/documentation/README.md) and [Music
+Blocks Guide](./Docs/guide/README.md).
 
 For Scratch and Snap users, you may want to look at [Music Blocks for
 Snap Users](./Music_Blocks_for_Snap_Users.md).
 
 Looking for a block? Find it in the
-[Palette Tables](./guide/README.md#6-appendix).
+[Palette Tables](./Docs/guide/README.md#6-appendix).
 
 ## <a name="LEGO_BRICKS_WIDGET"></a>LEGO Bricks Widget
 
@@ -492,7 +492,7 @@ this.createZoomControls = function() {
     
     // Fine adjustment buttons for precise control
     const zoomOut = document.createElement("button");
-    zoomOut.textContent = "−";
+    zoomOut.textContent = "âˆ’";
     zoomOut.onclick = () => this._adjustZoom(-0.01);
     
     const zoomIn = document.createElement("button");
@@ -1064,7 +1064,7 @@ Use the
 [discussions](https://github.com/sugarlabs/musicblocks/discussions)
 tab at the top of the repository to:
 
-- Ask questions you’re wondering about.
+- Ask questions youâ€™re wondering about.
 - Share ideas.
 - Engage with other community members.
 
@@ -1247,3 +1247,4 @@ remix projects created by other Music Blocks users. Use of the Planet
 is anonymous and not required in order to enjoy Music Blocks.
 
 Have fun, play hard, and learn.
+
