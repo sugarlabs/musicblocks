@@ -1379,7 +1379,7 @@ function LegoWidget() {
         const voiceLabels = [
             _("Electronic Synth"),
             _("Piano"),
-            _("Guitar"), 
+            _("Guitar"),
             _("Acoustic Guitar"),
             _("Electric Guitar"),
             _("Violin"),
@@ -1402,7 +1402,7 @@ function LegoWidget() {
 
         const voiceValues = [
             "electronic synth",
-            "piano", 
+            "piano",
             "guitar",
             "acoustic guitar",
             "electric guitar",
@@ -1512,7 +1512,7 @@ function LegoWidget() {
         // Set up the text update callback to update our button
         mockBlock.text._updateCallback = (newText) => {
             // Update the instrument when text is set by pie menu
-            const newInstrument = voiceValues[voiceLabels.findIndex(label => 
+            const newInstrument = voiceValues[voiceLabels.findIndex(label =>
                 label.toLowerCase() === newText.toLowerCase()
             )] || newText.toLowerCase();
             
