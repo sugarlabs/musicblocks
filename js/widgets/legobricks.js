@@ -2,6 +2,12 @@
    exported LegoWidget
 */
 
+/*
+   global
+
+   _, piemenuVoices, docById, platformColor, noteToFrequency
+*/
+
 /**
  * Represents a LEGO Bricks Widget with Phrase Maker functionality.
  * @constructor
@@ -41,6 +47,7 @@ function LegoWidget() {
     this.imageWrapper = null;
     this.synth = null;
     this.selectedInstrument = "electronic synth";
+    this.hasGeneratedVisualization = false; // Flag to prevent double PNG downloads
 
     // Pitch block handling properties (similar to PhraseMaker)
     this.blockNo = null;
@@ -490,52 +497,22 @@ function LegoWidget() {
         this.zoomControls.style.gap = "8px";
         this.zoomControls.style.zIndex = "20"; // Ensure it's above the grid
 
-        // Instrument selector
+        // Instrument selector (pie menu button)
         const instrumentLabel = document.createElement("span");
         instrumentLabel.textContent = "Instrument:";
         instrumentLabel.style.fontSize = "12px";
         instrumentLabel.style.fontWeight = "bold";
 
-        this.instrumentSelect = document.createElement("select");
-        this.instrumentSelect.style.fontSize = "12px";
-        this.instrumentSelect.style.marginRight = "16px";
-        
-        // Add instrument options
-        const instruments = [
-            "electronic synth",
-            "piano",
-            "guitar",
-            "acoustic guitar",
-            "electric guitar",
-            "violin",
-            "viola",
-            "cello",
-            "bass",
-            "flute",
-            "clarinet",
-            "saxophone",
-            "trumpet",
-            "trombone",
-            "oboe",
-            "tuba",
-            "banjo",
-            "sine",
-            "square",
-            "sawtooth",
-            "triangle"
-        ];
-        
-        instruments.forEach(instrument => {
-            const option = document.createElement("option");
-            option.value = instrument;
-            option.textContent = instrument.charAt(0).toUpperCase() + instrument.slice(1);
-            if (instrument === this.selectedInstrument) {
-                option.selected = true;
-            }
-            this.instrumentSelect.appendChild(option);
-        });
-        
-        this.instrumentSelect.onchange = () => this._changeInstrument();
+        this.instrumentButton = document.createElement("button");
+        this.instrumentButton.textContent = this.selectedInstrument.charAt(0).toUpperCase() + this.selectedInstrument.slice(1);
+        this.instrumentButton.style.fontSize = "12px";
+        this.instrumentButton.style.marginRight = "16px";
+        this.instrumentButton.style.padding = "4px 8px";
+        this.instrumentButton.style.border = "1px solid #ccc";
+        this.instrumentButton.style.borderRadius = "4px";
+        this.instrumentButton.style.backgroundColor = "#f8f8f8";
+        this.instrumentButton.style.cursor = "pointer";
+        this.instrumentButton.onclick = () => this._createInstrumentPieMenu();
 
         const zoomLabel = document.createElement("span");
         zoomLabel.textContent = "Zoom:";
@@ -597,7 +574,7 @@ function LegoWidget() {
         this.spacingValue.style.minWidth = "40px";
 
         this.zoomControls.appendChild(instrumentLabel);
-        this.zoomControls.appendChild(this.instrumentSelect);
+        this.zoomControls.appendChild(this.instrumentButton);
         this.zoomControls.appendChild(zoomLabel);
         this.zoomControls.appendChild(zoomOut);
         this.zoomControls.appendChild(this.zoomSlider);
@@ -826,6 +803,7 @@ function LegoWidget() {
             else if (duration < 3000) noteValue = 2;   // half note (1500-3000ms)
             else noteValue = 1;                        // whole note (3000ms+)
             let hasNonGreenColor = false;
+            let pitches = [];  // Array to collect pitches for this time column
 
             // Check each row for non-green colors in this time range
             this.colorData.forEach((rowData, rowIndex) => {
@@ -1391,6 +1369,169 @@ function LegoWidget() {
         this.activity.textMsg(_("Instrument changed to: ") + this.selectedInstrument);
     };
 
+    /**
+     * Creates a pie menu for instrument selection.
+     * @private
+     * @returns {void}
+     */
+    this._createInstrumentPieMenu = function() {
+        // Define instrument options
+        const voiceLabels = [
+            _("Electronic Synth"),
+            _("Piano"),
+            _("Guitar"),
+            _("Acoustic Guitar"),
+            _("Electric Guitar"),
+            _("Violin"),
+            _("Viola"),
+            _("Cello"),
+            _("Bass"),
+            _("Flute"),
+            _("Clarinet"),
+            _("Saxophone"),
+            _("Trumpet"),
+            _("Trombone"),
+            _("Oboe"),
+            _("Tuba"),
+            _("Banjo"),
+            _("Sine"),
+            _("Square"),
+            _("Sawtooth"),
+            _("Triangle")
+        ];
+
+        const voiceValues = [
+            "electronic synth",
+            "piano",
+            "guitar",
+            "acoustic guitar",
+            "electric guitar",
+            "violin",
+            "viola",
+            "cello",
+            "bass",
+            "flute",
+            "clarinet",
+            "saxophone",
+            "trumpet",
+            "trombone",
+            "oboe",
+            "tuba",
+            "banjo",
+            "sine",
+            "square",
+            "sawtooth",
+            "triangle"
+        ];
+
+        const categories = [];  // No categories needed for instruments
+
+        // Create a mock block object for the pie menu
+        const mockBlock = {
+            // Position the pie menu near the button
+            container: {
+                x: this.instrumentButton.offsetLeft + this.instrumentButton.offsetWidth / 2,
+                y: this.instrumentButton.offsetTop + this.instrumentButton.offsetHeight / 2,
+                children: [], // Mock children array for setChildIndex
+                setChildIndex: (child, index) => {} // Mock function
+            },
+            
+            // Mock text object that the pie menu expects
+            text: {
+                _text: this.selectedInstrument,
+                get text() {
+                    return this._text;
+                },
+                set text(value) {
+                    this._text = value;
+                    // Update the button text when the pie menu updates the text
+                    if (this._updateCallback) {
+                        this._updateCallback(value);
+                    }
+                },
+                _updateCallback: null
+            },
+            
+            value: this.selectedInstrument,
+            
+            activity: {
+                canvas: {
+                    offsetLeft: 0,
+                    offsetTop: 0
+                },
+                blocksContainer: {
+                    x: 0,
+                    y: 0
+                },
+                getStageScale: () => 1,
+                logo: {
+                    synth: this.synth
+                },
+                turtles: {
+                    ithTurtle: (index) => {
+                        return {
+                            singer: {
+                                instrumentNames: [this.selectedInstrument]
+                            }
+                        };
+                    }
+                }
+            },
+            
+            blocks: {
+                blockScale: 1,
+                turtles: {
+                    _canvas: {
+                        width: window.innerWidth,
+                        height: window.innerHeight
+                    }
+                }
+            },
+            
+            // Mock methods needed by piemenu
+            updateCache: () => {},
+            updateValue: (newValue) => {
+                // Update the instrument when selection is made
+                this.selectedInstrument = newValue;
+                this.instrumentButton.textContent = newValue.charAt(0).toUpperCase() + newValue.slice(1);
+                
+                // Recreate the synth with the new instrument
+                if (this.synth) {
+                    this.synth.createSynth(0, this.selectedInstrument, this.selectedInstrument, null);
+                }
+                
+                // Show a message indicating the instrument change
+                this.activity.textMsg(_("Instrument changed to: ") + this.selectedInstrument);
+                
+                // Update the mock block's value and text
+                mockBlock.value = newValue;
+                mockBlock.text.text = newValue;
+            }
+        };
+
+        // Set up the text update callback to update our button
+        mockBlock.text._updateCallback = (newText) => {
+            // Update the instrument when text is set by pie menu
+            const newInstrument = voiceValues[voiceLabels.findIndex(label =>
+                label.toLowerCase() === newText.toLowerCase()
+            )] || newText.toLowerCase();
+            
+            this.selectedInstrument = newInstrument;
+            this.instrumentButton.textContent = newInstrument.charAt(0).toUpperCase() + newInstrument.slice(1);
+            
+            // Recreate the synth with the new instrument
+            if (this.synth) {
+                this.synth.createSynth(0, this.selectedInstrument, this.selectedInstrument, null);
+            }
+            
+            // Show a message indicating the instrument change
+            this.activity.textMsg(_("Instrument changed to: ") + this.selectedInstrument);
+        };
+
+        // Call the pie menu function
+        piemenuVoices(mockBlock, voiceLabels, voiceValues, categories, this.selectedInstrument, false);
+    };
+
 
     /**
      * Handles zoom changes.
@@ -1506,6 +1647,9 @@ function LegoWidget() {
     // Clear any existing animation
         this._stopPlayback();
         this.activity.textMsg(_("Scanning image with vertical lines..."));
+        
+        // Reset the visualization flag to allow new download
+        this.hasGeneratedVisualization = false;
     
         // Get all grid lines (sorted by position)
         const gridLines = Array.from(this.gridOverlay.querySelectorAll("div"))
@@ -1701,7 +1845,7 @@ function LegoWidget() {
  */
     this._stopPlayback = function() {
         this.isPlaying = false;
-    
+
         // Save final color segments for all lines
         if (this.scanningLines) {
             const now = performance.now();
@@ -1721,15 +1865,22 @@ function LegoWidget() {
             });
             this.scanningLines = null;
         }
-    
-        // Generate color visualization PNG
-        setTimeout(() => {
-            this._generateColorVisualization();
-            this._drawColumnLinesOnCanvas(); // Draw column lines on the overlay
-        }, 100); // Small delay to ensure all data is processed
+
+        // Only generate color visualization PNG if scanning was actually completed and not generated yet
+        // This prevents the double download issue where _stopPlayback() is called at the start for cleanup
+        if (!this.hasGeneratedVisualization && this.colorData && this.colorData.length > 0) {
+            // Check if any colorData actually has color segments (indicating scanning occurred)
+            const hasScannedData = this.colorData.some(row => row.colorSegments && row.colorSegments.length > 0);
+            
+            if (hasScannedData) {
+                this.hasGeneratedVisualization = true; // Set flag to prevent double generation
+                setTimeout(() => {
+                    this._generateColorVisualization();
+                    this._drawColumnLinesOnCanvas(); // Draw column lines on the overlay
+                }, 100); // Small delay to ensure all data is processed
+            }
+        }
     };
-
-
     /**
  * Samples and detects colors along a vertical line
  * @private
