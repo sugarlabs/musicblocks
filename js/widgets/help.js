@@ -1,4 +1,4 @@
-// Copyright (c) 2016-20 Walter Bender
+﻿// Copyright (c) 2016-20 Walter Bender
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the The GNU Affero General Public
 // License as published by the Free Software Foundation; either
@@ -221,7 +221,7 @@ class HelpWidget {
                         let path = message[1];
                         // We need to add a case here whenever we add
                         // help artwort support for a new language.
-                        // e.g., documentation-es
+                        // e.g., Docs/documentation-es
                         let language = localStorage.languagePreference;
                         if (language === undefined) {
                             language = navigator.language;
@@ -553,7 +553,7 @@ class HelpWidget {
                     let path = message[1];
                     // We need to add a case here whenever we add
                     // help artwort support for a new language.
-                    // e.g., documentation-es
+                    // e.g., Docs/documentation-es
                     let language = localStorage.languagePreference;
                     if (language === undefined) {
                         language = navigator.language;
@@ -577,7 +577,7 @@ class HelpWidget {
                             break;
                     }
 
-                    const imageSrc = `documentation/${name}_block.svg` ;
+                    const imageSrc = `Docs/documentation/${name}_block.svg` ;
                     body += `<figure class="blockImage-wrapper"><img class="blockImage" src="${imageSrc}"></figure>` ;
                 }
 
@@ -659,3 +659,5 @@ class HelpWidget {
         }
     }
 }
+
+

@@ -1,4 +1,4 @@
-MusicBlocks/js
+﻿MusicBlocks/js
 ==============
 
 The core code for Music Blocks resides in this directory, the blocks and the turtleactions
@@ -622,7 +622,7 @@ only need to worry about the position of the first block in a stack of
 blocks. Everything else is calculated for you.)
 
 ![alt
- tag](../documentation/block-connections-diagram.svg
+ tag](../Docs/documentation/block-connections-diagram.svg
  "Blocks maintain a list of connections to other blocks.")
 
 In the figure about and in the code example above, the `divide` block
@@ -643,3 +643,4 @@ You must update three files: ```index.html```, ```js/toolbar.js``` and ```js/lan
 [ ] In ```languagebox.js```, add an event handler,
 
 [ ] and add a dictionary entry for "Refresh your browser to change your language preference."
+

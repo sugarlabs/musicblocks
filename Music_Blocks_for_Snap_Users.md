@@ -1,9 +1,9 @@
-# Music Blocks for Snap Users
+﻿# Music Blocks for Snap Users
 
-“All musicians are subconsciously mathematicians.” — Monk
+â€œAll musicians are subconsciously mathematicians.â€ â€” Monk
 
-“Music is a hidden arithmetic exercise of the soul, which does not
-know that it is counting.” — Leibniz
+â€œMusic is a hidden arithmetic exercise of the soul, which does not
+know that it is counting.â€ â€” Leibniz
 
 ## Introduction
 
@@ -13,18 +13,18 @@ are some aspects of the interface that may be confusing. This document
 aims to highlight those differences and explain where Music Blocks
 does things a bit differently.
 
-The roots of Music Blocks are in Brian Smith’s Turtle Art, a precursor
+The roots of Music Blocks are in Brian Smithâ€™s Turtle Art, a precursor
 to Snap (or Scratch).
 
 ### Why Music Blocks?
 
 Music manipulatives have been part of the Logo repertoire since the
 1970s. Jeanne Bamberger, Hal Abelson, and Terry Winograd created
-MusicLogo, “whose commands controlled a sound-emitting box [originally
-Marvin Minsky and Ed Fredkin’s Music Box], allowing a tune to be
-written in code and then immediately played aloud.” Exposed by the
-language and built into some of Bamberger’s pedagogy were some
-“powerful ideas”, such as some of the higher-level structural elements
+MusicLogo, â€œwhose commands controlled a sound-emitting box [originally
+Marvin Minsky and Ed Fredkinâ€™s Music Box], allowing a tune to be
+written in code and then immediately played aloud.â€ Exposed by the
+language and built into some of Bambergerâ€™s pedagogy were some
+â€œpowerful ideasâ€, such as some of the higher-level structural elements
 of music: e.g., phrases and scalar steps.
 
 ![Marvin Minsky and the Music Box](./Minsky.jpg)
@@ -33,9 +33,9 @@ Music composition and performance require practitioners to follow
 basic control flow such as: sequences; conditionals and loops; data
 abstractions such as changes in timbre, tone, and meter; functions and
 operators such as transpositions, inversions, and retrograde; and
-debugging—making corrections to a composition, perfecting a
+debuggingâ€”making corrections to a composition, perfecting a
 transcription, or working through a section of music on an
-instrument—that leads to a deeper understanding of music (and
+instrumentâ€”that leads to a deeper understanding of music (and
 computation) theory. The social aspect of musical performance also
 parallels the perspective that computing is both collaborative and
 creative. An analog can be built between the way programmers work
@@ -47,7 +47,7 @@ programmers modify, improvise, and derive inspiration from the work of
 peers and mentors. They also share lesson plans and innovations around
 the use of manipulatives.
 
-## Vive la différence
+## Vive la diffÃ©rence
 
 ### The Workspace
 
@@ -98,8 +98,8 @@ Operators are written to the left of the operands.
 
 ### Variables
 
-In Music Blocks, we call variables “boxes”. There are a few boxes
-predefined, but you can add/name as many new variables as you’d like.
+In Music Blocks, we call variables â€œboxesâ€. There are a few boxes
+predefined, but you can add/name as many new variables as youâ€™d like.
 
 In Snap, you make variables explicitly.
 
@@ -141,17 +141,17 @@ the equivalent of the Snap Change By commands.
 
 ![Music Blocks Change By](./images/snap/change-by.png)
 
-There is also a box “reporter” block that lets you access a variable
+There is also a box â€œreporterâ€ block that lets you access a variable
 by reference. For example,
 
 ![Music Blocks Box Block](./images/snap/box-block.png)
 
 A bit obscure, but very powerful: Here I use it to record stats on
-rolling dice. I have a box (variable) each for eleven boxes (named “2”
-to “12”) to store the possible outcome of rolling two dice. I store in
-the box named “box” the sum of two random numbers between 1 and 6, so
-the box named “box” has a number between 2 and 12. Then I increment
-the box named for the number stored in “box” by one. Later in the
+rolling dice. I have a box (variable) each for eleven boxes (named â€œ2â€
+to â€œ12â€) to store the possible outcome of rolling two dice. I store in
+the box named â€œboxâ€ the sum of two random numbers between 1 and 6, so
+the box named â€œboxâ€ has a number between 2 and 12. Then I increment
+the box named for the number stored in â€œboxâ€ by one. Later in the
 program, I make a bar chart showing the value stored in each box.
 
 ![Music Blocks Dice](./images/snap/dice.png)
@@ -159,33 +159,33 @@ program, I make a bar chart showing the value stored in each box.
 #### Variable Scope
 
 Perhaps more detail than is necessary, but variables in Snap and boxes
-in Music Blocks have a property called “scope”. The scope of a
+in Music Blocks have a property called â€œscopeâ€. The scope of a
 variable defines where in your program the variable can be used. For
 example, in Snap, a variable defined on the Variable palette can be
 used anywhere. The variables defined inside of a Command can only be
 used inside of the Command. They cannot be seen outside of the
-command. “Anywhere” variables are called “global”. Variables defined
-inside of commands are “local” to the command.
+command. â€œAnywhereâ€ variables are called â€œglobalâ€. Variables defined
+inside of commands are â€œlocalâ€ to the command.
 
-In Music Blocks, boxes defined on the Boxes palette are “global” and
+In Music Blocks, boxes defined on the Boxes palette are â€œglobalâ€ and
 shared between threads.
 
 #### Lists and Heaps
 
-Snap has support for “lists”.
+Snap has support for â€œlistsâ€.
 
 ![Snap Lists](./images/snap/snap-list.png)
 
 The Music Block equivalent of a list is the Heap. Think of it as a
-pile of “shoe boxes”, where each shoe box has a variable stored in
+pile of â€œshoe boxesâ€, where each shoe box has a variable stored in
 it. You can put boxes on to the pile (using the Push block) and take a
 box off of the top of the pile with the Pop block. You can also access
 the contents of any box in the pile using the Index Heap block. (You
 can also save/load heaps to/from a file.)
 
-Heaps are “local”, as are the various blocks that maintain state,
+Heaps are â€œlocalâ€, as are the various blocks that maintain state,
 e.g., x-position, y-position, color, heading, etc. (Each Start block
-gets its own heap and each mouse has its own “local” state.)
+gets its own heap and each mouse has its own â€œlocalâ€ state.)
 
 ![Music Blocks Heap Palette](./images/snap/heap-palette.png)
 
@@ -197,7 +197,7 @@ All of the state blocks can also be used with the Adders.
 
 ![Music Blocks Adder](./images/snap/add-one-to.png)
 
-Action args (explained below) are “local”.
+Action args (explained below) are â€œlocalâ€.
 
 ![Music Blocks Arg Blocks](./images/snap/arg-blocks.png)
 
@@ -219,10 +219,10 @@ interested in watching.
 
 ### The Start Block
 
-It wouldn’t make a lot of sense to have more than one turtle in Turtle
-Stitch, since the embroidery machines only have one needle (“single
-threaded”). But in music, we often have more than one voice or
-instrument. You get a separate “thread” for each Start block.
+It wouldnâ€™t make a lot of sense to have more than one turtle in Turtle
+Stitch, since the embroidery machines only have one needle (â€œsingle
+threadedâ€). But in music, we often have more than one voice or
+instrument. You get a separate â€œthreadâ€ for each Start block.
 
 For example, we can implement a simple mirror paint by using four Start blocks. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732171217345259&run=True)
 
@@ -231,7 +231,7 @@ For example, we can implement a simple mirror paint by using four Start blocks. 
 ![Music Blocks Symmetry Paint](./images/snap/sym-paint.png)
 
 It is often useful to give a Start block a name, in part because the
-“Ensemble” blocks let you query status between different threads,
+â€œEnsembleâ€ blocks let you query status between different threads,
 which can be really useful in music projects.
 
 ![Music Blocks Set Name](./images/snap/set-name.png)
@@ -253,7 +253,7 @@ You can add args.
 
 ![Music Blocks Square with Arg](./images/snap/arg.png)
 
-Although, unlike Snap, you cannot label the args… Maybe I should add
+Although, unlike Snap, you cannot label the argsâ€¦ Maybe I should add
 that feature.
 
 You can also make "Reporter" blocks by using a Return.
@@ -330,12 +330,12 @@ There are a few additional debugging aids:
 
 The Planet is a public forum for sharing projects. Unlike Turtle
 Stitch, the Planet is anonymous. Projects can be downloaded and
-“remixed” from the Planet.
+â€œremixedâ€ from the Planet.
 
-![Music Blocks Planet Button](./documentation/planet_view_icon.png)
+![Music Blocks Planet Button](./Docs/documentation/planet_view_icon.png)
 
-![Music Blocks Planet](./documentation/planet-3.png)
-![Music Blocks Planet](./documentation/planet-4.png)
+![Music Blocks Planet](./Docs/documentation/planet-3.png)
+![Music Blocks Planet](./Docs/documentation/planet-4.png)
 
 ### Widgets
 
@@ -344,12 +344,12 @@ ideas. Widgets are launched from Music Blocks and in most cases their
 behavior is programmable. Widgets let you explore an idea and then
 export Music Blocks code. For example, the Rhythm Ruler widget lets
 you explore polyrhythms and create drum machines in Music Blocks. The
-Phrase Maker widget lets you “paint” musical phrases and then export
+Phrase Maker widget lets you â€œpaintâ€ musical phrases and then export
 them as actions to use in your program.
 
-![Music Blocks Rhythm Widget](./guide/rhythm4.svg)
+![Music Blocks Rhythm Widget](./Docs/guide/rhythm4.svg)
 
-![Music Blocks Phrase Maker Widget](./guide/matrix8.svg)
+![Music Blocks Phrase Maker Widget](./Docs/guide/matrix8.svg)
 
 There are widgets for exploring pitch, rhythm, tempo, temperament,
 mode, timbre, et al. There is even a widget that allows you to plug in
@@ -474,7 +474,7 @@ collection of notes.  Music Blocks uses Action blocks to contain
 multiple Note blocks. The actions are used in combination to create
 music.
 
-Here is an example of a canon (Frère Jacques), using four voices, each
+Here is an example of a canon (FrÃ¨re Jacques), using four voices, each
 sharing the actions. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=1732463245651983&run=True)
 
 ![Frere Jacques](./images/snap/frere-jacques.png)
@@ -483,6 +483,6 @@ sharing the actions. [RUN LIVE](https://musicblocks.sugarlabs.org/index.html?id=
 
 [Music Blocks README](./README.md) explains where to find Music Blocks.
 
-[Using Music Blocks](./documentation/README.md) has basic instructions.
+[Using Music Blocks](./Docs/documentation/README.md) has basic instructions.
 
-[Music Blocks Guide](./guide/README.md) details on the musical aspects of Music Blocks.
+[Music Blocks Guide](./Docs/guide/README.md) details on the musical aspects of Music Blocks.

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @license
  * MusicBlocks v3.4.1
  * Copyright (C) 2025 Om Santosh Suneri
@@ -34,7 +34,7 @@ global.HELPTURTLEBUTTON = "HELPTURTLEBUTTON";
 global.LANGUAGEBUTTON = "LANGUAGEBUTTON";
 
 if (GUIDEURL === "guide url") {
-    GUIDEURL = "https://github.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md";
+    GUIDEURL = "https://github.com/sugarlabs/turtleblocksjs/tree/master/Docs/guide/README.md";
 }
 
 describe("turtledefs.js", () => {
@@ -53,7 +53,7 @@ describe("turtledefs.js", () => {
     });
 
     test("GUIDEURL should default to the correct URL", () => {
-        expect(GUIDEURL).toBe("https://github.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md");
+        expect(GUIDEURL).toBe("https://github.com/sugarlabs/turtleblocksjs/tree/master/Docs/guide/README.md");
     });
 
     test("TITLESTRING should be defined", () => {
@@ -64,3 +64,4 @@ describe("turtledefs.js", () => {
         expect(typeof createDefaultStack).toBe("function");
     });
 });
+
