@@ -66,7 +66,7 @@ const changeImage = (imgElement, from, to) => {
  */
 function _(text, options = {}) {
     if (!text) return "";
-    console.log(text);
+
     try {
         const removeChars = [",","(",")","?","¿","<",">",".","\n",'"',":","%s","%d","/","'",";","×","!","¡"];
         let cleanedText = text;
@@ -123,6 +123,7 @@ function _(text, options = {}) {
         return text;
     }
 }
+
 
 
 

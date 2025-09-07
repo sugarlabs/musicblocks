@@ -95,10 +95,9 @@ requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBacken
 
             if (document.readyState === "loading") {
                 document.addEventListener("DOMContentLoaded", function() {
-                    console.log("DOMContentLoaded event triggered");
                     updateContent();
                 });
-            } else {  // DOM is already fully loaded
+            } else {
                 console.log("DOM already loaded, updating content immediately");
                 updateContent();
             }
@@ -116,7 +115,6 @@ requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBacken
             console.error("Error changing language:", err);
             return;
         }
-        console.log("Language changed to:", lang);
         updateContent();
     });
 
