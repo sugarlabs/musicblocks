@@ -59,13 +59,13 @@ class LanguageBox {
      * @returns {void}
      */
     ja_onclick() {
-    this._language = "ja";
-    this.activity.storage.kanaPreference = "kanji";
-    this.hide();
+        this._language = "ja-kanji";
+        this.activity.storage.kanaPreference = "kanji";
+        this.hide();
     }
 
     kana_onclick() {
-        this._language = "ja";
+        this._language = "ja-kana";
         this.activity.storage.kanaPreference = "kana";
         this.hide();
     }

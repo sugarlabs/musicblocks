@@ -138,13 +138,13 @@ describe("setupMeterActions", () => {
             [5000,0.25, ["maximum 1/4 beats per minute is 1000"], 1000, 1],
         ])(
             "setBPM(%i) should handle %s range", (bpm, factor, errors, expected, errBlk) => {
-            activity.errorMsg.mockClear();
-            Singer.MeterActions.setBPM(bpm, factor, 0, errBlk);
-            if (errors.length) {
-                errors.forEach(msg => expect(activity.errorMsg).toHaveBeenCalledWith(msg, errBlk));
-            }
-            expect(targetTurtle.singer.bpm).toContain(expected);
-        });
+                activity.errorMsg.mockClear();
+                Singer.MeterActions.setBPM(bpm, factor, 0, errBlk);
+                if (errors.length) {
+                    errors.forEach(msg => expect(activity.errorMsg).toHaveBeenCalledWith(msg, errBlk));
+                }
+                expect(targetTurtle.singer.bpm).toContain(expected);
+            });
     });
 
     describe("master BPM settings", () => {
@@ -155,14 +155,14 @@ describe("setupMeterActions", () => {
             [5000,["maximum 1/4 beats per minute is 1000"], 1000],
         ])(
             "setMasterBPM(%i) should result in masterBPM %i", (bpm, errors, expected) => {
-            activity.errorMsg.mockClear();
-            Singer.MeterActions.setMasterBPM(bpm, 0.25, 1);
-            if (errors.length) {
-                errors.forEach(msg => expect(activity.errorMsg).toHaveBeenCalledWith(msg, 1));
-            }
-            expect(Singer.masterBPM).toBe(expected);
-            if (!errors.length) expect(Singer.defaultBPMFactor).toBe(TONEBPM / expected);
-        });
+                activity.errorMsg.mockClear();
+                Singer.MeterActions.setMasterBPM(bpm, 0.25, 1);
+                if (errors.length) {
+                    errors.forEach(msg => expect(activity.errorMsg).toHaveBeenCalledWith(msg, 1));
+                }
+                expect(Singer.masterBPM).toBe(expected);
+                if (!errors.length) expect(Singer.defaultBPMFactor).toBe(TONEBPM / expected);
+            });
     });
 
     it("should set a listener for every beat", () => {
@@ -354,7 +354,7 @@ describe("setupMeterActions", () => {
     test.each([
         [null],
         [0]
-    ])('should return 0 when noteValue is %p', (noteValue) => {
+    ])("should return 0 when noteValue is %p", (noteValue) => {
         const result = Singer.MeterActions.getNotesPlayed(noteValue, 0);
         expect(result).toBe(0);
     });
@@ -396,7 +396,7 @@ describe("setupMeterActions", () => {
     });
 
     it("should calculate measure count correctly", () => {
-        targetTurtle.singer.notesPlayed = [9, 1]; 
+        targetTurtle.singer.notesPlayed = [9, 1];
         targetTurtle.singer.pickup = 1;
         targetTurtle.singer.noteValuePerBeat = 1;
         targetTurtle.singer.beatsPerMeasure = 4;
@@ -408,7 +408,7 @@ describe("setupMeterActions", () => {
     test.each([
         [[], 80, 80],
         [[80, 120], undefined, 120]
-    ])('getBPM with singer.bpm %p and masterBPM %p returns %p', (bpmArray, _, expected) => {
+    ])("getBPM with singer.bpm %p and masterBPM %p returns %p", (bpmArray, _, expected) => {
         targetTurtle.singer.bpm = bpmArray;
         Singer.masterBPM = 80;
         const result = Singer.MeterActions.getBPM(0);
@@ -440,9 +440,9 @@ describe("setupMeterActions", () => {
         });
 
         test.each([
-            [0, 1/4, 'beatsPerMeasure', 4],
-            [4, 0, 'noteValuePerBeat', 4]
-        ])('setMeter(%p, %p) defaults %s to %i', (beats, noteValue, prop, expected) => {
+            [0, 1/4, "beatsPerMeasure", 4],
+            [4, 0, "noteValuePerBeat", 4]
+        ])("setMeter(%p, %p) defaults %s to %i", (beats, noteValue, prop, expected) => {
             Singer.MeterActions.setMeter(beats, noteValue, 0);
             expect(targetTurtle.singer[prop]).toBe(expected);
         });

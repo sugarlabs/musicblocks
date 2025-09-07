@@ -66,62 +66,65 @@ const changeImage = (imgElement, from, to) => {
  */
 function _(text, options = {}) {
     if (!text) return "";
-
+    console.log(text);
     try {
-        const removeChars = [
-            ",", "(", ")", "?", "¿", "<", ">", ".", "\n", '"',
-            ":", "%s", "%d", "/", "'", ";", "×", "!", "¡"
-        ];
-        
+        const removeChars = [",","(",")","?","¿","<",">",".","\n",'"',":","%s","%d","/","'",";","×","!","¡"];
         let cleanedText = text;
-        for (let char of removeChars) {
-            cleanedText = cleanedText.split(char).join("");
-        }
+        for (let char of removeChars) cleanedText = cleanedText.split(char).join("");
 
         let translated = "";
         const lang = i18next.language;
-        let subLang = "";
 
-        if (lang.includes("kanji") || lang.includes("kana")) {
-            subLang = lang.includes("kana") ? "=)kana" : "=)kanji";
-            translated = i18next.t(`${text}${subLang}`, options);
-            if (translated === `${text}${subLang}`) {
-                translated = i18next.t(text, options);
+        if (lang.startsWith("ja")) {
+            const kanaPref = localStorage.getItem("kanaPreference") || "kanji";
+            const script = (kanaPref === "kana") ? "kana" : "kanji";
+
+            const resolveObj = (key) => {
+                let obj = i18next.t(key, { ...options, ns: undefined, returnObjects: true });
+
+                if (obj && typeof obj === "object") {
+                    return obj[script] || key;
+                }
+
+                if (typeof obj === "string") {
+                    return obj;
+                }
+
+                return key;
+            };
+
+            translated = resolveObj(text);
+            if (!translated || translated === text) translated = resolveObj(cleanedText);
+            if (!translated || translated === text) translated = resolveObj(text.toLowerCase());
+            if (!translated || translated === text) {
+                const titleCase = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+                translated = resolveObj(titleCase);
+            }
+            if (!translated || translated === text) {
+                const hyphenatedText = cleanedText.replace(/ /g, "-");
+                translated = resolveObj(hyphenatedText);
+            }
+        } else {
+            translated = i18next.t(text, options);
+            if (!translated || translated === text) translated = i18next.t(cleanedText, options);
+            if (!translated || translated === text) translated = i18next.t(text.toLowerCase(), options);
+            if (!translated || translated === text) {
+                const titleCase = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+                translated = i18next.t(titleCase, options);
+            }
+            if (!translated || translated === text) {
+                const hyphenatedText = cleanedText.replace(/ /g, "-");
+                translated = i18next.t(hyphenatedText, options);
             }
         }
-        else {
-            translated = i18next.t(text, options);
-        }
 
-        if (translated && translated === text) {
-            return translated;
-        }
-
-        if (!translated || translated === text) {
-            translated = i18next.t(cleanedText, options);
-        }
-
-        if (!translated || translated === text) {
-            translated = i18next.t(text.toLowerCase(), options);
-        }
-
-        if (!translated || translated === text) {
-            const titleCase = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
-            translated = i18next.t(titleCase, options);
-        }
-
-        let hyphenatedText = cleanedText.replace(/ /g, "-");
-        if (!translated || translated === text) {
-            translated = i18next.t(hyphenatedText, options);
-        }
-
-        translated = translated || text;
-
-        return translated;
+        return translated || text;
     } catch (e) {
         return text;
     }
 }
+
+
 
 /**
  * A string formatting function using placeholder substitution.

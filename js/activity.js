@@ -310,6 +310,7 @@ class Activity {
             let lang = "en";
             if (this.storage.languagePreference !== undefined) {
                 lang = this.storage.languagePreference;
+                if (lang.startsWith("ja")) lang = "ja";  // normalize Japanese
                 i18next.changeLanguage(lang);
             } else {
                 lang = navigator.language;
