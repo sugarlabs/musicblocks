@@ -17,34 +17,59 @@ import os
 import json
 import re
 
-def convert_po_to_json(po_file, output_dir):
-    """Convert a .po file to .json reading only msgid and msgstr lines."""
-
-    json_data = {}
+def parse_po_file(po_file):
+    """Parse a .po file and return a dict of {msgid: msgstr}."""
+    data = {}
     current_msgid = None
     current_msgstr = None
 
     with open(po_file, "r", encoding="utf-8") as f:
         for line in f:
-            # Ignore all lines except those with msgid or msgstr
             line = line.strip()
             if line.startswith("msgid"):
                 current_msgid = re.findall(r'"(.*)"', line)[0]
             elif line.startswith("msgstr"):
                 current_msgstr = re.findall(r'"(.*)"', line)[0]
-                # Save the pair if msgid is present
                 if current_msgid is not None:
-                    json_data[current_msgid] = current_msgstr or current_msgid
-                    current_msgid = None  # Reset for the next pair
+                    data[current_msgid] = current_msgstr or current_msgid
+                    current_msgid = None
+    return data
 
-    # Extract language code (e.g., 'fr' from 'fr.po')
+def convert_po_to_json(po_file, output_dir):
+    """Convert a .po file to .json. Special case: ja.po + ja-kana.po -> merged ja.json."""
+
     lang_code = os.path.splitext(os.path.basename(po_file))[0]
-    output_path = os.path.join(output_dir, f"{lang_code}.json")
 
+    # Special handling for Japanese
+    if lang_code in ["ja", "ja-kana"]:
+        ja_file = os.path.join(os.path.dirname(po_file), "ja.po")
+        kana_file = os.path.join(os.path.dirname(po_file), "ja-kana.po")
+
+        if os.path.exists(ja_file) and os.path.exists(kana_file):
+            ja_dict = parse_po_file(ja_file)
+            kana_dict = parse_po_file(kana_file)
+
+            combined = {}
+            all_keys = set(ja_dict.keys()) | set(kana_dict.keys())
+            for key in all_keys:
+                combined[key] = {
+                    "kanji": ja_dict.get(key, key),
+                    "kana": kana_dict.get(key, key),
+                }
+
+            output_path = os.path.join(output_dir, "ja.json")
+            os.makedirs(output_dir, exist_ok=True)
+            with open(output_path, "w", encoding="utf-8") as f:
+                json.dump(combined, f, indent=2, ensure_ascii=False)
+            print(f"✅ Combined ja.po + ja-kana.po → {output_path}")
+            return  # Don’t fall through to default case
+
+    # Default for all other langs
+    json_data = parse_po_file(po_file)
+    output_path = os.path.join(output_dir, f"{lang_code}.json")
     os.makedirs(output_dir, exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(json_data, f, indent=2, ensure_ascii=False)
-
     print(f"✅ Converted {po_file} → {output_path}")
 
 def convert_all_po_files(po_dir, output_dir):
