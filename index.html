@@ -454,6 +454,7 @@
                     <li><a id="ko"></a></li>
                     <li><a id="zhCN"></a></li>
                     <li><a id="th"></a></li>
+                    <li><a id="tr"></a></li>
                     <li><a id="ayc"></a></li>
                     <li><a id="quz"></a></li>
                     <li><a id="gug"></a></li>
@@ -543,8 +544,8 @@
                 }
 
                 const container = document.getElementById("loading-media");
-                const content = lang === "ja"
-                    ? `<img src="loading-animation-ja.svg" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
+                const content = lang.startsWith("ja")                    
+                ? `<img src="loading-animation-ja.svg" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
                     : `<video loop autoplay muted playsinline fetchpriority="high" style="width: 90%; height: 100%; object-fit: contain;">
                         <source src="loading-animation.webm" type="video/webm">
                         <source src="loading-animation.mp4" type="video/mp4">

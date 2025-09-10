@@ -173,8 +173,8 @@ describe("setupDrumActions", () => {
     });
 
     const actionConfigs = [
-        ['setDrum', '_setdrum_0', true],
-        ['mapPitchToDrum', '_mapdrum_0', false],
+        ["setDrum", "_setdrum_0", true],
+        ["mapPitchToDrum", "_mapdrum_0", false],
     ];
     describe.each(actionConfigs)("%s", (actionName, prefix, resetPitchDrumTable) => {
         beforeEach(() => {
@@ -186,37 +186,37 @@ describe("setupDrumActions", () => {
             global.Mouse.getMouseFromTurtle.mockReturnValue(null);
         });
 
-        it('sets drum style and listener', () => {
+        it("sets drum style and listener", () => {
             Singer.DrumActions[actionName]("d1", 0, 1);
-            expect(targetTurtle.singer.drumStyle).toContain('drum1');
+            expect(targetTurtle.singer.drumStyle).toContain("drum1");
             expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, prefix);
             expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(0, prefix, expect.any(Function));
         });
 
-        it('handles MusicBlocks.isRun case', () => {
+        it("handles MusicBlocks.isRun case", () => {
             const mockMouse = { MB: { listeners: [] } };
             global.MusicBlocks.isRun = true;
             global.Mouse.getMouseFromTurtle.mockReturnValue(mockMouse);
-            Singer.DrumActions[actionName]('d1', 0);
-            expect(targetTurtle.singer.drumStyle).toContain('drum1');
+            Singer.DrumActions[actionName]("d1", 0);
+            expect(targetTurtle.singer.drumStyle).toContain("drum1");
             expect(mockMouse.MB.listeners).toContain(prefix);
         });
 
-        it('handles direct drum name input', () => {
-            Singer.DrumActions[actionName]('drum2', 0, 1);
-            expect(targetTurtle.singer.drumStyle).toContain('drum2');
+        it("handles direct drum name input", () => {
+            Singer.DrumActions[actionName]("drum2", 0, 1);
+            expect(targetTurtle.singer.drumStyle).toContain("drum2");
         });
 
-        it('handles rhythm ruler', () => {
+        it("handles rhythm ruler", () => {
             activity.logo.inRhythmRuler = true;
-            Singer.DrumActions[actionName]('d1', 0, 1);
+            Singer.DrumActions[actionName]("d1", 0, 1);
             expect(activity.logo._currentDrumBlock).toBe(1);
             expect(activity.logo.rhythmRuler.Drums).toContain(1);
             expect(activity.logo.rhythmRuler.Rulers).toHaveLength(1);
         });
 
-        it('removes drumStyle on listener', () => {
-            Singer.DrumActions[actionName]('d1', 0, 1);
+        it("removes drumStyle on listener", () => {
+            Singer.DrumActions[actionName]("d1", 0, 1);
             const listenerFn = activity.logo.setTurtleListener.mock.calls[0][2];
             listenerFn();
             expect(targetTurtle.singer.drumStyle).toHaveLength(0);
@@ -225,8 +225,8 @@ describe("setupDrumActions", () => {
             }
         });
 
-        it('only adds listener when blk undefined and not running', () => {
-            Singer.DrumActions[actionName]('d1', 0);
+        it("only adds listener when blk undefined and not running", () => {
+            Singer.DrumActions[actionName]("d1", 0);
             expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
             expect(global.Mouse.getMouseFromTurtle).not.toHaveBeenCalled();
             expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(
@@ -236,10 +236,10 @@ describe("setupDrumActions", () => {
             );
         });
 
-        it('skips mouse listener when isRun and mouse null', () => {
+        it("skips mouse listener when isRun and mouse null", () => {
             global.MusicBlocks.isRun = true;
             global.Mouse.getMouseFromTurtle.mockReturnValue(null);
-            Singer.DrumActions[actionName]('d1', 0);
+            Singer.DrumActions[actionName]("d1", 0);
             expect(activity.logo.setDispatchBlock).not.toHaveBeenCalled();
             expect(global.Mouse.getMouseFromTurtle).toHaveBeenCalledWith(expect.any(Object));
             expect(activity.logo.setTurtleListener).toHaveBeenCalledWith(

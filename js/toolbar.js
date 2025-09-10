@@ -99,6 +99,7 @@ class Toolbar {
                 ["kana", _("にほんご"), "innerHTML"],
                 ["zhCN", _("中文"), "innerHTML"],
                 ["th", _("ภาษาไทย"), "innerHTML"],
+                ["tr", _("Turkish"), "innerHTML"],
                 ["ayc", _("aymara"), "innerHTML"],
                 ["quz", _("quechua"), "innerHTML"],
                 ["gug", _("guarani"), "innerHTML"],
@@ -172,6 +173,7 @@ class Toolbar {
                 _("にほんご"),
                 _("中文"),
                 _("ภาษาไทย"),
+                _("Turkish"),
                 _("aymara"),
                 _("quechua"),
                 _("guarani"),
@@ -232,6 +234,7 @@ class Toolbar {
                 ["kana", _("にほんご"), "innerHTML"],
                 ["zhCN", _("中文"), "innerHTML"],
                 ["th", _("ภาษาไทย"), "innerHTML"],
+                ["tr", _("Turkish"), "innerHTML"],
                 ["ayc", _("aymara"), "innerHTML"],
                 ["quz", _("quechua"), "innerHTML"],
                 ["gug", _("guarani"), "innerHTML"],
@@ -293,6 +296,7 @@ class Toolbar {
                 _("にほんご"),
                 _("中文"),
                 _("ภาษาไทย"),
+                _("Turkish"),
                 _("aymara"),
                 _("quechua"),
                 _("guarani"),
@@ -1117,7 +1121,7 @@ class Toolbar {
     renderLanguageSelectIcon(languageBox) {
         const languageSelectIcon = docById("languageSelectIcon");
         const languages = [
-            "enUS", "enUK", "es", "pt", "ko", "ja", "kana", "zhCN", "th",
+            "enUS", "enUK", "es", "pt", "ko", "ja", "kana", "zhCN", "th", "tr",
             "ayc", "quz", "gug", "hi", "ibo", "ar", "te", "he", "ur"
         ];
     

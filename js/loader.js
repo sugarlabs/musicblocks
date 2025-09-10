@@ -27,9 +27,100 @@ requirejs.config({
         prefixfree: "../bower_components/prefixfree/prefixfree.min",
         samples: "../sounds/samples",
         planet: "../js/planet",
-        tonejsMidi: "../node_modules/@tonejs/midi/dist/Midi"
+        tonejsMidi: "../node_modules/@tonejs/midi/dist/Midi",
+        i18next: "../node_modules/i18next/dist/umd/i18next.min",
+        i18nextHttpBackend: "../node_modules/i18next-http-backend/i18nextHttpBackend.min"
     },
     packages: []
 });
 
-requirejs(["utils/utils", "activity/activity"]);
+requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBackend) {
+
+    function updateContent() {
+        console.log("updateContent() called");  // Debugging line
+        const elements = document.querySelectorAll("[data-i18n]");
+
+        elements.forEach((element) => {
+            const key = element.getAttribute("data-i18n");
+            const translation = i18next.t(key);
+            element.textContent = translation;
+        });
+    }
+
+    async function initializeI18next() {
+        return new Promise((resolve, reject) => {
+            i18next
+                .use(i18nextHttpBackend)
+                .init({
+                    lng: "en",
+                    fallbackLng: "en",
+                    keySeparator: false,
+                    nsSeparator: false,
+                    interpolation: {
+                        escapeValue: false
+                    },
+                    backend: {
+                        loadPath: "locales/{{lng}}.json?v="+Date.now()
+                    }
+                }, function(err, t) {
+                    if (err) {
+                        console.error("i18next init failed:", err);
+                        reject(err);
+                    } else {
+                        console.log("i18next initialized");
+                        window.i18next = i18next;
+                        console.log("i18next Store:", i18next.store.data);
+                        resolve(i18next);
+                    }
+                });
+            
+
+            i18next.on("initialized", function() {
+                console.log("i18next initialized");
+            });
+
+            i18next.on("loaded", function(loaded) {
+                console.log("i18next loaded:", loaded);
+            });
+
+         
+
+    
+        });
+    }
+
+    async function main() {
+        try {
+            await initializeI18next();
+
+            if (document.readyState === "loading") {
+                document.addEventListener("DOMContentLoaded", function() {
+                    updateContent();
+                });
+            } else {
+                console.log("DOM already loaded, updating content immediately");
+                updateContent();
+            }
+        } catch (error) {
+            console.error("Error initializing i18next:", error);
+        }
+    }
+
+    main().then(() => {
+        requirejs(["utils/utils", "activity/activity"]);
+    });
+
+    i18next.changeLanguage(lang, (err, t) => {
+        if (err) {
+            console.error("Error changing language:", err);
+            return;
+        }
+        updateContent();
+    });
+
+    i18next.on("languageChanged", function() {
+        updateContent();
+    });
+});
+
+// requirejs(["utils/utils", "activity/activity"]);

@@ -138,7 +138,7 @@ describe("LanguageBox Class", () => {
 
             languageBox.ja_onclick();
 
-            expect(languageBox._language).toBe("ja");
+            expect(languageBox._language).toBe("ja-kanji");
             expect(mockActivity.storage.kanaPreference).toBe("kanji");
             expect(hideSpy).toHaveBeenCalled();
         });
@@ -148,7 +148,7 @@ describe("LanguageBox Class", () => {
 
             languageBox.kana_onclick();
 
-            expect(languageBox._language).toBe("ja");
+            expect(languageBox._language).toBe("ja-kana");
             expect(mockActivity.storage.kanaPreference).toBe("kana");
             expect(hideSpy).toHaveBeenCalled();
         });

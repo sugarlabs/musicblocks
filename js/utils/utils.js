@@ -64,62 +64,68 @@ const changeImage = (imgElement, from, to) => {
  * @param {string} text - The input text to be translated.
  * @returns {string} The translated text.
  */
-function _(text) {
-    if (text === null || text === undefined) {
-        // console.debug("null string passed to _");
-        return "";
-    }
+function _(text, options = {}) {
+    if (!text) return "";
 
     try {
-        // Remove unwanted characters using a single regex
-        const unwantedChars = /[,\()?¿<>.\n":%s%d\/';×!¡]/g;
-        const cleanedText = text.replace(unwantedChars, "").replace(/ /g, "-");
+        const removeChars = [",","(",")","?","¿","<",">",".","\n",'"',":","%s","%d","/","'",";","×","!","¡"];
+        let cleanedText = text;
+        for (let char of removeChars) cleanedText = cleanedText.split(char).join("");
 
-        if (localStorage.kanaPreference === "kana") {
-            const lang = document.webL10n.getLanguage();
-            if (lang === "ja") {
-                cleanedText = "kana-" + cleanedText;
+        let translated = "";
+        const lang = i18next.language;
+
+        if (lang.startsWith("ja")) {
+            const kanaPref = localStorage.getItem("kanaPreference") || "kanji";
+            const script = (kanaPref === "kana") ? "kana" : "kanji";
+
+            const resolveObj = (key) => {
+                let obj = i18next.t(key, { ...options, ns: undefined, returnObjects: true });
+
+                if (obj && typeof obj === "object") {
+                    return obj[script] || key;
+                }
+
+                if (typeof obj === "string") {
+                    return obj;
+                }
+
+                return key;
+            };
+
+            translated = resolveObj(text);
+            if (!translated || translated === text) translated = resolveObj(cleanedText);
+            if (!translated || translated === text) translated = resolveObj(text.toLowerCase());
+            if (!translated || translated === text) {
+                const titleCase = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+                translated = resolveObj(titleCase);
+            }
+            if (!translated || translated === text) {
+                const hyphenatedText = cleanedText.replace(/ /g, "-");
+                translated = resolveObj(hyphenatedText);
+            }
+        } else {
+            translated = i18next.t(text, options);
+            if (!translated || translated === text) translated = i18next.t(cleanedText, options);
+            if (!translated || translated === text) translated = i18next.t(text.toLowerCase(), options);
+            if (!translated || translated === text) {
+                const titleCase = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+                translated = i18next.t(titleCase, options);
+            }
+            if (!translated || translated === text) {
+                const hyphenatedText = cleanedText.replace(/ /g, "-");
+                translated = i18next.t(hyphenatedText, options);
             }
         }
 
-        // Helper function to get translation with case matching
-        function getTranslationWithCase(inputText, caseType) {
-            const translatedText = document.webL10n.get(inputText);
-            if (!translatedText || translatedText === inputText) {
-                return null; // No translation found
-            }
-        
-            switch (caseType) {
-                case "upper":
-                    return translatedText.toUpperCase();
-                case "lower":
-                    return translatedText.toLowerCase();
-                case "title":
-                    return translatedText.charAt(0).toUpperCase() + translatedText.slice(1).toLowerCase();
-                default:
-                    return translatedText;
-            }
-        }
-
-        // Try translations in order of priority
-        const translations = [
-            getTranslationWithCase(text, "original"), // Original case
-            getTranslationWithCase(cleanedText, "original"), // Cleaned text
-            getTranslationWithCase(text.toLowerCase(), "lower"), // Lowercase
-            getTranslationWithCase(
-                text.charAt(0).toUpperCase() + text.slice(1).toLowerCase(),
-                "title" // Title case
-            ),
-        ];
-
-        const validTranslation = translations.find(t => t !== null);
-        return validTranslation || text;
-
+        return translated || text;
     } catch (e) {
-        // console.debug("i18n error: " + text);
         return text;
     }
 }
+
+
+
 
 /**
  * A string formatting function using placeholder substitution.

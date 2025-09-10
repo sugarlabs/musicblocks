@@ -40,7 +40,7 @@ describe("setupVolumeActions", () => {
         };
         
         global.instruments = {
-            0: { 
+            0: {
                 synth1: { connect: jest.fn() },
                 piano: { connect: jest.fn() }
             },
@@ -55,11 +55,11 @@ describe("setupVolumeActions", () => {
         
         global.last = jest.fn(array => array[array.length - 1]);
         global._ = jest.fn(msg => msg);
-        global.VOICENAMES = { 
+        global.VOICENAMES = {
             Piano: ["Piano", "piano"],
             Violin: ["Violin", "violin"]
         };
-        global.DRUMNAMES = { 
+        global.DRUMNAMES = {
             Kick: ["Kick", "kick"],
             Snare: ["Snare", "snare"]
         };
@@ -129,11 +129,11 @@ describe("setupVolumeActions", () => {
     
         targetTurtle = {
             singer: {
-                synthVolume: { 
+                synthVolume: {
                     default: [DEFAULTVOLUME],
                     piano: [DEFAULTVOLUME]
                 },
-                crescendoInitialVolume: { 
+                crescendoInitialVolume: {
                     default: [DEFAULTVOLUME],
                     piano: [DEFAULTVOLUME]
                 },
