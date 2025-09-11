@@ -980,7 +980,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                 tur.singer.inNoteBlock.push(blk);
 
                 const bpmFactor =
-                    TONEBPM / tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM;
+                    TONEBPM / (tur.singer.bpm.length > 0 ? last(tur.singer.bpm) : Singer.masterBPM);
 
                 const beatValue = bpmFactor / noteBeatValue / arg0;
 
@@ -1003,7 +1003,7 @@ function setupRhythmBlockPaletteBlocks(activity) {
                     }
 
                     __rhythmPlayNote(
-                        noteBeatValue * arg0,
+                        noteBeatValue,
                         blk,
                         turtle,
                         __callback,
