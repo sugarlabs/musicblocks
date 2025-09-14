@@ -49,6 +49,11 @@ function LegoWidget() {
     this.selectedInstrument = "electronic synth";
     this.hasGeneratedVisualization = false; // Flag to prevent double PNG downloads
 
+    // Eye dropper and background color properties
+    this.eyeDropperMode = false;
+    this.selectedBackgroundColor = { name: "green", hue: 120 }; // Default green background
+    this.eyeDropperCursor = null;
+
     // Pitch block handling properties (similar to PhraseMaker)
     this.blockNo = null;
     this.rowLabels = [];
@@ -212,6 +217,7 @@ function LegoWidget() {
 
         widgetWindow.onclose = () => {
             this._stopWebcam();
+            this._deactivateEyeDropper(); // Clean up eye dropper mode
             this.running = false;
             widgetWindow.destroy();
         };
@@ -484,7 +490,6 @@ function LegoWidget() {
      */
     this.createZoomControls = function() {
         this.zoomControls = document.createElement("div");
-        this.zoomControls.style.display = "none";
         this.zoomControls.style.position = "absolute"; // Changed to absolute positioning
         this.zoomControls.style.bottom = "0";
         this.zoomControls.style.left = "180px"; // Align with image area
@@ -573,6 +578,52 @@ function LegoWidget() {
         this.spacingValue.style.fontSize = "12px";
         this.spacingValue.style.minWidth = "40px";
 
+        // Add separator
+        const separator2 = document.createElement("span");
+        separator2.textContent = "|";
+        separator2.style.margin = "0 8px";
+        separator2.style.color = "#888";
+
+        // Add eye dropper button
+        const eyeDropperLabel = document.createElement("span");
+        eyeDropperLabel.textContent = "Eye Dropper:";
+        eyeDropperLabel.style.fontSize = "12px";
+        eyeDropperLabel.style.fontWeight = "bold";
+
+        this.eyeDropperButton = document.createElement("button");
+        this.eyeDropperButton.textContent = "🎨";
+        this.eyeDropperButton.style.fontSize = "12px";
+        this.eyeDropperButton.style.padding = "4px 8px";
+        this.eyeDropperButton.style.border = "1px solid #ccc";
+        this.eyeDropperButton.style.borderRadius = "4px";
+        this.eyeDropperButton.style.backgroundColor = "#f8f8f8";
+        this.eyeDropperButton.style.cursor = "pointer";
+        this.eyeDropperButton.title = "Click to activate eye dropper mode";
+        this.eyeDropperButton.onclick = () => this._toggleEyeDropper();
+
+        // Add separator
+        const separator3 = document.createElement("span");
+        separator3.textContent = "|";
+        separator3.style.margin = "0 8px";
+        separator3.style.color = "#888";
+
+        // Add background color display
+        const backgroundLabel = document.createElement("span");
+        backgroundLabel.textContent = "Background:";
+        backgroundLabel.style.fontSize = "12px";
+        backgroundLabel.style.fontWeight = "bold";
+
+        this.backgroundColorDisplay = document.createElement("span");
+        this.backgroundColorDisplay.textContent = this.selectedBackgroundColor.name;
+        this.backgroundColorDisplay.style.fontSize = "12px";
+        this.backgroundColorDisplay.style.padding = "4px 8px";
+        this.backgroundColorDisplay.style.border = "1px solid #ccc";
+        this.backgroundColorDisplay.style.borderRadius = "4px";
+        this.backgroundColorDisplay.style.backgroundColor = this._getColorHex(this.selectedBackgroundColor.name);
+        this.backgroundColorDisplay.style.color = this._getContrastColor(this.selectedBackgroundColor.name);
+        this.backgroundColorDisplay.style.minWidth = "60px";
+        this.backgroundColorDisplay.style.textAlign = "center";
+
         this.zoomControls.appendChild(instrumentLabel);
         this.zoomControls.appendChild(this.instrumentButton);
         this.zoomControls.appendChild(zoomLabel);
@@ -586,6 +637,12 @@ function LegoWidget() {
         this.zoomControls.appendChild(this.spacingSlider);
         this.zoomControls.appendChild(spacingIn);
         this.zoomControls.appendChild(this.spacingValue);
+        this.zoomControls.appendChild(separator2);
+        this.zoomControls.appendChild(eyeDropperLabel);
+        this.zoomControls.appendChild(this.eyeDropperButton);
+        this.zoomControls.appendChild(separator3);
+        this.zoomControls.appendChild(backgroundLabel);
+        this.zoomControls.appendChild(this.backgroundColorDisplay);
     };
 
     /**
@@ -802,10 +859,10 @@ function LegoWidget() {
             else if (duration < 1500) noteValue = 4;   // quarter note (750-1500ms)
             else if (duration < 3000) noteValue = 2;   // half note (1500-3000ms)
             else noteValue = 1;                        // whole note (3000ms+)
-            let hasNonGreenColor = false;
+            let hasNonBackgroundColor = false;
             let pitches = [];  // Array to collect pitches for this time column
 
-            // Check each row for non-green colors in this time range
+            // Check each row for non-background colors in this time range
             this.colorData.forEach((rowData, rowIndex) => {
                 if (rowData.colorSegments) {
                     let currentTime = 0;
@@ -824,9 +881,9 @@ function LegoWidget() {
                             // Only count as significant if overlap is substantial (>350ms)
                             // This prevents spillovers <350ms across blue lines from creating duplicate notes
                             if (overlapDuration > 350) {
-                                // Check if color is not green (meaning note should play)
-                                if (segment.color !== "green") {
-                                    hasNonGreenColor = true;
+                                // Check if color is not the selected background color (meaning note should play)
+                                if (segment.color !== this.selectedBackgroundColor.name) {
+                                    hasNonBackgroundColor = true;
                                     
                                     // Convert row data to pitch information
                                     const pitch = this._convertRowToPitch(rowData);
@@ -834,7 +891,7 @@ function LegoWidget() {
                                         pitches.push(pitch);
                                     }
                                 }
-                            } else if (segment.color !== "green") {
+                            } else if (segment.color !== this.selectedBackgroundColor.name) {
                                 // Ignore small overlaps without logging
                             }
                         }
@@ -849,7 +906,7 @@ function LegoWidget() {
                 pitches: pitches,
                 noteValue: noteValue,
                 duration: duration,
-                isRest: !hasNonGreenColor || pitches.length === 0
+                isRest: !hasNonBackgroundColor || pitches.length === 0
             });
         }
     };
@@ -1091,6 +1148,304 @@ function LegoWidget() {
     };
 
     /**
+     * Toggles eye dropper mode for background color selection.
+     * @private
+     * @returns {void}
+     */
+    this._toggleEyeDropper = function() {
+        this.eyeDropperMode = !this.eyeDropperMode;
+        
+        if (this.eyeDropperMode) {
+            this._activateEyeDropper();
+        } else {
+            this._deactivateEyeDropper();
+        }
+    };
+
+    /**
+     * Activates eye dropper mode.
+     * @private
+     * @returns {void}
+     */
+    this._activateEyeDropper = function() {
+        // Change cursor to crosshair for eye dropper mode
+        if (this.imageDisplayArea) {
+            this.imageDisplayArea.style.cursor = "crosshair";
+        }
+        
+        // Update button appearance
+        this.eyeDropperButton.style.backgroundColor = "#4CAF50";
+        this.eyeDropperButton.style.color = "white";
+        
+        // Add event listeners for hover preview and click selection
+        if (this.imageDisplayArea) {
+            this.imageDisplayArea.addEventListener('mousemove', this._handleEyeDropperHover);
+            this.imageDisplayArea.addEventListener('click', this._handleEyeDropperClick);
+            this.imageDisplayArea.addEventListener('mouseleave', this._handleEyeDropperLeave);
+        }
+        
+        // Create color preview tooltip
+        this._createColorPreviewTooltip();
+        
+        this.activity.textMsg(_("Eye dropper active - hover over image to preview colors, click to select background color"));
+    };
+
+    /**
+     * Deactivates eye dropper mode.
+     * @private
+     * @returns {void}
+     */
+    this._deactivateEyeDropper = function() {
+        // Reset cursor
+        if (this.imageDisplayArea) {
+            this.imageDisplayArea.style.cursor = "default";
+        }
+        
+        // Reset button appearance
+        this.eyeDropperButton.style.backgroundColor = "";
+        this.eyeDropperButton.style.color = "";
+        
+        // Remove event listeners
+        if (this.imageDisplayArea) {
+            this.imageDisplayArea.removeEventListener('mousemove', this._handleEyeDropperHover);
+            this.imageDisplayArea.removeEventListener('click', this._handleEyeDropperClick);
+            this.imageDisplayArea.removeEventListener('mouseleave', this._handleEyeDropperLeave);
+        }
+        
+        // Remove color preview tooltip
+        this._removeColorPreviewTooltip();
+    };
+
+    /**
+     * Handles eye dropper click to select background color.
+     * @private
+     * @param {Event} event - The click event
+     * @returns {void}
+     */
+    this._handleEyeDropperClick = function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        // Hide the preview tooltip
+        if (this.colorPreviewTooltip) {
+            this.colorPreviewTooltip.style.display = "none";
+        }
+        
+        // Get the clicked position relative to the image
+        const clickedColor = this._sampleColorAtPosition(event.clientX, event.clientY);
+        
+        if (clickedColor) {
+            this.selectedBackgroundColor = clickedColor;
+            this._deactivateEyeDropper();
+            this.eyeDropperMode = false;
+            
+            // Update UI to show selected color
+            this._updateBackgroundColorDisplay();
+            
+            this.activity.textMsg(_("Background color selected: ") + clickedColor.name);
+        } else {
+            this.activity.textMsg(_("Could not sample color - please try clicking on the image"));
+        }
+    }.bind(this);
+
+    /**
+     * Samples color at a specific screen position.
+     * @private
+     * @param {number} screenX - Screen X coordinate
+     * @param {number} screenY - Screen Y coordinate
+     * @returns {object|null} Color family object or null
+     */
+    this._sampleColorAtPosition = function(screenX, screenY) {
+        // Get the image or video element
+        let mediaElement = null;
+        if (this.imageWrapper) {
+            mediaElement = this.imageWrapper.querySelector('img') || this.imageWrapper.querySelector('video');
+        }
+
+        if (!mediaElement) {
+            return null;
+        }
+
+        // Create a temporary canvas to sample pixel data
+        const tempCanvas = document.createElement("canvas");
+        const ctx = tempCanvas.getContext("2d");
+
+        // Set canvas size to match the media element's natural size
+        tempCanvas.width = mediaElement.naturalWidth || mediaElement.videoWidth || mediaElement.width;
+        tempCanvas.height = mediaElement.naturalHeight || mediaElement.videoHeight || mediaElement.height;
+
+        // Draw the media element to the canvas
+        try {
+            ctx.drawImage(mediaElement, 0, 0, tempCanvas.width, tempCanvas.height);
+        } catch (e) {
+            console.log("Could not draw media element to canvas for color sampling:", e);
+            return null;
+        }
+
+        // Convert screen coordinates to image coordinates
+        const mediaRect = mediaElement.getBoundingClientRect();
+        const imageX = ((screenX - mediaRect.left) / mediaRect.width) * tempCanvas.width;
+        const imageY = ((screenY - mediaRect.top) / mediaRect.height) * tempCanvas.height;
+
+        // Ensure coordinates are within bounds
+        if (imageX < 0 || imageX >= tempCanvas.width || imageY < 0 || imageY >= tempCanvas.height) {
+            return null;
+        }
+
+        // Sample the pixel
+        const pixelData = ctx.getImageData(Math.floor(imageX), Math.floor(imageY), 1, 1).data;
+        const [r, g, b] = pixelData;
+
+        // Convert to color family
+        const hsl = this._rgbToHsl(r, g, b);
+        const colorFamily = this._getColorFamily(hsl[0], hsl[1], hsl[2]);
+
+        return colorFamily;
+    };
+
+    /**
+     * Creates a color preview tooltip for the eye dropper.
+     * @private
+     * @returns {void}
+     */
+    this._createColorPreviewTooltip = function() {
+        if (this.colorPreviewTooltip) {
+            this._removeColorPreviewTooltip();
+        }
+        
+        this.colorPreviewTooltip = document.createElement("div");
+        this.colorPreviewTooltip.style.position = "absolute";
+        this.colorPreviewTooltip.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+        this.colorPreviewTooltip.style.color = "white";
+        this.colorPreviewTooltip.style.padding = "8px 12px";
+        this.colorPreviewTooltip.style.borderRadius = "6px";
+        this.colorPreviewTooltip.style.fontSize = "12px";
+        this.colorPreviewTooltip.style.fontWeight = "bold";
+        this.colorPreviewTooltip.style.pointerEvents = "none";
+        this.colorPreviewTooltip.style.zIndex = "1000";
+        this.colorPreviewTooltip.style.display = "none";
+        this.colorPreviewTooltip.style.boxShadow = "0 2px 8px rgba(0,0,0,0.3)";
+        
+        // Add color swatch inside tooltip
+        this.colorSwatch = document.createElement("div");
+        this.colorSwatch.style.width = "20px";
+        this.colorSwatch.style.height = "20px";
+        this.colorSwatch.style.border = "2px solid white";
+        this.colorSwatch.style.borderRadius = "3px";
+        this.colorSwatch.style.display = "inline-block";
+        this.colorSwatch.style.marginRight = "8px";
+        this.colorSwatch.style.verticalAlign = "middle";
+        
+        this.colorPreviewTooltip.appendChild(this.colorSwatch);
+        
+        this.colorPreviewText = document.createElement("span");
+        this.colorPreviewText.style.verticalAlign = "middle";
+        this.colorPreviewTooltip.appendChild(this.colorPreviewText);
+        
+        document.body.appendChild(this.colorPreviewTooltip);
+    };
+
+    /**
+     * Removes the color preview tooltip.
+     * @private
+     * @returns {void}
+     */
+    this._removeColorPreviewTooltip = function() {
+        if (this.colorPreviewTooltip) {
+            document.body.removeChild(this.colorPreviewTooltip);
+            this.colorPreviewTooltip = null;
+            this.colorSwatch = null;
+            this.colorPreviewText = null;
+        }
+    };
+
+    /**
+     * Handles eye dropper hover to show color preview.
+     * @private
+     * @param {Event} event - The mouse move event
+     * @returns {void}
+     */
+    this._handleEyeDropperHover = function(event) {
+        if (!this.eyeDropperMode || !this.colorPreviewTooltip) return;
+        
+        // Get the color at the current position
+        const hoveredColor = this._sampleColorAtPosition(event.clientX, event.clientY);
+        
+        if (hoveredColor) {
+            // Update tooltip content
+            this.colorSwatch.style.backgroundColor = this._getColorHex(hoveredColor.name);
+            this.colorPreviewText.textContent = hoveredColor.name.charAt(0).toUpperCase() + hoveredColor.name.slice(1);
+            
+            // Position tooltip near cursor
+            this.colorPreviewTooltip.style.left = (event.clientX + 15) + "px";
+            this.colorPreviewTooltip.style.top = (event.clientY - 40) + "px";
+            this.colorPreviewTooltip.style.display = "block";
+        } else {
+            this.colorPreviewTooltip.style.display = "none";
+        }
+    }.bind(this);
+
+    /**
+     * Handles mouse leave from eye dropper area.
+     * @private
+     * @param {Event} event - The mouse leave event
+     * @returns {void}
+     */
+    this._handleEyeDropperLeave = function(event) {
+        if (this.colorPreviewTooltip) {
+            this.colorPreviewTooltip.style.display = "none";
+        }
+    }.bind(this);
+
+    /**
+     * Updates the background color display in the UI.
+     * @private
+     * @returns {void}
+     */
+    this._updateBackgroundColorDisplay = function() {
+        if (this.backgroundColorDisplay) {
+            this.backgroundColorDisplay.textContent = this.selectedBackgroundColor.name;
+            this.backgroundColorDisplay.style.backgroundColor = this._getColorHex(this.selectedBackgroundColor.name);
+            this.backgroundColorDisplay.style.color = this._getContrastColor(this.selectedBackgroundColor.name);
+        }
+    };
+
+    /**
+     * Gets hex color code for a color name.
+     * @private
+     * @param {string} colorName - The color name
+     * @returns {string} Hex color code
+     */
+    this._getColorHex = function(colorName) {
+        const colorMap = {
+            "red": "#FF0000",
+            "orange": "#FFA500",
+            "yellow": "#FFFF00",
+            "green": "#00FF00",
+            "blue": "#0000FF",
+            "purple": "#800080",
+            "pink": "#FFC0CB",
+            "cyan": "#00FFFF",
+            "magenta": "#FF00FF",
+            "white": "#FFFFFF",
+            "black": "#000000",
+            "gray": "#808080"
+        };
+        return colorMap[colorName] || "#808080";
+    };
+
+    /**
+     * Gets contrasting text color for a background color.
+     * @private
+     * @param {string} colorName - The color name
+     * @returns {string} Contrasting text color
+     */
+    this._getContrastColor = function(colorName) {
+        const lightColors = ["white", "yellow", "cyan", "pink", "orange"];
+        return lightColors.includes(colorName) ? "#000000" : "#FFFFFF";
+    };
+
+    /**
      * Makes image draggable.
      * @private
      * @param {HTMLElement} wrapper - The image wrapper element.
@@ -1272,6 +1627,13 @@ function LegoWidget() {
      * @param {HTMLElement} mediaElement - The image or video element
      * @returns {object|null} Color family object or null if should continue with normal sampling
      */
+    /**
+     * Checks if a canvas row is within the actual image bounds and returns appropriate color
+     * @private
+     * @param {object} line - The scanning line object
+     * @param {HTMLElement} mediaElement - The image or video element
+     * @returns {object|null} Color family object or null if should continue with normal sampling
+     */
     this._getColorForCanvasRow = function(line, mediaElement) {
         // Get the actual image display area
         const imageRect = mediaElement.getBoundingClientRect();
@@ -1287,8 +1649,8 @@ function LegoWidget() {
         
         // Check if row is completely outside image bounds (underflow/overflow)
         if (rowBottomInOverlay <= imageTop || rowTopInOverlay >= imageBottom) {
-            // Row is outside image - return green for empty canvas areas
-            return this._getColorFamilyByName("green");
+            // Row is outside image - return selected background color for empty canvas areas
+            return this.selectedBackgroundColor || this._getColorFamilyByName("green");
         }
         
         // Row is within or partially within image bounds - continue with normal color sampling
@@ -1302,7 +1664,7 @@ function LegoWidget() {
      * @returns {void}
      */
     this._showZoomControls = function() {
-        this.zoomControls.style.display = "flex";
+        // Controls are now always visible, just initialize their values
         this.currentZoom = 1;
         this.zoomSlider.value = "1";
         this.zoomValue.textContent = "100%";
@@ -1689,9 +2051,9 @@ function LegoWidget() {
         
             // Skip if this row is completely outside canvas bounds
             if (clampedTopPos >= canvasHeight || clampedBottomPos <= 0) {
-            // Fill this row with green color for the entire duration
+            // Fill this row with selected background color for the entire duration
                 this.colorData[this.colorData.length - 1].colorSegments.push({
-                    color: "green",
+                    color: this.selectedBackgroundColor.name,
                     duration: 5000, // Default scan duration
                     timestamp: performance.now()
                 });
@@ -1899,10 +2261,10 @@ function LegoWidget() {
             return;
         }
     
-        // Check if this row is outside image bounds - if so, use green
+        // Check if this row is outside image bounds - if so, use selected background color
         const boundColor = this._getColorForCanvasRow(line, mediaElement);
         if (boundColor) {
-        // Row is outside image bounds, force green color
+        // Row is outside image bounds, force selected background color
             if (!line.currentColor || line.currentColor.name !== boundColor.name) {
                 const timeSinceLastChange = line.lastColorChangeTime ? (now - line.lastColorChangeTime) : 1000;
                 if (timeSinceLastChange > 150) {
@@ -2312,7 +2674,7 @@ function LegoWidget() {
 
     /**
  * Plays all detected notes simultaneously, using filtered column boundaries.
- * Only plays when color is NOT green.
+ * Only plays when color is NOT the selected background color.
  * Updated to use same filtering logic as export (350ms minimum).
  * @param {Array} colorData - The colorData array from scanning.
  */
@@ -2332,13 +2694,13 @@ function LegoWidget() {
             const endTime = filteredBoundaries[colIndex + 1];
             const duration = endTime - startTime;
         
-            // Check each row for non-green colors in this time range
+            // Check each row for non-background colors in this time range
             colorData.forEach((rowData, rowIndex) => {
                 if (rowData.colorSegments && rowData.note) {
                     let currentTime = 0;
-                    let hasNonGreenColor = false;
+                    let hasNonBackgroundColor = false;
                 
-                    // Check if this time column overlaps with any non-green segments
+                    // Check if this time column overlaps with any non-background segments
                     for (const segment of rowData.colorSegments) {
                         const segmentStart = currentTime;
                         const segmentEnd = currentTime + segment.duration;
@@ -2352,18 +2714,18 @@ function LegoWidget() {
                         
                             // Only count as significant if overlap is substantial (>350ms)
                             // This prevents spillovers <350ms across blue lines from creating duplicate notes
-                            if (overlapDuration > 350 && segment.color !== "green") {
-                                hasNonGreenColor = true;
+                            if (overlapDuration > 350 && segment.color !== this.selectedBackgroundColor.name) {
+                                hasNonBackgroundColor = true;
                                 break;
-                            } else if (overlapDuration <= 350 && segment.color !== "green") {
+                            } else if (overlapDuration <= 350 && segment.color !== this.selectedBackgroundColor.name) {
                             // Ignore small overlaps during playback
                             }
                         }
                         currentTime += segment.duration;
                     }
                 
-                    // If we found non-green color, add note on/off events
-                    if (hasNonGreenColor) {
+                    // If we found non-background color, add note on/off events
+                    if (hasNonBackgroundColor) {
                         events.push({
                             time: startTime,
                             type: "on",
