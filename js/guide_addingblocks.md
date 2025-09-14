@@ -1,4 +1,4 @@
-# __How To Add Blocks__
+﻿# __How To Add Blocks__
 
 This document describes for developers how to add new blocks in
 support of additional functionality by changes to the core code of
@@ -181,9 +181,9 @@ both responsible for movement;sos
 ## References
 Sample block artwork
 
-![pitch name](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/pitchname.svg)
+![pitch name](https://rawgithub.com/sugarlabs/musicblocks/master/Docs/documentation/pitchname.svg)
 
-![note value](https://rawgithub.com/sugarlabs/musicblocks/master/documentation/notevalue.svg)
+![note value](https://rawgithub.com/sugarlabs/musicblocks/master/Docs/documentation/notevalue.svg)
 
 Valid blocks styles in turtleblocksjs:
 * `zeroArgBlock`: E.g., penup, pendown
@@ -231,3 +231,4 @@ You have to go to [turtledefs.js](https://github.com/sugarlabs/musicblocks/blob/
 Remember to add it under the right `palette`.
 
 You also need to add the `.svg` file (your example of usage of the Block) to the [musiclabs/documentation folder](https://github.com/sugarlabs/musicblocks/tree/master/documentation).
+
