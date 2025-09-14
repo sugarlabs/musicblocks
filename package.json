@@ -52,7 +52,7 @@
     "gulp-sass": "^5.1.0",
     "gulp-sourcemaps": "^2.6.5",
     "http-server": "^14.1.1",
-    "i18next": "^25.5.2",
+    "i18next": "^25.3.2",
     "i18next-http-backend": "^3.0.2",
     "lodash.template": "^4.5.0",
     "node": "^24.2.0",
