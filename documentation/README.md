@@ -654,9 +654,25 @@ try to make a corresponding change in the matrix.
 Note: You can construct a matrix from a chuck of blocks by including
 the chunk in the clamp of the _Pitch-time Marix_ block.
 
+
+![LEGO Bricks](./legobricks_block.svg "LEGO Bricks block")
+
+The _LEGO Bricks_ widget provides an innovative way to create music by analyzing colored LEGO brick patterns from images or live webcam feeds. This widget transforms visual art into musical compositions by detecting color changes and converting them into musical notes.
+
+The widget features an interactive interface where users can upload images of LEGO brick arrangements or use their webcam to capture live constructions. An eye dropper tool allows users to select the background color (such as green baseplates, white surfaces, or any colored background), ensuring accurate color detection regardless of the surface the LEGO bricks are placed on.
+
+As the widget scans the image with vertical lines, it detects different colored LEGO bricks and maps them to corresponding musical pitches. The scanning speed and column spacing can be adjusted for precise timing control. Non-background colors trigger musical notes, while areas matching the selected background color remain silent, creating natural rests in the composition.
+
+![LEGO Bricks Widget](./legobricks_widget.svg "LEGO Bricks Widget")
+
+The _LEGO Bricks_ widget supports multiple output formats: real-time audio playback during scanning, export as Music Blocks action blocks for further editing, and downloadable visualizations of the detected color patterns. This makes it an excellent tool for combining physical construction play with musical creativity, allowing users to literally build their melodies with LEGO bricks.
+
+![LEGO Bricks Demo](./legobricks_demo.svg "LEGO Bricks Widget Demo")
+
+If you want to read more about the LEGO Bricks widget, including detailed usage instructions and educational applications, see the [Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md#427-lego-bricks-widget).
+
 More details about all of the widgets are available in the
 [Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md).
-
 
 ## 8. Stats
 
