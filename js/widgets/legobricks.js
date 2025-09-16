@@ -1179,9 +1179,9 @@ function LegoWidget() {
         
         // Add event listeners for hover preview and click selection
         if (this.imageDisplayArea) {
-            this.imageDisplayArea.addEventListener('mousemove', this._handleEyeDropperHover);
-            this.imageDisplayArea.addEventListener('click', this._handleEyeDropperClick);
-            this.imageDisplayArea.addEventListener('mouseleave', this._handleEyeDropperLeave);
+            this.imageDisplayArea.addEventListener("mousemove", this._handleEyeDropperHover);
+            this.imageDisplayArea.addEventListener("click", this._handleEyeDropperClick);
+            this.imageDisplayArea.addEventListener("mouseleave", this._handleEyeDropperLeave);
         }
         
         // Create color preview tooltip
@@ -1207,9 +1207,9 @@ function LegoWidget() {
         
         // Remove event listeners
         if (this.imageDisplayArea) {
-            this.imageDisplayArea.removeEventListener('mousemove', this._handleEyeDropperHover);
-            this.imageDisplayArea.removeEventListener('click', this._handleEyeDropperClick);
-            this.imageDisplayArea.removeEventListener('mouseleave', this._handleEyeDropperLeave);
+            this.imageDisplayArea.removeEventListener("mousemove", this._handleEyeDropperHover);
+            this.imageDisplayArea.removeEventListener("click", this._handleEyeDropperClick);
+            this.imageDisplayArea.removeEventListener("mouseleave", this._handleEyeDropperLeave);
         }
         
         // Remove color preview tooltip
@@ -1259,7 +1259,7 @@ function LegoWidget() {
         // Get the image or video element
         let mediaElement = null;
         if (this.imageWrapper) {
-            mediaElement = this.imageWrapper.querySelector('img') || this.imageWrapper.querySelector('video');
+            mediaElement = this.imageWrapper.querySelector("img") || this.imageWrapper.querySelector("video");
         }
 
         if (!mediaElement) {
