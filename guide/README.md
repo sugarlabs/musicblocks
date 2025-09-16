@@ -1840,15 +1840,15 @@ inside the *Repeat*, working our way down to `Sol` in `Octave
 
 #### <a name="LEGO-BRICKS">4.2.7 LEGO Bricks Widget</a>
 
-![LEGO Bricks](./legobricks_block.svg "LEGO Bricks block")
+![LEGO Bricks](../documentation/legobricks_block.svg "LEGO Bricks block")
 
 The *LEGO Bricks* widget represents a groundbreaking approach to music composition that bridges the physical and digital worlds. This innovative tool transforms tangible LEGO brick constructions into dynamic musical compositions through advanced computer vision and color detection algorithms.
 
-![LEGO Bricks Widget](./legobricks_widget.svg "LEGO Bricks Widget Interface")
+![LEGO Bricks Widget](../documentation/legobricks_widget.svg "LEGO Bricks Widget Interface")
 
 The widget operates by analyzing colored LEGO brick arrangements from uploaded images or live webcam feeds. Users can upload photos of their LEGO creations or use their device's camera to capture constructions in real-time. The widget features an intelligent color detection system that can adapt to different backgrounds and lighting conditions.
 
-![LEGO Bricks Demo](./legobricks_demo.svg "LEGO Bricks Widget Demo Example")
+![LEGO Bricks Demo](../documentation/legobricks_demo.svg "LEGO Bricks Widget Demo Example")
 
 **Key Features:**
 

@@ -880,7 +880,7 @@ function LegoWidget() {
                             
                             // Only count as significant if overlap is substantial (>350ms)
                             // This prevents spillovers <350ms across blue lines from creating duplicate notes
-                            if (overlapDuration > 350) {
+                            if (overlapDuration > 1000) {
                                 // Check if color is not the selected background color (meaning note should play)
                                 if (segment.color !== this.selectedBackgroundColor.name) {
                                     hasNonBackgroundColor = true;
@@ -921,7 +921,7 @@ function LegoWidget() {
     this._filterSmallSegments = function(boundaries) {
         if (boundaries.length <= 2) return boundaries;
         
-        const minDuration = 350; // Minimum duration for valid segments (350ms)
+        const minDuration = 1000; // Much larger minimum duration (1 second)
         const filteredBoundaries = [boundaries[0]]; // Always keep the start boundary
         
         // Process each potential segment
@@ -932,7 +932,7 @@ function LegoWidget() {
             if (segmentDuration >= minDuration) {
                 filteredBoundaries.push(boundaries[i]);
             }
-            // If segment is too small (<350ms), we skip this boundary entirely
+            // If segment is too small (<1000ms), we skip this boundary entirely
             // The time gets absorbed into the adjacent larger segment
         }
         
@@ -967,10 +967,10 @@ function LegoWidget() {
         // Convert to sorted array
         const sortedBoundaries = Array.from(boundaries).sort((a, b) => a - b);
         
-        // Merge boundaries that are very close together (within 50ms)
+        // Merge boundaries that are very close together (within 500ms for much larger blocks)
         const mergedBoundaries = [sortedBoundaries[0]];
         for (let i = 1; i < sortedBoundaries.length; i++) {
-            if (sortedBoundaries[i] - mergedBoundaries[mergedBoundaries.length - 1] > 50) {
+            if (sortedBoundaries[i] - mergedBoundaries[mergedBoundaries.length - 1] > 500) {
                 mergedBoundaries.push(sortedBoundaries[i]);
             }
         }
@@ -1487,35 +1487,59 @@ function LegoWidget() {
     };
 
     /**
- * Converts RGB values to a named color category.
- * @private
- */
+     * Converts RGB values to a named color category with improved accuracy.
+     * @private
+     */
     this._getColorFamily = function(r, g, b) {
         const hsl = this._rgbToHsl(r, g, b);
         const [hue, saturation, lightness] = hsl;
 
-        let name = "unknown";
-        if (lightness < 20) name = "black";
-        else if (lightness > 80 && saturation < 20) name = "white";
-        else if (saturation < 25) name = "gray";
-        else if (hue >= 0 && hue < 30) name = "red";
-        else if (hue >= 30 && hue < 60) name = "orange";
-        else if (hue >= 60 && hue < 90) name = "yellow";
-        else if (hue >= 90 && hue < 150) name = "green";  // FIXED: Added green detection!
-        else if (hue >= 150 && hue < 210) name = "cyan";
-        else if (hue >= 210 && hue < 270) name = "blue";
-        else if (hue >= 270 && hue < 330) name = "magenta";
-        else if (hue >= 330 && hue <= 360) name = "red";
+        // Simple and accurate color detection
+        
+        // Handle very dark colors first
+        if (lightness < 15) {
+            return { name: "black", hue: hue, saturation: saturation, lightness: lightness };
+        }
+        
+        // Handle grayscale colors (low saturation) - keep it simple
+        if (saturation < 20) {
+            if (lightness > 85) return { name: "white", hue: hue, saturation: saturation, lightness: lightness };
+            if (lightness < 25) return { name: "black", hue: hue, saturation: saturation, lightness: lightness };
+            return { name: "gray", hue: hue, saturation: saturation, lightness: lightness };
+        }
+
+        // Improved hue-based detection with clear boundaries to prevent orange/purple confusion
+        let colorName = "unknown";
+        
+        if (hue >= 345 || hue < 15) {
+            colorName = "red";
+        } else if (hue >= 15 && hue < 45) {
+            // Orange range - key fix for orange/purple confusion
+            colorName = "orange";
+        } else if (hue >= 45 && hue < 75) {
+            colorName = "yellow";
+        } else if (hue >= 75 && hue < 165) {
+            colorName = "green";
+        } else if (hue >= 165 && hue < 195) {
+            colorName = "cyan";
+        } else if (hue >= 195 && hue < 255) {
+            colorName = "blue";
+        } else if (hue >= 255 && hue < 285) {
+            // Purple range - separated clearly from orange
+            colorName = "purple";
+        } else if (hue >= 285 && hue < 315) {
+            colorName = "magenta";
+        } else if (hue >= 315 && hue < 345) {
+            colorName = "pink";
+        }
 
         return {
-            name: name,
+            name: colorName,
             hue: hue,
             saturation: saturation,
             lightness: lightness
         };
-    };
-
-    /**
+    };    /**
  * Gets color family from HSL values
  * @private
  * @param {number} h - Hue (0-360)
@@ -1546,25 +1570,25 @@ function LegoWidget() {
     };
 
     /**
- * Gets color family by name
- * @private
- * @param {string} colorName - The color name
- * @returns {object} Color family object
- */
+     * Gets color family by name with simple mapping.
+     * @private
+     * @param {string} colorName - The color name
+     * @returns {object} Color family object
+     */
     this._getColorFamilyByName = function(colorName) {
         const colorFamilies = {
-            "red": { name: "red", hue: 0 },
-            "orange": { name: "orange", hue: 30 },
-            "yellow": { name: "yellow", hue: 60 },
-            "green": { name: "green", hue: 120 },     // FIXED: Added green!
-            "cyan": { name: "cyan", hue: 180 },      // FIXED: Added cyan!
-            "blue": { name: "blue", hue: 240 },
-            "purple": { name: "purple", hue: 270 },
-            "magenta": { name: "magenta", hue: 300 }, // FIXED: Added magenta!
-            "pink": { name: "pink", hue: 330 },
-            "white": { name: "white", hue: 0 },      // FIXED: Added white!
-            "black": { name: "black", hue: 0 },      // FIXED: Added black!
-            "gray": { name: "gray", hue: 0 }         // FIXED: Added gray!
+            "red": { name: "red", hue: 0, saturation: 80, lightness: 50 },
+            "orange": { name: "orange", hue: 30, saturation: 80, lightness: 50 },
+            "yellow": { name: "yellow", hue: 60, saturation: 80, lightness: 50 },
+            "green": { name: "green", hue: 120, saturation: 80, lightness: 50 },
+            "cyan": { name: "cyan", hue: 180, saturation: 80, lightness: 50 },
+            "blue": { name: "blue", hue: 240, saturation: 80, lightness: 50 },
+            "purple": { name: "purple", hue: 270, saturation: 80, lightness: 50 },
+            "magenta": { name: "magenta", hue: 300, saturation: 80, lightness: 50 },
+            "pink": { name: "pink", hue: 330, saturation: 70, lightness: 75 },
+            "white": { name: "white", hue: 0, saturation: 0, lightness: 95 },
+            "gray": { name: "gray", hue: 0, saturation: 5, lightness: 50 },
+            "black": { name: "black", hue: 0, saturation: 0, lightness: 5 }
         };
         return colorFamilies[colorName] || null;
     };
@@ -1599,7 +1623,7 @@ function LegoWidget() {
 
     
     /**
-     * Checks if two colors are similar enough to not count as a change.
+     * Checks if two colors are similar enough to be considered the same.
      * @private
      * @param {object} color1 - First color family object.
      * @param {object} color2 - Second color family object.
@@ -1608,13 +1632,23 @@ function LegoWidget() {
     this._colorsAreSimilar = function(color1, color2) {
         if (!color1 || !color2) return false;
         
-        // Same color family
+        // Exact name match
         if (color1.name === color2.name) return true;
         
-        // Black/white/gray similarities
-        if ((color1.name === "black" && color2.name === "gray" && color2.lightness < 60) ||
-            (color2.name === "black" && color1.name === "gray" && color1.lightness < 60)) {
-            return true;
+        // Handle gray variations (keep simple)
+        const grayColors = ["white", "gray", "black"];
+        if (grayColors.includes(color1.name) && grayColors.includes(color2.name)) {
+            // Allow some flexibility between white/gray/black based on lightness
+            return Math.abs(color1.lightness - color2.lightness) < 30;
+        }
+        
+        // For colored objects, use HSL distance
+        if (color1.saturation > 20 && color2.saturation > 20) {
+            const hueDiff = Math.min(Math.abs(color1.hue - color2.hue), 360 - Math.abs(color1.hue - color2.hue));
+            const satDiff = Math.abs(color1.saturation - color2.saturation);
+            const lightDiff = Math.abs(color1.lightness - color2.lightness);
+            
+            return hueDiff < 25 && satDiff < 20 && lightDiff < 20;
         }
         
         return false;
@@ -2126,11 +2160,13 @@ function LegoWidget() {
                 // Record final color segment if it existed
                 if (line.lastSignificantColor && line.colorStartTime) {
                     const duration = (now - line.colorStartTime) / 1000;
-                    this.colorData[line.rowIndex].colorSegments.push({
-                        color: line.lastSignificantColor.name,
-                        duration: duration,
-                        endTime: now - this.startTime
-                    });
+                    if (duration > 1.0) { // Only save segments longer than 1000ms
+                        this.colorData[line.rowIndex].colorSegments.push({
+                            color: line.lastSignificantColor.name,
+                            duration: duration,
+                            endTime: now - this.startTime
+                        });
+                    }
                 }
                 return;
             }
@@ -2141,11 +2177,13 @@ function LegoWidget() {
                 // Record final color segment if it existed
                 if (line.lastSignificantColor && line.colorStartTime) {
                     const duration = (now - line.colorStartTime) / 1000;
-                    this.colorData[line.rowIndex].colorSegments.push({
-                        color: line.lastSignificantColor.name,
-                        duration: duration,
-                        endTime: now - this.startTime
-                    });
+                    if (duration > 1.0) { // Only save segments longer than 1000ms
+                        this.colorData[line.rowIndex].colorSegments.push({
+                            color: line.lastSignificantColor.name,
+                            duration: duration,
+                            endTime: now - this.startTime
+                        });
+                    }
                 }
                 return;
             }
@@ -2215,7 +2253,7 @@ function LegoWidget() {
             // Save the final color segment if it exists
                 if (line.currentColor && line.colorStartTime) {
                     const duration = now - line.colorStartTime;
-                    if (duration > 350) { // Save final segment if long enough (updated to match new minimum)
+                    if (duration > 1000) { // Save final segment if long enough (increased from 400ms)
                         this._addColorSegment(line.rowIndex, line.currentColor, duration);
                     }
                 }
@@ -2235,6 +2273,9 @@ function LegoWidget() {
             const hasScannedData = this.colorData.some(row => row.colorSegments && row.colorSegments.length > 0);
             
             if (hasScannedData) {
+                // Merge consecutive segments with same colors
+                this._mergeConsecutiveColorSegments();
+                
                 this.hasGeneratedVisualization = true; // Set flag to prevent double generation
                 setTimeout(() => {
                     this._generateColorVisualization();
@@ -2243,6 +2284,72 @@ function LegoWidget() {
             }
         }
     };
+
+    /**
+     * Merges consecutive color segments with the same color to reduce fragmentation
+     * @private
+     */
+    this._mergeConsecutiveColorSegments = function() {
+        this.colorData.forEach(rowData => {
+            if (!rowData.colorSegments || rowData.colorSegments.length <= 1) return;
+            
+            const mergedSegments = [];
+            let currentSegment = null;
+            
+            for (const segment of rowData.colorSegments) {
+                if (!currentSegment) {
+                    // First segment
+                    currentSegment = {
+                        color: segment.color,
+                        duration: segment.duration,
+                        endTime: segment.endTime
+                    };
+                } else if (this._shouldMergeColors(currentSegment.color, segment.color)) {
+                    // Same or similar color - merge them
+                    currentSegment.duration += segment.duration;
+                    currentSegment.endTime = segment.endTime;
+                } else {
+                    // Different color - save current segment and start new one
+                    mergedSegments.push(currentSegment);
+                    currentSegment = {
+                        color: segment.color,
+                        duration: segment.duration,
+                        endTime: segment.endTime
+                    };
+                }
+            }
+            
+            // Don't forget to add the last segment
+            if (currentSegment) {
+                mergedSegments.push(currentSegment);
+            }
+            
+            // Replace the original segments with merged ones
+            rowData.colorSegments = mergedSegments;
+        });
+    };
+
+    /**
+     * Determines if two colors should be merged together
+     * @private
+     * @param {string} color1 - First color name
+     * @param {string} color2 - Second color name  
+     * @returns {boolean} True if colors should be merged
+     */
+    this._shouldMergeColors = function(color1, color2) {
+        // Exact match
+        if (color1 === color2) return true;
+        
+        // Merge all gray variants (white, gray, black)
+        const grayColors = ["white", "gray", "black"];
+        if (grayColors.includes(color1) && grayColors.includes(color2)) {
+            return true;
+        }
+        
+        // Don't merge other distinct colors
+        return false;
+    };
+
     /**
  * Samples and detects colors along a vertical line
  * @private
@@ -2267,10 +2374,10 @@ function LegoWidget() {
         // Row is outside image bounds, force selected background color
             if (!line.currentColor || line.currentColor.name !== boundColor.name) {
                 const timeSinceLastChange = line.lastColorChangeTime ? (now - line.lastColorChangeTime) : 1000;
-                if (timeSinceLastChange > 150) {
+                if (timeSinceLastChange > 500) { // Increased from 200ms for consistency
                     if (line.currentColor && line.colorStartTime) {
                         const duration = now - line.colorStartTime;
-                        if (duration > 350) { // Updated to match new minimum note duration
+                        if (duration > 1000) { // Increased from 400ms to match main detection
                             this._addColorSegment(line.rowIndex, line.currentColor, duration);
                         }
                     }
@@ -2384,11 +2491,11 @@ function LegoWidget() {
         // Require a minimum time gap between color changes (reduces noise)
             const timeSinceLastChange = line.lastColorChangeTime ? (now - line.lastColorChangeTime) : 1000;
         
-            if (timeSinceLastChange > 150) {
+            if (timeSinceLastChange > 500) { // Increased from 200ms to 500ms for much less sensitivity
             // Color changed - save previous segment if it existed
                 if (line.currentColor && line.colorStartTime) {
                     const duration = now - line.colorStartTime;
-                    if (duration > 350) { // Updated to match new minimum note duration
+                    if (duration > 1000) { // Increased minimum duration from 400ms to 1000ms
                         this._addColorSegment(line.rowIndex, line.currentColor, duration);
                     }
                 }
@@ -2714,7 +2821,7 @@ function LegoWidget() {
                         
                             // Only count as significant if overlap is substantial (>350ms)
                             // This prevents spillovers <350ms across blue lines from creating duplicate notes
-                            if (overlapDuration > 350 && segment.color !== this.selectedBackgroundColor.name) {
+                            if (overlapDuration > 1000 && segment.color !== this.selectedBackgroundColor.name) {
                                 hasNonBackgroundColor = true;
                                 break;
                             } else if (overlapDuration <= 350 && segment.color !== this.selectedBackgroundColor.name) {
