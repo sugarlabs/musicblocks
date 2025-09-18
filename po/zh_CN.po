@@ -1983,7 +1983,7 @@ msgstr "igbo"
 #: js/toolbar.js:238
 #: js/toolbar.js:300
 msgid "عربى"
-msgstr ""
+msgstr "عربى"
 
 #: js/toolbar.js:107
 #: js/toolbar.js:177
@@ -5225,7 +5225,7 @@ msgstr "y坐标转音高"
 
 #: js/blocks/PitchBlocks.js:729
 msgid "Y to pitch block will convert a staff y position to corresponding pitch notation."
-msgstr ""
+msgstr "Y 到音高模块会将五线谱的 Y 位置转换为对应的音高符号。"
 
 #: js/blocks/PitchBlocks.js:841
 msgid "accidental selector"
@@ -7159,7 +7159,7 @@ msgstr "设置鼓音量"
 
 #: js/blocks/VolumeBlocks.js:530
 msgid "The Set synth volume block will change the volume of a particular synth,"
-msgstr ""
+msgstr "设置合成器音量模块会改变特定合成器的音量，"
 
 #: js/blocks/VolumeBlocks.js:532
 msgid "eg guitar violin snare drum etc."
@@ -7740,211 +7740,211 @@ msgstr "复音值"
 
 #: planet/js/GlobalCard.js:68
 msgid "Share"
-msgstr ""
+msgstr "分享"
 
 #: planet/js/GlobalCard.js:74
 msgid "Flags"
-msgstr ""
+msgstr "标志"
 
 #: planet/js/GlobalPlanet.js:35
 msgid "No results found."
-msgstr ""
+msgstr "未找到结果。"
 
 #: planet/js/GlobalPlanet.js:51
 msgid "Remix of"
-msgstr ""
+msgstr "混音自"
 
 #: planet/js/GlobalPlanet.js:509
 msgid "Cannot connect to server"
-msgstr ""
+msgstr "无法连接到服务器"
 
 #: planet/js/GlobalTag.js:28
 #. TRANS: On the Planet, we use labels to tag projects.
 msgid "All Projects"
-msgstr ""
+msgstr "所有项目"
 
 #: planet/js/GlobalTag.js:30
 #: planet/js/StringHelper.js:37
 #. TRANS: On the Planet, we use labels to tag projects.
 msgid "My Projects"
-msgstr ""
+msgstr "我的项目"
 
 #: planet/js/GlobalTag.js:32
 #. TRANS: On the Planet, we use labels to tag projects.
 msgid "Examples"
-msgstr ""
+msgstr "示例"
 
 #: planet/js/GlobalTag.js:36
 #. TRANS: On the Planet, we use labels to tag projects.
 msgid "Art"
-msgstr ""
+msgstr "艺术"
 
 #: planet/js/GlobalTag.js:38
 #. TRANS: On the Planet, we use labels to tag projects.
 msgid "Math"
-msgstr ""
+msgstr "数学"
 
 #: planet/js/GlobalTag.js:40
 #. TRANS: On the Planet, we use labels to tag projects.
 msgid "Interactive"
-msgstr ""
+msgstr "互动"
 
 #: planet/js/GlobalTag.js:42
 #. TRANS: On the Planet, we use labels to tag projects.
 msgid "Design"
-msgstr ""
+msgstr "设计"
 
 #: planet/js/GlobalTag.js:44
 #. TRANS: On the Planet, we use labels to tag projects.
 msgid "Game"
-msgstr ""
+msgstr "游戏"
 
 #: planet/js/GlobalTag.js:52
 #. TRANS: On the Planet, we use labels to tag projects.
 msgid "Code Snippet"
-msgstr ""
+msgstr "代码片段"
 
 #: planet/js/LocalCard.js:36
 msgid "View published project"
-msgstr ""
+msgstr "查看已发布项目"
 
 #: planet/js/LocalCard.js:42
 #: planet/js/StringHelper.js:38
 msgid "Publish project"
-msgstr ""
+msgstr "发布项目"
 
 #: planet/js/LocalCard.js:51
 msgid "Edit project"
-msgstr ""
+msgstr "编辑项目"
 
 #: planet/js/LocalCard.js:52
 msgid "Delete project"
-msgstr ""
+msgstr "删除项目"
 
 #: planet/js/LocalCard.js:53
 msgid "Download project"
-msgstr ""
+msgstr "下载项目"
 
 #: planet/js/LocalCard.js:55
 msgid "Duplicate project"
-msgstr ""
+msgstr "复制项目"
 
 #: planet/js/ProjectStorage.js:243
 msgid "anonymous"
-msgstr ""
+msgstr "匿名"
 
 #: planet/js/ProjectViewer.js:30
 msgid "Error: Report could not be submitted. Try again later."
-msgstr ""
+msgstr "错误：无法提交报告。请稍后再试。"
 
 #: planet/js/ProjectViewer.js:31
 msgid "Thank you for reporting this project. A moderator will review the project shortly, to verify violation of the Sugar Labs Code of Conduct."
-msgstr ""
+msgstr "感谢您举报此项目。版主将很快审核该项目，以确认是否违反了 Sugar Labs 行为准则。"
 
 #: planet/js/ProjectViewer.js:32
 #: planet/js/StringHelper.js:62
 #: planet/js/StringHelper.js:64
 #: planet/js/StringHelper.js:68
 msgid "Report Project"
-msgstr ""
+msgstr "举报项目"
 
 #: planet/js/ProjectViewer.js:33
 #: planet/js/StringHelper.js:63
 msgid "Project Reported"
-msgstr ""
+msgstr "项目已被举报"
 
 #: planet/js/ProjectViewer.js:34
 msgid "Report description required"
-msgstr ""
+msgstr "必须填写举报描述"
 
 #: planet/js/ProjectViewer.js:35
 msgid "Report description too long"
-msgstr ""
+msgstr "举报描述过长"
 
 #: planet/js/Publisher.js:30
 msgid "Feature unavailable - cannot connect to server. Reload Music Blocks to try again."
-msgstr ""
+msgstr "功能不可用 - 无法连接到服务器。请重新加载 Music Blocks 再试一次。"
 
 #: planet/js/Publisher.js:220
 #: planet/js/Publisher.js:237
 msgid "This field is required"
-msgstr ""
+msgstr "此字段为必填项"
 
 #: planet/js/Publisher.js:227
 msgid "Title too long"
-msgstr ""
+msgstr "标题过长"
 
 #: planet/js/Publisher.js:244
 msgid "Description too long"
-msgstr ""
+msgstr "描述过长"
 
 #: planet/js/Publisher.js:341
 msgid "Server Error"
-msgstr ""
+msgstr "服务器错误"
 
 #: planet/js/Publisher.js:341
 msgid "Try Again"
-msgstr ""
+msgstr "重试"
 
 #: planet/js/SaveInterface.js:34
 msgid "Open in Music Blocks"
-msgstr ""
+msgstr "在 Music Blocks 中打开"
 
 #: planet/js/SaveInterface.js:35
 msgid "Open in Turtle Blocks"
-msgstr ""
+msgstr "在 Turtle Blocks 中打开"
 
 #: planet/js/helper.js:149
 #: planet/js/StringHelper.js:49
 msgid "Show more tags"
-msgstr ""
+msgstr "显示更多标签"
 
 #: planet/js/helper.js:150
 msgid "Show fewer tags"
-msgstr ""
+msgstr "显示较少标签"
 
 #: planet/js/StringHelper.js:30
 msgid "Planet"
-msgstr ""
+msgstr "星球"
 
 #: planet/js/StringHelper.js:31
 msgid "Close Planet"
-msgstr ""
+msgstr "关闭星球"
 
 #: planet/js/StringHelper.js:32
 msgid "Open project from file"
-msgstr ""
+msgstr "从文件打开项目"
 
 #: planet/js/StringHelper.js:34
 msgid "Local"
-msgstr ""
+msgstr "本地"
 
 #: planet/js/StringHelper.js:35
 msgid "Global"
-msgstr ""
+msgstr "全局"
 
 #: planet/js/StringHelper.js:36
 msgid "Search for a project"
-msgstr ""
+msgstr "搜索项目"
 
 #: planet/js/StringHelper.js:40
 msgid "Tags (max 5)"
-msgstr ""
+msgstr "标签（最多 5 个）"
 
 #: planet/js/StringHelper.js:41
 #: planet/js/StringHelper.js:61
 msgid "Description"
-msgstr ""
+msgstr "描述"
 
 #: planet/js/StringHelper.js:42
 #: planet/js/StringHelper.js:67
 msgid "Submit"
-msgstr ""
+msgstr "提交"
 
 #: planet/js/StringHelper.js:43
 #: planet/js/StringHelper.js:47
 msgid "Cancel"
-msgstr ""
+msgstr "取消"
 
 #: planet/js/StringHelper.js:44
 msgid "Delete \\"<span id=\\"deleter-title\\"></span>\\"?"
@@ -7956,51 +7956,51 @@ msgstr ""
 
 #: planet/js/StringHelper.js:48
 msgid "Explore Projects"
-msgstr ""
+msgstr "探索项目"
 
 #: planet/js/StringHelper.js:50
 msgid "Most recent"
-msgstr ""
+msgstr "最新"
 
 #: planet/js/StringHelper.js:51
 msgid "Most liked"
-msgstr ""
+msgstr "最受喜爱"
 
 #: planet/js/StringHelper.js:52
 msgid "Most downloaded"
-msgstr ""
+msgstr "下载最多"
 
 #: planet/js/StringHelper.js:53
 msgid "A-Z"
-msgstr ""
+msgstr "按字母排序"
 
 #: planet/js/StringHelper.js:54
 msgid "Sort by"
-msgstr ""
+msgstr "排序方式"
 
 #: planet/js/StringHelper.js:55
 msgid "Load More Projects"
-msgstr ""
+msgstr "加载更多项目"
 
 #: planet/js/StringHelper.js:56
 msgid "Last Updated"
-msgstr ""
+msgstr "最后更新"
 
 #: planet/js/StringHelper.js:57
 msgid "Creation Date"
-msgstr ""
+msgstr "创建日期"
 
 #: planet/js/StringHelper.js:58
 msgid "Number of Downloads:"
-msgstr ""
+msgstr "下载次数："
 
 #: planet/js/StringHelper.js:59
 msgid "Number of Likes:"
-msgstr ""
+msgstr "点赞数："
 
 #: planet/js/StringHelper.js:60
 msgid "Tags:"
-msgstr ""
+msgstr "标签："
 
 #: planet/js/StringHelper.js:65
 msgid "Report projects which violate the <a href=\\"https://github.com/sugarlabs/sugar-docs/blob/master/CODE_OF_CONDUCT.md\\" target=\\"_blank\\">Sugar Labs Code of Conduct</a>."
@@ -8008,175 +8008,175 @@ msgstr ""
 
 #: planet/js/StringHelper.js:66
 msgid "Reason for reporting project"
-msgstr ""
+msgstr "举报项目原因"
 
 #: planet/js/StringHelper.js:70
 msgid "Download as File"
-msgstr ""
+msgstr "下载为文件"
 
 #: plugins/accelerometer.rtp:48
 msgid "motion x"
-msgstr ""
+msgstr "运动 x"
 
 #: plugins/accelerometer.rtp:56
 msgid "motion y"
-msgstr ""
+msgstr "运动 y"
 
 #: plugins/accelerometer.rtp:64
 msgid "motion z"
-msgstr ""
+msgstr "运动 z"
 
 #: plugins/facebook.rtp:27
 msgid "publish"
-msgstr ""
+msgstr "发布"
 
 #: plugins/maths.rtp:62
 msgid "power"
-msgstr ""
+msgstr "乘方"
 
 #: plugins/maths.rtp:62
 msgid "base"
-msgstr ""
+msgstr "底数"
 
 #: plugins/maths.rtp:62
 msgid "exp"
-msgstr ""
+msgstr "指数"
 
 #: plugins/maths.rtp:99
 msgid "floor"
-msgstr ""
+msgstr "向下取整"
 
 #: plugins/maths.rtp:104
 msgid "ceiling"
-msgstr ""
+msgstr "向上取整"
 
 #: plugins/maths.rtp:109
 msgid "to degrees"
-msgstr ""
+msgstr "转为角度"
 
 #: plugins/maths.rtp:114
 msgid "to radians"
-msgstr ""
+msgstr "转为弧度"
 
 #: plugins/nutrition.rtp:104
 msgid "get calories"
-msgstr ""
+msgstr "获取卡路里"
 
 #: plugins/nutrition.rtp:107
 msgid "get protein"
-msgstr ""
+msgstr "获取蛋白质"
 
 #: plugins/nutrition.rtp:110
 msgid "get carbs"
-msgstr ""
+msgstr "获取碳水化合物"
 
 #: plugins/nutrition.rtp:113
 msgid "get fiber"
-msgstr ""
+msgstr "获取纤维"
 
 #: plugins/nutrition.rtp:116
 msgid "get fat"
-msgstr ""
+msgstr "获取脂肪"
 
 #: plugins/nutrition.rtp:119
 msgid "get name"
-msgstr ""
+msgstr "获取名称"
 
 #: plugins/nutrition.rtp:122
 msgid "calories"
-msgstr ""
+msgstr "卡路里"
 
 #: plugins/nutrition.rtp:128
 msgid "protein"
-msgstr ""
+msgstr "蛋白质"
 
 #: plugins/nutrition.rtp:134
 msgid "carbs"
-msgstr ""
+msgstr "碳水化合物"
 
 #: plugins/nutrition.rtp:140
 msgid "fiber"
-msgstr ""
+msgstr "纤维"
 
 #: plugins/nutrition.rtp:146
 msgid "fat"
-msgstr ""
+msgstr "脂肪"
 
 #: plugins/nutrition.rtp:152
 msgid "eat"
-msgstr ""
+msgstr "吃"
 
 #: plugins/nutrition.rtp:155
 msgid "digest meal"
-msgstr ""
+msgstr "消化餐食"
 
 #: plugins/nutrition.rtp:158
 msgid "apple"
-msgstr ""
+msgstr "苹果"
 
 #: plugins/nutrition.rtp:161
 msgid "banana"
-msgstr ""
+msgstr "香蕉"
 
 #: plugins/nutrition.rtp:167
 msgid "wheat bread"
-msgstr ""
+msgstr "全麦面包"
 
 #: plugins/nutrition.rtp:170
 msgid "corn"
-msgstr ""
+msgstr "玉米"
 
 #: plugins/nutrition.rtp:173
 msgid "potato"
-msgstr ""
+msgstr "土豆"
 
 #: plugins/nutrition.rtp:176
 msgid "sweet potato"
-msgstr ""
+msgstr "红薯"
 
 #: plugins/nutrition.rtp:179
 msgid "tomato"
-msgstr ""
+msgstr "番茄"
 
 #: plugins/nutrition.rtp:182
 msgid "broccoli"
-msgstr ""
+msgstr "西兰花"
 
 #: plugins/nutrition.rtp:185
 msgid "rice and beans"
-msgstr ""
+msgstr "米饭和豆子"
 
 #: plugins/nutrition.rtp:188
 msgid "tamale"
-msgstr ""
+msgstr "塔玛莱"
 
 #: plugins/nutrition.rtp:191
 msgid "cheese"
-msgstr ""
+msgstr "奶酪"
 
 #: plugins/nutrition.rtp:194
 msgid "chicken"
-msgstr ""
+msgstr "鸡肉"
 
 #: plugins/nutrition.rtp:197
 msgid "fish"
-msgstr ""
+msgstr "鱼"
 
 #: plugins/nutrition.rtp:200
 msgid "beef"
-msgstr ""
+msgstr "牛肉"
 
 #: plugins/nutrition.rtp:203
 msgid "cake"
-msgstr ""
+msgstr "蛋糕"
 
 #: plugins/nutrition.rtp:206
 msgid "cookie"
-msgstr ""
+msgstr "饼干"
 
 #: plugins/nutrition.rtp:209
 msgid "water"
-msgstr ""
+msgstr "水"
 
 #: plugins/weather.rtp:68
 #: plugins/weather.rtp:97
@@ -8185,51 +8185,51 @@ msgstr ""
 
 #: plugins/weather.rtp:122
 msgid "forecast"
-msgstr ""
+msgstr "天气预报"
 
 #: plugins/weather.rtp:123
 #: plugins/weather.rtp:137
 #: plugins/weather.rtp:150
 msgid "city"
-msgstr ""
+msgstr "城市"
 
 #: plugins/weather.rtp:124
 #: plugins/weather.rtp:138
 #: plugins/weather.rtp:151
 msgid "day"
-msgstr ""
+msgstr "天"
 
 #: plugins/weather.rtp:136
 msgid "high"
-msgstr ""
+msgstr "高"
 
 #: plugins/weather.rtp:149
 msgid "low"
-msgstr ""
+msgstr "低"
 
 #: plugins/rodi.rtp:172
 msgid "blink"
-msgstr ""
+msgstr "闪烁"
 
 #: plugins/rodi.rtp:246
 msgid "led"
-msgstr ""
+msgstr "LED"
 
 #: plugins/rodi.rtp:265
 msgid "light intensity"
-msgstr ""
+msgstr "光照强度"
 
 #: plugins/rodi.rtp:282
 msgid "infrared light (left)"
-msgstr ""
+msgstr "红外光（左）"
 
 #: plugins/rodi.rtp:296
 msgid "infrared light (right)"
-msgstr ""
+msgstr "红外光（右）"
 
 #: plugins/rodi.rtp:338
 msgid "move"
-msgstr ""
+msgstr "移动"
 
 #: js/activity.js:3323
 
