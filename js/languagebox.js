@@ -93,7 +93,7 @@ class LanguageBox {
      * @returns {void}
      */
     zhCN_onclick() {
-        this._language = "zhCN";
+        this._language = "zh_CN";
         this.hide();
     }
 
@@ -218,7 +218,7 @@ class LanguageBox {
             ko: "언어 기본 설정을 변경하려면 브라우저를 새로 고치십시오.",
             es: "Actualice su navegador para cambiar su preferencia de idioma.",
             pt: "Atualize seu navegador para alterar sua preferência de idioma.",
-            zhCN: "刷新浏览器以更改您的语言偏好",
+            zh_CN: "刷新浏览器以更改您的语言偏好",
             th: "รีเฟรชเบราเซอร์เพื่อเปลี่ยนการตั้งค่าภาษาของคุณ",
             hi: "अपनी भाषा की वरीयता बदलने के लिए अपना ब्राउज़र ताज़ा करें",
             te: "మీ భాష ప్రాధాన్యతను మార్చడానికి మీ బ్రౌజర్‌ని రిఫ్రెష్ చేయండి.",
