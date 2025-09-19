@@ -28,8 +28,8 @@ requirejs.config({
         samples: "../sounds/samples",
         planet: "../js/planet",
         tonejsMidi: "../node_modules/@tonejs/midi/dist/Midi",
-        i18next: "../node_modules/i18next/dist/umd/i18next.min",
-        i18nextHttpBackend: "../node_modules/i18next-http-backend/i18nextHttpBackend.min"
+        i18next: "https://cdn.jsdelivr.net/npm/i18next@23.11.5/dist/umd/i18next.min",
+        i18nextHttpBackend: "https://cdn.jsdelivr.net/npm/i18next-http-backend@2.5.1/i18nextHttpBackend.min"
     },
     packages: []
 });
@@ -37,6 +37,7 @@ requirejs.config({
 requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBackend) {
 
     function updateContent() {
+        console.log("asdasdasd");
         console.log("updateContent() called");  // Debugging line
         const elements = document.querySelectorAll("[data-i18n]");
 
