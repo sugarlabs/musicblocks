@@ -28,8 +28,14 @@ requirejs.config({
         samples: "../sounds/samples",
         planet: "../js/planet",
         tonejsMidi: "../node_modules/@tonejs/midi/dist/Midi",
-        i18next: "https://cdn.jsdelivr.net/npm/i18next@23.11.5/dist/umd/i18next.min",
-        i18nextHttpBackend: "https://cdn.jsdelivr.net/npm/i18next-http-backend@2.5.1/i18nextHttpBackend.min"
+        i18next: [
+            "../lib/i18next.min",
+            "https://cdn.jsdelivr.net/npm/i18next@23.11.5/dist/umd/i18next.min"
+        ],
+        i18nextHttpBackend: [
+            "../lib/i18nextHttpBackend.min",
+            "https://cdn.jsdelivr.net/npm/i18next-http-backend@2.5.1/i18nextHttpBackend.min"
+        ]
     },
     packages: []
 });
