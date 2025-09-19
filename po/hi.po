@@ -243,19 +243,19 @@ msgstr "ब्लॉक्स के लिए खोजें"
 
 #: js/activity.js:1359
 msgid "Are you sure you want to clear the workspace?"
-msgstr ""
+msgstr "क्या आप वाकई कार्यक्षेत्र साफ़ करना चाहते हैं?"
 
 #: js/activity.js:1578
 msgid "Enter file name"
-msgstr ""
+msgstr "फाइल का नाम दर्ज करें"
 
 #: js/activity.js:1580
 msgid "File save canceled"
-msgstr ""
+msgstr "फाइल सहेजना रद्द कर दिया गया"
 
 #: js/activity.js:1599
 msgid "Click on stop saving"
-msgstr ""
+msgstr "सहेजना रोकने पर क्लिक करें"
 
 #: js/activity.js:1884
 msgid "Catching mice"
@@ -584,20 +584,20 @@ msgstr "ब्लॉक छुपाएँ"
 #: js/activity.js:3659
 #: js/activity.js:3674
 msgid "Trash can is empty."
-msgstr ""
+msgstr "कचरा पात्र खाली है।"
 
 #: js/activity.js:3681
 #: js/activity.js:3762
 msgid "Item restored from the trash."
-msgstr ""
+msgstr "आइटम को कचरे से पुनः स्थापित किया गया।"
 
 #: js/activity.js:3820
 msgid "Restore last item"
-msgstr ""
+msgstr "आखिरी आइटम पुनः स्थापित करें"
 
 #: js/activity.js:3821
 msgid "Restore all items"
-msgstr ""
+msgstr "सभी आइटम पुनः स्थापित करें"
 
 #: js/activity.js:4379
 msgid "Click the run button to run the project."
@@ -634,11 +634,11 @@ msgstr "JSON इनपुट को पार्स नहीं कर सक�
 
 #: js/activity.js:5987
 msgid "Select is enabled."
-msgstr ""
+msgstr "चयन सक्षम है।"
 
 #: js/activity.js:5987
 msgid "Select is disabled."
-msgstr ""
+msgstr "चयन अक्षम है।"
 
 #: js/activity.js:6369
 #: js/activity.js:6475
@@ -652,7 +652,7 @@ msgstr "अमान्य पैरामीटर्स"
 
 #: js/activity.js:6963
 msgid "Error regenerating palettes. Please refresh the page."
-msgstr ""
+msgstr "पैलेट्स को फिर से बनाने में त्रुटि हुई। कृपया पृष्ठ रीफ्रेश करें।"
 
 #: js/block.js:1576
 #: js/block.js:1695
@@ -828,7 +828,7 @@ msgstr "मौन अवरोध हटाया नहीं जा सकत�
 #: js/block.js:3135
 #: js/piemenus.js:3457
 msgid "You can restore deleted blocks from the trash with the Restore From Trash button."
-msgstr ""
+msgstr "आप हटाए गए ब्लॉकों को कचरे से पुनर्स्थापित कर सकते हैं 'कचरे से पुनर्स्थापित करें' बटन द्वारा।"
 
 #: js/block.js:3765
 #: js/blocks.js:2607
@@ -941,11 +941,11 @@ msgstr "एक संख्या नहीं"
 
 #: js/block.js:4418
 msgid "Octave value must be between 1 and 8."
-msgstr ""
+msgstr "ऑक्टेव मान 1 से 8 के बीच होना चाहिए।"
 
 #: js/block.js:4426
 msgid "Numbers can have at most 10 digits."
-msgstr ""
+msgstr "संख्याओं में अधिकतम 10 अंक हो सकते हैं।"
 
 #: js/blocks.js:1212
 #: js/blocks.js:3444
@@ -1045,7 +1045,7 @@ msgstr "मान"
 
 #: js/blocks.js:4465
 msgid "Forever loop detected inside a note value block. Unexpected things may happen."
-msgstr ""
+msgstr "नोट वैल्यू ब्लॉक के अंदर एक अनंत लूप पाया गया है। अप्रत्याशित चीज़ें हो सकती हैं।"
 
 #: js/blocks.js:4988
 msgid "There is no block selected."
@@ -1301,11 +1301,11 @@ msgstr "मदद"
 
 #: js/piemenus.js:3412
 msgid "In order to copy a sample, you must reload the widget, import the sample again, and export it."
-msgstr ""
+msgstr "सैंपल कॉपी करने के लिए, आपको विजेट को फिर से लोड करना होगा, सैंपल को पुनः आयात करना होगा, और फिर इसे निर्यात करना होगा।"
 
 #: js/piemenus.js:3801
 msgid "You have chosen key for your pitch preview."
-msgstr ""
+msgstr "आपने अपनी पिच पूर्वावलोकन के लिए कुंजी चुनी है।"
 
 #: js/rubrics.js:523
 #: js/turtledefs.js:122
@@ -1530,21 +1530,21 @@ msgstr "क्षैतिज स्क्रोलिंग अक्षम क
 #: js/toolbar.js:270
 #: js/turtledefs.js:643
 msgid "Change theme"
-msgstr ""
+msgstr "थीम बदलें"
 
 #: js/toolbar.js:71
 #: js/toolbar.js:138
 #: js/toolbar.js:210
 #: js/toolbar.js:271
 msgid "Light Mode"
-msgstr ""
+msgstr "लाइट मोड"
 
 #: js/toolbar.js:72
 #: js/toolbar.js:139
 #: js/toolbar.js:211
 #: js/toolbar.js:272
 msgid "Dark Mode"
-msgstr ""
+msgstr "डार्क मोड"
 
 #: js/toolbar.js:73
 #: js/toolbar.js:140
@@ -1654,7 +1654,7 @@ msgstr "ब्लॉक आर्टवर्क को SVG के रूप म
 #: js/toolbar.js:224
 #: js/toolbar.js:285
 msgid "Save block artwork as PNG"
-msgstr ""
+msgstr "ब्लॉक आर्टवर्क को PNG के रूप में सहेजें"
 
 #: js/toolbar.js:92
 #: js/toolbar.js:156
@@ -1670,95 +1670,95 @@ msgstr "पुष्टि करें"
 #: js/toolbar.js:226
 #: js/toolbar.js:287
 msgid "English (United States)"
-msgstr ""
+msgstr "English (United States)"
 
 #: js/toolbar.js:94
 #: js/toolbar.js:167
 #: js/toolbar.js:227
 #: js/toolbar.js:288
 msgid "English (United Kingdom)"
-msgstr ""
+msgstr "English (United Kingdom)"
 
 #: js/toolbar.js:95
 #: js/toolbar.js:168
 #: js/toolbar.js:228
 #: js/toolbar.js:289
 msgid "日本語"
-msgstr ""
+msgstr "日本語"
 
 #: js/toolbar.js:96
 msgid "한국어"
-msgstr ""
+msgstr "한국어"
 
 #: js/toolbar.js:97
 #: js/toolbar.js:170
 #: js/toolbar.js:230
 #: js/toolbar.js:291
 msgid "español"
-msgstr ""
+msgstr "español"
 
 #: js/toolbar.js:98
 #: js/toolbar.js:171
 #: js/toolbar.js:231
 #: js/toolbar.js:292
 msgid "português"
-msgstr ""
+msgstr "português"
 
 #: js/toolbar.js:99
 #: js/toolbar.js:172
 #: js/toolbar.js:232
 #: js/toolbar.js:293
 msgid "にほんご"
-msgstr ""
+msgstr "にほんご"
 
 #: js/toolbar.js:100
 #: js/toolbar.js:173
 #: js/toolbar.js:233
 #: js/toolbar.js:294
 msgid "中文"
-msgstr ""
+msgstr "中文"
 
 #: js/toolbar.js:101
 #: js/toolbar.js:174
 #: js/toolbar.js:234
 #: js/toolbar.js:295
 msgid "ภาษาไทย"
-msgstr ""
+msgstr "ภาษาไทย"
 
 #: js/toolbar.js:102
 #: js/toolbar.js:175
 #: js/toolbar.js:235
 #: js/toolbar.js:296
 msgid "aymara"
-msgstr ""
+msgstr "aymara"
 
 #: js/toolbar.js:103
 #: js/toolbar.js:176
 #: js/toolbar.js:236
 #: js/toolbar.js:297
 msgid "quechua"
-msgstr ""
+msgstr "quechua"
 
 #: js/toolbar.js:104
 #: js/toolbar.js:177
 #: js/toolbar.js:237
 #: js/toolbar.js:298
 msgid "guarani"
-msgstr ""
+msgstr "guarani"
 
 #: js/toolbar.js:105
 #: js/toolbar.js:178
 #: js/toolbar.js:238
 #: js/toolbar.js:299
 msgid "हिंदी"
-msgstr ""
+msgstr "हिंदी"
 
 #: js/toolbar.js:106
 #: js/toolbar.js:180
 #: js/toolbar.js:239
 #: js/toolbar.js:301
 msgid "igbo"
-msgstr ""
+msgstr "igbo"
 
 #: js/toolbar.js:107
 #: js/toolbar.js:181
@@ -1772,21 +1772,21 @@ msgstr ""
 #: js/toolbar.js:241
 #: js/toolbar.js:300
 msgid "తెలుగు"
-msgstr ""
+msgstr "తెలుగు"
 
 #: js/toolbar.js:109
 #: js/toolbar.js:182
 #: js/toolbar.js:242
 #: js/toolbar.js:303
 msgid "עִברִית"
-msgstr ""
+msgstr "עִברִית"
 
 #: js/toolbar.js:110
 #: js/toolbar.js:183
 #: js/toolbar.js:243
 #: js/toolbar.js:304
 msgid "اردو"
-msgstr ""
+msgstr "اردو"
 
 #: js/toolbar.js:159
 #: js/toolbar.js:162
@@ -1809,7 +1809,7 @@ msgstr "टर्टल आर्टवर्क को SVG के रूप म
 #: js/toolbar.js:229
 #: js/toolbar.js:290
 msgid "한국인"
-msgstr ""
+msgstr "한국인"
 
 #: js/toolbar.js:187
 #: js/toolbar.js:248
@@ -1829,7 +1829,7 @@ msgstr "टर्टल रैप चालू"
 
 #: js/toolbar.js:1143
 msgid "Are you sure you want to create a new project?"
-msgstr ""
+msgstr "क्या आप निश्चित हैं कि आप नया प्रोजेक्ट बनाना चाहते हैं?"
 
 #: js/turtle-singer.js:1365
 #. TRANS: partials are weighted components in a harmonic series
@@ -2074,11 +2074,11 @@ msgstr "ब्लॉक कला को एसवीजी फ़ाइल क�
 
 #: js/turtledefs.js:572
 msgid "Save sheet music as ABC, Lilypond or MusicXML"
-msgstr ""
+msgstr "शीट संगीत को ABC, Lilypond या MusicXML के रूप में सहेजें"
 
 #: js/turtledefs.js:574
 msgid "Save block artwork as SVG or PNG"
-msgstr ""
+msgstr "ब्लॉक आर्टवर्क को SVG या PNG के रूप में सहेजें"
 
 #: js/turtledefs.js:581
 msgid "Load samples from server"
@@ -2098,7 +2098,7 @@ msgstr "सहायक उपकरण पट्टी को विस्त�
 
 #: js/turtledefs.js:594
 msgid "Displays help messages for the main and auxiliary toolbar, right-click contextual menu for blocks and canvas, and palettes."
-msgstr ""
+msgstr "मुख्य और सहायक टूलबार, ब्लॉक्स और कैनवास के राइट-क्लिक संदर्भ मेनू, और पैलेट्स के लिए सहायता संदेश दिखाता है।"
 
 #: js/turtledefs.js:600
 msgid "Click to run the project in slow mode."
@@ -2114,7 +2114,7 @@ msgstr "अपने संगीत प्रोजेक्ट के आँ�
 
 #: js/turtledefs.js:619
 msgid "Load a selected plugin."
-msgstr ""
+msgstr "चयनित प्लगइन लोड करें।"
 
 #: js/turtledefs.js:627
 msgid "Delete a selected plugin."
@@ -2130,11 +2130,11 @@ msgstr "आप कैनवास पर ब्लॉक्स को स्क�
 
 #: js/turtledefs.js:644
 msgid "Switch between dark and light mode."
-msgstr ""
+msgstr "डार्क और लाइट मोड के बीच स्विच करें।"
 
 #: js/turtledefs.js:650
 msgid "Click to add another project into the current one."
-msgstr ""
+msgstr "वर्तमान प्रोजेक्ट में एक और प्रोजेक्ट जोड़ने के लिए क्लिक करें।"
 
 #: js/turtledefs.js:655
 msgid "Wrap Turtle"
@@ -2146,11 +2146,11 @@ msgstr "टर्टल लपेटें को चालू या बंद 
 
 #: js/turtledefs.js:664
 msgid "Click to set the current pitch."
-msgstr ""
+msgstr "वर्तमान पिच सेट करने के लिए क्लिक करें।"
 
 #: js/turtledefs.js:671
 msgid "Converts Music Block programs to JavaScript."
-msgstr ""
+msgstr "म्यूजिक ब्लॉक प्रोग्राम को जावास्क्रिप्ट में परिवर्तित करता है।"
 
 #: js/turtledefs.js:678
 msgid "Restore blocks from the trash."
@@ -2170,11 +2170,11 @@ msgstr "अपनी भाषा प्राथमिकता का चय�
 
 #: js/turtledefs.js:697
 msgid "Contextual Menu for Blocks"
-msgstr ""
+msgstr "ब्लॉक्स के लिए संदर्भ मेनू"
 
 #: js/turtledefs.js:698
 msgid "Right-click on a block to access common actions."
-msgstr ""
+msgstr "सामान्य क्रियाओं तक पहुंचने के लिए ब्लॉक पर राइट-क्लिक करें।"
 
 #: js/turtledefs.js:703
 #: planet/js/StringHelper.js:46
@@ -2203,19 +2203,19 @@ msgstr "आप डू ब्लॉक बनाने के लिए डी �
 
 #: js/turtledefs.js:730
 msgid "Contextual Menu for Canvas"
-msgstr ""
+msgstr "कैनवास के लिए संदर्भ मेनू"
 
 #: js/turtledefs.js:731
 msgid "Right-click on the canvas to perform additional canvas-related tasks."
-msgstr ""
+msgstr "अतिरिक्त कैनवास संबंधित कार्य करने के लिए कैनवास पर राइट-क्लिक करें।"
 
 #: js/turtledefs.js:738
 msgid "Turn on/off lines for cartesian or polar grids."
-msgstr ""
+msgstr "कार्टेशियन या पोलर ग्रिड की लाइनों को चालू/बंद करें।"
 
 #: js/turtledefs.js:740
 msgid "Turn on/off music staffs."
-msgstr ""
+msgstr "म्यूजिक स्टाफ को चालू/बंद करें।"
 
 #: js/turtledefs.js:745
 #: js/turtles.js:959
@@ -2268,11 +2268,11 @@ msgstr "ब्लॉक्स का आकार बढ़ाएं"
 
 #: js/turtledefs.js:790
 msgid "Select"
-msgstr ""
+msgstr "चुनें"
 
 #: js/turtledefs.js:791
 msgid "Left-click and drag on workspace to select multiple blocks."
-msgstr ""
+msgstr "मल्टीपल ब्लॉकों को चुनने के लिए वर्कस्पेस पर लेफ्ट-क्लिक करें और ड्रैग करें।"
 
 #: js/turtledefs.js:798
 msgid "Palette buttons"
@@ -2344,7 +2344,7 @@ msgstr "म्यूजिक ब्लॉक्स GitHub रेपॉजिट
 
 #: js/turtledefs.js:855
 msgid "Congratulations!"
-msgstr ""
+msgstr "बधाई हो!"
 
 #: js/turtledefs.js:856
 msgid "You have finished the tour. Please enjoy Music Blocks!"
@@ -2726,7 +2726,7 @@ msgstr "जापान"
 #: js/utils/musicutils.js:1074
 #. TRANS: https://en.wikipedia.org/wiki/In_scale and https://en.wikipedia.org/wiki/Sakura_Sakura
 msgid "in"
-msgstr ""
+msgstr "इन"
 
 #: js/utils/musicutils.js:1076
 #. TRANS: https://en.wikipedia.org/wiki/Miny%C5%8D_scale
@@ -2916,7 +2916,7 @@ msgstr "गिटार"
 #: js/utils/synthutils.js:84
 #. TRANS: sitar musical instrument
 msgid "sitar"
-msgstr ""
+msgstr "सितार"
 
 #: js/utils/musicutils.js:1115
 msgid "harmoiunm"
@@ -2999,7 +2999,7 @@ msgstr "सिम्पल 4"
 #: js/blocks/DrumBlocks.js:191
 #. TRANS: white noise synthesizer
 msgid "white noise"
-msgstr ""
+msgstr "व्हाइट नॉइज़"
 
 #: js/utils/musicutils.js:1130
 #: js/utils/synthutils.js:60
@@ -3234,7 +3234,7 @@ msgstr "जस्ट इंटोनेशन"
 #: js/utils/musicutils.js:1627
 #. TRANS: musical temperament
 msgid "Meantone"
-msgstr ""
+msgstr "मींटोन"
 
 #: js/utils/musicutils.js:1191
 msgid "major 7th"
@@ -3263,37 +3263,37 @@ msgstr "हाफ-डिमिनिश 7वां"
 #: js/utils/musicutils.js:1603
 #: js/utils/musicutils.js:1619
 msgid "Equal (12EDO)"
-msgstr ""
+msgstr "समान (12EDO)"
 
 #: js/utils/musicutils.js:1604
 #: js/utils/musicutils.js:1620
 msgid "Equal (5EDO)"
-msgstr ""
+msgstr "समान (5EDO)"
 
 #: js/utils/musicutils.js:1605
 #: js/utils/musicutils.js:1621
 msgid "Equal (7EDO)"
-msgstr ""
+msgstr "समान (7EDO)"
 
 #: js/utils/musicutils.js:1606
 #: js/utils/musicutils.js:1622
 msgid "Equal (19EDO)"
-msgstr ""
+msgstr "समान (19EDO)"
 
 #: js/utils/musicutils.js:1607
 #: js/utils/musicutils.js:1623
 msgid "Equal (31EDO)"
-msgstr ""
+msgstr "समान (31EDO)"
 
 #: js/utils/musicutils.js:1608
 #: js/utils/musicutils.js:1624
 msgid "5-limit Just Intonation"
-msgstr ""
+msgstr "5-सीमा सही स्वर ताल"
 
 #: js/utils/musicutils.js:1609
 #: js/utils/musicutils.js:1625
 msgid "Pythagorean (3-limit JI)"
-msgstr ""
+msgstr "पाइथागोरियन (3-सीमा JI)"
 
 #: js/utils/musicutils.js:5737
 #: js/utils/musicutils.js:5780
@@ -3353,7 +3353,7 @@ msgstr "और"
 
 #: js/blocks/BooleanBlocks.js:218
 msgid "The Or block is the logical or operator."
-msgstr ""
+msgstr "ओर ब्लॉक तार्किक ओर ऑपरेटर है।"
 
 #: js/blocks/BooleanBlocks.js:236
 msgid "or"
@@ -3373,7 +3373,7 @@ msgstr "इक्वल ब्लॉक यदि दो नंबर समा�
 
 #: js/blocks/BooleanBlocks.js:909
 msgid "The Not-equal-to block returns True if the two numbers are not equal to each other."
-msgstr ""
+msgstr "नॉट-इक्वल-टू ब्लॉक तब ट्रू लौटाता है जब दो नंबर एक-दूसरे के बराबर न हों।"
 
 #: js/blocks/BooleanBlocks.js:1008
 msgid "The Boolean block is used to specify true or false."
@@ -3475,7 +3475,7 @@ msgstr "डिक्शनरी दिखाएं"
 #: js/blocks/ProgramBlocks.js:501
 #: js/blocks/ProgramBlocks.js:664
 msgid "My Dictionary"
-msgstr ""
+msgstr "मेरा शब्दकोश"
 
 #: js/blocks/DictBlocks.js:129
 msgid "The Dictionary block returns a dictionary."
@@ -3709,7 +3709,7 @@ msgstr "इंटरवल संख्या"
 
 #: js/blocks/IntervalsBlocks.js:317
 msgid "current interval"
-msgstr ""
+msgstr "वर्तमान अंतराल"
 
 #: js/blocks/IntervalsBlocks.js:387
 #. TRANS: measure the distance between two pitches in semi-tones
@@ -3818,7 +3818,7 @@ msgstr "सेट कुंजी ब्लॉक का उपयोग कु�
 
 #: js/blocks/IntervalsBlocks.js:1449
 msgid "eg C Major"
-msgstr ""
+msgstr "जैसे C मेजर"
 
 #: js/blocks/NumberBlocks.js:28
 msgid "The Int block returns an integer."
@@ -4616,7 +4616,7 @@ msgstr "बीट"
 #: js/blocks/ActionBlocks.js:959
 #: js/blocks/ActionBlocks.js:1048
 msgid "do1"
-msgstr ""
+msgstr "डो1"
 
 #: js/blocks/MeterBlocks.js:814
 msgid "on every beat do"
@@ -5047,7 +5047,7 @@ msgstr "उदाहरण के लिए अगर आखिरी बजा�
 
 #: js/blocks/PitchBlocks.js:1857
 msgid "The Pitch block specifies the pitch name and octave of a note that together determine the frequency of the note."
-msgstr ""
+msgstr "पिच ब्लॉक किसी नोट का पिच नाम और ऑक्टेव निर्धारित करता है, जो मिलकर उस नोट की आवृत्ति तय करते हैं।"
 
 #: js/blocks/ToneBlocks.js:34
 #: js/widgets/timbre.js:783
@@ -5118,7 +5118,7 @@ msgstr "आंशिक"
 
 #: js/blocks/ToneBlocks.js:265
 msgid "The Partial block is used to specify a weight for a specific partial harmonic."
-msgstr ""
+msgstr "पार्शियल ब्लॉक का उपयोग किसी विशिष्ट आंशिक हार्मोनिक के लिए भार निर्दिष्ट करने के लिए किया जाता है।"
 
 #: js/blocks/ToneBlocks.js:284
 #. TRANS: partials are weighted components in a harmonic series
@@ -7200,7 +7200,7 @@ msgstr "बटन के साथ ताल को समायोजित क
 
 #: js/widgets/tempo.js:259
 msgid "Please enter a number between 30 and 1000"
-msgstr ""
+msgstr "कृपया 30 और 1000 के बीच एक संख्या दर्ज करें"
 
 #: js/widgets/tempo.js:266
 #: js/widgets/tempo.js:269
@@ -7265,11 +7265,11 @@ msgstr "मेट्रोनोम"
 
 #: js/widgets/musickeyboard.js:1630
 msgid "Note value"
-msgstr ""
+msgstr "नोट मान"
 
 #: js/widgets/musickeyboard.js:3265
 msgid "New action blocks generated."
-msgstr ""
+msgstr "नए एक्शन ब्लॉक्स उत्पन्न हुए।"
 
 #: js/widgets/musickeyboard.js:3449
 #: js/widgets/musickeyboard.js:3457
