@@ -264,6 +264,20 @@ class PhraseMaker {
          * @type {boolean}
          */
         this.lyricsON = false;
+
+        /**
+         * Number of beats per measure (from meter block)
+         * @type {number}
+         * @private
+         */
+        this._meterBeats = 4;
+
+        /**
+         * Note value that gets the beat (from meter block)
+         * @type {number}
+         * @private
+         */
+        this._meterNoteValue = 4;
     }
 
     /**
@@ -356,6 +370,67 @@ class PhraseMaker {
                 wfWinBody.style.background = "#cccccc";
             }
         }
+    }
+    /**
+     * Gets the current meter settings from the turtle's singer.
+     * Updates internal meter properties for bar line calculations.
+     * @private
+     */
+    _getCurrentMeter() {
+        // Access meter from the turtle's singer
+        if (this.activity.turtles && this.activity.turtles.ithTurtle(0)) {
+            const turtle = this.activity.turtles.ithTurtle(0);
+            if (turtle.singer) {
+                // Get the most recent meter setting
+                if (turtle.singer.beatsPerMeasure && turtle.singer.beatsPerMeasure.length > 0) {
+                    this._meterBeats = turtle.singer.beatsPerMeasure[turtle.singer.beatsPerMeasure.length - 1];
+                }
+                if (turtle.singer.noteValuePerBeat && turtle.singer.noteValuePerBeat.length > 0) {
+                    this._meterNoteValue = turtle.singer.noteValuePerBeat[turtle.singer.noteValuePerBeat.length - 1];
+                }
+            }
+        }
+    }
+
+    /**
+     * Determines if a column position should have a bar line.
+     * @param {number} columnIndex - The index of the column to check.
+     * @returns {boolean} True if this column should have a bar line.
+     * @private
+     */
+    _isBarLine(columnIndex) {
+        if (columnIndex === 0) {
+            return true; // First measure always starts with a bar line
+        }
+        
+        this._getCurrentMeter();
+        
+        // Calculate the cumulative note value up to this position
+        let cumulativeValue = 0;
+        for (let i = 0; i < columnIndex; i++) {
+            if (this._noteValueRow && this._noteValueRow.cells[i]) {
+                const noteValue = parseFloat(this._noteValueRow.cells[i].getAttribute("alt")) || 0;
+                cumulativeValue += noteValue;
+            } else {
+                // Fallback for tuplet cases
+                const noteValue = 1 / (this._notesToPlay[i] && this._notesToPlay[i][1] ? this._notesToPlay[i][1] : 4);
+                cumulativeValue += noteValue;
+            }
+        }
+        
+        // Calculate measure duration in whole note units
+        // meterBeats * (4 / meterNoteValue) gives us the measure duration
+        const measureDuration = this._meterBeats * (4 / this._meterNoteValue);
+        
+        // Convert cumulative value to quarter note units for easier calculation
+        const positionInQuarters = cumulativeValue * 4;
+        const measureInQuarters = measureDuration;
+        
+        // Check if we're at a measure boundary (with tolerance for floating point errors)
+        const remainder = positionInQuarters % measureInQuarters;
+
+
+        return Math.abs(remainder) < 0.001 || Math.abs(remainder - measureInQuarters) < 0.001;
     }
 
     /**
@@ -503,6 +578,8 @@ class PhraseMaker {
 
         this._notesToPlay = [];
         this._matrixHasTuplets = false;
+
+        this._getCurrentMeter();
 
         // Add the buttons to the top row.
 
@@ -3024,7 +3101,7 @@ class PhraseMaker {
         cell.innerHTML = tupletValue;
         cell.style.backgroundColor = platformColor.tupletBackground;
 
-        // And a span in the note value column too.
+        // Add a span in the note value column too.
         const noteValueRow = this._noteValueRow;
         cell = noteValueRow.insertCell();
         cell.colSpan = numberOfNotes;
@@ -3038,6 +3115,12 @@ class PhraseMaker {
         cell.innerHTML = noteValueToDisplay;
         cell.style.backgroundColor = platformColor.rhythmcellcolor;
         this._matrixHasTuplets = true;
+
+        const currentColumnIndex = noteValueRow.cells.length - 1;
+        if (this._isBarLine(currentColumnIndex)) {
+            cell.style.borderLeft = "3px solid #333333";
+            cell.style.paddingLeft = "2px";
+        }
     }
 
     /**
@@ -3126,6 +3209,11 @@ class PhraseMaker {
             cell.style.backgroundColor = platformColor.rhythmcellcolor;
             cell.style.color = platformColor.textColor;
             cell.setAttribute("alt", noteValue);
+
+            if (this._isBarLine(j)) {
+                cell.style.borderLeft = "3px solid #333333";
+                cell.style.paddingLeft = "2px";
+            }
 
             if (this._matrixHasTuplets) {
                 // We may need to insert some blank cells in the extra rows
