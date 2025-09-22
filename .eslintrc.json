@@ -14,7 +14,7 @@
     }
   },
   "extends": ["eslint:recommended", "prettier"],
-  "ignorePatterns": ["lib/**"],
+  "ignorePatterns": ["lib/**", "planet/libs/**", "**/*.min.js"],
   "rules": {
     "no-console": "off",
     "no-mixed-spaces-and-tabs": "warn",
