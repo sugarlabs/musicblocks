@@ -25,7 +25,7 @@ jobs:
       - name: Get changed JavaScript files
         id: get_files
         run: |
-          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} -- '*.js' | xargs -I {} sh -c 'test -f "{}" && echo "{}"')
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} -- '*.js' | xargs -I {} sh -c 'test -f "{}" && echo "{}"' || true)
           echo "files<<EOF" >> $GITHUB_ENV
           echo "$CHANGED_FILES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
