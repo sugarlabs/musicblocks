@@ -178,6 +178,7 @@ class PhraseMaker {
          * @type {number}
          * @private
          */
+        this._globalColumnIndex = 0;
         this._notesCounter = 0;
 
         /**
@@ -399,6 +400,7 @@ class PhraseMaker {
      * @private
      */
     _isBarLine(columnIndex) {
+
         if (columnIndex === 0) {
             return true; // First measure always starts with a bar line
         }
@@ -408,29 +410,24 @@ class PhraseMaker {
         // Calculate the cumulative note value up to this position
         let cumulativeValue = 0;
         for (let i = 0; i < columnIndex; i++) {
-            if (this._noteValueRow && this._noteValueRow.cells[i]) {
-                const noteValue = parseFloat(this._noteValueRow.cells[i].getAttribute("alt")) || 0;
-                cumulativeValue += noteValue;
-            } else {
-                // Fallback for tuplet cases
-                const noteValue = 1 / (this._notesToPlay[i] && this._notesToPlay[i][1] ? this._notesToPlay[i][1] : 4);
-                cumulativeValue += noteValue;
-            }
+            cumulativeValue += 0.25;
         }
         
         // Calculate measure duration in whole note units
         // meterBeats * (4 / meterNoteValue) gives us the measure duration
-        const measureDuration = this._meterBeats * (4 / this._meterNoteValue);
+        const measureDuration = this._meterBeats * (4 / this._meterNoteValue)/4;
         
         // Convert cumulative value to quarter note units for easier calculation
-        const positionInQuarters = cumulativeValue * 4;
-        const measureInQuarters = measureDuration;
+        // const positionInQuarters = cumulativeValue * 4;
+        // const measureInQuarters = measureDuration;
+        // // Check if we're at a measure boundary (with tolerance for floating point errors)
+        // const remainder = positionInQuarters % measureInQuarters;
+        // return Math.abs(remainder) < 0.001 || Math.abs(remainder - measureInQuarters) < 0.001;
+        const measurePosition = cumulativeValue / measureDuration;
+        const isWholeMeasure = Math.abs(measurePosition - Math.round(measurePosition)) < 0.001;
         
-        // Check if we're at a measure boundary (with tolerance for floating point errors)
-        const remainder = positionInQuarters % measureInQuarters;
-
-
-        return Math.abs(remainder) < 0.001 || Math.abs(remainder - measureInQuarters) < 0.001;
+        
+        return isWholeMeasure && columnIndex > 0;
     }
 
     /**
@@ -555,6 +552,7 @@ class PhraseMaker {
     init(activity) {
         // Initializes the matrix. First removes the previous matrix
         // and then make another one in DOM (document object model)
+        this._globalColumnIndex = 0;
         let tempTable;
         this.activity = activity;
 
@@ -3138,6 +3136,7 @@ class PhraseMaker {
      * @param {number} noteValue - The value of the notes (e.g., 4 for quarter notes, 8 for eighth notes).
      */
     addNotes(numBeats, noteValue) {
+
         let noteValueToDisplay = calcNoteValueToDisplay(noteValue, 1);
 
         if (noteValue > 12) {
@@ -3210,10 +3209,12 @@ class PhraseMaker {
             cell.style.color = platformColor.textColor;
             cell.setAttribute("alt", noteValue);
 
-            if (this._isBarLine(j)) {
+            if (this._isBarLine(this._globalColumnIndex)) {
                 cell.style.borderLeft = "3px solid #333333";
                 cell.style.paddingLeft = "2px";
             }
+
+            this._globalColumnIndex++;
 
             if (this._matrixHasTuplets) {
                 // We may need to insert some blank cells in the extra rows
