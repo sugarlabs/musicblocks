@@ -6,7 +6,7 @@
   "launch_path": "/index.html",
   "background_color": "white",
   "icons": [{
-    "src": "/activity/activity-icon-color-512.png",
+  "src": "/activity/activity-icon-color-512.png",
     "sizes": "512x512",
     "type": "image/png"
   },

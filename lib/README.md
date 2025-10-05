@@ -16,7 +16,7 @@ If you need to view or modify the original source code, it's best to refer to th
 | 04  | `domReady.js`                         | [domReady](https://github.com/requirejs/domReady)                                                    |
 | 05  | `easeljs.min.js`                      | [EaselJS](https://github.com/CreateJS/EaselJS)                                                       |
 | 06  | `howler.js`                           | [howler.js](https://github.com/goldfire/howler.js) <!-- Used in MB: v1.1.25, Latest: v2.2.4 -->      |
-| 07  | `jquery-3.7.1.js`                     | [jquery](https://github.com/jquery/jquery)                                                           |
+| 07  | `jquery-3.7.1.js` (CDN recommended)    | [jquery](https://github.com/jquery/jquery) - Local jQuery 2.1.4 files have been deprecated and removed; the app now loads jQuery 3.7.1 from CDN by default.                                                           |
 | 08  | `jquery-ui.js`                        | [jquery-ui](https://github.com/jquery/jquery-ui) <!-- Used in MB: v1.11.4, Latest: v1.14.1 -->       |
 | 09  | `jquery.cookie.js`                    | [jquery-cookie](https://github.com/carhartl/jquery-cookie) (No longer maintained)                    |
 | 10  | `jquery.joyride-2.1.js`               | [joyride](https://github.com/zurb/joyride)                                                           |
