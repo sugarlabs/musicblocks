@@ -595,7 +595,7 @@ function SampleWidget() {
                 submit.disabled = true;
                 const prompt = textArea.value;
                 const encodedPrompt = encodeURIComponent(prompt);
-                const url = `http://localhost:8000/generate?prompt=${encodedPrompt}`;
+                const url = `http://13.61.94.100:8000/generate?prompt=${encodedPrompt}`;
 
                 let blinkInterval;
 
@@ -639,7 +639,7 @@ function SampleWidget() {
             preview.innerHTML = "Preview";
             preview.disabled = true;
             preview.onclick = function (){
-                const audioURL = `http://localhost:8000/preview`;
+                const audioURL = `http://13.61.94.100:8000/preview`;
                 const audio = new Audio(audioURL);
                 audio.play();
             };
@@ -654,7 +654,7 @@ function SampleWidget() {
             save.innerHTML = "Save";
             save.disabled = true;
             save.onclick = function (){
-                const audioURL = `http://localhost:8000/save`;
+                const audioURL = `http://13.61.94.100:8000/save`;
                 const link = document.createElement('a');
                 link.href = audioURL;
                 link.download = 'output.wav';
@@ -792,7 +792,7 @@ function SampleWidget() {
             preview.onclick = async function() {
                 const from = fromInputBox.value
                 const to = toInputBox.value
-                const audioURL = `http://localhost:8000/trim-preview?start=${from}&end=${to}`;
+                const audioURL = `http://13.61.94.100:8000/trim-preview?start=${from}&end=${to}`;
                 const audio = new Audio(audioURL);
                 audio.play();
                 save.disabled = false;
@@ -808,7 +808,7 @@ function SampleWidget() {
             save.innerHTML = "Save";
             save.disabled = true;
             save.onclick = function (){
-                const audioURL = `http://localhost:8000/trim-save`;
+                const audioURL = `http://13.61.94.100:8000/trim-save`;
                 const link = document.createElement('a');
                 link.href = audioURL;
                 link.download = 'trimmed-output.wav';
