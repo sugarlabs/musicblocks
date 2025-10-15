@@ -492,7 +492,7 @@ msgstr "项目未定义"
 #: js/widgets/rhythmruler.js:2508
 #: js/widgets/phrasemaker.js:4996
 msgid "action"
-msgstr "动作"
+msgstr "動作"
 
 #: js/macros.js:711
 #: js/utils/musicutils.js:1157
@@ -936,6 +936,7 @@ msgstr "保存模块帮助"
 #. TRANS: the note names must be separated by single spaces
 #. TRANS: the note names must be separated by single spaces
 msgid "ti la sol fa mi re do"
+# TRANS: machine translation
 msgstr "ti la sol fa mi re do"
 
 #: js/activity.js:3173
@@ -1580,10 +1581,12 @@ msgstr "传感器"
 #: planet/js/GlobalTag.js:46
 #. TRANS: On the Planet, we use labels to tag projects.
 msgid "Media"
+# TRANS: machine translation
 msgstr "媒体"
 
 #: js/rubrics.js:533
 msgid "mice"
+# TRANS: machine translation
 msgstr "鼠标"
 
 #: js/toolbar.js:48
@@ -1902,10 +1905,12 @@ msgstr "English (United Kingdom)"
 #: js/toolbar.js:226
 #: js/toolbar.js:287
 msgid "日本語"
+# TRANS: machine translation
 msgstr "日本語"
 
 #: js/toolbar.js:95
 msgid "한국어"
+# TRANS: machine translation
 msgstr "한국어"
 
 #: js/toolbar.js:96
@@ -1913,6 +1918,7 @@ msgstr "한국어"
 #: js/toolbar.js:228
 #: js/toolbar.js:289
 msgid "español"
+# TRANS: machine translation
 msgstr "español"
 
 #: js/toolbar.js:97
@@ -1920,6 +1926,7 @@ msgstr "español"
 #: js/toolbar.js:229
 #: js/toolbar.js:290
 msgid "português"
+# TRANS: machine translation
 msgstr "português"
 
 #: js/toolbar.js:98
@@ -1927,6 +1934,7 @@ msgstr "português"
 #: js/toolbar.js:230
 #: js/toolbar.js:291
 msgid "にほんご"
+# TRANS: machine translation
 msgstr "にほんご"
 
 #: js/toolbar.js:99
@@ -1934,6 +1942,7 @@ msgstr "にほんご"
 #: js/toolbar.js:231
 #: js/toolbar.js:292
 msgid "中文"
+# TRANS: machine translation
 msgstr "中文"
 
 #: js/toolbar.js:100
@@ -1941,6 +1950,7 @@ msgstr "中文"
 #: js/toolbar.js:232
 #: js/toolbar.js:293
 msgid "ภาษาไทย"
+# TRANS: machine translation
 msgstr "ภาษาไทย"
 
 #: js/toolbar.js:101
@@ -1948,6 +1958,7 @@ msgstr "ภาษาไทย"
 #: js/toolbar.js:233
 #: js/toolbar.js:294
 msgid "aymara"
+# TRANS: machine translation
 msgstr "aymara"
 
 #: js/toolbar.js:102
@@ -1955,6 +1966,7 @@ msgstr "aymara"
 #: js/toolbar.js:234
 #: js/toolbar.js:295
 msgid "quechua"
+# TRANS: machine translation
 msgstr "quechua"
 
 #: js/toolbar.js:103
@@ -1962,6 +1974,7 @@ msgstr "quechua"
 #: js/toolbar.js:235
 #: js/toolbar.js:296
 msgid "guarani"
+# TRANS: machine translation
 msgstr "guarani"
 
 #: js/toolbar.js:104
@@ -1969,6 +1982,7 @@ msgstr "guarani"
 #: js/toolbar.js:236
 #: js/toolbar.js:297
 msgid "हिंदी"
+# TRANS: machine translation
 msgstr "हिंदी"
 
 #: js/toolbar.js:105
@@ -1976,6 +1990,7 @@ msgstr "हिंदी"
 #: js/toolbar.js:237
 #: js/toolbar.js:299
 msgid "igbo"
+# TRANS: machine translation
 msgstr "igbo"
 
 #: js/toolbar.js:106
@@ -1983,6 +1998,7 @@ msgstr "igbo"
 #: js/toolbar.js:238
 #: js/toolbar.js:300
 msgid "عربى"
+# TRANS: machine translation
 msgstr "عربى"
 
 #: js/toolbar.js:107
@@ -1990,6 +2006,7 @@ msgstr "عربى"
 #: js/toolbar.js:239
 #: js/toolbar.js:298
 msgid "తెలుగు"
+# TRANS: machine translation
 msgstr "తెలుగు"
 
 #: js/toolbar.js:108
@@ -1997,6 +2014,7 @@ msgstr "తెలుగు"
 #: js/toolbar.js:240
 #: js/toolbar.js:301
 msgid "עִברִית"
+# TRANS: machine translation
 msgstr "עִברִית"
 
 #: js/toolbar.js:109
@@ -2004,6 +2022,7 @@ msgstr "עִברִית"
 #: js/toolbar.js:241
 #: js/toolbar.js:302
 msgid "اردو"
+# TRANS: machine translation
 msgstr "اردو"
 
 #: js/toolbar.js:157
@@ -2027,6 +2046,7 @@ msgstr "将海龟图形保存为SVG"
 #: js/toolbar.js:227
 #: js/toolbar.js:288
 msgid "한국인"
+# TRANS: machine translation
 msgstr "한국인"
 
 #: js/toolbar.js:185
@@ -2419,6 +2439,7 @@ msgstr "您也可以从文件系统加载项目"
 #: js/widgets/timbre.js:750
 #: js/widgets/phrasemaker.js:561
 msgid "Save"
+# TRANS: machine translation
 msgstr "保存"
 
 #: js/turtledefs.js:548
@@ -2864,75 +2885,93 @@ msgstr ""
 
 #: js/utils/musicutils.js:700
 msgid "Augmented octave"
+# TRANS: machine translation
 msgstr "增八度"
 
 #: js/utils/musicutils.js:701
 msgid "Major ninth"
+# TRANS: machine translation
 msgstr "大九度"
 
 #: js/utils/musicutils.js:701
 msgid "Diminished tenth"
+# TRANS: machine translation
 msgstr "减十度"
 
 #: js/utils/musicutils.js:702
 msgid "Minor tenth"
+# TRANS: machine translation
 msgstr "小十度"
 
 #: js/utils/musicutils.js:702
 msgid "Augmented ninth"
+# TRANS: machine translation
 msgstr "增九度"
 
 #: js/utils/musicutils.js:703
 msgid "Major tenth"
+# TRANS: machine translation
 msgstr "大十度"
 
 #: js/utils/musicutils.js:703
 msgid "Diminished eleventh"
+# TRANS: machine translation
 msgstr "减十一度"
 
 #: js/utils/musicutils.js:704
 msgid "Perfect eleventh"
+# TRANS: machine translation
 msgstr "纯十一度"
 
 #: js/utils/musicutils.js:704
 msgid "Augmented tenth"
+# TRANS: machine translation
 msgstr "增十度"
 
 #: js/utils/musicutils.js:705
 msgid "Diminished twelfth"
+# TRANS: machine translation
 msgstr "减十二度"
 
 #: js/utils/musicutils.js:705
 msgid "Augmented eleventh"
+# TRANS: machine translation
 msgstr "增十一度"
 
 #: js/utils/musicutils.js:706
 msgid "Perfect twelfth"
+# TRANS: machine translation
 msgstr "纯十二度"
 
 #: js/utils/musicutils.js:706
 msgid "Diminished thirteenth"
+# TRANS: machine translation
 msgstr "减十三度"
 
 #: js/utils/musicutils.js:707
 msgid "Minor thirteenth"
+# TRANS: machine translation
 msgstr "小十三度"
 
 #: js/utils/musicutils.js:707
 msgid "Augmented fifth, plus an octave"
+# TRANS: machine translation
 msgstr "增五度加八度"
 
 #: js/utils/musicutils.js:708
 msgid "Major thirteenth"
+# TRANS: machine translation
 msgstr "大十三度"
 
 #: js/utils/musicutils.js:708
 msgid "Diminished seventh, plus an octave"
+# TRANS: machine translation
 msgstr "减七度加八度"
 
 #: js/utils/musicutils.js:836
 #. TRANS: ordinal number. Please keep exactly one space between each number.
 msgid "1st 2nd 3rd 4th 5th 6th 7th 8th 9th 10th 11th 12th"
+# TRANS: machine translation
 msgstr "第一 第二 第三 第四 第五 第六 第七 第八 第九 第十 第十一 第十二"
 
 #: js/utils/musicutils.js:1002
@@ -2940,6 +2979,7 @@ msgstr "第一 第二 第三 第四 第五 第六 第七 第八 第九 第十 �
 #: js/utils/musicutils.js:1368
 #. TRANS: augmented is a music term related to intervals
 msgid "augmented"
+# TRANS: machine translation
 msgstr "增音程"
 
 #: js/utils/musicutils.js:1004
@@ -2947,6 +2987,7 @@ msgstr "增音程"
 #: js/utils/musicutils.js:1367
 #. TRANS: diminished is a music term related to intervals and mode
 msgid "diminished"
+# TRANS: machine translation
 msgstr "减音程"
 
 #: js/utils/musicutils.js:1010
@@ -2956,179 +2997,217 @@ msgstr "减音程"
 #: js/turtleactions/IntervalsActions.js:124
 #. TRANS: perfect is a music term related to intervals
 msgid "perfect"
+# TRANS: machine translation
 msgstr "纯音程"
 
 #: js/utils/musicutils.js:1012
 #. TRANS: twelve semi-tone scale for music
 msgid "chromatic"
+# TRANS: machine translation
 msgstr "半音阶"
 
 #: js/utils/musicutils.js:1013
 msgid "algerian"
+# TRANS: machine translation
 msgstr "algerian"
 
 #: js/utils/musicutils.js:1014
 msgid "spanish"
+# TRANS: machine translation
 msgstr "西班牙调式"
 
 #: js/utils/musicutils.js:1016
 #. TRANS: modal scale in music
 msgid "octatonic"
+# TRANS: machine translation
 msgstr "八音阶"
 
 #: js/utils/musicutils.js:1018
 #. TRANS: harmonic major scale in music
 msgid "harmonic major"
+# TRANS: machine translation
 msgstr "和声大调"
 
 #: js/utils/musicutils.js:1020
 #. TRANS: natural minor scales in music
 msgid "natural minor"
+# TRANS: machine translation
 msgstr "自然小调"
 
 #: js/utils/musicutils.js:1022
 #. TRANS: harmonic minor scale in music
 msgid "harmonic minor"
+# TRANS: machine translation
 msgstr "和声小调"
 
 #: js/utils/musicutils.js:1024
 #. TRANS: melodic minor scale in music
 msgid "melodic minor"
+# TRANS: machine translation
 msgstr "旋律小调"
 
 #: js/utils/musicutils.js:1028
 #. TRANS: modal scale for music
 msgid "dorian"
+# TRANS: machine translation
 msgstr "多利安调式"
 
 #: js/utils/musicutils.js:1030
 #. TRANS: modal scale for music
 msgid "phrygian"
+# TRANS: machine translation
 msgstr "弗利几亚调式"
 
 #: js/utils/musicutils.js:1032
 #. TRANS: modal scale for music
 msgid "lydian"
+# TRANS: machine translation
 msgstr "利底亚调式"
 
 #: js/utils/musicutils.js:1034
 #. TRANS: modal scale for music
 msgid "mixolydian"
+# TRANS: machine translation
 msgstr "米克索利底亚调式"
 
 #: js/utils/musicutils.js:1038
 #. TRANS: modal scale for music
 msgid "locrian"
+# TRANS: machine translation
 msgstr "洛克利亚调式"
 
 #: js/utils/musicutils.js:1040
 #. TRANS: minor jazz scale for music
 msgid "jazz minor"
+# TRANS: machine translation
 msgstr "爵士小调"
 
 #: js/utils/musicutils.js:1042
 #. TRANS: bebop scale for music
 msgid "bebop"
+# TRANS: machine translation
 msgstr "bebop"
 
 #: js/utils/musicutils.js:1043
 msgid "arabic"
+# TRANS: machine translation
 msgstr "阿拉伯调式"
 
 #: js/utils/musicutils.js:1044
 msgid "byzantine"
+# TRANS: machine translation
 msgstr "拜占庭调式"
 
 #: js/utils/musicutils.js:1046
 #. TRANS: musical scale for music by Verdi
 msgid "enigmatic"
+# TRANS: machine translation
 msgstr "谜样调式"
 
 #: js/utils/musicutils.js:1047
 msgid "ethiopian"
+# TRANS: machine translation
 msgstr "埃塞俄比亚调式"
 
 #: js/utils/musicutils.js:1049
 #. TRANS: Ethiopic scale for music
 msgid "geez"
+# TRANS: machine translation
 msgstr "geez"
 
 #: js/utils/musicutils.js:1050
 msgid "hindu"
+# TRANS: machine translation
 msgstr "印度调式"
 
 #: js/utils/musicutils.js:1051
 msgid "hungarian"
+# TRANS: machine translation
 msgstr "匈牙利调式"
 
 #: js/utils/musicutils.js:1053
 #. TRANS: minor Romanian scale for music
 msgid "romanian minor"
+# TRANS: machine translation
 msgstr "罗马尼亚小调"
 
 #: js/utils/musicutils.js:1054
 msgid "spanish gypsy"
+# TRANS: machine translation
 msgstr "西班牙吉普赛调式"
 
 #: js/utils/musicutils.js:1056
 #. TRANS: musical scale for Mid-Eastern music
 msgid "maqam"
+# TRANS: machine translation
 msgstr "maqam"
 
 #: js/utils/musicutils.js:1058
 #. TRANS: minor blues scale for music
 msgid "minor blues"
+# TRANS: machine translation
 msgstr "小调布鲁斯"
 
 #: js/utils/musicutils.js:1060
 #. TRANS: major blues scale for music
 msgid "major blues"
+# TRANS: machine translation
 msgstr "大调布鲁斯"
 
 #: js/utils/musicutils.js:1061
 msgid "whole tone"
+# TRANS: machine translation
 msgstr "全音音阶"
 
 #: js/utils/musicutils.js:1063
 #. TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "minor pentatonic"
 msgid "minor pentatonic"
+# TRANS: machine translation
 msgstr "小调五声音阶"
 
 #: js/utils/musicutils.js:1065
 #. TRANS: pentatonic is a general term that means "five note scale". This scale is typically known as "major pentatonic"
 msgid "major pentatonic"
+# TRANS: machine translation
 msgstr "大调五声音阶"
 
 #: js/utils/musicutils.js:1066
 msgid "chinese"
+# TRANS: machine translation
 msgstr "中国调式"
 
 #: js/utils/musicutils.js:1067
 msgid "egyptian"
+# TRANS: machine translation
 msgstr "埃及调式"
 
 #: js/utils/musicutils.js:1069
 #. TRANS: https://en.wikipedia.org/wiki/Hirajoshi_scale NOTE: There are three different versions of this scale
 msgid "hirajoshi"
+# TRANS: machine translation
 msgstr "平调式"
 
 #: js/utils/musicutils.js:1070
 msgid "Japan"
+# TRANS: machine translation
 msgstr "日本调式"
 
 #: js/utils/musicutils.js:1072
 #. TRANS: https://en.wikipedia.org/wiki/In_scale and https://en.wikipedia.org/wiki/Sakura_Sakura
 msgid "in"
+# TRANS: machine translation
 msgstr "in"
 
 #: js/utils/musicutils.js:1074
 #. TRANS: https://en.wikipedia.org/wiki/Miny%C5%8D_scale
 msgid "minyo"
+# TRANS: machine translation
 msgstr "民谣调式"
 
 #: js/utils/musicutils.js:1076
 #. TRANS: Italian mathematician
 msgid "fibonacci"
+# TRANS: machine translation
 msgstr "斐波那契"
 
 #: js/utils/musicutils.js:1077
@@ -3146,6 +3225,7 @@ msgstr "斐波那契"
 #: js/widgets/modewidget.js:913
 #. TRANS: customize voice
 msgid "custom"
+# TRANS: machine translation
 msgstr "自定义"
 
 #: js/utils/musicutils.js:1079
@@ -3153,48 +3233,56 @@ msgstr "自定义"
 #: js/blocks/WidgetBlocks.js:176
 #. TRANS: highpass filter
 msgid "highpass"
+# TRANS: machine translation
 msgstr "高通滤波器"
 
 #: js/utils/musicutils.js:1081
 #: js/utils/musicutils.js:1575
 #. TRANS: lowpass filter
 msgid "lowpass"
+# TRANS: machine translation
 msgstr "低通滤波器"
 
 #: js/utils/musicutils.js:1083
 #: js/utils/musicutils.js:1576
 #. TRANS: bandpass filter
 msgid "bandpass"
+# TRANS: machine translation
 msgstr "带通滤波器"
 
 #: js/utils/musicutils.js:1085
 #: js/utils/musicutils.js:1577
 #. TRANS: high-shelf filter
 msgid "highshelf"
+# TRANS: machine translation
 msgstr "高架滤波器"
 
 #: js/utils/musicutils.js:1087
 #: js/utils/musicutils.js:1578
 #. TRANS: low-shelf filter
 msgid "lowshelf"
+# TRANS: machine translation
 msgstr "低架滤波器"
 
 #: js/utils/musicutils.js:1089
 #: js/utils/musicutils.js:1579
 #. TRANS: notch-shelf filter
 msgid "notch"
+# TRANS: machine translation
 msgstr "陷波滤波器"
 
 #: js/utils/musicutils.js:1091
 #: js/utils/musicutils.js:1580
 #. TRANS: all-pass filter
 msgid "allpass"
+# TRANS: machine translation
 msgstr "全通滤波器"
 
 #: js/utils/musicutils.js:1093
 #: js/utils/musicutils.js:1581
 #. TRANS: peaking filter
 msgid "peaking"
+# TRANS: machine translation
 msgstr "峰值滤波器"
 
 #: js/utils/musicutils.js:1094
@@ -3203,6 +3291,7 @@ msgstr "峰值滤波器"
 #: js/blocks/PitchBlocks.js:85
 #. TRANS: sine wave
 msgid "sine"
+# TRANS: machine translation
 msgstr "正弦波"
 
 #: js/utils/musicutils.js:1095
@@ -3211,6 +3300,7 @@ msgstr "正弦波"
 #: js/blocks/PitchBlocks.js:39
 #. TRANS: square wave
 msgid "square"
+# TRANS: machine translation
 msgstr "方波"
 
 #: js/utils/musicutils.js:1096
@@ -3220,6 +3310,7 @@ msgstr "方波"
 #: js/blocks/ToneBlocks.js:39
 #. TRANS: triangle wave
 msgid "triangle"
+# TRANS: machine translation
 msgstr "三角波"
 
 #: js/utils/musicutils.js:1097
@@ -3228,6 +3319,7 @@ msgstr "三角波"
 #: js/blocks/PitchBlocks.js:108
 #. TRANS: sawtooth wave
 msgid "sawtooth"
+# TRANS: machine translation
 msgstr "锯齿波"
 
 #: js/utils/musicutils.js:1099
@@ -3238,6 +3330,7 @@ msgstr "锯齿波"
 #. TRANS: even numbers
 #. TRANS: invert based on even or odd number or musical scale
 msgid "even"
+# TRANS: machine translation
 msgstr "偶数"
 
 #: js/utils/musicutils.js:1101
@@ -3246,6 +3339,7 @@ msgstr "偶数"
 #: js/turtleactions/PitchActions.js:471
 #. TRANS: odd numbers
 msgid "odd"
+# TRANS: machine translation
 msgstr "奇数"
 
 #: js/utils/musicutils.js:1102
@@ -3253,6 +3347,7 @@ msgstr "奇数"
 #: js/blocks/PitchBlocks.js:937
 #: js/turtleactions/PitchActions.js:473
 msgid "scalar"
+# TRANS: machine translation
 msgstr "标量"
 
 #: js/utils/musicutils.js:1103
@@ -3260,42 +3355,49 @@ msgstr "标量"
 #: js/blocks/VolumeBlocks.js:47
 #. TRANS: musical instrument
 msgid "piano"
+# TRANS: machine translation
 msgstr "钢琴"
 
 #: js/utils/musicutils.js:1104
 #: js/utils/synthutils.js:74
 #. TRANS: musical instrument
 msgid "violin"
+# TRANS: machine translation
 msgstr "小提琴"
 
 #: js/utils/musicutils.js:1105
 #: js/utils/synthutils.js:76
 #. TRANS: viola musical instrument
 msgid "viola"
+# TRANS: machine translation
 msgstr "中提琴"
 
 #: js/utils/musicutils.js:1106
 #: js/utils/synthutils.js:116
 #. TRANS: xylophone musical instrument
 msgid "xylophone"
+# TRANS: machine translation
 msgstr "木琴"
 
 #: js/utils/musicutils.js:1107
 #: js/utils/synthutils.js:138
 #. TRANS: vibraphone musical instrument
 msgid "vibraphone"
+# TRANS: machine translation
 msgstr "颤音琴"
 
 #: js/utils/musicutils.js:1108
 #: js/utils/synthutils.js:78
 #. TRANS: musical instrument
 msgid "cello"
+# TRANS: machine translation
 msgstr "大提琴"
 
 #: js/utils/musicutils.js:1110
 #: js/utils/synthutils.js:82
 #. TRANS: viola musical instrument
 msgid "double bass"
+# TRANS: machine translation
 msgstr "低音提琴"
 
 #: js/utils/musicutils.js:1111
@@ -3303,84 +3405,99 @@ msgstr "低音提琴"
 #: js/widgets/rhythmruler.js:2501
 #. TRANS: musical instrument
 msgid "guitar"
+# TRANS: machine translation
 msgstr "吉他"
 
 #: js/utils/musicutils.js:1112
 #: js/utils/synthutils.js:84
 #. TRANS: sitar musical instrument
 msgid "sitar"
+# TRANS: machine translation
 msgstr "锡塔尔琴"
 
 #: js/utils/musicutils.js:1113
 #: js/utils/synthutils.js:88
 #. TRANS: musical instrument
 msgid "acoustic guitar"
+# TRANS: machine translation
 msgstr "原声吉他"
 
 #: js/utils/musicutils.js:1114
 #: js/utils/synthutils.js:90
 #. TRANS: musical instrument
 msgid "flute"
+# TRANS: machine translation
 msgstr "长笛"
 
 #: js/utils/musicutils.js:1115
 #: js/utils/synthutils.js:92
 #. TRANS: musical instrument
 msgid "clarinet"
+# TRANS: machine translation
 msgstr "单簧管"
 
 #: js/utils/musicutils.js:1116
 #: js/utils/synthutils.js:94
 #. TRANS: musical instrument
 msgid "saxophone"
+# TRANS: machine translation
 msgstr "萨克斯管"
 
 #: js/utils/musicutils.js:1117
 #: js/utils/synthutils.js:96
 #. TRANS: musical instrument
 msgid "tuba"
+# TRANS: machine translation
 msgstr "大号"
 
 #: js/utils/musicutils.js:1118
 #: js/utils/synthutils.js:98
 #. TRANS: musical instrument
 msgid "trumpet"
+# TRANS: machine translation
 msgstr "小号"
 
 #: js/utils/musicutils.js:1119
 #: js/utils/synthutils.js:100
 #. TRANS: musical instrument
 msgid "oboe"
+# TRANS: machine translation
 msgstr "双簧管"
 
 #: js/utils/musicutils.js:1120
 #: js/utils/synthutils.js:102
 #. TRANS: musical instrument
 msgid "trombone"
+# TRANS: machine translation
 msgstr "长号"
 
 #: js/utils/musicutils.js:1121
 #: js/utils/synthutils.js:118
 #. TRANS: polytone synthesizer
 msgid "electronic synth"
+# TRANS: machine translation
 msgstr "电子合成器"
 
 #: js/utils/musicutils.js:1122
 #: js/utils/synthutils.js:120
 #. TRANS: simple monotone synthesizer
 msgid "simple 1"
+# TRANS: machine translation
 msgstr "简单1"
 
 #: js/utils/musicutils.js:1123
 msgid "simple 2"
+# TRANS: machine translation
 msgstr "简单2"
 
 #: js/utils/musicutils.js:1124
 msgid "simple 3"
+# TRANS: machine translation
 msgstr "简单3"
 
 #: js/utils/musicutils.js:1125
 msgid "simple 4"
+# TRANS: machine translation
 msgstr "简单4"
 
 #: js/utils/musicutils.js:1126
@@ -3388,18 +3505,21 @@ msgstr "简单4"
 #: js/blocks/DrumBlocks.js:191
 #. TRANS: white noise synthesizer
 msgid "white noise"
+# TRANS: machine translation
 msgstr "白噪音"
 
 #: js/utils/musicutils.js:1127
 #: js/utils/synthutils.js:60
 #. TRANS: brown noise synthesizer
 msgid "brown noise"
+# TRANS: machine translation
 msgstr "棕色噪音"
 
 #: js/utils/musicutils.js:1128
 #: js/utils/synthutils.js:62
 #. TRANS: pink noise synthesizer
 msgid "pink noise"
+# TRANS: machine translation
 msgstr "粉红噪音"
 
 #: js/utils/musicutils.js:1130
@@ -3408,212 +3528,248 @@ msgstr "粉红噪音"
 #: js/widgets/rhythmruler.js:2309
 #. TRANS: musical instrument
 msgid "snare drum"
+# TRANS: machine translation
 msgstr "军鼓"
 
 #: js/utils/musicutils.js:1131
 #: js/utils/synthutils.js:152
 #. TRANS: musical instrument
 msgid "kick drum"
+# TRANS: machine translation
 msgstr "大鼓"
 
 #: js/utils/musicutils.js:1132
 #: js/utils/synthutils.js:154
 #. TRANS: musical instrument
 msgid "tom tom"
+# TRANS: machine translation
 msgstr "通通鼓"
 
 #: js/utils/musicutils.js:1133
 #: js/utils/synthutils.js:156
 #. TRANS: musical instrument
 msgid "floor tom"
+# TRANS: machine translation
 msgstr "落地鼓"
 
 #: js/utils/musicutils.js:1134
 #: js/utils/synthutils.js:158
 #. TRANS: musical instrument
 msgid "bass drum"
+# TRANS: machine translation
 msgstr "低音鼓"
 
 #: js/utils/musicutils.js:1135
 #: js/utils/synthutils.js:160
 #. TRANS: a drum made from an inverted cup
 msgid "cup drum"
+# TRANS: machine translation
 msgstr "杯鼓"
 
 #: js/utils/musicutils.js:1136
 #: js/utils/synthutils.js:162
 #. TRANS: musical instrument
 msgid "darbuka drum"
+# TRANS: machine translation
 msgstr "达布卡鼓"
 
 #: js/utils/musicutils.js:1137
 #: js/utils/synthutils.js:166
 #. TRANS: musical instrument
 msgid "hi hat"
+# TRANS: machine translation
 msgstr "踩镲"
 
 #: js/utils/musicutils.js:1138
 #: js/utils/synthutils.js:168
 #. TRANS: a small metal bell
 msgid "ride bell"
+# TRANS: machine translation
 msgstr "骑铃"
 
 #: js/utils/musicutils.js:1139
 #: js/utils/synthutils.js:170
 #. TRANS: musical instrument
 msgid "cow bell"
+# TRANS: machine translation
 msgstr "牛铃"
 
 #: js/utils/musicutils.js:1140
 msgid "japanese drum"
+# TRANS: machine translation
 msgstr "日本鼓"
 
 #: js/utils/musicutils.js:1141
 #: js/utils/synthutils.js:176
 #. TRANS: musical instrument
 msgid "japanese bell"
+# TRANS: machine translation
 msgstr "日本铃"
 
 #: js/utils/musicutils.js:1142
 #: js/utils/synthutils.js:172
 #. TRANS: musical instrument
 msgid "triangle bell"
+# TRANS: machine translation
 msgstr "三角铃"
 
 #: js/utils/musicutils.js:1143
 #: js/utils/synthutils.js:174
 #. TRANS: musical instrument
 msgid "finger cymbals"
+# TRANS: machine translation
 msgstr "指钹"
 
 #: js/utils/musicutils.js:1144
 #: js/utils/synthutils.js:178
 #. TRANS: a musically tuned set of bells
 msgid "chime"
+# TRANS: machine translation
 msgstr "风铃"
 
 #: js/utils/musicutils.js:1145
 #: js/utils/synthutils.js:180
 #. TRANS: a musical instrument
 msgid "gong"
+# TRANS: machine translation
 msgstr "锣"
 
 #: js/utils/musicutils.js:1146
 #: js/utils/synthutils.js:182
 #. TRANS: sound effect
 msgid "clang"
+# TRANS: machine translation
 msgstr "叮当声"
 
 #: js/utils/musicutils.js:1147
 #: js/utils/synthutils.js:184
 #. TRANS: sound effect
 msgid "crash"
+# TRANS: machine translation
 msgstr "撞击声"
 
 #: js/utils/musicutils.js:1148
 #: js/utils/synthutils.js:186
 #. TRANS: sound effect
 msgid "bottle"
+# TRANS: machine translation
 msgstr "瓶子声"
 
 #: js/utils/musicutils.js:1149
 #: js/utils/synthutils.js:188
 #. TRANS: sound effect
 msgid "clap"
+# TRANS: machine translation
 msgstr "拍手声"
 
 #: js/utils/musicutils.js:1150
 #: js/utils/synthutils.js:190
 #. TRANS: sound effect
 msgid "slap"
+# TRANS: machine translation
 msgstr "拍打声"
 
 #: js/utils/musicutils.js:1151
 #: js/utils/synthutils.js:192
 #. TRANS: sound effect
 msgid "splash"
+# TRANS: machine translation
 msgstr "水花声"
 
 #: js/utils/musicutils.js:1152
 #: js/utils/synthutils.js:194
 #. TRANS: sound effect
 msgid "bubbles"
+# TRANS: machine translation
 msgstr "气泡声"
 
 #: js/utils/musicutils.js:1153
 #: js/utils/synthutils.js:196
 #. TRANS: sound effect
 msgid "raindrop"
+# TRANS: machine translation
 msgstr "雨滴声"
 
 #: js/utils/musicutils.js:1154
 #: js/utils/synthutils.js:198
 #. TRANS: animal sound effect
 msgid "cat"
+# TRANS: machine translation
 msgstr "猫"
 
 #: js/utils/musicutils.js:1155
 #: js/utils/synthutils.js:200
 #. TRANS: animal sound effect
 msgid "cricket"
+# TRANS: machine translation
 msgstr "蟋蟀声"
 
 #: js/utils/musicutils.js:1156
 #: js/utils/synthutils.js:202
 #. TRANS: animal sound effect
 msgid "dog"
+# TRANS: machine translation
 msgstr "狗"
 
 #: js/utils/musicutils.js:1158
 #: js/utils/synthutils.js:104
 #. TRANS: musical instrument
 msgid "banjo"
+# TRANS: machine translation
 msgstr "班卓琴"
 
 #: js/utils/musicutils.js:1159
 #: js/utils/synthutils.js:106
 #. TRANS: musical instrument
 msgid "koto"
+# TRANS: machine translation
 msgstr "琴"
 
 #: js/utils/musicutils.js:1160
 #: js/utils/synthutils.js:108
 #. TRANS: musical instrument
 msgid "dulcimer"
+# TRANS: machine translation
 msgstr "扬琴"
 
 #: js/utils/musicutils.js:1161
 #: js/utils/synthutils.js:110
 #. TRANS: musical instrument
 msgid "electric guitar"
+# TRANS: machine translation
 msgstr "电吉他"
 
 #: js/utils/musicutils.js:1162
 #: js/utils/synthutils.js:112
 #. TRANS: musical instrument
 msgid "bassoon"
+# TRANS: machine translation
 msgstr "巴松管"
 
 #: js/utils/musicutils.js:1163
 #: js/utils/synthutils.js:114
 #. TRANS: musical instrument
 msgid "celeste"
+# TRANS: machine translation
 msgstr "颤音琴"
 
 #: js/utils/musicutils.js:1165
 #: js/widgets/temperament.js:757
 #. TRANS: musical temperament
 msgid "equal"
+# TRANS: machine translation
 msgstr "平均律"
 
 #: js/utils/musicutils.js:1167
 #. TRANS: musical temperament
 msgid "Pythagorean"
+# TRANS: machine translation
 msgstr "毕达哥拉斯律"
 
 #: js/utils/musicutils.js:1169
 #. TRANS: musical temperament
 msgid "just intonation"
+# TRANS: machine translation
 msgstr "纯律"
 
 #: js/utils/musicutils.js:1171
@@ -3623,80 +3779,97 @@ msgstr "纯律"
 #: js/utils/musicutils.js:1624
 #. TRANS: musical temperament
 msgid "Meantone"
+# TRANS: machine translation
 msgstr "中庸律"
 
 #: js/utils/musicutils.js:1188
 msgid "major 7th"
+# TRANS: machine translation
 msgstr "大七度"
 
 #: js/utils/musicutils.js:1189
 msgid "minor 7th"
+# TRANS: machine translation
 msgstr "小七度"
 
 #: js/utils/musicutils.js:1190
 msgid "dominant 7th"
+# TRANS: machine translation
 msgstr "属七度"
 
 #: js/utils/musicutils.js:1191
 msgid "minor-major 7th"
+# TRANS: machine translation
 msgstr "小大七度"
 
 #: js/utils/musicutils.js:1192
 msgid "fully-diminished 7th"
+# TRANS: machine translation
 msgstr "完全减七度"
 
 #: js/utils/musicutils.js:1193
 msgid "half-diminished 7th"
+# TRANS: machine translation
 msgstr "半减七度"
 
 #: js/utils/musicutils.js:1600
 #: js/utils/musicutils.js:1616
 msgid "Equal (12EDO)"
+# TRANS: machine translation
 msgstr "十二平均律"
 
 #: js/utils/musicutils.js:1601
 #: js/utils/musicutils.js:1617
 msgid "Equal (5EDO)"
+# TRANS: machine translation
 msgstr "五平均律"
 
 #: js/utils/musicutils.js:1602
 #: js/utils/musicutils.js:1618
 msgid "Equal (7EDO)"
+# TRANS: machine translation
 msgstr "七平均律"
 
 #: js/utils/musicutils.js:1603
 #: js/utils/musicutils.js:1619
 msgid "Equal (19EDO)"
+# TRANS: machine translation
 msgstr "十九平均律"
 
 #: js/utils/musicutils.js:1604
 #: js/utils/musicutils.js:1620
 msgid "Equal (31EDO)"
+# TRANS: machine translation
 msgstr "三十一平均律"
 
 #: js/utils/musicutils.js:1605
 #: js/utils/musicutils.js:1621
 msgid "5-limit Just Intonation"
+# TRANS: machine translation
 msgstr "五限纯律"
 
 #: js/utils/musicutils.js:1606
 #: js/utils/musicutils.js:1622
 msgid "Pythagorean (3-limit JI)"
+# TRANS: machine translation
 msgstr "毕达哥拉斯（三级纯律）"
 
 #: js/utils/musicutils.js:5631
 #: js/utils/musicutils.js:5674
 msgid "current"
+# TRANS: machine translation
 msgstr "当前"
 
 #: js/utils/musicutils.js:5634
 #: js/utils/musicutils.js:5665
 msgid "next"
+# TRANS: machine translation
 msgstr "下一个"
 
 #: js/utils/musicutils.js:5637
 #: js/utils/musicutils.js:5670
 msgid "previous"
+# TRANS: machine translation
 msgstr "上一个"
 
 #: js/utils/synthutils.js:122
@@ -3721,6 +3894,7 @@ msgstr ""
 
 #: js/blocks/BooleanBlocks.js:44
 msgid "The Not block is the logical not operator."
+# TRANS: machine translation
 msgstr "Not 块是逻辑非运算符。"
 
 #: js/blocks/BooleanBlocks.js:62
@@ -3729,6 +3903,7 @@ msgstr "否"
 
 #: js/blocks/BooleanBlocks.js:134
 msgid "The And block is the logical and operator."
+# TRANS: machine translation
 msgstr "And 块是逻辑与运算符。"
 
 #: js/blocks/BooleanBlocks.js:152
@@ -3737,6 +3912,7 @@ msgstr "且"
 
 #: js/blocks/BooleanBlocks.js:218
 msgid "The Or block is the logical or operator."
+# TRANS: machine translation
 msgstr "Or 块是逻辑或运算符。"
 
 #: js/blocks/BooleanBlocks.js:236
@@ -3745,110 +3921,135 @@ msgstr "或"
 
 #: js/blocks/BooleanBlocks.js:302
 msgid "The XOR block is the logical XOR operator."
+# TRANS: machine translation
 msgstr "XOR 块是逻辑异或运算符。"
 
 #: js/blocks/BooleanBlocks.js:320
 msgid "xor"
+# TRANS: machine translation
 msgstr "异或"
 
 #: js/blocks/BooleanBlocks.js:808
 msgid "The Equal block returns True if the two numbers are equal."
+# TRANS: machine translation
 msgstr "Equal 块在两个数字相等时返回真。"
 
 #: js/blocks/BooleanBlocks.js:909
 msgid "The Not-equal-to block returns True if the two numbers are not equal to each other."
+# TRANS: machine translation
 msgstr "Not-equal-to 块在两个数字不相等时返回真。"
 
 #: js/blocks/BooleanBlocks.js:1008
 msgid "The Boolean block is used to specify true or false."
+# TRANS: machine translation
 msgstr "Boolean 块用于指定真或假。"
 
 #: js/blocks/BoxesBlocks.js:53
 #: js/blocks/BoxesBlocks.js:59
 msgid "The Add-to block is used to add to the value stored in a box."
+# TRANS: machine translation
 msgstr "Add-to 块用于对盒子中存储的值进行加法。"
 
 #: js/blocks/BoxesBlocks.js:61
 msgid "It can also be used with other blocks such as Color and Pen size."
+# TRANS: machine translation
 msgstr "它也可以与颜色和画笔大小等其他块一起使用。"
 
 #: js/blocks/BoxesBlocks.js:73
 msgid "add"
+# TRANS: machine translation
 msgstr "加"
 
 #: js/blocks/BoxesBlocks.js:75
 #: js/widgets/temperament.js:825
 msgid "to"
+# TRANS: machine translation
 msgstr "到"
 
 #: js/blocks/BoxesBlocks.js:75
 #: js/blocks/BoxesBlocks.js:595
 #: js/blocks/HeapBlocks.js:544
 msgid "value1"
+# TRANS: machine translation
 msgstr "数值1"
 
 #: js/blocks/BoxesBlocks.js:118
 msgid "Block does not support incrementing."
+# TRANS: machine translation
 msgstr "该块不支持递增操作。"
 
 #: js/blocks/BoxesBlocks.js:152
 msgid "The Add-1-to block adds one to the value stored in a box."
+# TRANS: machine translation
 msgstr "Add-1-to 块将盒子中存储的值加一。"
 
 #: js/blocks/BoxesBlocks.js:163
 msgid "add 1 to"
+# TRANS: machine translation
 msgstr "加 1 到"
 
 #: js/blocks/BoxesBlocks.js:211
 msgid "The Subtract-1-from block subtracts one from the value stored in a box."
+# TRANS: machine translation
 msgstr "Subtract-1-from 块从盒子中存储的值中减去一。"
 
 #: js/blocks/BoxesBlocks.js:222
 msgid "subtract 1 from"
+# TRANS: machine translation
 msgstr "从中减去 1"
 
 #: js/blocks/BoxesBlocks.js:270
 #: js/blocks/BoxesBlocks.js:387
 msgid "The Box block returns the value stored in a box."
+# TRANS: machine translation
 msgstr "Box 块返回盒子中存储的值。"
 
 #: js/blocks/BoxesBlocks.js:500
 #: js/blocks/BoxesBlocks.js:576
 msgid "The Store in block will store a value in a box."
+# TRANS: machine translation
 msgstr "Store in 块用于将值存储到盒子中。"
 
 #: js/blocks/BoxesBlocks.js:595
 #: js/blocks/EnsembleBlocks.js:393
 #: js/blocks/EnsembleBlocks.js:404
 msgid "name1"
+# TRANS: machine translation
 msgstr "名称1"
 
 #: js/blocks/BoxesBlocks.js:652
 msgid "The Box2 block returns the value stored in Box2."
+# TRANS: machine translation
 msgstr "Box2 块返回存储在 Box2 中的值。"
 
 #: js/blocks/BoxesBlocks.js:703
 msgid "The Store in Box2 block is used to store a value in Box2."
+# TRANS: machine translation
 msgstr "Store in Box2 块用于将值存储到 Box2 中。"
 
 #: js/blocks/BoxesBlocks.js:715
 msgid "store in box2"
+# TRANS: machine translation
 msgstr "存储到 box2"
 
 #: js/blocks/BoxesBlocks.js:761
 msgid "The Box1 block returns the value stored in Box1."
+# TRANS: machine translation
 msgstr "Box1 块返回存储在 Box1 中的值。"
 
 #: js/blocks/BoxesBlocks.js:812
 msgid "The Store in Box1 block is used to store a value in Box1."
+# TRANS: machine translation
 msgstr "Store in Box1 块用于将值存储到 Box1 中。"
 
 #: js/blocks/BoxesBlocks.js:826
 msgid "store in box1"
+# TRANS: machine translation
 msgstr "存储到 box1"
 
 #: js/blocks/DictBlocks.js:77
 msgid "show dictionary"
+# TRANS: machine translation
 msgstr "显示字典"
 
 #: js/blocks/DictBlocks.js:80
@@ -3859,21 +4060,25 @@ msgstr "显示字典"
 #: js/blocks/ProgramBlocks.js:501
 #: js/blocks/ProgramBlocks.js:664
 msgid "My Dictionary"
+# TRANS: machine translation
 msgstr "我的字典"
 
 #: js/blocks/DictBlocks.js:129
 msgid "The Dictionary block returns a dictionary."
+# TRANS: machine translation
 msgstr "Dictionary 块返回一个字典。"
 
 #: js/blocks/DictBlocks.js:197
 #: js/blocks/DictBlocks.js:339
 msgid "The Get-dict block returns a value in the dictionary for a specified key."
+# TRANS: machine translation
 msgstr "Get-dict 块返回字典中指定键的值。"
 
 #: js/blocks/DictBlocks.js:212
 #: js/blocks/DictBlocks.js:354
 #. TRANS: retrieve a value from the dictionary with a given key
 msgid "get value"
+# TRANS: machine translation
 msgstr "获取值"
 
 #: js/blocks/DictBlocks.js:215
@@ -3884,6 +4089,7 @@ msgstr "获取值"
 #: js/blocks/DictBlocks.js:430
 #: js/blocks/DictBlocks.js:431
 msgid "key2"
+# TRANS: machine translation
 msgstr "键2"
 
 #: js/blocks/DictBlocks.js:215
@@ -3896,67 +4102,82 @@ msgstr "键2"
 #: js/blocks/IntervalsBlocks.js:1462
 #. TRANS: key, e.g., C in C Major
 msgid "key"
+# TRANS: machine translation
 msgstr "调"
 
 #: js/blocks/DictBlocks.js:271
 #: js/blocks/DictBlocks.js:411
 msgid "The Set-dict block sets a value in the dictionary for a specified key."
+# TRANS: machine translation
 msgstr "Set-dict 块为字典中指定的键设置值。"
 
 #: js/blocks/DictBlocks.js:286
 #: js/blocks/DictBlocks.js:427
 #. TRANS: set a value in the dictionary for a given key
 msgid "set value"
+# TRANS: machine translation
 msgstr "设置值"
 
 #: js/blocks/DrumBlocks.js:59
 msgid "The Noise name block is used to select a noise synthesizer."
+# TRANS: machine translation
 msgstr "Noise name 块用于选择噪声合成器。"
 
 #: js/blocks/DrumBlocks.js:102
 msgid "The Drum name block is used to select a drum."
+# TRANS: machine translation
 msgstr "Drum name 块用于选择一个鼓。"
 
 #: js/blocks/DrumBlocks.js:146
 msgid "The Effects name block is used to select a sound effect."
+# TRANS: machine translation
 msgstr "Effects name 块用于选择音效。"
 
 #: js/blocks/DrumBlocks.js:163
 msgid "noise"
+# TRANS: machine translation
 msgstr "噪音"
 
 #: js/blocks/DrumBlocks.js:177
 msgid "The Play noise block will generate white, pink, or brown noise."
+# TRANS: machine translation
 msgstr "Play noise 块将生成白噪声、粉噪声或棕噪声。"
 
 #: js/blocks/DrumBlocks.js:317
 msgid "Replace every instance of a pitch with a drum sound."
+# TRANS: machine translation
 msgstr "将每个音高替换为鼓声。"
 
 #: js/blocks/DrumBlocks.js:328
 #. TRANS: map a pitch to a drum sound
 msgid "map pitch to drum"
+# TRANS: machine translation
 msgstr "映射音高到鼓声"
 
 #: js/blocks/DrumBlocks.js:395
 msgid "In the example above, a kick drum sound will be played instead of sol."
+# TRANS: machine translation
 msgstr "上述示例中，将播放踢鼓声代替 sol。"
 
 #: js/blocks/DrumBlocks.js:407
 #. TRANS: set the current drum sound for playback
 msgid "set drum"
+# TRANS: machine translation
 msgstr "设置鼓声"
 
 #: js/blocks/DrumBlocks.js:451
 msgid "sound effect"
+# TRANS: machine translation
 msgstr "音效"
 
 #: js/blocks/DrumBlocks.js:489
 msgid "You can use multiple Drum blocks within a Note block."
+# TRANS: machine translation
 msgstr "您可以在 Note 块内使用多个 Drum 块。"
 
 #: js/blocks/HeapBlocks.js:49
 msgid "The Heap block returns the heap."
+# TRANS: machine translation
 msgstr "Heap 块返回堆。"
 
 #: js/blocks/HeapBlocks.js:133
@@ -3965,23 +4186,28 @@ msgstr "顯示堆疊"
 
 #: js/blocks/HeapBlocks.js:181
 msgid "The Heap-length block returns the length of the heap."
+# TRANS: machine translation
 msgstr "Heap-length 块返回堆的长度。"
 
 #: js/blocks/HeapBlocks.js:195
 msgid "heap length"
+# TRANS: machine translation
 msgstr "堆长度"
 
 #: js/blocks/HeapBlocks.js:254
 msgid "The Heap-empty? block returns true if the heap is empty."
+# TRANS: machine translation
 msgstr "Heap-empty? 块在堆为空时返回真。"
 
 #: js/blocks/HeapBlocks.js:268
 #. TRANS: Is the heap empty?
 msgid "heap empty?"
+# TRANS: machine translation
 msgstr "堆是否为空？"
 
 #: js/blocks/HeapBlocks.js:317
 msgid "The Empty-heap block empties the heap."
+# TRANS: machine translation
 msgstr "Empty-heap 块清空堆。"
 
 #: js/blocks/HeapBlocks.js:327
@@ -3992,20 +4218,24 @@ msgstr "清除堆疊"
 
 #: js/blocks/HeapBlocks.js:371
 msgid "The Reverse-heap block reverses the order of the heap."
+# TRANS: machine translation
 msgstr "Reverse-heap 块将堆的顺序反转。"
 
 #: js/blocks/HeapBlocks.js:384
 #. TRANS: reverse the order of the heap
 msgid "reverse heap"
+# TRANS: machine translation
 msgstr "反转堆"
 
 #: js/blocks/HeapBlocks.js:428
 msgid "The Index-heap block returns a value in the heap at a specified location."
+# TRANS: machine translation
 msgstr "Index-heap 块返回堆中指定位置的值。"
 
 #: js/blocks/HeapBlocks.js:443
 #. TRANS: retrieve a value from the heap at index position in the heap
 msgid "index heap"
+# TRANS: machine translation
 msgstr "堆索引"
 
 #: js/blocks/HeapBlocks.js:474
@@ -4013,32 +4243,38 @@ msgstr "堆索引"
 #: js/blocks/EnsembleBlocks.js:124
 #: js/blocks/EnsembleBlocks.js:1200
 msgid "Index must be > 0."
+# TRANS: machine translation
 msgstr "索引必须大于0。"
 
 #: js/blocks/HeapBlocks.js:479
 #: js/blocks/HeapBlocks.js:577
 #: js/blocks/EnsembleBlocks.js:129
 msgid "Maximum heap size is 1000."
+# TRANS: machine translation
 msgstr "堆的最大大小为1000。"
 
 #: js/blocks/HeapBlocks.js:523
 msgid "The Set-heap entry block sets a value in he heap at the specified location."
+# TRANS: machine translation
 msgstr "Set-heap entry 块在指定位置设置堆中的值。"
 
 #: js/blocks/HeapBlocks.js:539
 #: js/blocks/ProgramBlocks.js:299
 #. TRANS: load the heap from a JSON encoding
 msgid "set heap"
+# TRANS: machine translation
 msgstr "设置堆"
 
 #: js/blocks/HeapBlocks.js:544
 #: js/blocks/EnsembleBlocks.js:96
 #. TRANS: value1 is a numeric value (JAPANESE ONLY)
 msgid "index"
+# TRANS: machine translation
 msgstr "索引"
 
 #: js/blocks/HeapBlocks.js:619
 msgid "The Pop block removes the value at the top of the heap."
+# TRANS: machine translation
 msgstr "Pop 块移除堆顶的值。"
 
 #: js/blocks/HeapBlocks.js:633
@@ -4048,6 +4284,7 @@ msgstr "取出堆疊"
 
 #: js/blocks/HeapBlocks.js:680
 msgid "The Push block adds a value to the top of the heap."
+# TRANS: machine translation
 msgstr "Push 块将一个值添加到堆顶。"
 
 #: js/blocks/HeapBlocks.js:696
@@ -4057,6 +4294,7 @@ msgstr "存入堆疊"
 
 #: js/blocks/IntervalsBlocks.js:45
 msgid "set temperament"
+# TRANS: machine translation
 msgstr "设置音律"
 
 #: js/blocks/IntervalsBlocks.js:63
@@ -4073,147 +4311,180 @@ msgstr "设置音律"
 #: js/turtleactions/IntervalsActions.js:114
 #. TRANS: adjusts the shift up or down by one octave (twelve half-steps in the interval between two notes, one having twice or half the frequency in Hz of the other.)
 msgid "octave"
+# TRANS: machine translation
 msgstr "八度"
 
 #: js/blocks/IntervalsBlocks.js:99
 msgid "The Temperament name block is used to select a tuning method."
+# TRANS: machine translation
 msgstr "Temperament name 块用于选择调音方法。"
 
 #: js/blocks/IntervalsBlocks.js:161
 msgid "doubly"
+# TRANS: machine translation
 msgstr "双倍"
 
 #: js/blocks/IntervalsBlocks.js:166
 msgid "The Doubly block will double the size of an interval."
+# TRANS: machine translation
 msgstr "Doubly 块会将音程加倍。"
 
 #: js/blocks/IntervalsBlocks.js:262
 msgid "interval number"
+# TRANS: machine translation
 msgstr "音程编号"
 
 #: js/blocks/IntervalsBlocks.js:317
 msgid "current interval"
+# TRANS: machine translation
 msgstr "当前音程"
 
 #: js/blocks/IntervalsBlocks.js:387
 #. TRANS: measure the distance between two pitches in semi-tones
 msgid "semi-tone interval measure"
+# TRANS: machine translation
 msgstr "半音程测量"
 
 #: js/blocks/IntervalsBlocks.js:454
 #: js/blocks/IntervalsBlocks.js:570
 msgid "You must use two pitch blocks when measuring an interval."
+# TRANS: machine translation
 msgstr "测量音程时必须使用两个音高块。"
 
 #: js/blocks/IntervalsBlocks.js:496
 msgid "The Scalar interval block measures the distance between two notes in the current key and mode."
+# TRANS: machine translation
 msgstr "Scalar interval 块测量当前调式中两个音符之间的距离。"
 
 #: js/blocks/IntervalsBlocks.js:502
 #. TRANS: measure the distance between two pitches in steps of musical scale
 msgid "scalar interval measure"
+# TRANS: machine translation
 msgstr "标量音程测量"
 
 #: js/blocks/IntervalsBlocks.js:678
 msgid "In the figure, we add sol# to sol."
+# TRANS: machine translation
 msgstr "图中，我们将升sol加到sol上。"
 
 #: js/blocks/IntervalsBlocks.js:684
 #: js/blocks/OrnamentBlocks.js:220
 #. TRANS: calculate a relative step between notes based on semi-tones
 msgid "semi-tone interval"
+# TRANS: machine translation
 msgstr "半音程"
 
 #: js/blocks/IntervalsBlocks.js:733
 msgid "The output of the example is: do, mi, sol, sol, ti, mi"
+# TRANS: machine translation
 msgstr "示例输出为：do, mi, sol, sol, ti, mi"
 
 #: js/blocks/IntervalsBlocks.js:740
 #: js/blocks/WidgetBlocks.js:768
 msgid "arpeggio"
+# TRANS: machine translation
 msgstr "琶音"
 
 #: js/blocks/IntervalsBlocks.js:931
 msgid "The Chord block calculates common chords."
+# TRANS: machine translation
 msgstr "Chord 块计算常见和弦。"
 
 #: js/blocks/IntervalsBlocks.js:933
 msgid "In the figure, we generate a C-major chord."
+# TRANS: machine translation
 msgstr "图中，我们生成一个C大调和弦。"
 
 #: js/blocks/IntervalsBlocks.js:938
 msgid "chord"
+# TRANS: machine translation
 msgstr "和弦"
 
 #: js/blocks/IntervalsBlocks.js:990
 msgid "The Ratio Interval block calculates an interval based on a ratio."
+# TRANS: machine translation
 msgstr "Ratio Interval 块根据比例计算音程。"
 
 #: js/blocks/IntervalsBlocks.js:995
 msgid "ratio interval"
+# TRANS: machine translation
 msgstr "比例音程"
 
 #: js/blocks/IntervalsBlocks.js:1064
 msgid "In the figure, we add la to sol."
+# TRANS: machine translation
 msgstr "图中，我们将la加到sol上。"
 
 #: js/blocks/IntervalsBlocks.js:1120
 #. TRANS: define a custom mode
 msgid "define mode"
+# TRANS: machine translation
 msgstr "定义调式"
 
 #: js/blocks/IntervalsBlocks.js:1173
 msgid "movable Do"
+# TRANS: machine translation
 msgstr "可移调的Do"
 
 #: js/blocks/IntervalsBlocks.js:1224
 #. TRANS: mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
 msgid "mode length"
+# TRANS: machine translation
 msgstr "调式长度"
 
 #: js/blocks/IntervalsBlocks.js:1233
 msgid "The Mode length block is the number of notes in the current scale."
+# TRANS: machine translation
 msgstr "Mode length 块表示当前音阶中的音符数量。"
 
 #: js/blocks/IntervalsBlocks.js:1235
 msgid "Most Western scales have 7 notes."
+# TRANS: machine translation
 msgstr "大多数西方音阶有7个音符。"
 
 #: js/blocks/IntervalsBlocks.js:1284
 #. TRANS: the mode in music is 'major', 'minor', etc.
 msgid "current mode"
+# TRANS: machine translation
 msgstr "当前调式"
 
 #: js/blocks/IntervalsBlocks.js:1337
 #. TRANS: the key is a group of pitches with which a music composition is created
 msgid "current key"
+# TRANS: machine translation
 msgstr "当前调"
 
 #: js/blocks/IntervalsBlocks.js:1389
 #: js/blocks/IntervalsBlocks.js:1434
 #. TRANS: set the key and mode, e.g. C Major
 msgid "set key"
+# TRANS: machine translation
 msgstr "设置调"
 
 #: js/blocks/IntervalsBlocks.js:1443
 #: js/blocks/IntervalsBlocks.js:1449
 msgid "The Set key block is used to set the key and mode,"
+# TRANS: machine translation
 msgstr "Set key 块用于设置调和调式，"
 
 #: js/blocks/IntervalsBlocks.js:1449
 msgid "eg C Major"
+# TRANS: machine translation
 msgstr "例如 C 大调"
 
 #: js/blocks/NumberBlocks.js:28
 msgid "The Int block returns an integer."
+# TRANS: machine translation
 msgstr "Int 块返回一个整数。"
 
 #: js/blocks/NumberBlocks.js:34
 msgid "int"
+# TRANS: machine translation
 msgstr "整数"
 
 #: js/blocks/NumberBlocks.js:73
 msgid "The Mod block returns the remainder from a division."
+# TRANS: machine translation
 msgstr "Mod 块返回除法的余数。"
 
 #: js/blocks/NumberBlocks.js:79
@@ -4222,68 +4493,84 @@ msgstr "模數"
 
 #: js/blocks/NumberBlocks.js:141
 msgid "The Power block calculates a power function."
+# TRANS: machine translation
 msgstr "Power 块计算幂函数。"
 
 #: js/blocks/NumberBlocks.js:196
 msgid "The Sqrt block returns the square root."
+# TRANS: machine translation
 msgstr "Sqrt 块返回平方根。"
 
 #: js/blocks/NumberBlocks.js:202
 msgid "sqrt"
+# TRANS: machine translation
 msgstr "平方根"
 
 #: js/blocks/NumberBlocks.js:248
 msgid "The Abs block returns the absolute value."
+# TRANS: machine translation
 msgstr "Abs 块返回绝对值。"
 
 #: js/blocks/NumberBlocks.js:254
 msgid "abs"
+# TRANS: machine translation
 msgstr "绝对值"
 
 #: js/blocks/NumberBlocks.js:295
 msgid "The Distance block returns the distance between two points. For example, between the mouse and the center of the screen."
+# TRANS: machine translation
 msgstr "Distance 块返回两点之间的距离。例如，鼠标与屏幕中心之间的距离。"
 
 #: js/blocks/NumberBlocks.js:301
 #: plugins/rodi.rtp:310
 msgid "distance"
+# TRANS: machine translation
 msgstr "距离"
 
 #: js/blocks/NumberBlocks.js:361
 msgid "The Divide block is used to divide."
+# TRANS: machine translation
 msgstr "Divide 块用于除法运算。"
 
 #: js/blocks/NumberBlocks.js:441
 msgid "The Multiply block is used to multiply."
+# TRANS: machine translation
 msgstr "Multiply 块用于乘法运算。"
 
 #: js/blocks/NumberBlocks.js:612
 msgid "The Minus block is used to subtract."
+# TRANS: machine translation
 msgstr "Minus 块用于减法运算。"
 
 #: js/blocks/NumberBlocks.js:723
 msgid "The Plus block is used to add."
+# TRANS: machine translation
 msgstr "Plus 块用于加法运算。"
 
 #: js/blocks/NumberBlocks.js:849
 msgid "The One-of block returns one of two choices."
+# TRANS: machine translation
 msgstr "One-of 块返回两个选项中的一个。"
 
 #: js/blocks/NumberBlocks.js:856
 #: js/blocks/PitchBlocks.js:616
 msgid "one of"
+# TRANS: machine translation
 msgstr "其中之一"
 
 #: js/blocks/NumberBlocks.js:858
 msgid "this"
+# TRANS: machine translation
 msgstr "此"
 
 #: js/blocks/NumberBlocks.js:858
 msgid "that"
+# TRANS: machine translation
 msgstr "彼"
 
 #: js/blocks/NumberBlocks.js:913
 msgid "The Random block returns a random number."
+# TRANS: machine translation
 msgstr "Random 块返回一个随机数。"
 
 #: js/blocks/NumberBlocks.js:920
@@ -4300,48 +4587,58 @@ msgstr "最大"
 
 #: js/blocks/NumberBlocks.js:986
 msgid "The Number block holds a number."
+# TRANS: machine translation
 msgstr "Number 块保存一个数字。"
 
 #: js/blocks/OrnamentBlocks.js:32
 msgid "staccato factor"
+# TRANS: machine translation
 msgstr "断音因子"
 
 #: js/blocks/OrnamentBlocks.js:108
 msgid "slur factor"
+# TRANS: machine translation
 msgstr "连音因子"
 
 #: js/blocks/OrnamentBlocks.js:217
 #: js/blocks/OrnamentBlocks.js:309
 #. TRANS: the neighbor refers to a neighboring note, e.g., D is a neighbor of C
 msgid "neighbor"
+# TRANS: machine translation
 msgstr "邻近音"
 
 #: js/blocks/OrnamentBlocks.js:293
 msgid "The Neighbor block rapidly switches between neighboring pitches."
+# TRANS: machine translation
 msgstr "Neighbor 块快速切换相邻音高。"
 
 #: js/blocks/OrnamentBlocks.js:364
 msgid "glide"
+# TRANS: machine translation
 msgstr "滑音"
 
 #: js/blocks/OrnamentBlocks.js:479
 #: js/blocks/OrnamentBlocks.js:643
 msgid "slur"
+# TRANS: machine translation
 msgstr "连音线"
 
 #: js/blocks/OrnamentBlocks.js:558
 #: js/blocks/OrnamentBlocks.js:710
 #. TRANS: play each note sharply detached from the others
 msgid "staccato"
+# TRANS: machine translation
 msgstr "断音"
 
 #: js/blocks/ProgramBlocks.js:33
 msgid "The Load-heap-from-app block loads the heap from a web page."
+# TRANS: machine translation
 msgstr "Load-heap-from-app 块从网页加载堆。"
 
 #: js/blocks/ProgramBlocks.js:44
 #. TRANS: load the heap contents from a URL
 msgid "load heap from App"
+# TRANS: machine translation
 msgstr "从应用加载堆"
 
 #: js/blocks/ProgramBlocks.js:95
@@ -4354,133 +4651,163 @@ msgstr "找不到网页"
 
 #: js/blocks/ProgramBlocks.js:133
 msgid "The Save-heap-to-app block saves the heap to a web page."
+# TRANS: machine translation
 msgstr "Save-heap-to-app 块将堆保存到网页。"
 
 #: js/blocks/ProgramBlocks.js:144
 #. TRANS: save the heap contents to a URL
 msgid "save heap to App"
+# TRANS: machine translation
 msgstr "保存堆到应用"
 
 #: js/blocks/ProgramBlocks.js:189
 msgid "Cannot find a valid heap for"
+# TRANS: machine translation
 msgstr "找不到有效的堆用于"
 
 #: js/blocks/ProgramBlocks.js:206
 msgid "The Load-heap block loads the heap from a file."
+# TRANS: machine translation
 msgstr "Load-heap 块从文件加载堆。"
 
 #: js/blocks/ProgramBlocks.js:217
 #. TRANS: load the heap from a file
 msgid "load heap"
+# TRANS: machine translation
 msgstr "加载堆"
 
 #: js/blocks/ProgramBlocks.js:270
 msgid "The file you selected does not contain a valid heap."
+# TRANS: machine translation
 msgstr "您选择的文件不包含有效的堆。"
 
 #: js/blocks/ProgramBlocks.js:275
 msgid "The loadHeap block needs a loadFile block."
+# TRANS: machine translation
 msgstr "loadHeap 块需要一个 loadFile 块。"
 
 #: js/blocks/ProgramBlocks.js:291
 msgid "The Set-heap block loads the heap."
+# TRANS: machine translation
 msgstr "Set-heap 块加载堆。"
 
 #: js/blocks/ProgramBlocks.js:340
 msgid "The block you selected does not contain a valid heap."
+# TRANS: machine translation
 msgstr "您选择的块不包含有效的堆。"
 
 #: js/blocks/ProgramBlocks.js:343
 msgid "The Set heap block needs a heap."
+# TRANS: machine translation
 msgstr "Set heap 块需要一个堆。"
 
 #: js/blocks/ProgramBlocks.js:360
 msgid "The Load-dictionary block loads a dictionary from a file."
+# TRANS: machine translation
 msgstr "Load-dictionary 块从文件加载字典。"
 
 #: js/blocks/ProgramBlocks.js:372
 #. TRANS: load a dictionary from a file
 msgid "load dictionary"
+# TRANS: machine translation
 msgstr "加载字典"
 
 #: js/blocks/ProgramBlocks.js:390
 #: js/blocks/ProgramBlocks.js:658
 #: js/blocks/ToneBlocks.js:1025
 msgid "file"
+# TRANS: machine translation
 msgstr "文件"
 
 #: js/blocks/ProgramBlocks.js:444
 msgid "The file you selected does not contain a valid dictionary."
+# TRANS: machine translation
 msgstr "您选择的文件不包含有效的字典。"
 
 #: js/blocks/ProgramBlocks.js:449
 msgid "The load dictionary block needs a load file block."
+# TRANS: machine translation
 msgstr "load dictionary 块需要一个 load file 块。"
 
 #: js/blocks/ProgramBlocks.js:466
 msgid "The Set-dictionary block loads a dictionary."
+# TRANS: machine translation
 msgstr "Set-dictionary 块加载字典。"
 
 #: js/blocks/ProgramBlocks.js:477
 #. TRANS: load a dictionary from a JSON
 msgid "set dictionary"
+# TRANS: machine translation
 msgstr "设置字典"
 
 #: js/blocks/ProgramBlocks.js:546
 msgid "The block you selected does not contain a valid dictionary."
+# TRANS: machine translation
 msgstr "您选择的块不包含有效的字典。"
 
 #: js/blocks/ProgramBlocks.js:550
 msgid "The set dictionary block needs a dictionary."
+# TRANS: machine translation
 msgstr "set dictionary 块需要一个字典。"
 
 #: js/blocks/ProgramBlocks.js:567
 msgid "The Save-heap block saves the heap to a file."
+# TRANS: machine translation
 msgstr "Save-heap 块将堆保存到文件。"
 
 #: js/blocks/ProgramBlocks.js:578
 #. TRANS: save the heap to a file
 msgid "save heap"
+# TRANS: machine translation
 msgstr "保存堆"
 
 #: js/blocks/ProgramBlocks.js:629
 msgid "The Save-dictionary block saves a dictionary to a file."
+# TRANS: machine translation
 msgstr "Save-dictionary 块将字典保存到文件。"
 
 #: js/blocks/ProgramBlocks.js:640
 #. TRANS: save a dictionary to a file
 msgid "save dictionary"
+# TRANS: machine translation
 msgstr "保存字典"
 
 #: js/blocks/ProgramBlocks.js:720
 msgid "The Open palette block opens a palette."
+# TRANS: machine translation
 msgstr "Open palette 块打开调色板。"
 
 #: js/blocks/ProgramBlocks.js:727
 msgid "open palette"
+# TRANS: machine translation
 msgstr "打开调色板"
 
 #: js/blocks/ProgramBlocks.js:785
 msgid "The Delete block block removes a block."
+# TRANS: machine translation
 msgstr "Delete block 块删除一个块。"
 
 #: js/blocks/ProgramBlocks.js:797
 #. TRANS: Move this block to the trash.
 msgid "delete block"
+# TRANS: machine translation
 msgstr "删除块"
 
 #: js/blocks/ProgramBlocks.js:861
 msgid "The Move block block moves a block."
+# TRANS: machine translation
 msgstr "Move block 块用于移动一个块。"
 
 #: js/blocks/ProgramBlocks.js:869
 #. TRANS: Move the position of a block on the screen.
 msgid "move block"
+# TRANS: machine translation
 msgstr "移动块"
 
 #: js/blocks/ProgramBlocks.js:881
 #: js/blocks/ProgramBlocks.js:1048
 msgid "block number"
+# TRANS: machine translation
 msgstr "块编号"
 
 #: js/blocks/ProgramBlocks.js:881
@@ -4510,32 +4837,39 @@ msgstr "Y座標"
 #: js/blocks/ProgramBlocks.js:935
 #. TRANS: Run program beginning at this block.
 msgid "run block"
+# TRANS: machine translation
 msgstr "运行块"
 
 #: js/blocks/ProgramBlocks.js:1025
 msgid "The Dock block block connections two blocks."
+# TRANS: machine translation
 msgstr "Dock block 块连接两个块。"
 
 #: js/blocks/ProgramBlocks.js:1036
 #. TRANS: We can connect a block to another block.
 msgid "connect blocks"
+# TRANS: machine translation
 msgstr "连接块"
 
 #: js/blocks/ProgramBlocks.js:1048
 msgid "target block"
+# TRANS: machine translation
 msgstr "目标块"
 
 #: js/blocks/ProgramBlocks.js:1048
 msgid "connection number"
+# TRANS: machine translation
 msgstr "连接编号"
 
 #: js/blocks/ProgramBlocks.js:1140
 msgid "The Make block block creates a new block."
+# TRANS: machine translation
 msgstr "Make block 块用于创建一个新块。"
 
 #: js/blocks/ProgramBlocks.js:1152
 #. TRANS: Create a new block
 msgid "make block"
+# TRANS: machine translation
 msgstr "创建块"
 
 #: js/blocks/ProgramBlocks.js:1186
@@ -4555,29 +4889,35 @@ msgstr "音符"
 
 #: js/blocks/ProgramBlocks.js:1285
 msgid "Cannot find block"
+# TRANS: machine translation
 msgstr "找不到块"
 
 #: js/blocks/ProgramBlocks.js:1304
 #: js/blocks/ProgramBlocks.js:1313
 msgid "Warning: block argument type mismatch"
+# TRANS: machine translation
 msgstr "警告：块参数类型不匹配"
 
 #: js/blocks/ProgramBlocks.js:1347
 msgid "The Open project block is used to open a project from a web page."
+# TRANS: machine translation
 msgstr "Open project 块用于从网页打开项目。"
 
 #: js/blocks/ProgramBlocks.js:1357
 msgid "open project"
+# TRANS: machine translation
 msgstr "打开项目"
 
 #: js/blocks/ProgramBlocks.js:1410
 msgid "Please enter a valid URL."
+# TRANS: machine translation
 msgstr "请输入有效的URL。"
 
 #: js/blocks/RhythmBlocks.js:182
 #: js/blocks/RhythmBlocks.js:1086
 #: js/blocks/RhythmBlocks.js:1162
 msgid "Note value must be greater than 0."
+# TRANS: machine translation
 msgstr "音符值必须大于0。"
 
 #: js/blocks/RhythmBlocks.js:215
@@ -4585,84 +4925,102 @@ msgstr "音符值必须大于0。"
 #: js/blocks/RhythmBlocks.js:350
 #. TRANS: swing is a rhythmic variation that emphasises the offbeat
 msgid "swing"
+# TRANS: machine translation
 msgstr "摇摆"
 
 #: js/blocks/RhythmBlocks.js:355
 #. TRANS: the amount to shift to the offbeat note
 msgid "swing value"
+# TRANS: machine translation
 msgstr "摆动值"
 
 #: js/blocks/RhythmBlocks.js:419
 msgid "The Skip notes block will cause notes to be skipped."
+# TRANS: machine translation
 msgstr "Skip notes 块会导致音符被跳过。"
 
 #: js/blocks/RhythmBlocks.js:427
 #. TRANS: substitute rests on notes being skipped
 msgid "skip notes"
+# TRANS: machine translation
 msgstr "跳过音符"
 
 #: js/blocks/RhythmBlocks.js:489
 #. TRANS: speed up note duration by some factor, e.g. convert 1/4 to 1/8 notes by using a factor of 2
 msgid "multiply note value"
+# TRANS: machine translation
 msgstr "倍乘音符值"
 
 #: js/blocks/RhythmBlocks.js:542
 msgid "The Tie block works on pairs of notes, combining them into one note."
+# TRANS: machine translation
 msgstr "Tie 块作用于成对的音符，将它们合并为一个音符。"
 
 #: js/blocks/RhythmBlocks.js:550
 #. TRANS: tie notes together into one longer note
 msgid "tie"
+# TRANS: machine translation
 msgstr "连音"
 
 #: js/blocks/RhythmBlocks.js:591
 #: js/blocks/RhythmBlocks.js:671
 #. TRANS: a dotted note is played for 1.5x its value, e.g., 1/8. --> 3/16
 msgid "dot"
+# TRANS: machine translation
 msgstr "附点"
 
 #: js/blocks/RhythmBlocks.js:619
 #: js/turtleactions/RhythmActions.js:221
 msgid "An argument of -1 results in a note value of 0."
+# TRANS: machine translation
 msgstr "参数为 -1 会导致音符值为 0。"
 
 #: js/blocks/RhythmBlocks.js:661
 msgid "The Dot block extends the duration of a note by 50%."
+# TRANS: machine translation
 msgstr "Dot 块将音符时值延长50%。"
 
 #: js/blocks/RhythmBlocks.js:663
 msgid "Eg a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat."
+# TRANS: machine translation
 msgstr "例如，附点四分音符的时值为3/8拍（1/4 + 1/8）。"
 
 #: js/blocks/RhythmBlocks.js:765
 #. TRANS: Japanese only: note value block for drum
 msgid "note value drum"
+# TRANS: machine translation
 msgstr "音符值鼓"
 
 #: js/blocks/RhythmBlocks.js:829
 msgid "392 hertz"
+# TRANS: machine translation
 msgstr "392 赫兹"
 
 #: js/blocks/RhythmBlocks.js:1119
 msgid "The Note block is a container for one or more Pitch blocks."
+# TRANS: machine translation
 msgstr "Note 块是一个或多个 Pitch 块的容器。"
 
 #: js/blocks/RhythmBlocks.js:1121
 msgid "The Note block specifies the duration (note value) of its contents."
+# TRANS: machine translation
 msgstr "Note 块指定其内容的时值（音符值）。"
 
 #: js/blocks/RhythmBlocks.js:1130
 msgid "value2"
+# TRANS: machine translation
 msgstr "值2"
 
 #: js/blocks/RhythmBlocks.js:1200
 msgid "define frequency"
+# TRANS: machine translation
 msgstr "定义频率"
 
 #: js/blocks/RhythmBlocks.js:1218
 #: js/widgets/temperament.js:757
 #: js/widgets/temperament.js:1522
 msgid "octave space"
+# TRANS: machine translation
 msgstr "八度空间"
 
 #: js/blocks/RhythmBlockPaletteBlocks.js:50
@@ -4670,6 +5028,7 @@ msgstr "八度空间"
 #. TRANS: rhythm block
 #. TRANS: translate "rhythm1" as rhythm
 msgid "rhythm1"
+# TRANS: machine translation
 msgstr "节奏1"
 
 #: js/blocks/RhythmBlockPaletteBlocks.js:70
@@ -4678,47 +5037,57 @@ msgstr "节奏1"
 #: js/blocks/RhythmBlockPaletteBlocks.js:586
 #: js/blocks/RhythmBlockPaletteBlocks.js:907
 msgid "number of notes"
+# TRANS: machine translation
 msgstr "音符数量"
 
 #: js/blocks/RhythmBlockPaletteBlocks.js:126
 msgid "polyphonic rhythm"
+# TRANS: machine translation
 msgstr "复音节奏"
 
 #: js/blocks/RhythmBlockPaletteBlocks.js:219
 msgid "The Rhythm block is used to generate rhythm patterns."
+# TRANS: machine translation
 msgstr "Rhythm 块用于生成节奏模式。"
 
 #: js/blocks/RhythmBlockPaletteBlocks.js:281
 #: js/blocks/RhythmBlockPaletteBlocks.js:286
 msgid "1/64 note"
+# TRANS: machine translation
 msgstr "六十四分音符"
 
 #: js/blocks/RhythmBlockPaletteBlocks.js:312
 #: js/blocks/RhythmBlockPaletteBlocks.js:317
 msgid "1/32 note"
+# TRANS: machine translation
 msgstr "三十二分音符"
 
 #: js/blocks/RhythmBlockPaletteBlocks.js:346
 #: js/blocks/RhythmBlockPaletteBlocks.js:351
 msgid "1/16 note"
+# TRANS: machine translation
 msgstr "十六分音符"
 
 #: js/blocks/RhythmBlockPaletteBlocks.js:380
 msgid "eighth note"
+# TRANS: machine translation
 msgstr "八分音符"
 
 #: js/blocks/RhythmBlockPaletteBlocks.js:408
 msgid "quarter note"
+# TRANS: machine translation
 msgstr "四分音符"
 
 #: js/blocks/RhythmBlockPaletteBlocks.js:436
 #: js/blocks/RhythmBlockPaletteBlocks.js:441
 msgid "half note"
+# TRANS: machine translation
 msgstr "二分音符"
 
 #: js/blocks/RhythmBlockPaletteBlocks.js:470
 #: js/blocks/RhythmBlockPaletteBlocks.js:475
 msgid "whole note"
+# TRANS: machine translation
 msgstr "全音符"
 
 #: js/blocks/RhythmBlockPaletteBlocks.js:514
@@ -4726,87 +5095,108 @@ msgstr "全音符"
 #: js/blocks/RhythmBlockPaletteBlocks.js:634
 #. TRANS: A tuplet is a note value divided into irregular time values.
 msgid "tuplet"
+# TRANS: machine translation
 msgstr "复音符组"
 
 #: js/blocks/RhythmBlockPaletteBlocks.js:800
 msgid "septuplet"
+# TRANS: machine translation
 msgstr "七连音"
 
 #: js/blocks/RhythmBlockPaletteBlocks.js:828
 msgid "quintuplet"
+# TRANS: machine translation
 msgstr "五连音"
 
 #: js/blocks/RhythmBlockPaletteBlocks.js:856
 msgid "triplet"
+# TRANS: machine translation
 msgstr "三连音"
 
 #: js/blocks/RhythmBlockPaletteBlocks.js:883
 msgid "simple tuplet"
+# TRANS: machine translation
 msgstr "简单复拍"
 
 #: js/blocks/RhythmBlockPaletteBlocks.js:893
 msgid "Tuplets are a collection of notes that get scaled to a specific duration."
+# TRANS: machine translation
 msgstr "复拍是一组被缩放到特定时值的音符。"
 
 #: js/blocks/FlowBlocks.js:41
 msgid "The Backward block runs code in reverse order (Musical retrograde)."
+# TRANS: machine translation
 msgstr "Backward 块按相反顺序运行代码（音乐倒行）。"
 
 #: js/blocks/FlowBlocks.js:48
 msgid "backward"
+# TRANS: machine translation
 msgstr "后退"
 
 #: js/blocks/FlowBlocks.js:124
 msgid "The Duplicate block will run each block multiple times."
+# TRANS: machine translation
 msgstr "Duplicate 块将多次运行每个块。"
 
 #: js/blocks/FlowBlocks.js:334
 msgid "The Default block is used inside of a Switch to define the default action."
+# TRANS: machine translation
 msgstr "Default 块用于 Switch 内定义默认操作。"
 
 #: js/blocks/FlowBlocks.js:342
 msgid "default"
+# TRANS: machine translation
 msgstr "默认"
 
 #: js/blocks/FlowBlocks.js:361
 #: js/blocks/FlowBlocks.js:418
 msgid "The Case Block must be used inside of a Switch Block."
+# TRANS: machine translation
 msgstr "Case 块必须在 Switch 块内使用。"
 
 #: js/blocks/FlowBlocks.js:389
 msgid "The Case block is used inside of a Switch to define matches."
+# TRANS: machine translation
 msgstr "Case 块用于 Switch 内定义匹配项。"
 
 #: js/blocks/FlowBlocks.js:397
 msgid "case"
+# TRANS: machine translation
 msgstr "情况"
 
 #: js/blocks/FlowBlocks.js:446
 msgid "The Switch block will run the code in the matching Case."
+# TRANS: machine translation
 msgstr "Switch 块将运行匹配 Case 中的代码。"
 
 #: js/blocks/FlowBlocks.js:454
 msgid "switch"
+# TRANS: machine translation
 msgstr "切换"
 
 #: js/blocks/FlowBlocks.js:595
 msgid "The Stop block will stop a loop"
+# TRANS: machine translation
 msgstr "Stop 块将停止循环"
 
 #: js/blocks/FlowBlocks.js:597
 msgid "Forever, Repeat, While, or Until."
+# TRANS: machine translation
 msgstr "Forever、Repeat、While 或 Until。"
 
 #: js/blocks/FlowBlocks.js:653
 msgid "The Waitfor block will wait until the condition is true."
+# TRANS: machine translation
 msgstr "Waitfor 块将等待直到条件为真。"
 
 #: js/blocks/FlowBlocks.js:661
 msgid "wait for"
+# TRANS: machine translation
 msgstr "等待"
 
 #: js/blocks/FlowBlocks.js:732
 msgid "The Until block will repeat until the condition is true."
+# TRANS: machine translation
 msgstr "Until 块将重复直到条件为真。"
 
 #: js/blocks/FlowBlocks.js:740
@@ -4816,6 +5206,7 @@ msgstr "直到"
 #: js/blocks/FlowBlocks.js:742
 #: js/blocks/FlowBlocks.js:822
 msgid "do2"
+# TRANS: machine translation
 msgstr "执行2"
 
 #: js/blocks/FlowBlocks.js:742
@@ -4826,10 +5217,12 @@ msgstr "执行2"
 #: js/blocks/ActionBlocks.js:959
 #: js/blocks/ActionBlocks.js:1048
 msgid "do"
+# TRANS: machine translation
 msgstr "执行"
 
 #: js/blocks/FlowBlocks.js:812
 msgid "The While block will repeat while the condition is true."
+# TRANS: machine translation
 msgstr "While 块在条件为真时重复执行。"
 
 #: js/blocks/FlowBlocks.js:820
@@ -4840,6 +5233,7 @@ msgstr "同時間"
 #: js/blocks/FlowBlocks.js:968
 #: js/blocks/FlowBlocks.js:979
 msgid "In this example if the mouse button is pressed a snare drum will play."
+# TRANS: machine translation
 msgstr "在此示例中，如果按下鼠标按钮，将播放军鼓。"
 
 #: js/blocks/FlowBlocks.js:925
@@ -4858,6 +5252,7 @@ msgstr "否則"
 
 #: js/blocks/FlowBlocks.js:1025
 msgid "The Forever block will repeat the contained blocks forever."
+# TRANS: machine translation
 msgstr "Forever 块将无限重复包含的块。"
 
 #: js/blocks/FlowBlocks.js:1037
@@ -4866,10 +5261,12 @@ msgstr "持續執行"
 
 #: js/blocks/FlowBlocks.js:1073
 msgid "The Repeat block will repeat the contained blocks."
+# TRANS: machine translation
 msgstr "Repeat 块将重复包含的块。"
 
 #: js/blocks/FlowBlocks.js:1075
 msgid "In this example the note will be played 4 times."
+# TRANS: machine translation
 msgstr "在此示例中，该音符将播放 4 次。"
 
 #: js/blocks/FlowBlocks.js:1083
@@ -4878,20 +5275,24 @@ msgstr "重複"
 
 #: js/blocks/FlowBlocks.js:1123
 msgid "duplicate factor"
+# TRANS: machine translation
 msgstr "重复因子"
 
 #: js/blocks/MeterBlocks.js:34
 #. TRANS: musical meter (time signature), e.g., 4:4
 msgid "current meter"
+# TRANS: machine translation
 msgstr "当前拍号"
 
 #: js/blocks/MeterBlocks.js:85
 #. TRANS: number of beats per minute
 msgid "beat factor"
+# TRANS: machine translation
 msgstr "节拍因子"
 
 #: js/blocks/MeterBlocks.js:161
 msgid "The Beats per minute block returns the current beats per minute."
+# TRANS: machine translation
 msgstr "每分钟节拍数块返回当前的每分钟节拍数。"
 
 #: js/blocks/MeterBlocks.js:170
@@ -4899,6 +5300,7 @@ msgstr "每分钟节拍数块返回当前的每分钟节拍数。"
 #. TRANS: number of beats played per minute
 #. TRANS: in Japanese: "１分当たりの拍の数"
 msgid "beats per minute2"
+# TRANS: machine translation
 msgstr "每分钟节拍数2"
 
 #: js/blocks/MeterBlocks.js:170
@@ -4907,20 +5309,24 @@ msgstr "每分钟节拍数2"
 #: js/blocks/MeterBlocks.js:1212
 #. TRANS: sets tempo by defining a beat and beats per minute
 msgid "beats per minute"
+# TRANS: machine translation
 msgstr "每分钟节拍数"
 
 #: js/blocks/MeterBlocks.js:234
 #. TRANS: count of current musical measure in meter
 msgid "measure count"
+# TRANS: machine translation
 msgstr "小节数"
 
 #: js/blocks/MeterBlocks.js:242
 msgid "The Measure count block returns the current measure."
+# TRANS: machine translation
 msgstr "小节数块返回当前小节。"
 
 #: js/blocks/MeterBlocks.js:291
 #. TRANS: count of current beat in the meter
 msgid "beat count"
+# TRANS: machine translation
 msgstr "节拍计数"
 
 #: js/blocks/MeterBlocks.js:301
@@ -4928,70 +5334,85 @@ msgstr "节拍计数"
 #: js/blocks/MeterBlocks.js:566
 #: js/blocks/MeterBlocks.js:577
 msgid "The Beat count block is the number of the current beat,"
+# TRANS: machine translation
 msgstr "节拍计数块表示当前节拍数，"
 
 #: js/blocks/MeterBlocks.js:314
 #: js/blocks/MeterBlocks.js:579
 msgid "eg 1, 2, 3, or 4."
+# TRANS: machine translation
 msgstr "例如 1、2、3 或 4。"
 
 #: js/blocks/MeterBlocks.js:369
 #. TRANS: count the number of notes
 msgid "sum note values"
+# TRANS: machine translation
 msgstr "音符值总和"
 
 #: js/blocks/MeterBlocks.js:377
 #: js/blocks/MeterBlocks.js:441
 msgid "The Note counter block can be used to count the number of contained notes."
+# TRANS: machine translation
 msgstr "音符计数器块可用于计算包含的音符数量。"
 
 #: js/blocks/MeterBlocks.js:433
 #. TRANS: count the number of notes
 msgid "note counter"
+# TRANS: machine translation
 msgstr "音符计数器"
 
 #: js/blocks/MeterBlocks.js:497
 #. TRANS: number of whole notes that have been played
 msgid "whole notes played"
+# TRANS: machine translation
 msgstr "演奏的全音符数"
 
 #: js/blocks/MeterBlocks.js:506
 msgid "The Whole notes played block returns the total number of whole notes played."
+# TRANS: machine translation
 msgstr "全音符演奏块返回演奏的全音符总数。"
 
 #: js/blocks/MeterBlocks.js:556
 #: js/turtleactions/DictActions.js:83
 #. TRANS: number of notes that have been played
 msgid "notes played"
+# TRANS: machine translation
 msgstr "演奏的音符数"
 
 #: js/blocks/MeterBlocks.js:654
 msgid "The No clock block decouples the notes from the master clock."
+# TRANS: machine translation
 msgstr "无时钟块将音符与主时钟解耦。"
 
 #: js/blocks/MeterBlocks.js:662
 #. TRANS: don't lock notes to master clock
 msgid "no clock"
+# TRANS: machine translation
 msgstr "无时钟"
 
 #: js/blocks/MeterBlocks.js:701
 msgid "on weak beat do"
+# TRANS: machine translation
 msgstr "在弱拍执行"
 
 #: js/blocks/MeterBlocks.js:706
 msgid "The On-weak-beat block lets you specify actions to take on weak (off) beats."
+# TRANS: machine translation
 msgstr "弱拍块允许您指定在弱拍（弱拍）上执行的操作。"
 
 #: js/blocks/MeterBlocks.js:751
 msgid "on strong beat"
+# TRANS: machine translation
 msgstr "在强拍执行"
 
 #: js/blocks/MeterBlocks.js:759
 msgid "The On-strong-beat block lets you specify actions to take on specified beats."
+# TRANS: machine translation
 msgstr "强拍块允许您指定在特定强拍上执行的操作。"
 
 #: js/blocks/MeterBlocks.js:770
 msgid "beat"
+# TRANS: machine translation
 msgstr "节拍"
 
 #: js/blocks/MeterBlocks.js:770
@@ -5000,102 +5421,123 @@ msgstr "节拍"
 #: js/blocks/ActionBlocks.js:959
 #: js/blocks/ActionBlocks.js:1048
 msgid "do1"
+# TRANS: machine translation
 msgstr "做1"
 
 #: js/blocks/MeterBlocks.js:814
 msgid "on every beat do"
+# TRANS: machine translation
 msgstr "在每个拍子执行"
 
 #: js/blocks/MeterBlocks.js:822
 msgid "The On-every-beat block lets you specify actions to take on every beat."
+# TRANS: machine translation
 msgstr "每拍块允许您指定在每个拍子上执行的操作。"
 
 #: js/blocks/MeterBlocks.js:875
 msgid "on every note do"
+# TRANS: machine translation
 msgstr "在每个音符执行"
 
 #: js/blocks/MeterBlocks.js:883
 msgid "The On-every-note block lets you specify actions to take on every note."
+# TRANS: machine translation
 msgstr "每音符块允许您指定在每个音符上执行的操作。"
 
 #: js/blocks/MeterBlocks.js:929
 #: js/blocks/MeterBlocks.js:1000
 #. TRANS: sets tempo by defining a beat and beats per minute
 msgid "master beats per minute"
+# TRANS: machine translation
 msgstr "主节拍每分钟数"
 
 #: js/blocks/MeterBlocks.js:953
 #: js/blocks/MeterBlocks.js:1079
 #: js/blocks/MeterBlocks.js:1136
 msgid "bpm"
+# TRANS: machine translation
 msgstr "每分钟节拍数"
 
 #: js/blocks/MeterBlocks.js:953
 #: js/blocks/MeterBlocks.js:1079
 #: js/blocks/MeterBlocks.js:1136
 msgid "beat value"
+# TRANS: machine translation
 msgstr "节拍值"
 
 #: js/blocks/MeterBlocks.js:1025
 #: js/blocks/MeterBlocks.js:1168
 #: js/blocks/MeterBlocks.js:1242
 msgid "Beats per minute must be > 30."
+# TRANS: machine translation
 msgstr "每分钟节拍数必须大于30。"
 
 #: js/blocks/MeterBlocks.js:1028
 #: js/blocks/MeterBlocks.js:1171
 #: js/blocks/MeterBlocks.js:1245
 msgid "Maximum beats per minute is 1000."
+# TRANS: machine translation
 msgstr "最大每分钟节拍数为1000。"
 
 #: js/blocks/MeterBlocks.js:1069
 msgid "The Beats per minute block sets the number of 1/4 notes per minute."
+# TRANS: machine translation
 msgstr "节拍每分钟块设置每分钟四分音符的数量。"
 
 #: js/blocks/MeterBlocks.js:1280
 #. TRANS: anacrusis
 msgid "pickup"
+# TRANS: machine translation
 msgstr "前奏拍"
 
 #: js/blocks/MeterBlocks.js:1368
 msgid "number of beats"
+# TRANS: machine translation
 msgstr "拍数"
 
 #: js/blocks/PitchBlocks.js:141
 #. TRANS: musical transposition (adjustment of pitch up or down)
 msgid "transposition"
+# TRANS: machine translation
 msgstr "移调"
 
 #: js/blocks/PitchBlocks.js:168
 #. TRANS: step down one note in current musical scale
 msgid "scalar step down"
+# TRANS: machine translation
 msgstr "音阶下行"
 
 #: js/blocks/PitchBlocks.js:172
 msgid "The Scalar step down block returns the number of semi-tones down to the previous note in the current key and mode."
+# TRANS: machine translation
 msgstr "音阶下行块返回当前调式中与前一个音符之间的半音数。"
 
 #: js/blocks/PitchBlocks.js:190
 #. TRANS: step up one note in current musical scale
 msgid "scalar step up"
+# TRANS: machine translation
 msgstr "音阶上行"
 
 #: js/blocks/PitchBlocks.js:194
 msgid "The Scalar step up block returns the number of semi-tones up to the next note in the current key and mode."
+# TRANS: machine translation
 msgstr "音阶上行块返回当前调式中与下一个音符之间的半音数。"
 
 #: js/blocks/PitchBlocks.js:212
 #. TRANS: the change measured in half-steps between the current pitch and the previous pitch
 msgid "change in pitch"
+# TRANS: machine translation
 msgstr "音高变化"
 
 #: js/blocks/PitchBlocks.js:216
 msgid "The Change in pitch block is the difference (in half steps) between the current pitch being played and the previous pitch played."
+# TRANS: machine translation
 msgstr "音高变化块表示当前播放音高与之前播放音高之间的半音差异。"
 
 #: js/blocks/PitchBlocks.js:243
 #. TRANS: the change measured in scale-steps between the current pitch and the previous pitch
 msgid "scalar change in pitch"
+# TRANS: machine translation
 msgstr "音阶音高变化"
 
 #: js/blocks/PitchBlocks.js:250
@@ -5108,89 +5550,109 @@ msgstr "音阶音高变化"
 #. TRANS: convert current note to piano key (1-88)
 #. TRANS: a mapping of pitch to the 88 piano keys
 msgid "pitch number"
+# TRANS: machine translation
 msgstr "音高编号"
 
 #: js/blocks/PitchBlocks.js:256
 msgid "The Pitch number block is the value of the pitch of the note currently being played."
+# TRANS: machine translation
 msgstr "音高编号块表示当前正在播放的音符的音高值。"
 
 #: js/blocks/PitchBlocks.js:329
 #: js/blocks/PitchBlocks.js:433
 #. TRANS: the current pitch expressed in Hertz
 msgid "pitch in hertz"
+# TRANS: machine translation
 msgstr "以赫兹表示的音高"
 
 #: js/blocks/PitchBlocks.js:334
 msgid "The Pitch in Hertz block is the value in Hertz of the pitch of the note currently being played."
+# TRANS: machine translation
 msgstr "以赫兹表示的音高块是当前正在播放音符的赫兹值。"
 
 #: js/blocks/PitchBlocks.js:367
 #: js/turtleactions/DictActions.js:87
 msgid "current pitch"
+# TRANS: machine translation
 msgstr "当前音高"
 
 #: js/blocks/PitchBlocks.js:373
 msgid "The Current Pitch block is used with the Pitch Converter block. In the example above, current pitch, sol 4, is displayed as 392 hertz."
+# TRANS: machine translation
 msgstr "当前音高块与音高转换块一起使用。上述示例中，当前音高 sol 4 显示为 392 赫兹。"
 
 #: js/blocks/PitchBlocks.js:410
 msgid "This block converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al."
+# TRANS: machine translation
 msgstr "此块将最后播放音符的音高值转换为赫兹、字母名、音高编号等多种格式。"
 
 #: js/blocks/PitchBlocks.js:434
 msgid "alphabet"
+# TRANS: machine translation
 msgstr "字母表"
 
 #: js/blocks/PitchBlocks.js:436
 #. TRANS: Translate as "alphabet class"
 msgid "letter class"
+# TRANS: machine translation
 msgstr "字母类别"
 
 #: js/blocks/PitchBlocks.js:437
 msgid "solfege class"
+# TRANS: machine translation
 msgstr "视唱类别"
 
 #: js/blocks/PitchBlocks.js:438
 msgid "staff y"
+# TRANS: machine translation
 msgstr "五线谱Y坐标"
 
 #: js/blocks/PitchBlocks.js:439
 msgid "solfege syllable"
+# TRANS: machine translation
 msgstr "视唱音节"
 
 #: js/blocks/PitchBlocks.js:440
 msgid "pitch class"
+# TRANS: machine translation
 msgstr "音高类别"
 
 #: js/blocks/PitchBlocks.js:441
 msgid "scalar class"
+# TRANS: machine translation
 msgstr "标量类别"
 
 #: js/blocks/PitchBlocks.js:443
 msgid "nth degree"
+# TRANS: machine translation
 msgstr "第n度音"
 
 #: js/blocks/PitchBlocks.js:444
 msgid "pitch to shade"
+# TRANS: machine translation
 msgstr "音高到阴影"
 
 #: js/blocks/PitchBlocks.js:445
 msgid "pitch to color"
+# TRANS: machine translation
 msgstr "音高到颜色"
 
 #: js/blocks/PitchBlocks.js:629
 #: js/widgets/musickeyboard.js:753
 #. TRANS: MIDI is a technical standard for electronic music
 msgid "MIDI"
+# TRANS: machine translation
 msgstr "MIDI"
 
 #: js/blocks/PitchBlocks.js:642
 #. TRANS: set an offset associated with the numeric piano keyboard mapping
 msgid "set pitch number offset"
+# TRANS: machine translation
 msgstr "设置音高编号偏移"
 
 #: js/blocks/PitchBlocks.js:645
 msgid "The Set pitch number offset block is used to set the offset for mapping pitch numbers to pitch and octave."
+# TRANS: machine translation
 msgstr "设置音高编号偏移块用于设置将音高编号映射到音高和八度的偏移量。"
 
 #: js/blocks/PitchBlocks.js:656
@@ -5199,174 +5661,212 @@ msgstr "设置音高编号偏移块用于设置将音高编号映射到音高和
 #: js/blocks/MediaBlocks.js:746
 #. TRANS: name2 is name as in name of pitch (JAPANESE ONLY)
 msgid "name2"
+# TRANS: machine translation
 msgstr "名称2"
 
 #: js/blocks/PitchBlocks.js:679
 #. TRANS: convert piano key number (1-88) to pitch
 msgid "number to pitch"
+# TRANS: machine translation
 msgstr "数字转音高"
 
 #: js/blocks/PitchBlocks.js:682
 msgid "The Number to pitch block will convert a pitch number to a pich name."
+# TRANS: machine translation
 msgstr "数字转音高块将音高编号转换为音高名称。"
 
 #: js/blocks/PitchBlocks.js:715
 #. TRANS: convert piano key number (1-88) to octave
 msgid "number to octave"
+# TRANS: machine translation
 msgstr "数字转八度"
 
 #: js/blocks/PitchBlocks.js:717
 msgid "The Number to octave block will convert a pitch number to an octave."
+# TRANS: machine translation
 msgstr "数字转八度块将音高编号转换为八度。"
 
 #: js/blocks/PitchBlocks.js:726
 msgid "y to pitch"
+# TRANS: machine translation
 msgstr "y坐标转音高"
 
 #: js/blocks/PitchBlocks.js:729
 msgid "Y to pitch block will convert a staff y position to corresponding pitch notation."
+# TRANS: machine translation
 msgstr "Y 到音高模块会将五线谱的 Y 位置转换为对应的音高符号。"
 
 #: js/blocks/PitchBlocks.js:841
 msgid "accidental selector"
+# TRANS: machine translation
 msgstr "变音符号选择器"
 
 #: js/blocks/PitchBlocks.js:844
 msgid "The Accidental selector block is used to choose between double-sharp, sharp, natural, flat, and double-flat."
+# TRANS: machine translation
 msgstr "变音符号选择器块用于选择重升号、升号、还原号、降号和重降号。"
 
 #: js/blocks/PitchBlocks.js:858
 msgid "Pitch can be specified in terms of ni dha pa ma ga re sa."
+# TRANS: machine translation
 msgstr "音高可以用 ni dha pa ma ga re sa 表示。"
 
 #: js/blocks/PitchBlocks.js:872
 msgid "Pitch can be specified in terms of C D E F G A B."
+# TRANS: machine translation
 msgstr "音高可以用 C D E F G A B 表示。"
 
 #: js/blocks/PitchBlocks.js:884
 msgid "solfege"
+# TRANS: machine translation
 msgstr "视唱法"
 
 #: js/blocks/PitchBlocks.js:887
 msgid "Pitch can be specified in terms of do re mi fa sol la ti."
+# TRANS: machine translation
 msgstr "音高可以用 do re mi fa sol la ti 表示。"
 
 #: js/blocks/PitchBlocks.js:922
 msgid "The Invert block rotates any contained notes around a target note."
+# TRANS: machine translation
 msgstr "反转块将包含的音符绕目标音符旋转。"
 
 #: js/blocks/PitchBlocks.js:929
 #: js/widgets/modewidget.js:137
 #. TRANS: pitch inversion rotates a pitch around another pitch
 msgid "Invert"
+# TRANS: machine translation
 msgstr "反转"
 
 #: js/blocks/PitchBlocks.js:968
 #. TRANS: pitch inversion rotates a pitch around another pitch (odd number)
 msgid "invert (odd)"
+# TRANS: machine translation
 msgstr "反转（奇数）"
 
 #: js/blocks/PitchBlocks.js:1001
 #. TRANS: pitch inversion rotates a pitch around another pitch (even number)
 msgid "invert (even)"
+# TRANS: machine translation
 msgstr "反转（偶数）"
 
 #: js/blocks/PitchBlocks.js:1022
 #. TRANS: register is the octave of the current pitch
 msgid "register"
+# TRANS: machine translation
 msgstr "音区"
 
 #: js/blocks/PitchBlocks.js:1026
 msgid "The Register block provides an easy way to modify the register (octave) of the notes that follow it."
+# TRANS: machine translation
 msgstr "移调块提供了一种简单的方法来修改后续音符的音区（八度）。"
 
 #: js/blocks/PitchBlocks.js:1047
 #. TRANS: cents are units used to specify the ratio between pitches. There are 100 cents between successive notes.
 msgid "50 cents"
+# TRANS: machine translation
 msgstr "50分音"
 
 #: js/blocks/PitchBlocks.js:1102
 msgid "The Semi-tone transposition block will shift the pitches contained inside Note blocks up (or down) by half steps."
+# TRANS: machine translation
 msgstr "半音移调块会将Note块内的音高向上（或向下）移动半音。"
 
 #: js/blocks/PitchBlocks.js:1104
 msgid "In the example shown above, sol is shifted up to sol#."
+# TRANS: machine translation
 msgstr "在上例中，sol被移调到了sol#。"
 
 #: js/blocks/PitchBlocks.js:1110
 #. TRANS: adjust the amount of shift (up or down) of a pitch
 msgid "semi-tone transpose"
+# TRANS: machine translation
 msgstr "半音移调"
 
 #: js/blocks/PitchBlocks.js:1143
 msgid "The Transpose by Ratio block will shift the pitches contained inside Note blocks up (or down) by a ratio"
+# TRANS: machine translation
 msgstr "按比例移调块会将Note块内的音高按比例向上（或向下）移动。"
 
 #: js/blocks/PitchBlocks.js:1149
 #. TRANS: adjust the amount of shift (up or down) of a pitch
 msgid "transpose by ratio"
+# TRANS: machine translation
 msgstr "按比例移调"
 
 #: js/blocks/PitchBlocks.js:1232
 #. TRANS: down sixth means the note is five scale degrees below current note
 msgid "down sixth"
+# TRANS: machine translation
 msgstr "下降六度"
 
 #: js/blocks/PitchBlocks.js:1251
 #. TRANS: down third means the note is two scale degrees below current note
 msgid "down third"
+# TRANS: machine translation
 msgstr "下降三度"
 
 #: js/blocks/PitchBlocks.js:1270
 #. TRANS: seventh means the note is the six scale degrees above current note
 msgid "seventh"
+# TRANS: machine translation
 msgstr "七度"
 
 #: js/blocks/PitchBlocks.js:1289
 #. TRANS: sixth means the note is the five scale degrees above current note
 msgid "sixth"
+# TRANS: machine translation
 msgstr "六度"
 
 #: js/blocks/PitchBlocks.js:1308
 #. TRANS: fifth means the note is the four scale degrees above current note
 msgid "fifth"
+# TRANS: machine translation
 msgstr "五度"
 
 #: js/blocks/PitchBlocks.js:1328
 #. TRANS: fourth means the note is three scale degrees above current note
 msgid "fourth"
+# TRANS: machine translation
 msgstr "四度"
 
 #: js/blocks/PitchBlocks.js:1347
 #. TRANS: third means the note is two scale degrees above current note
 msgid "third"
+# TRANS: machine translation
 msgstr "三度"
 
 #: js/blocks/PitchBlocks.js:1366
 #. TRANS: second means the note is one scale degree above current note
 msgid "second"
+# TRANS: machine translation
 msgstr "二度"
 
 #: js/blocks/PitchBlocks.js:1407
 msgid "The Scalar transposition block will shift the pitches contained inside Note blocks up (or down) the scale."
+# TRANS: machine translation
 msgstr "音阶移调块会将Note块内的音高按音阶向上（或向下）移动。"
 
 #: js/blocks/PitchBlocks.js:1409
 msgid "In the example shown above, sol is shifted up to la."
+# TRANS: machine translation
 msgstr "在上例中，sol被移调到la。"
 
 #: js/blocks/PitchBlocks.js:1416
 #. TRANS: adjust the amount of shift (up or down) of a pitch by musical scale (scalar) steps
 msgid "scalar transpose"
+# TRANS: machine translation
 msgstr "音阶移调"
 
 #: js/blocks/PitchBlocks.js:1451
 msgid "The Accidental block is used to create sharps and flats"
+# TRANS: machine translation
 msgstr "临时升降记号块用于创建升音和降音"
 
 #: js/blocks/PitchBlocks.js:1458
 #. TRANS: An accidental is a modification to a pitch, e.g., sharp or flat.
 msgid "accidental override"
+# TRANS: machine translation
 msgstr "临时升降记号覆盖"
 
 #: js/blocks/PitchBlocks.js:1577
@@ -5375,14 +5875,17 @@ msgstr "临时升降记号覆盖"
 #: js/widgets/phrasemaker.js:1123
 #. TRANS: a measure of frequency: one cycle per second
 msgid "hertz"
+# TRANS: machine translation
 msgstr "赫兹"
 
 #: js/blocks/PitchBlocks.js:1581
 msgid "The Hertz block (in combination with a Number block) will play a sound at the specified frequency."
+# TRANS: machine translation
 msgstr "赫兹块（与数字块结合使用）将在指定频率播放声音。"
 
 #: js/blocks/PitchBlocks.js:1671
 msgid "The Pitch Number block will play a pitch associated by its number, e.g. 0 for C and 7 for G."
+# TRANS: machine translation
 msgstr "音高编号块将播放与其数字对应的音高，例如0代表C，7代表G。"
 
 #: js/blocks/PitchBlocks.js:1703
@@ -5390,52 +5893,64 @@ msgstr "音高编号块将播放与其数字对应的音高，例如0代表C，7
 #. TRANS: a numeric mapping of the notes in an octave based on the musical mode
 #. TRANS: a numeric mapping of the notes in an octave based on the musical mode
 msgid "nth modal pitch"
+# TRANS: machine translation
 msgstr "第n阶音高"
 
 #: js/blocks/PitchBlocks.js:1706
 msgid "nth Modal Pitch takes the pattern of pitches in semitones for a mode and makes each point a degree of the mode,"
+# TRANS: machine translation
 msgstr "第n阶调式音高采用模式中以半音为单位的音高模式，并将每个点视为该模式的一个阶。"
 
 #: js/blocks/PitchBlocks.js:1708
 msgid "starting from 1 and regardless of tonal framework (i.e. not always 8 notes in the octave)"
+# TRANS: machine translation
 msgstr "从1开始，不考虑音调框架（即不总是八度内有8个音符）"
 
 #: js/blocks/PitchBlocks.js:1749
 msgid "Nth Modal Pitch takes a number as an input as the nth degree for the given mode. 0 is the first position, 1 is the second, -1 is the note before the first etc."
+# TRANS: machine translation
 msgstr "第n阶调式音高以数字作为输入，表示给定模式的第n个阶。0表示第一个位置，1表示第二个，-1表示第一个之前的音符，依此类推。"
 
 #: js/blocks/PitchBlocks.js:1751
 msgid "The pitches change according to the mode specified without any need for respellings."
+# TRANS: machine translation
 msgstr "音高根据指定的调式变化，无需重新拼写。"
 
 #: js/blocks/PitchBlocks.js:1790
 msgid "Scale Degree is a common convention in music. Scale Degree offers seven possible positions in the scale (1-7) and can be modified via accidentals."
+# TRANS: machine translation
 msgstr "音阶度数是音乐中的常用约定。音阶度数提供音阶中的七个可能位置（1-7），并可通过临时升降记号进行修改。"
 
 #: js/blocks/PitchBlocks.js:1792
 msgid "Scale Degree 1 is always the first pitch in a given scale, regardless of octave."
+# TRANS: machine translation
 msgstr "音阶度数1始终是给定音阶中的第一个音高，不论其所在的八度。"
 
 #: js/blocks/PitchBlocks.js:1814
 #. TRANS: step some number of notes in current musical scale
 msgid "scalar step"
+# TRANS: machine translation
 msgstr "音阶步长"
 
 #: js/blocks/PitchBlocks.js:1819
 msgid "The Scalar Step block (in combination with a Number block) will play the next pitch in a scale,"
+# TRANS: machine translation
 msgstr "音阶步长块（与数字块结合使用）将播放音阶中的下一个音高，"
 
 #: js/blocks/PitchBlocks.js:1821
 msgid "eg if the last note played was sol, Scalar Step 1 will play la."
+# TRANS: machine translation
 msgstr "例如，如果上一个播放的音符是sol，音阶步长1将播放la。"
 
 #: js/blocks/PitchBlocks.js:1857
 msgid "The Pitch block specifies the pitch name and octave of a note that together determine the frequency of the note."
+# TRANS: machine translation
 msgstr "音高块指定一个音符的音名和八度，这两者共同决定该音符的频率。"
 
 #: js/blocks/ToneBlocks.js:34
 #: js/widgets/timbre.js:783
 msgid "Oscillator"
+# TRANS: machine translation
 msgstr "振荡器"
 
 #: js/blocks/ToneBlocks.js:42
@@ -5445,107 +5960,129 @@ msgstr "振荡器"
 #. TRANS: there are different types (sine, triangle, square...) of oscillators.
 #. TRANS: type of filter, e.g., lowpass, highpass, etc.
 msgid "type"
+# TRANS: machine translation
 msgstr "类型"
 
 #: js/blocks/ToneBlocks.js:44
 #: js/widgets/timbre.js:1554
 #. TRANS: Partials refers to the number of sine waves combined into the sound.
 msgid "partials"
+# TRANS: machine translation
 msgstr "部分谐波"
 
 #: js/blocks/ToneBlocks.js:76
 msgid "You are adding multiple oscillator blocks."
+# TRANS: machine translation
 msgstr "您正在添加多个振荡器块。"
 
 #: js/blocks/ToneBlocks.js:144
 #: js/widgets/timbre.js:1217
 #. TRANS: a duo synthesizer combines a synth with a sequencer
 msgid "duo synth"
+# TRANS: machine translation
 msgstr "duo synth"
 
 #: js/blocks/ToneBlocks.js:149
 msgid "The Duo synth block is a duo-frequency modulator used to define a timbre."
+# TRANS: machine translation
 msgstr "Duo synth块是一个双频率调制器，用于定义音色。"
 
 #: js/blocks/ToneBlocks.js:157
 #: js/widgets/timbre.js:1468
 msgid "vibrato rate"
+# TRANS: machine translation
 msgstr "颤音速率"
 
 #: js/blocks/ToneBlocks.js:157
 msgid "vibrato intensity"
+# TRANS: machine translation
 msgstr "颤音强度"
 
 #: js/blocks/ToneBlocks.js:185
 #: js/widgets/timbre.js:1215
 #. TRANS: AM (amplitude modulation) synthesizer
 msgid "AM synth"
+# TRANS: machine translation
 msgstr "AM 合成器"
 
 #: js/blocks/ToneBlocks.js:189
 msgid "The AM synth block is an amplitude modulator used to define a timbre."
+# TRANS: machine translation
 msgstr "AM 合成器块是用于定义音色的振幅调制器。"
 
 #: js/blocks/ToneBlocks.js:224
 #: js/widgets/timbre.js:1216
 #. TRANS: FM (frequency modulation) synthesizer
 msgid "FM synth"
+# TRANS: machine translation
 msgstr "FM 合成器"
 
 #: js/blocks/ToneBlocks.js:228
 msgid "The FM synth block is a frequency modulator used to define a timbre."
+# TRANS: machine translation
 msgstr "FM 合成器块是用于定义音色的频率调制器。"
 
 #: js/blocks/ToneBlocks.js:262
 msgid "partial"
+# TRANS: machine translation
 msgstr "部分"
 
 #: js/blocks/ToneBlocks.js:265
 msgid "The Partial block is used to specify a weight for a specific partial harmonic."
+# TRANS: machine translation
 msgstr "Partial块用于指定特定部分泛音的权重。"
 
 #: js/blocks/ToneBlocks.js:284
 #. TRANS: partials are weighted components in a harmonic series
 msgid "Partial weight must be between 0 and 1."
+# TRANS: machine translation
 msgstr "部分权重必须在0到1之间。"
 
 #: js/blocks/ToneBlocks.js:297
 #. TRANS: partials are weighted components in a harmonic series
 msgid "Partial block should be used inside of a Weighted-partials block."
+# TRANS: machine translation
 msgstr "Partial块应在加权部分块内使用。"
 
 #: js/blocks/ToneBlocks.js:325
 #. TRANS: partials are weighted components in a harmonic series
 msgid "weighted partials"
+# TRANS: machine translation
 msgstr "加权泛音"
 
 #: js/blocks/ToneBlocks.js:383
 msgid "The Harmonic block will add harmonics to the contained notes."
+# TRANS: machine translation
 msgstr "Harmonic块将为包含的音符添加泛音。"
 
 #: js/blocks/ToneBlocks.js:390
 #. TRANS: A harmonic is an overtone.
 msgid "harmonic"
+# TRANS: machine translation
 msgstr "谐波"
 
 #: js/blocks/ToneBlocks.js:431
 msgid "The Distortion block adds distortion to the pitch."
+# TRANS: machine translation
 msgstr "Distortion块为音高添加失真效果。"
 
 #: js/blocks/ToneBlocks.js:438
 #: js/widgets/timbre.js:2088
 #. TRANS: distortion is an alteration in the sound
 msgid "distortion"
+# TRANS: machine translation
 msgstr "失真"
 
 #: js/blocks/ToneBlocks.js:487
 msgid "The Tremolo block adds a wavering effect."
+# TRANS: machine translation
 msgstr "Tremolo块添加颤音效果。"
 
 #: js/blocks/ToneBlocks.js:495
 #: js/widgets/timbre.js:2084
 #. TRANS: a wavering effect in a musical tone
 msgid "tremolo"
+# TRANS: machine translation
 msgstr "颤音"
 
 #: js/blocks/ToneBlocks.js:500
@@ -5558,6 +6095,7 @@ msgstr "颤音"
 #: js/widgets/timbre.js:2407
 #. TRANS: rate at which tremolo wavers
 msgid "rate"
+# TRANS: machine translation
 msgstr "速率"
 
 #: js/blocks/ToneBlocks.js:502
@@ -5566,111 +6104,134 @@ msgstr "速率"
 #: js/widgets/timbre.js:2316
 #. TRANS: amplitude of tremolo waver
 msgid "depth"
+# TRANS: machine translation
 msgstr "深度"
 
 #: js/blocks/ToneBlocks.js:559
 msgid "The Phaser block adds a sweeping sound."
+# TRANS: machine translation
 msgstr "Phaser块添加扫频效果。"
 
 #: js/blocks/ToneBlocks.js:566
 #: js/widgets/timbre.js:2087
 #. TRANS: alter the phase of the sound
 msgid "phaser"
+# TRANS: machine translation
 msgstr "移相器"
 
 #: js/blocks/ToneBlocks.js:569
 #: js/turtleactions/IntervalsActions.js:114
 #: js/widgets/timbre.js:2410
 msgid "octaves"
+# TRANS: machine translation
 msgstr "八度"
 
 #: js/blocks/ToneBlocks.js:569
 #: js/widgets/timbre.js:2413
 msgid "base frequency"
+# TRANS: machine translation
 msgstr "基频"
 
 #: js/blocks/ToneBlocks.js:619
 msgid "The Chorus block adds a chorus effect."
+# TRANS: machine translation
 msgstr "Chorus块添加合唱效果。"
 
 #: js/blocks/ToneBlocks.js:627
 #: js/widgets/timbre.js:2086
 #. TRANS: musical effect to simulate a choral sound
 msgid "chorus"
+# TRANS: machine translation
 msgstr "合唱"
 
 #: js/blocks/ToneBlocks.js:630
 #: js/widgets/timbre.js:2310
 msgid "delay (MS)"
+# TRANS: machine translation
 msgstr "延迟（毫秒）"
 
 #: js/blocks/ToneBlocks.js:678
 msgid "The Vibrato block adds a rapid, slight variation in pitch."
+# TRANS: machine translation
 msgstr "Vibrato块添加快速且轻微的音高变化。"
 
 #: js/blocks/ToneBlocks.js:686
 #: js/widgets/timbre.js:2085
 #. TRANS: a rapid, slight variation in pitch
 msgid "vibrato"
+# TRANS: machine translation
 msgstr "颤音"
 
 #: js/blocks/ToneBlocks.js:689
 #: js/widgets/timbre.js:2209
 msgid "intensity"
+# TRANS: machine translation
 msgstr "强度"
 
 #: js/blocks/ToneBlocks.js:733
 #. TRANS: select synthesizer
 msgid "set synth"
+# TRANS: machine translation
 msgstr "设置合成器"
 
 #: js/blocks/ToneBlocks.js:804
 msgid "synth name"
+# TRANS: machine translation
 msgstr "合成器名称"
 
 #: js/blocks/ToneBlocks.js:842
 msgid "set default instrument"
+# TRANS: machine translation
 msgstr "设置默认乐器"
 
 #: js/blocks/ToneBlocks.js:895
 #: js/blocks/ToneBlocks.js:943
 #. TRANS: set the characteristics of a custom instrument
 msgid "set instrument"
+# TRANS: machine translation
 msgstr "设置乐器"
 
 #: js/blocks/ToneBlocks.js:898
 #: js/blocks/ToneBlocks.js:926
 #: js/blocks/ToneBlocks.js:932
 msgid "The Set instrument block selects a voice for the synthesizer,"
+# TRANS: machine translation
 msgstr "Set instrument块用于选择合成器的声音，"
 
 #: js/blocks/ToneBlocks.js:900
 #: js/blocks/ToneBlocks.js:934
 msgid "eg guitar piano violin or cello."
+# TRANS: machine translation
 msgstr "例如吉他、钢琴、小提琴或大提琴。"
 
 #: js/blocks/ToneBlocks.js:1015
 msgid "Import a sound file to use as an instrument and set its pitch center."
+# TRANS: machine translation
 msgstr "导入音频文件作为乐器并设置其音高中心。"
 
 #: js/blocks/ToneBlocks.js:1110
 msgid "Upload a sound file to connect with the sample block."
+# TRANS: machine translation
 msgstr "上传音频文件以连接采样块。"
 
 #: js/blocks/ActionBlocks.js:58
 msgid "The Return block will return a value from an action."
+# TRANS: machine translation
 msgstr "Return块将从一个动作返回一个值。"
 
 #: js/blocks/ActionBlocks.js:75
 msgid "return"
+# TRANS: machine translation
 msgstr "返回"
 
 #: js/blocks/ActionBlocks.js:128
 msgid "The Return to URL block will return a value to a webpage."
+# TRANS: machine translation
 msgstr "Return to URL块将值返回到网页。"
 
 #: js/blocks/ActionBlocks.js:145
 msgid "return to URL"
+# TRANS: machine translation
 msgstr "返回到URL"
 
 #: js/blocks/ActionBlocks.js:233
@@ -5678,12 +6239,14 @@ msgstr "返回到URL"
 #: js/blocks/ActionBlocks.js:501
 #: js/blocks/ActionBlocks.js:688
 msgid "The Calculate block returns a value calculated by an action."
+# TRANS: machine translation
 msgstr "Calculate块返回一个动作计算的值。"
 
 #: js/blocks/ActionBlocks.js:251
 #: js/blocks/ActionBlocks.js:517
 #: js/blocks/ActionBlocks.js:707
 msgid "calculate"
+# TRANS: machine translation
 msgstr "计算"
 
 #: js/blocks/ActionBlocks.js:376
@@ -5692,81 +6255,99 @@ msgstr "计算"
 #: js/blocks/ActionBlocks.js:1389
 #. TRANS: do is the do something or take an action.
 msgid "The Do block is used to initiate an action."
+# TRANS: machine translation
 msgstr "Do块用于启动一个动作。"
 
 #: js/blocks/ActionBlocks.js:791
 #: js/blocks/ActionBlocks.js:865
 msgid "The Arg block contains the value of an argument passed to an action."
+# TRANS: machine translation
 msgstr "Arg块包含传递给动作的参数值。"
 
 #: js/blocks/ActionBlocks.js:806
 #: js/blocks/ActionBlocks.js:878
 msgid "arg"
+# TRANS: machine translation
 msgstr "参数"
 
 #: js/blocks/ActionBlocks.js:836
 #: js/blocks/ActionBlocks.js:900
 #: js/blocks/ActionBlocks.js:908
 msgid "Invalid argument"
+# TRANS: machine translation
 msgstr "无效参数"
 
 #: js/blocks/ActionBlocks.js:944
 msgid "In the example, it is used with the One of block to choose a random phase."
+# TRANS: machine translation
 msgstr "在示例中，它与One of块一起使用以选择随机阶段。"
 
 #: js/blocks/ActionBlocks.js:1019
 #: js/blocks/ActionBlocks.js:1026
 msgid "The Listen block is used to listen for an event such as a mouse click."
+# TRANS: machine translation
 msgstr "Listen块用于监听事件，例如鼠标点击。"
 
 #: js/blocks/ActionBlocks.js:1028
 msgid "When the event happens, an action is taken."
+# TRANS: machine translation
 msgstr "当事件发生时，会执行一个动作。"
 
 #: js/blocks/ActionBlocks.js:1045
 msgid "on"
+# TRANS: machine translation
 msgstr "开启"
 
 #: js/blocks/ActionBlocks.js:1048
 #: js/blocks/ActionBlocks.js:1049
 #: js/blocks/ActionBlocks.js:1153
 msgid "event"
+# TRANS: machine translation
 msgstr "事件"
 
 #: js/blocks/ActionBlocks.js:1133
 msgid "The Broadcast block is used to trigger an event."
+# TRANS: machine translation
 msgstr "Broadcast块用于触发事件。"
 
 #: js/blocks/ActionBlocks.js:1151
 msgid "broadcast"
+# TRANS: machine translation
 msgstr "广播"
 
 #: js/blocks/ActionBlocks.js:1208
 msgid "Each Start block is a separate voice."
+# TRANS: machine translation
 msgstr "每个Start块是一个独立的声音。"
 
 #: js/blocks/ActionBlocks.js:1304
 msgid "It is often used for storing a phrase of music that is repeated."
+# TRANS: machine translation
 msgstr "它通常用于存储重复的音乐短语。"
 
 #: js/blocks/ActionBlocks.js:1495
 msgid "define temperament"
+# TRANS: machine translation
 msgstr "定义律制"
 
 #: js/blocks/EnsembleBlocks.js:87
 msgid "mouse index heap"
+# TRANS: machine translation
 msgstr "鼠标索引堆"
 
 #: js/blocks/EnsembleBlocks.js:87
 msgid "turtle index heap"
+# TRANS: machine translation
 msgstr "乌龟索引堆"
 
 #: js/blocks/EnsembleBlocks.js:89
 msgid "The Mouse index heap block returns a value in the heap at a specified location for a specified mouse."
+# TRANS: machine translation
 msgstr "Mouse索引堆块返回指定鼠标在堆中指定位置的值。"
 
 #: js/blocks/EnsembleBlocks.js:90
 msgid "The Turtle index heap block returns a value in the heap at a specified location for a specified turtle."
+# TRANS: machine translation
 msgstr "Turtle索引堆块返回指定乌龟在堆中指定位置的值。"
 
 #: js/blocks/EnsembleBlocks.js:94
@@ -5787,32 +6368,39 @@ msgstr "Turtle索引堆块返回指定乌龟在堆中指定位置的值。"
 #: js/blocks/EnsembleBlocks.js:1222
 #: js/blocks/EnsembleBlocks.js:1296
 msgid "Yertle"
+# TRANS: machine translation
 msgstr "Yertle"
 
 #: js/blocks/EnsembleBlocks.js:96
 #: js/blocks/EnsembleBlocks.js:1083
 msgid "mouse name"
+# TRANS: machine translation
 msgstr "鼠标名称"
 
 #: js/blocks/EnsembleBlocks.js:96
 #: js/blocks/EnsembleBlocks.js:1092
 msgid "turtle name"
+# TRANS: machine translation
 msgstr "乌龟名称"
 
 #: js/blocks/EnsembleBlocks.js:147
 msgid "stop mouse"
+# TRANS: machine translation
 msgstr "停止鼠标"
 
 #: js/blocks/EnsembleBlocks.js:149
 msgid "The Stop mouse block stops the specified mouse."
+# TRANS: machine translation
 msgstr "停止鼠标块停止指定的鼠标。"
 
 #: js/blocks/EnsembleBlocks.js:160
 msgid "stop turtle"
+# TRANS: machine translation
 msgstr "停止乌龟"
 
 #: js/blocks/EnsembleBlocks.js:162
 msgid "The Stop turtle block stops the specified turtle."
+# TRANS: machine translation
 msgstr "停止乌龟块停止指定的乌龟。"
 
 #: js/blocks/EnsembleBlocks.js:186
@@ -5825,6 +6413,7 @@ msgstr "停止乌龟块停止指定的乌龟。"
 #: js/blocks/EnsembleBlocks.js:1193
 #: js/blocks/EnsembleBlocks.js:1256
 msgid "Cannot find mouse"
+# TRANS: machine translation
 msgstr "找不到鼠标"
 
 #: js/blocks/EnsembleBlocks.js:188
@@ -5837,90 +6426,110 @@ msgstr "找不到鼠标"
 #: js/blocks/EnsembleBlocks.js:1195
 #: js/blocks/EnsembleBlocks.js:1258
 msgid "Cannot find turtle"
+# TRANS: machine translation
 msgstr "找不到乌龟"
 
 #: js/blocks/EnsembleBlocks.js:208
 msgid "start mouse"
+# TRANS: machine translation
 msgstr "启动鼠标"
 
 #: js/blocks/EnsembleBlocks.js:211
 msgid "The Start mouse block starts the specified mouse."
+# TRANS: machine translation
 msgstr "启动鼠标块启动指定的鼠标。"
 
 #: js/blocks/EnsembleBlocks.js:222
 msgid "start turtle"
+# TRANS: machine translation
 msgstr "启动乌龟"
 
 #: js/blocks/EnsembleBlocks.js:225
 msgid "The Start turtle block starts the specified turtle."
+# TRANS: machine translation
 msgstr "启动乌龟块启动指定的乌龟。"
 
 #: js/blocks/EnsembleBlocks.js:258
 msgid "Mouse is already running."
+# TRANS: machine translation
 msgstr "鼠标已经在运行。"
 
 #: js/blocks/EnsembleBlocks.js:260
 msgid "Turtle is already running."
+# TRANS: machine translation
 msgstr "乌龟已经在运行。"
 
 #: js/blocks/EnsembleBlocks.js:284
 msgid "Cannot find start block"
+# TRANS: machine translation
 msgstr "找不到启动块"
 
 #: js/blocks/EnsembleBlocks.js:294
 #. TRANS: pen color for this mouse
 msgid "mouse color"
+# TRANS: machine translation
 msgstr "鼠标颜色"
 
 #: js/blocks/EnsembleBlocks.js:296
 msgid "The Mouse color block returns the pen color of the specified mouse."
+# TRANS: machine translation
 msgstr "鼠标颜色块返回指定鼠标的画笔颜色。"
 
 #: js/blocks/EnsembleBlocks.js:308
 #. TRANS: pen color for this turtle
 msgid "turtle color"
+# TRANS: machine translation
 msgstr "乌龟颜色"
 
 #: js/blocks/EnsembleBlocks.js:310
 msgid "The Turtle color block returns the pen color of the specified turtle."
+# TRANS: machine translation
 msgstr "乌龟颜色块返回指定乌龟的画笔颜色。"
 
 #: js/blocks/EnsembleBlocks.js:340
 #. TRANS: heading (compass direction) for this mouse
 msgid "mouse heading"
+# TRANS: machine translation
 msgstr "鼠标朝向"
 
 #: js/blocks/EnsembleBlocks.js:342
 msgid "The Mouse heading block returns the heading of the specified mouse."
+# TRANS: machine translation
 msgstr "鼠标朝向块返回指定鼠标的朝向。"
 
 #: js/blocks/EnsembleBlocks.js:354
 #. TRANS: heading (compass direction) for this turtle
 msgid "turtle heading"
+# TRANS: machine translation
 msgstr "乌龟朝向"
 
 #: js/blocks/EnsembleBlocks.js:356
 msgid "The Turtle heading block returns the heading of the specified turtle."
+# TRANS: machine translation
 msgstr "乌龟朝向块返回指定乌龟的朝向。"
 
 #: js/blocks/EnsembleBlocks.js:386
 #: js/blocks/EnsembleBlocks.js:441
 #. TRANS: set xy position for this mouse
 msgid "set mouse"
+# TRANS: machine translation
 msgstr "设置鼠标"
 
 #: js/blocks/EnsembleBlocks.js:397
 #: js/blocks/EnsembleBlocks.js:454
 #. TRANS: set xy position for this turtle
 msgid "set turtle"
+# TRANS: machine translation
 msgstr "设置乌龟"
 
 #: js/blocks/EnsembleBlocks.js:435
 msgid "The Set mouse block sends a stack of blocks to be run by the specified mouse."
+# TRANS: machine translation
 msgstr "设置鼠标块发送一组积木给指定的鼠标执行。"
 
 #: js/blocks/EnsembleBlocks.js:448
 msgid "The Set turtle block sends a stack of blocks to be run by the specified turtle."
+# TRANS: machine translation
 msgstr "设置乌龟块发送一组积木给指定的乌龟执行。"
 
 #: js/blocks/EnsembleBlocks.js:482
@@ -5930,15 +6539,18 @@ msgstr "滑鼠座標 y"
 
 #: js/blocks/EnsembleBlocks.js:484
 msgid "The Y mouse block returns the Y position of the specified mouse."
+# TRANS: machine translation
 msgstr "鼠标 Y 坐标块返回指定鼠标的 Y 位置。"
 
 #: js/blocks/EnsembleBlocks.js:496
 #. TRANS: y position for this turtle
 msgid "turtle y"
+# TRANS: machine translation
 msgstr "乌龟 Y 坐标"
 
 #: js/blocks/EnsembleBlocks.js:498
 msgid "The Y turtle block returns the Y position of the specified turtle."
+# TRANS: machine translation
 msgstr "乌龟 Y 坐标块返回指定乌龟的 Y 位置。"
 
 #: js/blocks/EnsembleBlocks.js:528
@@ -5948,225 +6560,277 @@ msgstr "滑鼠座標 x"
 
 #: js/blocks/EnsembleBlocks.js:530
 msgid "The X mouse block returns the X position of the specified mouse."
+# TRANS: machine translation
 msgstr "鼠标 X 坐标块返回指定鼠标的 X 位置。"
 
 #: js/blocks/EnsembleBlocks.js:542
 #. TRANS: x position for this turtle
 msgid "turtle x"
+# TRANS: machine translation
 msgstr "乌龟 X 坐标"
 
 #: js/blocks/EnsembleBlocks.js:544
 msgid "The X turtle block returns the X position of the specified turtle."
+# TRANS: machine translation
 msgstr "乌龟 X 坐标块返回指定乌龟的 X 位置。"
 
 #: js/blocks/EnsembleBlocks.js:575
 #. TRANS: notes played by this mouse
 msgid "mouse notes played"
+# TRANS: machine translation
 msgstr "鼠标已弹奏的音符数"
 
 #: js/blocks/EnsembleBlocks.js:577
 msgid "The Mouse elapse notes block returns the number of notes played by the specified mouse."
+# TRANS: machine translation
 msgstr "鼠标经过音符块返回指定鼠标已弹奏的音符数量。"
 
 #: js/blocks/EnsembleBlocks.js:589
 #. TRANS: notes played by this turtle
 msgid "turtle notes played"
+# TRANS: machine translation
 msgstr "乌龟已弹奏的音符数"
 
 #: js/blocks/EnsembleBlocks.js:591
 msgid "The Turtle elapse notes block returns the number of notes played by the specified turtle."
+# TRANS: machine translation
 msgstr "乌龟经过音符块返回指定乌龟已弹奏的音符数量。"
 
 #: js/blocks/EnsembleBlocks.js:629
 #. TRANS: convert current note for this turtle to piano key (1-88)
 msgid "mouse pitch number"
+# TRANS: machine translation
 msgstr "鼠标音高编号"
 
 #: js/blocks/EnsembleBlocks.js:631
 msgid "The Mouse pitch block returns the current pitch number being played by the specified mouse."
+# TRANS: machine translation
 msgstr "鼠标音高块返回指定鼠标当前演奏的音高编号。"
 
 #: js/blocks/EnsembleBlocks.js:643
 #. TRANS: convert current note for this turtle to piano key (1-88)
 msgid "turtle pitch number"
+# TRANS: machine translation
 msgstr "乌龟音高编号"
 
 #: js/blocks/EnsembleBlocks.js:645
 msgid "The Turtle pitch block returns the current pitch number being played by the specified turtle."
+# TRANS: machine translation
 msgstr "乌龟音高块返回指定乌龟当前演奏的音高编号。"
 
 #: js/blocks/EnsembleBlocks.js:749
 #: js/blocks/EnsembleBlocks.js:821
 #. TRANS: note value is the duration of the note played by this mouse
 msgid "mouse note value"
+# TRANS: machine translation
 msgstr "鼠标音符时值"
 
 #: js/blocks/EnsembleBlocks.js:759
 #. TRANS: note value is the duration of the note played by this turtle
 msgid "turtle note value"
+# TRANS: machine translation
 msgstr "乌龟音符时值"
 
 #: js/blocks/EnsembleBlocks.js:832
 #. TRANS: sync is short for synchronization
 msgid "mouse sync"
+# TRANS: machine translation
 msgstr "鼠标同步"
 
 #: js/blocks/EnsembleBlocks.js:834
 msgid "The Mouse sync block aligns the beat count between mice."
+# TRANS: machine translation
 msgstr "鼠标同步块用于对齐鼠标之间的节拍计数。"
 
 #: js/blocks/EnsembleBlocks.js:846
 #. TRANS: sync is short for synchronization
 msgid "turtle sync"
+# TRANS: machine translation
 msgstr "乌龟同步"
 
 #: js/blocks/EnsembleBlocks.js:848
 msgid "The Turtle sync block aligns the beat count between turtles."
+# TRANS: machine translation
 msgstr "乌龟同步块用于对齐乌龟之间的节拍计数。"
 
 #: js/blocks/EnsembleBlocks.js:889
 msgid "The Found mouse block will return true if the specified mouse can be found."
+# TRANS: machine translation
 msgstr "找到鼠标块在指定鼠标被找到时返回真。"
 
 #: js/blocks/EnsembleBlocks.js:895
 msgid "found mouse"
+# TRANS: machine translation
 msgstr "找到鼠标"
 
 #: js/blocks/EnsembleBlocks.js:905
 msgid "The Found turtle block will return true if the specified turtle can be found."
+# TRANS: machine translation
 msgstr "找到乌龟块在指定乌龟被找到时返回真。"
 
 #: js/blocks/EnsembleBlocks.js:911
 msgid "found turtle"
+# TRANS: machine translation
 msgstr "找到乌龟"
 
 #: js/blocks/EnsembleBlocks.js:934
 msgid "new mouse"
+# TRANS: machine translation
 msgstr "新鼠标"
 
 #: js/blocks/EnsembleBlocks.js:936
 msgid "The New mouse block will create a new mouse."
+# TRANS: machine translation
 msgstr "新鼠标块将创建一个新的鼠标。"
 
 #: js/blocks/EnsembleBlocks.js:947
 msgid "new turtle"
+# TRANS: machine translation
 msgstr "新乌龟"
 
 #: js/blocks/EnsembleBlocks.js:949
 msgid "The New turtle block will create a new turtle."
+# TRANS: machine translation
 msgstr "新乌龟块将创建一个新的乌龟。"
 
 #: js/blocks/EnsembleBlocks.js:1013
 msgid "set mouse color"
+# TRANS: machine translation
 msgstr "设置鼠标颜色"
 
 #: js/blocks/EnsembleBlocks.js:1016
 msgid "The Set-mouse-color block is used to set the color of a mouse."
+# TRANS: machine translation
 msgstr "设置鼠标颜色块用于设置鼠标的颜色。"
 
 #: js/blocks/EnsembleBlocks.js:1022
 msgid "set turtle color"
+# TRANS: machine translation
 msgstr "设置乌龟颜色"
 
 #: js/blocks/EnsembleBlocks.js:1025
 msgid "The Set-turtle-color block is used to set the color of a turtle."
+# TRANS: machine translation
 msgstr "设置乌龟颜色块用于设置乌龟的颜色。"
 
 #: js/blocks/EnsembleBlocks.js:1086
 msgid "The Mouse-name block returns the name of a mouse."
+# TRANS: machine translation
 msgstr "鼠标名称块返回鼠标的名称。"
 
 #: js/blocks/EnsembleBlocks.js:1095
 msgid "The Turtle-name block returns the name of a turtle."
+# TRANS: machine translation
 msgstr "乌龟名称块返回乌龟的名称。"
 
 #: js/blocks/EnsembleBlocks.js:1118
 msgid "mouse count"
+# TRANS: machine translation
 msgstr "鼠标数量"
 
 #: js/blocks/EnsembleBlocks.js:1121
 msgid "The Mouse-count block returns the number of mice."
+# TRANS: machine translation
 msgstr "鼠标计数块返回鼠标的数量。"
 
 #: js/blocks/EnsembleBlocks.js:1127
 msgid "turtle count"
+# TRANS: machine translation
 msgstr "乌龟数量"
 
 #: js/blocks/EnsembleBlocks.js:1130
 msgid "The Turtle-count block returns the number of turtles."
+# TRANS: machine translation
 msgstr "Turtle-count 块返回乌龟的数量。"
 
 #: js/blocks/EnsembleBlocks.js:1152
 msgid "nth mouse name"
+# TRANS: machine translation
 msgstr "表示老鼠名称的音乐元素标签"
 
 #: js/blocks/EnsembleBlocks.js:1155
 msgid "The Nth-Mouse name block returns the name of the nth mouse."
+# TRANS: machine translation
 msgstr "Nth-Mouse 名称块返回第n只老鼠的名称。"
 
 #: js/blocks/EnsembleBlocks.js:1161
 msgid "nth turtle name"
+# TRANS: machine translation
 msgstr "用于识别乐队中特定乌龟的块标签"
 
 #: js/blocks/EnsembleBlocks.js:1164
 msgid "The Nth-Turtle name block returns the name of the nth turtle."
+# TRANS: machine translation
 msgstr "Nth-Turtle 名称块返回第n只乌龟的名称。"
 
 #: js/blocks/EnsembleBlocks.js:1208
 #: js/blocks/EnsembleBlocks.js:1268
 msgid "set name"
+# TRANS: machine translation
 msgstr "设置音乐元素或实体名称的块标签"
 
 #: js/blocks/EnsembleBlocks.js:1217
 #: js/blocks/EnsembleBlocks.js:1224
 msgid "source"
+# TRANS: machine translation
 msgstr "来源"
 
 #: js/blocks/EnsembleBlocks.js:1217
 #: js/blocks/EnsembleBlocks.js:1224
 msgid "target"
+# TRANS: machine translation
 msgstr "目标"
 
 #: js/blocks/EnsembleBlocks.js:1274
 msgid "The Set-name block is used to name a mouse."
+# TRANS: machine translation
 msgstr "Set-name 块用于命名一只老鼠。"
 
 #: js/blocks/EnsembleBlocks.js:1287
 msgid "The Set-name block is used to name a turtle."
+# TRANS: machine translation
 msgstr "Set-name 块用于命名一只乌龟。"
 
 #: js/blocks/ExtrasBlocks.js:33
 msgid "fraction"
+# TRANS: machine translation
 msgstr "分数"
 
 #: js/blocks/ExtrasBlocks.js:36
 msgid "Convert a float to a fraction"
+# TRANS: machine translation
 msgstr "将浮动数转换为分数的工具提示标签"
 
 #: js/blocks/ExtrasBlocks.js:93
 msgid "save as ABC"
+# TRANS: machine translation
 msgstr "保存为 ABC 的块标签"
 
 #: js/blocks/ExtrasBlocks.js:96
 #: js/blocks/ExtrasBlocks.js:132
 #: js/blocks/ExtrasBlocks.js:168
 msgid "title"
+# TRANS: machine translation
 msgstr "标题"
 
 #: js/blocks/ExtrasBlocks.js:129
 msgid "save as Lilypond"
+# TRANS: machine translation
 msgstr "保存为 LilyPond 的块标签"
 
 #: js/blocks/ExtrasBlocks.js:165
 msgid "save as SVG"
+# TRANS: machine translation
 msgstr "保存为 SVG 的块标签"
 
 #: js/blocks/ExtrasBlocks.js:216
 msgid "no background"
+# TRANS: machine translation
 msgstr "移除背景的块标签"
 
 #: js/blocks/ExtrasBlocks.js:219
 msgid "The No background block eliminates the background from the saved SVG output."
+# TRANS: machine translation
 msgstr "No background 块将从保存的 SVG 输出中移除背景。"
 
 #: js/blocks/ExtrasBlocks.js:247
@@ -6175,15 +6839,18 @@ msgstr "顯示區塊"
 
 #: js/blocks/ExtrasBlocks.js:249
 msgid "The Show blocks block shows the blocks."
+# TRANS: machine translation
 msgstr "Show blocks 块显示其他块。"
 
 #: js/blocks/ExtrasBlocks.js:276
 msgid "The Hide blocks block hides the blocks."
+# TRANS: machine translation
 msgstr "Hide blocks 块隐藏其他块。"
 
 #: js/blocks/ExtrasBlocks.js:305
 #: js/blocks/ExtrasBlocks.js:338
 msgid "The Space block is used to add space between blocks."
+# TRANS: machine translation
 msgstr "Space 块用于在块之间添加空格。"
 
 #: js/blocks/ExtrasBlocks.js:376
@@ -6192,6 +6859,7 @@ msgstr "等待"
 
 #: js/blocks/ExtrasBlocks.js:379
 msgid "The Wait block pauses the program for a specified number of seconds."
+# TRANS: machine translation
 msgstr "Wait 块使程序暂停指定的秒数。"
 
 #: js/blocks/ExtrasBlocks.js:433
@@ -6205,14 +6873,17 @@ msgstr "顯示"
 
 #: js/blocks/ExtrasBlocks.js:476
 msgid "The Print block displays text at the top of the screen."
+# TRANS: machine translation
 msgstr "Print 块在屏幕顶部显示文本。"
 
 #: js/blocks/ExtrasBlocks.js:585
 msgid "display grid"
+# TRANS: machine translation
 msgstr "显示网格的块标签"
 
 #: js/blocks/ExtrasBlocks.js:590
 msgid "The Display Grid Block changes the grid type"
+# TRANS: machine translation
 msgstr "Display Grid 块更改网格类型"
 
 #: js/blocks/ExtrasBlocks.js:692
@@ -6224,6 +6895,7 @@ msgstr "Display Grid 块更改网格类型"
 #: js/blocks/ExtrasBlocks.js:813
 #: js/blocks/ExtrasBlocks.js:832
 msgid "unknown"
+# TRANS: machine translation
 msgstr "未知"
 
 #: js/blocks/GraphicsBlocks.js:46
@@ -6235,58 +6907,72 @@ msgstr "方向"
 
 #: js/blocks/GraphicsBlocks.js:56
 msgid "The Heading block returns the orientation of the mouse."
+# TRANS: machine translation
 msgstr "Heading 块返回老鼠的朝向。"
 
 #: js/blocks/GraphicsBlocks.js:62
 msgid "The Heading block returns the orientation of the turtle."
+# TRANS: machine translation
 msgstr "Heading 块返回乌龟的朝向。"
 
 #: js/blocks/GraphicsBlocks.js:133
 msgid "The Y block returns the vertical position of the mouse."
+# TRANS: machine translation
 msgstr "Y 块返回老鼠的垂直位置。"
 
 #: js/blocks/GraphicsBlocks.js:140
 msgid "The Y block returns the vertical position of the turtle."
+# TRANS: machine translation
 msgstr "Y 块返回乌龟的垂直位置。"
 
 #: js/blocks/GraphicsBlocks.js:149
 msgid "y3"
+# TRANS: machine translation
 msgstr "y3"
 
 #: js/blocks/GraphicsBlocks.js:219
 msgid "The X block returns the horizontal position of the mouse."
+# TRANS: machine translation
 msgstr "X 块返回老鼠的水平位置。"
 
 #: js/blocks/GraphicsBlocks.js:226
 msgid "The X block returns the horizontal position of the turtle."
+# TRANS: machine translation
 msgstr "X 块返回乌龟的水平位置。"
 
 #: js/blocks/GraphicsBlocks.js:235
 msgid "x3"
+# TRANS: machine translation
 msgstr "x3"
 
 #: js/blocks/GraphicsBlocks.js:295
 msgid "scroll xy"
+# TRANS: machine translation
 msgstr "滚动 xy 块标签"
 
 #: js/blocks/GraphicsBlocks.js:303
 msgid "The Scroll XY block moves the canvas."
+# TRANS: machine translation
 msgstr "Scroll XY 块移动画布。"
 
 #: js/blocks/GraphicsBlocks.js:313
 msgid "x2"
+# TRANS: machine translation
 msgstr "x2"
 
 #: js/blocks/GraphicsBlocks.js:313
 msgid "y2"
+# TRANS: machine translation
 msgstr "y2"
 
 #: js/blocks/GraphicsBlocks.js:417
 msgid "The Control-point 2 block sets the second control point for the Bezier curve."
+# TRANS: machine translation
 msgstr "Control-point 2 块设置贝塞尔曲线的第二个控制点。"
 
 #: js/blocks/GraphicsBlocks.js:424
 msgid "control point 2"
+# TRANS: machine translation
 msgstr "图形控制点 2 的标签"
 
 #: js/blocks/GraphicsBlocks.js:427
@@ -6294,6 +6980,7 @@ msgstr "图形控制点 2 的标签"
 #: js/blocks/GraphicsBlocks.js:525
 #: js/blocks/GraphicsBlocks.js:741
 msgid "x1"
+# TRANS: machine translation
 msgstr "x1"
 
 #: js/blocks/GraphicsBlocks.js:427
@@ -6301,26 +6988,32 @@ msgstr "x1"
 #: js/blocks/GraphicsBlocks.js:525
 #: js/blocks/GraphicsBlocks.js:741
 msgid "y1"
+# TRANS: machine translation
 msgstr "y1"
 
 #: js/blocks/GraphicsBlocks.js:468
 msgid "The Control-point 1 block sets the first control point for the Bezier curve."
+# TRANS: machine translation
 msgstr "Control-point 1 块设置贝塞尔曲线的第一个控制点。"
 
 #: js/blocks/GraphicsBlocks.js:475
 msgid "control point 1"
+# TRANS: machine translation
 msgstr "图形控制点 1 的标签"
 
 #: js/blocks/GraphicsBlocks.js:518
 msgid "The Bezier block draws a Bezier curve."
+# TRANS: machine translation
 msgstr "Bezier 块绘制贝塞尔曲线。"
 
 #: js/blocks/GraphicsBlocks.js:522
 msgid "bezier"
+# TRANS: machine translation
 msgstr "贝塞尔曲线"
 
 #: js/blocks/GraphicsBlocks.js:583
 msgid "The Arc block moves the turtle in an arc."
+# TRANS: machine translation
 msgstr "Arc 块以弧形移动乌龟。"
 
 #: js/blocks/GraphicsBlocks.js:591
@@ -6340,6 +7033,7 @@ msgstr "半徑"
 #: js/blocks/GraphicsBlocks.js:1001
 #: js/blocks/GraphicsBlocks.js:1084
 msgid "Value must be within -5000 to 5000 when Wrap Mode is off."
+# TRANS: machine translation
 msgstr "当 Wrap Mode 关闭时，值必须在 -5000 到 5000 之间。"
 
 #: js/blocks/GraphicsBlocks.js:613
@@ -6347,6 +7041,7 @@ msgstr "当 Wrap Mode 关闭时，值必须在 -5000 到 5000 之间。"
 #: js/blocks/GraphicsBlocks.js:1003
 #: js/blocks/GraphicsBlocks.js:1086
 msgid "Value must be within -20000 to 20000 when Wrap Mode is on."
+# TRANS: machine translation
 msgstr "当 Wrap Mode 开启时，值必须在 -20000 到 20000 之间。"
 
 #: js/blocks/GraphicsBlocks.js:651
@@ -6355,14 +7050,17 @@ msgstr "設定標頭"
 
 #: js/blocks/GraphicsBlocks.js:664
 msgid "The Set heading block sets the heading of the turtle."
+# TRANS: machine translation
 msgstr "Set heading 块设置乌龟的朝向。"
 
 #: js/blocks/GraphicsBlocks.js:724
 msgid "The Set XY block moves the mouse to a specific position on the screen."
+# TRANS: machine translation
 msgstr "Set XY 块将鼠标移动到屏幕上的指定位置。"
 
 #: js/blocks/GraphicsBlocks.js:730
 msgid "The Set XY block moves the turtle to a specific position on the screen."
+# TRANS: machine translation
 msgstr "Set XY 块将乌龟移动到屏幕上的指定位置。"
 
 #: js/blocks/GraphicsBlocks.js:738
@@ -6371,14 +7069,17 @@ msgstr "指定座標"
 
 #: js/blocks/GraphicsBlocks.js:810
 msgid "The Right block turns the mouse to the right."
+# TRANS: machine translation
 msgstr "Right 块将鼠标向右转。"
 
 #: js/blocks/GraphicsBlocks.js:817
 msgid "The Right block turns the turtle to the right."
+# TRANS: machine translation
 msgstr "Right 块将乌龟向右转。"
 
 #: js/blocks/GraphicsBlocks.js:826
 msgid "right1"
+# TRANS: machine translation
 msgstr "右1"
 
 #: js/blocks/GraphicsBlocks.js:826
@@ -6390,14 +7091,17 @@ msgstr "右轉"
 
 #: js/blocks/GraphicsBlocks.js:890
 msgid "The Left block turns the mouse to the left."
+# TRANS: machine translation
 msgstr "Left 块将鼠标向左转。"
 
 #: js/blocks/GraphicsBlocks.js:897
 msgid "The Left block turns the turtle to the left."
+# TRANS: machine translation
 msgstr "Left 块将乌龟向左转。"
 
 #: js/blocks/GraphicsBlocks.js:906
 msgid "left1"
+# TRANS: machine translation
 msgstr "左1"
 
 #: js/blocks/GraphicsBlocks.js:906
@@ -6417,10 +7121,12 @@ msgstr "後退"
 
 #: js/blocks/GraphicsBlocks.js:967
 msgid "The Back block moves the mouse backward."
+# TRANS: machine translation
 msgstr "Back 块使鼠标向后移动。"
 
 #: js/blocks/GraphicsBlocks.js:974
 msgid "The Back block moves the turtle backward."
+# TRANS: machine translation
 msgstr "Back 块使乌龟向后移动。"
 
 #: js/blocks/GraphicsBlocks.js:1041
@@ -6431,88 +7137,107 @@ msgstr "前進"
 
 #: js/blocks/GraphicsBlocks.js:1050
 msgid "The Forward block moves the mouse forward."
+# TRANS: machine translation
 msgstr "Forward 块使鼠标向前移动。"
 
 #: js/blocks/GraphicsBlocks.js:1057
 msgid "The Forward block moves the turtle forward."
+# TRANS: machine translation
 msgstr "Forward 块使乌龟向前移动。"
 
 #: js/blocks/GraphicsBlocks.js:1145
 #: js/blocks/GraphicsBlocks.js:1163
 msgid "wrap"
+# TRANS: machine translation
 msgstr "环绕"
 
 #: js/blocks/MediaBlocks.js:35
 #. TRANS: right side of the screen
 msgid "right (screen)"
+# TRANS: machine translation
 msgstr "右侧（屏幕）"
 
 #: js/blocks/MediaBlocks.js:45
 #: js/blocks/MediaBlocks.js:56
 msgid "The Right block returns the position of the right of the canvas."
+# TRANS: machine translation
 msgstr "Right 块返回画布右侧的位置。"
 
 #: js/blocks/MediaBlocks.js:97
 #. TRANS: left side of the screen
 msgid "left (screen)"
+# TRANS: machine translation
 msgstr "左侧（屏幕）"
 
 #: js/blocks/MediaBlocks.js:107
 #: js/blocks/MediaBlocks.js:118
 msgid "The Left block returns the position of the left of the canvas."
+# TRANS: machine translation
 msgstr "Left 块返回画布左侧的位置。"
 
 #: js/blocks/MediaBlocks.js:158
 msgid "top (screen)"
+# TRANS: machine translation
 msgstr "顶部（屏幕）"
 
 #: js/blocks/MediaBlocks.js:168
 #: js/blocks/MediaBlocks.js:179
 msgid "The Top block returns the position of the top of the canvas."
+# TRANS: machine translation
 msgstr "Top 块返回画布顶部的位置。"
 
 #: js/blocks/MediaBlocks.js:219
 msgid "bottom (screen)"
+# TRANS: machine translation
 msgstr "底部（屏幕）"
 
 #: js/blocks/MediaBlocks.js:229
 #: js/blocks/MediaBlocks.js:240
 msgid "The Bottom block returns the position of the bottom of the canvas."
+# TRANS: machine translation
 msgstr "Bottom 块返回画布底部的位置。"
 
 #: js/blocks/MediaBlocks.js:282
 msgid "width"
+# TRANS: machine translation
 msgstr "宽度"
 
 #: js/blocks/MediaBlocks.js:291
 msgid "The Width block returns the width of the canvas."
+# TRANS: machine translation
 msgstr "Width 块返回画布的宽度。"
 
 #: js/blocks/MediaBlocks.js:325
 msgid "height"
+# TRANS: machine translation
 msgstr "高度"
 
 #: js/blocks/MediaBlocks.js:334
 msgid "The Height block returns the height of the canvas."
+# TRANS: machine translation
 msgstr "Height 块返回画布的高度。"
 
 #: js/blocks/MediaBlocks.js:369
 #. TRANS: stops playback of an audio recording
 msgid "stop play"
+# TRANS: machine translation
 msgstr "停止播放"
 
 #: js/blocks/MediaBlocks.js:404
 #. TRANS: Erases the images and text
 msgid "erase media"
+# TRANS: machine translation
 msgstr "清除媒体"
 
 #: js/blocks/MediaBlocks.js:409
 msgid "The Erase Media block erases text and images."
+# TRANS: machine translation
 msgstr "Erase Media 块会清除文本和图像。"
 
 #: js/blocks/MediaBlocks.js:439
 #. TRANS: play an audio recording
 msgid "play back"
+# TRANS: machine translation
 msgstr "回放"
 
 #: js/blocks/MediaBlocks.js:487
@@ -6521,34 +7246,42 @@ msgstr "聽我說"
 
 #: js/blocks/MediaBlocks.js:495
 msgid "The Speak block outputs to the text-to-speech synthesizer"
+# TRANS: machine translation
 msgstr "Speak 块输出到文本转语音合成器。"
 
 #: js/blocks/MediaBlocks.js:546
 msgid "camera"
+# TRANS: machine translation
 msgstr "摄像头"
 
 #: js/blocks/MediaBlocks.js:551
 msgid "The Camera block connects a webcam to the Show block."
+# TRANS: machine translation
 msgstr "Camera 块将摄像头连接到 Show 块。"
 
 #: js/blocks/MediaBlocks.js:574
 msgid "video"
+# TRANS: machine translation
 msgstr "视频"
 
 #: js/blocks/MediaBlocks.js:579
 msgid "The Video block selects video for use with the Show block."
+# TRANS: machine translation
 msgstr "Video 块选择用于 Show 块的视频。"
 
 #: js/blocks/MediaBlocks.js:607
 msgid "The Open file block opens a file for use with the Show block."
+# TRANS: machine translation
 msgstr "Open file 块打开一个用于 Show 块的文件。"
 
 #: js/blocks/MediaBlocks.js:645
 msgid "stop media"
+# TRANS: machine translation
 msgstr "停止媒体"
 
 #: js/blocks/MediaBlocks.js:650
 msgid "The Stop media block stops audio or video playback."
+# TRANS: machine translation
 msgstr "Stop media 块停止音频或视频的播放。"
 
 #: js/blocks/MediaBlocks.js:692
@@ -6560,34 +7293,41 @@ msgstr "Stop media 块停止音频或视频的播放。"
 #: js/widgets/temperament.js:1446
 #: js/widgets/timbre.js:1834
 msgid "frequency"
+# TRANS: machine translation
 msgstr "频率"
 
 #: js/blocks/MediaBlocks.js:692
 #: plugins/rodi.rtp:193
 msgid "duration (MS)"
+# TRANS: machine translation
 msgstr "持续时间（毫秒）"
 
 #: js/blocks/MediaBlocks.js:728
 #. TRANS: translate a note into hertz, e.g., A4 -> 440HZ
 msgid "note to frequency"
+# TRANS: machine translation
 msgstr "音符转频率"
 
 #: js/blocks/MediaBlocks.js:736
 msgid "The To frequency block converts a pitch name and octave to Hertz."
+# TRANS: machine translation
 msgstr "To frequency 块将音高名称和音阶转换为赫兹。"
 
 #: js/blocks/MediaBlocks.js:812
 msgid "The Avatar block is used to change the appearance of the mouse."
+# TRANS: machine translation
 msgstr "Avatar 块用于更改鼠标的外观。"
 
 #: js/blocks/MediaBlocks.js:819
 msgid "The Avatar block is used to change the appearance of the turtle."
+# TRANS: machine translation
 msgstr "Avatar 块用于更改乌龟的外观。"
 
 #: js/blocks/MediaBlocks.js:831
 #: js/blocks/MediaBlocks.js:891
 #. TRANS: a media object
 msgid "size"
+# TRANS: machine translation
 msgstr "大小"
 
 #: js/blocks/MediaBlocks.js:831
@@ -6596,43 +7336,52 @@ msgstr "圖片"
 
 #: js/blocks/MediaBlocks.js:880
 msgid "The Show block is used to display text or images on the canvas."
+# TRANS: machine translation
 msgstr "Show 块用于在画布上显示文本或图像。"
 
 #: js/blocks/MediaBlocks.js:888
 #. TRANS: show1 is show as in display an image or text on the screen.
 msgid "show1"
+# TRANS: machine translation
 msgstr "显示1"
 
 #: js/blocks/MediaBlocks.js:891
 msgid "obj"
+# TRANS: machine translation
 msgstr "对象"
 
 #: js/blocks/MediaBlocks.js:938
 msgid "The Media block is used to import an image."
+# TRANS: machine translation
 msgstr "Media 块用于导入图像。"
 
 #: js/blocks/MediaBlocks.js:973
 msgid "The Text block holds a text string."
+# TRANS: machine translation
 msgstr "Text 块包含一段文本字符串。"
 
 #: js/blocks/PenBlocks.js:30
 msgid "purple"
+# TRANS: machine translation
 msgstr "紫色"
 
 #: js/blocks/PenBlocks.js:48
 #: js/blocks/SensorsBlocks.js:521
 #: plugins/rodi.rtp:219
 msgid "blue"
+# TRANS: machine translation
 msgstr "蓝色"
 
 #: js/blocks/PenBlocks.js:64
 #: js/blocks/SensorsBlocks.js:577
 #: plugins/rodi.rtp:218
 msgid "green"
+# TRANS: machine translation
 msgstr "绿色"
 
 #: js/blocks/PenBlocks.js:80
 msgid "yellow"
+# TRANS: machine translation
 msgstr "黄色"
 
 #: js/blocks/PenBlocks.js:96
@@ -6644,18 +7393,22 @@ msgstr "橘色"
 #: js/blocks/SensorsBlocks.js:633
 #: plugins/rodi.rtp:217
 msgid "red"
+# TRANS: machine translation
 msgstr "红色"
 
 #: js/blocks/PenBlocks.js:128
 msgid "white"
+# TRANS: machine translation
 msgstr "白色"
 
 #: js/blocks/PenBlocks.js:144
 msgid "black"
+# TRANS: machine translation
 msgstr "黑色"
 
 #: js/blocks/PenBlocks.js:163
 msgid "begin fill"
+# TRANS: machine translation
 msgstr "开始填充"
 
 #: js/blocks/PenBlocks.js:188
@@ -6666,6 +7419,7 @@ msgstr "停止填滿"
 #: js/blocks/PenBlocks.js:537
 #. TRANS: set the background color
 msgid "background"
+# TRANS: machine translation
 msgstr "背景"
 
 #: js/blocks/PenBlocks.js:253
@@ -6673,10 +7427,12 @@ msgstr "背景"
 #: js/turtleactions/DictActions.js:138
 #: js/turtleactions/DictActions.js:170
 msgid "grey"
+# TRANS: machine translation
 msgstr "灰色"
 
 #: js/blocks/PenBlocks.js:261
 msgid "The Grey block returns the current pen grey value."
+# TRANS: machine translation
 msgstr "Grey 块返回当前画笔的灰度值。"
 
 #: js/blocks/PenBlocks.js:319
@@ -6688,6 +7444,7 @@ msgstr "形狀"
 
 #: js/blocks/PenBlocks.js:326
 msgid "The Shade block returns the current pen shade value."
+# TRANS: machine translation
 msgstr "Shade 块返回当前画笔的明暗值。"
 
 #: js/blocks/PenBlocks.js:384
@@ -6699,6 +7456,7 @@ msgstr "顏色"
 
 #: js/blocks/PenBlocks.js:394
 msgid "The Color block returns the current pen color."
+# TRANS: machine translation
 msgstr "Color 块返回当前画笔颜色。"
 
 #: js/blocks/PenBlocks.js:449
@@ -6710,36 +7468,44 @@ msgstr "畫筆大小"
 
 #: js/blocks/PenBlocks.js:453
 msgid "The Pen size block returns the current pen size value."
+# TRANS: machine translation
 msgstr "Pen size 块返回当前画笔大小的数值。"
 
 #: js/blocks/PenBlocks.js:492
 msgid "set font"
+# TRANS: machine translation
 msgstr "设置字体"
 
 #: js/blocks/PenBlocks.js:497
 msgid "The Set font block sets the font used by the Show block."
+# TRANS: machine translation
 msgstr "Set font 块设置 Show 块使用的字体。"
 
 #: js/blocks/PenBlocks.js:544
 msgid "The Background block sets the window background color."
+# TRANS: machine translation
 msgstr "Background 块设置窗口背景颜色。"
 
 #: js/blocks/PenBlocks.js:575
 msgid "The Hollow line block creates a line with a hollow center."
+# TRANS: machine translation
 msgstr "Hollow line 块创建一条中空的线条。"
 
 #: js/blocks/PenBlocks.js:583
 #. TRANS: draw a line logo has a hollow space down its center
 msgid "hollow line"
+# TRANS: machine translation
 msgstr "中空线条"
 
 #: js/blocks/PenBlocks.js:652
 msgid "The Fill block fills in a shape with a color."
+# TRANS: machine translation
 msgstr "Fill 块用颜色填充图形。"
 
 #: js/blocks/PenBlocks.js:661
 #. TRANS: fill in as a solid color
 msgid "fill"
+# TRANS: machine translation
 msgstr "填充"
 
 #: js/blocks/PenBlocks.js:738
@@ -6749,6 +7515,7 @@ msgstr "提筆"
 
 #: js/blocks/PenBlocks.js:745
 msgid "The Pen-up block raises the pen so that it does not draw."
+# TRANS: machine translation
 msgstr "Pen-up 块抬起画笔，使其不绘图。"
 
 #: js/blocks/PenBlocks.js:779
@@ -6758,6 +7525,7 @@ msgstr "落筆"
 
 #: js/blocks/PenBlocks.js:787
 msgid "The Pen-down block lowers the pen so that it draws."
+# TRANS: machine translation
 msgstr "Pen-down 块放下画笔，使其开始绘图。"
 
 #: js/blocks/PenBlocks.js:821
@@ -6767,23 +7535,28 @@ msgstr "設定畫筆大小"
 
 #: js/blocks/PenBlocks.js:831
 msgid "The Set-pen-size block changes the size of the pen."
+# TRANS: machine translation
 msgstr "Set-pen-size 块更改画笔的大小。"
 
 #: js/blocks/PenBlocks.js:890
 #. TRANS: set degree of translucence of the pen color
 msgid "set translucency"
+# TRANS: machine translation
 msgstr "设置透明度"
 
 #: js/blocks/PenBlocks.js:898
 msgid "The Set translucency block changes the opacity of the pen."
+# TRANS: machine translation
 msgstr "Set translucency 块更改画笔的不透明度。"
 
 #: js/blocks/PenBlocks.js:958
 msgid "set hue"
+# TRANS: machine translation
 msgstr "设置色相"
 
 #: js/blocks/PenBlocks.js:966
 msgid "The Set hue block changes the color of the pen."
+# TRANS: machine translation
 msgstr "Set hue 块改变画笔的颜色。"
 
 #: js/blocks/PenBlocks.js:1024
@@ -6792,15 +7565,18 @@ msgstr "設定填滿顏色"
 
 #: js/blocks/PenBlocks.js:1034
 msgid "The Set-shade block changes the pen color from dark to light."
+# TRANS: machine translation
 msgstr "Set-shade 块改变画笔颜色的明暗度。"
 
 #: js/blocks/PenBlocks.js:1088
 #. TRANS: set the level of vividness of the pen color
 msgid "set grey"
+# TRANS: machine translation
 msgstr "设置灰度"
 
 #: js/blocks/PenBlocks.js:1096
 msgid "The Set grey block changes the vividness of the pen color."
+# TRANS: machine translation
 msgstr "Set grey 块改变画笔颜色的鲜艳度。"
 
 #: js/blocks/PenBlocks.js:1149
@@ -6809,26 +7585,32 @@ msgstr "設定線條顏色"
 
 #: js/blocks/PenBlocks.js:1159
 msgid "The Set-color block changes the pen color."
+# TRANS: machine translation
 msgstr "Set-color 块改变画笔颜色。"
 
 #: js/blocks/SensorsBlocks.js:36
 msgid "The Input block prompts for keyboard input."
+# TRANS: machine translation
 msgstr "Input 块提示键盘输入。"
 
 #: js/blocks/SensorsBlocks.js:46
 msgid "input"
+# TRANS: machine translation
 msgstr "输入"
 
 #: js/blocks/SensorsBlocks.js:64
 msgid "Input a value"
+# TRANS: machine translation
 msgstr "输入一个值"
 
 #: js/blocks/SensorsBlocks.js:126
 msgid "input value"
+# TRANS: machine translation
 msgstr "输入值"
 
 #: js/blocks/SensorsBlocks.js:131
 msgid "The Input-value block stores the input."
+# TRANS: machine translation
 msgstr "Input-value 块存储输入内容。"
 
 #: js/blocks/SensorsBlocks.js:238
@@ -6837,55 +7619,68 @@ msgstr "音量"
 
 #: js/blocks/SensorsBlocks.js:245
 msgid "The Loudness block returns the volume detected by the microphone."
+# TRANS: machine translation
 msgstr "Loudness 块返回麦克风检测到的音量。"
 
 #: js/blocks/SensorsBlocks.js:300
 msgid "click"
+# TRANS: machine translation
 msgstr "点击"
 
 #: js/blocks/SensorsBlocks.js:306
 msgid "The Click block triggers an event if a mouse has been clicked."
+# TRANS: machine translation
 msgstr "Click 块在鼠标被点击时触发事件。"
 
 #: js/blocks/SensorsBlocks.js:313
 msgid "The Click block triggers an event if a turtle has been clicked."
+# TRANS: machine translation
 msgstr "Click 块在乌龟被点击时触发事件。"
 
 #: js/blocks/SensorsBlocks.js:342
 msgid "cursor over"
+# TRANS: machine translation
 msgstr "光标悬停"
 
 #: js/blocks/SensorsBlocks.js:387
 msgid "cursor out"
+# TRANS: machine translation
 msgstr "光标移出"
 
 #: js/blocks/SensorsBlocks.js:433
 msgid "cursor button down"
+# TRANS: machine translation
 msgstr "光标按钮按下"
 
 #: js/blocks/SensorsBlocks.js:477
 msgid "cursor button up"
+# TRANS: machine translation
 msgstr "光标按钮抬起"
 
 #: js/blocks/SensorsBlocks.js:638
 msgid "The Get red block returns the red component of the pixel under the mouse."
+# TRANS: machine translation
 msgstr "Get red 块返回鼠标下像素的红色分量。"
 
 #: js/blocks/SensorsBlocks.js:644
 msgid "The Get red block returns the red component of the pixel under the turtle."
+# TRANS: machine translation
 msgstr "Get red 块返回乌龟下方像素的红色分量。"
 
 #: js/blocks/SensorsBlocks.js:685
 #: plugins/rodi.rtp:216
 msgid "pixel color"
+# TRANS: machine translation
 msgstr "像素颜色"
 
 #: js/blocks/SensorsBlocks.js:690
 msgid "The Get pixel block returns the color of the pixel under the mouse."
+# TRANS: machine translation
 msgstr "Get pixel 块返回鼠标下像素的颜色。"
 
 #: js/blocks/SensorsBlocks.js:696
 msgid "The Get pixel block returns the color of the pixel under the turtle."
+# TRANS: machine translation
 msgstr "Get pixel 块返回乌龟下像素的颜色。"
 
 #: js/blocks/SensorsBlocks.js:759
@@ -6894,252 +7689,308 @@ msgstr "時間"
 
 #: js/blocks/SensorsBlocks.js:805
 msgid "cursor y"
+# TRANS: machine translation
 msgstr "光标Y坐标"
 
 #: js/blocks/SensorsBlocks.js:810
 msgid "The Cursor Y block returns the vertical position of the mouse."
+# TRANS: machine translation
 msgstr "Cursor Y 块返回鼠标的垂直位置。"
 
 #: js/blocks/SensorsBlocks.js:846
 msgid "cursor x"
+# TRANS: machine translation
 msgstr "光标X坐标"
 
 #: js/blocks/SensorsBlocks.js:851
 msgid "The Cursor X block returns the horizontal position of the mouse."
+# TRANS: machine translation
 msgstr "Cursor X 块返回鼠标的水平位置。"
 
 #: js/blocks/SensorsBlocks.js:887
 msgid "mouse button"
+# TRANS: machine translation
 msgstr "鼠标按钮"
 
 #: js/blocks/SensorsBlocks.js:889
 msgid "The Mouse-button block returns True if the mouse button is pressed."
+# TRANS: machine translation
 msgstr "Mouse-button 块在鼠标按钮被按下时返回 True。"
 
 #: js/blocks/SensorsBlocks.js:935
 msgid "to ASCII"
+# TRANS: machine translation
 msgstr "转换为 ASCII"
 
 #: js/blocks/SensorsBlocks.js:939
 msgid "The To ASCII block converts numbers to letters."
+# TRANS: machine translation
 msgstr "To ASCII 块将数字转换为字母。"
 
 #: js/blocks/SensorsBlocks.js:1006
 msgid "The Keyboard block returns computer keyboard input."
+# TRANS: machine translation
 msgstr "Keyboard 块返回电脑键盘输入。"
 
 #: js/blocks/WidgetBlocks.js:81
 #: js/widgets/timbre.js:834
 #. TRANS: sound envelope (ADSR)
 msgid "Envelope"
+# TRANS: machine translation
 msgstr "包络"
 
 #: js/blocks/WidgetBlocks.js:89
 #. TRANS: Attack time is the time taken for initial run-up of level from nil to peak, beginning when the key is first pressed.
 msgid "attack"
+# TRANS: machine translation
 msgstr "起音时间"
 
 #: js/blocks/WidgetBlocks.js:91
 #. TRANS: Decay time is the time taken for the subsequent run down from the attack level to the designated sustain level.
 msgid "decay"
+# TRANS: machine translation
 msgstr "衰减时间"
 
 #: js/blocks/WidgetBlocks.js:93
 #. TRANS: Sustain level is the level during the main sequence of the sound's duration, until the key is released.
 msgid "sustain"
+# TRANS: machine translation
 msgstr "持续时间"
 
 #: js/blocks/WidgetBlocks.js:95
 #. TRANS: Release time is the time taken for the level to decay from the sustain level to zero after the key is released.
 msgid "release"
+# TRANS: machine translation
 msgstr "释放时间"
 
 #: js/blocks/WidgetBlocks.js:113
 msgid "Attack value should be from 0 to 100."
+# TRANS: machine translation
 msgstr "Attack 值应在 0 到 100 之间。"
 
 #: js/blocks/WidgetBlocks.js:116
 msgid "Decay value should be from 0 to 100."
+# TRANS: machine translation
 msgstr "Decay 值应在 0 到 100 之间。"
 
 #: js/blocks/WidgetBlocks.js:119
 msgid "Sustain value should be from 0 to 100."
+# TRANS: machine translation
 msgstr "Sustain 值应在 0 到 100 之间。"
 
 #: js/blocks/WidgetBlocks.js:122
 msgid "Release value should be from 0-100."
+# TRANS: machine translation
 msgstr "Release 值应在 0 到 100 之间。"
 
 #: js/blocks/WidgetBlocks.js:140
 msgid "You are adding multiple envelope blocks."
+# TRANS: machine translation
 msgstr "您正在添加多个包络块。"
 
 #: js/blocks/WidgetBlocks.js:171
 #: js/widgets/timbre.js:898
 #. TRANS: a filter removes some unwanted components from a signal
 msgid "Filter"
+# TRANS: machine translation
 msgstr "滤波器"
 
 #: js/blocks/WidgetBlocks.js:181
 #: js/widgets/timbre.js:1810
 #. TRANS: rolloff is the steepness of a change in frequency.
 msgid "rolloff"
+# TRANS: machine translation
 msgstr "衰减斜率"
 
 #: js/blocks/WidgetBlocks.js:213
 #. TRANS: rolloff is the steepness of a change in frequency.
 msgid "Rolloff value should be either -12, -24, -48, or -96 decibels/octave."
+# TRANS: machine translation
 msgstr "Rolloff 值应为 -12、-24、-48 或 -96 分贝/倍频程。"
 
 #: js/blocks/WidgetBlocks.js:252
 msgid "The Temperament tool is used to define custom tuning."
+# TRANS: machine translation
 msgstr "Temperament 工具用于定义自定义调音。"
 
 #: js/blocks/WidgetBlocks.js:332
 #: js/blocks/WidgetBlocks.js:1574
 #: js/widgets/sampler.js:501
 msgid "Upload a sample and adjust its pitch center."
+# TRANS: machine translation
 msgstr "上传采样并调整其音高中心。"
 
 #: js/blocks/WidgetBlocks.js:339
 #. TRANS: the speed at music is should be played.
 msgid "sampler"
+# TRANS: machine translation
 msgstr "采样器"
 
 #: js/blocks/WidgetBlocks.js:517
 msgid "The Meter block opens a tool to select strong beats for the meter."
+# TRANS: machine translation
 msgstr "Meter 块打开一个工具以选择强拍。"
 
 #: js/blocks/WidgetBlocks.js:573
 msgid "The oscilloscope block opens a tool to visualize waveforms."
+# TRANS: machine translation
 msgstr "示波器块打开一个用于可视化波形的工具。"
 
 #: js/blocks/WidgetBlocks.js:578
 msgid "oscilloscope"
+# TRANS: machine translation
 msgstr "示波器"
 
 #: js/blocks/WidgetBlocks.js:645
 msgid "The Custom mode block opens a tool to explore musical mode (the spacing of the notes in a scale)."
+# TRANS: machine translation
 msgstr "Custom mode 块打开一个用于探索音乐调式（音阶中音符间距）的工具。"
 
 #: js/blocks/WidgetBlocks.js:651
 #. TRANS: musical mode is the pattern of half-steps in an octave, e.g., Major or Minor modes
 msgid "custom mode"
+# TRANS: machine translation
 msgstr "custom mode"
 
 #: js/blocks/WidgetBlocks.js:700
 msgid "The Tempo block opens a metronome to visualize the beat."
+# TRANS: machine translation
 msgstr "Tempo 块打开节拍器以显示节拍。"
 
 #: js/blocks/WidgetBlocks.js:762
 msgid "The Arpeggio Widget is used to compose chord sequences."
+# TRANS: machine translation
 msgstr "琶音小工具用于编写和弦序列。"
 
 #: js/blocks/WidgetBlocks.js:837
 msgid "The Pitch drum matrix is used to map pitches to drum sounds."
+# TRANS: machine translation
 msgstr "音高鼓矩阵用于将音高映射到鼓声。"
 
 #: js/blocks/WidgetBlocks.js:842
 #. TRANS: makes a mapping between pitches and drum sounds
 msgid "pitch-drum mapper"
+# TRANS: machine translation
 msgstr "pitch-drum mapper"
 
 #: js/blocks/WidgetBlocks.js:891
 msgid "You must have at least one pitch block and one drum block in the matrix."
+# TRANS: machine translation
 msgstr "矩阵中必须至少有一个音高块和一个鼓块。"
 
 #: js/blocks/WidgetBlocks.js:920
 msgid "The Pitch slider tool to is used to generate pitches at selected frequencies."
+# TRANS: machine translation
 msgstr "音高滑块工具用于生成选定频率的音高。"
 
 #: js/blocks/WidgetBlocks.js:925
 #. TRANS: widget to generate pitches using a slider
 msgid "pitch slider"
+# TRANS: machine translation
 msgstr "音高滑块"
 
 #: js/blocks/WidgetBlocks.js:977
 msgid "chromatic keyboard"
+# TRANS: machine translation
 msgstr "chromatic keyboard"
 
 #: js/blocks/WidgetBlocks.js:1011
 #: js/blocks/WidgetBlocks.js:1077
 #. TRANS: widget to generate pitches using a slider
 msgid "music keyboard"
+# TRANS: machine translation
 msgstr "music keyboard"
 
 #: js/blocks/WidgetBlocks.js:1062
 #: js/blocks/WidgetBlocks.js:1069
 msgid "The Music keyboard block opens a piano keyboard that can be used to create notes."
+# TRANS: machine translation
 msgstr "Music keyboard 块打开一个钢琴键盘，可用于创建音符。"
 
 #: js/blocks/WidgetBlocks.js:1128
 msgid "The Pitch staircase tool to is used to generate pitches from a given ratio."
+# TRANS: machine translation
 msgstr "音高阶梯工具用于根据给定比例生成音高。"
 
 #: js/blocks/WidgetBlocks.js:1135
 #. TRANS: generate a progressive sequence of pitches
 msgid "pitch staircase"
+# TRANS: machine translation
 msgstr "音高阶梯"
 
 #: js/blocks/WidgetBlocks.js:1222
 msgid "The Rhythm Maker block opens a tool to create drum machines."
+# TRANS: machine translation
 msgstr "Rhythm Maker 块打开一个制作鼓机的工具。"
 
 #: js/blocks/WidgetBlocks.js:1291
 msgid "G major scale"
+# TRANS: machine translation
 msgstr "G大调音阶"
 
 #: js/blocks/WidgetBlocks.js:1326
 msgid "C major scale"
+# TRANS: machine translation
 msgstr "C大调音阶"
 
 #: js/blocks/WidgetBlocks.js:1366
 msgid "The Phrase Maker block opens a tool to create musical phrases."
+# TRANS: machine translation
 msgstr "Phrase Maker 块打开一个创建音乐短语的工具。"
 
 #: js/blocks/WidgetBlocks.js:1373
 #. TRANS: assigns pitch to a sequence of beats to generate a melody
 msgid "phrase maker"
+# TRANS: machine translation
 msgstr "短语生成器"
 
 #: js/blocks/WidgetBlocks.js:1445
 msgid "You must have at least one pitch block and one rhythm block in the matrix."
+# TRANS: machine translation
 msgstr "矩阵中必须至少有一个音高块和一个节奏块。"
 
 #: js/blocks/WidgetBlocks.js:1504
 msgid "The Status block opens a tool for inspecting the status of Music Blocks as it is running."
+# TRANS: machine translation
 msgstr "Status 块打开一个工具，用于检查 Music Blocks 运行时的状态。"
 
 #: js/blocks/WidgetBlocks.js:1581
 #: js/widgets/aiwidget.js:699
 #. TRANS: AI-generated music
 msgid "AI Music"
+# TRANS: machine translation
 msgstr "AI Music"
 
 #: js/blocks/VolumeBlocks.js:35
 msgid "synth volume"
+# TRANS: machine translation
 msgstr "合成器音量"
 
 #: js/blocks/VolumeBlocks.js:39
 msgid "The Synth volume block returns the current volume of the current synthesizer."
+# TRANS: machine translation
 msgstr "Synth volume 块返回当前合成器的音量。"
 
 #: js/blocks/VolumeBlocks.js:105
 msgid "master volume"
+# TRANS: machine translation
 msgstr "主音量"
 
 #: js/blocks/VolumeBlocks.js:109
 msgid "The Master volume block returns the master volume."
+# TRANS: machine translation
 msgstr "Master volume 块返回主音量。"
 
 #: js/blocks/VolumeBlocks.js:355
 #: js/blocks/VolumeBlocks.js:524
 msgid "set synth volume"
+# TRANS: machine translation
 msgstr "设置合成器音量"
 
 #: js/blocks/VolumeBlocks.js:362
 #: js/blocks/VolumeBlocks.js:545
 msgid "synth"
+# TRANS: machine translation
 msgstr "合成器"
 
 #: js/blocks/VolumeBlocks.js:403
@@ -7147,138 +7998,171 @@ msgstr "合成器"
 #: js/blocks/VolumeBlocks.js:740
 #: js/turtleactions/VolumeActions.js:173
 msgid "Setting volume to 0."
+# TRANS: machine translation
 msgstr "音量设置为0。"
 
 #: js/blocks/VolumeBlocks.js:440
 msgid "Synth not found"
+# TRANS: machine translation
 msgstr "未找到合成器"
 
 #: js/blocks/VolumeBlocks.js:494
 msgid "set drum volume"
+# TRANS: machine translation
 msgstr "设置鼓音量"
 
 #: js/blocks/VolumeBlocks.js:530
 msgid "The Set synth volume block will change the volume of a particular synth,"
+# TRANS: machine translation
 msgstr "设置合成器音量模块会改变特定合成器的音量，"
 
 #: js/blocks/VolumeBlocks.js:532
 msgid "eg guitar violin snare drum etc."
+# TRANS: machine translation
 msgstr "例如 吉他 小提琴 小军鼓 等等。"
 
 #: js/blocks/VolumeBlocks.js:534
 msgid "The default volume is 50."
+# TRANS: machine translation
 msgstr "默认音量是50。"
 
 #: js/blocks/VolumeBlocks.js:536
 msgid "The range is 0 for silence to 100 for full volume."
+# TRANS: machine translation
 msgstr "范围是0表示静音，100表示最大音量。"
 
 #: js/blocks/VolumeBlocks.js:597
 msgid "set panning"
+# TRANS: machine translation
 msgstr "设置声像"
 
 #: js/blocks/VolumeBlocks.js:603
 msgid "The Set Panning block sets the panning for all synthesizers."
+# TRANS: machine translation
 msgstr "Set Panning 块设置所有合成器的声像。"
 
 #: js/blocks/VolumeBlocks.js:625
 msgid "Warning: Sound is coming out from only the left or right side."
+# TRANS: machine translation
 msgstr "警告：声音仅从左侧或右侧发出。"
 
 #: js/blocks/VolumeBlocks.js:647
 #: js/blocks/VolumeBlocks.js:695
 msgid "set master volume"
+# TRANS: machine translation
 msgstr "设置主音量"
 
 #: js/blocks/VolumeBlocks.js:653
 msgid "The Set master volume block sets the volume for all synthesizers."
+# TRANS: machine translation
 msgstr "Set master volume 块设置所有合成器的音量。"
 
 #: js/blocks/VolumeBlocks.js:784
 msgid "The Set relative volume block changes the volume of the contained notes."
+# TRANS: machine translation
 msgstr "Set relative volume 块改变包含音符的音量。"
 
 #: js/blocks/VolumeBlocks.js:791
 msgid "set relative volume"
+# TRANS: machine translation
 msgstr "设置相对音量"
 
 #: js/blocks/VolumeBlocks.js:857
 msgid "decrescendo"
+# TRANS: machine translation
 msgstr "渐弱"
 
 #: js/blocks/VolumeBlocks.js:921
 msgid "crescendo"
+# TRANS: machine translation
 msgstr "渐强"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "one"
+# TRANS: machine translation
 msgstr "一"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "two"
+# TRANS: machine translation
 msgstr "二"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "three"
+# TRANS: machine translation
 msgstr "三"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "four"
+# TRANS: machine translation
 msgstr "四"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "five"
+# TRANS: machine translation
 msgstr "五"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "six"
+# TRANS: machine translation
 msgstr "六"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "seven"
+# TRANS: machine translation
 msgstr "七"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "eight"
+# TRANS: machine translation
 msgstr "八"
 
 #: js/turtleactions/IntervalsActions.js:113
 msgid "nine"
+# TRANS: machine translation
 msgstr "九"
 
 #: js/turtleactions/IntervalsActions.js:120
 #: js/turtleactions/IntervalsActions.js:140
 msgid "below"
+# TRANS: machine translation
 msgstr "下方"
 
 #: js/turtleactions/IntervalsActions.js:124
 msgid "above"
+# TRANS: machine translation
 msgstr "上方"
 
 #: js/turtleactions/IntervalsActions.js:131
 msgid "plus"
+# TRANS: machine translation
 msgstr "加"
 
 #: js/turtleactions/IntervalsActions.js:258
 msgid "Adding missing pitch number 0."
+# TRANS: machine translation
 msgstr "添加缺失的音高编号0。"
 
 #: js/turtleactions/IntervalsActions.js:266
 msgid "Ignoring pitch numbers less than zero or greater than eleven."
+# TRANS: machine translation
 msgstr "忽略小于零或大于十一的音高编号。"
 
 #: js/turtleactions/IntervalsActions.js:272
 msgid "Ignoring duplicate pitch numbers."
+# TRANS: machine translation
 msgstr "忽略重复的音高编号。"
 
 #: js/turtleactions/DictActions.js:75
 #: js/turtleactions/DictActions.js:142
 #: js/turtleactions/DictActions.js:172
 msgid "font"
+# TRANS: machine translation
 msgstr "字体"
 
 #: js/turtleactions/DictActions.js:255
 msgid "Dictionary with this name does not exist"
+# TRANS: machine translation
 msgstr "不存在该名称的词典"
 
 #: js/turtleactions/DictActions.js:259
@@ -7287,6 +8171,7 @@ msgstr ""
 
 #: js/turtleactions/DrumActions.js:227
 msgid "Noise Block: Did you mean to use a Note block?"
+# TRANS: machine translation
 msgstr "噪声块：您是否想使用音符块？"
 
 #: js/turtleactions/ToneActions.js:134
@@ -7301,15 +8186,18 @@ msgstr "震音率必须大于0"
 #: js/turtleactions/ToneActions.js:265
 #. TRANS: Depth is the intesity of the tremolo or chorus effect.
 msgid "Depth is out of range."
+# TRANS: machine translation
 msgstr "深度超出范围。"
 
 #: js/turtleactions/ToneActions.js:301
 msgid "Distortion must be from 0 to 100."
+# TRANS: machine translation
 msgstr "失真值必须在0到100之间。"
 
 #: js/turtleactions/ToneActions.js:332
 #. TRANS: partials components in a harmonic series
 msgid "Partial must be greater than or equal to 0."
+# TRANS: machine translation
 msgstr "部分必须大于或等于0。"
 
 #: js/turtleactions/ToneActions.js:378
@@ -7317,26 +8205,31 @@ msgstr "部分必须大于或等于0。"
 #: js/turtleactions/ToneActions.js:456
 #: js/widgets/timbre.js:776
 msgid "Unable to use synth due to existing oscillator"
+# TRANS: machine translation
 msgstr "由于存在振荡器，无法使用合成器。"
 
 #: js/turtleactions/ToneActions.js:388
 #: js/turtleactions/ToneActions.js:427
 msgid "The input cannot be negative."
+# TRANS: machine translation
 msgstr "输入不能为负数。"
 
 #: js/turtleactions/MeterActions.js:101
 #: js/turtleactions/MeterActions.js:139
 msgid "beats per minute must be greater than"
+# TRANS: machine translation
 msgstr "每分钟节拍数必须大于"
 
 #: js/turtleactions/MeterActions.js:111
 #: js/turtleactions/MeterActions.js:149
 msgid "maximum"
+# TRANS: machine translation
 msgstr "最大值"
 
 #: js/turtleactions/MeterActions.js:117
 #: js/turtleactions/MeterActions.js:155
 msgid "beats per minute is"
+# TRANS: machine translation
 msgstr "每分钟节拍数是"
 
 #: js/widgets/help.js:95
@@ -7346,6 +8239,7 @@ msgstr "每分钟节拍数是"
 #: js/widgets/help.js:378
 #: js/widgets/help.js:393
 msgid "Take a tour"
+# TRANS: machine translation
 msgstr "开始导览"
 
 #: js/widgets/aiwidget.js:135
@@ -7360,33 +8254,40 @@ msgstr "开始导览"
 #: js/widgets/tempo.js:97
 #: js/widgets/tempo.js:98
 msgid "Pause"
+# TRANS: machine translation
 msgstr "暂停"
 
 #: js/widgets/aiwidget.js:179
 #: js/widgets/sampler.js:225
 msgid "Warning: Sample is bigger than 1MB."
+# TRANS: machine translation
 msgstr "警告：样本大于1MB。"
 
 #: js/widgets/aiwidget.js:538
 msgid "New start block generated"
+# TRANS: machine translation
 msgstr "生成了新的开始块"
 
 #: js/widgets/aiwidget.js:540
 msgid "MIDI loading. This may take some time depending upon the number of notes in the track"
+# TRANS: machine translation
 msgstr "MIDI加载中。根据曲目中的音符数量，可能需要一些时间"
 
 #: js/widgets/aiwidget.js:550
 #: js/widgets/sampler.js:252
 msgid "Upload failed: Sample is not a .wav file."
+# TRANS: machine translation
 msgstr "上传失败：样本不是.wav文件。"
 
 #: js/widgets/aiwidget.js:677
 #: js/widgets/sampler.js:430
 msgid "Save sample"
+# TRANS: machine translation
 msgstr "保存样本"
 
 #: js/widgets/arpeggio.js:241
 msgid "Click in the grid to add steps to the arpeggio."
+# TRANS: machine translation
 msgstr "点击网格以添加琶音步骤。"
 
 #: js/widgets/meterwidget.js:195
@@ -7404,22 +8305,27 @@ msgstr "点击网格以添加琶音步骤。"
 #: js/widgets/rhythmruler.js:1810
 #: js/widgets/temperament.js:2165
 msgid "Play all"
+# TRANS: machine translation
 msgstr "全部播放"
 
 #: js/widgets/meterwidget.js:269
 msgid "Reset"
+# TRANS: machine translation
 msgstr "重置"
 
 #: js/widgets/meterwidget.js:295
 msgid "Click in the circle to select strong beats for the meter."
+# TRANS: machine translation
 msgstr "点击圆圈选择强拍。"
 
 #: js/widgets/modewidget.js:125
 msgid "Rotate counter clockwise"
+# TRANS: machine translation
 msgstr "逆时针旋转"
 
 #: js/widgets/modewidget.js:131
 msgid "Rotate clockwise"
+# TRANS: machine translation
 msgstr "顺时针旋转"
 
 #: js/widgets/modewidget.js:143
@@ -7427,11 +8333,13 @@ msgstr "顺时针旋转"
 #: js/widgets/rhythmruler.js:578
 #: js/widgets/timbre.js:957
 msgid "Undo"
+# TRANS: machine translation
 msgstr "撤销"
 
 #: js/widgets/modewidget.js:161
 #. TRANS: A circle of notes represents the musical mode.
 msgid "Click in the circle to select notes for the mode."
+# TRANS: machine translation
 msgstr "点击圆圈选择调式音符。"
 
 #: js/widgets/modewidget.js:1011
@@ -7443,82 +8351,101 @@ msgstr "点击圆圈选择调式音符。"
 #: js/widgets/tempo.js:412
 #: js/widgets/phrasemaker.js:5467
 msgid "New action block generated."
+# TRANS: machine translation
 msgstr "生成了新的动作块。"
 
 #: js/widgets/musickeyboard.js:743
 #: js/widgets/phrasemaker.js:595
 msgid "Add note"
+# TRANS: machine translation
 msgstr "添加音符"
 
 #: js/widgets/musickeyboard.js:762
 msgid "Metronome"
+# TRANS: machine translation
 msgstr "节拍器"
 
 #: js/widgets/musickeyboard.js:1574
 msgid "Note value"
+# TRANS: machine translation
 msgstr "音符值"
 
 #: js/widgets/musickeyboard.js:3209
 msgid "New action blocks generated."
+# TRANS: machine translation
 msgstr "生成了新的动作块。"
 
 #: js/widgets/musickeyboard.js:3393
 #: js/widgets/musickeyboard.js:3401
 msgid "MIDI device present."
+# TRANS: machine translation
 msgstr "检测到MIDI设备。"
 
 #: js/widgets/musickeyboard.js:3404
 msgid "No MIDI device found."
+# TRANS: machine translation
 msgstr "未找到MIDI设备。"
 
 #: js/widgets/musickeyboard.js:3414
 msgid "Failed to get MIDI access in browser."
+# TRANS: machine translation
 msgstr "浏览器中获取MIDI访问失败。"
 
 #: js/widgets/pitchdrummatrix.js:356
 #: js/widgets/pitchdrummatrix.js:741
 msgid "Click in the grid to map notes to drums."
+# TRANS: machine translation
 msgstr "点击网格将音符映射到鼓声。"
 
 #: js/widgets/pitchslider.js:103
 msgid "Move up"
+# TRANS: machine translation
 msgstr "向上移动"
 
 #: js/widgets/pitchslider.js:114
 msgid "Move down"
+# TRANS: machine translation
 msgstr "向下移动"
 
 #: js/widgets/pitchslider.js:136
 msgid "Click on the slider to create a note block."
+# TRANS: machine translation
 msgstr "点击滑块以创建音符块。"
 
 #: js/widgets/pitchstaircase.js:622
 msgid "Play chord"
+# TRANS: machine translation
 msgstr "播放和弦"
 
 #: js/widgets/pitchstaircase.js:630
 msgid "Play scale"
+# TRANS: machine translation
 msgstr "播放音阶"
 
 #: js/widgets/pitchstaircase.js:694
 msgid "Click on a note to create a new step."
+# TRANS: machine translation
 msgstr "点击音符以创建新步骤。"
 
 #: js/widgets/rhythmruler.js:486
 msgid "Save rhythms"
+# TRANS: machine translation
 msgstr "保存节奏"
 
 #: js/widgets/rhythmruler.js:512
 msgid "Save drum machine"
+# TRANS: machine translation
 msgstr "保存鼓机"
 
 #: js/widgets/rhythmruler.js:589
 #. TRANS: user can tap out a rhythm by clicking on a ruler.
 msgid "Tap a rhythm"
+# TRANS: machine translation
 msgstr "敲击节奏"
 
 #: js/widgets/rhythmruler.js:813
 msgid "Click on the ruler to divide it."
+# TRANS: machine translation
 msgstr "点击刻度尺进行分割。"
 
 #: js/widgets/rhythmruler.js:947
@@ -7528,51 +8455,63 @@ msgstr "点击刻度尺进行分割。"
 #: js/widgets/rhythmruler.js:1760
 #: js/widgets/rhythmruler.js:1761
 msgid "tap a rhythm"
+# TRANS: machine translation
 msgstr "敲击节奏"
 
 #: js/widgets/rhythmruler.js:1453
 msgid "Maximum value of 256 has been exceeded."
+# TRANS: machine translation
 msgstr "已超过最大值256。"
 
 #: js/widgets/sampler.js:235
 msgid "Recording started"
+# TRANS: machine translation
 msgstr "录音开始"
 
 #: js/widgets/sampler.js:243
 msgid "Recording complete"
+# TRANS: machine translation
 msgstr "录音完成"
 
 #: js/widgets/sampler.js:281
 msgid "A new sample block was generated."
+# TRANS: machine translation
 msgstr "生成了新的采样块。"
 
 #: js/widgets/sampler.js:376
 msgid "Upload sample"
+# TRANS: machine translation
 msgstr "上传采样"
 
 #: js/widgets/sampler.js:397
 msgid "Warning: Your sample cannot be loaded because it is >1MB."
+# TRANS: machine translation
 msgstr "警告：您的采样无法加载，因为文件大于1MB。"
 
 #: js/widgets/sampler.js:446
 msgid "Toggle Mic"
+# TRANS: machine translation
 msgstr "切换麦克风"
 
 #: js/widgets/sampler.js:453
 msgid "Playback"
+# TRANS: machine translation
 msgstr "播放"
 
 #: js/widgets/sampler.js:933
 #. TRANS: The reference tone is a sound used for comparison.
 msgid "reference tone"
+# TRANS: machine translation
 msgstr "参考音"
 
 #: js/widgets/temperament.js:319
 msgid "back to 2:1 octave space"
+# TRANS: machine translation
 msgstr "返回到2:1倍频程间距"
 
 #: js/widgets/temperament.js:445
 msgid "edit"
+# TRANS: machine translation
 msgstr "编辑"
 
 #: js/widgets/temperament.js:525
@@ -7586,32 +8525,39 @@ msgstr "编辑"
 #: js/widgets/temperament.js:1448
 #: js/widgets/temperament.js:1529
 msgid "done"
+# TRANS: machine translation
 msgstr "完成"
 
 #: js/widgets/temperament.js:582
 #: js/widgets/temperament.js:587
 #: js/widgets/temperament.js:1021
 msgid "ratio"
+# TRANS: machine translation
 msgstr "比率"
 
 #: js/widgets/temperament.js:588
 msgid "interval"
+# TRANS: machine translation
 msgstr "音程"
 
 #: js/widgets/temperament.js:716
 msgid "non scalar"
+# TRANS: machine translation
 msgstr "非标量"
 
 #: js/widgets/temperament.js:757
 msgid "ratios"
+# TRANS: machine translation
 msgstr "比率"
 
 #: js/widgets/temperament.js:757
 msgid "arbitrary"
+# TRANS: machine translation
 msgstr "任意"
 
 #: js/widgets/temperament.js:828
 msgid "number of divisions"
+# TRANS: machine translation
 msgstr "分割数量"
 
 #: js/widgets/temperament.js:843
@@ -7619,226 +8565,278 @@ msgstr "分割数量"
 #: js/widgets/temperament.js:1037
 #: js/widgets/temperament.js:1128
 msgid "preview"
+# TRANS: machine translation
 msgstr "预览"
 
 #: js/widgets/temperament.js:888
 msgid "The Number of divisions is too large."
+# TRANS: machine translation
 msgstr "分割数量过大。"
 
 #: js/widgets/temperament.js:1023
 msgid "recursion"
+# TRANS: machine translation
 msgstr "递归"
 
 #: js/widgets/temperament.js:1549
 msgid "The octave ratio has changed. This changes temperament significantly."
+# TRANS: machine translation
 msgstr "倍频比已更改，这会显著改变音律。"
 
 #: js/widgets/temperament.js:2177
 msgid "Table"
+# TRANS: machine translation
 msgstr "表格"
 
 #: js/widgets/temperament.js:2285
 msgid "Add pitches"
+# TRANS: machine translation
 msgstr "添加音高"
 
 #: js/widgets/tempo.js:111
 msgid "Save tempo"
+# TRANS: machine translation
 msgstr "保存节奏"
 
 #: js/widgets/tempo.js:142
 msgid "speed up"
+# TRANS: machine translation
 msgstr "加快速度"
 
 #: js/widgets/tempo.js:148
 msgid "slow down"
+# TRANS: machine translation
 msgstr "减慢速度"
 
 #: js/widgets/tempo.js:192
 msgid "Adjust the tempo with the buttons."
+# TRANS: machine translation
 msgstr "使用按钮调整节奏。"
 
 #: js/widgets/tempo.js:259
 msgid "Please enter a number between 30 and 1000"
+# TRANS: machine translation
 msgstr "请输入30到1000之间的数字"
 
 #: js/widgets/tempo.js:266
 #: js/widgets/tempo.js:269
 msgid "The beats per minute must be between 30 and 1000."
+# TRANS: machine translation
 msgstr "每分钟节拍数必须在30到1000之间。"
 
 #: js/widgets/tempo.js:285
 msgid "The beats per minute must be below 1000."
+# TRANS: machine translation
 msgstr "每分钟节拍数必须低于1000。"
 
 #: js/widgets/tempo.js:301
 msgid "The beats per minute must be above 30"
+# TRANS: machine translation
 msgstr "每分钟节拍数必须高于30"
 
 #: js/widgets/timbre.js:760
 msgid "Synthesizer"
+# TRANS: machine translation
 msgstr "合成器"
 
 #: js/widgets/timbre.js:880
 #: planet/js/GlobalTag.js:50
 #. TRANS: On the Planet, we use labels to tag projects.
 msgid "Effects"
+# TRANS: machine translation
 msgstr "效果"
 
 #: js/widgets/timbre.js:940
 msgid "Add filter"
+# TRANS: machine translation
 msgstr "添加滤波器"
 
 #: js/widgets/timbre.js:981
 msgid "Click on buttons to open the timbre design tools."
+# TRANS: machine translation
 msgstr "点击按钮打开音色设计工具。"
 
 #: js/widgets/timbre.js:1265
 msgid "harmonicity"
+# TRANS: machine translation
 msgstr "谐波性"
 
 #: js/widgets/timbre.js:1332
 #: js/widgets/timbre.js:1398
 msgid "modulation index"
+# TRANS: machine translation
 msgstr "调制指数"
 
 #: js/widgets/timbre.js:1476
 msgid "vibrato amount"
+# TRANS: machine translation
 msgstr "颤音量"
 
 #: js/widgets/timbre.js:1911
 msgid "Filter already present."
+# TRANS: machine translation
 msgstr "滤波器已存在。"
 
 #: js/widgets/timbre.js:2495
 msgid "distortion amount"
+# TRANS: machine translation
 msgstr "失真量"
 
 #: js/widgets/oscilloscope.js:79
 msgid "Zoom In"
+# TRANS: machine translation
 msgstr "放大"
 
 #: js/widgets/oscilloscope.js:88
 msgid "Zoom Out"
+# TRANS: machine translation
 msgstr "缩小"
 
 #: js/widgets/phrasemaker.js:585
 msgid "Export"
+# TRANS: machine translation
 msgstr "导出"
 
 #: js/widgets/phrasemaker.js:592
 msgid "Sort"
+# TRANS: machine translation
 msgstr "排序"
 
 #: js/widgets/phrasemaker.js:1061
 msgid "Click on the table to add notes."
+# TRANS: machine translation
 msgstr "点击表格添加音符。"
 
 #: js/widgets/phrasemaker.js:2755
 #: js/widgets/phrasemaker.js:2891
 msgid "tuplet value"
+# TRANS: machine translation
 msgstr "复音值"
 
 #: planet/js/GlobalCard.js:68
 msgid "Share"
+# TRANS: machine translation
 msgstr "分享"
 
 #: planet/js/GlobalCard.js:74
 msgid "Flags"
+# TRANS: machine translation
 msgstr "标志"
 
 #: planet/js/GlobalPlanet.js:35
 msgid "No results found."
+# TRANS: machine translation
 msgstr "未找到结果。"
 
 #: planet/js/GlobalPlanet.js:51
 msgid "Remix of"
+# TRANS: machine translation
 msgstr "混音自"
 
 #: planet/js/GlobalPlanet.js:509
 msgid "Cannot connect to server"
+# TRANS: machine translation
 msgstr "无法连接到服务器"
 
 #: planet/js/GlobalTag.js:28
 #. TRANS: On the Planet, we use labels to tag projects.
 msgid "All Projects"
+# TRANS: machine translation
 msgstr "所有项目"
 
 #: planet/js/GlobalTag.js:30
 #: planet/js/StringHelper.js:37
 #. TRANS: On the Planet, we use labels to tag projects.
 msgid "My Projects"
+# TRANS: machine translation
 msgstr "我的项目"
 
 #: planet/js/GlobalTag.js:32
 #. TRANS: On the Planet, we use labels to tag projects.
 msgid "Examples"
+# TRANS: machine translation
 msgstr "示例"
 
 #: planet/js/GlobalTag.js:36
 #. TRANS: On the Planet, we use labels to tag projects.
 msgid "Art"
+# TRANS: machine translation
 msgstr "艺术"
 
 #: planet/js/GlobalTag.js:38
 #. TRANS: On the Planet, we use labels to tag projects.
 msgid "Math"
+# TRANS: machine translation
 msgstr "数学"
 
 #: planet/js/GlobalTag.js:40
 #. TRANS: On the Planet, we use labels to tag projects.
 msgid "Interactive"
+# TRANS: machine translation
 msgstr "互动"
 
 #: planet/js/GlobalTag.js:42
 #. TRANS: On the Planet, we use labels to tag projects.
 msgid "Design"
+# TRANS: machine translation
 msgstr "设计"
 
 #: planet/js/GlobalTag.js:44
 #. TRANS: On the Planet, we use labels to tag projects.
 msgid "Game"
+# TRANS: machine translation
 msgstr "游戏"
 
 #: planet/js/GlobalTag.js:52
 #. TRANS: On the Planet, we use labels to tag projects.
 msgid "Code Snippet"
+# TRANS: machine translation
 msgstr "代码片段"
 
 #: planet/js/LocalCard.js:36
 msgid "View published project"
+# TRANS: machine translation
 msgstr "查看已发布项目"
 
 #: planet/js/LocalCard.js:42
 #: planet/js/StringHelper.js:38
 msgid "Publish project"
+# TRANS: machine translation
 msgstr "发布项目"
 
 #: planet/js/LocalCard.js:51
 msgid "Edit project"
+# TRANS: machine translation
 msgstr "编辑项目"
 
 #: planet/js/LocalCard.js:52
 msgid "Delete project"
+# TRANS: machine translation
 msgstr "删除项目"
 
 #: planet/js/LocalCard.js:53
 msgid "Download project"
+# TRANS: machine translation
 msgstr "下载项目"
 
 #: planet/js/LocalCard.js:55
 msgid "Duplicate project"
+# TRANS: machine translation
 msgstr "复制项目"
 
 #: planet/js/ProjectStorage.js:243
 msgid "anonymous"
+# TRANS: machine translation
 msgstr "匿名"
 
 #: planet/js/ProjectViewer.js:30
 msgid "Error: Report could not be submitted. Try again later."
+# TRANS: machine translation
 msgstr "错误：无法提交报告。请稍后再试。"
 
 #: planet/js/ProjectViewer.js:31
 msgid "Thank you for reporting this project. A moderator will review the project shortly, to verify violation of the Sugar Labs Code of Conduct."
+# TRANS: machine translation
 msgstr "感谢您举报此项目。版主将很快审核该项目，以确认是否违反了 Sugar Labs 行为准则。"
 
 #: planet/js/ProjectViewer.js:32
@@ -7846,104 +8844,128 @@ msgstr "感谢您举报此项目。版主将很快审核该项目，以确认是
 #: planet/js/StringHelper.js:64
 #: planet/js/StringHelper.js:68
 msgid "Report Project"
+# TRANS: machine translation
 msgstr "举报项目"
 
 #: planet/js/ProjectViewer.js:33
 #: planet/js/StringHelper.js:63
 msgid "Project Reported"
+# TRANS: machine translation
 msgstr "项目已被举报"
 
 #: planet/js/ProjectViewer.js:34
 msgid "Report description required"
+# TRANS: machine translation
 msgstr "必须填写举报描述"
 
 #: planet/js/ProjectViewer.js:35
 msgid "Report description too long"
+# TRANS: machine translation
 msgstr "举报描述过长"
 
 #: planet/js/Publisher.js:30
 msgid "Feature unavailable - cannot connect to server. Reload Music Blocks to try again."
+# TRANS: machine translation
 msgstr "功能不可用 - 无法连接到服务器。请重新加载 Music Blocks 再试一次。"
 
 #: planet/js/Publisher.js:220
 #: planet/js/Publisher.js:237
 msgid "This field is required"
+# TRANS: machine translation
 msgstr "此字段为必填项"
 
 #: planet/js/Publisher.js:227
 msgid "Title too long"
+# TRANS: machine translation
 msgstr "标题过长"
 
 #: planet/js/Publisher.js:244
 msgid "Description too long"
+# TRANS: machine translation
 msgstr "描述过长"
 
 #: planet/js/Publisher.js:341
 msgid "Server Error"
+# TRANS: machine translation
 msgstr "服务器错误"
 
 #: planet/js/Publisher.js:341
 msgid "Try Again"
+# TRANS: machine translation
 msgstr "重试"
 
 #: planet/js/SaveInterface.js:34
 msgid "Open in Music Blocks"
+# TRANS: machine translation
 msgstr "在 Music Blocks 中打开"
 
 #: planet/js/SaveInterface.js:35
 msgid "Open in Turtle Blocks"
+# TRANS: machine translation
 msgstr "在 Turtle Blocks 中打开"
 
 #: planet/js/helper.js:149
 #: planet/js/StringHelper.js:49
 msgid "Show more tags"
+# TRANS: machine translation
 msgstr "显示更多标签"
 
 #: planet/js/helper.js:150
 msgid "Show fewer tags"
+# TRANS: machine translation
 msgstr "显示较少标签"
 
 #: planet/js/StringHelper.js:30
 msgid "Planet"
+# TRANS: machine translation
 msgstr "星球"
 
 #: planet/js/StringHelper.js:31
 msgid "Close Planet"
+# TRANS: machine translation
 msgstr "关闭星球"
 
 #: planet/js/StringHelper.js:32
 msgid "Open project from file"
+# TRANS: machine translation
 msgstr "从文件打开项目"
 
 #: planet/js/StringHelper.js:34
 msgid "Local"
+# TRANS: machine translation
 msgstr "本地"
 
 #: planet/js/StringHelper.js:35
 msgid "Global"
+# TRANS: machine translation
 msgstr "全局"
 
 #: planet/js/StringHelper.js:36
 msgid "Search for a project"
+# TRANS: machine translation
 msgstr "搜索项目"
 
 #: planet/js/StringHelper.js:40
 msgid "Tags (max 5)"
+# TRANS: machine translation
 msgstr "标签（最多 5 个）"
 
 #: planet/js/StringHelper.js:41
 #: planet/js/StringHelper.js:61
 msgid "Description"
+# TRANS: machine translation
 msgstr "描述"
 
 #: planet/js/StringHelper.js:42
 #: planet/js/StringHelper.js:67
 msgid "Submit"
+# TRANS: machine translation
 msgstr "提交"
 
 #: planet/js/StringHelper.js:43
 #: planet/js/StringHelper.js:47
 msgid "Cancel"
+# TRANS: machine translation
 msgstr "取消"
 
 #: planet/js/StringHelper.js:44
@@ -7956,50 +8978,62 @@ msgstr ""
 
 #: planet/js/StringHelper.js:48
 msgid "Explore Projects"
+# TRANS: machine translation
 msgstr "探索项目"
 
 #: planet/js/StringHelper.js:50
 msgid "Most recent"
+# TRANS: machine translation
 msgstr "最新"
 
 #: planet/js/StringHelper.js:51
 msgid "Most liked"
+# TRANS: machine translation
 msgstr "最受喜爱"
 
 #: planet/js/StringHelper.js:52
 msgid "Most downloaded"
+# TRANS: machine translation
 msgstr "下载最多"
 
 #: planet/js/StringHelper.js:53
 msgid "A-Z"
+# TRANS: machine translation
 msgstr "按字母排序"
 
 #: planet/js/StringHelper.js:54
 msgid "Sort by"
+# TRANS: machine translation
 msgstr "排序方式"
 
 #: planet/js/StringHelper.js:55
 msgid "Load More Projects"
+# TRANS: machine translation
 msgstr "加载更多项目"
 
 #: planet/js/StringHelper.js:56
 msgid "Last Updated"
+# TRANS: machine translation
 msgstr "最后更新"
 
 #: planet/js/StringHelper.js:57
 msgid "Creation Date"
+# TRANS: machine translation
 msgstr "创建日期"
 
 #: planet/js/StringHelper.js:58
 msgid "Number of Downloads:"
+# TRANS: machine translation
 msgstr "下载次数："
 
 #: planet/js/StringHelper.js:59
 msgid "Number of Likes:"
+# TRANS: machine translation
 msgstr "点赞数："
 
 #: planet/js/StringHelper.js:60
 msgid "Tags:"
+# TRANS: machine translation
 msgstr "标签："
 
 #: planet/js/StringHelper.js:65
@@ -8008,174 +9042,217 @@ msgstr ""
 
 #: planet/js/StringHelper.js:66
 msgid "Reason for reporting project"
+# TRANS: machine translation
 msgstr "举报项目原因"
 
 #: planet/js/StringHelper.js:70
 msgid "Download as File"
+# TRANS: machine translation
 msgstr "下载为文件"
 
 #: plugins/accelerometer.rtp:48
 msgid "motion x"
+# TRANS: machine translation
 msgstr "运动 x"
 
 #: plugins/accelerometer.rtp:56
 msgid "motion y"
+# TRANS: machine translation
 msgstr "运动 y"
 
 #: plugins/accelerometer.rtp:64
 msgid "motion z"
+# TRANS: machine translation
 msgstr "运动 z"
 
 #: plugins/facebook.rtp:27
 msgid "publish"
+# TRANS: machine translation
 msgstr "发布"
 
 #: plugins/maths.rtp:62
 msgid "power"
+# TRANS: machine translation
 msgstr "乘方"
 
 #: plugins/maths.rtp:62
 msgid "base"
+# TRANS: machine translation
 msgstr "底数"
 
 #: plugins/maths.rtp:62
 msgid "exp"
+# TRANS: machine translation
 msgstr "指数"
 
 #: plugins/maths.rtp:99
 msgid "floor"
+# TRANS: machine translation
 msgstr "向下取整"
 
 #: plugins/maths.rtp:104
 msgid "ceiling"
+# TRANS: machine translation
 msgstr "向上取整"
 
 #: plugins/maths.rtp:109
 msgid "to degrees"
+# TRANS: machine translation
 msgstr "转为角度"
 
 #: plugins/maths.rtp:114
 msgid "to radians"
+# TRANS: machine translation
 msgstr "转为弧度"
 
 #: plugins/nutrition.rtp:104
 msgid "get calories"
+# TRANS: machine translation
 msgstr "获取卡路里"
 
 #: plugins/nutrition.rtp:107
 msgid "get protein"
+# TRANS: machine translation
 msgstr "获取蛋白质"
 
 #: plugins/nutrition.rtp:110
 msgid "get carbs"
+# TRANS: machine translation
 msgstr "获取碳水化合物"
 
 #: plugins/nutrition.rtp:113
 msgid "get fiber"
+# TRANS: machine translation
 msgstr "获取纤维"
 
 #: plugins/nutrition.rtp:116
 msgid "get fat"
+# TRANS: machine translation
 msgstr "获取脂肪"
 
 #: plugins/nutrition.rtp:119
 msgid "get name"
+# TRANS: machine translation
 msgstr "获取名称"
 
 #: plugins/nutrition.rtp:122
 msgid "calories"
+# TRANS: machine translation
 msgstr "卡路里"
 
 #: plugins/nutrition.rtp:128
 msgid "protein"
+# TRANS: machine translation
 msgstr "蛋白质"
 
 #: plugins/nutrition.rtp:134
 msgid "carbs"
+# TRANS: machine translation
 msgstr "碳水化合物"
 
 #: plugins/nutrition.rtp:140
 msgid "fiber"
+# TRANS: machine translation
 msgstr "纤维"
 
 #: plugins/nutrition.rtp:146
 msgid "fat"
+# TRANS: machine translation
 msgstr "脂肪"
 
 #: plugins/nutrition.rtp:152
 msgid "eat"
+# TRANS: machine translation
 msgstr "吃"
 
 #: plugins/nutrition.rtp:155
 msgid "digest meal"
+# TRANS: machine translation
 msgstr "消化餐食"
 
 #: plugins/nutrition.rtp:158
 msgid "apple"
+# TRANS: machine translation
 msgstr "苹果"
 
 #: plugins/nutrition.rtp:161
 msgid "banana"
+# TRANS: machine translation
 msgstr "香蕉"
 
 #: plugins/nutrition.rtp:167
 msgid "wheat bread"
+# TRANS: machine translation
 msgstr "全麦面包"
 
 #: plugins/nutrition.rtp:170
 msgid "corn"
+# TRANS: machine translation
 msgstr "玉米"
 
 #: plugins/nutrition.rtp:173
 msgid "potato"
+# TRANS: machine translation
 msgstr "土豆"
 
 #: plugins/nutrition.rtp:176
 msgid "sweet potato"
+# TRANS: machine translation
 msgstr "红薯"
 
 #: plugins/nutrition.rtp:179
 msgid "tomato"
+# TRANS: machine translation
 msgstr "番茄"
 
 #: plugins/nutrition.rtp:182
 msgid "broccoli"
+# TRANS: machine translation
 msgstr "西兰花"
 
 #: plugins/nutrition.rtp:185
 msgid "rice and beans"
+# TRANS: machine translation
 msgstr "米饭和豆子"
 
 #: plugins/nutrition.rtp:188
 msgid "tamale"
+# TRANS: machine translation
 msgstr "塔玛莱"
 
 #: plugins/nutrition.rtp:191
 msgid "cheese"
+# TRANS: machine translation
 msgstr "奶酪"
 
 #: plugins/nutrition.rtp:194
 msgid "chicken"
+# TRANS: machine translation
 msgstr "鸡肉"
 
 #: plugins/nutrition.rtp:197
 msgid "fish"
+# TRANS: machine translation
 msgstr "鱼"
 
 #: plugins/nutrition.rtp:200
 msgid "beef"
+# TRANS: machine translation
 msgstr "牛肉"
 
 #: plugins/nutrition.rtp:203
 msgid "cake"
+# TRANS: machine translation
 msgstr "蛋糕"
 
 #: plugins/nutrition.rtp:206
 msgid "cookie"
+# TRANS: machine translation
 msgstr "饼干"
 
 #: plugins/nutrition.rtp:209
 msgid "water"
+# TRANS: machine translation
 msgstr "水"
 
 #: plugins/weather.rtp:68
@@ -8185,50 +9262,61 @@ msgstr ""
 
 #: plugins/weather.rtp:122
 msgid "forecast"
+# TRANS: machine translation
 msgstr "天气预报"
 
 #: plugins/weather.rtp:123
 #: plugins/weather.rtp:137
 #: plugins/weather.rtp:150
 msgid "city"
+# TRANS: machine translation
 msgstr "城市"
 
 #: plugins/weather.rtp:124
 #: plugins/weather.rtp:138
 #: plugins/weather.rtp:151
 msgid "day"
+# TRANS: machine translation
 msgstr "天"
 
 #: plugins/weather.rtp:136
 msgid "high"
+# TRANS: machine translation
 msgstr "高"
 
 #: plugins/weather.rtp:149
 msgid "low"
+# TRANS: machine translation
 msgstr "低"
 
 #: plugins/rodi.rtp:172
 msgid "blink"
+# TRANS: machine translation
 msgstr "闪烁"
 
 #: plugins/rodi.rtp:246
 msgid "led"
+# TRANS: machine translation
 msgstr "LED"
 
 #: plugins/rodi.rtp:265
 msgid "light intensity"
+# TRANS: machine translation
 msgstr "光照强度"
 
 #: plugins/rodi.rtp:282
 msgid "infrared light (left)"
+# TRANS: machine translation
 msgstr "红外光（左）"
 
 #: plugins/rodi.rtp:296
 msgid "infrared light (right)"
+# TRANS: machine translation
 msgstr "红外光（右）"
 
 #: plugins/rodi.rtp:338
 msgid "move"
+# TRANS: machine translation
 msgstr "移动"
 
 #: js/activity.js:3323
