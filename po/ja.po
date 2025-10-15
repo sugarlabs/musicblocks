@@ -109,6 +109,7 @@ msgstr "あひる"
 
 #: js/themebox.js:66
 msgid "Music Blocks is already set to this theme."
+# TRANS: machine translation
 msgstr "Music Blocksはすでにこのテーマに設定されています。"
 
 #: js/SaveInterface.js:59
@@ -247,18 +248,22 @@ msgstr "ブロックを検索"
 
 #: js/activity.js:1358
 msgid "Are you sure you want to clear the workspace?"
+# TRANS: machine translation
 msgstr "ワークスペースを本当にクリアしますか？"
 
 #: js/activity.js:1577
 msgid "Enter file name"
+# TRANS: machine translation
 msgstr "ファイル名を入力してください"
 
 #: js/activity.js:1579
 msgid "File save canceled"
+# TRANS: machine translation
 msgstr "ファイルの保存がキャンセルされました"
 
 #: js/activity.js:1598
 msgid "Click on stop saving"
+# TRANS: machine translation
 msgstr "保存を停止をクリックしてください"
 
 #: js/activity.js:1882
@@ -588,19 +593,23 @@ msgstr "ブロックを非表示"
 #: js/activity.js:3657
 #: js/activity.js:3672
 msgid "Trash can is empty."
+# TRANS: machine translation
 msgstr "ゴミ箱は空です。"
 
 #: js/activity.js:3679
 #: js/activity.js:3760
 msgid "Item restored from the trash."
+# TRANS: machine translation
 msgstr "ゴミ箱からアイテムを復元しました。"
 
 #: js/activity.js:3818
 msgid "Restore last item"
+# TRANS: machine translation
 msgstr "最後のアイテムを復元"
 
 #: js/activity.js:3819
 msgid "Restore all items"
+# TRANS: machine translation
 msgstr "すべてのアイテムを復元"
 
 #: js/activity.js:5016
@@ -638,10 +647,12 @@ msgstr "JSONのインプットのパースができません。"
 
 #: js/activity.js:6624
 msgid "Select is enabled."
+# TRANS: machine translation
 msgstr "選択モードが有効です。"
 
 #: js/activity.js:6624
 msgid "Select is disabled."
+# TRANS: machine translation
 msgstr "選択モードが無効です。"
 
 #: js/activity.js:7005
@@ -656,6 +667,7 @@ msgstr "無効なパラメータ"
 
 #: js/activity.js:7599
 msgid "Error regenerating palettes. Please refresh the page."
+# TRANS: machine translation
 msgstr "パレットの再生成に失敗しました。ページを更新してください。"
 
 #: js/block.js:1576
@@ -832,6 +844,7 @@ msgstr "「休符」は取り出すことができません。"
 #: js/block.js:3135
 #: js/piemenus.js:3457
 msgid "You can restore deleted blocks from the trash with the Restore From Trash button."
+# TRANS: machine translation
 msgstr "削除されたブロックは「ゴミ箱から復元」ボタンで復元できます。"
 
 #: js/block.js:3765
@@ -1360,6 +1373,7 @@ msgstr "たて方向にスクロール"
 #: js/toolbar.js:268
 #: js/turtledefs.js:642
 msgid "Change theme"
+# TRANS: machine translation
 msgstr "テーマを変更"
 
 #: js/toolbar.js:71
@@ -1367,6 +1381,7 @@ msgstr "テーマを変更"
 #: js/toolbar.js:208
 #: js/toolbar.js:269
 msgid "Light Mode"
+# TRANS: machine translation
 msgstr "ライトモード"
 
 #: js/toolbar.js:72
@@ -1374,6 +1389,7 @@ msgstr "ライトモード"
 #: js/toolbar.js:209
 #: js/toolbar.js:270
 msgid "Dark Mode"
+# TRANS: machine translation
 msgstr "ダークモード"
 
 #: js/toolbar.js:73
@@ -1478,6 +1494,7 @@ msgstr "ブロックのアートをほぞん"
 #: js/toolbar.js:222
 #: js/toolbar.js:283
 msgid "Save block artwork as PNG"
+# TRANS: machine translation
 msgstr "ブロックのアートワークをPNGで保存"
 
 #: js/toolbar.js:91
@@ -1494,6 +1511,7 @@ msgstr "作成する"
 #: js/toolbar.js:224
 #: js/toolbar.js:285
 msgid "English (United States)"
+# TRANS: machine translation
 msgstr "English (United States)"
 
 #: js/toolbar.js:93
@@ -1501,6 +1519,7 @@ msgstr "English (United States)"
 #: js/toolbar.js:225
 #: js/toolbar.js:286
 msgid "English (United Kingdom)"
+# TRANS: machine translation
 msgstr "English (United Kingdom)"
 
 #: js/toolbar.js:94
@@ -1508,10 +1527,12 @@ msgstr "English (United Kingdom)"
 #: js/toolbar.js:226
 #: js/toolbar.js:287
 msgid "日本語"
+# TRANS: machine translation
 msgstr "日本語"
 
 #: js/toolbar.js:95
 msgid "한국어"
+# TRANS: machine translation
 msgstr "한국어"
 
 #: js/toolbar.js:96
@@ -1519,6 +1540,7 @@ msgstr "한국어"
 #: js/toolbar.js:228
 #: js/toolbar.js:289
 msgid "español"
+# TRANS: machine translation
 msgstr "español"
 
 #: js/toolbar.js:97
@@ -1526,6 +1548,7 @@ msgstr "español"
 #: js/toolbar.js:229
 #: js/toolbar.js:290
 msgid "português"
+# TRANS: machine translation
 msgstr "português"
 
 #: js/toolbar.js:98
@@ -1533,6 +1556,7 @@ msgstr "português"
 #: js/toolbar.js:230
 #: js/toolbar.js:291
 msgid "にほんご"
+# TRANS: machine translation
 msgstr "にほんご"
 
 #: js/toolbar.js:99
@@ -1540,6 +1564,7 @@ msgstr "にほんご"
 #: js/toolbar.js:231
 #: js/toolbar.js:292
 msgid "中文"
+# TRANS: machine translation
 msgstr "中文"
 
 #: js/toolbar.js:100
@@ -1547,6 +1572,7 @@ msgstr "中文"
 #: js/toolbar.js:232
 #: js/toolbar.js:293
 msgid "ภาษาไทย"
+# TRANS: machine translation
 msgstr "ภาษาไทย"
 
 #: js/toolbar.js:101
@@ -1554,6 +1580,7 @@ msgstr "ภาษาไทย"
 #: js/toolbar.js:233
 #: js/toolbar.js:294
 msgid "aymara"
+# TRANS: machine translation
 msgstr "aymara"
 
 #: js/toolbar.js:102
@@ -1561,6 +1588,7 @@ msgstr "aymara"
 #: js/toolbar.js:234
 #: js/toolbar.js:295
 msgid "quechua"
+# TRANS: machine translation
 msgstr "quechua"
 
 #: js/toolbar.js:103
@@ -1568,6 +1596,7 @@ msgstr "quechua"
 #: js/toolbar.js:235
 #: js/toolbar.js:296
 msgid "guarani"
+# TRANS: machine translation
 msgstr "guarani"
 
 #: js/toolbar.js:104
@@ -1575,6 +1604,7 @@ msgstr "guarani"
 #: js/toolbar.js:236
 #: js/toolbar.js:297
 msgid "हिंदी"
+# TRANS: machine translation
 msgstr "हिंदी"
 
 #: js/toolbar.js:105
@@ -1582,6 +1612,7 @@ msgstr "हिंदी"
 #: js/toolbar.js:237
 #: js/toolbar.js:299
 msgid "igbo"
+# TRANS: machine translation
 msgstr "igbo"
 
 #: js/toolbar.js:106
@@ -1589,6 +1620,7 @@ msgstr "igbo"
 #: js/toolbar.js:238
 #: js/toolbar.js:300
 msgid "عربى"
+# TRANS: machine translation
 msgstr "عربى"
 
 #: js/toolbar.js:107
@@ -1596,6 +1628,7 @@ msgstr "عربى"
 #: js/toolbar.js:239
 #: js/toolbar.js:298
 msgid "తెలుగు"
+# TRANS: machine translation
 msgstr "తెలుగు"
 
 #: js/toolbar.js:108
@@ -1603,6 +1636,7 @@ msgstr "తెలుగు"
 #: js/toolbar.js:240
 #: js/toolbar.js:301
 msgid "עִברִית"
+# TRANS: machine translation
 msgstr "עִברִית"
 
 #: js/toolbar.js:109
@@ -1610,6 +1644,7 @@ msgstr "עִברִית"
 #: js/toolbar.js:241
 #: js/toolbar.js:302
 msgid "اردو"
+# TRANS: machine translation
 msgstr "اردو"
 
 #: js/toolbar.js:157
@@ -1633,6 +1668,7 @@ msgstr "アートをSVGで保存"
 #: js/toolbar.js:227
 #: js/toolbar.js:288
 msgid "한국인"
+# TRANS: machine translation
 msgstr "한국인"
 
 #: js/toolbar.js:185
@@ -1653,6 +1689,7 @@ msgstr "画面の境界を無視する"
 
 #: js/toolbar.js:1121
 msgid "Are you sure you want to create a new project?"
+# TRANS: machine translation
 msgstr "新しいプロジェクトを作成してもよろしいですか？"
 
 #: js/logo.js:61
@@ -1799,6 +1836,7 @@ msgstr "サンプルをコピーするため、ツールを再度試して、ま
 
 #: js/piemenus.js:3801
 msgid "You have chosen key for your pitch preview."
+# TRANS: machine translation
 msgstr "ピッチプレビューのキーを選択しました。"
 
 #: js/turtle-singer.js:1364
@@ -2045,10 +2083,12 @@ msgstr "ブロックのグラフィックをSVGで保存"
 
 #: js/turtledefs.js:571
 msgid "Save sheet music as ABC, Lilypond or MusicXML"
+# TRANS: machine translation
 msgstr "楽譜をABC、Lilypond、またはMusicXMLとして保存する。"
 
 #: js/turtledefs.js:573
 msgid "Save block artwork as SVG or PNG"
+# TRANS: machine translation
 msgstr "ブロックのアートワークをSVGまたはPNGとして保存する。"
 
 #: js/turtledefs.js:580
@@ -2069,6 +2109,7 @@ msgstr "このボタンをクリックすると「サブメニュー」を開い
 
 #: js/turtledefs.js:593
 msgid "Displays help messages for the main and auxiliary toolbar, right-click contextual menu for blocks and canvas, and palettes."
+# TRANS: machine translation
 msgstr "メインおよび補助ツールバー、ブロックとキャンバスの右クリックコンテキストメニュー、パレットのヘルプメッセージを表示します。"
 
 #: js/turtledefs.js:599
@@ -2085,6 +2126,7 @@ msgstr "プロジェクトに含まれているブロックの種類、わりあ
 
 #: js/turtledefs.js:618
 msgid "Load a selected plugin."
+# TRANS: machine translation
 msgstr "選択したプラグインを読み込みます。"
 
 #: js/turtledefs.js:626
@@ -2101,10 +2143,12 @@ msgstr "カンバス上をドラッグそうさしたときに、画面をスク
 
 #: js/turtledefs.js:643
 msgid "Switch between dark and light mode."
+# TRANS: machine translation
 msgstr "ダークモードとライトモードを切り替えます。"
 
 #: js/turtledefs.js:649
 msgid "Click to add another project into the current one."
+# TRANS: machine translation
 msgstr "クリックして別のプロジェクトを現在のプロジェクトに追加します。"
 
 #: js/turtledefs.js:654
@@ -2117,10 +2161,12 @@ msgstr "アートを包むか・包まない"
 
 #: js/turtledefs.js:663
 msgid "Click to set the current pitch."
+# TRANS: machine translation
 msgstr "クリックして現在の音高を設定します。"
 
 #: js/turtledefs.js:670
 msgid "Converts Music Block programs to JavaScript."
+# TRANS: machine translation
 msgstr "Music BlocksのプログラムをJavaScriptに変換します。"
 
 #: js/turtledefs.js:677
@@ -2141,10 +2187,12 @@ msgstr "ブロックの名前などに表示される言語をえらぶ。"
 
 #: js/turtledefs.js:696
 msgid "Contextual Menu for Blocks"
+# TRANS: machine translation
 msgstr "ブロックのコンテキストメニュー"
 
 #: js/turtledefs.js:697
 msgid "Right-click on a block to access common actions."
+# TRANS: machine translation
 msgstr "ブロックを右クリックして共通操作にアクセスします。"
 
 #: js/turtledefs.js:702
@@ -2174,10 +2222,12 @@ msgstr "キーボードを使うと、パレットボタンからブロックを
 
 #: js/turtledefs.js:729
 msgid "Contextual Menu for Canvas"
+# TRANS: machine translation
 msgstr "キャンバスのコンテキストメニュー"
 
 #: js/turtledefs.js:730
 msgid "Right-click on the canvas to perform additional canvas-related tasks."
+# TRANS: machine translation
 msgstr "キャンバスを右クリックして追加のキャンバス関連タスクを実行します。"
 
 #: js/turtledefs.js:736
@@ -2188,10 +2238,12 @@ msgstr "グリッド"
 
 #: js/turtledefs.js:737
 msgid "Turn on/off lines for cartesian or polar grids."
+# TRANS: machine translation
 msgstr "デカルト座標または極座標グリッドの線をオン/オフにします。"
 
 #: js/turtledefs.js:739
 msgid "Turn on/off music staffs."
+# TRANS: machine translation
 msgstr "五線譜の表示/非表示を切り替えます。"
 
 #: js/turtledefs.js:744
@@ -2245,10 +2297,12 @@ msgstr "画面に表示されるブロックのサイズを大きくする。"
 
 #: js/turtledefs.js:789
 msgid "Select"
+# TRANS: machine translation
 msgstr "選択"
 
 #: js/turtledefs.js:790
 msgid "Left-click and drag on workspace to select multiple blocks."
+# TRANS: machine translation
 msgstr "ワークスペースを左クリックしてドラッグすると複数のブロックを選択できます。"
 
 #: js/turtledefs.js:797
@@ -2321,6 +2375,7 @@ msgstr "ミュージック・ブロックスのリポジトリ"
 
 #: js/turtledefs.js:854
 msgid "Congratulations!"
+# TRANS: machine translation
 msgstr "おめでとうございます！"
 
 #: js/turtledefs.js:855
@@ -2915,6 +2970,7 @@ msgstr "ギター"
 #: js/utils/synthutils.js:84
 #. TRANS: sitar musical instrument
 msgid "sitar"
+# TRANS: machine translation
 msgstr "シタール"
 
 #: js/utils/musicutils.js:1113
@@ -3327,6 +3383,7 @@ msgstr "太鼓"
 
 #: js/blocks/BooleanBlocks.js:44
 msgid "The Not block is the logical not operator."
+# TRANS: machine translation
 msgstr "Notブロックは論理的なNOT演算子です。"
 
 #: js/blocks/BooleanBlocks.js:62
@@ -3335,6 +3392,7 @@ msgstr "ではない"
 
 #: js/blocks/BooleanBlocks.js:134
 msgid "The And block is the logical and operator."
+# TRANS: machine translation
 msgstr "Andブロックは論理積（AND）演算子です。"
 
 #: js/blocks/BooleanBlocks.js:152
@@ -3343,6 +3401,7 @@ msgstr "かつ"
 
 #: js/blocks/BooleanBlocks.js:218
 msgid "The Or block is the logical or operator."
+# TRANS: machine translation
 msgstr "Orブロックは論理和（OR）演算子です。"
 
 #: js/blocks/BooleanBlocks.js:236
@@ -3351,10 +3410,12 @@ msgstr "または"
 
 #: js/blocks/BooleanBlocks.js:302
 msgid "The XOR block is the logical XOR operator."
+# TRANS: machine translation
 msgstr "XORブロックは排他的論理和（XOR）演算子です。"
 
 #: js/blocks/BooleanBlocks.js:320
 msgid "xor"
+# TRANS: machine translation
 msgstr "XOR（エクスクルーシブ・オア）"
 
 #: js/blocks/BooleanBlocks.js:808
@@ -3363,10 +3424,12 @@ msgstr "<h2>しんぎブロック（等しい）</h2><br>２つのすうちを�
 
 #: js/blocks/BooleanBlocks.js:909
 msgid "The Not-equal-to block returns True if the two numbers are not equal to each other."
+# TRANS: machine translation
 msgstr "Not-equal-toブロックは2つの数字が等しくない場合にTrueを返します。"
 
 #: js/blocks/BooleanBlocks.js:1008
 msgid "The Boolean block is used to specify true or false."
+# TRANS: machine translation
 msgstr "Booleanブロックはtrueまたはfalseを指定するために使われます。"
 
 #: js/blocks/BoxesBlocks.js:53
@@ -3407,6 +3470,7 @@ msgstr "箱に１を足す"
 
 #: js/blocks/BoxesBlocks.js:211
 msgid "The Subtract-1-from block subtracts one from the value stored in a box."
+# TRANS: machine translation
 msgstr "Subtract-1-fromブロックはボックスに保存された値から1を引きます。"
 
 #: js/blocks/BoxesBlocks.js:222
@@ -3431,10 +3495,12 @@ msgstr "箱へ"
 
 #: js/blocks/BoxesBlocks.js:652
 msgid "The Box2 block returns the value stored in Box2."
+# TRANS: machine translation
 msgstr "Box2ブロックはBox2に保存された値を返します。"
 
 #: js/blocks/BoxesBlocks.js:703
 msgid "The Store in Box2 block is used to store a value in Box2."
+# TRANS: machine translation
 msgstr "Store in Box2ブロックは値をBox2に保存するために使われます。"
 
 #: js/blocks/BoxesBlocks.js:715
@@ -3443,10 +3509,12 @@ msgstr "箱２にすうちを入れる"
 
 #: js/blocks/BoxesBlocks.js:761
 msgid "The Box1 block returns the value stored in Box1."
+# TRANS: machine translation
 msgstr "Box1ブロックはBox1に保存された値を返します。"
 
 #: js/blocks/BoxesBlocks.js:812
 msgid "The Store in Box1 block is used to store a value in Box1."
+# TRANS: machine translation
 msgstr "Store in Box1ブロックは値をBox1に保存するために使われます。"
 
 #: js/blocks/BoxesBlocks.js:826
@@ -3469,11 +3537,13 @@ msgstr "私の辞書"
 
 #: js/blocks/DictBlocks.js:129
 msgid "The Dictionary block returns a dictionary."
+# TRANS: machine translation
 msgstr "Dictionaryブロックは辞書を返します。"
 
 #: js/blocks/DictBlocks.js:197
 #: js/blocks/DictBlocks.js:339
 msgid "The Get-dict block returns a value in the dictionary for a specified key."
+# TRANS: machine translation
 msgstr "Get-dictブロックは指定されたキーの辞書の値を返します。"
 
 #: js/blocks/DictBlocks.js:212
@@ -3507,6 +3577,7 @@ msgstr "調"
 #: js/blocks/DictBlocks.js:271
 #: js/blocks/DictBlocks.js:411
 msgid "The Set-dict block sets a value in the dictionary for a specified key."
+# TRANS: machine translation
 msgstr "Set-dictブロックは指定されたキーに辞書の値を設定します。"
 
 #: js/blocks/DictBlocks.js:286
@@ -3517,6 +3588,7 @@ msgstr "値を設定"
 
 #: js/blocks/DrumBlocks.js:59
 msgid "The Noise name block is used to select a noise synthesizer."
+# TRANS: machine translation
 msgstr "Noise nameブロックはノイズシンセサイザーを選択するために使われます。"
 
 #: js/blocks/DrumBlocks.js:102
@@ -3533,10 +3605,12 @@ msgstr "ノイズ"
 
 #: js/blocks/DrumBlocks.js:177
 msgid "The Play noise block will generate white, pink, or brown noise."
+# TRANS: machine translation
 msgstr "Play noiseブロックはホワイトノイズ、ピンクノイズ、またはブラウンノイズを生成します。"
 
 #: js/blocks/DrumBlocks.js:317
 msgid "Replace every instance of a pitch with a drum sound."
+# TRANS: machine translation
 msgstr "すべてのピッチをドラム音に置き換えます。"
 
 #: js/blocks/DrumBlocks.js:328
@@ -3563,6 +3637,7 @@ msgstr "<h2>ドラムブロック</h2><br>「音符（おんぷ）ブロック�
 
 #: js/blocks/HeapBlocks.js:49
 msgid "The Heap block returns the heap."
+# TRANS: machine translation
 msgstr "Heapブロックはヒープを返します。"
 
 #: js/blocks/HeapBlocks.js:133
@@ -3571,6 +3646,7 @@ msgstr "ヒープを表示する"
 
 #: js/blocks/HeapBlocks.js:181
 msgid "The Heap-length block returns the length of the heap."
+# TRANS: machine translation
 msgstr "Heap-lengthブロックはヒープの長さを返します。"
 
 #: js/blocks/HeapBlocks.js:195
@@ -3579,6 +3655,7 @@ msgstr "ヒープの長さ"
 
 #: js/blocks/HeapBlocks.js:254
 msgid "The Heap-empty? block returns true if the heap is empty."
+# TRANS: machine translation
 msgstr "Heap-empty?ブロックはヒープが空の場合にtrueを返します。"
 
 #: js/blocks/HeapBlocks.js:268
@@ -3588,6 +3665,7 @@ msgstr "ヒープは空ですか？"
 
 #: js/blocks/HeapBlocks.js:317
 msgid "The Empty-heap block empties the heap."
+# TRANS: machine translation
 msgstr "Empty-heapブロックはヒープを空にします。"
 
 #: js/blocks/HeapBlocks.js:327
@@ -3598,6 +3676,7 @@ msgstr "空のヒープ"
 
 #: js/blocks/HeapBlocks.js:371
 msgid "The Reverse-heap block reverses the order of the heap."
+# TRANS: machine translation
 msgstr "Reverse-heapブロックはヒープの順序を逆にします。"
 
 #: js/blocks/HeapBlocks.js:384
@@ -3607,6 +3686,7 @@ msgstr "ヒープを逆にする"
 
 #: js/blocks/HeapBlocks.js:428
 msgid "The Index-heap block returns a value in the heap at a specified location."
+# TRANS: machine translation
 msgstr "Index-heapブロックは指定された位置のヒープの値を返します。"
 
 #: js/blocks/HeapBlocks.js:443
@@ -3629,6 +3709,7 @@ msgstr "ヒープの大きさは、最大1000です。"
 
 #: js/blocks/HeapBlocks.js:523
 msgid "The Set-heap entry block sets a value in he heap at the specified location."
+# TRANS: machine translation
 msgstr "Set-heapエントリーブロックは指定された位置のヒープに値を設定します。"
 
 #: js/blocks/HeapBlocks.js:539
@@ -3645,6 +3726,7 @@ msgstr "インデックス"
 
 #: js/blocks/HeapBlocks.js:619
 msgid "The Pop block removes the value at the top of the heap."
+# TRANS: machine translation
 msgstr "Popブロックはヒープの先頭の値を削除します。"
 
 #: js/blocks/HeapBlocks.js:633
@@ -3654,6 +3736,7 @@ msgstr "ポップ"
 
 #: js/blocks/HeapBlocks.js:680
 msgid "The Push block adds a value to the top of the heap."
+# TRANS: machine translation
 msgstr "Pushブロックは値をヒープの先頭に追加します。"
 
 #: js/blocks/HeapBlocks.js:696
@@ -3691,6 +3774,7 @@ msgstr "重"
 
 #: js/blocks/IntervalsBlocks.js:166
 msgid "The Doubly block will double the size of an interval."
+# TRANS: machine translation
 msgstr "Doublyブロックはインターバルのサイズを2倍にします。"
 
 #: js/blocks/IntervalsBlocks.js:262
@@ -3713,6 +3797,7 @@ msgstr "音程を計る際は、２つの音符を使う必要があります。
 
 #: js/blocks/IntervalsBlocks.js:496
 msgid "The Scalar interval block measures the distance between two notes in the current key and mode."
+# TRANS: machine translation
 msgstr "Scalar intervalブロックは現在の調とモードで2つの音の距離を測定します。"
 
 #: js/blocks/IntervalsBlocks.js:502
@@ -3741,10 +3826,12 @@ msgstr "アルペジオ"
 
 #: js/blocks/IntervalsBlocks.js:931
 msgid "The Chord block calculates common chords."
+# TRANS: machine translation
 msgstr "Chordブロックは一般的なコードを計算します。"
 
 #: js/blocks/IntervalsBlocks.js:933
 msgid "In the figure, we generate a C-major chord."
+# TRANS: machine translation
 msgstr "図では、Cメジャーコードを生成します。"
 
 #: js/blocks/IntervalsBlocks.js:938
@@ -3812,6 +3899,7 @@ msgstr "たとえば、「ド」を始まりの音にしたときの「ドレミ
 
 #: js/blocks/NumberBlocks.js:28
 msgid "The Int block returns an integer."
+# TRANS: machine translation
 msgstr "Intブロックは整数を返します。"
 
 #: js/blocks/NumberBlocks.js:34
@@ -3820,6 +3908,7 @@ msgstr "整数に"
 
 #: js/blocks/NumberBlocks.js:73
 msgid "The Mod block returns the remainder from a division."
+# TRANS: machine translation
 msgstr "Modブロックは割り算の余りを返します。"
 
 #: js/blocks/NumberBlocks.js:79
@@ -3828,10 +3917,12 @@ msgstr "～で割った余り（mod）"
 
 #: js/blocks/NumberBlocks.js:141
 msgid "The Power block calculates a power function."
+# TRANS: machine translation
 msgstr "Powerブロックはべき乗を計算します。"
 
 #: js/blocks/NumberBlocks.js:196
 msgid "The Sqrt block returns the square root."
+# TRANS: machine translation
 msgstr "Sqrtブロックは平方根を返します。"
 
 #: js/blocks/NumberBlocks.js:202
@@ -3840,6 +3931,7 @@ msgstr "平方根"
 
 #: js/blocks/NumberBlocks.js:248
 msgid "The Abs block returns the absolute value."
+# TRANS: machine translation
 msgstr "Absブロックは絶対値を返します。"
 
 #: js/blocks/NumberBlocks.js:254
@@ -3848,6 +3940,7 @@ msgstr "絶対値"
 
 #: js/blocks/NumberBlocks.js:295
 msgid "The Distance block returns the distance between two points. For example, between the mouse and the center of the screen."
+# TRANS: machine translation
 msgstr "Distanceブロックは2点間の距離を返します。例えば、マウスと画面中央の距離です。"
 
 #: js/blocks/NumberBlocks.js:301
@@ -3943,6 +4036,7 @@ msgstr "スタッカート"
 
 #: js/blocks/ProgramBlocks.js:33
 msgid "The Load-heap-from-app block loads the heap from a web page."
+# TRANS: machine translation
 msgstr "Load-heap-from-appブロックはウェブページからヒープを読み込みます。"
 
 #: js/blocks/ProgramBlocks.js:44
@@ -3960,6 +4054,7 @@ msgstr "４０４エラー：ページが見つかりません。"
 
 #: js/blocks/ProgramBlocks.js:133
 msgid "The Save-heap-to-app block saves the heap to a web page."
+# TRANS: machine translation
 msgstr "Save-heap-to-appブロックはヒープをウェブページに保存します。"
 
 #: js/blocks/ProgramBlocks.js:144
@@ -3973,6 +4068,7 @@ msgstr "正しいヒープが見つかりません。"
 
 #: js/blocks/ProgramBlocks.js:206
 msgid "The Load-heap block loads the heap from a file."
+# TRANS: machine translation
 msgstr "Load-heapブロックはファイルからヒープを読み込みます。"
 
 #: js/blocks/ProgramBlocks.js:217
@@ -3990,18 +4086,22 @@ msgstr "ロードヒープのブロックには、ロードファイルブロッ
 
 #: js/blocks/ProgramBlocks.js:291
 msgid "The Set-heap block loads the heap."
+# TRANS: machine translation
 msgstr "Set-heapブロックはヒープを読み込みます。"
 
 #: js/blocks/ProgramBlocks.js:340
 msgid "The block you selected does not contain a valid heap."
+# TRANS: machine translation
 msgstr "選択したブロックには有効なヒープが含まれていません。"
 
 #: js/blocks/ProgramBlocks.js:343
 msgid "The Set heap block needs a heap."
+# TRANS: machine translation
 msgstr "Set heapブロックにはヒープが必要です。"
 
 #: js/blocks/ProgramBlocks.js:360
 msgid "The Load-dictionary block loads a dictionary from a file."
+# TRANS: machine translation
 msgstr "Load-dictionaryブロックはファイルから辞書を読み込みます。"
 
 #: js/blocks/ProgramBlocks.js:372
@@ -4017,14 +4117,17 @@ msgstr "ファイル"
 
 #: js/blocks/ProgramBlocks.js:444
 msgid "The file you selected does not contain a valid dictionary."
+# TRANS: machine translation
 msgstr "選択したファイルには有効な辞書が含まれていません。"
 
 #: js/blocks/ProgramBlocks.js:449
 msgid "The load dictionary block needs a load file block."
+# TRANS: machine translation
 msgstr "load dictionaryブロックにはload fileブロックが必要です。"
 
 #: js/blocks/ProgramBlocks.js:466
 msgid "The Set-dictionary block loads a dictionary."
+# TRANS: machine translation
 msgstr "Set-dictionaryブロックは辞書を読み込みます。"
 
 #: js/blocks/ProgramBlocks.js:477
@@ -4034,14 +4137,17 @@ msgstr "辞書を設定"
 
 #: js/blocks/ProgramBlocks.js:546
 msgid "The block you selected does not contain a valid dictionary."
+# TRANS: machine translation
 msgstr "選択したブロックには有効な辞書が含まれていません。"
 
 #: js/blocks/ProgramBlocks.js:550
 msgid "The set dictionary block needs a dictionary."
+# TRANS: machine translation
 msgstr "set dictionaryブロックには辞書が必要です。"
 
 #: js/blocks/ProgramBlocks.js:567
 msgid "The Save-heap block saves the heap to a file."
+# TRANS: machine translation
 msgstr "Save-heapブロックはヒープをファイルに保存します。"
 
 #: js/blocks/ProgramBlocks.js:578
@@ -4051,6 +4157,7 @@ msgstr "ヒープを保存する"
 
 #: js/blocks/ProgramBlocks.js:629
 msgid "The Save-dictionary block saves a dictionary to a file."
+# TRANS: machine translation
 msgstr "Save-dictionaryブロックは辞書をファイルに保存します。"
 
 #: js/blocks/ProgramBlocks.js:640
@@ -4060,6 +4167,7 @@ msgstr "辞書を保存"
 
 #: js/blocks/ProgramBlocks.js:720
 msgid "The Open palette block opens a palette."
+# TRANS: machine translation
 msgstr "Open paletteブロックはパレットを開きます。"
 
 #: js/blocks/ProgramBlocks.js:727
@@ -4068,6 +4176,7 @@ msgstr "パレットを開きます"
 
 #: js/blocks/ProgramBlocks.js:785
 msgid "The Delete block block removes a block."
+# TRANS: machine translation
 msgstr "Delete blockブロックはブロックを削除します。"
 
 #: js/blocks/ProgramBlocks.js:797
@@ -4077,6 +4186,7 @@ msgstr "ブロックを消す"
 
 #: js/blocks/ProgramBlocks.js:861
 msgid "The Move block block moves a block."
+# TRANS: machine translation
 msgstr "Move blockブロックはブロックを移動します。"
 
 #: js/blocks/ProgramBlocks.js:869
@@ -4120,6 +4230,7 @@ msgstr "ブロックを再生"
 
 #: js/blocks/ProgramBlocks.js:1025
 msgid "The Dock block block connections two blocks."
+# TRANS: machine translation
 msgstr "Dock blockブロックは2つのブロックを接続します。"
 
 #: js/blocks/ProgramBlocks.js:1036
@@ -4137,6 +4248,7 @@ msgstr "接続の番号"
 
 #: js/blocks/ProgramBlocks.js:1140
 msgid "The Make block block creates a new block."
+# TRANS: machine translation
 msgstr "Make blockブロックは新しいブロックを作成します。"
 
 #: js/blocks/ProgramBlocks.js:1152
@@ -4170,6 +4282,7 @@ msgstr "注意：ブロックとタイプが合っていません。"
 
 #: js/blocks/ProgramBlocks.js:1347
 msgid "The Open project block is used to open a project from a web page."
+# TRANS: machine translation
 msgstr "Open projectブロックはウェブページからプロジェクトを開くために使われます。"
 
 #: js/blocks/ProgramBlocks.js:1357
@@ -4200,6 +4313,7 @@ msgstr "スイングの数値"
 
 #: js/blocks/RhythmBlocks.js:419
 msgid "The Skip notes block will cause notes to be skipped."
+# TRANS: machine translation
 msgstr "Skip notesブロックは音符をスキップさせます。"
 
 #: js/blocks/RhythmBlocks.js:427
@@ -4234,10 +4348,12 @@ msgstr "ー１は０の音価にします"
 
 #: js/blocks/RhythmBlocks.js:661
 msgid "The Dot block extends the duration of a note by 50%."
+# TRANS: machine translation
 msgstr "Dotブロックは音符の長さを50%延長します。"
 
 #: js/blocks/RhythmBlocks.js:663
 msgid "Eg a dotted quarter note will play for 3/8 (1/4 + 1/8) of a beat."
+# TRANS: machine translation
 msgstr "例：付点四分音符は1拍の3/8（1/4 + 1/8）演奏されます。"
 
 #: js/blocks/RhythmBlocks.js:765
@@ -4364,10 +4480,12 @@ msgstr "ぎゃく向きに実行"
 
 #: js/blocks/FlowBlocks.js:124
 msgid "The Duplicate block will run each block multiple times."
+# TRANS: machine translation
 msgstr "Duplicateブロックは各ブロックを複数回実行します。"
 
 #: js/blocks/FlowBlocks.js:334
 msgid "The Default block is used inside of a Switch to define the default action."
+# TRANS: machine translation
 msgstr "DefaultブロックはSwitch内でデフォルトの動作を定義するために使われます。"
 
 #: js/blocks/FlowBlocks.js:342
@@ -4381,6 +4499,7 @@ msgstr "ケースブロックはスイッチブロックの中にある必要が
 
 #: js/blocks/FlowBlocks.js:389
 msgid "The Case block is used inside of a Switch to define matches."
+# TRANS: machine translation
 msgstr "CaseブロックはSwitch内で一致条件を定義するために使われます。"
 
 #: js/blocks/FlowBlocks.js:397
@@ -4389,6 +4508,7 @@ msgstr "ケース"
 
 #: js/blocks/FlowBlocks.js:446
 msgid "The Switch block will run the code in the matching Case."
+# TRANS: machine translation
 msgstr "Switchブロックは一致するCase内のコードを実行します。"
 
 #: js/blocks/FlowBlocks.js:454
@@ -4397,14 +4517,17 @@ msgstr "スイッチ"
 
 #: js/blocks/FlowBlocks.js:595
 msgid "The Stop block will stop a loop"
+# TRANS: machine translation
 msgstr "Stopブロックはループを停止します。"
 
 #: js/blocks/FlowBlocks.js:597
 msgid "Forever, Repeat, While, or Until."
+# TRANS: machine translation
 msgstr "Forever、Repeat、While、またはUntil。"
 
 #: js/blocks/FlowBlocks.js:653
 msgid "The Waitfor block will wait until the condition is true."
+# TRANS: machine translation
 msgstr "Waitforブロックは条件が真になるまで待ちます。"
 
 #: js/blocks/FlowBlocks.js:661
@@ -4413,6 +4536,7 @@ msgstr "を待つ"
 
 #: js/blocks/FlowBlocks.js:732
 msgid "The Until block will repeat until the condition is true."
+# TRANS: machine translation
 msgstr "Untilブロックは条件が真になるまで繰り返します。"
 
 #: js/blocks/FlowBlocks.js:740
@@ -4436,6 +4560,7 @@ msgstr "アクション"
 
 #: js/blocks/FlowBlocks.js:812
 msgid "The While block will repeat while the condition is true."
+# TRANS: machine translation
 msgstr "Whileブロックは条件が真である間繰り返します。"
 
 #: js/blocks/FlowBlocks.js:820
@@ -4498,6 +4623,7 @@ msgstr "拍を～倍にするファクター"
 
 #: js/blocks/MeterBlocks.js:161
 msgid "The Beats per minute block returns the current beats per minute."
+# TRANS: machine translation
 msgstr "Beats per minuteブロックは現在の1分あたりのビート数を返します。"
 
 #: js/blocks/MeterBlocks.js:170
@@ -4522,6 +4648,7 @@ msgstr "小節の数"
 
 #: js/blocks/MeterBlocks.js:242
 msgid "The Measure count block returns the current measure."
+# TRANS: machine translation
 msgstr "Measure countブロックは現在の小節数を返します。"
 
 #: js/blocks/MeterBlocks.js:291
@@ -4549,6 +4676,7 @@ msgstr "音の長さを足す"
 #: js/blocks/MeterBlocks.js:377
 #: js/blocks/MeterBlocks.js:441
 msgid "The Note counter block can be used to count the number of contained notes."
+# TRANS: machine translation
 msgstr "Note counterブロックは含まれる音符の数を数えるために使用できます。"
 
 #: js/blocks/MeterBlocks.js:433
@@ -4563,6 +4691,7 @@ msgstr "さいせいされた全音符の数"
 
 #: js/blocks/MeterBlocks.js:506
 msgid "The Whole notes played block returns the total number of whole notes played."
+# TRANS: machine translation
 msgstr "Whole notes playedブロックは演奏された全音符の総数を返します。"
 
 #: js/blocks/MeterBlocks.js:556
@@ -4586,6 +4715,7 @@ msgstr "弱拍に～する"
 
 #: js/blocks/MeterBlocks.js:706
 msgid "The On-weak-beat block lets you specify actions to take on weak (off) beats."
+# TRANS: machine translation
 msgstr "On-weak-beatブロックは弱拍（裏拍）で実行するアクションを指定できます。"
 
 #: js/blocks/MeterBlocks.js:751
@@ -4594,6 +4724,7 @@ msgstr "強拍に"
 
 #: js/blocks/MeterBlocks.js:759
 msgid "The On-strong-beat block lets you specify actions to take on specified beats."
+# TRANS: machine translation
 msgstr "On-strong-beatブロックは指定された強拍で実行するアクションを指定できます。"
 
 #: js/blocks/MeterBlocks.js:770
@@ -4614,6 +4745,7 @@ msgstr "全ての拍子にアクション実行"
 
 #: js/blocks/MeterBlocks.js:822
 msgid "The On-every-beat block lets you specify actions to take on every beat."
+# TRANS: machine translation
 msgstr "On-every-beatブロックはすべての拍で実行するアクションを指定できます。"
 
 #: js/blocks/MeterBlocks.js:875
@@ -4622,6 +4754,7 @@ msgstr "全ての音符にアクション実行"
 
 #: js/blocks/MeterBlocks.js:883
 msgid "The On-every-note block lets you specify actions to take on every note."
+# TRANS: machine translation
 msgstr "On-every-noteブロックはすべての音符で実行するアクションを指定できます。"
 
 #: js/blocks/MeterBlocks.js:929
@@ -4679,6 +4812,7 @@ msgstr "音階内で~度下がる:"
 
 #: js/blocks/PitchBlocks.js:172
 msgid "The Scalar step down block returns the number of semi-tones down to the previous note in the current key and mode."
+# TRANS: machine translation
 msgstr "Scalar step downブロックは現在の調とモードにおける前の音までの半音数を返します。"
 
 #: js/blocks/PitchBlocks.js:190
@@ -4688,6 +4822,7 @@ msgstr "音階内で~度上がる:"
 
 #: js/blocks/PitchBlocks.js:194
 msgid "The Scalar step up block returns the number of semi-tones up to the next note in the current key and mode."
+# TRANS: machine translation
 msgstr "Scalar step upブロックは現在の調とモードにおける次の音までの半音数を返します。"
 
 #: js/blocks/PitchBlocks.js:212
@@ -4737,10 +4872,12 @@ msgstr "現代の音の高さ"
 
 #: js/blocks/PitchBlocks.js:373
 msgid "The Current Pitch block is used with the Pitch Converter block. In the example above, current pitch, sol 4, is displayed as 392 hertz."
+# TRANS: machine translation
 msgstr "Current PitchブロックはPitch Converterブロックと共に使用されます。上記の例では、現在のピッチsol 4が392ヘルツとして表示されます。"
 
 #: js/blocks/PitchBlocks.js:410
 msgid "This block converts the pitch value of the last note played into different formats such as hertz, letter name, pitch number, et al."
+# TRANS: machine translation
 msgstr "このブロックは最後に演奏された音のピッチ値をヘルツ、音名、ピッチ番号などの異なる形式に変換します。"
 
 #: js/blocks/PitchBlocks.js:434
@@ -4788,6 +4925,7 @@ msgstr "音の高さを色に"
 #: js/widgets/musickeyboard.js:753
 #. TRANS: MIDI is a technical standard for electronic music
 msgid "MIDI"
+# TRANS: machine translation
 msgstr "MIDI"
 
 #: js/blocks/PitchBlocks.js:642
@@ -4797,6 +4935,7 @@ msgstr "音高の数字を初期化"
 
 #: js/blocks/PitchBlocks.js:645
 msgid "The Set pitch number offset block is used to set the offset for mapping pitch numbers to pitch and octave."
+# TRANS: machine translation
 msgstr "ピッチ番号をピッチとオクターブにマッピングするためのオフセットを設定するために使われるブロックです。"
 
 #: js/blocks/PitchBlocks.js:656
@@ -4814,6 +4953,7 @@ msgstr "数字を音名へ"
 
 #: js/blocks/PitchBlocks.js:682
 msgid "The Number to pitch block will convert a pitch number to a pich name."
+# TRANS: machine translation
 msgstr "Number to pitchブロックはピッチ番号をピッチ名に変換します。"
 
 #: js/blocks/PitchBlocks.js:715
@@ -4823,6 +4963,7 @@ msgstr "数値をオクターヴ表記へ"
 
 #: js/blocks/PitchBlocks.js:717
 msgid "The Number to octave block will convert a pitch number to an octave."
+# TRANS: machine translation
 msgstr "Number to octaveブロックはピッチ番号をオクターブに変換します。"
 
 #: js/blocks/PitchBlocks.js:726
@@ -4831,10 +4972,12 @@ msgstr "音の高さをy座に"
 
 #: js/blocks/PitchBlocks.js:729
 msgid "Y to pitch block will convert a staff y position to corresponding pitch notation."
+# TRANS: machine translation
 msgstr "五線譜のy位置を対応する音高表記に変換するブロック"
 
 #: js/blocks/PitchBlocks.js:841
 msgid "accidental selector"
+# TRANS: machine translation
 msgstr "臨時記号セレクター"
 
 #: js/blocks/PitchBlocks.js:844
@@ -4859,6 +5002,7 @@ msgstr "<h2>音の高さブロック</h2><br>音の高さを、ド、レ、ミ�
 
 #: js/blocks/PitchBlocks.js:922
 msgid "The Invert block rotates any contained notes around a target note."
+# TRANS: machine translation
 msgstr "Invertブロックは含まれる音符を対象の音符の周りで反転させます。"
 
 #: js/blocks/PitchBlocks.js:929
@@ -4884,11 +5028,13 @@ msgstr "登録"
 
 #: js/blocks/PitchBlocks.js:1026
 msgid "The Register block provides an easy way to modify the register (octave) of the notes that follow it."
+# TRANS: machine translation
 msgstr "Registerブロックは後に続く音符のオクターブ（レジスター）を簡単に変更する方法を提供します。"
 
 #: js/blocks/PitchBlocks.js:1047
 #. TRANS: cents are units used to specify the ratio between pitches. There are 100 cents between successive notes.
 msgid "50 cents"
+# TRANS: machine translation
 msgstr "50セント"
 
 #: js/blocks/PitchBlocks.js:1102
@@ -4989,6 +5135,7 @@ msgstr "<h2>ヘルツブロック</h2><br>音の高さをヘルツ（周波数�
 
 #: js/blocks/PitchBlocks.js:1671
 msgid "The Pitch Number block will play a pitch associated by its number, e.g. 0 for C and 7 for G."
+# TRANS: machine translation
 msgstr "Pitch Numberブロックは番号に対応した音高を再生します。例：0はC、7はG。"
 
 #: js/blocks/PitchBlocks.js:1703
@@ -5000,26 +5147,32 @@ msgstr "ピッチ度"
 
 #: js/blocks/PitchBlocks.js:1706
 msgid "nth Modal Pitch takes the pattern of pitches in semitones for a mode and makes each point a degree of the mode,"
+# TRANS: machine translation
 msgstr "nth Modal Pitchはモードの半音単位の音高パターンを取り、各点をモードの度数にします。"
 
 #: js/blocks/PitchBlocks.js:1708
 msgid "starting from 1 and regardless of tonal framework (i.e. not always 8 notes in the octave)"
+# TRANS: machine translation
 msgstr "1から始まり、音階の枠組みに関係なく（つまりオクターブが常に8音とは限らない）"
 
 #: js/blocks/PitchBlocks.js:1749
 msgid "Nth Modal Pitch takes a number as an input as the nth degree for the given mode. 0 is the first position, 1 is the second, -1 is the note before the first etc."
+# TRANS: machine translation
 msgstr "Nth Modal Pitchは番号を入力として受け取り、指定されたモードのnth度数を表します。0は最初の位置、1は2番目、-1は最初の前の音など。"
 
 #: js/blocks/PitchBlocks.js:1751
 msgid "The pitches change according to the mode specified without any need for respellings."
+# TRANS: machine translation
 msgstr "音高は指定されたモードに従って変化し、書き換えは不要です。"
 
 #: js/blocks/PitchBlocks.js:1790
 msgid "Scale Degree is a common convention in music. Scale Degree offers seven possible positions in the scale (1-7) and can be modified via accidentals."
+# TRANS: machine translation
 msgstr "スケールディグリーは音楽で一般的な表記法です。スケール内の7つの位置（1-7）を示し、臨時記号で変更可能です。"
 
 #: js/blocks/PitchBlocks.js:1792
 msgid "Scale Degree 1 is always the first pitch in a given scale, regardless of octave."
+# TRANS: machine translation
 msgstr "スケールディグリー1は、オクターブに関係なく常に与えられたスケールの最初の音です。"
 
 #: js/blocks/PitchBlocks.js:1814
@@ -5071,6 +5224,7 @@ msgstr "シーケンサー込みシンセ"
 
 #: js/blocks/ToneBlocks.js:149
 msgid "The Duo synth block is a duo-frequency modulator used to define a timbre."
+# TRANS: machine translation
 msgstr "Duo synthブロックは音色を定義するための二重周波数モジュレータです。"
 
 #: js/blocks/ToneBlocks.js:157
@@ -5090,6 +5244,7 @@ msgstr "AM シンセ"
 
 #: js/blocks/ToneBlocks.js:189
 msgid "The AM synth block is an amplitude modulator used to define a timbre."
+# TRANS: machine translation
 msgstr "AMシンセブロックは音色を定義するための振幅変調装置です。"
 
 #: js/blocks/ToneBlocks.js:224
@@ -5100,6 +5255,7 @@ msgstr "FM シンセ"
 
 #: js/blocks/ToneBlocks.js:228
 msgid "The FM synth block is a frequency modulator used to define a timbre."
+# TRANS: machine translation
 msgstr "FMシンセブロックは音色を定義するための周波数変調装置です。"
 
 #: js/blocks/ToneBlocks.js:262
@@ -5108,6 +5264,7 @@ msgstr "倍音"
 
 #: js/blocks/ToneBlocks.js:265
 msgid "The Partial block is used to specify a weight for a specific partial harmonic."
+# TRANS: machine translation
 msgstr "Partialブロックは特定の部分倍音の重みを指定するために使われます。"
 
 #: js/blocks/ToneBlocks.js:284
@@ -5127,6 +5284,7 @@ msgstr "ウェート倍音"
 
 #: js/blocks/ToneBlocks.js:383
 msgid "The Harmonic block will add harmonics to the contained notes."
+# TRANS: machine translation
 msgstr "Harmonicブロックは含まれる音符に倍音を追加します。"
 
 #: js/blocks/ToneBlocks.js:390
@@ -5136,6 +5294,7 @@ msgstr "ハーモニックス"
 
 #: js/blocks/ToneBlocks.js:431
 msgid "The Distortion block adds distortion to the pitch."
+# TRANS: machine translation
 msgstr "Distortionブロックは音程に歪みを加えます。"
 
 #: js/blocks/ToneBlocks.js:438
@@ -5176,6 +5335,7 @@ msgstr "大きさ"
 
 #: js/blocks/ToneBlocks.js:559
 msgid "The Phaser block adds a sweeping sound."
+# TRANS: machine translation
 msgstr "Phaserブロックはスウィープ音を加えます。"
 
 #: js/blocks/ToneBlocks.js:566
@@ -5265,6 +5425,7 @@ msgstr "音色サンプルをアップロードして、音の高さを合わせ
 
 #: js/blocks/ActionBlocks.js:58
 msgid "The Return block will return a value from an action."
+# TRANS: machine translation
 msgstr "Returnブロックはアクションから値を返します。"
 
 #: js/blocks/ActionBlocks.js:75
@@ -5273,6 +5434,7 @@ msgstr "リターン"
 
 #: js/blocks/ActionBlocks.js:128
 msgid "The Return to URL block will return a value to a webpage."
+# TRANS: machine translation
 msgstr "Return to URLブロックは値をウェブページに返します。"
 
 #: js/blocks/ActionBlocks.js:145
@@ -5284,6 +5446,7 @@ msgstr "URLに戻ります"
 #: js/blocks/ActionBlocks.js:501
 #: js/blocks/ActionBlocks.js:688
 msgid "The Calculate block returns a value calculated by an action."
+# TRANS: machine translation
 msgstr "Calculateブロックはアクションで計算された値を返します。"
 
 #: js/blocks/ActionBlocks.js:251
@@ -5303,11 +5466,13 @@ msgstr "<h2>アクションブロック（指定）</h2><br>指定したアク�
 #: js/blocks/ActionBlocks.js:791
 #: js/blocks/ActionBlocks.js:865
 msgid "The Arg block contains the value of an argument passed to an action."
+# TRANS: machine translation
 msgstr "Argブロックはアクションに渡された引数の値を含みます。"
 
 #: js/blocks/ActionBlocks.js:806
 #: js/blocks/ActionBlocks.js:878
 msgid "arg"
+# TRANS: machine translation
 msgstr "引数"
 
 #: js/blocks/ActionBlocks.js:836
@@ -5369,10 +5534,12 @@ msgstr "タートル ヒープに番号をふる"
 
 #: js/blocks/EnsembleBlocks.js:89
 msgid "The Mouse index heap block returns a value in the heap at a specified location for a specified mouse."
+# TRANS: machine translation
 msgstr "指定されたマウスの指定された位置のヒープ内の値を返します。"
 
 #: js/blocks/EnsembleBlocks.js:90
 msgid "The Turtle index heap block returns a value in the heap at a specified location for a specified turtle."
+# TRANS: machine translation
 msgstr "指定されたタートルの指定された位置のヒープ内の値を返します。"
 
 #: js/blocks/EnsembleBlocks.js:94
@@ -5411,6 +5578,7 @@ msgstr "ネズミを止める"
 
 #: js/blocks/EnsembleBlocks.js:149
 msgid "The Stop mouse block stops the specified mouse."
+# TRANS: machine translation
 msgstr "指定されたマウスを停止します。"
 
 #: js/blocks/EnsembleBlocks.js:160
@@ -5419,6 +5587,7 @@ msgstr "ネズミを止める"
 
 #: js/blocks/EnsembleBlocks.js:162
 msgid "The Stop turtle block stops the specified turtle."
+# TRANS: machine translation
 msgstr "指定されたタートルを停止します。"
 
 #: js/blocks/EnsembleBlocks.js:186
@@ -5451,6 +5620,7 @@ msgstr "ネズミをスタート"
 
 #: js/blocks/EnsembleBlocks.js:211
 msgid "The Start mouse block starts the specified mouse."
+# TRANS: machine translation
 msgstr "指定されたマウスを開始します。"
 
 #: js/blocks/EnsembleBlocks.js:222
@@ -5459,6 +5629,7 @@ msgstr "ネズミをスタートする"
 
 #: js/blocks/EnsembleBlocks.js:225
 msgid "The Start turtle block starts the specified turtle."
+# TRANS: machine translation
 msgstr "指定されたタートルを開始します。"
 
 #: js/blocks/EnsembleBlocks.js:258
@@ -5480,6 +5651,7 @@ msgstr "ネズミの色"
 
 #: js/blocks/EnsembleBlocks.js:296
 msgid "The Mouse color block returns the pen color of the specified mouse."
+# TRANS: machine translation
 msgstr "指定されたマウスのペンの色を返します。"
 
 #: js/blocks/EnsembleBlocks.js:308
@@ -5489,6 +5661,7 @@ msgstr "タートルの色"
 
 #: js/blocks/EnsembleBlocks.js:310
 msgid "The Turtle color block returns the pen color of the specified turtle."
+# TRANS: machine translation
 msgstr "指定されたタートルのペンの色を返します。"
 
 #: js/blocks/EnsembleBlocks.js:340
@@ -5498,6 +5671,7 @@ msgstr "ネズミの進む角度"
 
 #: js/blocks/EnsembleBlocks.js:342
 msgid "The Mouse heading block returns the heading of the specified mouse."
+# TRANS: machine translation
 msgstr "指定されたマウスの向きを返します。"
 
 #: js/blocks/EnsembleBlocks.js:354
@@ -5507,6 +5681,7 @@ msgstr "タートルの進む角度"
 
 #: js/blocks/EnsembleBlocks.js:356
 msgid "The Turtle heading block returns the heading of the specified turtle."
+# TRANS: machine translation
 msgstr "指定されたタートルの向きを返します。"
 
 #: js/blocks/EnsembleBlocks.js:386
@@ -5523,10 +5698,12 @@ msgstr "タートルを設定"
 
 #: js/blocks/EnsembleBlocks.js:435
 msgid "The Set mouse block sends a stack of blocks to be run by the specified mouse."
+# TRANS: machine translation
 msgstr "指定されたマウスに実行するブロックのスタックを送ります。"
 
 #: js/blocks/EnsembleBlocks.js:448
 msgid "The Set turtle block sends a stack of blocks to be run by the specified turtle."
+# TRANS: machine translation
 msgstr "指定されたタートルに実行するブロックのスタックを送ります。"
 
 #: js/blocks/EnsembleBlocks.js:482
@@ -5536,6 +5713,7 @@ msgstr "ネズミのy座標"
 
 #: js/blocks/EnsembleBlocks.js:484
 msgid "The Y mouse block returns the Y position of the specified mouse."
+# TRANS: machine translation
 msgstr "指定されたマウスのY座標を返します。"
 
 #: js/blocks/EnsembleBlocks.js:496
@@ -5545,6 +5723,7 @@ msgstr "タートルのy座標"
 
 #: js/blocks/EnsembleBlocks.js:498
 msgid "The Y turtle block returns the Y position of the specified turtle."
+# TRANS: machine translation
 msgstr "指定されたタートルのY座標を返します。"
 
 #: js/blocks/EnsembleBlocks.js:528
@@ -5554,6 +5733,7 @@ msgstr "ネズミのx座標"
 
 #: js/blocks/EnsembleBlocks.js:530
 msgid "The X mouse block returns the X position of the specified mouse."
+# TRANS: machine translation
 msgstr "指定されたマウスのX座標を返します。"
 
 #: js/blocks/EnsembleBlocks.js:542
@@ -5563,6 +5743,7 @@ msgstr "タートルのx座標"
 
 #: js/blocks/EnsembleBlocks.js:544
 msgid "The X turtle block returns the X position of the specified turtle."
+# TRANS: machine translation
 msgstr "指定されたタートルのX座標を返します。"
 
 #: js/blocks/EnsembleBlocks.js:575
@@ -5572,6 +5753,7 @@ msgstr "ネズミの演奏した音符の数"
 
 #: js/blocks/EnsembleBlocks.js:577
 msgid "The Mouse elapse notes block returns the number of notes played by the specified mouse."
+# TRANS: machine translation
 msgstr "指定されたマウスが演奏したノート数を返します。"
 
 #: js/blocks/EnsembleBlocks.js:589
@@ -5581,6 +5763,7 @@ msgstr "タートルの演奏した音符の数"
 
 #: js/blocks/EnsembleBlocks.js:591
 msgid "The Turtle elapse notes block returns the number of notes played by the specified turtle."
+# TRANS: machine translation
 msgstr "指定されたタートルが演奏したノート数を返します。"
 
 #: js/blocks/EnsembleBlocks.js:629
@@ -5590,6 +5773,7 @@ msgstr "ネズミの音高数字"
 
 #: js/blocks/EnsembleBlocks.js:631
 msgid "The Mouse pitch block returns the current pitch number being played by the specified mouse."
+# TRANS: machine translation
 msgstr "指定されたマウスが現在演奏しているピッチ番号を返します。"
 
 #: js/blocks/EnsembleBlocks.js:643
@@ -5599,6 +5783,7 @@ msgstr "タートルの音高数字"
 
 #: js/blocks/EnsembleBlocks.js:645
 msgid "The Turtle pitch block returns the current pitch number being played by the specified turtle."
+# TRANS: machine translation
 msgstr "指定されたタートルが現在演奏しているピッチ番号を返します。"
 
 #: js/blocks/EnsembleBlocks.js:749
@@ -5619,6 +5804,7 @@ msgstr "ネズミを同期させる"
 
 #: js/blocks/EnsembleBlocks.js:834
 msgid "The Mouse sync block aligns the beat count between mice."
+# TRANS: machine translation
 msgstr "マウス間のビート数を同期させるブロックです。"
 
 #: js/blocks/EnsembleBlocks.js:846
@@ -5628,10 +5814,12 @@ msgstr "タートルを同期させる"
 
 #: js/blocks/EnsembleBlocks.js:848
 msgid "The Turtle sync block aligns the beat count between turtles."
+# TRANS: machine translation
 msgstr "タートル間のビート数を同期させるブロックです。"
 
 #: js/blocks/EnsembleBlocks.js:889
 msgid "The Found mouse block will return true if the specified mouse can be found."
+# TRANS: machine translation
 msgstr "指定されたマウスが見つかった場合にtrueを返します。"
 
 #: js/blocks/EnsembleBlocks.js:895
@@ -5640,6 +5828,7 @@ msgstr "ネズミを見つけた"
 
 #: js/blocks/EnsembleBlocks.js:905
 msgid "The Found turtle block will return true if the specified turtle can be found."
+# TRANS: machine translation
 msgstr "指定されたタートルが見つかった場合にtrueを返します。"
 
 #: js/blocks/EnsembleBlocks.js:911
@@ -5652,6 +5841,7 @@ msgstr "新しいネズミ"
 
 #: js/blocks/EnsembleBlocks.js:936
 msgid "The New mouse block will create a new mouse."
+# TRANS: machine translation
 msgstr "新しいマウスを作成するブロックです。"
 
 #: js/blocks/EnsembleBlocks.js:947
@@ -5660,6 +5850,7 @@ msgstr "新しいタートル"
 
 #: js/blocks/EnsembleBlocks.js:949
 msgid "The New turtle block will create a new turtle."
+# TRANS: machine translation
 msgstr "新しいタートルを作成するブロックです。"
 
 #: js/blocks/EnsembleBlocks.js:1013
@@ -5676,6 +5867,7 @@ msgstr "タートル色を設定"
 
 #: js/blocks/EnsembleBlocks.js:1025
 msgid "The Set-turtle-color block is used to set the color of a turtle."
+# TRANS: machine translation
 msgstr "タートルの色を設定するためのブロックです。"
 
 #: js/blocks/EnsembleBlocks.js:1086
@@ -5684,6 +5876,7 @@ msgstr "<h2>文字ブロック</h2><br>このプログラムを実行してい�
 
 #: js/blocks/EnsembleBlocks.js:1095
 msgid "The Turtle-name block returns the name of a turtle."
+# TRANS: machine translation
 msgstr "タートルの名前を返すブロックです。"
 
 #: js/blocks/EnsembleBlocks.js:1118
@@ -5700,6 +5893,7 @@ msgstr "何匹のタートル"
 
 #: js/blocks/EnsembleBlocks.js:1130
 msgid "The Turtle-count block returns the number of turtles."
+# TRANS: machine translation
 msgstr "タートルカウントブロックはタートルの数を返します。"
 
 #: js/blocks/EnsembleBlocks.js:1152
@@ -5708,6 +5902,7 @@ msgstr "何匹目のネズミの名前"
 
 #: js/blocks/EnsembleBlocks.js:1155
 msgid "The Nth-Mouse name block returns the name of the nth mouse."
+# TRANS: machine translation
 msgstr "エヌス・マウス・ネームブロックはエヌ番目のマウスの名前を返します。"
 
 #: js/blocks/EnsembleBlocks.js:1161
@@ -5716,6 +5911,7 @@ msgstr "何匹目のタートルの名前"
 
 #: js/blocks/EnsembleBlocks.js:1164
 msgid "The Nth-Turtle name block returns the name of the nth turtle."
+# TRANS: machine translation
 msgstr "エヌス・タートル・ネームブロックはエヌ番目のタートルの名前を返します。"
 
 #: js/blocks/EnsembleBlocks.js:1208
@@ -5773,6 +5969,7 @@ msgstr "バックグラウンドなし"
 
 #: js/blocks/ExtrasBlocks.js:219
 msgid "The No background block eliminates the background from the saved SVG output."
+# TRANS: machine translation
 msgstr "ノー・バックグラウンドブロックは保存されたSVG出力の背景を削除します。"
 
 #: js/blocks/ExtrasBlocks.js:247
@@ -5781,10 +5978,12 @@ msgstr "ブロックを表示"
 
 #: js/blocks/ExtrasBlocks.js:249
 msgid "The Show blocks block shows the blocks."
+# TRANS: machine translation
 msgstr "ショウ・ブロックスブロックはブロックを表示します。"
 
 #: js/blocks/ExtrasBlocks.js:276
 msgid "The Hide blocks block hides the blocks."
+# TRANS: machine translation
 msgstr "ハイド・ブロックスブロックはブロックを非表示にします。"
 
 #: js/blocks/ExtrasBlocks.js:305
@@ -5798,6 +5997,7 @@ msgstr "待つ"
 
 #: js/blocks/ExtrasBlocks.js:379
 msgid "The Wait block pauses the program for a specified number of seconds."
+# TRANS: machine translation
 msgstr "ウェイトブロックは指定された秒数だけプログラムを一時停止します。"
 
 #: js/blocks/ExtrasBlocks.js:433
@@ -5845,6 +6045,7 @@ msgstr "<h2>すうちブロック</h2><br>ネズミの向いている角度を�
 
 #: js/blocks/GraphicsBlocks.js:62
 msgid "The Heading block returns the orientation of the turtle."
+# TRANS: machine translation
 msgstr "ヘディングブロックはタートルの向きを返します。"
 
 #: js/blocks/GraphicsBlocks.js:133
@@ -5853,6 +6054,7 @@ msgstr "<h2>すうちブロック</h2><br>ネズミのｙざひょう（たて�
 
 #: js/blocks/GraphicsBlocks.js:140
 msgid "The Y block returns the vertical position of the turtle."
+# TRANS: machine translation
 msgstr "Yブロックはタートルの垂直位置を返します。"
 
 #: js/blocks/GraphicsBlocks.js:149
@@ -5865,6 +6067,7 @@ msgstr "<h2>すうちブロック</h2><br>ネズミのｘざひょう（よこ�
 
 #: js/blocks/GraphicsBlocks.js:226
 msgid "The X block returns the horizontal position of the turtle."
+# TRANS: machine translation
 msgstr "Xブロックはタートルの水平方向の位置を返します。"
 
 #: js/blocks/GraphicsBlocks.js:235
@@ -5889,6 +6092,7 @@ msgstr "たていどう"
 
 #: js/blocks/GraphicsBlocks.js:417
 msgid "The Control-point 2 block sets the second control point for the Bezier curve."
+# TRANS: machine translation
 msgstr "コントロールポイント2ブロックはベジエ曲線の第2コントロールポイントを設定します。"
 
 #: js/blocks/GraphicsBlocks.js:424
@@ -5911,6 +6115,7 @@ msgstr "yざひょう（ネズミ）"
 
 #: js/blocks/GraphicsBlocks.js:468
 msgid "The Control-point 1 block sets the first control point for the Bezier curve."
+# TRANS: machine translation
 msgstr "コントロールポイント1ブロックはベジエ曲線の第1コントロールポイントを設定します。"
 
 #: js/blocks/GraphicsBlocks.js:475
@@ -5919,6 +6124,7 @@ msgstr "コントロール点１"
 
 #: js/blocks/GraphicsBlocks.js:518
 msgid "The Bezier block draws a Bezier curve."
+# TRANS: machine translation
 msgstr "ベジエブロックはベジエ曲線を描きます。"
 
 #: js/blocks/GraphicsBlocks.js:522
@@ -5927,6 +6133,7 @@ msgstr "ベジェ曲線"
 
 #: js/blocks/GraphicsBlocks.js:583
 msgid "The Arc block moves the turtle in an arc."
+# TRANS: machine translation
 msgstr "アークブロックはタートルを弧を描いて動かします。"
 
 #: js/blocks/GraphicsBlocks.js:591
@@ -5946,6 +6153,7 @@ msgstr "半径"
 #: js/blocks/GraphicsBlocks.js:1001
 #: js/blocks/GraphicsBlocks.js:1084
 msgid "Value must be within -5000 to 5000 when Wrap Mode is off."
+# TRANS: machine translation
 msgstr "ラップモードがオフのとき、値は -5000 から 5000 の範囲でなければなりません。"
 
 #: js/blocks/GraphicsBlocks.js:613
@@ -5953,6 +6161,7 @@ msgstr "ラップモードがオフのとき、値は -5000 から 5000 の範�
 #: js/blocks/GraphicsBlocks.js:1003
 #: js/blocks/GraphicsBlocks.js:1086
 msgid "Value must be within -20000 to 20000 when Wrap Mode is on."
+# TRANS: machine translation
 msgstr "ラップモードがオンのとき、値は -20000 から 20000 の範囲でなければなりません。"
 
 #: js/blocks/GraphicsBlocks.js:651
@@ -6135,6 +6344,7 @@ msgstr "カメラ"
 
 #: js/blocks/MediaBlocks.js:551
 msgid "The Camera block connects a webcam to the Show block."
+# TRANS: machine translation
 msgstr "カメラブロックはウェブカメラをショウブロックに接続します。"
 
 #: js/blocks/MediaBlocks.js:574
@@ -6143,10 +6353,12 @@ msgstr "ビデオ"
 
 #: js/blocks/MediaBlocks.js:579
 msgid "The Video block selects video for use with the Show block."
+# TRANS: machine translation
 msgstr "ビデオブロックはショウブロックで使用するビデオを選択します。"
 
 #: js/blocks/MediaBlocks.js:607
 msgid "The Open file block opens a file for use with the Show block."
+# TRANS: machine translation
 msgstr "オープンファイルブロックはショウブロックで使用するファイルを開きます。"
 
 #: js/blocks/MediaBlocks.js:645
@@ -6155,6 +6367,7 @@ msgstr "メデイアを停止"
 
 #: js/blocks/MediaBlocks.js:650
 msgid "The Stop media block stops audio or video playback."
+# TRANS: machine translation
 msgstr "ストップメディアブロックは音声または動画の再生を停止します。"
 
 #: js/blocks/MediaBlocks.js:692
@@ -6171,6 +6384,7 @@ msgstr "周波数"
 #: js/blocks/MediaBlocks.js:692
 #: plugins/rodi.rtp:193
 msgid "duration (MS)"
+# TRANS: machine translation
 msgstr "継続時間（ミリ秒）"
 
 #: js/blocks/MediaBlocks.js:728
@@ -6180,14 +6394,17 @@ msgstr "音符の高さを周波数表示へ"
 
 #: js/blocks/MediaBlocks.js:736
 msgid "The To frequency block converts a pitch name and octave to Hertz."
+# TRANS: machine translation
 msgstr "トゥーフリクエンシーブロックは音名とオクターブをヘルツに変換します。"
 
 #: js/blocks/MediaBlocks.js:812
 msgid "The Avatar block is used to change the appearance of the mouse."
+# TRANS: machine translation
 msgstr "アバターブロックはマウスの外見を変更するために使われます。"
 
 #: js/blocks/MediaBlocks.js:819
 msgid "The Avatar block is used to change the appearance of the turtle."
+# TRANS: machine translation
 msgstr "アバターブロックはタートルの外見を変更するために使われます。"
 
 #: js/blocks/MediaBlocks.js:831
@@ -6283,6 +6500,7 @@ msgstr "灰色"
 
 #: js/blocks/PenBlocks.js:261
 msgid "The Grey block returns the current pen grey value."
+# TRANS: machine translation
 msgstr "グレーブロックは現在のペンのグレー値を返します。"
 
 #: js/blocks/PenBlocks.js:319
@@ -6294,6 +6512,7 @@ msgstr "シェード"
 
 #: js/blocks/PenBlocks.js:326
 msgid "The Shade block returns the current pen shade value."
+# TRANS: machine translation
 msgstr "シェードブロックは現在のペンのシェード値を返します。"
 
 #: js/blocks/PenBlocks.js:384
@@ -6316,6 +6535,7 @@ msgstr "ペンの大きさ"
 
 #: js/blocks/PenBlocks.js:453
 msgid "The Pen size block returns the current pen size value."
+# TRANS: machine translation
 msgstr "ペンサイズブロックは現在のペンのサイズ値を返します。"
 
 #: js/blocks/PenBlocks.js:492
@@ -6324,6 +6544,7 @@ msgstr "フォントの設定"
 
 #: js/blocks/PenBlocks.js:497
 msgid "The Set font block sets the font used by the Show block."
+# TRANS: machine translation
 msgstr "フォント設定ブロックはショウブロックで使われるフォントを設定します。"
 
 #: js/blocks/PenBlocks.js:544
@@ -6332,6 +6553,7 @@ msgstr "背景ブロックは、カンバスの色をせっていする。"
 
 #: js/blocks/PenBlocks.js:575
 msgid "The Hollow line block creates a line with a hollow center."
+# TRANS: machine translation
 msgstr "ホローラインブロックは中空の線を作成します。"
 
 #: js/blocks/PenBlocks.js:583
@@ -6390,6 +6612,7 @@ msgstr "色相を設定"
 
 #: js/blocks/PenBlocks.js:966
 msgid "The Set hue block changes the color of the pen."
+# TRANS: machine translation
 msgstr "色相設定ブロックはペンの色を変更します。"
 
 #: js/blocks/PenBlocks.js:1024
@@ -6407,6 +6630,7 @@ msgstr "灰色を設定"
 
 #: js/blocks/PenBlocks.js:1096
 msgid "The Set grey block changes the vividness of the pen color."
+# TRANS: machine translation
 msgstr "グレー設定ブロックはペンの色の鮮やかさを変更します。"
 
 #: js/blocks/PenBlocks.js:1149
@@ -6419,6 +6643,7 @@ msgstr "<h2>ペンブロック</h2><br>ネズミがえがく線の色をせっ�
 
 #: js/blocks/SensorsBlocks.js:36
 msgid "The Input block prompts for keyboard input."
+# TRANS: machine translation
 msgstr "インプットブロックはキーボード入力を促します。"
 
 #: js/blocks/SensorsBlocks.js:46
@@ -6435,6 +6660,7 @@ msgstr "インプットの価値"
 
 #: js/blocks/SensorsBlocks.js:131
 msgid "The Input-value block stores the input."
+# TRANS: machine translation
 msgstr "インプット値ブロックは入力を保存します。"
 
 #: js/blocks/SensorsBlocks.js:238
@@ -6443,6 +6669,7 @@ msgstr "音量"
 
 #: js/blocks/SensorsBlocks.js:245
 msgid "The Loudness block returns the volume detected by the microphone."
+# TRANS: machine translation
 msgstr "ラウドネスブロックはマイクで検出された音量を返します。"
 
 #: js/blocks/SensorsBlocks.js:300
@@ -6451,10 +6678,12 @@ msgstr "クリック"
 
 #: js/blocks/SensorsBlocks.js:306
 msgid "The Click block triggers an event if a mouse has been clicked."
+# TRANS: machine translation
 msgstr "クリックブロックはマウスがクリックされた場合にイベントをトリガーします。"
 
 #: js/blocks/SensorsBlocks.js:313
 msgid "The Click block triggers an event if a turtle has been clicked."
+# TRANS: machine translation
 msgstr "クリックブロックはカメがクリックされた場合にイベントをトリガーします。"
 
 #: js/blocks/SensorsBlocks.js:342
@@ -6475,10 +6704,12 @@ msgstr "カーソルクリック（上）"
 
 #: js/blocks/SensorsBlocks.js:638
 msgid "The Get red block returns the red component of the pixel under the mouse."
+# TRANS: machine translation
 msgstr "Get redブロックはマウス下のピクセルの赤成分を返します。"
 
 #: js/blocks/SensorsBlocks.js:644
 msgid "The Get red block returns the red component of the pixel under the turtle."
+# TRANS: machine translation
 msgstr "Get redブロックはカメの下のピクセルの赤成分を返します。"
 
 #: js/blocks/SensorsBlocks.js:685
@@ -6488,10 +6719,12 @@ msgstr "ピクセルの色"
 
 #: js/blocks/SensorsBlocks.js:690
 msgid "The Get pixel block returns the color of the pixel under the mouse."
+# TRANS: machine translation
 msgstr "Get pixelブロックはマウス下のピクセルの色を返します。"
 
 #: js/blocks/SensorsBlocks.js:696
 msgid "The Get pixel block returns the color of the pixel under the turtle."
+# TRANS: machine translation
 msgstr "Get pixelブロックはカメの下のピクセルの色を返します。"
 
 #: js/blocks/SensorsBlocks.js:759
@@ -6528,10 +6761,12 @@ msgstr "ASCIIに"
 
 #: js/blocks/SensorsBlocks.js:939
 msgid "The To ASCII block converts numbers to letters."
+# TRANS: machine translation
 msgstr "To ASCIIブロックは数字を文字に変換します。"
 
 #: js/blocks/SensorsBlocks.js:1006
 msgid "The Keyboard block returns computer keyboard input."
+# TRANS: machine translation
 msgstr "Keyboardブロックはコンピュータのキーボード入力を返します。"
 
 #: js/blocks/WidgetBlocks.js:81
@@ -6599,12 +6834,14 @@ msgstr "ロールオフ値は -12, -24, -48, -98 デシベル / オクターヴ�
 
 #: js/blocks/WidgetBlocks.js:252
 msgid "The Temperament tool is used to define custom tuning."
+# TRANS: machine translation
 msgstr "Temperamentツールはカスタムチューニングを定義するために使用されます。"
 
 #: js/blocks/WidgetBlocks.js:332
 #: js/blocks/WidgetBlocks.js:1574
 #: js/widgets/sampler.js:501
 msgid "Upload a sample and adjust its pitch center."
+# TRANS: machine translation
 msgstr "サンプルをアップロードしてピッチセンターを調整します。"
 
 #: js/blocks/WidgetBlocks.js:339
@@ -6618,6 +6855,7 @@ msgstr "<h2>拍子ブロック</h2><br>テーブルの数字をクリックし�
 
 #: js/blocks/WidgetBlocks.js:573
 msgid "The oscilloscope block opens a tool to visualize waveforms."
+# TRANS: machine translation
 msgstr "Oscilloscopeブロックは波形を可視化するツールを開きます。"
 
 #: js/blocks/WidgetBlocks.js:578
@@ -6643,6 +6881,7 @@ msgstr "「アルペジオ」ウィジェットは コード進行 を作るた�
 
 #: js/blocks/WidgetBlocks.js:837
 msgid "The Pitch drum matrix is used to map pitches to drum sounds."
+# TRANS: machine translation
 msgstr "Pitch drumマトリックスはピッチをドラム音にマッピングするために使われます。"
 
 #: js/blocks/WidgetBlocks.js:842
@@ -6680,6 +6919,7 @@ msgstr "<h2>キーボードブロック</h2><br>ピアノのキーボードを�
 
 #: js/blocks/WidgetBlocks.js:1128
 msgid "The Pitch staircase tool to is used to generate pitches from a given ratio."
+# TRANS: machine translation
 msgstr "Pitch staircaseツールは指定された比率からピッチを生成するために使用されます。"
 
 #: js/blocks/WidgetBlocks.js:1135
@@ -6728,6 +6968,7 @@ msgstr "シンセノ音量"
 
 #: js/blocks/VolumeBlocks.js:39
 msgid "The Synth volume block returns the current volume of the current synthesizer."
+# TRANS: machine translation
 msgstr "Synth volumeブロックは現在のシンセサイザーの音量を返します。"
 
 #: js/blocks/VolumeBlocks.js:105
@@ -6736,6 +6977,7 @@ msgstr "マスター音量"
 
 #: js/blocks/VolumeBlocks.js:109
 msgid "The Master volume block returns the master volume."
+# TRANS: machine translation
 msgstr "Master volumeブロックはマスターボリュームを返します。"
 
 #: js/blocks/VolumeBlocks.js:355
@@ -6785,6 +7027,7 @@ msgstr "ステレオを設定"
 
 #: js/blocks/VolumeBlocks.js:603
 msgid "The Set Panning block sets the panning for all synthesizers."
+# TRANS: machine translation
 msgstr "Set Panningブロックはすべてのシンセのパンを設定します。"
 
 #: js/blocks/VolumeBlocks.js:625
@@ -6802,6 +7045,7 @@ msgstr "<h2>全体の音量をせっていブロック</h2><br>全体の音量�
 
 #: js/blocks/VolumeBlocks.js:784
 msgid "The Set relative volume block changes the volume of the contained notes."
+# TRANS: machine translation
 msgstr "Set relative volumeブロックは含まれる音符の音量を変更します。"
 
 #: js/blocks/VolumeBlocks.js:791
@@ -7062,6 +7306,7 @@ msgstr "メトロノーム"
 
 #: js/widgets/musickeyboard.js:1574
 msgid "Note value"
+# TRANS: machine translation
 msgstr "ノートの値"
 
 #: js/widgets/musickeyboard.js:3209
@@ -7142,10 +7387,12 @@ msgstr "リズムメーカーの音の長さは、最大２５６です。"
 
 #: js/widgets/sampler.js:235
 msgid "Recording started"
+# TRANS: machine translation
 msgstr "録音開始"
 
 #: js/widgets/sampler.js:243
 msgid "Recording complete"
+# TRANS: machine translation
 msgstr "録音完了"
 
 #: js/widgets/sampler.js:281
@@ -7229,6 +7476,7 @@ msgstr "試す"
 
 #: js/widgets/temperament.js:888
 msgid "The Number of divisions is too large."
+# TRANS: machine translation
 msgstr "分割数が大きすぎます。"
 
 #: js/widgets/temperament.js:1023
@@ -7237,6 +7485,7 @@ msgstr "反復"
 
 #: js/widgets/temperament.js:1549
 msgid "The octave ratio has changed. This changes temperament significantly."
+# TRANS: machine translation
 msgstr "オクターブ比が変わりました。これにより調律が大きく変わります。"
 
 #: js/widgets/temperament.js:2177
@@ -9249,4 +9498,3 @@ msgstr "動き出し"
 
 #~ msgid "Fullscreen"
 #~ msgstr "フルスクリーン"
-
