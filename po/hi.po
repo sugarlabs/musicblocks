@@ -1060,7 +1060,7 @@ msgstr "मान"
 #: js/blocks.js:4465
 msgid "Forever loop detected inside a note value block. Unexpected things may happen."
 # TRANS: machine translation
-msgstr "नोट वैल्यू ब्लॉक के अंदर एक अनंत लूप पाया गया है। अप्रत्याशित चीज़ें हो सकती हैं।"
+msgstr "नोट वैल्यू ब्लॉक के अंदर एक अनंत लूप पाया गया है। समस्या आ सकती है।"
 
 #: js/blocks.js:4988
 msgid "There is no block selected."
@@ -12817,4 +12817,5 @@ msgstr "सरकाय"
 
 #~ msgid "Spanish"
 #~ msgstr "स्पैनिश"
+
 
