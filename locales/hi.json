@@ -194,7 +194,8 @@
   "Save stack": "स्टैक को सेव करें",
   "Help": "मदद",
   "In order to copy a sample, you must reload the widget, import the sample again, and export it.": "सैंपल कॉपी करने के लिए, आपको विजेट को फिर से लोड करना होगा, सैंपल को पुनः इम्पोर्ट करना होगा, और फिर इसे एक्सपोर्ट करना होगा।",
-  "You have chosen key for your pitch preview.": "आपने अपनी पिच पूर्वावलोकन के लिए कुंजी चुनी है।",
+  "You have chosen key for your pitch preview.": "आपने अपनी पिच पूर्वावलोकन के लिए चाबी चुनी है।",
+
   "rhythm": "रिद्धम",
   "tone": "स्वर",
   "pen": "क़लम",
