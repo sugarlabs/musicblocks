@@ -1,0 +1,71 @@
+/* Dark mode wheel nav slices for container #wheel */
+.wheelnav-wheel-slice-basic-0,
+.wheelnav-wheel-slice-basic-1,
+.wheelnav-wheel-slice-basic-2 {
+  fill: #222;
+  stroke: #444;
+  cursor: pointer;
+}
+
+.wheelnav-wheel-slice-hover-0,
+.wheelnav-wheel-slice-hover-1,
+.wheelnav-wheel-slice-hover-2 {
+  fill: #555;
+  stroke: #666;
+  cursor: pointer;
+}
+
+.wheelnav-wheel-slice-selected-0,
+.wheelnav-wheel-slice-selected-1,
+.wheelnav-wheel-slice-selected-2 {
+  fill: #888;
+  stroke: #aaa;
+  cursor: default;
+}
+
+/* Dark mode titles for container #wheel */
+.wheelnav-wheel-title-basic-0,
+.wheelnav-wheel-title-basic-1,
+.wheelnav-wheel-title-basic-2 {
+  fill: #eee;
+  cursor: pointer;
+}
+
+.wheelnav-wheel-title-hover-0,
+.wheelnav-wheel-title-hover-1,
+.wheelnav-wheel-title-hover-2 {
+  fill: #fff;
+  cursor: pointer;
+}
+
+.wheelnav-wheel-title-selected-0,
+.wheelnav-wheel-title-selected-1,
+.wheelnav-wheel-title-selected-2 {
+  fill: #ccc;
+  cursor: default;
+}
+
+/* Dark mode lines for container #wheel */
+.wheelnav-wheel-line-basic-0,
+.wheelnav-wheel-line-basic-1,
+.wheelnav-wheel-line-basic-2 {
+  stroke: #444;
+  stroke-width: 1;
+  cursor: pointer;
+}
+
+.wheelnav-wheel-line-hover-0,
+.wheelnav-wheel-line-hover-1,
+.wheelnav-wheel-line-hover-2 {
+  stroke: #666;
+  stroke-width: 2;
+  cursor: pointer;
+}
+
+.wheelnav-wheel-line-selected-0,
+.wheelnav-wheel-line-selected-1,
+.wheelnav-wheel-line-selected-2 {
+  stroke: #888;
+  stroke-width: 1;
+  cursor: default;
+}
