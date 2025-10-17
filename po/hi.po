@@ -954,7 +954,7 @@ msgstr "एक संख्या नहीं"
 #: js/block.js:4418
 msgid "Octave value must be between 1 and 8."
 # TRANS: machine translation
-msgstr "ऑक्टेव मान 1 से 8 के बीच होना चाहिए।"
+msgstr "ऑक्टेव का मान 1 से 8 के बीच होना चाहिए।"
 
 #: js/block.js:4426
 msgid "Numbers can have at most 10 digits."
@@ -1317,12 +1317,12 @@ msgstr "मदद"
 #: js/piemenus.js:3412
 msgid "In order to copy a sample, you must reload the widget, import the sample again, and export it."
 # TRANS: machine translation
-msgstr "सैंपल कॉपी करने के लिए, आपको विजेट को फिर से लोड करना होगा, सैंपल को पुनः आयात करना होगा, और फिर इसे निर्यात करना होगा।"
+msgstr "सैंपल कॉपी करने के लिए, आपको विजेट को फिर से लोड करना होगा, सैंपल को पुनः इम्पोर्ट करना होगा, और फिर इसे एक्सपोर्ट करना होगा।"
 
 #: js/piemenus.js:3801
 msgid "You have chosen key for your pitch preview."
 # TRANS: machine translation
-msgstr "आपने अपनी पिच पूर्वावलोकन के लिए कुंजी चुनी है।"
+msgstr "आपने अपनी पिच पूर्वावलोकन के लिए चाबी चुनी है।"
 
 #: js/rubrics.js:523
 #: js/turtledefs.js:122
@@ -2141,7 +2141,7 @@ msgstr "सहायक उपकरण पट्टी को विस्त�
 #: js/turtledefs.js:594
 msgid "Displays help messages for the main and auxiliary toolbar, right-click contextual menu for blocks and canvas, and palettes."
 # TRANS: machine translation
-msgstr "मुख्य और सहायक टूलबार, ब्लॉक्स और कैनवास के राइट-क्लिक संदर्भ मेनू, और पैलेट्स के लिए सहायता संदेश दिखाता है।"
+msgstr "मुख्य और सहायक टूलबार, ब्लॉक्स और कैनवास के राइट-क्लिक संदर्भ मेन्यू, और पैलेट्स के लिए सहायता संदेश दिखाता है।"
 
 #: js/turtledefs.js:600
 msgid "Click to run the project in slow mode."
@@ -2219,7 +2219,7 @@ msgstr "अपनी भाषा प्राथमिकता का चय�
 #: js/turtledefs.js:697
 msgid "Contextual Menu for Blocks"
 # TRANS: machine translation
-msgstr "ब्लॉक्स के लिए संदर्भ मेनू"
+msgstr "ब्लॉक्स के लिए संदर्भ मेन्यू"
 
 #: js/turtledefs.js:698
 msgid "Right-click on a block to access common actions."
@@ -2254,7 +2254,7 @@ msgstr "आप डू ब्लॉक बनाने के लिए डी �
 #: js/turtledefs.js:730
 msgid "Contextual Menu for Canvas"
 # TRANS: machine translation
-msgstr "कैनवास के लिए संदर्भ मेनू"
+msgstr "कैनवास के लिए संदर्भ मेन्यू"
 
 #: js/turtledefs.js:731
 msgid "Right-click on the canvas to perform additional canvas-related tasks."
@@ -2269,7 +2269,7 @@ msgstr "कार्टेशियन या पोलर ग्रिड क�
 #: js/turtledefs.js:740
 msgid "Turn on/off music staffs."
 # TRANS: machine translation
-msgstr "म्यूजिक स्टाफ को चालू/बंद करें।"
+msgstr "म्यूजिक स्टाफों को चालू/बंद करें।"
 
 #: js/turtledefs.js:745
 #: js/turtles.js:959
@@ -3059,19 +3059,19 @@ msgstr "सिम्पल 4"
 #. TRANS: white noise synthesizer
 msgid "white noise"
 # TRANS: machine translation
-msgstr "व्हाइट नॉइज़"
+msgstr "सफ़ेद नॉइज़"
 
 #: js/utils/musicutils.js:1130
 #: js/utils/synthutils.js:60
 #. TRANS: brown noise synthesizer
-msgid "brown noise"
+msgid "भूरी noise"
 msgstr "ब्राउन नॉइज़"
 
 #: js/utils/musicutils.js:1131
 #: js/utils/synthutils.js:62
 #. TRANS: pink noise synthesizer
 msgid "pink noise"
-msgstr "पिंक नॉइज़"
+msgstr "गुलाबी नॉइज़"
 
 #: js/utils/musicutils.js:1133
 #: js/utils/synthutils.js:152
@@ -3422,7 +3422,7 @@ msgstr "और"
 #: js/blocks/BooleanBlocks.js:218
 msgid "The Or block is the logical or operator."
 # TRANS: machine translation
-msgstr "ओर ब्लॉक तार्किक ओर ऑपरेटर है।"
+msgstr "'ओर' ब्लॉक तार्किक ओर ऑपरेटर है।"
 
 #: js/blocks/BooleanBlocks.js:236
 msgid "or"
@@ -3443,7 +3443,7 @@ msgstr "इक्वल ब्लॉक यदि दो नंबर समा�
 #: js/blocks/BooleanBlocks.js:909
 msgid "The Not-equal-to block returns True if the two numbers are not equal to each other."
 # TRANS: machine translation
-msgstr "नॉट-इक्वल-टू ब्लॉक तब ट्रू लौटाता है जब दो नंबर एक-दूसरे के बराबर न हों।"
+msgstr "'नॉट-इक्वल-टू' ब्लॉक तब 'ट्रू' लौटाता है जब दो नंबर एक-दूसरे के बराबर न हों।"
 
 #: js/blocks/BooleanBlocks.js:1008
 msgid "The Boolean block is used to specify true or false."
