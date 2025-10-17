@@ -138,7 +138,8 @@
   "on2": "ऑन2",
   "off": "ऑफ",
   "Not a number": "एक संख्या नहीं",
-  "Octave value must be between 1 and 8.": "ऑक्टेव मान 1 से 8 के बीच होना चाहिए।",
+  "Octave value must be between 1 and 8.": "ऑक्टेव का मान 1 से 8 के बीच होना चाहिए।",
+
   "Numbers can have at most 10 digits.": "संख्याओं में अधिकतम 10 अंक हो सकते हैं।",
   "box": "बक्सा",
   "Consider breaking this stack into parts.": "इस स्टैक को भागों में बाँटने का विचार करें।",
