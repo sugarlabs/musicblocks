@@ -150,7 +150,7 @@
   "store in": "में भंडारित करें",
   "name": "नाम",
   "value": "मान",
-  "Forever loop detected inside a note value block. Unexpected things may happen.": "नोट वैल्यू ब्लॉक के अंदर एक अनंत लूप पाया गया है। अप्रत्याशित चीज़ें हो सकती हैं।",
+  "Forever loop detected inside a note value block. Unexpected things may happen.": "नोट वैल्यू ब्लॉक के अंदर एक अनंत लूप पाया गया है। समस्या आ सकती है।",
   "There is no block selected.": "कोई ब्लॉक चयन नहीं किया गया है।",
   "avatar": "अवतार",
   "sample": "सैम्पल",
@@ -1539,4 +1539,5 @@
   "infrared light (left)": "इंफ्रारेड लाइट (बाएं)",
   "infrared light (right)": "इंफ्रारेड लाइट (दाएं)",
   "move": "सरकाय"
+
 }
