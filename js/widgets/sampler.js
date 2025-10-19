@@ -601,7 +601,7 @@ function SampleWidget() {
 
                 try {
                     generating = true;
-                    activity.textMsg(_("Generating Audio..."), 2500);
+                    activity.textMsg(_("Generating Audio... (It may take up to 1 minute)"), 2500);
 
                     blinkInterval = setInterval(() => {
                         activity.textMsg(_("Generating Audio..."), 1000);
