@@ -840,7 +840,7 @@ function setupVolumeBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played." +
+                _("The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played.") +
                     " " +
                     _("For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."),
                 "documentation",
