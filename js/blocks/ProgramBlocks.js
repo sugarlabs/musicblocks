@@ -919,9 +919,7 @@ function setupProgramBlocks(activity) {
             super("runblock");
             this.setPalette("program", activity);
             this.setHelpString([
-                _(
-                    "The Run block block runs a block. It accepts two types of arguments: block number or block name."
-                ),
+                _("The Run block block runs a block. It accepts two types of arguments: block number or block name."),
                 "documentation",
                 ""
             ]);

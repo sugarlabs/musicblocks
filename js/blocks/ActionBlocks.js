@@ -1207,9 +1207,7 @@ function setupActionBlocks(activity) {
             this.setHelpString([
                 _("Each Start block is a separate voice.") +
                     " " +
-                    _(
-                        "All of the Start blocks run at the same time when the Play button is pressed."
-                    ),
+                    _("All of the Start blocks run at the same time when the Play button is pressed."),
                 "documentation",
                 ""
             ]);
@@ -1297,9 +1295,7 @@ function setupActionBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _(
-                    "The Action block is used to group together blocks so that they can be used more than once."
-                ) +
+                _("The Action block is used to group together blocks so that they can be used more than once.") +
                     " " +
                     _("It is often used for storing a phrase of music that is repeated."),
                 "documentation",

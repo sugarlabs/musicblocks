@@ -389,9 +389,7 @@ function setupBooleanBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _(
-                    "The Greater-than block returns True if the top number is greater than the bottom number."
-                ),
+                _("The Greater-than block returns True if the top number is greater than the bottom number."),
                 "documentation",
                 ""
             ]);
@@ -495,9 +493,7 @@ function setupBooleanBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _(
-                    "The Less-than block returns True if the top number is less than the bottom number."
-                ),
+                _("The Less-than block returns True if the top number is less than the bottom number."),
                 "documentation",
                 ""
             ]);
@@ -596,9 +592,7 @@ function setupBooleanBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _(
-                    "The Less-than-or-equal-to block returns True if the top number is less than or equal to the bottom number."
-                ),
+                _("The Less-than-or-equal-to block returns True if the top number is less than or equal to the bottom number."),
                 "documentation",
                 ""
             ]);
@@ -697,9 +691,7 @@ function setupBooleanBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _(
-                    "The Greater-than-or-equal-to block returns True if the top number is greater than or equal to the bottom number."
-                ),
+                _("The Greater-than-or-equal-to block returns True if the top number is greater than or equal to the bottom number."),
                 "documentation",
                 ""
             ]);

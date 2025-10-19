@@ -379,18 +379,14 @@ function setupDrumBlocks(activity) {
              */
             if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    _(
-                        "The Set drum block will select a drum sound to replace the pitch of any contained notes."
-                    ),
+                    _("The Set drum block will select a drum sound to replace the pitch of any contained notes."),
                     "documentation",
                     null,
                     "rhythmruler2"
                 ]);
             } else {
                 this.setHelpString([
-                    _(
-                        "The Set drum block will select a drum sound to replace the pitch of any contained notes."
-                    ) +
+                    _("The Set drum block will select a drum sound to replace the pitch of any contained notes.") +
                         " " +
                         _("In the example above, a kick drum sound will be played instead of sol."),
                     "documentation",
