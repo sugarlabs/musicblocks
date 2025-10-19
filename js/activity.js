@@ -6572,9 +6572,7 @@ class Activity {
                                     that.refreshCanvas();
                                 } catch (e) {
                                     that.errorMsg(
-                                        _(
-                                            "Cannot load project from the file. Please check the file type."
-                                        )
+                                        _("Cannot load project from the file. Please check the file type.")
                                     );
                                     // eslint-disable-next-line no-console
                                     console.error(e);

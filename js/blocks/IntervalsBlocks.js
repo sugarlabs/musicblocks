@@ -50,9 +50,7 @@ function setupIntervalsBlocks(activity) {
 
             // Set the help string for the SetTemperament block
             this.setHelpString([
-                _(
-                    "The Set temperament block is used to choose the tuning system used by Music Blocks."
-                ),
+                _("The Set temperament block is used to choose the tuning system used by Music Blocks."),
                 "documentation",
                 ""
             ]);
@@ -264,9 +262,7 @@ function setupIntervalsBlocks(activity) {
             // Set the palette, activity, help string, beginner block, hidden status, and form the block with specific parameters
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _(
-                    "The Interval number block returns the number of scalar steps in the current interval."
-                ),
+                _("The Interval number block returns the number of scalar steps in the current interval."),
                 "documentation",
                 ""
             ]);
@@ -319,9 +315,7 @@ function setupIntervalsBlocks(activity) {
             // Set the palette, activity, help string, beginner block, hidden status, and form the block with specific parameters
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _(
-                    "The Current interval block returns the name of scalar steps in the current interval."
-                ),
+                _("The Current interval block returns the name of scalar steps in the current interval."),
                 "documentation",
                 ""
             ]);
@@ -376,9 +370,7 @@ function setupIntervalsBlocks(activity) {
             // Set the palette, activity, help string, and form the block with specific parameters
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _(
-                    "The Semi-tone interval block measures the distance between two notes in semi-tones."
-                ),
+                _("The Semi-tone interval block measures the distance between two notes in semi-tones."),
                 "documentation",
                 ""
             ]);
@@ -671,9 +663,7 @@ function setupIntervalsBlocks(activity) {
                 11, 12
             ];
             this.setHelpString([
-                _(
-                    "The Semi-tone interval block calculates a relative interval based on half steps."
-                ) +
+                _("The Semi-tone interval block calculates a relative interval based on half steps.") +
                     " " +
                     _("In the figure, we add sol# to sol."),
                 "documentation",
@@ -726,9 +716,7 @@ function setupIntervalsBlocks(activity) {
             super("arpeggio");
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _(
-                    "The Arpeggio block will run each note block multiple times, adding a transposition based on the specified chord."
-                ) +
+                _("The Arpeggio block will run each note block multiple times, adding a transposition based on the specified chord.") +
                     " " +
                     _("The output of the example is: do, mi, sol, sol, ti, mi"),
                 "documentation",
@@ -1057,9 +1045,7 @@ function setupIntervalsBlocks(activity) {
             this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.beginnerBlock(true);
             this.setHelpString([
-                _(
-                    "The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode."
-                ) +
+                _("The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode.") +
                     " " +
                     _("In the figure, we add la to sol."),
                 "documentation",
@@ -1108,9 +1094,7 @@ function setupIntervalsBlocks(activity) {
             super("definemode");
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _(
-                    "The Define mode block allows you to define a custom mode by specifying pitch numbers."
-                ),
+                _("The Define mode block allows you to define a custom mode by specifying pitch numbers."),
                 "documentation",
                 null,
                 "definemode"
@@ -1174,13 +1158,9 @@ function setupIntervalsBlocks(activity) {
             this.setPalette("intervals", activity);
             this.beginnerBlock(true);
             this.setHelpString([
-                _(
-                    "When Movable do is false, the solfege note names are always tied to specific pitches,"
-                ) +
+                _("When Movable do is false, the solfege note names are always tied to specific pitches,") +
                     " " +
-                    _(
-                        'eg "do" is always "C-natural" when Movable do is true, the solfege note names are assigned to scale degrees "do" is always the first degree of the major scale.'
-                    ),
+                    _('eg "do" is always "C-natural" when Movable do is true, the solfege note names are assigned to scale degrees "do" is always the first degree of the major scale.'),
                 "documentation",
                 null,
                 "moveablehelp"

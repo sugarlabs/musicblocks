@@ -1150,9 +1150,7 @@ function setupGraphicsBlocks(activity) {
 
             // Set the help string for the Wrap block
             this.setHelpString([
-                _(
-                    "The Wrap block enables or disables screen wrapping for the graphics actions within it."
-                ),
+                _("The Wrap block enables or disables screen wrapping for the graphics actions within it."),
                 "documentation",
                 null,
                 "wraphelp"

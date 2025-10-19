@@ -344,18 +344,14 @@ function setupSensorsBlocks(activity) {
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _(
-                        "The Cursor over block triggers an event when the cursor is moved over a mouse."
-                    ),
+                    _("The Cursor over block triggers an event when the cursor is moved over a mouse."),
                     "documentation",
                     null,
                     "cursoroverhelp"
                 ]);
             } else {
                 this.setHelpString([
-                    _(
-                        "The Cursor over block triggers an event when the cursor is moved over a turtle."
-                    ),
+                    _("The Cursor over block triggers an event when the cursor is moved over a turtle."),
                     "documentation",
                     null,
                     "cursoroverhelp"
@@ -390,9 +386,7 @@ function setupSensorsBlocks(activity) {
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
                     // TRANS: hover
-                    _(
-                        "The Cursor out block triggers an event when the cursor is moved off of a mouse."
-                    ),
+                    _("The Cursor out block triggers an event when the cursor is moved off of a mouse."),
                     "documentation",
                     null,
                     "cursorouthelp"
@@ -400,9 +394,7 @@ function setupSensorsBlocks(activity) {
             } else {
                 this.setHelpString([
                     // TRANS: hover
-                    _(
-                        "The Cursor out block triggers an event when the cursor is moved off of a turtle."
-                    ),
+                    _("The Cursor out block triggers an event when the cursor is moved off of a turtle."),
                     "documentation",
                     null,
                     "cursorouthelp"
@@ -435,18 +427,14 @@ function setupSensorsBlocks(activity) {
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _(
-                        "The Cursor button down block triggers an event when the cursor button is pressed on a mouse."
-                    ),
+                    _("The Cursor button down block triggers an event when the cursor button is pressed on a mouse."),
                     "documentation",
                     null,
                     "cursordownhelp"
                 ]);
             } else {
                 this.setHelpString([
-                    _(
-                        "The Cursor button down block triggers an event when the cursor button is pressed on a turtle."
-                    ),
+                    _("The Cursor button down block triggers an event when the cursor button is pressed on a turtle."),
                     "documentation",
                     null,
                     "cursordownhelp"
@@ -479,18 +467,14 @@ function setupSensorsBlocks(activity) {
 
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _(
-                        "The Cursor button up block triggers an event when the cursor button is released while over a mouse."
-                    ),
+                    _("The Cursor button up block triggers an event when the cursor button is released while over a mouse."),
                     "documentation",
                     null,
                     "cursoruphelp"
                 ]);
             } else {
                 this.setHelpString([
-                    _(
-                        "The Cursor button up block triggers an event when the cursor button is released while over a turtle."
-                    ),
+                    _("The Cursor button up block triggers an event when the cursor button is released while over a turtle."),
                     "documentation",
                     null,
                     "cursoruphelp"
@@ -523,17 +507,13 @@ function setupSensorsBlocks(activity) {
             this.parameter = true;
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _(
-                        "The Get blue block returns the blue component of the pixel under the mouse."
-                    ),
+                    _("The Get blue block returns the blue component of the pixel under the mouse."),
                     "documentation",
                     ""
                 ]);
             } else {
                 this.setHelpString([
-                    _(
-                        "The Get blue block returns the blue component of the pixel under the turtle."
-                    ),
+                    _("The Get blue block returns the blue component of the pixel under the turtle."),
                     "documentation",
                     ""
                 ]);
@@ -579,17 +559,13 @@ function setupSensorsBlocks(activity) {
             this.parameter = true;
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _(
-                        "The Get green block returns the green component of the pixel under the mouse."
-                    ),
+                    _("The Get green block returns the green component of the pixel under the mouse."),
                     "documentation",
                     ""
                 ]);
             } else {
                 this.setHelpString([
-                    _(
-                        "The Get green block returns the green component of the pixel under the turtle."
-                    ),
+                    _("The Get green block returns the green component of the pixel under the turtle."),
                     "documentation",
                     ""
                 ]);
@@ -815,9 +791,7 @@ function setupSensorsBlocks(activity) {
             this.beginnerBlock(!(this.lang === "ja"));
 
             this.setHelpString([
-                _(
-                    "The Time block returns the number of seconds that the program has been running."
-                ),
+                _("The Time block returns the number of seconds that the program has been running."),
                 "documentation",
                 ""
             ]);

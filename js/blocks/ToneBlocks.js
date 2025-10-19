@@ -314,9 +314,7 @@ function setupToneBlocks(activity) {
             super("harmonic");
             this.setPalette("tone", activity);
             this.setHelpString([
-                _(
-                    "The Weighted partials block is used to specify the partials associated with a timbre."
-                ),
+                _("The Weighted partials block is used to specify the partials associated with a timbre."),
                 "documentation",
                 ""
             ]);
@@ -842,9 +840,7 @@ function setupToneBlocks(activity) {
             super("setdefaultinstrument", _("set default instrument"));
             this.setPalette("tone", activity);
             this.setHelpString([
-                _(
-                    "The set default instrument block changes the default instrument from electronic synth to the instrument of your choice."
-                ),
+                _("The set default instrument block changes the default instrument from electronic synth to the instrument of your choice."),
                 "documentation",
                 ""
             ]);
