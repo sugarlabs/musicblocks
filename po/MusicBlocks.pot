@@ -6353,8 +6353,7 @@ msgid "set relative volume"
 msgstr ""
 
 #: js/blocks/VolumeBlocks.js:843
-msgid "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played.\" +
-"
+msgid "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
 msgstr ""
 
 #: js/blocks/VolumeBlocks.js:845
@@ -6366,8 +6365,7 @@ msgid "decrescendo"
 msgstr ""
 
 #: js/blocks/VolumeBlocks.js:903
-msgid "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played.\" +
-"
+msgid "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
 msgstr ""
 
 #: js/blocks/VolumeBlocks.js:905
@@ -7693,7 +7691,10 @@ msgid "Webcam"
 msgstr ""
 
 #: js/widgets/legobricks.js:271
-msgid "LEGO Bricks - Phrase Maker with \" + this.rowLabels.length + \" pitch rows (sorted by frequency, Instrument: \" + this.selectedInstrument + "
+msgid "LEGO Bricks - Phrase Maker with"
+msgstr ""
+
+msgid "pitch rows (sorted by frequency, Instrument:"
 msgstr ""
 
 #: js/widgets/legobricks.js:696
