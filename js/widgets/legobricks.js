@@ -268,7 +268,7 @@ function LegoWidget() {
         this._initializeRowHeaders();
         
         this._scale();
-        this.activity.textMsg(_("LEGO Bricks - Phrase Maker with " + this.rowLabels.length + " pitch rows (sorted by frequency, Instrument: " + this.selectedInstrument + ")"));
+        this.activity.textMsg(_("LEGO Bricks - Phrase Maker with") + " " + this.rowLabels.length + " " + _("pitch rows (sorted by frequency, Instrument:" + " " + this.selectedInstrument + ")"));
     };
 
     /**
