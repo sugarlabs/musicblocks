@@ -4875,7 +4875,7 @@ msgstr "जब मूवेबल डू झूठा होता है, त�
 
 #: js/blocks/IntervalsBlocks.js:1163
 msgid "eg \"do\" is always \"C-natural\" when Movable do is true, the solfege note names are assigned to scale degrees \"do\" is always the first degree of the major scale."
-msgstr ""
+msgstr "जैसे 'डू' हमेशा 'C-नेचुरल' होता है; जब मूवेबल डू सच होता है, तो सोल्फेज नोट नाम स्केल डिग्री को सौंपे जाते हैं, 'डू' हमेशा मेजर स्केल की पहली डिग्री होती है।"
 
 #: js/blocks/IntervalsBlocks.js:1204
 #.TRANS: mode length is the number of notes in the mode, e.g., 7 for major and minor scales; 12 for chromatic scales
@@ -6449,9 +6449,8 @@ msgid "set relative volume"
 msgstr "रिलेटिव वॉल्यूम सेट करें"
 
 #: js/blocks/VolumeBlocks.js:843
-msgid "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played.\" +
-"
-msgstr ""
+msgid "The Decrescendo block will decrease the volume of the contained notes by a specified amount for every note played."
+msgstr "डिक्रेसेंडो ब्लॉक में शामिल नोट्स की आवाज़ हर बजाए गए नोट पर एक निर्दिष्ट मात्रा से कम होगी।"
 
 #: js/blocks/VolumeBlocks.js:845
 msgid "For example if you have 7 notes in sequence contained in a Decrescendo block with a value of 5 the final note will be at 35% less than the starting volume."
@@ -6462,9 +6461,8 @@ msgid "decrescendo"
 msgstr "डेक्रेसेंडो"
 
 #: js/blocks/VolumeBlocks.js:903
-msgid "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played.\" +
-"
-msgstr ""
+msgid "The Crescendo block will increase the volume of the contained notes by a specified amount for every note played."
+msgstr "रेसेन्डो ब्लॉक में शामिल नोट्स की आवाज़ हर बजाए गए नोट पर एक निर्दिष्ट मात्रा से बढ़ेगी।"
 
 #: js/blocks/VolumeBlocks.js:905
 msgid "For example if you have 7 notes in sequence contained in a Crescendo block with a value of 5 the final note will be at 35% more than the starting volume."
@@ -7824,8 +7822,8 @@ msgid "Webcam"
 msgstr "वेबकैम"
 
 #: js/widgets/legobricks.js:271
-msgid "LEGO Bricks - Phrase Maker with \" + this.rowLabels.length + \" pitch rows (sorted by frequency, Instrument: \" + this.selectedInstrument + "
-msgstr ""
+msgid "LEGO Bricks - Phrase Maker with ' + this.rowLabels.length + ' pitch rows (sorted by frequency, Instrument: ' + this.selectedInstrument + "
+msgstr "लेगो ब्रिक्स - फ्रेज़ मेकर जिसमें ' + this.rowLabels.length + ' पिच पंक्तियाँ हैं (फ्रीक्वेंसी के अनुसार क्रमबद्ध, वाद्य यंत्र: ' + this.selectedInstrument"
 
 #: js/widgets/legobricks.js:696
 msgid "No color data to save. Please scan an image first."
