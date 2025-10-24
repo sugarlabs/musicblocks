@@ -399,7 +399,9 @@ const piemenuPitches = (
             }
 
             const label = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
-            const i = noteLabels.indexOf(label);
+            // Ensure consistent case for lookup - convert to lowercase for comparison
+            const normalizedLabel = label.toLowerCase();
+            const i = noteLabels.indexOf(normalizedLabel);
 
             // Are we wrapping across C? We need to compare with the previous pitch
             if (prevPitch === null) {
@@ -541,7 +543,9 @@ const piemenuPitches = (
 
     const __selectionChangedSolfege = () => {
         selection["note"] = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
-        const i = noteLabels.indexOf(selection["note"]);
+        // Ensure consistent case for lookup - convert to lowercase for comparison
+        const normalizedNote = selection["note"].toLowerCase();
+        const i = noteLabels.indexOf(normalizedNote);
         that.value = noteValues[i];
 
         // Auto-selection of sharps and flats in fixed solfege handles
@@ -558,21 +562,23 @@ const piemenuPitches = (
                     )
                     : true))
         ) {
-            let i = scale.indexOf(selection["note"]);
+            // Use normalized note for scale lookup
+            const normalizedSelectionNote = selection["note"].toLowerCase();
+            let i = scale.indexOf(normalizedSelectionNote);
             if (i === -1) {
                 i = scale.indexOf(that.value);
             }
             if (i === -1) {
-                i = NOTENAMES.indexOf(FIXEDSOLFEGE[selection["note"]]);
+                i = NOTENAMES.indexOf(FIXEDSOLFEGE[normalizedSelectionNote]);
             }
             if (i === -1) {
                 i = NOTENAMES.indexOf(FIXEDSOLFEGE[that.value]);
             }
             if (
                 NOTENAMES.includes(selection["note"]) ||
-                scale[i][0] === FIXEDSOLFEGE[selection["note"]] ||
+                scale[i][0] === FIXEDSOLFEGE[normalizedSelectionNote] ||
                 scale[i][0] === FIXEDSOLFEGE[that.value] ||
-                scale[i][0] === selection["note"]
+                scale[i][0] === normalizedSelectionNote
             ) {
                 selection["attr"] = scale[i].substr(1);
             } else {

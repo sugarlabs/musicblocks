@@ -5787,9 +5787,12 @@ const i18nSolfege = (note) => {
     const solfnotes_ = _("ti la sol fa mi re do").split(" ");
     const obj = splitSolfege(note);
 
-    const i = SOLFNOTES.indexOf(obj[0]);
+    // Normalize the note part to lowercase for lookup
+    const normalizedNote = obj[0].toLowerCase();
+    const i = SOLFNOTES.indexOf(normalizedNote);
     if (i !== -1) {
-        return solfnotes_[i] + obj[1];
+        // Ensure the internationalized solfege note is always lowercase
+        return solfnotes_[i].toLowerCase() + obj[1];
     } else {
         // Wasn't solfege so it doesn't need translation.
         return note;

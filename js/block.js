@@ -3433,9 +3433,11 @@ class Block {
             // solfnotes_ is used in the interface for internationalization.
             //.TRANS: the note names must be separated by single spaces
             const solfnotes_ = _("ti la sol fa mi re do").split(" ");
+            // Ensure all solfege notes are lowercase for consistent processing
+            const normalizedSolfnotes_ = solfnotes_.map(note => note.toLowerCase());
 
             if (this.piemenuOKtoLaunch()) {
-                piemenuPitches(this, solfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
+                piemenuPitches(this, normalizedSolfnotes_, SOLFNOTES, SOLFATTRS, obj[0], obj[1]);
             }
         } else if (this.name === "scaledegree2") {
             obj = splitScaleDegree(this.value);
