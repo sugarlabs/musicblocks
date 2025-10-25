@@ -94,24 +94,8 @@ function _(text, options = {}) {
             };
 
             translated = resolveObj(text);
-            if (!translated || translated === text) translated = resolveObj(cleanedText);
-            if (!translated || translated === text) translated = resolveObj(text.toLowerCase());
-            if (!translated || translated === text) {
-                const titleCase = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
-                translated = resolveObj(titleCase);
-            }
-            if (!translated || translated === text) {
-                const hyphenatedText = cleanedText.replace(/ /g, "-");
-                translated = resolveObj(hyphenatedText);
-            }
         } else {
             translated = i18next.t(text, options);
-            if (!translated || translated === text) translated = i18next.t(cleanedText, options);
-            if (!translated || translated === text) translated = i18next.t(text.toLowerCase(), options);
-            if (!translated || translated === text) {
-                const hyphenatedText = cleanedText.replace(/ /g, "-");
-                translated = i18next.t(hyphenatedText, options);
-            }
         }
 
         return translated || text;
