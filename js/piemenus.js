@@ -326,10 +326,16 @@ const piemenuPitches = (
                 )
                 : true))
     ) {
-        if (scale[6 - i][0] === FIXEDSOLFEGE[note] || scale[6 - i][0] === note) {
-            accidental = scale[6 - i].substr(1);
+        // Ensure we have a valid index before accessing scale array
+        if (i !== -1 && i < scale.length && (6 - i) >= 0 && (6 - i) < scale.length) {
+            if (scale[6 - i][0] === FIXEDSOLFEGE[note] || scale[6 - i][0] === note) {
+                accidental = scale[6 - i].substr(1);
+            } else {
+                accidental = EQUIVALENTACCIDENTALS[scale[6 - i]].substr(1);
+            }
         } else {
-            accidental = EQUIVALENTACCIDENTALS[scale[6 - i]].substr(1);
+            // Fallback to natural if scale lookup fails
+            accidental = NATURAL;
         }
         block.value = block.value.replace(SHARP, "").replace(FLAT, "").replace(DOUBLESHARP, "").replace(DOUBLEFLAT, "");
         block.value += accidental;
@@ -574,15 +580,21 @@ const piemenuPitches = (
             if (i === -1) {
                 i = NOTENAMES.indexOf(FIXEDSOLFEGE[that.value]);
             }
-            if (
-                NOTENAMES.includes(selection["note"]) ||
-                scale[i][0] === FIXEDSOLFEGE[normalizedSelectionNote] ||
-                scale[i][0] === FIXEDSOLFEGE[that.value] ||
-                scale[i][0] === normalizedSelectionNote
-            ) {
-                selection["attr"] = scale[i].substr(1);
+            // Ensure we have a valid index before accessing scale array
+            if (i !== -1 && i < scale.length) {
+                if (
+                    NOTENAMES.includes(selection["note"]) ||
+                    scale[i][0] === FIXEDSOLFEGE[normalizedSelectionNote] ||
+                    scale[i][0] === FIXEDSOLFEGE[that.value] ||
+                    scale[i][0] === normalizedSelectionNote
+                ) {
+                    selection["attr"] = scale[i].substr(1);
+                } else {
+                    selection["attr"] = EQUIVALENTACCIDENTALS[scale[i]].substr(1);
+                }
             } else {
-                selection["attr"] = EQUIVALENTACCIDENTALS[scale[i]].substr(1);
+                // Fallback to natural if scale lookup fails
+                selection["attr"] = NATURAL;
             }
             switch (selection["attr"]) {
                 case DOUBLEFLAT:
