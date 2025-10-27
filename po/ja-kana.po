@@ -8432,8 +8432,8 @@ msgstr "動き出し"
 #~ msgid "define"
 #~ msgstr "ていぎ"
 
-#~ msgid "bitcoin"
 # Maybe no need, but this did seem to come up in dictionary
+#~ msgid "bitcoin"
 #~ msgstr "ビットコイン"
 
 #~ msgid "You need to select a file."
