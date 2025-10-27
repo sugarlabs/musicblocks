@@ -2471,28 +2471,35 @@ class Block {
                 c2 = this.blocks.blockList[c].connections[2];
                 if (this.blocks.blockList[c2].name === "number") {
                     if (this.blocks.blockList[c1].name === "solfege") {
-                        const solfnotes_ = _("ti la sol fa mi re do").split(" ");
+                        // English reference for logic
+                        const solfnotesRef = ["ti", "la", "sol", "fa", "mi", "re", "do"];
+                        // Localized notes for display
+                        const solfnotesLocalized = _("ti la sol fa mi re do").split(" ");
+
                         const stripped = this.blocks.blockList[c1].value
                             .replace(SHARP, "")
                             .replace(FLAT, "")
                             .replace(DOUBLESHARP, "")
                             .replace(DOUBLEFLAT, "");
-                        const i = ["ti", "la", "sol", "fa", "mi", "re", "do"].indexOf(stripped);
-                        if (this.blocks.blockList[c1].value.includes(SHARP)) {
-                            return solfnotes_[i] + SHARP + " " + this.blocks.blockList[c2].value;
-                        } else if (this.blocks.blockList[c1].value.includes(FLAT)) {
-                            return solfnotes_[i] + FLAT + " " + this.blocks.blockList[c2].value;
-                        } else if (this.blocks.blockList[c1].value.includes(DOUBLESHARP)) {
-                            return (
-                                solfnotes_[i] + DOUBLESHARP + " " + this.blocks.blockList[c2].value
-                            );
-                        } else if (this.blocks.blockList[c1].value.includes(DOUBLEFLAT)) {
-                            return (
-                                solfnotes_[i] + DOUBLEFLAT + " " + this.blocks.blockList[c2].value
-                            );
-                        } else {
-                            return solfnotes_[i] + " " + this.blocks.blockList[c2].value;
+
+                        const i = solfnotesRef.indexOf(stripped);
+                        if (i === -1) {
+                            // fallback if note not found
+                            return stripped + " " + this.blocks.blockList[c2].value;
                         }
+
+                        if (this.blocks.blockList[c1].value.includes(SHARP)) {
+                            return solfnotesLocalized[i] + SHARP + " " + this.blocks.blockList[c2].value;
+                        } else if (this.blocks.blockList[c1].value.includes(FLAT)) {
+                            return solfnotesLocalized[i] + FLAT + " " + this.blocks.blockList[c2].value;
+                        } else if (this.blocks.blockList[c1].value.includes(DOUBLESHARP)) {
+                            return solfnotesLocalized[i] + DOUBLESHARP + " " + this.blocks.blockList[c2].value;
+                        } else if (this.blocks.blockList[c1].value.includes(DOUBLEFLAT)) {
+                            return solfnotesLocalized[i] + DOUBLEFLAT + " " + this.blocks.blockList[c2].value;
+                        } else {
+                            return solfnotesLocalized[i] + " " + this.blocks.blockList[c2].value;
+                        }
+
                     } else if (this.blocks.blockList[c1].name === "notename") {
                         return (
                             this.blocks.blockList[c1].value + " " + this.blocks.blockList[c2].value
