@@ -76,7 +76,7 @@ class ReflectionMatrix {
         this.isOpen = true;
         this.isMaximized = false;
         this.activity.isInputON = true;
-        this.PORT = "http://52.65.37.66:8000"; // http://127.0.0.1:8000
+        this.PORT = "http://3.105.177.138:8000"; // http://127.0.0.1:8000 
 
         const widgetWindow = window.widgetWindows.windowFor(this, "reflection", "reflection");
         this.widgetWindow = widgetWindow;
