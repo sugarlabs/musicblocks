@@ -42,6 +42,7 @@
    fnBrowserDetect
 */
 
+
 /**
  * Changes the source of an image element from one SVG data URI to another.
  * @function
