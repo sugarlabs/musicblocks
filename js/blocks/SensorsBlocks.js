@@ -744,6 +744,37 @@ function setupSensorsBlocks(activity) {
             }
             return ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
         }
+        getPixelDataFromMedia(x, y, mediaBlock) {
+    try {
+        //  Find the media bitmap in the block
+        const mediaBitmap = mediaBlock.container.getChildByName("media");
+        if (!mediaBitmap) {
+            throw new Error("No media found in this block");
+        }
+
+        //  Create a temporary canvas
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        
+        // Set canvas size to match the image
+        const image = mediaBitmap.image;
+        tempCanvas.width = image.width;
+        tempCanvas.height = image.height;
+        
+        // Draw the media image to the temporary canvas
+        tempCtx.drawImage(image, 0, 0);
+        
+        //  Get pixel data at the specified coordinates
+        const pixelData = tempCtx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
+        
+        return pixelData;
+        
+    } catch (error) {
+        console.error("Error getting pixel data from media:", error);
+        throw new Error("Cannot get pixel data from media block");
+    }
+}
+
 
         /**
          * Determines the color based on pixel data.
