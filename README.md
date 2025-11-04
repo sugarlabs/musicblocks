@@ -179,10 +179,6 @@ Snap Users](./Music_Blocks_for_Snap_Users.md).
 Looking for a block? Find it in the
 [Palette Tables](./guide/README.md#6-appendix).
 
-## <a name="LEGO_BRICKS_WIDGET"></a>LEGO Bricks Widget
-
-This section has moved to the dedicated root document: [README-LEGO-BRICKS-WIDGET.md](./README-LEGO-BRICKS-WIDGET.md).
-
 ## <a name="CODEOFCONDUCT"></a>Code of Conduct
 
 The Music Blocks project adheres to the [Sugar Labs Code of
