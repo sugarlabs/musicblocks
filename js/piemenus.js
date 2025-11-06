@@ -317,7 +317,9 @@ const piemenuPitches = (
 
     // Auto-selection of sharps and flats in fixed solfege handles the
     // case of opening the pie-menu, not whilst in the pie-menu.
+    const hasUserValue = block.value && block.value.length > 0 && block.value !== "sol";
     if (
+        !hasUserValue &&
         (!block.activity.KeySignatureEnv[2] && block.name === "solfege") ||
         (block.name === "notename" &&
             (block.connections[0] != undefined
@@ -550,6 +552,7 @@ const piemenuPitches = (
         // for solfege pie-menu In. case of alphabet, direct comparison
         // is performed.
         if (
+            !userAlreadySelectedAccidental &&
             (!block.activity.KeySignatureEnv[2] && that.name === "solfege") ||
             (that.name === "notename" &&
                 (that.connections[0] != undefined
@@ -646,8 +649,8 @@ const piemenuPitches = (
             that.text.text = selection["note"];
             that.value = selection["note"];
         } else {
-            that.value = selection["note"] + selection["attr"];
-            that.text.text = that.value;
+           
+            that.text.text =  selection["note"] + selection["attr"];
         }
         // Store the selected accidental in the block for later use.
         prevAccidental = selection["attr"];
