@@ -4266,6 +4266,313 @@ class PhraseMaker {
                 }
             }
         }
+
+        this._updateMeasureBoundaries();
+    }
+
+    /**
+     * Updates visual barlines based on the active meter so measure starts are easy to spot.
+     * @private
+     */
+    _updateMeasureBoundaries() {
+        const columnCount = this._getColumnCount();
+        if (columnCount === 0) {
+            return;
+        }
+
+        const meterInfo = this._getMeterInfo();
+        if (!meterInfo || !meterInfo.beatUnit || meterInfo.beatUnit <= 0) {
+            return;
+        }
+
+        const beatsPerMeasure = meterInfo.beatsPerMeasure;
+        const beatUnit = meterInfo.beatUnit;
+        const EPSILON = 1e-6;
+        let beatAccumulator = 0;
+        const measureBoundaries = new Set([0]);
+
+        for (let column = 0; column < columnCount; column++) {
+            const duration = this._getColumnDuration(column);
+            if (duration === null) {
+                continue;
+            }
+
+            beatAccumulator += duration / beatUnit;
+
+            if (beatAccumulator > beatsPerMeasure - EPSILON) {
+                while (beatAccumulator >= beatsPerMeasure - EPSILON) {
+                    measureBoundaries.add(column + 1);
+                    beatAccumulator -= beatsPerMeasure;
+                }
+            }
+
+            if (Math.abs(beatAccumulator) < EPSILON) {
+                beatAccumulator = 0;
+            }
+        }
+
+        measureBoundaries.delete(columnCount);
+
+        const measureBorder = `2px solid ${this._resolveBarlineColor()}`;
+
+        const applyBorder = (row) => {
+            if (!row || !row.cells) {
+                return;
+            }
+
+            let columnIndex = 0;
+            for (let cellIdx = 0; cellIdx < row.cells.length; cellIdx++) {
+                const cell = row.cells[cellIdx];
+                if (!cell) {
+                    columnIndex += 1;
+                    continue;
+                }
+
+                const span = cell.colSpan || 1;
+
+                cell.style.borderLeft = "";
+
+                if (measureBoundaries.has(columnIndex)) {
+                    cell.style.borderLeft = measureBorder;
+                }
+
+                columnIndex += span;
+            }
+        };
+
+        this._rows.forEach(applyBorder);
+        applyBorder(this._noteValueRow);
+        applyBorder(this._tupletNoteValueRow);
+        applyBorder(this._tupletValueRow);
+
+        if (this.lyricsON) {
+            const lyricsRow = docById("lyricRow");
+            if (lyricsRow) {
+                const nestedTable = lyricsRow.querySelector("table");
+                if (nestedTable && nestedTable.rows.length > 0) {
+                    applyBorder(nestedTable.rows[0]);
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns the number of rhythm columns currently displayed in the grid.
+     * @returns {number}
+     * @private
+     */
+    _getColumnCount() {
+        for (let i = 0; i < this._rows.length; i++) {
+            const row = this._rows[i];
+            if (row && row.cells && row.cells.length > 0) {
+                return row.cells.length;
+            }
+        }
+
+        if (this._noteValueRow && this._noteValueRow.cells) {
+            let total = 0;
+            for (let i = 0; i < this._noteValueRow.cells.length; i++) {
+                total += this._noteValueRow.cells[i].colSpan || 1;
+            }
+            return total;
+        }
+
+        return 0;
+    }
+
+    /**
+     * Retrieves the duration of a column, expressed as a fraction of a whole note.
+     * @param {number} index - Column index.
+     * @returns {?number}
+     * @private
+     */
+    _getColumnDuration(index) {
+        for (let i = 0; i < this._rows.length; i++) {
+            const row = this._rows[i];
+            if (!row || !row.cells || row.cells.length <= index) {
+                continue;
+            }
+
+            const duration = this._parseDurationFromCell(row.cells[index], false);
+            if (duration !== null) {
+                return duration;
+            }
+        }
+
+        if (this._noteValueRow && this._noteValueRow.cells) {
+            let columnPointer = 0;
+            for (let cellIdx = 0; cellIdx < this._noteValueRow.cells.length; cellIdx++) {
+                const cell = this._noteValueRow.cells[cellIdx];
+                const span = cell.colSpan || 1;
+
+                if (index >= columnPointer && index < columnPointer + span) {
+                    const duration = this._parseDurationFromCell(cell, true);
+                    if (duration !== null) {
+                        return duration;
+                    }
+                    break;
+                }
+
+                columnPointer += span;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Parses a duration value from a cell element.
+     * @param {HTMLElement} cell - The cell to inspect.
+     * @param {boolean} fromNoteValueRow - Whether the cell comes from the note value row.
+     * @returns {?number}
+     * @private
+     */
+    _parseDurationFromCell(cell, fromNoteValueRow) {
+        if (!cell) {
+            return null;
+        }
+
+        const alt = cell.getAttribute("alt");
+        if (alt !== null) {
+            let parsed = parseFloat(alt);
+            if (!Number.isNaN(parsed) && parsed > 0) {
+                if (fromNoteValueRow && parsed >= 1) {
+                    parsed = 1 / parsed;
+                }
+                if (parsed > 0) {
+                    return parsed;
+                }
+            }
+
+            if (typeof alt === "string" && alt.includes("/")) {
+                const parts = alt.split("/");
+                if (parts.length === 2) {
+                    const numerator = parseFloat(parts[0]);
+                    const denominator = parseFloat(parts[1]);
+                    if (
+                        !Number.isNaN(numerator) &&
+                        !Number.isNaN(denominator) &&
+                        denominator !== 0
+                    ) {
+                        return numerator / denominator;
+                    }
+                }
+            }
+        }
+
+        const id = cell.getAttribute("id");
+        if (id !== null) {
+            let parsed = parseFloat(id);
+            if (!Number.isNaN(parsed) && parsed > 0) {
+                if (fromNoteValueRow && parsed >= 1) {
+                    parsed = 1 / parsed;
+                }
+                if (parsed > 0) {
+                    return parsed;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Retrieves meter information for the active turtle.
+     * @returns {{beatsPerMeasure: number, beatUnit: number}}
+     * @private
+     */
+    _getMeterInfo() {
+        let beatsPerMeasure = 4;
+        let noteValuePerBeat = 4;
+
+        if (
+            this.activity &&
+            this.activity.turtles &&
+            typeof this.activity.turtles.ithTurtle === "function"
+        ) {
+            const turtle = this.activity.turtles.ithTurtle(0);
+            if (turtle && turtle.singer) {
+                if (
+                    Number.isFinite(turtle.singer.beatsPerMeasure) &&
+                    turtle.singer.beatsPerMeasure > 0
+                ) {
+                    beatsPerMeasure = turtle.singer.beatsPerMeasure;
+                }
+
+                if (
+                    Number.isFinite(turtle.singer.noteValuePerBeat) &&
+                    turtle.singer.noteValuePerBeat > 0
+                ) {
+                    noteValuePerBeat = turtle.singer.noteValuePerBeat;
+                }
+            }
+        }
+
+        beatsPerMeasure = Math.max(1, Math.round(beatsPerMeasure));
+
+        let beatUnit = noteValuePerBeat >= 1 ? 1 / noteValuePerBeat : noteValuePerBeat;
+        if (!Number.isFinite(beatUnit) || beatUnit <= 0) {
+            beatUnit = 1 / 4;
+        }
+
+        return {
+            beatsPerMeasure,
+            beatUnit
+        };
+    }
+
+    /**
+     * Determines the barline color that best contrasts with the current theme.
+     * @returns {string}
+     * @private
+     */
+    _resolveBarlineColor() {
+        if (!platformColor || !platformColor.background) {
+            return "#303030";
+        }
+
+        return this._isDarkColor(platformColor.background) ? "#E0E0E0" : "#303030";
+    }
+
+    /**
+     * Determines if a hex color string represents a dark tone.
+     * @param {string} color - Hex color string (e.g., #303030).
+     * @returns {boolean}
+     * @private
+     */
+    _isDarkColor(color) {
+        if (typeof color !== "string") {
+            return false;
+        }
+
+        let hex = color.trim();
+        if (hex.startsWith("#")) {
+            hex = hex.slice(1);
+        } else {
+            return false;
+        }
+
+        if (hex.length === 3) {
+            hex = hex
+                .split("")
+                .map((char) => char + char)
+                .join("");
+        }
+
+        if (hex.length !== 6) {
+            return false;
+        }
+
+        const r = parseInt(hex.slice(0, 2), 16);
+        const g = parseInt(hex.slice(2, 4), 16);
+        const b = parseInt(hex.slice(4, 6), 16);
+
+        if ([r, g, b].some((value) => Number.isNaN(value))) {
+            return false;
+        }
+
+        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        return luminance < 0.5;
     }
 
     /**
