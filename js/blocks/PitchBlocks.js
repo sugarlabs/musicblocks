@@ -709,7 +709,7 @@ function setupPitchBlocks(activity) {
         }
     }
 
-    class Number2OctaveBlock extends Number2PitchBlock {
+class Number2OctaveBlock extends Number2PitchBlock {
         constructor() {
             //.TRANS: convert piano key number (1-88) to octave
             super("number2octave", _("number to octave"));
