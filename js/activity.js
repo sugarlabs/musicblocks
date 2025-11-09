@@ -48,7 +48,7 @@
  */
 const LEADING = 0;
 const BLOCKSCALES = [1, 1.5, 2, 3, 4];
-const _THIS_IS_MUSIC_BLOCKS_ = true;
+const _THIS_IS_MUSIC_BLOCKS_ = true;oninput
 const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
 
 const _ERRORMSGTIMEOUT_ = 15000;
@@ -538,6 +538,17 @@ class Activity {
                 false
             );
         };
+        /*
+        * Prevents workspace duplication or glitches when typing inside input boxes
+        * Fix for Issue #4788
+        */
+        window.addEventListener("keydown", function (event) {
+            // If the active element is an input field (like Set Pen Size)
+            if (event.target && event.target.tagName === "INPUT") {
+                event.stopPropagation();
+                return; // Don't trigger workspace keyboard events
+            }
+        });
 
         /*
          * displays helpfulWheel on canvas on right click
