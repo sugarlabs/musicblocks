@@ -494,158 +494,47 @@ function setupSensorsBlocks(activity) {
     }
 
     /**
-     * Represents a block that returns the blue component of the pixel under the mouse or turtle.
-     * @extends {ValueBlock}
-     */
-    class GetBlueBlock extends ValueBlock {
+    * Base class for color component blocks (red, green, blue).
+    * Represents a block that returns the red, green or blue component of the pixel under the mouse or turtle.
+    * @extends {ValueBlock}
+    */
+    class GetColorComponentBlock extends ValueBlock {
         /**
-         * Constructs a new GetBlueBlock instance.
+         * Constructs a new color component block instance.
+         * @param {string} name - The internal block name (e.g., "getred").
+         * @param {string} label - The display label (e.g., _("red")).
+         * @param {number} index - The RGB component index (0=red, 1=green, 2=blue).
+         * @param {string} helpMouse - Help text for mouse context.
+         * @param {string} helpTurtle - Help text for turtle context.
          */
-        constructor() {
-            super("getblue", _("blue"));
+        constructor(name, label, index, helpMouse, helpTurtle) {
+            super(name, label);
+            this.colorIndex = index;
             this.setPalette("sensors", activity);
             this.parameter = true;
+
             if (_THIS_IS_MUSIC_BLOCKS_) {
-                this.setHelpString([
-                    _("The Get blue block returns the blue component of the pixel under the mouse."),
-                    "documentation",
-                    ""
-                ]);
+                this.setHelpString([helpMouse, "documentation", ""]);
             } else {
-                this.setHelpString([
-                    _("The Get blue block returns the blue component of the pixel under the turtle."),
-                    "documentation",
-                    ""
-                ]);
+                this.setHelpString([helpTurtle, "documentation", ""]);
             }
         }
 
-        /**
-         * Updates the parameter value of the block.
-         * @param {Object} logo - The logo object.
-         * @param {number} turtle - The identifier of the turtle.
-         * @param {number} blk - The identifier of the block.
-         * @returns {number} - The updated parameter value representing the blue component.
-         */
         updateParameter(logo, turtle, blk) {
             return toFixed2(activity.blocks.blockList[blk].value);
         }
 
-        /**
-         * Retrieves the argument value of the block.
-         * @param {Object} logo - The logo object.
-         * @param {number} turtle - The identifier of the turtle.
-         * @returns {number} - The argument value representing the blue component.
-         */
         arg(logo, turtle) {
             let colorString = activity.turtles.getTurtle(turtle).painter.canvasColor;
-            if (colorString[2] === "#") colorString = hex2rgb(colorString.split("#")[1]);
-            const obj = colorString.split("(")[1].split(",");
-            return parseInt(Number(obj[0]) / 2.55);
-        }
-    }
 
-    /**
-     * Represents a block that returns the green component of the pixel under the mouse or turtle.
-     * @extends {ValueBlock}
-     */
-    class GetGreenBlock extends ValueBlock {
-        /**
-         * Constructs a new GetGreenBlock instance.
-         */
-        constructor() {
-            super("getgreen", _("green"));
-            this.setPalette("sensors", activity);
-            this.parameter = true;
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                this.setHelpString([
-                    _("The Get green block returns the green component of the pixel under the mouse."),
-                    "documentation",
-                    ""
-                ]);
-            } else {
-                this.setHelpString([
-                    _("The Get green block returns the green component of the pixel under the turtle."),
-                    "documentation",
-                    ""
-                ]);
+            // Handle hex and rgb color formats
+            if (colorString.includes("#")) {
+                colorString = hex2rgb(colorString.split("#")[1]);
             }
-        }
 
-        /**
-         * Updates the parameter value of the block.
-         * @param {Object} logo - The logo object.
-         * @param {number} turtle - The identifier of the turtle.
-         * @param {number} blk - The identifier of the block.
-         * @returns {number} - The updated parameter value representing the green component.
-         */
-        updateParameter(logo, turtle, blk) {
-            return toFixed2(activity.blocks.blockList[blk].value);
-        }
-
-        /**
-         * Retrieves the argument value of the block.
-         * @param {Object} logo - The logo object.
-         * @param {number} turtle - The identifier of the turtle.
-         * @returns {number} - The argument value representing the green component.
-         */
-        arg(logo, turtle) {
-            let colorString = activity.turtles.getTurtle(turtle).painter.canvasColor;
-            if (colorString[1] === "#") colorString = hex2rgb(colorString.split("#")[1]);
             const obj = colorString.split("(")[1].split(",");
-            return parseInt(Number(obj[0]) / 2.55);
-        }
-    }
-
-    /**
-     * Represents a block that returns the red component of the pixel under the mouse or turtle.
-     * @extends {ValueBlock}
-     */
-    class GetRedBlock extends ValueBlock {
-        /**
-         * Constructs a new GetRedBlock instance.
-         */
-        constructor() {
-            super("getred", _("red"));
-            this.setPalette("sensors", activity);
-            this.parameter = true;
-            if (_THIS_IS_MUSIC_BLOCKS_) {
-                this.setHelpString([
-                    _("The Get red block returns the red component of the pixel under the mouse."),
-                    "documentation",
-                    ""
-                ]);
-            } else {
-                this.setHelpString([
-                    _("The Get red block returns the red component of the pixel under the turtle."),
-                    "documentation",
-                    ""
-                ]);
-            }
-        }
-
-        /**
-         * Updates the parameter value of the block.
-         * @param {Object} logo - The logo object.
-         * @param {number} turtle - The identifier of the turtle.
-         * @param {number} blk - The identifier of the block.
-         * @returns {number} - The updated parameter value representing the red component.
-         */
-        updateParameter(logo, turtle, blk) {
-            return toFixed2(activity.blocks.blockList[blk].value);
-        }
-
-        /**
-         * Retrieves the argument value of the block.
-         * @param {Object} logo - The logo object.
-         * @param {number} turtle - The identifier of the turtle.
-         * @returns {number} - The argument value representing the red component.
-         */
-        arg(logo, turtle) {
-            let colorString = activity.turtles.getTurtle(turtle).painter.canvasColor;
-            if (colorString[0] === "#") colorString = hex2rgb(colorString.split("#")[1]);
-            const obj = colorString.split("(")[1].split(",");
-            return parseInt(Number(obj[0]) / 2.55);
+            const component = Number(obj[this.colorIndex]);
+            return parseInt(component / 2.55);
         }
     }
 
@@ -995,7 +884,7 @@ function setupSensorsBlocks(activity) {
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                "print"
             ) {
                 logo.statusFields.push([blk, "toascii"]);
             } else {
@@ -1063,9 +952,13 @@ function setupSensorsBlocks(activity) {
         }
     }
 
-    new GetBlueBlock().setup(activity);
-    new GetGreenBlock().setup(activity);
-    new GetRedBlock().setup(activity);
+    [
+        { name: "getred", label: _("red"), index: 0, helpMouse: _("The Get red block returns the red component of the pixel under the mouse."), helpTurtle: _("The Get red block returns the red component of the pixel under the turtle.") },
+        { name: "getgreen", label: _("green"), index: 1, helpMouse: _("The Get green block returns the green component of the pixel under the mouse."), helpTurtle: _("The Get green block returns the green component of the pixel under the turtle.") },
+        { name: "getblue", label: _("blue"), index: 2, helpMouse: _("The Get blue block returns the blue component of the pixel under the mouse."), helpTurtle: _("The Get blue block returns the blue component of the pixel under the turtle.") }
+    ].forEach(cfg => {
+        new GetColorComponentBlock(cfg.name, cfg.label, cfg.index, cfg.helpMouse, cfg.helpTurtle).setup(activity);
+    });
     new GetColorPixelBlock().setup(activity);
     new ToASCIIBlock().setup(activity);
     new KeyboardBlock().setup(activity);
