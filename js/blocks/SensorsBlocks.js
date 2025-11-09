@@ -999,8 +999,8 @@ class GetColorMediaBlock extends ValueBlock {
      */
     /**
      * Gets pixel color data from either the canvas or a media block.
-     * @param {number} x - The x-coordinate of the pixel.
-     * @param {number} y - The y-coordinate of the pixel.
+     * @param {number} x - The x-coordinate of the pixel to sample.
+     * @param {number} y - The y-coordinate of the pixel to sample.
      * @param {Object} [mediaBlock] - Optional media block to read from.
      * @returns {Uint8ClampedArray} - The RGBA values of the pixel.
      * @throws {Error} - If the canvas context is unavailable or media access fails.
