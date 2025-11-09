@@ -603,9 +603,9 @@ function setupSensorsBlocks(activity) {
          */
         arg(logo, turtle) {
             let colorString = activity.turtles.getTurtle(turtle).painter.canvasColor;
-            if (colorString[2] === "#") colorString = hex2rgb(colorString.split("#")[1]);
+            if (colorString[0] === "#") colorString = hex2rgb(colorString.split("#")[1]);
             const obj = colorString.split("(")[1].split(",");
-            return parseInt(Number(obj[0]) / 2.55);
+            return parseInt(Number(obj[2]) / 2.55);  // Use index 2 for blue component
         }
     }
 
@@ -655,9 +655,9 @@ function setupSensorsBlocks(activity) {
          */
         arg(logo, turtle) {
             let colorString = activity.turtles.getTurtle(turtle).painter.canvasColor;
-            if (colorString[1] === "#") colorString = hex2rgb(colorString.split("#")[1]);
+            if (colorString[0] === "#") colorString = hex2rgb(colorString.split("#")[1]);
             const obj = colorString.split("(")[1].split(",");
-            return parseInt(Number(obj[0]) / 2.55);
+            return parseInt(Number(obj[1]) / 2.55);  // Use index 1 for green component
         }
     }
 
@@ -979,102 +979,106 @@ class GetColorMediaBlock extends ValueBlock {
         this.parameter = true;
     }
 
+    /**
+     * Updates the parameter value of the block.
+     * @param {Object} logo - The logo object.
+     * @param {number} turtle - The turtle identifier.
+     * @param {number} blk - The block identifier.
+     * @returns {string} - Test value for parameter update.
+     */
     updateParameter(logo, turtle, blk) {
         return "test";
     }
 
-    
+    /**
+     * Retrieves the color value at the current position, either from the canvas or media.
+     * @param {Object} logo - The logo object.
+     * @param {number} turtle - The turtle identifier.
+     * @param {Object} mediaBlock - Optional media block to read from.
+     * @returns {number} - The color value at the specified position.
+     */
+    /**
+     * Gets pixel color data from either the canvas or a media block.
+     * @param {number} x - The x-coordinate of the pixel.
+     * @param {number} y - The y-coordinate of the pixel.
+     * @param {Object} [mediaBlock] - Optional media block to read from.
+     * @returns {Uint8ClampedArray} - The RGBA values of the pixel.
+     * @throws {Error} - If the canvas context is unavailable or media access fails.
+     */
+    getPixelData(x, y, mediaBlock = null) {
+        if (mediaBlock) {
+            try {
+                const mediaBitmap = mediaBlock.container.getChildByName("media");
+                if (!mediaBitmap) {
+                    throw new Error("No media found in this block");
+                }
 
-    
-
-    arg(logo, turtle) {
-        let requiredTurtle;
-
-        try {
-            requiredTurtle = activity.turtles.getTurtle(turtle);
-        } catch (error) {
-            return this.getFallbackColor(); // Turtle not found, no visibility to restore
+                const tempCanvas = document.createElement("canvas");
+                const tempCtx = tempCanvas.getContext("2d");
+                
+                const image = mediaBitmap.image;
+                tempCanvas.width = image.width;
+                tempCanvas.height = image.height;
+                
+                tempCtx.drawImage(image, 0, 0);
+                
+                return tempCtx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
+            } catch (error) {
+                console.error("Error getting pixel data from media:", error);
+                throw new Error("Cannot get pixel data from media block");
+            }
+        } else {
+            const canvas = docById("overlayCanvas");
+            const ctx = canvas?.getContext("2d");
+            if (!ctx) {
+                throw new Error("Canvas context unavailable");
+            }
+            return ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
         }
+    }
 
-        if (!requiredTurtle.container) {
-            return this.getFallbackColor(); // Container not found, no visibility to restore
-        }
-
-        const { x, y } = requiredTurtle.container;
-        const originalVisibility = requiredTurtle.container.visible;
-
+    /**
+     * Retrieves the color value at the current position.
+     * @param {Object} logo - The logo object.
+     * @param {number} turtle - The turtle identifier.
+     * @param {Object} [mediaBlock] - Optional media block to read from.
+     * @returns {number} - The color value at the specified position.
+     */
+    arg(logo, turtle, mediaBlock = null) {
         try {
-            requiredTurtle.container.visible = false;
-            activity.refreshCanvas();
+            if (mediaBlock) {
+                const { x, y } = mediaBlock.container;
+                const pixelData = this.getPixelData(x, y, mediaBlock);
+                return this.detectColor(pixelData);
+            }
 
-            const pixelData = this.getPixelData(x, y);
-            const color = this.detectColor(pixelData);
+            const requiredTurtle = activity.turtles.getTurtle(turtle);
+            if (!requiredTurtle?.container) {
+                return this.getFallbackColor();
+            }
 
-            requiredTurtle.container.visible = originalVisibility;
-            return color;
+            const { x, y } = requiredTurtle.container;
+            const originalVisibility = requiredTurtle.container.visible;
+
+            try {
+                requiredTurtle.container.visible = false;
+                activity.refreshCanvas();
+                const pixelData = this.getPixelData(x, y);
+                return this.detectColor(pixelData);
+            } finally {
+                requiredTurtle.container.visible = originalVisibility;
+            }
         } catch (error) {
-            requiredTurtle.container.visible = originalVisibility;
+            console.error("Error in GetColorMediaBlock.arg:", error);
             return this.getFallbackColor();
         }
     }
-        
 
     /**
-         * Extracts pixel data from the canvas at the specified coordinates.
-         * @param {number} x - The x-coordinate of the pixel.
-         * @param {number} y - The y-coordinate of the pixel.
-         * @returns {Uint8ClampedArray} - The RGBA values of the pixel.
-         * @throws {Error} - If the canvas context is unavailable.
-         */
-    /**
- * Gets pixel color data from the main drawing canvas at specified coordinates.
- * Currently only works with turtle-drawn content on overlayCanvas.
- */
-    getPixelData(x, y) {
-        const canvas = docById("overlayCanvas");
-        const ctx = canvas?.getContext("2d");
-        if (!ctx) {
-            throw new Error("Canvas context unavailable");
-        }
-        return ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
-    }
-    getPixelDataFromMedia(x, y, mediaBlock) {
-        try {
-        //  Find the media bitmap in the block
-            const mediaBitmap = mediaBlock.container.getChildByName("media");
-            if (!mediaBitmap) {
-                throw new Error("No media found in this block");
-            }
-
-            //  Create a temporary canvas
-            const tempCanvas = document.createElement("canvas");
-            const tempCtx = tempCanvas.getContext("2d");
-        
-            // Set canvas size to match the image
-            const image = mediaBitmap.image;
-            tempCanvas.width = image.width;
-            tempCanvas.height = image.height;
-        
-            // Draw the media image to the temporary canvas
-            tempCtx.drawImage(image, 0, 0);
-        
-            //  Get pixel data at the specified coordinates
-            const pixelData = tempCtx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
-        
-            return pixelData;
-        
-        } catch (error) {
-            console.error("Error getting pixel data from media:", error);
-            throw new Error("Cannot get pixel data from media block");
-        }
-    }
-
-
-    /**
-         * Determines the color based on pixel data.
-         * @param {Uint8ClampedArray} pixelData - The RGBA values of the pixel.
-         * @returns {number} - The color index from searchColors.
-         */
+     * Determines the color based on pixel data.
+     * @param {Uint8ClampedArray} pixelData - The RGBA values of the pixel.
+     * @returns {number} - The color index from searchColors.
+     */
     detectColor(pixelData) {
         if (pixelData.length !== 4) {
             throw new Error("Invalid pixel data");
@@ -1084,9 +1088,9 @@ class GetColorMediaBlock extends ValueBlock {
     }
 
     /**
-         * Retrieves the background color as a fallback.
-         * @returns {number} - The background color index.
-         */
+     * Retrieves the background color as a fallback.
+     * @returns {number} - The background color index.
+     */
     getBackgroundColor() {
         const [r, g, b] = platformColor.background
             .match(/\(([^)]+)\)/)[1]
@@ -1096,9 +1100,9 @@ class GetColorMediaBlock extends ValueBlock {
     }
 
     /**
-         * Provides a default color value in case of failure.
-         * @returns {number} - A default color index (e.g., gray).
-         */
+     * Provides a default color value in case of failure.
+     * @returns {number} - A default color index (e.g., gray).
+     */
     getFallbackColor() {
         return searchColors(128, 128, 128);
     }
