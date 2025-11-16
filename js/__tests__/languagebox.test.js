@@ -171,12 +171,12 @@ describe("LanguageBox Class", () => {
             expect(hideSpy).toHaveBeenCalled();
         });
 
-        it("should set language to zhCN and call hide when zhCN_onclick is called", () => {
+        it("should set language to zh_CN and call hide when zhCN_onclick is called", () => {
             const hideSpy = jest.spyOn(languageBox, "hide").mockImplementation();
 
             languageBox.zhCN_onclick();
 
-            expect(languageBox._language).toBe("zhCN");
+            expect(languageBox._language).toBe("zh_CN");
             expect(hideSpy).toHaveBeenCalled();
         });
 
