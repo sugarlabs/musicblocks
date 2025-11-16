@@ -3502,7 +3502,7 @@ const piemenuBlockContext = (block) => {
 
     wheel.navItems[2].navigateFunction = () => {
         that.blocks.activeBlock = blockBlock;
-        that.blocks.extract();
+        
         that.blocks.sendStackToTrash(that.blocks.blockList[blockBlock]);
         docById("contextWheelDiv").style.display = "none";
         // prompting a notification on deleting any block 
