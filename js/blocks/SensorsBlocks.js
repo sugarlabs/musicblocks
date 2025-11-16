@@ -732,6 +732,10 @@ function setupSensorsBlocks(activity) {
          * @returns {Uint8ClampedArray} - The RGBA values of the pixel.
          * @throws {Error} - If the canvas context is unavailable.
          */
+        /**
+ * Gets pixel color data from the main drawing canvas at specified coordinates.
+ * Currently only works with turtle-drawn content on overlayCanvas.
+ */
         getPixelData(x, y) {
             const canvas = docById("overlayCanvas");
             const ctx = canvas?.getContext("2d");
