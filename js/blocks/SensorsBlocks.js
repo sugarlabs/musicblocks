@@ -21,346 +21,346 @@
 // ✅ Safe fallback definitions for Jest or non-browser runs
 // ✅ Safe fallback definitions for Jest or non-browser runs
 if (typeof globalThis.ValueBlock === "undefined") {
-  globalThis.ValueBlock = class {
-    constructor(name = "", label = "") {
-      this.name = name;
-      this.label = label;
-    }
-    setPalette() {}
-    updateParameter() {}
-    arg() { return 0; }
-  };
+    globalThis.ValueBlock = class {
+        constructor(name = "", label = "") {
+            this.name = name;
+            this.label = label;
+        }
+        setPalette() {}
+        updateParameter() {}
+        arg() { return 0; }
+    };
 }
 
 if (typeof globalThis.BooleanSensorBlock === "undefined") {
-  globalThis.BooleanSensorBlock = class {
-    constructor(name = "", label = "") {
-      this.name = name;
-      this.label = label;
-    }
-    setPalette() {}
-    updateParameter() { return false; }
-    arg() { return false; }
-  };
+    globalThis.BooleanSensorBlock = class {
+        constructor(name = "", label = "") {
+            this.name = name;
+            this.label = label;
+        }
+        setPalette() {}
+        updateParameter() { return false; }
+        arg() { return false; }
+    };
 }
 
 if (typeof globalThis.LeftBlock === "undefined") {
-  globalThis.LeftBlock = class {
-    constructor(name = "", label = "") {
-      this.name = name;
-      this.label = label;
-    }
-    setPalette() {}
-    updateParameter() {}
-    arg() { return null; }
-  };
+    globalThis.LeftBlock = class {
+        constructor(name = "", label = "") {
+            this.name = name;
+            this.label = label;
+        }
+        setPalette() {}
+        updateParameter() {}
+        arg() { return null; }
+    };
 }
 
 // ✅ Safe stubs for color blocks to prevent Jest errors (kept as minimal fallbacks)
 if (typeof globalThis.GetBlueBlock === "undefined") {
-  globalThis.GetBlueBlock = class {
-    setup() {}
-  };
+    globalThis.GetBlueBlock = class {
+        setup() {}
+    };
 }
 
 if (typeof globalThis.GetGreenBlock === "undefined") {
-  globalThis.GetGreenBlock = class {
-    setup() {}
-  };
+    globalThis.GetGreenBlock = class {
+        setup() {}
+    };
 }
 
 if (typeof globalThis.GetRedBlock === "undefined") {
-  globalThis.GetRedBlock = class {
-    setup() {}
-  };
+    globalThis.GetRedBlock = class {
+        setup() {}
+    };
 }
 
 if (typeof globalThis.GetColorPixelBlock === "undefined") {
-  globalThis.GetColorPixelBlock = class {
-    setup() {}
-  };
+    globalThis.GetColorPixelBlock = class {
+        setup() {}
+    };
 }
 
 function setupSensorsBlocks(activity) {
-  /**
+    /**
    * Represents a block that prompts for keyboard input in the logo programming language.
    * @extends {FlowBlock}
    */
-  class InputBlock extends FlowBlock {
-    constructor() {
-      super("input");
-      this.setPalette("sensors", activity);
-      this.parameter = true;
-      this.setHelpString([
-        _("The Input block prompts for keyboard input."),
-        "documentation",
-        ""
-      ]);
+    class InputBlock extends FlowBlock {
+        constructor() {
+            super("input");
+            this.setPalette("sensors", activity);
+            this.parameter = true;
+            this.setHelpString([
+                _("The Input block prompts for keyboard input."),
+                "documentation",
+                ""
+            ]);
 
-      this.formBlock({
-        name: _("input"),
-        args: 1,
-        argTypes: ["anyin"],
-        defaults: [_("Input a value")]
-      });
-    }
+            this.formBlock({
+                name: _("input"),
+                args: 1,
+                argTypes: ["anyin"],
+                defaults: [_("Input a value")]
+            });
+        }
 
-    flow(args, logo, turtle, blk) {
-      const tur = activity.turtles.ithTurtle(turtle);
-      tur.doWait(120);
+        flow(args, logo, turtle, blk) {
+            const tur = activity.turtles.ithTurtle(turtle);
+            tur.doWait(120);
 
-      docById("labelDiv").innerHTML =
+            docById("labelDiv").innerHTML =
         '<input id="textLabel" style="position: absolute; -webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="input" type="text" value="" />';
-      const inputElem = docById("textLabel");
-      const cblk = activity.blocks.blockList[blk].connections[1];
-      if (cblk !== null) {
-        inputElem.placeholder = activity.blocks.blockList[cblk].value;
-      }
-      inputElem.style.left = activity.turtles.getTurtle(turtle).container.x + "px";
-      inputElem.style.top = activity.turtles.getTurtle(turtle).container.y + "px";
-      inputElem.focus();
+            const inputElem = docById("textLabel");
+            const cblk = activity.blocks.blockList[blk].connections[1];
+            if (cblk !== null) {
+                inputElem.placeholder = activity.blocks.blockList[cblk].value;
+            }
+            inputElem.style.left = activity.turtles.getTurtle(turtle).container.x + "px";
+            inputElem.style.top = activity.turtles.getTurtle(turtle).container.y + "px";
+            inputElem.focus();
 
-      docById("labelDiv").classList.add("hasKeyboard");
+            docById("labelDiv").classList.add("hasKeyboard");
 
-      function __keyPressed(event) {
-        if (event.keyCode === 13) {
-          const inputElem = docById("textLabel");
-          const value = inputElem.value;
-          if (isNaN(value)) {
-            logo.inputValues[turtle] = value;
-          } else {
-            logo.inputValues[turtle] = Number(value);
-          }
+            function __keyPressed(event) {
+                if (event.keyCode === 13) {
+                    const inputElem = docById("textLabel");
+                    const value = inputElem.value;
+                    if (isNaN(value)) {
+                        logo.inputValues[turtle] = value;
+                    } else {
+                        logo.inputValues[turtle] = Number(value);
+                    }
 
-          inputElem.blur();
-          inputElem.style.display = "none";
-          logo.clearTurtleRun(turtle);
-          docById("labelDiv").classList.remove("hasKeyboard");
+                    inputElem.blur();
+                    inputElem.style.display = "none";
+                    logo.clearTurtleRun(turtle);
+                    docById("labelDiv").classList.remove("hasKeyboard");
+                }
+            }
+
+            docById("textLabel").addEventListener("keypress", __keyPressed);
         }
-      }
-
-      docById("textLabel").addEventListener("keypress", __keyPressed);
-    }
-  }
-
-  class InputValueBlock extends ValueBlock {
-    constructor() {
-      super("inputvalue", _("input value"));
-      this.setPalette("sensors", activity);
-      this.parameter = true;
-
-      this.setHelpString([
-        _("The Input-value block stores the input."),
-        "documentation",
-        null,
-        "input"
-      ]);
     }
 
-    updateParameter(logo, turtle) {
-      if (turtle in logo.inputValues) {
-        return logo.inputValues[turtle];
-      } else {
-        return 0;
-      }
-    }
+    class InputValueBlock extends ValueBlock {
+        constructor() {
+            super("inputvalue", _("input value"));
+            this.setPalette("sensors", activity);
+            this.parameter = true;
 
-    arg(logo, turtle, blk) {
-      if (turtle in logo.inputValues) {
-        return logo.inputValues[turtle];
-      } else {
-        activity.errorMsg(NOINPUTERRORMSG, blk);
-        return 0;
-      }
-    }
-  }
-
-  class PitchnessBlock extends ValueBlock {
-    constructor() {
-      super("pitchness", _("pitch"));
-      this.setPalette("sensors", activity);
-      this.parameter = true;
-    }
-
-    updateParameter(logo, turtle, blk) {
-      return toFixed2(activity.blocks.blockList[blk].value);
-    }
-
-    arg(logo) {
-      if (logo.mic === null) {
-        return 440;
-      }
-      if (logo.pitchAnalyser === null) {
-        logo.pitchAnalyser = new Tone.Analyser({
-          type: "fft",
-          size: logo.limit,
-          smoothing: 0
-        });
-        logo.mic.connect(logo.pitchAnalyser);
-      }
-
-      const values = logo.pitchAnalyser.getValue();
-      let max = Infinity;
-      let idx = 0;
-
-      for (let i = 0; i < logo.limit; i++) {
-        const v2 = -values[i];
-        if (v2 < max) {
-          max = v2;
-          idx = i;
+            this.setHelpString([
+                _("The Input-value block stores the input."),
+                "documentation",
+                null,
+                "input"
+            ]);
         }
-      }
 
-      const freq = idx / (logo.pitchAnalyser.sampleTime * logo.limit * 2);
-      return freq;
-    }
-  }
+        updateParameter(logo, turtle) {
+            if (turtle in logo.inputValues) {
+                return logo.inputValues[turtle];
+            } else {
+                return 0;
+            }
+        }
 
-  class LoudnessBlock extends ValueBlock {
-    constructor() {
-      super("loudness", _("loudness"));
-      this.setPalette("sensors", activity);
-      this.parameter = true;
-      this.beginnerBlock(!(this.lang === "ja"));
-
-      this.setHelpString([
-        _("The Loudness block returns the volume detected by the microphone."),
-        "documentation",
-        ""
-      ]);
+        arg(logo, turtle, blk) {
+            if (turtle in logo.inputValues) {
+                return logo.inputValues[turtle];
+            } else {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return 0;
+            }
+        }
     }
 
-    updateParameter(logo, turtle, blk) {
-      return toFixed2(activity.blocks.blockList[blk].value);
+    class PitchnessBlock extends ValueBlock {
+        constructor() {
+            super("pitchness", _("pitch"));
+            this.setPalette("sensors", activity);
+            this.parameter = true;
+        }
+
+        updateParameter(logo, turtle, blk) {
+            return toFixed2(activity.blocks.blockList[blk].value);
+        }
+
+        arg(logo) {
+            if (logo.mic === null) {
+                return 440;
+            }
+            if (logo.pitchAnalyser === null) {
+                logo.pitchAnalyser = new Tone.Analyser({
+                    type: "fft",
+                    size: logo.limit,
+                    smoothing: 0
+                });
+                logo.mic.connect(logo.pitchAnalyser);
+            }
+
+            const values = logo.pitchAnalyser.getValue();
+            let max = Infinity;
+            let idx = 0;
+
+            for (let i = 0; i < logo.limit; i++) {
+                const v2 = -values[i];
+                if (v2 < max) {
+                    max = v2;
+                    idx = i;
+                }
+            }
+
+            const freq = idx / (logo.pitchAnalyser.sampleTime * logo.limit * 2);
+            return freq;
+        }
     }
 
-    arg(logo) {
-      if (logo.mic === null) {
-        return 0;
-      }
-      if (logo.volumeAnalyser === null) {
-        logo.volumeAnalyser = new Tone.Analyser({
-          type: "waveform",
-          size: logo.limit
-        });
+    class LoudnessBlock extends ValueBlock {
+        constructor() {
+            super("loudness", _("loudness"));
+            this.setPalette("sensors", activity);
+            this.parameter = true;
+            this.beginnerBlock(!(this.lang === "ja"));
 
-        logo.mic.connect(logo.volumeAnalyser);
-      }
+            this.setHelpString([
+                _("The Loudness block returns the volume detected by the microphone."),
+                "documentation",
+                ""
+            ]);
+        }
 
-      const values = logo.volumeAnalyser.getValue();
-      let sum = 0;
-      for (let k = 0; k < logo.limit; k++) {
-        sum += values[k] * values[k];
-      }
+        updateParameter(logo, turtle, blk) {
+            return toFixed2(activity.blocks.blockList[blk].value);
+        }
 
-      const rms = Math.sqrt(sum / logo.limit);
-      return Math.round(rms * 100);
-    }
-  }
+        arg(logo) {
+            if (logo.mic === null) {
+                return 0;
+            }
+            if (logo.volumeAnalyser === null) {
+                logo.volumeAnalyser = new Tone.Analyser({
+                    type: "waveform",
+                    size: logo.limit
+                });
 
-  class MyClickBlock extends ValueBlock {
-    constructor() {
-      super("myclick", _("click"));
-      this.setPalette("sensors", activity);
-      this.beginnerBlock(true);
+                logo.mic.connect(logo.volumeAnalyser);
+            }
 
-      if (_THIS_IS_MUSIC_BLOCKS_) {
-        this.setHelpString([
-          _("The Click block triggers an event if a mouse has been clicked."),
-          "documentation",
-          null,
-          "clickhelp"
-        ]);
-      } else {
-        this.setHelpString([
-          _("The Click block triggers an event if a turtle has been clicked."),
-          "documentation",
-          null,
-          "clickhelp"
-        ]);
-      }
+            const values = logo.volumeAnalyser.getValue();
+            let sum = 0;
+            for (let k = 0; k < logo.limit; k++) {
+                sum += values[k] * values[k];
+            }
+
+            const rms = Math.sqrt(sum / logo.limit);
+            return Math.round(rms * 100);
+        }
     }
 
-    arg(logo, turtle) {
-      return "click" + activity.turtles.getTurtle(turtle).id;
-    }
-  }
+    class MyClickBlock extends ValueBlock {
+        constructor() {
+            super("myclick", _("click"));
+            this.setPalette("sensors", activity);
+            this.beginnerBlock(true);
 
-  class MyCursoroverBlock extends ValueBlock {
-    constructor() {
-      super("mycursorover", _("cursor over"));
-      this.setPalette("sensors", activity);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
+                    _("The Click block triggers an event if a mouse has been clicked."),
+                    "documentation",
+                    null,
+                    "clickhelp"
+                ]);
+            } else {
+                this.setHelpString([
+                    _("The Click block triggers an event if a turtle has been clicked."),
+                    "documentation",
+                    null,
+                    "clickhelp"
+                ]);
+            }
+        }
 
-      if (_THIS_IS_MUSIC_BLOCKS_) {
-        this.setHelpString([
-          _("The Cursor over block triggers an event when the cursor is moved over a mouse."),
-          "documentation",
-          null,
-          "cursoroverhelp"
-        ]);
-      } else {
-        this.setHelpString([
-          _("The Cursor over block triggers an event when the cursor is moved over a turtle."),
-          "documentation",
-          null,
-          "cursoroverhelp"
-        ]);
-      }
-    }
-
-    arg(logo, turtle) {
-      return "CursorOver" + activity.turtles.getTurtle(turtle).id;
-    }
-  }
-
-  class MyCursoroutBlock extends ValueBlock {
-    constructor() {
-      super("mycursorout", _("cursor out"));
-      this.setPalette("sensors", activity);
-
-      if (_THIS_IS_MUSIC_BLOCKS_) {
-        this.setHelpString([
-          _("The Cursor out block triggers an event when the cursor is moved off of a mouse."),
-          "documentation",
-          null,
-          "cursorouthelp"
-        ]);
-      } else {
-        this.setHelpString([
-          _("The Cursor out block triggers an event when the cursor is moved off of a turtle."),
-          "documentation",
-          null,
-          "cursorouthelp"
-        ]);
-      }
+        arg(logo, turtle) {
+            return "click" + activity.turtles.getTurtle(turtle).id;
+        }
     }
 
-    arg(logo, turtle) {
-      return "CursorOut" + activity.turtles.getTurtle(turtle).id;
-    }
-  }
+    class MyCursoroverBlock extends ValueBlock {
+        constructor() {
+            super("mycursorover", _("cursor over"));
+            this.setPalette("sensors", activity);
 
-  class MyCursordownBlock extends ValueBlock {
-    constructor() {
-      super("mycursordown", _("cursor button down"));
-      this.setPalette("sensors", activity);
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
+                    _("The Cursor over block triggers an event when the cursor is moved over a mouse."),
+                    "documentation",
+                    null,
+                    "cursoroverhelp"
+                ]);
+            } else {
+                this.setHelpString([
+                    _("The Cursor over block triggers an event when the cursor is moved over a turtle."),
+                    "documentation",
+                    null,
+                    "cursoroverhelp"
+                ]);
+            }
+        }
 
-      if (_THIS_IS_MUSIC_BLOCKS_) {
-        this.setHelpString([
-          _("The Cursor button down block triggers an event when the cursor button is pressed on a mouse."),
-          "documentation",
-          null,
-          "cursordownhelp"
-        ]);
-      } else {
-        this.setHelpString([
-          _("The Cursor button down block triggers an event when the cursor button is pressed on a turtle."),
-          "documentation",
-          null,
-          "cursordownhelp"
-        ]);
-      }
+        arg(logo, turtle) {
+            return "CursorOver" + activity.turtles.getTurtle(turtle).id;
+        }
     }
+
+    class MyCursoroutBlock extends ValueBlock {
+        constructor() {
+            super("mycursorout", _("cursor out"));
+            this.setPalette("sensors", activity);
+
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
+                    _("The Cursor out block triggers an event when the cursor is moved off of a mouse."),
+                    "documentation",
+                    null,
+                    "cursorouthelp"
+                ]);
+            } else {
+                this.setHelpString([
+                    _("The Cursor out block triggers an event when the cursor is moved off of a turtle."),
+                    "documentation",
+                    null,
+                    "cursorouthelp"
+                ]);
+            }
+        }
+
+        arg(logo, turtle) {
+            return "CursorOut" + activity.turtles.getTurtle(turtle).id;
+        }
+    }
+
+    class MyCursordownBlock extends ValueBlock {
+        constructor() {
+            super("mycursordown", _("cursor button down"));
+            this.setPalette("sensors", activity);
+
+            if (_THIS_IS_MUSIC_BLOCKS_) {
+                this.setHelpString([
+                    _("The Cursor button down block triggers an event when the cursor button is pressed on a mouse."),
+                    "documentation",
+                    null,
+                    "cursordownhelp"
+                ]);
+            } else {
+                this.setHelpString([
+                    _("The Cursor button down block triggers an event when the cursor button is pressed on a turtle."),
+                    "documentation",
+                    null,
+                    "cursordownhelp"
+                ]);
+            }
+        }
 
 
         /**
@@ -575,23 +575,23 @@ function setupSensorsBlocks(activity) {
      * @extends {ValueBlock}
      */
  
-  //  Define and safely register the "get color pixel" block
-  const GetColorPixelBlock = {
-    name: "get color pixel",
-    help: "returns the color value of the pixel under the turtle",
-    type: "number",
+    //  Define and safely register the "get color pixel" block
+    const GetColorPixelBlock = {
+        name: "get color pixel",
+        help: "returns the color value of the pixel under the turtle",
+        type: "number",
 
-    // Core logic — returns RGB color of the pixel below turtle
-    arg(logo, turtle) {
-      try {
-        if (!activity.turtles || !activity.turtles.getTurtle) {
-          return this.getFallbackColor();
-        }
+        // Core logic — returns RGB color of the pixel below turtle
+        arg(logo, turtle) {
+            try {
+                if (!activity.turtles || !activity.turtles.getTurtle) {
+                    return this.getFallbackColor();
+                }
 
-        const turtleObj = activity.turtles.getTurtle(turtle);
-        if (!turtleObj || !turtleObj.container) {
-          return this.getFallbackColor();
-        }
+                const turtleObj = activity.turtles.getTurtle(turtle);
+                if (!turtleObj || !turtleObj.container) {
+                    return this.getFallbackColor();
+                }
 
                 // Hide turtle temporarily to read underlying color and ensure
                 // visibility is restored even if an error occurs.
@@ -610,79 +610,79 @@ function setupSensorsBlocks(activity) {
                         // ignore
                     }
                 }
-      } catch (err) {
-        console.error("[SensorsBlocks] Error reading color pixel:", err);
-        return this.getFallbackColor();
-      }
-    },
+            } catch (err) {
+                console.error("[SensorsBlocks] Error reading color pixel:", err);
+                return this.getFallbackColor();
+            }
+        },
 
-    // 🖼️ Get pixel data from canvas
+        // 🖼️ Get pixel data from canvas
         getPixelData(x, y) {
             // Prefer overlayCanvas (used for turtle drawing in tests); fall back
             // to myCanvas if present.
             let canvas = docById("overlayCanvas");
             if (!canvas) canvas = docById("myCanvas");
-      if (!canvas || !canvas.getContext) {
-        throw new Error("Canvas context unavailable");
-      }
+            if (!canvas || !canvas.getContext) {
+                throw new Error("Canvas context unavailable");
+            }
 
-      const ctx = canvas.getContext("2d");
-      if (!ctx) {
-        throw new Error("Canvas context unavailable");
-      }
+            const ctx = canvas.getContext("2d");
+            if (!ctx) {
+                throw new Error("Canvas context unavailable");
+            }
 
-      const imageData = ctx.getImageData(x, y, 1, 1).data;
-      return Array.from(imageData);
-    },
+            const imageData = ctx.getImageData(x, y, 1, 1).data;
+            return Array.from(imageData);
+        },
 
-    // 🎨 Convert pixel data to readable color string
-    detectColor(pixelData) {
-      if (!pixelData || pixelData.length !== 4) {
-        throw new Error("Invalid pixel data");
-      }
+        // 🎨 Convert pixel data to readable color string
+        detectColor(pixelData) {
+            if (!pixelData || pixelData.length !== 4) {
+                throw new Error("Invalid pixel data");
+            }
 
-      const [r, g, b, a] = pixelData;
+            const [r, g, b, a] = pixelData;
 
-      // Transparent pixel → use background color
-      if (a === 0) {
-        return this.getBackgroundColor();
-      }
+            // Transparent pixel → use background color
+            if (a === 0) {
+                return this.getBackgroundColor();
+            }
 
-      return `rgb(${r},${g},${b})`;
-    },
+            return `rgb(${r},${g},${b})`;
+        },
 
-    // 🌈 Fetch the background color of the canvas
-    getBackgroundColor() {
-      try {
-        const canvas = docById("myCanvas");
-        const style = canvas ? getComputedStyle(canvas) : null;
-        const bgColor = style ? style.backgroundColor : "rgb(200,200,200)";
-        return bgColor;
-      } catch {
-        return "rgb(200,200,200)";
-      }
-    },
+        // 🌈 Fetch the background color of the canvas
+        getBackgroundColor() {
+            try {
+                const canvas = docById("myCanvas");
+                const style = canvas ? getComputedStyle(canvas) : null;
+                const bgColor = style ? style.backgroundColor : "rgb(200,200,200)";
+                return bgColor;
+            } catch {
+                return "rgb(200,200,200)";
+            }
+        },
 
-    // 🩶 Default fallback
-    getFallbackColor() {
-      return "rgb(128,128,128)";
-    },
-  };
+        // 🩶 Default fallback
+        getFallbackColor() {
+            return "rgb(128,128,128)";
+        },
+    };
 
-  // ✅ Register the block safely
-  if (typeof activity.blocks.addBlock === "function") {
-    activity.blocks.addBlock(GetColorPixelBlock.name, GetColorPixelBlock);
-  } else {
-    console.warn("[SensorsBlocks] activity.blocks.addBlock() not found — skipping block registration");
-  }
+    // ✅ Register the block safely
+    if (typeof activity.blocks.addBlock === "function") {
+        activity.blocks.addBlock(GetColorPixelBlock.name, GetColorPixelBlock);
+    } else {
+        console.warn("[SensorsBlocks] activity.blocks.addBlock() not found — skipping block registration");
+    }
 
-  // Export for test access
+    // Export for test access
     // In test environments the test harness expects DummyFlowBlock.createdBlocks
     // to contain simple block objects keyed by the block name (no spaces,
     // lowercase). Ensure the most commonly-tested blocks are present by
     // populating those entries with lightweight objects that implement the
     // methods used in the tests.
-        try {
+    try {
         // Prefer the test harness's FlowBlock.createdBlocks (tests export DummyFlowBlock
         // into global.FlowBlock). Fall back to DummyFlowBlock if present.
         const cb = (typeof FlowBlock !== "undefined" && FlowBlock.createdBlocks)
@@ -779,12 +779,12 @@ function setupSensorsBlocks(activity) {
                 updateParameter: function (logo, turtle, blk) { return activity.blocks.blockList[blk].value; },
                 arg: function (logo, turtle, blk, receivedArg) {
                     const cblk1 = activity.blocks.blockList[blk] && activity.blocks.blockList[blk].connections && activity.blocks.blockList[blk].connections[1];
-                    if (cblk1 === null || typeof cblk1 === 'undefined') {
+                    if (cblk1 === null || typeof cblk1 === "undefined") {
                         activity.errorMsg && activity.errorMsg(NOINPUTERRORMSG, blk);
                         return "A";
                     }
                     const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                    if (typeof a === 'number') {
+                    if (typeof a === "number") {
                         if (a < 1) return 0; else return String.fromCharCode(a);
                     } else {
                         activity.errorMsg && activity.errorMsg(NANERRORMSG, blk);
@@ -801,7 +801,7 @@ function setupSensorsBlocks(activity) {
             };
 
             // Time
-                    cb["time"] = cb["time"] || { name: "time", updateParameter: function (logo, turtle, blk) { return activity.blocks.blockList[blk].value; }, arg: function (logo) { const d = new Date(); return (d.getTime() - logo.time) / 1000; } };
+            cb["time"] = cb["time"] || { name: "time", updateParameter: function (logo, turtle, blk) { return activity.blocks.blockList[blk].value; }, arg: function (logo) { const d = new Date(); return (d.getTime() - logo.time) / 1000; } };
 
         }
     } catch (e) {
@@ -810,22 +810,22 @@ function setupSensorsBlocks(activity) {
 
     return { GetColorPixelBlock };
 }
-        /**
+/**
  * Represents a block that returns the color of a pixel from uploaded media.
  */
 
 // ✅ Safe mock: prevents "ValueBlock is not defined" errors
 if (typeof ValueBlock === "undefined") {
-  globalThis.ValueBlock = class {
-    constructor(name, label) {
-      this.name = name;
-      this.label = label;
-      this.palette = null;
-    }
-    setPalette(paletteName, activity) {
-      this.palette = paletteName;
-    }
-  };
+    globalThis.ValueBlock = class {
+        constructor(name, label) {
+            this.name = name;
+            this.label = label;
+            this.palette = null;
+        }
+        setPalette(paletteName, activity) {
+            this.palette = paletteName;
+        }
+    };
 }
 
 
@@ -835,363 +835,353 @@ class GetColorMediaBlock extends ValueBlock {
         this.setPalette("sensors", activity);
         this.parameter = true;
     }
-
-    updateParameter(logo, turtle, blk) {
-        return "test";
-    }
-
-    arg(logo, turtle, args) {
-        return searchColors(255, 0, 0); // Always return red for testing
-    }
-
-
     
 
-        // /**
-        //  * Updates the parameter value of the block.
-        //  * @param {Object} logo - The logo object.
-        //  * @param {number} turtle - The identifier of the turtle.
-        //  * @param {number} blk - The identifier of the block.
-        //  * @returns {number} - The updated parameter value representing the color.
-        //  */
-        updateParameter(logo, turtle, blk) {
-            return toFixed2(activity.blocks.blockList[blk].value);
-        }
+    // /**
+    //  * Updates the parameter value of the block.
+    //  * @param {Object} logo - The logo object.
+    //  * @param {number} turtle - The identifier of the turtle.
+    //  * @param {number} blk - The identifier of the block.
+    //  * @returns {number} - The updated parameter value representing the color.
+    //  */
+    updateParameter(logo, turtle, blk) {
+        return toFixed2(activity.blocks.blockList[blk].value);
+    }
 
-        /**
+    /**
          * Retrieves the color value of the pixel under the turtle.
          * @param {Object} logo - The logo object managing the runtime state.
          * @param {number} turtle - The identifier of the turtle.
          * @returns {number} - The color index from searchColors, or a fallback value if detection fails.
          * @throws {Error} - If the turtle or canvas context cannot be accessed.
          */
-        arg(logo, turtle) {
-            let requiredTurtle;
+    arg(logo, turtle) {
+        let requiredTurtle;
 
-            try {
-                requiredTurtle = activity.turtles.getTurtle(turtle);
-            } catch (error) {
-                return this.getFallbackColor(); // Turtle not found, no visibility to restore
-            }
-
-            if (!requiredTurtle.container) {
-                return this.getFallbackColor(); // Container not found, no visibility to restore
-            }
-
-            const { x, y } = requiredTurtle.container;
-            const originalVisibility = requiredTurtle.container.visible;
-
-            try {
-                requiredTurtle.container.visible = false;
-                activity.refreshCanvas();
-
-                const pixelData = this.getPixelData(x, y);
-                const color = this.detectColor(pixelData);
-
-                requiredTurtle.container.visible = originalVisibility;
-                return color;
-            } catch (error) {
-                requiredTurtle.container.visible = originalVisibility;
-                return this.getFallbackColor();
-            }
+        try {
+            requiredTurtle = activity.turtles.getTurtle(turtle);
+        } catch (error) {
+            return this.getFallbackColor(); // Turtle not found, no visibility to restore
         }
+
+        if (!requiredTurtle.container) {
+            return this.getFallbackColor(); // Container not found, no visibility to restore
+        }
+
+        const { x, y } = requiredTurtle.container;
+        const originalVisibility = requiredTurtle.container.visible;
+
+        try {
+            requiredTurtle.container.visible = false;
+            activity.refreshCanvas();
+
+            const pixelData = this.getPixelData(x, y);
+            const color = this.detectColor(pixelData);
+
+            requiredTurtle.container.visible = originalVisibility;
+            return color;
+        } catch (error) {
+            requiredTurtle.container.visible = originalVisibility;
+            return this.getFallbackColor();
+        }
+    }
         
 
-        /**
+    /**
          * Extracts pixel data from the canvas at the specified coordinates.
          * @param {number} x - The x-coordinate of the pixel.
          * @param {number} y - The y-coordinate of the pixel.
          * @returns {Uint8ClampedArray} - The RGBA values of the pixel.
          * @throws {Error} - If the canvas context is unavailable.
          */
-        /**
+    /**
  * Gets pixel color data from the main drawing canvas at specified coordinates.
  * Currently only works with turtle-drawn content on overlayCanvas.
  */
-        getPixelData(x, y) {
-            const canvas = docById("overlayCanvas");
-            const ctx = canvas?.getContext("2d");
-            if (!ctx) {
-                throw new Error("Canvas context unavailable");
-            }
-            return ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
+    getPixelData(x, y) {
+        const canvas = docById("overlayCanvas");
+        const ctx = canvas?.getContext("2d");
+        if (!ctx) {
+            throw new Error("Canvas context unavailable");
         }
-        getPixelDataFromMedia(x, y, mediaBlock) {
-    try {
-        //  Find the media bitmap in the block
-        const mediaBitmap = mediaBlock.container.getChildByName("media");
-        if (!mediaBitmap) {
-            throw new Error("No media found in this block");
-        }
-
-        //  Create a temporary canvas
-        const tempCanvas = document.createElement('canvas');
-        const tempCtx = tempCanvas.getContext('2d');
-        
-        // Set canvas size to match the image
-        const image = mediaBitmap.image;
-        tempCanvas.width = image.width;
-        tempCanvas.height = image.height;
-        
-        // Draw the media image to the temporary canvas
-        tempCtx.drawImage(image, 0, 0);
-        
-        //  Get pixel data at the specified coordinates
-        const pixelData = tempCtx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
-        
-        return pixelData;
-        
-    } catch (error) {
-        console.error("Error getting pixel data from media:", error);
-        throw new Error("Cannot get pixel data from media block");
+        return ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
     }
-}
+    getPixelDataFromMedia(x, y, mediaBlock) {
+        try {
+        //  Find the media bitmap in the block
+            const mediaBitmap = mediaBlock.container.getChildByName("media");
+            if (!mediaBitmap) {
+                throw new Error("No media found in this block");
+            }
+
+            //  Create a temporary canvas
+            const tempCanvas = document.createElement("canvas");
+            const tempCtx = tempCanvas.getContext("2d");
+        
+            // Set canvas size to match the image
+            const image = mediaBitmap.image;
+            tempCanvas.width = image.width;
+            tempCanvas.height = image.height;
+        
+            // Draw the media image to the temporary canvas
+            tempCtx.drawImage(image, 0, 0);
+        
+            //  Get pixel data at the specified coordinates
+            const pixelData = tempCtx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
+        
+            return pixelData;
+        
+        } catch (error) {
+            console.error("Error getting pixel data from media:", error);
+            throw new Error("Cannot get pixel data from media block");
+        }
+    }
 
 
-        /**
+    /**
          * Determines the color based on pixel data.
          * @param {Uint8ClampedArray} pixelData - The RGBA values of the pixel.
          * @returns {number} - The color index from searchColors.
          */
-        detectColor(pixelData) {
-            if (pixelData.length !== 4) {
-                throw new Error("Invalid pixel data");
-            }
-            const [r, g, b, a] = pixelData;
-            return a === 0 ? this.getBackgroundColor() : searchColors(r, g, b);
+    detectColor(pixelData) {
+        if (pixelData.length !== 4) {
+            throw new Error("Invalid pixel data");
         }
-
-        /**
-         * Retrieves the background color as a fallback.
-         * @returns {number} - The background color index.
-         */
-        getBackgroundColor() {
-            const [r, g, b] = platformColor.background
-                .match(/\(([^)]+)\)/)[1]
-                .split(/,\s*/)
-                .map(Number);
-            return searchColors(r, g, b);
-        }
-
-        /**
-         * Provides a default color value in case of failure.
-         * @returns {number} - A default color index (e.g., gray).
-         */
-        getFallbackColor() {
-            return searchColors(128, 128, 128);
-        }
+        const [r, g, b, a] = pixelData;
+        return a === 0 ? this.getBackgroundColor() : searchColors(r, g, b);
     }
 
     /**
+         * Retrieves the background color as a fallback.
+         * @returns {number} - The background color index.
+         */
+    getBackgroundColor() {
+        const [r, g, b] = platformColor.background
+            .match(/\(([^)]+)\)/)[1]
+            .split(/,\s*/)
+            .map(Number);
+        return searchColors(r, g, b);
+    }
+
+    /**
+         * Provides a default color value in case of failure.
+         * @returns {number} - A default color index (e.g., gray).
+         */
+    getFallbackColor() {
+        return searchColors(128, 128, 128);
+    }
+}
+
+/**
      * Represents a block that returns the number of seconds that the program has been running.
      * @extends {ValueBlock}
      */
-    class TimeBlock extends ValueBlock {
-        /**
+class TimeBlock extends ValueBlock {
+    /**
          * Constructs a new TimeBlock instance.
          */
-        constructor() {
-            super("time", _("time"));
-            this.setPalette("sensors", activity);
-            this.parameter = true;
-            // Put this block on the beginner palette except in Japanese.
-            this.beginnerBlock(!(this.lang === "ja"));
+    constructor() {
+        super("time", _("time"));
+        this.setPalette("sensors", activity);
+        this.parameter = true;
+        // Put this block on the beginner palette except in Japanese.
+        this.beginnerBlock(!(this.lang === "ja"));
 
-            this.setHelpString([
-                _("The Time block returns the number of seconds that the program has been running."),
-                "documentation",
-                ""
-            ]);
-        }
+        this.setHelpString([
+            _("The Time block returns the number of seconds that the program has been running."),
+            "documentation",
+            ""
+        ]);
+    }
 
-        /**
+    /**
          * Updates the parameter value of the block.
          * @param {Object} logo - The logo object.
          * @param {number} turtle - The identifier of the turtle.
          * @param {number} blk - The identifier of the block.
          * @returns {number} - The updated parameter value representing the time.
          */
-        updateParameter(logo, turtle, blk) {
-            return activity.blocks.blockList[blk].value;
-        }
+    updateParameter(logo, turtle, blk) {
+        return activity.blocks.blockList[blk].value;
+    }
 
-        /**
+    /**
          * Retrieves the argument value of the block.
          * @param {Object} logo - The logo object.
          * @returns {number} - The argument value representing the time.
          */
-        arg(logo) {
-            const d = new Date();
-            return (d.getTime() - logo.time) / 1000;
-        }
+    arg(logo) {
+        const d = new Date();
+        return (d.getTime() - logo.time) / 1000;
     }
+}
 
-    /**
+/**
      * Represents a block that returns the vertical position of the mouse cursor.
      * @extends {ValueBlock}
      */
-    class MouseYBlock extends ValueBlock {
-        /**
+class MouseYBlock extends ValueBlock {
+    /**
          * Constructs a new MouseYBlock instance.
          */
-        constructor() {
-            super("mousey", _("cursor y"));
-            this.setPalette("sensors", activity);
-            this.beginnerBlock(true);
-            this.parameter = true;
-            this.setHelpString([
-                _("The Cursor Y block returns the vertical position of the mouse."),
-                "documentation",
-                null,
-                "mousebuttonhelp"
-            ]);
-        }
+    constructor() {
+        super("mousey", _("cursor y"));
+        this.setPalette("sensors", activity);
+        this.beginnerBlock(true);
+        this.parameter = true;
+        this.setHelpString([
+            _("The Cursor Y block returns the vertical position of the mouse."),
+            "documentation",
+            null,
+            "mousebuttonhelp"
+        ]);
+    }
 
-        /**
+    /**
          * Updates the parameter value of the block.
          * @param {Object} logo - The logo object.
          * @param {number} turtle - The identifier of the turtle.
          * @param {number} blk - The identifier of the block.
          * @returns {number} - The updated parameter value representing the mouse cursor's vertical position.
          */
-        updateParameter(logo, turtle, blk) {
-            return activity.blocks.blockList[blk].value;
-        }
-
-        /**
-         * Retrieves the argument value of the block.
-         * @returns {number} - The argument value representing the mouse cursor's vertical position.
-         */
-        arg() {
-            return activity.getStageY();
-        }
+    updateParameter(logo, turtle, blk) {
+        return activity.blocks.blockList[blk].value;
     }
 
     /**
+         * Retrieves the argument value of the block.
+         * @returns {number} - The argument value representing the mouse cursor's vertical position.
+         */
+    arg() {
+        return activity.getStageY();
+    }
+}
+
+/**
      * Represents a block that returns the horizontal position of the mouse.
      * @extends {ValueBlock}
      */
-    class MouseXBlock extends ValueBlock {
-        /**
+class MouseXBlock extends ValueBlock {
+    /**
          * Constructs a new MouseXBlock instance.
          */
-        constructor() {
-            super("mousex", _("cursor x"));
-            this.setPalette("sensors", activity);
-            this.beginnerBlock(true);
-            this.parameter = true;
-            this.setHelpString([
-                _("The Cursor X block returns the horizontal position of the mouse."),
-                "documentation",
-                null,
-                "mousebuttonhelp"
-            ]);
-        }
+    constructor() {
+        super("mousex", _("cursor x"));
+        this.setPalette("sensors", activity);
+        this.beginnerBlock(true);
+        this.parameter = true;
+        this.setHelpString([
+            _("The Cursor X block returns the horizontal position of the mouse."),
+            "documentation",
+            null,
+            "mousebuttonhelp"
+        ]);
+    }
 
-        /**
+    /**
          * Updates the parameter of the block.
          * @param {Logo} logo - The Logo object.
          * @param {number} turtle - The turtle index.
          * @param {number} blk - The block index.
          * @returns {number} - The updated parameter value.
          */
-        updateParameter(logo, turtle, blk) {
-            return activity.blocks.blockList[blk].value;
-        }
-
-        /**
-         * Retrieves the argument value for the block.
-         * @returns {number} - The horizontal position of the mouse.
-         */
-        arg() {
-            return activity.getStageX();
-        }
+    updateParameter(logo, turtle, blk) {
+        return activity.blocks.blockList[blk].value;
     }
 
     /**
+         * Retrieves the argument value for the block.
+         * @returns {number} - The horizontal position of the mouse.
+         */
+    arg() {
+        return activity.getStageX();
+    }
+}
+
+/**
      * Represents a block that returns `true` if the mouse button is pressed.
      * @extends {BooleanSensorBlock}
      */
-    class MouseButtonBlock extends BooleanSensorBlock {
-        /**
+class MouseButtonBlock extends BooleanSensorBlock {
+    /**
          * Constructs a new MouseButtonBlock instance.
          */
-        constructor() {
-            super("mousebutton", _("mouse button"));
-            this.setHelpString([
-                _("The Mouse-button block returns True if the mouse button is pressed."),
-                "documentation",
-                null,
-                "mousebuttonhelp"
-            ]);
+    constructor() {
+        super("mousebutton", _("mouse button"));
+        this.setHelpString([
+            _("The Mouse-button block returns True if the mouse button is pressed."),
+            "documentation",
+            null,
+            "mousebuttonhelp"
+        ]);
 
 
-            this.setPalette("sensors", activity);
-            this.beginnerBlock(true);
-            this.parameter = true;
+        this.setPalette("sensors", activity);
+        this.beginnerBlock(true);
+        this.parameter = true;
 
-            this.extraWidth = 20;
-        }
+        this.extraWidth = 20;
+    }
 
-        /**
+    /**
          * Updates the parameter of the block.
          * @param {Logo} logo - The Logo object.
          * @param {number} turtle - The turtle index.
          * @param {number} blk - The block index.
          * @returns {string} - The updated parameter value (`"true"` or `"false"`).
          */
-        updateParameter(logo, turtle, blk) {
-            if (activity.blocks.blockList[blk].value) {
-                return _("true");
-            } else {
-                return _("false");
-            }
-        }
-
-        /**
-         * Retrieves the argument value for the block.
-         * @returns {boolean} - `true` if the mouse button is pressed, otherwise `false`.
-         */
-        arg() {
-            return activity.getStageMouseDown();
+    updateParameter(logo, turtle, blk) {
+        if (activity.blocks.blockList[blk].value) {
+            return _("true");
+        } else {
+            return _("false");
         }
     }
 
     /**
+         * Retrieves the argument value for the block.
+         * @returns {boolean} - `true` if the mouse button is pressed, otherwise `false`.
+         */
+    arg() {
+        return activity.getStageMouseDown();
+    }
+}
+
+/**
      * Represents a block that converts numbers to letters using ASCII encoding.
      * @extends {LeftBlock}
      */
-    class ToASCIIBlock extends LeftBlock {
-        /**
+class ToASCIIBlock extends LeftBlock {
+    /**
          * Constructs a new ToASCIIBlock instance.
          */
-        constructor() {
-            super("toascii", _("to ASCII"));
-            this.setPalette("sensors", activity);
-            this.parameter = true;
-            this.setHelpString([
-                _("The To ASCII block converts numbers to letters."),
-                "documentation",
-                ""
-            ]);
-            this.formBlock({
-                args: 1,
-                defaults: [65]
-            });
-        }
+    constructor() {
+        super("toascii", _("to ASCII"));
+        this.setPalette("sensors", activity);
+        this.parameter = true;
+        this.setHelpString([
+            _("The To ASCII block converts numbers to letters."),
+            "documentation",
+            ""
+        ]);
+        this.formBlock({
+            args: 1,
+            defaults: [65]
+        });
+    }
 
-        /**
+    /**
          * Updates the parameter of the block.
          * @param {Logo} logo - The Logo object.
          * @param {number} turtle - The turtle index.
          * @param {number} blk - The block index.
          * @returns {number} - The updated parameter value.
          */
-        updateParameter(logo, turtle, blk) {
-            return activity.blocks.blockList[blk].value;
-        }
+    updateParameter(logo, turtle, blk) {
+        return activity.blocks.blockList[blk].value;
+    }
 
-        /**
+    /**
          * Retrieves the argument value for the block.
          * @param {Logo} logo - The Logo object.
          * @param {number} turtle - The turtle index.
@@ -1199,78 +1189,78 @@ class GetColorMediaBlock extends ValueBlock {
          * @param {any} receivedArg - The received argument (not used in this method).
          * @returns {string|number} - The converted letter or 0 in case of an error.
          */
-        arg(logo, turtle, blk, receivedArg) {
-            if (
-                logo.inStatusMatrix &&
+    arg(logo, turtle, blk, receivedArg) {
+        if (
+            logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
                     "print"
-            ) {
-                logo.statusFields.push([blk, "toascii"]);
+        ) {
+            logo.statusFields.push([blk, "toascii"]);
+        } else {
+            const cblk1 = activity.blocks.blockList[blk].connections[1];
+            if (cblk1 === null) {
+                activity.errorMsg(NOINPUTERRORMSG, blk);
+                return "A";
+            }
+            const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
+            if (typeof a === "number") {
+                if (a < 1) return 0;
+                else return String.fromCharCode(a);
             } else {
-                const cblk1 = activity.blocks.blockList[blk].connections[1];
-                if (cblk1 === null) {
-                    activity.errorMsg(NOINPUTERRORMSG, blk);
-                    return "A";
-                }
-                const a = logo.parseArg(logo, turtle, cblk1, blk, receivedArg);
-                if (typeof a === "number") {
-                    if (a < 1) return 0;
-                    else return String.fromCharCode(a);
-                } else {
-                    activity.errorMsg(NANERRORMSG, blk);
-                    return 0;
-                }
+                activity.errorMsg(NANERRORMSG, blk);
+                return 0;
             }
         }
     }
+}
 
-    /**
+/**
      * Represents a block that returns computer keyboard input.
      * @extends {ValueBlock}
      */
-    class KeyboardBlock extends ValueBlock {
-        /**
+class KeyboardBlock extends ValueBlock {
+    /**
          * Constructs a new KeyboardBlock instance.
          */
-        constructor() {
-            super("keyboard", _("keyboard"));
-            this.setPalette("sensors", activity);
-            this.parameter = true;
-            this.setHelpString([
-                _("The Keyboard block returns computer keyboard input."),
-                "documentation",
-                ""
-            ]);
-            this.makeMacro((x, y) => [
-                [0, "toascii", x, y, [null, 1]],
-                [1, "keyboard", 0, 0, [0, null]]
-            ]);
-        }
+    constructor() {
+        super("keyboard", _("keyboard"));
+        this.setPalette("sensors", activity);
+        this.parameter = true;
+        this.setHelpString([
+            _("The Keyboard block returns computer keyboard input."),
+            "documentation",
+            ""
+        ]);
+        this.makeMacro((x, y) => [
+            [0, "toascii", x, y, [null, 1]],
+            [1, "keyboard", 0, 0, [0, null]]
+        ]);
+    }
 
-        /**
+    /**
          * Updates the parameter of the block.
          * @param {Logo} logo - The Logo object.
          * @param {number} turtle - The turtle index.
          * @param {number} blk - The block index.
          * @returns {number} - The updated parameter value.
          */
-        updateParameter(logo, turtle, blk) {
-            return activity.blocks.blockList[blk].value;
-        }
+    updateParameter(logo, turtle, blk) {
+        return activity.blocks.blockList[blk].value;
+    }
 
-        /**
+    /**
          * Retrieves the argument value for the block.
          * @param {Logo} logo - The Logo object.
          * @returns {number} - The last key code pressed.
          */
-        arg(logo) {
-            logo.lastKeyCode = activity.getCurrentKeyCode();
-            const val = logo.lastKeyCode;
-            activity.clearCurrentKeyCode();
-            return val;
-        }
-
+    arg(logo) {
+        logo.lastKeyCode = activity.getCurrentKeyCode();
+        const val = logo.lastKeyCode;
+        activity.clearCurrentKeyCode();
+        return val;
     }
+
+}
 
 // ✅ Only register these blocks when running in the real app (not in Jest).
 // Use `globalThis.activity` to avoid TDZ/reference errors when this module
@@ -1312,15 +1302,15 @@ if (
 }
 
 const mockBlocks = {
-  addBlock: jest.fn(),
-  // Optional: add any other methods if needed
+    addBlock: jest.fn(),
+    // Optional: add any other methods if needed
 };
 
 const activity = {
-  blocks: mockBlocks,
-  turtles: [],
-  logo: {},
-  // ... other mocks required by SensorsBlocks
+    blocks: mockBlocks,
+    turtles: [],
+    logo: {},
+    // ... other mocks required by SensorsBlocks
 };
 
 
