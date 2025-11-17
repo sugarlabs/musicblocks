@@ -389,7 +389,7 @@ const piemenuPitches = (
 
             // Ensure synth is initialized before proceeding
             if (!that.activity.logo.synth) {
-                console.debug('Creating synth in logo');
+                console.debug("Creating synth in logo");
                 that.activity.logo.synth = new Synth();
             }
             
@@ -501,7 +501,7 @@ const piemenuPitches = (
                     that.activity.logo.synth.createDefaultSynth(0);
                     await that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
                 } catch (e) {
-                    console.debug('Error initializing synth:', e);
+                    console.debug("Error initializing synth:", e);
                     return;
                 }
             }
@@ -516,7 +516,7 @@ const piemenuPitches = (
                 that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
                 that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
             } catch (e) {
-                console.debug('Error setting volume:', e);
+                console.debug("Error setting volume:", e);
                 return;
             }
 
@@ -526,7 +526,7 @@ const piemenuPitches = (
                 try {
                     await that.activity.logo.synth.trigger(0, [obj[0] + obj[1]], 1/8, DEFAULTVOICE, null, null, false);
                 } catch (e) {
-                    console.debug('Error triggering note:', e);
+                    console.debug("Error triggering note:", e);
                 } finally {
                     // Ensure trigger lock is released after a delay
                     setTimeout(() => {
@@ -535,7 +535,7 @@ const piemenuPitches = (
                 }
             }
         } catch (e) {
-            console.error('Error in pitch preview:', e);
+            console.error("Error in pitch preview:", e);
         }
     };
 
@@ -668,9 +668,9 @@ const piemenuPitches = (
     const setupAudioContext = async () => {
         try {
             await Tone.start();
-            console.debug('Audio context started');
+            console.debug("Audio context started");
         } catch (e) {
-            console.debug('Error starting audio context:', e);
+            console.debug("Error starting audio context:", e);
         }
     };
 
