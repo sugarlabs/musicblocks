@@ -672,6 +672,8 @@ function SampleWidget() {
             container.appendChild(buttonDiv);
         };
 
+        // Commented out the audio trimmer code because it doesn't provide a visual trimming interface.
+
         // this._trimBtn.onclick = () => {
 
         //     this.widgetWindow.clearScreen();
