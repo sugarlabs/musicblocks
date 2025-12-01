@@ -2,6 +2,5 @@ node_modules/
 lib/
 dist/
 build/
-coverage/
 *.min.js
 *.svg
