@@ -40,9 +40,10 @@ requirejs.config({
     packages: []
 });
 
-requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBackend) {
+requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBackend) {
 
     function updateContent() {
+        console.log("asdasdasd");
         console.log("updateContent() called");  // Debugging line
         const elements = document.querySelectorAll("[data-i18n]");
 
@@ -66,9 +67,9 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                         escapeValue: false
                     },
                     backend: {
-                        loadPath: "locales/{{lng}}.json?v=" + Date.now()
+                        loadPath: "locales/{{lng}}.json?v="+Date.now()
                     }
-                }, function (err, t) {
+                }, function(err, t) {
                     if (err) {
                         console.error("i18next init failed:", err);
                         reject(err);
@@ -79,19 +80,19 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                         resolve(i18next);
                     }
                 });
+            
 
-
-            i18next.on("initialized", function () {
+            i18next.on("initialized", function() {
                 console.log("i18next initialized");
             });
 
-            i18next.on("loaded", function (loaded) {
+            i18next.on("loaded", function(loaded) {
                 console.log("i18next loaded:", loaded);
             });
 
+         
 
-
-
+    
         });
     }
 
@@ -100,7 +101,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
             await initializeI18next();
 
             if (document.readyState === "loading") {
-                document.addEventListener("DOMContentLoaded", function () {
+                document.addEventListener("DOMContentLoaded", function() {
                     updateContent();
                 });
             } else {
@@ -124,7 +125,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
         updateContent();
     });
 
-    i18next.on("languageChanged", function () {
+    i18next.on("languageChanged", function() {
         updateContent();
     });
 });
