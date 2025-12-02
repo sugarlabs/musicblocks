@@ -448,7 +448,7 @@ Turtles.TurtlesModel = class {
      * @param {Object} turtle
      */
     pushTurtle(turtle) {
-        if(!this._turtleList.includes(turtle))
+        if (!this._turtleList.includes(turtle))
             this._turtleList.push(turtle);
     }
 
@@ -565,7 +565,7 @@ Turtles.TurtlesModel = class {
      * @return {Boolean} - running
      */
     running() {
-        for(let i = 0; i < this.getTurtleCount(); i++) {
+        for (let i = 0; i < this.getTurtleCount(); i++) {
             if (this.getTurtle(i).running) {
                 return true;
             }
@@ -940,14 +940,14 @@ Turtles.TurtlesView = class {
             this.gridButton = _makeButton(
                 CARTESIANBUTTON,
                 {
-                    "name":"Grid",
-                    "label":_("Grid")
+                    "name": "Grid",
+                    "label": _("Grid")
                 },
                 this._w - 10 - 3 * 55,
                 70 + LEADING + 6
             );
             const that = this;
-            this.gridButton.onclick  = () => {
+            this.gridButton.onclick = () => {
                 piemenuGrid(that.activity);
             };
         };
@@ -980,8 +980,8 @@ Turtles.TurtlesView = class {
             this._collapseButton = _makeButton(
                 COLLAPSEBUTTON,
                 {
-                    "name":"Collapse",
-                    "label":_("Collapse")
+                    "name": "Collapse",
+                    "label": _("Collapse")
                 },
                 this._w - 55,
                 70 + LEADING + 6
@@ -1049,8 +1049,8 @@ Turtles.TurtlesView = class {
             this._expandButton = _makeButton(
                 EXPANDBUTTON,
                 {
-                    "name":"Expand",
-                    "label":_("Expand"),
+                    "name": "Expand",
+                    "label": _("Expand"),
                 },
                 this._w - 55,
                 70 + LEADING + 6
@@ -1121,7 +1121,7 @@ Turtles.TurtlesView = class {
             if (this.currentGrid !== null) {
                 this.activity.turtles.doGrid(0);
             }
-            
+
             // remove the stage and add it back in position 0
             this.masterStage.removeChild(turtlesStage);
             this.masterStage.addChildAt(turtlesStage, 0);
@@ -1152,7 +1152,7 @@ Turtles.TurtlesView = class {
             __makeExpandButton();
             __makeClearButton();
             __makeGridButton();
-            jQuery.noConflict()(".tooltipped").each(function(){
+            jQuery.noConflict()(".tooltipped").each(function () {
                 jQuery.noConflict()(this).tooltip(
                     {
                         html: true,
@@ -1257,10 +1257,15 @@ Turtles.TurtlesView = class {
             __makeBoundary();
         }
 
-        window.addEventListener("resize", ()=>{
-            handleCanvasResize();
-            __makeBoundary();
-            __makeBoundary2();
+        // Debounce the resize event to prevent performance issues
+        let resizeTimeout;
+        window.addEventListener("resize", () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                handleCanvasResize();
+                __makeBoundary();
+                __makeBoundary2();
+            }, 150); // Wait 150ms after the last resize event to execute
         });
 
         return this;
