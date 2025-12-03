@@ -5791,9 +5791,14 @@ const i18nSolfege = (note) => {
     if (i !== -1) {
         return solfnotes_[i] + obj[1];
     } else {
-        // Wasn't solfege so it doesn't need translation.
-        return note;
+        // Check if the note is in a different language.
+        const i = Object.values(solfnotes_).indexOf(obj[0]);
+        if (i !== -1) {
+            return SOLFNOTES[i] + obj[1];
+        }
     }
+    // Wasn't solfege so it doesn't need translation.
+    return note;
 };
 
 /**
