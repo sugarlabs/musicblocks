@@ -602,6 +602,17 @@ class WidgetWindow {
     }
 
     /**
+     * @public
+     * @return {WidgetWindow} this
+     * 
+     * Clears the widget window not the toolbar
+     */
+    clearScreen() {
+        this._widget.innerHTML = "";
+        return this;
+    }
+
+    /**
      * @private
      * @return {WidgetWindow} this
      */

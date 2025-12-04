@@ -43,7 +43,6 @@ requirejs.config({
 requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBackend) {
 
     function updateContent() {
-        console.log("asdasdasd");
         console.log("updateContent() called");  // Debugging line
         const elements = document.querySelectorAll("[data-i18n]");
 
