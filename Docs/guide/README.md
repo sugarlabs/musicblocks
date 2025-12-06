@@ -770,7 +770,7 @@ Because some users may want to explicitly spell out all of the pitches
 regardless of the chosen key, we allow them to use Scale Degree with
 the *Movable Do* block (remember, Scale Degree works like Movable=La
 by default). Please see [this
-code](https://rawgithub.com/sugarlabs/musicblocks/master/examples/2-spelling-systems-for-Scale-Degree.html)
+code](../../examples/2-spelling-systems-for-Scale-Degree.html)
 as an example.
 
 The following chart describes the behavior of different blocks
