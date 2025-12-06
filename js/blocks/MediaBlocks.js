@@ -19,6 +19,9 @@
 
 /* exported setupMediaBlocks */
 
+// Addition Made: Import gifuct-js
+import { parseGIF, decompressFrames } from 'gifuct-js';
+
 function setupMediaBlocks(activity) {
     /**
      * Represents a block that returns the position of the right side of the screen.
@@ -402,11 +405,37 @@ function setupMediaBlocks(activity) {
          * @param {Logo} logo - The logo object.
          * @param {number} turtle - The turtle identifier.
          */
+
+    // ------------------------------------------------------------ //
+    //                   CHANGE #3 STARTS HERE                      //
+    // ------------------------------------------------------------ //
+
+    /*
+    Ensures that all GIF animations stop when the MediaClear block is executed.
+    This change updates the flow() function of the MediaClear block so that, in 
+    addition to clearing the canvas, it iterates through all existing blocks and 
+    stops any active GIF animations running inside MediaBlock instances. This 
+    prevents GIFs from continuing to animate after the media has been cleared and 
+    ensures proper cleanup of timers and frame updates.
+    */
+
         flow(args, logo, turtle) {
             const tur = activity.turtles.ithTurtle(turtle);
             tur.painter.doClearMedia();
+
+            // Stop GIF animation in all MediaBlocks
+            for (const blkId in activity.blocks.blockList) {
+                const blk = activity.blocks.blockList[blkId];
+                if (blk instanceof MediaBlock) {
+                    blk.stopAnimation();
+                }
+            }
         }
     }
+
+    // ------------------------------------------------------------ //
+    //                     CHANGE #3 ENDS HERE                      //
+    // ------------------------------------------------------------ //
 
     /**
      * Represents a block that plays back an audio recording.
@@ -885,26 +914,57 @@ function setupMediaBlocks(activity) {
          * @param {number} turtle - The turtle identifier.
          * @param {string} blk - The block identifier.
          */
+
+    // ------------------------------------------------------------ //
+    //                   CHANGE #2 STARTS HERE                      //
+    // ------------------------------------------------------------ //
+
+    /*
+    Adds functionality to render GIF frames or static images during flow execution.
+    This update modifies the flow() function so that when a block is executed, it checks 
+    whether the media object includes GIF frames or a static image. If it's a GIF, it extracts 
+    the current frame’s pixel data and draws it directly onto the turtle’s canvas using putImageData. 
+    If it's a static image, it draws it with drawImage. The change also preserves existing behavior 
+    for note blocks and suppressed output.
+    */
+
         flow(args, logo, turtle, blk) {
             const tur = activity.turtles.ithTurtle(turtle);
 
-            if (args.length === 2) {
-                if (tur.singer.inNoteBlock.length > 0) {
-                    tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
-                } else {
-                    if (!tur.singer.suppressOutput) {
-                        logo.processShow(turtle, blk, args[0], args[1]);
-                    }
+            if (args.length !== 2) return;
+            const [size, media] = args;
+
+            if (tur.singer.inNoteBlock.length > 0) {
+                tur.singer.embeddedGraphics[last(tur.singer.inNoteBlock)].push(blk);
+            } else if (!tur.singer.suppressOutput) {
+                if (media.frames) {
+                    // Draw current GIF frame
+                    const frame = media.frames[media.currentFrame];
+                    const imageData = new ImageData(
+                        new Uint8ClampedArray(frame.data),
+                        frame.dims.width,
+                        frame.dims.height
+                    );
+
+                    const ctx = tur.painter._ctx; // get canvas context
+                    ctx.putImageData(imageData, 0, 0); // adjust x,y if needed
+                } else if (media.image) {
+                    tur.painter._ctx.drawImage(media.image, 0, 0, size, size);
                 }
             }
         }
     }
+
+    // ------------------------------------------------------------ //
+    //                     CHANGE #2 ENDS HERE                      //
+    // ------------------------------------------------------------ //
 
     /**
      * Represents a block that imports an image.
      * @class
      * @extends ValueBlock
      */
+
     class MediaBlock extends ValueBlock {
         /**
          * Constructs a MediaBlock instance.
@@ -930,7 +990,77 @@ function setupMediaBlocks(activity) {
                 image: "images/load-media.svg",
                 outType: "mediaout"
             });
+
+    // ------------------------------------------------------------ //
+    //                   CHANGE #1 STARTS HERE                      //
+    // ------------------------------------------------------------ //
+
+    /*
+    Adds GIF support by parsing frames, storing them, and animating them on the turtle canvas.
+    This change extends the MediaBlock so that when a GIF file is loaded, its frames are extracted 
+    using parseGIF and decompressFrames. Each frame’s pixel data is then drawn onto the canvas using 
+    putImageData, and a timer (setTimeout) cycles through the frames to simulate animation. Static 
+    images follow the original behavior. The animateFrames() method handles rendering and looping 
+    through GIF frames using the stored canvas context.
+    */
+
+            this.frames = null;         // GIF frames
+            this.currentFrame = 0;      // Current frame index
+            this.frameTimer = null;     // Timer for animation
         }
+
+        // Load a file into this MediaBlock
+        async loadFile(file) {
+            const tur = activity.turtles.ithTurtle(0); // pick first turtle, or the right one
+            this.ctx = tur.painter._ctx;
+
+            if (file.type === "image/gif") {
+                const buffer = await file.arrayBuffer();
+                const gif = parseGIF(buffer);
+                this.frames = decompressFrames(gif, true);
+                this.currentFrame = 0;
+
+                if (this.frames.length > 0) this.animateFrames();
+            } else {
+                this.frames = null;
+                this.currentFrame = 0;
+
+                const img = new Image();
+                img.src = URL.createObjectURL(file);
+                this.image = img;
+
+                if (ctx) ctx.drawImage(img, 0, 0); // draw non-GIF image
+            }
+        }
+
+
+        animateFrames() {
+            if (!this.frames) return;
+
+            const frame = this.frames[this.currentFrame];
+            const ctx = this.ctx; // we need to store canvas context when loaded
+            if (ctx) {
+                const imageData = new ImageData(
+                    new Uint8ClampedArray(frame.data),
+                    frame.dims.width,
+                    frame.dims.height
+                );
+                ctx.putImageData(imageData, 0, 0);
+            }
+
+            const delay = frame.delay || 10; // hundredths of a second
+
+            this.frameTimer = setTimeout(() => {
+                this.currentFrame = (this.currentFrame + 1) % this.frames.length;
+                this.animateFrames();
+            }, delay * 10);
+        }
+
+
+    // ------------------------------------------------------------ //
+    //                     CHANGE #1 ENDS HERE                      //
+    // ------------------------------------------------------------ //
+
     }
 
     /**
