@@ -684,7 +684,7 @@ class Block {
                 this.disconnectedBitmap.visible = true;
             }
             this.container.updateCache();
-        }
+        };
     }
 
     /**
