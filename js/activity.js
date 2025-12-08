@@ -1461,6 +1461,14 @@ class Activity {
                 this.turtles.setBackgroundColor(-1);
                 this.logo.svgOutput = "";
                 this.logo.notationOutput = "";
+                
+                // Clear the recording buffer (Issue #2330)
+                this.logo.recordingBuffer.hasData = false;
+                this.logo.recordingBuffer.notationOutput = "";
+                this.logo.recordingBuffer.notationNotes = {};
+                this.logo.recordingBuffer.notationStaging = {};
+                this.logo.recordingBuffer.notationDrumStaging = {};
+                
                 for (let turtle = 0; turtle < this.turtles.getTurtleCount(); turtle++) {
                     this.logo.turtleHeaps[turtle] = [];
                     this.logo.turtleDicts[turtle] = {};

@@ -494,17 +494,38 @@ class SaveInterface {
      */
     saveAbc(activity) {
         document.body.style.cursor = "wait";
-        //Suppress music and turtle output when generating
-        // Abc output.
-        activity.logo.runningAbc = true;
-        activity.logo.notationOutput = ABCHEADER;
-        activity.logo.notationNotes = {};
-        for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
-            activity.logo.notation.notationStaging[t] = [];
-            activity.logo.notation.notationDrumStaging[t] = [];
-            activity.turtles.getTurtle(t).painter.doClear(true, true, true);
+        
+        // Check if we have buffered notation data (Issue #2330)
+        if (activity.logo.recordingBuffer.hasData) {
+            // Use buffered data - restore it temporarily
+            activity.logo.notationOutput = activity.logo.recordingBuffer.notationOutput;
+            activity.logo.notationNotes = activity.logo.recordingBuffer.notationNotes;
+            for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
+                if (activity.logo.recordingBuffer.notationStaging[t]) {
+                    activity.logo.notation.notationStaging[t] = activity.logo.recordingBuffer.notationStaging[t];
+                }
+                if (activity.logo.recordingBuffer.notationDrumStaging[t]) {
+                    activity.logo.notation.notationDrumStaging[t] = activity.logo.recordingBuffer.notationDrumStaging[t];
+                }
+            }
+            
+            // Save immediately
+            setTimeout(() => {
+                activity.save.afterSaveAbc();
+            }, 100);
+        } else {
+            // No buffered data - run the program to generate notation (original behavior)
+            //Suppress music and turtle output when generating Abc output.
+            activity.logo.runningAbc = true;
+            activity.logo.notationOutput = ABCHEADER;
+            activity.logo.notationNotes = {};
+            for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
+                activity.logo.notation.notationStaging[t] = [];
+                activity.logo.notation.notationDrumStaging[t] = [];
+                activity.turtles.getTurtle(t).painter.doClear(true, true, true);
+            }
+            activity.logo.runLogoCommands();
         }
-        activity.logo.runLogoCommands();
     }
 
     /**
@@ -534,6 +555,34 @@ class SaveInterface {
      * @instance
      */
     saveLilypond(activity) {
+        // Check if we have buffered notation data (Issue #2330)
+        // If so, use it directly; otherwise run the program
+        if (activity.logo.recordingBuffer.hasData) {
+            // Restore buffered data temporarily for save operation
+            const savedNotationOutput = activity.logo.notationOutput;
+            const savedNotationNotes = activity.logo.notationNotes;
+            const savedNotationStaging = {};
+            const savedNotationDrumStaging = {};
+            
+            // Save current state
+            for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
+                savedNotationStaging[t] = activity.logo.notation.notationStaging[t];
+                savedNotationDrumStaging[t] = activity.logo.notation.notationDrumStaging[t];
+            }
+            
+            // Load buffered data
+            activity.logo.notationOutput = activity.logo.recordingBuffer.notationOutput;
+            activity.logo.notationNotes = activity.logo.recordingBuffer.notationNotes;
+            for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
+                if (activity.logo.recordingBuffer.notationStaging[t]) {
+                    activity.logo.notation.notationStaging[t] = activity.logo.recordingBuffer.notationStaging[t];
+                }
+                if (activity.logo.recordingBuffer.notationDrumStaging[t]) {
+                    activity.logo.notation.notationDrumStaging[t] = activity.logo.recordingBuffer.notationDrumStaging[t];
+                }
+            }
+        }
+        
         const lyext = "ly";
         let filename = _("My Project");
         if (activity.PlanetInterface !== undefined) {
@@ -648,26 +697,50 @@ class SaveInterface {
             this.activity.logo.guitarOutputEnd = "      >>\n%}\n";
         }
 
-        // Suppress music and turtle output when generating
-        // Lilypond output.
-        this.activity.logo.runningLilypond = true;
-        if (isPDF) {
-            this.notationConvert = "pdf";
+        // Check if we're using buffered data (Issue #2330)
+        if (this.activity.logo.recordingBuffer.hasData) {
+            // We already have the notation data in the buffer, just save it
+            if (isPDF) {
+                this.notationConvert = "pdf";
+            } else {
+                this.notationConvert = "";
+            }
+            // Update the header with user's title and author
+            this.activity.logo.notationOutput = this.activity.logo.notationOutput.replace(
+                /My Music Blocks Creation|Mr. Mouse/gi,
+                (matched) => mapLilypondObj[matched]
+            );
+            
+            // Close dialog and save immediately
+            docById("lilypondModal").style.display = "none";
+            document.body.style.cursor = "wait";
+            
+            // Trigger save after a short delay to let UI update
+            setTimeout(() => {
+                this.afterSaveLilypond();
+            }, 100);
         } else {
-            this.notationConvert = "";
-        }
-        this.activity.logo.notationOutput = lyheader;
-        this.activity.logo.notationNotes = {};
-        for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
-            this.activity.logo.notation.notationStaging[t] = [];
-            this.activity.logo.notation.notationDrumStaging[t] = [];
-            this.activity.turtles.getTurtle(t).painter.doClear(true, true, true);
-        }
-        document.body.style.cursor = "wait";
-        this.activity.logo.runLogoCommands();
+            // No buffered data - run the program to generate notation (original behavior)
+            // Suppress music and turtle output when generating Lilypond output.
+            this.activity.logo.runningLilypond = true;
+            if (isPDF) {
+                this.notationConvert = "pdf";
+            } else {
+                this.notationConvert = "";
+            }
+            this.activity.logo.notationOutput = lyheader;
+            this.activity.logo.notationNotes = {};
+            for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
+                this.activity.logo.notation.notationStaging[t] = [];
+                this.activity.logo.notation.notationDrumStaging[t] = [];
+                this.activity.turtles.getTurtle(t).painter.doClear(true, true, true);
+            }
+            document.body.style.cursor = "wait";
+            this.activity.logo.runLogoCommands();
 
-        // Close the dialog box after hitting button.
-        docById("lilypondModal").style.display = "none";
+            // Close the dialog box after hitting button.
+            docById("lilypondModal").style.display = "none";
+        }
     }
 
     /** 

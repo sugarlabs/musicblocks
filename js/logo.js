@@ -216,6 +216,16 @@ class Logo {
         this.runningMIDI = false;
         this._checkingCompletionState = false;
         this.recording = false;
+        
+        // Buffer for recording musical output (Issue #2330)
+        // This allows saving Lilypond/ABC notation from interactive sessions
+        this.recordingBuffer = {
+            hasData: false,
+            notationOutput: "",
+            notationNotes: {},
+            notationStaging: {},
+            notationDrumStaging: {}
+        };
 
         this.temperamentSelected = [];
         this.customTemperamentDefined = false;
@@ -1725,6 +1735,25 @@ class Logo {
                         // console.debug("finishing compiling");
                         if (!logo.recording) {
                             logo.activity.errorMsg(_("Playback is ready."));
+                        }
+                    } else {
+                        // Record notation data into buffer for later save (Issue #2330)
+                        // This allows saving Lilypond/ABC from interactive sessions
+                        if (logo.notationOutput && logo.notationOutput.length > 0) {
+                            logo.recordingBuffer.hasData = true;
+                            logo.recordingBuffer.notationOutput = logo.notationOutput;
+                            logo.recordingBuffer.notationNotes = JSON.parse(JSON.stringify(logo.notationNotes));
+                            // Copy notation staging data
+                            logo.recordingBuffer.notationStaging = {};
+                            logo.recordingBuffer.notationDrumStaging = {};
+                            for (let t = 0; t < logo.activity.turtles.getTurtleCount(); t++) {
+                                if (logo.notation.notationStaging[t]) {
+                                    logo.recordingBuffer.notationStaging[t] = [...logo.notation.notationStaging[t]];
+                                }
+                                if (logo.notation.notationDrumStaging[t]) {
+                                    logo.recordingBuffer.notationDrumStaging[t] = [...logo.notation.notationDrumStaging[t]];
+                                }
+                            }
                         }
                     }
 
