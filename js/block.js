@@ -2205,8 +2205,6 @@ class Block {
             this.disconnectedHighlightBitmap.visible = false;
         }
 
-        this.updateCache();
-
         if (this.name === "action") {
             // Label the collapsed block with the action label.
             if (this.connections[1] !== null) {
@@ -2243,6 +2241,19 @@ class Block {
                 }
             }
         }
+        //Update visibility of standard vs highlight bitmaps first
+        this.unhighlight();
+
+        //Delete the old cache.
+        // We must delete it so the engine is forced to calculate the new size.
+        if (this.container.cacheID) {
+            this.container.uncache();
+        }
+
+        //Create a NEW cache.
+        this._createCache((that) => {
+            that.activity.refreshCanvas();
+        });
 
         this.updateCache();
         this.unhighlight();
