@@ -16,16 +16,21 @@
     <link rel="apple-touch-icon" href="/activity/activity-icon-color-512.png">
     <link rel="manifest" href="android_chrome_manifest.json">
 
+    <!-- Resource Hints -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+
     <!-- Stylesheets -->
     <link rel="preload" href="https://fonts.googleapis.com/icon?family=Material+Icons" as="style"
         onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="fonts/material-icons.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="css/activities.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="dist/css/activities.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="dist/css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="dist/css/keyboard.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="dist/css/windows.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="lib/materialize-iso.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="css/darkmode.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="dist/css/themes.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" as="video" href="loading-animation.webm" type="video/webm">
     <link rel="preload" as="video" href="loading-animation.mp4" type="video/mp4">
     <link rel="preload" as="image" href="loading-animation-ja.svg">
@@ -40,7 +45,7 @@
     <script src="lib/reqwest.js" defer></script>
 
     <!-- <script src="lib/jquery-3.7.1.js"></script> -->
-    <script src="lib/jquery-2.1.4.min.js"></script>
+    <script src="lib/jquery-2.1.4.min.js" defer></script>
     <script src="lib/jquery-ui.js" defer></script>
     <script src="lib/materialize.min.js" defer></script>
     <script src="lib/webL10n.js" defer></script>
@@ -52,13 +57,24 @@
     <script src="lib/wheelnav.js" defer></script>
     <script src="lib/abc.min.js" defer></script>
     <script src="lib/codejar/codejar.min.js" defer></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
-    <script>
-        hljs.highlightAll();
-        <code class="language-javascript">
-        </code>
+    <!-- Conditionally load highlight.js only if code blocks are present -->
+    <script defer>
+        document.addEventListener('DOMContentLoaded', function(){
+            if (!document.querySelector('pre code')) return;
+            var cssHref = '//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css';
+            var css = document.createElement('link');
+            css.rel = 'preload'; css.as = 'style'; css.href = cssHref; css.onload = function(){ this.onload=null; this.rel='stylesheet'; };
+            document.head.appendChild(css);
+            var s = document.createElement('script');
+            s.src = '//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js';
+            s.defer = true;
+            s.onload = function(){ if (window.hljs && window.hljs.highlightAll) window.hljs.highlightAll(); };
+            document.head.appendChild(s);
+        });
     </script>
+    <noscript>
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css" />
+    </noscript>
     <script src="lib/astring.min.js" defer></script>
 
     <script src="lib/acorn.min.js" defer></script>
@@ -66,10 +82,14 @@
     <link rel="prefetch" type="application/l10n" href="./localization.ini" />
 
     <script data-main="js/loader" src="lib/require.js" defer></script>
-    <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
     <link rel="preload" href="/fonts/material-icons.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-    <link rel="stylesheet" href="lib/materialize-iso.css">
-    <link rel="stylesheet" href="css/themes.css">
+    <!-- noscript fallbacks for async CSS -->
+    <noscript>
+        <link rel="stylesheet" href="fonts/material-icons.css" />
+        <link rel="stylesheet" href="lib/materialize-iso.css" />
+        <link rel="stylesheet" href="dist/css/themes.css" />
+        <link rel="stylesheet" href="dist/css/style.css" />
+    </noscript>
     <script src="lib/easeljs.min.js" defer></script>
     <script src="lib/tweenjs.min.js" defer></script>
     <script>
@@ -77,6 +97,15 @@
         fetch("js/js-export/ast2blocks.min.json")
             .then(response => response.json())
             .then(data => { ast2blocklist_config = data })
+    </script>
+    <script>
+        // Lazy-load all non-critical images that lack explicit loading
+        window.addEventListener('load', function(){
+            document.querySelectorAll('img:not([loading])').forEach(function(img){
+                // do not override images explicitly eager
+                img.setAttribute('loading','lazy');
+            });
+        });
     </script>
 </head>
 
@@ -174,7 +203,7 @@
                     <div id="load-container">
                         <div id="load-content">
                             <p id="messageText"></p>
-                            <amp-img id="loading-image" src="images/loading.gif" alt="Loading..."></amp-img>
+                            <amp-img id="loading-image" src="images/loading.gif" alt="Loading..." loading="lazy"></amp-img>
                         </div>
                     </div>
                 </div>
@@ -207,7 +236,7 @@
 
                 <div id="loader"></div>
 
-                <iframe src="planet/index.html" id="planet-iframe" style="display: none;"></iframe>
+                <iframe src="planet/index.html" id="planet-iframe" style="display: none;" loading="lazy"></iframe>
 
                 <div id="floatingWindows"></div>
 
@@ -274,7 +303,7 @@
                         <div id="mb-logo" class="logo left tooltipped"
                             style="display: flex; align-items: center; line-height: 0; height: 100%; padding-right: 0;"
                             data-position="bottom">
-                            <amp-img alt="MusicBlocks Logo" width="100%" src="images/logo.svg">
+                            <amp-img alt="MusicBlocks Logo" width="100%" src="images/logo.svg" loading="lazy">
                             </amp-img>
                         </div>
                         <ul class="main left">
@@ -519,9 +548,17 @@
         }
     </script>
     <script>
-        $(document).ready(function () {
-            doSearch();
-        });
+        // Defer non-critical search initialization off the critical path
+        (function(){
+            function schedule() {
+                try { if (typeof doSearch === 'function') doSearch(); } catch(e) { /* no-op */ }
+            }
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(schedule, { timeout: 2000 });
+            } else {
+                setTimeout(schedule, 1500);
+            }
+        })();
     </script>
 
     <!-- Loading Dialog Script -->

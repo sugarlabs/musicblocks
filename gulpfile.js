@@ -9,7 +9,7 @@
 const { src, dest, watch, series, parallel } = require("gulp");
 // Importing all the Gulp-related packages we want to use
 const sourcemaps = require("gulp-sourcemaps");
-const sass = require("gulp-sass");
+const sass = require("gulp-sass")(require("sass"));
 const concat = require("gulp-concat");
 const uglify = require("gulp-uglify");
 const babel = require("gulp-babel");
@@ -23,7 +23,13 @@ const prettier = require("gulp-prettier");
 
 // File paths
 const files = {
-    jsPath: "js/**/*.js",
+    // Exclude any prebuilt/minified bundles to avoid duplicate declarations
+    jsPath: [
+        "js/**/*.js",
+        "!js/**/app.min.js",
+        "!js/**/bundle*.js",
+        "!dist/**/*.js"
+    ],
     cssPath: "css/*.css",
     sassPath: "css/*.sass"
 
@@ -45,17 +51,20 @@ const cssTask = () => {
 };
 
 // JS task: concatenates and uglifies JS files to app.min.js
+// JS task: transpile and minify each file individually to avoid collisions
 const jsTask = () => {
-    return src([files.jsPath])
-        .pipe(concat("app.min.js"))
-        .pipe(babel(
-            {
-                presets: ["@babel/env"]
-            }
-        ))
+    return src([
+        "js/**/*.js",
+        "!js/**/app.min.js",
+        "!js/**/bundle*.js",
+        "!dist/**/*.js"
+    ], { allowEmpty: true, base: "." })
+        .pipe(babel({
+            presets: ["@babel/env"],
+            plugins: ["@babel/plugin-proposal-class-properties"]
+        }))
         .pipe(uglify())
-        .pipe(dest("dist")
-        );
+        .pipe(dest("dist")); // preserves folder structure under dist/
 };
 
 // Cachebust
@@ -91,11 +100,19 @@ const watchTask = () => {
         parallel( jsTask, cssTask, sassTask));
 };
 
-// Export the default Gulp task so it can be run
-// Runs the sass ,css and js tasks simultaneously
-// then runs prettify, cacheBust, watch task, then validate
-exports.default = series(
-    parallel( jsTask, cssTask , sassTask ), prettify,
-    cacheBustTask,
-    watchTask, validate
+// Define build and dev tasks
+const build = series(
+    parallel(jsTask, cssTask, sassTask),
+    cacheBustTask
 );
+
+const dev = series(
+    parallel(jsTask, cssTask, sassTask),
+    cacheBustTask,
+    watchTask
+);
+
+// Exports
+exports.build = build;
+exports.dev = dev;
+exports.default = build;

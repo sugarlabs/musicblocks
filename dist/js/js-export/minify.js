@@ -1,0 +1,1 @@
+"use strict";var fs=require("fs"),jsonContent=fs.readFileSync("ast2blocks.json","utf8"),minified=JSON.stringify(JSON.parse(jsonContent));fs.writeFileSync("ast2blocks.min.json",minified);

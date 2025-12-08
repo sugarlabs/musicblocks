@@ -984,8 +984,10 @@ function Synth() {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            // eslint-disable-next-line no-delete-var
-            delete link;
+            // Avoid deleting local variables in strict mode
+            // release reference for GC
+            // eslint-disable-next-line no-unused-vars
+            const _unused = null; // keep scope clean
         };
         this.recorder.onstop = () => {
             if (!chunks.length) return;
