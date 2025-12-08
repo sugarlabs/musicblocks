@@ -684,7 +684,7 @@ class Block {
                 this.disconnectedBitmap.visible = true;
             }
             this.container.updateCache();
-        };
+        }
     }
 
     /**
@@ -812,7 +812,7 @@ class Block {
             if (this.name === "interval") {
                 proto.extraWidth = 80;
             } else {
-                proto.extraWidth = 40;
+                proto.extraWidth = 50;
             }
             proto.zeroArgBlock();
             obj = proto.generator();
@@ -821,7 +821,7 @@ class Block {
         } else if (this.isCollapsible()) {
             proto = new ProtoBlock("collapse");
             proto.scale = this.protoblock.scale;
-            proto.extraWidth = 40;
+            proto.extraWidth = 50;
             proto.basicBlockCollapsed();
             obj = proto.generator();
             this.collapseArtwork = obj[0];
@@ -1427,13 +1427,13 @@ class Block {
                 if (this.name === "interval") {
                     proto.extraWidth = 80;
                 } else {
-                    proto.extraWidth = 40;
+                    proto.extraWidth = 50;
                 }
                 proto.zeroArgBlock();
             } else {
                 proto = new ProtoBlock("collapse");
                 proto.scale = this.protoblock.scale;
-                proto.extraWidth = 40;
+                proto.extraWidth = 50;
                 proto.basicBlockCollapsed();
             }
 
