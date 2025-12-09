@@ -7120,16 +7120,28 @@ class Activity {
 
 const activity = new Activity();
 
-require(["domReady!"], (doc) =>{
-    setTimeout(() => {
-        activity.setupDependencies();
-        activity.domReady(doc);
-    }, 5000);
-});
+// Expose a deferred boot entry. This loads heavy deps, then starts the app.
+window.initActivity = function() {
+    try {
+        // Load all heavy dependencies just-in-time
+        require(MYDEFINES, function() {
+            const start = () => {
+                activity.setupDependencies();
+                activity.doContextMenus();
+                activity.doPluginsAndPaletteCols();
+                require(["domReady!"], (doc) => {
+                    activity.domReady(doc);
+                });
+            };
 
-// eslint-disable-next-line no-unused-vars
-define(MYDEFINES, (compatibility) =>{
-    activity.setupDependencies();
-    activity.doContextMenus();
-    activity.doPluginsAndPaletteCols();
-});
+            if (window.requestIdleCallback) {
+                requestIdleCallback(start);
+            } else {
+                setTimeout(start, 0);
+            }
+        });
+    } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error("initActivity failed:", e);
+    }
+};
