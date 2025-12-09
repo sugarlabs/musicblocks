@@ -3,18 +3,22 @@
     <head>
             <title>Music Blocks </title>
       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <!--Import Google Icon Font-->
-        <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
-        <!--Import materialize.css-->
-        <link type="text/css" rel="stylesheet" href="libs/materialize.min.css" media="screen,projection"/>
+        <!-- Preload CSS (non-blocking load with onload swap) -->
+        <link rel="preload" href="fonts/material-icons.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <link rel="preload" href="libs/materialize.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
         
         <link rel="preload" href="./fonts/material-icons.woff2" as="font" type="font/woff2" crossorigin="anonymous">
         <!-- Import clipboard.js -->
         <script src="libs/clipboard.min.js"></script>
  
-        <!--Import style.css-->
-        <link type="text/css" rel="stylesheet" href="css/style.css"/>
-        <link type="text/css" rel="stylesheet" href="css/planetThemes.css"/>
+        <!-- Page styles (non-blocking) -->
+        <link rel="preload" href="css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <link rel="preload" href="css/planetThemes.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <!-- Fallbacks for users with JS disabled -->
+        <noscript><link rel="stylesheet" href="fonts/material-icons.css"></noscript>
+        <noscript><link rel="stylesheet" href="libs/materialize.min.css" media="screen,projection"></noscript>
+        <noscript><link rel="stylesheet" href="css/style.css"></noscript>
+        <noscript><link rel="stylesheet" href="css/planetThemes.css"></noscript>
 
         <!--Let browser know website is optimized for mobile-->
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>

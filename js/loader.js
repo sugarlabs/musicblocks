@@ -42,15 +42,40 @@ requirejs.config({
 
 requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBackend) {
 
+    // Process large lists without blocking the UI thread
+    function processInChunks(list, processor, options) {
+        const arr = Array.isArray(list) ? list : Array.from(list);
+        const budgetMs = options && options.budgetMs ? options.budgetMs : 16; // ~1 frame
+        let i = options && typeof options.startIndex === "number" ? options.startIndex : 0;
+
+        const schedule = (cb) => {
+            if (typeof window.requestIdleCallback === "function") {
+                requestIdleCallback(() => cb(), { timeout: budgetMs });
+            } else {
+                setTimeout(cb, 0);
+            }
+        };
+
+        (function run() {
+            const start = (typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now();
+            while (i < arr.length && (((typeof performance !== "undefined" && performance.now) ? performance.now() : Date.now()) - start) < budgetMs) {
+                processor(arr[i], i);
+                i++;
+            }
+            if (i < arr.length) {
+                schedule(run);
+            }
+        })();
+    }
+
     function updateContent() {
         console.log("updateContent() called");  // Debugging line
         const elements = document.querySelectorAll("[data-i18n]");
-
-        elements.forEach((element) => {
+        processInChunks(elements, (element) => {
             const key = element.getAttribute("data-i18n");
             const translation = i18next.t(key);
             element.textContent = translation;
-        });
+        }, { budgetMs: 16 });
     }
 
     async function initializeI18next() {
@@ -109,12 +134,29 @@ requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBacken
             }
         } catch (error) {
             console.error("Error initializing i18next:", error);
+        } finally {
+            // Expose a lazy heavy-init hook; do not load heavy modules yet
+            window.initHeavyStuff = function() {
+                try {
+                    requirejs(["utils/utils", "activity/activity"], function() {
+                        if (typeof window.initActivity === "function") {
+                            // Allow browser a breath; schedule on idle if available
+                            if (window.requestIdleCallback) {
+                                requestIdleCallback(window.initActivity);
+                            } else {
+                                setTimeout(window.initActivity, 0);
+                            }
+                        }
+                    });
+                } catch (e) {
+                    console.error("Failed to start heavy initialization:", e);
+                }
+            };
         }
     }
 
-    main().then(() => {
-        requirejs(["utils/utils", "activity/activity"]);
-    });
+    // Initialize i18n and content; heavy app boot waits for user action
+    main();
 
     i18next.changeLanguage(lang, (err, t) => {
         if (err) {
