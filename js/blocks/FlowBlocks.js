@@ -1209,3 +1209,7 @@ function setupFlowBlocks(activity) {
     new HiddenNoFlowBlock().setup(activity);
     new HiddenBlock().setup(activity);
 }
+
+if (typeof module !== "undefined") {
+    module.exports = { setupFlowBlocks };
+}
