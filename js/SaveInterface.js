@@ -756,7 +756,7 @@ class SaveInterface {
             if (!success) {
                 // eslint-disable-next-line no-console
                 console.debug("Error: " + dataurl);
-                this.activity.errorMsg(_("Error generating PDF") + ": " + dataurl);
+                this.activity.errorMsg(_("Error generating PDF"));
             } else {
                 this.activity.save.download("pdf", dataurl, filename);
             }
