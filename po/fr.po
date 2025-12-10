@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2015-02-13 15:37+0000\n"
-"Last-Translator: Martin <tch@sugarlabs.org>\n"
+"PO-Revision-Date: 2025-12-10 18:51+0530\n"
+"Last-Translator: Harihara Vardhan <hariharavardhan1234@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -1618,7 +1618,7 @@ msgstr "Hébreu"
 #: js/toolbar.js:241
 #: js/toolbar.js:302
 msgid "اردو"
-msgstr ""
+msgstr "Ourdou"
 
 #: js/toolbar.js:157
 #: js/toolbar.js:160
@@ -1641,7 +1641,7 @@ msgstr "Enregistrer l'œuvre de la tortue en tant que SVG"
 #: js/toolbar.js:227
 #: js/toolbar.js:288
 msgid "한국인"
-msgstr ""
+msgstr "Coréen"
 
 #: js/toolbar.js:185
 #: js/toolbar.js:246
@@ -2053,11 +2053,11 @@ msgstr "Enregistrer l'œuvre du bloc en tant que fichier SVG."
 
 #: js/turtledefs.js:571
 msgid "Save sheet music as ABC, Lilypond or MusicXML"
-msgstr ""
+msgstr "Enregistrer la partition sous forme de ABC, Lilypond ou MusicXML"
 
 #: js/turtledefs.js:573
 msgid "Save block artwork as SVG or PNG"
-msgstr ""
+msgstr "Enregistrer l'œuvre du bloc en tant que SVG ou PNG"
 
 #: js/turtledefs.js:580
 msgid "Load samples from server"
@@ -2077,7 +2077,7 @@ msgstr "Cliquez sur ce bouton pour développer ou réduire la barre d'outils aux
 
 #: js/turtledefs.js:593
 msgid "Displays help messages for the main and auxiliary toolbar, right-click contextual menu for blocks and canvas, and palettes."
-msgstr ""
+msgstr "Affiche des messages d'aide pour la barre d'outils principale et auxiliaire, le menu contextuel par clic droit pour les blocs et le canevas, et les palettes."
 
 #: js/turtledefs.js:599
 msgid "Click to run the project in slow mode."
@@ -2093,7 +2093,7 @@ msgstr "Afficher les statistiques sur votre projet musical."
 
 #: js/turtledefs.js:618
 msgid "Load a selected plugin."
-msgstr ""
+msgstr "Charger un plugin sélectionné."
 
 #: js/turtledefs.js:626
 msgid "Delete a selected plugin."
@@ -2109,11 +2109,11 @@ msgstr "Vous pouvez faire défiler les blocs sur la toile."
 
 #: js/turtledefs.js:643
 msgid "Switch between dark and light mode."
-msgstr ""
+msgstr "Basculer entre le mode sombre et clair."
 
 #: js/turtledefs.js:649
 msgid "Click to add another project into the current one."
-msgstr ""
+msgstr "Cliquez pour ajouter un autre projet à celui en cours."
 
 #: js/turtledefs.js:654
 msgid "Wrap Turtle"
@@ -2125,11 +2125,11 @@ msgstr "Activer ou désactiver l'enveloppement de la tortue."
 
 #: js/turtledefs.js:663
 msgid "Click to set the current pitch."
-msgstr ""
+msgstr "Cliquez pour définir la hauteur actuelle."
 
 #: js/turtledefs.js:670
 msgid "Converts Music Block programs to JavaScript."
-msgstr ""
+msgstr "Convertit les programmes Music Blocks en JavaScript."
 
 #: js/turtledefs.js:677
 msgid "Restore blocks from the trash."
@@ -2149,11 +2149,11 @@ msgstr "Sélectionnez votre préférence linguistique."
 
 #: js/turtledefs.js:696
 msgid "Contextual Menu for Blocks"
-msgstr ""
+msgstr "Menu contextuel pour les blocs"
 
 #: js/turtledefs.js:697
 msgid "Right-click on a block to access common actions."
-msgstr ""
+msgstr "Faites un clic droit sur un bloc pour accéder aux actions courantes."
 
 #: js/turtledefs.js:702
 #: planet/js/StringHelper.js:46
@@ -2182,11 +2182,11 @@ msgstr "Vous pouvez taper d pour créer un bloc do et r pour créer un bloc re, 
 
 #: js/turtledefs.js:729
 msgid "Contextual Menu for Canvas"
-msgstr ""
+msgstr "Menu contextuel pour le canevas"
 
 #: js/turtledefs.js:730
 msgid "Right-click on the canvas to perform additional canvas-related tasks."
-msgstr ""
+msgstr "Faites un clic droit sur le canevas pour effectuer des tâches supplémentaires liées au canevas."
 
 #: js/turtledefs.js:736
 #: js/turtles.js:940
@@ -2196,11 +2196,11 @@ msgstr "Grille"
 
 #: js/turtledefs.js:737
 msgid "Turn on/off lines for cartesian or polar grids."
-msgstr ""
+msgstr "Activer/désactiver les lignes pour les grilles cartésiennes ou polaires."
 
 #: js/turtledefs.js:739
 msgid "Turn on/off music staffs."
-msgstr ""
+msgstr "Activer/désactiver les portées musicales."
 
 #: js/turtledefs.js:744
 #: js/turtles.js:959
@@ -2253,11 +2253,11 @@ msgstr "Augmenter la taille des blocs."
 
 #: js/turtledefs.js:789
 msgid "Select"
-msgstr ""
+msgstr "Sélectionner"
 
 #: js/turtledefs.js:790
 msgid "Left-click and drag on workspace to select multiple blocks."
-msgstr ""
+msgstr "Faites un clic gauche et faites glisser sur l'espace de travail pour sélectionner plusieurs blocs."
 
 #: js/turtledefs.js:797
 msgid "Palette buttons"
@@ -2329,7 +2329,7 @@ msgstr "Dépôt GitHub de Music Blocks"
 
 #: js/turtledefs.js:854
 msgid "Congratulations!"
-msgstr ""
+msgstr "Félicitations !"
 
 #: js/turtledefs.js:855
 msgid "You have finished the tour. Please enjoy Music Blocks!"
@@ -2923,7 +2923,7 @@ msgstr "guitare"
 #: js/utils/synthutils.js:84
 #. TRANS: sitar musical instrument
 msgid "sitar"
-msgstr ""
+msgstr "sitar"
 
 #: js/utils/musicutils.js:1113
 #: js/utils/synthutils.js:88
@@ -4822,7 +4822,7 @@ msgstr "numéro à hauteur"
 
 #: js/blocks/PitchBlocks.js:682
 msgid "The Number to pitch block will convert a pitch number to a pich name."
-msgstr ""
+msgstr "Le bloc Numéro à hauteur convertira un numéro de hauteur en un nom de hauteur."
 
 #: js/blocks/PitchBlocks.js:715
 #. TRANS: convert piano key number (1-88) to octave
@@ -7070,7 +7070,7 @@ msgstr "Métronome"
 
 #: js/widgets/musickeyboard.js:1574
 msgid "Note value"
-msgstr ""
+msgstr "Valeur de la note"
 
 #: js/widgets/musickeyboard.js:3209
 msgid "New action blocks generated."

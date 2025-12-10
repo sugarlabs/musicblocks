@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: \n"
-"Last-Translator: Ignacio Rodriguez <ignacio@sugarlabs.org>\n"
+"PO-Revision-Date: 2025-12-10 18:51+0530\n"
+"Last-Translator: Harihara Vardhan <hariharavardhan1234@gmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
@@ -345,7 +345,7 @@ msgstr "nombre accidental"
 #: js/activity.js:2621
 #: js/blocks/PitchBlocks.js:855
 msgid "east indian solfege"
-msgstr ""
+msgstr "solfeo de la india oriental"
 
 #: js/activity.js:2624
 #: js/blocks/PitchBlocks.js:869
@@ -1500,123 +1500,123 @@ msgstr "Confirmar"
 #: js/toolbar.js:224
 #: js/toolbar.js:285
 msgid "English (United States)"
-msgstr ""
+msgstr "Inglés (Estados Unidos)"
 
 #: js/toolbar.js:93
 #: js/toolbar.js:165
 #: js/toolbar.js:225
 #: js/toolbar.js:286
 msgid "English (United Kingdom)"
-msgstr ""
+msgstr "Inglés (Reino Unido)"
 
 #: js/toolbar.js:94
 #: js/toolbar.js:166
 #: js/toolbar.js:226
 #: js/toolbar.js:287
 msgid "日本語"
-msgstr ""
+msgstr "Japonés"
 
 #: js/toolbar.js:95
 msgid "한국어"
-msgstr ""
+msgstr "Coreano"
 
 #: js/toolbar.js:96
 #: js/toolbar.js:168
 #: js/toolbar.js:228
 #: js/toolbar.js:289
 msgid "español"
-msgstr ""
+msgstr "Español"
 
 #: js/toolbar.js:97
 #: js/toolbar.js:169
 #: js/toolbar.js:229
 #: js/toolbar.js:290
 msgid "português"
-msgstr ""
+msgstr "Portugués"
 
 #: js/toolbar.js:98
 #: js/toolbar.js:170
 #: js/toolbar.js:230
 #: js/toolbar.js:291
 msgid "にほんご"
-msgstr ""
+msgstr "Japonés"
 
 #: js/toolbar.js:99
 #: js/toolbar.js:171
 #: js/toolbar.js:231
 #: js/toolbar.js:292
 msgid "中文"
-msgstr ""
+msgstr "Chino"
 
 #: js/toolbar.js:100
 #: js/toolbar.js:172
 #: js/toolbar.js:232
 #: js/toolbar.js:293
 msgid "ภาษาไทย"
-msgstr ""
+msgstr "Tailandés"
 
 #: js/toolbar.js:101
 #: js/toolbar.js:173
 #: js/toolbar.js:233
 #: js/toolbar.js:294
 msgid "aymara"
-msgstr ""
+msgstr "Aymara"
 
 #: js/toolbar.js:102
 #: js/toolbar.js:174
 #: js/toolbar.js:234
 #: js/toolbar.js:295
 msgid "quechua"
-msgstr ""
+msgstr "Quechua"
 
 #: js/toolbar.js:103
 #: js/toolbar.js:175
 #: js/toolbar.js:235
 #: js/toolbar.js:296
 msgid "guarani"
-msgstr ""
+msgstr "Guaraní"
 
 #: js/toolbar.js:104
 #: js/toolbar.js:176
 #: js/toolbar.js:236
 #: js/toolbar.js:297
 msgid "हिंदी"
-msgstr ""
+msgstr "Hindi"
 
 #: js/toolbar.js:105
 #: js/toolbar.js:178
 #: js/toolbar.js:237
 #: js/toolbar.js:299
 msgid "igbo"
-msgstr ""
+msgstr "Igbo"
 
 #: js/toolbar.js:106
 #: js/toolbar.js:179
 #: js/toolbar.js:238
 #: js/toolbar.js:300
 msgid "عربى"
-msgstr ""
+msgstr "Arabe"
 
 #: js/toolbar.js:107
 #: js/toolbar.js:177
 #: js/toolbar.js:239
 #: js/toolbar.js:298
 msgid "తెలుగు"
-msgstr ""
+msgstr "Telugu"
 
 #: js/toolbar.js:108
 #: js/toolbar.js:180
 #: js/toolbar.js:240
 #: js/toolbar.js:301
 msgid "עִברִית"
-msgstr ""
+msgstr "Hebreo"
 
 #: js/toolbar.js:109
 #: js/toolbar.js:181
 #: js/toolbar.js:241
 #: js/toolbar.js:302
 msgid "اردو"
-msgstr ""
+msgstr "Urdu"
 
 #: js/toolbar.js:157
 #: js/toolbar.js:160
@@ -1639,7 +1639,7 @@ msgstr "Guardar la ilustración de la tortuga como SVG"
 #: js/toolbar.js:227
 #: js/toolbar.js:288
 msgid "한국인"
-msgstr ""
+msgstr "Coreano"
 
 #: js/toolbar.js:185
 #: js/toolbar.js:246
@@ -2343,7 +2343,7 @@ msgstr "efecto"
 
 #: js/palette.js:669
 msgid "sargam"
-msgstr ""
+msgstr "sargam"
 
 #: js/palette.js:684
 #: js/blocks/PitchBlocks.js:1209
@@ -2771,43 +2771,43 @@ msgstr "highpass"
 #: js/utils/musicutils.js:1575
 #. TRANS: lowpass filter
 msgid "lowpass"
-msgstr ""
+msgstr "paso bajo"
 
 #: js/utils/musicutils.js:1083
 #: js/utils/musicutils.js:1576
 #. TRANS: bandpass filter
 msgid "bandpass"
-msgstr ""
+msgstr "paso de banda"
 
 #: js/utils/musicutils.js:1085
 #: js/utils/musicutils.js:1577
 #. TRANS: high-shelf filter
 msgid "highshelf"
-msgstr ""
+msgstr "estante alto"
 
 #: js/utils/musicutils.js:1087
 #: js/utils/musicutils.js:1578
 #. TRANS: low-shelf filter
 msgid "lowshelf"
-msgstr ""
+msgstr "estante bajo"
 
 #: js/utils/musicutils.js:1089
 #: js/utils/musicutils.js:1579
 #. TRANS: notch-shelf filter
 msgid "notch"
-msgstr ""
+msgstr "muesca"
 
 #: js/utils/musicutils.js:1091
 #: js/utils/musicutils.js:1580
 #. TRANS: all-pass filter
 msgid "allpass"
-msgstr ""
+msgstr "pasa todo"
 
 #: js/utils/musicutils.js:1093
 #: js/utils/musicutils.js:1581
 #. TRANS: peaking filter
 msgid "peaking"
-msgstr ""
+msgstr "pico"
 
 #: js/utils/musicutils.js:1094
 #: js/utils/musicutils.js:1589
@@ -2921,7 +2921,7 @@ msgstr "guitarra"
 #: js/utils/synthutils.js:84
 #. TRANS: sitar musical instrument
 msgid "sitar"
-msgstr ""
+msgstr "sitar"
 
 #: js/utils/musicutils.js:1113
 #: js/utils/synthutils.js:88
@@ -3062,7 +3062,7 @@ msgstr "darbuka"
 #: js/utils/synthutils.js:166
 #. TRANS: musical instrument
 msgid "hi hat"
-msgstr ""
+msgstr "platillos charles"
 
 #: js/utils/musicutils.js:1138
 #: js/utils/synthutils.js:168
@@ -3235,7 +3235,7 @@ msgstr "solo entonación"
 #: js/utils/musicutils.js:1624
 #. TRANS: musical temperament
 msgid "Meantone"
-msgstr ""
+msgstr "Mesotónico"
 
 #: js/utils/musicutils.js:1188
 msgid "major 7th"
@@ -4667,7 +4667,7 @@ msgstr "El bloque Pulsaciones por minuto establece el número de 1/4 notas por m
 #: js/blocks/MeterBlocks.js:1280
 #. TRANS: anacrusis
 msgid "pickup"
-msgstr ""
+msgstr "anacrusa"
 
 #: js/blocks/MeterBlocks.js:1368
 msgid "number of beats"
@@ -4857,7 +4857,7 @@ msgstr "El tono puede especificarse en términos de C D E F G A B."
 
 #: js/blocks/PitchBlocks.js:884
 msgid "solfege"
-msgstr ""
+msgstr "solfeo"
 
 #: js/blocks/PitchBlocks.js:887
 msgid "Pitch can be specified in terms of do re mi fa sol la ti."
@@ -5399,7 +5399,7 @@ msgstr "El bloque de valor en la pila de tortuga devuelve un valor en el almacen
 #: js/blocks/EnsembleBlocks.js:1222
 #: js/blocks/EnsembleBlocks.js:1296
 msgid "Yertle"
-msgstr ""
+msgstr "Yertle"
 
 #: js/blocks/EnsembleBlocks.js:96
 #: js/blocks/EnsembleBlocks.js:1083
