@@ -98,31 +98,41 @@ class SaveInterface {
             '  var showHideButton = document.getElementById("showhide");' +
             '  if (codeBlock.style.display === "none") {' +
             '    codeBlock.style.display = "flex";' +
-            '    showHideButton.textContent = "' + _("Hide") + '";' +
+            '    showHideButton.textContent = "' +
+            _("Hide") +
+            '";' +
             "  } else {" +
             '    codeBlock.style.display = "none";' +
-            '    showHideButton.textContent = "' + _("Show") + '";' +
+            '    showHideButton.textContent = "' +
+            _("Show") +
+            '";' +
             "  }" +
             "}" +
             "window.onload = function() {" +
             '  var codeBlock = document.getElementById("codeBlock");' +
             '  var showHideButton = document.getElementById("showhide");' +
             '  codeBlock.style.display = "none";' +
-            '  showHideButton.textContent = "' + _("Show") + '";' +
+            '  showHideButton.textContent = "' +
+            _("Show") +
+            '";' +
             "};" +
             "function copyCode() {" +
             '  var text = document.getElementById("codeBlock").innerText;' +
             "  navigator.clipboard.writeText(text).then(function() {" +
-            '    alert("' + _("Project code copied to clipboard!") + '");' +
+            '    alert("' +
+            _("Project code copied to clipboard!") +
+            '");' +
             "  }).catch(function() {" +
-            '    alert("' + _("Failed to copy.") + '");' +
+            '    alert("' +
+            _("Failed to copy.") +
+            '");' +
             "  });" +
             "}" +
             "</script>";
 
         this.timeLastSaved = -100;
         const $j = jQuery.noConflict();
-        $j(window).on("beforeunload", (event) => {
+        $j(window).on("beforeunload", event => {
             let saveButton = "#saveButtonAdvanced";
             if (this.activity.beginnerMode) {
                 saveButton = "#saveButton";
@@ -202,7 +212,6 @@ class SaveInterface {
         a.click();
         document.body.removeChild(a);
     }
-
 
     /**
      * Prepare HTML content for export.
@@ -318,8 +327,8 @@ class SaveInterface {
     afterSaveMIDI() {
         const instrumentMIDI = getMidiInstrument();
         const drumMIDI = getMidiDrum();
-        const generateMidi = (data) => {
-            const normalizeNote = (note) => {
+        const generateMidi = data => {
+            const normalizeNote = note => {
                 return note.replace("♯", "#").replace("♭", "b");
             };
 
@@ -333,7 +342,7 @@ class SaveInterface {
                 const trackMap = new Map();
                 let globalTime = 0;
 
-                notes.forEach((noteData) => {
+                notes.forEach(noteData => {
                     if (!noteData.note || noteData.note.length === 0) return;
                     const duration = ((1 / noteData.duration) * 60 * 4) / noteData.bpm;
                     const instrument = noteData.instrument || "default";
@@ -369,7 +378,7 @@ class SaveInterface {
 
                         const instrumentTrack = trackMap.get(instrument);
 
-                        noteData.note.forEach((pitch) => {
+                        noteData.note.forEach(pitch => {
                             if (!pitch.includes("R")) {
                                 instrumentTrack.addNote({
                                     name: normalizeNote(pitch),
@@ -456,7 +465,7 @@ class SaveInterface {
      * @instance
      */
     saveBlockArtworkPNG(activity) {
-        activity.printBlockPNG().then((pngDataUrl) => {
+        activity.printBlockPNG().then(pngDataUrl => {
             activity.save.download("png", pngDataUrl, null);
         });
     }
@@ -627,7 +636,7 @@ class SaveInterface {
 
         const lyheader = LILYPONDHEADER.replace(
             /My Music Blocks Creation|Mr. Mouse/gi,
-            (matched) => mapLilypondObj[matched]
+            matched => mapLilypondObj[matched]
         );
 
         if (MIDICheck) {
@@ -670,17 +679,17 @@ class SaveInterface {
         docById("lilypondModal").style.display = "none";
     }
 
-    /** 
-    * Perform actions after saving a Lilypond file.
-    *
-    * This method handles post-processing steps after saving a Lilypond file, such as handling PDF conversion.
-    *
-    * @param {string} filename - The name of the Lilypond file.
-    * @returns {void}
-    * @memberof SaveInterface
-    * @method
-    * @instance
-    */
+    /**
+     * Perform actions after saving a Lilypond file.
+     *
+     * This method handles post-processing steps after saving a Lilypond file, such as handling PDF conversion.
+     *
+     * @param {string} filename - The name of the Lilypond file.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     */
     afterSaveLilypond(filename) {
         filename = docById("fileName").value;
         const ly = saveLilypondOutput(this.activity);
@@ -722,12 +731,11 @@ class SaveInterface {
             tmp.remove();
             this.activity.textMsg(
                 _("The Lilypond code is copied to clipboard. You can paste it here: ") +
-                "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a> "
+                    "<a href='http://hacklily.org' target='_blank'>http://hacklily.org</a> "
             );
         }
         this.download("ly", "data:text;utf8," + encodeURIComponent(lydata), filename);
     }
-
 
     /**
      * Perform actions after saving a Lilypond file in PDF format.
@@ -748,7 +756,7 @@ class SaveInterface {
             if (!success) {
                 // eslint-disable-next-line no-console
                 console.debug("Error: " + dataurl);
-                //TODO: Error message box
+                this.activity.errorMsg(_("Error generating PDF"));
             } else {
                 this.activity.save.download("pdf", dataurl, filename);
             }
@@ -756,18 +764,18 @@ class SaveInterface {
     }
 
     /**
-    * 
-    * Save MXML file.
-    *
-    * This method initiates the process of saving an MXML file.
-    *
-    * @param {string} filename - The name of the MXML file.
-    * @returns {void}
-    * @memberof SaveInterface
-    * @method
-    * @instance
-    *
-    */
+     *
+     * Save MXML file.
+     *
+     * This method initiates the process of saving an MXML file.
+     *
+     * @param {string} filename - The name of the MXML file.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     *
+     */
     // eslint-disable-next-line no-unused-vars
     saveMxml(filename) {
         this.activity.logo.runningMxml = true;
@@ -781,24 +789,23 @@ class SaveInterface {
     }
 
     /**
-    * Perform actions after saving an MXML file.
-    *
-    * This method handles post-processing steps after saving an MXML file.
-    *
-    * @param {string} filename - The name of the MXML file.
-    * @returns {void}
-    * @memberof SaveInterface
-    * @method
-    * @instance
-    *
-    */
+     * Perform actions after saving an MXML file.
+     *
+     * This method handles post-processing steps after saving an MXML file.
+     *
+     * @param {string} filename - The name of the MXML file.
+     * @returns {void}
+     * @memberof SaveInterface
+     * @method
+     * @instance
+     *
+     */
     afterSaveMxml(filename) {
         const data = saveMxmlOutput(this.activity.logo);
         this.download("xml", "data:text;utf8," + encodeURIComponent(data), filename);
         this.activity.logo.runningMxml = false;
     }
 }
-
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = { SaveInterface };

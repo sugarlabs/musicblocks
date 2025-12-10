@@ -566,6 +566,7 @@ describe("saveLilypond Methods", () => {
                 runLogoCommands: jest.fn(),
             },
             textMsg: jest.fn(),
+            errorMsg: jest.fn(),
             download: jest.fn(),
         };
 
@@ -713,6 +714,7 @@ describe("saveLilypond Methods", () => {
 
         expect(document.body.style.cursor).toBe("default");
         expect(console.debug).toHaveBeenCalledWith("Error: " + errorMessage);
+        expect(activity.errorMsg).toHaveBeenCalledWith("Error generating PDF");
         // Verify activity.save.download is not called
         expect(activity.save.download).not.toHaveBeenCalled();
     });
