@@ -152,7 +152,7 @@ function setupPitchBlocks(activity) {
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                "print"
             ) {
                 logo.statusFields.push([blk, "transposition"]);
             } else {
@@ -228,7 +228,7 @@ function setupPitchBlocks(activity) {
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                "print"
             ) {
                 logo.statusFields.push([blk, "mypitch"]);
             }
@@ -276,7 +276,7 @@ function setupPitchBlocks(activity) {
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                "print"
             ) {
                 logo.statusFields.push([blk, "mypitch"]);
             } else {
@@ -346,7 +346,7 @@ function setupPitchBlocks(activity) {
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                "print"
             ) {
                 logo.statusFields.push([blk, "pitchinhertz"]);
             } else {
@@ -386,7 +386,7 @@ function setupPitchBlocks(activity) {
             if (
                 !logo.inStatusMatrix ||
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name !==
-                    "outputtools"
+                "outputtools"
             ) {
                 if (tur.singer.lastNotePlayed !== null) {
                     return tur.singer.lastNotePlayed[0];
@@ -459,7 +459,7 @@ function setupPitchBlocks(activity) {
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                "print"
             ) {
                 logo.statusFields.push([blk, "outputtools"]);
             } else {
@@ -591,7 +591,7 @@ function setupPitchBlocks(activity) {
                         if (activity.blocks.blockList[cblk1].value < 55) {
                             const obj = numberToPitch(
                                 activity.blocks.blockList[cblk1].value +
-                                    tur.singer.pitchNumberOffset
+                                tur.singer.pitchNumberOffset
                             );
                             notePlayed = obj[0] + obj[1];
                         } else {
@@ -664,13 +664,27 @@ function setupPitchBlocks(activity) {
             ]);
         }
 
-        flow(args, logo, turtle, blk) {
-            if (args[0] === null || args[1] === null) activity.errorMsg(NOINPUTERRORMSG, blk);
+        flow(args, logo) {
+            // Validate required args
+            if (!args || args.length < 2 || args[0] == null || args[1] == null) {
+                activity.errorMsg("SetPitchNumberOffset: requires both pitch number and offset.");
+                // stop execution — do NOT apply defaults
+                return;
+            }
 
-            const arg0 = args[0] === null ? "C" : args[0];
-            const arg1 = args[1] === null ? 4 : args[1];
-            Singer.PitchActions.setPitchNumberOffset(arg0, arg1, turtle, activity);
+            const pitchNum = Number(args[0]);
+            const offset = Number(args[1]);
+
+            // Optional: validate numeric input
+            if (Number.isNaN(pitchNum) || Number.isNaN(offset)) {
+                activity.errorMsg("SetPitchNumberOffset: arguments must be valid numbers.");
+                return;
+            }
+
+            // Execute action only when inputs are valid
+            logo.setPitchOffset(pitchNum, offset);
         }
+
     }
 
     class Number2PitchBlock extends LeftBlock {
@@ -1050,18 +1064,18 @@ function setupPitchBlocks(activity) {
                 [0, "settransposition", x, y, [null, 12, 1, 2]],
                 [1, "vspace", 0, 0, [0, 3]],
                 [2, "hidden", 0, 0, [0, null]],
-                [3, ["newnote", {"collapsed": false}], 0, 0, [1, 4, 7, 11]],
+                [3, ["newnote", { "collapsed": false }], 0, 0, [1, 4, 7, 11]],
                 [4, "divide", 0, 0, [3, 5, 6]],
-                [5, ["number", {"value": 1}], 0, 0, [4]],
-                [6, ["number", {"value": 4}], 0, 0, [4]],
+                [5, ["number", { "value": 1 }], 0, 0, [4]],
+                [6, ["number", { "value": 4 }], 0, 0, [4]],
                 [7, "vspace", 0, 0, [3, 8]],
                 [8, "pitch", 0, 0, [7, 9, 10, null]],
-                [9, ["solfege", {"value": "sol"}], 0, 0, [8]],
-                [10, ["number", {"value": 4}], 0, 0, [8]],
+                [9, ["solfege", { "value": "sol" }], 0, 0, [8]],
+                [10, ["number", { "value": 4 }], 0, 0, [8]],
                 [11, "hidden", 0, 0, [3, null]],
                 [12, "divide", 0, 0, [0, 13, 14]],
-                [13, ["number", {"value": 50}], 0, 0, [12]],
-                [14, ["number", {"value": 100}], 9, 0, [12]]
+                [13, ["number", { "value": 50 }], 0, 0, [12]],
+                [14, ["number", { "value": 100 }], 9, 0, [12]]
             ]);
         }
     }
@@ -1100,8 +1114,8 @@ function setupPitchBlocks(activity) {
             ];
             this.setHelpString([
                 _("The Semi-tone transposition block will shift the pitches contained inside Note blocks up (or down) by half steps.") +
-                    " " +
-                    _("In the example shown above, sol is shifted up to sol#."),
+                " " +
+                _("In the example shown above, sol is shifted up to sol#."),
                 "documentation",
                 ""
             ]);
@@ -1405,8 +1419,8 @@ function setupPitchBlocks(activity) {
             this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.setHelpString([
                 _("The Scalar transposition block will shift the pitches contained inside Note blocks up (or down) the scale.") +
-                    " " +
-                    _("In the example shown above, sol is shifted up to la."),
+                " " +
+                _("In the example shown above, sol is shifted up to la."),
                 "documentation",
                 null,
                 "scalartranshelp"
@@ -1457,7 +1471,7 @@ function setupPitchBlocks(activity) {
                 //.TRANS: An accidental is a modification to a pitch, e.g., sharp or flat.
                 name: _("accidental override"),
                 args: 1,
-                argTypes:["anyin"]
+                argTypes: ["anyin"]
             });
             this.makeMacro((x, y) => [
                 [0, "accidental", x, y, [null, 11, 1, 10]],
@@ -1715,8 +1729,8 @@ function setupPitchBlocks(activity) {
             this.setPalette("pitch", activity);
             this.setHelpString([
                 _("nth Modal Pitch takes the pattern of pitches in semitones for a mode and makes each point a degree of the mode,") +
-                    " " +
-                    _("starting from 1 and regardless of tonal framework (i.e. not always 8 notes in the octave)"),
+                " " +
+                _("starting from 1 and regardless of tonal framework (i.e. not always 8 notes in the octave)"),
                 "documentation",
                 ""
             ]);
@@ -1758,8 +1772,8 @@ function setupPitchBlocks(activity) {
             this.piemenuValuesC1 = [7, 6, 5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5, -6, -7];
             this.setHelpString([
                 _("Nth Modal Pitch takes a number as an input as the nth degree for the given mode. 0 is the first position, 1 is the second, -1 is the note before the first etc.") +
-                    " " +
-                    _("The pitches change according to the mode specified without any need for respellings."),
+                " " +
+                _("The pitches change according to the mode specified without any need for respellings."),
                 "documentation",
                 ""
             ]);
@@ -1799,8 +1813,8 @@ function setupPitchBlocks(activity) {
             this.extraWidth = 10;
             this.setHelpString([
                 _("Scale Degree is a common convention in music. Scale Degree offers seven possible positions in the scale (1-7) and can be modified via accidentals.") +
-                    " " +
-                    _("Scale Degree 1 is always the first pitch in a given scale, regardless of octave."),
+                " " +
+                _("Scale Degree 1 is always the first pitch in a given scale, regardless of octave."),
                 "documentation",
                 ""
             ]);
@@ -1828,8 +1842,8 @@ function setupPitchBlocks(activity) {
             this.beginnerBlock(true);
             this.setHelpString([
                 _("The Scalar Step block (in combination with a Number block) will play the next pitch in a scale,") +
-                    " " +
-                    _("eg if the last note played was sol, Scalar Step 1 will play la."),
+                " " +
+                _("eg if the last note played was sol, Scalar Step 1 will play la."),
                 "documentation",
                 ""
             ]);
@@ -1956,7 +1970,7 @@ function setupPitchBlocks(activity) {
                         NOTESFLAT.includes(note)
                             ? NOTESFLAT.indexOf(note) - ref
                             : NOTESSHARP.indexOf(note) - ref;
-    
+
                     /** calculates changes in reference octave which occur a semitone before the reference key */
                     const deltaOctave = isNegativeArg
                         ? Math.floor((scaledegree + 1) / 7)
