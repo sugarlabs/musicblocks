@@ -2210,7 +2210,7 @@ msgstr "ブロックをコピーには、ブロックを右クリックすると
 
 #: js/turtledefs.js:715
 msgid "To extract a block, right-click on it. You will see the extract option."
-msgstr ""
+msgstr "ブロックを取り出すには、ブロックを右クリックします。「取り出す」オプションが表示されます。"
 
 #: js/turtledefs.js:721
 msgid "Keyboard shortcuts"
