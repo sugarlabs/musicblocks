@@ -799,6 +799,11 @@ class Painter {
 
             this.activity.refreshCanvas();
         }
+        //update media positions
+        const view = this.turtle._view;
+        if(view && typeof view._updateMediaPositions === "function"){
+            view._updateMediaPositions();
+        }
     }
 
     /**
@@ -847,6 +852,10 @@ class Painter {
 
         this._move(ox, oy, nx, ny, true);
         this.activity.refreshCanvas();
+        const view = this.turtle._view;
+        if(view && typeof view._updateMediaPositions === "function"){
+            view._updateMediaPositions();
+        }
     }
 
     /**
@@ -1143,8 +1152,17 @@ class Painter {
      * Clears the media layer
      */
     doClearMedia() {
+        if(!this._media){
+            return;
+        }
+        const gifAnimator = this.activity.gifAnimator;
         // Clear all media
         for (let i = 0; i < this.turtle.media.length; i++) {
+            const item = this.turtle.media[i];
+            if(item.type === 'gif' && gifAnimator){
+                //Stop GIF animation
+                item.stop();
+            }
             // Could be in the image Container or the Stage
             this.turtle.imageContainer.removeChild(this.turtle.media[i]);
             this.turtles.stage.removeChild(this.turtle.media[i]);

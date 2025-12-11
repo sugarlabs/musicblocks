@@ -2056,12 +2056,20 @@ class Block {
                     bitmap.scaleX = bitmap.scaleY = bitmap.scale = MAXHEIGHT / image.height;
                 }
             }
+            // CRITICAL FIX: PRESERVE GIF
+            const src = image.src || "";
 
-            const bounds = myContainer.getBounds();
-            myContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-            that.value = myContainer.bitmapCache.getCacheDataURL();
-            that.imageBitmap = bitmap;
+            if (src.startsWith("data:image/gif")) {
+                //DO NOT cache GIF , keeps animation
+                that.value = src;
+                that.imageBitmap = bitmap;
 
+            } else {
+                const bounds = myContainer.getBounds();
+                myContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+                that.value = myContainer.bitmapCache.getCacheDataURL();
+                that.imageBitmap = bitmap;
+            }
             // Next, scale the bitmap for the thumbnail.
             that._positionMedia(
                 bitmap,
