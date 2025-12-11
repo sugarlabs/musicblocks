@@ -301,7 +301,6 @@ class Turtle {
         this.singer.dispatchFactor = 1;
 
         this.singer.runningFromEvent = false;
-
     }
 
     // ================================ CONTROLLER ============================
@@ -708,7 +707,7 @@ Turtle.TurtleView = class {
 
         const gifAnimator = this.activity.gifAnimator;
 
-    // HARD CLEANUP: kill previous GIF before loading a new one
+        // HARD CLEANUP: kill previous GIF before loading a new one
         if (this._activeGifId && gifAnimator) {
             gifAnimator.stopAnimation(this._activeGifId);
 
@@ -724,7 +723,6 @@ Turtle.TurtleView = class {
 
             this._activeGifId = null;
         }
-
 
         // Check if it's a GIF and try to animate it
         if (gifAnimator && gifAnimator.isAnimatedGIF(myImage)) {
@@ -746,7 +744,7 @@ Turtle.TurtleView = class {
                     this._activeGifId = gifId;
 
                     this._media.push({
-                        type: 'gif',
+                        type: "gif",
                         id: gifId,
                         stop: () => gifAnimator.stopAnimation(gifId)
                     });
@@ -755,13 +753,12 @@ Turtle.TurtleView = class {
                     return;
                 }
 
-            
-            // If gifId is null, it's a static GIF (1 frame), fall through
+                // If gifId is null, it's a static GIF (1 frame), fall through
             } catch (error) {
-                console.warn('GIF animation failed, falling back to static image:', error);
+                console.warn("GIF animation failed, falling back to static image:", error);
                 // Fall through to static image handling
             }
-    }
+        }
         //original static image code (for non-GIFs or static GIFs)
         const image = new Image();
         image.onload = () => {
@@ -789,11 +786,11 @@ Turtle.TurtleView = class {
         if (!this._media) {
             return;
         }
-        
+
         const gifAnimator = this.activity.gifAnimator;
-        
+
         this._media.forEach(item => {
-            if (item.type === 'gif' && gifAnimator) {
+            if (item.type === "gif" && gifAnimator) {
                 // Update GIF animation position
                 gifAnimator.updatePosition(
                     item.id,
