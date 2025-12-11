@@ -448,7 +448,7 @@ class Activity {
             if(this.stage){
                 this.stage.update();
             }
-        })
+        });
 
         /*
          * creates helpfulSearchDiv for search
