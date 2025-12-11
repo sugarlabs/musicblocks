@@ -696,9 +696,11 @@ Turtle.TurtleView = class {
 
     /**
      * Adds an image object to the canvas (shows an image).
+     * Supports both static images and animated GIFs.
      *
-     * @param size - size of image
-     * @param myImage - image path
+     * @param {number} size - size of image
+     * @param {string} myImage - image data URL or path
+     * @async
      */
     async doShowImage(size, myImage) {
         // Is there a JS test for a valid image path?
@@ -728,7 +730,6 @@ Turtle.TurtleView = class {
 
         // Check if it's a GIF and try to animate it
         if (gifAnimator && gifAnimator.isAnimatedGIF(myImage)) {
-            console.log("GIF FOUND");
             try {
                 const scaledSize = Number(size);
                 const gifId = await gifAnimator.createAnimation(
@@ -762,7 +763,7 @@ Turtle.TurtleView = class {
                 console.warn('GIF animation failed, falling back to static image:', error);
                 // Fall through to static image handling
             }
-    }
+        }
         //original static image code (for non-GIFs or static GIFs)
         const image = new Image();
         image.onload = () => {
@@ -779,13 +780,12 @@ Turtle.TurtleView = class {
             bitmap.rotation = this.orientation;
             this.activity.refreshCanvas();
         };
-
         image.src = myImage;
     }
-    /**
-     * Updates positions of all media (including GIFs) when turtle moves
-     * @private
-     */
+/**
+ * Updates positions of all media (including GIFs) when turtle moves
+ * @private
+ */
     _updateMediaPositions() {
         if (!this._media) {
             return;
@@ -809,35 +809,6 @@ Turtle.TurtleView = class {
                 item.rotation = this.orientation;
             }
         });
-    }
-    /**
-     * Adds an image object from a URL to the canvas (shows an image).
-     *
-     * @param size - size of image
-     * @param myImage - URL of image (image address)
-     */
-    doShowURL(size, myURL) {
-        if (myURL === null) {
-            return;
-        }
-        const image = new Image();
-        image.src = myURL;
-        const turtle = this;
-
-        image.onload = () => {
-            const bitmap = new createjs.Bitmap(image);
-            turtle.imageContainer.addChild(bitmap);
-            turtle._media.push(bitmap);
-            bitmap.scaleX = Number(size) / image.width;
-            bitmap.scaleY = bitmap.scaleX;
-            bitmap.scale = bitmap.scaleX;
-            bitmap.x = turtle.container.x;
-            bitmap.y = turtle.container.y;
-            bitmap.regX = image.width / 2;
-            bitmap.regY = image.height / 2;
-            bitmap.rotation = turtle.orientation;
-            turtle.activity.refreshCanvas();
-        };
     }
 
     /**

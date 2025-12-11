@@ -799,11 +799,12 @@ class Painter {
 
             this.activity.refreshCanvas();
         }
-        //update media positions
+        // Update media positions
         const view = this.turtle._view;
-        if(view && typeof view._updateMediaPositions === "function"){
+        if (view && typeof view._updateMediaPositions === "function") {
             view._updateMediaPositions();
         }
+
     }
 
     /**
@@ -853,7 +854,7 @@ class Painter {
         this._move(ox, oy, nx, ny, true);
         this.activity.refreshCanvas();
         const view = this.turtle._view;
-        if(view && typeof view._updateMediaPositions === "function"){
+        if (view && typeof view._updateMediaPositions === "function") {
             view._updateMediaPositions();
         }
     }

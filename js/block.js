@@ -2088,6 +2088,7 @@ class Block {
         }
     }
 
+
     /**
      * Opens media for the block.
      * @param {number} thisBlock - Index of the current block.
