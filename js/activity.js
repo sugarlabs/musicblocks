@@ -280,7 +280,7 @@ class Activity {
         this.isInputON = false;
 
         //Initialize GIF animator
-        this.gifAnimator = new this.GIFAnimator();
+        this.gifAnimator = new GIFAnimator();
 
         this.themes = ["light", "dark"];
         try {
