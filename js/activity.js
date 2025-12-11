@@ -279,6 +279,9 @@ class Activity {
         //Flag to check if any other input box is active or not
         this.isInputON = false;
 
+        //Initialize GIF animator
+        this.gifAnimator = new this.GIFAnimator();
+
         this.themes = ["light", "dark"];
         try {
             for (let i = 0; i < this.themes.length; i++) {
@@ -435,6 +438,17 @@ class Activity {
 
             this.setHelpfulSearchDiv();
         };
+
+        /* CreateJS does not automatically repaint the canvas. The ticker forces
+        continuos redraws (60 fps), which is required for animated GIFs since each
+        new frame must be rendered to the canvas. Without this loop, the canvas
+        updates only on user interaction, causing GIFs to appear frozen  */
+        createjs.Ticker.framerate = 60;
+        createjs.Ticker.on("tick",()=>{
+            if(this.stage){
+                this.stage.update();
+            }
+        })
 
         /*
          * creates helpfulSearchDiv for search
