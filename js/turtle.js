@@ -790,7 +790,7 @@ Turtle.TurtleView = class {
 
         const gifAnimator = this.activity.gifAnimator;
 
-        this._media.forEach((item) => {
+        this._media.forEach(item => {
             if (item.type === "gif" && gifAnimator) {
                 // Update GIF animation position
                 gifAnimator.updatePosition(
