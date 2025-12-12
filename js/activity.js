@@ -1730,7 +1730,7 @@ class Activity {
                 recording();
                 start.dispatchEvent(clickEvent);
                 flag = 1;
-            };
+            }
 
             // Stop recording if already executing
             if (flag == 1 && isExecuting){
@@ -4803,7 +4803,7 @@ class Activity {
                             staffBlocksMap[staffIndex].repeatBlock[prevrepeatnameddo][4][3] = blockId;
                         }
                         if (afternamedo !== -1) {
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][afternamedo][4][1] = null;;
+                            staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][afternamedo][4][1] = null;
                         }
                         staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0] = blockId;
                         if (nextBlockId  !== null ) {
