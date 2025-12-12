@@ -279,6 +279,9 @@ class Activity {
         //Flag to check if any other input box is active or not
         this.isInputON = false;
 
+        // Initialize GIF animator
+        this.gifAnimator = new GIFAnimator();
+
         this.themes = ["light", "dark"];
         try {
             for (let i = 0; i < this.themes.length; i++) {
@@ -393,6 +396,7 @@ class Activity {
             this.palettes = null;
             this.blocks = null;
             this.logo = null;
+            this.gif = null;
             this.pasteBox = null;
             this.languageBox = null;
             this.themeBox = null;
@@ -435,6 +439,13 @@ class Activity {
 
             this.setHelpfulSearchDiv();
         };
+        createjs.Ticker.framerate = 60;
+        createjs.Ticker.on("tick", () => {
+            if (this.stage) {
+                this.stage.update();
+            }
+        });
+
 
         /*
          * creates helpfulSearchDiv for search
@@ -1730,7 +1741,7 @@ class Activity {
                 recording();
                 start.dispatchEvent(clickEvent);
                 flag = 1;
-            };
+            }
 
             // Stop recording if already executing
             if (flag == 1 && isExecuting){
@@ -4772,7 +4783,7 @@ class Activity {
                             staffBlocksMap[staffIndex].repeatBlock[prevrepeatnameddo][4][3] = blockId;
                         }
                         if (afternamedo !== -1) {
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][afternamedo][4][1] = null;;
+                            staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][afternamedo][4][1] = null;
                         }
                         staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][currentnammeddo][4][0] = blockId;
                         if (nextBlockId  !== null ) {
