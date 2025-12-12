@@ -2837,10 +2837,41 @@ class Activity {
                 },
                 focus: (event) => {
                     event.preventDefault();
+                },
+                response: (event, ui) => {
+                    // Handle empty search results
+                    if (!ui.content || ui.content.length === 0) {
+                        const noResultMessage = {
+                            label: _("No results found"),
+                            value: "",
+                            isNoResult: true
+                        };
+                        ui.content.push(noResultMessage);
+                    }
                 }
             });
 
             $j("#search").autocomplete("instance")._renderItem = (ul, item) => {
+                // Render "No results found" message differently
+                if (item.isNoResult) {
+                    return $j("<li></li>")
+                        .data("item.autocomplete", item)
+                        .append(
+                            '<div style="padding: 10px; text-align: center; color: #666; font-style: italic;">' +
+                                item.label +
+                            '</div>'
+                        )
+                        .appendTo(ul.css({
+                            "z-index": 9999,
+                            "max-height": "200px",
+                            "overflow-y": "auto"
+                        }))
+                        .css({
+                            "pointer-events": "none",
+                            "background-color": "#f9f9f9"
+                        });
+                }
+                
                 return $j("<li></li>")
                     .data("item.autocomplete", item)
                     .append(
@@ -5767,10 +5798,37 @@ class Activity {
                 },
                 focus: (event) => {
                     event.preventDefault();
+                },
+                response: (event, ui) => {
+                    // Handle empty search results
+                    if (!ui.content || ui.content.length === 0) {
+                        const noResultMessage = {
+                            label: _("No results found"),
+                            value: "",
+                            isNoResult: true
+                        };
+                        ui.content.push(noResultMessage);
+                    }
                 }
             });
 
             $j("#helpfulSearch").autocomplete("instance")._renderItem = (ul, item) => {
+                // Render "No results found" message differently
+                if (item.isNoResult) {
+                    return $j("<li></li>")
+                        .data("item.autocomplete", item)
+                        .append(
+                            '<div style="padding: 10px; text-align: center; color: #666; font-style: italic;">' +
+                                item.label +
+                            '</div>'
+                        )
+                        .appendTo(ul.css("z-index", 9999))
+                        .css({
+                            "pointer-events": "none",
+                            "background-color": "#f9f9f9"
+                        });
+                }
+                
                 return $j("<li></li>")
                     .data("item.autocomplete", item)
                     .append(
