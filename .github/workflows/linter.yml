@@ -31,7 +31,7 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
 
       - name: Install dependencies
-        run: npm install eslint
+        run: npm install eslint prettier
 
       - name: Run ESLint on changed files
         if: env.files != ''
@@ -39,3 +39,9 @@ jobs:
           echo "Linting the following files:"
           echo "$files"
           echo "$files" | xargs npx eslint
+      - name: Run Prettier check on changed files
+        if: env.files != ''
+        run: |
+          echo "Checking formatting for the following files:"
+          echo "$files"
+          echo "$files" | xargs npx prettier --check

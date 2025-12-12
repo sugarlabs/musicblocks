@@ -1257,10 +1257,15 @@ Turtles.TurtlesView = class {
             __makeBoundary();
         }
 
-        window.addEventListener("resize", ()=>{
-            handleCanvasResize();
-            __makeBoundary();
-            __makeBoundary2();
+        // Debounce the resize event to prevent performance issues
+        let resizeTimeout;
+        window.addEventListener("resize", () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                handleCanvasResize();
+                __makeBoundary();
+                __makeBoundary2();
+            }, 150); // Wait 150ms after the last resize event to execute
         });
 
         return this;
