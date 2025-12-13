@@ -489,7 +489,6 @@ class Toolbar {
         newDropdown.appendChild(cancelButtonLi);
         cancelButton.onclick = () => {
             modalContainer.style.display = "none";
-            console.log("cancel button clicked")
         };
         modalContainer.style.display = "flex";
     }
