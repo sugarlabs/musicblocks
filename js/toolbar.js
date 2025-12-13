@@ -478,6 +478,20 @@ class Toolbar {
             modalContainer.style.display = "none";
             onclick(this.activity);
         };
+
+        //Cancel Button
+        const cancelButtonLi = document.createElement("li");
+        const cancelButton = document.createElement("div");
+        cancelButton.classList.add("cancel-button");
+        cancelButton.id = "cancel-project";
+        cancelButton.textContent = _("Cancel");
+        cancelButtonLi.appendChild(cancelButton);
+        newDropdown.appendChild(cancelButtonLi);
+        cancelButton.onclick = () => {
+            modalContainer.style.display = "none";
+            console.log("cancel button clicked")
+        };
+        modalContainer.style.display = "flex";
     }
 
     /**
