@@ -1,6 +1,7 @@
 {
   "name": "musicblocks",
   "version": "3.4.1",
+  "main": "electron-main.js",
   "description": "A musical microworld",
   "repository": {
     "url": "https://github.com/sugarlabs/musicblocks.git"
@@ -16,7 +17,9 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "jest",
-    "cypress:run": "cypress run"
+    "cypress:run": "cypress run",
+    "electron": "electron .",
+    "dist": "electron-builder"
   },
   "devDependencies": {
     "@babel/core": "^7.11.1",
@@ -25,6 +28,8 @@
     "babel-eslint": "^10.1.0",
     "clean-css": "^4.2.4",
     "cypress": "^14.0.2",
+    "electron": "^39.2.7",
+    "electron-builder": "^26.0.12",
     "eslint": "^7.6.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-config-standard": "^14.1.1",
@@ -56,5 +61,19 @@
     "i18next-http-backend": "^3.0.2",
     "node": "^24.2.0",
     "tone": "^15.1.22"
+  },
+  "build": {
+    "appId": "com.musicblocks.app", 
+    "productName": "Music Blocks",
+    "mac": {
+      "category": "public.app-category.music",
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
   }
 }
