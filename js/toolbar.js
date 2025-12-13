@@ -19,6 +19,7 @@
 let WRAP = true;
 const $j = jQuery.noConflict();
 let play_button_debounce_timeout = null;
+console.log("toolbar is reloded", Date.now());
 class Toolbar {
     /**
     * Constructs a new Toolbar instance.
@@ -48,7 +49,7 @@ class Toolbar {
                 ["mb-logo", _("About Music Blocks")],
                 ["play", _("Play")],
                 ["stop", _("Stop")],
-                ["record",_("Record")],
+                ["record", _("Record")],
                 ["Full screen", _("Full screen")],
                 ["FullScreen", _("Full screen")],
                 ["Toggle Fullscreen", _("Toggle Fullscreen")],
@@ -334,18 +335,60 @@ class Toolbar {
             }
         }
 
-        if (!this.tooltipsDisabled) {
-            $j(".tooltipped").tooltip({
-                html: true,
-                delay: 100
-            });
-        }
-
         $j(".materialize-iso, .dropdown-trigger").dropdown({
             constrainWidth: false,
             hover: false,
             belowOrigin: true // Displays dropdown below the button
         });
+
+        setTimeout(() => {
+            console.log("Tooltip override block REACHED!");
+            const icons = Array.from(document.querySelectorAll('.tooltipped'));
+            const right_icons = Array.from(document.querySelectorAll('ul.main.right a'));
+            const left_below_icons = Array.from(document.querySelectorAll('ul.aux.ledt a'));
+            const bottom_icons = Array.from(document.querySelectorAll('ul.aux.right a'));
+            if (icons.length === 0) return;
+
+            const second = icons[2];
+            const last = icons[icons.length - 1];
+            const third = right_icons[0];
+            const fourth = left_below_icons[0];
+            const fifth = left_below_icons[1];
+
+            icons.forEach(el => {
+                let position = "top";
+                if (el == second || el == fifth) {
+                    position = "right";
+                }
+                else if (el == third) {
+                    position = "left";
+                }
+                else if ( el == fourth || bottom_icons.includes(el)) {
+                    position = "bottom";
+                }
+                console.log(el.id, "->", position);
+
+                el.setAttribute("data-position", position);
+
+                $j(el).tooltip("remove");
+
+                const oldTooltip = el.getAttribute("data-tooltip-id");
+                if (oldTooltip) {
+                    const ttDiv = document.getElementById(oldTooltip);
+                    if (ttDiv) ttDiv.remove();
+                    el.removeAttribute("data-tooltip-id");
+                }
+                $j(el).tooltip({
+                    html: true,
+                    delay: 100,
+                    position: position,
+                    container: "body"
+                });
+                el.addEventListener("click", () => {
+                    $j(el).tooltip("close");
+                });
+            });
+        }, 500);
     }
 
     /**
@@ -411,9 +454,9 @@ class Toolbar {
             saveButtonAdvanced.className = "grey-text inactiveLink";
             recordButton.className = "grey-text inactiveLink";
             isPlayIconRunning = true;
-            play_button_debounce_timeout = setTimeout(function() { handleClick(); }, 2000);
+            play_button_debounce_timeout = setTimeout(function () { handleClick(); }, 2000);
 
-            stopIcon.addEventListener("click", function(){
+            stopIcon.addEventListener("click", function () {
                 clearTimeout(play_button_debounce_timeout);
                 isPlayIconRunning = true;
                 hideMsgs();
@@ -497,8 +540,8 @@ class Toolbar {
 
     renderThemeSelectIcon(themeBox, themes) {
         const icon = document.getElementById("themeSelectIcon");
-        themes.forEach((theme) =>{
-            if(localStorage.themePreference === theme){
+        themes.forEach((theme) => {
+            if (localStorage.themePreference === theme) {
                 icon.innerHTML = document.getElementById(theme).innerHTML;
             }
         });
@@ -657,7 +700,7 @@ class Toolbar {
                         this.activity.canvas.height,
                         1.0
                     );
-                    
+
                     if (svgData == "") {
                         savePNG.disabled = true;
                         savePNG.className = "grey-text inactiveLink";
@@ -704,7 +747,7 @@ class Toolbar {
                     savePNG.disabled = false;
                     saveSVG.className = "";
                     savePNG.className = "";
-                    
+
                     saveSVG.onclick = () => {
                         svg_onclick(this.activity);
                     };
@@ -761,12 +804,12 @@ class Toolbar {
         const Record = docById("record");
         const browser = fnBrowserDetect();
         const hideIn = ["firefox", "safari"];
-    
+
         if (hideIn.includes(browser)) {
             Record.classList.add("hide");
             return;
         }
-    
+
         Record.style.display = "block";
         Record.innerHTML = `<i class="material-icons main">${RECORDBUTTON}</i>`;
         Record.onclick = () => rec_onclick(this.activity);
@@ -910,20 +953,20 @@ class Toolbar {
                 // Horizontal Scroll
                 const enableHorizScrollIcon = docById("enableHorizScrollIcon");
                 const disableHorizScrollIcon = docById("disableHorizScrollIcon");
-                
+
                 if (enableHorizScrollIcon) {
                     enableHorizScrollIcon.style.display = "block";
                     enableHorizScrollIcon.onclick = () => {
                         setScroller(this.activity);
                     };
                 }
-                
+
                 if (disableHorizScrollIcon) {
                     disableHorizScrollIcon.onclick = () => {
                         setScroller(this.activity);
                     };
                 }
-                
+
                 // JavaScript Toggle
                 const toggleJavaScriptIcon = docById("toggleJavaScriptIcon");
                 if (toggleJavaScriptIcon) {
@@ -989,7 +1032,7 @@ class Toolbar {
         // Handle mode switching
         const handleModeSwitch = (event) => {
             this.activity.beginnerMode = !this.activity.beginnerMode;
-            
+
             try {
                 localStorage.setItem("beginnerMode", this.activity.beginnerMode.toString());
             } catch (e) {
@@ -1124,7 +1167,7 @@ class Toolbar {
             "enUS", "enUK", "es", "pt", "ko", "ja", "kana", "zhCN", "th", "tr",
             "ayc", "quz", "gug", "hi", "ibo", "ar", "te", "he", "ur"
         ];
-    
+
         languageSelectIcon.onclick = () => {
             languages.forEach(lang => {
                 docById(lang).onclick = () => languageBox[`${lang}_onclick`](this.activity);
