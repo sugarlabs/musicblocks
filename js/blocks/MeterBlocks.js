@@ -1428,3 +1428,7 @@ function setupMeterBlocks(activity) {
     new PickupBlock().setup(activity);
     new MeterBlock().setup(activity);
 }
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = setupMeterBlocks;
+}
