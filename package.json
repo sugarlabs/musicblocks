@@ -2,6 +2,7 @@
   "name": "musicblocks",
   "version": "3.4.1",
   "description": "A musical microworld",
+  "main": "electron.js",
   "repository": {
     "url": "https://github.com/sugarlabs/musicblocks.git"
   },
@@ -11,20 +12,26 @@
   },
   "amd": {},
   "scripts": {
-    "lint": "eslint js/**/*.js",
-    "serve": "http-server -a 127.0.0.1 -p 3000 --gzip --brotli",
-    "start": "node index.js",
-    "dev": "nodemon index.js",
-    "test": "jest",
-    "cypress:run": "cypress run"
-  },
+  "lint": "eslint js/**/*.js",
+  "serve": "http-server -a 127.0.0.1 -p 3000 --gzip --brotli",
+  "start": "node index.js",
+  "dev": "nodemon index.js",
+    "dev:app": "npm run dev",
+  "electron": "electron .",
+  "electron:dev": "wait-on http://127.0.0.1:3000/ && electron .",
+  "dev:electron": "concurrently \"npm run dev:app\" \"npm run electron:dev\"",
+  "test": "jest",
+  "cypress:run": "cypress run"
+},
   "devDependencies": {
     "@babel/core": "^7.11.1",
     "@babel/eslint-parser": "^7.26.10",
     "@babel/preset-env": "^7.11.0",
     "babel-eslint": "^10.1.0",
     "clean-css": "^4.2.4",
+    "concurrently": "^9.2.1",
     "cypress": "^14.0.2",
+    "electron": "^33.4.11",
     "eslint": "^7.6.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-config-standard": "^14.1.1",
@@ -38,7 +45,8 @@
     "gulp-uglify": "^3.0.2",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.9",
+    "wait-on": "^9.0.3"
   },
   "dependencies": {
     "@tonejs/midi": "^2.0.28",
