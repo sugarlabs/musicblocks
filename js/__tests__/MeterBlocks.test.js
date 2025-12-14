@@ -32,7 +32,7 @@ describe("MeterBlocks setup", () => {
     const setupGlobals = () => {
         blockRegistry = {};
 
-        global._ = (message) => message;
+        global._ = message => message;
         global.NOINPUTERRORMSG = "NO_INPUT";
         global.NOACTIONERRORMSG = "NO_ACTION";
         global.TONEBPM = 600;
@@ -155,7 +155,7 @@ describe("MeterBlocks setup", () => {
         setupMeterBlocks(activity);
     };
 
-    const getBlock = (name) => blockRegistry[name];
+    const getBlock = name => blockRegistry[name];
 
     beforeEach(() => {
         jest.resetModules();
@@ -165,7 +165,7 @@ describe("MeterBlocks setup", () => {
     });
 
     it("registers every meter block prototype", () => {
-        expectedBlocks.forEach((name) => {
+        expectedBlocks.forEach(name => {
             expect(getBlock(name)).toBeDefined();
         });
     });
@@ -347,16 +347,41 @@ describe("MeterBlocks setup", () => {
         expect(activity.errorMsg).toHaveBeenCalledWith(NOACTIONERRORMSG, "off", undefined);
 
         offBeat.flow(["action"], logo, 0, "off", null, null, true);
-        expect(Singer.MeterActions.onWeakBeatDo).toHaveBeenCalledWith("action", true, null, 0, "off");
+        expect(Singer.MeterActions.onWeakBeatDo).toHaveBeenCalledWith(
+            "action",
+            true,
+            null,
+            0,
+            "off"
+        );
 
         onBeat.flow([1, "clap"], logo, 0, "on", undefined, undefined, false);
-        expect(Singer.MeterActions.onStrongBeatDo).toHaveBeenCalledWith(1, "clap", false, undefined, 0, "on");
+        expect(Singer.MeterActions.onStrongBeatDo).toHaveBeenCalledWith(
+            1,
+            "clap",
+            false,
+            undefined,
+            0,
+            "on"
+        );
 
         everyBeatNew.flow(["action"], logo, 0, "every", undefined, undefined, true);
-        expect(Singer.MeterActions.onEveryBeatDo).toHaveBeenCalledWith("action", true, undefined, 0, "every");
+        expect(Singer.MeterActions.onEveryBeatDo).toHaveBeenCalledWith(
+            "action",
+            true,
+            undefined,
+            0,
+            "every"
+        );
 
         everyBeat.flow(["action"], logo, 0, "everyNote", undefined, undefined, false);
-        expect(Singer.MeterActions.onEveryNoteDo).toHaveBeenCalledWith("action", false, undefined, 0, "everyNote");
+        expect(Singer.MeterActions.onEveryNoteDo).toHaveBeenCalledWith(
+            "action",
+            false,
+            undefined,
+            0,
+            "everyNote"
+        );
     });
 
     it("configures master BPM with shared tempo metadata", () => {
@@ -385,7 +410,10 @@ describe("MeterBlocks setup", () => {
         expect(Singer.masterBPM).toBe(30);
 
         block.flow([1500], logo, 0, "legacy");
-        expect(activity.errorMsg).toHaveBeenCalledWith("Maximum beats per minute is 1000.", "legacy");
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Maximum beats per minute is 1000.",
+            "legacy"
+        );
         expect(Singer.masterBPM).toBe(1000);
 
         block.flow([120], logo, 0, "legacy");
@@ -432,7 +460,7 @@ describe("MeterBlocks setup", () => {
         expect(turtle.singer.bpm[turtle.singer.bpm.length - 1]).toBe((120 * 0.5) / 0.25);
         expect(logo.setDispatchBlock).toHaveBeenCalledWith("flow", 0, "_bpm_0");
         expect(listenerCalls).toHaveLength(3);
-        listenerCalls.forEach((handler) => handler());
+        listenerCalls.forEach(handler => handler());
         expect(turtle.singer.bpm).toEqual([]);
     });
 
@@ -442,19 +470,27 @@ describe("MeterBlocks setup", () => {
         activity.turtles.ithTurtle.mockReturnValue(turtle);
 
         const listeners = [];
-        logo.setTurtleListener.mockImplementation((_turtle, _name, handler) => listeners.push(handler));
+        logo.setTurtleListener.mockImplementation((_turtle, _name, handler) =>
+            listeners.push(handler)
+        );
 
         block.flow([20, "next"], logo, 0, "legacyBpm");
-        expect(activity.errorMsg).toHaveBeenCalledWith("Beats per minute must be > 30.", "legacyBpm");
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Beats per minute must be > 30.",
+            "legacyBpm"
+        );
         expect(turtle.singer.bpm).toEqual([30]);
 
         block.flow([5000, "next"], logo, 0, "legacyBpm");
-        expect(activity.errorMsg).toHaveBeenCalledWith("Maximum beats per minute is 1000.", "legacyBpm");
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Maximum beats per minute is 1000.",
+            "legacyBpm"
+        );
 
         const response = block.flow([180, "next"], logo, 0, "legacyBpm");
         expect(response).toEqual(["next", 1]);
         expect(logo.setDispatchBlock).toHaveBeenCalledWith("legacyBpm", 0, "_bpm_0");
-        listeners.forEach((handler) => handler());
+        listeners.forEach(handler => handler());
         expect(turtle.singer.bpm).toEqual([]);
     });
 

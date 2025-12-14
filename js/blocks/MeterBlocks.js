@@ -931,7 +931,25 @@ function setupMeterBlocks(activity) {
             // Set palette, activity, piemenuValuesC1, and beginnerBlock for the block
             this.setPalette("meter", activity);
             this.piemenuValuesC1 = [
-                42, 46, 50, 54, 58, 63, 69, 76, 84, 90, 96, 104, 112, 120, 132, 144, 160, 176, 192,
+                42,
+                46,
+                50,
+                54,
+                58,
+                63,
+                69,
+                76,
+                84,
+                90,
+                96,
+                104,
+                112,
+                120,
+                132,
+                144,
+                160,
+                176,
+                192,
                 208
             ];
             this.beginnerBlock(true);
@@ -1059,7 +1077,25 @@ function setupMeterBlocks(activity) {
             // Set palette, piemenuValuesC1, beginnerBlock, and activity for the block
             this.setPalette("meter", activity);
             this.piemenuValuesC1 = [
-                42, 46, 50, 54, 58, 63, 69, 76, 84, 90, 96, 104, 112, 120, 132, 144, 160, 176, 192,
+                42,
+                46,
+                50,
+                54,
+                58,
+                63,
+                69,
+                76,
+                84,
+                90,
+                96,
+                104,
+                112,
+                120,
+                132,
+                144,
+                160,
+                176,
+                192,
                 208
             ];
             this.beginnerBlock(true);
@@ -1179,7 +1215,7 @@ function setupMeterBlocks(activity) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
                 // eslint-disable-next-line no-unused-vars
-                const __listener = (event) => {
+                const __listener = event => {
                     tur.singer.bpm.pop();
                 };
 
@@ -1254,7 +1290,7 @@ function setupMeterBlocks(activity) {
                 logo.setDispatchBlock(blk, turtle, listenerName);
 
                 // eslint-disable-next-line no-unused-vars
-                const __listener = (event) => {
+                const __listener = event => {
                     tur.singer.bpm.pop();
                 };
 
