@@ -40,7 +40,7 @@
     <script src="lib/reqwest.js" defer></script>
 
     <!-- <script src="lib/jquery-3.7.1.js"></script> -->
-    <script src="lib/jquery-2.1.4.min.js"></script>
+    <script src="lib/jquery-2.1.4.min.js" defer></script>
     <script src="lib/jquery-ui.js" defer></script>
     <script src="lib/materialize.min.js" defer></script>
     <script src="lib/webL10n.js" defer></script>
@@ -52,13 +52,13 @@
     <script src="lib/wheelnav.js" defer></script>
     <script src="lib/abc.min.js" defer></script>
     <script src="lib/codejar/codejar.min.js" defer></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js" defer></script>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
-    <script>
-        hljs.highlightAll();
-        <code class="language-javascript">
-        </code>
-    </script>
+    <script defer>
+    document.addEventListener("DOMContentLoaded", function () {
+        if (window.hljs) hljs.highlightAll();
+    });
+</script>
     <script src="lib/astring.min.js" defer></script>
 
     <script src="lib/acorn.min.js" defer></script>
@@ -80,7 +80,7 @@
     </script>
 </head>
 
-<body id="body" onload="init();" data-title="index" style="background: #f9f9f9;">
+<body id="body" data-title="index" style="background: #f9f9f9;">
     <!-- Fallback for browsers that don't support preload -->
     <noscript>
         JavaScript is required to view this page.
@@ -490,13 +490,15 @@
 
     <!-- Initialize Scripts -->
     <script>
-        let canvas, stage, lang;
-        function init() {
-            canvas = document.getElementById("canvas");
-            stage = new createjs.Stage(canvas);
-            stage.update();
-            // createjs.Ticker.addEventListener("tick", stage);
-        }
+    let canvas, stage;
+function init() {
+    canvas = document.getElementById("canvas");
+    stage = new createjs.Stage(canvas);
+
+    createjs.Ticker.framerate = 60;
+    createjs.Ticker.addEventListener("tick", stage);
+}
+document.addEventListener("DOMContentLoaded", init);
     </script>
 
     <script>
