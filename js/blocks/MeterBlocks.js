@@ -1465,6 +1465,6 @@ function setupMeterBlocks(activity) {
     new MeterBlock().setup(activity);
 }
 
-if (typeof module !== "undefined" && module.exports) {
-    module.exports = setupMeterBlocks;
+if (typeof module !== "undefined") {
+    module.exports = { setupMeterBlocks };
 }
