@@ -1006,7 +1006,7 @@ class PhraseMaker {
                     this._lyrics[i] = event.target.value;
                 });
 
-            };
+            }
             lyricsRow.insertCell().appendChild(tempTable);
         }
 
