@@ -68,7 +68,7 @@ function _(text, options = {}) {
     if (!text) return "";
 
     try {
-        const removeChars = [",","(",")","?","¿","<",">",".","\n",'"',":","%s","%d","/","'",";","×","!","¡"];
+        const removeChars = [",", "(", ")", "?", "¿", "<", ">", ".", "\n", '"', ":", "%s", "%d", "/", "'", ";", "×", "!", "¡"];
         let cleanedText = text;
         for (let char of removeChars) cleanedText = cleanedText.split(char).join("");
 
@@ -145,19 +145,19 @@ function fnBrowserDetect() {
 
     if (userAgent.match(/chrome|chromium|crios/i)) {
         browserName = "chrome";
-    } else if(userAgent.match(/firefox|fxios/i)) {
+    } else if (userAgent.match(/firefox|fxios/i)) {
         browserName = "firefox";
-    } else if(userAgent.match(/safari/i)) {
+    } else if (userAgent.match(/safari/i)) {
         browserName = "safari";
-    } else if(userAgent.match(/opr\//i)) {
+    } else if (userAgent.match(/opr\//i)) {
         browserName = "opera";
-    } else if(userAgent.match(/edg/i)) {
+    } else if (userAgent.match(/edg/i)) {
         browserName = "edge";
     } else {
-        browserName="No browser detection";
+        browserName = "No browser detection";
     }
     return browserName;
-};
+}
 
 /**
  * Returns the pixel ratio of the canvas for high-resolution displays.
@@ -392,7 +392,7 @@ function docByClass(classname) {
  * @returns {NodeList} A collection of elements with the specified tag name.
  */
 function docByTagName(tag) {
-    document.getElementsByTagName(tag);
+    return document.getElementsByTagName(tag);
 }
 
 /**
@@ -1525,7 +1525,7 @@ let delayExecution = (duration) => {
  */
 function closeWidgets() {
     window.widgetWindows.hideAllWindows();
-};
+}
 
 /**
  * Closes a specific widget by its name.
@@ -1553,7 +1553,7 @@ let closeBlkWidgets = (name) => {
  * @returns {void}
  */
 let importMembers = (obj, className, modelArgs, viewArgs) => {
-    
+
     /**
      * Adds methods and variables of one class to another class's instance.
      *
@@ -1574,7 +1574,7 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
         } else {
             obj.added = new ctype(...args);
         }
-        
+
 
         // Loop for all method names of class type
         for (const name of Object.getOwnPropertyNames(ctype.prototype)) {

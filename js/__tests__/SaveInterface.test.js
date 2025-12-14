@@ -36,7 +36,7 @@ global.jQuery.noConflict = jest.fn(() => global.jQuery);
 global._ = jest.fn((str) => str);
 global._THIS_IS_TURTLE_BLOCKS_ = true;
 global.TITLESTRING = "Music Blocks";
-global.GUIDEURL = "../guide/guide.html";
+global.GUIDEURL = "Docs/guide/guide.html";
 global.fileExt = jest.fn((file) => {
     if (!file) { // This covers both null and undefined
         return "";
@@ -61,7 +61,7 @@ global.document = {
         removeChild: jest.fn(),
     },
 };
-global.docById = jest.fn((id) => document.getElementById(id));;
+global.docById = jest.fn((id) => document.getElementById(id));
 global.docByClass = jest.fn((classname) => document.getElementsByClassName(classname));
 global.mockRunLogoCommands = jest.fn();
 global.mockDownload = jest.fn();
@@ -460,7 +460,7 @@ describe("saveWAV & saveABC methods", () => {
             turtles: {
                 turtleList: [{ painter: { doClear: jest.fn() } }],
                 getTurtleCount: jest.fn(() => 1),
-                getTurtle: function(index) {
+                getTurtle: function (index) {
                     return this.turtleList[index];
                 }
             }
@@ -575,7 +575,7 @@ describe("saveLilypond Methods", () => {
             turtles: {
                 turtleList: [{ painter: { doClear: jest.fn() } }],
                 getTurtleCount: jest.fn(() => 1),
-                getTurtle: function(index) {
+                getTurtle: function (index) {
                     return this.turtleList[index];
                 }
             }
@@ -731,10 +731,10 @@ describe("MXML Methods", () => {
                 { painter: mockPainter1 },
                 { painter: mockPainter2 }
             ],
-            getTurtleCount: function() {
+            getTurtleCount: function () {
                 return this.turtleList.length;
             },
-            getTurtle: function(index) {
+            getTurtle: function (index) {
                 return this.turtleList[index];
             }
         };
