@@ -499,7 +499,7 @@ class SaveInterface {
     document.body.style.cursor = "wait";
 
     // Check if we have buffered notation data (Issue #2330)
-    if (activity.logo.recordingBuffer.hasData) {
+    if (activity.logo.recordingBuffer && activity.logo.recordingBuffer.hasData) {
       // Use buffered data - restore it temporarily
       activity.logo.notationOutput = activity.logo.recordingBuffer.notationOutput;
       activity.logo.notationNotes = activity.logo.recordingBuffer.notationNotes;
@@ -562,7 +562,7 @@ class SaveInterface {
   saveLilypond(activity) {
     // Check if we have buffered notation data (Issue #2330)
     // If so, use it directly; otherwise run the program
-    if (activity.logo.recordingBuffer.hasData) {
+    if (activity.logo.recordingBuffer && activity.logo.recordingBuffer.hasData) {
       // Restore buffered data temporarily for save operation
       const savedNotationOutput = activity.logo.notationOutput;
       const savedNotationNotes = activity.logo.notationNotes;
@@ -705,7 +705,7 @@ class SaveInterface {
     }
 
     // Check if we're using buffered data (Issue #2330)
-    if (this.activity.logo.recordingBuffer.hasData) {
+    if (this.activity.logo.recordingBuffer && this.activity.logo.recordingBuffer.hasData) {
       // We already have the notation data in the buffer, just save it
       if (isPDF) {
         this.notationConvert = "pdf";
