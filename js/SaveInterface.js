@@ -264,8 +264,7 @@ class SaveInterface {
    * @instance
    */
   saveHTML(activity) {
-    const html =
-            "data:text/plain;charset=utf-8," + encodeURIComponent(activity.save.prepareHTML());
+    const html = "data:text/plain;charset=utf-8," + encodeURIComponent(activity.save.prepareHTML());
     activity.save.download("html", html, null);
   }
 
@@ -286,10 +285,7 @@ class SaveInterface {
       const html =
         "data:text/plain;charset=utf-8," + encodeURIComponent(activity.save.prepareHTML());
       if (activity.PlanetInterface !== undefined) {
-        activity.save.downloadURL(
-                    activity.PlanetInterface.getCurrentProjectName() + ".html",
-                    html
-                );
+        activity.save.downloadURL(activity.PlanetInterface.getCurrentProjectName() + ".html",html);
       } else {
         activity.save.downloadURL(_("My Project").replace(" ", "_") + ".html", html);
       }
