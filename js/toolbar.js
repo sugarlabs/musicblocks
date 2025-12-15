@@ -345,7 +345,7 @@ class Toolbar {
             console.log("Tooltip override block REACHED!");
             const icons = Array.from(document.querySelectorAll('.tooltipped'));
             const right_icons = Array.from(document.querySelectorAll('ul.main.right a'));
-            const left_below_icons = Array.from(document.querySelectorAll('ul.aux.ledt a'));
+            const left_below_icons = Array.from(document.querySelectorAll('ul.aux.left a'));
             const bottom_icons = Array.from(document.querySelectorAll('ul.aux.right a'));
             if (icons.length === 0) return;
 
