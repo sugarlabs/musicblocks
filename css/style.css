@@ -100,6 +100,10 @@ input[type="range"]:focus::-ms-fill-upper {
   background: #90c100;
 }
 
+.material-tooltip[data-position= "top"]{
+  margin-top: -12px ! important;
+}
+
 .lego-brick {
     display: inline-block;
     background-color: #FF0000;
