@@ -264,7 +264,8 @@ class SaveInterface {
    * @instance
    */
   saveHTML(activity) {
-    const html = "data:text/plain;charset=utf-8," + encodeURIComponent(activity.save.prepareHTML());
+    const html =
+            "data:text/plain;charset=utf-8," + encodeURIComponent(activity.save.prepareHTML());
     activity.save.download("html", html, null);
   }
 
