@@ -741,7 +741,7 @@ function SampleWidget() {
             buttonDiv.appendChild(preview);
             buttonDiv.appendChild(save);
 
-            container.appendChild(h1)
+            container.appendChild(h1);
             container.appendChild(textArea);
             container.appendChild(buttonDiv);
         };
