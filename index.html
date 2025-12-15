@@ -37,10 +37,9 @@
     <link rel="preload" href="lib/materialize-iso.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="css/themes.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="css/darkmode.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" as="video" href="loading-animation.webm" type="video/webm">
-    <link rel="preload" as="video" href="loading-animation.mp4" type="video/mp4">
-    <link rel="preload" as="image" href="loading-animation-ja.svg">
+    <link rel="prefetch" as="video" href="loading-animation.webm" type="video/webm">
+    <link rel="prefetch" as="video" href="loading-animation.mp4" type="video/mp4">
+    <link rel="prefetch" as="image" href="loading-animation-ja.svg">
 
 
     <!-- <script src="js/utils/detectIE.js"></script> -->
@@ -65,13 +64,11 @@
     <script src="lib/codejar/codejar.min.js" defer></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js" defer></script>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            if (window.hljs && typeof hljs.highlightAll === 'function') {
-                hljs.highlightAll();
-            }
-        });
-    </script>
+    <script defer>
+    document.addEventListener("DOMContentLoaded", function () {
+        if (window.hljs) hljs.highlightAll();
+    });
+</script>
     <script src="lib/astring.min.js" defer></script>
 
     <script src="lib/acorn.min.js" defer></script>
@@ -96,7 +93,7 @@
     </script>
 </head>
 
-<body id="body" onload="init();" data-title="index" style="background: #f9f9f9;">
+<body id="body" data-title="index" style="background: #f9f9f9;">
     <!-- Fallback for browsers that don't support preload -->
     <noscript>
         JavaScript is required to view this page.
@@ -518,62 +515,15 @@
 
     <!-- Initialize Scripts -->
     <script>
-        // Lightweight lazy loader for scripts
-        function loadScript(src) {
-            return new Promise((resolve, reject) => {
-                if (document.querySelector(`script[src="${src}"]`)) {
-                    return resolve();
-                }
-                const s = document.createElement('script');
-                s.src = src;
-                s.async = true;
-                s.onload = () => resolve();
-                s.onerror = () => reject(new Error(`Failed to load ${src}`));
-                document.head.appendChild(s);
-            });
-        }
+    let canvas, stage;
+function init() {
+    canvas = document.getElementById("canvas");
+    stage = new createjs.Stage(canvas);
 
-        // Public helpers for feature-specific lazy loads
-        window.ensureAudioEngine = async function () {
-            await loadScript('lib/Tone.js');
-        };
-
-        window.ensureNotationLib = async function () {
-            await loadScript('lib/abc.min.js');
-        };
-
-        window.ensureVectorLibs = async function () {
-            // Load Raphael and Wheelnav only when needed
-            await loadScript('lib/raphael.min.js');
-            await loadScript('lib/wheelnav.js');
-        };
-
-        // Opportunistic pre-load on the first user interaction with playback or load
-        document.addEventListener('DOMContentLoaded', function () {
-            const playBtn = document.getElementById('play');
-            const loadBtn = document.getElementById('load');
-            if (playBtn) {
-                playBtn.addEventListener('click', function () {
-                    // Warm up audio engine right before playback usage
-                    window.ensureAudioEngine().catch(() => {});
-                }, { once: true });
-            }
-            if (loadBtn) {
-                loadBtn.addEventListener('click', function () {
-                    // Project load may need notation/vector libs
-                    window.ensureNotationLib().catch(() => {});
-                    window.ensureVectorLibs().catch(() => {});
-                }, { once: true });
-            }
-        });
-
-        let canvas, stage, lang;
-        function init() {
-            canvas = document.getElementById("canvas");
-            stage = new createjs.Stage(canvas);
-            stage.update();
-            // createjs.Ticker.addEventListener("tick", stage);
-        }
+    createjs.Ticker.framerate = 60;
+    createjs.Ticker.addEventListener("tick", stage);
+}
+document.addEventListener("DOMContentLoaded", init);
     </script>
 
     <script>
