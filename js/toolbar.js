@@ -48,7 +48,7 @@ class Toolbar {
                 ["mb-logo", _("About Music Blocks")],
                 ["play", _("Play")],
                 ["stop", _("Stop")],
-                ["record",_("Record")],
+                ["record", _("Record")],
                 ["Full screen", _("Full screen")],
                 ["FullScreen", _("Full screen")],
                 ["Toggle Fullscreen", _("Toggle Fullscreen")],
@@ -340,6 +340,10 @@ class Toolbar {
                 delay: 100
             });
         }
+
+        $j(".tooltipped").on("click", function () {
+            $j(this).tooltip("close");
+        });
 
         $j(".materialize-iso, .dropdown-trigger").dropdown({
             constrainWidth: false,
