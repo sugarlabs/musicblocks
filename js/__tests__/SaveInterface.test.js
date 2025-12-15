@@ -566,6 +566,7 @@ describe("saveLilypond Methods", () => {
                 runLogoCommands: jest.fn(),
             },
             textMsg: jest.fn(),
+            errorMsg: jest.fn(),
             download: jest.fn(),
         };
 
@@ -699,7 +700,7 @@ describe("saveLilypond Methods", () => {
         expect(activity.save.download).toHaveBeenCalledWith("pdf", dataurl, filename);
     });
 
-    it('should reset cursor to "default" and log an error on failure', () => {
+    it('should reset cursor to "default" and display error message on failure', () => {
         const errorMessage = "Conversion failed";
 
         window.Converter.ly2pdf.mockImplementation((lydata, callback) => {
@@ -713,6 +714,8 @@ describe("saveLilypond Methods", () => {
 
         expect(document.body.style.cursor).toBe("default");
         expect(console.debug).toHaveBeenCalledWith("Error: " + errorMessage);
+        // Verify errorMsg is called with the error message
+        expect(activity.errorMsg).toHaveBeenCalledWith("Error generating PDF" + ": " + errorMessage);
         // Verify activity.save.download is not called
         expect(activity.save.download).not.toHaveBeenCalled();
     });
