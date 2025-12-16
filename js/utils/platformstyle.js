@@ -379,3 +379,8 @@ let showButtonHighlight = (x, y, r, event, scale, stage) => {
     if (platform.FFOS) return {};
     return showMaterialHighlight(x, y, r, event, scale, stage);
 };
+
+// Provide explicit export for Node/test environments.
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { showButtonHighlight };
+}
