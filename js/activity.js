@@ -248,6 +248,23 @@ class Activity {
       "notastring",
       "nomicrophone"
     ];
+    
+    /* Global bridge functions for inline HTML event handlers.
+     * Inline onclick attributes require functions to exist on the global
+     * window object. These wrappers safely delegate the calls to the
+     * active Activity instance, keeping UI logic within Activity.
+     */
+    window.hidePrintText = () => {
+      if (globalActivity) {
+        globalActivity.hidePrintText();
+      }
+    };
+
+    window.hideErrorText = () => {
+      if (globalActivity) {
+        globalActivity.hideErrorText();
+      }
+    };
 
     this.saveLocally = null;
     this.scrollBlockContainer = false;
@@ -5149,6 +5166,23 @@ class Activity {
       }
 
       this.refreshCanvas();
+    };
+
+    /*
+     * Hides Error Text
+     */
+    this.hideErrorText=()=>{
+      if (this.errorText) {
+        this.errorText.style.display = "none";
+      }
+    };
+    /*
+     * Hides Print Text
+     */
+    this.hidePrintText=()=> {
+      if (this.printText) {
+        this.printText.style.display = "none";
+      }
     };
 
     /*
