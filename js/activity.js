@@ -195,6 +195,56 @@ const doAnalyzeProject = function () {
   return analyzeProject(globalActivity);
 };
 
+class Action {
+    constructor(doFunc, undoFunc, description = "") {
+        this.doFunc = doFunc;
+        this.undoFunc = undoFunc;
+        this.description = description;
+    }
+
+    undo() {
+        if (typeof this.undoFunc === "function") {
+            this.undoFunc();
+        }
+    }
+
+    do() {
+        if (typeof this.doFunc === "function") {
+            this.doFunc();
+        }
+    }
+}
+
+class UndoRedoManager {
+    constructor() {
+        this.undoStack = [];
+        this.redoStack = [];
+    }
+
+    addAction(action) {
+        this.undoStack.push(action);
+        this.redoStack = [];
+    }
+
+    undo() {
+        if (this.undoStack.length === 0) return;
+        const action = this.undoStack.pop();
+        action.undo();
+        this.redoStack.push(action);
+    }
+
+    redo() {
+        if (this.redoStack.length === 0) return;
+        const action = this.redoStack.pop();
+        action.do();
+        this.undoStack.push(action);
+    }
+}
+
+// Global instance
+window.UndoRedo = new UndoRedoManager();
+window.Action = Action;
+
 /**
  * Represents an activity in the application.
  */
@@ -1397,6 +1447,12 @@ class Activity {
 
       document.body.appendChild(modal);
     };
+
+    document.addEventListener("keydown", (e) => {
+      if (e.ctrlKey && e.key === "z") window.UndoRedo.undo();
+      if (e.ctrlKey && (e.key === "y" || (e.shiftKey && e.key === "Z"))) window.UndoRedo.redo();
+    });
+
 
     /*
      * Clears "canvas"
@@ -2940,7 +2996,7 @@ class Activity {
         ],
         [8, "hidden", 0, 0, [0, null]]
       ];
-
+      
       this.blocks.loadNewBlocks(newNote);
       if (this.blocks.activeBlock !== null) {
         // Connect the newly created block to the active block (if
@@ -2967,8 +3023,8 @@ class Activity {
       }
 
       // Set new hidden block at the end of the newly created
-      // note block to the active block.
-      this.blocks.activeBlock = this.blocks.blockList.length - 1;
+      // note block to the active block
+
     };
 
     //To create a sampler widget

@@ -1037,7 +1037,7 @@ class Blocks {
                                     protoblock.name === "nameddo" &&
                                     protoblock.defaults[0] === that.blockList[oldBlock].value
                                 ) {
-                                    setTimeout(() =>{
+                                    setTimeout(() => {
                                         blockPalette.remove(protoblock, that.blockList[oldBlock].value);
                                         delete that
                                             .protoBlockDict["myDo_" + that.blockList[oldBlock].value];
@@ -1079,7 +1079,7 @@ class Blocks {
             } else if (this.blockList[parentblk].name === "temperament1") {
                 cblk = this.blockList[parentblk].connections[1];
                 if (cblk == null) {
-                    const postProcess = (args) =>{
+                    const postProcess = (args) => {
                         const parentblk = args[0];
                         const oldBlock = args[1];
 
@@ -1351,7 +1351,7 @@ class Blocks {
                     return;
                 }
             }
-            
+
             if (thisBlockobj.name === "rest2") {
                 this._deletePitchBlocks(thisBlock);
             } else {
@@ -1521,6 +1521,8 @@ class Blocks {
                 console.debug("null block found in blockMoved method: " + thisBlock);
                 return;
             }
+            const oldX = myBlock.original.x;
+            const oldY = myBlock.original.y;
 
             const c = myBlock.connections[0];
             let cBlock;
@@ -2152,6 +2154,31 @@ class Blocks {
                 const stopBtn = document.getElementById("stop");
                 if (stopBtn) stopBtn.style.color = "white";
             }
+
+            const newX = myBlock.container.x;
+            const newY = myBlock.container.y;
+
+            if (oldX != newX || oldY != newY) {
+                UndoRedo.addAction(
+                    new Action(
+                        () => {
+                            myBlock.container.x = newX;
+                            myBlock.container.y = newY;
+                            myBlock.original.x = newX;
+                            myBlock.original.y = newY;
+                            this.activity.refreshCanvas();
+                        },
+                        () => {
+                            myBlock.container.x = oldX;
+                            myBlock.container.y = oldY;
+                            myBlock.original.x = oldX;
+                            myBlock.original.y = oldY;
+                            this.activity.refreshCanvas();
+                        },
+                        "Move Block"
+                    )
+                );
+            }
         };
 
         /**
@@ -2169,7 +2196,7 @@ class Blocks {
             if (type1 === "vspacein" && type2 === "vspaceout") {
                 return true;
             }
-            
+
             if (type1 === "in" && type2 === "out") {
                 return true;
             }
@@ -3310,7 +3337,7 @@ class Blocks {
 
                 postProcessArg = [thisBlock, DEFAULTCHORD];
             } else if (name === "accidentalname") {
-                postProcess = (args) =>{
+                postProcess = (args) => {
                     const b = args[0];
                     const v = args[1];
                     that.blockList[b].value = v;
@@ -5243,6 +5270,7 @@ class Blocks {
              * may still have playback blocks appended, which we will
              * remove.
              */
+            const beforeCount = this.blockList.length;
             let playbackQueueStartsHere = null;
             for (let b = 0; b < blockObjs.length; b++) {
                 const blkData = blockObjs[b];
@@ -6450,7 +6478,7 @@ class Blocks {
                                             if (this.protoBlockDict[blockObjs[c][1][0]] !== undefined) {
                                                 if (
                                                     this.protoBlockDict[blockObjs[c][1][0]].dockTypes[
-                                                        cc
+                                                    cc
                                                     ] !== "out"
                                                 ) {
                                                     flowBlock = false;
@@ -6532,6 +6560,34 @@ class Blocks {
                         }
                     }
                 }
+            }
+            const afterCount = this.blockList.length;
+            if (afterCount > beforeCount) {
+                const createdIndices= [];
+                for (let i=beforeCount; i<afterCount; i++) {
+                    createdIndices.push(i);
+                }
+
+                const snapshot = JSON.parse(JSON.stringify(blockObjs));
+
+                UndoRedo.addAction(
+                    new Action(
+                        () => {
+                            this.loadNewBlocks(JSON.parse(JSON.stringify(snapshot)));
+                            this.activity.refreshCanvas();
+                        },
+                        () => {
+                            for (let i= createdIndices.length-1; i>=0; i--) {
+                                const blk = this.blockList[createdIndices[i]];
+                                if (blk && !blk.trash){
+                                    this.sendStackToTrash(blk);
+                                }
+                            }
+                            this.activity.refreshCanvas();
+                        },
+                        "Add blocks",
+                    )
+                )
             }
         };
 
@@ -6826,16 +6882,53 @@ class Blocks {
          */
         this.sendStackToTrash = (myBlock) => {
             /** First, hide the palettes as they may need updating. */
+
+            const thisBlock = this.blockList.indexOf(myBlock);
+            if (thisBlock === -1 || myBlock.trash) {
+                return;
+            }
+
+            this.findDragGroup(thisBlock);
+            const deletedBlocks = [...this.dragGroup];
+
+            const snapshot = deletedBlocks.map(b => {
+                const blk = this.blockList[b];
+                return {
+                    index: b,
+                    x: blk.container.x,
+                    y: blk.container.y
+                };
+            });
+
+            UndoRedo.addAction(
+                new Action(
+                    () => {
+                        deletedBlocks.forEach(b => {
+                            const blk = this.blockList[b];
+                            blk.trash = true;
+                            blk.hide();
+                        });
+                        this.activity.refreshCanvas();
+                    },
+                    () => {
+                        snapshot.forEach(b => {
+                            const blk = this.blockList[b.index];
+                            blk.trash = false;
+                            blk.show();
+                            blk.container.x = b.x;
+                            blk.container.y = b.y;
+                        });
+                        this.activity.refreshCanvas();
+                    },
+                    "Delete Block"
+                )
+            );
+
             for (const name in this.activity.palettes.dict) {
                 this.activity.palettes.dict[name].hideMenu(true);
             }
 
             this.activity.refreshCanvas();
-
-            const thisBlock = this.blockList.indexOf(myBlock);
-
-            /** Add this block to the list of blocks in the trash so we can undo this action. */
-            this.trashStacks.push(thisBlock);
 
             /** Disconnect block. */
             const parentBlock = myBlock.connections[0];
@@ -6923,6 +7016,8 @@ class Blocks {
             this.activity.refreshCanvas();
             this.activity.trashcan.stopHighlightAnimation();
             document.getElementById("hideContents").click();
+
+
         };
 
         /***
@@ -7052,7 +7147,7 @@ class Blocks {
         this.setSelectedBlocks = (blocks) => {
             this.selectedBlocks = blocks;
         };
-        
+
         /**
         * Checks if coordinates intersect with any block
         * @public
@@ -7060,10 +7155,10 @@ class Blocks {
         * @param {number} y - The y coordinate to check  
         * @returns {boolean} True if coordinates intersect with a block
         */
-        this.isCoordinateOnBlock = function(x, y) {
+        this.isCoordinateOnBlock = function (x, y) {
             return this.blockList.some(block => {
                 if (block.trash) return false;
-                
+
                 const blockX = block.container.x;
                 const blockY = block.container.y;
                 return x >= blockX &&
