@@ -451,6 +451,11 @@ describe("saveWAV & saveABC methods", () => {
                 runningAbc: false,
                 notationOutput: "",
                 notationNotes: {},
+                recordingBuffer: {
+                    hasData: false,
+                    notationOutput: "",
+                    notationNotes: {}
+                },
                 notation: {
                     notationStaging: {},
                     notationDrumStaging: {}
@@ -559,6 +564,11 @@ describe("saveLilypond Methods", () => {
                 guitarOutputEnd: "",
                 notationOutput: "",
                 notationNotes: {},
+                recordingBuffer: {
+                    hasData: false,
+                    notationOutput: "",
+                    notationNotes: {}
+                },
                 notation: {
                     notationStaging: [],
                     notationDrumStaging: [],

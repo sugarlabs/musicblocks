@@ -179,7 +179,7 @@ const transcribeMidi = async (midi, maxNoteBlocks) => {
         };
         //Using for loop for finding the shortest note value
         for (const j in sched) {
-            const dur = sched[j].end - sched[j].start;;
+            const dur = sched[j].end - sched[j].start;
             const temp = getClosestStandardNoteValue(dur * 3 / 8);
             shortestNoteDenominator = Math.max(shortestNoteDenominator, temp[1]);
         }
