@@ -22,7 +22,6 @@ describe("platformstyle", () => {
 
     const loadModule = () => {
         jest.isolateModules(() => {
-            // eslint-disable-next-line global-require
             require("../platformstyle");
         });
         showButtonHighlightRef = require("../platformstyle").showButtonHighlight;
