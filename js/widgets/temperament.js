@@ -2106,7 +2106,11 @@ function TemperamentWidget() {
                     >&nbsp;&nbsp;`;
                 that._playing = false;
                 that.playbackForward = true;
-                this.inbetween = false;
+                // Use the widget instance (`that`) instead of the global/window context (`this`)
+                // so that the state machine for play/pause behaves correctly and does not leave
+                // the widget thinking it is "in between" play cycles. Leaving `inbetween` stuck
+                // as true could cause overlapping play loops and result in strange‑sounding notes.
+                that.inbetween = false;
                 setTimeout(function () {
                     that.notesCircle.navItems[0].fillAttr = "#c8C8C8";
                     that.notesCircle.navItems[0].sliceHoverAttr.fill = "#c8C8C8";
