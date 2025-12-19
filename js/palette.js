@@ -997,9 +997,19 @@ class Palette {
 
             if (b.image) {
                 if (["media", "camera", "video"].includes(b.blkname)) {
-                    // Use artwork.js strings as images for:
-                    // cameraPALETTE, videoPALETTE, mediaPALETTE
-                    img = makePaletteIcons(eval(b.blkname + "PALETTE"));
+                    // Use artwork.js constants without eval
+                    const paletteIconMap = {
+                        camera: typeof cameraPALETTE !== "undefined" ? cameraPALETTE : undefined,
+                        video: typeof videoPALETTE !== "undefined" ? videoPALETTE : undefined,
+                        media: typeof mediaPALETTE !== "undefined" ? mediaPALETTE : undefined
+                    };
+                    const art = paletteIconMap[b.blkname];
+                    if (art) {
+                        img = makePaletteIcons(art);
+                    } else {
+                        // Fallback to plugin image if constant not found
+                        img = makePaletteIcons(this.activity.pluginsImages[b.blkname]);
+                    }
                 } else {
                     // or use the plugin image...
                     img = makePaletteIcons(this.activity.pluginsImages[b.blkname]);

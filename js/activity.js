@@ -65,6 +65,7 @@ let MYDEFINES = [
     "p5.dom.min",
     // 'mespeak',
     "Chart",
+    "utils/safeFunctionRegistry",
     "utils/utils",
     "activity/artwork",
     "widgets/status",

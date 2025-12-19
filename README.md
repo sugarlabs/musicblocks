@@ -178,6 +178,22 @@ Snap Users](./Music_Blocks_for_Snap_Users.md).
 Looking for a block? Find it in the
 [Palette Tables](./guide/README.md#6-appendix).
 
+## Backend Proxy for API Keys
+
+To avoid exposing secrets in the browser, the local server provides a minimal proxy at `/api/data`.
+
+- Set environment variables before starting:
+    - `API_KEY`: your service API key
+    - `EXTERNAL_API_URL`: the target endpoint the proxy will call
+- Start the server:
+    - Windows (PowerShell): `$env:API_KEY="<key>"; $env:EXTERNAL_API_URL="https://example.com/api"; npm run dev`
+    - macOS/Linux (bash): `API_KEY=<key> EXTERNAL_API_URL=https://example.com/api npm run dev`
+- Update any client code to fetch from `/api/data` instead of calling the external API directly.
+
+Notes:
+- Secrets should never be hardcoded in client-side code.
+- In production, use secure server-side storage for keys and restrict outbound destinations.
+
 ## <a name="CODEOFCONDUCT"></a>Code of Conduct
 
 The Music Blocks project adheres to the [Sugar Labs Code of

@@ -6961,8 +6961,19 @@ class Blocks {
                 if (typeof this.blockList[blk].protoblock.updateParameter === "function") {
                     value = this.blockList[blk].protoblock.updateParameter(logo, turtle, blk);
                 } else {
-                    if (name in logo.evalParameterDict) {
-                        eval(logo.evalParameterDict[name]);
+                    if (typeof SafeRegistry !== "undefined" && SafeRegistry.has("parameter", name)) {
+                        try {
+                            value = SafeRegistry.invoke("parameter", name, {
+                                globalActivity: this.activity,
+                                logo: logo,
+                                blk: blk,
+                                turtle: turtle,
+                                block: this.blockList[blk]
+                            });
+                        } catch (e) {
+                            console.error(e);
+                            return;
+                        }
                     } else {
                         return;
                     }
@@ -7006,8 +7017,21 @@ class Blocks {
             if (typeof this.blockList[blk].protoblock.setter === "function") {
                 this.blockList[blk].protoblock.setter(logo, value, turtle, blk);
             } else {
-                if (this.blockList[blk].name in logo.evalSetterDict) {
-                    eval(logo.evalSetterDict[this.blockList[blk].name]);
+                const action = this.blockList[blk].name;
+                if (typeof SafeRegistry !== "undefined" && SafeRegistry.has("setter", action)) {
+                    try {
+                        SafeRegistry.invoke("setter", action, {
+                            globalActivity: this.activity,
+                            logo: logo,
+                            blk: blk,
+                            turtle: turtle,
+                            value: value,
+                            block: this.blockList[blk]
+                        });
+                    } catch (e) {
+                        console.error(e);
+                        throw new Error();
+                    }
                 } else {
                     throw new Error();
                 }

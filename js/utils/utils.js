@@ -216,10 +216,8 @@ let httpGet = (projectName) => {
     xmlHttp = new XMLHttpRequest();
     if (projectName === null) {
         xmlHttp.open("GET", window.server, false);
-        xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
     } else {
         xmlHttp.open("GET", window.server + projectName, false);
-        xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
     }
 
     xmlHttp.send();
@@ -240,7 +238,6 @@ let httpPost = (projectName, data) => {
     let xmlHttp = null;
     xmlHttp = new XMLHttpRequest();
     xmlHttp.open("POST", window.server + projectName, false);
-    xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
     xmlHttp.send(data);
     return xmlHttp.responseText;
     // return 'https://apps.facebook.com/turtleblocks/?file=' + projectName;
@@ -653,24 +650,48 @@ const processPluginData = (activity, pluginData) => {
         }
     }
 
-    // Populate the flow-block dictionary, i.e., the code that is
-    // eval'd by this block.
+    // Helper to register declarative handlers into SafeRegistry
+    const registerHandler = (category, name, spec) => {
+        try {
+            if (typeof SafeRegistry === "undefined") return;
+            let fn = null;
+            if (typeof spec === "function") {
+                fn = spec;
+            } else if (typeof spec === "string") {
+                // Treat as resolvePath string, not raw code
+                fn = SafeRegistry.resolvePath(spec);
+            } else if (spec && typeof spec === "object" && typeof spec.handler === "string") {
+                fn = SafeRegistry.resolvePath(spec.handler);
+            }
+            if (typeof fn === "function") {
+                SafeRegistry.register(category, name, fn);
+            } else {
+                // eslint-disable-next-line no-console
+                console.warn(`Plugin handler not registered for ${category}:${name}`);
+            }
+        } catch (e) {
+            // eslint-disable-next-line no-console
+            console.warn(e);
+        }
+    };
+
+    // Declarative flow handlers (preferred). Legacy string code is ignored for security.
     if ("FLOWPLUGINS" in obj) {
         for (const flow in obj["FLOWPLUGINS"]) {
-            activity.logo.evalFlowDict[flow] = obj["FLOWPLUGINS"][flow];
+            const spec = obj["FLOWPLUGINS"][flow];
+            registerHandler("flow", flow, spec);
         }
     }
 
-    // Populate the arg-block dictionary, i.e., the code that is
-    // eval'd by this block.
+    // Declarative arg handlers (preferred). Legacy string code is ignored for security.
     if ("ARGPLUGINS" in obj) {
         for (const arg in obj["ARGPLUGINS"]) {
-            activity.logo.evalArgDict[arg] = obj["ARGPLUGINS"][arg];
+            const spec = obj["ARGPLUGINS"][arg];
+            registerHandler("arg", arg, spec);
         }
     }
 
-    // Populate the macro dictionary, i.e., the code that is
-    // eval'd by this block.
+    // Populate the macro dictionary (data-only JSON)
     if ("MACROPLUGINS" in obj) {
         for (const macro in obj["MACROPLUGINS"]) {
             try {
@@ -684,11 +705,11 @@ const processPluginData = (activity, pluginData) => {
         }
     }
 
-    // Populate the setter dictionary, i.e., the code that is
-    // used to set a value block.
+    // Declarative setter handlers
     if ("SETTERPLUGINS" in obj) {
         for (const setter in obj["SETTERPLUGINS"]) {
-            activity.logo.evalSetterDict[setter] = obj["SETTERPLUGINS"][setter];
+            const spec = obj["SETTERPLUGINS"][setter];
+            registerHandler("setter", setter, spec);
         }
     }
 
@@ -698,48 +719,130 @@ const processPluginData = (activity, pluginData) => {
     // Maybe:
     // let g = (function() { return this ? this : typeof self !== 'undefined' ? self : undefined})() || Function("return this")();
 
-    if ("BLOCKPLUGINS" in obj) {
-        for (const block in obj["BLOCKPLUGINS"]) {
-            // eslint-disable-next-line no-console
-            console.debug("adding plugin block " + block);
-            try {
-                eval(obj["BLOCKPLUGINS"][block]);
-            } catch (e) {
-                // eslint-disable-next-line no-console
-                console.debug("Failed to load plugin for " + block + ": " + e);
+    // Declarative block definitions
+    const createBlockFromDescriptor = (desc) => {
+        try {
+            const name = desc.name;
+            const label = desc.label;
+            const palette = desc.palette;
+            const kind = desc.kind; // oneArgMath | parameter | oneArg | zeroArg | media
+            const imageKey = desc.imageKey;
+
+            if (!name || !palette) return;
+            const block = new ProtoBlock(name);
+            block.palette = activity.palettes.dict[palette];
+            activity.blocks.protoBlockDict[name] = block;
+            if (label) {
+                block.staticLabels.push(label);
+                block.adjustWidthToLabel();
             }
+            if (imageKey && activity.pluginsImages && activity.pluginsImages[imageKey]) {
+                block.image = activity.pluginsImages[imageKey];
+            }
+            switch (kind) {
+                case "oneArgMath":
+                    block.oneArgMathBlock();
+                    if (Array.isArray(desc.dockTypes)) block.dockTypes = desc.dockTypes;
+                    break;
+                case "parameter":
+                    block.parameterBlock();
+                    break;
+                case "oneArg":
+                    block.oneArgBlock();
+                    if (Array.isArray(desc.dockTypes)) block.dockTypes = desc.dockTypes;
+                    break;
+                case "zeroArg":
+                    block.zeroArgBlock();
+                    break;
+                case "media":
+                    block.mediaBlock();
+                    break;
+                default:
+                    // eslint-disable-next-line no-console
+                    console.warn("Unknown block kind for "+name+": "+kind);
+            }
+        } catch (e) {
+            // eslint-disable-next-line no-console
+            console.debug(e);
         }
+    };
+
+    if ("BLOCKS" in obj && Array.isArray(obj["BLOCKS"])) {
+        obj["BLOCKS"].forEach(createBlockFromDescriptor);
+    } else if ("BLOCKPLUGINS" in obj) {
+        // Legacy BLOCKPLUGINS contains raw code strings; skip for security.
+        // eslint-disable-next-line no-console
+        console.warn("Legacy BLOCKPLUGINS detected; declarative BLOCKS schema required.");
     }
 
-    // Create the globals.
-    if ("GLOBALS" in obj) {
-        eval(obj["GLOBALS"]);
+    // Create globals from JSON (preferred). Legacy string code is ignored.
+    if ("GLOBALS_JSON" in obj) {
+        try {
+            const g = obj["GLOBALS_JSON"];
+            if (g && typeof g === "object") {
+                if (!activity.logo.pluginVars) activity.logo.pluginVars = Object.create(null);
+                // Shallow merge is sufficient for pluginVars
+                for (const k in g) {
+                    activity.logo.pluginVars[k] = g[k];
+                }
+            }
+        } catch (e) {
+            // eslint-disable-next-line no-console
+            console.debug(e);
+        }
+    } else if ("GLOBALS" in obj) {
+        // eslint-disable-next-line no-console
+        console.warn("Legacy GLOBALS string detected; use GLOBALS_JSON.");
     }
 
+    // Declarative parameter handlers
     if ("PARAMETERPLUGINS" in obj) {
         for (const parameter in obj["PARAMETERPLUGINS"]) {
-            activity.logo.evalParameterDict[parameter] = obj["PARAMETERPLUGINS"][parameter];
+            const spec = obj["PARAMETERPLUGINS"][parameter];
+            registerHandler("parameter", parameter, spec);
         }
     }
 
-    // Code to execute when plugin is loaded
+    // Declarative onload handlers: array or object of handler paths/functions
     if ("ONLOAD" in obj) {
-        for (const arg in obj["ONLOAD"]) {
-            eval(obj["ONLOAD"][arg]);
+        const onloadSpecs = obj["ONLOAD"];
+        const runOnload = (spec) => {
+            try {
+                let fn = null;
+                if (typeof spec === "function") fn = spec;
+                else if (typeof spec === "string") fn = SafeRegistry && SafeRegistry.resolvePath(spec);
+                else if (spec && typeof spec === "object" && typeof spec.handler === "string") fn = SafeRegistry && SafeRegistry.resolvePath(spec.handler);
+                if (typeof fn === "function") {
+                    fn({ activity: activity, logo: activity.logo });
+                } else {
+                    // eslint-disable-next-line no-console
+                    console.warn("Onload handler not resolved");
+                }
+            } catch (e) {
+                // eslint-disable-next-line no-console
+                console.debug(e);
+            }
+        };
+        if (Array.isArray(onloadSpecs)) {
+            onloadSpecs.forEach(runOnload);
+        } else {
+            for (const k in onloadSpecs) runOnload(onloadSpecs[k]);
         }
     }
 
-    // Code to execute when turtle code is started
+    // Declarative onstart handlers
     if ("ONSTART" in obj) {
         for (const arg in obj["ONSTART"]) {
-            activity.logo.evalOnStartList[arg] = obj["ONSTART"][arg];
+            const spec = obj["ONSTART"][arg];
+            registerHandler("onstart", arg, spec);
         }
     }
 
-    // Code to execute when turtle code is stopped
+    // Declarative onstop handlers
     if ("ONSTOP" in obj) {
         for (const arg in obj["ONSTOP"]) {
-            activity.logo.evalOnStopList[arg] = obj["ONSTOP"][arg];
+            const spec = obj["ONSTOP"][arg];
+            registerHandler("onstop", arg, spec);
         }
     }
 
@@ -1601,15 +1704,41 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
     const cname = obj.constructor.name; // class name of component object
 
     if (className !== "" && className !== undefined) {
-        addMembers(obj, eval(className));
-        return;
+        const ctor = (typeof SafeRegistry !== "undefined" && SafeRegistry.resolvePath)
+            ? SafeRegistry.resolvePath(className)
+            : undefined;
+        if (ctor) {
+            addMembers(obj, ctor);
+            return;
+        }
+        console.warn("Unable to resolve className", className);
     }
 
     // Add members of Model (class type has to be controller's name + "Model")
-    addMembers(obj, eval(cname + "." + cname + "Model"), modelArgs);
+    {
+        const modelPath = cname + "." + cname + "Model";
+        const modelCtor = (typeof SafeRegistry !== "undefined" && SafeRegistry.resolvePath)
+            ? SafeRegistry.resolvePath(modelPath)
+            : undefined;
+        if (modelCtor) {
+            addMembers(obj, modelCtor, modelArgs);
+        } else {
+            console.warn("Unable to resolve model path", modelPath);
+        }
+    }
 
     // Add members of View (class type has to be controller's name + "View")
-    addMembers(obj, eval(cname + "." + cname + "View"), viewArgs);
+    {
+        const viewPath = cname + "." + cname + "View";
+        const viewCtor = (typeof SafeRegistry !== "undefined" && SafeRegistry.resolvePath)
+            ? SafeRegistry.resolvePath(viewPath)
+            : undefined;
+        if (viewCtor) {
+            addMembers(obj, viewCtor, viewArgs);
+        } else {
+            console.warn("Unable to resolve view path", viewPath);
+        }
+    }
 };
 
 if (typeof module !== "undefined" && module.exports) {

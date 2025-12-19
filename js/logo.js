@@ -693,11 +693,19 @@ class Logo {
                     break;
 
                 default:
-                    // Is it a plugin?
-                    if (logo.blockList[blk].name in logo.evalArgDict) {
-                        // eslint-disable-next-line no-console
-                        console.log("running eval on " + logo.blockList[blk].name);
-                        eval(logo.evalArgDict[logo.blockList[blk].name]);
+                    // Is it a plugin? Use SafeRegistry instead of eval
+                    if (typeof SafeRegistry !== "undefined" && SafeRegistry.has("arg", logo.blockList[blk].name)) {
+                        try {
+                            SafeRegistry.invoke("arg", logo.blockList[blk].name, {
+                                globalActivity: logo.activity,
+                                logo: logo,
+                                blk: blk,
+                                turtle: turtle,
+                                block: logo.blockList[blk]
+                            });
+                        } catch (e) {
+                            console.error(e);
+                        }
                     } else {
                         // eslint-disable-next-line no-console
                         console.error("I do not know how to " + logo.blockList[blk].name);
@@ -1026,7 +1034,13 @@ class Logo {
         this.activity.saveLocally(); // Save the state before running.
 
         for (const arg in this.evalOnStartList) {
-            eval(this.evalOnStartList[arg]);
+            if (typeof SafeRegistry !== "undefined" && SafeRegistry.has("onstart", arg)) {
+                try {
+                    SafeRegistry.invoke("onstart", arg, { globalActivity: this.activity, logo: this });
+                } catch (e) {
+                    console.error(e);
+                }
+            }
         }
 
         this.stopTurtle = false;
@@ -1459,14 +1473,22 @@ class Logo {
 
         if (!logo.blockList[blk].isArgBlock()) {
             let res = null;
-            // Is it a plugin?
-            if (logo.blockList[blk].name in logo.evalFlowDict) {
-                // eslint-disable-next-line no-console
-                console.log("running eval on " + logo.blockList[blk].name);
-                logo.pluginReturnValue = null;
-                eval(logo.evalFlowDict[logo.blockList[blk].name]);
-                // Clamp blocks will return the child flow.
-                res = logo.pluginReturnValue;
+            // Is it a plugin? Use SafeRegistry instead of eval
+            if (typeof SafeRegistry !== "undefined" && SafeRegistry.has("flow", logo.blockList[blk].name)) {
+                try {
+                    logo.pluginReturnValue = null;
+                    SafeRegistry.invoke("flow", logo.blockList[blk].name, {
+                        globalActivity: logo.activity,
+                        logo: logo,
+                        blk: blk,
+                        turtle: turtle,
+                        block: logo.blockList[blk]
+                    });
+                    // Clamp blocks will return the child flow.
+                    res = logo.pluginReturnValue;
+                } catch (e) {
+                    console.error(e);
+                }
             } else {
                 res = logo.blockList[blk].protoblock.flow(
                     args,

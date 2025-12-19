@@ -160,8 +160,11 @@ class MusicBlocks {
                 MusicBlocks._methodList[className] = [];
 
                 if (className === "Painter") {
+                    const protoObj = (typeof SafeRegistry !== "undefined")
+                        ? SafeRegistry.resolvePath(className + ".prototype")
+                        : null;
                     for (const methodName of Object.getOwnPropertyNames(
-                        eval(className + ".prototype")
+                        protoObj || {}
                     )) {
                         if (methodName !== "constructor" && !methodName.startsWith("_"))
                             MusicBlocks._methodList[className].push(methodName);
@@ -169,7 +172,10 @@ class MusicBlocks {
                     return;
                 }
 
-                for (const methodName of Object.getOwnPropertyNames(eval(className))) {
+                const targetObj = (typeof SafeRegistry !== "undefined")
+                    ? SafeRegistry.resolvePath(className)
+                    : null;
+                for (const methodName of Object.getOwnPropertyNames(targetObj || {})) {
                     if (methodName !== "length" && methodName !== "prototype")
                         MusicBlocks._methodList[className].push(methodName);
                 }
@@ -243,7 +249,9 @@ class MusicBlocks {
                     }
                 }
 
-                cname = cname === "Painter" ? this.turtle.painter : eval(cname);
+                cname = cname === "Painter"
+                    ? this.turtle.painter
+                    : (typeof SafeRegistry !== "undefined" ? SafeRegistry.resolvePath(cname) : null);
 
                 returnVal =
                  args === undefined || (Array.isArray(args) && args.length === 0) ? cname[command]() : cname[command](...args);

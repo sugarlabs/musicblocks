@@ -10,6 +10,9 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta id="theme-color" name="theme-color" content="#2196F3">
+    <!-- Content Security Policy (Report-Only to avoid breaking existing CDN/inline usage). Tighten over time. -->
+    <meta http-equiv="Content-Security-Policy-Report-Only"
+        content="default-src 'self'; script-src 'self' https://code.jquery.com https://cdnjs.cloudflare.com 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'self';">
 
     <!-- Icons & PWA -->
     <link rel="icon" sizes="192x192" href="favicon.ico">
@@ -39,9 +42,10 @@
 
     <script src="lib/reqwest.js" defer></script>
 
-    <!-- <script src="lib/jquery-3.7.1.js"></script> -->
-    <script src="lib/jquery-2.1.4.min.js"></script>
-    <script src="lib/jquery-ui.js" defer></script>
+    <!-- Upgrade jQuery to 3.7.1 (CDN) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- Upgrade jQuery UI to 1.13.2 (CDN) for jQuery 3.x compatibility -->
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" defer></script>
     <script src="lib/materialize.min.js" defer></script>
     <script src="lib/webL10n.js" defer></script>
     <script src="lib/Tone.js" defer></script>
