@@ -1,10 +1,71 @@
 /* css/darkmode.css - placeholder dark mode styles */
 :root{
-  --bg: #0f0f10;
+  --bg: #181820;
   --fg: #e8e8e8;
+  --accent: #3a3a4d;
+  --border: #282838;
+  --link: #8ab4f8;
+  --link-hover: #a1c2fa;
+  --button-bg: #23233a;
+  --button-fg: #e8e8e8;
+  --input-bg: #23233a;
+  --input-fg: #e8e8e8;
+  --focus: #4444aa;
+  --transition: 0.2s;
 }
 body {
   background: var(--bg);
   color: var(--fg);
+  transition: background var(--transition), color var(--transition);
 }
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--fg);
+}
+
+a {
+  color: var(--link);
+  transition: color var(--transition);
+}
+a:hover, a:focus {
+  color: var(--link-hover);
+  outline: none;
+}
+
+button, .btn {
+  background: var(--button-bg);
+  color: var(--button-fg);
+  border: 1px solid var(--border);
+  transition: background var(--transition), color var(--transition), border var(--transition);
+}
+button:hover, .btn:hover, button:focus, .btn:focus {
+  background: var(--accent);
+  color: var(--fg);
+  border-color: var(--focus);
+  outline: none;
+}
+
+input, textarea, select {
+  background: var(--input-bg);
+  color: var(--input-fg);
+  border: 1px solid var(--border);
+  transition: background var(--transition), color var(--transition), border var(--transition);
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--focus);
+  outline: none;
+}
+
+hr {
+  border-color: var(--border);
+}
+
+.card, .panel, .modal {
+  background: var(--accent);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  transition: background var(--transition), color var(--transition), border var(--transition);
+}
+
 
