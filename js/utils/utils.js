@@ -157,7 +157,7 @@ function fnBrowserDetect() {
         browserName = "No browser detection";
     }
     return browserName;
-};
+}
 
 /**
  * Returns the pixel ratio of the canvas for high-resolution displays.
@@ -1628,7 +1628,7 @@ let delayExecution = (duration) => {
  */
 function closeWidgets() {
     window.widgetWindows.hideAllWindows();
-};
+}
 
 /**
  * Closes a specific widget by its name.

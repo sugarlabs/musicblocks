@@ -13,7 +13,7 @@
     {
       "files": ["*.json", "*.yml", "*.html", "*.css", "*.scss"],
       "options": {
-        "tabWidth": 2
+        "tabWidth": 4
       }
     }
   ]

@@ -169,14 +169,14 @@ This documentation provides a basic setup for running Music Blocks locally using
 ## <a name="USING_MUSIC_BLOCKS"></a>Using Music Blocks
 
 Once Music Blocks is running, you'll want suggestions on how to use
-it. Follow [Using Music Blocks](./documentation/README.md) and [Music
-Blocks Guide](./guide/README.md).
+it. Follow [Using Music Blocks](./Docs/documentation/README.md) and [Music
+Blocks Guide](./Docs/guide/README.md).
 
 For Scratch and Snap users, you may want to look at [Music Blocks for
 Snap Users](./Music_Blocks_for_Snap_Users.md).
 
 Looking for a block? Find it in the
-[Palette Tables](./guide/README.md#6-appendix).
+[Palette Tables](./Docs/guide/README.md#6-appendix).
 
 ## Backend Proxy for API Keys
 

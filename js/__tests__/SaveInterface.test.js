@@ -61,7 +61,7 @@ global.document = {
         removeChild: jest.fn(),
     },
 };
-global.docById = jest.fn((id) => document.getElementById(id));;
+global.docById = jest.fn((id) => document.getElementById(id));
 global.docByClass = jest.fn((classname) => document.getElementsByClassName(classname));
 global.mockRunLogoCommands = jest.fn();
 global.mockDownload = jest.fn();
