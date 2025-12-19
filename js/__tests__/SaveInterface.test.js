@@ -39,7 +39,7 @@ global.TITLESTRING = "Music Blocks";
 global.GUIDEURL = "Docs/guide/guide.html";
 global.fileExt = jest.fn(file => {
     if (!file) {
-        // This covers both null and undefined
+        // This covers both null & undefined
         return "";
     }
     const parts = file.split(".");
