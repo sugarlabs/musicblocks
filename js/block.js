@@ -2059,7 +2059,9 @@ class Block {
 
             const bounds = myContainer.getBounds();
             myContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-            that.value = myContainer.bitmapCache.getCacheDataURL();
+            if (image.src.indexOf("data:image/gif") === -1) {
+                that.value = myContainer.bitmapCache.getCacheDataURL();
+            }
             that.imageBitmap = bitmap;
 
             // Next, scale the bitmap for the thumbnail.
@@ -2086,7 +2088,12 @@ class Block {
      */
     _doOpenMedia(thisBlock) {
         const that = this;
-        const fileChooser = that.name=="media" ? docById("myMedia") : docById("audio");
+        let fileChooser = docById("myMedia");
+        if (that.name === "audiofile") {
+            fileChooser = docById("audioInput");
+        } else if (that.name === "loadFile") {
+            fileChooser = docById("myOpenAll");
+        }
 
         const __readerAction = () => {
             window.scroll(0, 0);
@@ -2105,9 +2112,12 @@ class Block {
                     fileChooser.value = "";
                 }
             };
-            if (that.name === "media") {
+            if (that.name === "media" || that.name === "audiofile") {
                 reader.readAsDataURL(fileChooser.files[0]);
-            } else if (that.name === "audiofile") {
+            } else if (
+                that.name === "loadFile" &&
+                fileChooser.files[0].type.startsWith("image/")
+            ) {
                 reader.readAsDataURL(fileChooser.files[0]);
             } else {
                 reader.readAsText(fileChooser.files[0]);
