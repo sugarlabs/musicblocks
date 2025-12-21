@@ -215,12 +215,13 @@ let httpGet = (projectName) => {
     let xmlHttp = null;
     xmlHttp = new XMLHttpRequest();
     if (projectName === null) {
-        xmlHttp.open("GET", window.server, false);
-        xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
+        xmlHttp.open("GET", "/api/data", false);
     } else {
-        xmlHttp.open("GET", window.server + projectName, false);
-        xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
+        xmlHttp.open("GET", "/api/data?projectName=" + encodeURIComponent(projectName), false);
     }
+
+    // Guardrail: require a non-simple header to prevent cross-site requests from reaching /api/data.
+    xmlHttp.setRequestHeader("x-mb-client", "1");
 
     xmlHttp.send();
     if (xmlHttp.status > 299) {
@@ -239,8 +240,11 @@ let httpGet = (projectName) => {
 let httpPost = (projectName, data) => {
     let xmlHttp = null;
     xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("POST", window.server + projectName, false);
-    xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
+    xmlHttp.open("POST", "/api/data?projectName=" + encodeURIComponent(projectName), false);
+
+    // Guardrail: require a non-simple header to prevent cross-site requests from reaching /api/data.
+    xmlHttp.setRequestHeader("x-mb-client", "1");
+
     xmlHttp.send(data);
     return xmlHttp.responseText;
     // return 'https://apps.facebook.com/turtleblocks/?file=' + projectName;
@@ -559,6 +563,84 @@ let toTitleCase = (str) => {
  * @returns {object|null} The processed plugin data object or null if parsing fails.
  */
 const processPluginData = (activity, pluginData) => {
+    const getSafeFunctionRegistry = () => {
+        try {
+            if (typeof globalThis !== "undefined") {
+                if (!globalThis.SAFE_FUNCTIONS) {
+                    globalThis.SAFE_FUNCTIONS = Object.create(null);
+                }
+                return globalThis.SAFE_FUNCTIONS;
+            }
+        } catch (e) {
+            // ignore
+        }
+        return Object.create(null);
+    };
+
+    const looksLikeLegacyCodeString = (value) => {
+        if (typeof value !== "string") return false;
+        // Heuristic: legacy plugins embed JS code, not handler identifiers.
+        return /\b(const|let|var|function)\b|=>|;|\n|\r/.test(value);
+    };
+
+    const resolveSafeHandler = (handlerName) => {
+        if (typeof handlerName !== "string" || handlerName.length === 0) return null;
+        const registry = getSafeFunctionRegistry();
+        const fn = registry[handlerName];
+        return typeof fn === "function" ? fn : null;
+    };
+
+    const registerPlugin = (plugin) => {
+        if (!plugin || typeof plugin !== "object") {
+            throw new Error("Invalid plugin entry (expected object)");
+        }
+        const id = plugin.id;
+        const type = plugin.type;
+        const handlerName = plugin.handler;
+
+        if (typeof id !== "string" || id.length === 0) {
+            throw new Error("Invalid plugin id");
+        }
+        if (typeof type !== "string" || type.length === 0) {
+            throw new Error("Invalid plugin type");
+        }
+        if (typeof handlerName !== "string" || handlerName.length === 0) {
+            throw new Error("Invalid plugin handler");
+        }
+
+        const fn = resolveSafeHandler(handlerName);
+        if (!fn) {
+            throw new Error("Invalid plugin handler: " + handlerName);
+        }
+
+        switch (type) {
+            case "flow":
+                activity.logo.evalFlowDict[id] = fn;
+                break;
+            case "arg":
+                activity.logo.evalArgDict[id] = fn;
+                break;
+            case "parameter":
+                activity.logo.evalParameterDict[id] = fn;
+                break;
+            case "setter":
+                activity.logo.evalSetterDict[id] = fn;
+                break;
+            case "onstart":
+                activity.logo.evalOnStartList[id] = fn;
+                break;
+            case "onstop":
+                activity.logo.evalOnStopList[id] = fn;
+                break;
+            case "onload":
+                // Execute allow-listed onload hook immediately.
+                fn(activity, plugin);
+                break;
+            default:
+                throw new Error("Unsupported plugin type: " + type);
+        }
+    };
+
     // Plugins are JSON-encoded dictionaries.
     if (pluginData === undefined) {
         return null;
@@ -657,7 +739,22 @@ const processPluginData = (activity, pluginData) => {
     // eval'd by this block.
     if ("FLOWPLUGINS" in obj) {
         for (const flow in obj["FLOWPLUGINS"]) {
-            activity.logo.evalFlowDict[flow] = obj["FLOWPLUGINS"][flow];
+            const entry = obj["FLOWPLUGINS"][flow];
+            const handlerName = typeof entry === "string" ? entry : entry && entry.handler;
+
+            if (looksLikeLegacyCodeString(entry)) {
+                // eslint-disable-next-line no-console
+                console.warn("Ignoring legacy code-based FLOWPLUGINS entry:", flow);
+                continue;
+            }
+
+            const fn = resolveSafeHandler(handlerName);
+            if (fn) {
+                activity.logo.evalFlowDict[flow] = fn;
+            } else {
+                // eslint-disable-next-line no-console
+                console.warn("Invalid FLOWPLUGINS handler:", flow, handlerName);
+            }
         }
     }
 
@@ -665,7 +762,22 @@ const processPluginData = (activity, pluginData) => {
     // eval'd by this block.
     if ("ARGPLUGINS" in obj) {
         for (const arg in obj["ARGPLUGINS"]) {
-            activity.logo.evalArgDict[arg] = obj["ARGPLUGINS"][arg];
+            const entry = obj["ARGPLUGINS"][arg];
+            const handlerName = typeof entry === "string" ? entry : entry && entry.handler;
+
+            if (looksLikeLegacyCodeString(entry)) {
+                // eslint-disable-next-line no-console
+                console.warn("Ignoring legacy code-based ARGPLUGINS entry:", arg);
+                continue;
+            }
+
+            const fn = resolveSafeHandler(handlerName);
+            if (fn) {
+                activity.logo.evalArgDict[arg] = fn;
+            } else {
+                // eslint-disable-next-line no-console
+                console.warn("Invalid ARGPLUGINS handler:", arg, handlerName);
+            }
         }
     }
 
@@ -688,58 +800,118 @@ const processPluginData = (activity, pluginData) => {
     // used to set a value block.
     if ("SETTERPLUGINS" in obj) {
         for (const setter in obj["SETTERPLUGINS"]) {
-            activity.logo.evalSetterDict[setter] = obj["SETTERPLUGINS"][setter];
-        }
-    }
+            const entry = obj["SETTERPLUGINS"][setter];
+            const handlerName = typeof entry === "string" ? entry : entry && entry.handler;
 
-    // Create the plugin protoblocks.
-    // FIXME: On Chrome, plugins are broken (They still work on Firefox):
-    // EvalError: Refused to evaluate a string as JavaScript because 'unsafe-eval' is not an allowed source of script in the following Content Security Policy directive: "script-src 'self' blob: filesystem: chrome-extension-resource:".
-    // Maybe:
-    // let g = (function() { return this ? this : typeof self !== 'undefined' ? self : undefined})() || Function("return this")();
-
-    if ("BLOCKPLUGINS" in obj) {
-        for (const block in obj["BLOCKPLUGINS"]) {
-            // eslint-disable-next-line no-console
-            console.debug("adding plugin block " + block);
-            try {
-                eval(obj["BLOCKPLUGINS"][block]);
-            } catch (e) {
+            if (looksLikeLegacyCodeString(entry)) {
                 // eslint-disable-next-line no-console
-                console.debug("Failed to load plugin for " + block + ": " + e);
+                console.warn("Ignoring legacy code-based SETTERPLUGINS entry:", setter);
+                continue;
+            }
+
+            const fn = resolveSafeHandler(handlerName);
+            if (fn) {
+                activity.logo.evalSetterDict[setter] = fn;
+            } else {
+                // eslint-disable-next-line no-console
+                console.warn("Invalid SETTERPLUGINS handler:", setter, handlerName);
             }
         }
     }
 
-    // Create the globals.
+    // SECURITY: plugins must be data, not executable code.
+    // Legacy plugins used to ship JS strings under BLOCKPLUGINS/GLOBALS/ONLOAD.
+    // We intentionally do not execute those strings.
+    if ("BLOCKPLUGINS" in obj) {
+        // eslint-disable-next-line no-console
+        console.warn("Ignoring legacy BLOCKPLUGINS (code execution is disabled).");
+    }
     if ("GLOBALS" in obj) {
-        eval(obj["GLOBALS"]);
+        // eslint-disable-next-line no-console
+        console.warn("Ignoring legacy GLOBALS (code execution is disabled).");
     }
 
     if ("PARAMETERPLUGINS" in obj) {
         for (const parameter in obj["PARAMETERPLUGINS"]) {
-            activity.logo.evalParameterDict[parameter] = obj["PARAMETERPLUGINS"][parameter];
+            const entry = obj["PARAMETERPLUGINS"][parameter];
+            const handlerName = typeof entry === "string" ? entry : entry && entry.handler;
+
+            if (looksLikeLegacyCodeString(entry)) {
+                // eslint-disable-next-line no-console
+                console.warn("Ignoring legacy code-based PARAMETERPLUGINS entry:", parameter);
+                continue;
+            }
+
+            const fn = resolveSafeHandler(handlerName);
+            if (fn) {
+                activity.logo.evalParameterDict[parameter] = fn;
+            } else {
+                // eslint-disable-next-line no-console
+                console.warn("Invalid PARAMETERPLUGINS handler:", parameter, handlerName);
+            }
         }
     }
 
-    // Code to execute when plugin is loaded
+    // Code to execute when plugin is loaded (must be allow-listed)
     if ("ONLOAD" in obj) {
-        for (const arg in obj["ONLOAD"]) {
-            eval(obj["ONLOAD"][arg]);
-        }
+        // eslint-disable-next-line no-console
+        console.warn("Ignoring legacy ONLOAD (code execution is disabled).");
     }
 
     // Code to execute when turtle code is started
     if ("ONSTART" in obj) {
         for (const arg in obj["ONSTART"]) {
-            activity.logo.evalOnStartList[arg] = obj["ONSTART"][arg];
+            const entry = obj["ONSTART"][arg];
+            const handlerName = typeof entry === "string" ? entry : entry && entry.handler;
+
+            if (looksLikeLegacyCodeString(entry)) {
+                // eslint-disable-next-line no-console
+                console.warn("Ignoring legacy code-based ONSTART entry:", arg);
+                continue;
+            }
+
+            const fn = resolveSafeHandler(handlerName);
+            if (fn) {
+                activity.logo.evalOnStartList[arg] = fn;
+            } else {
+                // eslint-disable-next-line no-console
+                console.warn("Invalid ONSTART handler:", arg, handlerName);
+            }
         }
     }
 
     // Code to execute when turtle code is stopped
     if ("ONSTOP" in obj) {
         for (const arg in obj["ONSTOP"]) {
-            activity.logo.evalOnStopList[arg] = obj["ONSTOP"][arg];
+            const entry = obj["ONSTOP"][arg];
+            const handlerName = typeof entry === "string" ? entry : entry && entry.handler;
+
+            if (looksLikeLegacyCodeString(entry)) {
+                // eslint-disable-next-line no-console
+                console.warn("Ignoring legacy code-based ONSTOP entry:", arg);
+                continue;
+            }
+
+            const fn = resolveSafeHandler(handlerName);
+            if (fn) {
+                activity.logo.evalOnStopList[arg] = fn;
+            } else {
+                // eslint-disable-next-line no-console
+                console.warn("Invalid ONSTOP handler:", arg, handlerName);
+            }
+        }
+    }
+
+    // New declarative plugin schema:
+    // { "PLUGINS": [ { id, type, handler, params? } ... ] }
+    if (Array.isArray(obj.PLUGINS)) {
+        for (const plugin of obj.PLUGINS) {
+            try {
+                registerPlugin(plugin);
+            } catch (e) {
+                // eslint-disable-next-line no-console
+                console.warn("Failed to register plugin entry:", e);
+            }
         }
     }
 
@@ -1554,6 +1726,16 @@ let closeBlkWidgets = (name) => {
  */
 let importMembers = (obj, className, modelArgs, viewArgs) => {
 
+    const resolveGlobalPath = (path) => {
+        if (typeof path !== "string" || path.length === 0) return undefined;
+        let current = typeof globalThis !== "undefined" ? globalThis : undefined;
+        for (const part of path.split(".")) {
+            if (current == null) return undefined;
+            current = current[part];
+        }
+        return current;
+    };
+
     /**
      * Adds methods and variables of one class to another class's instance.
      *
@@ -1601,15 +1783,21 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
     const cname = obj.constructor.name; // class name of component object
 
     if (className !== "" && className !== undefined) {
-        addMembers(obj, eval(className));
+        const resolved = resolveGlobalPath(className);
+        if (resolved === undefined) {
+            throw new Error("Unknown className for importMembers: " + className);
+        }
+
+        addMembers(obj, resolved);
         return;
     }
 
     // Add members of Model (class type has to be controller's name + "Model")
-    addMembers(obj, eval(cname + "." + cname + "Model"), modelArgs);
+    const namespace = resolveGlobalPath(cname);
+    addMembers(obj, namespace && namespace[cname + "Model"], modelArgs);
 
     // Add members of View (class type has to be controller's name + "View")
-    addMembers(obj, eval(cname + "." + cname + "View"), viewArgs);
+    addMembers(obj, namespace && namespace[cname + "View"], viewArgs);
 };
 
 if (typeof module !== "undefined" && module.exports) {

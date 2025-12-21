@@ -999,7 +999,15 @@ class Palette {
                 if (["media", "camera", "video"].includes(b.blkname)) {
                     // Use artwork.js strings as images for:
                     // cameraPALETTE, videoPALETTE, mediaPALETTE
-                    img = makePaletteIcons(eval(b.blkname + "PALETTE"));
+                    const paletteKey = b.blkname + "PALETTE";
+                    const paletteArtwork =
+                        typeof globalThis !== "undefined" ? globalThis[paletteKey] : undefined;
+
+                    if (paletteArtwork === undefined) {
+                        throw new Error("Missing palette artwork: " + paletteKey);
+                    }
+
+                    img = makePaletteIcons(paletteArtwork);
                 } else {
                     // or use the plugin image...
                     img = makePaletteIcons(this.activity.pluginsImages[b.blkname]);

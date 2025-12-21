@@ -30,7 +30,7 @@
 //* globals *//
 
 //* arg:weatherincity *//
-const weatherMashapeKey = '3Rfxc7fwp2mshJxgtDxKSueYna8Ap1qZfAcjsn2hjpuWPuBCrI';const weatherBlock = globalActivity.blocks.blockList[blk];
+const weatherMashapeKey = '';const weatherBlock = globalActivity.blocks.blockList[blk];
 const apiURL = 'https://george-vustrey-weather.p.mashape.com/api.php?location=';
 const conns = weatherBlock.connections;
 const city = globalActivity.logo.parseArg(globalActivity.logo, turtle, conns[1]);
@@ -58,7 +58,7 @@ if (weatherBlock.cacheCity === city && weatherBlock.cache !== undefined) {
 }
 
 //* arg:weatherincityhigh *//
-const weatherMashapeKey = '3Rfxc7fwp2mshJxgtDxKSueYna8Ap1qZfAcjsn2hjpuWPuBCrI';
+const weatherMashapeKey = '';
 const weatherBlock = globalActivity.blocks.blockList[blk];
 const apiURL = 'https://george-vustrey-weather.p.mashape.com/api.php?location=';
 const conns = weatherBlock.connections;
@@ -87,7 +87,7 @@ if (weatherBlock.cacheCity === city && weatherBlock.cache !== undefined) {
 }
 
 //* arg:weatherincitylow *//
-const weatherMashapeKey = '3Rfxc7fwp2mshJxgtDxKSueYna8Ap1qZfAcjsn2hjpuWPuBCrI';
+const weatherMashapeKey = '';
 const weatherBlock = globalActivity.blocks.blockList[blk];
 const apiURL = 'https://george-vustrey-weather.p.mashape.com/api.php?location=';
 const conns = weatherBlock.connections;

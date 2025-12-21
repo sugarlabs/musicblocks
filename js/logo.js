@@ -688,11 +688,20 @@ class Logo {
           break;
 
         default:
-          // Is it a plugin?
+          
           if (logo.blockList[blk].name in logo.evalArgDict) {
-            // eslint-disable-next-line no-console
-            console.log("running eval on " + logo.blockList[blk].name);
-            eval(logo.evalArgDict[logo.blockList[blk].name]);
+            const pluginName = logo.blockList[blk].name;
+            const argHandler = logo.evalArgDict[pluginName];
+            if (typeof argHandler === "function") {
+              argHandler(logo, turtle, blk, parentBlk, receivedArg);
+            } else {
+              // eslint-disable-next-line no-console
+              console.warn(
+                "Unsupported arg handler for block:",
+                pluginName,
+                "(expected function)"
+              );
+            }
           } else {
             // eslint-disable-next-line no-console
             console.error("I do not know how to " + logo.blockList[blk].name);
@@ -1005,7 +1014,14 @@ class Logo {
     this.activity.saveLocally(); // Save the state before running.
 
     for (const arg in this.evalOnStartList) {
-      eval(this.evalOnStartList[arg]);
+      const onStartHandler = this.evalOnStartList[arg];
+      if (typeof onStartHandler === "function") {
+        onStartHandler(this, env);
+      } else {
+        // Legacy string hooks are no longer executed.
+        // eslint-disable-next-line no-console
+        console.warn("Unsupported ONSTART handler:", arg, "(expected function)");
+      }
     }
 
     this.stopTurtle = false;
@@ -1409,12 +1425,23 @@ class Logo {
       let res = null;
       // Is it a plugin?
       if (logo.blockList[blk].name in logo.evalFlowDict) {
-        // eslint-disable-next-line no-console
-        console.log("running eval on " + logo.blockList[blk].name);
+        const pluginName = logo.blockList[blk].name;
+        const flowHandler = logo.evalFlowDict[pluginName];
         logo.pluginReturnValue = null;
-        eval(logo.evalFlowDict[logo.blockList[blk].name]);
-        // Clamp blocks will return the child flow.
-        res = logo.pluginReturnValue;
+
+        if (typeof flowHandler === "function") {
+          // Prefer explicit return from handler; fallback to pluginReturnValue for legacy-style handlers.
+          const flowResult = flowHandler(logo, turtle, blk, receivedArg, args, actionArgs, isflow);
+          res = flowResult !== undefined ? flowResult : logo.pluginReturnValue;
+        } else {
+          // eslint-disable-next-line no-console
+          console.warn(
+            "Unsupported flow handler for block:",
+            pluginName,
+            "(expected function)"
+          );
+          res = null;
+        }
       } else {
         res = logo.blockList[blk].protoblock.flow(
           args,

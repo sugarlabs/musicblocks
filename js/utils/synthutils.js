@@ -984,8 +984,6 @@ function Synth() {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            // eslint-disable-next-line no-delete-var
-            delete link;
         };
         this.recorder.onstop = () => {
             if (!chunks.length) return;

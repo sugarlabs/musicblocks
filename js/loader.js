@@ -113,7 +113,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBacken
     }
 
     main().then(() => {
-        requirejs(["utils/utils", "activity/activity"]);
+        requirejs(["utils/safeFunctionRegistry", "utils/utils", "activity/activity"]);
     });
 
     i18next.changeLanguage(lang, (err, t) => {
