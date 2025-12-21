@@ -499,18 +499,19 @@ class SaveInterface {
     document.body.style.cursor = "wait";
 
     // Check if we have buffered notation data (Issue #2330)
-    if (activity.logo.recordingBuffer.hasData) {
+    const recordingBuffer = activity && activity.logo && activity.logo.recordingBuffer;
+    if (recordingBuffer && recordingBuffer.hasData) {
       // Use buffered data - restore it temporarily
-      activity.logo.notationOutput = activity.logo.recordingBuffer.notationOutput;
-      activity.logo.notationNotes = activity.logo.recordingBuffer.notationNotes;
+      activity.logo.notationOutput = recordingBuffer.notationOutput;
+      activity.logo.notationNotes = recordingBuffer.notationNotes;
       for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
-        if (activity.logo.recordingBuffer.notationStaging[t]) {
+        if (recordingBuffer.notationStaging[t]) {
           activity.logo.notation.notationStaging[t] =
-            activity.logo.recordingBuffer.notationStaging[t];
+            recordingBuffer.notationStaging[t];
         }
-        if (activity.logo.recordingBuffer.notationDrumStaging[t]) {
+        if (recordingBuffer.notationDrumStaging[t]) {
           activity.logo.notation.notationDrumStaging[t] =
-            activity.logo.recordingBuffer.notationDrumStaging[t];
+            recordingBuffer.notationDrumStaging[t];
         }
       }
 
@@ -562,7 +563,8 @@ class SaveInterface {
   saveLilypond(activity) {
     // Check if we have buffered notation data (Issue #2330)
     // If so, use it directly; otherwise run the program
-    if (activity.logo.recordingBuffer.hasData) {
+    const recordingBuffer = activity && activity.logo && activity.logo.recordingBuffer;
+    if (recordingBuffer && recordingBuffer.hasData) {
       // Restore buffered data temporarily for save operation
       const savedNotationOutput = activity.logo.notationOutput;
       const savedNotationNotes = activity.logo.notationNotes;
@@ -576,16 +578,16 @@ class SaveInterface {
       }
 
       // Load buffered data
-      activity.logo.notationOutput = activity.logo.recordingBuffer.notationOutput;
-      activity.logo.notationNotes = activity.logo.recordingBuffer.notationNotes;
+      activity.logo.notationOutput = recordingBuffer.notationOutput;
+      activity.logo.notationNotes = recordingBuffer.notationNotes;
       for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
-        if (activity.logo.recordingBuffer.notationStaging[t]) {
+        if (recordingBuffer.notationStaging[t]) {
           activity.logo.notation.notationStaging[t] =
-            activity.logo.recordingBuffer.notationStaging[t];
+            recordingBuffer.notationStaging[t];
         }
-        if (activity.logo.recordingBuffer.notationDrumStaging[t]) {
+        if (recordingBuffer.notationDrumStaging[t]) {
           activity.logo.notation.notationDrumStaging[t] =
-            activity.logo.recordingBuffer.notationDrumStaging[t];
+            recordingBuffer.notationDrumStaging[t];
         }
       }
     }
@@ -705,7 +707,9 @@ class SaveInterface {
     }
 
     // Check if we're using buffered data (Issue #2330)
-    if (this.activity.logo.recordingBuffer.hasData) {
+    const recordingBuffer =
+      this.activity && this.activity.logo && this.activity.logo.recordingBuffer;
+    if (recordingBuffer && recordingBuffer.hasData) {
       // We already have the notation data in the buffer, just save it
       if (isPDF) {
         this.notationConvert = "pdf";

@@ -6961,9 +6961,17 @@ class Blocks {
                 if (typeof this.blockList[blk].protoblock.updateParameter === "function") {
                     value = this.blockList[blk].protoblock.updateParameter(logo, turtle, blk);
                 } else {
-                    if (name in logo.evalParameterDict) {
-                        eval(logo.evalParameterDict[name]);
+                    const parameterHandler = logo.evalParameterDict[name];
+                    if (typeof parameterHandler === "function") {
+                        value = parameterHandler(logo, turtle, blk);
                     } else {
+                        // Plugin parameter handlers must be functions; legacy string handlers are no longer executed.
+                        // eslint-disable-next-line no-console
+                        console.warn(
+                            "Unsupported parameter handler for block:",
+                            name,
+                            "(expected function)"
+                        );
                         return;
                     }
                 }
@@ -7006,10 +7014,13 @@ class Blocks {
             if (typeof this.blockList[blk].protoblock.setter === "function") {
                 this.blockList[blk].protoblock.setter(logo, value, turtle, blk);
             } else {
-                if (this.blockList[blk].name in logo.evalSetterDict) {
-                    eval(logo.evalSetterDict[this.blockList[blk].name]);
+                const setterName = this.blockList[blk].name;
+                const setterHandler = logo.evalSetterDict[setterName];
+
+                if (typeof setterHandler === "function") {
+                    setterHandler(logo, turtle, blk, value);
                 } else {
-                    throw new Error();
+                    throw new Error("Unsupported setter handler for block: " + setterName);
                 }
             }
         };

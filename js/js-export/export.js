@@ -143,6 +143,38 @@ class MusicBlocks {
          * @returns {void}
          */
         function CreateAPIMethodList() {
+            const SAFE_API_CLASS_PATHS = [
+                "Painter",
+                "Singer.RhythmActions",
+                "Singer.MeterActions",
+                "Singer.PitchActions",
+                "Singer.IntervalsActions",
+                "Singer.ToneActions",
+                "Singer.OrnamentActions",
+                "Singer.VolumeActions",
+                "Singer.DrumActions",
+                "Turtle.DictActions"
+            ];
+
+            function getGlobalByPath(path) {
+                if (SAFE_API_CLASS_PATHS.indexOf(path) === -1) {
+                    throw new Error("Unsupported API class path: " + path);
+                }
+
+                let obj = globalThis;
+                for (const part of path.split(".")) {
+                    if (obj == null) {
+                        throw new Error("Missing global for API class path: " + path);
+                    }
+                    obj = obj[part];
+                }
+
+                if (obj == null) {
+                    throw new Error("Missing global for API class path: " + path);
+                }
+                return obj;
+            }
+
             [
                 "Painter",
                 // "Painter.GraphicsActions",
@@ -160,16 +192,15 @@ class MusicBlocks {
                 MusicBlocks._methodList[className] = [];
 
                 if (className === "Painter") {
-                    for (const methodName of Object.getOwnPropertyNames(
-                        eval(className + ".prototype")
-                    )) {
+                    const painterProto = getGlobalByPath("Painter").prototype;
+                    for (const methodName of Object.getOwnPropertyNames(painterProto)) {
                         if (methodName !== "constructor" && !methodName.startsWith("_"))
                             MusicBlocks._methodList[className].push(methodName);
                     }
                     return;
                 }
 
-                for (const methodName of Object.getOwnPropertyNames(eval(className))) {
+                for (const methodName of Object.getOwnPropertyNames(getGlobalByPath(className))) {
                     if (methodName !== "length" && methodName !== "prototype")
                         MusicBlocks._methodList[className].push(methodName);
                 }
@@ -243,7 +274,18 @@ class MusicBlocks {
                     }
                 }
 
-                cname = cname === "Painter" ? this.turtle.painter : eval(cname);
+                if (cname === "Painter") {
+                    cname = this.turtle.painter;
+                } else {
+                    let obj = globalThis;
+                    for (const part of cname.split(".")) {
+                        if (obj == null) {
+                            throw new Error("Missing global for API class path: " + cname);
+                        }
+                        obj = obj[part];
+                    }
+                    cname = obj;
+                }
 
                 returnVal =
                  args === undefined || (Array.isArray(args) && args.length === 0) ? cname[command]() : cname[command](...args);

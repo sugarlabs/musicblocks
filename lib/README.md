@@ -24,7 +24,7 @@ If you need to view or modify the original source code, it's best to refer to th
 | 12  | `materialize.min.js`                  | [materialize](https://github.com/Dogfalo/materialize) <!-- Used in MB: v0.100.2, Latest: v1.0.0 -->  |
 | 13  | `mespeak.js`                          | [speak.js](https://github.com/kripken/speak.js)                                                      |
 | 14  | `midi.js`                             | [midi.js]() (Upstream link TBD)                                                                      |
-| 15  | `modernizr-2.6.2.min.js`              | [Modernizr](https://github.com/Modernizr/Modernizr) <!-- Used in MB: v2.6.2, Latest: v3.13.1 -->     |
+| 15  | `modernizr-2.6.2.min.js`              | [Modernizr](https://github.com/Modernizr/Modernizr) <!-- Legacy file; no longer loaded by MB -->      |
 | 16  | `p5.dom.min.js`                       | [p5.dom.min.js]() (Upstream link TBD)                                                                |
 | 17  | `p5.min.js`                           | [p5.js](https://github.com/processing/p5.js) <!-- Used in MB: v1.11.3, Latest: v1.11.4 -->           |
 | 18  | `p5.sound.min.js`                     | [p5.js-sound](https://github.com/processing/p5.js-sound) <!-- Used in MB: v1.0.1, Latest: v1.0.2 --> |
