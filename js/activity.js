@@ -1598,41 +1598,67 @@ class Activity {
       const start = document.getElementById("record"),
         recInside = document.getElementById("rec_inside");
       let mediaRecorder;
-      let currentStream = null;
-      let audioDestination = null;
       var clickEvent = new Event("click");
       let flag = 0;
+      let currentStream = null;
+      let audioDestination = null;
 
       /**
        * Records the screen using the browser's media devices API.
        * @returns {Promise<MediaStream>} A promise resolving to the recorded media stream.
        */
+      async function recordScreen(){
+        const mode = localStorage.getItem("musicBlocksRecordMode");
 
-async function recordScreen() {
-  flag = 1;
-  
-  const canvas = document.getElementById("myCanvas");
-  if (!canvas) {
-    throw new Error("Canvas element not found");
-  }
-  
-  const canvasStream = canvas.captureStream(30);
-  
-  const Tone = that.logo.synth.tone;
-  if (Tone && Tone.context) {
-    const dest = Tone.context.createMediaStreamDestination();
-    Tone.Destination.connect(dest);
-    audioDestination = dest;
-    
-    const audioTrack = dest.stream.getAudioTracks()[0];
-    if (audioTrack) {
-      canvasStream.addTrack(audioTrack);
-    }
-  }
-  
-  currentStream = canvasStream;
-  return canvasStream;
-}
+        if (mode === "canvas") {
+          return await recordCanvasOnly();
+
+        }
+        else {
+          return await recordScreenWithTools();
+        }
+      }
+      async function recordCanvasOnly() {
+        flag =1;
+
+        const canvas = document.getElementById("myCanvas");
+        if (!canvas) {
+          throw new Error("Canvas element not found");
+        }
+
+        const canvasStream = canvas.captureStream(30);
+
+        const Tone = that.logo.synth.tone;
+        if (Tone && Tone.context) {
+          const dest = Tone.context.createMideaStreamDestination();
+          Tone.Destination.connect(dest);
+          audioDestination = dest;
+
+          const audioTrack = deststream.getAudioTracks()[0];
+          if (audioTrack){
+            canvasStream.addTrack(audioTrack);
+          }
+        }
+
+        currentStream = canvasStream;
+        return canvasStream;
+      }
+      async function recordScreenWithTools() {
+        flag = 1;
+        return await navigator.mediaDevices.getDisplayMedia({
+          preferCurrentTab: "True",
+          systemAudio: "include",
+          audio: "True",
+          video: { mediaSource: "tab" },
+          bandwidthProfile: {
+            video: {
+              clientTrackSwitchOffControl: "auto",
+              contentPreferencesMode: "auto"
+            }
+          },
+          preferredVideoCodecs: "auto"
+        });
+      }
 
       const that = this;
 
@@ -1668,6 +1694,7 @@ async function recordScreen() {
         // eslint-disable-next-line no-use-before-define
         recording();
         doRecordButton();
+        that.textMsg(_("Click on stop saving"));
       }
       /**
        * Stops the recording process.
@@ -1675,20 +1702,23 @@ async function recordScreen() {
       function stopRec() {
         flag = 0;
         mediaRecorder.stop();
-        
-        if (currentStream) {
-          currentStream.getTracks().forEach(track => track.stop());
-          currentStream = null;
-        }
-        
-        if (audioDestination) {
-          const Tone = that.logo.synth.tone;
-          if (Tone && Tone.Destination) {
-            Tone.Destination.disconnect(audioDestination);
+
+        const recordMode = localStorage.getItem("musiclBlocksRecordMode") || "canvas";
+
+        if (recordMode === "canvas") {
+          if (currentStream) {
+            currentStream.getTracks().forEach(track => track.stop());
+            currentStream = null;
           }
-          audioDestination = null;
+
+          if (audioDestination) {
+            const Tone = that.logo.synth.tone;
+            if (Tone && Tone.Destination) {
+              Tone.Destination.disconnect(audioDestination);
+            }
+            audioDestination  = null;
+          }
         }
-        
         const node = document.createElement("p");
         node.textContent = "Stopped recording";
         document.body.appendChild(node);
@@ -1750,7 +1780,6 @@ async function recordScreen() {
           node.textContent = "Started recording";
           document.body.appendChild(node);
           recInside.setAttribute("fill", "red");
-                that.textMsg(_("Recording... Click stop to save"));
         });
       }
 
@@ -5030,6 +5059,19 @@ async function recordScreen() {
       if (this.errorMsgArrow !== null) {
         this.errorMsgArrow.removeAllChildren();
         this.refreshCanvas();
+      }
+    };
+
+    // Global functions for message close buttons (accessed from index.html)
+    window.hidePrintText = () => {
+      if (globalActivity) {
+        globalActivity.hideMsgs();
+      }
+    };
+
+    window.hideErrorText = () => {
+      if (globalActivity) {
+        globalActivity.hideMsgs();
       }
     };
 

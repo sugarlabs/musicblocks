@@ -1,75 +1,86 @@
 input[type="range"] {
   height: 4px;
+  appearance: none;
   -webkit-appearance: none;
   width: 250px;
 }
+
 input[type="range"]:focus {
-  outline: 0;
+  outline: none;
 }
+
 input[type="range"]:not(.pitchSlider)::-webkit-slider-runnable-track {
   width: 10px;
   height: 11px;
   cursor: pointer;
   animation: 0.2s;
-  box-shadow: 1px 1px 1px #000;
+  box-shadow: 1px 1px 1px #000000;
   background: #90c100;
   border-radius: 1px;
-  border: 0 solid #010101;
+  border: 0px solid #010101;
 }
+
 input[type="range"]:not(.pitchSlider)::-webkit-slider-thumb {
   box-shadow: 1px 1px 1px #000031;
   border: 1px solid #00001e;
   height: 26px;
   width: 26px;
   border-radius: 15px;
-  background: #00f;
+  background: blue;
   cursor: pointer;
   -webkit-appearance: none;
   margin-top: -8px;
 }
+
 input[type="range"]:not(.pitchSlider):focus::-webkit-slider-runnable-track {
   background: #90c100;
 }
+
 input[type="range"]:not(.pitchSlider)::-moz-range-track {
   width: 100%;
   height: 4px;
   cursor: pointer;
   animation: 0.2s;
-  box-shadow: 1px 1px 1px #000;
+  box-shadow: 1px 1px 1px #000000;
   background: #90c100;
   border-radius: 1px;
-  border: 0 solid #010101;
+  border: 0px solid #010101;
 }
+
 input[type="range"]:not(.pitchSlider)::-moz-range-thumb {
   box-shadow: 1px 1px 1px #000031;
   border: 1px solid #00001e;
   height: 26px;
   width: 26px;
   border-radius: 15px;
-  background: #fff;
+  background: #ffffff;
   cursor: pointer;
 }
+
 input[type="range"]::-ms-track {
   width: 100%;
   height: 11px;
   cursor: pointer;
   animation: 0.2s;
-  background: 0 0;
+  background: transparent;
   border-color: transparent;
   color: transparent;
 }
+
 input[type="range"]::-ms-fill-lower {
   background: #90c100;
-  border: 0 solid #010101;
+  border: 0px solid #010101;
   border-radius: 2px;
-  box-shadow: 1px 1px 1px #000;
+  box-shadow: 1px 1px 1px #000000;
 }
+
 input[type="range"]::-ms-fill-upper {
   background: #90c100;
-  border: 0 solid #010101;
+  border: 0px solid #010101;
   border-radius: 2px;
-  box-shadow: 1px 1px 1px #000;
+  box-shadow: 1px 1px 1px #000000;
 }
+
 input[type="range"]::-ms-thumb {
   margin-top: 1px;
   box-shadow: 1px 1px 1px #000031;
@@ -77,30 +88,184 @@ input[type="range"]::-ms-thumb {
   height: 26px;
   width: 26px;
   border-radius: 15px;
-  background: #fff;
+  background: #ffffff;
   cursor: pointer;
 }
+
 input[type="range"]:focus::-ms-fill-lower {
   background: #90c100;
 }
+
 input[type="range"]:focus::-ms-fill-upper {
   background: #90c100;
 }
-#ClearButton {
-  right: 100px;
-  top: 132px;
-  background-color: white;
-  border: 2px solid red;
-  border-radius: 15px;
-  width: 200px;
-  height: 40px;
-  z-index: 100;
-  visibility: hidden;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
+
+.lego-brick {
+    display: inline-block;
+    background-color: #FF0000;
+    border: 1px solid #880000;
+    margin: 2px;
 }
-.clearPop {
-  position: absolute;
-  cursor: pointer;
+
+.lego-size-1 { width: 20px; height: 10px; }
+.lego-size-2 { width: 40px; height: 10px; }
+/* ... more sizes ... */
+
+/* Recording Mode Dropdown - Specific to record button only */
+li.record-mode-container {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    height: 64px;
+    display: flex;
+    align-items: center;
+}
+
+li.record-mode-container .record-dropdown {
+    position: relative;
+    display: inline-block;
+    width: 140px;
+}
+
+button#recordModeBtn.record-mode-btn {
+    background: #1976d2 !important;
+    border: none !important;
+    border-radius: 3px;
+    padding: 5px 10px;
+    font-size: 12px;
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    font-weight: 400;
+    color: white !important;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    outline: none;
+    transition: all 0.2s ease;
+    height: 32px;
+    width: 100%;
+    white-space: nowrap;
+    vertical-align: middle;
+    line-height: normal;
+}
+
+button#recordModeBtn.record-mode-btn:hover {
+    background: #1565c0 !important;
+}
+
+button#recordModeBtn.record-mode-btn:active,
+button#recordModeBtn.record-mode-btn.active {
+    background: #0d47a1 !important;
+}
+
+button#recordModeBtn .dropdown-arrow {
+    font-size: 10px;
+    transition: transform 0.2s ease;
+    opacity: 0.9;
+    color: white;
+}
+
+button#recordModeBtn.active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+div#recordModeMenu.record-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0;
+    background: #1976d2 !important;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 3px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    z-index: 10000;
+    overflow: hidden;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+div#recordModeMenu .record-option {
+    padding: 2px 16px;
+    font-size: 12px;
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    color: white !important;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+    text-align: center;
+    margin: 0;
+    display: block;
+    line-height: 4;
+}
+
+div#recordModeMenu .record-option:hover {
+    background: #1565c0 !important;
+}
+
+div#recordModeMenu .record-option.selected {
+    background: #0d47a1 !important;
+    color: white !important;
+}
+
+/* Responsive styles for recording dropdown */
+@media (max-width: 768px) {
+    li.record-mode-container {
+        height: 56px;
+    }
+
+    li.record-mode-container .record-dropdown {
+        width: 130px;
+    }
+
+    button#recordModeBtn.record-mode-btn {
+        padding: 4px 8px;
+        font-size: 11px;
+        height: 28px;
+        gap: 4px;
+    }
+
+    button#recordModeBtn .dropdown-arrow {
+        font-size: 9px;
+    }
+
+    div#recordModeMenu .record-option {
+        padding: 2px 12px;
+        font-size: 11px;
+        line-height: 3.5;
+    }
+}
+
+@media (max-width: 480px) {
+    li.record-mode-container {
+        height: 48px;
+    }
+
+    li.record-mode-container .record-dropdown {
+        width: 110px;
+    }
+
+    button#recordModeBtn.record-mode-btn {
+        padding: 3px 6px;
+        font-size: 10px;
+        height: 24px;
+        gap: 3px;
+        border-radius: 2px;
+    }
+
+    button#recordModeBtn .dropdown-arrow {
+        font-size: 8px;
+    }
+
+    div#recordModeMenu.record-dropdown-menu {
+        border-radius: 2px;
+    }
+
+    div#recordModeMenu .record-option {
+        padding: 2px 8px;
+        font-size: 10px;
+        line-height: 3;
+    }
 }
