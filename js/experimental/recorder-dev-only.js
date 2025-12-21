@@ -4,6 +4,11 @@
 // window.__startExportRecording({ getCanvas: ()=>..., getAudioContext: ()=>..., connectAudioToDest: (dest)=>{ /* connect masterGain to dest */ } })
 // window.__stopExportRecording()
 // Strict: re-uses existing AudioContext; does not create new one; WebM only.
+// Do not load in Jest / Node test environment
+if (typeof window === 'undefined' || process.env.NODE_ENV === 'test') {
+  // Running in Node/Jest — skip loading browser-only recorder
+  return;
+}
 
 (function () {
   'use strict';
