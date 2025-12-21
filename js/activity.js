@@ -1630,11 +1630,11 @@ class Activity {
 
         const Tone = that.logo.synth.tone;
         if (Tone && Tone.context) {
-          const dest = Tone.context.createMideaStreamDestination();
+          const dest = Tone.context.createMediaStreamDestination();
           Tone.Destination.connect(dest);
           audioDestination = dest;
 
-          const audioTrack = deststream.getAudioTracks()[0];
+          const audioTrack = dest.stream.getAudioTracks()[0];
           if (audioTrack){
             canvasStream.addTrack(audioTrack);
           }

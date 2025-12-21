@@ -21,7 +21,7 @@
         onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="fonts/material-icons.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="css/activities.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="dist/css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="dist/css/style.css?v=2" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="dist/css/keyboard.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="dist/css/windows.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="lib/materialize-iso.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -286,7 +286,19 @@
                                 <a id="stop" class="left tooltipped"><i class="material-icons main">stop</i></a>
                             </li>
                             <li>
-                            <a id="record" class="left tooltipped" data-tooltip="Record"></a>
+                                <a id="record" class="left tooltipped" data-tooltip="Record"></a>
+                            </li>
+                            <li class="record-mode-container" style="display: none;">
+                                <div class="record-dropdown">
+                                    <button id="recordModeBtn" class="record-mode-btn">
+                                        <span id="recordModeText">Screen + Tools</span>
+                                        <span class="dropdown-arrow">▼</span>
+                                    </button>
+                                    <div id="recordModeMenu" class="record-dropdown-menu" style="display: none;">
+                                        <div class="record-option" data-mode="canvas">Canvas Only</div>
+                                        <div class="record-option" data-mode="screen">Screen + Tools</div>
+                                    </div>
+                                </div>
                             </li>
                         </ul>
 
