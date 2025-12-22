@@ -8,6 +8,26 @@
   box-sizing: border-box;
 }
 
+/* Backdrop overlay for help/tutorial modal */
+.help-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9998;
+}
+
+/* Ensure help modal appears above backdrop and is centered */
+#floatingWindows > .windowFrame.help-modal {
+  z-index: 9999 !important;
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
 #floatingWindows > .windowFrame {
   overflow: hidden;
   border-radius: 8px;

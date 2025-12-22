@@ -42,16 +42,33 @@ class HelpWidget {
         this.index = 0;
         this.isOpen = true;
 
+        // Create backdrop overlay for better visual hierarchy
+        this._backdrop = document.createElement("div");
+        this._backdrop.className = "help-modal-backdrop";
+        document.body.appendChild(this._backdrop);
+
         const widgetWindow = window.widgetWindows.windowFor(this, "help", "help", false);
         //widgetWindow.getWidgetBody().style.overflowY = "auto";
         // const canvasHeight = docById("myCanvas").getBoundingClientRect().height;
         widgetWindow.getWidgetBody().style.maxHeight = "70vh";
         this.widgetWindow = widgetWindow;
+        
+        // Add help-modal class to ensure proper z-index above backdrop
+        widgetWindow.getWidgetFrame().classList.add("help-modal");
+        
         widgetWindow.clear();
         widgetWindow.show();
+        
+        // Store reference to backdrop for cleanup
+        const backdrop = this._backdrop;
         widgetWindow.onclose = () => {
             this.isOpen = false;
             document.onkeydown = activity.__keyPressed;
+            // Remove backdrop when modal closes
+            if (backdrop && backdrop.parentNode) {
+                backdrop.parentNode.removeChild(backdrop);
+            }
+            widgetWindow.getWidgetFrame().classList.remove("help-modal");
             widgetWindow.destroy();
         };
         // Position the widget and make it visible.
@@ -60,9 +77,16 @@ class HelpWidget {
         // Give the DOM time to create the div.
         setTimeout(() => this._setup(useActiveBlock, 0), 0);
 
-        // Position center
-        setTimeout(this.widgetWindow.sendToCenter, 50);
+        // Clear inline position styles so CSS centering can take effect
+        // The inline styles from setPosition override CSS, so we need to clear them
+        setTimeout(() => {
+            const frame = this.widgetWindow.getWidgetFrame();
+            frame.style.left = "";
+            frame.style.top = "";
+            frame.style.transform = "";
+        }, 100);
     }
+
 
     /**
      * @private
