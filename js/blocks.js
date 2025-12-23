@@ -1037,7 +1037,7 @@ class Blocks {
                                     protoblock.name === "nameddo" &&
                                     protoblock.defaults[0] === that.blockList[oldBlock].value
                                 ) {
-                                    setTimeout(() =>{
+                                    setTimeout(() => {
                                         blockPalette.remove(protoblock, that.blockList[oldBlock].value);
                                         delete that
                                             .protoBlockDict["myDo_" + that.blockList[oldBlock].value];
@@ -1079,7 +1079,7 @@ class Blocks {
             } else if (this.blockList[parentblk].name === "temperament1") {
                 cblk = this.blockList[parentblk].connections[1];
                 if (cblk == null) {
-                    const postProcess = (args) =>{
+                    const postProcess = (args) => {
                         const parentblk = args[0];
                         const oldBlock = args[1];
 
@@ -1351,7 +1351,7 @@ class Blocks {
                     return;
                 }
             }
-            
+
             if (thisBlockobj.name === "rest2") {
                 this._deletePitchBlocks(thisBlock);
             } else {
@@ -2169,7 +2169,7 @@ class Blocks {
             if (type1 === "vspacein" && type2 === "vspaceout") {
                 return true;
             }
-            
+
             if (type1 === "in" && type2 === "out") {
                 return true;
             }
@@ -3310,7 +3310,7 @@ class Blocks {
 
                 postProcessArg = [thisBlock, DEFAULTCHORD];
             } else if (name === "accidentalname") {
-                postProcess = (args) =>{
+                postProcess = (args) => {
                     const b = args[0];
                     const v = args[1];
                     that.blockList[b].value = v;
@@ -6450,7 +6450,7 @@ class Blocks {
                                             if (this.protoBlockDict[blockObjs[c][1][0]] !== undefined) {
                                                 if (
                                                     this.protoBlockDict[blockObjs[c][1][0]].dockTypes[
-                                                        cc
+                                                    cc
                                                     ] !== "out"
                                                 ) {
                                                     flowBlock = false;
@@ -6962,7 +6962,8 @@ class Blocks {
                     value = this.blockList[blk].protoblock.updateParameter(logo, turtle, blk);
                 } else {
                     if (name in logo.evalParameterDict) {
-                        eval(logo.evalParameterDict[name]);
+                        // eval(logo.evalParameterDict[name]);
+                        console.warn("Eval execution for parameters is disabled.");
                     } else {
                         return;
                     }
@@ -7007,7 +7008,8 @@ class Blocks {
                 this.blockList[blk].protoblock.setter(logo, value, turtle, blk);
             } else {
                 if (this.blockList[blk].name in logo.evalSetterDict) {
-                    eval(logo.evalSetterDict[this.blockList[blk].name]);
+                    // eval(logo.evalSetterDict[this.blockList[blk].name]);
+                    console.warn("Eval execution for setters is disabled.");
                 } else {
                     throw new Error();
                 }
@@ -7052,7 +7054,7 @@ class Blocks {
         this.setSelectedBlocks = (blocks) => {
             this.selectedBlocks = blocks;
         };
-        
+
         /**
         * Checks if coordinates intersect with any block
         * @public
@@ -7060,10 +7062,10 @@ class Blocks {
         * @param {number} y - The y coordinate to check  
         * @returns {boolean} True if coordinates intersect with a block
         */
-        this.isCoordinateOnBlock = function(x, y) {
+        this.isCoordinateOnBlock = function (x, y) {
             return this.blockList.some(block => {
                 if (block.trash) return false;
-                
+
                 const blockX = block.container.x;
                 const blockY = block.container.y;
                 return x >= blockX &&
