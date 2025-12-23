@@ -1,0 +1,332 @@
+﻿  console.debug
+    saving to custom.abc
+
+      at SaveInterface.debug [as download] (js/SaveInterface.js:186:13)
+
+  console.debug
+    saving to My Project.abc
+
+      at SaveInterface.debug [as download] (js/SaveInterface.js:186:13)
+
+  console.debug
+    saving to My Project.wav
+
+      at SaveInterface.debug [as download] (js/SaveInterface.js:186:13)
+
+  console.debug
+    saving to My Project.xml
+
+      at SaveInterface.debug [as download] (js/SaveInterface.js:186:13)
+
+node.exe : FAIL js/__tests__/SaveInterface.test.js
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (FAIL js/__tests__/SaveInterface.test.js:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  SaveInterface
+    ΓêÜ should initialize with the correct default values (5 ms)
+    ΓêÜ should store activity instance correctly (2 ms)
+  download
+    ΓêÜ should set correct filename and extension when defaultfilename is provided (79 ms)
+    ΓêÜ should default filename to 'My Project.abc' if defaultfilename is null (13 ms)
+    ΓêÜ should append the extension if not present in the filename (6 ms)
+    ΓêÜ should not append the extension if already present in the filename (11 ms)
+    ΓêÜ should create an anchor tag and trigger a download (3 ms)
+  save HTML methods
+    ΓêÜ should replace placeholders with actual project data (1 ms)
+    ΓêÜ should call prepareHTML and download the file
+    ΓêÜ should call prepareHTML and download the file with the correct filename (3 ms)
+  saveMIDI Method
+    ΓêÜ should set runningMIDI to true and run logo commands (2 ms)
+  afterSaveMIDI
+    ΓêÜ should generate MIDI and trigger download (5 ms)
+    ΓêÜ should create instrument tracks and add notes correctly (2 ms)
+  save artwork methods
+    ΓêÜ should call doSVG and download the SVG file (6 ms)
+    ΓêÜ should call toDataURL and download the PNG file (2 ms)
+    ΓêÜ should call printBlockSVG and download the SVG file (2 ms)
+    ΓêÜ should call printBlockPNG and download the PNG file (3 ms)
+  saveWAV & saveABC methods
+    ΓêÜ should start audio recording and update UI (1 ms)
+    ├ù should prepare and run ABC notation commands (2 ms)
+    ΓêÜ should encode and download ABC notation output
+  saveLilypond Methods
+    ├ù should open the Lilypond modal and populate fields (14 ms)
+    ├ù should close the modal when close button is clicked (6 ms)
+    ├ù should call saveLYFile when save button is clicked (5 ms)
+    ├ù should save a Lilypond file with default settings (8 ms)
+    ├ù should save a Lilypond file with PDF conversion (5 ms)
+    ├ù should handle MIDI and guitar output settings correctly (5 ms)
+    ΓêÜ should call saveLilypondOutput and afterSaveLilypondLY (5 ms)
+    ΓêÜ should set cursor to "wait" and call ly2pdf with correct arguments (4 ms)
+    ΓêÜ should reset cursor to "default" and call activity.save.download on success (5 ms)
+    ΓêÜ should reset cursor to "default" and log an error on failure (5 ms)
+  MXML Methods
+    ΓêÜ should initialize MXML state and clear turtle canvases (2 ms)
+    ΓêÜ should generate XML and trigger download (1 ms)
+    ΓêÜ should handle empty data gracefully (1 ms)
+
+  ΓùÅ saveWAV & saveABC methods ΓÇ║ should prepare and run ABC notation commands
+
+    TypeError: Cannot read properties of undefined (reading 'hasData')
+
+    [0m [90m 500 |[39m
+     [90m 501 |[39m     [90m// Check if we have buffered notation data (Issue #2330)[39m
+    [31m[1m>[22m[39m[90m 502 |[39m     [36mif[39m 
+(activity[33m.[39mlogo[33m.[39mrecordingBuffer[33m.[39mhasData) {
+     [90m     |[39m                                       [31m[1m^[22m[39m
+     [90m 503 |[39m       [90m// Use buffered data - restore it temporarily[39m
+     [90m 504 |[39m       activity[33m.[39mlogo[33m.[39mnotationOutput [33m=[39m 
+activity[33m.[39mlogo[33m.[39mrecordingBuffer[33m.[39mnotationOutput[33m;[39m
+     [90m 505 |[39m       activity[33m.[39mlogo[33m.[39mnotationNotes [33m=[39m 
+activity[33m.[39mlogo[33m.[39mrecordingBuffer[33m.[39mnotationNotes[33m;[39m[0m
+
+      at SaveInterface.hasData (js/SaveInterface.js:502:39)
+      at Object.saveAbc (js/__tests__/SaveInterface.test.js:469:18)
+
+  ΓùÅ saveLilypond Methods ΓÇ║ should open the Lilypond modal and populate fields
+
+    TypeError: Cannot read properties of undefined (reading 'hasData')
+
+    [0m [90m 563 |[39m     [90m// Check if we have buffered notation data (Issue #2330)[39m
+     [90m 564 |[39m     [90m// If so, use it directly; otherwise run the program[39m
+    [31m[1m>[22m[39m[90m 565 |[39m     [36mif[39m 
+(activity[33m.[39mlogo[33m.[39mrecordingBuffer[33m.[39mhasData) {
+     [90m     |[39m                                       [31m[1m^[22m[39m
+     [90m 566 |[39m       [90m// Restore buffered data temporarily for save operation[39m
+     [90m 567 |[39m       [36mconst[39m savedNotationOutput [33m=[39m 
+activity[33m.[39mlogo[33m.[39mnotationOutput[33m;[39m
+     [90m 568 |[39m       [36mconst[39m savedNotationNotes [33m=[39m 
+activity[33m.[39mlogo[33m.[39mnotationNotes[33m;[39m[0m
+
+      at SaveInterface.hasData [as saveLilypond] (js/SaveInterface.js:565:39)
+      at Object.saveLilypond (js/__tests__/SaveInterface.test.js:607:18)
+
+  ΓùÅ saveLilypond Methods ΓÇ║ should close the modal when close button is clicked
+
+    TypeError: Cannot read properties of undefined (reading 'hasData')
+
+    [0m [90m 563 |[39m     [90m// Check if we have buffered notation data (Issue #2330)[39m
+     [90m 564 |[39m     [90m// If so, use it directly; otherwise run the program[39m
+    [31m[1m>[22m[39m[90m 565 |[39m     [36mif[39m 
+(activity[33m.[39mlogo[33m.[39mrecordingBuffer[33m.[39mhasData) {
+     [90m     |[39m                                       [31m[1m^[22m[39m
+     [90m 566 |[39m       [90m// Restore buffered data temporarily for save operation[39m
+     [90m 567 |[39m       [36mconst[39m savedNotationOutput [33m=[39m 
+activity[33m.[39mlogo[33m.[39mnotationOutput[33m;[39m
+     [90m 568 |[39m       [36mconst[39m savedNotationNotes [33m=[39m 
+activity[33m.[39mlogo[33m.[39mnotationNotes[33m;[39m[0m
+
+      at SaveInterface.hasData [as saveLilypond] (js/SaveInterface.js:565:39)
+      at Object.saveLilypond (js/__tests__/SaveInterface.test.js:617:18)
+
+  ΓùÅ saveLilypond Methods ΓÇ║ should call saveLYFile when save button is clicked
+
+    TypeError: Cannot read properties of undefined (reading 'hasData')
+
+    [0m [90m 563 |[39m     [90m// Check if we have buffered notation data (Issue #2330)[39m
+     [90m 564 |[39m     [90m// If so, use it directly; otherwise run the program[39m
+    [31m[1m>[22m[39m[90m 565 |[39m     [36mif[39m 
+(activity[33m.[39mlogo[33m.[39mrecordingBuffer[33m.[39mhasData) {
+     [90m     |[39m                                       [31m[1m^[22m[39m
+     [90m 566 |[39m       [90m// Restore buffered data temporarily for save operation[39m
+     [90m 567 |[39m       [36mconst[39m savedNotationOutput [33m=[39m 
+activity[33m.[39mlogo[33m.[39mnotationOutput[33m;[39m
+     [90m 568 |[39m       [36mconst[39m savedNotationNotes [33m=[39m 
+activity[33m.[39mlogo[33m.[39mnotationNotes[33m;[39m[0m
+
+      at SaveInterface.hasData [as saveLilypond] (js/SaveInterface.js:565:39)
+      at Object.saveLilypond (js/__tests__/SaveInterface.test.js:628:18)
+
+  ΓùÅ saveLilypond Methods ΓÇ║ should save a Lilypond file with default settings
+
+    TypeError: Cannot read properties of undefined (reading 'hasData')
+
+    [0m [90m 706 |[39m
+     [90m 707 |[39m     [90m// Check if we're using buffered data (Issue #2330)[39m
+    [31m[1m>[22m[39m[90m 708 |[39m     [36mif[39m 
+([36mthis[39m[33m.[39mactivity[33m.[39mlogo[33m.[39mrecordingBuffer[33m.[39mhasData) {
+     [90m     |[39m                                            [31m[1m^[22m[39m
+     [90m 709 |[39m       [90m// We already have the notation data in the buffer, just save it[39m
+     [90m 710 |[39m       [36mif[39m (isPDF) {
+     [90m 711 |[39m         [36mthis[39m[33m.[39mnotationConvert [33m=[39m [32m"pdf"[39m[33m;[39m[0m
+
+      at SaveInterface.hasData [as saveLYFile] (js/SaveInterface.js:708:44)
+      at Object.saveLYFile (js/__tests__/SaveInterface.test.js:641:23)
+
+  ΓùÅ saveLilypond Methods ΓÇ║ should save a Lilypond file with PDF conversion
+
+    TypeError: Cannot read properties of undefined (reading 'hasData')
+
+    [0m [90m 706 |[39m
+     [90m 707 |[39m     [90m// Check if we're using buffered data (Issue #2330)[39m
+    [31m[1m>[22m[39m[90m 708 |[39m     [36mif[39m 
+([36mthis[39m[33m.[39mactivity[33m.[39mlogo[33m.[39mrecordingBuffer[33m.[39mhasData) {
+     [90m     |[39m                                            [31m[1m^[22m[39m
+     [90m 709 |[39m       [90m// We already have the notation data in the buffer, just save it[39m
+     [90m 710 |[39m       [36mif[39m (isPDF) {
+     [90m 711 |[39m         [36mthis[39m[33m.[39mnotationConvert [33m=[39m [32m"pdf"[39m[33m;[39m[0m
+
+      at SaveInterface.hasData [as saveLYFile] (js/SaveInterface.js:708:44)
+      at Object.saveLYFile (js/__tests__/SaveInterface.test.js:646:23)
+
+  ΓùÅ saveLilypond Methods ΓÇ║ should handle MIDI and guitar output settings correctly
+
+    TypeError: Cannot read properties of undefined (reading 'hasData')
+
+    [0m [90m 706 |[39m
+     [90m 707 |[39m     [90m// Check if we're using buffered data (Issue #2330)[39m
+    [31m[1m>[22m[39m[90m 708 |[39m     [36mif[39m 
+([36mthis[39m[33m.[39mactivity[33m.[39mlogo[33m.[39mrecordingBuffer[33m.[39mhasData) {
+     [90m     |[39m                                            [31m[1m^[22m[39m
+     [90m 709 |[39m       [90m// We already have the notation data in the buffer, just save it[39m
+     [90m 710 |[39m       [36mif[39m (isPDF) {
+     [90m 711 |[39m         [36mthis[39m[33m.[39mnotationConvert [33m=[39m [32m"pdf"[39m[33m;[39m[0m
+
+      at SaveInterface.hasData [as saveLYFile] (js/SaveInterface.js:708:44)
+      at Object.saveLYFile (js/__tests__/SaveInterface.test.js:664:23)
+
+
+=============================== Coverage summary ===============================
+Statements   : 0.29% ( 143/48621 )
+Branches     : 0.18% ( 35/19290 )
+Functions    : 0.66% ( 30/4541 )
+Lines        : 0.3% ( 142/46986 )
+================================================================================
+------------------------------|---------|----------|---------|---------|---------------------------------------------------------------------------------------------------------
+File                          | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                                                       
+------------------------------|---------|----------|---------|---------|---------------------------------------------------------------------------------------------------------
+All files                     |    0.29 |     0.18 |    0.66 |     0.3 |                                                                                                         
+ js                           |    0.72 |     0.42 |    1.88 |    0.74 |                                                                                                         
+  SaveInterface.js            |      50 |    33.33 |   78.94 |   50.93 | 136-148,164,174,189-190,194,228-252,290,347-358,504-532,567-645,675,690,698-700,710-749,769-770,792-808 
+  abc.js                      |       0 |        0 |       0 |       0 | 23-448                                                                                                  
+  activity.js                 |       0 |        0 |       0 |       0 | 49-7398                                                                                                 
+  artwork.js                  |       0 |        0 |       0 |       0 | 63-803                                                                                                  
+  background.js               |       0 |        0 |       0 |       0 | 16-38                                                                                                   
+  base64Utils.js              |       0 |        0 |       0 |       0 | 31-50                                                                                                   
+  basicblocks.js              |       0 |        0 |       0 |       0 | 40-121                                                                                                  
+  block.js                    |       0 |        0 |       0 |       0 | 82-4646                                                                                                 
+  blockfactory.js             |       0 |        0 |       0 |       0 | 40-1808                                                                                                 
+  blocks.js                   |       0 |        0 |       0 |       0 | 60-7071                                                                                                 
+  boundary.js                 |       0 |        0 |       0 |       0 | 29-126                                                                                                  
+  languagebox.js              |       0 |        0 |       0 |       0 | 26-266                                                                                                  
+  lilypond.js                 |    1.22 |      1.2 |       0 |    1.25 | 48,55-594,604-985                                                                                       
+  loader.js                   |       0 |        0 |       0 |       0 | 14-128                                                                                                  
+  logo.js                     |       0 |        0 |       0 |       0 | 37-2350                                                                                                 
+  macros.js                   |       0 |        0 |       0 |       0 | 50-1762                                                                                                 
+  midi.js                     |       0 |        0 |       0 |       0 | 17-356                                                                                                  
+  mxml.js                     |       0 |        0 |       0 |       0 | 15-251                                                                                                  
+  notation.js                 |       0 |        0 |       0 |       0 | 48-506                                                                                                  
+  palette.js                  |       0 |        0 |       0 |       0 | 28-1630                                                                                                 
+  pastebox.js                 |       0 |        0 |       0 |       0 | 13-159                                                                                                  
+  piemenus.js                 |       0 |        0 |       0 |       0 | 63-4010                                                                                                 
+  planetInterface.js          |       0 |        0 |       0 |       0 | 30-334                                                                                                  
+  protoblocks.js              |       0 |        0 |       0 |       0 | 40-2334                                                                                                 
+  rubrics.js                  |       0 |        0 |       0 |       0 | 39-872                                                                                                  
+  themebox.js                 |       0 |        0 |       0 |       0 | 25-74                                                                                                   
+  toolbar.js                  |       0 |        0 |       0 |       0 | 19-1163                                                                                                 
+  trash.js                    |       0 |        0 |       0 |       0 | 22-280                                                                                                  
+  turtle-painter.js           |       0 |        0 |       0 |       0 | 38-1479                                                                                                 
+  turtle-singer.js            |       0 |        0 |       0 |       0 | 69-2469                                                                                                 
+  turtle.js                   |       0 |        0 |       0 |       0 | 56-922                                                                                                  
+  turtledefs.js               |       0 |        0 |       0 |       0 | 38-871                                                                                                  
+  turtles.js                  |       0 |        0 |       0 |       0 | 32-1276                                                                                                 
+ js/blocks                    |       0 |        0 |       0 |       0 |                                                                                                         
+  ActionBlocks.js             |       0 |        0 |       0 |       0 | 38-1540                                                                                                 
+  BooleanBlocks.js            |       0 |        0 |       0 |       0 | 30-1046                                                                                                 
+  BoxesBlocks.js              |       0 |        0 |       0 |       0 | 32-858                                                                                                  
+  DictBlocks.js               |       0 |        0 |       0 |       0 | 30-458                                                                                                  
+  DrumBlocks.js               |       0 |        0 |       0 |       0 | 32-593                                                                                                  
+  EnsembleBlocks.js           |       0 |        0 |       0 |       0 | 30-1337                                                                                                 
+  ExtrasBlocks.js             |       0 |        0 |       0 |       0 | 33-913                                                                                                  
+  FlowBlocks.js               |       0 |        0 |       0 |       0 | 32-1214                                                                                                 
+  GraphicsBlocks.js           |       0 |        0 |       0 |       0 | 46-1223                                                                                                 
+  HeapBlocks.js               |       0 |        0 |       0 |       0 | 31-735                                                                                                  
+  IntervalsBlocks.js          |       0 |        0 |       0 |       0 | 45-1506                                                                                                 
+  MediaBlocks.js              |       0 |        0 |       0 |       0 | 35-989                                                                                                  
+  MeterBlocks.js              |       0 |        0 |       0 |       0 | 34-1429                                                                                                 
+  NumberBlocks.js             |       0 |        0 |       0 |       0 | 25-1020                                                                                                 
+  OrnamentBlocks.js           |       0 |        0 |       0 |       0 | 32-745                                                                                                  
+  PenBlocks.js                |       0 |        0 |       0 |       0 | 30-1230                                                                                                 
+  PitchBlocks.js              |       0 |        0 |       0 |       0 | 31-2113                                                                                                 
+  ProgramBlocks.js            |       0 |        0 |       0 |       0 | 30-1442                                                                                                 
+  RhythmBlockPaletteBlocks.js |       0 |        0 |       0 |       0 | 22-1044                                                                                                 
+  RhythmBlocks.js             |       0 |        0 |       0 |       0 | 33-1242                                                                                                 
+  SensorsBlocks.js            |       0 |        0 |       0 |       0 | 32-982                                                                                                  
+  ToneBlocks.js               |       0 |        0 |       0 |       0 | 34-1154                                                                                                 
+  VolumeBlocks.js             |       0 |        0 |       0 |       0 | 35-947                                                                                                  
+  WidgetBlocks.js             |       0 |        0 |       0 |       0 | 86-1865                                                                                                 
+ js/js-export                 |       0 |        0 |       0 |       0 |                                                                                                         
+  ASTutils.js                 |       0 |        0 |       0 |       0 | 36-769                                                                                                  
+  ast2blocklist.js            |       0 |        0 |       0 |       0 | 33-644                                                                                                  
+  constraints.js              |       0 |        0 |     100 |       0 | 23-1195                                                                                                 
+  export.js                   |       0 |        0 |       0 |       0 | 23-454                                                                                                  
+  generate.js                 |       0 |        0 |       0 |       0 | 36-386                                                                                                  
+  interface.js                |       0 |        0 |       0 |       0 | 33-1811                                                                                                 
+  minify.js                   |       0 |      100 |     100 |       0 | 1-7                                                                                                     
+ js/js-export/API             |       0 |        0 |       0 |       0 |                                                                                                         
+  DictBlocksAPI.js            |       0 |        0 |       0 |       0 | 31-55                                                                                                   
+  DrumBlocksAPI.js            |       0 |        0 |       0 |       0 | 31-55                                                                                                   
+  GraphicsBlocksAPI.js        |       0 |        0 |       0 |       0 | 31-90                                                                                                   
+  IntervalsBlocksAPI.js       |       0 |        0 |       0 |       0 | 31-62                                                                                                   
+  MeterBlocksAPI.js           |       0 |        0 |       0 |       0 | 31-78                                                                                                   
+  OrnamentBlocksAPI.js        |       0 |        0 |       0 |       0 | 31-52                                                                                                   
+  PenBlocksAPI.js             |       0 |        0 |       0 |       0 | 31-103                                                                                                  
+  PitchBlocksAPI.js           |       0 |        0 |       0 |       0 | 37-183                                                                                                  
+  RhythmBlocksAPI.js          |       0 |        0 |       0 |       0 | 37-117                                                                                                  
+  ToneBlocksAPI.js            |       0 |        0 |       0 |       0 | 37-133                                                                                                  
+  VolumeBlocksAPI.js          |       0 |        0 |       0 |       0 | 31-62                                                                                                   
+ js/js-export/samples         |       0 |      100 |     100 |       0 |                                                                                                         
+  sample.js                   |       0 |      100 |     100 |       0 | 19-299                                                                                                  
+ js/turtleactions             |       0 |        0 |       0 |       0 |                                                                                                         
+  DictActions.js              |       0 |        0 |       0 |       0 | 52-268                                                                                                  
+  DrumActions.js              |       0 |        0 |       0 |       0 | 52-234                                                                                                  
+  IntervalsActions.js         |       0 |        0 |       0 |       0 | 49-455                                                                                                  
+  MeterActions.js             |       0 |        0 |       0 |       0 | 46-379                                                                                                  
+  OrnamentActions.js          |       0 |        0 |       0 |       0 | 36-133                                                                                                  
+  PitchActions.js             |       0 |        0 |       0 |       0 | 58-646                                                                                                  
+  RhythmActions.js            |       0 |        0 |       0 |       0 | 40-456                                                                                                  
+  ToneActions.js              |       0 |        0 |       0 |       0 | 47-492                                                                                                  
+  VolumeActions.js            |       0 |        0 |       0 |       0 | 49-315                                                                                                  
+ js/utils                     |       0 |        0 |       0 |       0 |                                                                                                         
+  mathutils.js                |       0 |        0 |       0 |       0 | 59-330                                                                                                  
+  munsell.js                  |       0 |        0 |       0 |       0 | 31-6862                                                                                                 
+  musicutils.js               |       0 |        0 |       0 |       0 | 66-6167                                                                                                 
+  platformstyle.js            |       0 |        0 |       0 |       0 | 22-380                                                                                                  
+  synthutils.js               |       0 |        0 |       0 |       0 | 55-3272                                                                                                 
+  utils.js                    |       0 |        0 |       0 |       0 | 52-1641                                                                                                 
+ js/utils/__tests__           |       0 |      100 |       0 |       0 |                                                                                                         
+  tonemock.js                 |       0 |      100 |       0 |       0 | 22-192                                                                                                  
+ js/widgets                   |       0 |        0 |       0 |       0 |                                                                                                         
+  aidebugger.js               |       0 |        0 |       0 |       0 | 20-1123                                                                                                 
+  aiwidget.js                 |       0 |        0 |       0 |       0 | 26-1105                                                                                                 
+  arpeggio.js                 |       0 |        0 |       0 |       0 | 33-833                                                                                                  
+  help.js                     |       0 |        0 |       0 |       0 | 32-656                                                                                                  
+  jseditor.js                 |       0 |        0 |       0 |       0 | 34-946                                                                                                  
+  legobricks.js               |       0 |        0 |       0 |       0 | 16-2882                                                                                                 
+  meterwidget.js              |       0 |        0 |       0 |       0 | 61-656                                                                                                  
+  modewidget.js               |       0 |        0 |       0 |       0 | 32-1198                                                                                                 
+  musickeyboard.js            |       0 |        0 |       0 |       0 | 49-3522                                                                                                 
+  oscilloscope.js             |       0 |        0 |       0 |       0 | 41-199                                                                                                  
+  phrasemaker.js              |       0 |        0 |       0 |       0 | 51-5478                                                                                                 
+  pitchdrummatrix.js          |       0 |        0 |       0 |       0 | 51-1075                                                                                                 
+  pitchslider.js              |       0 |        0 |       0 |       0 | 26-220                                                                                                  
+  pitchstaircase.js           |       0 |        0 |       0 |       0 | 33-710                                                                                                  
+  reflection.js               |       0 |        0 |       0 |       0 | 20-627                                                                                                  
+  rhythmruler.js              |       0 |        0 |       0 |       0 | 67-2849                                                                                                 
+  sampler.js                  |       0 |        0 |       0 |       0 | 27-2268                                                                                                 
+  statistics.js               |       0 |        0 |       0 |       0 | 28-103                                                                                                  
+  status.js                   |       0 |        0 |       0 |       0 | 20-346                                                                                                  
+  temperament.js              |       0 |        0 |       0 |       0 | 38-2320                                                                                                 
+  tempo.js                    |       0 |        0 |       0 |       0 | 30-432                                                                                                  
+  timbre.js                   |       0 |        0 |       0 |       0 | 40-2614                                                                                                 
+  tuner.js                    |       0 |        0 |       0 |       0 | 6-207                                                                                                   
+  widgetWindows.js            |       0 |        0 |       0 |       0 | 20-701                                                                                                  
+------------------------------|---------|----------|---------|---------|---------------------------------------------------------------------------------------------------------
+Test Suites: 1 failed, 1 total
+Tests:       7 failed, 26 passed, 33 total
+Snapshots:   0 total
+Time:        10.909 s
+Ran all test suites matching /js\\__tests__\\SaveInterface.test.js/i.
