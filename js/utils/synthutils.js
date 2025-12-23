@@ -510,7 +510,7 @@ function Synth() {
      * @type {Object.<string, [number, number]>}
      */
     this.noteFrequencies = {};
-    
+
     /**
      * Function to initialize a new Tone.js instance.
      * @function
@@ -518,7 +518,7 @@ function Synth() {
     this.newTone = () => {
         this.tone = Tone;
     };
-    
+
     /**
      * Function to get the current temperament.
      * @function
@@ -773,20 +773,20 @@ function Synth() {
                 0,
                 "C Major"
             );
-            if (typeof(oneNote) !== "number") {
+            if (typeof (oneNote) !== "number") {
                 const thisTemperament = getTemperament(customID);
                 for (const pitchNumber in thisTemperament) {
                     if (pitchNumber !== "pitchNumber") {
                         if (
                             (isCustomTemperament(customID) &&
-                             oneNote === thisTemperament[pitchNumber][3]) ||
-                                oneNote === thisTemperament[pitchNumber][1]
+                                oneNote === thisTemperament[pitchNumber][3]) ||
+                            oneNote === thisTemperament[pitchNumber][1]
                         ) {
                             const octaveDiff = octave - thisTemperament[pitchNumber][2];
                             return Number(
                                 thisTemperament[pitchNumber][0] *
-                                    startPitchFrequency *
-                                    Math.pow(getOctaveRatio(), octaveDiff)
+                                startPitchFrequency *
+                                Math.pow(getOctaveRatio(), octaveDiff)
                             );
                         }
                     }
@@ -813,7 +813,7 @@ function Synth() {
             return notes;
         }
     };
-    
+
     /**
      * Function to resume the Tone.js context.
      * @function
@@ -984,8 +984,7 @@ function Synth() {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            // eslint-disable-next-line no-delete-var
-            delete link;
+            // delete link;
         };
         this.recorder.onstop = () => {
             if (!chunks.length) return;
@@ -1245,17 +1244,17 @@ function Synth() {
         } else if (sourceName in this.samples.drum) {
             instrumentsSource[instrumentName] = [1, sourceName];
             tempSynth = new Tone.Player(this.samples.drum[sourceName]);
-        } else if (sourceName in CUSTOMSAMPLES){
+        } else if (sourceName in CUSTOMSAMPLES) {
             instrumentsSource[instrumentName] = [2, sourceName];
             const noteDict = {};
             const params = CUSTOMSAMPLES[sourceName];
-            
+
             // Get the base center note
             const center = this._parseSampleCenterNo(params[1], params[2]);
-            
+
             // Check if there's a cent adjustment (stored as the fifth parameter)
             const centAdjustment = params[4] || 0;
-            
+
             // Store the cent adjustment for later use
             if (centAdjustment !== 0) {
                 if (!this.sampleCentAdjustments) {
@@ -1263,7 +1262,7 @@ function Synth() {
                 }
                 this.sampleCentAdjustments[sourceName] = centAdjustment;
             }
-            
+
             noteDict[center] = params[0];
             tempSynth = new Tone.Sampler(noteDict);
         } else {
@@ -1274,7 +1273,7 @@ function Synth() {
 
         return tempSynth;
     };
-    
+
     /**
      * Parses solfege notation and octave to determine the pitch number.
      * @function
@@ -1285,13 +1284,13 @@ function Synth() {
      */
     this._parseSampleCenterNo = (solfege, octave) => {
         // const pitchName = "C4";
-        const solfegeDict = {"do":0, "re":2, "mi":4, "fa":5, "sol":7, "la":9, "ti":11};
-        const letterDict = {"C":0, "D":2, "E":4, "F":5, "G":7, "A":9, "B":11};
+        const solfegeDict = { "do": 0, "re": 2, "mi": 4, "fa": 5, "sol": 7, "la": 9, "ti": 11 };
+        const letterDict = { "C": 0, "D": 2, "E": 4, "F": 5, "G": 7, "A": 9, "B": 11 };
 
         let attr = getArticulation(solfege);
         if (attr === SHARP) {
             attr = 1;
-        } else if (attr ===FLAT) {
+        } else if (attr === FLAT) {
             attr = -1;
         } else if (attr === DOUBLESHARP) {
             attr = 2;
@@ -1317,7 +1316,7 @@ function Synth() {
         return pitchNumber.toString();
     };
 
-    
+
     /**
      * Creates a synth using builtin synths from Tone.js.
      * @function
@@ -1405,7 +1404,7 @@ function Synth() {
 
         return tempSynth;
     };
-    
+
     /**
      * Creates a synth based on the specified parameters, either using samples, built-in synths, or custom synths.
      * @function
@@ -1510,7 +1509,7 @@ function Synth() {
             this.__createSynth(turtle, instrumentName, sourceName, params);
         }
     };
-    
+
     /**
      * Loads a synth based on the user's input, creating and setting volume for the specified turtle.
      * @function
@@ -1535,7 +1534,7 @@ function Synth() {
 
         return null;
     };
-    
+
     /**
      * Perform notes using the provided synth, notes, and parameters for effects and filters.
      * @function
@@ -1595,7 +1594,7 @@ function Synth() {
                 try {
                     await Tone.ToneAudioBuffer.loaded();
                     synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
-                } catch(e) {
+                } catch (e) {
                     console.debug('Error triggering note:', e);
                 }
             } else {
@@ -1733,7 +1732,7 @@ function Synth() {
                         try {
                             await Tone.ToneAudioBuffer.loaded();
                             synth.triggerAttackRelease(notes, beatValue, Tone.now() + future);
-                        } catch(e) {
+                        } catch (e) {
                             console.debug('Error triggering note:', e);
                         }
                     }
@@ -1845,13 +1844,13 @@ function Synth() {
                 flag = instrumentsSource[instrumentName][0];
                 if (flag === 1 || flag === 2) {
                     const sampleName = instrumentsSource[instrumentName][1];
-                    
+
                     // Check if there's a cent adjustment for this sample
                     if (flag === 2 && this.sampleCentAdjustments && this.sampleCentAdjustments[sampleName]) {
                         const centAdjustment = this.sampleCentAdjustments[sampleName];
                         // Apply cent adjustment to playback rate
                         // Formula: playbackRate = 2^(cents/1200)
-                        const playbackRate = Math.pow(2, centAdjustment/1200);
+                        const playbackRate = Math.pow(2, centAdjustment / 1200);
                         if (tempSynth && tempSynth.playbackRate) {
                             tempSynth.playbackRate.value = playbackRate;
                         }
@@ -1981,7 +1980,7 @@ function Synth() {
         Tone.Transport.start();
     };
 
-    this.stop =  () => {
+    this.stop = () => {
         Tone.Transport.stop();
     };
 
@@ -2043,7 +2042,7 @@ function Synth() {
         console.debug("instrument not found");
         return 50;  // Default volume
     };
-    
+
     /**
      * Sets the volume of a specific instrument for a given turtle.
      * @function
@@ -2074,7 +2073,7 @@ function Synth() {
             instruments[turtle][instrumentName].volume.value = db;
         }
     };
-    
+
     /**
      * Sets the master volume for all instruments.
      * @function
@@ -2090,11 +2089,11 @@ function Synth() {
             // Reset volume to default (0 dB) first
             Tone.Destination.volume.rampTo(0, 0.01);
             this.setVolume(0, "electronic synth", volume);
-            setTimeout(()=>{
+            setTimeout(() => {
                 this.trigger(0, "G4", 1 / 4, "electronic synth", null, null, false);
-            },200);
+            }, 200);
         }
-        else{
+        else {
             const db = Tone.gainToDb(volume / 100);
             Tone.Destination.volume.rampTo(db, 0.01);
         }
@@ -2182,7 +2181,7 @@ function Synth() {
             window.activity = {
                 blocks: {
                     blockList: [],
-                    setPitchOctave: () => {},
+                    setPitchOctave: () => { },
                     findPitchOctave: () => 4,
                     stageClick: false
                 },
@@ -2203,7 +2202,7 @@ function Synth() {
             const wheelnavScript = document.createElement('script');
             wheelnavScript.src = 'lib/wheelnav/wheelnav.min.js';
             document.head.appendChild(wheelnavScript);
-            
+
             // Wait for wheelnav to load
             await new Promise((resolve) => {
                 wheelnavScript.onload = resolve;
@@ -2217,7 +2216,7 @@ function Synth() {
             const raphaelScript = document.createElement('script');
             raphaelScript.src = 'lib/raphael.min.js';
             document.head.appendChild(raphaelScript);
-            
+
             // Wait for Raphael to load
             await new Promise((resolve) => {
                 raphaelScript.onload = resolve;
@@ -2245,10 +2244,10 @@ function Synth() {
         await Tone.start();
         this.tunerMic = new Tone.UserMedia();
         await this.tunerMic.open();
-        
+
         const analyser = new Tone.Analyser("waveform", 2048);
         this.tunerMic.connect(analyser);
-        
+
         const YIN = (sampleRate, bufferSize = 2048, threshold = 0.1) => {
             // Low-Pass Filter to remove high-frequency noise
             const lowPassFilter = (buffer, cutoff = 500) => {
@@ -2332,10 +2331,10 @@ function Synth() {
 
             if (pitch > 0) {
                 let note, cents;
-                
+
                 // Get the current note being played
                 const currentNote = frequencyToNote(pitch);
-                
+
                 if (tunerMode === 'chromatic') {
                     // Chromatic mode - use nearest note
                     note = currentNote.note;
@@ -2344,7 +2343,7 @@ function Synth() {
                     // Target pitch mode
                     // Show current note in display but calculate cents from target
                     note = currentNote.note;  // Show the current note being played
-                    
+
                     // Debug logging
                     console.log('Debug values:', {
                         detectedPitch: pitch,
@@ -2352,22 +2351,22 @@ function Synth() {
                         targetFrequency: targetPitch.frequency,
                         currentNote: note
                     });
-                    
+
                     // Ensure we have valid frequencies before calculation
                     if (pitch > 0 && targetPitch.frequency > 0) {
                         // Calculate cents from target frequency
                         const centsFromTarget = 1200 * Math.log2(pitch / targetPitch.frequency);
-                    
-                    // Calculate octaves and semitones when far off
+
+                        // Calculate octaves and semitones when far off
                         const totalSemitones = Math.round(centsFromTarget / 100);
-                    const octaves = Math.floor(Math.abs(totalSemitones) / 12);
-                    const remainingSemitones = Math.abs(totalSemitones) % 12;
-                    
+                        const octaves = Math.floor(Math.abs(totalSemitones) / 12);
+                        const remainingSemitones = Math.abs(totalSemitones) % 12;
+
                         if (Math.abs(centsFromTarget) >= 100) {
-                        // More than a semitone off - show octaves and semitones
+                            // More than a semitone off - show octaves and semitones
                             const direction = centsFromTarget > 0 ? '+' : '-';
                             cents = Math.round(centsFromTarget);
-                        
+
                             // Store the display text for the grey text display
                             let displayText = direction;
                             if (octaves > 0) {
@@ -2378,10 +2377,10 @@ function Synth() {
                                 displayText += remainingSemitones + ' semitone' + (remainingSemitones > 1 ? 's' : '');
                             }
                             this.displayText = displayText;
-                    } else {
-                        // Less than a semitone off - show cents
+                        } else {
+                            // Less than a semitone off - show cents
                             cents = Math.round(centsFromTarget);
-                        this.displayText = `${cents > 0 ? '+' : ''}${cents} cents`;
+                            this.displayText = `${cents > 0 ? '+' : ''}${cents} cents`;
                         }
                     } else {
                         // If we don't have valid frequencies, set defaults
@@ -2389,7 +2388,7 @@ function Synth() {
                         this.displayText = '0 cents';
                     }
                 }
-                
+
                 // Debug logging
                 console.log({
                     frequency: pitch.toFixed(1),
@@ -2397,11 +2396,11 @@ function Synth() {
                     centsDeviation: cents,
                     mode: tunerMode
                 });
-                
+
                 // Initialize display elements if they don't exist
                 let noteDisplayContainer = document.getElementById("noteDisplayContainer");
                 const tunerContainer = document.getElementById("tunerContainer");
-                
+
                 if (!noteDisplayContainer && tunerContainer) {
                     // Create container
                     noteDisplayContainer = document.createElement("div");
@@ -2413,7 +2412,7 @@ function Synth() {
                     noteDisplayContainer.style.textAlign = "center";
                     noteDisplayContainer.style.fontFamily = "Arial, sans-serif";
                     noteDisplayContainer.style.zIndex = "1000";
-                    
+
                     // Create target note selector (only for target mode)
                     const targetNoteSelector = document.createElement("div");
                     targetNoteSelector.id = "targetNoteSelector";
@@ -2427,16 +2426,16 @@ function Synth() {
                     targetNoteSelector.style.transition = "opacity 0.2s ease";
                     targetNoteSelector.style.opacity = "0.7";
                     targetNoteSelector.textContent = targetPitch.note;
-                    
+
                     // Hover effects
                     targetNoteSelector.addEventListener('mouseenter', () => {
                         targetNoteSelector.style.opacity = "1";
                     });
-                    
+
                     targetNoteSelector.addEventListener('mouseleave', () => {
                         targetNoteSelector.style.opacity = "0.7";
                     });
-                    
+
                     // Create the wheel div if it doesn't exist
                     let wheelDiv = docById("wheelDiv");
                     if (!wheelDiv) {
@@ -2456,14 +2455,14 @@ function Synth() {
                             const SOLFNOTES = ["ti", "la", "sol", "fa", "mi", "re", "do"];
                             const NOTENOTES = ["B", "A", "G", "F", "E", "D", "C"];
                             const SOLFATTRS = ["𝄪", "♯", "♮", "♭", "𝄫"];
-                            
+
                             // Get current note and accidental
                             let selectedNote = targetPitch.note[0];
                             let selectedAttr = targetPitch.note.length > 1 ? targetPitch.note.substring(1) : "♮";
-                            
+
                             // Convert letter note to solfege for initial selection
                             let selectedSolfege = SOLFNOTES[NOTENOTES.indexOf(selectedNote)];
-                            
+
                             if (selectedAttr === "") {
                                 selectedAttr = "♮";
                             }
@@ -2471,7 +2470,7 @@ function Synth() {
                             try {
                                 // Create a temporary block object to use with piemenuPitches
                                 const tempBlock = {
-                                    container: { 
+                                    container: {
                                         x: targetNoteSelector.offsetLeft,
                                         y: targetNoteSelector.offsetTop
                                     },
@@ -2487,7 +2486,7 @@ function Synth() {
                                             }
                                         }],
                                         stageClick: false,
-                                        setPitchOctave: () => {},
+                                        setPitchOctave: () => { },
                                         findPitchOctave: () => 4,
                                         turtles: {
                                             _canvas: { width: window.innerWidth, height: window.innerHeight },
@@ -2501,7 +2500,7 @@ function Synth() {
                                     connections: [0], // Connect to the pitch block
                                     value: targetPitch.note,
                                     text: { text: targetPitch.note },
-                                    updateCache: () => {},
+                                    updateCache: () => { },
                                     _exitWheel: null,
                                     _pitchWheel: null,
                                     _accidentalsWheel: null,
@@ -2511,7 +2510,7 @@ function Synth() {
                                     container: {
                                         x: targetNoteSelector.offsetLeft,
                                         y: targetNoteSelector.offsetTop,
-                                        setChildIndex: () => {}
+                                        setChildIndex: () => { }
                                     },
                                     prevAccidental: "♮",
                                     name: "pitch", // This is needed for pitch preview
@@ -2522,25 +2521,25 @@ function Synth() {
                                 if (!window.activity.logo) {
                                     window.activity.logo = {
                                         synth: {
-                                            createDefaultSynth: () => {},
-                                            loadSynth: () => {},
-                                            setMasterVolume: () => {},
+                                            createDefaultSynth: () => { },
+                                            loadSynth: () => { },
+                                            setMasterVolume: () => { },
                                             trigger: (turtle, note, duration, instrument) => {
                                                 // Use the Web Audio API to play the preview note
                                                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                                                 const oscillator = audioContext.createOscillator();
                                                 const gainNode = audioContext.createGain();
-                                                
+
                                                 oscillator.connect(gainNode);
                                                 gainNode.connect(audioContext.destination);
-                                                
+
                                                 // Convert note to frequency
                                                 const freq = pitchToFrequency(note[0], "equal");
                                                 oscillator.frequency.value = freq;
-                                                
+
                                                 // Set volume
                                                 gainNode.gain.value = 0.1; // Low volume for preview
-                                                
+
                                                 // Schedule note
                                                 oscillator.start();
                                                 gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
@@ -2622,19 +2621,19 @@ function Synth() {
                                 // Function to update the target note display
                                 const updateTargetNote = () => {
                                     if (!selectionState.note) return;
-                                    
+
                                     // Convert accidental symbols to notation
                                     let noteWithAccidental = selectionState.note;
                                     if (selectionState.accidental === "♯") noteWithAccidental += "#";
                                     else if (selectionState.accidental === "♭") noteWithAccidental += "b";
                                     else if (selectionState.accidental === "𝄪") noteWithAccidental += "##";
                                     else if (selectionState.accidental === "𝄫") noteWithAccidental += "bb";
-                                    
+
                                     const noteWithOctave = noteWithAccidental + selectionState.octave;
-                                    
+
                                     // Update target pitch
-                                        targetPitch.note = noteWithOctave;
-                                    
+                                    targetPitch.note = noteWithOctave;
+
                                     // Calculate the frequency for the target pitch
                                     try {
                                         // Define base frequencies for each note (C4 = 261.63 Hz)
@@ -2662,7 +2661,7 @@ function Synth() {
                                         const [, note, octave] = noteMatch;
                                         // Convert flats to sharps for lookup
                                         const lookupNote = note.replace('b', '#').replace('bb', '##');
-                                        
+
                                         // Get base frequency for the note
                                         let freq = baseFrequencies[lookupNote];
                                         if (!freq) {
@@ -2674,13 +2673,13 @@ function Synth() {
                                         freq *= Math.pow(2, octaveDiff);
 
                                         targetPitch.frequency = freq;
-                                        
+
                                         // Debug logging
                                         console.log('Target pitch updated:', {
                                             note: noteWithOctave,
                                             frequency: targetPitch.frequency
                                         });
-                                        
+
                                         // Validate frequency
                                         if (isNaN(targetPitch.frequency) || targetPitch.frequency <= 0) {
                                             console.error('Invalid frequency calculated:', targetPitch.frequency);
@@ -2690,9 +2689,9 @@ function Synth() {
                                         console.error('Error calculating frequency:', error);
                                         targetPitch.frequency = 440; // Default to A4 if calculation fails
                                     }
-                                    
+
                                     // Update display
-                                        targetNoteSelector.textContent = noteWithOctave;
+                                    targetNoteSelector.textContent = noteWithOctave;
                                 };
 
                                 // Update exit wheel handler
@@ -2711,7 +2710,7 @@ function Synth() {
                                         if (tempBlock._exitWheel) {
                                             tempBlock._exitWheel.removeWheel();
                                         }
-                                        
+
                                         // Hide the wheel div
                                         wheelDiv.style.display = "none";
                                     };
@@ -2721,9 +2720,9 @@ function Synth() {
                             }
                         }
                     });
-                    
+
                     noteDisplayContainer.appendChild(targetNoteSelector);
-                    
+
                     // Create mode toggle button
                     const modeToggle = document.createElement("div");
                     modeToggle.id = "modeToggle";
@@ -2813,61 +2812,61 @@ function Synth() {
                     updateButtonStyles();
 
                     tunerContainer.appendChild(modeToggle);
-                    
+
                     // Create note display
                     const noteText = document.createElement("div");
                     noteText.id = "noteText";
                     noteText.style.fontSize = "64px";
                     noteText.style.fontWeight = "bold";
                     noteText.style.marginBottom = "5px";
-                    
+
                     // Create cents deviation display
                     const centsText = document.createElement("div");
                     centsText.id = "centsText";
                     centsText.style.fontSize = "14px";
                     centsText.style.color = "#666666";
                     centsText.style.marginBottom = "5px";
-                    
+
                     // Create tune direction display
                     const tuneDirection = document.createElement("div");
                     tuneDirection.id = "tuneDirection";
                     tuneDirection.style.fontSize = "18px";
                     tuneDirection.style.color = "#FF4500";
-                    
+
                     // Append all elements
                     noteDisplayContainer.appendChild(noteText);
                     noteDisplayContainer.appendChild(centsText);
                     noteDisplayContainer.appendChild(tuneDirection);
                     tunerContainer.appendChild(noteDisplayContainer);
                 }
-                
+
                 // Update displays if they exist
                 if (noteDisplayContainer) {
                     const noteText = document.getElementById("noteText");
                     const centsText = document.getElementById("centsText");
                     const tuneDirection = document.getElementById("tuneDirection");
                     const targetNoteSelector = document.getElementById("targetNoteSelector");
-                    
+
                     if (noteText) noteText.textContent = note;
                     if (centsText) {
                         centsText.textContent = this.displayText || (tunerMode === 'target' ? '0 cents' : `${cents > 0 ? '+' : ''}${Math.round(cents)} cents`);
                     }
-                    
+
                     // Update target note selector visibility based on mode
                     if (targetNoteSelector) {
                         targetNoteSelector.style.display = tunerMode === 'target' ? 'block' : 'none';
                         targetNoteSelector.textContent = targetPitch.note;
                     }
-                    
+
                     if (tuneDirection) {
                         tuneDirection.textContent = "";
                         tuneDirection.style.color = Math.abs(cents) <= 5 ? "#00FF00" : "#FF4500";
                     }
                 }
-                
+
                 // Update tuner segments
                 const tunerSegments = document.querySelectorAll("#tunerContainer svg path");
-                
+
                 // Define colors for the gradient
                 const colors = {
                     deepRed: "#FF0000",
@@ -2882,16 +2881,16 @@ function Synth() {
                 // Update tuner display
                 tunerSegments.forEach((segment, i) => {
                     const segmentCents = (i - 5) * 10; // Each segment represents 10 cents
-                    
+
                     // Default to inactive color
                     let segmentColor = colors.inactive;
-                    
+
                     if (tunerMode === 'chromatic') {
                         // Chromatic mode - normal behavior
                         const absCents = Math.abs(cents);
-                        
+
                         // Determine if segment should be lit based on current cents value
-                        const shouldLight = cents < 0 ? 
+                        const shouldLight = cents < 0 ?
                             (segmentCents <= 0 && Math.abs(segmentCents) <= Math.abs(cents)) : // Flat side
                             (segmentCents >= 0 && segmentCents <= cents); // Sharp side
 
@@ -2902,7 +2901,7 @@ function Synth() {
                             }
                             // Flat side (segments 0-4)
                             else if (i < 5) {
-                                switch(i) {
+                                switch (i) {
                                     case 0: segmentColor = colors.deepRed; break;
                                     case 1: segmentColor = colors.redOrange; break;
                                     case 2: segmentColor = colors.orange; break;
@@ -2912,7 +2911,7 @@ function Synth() {
                             }
                             // Sharp side (segments 6-10)
                             else {
-                                switch(i) {
+                                switch (i) {
                                     case 6: segmentColor = colors.yellowGreen; break;
                                     case 7: segmentColor = colors.yellowOrange; break;
                                     case 8: segmentColor = colors.orange; break;
@@ -2924,7 +2923,7 @@ function Synth() {
                     } else {
                         // Target pitch mode - use centsFromTarget for segment display
                         const centsFromTarget = cents; // We already calculated this above
-                        
+
                         if (Math.abs(centsFromTarget) > 50) {
                             // More than 50 cents off - only show red segments
                             if (centsFromTarget < 0) {
@@ -2936,7 +2935,7 @@ function Synth() {
                             }
                         } else {
                             // Within 50 cents - show normal gradient behavior
-                            const shouldLight = centsFromTarget < 0 ? 
+                            const shouldLight = centsFromTarget < 0 ?
                                 (segmentCents <= 0 && Math.abs(segmentCents) <= Math.abs(centsFromTarget)) : // Flat side
                                 (segmentCents >= 0 && segmentCents <= centsFromTarget); // Sharp side
 
@@ -2947,7 +2946,7 @@ function Synth() {
                                 }
                                 // Flat side (segments 0-4)
                                 else if (i < 5) {
-                                    switch(i) {
+                                    switch (i) {
                                         case 0: segmentColor = colors.deepRed; break;
                                         case 1: segmentColor = colors.redOrange; break;
                                         case 2: segmentColor = colors.orange; break;
@@ -2957,7 +2956,7 @@ function Synth() {
                                 }
                                 // Sharp side (segments 6-10)
                                 else {
-                                    switch(i) {
+                                    switch (i) {
                                         case 6: segmentColor = colors.yellowGreen; break;
                                         case 7: segmentColor = colors.yellowOrange; break;
                                         case 8: segmentColor = colors.orange; break;
@@ -2974,7 +2973,7 @@ function Synth() {
                     segment.setAttribute("fill", segmentColor);
                 });
             }
-            
+
             requestAnimationFrame(updatePitch);
         };
 
@@ -2995,13 +2994,13 @@ function Synth() {
 
         // Calculate how many half steps away from A4 (69 midi note)
         const midiNote = 69 + 12 * Math.log2(frequency / A4);
-        
+
         // Get the nearest note's MIDI number
         let roundedMidi = Math.round(midiNote);
-        
+
         // Calculate cents before rounding to nearest note
         const cents = Math.round(100 * (midiNote - roundedMidi));
-        
+
         // Adjust for edge cases where cents calculation puts us closer to the next note
         if (cents > 50) {
             roundedMidi++;
@@ -3040,7 +3039,7 @@ function Synth() {
         const audioContext = new AudioContext();
         const oscillator = audioContext.createOscillator();
         const gainNode = audioContext.createGain();
-        
+
         oscillator.connect(gainNode);
         gainNode.connect(audioContext.destination);
         gainNode.gain.value = 0.1; // Low volume
@@ -3055,7 +3054,7 @@ function Synth() {
         ];
 
         let currentTest = 0;
-        
+
         const runTest = () => {
             if (currentTest >= testCases.length) {
                 oscillator.stop();
@@ -3065,9 +3064,9 @@ function Synth() {
 
             const test = testCases[currentTest];
             console.log(`Testing frequency: ${test.freq}Hz (Expected: ${test.expected})`);
-            
+
             oscillator.frequency.setValueAtTime(test.freq, audioContext.currentTime);
-            
+
             currentTest++;
             setTimeout(runTest, 2000); // Test each frequency for 2 seconds
         };
@@ -3086,16 +3085,16 @@ function Synth() {
         const audioContext = new AudioContext();
         const oscillator = audioContext.createOscillator();
         const gainNode = audioContext.createGain();
-        
+
         oscillator.connect(gainNode);
         gainNode.connect(audioContext.destination);
         gainNode.gain.value = 0.1; // Low volume
 
         oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
         oscillator.start();
-        
+
         console.log(`Testing frequency: ${frequency}Hz`);
-        
+
         // Stop after 3 seconds
         setTimeout(() => {
             oscillator.stop();
@@ -3109,13 +3108,13 @@ function Synth() {
      */
     this.createCentsSlider = function () {
         const widgetBody = this.widgetWindow.getWidgetBody();
-        
+
         // Store the current content to restore later
         this.previousContent = widgetBody.innerHTML;
-        
+
         // Clear the widget body
         widgetBody.innerHTML = '';
-        
+
         // Create the cents adjustment interface
         const centsInterface = document.createElement("div");
         Object.assign(centsInterface.style, {

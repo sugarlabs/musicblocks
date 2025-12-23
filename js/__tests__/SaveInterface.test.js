@@ -455,7 +455,8 @@ describe("saveWAV & saveABC methods", () => {
                     notationStaging: {},
                     notationDrumStaging: {}
                 },
-                runLogoCommands: mockRunLogoCommands
+                runLogoCommands: mockRunLogoCommands,
+                recordingBuffer: { hasData: false }
             },
             turtles: {
                 turtleList: [{ painter: { doClear: jest.fn() } }],
@@ -564,6 +565,7 @@ describe("saveLilypond Methods", () => {
                     notationDrumStaging: [],
                 },
                 runLogoCommands: jest.fn(),
+                recordingBuffer: { hasData: false }
             },
             textMsg: jest.fn(),
             download: jest.fn(),

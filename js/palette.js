@@ -356,7 +356,7 @@ class Palettes {
         this.activePalette = name; // used to delete plugins
     }
 
-    _showMenus() {}
+    _showMenus() { }
 
     _hideMenus() {
         // Hide the menu buttons and the palettes themselves.
@@ -415,13 +415,13 @@ class Palettes {
                     }
                 }
             }
-    
+
             // Remove the palette DOM element if it exists
             const paletteElement = docById("palette");
             if (paletteElement) {
                 paletteElement.parentNode.removeChild(paletteElement);
             }
-    
+
             // Clear the dictionary and reset state
             this.dict = {};
             this.visible = false;
@@ -435,7 +435,7 @@ class Palettes {
             element.classList.add("flex-palette");
             element.setAttribute(
                 "style",
-                `position: fixed; z-index: 1000; left: 0px; top: ${60+this.top}px; overflow-y: auto;`
+                `position: fixed; z-index: 1000; left: 0px; top: ${60 + this.top}px; overflow-y: auto;`
             );
             element.innerHTML =
                 `<div style="height:fit-content">
@@ -517,7 +517,7 @@ class Palettes {
             const actionBlock = this.dict["action"].protoList[blk];
             if (
                 ["nameddo", "namedcalc", "nameddoArg", "namedcalcArg"].indexOf(actionBlock.name) !==
-                    -1 &&
+                -1 &&
                 actionBlock.defaults[0] === actionName
             ) {
                 // Remove the palette protoList entry for this block.
@@ -999,7 +999,13 @@ class Palette {
                 if (["media", "camera", "video"].includes(b.blkname)) {
                     // Use artwork.js strings as images for:
                     // cameraPALETTE, videoPALETTE, mediaPALETTE
-                    img = makePaletteIcons(eval(b.blkname + "PALETTE"));
+                    // img = makePaletteIcons(eval(b.blkname + "PALETTE"));
+                    // Use a safer lookup for global palette variables
+                    let paletteIcon = undefined;
+                    if (typeof window !== 'undefined' && window[b.blkname + "PALETTE"]) {
+                        paletteIcon = window[b.blkname + "PALETTE"];
+                    }
+                    img = makePaletteIcons(paletteIcon);
                 } else {
                     // or use the plugin image...
                     img = makePaletteIcons(this.activity.pluginsImages[b.blkname]);
@@ -1311,11 +1317,11 @@ class Palette {
         ) {
             this._makeBlockFromProtoblock(protoblk, true, blkname, null, 100, 100);
             callback(lastBlock);
-            return(lastBlock);
+            return (lastBlock);
         } else {
             const newBlock = paletteBlockButtonPush(this.activity.blocks, newBlk, arg);
             callback(newBlock);
-            return(newBlock);
+            return (newBlock);
         }
     }
 
@@ -1514,7 +1520,7 @@ class Palette {
                 // the palette.
                 if (
                     this.activity.blocks.blockList[topBlk].container.x <
-                        this.activity.palettes.paletteWidth * 2
+                    this.activity.palettes.paletteWidth * 2
                 ) {
                     this.activity.blocks.moveBlock(
                         topBlk,
@@ -1575,7 +1581,7 @@ class Palette {
                 // the palette.
                 if (
                     this.activity.blocks.blockList[topBlk].container.x <
-                        this.activity.palettes.paletteWidth * 2
+                    this.activity.palettes.paletteWidth * 2
                 ) {
                     this.activity.blocks.moveBlock(
                         topBlk,
@@ -1593,7 +1599,7 @@ class Palette {
                 // the palette.
                 if (
                     this.activity.blocks.blockList[newBlock].container.x <
-                        this.activity.palettes.paletteWidth * 2
+                    this.activity.palettes.paletteWidth * 2
                 ) {
                     this.activity.blocks.moveBlock(
                         newBlock,

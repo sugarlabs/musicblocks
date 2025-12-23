@@ -219,7 +219,7 @@ let httpGet = (projectName) => {
         xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
     } else {
         xmlHttp.open("GET", window.server + projectName, false);
-        xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
+        // xmlHttp.setRequestHeader("x-api-key", "API_KEY_PLACEHOLDER");
     }
 
     xmlHttp.send();
@@ -240,7 +240,7 @@ let httpPost = (projectName, data) => {
     let xmlHttp = null;
     xmlHttp = new XMLHttpRequest();
     xmlHttp.open("POST", window.server + projectName, false);
-    xmlHttp.setRequestHeader("x-api-key", "3tgTzMXbbw6xEKX7");
+    // xmlHttp.setRequestHeader("x-api-key", "API_KEY_PLACEHOLDER");
     xmlHttp.send(data);
     return xmlHttp.responseText;
     // return 'https://apps.facebook.com/turtleblocks/?file=' + projectName;
@@ -703,7 +703,8 @@ const processPluginData = (activity, pluginData) => {
             // eslint-disable-next-line no-console
             console.debug("adding plugin block " + block);
             try {
-                eval(obj["BLOCKPLUGINS"][block]);
+                // eval(obj["BLOCKPLUGINS"][block]);
+                console.warn("Dynamic block loading via eval is disabled for security.");
             } catch (e) {
                 // eslint-disable-next-line no-console
                 console.debug("Failed to load plugin for " + block + ": " + e);
@@ -713,7 +714,8 @@ const processPluginData = (activity, pluginData) => {
 
     // Create the globals.
     if ("GLOBALS" in obj) {
-        eval(obj["GLOBALS"]);
+        // eval(obj["GLOBALS"]);
+        console.warn("Global execution from plugins is disabled for security.");
     }
 
     if ("PARAMETERPLUGINS" in obj) {
@@ -725,7 +727,8 @@ const processPluginData = (activity, pluginData) => {
     // Code to execute when plugin is loaded
     if ("ONLOAD" in obj) {
         for (const arg in obj["ONLOAD"]) {
-            eval(obj["ONLOAD"][arg]);
+            // eval(obj["ONLOAD"][arg]);
+            console.warn("ONLOAD execution from plugins is disabled for security.");
         }
     }
 
@@ -1600,16 +1603,38 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
 
     const cname = obj.constructor.name; // class name of component object
 
+    // Helper to resolve string path to object in global scope
+    const resolveGlobal = (path) => {
+        const parts = path.split('.');
+        let current = typeof window !== 'undefined' ? window : (typeof global !== 'undefined' ? global : this);
+        for (const part of parts) {
+            if (current === undefined || current === null) return undefined;
+            current = current[part];
+        }
+        return current;
+    };
+
     if (className !== "" && className !== undefined) {
-        addMembers(obj, eval(className));
+        const resolvedClass = resolveGlobal(className);
+        if (resolvedClass) {
+            addMembers(obj, resolvedClass);
+        } else {
+            console.warn("Could not resolve class: " + className);
+        }
         return;
     }
 
     // Add members of Model (class type has to be controller's name + "Model")
-    addMembers(obj, eval(cname + "." + cname + "Model"), modelArgs);
+    const modelClass = resolveGlobal(cname + "." + cname + "Model");
+    if (modelClass) {
+        addMembers(obj, modelClass, modelArgs);
+    }
 
     // Add members of View (class type has to be controller's name + "View")
-    addMembers(obj, eval(cname + "." + cname + "View"), viewArgs);
+    const viewClass = resolveGlobal(cname + "." + cname + "View");
+    if (viewClass) {
+        addMembers(obj, viewClass, viewArgs);
+    }
 };
 
 if (typeof module !== "undefined" && module.exports) {

@@ -20,6 +20,16 @@
 
 /* global JSEditor, last, importMembers, Singer, JSInterface, globalActivity */
 
+const resolveGlobal = (path) => {
+    const parts = path.split('.');
+    let current = typeof window !== 'undefined' ? window : (typeof global !== 'undefined' ? global : this);
+    for (const part of parts) {
+        if (current === undefined || current === null) return undefined;
+        current = current[part];
+    }
+    return current;
+};
+
 /**
  * @class
  * @classdesc pertains to the Mouse (corresponding to Turtle) in JavaScript based Music Blocks programs.
@@ -38,7 +48,7 @@ class Mouse {
      * @param {Function} flow - flow function associated with the Mouse
      */
     constructor(flow) {
-        const numberOfTurtles = globalActivity.turtles.getTurtleCount() ;
+        const numberOfTurtles = globalActivity.turtles.getTurtleCount();
         if (Mouse.MouseList.length < numberOfTurtles) {
             this.turtle = globalActivity.turtles.getTurtle(Mouse.MouseList.length);
         } else {
@@ -161,7 +171,7 @@ class MusicBlocks {
 
                 if (className === "Painter") {
                     for (const methodName of Object.getOwnPropertyNames(
-                        eval(className + ".prototype")
+                        resolveGlobal(className + ".prototype") || {}
                     )) {
                         if (methodName !== "constructor" && !methodName.startsWith("_"))
                             MusicBlocks._methodList[className].push(methodName);
@@ -169,7 +179,12 @@ class MusicBlocks {
                     return;
                 }
 
-                for (const methodName of Object.getOwnPropertyNames(eval(className))) {
+
+
+                const resolvedClass = resolveGlobal(className);
+                if (!resolvedClass) return;
+
+                for (const methodName of Object.getOwnPropertyNames(resolvedClass.prototype)) {
                     if (methodName !== "length" && methodName !== "prototype")
                         MusicBlocks._methodList[className].push(methodName);
                 }
@@ -243,10 +258,10 @@ class MusicBlocks {
                     }
                 }
 
-                cname = cname === "Painter" ? this.turtle.painter : eval(cname);
+                cname = cname === "Painter" ? this.turtle.painter : (resolveGlobal(cname) || null);
 
                 returnVal =
-                 args === undefined || (Array.isArray(args) && args.length === 0) ? cname[command]() : cname[command](...args);
+                    args === undefined || (Array.isArray(args) && args.length === 0) ? cname[command]() : cname[command](...args);
 
             }
 
@@ -436,5 +451,5 @@ class MusicBlocks {
     }
 }
 if (typeof module !== "undefined" && module.exports) {
-    module.exports = {Mouse, MusicBlocks};
+    module.exports = { Mouse, MusicBlocks };
 }
