@@ -1703,7 +1703,7 @@ class Activity {
         flag = 0;
         mediaRecorder.stop();
 
-        const recordMode = localStorage.getItem("musiclBlocksRecordMode") || "canvas";
+        const recordMode = localStorage.getItem("musicBlocksRecordMode") || "canvas";
 
         if (recordMode === "canvas") {
           if (currentStream) {
