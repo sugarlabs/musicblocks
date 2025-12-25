@@ -112,7 +112,14 @@ describe("platformstyle", () => {
         loadModule();
         const result = showButtonHighlightRef(1, 2, 3, { type: "click" }, 1, {});
         expect(result).toEqual({ highlight: true });
-        expect(global.showMaterialHighlight).toHaveBeenCalledWith(1, 2, 3, { type: "click" }, 1, {});
+        expect(global.showMaterialHighlight).toHaveBeenCalledWith(
+            1,
+            2,
+            3,
+            { type: "click" },
+            1,
+            {}
+        );
     });
 
     it("returns empty highlight when FFOS", () => {
