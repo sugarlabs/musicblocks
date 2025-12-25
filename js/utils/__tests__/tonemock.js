@@ -120,15 +120,12 @@ class PolySynth {
 }
 
 class context {
-    static resume() {
-    }
+    static resume() {}
 }
 
 class Transport {
-    static start() {
-    }
-    static stop() {
-    }
+    static start() {}
+    static stop() {}
 }
 
 class ToneAudioBuffer {
@@ -169,13 +166,13 @@ const Tone = {
     }),
     Context: jest.fn().mockReturnThis(),
     Loop: jest.fn((callback, interval) => ({
-        start: jest.fn((start) => {
+        start: jest.fn(start => {
             callback(start); // Simulate immediate execution of the callback
             return {}; // Mocked loop instance
-        }),
+        })
     })),
     Instrument: jest.fn().mockImplementation(() => ({
-        toDestination: jest.fn(),
+        toDestination: jest.fn()
     })),
     doNeighbor: jest.fn().mockReturnThis(),
     Destination: { volume: { rampTo: jest.fn() } },
