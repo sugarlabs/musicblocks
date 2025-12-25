@@ -16,6 +16,16 @@
     <link rel="apple-touch-icon" href="/activity/activity-icon-color-512.png">
     <link rel="manifest" href="android_chrome_manifest.json">
 
+    <!-- Critical CSS: minimal styles for first paint (loading screen) -->
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { margin: 0; background: #f9f9f9; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif; color: #222; }
+        .loading-text { font-family: inherit; }
+        /* Prevent layout shift for Material Icons before CSS loads */
+        .material-icons { font-family: 'Material Icons', sans-serif; font-weight: normal; font-style: normal; line-height: 1; letter-spacing: normal; text-transform: none; display: inline-block; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; -moz-osx-font-smoothing: grayscale; font-feature-settings: 'liga'; }
+    </style>
+
     <!-- Stylesheets -->
     <link rel="preload" href="https://fonts.googleapis.com/icon?family=Material+Icons" as="style"
         onload="this.onload=null;this.rel='stylesheet'">
@@ -25,6 +35,7 @@
     <link rel="preload" href="dist/css/keyboard.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="dist/css/windows.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="lib/materialize-iso.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/themes.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="css/darkmode.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="prefetch" as="video" href="loading-animation.webm" type="video/webm">
     <link rel="prefetch" as="video" href="loading-animation.mp4" type="video/mp4">
@@ -44,13 +55,12 @@
     <script src="lib/jquery-ui.js" defer></script>
     <script src="lib/materialize.min.js" defer></script>
     <script src="lib/webL10n.js" defer></script>
-    <script src="lib/Tone.js" defer></script>
+    <!-- Tone.js will be lazy-loaded on user interaction -->
     <script src="lib/midi.js" defer></script>
-    <script src="lib/jquery.ruler.js" defer></script>
-    <script src="lib/modernizr-2.6.2.min.js" defer></script>
-    <script src="lib/raphael.min.js" defer></script>
-    <script src="lib/wheelnav.js" defer></script>
-    <script src="lib/abc.min.js" defer></script>
+    <!-- Removed jquery.ruler.js (unused) and Modernizr (no longer needed) -->
+    <!-- raphael.min.js will be lazy-loaded when needed -->
+    <!-- wheelnav.js will be lazy-loaded when needed -->
+    <!-- abc.min.js will be lazy-loaded when needed -->
     <script src="lib/codejar/codejar.min.js" defer></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js" defer></script>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
@@ -66,10 +76,13 @@
     <link rel="prefetch" type="application/l10n" href="./localization.ini" />
 
     <script data-main="js/loader" src="lib/require.js" defer></script>
-    <link type="text/css" href="fonts/material-icons.css" rel="stylesheet">
+    <!-- Material Icons CSS non-blocking; fallback for no-JS below -->
     <link rel="preload" href="/fonts/material-icons.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-    <link rel="stylesheet" href="lib/materialize-iso.css">
-    <link rel="stylesheet" href="css/themes.css">
+    <!-- Materialize and other CSS already preloaded above; provide <noscript> fallbacks only -->
+    <noscript><link rel="stylesheet" href="fonts/material-icons.css"></noscript>
+    <noscript><link rel="stylesheet" href="lib/materialize-iso.css"></noscript>
+    <noscript><link rel="stylesheet" href="css/themes.css"></noscript>
+    <noscript><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css"></noscript>
     <script src="lib/easeljs.min.js" defer></script>
     <script src="lib/tweenjs.min.js" defer></script>
     <script>
@@ -88,9 +101,21 @@
     <header>
         <div id="loading-image-container"
             style="position: fixed; top: 0; left: 0; width: 100%; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #FFFFFF; z-index: 9999; contain: paint;">
-            <div id="loading-media" style="width: 100%; padding: 0 20px; box-sizing: border-box;"></div>
+            <div id="loading-media" style="width: 100%; padding: 0 20px; box-sizing: border-box;">
+                <div class="media-wrapper" style="width: 100%; aspect-ratio: 16/9; max-height: 500px; display: flex; justify-content: center; align-items: center;">
+                    <video id="hero-video" loop autoplay muted playsinline preload="auto" fetchpriority="high" style="width: 90%; height: 100%; object-fit: contain;" width="1600" height="900">
+                        <source src="loading-animation.webm" type="video/webm">
+                        <source src="loading-animation.mp4" type="video/mp4">
+                    </video>
+                    <!-- Optional locale-specific static image; kept in DOM so browser can paint without JS if used -->
+                    <img id="hero-ja" src="loading-animation-ja.svg" alt="Loading animation" fetchpriority="high" style="display: none; width: 70%; height: 90%; object-fit: contain;" width="1400" height="900" />
+                </div>
+            </div>
             <div class="loading-text" id="loadingText" style="margin-top: 2rem; min-height: 1.5em; font-size: 1.2rem;">
             </div>
+            <button id="start-btn" style="margin-top: 1.25rem; padding: 0.6rem 1.2rem; border-radius: 8px; border: none; background: #2196F3; color: #fff; font-size: 1rem; cursor: pointer;">
+                Start Music Blocks
+            </button>
             <a href="https://www.sugarlabs.org/" target="_blank" id="link-to-sugarLabs"
                 style="position: fixed; bottom: 20px; right: 20px;">
                 <div class="logo-container" id="bottom-right-logo">
@@ -502,6 +527,35 @@ document.addEventListener("DOMContentLoaded", init);
     </script>
 
     <script>
+        // Lightweight startup: attach Start button to deferred heavy init
+        window.addEventListener('load', () => {
+            const setupBasicUI = () => {
+                // Nothing heavy here; splash already visible
+            };
+
+            const initHeavy = () => {
+                try {
+                    if (window.initHeavyStuff) {
+                        if (window.requestIdleCallback) {
+                            requestIdleCallback(window.initHeavyStuff);
+                        } else {
+                            setTimeout(window.initHeavyStuff, 0);
+                        }
+                    }
+                } catch (e) {
+                    console.error('Failed to kick off heavy init:', e);
+                }
+            };
+
+            setupBasicUI();
+            const btn = document.getElementById('start-btn');
+            if (btn) {
+                btn.addEventListener('click', initHeavy, { once: true });
+            }
+        });
+    </script>
+
+    <script>
         if ("serviceWorker" in navigator) {
             if (navigator.serviceWorker.controller) {
                 console.debug(
@@ -521,41 +575,28 @@ document.addEventListener("DOMContentLoaded", init);
         }
     </script>
     <script>
-        $(document).ready(function () {
-            doSearch();
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof doSearch === 'function') {
+                doSearch();
+            }
         });
     </script>
 
-    <!-- Loading Dialog Script -->
+    <!-- Loading Dialog Script (no longer decides LCP media; HTML includes it) -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            let loadL10nSplashScreen = function () {
-                console.debug("The browser is set to " + navigator.language);
-                let lang = navigator.language;
-                if (localStorage.languagePreference) {
-                    console.debug(
-                        "Music Blocks is set to " + localStorage.languagePreference
-                    );
-                    lang = localStorage.languagePreference;
+            // If user prefers Japanese, swap visibility without removing the existing media
+            try {
+                let lang = localStorage.languagePreference || navigator.language || "en";
+                if (typeof lang === "string" && lang.toLowerCase().startsWith("ja")) {
+                    const jaImg = document.getElementById("hero-ja");
+                    const vid = document.getElementById("hero-video");
+                    if (jaImg && vid) {
+                        jaImg.style.display = "block";
+                        vid.style.display = "none";
+                    }
                 }
-
-                console.debug("Using " + lang);
-                if (lang === undefined) {
-                    lang = "enUS";
-                    console.debug("Reverting to " + lang);
-                }
-
-                const container = document.getElementById("loading-media");
-                const content = lang.startsWith("ja")                    
-                ? `<img src="loading-animation-ja.svg" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
-                    : `<video loop autoplay muted playsinline fetchpriority="high" style="width: 90%; height: 100%; object-fit: contain;">
-                        <source src="loading-animation.webm" type="video/webm">
-                        <source src="loading-animation.mp4" type="video/mp4">
-                       </video>`;
-                container.innerHTML = `<div class="media-wrapper" style="width: 100%; aspect-ratio: 16/9; max-height: 500px; display: flex; justify-content: center; align-items: center;">${content}</div>`;
-            };
-
-            loadL10nSplashScreen();
+            } catch (e) { /* ignore */ }
 
             setTimeout(function () {
                 const loadingText = document.getElementById("loadingText");

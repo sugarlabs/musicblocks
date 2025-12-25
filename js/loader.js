@@ -40,24 +40,61 @@ requirejs.config({
     packages: []
 });
 
-requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBackend) {
+requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBackend) {
+    // Process large lists without blocking the UI thread
+    function processInChunks(list, processor, options) {
+        const arr = Array.isArray(list) ? list : Array.from(list);
+        const budgetMs = options && options.budgetMs ? options.budgetMs : 16; // ~1 frame
+        let i = options && typeof options.startIndex === "number" ? options.startIndex : 0;
+
+        const schedule = cb => {
+            if (typeof window.requestIdleCallback === "function") {
+                requestIdleCallback(() => cb(), { timeout: budgetMs });
+            } else {
+                setTimeout(cb, 0);
+            }
+        };
+
+        (function run() {
+            const start =
+                typeof performance !== "undefined" && performance.now
+                    ? performance.now()
+                    : Date.now();
+            while (
+                i < arr.length &&
+                (typeof performance !== "undefined" && performance.now
+                    ? performance.now()
+                    : Date.now()) -
+                    start <
+                    budgetMs
+            ) {
+                processor(arr[i], i);
+                i++;
+            }
+            if (i < arr.length) {
+                schedule(run);
+            }
+        })();
+    }
 
     function updateContent() {
-        console.log("updateContent() called");  // Debugging line
+        console.log("updateContent() called"); // Debugging line
         const elements = document.querySelectorAll("[data-i18n]");
-
-        elements.forEach((element) => {
-            const key = element.getAttribute("data-i18n");
-            const translation = i18next.t(key);
-            element.textContent = translation;
-        });
+        processInChunks(
+            elements,
+            element => {
+                const key = element.getAttribute("data-i18n");
+                const translation = i18next.t(key);
+                element.textContent = translation;
+            },
+            { budgetMs: 16 }
+        );
     }
 
     async function initializeI18next() {
         return new Promise((resolve, reject) => {
-            i18next
-                .use(i18nextHttpBackend)
-                .init({
+            i18next.use(i18nextHttpBackend).init(
+                {
                     lng: "en",
                     fallbackLng: "en",
                     keySeparator: false,
@@ -66,9 +103,10 @@ requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBacken
                         escapeValue: false
                     },
                     backend: {
-                        loadPath: "locales/{{lng}}.json?v="+Date.now()
+                        loadPath: "locales/{{lng}}.json?v=" + Date.now()
                     }
-                }, function(err, t) {
+                },
+                function (err, t) {
                     if (err) {
                         console.error("i18next init failed:", err);
                         reject(err);
@@ -78,20 +116,16 @@ requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBacken
                         console.log("i18next Store:", i18next.store.data);
                         resolve(i18next);
                     }
-                });
-            
+                }
+            );
 
-            i18next.on("initialized", function() {
+            i18next.on("initialized", function () {
                 console.log("i18next initialized");
             });
 
-            i18next.on("loaded", function(loaded) {
+            i18next.on("loaded", function (loaded) {
                 console.log("i18next loaded:", loaded);
             });
-
-         
-
-    
         });
     }
 
@@ -100,7 +134,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBacken
             await initializeI18next();
 
             if (document.readyState === "loading") {
-                document.addEventListener("DOMContentLoaded", function() {
+                document.addEventListener("DOMContentLoaded", function () {
                     updateContent();
                 });
             } else {
@@ -109,12 +143,29 @@ requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBacken
             }
         } catch (error) {
             console.error("Error initializing i18next:", error);
+        } finally {
+            // Expose a lazy heavy-init hook; do not load heavy modules yet
+            window.initHeavyStuff = function () {
+                try {
+                    requirejs(["utils/utils", "activity/activity"], function () {
+                        if (typeof window.initActivity === "function") {
+                            // Allow browser a breath; schedule on idle if available
+                            if (window.requestIdleCallback) {
+                                requestIdleCallback(window.initActivity);
+                            } else {
+                                setTimeout(window.initActivity, 0);
+                            }
+                        }
+                    });
+                } catch (e) {
+                    console.error("Failed to start heavy initialization:", e);
+                }
+            };
         }
     }
 
-    main().then(() => {
-        requirejs(["utils/utils", "activity/activity"]);
-    });
+    // Initialize i18n and content; heavy app boot waits for user action
+    main();
 
     i18next.changeLanguage(lang, (err, t) => {
         if (err) {
@@ -124,7 +175,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBacken
         updateContent();
     });
 
-    i18next.on("languageChanged", function() {
+    i18next.on("languageChanged", function () {
         updateContent();
     });
 });
