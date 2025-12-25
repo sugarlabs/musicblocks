@@ -984,7 +984,6 @@ function Synth() {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            // eslint-disable-next-line no-delete-var
         };
         this.recorder.onstop = () => {
             if (!chunks.length) return;
@@ -1801,7 +1800,6 @@ function Synth() {
         setNote,
         future
     ) => {
-       // --- FIX START ---
         // If audio is not running, try to start it
         if (Tone.context.state !== 'running') {
             Tone.start().catch(function(e) {
@@ -1817,8 +1815,6 @@ function Synth() {
                 }
             }, 2000);
         }
-        // --- FIX END ---
-        // ... existing code below ...
         try {
             // Ensure audio context is started
             if (Tone.context.state !== 'running') {
