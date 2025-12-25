@@ -40,13 +40,12 @@ requirejs.config({
     packages: []
 });
 
-requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBackend) {
-
+requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBackend) {
     function updateContent() {
-        console.log("updateContent() called");  // Debugging line
+        console.log("updateContent() called"); // Debugging line
         const elements = document.querySelectorAll("[data-i18n]");
 
-        elements.forEach((element) => {
+        elements.forEach(element => {
             const key = element.getAttribute("data-i18n");
             const translation = i18next.t(key);
             element.textContent = translation;
@@ -55,9 +54,8 @@ requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBacken
 
     async function initializeI18next() {
         return new Promise((resolve, reject) => {
-            i18next
-                .use(i18nextHttpBackend)
-                .init({
+            i18next.use(i18nextHttpBackend).init(
+                {
                     lng: "en",
                     fallbackLng: "en",
                     keySeparator: false,
@@ -66,9 +64,10 @@ requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBacken
                         escapeValue: false
                     },
                     backend: {
-                        loadPath: "locales/{{lng}}.json?v="+Date.now()
+                        loadPath: "locales/{{lng}}.json?v=" + Date.now()
                     }
-                }, function(err, t) {
+                },
+                function (err, t) {
                     if (err) {
                         console.error("i18next init failed:", err);
                         reject(err);
@@ -78,20 +77,16 @@ requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBacken
                         console.log("i18next Store:", i18next.store.data);
                         resolve(i18next);
                     }
-                });
-            
+                }
+            );
 
-            i18next.on("initialized", function() {
+            i18next.on("initialized", function () {
                 console.log("i18next initialized");
             });
 
-            i18next.on("loaded", function(loaded) {
+            i18next.on("loaded", function (loaded) {
                 console.log("i18next loaded:", loaded);
             });
-
-         
-
-    
         });
     }
 
@@ -100,7 +95,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBacken
             await initializeI18next();
 
             if (document.readyState === "loading") {
-                document.addEventListener("DOMContentLoaded", function() {
+                document.addEventListener("DOMContentLoaded", function () {
                     updateContent();
                 });
             } else {
@@ -124,7 +119,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBacken
         updateContent();
     });
 
-    i18next.on("languageChanged", function() {
+    i18next.on("languageChanged", function () {
         updateContent();
     });
 });
