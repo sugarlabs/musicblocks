@@ -1,9 +1,9 @@
 /**
  * MusicBlocks v3.6.2
  *
- * @author Anubhab 
+ * @author Anubhab
  *
- * @copyright 2025 Anubhab 
+ * @copyright 2025 Anubhab
  *
  * @license
  * This program is free software: you can redistribute it and/or modify
@@ -23,10 +23,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const code = fs.readFileSync(
-    path.join(__dirname, "../IntervalsBlocks.js"),
-    "utf8"
-);
+const code = fs.readFileSync(path.join(__dirname, "../IntervalsBlocks.js"), "utf8");
 
 eval(code);
 
@@ -41,12 +38,24 @@ describe("setupIntervalsBlocks", () => {
             this.name = name;
             createdBlocks[name] = this;
         }
-        setPalette() { return this; }
-        beginnerBlock() { return this; }
-        setHelpString() { return this; }
-        formBlock() { return this; }
-        makeMacro() { return this; }
-        setup() { return this; }
+        setPalette() {
+            return this;
+        }
+        beginnerBlock() {
+            return this;
+        }
+        setHelpString() {
+            return this;
+        }
+        formBlock() {
+            return this;
+        }
+        makeMacro() {
+            return this;
+        }
+        setup() {
+            return this;
+        }
     }
 
     class DummyFlowBlock extends DummyValueBlock {}
@@ -67,13 +76,16 @@ describe("setupIntervalsBlocks", () => {
         global.NOINPUTERRORMSG = "No input";
         global.DEFAULTCHORD = "major";
         global.CHORDNAMES = {
-            major: ["major", "major"],
+            major: ["major", "major"]
         };
         global.CHORDVALUES = {
-            major: [[0, 4], [0, 7]],
+            major: [
+                [0, 4],
+                [0, 7]
+            ]
         };
         global.INTERVALVALUES = {
-            fifth: [0, 0, 1.5],
+            fifth: [0, 0, 1.5]
         };
 
         global.Singer = {
@@ -90,16 +102,16 @@ describe("setupIntervalsBlocks", () => {
                 getModeLength: jest.fn(() => 7),
                 getCurrentMode: jest.fn(() => "major"),
                 getCurrentKey: jest.fn(() => "C"),
-                setKey: jest.fn(),
+                setKey: jest.fn()
             },
-            scalarDistance: jest.fn(() => 3),
+            scalarDistance: jest.fn(() => 3)
         };
 
         activity = {
             errorMsg: jest.fn(),
             blocks: {
                 blockList: {},
-                findBottomBlock: jest.fn(),
+                findBottomBlock: jest.fn()
             },
             turtles: {
                 ithTurtle() {
@@ -112,20 +124,20 @@ describe("setupIntervalsBlocks", () => {
                             lastPitch: [],
                             notesPlayed: 0,
                             duplicateFactor: 1,
-                            arpeggio: [],
+                            arpeggio: []
                         },
                         painter: {
                             doPenUp: jest.fn(),
                             doSetXY: jest.fn(),
-                            doSetHeading: jest.fn(),
+                            doSetHeading: jest.fn()
                         },
                         endOfClampSignals: {},
                         butNotThese: {},
                         queue: [],
-                        parentFlowQueue: [],
+                        parentFlowQueue: []
                     };
-                },
-            },
+                }
+            }
         };
 
         logo = {
@@ -135,8 +147,8 @@ describe("setupIntervalsBlocks", () => {
             setDispatchBlock: jest.fn(),
             setTurtleListener: jest.fn(),
             notation: {
-                notationKey: jest.fn(),
-            },
+                notationKey: jest.fn()
+            }
         };
 
         turtleIndex = 0;
@@ -151,43 +163,33 @@ describe("setupIntervalsBlocks", () => {
         const blk = "blk1";
         activity.blocks.blockList[blk] = { connections: [null] };
 
-        expect(
-            createdBlocks.intervalnumber.arg(logo, turtleIndex, blk)
-        ).toBe(5);
+        expect(createdBlocks.intervalnumber.arg(logo, turtleIndex, blk)).toBe(5);
     });
 
     it("CurrentIntervalBlock returns current interval", () => {
         const blk = "blk2";
         activity.blocks.blockList[blk] = { connections: [null] };
 
-        expect(
-            createdBlocks.currentinterval.arg(logo, turtleIndex, blk)
-        ).toBe(7);
+        expect(createdBlocks.currentinterval.arg(logo, turtleIndex, blk)).toBe(7);
     });
 
     it("MovableBlock sets movable do", () => {
         createdBlocks.movable.flow([true], logo, turtleIndex, "blk3");
 
-        expect(
-            Singer.IntervalsActions.setMovableDo
-        ).toHaveBeenCalledWith(true, turtleIndex);
+        expect(Singer.IntervalsActions.setMovableDo).toHaveBeenCalledWith(true, turtleIndex);
     });
 
     it("ModeLengthBlock returns mode length", () => {
         const blk = "blk4";
         activity.blocks.blockList[blk] = { connections: [null] };
 
-        expect(
-            createdBlocks.modelength.arg(logo, turtleIndex, blk)
-        ).toBe(7);
+        expect(createdBlocks.modelength.arg(logo, turtleIndex, blk)).toBe(7);
     });
 
     it("KeyBlock returns current key", () => {
         const blk = "blk5";
         activity.blocks.blockList[blk] = { connections: [null] };
 
-        expect(
-            createdBlocks.key.arg(logo, turtleIndex, blk)
-        ).toBe("C");
+        expect(createdBlocks.key.arg(logo, turtleIndex, blk)).toBe("C");
     });
 });
