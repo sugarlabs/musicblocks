@@ -163,7 +163,7 @@ const Tone = {
     gainToDb: jest.fn(() => {
         return 4;
     }),
-    start: jest.fn(),
+    start: jest.fn().mockResolvedValue(),
     now: jest.fn(() => {
         return new Date().getTime();
     }),
