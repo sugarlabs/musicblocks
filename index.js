@@ -8,7 +8,7 @@ const app = express();
 app.use(
     compression({
         level: 9,
-        threshold: 0,
+        threshold: 0
     })
 );
 
@@ -20,7 +20,7 @@ app.use(
     "/lib",
     express.static(path.join(__dirname, "lib"), {
         maxAge: "1y",
-        immutable: true,
+        immutable: true
     })
 );
 
@@ -28,7 +28,7 @@ app.use(
     "/css",
     express.static(path.join(__dirname, "css"), {
         maxAge: "1y",
-        immutable: true,
+        immutable: true
     })
 );
 
@@ -36,7 +36,7 @@ app.use(
     "/fonts",
     express.static(path.join(__dirname, "fonts"), {
         maxAge: "1y",
-        immutable: true,
+        immutable: true
     })
 );
 
@@ -55,10 +55,7 @@ app.use(
 
             // HTML should not be cached by the browser
             if (ext === ".html") {
-                res.setHeader(
-                    "Cache-Control",
-                    "no-cache, max-age=0, must-revalidate"
-                );
+                res.setHeader("Cache-Control", "no-cache, max-age=0, must-revalidate");
                 return;
             }
 
@@ -67,13 +64,10 @@ app.use(
                 (ext === ".js" || ext === ".css") &&
                 HASHED_NAME_REGEX.test(path.basename(filePath))
             ) {
-                res.setHeader(
-                    "Cache-Control",
-                    "public, max-age=31536000, immutable"
-                );
+                res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
                 return;
             }
-        },
+        }
     })
 );
 
