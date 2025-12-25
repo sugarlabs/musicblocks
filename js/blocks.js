@@ -261,8 +261,6 @@ class Blocks {
             const blkObj = this.blockList[blk];
 
             const firstConnection = blkObj.connections[0];
-	    console.log("FIRST CONNECTION");
-	    console.log(firstConnection);
             let connectionIdx;
 
             if (!SPECIALINPUTS.includes(blkObj.name)) {
