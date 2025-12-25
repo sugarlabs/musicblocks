@@ -21,10 +21,10 @@ const $j = jQuery.noConflict();
 let play_button_debounce_timeout = null;
 class Toolbar {
     /**
-    * Constructs a new Toolbar instance.
-    * 
-    * @constructor
-    */
+     * Constructs a new Toolbar instance.
+     *
+     * @constructor
+     */
     constructor() {
         this.stopIconColorWhenPlaying = window.platformColor.stopIconcolor;
         this.language = localStorage.languagePreference;
@@ -48,7 +48,7 @@ class Toolbar {
                 ["mb-logo", _("About Music Blocks")],
                 ["play", _("Play")],
                 ["stop", _("Stop")],
-                ["record",_("Record")],
+                ["record", _("Record")],
                 ["Full screen", _("Full screen")],
                 ["FullScreen", _("Full screen")],
                 ["Toggle Fullscreen", _("Toggle Fullscreen")],
@@ -311,7 +311,8 @@ class Toolbar {
 
         const beginnerMode = docById("beginnerMode");
         const advancedMode = docById("advancedMode");
-        if (this.activity.beginnerMode) { // || mode === "null") {
+        if (this.activity.beginnerMode) {
+            // || mode === "null") {
             advancedMode.style.display = "block";
             beginnerMode.style.display = "none";
         } else {
@@ -356,7 +357,8 @@ class Toolbar {
     renderLogoIcon(onclick) {
         const logoIcon = docById("mb-logo");
         if (this.language === "ja") {
-            logoIcon.innerHTML = '<img style="width: 100%; transform: scale(0.85);" src="images/logo-ja.svg">';
+            logoIcon.innerHTML =
+                '<img style="width: 100%; transform: scale(0.85);" src="images/logo-ja.svg">';
         }
 
         logoIcon.onmouseenter = () => {
@@ -374,7 +376,7 @@ class Toolbar {
 
     /**
      * Renders the play icon with the provided onclick handler.
-     * 
+     *
      * @public
      * @param {Function} onclick - The onclick handler for the play icon.
      * @returns {void}
@@ -397,7 +399,7 @@ class Toolbar {
             }
         }
 
-        var tempClick = playIcon.onclick = () => {
+        var tempClick = (playIcon.onclick = () => {
             const hideMsgs = () => {
                 this.activity.hideMsgs();
             };
@@ -411,20 +413,22 @@ class Toolbar {
             saveButtonAdvanced.className = "grey-text inactiveLink";
             recordButton.className = "grey-text inactiveLink";
             isPlayIconRunning = true;
-            play_button_debounce_timeout = setTimeout(function() { handleClick(); }, 2000);
+            play_button_debounce_timeout = setTimeout(function () {
+                handleClick();
+            }, 2000);
 
-            stopIcon.addEventListener("click", function(){
+            stopIcon.addEventListener("click", function () {
                 clearTimeout(play_button_debounce_timeout);
                 isPlayIconRunning = true;
                 hideMsgs();
                 handleClick();
             });
-        };
+        });
     }
 
     /**
      * Renders the stop icon with the provided onclick handler.
-     * 
+     *
      * @public
      * @param {Function} onclick - The onclick handler for the stop icon.
      * @returns {void}
@@ -445,7 +449,7 @@ class Toolbar {
 
     /**
      * Renders the new project icon with the provided onclick handler.
-     * 
+     *
      * @public
      * @param {Function} onclick - The onclick handler for the new project icon.
      * @returns {void}
@@ -510,15 +514,15 @@ class Toolbar {
 
     renderThemeSelectIcon(themeBox, themes) {
         const icon = document.getElementById("themeSelectIcon");
-        themes.forEach((theme) =>{
-            if(localStorage.themePreference === theme){
+        themes.forEach(theme => {
+            if (localStorage.themePreference === theme) {
                 icon.innerHTML = document.getElementById(theme).innerHTML;
             }
         });
         const themeSelectIcon = docById("themeSelectIcon");
         const themeList = themes;
         themeSelectIcon.onclick = () => {
-            themeList.forEach((theme) => {
+            themeList.forEach(theme => {
                 docById(theme).onclick = () => themeBox[`${theme}_onclick`](this.activity);
             });
         };
@@ -526,7 +530,7 @@ class Toolbar {
 
     /**
      * Renders the wrap icon.
-     * 
+     *
      * @public
      * @returns {void}
      */
@@ -572,7 +576,7 @@ class Toolbar {
 
     /**
      * Toggles the turtle wrap functionality.
-     * 
+     *
      * @public
      * @param  {Object} activity - The activity object containing details of the current activity.
      * @returns {void}
@@ -615,7 +619,7 @@ class Toolbar {
 
     /**
      * Renders the save icons based on the provided onclick handlers.
-     * 
+     *
      * @public
      * @param  {Function} html_onclick - The onclick handler for HTML.
      * @param  {Function} midi_onclick - The onclick handler for MIDI.
@@ -649,8 +653,7 @@ class Toolbar {
                 saveButton.onclick = () => {
                     html_onclick(this.activity);
                 };
-            }
-            else {
+            } else {
                 saveButton.style.display = "block";
                 saveButtonAdvanced.style.display = "none";
                 saveButton.onclick = () => {
@@ -670,7 +673,7 @@ class Toolbar {
                         this.activity.canvas.height,
                         1.0
                     );
-                    
+
                     if (svgData == "") {
                         savePNG.disabled = true;
                         savePNG.className = "grey-text inactiveLink";
@@ -717,7 +720,7 @@ class Toolbar {
                     savePNG.disabled = false;
                     saveSVG.className = "";
                     savePNG.className = "";
-                    
+
                     saveSVG.onclick = () => {
                         svg_onclick(this.activity);
                     };
@@ -765,8 +768,8 @@ class Toolbar {
 
     /**
      * Renders Record button style
-     * 
-     * @public 
+     *
+     * @public
      * @param {Function} rec_onclick
      * @returns {void}
      */
@@ -774,12 +777,12 @@ class Toolbar {
         const Record = docById("record");
         const browser = fnBrowserDetect();
         const hideIn = ["firefox", "safari"];
-    
+
         if (hideIn.includes(browser)) {
             Record.classList.add("hide");
             return;
         }
-    
+
         Record.style.display = "block";
         Record.innerHTML = `<i class="material-icons main">${RECORDBUTTON}</i>`;
         Record.onclick = () => rec_onclick(this.activity);
@@ -853,7 +856,7 @@ class Toolbar {
 
     /**
      * Renders the help icon with the provided onclick handler.
-     * 
+     *
      * @public
      * @param {Function} onclick - The onclick handler for the help icon.
      * @returns {void}
@@ -868,7 +871,7 @@ class Toolbar {
 
     /**
      * Renders the mode changes with the provided onclick handler.
-     * 
+     *
      * @public
      * @param  {Function} rec_onclick - The onclick handler for the record icon.
      * @param  {Function} analytics_onclick - The onclick handler for the analytics icon.
@@ -877,7 +880,14 @@ class Toolbar {
      * @param  {Function} setScroller - The function to set the scroller.
      * @returns {void}
      */
-    renderModeSelectIcon(onclick, rec_onclick, analytics_onclick, openPlugin_onclick, delPlugin_onclick, setScroller) {
+    renderModeSelectIcon(
+        onclick,
+        rec_onclick,
+        analytics_onclick,
+        openPlugin_onclick,
+        delPlugin_onclick,
+        setScroller
+    ) {
         const begIcon = docById("beginnerMode");
         const advIcon = docById("advancedMode");
 
@@ -923,20 +933,20 @@ class Toolbar {
                 // Horizontal Scroll
                 const enableHorizScrollIcon = docById("enableHorizScrollIcon");
                 const disableHorizScrollIcon = docById("disableHorizScrollIcon");
-                
+
                 if (enableHorizScrollIcon) {
                     enableHorizScrollIcon.style.display = "block";
                     enableHorizScrollIcon.onclick = () => {
                         setScroller(this.activity);
                     };
                 }
-                
+
                 if (disableHorizScrollIcon) {
                     disableHorizScrollIcon.onclick = () => {
                         setScroller(this.activity);
                     };
                 }
-                
+
                 // JavaScript Toggle
                 const toggleJavaScriptIcon = docById("toggleJavaScriptIcon");
                 if (toggleJavaScriptIcon) {
@@ -982,8 +992,10 @@ class Toolbar {
             // Update save buttons
             const saveButton = docById("saveButton");
             const saveButtonAdvanced = docById("saveButtonAdvanced");
-            if (saveButton) saveButton.style.display = this.activity.beginnerMode ? "block" : "none";
-            if (saveButtonAdvanced) saveButtonAdvanced.style.display = this.activity.beginnerMode ? "none" : "block";
+            if (saveButton)
+                saveButton.style.display = this.activity.beginnerMode ? "block" : "none";
+            if (saveButtonAdvanced)
+                saveButtonAdvanced.style.display = this.activity.beginnerMode ? "none" : "block";
             this.activity.toolbar.renderSaveIcons(
                 this.activity.save.saveHTML.bind(this.activity.save),
                 doSVG,
@@ -1000,9 +1012,9 @@ class Toolbar {
         };
 
         // Handle mode switching
-        const handleModeSwitch = (event) => {
+        const handleModeSwitch = event => {
             this.activity.beginnerMode = !this.activity.beginnerMode;
-            
+
             try {
                 localStorage.setItem("beginnerMode", this.activity.beginnerMode.toString());
             } catch (e) {
@@ -1050,7 +1062,7 @@ class Toolbar {
 
     /**
      * Renders the run step-by-step icon with the provided onclick handler.
-     * 
+     *
      * @public
      * @param {Function} onclick - The onclick handler for the run step-by-step icon.
      * @returns {void}
@@ -1068,7 +1080,7 @@ class Toolbar {
 
     /**
      * Renders the merge icon with the provided onclick handler.
-     * 
+     *
      * @public
      * @param {Function} onclick - The onclick handler for the merge icon.
      * @returns {void}
@@ -1083,7 +1095,7 @@ class Toolbar {
 
     /**
      * Renders the restore icon with the provided onclick handler.
-     * 
+     *
      * @public
      * @param {Function} onclick - The onclick handler for the restore icon.
      * @returns {void}
@@ -1098,7 +1110,7 @@ class Toolbar {
 
     /**
      * Renders the choose key icon with the provided onclick handler.
-     * 
+     *
      * @public
      * @param {Function} onclick - The onclick handler for the choose key icon.
      * @returns {void}
@@ -1115,7 +1127,7 @@ class Toolbar {
 
     /**
      * Renders the JavaScript icon with the provided onclick handler.
-     * 
+     *
      * @public
      * @param {Function} onclick - The onclick handler for the JavaScript icon.
      * @returns {void}
@@ -1126,7 +1138,7 @@ class Toolbar {
 
     /**
      * Renders the language select icon with the provided languageBox object.
-     * 
+     *
      * @public
      * @param  {Object} languageBox - The languageBox object containing language options.
      * @returns {void}
@@ -1134,10 +1146,27 @@ class Toolbar {
     renderLanguageSelectIcon(languageBox) {
         const languageSelectIcon = docById("languageSelectIcon");
         const languages = [
-            "enUS", "enUK", "es", "pt", "ko", "ja", "kana", "zhCN", "th", "tr",
-            "ayc", "quz", "gug", "hi", "ibo", "ar", "te", "he", "ur"
+            "enUS",
+            "enUK",
+            "es",
+            "pt",
+            "ko",
+            "ja",
+            "kana",
+            "zhCN",
+            "th",
+            "tr",
+            "ayc",
+            "quz",
+            "gug",
+            "hi",
+            "ibo",
+            "ar",
+            "te",
+            "he",
+            "ur"
         ];
-    
+
         languageSelectIcon.onclick = () => {
             languages.forEach(lang => {
                 docById(lang).onclick = () => languageBox[`${lang}_onclick`](this.activity);
@@ -1150,7 +1179,7 @@ class Toolbar {
      * @param  {Object} jquery
      * @returns {void}
      */
-    disableTooltips = (jquery) => {
+    disableTooltips = jquery => {
         jquery(".tooltipped").tooltip("remove");
         this.tooltipsDisabled = true;
     };
@@ -1160,7 +1189,7 @@ class Toolbar {
      * @param {Function} onclick
      * @returns {void}
      */
-    closeAuxToolbar = (onclick) => {
+    closeAuxToolbar = onclick => {
         const auxToolbar = docById("aux-toolbar");
         if (auxToolbar.style.display === "block") {
             onclick(this.activity, false);
