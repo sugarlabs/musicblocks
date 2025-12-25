@@ -531,7 +531,7 @@ class Toolbar {
             WRAP = !WRAP;
             if (WRAP) {
                 wrapButtonTooltipData = _("Turtle Wrap Off");
-                this.activity.textMsg(_("Turtle Wrap Turned On"), 3000);
+                this.activity.textMsg(_("Turtle Wrap On"), 3000);
                 this.activity.helpfulWheelItems.forEach(ele => {
                     if (ele.label === "Turtle Wrap Off") {
                         ele.display = true;
@@ -541,7 +541,7 @@ class Toolbar {
                 });
             } else {
                 wrapButtonTooltipData = _("Turtle Wrap On");
-                this.activity.textMsg(_("Turtle Wrap Turned Off"), 3000);
+                this.activity.textMsg(_("Turtle Wrap Off"), 3000);
                 this.activity.helpfulWheelItems.forEach(ele => {
                     if (ele.label === "Turtle Wrap Off") {
                         ele.display = false;
@@ -573,7 +573,7 @@ class Toolbar {
         WRAP = !WRAP;
         if (WRAP) {
             wrapButtonTooltipData = _("Turtle Wrap Off");
-            activity.textMsg(_("Turtle Wrap Turned On"), 3000);
+            activity.textMsg(_("Turtle Wrap On"), 3000);
             activity.helpfulWheelItems.forEach(ele => {
                 if (ele.label === "Turtle Wrap Off") {
                     ele.display = true;
@@ -583,7 +583,7 @@ class Toolbar {
             });
         } else {
             wrapButtonTooltipData = _("Turtle Wrap On");
-            activity.textMsg(_("Turtle Wrap Turned Off"), 3000);
+            activity.textMsg(_("Turtle Wrap Off"), 3000);
             activity.helpfulWheelItems.forEach(ele => {
                 if (ele.label === "Turtle Wrap Off") {
                     ele.display = false;
