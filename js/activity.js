@@ -37,7 +37,7 @@
    SPECIALINPUTS, STANDARDBLOCKHEIGHT, StatsWindow, STROKECOLORS,
    TENOR, TITLESTRING, Toolbar, Trashcan, TREBLE, Turtles, TURTLESVG,
    updatePluginObj, ZERODIVIDEERRORMSG, GRAND_G, GRAND_F,
-   SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G
+   SHARP, FLAT, buildScale, TREBLE_F, TREBLE_G, GIFAnimator
  */
 
 /*
@@ -70,6 +70,7 @@ let MYDEFINES = [
     "widgets/status",
     "widgets/help",
     "utils/munsell",
+    "activity/gif-animator",
     "activity/toolbar",
     "activity/trash",
     "activity/boundary",
@@ -296,6 +297,9 @@ class Activity {
         //Flag to check if any other input box is active or not
         this.isInputON = false;
 
+        // Initialize GIF animator
+        this.gifAnimator = new GIFAnimator();
+
         this.themes = ["light", "dark"];
         try {
             for (let i = 0; i < this.themes.length; i++) {
@@ -409,6 +413,7 @@ class Activity {
             this.palettes = null;
             this.blocks = null;
             this.logo = null;
+            this.gif = null;
             this.pasteBox = null;
             this.languageBox = null;
             this.themeBox = null;
@@ -451,6 +456,18 @@ class Activity {
 
             this.setHelpfulSearchDiv();
         };
+
+        /*
+         * Ensure continuous canvas updates for animated content.
+         * The ticker runs at a fixed framerate to allow smooth GIF animation
+         * even when the turtle or UI is otherwise idle.
+         */
+        createjs.Ticker.framerate = 60;
+        createjs.Ticker.on("tick", () => {
+            if (this.stage) {
+                this.stage.update();
+            }
+        });
 
         /*
          * creates helpfulSearchDiv for search
