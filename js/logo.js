@@ -518,7 +518,14 @@ class Logo {
       this.blockList[this.blockList[blk].connections[2]].name === "loadFile"
     ) {
       if (arg1) {
-        requiredTurtle.doShowText(arg0, arg1[1]);
+        if (
+          typeof arg1[1] === "string" &&
+          arg1[1].substr(0, 10) === "data:image"
+        ) {
+          requiredTurtle.doShowImage(arg0, arg1[1]);
+        } else {
+          requiredTurtle.doShowText(arg0, arg1[1]);
+        }
       } else {
         this.activity.errorMsg(_("You must select a file."));
       }
