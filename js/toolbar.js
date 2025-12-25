@@ -561,18 +561,31 @@ class Toolbar {
         const undoButton = docById("undoButton");
         const redoButton = docById("redoButton");
         if (!undoButton || !redoButton) return;
-        undoButton.onclick = () => {
-            UndoRedo.undo();
+        const that = this;
+        undoButton.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (window.UndoRedo && window.UndoRedo.undoStack.length > 0) {
+                window.UndoRedo.undo();
+            }
         };
-        redoButton.onclick = () => {
-            UndoRedo.redo();
+        redoButton.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (window.UndoRedo && window.UndoRedo.redoStack.length > 0) {
+                window.UndoRedo.redo();
+            }
         };
+        // Initialize button states
+        this.updateUndoRedoButton();
     }
     updateUndoRedoButton(){
         const undoBtn = docById("undoButton");
         const redoBtn = docById("redoButton");
-        undoBtn.disabled = UndoRedo.undoStack.length === 0;
-        redoBtn.disabled = UndoRedo.redoStack.length === 0;
+        if (undoBtn && redoBtn && window.UndoRedo) {
+            undoBtn.disabled = !window.UndoRedo.canUndo();
+            redoBtn.disabled = !window.UndoRedo.canRedo();
+        }
     }
 
     /**

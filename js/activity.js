@@ -215,6 +215,93 @@ class Action {
     }
 }
 
+/**
+ * Command class for block movement operations.
+ * Implements the Command pattern for undo/redo functionality.
+ */
+class MoveBlockCommand {
+    constructor(blocks, blockIndices, oldPositions, newPositions, oldConnections, newConnections, oldArgClampSlots, newArgClampSlots) {
+        this.blocks = blocks;
+        this.blockIndices = blockIndices; // Array of block indices that were moved
+        this.oldPositions = oldPositions; // Map of index -> {x, y}
+        this.newPositions = newPositions; // Map of index -> {x, y}
+        this.oldConnections = oldConnections; // Map of index -> connections array
+        this.newConnections = newConnections; // Map of index -> connections array
+        this.oldArgClampSlots = oldArgClampSlots; // Map of index -> argClampSlots
+        this.newArgClampSlots = newArgClampSlots; // Map of index -> argClampSlots
+    }
+
+    /**
+     * Execute the command (redo) - move blocks to new positions
+     */
+    execute() {
+        this.blocks._isUndoingMove = true;
+        // Restore to new positions (after move)
+        for (const index of this.blockIndices) {
+            const blk = this.blocks.blockList[index];
+            if (!blk || blk.trash || !blk.container) continue;
+            
+            const newPos = this.newPositions.get(index);
+            if (newPos && typeof newPos.x === 'number' && typeof newPos.y === 'number' && 
+                !isNaN(newPos.x) && !isNaN(newPos.y) && isFinite(newPos.x) && isFinite(newPos.y)) {
+                blk.container.x = newPos.x;
+                blk.container.y = newPos.y;
+            }
+            
+            const newConn = this.newConnections.get(index);
+            if (newConn) {
+                blk.connections = [...newConn];
+            }
+            
+            const newArgSlots = this.newArgClampSlots.get(index);
+            if (newArgSlots) {
+                blk.argClampSlots = [...newArgSlots];
+                if (blk.updateArgSlots) {
+                    blk.updateArgSlots(blk.argClampSlots);
+                }
+            }
+        }
+        this.blocks.adjustExpandableClampBlock();
+        this.blocks._isUndoingMove = false;
+        this.blocks.checkBounds();
+    }
+
+    /**
+     * Undo the command - move blocks back to old positions
+     */
+    undo() {
+        this.blocks._isUndoingMove = true;
+        // Restore to old positions (before move)
+        for (const index of this.blockIndices) {
+            const blk = this.blocks.blockList[index];
+            if (!blk || blk.trash || !blk.container) continue;
+            
+            const oldPos = this.oldPositions.get(index);
+            if (oldPos && typeof oldPos.x === 'number' && typeof oldPos.y === 'number' && 
+                !isNaN(oldPos.x) && !isNaN(oldPos.y) && isFinite(oldPos.x) && isFinite(oldPos.y)) {
+                blk.container.x = oldPos.x;
+                blk.container.y = oldPos.y;
+            }
+            
+            const oldConn = this.oldConnections.get(index);
+            if (oldConn) {
+                blk.connections = [...oldConn];
+            }
+            
+            const oldArgSlots = this.oldArgClampSlots.get(index);
+            if (oldArgSlots) {
+                blk.argClampSlots = [...oldArgSlots];
+                if (blk.updateArgSlots) {
+                    blk.updateArgSlots(blk.argClampSlots);
+                }
+            }
+        }
+        this.blocks.adjustExpandableClampBlock();
+        this.blocks._isUndoingMove = false;
+        this.blocks.checkBounds();
+    }
+}
+
 class UndoRedoManager {
     constructor() {
         this.undoStack = [];
@@ -223,27 +310,70 @@ class UndoRedoManager {
 
     addAction(action) {
         this.undoStack.push(action);
-        this.redoStack = [];
+        this.redoStack = []; // Clear redo stack when new action is performed
+        this.updateButtons();
+    }
+
+    executeCommand(command) {
+        // For command pattern - execute the command and add to undo stack
+        command.execute();
+        this.undoStack.push(command);
+        this.redoStack = []; // Clear redo stack when new action is performed
+        this.updateButtons();
+        if (globalActivity) {
+            globalActivity.refreshCanvas();
+        }
     }
 
     undo() {
-        if (this.undoStack.length === 0) return;
-        const action = this.undoStack.pop();
-        action.undo();
-        this.redoStack.push(action);
+        if (!this.canUndo()) return;
+        const command = this.undoStack.pop();
+        command.undo();
+        this.redoStack.push(command);
+        this.updateButtons();
+        if (globalActivity) {
+            globalActivity.refreshCanvas();
+        }
     }
 
     redo() {
-        if (this.redoStack.length === 0) return;
-        const action = this.redoStack.pop();
-        action.do();
-        this.undoStack.push(action);
+        if (!this.canRedo()) return;
+        const command = this.redoStack.pop();
+        // Handle both Command pattern (execute) and Action pattern (do)
+        if (typeof command.execute === 'function') {
+            command.execute();
+        } else if (typeof command.do === 'function') {
+            command.do();
+        } else if (typeof command.doFunc === 'function') {
+            command.doFunc();
+        }
+        this.undoStack.push(command);
+        this.updateButtons();
+        if (globalActivity) {
+            globalActivity.refreshCanvas();
+        }
+    }
+
+    canUndo() {
+        return this.undoStack.length > 0;
+    }
+
+    canRedo() {
+        return this.redoStack.length > 0;
+    }
+
+    updateButtons() {
+        // Update button states
+        if (globalActivity && globalActivity.toolbar) {
+            globalActivity.toolbar.updateUndoRedoButton();
+        }
     }
 }
 
 // Global instance
 window.UndoRedo = new UndoRedoManager();
 window.Action = Action;
+window.MoveBlockCommand = MoveBlockCommand;
 
 /**
  * Represents an activity in the application.
@@ -1449,8 +1579,16 @@ class Activity {
     };
 
     document.addEventListener("keydown", (e) => {
-      if (e.ctrlKey && e.key === "z") window.UndoRedo.undo();
-      if (e.ctrlKey && (e.key === "y" || (e.shiftKey && e.key === "Z"))) window.UndoRedo.redo();
+      // Handle undo/redo keyboard shortcuts
+      if (e.ctrlKey || e.metaKey) { // Ctrl on Windows/Linux, Cmd on Mac
+        if (e.key === "z" && !e.shiftKey) {
+          e.preventDefault(); // Prevent default browser undo
+          window.UndoRedo.undo();
+        } else if (e.key === "y" || (e.shiftKey && e.key === "Z")) {
+          e.preventDefault(); // Prevent default browser redo
+          window.UndoRedo.redo();
+        }
+      }
     });
 
 
@@ -6800,6 +6938,7 @@ class Activity {
       this.toolbar.renderJavaScriptIcon(toggleJSWindow);
       this.toolbar.renderLanguageSelectIcon(this.languageBox);
       this.toolbar.renderWrapIcon();
+      this.toolbar.renderUndoRedoButtons();
 
       initPalettes(this.palettes);
 
