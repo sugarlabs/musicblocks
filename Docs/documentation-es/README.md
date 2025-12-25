@@ -32,7 +32,7 @@ of blocks representing four notes: `Do 4`, `Mi 4`, `Sol 4` and `Do
 5`. The first note is a `1/2` note; the second and third notes are
 `1/4` notes; the fourth note is a `1/1` note.
 
-https://rawgithub.com/sugarlabs/
+https://github.com/sugarlabs
 
 ![alt tag](../header-icons/play-button.svg "play button")
 
@@ -91,7 +91,7 @@ additional menu appears when a "right click" is applied to a stack of
 blocks).
 
 These toolbars are described in detail in the
-[Turtle Blocks documentation pages](http://rawgithub.com/sugarlabs/turtleblocksjs/tree/master/documentation).
+[Turtle Blocks documentation pages](https://github.com/sugarlabs/turtleblocksjs/blob/master/documentation/README.md).
 
 Keyboard shortcuts
 ------------------
@@ -119,16 +119,16 @@ The block palettes are displayed on the left side of the screen. These
 palettes contain the blocks used to create programs.
 
 See the
-[Turtle Blocks Programming Guide](http://rawgithub.com/sugarlabs/turtleblocksjs/tree/master/guide/README.md)
+[Turtle Blocks Programming Guide](https://github.com/sugarlabs/turtleblocksjs/blob/master/guide/README.md)
 for general details on how to use the blocks.
 
 See the
-[Music Blocks Programming Guide](http://rawgithub.com/sugarlabs/musicblocks/tree/master/guide/README.md)
+[Music Blocks Programming Guide](https://github.com/sugarlabs/turtleblocksjs/blob/master/guide/README.md)
 for details specific to music: *Rhythm*, *Meter*, *Pitch*, *Intervals*,
 *Tone*, *Ornament*, *Volume*, *Drum*, and *Widget*.
 
 All of the other palettes are described in the
-[Turtle Blocks documentation pages](http://rawgithub.com/sugarlabs/turtleblocksjs/tree/master/documentation).
+[Turtle Blocks documentation pages](https://github.com/sugarlabs/turtleblocksjs/tree/master/documentation).
 
 Defining a note
 ---------------
