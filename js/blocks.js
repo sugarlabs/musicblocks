@@ -261,6 +261,8 @@ class Blocks {
             const blkObj = this.blockList[blk];
 
             const firstConnection = blkObj.connections[0];
+	    console.log("FIRST CONNECTION");
+	    console.log(firstConnection);
             let connectionIdx;
 
             if (!SPECIALINPUTS.includes(blkObj.name)) {
@@ -279,8 +281,9 @@ class Blocks {
 
                 if (lastConnection != null) {
                     /** Is it a hidden block? Keep it attached. */
-                    if (this.blockList[lastConnection].name === "hidden") {
+                    if (this.blockList[lastConnection].name === "hidden" || this.blockList[lastConnection].name === "hiddennoflow") {
                         lastConnection = last(this.blockList[lastConnection].connections);
+
                         this.blockList[last(blkObj.connections)].connections[
                             this.blockList[last(blkObj.connections)].connections.length - 1
                         ] = null;
