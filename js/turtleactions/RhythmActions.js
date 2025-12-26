@@ -455,5 +455,11 @@ function setupRhythmActions(activity) {
 
             return value !== 0 ? 1 / value : 0;
         }
+       
+
     };
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = setupRhythmActions;
 }
