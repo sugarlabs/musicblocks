@@ -548,6 +548,7 @@ class WidgetWindow {
         window.widgetWindows.openWindows[this._key] = undefined;
     }
 
+    
     /**
      * @public
      * @returns {WidgetWindow} this
