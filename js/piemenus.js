@@ -637,32 +637,58 @@ const piemenuPitches = (
         selection["octave"] = octave;
     };
 
+    block.prevAccidental =
+    !custom && that._accidentalsWheel
+        ? that._accidentalsWheel.navItems[
+              that._accidentalsWheel.selectedNavItemIndex
+          ].title
+        : null;
+
+
     const __selectionChangedAccidental = () => {
-        selection["note"] = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
-        selection["attr"] =
-            that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
+    const newAccidental =
+        that._accidentalsWheel.navItems[
+            that._accidentalsWheel.selectedNavItemIndex
+        ].title;
 
-        if (selection["attr"] === "♮") {
-            that.text.text = selection["note"];
-            that.value = selection["note"];
-        } else {
-            that.value = selection["note"] + selection["attr"];
-            that.text.text = that.value;
-        }
-        // Store the selected accidental in the block for later use.
-        prevAccidental = selection["attr"];
-        block.prevAccidental = prevAccidental;
-       
-        that.container.setChildIndex(that.text, that.container.children.length - 1);
-        that.updateCache();
+    //  Prevent toggling if same accidental is clicked again
+    if (block.prevAccidental === newAccidental) {
+        return;
+    }
 
-        // Ensure we have the current octave
-        if (hasOctaveWheel) {
-            selection["octave"] = Number(
-                that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title
-            );
-        }
-    };
+    selection["note"] =
+        that._pitchWheel.navItems[
+            that._pitchWheel.selectedNavItemIndex
+        ].title;
+
+    selection["attr"] = newAccidental;
+
+    if (selection["attr"] === "♮") {
+        that.text.text = selection["note"];
+        that.value = selection["note"];
+    } else {
+        that.value = selection["note"] + selection["attr"];
+        that.text.text = that.value;
+    }
+
+    // Persist accidental
+    block.prevAccidental = selection["attr"];
+
+    that.container.setChildIndex(
+        that.text,
+        that.container.children.length - 1
+    );
+    that.updateCache();
+
+    // Ensure we have the current octave
+    if (hasOctaveWheel) {
+        selection["octave"] = Number(
+            that._octavesWheel.navItems[
+                that._octavesWheel.selectedNavItemIndex
+            ].title
+        );
+    }
+};
 
     // Set up handlers for pitch preview.
     const setupAudioContext = async () => {
