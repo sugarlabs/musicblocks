@@ -1166,7 +1166,7 @@ class Painter {
      * Clears the media layer
      */
     doClearMedia() {
-        if (!this._media) {
+        if (!this.turtle.media || this.turtle.media.length === 0) {
             return;
         }
         const gifAnimator = this.activity.gifAnimator;
