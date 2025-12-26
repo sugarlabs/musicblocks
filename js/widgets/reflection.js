@@ -465,7 +465,7 @@ class ReflectionMatrix {
         if (this.chatHistory.length > 10) {
             this.summaryButton.style.removeProperty("background");
         }
-        
+
         const messageContainer = document.createElement("div");
         messageContainer.className = "message-container";
 
