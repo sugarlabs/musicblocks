@@ -1513,6 +1513,16 @@ class Activity {
                 this.blocks.activeBlock = null;
                 hideDOMLabel();
 
+                // Stop all GIF animations and clear overlay canvas (Issue #4907)
+                if (this.gifAnimator) {
+                    this.gifAnimator.stopAll();
+                    const overlayCanvas = document.getElementById("overlayCanvas");
+                    if (overlayCanvas) {
+                        const ctx = overlayCanvas.getContext("2d");
+                        ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+                    }
+                }
+
                 this.logo.boxes = {};
                 this.logo.time = 0;
                 this.hideMsgs();
