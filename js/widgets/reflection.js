@@ -76,7 +76,7 @@ class ReflectionMatrix {
         this.isOpen = true;
         this.isMaximized = false;
         this.activity.isInputON = true;
-        this.PORT = "http://3.105.177.138:8000"; // http://127.0.0.1:8000 
+        this.PORT = "http://3.105.177.138:8000"; // http://127.0.0.1:8000
 
         const widgetWindow = window.widgetWindows.windowFor(this, "reflection", "reflection");
         this.widgetWindow = widgetWindow;
@@ -167,7 +167,7 @@ class ReflectionMatrix {
         this.input.style.marginLeft = "10px";
         this.inputContainer.appendChild(this.input);
 
-        this.input.onkeydown = (e) => {
+        this.input.onkeydown = e => {
             if (e.key === "Enter") {
                 this.sendMessage();
             }
@@ -535,7 +535,7 @@ class ReflectionMatrix {
     renderChatHistory() {
         this.chatLog.innerHTML = "";
 
-        this.chatHistory.forEach((msg) => {
+        this.chatHistory.forEach(msg => {
             const messageContainer = document.createElement("div");
             messageContainer.className = "message-container";
 
@@ -596,8 +596,7 @@ class ReflectionMatrix {
         }
         const transcript = conversationData
             .map(
-                (item) =>
-                    `${this.mentorsMap[item.role] || item.role.toUpperCase()}: ${item.content}`
+                item => `${this.mentorsMap[item.role] || item.role.toUpperCase()}: ${item.content}`
             )
             .join("\n\n");
 
