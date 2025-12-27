@@ -565,14 +565,16 @@ class Toolbar {
         undoButton.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
-            if (window.UndoRedo && window.UndoRedo.undoStack.length > 0) {
+            // Use canUndo() for robust check
+            if (window.UndoRedo && window.UndoRedo.canUndo()) {
                 window.UndoRedo.undo();
             }
         };
         redoButton.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
-            if (window.UndoRedo && window.UndoRedo.redoStack.length > 0) {
+            // Use canRedo() for robust check
+            if (window.UndoRedo && window.UndoRedo.canRedo()) {
                 window.UndoRedo.redo();
             }
         };

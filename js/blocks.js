@@ -6995,6 +6995,10 @@ class Blocks {
                 };
             });
 
+            // Check if this is the top block of a stack (before we disconnect it)
+            // If so, we need to add it to trashStacks for restoration from trash can
+            const isTopBlock = myBlock.connections[0] === null;
+
             // Only create undo/redo action if not already in an undo/redo operation
             if (!isUndoRedoOperation) {
                 UndoRedo.addAction(
@@ -7009,6 +7013,12 @@ class Blocks {
                                     blk.hide();
                                 }
                             });
+                            // If this was a top block, add it back to trashStacks on redo
+                            if (isTopBlock && thisBlock !== -1) {
+                                if (this.trashStacks.indexOf(thisBlock) === -1) {
+                                    this.trashStacks.push(thisBlock);
+                                }
+                            }
                             this._isRedoingDelete = false;
                             this.activity.refreshCanvas();
                         },
@@ -7033,6 +7043,13 @@ class Blocks {
                                     }
                                 }
                             });
+                            // If this was a top block, remove it from trashStacks on undo
+                            if (isTopBlock && thisBlock !== -1) {
+                                const trashIndex = this.trashStacks.indexOf(thisBlock);
+                                if (trashIndex !== -1) {
+                                    this.trashStacks.splice(trashIndex, 1);
+                                }
+                            }
                             this._isUndoingDelete = false;
                             this.activity.refreshCanvas();
                         },
@@ -7095,6 +7112,14 @@ class Blocks {
                 const title = this.blockList[blk].protoblock.staticLabels[0];
                 closeBlkWidgets(_(title));
                 this.activity.refreshCanvas();
+            }
+
+            // If this is the top block of a stack, add it to trashStacks for restoration from trash can
+            // Only do this if not in an undo/redo operation (to avoid duplicates)
+            if (isTopBlock && !isUndoRedoOperation && thisBlock !== -1) {
+                if (this.trashStacks.indexOf(thisBlock) === -1) {
+                    this.trashStacks.push(thisBlock);
+                }
             }
 
             /** Adjust the stack from which we just deleted blocks. */
