@@ -18,6 +18,21 @@
  */
 
 /* exported setupToneBlocks */
+function addParameterHelpSupport(proto) {
+    if (!proto.setHelpStringForParameter) {
+        proto.setHelpStringForParameter = function (parameter, helpText) {
+            if (!this.parameterHelp) {
+                this.parameterHelp = {};
+            }
+            this.parameterHelp[parameter] = helpText;
+        };
+    }
+}
+
+addParameterHelpSupport(FlowBlock.prototype);
+addParameterHelpSupport(ValueBlock.prototype);
+addParameterHelpSupport(FlowClampBlock.prototype);
+addParameterHelpSupport(LeftBlock.prototype);
 
 function setupToneBlocks(activity) {
     /**
@@ -412,129 +427,150 @@ function setupToneBlocks(activity) {
     }
 
     /**
-     * Represents a Distortion block.
-     * Extends FlowClampBlock.
-     * @class
-     * @extends FlowClampBlock
+    /**
+ * Represents a Distortion block.
+ * Extends FlowClampBlock.
+ * @class
+ * @extends FlowClampBlock
+ */
+class DisBlock extends FlowClampBlock {
+    /**
+     * Creates an instance of DisBlock.
      */
-    class DisBlock extends FlowClampBlock {
-        /**
-         * Creates an instance of DisBlock.
-         */
-        constructor() {
-            super("dis");
-            this.setPalette("tone", activity);
-            this.piemenuValuesC1 = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-            this.setHelpString([
-                _("The Distortion block adds distortion to the pitch."),
-                "documentation",
-                null,
-                "dishelp"
-            ]);
-            this.formBlock({
-                //.TRANS: distortion is an alteration in the sound
-                name: _("distortion"),
-                args: 1,
-                defaults: [40]
-            });
-        }
+    constructor() {
+        super("dis");
+        this.setPalette("tone", activity);
 
-        /**
-         * Handles the flow of the DisBlock.
-         * @param {Array} args - The arguments provided to the block.
-         * @param {Logo} logo - The Logo interpreter instance.
-         * @param {number} turtle - The turtle associated with the block.
-         * @param {Block} blk - The block instance.
-         * @returns {Array} - An array containing the result of the flow.
-         */
-        flow(args, logo, turtle, blk) {
-            Singer.ToneActions.doDistortion(args[0], turtle, blk);
+        this.piemenuValuesC1 = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
-            const tur = activity.turtles.ithTurtle(turtle);
+        this.setHelpString([
+            _("The Distortion block adds distortion to the pitch."),
+            "documentation",
+            null,
+            "dishelp"
+        ]);
 
-            if (logo.inTimbre) {
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["distortionActive"] = true;
-                logo.timbre.distortionEffect.push(blk);
-                logo.timbre.distortionParams.push(last(tur.singer.distortionAmount) * 100);
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["distortionAmount"] =
-                    args[0];
-            }
+        this.formBlock({
+            // .TRANS: distortion is an alteration in the sound
+            name: _("distortion"),
+            args: 1,
+            defaults: [40]
+        });
 
-            return [args[1], 1];
-        }
+        // PARAMETER-LEVEL HELP (NEW)
+        this.setHelpStringForParameter(
+            "distortion",
+            _("Controls how rough or harsh the sound becomes.")
+        );
     }
 
     /**
-     * Represents a Tremolo block.
-     * Extends FlowClampBlock.
-     * @class
-     * @extends FlowClampBlock
+     * Handles the flow of the DisBlock.
+     * @param {Array} args - The arguments provided to the block.
+     * @param {Logo} logo - The Logo interpreter instance.
+     * @param {number} turtle - The turtle associated with the block.
+     * @param {Block} blk - The block instance.
+     * @returns {Array} - An array containing the result of the flow.
      */
-    class TremoloBlock extends FlowClampBlock {
-        /**
-         * Creates an instance of TremoloBlock.
-         */
-        constructor() {
-            super("tremolo");
-            this.setPalette("tone", activity);
-            this.piemenuValuesC1 = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 20];
-            this.piemenuValuesC2 = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-            this.beginnerBlock(true);
+    flow(args, logo, turtle, blk) {
+        Singer.ToneActions.doDistortion(args[0], turtle, blk);
 
-            this.setHelpString([
-                _("The Tremolo block adds a wavering effect."),
-                "documentation",
-                null,
-                "tremolohelp"
-            ]);
+        const tur = activity.turtles.ithTurtle(turtle);
 
-            this.formBlock({
-                //.TRANS: a wavering effect in a musical tone
-                name: _("tremolo"),
-                args: 2,
-                defaults: [10, 50],
-                argLabels: [
-                    //.TRANS: rate at which tremolo wavers
-                    _("rate"),
-                    //.TRANS: amplitude of tremolo waver
-                    _("depth")
-                ]
-            });
-            this.makeMacro((x, y) => [
-                [0, "tremolo", x, y, [null, 1, 2, null, 3]],
-                [1, ["number", { value: 10 }], 0, 0, [0]],
-                [2, ["number", { value: 50 }], 0, 0, [0]],
-                [3, "hidden", 0, 0, [0, null]]
-            ]);
+        if (logo.inTimbre) {
+            instrumentsEffects[turtle][logo.timbre.instrumentName]["distortionActive"] = true;
+            logo.timbre.distortionEffect.push(blk);
+            logo.timbre.distortionParams.push(
+                last(tur.singer.distortionAmount) * 100
+            );
+            instrumentsEffects[turtle][logo.timbre.instrumentName]["distortionAmount"] =
+                args[0];
         }
 
-        /**
-         * Handles the flow of the TremoloBlock.
-         * @param {Array} args - The arguments provided to the block.
-         * @param {Logo} logo - The Logo interpreter instance.
-         * @param {number} turtle - The turtle associated with the block.
-         * @param {Block} blk - The block instance.
-         * @returns {Array} - An array containing the result of the flow.
-         */
-        flow(args, logo, turtle, blk) {
-            Singer.ToneActions.doTremolo(args[0], args[1], turtle, blk);
+        return [args[1], 1];
+    }
+}
 
-            const tur = activity.turtles.ithTurtle(turtle);
 
-            if (logo.inTimbre) {
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["tremoloActive"] = true;
-                logo.timbre.tremoloEffect.push(blk);
-                logo.timbre.tremoloParams.push(last(tur.singer.tremoloFrequency));
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["tremoloFrequency"] =
-                    args[0];
-                logo.timbre.tremoloParams.push(last(tur.singer.tremoloDepth) * 100);
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["tremoloDepth"] = args[1];
-            }
+    /**
+ * Represents a Tremolo block.
+ * Extends FlowClampBlock.
+ * @class
+ * @extends FlowClampBlock
+ */
+/**
+ * Represents a Tremolo block.
+ * Extends FlowClampBlock.
+ * @class
+ * @extends FlowClampBlock
+ */
+class TremoloBlock extends FlowClampBlock {
+    constructor() {
+        super("tremolo");
+        this.setPalette("tone", activity);
+        this.piemenuValuesC1 = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 20];
+        this.piemenuValuesC2 = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+        this.beginnerBlock(true);
 
-            return [args[2], 1];
-        }
+        this.setHelpString([
+            _("The Tremolo block adds a wavering effect."),
+            "documentation",
+            null,
+            "tremolohelp"
+        ]);
+
+        this.formBlock({
+            name: _("tremolo"),
+            args: 2,
+            defaults: [10, 50],
+            argLabels: [
+                _("rate"),
+                _("depth")
+            ]
+        });
+
+        // PARAMETER-LEVEL HELP
+        this.setHelpStringForParameter(
+            "rate",
+            _("Controls how fast the volume goes up and down.")
+        );
+
+        this.setHelpStringForParameter(
+            "depth",
+            _("Controls how strong the volume change is.")
+        );
+
+        this.makeMacro((x, y) => [
+            [0, "tremolo", x, y, [null, 1, 2, null, 3]],
+            [1, ["number", { value: 10 }], 0, 0, [0]],
+            [2, ["number", { value: 50 }], 0, 0, [0]],
+            [3, "hidden", 0, 0, [0, null]]
+        ]);
     }
 
+    flow(args, logo, turtle, blk) {
+        Singer.ToneActions.doTremolo(args[0], args[1], turtle, blk);
+
+        if (logo.inTimbre) {
+            const tur = activity.turtles.ithTurtle(turtle);
+
+            instrumentsEffects[turtle][logo.timbre.instrumentName].tremoloActive = true;
+            logo.timbre.tremoloEffect.push(blk);
+
+            //  FIX: Use values from singer state AFTER doTremolo for timbre params
+            const freq = last(tur.singer.tremoloFrequency);
+            const depth = last(tur.singer.tremoloDepth);
+
+            logo.timbre.tremoloParams.push(freq);
+            logo.timbre.tremoloParams.push(depth * 100);
+
+            //  FIX: Store the input argument directly (not from singer state)
+            instrumentsEffects[turtle][logo.timbre.instrumentName].tremoloFrequency = args[0];
+        }
+
+        return [args[2], 1];
+    }
+}
     /**
      * Represents a Phaser block.
      * Extends FlowClampBlock.
@@ -542,58 +578,59 @@ function setupToneBlocks(activity) {
      * @extends FlowClampBlock
      */
     class PhaserBlock extends FlowClampBlock {
-        /**
-         * Creates an instance of PhaserBlock.
-         */
-        constructor() {
-            super("phaser");
-            this.setPalette("tone", activity);
-            this.piemenuValuesC1 = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 20];
-            this.piemenuValuesC2 = [1, 2, 3];
-            this.piemenuValuesC3 = [
-                220, 247, 262, 294, 330, 349, 392, 440, 494, 523, 587, 659, 698, 783, 880
-            ];
-            this.setHelpString([
-                _("The Phaser block adds a sweeping sound."),
-                "documentation",
-                null,
-                "phaserhelp"
-            ]);
-            this.formBlock({
-                //.TRANS: alter the phase of the sound
-                name: _("phaser"),
-                args: 3,
-                defaults: [0.5, 3, 392],
-                argLabels: [_("rate"), _("octaves"), _("base frequency")]
-            });
-        }
+    constructor() {
+        super("phaser");
+        this.setPalette("tone", activity);
 
-        /**
-         * Handles the flow of the PhaserBlock.
-         * @param {Array} args - The arguments provided to the block.
-         * @param {Logo} logo - The Logo interpreter instance.
-         * @param {number} turtle - The turtle associated with the block.
-         * @param {Block} blk - The block instance.
-         * @returns {Array} - An array containing the result of the flow.
-         */
-        flow(args, logo, turtle, blk) {
-            Singer.ToneActions.doPhaser(args[0], args[1], args[2], turtle, blk);
-            const tur = activity.turtles.ithTurtle(turtle);
+        this.piemenuValuesC1 = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 20];
+        this.piemenuValuesC2 = [1, 2, 3];
+        this.piemenuValuesC3 = [
+            220, 247, 262, 294, 330, 349, 392, 440, 494, 523
+        ];
 
-            if (logo.inTimbre) {
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["phaserActive"] = true;
-                logo.timbre.phaserEffect.push(blk);
-                logo.timbre.phaserParams.push(last(tur.singer.rate));
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["rate"] = args[0];
-                logo.timbre.phaserParams.push(last(tur.singer.octaves));
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["octaves"] = args[1];
-                logo.timbre.phaserParams.push(last(tur.singer.baseFrequency));
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["baseFrequency"] = args[2];
-            }
+        this.setHelpString([
+            _("The Phaser block adds a sweeping sound."),
+            "documentation",
+            null,
+            "phaserhelp"
+        ]);
 
-            return [args[3], 1];
-        }
+        this.formBlock({
+            name: _("phaser"),
+            args: 3,
+            defaults: [0.5, 3, 392],
+            argLabels: [_("rate"), _("octaves"), _("base frequency")]
+        });
+
+        this.setHelpStringForParameter(
+            "rate",
+            _("Controls how fast the sweeping effect moves.")
+        );
+        this.setHelpStringForParameter(
+            "octaves",
+            _("Controls how wide the frequency sweep is.")
+        );
+        this.setHelpStringForParameter(
+            "base frequency",
+            _("Controls the starting frequency of the sweep.")
+        );
     }
+
+    flow(args, logo, turtle, blk) {
+    Singer.ToneActions.doPhaser(args[0], args[1], args[2], turtle, blk);
+
+    if (logo.inTimbre) {
+        instrumentsEffects[turtle][logo.timbre.instrumentName].phaserActive = true;
+        logo.timbre.phaserEffect.push(blk);
+        logo.timbre.phaserParams.push(args[0]);
+        logo.timbre.phaserParams.push(args[1]);
+        logo.timbre.phaserParams.push(args[2]);
+    }
+
+    return [args[3], 1];
+}
+}
+
 
     /**
      * Represents a Chorus block.
@@ -601,60 +638,61 @@ function setupToneBlocks(activity) {
      * @class
      * @extends FlowClampBlock
      */
-    class ChorusBlock extends FlowClampBlock {
-        /**
-         * Creates an instance of ChorusBlock.
-         */
-        constructor() {
-            super("chorus");
-            this.setPalette("tone", activity);
-            this.piemenuValuesC1 = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
-            this.piemenuValuesC2 = [2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 9, 10];
-            this.piemenuValuesC3 = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-            this.beginnerBlock(true);
+   class ChorusBlock extends FlowClampBlock {
+    constructor() {
+        super("chorus");
+        this.setPalette("tone", activity);
 
-            this.setHelpString([
-                _("The Chorus block adds a chorus effect."),
-                "documentation",
-                null,
-                "chorushelp"
-            ]);
+        this.piemenuValuesC1 = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
+        this.piemenuValuesC2 = [2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 9, 10];
+        this.piemenuValuesC3 = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
-            this.formBlock({
-                //.TRANS: musical effect to simulate a choral sound
-                name: _("chorus"),
-                args: 3,
-                defaults: [1.5, 3.5, 70],
-                argLabels: [_("rate"), _("delay (MS)"), _("depth")]
-            });
-        }
+        this.beginnerBlock(true);
 
-        /**
-         * Handles the flow of the ChorusBlock.
-         * @param {Array} args - The arguments provided to the block.
-         * @param {Logo} logo - The Logo interpreter instance.
-         * @param {number} turtle - The turtle associated with the block.
-         * @param {Block} blk - The block instance.
-         * @returns {Array} - An array containing the result of the flow.
-         */
-        flow(args, logo, turtle, blk) {
-            Singer.ToneActions.doChorus(args[0], args[1], args[2], turtle, blk);
-            const tur = activity.turtles.ithTurtle(turtle);
+        this.setHelpString([
+            _("The Chorus block adds a chorus effect."),
+            "documentation",
+            null,
+            "chorushelp"
+        ]);
 
-            if (logo.inTimbre) {
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["chorusActive"] = true;
-                logo.timbre.chorusEffect.push(blk);
-                logo.timbre.chorusParams.push(last(tur.singer.chorusRate));
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["chorusRate"] = args[0];
-                logo.timbre.chorusParams.push(last(tur.singer.delayTime));
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["delayTime"] = args[1];
-                logo.timbre.chorusParams.push(last(tur.singer.chorusDepth) * 100);
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["chorusDepth"] = args[2];
-            }
+        this.formBlock({
+            name: _("chorus"),
+            args: 3,
+            defaults: [1.5, 3.5, 70],
+            argLabels: [_("rate"), _("delay (MS)"), _("depth")]
+        });
 
-            return [args[3], 1];
-        }
+        this.setHelpStringForParameter(
+            "rate",
+            _("Controls how fast the chorus effect moves.")
+        );
+        this.setHelpStringForParameter(
+            "delay (MS)",
+            _("Controls the delay time between the voices.")
+        );
+        this.setHelpStringForParameter(
+            "depth",
+            _("Controls how wide the chorus effect sounds.")
+        );
     }
+
+   flow(args, logo, turtle, blk) {
+    Singer.ToneActions.doChorus(args[0], args[1], args[2], turtle, blk);
+
+    if (logo.inTimbre) {
+        instrumentsEffects[turtle][logo.timbre.instrumentName].chorusActive = true;
+        logo.timbre.chorusEffect.push(blk);
+        logo.timbre.chorusParams.push(args[0]);
+        logo.timbre.chorusParams.push(args[1]);
+        logo.timbre.chorusParams.push(args[2]);
+    }
+
+    return [args[3], 1];
+}
+}
+
+
 
     /**
      * Represents a Vibrato block.
@@ -662,55 +700,196 @@ function setupToneBlocks(activity) {
      * @class
      * @extends FlowClampBlock
      */
-    class VibratoBlock extends FlowClampBlock {
-        /**
-         * Creates an instance of VibratoBlock.
-         */
-        constructor() {
-            super("vibrato");
-            this.setPalette("tone", activity);
-            this.piemenuValuesC1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-            this.beginnerBlock(true);
+   class VibratoBlock extends FlowClampBlock {
+    constructor() {
+        super("vibrato");
+        this.setPalette("tone", activity);
+        this.piemenuValuesC1 = [1,2,3,4,5,6,7,8,9,10];
+        this.beginnerBlock(true);
 
-            this.setHelpString([
-                _("The Vibrato block adds a rapid, slight variation in pitch."),
-                "documentation",
-                null,
-                "vibratohelp"
-            ]);
+        this.setHelpString([
+            _("The Vibrato block adds a rapid, slight variation in pitch."),
+            "documentation",
+            null,
+            "vibratohelp"
+        ]);
 
-            this.formBlock({
-                //.TRANS: a rapid, slight variation in pitch
-                name: _("vibrato"),
-                args: 2,
-                defaults: [5, 1 / 16],
-                argLabels: [_("intensity"), _("rate")]
-            });
-            this.makeMacro((x, y) => [
-                [0, "vibrato", x, y, [null, 1, 3, 2, 6]],
-                [1, ["number", { value: 5 }], 0, 0, [0]],
-                [2, "vspace", 0, 0, [0, null]],
-                [3, "divide", 0, 0, [0, 4, 5]],
-                [4, ["number", { value: 1 }], 0, 0, [3]],
-                [5, ["number", { value: 16 }], 0, 0, [3]],
-                [6, "hidden", 0, 0, [0, null]]
-            ]);
-        }
+        this.formBlock({
+            name: _("vibrato"),
+            args: 2,
+            defaults: [5, 1 / 16],
+            argLabels: [_("intensity"), _("rate")]
+        });
 
-        /**
-         * Handles the flow of the VibratoBlock.
-         * @param {Array} args - The arguments provided to the block.
-         * @param {Logo} logo - The Logo interpreter instance.
-         * @param {number} turtle - The turtle associated with the block.
-         * @param {Block} blk - The block instance.
-         * @returns {Array} - An array containing the result of the flow.
-         */
-        flow(args, logo, turtle, blk) {
-            Singer.ToneActions.doVibrato(args[0], args[1], turtle, blk);
+        // PARAMETER HELP (NEW)
+        this.setHelpStringForParameter(
+            "intensity",
+            _("Controls how strong the pitch variation is.")
+        );
 
-            return [args[2], 1];
-        }
+        this.setHelpStringForParameter(
+            "rate",
+            _("Controls how fast the pitch changes.")
+        );
     }
+
+    flow(args, logo, turtle, blk) {
+        Singer.ToneActions.doVibrato(args[0], args[1], turtle, blk);
+        return [args[2], 1];
+    }
+}
+
+/**
+ * Represents a Delay block.
+ * Extends FlowClampBlock.
+ */
+class DelayBlock extends FlowClampBlock {
+    constructor() {
+        super("delay");
+        this.setPalette("tone", activity);
+
+        this.piemenuValuesC1 = [0.1, 0.25, 0.5, 1, 2];
+        this.piemenuValuesC2 = [0, 20, 40, 60, 80, 100];
+
+        this.beginnerBlock(true);
+
+        this.setHelpString([
+            _("The Delay block repeats the sound after a short time, creating an echo."),
+            "documentation",
+            null,
+            "delayhelp"
+        ]);
+
+        this.formBlock({
+            name: _("delay"),
+            args: 2,
+            defaults: [0.5, 40],
+            argLabels: [_("time"), _("feedback")]
+        });
+
+        this.setHelpStringForParameter(
+            "time",
+            _("Controls how long it takes for the echo to repeat.")
+        );
+
+        this.setHelpStringForParameter(
+            "feedback",
+            _("Controls how many times the echo repeats.")
+        );
+    }
+
+    flow(args, logo, turtle, blk) {
+        Singer.ToneActions.doDelay(args[0], args[1], turtle, blk);
+
+        if (logo.inTimbre) {
+            instrumentsEffects[turtle][logo.timbre.instrumentName].delayActive = true;
+            logo.timbre.delayEffect.push(blk);
+            logo.timbre.delayParams.push(args[0]);
+            logo.timbre.delayParams.push(args[1]);
+        }
+
+        return [args[2], 1];
+    }
+}
+/**
+ * Represents a Reverb block.
+ * Extends FlowClampBlock.
+ */
+class ReverbBlock extends FlowClampBlock {
+    constructor() {
+        super("reverb");
+        this.setPalette("tone", activity);
+
+        this.piemenuValuesC1 = [0, 20, 40, 60, 80, 100];
+
+        this.beginnerBlock(true);
+
+        this.setHelpString([
+            _("The Reverb block adds space and depth, making the sound feel like it is in a room."),
+            "documentation",
+            null,
+            "reverbhelp"
+        ]);
+
+        this.formBlock({
+            name: _("reverb"),
+            args: 1,
+            defaults: [40],
+            argLabels: [_("amount")]
+        });
+
+        this.setHelpStringForParameter(
+            "amount",
+            _("Controls how large or echoey the space sounds.")
+        );
+    }
+
+    flow(args, logo, turtle, blk) {
+        Singer.ToneActions.doReverb(args[0], turtle, blk);
+
+        if (logo.inTimbre) {
+            instrumentsEffects[turtle][logo.timbre.instrumentName].reverbActive = true;
+            logo.timbre.reverbEffect.push(blk);
+            logo.timbre.reverbParams.push(args[0]);
+        }
+
+        return [args[1], 1];
+    }
+}
+/**
+ * Represents a Filter block.
+ * Extends FlowClampBlock.
+ */
+class FilterBlock extends FlowClampBlock {
+    constructor() {
+        super("filter");
+        this.setPalette("tone", activity);
+
+        this.piemenuValuesC1 = [200, 400, 800, 1600, 3200];
+        this.piemenuValuesC2 = ["lowpass", "highpass"];
+
+        this.beginnerBlock(true);
+
+        this.setHelpString([
+            _("The Filter block removes certain frequencies from the sound."),
+            "documentation",
+            null,
+            "filterhelp"
+        ]);
+
+        this.formBlock({
+            name: _("filter"),
+            args: 2,
+            defaults: [800, "lowpass"],
+            argLabels: [_("frequency"), _("type")]
+        });
+
+        this.setHelpStringForParameter(
+            "frequency",
+            _("Controls which pitches are removed from the sound.")
+        );
+
+        this.setHelpStringForParameter(
+            "type",
+            _("Choose whether low or high sounds are reduced.")
+        );
+    }
+
+    flow(args, logo, turtle, blk) {
+        Singer.ToneActions.doFilter(args[0], args[1], turtle, blk);
+
+        if (logo.inTimbre) {
+            instrumentsEffects[turtle][logo.timbre.instrumentName].filterActive = true;
+            logo.timbre.filterEffect.push(blk);
+            logo.timbre.filterParams.push(args[0]);
+            logo.timbre.filterParams.push(args[1]);
+        }
+
+        return [args[2], 1];
+    }
+}
+
+
 
     /**
      * Represents a SetVoice block.
@@ -1125,28 +1304,36 @@ function setupToneBlocks(activity) {
             return activity.blocks.blockList[blk].value;
         }
     }
-
+    
     new OscillatorBlock().setup(activity);
-    new FillerTypeBlock().setup(activity);
-    new OscillatorTypeBlock().setup(activity);
-    new DuoSynthBlock().setup(activity);
-    new AMSynth().setup(activity);
-    new FMSynth().setup(activity);
-    new PartialBlock().setup(activity);
-    new HarmonicBlock().setup(activity);
-    new Harmonic2Block().setup(activity);
-    new DisBlock().setup(activity);
-    new TremoloBlock().setup(activity);
-    new PhaserBlock().setup(activity);
-    new ChorusBlock().setup(activity);
-    new VibratoBlock().setup(activity);
-    new AudioFileBlock().setup(activity);
-    new CustomSampleBlock().setup(activity);
-    new SetDefaultVoiceBlock().setup(activity);
-    new SetVoiceBlock().setup(activity);
-    new SynthNameBlock().setup(activity);
-    new VoiceNameBlock().setup(activity);
-    new SetTimbreBlock().setup(activity);
+new FillerTypeBlock().setup(activity);
+new OscillatorTypeBlock().setup(activity);
+new DuoSynthBlock().setup(activity);
+new AMSynth().setup(activity);
+new FMSynth().setup(activity);
+new PartialBlock().setup(activity);
+new HarmonicBlock().setup(activity);
+new Harmonic2Block().setup(activity);
+
+// AUDIO EFFECT BLOCKS (GROUPED)
+new DisBlock().setup(activity);
+new TremoloBlock().setup(activity);
+new PhaserBlock().setup(activity);
+new ChorusBlock().setup(activity);
+new VibratoBlock().setup(activity);
+new DelayBlock().setup(activity);
+new ReverbBlock().setup(activity);
+new FilterBlock().setup(activity);
+
+//  VOICE / SAMPLE BLOCKS
+new AudioFileBlock().setup(activity);
+new CustomSampleBlock().setup(activity);
+new SetDefaultVoiceBlock().setup(activity);
+new SetVoiceBlock().setup(activity);
+new SynthNameBlock().setup(activity);
+new VoiceNameBlock().setup(activity);
+new SetTimbreBlock().setup(activity);
+
 }
 
 
