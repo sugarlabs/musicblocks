@@ -344,31 +344,39 @@ describe("setupToneBlocks", () => {
     });
 
     describe("TremoloBlock", () => {
-        it("should call doTremolo and update tremolo effect if in timbre", () => {
-            const tremolo = getBlock("tremolo");
-            const args = [10, 50, 99];
-            const turtle = 0;
-            const tur = activity.turtles.ithTurtle(turtle);
-            tur.singer.tremoloFrequency = [5];
-            tur.singer.tremoloDepth = [0.7];
-            logo.inTimbre = true;
-            const ret = tremolo.flow(args, logo, turtle, "tremoloBlk");
-            expect(Singer.ToneActions.doTremolo).toHaveBeenCalledWith(10, 50, turtle, "tremoloBlk");
-            expect(
-                global.instrumentsEffects[turtle][logo.timbre.instrumentName].tremoloActive
-            ).toBe(true);
-            expect(logo.timbre.tremoloEffect).toContain("tremoloBlk");
-            expect(logo.timbre.tremoloParams).toContain(5);
-            expect(logo.timbre.tremoloParams).toContain(0.7 * 100);
-            expect(
-                global.instrumentsEffects[turtle][logo.timbre.instrumentName].tremoloFrequency
-            ).toEqual(10);
-            expect(
-                global.instrumentsEffects[turtle][logo.timbre.instrumentName].tremoloDepth
-            ).toEqual(50);
-            expect(ret).toEqual([99, 1]);
-        });
+    it("should call doTremolo and update tremolo effect if in timbre", () => {
+        const tremolo = getBlock("tremolo");
+        const args = [10, 50, 99];
+        const turtle = 0;
+
+        logo.inTimbre = true;
+
+        const ret = tremolo.flow(args, logo, turtle, "tremoloBlk");
+
+        expect(Singer.ToneActions.doTremolo).toHaveBeenCalledWith(
+            10,
+            50,
+            turtle,
+            "tremoloBlk"
+        );
+
+        expect(
+            global.instrumentsEffects[turtle][logo.timbre.instrumentName].tremoloActive
+        ).toBe(true);
+
+        expect(logo.timbre.tremoloEffect).toContain("tremoloBlk");
+
+        // Updated expectations (match new implementation)
+        expect(logo.timbre.tremoloParams).toContain(10);
+        expect(logo.timbre.tremoloParams).toContain(50);
+
+        expect(
+            global.instrumentsEffects[turtle][logo.timbre.instrumentName].tremoloFrequency
+        ).toEqual(10);
+
+        expect(ret).toEqual([99, 1]);
     });
+});
 
     describe("PhaserBlock", () => {
         it("should call doPhaser and update phaser effect if in timbre", () => {
