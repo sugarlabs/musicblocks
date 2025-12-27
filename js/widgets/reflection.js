@@ -76,7 +76,7 @@ class ReflectionMatrix {
         this.isOpen = true;
         this.isMaximized = false;
         this.activity.isInputON = true;
-        this.PORT = "http://3.105.177.138:8000"; // http://127.0.0.1:8000 
+        this.PORT = "http://3.105.177.138:8000"; // http://127.0.0.1:8000
 
         const widgetWindow = window.widgetWindows.windowFor(this, "reflection", "reflection");
         this.widgetWindow = widgetWindow;
@@ -98,8 +98,18 @@ class ReflectionMatrix {
         this.chatInterface.className = "chatInterface";
         widgetWindow.getWidgetBody().append(this.chatInterface);
 
-        widgetWindow.addButton("notes_icon.svg", ReflectionMatrix.ICONSIZE, _("Summary")).onclick =
-            () => this.getAnalysis();
+        this.summaryButton = widgetWindow.addButton(
+            "notes_icon.svg",
+            ReflectionMatrix.ICONSIZE,
+            _("Summary")
+        );
+
+        this.summaryButton.onclick = () => this.getAnalysis();
+
+        if (this.chatHistory.length < 10) {
+            this.summaryButton.style.background = "gray";
+        }
+
         widgetWindow.addButton(
             "save-button-dark.svg",
             ReflectionMatrix.ICONSIZE,
@@ -157,7 +167,7 @@ class ReflectionMatrix {
         this.input.style.marginLeft = "10px";
         this.inputContainer.appendChild(this.input);
 
-        this.input.onkeydown = (e) => {
+        this.input.onkeydown = e => {
             if (e.key === "Enter") {
                 this.sendMessage();
             }
@@ -430,6 +440,7 @@ class ReflectionMatrix {
         let reply;
         // check if message is from user or bot
         if (user_query === true) {
+            if (this.typingDiv) return;
             reply = await this.generateBotReply(
                 message,
                 this.chatHistory,
@@ -450,6 +461,10 @@ class ReflectionMatrix {
             role: this.AImentor,
             content: reply.response
         });
+
+        if (this.chatHistory.length > 10) {
+            this.summaryButton.style.removeProperty("background");
+        }
 
         const messageContainer = document.createElement("div");
         messageContainer.className = "message-container";
@@ -520,7 +535,7 @@ class ReflectionMatrix {
     renderChatHistory() {
         this.chatLog.innerHTML = "";
 
-        this.chatHistory.forEach((msg) => {
+        this.chatHistory.forEach(msg => {
             const messageContainer = document.createElement("div");
             messageContainer.className = "message-container";
 
@@ -581,8 +596,7 @@ class ReflectionMatrix {
         }
         const transcript = conversationData
             .map(
-                (item) =>
-                    `${this.mentorsMap[item.role] || item.role.toUpperCase()}: ${item.content}`
+                item => `${this.mentorsMap[item.role] || item.role.toUpperCase()}: ${item.content}`
             )
             .join("\n\n");
 
