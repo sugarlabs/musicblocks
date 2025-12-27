@@ -566,7 +566,8 @@ class TremoloBlock extends FlowClampBlock {
 
             //  FIX: Store the input argument directly (not from singer state)
             instrumentsEffects[turtle][logo.timbre.instrumentName].tremoloFrequency = args[0];
-        }
+instrumentsEffects[turtle][logo.timbre.instrumentName].tremoloDepth = args[1];
+
 
         return [args[2], 1];
     }
