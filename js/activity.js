@@ -5423,7 +5423,7 @@ class Activity {
          */
         this.hidePrintText = () => {
             if (this.printText) {
-                this.printText.style.display = "none";
+                this.printText.classList.remove("show");
             }
         };
 
