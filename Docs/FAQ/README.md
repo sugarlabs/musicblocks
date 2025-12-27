@@ -36,6 +36,11 @@ I do not believe this software can replace conventional music notation. I do not
 
 ## <a name="CODE"></a>3. Coding Questions
 
+If you are submitting coding solutions, patches, or improvements, please make sure to follow our contribution guidelines.  
+Detailed instructions on how to contribute, code style, and submitting pull requests can be found in the [CONTRIBUTING.md](CONTRIBUTING.md) file.  
+
+Following these guidelines helps us maintain a clean, consistent, and high-quality codebase.
+
 ## <a name="EDUCATION"></a>4. Education Questions
 
 ### What kind of practical educational activities would you use to complement the project?
