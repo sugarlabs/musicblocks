@@ -383,9 +383,6 @@ class WidgetWindow {
      * @returns {void}
      */
     close() {
-        document.removeEventListener("mouseup", this._dragTopHandler, true);
-        document.removeEventListener("mousemove", this._docMouseMoveHandler, true);
-        document.removeEventListener("mousedown", this._docMouseDownHandler, true);
         this.onclose();
     }
 
@@ -538,6 +535,10 @@ class WidgetWindow {
      * @returns {void}
      */
     destroy() {
+        document.removeEventListener("mouseup", this._dragTopHandler, true);
+        document.removeEventListener("mousemove", this._docMouseMoveHandler, true);
+        document.removeEventListener("mousedown", this._docMouseDownHandler, true);
+
         if (this._frame && this._frame.parentElement) {
             this._frame.parentElement.removeChild(this._frame);
         }
