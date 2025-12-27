@@ -1,7 +1,7 @@
 /**
  * @license
  * MusicBlocks v3.4.1
- * Copyright (C) 2025 Justin Charles
+ * Copyright (C) 2025 Shreya Saxena
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
