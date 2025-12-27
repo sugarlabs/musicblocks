@@ -87,15 +87,25 @@ global.last = (arr) => (arr && arr.length ? arr[arr.length - 1] : undefined);
 
 global.Singer = {
     ToneActions: {
+        // Synths
         defDuoSynth: jest.fn(),
         defAMSynth: jest.fn(),
         defFMSynth: jest.fn(),
+
+        // Harmonics / pitch
         doHarmonic: jest.fn(),
+        doVibrato: jest.fn(),
+
+        // Audio effects (ALL of them)
         doDistortion: jest.fn(),
         doTremolo: jest.fn(),
         doPhaser: jest.fn(),
         doChorus: jest.fn(),
-        doVibrato: jest.fn(),
+        doDelay: jest.fn(),
+        doReverb: jest.fn(),
+        doFilter: jest.fn(),
+
+        // Timbre
         setTimbre: jest.fn()
     }
 };
