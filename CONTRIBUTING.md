@@ -1,9 +1,13 @@
 ## <a name="CONTRIBUTING"></a>Contributing
 
-We welcome contributions of all kinds — whether it’s code, documentation, music, lesson plans, artwork, or ideas.
-Music Blocks is a community-driven project, and every meaningful contribution helps improve the platform for learners and educators around the world.
+We welcome contributions of all kinds — whether it’s code,
+documentation, music, lesson plans, artwork, or ideas.  Music Blocks
+is a community-driven project, and every meaningful contribution helps
+improve the platform for learners and educators around the world.
 
-If you’re new to the project, start by setting up the local development environment using the guide linked above, then explore open issues or discussions to find a place to contribute.
+If you’re new to the project, start by setting up the local
+development environment using the guide linked above, then explore
+open issues or discussions to find a place to contribute.
 
 - [How to set up a local server](README.md#how-to-set-up-a-local-server)
 
@@ -22,9 +26,10 @@ tightly coupled with the interface and native client API (Web API).
 
 Keeping these problems in mind, we have considered a foundational
 rebuild that will address all these issues, whilst adding buffers for
-future additions. Additionally, we will make use of a more elegant tech-stack to
-develop and maintain this project given its scale. After the core is
-built, we'll be porting features from this application to it.
+future additions. Additionally, we will make use of a more elegant
+tech-stack to develop and maintain this project given its scale. After
+the core is built, we'll be porting features from this application to
+it.
 
 Refer to the repository
 [**sugarlabs/musicblocks-v4**](https://github.com/sugarlabs/musicblocks-v4)

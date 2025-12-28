@@ -94,13 +94,15 @@ CLI_), on your local machine.
 2. In a terminal, `cd` to the directory where you downloaded/cloned
 Music Blocks, using `cd path/to/musicblocks/`.
 
-3. After you are in `path/to/musicblocks/` directory, install the dependencies using the following command
+3. After you are in `path/to/musicblocks/` directory, install the
+dependencies using the following command
 
     ```bash
     npm install
     ```
 
-4. After cloning the musicblocks repository, you can start a local server using npm
+4. After cloning the musicblocks repository, you can start a local
+server using npm
 
     ```bash
     npm run dev
@@ -114,8 +116,6 @@ listening on port 3000.
 
 **NOTE:** _Use `ctrl + c` or `cmd + c` to quit the HTTP Server to avoid
 `socket.error:[Errno 48]`_.
-
-
 
 ## Local Setup with Docker
 
@@ -150,22 +150,30 @@ Before you begin, ensure you have Docker installed on your machine. You can down
    docker run -p 3000:3000 musicblocks
    ```
 
-   This command will start a Docker container running Music Blocks and expose it on port 3000.
+   This command will start a Docker container running Music Blocks and
+   expose it on port 3000.
 
-2. Access Music Blocks in your web browser by navigating to `http://localhost:3000`.
+2. Access Music Blocks in your web browser by navigating to
+`http://localhost:3000`.
 
 ## Stopping the Docker container
 
-To stop the Docker container, use `Ctrl + C` in your terminal. This will stop the container and free up the port it was using.
+To stop the Docker container, use `Ctrl + C` in your terminal. This
+will stop the container and free up the port it was using.
 
 ## Additional Notes
 
-- Make sure to replace `musicblocks` with the appropriate image name if you have tagged the Docker image differently.
-- You can customize the port mapping (`-p`) if you prefer to use a different port for accessing Music Blocks.
+- Make sure to replace `musicblocks` with the appropriate image name
+  if you have tagged the Docker image differently.
+- You can customize the port mapping (`-p`) if you prefer to use a
+  different port for accessing Music Blocks.
 
 ---
 
-This documentation provides a basic setup for running Music Blocks locally using Docker. Feel free to customize it further based on your specific requirements and environment.
+This documentation provides a basic setup for running Music Blocks
+locally using Docker. Feel free to customize it further based on your
+specific requirements and environment.
+
 ## <a name="USING_MUSIC_BLOCKS"></a>Using Music Blocks
 
 Once Music Blocks is running, you'll want suggestions on how to use
@@ -185,9 +193,13 @@ Conduct](https://github.com/sugarlabs/sugar-docs/blob/master/src/CODE_OF_CONDUCT
 
 ## <a name="CONTRIBUTING"></a>Contributing
 
-[Contributing.md](CONTRIBUTING.md) provides a general overview of Sugar Lab's guidelines.  
-It contains best practices for writing code, submitting pull requests, and following coding standards.  
-Please refer to this guide before making contributions to ensure consistency and maintain the quality of the project.  
+[Contributing.md](CONTRIBUTING.md) provides a general overview of
+Sugar Lab's guidelines.
+
+It contains best practices for writing code, submitting pull requests,
+and following coding standards.  Please refer to this guide before
+making contributions to ensure consistency and maintain the quality of
+the project.
 
 ## <a name="MODIFYING_MUSIC_BLOCKS"></a>Modifying Music Blocks
 
