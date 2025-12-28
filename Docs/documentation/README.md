@@ -43,8 +43,9 @@ You can run it from
     2. [A Quick Tour of Selected Blocks](#2-a-quick-tour-of-selected-blocks)
 6. [Flow Palette](#6-flow-palette)
 7. [Widget Palette](#7-widget-palette)
-8. [Stats](#8-stats)
-9. [Planet View](#9-planet-view)
+8. [Program Palette](#8-program-palette)
+9. [Stats](#9-stats)
+10. [Planet View](#10-planet-view)
 
 ## <a>1. Getting Started</a>
 
@@ -674,7 +675,82 @@ If you want to read more about the LEGO Bricks widget, including detailed usage 
 More details about all of the widgets are available in the
 [Music Blocks Programming Guide](http://github.com/sugarlabs/musicblocks/tree/master/guide/README.md).
 
-## 8. Stats
+## 8. Program Palette
+
+[Back to Table of Contents](#table-of-contents)
+
+The *Program* palette contains blocks that allow you to manipulate the program itself, manage data (heaps and dictionaries), and interact with the project environment. These blocks are powerful tools for meta-programming and managing the state of your Music Blocks project.
+
+### 1. Block Manipulation
+
+These blocks allow you to dynamically create, modify, and run blocks within your program.
+
+*   **Run Block**
+    The *Run block* block executes a specific block. It accepts either a block number or a block name as an argument.
+    *   If a **block name** is provided, it searches for a block with that label and runs it.
+    *   If a **block number** is provided, it runs the block with that specific ID.
+    *   *Example*: You can use this to trigger a specific stack of code programmatically.
+
+*   **Move Block**
+    The *Move block* block moves a block to a specific position on the screen.
+    *   **Arguments**:
+        1.  Block number
+        2.  X-coordinate
+        3.  Y-coordinate
+    *   *Example*: `Move block (10, 100, 200)` moves block #10 to position (100, 200).
+
+*   **Delete Block**
+    The *Delete block* block removes a block from the workspace.
+    *   **Argument**: Block number.
+    *   *Example*: `Delete block (5)` removes block #5.
+
+*   **Connect Blocks**
+    The *Connect blocks* block (internally known as DockBlock) connects one block to another.
+    *   **Arguments**:
+        1.  Target block number
+        2.  Connection number (which dock on the target block to connect to)
+        3.  Block number to connect (the block being attached)
+    *   *Example*: This allows you to assemble code structures dynamically.
+
+*   **Make Block**
+    The *Make block* block creates a new block of a specified type.
+    *   **Argument**: Name of the block to create (e.g., "note", "start", "rhythm").
+    *   **Returns**: The block number of the newly created block.
+    *   *Example*: `Make block ("note")` creates a new note block and returns its ID, which you can then use with *Move block* or *Connect blocks*.
+
+### 2. Data Management (Heaps and Dictionaries)
+
+These blocks are used for saving and loading data structures like heaps and dictionaries. This is useful for saving the state of your program or loading configuration data.
+
+*   **Heap Operations**:
+    *   **Save Heap**: Saves the current heap (variable storage) to a file (JSON format).
+    *   **Load Heap**: Loads a heap from a file.
+    *   **Set Heap**: Sets the heap content directly from a JSON string.
+    *   **Save Heap to App**: Saves the heap to a web service (requires a URL).
+    *   **Load Heap from App**: Loads the heap from a web service (requires a URL).
+
+*   **Dictionary Operations**:
+    *   **Save Dictionary**: Saves a dictionary to a file.
+    *   **Load Dictionary**: Loads a dictionary from a file.
+    *   **Set Dictionary**: Sets a dictionary directly from a JSON string.
+
+### 3. Project and UI
+
+*   **Open Project**
+    The *Open project* block opens a new Music Blocks project from a URL.
+    *   **Argument**: URL of the project.
+    *   *Example*: Useful for linking multiple projects together.
+
+*   **Save Project**
+    The *Save project* block saves the current project state, typically prompting the user for a filename or location.
+    *   *Example*: Used to save your work.
+
+*   **Open Palette**
+    The *Open palette* block opens a specific palette in the UI.
+    *   **Argument**: Name of the palette (e.g., "rhythm", "pitch", "program").
+    *   *Example*: You can guide the user to the correct palette during a tutorial.
+
+## 9. Stats
 
 
 [Back to Table of Contents](#table-of-contents)
@@ -685,7 +761,7 @@ toolbar in advanced mode.
 ![Stats](./stats.svg "Stats Details")
 
 
-## 9. Planet View
+## 10. Planet View
 
 
 [Back to Table of Contents](#table-of-contents)

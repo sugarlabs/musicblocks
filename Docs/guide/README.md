@@ -1628,76 +1628,11 @@ The *Set mouse* block sends a stack of blocks to be run by the specified mouse.
 
 ### <a name="PROGRAM-BLOCKS">3.9 Program Blocks</a>
 
-The *Program* palette contains blocks that allow you to manipulate the program itself, manage data (heaps and dictionaries), and interact with the project environment. These blocks are powerful tools for meta-programming and managing the state of your Music Blocks project.
+The *Program* palette contains blocks that allow you to manipulate the program itself, manage data (heaps and dictionaries), and interact with the project environment.
 
-#### <a name="BLOCK-MANIPULATION">3.9.1 Block Manipulation</a>
+For a detailed reference of these blocks, please see the [Program Palette](../documentation/README.md#8-program-palette) section in the documentation.
 
-These blocks allow you to dynamically create, modify, and run blocks within your program.
-
-*   **Run Block**
-    The *Run block* block executes a specific block. It accepts either a block number or a block name as an argument.
-    *   If a **block name** is provided, it searches for a block with that label and runs it.
-    *   If a **block number** is provided, it runs the block with that specific ID.
-    *   *Example*: You can use this to trigger a specific stack of code programmatically.
-
-*   **Move Block**
-    The *Move block* block moves a block to a specific position on the screen.
-    *   **Arguments**:
-        1.  Block number
-        2.  X-coordinate
-        3.  Y-coordinate
-    *   *Example*: `Move block (10, 100, 200)` moves block #10 to position (100, 200).
-
-*   **Delete Block**
-    The *Delete block* block removes a block from the workspace.
-    *   **Argument**: Block number.
-    *   *Example*: `Delete block (5)` removes block #5.
-
-*   **Connect Blocks**
-    The *Connect blocks* block (internally known as DockBlock) connects one block to another.
-    *   **Arguments**:
-        1.  Target block number
-        2.  Connection number (which dock on the target block to connect to)
-        3.  Block number to connect (the block being attached)
-    *   *Example*: This allows you to assemble code structures dynamically.
-
-*   **Make Block**
-    The *Make block* block creates a new block of a specified type.
-    *   **Argument**: Name of the block to create (e.g., "note", "start", "rhythm").
-    *   **Returns**: The block number of the newly created block.
-    *   *Example*: `Make block ("note")` creates a new note block and returns its ID, which you can then use with *Move block* or *Connect blocks*.
-
-#### <a name="DATA-MANAGEMENT">3.9.2 Data Management (Heaps and Dictionaries)</a>
-
-These blocks are used for saving and loading data structures like heaps and dictionaries. This is useful for saving the state of your program or loading configuration data.
-
-*   **Heap Operations**:
-    *   **Save Heap**: Saves the current heap (variable storage) to a file (JSON format).
-    *   **Load Heap**: Loads a heap from a file.
-    *   **Set Heap**: Sets the heap content directly from a JSON string.
-    *   **Save Heap to App**: Saves the heap to a web service (requires a URL).
-    *   **Load Heap from App**: Loads the heap from a web service (requires a URL).
-
-*   **Dictionary Operations**:
-    *   **Save Dictionary**: Saves a dictionary to a file.
-    *   **Load Dictionary**: Loads a dictionary from a file.
-    *   **Set Dictionary**: Sets a dictionary directly from a JSON string.
-
-#### <a name="PROJECT-AND-UI">3.9.3 Project and UI</a>
-
-*   **Open Project**
-    The *Open project* block opens a new Music Blocks project from a URL.
-    *   **Argument**: URL of the project.
-    *   *Example*: Useful for linking multiple projects together.
-
-*   **Save Project**
-    The *Save project* block saves the current project state, typically prompting the user for a filename or location.
-    *   *Example*: Used to save your work.
-
-*   **Open Palette**
-    The *Open palette* block opens a specific palette in the UI.
-    *   **Argument**: Name of the palette (e.g., "rhythm", "pitch", "program").
-    *   *Example*: You can guide the user to the correct palette during a tutorial.
+These blocks are particularly useful for creating meta-programming projects, such as the [Musical Paint](#musical-paint) example, where the *Make Block* is used to generate code from a drawing.
 
 ## <a name="WIDGETS">4. Widgets</a>
 
