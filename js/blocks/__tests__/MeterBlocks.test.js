@@ -1,8 +1,11 @@
 /**
- * @license
- * MusicBlocks v3.4.1
- * Copyright (C) 2025 Jetshree
+ * MusicBlocks v3.6.2
  *
+ * @author Jetshree
+ *
+ * @copyright 2025 Jetshree
+ *
+ * @license
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -98,10 +101,10 @@ describe("MeterBlocks setup", () => {
             }
         }
 
-        global.ValueBlock = class extends BaseBlock {};
-        global.LeftBlock = class extends BaseBlock {};
-        global.FlowBlock = class extends BaseBlock {};
-        global.FlowClampBlock = class extends global.FlowBlock {};
+        global.ValueBlock = class extends BaseBlock { };
+        global.LeftBlock = class extends BaseBlock { };
+        global.FlowBlock = class extends BaseBlock { };
+        global.FlowClampBlock = class extends global.FlowBlock { };
 
         Singer = {
             MeterActions: {
