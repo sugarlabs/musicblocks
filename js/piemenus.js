@@ -60,7 +60,7 @@
    piemenuNoteValue, piemenuAccidentals, piemenuKey, piemenuChords
 */
 
-const setWheelSize = (i) => {
+const setWheelSize = i => {
     const wheelDiv = document.getElementById("wheelDiv");
     const screenWidth = window.innerWidth;
 
@@ -71,11 +71,11 @@ const setWheelSize = (i) => {
         wheelDiv.style.width = i + "px";
         wheelDiv.style.height = i + "px";
     } else if (screenWidth >= 768) {
-        wheelDiv.style.width = (i - 50) + "px";
-        wheelDiv.style.height = (i - 50) + "px";
+        wheelDiv.style.width = i - 50 + "px";
+        wheelDiv.style.height = i - 50 + "px";
     } else {
-        wheelDiv.style.width = (i - 100) + "px";
-        wheelDiv.style.height = (i - 100) + "px";
+        wheelDiv.style.width = i - 100 + "px";
+        wheelDiv.style.height = i - 100 + "px";
     }
 
     wheelDiv.style.height = wheelDiv.style.width;
@@ -85,17 +85,8 @@ const setWheelSize = (i) => {
 setWheelSize();
 window.addEventListener("resize", setWheelSize);
 
-const piemenuPitches = (
-    block,
-    noteLabels,
-    noteValues,
-    accidentals,
-    note,
-    accidental,
-    custom
-) => {
+const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accidental, custom) => {
     let prevPitch = null;
-    let prevAccidental = block.prevAccidental || null; // to remember the previous accidental value
     // wheelNav pie menu for pitch selection
     if (block.blocks.stageClick) {
         return;
@@ -251,7 +242,8 @@ const piemenuPitches = (
             Math.max(
                 0,
                 Math.round(
-                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
+                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
+                        canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -261,7 +253,8 @@ const piemenuPitches = (
             Math.max(
                 0,
                 Math.round(
-                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
+                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
+                        canvasTop
                 ) - 200
             )
         ) + "px";
@@ -317,40 +310,46 @@ const piemenuPitches = (
 
     // Auto-selection of sharps and flats in fixed solfege handles the
     // case of opening the pie-menu, not whilst in the pie-menu.
+    // Skip auto-selection if user already has a non-natural accidental (Issue #4886).
+    const pitchHasAccidental = accidental !== "" && accidental !== NATURAL;
     if (
-        (!block.activity.KeySignatureEnv[2] && block.name === "solfege") ||
-        (block.name === "notename" &&
-            (block.connections[0] != undefined
-                ? !["setkey", "setkey2"].includes(
-                    block.blocks.blockList[block.connections[0]].name
-                )
-                : true))
+        !pitchHasAccidental &&
+        ((!block.activity.KeySignatureEnv[2] && block.name === "solfege") ||
+            (block.name === "notename" &&
+                (block.connections[0] != undefined
+                    ? !["setkey", "setkey2"].includes(
+                          block.blocks.blockList[block.connections[0]].name
+                      )
+                    : true)))
     ) {
         if (scale[6 - i][0] === FIXEDSOLFEGE[note] || scale[6 - i][0] === note) {
             accidental = scale[6 - i].substr(1);
         } else {
             accidental = EQUIVALENTACCIDENTALS[scale[6 - i]].substr(1);
         }
-        block.value = block.value.replace(SHARP, "").replace(FLAT, "").replace(DOUBLESHARP, "").replace(DOUBLEFLAT, "");
+        block.value = block.value
+            .replace(SHARP, "")
+            .replace(FLAT, "")
+            .replace(DOUBLESHARP, "")
+            .replace(DOUBLEFLAT, "");
         block.value += accidental;
         block.text.text = block.value;
     }
 
     if (!custom) {
-        // Navigate to a the current accidental value.
-        let accidentalIndex = 2; // Default to "natural" if none is set.
-        if (prevAccidental !== null) {
-            accidentalIndex = accidentals.indexOf(prevAccidental);
-        } else if (accidental === DOUBLEFLAT) {
-            accidentalIndex = 4;
-        } else if (accidental === FLAT) {
-            accidentalIndex = 3;
-        } else if (accidental === NATURAL) {
-            accidentalIndex = 2;
+        // Navigate to the current accidental value.
+        // Use the accidental parameter directly - it's already correctly parsed from block value.
+        let accidentalIndex = 2; // Default to "natural"
+        if (accidental === DOUBLESHARP) {
+            accidentalIndex = 0;
         } else if (accidental === SHARP) {
             accidentalIndex = 1;
-        } else if (accidental === DOUBLESHARP) {
-            accidentalIndex = 0;
+        } else if (accidental === NATURAL || accidental === "") {
+            accidentalIndex = 2;
+        } else if (accidental === FLAT) {
+            accidentalIndex = 3;
+        } else if (accidental === DOUBLEFLAT) {
+            accidentalIndex = 4;
         }
         block._accidentalsWheel.navigateWheel(accidentalIndex);
     }
@@ -389,10 +388,10 @@ const piemenuPitches = (
 
             // Ensure synth is initialized before proceeding
             if (!that.activity.logo.synth) {
-                console.debug('Creating synth in logo');
+                console.debug("Creating synth in logo");
                 that.activity.logo.synth = new Synth();
             }
-            
+
             // Always ensure tone is initialized
             if (!that.activity.logo.synth.tone) {
                 that.activity.logo.synth.newTone();
@@ -428,7 +427,8 @@ const piemenuPitches = (
             let note = noteValues[i];
             if (!custom) {
                 attr =
-                    that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title;
+                    that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex]
+                        .title;
                 if (label === " ") {
                     return;
                 } else if (attr !== "♮") {
@@ -452,7 +452,7 @@ const piemenuPitches = (
             } else if (octave > 8) {
                 octave = 8;
             }
-            
+
             // Store the final octave back in selection
             selection["octave"] = octave;
 
@@ -501,7 +501,7 @@ const piemenuPitches = (
                     that.activity.logo.synth.createDefaultSynth(0);
                     await that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
                 } catch (e) {
-                    console.debug('Error initializing synth:', e);
+                    console.debug("Error initializing synth:", e);
                     return;
                 }
             }
@@ -516,7 +516,7 @@ const piemenuPitches = (
                 that.activity.logo.synth.setMasterVolume(PREVIEWVOLUME);
                 that.activity.logo.synth.setVolume(0, DEFAULTVOICE, PREVIEWVOLUME);
             } catch (e) {
-                console.debug('Error setting volume:', e);
+                console.debug("Error setting volume:", e);
                 return;
             }
 
@@ -524,9 +524,17 @@ const piemenuPitches = (
             if (!that._triggerLock) {
                 that._triggerLock = true;
                 try {
-                    await that.activity.logo.synth.trigger(0, [obj[0] + obj[1]], 1/8, DEFAULTVOICE, null, null, false);
+                    await that.activity.logo.synth.trigger(
+                        0,
+                        [obj[0] + obj[1]],
+                        1 / 8,
+                        DEFAULTVOICE,
+                        null,
+                        null,
+                        false
+                    );
                 } catch (e) {
-                    console.debug('Error triggering note:', e);
+                    console.debug("Error triggering note:", e);
                 } finally {
                     // Ensure trigger lock is released after a delay
                     setTimeout(() => {
@@ -535,7 +543,7 @@ const piemenuPitches = (
                 }
             }
         } catch (e) {
-            console.error('Error in pitch preview:', e);
+            console.error("Error in pitch preview:", e);
         }
     };
 
@@ -554,8 +562,8 @@ const piemenuPitches = (
             (that.name === "notename" &&
                 (that.connections[0] != undefined
                     ? !["setkey", "setkey2"].includes(
-                        that.blocks.blockList[that.connections[0]].name
-                    )
+                          that.blocks.blockList[that.connections[0]].name
+                      )
                     : true))
         ) {
             let i = scale.indexOf(selection["note"]);
@@ -632,7 +640,7 @@ const piemenuPitches = (
             that._octavesWheel.navItems[that._octavesWheel.selectedNavItemIndex].title
         );
         that.blocks.setPitchOctave(that.connections[0], octave);
-        
+
         // Update the state before preview
         selection["octave"] = octave;
     };
@@ -649,10 +657,7 @@ const piemenuPitches = (
             that.value = selection["note"] + selection["attr"];
             that.text.text = that.value;
         }
-        // Store the selected accidental in the block for later use.
-        prevAccidental = selection["attr"];
-        block.prevAccidental = prevAccidental;
-       
+
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         that.updateCache();
 
@@ -668,9 +673,9 @@ const piemenuPitches = (
     const setupAudioContext = async () => {
         try {
             await Tone.start();
-            console.debug('Audio context started');
+            console.debug("Audio context started");
         } catch (e) {
-            console.debug('Error starting audio context:', e);
+            console.debug("Error starting audio context:", e);
         }
     };
 
@@ -714,28 +719,28 @@ const piemenuPitches = (
     // Hide the widget when the exit button is clicked.
     block._exitWheel.navItems[0].navigateFunction = () => {
         that._piemenuExitTime = new Date().getTime();
-        const selectedNote =
-        that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
+        const selectedNote = that._pitchWheel.navItems[that._pitchWheel.selectedNavItemIndex].title;
         const selectedAccidental =
-        !custom && that._accidentalsWheel
-            ? that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title
-            : "";
+            !custom && that._accidentalsWheel
+                ? that._accidentalsWheel.navItems[that._accidentalsWheel.selectedNavItemIndex].title
+                : "";
 
         // Update the block's displayed text with the note and accidental
         if (selectedAccidental === "♮" || selectedAccidental === "") {
             // Natural or no accidental: display only the note
             that.text.text = selectedNote;
+            that.value = selectedNote;
         } else {
             // Combine note and accidental for display
             that.text.text = selectedNote + selectedAccidental;
+            that.value = selectedNote + selectedAccidental;
         }
-        // Update the block value and refresh the cache
-        that.value = selectedNote + (selectedAccidental === "♮" ? "" : selectedAccidental);
+
         // Ensure proper layering of the text element
         that.container.setChildIndex(that.text, that.container.children.length - 1);
         // Refresh the block's cache
         that.updateCache();
-        // Hide the pie menu and remove the wheels 
+        // Hide the pie menu and remove the wheels
         docById("wheelDiv").style.display = "none";
         that._pitchWheel.removeWheel();
         if (!custom) {
@@ -748,13 +753,7 @@ const piemenuPitches = (
     };
 };
 
-const piemenuCustomNotes = (
-    block,
-    noteLabels,
-    customLabels,
-    selectedCustom,
-    selectedNote
-) => {
+const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, selectedNote) => {
     // pie menu for customNote selection
     if (block.blocks.stageClick) {
         return;
@@ -855,7 +854,7 @@ const piemenuCustomNotes = (
         labelsDict[t] = [];
         for (const k in noteLabels[t]) {
             if (k !== "pitchNumber" && k !== "interval") {
-                if (typeof(noteLabels[t][k]) === "number") {
+                if (typeof noteLabels[t][k] === "number") {
                     // labels.push(k);
                     labelsDict[t].push(k);
                     blockCustom++;
@@ -925,7 +924,8 @@ const piemenuCustomNotes = (
             Math.max(
                 0,
                 Math.round(
-                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
+                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
+                        canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -935,7 +935,8 @@ const piemenuCustomNotes = (
             Math.max(
                 0,
                 Math.round(
-                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
+                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
+                        canvasTop
                 ) - 200
             )
         ) + "px";
@@ -949,7 +950,7 @@ const piemenuCustomNotes = (
     }
 
     // Add function to each main menu for show/hide sub menus
-    const __setupAction = (i) => {
+    const __setupAction = i => {
         that._customWheel.navItems[i].navigateFunction = () => {
             that.customID =
                 that._customWheel.navItems[that._customWheel.selectedNavItemIndex].title;
@@ -1043,9 +1044,7 @@ const piemenuCustomNotes = (
         const obj = getNote(note, octave, 0, "C major", false, null, that.activity.errorMsg, label);
         const tur = that.activity.turtles.ithTurtle(0);
 
-        if (
-            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
-        ) {
+        if (!tur.singer.instrumentNames.includes(DEFAULTVOICE)) {
             that.activity.logo.synth.createDefaultSynth(0);
             that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
@@ -1166,8 +1165,7 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
 
     // enable changing values while pie-menu is open
     const labelElem = docById("labelDiv");
-    labelElem.innerHTML =
-        `<input id="numberLabel" style="position: absolute; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;" class="number" type="number" value="${note}" />`;
+    labelElem.innerHTML = `<input id="numberLabel" style="position: absolute; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;" class="number" type="number" value="${note}" />`;
     labelElem.classList.add("hasKeyboard");
 
     block.label = docById("numberLabel");
@@ -1294,9 +1292,7 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
 
         const tur = that.activity.turtles.ithTurtle(0);
 
-        if (
-            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
-        ) {
+        if (!tur.singer.instrumentNames.includes(DEFAULTVOICE)) {
             that.activity.logo.synth.createDefaultSynth(0);
             that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
@@ -1436,7 +1432,8 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
             Math.max(
                 0,
                 Math.round(
-                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
+                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
+                        canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -1446,7 +1443,8 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
             Math.max(
                 0,
                 Math.round(
-                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
+                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
+                        canvasTop
                 ) - 200
             )
         ) + "px";
@@ -1604,8 +1602,7 @@ const piemenuNoteValue = (block, noteValue) => {
     };
 
     const labelElem = docById("labelDiv");
-    labelElem.innerHTML =
-        `<input id="numberLabel" style="position: absolute; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;" class="number" type="number" value="${noteValue}" />`;
+    labelElem.innerHTML = `<input id="numberLabel" style="position: absolute; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;" class="number" type="number" value="${noteValue}" />`;
     labelElem.classList.add("hasKeyboard");
     block.label = docById("numberLabel");
 
@@ -1835,8 +1832,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     };
 
     const labelElem = docById("labelDiv");
-    labelElem.innerHTML =
-        `<input id="numberLabel" style="position: absolute; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;" class="number" type="number" value="${selectedValue}" />`;
+    labelElem.innerHTML = `<input id="numberLabel" style="position: absolute; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;" class="number" type="number" value="${selectedValue}" />`;
     labelElem.classList.add("hasKeyboard");
     block.label = docById("numberLabel");
 
@@ -1940,9 +1936,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         const i = wheelLabels.indexOf(label);
         const actualPitch = numberToPitch(wheelValues[i] + 3);
         const tur = that.activity.turtles.ithTurtle(0);
-        if (
-            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
-        ) {
+        if (!tur.singer.instrumentNames.includes(DEFAULTVOICE)) {
             that.activity.logo.synth.createDefaultSynth(0);
             that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
@@ -1972,9 +1966,7 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
         const i = wheelLabels.indexOf(label);
         const actualPitch = frequencyToPitch(wheelValues[i]);
         const tur = that.activity.turtles.ithTurtle(0);
-        if (
-            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
-        ) {
+        if (!tur.singer.instrumentNames.includes(DEFAULTVOICE)) {
             that.activity.logo.synth.createDefaultSynth(0);
             that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
@@ -2115,8 +2107,7 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     };
 
     const labelElem = docById("labelDiv");
-    labelElem.innerHTML =
-        `<input id="numberLabel" style="position: absolute; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;" class="number" type="number" value="${selectedValue}" />`;
+    labelElem.innerHTML = `<input id="numberLabel" style="position: absolute; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;" class="number" type="number" value="${selectedValue}" />`;
     labelElem.classList.add("hasKeyboard");
     block.label = docById("numberLabel");
 
@@ -2206,7 +2197,7 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
     if (block.name === "outputtools" || block.name === "grid") {
         // slightly larger menu
         size = 1000;
-    }else if ( block.name === "temperamentname"){
+    } else if (block.name === "temperamentname") {
         // slightly larger wheel size for the Temperament Menu
         size = 1200;
     }
@@ -2292,7 +2283,8 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
             Math.max(
                 0,
                 Math.round(
-                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
+                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
+                        canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -2302,7 +2294,8 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
             Math.max(
                 0,
                 Math.round(
-                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
+                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
+                        canvasTop
                 ) - 200
             )
         ) + "px";
@@ -2394,7 +2387,8 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
             Math.max(
                 0,
                 Math.round(
-                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
+                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
+                        canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -2404,7 +2398,8 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
             Math.max(
                 0,
                 Math.round(
-                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
+                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
+                        canvasTop
                 ) - 200
             )
         ) + "px";
@@ -2429,7 +2424,6 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
     };
 };
 
-
 const piemenuChords = (block, selectedChord) => {
     // wheelNav pie menu for chord selection
 
@@ -2447,7 +2441,7 @@ const piemenuChords = (block, selectedChord) => {
     for (let i = 0; i < CHORDNAMES.length; i++) {
         const name = _(CHORDNAMES[i]);
         if (name.length === 0) {
-            chordLabels.push(CHORDNAMES[i]);  // In case i18n fails
+            chordLabels.push(CHORDNAMES[i]); // In case i18n fails
         } else {
             chordLabels.push(name);
         }
@@ -2455,7 +2449,7 @@ const piemenuChords = (block, selectedChord) => {
     wheelnav.cssMode = true;
 
     block._chordWheel.keynavigateEnabled = false;
-    
+
     block._chordWheel.colors = platformColor.modeWheelcolors;
     block._chordWheel.slicePathFunction = slicePath().DonutSlice;
     block._chordWheel.slicePathCustom = slicePath().DonutSliceCustomization();
@@ -2520,7 +2514,8 @@ const piemenuChords = (block, selectedChord) => {
             Math.max(
                 0,
                 Math.round(
-                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
+                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
+                        canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -2530,7 +2525,8 @@ const piemenuChords = (block, selectedChord) => {
             Math.max(
                 0,
                 Math.round(
-                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
+                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
+                        canvasTop
                 ) - 200
             )
         ) + "px";
@@ -2555,7 +2551,6 @@ const piemenuChords = (block, selectedChord) => {
         __exitMenu();
     };
 };
-
 
 const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotate) => {
     // wheelNav pie menu for voice selection
@@ -2660,9 +2655,7 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
 
         const tur = that.activity.turtles.ithTurtle(0);
 
-        if (
-            !tur.singer.instrumentNames.includes(voice)
-        ) {
+        if (!tur.singer.instrumentNames.includes(voice)) {
             tur.singer.instrumentNames.push(voice);
             if (voice === DEFAULTVOICE) {
                 that.activity.logo.synth.createDefaultSynth(0);
@@ -2697,7 +2690,8 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
             Math.max(
                 0,
                 Math.round(
-                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
+                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
+                        canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -2707,7 +2701,8 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
             Math.max(
                 0,
                 Math.round(
-                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
+                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
+                        canvasTop
                 ) - 200
             )
         ) + "px";
@@ -2831,7 +2826,8 @@ const piemenuIntervals = (block, selectedInterval) => {
             Math.max(
                 0,
                 Math.round(
-                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
+                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
+                        canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -2841,7 +2837,8 @@ const piemenuIntervals = (block, selectedInterval) => {
             Math.max(
                 0,
                 Math.round(
-                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
+                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
+                        canvasTop
                 ) - 200
             )
         ) + "px";
@@ -2918,9 +2915,7 @@ const piemenuIntervals = (block, selectedInterval) => {
 
         const tur = that.activity.turtles.ithTurtle(0);
 
-        if (
-            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
-        ) {
+        if (!tur.singer.instrumentNames.includes(DEFAULTVOICE)) {
             that.activity.logo.synth.createDefaultSynth(0);
             that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
@@ -3093,7 +3088,7 @@ const piemenuModes = (block, selectedMode) => {
     };
 
     // Build a pie menu of modes based on the current mode group.
-    const __buildModeNameWheel = (grp) => {
+    const __buildModeNameWheel = grp => {
         let newWheel = false;
         if (that._modeNameWheel === null) {
             that._modeNameWheel = new wheelnav("_modeNameWheel", that._modeWheel.raphael);
@@ -3234,9 +3229,7 @@ const piemenuModes = (block, selectedMode) => {
 
         const tur = that.activity.turtles.ithTurtle(0);
 
-        if (
-            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
-        ) {
+        if (!tur.singer.instrumentNames.includes(DEFAULTVOICE)) {
             that.activity.logo.synth.createDefaultSynth(0);
             that.activity.logo.synth.loadSynth(0, DEFAULTVOICE);
         }
@@ -3315,7 +3308,8 @@ const piemenuModes = (block, selectedMode) => {
             Math.max(
                 0,
                 Math.round(
-                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
+                    (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
+                        canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -3325,7 +3319,8 @@ const piemenuModes = (block, selectedMode) => {
             Math.max(
                 0,
                 Math.round(
-                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
+                    (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
+                        canvasTop
                 ) - 200
             )
         ) + "px";
@@ -3377,7 +3372,7 @@ const piemenuModes = (block, selectedMode) => {
 /*
  * Sets up context menu for each block
  */
-const piemenuBlockContext = (block) => {
+const piemenuBlockContext = block => {
     if (block.blocks.activeBlock === null) {
         return;
     }
@@ -3398,11 +3393,15 @@ const piemenuBlockContext = (block) => {
     const canvasTop = block.activity.canvas.offsetTop + 6 * block.activity.getStageScale();
 
     docById("contextWheelDiv").style.left =
-        Math.round((x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft) -
+        Math.round(
+            (x + block.activity.blocksContainer.x) * block.activity.getStageScale() + canvasLeft
+        ) -
         150 +
         "px";
     docById("contextWheelDiv").style.top =
-        Math.round((y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop) -
+        Math.round(
+            (y + block.activity.blocksContainer.y) * block.activity.getStageScale() + canvasTop
+        ) -
         150 +
         "px";
 
@@ -3464,7 +3463,7 @@ const piemenuBlockContext = (block) => {
 
     wheel.navItems[0].selected = false;
 
-    const stackPasting = function() {
+    const stackPasting = function () {
         that.blocks.activeBlock = blockBlock;
         that.blocks.prepareStackForCopy();
         that.blocks.pasteDx = pasteDx;
@@ -3482,10 +3481,12 @@ const piemenuBlockContext = (block) => {
     };
 
     wheel.navItems[0].navigateFunction = () => {
-        if (
-            "customsample" === block.blocks.blockList[topBlock].name
-        ) {
-            that.activity.errorMsg(_("In order to copy a sample, you must reload the widget, import the sample again, and export it."));
+        if ("customsample" === block.blocks.blockList[topBlock].name) {
+            that.activity.errorMsg(
+                _(
+                    "In order to copy a sample, you must reload the widget, import the sample again, and export it."
+                )
+            );
         } else {
             stackPasting();
         }
@@ -3502,9 +3503,10 @@ const piemenuBlockContext = (block) => {
         that.blocks.extract();
         that.blocks.sendStackToTrash(that.blocks.blockList[blockBlock]);
         docById("contextWheelDiv").style.display = "none";
-        // prompting a notification on deleting any block 
+        // prompting a notification on deleting any block
         activity.textMsg(
-            _("You can restore deleted blocks from the trash with the Restore From Trash button."), 3000
+            _("You can restore deleted blocks from the trash with the Restore From Trash button."),
+            3000
         );
     };
 
@@ -3512,7 +3514,7 @@ const piemenuBlockContext = (block) => {
         docById("contextWheelDiv").style.display = "none";
     };
 
-    document.body.addEventListener("click", (event) => {
+    document.body.addEventListener("click", event => {
         const wheelElement = document.getElementById("contextWheelDiv");
         const displayStyle = window.getComputedStyle(wheelElement).display;
         if (displayStyle === "block") {
@@ -3550,7 +3552,7 @@ const piemenuBlockContext = (block) => {
  *
  * @returns {void}
  */
-const piemenuGrid = (activity) => {
+const piemenuGrid = activity => {
     docById("wheelDivptm").style.display = "none";
     const x = activity.turtles.gridButton.getBoundingClientRect().x;
     const y = activity.turtles.gridButton.getBoundingClientRect().y;
@@ -3576,13 +3578,7 @@ const piemenuGrid = (activity) => {
             ""
         ];
 
-        gridLabels = [
-            "Blank",
-            "Cartesian",
-            "Cartesian/Polar",
-            "Polar",
-            "Blank"
-        ];
+        gridLabels = ["Blank", "Cartesian", "Cartesian/Polar", "Polar", "Blank"];
     } else {
         grids = [
             "imgsrc: images/grid/blank.svg",
@@ -3633,7 +3629,7 @@ const piemenuGrid = (activity) => {
     activity.turtles.gridWheel.createWheel();
     const storedGrid = activity.turtles.currentGrid ?? 0;
     activity.turtles.gridWheel.navigateWheel(storedGrid);
-      
+
     for (let i = 0; i < gridLabels.length; i++) {
         activity.turtles.gridWheel.navItems[i].navigateFunction = function () {
             activity.hideGrids();
@@ -3649,7 +3645,7 @@ const piemenuGrid = (activity) => {
     activity.turtles._exitWheel.slicePathCustom.minRadiusPercent = 0.0;
     activity.turtles._exitWheel.slicePathCustom.maxRadiusPercent = 0.3;
     activity.turtles._exitWheel.sliceSelectedPathCustom =
-    activity.turtles._exitWheel.slicePathCustom;
+        activity.turtles._exitWheel.slicePathCustom;
     activity.turtles._exitWheel.sliceInitPathCustom = activity.turtles._exitWheel.slicePathCustom;
     activity.turtles._exitWheel.clickModeRotate = false;
     activity.turtles._exitWheel.createWheel(["×", " "]);
@@ -3662,13 +3658,13 @@ const piemenuGrid = (activity) => {
         docById("helpfulWheelDiv").style.display = "none";
     }
 
-    const hidePiemenu = (activity) => {
+    const hidePiemenu = activity => {
         docById("wheelDivptm").style.display = "none";
         activity.turtles.gridWheel.removeWheel();
         activity.turtles._exitWheel.removeWheel();
     };
 
-    const clickOutsideHandler = (event) => {
+    const clickOutsideHandler = event => {
         const piemenu = docById("wheelDivptm");
         if (!piemenu.contains(event.target)) {
             hidePiemenu(activity);
@@ -3679,13 +3675,26 @@ const piemenuGrid = (activity) => {
     document.addEventListener("mousedown", clickOutsideHandler);
 };
 
-const piemenuKey = (activity) => {
+const piemenuKey = activity => {
     docById("chooseKeyDiv").style.display = "block";
     docById("movable").style.display = "block";
 
     const keyNameWheel = new wheelnav("chooseKeyDiv", null, 1300, 1300);
     const keyNameWheel2 = new wheelnav("keyNameWheel2", keyNameWheel.raphael);
-    const keys = ["C", "G", "D", "A", "E", "B/C♭", "F♯/G♭", "C♯/D♭", "G♯/A♭", "D♯/E♭", "A♯/B♭", "F"];
+    const keys = [
+        "C",
+        "G",
+        "D",
+        "A",
+        "E",
+        "B/C♭",
+        "F♯/G♭",
+        "C♯/D♭",
+        "G♯/A♭",
+        "D♯/E♭",
+        "A♯/B♭",
+        "F"
+    ];
 
     wheelnav.cssMode = true;
 
@@ -3876,7 +3885,7 @@ const piemenuKey = (activity) => {
 
     exitWheel.navItems[0].navigateFunction = __exitMenu;
 
-    const __playNote = (note) => {
+    const __playNote = note => {
         const obj = getNote(
             note,
             4,
@@ -3889,9 +3898,7 @@ const piemenuKey = (activity) => {
         obj[0] = obj[0].replace(SHARP, "#").replace(FLAT, "b");
 
         const tur = activity.turtles.ithTurtle(0);
-        if (
-            !tur.singer.instrumentNames.includes(DEFAULTVOICE)
-        ) {
+        if (!tur.singer.instrumentNames.includes(DEFAULTVOICE)) {
             tur.singer.instrumentNames.push(DEFAULTVOICE);
             activity.logo.synth.createDefaultSynth(0);
             activity.logo.synth.loadSynth(0, DEFAULTVOICE);
@@ -3915,7 +3922,7 @@ const piemenuKey = (activity) => {
         activity.storage.KeySignatureEnv = activity.KeySignatureEnv;
     };
 
-    const __setupActionKey = (i) => {
+    const __setupActionKey = i => {
         keyNameWheel.navItems[i].navigateFunction = () => {
             for (let j = 0; j < keys2.length; j++) {
                 if (Math.floor(j / 2) != i) {
