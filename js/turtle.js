@@ -783,7 +783,7 @@ Turtle.TurtleView = class {
      * Updates positions of all media (including GIFs) when turtle moves
      * @private
      */
-    _updateMediaPositions() {
+        _updateMediaPositions() {
         if (!this._media) {
             return;
         }
@@ -806,6 +806,10 @@ Turtle.TurtleView = class {
                 item.rotation = this.orientation;
             }
         });
+    }
+
+    getCanvasForExport() {
+        return this._canvas;
     }
 
     /**

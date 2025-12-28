@@ -55,6 +55,7 @@ const _ERRORMSGTIMEOUT_ = 15000;
 const _MSGTIMEOUT_ = 60000;
 
 let MYDEFINES = [
+    "utils/export-service",
     "utils/platformstyle",
     "easeljs.min",
     "tweenjs.min",
@@ -299,7 +300,7 @@ class Activity {
 
         // Initialize GIF animator
         this.gifAnimator = new GIFAnimator();
-
+        this.exportService = new ExportService(this);
         this.themes = ["light", "dark"];
         try {
             for (let i = 0; i < this.themes.length; i++) {

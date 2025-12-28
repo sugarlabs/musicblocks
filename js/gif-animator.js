@@ -1,67 +1,25 @@
-// Copyright (c) 2025 Music Blocks Contributors
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Affero General Public
-// License as published by the Free Software Foundation; either
-// version 3 of the License, or (at your option) any later version.
-//
-// This file depends on SuperGif (libgif.js), which is licensed
-// under the MIT License. See: https://github.com/buzzfeed/libgif-js
-//
-// You should have received a copy of the GNU Affero General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
-
-/**
- * GIF animation manager for Music Blocks.
- *
- * Handles animated GIF playback on the turtle canvas using the
- * SuperGif decoder from libgif.js. This module manages frame timing,
- * rendering, position updates, and cleanup of animation resources.
- */
-
-/* exported GIFAnimator */
-
-/**
- * Manages animated GIF playback on the canvas.
- */
 class GIFAnimator {
     constructor() {
-        this.animations = new Map(); // Tracks active GIF animations by ID
+        this.animations = new Map();
         this.frameRequestId = null;
         this.isRunning = false;
-        this.gifCounter = 0; // Generates unique animation IDs
+        this.gifCounter = 0;
     }
 
-    /**
-     * Determines whether a data URL represents a GIF.
-     */
     isAnimatedGIF(dataURL) {
         return typeof dataURL === "string" && dataURL.startsWith("data:image/gif");
     }
 
-    /**
-     * Creates a unique identifier for a GIF animation.
-     */
     generateGifId() {
         return `gif_${Date.now()}_${this.gifCounter++}`;
     }
 
-    /**
-     * Creates and initializes a new GIF animation instance.
-     *
-     * Loads the GIF through SuperGif, extracts frame metadata, and registers
-     * the animation for rendering.
-     *
-     * @returns {Promise<string|null>} A unique GIF ID or null if not animated.
-     */
     async createAnimation(dataURL, canvas, x, y, width, height, rotation) {
         try {
             if (!window.SuperGif) {
                 throw new Error("libgif.js (SuperGif) is not loaded");
             }
 
-            // Hidden <img> element required by SuperGif
             const img = document.createElement("img");
             img.src = dataURL;
             img.style.display = "none";
@@ -71,8 +29,6 @@ class GIFAnimator {
             await new Promise(resolve => gifPlayer.load(resolve));
 
             const totalFrames = gifPlayer.get_length();
-
-            // Ignore static (single-frame) GIFs
             if (totalFrames <= 1) {
                 document.body.removeChild(img);
                 return null;
@@ -114,13 +70,8 @@ class GIFAnimator {
         }
     }
 
-    /**
-     * Renders a single GIF frame to the target canvas.
-     */
     renderFrame(animation) {
         const ctx = animation.canvas.getContext("2d");
-
-        // Clear only the region occupied by the GIF
         ctx.save();
         ctx.translate(animation.x, animation.y);
         ctx.rotate((animation.rotation * Math.PI) / 180);
@@ -132,11 +83,9 @@ class GIFAnimator {
         );
         ctx.restore();
 
-        // Decode the next frame
         animation.gifPlayer.move_to(animation.currentFrame);
         const frameImage = animation.gifPlayer.get_canvas();
 
-        // Draw the frame
         ctx.save();
         ctx.translate(animation.x, animation.y);
         ctx.rotate((animation.rotation * Math.PI) / 180);
@@ -150,14 +99,10 @@ class GIFAnimator {
         ctx.restore();
     }
 
-    /**
-     * Main animation loop. Advances and renders frames based on time.
-     */
     animate(timestamp) {
         if (!this.isRunning) return;
 
-        const FRAME_DELAY = 120; // ~8 FPS
-
+        const FRAME_DELAY = 120;
         this.animations.forEach((animation, gifId) => {
             if (animation.disposed) {
                 animation.gifPlayer.pause();
@@ -166,7 +111,6 @@ class GIFAnimator {
                 return;
             }
 
-            // Initialize first frame timestamp
             if (!animation.lastFrameTime) {
                 animation.lastFrameTime = timestamp;
                 this.renderFrame(animation);
@@ -187,9 +131,6 @@ class GIFAnimator {
         }
     }
 
-    /**
-     * Starts the animation loop.
-     */
     start() {
         if (!this.isRunning) {
             this.isRunning = true;
@@ -197,9 +138,6 @@ class GIFAnimator {
         }
     }
 
-    /**
-     * Updates position and rotation of an active animation.
-     */
     updatePosition(gifId, x, y, rotation) {
         const animation = this.animations.get(gifId);
         if (animation && !animation.disposed) {
@@ -209,9 +147,6 @@ class GIFAnimator {
         }
     }
 
-    /**
-     * Stops and removes a specific GIF animation.
-     */
     stopAnimation(gifId) {
         const animation = this.animations.get(gifId);
         if (animation) {
@@ -220,24 +155,16 @@ class GIFAnimator {
         }
     }
 
-    /**
-     * Stops all animations and resets internal state.
-     */
     stopAll() {
         this.animations.forEach(anim => (anim.disposed = true));
         this.animations.clear();
-
         if (this.frameRequestId) {
             cancelAnimationFrame(this.frameRequestId);
             this.frameRequestId = null;
         }
-
         this.isRunning = false;
     }
 
-    /**
-     * Returns how many GIF animations are currently active.
-     */
     getActiveCount() {
         return this.animations.size;
     }

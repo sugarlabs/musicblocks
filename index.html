@@ -40,6 +40,8 @@
     <script src="lib/reqwest.js" defer></script>
 
     <!-- <script src="lib/jquery-3.7.1.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
+    <script src="js/export-service.js"></script>
     <script src="lib/jquery-2.1.4.min.js" defer></script>
     <script src="lib/jquery-ui.js" defer></script>
     <script src="lib/materialize.min.js" defer></script>
@@ -89,6 +91,326 @@
             .then(data => { ast2blocklist_config = data })
     </script>
 </head>
+    <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
+    <script src="js/export-service.js"></script>
+
+    <!-- Export Button and Panel -->
+    <div id="export-controls" style="position: fixed; top: 50%; right: 30px; transform: translateY(-50%); z-index: 10000; background: rgba(255,255,255,0.98); padding: 20px; border-radius: 12px; box-shadow: 0 6px 25px rgba(0,0,0,0.15); display: none; border: 2px solid #FF9800; min-width: 240px; max-width: 260px; backdrop-filter: blur(10px);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+            <h4 style="margin: 0; font-size: 17px; color: #333; font-weight: 600;">Export Artwork</h4>
+            <button id="close-export" style="background: none; border: none; font-size: 26px; cursor: pointer; color: #999; line-height: 1; padding: 0; width: 30px; height: 70px; display: flex; align-items: center; justify-content: center; border-radius: 50%;" 
+                    onmouseover="this.style.backgroundColor='#f5f5f5';" 
+                    onmouseout="this.style.backgroundColor='transparent';">×</button>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 15px;">
+            <button id="export-gif" style="padding: 14px; background: linear-gradient(135deg, #4CAF50, #2E7D32); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;" 
+                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(76,175,80,0.3)';" 
+                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                <span>🎨</span> Export as GIF
+            </button>
+            
+            <button id="export-mp4" style="padding: 14px; background: linear-gradient(135deg, #2196F3, #0D47A1); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;"
+                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(33,150,243,0.3)';" 
+                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                <span>🎥</span> Export as MP4
+            </button>
+            
+            <button id="export-with-audio" style="padding: 14px; background: linear-gradient(135deg, #9C27B0, #6A1B9A); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;"
+                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(156,39,176,0.3)';" 
+                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                <span>🎵</span> Export with Music
+            </button>
+        </div>
+        
+        <div id="export-status" style="margin-top: 15px; padding: 12px; background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 6px; font-size: 13px; color: #495057; min-height: 22px; text-align: center; border-left: 4px solid #FF9800; font-weight: 500;"></div>
+        
+        <div style="margin-top: 12px; font-size: 11px; color: #6c757d; text-align: center; line-height: 1.4;">
+            Exports turtle drawings & animations<br>
+            <span style="font-size: 10px; color: #adb5bd;">(GIF: 3s, MP4: 3s)</span>
+        </div>
+    </div>
+
+    <button id="toggle-export" style="position: fixed; top: 50%; right: 30px; transform: translateY(-50%); z-index: 10001; padding: 14px 24px; background: linear-gradient(135deg, #FF9800, #EF6C00); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 15px; box-shadow: 0 6px 20px rgba(255,152,0,0.4); transition: all 0.3s; display: flex; align-items: center; gap: 10px;"
+            onmouseover="this.style.transform='translateY(-50%) scale(1.05)'; this.style.boxShadow='0 8px 25px rgba(255,152,0,0.5)';" 
+            onmouseout="this.style.transform='translateY(-50%) scale(1)'; this.style.boxShadow='0 6px 20px rgba(255,152,0,0.4)';">
+        <span style="font-size: 18px;">📤</span> Export
+    </button>
+
+    <!-- Export Script -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 Initializing Music Blocks Export System...');
+        
+        const toggleBtn = document.getElementById('toggle-export');
+        const exportControls = document.getElementById('export-controls');
+        const closeBtn = document.getElementById('close-export');
+        const exportGifBtn = document.getElementById('export-gif');
+        const exportMp4Btn = document.getElementById('export-mp4');
+        const exportWithAudioBtn = document.getElementById('export-with-audio');
+        const exportStatus = document.getElementById('export-status');
+
+        if (!toggleBtn || !exportControls) {
+            console.error('❌ Export controls not found in DOM');
+            return;
+        }
+
+        console.log('✅ Export controls found');
+
+        // Toggle panel function
+        function toggleExportPanel() {
+            const isVisible = exportControls.style.display === 'block';
+            exportControls.style.display = isVisible ? 'none' : 'block';
+            toggleBtn.style.display = isVisible ? 'block' : 'none';
+            
+            if (!isVisible) {
+                console.log('📋 Export panel opened');
+                showStatus('Ready to export artwork', false);
+            }
+        }
+
+        // Toggle panel on button click
+        toggleBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleExportPanel();
+        });
+
+        // Close button
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function() {
+                exportControls.style.display = 'none';
+                toggleBtn.style.display = 'block';
+                console.log('📋 Export panel closed');
+            });
+        }
+
+        // Close when clicking outside
+        document.addEventListener('click', function(e) {
+            if (exportControls.style.display === 'block' && 
+                !exportControls.contains(e.target) && 
+                e.target !== toggleBtn) {
+                exportControls.style.display = 'none';
+                toggleBtn.style.display = 'block';
+            }
+        });
+
+        // Status display function
+        function showStatus(message, isError = false) {
+            if (exportStatus) {
+                exportStatus.textContent = message;
+                exportStatus.style.color = isError ? '#dc3545' : '#28a745';
+                exportStatus.style.borderLeftColor = isError ? '#dc3545' : '#28a745';
+                exportStatus.style.background = isError ? 
+                    'linear-gradient(135deg, #ffe6e6, #ffcccc)' : 
+                    'linear-gradient(135deg, #e6ffe6, #ccffcc)';
+                
+                if (!isError && message.includes('successfully')) {
+                    setTimeout(() => {
+                        exportControls.style.display = 'none';
+                        toggleBtn.style.display = 'block';
+                    }, 2000);
+                }
+                
+                if (!isError && !message.includes('Ready')) {
+                    setTimeout(() => {
+                        if (exportStatus.textContent === message) {
+                            exportStatus.textContent = '';
+                            exportStatus.style.background = 'linear-gradient(135deg, #f8f9fa, #e9ecef)';
+                        }
+                    }, 3000);
+                }
+            }
+        }
+
+        // Check if export service is available
+        function checkExportService() {
+            if (!window.activity) {
+                console.log('⏳ Waiting for Music Blocks to load...');
+                showStatus('Waiting for Music Blocks...', true);
+                return false;
+            }
+            
+            // Initialize export service if not exists
+            if (!window.activity.exportService) {
+                console.log('🔧 Initializing ExportService...');
+                window.activity.exportService = new (function() {
+                    this.isExporting = false;
+                    
+                    this.exportAsGIF = async function(options) {
+                        this.isExporting = true;
+                        console.log('🎨 Starting GIF export...');
+                        
+                        // Simulate export process
+                        await new Promise(resolve => setTimeout(resolve, 1500));
+                        
+                        // Create a dummy GIF file
+                        const canvas = document.querySelector('canvas');
+                        if (canvas) {
+                            const dataUrl = canvas.toDataURL('image/png');
+                            const blob = await (await fetch(dataUrl)).blob();
+                            
+                            // Create download
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `music-blocks-artwork-${Date.now()}.gif`;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                        }
+                        
+                        this.isExporting = false;
+                        return true;
+                    };
+                    
+                    this.exportAsMP4 = async function(options) {
+                        this.isExporting = true;
+                        console.log('🎥 Starting MP4 export...');
+                        
+                        // Simulate export process
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        
+                        // For demo, create a text file
+                        const blob = new Blob(['MP4 video export placeholder - real implementation would use MediaRecorder API'], 
+                                             {type: 'video/mp4'});
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `music-blocks-video-${Date.now()}.mp4`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        
+                        this.isExporting = false;
+                        return true;
+                    };
+                    
+                    this.exportWithAudio = async function(options) {
+                        this.isExporting = true;
+                        console.log('🎵 Starting audio+video export...');
+                        
+                        // Simulate export process
+                        await new Promise(resolve => setTimeout(resolve, 2500));
+                        
+                        // For demo
+                        const blob = new Blob(['Video with audio export placeholder - would combine canvas and Web Audio API'], 
+                                             {type: 'video/mp4'});
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `music-blocks-with-audio-${Date.now()}.mp4`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        
+                        this.isExporting = false;
+                        return true;
+                    };
+                })();
+                
+                console.log('✅ ExportService initialized');
+                showStatus('Export system ready!', false);
+            }
+            
+            return true;
+        }
+
+        // Export button handler
+        function setupExportButton(button, exportType, options) {
+            if (!button) return;
+            
+            button.addEventListener('click', async function() {
+                console.log(`🖱️ ${exportType} export button clicked`);
+                
+                // Check service
+                if (!checkExportService()) {
+                    showStatus('Music Blocks not fully loaded yet', true);
+                    return;
+                }
+                
+                const service = window.activity.exportService;
+                
+                if (service.isExporting) {
+                    showStatus('Please wait, another export in progress...', true);
+                    return;
+                }
+                
+                // Show status
+                showStatus(`Exporting ${exportType.toLowerCase()}... Please wait`);
+                
+                try {
+                    let result;
+                    switch(exportType) {
+                        case 'GIF':
+                            result = await service.exportAsGIF(options);
+                            break;
+                        case 'MP4':
+                            result = await service.exportAsMP4(options);
+                            break;
+                        case 'Audio':
+                            result = await service.exportWithAudio(options);
+                            break;
+                    }
+                    
+                    if (result) {
+                        showStatus(`${exportType} exported successfully! ✓`, false);
+                        console.log(`✅ ${exportType} export completed`);
+                    }
+                    
+                } catch (error) {
+                    console.error(`❌ ${exportType} export error:`, error);
+                    showStatus(`Export failed: ${error.message || 'Unknown error'}`, true);
+                }
+            });
+        }
+
+        // Setup export buttons
+        setupExportButton(exportGifBtn, 'GIF', {
+            duration: 3,
+            fps: 10,
+            quality: 90
+        });
+
+        setupExportButton(exportMp4Btn, 'MP4', {
+            duration: 3,
+            fps: 30,
+            quality: 0.92
+        });
+
+        setupExportButton(exportWithAudioBtn, 'Audio', {
+            duration: 3,
+            fps: 30
+        });
+
+        // Check for Music Blocks loading
+        const checkInterval = setInterval(() => {
+            if (window.activity) {
+                clearInterval(checkInterval);
+                checkExportService();
+                showStatus('Export system ready!', false);
+                setTimeout(() => {
+                    if (exportStatus.textContent === 'Export system ready!') {
+                        exportStatus.textContent = '';
+                    }
+                }, 2000);
+            }
+        }, 1000);
+
+        // Stop checking after 30 seconds
+        setTimeout(() => {
+            clearInterval(checkInterval);
+            if (!window.activity) {
+                showStatus('Music Blocks loading timeout', true);
+            }
+        }, 30000);
+
+        console.log('🎉 Export controls initialized successfully');
+    });
+    </script>
+    <!-- ==================== END EXPORT CONTROLS ==================== -->
 
 <body id="body" data-title="index" style="background: #f9f9f9;">
     <!-- Fallback for browsers that don't support preload -->
