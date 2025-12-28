@@ -84,10 +84,29 @@ function setupEnsembleBlocks(activity) {
     // Refactor TurtleHeapBlock
     class TurtleHeapBlock extends LeftBlock {
         constructor() {
-            super("turtleheap", _THIS_IS_MUSIC_BLOCKS_ ? _("mouse index heap") : _("turtle index heap"));
-            initializeBlock(this, "ensemble", _THIS_IS_MUSIC_BLOCKS_
-                ? [_("The Mouse index heap block returns a value in the heap at a specified location for a specified mouse."), "documentation", ""]
-                : [_("The Turtle index heap block returns a value in the heap at a specified location for a specified turtle."), "documentation", ""]);
+            super(
+                "turtleheap",
+                _THIS_IS_MUSIC_BLOCKS_ ? _("mouse index heap") : _("turtle index heap")
+            );
+            initializeBlock(
+                this,
+                "ensemble",
+                _THIS_IS_MUSIC_BLOCKS_
+                    ? [
+                          _(
+                              "The Mouse index heap block returns a value in the heap at a specified location for a specified mouse."
+                          ),
+                          "documentation",
+                          ""
+                      ]
+                    : [
+                          _(
+                              "The Turtle index heap block returns a value in the heap at a specified location for a specified turtle."
+                          ),
+                          "documentation",
+                          ""
+                      ]
+            );
 
             const formOptions = {
                 args: 2,
@@ -432,7 +451,9 @@ function setupEnsembleBlocks(activity) {
             super("setturtle");
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _("The Set mouse block sends a stack of blocks to be run by the specified mouse."),
+                    _(
+                        "The Set mouse block sends a stack of blocks to be run by the specified mouse."
+                    ),
                     "documentation",
                     ""
                 ]);
@@ -445,7 +466,9 @@ function setupEnsembleBlocks(activity) {
                 });
             } else {
                 this.setHelpString([
-                    _("The Set turtle block sends a stack of blocks to be run by the specified turtle."),
+                    _(
+                        "The Set turtle block sends a stack of blocks to be run by the specified turtle."
+                    ),
                     "documentation",
                     ""
                 ]);
@@ -574,7 +597,9 @@ function setupEnsembleBlocks(activity) {
                 //.TRANS: notes played by this mouse
                 super("turtleelapsednotes", _("mouse notes played"));
                 this.setHelpString([
-                    _("The Mouse elapse notes block returns the number of notes played by the specified mouse."),
+                    _(
+                        "The Mouse elapse notes block returns the number of notes played by the specified mouse."
+                    ),
                     "documentation",
                     ""
                 ]);
@@ -588,7 +613,9 @@ function setupEnsembleBlocks(activity) {
                 //.TRANS: notes played by this turtle
                 super("turtlelapsednotes", _("turtle notes played"));
                 this.setHelpString([
-                    _("The Turtle elapse notes block returns the number of notes played by the specified turtle."),
+                    _(
+                        "The Turtle elapse notes block returns the number of notes played by the specified turtle."
+                    ),
                     "documentation",
                     ""
                 ]);
@@ -628,7 +655,9 @@ function setupEnsembleBlocks(activity) {
                 //.TRANS: convert current note for this turtle to piano key (1-88)
                 super("turtlepitch", _("mouse pitch number"));
                 this.setHelpString([
-                    _("The Mouse pitch block returns the current pitch number being played by the specified mouse."),
+                    _(
+                        "The Mouse pitch block returns the current pitch number being played by the specified mouse."
+                    ),
                     "documentation",
                     ""
                 ]);
@@ -642,7 +671,9 @@ function setupEnsembleBlocks(activity) {
                 //.TRANS: convert current note for this turtle to piano key (1-88)
                 super("turtlepitch", _("turtle pitch number"));
                 this.setHelpString([
-                    _("The Turtle pitch block returns the current pitch number being played by the specified turtle."),
+                    _(
+                        "The Turtle pitch block returns the current pitch number being played by the specified turtle."
+                    ),
                     "documentation",
                     ""
                 ]);
@@ -886,7 +917,9 @@ function setupEnsembleBlocks(activity) {
             super("foundturtle");
             if (_THIS_IS_MUSIC_BLOCKS_) {
                 this.setHelpString([
-                    _("The Found mouse block will return true if the specified mouse can be found."),
+                    _(
+                        "The Found mouse block will return true if the specified mouse can be found."
+                    ),
                     "documentation",
                     ""
                 ]);
@@ -902,7 +935,9 @@ function setupEnsembleBlocks(activity) {
                 });
             } else {
                 this.setHelpString([
-                    _("The Found turtle block will return true if the specified turtle can be found."),
+                    _(
+                        "The Found turtle block will return true if the specified turtle can be found."
+                    ),
                     "documentation",
                     ""
                 ]);
@@ -1062,12 +1097,16 @@ function setupEnsembleBlocks(activity) {
                 fillColor = getMunsellColor(0, 50, 100);
                 strokeColor = getMunsellColor(0, 70, 80);
             }
-            const artwork = TURTLESVG
-                .replace(/fill_color/g, fillColor)
-                .replace(/stroke_color/g, strokeColor);
+            const artwork = TURTLESVG.replace(/fill_color/g, fillColor).replace(
+                /stroke_color/g,
+                strokeColor
+            );
 
             // eslint-disable-next-line no-undef
-            tur.doTurtleShell(55, "data:image/svg+xml;base64," + window.btoa(base64Encode(artwork)));
+            tur.doTurtleShell(
+                55,
+                "data:image/svg+xml;base64," + window.btoa(base64Encode(artwork))
+            );
 
             // Restore the heading.
             if (heading != 0) {
@@ -1075,7 +1114,6 @@ function setupEnsembleBlocks(activity) {
             }
         }
     }
-
 
     class TurtleNameBlock extends ValueBlock {
         constructor() {
@@ -1335,4 +1373,8 @@ function setupEnsembleBlocks(activity) {
     ];
 
     blockClasses.forEach(setupBlock);
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupEnsembleBlocks, getTargetTurtle };
 }
