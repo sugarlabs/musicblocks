@@ -1,7 +1,29 @@
+/**
+ * MusicBlocks v3.6.2
+ *
+ * @author Jetshree
+ *
+ * @copyright 2025 Jetshree
+ *
+ * @license
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 const { setupFlowBlocks } = jest.requireActual("../FlowBlocks");
 
-global._ = (s) => s;
-global.last = (arr) => (arr && arr.length ? arr[arr.length - 1] : null);
+global._ = s => s;
+global.last = arr => (arr && arr.length ? arr[arr.length - 1] : null);
 global.ZERODIVIDEERRORMSG = "ZERO_DIVIDE";
 global.NOINPUTERRORMSG = "NO_INPUT";
 global.POSNUMBER = "POS_NUMBER";
@@ -98,14 +120,14 @@ describe("FlowBlocks integration", () => {
             suppressOutput: false,
             runningFromEvent: false,
             turtleTime: 0,
-            previousTurtleTime: 0,
+            previousTurtleTime: 0
         },
         parentFlowQueue: [],
         queue: [],
         endOfClampSignals: {},
         unhighlightQueue: [],
         doWait: jest.fn(),
-        running: true,
+        running: true
     });
 
     beforeEach(() => {
@@ -114,15 +136,15 @@ describe("FlowBlocks integration", () => {
             beginnerMode: false,
             blocks: {
                 blockList: {},
-                findBottomBlock: jest.fn((blk) => blk),
+                findBottomBlock: jest.fn(blk => blk)
             },
             turtles: {
-                ithTurtle: jest.fn((id) => {
+                ithTurtle: jest.fn(id => {
                     if (!turtles[id]) turtles[id] = makeTurtle();
                     return turtles[id];
-                }),
+                })
             },
-            errorMsg: jest.fn(),
+            errorMsg: jest.fn()
         };
 
         logo = {
@@ -138,13 +160,13 @@ describe("FlowBlocks integration", () => {
             runFromBlockNow: jest.fn(),
             stopTurtle: false,
             firstNoteTime: null,
-            receivedArg: null,
+            receivedArg: null
         };
 
         setupFlowBlocks(activity);
     });
 
-    const getBlock = (name) => activity.registeredBlocks[name];
+    const getBlock = name => activity.registeredBlocks[name];
 
     test("macros generate expected starter stacks", () => {
         const backwardMacro = getBlock("backward").macro(10, 20);
@@ -175,7 +197,7 @@ describe("FlowBlocks integration", () => {
             "repeat",
             "duplicatefactor",
             "hiddennoflow",
-            "hidden",
+            "hidden"
         ];
 
         expect(Object.keys(activity.registeredBlocks).sort()).toEqual(expected.sort());
@@ -221,7 +243,7 @@ describe("FlowBlocks integration", () => {
             0: { name: "duplicatenotes", connections: [null, 1, null, 2] },
             1: { name: "visibleA", connections: [0, 2] },
             2: { name: "hidden", connections: [1, 3] },
-            3: { name: "visibleB", connections: [2, 0] },
+            3: { name: "visibleB", connections: [2, 0] }
         };
         logo.connectionStore[0][blk] = [];
         logo.connectionStoreLock = false;
@@ -240,9 +262,9 @@ describe("FlowBlocks integration", () => {
             1: {
                 [blk]: [
                     [4, 1, 5],
-                    [5, 0, null],
-                ],
-            },
+                    [5, 0, null]
+                ]
+            }
         };
         activity.blocks.blockList[4] = { name: "hidden", connections: [6, null] };
         activity.blocks.blockList[5] = { name: "visibleC", connections: [null] };
@@ -298,14 +320,24 @@ describe("FlowBlocks integration", () => {
 
         // Provide cases and run listener with matching case
         logo.switchBlocks[0] = [blk];
-        logo.switchCases[0][blk] = [[["match", 12], ["__default__", 14]]];
+        logo.switchCases[0][blk] = [
+            [
+                ["match", 12],
+                ["__default__", 14]
+            ]
+        ];
         logo.parseArg.mockReturnValue("match");
         listener();
         expect(activity.turtles.ithTurtle(0).queue[0].child).toBe(12);
 
         // Default path when no case matches
         logo.switchBlocks[0] = [blk];
-        logo.switchCases[0][blk] = [[["other", 99], ["__default__", 77]]];
+        logo.switchCases[0][blk] = [
+            [
+                ["other", 99],
+                ["__default__", 77]
+            ]
+        ];
         logo.parseArg.mockReturnValue("unknown");
         listener();
         expect(activity.turtles.ithTurtle(0).queue.pop().child).toBe(77);
@@ -343,7 +375,7 @@ describe("FlowBlocks integration", () => {
         block.flow([true], logo, 0, blk);
         expect(logo.firstNoteTime).not.toBeNull();
         // One requeued entry should remain for this block
-        const remaining = turtle.queue.filter((q) => q.parentBlk === blk);
+        const remaining = turtle.queue.filter(q => q.parentBlk === blk);
         expect(remaining).toHaveLength(1);
     });
 
