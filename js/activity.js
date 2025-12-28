@@ -474,7 +474,9 @@ class Activity {
          */
         this.setHelpfulSearchDiv = () => {
             if (document.getElementById("helpfulSearchDiv")) {
-                document.getElementById("helpfulSearchDiv").parentNode.removeChild(document.getElementById("helpfulSearchDiv"));
+                document
+                    .getElementById("helpfulSearchDiv")
+                    .parentNode.removeChild(document.getElementById("helpfulSearchDiv"));
             }
             this.helpfulSearchDiv = document.createElement("div");
             this.helpfulSearchDiv.setAttribute("id", "helpfulSearchDiv");
@@ -512,9 +514,13 @@ class Activity {
                 this.setHelpfulSearchDiv(); // Re-create and append the div if it's not found
             }
             this.helpfulSearchDiv.style.left =
-                document.getElementById("helpfulWheelDiv").offsetLeft + 80 * this.getStageScale() + "px";
+                document.getElementById("helpfulWheelDiv").offsetLeft +
+                80 * this.getStageScale() +
+                "px";
             this.helpfulSearchDiv.style.top =
-                document.getElementById("helpfulWheelDiv").offsetTop + 110 * this.getStageScale() + "px";
+                document.getElementById("helpfulWheelDiv").offsetTop +
+                110 * this.getStageScale() +
+                "px";
 
             const windowWidth = window.innerWidth;
             const windowHeight = window.innerHeight;
@@ -1858,7 +1864,9 @@ class Activity {
                 // Queue and take first step.
                 if (!this.turtles.running()) {
                     this.logo.runLogoCommands();
-                    document.getElementById("stop").style.color = this.toolbar.stopIconColorWhenPlaying;
+                    document.getElementById(
+                        "stop"
+                    ).style.color = this.toolbar.stopIconColorWhenPlaying;
                 }
                 this.logo.step();
             } else {
@@ -2880,13 +2888,15 @@ class Activity {
                 const closeListener = e => {
                     if (
                         document.getElementById("search").style.visibility === "visible" &&
-                        (e.target === document.getElementById("search") || document.getElementById("search").contains(e.target))
+                        (e.target === document.getElementById("search") ||
+                            document.getElementById("search").contains(e.target))
                     ) {
                         //do nothing when clicked in the input field
                     } else if (
                         document.getElementById("ui-id-1") &&
                         document.getElementById("ui-id-1").style.display === "block" &&
-                        (e.target === document.getElementById("ui-id-1") || document.getElementById("ui-id-1").contains(e.target))
+                        (e.target === document.getElementById("ui-id-1") ||
+                            document.getElementById("ui-id-1").contains(e.target))
                     ) {
                         //do nothing when clicked on the menu
                     } else if (document.getElementsByTagName("tr")[2].contains(e.target)) {
@@ -3354,7 +3364,10 @@ class Activity {
                         break;
                 }
             } else {
-                if (document.getElementById("paste").style.visibility === "visible" && event.keyCode === RETURN) {
+                if (
+                    document.getElementById("paste").style.visibility === "visible" &&
+                    event.keyCode === RETURN
+                ) {
                     if (document.getElementById("paste").value.length > 0) {
                         this.pasted();
                     }
