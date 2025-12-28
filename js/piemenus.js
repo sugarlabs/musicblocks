@@ -60,7 +60,7 @@
    piemenuNoteValue, piemenuAccidentals, piemenuKey, piemenuChords
 */
 
-const setWheelSize = (i) => {
+const setWheelSize = i => {
     const wheelDiv = document.getElementById("wheelDiv");
     const screenWidth = window.innerWidth;
 
@@ -243,7 +243,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                 0,
                 Math.round(
                     (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                    canvasLeft
+                        canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -254,7 +254,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                 0,
                 Math.round(
                     (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                    canvasTop
+                        canvasTop
                 ) - 200
             )
         ) + "px";
@@ -318,8 +318,8 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
             (block.name === "notename" &&
                 (block.connections[0] != undefined
                     ? !["setkey", "setkey2"].includes(
-                        block.blocks.blockList[block.connections[0]].name
-                    )
+                          block.blocks.blockList[block.connections[0]].name
+                      )
                     : true)))
     ) {
         if (scale[6 - i][0] === FIXEDSOLFEGE[note] || scale[6 - i][0] === note) {
@@ -562,8 +562,8 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
             (that.name === "notename" &&
                 (that.connections[0] != undefined
                     ? !["setkey", "setkey2"].includes(
-                        that.blocks.blockList[that.connections[0]].name
-                    )
+                          that.blocks.blockList[that.connections[0]].name
+                      )
                     : true))
         ) {
             let i = scale.indexOf(selection["note"]);
@@ -925,7 +925,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
                 0,
                 Math.round(
                     (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                    canvasLeft
+                        canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -936,7 +936,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
                 0,
                 Math.round(
                     (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                    canvasTop
+                        canvasTop
                 ) - 200
             )
         ) + "px";
@@ -950,7 +950,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
     }
 
     // Add function to each main menu for show/hide sub menus
-    const __setupAction = (i) => {
+    const __setupAction = i => {
         that._customWheel.navItems[i].navigateFunction = () => {
             that.customID =
                 that._customWheel.navItems[that._customWheel.selectedNavItemIndex].title;
@@ -1433,7 +1433,7 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
                 0,
                 Math.round(
                     (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                    canvasLeft
+                        canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -1444,7 +1444,7 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
                 0,
                 Math.round(
                     (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                    canvasTop
+                        canvasTop
                 ) - 200
             )
         ) + "px";
@@ -2284,7 +2284,7 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
                 0,
                 Math.round(
                     (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                    canvasLeft
+                        canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -2295,7 +2295,7 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
                 0,
                 Math.round(
                     (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                    canvasTop
+                        canvasTop
                 ) - 200
             )
         ) + "px";
@@ -2388,7 +2388,7 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
                 0,
                 Math.round(
                     (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                    canvasLeft
+                        canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -2399,7 +2399,7 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
                 0,
                 Math.round(
                     (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                    canvasTop
+                        canvasTop
                 ) - 200
             )
         ) + "px";
@@ -2515,7 +2515,7 @@ const piemenuChords = (block, selectedChord) => {
                 0,
                 Math.round(
                     (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                    canvasLeft
+                        canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -2526,7 +2526,7 @@ const piemenuChords = (block, selectedChord) => {
                 0,
                 Math.round(
                     (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                    canvasTop
+                        canvasTop
                 ) - 200
             )
         ) + "px";
@@ -2691,7 +2691,7 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
                 0,
                 Math.round(
                     (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                    canvasLeft
+                        canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -2702,7 +2702,7 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
                 0,
                 Math.round(
                     (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                    canvasTop
+                        canvasTop
                 ) - 200
             )
         ) + "px";
@@ -2827,7 +2827,7 @@ const piemenuIntervals = (block, selectedInterval) => {
                 0,
                 Math.round(
                     (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                    canvasLeft
+                        canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -2838,7 +2838,7 @@ const piemenuIntervals = (block, selectedInterval) => {
                 0,
                 Math.round(
                     (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                    canvasTop
+                        canvasTop
                 ) - 200
             )
         ) + "px";
@@ -3088,7 +3088,7 @@ const piemenuModes = (block, selectedMode) => {
     };
 
     // Build a pie menu of modes based on the current mode group.
-    const __buildModeNameWheel = (grp) => {
+    const __buildModeNameWheel = grp => {
         let newWheel = false;
         if (that._modeNameWheel === null) {
             that._modeNameWheel = new wheelnav("_modeNameWheel", that._modeWheel.raphael);
@@ -3309,7 +3309,7 @@ const piemenuModes = (block, selectedMode) => {
                 0,
                 Math.round(
                     (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                    canvasLeft
+                        canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -3320,7 +3320,7 @@ const piemenuModes = (block, selectedMode) => {
                 0,
                 Math.round(
                     (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                    canvasTop
+                        canvasTop
                 ) - 200
             )
         ) + "px";
@@ -3372,7 +3372,7 @@ const piemenuModes = (block, selectedMode) => {
 /*
  * Sets up context menu for each block
  */
-const piemenuBlockContext = (block) => {
+const piemenuBlockContext = block => {
     if (block.blocks.activeBlock === null) {
         return;
     }
@@ -3472,7 +3472,7 @@ const piemenuBlockContext = (block) => {
         pasteDx += 21;
         pasteDy += 21;
 
-        that.activity.helpfulWheelItems.forEach((ele) => {
+        that.activity.helpfulWheelItems.forEach(ele => {
             if (ele.label === "Paste previous stack") {
                 ele.display = true;
                 ele.fn = stackPasting.bind(that);
@@ -3514,7 +3514,7 @@ const piemenuBlockContext = (block) => {
         docById("contextWheelDiv").style.display = "none";
     };
 
-    document.body.addEventListener("click", (event) => {
+    document.body.addEventListener("click", event => {
         const wheelElement = document.getElementById("contextWheelDiv");
         const displayStyle = window.getComputedStyle(wheelElement).display;
         if (displayStyle === "block") {
@@ -3552,7 +3552,7 @@ const piemenuBlockContext = (block) => {
  *
  * @returns {void}
  */
-const piemenuGrid = (activity) => {
+const piemenuGrid = activity => {
     docById("wheelDivptm").style.display = "none";
     const x = activity.turtles.gridButton.getBoundingClientRect().x;
     const y = activity.turtles.gridButton.getBoundingClientRect().y;
@@ -3658,13 +3658,13 @@ const piemenuGrid = (activity) => {
         docById("helpfulWheelDiv").style.display = "none";
     }
 
-    const hidePiemenu = (activity) => {
+    const hidePiemenu = activity => {
         docById("wheelDivptm").style.display = "none";
         activity.turtles.gridWheel.removeWheel();
         activity.turtles._exitWheel.removeWheel();
     };
 
-    const clickOutsideHandler = (event) => {
+    const clickOutsideHandler = event => {
         const piemenu = docById("wheelDivptm");
         if (!piemenu.contains(event.target)) {
             hidePiemenu(activity);
@@ -3675,7 +3675,7 @@ const piemenuGrid = (activity) => {
     document.addEventListener("mousedown", clickOutsideHandler);
 };
 
-const piemenuKey = (activity) => {
+const piemenuKey = activity => {
     docById("chooseKeyDiv").style.display = "block";
     docById("movable").style.display = "block";
 
@@ -3858,9 +3858,9 @@ const piemenuKey = (activity) => {
                         activity.KeySignatureEnv[1];
                     activity.textMsg(
                         _("You have chosen key for your pitch preview.") +
-                        activity.KeySignatureEnv[0] +
-                        " " +
-                        activity.KeySignatureEnv[1]
+                            activity.KeySignatureEnv[0] +
+                            " " +
+                            activity.KeySignatureEnv[1]
                     );
                 }
             }
@@ -3885,7 +3885,7 @@ const piemenuKey = (activity) => {
 
     exitWheel.navItems[0].navigateFunction = __exitMenu;
 
-    const __playNote = (note) => {
+    const __playNote = note => {
         const obj = getNote(
             note,
             4,
@@ -3922,7 +3922,7 @@ const piemenuKey = (activity) => {
         activity.storage.KeySignatureEnv = activity.KeySignatureEnv;
     };
 
-    const __setupActionKey = (i) => {
+    const __setupActionKey = i => {
         keyNameWheel.navItems[i].navigateFunction = () => {
             for (let j = 0; j < keys2.length; j++) {
                 if (Math.floor(j / 2) != i) {
