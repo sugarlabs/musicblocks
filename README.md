@@ -183,6 +183,12 @@ Looking for a block? Find it in the
 The Music Blocks project adheres to the [Sugar Labs Code of
 Conduct](https://github.com/sugarlabs/sugar-docs/blob/master/src/CODE_OF_CONDUCT.md)
 
+## <a name="CONTRIBUTING"></a>Contributing
+
+[Contributing.md](CONTRIBUTING.md) provides a general overview of Sugar Lab's guidelines.  
+It contains best practices for writing code, submitting pull requests, and following coding standards.  
+Please refer to this guide before making contributions to ensure consistency and maintain the quality of the project.  
+
 ## <a name="MODIFYING_MUSIC_BLOCKS"></a>Modifying Music Blocks
 
 The core functionality for Music Blocks resides in the [`js/`
