@@ -101,10 +101,10 @@ describe("MeterBlocks setup", () => {
             }
         }
 
-        global.ValueBlock = class extends BaseBlock { };
-        global.LeftBlock = class extends BaseBlock { };
-        global.FlowBlock = class extends BaseBlock { };
-        global.FlowClampBlock = class extends global.FlowBlock { };
+        global.ValueBlock = class extends BaseBlock {};
+        global.LeftBlock = class extends BaseBlock {};
+        global.FlowBlock = class extends BaseBlock {};
+        global.FlowClampBlock = class extends global.FlowBlock {};
 
         Singer = {
             MeterActions: {
