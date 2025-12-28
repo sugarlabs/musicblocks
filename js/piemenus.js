@@ -243,7 +243,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                 0,
                 Math.round(
                     (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                        canvasLeft
+                    canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -254,7 +254,7 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
                 0,
                 Math.round(
                     (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                        canvasTop
+                    canvasTop
                 ) - 200
             )
         ) + "px";
@@ -311,15 +311,15 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     // Auto-selection of sharps and flats in fixed solfege handles the
     // case of opening the pie-menu, not whilst in the pie-menu.
     // Skip auto-selection if user already has a non-natural accidental (Issue #4886).
-    const userHasAccidental = accidental !== "" && accidental !== NATURAL;
+    const pitchHasAccidental = accidental !== "" && accidental !== NATURAL;
     if (
-        !userHasAccidental &&
+        !pitchHasAccidental &&
         ((!block.activity.KeySignatureEnv[2] && block.name === "solfege") ||
             (block.name === "notename" &&
                 (block.connections[0] != undefined
                     ? !["setkey", "setkey2"].includes(
-                          block.blocks.blockList[block.connections[0]].name
-                      )
+                        block.blocks.blockList[block.connections[0]].name
+                    )
                     : true)))
     ) {
         if (scale[6 - i][0] === FIXEDSOLFEGE[note] || scale[6 - i][0] === note) {
@@ -562,8 +562,8 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
             (that.name === "notename" &&
                 (that.connections[0] != undefined
                     ? !["setkey", "setkey2"].includes(
-                          that.blocks.blockList[that.connections[0]].name
-                      )
+                        that.blocks.blockList[that.connections[0]].name
+                    )
                     : true))
         ) {
             let i = scale.indexOf(selection["note"]);
@@ -925,7 +925,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
                 0,
                 Math.round(
                     (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                        canvasLeft
+                    canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -936,7 +936,7 @@ const piemenuCustomNotes = (block, noteLabels, customLabels, selectedCustom, sel
                 0,
                 Math.round(
                     (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                        canvasTop
+                    canvasTop
                 ) - 200
             )
         ) + "px";
@@ -1433,7 +1433,7 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
                 0,
                 Math.round(
                     (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                        canvasLeft
+                    canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -1444,7 +1444,7 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
                 0,
                 Math.round(
                     (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                        canvasTop
+                    canvasTop
                 ) - 200
             )
         ) + "px";
@@ -2284,7 +2284,7 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
                 0,
                 Math.round(
                     (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                        canvasLeft
+                    canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -2295,7 +2295,7 @@ const piemenuBasic = (block, menuLabels, menuValues, selectedValue, colors) => {
                 0,
                 Math.round(
                     (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                        canvasTop
+                    canvasTop
                 ) - 200
             )
         ) + "px";
@@ -2388,7 +2388,7 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
                 0,
                 Math.round(
                     (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                        canvasLeft
+                    canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -2399,7 +2399,7 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
                 0,
                 Math.round(
                     (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                        canvasTop
+                    canvasTop
                 ) - 200
             )
         ) + "px";
@@ -2515,7 +2515,7 @@ const piemenuChords = (block, selectedChord) => {
                 0,
                 Math.round(
                     (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                        canvasLeft
+                    canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -2526,7 +2526,7 @@ const piemenuChords = (block, selectedChord) => {
                 0,
                 Math.round(
                     (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                        canvasTop
+                    canvasTop
                 ) - 200
             )
         ) + "px";
@@ -2691,7 +2691,7 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
                 0,
                 Math.round(
                     (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                        canvasLeft
+                    canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -2702,7 +2702,7 @@ const piemenuVoices = (block, voiceLabels, voiceValues, categories, voice, rotat
                 0,
                 Math.round(
                     (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                        canvasTop
+                    canvasTop
                 ) - 200
             )
         ) + "px";
@@ -2827,7 +2827,7 @@ const piemenuIntervals = (block, selectedInterval) => {
                 0,
                 Math.round(
                     (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                        canvasLeft
+                    canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -2838,7 +2838,7 @@ const piemenuIntervals = (block, selectedInterval) => {
                 0,
                 Math.round(
                     (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                        canvasTop
+                    canvasTop
                 ) - 200
             )
         ) + "px";
@@ -3309,7 +3309,7 @@ const piemenuModes = (block, selectedMode) => {
                 0,
                 Math.round(
                     (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
-                        canvasLeft
+                    canvasLeft
                 ) - 200
             )
         ) + "px";
@@ -3320,7 +3320,7 @@ const piemenuModes = (block, selectedMode) => {
                 0,
                 Math.round(
                     (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
-                        canvasTop
+                    canvasTop
                 ) - 200
             )
         ) + "px";
@@ -3858,9 +3858,9 @@ const piemenuKey = (activity) => {
                         activity.KeySignatureEnv[1];
                     activity.textMsg(
                         _("You have chosen key for your pitch preview.") +
-                            activity.KeySignatureEnv[0] +
-                            " " +
-                            activity.KeySignatureEnv[1]
+                        activity.KeySignatureEnv[0] +
+                        " " +
+                        activity.KeySignatureEnv[1]
                     );
                 }
             }
