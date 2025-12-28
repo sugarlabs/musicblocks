@@ -1221,4 +1221,8 @@ function setupGraphicsBlocks(activity) {
     new MLeftBlock().setup(activity);
     new BackBlock().setup(activity);
     new ForwardBlock().setup(activity);
+    
+}
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupGraphicsBlocks };
 }
