@@ -19,309 +19,278 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-global._ = jest.fn((s) => s);
-global.last = (arr) => arr[arr.length - 1];
+global._ = jest.fn(s => s);
+global.last = arr => arr[arr.length - 1];
 global.NANERRORMSG = "NaN error";
 global.NOINPUTERRORMSG = "No input error";
 global._THIS_IS_MUSIC_BLOCKS_ = false;
-global.toFixed2 = jest.fn((n) => n);
+global.toFixed2 = jest.fn(n => n);
 
 /* Base block mocks */
 global.ValueBlock = class {
-  constructor(name) {
-    this.name = name;
-  }
-  setPalette = jest.fn();
-  setHelpString = jest.fn();
-  formBlock = jest.fn();
-  beginnerBlock = jest.fn();
+    constructor(name) {
+        this.name = name;
+    }
+    setPalette = jest.fn();
+    setHelpString = jest.fn();
+    formBlock = jest.fn();
+    beginnerBlock = jest.fn();
 
-  setup(activity) {
-    activity.blocks[this.name] = this.constructor;
-  }
+    setup(activity) {
+        activity.blocks[this.name] = this.constructor;
+    }
 };
 
 global.FlowBlock = class extends global.ValueBlock {};
 
 global.FlowClampBlock = class extends global.FlowBlock {
-  makeMacro = jest.fn();
+    makeMacro = jest.fn();
 };
-
 
 const { setupGraphicsBlocks } = require("../GraphicsBlocks");
 
 describe("GraphicsBlocks", () => {
-  let activity, logo, turtle, turtleObj;
-
-  beforeEach(() => {
-    turtle = 0;
-
-
-    turtleObj = {
-      singer: {
-        inNoteBlock: [],
-        suppressOutput: false,
-        embeddedGraphics: [[]],
-      },
-      painter: {
-        doSetHeading: jest.fn(),
-        doSetXY: jest.fn(),
-        doScrollXY: jest.fn(),
-        doClear: jest.fn(),
-        doBezier: jest.fn(),
-        doArc: jest.fn(),
-        doForward: jest.fn(),
-        doRight: jest.fn(),
-        penState: true,
-        wrap: false,
-      },
-      x: 0,
-      y: 0,
-      orientation: 45,
-      container: { x: 10, y: 20 },
-    };
-
-    activity = {
-      blocks: {},
-      errorMsg: jest.fn(),
-      turtles: {
-        companionTurtle: jest.fn(() => 0),
-        ithTurtle: jest.fn(() => turtleObj),
-        getTurtle: jest.fn(() => turtleObj),
-        screenX2turtleX: jest.fn((x) => x),
-        screenY2turtleY: jest.fn((y) => y),
-      },
-    };
-
-    logo = {
-      inMatrix: false,
-      inStatusMatrix: false,
-      statusFields: [],
-      phraseMaker: {
-        addRowBlock: jest.fn(),
-        rowLabels: [],
-        rowArgs: [],
-      },
-      pitchBlocks: [],
-      setDispatchBlock: jest.fn(),
-      setTurtleListener: jest.fn(),
-    };
+    let activity, logo, turtle, turtleObj;
+
+    beforeEach(() => {
+        turtle = 0;
+
+        turtleObj = {
+            singer: {
+                inNoteBlock: [],
+                suppressOutput: false,
+                embeddedGraphics: [[]]
+            },
+            painter: {
+                doSetHeading: jest.fn(),
+                doSetXY: jest.fn(),
+                doScrollXY: jest.fn(),
+                doClear: jest.fn(),
+                doBezier: jest.fn(),
+                doArc: jest.fn(),
+                doForward: jest.fn(),
+                doRight: jest.fn(),
+                penState: true,
+                wrap: false
+            },
+            x: 0,
+            y: 0,
+            orientation: 45,
+            container: { x: 10, y: 20 }
+        };
+
+        activity = {
+            blocks: {},
+            errorMsg: jest.fn(),
+            turtles: {
+                companionTurtle: jest.fn(() => 0),
+                ithTurtle: jest.fn(() => turtleObj),
+                getTurtle: jest.fn(() => turtleObj),
+                screenX2turtleX: jest.fn(x => x),
+                screenY2turtleY: jest.fn(y => y)
+            }
+        };
+
+        logo = {
+            inMatrix: false,
+            inStatusMatrix: false,
+            statusFields: [],
+            phraseMaker: {
+                addRowBlock: jest.fn(),
+                rowLabels: [],
+                rowArgs: []
+            },
+            pitchBlocks: [],
+            setDispatchBlock: jest.fn(),
+            setTurtleListener: jest.fn()
+        };
+
+        setupGraphicsBlocks(activity);
+    });
+
+    test("setupGraphicsBlocks initializes without crashing", () => {
+        expect(typeof setupGraphicsBlocks).toBe("function");
+        expect(activity.blocks).toBeDefined();
+    });
+
+    test("HeadingBlock: arg returns turtle orientation", () => {
+        const Heading = activity.blocks.heading;
+        const block = new Heading();
 
-    setupGraphicsBlocks(activity);
-  });
+        const value = block.arg(logo, turtle, 0);
 
+        expect(value).toBe(45);
+    });
 
-  test("setupGraphicsBlocks initializes without crashing", () => {
-    expect(typeof setupGraphicsBlocks).toBe("function");
-    expect(activity.blocks).toBeDefined();
-  });
+    test("XBlock: arg returns turtle X position", () => {
+        const X = activity.blocks.x;
+        const block = new X();
 
+        const value = block.arg(logo, turtle, 0);
 
-  test("HeadingBlock: arg returns turtle orientation", () => {
-    const Heading = activity.blocks.heading;
-    const block = new Heading();
+        expect(value).toBe(10);
+    });
 
-    const value = block.arg(logo, turtle, 0);
+    test("YBlock: arg returns turtle Y position", () => {
+        const Y = activity.blocks.y;
+        const block = new Y();
 
-    expect(value).toBe(45);
-  });
+        const value = block.arg(logo, turtle, 0);
 
+        expect(value).toBe(20);
+    });
 
-  test("XBlock: arg returns turtle X position", () => {
-    const X = activity.blocks.x;
-    const block = new X();
+    test("ForwardBlock: flow moves turtle forward", () => {
+        const Forward = activity.blocks.forward;
+        const block = new Forward();
 
-    const value = block.arg(logo, turtle, 0);
+        block.flow([100], logo, turtle, 1);
 
-    expect(value).toBe(10);
-  });
+        expect(turtleObj.painter.doForward).toHaveBeenCalledWith(100);
+    });
 
-  test("YBlock: arg returns turtle Y position", () => {
-    const Y = activity.blocks.y;
-    const block = new Y();
+    test("RightBlock: flow turns turtle right", () => {
+        const Right = activity.blocks.right;
+        const block = new Right();
 
-    const value = block.arg(logo, turtle, 0);
+        block.flow([90], logo, turtle, 1);
 
-    expect(value).toBe(20);
-  });
+        expect(turtleObj.painter.doRight).toHaveBeenCalledWith(90);
+    });
 
+    test("ClearBlock: flow clears screen", () => {
+        const Clear = activity.blocks.clear;
+        const block = new Clear();
 
-  test("ForwardBlock: flow moves turtle forward", () => {
-    const Forward = activity.blocks.forward;
-    const block = new Forward();
+        // capture the turtle object used internally
+        const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
-    block.flow([100], logo, turtle, 1);
+        block.flow([], logo, turtle, 1);
 
-    expect(turtleObj.painter.doForward).toHaveBeenCalledWith(100);
-  });
+        expect(tur.painter.doClear).toHaveBeenCalled();
+    });
 
-  test("RightBlock: flow turns turtle right", () => {
-  const Right = activity.blocks.right;
-  const block = new Right();
+    test("BackBlock: flow moves turtle backward", () => {
+        const Back = activity.blocks.back;
+        const block = new Back();
 
-  block.flow([90], logo, turtle, 1);
+        // capture same turtle instance used inside flow
+        const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
-  expect(turtleObj.painter.doRight).toHaveBeenCalledWith(90);
-});
+        block.flow([50], logo, turtle, 1);
 
-test("ClearBlock: flow clears screen", () => {
-  const Clear = activity.blocks.clear;
-  const block = new Clear();
+        expect(tur.painter.doForward).toHaveBeenCalledWith(-50);
+    });
 
-  // capture the turtle object used internally
-  const tur = activity.turtles.ithTurtle(
-    activity.turtles.companionTurtle(turtle)
-  );
+    test("RightBlock: flow turns turtle right", () => {
+        const Right = activity.blocks.right;
+        const block = new Right();
 
-  block.flow([], logo, turtle, 1);
+        const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
-  expect(tur.painter.doClear).toHaveBeenCalled();
-});
+        block.flow([90], logo, turtle, 1);
 
-test("BackBlock: flow moves turtle backward", () => {
-  const Back = activity.blocks.back;
-  const block = new Back();
+        expect(tur.painter.doRight).toHaveBeenCalledWith(90);
+    });
 
-  // capture same turtle instance used inside flow
-  const tur = activity.turtles.ithTurtle(
-    activity.turtles.companionTurtle(turtle)
-  );
+    test("ForwardBlock: flow moves turtle forward", () => {
+        const Forward = activity.blocks.forward;
+        const block = new Forward();
 
-  block.flow([50], logo, turtle, 1);
+        const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
-  expect(tur.painter.doForward).toHaveBeenCalledWith(-50);
-});
+        block.flow([100], logo, turtle, 1);
 
-test("RightBlock: flow turns turtle right", () => {
-  const Right = activity.blocks.right;
-  const block = new Right();
+        expect(tur.painter.doForward).toHaveBeenCalledWith(100);
+    });
 
-  const tur = activity.turtles.ithTurtle(
-    activity.turtles.companionTurtle(turtle)
-  );
+    test("ForwardBlock: suppressOutput disables pen while moving", () => {
+        const Forward = activity.blocks.forward;
+        const block = new Forward();
 
-  block.flow([90], logo, turtle, 1);
+        const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
+        tur.singer.suppressOutput = true;
 
-  expect(tur.painter.doRight).toHaveBeenCalledWith(90);
-});
+        block.flow([50], logo, turtle, 1);
 
-test("ForwardBlock: flow moves turtle forward", () => {
-  const Forward = activity.blocks.forward;
-  const block = new Forward();
+        expect(tur.painter.doForward).toHaveBeenCalledWith(50);
+    });
 
-  const tur = activity.turtles.ithTurtle(
-    activity.turtles.companionTurtle(turtle)
-  );
+    test("RightBlock: suppressOutput still turns turtle right", () => {
+        const Right = activity.blocks.right;
+        const block = new Right();
 
-  block.flow([100], logo, turtle, 1);
+        const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
+        tur.singer.suppressOutput = true;
 
-  expect(tur.painter.doForward).toHaveBeenCalledWith(100);
-});
+        block.flow([45], logo, turtle, 1);
 
-test("ForwardBlock: suppressOutput disables pen while moving", () => {
-  const Forward = activity.blocks.forward;
-  const block = new Forward();
+        expect(tur.painter.doRight).toHaveBeenCalledWith(45);
+    });
 
-  const tur = activity.turtles.ithTurtle(
-    activity.turtles.companionTurtle(turtle)
-  );
-  tur.singer.suppressOutput = true;
+    test("RightBlock: flow turns turtle right", () => {
+        const Right = activity.blocks.right;
+        const block = new Right();
 
-  block.flow([50], logo, turtle, 1);
+        const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
-  expect(tur.painter.doForward).toHaveBeenCalledWith(50);
-});
+        block.flow([90], logo, turtle, 1);
 
-test("RightBlock: suppressOutput still turns turtle right", () => {
-  const Right = activity.blocks.right;
-  const block = new Right();
+        expect(tur.painter.doRight).toHaveBeenCalledWith(90);
+    });
 
-  const tur = activity.turtles.ithTurtle(
-    activity.turtles.companionTurtle(turtle)
-  );
-  tur.singer.suppressOutput = true;
+    test("LeftBlock: flow turns turtle left", () => {
+        const Left = activity.blocks.left;
+        const block = new Left();
 
-  block.flow([45], logo, turtle, 1);
+        const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
-  expect(tur.painter.doRight).toHaveBeenCalledWith(45);
-});
+        block.flow([45], logo, turtle, 1);
 
-test("RightBlock: flow turns turtle right", () => {
-  const Right = activity.blocks.right;
-  const block = new Right();
+        expect(tur.painter.doRight).toHaveBeenCalledWith(-45);
+    });
 
-  const tur = activity.turtles.ithTurtle(
-    activity.turtles.companionTurtle(turtle)
-  );
+    test("SetXYBlock: flow sets turtle position", () => {
+        const SetXY = activity.blocks.setxy;
+        const block = new SetXY();
 
-  block.flow([90], logo, turtle, 1);
+        const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
-  expect(tur.painter.doRight).toHaveBeenCalledWith(90);
-});
+        block.flow([30, 40], logo, turtle, 1);
 
-test("LeftBlock: flow turns turtle left", () => {
-  const Left = activity.blocks.left;
-  const block = new Left();
+        expect(tur.painter.doSetXY).toHaveBeenCalledWith(30, 40);
+    });
 
-  const tur = activity.turtles.ithTurtle(
-    activity.turtles.companionTurtle(turtle)
-  );
+    test("ScrollXYBlock: flow scrolls canvas", () => {
+        const ScrollXY = activity.blocks.scrollxy;
+        const block = new ScrollXY();
 
-  block.flow([45], logo, turtle, 1);
+        const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
-  expect(tur.painter.doRight).toHaveBeenCalledWith(-45);
-});
+        block.flow([10, 20], logo, turtle, 1);
 
-test("SetXYBlock: flow sets turtle position", () => {
-  const SetXY = activity.blocks.setxy;
-  const block = new SetXY();
+        expect(tur.painter.doScrollXY).toHaveBeenCalledWith(10, 20);
+    });
 
-  const tur = activity.turtles.ithTurtle(
-    activity.turtles.companionTurtle(turtle)
-  );
+    test("ClearBlock: flow clears turtle drawing", () => {
+        const Clear = activity.blocks.clear;
+        const block = new Clear();
 
-  block.flow([30, 40], logo, turtle, 1);
+        const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
-  expect(tur.painter.doSetXY).toHaveBeenCalledWith(30, 40);
-});
+        block.flow([], logo, turtle, 1);
 
-test("ScrollXYBlock: flow scrolls canvas", () => {
-  const ScrollXY = activity.blocks.scrollxy;
-  const block = new ScrollXY();
+        expect(tur.painter.doClear).toHaveBeenCalled();
+    });
 
-  const tur = activity.turtles.ithTurtle(
-    activity.turtles.companionTurtle(turtle)
-  );
+    test("ArcBlock: flow draws arc", () => {
+        const Arc = activity.blocks.arc;
+        const block = new Arc();
 
-  block.flow([10, 20], logo, turtle, 1);
+        const tur = activity.turtles.ithTurtle(activity.turtles.companionTurtle(turtle));
 
-  expect(tur.painter.doScrollXY).toHaveBeenCalledWith(10, 20);
-});
+        block.flow([90, 100], logo, turtle, 1);
 
-test("ClearBlock: flow clears turtle drawing", () => {
-  const Clear = activity.blocks.clear;
-  const block = new Clear();
-
-  const tur = activity.turtles.ithTurtle(
-    activity.turtles.companionTurtle(turtle)
-  );
-
-  block.flow([], logo, turtle, 1);
-
-  expect(tur.painter.doClear).toHaveBeenCalled();
-});
-
-test("ArcBlock: flow draws arc", () => {
-  const Arc = activity.blocks.arc;
-  const block = new Arc();
-
-  const tur = activity.turtles.ithTurtle(
-    activity.turtles.companionTurtle(turtle)
-  );
-
-  block.flow([90, 100], logo, turtle, 1);
-
-  expect(tur.painter.doArc).toHaveBeenCalledWith(90, 100);
-});
-
+        expect(tur.painter.doArc).toHaveBeenCalledWith(90, 100);
+    });
 });
