@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-// A basic test file in jest framework for the mathutils.js 
+// A basic test file in jest framework for the mathutils.js
 const MathUtility = require("../mathutils");
 
 // Mock SOLFEGENAMES for testing doRandom function
@@ -145,4 +145,3 @@ describe("MathUtility", () => {
         });
     });
 });
-

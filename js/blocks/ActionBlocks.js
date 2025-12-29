@@ -462,7 +462,7 @@ function setupActionBlocks(activity) {
                     }
 
                     // eslint-disable-next-line no-unused-vars
-                    const __listener = (event) => tur.singer.backward.pop();
+                    const __listener = event => tur.singer.backward.pop();
 
                     logo.setTurtleListener(turtle, listenerName, __listener);
                 } else {
@@ -1067,7 +1067,7 @@ function setupActionBlocks(activity) {
                 const tur = activity.turtles.ithTurtle(turtle);
 
                 // eslint-disable-next-line no-unused-vars
-                const __listener = (event) => {
+                const __listener = event => {
                     if (tur.running) {
                         const queueBlock = new Queue(logo.actions[args[1]], 1, blk);
                         tur.parentFlowQueue.push(blk);
@@ -1207,7 +1207,9 @@ function setupActionBlocks(activity) {
             this.setHelpString([
                 _("Each Start block is a separate voice.") +
                     " " +
-                    _("All of the Start blocks run at the same time when the Play button is pressed."),
+                    _(
+                        "All of the Start blocks run at the same time when the Play button is pressed."
+                    ),
                 "documentation",
                 ""
             ]);
@@ -1295,7 +1297,9 @@ function setupActionBlocks(activity) {
              * @type {string[]}
              */
             this.setHelpString([
-                _("The Action block is used to group together blocks so that they can be used more than once.") +
+                _(
+                    "The Action block is used to group together blocks so that they can be used more than once."
+                ) +
                     " " +
                     _("It is often used for storing a phrase of music that is repeated."),
                 "documentation",
@@ -1449,7 +1453,7 @@ function setupActionBlocks(activity) {
                 }
 
                 // eslint-disable-next-line no-unused-vars
-                const __listener = (event) => tur.singer.backward.pop();
+                const __listener = event => tur.singer.backward.pop();
 
                 logo.setTurtleListener(turtle, listenerName, __listener);
             } else {

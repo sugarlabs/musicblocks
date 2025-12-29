@@ -58,8 +58,7 @@ class PitchStaircase {
      */
     _addButton(row, icon, iconSize, label) {
         const cell = row.insertCell(-1);
-        cell.innerHTML =
-            `&nbsp;&nbsp;<img 
+        cell.innerHTML = `&nbsp;&nbsp;<img 
                 src="header-icons/play-button.svg" 
                 title="${label}" 
                 alt="${label}" 
@@ -129,8 +128,9 @@ class PitchStaircase {
                     this._cellScale) /
                     3 +
                 "px";
-            stepCell.innerHTML =
-                `${frequency.toFixed(2)}<br>${this.Stairs[i][0]}${this.Stairs[i][1]}`;
+            stepCell.innerHTML = `${frequency.toFixed(2)}<br>${this.Stairs[i][0]}${
+                this.Stairs[i][1]
+            }`;
             stepCell.style.minWidth = stepCell.style.width;
             stepCell.style.maxWidth = stepCell.style.width;
             stepCell.style.height = PitchStaircase.BUTTONSIZE + "px";
@@ -153,7 +153,7 @@ class PitchStaircase {
             stepCell.style.backgroundRepeat = "no-repeat";
             stepCell.style.backgroundPosition = "center center";
 
-            stepCell.addEventListener("click", (event) => {
+            stepCell.addEventListener("click", event => {
                 this._dissectStair(event);
             });
 
@@ -604,7 +604,12 @@ class PitchStaircase {
         const w = window.innerWidth;
         this._cellScale = w / 1200;
 
-        const widgetWindow = window.widgetWindows.windowFor(this, "pitch staircase", "pitch staircase", true);
+        const widgetWindow = window.widgetWindows.windowFor(
+            this,
+            "pitch staircase",
+            "pitch staircase",
+            true
+        );
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();

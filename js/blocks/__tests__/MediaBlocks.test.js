@@ -30,9 +30,15 @@ class DummyFlowBlock {
         this.displayName = displayName || name;
         createdBlocks[name] = this;
     }
-    setPalette(palette, activity) { return this; }
-    beginnerBlock(flag) { return this; }
-    setHelpString(helpArr) { return this; }
+    setPalette(palette, activity) {
+        return this;
+    }
+    beginnerBlock(flag) {
+        return this;
+    }
+    setHelpString(helpArr) {
+        return this;
+    }
     formBlock(config) {
         this.config = config;
         return this;
@@ -41,8 +47,10 @@ class DummyFlowBlock {
         this.macro = fn;
         return this;
     }
-    setup(activity) { return this; }
-    flow() { }
+    setup(activity) {
+        return this;
+    }
+    flow() {}
 }
 
 class DummyValueBlock {
@@ -52,9 +60,15 @@ class DummyValueBlock {
         createdBlocks[name] = this;
         this.extraWidth = 0;
     }
-    setPalette(palette, activity) { return this; }
-    beginnerBlock(flag) { return this; }
-    setHelpString(helpArr) { return this; }
+    setPalette(palette, activity) {
+        return this;
+    }
+    beginnerBlock(flag) {
+        return this;
+    }
+    setHelpString(helpArr) {
+        return this;
+    }
     formBlock(config) {
         this.config = config;
         return this;
@@ -63,7 +77,9 @@ class DummyValueBlock {
         this.macro = fn;
         return this;
     }
-    setup(activity) { return this; }
+    setup(activity) {
+        return this;
+    }
     arg(logo, turtle, blk) {
         return global.activity.blocks.blockList[blk].value;
     }
@@ -75,9 +91,15 @@ class DummyLeftBlock {
         this.displayName = displayName || name;
         createdBlocks[name] = this;
     }
-    setPalette(palette, activity) { return this; }
-    beginnerBlock(flag) { return this; }
-    setHelpString(helpArr) { return this; }
+    setPalette(palette, activity) {
+        return this;
+    }
+    beginnerBlock(flag) {
+        return this;
+    }
+    setHelpString(helpArr) {
+        return this;
+    }
     formBlock(config) {
         this.config = config;
         return this;
@@ -86,7 +108,9 @@ class DummyLeftBlock {
         this.macro = fn;
         return this;
     }
-    setup(activity) { return this; }
+    setup(activity) {
+        return this;
+    }
     arg(logo, turtle, blk) {
         return global.activity.blocks.blockList[blk].value;
     }
@@ -95,15 +119,14 @@ class DummyLeftBlock {
 global.FlowBlock = DummyFlowBlock;
 global.ValueBlock = DummyValueBlock;
 global.LeftBlock = DummyLeftBlock;
-global._ = jest.fn((str) => str);
+global._ = jest.fn(str => str);
 
 global.NOINPUTERRORMSG = "No input provided";
 global.NANERRORMSG = "Not a number";
 
-global.toFixed2 = (val) => Number(val).toFixed(2);
+global.toFixed2 = val => Number(val).toFixed(2);
 
-global.calcOctave = (currentOctave, val, lastNote, noteValue) =>
-    currentOctave + parseInt(val);
+global.calcOctave = (currentOctave, val, lastNote, noteValue) => currentOctave + parseInt(val);
 global.pitchToFrequency = (note, octave, cents, keySig) => 440;
 global.doStopVideoCam = jest.fn();
 
@@ -112,7 +135,7 @@ global.Howl = function (config) {
     this.play = jest.fn();
     this.stop = jest.fn();
 };
-global.last = (arr) => arr[arr.length - 1];
+global.last = arr => arr[arr.length - 1];
 global._THIS_IS_MUSIC_BLOCKS_ = true;
 
 const createDummyTurtle = () => ({

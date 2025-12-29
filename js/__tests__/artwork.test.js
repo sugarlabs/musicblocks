@@ -18,7 +18,15 @@
  */
 
 global._THIS_IS_TURTLE_BLOCKS_ = true;
-const { showMaterialHighlight, hideButtonHighlight, hidePaletteNameDisplay, COLLAPSEBUTTONXOFF, STANDARDBLOCKHEIGHT, FILLCOLORS, TURTLESVG } = require("../artwork");
+const {
+    showMaterialHighlight,
+    hideButtonHighlight,
+    hidePaletteNameDisplay,
+    COLLAPSEBUTTONXOFF,
+    STANDARDBLOCKHEIGHT,
+    FILLCOLORS,
+    TURTLESVG
+} = require("../artwork");
 
 global.createjs = {
     Shape: jest.fn(() => ({
