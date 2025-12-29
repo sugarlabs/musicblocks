@@ -22,11 +22,11 @@ const { Palettes, initPalettes } = require("../palette");
 global.LEADING = 10;
 global.DEFAULTPALETTE = "default";
 global.MULTIPALETTES = ["palette1", "palette2"];
-global.PALETTEICONS = { "search": "<svg></svg>", "palette1": "<svg></svg>", "palette2": "<svg></svg>" };
+global.PALETTEICONS = { search: "<svg></svg>", palette1: "<svg></svg>", palette2: "<svg></svg>" };
 global.MULTIPALETTEICONS = ["palette1", "palette2"];
 global.SKIPPALETTES = [];
-global.toTitleCase = (str) => str.charAt(0).toUpperCase() + str.slice(1);
-global._ = (str) => str;
+global.toTitleCase = str => str.charAt(0).toUpperCase() + str.slice(1);
+global._ = str => str;
 global.platformColor = {
     selectorSelected: "#000",
     paletteBackground: "#fff",
@@ -53,7 +53,7 @@ describe("Palettes Class", () => {
                                 {},
                                 {
                                     parentNode: { removeChild: jest.fn() },
-                                    appendChild: jest.fn(() => ({})),
+                                    appendChild: jest.fn(() => ({}))
                                 }
                             ]
                         }
@@ -62,7 +62,7 @@ describe("Palettes Class", () => {
             ]
         };
 
-        global.docById = jest.fn((id) => {
+        global.docById = jest.fn(id => {
             if (id === "PaletteBody") {
                 return { parentNode: { removeChild: jest.fn() } };
             }
@@ -70,21 +70,31 @@ describe("Palettes Class", () => {
                 return {
                     ...paletteMock,
                     children: [
-                        { children: [{}, { children: [{}, { removeChild: jest.fn(), appendChild: jest.fn(() => ({})) }] }] }
-                    ],
+                        {
+                            children: [
+                                {},
+                                {
+                                    children: [
+                                        {},
+                                        { removeChild: jest.fn(), appendChild: jest.fn(() => ({})) }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
                 };
             }
             return { style: {}, appendChild: jest.fn(), removeChild: jest.fn() };
         });
-    
+
         mockActivity = {
             cellSize: 50,
             blocks: { protoBlockDict: {}, makeBlock: jest.fn(() => ({})) },
             hideSearchWidget: jest.fn(),
             showSearchWidget: jest.fn(),
-            palettes: {},
+            palettes: {}
         };
-        
+
         palettes = new Palettes(mockActivity);
     });
 
@@ -114,7 +124,11 @@ describe("Palettes Class", () => {
         mockActivity.blocks.protoBlockDict = {
             testBlock: { name: "testBlock", palette: { name: "testPalette" }, hidden: false }
         };
-        expect(palettes.getProtoNameAndPalette("testBlock")).toEqual(["testBlock", "testPalette", "testBlock"]);
+        expect(palettes.getProtoNameAndPalette("testBlock")).toEqual([
+            "testBlock",
+            "testPalette",
+            "testBlock"
+        ]);
     });
 
     test("hide and show functions modify visibility", () => {
@@ -129,7 +143,12 @@ describe("initPalettes function", () => {
     let palettes;
 
     beforeEach(() => {
-        palettes = { add: jest.fn(), init_selectors: jest.fn(), makePalettes: jest.fn(), show: jest.fn() };
+        palettes = {
+            add: jest.fn(),
+            init_selectors: jest.fn(),
+            makePalettes: jest.fn(),
+            show: jest.fn()
+        };
         global.BUILTINPALETTES = ["default"];
     });
 
