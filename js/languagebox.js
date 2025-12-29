@@ -18,7 +18,6 @@
 /* exported LanguageBox */
 
 class LanguageBox {
-
     /**
      * @constructor
      */
@@ -194,8 +193,7 @@ class LanguageBox {
         this._language = "ur";
         this.hide();
     }
-    
-    
+
     /**
      * @public
      * @returns {void}
@@ -205,7 +203,7 @@ class LanguageBox {
     }
     hide() {
         const MSGPrefix =
-        "<a href='#' class='language-link' " +
+            "<a href='#' class='language-link' " +
             "onMouseOver='this.style.opacity = 0.5'" +
             "onMouseOut='this.style.opacity = 1'>";
         const MSGSuffix = "</a>";
@@ -229,27 +227,23 @@ class LanguageBox {
             ayc: "Actualice su navegador para cambiar su preferencia de idioma.",
             quz: "Actualice su navegador para cambiar su preferencia de idioma.",
             gug: "Actualice su navegador para cambiar su preferencia de idioma.",
-            ur:"اپنی زبان کی ترجیح کو تبدیل کرنے کے لئے اپنے براؤزر کو تازہ دم کریں۔"
+            ur: "اپنی زبان کی ترجیح کو تبدیل کرنے کے لئے اپنے براؤزر کو تازہ دم کریں۔"
         };
         if (localStorage.getItem("languagePreference") === this._language) {
-            if(this._language.includes("ja"))
-            {
-                this._language=this._language.split("-")[0];
+            if (this._language.includes("ja")) {
+                this._language = this._language.split("-")[0];
             }
 
-            localStorage.setItem("languagePreference",this._language);
+            localStorage.setItem("languagePreference", this._language);
             this.activity.textMsg(_("Music Blocks is already set to this language."));
-        }
-        else{
+        } else {
             this.activity.storage.languagePreference = this._language;
 
             if (this._language === "ja" && this.activity.storage.kanaPreference === "kana") {
                 this.activity.textMsg(MSGPrefix + MSG["kana"] + MSGSuffix);
             } else {
-
-                if(this._language.includes("ja"))
-                {
-                    this._language=this._language.split("-")[0];
+                if (this._language.includes("ja")) {
+                    this._language = this._language.split("-")[0];
                 }
 
                 this.activity.textMsg(MSGPrefix + MSG[this._language] + MSGSuffix);

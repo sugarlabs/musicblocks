@@ -122,7 +122,9 @@ global.Tone = {
             this.sampleTime = 0.01;
         }
         getValue() {
-            return Array(this.size).fill(-100).map((val, i) => val + i);
+            return Array(this.size)
+                .fill(-100)
+                .map((val, i) => val + i);
         }
     }
 };
@@ -178,7 +180,7 @@ describe("setupSensorsBlocks", () => {
         global.NANERRORMSG = "Not a number";
 
         // Dummy internationalization.
-        global._ = jest.fn((str) => str);
+        global._ = jest.fn(str => str);
 
         // Dummy activity.
         activity = {
@@ -226,7 +228,7 @@ describe("setupSensorsBlocks", () => {
     describe("GetColorPixelBlock", () => {
         let block, logo, turtle;
         let originalDocById;
-    
+
         beforeEach(() => {
             block = DummyFlowBlock.createdBlocks["getcolorpixel"];
             logo = {
@@ -239,13 +241,13 @@ describe("setupSensorsBlocks", () => {
                 setTurtleListener: jest.fn()
             };
             turtle = 0;
-    
+
             // Save the original docById and set up the mock
             originalDocById = global.docById;
-            global.docById = jest.fn((id) => documentElements[id] || null);
-    
+            global.docById = jest.fn(id => documentElements[id] || null);
+
             // Ensure the turtle is set up correctly
-            activity.turtles.getTurtle = jest.fn((turtle) => {
+            activity.turtles.getTurtle = jest.fn(turtle => {
                 const t = createDummyTurtle();
                 if (turtle === 999) {
                     throw new Error(`Turtle ${turtle} not found`);
@@ -253,47 +255,47 @@ describe("setupSensorsBlocks", () => {
                 return t;
             });
         });
-    
+
         afterEach(() => {
             // Restore the original docById after each test
             global.docById = originalDocById;
         });
-    
+
         describe("arg", () => {
             it("should return a color value for a pixel", () => {
                 const color = block.arg(logo, turtle);
                 expect(color).toBe("rgb(100,150,200)");
             });
-    
+
             it("should return fallback color if turtle is not found", () => {
                 const color = block.arg(logo, 999);
                 expect(color).toBe("rgb(128,128,128)");
             });
-    
+
             it("should return fallback color if turtle container is missing", () => {
                 activity.turtles.getTurtle = jest.fn(() => ({})); // Turtle exists but no container
                 const color = block.arg(logo, turtle);
                 expect(color).toBe("rgb(128,128,128)");
             });
-    
+
             it("should handle canvas errors and return fallback color", () => {
                 global.docById = jest.fn(() => null); // Simulate canvas failure
                 const color = block.arg(logo, turtle);
                 expect(color).toBe("rgb(128,128,128)");
             });
-    
+
             it("should restore turtle visibility after successful execution", () => {
                 const turtleObj = createDummyTurtle();
                 activity.turtles.getTurtle = jest.fn(() => turtleObj);
                 block.arg(logo, turtle);
                 expect(turtleObj.container.visible).toBe(true);
             });
-    
+
             it("should not attempt to restore visibility if turtle is not found", () => {
                 const color = block.arg(logo, 999);
                 expect(color).toBe("rgb(128,128,128)");
             });
-    
+
             it("should not attempt to restore visibility if container is missing", () => {
                 const turtleObj = { container: null };
                 activity.turtles.getTurtle = jest.fn(() => turtleObj);
@@ -301,45 +303,45 @@ describe("setupSensorsBlocks", () => {
                 expect(color).toBe("rgb(128,128,128)");
             });
         });
-    
+
         describe("getPixelData", () => {
             it("should return pixel data from the canvas", () => {
                 const pixelData = block.getPixelData(50, 100);
                 expect(pixelData).toEqual([100, 150, 200, 255]);
             });
-    
+
             it("should throw an error if canvas context is unavailable", () => {
                 global.docById = jest.fn(() => null);
                 expect(() => block.getPixelData(50, 100)).toThrow("Canvas context unavailable");
             });
         });
-    
+
         describe("detectColor", () => {
             it("should return color index for opaque pixel", () => {
                 const pixelData = [100, 150, 200, 255];
                 const color = block.detectColor(pixelData);
                 expect(color).toBe("rgb(100,150,200)");
             });
-    
+
             it("should return background color for transparent pixel", () => {
                 const pixelData = [100, 150, 200, 0];
                 const color = block.detectColor(pixelData);
                 expect(color).toBe("rgb(200,200,200)");
             });
-    
+
             it("should throw an error for invalid pixel data", () => {
                 const pixelData = [100, 150]; // Invalid length
                 expect(() => block.detectColor(pixelData)).toThrow("Invalid pixel data");
             });
         });
-    
+
         describe("getBackgroundColor", () => {
             it("should parse and return background color", () => {
                 const color = block.getBackgroundColor();
                 expect(color).toBe("rgb(200,200,200)");
             });
         });
-    
+
         describe("getFallbackColor", () => {
             it("should return a default gray color", () => {
                 const color = block.getFallbackColor();
@@ -360,7 +362,7 @@ describe("setupSensorsBlocks", () => {
             activity.blocks.blockList["cblk1"] = { value: "Enter text" };
             inputBlock.flow([], logo, turtleIndex, "blkInput");
             const labelDiv = docById("labelDiv");
-            expect(labelDiv.innerHTML).toContain("input id=\"textLabel\"");
+            expect(labelDiv.innerHTML).toContain('input id="textLabel"');
             expect(activity.turtles.ithTurtle(turtleIndex).doWait).toHaveBeenCalledWith(120);
             // Note: we are not simulating the keypress event.
         });

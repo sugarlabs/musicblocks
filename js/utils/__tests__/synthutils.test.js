@@ -146,9 +146,7 @@ describe("Utility Functions (logic-only)", () => {
         setVolume = Synth.setVolume;
         getVolume = Synth.getVolume;
         setMasterVolume = Synth.setMasterVolume;
-
     });
-
 
     describe("setupRecorder", () => {
         it("it should sets up the recorder for the Synth instance.", () => {
@@ -157,9 +155,11 @@ describe("Utility Functions (logic-only)", () => {
             }
             expect(setupRecorder()).toBe(undefined);
             function isToneInstance(instance) {
-                return instance instanceof Tone.PolySynth ||
+                return (
+                    instance instanceof Tone.PolySynth ||
                     instance instanceof Tone.Sampler ||
-                    instance instanceof Tone.Player;
+                    instance instanceof Tone.Player
+                );
             }
 
             for (const tur in instruments) {
@@ -169,7 +169,6 @@ describe("Utility Functions (logic-only)", () => {
             }
         });
     });
-
 
     describe("createDefaultSynth", () => {
         it("it should create the default poly/default/custom synth for the specified turtle", () => {
@@ -278,7 +277,6 @@ describe("Utility Functions (logic-only)", () => {
         const turtle = "turtle1";
         const beatValue = 1;
 
-
         test("should process effect parameters correctly", () => {
             // Arrange
             const paramsEffects = {
@@ -309,7 +307,7 @@ describe("Utility Functions (logic-only)", () => {
 
             // Mock context
             const mockContext = {
-                _performNotes: mockPerformNotes,
+                _performNotes: mockPerformNotes
             };
 
             // Mock trigger function
@@ -338,11 +336,11 @@ describe("Utility Functions (logic-only)", () => {
 
             // Arrange
             const paramsEffects = {
-                vibratoIntensity: 1,
+                vibratoIntensity: 1
             };
             const waveforms = ["sine", "sawtooth", "triangle", "square"];
 
-            waveforms.forEach((waveform) => {
+            waveforms.forEach(waveform => {
                 // Act
                 trigger(turtle, "C4", beatValue, waveform, paramsEffects, null, true, 0);
 
@@ -351,14 +349,13 @@ describe("Utility Functions (logic-only)", () => {
                     turtle,
                     "C4",
                     1,
-                    { "vibratoIntensity": 1 }, // paramsEffects should be null for basic waveform instruments
+                    { vibratoIntensity: 1 }, // paramsEffects should be null for basic waveform instruments
                     null,
                     true,
                     0
                 );
             });
         });
-
 
         test("should handle array of notes for builtin synth", () => {
             // Arrange
@@ -368,7 +365,7 @@ describe("Utility Functions (logic-only)", () => {
 
             // Mock context
             const mockContext = {
-                _performNotes: mockPerformNotes,
+                _performNotes: mockPerformNotes
             };
 
             // Mock trigger function
@@ -408,10 +405,6 @@ describe("Utility Functions (logic-only)", () => {
                 0
             );
         });
-
-
-
-
     });
 
     describe("temperamentChanged", () => {
@@ -420,7 +413,6 @@ describe("Utility Functions (logic-only)", () => {
             expect(whichTemperament()).toBe("equal");
         });
     });
-
 
     describe("resume", () => {
         it("it should resume the Tone.js context", () => {
@@ -437,14 +429,20 @@ describe("Utility Functions (logic-only)", () => {
     });
 
     describe("rampTo function", () => {
-
         test("should ramp the volume for non-percussion and non-string instruments", () => {
-            const turtle = "turtle1", instrumentName = "flute", oldVol = 20, volume = 60, rampTime = 5;
+            const turtle = "turtle1",
+                instrumentName = "flute",
+                oldVol = 20,
+                volume = 60,
+                rampTime = 5;
             rampTo(turtle, instrumentName, oldVol, volume, rampTime);
 
             expect(Tone.gainToDb).toHaveBeenCalledWith(0.92);
             expect(Tone.now).toHaveBeenCalled();
-            expect(instruments.turtle1.flute.volume.linearRampToValueAtTime).toHaveBeenCalledWith(4, expect.any(Number));
+            expect(instruments.turtle1.flute.volume.linearRampToValueAtTime).toHaveBeenCalledWith(
+                4,
+                expect.any(Number)
+            );
         });
 
         test("should not ramp the volume for percussion instruments", () => {
@@ -456,7 +454,6 @@ describe("Utility Functions (logic-only)", () => {
     });
 
     describe("setVolume function", () => {
-
         test("should set the volume for an instrument using DEFAULTSYNTHVOLUME", () => {
             setVolume("turtle1", "flute", 80);
 
@@ -496,7 +493,7 @@ describe("Utility Functions (logic-only)", () => {
         });
 
         test("should return default volume if instrument is not found", () => {
-            const consoleSpy = jest.spyOn(console, "debug").mockImplementation(() => { });
+            const consoleSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
 
             const result = getVolume("turtle1", "nonexistent");
 
@@ -506,7 +503,6 @@ describe("Utility Functions (logic-only)", () => {
             consoleSpy.mockRestore();
         });
     });
-
 
     describe("setMasterVolume function", () => {
         test("should set the master volume correctly", () => {
@@ -532,21 +528,16 @@ describe("Utility Functions (logic-only)", () => {
             expect(Tone.gainToDb).toHaveBeenCalledWith(1);
             expect(Tone.Destination.volume.rampTo).toHaveBeenCalledWith(expectedDb, 0.01);
         });
-
-
-
-
     });
 
     describe("startSound", () => {
         const turtle = "turtle1";
 
-
         test("should call start() for drum instruments", () => {
             // Arrange
             const instrumentName = "guitar"; // Assuming 'snare' is a drum
             const note = "C4";
-            
+
             // Act
             startSound(turtle, instrumentName, note);
 
@@ -554,7 +545,6 @@ describe("Utility Functions (logic-only)", () => {
             expect(instruments[turtle][instrumentName].start).toHaveBeenCalledTimes(1);
             expect(instruments[turtle][instrumentName].triggerAttack).not.toHaveBeenCalled();
         });
-
 
         test("should call triggerAttack() for non-drum instruments", () => {
             // Arrange
@@ -588,7 +578,6 @@ describe("Utility Functions (logic-only)", () => {
             expect(() => startSound(invalidTurtle, instrumentName, note)).toThrow();
         });
     });
-
 
     describe("stopSound", () => {
         const turtle = "turtle1";
@@ -650,7 +639,6 @@ describe("Utility Functions (logic-only)", () => {
         });
     });
 
-
     describe("loop", () => {
         test("should create and start a loop for drum instruments", () => {
             const turtle = "turtle1";
@@ -682,22 +670,23 @@ describe("Utility Functions (logic-only)", () => {
 
             const loopCallback = Tone.Loop.mock.calls[0][0];
             loopCallback(0);
-            expect(instruments[turtle][instrumentName].triggerAttackRelease)
-                .toHaveBeenCalledWith(note, duration, expect.any(Number), velocity);
+            expect(instruments[turtle][instrumentName].triggerAttackRelease).toHaveBeenCalledWith(
+                note,
+                duration,
+                expect.any(Number),
+                velocity
+            );
             expect(instruments[turtle][instrumentName].start).not.toHaveBeenCalled();
             expect(result).toStrictEqual({});
         });
 
         test("should calculate correct loop interval based on BPM", () => {
             const bpm = 120;
-            const expectedInterval = 60 / bpm;  // Should be 0.5 seconds for 120 BPM
+            const expectedInterval = 60 / bpm; // Should be 0.5 seconds for 120 BPM
 
             loop("turtle1", "flute", "C4", 0.25, 0, bpm, 0.8);
 
-            expect(Tone.Loop).toHaveBeenCalledWith(
-                expect.any(Function),
-                expectedInterval
-            );
+            expect(Tone.Loop).toHaveBeenCalledWith(expect.any(Function), expectedInterval);
         });
 
         test("should handle different start times", () => {
@@ -719,9 +708,12 @@ describe("Utility Functions (logic-only)", () => {
             loop("turtle1", "flute", "C4", 0.25, 0, 120, velocity);
             const melodicCallback = Tone.Loop.mock.calls[0][0];
             melodicCallback(0);
-            expect(instruments.turtle1.flute.triggerAttackRelease)
-                .toHaveBeenCalledWith("C4", 0.25, 100, velocity);
-
+            expect(instruments.turtle1.flute.triggerAttackRelease).toHaveBeenCalledWith(
+                "C4",
+                0.25,
+                100,
+                velocity
+            );
         });
     });
 
@@ -809,9 +801,7 @@ describe("Utility Functions (logic-only)", () => {
         });
     });
 
-
     describe("loadSamples", () => {
-
         beforeEach(() => {
             // Reset mocks before each test
             jest.clearAllMocks();
@@ -915,14 +905,12 @@ describe("Utility Functions (logic-only)", () => {
         });
     });
 
-
     describe("createSynth", () => {
         it("it should create a synth based on the user's input in the 'Timbre' clamp, handling race conditions with the samples loader.", () => {
-            const turtle = "turtle1";  // Use const or let
-            const instrumentName = "piano";  // Localize declaration
-            const sourceName = "voice recording";  // Localize declaration
+            const turtle = "turtle1"; // Use const or let
+            const instrumentName = "piano"; // Localize declaration
+            const sourceName = "voice recording"; // Localize declaration
             expect(createSynth(turtle, instrumentName, sourceName, {})).toBe(undefined);
         });
     });
-
 });

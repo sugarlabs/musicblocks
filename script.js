@@ -3,7 +3,7 @@
  * @function
  * @global
  */
-$(document).ready(function() {
+$(document).ready(function () {
     /**
      * The user's selected mode, stored in local storage.
      * @type {string}
@@ -45,6 +45,6 @@ $(document).ready(function() {
     $(".materialize-iso, .dropdown-trigger").dropdown({
         constrainWidth: false,
         hover: false, // Activate on click
-        belowOrigin: true, // Displays dropdown below the button
+        belowOrigin: true // Displays dropdown below the button
     });
 });

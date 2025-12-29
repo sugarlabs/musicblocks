@@ -17,13 +17,16 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const frequencyToPitch = jest.fn((n) => {
+const frequencyToPitch = jest.fn(n => {
     return ["C", "4"];
 });
 const getScaleAndHalfSteps = jest.fn(() => {
-    return [["C", "D", "E", "F", "G", "A", "B"], ["", "", "", "", "", "", ""]];
+    return [
+        ["C", "D", "E", "F", "G", "A", "B"],
+        ["", "", "", "", "", "", ""]
+    ];
 });
-const toFraction = jest.fn((num) => {
+const toFraction = jest.fn(num => {
     return [num, 1];
 });
 
@@ -50,8 +53,8 @@ global.NATURAL = "♮";
 global.DOUBLESHARP = "𝄪";
 global.DOUBLEFLAT = "𝄫";
 
-global._ = jest.fn((str) => str);
-global.last = jest.fn((array) => array[array.length - 1]);
+global._ = jest.fn(str => str);
+global.last = jest.fn(array => array[array.length - 1]);
 
 const { getLilypondHeader, processLilypondNotes, saveLilypondOutput } = require("../lilypond");
 
@@ -64,7 +67,6 @@ describe("getLilypondHeader", () => {
         expect(result).toContain("Creative Commons Attribution ShareAlike 3.0");
     });
 });
-
 
 describe("processLilypondNotes", () => {
     let logo;
@@ -79,20 +81,7 @@ describe("processLilypondNotes", () => {
             },
             notation: {
                 notationStaging: {
-                    [turtle]: [
-                        [
-                            ["G4"],
-                            4,
-                            0,
-                            null,
-                            0,
-                            -1,
-                            false
-                        ],
-                        "meter",
-                        4,
-                        4
-                    ]
+                    [turtle]: [[["G4"], 4, 0, null, 0, -1, false], "meter", 4, 4]
                 }
             }
         };
@@ -106,38 +95,20 @@ describe("processLilypondNotes", () => {
     });
 
     test("should process a note object correctly", () => {
-        logo.notation.notationStaging[turtle] = [
-            [
-                ["G4"],
-                4,
-                0,
-                null,
-                0,
-                -1,
-                false
-            ]
-        ];
+        logo.notation.notationStaging[turtle] = [[["G4"], 4, 0, null, 0, -1, false]];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "g'4 ");
         expect(logo.notationNotes[turtle]).toContain("4");
     });
 
     test("should process a key signature correctly", () => {
-        logo.notation.notationStaging[turtle] = [
-            "key",
-            "C",
-            "major"
-        ];
+        logo.notation.notationStaging[turtle] = ["key", "C", "major"];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\key c \\major");
     });
 
     test("should process a tempo change correctly", () => {
-        logo.notation.notationStaging[turtle] = [
-            "tempo",
-            120,
-            "Allegro"
-        ];
+        logo.notation.notationStaging[turtle] = ["tempo", 120, "Allegro"];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tempo Allegro = 120");
     });
@@ -145,15 +116,7 @@ describe("processLilypondNotes", () => {
     test("should process a slur correctly", () => {
         logo.notation.notationStaging[turtle] = [
             "begin slur",
-            [
-                ["G4"],
-                4,
-                0,
-                null,
-                0,
-                -1,
-                false
-            ],
+            [["G4"], 4, 0, null, 0, -1, false],
             "end slur"
         ];
         processLilypondNotes(lilypond, logo, turtle);
@@ -163,15 +126,7 @@ describe("processLilypondNotes", () => {
     test("should process a crescendo correctly", () => {
         logo.notation.notationStaging[turtle] = [
             "begin crescendo",
-            [
-                ["G4"],
-                4,
-                0,
-                null,
-                0,
-                -1,
-                false
-            ],
+            [["G4"], 4, 0, null, 0, -1, false],
             "end crescendo"
         ];
         processLilypondNotes(lilypond, logo, turtle);
@@ -181,15 +136,7 @@ describe("processLilypondNotes", () => {
     test("should process a decrescendo correctly", () => {
         logo.notation.notationStaging[turtle] = [
             "begin decrescendo",
-            [
-                ["G4"],
-                4,
-                0,
-                null,
-                0,
-                -1,
-                false
-            ],
+            [["G4"], 4, 0, null, 0, -1, false],
             "end decrescendo"
         ];
         processLilypondNotes(lilypond, logo, turtle);
@@ -197,60 +144,30 @@ describe("processLilypondNotes", () => {
     });
 
     test("should process a tuplet correctly", () => {
-        logo.notation.notationStaging[turtle] = [
-            [
-                ["G4"],
-                4,
-                0,
-                [3, 2],
-                0,
-                -1,
-                false
-            ]
-        ];
+        logo.notation.notationStaging[turtle] = [[["G4"], 4, 0, [3, 2], 0, -1, false]];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\meter\n" + "\\tuplet Infinity/1 { g' 0} ");
     });
 
     test("should process a markup command correctly", () => {
-        logo.notation.notationStaging[turtle] = [
-            "markup",
-            "Test Markup"
-        ];
+        logo.notation.notationStaging[turtle] = ["markup", "Test Markup"];
         processLilypondNotes(lilypond, logo, turtle);
-        expect(logo.notationNotes[turtle]).toContain("^\\markup { \\abs-fontsize #6 { Test Markup } } ");
+        expect(logo.notationNotes[turtle]).toContain(
+            "^\\markup { \\abs-fontsize #6 { Test Markup } } "
+        );
     });
 
     test("should process a markdown command correctly", () => {
-        logo.notation.notationStaging[turtle] = [
-            "markdown",
-            "Test Markdown"
-        ];
+        logo.notation.notationStaging[turtle] = ["markdown", "Test Markdown"];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("_\\markup { Test Markdown } ");
     });
 
     test("should process a break command correctly", () => {
         logo.notation.notationStaging[turtle] = [
-            [
-                ["G4"],
-                4,
-                0,
-                null,
-                0,
-                -1,
-                false
-            ],
+            [["G4"], 4, 0, null, 0, -1, false],
             "break",
-            [
-                ["E4"],
-                4,
-                0,
-                null,
-                0,
-                -1,
-                false
-            ]
+            [["E4"], 4, 0, null, 0, -1, false]
         ];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\n");
@@ -259,15 +176,7 @@ describe("processLilypondNotes", () => {
     test("should process articulation commands correctly", () => {
         logo.notation.notationStaging[turtle] = [
             "begin articulation",
-            [
-                ["G4"],
-                4,
-                0,
-                null,
-                0,
-                -1,
-                false
-            ],
+            [["G4"], 4, 0, null, 0, -1, false],
             "end articulation"
         ];
         processLilypondNotes(lilypond, logo, turtle);
@@ -275,19 +184,7 @@ describe("processLilypondNotes", () => {
     });
 
     test("should process a pickup command correctly", () => {
-        logo.notation.notationStaging[turtle] = [
-            "pickup",
-            4,
-            [
-                ["G4"],
-                4,
-                0,
-                null,
-                0,
-                -1,
-                false
-            ]
-        ];
+        logo.notation.notationStaging[turtle] = ["pickup", 4, [["G4"], 4, 0, null, 0, -1, false]];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\partial 4\n");
     });
@@ -295,25 +192,9 @@ describe("processLilypondNotes", () => {
     test("should process voice commands correctly", () => {
         logo.notation.notationStaging[turtle] = [
             "voice one",
-            [
-                ["G4"],
-                4,
-                0,
-                null,
-                0,
-                -1,
-                false
-            ],
+            [["G4"], 4, 0, null, 0, -1, false],
             "voice two",
-            [
-                ["E4"],
-                4,
-                0,
-                null,
-                0,
-                -1,
-                false
-            ],
+            [["E4"], 4, 0, null, 0, -1, false],
             "one voice"
         ];
         processLilypondNotes(lilypond, logo, turtle);
@@ -323,49 +204,25 @@ describe("processLilypondNotes", () => {
     });
 
     test("should process a tie command correctly", () => {
-        logo.notation.notationStaging[turtle] = [
-            "tie"
-        ];
+        logo.notation.notationStaging[turtle] = ["tie"];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("~");
     });
 
     test("should append unrecognized command as is", () => {
-        logo.notation.notationStaging[turtle] = [
-            "unrecognized"
-        ];
+        logo.notation.notationStaging[turtle] = ["unrecognized"];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("unrecognized");
     });
 
     test("should process note object with dot notation", () => {
-        logo.notation.notationStaging[turtle] = [
-            [
-                ["G4"],
-                4,
-                0,
-                null,
-                2,
-                -1,
-                false
-            ]
-        ];
+        logo.notation.notationStaging[turtle] = [[["G4"], 4, 0, null, 2, -1, false]];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("4..");
     });
 
     test("should process note object with staccato", () => {
-        logo.notation.notationStaging[turtle] = [
-            [
-                ["G4"],
-                4,
-                0,
-                null,
-                0,
-                -1,
-                true
-            ]
-        ];
+        logo.notation.notationStaging[turtle] = [[["G4"], 4, 0, null, 0, -1, true]];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\staccato ");
     });
@@ -373,15 +230,7 @@ describe("processLilypondNotes", () => {
     test("should insert newline after 8 notes", () => {
         const notesArray = [];
         for (let i = 0; i < 9; i++) {
-            notesArray.push([
-                ["G4"],
-                4,
-                0,
-                null,
-                0,
-                -1,
-                false
-            ]);
+            notesArray.push([["G4"], 4, 0, null, 0, -1, false]);
         }
         logo.notation.notationStaging[turtle] = notesArray;
         processLilypondNotes(lilypond, logo, turtle);
@@ -389,17 +238,7 @@ describe("processLilypondNotes", () => {
     });
 
     test("should handle incomplete tuplet gracefully", () => {
-        logo.notation.notationStaging[turtle] = [
-            [
-                ["G4"],
-                4,
-                0,
-                [3, 2],
-                0,
-                -1,
-                false
-            ]
-        ];
+        logo.notation.notationStaging[turtle] = [[["G4"], 4, 0, [3, 2], 0, -1, false]];
         processLilypondNotes(lilypond, logo, turtle);
         expect(logo.notationNotes[turtle]).toContain("\\tuplet");
     });
@@ -427,28 +266,8 @@ describe("saveLilypondOutput", () => {
             logo: {
                 notation: {
                     notationStaging: {
-                        "0": [
-                            [
-                                ["G4"],
-                                4,
-                                0,
-                                null,
-                                0,
-                                -1,
-                                false
-                            ]
-                        ],
-                        "1": [
-                            [
-                                ["E4"],
-                                4,
-                                0,
-                                null,
-                                0,
-                                -1,
-                                false
-                            ]
-                        ]
+                        "0": [[["G4"], 4, 0, null, 0, -1, false]],
+                        "1": [[["E4"], 4, 0, null, 0, -1, false]]
                     },
                     notationDrumStaging: {}
                 },
@@ -473,7 +292,9 @@ describe("saveLilypondOutput", () => {
 
     test("should generate LilyPond output correctly", () => {
         const result = saveLilypondOutput(activity);
-        expect(result).toContain("% You can change the MIDI instruments below to anything on this list:");
+        expect(result).toContain(
+            "% You can change the MIDI instruments below to anything on this list:"
+        );
         expect(result).toContain("\\score {");
         expect(result).toContain("\\layout {}");
         expect(result).toContain("% MUSIC BLOCKS CODE");
@@ -482,17 +303,7 @@ describe("saveLilypondOutput", () => {
 
     test("should handle drum staging correctly", () => {
         activity.logo.notation.notationDrumStaging = {
-            "0": [
-                [
-                    ["C4"],
-                    4,
-                    0,
-                    null,
-                    0,
-                    -1,
-                    false
-                ]
-            ]
+            "0": [[["C4"], 4, 0, null, 0, -1, false]]
         };
         const result = saveLilypondOutput(activity);
         expect(result).toContain("\\drummode {");
@@ -525,7 +336,8 @@ describe("saveLilypondOutput", () => {
     test("should handle empty notation staging correctly", () => {
         activity.logo.notation.notationStaging = {};
         const result = saveLilypondOutput(activity);
-        const expected = "% You can change the MIDI instruments below to anything on this list:\n" +
+        const expected =
+            "% You can change the MIDI instruments below to anything on this list:\n" +
             "% (http://lilypond.org/doc/v2.18/documentation/notation/midi-instruments)\n\n" +
             "\\score {\n" +
             " <<\n\n" +
@@ -534,7 +346,7 @@ describe("saveLilypondOutput", () => {
             "% MUSIC BLOCKS CODE\n" +
             "% Below is the code for the Music Blocks project that generated this Lilypond file.\n" +
             "%{\n\n" +
-            "{\"project\":\"data\"}\n" +
+            '{"project":"data"}\n' +
             "%}\n\n";
         expect(result).not.toContain(expected);
     });
@@ -542,11 +354,13 @@ describe("saveLilypondOutput", () => {
     test("should handle empty notation output correctly", () => {
         activity.logo.notationOutput = "";
         const result = saveLilypondOutput(activity);
-        expect(result).toContain("% You can change the MIDI instruments below to anything on this list:");
+        expect(result).toContain(
+            "% You can change the MIDI instruments below to anything on this list:"
+        );
     });
 
     test("should fallback to RODENTS names if instrument name is empty", () => {
-        activity.turtles.getTurtle = jest.fn((t) => ({ name: "" }));
+        activity.turtles.getTurtle = jest.fn(t => ({ name: "" }));
         activity.turtles.turtleList = { "0": {} };
         saveLilypondOutput(activity);
         expect(activity.logo.notationOutput).toContain(RODENTS[0]);
@@ -566,8 +380,8 @@ describe("saveLilypondOutput", () => {
 
         const result = saveLilypondOutput(activity);
 
-        expect(result).toContain("\\context TabVoice = \"Turtle0\" \\Turtle0");
-        expect(result).toContain("shortInstrumentName = \"Tu\"");
+        expect(result).toContain('\\context TabVoice = "Turtle0" \\Turtle0');
+        expect(result).toContain('shortInstrumentName = "Tu"');
         expect(result).toContain("Turtle1Voice = \\new Staff \\with {");
     });
 

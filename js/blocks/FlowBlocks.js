@@ -93,7 +93,7 @@ function setupFlowBlocks(activity) {
             }
 
             // Set up the listener function
-            const __listener = (event) => tur.singer.backward.pop();
+            const __listener = event => tur.singer.backward.pop();
 
             // Set the turtle listener
             logo.setTurtleListener(turtle, listenerName, __listener);
@@ -123,7 +123,9 @@ function setupFlowBlocks(activity) {
             this.setHelpString([
                 _("The Duplicate block will run each block multiple times.") +
                     " " +
-                    _("The output of the example is: Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol."),
+                    _(
+                        "The output of the example is: Sol, Sol, Sol, Sol, Re, Re, Re, Re, Sol, Sol, Sol, Sol."
+                    ),
                 "documentation",
                 null,
                 "duphelp"
@@ -196,7 +198,7 @@ function setupFlowBlocks(activity) {
                 tur.singer.inDuplicate = true;
 
                 // Listener function for handling the end of duplication
-                const __listener = (event) => {
+                const __listener = event => {
                     tur.singer.inDuplicate = false;
                     tur.singer.duplicateFactor /= factor;
 
@@ -894,7 +896,9 @@ function setupFlowBlocks(activity) {
 
             if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    _("Conditionals lets your program take different actions depending on the condition.") +
+                    _(
+                        "Conditionals lets your program take different actions depending on the condition."
+                    ) +
                         " " +
                         _("In this example if the mouse button is pressed a snare drum will play."),
                     "documentation",
@@ -903,9 +907,13 @@ function setupFlowBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    _("Conditionals lets your program take different actions depending on the condition.") +
+                    _(
+                        "Conditionals lets your program take different actions depending on the condition."
+                    ) +
                         " " +
-                        _("In this example if the mouse button is pressed a snare drum will play, else a kick drum will play."),
+                        _(
+                            "In this example if the mouse button is pressed a snare drum will play, else a kick drum will play."
+                        ),
                     "documentation",
                     null,
                     "elifhelp"
@@ -953,7 +961,9 @@ function setupFlowBlocks(activity) {
 
             if (activity.beginnerMode && this.lang === "ja") {
                 this.setHelpString([
-                    _("Conditionals lets your program take different actions depending on the condition.") +
+                    _(
+                        "Conditionals lets your program take different actions depending on the condition."
+                    ) +
                         " " +
                         _("In this example if the mouse button is pressed a snare drum will play."),
                     "documentation",
@@ -962,7 +972,9 @@ function setupFlowBlocks(activity) {
                 ]);
             } else {
                 this.setHelpString([
-                    _("Conditionals lets your program take different actions depending on the condition.") +
+                    _(
+                        "Conditionals lets your program take different actions depending on the condition."
+                    ) +
                         " " +
                         _("In this example if the mouse button is pressed a snare drum will play."),
                     "documentation",
@@ -1012,7 +1024,9 @@ function setupFlowBlocks(activity) {
             this.setHelpString([
                 _("The Forever block will repeat the contained blocks forever.") +
                     " " +
-                    _("In this example of a simple drum machine a kick drum will play 1/4 notes forever."),
+                    _(
+                        "In this example of a simple drum machine a kick drum will play 1/4 notes forever."
+                    ),
                 "documentation",
                 null,
                 "foreverhelp"
@@ -1130,8 +1144,9 @@ function setupFlowBlocks(activity) {
             ) {
                 logo.statusFields.push([blk, "duplicate"]);
             } else {
-                activity.blocks.blockList[blk].value =
-                    activity.turtles.ithTurtle(turtle).singer.duplicateFactor;
+                activity.blocks.blockList[blk].value = activity.turtles.ithTurtle(
+                    turtle
+                ).singer.duplicateFactor;
             }
         }
     }

@@ -26,17 +26,17 @@ describe("setupDrumActions", () => {
     beforeAll(() => {
         global.Singer = {
             DrumActions: {},
-            processNote: jest.fn(),
+            processNote: jest.fn()
         };
 
         global.DEFAULTDRUM = "defaultDrum";
         global.DRUMNAMES = {
             drum1: ["d1", "drum1"],
-            drum2: ["d2", "drum2"],
+            drum2: ["d2", "drum2"]
         };
         global.NOISENAMES = {
             noise1: ["n1", "noise1"],
-            noise2: ["n2", "noise2"],
+            noise2: ["n2", "noise2"]
         };
         global.DEFAULTVOLUME = 100;
         global.last = jest.fn(arr => arr[arr.length - 1]);
@@ -56,9 +56,9 @@ describe("setupDrumActions", () => {
                 clearNoteParams: jest.fn(),
                 inRhythmRuler: false,
                 rhythmRuler: { Drums: [], Rulers: [] },
-                _currentDrumBlock: null,
+                _currentDrumBlock: null
             },
-            errorMsg: jest.fn(),
+            errorMsg: jest.fn()
         };
 
         targetTurtle = {
@@ -71,8 +71,8 @@ describe("setupDrumActions", () => {
                 noteBeatValues: {},
                 beatFactor: 1,
                 pushedNote: false,
-                pitchDrumTable: {},
-            },
+                pitchDrumTable: {}
+            }
         };
 
         activity.turtles.ithTurtle.mockReturnValue(targetTurtle);
@@ -107,11 +107,7 @@ describe("setupDrumActions", () => {
             Singer.DrumActions.playDrum("d1", 0, 1);
 
             expect(Singer.processNote).toHaveBeenCalled();
-            expect(activity.logo.clearNoteParams).toHaveBeenCalledWith(
-                targetTurtle,
-                1,
-                []
-            );
+            expect(activity.logo.clearNoteParams).toHaveBeenCalledWith(targetTurtle, 1, []);
             expect(targetTurtle.singer.inNoteBlock).toContain(1);
             expect(targetTurtle.singer.noteDrums[1]).toContain("drum1");
             expect(targetTurtle.singer.pushedNote).toBe(true);
@@ -141,9 +137,7 @@ describe("setupDrumActions", () => {
 
             Singer.DrumActions.playDrum("d1", 0, 1);
             expect(targetTurtle.singer.synthVolume.drum1).toEqual([DEFAULTVOLUME]);
-            expect(
-                targetTurtle.singer.crescendoInitialVolume.drum1
-            ).toEqual([DEFAULTVOLUME]);
+            expect(targetTurtle.singer.crescendoInitialVolume.drum1).toEqual([DEFAULTVOLUME]);
         });
 
         it("keeps existing volume", () => {
@@ -154,9 +148,7 @@ describe("setupDrumActions", () => {
 
             Singer.DrumActions.playDrum("d1", 0, 5);
             expect(targetTurtle.singer.synthVolume.drum1).toEqual([30]);
-            expect(
-                targetTurtle.singer.crescendoInitialVolume.drum1
-            ).toEqual([40]);
+            expect(targetTurtle.singer.crescendoInitialVolume.drum1).toEqual([40]);
         });
 
         it("removes block on callback", () => {
@@ -171,7 +163,7 @@ describe("setupDrumActions", () => {
 
     describe.each([
         ["setDrum", "_setdrum_0", true],
-        ["mapPitchToDrum", "_mapdrum_0", false],
+        ["mapPitchToDrum", "_mapdrum_0", false]
     ])("%s", (action, prefix, resetTable) => {
         beforeEach(() => {
             targetTurtle.singer.drumStyle = [];
@@ -183,11 +175,7 @@ describe("setupDrumActions", () => {
         it("sets drum and listener", () => {
             Singer.DrumActions[action]("d1", 0, 1);
             expect(targetTurtle.singer.drumStyle).toContain("drum1");
-            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(
-                1,
-                0,
-                prefix
-            );
+            expect(activity.logo.setDispatchBlock).toHaveBeenCalledWith(1, 0, prefix);
             expect(activity.logo.setTurtleListener).toHaveBeenCalled();
         });
 

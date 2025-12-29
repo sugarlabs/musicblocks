@@ -18,7 +18,7 @@
  */
 
 const JSInterface = {
-    validateArgs: jest.fn(),
+    validateArgs: jest.fn()
 };
 global.JSInterface = JSInterface;
 const IntervalsBlocksAPI = require("../IntervalsBlocksAPI");
@@ -48,7 +48,11 @@ describe("IntervalsBlocksAPI", () => {
         JSInterface.validateArgs.mockReturnValue(["dorian", flow]);
         await intervalsBlocksAPI.defineMode("dorian", flow);
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("defineMode", ["dorian", flow]);
-        expect(intervalsBlocksAPI.runCommand).toHaveBeenCalledWith("defineMode", ["dorian", 1, "mockedBlock"]);
+        expect(intervalsBlocksAPI.runCommand).toHaveBeenCalledWith("defineMode", [
+            "dorian",
+            1,
+            "mockedBlock"
+        ]);
         expect(flow).toHaveBeenCalled();
     });
 
@@ -74,6 +78,10 @@ describe("IntervalsBlocksAPI", () => {
         JSInterface.validateArgs.mockReturnValue(["equal", 440, 4]);
         intervalsBlocksAPI.setTemperament("equal", 440, 4);
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("setTemperament", ["equal", 440, 4]);
-        expect(intervalsBlocksAPI.runCommand).toHaveBeenCalledWith("setTemperament", ["equal", 440, 4]);
+        expect(intervalsBlocksAPI.runCommand).toHaveBeenCalledWith("setTemperament", [
+            "equal",
+            440,
+            4
+        ]);
     });
 });
