@@ -18,27 +18,27 @@
  */
 
 const { JSGenerate } = require("../generate");
-global.last = jest.fn((array) => array[array.length - 1]);
+global.last = jest.fn(array => array[array.length - 1]);
 const globalActivity = {
     blocks: {
         stackList: [],
         blockList: {},
-        findStacks: jest.fn(),
-    },
+        findStacks: jest.fn()
+    }
 };
 global.globalActivity = globalActivity;
 global.console = {
     log: jest.fn(),
     error: jest.fn(),
-    warn: jest.fn(),
+    warn: jest.fn()
 };
 const ASTUtils = {
     BAREBONE_AST: { type: "Program", body: [] },
     getMethodAST: jest.fn(),
-    getMouseAST: jest.fn(),
+    getMouseAST: jest.fn()
 };
 const astring = {
-    generate: jest.fn(),
+    generate: jest.fn()
 };
 
 global.ASTUtils = ASTUtils;
@@ -64,10 +64,7 @@ describe("JSGenerate Class", () => {
 
         const expectedAST = {
             type: "Program",
-            body: [
-                { type: "Method" },
-                { type: "Mouse" },
-            ],
+            body: [{ type: "Method" }, { type: "Mouse" }]
         };
 
         ASTUtils.getMethodAST.mockReturnValue({ type: "Method" });
@@ -132,7 +129,7 @@ describe("JSGenerate Class", () => {
         globalActivity.blocks.blockList = {
             1: { name: "action", trash: false, connections: [null, 2, 3] },
             2: { name: "namedbox", value: null, connections: [null] },
-            3: { name: "value", value: "arg1", connections: [null] },
+            3: { name: "value", value: "arg1", connections: [null] }
         };
 
         JSGenerate.generateStacksTree();
@@ -143,7 +140,7 @@ describe("JSGenerate Class", () => {
     test("should handle invalid block connections", () => {
         globalActivity.blocks.stackList = [1];
         globalActivity.blocks.blockList = {
-            1: { name: "start", trash: false, connections: [] },
+            1: { name: "start", trash: false, connections: [] }
         };
 
         JSGenerate.generateStacksTree();

@@ -52,5 +52,5 @@ class DrumBlocksAPI {
     }
 }
 if (typeof module !== "undefined" && module.exports) {
-    module.exports=DrumBlocksAPI;
+    module.exports = DrumBlocksAPI;
 }

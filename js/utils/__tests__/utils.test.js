@@ -37,7 +37,7 @@ describe("Utility Functions (logic-only)", () => {
 
     beforeAll(() => {
         global.window = {
-            btoa: (str) => Buffer.from(str, "utf8").toString("base64"),
+            btoa: str => Buffer.from(str, "utf8").toString("base64"),
             outerHeight: 600,
             outerWidth: 800,
             innerHeight: 400,
@@ -65,8 +65,8 @@ describe("Utility Functions (logic-only)", () => {
                 };
             }),
             webL10n: {
-                get: jest.fn((str) => str),
-                getLanguage: jest.fn(() => "en"),
+                get: jest.fn(str => str),
+                getLanguage: jest.fn(() => "en")
             },
             body: { innerHTML: "" },
             createElement: jest.fn(() => {
@@ -171,8 +171,8 @@ describe("Utility Functions (logic-only)", () => {
 
     describe("last()", () => {
         it("returns last element of array", () => {
-            expect(last([1,2,3])).toBe(3);
-            expect(last(["a","b","c"])).toBe("c");
+            expect(last([1, 2, 3])).toBe(3);
+            expect(last(["a", "b", "c"])).toBe("c");
         });
 
         it("returns null if empty array", () => {
@@ -215,42 +215,42 @@ describe("Utility Functions (logic-only)", () => {
 
     describe("nearestBeat()", () => {
         it("finds nearest beat", () => {
-            expect(nearestBeat(50,8)).toEqual([4,8]);
+            expect(nearestBeat(50, 8)).toEqual([4, 8]);
         });
     });
 
     describe("oneHundredToFraction()", () => {
         it("returns fraction for given number", () => {
-            expect(oneHundredToFraction(50)).toEqual([1,2]);
-            expect(oneHundredToFraction(1)).toEqual([1,64]);
-            expect(oneHundredToFraction(100)).toEqual([1,1]);
+            expect(oneHundredToFraction(50)).toEqual([1, 2]);
+            expect(oneHundredToFraction(1)).toEqual([1, 64]);
+            expect(oneHundredToFraction(100)).toEqual([1, 1]);
         });
     });
 
     describe("rationalToFraction()", () => {
         it("converts float to fraction", () => {
-            expect(rationalToFraction(0.5)).toEqual([1,2]);
+            expect(rationalToFraction(0.5)).toEqual([1, 2]);
         });
 
         it("handles 0, NaN, Infinity", () => {
-            expect(rationalToFraction(0)).toEqual([0,1]);
-            expect(rationalToFraction(NaN)).toEqual([0,1]);
-            expect(rationalToFraction(Infinity)).toEqual([0,1]);
+            expect(rationalToFraction(0)).toEqual([0, 1]);
+            expect(rationalToFraction(NaN)).toEqual([0, 1]);
+            expect(rationalToFraction(Infinity)).toEqual([0, 1]);
         });
     });
 
     describe("rgbToHex()", () => {
         it("converts rgb to hex", () => {
-            expect(rgbToHex(255,0,0)).toBe("#ff0000");
-            expect(rgbToHex(0,255,0)).toBe("#00ff00");
-            expect(rgbToHex(0,0,255)).toBe("#0000ff");
+            expect(rgbToHex(255, 0, 0)).toBe("#ff0000");
+            expect(rgbToHex(0, 255, 0)).toBe("#00ff00");
+            expect(rgbToHex(0, 0, 255)).toBe("#0000ff");
         });
     });
 
     describe("hexToRGB()", () => {
         it("converts hex to rgb object", () => {
-            expect(hexToRGB("#ff0000")).toEqual({r:255,g:0,b:0});
-            expect(hexToRGB("#00ff00")).toEqual({r:0,g:255,b:0});
+            expect(hexToRGB("#ff0000")).toEqual({ r: 255, g: 0, b: 0 });
+            expect(hexToRGB("#00ff00")).toEqual({ r: 0, g: 255, b: 0 });
         });
 
         it("returns null for invalid hex", () => {

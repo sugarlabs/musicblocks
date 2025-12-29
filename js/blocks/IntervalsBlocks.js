@@ -50,7 +50,9 @@ function setupIntervalsBlocks(activity) {
 
             // Set the help string for the SetTemperament block
             this.setHelpString([
-                _("The Set temperament block is used to choose the tuning system used by Music Blocks."),
+                _(
+                    "The Set temperament block is used to choose the tuning system used by Music Blocks."
+                ),
                 "documentation",
                 ""
             ]);
@@ -262,7 +264,9 @@ function setupIntervalsBlocks(activity) {
             // Set the palette, activity, help string, beginner block, hidden status, and form the block with specific parameters
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _("The Interval number block returns the number of scalar steps in the current interval."),
+                _(
+                    "The Interval number block returns the number of scalar steps in the current interval."
+                ),
                 "documentation",
                 ""
             ]);
@@ -315,7 +319,9 @@ function setupIntervalsBlocks(activity) {
             // Set the palette, activity, help string, beginner block, hidden status, and form the block with specific parameters
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _("The Current interval block returns the name of scalar steps in the current interval."),
+                _(
+                    "The Current interval block returns the name of scalar steps in the current interval."
+                ),
                 "documentation",
                 ""
             ]);
@@ -353,8 +359,6 @@ function setupIntervalsBlocks(activity) {
         }
     }
 
-    
-    
     /**
      * Represents a block for measuring the distance between two notes in semi-tones in Music Blocks.
      * @extends {LeftBlock}
@@ -370,7 +374,9 @@ function setupIntervalsBlocks(activity) {
             // Set the palette, activity, help string, and form the block with specific parameters
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _("The Semi-tone interval block measures the distance between two notes in semi-tones."),
+                _(
+                    "The Semi-tone interval block measures the distance between two notes in semi-tones."
+                ),
                 "documentation",
                 ""
             ]);
@@ -485,7 +491,9 @@ function setupIntervalsBlocks(activity) {
             // Set the palette, activity, help string, and form the block with specific parameters
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _("The Scalar interval block measures the distance between two notes in the current key and mode."),
+                _(
+                    "The Scalar interval block measures the distance between two notes in the current key and mode."
+                ),
                 "documentation",
                 ""
             ]);
@@ -659,11 +667,36 @@ function setupIntervalsBlocks(activity) {
             this.setPalette("intervals", activity);
             // Values for the piemenu (circle menu) representing semi-tone intervals.
             this.piemenuValuesC1 = [
-                -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-                11, 12
+                -12,
+                -11,
+                -10,
+                -9,
+                -8,
+                -7,
+                -6,
+                -5,
+                -4,
+                -3,
+                -2,
+                -1,
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12
             ];
             this.setHelpString([
-                _("The Semi-tone interval block calculates a relative interval based on half steps.") +
+                _(
+                    "The Semi-tone interval block calculates a relative interval based on half steps."
+                ) +
                     " " +
                     _("In the figure, we add sol# to sol."),
                 "documentation",
@@ -716,7 +749,9 @@ function setupIntervalsBlocks(activity) {
             super("arpeggio");
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _("The Arpeggio block will run each note block multiple times, adding a transposition based on the specified chord.") +
+                _(
+                    "The Arpeggio block will run each note block multiple times, adding a transposition based on the specified chord."
+                ) +
                     " " +
                     _("The output of the example is: do, mi, sol, sol, ti, mi"),
                 "documentation",
@@ -746,7 +781,7 @@ function setupIntervalsBlocks(activity) {
          * @param {boolean} receivedArg - Whether an argument is received.
          */
         flow(args, logo, turtle, blk, receivedArg) {
-            (args[0]);
+            args[0];
             if (args[1] === undefined) return;
 
             let i = CHORDNAMES.indexOf(args[0]);
@@ -766,7 +801,7 @@ function setupIntervalsBlocks(activity) {
             const listenerName = "_duplicate_" + turtle;
             logo.setDispatchBlock(blk, turtle, listenerName);
 
-            const __lookForOtherTurtles = function(blk, turtle) {
+            const __lookForOtherTurtles = function (blk, turtle) {
                 for (const t in logo.connectionStore) {
                     if (t !== turtle.toString()) {
                         for (const b in logo.connectionStore[t]) {
@@ -861,36 +896,20 @@ function setupIntervalsBlocks(activity) {
                 logo.connectionStore[turtle][blk] = [];
                 child = args[1];
                 while (child != null) {
-                    const lastConnection =
-                        activity.blocks.blockList[child].connections.length - 1;
-                    const nextBlk =
-                        activity.blocks.blockList[child].connections[
-                            lastConnection
-                        ];
+                    const lastConnection = activity.blocks.blockList[child].connections.length - 1;
+                    const nextBlk = activity.blocks.blockList[child].connections[lastConnection];
                     // Don't disconnect a hidden block from its parent.
-                    if (
-                        nextBlk != null &&
-                        activity.blocks.blockList[nextBlk].name === "hidden"
-                    ) {
+                    if (nextBlk != null && activity.blocks.blockList[nextBlk].name === "hidden") {
                         logo.connectionStore[turtle][blk].push([
                             nextBlk,
                             1,
                             activity.blocks.blockList[nextBlk].connections[1]
                         ]);
-                        child =
-                            activity.blocks.blockList[nextBlk].connections[1];
-                        activity.blocks.blockList[
-                            nextBlk
-                        ].connections[1] = null;
+                        child = activity.blocks.blockList[nextBlk].connections[1];
+                        activity.blocks.blockList[nextBlk].connections[1] = null;
                     } else {
-                        logo.connectionStore[turtle][blk].push([
-                            child,
-                            lastConnection,
-                            nextBlk
-                        ]);
-                        activity.blocks.blockList[child].connections[
-                            lastConnection
-                        ] = null;
+                        logo.connectionStore[turtle][blk].push([child, lastConnection, nextBlk]);
+                        activity.blocks.blockList[child].connections[lastConnection] = null;
                         child = nextBlk;
                     }
 
@@ -1045,7 +1064,9 @@ function setupIntervalsBlocks(activity) {
             this.piemenuValuesC1 = [-7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
             this.beginnerBlock(true);
             this.setHelpString([
-                _("The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode.") +
+                _(
+                    "The Scalar interval block calculates a relative interval based on the current mode, skipping all notes outside of the mode."
+                ) +
                     " " +
                     _("In the figure, we add la to sol."),
                 "documentation",
@@ -1094,7 +1115,9 @@ function setupIntervalsBlocks(activity) {
             super("definemode");
             this.setPalette("intervals", activity);
             this.setHelpString([
-                _("The Define mode block allows you to define a custom mode by specifying pitch numbers."),
+                _(
+                    "The Define mode block allows you to define a custom mode by specifying pitch numbers."
+                ),
                 "documentation",
                 null,
                 "definemode"
@@ -1158,9 +1181,13 @@ function setupIntervalsBlocks(activity) {
             this.setPalette("intervals", activity);
             this.beginnerBlock(true);
             this.setHelpString([
-                _("When Movable do is false, the solfege note names are always tied to specific pitches,") +
+                _(
+                    "When Movable do is false, the solfege note names are always tied to specific pitches,"
+                ) +
                     " " +
-                    _('eg "do" is always "C-natural" when Movable do is true, the solfege note names are assigned to scale degrees "do" is always the first degree of the major scale.'),
+                    _(
+                        'eg "do" is always "C-natural" when Movable do is true, the solfege note names are assigned to scale degrees "do" is always the first degree of the major scale.'
+                    ),
                 "documentation",
                 null,
                 "moveablehelp"
