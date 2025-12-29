@@ -827,7 +827,10 @@ class SaveInterface {
       if (!success) {
         // eslint-disable-next-line no-console
         console.debug("Error: " + dataurl);
-        //TODO: Error message box
+        this.activity.errorMsg(
+          _("Failed to convert Lilypond to PDF. Please try saving as .ly file instead."),
+          5000
+        );
       } else {
         this.activity.save.download("pdf", dataurl, filename);
       }

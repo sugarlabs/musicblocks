@@ -736,11 +736,18 @@ describe("saveLilypond Methods", () => {
 
         // Mock console.debug to verify the error message
         console.debug = jest.fn();
+        
+        // Mock activity.errorMsg to verify error message is shown to user
+        activity.errorMsg = jest.fn();
 
         instance.afterSaveLilypondPDF(lydata, filename);
 
         expect(document.body.style.cursor).toBe("default");
         expect(console.debug).toHaveBeenCalledWith("Error: " + errorMessage);
+        expect(activity.errorMsg).toHaveBeenCalledWith(
+            "Failed to convert Lilypond to PDF. Please try saving as .ly file instead.",
+            5000
+        );
         // Verify activity.save.download is not called
         expect(activity.save.download).not.toHaveBeenCalled();
     });
