@@ -659,22 +659,6 @@ class PitchStaircase {
         widgetWindow.addDivider();
         this._musicRatio2 = widgetWindow.addInputButton("2");
 
-        // TODO: THIS
-        // DO NOT COMMIT WITH THIS COMMENTED
-        /*
-        let cell = row.insertCell();
-        cell.innerHTML = '<h2>:</h2>';
-        cell.style.backgroundColor = platformColor.selectorBackground;
-
-        let cell = row.insertCell();
-        cell.innerHTML = '<input id="musicratio2" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;" class="musicratio2" type="musicratio2" value="' + 2 + '" />';
-        cell.style.width = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + 'px';
-        cell.style.minWidth = cell.style.width;
-        cell.style.maxWidth = cell.style.width;
-        cell.style.backgroundColor = platformColor.selectorBackground;
-        docById('musicratio2').classList.add('hasKeyboard');
-        */
-
         widgetWindow.addButton(
             "restore-button.svg",
             PitchStaircase.ICONSIZE,
