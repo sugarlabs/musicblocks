@@ -149,7 +149,8 @@ function setupRhythmActions(activity) {
                         );
                     }
 
-                    Singer.processNote(activity,
+                    Singer.processNote(
+                        activity,
                         1 / tur.singer.noteValue[last(tur.singer.inNoteBlock)],
                         blkName === "osctime",
                         last(tur.singer.inNoteBlock),
@@ -455,8 +456,6 @@ function setupRhythmActions(activity) {
 
             return value !== 0 ? 1 / value : 0;
         }
-       
-
     };
 }
 
