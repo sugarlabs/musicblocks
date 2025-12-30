@@ -209,12 +209,6 @@ function AIWidget() {
         pitchDuration = toFraction(pitchDuration);
         const adjustedNote = adjustPitch(pitch.name, keySignature).toUpperCase();
         if (triplet !== undefined && triplet !== null) {
-            console.log("For the Pitch");
-            console.log(pitch);
-            console.log("below is the meter Den");
-            console.log(meterDen);
-            console.log("below is the triplet");
-            console.log(triplet);
             pitchDuration[1] = meterDen * triplet;
         }
 
@@ -271,7 +265,6 @@ function AIWidget() {
         const instruction = (tune.metaText?.instruction ?? "guitar").toString().toLowerCase();
 
         tune.lines?.forEach(line => {
-            console.log(line);
             line.staff?.forEach((staff, staffIndex) => {
                 if (!organizeBlock.hasOwnProperty(staffIndex)) {
                     organizeBlock[staffIndex] = {
@@ -282,8 +275,6 @@ function AIWidget() {
                 organizeBlock[staffIndex].arrangedBlocks.push(staff);
             });
         });
-        console.log("below is the arranged blocks");
-        console.log(organizeBlock);
         for (const lineId in organizeBlock) {
             organizeBlock[lineId].arrangedBlocks?.forEach(staff => {
                 if (!staffBlocksMap.hasOwnProperty(lineId)) {
@@ -389,10 +380,7 @@ function AIWidget() {
 
                 const actionBlock = [];
                 staff.voices.forEach(voice => {
-                    console.log(voice);
-
                     voice.forEach(element => {
-                        console.log("hello");
                         if (element.el_type === "note") {
                             //check if triplet exists
                             if (
@@ -403,9 +391,6 @@ function AIWidget() {
                             }
 
                             // Check and set tripletFinder to null if element?.endTriplets exists
-
-                            console.log("pitches are below");
-                            console.log(element);
                             createPitchBlocks(
                                 element.pitches[0],
                                 blockId,
@@ -432,10 +417,6 @@ function AIWidget() {
                                 const endBlockSearch = staffBlocksMap[lineId].repeatArray;
 
                                 for (const repeatbar in endBlockSearch) {
-                                    console.log(
-                                        "endBlockSearch[repeatbar].end" +
-                                            endBlockSearch[repeatbar].end
-                                    );
                                     if (endBlockSearch[repeatbar].end == -1) {
                                         staffBlocksMap[lineId].repeatArray[repeatbar].end =
                                             staffBlocksMap[lineId].baseBlocks.length;
@@ -523,16 +504,12 @@ function AIWidget() {
                     blockId = blockId + 4;
 
                     musicBlocksJSON.push(actionBlock);
-
-                    console.log("below is the repeat checker" + lineId);
                     staffBlocksMap[lineId].baseBlocks.push([actionBlock]);
                 });
             });
         }
 
         const finalBlock = [];
-        console.log("below is the staff Block map");
-        console.log(staffBlocksMap);
 
         //Some Error are here need to be fixed
         for (const staffIndex in staffBlocksMap) {
@@ -550,14 +527,6 @@ function AIWidget() {
                 staffBlocksMap[staffIndex].startBlock[
                     staffBlocksMap[staffIndex].startBlock.length - 3
                 ][0];
-
-            console.log(`For iter ${staffIndex}`);
-            console.log(
-                staffBlocksMap[staffIndex].baseBlocks[0][0][
-                    staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4
-                ]
-            );
-
             const repeatBlock = [];
 
             const repeatblockids = staffBlocksMap[staffIndex].repeatArray;
@@ -595,8 +564,6 @@ function AIWidget() {
                     staffBlocksMap[staffIndex].startBlock[
                         staffBlocksMap[staffIndex].startBlock.length - 3
                     ][4][2] = blockId;
-                    console.log("Following are the nameddo Array");
-                    console.log(staffBlocksMap[staffIndex].nameddoArray);
                     const firstnammedo = searchIndexForMusicBlock(
                         staffBlocksMap[staffIndex].baseBlocks[0][0],
                         staffBlocksMap[staffIndex].nameddoArray[staffIndex][0]
@@ -605,13 +572,8 @@ function AIWidget() {
                         staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0],
                         staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end]
                     );
-                    console.log("below is the firstnammedo");
-                    console.log(firstnammedo);
-                    console.log("below and below is the error for you ");
 
-                    console.log(staffBlocksMap[staffIndex].baseBlocks[0][0]);
                     //because its [0]is the first nammeddo block obviously
-
                     // Check if staffBlocksMap[staffIndex].baseBlocks[repeatId.end+1] exists and has a [0] element
                     if (
                         staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1] &&
@@ -664,8 +626,6 @@ function AIWidget() {
                         staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
                             currentnammeddo
                         ][4][0];
-                    console.log("prevBlockID");
-                    console.log(prevBlockId);
                     const currentBlockId =
                         staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
                             currentnammeddo
@@ -715,8 +675,6 @@ function AIWidget() {
                     ][4][0] = blockId;
 
                     if (nextBlockId != null) {
-                        console.log("below is the repeat next block id " + repeatId);
-                        console.log(staffBlocksMap[staffIndex].baseBlocks);
                         const nextnameddo = searchIndexForMusicBlock(
                             staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0],
                             nextBlockId
@@ -740,15 +698,7 @@ function AIWidget() {
             finalBlock.push(...staffBlocksMap[staffIndex].startBlock);
             finalBlock.push(...flattenedLineBlock);
             finalBlock.push(...staffBlocksMap[staffIndex].repeatBlock);
-            console.log("Below is the combined block:");
-            console.log(combinedBlock);
         }
-
-        console.log("below is the staff Block map");
-        console.log(staffBlocksMap);
-
-        console.log("test block is ");
-        console.log(finalBlock);
 
         this.activity.blocks.loadNewBlocks(finalBlock);
 
@@ -773,11 +723,10 @@ function AIWidget() {
      */
     this.__save = function () {
         const tunebook = new ABCJS.parseOnly(abcNotationSong);
-        console.log(tunebook);
+
         tunebook.forEach(tune => {
             //call parseABC to parse abcdata to MB json
             this._parseABC(tune);
-            console.log(tune);
         });
     };
 
@@ -859,7 +808,6 @@ function AIWidget() {
 
         this.playBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
         this.playBtn.onclick = () => {
-            console.log(abcNotationSong);
             if (this.isMoving) {
                 this.pause();
                 this.playBtn.innerHTML = `<img 
@@ -873,7 +821,6 @@ function AIWidget() {
                 this.isMoving = false;
             } else {
                 if (!(abcNotationSong == "")) {
-                    console.log(abcNotationSong);
                     this.resume();
                     this._playABCSong();
                 }
@@ -928,7 +875,6 @@ function AIWidget() {
     this._playABCSong = function () {
         var abc = abcNotationSong;
         var stopAudioButton = document.querySelector(".stop-audio");
-        console.log("abcd", abcNotationSong);
 
         var visualObj = ABCJS.renderAbc("*", abc, {
             responsive: "resize"
@@ -959,8 +905,6 @@ function AIWidget() {
                         millisecondsPerMeasure: visualObj.millisecondsPerMeasure()
                     })
                     .then(function (response) {
-                        console.log("Notes loaded: ", response);
-
                         // midiBuffer.prime actually builds the output buffer.
                         return midiBuffer.prime();
                     })
@@ -1246,8 +1190,6 @@ function AIWidget() {
             })
                 .then(response => response.json())
                 .then(data => {
-                    console.log("API Response:", data);
-
                     const responseText = data.choices[0].message?.content || "";
                     const abcStartIndex = responseText.indexOf("X:");
 
@@ -1266,7 +1208,6 @@ function AIWidget() {
                         .replace(/(X:|T:|M:|L:|Q:|K:)/g, "\n$1")
                         .replace(/\n\s+/g, "\n")
                         .trim();
-                    console.log(abcNotation);
 
                     const lines = abcNotation.split("\n").map(line => line.trim());
 
@@ -1286,9 +1227,7 @@ function AIWidget() {
                         })
                         .join("");
 
-                    console.log(formattedNotation);
                     abcNotationSong = formattedNotation;
-                    console.log("Updated abcNotationSong:", abcNotationSong);
 
                     textarea.value = abcNotationSong;
                 })
@@ -1304,7 +1243,6 @@ function AIWidget() {
         // Update abcNotationSong whenever the textarea content changes
         textarea.addEventListener("input", function () {
             abcNotationSong = textarea.value;
-            console.log("abcNotationSong updated to:", abcNotationSong);
         });
     };
 }
