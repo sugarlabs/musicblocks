@@ -297,6 +297,9 @@ class Activity {
         //Flag to check if any other input box is active or not
         this.isInputON = false;
 
+        // Interval ID for the loading animation (to allow cleanup)
+        this.loadAnimationIntervalId = null;
+
         // Initialize GIF animator
         this.gifAnimator = new GIFAnimator();
 
@@ -2028,7 +2031,22 @@ class Activity {
                 }
             };
 
-            setInterval(changeText, 2000);
+            this.loadAnimationIntervalId = setInterval(changeText, 2000);
+        };
+
+        /**
+         * Stops the loading animation and clears the interval.
+         * This prevents the interval from running indefinitely in the background.
+         */
+        this.stopLoadAnimation = () => {
+            if (this.loadAnimationIntervalId !== null) {
+                clearInterval(this.loadAnimationIntervalId);
+                this.loadAnimationIntervalId = null;
+            }
+            const loadContainer = document.getElementById("load-container");
+            if (loadContainer) {
+                loadContainer.style.display = "none";
+            }
         };
 
         /**
