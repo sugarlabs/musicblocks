@@ -129,6 +129,12 @@ function SampleWidget() {
     this.currentNoteObj = null;
     this.player = null;
 
+    // Pitch detection resource tracking (to prevent memory leaks)
+    this.pitchDetectionAudioContext = null;
+    this.pitchDetectionStream = null;
+    this.pitchDetectionAnimationId = null;
+    this.isPitchDetectionRunning = false;
+
     /**
      * Updates the blocks related to the sample.
      * @private
@@ -472,6 +478,9 @@ function SampleWidget() {
             }
 
             this.running = false;
+
+            // Stop pitch detection and release resources (microphone, AudioContext)
+            this.stopPitchDetection();
 
             // Close the pie menu if it's open
             const wheelDiv = docById("wheelDiv");
@@ -2140,12 +2149,50 @@ function SampleWidget() {
     };
 
     /**
+     * Stops pitch detection and releases all associated resources.
+     * This prevents memory leaks from AudioContext, MediaStream, and animation frames.
+     * @returns {void}
+     */
+    this.stopPitchDetection = () => {
+        this.isPitchDetectionRunning = false;
+
+        // Cancel the animation frame loop
+        if (this.pitchDetectionAnimationId !== null) {
+            cancelAnimationFrame(this.pitchDetectionAnimationId);
+            this.pitchDetectionAnimationId = null;
+        }
+
+        // Stop all tracks in the media stream (turns off microphone)
+        if (this.pitchDetectionStream !== null) {
+            this.pitchDetectionStream.getTracks().forEach(track => track.stop());
+            this.pitchDetectionStream = null;
+        }
+
+        // Close the audio context to free up system resources
+        if (this.pitchDetectionAudioContext !== null) {
+            this.pitchDetectionAudioContext.close().catch(err => {
+                // Ignore errors if context is already closed
+                console.debug("AudioContext close error (may already be closed):", err);
+            });
+            this.pitchDetectionAudioContext = null;
+        }
+    };
+
+    /**
      * Start pitch detection
+     * @returns {Promise<void>}
      */
     const startPitchDetection = async () => {
+        // Stop any existing pitch detection first to avoid multiple instances
+        this.stopPitchDetection();
+
         try {
             const audioContext = new AudioContext();
+            this.pitchDetectionAudioContext = audioContext;
+
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            this.pitchDetectionStream = stream;
+
             const source = audioContext.createMediaStreamSource(stream);
 
             const analyser = audioContext.createAnalyser();
@@ -2157,27 +2204,46 @@ function SampleWidget() {
             const buffer = new Float32Array(bufferSize);
             const detectPitch = YIN(sampleRate, bufferSize);
 
+            this.isPitchDetectionRunning = true;
+
             const updatePitch = () => {
+                // Check if we should stop the loop
+                if (!this.isPitchDetectionRunning) {
+                    return;
+                }
+
                 analyser.getFloatTimeDomainData(buffer);
                 const pitch = detectPitch(buffer);
 
-                if (pitch > 0) {
-                    const { note, cents } = frequencyToNote(pitch);
-                    document.getElementById("pitch").textContent = pitch.toFixed(2);
-                    document.getElementById("note").textContent =
-                        cents === 0 ? ` ${note} (Perfect)` : ` ${note}, off by ${cents} cents`;
-                } else {
-                    document.getElementById("pitch").textContent = "---";
-                    document.getElementById("note").textContent = "---";
+                // Safely update DOM elements (check if they exist first)
+                const pitchElement = document.getElementById("pitch");
+                const noteElement = document.getElementById("note");
+
+                if (pitchElement && noteElement) {
+                    if (pitch > 0) {
+                        const { note, cents } = frequencyToNote(pitch);
+                        pitchElement.textContent = pitch.toFixed(2);
+                        noteElement.textContent =
+                            cents === 0 ? ` ${note} (Perfect)` : ` ${note}, off by ${cents} cents`;
+                    } else {
+                        pitchElement.textContent = "---";
+                        noteElement.textContent = "---";
+                    }
                 }
 
-                requestAnimationFrame(updatePitch);
+                // Only continue the loop if still running
+                if (this.isPitchDetectionRunning) {
+                    this.pitchDetectionAnimationId = requestAnimationFrame(updatePitch);
+                }
             };
 
-            updatePitch();
+            // Start the animation loop
+            this.pitchDetectionAnimationId = requestAnimationFrame(updatePitch);
         } catch (err) {
             console.error(`${err.name}: ${err.message}`);
             alert("Microphone access failed: " + err.message);
+            // Clean up any partially initialized resources
+            this.stopPitchDetection();
         }
     };
 
