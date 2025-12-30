@@ -50,7 +50,7 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
     }
 
     function initializeI18next() {
-        return new Promise((resolve, reject) => {
+        return new Promise(resolve => {
             i18next.use(i18nextHttpBackend).init(
                 {
                     lng: "en",
@@ -67,43 +67,37 @@ requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBacke
                 function (err) {
                     if (err) {
                         console.error("i18next init failed:", err);
-                        reject(err);
-                    } else {
-                        window.i18next = i18next;
-                        resolve(i18next);
                     }
+                    window.i18next = i18next;
+                    resolve(i18next); 
                 }
             );
         });
     }
 
     async function main() {
-        try {
-            await initializeI18next();
+        await initializeI18next();
 
-            const lang = "en";
+        const lang = "en";
 
-            i18next.changeLanguage(lang, function (err) {
-                if (err) {
-                    console.error("Error changing language:", err);
-                    return;
-                }
-                updateContent();
-            });
-
-            if (document.readyState === "loading") {
-                document.addEventListener("DOMContentLoaded", updateContent);
-            } else {
-                updateContent();
+        i18next.changeLanguage(lang, function (err) {
+            if (err) {
+                console.error("Error changing language:", err);
+                return;
             }
+            updateContent();
+        });
 
-            i18next.on("languageChanged", updateContent);
-
-            // Load app only after i18n is ready
-            requirejs(["utils/utils", "activity/activity"]);
-        } catch (error) {
-            console.error("Error initializing i18next:", error);
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", updateContent);
+        } else {
+            updateContent();
         }
+
+        i18next.on("languageChanged", updateContent);
+
+        // Load app only after i18n is ready
+        requirejs(["utils/utils", "activity/activity"]);
     }
 
     main();
