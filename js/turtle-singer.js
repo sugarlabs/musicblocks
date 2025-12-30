@@ -304,17 +304,17 @@ class Singer {
                 noteObj[1],
                 steps > 0
                     ? getStepSizeUp(
-                        tur.singer.keySignature,
-                        noteObj[0],
-                        steps,
-                        logo.synth.inTemperament
-                    )
+                          tur.singer.keySignature,
+                          noteObj[0],
+                          steps,
+                          logo.synth.inTemperament
+                      )
                     : getStepSizeDown(
-                        tur.singer.keySignature,
-                        noteObj[0],
-                        steps,
-                        logo.synth.inTemperament
-                    ),
+                          tur.singer.keySignature,
+                          noteObj[0],
+                          steps,
+                          logo.synth.inTemperament
+                      ),
                 tur.singer.keySignature,
                 tur.singer.movable,
                 null,
@@ -839,7 +839,7 @@ class Singer {
                 const nnote = getNote(
                     note,
                     octave,
-                    atrans,  // transposition,
+                    atrans, // transposition,
                     tur.singer.keySignature,
                     tur.singer.movable,
                     null,
@@ -877,7 +877,7 @@ class Singer {
                 const noteObj = getNote(
                     note,
                     octave,
-                    atrans,  // transposition,
+                    atrans, // transposition,
                     tur.singer.keySignature,
                     tur.singer.movable,
                     null,
@@ -940,7 +940,7 @@ class Singer {
                 const noteObj = getNote(
                     note,
                     octave,
-                    atrans,  // transposition,
+                    atrans, // transposition,
                     tur.singer.keySignature,
                     tur.singer.movable,
                     null,
@@ -994,11 +994,12 @@ class Singer {
                         anote = "rest";
                         tur.singer.arpeggioIndex += 1;
                     } else {
-                        const arpeggioTrans = getInterval(
-                            tur.singer.arpeggio[tur.singer.arpeggioIndex][0],
-                            tur.singer.keySignature,
-                            noteObj[0],
-                        ) + tur.singer.arpeggio[tur.singer.arpeggioIndex][1];
+                        const arpeggioTrans =
+                            getInterval(
+                                tur.singer.arpeggio[tur.singer.arpeggioIndex][0],
+                                tur.singer.keySignature,
+                                noteObj[0]
+                            ) + tur.singer.arpeggio[tur.singer.arpeggioIndex][1];
                         atrans += arpeggioTrans;
 
                         tur.singer.arpeggioIndex += 1;
@@ -1115,12 +1116,9 @@ class Singer {
                 // (1) convert it to Hertz
                 // (2) apply the ratio
                 // (3) convert it to pitch, octave, cents
-                const hertz = pitchToFrequency(
-                    noteObj1[0],
-                    noteObj1[1],
-                    0,
-                    tur.singer.keySignature
-                ) * tur.singer.ratioIntervals[i];
+                const hertz =
+                    pitchToFrequency(noteObj1[0], noteObj1[1], 0, tur.singer.keySignature) *
+                    tur.singer.ratioIntervals[i];
                 const noteObj2 = frequencyToPitch(hertz);
                 addPitch(noteObj2[0], noteObj2[1], noteObj2[2]);
             }
@@ -1806,7 +1804,7 @@ class Singer {
                     future = 0;
                     for (let i = 0; i < tur.singer.delayedNotes.length; i++) {
                         if (i > 0) {
-                            future += (bpmFactor * tur.singer.delayedNotes[i - 1][1]);
+                            future += bpmFactor * tur.singer.delayedNotes[i - 1][1];
                         }
                         if (tur.singer.delayedNotes[i][0] === blk) {
                             break;
@@ -1984,9 +1982,7 @@ class Singer {
                                         chordNotes.push(note);
                                     }
 
-                                    if (
-                                        !chordDrums.includes(tur.singer.noteDrums[thisBlk][0])
-                                    ) {
+                                    if (!chordDrums.includes(tur.singer.noteDrums[thisBlk][0])) {
                                         chordDrums.push(tur.singer.noteDrums[thisBlk][0]);
                                     }
                                 } else {
@@ -2033,7 +2029,14 @@ class Singer {
                                 activity.logo.runningAbc ||
                                 activity.logo.runningMIDI
                             ) {
-                                activity.logo.notationMIDI(chordNotes, chordDrums, d, turtle, bpmValue || 90, last(tur.singer.instrumentNames));
+                                activity.logo.notationMIDI(
+                                    chordNotes,
+                                    chordDrums,
+                                    d,
+                                    turtle,
+                                    bpmValue || 90,
+                                    last(tur.singer.instrumentNames)
+                                );
                                 activity.logo.updateNotation(chordNotes, d, turtle, -1, chordDrums);
                             }
                         }
@@ -2042,9 +2045,9 @@ class Singer {
                     const notesFrequency = isCustomTemperament(activity.logo.synth.inTemperament)
                         ? activity.logo.synth.getCustomFrequency(notes)
                         : activity.logo.synth.getFrequency(
-                            notes,
-                            activity.logo.synth.changeInTemperament
-                        );
+                              notes,
+                              activity.logo.synth.changeInTemperament
+                          );
                     const startingPitch = activity.logo.synth.startingPitch;
                     const frequency = pitchToFrequency(
                         startingPitch.substring(0, startingPitch.length - 1),
