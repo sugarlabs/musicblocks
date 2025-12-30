@@ -25,7 +25,7 @@ jobs:
       - name: Get changed JavaScript files
         id: get_files
         run: |
-          CHANGED_FILES=$(git diff --name-only --diff-filter=ACM ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} -- '*.js')
+          CHANGED_FILES=$(git diff --name-only --diff-filter=ACM origin/${{ github.event.pull_request.base.ref }}...HEAD -- '*.js')
           echo "files<<EOF" >> $GITHUB_ENV
           echo "$CHANGED_FILES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
