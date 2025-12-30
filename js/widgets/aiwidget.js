@@ -380,7 +380,6 @@ function AIWidget() {
 
                 const actionBlock = [];
                 staff.voices.forEach(voice => {
-
                     voice.forEach(element => {
                         if (element.el_type === "note") {
                             //check if triplet exists
@@ -728,7 +727,6 @@ function AIWidget() {
         tunebook.forEach(tune => {
             //call parseABC to parse abcdata to MB json
             this._parseABC(tune);
-
         });
     };
 
@@ -810,7 +808,6 @@ function AIWidget() {
 
         this.playBtn = widgetWindow.addButton("play-button.svg", ICONSIZE, _("Play"));
         this.playBtn.onclick = () => {
-
             if (this.isMoving) {
                 this.pause();
                 this.playBtn.innerHTML = `<img 
@@ -824,7 +821,6 @@ function AIWidget() {
                 this.isMoving = false;
             } else {
                 if (!(abcNotationSong == "")) {
-
                     this.resume();
                     this._playABCSong();
                 }
@@ -880,7 +876,6 @@ function AIWidget() {
         var abc = abcNotationSong;
         var stopAudioButton = document.querySelector(".stop-audio");
 
-
         var visualObj = ABCJS.renderAbc("*", abc, {
             responsive: "resize"
         })[0];
@@ -910,8 +905,6 @@ function AIWidget() {
                         millisecondsPerMeasure: visualObj.millisecondsPerMeasure()
                     })
                     .then(function (response) {
-
-
                         // midiBuffer.prime actually builds the output buffer.
                         return midiBuffer.prime();
                     })
@@ -1197,8 +1190,6 @@ function AIWidget() {
             })
                 .then(response => response.json())
                 .then(data => {
-
-
                     const responseText = data.choices[0].message?.content || "";
                     const abcStartIndex = responseText.indexOf("X:");
 
@@ -1217,7 +1208,6 @@ function AIWidget() {
                         .replace(/(X:|T:|M:|L:|Q:|K:)/g, "\n$1")
                         .replace(/\n\s+/g, "\n")
                         .trim();
-
 
                     const lines = abcNotation.split("\n").map(line => line.trim());
 
@@ -1253,7 +1243,6 @@ function AIWidget() {
         // Update abcNotationSong whenever the textarea content changes
         textarea.addEventListener("input", function () {
             abcNotationSong = textarea.value;
-
         });
     };
 }
