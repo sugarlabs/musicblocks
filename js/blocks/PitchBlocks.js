@@ -2112,3 +2112,7 @@ function setupPitchBlocks(activity) {
     new Pitch2Block().setup(activity);
     new PitchBlock().setup(activity);
 }
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { setupPitchBlocks };
+}
