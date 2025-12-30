@@ -7748,7 +7748,6 @@ window.doSearch = activity.doSearch.bind(activity);
 // Notify index.html that Activity and all dependencies are ready
 document.dispatchEvent(new Event("mb-ready"));
 
-
 require(["domReady!"], doc => {
     setTimeout(() => {
         activity.setupDependencies();
