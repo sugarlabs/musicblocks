@@ -1614,7 +1614,6 @@ class RhythmRuler {
      * @returns {void}
      */
     _undo() {
-        // FIXME: Add undo for REST
         this.activity.logo.synth.stop();
         this._startingTime = null;
         this._playing = false;

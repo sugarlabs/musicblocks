@@ -31,7 +31,7 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
 
       - name: Install dependencies
-        run: npm install eslint prettier
+        run: npm ci
 
       - name: Run ESLint on changed files
         if: env.files != ''

@@ -368,7 +368,8 @@ describe("Toolbar Class", () => {
             helpfulWheelItems: [
                 { label: "Turtle Wrap Off", display: false },
                 { label: "Turtle Wrap On", display: true }
-            ]
+            ],
+            textMsg: jest.fn()
         };
         toolbar.activity = mockActivity;
 
@@ -400,7 +401,8 @@ describe("Toolbar Class", () => {
             helpfulWheelItems: [
                 { label: "Turtle Wrap Off", display: false },
                 { label: "Turtle Wrap On", display: true }
-            ]
+            ],
+            textMsg: jest.fn()
         };
 
         const wrapIcon = {
