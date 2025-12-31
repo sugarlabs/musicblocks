@@ -6,6 +6,10 @@
     <img src="https://img.shields.io/github/license/sugarlabs/musicblocks" />
 </a>
 
+<a href="https://github.com/sugarlabs/musicblocks/actions/workflows/main.yml" alt="CI">
+    <img src="https://github.com/sugarlabs/musicblocks/actions/workflows/main.yml/badge.svg" />
+</a>
+
 # Music Blocks
 
 “_All musicians are subconsciously mathematicians._” — Monk
@@ -216,6 +220,15 @@ Code](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md)
 provides a general overview of Sugar Lab's guidelines. See
 [Contributing](#CONTRIBUTING) section for specific details about this
 repository.
+
+### Developer Quick Start
+
+1. Clone and install: `git clone ... && npm install`
+2. Run locally: `npm run dev`
+3. Before pushing: `npm run lint && npx prettier --check . && npm test`
+
+For writing tests, see [docs/TESTING.md](./docs/TESTING.md).
+
 
 ## <a name="REPORTING_BUGS"></a>Reporting Bugs
 
