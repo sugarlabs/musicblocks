@@ -1251,3 +1251,7 @@ function setupRhythmBlocks(activity) {
     new DefineFrequencyBlock().setup(activity);
     new OctaveSpaceBlock().setup(activity);
 }
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupRhythmBlocks };
+}
