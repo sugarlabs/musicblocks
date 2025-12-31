@@ -282,12 +282,10 @@ const processABCNotes = function (logo, turtle) {
 
                         logo.notationNotes[turtle] +=
                             logo.notation.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
-                        j++; // Jump to next note.
-                        k++; // Increment notes in tuplet.
-                    } else {
-                        j++; // Jump to next note.
-                        k++; // Increment notes in tuplet.
+                    
                     }
+                        j++; // Jump to next note.
+                        k++; // Increment notes in tuplet.
                 }
 
                 // FIXME: Debug for ABC
