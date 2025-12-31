@@ -21,14 +21,15 @@
 */
 
 class ProjectViewer {
-    
     constructor(Planet) {
-        this.Planet = Planet ;
+        this.Planet = Planet;
         this.ProjectCache = Planet.GlobalPlanet.cache;
         this.PlaceholderMBImage = "images/mbgraphic.png";
         this.PlaceholderTBImage = "images/tbgraphic.png";
         this.ReportError = _("Error: Report could not be submitted. Try again later.");
-        this.ReportSuccess = _("Thank you for reporting this project. A moderator will review the project shortly, to verify violation of the Sugar Labs Code of Conduct.");
+        this.ReportSuccess = _(
+            "Thank you for reporting this project. A moderator will review the project shortly, to verify violation of the Sugar Labs Code of Conduct."
+        );
         this.ReportEnabledButton = _("Report Project");
         this.ReportDisabledButton = _("Project Reported");
         this.ReportDescriptionError = _("Report description required");
@@ -37,7 +38,7 @@ class ProjectViewer {
     }
 
     open(id) {
-        const Planet = this.Planet ;
+        const Planet = this.Planet;
         this.id = id;
         const proj = this.ProjectCache[id];
 
@@ -48,11 +49,23 @@ class ProjectViewer {
             el.appendChild(b);
         };
 
-        const options = { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "numeric" };
+        const options = {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "numeric"
+        };
         const last_updated_timestamp = proj.ProjectLastUpdated;
-        const formatted_LastUpdated = new Date(last_updated_timestamp).toLocaleString(undefined, options);
+        const formatted_LastUpdated = new Date(last_updated_timestamp).toLocaleString(
+            undefined,
+            options
+        );
         const created_timestamp = proj.ProjectCreatedDate;
-        const formatted_CreatedDate = new Date(created_timestamp).toLocaleString(undefined, options);
+        const formatted_CreatedDate = new Date(created_timestamp).toLocaleString(
+            undefined,
+            options
+        );
 
         document.getElementById("projectviewer-title").textContent = proj.ProjectName;
         setBoldText(document.getElementById("projectviewer-last-updated"), formatted_LastUpdated);
@@ -62,8 +75,8 @@ class ProjectViewer {
 
         let img = proj.ProjectImage;
         if (img === "" || img === null)
-            img = (proj.ProjectIsMusicBlocks==1) ?
-                this.PlaceholderMBImage : this.PlaceholderTBImage ;
+            img =
+                proj.ProjectIsMusicBlocks == 1 ? this.PlaceholderMBImage : this.PlaceholderTBImage;
 
         document.getElementById("projectviewer-image").src = img;
         document.getElementById("projectviewer-description").textContent = proj.ProjectDescription;
@@ -76,11 +89,11 @@ class ProjectViewer {
             tagcontainer.appendChild(chip);
         }
 
-        if (Planet.ProjectStorage.isReported(this.id)){
+        if (Planet.ProjectStorage.isReported(this.id)) {
             document.getElementById("projectviewer-report-project").style.display = "none";
-            document.getElementById("projectviewer-report-project-disabled").style.display = "block";
-        }
-        else {
+            document.getElementById("projectviewer-report-project-disabled").style.display =
+                "block";
+        } else {
             document.getElementById("projectviewer-report-project").style.display = "block";
             document.getElementById("projectviewer-report-project-disabled").style.display = "none";
         }
@@ -89,16 +102,15 @@ class ProjectViewer {
     }
 
     download() {
-        this.Planet.GlobalPlanet.getData(this.id,this.afterDownload.bind(this));
+        this.Planet.GlobalPlanet.getData(this.id, this.afterDownload.bind(this));
     }
 
-    afterDownload (data) {
-        const Planet = this.Planet ;
+    afterDownload(data) {
+        const Planet = this.Planet;
 
         const proj = this.ProjectCache[this.id];
         let image = Planet.ProjectStorage.ImageDataURL;
-        if (proj.ProjectImage !== "")
-            image = proj.ProjectImage;
+        if (proj.ProjectImage !== "") image = proj.ProjectImage;
 
         Planet.SaveInterface.saveHTML(
             proj.ProjectName,
@@ -129,7 +141,7 @@ class ProjectViewer {
         document.getElementById("projectviewer-report-progress").style.visibility = "hidden";
         document.getElementById("report-error").style.display = "none";
         document.getElementById("projectviewer-report-card").style.display = "block";
-        
+
         hideOnClickOutside(
             [
                 document.getElementById("projectviewer-report-card"),
@@ -142,17 +154,17 @@ class ProjectViewer {
     submitReporter() {
         const text = document.getElementById("reportdescription").value;
 
-        if (text === ""){
+        if (text === "") {
             document.getElementById("report-error").textContent = this.ReportDescriptionError;
             document.getElementById("report-error").style.display = "block";
             return;
-        }
-        else if (text.length > 1000){
-            document.getElementById("report-error").textContent = this.ReportDescriptionTooLongError;
+        } else if (text.length > 1000) {
+            document.getElementById(
+                "report-error"
+            ).textContent = this.ReportDescriptionTooLongError;
             document.getElementById("report-error").style.display = "block";
             return;
-        }
-        else {
+        } else {
             document.getElementById("projectviewer-report-progress").style.visibility = "hidden";
             this.Planet.ServerInterface.reportProject(this.id, text, this.afterReport.bind(this));
         }
@@ -161,11 +173,11 @@ class ProjectViewer {
     afterReport(data) {
         if (data.success) {
             document.getElementById("submittext").textContent = this.ReportSuccess;
-            this.Planet.ProjectStorage.report(this.id,true);
+            this.Planet.ProjectStorage.report(this.id, true);
             document.getElementById("projectviewer-report-project").style.display = "none";
-            document.getElementById("projectviewer-report-project-disabled").style.display = "block";
-        }
-        else document.getElementById("submittext").textContent = this.ReportError;
+            document.getElementById("projectviewer-report-project-disabled").style.display =
+                "block";
+        } else document.getElementById("submittext").textContent = this.ReportError;
 
         document.getElementById("projectviewer-report-content").style.display = "none";
         document.getElementById("projectviewer-report-progress").style.visibility = "hidden";
@@ -177,7 +189,6 @@ class ProjectViewer {
     }
 
     init() {
-
         // eslint-disable-next-line no-unused-vars
         document.getElementById("projectviewer-download-file").addEventListener("click", evt => {
             this.download();
@@ -208,5 +219,4 @@ class ProjectViewer {
             this.closeReporter();
         });
     }
-
 }
