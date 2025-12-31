@@ -62,9 +62,6 @@
     "node": "^24.2.0",
     "tone": "^15.1.22"
   },
-  "overrides": {
-    "qs": "^6.14.1"
-  },
   "build": {
     "appId": "com.musicblocks.app", 
     "productName": "Music Blocks",
