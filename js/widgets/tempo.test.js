@@ -1,7 +1,7 @@
 const Tempo = require("./tempo.js");
 
 // --- 1. Global Mocks (Fake the Browser Environment) ---
-global._ = (msg) => msg; // Mock translation function
+global._ = msg => msg; // Mock translation function
 global.getDrumSynthName = jest.fn();
 
 // Mock the Window Manager
@@ -11,7 +11,7 @@ global.window = {
             clear: jest.fn(),
             show: jest.fn(),
             addButton: jest.fn().mockReturnValue({ onclick: () => {} }),
-            addInputButton: jest.fn().mockImplementation((val) => ({
+            addInputButton: jest.fn().mockImplementation(val => ({
                 value: val,
                 addEventListener: jest.fn()
             })),
@@ -77,9 +77,9 @@ describe("Tempo Widget", () => {
         tempoWidget.BPMInputs = [{ value: 100 }]; // Fake input element
         tempoWidget._intervals = [600];
         tempoWidget.BPMBlocks = [null];
-        
+
         // --- FIX 2: Initialize 'isMoving' ---
-        tempoWidget.isMoving = true; 
+        tempoWidget.isMoving = true;
     });
 
     test("should initialize with default values", () => {
@@ -105,7 +105,7 @@ describe("Tempo Widget", () => {
         tempoWidget.BPMs[0] = 950;
         // 950 + 95 = 1045 -> Should clamp to 1000
         tempoWidget.speedUp(0);
-        
+
         expect(tempoWidget.BPMs[0]).toBe(1000);
         expect(mockActivity.errorMsg).toHaveBeenCalled();
     });
