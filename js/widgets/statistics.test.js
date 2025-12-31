@@ -1,6 +1,6 @@
-const StatsWindow = require('./statistics.js');
+const StatsWindow = require("./statistics.js");
 
-describe('StatsWindow', () => {
+describe("StatsWindow", () => {
     let mockActivity;
     let mockWidgetWindow;
 
@@ -21,8 +21,10 @@ describe('StatsWindow', () => {
             sendToCenter: jest.fn(),
             onclose: null,
             onmaximize: null,
-            getWidgetBody: jest.fn().mockReturnValue(document.createElement('div')),
-            getWidgetFrame: jest.fn().mockReturnValue({ getBoundingClientRect: () => ({ height: 500 }) }),
+            getWidgetBody: jest.fn().mockReturnValue(document.createElement("div")),
+            getWidgetFrame: jest
+                .fn()
+                .mockReturnValue({ getBoundingClientRect: () => ({ height: 500 }) }),
             isMaximized: jest.fn().mockReturnValue(false)
         };
 
@@ -43,14 +45,14 @@ describe('StatsWindow', () => {
         global.runAnalytics = jest.fn();
         global.scoreToChartData = jest.fn().mockReturnValue({});
         global.getChartOptions = jest.fn().mockReturnValue({});
-        
+
         // Mock the Chart.js library
         global.Chart = jest.fn().mockImplementation(() => ({
             Radar: jest.fn()
         }));
     });
 
-    test('displayInfo should correctly format note statistics and Hz calculations', () => {
+    test("displayInfo should correctly format note statistics and Hz calculations", () => {
         const statsWindow = new StatsWindow(mockActivity);
 
         // Prepare dummy data
@@ -58,10 +60,10 @@ describe('StatsWindow', () => {
             duples: 5,
             triplets: 2,
             quintuplets: 0,
-            pitchNames: new Set(['A', 'C#', 'E']),
+            pitchNames: new Set(["A", "C#", "E"]),
             numberOfNotes: 20,
-            lowestNote: ['A4', 60, 440],
-            highestNote: ['C5', 72, 523.25],
+            lowestNote: ["A4", 60, 440],
+            highestNote: ["C5", 72, 523.25],
             rests: 4,
             ornaments: 1
         };
@@ -72,10 +74,10 @@ describe('StatsWindow', () => {
         // Check results
         const outputHtml = statsWindow.jsonObject.innerHTML;
 
-        expect(outputHtml).toContain('441Hz'); // 440 + 0.5 rounded
-        expect(outputHtml).toContain('524Hz'); // 523.25 + 0.5 rounded
-        expect(outputHtml).toContain('duples: 5');
-        expect(outputHtml).toContain('triplets: 2');
-        expect(outputHtml).toContain('pitch names: A, C#, E');
+        expect(outputHtml).toContain("441Hz"); // 440 + 0.5 rounded
+        expect(outputHtml).toContain("524Hz"); // 523.25 + 0.5 rounded
+        expect(outputHtml).toContain("duples: 5");
+        expect(outputHtml).toContain("triplets: 2");
+        expect(outputHtml).toContain("pitch names: A, C#, E");
     });
 });
