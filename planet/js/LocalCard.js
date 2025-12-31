@@ -77,13 +77,13 @@ class LocalCard {
             image,
             description
         );
-    } ;
+    }
 
     duplicate() {
         const Planet = this.Planet ;
         Planet.ProjectStorage.initialiseNewProject(this.ProjectData.ProjectName + " " + this.CopySuffix, this.ProjectData.ProjectData, this.ProjectData.ProjectImage);
         Planet.LocalPlanet.updateProjects();
-    };
+    }
 
     render() {
         const Planet = this.Planet ;
@@ -171,13 +171,13 @@ class LocalCard {
         }
 
         document.getElementById("local-projects").appendChild(frag);
-    };
+    }
 
     init(id) {
         const Planet = this.Planet ;
         this.id = id;
         this.ProjectData = Planet.LocalPlanet.ProjectTable[this.id];
-    };
+    }
 
 }
 

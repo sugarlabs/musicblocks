@@ -84,7 +84,7 @@ class GlobalTag {
         document.getElementById(elementTag).appendChild(tag);
 
         this.tagElement = tag;
-    };
+    }
 
     onTagClick() {
         if (this.specialTag && !this.selected)
@@ -94,17 +94,17 @@ class GlobalTag {
             this.selected ? this.unselect() : this.select() ;
             this.globalPlanet.refreshTagList();
         }
-    };
+    }
 
     select() {
         this.tagElement.classList.add(this.selectedClass);
         this.selected = true;
-    };
+    }
 
     unselect() {
         this.tagElement.classList.remove(this.selectedClass);
         this.selected = false;
-    };
+    }
 
     init(obj) {
         const Planet = this.Planet ;
@@ -127,6 +127,6 @@ class GlobalTag {
         }
 
         this.render();
-    };
+    }
 
 }

@@ -86,6 +86,6 @@ class StringHelper {
                 else elem.innerHTML += obj[1];
             }
         }
-    };
+    }
 
 }

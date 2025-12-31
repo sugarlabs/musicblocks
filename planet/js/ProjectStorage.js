@@ -56,7 +56,7 @@ class ProjectStorage {
             suffix += Math.floor(Math.random() * 10).toString();
 
         return prefix+suffix;
-    };
+    }
 
     saveLocally (data, image) {
         if (this.data.CurrentProject === undefined)
@@ -76,18 +76,18 @@ class ProjectStorage {
         this.data.Projects[c].ProjectImage = image;
         this.data.Projects[c].DateLastModified = Date.now();
         this.save();
-    };
+    }
 
     async getCurrentProjectData() {
         await this.dataLoaded;
         const c = this.data.CurrentProject;
         return this.data.Projects[c]?.ProjectData ?? null ;
-    };
+    }
 
     getCurrentProjectName() {
         const c = this.data.CurrentProject;
         return this.data.Projects[c]?.ProjectName ?? this.defaultProjectName ;
-    };
+    }
 
     getCurrentProjectDescription(){
         const c = this.data.CurrentProject;
@@ -97,7 +97,7 @@ class ProjectStorage {
             return this.data.Projects[c].PublishedData.ProjectDescription;
 
         return null;
-    };
+    }
 
     getCurrentProjectImage() {
         const c = this.data.CurrentProject;
@@ -107,7 +107,7 @@ class ProjectStorage {
             return this.data.Projects[c].ProjectImage;
 
         return this.ImageDataURL;
-    };
+    }
 
     initialiseNewProject (name, data, image) {
         name  = name ?? this.defaultProjectName ;
@@ -123,57 +123,57 @@ class ProjectStorage {
         this.data.Projects[c].PublishedData = null;
         this.data.Projects[c].DateLastModified = Date.now();
         this.save();
-    };
+    }
 
     renameProject (id, name) {
         this.data.Projects[id].ProjectName = name;
         this.save();
-    };
+    }
 
     addPublishedData (id, data) {
         this.data.Projects[id].PublishedData = data;
         this.save();
-    };
+    }
 
     deleteProject(id) {
         delete this.data.Projects[id];
         this.save();
         this.Planet.LocalPlanet.updateProjects();
-    };
+    }
 
     getCurrentProjectID() {
         return this.data.CurrentProject;
-    };
+    }
 
     setCurrentProjectID(id) {
         this.data.CurrentProject = id;
-    };
+    }
 
     encodeTB(tb) {
         return window.btoa(encodeURIComponent(tb));
-    };
+    }
 
     decodeTB(tb) {
         return decodeURIComponent(window.atob(tb));
-    };
+    }
 
     isLiked(id) {
         return this.data.LikedProjects[id] === true ;
-    };
+    }
 
     like(id,like) {
         this.data.LikedProjects[id] = like;
         this.save();
-    };
+    }
 
     isReported(id) {
         return this.data.ReportedProjects[id] === true ;
-    };
+    }
 
     report (id, report) {
         this.data.ReportedProjects[id] = report;
         this.save();
-    };
+    }
 
     // Ancillary Functions
 
@@ -186,7 +186,7 @@ class ProjectStorage {
 
         if (savedjsonobj == null)
             throw new Error("Failed to save project data");
-    };
+    }
 
     async get (key) {
         const jsonobj = await this.LocalStorage.getItem(key) ;
@@ -202,12 +202,12 @@ class ProjectStorage {
             console.log(e);
             return null;
         }
-    };
+    }
 
     async save() {
         this.TimeLastSaved = Date.now();
         await this.set(this.LocalStorageKey, this.data);
-    };
+    }
 
     async restore() {
         const currentData = await this.get(this.LocalStorageKey);
@@ -221,7 +221,7 @@ class ProjectStorage {
             console.log(e);
             return null;
         }
-    };
+    }
 
     async initialiseStorage() {
 
@@ -246,11 +246,11 @@ class ProjectStorage {
         }
         this.fireDataLoaded();
         await this.save();
-    };
+    }
 
     getDefaultCreatorName() {
         return this.data.DefaultCreatorName;
-    };
+    }
 
     async port() {
         const oldProjectData = localStorage.getItem(this.LocalStorageKey);
@@ -262,7 +262,7 @@ class ProjectStorage {
             await this.set(this.LocalStorageKey, oldProjectData);
             await this.set(this.VersionKey, this.Version);
         }
-    };
+    }
 
     async init() {
         // don't use Planet's localStorage, use IndexedDB if available to allow bigger projects.
@@ -270,5 +270,5 @@ class ProjectStorage {
         await this.port();
         await this.restore();
         await this.initialiseStorage();
-    };
-};
+    }
+}

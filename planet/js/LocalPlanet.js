@@ -38,12 +38,12 @@ class LocalPlanet {
         this.refreshProjectArray();
         this.initCards();
         this.renderAllProjects();
-    };
+    }
 
     setCurrentProjectImage(image)  {
         this.currentProjectImage = image;
         this.currentProjectID = this.Planet.ProjectStorage.getCurrentProjectID();
-    };
+    }
 
     refreshProjectArray() {
         this.projects = [];
@@ -59,7 +59,7 @@ class LocalPlanet {
             // eslint-disable-next-line max-len
             return this.ProjectTable[b[0]].DateLastModified - this.ProjectTable[a[0]].DateLastModified;
         });
-    };
+    }
 
     initCards() {
         for (let i = 0; i < this.projects.length; i++) {
@@ -67,7 +67,7 @@ class LocalPlanet {
             this.projects[i][1] = new LocalCard(Planet);
             this.projects[i][1].init(this.projects[i][0]);
         }
-    };
+    }
 
     renderAllProjects() {
         document.getElementById("local-projects").innerHTML = "";
@@ -87,7 +87,7 @@ class LocalPlanet {
         }
 
         jQuery(".tooltipped").tooltip({delay: 50});
-    };
+    }
 
     initDeleteModal() {
         const t = this;
@@ -101,7 +101,7 @@ class LocalPlanet {
                 }
             }
         );
-    };
+    }
 
     openDeleteModal(id)  {
         this.DeleteModalID = id;
@@ -109,13 +109,13 @@ class LocalPlanet {
         document.getElementById("deleter-title").textContent = name;
         document.getElementById("deleter-name").textContent = name;
         jQuery("#deleter").modal("open");
-    };
+    }
 
     openProject(id) {
         const Planet = this.Planet ;
         Planet.ProjectStorage.setCurrentProjectID(id);
         Planet.loadProjectFromData(this.ProjectTable[id].ProjectData);
-    };
+    }
 
     mergeProject(id) {
         const Planet = this.Planet ;
@@ -126,7 +126,7 @@ class LocalPlanet {
             Planet.loadProjectFromData(this.ProjectTable[id].ProjectData);
         }
         else Planet.loadProjectFromData(this.ProjectTable[id].ProjectData, true);
-    };
+    }
 
     init() {
         const Planet = this.Planet ;
@@ -136,6 +136,6 @@ class LocalPlanet {
         this.initDeleteModal();
         this.Publisher = new Publisher(Planet);
         this.Publisher.init();
-    };
+    }
 
 }

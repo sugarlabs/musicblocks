@@ -6117,14 +6117,14 @@ class Activity {
 
             this.homeButtonContainer = createButton(
                 GOHOMEFADEDBUTTON,
-                _("Home") + " [" + _("Home").toUpperCase() + "]",
+                _("Home"),
                 findBlocks
             );
             this.boundary.hide();
 
             if (!this.helpfulWheelItems.find(ele => ele.label === "Home [HOME]"))
                 this.helpfulWheelItems.push({
-                    label: "Home [HOME]",
+                    label: "Home",
                     icon:
                         "imgsrc:data:image/svg+xml;base64," +
                         window.btoa(base64Encode(GOHOMEFADEDBUTTON)),

@@ -77,7 +77,7 @@ class Publisher {
             tags.push("4");  // math
 
         return tags;
-    };
+    }
 
     findTagWithName(name) {
         const Planet = this.Planet ;
@@ -88,7 +88,7 @@ class Publisher {
                 return keys[i];
       
         return null;
-    };
+    }
 
     addTags() {
         const tags = this.Planet.TagsManifest;
@@ -126,7 +126,7 @@ class Publisher {
 
             this.setTagInput(arr);
         });
-    };
+    }
 
     setTagInput(arr) {
         jQuery(".chips-initial").material_chip({
@@ -137,7 +137,7 @@ class Publisher {
                 minLength: 1
             }
         });
-    };
+    }
 
     setTags(arr) {
         const a = [];
@@ -149,7 +149,7 @@ class Publisher {
             a.push(o);
         }
         this.setTagInput(a);
-    };
+    }
 
     getTags() {
         const t = jQuery(".chips-initial").material_chip("data");
@@ -159,12 +159,12 @@ class Publisher {
             a.push(t[i].id);
 
         return a;
-    };
+    }
 
     initSubmit() {
         document.getElementById("publisher-submit")
             .addEventListener("click", this.publishProject.bind(this));
-    };
+    }
 
     open(id, IsShareLink) {
 
@@ -174,7 +174,7 @@ class Publisher {
         const published = this.ProjectTable[id].PublishedData;
         const DATA = this.ProjectTable[id].ProjectData;
         const description = (published !== null) ? published.ProjectDescription : "" ;
-        const tags = (published !== null) ? published.ProjectTags: this.dataToTags(DATA); ;
+        const tags = (published !== null) ? published.ProjectTags: this.dataToTags(DATA);
         
         document.getElementById("publisher-ptitle").textContent =
                  _(`${(published !== null) ? "Republish":"Publish"}  Project`) ;
@@ -201,7 +201,7 @@ class Publisher {
         }
 
         jQuery("#publisher").modal("open");
-    };
+    }
 
     publishProject() {
         const Planet = this.Planet ;
@@ -285,7 +285,7 @@ class Publisher {
                 this.afterPublishProject(data, id, title.value, published);
             }.bind(this));
         }
-    };
+    }
 
     parseProject(tb) {
 
@@ -317,11 +317,11 @@ class Publisher {
             s += `${item} `;
 
         return s.slice(0, -1);
-    };
+    }
 
     hideProgressBar() {
         document.getElementById("publisher-progress").style.visibility = "hidden";
-    };
+    }
 
     afterPublishProject(data, id, name, published) {
         const Planet = this.Planet ;
@@ -352,16 +352,16 @@ class Publisher {
             document.getElementById("publisher-form").getElementsByTagName("TEXTAREA")[i].style.cursor = "text";
 
         document.body.style.cursor = "default";
-    };
+    }
 
     throwError(error) {
         document.getElementById("publisher-error").textContent = error;
         document.getElementById("publisher-error").style.display = "initial";
-    };
+    }
 
     close() {
         jQuery("#publisher").modal("close");
-    };
+    }
 
     init() {
         const Planet = this.Planet ;
@@ -378,6 +378,6 @@ class Publisher {
             this.addTags();
             this.initSubmit();
         }
-    };
+    }
 
 }

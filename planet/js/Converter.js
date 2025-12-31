@@ -25,7 +25,7 @@ class Converter {
 
     isConnected() {
         return this.Planet.ConnectedToServer;
-    };
+    }
 
     // callbacks: (success, data/error message)
     // Conversion Functions
@@ -34,17 +34,17 @@ class Converter {
         this.ServerInterface.convertFile("ly", "pdf", window.btoa(encodeURIComponent(data)), function(result) {
             this.afterly2pdf(result,callback);
         }.bind(this));
-    };
+    }
     
     afterly2pdf (data, callback) {
         (!data.success) ? callback(false, data.error) :
             callback(true, this.getDataURL(data.data.contenttype, data.data.blob)) ;
-    };
+    }
 
     // Ancillary Functions
     getDataURL (mime, data) {
         return `data:${mime};base64,${data}` ;
-    };
+    }
 
     // Unused, but might be useful.
     getBlob(mime, data) {
@@ -57,7 +57,7 @@ class Converter {
 
         const blob = new Blob([arr], {type: mime});
         return blob;
-    };
+    }
 
     init() {}
 

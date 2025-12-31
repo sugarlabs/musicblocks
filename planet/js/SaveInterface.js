@@ -40,7 +40,7 @@ class SaveInterface {
 
         this.htmlSaveTemplate = HTMLTemplate ;
         this.buttonTemplate = buttonTemplate ;
-    };
+    }
 
     downloadURL(filename, dataurl) {
         const a = document.createElement("a");
@@ -49,7 +49,7 @@ class SaveInterface {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-    };
+    }
 
     prepareHTML (name, data, image, description, projectid) {
 
@@ -68,11 +68,11 @@ class SaveInterface {
             .replace(new RegExp("{{ project_button }}", "g"), id);
         
         return file;
-    };
+    }
 
     saveHTML(name, data, image, description, projectid) {
         const html = "data:text/plain;charset=utf-8," + encodeURIComponent(this.prepareHTML(name, data, image, description, projectid));
         this.downloadURL(name + ".html", html);
-    };
+    }
 
 }

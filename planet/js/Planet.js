@@ -52,7 +52,7 @@ class Planet {
         }
 
         this.UserID = id;
-    };
+    }
 
     open(image) {
         if (this.LocalPlanet === null) {
@@ -62,39 +62,39 @@ class Planet {
             this.LocalPlanet.updateProjects();
             this.oldCurrentProjectID = this.ProjectStorage.getCurrentProjectID();
         }
-    };
+    }
 
     saveLocally(data, image) {
         this.ProjectStorage.saveLocally(data, image);
-    };
+    }
 
     setAnalyzeProject(func) {
         this.analyzeProject = func;
-    };
+    }
 
     setLoadProjectFromData(func) {
         this.loadProjectFromData = func;
-    };
+    }
 
     setPlanetClose(func) {
         this.planetClose = func;
-    };
+    }
 
     setLoadNewProject(func) {
         this.loadNewProject = func;
-    };
+    }
 
     setLoadProjectFromFile(func) {
         this.loadProjectFromFile = func;
-    };
+    }
 
     setOnConverterLoad(func) {
         this.onConverterLoad = func;
-    };
+    }
 
     openProjectFromPlanet(id,error) {
         this.GlobalPlanet.openGlobalProject(id,error);
-    };
+    }
     
     async init() {
         this.StringHelper = new StringHelper(this);
@@ -126,7 +126,7 @@ class Planet {
                 this.initPlanets(data);
             }.bind(this)
         );
-    };
+    }
 
     closeButton() {
         if (this.ProjectStorage.getCurrentProjectID() !== this.oldCurrentProjectID) {
@@ -135,7 +135,7 @@ class Planet {
         }
         
         else this.planetClose();
-    };
+    }
     
     initPlanets(tags) {
         const status = tags.success || false ;
@@ -151,7 +151,7 @@ class Planet {
         this.LocalPlanet.init();
         this.GlobalPlanet = new GlobalPlanet(this);
         this.GlobalPlanet.init();
-    };
+    }
 
 }
 

@@ -43,7 +43,7 @@ function debounce(func, wait, immediate) {
         timeout = setTimeout(later, wait);
         if (callNow) func.apply(context, args);
     };
-};
+}
 
 function getCookie(cname) {
     // from W3Schools
@@ -61,7 +61,7 @@ function getCookie(cname) {
             return c.substring(name.length, c.length);
     }
     return "";
-};
+}
 
 function setCookie(cname, cvalue, exdays) {
     // from W3Schools
@@ -69,12 +69,12 @@ function setCookie(cname, cvalue, exdays) {
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
     const expires = `expires=${d.toUTCString()}`;
     document.cookie = `${cname}=${cvalue};${expires};path=/` ;
-};
+}
 
 function toggleSearch(on) {
     const displayValue = on ? "block" : "none" ;
     document.getElementById("searchcontainer").style.display = displayValue;
-};
+}
 
 function toggleText(id, a, b) {
     const el = document.getElementById(id);
@@ -84,12 +84,12 @@ function toggleText(id, a, b) {
 
     el.innerHTML = "" ;
     el.insertAdjacentHTML("afterbegin", updatedHTML) ;
-};
+}
 
 function toggleExpandable(id, c) {
     const el = document.getElementById(id) ;
     el.className = (el.className === `${c} open`) ? c : `${c} open` ;
-};
+}
 
 function hideOnClickOutside(eles, other) {
     // if click not in id, hide
@@ -114,7 +114,7 @@ function hideOnClickOutside(eles, other) {
     };
 
     document.addEventListener("click", outsideClickListener);
-};
+}
 
 function updateCheckboxes(id) {
     const elements = document.getElementById(id).querySelectorAll("input:checked");
@@ -125,7 +125,7 @@ function updateCheckboxes(id) {
         url += `&${elements[i].name}=True`;
 
     urlel.value = url;
-};
+}
 
 $(document).ready(() => {
     $("#publisher").modal();

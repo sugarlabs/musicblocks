@@ -86,7 +86,7 @@ class GlobalPlanet {
             tagsToInitialise[i].select();
         
         this.refreshTagList();
-    };
+    }
 
     selectSpecialTag(tag) {
         for (let i = 0; i < this.tags.length; i++)
@@ -94,13 +94,13 @@ class GlobalPlanet {
 
         tag.select();
         tag.func();
-    };
+    }
 
     unselectSpecialTags() {
         for (let i = 0; i < this.tags.length; i++)
             if (this.tags[i].specialTag)
                 this.tags[i].unselect();
-    };
+    }
 
     refreshTagList() {
         const tagids = [];
@@ -116,22 +116,22 @@ class GlobalPlanet {
             this.unselectSpecialTags();
             this.searchTags(tagids);
         }
-    };
+    }
 
     searchAllProjects() {
         this.searchMode = "ALL_PROJECTS";
         this.refreshProjects();
-    };
+    }
 
     searchMyProjects() {
         this.searchMode = "USER_PROJECTS";
         this.refreshProjects();
-    };
+    }
 
     searchTags(tagids) {
         this.searchMode = JSON.stringify(tagids);
         this.refreshProjects();
-    };
+    }
 
     refreshProjects() {
         const Planet = this.Planet ;
@@ -160,7 +160,7 @@ class GlobalPlanet {
                 this.afterRefreshProjects.bind(this)
             );
         }
-    };
+    }
     
     loadMoreProjects() {
         const Planet = this.Planet ;
@@ -186,7 +186,7 @@ class GlobalPlanet {
                 this.afterRefreshProjects.bind(this)
             );
         }
-    };
+    }
 
     search() {
         const Planet = this.Planet ;
@@ -216,18 +216,18 @@ class GlobalPlanet {
                 this.afterRefreshProjects.bind(this)
             );
         }
-    };
+    }
 
     afterSearch() {
         this.searching = false;
 
         if (this.searchString !== this.oldSearchString)
             this.search();
-    };
+    }
 
     afterRefreshProjects(data) {
         data.success ? this.addProjects(data.data) : this.throwOfflineError() ;
-    };
+    }
 
     addProjects(data) {
         const toDownload = [];
@@ -269,7 +269,7 @@ class GlobalPlanet {
                 this.render(data);this.hideLoadMore();
             }.bind(this));
         }
-    };
+    }
 
     downloadProjectsToCache(data, callback) {
         const Planet = this.Planet ;
@@ -284,7 +284,7 @@ class GlobalPlanet {
                 }.bind(this));
             }.bind(this))();
         }
-    };
+    }
 
     addProjectToCache(id, data, callback) {
         if (data.success) {
@@ -296,13 +296,13 @@ class GlobalPlanet {
                 callback();
         }
         else this.throwOfflineError();
-    };
+    }
 
     forceAddToCache(id, callback) {
         this.Planet.ServerInterface.getProjectDetails(id, function(d) {
             this.addProjectToCache(id, d, callback);
         }.bind(this));
-    };
+    }
 
     afterForceAddToCache (id, data, callback) {
         if (data.success) {
@@ -312,7 +312,7 @@ class GlobalPlanet {
         }
         
         else this.throwOfflineError();
-    };
+    }
 
     getData(id, callback, error) {
         if (error === undefined)
@@ -322,7 +322,7 @@ class GlobalPlanet {
             this.downloadDataToCache(id, callback, error);
 
         else  callback(this.cache[id].ProjectData);
-    };
+    }
 
     downloadDataToCache(id, callback, error) {
         if (error === undefined)
@@ -331,7 +331,7 @@ class GlobalPlanet {
         this.Planet.ServerInterface.downloadProject(id, function(data) {
             this.afterDownloadData(id, data, callback, error);
         }.bind(this));
-    };
+    }
 
     afterDownloadData(id, data, callback, error) {
         const Planet = this.Planet ;
@@ -352,7 +352,7 @@ class GlobalPlanet {
             if (error !== null)
                 error();
         }
-    };
+    }
 
     cleanContainer() {
         const element = document.getElementById("global-projects").firstElementChild ;
@@ -367,7 +367,7 @@ class GlobalPlanet {
                 return ;
             }
         });
-    } ;
+    }
 
     render(data) {
         // Make sure the container doesn't display the offlineHTML or noProjectsHTML even when cards are being rendered.
@@ -388,7 +388,7 @@ class GlobalPlanet {
 
         jQuery(".tooltipped").tooltip({delay: 50});
         this.afterAddProjects();
-    };
+    }
 
     afterAddProjects() {
         this.index += this.page;
@@ -396,7 +396,7 @@ class GlobalPlanet {
 
         if (this.oldSearchString !== "")
             this.afterSearch();
-    };
+    }
 
     throwOfflineError() {
         this.hideLoading();
@@ -405,7 +405,7 @@ class GlobalPlanet {
         const element = document.getElementById("global-projects") ;
         element.innerHTML = "";
         element.insertAdjacentHTML("afterbegin", this.offlineHTML);
-    };
+    }
 
     throwNoProjectsError() {
         this.hideLoading();
@@ -414,35 +414,35 @@ class GlobalPlanet {
         const element = document.getElementById("global-projects") ;
         element.innerHTML = "";
         element.insertAdjacentHTML("afterbegin", this.noProjects);
-    };
+    }
 
     hideLoading() {
         document.getElementById("global-load").style.display = "none";
-    };
+    }
 
     showLoading() {
         document.getElementById("global-load").style.display = "block";
-    };
+    }
 
     hideLoadMore() {
         document.getElementById("load-more-projects").style.display = "none";
         this.loadButtonShown = false;
-    };
+    }
 
     showLoadMore() {
         const l = document.getElementById("load-more-projects");
         l.style.display = "block";
         l.classList.remove("disabled");
         this.loadButtonShown = true;
-    };
+    }
 
     hideTags() {
         document.getElementById("tagscontainer").style.display = "none";
-    };
+    }
 
     showTags() {
         document.getElementById("tagscontainer").style.display = "block";
-    };
+    }
 
     openGlobalProject (id, error) {
         const Planet = this.Planet ;
@@ -475,7 +475,7 @@ class GlobalPlanet {
 
             Planet.loadProjectFromData(data);
         }, error);
-    };
+    }
 
     mergeGlobalProject (id, error) {
         const Planet = this.Planet ;
@@ -500,7 +500,7 @@ class GlobalPlanet {
 
             Planet.loadProjectFromData(data, true);
         }, error);
-    };
+    }
     
     init() {
         const Planet = this.Planet ;
@@ -597,6 +597,6 @@ class GlobalPlanet {
             this.ProjectViewer = new ProjectViewer(Planet);
             this.ProjectViewer.init();
         }
-    };
+    }
 
 }

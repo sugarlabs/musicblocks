@@ -44,53 +44,53 @@ class ServerInterface {
             .fail(() => {
                 callback(this.ConnectionFailureData);
             });
-    };
+    }
 
     getTagManifest(callback) {
         const obj = {"action": "getTagManifest"};
         this.request(obj, callback);
-    };
+    }
 
     addProject (data, callback) {
         const obj = {"action": "addProject", "ProjectJSON": data};
         this.request(obj, callback);
-    };
+    }
 
     downloadProjectList (ProjectTags, ProjectSort, Start, End, callback) {
         const obj = {"action": "downloadProjectList", "ProjectTags": ProjectTags, "ProjectSort": ProjectSort, "Start": Start, "End": End};
         this.request(obj, callback);
-    };
+    }
 
     getProjectDetails (ProjectID, callback) {
         const obj = {"action": "getProjectDetails", "ProjectID": ProjectID};
         this.request(obj, callback);
-    };
+    }
 
     searchProjects (Search, ProjectSort, Start, End, callback) {
         const obj = {"action": "searchProjects", "Search": Search, "ProjectSort": ProjectSort, "Start": Start, "End": End};
         this.request(obj, callback);
-    };
+    }
 
     downloadProject(ProjectID, callback) {
         const obj = {"action": "downloadProject", "ProjectID": ProjectID};
         this.request(obj, callback);
-    };
+    }
 
     likeProject (ProjectID, Like, callback) {
         const obj = {"action": "likeProject", "ProjectID": ProjectID, "Like": ((Like) ? "true" : "false")};
         this.request(obj, callback);
-    };
+    }
 
     reportProject (ProjectID, Description, callback) {
         const obj = {"action": "reportProject", "ProjectID": ProjectID, "Description": Description};
         this.request(obj, callback);
-    };
+    }
 
     convertFile (From, To, Data, callback) {
         const obj = {"action": "convertData", "From": From, "To": To, "Data": Data};
         this.request(obj, callback);
-    };
+    }
 
-    init() { };
+    init() { }
 
 }
