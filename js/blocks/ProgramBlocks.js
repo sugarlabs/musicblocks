@@ -1442,3 +1442,7 @@ function setupProgramBlocks(activity) {
     new LoadHeapBlock().setup(activity);
     new SetHeapBlock().setup(activity);
 }
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupProgramBlocks };
+}
