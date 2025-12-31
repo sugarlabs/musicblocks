@@ -1543,3 +1543,7 @@ function setupActionBlocks(activity) {
     new NamedDoBlock().setup(activity);
     new Temperament1Block().setup(activity);
 }
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupActionBlocks };
+}
