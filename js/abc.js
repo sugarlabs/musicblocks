@@ -285,8 +285,6 @@ const processABCNotes = function (logo, turtle) {
                         j++; // Jump to next note.
                         k++; // Increment notes in tuplet.
                     } else {
-                        // eslint-disable-next-line no-console
-                        console.debug("ignoring " + notes);
                         j++; // Jump to next note.
                         k++; // Increment notes in tuplet.
                     }
