@@ -218,6 +218,6 @@ class ProjectViewer {
         document.getElementById("projectviewer-report-close").addEventListener("click", evt => {
             this.closeReporter();
         });
-    };
+    }
 
 }
