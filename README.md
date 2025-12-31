@@ -6,8 +6,8 @@
     <img src="https://img.shields.io/github/license/sugarlabs/musicblocks" />
 </a>
 
-<a href="https://github.com/sugarlabs/musicblocks/actions/workflows/main.yml" alt="CI">
-    <img src="https://github.com/sugarlabs/musicblocks/actions/workflows/main.yml/badge.svg" />
+<a href="https://github.com/sugarlabs/musicblocks/actions/workflows/node.js.yml" alt="CI">
+    <img src="https://github.com/sugarlabs/musicblocks/actions/workflows/node.js.yml/badge.svg" />
 </a>
 
 # Music Blocks
@@ -223,12 +223,11 @@ repository.
 
 ### Developer Quick Start
 
-1. Clone and install: `git clone ... && npm install`
+1. Clone and install: `git clone https://github.com/sugarlabs/musicblocks.git && npm install`
 2. Run locally: `npm run dev`
 3. Before pushing: `npm run lint && npx prettier --check . && npm test`
 
 For writing tests, see [docs/TESTING.md](./docs/TESTING.md).
-
 
 ## <a name="REPORTING_BUGS"></a>Reporting Bugs
 

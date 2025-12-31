@@ -8,7 +8,6 @@ subdirectory.
 
 For writing unit tests for block files, see [docs/TESTING.md](../docs/TESTING.md).
 
-
 * `activity.js` -- where the menus are defined
 
 Logo code
