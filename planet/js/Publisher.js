@@ -21,13 +21,15 @@
 */
 
 class Publisher {
-
     constructor(Planet) {
-        this.Planet = Planet ;
+        this.Planet = Planet;
         this.ChipTags = null;
         this.PlaceholderMBImage = "images/mbgraphic.png";
         this.PlaceholderTBImage = "images/tbgraphic.png";
-        this.PublisherOfflineHTML = "<div>" + _("Feature unavailable - cannot connect to server. Reload Music Blocks to try again.") + "</div>";
+        this.PublisherOfflineHTML =
+            "<div>" +
+            _("Feature unavailable - cannot connect to server. Reload Music Blocks to try again.") +
+            "</div>";
         this.TitleLowerBound = 1;
         this.TitleUpperBound = 50;
         this.DescriptionLowerBound = 1;
@@ -46,7 +48,7 @@ class Publisher {
 
         for (const i of DATA) {
             const block = {};
-            block.name = (typeof i[1] === "string") ? i[1] : i[1][0] ;
+            block.name = typeof i[1] === "string" ? i[1] : i[1][0];
             block.connections = i[4];
             blocks.blockList.push(block);
         }
@@ -61,32 +63,27 @@ class Publisher {
         const tags = [];
 
         //Pitch, Tone, and/or Rhythm
-        if (score[1] && score[2])
-            tags.push("2");  // music
+        if (score[1] && score[2]) tags.push("2"); // music
 
         //pen,mouse
-        if (score[3] && score[4])
-            tags.push("3");  // art
-        
+        if (score[3] && score[4]) tags.push("3"); // art
+
         //sensors
-        if (score[8])
-            tags.push("5");  // interactive
-        
+        if (score[8]) tags.push("5"); // interactive
+
         //number
-        if (score[5])
-            tags.push("4");  // math
+        if (score[5]) tags.push("4"); // math
 
         return tags;
     }
 
     findTagWithName(name) {
-        const Planet = this.Planet ;
+        const Planet = this.Planet;
         const keys = Object.keys(Planet.TagsManifest);
 
         for (let i = 0; i < keys.length; i++)
-            if (Planet.TagsManifest[keys[i]].TagName === name)
-                return keys[i];
-      
+            if (Planet.TagsManifest[keys[i]].TagName === name) return keys[i];
+
         return null;
     }
 
@@ -96,8 +93,7 @@ class Publisher {
         const keys = Object.keys(tags);
 
         for (let i = 0; i < keys.length; i++)
-            if (tags[keys[i]].IsTagUserAddable === "1")
-                this.ChipTags[tags[keys[i]].TagName] = null;
+            if (tags[keys[i]].IsTagUserAddable === "1") this.ChipTags[tags[keys[i]].TagName] = null;
 
         const maxLength = 5;
 
@@ -105,23 +101,18 @@ class Publisher {
             // you have the added chip here
             let arr = jQuery(".chips-initial").material_chip("data");
 
-            if (!(chip.tag in this.ChipTags))
-                arr.splice(arr.length - 1, 1);
-
+            if (!(chip.tag in this.ChipTags)) arr.splice(arr.length - 1, 1);
             else chip.id = this.findTagWithName(chip.tag);
 
-            if (arr.length>maxLength)
-                arr=arr.slice(0,maxLength);
-    
+            if (arr.length > maxLength) arr = arr.slice(0, maxLength);
+
             this.setTagInput(arr);
         });
 
         jQuery(".chips").on("chip.delete", (e, chip) => {
             let arr = jQuery(".chips-initial").material_chip("data");
 
-            if (!(chip.tag in this.ChipTags))
-                arr.splice(arr.length - 1, 1);
-
+            if (!(chip.tag in this.ChipTags)) arr.splice(arr.length - 1, 1);
             else chip.id = this.findTagWithName(chip.tag);
 
             this.setTagInput(arr);
@@ -155,32 +146,32 @@ class Publisher {
         const t = jQuery(".chips-initial").material_chip("data");
         const a = [];
 
-        for (let i = 0; i < t.length; i++)
-            a.push(t[i].id);
+        for (let i = 0; i < t.length; i++) a.push(t[i].id);
 
         return a;
     }
 
     initSubmit() {
-        document.getElementById("publisher-submit")
+        document
+            .getElementById("publisher-submit")
             .addEventListener("click", this.publishProject.bind(this));
     }
 
     open(id, IsShareLink) {
-
-        this.IsShareLink = (IsShareLink === undefined) ? false : IsShareLink ;
+        this.IsShareLink = IsShareLink === undefined ? false : IsShareLink;
         const name = this.ProjectTable[id].ProjectName;
         let image = this.ProjectTable[id].ProjectImage;
         const published = this.ProjectTable[id].PublishedData;
         const DATA = this.ProjectTable[id].ProjectData;
-        const description = (published !== null) ? published.ProjectDescription : "" ;
-        const tags = (published !== null) ? published.ProjectTags: this.dataToTags(DATA);
-        
-        document.getElementById("publisher-ptitle").textContent =
-                 _(`${(published !== null) ? "Republish":"Publish"}  Project`) ;
+        const description = published !== null ? published.ProjectDescription : "";
+        const tags = published !== null ? published.ProjectTags : this.dataToTags(DATA);
 
-        const Planet = this.Planet ;
-        
+        document.getElementById("publisher-ptitle").textContent = _(
+            `${published !== null ? "Republish" : "Publish"}  Project`
+        );
+
+        const Planet = this.Planet;
+
         if (Planet.ConnectedToServer) {
             document.getElementById("publish-description").value = description;
             document.getElementById("publish-description-label").setAttribute("data-error", "");
@@ -188,10 +179,9 @@ class Publisher {
             document.getElementById("publish-id").value = id;
             document.getElementById("publish-title").value = name;
             document.getElementById("publish-title-label").setAttribute("data-error", "");
-            
+
             if (image === null) {
-                image = (Planet.IsMusicBlocks) ?
-                    this.PlaceholderMBImage : this.PlaceholderTBImage ;
+                image = Planet.IsMusicBlocks ? this.PlaceholderMBImage : this.PlaceholderTBImage;
             }
 
             document.getElementById("publish-image").src = image;
@@ -204,7 +194,7 @@ class Publisher {
     }
 
     publishProject() {
-        const Planet = this.Planet ;
+        const Planet = this.Planet;
 
         document.getElementById("publisher-error").textContent = "";
         document.getElementById("publisher-error").style.display = "none";
@@ -246,9 +236,7 @@ class Publisher {
             descriptionlabel.classList.add("active");
         }
 
-        if (errors === true)
-            this.hideProgressBar();
-
+        if (errors === true) this.hideProgressBar();
         else {
             const submitobj = {};
             submitobj.ProjectID = id;
@@ -264,7 +252,7 @@ class Publisher {
                 this.ProjectTable[id].ProjectData
             );
             submitobj.ProjectImage = this.ProjectTable[id].ProjectImage;
-            submitobj.ProjectIsMusicBlocks = (Planet.IsMusicBlocks ? 1 : 0);
+            submitobj.ProjectIsMusicBlocks = Planet.IsMusicBlocks ? 1 : 0;
             submitobj.ProjectCreatorName = Planet.ProjectStorage.getDefaultCreatorName();
             submitobj.ProjectTags = this.getTags();
             const send = JSON.stringify(submitobj);
@@ -274,25 +262,39 @@ class Publisher {
             document.getElementById("publisher-submit").style.cursor = "wait";
             document.getElementById("publisher-cancel").style.cursor = "wait";
 
-            for (let i=0; i<document.getElementById("publisher-form").getElementsByTagName("INPUT").length; i++)
-                document.getElementById("publisher-form").getElementsByTagName("INPUT")[i].style.cursor = "wait";
-            
-            for (let i=0; i<document.getElementById("publisher-form").getElementsByTagName("TEXTAREA").length; i++)
-                document.getElementById("publisher-form").getElementsByTagName("TEXTAREA")[i].style.cursor = "wait";
-            
+            for (
+                let i = 0;
+                i < document.getElementById("publisher-form").getElementsByTagName("INPUT").length;
+                i++
+            )
+                document.getElementById("publisher-form").getElementsByTagName("INPUT")[
+                    i
+                ].style.cursor = "wait";
+
+            for (
+                let i = 0;
+                i <
+                document.getElementById("publisher-form").getElementsByTagName("TEXTAREA").length;
+                i++
+            )
+                document.getElementById("publisher-form").getElementsByTagName("TEXTAREA")[
+                    i
+                ].style.cursor = "wait";
+
             document.body.style.cursor = "wait";
-            Planet.ServerInterface.addProject(send, function(data) {
-                this.afterPublishProject(data, id, title.value, published);
-            }.bind(this));
+            Planet.ServerInterface.addProject(
+                send,
+                function (data) {
+                    this.afterPublishProject(data, id, title.value, published);
+                }.bind(this)
+            );
         }
     }
 
     parseProject(tb) {
-
         try {
             tb = JSON.parse(tb);
-        }
-        catch (e) {
+        } catch (e) {
             // eslint-disable-next-line no-console
             console.log(e);
             return "";
@@ -303,18 +305,13 @@ class Publisher {
         for (let i = 0; i < tb.length; i++) {
             const block = tb[i];
 
-            if (typeof block[1] === "string")
-                words.add(block[1]);
-
-            else if (Array.isArray(block[1]))
-                words.add(block[1][0]);
-
-            else if (typeof block[1] === "number") break ;
+            if (typeof block[1] === "string") words.add(block[1]);
+            else if (Array.isArray(block[1])) words.add(block[1][0]);
+            else if (typeof block[1] === "number") break;
         }
 
         let s = "";
-        for (const item of words)
-            s += `${item} `;
+        for (const item of words) s += `${item} `;
 
         return s.slice(0, -1);
     }
@@ -324,7 +321,7 @@ class Publisher {
     }
 
     afterPublishProject(data, id, name, published) {
-        const Planet = this.Planet ;
+        const Planet = this.Planet;
 
         if (data.success) {
             Planet.ProjectStorage.addPublishedData(id, published);
@@ -336,8 +333,7 @@ class Publisher {
 
             if (this.IsShareLink)
                 document.getElementById("sharebox-" + id).style.display = "initial";
-        }
-        else {
+        } else {
             this.throwError(_("Server Error") + " (" + data.error + ") - " + _("Try Again"));
             this.hideProgressBar();
         }
@@ -345,11 +341,23 @@ class Publisher {
         document.getElementById("publisher-submit").style.cursor = "pointer";
         document.getElementById("publisher-cancel").style.cursor = "pointer";
 
-        for (let i=0; i<document.getElementById("publisher-form").getElementsByTagName("INPUT").length; i++)
-            document.getElementById("publisher-form").getElementsByTagName("INPUT")[i].style.cursor = "text";
+        for (
+            let i = 0;
+            i < document.getElementById("publisher-form").getElementsByTagName("INPUT").length;
+            i++
+        )
+            document.getElementById("publisher-form").getElementsByTagName("INPUT")[
+                i
+            ].style.cursor = "text";
 
-        for (let i=0; i<document.getElementById("publisher-form").getElementsByTagName("TEXTAREA").length; i++)
-            document.getElementById("publisher-form").getElementsByTagName("TEXTAREA")[i].style.cursor = "text";
+        for (
+            let i = 0;
+            i < document.getElementById("publisher-form").getElementsByTagName("TEXTAREA").length;
+            i++
+        )
+            document.getElementById("publisher-form").getElementsByTagName("TEXTAREA")[
+                i
+            ].style.cursor = "text";
 
         document.body.style.cursor = "default";
     }
@@ -364,7 +372,7 @@ class Publisher {
     }
 
     init() {
-        const Planet = this.Planet ;
+        const Planet = this.Planet;
 
         if (!Planet.ConnectedToServer) {
             let element = document.getElementById("publisher-form");
@@ -373,11 +381,9 @@ class Publisher {
             element.parentNode.removeChild(element);
             const frag = document.createRange().createContextualFragment(this.PublisherOfflineHTML);
             document.getElementById("publisher-content").appendChild(frag);
-        }
-        else {
+        } else {
             this.addTags();
             this.initSubmit();
         }
     }
-
 }

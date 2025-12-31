@@ -22,7 +22,6 @@
 */
 
 class Planet {
-
     constructor(isMusicBlocks, storage) {
         this.LocalPlanet = null;
         this.GlobalPlanet = null;
@@ -46,7 +45,7 @@ class Planet {
     prepareUserID() {
         let id = getCookie(this.UserIDCookie);
 
-        if (id === ""){
+        if (id === "") {
             id = this.ProjectStorage.generateID();
             setCookie(this.UserIDCookie, id, 3650);
         }
@@ -92,10 +91,10 @@ class Planet {
         this.onConverterLoad = func;
     }
 
-    openProjectFromPlanet(id,error) {
-        this.GlobalPlanet.openGlobalProject(id,error);
+    openProjectFromPlanet(id, error) {
+        this.GlobalPlanet.openGlobalProject(id, error);
     }
-    
+
     async init() {
         this.StringHelper = new StringHelper(this);
         this.StringHelper.init();
@@ -104,7 +103,6 @@ class Planet {
         this.prepareUserID();
         this.ServerInterface = new ServerInterface(this);
         this.ServerInterface.init();
-
 
         // eslint-disable-next-line no-unused-vars
         document.getElementById("close-planet").addEventListener("click", evt => {
@@ -122,7 +120,7 @@ class Planet {
         });
 
         this.ServerInterface.getTagManifest(
-            function(data) {
+            function (data) {
                 this.initPlanets(data);
             }.bind(this)
         );
@@ -130,17 +128,15 @@ class Planet {
 
     closeButton() {
         if (this.ProjectStorage.getCurrentProjectID() !== this.oldCurrentProjectID) {
-            const data = this.ProjectStorage.getCurrentProjectData() ;
-            (!data) ? this.loadNewProject() : this.loadProjectFromData(data) ;
-        }
-        
-        else this.planetClose();
+            const data = this.ProjectStorage.getCurrentProjectData();
+            !data ? this.loadNewProject() : this.loadProjectFromData(data);
+        } else this.planetClose();
     }
-    
+
     initPlanets(tags) {
-        const status = tags.success || false ;
-        this.ConnectedToServer = status ;
-        if (status) this.TagsManifest = tags.data ;
+        const status = tags.success || false;
+        this.ConnectedToServer = status;
+        if (status) this.TagsManifest = tags.data;
 
         this.Converter = new Converter(this);
         this.Converter.init();
@@ -152,7 +148,6 @@ class Planet {
         this.GlobalPlanet = new GlobalPlanet(this);
         this.GlobalPlanet.init();
     }
-
 }
 
 // sync the dark mode of the planet with the main page and themePreference

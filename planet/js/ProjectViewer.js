@@ -219,5 +219,4 @@ class ProjectViewer {
             this.closeReporter();
         });
     }
-
 }
