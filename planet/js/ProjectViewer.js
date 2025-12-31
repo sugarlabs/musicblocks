@@ -86,11 +86,11 @@ class ProjectViewer {
         }
 
         jQuery("#projectviewer").modal("open");
-    };
+    }
 
     download() {
         this.Planet.GlobalPlanet.getData(this.id,this.afterDownload.bind(this));
-    };
+    }
 
     afterDownload (data) {
         const Planet = this.Planet ;
@@ -107,19 +107,19 @@ class ProjectViewer {
             proj.ProjectDescription,
             this.id
         );
-    };
+    }
 
     openProject() {
         // newPageTitle = proj.ProjectName;
         // document.title = newPageTitle;
         this.Planet.GlobalPlanet.openGlobalProject(this.id);
-    };
+    }
 
     mergeProject() {
         // newPageTitle = proj.ProjectName;
         // document.title = newPageTitle;
         this.Planet.GlobalPlanet.mergeGlobalProject(this.id);
-    };
+    }
 
     openReporter() {
         // eslint-disable-next-line no-console
@@ -137,7 +137,7 @@ class ProjectViewer {
             ],
             "projectviewer-report-card"
         );
-    };
+    }
 
     submitReporter() {
         const text = document.getElementById("reportdescription").value;
@@ -156,7 +156,7 @@ class ProjectViewer {
             document.getElementById("projectviewer-report-progress").style.visibility = "hidden";
             this.Planet.ServerInterface.reportProject(this.id, text, this.afterReport.bind(this));
         }
-    };
+    }
 
     afterReport(data) {
         if (data.success) {
@@ -170,11 +170,11 @@ class ProjectViewer {
         document.getElementById("projectviewer-report-content").style.display = "none";
         document.getElementById("projectviewer-report-progress").style.visibility = "hidden";
         document.getElementById("projectviewer-reportsubmit-content").style.display = "block";
-    };
+    }
 
     closeReporter() {
         document.getElementById("projectviewer-report-card").style.display = "none";
-    };
+    }
 
     init() {
 
@@ -207,6 +207,6 @@ class ProjectViewer {
         document.getElementById("projectviewer-report-close").addEventListener("click", evt => {
             this.closeReporter();
         });
-    };
+    }
 
 }
