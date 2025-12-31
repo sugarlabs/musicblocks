@@ -282,14 +282,9 @@ const processABCNotes = function (logo, turtle) {
 
                         logo.notationNotes[turtle] +=
                             logo.notation.notationStaging[turtle][i + j][NOTATIONROUNDDOWN];
-                        j++; // Jump to next note.
-                        k++; // Increment notes in tuplet.
-                    } else {
-                        // eslint-disable-next-line no-console
-                        console.debug("ignoring " + notes);
-                        j++; // Jump to next note.
-                        k++; // Increment notes in tuplet.
                     }
+                    j++; // Jump to next note.
+                    k++; // Increment notes in tuplet.
                 }
 
                 // FIXME: Debug for ABC
