@@ -7098,7 +7098,7 @@ class Activity {
             // Load any plugins saved in local storage.
             this.pluginData = this.storage.plugins;
             if (this.pluginData !== null && this.pluginData !== "null") {
-                updatePluginObj(this, processPluginData(this, this.pluginData));
+                updatePluginObj(this, processPluginData(this, this.pluginData, "localStorage:plugins"));
             }
 
             // Load custom mode saved in local storage.
@@ -7399,6 +7399,7 @@ class Activity {
 
                     // Read file here.
                     const reader = new FileReader();
+                    const pluginFile = that.pluginChooser.files[0];
 
                     // eslint-disable-next-line no-unused-vars
                     reader.onload = theFile => {
@@ -7407,7 +7408,11 @@ class Activity {
                         //doLoadAnimation();
 
                         setTimeout(() => {
-                            const obj = processRawPluginData(that, reader.result);
+                            const obj = processRawPluginData(
+                                that,
+                                reader.result,
+                                pluginFile && pluginFile.name ? pluginFile.name : "local-file"
+                            );
                             // Save plugins to local storage.
                             if (obj !== null) {
                                 that.storage.plugins = preparePluginExports(that, obj);
@@ -7425,7 +7430,7 @@ class Activity {
                         }, 200);
                     };
 
-                    reader.readAsText(that.pluginChooser.files[0]);
+                    reader.readAsText(pluginFile);
                 },
                 false
             );

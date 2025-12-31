@@ -40,6 +40,14 @@ class ProjectViewer {
         const Planet = this.Planet ;
         this.id = id;
         const proj = this.ProjectCache[id];
+
+        const setBoldText = (el, text) => {
+            el.textContent = "";
+            const b = document.createElement("b");
+            b.textContent = String(text);
+            el.appendChild(b);
+        };
+
         const options = { year: "numeric", month: "short", day: "numeric", hour: "numeric", minute: "numeric" };
         const last_updated_timestamp = proj.ProjectLastUpdated;
         const formatted_LastUpdated = new Date(last_updated_timestamp).toLocaleString(undefined, options);
@@ -47,10 +55,10 @@ class ProjectViewer {
         const formatted_CreatedDate = new Date(created_timestamp).toLocaleString(undefined, options);
 
         document.getElementById("projectviewer-title").textContent = proj.ProjectName;
-        document.getElementById("projectviewer-last-updated").innerHTML = `<b>${formatted_LastUpdated}</b>`;
-        document.getElementById("projectviewer-date").innerHTML =`<b>${formatted_CreatedDate}</b>`;
-        document.getElementById("projectviewer-downloads").innerHTML = `<b>${proj.ProjectDownloads}</b>`;
-        document.getElementById("projectviewer-likes").innerHTML = `<b>${proj.ProjectLikes}</b>`;
+        setBoldText(document.getElementById("projectviewer-last-updated"), formatted_LastUpdated);
+        setBoldText(document.getElementById("projectviewer-date"), formatted_CreatedDate);
+        setBoldText(document.getElementById("projectviewer-downloads"), proj.ProjectDownloads);
+        setBoldText(document.getElementById("projectviewer-likes"), proj.ProjectLikes);
 
         let img = proj.ProjectImage;
         if (img === "" || img === null)
