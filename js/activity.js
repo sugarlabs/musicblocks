@@ -6117,7 +6117,7 @@ class Activity {
 
             this.homeButtonContainer = createButton(
                 GOHOMEFADEDBUTTON,
-                _("Home")+ " [" + _("Home").toUpperCase() + "]",
+                _("Home") + " [" + _("Home").toUpperCase() + "]",
                 findBlocks
             );
             this.boundary.hide();
