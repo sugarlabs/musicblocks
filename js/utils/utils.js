@@ -575,11 +575,49 @@ let toTitleCase = str => {
  * @param {string} pluginData - The JSON-encoded plugin data.
  * @returns {object|null} The processed plugin data object or null if parsing fails.
  */
-const processPluginData = (activity, pluginData) => {
+const processPluginData = (activity, pluginData, pluginSource) => {
     // Plugins are JSON-encoded dictionaries.
     if (pluginData === undefined) {
         return null;
     }
+
+    const isTrustedPluginSource = src => {
+        if (!src) return false;
+
+        // allow only local paths
+        return (
+            src.startsWith("./") ||
+            src.startsWith("../") ||
+            src.startsWith("/") ||
+            (!src.includes("http://") && !src.includes("https://"))
+        );
+    };
+
+    const safeEval = (code, label = "plugin") => {
+        if (typeof code !== "string") return;
+
+        // basic sanity limit (prevents huge payloads)
+        if (code.length > 500000) {
+            // eslint-disable-next-line no-console
+            console.warn("Plugin code too large:", label);
+            return;
+        }
+
+        try {
+            // eslint-disable-next-line no-eval
+            eval(code);
+        } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error("Plugin execution failed:", label, e);
+        }
+    };
+
+    if (!isTrustedPluginSource(pluginSource)) {
+        // eslint-disable-next-line no-console
+        console.warn("Blocked untrusted plugin source:", pluginSource);
+        return null;
+    }
+
     let obj;
     try {
         obj = JSON.parse(pluginData);
@@ -719,18 +757,13 @@ const processPluginData = (activity, pluginData) => {
         for (const block in obj["BLOCKPLUGINS"]) {
             // eslint-disable-next-line no-console
             console.debug("adding plugin block " + block);
-            try {
-                eval(obj["BLOCKPLUGINS"][block]);
-            } catch (e) {
-                // eslint-disable-next-line no-console
-                console.debug("Failed to load plugin for " + block + ": " + e);
-            }
+            safeEval(obj["BLOCKPLUGINS"][block], "BLOCKPLUGINS:" + block);
         }
     }
 
     // Create the globals.
     if ("GLOBALS" in obj) {
-        eval(obj["GLOBALS"]);
+        safeEval(obj["GLOBALS"], "GLOBALS");
     }
 
     if ("PARAMETERPLUGINS" in obj) {
@@ -742,7 +775,7 @@ const processPluginData = (activity, pluginData) => {
     // Code to execute when plugin is loaded
     if ("ONLOAD" in obj) {
         for (const arg in obj["ONLOAD"]) {
-            eval(obj["ONLOAD"][arg]);
+            safeEval(obj["ONLOAD"][arg], "ONLOAD:" + arg);
         }
     }
 
@@ -799,7 +832,7 @@ const processPluginData = (activity, pluginData) => {
  * @param {string} rawData - Raw plugin data to process.
  * @returns {object|null} The processed plugin data object or null if parsing fails.
  */
-const processRawPluginData = (activity, rawData) => {
+const processRawPluginData = (activity, rawData, pluginSource) => {
     const lineData = rawData.split("\n");
     let cleanData = "";
 
@@ -821,7 +854,7 @@ const processRawPluginData = (activity, rawData) => {
     // try/catch while debugging your plugin.
     let obj;
     try {
-        obj = processPluginData(activity, cleanData.replace(/\n/g, ""));
+        obj = processPluginData(activity, cleanData.replace(/\n/g, ""), pluginSource);
     } catch (e) {
         obj = null;
         // eslint-disable-next-line no-console
