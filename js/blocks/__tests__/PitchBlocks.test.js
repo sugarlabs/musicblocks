@@ -413,12 +413,16 @@ describe("setupPitchBlocks", () => {
                 if (block.updateParameter && typeof block.updateParameter === "function") {
                     try {
                         block.updateParameter(logo, 0, 10);
-                    } catch (e) {}
+                    } catch (e) {
+                        // Expected for some blocks
+                    }
                 }
                 if (block.arg && typeof block.arg === "function") {
                     try {
                         block.arg(logo, 0, 10);
-                    } catch (e) {}
+                    } catch (e) {
+                        // Expected for some blocks
+                    }
                 }
             });
         });
