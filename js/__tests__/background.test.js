@@ -34,7 +34,7 @@ describe("Browser Action Behavior", () => {
         mockBrowser = {
             browserAction: {
                 onClicked: {
-                    addListener: jest.fn((callback) => {
+                    addListener: jest.fn(callback => {
                         mockBrowser.browserAction.onClicked.callback = callback;
                     })
                 }
@@ -42,7 +42,7 @@ describe("Browser Action Behavior", () => {
             tabs: { create: jest.fn() },
             runtime: {
                 onInstalled: {
-                    addListener: jest.fn((callback) => {
+                    addListener: jest.fn(callback => {
                         mockBrowser.runtime.onInstalled.callback = callback;
                     })
                 }
@@ -52,18 +52,18 @@ describe("Browser Action Behavior", () => {
         mockChrome = {
             browserAction: {
                 onClicked: {
-                    addListener: jest.fn((callback) => {
+                    addListener: jest.fn(callback => {
                         mockChrome.browserAction.onClicked.callback = callback;
                     })
                 }
             },
             runtime: {
                 onInstalled: {
-                    addListener: jest.fn((callback) => {
+                    addListener: jest.fn(callback => {
                         mockChrome.runtime.onInstalled.callback = callback;
                     })
                 },
-                getURL: jest.fn((path) => `chrome-extension://fake-id/${path}`)
+                getURL: jest.fn(path => `chrome-extension://fake-id/${path}`)
             }
         };
 

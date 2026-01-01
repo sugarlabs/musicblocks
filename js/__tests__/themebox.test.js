@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-global._ = jest.fn((str) => str);
+global._ = jest.fn(str => str);
 const ThemeBox = require("../themebox");
 
 describe("ThemeBox", () => {
@@ -32,14 +32,14 @@ describe("ThemeBox", () => {
             textMsg: jest.fn()
         };
 
-        jest.spyOn(global.Storage.prototype, "getItem").mockImplementation((key) => {
+        jest.spyOn(global.Storage.prototype, "getItem").mockImplementation(key => {
             return key === "themePreference" ? "light" : null;
         });
         jest.spyOn(global.Storage.prototype, "setItem").mockImplementation(() => {});
 
         Object.defineProperty(window, "location", {
             value: { reload: jest.fn() },
-            writable: true,
+            writable: true
         });
 
         themeBox = new ThemeBox(mockActivity);
@@ -57,7 +57,9 @@ describe("ThemeBox", () => {
         themeBox.light_onclick();
         expect(themeBox._theme).toBe("light");
         expect(localStorage.getItem).toHaveBeenCalledWith("themePreference");
-        expect(mockActivity.textMsg).toHaveBeenCalledWith("Music Blocks is already set to this theme.");
+        expect(mockActivity.textMsg).toHaveBeenCalledWith(
+            "Music Blocks is already set to this theme."
+        );
     });
 
     test("dark_onclick() sets theme to dark and updates preference", () => {

@@ -31,11 +31,21 @@ describe("setupHeapBlocks", () => {
             this.displayName = displayName;
             createdBlocks[name] = this;
         }
-        setPalette() { return this; }
-        beginnerBlock() { return this; }
-        setHelpString() { return this; }
-        formBlock() { return this; }
-        setup() { return this; }
+        setPalette() {
+            return this;
+        }
+        beginnerBlock() {
+            return this;
+        }
+        setHelpString() {
+            return this;
+        }
+        formBlock() {
+            return this;
+        }
+        setup() {
+            return this;
+        }
     }
 
     class DummyFlowBlock {
@@ -44,12 +54,24 @@ describe("setupHeapBlocks", () => {
             this.displayName = displayName;
             createdBlocks[name] = this;
         }
-        setPalette() { return this; }
-        beginnerBlock() { return this; }
-        setHelpString() { return this; }
-        formBlock() { return this; }
-        makeMacro() { return this; }
-        setup() { return this; }
+        setPalette() {
+            return this;
+        }
+        beginnerBlock() {
+            return this;
+        }
+        setHelpString() {
+            return this;
+        }
+        formBlock() {
+            return this;
+        }
+        makeMacro() {
+            return this;
+        }
+        setup() {
+            return this;
+        }
     }
 
     class DummyLeftBlock {
@@ -58,17 +80,27 @@ describe("setupHeapBlocks", () => {
             this.displayName = displayName;
             createdBlocks[name] = this;
         }
-        setPalette() { return this; }
-        beginnerBlock() { return this; }
-        setHelpString() { return this; }
-        formBlock() { return this; }
-        setup() { return this; }
+        setPalette() {
+            return this;
+        }
+        beginnerBlock() {
+            return this;
+        }
+        setHelpString() {
+            return this;
+        }
+        formBlock() {
+            return this;
+        }
+        setup() {
+            return this;
+        }
     }
 
     beforeEach(() => {
         createdBlocks = {};
 
-        global._ = jest.fn((str) => str);
+        global._ = jest.fn(str => str);
         global.ValueBlock = DummyValueBlock;
         global.FlowBlock = DummyFlowBlock;
         global.LeftBlock = DummyLeftBlock;

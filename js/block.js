@@ -332,12 +332,13 @@ class Block {
         return new Promise((resolve, reject) => {
             let loopCount = 0;
 
-            const checkBounds = async (counter) => {
+            const checkBounds = async counter => {
                 try {
                     if (counter !== undefined) {
                         loopCount = counter;
                     }
-                    if (loopCount > 10) {  // race condition?
+                    if (loopCount > 10) {
+                        // race condition?
                         throw new Error("COULD NOT CREATE CACHE");
                     }
 
@@ -376,7 +377,7 @@ class Block {
         return new Promise((resolve, reject) => {
             let loopCount = 0;
 
-            const updateBounds = async (counter) => {
+            const updateBounds = async counter => {
                 try {
                     if (counter !== undefined) {
                         loopCount = counter;
@@ -740,10 +741,9 @@ class Block {
                 // Rescale the decoration on the start blocks.
                 for (let t = 0; t < this.activity.turtles.getTurtleCount(); t++) {
                     if (this.activity.turtles.getTurtle(t).startBlock === this) {
-                        this.activity.turtles.getTurtle(t).resizeDecoration(
-                            scale,
-                            this.bitmap.image.width
-                        );
+                        this.activity.turtles
+                            .getTurtle(t)
+                            .resizeDecoration(scale, this.bitmap.image.width);
                         this._ensureDecorationOnTop();
                         break;
                     }
@@ -776,14 +776,10 @@ class Block {
              * @param that - = this = container
              * @returns {void}
              */
-            const _postProcess = (that) => {
-                that.collapseButtonBitmap.scaleX =
-                    that.collapseButtonBitmap.scaleY =
-                    that.collapseButtonBitmap.scale =
+            const _postProcess = that => {
+                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale =
                     scale / 3;
-                that.expandButtonBitmap.scaleX =
-                    that.expandButtonBitmap.scaleY =
-                    that.expandButtonBitmap.scale =
+                that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale =
                     scale / 3;
                 that.updateCache();
                 that._calculateBlockHitArea();
@@ -961,8 +957,7 @@ class Block {
         };
 
         if (this.image.search("xmlns") !== -1) {
-            image.src =
-                "data:image/svg+xml;base64," + window.btoa(window.base64Encode(this.image));
+            image.src = "data:image/svg+xml;base64," + window.btoa(window.base64Encode(this.image));
         } else {
             image.src = this.image;
         }
@@ -1440,7 +1435,7 @@ class Block {
             obj = proto.generator();
             this.collapseArtwork = obj[0];
 
-            const postProcess = (that) => {
+            const postProcess = that => {
                 that.loadComplete = true;
 
                 if (that.postProcess !== null) {
@@ -1471,7 +1466,7 @@ class Block {
          * @private
          * @returns {void}
          */
-        const __finishCollapse = (that) => {
+        const __finishCollapse = that => {
             if (postProcess !== null) {
                 postProcess(that);
             }
@@ -1491,13 +1486,11 @@ class Block {
          * @param that - = this
          * @returns {void}
          */
-        const __processCollapseButton = (that) => {
+        const __processCollapseButton = that => {
             const image = new Image();
             image.onload = () => {
                 that.collapseButtonBitmap = new createjs.Bitmap(image);
-                that.collapseButtonBitmap.scaleX =
-                    that.collapseButtonBitmap.scaleY =
-                    that.collapseButtonBitmap.scale =
+                that.collapseButtonBitmap.scaleX = that.collapseButtonBitmap.scaleY = that.collapseButtonBitmap.scale =
                     that.protoblock.scale / 3;
                 that.container.addChild(that.collapseButtonBitmap);
                 that.collapseButtonBitmap.x = 2 * that.protoblock.scale;
@@ -1512,8 +1505,7 @@ class Block {
                 __finishCollapse(that);
             };
 
-            image.src =
-                "data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBUTTON));
+            image.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(COLLAPSEBUTTON));
         };
 
         /**
@@ -1522,13 +1514,11 @@ class Block {
          * @param that - = this
          * @returns {void}
          */
-        const __processExpandButton = (that) => {
+        const __processExpandButton = that => {
             const image = new Image();
             image.onload = () => {
                 that.expandButtonBitmap = new createjs.Bitmap(image);
-                that.expandButtonBitmap.scaleX =
-                    that.expandButtonBitmap.scaleY =
-                    that.expandButtonBitmap.scale =
+                that.expandButtonBitmap.scaleX = that.expandButtonBitmap.scaleY = that.expandButtonBitmap.scale =
                     that.protoblock.scale / 3;
 
                 that.container.addChild(that.expandButtonBitmap);
@@ -1544,8 +1534,7 @@ class Block {
                 __processCollapseButton(that);
             };
 
-            image.src =
-                "data:image/svg+xml;base64," + window.btoa(base64Encode(EXPANDBUTTON));
+            image.src = "data:image/svg+xml;base64," + window.btoa(base64Encode(EXPANDBUTTON));
         };
 
         /**
@@ -2056,12 +2045,19 @@ class Block {
                     bitmap.scaleX = bitmap.scaleY = bitmap.scale = MAXHEIGHT / image.height;
                 }
             }
+            // CRITICAL FIX: PRESERVE GIF
+            const src = image.src || "";
 
-            const bounds = myContainer.getBounds();
-            myContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
-            that.value = myContainer.bitmapCache.getCacheDataURL();
-            that.imageBitmap = bitmap;
-
+            if (src.startsWith("data:image/gif")) {
+                //DO NOT cache GIF , keeps animation
+                that.value = src;
+                that.imageBitmap = bitmap;
+            } else {
+                const bounds = myContainer.getBounds();
+                myContainer.cache(bounds.x, bounds.y, bounds.width, bounds.height);
+                that.value = myContainer.bitmapCache.getCacheDataURL();
+                that.imageBitmap = bitmap;
+            }
             // Next, scale the bitmap for the thumbnail.
             that._positionMedia(
                 bitmap,
@@ -2086,7 +2082,7 @@ class Block {
      */
     _doOpenMedia(thisBlock) {
         const that = this;
-        const fileChooser = that.name=="media" ? docById("myMedia") : docById("audio");
+        const fileChooser = that.name == "media" ? docById("myMedia") : docById("audio");
 
         const __readerAction = () => {
             window.scroll(0, 0);
@@ -2251,7 +2247,7 @@ class Block {
         }
 
         //Create a NEW cache.
-        this._createCache((that) => {
+        this._createCache(that => {
             that.activity.refreshCanvas();
         });
 
@@ -2500,17 +2496,33 @@ class Block {
                         }
 
                         if (this.blocks.blockList[c1].value.includes(SHARP)) {
-                            return solfnotesLocalized[i] + SHARP + " " + this.blocks.blockList[c2].value;
+                            return (
+                                solfnotesLocalized[i] +
+                                SHARP +
+                                " " +
+                                this.blocks.blockList[c2].value
+                            );
                         } else if (this.blocks.blockList[c1].value.includes(FLAT)) {
-                            return solfnotesLocalized[i] + FLAT + " " + this.blocks.blockList[c2].value;
+                            return (
+                                solfnotesLocalized[i] + FLAT + " " + this.blocks.blockList[c2].value
+                            );
                         } else if (this.blocks.blockList[c1].value.includes(DOUBLESHARP)) {
-                            return solfnotesLocalized[i] + DOUBLESHARP + " " + this.blocks.blockList[c2].value;
+                            return (
+                                solfnotesLocalized[i] +
+                                DOUBLESHARP +
+                                " " +
+                                this.blocks.blockList[c2].value
+                            );
                         } else if (this.blocks.blockList[c1].value.includes(DOUBLEFLAT)) {
-                            return solfnotesLocalized[i] + DOUBLEFLAT + " " + this.blocks.blockList[c2].value;
+                            return (
+                                solfnotesLocalized[i] +
+                                DOUBLEFLAT +
+                                " " +
+                                this.blocks.blockList[c2].value
+                            );
                         } else {
                             return solfnotesLocalized[i] + " " + this.blocks.blockList[c2].value;
                         }
-
                     } else if (this.blocks.blockList[c1].name === "notename") {
                         return (
                             this.blocks.blockList[c1].value + " " + this.blocks.blockList[c2].value
@@ -2794,8 +2806,8 @@ class Block {
          * Handles the click event on the block container.
          * @param {Event} event - The click event.
          */
-        this.container.on("click", (event) => {
-            if(docById("helpfulWheelDiv") && docById("helpfulWheelDiv").style.display !== "none") {
+        this.container.on("click", event => {
+            if (docById("helpfulWheelDiv") && docById("helpfulWheelDiv").style.display !== "none") {
                 docById("helpfulWheelDiv").style.display = "none";
             }
             // We might be able to check which button was clicked.
@@ -2902,7 +2914,7 @@ class Block {
          * Handles the mousedown event on the block container.
          * @param {Event} event - The mousedown event.
          */
-        this.container.on("mousedown", (event) =>{
+        this.container.on("mousedown", event => {
             docById("contextWheelDiv").style.display = "none";
 
             // Track time for detecting long pause...
@@ -2928,7 +2940,7 @@ class Block {
                     return;
                 }
             }
-            
+
             // Always show the trash when there is a block selected,
             that.activity.trashcan.show();
 
@@ -2959,7 +2971,7 @@ class Block {
          * Handles the pressmove event on the block container.
          * @param {Event} event - The pressmove event.
          */
-        this.container.on("pressmove", (event) =>{
+        this.container.on("pressmove", event => {
             // FIXME: More voodoo
             event.nativeEvent.preventDefault();
 
@@ -3075,7 +3087,7 @@ class Block {
          * Unhighlights the block and resets the active block.
          * @param {Event} event - The mouseout event object.
          */
-        this.container.on("mouseout", (event) =>{
+        this.container.on("mouseout", event => {
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false);
             } else {
@@ -3098,7 +3110,7 @@ class Block {
          * Unhighlights the block and resets the active block.
          * @param {Event} event - The pressup event object.
          */
-        this.container.on("pressup", (event) =>{
+        this.container.on("pressup", event => {
             if (!that.blocks.getLongPressStatus()) {
                 that._mouseoutCallback(event, moved, haveClick, false);
             } else {
@@ -3152,7 +3164,10 @@ class Block {
                 if (this.activity.trashcan.isVisible) {
                     this.blocks.sendStackToTrash(this);
                     this.activity.textMsg(
-                        _("You can restore deleted blocks from the trash with the Restore From Trash button."), 3000
+                        _(
+                            "You can restore deleted blocks from the trash with the Restore From Trash button."
+                        ),
+                        3000
                     );
                 }
             } else {
@@ -3166,10 +3181,7 @@ class Block {
                 // apart). Still need to get to the root cause.
                 this.blocks.adjustDocks(this.blocks.blockList.indexOf(this), true);
             }
-        } else if (
-            SPECIALINPUTS.includes(this.name) ||
-            ["media", "loadFile"].includes(this.name)
-        ) {
+        } else if (SPECIALINPUTS.includes(this.name) || ["media", "loadFile"].includes(this.name)) {
             if (!haveClick) {
                 // Simulate click on Android.
                 if (new Date().getTime() - this.blocks.mouseDownTime < 500) {
@@ -3417,7 +3429,7 @@ class Block {
 
         const labelElem = docById("labelDiv");
 
-        const safetext = (text) => {
+        const safetext = text => {
             // Best to avoid using these special characters in text strings
             // without first converting them to their "safe" form.
             const table = {
@@ -3429,7 +3441,7 @@ class Block {
                 "\r": "#10",
                 "\n": "#13"
             };
-            return text.toString().replace(/[<>"'\r\n&]/g, (chr) => {
+            return text.toString().replace(/[<>"'\r\n&]/g, chr => {
                 return "&" + table[chr] + ";";
             });
         };
@@ -3445,7 +3457,6 @@ class Block {
             // set the position of cursor to the end (for text value)
             const valueLength = this.label.value.length;
             this.label.setSelectionRange(valueLength, valueLength);
-
         } else if (this.name === "solfege") {
             obj = splitSolfege(this.value);
             // solfnotes_ is used in the interface for internationalization.
@@ -3792,18 +3803,8 @@ class Block {
             let gridLabels = [];
             let gridValues = [];
             if (_THIS_IS_TURTLE_BLOCKS_) {
-                gridLabels = [
-                    _("Cartesian"),
-                    _("polar"),
-                    _("Cartesian/Polar"),
-                    _("none")
-                ];
-                gridValues = [
-                    "Cartesian",
-                    "polar",
-                    "Cartesian/Polar",
-                    "none"
-                ];
+                gridLabels = [_("Cartesian"), _("polar"), _("Cartesian/Polar"), _("none")];
+                gridValues = ["Cartesian", "polar", "Cartesian/Polar", "none"];
             } else {
                 gridLabels = [
                     _("Cartesian"),
@@ -3844,7 +3845,7 @@ class Block {
                 labels = this.protoblock.piemenuLabels;
             }
             if (!values.includes(selectedValue)) {
-                selectedValue = values[3];  // letter class
+                selectedValue = values[3]; // letter class
             }
             piemenuBasic(this, labels, values, selectedValue, platformColor.piemenuBasic);
         } else if (this.name === "wrapmode") {
@@ -4018,7 +4019,7 @@ class Block {
              * @param {Event} event - The blur event object.
              * @returns {void}
              */
-            const __blur = (event) =>{
+            const __blur = event => {
                 // Not sure why the change in the input is not available
                 // immediately in FireFox. We need a workaround if hardware
                 // acceleration is enabled.
@@ -4062,7 +4063,7 @@ class Block {
              * @param {Event} event - The keypress event object.
              * @returns {void}
              */
-            let __keypress = (event) =>{
+            let __keypress = event => {
                 if ([13, 10, 9].includes(event.keyCode)) {
                     __blur(event);
                 }
@@ -4076,13 +4077,13 @@ class Block {
 
             this.label.style.left =
                 Math.round(
-                    (x + this.activity.blocksContainer.x) * this.activity.getStageScale()
-                        + canvasLeft
+                    (x + this.activity.blocksContainer.x) * this.activity.getStageScale() +
+                        canvasLeft
                 ) + "px";
             this.label.style.top =
                 Math.round(
-                    (y + this.activity.blocksContainer.y) * this.activity.getStageScale()
-                        + canvasTop
+                    (y + this.activity.blocksContainer.y) * this.activity.getStageScale() +
+                        canvasTop
                 ) + "px";
             this.label.style.width =
                 Math.round((selectorWidth * this.blocks.blockScale * this.protoblock.scale) / 2) +
@@ -4433,8 +4434,12 @@ class Block {
                 this.activity.refreshCanvas();
                 this.value = oldValue;
             }
-            
-            if(cblk1 != null && this.blocks.blockList[cblk1].name === "pitch" && (this.value > 8 || this.value < 1)) {
+
+            if (
+                cblk1 != null &&
+                this.blocks.blockList[cblk1].name === "pitch" &&
+                (this.value > 8 || this.value < 1)
+            ) {
                 const thisBlock = this.blocks.blockList.indexOf(this);
                 this.activity.errorMsg(_("Octave value must be between 1 and 8."), thisBlock);
                 this.activity.refreshCanvas();
@@ -4442,7 +4447,7 @@ class Block {
                 this.value = oldValue;
             }
 
-            if(String(this.value).length > 10) {
+            if (String(this.value).length > 10) {
                 const thisBlock = this.blocks.blockList.indexOf(this);
                 this.activity.errorMsg(_("Numbers can have at most 10 digits."), thisBlock);
                 this.activity.refreshCanvas();
@@ -4479,10 +4484,7 @@ class Block {
             label = this.value.toString();
         }
 
-        if (
-            !WIDENAMES.includes(this.name) &&
-            getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH
-        ) {
+        if (!WIDENAMES.includes(this.name) && getTextWidth(label, "bold 20pt Sans") > TEXTWIDTH) {
             let slen = label.length - 5;
             let nlabel = "" + label.substr(0, slen) + "...";
             while (getTextWidth(nlabel, "bold 20pt Sans") > TEXTWIDTH) {

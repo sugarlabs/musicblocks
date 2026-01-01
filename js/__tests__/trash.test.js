@@ -23,10 +23,10 @@ const Trashcan = require("../trash");
 const mockActivity = {
     trashContainer: {
         addChild: jest.fn(),
-        setChildIndex: jest.fn(),
+        setChildIndex: jest.fn()
     },
     cellSize: 50,
-    refreshCanvas: jest.fn(),
+    refreshCanvas: jest.fn()
 };
 const mockTo = jest.fn().mockReturnThis();
 const mockSet = jest.fn().mockReturnThis();
@@ -37,42 +37,42 @@ const mockCreatejs = {
         removeChildAt: jest.fn(),
         getBounds: jest.fn(() => ({
             width: 100,
-            height: 100,
+            height: 100
         })),
         children: [{ visible: false }, { visible: false }],
         visible: false,
         x: 0,
-        y: 0,
+        y: 0
     })),
     Bitmap: jest.fn(() => ({
         scaleX: 1,
         scaleY: 1,
         x: 0,
         y: 0,
-        getBounds: jest.fn(() => ({ width: 100 })),
+        getBounds: jest.fn(() => ({ width: 100 }))
     })),
     Tween: {
         get: jest.fn(() => ({
             to: mockTo,
-            set: mockSet,
-        })),
+            set: mockSet
+        }))
     },
     Shape: jest.fn(() => ({
         graphics: {
             beginFill: jest.fn().mockReturnThis(),
-            drawRect: jest.fn().mockReturnThis(),
-        },
-    })),
+            drawRect: jest.fn().mockReturnThis()
+        }
+    }))
 };
 global.createjs = mockCreatejs;
 global.platformColor = {
     trashActive: "red",
-    trashBorder: "blue",
+    trashBorder: "blue"
 };
-global.base64Encode = jest.fn((data) => data);
+global.base64Encode = jest.fn(data => data);
 global.BORDER = "mock_border_svg";
 global.TRASHICON = "mock_trash_icon_svg";
-global.last = jest.fn((array) => array[array.length - 1]);
+global.last = jest.fn(array => array[array.length - 1]);
 
 global.Image = jest.fn(() => {
     const img = {};
@@ -80,7 +80,7 @@ global.Image = jest.fn(() => {
     Object.defineProperty(img, "src", {
         set: function () {
             img.onload();
-        },
+        }
     });
     return img;
 });
@@ -103,7 +103,7 @@ describe("Trashcan Class", () => {
         expect(mockActivity.trashContainer.addChild).toHaveBeenCalled();
         expect(mockActivity.trashContainer.setChildIndex).toHaveBeenCalled();
     });
-    
+
     it("should check if resize is needed", () => {
         trashcan._container.x = 100;
         trashcan._container.y = 100;
@@ -136,7 +136,6 @@ describe("Trashcan Class", () => {
         trashcan.startHighlightAnimation();
         jest.advanceTimersByTime(3000);
         expect(trashcan._inAnimation).toBe(true);
-
     });
 
     it("should not restart highlight animation if already running", () => {

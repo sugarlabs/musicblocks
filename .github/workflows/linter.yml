@@ -25,13 +25,13 @@ jobs:
       - name: Get changed JavaScript files
         id: get_files
         run: |
-          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} -- '*.js')
+          CHANGED_FILES=$(git diff --diff-filter=ACMRT --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} -- '*.js')
           echo "files<<EOF" >> $GITHUB_ENV
           echo "$CHANGED_FILES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
       - name: Install dependencies
-        run: npm install eslint prettier
+        run: npm ci
 
       - name: Run ESLint on changed files
         if: env.files != ''

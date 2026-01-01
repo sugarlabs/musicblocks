@@ -26,10 +26,16 @@ global.NOTATIONROUNDDOWN = 4;
 global.NOTATIONINSIDECHORD = 5; // deprecated
 global.NOTATIONSTACCATO = 6;
 
-global.frequencyToPitch = jest.fn((freq) => ["G♯", "4"]);
-global.toFraction = jest.fn((num) => [1, 1]);
+global.frequencyToPitch = jest.fn(freq => ["G♯", "4"]);
+global.toFraction = jest.fn(num => [1, 1]);
 
-const { getABCHeader, processABCNotes, saveAbcOutput, ACCIDENTAL_MAP, OCTAVE_NOTATION_MAP } = require("../abc");
+const {
+    getABCHeader,
+    processABCNotes,
+    saveAbcOutput,
+    ACCIDENTAL_MAP,
+    OCTAVE_NOTATION_MAP
+} = require("../abc");
 
 describe("getABCHeader", () => {
     it("should return the correct ABC header", () => {
@@ -49,10 +55,10 @@ describe("processABCNotes", () => {
                     "0": [
                         [["G♯4"], 4, 0, null, null, -1, false],
                         [["F4"], 4, 0, null, null, -1, false],
-                        [["G♯4"], 2, 0, null, null, -1, false],
-                    ],
-                },
-            },
+                        [["G♯4"], 2, 0, null, null, -1, false]
+                    ]
+                }
+            }
         };
     });
 
@@ -75,29 +81,30 @@ describe("saveAbcOutput", () => {
                         "0": [
                             [["G♯4"], 4, 0, null, null, -1, false],
                             [["F4"], 4, 0, null, null, -1, false],
-                            [["G♯4"], 2, 0, null, null, -1, false],
-                        ],
-                    },
-                },
+                            [["G♯4"], 2, 0, null, null, -1, false]
+                        ]
+                    }
+                }
             },
             turtles: {
-                ithTurtle: (t) => ({
+                ithTurtle: t => ({
                     singer: {
-                        keySignature: "C major",
-                    },
-                }),
-            },
+                        keySignature: "C major"
+                    }
+                })
+            }
         };
     });
 
     it("should generate the correct ABC notation output", () => {
-        const expectedOutput ="X:1\n"+
-                               "T:Music Blocks composition\n"+
-                               "C:Mr. Mouse\n"+
-                               "L:1/16\n"+
-                               "M:C\n"+
-                               "K:CMAJOR\n"+
-                               "G^4 G^4 F4 F4 G^2 G^8 \n";
+        const expectedOutput =
+            "X:1\n" +
+            "T:Music Blocks composition\n" +
+            "C:Mr. Mouse\n" +
+            "L:1/16\n" +
+            "M:C\n" +
+            "K:CMAJOR\n" +
+            "G^4 G^4 F4 F4 G^2 G^8 \n";
 
         const result = saveAbcOutput(activity);
         expect(result).toBe(expectedOutput);
@@ -112,11 +119,11 @@ describe("processABCNotes - Tuplet Handling", () => {
                 notationStaging: {
                     "0": [
                         [["G♯4"], 4, 0, 3, 2, -1, false], // Tuplet
-                        [["F4"], 4, 0, 3, 2, -1, false],   // Tuplet
-                        [["G♯4"], 4, 0, 3, 2, -1, false],  // Tuplet
-                    ],
-                },
-            },
+                        [["F4"], 4, 0, 3, 2, -1, false], // Tuplet
+                        [["G♯4"], 4, 0, 3, 2, -1, false] // Tuplet
+                    ]
+                }
+            }
         };
 
         processABCNotes(logo, "0");

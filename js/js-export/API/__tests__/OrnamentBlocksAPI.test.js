@@ -18,12 +18,12 @@
  */
 
 const JSInterface = {
-    validateArgs: jest.fn(),
+    validateArgs: jest.fn()
 };
 global.JSInterface = JSInterface;
 
 const MusicBlocks = {
-    BLK: "MusicBlockTestValue",
+    BLK: "MusicBlockTestValue"
 };
 global.MusicBlocks = MusicBlocks;
 
@@ -74,7 +74,12 @@ describe("OrnamentBlocksAPI", () => {
         const result = await ornamentBlocksAPI.doNeighbor(2, 3, mockFlow);
 
         expect(JSInterface.validateArgs).toHaveBeenCalledWith("doNeighbor", [2, 3, mockFlow]);
-        expect(ornamentBlocksAPI.runCommand).toHaveBeenCalledWith("doNeighbor", [2, 3, 0, "MusicBlockTestValue"]);
+        expect(ornamentBlocksAPI.runCommand).toHaveBeenCalledWith("doNeighbor", [
+            2,
+            3,
+            0,
+            "MusicBlockTestValue"
+        ]);
         expect(mockFlow).toHaveBeenCalled();
         expect(result).toBe("endFlow");
     });

@@ -363,7 +363,6 @@ function setupProgramBlocks(activity) {
             ]);
 
             this.formBlock({
-                
                 /**
                  * The name of the block.
                  * @type {string}
@@ -919,7 +918,9 @@ function setupProgramBlocks(activity) {
             super("runblock");
             this.setPalette("program", activity);
             this.setHelpString([
-                _("The Run block block runs a block. It accepts two types of arguments: block number or block name."),
+                _(
+                    "The Run block block runs a block. It accepts two types of arguments: block number or block name."
+                ),
                 "documentation",
                 ""
             ]);
@@ -1397,10 +1398,10 @@ function setupProgramBlocks(activity) {
             function ValidURL(str) {
                 const pattern = new RegExp(
                     "^(https?:\\/\\/)?" + // protocol
-                        "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
-                        "((\\d{1,3}\\.) {3}\\d{1,3}))" + // OR ip (v4) address
-                        "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
-                        "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+                    "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+                    "((\\d{1,3}\\.) {3}\\d{1,3}))" + // OR ip (v4) address
+                    "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+                    "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
                         "(\\#[-a-z\\d_]*)?$",
                     "i"
                 ); // fragment locator
@@ -1440,4 +1441,8 @@ function setupProgramBlocks(activity) {
     new SaveHeapBlock().setup(activity);
     new LoadHeapBlock().setup(activity);
     new SetHeapBlock().setup(activity);
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { setupProgramBlocks };
 }

@@ -42,7 +42,7 @@ function SampleWidget() {
     // Oscilloscope constants
     const SAMPLEANALYSERSIZE = 8192;
     const SAMPLEOSCCOLORS = ["#3030FF", "#FF3050"];
-    
+
     /**
      * Reference to the timbre block.
      * @type {number | null}
@@ -140,7 +140,13 @@ function SampleWidget() {
         let solfegeBlock;
         let octaveBlock;
         // Include cent adjustment in the sample array
-        this.sampleArray = [this.sampleName, this.sampleData, this.samplePitch, this.sampleOctave, this.centAdjustmentValue || 0];
+        this.sampleArray = [
+            this.sampleName,
+            this.sampleData,
+            this.samplePitch,
+            this.sampleOctave,
+            this.centAdjustmentValue || 0
+        ];
         if (this.timbreBlock != null) {
             mainSampleBlock = this.activity.blocks.blockList[this.timbreBlock].connections[1];
             if (mainSampleBlock != null) {
@@ -167,16 +173,21 @@ function SampleWidget() {
                     this.activity.blocks.blockList[octaveBlock].text.text = this.sampleOctave;
                     this.activity.blocks.blockList[octaveBlock].updateCache();
                 }
-                
+
                 // Update the block display to show cent adjustment if applicable
                 if (this.centAdjustmentValue && this.centAdjustmentValue !== 0) {
-                    const centText = (this.centAdjustmentValue > 0 ? "+" : "") + this.centAdjustmentValue + "¢";
-                    if (this.activity.blocks.blockList[mainSampleBlock].text &&
-                        this.activity.blocks.blockList[mainSampleBlock].text.text) {
+                    const centText =
+                        (this.centAdjustmentValue > 0 ? "+" : "") + this.centAdjustmentValue + "¢";
+                    if (
+                        this.activity.blocks.blockList[mainSampleBlock].text &&
+                        this.activity.blocks.blockList[mainSampleBlock].text.text
+                    ) {
                         // Append cent adjustment to the block text if possible
-                        const currentText = this.activity.blocks.blockList[mainSampleBlock].text.text;
+                        const currentText = this.activity.blocks.blockList[mainSampleBlock].text
+                            .text;
                         if (!currentText.includes("¢")) {
-                            this.activity.blocks.blockList[mainSampleBlock].text.text += " " + centText;
+                            this.activity.blocks.blockList[mainSampleBlock].text.text +=
+                                " " + centText;
                         }
                     }
                 }
@@ -186,14 +197,13 @@ function SampleWidget() {
             }
         }
     };
-    
+
     /**
      * Pauses the sample playback.
      * @returns {void}
      */
     this.pause = function () {
-        this.playBtn.innerHTML =
-            `<img 
+        this.playBtn.innerHTML = `<img 
                 src="header-icons/play-button.svg" 
                 title="${_("Play")}" 
                 alt="${_("Play")}" 
@@ -209,8 +219,7 @@ function SampleWidget() {
      * @returns {void}
      */
     this.resume = function () {
-        this.playBtn.innerHTML =
-            `<img 
+        this.playBtn.innerHTML = `<img 
                 src="header-icons/pause-button.svg" 
                 title="${_("Pause")}" 
                 alt="${_("Pause")}" 
@@ -250,7 +259,6 @@ function SampleWidget() {
         this.octaveCenter = parseInt(o);
     };
 
-
     /**
      * Gets the length of the sample and displays a warning if it exceeds 1MB.
      * @returns {void}
@@ -260,7 +268,6 @@ function SampleWidget() {
             this.activity.errorMsg(_("Warning: Sample is bigger than 1MB."), this.timbreBlock);
         }
     };
-
 
     /**
      * Displays a message indicating that recording has started.
@@ -277,7 +284,6 @@ function SampleWidget() {
     this.displayRecordingStopMessage = function () {
         activity.textMsg(_("Recording complete"), 3000);
     };
-
 
     /**
      * Displays an error message when the uploaded sample is not a .wav file.
@@ -301,10 +307,21 @@ function SampleWidget() {
             const centAdjustment = that.centAdjustmentValue || 0;
 
             var newStack = [
-                [0,"settimbre",100,100,[null,1,null,5]],
+                [0, "settimbre", 100, 100, [null, 1, null, 5]],
                 [
                     1,
-                    ["customsample", { value: [that.sampleName, that.sampleData, that.samplePitch, that.sampleOctave, centAdjustment] }],
+                    [
+                        "customsample",
+                        {
+                            value: [
+                                that.sampleName,
+                                that.sampleData,
+                                that.samplePitch,
+                                that.sampleOctave,
+                                centAdjustment
+                            ]
+                        }
+                    ],
                     100,
                     100,
                     [0, 2, 3, 4]
@@ -312,7 +329,7 @@ function SampleWidget() {
                 [2, ["audiofile", { value: [that.sampleName, that.sampleData] }], 0, 0, [1]],
                 [3, ["solfege", { value: that.samplePitch }], 0, 0, [1]],
                 [4, ["number", { value: that.sampleOctave }], 0, 0, [1]],
-                [5,"hidden",0,0,[0,null]]
+                [5, "hidden", 0, 0, [0, null]]
             ];
 
             that.activity.blocks.loadNewBlocks(newStack);
@@ -339,19 +356,27 @@ function SampleWidget() {
     };
 
     //To handle sample files
-    this.handleFiles = (sampleFile) => {
+    this.handleFiles = sampleFile => {
         const reader = new FileReader();
         reader.readAsDataURL(sampleFile);
 
         reader.onload = () => {
             // if the file is of .wav type, save it
-            if (reader.result.substring(reader.result.indexOf(":") + 1, reader.result.indexOf(";")) === "audio/wav") {
+            if (
+                reader.result.substring(
+                    reader.result.indexOf(":") + 1,
+                    reader.result.indexOf(";")
+                ) === "audio/wav"
+            ) {
                 if (reader.result.length <= 1333333) {
                     this.sampleData = reader.result;
                     this.sampleName = sampleFile.name;
                     this._addSample();
                 } else {
-                    this.activity.errorMsg(_("Warning: Your sample cannot be loaded because it is >1MB."), this.timbreBlock);
+                    this.activity.errorMsg(
+                        _("Warning: Your sample cannot be loaded because it is >1MB."),
+                        this.timbreBlock
+                    );
                 }
             } else {
                 this.showSampleTypeError();
@@ -369,11 +394,11 @@ function SampleWidget() {
     this.drag_and_drop = () => {
         const dropZone = document.getElementsByClassName("samplerCanvas")[0];
 
-        dropZone.addEventListener("dragover", (e) => {
+        dropZone.addEventListener("dragover", e => {
             e.preventDefault();
         });
 
-        dropZone.addEventListener( "drop", (e) => {
+        dropZone.addEventListener("drop", e => {
             e.preventDefault();
             const sampleFiles = e.dataTransfer.files[0];
             this.handleFiles(sampleFiles);
@@ -403,17 +428,17 @@ function SampleWidget() {
             that._updateContainerPositions();
         };
 
-        widgetWindow.onrestore = function() {
+        widgetWindow.onrestore = function () {
             that._scale();
             that._updateContainerPositions();
         };
 
         // Function to update container positions based on window state
-        this._updateContainerPositions = function() {
+        this._updateContainerPositions = function () {
             const tunerContainer = docById("tunerContainer");
             const centAdjustmentContainer = docById("centAdjustmentContainer");
             const valueDisplay = docById("centValueDisplay");
-            
+
             if (tunerContainer) {
                 if (this.widgetWindow.isMaximized()) {
                     tunerContainer.style.marginTop = "150px";
@@ -427,7 +452,7 @@ function SampleWidget() {
                     tunerContainer.style.justifyContent = "";
                 }
             }
-            
+
             if (valueDisplay) {
                 if (this.widgetWindow.isMaximized()) {
                     valueDisplay.style.marginTop = "50px";
@@ -512,15 +537,15 @@ function SampleWidget() {
         this.pitchBtnContainer.style.flexDirection = "column";
         this.pitchBtnContainer.style.alignItems = "center";
         this.pitchBtnContainer.style.cursor = "pointer"; // Add pointer cursor to indicate clickable
-        
+
         // Add the container to the toolbar
         widgetWindow._toolbar.appendChild(this.pitchBtnContainer);
-        
+
         // Create the pitch button
         this.pitchBtn = document.createElement("input");
         this.pitchBtn.value = "C4";
         this.pitchBtnContainer.appendChild(this.pitchBtn);
-        
+
         // Create the frequency display
         this.frequencyDisplay = document.createElement("div");
         this.frequencyDisplay.style.fontSize = "smaller";
@@ -528,7 +553,7 @@ function SampleWidget() {
         this.frequencyDisplay.style.color = platformColor.textColor;
         this.frequencyDisplay.textContent = "261 Hz";
         this.pitchBtnContainer.appendChild(this.frequencyDisplay);
-        
+
         // Add click event to the container (includes both the button and frequency display)
         this.pitchBtnContainer.onclick = () => {
             stopTuner();
@@ -553,26 +578,11 @@ function SampleWidget() {
             }
         };
 
-        this._recordBtn= widgetWindow.addButton(
-            "mic.svg",
-            ICONSIZE,
-            _("Toggle Mic"),
-            ""
-        );
+        this._recordBtn = widgetWindow.addButton("mic.svg", ICONSIZE, _("Toggle Mic"), "");
 
-        this._playbackBtn= widgetWindow.addButton(
-            "playback.svg",
-            ICONSIZE,
-            _("Playback"),
-            ""
-        );
+        this._playbackBtn = widgetWindow.addButton("playback.svg", ICONSIZE, _("Playback"), "");
 
-        this._promptBtn = widgetWindow.addButton(
-            "prompt.svg",
-            ICONSIZE,
-            _("Prompt"),
-            ""
-        );
+        this._promptBtn = widgetWindow.addButton("prompt.svg", ICONSIZE, _("Prompt"), "");
 
         // this._trimBtn = widgetWindow.addButton(
         //     "trim.svg",
@@ -580,11 +590,10 @@ function SampleWidget() {
         //     _("Trim"),
         //     ""
         // );
-        
+
         let generating = false;
 
         this._promptBtn.onclick = () => {
-
             this.widgetWindow.clearScreen();
             let width, height;
             if (!this.widgetWindow.isMaximized()) {
@@ -640,7 +649,7 @@ function SampleWidget() {
             textArea.style.border = "none";
             textArea.style.padding = "15px";
             textArea.placeholder = randomPrompt;
-            textArea.addEventListener("input", function() {
+            textArea.addEventListener("input", function () {
                 if (generating) {
                     submit.disabled = true;
                     preview.disabled = true;
@@ -712,7 +721,7 @@ function SampleWidget() {
             preview.style.cursor = "pointer";
             preview.innerHTML = "Preview";
             preview.disabled = true;
-            preview.onclick = function (){
+            preview.onclick = function () {
                 const audioURL = `http://13.61.94.100:8000/preview`;
                 const audio = new Audio(audioURL);
                 audio.play();
@@ -727,11 +736,11 @@ function SampleWidget() {
             save.style.cursor = "pointer";
             save.innerHTML = "Save";
             save.disabled = true;
-            save.onclick = function (){
+            save.onclick = function () {
                 const audioURL = `http://13.61.94.100:8000/save`;
-                const link = document.createElement('a');
+                const link = document.createElement("a");
                 link.href = audioURL;
-                link.download = 'output.wav';
+                link.download = "output.wav";
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -902,9 +911,9 @@ function SampleWidget() {
         //     container.appendChild(buttonDiv);
         // };
 
-        this._playbackBtn.id="playbackBtn";
+        this._playbackBtn.id = "playbackBtn";
         this._playbackBtn.classList.add("disabled");
-        
+
         this.is_recording = false;
         this.playback = false;
 
@@ -939,12 +948,7 @@ function SampleWidget() {
             }
         };
 
-        this._tunerBtn = widgetWindow.addButton(
-            "tuner.svg",
-            ICONSIZE,
-            _("Tuner"),
-            ""
-        );
+        this._tunerBtn = widgetWindow.addButton("tuner.svg", ICONSIZE, _("Tuner"), "");
 
         let tunerOn = false;
 
@@ -983,7 +987,7 @@ function SampleWidget() {
                 tunerContainer.style.display = "flex";
                 tunerContainer.id = "tunerContainer";
                 tunerContainer.style.gap = "10px";
-                
+
                 // Adjust positioning based on whether the window is maximized
                 if (this.widgetWindow.isMaximized()) {
                     tunerContainer.style.marginTop = "150px";
@@ -1109,12 +1113,14 @@ function SampleWidget() {
 
                 // Add click handlers with debounce
                 let isClickable = true;
-                const handleClick = (mode) => {
+                const handleClick = mode => {
                     if (!isClickable) return;
                     isClickable = false;
                     tunerMode = mode;
                     updateButtonStyles();
-                    setTimeout(() => { isClickable = true; }, 200);
+                    setTimeout(() => {
+                        isClickable = true;
+                    }, 200);
                 };
 
                 chromaticButton.onclick = () => handleClick("chromatic");
@@ -1135,7 +1141,6 @@ function SampleWidget() {
 
                 await this.activity.logo.synth.startTuner();
                 activity.textMsg(_("Tuner started"), 3000);
-
             } else {
                 activity.textMsg(_("Tuner stopped"), 3000);
                 this.activity.logo.synth.stopTuner();
@@ -1158,7 +1163,7 @@ function SampleWidget() {
             if (existingCentAdjustmentContainer) {
                 existingCentAdjustmentContainer.remove();
                 this.centAdjustmentOn = false;
-                
+
                 // Show the sampler canvas
                 const samplerCanvas = docByClass("samplerCanvas")[0];
                 if (samplerCanvas) {
@@ -1166,7 +1171,7 @@ function SampleWidget() {
                 }
                 return;
             }
-            
+
             // Close the tuner window if it's open
             const tunerContainer = docById("tunerContainer");
             if (tunerContainer) {
@@ -1174,16 +1179,16 @@ function SampleWidget() {
                 this.activity.logo.synth.stopTuner();
                 tunerOn = false;
             }
-            
+
             if (!this.centAdjustmentOn) {
                 this.centAdjustmentOn = true;
-                
+
                 // Hide the sampler canvas
                 const samplerCanvas = docByClass("samplerCanvas")[0];
                 if (samplerCanvas) {
                     samplerCanvas.style.display = "none";
                 }
-                
+
                 // Create the cent adjustment container
                 const centAdjustmentContainer = document.createElement("div");
                 centAdjustmentContainer.id = "centAdjustmentContainer";
@@ -1194,15 +1199,18 @@ function SampleWidget() {
                 centAdjustmentContainer.style.height = "100%";
                 centAdjustmentContainer.style.backgroundColor = "#d8d8d8"; // Grey color to match tuner
                 centAdjustmentContainer.style.zIndex = "1000";
-                
+
                 // Create the value display (centered at top)
                 const valueDisplay = document.createElement("div");
                 valueDisplay.id = "centValueDisplay";
-                valueDisplay.textContent = (this.centAdjustmentValue >= 0 ? "+" : "") + (this.centAdjustmentValue || 0) + "¢";
+                valueDisplay.textContent =
+                    (this.centAdjustmentValue >= 0 ? "+" : "") +
+                    (this.centAdjustmentValue || 0) +
+                    "¢";
                 valueDisplay.style.fontSize = "24px";
                 valueDisplay.style.fontWeight = "bold";
                 valueDisplay.style.textAlign = "center";
-                
+
                 // Adjust positioning based on whether the window is maximized
                 if (this.widgetWindow.isMaximized()) {
                     valueDisplay.style.marginTop = "50px";
@@ -1211,12 +1219,12 @@ function SampleWidget() {
                     valueDisplay.style.marginTop = "30px";
                     valueDisplay.style.marginBottom = "30px";
                 }
-                
+
                 centAdjustmentContainer.appendChild(valueDisplay);
-                
+
                 // Create the slider container
                 const sliderContainer = document.createElement("div");
-                
+
                 // Adjust width and margins based on whether the window is maximized
                 if (this.widgetWindow.isMaximized()) {
                     sliderContainer.style.width = "60%";
@@ -1225,7 +1233,7 @@ function SampleWidget() {
                     sliderContainer.style.width = "80%";
                     sliderContainer.style.margin = "0 auto";
                 }
-                
+
                 // Create the HTML5 range slider
                 const slider = document.createElement("input");
                 Object.assign(slider, {
@@ -1235,7 +1243,7 @@ function SampleWidget() {
                     value: this.centAdjustmentValue || 0,
                     step: 1
                 });
-                
+
                 Object.assign(slider.style, {
                     width: "100%",
                     height: "20px",
@@ -1246,7 +1254,7 @@ function SampleWidget() {
                     cursor: "pointer",
                     opacity: "0.8"
                 });
-                
+
                 // Add slider thumb styling
                 const thumbStyle = `
                     input[type=range]::-webkit-slider-thumb {
@@ -1274,46 +1282,46 @@ function SampleWidget() {
                         transform: scale(1.1);
                     }
                 `;
-                
+
                 // Add the styles to the document
                 const styleSheet = document.createElement("style");
                 styleSheet.textContent = thumbStyle;
                 document.head.appendChild(styleSheet);
-                
+
                 sliderContainer.appendChild(slider);
                 centAdjustmentContainer.appendChild(sliderContainer);
-                
+
                 // Add labels for min and max values
                 const labelsDiv = document.createElement("div");
-                
+
                 // Adjust width based on whether the window is maximized
                 if (this.widgetWindow.isMaximized()) {
                     labelsDiv.style.width = "60%";
                 } else {
                     labelsDiv.style.width = "80%";
                 }
-                
+
                 labelsDiv.style.display = "flex";
                 labelsDiv.style.justifyContent = "space-between";
                 labelsDiv.style.margin = "10px auto";
-                
+
                 const minLabel = document.createElement("span");
                 minLabel.textContent = "-50¢";
                 minLabel.style.fontWeight = "bold";
-                
+
                 const maxLabel = document.createElement("span");
                 maxLabel.textContent = "+50¢";
                 maxLabel.style.fontWeight = "bold";
-                
+
                 labelsDiv.appendChild(minLabel);
                 labelsDiv.appendChild(maxLabel);
                 centAdjustmentContainer.appendChild(labelsDiv);
-                
+
                 // Add reset button
                 const resetButtonContainer = document.createElement("div");
                 resetButtonContainer.style.textAlign = "center";
                 resetButtonContainer.style.marginTop = "30px";
-                
+
                 const resetButton = document.createElement("button");
                 resetButton.textContent = _("Reset");
                 resetButton.style.padding = "10px 20px";
@@ -1323,20 +1331,20 @@ function SampleWidget() {
                 resetButton.style.borderRadius = "5px";
                 resetButton.style.cursor = "pointer";
                 resetButton.style.fontSize = "16px";
-                
+
                 resetButton.onclick = () => {
                     this.centAdjustmentValue = 0;
                     valueDisplay.textContent = "0¢";
                     slider.value = 0;
                     this.applyCentAdjustment(0);
                 };
-                
+
                 resetButtonContainer.appendChild(resetButton);
                 centAdjustmentContainer.appendChild(resetButtonContainer);
-                
+
                 // Add the container to the widget body
                 this.widgetWindow.getWidgetBody().appendChild(centAdjustmentContainer);
-                
+
                 // Add event listener for slider changes
                 slider.oninput = () => {
                     const value = parseInt(slider.value);
@@ -1344,16 +1352,15 @@ function SampleWidget() {
                     valueDisplay.textContent = (value >= 0 ? "+" : "") + value + "¢";
                     this.applyCentAdjustment(value);
                 };
-                
             } else {
                 this.centAdjustmentOn = false;
-                
+
                 // Remove the cent adjustment container
                 const centAdjustmentContainer = docById("centAdjustmentContainer");
                 if (centAdjustmentContainer) {
                     centAdjustmentContainer.remove();
                 }
-                
+
                 // Show the sampler canvas
                 const samplerCanvas = docByClass("samplerCanvas")[0];
                 if (samplerCanvas) {
@@ -1387,12 +1394,24 @@ function SampleWidget() {
         for (let i = 0; i < CUSTOMSAMPLES.length; i++) {
             if (CUSTOMSAMPLES[i][0] == this.sampleName) {
                 // Update existing sample with new data and cent adjustment
-                CUSTOMSAMPLES[i] = [this.sampleName, this.sampleData, this.samplePitch, this.sampleOctave, this.centAdjustmentValue || 0];
+                CUSTOMSAMPLES[i] = [
+                    this.sampleName,
+                    this.sampleData,
+                    this.samplePitch,
+                    this.sampleOctave,
+                    this.centAdjustmentValue || 0
+                ];
                 return;
             }
         }
         // Add new sample with cent adjustment
-        CUSTOMSAMPLES.push([this.sampleName, this.sampleData, this.samplePitch, this.sampleOctave, this.centAdjustmentValue || 0]);
+        CUSTOMSAMPLES.push([
+            this.sampleName,
+            this.sampleData,
+            this.samplePitch,
+            this.sampleOctave,
+            this.centAdjustmentValue || 0
+        ]);
     };
 
     /**
@@ -1431,15 +1450,15 @@ function SampleWidget() {
      */
     this._calculateFrequency = function () {
         let semitones = 0;
-        
+
         semitones += isNaN(this.octaveCenter) ? 0 : this.octaveCenter * 12;
         semitones += isNaN(this.pitchCenter) ? 0 : MAJORSCALE[this.pitchCenter];
         semitones += isNaN(this.accidentalCenter) ? 0 : this.accidentalCenter - 2;
-        
+
         // A4 = 440Hz at semitone position 57
         const netChange = semitones - 57;
         const frequency = Math.floor(440 * Math.pow(2, netChange / 12));
-        
+
         return frequency;
     };
 
@@ -1510,13 +1529,13 @@ function SampleWidget() {
 
             // Get a reference to the player
             const instrumentName = "customsample_" + this.originalSampleName;
-            
+
             // Ensure the instrument exists
             if (!instruments[0][instrumentName]) {
                 // Create the instrument if it doesn't exist
                 this.activity.logo.synth.loadSynth(0, instrumentName);
             }
-            
+
             if (instruments[0][instrumentName]) {
                 this.player = instruments[0][instrumentName];
             }
@@ -1524,7 +1543,7 @@ function SampleWidget() {
             // Calculate adjusted frequency for cent adjustment
             let playbackFrequency = CENTERPITCHHERTZ;
             if (this.centAdjustmentValue !== 0) {
-                const playbackRate = Math.pow(2, this.centAdjustmentValue/1200);
+                const playbackRate = Math.pow(2, this.centAdjustmentValue / 1200);
                 playbackFrequency = CENTERPITCHHERTZ * playbackRate;
             }
 
@@ -1545,7 +1564,7 @@ function SampleWidget() {
      * @returns {Promise<string>} A promise that resolves once the sample is played.
      */
     this._waitAndPlaySample = function () {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
             setTimeout(() => {
                 this._playSample();
                 resolve("played");
@@ -1567,7 +1586,7 @@ function SampleWidget() {
      * @returns {Promise<string>} A promise that resolves once the sample playback ends.
      */
     this._waitAndEndPlaying = function () {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
             setTimeout(() => {
                 this.pause();
                 resolve("ended");
@@ -1795,13 +1814,13 @@ function SampleWidget() {
 
         // Calculate frequency
         const frequency = this._calculateFrequency();
-        
+
         // Update the pitch button value
         this.pitchBtn.value = this.pitchName;
-        
+
         // Update the frequency display text
         this.frequencyDisplay.textContent = frequency + " Hz";
-        
+
         return this.pitchName;
     };
 
@@ -1812,7 +1831,7 @@ function SampleWidget() {
     this._scale = function () {
         let width, height;
         const canvas = document.getElementsByClassName("samplerCanvas");
-        Array.prototype.forEach.call(canvas, (ele) => {
+        Array.prototype.forEach.call(canvas, ele => {
             this.widgetWindow.getWidgetBody().removeChild(ele);
         });
         if (!this.widgetWindow.isMaximized()) {
@@ -1843,7 +1862,7 @@ function SampleWidget() {
         this.widgetWindow.getWidgetBody().appendChild(canvas);
         const canvasCtx = canvas.getContext("2d");
         canvasCtx.clearRect(0, 0, width, height);
-        
+
         // If tuner is enabled, create a separate tuner display
         if (this.tunerEnabled) {
             // Create a dedicated tuner canvas
@@ -1855,23 +1874,39 @@ function SampleWidget() {
             tunerCanvas.style.top = "10px";
             tunerCanvas.style.left = (width - tunerCanvas.width) / 2 + "px";
             this.widgetWindow.getWidgetBody().appendChild(tunerCanvas);
-            
+
             // Initialize or update the tuner display
             if (!this.tunerDisplay) {
-                this.tunerDisplay = new TunerDisplay(tunerCanvas, tunerCanvas.width, tunerCanvas.height);
+                this.tunerDisplay = new TunerDisplay(
+                    tunerCanvas,
+                    tunerCanvas.width,
+                    tunerCanvas.height
+                );
             } else {
                 this.tunerDisplay.canvas = tunerCanvas;
                 this.tunerDisplay.width = tunerCanvas.width;
                 this.tunerDisplay.height = tunerCanvas.height;
             }
-            
+
             // Set initial note display
-            const noteObj = TunerUtils.frequencyToPitch(A0 * Math.pow(2, (pitchToNumber(SOLFEGENAMES[this.pitchCenter] + EXPORTACCIDENTALNAMES[this.accidentalCenter], this.octaveCenter) - 57) / 12));
+            const noteObj = TunerUtils.frequencyToPitch(
+                A0 *
+                    Math.pow(
+                        2,
+                        (pitchToNumber(
+                            SOLFEGENAMES[this.pitchCenter] +
+                                EXPORTACCIDENTALNAMES[this.accidentalCenter],
+                            this.octaveCenter
+                        ) -
+                            57) /
+                            12
+                    )
+            );
             this.tunerDisplay.update(noteObj[0], noteObj[1], this.centsValue);
-            
+
             // Reduce the main canvas height to make room for the tuner
             canvas.height = height - tunerCanvas.height - 20;
-            canvas.style.marginTop = (tunerCanvas.height + 20) + "px";
+            canvas.style.marginTop = tunerCanvas.height + 20 + "px";
         } else if (this.tunerDisplay) {
             // Remove the tuner canvas if it exists
             const tunerCanvas = document.getElementsByClassName("tunerCanvas")[0];
@@ -1883,13 +1918,16 @@ function SampleWidget() {
 
         const draw = () => {
             this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
-            if (this.is_recording || (this.pitchAnalysers[turtleIdx] && (this.running || resized))) {
+            if (
+                this.is_recording ||
+                (this.pitchAnalysers[turtleIdx] && (this.running || resized))
+            ) {
                 canvasCtx.fillStyle = "#FFFFFF";
                 canvasCtx.font = "10px Verdana";
                 this.verticalOffset = -canvas.height / 4;
                 this.zoomFactor = 40.0;
                 canvasCtx.fillRect(0, 0, width, height);
-        
+
                 let oscText;
                 if (turtleIdx >= 0) {
                     //.TRANS: The sound sample that the user uploads.
@@ -1903,22 +1941,23 @@ function SampleWidget() {
                 for (let turtleIdx = 0; turtleIdx < 2; turtleIdx += 1) {
                     let dataArray;
                     if (this.is_recording) {
-                        dataArray = turtleIdx === 0
-                            ? this.pitchAnalysers[0].getValue()
-                            : this.activity.logo.synth.getWaveFormValues();
+                        dataArray =
+                            turtleIdx === 0
+                                ? this.pitchAnalysers[0].getValue()
+                                : this.activity.logo.synth.getWaveFormValues();
                     } else {
                         dataArray = this.pitchAnalysers[turtleIdx].getValue();
                     }
-        
+
                     const bufferLength = dataArray.length;
                     const rbga = SAMPLEOSCCOLORS[turtleIdx];
                     const sliceWidth = (width * this.zoomFactor) / bufferLength;
                     canvasCtx.lineWidth = 2;
                     canvasCtx.strokeStyle = rbga;
                     canvasCtx.beginPath();
-        
+
                     let x = 0;
-                    
+
                     for (let i = 0; i < bufferLength; i++) {
                         const y = (height / 2) * (1 - dataArray[i]) + this.verticalOffset;
                         if (i === 0) {
@@ -1932,7 +1971,7 @@ function SampleWidget() {
                     canvasCtx.stroke();
                     this.verticalOffset = canvas.height / 4;
                 }
-                
+
                 // Update the tuner display if enabled
                 if (this.tunerEnabled && this.tunerDisplay) {
                     // Get pitch data from analyzer if available
@@ -1943,9 +1982,11 @@ function SampleWidget() {
                             if (pitch > 0) {
                                 const { note, cents } = frequencyToNote(pitch);
                                 this.tunerDisplay.update(note, cents, this.centsValue);
-                                
+
                                 // Update segments
-                                const tunerSegments = document.querySelectorAll("#tunerContainer svg path");
+                                const tunerSegments = document.querySelectorAll(
+                                    "#tunerContainer svg path"
+                                );
                                 tunerSegments.forEach((segment, i) => {
                                     const segmentCents = (i - 5) * 10;
                                     if (Math.abs(cents - segmentCents) <= 5) {
@@ -1971,17 +2012,17 @@ function SampleWidget() {
      */
     this.toggleTuner = function () {
         this.tunerEnabled = !this.tunerEnabled;
-        
+
         if (this.tunerEnabled) {
             this._tunerBtn.getElementsByTagName("img")[0].src = "header-icons/tuner-active.svg";
         } else {
             this._tunerBtn.getElementsByTagName("img")[0].src = "header-icons/tuner.svg";
         }
-        
+
         // Redraw the canvas with the tuner display
         this._scale();
     };
-    
+
     /**
      * Applies the cents adjustment to the sample playback rate
      * @returns {void}
@@ -1991,7 +2032,9 @@ function SampleWidget() {
             const playbackRate = TunerUtils.calculatePlaybackRate(0, this.centsValue);
             // Apply the playback rate to the sample
             if (instruments[0]["customsample_" + this.originalSampleName]) {
-                instruments[0]["customsample_" + this.originalSampleName].playbackRate.value = playbackRate;
+                instruments[0][
+                    "customsample_" + this.originalSampleName
+                ].playbackRate.value = playbackRate;
             }
         }
     };
@@ -2002,28 +2045,28 @@ function SampleWidget() {
     const YIN = (sampleRate, bufferSize = 2048, threshold = 0.1) => {
         // Low-Pass Filter to remove high-frequency noise
         const lowPassFilter = (buffer, cutoff = 500) => {
-            const alpha = 2 * Math.PI * cutoff / sampleRate;
+            const alpha = (2 * Math.PI * cutoff) / sampleRate;
             return buffer.map((sample, i, arr) =>
-                i > 0 ? (alpha * sample + (1 - alpha) * arr[i - 1]) : sample
+                i > 0 ? alpha * sample + (1 - alpha) * arr[i - 1] : sample
             );
         };
 
         // Autocorrelation Function
-        const autocorrelation = (buffer) =>
+        const autocorrelation = buffer =>
             buffer.map((_, lag) =>
-                buffer.slice(0, buffer.length - lag).reduce(
-                    (sum, value, index) => sum + value * buffer[index + lag], 0
-                )
+                buffer
+                    .slice(0, buffer.length - lag)
+                    .reduce((sum, value, index) => sum + value * buffer[index + lag], 0)
             );
 
         // Difference Function
-        const difference = (buffer) => {
+        const difference = buffer => {
             const autocorr = autocorrelation(buffer);
             return autocorr.map((_, tau) => autocorr[0] + autocorr[tau] - 2 * autocorr[tau]);
         };
 
         // Cumulative Mean Normalized Difference Function
-        const cumulativeMeanNormalizedDifference = (diff) => {
+        const cumulativeMeanNormalizedDifference = diff => {
             let runningSum = 0;
             return diff.map((value, tau) => {
                 runningSum += value;
@@ -2032,7 +2075,7 @@ function SampleWidget() {
         };
 
         // Absolute Threshold Function
-        const absoluteThreshold = (cmnDiff) => {
+        const absoluteThreshold = cmnDiff => {
             for (let tau = 2; tau < cmnDiff.length; tau++) {
                 if (cmnDiff[tau] < threshold) {
                     while (tau + 1 < cmnDiff.length && cmnDiff[tau + 1] < cmnDiff[tau]) {
@@ -2052,14 +2095,16 @@ function SampleWidget() {
             if (x0 === tau) return cmnDiff[tau] <= cmnDiff[x2] ? tau : x2;
             if (x2 === tau) return cmnDiff[tau] <= cmnDiff[x0] ? tau : x0;
 
-            const s0 = cmnDiff[x0], s1 = cmnDiff[tau], s2 = cmnDiff[x2];
+            const s0 = cmnDiff[x0],
+                s1 = cmnDiff[tau],
+                s2 = cmnDiff[x2];
             const adjustment = ((x2 - x0) * (s0 - s2)) / (2 * (s0 - 2 * s1 + s2));
 
             return tau + adjustment;
         };
 
         // Main Pitch Detection Function
-        return (buffer) => {
+        return buffer => {
             buffer = lowPassFilter(buffer, 300);
             const diff = difference(buffer);
             const cmnDiff = cumulativeMeanNormalizedDifference(diff);
@@ -2075,7 +2120,7 @@ function SampleWidget() {
     /**
      * Convert frequency to note and cents
      */
-    const frequencyToNote = (frequency) => {
+    const frequencyToNote = frequency => {
         if (frequency <= 0) return { note: "---", cents: 0 };
 
         const A4 = 440;
@@ -2119,9 +2164,8 @@ function SampleWidget() {
                 if (pitch > 0) {
                     const { note, cents } = frequencyToNote(pitch);
                     document.getElementById("pitch").textContent = pitch.toFixed(2);
-                    document.getElementById("note").textContent = cents === 0 ?
-                        ` ${note} (Perfect)` :
-                        ` ${note}, off by ${cents} cents`;
+                    document.getElementById("note").textContent =
+                        cents === 0 ? ` ${note} (Perfect)` : ` ${note}, off by ${cents} cents`;
                 } else {
                     document.getElementById("pitch").textContent = "---";
                     document.getElementById("note").textContent = "---";
@@ -2194,36 +2238,36 @@ function SampleWidget() {
         document.getElementById("start").addEventListener("click", startPitchDetection);
     };
 
-
-
     /**
      * Applies the cent adjustment to the sample
      * @param {number} value - The cent adjustment value
      * @returns {void}
      */
-    this.applyCentAdjustment = function(value) {
+    this.applyCentAdjustment = function (value) {
         this.centAdjustmentValue = value;
-        
+
         // Calculate the playback rate adjustment based on cents
         // Formula: playbackRate = 2^(cents/1200)
-        const playbackRate = Math.pow(2, value/1200);
-        
+        const playbackRate = Math.pow(2, value / 1200);
+
         // Apply the playback rate to the current sample if it exists
         if (this.sampleName && this.sampleName !== "" && this.originalSampleName) {
             const instrumentName = "customsample_" + this.originalSampleName;
-            
+
             // Check if instruments object exists and the specific instrument exists
-            if (typeof instruments !== "undefined" &&
+            if (
+                typeof instruments !== "undefined" &&
                 instruments[0] &&
                 instruments[0][instrumentName] &&
-                instruments[0][instrumentName].playbackRate) {
+                instruments[0][instrumentName].playbackRate
+            ) {
                 instruments[0][instrumentName].playbackRate.value = playbackRate;
             } else {
                 // If the instrument doesn't exist yet, we'll apply the adjustment when playing
                 console.log("Instrument not found, will apply cent adjustment during playback");
             }
         }
-        
+
         // If we're currently playing, restart with the new adjustment
         if (this.isMoving) {
             this.pause();
@@ -2252,14 +2296,16 @@ class PitchSmoother {
 
     getSmoothedPitch() {
         if (this.pitchHistory.length === 0) return -1;
-        
+
         // Remove outliers
         const sorted = [...this.pitchHistory].sort((a, b) => a - b);
         const q1 = sorted[Math.floor(sorted.length / 4)];
-        const q3 = sorted[Math.floor(3 * sorted.length / 4)];
+        const q3 = sorted[Math.floor((3 * sorted.length) / 4)];
         const iqr = q3 - q1;
-        const validPitches = this.pitchHistory.filter(p => p >= q1 - 1.5 * iqr && p <= q3 + 1.5 * iqr);
-        
+        const validPitches = this.pitchHistory.filter(
+            p => p >= q1 - 1.5 * iqr && p <= q3 + 1.5 * iqr
+        );
+
         if (validPitches.length === 0) return -1;
         return validPitches.reduce((a, b) => a + b) / validPitches.length;
     }
