@@ -1897,8 +1897,6 @@ function TemperamentWidget() {
                     this.notes[i].slice(-1)
                 ];
             }
-            // eslint-disable-next-line no-console
-            console.log(newTemperament);
             addTemperamentToDictionary(this.inTemperament, newTemperament);
             updateTemperaments();
         }
