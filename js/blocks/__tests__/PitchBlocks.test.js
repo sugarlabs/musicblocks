@@ -34,29 +34,49 @@ describe("setupPitchBlocks", () => {
             this.connections = [null, null, null, null, null];
             this.value = null;
         }
-        setPalette() { return this; }
-        beginnerBlock() { return this; }
-        setHelpString() { return this; }
-        formBlock() { return this; }
-        setup() { return this; }
-        makeMacro() { return this; }
-        flow() { return this; }
+        setPalette() {
+            return this;
+        }
+        beginnerBlock() {
+            return this;
+        }
+        setHelpString() {
+            return this;
+        }
+        formBlock() {
+            return this;
+        }
+        setup() {
+            return this;
+        }
+        makeMacro() {
+            return this;
+        }
+        flow() {
+            return this;
+        }
     }
 
     class DummyValueBlock extends DummyBlock {
         updateParameter(logo, turtle, blk) {
             return activity.blocks.blockList[blk].value;
         }
-        arg() { return null; }
-        setter() { }
+        arg() {
+            return null;
+        }
+        setter() {}
     }
     class DummyFlowBlock extends DummyBlock {
-        flow() { return this; }
+        flow() {
+            return this;
+        }
     }
     class DummyFlowClampBlock extends DummyBlock {
-        flow() { return this; }
+        flow() {
+            return this;
+        }
     }
-    class DummyLeftBlock extends DummyBlock { }
+    class DummyLeftBlock extends DummyBlock {}
 
     beforeEach(() => {
         createdBlocks = {};
@@ -77,20 +97,78 @@ describe("setupPitchBlocks", () => {
         global.DOUBLEFLAT = "bb";
         global.DOUBLESHARP = "##";
         global.NATURAL = "n";
-        global.FIXEDSOLFEGE = { "do": "C", "re": "D", "mi": "E", "fa": "F", "sol": "G", "la": "A", "si": "B" };
-        global.SOLFEGENAMES1 = ["do", "re", "mi", "fa", "sol", "la", "si", "do#", "dob", "do##", "dobb", "do##", "dobb"];
+        global.FIXEDSOLFEGE = { do: "C", re: "D", mi: "E", fa: "F", sol: "G", la: "A", si: "B" };
+        global.SOLFEGENAMES1 = [
+            "do",
+            "re",
+            "mi",
+            "fa",
+            "sol",
+            "la",
+            "si",
+            "do#",
+            "dob",
+            "do##",
+            "dobb",
+            "do##",
+            "dobb"
+        ];
         global.NOTENAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-        global.NOTENAMES1 = ["C", "D", "E", "F", "G", "A", "B", "C#", "Db", "D#", "Eb", "F#", "Gb", "G#", "Ab", "A#", "Bb"];
-        global.ALLNOTENAMES = ["C", "C#", "Db", "D", "D#", "Eb", "E", "F", "F#", "Gb", "G", "G#", "Ab", "A", "A#", "Bb", "B"];
-        global.MUSICALMODES = { "major": [2, 2, 1, 2, 2, 2, 1], "minor": [2, 1, 2, 2, 1, 2, 2] };
+        global.NOTENAMES1 = [
+            "C",
+            "D",
+            "E",
+            "F",
+            "G",
+            "A",
+            "B",
+            "C#",
+            "Db",
+            "D#",
+            "Eb",
+            "F#",
+            "Gb",
+            "G#",
+            "Ab",
+            "A#",
+            "Bb"
+        ];
+        global.ALLNOTENAMES = [
+            "C",
+            "C#",
+            "Db",
+            "D",
+            "D#",
+            "Eb",
+            "E",
+            "F",
+            "F#",
+            "Gb",
+            "G",
+            "G#",
+            "Ab",
+            "A",
+            "A#",
+            "Bb",
+            "B"
+        ];
+        global.MUSICALMODES = { major: [2, 2, 1, 2, 2, 2, 1], minor: [2, 1, 2, 2, 1, 2, 2] };
         global.YSTAFFOCTAVEHEIGHT = 70;
         global.YSTAFFNOTEHEIGHT = 10;
         global.A0 = 27.5;
         global.C8 = 4186;
         global.NOTESSHARP = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
         global.NOTESFLAT = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
-        global.NOTESTEP = { "C": 1, "D": 3, "E": 5, "F": 6, "G": 8, "A": 10, "B": 12 };
-        global.SOLFEGECONVERSIONTABLE = { "C": "do", "D": "re", "E": "mi", "F": "fa", "G": "sol", "A": "la", "B": "si" };
+        global.NOTESTEP = { C: 1, D: 3, E: 5, F: 6, G: 8, A: 10, B: 12 };
+        global.SOLFEGECONVERSIONTABLE = {
+            C: "do",
+            D: "re",
+            E: "mi",
+            F: "fa",
+            G: "sol",
+            A: "la",
+            B: "si"
+        };
         global.INTERVALVALUES = { "major third": [0, 0, 1.25], "minor third": [0, 0, 1.2] };
 
         global.numberToPitch = jest.fn(num => ["C", Math.floor(num / 12)]);
@@ -102,7 +180,7 @@ describe("setupPitchBlocks", () => {
         global.pitchToNumber = jest.fn((p, o) => 60);
         global.buildScale = jest.fn(() => [["C", "D", "E", "F", "G", "A", "B"], []]);
         global.getPitchInfo = jest.fn((activity, data, note, tur) => note);
-        global.keySignatureToMode = jest.fn((key) => {
+        global.keySignatureToMode = jest.fn(key => {
             if (key === "Cb") return ["Cb", "major"];
             if (key === "C#") return ["C#", "major"];
             if (key === "Ab") return ["Ab", "major"];
@@ -169,7 +247,12 @@ describe("setupPitchBlocks", () => {
             errorMsg: jest.fn(),
             blocks: {
                 blockList: {
-                    10: { name: "test", connections: [null, null, null, null, null], value: null, privateData: {} },
+                    10: {
+                        name: "test",
+                        connections: [null, null, null, null, null],
+                        value: null,
+                        privateData: {}
+                    },
                     20: { name: "test2", connections: [null, null, null, null, null], value: null },
                     30: { name: "test3", connections: [null, null, null, null, null], value: null }
                 }
@@ -181,7 +264,9 @@ describe("setupPitchBlocks", () => {
         logo = {
             parseArg: jest.fn((logo, turtle, cblk, blk, receivedArg) => {
                 if (receivedArg !== undefined) return receivedArg;
-                return activity.blocks.blockList[cblk] ? activity.blocks.blockList[cblk].value : undefined;
+                return activity.blocks.blockList[cblk]
+                    ? activity.blocks.blockList[cblk].value
+                    : undefined;
             }),
             synth: {
                 _getFrequency: jest.fn(() => 440),
@@ -325,11 +410,15 @@ describe("setupPitchBlocks", () => {
         it("Generic check for all blocks updateParameter", () => {
             // This loop ensures that all updateParameter methods are called at least once
             Object.values(createdBlocks).forEach(block => {
-                if (block.updateParameter && typeof block.updateParameter === 'function') {
-                    try { block.updateParameter(logo, 0, 10); } catch (e) { }
+                if (block.updateParameter && typeof block.updateParameter === "function") {
+                    try {
+                        block.updateParameter(logo, 0, 10);
+                    } catch (e) {}
                 }
-                if (block.arg && typeof block.arg === 'function') {
-                    try { block.arg(logo, 0, 10); } catch (e) { }
+                if (block.arg && typeof block.arg === "function") {
+                    try {
+                        block.arg(logo, 0, 10);
+                    } catch (e) {}
                 }
             });
         });
@@ -338,7 +427,7 @@ describe("setupPitchBlocks", () => {
     describe("Transposition Blocks", () => {
         it("SetRatioTranspositionBlock", () => {
             const block = createdBlocks["setratio"];
-            const spy = jest.spyOn(console, "log").mockImplementation(() => { });
+            const spy = jest.spyOn(console, "log").mockImplementation(() => {});
 
             activity.blocks.blockList[10].connections[1] = 20;
 
@@ -496,18 +585,27 @@ describe("setupPitchBlocks", () => {
             activity.blocks.blockList[10].name = "number2pitch";
 
             block.arg(logo, 0, 10, 55);
-            expect(global.Singer.PitchActions.numToPitch).toHaveBeenCalledWith(55, "pitch", expect.anything());
+            expect(global.Singer.PitchActions.numToPitch).toHaveBeenCalledWith(
+                55,
+                "pitch",
+                expect.anything()
+            );
 
             block.arg(logo, 0, 10, null);
 
-            const spy = jest.spyOn(console, "error").mockImplementation(() => { });
-            global.Singer.PitchActions.numToPitch.mockImplementation(() => { throw new Error("Generic"); });
+            const spy = jest.spyOn(console, "error").mockImplementation(() => {});
+            global.Singer.PitchActions.numToPitch.mockImplementation(() => {
+                throw new Error("Generic");
+            });
 
             block.arg(logo, 0, 10, 55);
             expect(spy).toHaveBeenCalled();
 
             const blockOct = createdBlocks["number2octave"];
-            activity.blocks.blockList[20] = { name: "number2octave", connections: [null, null, null, null, null] };
+            activity.blocks.blockList[20] = {
+                name: "number2octave",
+                connections: [null, null, null, null, null]
+            };
             blockOct.arg(logo, 0, 20, 55);
             expect(spy).toHaveBeenCalledTimes(2);
 
@@ -647,17 +745,64 @@ describe("setupPitchBlocks", () => {
 
     describe("Existence", () => {
         const blocks = [
-            "rest", "square", "triangle", "sine", "sawtooth", "transpositionfactor",
-            "consonantstepsizedown", "consonantstepsizeup", "deltapitch", "deltapitch2",
-            "mypitch", "pitchinhertz", "currentpitch", "setpitchnumberoffset",
-            "number2pitch", "number2octave", "outputtools", "ytopitch", "midi",
-            "register", "setratio", "50cents", "settransposition", "octave",
-            "downsixth", "downthird", "seventh", "sixth", "fifth", "fourth",
-            "third", "second", "unison", "setscalartransposition", "accidentalname",
-            "accidental", "flat", "sharp", "oneOfPitchBlock", "scaledegree2",
-            "eastindiansolfege", "notename", "solfege", "hertz", "pitchnumber",
-            "scaledegree", "nthmodalpitch", "steppitch", "custompitch", "pitch2", "pitch", "customNote",
-            "invert1", "invert2", "invert", "retrograde1", "retrograde2", "retrograde"
+            "rest",
+            "square",
+            "triangle",
+            "sine",
+            "sawtooth",
+            "transpositionfactor",
+            "consonantstepsizedown",
+            "consonantstepsizeup",
+            "deltapitch",
+            "deltapitch2",
+            "mypitch",
+            "pitchinhertz",
+            "currentpitch",
+            "setpitchnumberoffset",
+            "number2pitch",
+            "number2octave",
+            "outputtools",
+            "ytopitch",
+            "midi",
+            "register",
+            "setratio",
+            "50cents",
+            "settransposition",
+            "octave",
+            "downsixth",
+            "downthird",
+            "seventh",
+            "sixth",
+            "fifth",
+            "fourth",
+            "third",
+            "second",
+            "unison",
+            "setscalartransposition",
+            "accidentalname",
+            "accidental",
+            "flat",
+            "sharp",
+            "oneOfPitchBlock",
+            "scaledegree2",
+            "eastindiansolfege",
+            "notename",
+            "solfege",
+            "hertz",
+            "pitchnumber",
+            "scaledegree",
+            "nthmodalpitch",
+            "steppitch",
+            "custompitch",
+            "pitch2",
+            "pitch",
+            "customNote",
+            "invert1",
+            "invert2",
+            "invert",
+            "retrograde1",
+            "retrograde2",
+            "retrograde"
         ];
 
         it("should create all expected blocks", () => {
@@ -671,7 +816,17 @@ describe("setupPitchBlocks", () => {
 
     describe("Comprehensive Block Coverage", () => {
         describe("Interval Blocks", () => {
-            const intervalBlocks = ["downsixth", "downthird", "seventh", "sixth", "fifth", "fourth", "third", "second", "unison"];
+            const intervalBlocks = [
+                "downsixth",
+                "downthird",
+                "seventh",
+                "sixth",
+                "fifth",
+                "fourth",
+                "third",
+                "second",
+                "unison"
+            ];
             intervalBlocks.forEach(blockName => {
                 it(`${blockName} block flow`, () => {
                     const block = createdBlocks[blockName];
@@ -934,7 +1089,19 @@ describe("setupPitchBlocks", () => {
 
                     // Test solfege connection with various inputs
                     activity.blocks.blockList[20].name = "solfege";
-                    ["do", "do#", "dob", "do##", "dobb", "re", "mi", "fa", "sol", "la", "si"].forEach(sol => {
+                    [
+                        "do",
+                        "do#",
+                        "dob",
+                        "do##",
+                        "dobb",
+                        "re",
+                        "mi",
+                        "fa",
+                        "sol",
+                        "la",
+                        "si"
+                    ].forEach(sol => {
                         logo.parseArg.mockReturnValue(sol);
                         block.arg(logo, 0, 10);
                     });
@@ -948,10 +1115,12 @@ describe("setupPitchBlocks", () => {
 
                     // Test NOTENAMES1 branch
                     activity.blocks.blockList[20].name = "other";
-                    ["C4", "Db4", "D#4", "Eb4", "F#4", "Gb4", "G#4", "Ab4", "A#4", "Bb4"].forEach(note => {
-                        logo.parseArg.mockReturnValue(note);
-                        block.arg(logo, 0, 10);
-                    });
+                    ["C4", "Db4", "D#4", "Eb4", "F#4", "Gb4", "G#4", "Ab4", "A#4", "Bb4"].forEach(
+                        note => {
+                            logo.parseArg.mockReturnValue(note);
+                            block.arg(logo, 0, 10);
+                        }
+                    );
 
                     // Test ALLNOTENAMES branch
                     ["C#", "Db", "D#", "Eb", "F#", "Gb", "G#", "Ab", "A#", "Bb"].forEach(note => {
@@ -1001,7 +1170,13 @@ describe("setupPitchBlocks", () => {
                     if (block && block.arg) {
                         try {
                             // Test with missing connections
-                            activity.blocks.blockList[10].connections = [null, null, null, null, null];
+                            activity.blocks.blockList[10].connections = [
+                                null,
+                                null,
+                                null,
+                                null,
+                                null
+                            ];
                             block.arg(logo, 0, 10);
                         } catch (e) {
                             // Expected for some blocks
@@ -1066,7 +1241,15 @@ describe("setupPitchBlocks", () => {
             });
 
             it("status matrix integration", () => {
-                const statusBlocks = ["transpositionfactor", "deltapitch", "mypitch", "pitchinhertz", "currentpitch", "outputtools", "ytopitch"];
+                const statusBlocks = [
+                    "transpositionfactor",
+                    "deltapitch",
+                    "mypitch",
+                    "pitchinhertz",
+                    "currentpitch",
+                    "outputtools",
+                    "ytopitch"
+                ];
                 statusBlocks.forEach(blockName => {
                     const block = createdBlocks[blockName];
                     if (block && block.arg) {
@@ -1095,7 +1278,11 @@ describe("setupPitchBlocks", () => {
             it("nested block connections", () => {
                 // Setup complex nested connections
                 activity.blocks.blockList[10].connections = [null, 20, null, 30];
-                activity.blocks.blockList[20] = { name: "pitch", connections: [null, 40], value: "C" };
+                activity.blocks.blockList[20] = {
+                    name: "pitch",
+                    connections: [null, 40],
+                    value: "C"
+                };
                 activity.blocks.blockList[30] = { name: "number", value: 4 };
                 activity.blocks.blockList[40] = { name: "notename", value: "C" };
 
