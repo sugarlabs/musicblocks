@@ -1,10 +1,11 @@
 import StatsWindow from './statistics.js';
+
 describe('StatsWindow', () => {
     let mockActivity;
     let mockWidgetWindow;
 
     beforeEach(() => {
-        // 1. Mock the Activity object
+        // Mock the Activity object
         mockActivity = {
             blocks: { showBlocks: jest.fn(), hideBlocks: jest.fn(), activeBlock: null },
             logo: { statsWindow: null },
@@ -12,7 +13,7 @@ describe('StatsWindow', () => {
             showBlocksAfterRun: true
         };
 
-        // 2. Mock the Widget Window
+        // Mock the Widget Window
         mockWidgetWindow = {
             clear: jest.fn(),
             show: jest.fn(),
@@ -21,35 +22,33 @@ describe('StatsWindow', () => {
             onclose: null,
             onmaximize: null,
             getWidgetBody: jest.fn().mockReturnValue(document.createElement('div')),
-            getWidgetFrame: jest.fn().mockReturnValue({
-                getBoundingClientRect: () => ({ height: 500 })
-            }),
+            getWidgetFrame: jest.fn().mockReturnValue({ getBoundingClientRect: () => ({ height: 500 }) }),
             isMaximized: jest.fn().mockReturnValue(false)
         };
 
-        // 3. Mock window.widgetWindows
+        // Mock window.widgetWindows
         window.widgetWindows = {
             windowFor: jest.fn().mockReturnValue(mockWidgetWindow)
         };
 
-        // 4. Mock docById (canvas)
+        // Mock docById to return a fake canvas
         global.docById = jest.fn().mockReturnValue({
             getContext: jest.fn().mockReturnValue({})
         });
 
-        // 5. Mock analytics helpers
+        // Mock external analytics functions
         global.analyzeProject = jest.fn().mockReturnValue({});
         global.runAnalytics = jest.fn();
         global.scoreToChartData = jest.fn().mockReturnValue({});
         global.getChartOptions = jest.fn().mockReturnValue({});
 
-        // 6. Mock Chart.js
+        // Mock Chart.js
         global.Chart = jest.fn().mockImplementation(() => ({
             Radar: jest.fn()
         }));
     });
 
-    test('displayInfo formats note statistics correctly', () => {
+    test('displayInfo formats note statistics and Hz calculations correctly', () => {
         const statsWindow = new StatsWindow(mockActivity);
 
         const mockStats = {
@@ -66,20 +65,12 @@ describe('StatsWindow', () => {
 
         statsWindow.displayInfo(mockStats);
 
-        const html = statsWindow.jsonObject.innerHTML;
+        const outputHtml = statsWindow.jsonObject.innerHTML;
 
-        // Basic stats
-        expect(html).toContain('duples: 5');
-        expect(html).toContain('triplets: 2');
-
-        // Pitch names (order-independent)
-        expect(html).toContain('pitch names:');
-        expect(html).toContain('A');
-        expect(html).toContain('C#');
-        expect(html).toContain('E');
-
-        // Hz values (rounding-safe)
-        expect(html).toMatch(/44\dHz/);
-        expect(html).toMatch(/52\dHz/);
+        expect(outputHtml).toContain('441Hz');
+        expect(outputHtml).toContain('524Hz');
+        expect(outputHtml).toContain('duples: 5');
+        expect(outputHtml).toContain('triplets: 2');
+        expect(outputHtml).toContain('pitch names: A, C#, E');
     });
 });
