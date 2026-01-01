@@ -1535,6 +1535,5 @@
   "light intensity": "light intensity",
   "infrared light (left)": "infrared light (left)",
   "infrared light (right)": "infrared light (right)",
-  "move": "move",
-  "Start by dragging a block from the left panel and connect it to the Start block.": "Start by dragging a block from the left panel and connect it to the Start block."
+  "move": "move"
 }
