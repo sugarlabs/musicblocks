@@ -482,6 +482,13 @@ class PhraseMaker {
         let tempTable;
         this.activity = activity;
 
+        this._currentMusicalTime = 0;
+        // Use the meter from logo.js or default to 4/4
+        const meterBeats = this.activity.logo.meter ? this.activity.logo.meter[0] : 4;
+        const meterValue = this.activity.logo.meter ? this.activity.logo.meter[1] : 4;
+        this._beatsPerMeasure = meterBeats / meterValue;
+
+
         this._noteStored = [];
         this._noteBlocks = false;
         this._rests = 0;
@@ -2830,6 +2837,10 @@ class PhraseMaker {
 
         const tupletTimeFactor = param[0][0] / param[0][1];
         const numberOfNotes = param[1].length;
+        // Check if the start of this tuplet falls on a measure boundary.
+        const isBarLine = (this._currentMusicalTime / this._beatsPerMeasure) % 1 < 0.0001 && this._currentMusicalTime > 0;
+        const barStyle = isBarLine ? "3px solid #555" : "1px solid #ccc";
+
         let totalNoteInterval = 0;
         // const ptmTable = docById("ptmTable");
         let lcd;
@@ -2934,6 +2945,7 @@ class PhraseMaker {
             cell.style.lineHeight = 60 + "%";
             cell.style.fontSize = this._cellScale * 75 + "%";
             cell.style.textAlign = "center";
+            cell.style.borderLeft = (i === 0) ? barStyle : "1px solid #ccc";
             obj = toFraction(numerator / (totalNoteInterval / tupletTimeFactor));
 
             if (obj[1] < 13) {
@@ -2978,6 +2990,7 @@ class PhraseMaker {
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
                 cell.style.backgroundColor = cellColor;
+                cell.style.borderLeft = (i === 0) ? barStyle : "1px solid #ccc";
 
                 cell.onmouseover = event => {
                     if (event.target.style.backgroundColor !== "black") {
@@ -3006,6 +3019,7 @@ class PhraseMaker {
         cell.style.textAlign = "center";
         cell.innerHTML = tupletValue;
         cell.style.backgroundColor = platformColor.tupletBackground;
+        cell.style.borderLeft = barStyle;
 
         // And a span in the note value column too.
         const noteValueRow = this._noteValueRow;
@@ -3020,7 +3034,9 @@ class PhraseMaker {
         cell.style.textAlign = "center";
         cell.innerHTML = noteValueToDisplay;
         cell.style.backgroundColor = platformColor.rhythmcellcolor;
+        cell.style.borderLeft = barStyle;
         this._matrixHasTuplets = true;
+        this._currentMusicalTime += tupletTimeFactor;
     }
 
     /**
@@ -3052,6 +3068,11 @@ class PhraseMaker {
         const rowCount = this.rowLabels.length - this._rests;
         let drumName, row, cell, cellColor;
         for (let j = 0; j < numBeats; j++) {
+            // Determine if this column is the start of a new measure.
+            // We check if the current musical time is a multiple of the beats per measure.
+            const isBarLine = (this._currentMusicalTime / this._beatsPerMeasure) % 1 < 0.0001 && this._currentMusicalTime > 0;
+            const barStyle = isBarLine ? "3px solid #555" : "1px solid #ccc";
+
             for (let i = 0; i < rowCount; i++) {
                 // Depending on the row, we choose a different background color.
                 if (
@@ -3079,6 +3100,7 @@ class PhraseMaker {
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
                 cell.style.backgroundColor = cellColor;
+                cell.style.borderLeft = barStyle;
                 // Using the alt attribute to store the note value
                 cell.setAttribute("alt", 1 / noteValue);
 
@@ -3109,6 +3131,7 @@ class PhraseMaker {
             cell.style.backgroundColor = platformColor.rhythmcellcolor;
             cell.style.color = platformColor.textColor;
             cell.setAttribute("alt", noteValue);
+            cell.style.borderLeft = barStyle;
 
             if (this._matrixHasTuplets) {
                 // We may need to insert some blank cells in the extra rows
@@ -3121,6 +3144,7 @@ class PhraseMaker {
                 cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.backgroundColor = platformColor.tupletBackground;
+                cell.style.borderLeft = barStyle;
 
                 row = this._tupletValueRow;
                 cell = row.insertCell();
@@ -3130,7 +3154,9 @@ class PhraseMaker {
                 cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.backgroundColor = platformColor.tupletBackground;
+                cell.style.borderLeft = barStyle;
             }
+            this._currentMusicalTime += (1 / noteValue);
         }
     }
 
