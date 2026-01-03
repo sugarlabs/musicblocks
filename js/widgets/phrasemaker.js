@@ -482,11 +482,18 @@ class PhraseMaker {
         let tempTable;
         this.activity = activity;
 
-        this._currentMusicalTime = 0;
-        // Use the meter from logo.js or default to 4/4
-        const meterBeats = this.activity.logo.meter ? this.activity.logo.meter[0] : 4;
-        const meterValue = this.activity.logo.meter ? this.activity.logo.meter[1] : 4;
-        this._beatsPerMeasure = meterBeats / meterValue;
+        this._currentMusicalTime = 0; // Tracks duration used in the current bar
+        
+        // Get the meter from the turtle's singer (Meter Block sets this)
+        const turtle = activity.turtles.ithTurtle(0);  // Get turtle 0
+        const beatsPerMeasure = turtle.singer.beatsPerMeasure || 4;  // Default to 4
+        const noteValuePerBeat = turtle.singer.noteValuePerBeat || 4;  // Default to 4
+        
+        // Calculate the duration of ONE measure
+        // beatsPerMeasure is the number of beats (e.g., 3 for 3/4)
+        // noteValuePerBeat is the note type that gets one beat (e.g., 4 for quarter note)
+        // For 3/4: 3 beats * (1/4) = 0.75
+        this._measureLimit = beatsPerMeasure / noteValuePerBeat;
 
 
         this._noteStored = [];
@@ -2837,8 +2844,8 @@ class PhraseMaker {
 
         const tupletTimeFactor = param[0][0] / param[0][1];
         const numberOfNotes = param[1].length;
-        // Check if the start of this tuplet falls on a measure boundary.
-        const isBarLine = (this._currentMusicalTime / this._beatsPerMeasure) % 1 < 0.0001 && this._currentMusicalTime > 0;
+        // Check if current bar position is at 0 (start of a measure)
+        const isBarLine = (this._currentMusicalTime < 0.001) && (this._notesToPlay.length > 0);
         const barStyle = isBarLine ? "3px solid #555" : "1px solid #ccc";
 
         let totalNoteInterval = 0;
@@ -3036,7 +3043,14 @@ class PhraseMaker {
         cell.style.backgroundColor = platformColor.rhythmcellcolor;
         cell.style.borderLeft = barStyle;
         this._matrixHasTuplets = true;
+        
+        // Update time by the total span of the tuplet
         this._currentMusicalTime += tupletTimeFactor;
+        
+        // Reset if measure is full
+        if (this._currentMusicalTime >= this._measureLimit - 0.001) {
+            this._currentMusicalTime = 0;
+        }
     }
 
     /**
@@ -3068,9 +3082,12 @@ class PhraseMaker {
         const rowCount = this.rowLabels.length - this._rests;
         let drumName, row, cell, cellColor;
         for (let j = 0; j < numBeats; j++) {
-            // Determine if this column is the start of a new measure.
-            // We check if the current musical time is a multiple of the beats per measure.
-            const isBarLine = (this._currentMusicalTime / this._beatsPerMeasure) % 1 < 0.0001 && this._currentMusicalTime > 0;
+            const noteDuration = 1 / noteValue;
+
+            // Check if we are at the start of a new measure
+            // Use a tiny epsilon (0.001) for float math safety
+            const isBarLine = (this._currentMusicalTime < 0.001) && (j > 0 || this._notesToPlay.length > numBeats);
+            
             const barStyle = isBarLine ? "3px solid #555" : "1px solid #ccc";
 
             for (let i = 0; i < rowCount; i++) {
@@ -3156,7 +3173,12 @@ class PhraseMaker {
                 cell.style.backgroundColor = platformColor.tupletBackground;
                 cell.style.borderLeft = barStyle;
             }
-            this._currentMusicalTime += (1 / noteValue);
+
+            // Increment time and reset if we hit the limit
+            this._currentMusicalTime += noteDuration;
+            if (this._currentMusicalTime >= this._measureLimit - 0.001) {
+                this._currentMusicalTime = 0; // Reset for the next bar
+            }
         }
     }
 
