@@ -235,7 +235,7 @@ const _domCache = {
     labelDiv: null
 };
 
-const _getStatic = (id) => {
+const _getStatic = id => {
     if (!_domCache[id]) {
         _domCache[id] = docById(id);
     }
@@ -2822,7 +2822,10 @@ class Block {
          * @param {Event} event - The click event.
          */
         this.container.on("click", event => {
-            if (_getStatic("helpfulWheelDiv") && _getStatic("helpfulWheelDiv").style.display !== "none") {
+            if (
+                _getStatic("helpfulWheelDiv") &&
+                _getStatic("helpfulWheelDiv").style.display !== "none"
+            ) {
                 _getStatic("helpfulWheelDiv").style.display = "none";
             }
             // We might be able to check which button was clicked.
@@ -3474,7 +3477,7 @@ class Block {
                 el.type = "text";
                 _domCache.textLabelInput = el;
             }
-            
+
             // Ensure it is the child of labelElem
             if (_domCache.textLabelInput.parentNode !== labelElem) {
                 labelElem.innerHTML = "";
@@ -4027,7 +4030,7 @@ class Block {
             } else {
                 // Reuse existing input element or create a new one
                 if (!_domCache.numberLabelInput) {
-                    const el = document.createElement('input');
+                    const el = document.createElement("input");
                     el.id = "numberLabel";
                     el.style.position = "absolute";
                     el.style.webkitUserSelect = "text";
@@ -4038,7 +4041,7 @@ class Block {
                     el.step = "any";
                     _domCache.numberLabelInput = el;
                 }
-                
+
                 // Ensure it is the child of labelElem
                 if (_domCache.numberLabelInput.parentNode !== labelElem) {
                     labelElem.innerHTML = "";
@@ -4126,14 +4129,12 @@ class Block {
 
             // Use GPU acceleration (transform) instead of left/top to avoid layout thrashing
             const left = Math.round(
-                (x + this.activity.blocksContainer.x) * this.activity.getStageScale() +
-                canvasLeft
+                (x + this.activity.blocksContainer.x) * this.activity.getStageScale() + canvasLeft
             );
             const top = Math.round(
-                (y + this.activity.blocksContainer.y) * this.activity.getStageScale() +
-                canvasTop
+                (y + this.activity.blocksContainer.y) * this.activity.getStageScale() + canvasTop
             );
-            
+
             this.label.style.transform = `translate3d(${left}px, ${top}px, 0)`;
             this.label.style.left = "0px";
             this.label.style.top = "0px";
