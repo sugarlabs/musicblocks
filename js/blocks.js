@@ -6760,6 +6760,10 @@ class Blocks {
 
             document.body.style.cursor = "default";
             document.getElementById("load-container").style.display = "none";
+            // Stop the loading animation interval to prevent CPU waste
+            if (this.activity.stopLoadAnimation) {
+                this.activity.stopLoadAnimation();
+            }
             const myCustomEvent = new Event("finishedLoading");
             document.dispatchEvent(myCustomEvent);
         };
