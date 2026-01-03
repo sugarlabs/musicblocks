@@ -1524,6 +1524,10 @@ class Blocks {
                 }
                 blk = this.insideExpandableBlock(blk);
             }
+            this.adjustExpandableClampBlock();
+            this.adjustDocks(thisBlock, true);
+            this.activity.refreshCanvas();
+
 
             this._checkTwoArgBlocks = [];
             const checkArgBlocks = [];
