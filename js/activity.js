@@ -3380,6 +3380,14 @@ class Activity {
                             this.__makeNewNote(5, "ti");
                         }
                         break;
+                    case SPACE:
+                        event.preventDefault();
+                        if (this.turtleContainer.scaleX === 1) {
+                            this.turtles.setStageScale(0.5);
+                        } else {
+                            this.turtles.setStageScale(1);
+                        }
+                        break;
                 }
             } else {
                 if (
@@ -3388,6 +3396,18 @@ class Activity {
                 ) {
                     if (document.getElementById("paste").value.length > 0) {
                         this.pasted();
+                    }
+                } else if (event.keyCode === SPACE) {
+                    // Check if any widget window is open
+                    const hasOpenWidget = Object.values(window.widgetWindows.openWindows).some(
+                        w => w
+                    );
+                    if (this.turtles.running()) {
+                        event.preventDefault();
+                        this._doHardStopButton();
+                    } else if (!disableKeys && !hasOpenWidget) {
+                        event.preventDefault();
+                        this._doFastButton();
                     }
                 } else if (!disableKeys) {
                     const solfnotes_ = _("ti la sol fa mi re do").split(" ");
@@ -3509,13 +3529,6 @@ class Activity {
                             this.stage.update();
                             break;
                         case TAB:
-                            break;
-                        case SPACE:
-                            if (this.turtleContainer.scaleX === 1) {
-                                this.turtles.setStageScale(0.5);
-                            } else {
-                                this.turtles.setStageScale(1);
-                            }
                             break;
                         case ESC:
                             if (this.searchWidget.style.visibility === "visible") {
