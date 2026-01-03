@@ -482,6 +482,19 @@ class PhraseMaker {
         let tempTable;
         this.activity = activity;
 
+        this._currentMusicalTime = 0; // Tracks duration used in the current bar
+
+        // Get the meter from the turtle's singer (Meter Block sets this)
+        const turtle = activity.turtles.ithTurtle(0); // Get turtle 0
+        const beatsPerMeasure = turtle.singer.beatsPerMeasure || 4; // Default to 4
+        const noteValuePerBeat = turtle.singer.noteValuePerBeat || 4; // Default to 4
+
+        // Calculate the duration of ONE measure
+        // beatsPerMeasure is the number of beats (e.g., 3 for 3/4)
+        // noteValuePerBeat is the note type that gets one beat (e.g., 4 for quarter note)
+        // For 3/4: 3 beats * (1/4) = 0.75
+        this._measureLimit = beatsPerMeasure / noteValuePerBeat;
+
         this._noteStored = [];
         this._noteBlocks = false;
         this._rests = 0;
@@ -2830,6 +2843,10 @@ class PhraseMaker {
 
         const tupletTimeFactor = param[0][0] / param[0][1];
         const numberOfNotes = param[1].length;
+        // Check if current bar position is at 0 (start of a measure)
+        const isBarLine = this._currentMusicalTime < 0.001 && this._notesToPlay.length > 0;
+        const barStyle = isBarLine ? "3px solid #555" : "1px solid #ccc";
+
         let totalNoteInterval = 0;
         // const ptmTable = docById("ptmTable");
         let lcd;
@@ -2934,6 +2951,7 @@ class PhraseMaker {
             cell.style.lineHeight = 60 + "%";
             cell.style.fontSize = this._cellScale * 75 + "%";
             cell.style.textAlign = "center";
+            cell.style.borderLeft = i === 0 ? barStyle : "1px solid #ccc";
             obj = toFraction(numerator / (totalNoteInterval / tupletTimeFactor));
 
             if (obj[1] < 13) {
@@ -2978,6 +2996,7 @@ class PhraseMaker {
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
                 cell.style.backgroundColor = cellColor;
+                cell.style.borderLeft = i === 0 ? barStyle : "1px solid #ccc";
 
                 cell.onmouseover = event => {
                     if (event.target.style.backgroundColor !== "black") {
@@ -3006,6 +3025,7 @@ class PhraseMaker {
         cell.style.textAlign = "center";
         cell.innerHTML = tupletValue;
         cell.style.backgroundColor = platformColor.tupletBackground;
+        cell.style.borderLeft = barStyle;
 
         // And a span in the note value column too.
         const noteValueRow = this._noteValueRow;
@@ -3020,7 +3040,16 @@ class PhraseMaker {
         cell.style.textAlign = "center";
         cell.innerHTML = noteValueToDisplay;
         cell.style.backgroundColor = platformColor.rhythmcellcolor;
+        cell.style.borderLeft = barStyle;
         this._matrixHasTuplets = true;
+
+        // Update time by the total span of the tuplet
+        this._currentMusicalTime += tupletTimeFactor;
+
+        // Reset if measure is full
+        if (this._currentMusicalTime >= this._measureLimit - 0.001) {
+            this._currentMusicalTime = 0;
+        }
     }
 
     /**
@@ -3052,6 +3081,15 @@ class PhraseMaker {
         const rowCount = this.rowLabels.length - this._rests;
         let drumName, row, cell, cellColor;
         for (let j = 0; j < numBeats; j++) {
+            const noteDuration = 1 / noteValue;
+
+            // Check if we are at the start of a new measure
+            // Use a tiny epsilon (0.001) for float math safety
+            const isBarLine =
+                this._currentMusicalTime < 0.001 && (j > 0 || this._notesToPlay.length > numBeats);
+
+            const barStyle = isBarLine ? "3px solid #555" : "1px solid #ccc";
+
             for (let i = 0; i < rowCount; i++) {
                 // Depending on the row, we choose a different background color.
                 if (
@@ -3079,6 +3117,7 @@ class PhraseMaker {
                 cell.style.minWidth = cell.style.width;
                 cell.style.maxWidth = cell.style.width;
                 cell.style.backgroundColor = cellColor;
+                cell.style.borderLeft = barStyle;
                 // Using the alt attribute to store the note value
                 cell.setAttribute("alt", 1 / noteValue);
 
@@ -3109,6 +3148,7 @@ class PhraseMaker {
             cell.style.backgroundColor = platformColor.rhythmcellcolor;
             cell.style.color = platformColor.textColor;
             cell.setAttribute("alt", noteValue);
+            cell.style.borderLeft = barStyle;
 
             if (this._matrixHasTuplets) {
                 // We may need to insert some blank cells in the extra rows
@@ -3121,6 +3161,7 @@ class PhraseMaker {
                 cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.backgroundColor = platformColor.tupletBackground;
+                cell.style.borderLeft = barStyle;
 
                 row = this._tupletValueRow;
                 cell = row.insertCell();
@@ -3130,6 +3171,13 @@ class PhraseMaker {
                 cell.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.height = Math.floor(1.5 * MATRIXSOLFEHEIGHT * this._cellScale) + "px";
                 cell.style.backgroundColor = platformColor.tupletBackground;
+                cell.style.borderLeft = barStyle;
+            }
+
+            // Increment time and reset if we hit the limit
+            this._currentMusicalTime += noteDuration;
+            if (this._currentMusicalTime >= this._measureLimit - 0.001) {
+                this._currentMusicalTime = 0; // Reset for the next bar
             }
         }
     }
