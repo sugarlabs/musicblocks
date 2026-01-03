@@ -22,6 +22,7 @@ assignees: ""
 
 -   [ ] I have read and followed the project's code of conduct.
 -   [ ] I have checked that no existing tests cover this area.
+-   [ ] I have checked that there is no open PR for the tests I am submitting.
 -   [ ] I have reviewed [docs/TESTING.md](docs/TESTING.md) for testing patterns.
 
 ---

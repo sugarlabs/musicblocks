@@ -16,6 +16,26 @@ Block files (in `js/blocks/`) need specific mocks. Copy this template and modify
 
 ### Basic Template
 
+Add a license header at the top of your test file:
+
+```javascript
+/**
+ * MusicBlocks v3.6.2
+ *
+ * @author Your Name
+ *
+ * @copyright 2026 Your Name
+ *
+ * @license
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+```
+
+Then add the test code:
+
 ```javascript
 const { setupYourBlocks } = jest.requireActual("../YourBlocks");
 
