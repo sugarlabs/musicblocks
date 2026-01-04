@@ -107,8 +107,14 @@ self.addEventListener("beforeinstallprompt", (event) => {
     // eslint-disable-next-line no-console
     console.log("done", "beforeinstallprompt", event);
     // Stash the event so it can be triggered later.
-    window.deferredPrompt = event;
-    // Remove the "hidden" class from the install button container
+    event.preventDefault();
+
+    try {
+        self.deferredPrompt = event;
+    } catch (e) {
+        
+    }
+
     divInstall.classList.toggle("hidden", false);
 });
 
