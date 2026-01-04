@@ -112,7 +112,7 @@ self.addEventListener("beforeinstallprompt", (event) => {
     try {
         self.deferredPrompt = event;
     } catch (e) {
-        
+        // Intentionally ignored: assignment may fail if not supported.
     }
 
     divInstall.classList.toggle("hidden", false);
