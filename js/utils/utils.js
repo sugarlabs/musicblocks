@@ -604,8 +604,8 @@ const processPluginData = (activity, pluginData, pluginSource) => {
         }
 
         try {
-            // eslint-disable-next-line no-new-func
-            new Function(code)();
+            // eslint-disable-next-line no-eval
+            eval(code);
         } catch (e) {
             // eslint-disable-next-line no-console
             console.error("Plugin execution failed:", label, e);
