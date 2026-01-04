@@ -212,10 +212,30 @@ class Singer {
     static masterVolume = [DEFAULTVOLUME];
 
     // Musical Constants
-    static DEFAULT_PITCH_NUMBER_OFFSET = 39; // C4
+
+    /**
+     * Default pitch number offset corresponding to middle C (C4).
+     */
+    static DEFAULT_PITCH_NUMBER_OFFSET = 39;
+
+    /**
+     * Default octave used when no octave is specified.
+     */
     static DEFAULT_OCTAVE = 4;
-    static DEFAULT_NOTE_VALUE = 4; // Quarter note
+
+    /**
+     * Default note value for durations (4 = quarter note).
+     */
+    static DEFAULT_NOTE_VALUE = 4;
+
+    /**
+     * Default number of beats per measure (e.g., 4/4 time).
+     */
     static DEFAULT_BEATS_PER_MEASURE = 4;
+
+    /**
+     * Default note value that receives one beat.
+     */
     static DEFAULT_NOTE_VALUE_PER_BEAT = 4;
 
     // ========= Deprecated ===================================================
