@@ -1605,6 +1605,18 @@ let closeBlkWidgets = name => {
  */
 let importMembers = (obj, className, modelArgs, viewArgs) => {
     /**
+     * Safely resolves a dot-notation string path to an object property globally.
+     * @param {string} path - The dot-notation path (e.g., "MyClass.Model").
+     * @returns {Object|undefined} The resolved object or undefined.
+     */
+    const resolveObject = path => {
+        if (!path) return undefined;
+        return path.split(".").reduce((obj, prop) => {
+            return obj && obj[prop];
+        }, window);
+    };
+
+    /**
      * Adds methods and variables of one class to another class's instance.
      *
      * @param {Object} obj - Object of the component (controller).
@@ -1650,15 +1662,15 @@ let importMembers = (obj, className, modelArgs, viewArgs) => {
     const cname = obj.constructor.name; // class name of component object
 
     if (className !== "" && className !== undefined) {
-        addMembers(obj, eval(className));
+        addMembers(obj, resolveObject(className));
         return;
     }
 
     // Add members of Model (class type has to be controller's name + "Model")
-    addMembers(obj, eval(cname + "." + cname + "Model"), modelArgs);
+    addMembers(obj, resolveObject(cname + "." + cname + "Model"), modelArgs);
 
     // Add members of View (class type has to be controller's name + "View")
-    addMembers(obj, eval(cname + "." + cname + "View"), viewArgs);
+    addMembers(obj, resolveObject(cname + "." + cname + "View"), viewArgs);
 };
 
 if (typeof module !== "undefined" && module.exports) {
