@@ -1187,8 +1187,7 @@ class Activity {
                     }
 
                     setTimeout(() => {
-                        // eslint-disable-next-line no-console
-                        console.log("Saving help artwork: " + name + "_block.svg");
+
                         const svg = "data:image/svg+xml;utf8," + that.printBlockSVG();
                         that.save.download("svg", svg, name + "_block.svg");
                     }, 500);

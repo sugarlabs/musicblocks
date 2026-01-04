@@ -40,7 +40,7 @@ function AIDebuggerWidget() {
         TIMEOUT: 30000
     };
 
-    console.log("AI Debugger Backend URL:", BACKEND_CONFIG.BASE_URL);
+
 
     /**
      * Chat history array to store conversation

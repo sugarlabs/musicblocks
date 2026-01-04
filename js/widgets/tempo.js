@@ -52,7 +52,7 @@ class Tempo {
         this._firstClickTimes = null;
         this._intervals = [];
         this.isMoving = true;
-        if (this._intervalID != undefined && this._intervalID != null) {
+        if (this._intervalID != null) {
             clearInterval(this._intervalID);
         }
 

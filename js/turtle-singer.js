@@ -83,7 +83,7 @@ class Singer {
         this.transpositionRatios = [];
 
         // Parameters used by notes
-        this.defaultNoteValue = 4;
+        this.defaultNoteValue = Singer.DEFAULT_NOTE_VALUE;
         this.register = 0;
         this.beatFactor = 1;
         this.dotCount = 0;
@@ -103,8 +103,8 @@ class Singer {
         this.previousNotePlayed = null;
         this.noteStatus = null;
         this.noteDirection = 0;
-        this.pitchNumberOffset = 39; // 39, C4
-        this.currentOctave = 4;
+        this.pitchNumberOffset = Singer.DEFAULT_PITCH_NUMBER_OFFSET;
+        this.currentOctave = Singer.DEFAULT_OCTAVE;
         this.currentCalculatedOctave = {}; // for a stand-alone pitch block
         this.inHarmonic = [];
         this.partials = [];
@@ -188,8 +188,8 @@ class Singer {
 
         // Parameters used in time signature
         this.pickup = 0;
-        this.beatsPerMeasure = 4;
-        this.noteValuePerBeat = 4;
+        this.beatsPerMeasure = Singer.DEFAULT_BEATS_PER_MEASURE;
+        this.noteValuePerBeat = Singer.DEFAULT_NOTE_VALUE_PER_BEAT;
         this.currentBeat = 0;
         this.currentMeasure = 0;
 
@@ -210,6 +210,13 @@ class Singer {
     static masterBPM = TARGETBPM;
     static defaultBPMFactor = TONEBPM / TARGETBPM;
     static masterVolume = [DEFAULTVOLUME];
+
+    // Musical Constants
+    static DEFAULT_PITCH_NUMBER_OFFSET = 39; // C4
+    static DEFAULT_OCTAVE = 4;
+    static DEFAULT_NOTE_VALUE = 4; // Quarter note
+    static DEFAULT_BEATS_PER_MEASURE = 4;
+    static DEFAULT_NOTE_VALUE_PER_BEAT = 4;
 
     // ========= Deprecated ===================================================
 

@@ -2583,7 +2583,7 @@ class PhraseMaker {
                 //eslint-disable-next-line no-console
                 console.debug("skipping " + obj[1] + " " + last(this.rowLabels));
                 this._sortedRowMap.push(last(this._sortedRowMap));
-                if (oldColumnBlockMap[sortedList[lastObj][3]] != undefined) {
+                if (oldColumnBlockMap[sortedList[lastObj][3]] != null) {
                     setTimeout(
                         this._removePitchBlock(oldColumnBlockMap[sortedList[lastObj][3]][0]),
                         500
@@ -2651,7 +2651,7 @@ class PhraseMaker {
     _export() {
         const exportWindow = window.open("");
         const exportDocument = exportWindow.document;
-        if (exportDocument === undefined) {
+        if (exportDocument == null) {
             //eslint-disable-next-line no-console
             console.debug("Could not create export window");
             return;
@@ -2955,7 +2955,7 @@ class PhraseMaker {
             obj = toFraction(numerator / (totalNoteInterval / tupletTimeFactor));
 
             if (obj[1] < 13) {
-                if (NOTESYMBOLS != undefined && obj[1] in NOTESYMBOLS) {
+                if (NOTESYMBOLS != null && obj[1] in NOTESYMBOLS) {
                     cell.innerHTML = `${obj[0]}<br>&mdash;<br>${obj[1]}<br>
                         <img 
                             src="${NOTESYMBOLS[obj[1]]}" 
@@ -3201,7 +3201,7 @@ class PhraseMaker {
                 continue;
             }
 
-            if (this.activity.blocks.blockList[blk] === undefined) {
+            if (this.activity.blocks.blockList[blk] == null) {
                 //eslint-disable-next-line no-console
                 console.debug("block " + blk + " is undefined");
                 continue;
@@ -4096,7 +4096,7 @@ class PhraseMaker {
             cell.setAttribute("id", j);
 
             cellTuplet = rowTuplet.cells[j];
-            if (cellTuplet !== undefined) {
+            if (cellTuplet != null) {
                 cellTuplet.setAttribute("id", j);
             }
 
@@ -4118,7 +4118,7 @@ class PhraseMaker {
                 }
             };
 
-            if (cellTuplet !== undefined) {
+            if (cellTuplet != null) {
                 if (this.activity.logo.tupletRhythms[0][0] === "notes") {
                     cell.onclick = event => {
                         this._createpiesubmenu(event.target.getAttribute("id"), null, "tupletnote");
@@ -4288,7 +4288,7 @@ class PhraseMaker {
                     row = this._rows[r];
                     if (row !== null && typeof row !== "undefined") {
                         cell = row.cells[c];
-                        if (cell != undefined) {
+                        if (cell != null) {
                             cell.style.backgroundColor = "black";
                             this._setNoteCell(r, c, cell, false, null);
                         }
@@ -4653,7 +4653,7 @@ class PhraseMaker {
                 row = this._noteValueRow;
                 cell = row.cells[this._colIndex];
 
-                if (cell != undefined) {
+                if (cell != null) {
                     cell.style.backgroundColor = platformColor.selectorBackground;
                     if (cell.colSpan > 1) {
                         row = this._tupletNoteValueRow;
@@ -4736,7 +4736,7 @@ class PhraseMaker {
 
             row = this._noteValueRow;
             cell = row.cells[this._colIndex];
-            if (cell != undefined) {
+            if (cell != null) {
                 if (cell.colSpan > 1) {
                     this._spanCounter += 1;
                     if (this._spanCounter === cell.colSpan) {
@@ -5120,7 +5120,7 @@ class PhraseMaker {
             // const x = idx + delta;
             let lastConnection, previousBlock, thisBlock;
 
-            if (note[0][0] === "R" || note[0][0] == undefined) {
+            if (note[0][0] === "R" || note[0][0] == null) {
                 // The last connection in last pitch block is null.
                 lastConnection = null;
                 if (delta === 5 || delta === 7) {

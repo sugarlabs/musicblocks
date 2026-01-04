@@ -16,7 +16,7 @@
   "extends": ["eslint:recommended"],
   "ignorePatterns": ["lib/**"],
   "rules": {
-    "no-console": "off",
+    "no-console": "warn",
     "no-unused-vars": "off",
     "no-use-before-define": "off",
     "prefer-const": "off",

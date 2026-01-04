@@ -762,7 +762,7 @@ class RhythmRuler {
 
                 const rhythmRulerTableRow = this._rulers[drum];
                 for (let j = 0; j < this._dissectHistory[i][0].length; j++) {
-                    if (this._dissectHistory[i][0][j] == undefined) {
+                    if (this._dissectHistory[i][0][j] == null) {
                         continue;
                     }
 
@@ -775,7 +775,7 @@ class RhythmRuler {
                         if (typeof this._dissectHistory[i][0][j][1] === "number") {
                             // dissect is [cell, num]
                             cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j][0]];
-                            if (cell != undefined) {
+                            if (cell != null) {
                                 this.__dissectByNumber(
                                     cell,
                                     this._dissectHistory[i][0][j][1],
@@ -789,7 +789,7 @@ class RhythmRuler {
                         } else {
                             // divide is [cell, [values]]
                             cell = rhythmRulerTableRow.cells[this._dissectHistory[i][0][j][0]];
-                            if (cell != undefined) {
+                            if (cell != null) {
                                 this.__divideFromList(
                                     cell,
                                     this._dissectHistory[i][0][j][1],
@@ -802,7 +802,7 @@ class RhythmRuler {
                         const history = this._dissectHistory[i][0][j];
                         this._mouseDownCell = rhythmRulerTableRow.cells[history[0][0]];
                         this._mouseUpCell = rhythmRulerTableRow.cells[last(history)[0]];
-                        if (this._mouseUpCell != undefined) {
+                        if (this._mouseUpCell != null) {
                             this.__tie(false);
                         }
 
@@ -926,7 +926,7 @@ class RhythmRuler {
         }
 
         this._rulerSelected = ruler;
-        if (this._rulerSelected == undefined) {
+        if (this._rulerSelected == null) {
             return;
         }
 
@@ -1244,7 +1244,7 @@ class RhythmRuler {
          * @returns {void}
          */
         const __clickHandler = event => {
-            if (event == undefined) return;
+            if (event == null) return;
             if (!this.__getLongPressStatus()) {
                 const cell = event.target;
                 if (cell !== null && cell.parentNode !== null) {
@@ -1298,7 +1298,7 @@ class RhythmRuler {
      * @returns {void}
      */
     __toggleRestState(cell, addToUndoList) {
-        if (cell !== null && cell.parentNode !== null && cell.parentNode !== undefined) {
+        if (cell != null && cell.parentNode != null) {
             this._rulerSelected = cell.parentNode.getAttribute("data-row");
             const noteValues = this.Rulers[this._rulerSelected][0];
             const noteValue = noteValues[cell.cellIndex];

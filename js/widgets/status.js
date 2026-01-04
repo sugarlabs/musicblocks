@@ -160,7 +160,7 @@ class StatusMatrix {
             }
             let str = label;
             str = label.charAt(0).toUpperCase() + label.slice(1);
-            // console.log(str);
+
             cell.innerHTML = `&nbsp;<b>${str}</b>`;
             cell.style.height = Math.floor(MATRIXBUTTONHEIGHT * this._cellScale) + "px";
             cell.style.backgroundColor = platformColor.selectorBackground;

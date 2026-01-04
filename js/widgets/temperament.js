@@ -1897,6 +1897,7 @@ function TemperamentWidget() {
                     this.notes[i].slice(-1)
                 ];
             }
+
             addTemperamentToDictionary(this.inTemperament, newTemperament);
             updateTemperaments();
         }
