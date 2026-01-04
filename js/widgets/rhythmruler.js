@@ -522,57 +522,18 @@ class RhythmRuler {
         // An input for setting the dissect number
         this._dissectNumber = widgetWindow.addInputButton("2");
 
-        this._dissectNumber.onfocus = () => {
-            // this._piemenuNumber(['2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16'], numberInput.value);
-        };
-
-        this._dissectNumber.onkeydown = event => {
-            if (event.keyCode === RhythmRuler.DEL) {
-                this._dissectNumber.value = this._dissectNumber.value.substring(
-                    0,
-                    this._dissectNumber.value.length - 1
-                );
-            }
-            if (event.keyCode === RhythmRuler.BACK) {
-                // Get the cursor position
-                const cursorPosition = this._dissectNumber.selectionStart;
-                // If there is a selection, delete the selected text
-                if (this._dissectNumber.selectionStart !== this._dissectNumber.selectionEnd) {
-                    const start = this._dissectNumber.selectionStart;
-                    const end = this._dissectNumber.selectionEnd;
-                    this._dissectNumber.value =
-                        this._dissectNumber.value.substring(0, start) +
-                        this._dissectNumber.value.substring(start, end + 1);
-                } else if (this._dissectNumber.value.length == 1 && cursorPosition == 1) {
-                    // If there is only a single digit in the input then replace it with an empty string
-                    this._dissectNumber.value = "";
-                } else if (cursorPosition > 0) {
-                    // If there is no selection and the cursor is not at the beginning, delete the character before the cursor
-                    const newValue =
-                        this._dissectNumber.value.substring(0, cursorPosition) +
-                        this._dissectNumber.value.substring(
-                            cursorPosition,
-                            this._dissectNumber.value
-                        );
-                    this._dissectNumber.value = newValue;
-                }
-                // If the cursor is at the beginning, do nothing
-            }
-        };
+        // Make the input read-only and show pie menu on click
+        this._dissectNumber.readOnly = true;
+        this._dissectNumber.style.cursor = "pointer";
 
         /**
-         * Event handler for the input event of the dissect number input.
-         * Limits the dissect number value to the range 2 to 128.
+         * Event handler for the click event of the dissect number input.
+         * Shows a pie menu for selecting the rhythm division number.
          * @private
          * @returns {void}
          */
-        this._dissectNumber.oninput = () => {
-            // Put a limit on the size (2 <--> 128).
-            this._dissectNumber.onmouseout = () => {
-                this._dissectNumber.value = Math.max(this._dissectNumber.value, 2);
-            };
-
-            this._dissectNumber.value = Math.max(Math.min(this._dissectNumber.value, 128), 2);
+        this._dissectNumber.onclick = () => {
+            this._showDissectNumberPieMenu();
         };
 
         /**
@@ -862,6 +823,152 @@ class RhythmRuler {
                 });
             }
         });
+    }
+
+    /**
+     * Shows a pie menu for selecting the rhythm dissect number.
+     * Displays different options based on beginner mode.
+     * @private
+     * @returns {void}
+     */
+    /**
+     * Shows a pie menu for selecting the rhythm dissect number.
+     * Displays different options based on beginner mode.
+     * @private
+     * @returns {void}
+     */
+    _showDissectNumberPieMenu() {
+        // Use activity.beginnerMode as the global beginnerMode variable references the DOM element
+        const isBeginnerMode = this.activity.beginnerMode;
+
+        // Determine wheel values based on beginner mode
+        const wheelValues = isBeginnerMode ? [2, 3, 4] : [2, 3, 4, 5, 7];
+
+        const currentValue = parseInt(this._dissectNumber.value) || 2;
+
+        // Show the wheel div
+        docById("wheelDiv").style.display = "";
+
+        // Create the number wheel
+        const numberWheel = new wheelnav("wheelDiv", null, 600, 600);
+        const exitWheel = new wheelnav("_exitWheel", numberWheel.raphael);
+
+        // Prepare labels with spacer
+        const wheelLabels = wheelValues.map(v => v.toString());
+        wheelLabels.push(null); // spacer
+
+        wheelnav.cssMode = true;
+        numberWheel.keynavigateEnabled = false;
+        numberWheel.colors = platformColor.numberWheelcolors;
+        numberWheel.slicePathFunction = slicePath().DonutSlice;
+        numberWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        numberWheel.slicePathCustom.minRadiusPercent = 0.2;
+        numberWheel.slicePathCustom.maxRadiusPercent = 0.6;
+        numberWheel.sliceSelectedPathCustom = numberWheel.slicePathCustom;
+        numberWheel.sliceInitPathCustom = numberWheel.slicePathCustom;
+        numberWheel.animatetime = 0;
+        numberWheel.createWheel(wheelLabels);
+
+        // Create exit wheel with close, minus, and plus buttons
+        exitWheel.colors = platformColor.exitWheelcolors2;
+        exitWheel.slicePathFunction = slicePath().DonutSlice;
+        exitWheel.slicePathCustom = slicePath().DonutSliceCustomization();
+        exitWheel.slicePathCustom.minRadiusPercent = 0.0;
+        exitWheel.slicePathCustom.maxRadiusPercent = 0.2;
+        exitWheel.sliceSelectedPathCustom = exitWheel.slicePathCustom;
+        exitWheel.sliceInitPathCustom = exitWheel.slicePathCustom;
+        exitWheel.clickModeRotate = false;
+        exitWheel.initWheel(["×", "-", "+"]); // Close, minus, plus
+        exitWheel.navItems[0].sliceSelectedAttr.cursor = "pointer";
+        exitWheel.navItems[0].sliceHoverAttr.cursor = "pointer";
+        exitWheel.navItems[0].titleSelectedAttr.cursor = "pointer";
+        exitWheel.navItems[0].titleHoverAttr.cursor = "pointer";
+        exitWheel.navItems[1].sliceSelectedAttr.cursor = "pointer";
+        exitWheel.navItems[1].sliceHoverAttr.cursor = "pointer";
+        exitWheel.navItems[1].titleSelectedAttr.cursor = "pointer";
+        exitWheel.navItems[1].titleHoverAttr.cursor = "pointer";
+        exitWheel.navItems[2].sliceSelectedAttr.cursor = "pointer";
+        exitWheel.navItems[2].sliceHoverAttr.cursor = "pointer";
+        exitWheel.navItems[2].titleSelectedAttr.cursor = "pointer";
+        exitWheel.navItems[2].titleHoverAttr.cursor = "pointer";
+        exitWheel.createWheel();
+
+        const widget = this;
+
+        // Handle selection
+        const __selectionChanged = () => {
+            const selectedIndex = numberWheel.selectedNavItemIndex;
+            const newValue = wheelValues[selectedIndex];
+            widget._dissectNumber.value = newValue;
+        };
+
+        // Handle exit
+        const __exitMenu = () => {
+            docById("wheelDiv").style.display = "none";
+            numberWheel.removeWheel();
+            exitWheel.removeWheel();
+        };
+
+        // Get button position for positioning the pie menu
+        const buttonRect = this._dissectNumber.getBoundingClientRect();
+        const canvasLeft = this.activity.canvas.offsetLeft + 28;
+        const canvasTop = this.activity.canvas.offsetTop + 6;
+
+        // Position the wheel
+        docById("wheelDiv").style.position = "absolute";
+        setWheelSize(300);
+
+        const left = Math.round(buttonRect.left - canvasLeft);
+        const top = Math.round(buttonRect.top - canvasTop);
+
+        // Position to the left of the button as shown in user image
+        // left - 300 (wheel size) - 10px padding
+        // top + half button height - 150 (half wheel size) for vertical centering
+        docById("wheelDiv").style.left = Math.max(0, left - 300 - 10) + "px";
+        docById("wheelDiv").style.top = Math.max(0, top + buttonRect.height / 2 - 150) + "px";
+
+        // Navigate to current value
+        const currentIndex = wheelValues.indexOf(currentValue);
+        if (currentIndex !== -1) {
+            numberWheel.navigateWheel(currentIndex);
+        }
+
+        // Set up click handlers for number selections
+        for (let i = 0; i < wheelValues.length; i++) {
+            numberWheel.navItems[i].navigateFunction = () => {
+                __selectionChanged();
+                __exitMenu();
+            };
+        }
+
+        // Set up exit button (×)
+        exitWheel.navItems[0].navigateFunction = () => {
+            __exitMenu();
+        };
+
+        // Set up decrement button (-)
+        exitWheel.navItems[1].navigateFunction = () => {
+            const currentVal = parseInt(widget._dissectNumber.value);
+            const currentIdx = wheelValues.indexOf(currentVal);
+
+            // Move to previous value in the array, or stay at first
+            if (currentIdx > 0) {
+                const newValue = wheelValues[currentIdx - 1];
+                widget._dissectNumber.value = newValue;
+            }
+        };
+
+        // Set up increment button (+)
+        exitWheel.navItems[2].navigateFunction = () => {
+            const currentVal = parseInt(widget._dissectNumber.value);
+            const currentIdx = wheelValues.indexOf(currentVal);
+
+            // Move to next value in the array, or stay at last
+            if (currentIdx < wheelValues.length - 1) {
+                const newValue = wheelValues[currentIdx + 1];
+                widget._dissectNumber.value = newValue;
+            }
+        };
     }
 
     /**
