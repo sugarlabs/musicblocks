@@ -1187,7 +1187,6 @@ class Activity {
                     }
 
                     setTimeout(() => {
-
                         const svg = "data:image/svg+xml;utf8," + that.printBlockSVG();
                         that.save.download("svg", svg, name + "_block.svg");
                     }, 500);

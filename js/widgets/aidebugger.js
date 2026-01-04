@@ -40,8 +40,6 @@ function AIDebuggerWidget() {
         TIMEOUT: 30000
     };
 
-
-
     /**
      * Chat history array to store conversation
      * @type {Array}
