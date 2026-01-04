@@ -1595,6 +1595,18 @@ let closeBlkWidgets = name => {
 };
 
 /**
+ * Safely resolves a dot-notation string path to an object property globally.
+ * @param {string} path - The dot-notation path (e.g., "MyClass.Model").
+ * @returns {Object|undefined} The resolved object or undefined.
+ */
+const resolveObject = path => {
+    if (!path) return undefined;
+    return path.split(".").reduce((obj, prop) => {
+        return obj && obj[prop];
+    }, window);
+};
+
+/**
  * Imports methods and variables of model and view objects to the controller object.
  *
  * @param {Object} obj - The component object (controller) to which members of its model and view are imported.
@@ -1604,18 +1616,6 @@ let closeBlkWidgets = name => {
  * @returns {void}
  */
 let importMembers = (obj, className, modelArgs, viewArgs) => {
-    /**
-     * Safely resolves a dot-notation string path to an object property globally.
-     * @param {string} path - The dot-notation path (e.g., "MyClass.Model").
-     * @returns {Object|undefined} The resolved object or undefined.
-     */
-    const resolveObject = path => {
-        if (!path) return undefined;
-        return path.split(".").reduce((obj, prop) => {
-            return obj && obj[prop];
-        }, window);
-    };
-
     /**
      * Adds methods and variables of one class to another class's instance.
      *
