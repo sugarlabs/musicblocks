@@ -87,7 +87,7 @@ const validate = () => {
 // Watch task: watch SASS , CSS and JS files for changes
 // If any change, run sass, css and js tasks simultaneously
 const watchTask = () => {
-    watch([ files.jsPath, files.cssPath, files.sassPath ],
+    return watch([ files.jsPath, files.cssPath, files.sassPath ],
         parallel( jsTask, cssTask, sassTask));
 };
 
@@ -97,5 +97,6 @@ const watchTask = () => {
 exports.default = series(
     parallel( jsTask, cssTask , sassTask ), prettify,
     cacheBustTask,
-    watchTask, validate
+    validate,
+    watchTask
 );
