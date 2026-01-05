@@ -748,9 +748,9 @@ describe("frequencyToPitch", () => {
         expect(frequencyToPitch(20)).toEqual(["A", 0, 0]);
         expect(frequencyToPitch(27.4)).toEqual(["A", 0, 0]);
     });
-    it("should handle frequencies above C8", () => {
-        expect(frequencyToPitch(4200)).toEqual(["C", 8, 0]);
-        expect(frequencyToPitch(5000)).toEqual(["C", 8, 0]);
+    it("should handle frequencies above C10", () => {
+        expect(frequencyToPitch(17000)).toEqual(["C", 10, 0]);
+        expect(frequencyToPitch(20000)).toEqual(["C", 10, 0]);
     });
     it("should handle frequencies with cents deviation", () => {
         const result = frequencyToPitch(442);

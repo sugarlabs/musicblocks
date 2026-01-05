@@ -2867,7 +2867,7 @@ const frequencyToPitch = hz => {
 
     // Calculate cents to keep track of drift
     let cents = 0;
-    for (let i = 0; i < 8 * 1200; i++) {
+    for (let i = 0; i < 10 * 1200; i++) {
         const f = A0 * Math.pow(TWELVEHUNDRETHROOT2, i);
         if (hz < f * 1.0003 && hz > f * 0.9997) {
             cents = i % 100;
