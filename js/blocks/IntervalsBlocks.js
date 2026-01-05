@@ -852,98 +852,98 @@ function setupIntervalsBlocks(activity) {
             logo.setTurtleListener(turtle, listenerName, __listener);
 
             const setupConnections = () => {
-                if (logo.connectionStoreLock) {
-                    setTimeout(setupConnections, 10);
-                    return;
-                }
-
-                logo.connectionStoreLock = true;
-
-                // Check to see if another turtle has already disconnected these blocks
-                const otherTurtle = __lookForOtherTurtles(blk, turtle);
-                if (otherTurtle != null) {
-                    // Copy the connections and queue the blocks.
-                    logo.connectionStore[turtle][blk] = [];
-                    for (let i = logo.connectionStore[otherTurtle][blk].length; i > 0; i--) {
-                        const obj = [
-                            logo.connectionStore[otherTurtle][blk][i - 1][0],
-                            logo.connectionStore[otherTurtle][blk][i - 1][1],
-                            logo.connectionStore[otherTurtle][blk][i - 1][2]
-                        ];
-                        logo.connectionStore[turtle][blk].push(obj);
+                let setupRetryCount = 0;
+                const maxSetupRetries = 1000;
+                const performSetup = () => {
+                    if (logo.connectionStoreLock) {
+                         if (setupRetryCount >= maxSetupRetries) {
+                            // eslint-disable-next-line no-console
+                            console.warn("setupConnections: connectionStoreLock stuck; proceeding after max retries.");
+                        } else {
+                            setupRetryCount += 1;
+                            setTimeout(performSetup, 10);
+                            return;
+                        }
                     }
-                } else {
-                    // Disconnect the blocks and queue them (so they don't move).
-                    logo.connectionStore[turtle][blk] = [];
-                    logo.disconnectBlock(blk);
-                }
 
-                logo.connectionStoreLock = false;
+                    logo.connectionStoreLock = true;
+
+                    // Check to see if another turtle has already disconnected these blocks
+                    const otherTurtle = __lookForOtherTurtles(blk, turtle);
+                    if (otherTurtle != null) {
+                        // Copy the connections and queue the blocks.
+                        logo.connectionStore[turtle][blk] = [];
+                        for (let i = logo.connectionStore[otherTurtle][blk].length; i > 0; i--) {
+                            const obj = [
+                                logo.connectionStore[otherTurtle][blk][i - 1][0],
+                                logo.connectionStore[otherTurtle][blk][i - 1][1],
+                                logo.connectionStore[otherTurtle][blk][i - 1][2]
+                            ];
+                            logo.connectionStore[turtle][blk].push(obj);
+                            
+                            // Queue logic copied from original logic that was outside setupConnections
+                            let child = obj[0];
+                            if (activity.blocks.blockList[child].name === "hidden") {
+                                child = activity.blocks.blockList[child].connections[0];
+                            }
+
+                            const queueBlock = new Queue(child, factor, blk, receivedArg);
+                            tur.parentFlowQueue.push(blk);
+                            tur.queue.push(queueBlock);
+                        }
+                    } else {
+                        // Disconnect the blocks and queue them (so they don't move).
+                        logo.connectionStore[turtle][blk] = [];
+                        logo.disconnectBlock(blk);
+                        
+                        // Queue logic for standard disconnection
+                        let child = activity.blocks.findBottomBlock(args[1]);
+                        while (child != blk) {
+                            if (activity.blocks.blockList[child].name !== "hidden") {
+                                const queueBlock = new Queue(child, factor, blk, receivedArg);
+                                tur.parentFlowQueue.push(blk);
+                                tur.queue.push(queueBlock);
+                            }
+                            child = activity.blocks.blockList[child].connections[0];
+                        }
+
+                        // Break the connections between blocks in the clamp so
+                        // that when we run the queues, only the individual blocks,
+                        // each inserted into a semitoneinterval block, run.
+                        logo.connectionStore[turtle][blk] = [];
+                        child = args[1];
+                        while (child != null) {
+                            const lastConnection = activity.blocks.blockList[child].connections.length - 1;
+                            const nextBlk = activity.blocks.blockList[child].connections[lastConnection];
+                            // Don't disconnect a hidden block from its parent.
+                            if (nextBlk != null && activity.blocks.blockList[nextBlk].name === "hidden") {
+                                logo.connectionStore[turtle][blk].push([
+                                    nextBlk,
+                                    1,
+                                    activity.blocks.blockList[nextBlk].connections[1]
+                                ]);
+                                child = activity.blocks.blockList[nextBlk].connections[1];
+                                activity.blocks.blockList[nextBlk].connections[1] = null;
+                            } else {
+                                logo.connectionStore[turtle][blk].push([child, lastConnection, nextBlk]);
+                                activity.blocks.blockList[child].connections[lastConnection] = null;
+                                child = nextBlk;
+                            }
+
+                            if (child != null) {
+                                activity.blocks.blockList[child].connections[0] = null;
+                            }
+                        }
+                    }
+    
+                    logo.connectionStoreLock = false;
+                };
+                performSetup();
             };
             setupConnections();
 
-            // Check to see if another turtle has already disconnected these blocks
-            const otherTurtle = __lookForOtherTurtles(blk, turtle);
-            if (otherTurtle != null) {
-                // Copy the connections and queue the blocks.
-                logo.connectionStore[turtle][blk] = [];
-                for (let i = logo.connectionStore[otherTurtle][blk].length; i > 0; i--) {
-                    const obj = [
-                        logo.connectionStore[otherTurtle][blk][i - 1][0],
-                        logo.connectionStore[otherTurtle][blk][i - 1][1],
-                        logo.connectionStore[otherTurtle][blk][i - 1][2]
-                    ];
-                    logo.connectionStore[turtle][blk].push(obj);
-                    let child = obj[0];
-                    if (activity.blocks.blockList[child].name === "hidden") {
-                        child = activity.blocks.blockList[child].connections[0];
-                    }
 
-                    const queueBlock = new Queue(child, factor, blk, receivedArg);
-                    tur.parentFlowQueue.push(blk);
-                    tur.queue.push(queueBlock);
-                }
-            } else {
-                let child = activity.blocks.findBottomBlock(args[1]);
-                while (child != blk) {
-                    if (activity.blocks.blockList[child].name !== "hidden") {
-                        const queueBlock = new Queue(child, factor, blk, receivedArg);
-                        tur.parentFlowQueue.push(blk);
-                        tur.queue.push(queueBlock);
-                    }
-                    child = activity.blocks.blockList[child].connections[0];
-                }
 
-                // Break the connections between blocks in the clamp so
-                // that when we run the queues, only the individual blocks,
-                // each inserted into a semitoneinterval block, run.
-                logo.connectionStore[turtle][blk] = [];
-                child = args[1];
-                while (child != null) {
-                    const lastConnection = activity.blocks.blockList[child].connections.length - 1;
-                    const nextBlk = activity.blocks.blockList[child].connections[lastConnection];
-                    // Don't disconnect a hidden block from its parent.
-                    if (nextBlk != null && activity.blocks.blockList[nextBlk].name === "hidden") {
-                        logo.connectionStore[turtle][blk].push([
-                            nextBlk,
-                            1,
-                            activity.blocks.blockList[nextBlk].connections[1]
-                        ]);
-                        child = activity.blocks.blockList[nextBlk].connections[1];
-                        activity.blocks.blockList[nextBlk].connections[1] = null;
-                    } else {
-                        logo.connectionStore[turtle][blk].push([child, lastConnection, nextBlk]);
-                        activity.blocks.blockList[child].connections[lastConnection] = null;
-                        child = nextBlk;
-                    }
-
-                    if (child != null) {
-                        activity.blocks.blockList[child].connections[0] = null;
-                    }
-                }
-            }
-
-            logo.connectionStoreLock = false;
         }
     }
 

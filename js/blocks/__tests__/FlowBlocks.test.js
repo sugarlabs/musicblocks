@@ -160,7 +160,8 @@ describe("FlowBlocks integration", () => {
             runFromBlockNow: jest.fn(),
             stopTurtle: false,
             firstNoteTime: null,
-            receivedArg: null
+            receivedArg: null,
+            disconnectBlock: jest.fn()
         };
 
         setupFlowBlocks(activity);
@@ -269,9 +270,14 @@ describe("FlowBlocks integration", () => {
         activity.blocks.blockList[4] = { name: "hidden", connections: [6, null] };
         activity.blocks.blockList[5] = { name: "visibleC", connections: [null] };
         activity.blocks.blockList[6] = { name: "visibleD", connections: [null] };
+
+        
+        jest.useFakeTimers();
         logo.connectionStoreLock = true;
         block.flow([3, 4], logo, 0, blk, ["arg"]);
+        jest.runAllTimers();
         expect(logo.connectionStoreLock).toBe(false);
+        jest.useRealTimers();
 
         // Non-number input triggers NOINPUT branch
         logo.connectionStore = { 0: { [blk]: [] } };
