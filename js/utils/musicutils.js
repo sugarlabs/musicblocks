@@ -853,6 +853,7 @@ const TWELTHROOT2 = 1.0594630943592953;
 const TWELVEHUNDRETHROOT2 = 1.0005777895065549;
 const A0 = 27.5;
 const C8 = 4186.01;
+const C10 = 16744.04;
 
 /**
  * Octave ratio.
@@ -2860,9 +2861,8 @@ const frequencyToPitch = hz => {
 
     if (hz < A0) {
         return ["A", 0, 0];
-    } else if (hz > C8) {
-        // FIXME: set upper bound of C10
-        return ["C", 8, 0];
+    } else if (hz > C10) {
+        return ["C", 10, 0];
     }
 
     // Calculate cents to keep track of drift
