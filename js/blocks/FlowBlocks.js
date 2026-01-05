@@ -202,44 +202,66 @@ function setupFlowBlocks(activity) {
                     tur.singer.inDuplicate = false;
                     tur.singer.duplicateFactor /= factor;
 
-                    // Check for a race condition
-                    // FIXME: Do something about the race condition
-                    if (logo.connectionStoreLock) {
-                        console.debug("LOCKED");
-                    }
-
-                    logo.connectionStoreLock = true;
-
-                    // The last turtle should restore the broken connections
-                    if (__lookForOtherTurtles(blk, turtle) === null) {
-                        const n = logo.connectionStore[turtle][blk].length;
-                        for (let i = 0; i < n; i++) {
-                            const obj = logo.connectionStore[turtle][blk].pop();
-                            activity.blocks.blockList[obj[0]].connections[obj[1]] = obj[2];
-                            if (obj[2] != null) {
-                                activity.blocks.blockList[obj[2]].connections[0] = obj[0];
-                            }
+                    const restoreConnections = () => {
+                        if (logo.connectionStoreLock) {
+                            setTimeout(restoreConnections, 10);
+                            return;
                         }
-                    } else {
-                        delete logo.connectionStore[turtle][blk];
-                    }
 
-                    logo.connectionStoreLock = false;
+                        logo.connectionStoreLock = true;
+
+                        // The last turtle should restore the broken connections
+                        if (__lookForOtherTurtles(blk, turtle) === null) {
+                            const n = logo.connectionStore[turtle][blk].length;
+                            for (let i = 0; i < n; i++) {
+                                const obj = logo.connectionStore[turtle][blk].pop();
+                                activity.blocks.blockList[obj[0]].connections[obj[1]] = obj[2];
+                                if (obj[2] != null) {
+                                    activity.blocks.blockList[obj[2]].connections[0] = obj[0];
+                                }
+                            }
+                        } else {
+                            delete logo.connectionStore[turtle][blk];
+                        }
+
+                        logo.connectionStoreLock = false;
+                    };
+                    restoreConnections();
                 };
 
                 // Set the turtle listener
                 logo.setTurtleListener(turtle, listenerName, __listener);
 
-                // Test for race condition
-                // FIXME: Do something about the race condition
-                if (logo.connectionStoreLock) {
-                    console.debug("LOCKED");
-                }
+                const setupConnections = () => {
+                    if (logo.connectionStoreLock) {
+                        setTimeout(setupConnections, 10);
+                        return;
+                    }
 
-                logo.connectionStoreLock = true;
+                    logo.connectionStoreLock = true;
 
-                // Check to see if another turtle has already disconnected these blocks
-                const otherTurtle = __lookForOtherTurtles(blk, turtle);
+                    // Check to see if another turtle has already disconnected these blocks
+                    const otherTurtle = __lookForOtherTurtles(blk, turtle);
+                    if (otherTurtle != null) {
+                        // Copy the connections and queue the blocks
+                        logo.connectionStore[turtle][blk] = [];
+                        for (let i = logo.connectionStore[otherTurtle][blk].length; i > 0; i--) {
+                            const obj = [
+                                logo.connectionStore[otherTurtle][blk][i - 1][0],
+                                logo.connectionStore[otherTurtle][blk][i - 1][1],
+                                logo.connectionStore[otherTurtle][blk][i - 1][2]
+                            ];
+                            logo.connectionStore[turtle][blk].push(obj);
+                        }
+                    } else {
+                        // Disconnect the blocks and queue them (so they don't move)
+                        logo.connectionStore[turtle][blk] = [];
+                        logo.disconnectBlock(blk);
+                    }
+
+                    logo.connectionStoreLock = false;
+                };
+                setupConnections();
                 if (otherTurtle != null) {
                     // Copy the connections and queue the blocks
                     logo.connectionStore[turtle][blk] = [];
