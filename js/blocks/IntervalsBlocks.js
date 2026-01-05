@@ -822,11 +822,21 @@ function setupIntervalsBlocks(activity) {
                 tur.singer.inDuplicate = false;
                 tur.singer.duplicateFactor /= factor;
                 tur.singer.arpeggio = [];
-                
+
+                let retryCount = 0;
+                const maxRetries = 1000;
                 const restoreConnections = () => {
                     if (logo.connectionStoreLock) {
-                        setTimeout(restoreConnections, 10);
-                        return;
+                        if (retryCount >= maxRetries) {
+                            // eslint-disable-next-line no-console
+                            console.warn(
+                                "restoreConnections: connectionStoreLock stuck; proceeding after max retries."
+                            );
+                        } else {
+                            retryCount += 1;
+                            setTimeout(restoreConnections, 10);
+                            return;
+                        }
                     }
 
                     logo.connectionStoreLock = true;
@@ -856,9 +866,11 @@ function setupIntervalsBlocks(activity) {
                 const maxSetupRetries = 1000;
                 const performSetup = () => {
                     if (logo.connectionStoreLock) {
-                         if (setupRetryCount >= maxSetupRetries) {
+                        if (setupRetryCount >= maxSetupRetries) {
                             // eslint-disable-next-line no-console
-                            console.warn("setupConnections: connectionStoreLock stuck; proceeding after max retries.");
+                            console.warn(
+                                "setupConnections: connectionStoreLock stuck; proceeding after max retries."
+                            );
                         } else {
                             setupRetryCount += 1;
                             setTimeout(performSetup, 10);
@@ -880,7 +892,7 @@ function setupIntervalsBlocks(activity) {
                                 logo.connectionStore[otherTurtle][blk][i - 1][2]
                             ];
                             logo.connectionStore[turtle][blk].push(obj);
-                            
+
                             // Queue logic copied from original logic that was outside setupConnections
                             let child = obj[0];
                             if (activity.blocks.blockList[child].name === "hidden") {
@@ -895,7 +907,7 @@ function setupIntervalsBlocks(activity) {
                         // Disconnect the blocks and queue them (so they don't move).
                         logo.connectionStore[turtle][blk] = [];
                         logo.disconnectBlock(blk);
-                        
+
                         // Queue logic for standard disconnection
                         let child = activity.blocks.findBottomBlock(args[1]);
                         while (child != blk) {
@@ -913,10 +925,15 @@ function setupIntervalsBlocks(activity) {
                         logo.connectionStore[turtle][blk] = [];
                         child = args[1];
                         while (child != null) {
-                            const lastConnection = activity.blocks.blockList[child].connections.length - 1;
-                            const nextBlk = activity.blocks.blockList[child].connections[lastConnection];
+                            const lastConnection =
+                                activity.blocks.blockList[child].connections.length - 1;
+                            const nextBlk =
+                                activity.blocks.blockList[child].connections[lastConnection];
                             // Don't disconnect a hidden block from its parent.
-                            if (nextBlk != null && activity.blocks.blockList[nextBlk].name === "hidden") {
+                            if (
+                                nextBlk != null &&
+                                activity.blocks.blockList[nextBlk].name === "hidden"
+                            ) {
                                 logo.connectionStore[turtle][blk].push([
                                     nextBlk,
                                     1,
@@ -925,7 +942,11 @@ function setupIntervalsBlocks(activity) {
                                 child = activity.blocks.blockList[nextBlk].connections[1];
                                 activity.blocks.blockList[nextBlk].connections[1] = null;
                             } else {
-                                logo.connectionStore[turtle][blk].push([child, lastConnection, nextBlk]);
+                                logo.connectionStore[turtle][blk].push([
+                                    child,
+                                    lastConnection,
+                                    nextBlk
+                                ]);
                                 activity.blocks.blockList[child].connections[lastConnection] = null;
                                 child = nextBlk;
                             }
@@ -935,15 +956,12 @@ function setupIntervalsBlocks(activity) {
                             }
                         }
                     }
-    
+
                     logo.connectionStoreLock = false;
                 };
                 performSetup();
             };
             setupConnections();
-
-
-
         }
     }
 

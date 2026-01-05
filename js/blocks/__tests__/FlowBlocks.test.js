@@ -271,7 +271,6 @@ describe("FlowBlocks integration", () => {
         activity.blocks.blockList[5] = { name: "visibleC", connections: [null] };
         activity.blocks.blockList[6] = { name: "visibleD", connections: [null] };
 
-        
         jest.useFakeTimers();
         logo.connectionStoreLock = true;
         block.flow([3, 4], logo, 0, blk, ["arg"]);

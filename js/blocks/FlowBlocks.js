@@ -209,7 +209,9 @@ function setupFlowBlocks(activity) {
                         if (logo.connectionStoreLock) {
                             if (retryCount >= maxRetries) {
                                 // eslint-disable-next-line no-console
-                                console.warn("restoreConnections: connectionStoreLock stuck; proceeding after max retries.");
+                                console.warn(
+                                    "restoreConnections: connectionStoreLock stuck; proceeding after max retries."
+                                );
                             } else {
                                 retryCount += 1;
                                 setTimeout(restoreConnections, 10);
@@ -245,13 +247,13 @@ function setupFlowBlocks(activity) {
                 const maxSetupRetries = 1000;
                 const setupConnections = () => {
                     if (logo.connectionStoreLock) {
-                         if (setupRetryCount >= maxSetupRetries) {
+                        if (setupRetryCount >= maxSetupRetries) {
                             // eslint-disable-next-line no-console
-                            console.warn("setupConnections: connectionStoreLock stuck; proceeding after max retries.");
-                            console.log("DEBUG: Force proceeding");
+                            console.warn(
+                                "setupConnections: connectionStoreLock stuck; proceeding after max retries."
+                            );
                         } else {
                             setupRetryCount += 1;
-                            // console.log("DEBUG: Retrying setup", setupRetryCount);
                             setTimeout(setupConnections, 10);
                             return;
                         }
@@ -287,7 +289,7 @@ function setupFlowBlocks(activity) {
                         // Disconnect the blocks and queue them (so they don't move)
                         logo.connectionStore[turtle][blk] = [];
                         logo.disconnectBlock(blk);
-                        
+
                         // Queue logic for new disconnection
                         let child = args[1];
                         while (child != null) {
@@ -329,8 +331,6 @@ function setupFlowBlocks(activity) {
             }
         }
     }
-
-
 
     /**
      * Represents a block for defining the default action inside a Switch block.
