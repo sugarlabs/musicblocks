@@ -1,8 +1,7 @@
-import StatsWindow from './statistics.js';
-
+const { StatsWindow } = require('./statistics');
 describe('StatsWindow', () => {
     let mockActivity;
-    let mockWidgetWindow;
+    let mockWidgetWindow;   
 
     beforeEach(() => {
         // Mock the Activity object
