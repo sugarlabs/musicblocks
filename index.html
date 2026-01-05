@@ -531,6 +531,20 @@ document.addEventListener("DOMContentLoaded", init);
         }
     </script>
     <script>
+        let deferredPrompt;
+
+        window.addEventListener("beforeinstallprompt", (event) => {
+            event.preventDefault(); // Prevent automatic browser prompt
+            deferredPrompt = event;
+
+            // Show your install button here
+            const divInstall = document.getElementById("installButton");
+            if (divInstall) {
+                divInstall.classList.remove("hidden");
+            }
+        });
+    </script>
+    <script>
         $(document).ready(function () {
             doSearch();
         });
