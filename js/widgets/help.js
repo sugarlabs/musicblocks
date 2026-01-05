@@ -52,6 +52,8 @@ class HelpWidget {
         widgetWindow.onclose = () => {
             this.isOpen = false;
             document.onkeydown = activity.__keyPressed;
+            const arrow = document.getElementById("tour-pointer");
+            if (arrow) arrow.style.display = "none";
             widgetWindow.destroy();
         };
         // Position the widget and make it visible.
@@ -62,6 +64,13 @@ class HelpWidget {
 
         // Position center
         setTimeout(this.widgetWindow.sendToCenter, 50);
+
+        // Create tour pointer if not exists
+        if (!document.getElementById("tour-pointer")) {
+            const arrow = document.createElement("div");
+            arrow.id = "tour-pointer";
+            document.body.appendChild(arrow);
+        }
     }
 
     /**
@@ -350,10 +359,22 @@ class HelpWidget {
 
         body += helpContentHTML;
 
-        if (HELPCONTENT[page].length > 3) {
+        if (HELPCONTENT[page].length > 3 && HELPCONTENT[page][3]) {
             const link = HELPCONTENT[page][3];
             // console.debug(page + " " + link);
             body += `<p><a href="${link}" target="_blank">${HELPCONTENT[page][4]}</a></p>`;
+        }
+
+        // Special case: Meet Mr. Mouse! (page 1) - always point to center
+        if (page === 1) {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            // console.log("Tour: Pointing to center for Mr. Mouse:", centerX, centerY);
+            this._pointTo({ x: centerX, y: centerY });
+        } else if (HELPCONTENT[page].length > 5 && HELPCONTENT[page][5]) {
+            this._pointTo(HELPCONTENT[page][5]);
+        } else {
+            this._pointTo(null);
         }
 
         if ([_("Congratulations.")].includes(HELPCONTENT[page][0])) {
@@ -651,6 +672,36 @@ class HelpWidget {
             if (HELPCONTENT[i].includes(pageName)) {
                 this._showPage(i);
             }
+        }
+    }
+
+    _pointTo(id) {
+        let arrow = document.getElementById("tour-pointer");
+        if (!arrow) {
+            // Create if missing (sanity check)
+            arrow = document.createElement("div");
+            arrow.id = "tour-pointer";
+            document.body.appendChild(arrow);
+        }
+
+        if (id && typeof id === 'object' && id.x !== undefined) {
+            // Point to specific coordinates
+            console.log("Tour pointer: setting to coordinates", id.x, id.y);
+            arrow.style.display = "block";
+            arrow.style.left = (id.x - 10) + "px"; // Centered horizontally (20px wide arrow)
+            arrow.style.top = (id.y + 20) + "px"; // 20px below center (closer to Mr Mouse)
+            return;
+        }
+
+        const target = id ? document.getElementById(id) : null;
+        if (target && target.offsetParent !== null) { // Check if visible
+            const rect = target.getBoundingClientRect();
+            arrow.style.display = "block";
+            // Default: Arrow below element, pointing UP
+            arrow.style.left = (rect.left + rect.width / 2 - 10) + "px";
+            arrow.style.top = (rect.bottom + 5) + "px";
+        } else {
+            arrow.style.display = "none";
         }
     }
 }
