@@ -4315,6 +4315,13 @@ class Activity {
          * When turtle stops running restore stop button to normal state
          */
         this.onStopTurtle = () => {
+            // Disable stop button when playback ends
+            const stopIcon = docById("stop");
+            if (stopIcon) {
+                stopIcon.style.pointerEvents = "none";
+                stopIcon.classList.add("grey-text", "inactiveLink");
+                stopIcon.style.color = "white";
+            }
             // TODO: plugin support
         };
 
@@ -4322,6 +4329,13 @@ class Activity {
          * When turtle starts running change stop button to running state
          */
         this.onRunTurtle = () => {
+            // Enable stop button when playback starts
+            const stopIcon = docById("stop");
+            if (stopIcon) {
+                stopIcon.style.pointerEvents = "auto";
+                stopIcon.classList.remove("grey-text", "inactiveLink");
+                stopIcon.style.color = platformColor.stopIconcolor;
+            }
             // TODO: plugin support
         };
 
