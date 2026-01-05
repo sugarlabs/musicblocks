@@ -2408,3 +2408,35 @@ class Logo {
         tur.embeddedGraphicsFinished = true;
     }
 }
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        Queue,
+        Logo,
+        DEFAULTVOLUME,
+        PREVIEWVOLUME,
+        DEFAULTDELAY,
+        OSCVOLUMEADJUSTMENT,
+        TONEBPM,
+        TARGETBPM,
+        TURTLESTEP,
+        NOTEDIV,
+        NOMICERRORMSG,
+        NANERRORMSG,
+        NOSTRINGERRORMSG,
+        NOBOXERRORMSG,
+        NOACTIONERRORMSG,
+        NOINPUTERRORMSG,
+        NOSQRTERRORMSG,
+        ZERODIVIDEERRORMSG,
+        EMPTYHEAPERRORMSG,
+        POSNUMBER,
+        NOTATIONNOTE,
+        NOTATIONDURATION,
+        NOTATIONDOTCOUNT,
+        NOTATIONTUPLETVALUE,
+        NOTATIONROUNDDOWN,
+        NOTATIONINSIDECHORD,
+        NOTATIONSTACCATO
+    };
+}
