@@ -293,8 +293,8 @@ class ReflectionMatrix {
     async updateProjectCode() {
         const code = await this.activity.prepareExport();
         if (code === this.code) {
-            console.log("No changes in code detected.");
-            return; // No changes in code
+            // No changes in code
+            return; 
         }
 
         this.showTypingIndicator("Reading code");
@@ -305,9 +305,7 @@ class ReflectionMatrix {
             if (data.algorithm !== "unchanged") {
                 this.projectAlgorithm = data.algorithm; // update algorithm
                 this.code = code;
-            } else {
-                console.log("No changes in algorithm detected.");
-            }
+            } 
             this.botReplyDiv(data, false, false);
         } else {
             this.activity.errorMsg(_(data.error), 3000);
@@ -413,7 +411,6 @@ class ReflectionMatrix {
      */
     async generateAnalysis() {
         try {
-            console.log("Summary stored", this.summary);
             const response = await fetch(`${this.PORT}/analysis`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -573,7 +570,6 @@ class ReflectionMatrix {
     saveReport(data) {
         const key = "musicblocks_analysis";
         localStorage.setItem(key, data.response);
-        console.log("Conversation saved in localStorage.");
     }
 
     /** Reads the analysis report from localStorage.
