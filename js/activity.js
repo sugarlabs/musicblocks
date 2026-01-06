@@ -54,6 +54,10 @@ const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
 const _ERRORMSGTIMEOUT_ = 15000;
 const _MSGTIMEOUT_ = 60000;
 
+// Responsive breakpoint constants
+const BREAKPOINT_TABLET = 768;
+const BREAKPOINT_MOBILE = 600;
+
 let MYDEFINES = [
     "utils/platformstyle",
     "easeljs.min",
@@ -762,14 +766,14 @@ class Activity {
                     };
                 }
 
-                if (canvasWidth < 768 && !referenceBlock.beforeMobilePosition) {
+                if (canvasWidth < BREAKPOINT_TABLET && !referenceBlock.beforeMobilePosition) {
                     referenceBlock.beforeMobilePosition = {
                         x: referenceBlock.container.x,
                         y: referenceBlock.container.y
                     };
                 }
 
-                if (canvasWidth >= 768 && referenceBlock.beforeMobilePosition) {
+                if (canvasWidth >= BREAKPOINT_TABLET && referenceBlock.beforeMobilePosition) {
                     const dx = referenceBlock.beforeMobilePosition.x - referenceBlock.container.x;
                     const dy = referenceBlock.beforeMobilePosition.y - referenceBlock.container.y;
                     group.forEach(blockId => {
@@ -781,14 +785,14 @@ class Activity {
                     //this prevents old groups from affecting new calculations.
                 }
 
-                if (canvasWidth < 600 && !referenceBlock.before600pxPosition) {
+                if (canvasWidth < BREAKPOINT_MOBILE && !referenceBlock.before600pxPosition) {
                     referenceBlock.before600pxPosition = {
                         x: referenceBlock.container.x,
                         y: referenceBlock.container.y
                     };
                 }
 
-                if (canvasWidth >= 600 && referenceBlock.before600pxPosition) {
+                if (canvasWidth >= BREAKPOINT_MOBILE && referenceBlock.before600pxPosition) {
                     const dx = referenceBlock.before600pxPosition.x - referenceBlock.container.x;
                     const dy = referenceBlock.before600pxPosition.y - referenceBlock.container.y;
 
@@ -852,7 +856,7 @@ class Activity {
             this.blocksContainer.y = 0;
 
             const screenWidth = window.innerWidth;
-            const isNarrowScreen = screenWidth < 600;
+            const isNarrowScreen = screenWidth < BREAKPOINT_MOBILE;
             const minColumnWidth = 400;
             const numColumns = isNarrowScreen ? 1 : Math.floor(screenWidth / minColumnWidth);
 
