@@ -33,14 +33,14 @@ const sassTask = () => {
     return src(files.sassPath)
         .pipe(sourcemaps.init()) // initialize sourcemaps first
         .pipe(sass()) // compile SASS to CSS
-        .pipe(postcss([ autoprefixer(), cssnano() ])) // PostCSS plugins
+        .pipe(postcss([autoprefixer(), cssnano()])) // PostCSS plugins
         .pipe(sourcemaps.write(".")) // write sourcemaps file in current directory
         .pipe(dest("dist/css")); // put final CSS in dist folder
 };
 
 const cssTask = () => {
     return src(files.cssPath)
-        .pipe(minifyCSS({compatibility: "ie8"}))
+        .pipe(minifyCSS({ compatibility: "ie8" }))
         .pipe(gulp.dest("dist/css"));
 };
 
@@ -81,21 +81,23 @@ const prettify = () => {
 
 const validate = () => {
     return gulp.src(files.jsPath)
-        .pipe(prettier.check({ singleQuote: true, trailingComma: "all"}));
+        .pipe(prettier.check({ singleQuote: true, trailingComma: "all" }));
 };
 
 // Watch task: watch SASS , CSS and JS files for changes
 // If any change, run sass, css and js tasks simultaneously
 const watchTask = () => {
-    watch([ files.jsPath, files.cssPath, files.sassPath ],
-        parallel( jsTask, cssTask, sassTask));
+    watch([files.jsPath, files.cssPath, files.sassPath],
+        parallel(jsTask, cssTask, sassTask));
 };
 
 // Export the default Gulp task so it can be run
 // Runs the sass ,css and js tasks simultaneously
 // then runs prettify, cacheBust, watch task, then validate
 exports.default = series(
-    parallel( jsTask, cssTask , sassTask ), prettify,
+    parallel(jsTask, cssTask, sassTask),
+    prettify,
     cacheBustTask,
-    watchTask, validate
+    validate,
+    watchTask
 );
