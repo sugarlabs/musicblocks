@@ -25,7 +25,7 @@ jobs:
       - name: Get changed JavaScript files
         id: get_files
         run: |
-          CHANGED_FILES=$(git diff --diff-filter=ACMRT --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} -- '*.js')
+          CHANGED_FILES=$(git diff --diff-filter=ACMRT --name-only ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} -- '*.js' ':!node_modules/**' | grep '\.js$' || true)
           echo "files<<EOF" >> $GITHUB_ENV
           echo "$CHANGED_FILES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
@@ -38,10 +38,11 @@ jobs:
         run: |
           echo "Linting the following files:"
           echo "$files"
-          echo "$files" | xargs npx eslint
+          echo "$files" | tr '\n' '\0' | xargs -0 -r npx eslint
+          
       - name: Run Prettier check on changed files
         if: env.files != ''
         run: |
           echo "Checking formatting for the following files:"
           echo "$files"
-          echo "$files" | xargs npx prettier --check
+          echo "$files" | tr '\n' '\0' | xargs -0 -r npx prettier --check
