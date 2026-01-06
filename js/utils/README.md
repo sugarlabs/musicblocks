@@ -36,9 +36,15 @@ Note: If you want to customise an existing theme, just put your changes in the d
 
     ```javascript
     <ul style="display: none;" id="themedropdown" class="dropdown-content">
-        <a id="light" class="tooltipped" data-tooltip="Light Mode"><i class='material-icons'>brightness_7</i></a>
-        <a id="dark" class="tooltipped" data-tooltip="Dark Mode"><i class='material-icons'>brightness_4</i></a>
-        <a id="custom" class="tooltipped" data-tooltip="Custom Theme"><i class='material-icons'>choose_your_material_icon</i></a>
+        <a id="light" class="tooltipped" data-tooltip="Light Mode">
+            <i class="material-icons">brightness_7</i>
+        </a>
+        <a id="dark" class="tooltipped" data-tooltip="Dark Mode">
+            <i class="material-icons">brightness_4</i>
+        </a>
+        <a id="custom" class="tooltipped" data-tooltip="Custom Theme">
+            <i class="material-icons">choose_your_material_icon</i>
+        </a>
     </ul>
     ```
 

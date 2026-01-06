@@ -1,10 +1,9 @@
 /* css/darkmode.css - placeholder dark mode styles */
-:root{
-  --bg: #0f0f10;
-  --fg: #e8e8e8;
+:root {
+    --bg: #0f0f10;
+    --fg: #e8e8e8;
 }
 body {
-  background: var(--bg);
-  color: var(--fg);
+    background: var(--bg);
+    color: var(--fg);
 }
-

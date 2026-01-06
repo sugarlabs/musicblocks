@@ -25,7 +25,7 @@ in an integrative and entertaining way.
 
 Music Blocks is an interactive Web Application &mdash; the interaction
 is done via basic mouse events like _click_, _right click_, _click and
-drag_, etc. and keyboard events like _hotkey press_.  The application
+drag_, etc. and keyboard events like _hotkey press_. The application
 is audio-visual; it produces graphics, artwork and music. Here are a
 couple of screenshots to give you an idea of how the application looks
 like:
@@ -44,25 +44,25 @@ Additional background on why we combine music and programming can be found
 
 **Refer to the following sections to get familiar with this application:**
 
-- [Running Music Blocks](#RUNNING-MUSIC-BLOCKS)
-- [How to set up a local server](#HOW-TO-SET-UP-A-LOCAL-SERVER)
-- [Using Music Blocks](#USING-MUSIC-BLOCKS)
+-   [Running Music Blocks](#RUNNING-MUSIC-BLOCKS)
+-   [How to set up a local server](#HOW-TO-SET-UP-A-LOCAL-SERVER)
+-   [Using Music Blocks](#USING-MUSIC-BLOCKS)
 
 If you are a developer (beginner, experienced, or pro), you are very
 welcome to participate in the evolution of Music Blocks.
 
 **Refer to the following sections to get an idea:**
 
-- [Code of Conduct](#CODE-OF-CONDUCT)
-- [Contributing](#CONTRIBUTING)
-- [Modifying Music Blocks](#MODIFYING-MUSIC-BLOCKS)
-- [Reporting Bugs](#REPORTING-BUGS)
+-   [Code of Conduct](#CODE-OF-CONDUCT)
+-   [Contributing](#CONTRIBUTING)
+-   [Modifying Music Blocks](#MODIFYING-MUSIC-BLOCKS)
+-   [Reporting Bugs](#REPORTING-BUGS)
 
 **Refer to the following for more information regarding the evolution
-  of this project:**
+of this project:**
 
-- [Credits](#CREDITS)
-- [Music Blocks in Japan](#MUSIC-BLOCKS-IN-JAPAN)
+-   [Credits](#CREDITS)
+-   [Music Blocks in Japan](#MUSIC-BLOCKS-IN-JAPAN)
 
 ## <a name="RUNNING_MUSIC_BLOCKS"></a>Running Music Blocks
 
@@ -90,33 +90,32 @@ However, doing so, some functionality will be unavailable. Therefore, it is
 best to launch a _local web server_ from the directory of Music
 Blocks.
 
-1. [Download](https://github.com/sugarlabs/musicblocks/archive/master.zip)
-Music Blocks, or clone (`https://github.com/sugarlabs/musicblocks.git`
-for _HTTPS_, or `gh repo clone sugarlabs/musicblocks` for _GitHub
-CLI_), on your local machine.
+1.  [Download](https://github.com/sugarlabs/musicblocks/archive/master.zip)
+    Music Blocks, or clone (`https://github.com/sugarlabs/musicblocks.git`
+    for _HTTPS_, or `gh repo clone sugarlabs/musicblocks` for _GitHub
+    CLI_), on your local machine.
 
-2. In a terminal, `cd` to the directory where you downloaded/cloned
-Music Blocks, using `cd path/to/musicblocks/`.
+2.  In a terminal, `cd` to the directory where you downloaded/cloned
+    Music Blocks, using `cd path/to/musicblocks/`.
 
-3. After you are in `path/to/musicblocks/` directory, install the
-dependencies using the following command
+3.  After you are in `path/to/musicblocks/` directory, install the
+    dependencies using the following command
 
-    ```bash
-    npm install
-    ```
+        ```bash
+        npm install
+        ```
 
-4. After cloning the musicblocks repository, you can start a local
-server using npm
+4.  After cloning the musicblocks repository, you can start a local
+    server using npm
 
-    ```bash
-    npm run dev
-    ```
+        ```bash
+        npm run dev
+        ```
 
-6. You should see a message `Serving HTTP on 127.0.0.1 port 3000
-(http://127.0.0.1:3000/) ...` since the HTTP Server is set to start
-listening on port 3000.
+5.  You should see a message `Serving HTTP on 127.0.0.1 port 3000 (http://127.0.0.1:3000/) ...` since the HTTP Server is set to start
+    listening on port 3000.
 
-7. Open your favorite browser and visit `localhost:3000` or `127.0.0.1:3000`.
+6.  Open your favorite browser and visit `localhost:3000` or `127.0.0.1:3000`.
 
 **NOTE:** _Use `ctrl + c` or `cmd + c` to quit the HTTP Server to avoid
 `socket.error:[Errno 48]`_.
@@ -131,34 +130,35 @@ Before you begin, ensure you have Docker installed on your machine. You can down
 
 1. Clone the Music Blocks repository to your local machine:
 
-   ```bash
-   git clone https://github.com/sugarlabs/musicblocks.git
-   ```
+    ```bash
+    git clone https://github.com/sugarlabs/musicblocks.git
+    ```
 
 2. Navigate to the cloned repository:
 
-   ```bash
-   cd musicblocks
-   ```
+    ```bash
+    cd musicblocks
+    ```
 
 3. Build the Docker image using the provided Dockerfile:
 
-   ```bash
-   docker build -t musicblocks .
-   ```
+    ```bash
+    docker build -t musicblocks .
+    ```
+
 ## Running Music Blocks
 
 1. Run the Docker container using the built image:
 
-   ```bash
-   docker run -p 3000:3000 musicblocks
-   ```
+    ```bash
+    docker run -p 3000:3000 musicblocks
+    ```
 
-   This command will start a Docker container running Music Blocks and
-   expose it on port 3000.
+    This command will start a Docker container running Music Blocks and
+    expose it on port 3000.
 
 2. Access Music Blocks in your web browser by navigating to
-`http://localhost:3000`.
+   `http://localhost:3000`.
 
 ## Stopping the Docker container
 
@@ -167,10 +167,10 @@ will stop the container and free up the port it was using.
 
 ## Additional Notes
 
-- Make sure to replace `musicblocks` with the appropriate image name
-  if you have tagged the Docker image differently.
-- You can customize the port mapping (`-p`) if you prefer to use a
-  different port for accessing Music Blocks.
+-   Make sure to replace `musicblocks` with the appropriate image name
+    if you have tagged the Docker image differently.
+-   You can customize the port mapping (`-p`) if you prefer to use a
+    different port for accessing Music Blocks.
 
 ---
 
@@ -201,7 +201,7 @@ Conduct](https://github.com/sugarlabs/sugar-docs/blob/master/src/CODE_OF_CONDUCT
 Sugar Lab's guidelines.
 
 It contains best practices for writing code, submitting pull requests,
-and following coding standards.  Please refer to this guide before
+and following coding standards. Please refer to this guide before
 making contributions to ensure consistency and maintain the quality of
 the project.
 
@@ -277,24 +277,24 @@ Del Puerto ([@cristinadp](https://github.com/cristinadp))_, and
 _Hrishi Patel ([@Hrishi1999](https://github.com/Hrishi1999))_ as part
 of GSoC 2017. During GSoC 2018, _Riya Lohia
 ([@riyalohia](https://github.com/riyalohia))_ developed a Temperament
-widget.  _Ritwik Abhishek ([@a-ritwik](https://github.com/a-ritwik))_
+widget. _Ritwik Abhishek ([@a-ritwik](https://github.com/a-ritwik))_
 added a keyboard widget and a pitch-tracking widget. During GSoC 2019,
 _Favor Kelvin ([@fakela](https://github.com/fakela))_ refactored much
 of the code to use promises. During GSoC 2020, _Anindya Kundu
 ([@meganindya](https://github.com/meganindya))_ did a major
 refactoring of the code base to support JavaScript export. _Aviral
 Gangwar ([@aviral243](https://github.com/aviral243))_ enhanced the
-internal representation of mode and key.  _Saksham Mrig
+internal representation of mode and key. _Saksham Mrig
 ([@sksum](https://github.com/sksum))_ fixed 70+ bugs and added support
 for pitch tracking and MIDI import.
 
 Many students contributed to the project as part of Google Code-in
-(2015&ndash;2019).  _Sam Parkinson
+(2015&ndash;2019). _Sam Parkinson
 ([@samdroid-apps](https://github.com/samdroid-apps))_ built the Planet
-during GCI.  _Emily Ong ([@EmilyOng](https://github.com/EmilyOng))_
+during GCI. _Emily Ong ([@EmilyOng](https://github.com/EmilyOng))_
 designed our mouse icon and _Euan Ong
 ([@eohomegrownapps](https://github.com/eohomegrownapps))_ redesigned
-the Planet code as a series of GCI tasks.  _Austin George
+the Planet code as a series of GCI tasks. _Austin George
 ([@aust-n](https://github.com/aust-n))_ refactored the toolbars as a
 series of GCI tasks. _Bottersnike
 ([@Bottersnike](https://github.com/Bottersnike))_ redesigned the
