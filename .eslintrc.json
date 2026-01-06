@@ -7,7 +7,7 @@
   },
   "parser": "@babel/eslint-parser",
   "parserOptions": {
-    "sourceType": "script",
+    "sourceType": "module",
     "requireConfigFile": false,
     "ecmaFeatures": {
       "globalReturn": false

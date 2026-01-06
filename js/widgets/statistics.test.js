@@ -1,7 +1,7 @@
-const { StatsWindow } = require('./statistics');
-describe('StatsWindow', () => {
+const { StatsWindow } = require("./statistics");
+describe("StatsWindow", () => {
     let mockActivity;
-    let mockWidgetWindow;   
+    let mockWidgetWindow;
 
     beforeEach(() => {
         // Mock the Activity object
@@ -20,8 +20,10 @@ describe('StatsWindow', () => {
             sendToCenter: jest.fn(),
             onclose: null,
             onmaximize: null,
-            getWidgetBody: jest.fn().mockReturnValue(document.createElement('div')),
-            getWidgetFrame: jest.fn().mockReturnValue({ getBoundingClientRect: () => ({ height: 500 }) }),
+            getWidgetBody: jest.fn().mockReturnValue(document.createElement("div")),
+            getWidgetFrame: jest
+                .fn()
+                .mockReturnValue({ getBoundingClientRect: () => ({ height: 500 }) }),
             isMaximized: jest.fn().mockReturnValue(false)
         };
 
@@ -47,17 +49,17 @@ describe('StatsWindow', () => {
         }));
     });
 
-    test('displayInfo formats note statistics and Hz calculations correctly', () => {
+    test("displayInfo formats note statistics and Hz calculations correctly", () => {
         const statsWindow = new StatsWindow(mockActivity);
 
         const mockStats = {
             duples: 5,
             triplets: 2,
             quintuplets: 0,
-            pitchNames: new Set(['A', 'C#', 'E']),
+            pitchNames: new Set(["A", "C#", "E"]),
             numberOfNotes: 20,
-            lowestNote: ['A4', 60, 440],
-            highestNote: ['C5', 72, 523.25],
+            lowestNote: ["A4", 60, 440],
+            highestNote: ["C5", 72, 523.25],
             rests: 4,
             ornaments: 1
         };
@@ -66,10 +68,10 @@ describe('StatsWindow', () => {
 
         const outputHtml = statsWindow.jsonObject.innerHTML;
 
-        expect(outputHtml).toContain('441Hz');
-        expect(outputHtml).toContain('524Hz');
-        expect(outputHtml).toContain('duples: 5');
-        expect(outputHtml).toContain('triplets: 2');
-        expect(outputHtml).toContain('pitch names: A, C#, E');
+        expect(outputHtml).toContain("441Hz");
+        expect(outputHtml).toContain("524Hz");
+        expect(outputHtml).toContain("duples: 5");
+        expect(outputHtml).toContain("triplets: 2");
+        expect(outputHtml).toContain("pitch names: A, C#, E");
     });
 });
