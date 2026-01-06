@@ -7,7 +7,7 @@
     },
     "parser": "@babel/eslint-parser",
     "parserOptions": {
-        "sourceType": "script",
+        "sourceType": "module",
         "requireConfigFile": false,
         "ecmaFeatures": {
             "globalReturn": false
@@ -15,6 +15,14 @@
     },
     "extends": ["eslint:recommended"],
     "ignorePatterns": ["lib/**"],
+    "overrides": [
+        {
+            "files": ["cypress/**/*.js"],
+            "parserOptions": {
+                "sourceType": "module"
+            }
+        }
+    ],
     "rules": {
         "no-console": "off",
         "no-unused-vars": "off",
