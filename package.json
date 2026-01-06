@@ -13,6 +13,10 @@
   "amd": {},
   "scripts": {
     "lint": "eslint js/**/*.js",
+    "lint:fix": "eslint js/**/*.js --fix",
+    "format": "prettier --write \"**/*.js\"",
+    "format:check": "prettier --check \"**/*.js\"",
+    "prepare": "husky install",
     "serve": "http-server -a 127.0.0.1 -p 3000 --gzip --brotli",
     "start": "node index.js",
     "dev": "nodemon index.js",
@@ -20,6 +24,12 @@
     "cypress:run": "cypress run",
     "electron": "electron .",
     "dist": "electron-builder"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   },
   "devDependencies": {
     "@babel/core": "^7.11.1",
@@ -41,9 +51,12 @@
     "gulp-clean-css": "^4.3.0",
     "gulp-prettier": "^3.0.0",
     "gulp-uglify": "^3.0.2",
+    "husky": "^8.0.3",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
-    "nodemon": "^3.1.9"
+    "lint-staged": "^15.2.0",
+    "nodemon": "^3.1.9",
+    "prettier": "^2.8.8"
   },
   "dependencies": {
     "@tonejs/midi": "^2.0.28",
@@ -75,5 +88,11 @@
     "linux": {
       "target": "AppImage"
     }
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   }
 }
