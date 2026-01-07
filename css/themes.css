@@ -1,36 +1,47 @@
 /* Theme DropDown Styling */
 
 #themedropdown {
-  background-color: transparent;
-  box-shadow: none;
-  display: flex;
-  transform: translateX(-25%) !important;
+    background-color: transparent;
+    box-shadow: none;
+    display: flex;
+    transform: translateX(-25%) !important;
+}
+
+.dark #themedropdown {
+    background-color: transparent !important;
+}
+
+.dark #themedropdown li {
+    background-color: transparent !important;
+}
+
+.dark #themedropdown li a {
+    background-color: transparent !important;
 }
 
 #themedropdown a {
-  color: #2196F3;
-  transition: all 0.3s ease;
+    color: #2196f3;
+    transition: all 0.3s ease;
 }
 
 #themedropdown a:hover {
-  color: #1E88E5;
-  background-color: transparent;
-  transition: all 0.3s ease;
+    color: #1e88e5;
+    background-color: transparent;
+    transition: all 0.3s ease;
 }
-
 
 /* Dark Mode */
 
 .dark .blue {
-  background-color: #022363 !important;
+    background-color: #022363 !important;
 }
 
 .dark #canvas {
-  background-color: #1c1c1c !important;
+    background-color: #1c1c1c !important;
 }
 
 .dark .blue.darken-1 {
-  background-color: #01143b !important;
+    background-color: #01143b !important;
 }
 
 .dark #floatingWindows>.windowFrame {
@@ -39,11 +50,11 @@
 }
 
 .dark .wfbtItem {
-  background-color: #225a91;
+    background-color: #225a91;
 }
 
-.dark #floatingWindows>.windowFrame>.wfTopBar .wftTitle {
-  color: #e8e8e8;
+.dark #floatingWindows > .windowFrame > .wfTopBar .wftTitle {
+    color: #e8e8e8;
 }
 
 .dark #floatingWindows>.windowFrame>.wfWinBody .wfbWidget {
@@ -52,12 +63,12 @@
 }
 
 .dark .popupMsg {
-  background-color: #084e86;
-  color: #e8e8e8;
+    background-color: #084e86;
+    color: #e8e8e8;
 }
 
 .dark #printText {
-  border-color: #000000;
+    border-color: #000000;
 }
 
 .dark #loading-image-container {
@@ -65,11 +76,11 @@
 }
 
 .dark #loadingText {
-  color: white !important;
+    color: white !important;
 }
 
 .dark .language-link {
-  color: #fff;
+    color: #fff;
 }
 
 .modal-content {
@@ -78,7 +89,7 @@
 }
 
 .dark #submitLilypond {
-  background-color: rgb(0, 102, 255);
+    background-color: rgb(0, 102, 255);
 }
 
 .dark #search,
@@ -89,59 +100,59 @@
 }
 
 .dark .ui-autocomplete li:hover {
-  background-color: #225a91 !important;
+    background-color: #225a91 !important;
 }
 
 .dark #helpfulSearchDiv {
-  background-color: transparent !important;
+    background-color: transparent !important;
 }
 
 .dark #crossButton {
-  color: #fff;
+    color: #fff;
 }
 
 .dark #chooseKeyDiv {
-  background: #333;
+    background: #333;
 }
 
 .dark #movable {
-  background: #333;
-  color: white;
+    background: #333;
+    color: white;
 }
 
-.dark .dropdown-content li>a {
-  background-color: #1c1c1c;
-  color: #3fe0d1;
+.dark .dropdown-content li > a {
+    background-color: #1c1c1c;
+    color: #3fe0d1;
 }
 
-.dark .dropdown-content li>a:hover {
-  background-color: #333;
+.dark .dropdown-content li > a:hover {
+    background-color: #333;
 }
 
 .dark .dropdown-content {
-  background-color: #1c1c1c;
+    background-color: #1c1c1c;
 }
 
 .dark .modalBox {
-  background-color: #1C1C1C;
+    background-color: #1c1c1c;
 }
 
 .dark .modal-message {
-  color: #e2e2e2;
-  background-color: #1C1C1C;
+    color: #e2e2e2;
+    background-color: #1c1c1c;
 }
 
 .dark #newdropdown {
-  border: #000000;
-  background-color: #1c1c1c;
+    border: #000000;
+    background-color: #1c1c1c;
 }
 
 .dark #newdropdown li {
-  background-color: #1c1c1c;
+    background-color: #1c1c1c;
 }
 
 .dark #confirmation-message {
-  color: #e2e2e2;
+    color: #e2e2e2;
 }
 
 body {
@@ -172,4 +183,18 @@ body.dark {
 .dark #languagedropdown li a.selected-language {
   background-color: rgba(33, 150, 243, 0.25);
   border-left: 3px solid #64B5F6;
+}
+
+/* Dark Mode Tooltip Styling - Slightly lighter background for better contrast */
+.dark .material-tooltip {
+    background-color: #3a3a3a !important;
+    color: #ffffff !important;
+}
+
+.dark .material-tooltip .backdrop {
+    background-color: #3a3a3a !important;
+}
+
+.dark .material-tooltip span {
+    color: #ffffff !important;
 }
