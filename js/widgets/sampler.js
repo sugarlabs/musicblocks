@@ -305,14 +305,14 @@ function SampleWidget() {
      * @returns {void}
      */
     this.__save = function () {
-        var that = this;
+        const that = this;
         setTimeout(function () {
             that._addSample();
 
             // Include the cent adjustment value in the sample block
             const centAdjustment = that.centAdjustmentValue || 0;
 
-            var newStack = [
+            const newStack = [
                 [0, "settimbre", 100, 100, [null, 1, null, 5]],
                 [
                     1,
