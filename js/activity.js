@@ -6251,7 +6251,11 @@ class Activity {
                     fn: this.toolbar.changeWrap
                 });
 
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Enable omnidirectional scrolling"))
+            if (
+                !this.helpfulWheelItems.find(
+                    ele => ele.label === "Enable omnidirectional scrolling"
+                )
+            )
                 this.helpfulWheelItems.push({
                     label: "Enable omnidirectional scrolling",
                     icon: "imgsrc:header-icons/compare-arrows.svg",
@@ -6259,7 +6263,11 @@ class Activity {
                     fn: setScroller
                 });
 
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Disable omnidirectional scrolling"))
+            if (
+                !this.helpfulWheelItems.find(
+                    ele => ele.label === "Disable omnidirectional scrolling"
+                )
+            )
                 this.helpfulWheelItems.push({
                     label: "Disable omnidirectional scrolling",
                     icon: "imgsrc:header-icons/lock.svg",
