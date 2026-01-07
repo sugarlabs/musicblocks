@@ -1042,14 +1042,10 @@ class Blocks {
                                     protoblock.name === "nameddo" &&
                                     protoblock.defaults[0] === that.blockList[oldBlock].value
                                 ) {
-                                    setTimeout(() => {
-                                        blockPalette.remove(
-                                            protoblock,
-                                            that.blockList[oldBlock].value
-                                        );
-                                        delete that.protoBlockDict[
-                                            "myDo_" + that.blockList[oldBlock].value
-                                        ];
+                                    setTimeout(() =>{
+                                        blockPalette.remove(protoblock, that.blockList[oldBlock].value);
+                                        delete that
+                                            .protoBlockDict["myDo_" + that.blockList[oldBlock].value];
                                         /** that.activity.palettes.hide(); */
                                         that.activity.palettes.updatePalettes("action");
                                         /** that.activity.palettes.show(); */
@@ -1088,7 +1084,7 @@ class Blocks {
             } else if (this.blockList[parentblk].name === "temperament1") {
                 cblk = this.blockList[parentblk].connections[1];
                 if (cblk == null) {
-                    const postProcess = args => {
+                    const postProcess = (args) =>{
                         const parentblk = args[0];
                         const oldBlock = args[1];
 
@@ -2117,8 +2113,9 @@ class Blocks {
                 }
             }
 
-            this.addDefaultBlock(parentblk, thisBlock, actionCheck);
-
+            if (this.blockList[parentblk].name !== "pitch") {
+                this.addDefaultBlock(parentblk, thisBlock, actionCheck);
+            }
             /**
              * Put block adjustments inside a slight delay to make the
              * addition/substraction of vspace and changes of block shape
@@ -3351,7 +3348,7 @@ class Blocks {
 
                 postProcessArg = [thisBlock, DEFAULTCHORD];
             } else if (name === "accidentalname") {
-                postProcess = args => {
+                postProcess = (args) =>{
                     const b = args[0];
                     const v = args[1];
                     that.blockList[b].value = v;
@@ -6599,8 +6596,9 @@ class Blocks {
                                                 undefined
                                             ) {
                                                 if (
-                                                    this.protoBlockDict[blockObjs[c][1][0]]
-                                                        .dockTypes[cc] !== "out"
+                                                    this.protoBlockDict[blockObjs[c][1][0]].dockTypes[
+                                                        cc
+                                                    ] !== "out"
                                                 ) {
                                                     flowBlock = false;
                                                 }
@@ -7211,13 +7209,13 @@ class Blocks {
         };
 
         /**
-         * Checks if coordinates intersect with any block
-         * @public
-         * @param {number} x - The x coordinate to check
-         * @param {number} y - The y coordinate to check
-         * @returns {boolean} True if coordinates intersect with a block
-         */
-        this.isCoordinateOnBlock = function (x, y) {
+        * Checks if coordinates intersect with any block
+        * @public
+        * @param {number} x - The x coordinate to check
+        * @param {number} y - The y coordinate to check  
+        * @returns {boolean} True if coordinates intersect with a block
+        */
+        this.isCoordinateOnBlock = function(x, y) {
             return this.blockList.some(block => {
                 if (block.trash) return false;
 
