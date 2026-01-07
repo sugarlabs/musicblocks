@@ -516,7 +516,7 @@ describe("Utility Functions (logic-only)", () => {
         });
 
         test("should return default volume if instrument is not found", () => {
-            const consoleSpy = jest.spyOn(console, "debug").mockImplementation(() => { });
+            const consoleSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
 
             const result = getVolume("turtle1", "nonexistent");
 
@@ -982,6 +982,3 @@ describe("Utility Functions (logic-only)", () => {
         });
     });
 });
-
-
-
