@@ -2846,3 +2846,6 @@ class RhythmRuler {
         }
     }
 }
+if (typeof module !== "undefined") {
+    module.exports = RhythmRuler;
+}
