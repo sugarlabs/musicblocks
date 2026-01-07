@@ -23,8 +23,7 @@
    getStepSizeDown, numberToPitch, pitchToNumber, rationalSum,
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
-   noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction,
-   SEMITONES
+   noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction
  */
 
 /*
@@ -42,6 +41,23 @@
  */
 
 /* exported Singer */
+
+/**
+ * Gets the number of pitch intervals per octave for the current temperament.
+ * Defaults to 12 (standard Western tuning) if temperament is not found.
+ * @param {Object} activity - The activity object containing synth information.
+ * @returns {number} The number of intervals per octave.
+ */
+const getOctaveInterval = activity => {
+    let temperamentName = "equal";
+    if (activity && activity.logo && activity.logo.synth && activity.logo.synth.inTemperament) {
+        temperamentName = activity.logo.synth.inTemperament;
+    }
+    const temperament = getTemperament(temperamentName);
+    return temperament && typeof temperament.pitchNumber === "number"
+        ? temperament.pitchNumber
+        : 12;
+};
 
 /**
  * Class pertaining to music related actions for each turtle.
@@ -1014,16 +1030,30 @@ class Singer {
                     }
                 }
 
+                const octaveShift = tur.singer.register * getOctaveInterval(activity);
                 noteObj = getNote(
                     anote,
                     octave,
-                    atrans + tur.singer.register * SEMITONES,
+                    atrans + octaveShift,
                     tur.singer.keySignature,
                     tur.singer.movable,
                     direction,
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
                 );
+                if (noteObj && Number.isNaN(noteObj[0])) {
+                    // Fallback to 12-TET if custom temperament fails
+                    noteObj = getNote(
+                        anote,
+                        octave,
+                        atrans + tur.singer.register * 12,
+                        tur.singer.keySignature,
+                        tur.singer.movable,
+                        direction,
+                        activity.errorMsg,
+                        activity.logo.synth.inTemperament
+                    );
+                }
 
                 // Apply ratio transposition:
                 // (1) convert note to Hertz
@@ -1046,7 +1076,6 @@ class Singer {
                 // Cents may have been added through a transposition.
                 if (noteObj[2] !== 0 && cents === 0) {
                     cents = noteObj[2];
-                    // eslint-disable-next-line no-console
                 }
 
                 if (tur.singer.drumStyle.length > 0) {
@@ -1211,7 +1240,7 @@ class Singer {
                 activity.logo.musicKeyboard.noteNames.push(nnote[0]);
                 activity.logo.musicKeyboard.octaves.push(nnote[1]);
                 activity.logo.musicKeyboard.addRowBlock(blk);
-                tur.singer.lastNotePlayed = [noteObj[0] + noteObj[1], 4];
+                tur.singer.lastNotePlayed = [nnote[0] + nnote[1], 4];
             }
         } else {
             // Play a stand-alone pitch block as a quarter note.
@@ -1227,16 +1256,30 @@ class Singer {
                 // Apply transpositions
                 const transposition = 2 * delta + tur.singer.transposition;
 
-                const noteObj = getNote(
+                const octaveShift = tur.singer.register * getOctaveInterval(activity);
+                let noteObj = getNote(
                     note,
                     octave,
-                    transposition + tur.singer.register * SEMITONES,
+                    transposition + octaveShift,
                     tur.singer.keySignature,
                     tur.singer.movable,
                     direction,
                     activity.errorMsg,
                     activity.logo.synth.inTemperament
                 );
+                if (noteObj && Number.isNaN(noteObj[0])) {
+                    // Fallback to 12-TET if custom temperament fails
+                    noteObj = getNote(
+                        note,
+                        octave,
+                        transposition + tur.singer.register * 12,
+                        tur.singer.keySignature,
+                        tur.singer.movable,
+                        direction,
+                        activity.errorMsg,
+                        activity.logo.synth.inTemperament
+                    );
+                }
 
                 if (tur.singer.drumStyle.length > 0) {
                     const drumname = last(tur.singer.drumStyle);
