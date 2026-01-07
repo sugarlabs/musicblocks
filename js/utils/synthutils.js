@@ -296,7 +296,8 @@ const SAMPLE_INFO = {
  * @constant
  * @type {Array<string>}
  */
-const SOUNDSAMPLESDEFINES = Object.values(SAMPLE_INFO.voice).map(s => s.path)
+const SOUNDSAMPLESDEFINES = Object.values(SAMPLE_INFO.voice)
+    .map(s => s.path)
     .concat(Object.values(SAMPLE_INFO.drum).map(s => s.path));
 
 // Some samples have a default volume other than 50 (See #1697)
@@ -809,8 +810,8 @@ function Synth() {
                             const octaveDiff = octave - thisTemperament[pitchNumber][2];
                             return Number(
                                 thisTemperament[pitchNumber][0] *
-                                startPitchFrequency *
-                                Math.pow(getOctaveRatio(), octaveDiff)
+                                    startPitchFrequency *
+                                    Math.pow(getOctaveRatio(), octaveDiff)
                             );
                         }
                     }
@@ -918,7 +919,9 @@ function Synth() {
                         this.samples[sampleType][sampleName] = sampleData();
                         resolve();
                     } else {
-                        console.error(`Global variable ${sampleInfo.global} not found for sample ${sampleName}`);
+                        console.error(
+                            `Global variable ${sampleInfo.global} not found for sample ${sampleName}`
+                        );
                         reject(`Sample global not found: ${sampleName}`);
                     }
                 } catch (e) {
@@ -927,6 +930,86 @@ function Synth() {
                 }
             });
         });
+    };
+
+    /**
+     * Preloads samples used in a project by scanning blocks for instrument names.
+     * This should be called when a project is loaded to avoid playback delays.
+     * @function
+     * @memberof Synth
+     * @param {Array} blockList - The list of blocks from the project.
+     * @returns {Promise<void>} - A promise that resolves when all samples are preloaded.
+     */
+    this.preloadProjectSamples = async blockList => {
+        if (!blockList || !Array.isArray(blockList)) {
+            return;
+        }
+
+        const instrumentsToLoad = new Set();
+
+        // Known instrument block names
+        const instrumentBlockNames = ["settimbre", "setinstrument", "timbre", "instrument"];
+
+        // Scan blocks for instrument references
+        for (const block of blockList) {
+            if (!Array.isArray(block) || block.length < 2) continue;
+
+            const blockName = block[1];
+
+            // Check if this is an instrument-setting block
+            if (instrumentBlockNames.includes(blockName)) {
+                // The instrument name is usually in a connected block
+                // Check the connections for potential instrument names
+                const connections = block[4];
+                if (Array.isArray(connections)) {
+                    for (const connIdx of connections) {
+                        if (connIdx !== null && blockList[connIdx]) {
+                            const connBlock = blockList[connIdx];
+                            // Check if it's a text/value block with an instrument name
+                            if (Array.isArray(connBlock) && connBlock.length > 1) {
+                                const value = connBlock[1];
+                                // Check if this value is a known instrument
+                                if (typeof value === "string") {
+                                    // Check voice samples
+                                    if (SAMPLE_INFO.voice && SAMPLE_INFO.voice[value]) {
+                                        instrumentsToLoad.add(value);
+                                    }
+                                    // Check drum samples
+                                    if (SAMPLE_INFO.drum && SAMPLE_INFO.drum[value]) {
+                                        instrumentsToLoad.add(value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Also check if the block name itself is an instrument
+            if (typeof blockName === "string") {
+                if (SAMPLE_INFO.voice && SAMPLE_INFO.voice[blockName]) {
+                    instrumentsToLoad.add(blockName);
+                }
+                if (SAMPLE_INFO.drum && SAMPLE_INFO.drum[blockName]) {
+                    instrumentsToLoad.add(blockName);
+                }
+            }
+        }
+
+        // Preload all found instruments in parallel
+        if (instrumentsToLoad.size > 0) {
+            console.debug(
+                `Preloading ${instrumentsToLoad.size} instruments:`,
+                Array.from(instrumentsToLoad)
+            );
+            const loadPromises = Array.from(instrumentsToLoad).map(name =>
+                this._loadSample(name).catch(err => {
+                    console.warn(`Failed to preload sample ${name}:`, err);
+                })
+            );
+            await Promise.all(loadPromises);
+            console.debug("Project samples preloaded successfully");
+        }
     };
 
     /**
@@ -941,7 +1024,7 @@ function Synth() {
     /*
     require(SOUNDSAMPLESDEFINES, () => {
         this.loadSamples();
-
+ 
         for (let i = 0; i < this.samplesQueue.length; i++) {
             this.__createSynth(
                 0,
@@ -1433,11 +1516,13 @@ function Synth() {
             }
 
             // If not loaded, load asynchronously (lazy loading)
-            return this._loadSample(sourceName).then(() => {
-                this.___createSynth(turtle, instrumentName, sourceName, params);
-            }).catch(err => {
-                console.error(`Failed to load ${sourceName}:`, err);
-            });
+            return this._loadSample(sourceName)
+                .then(() => {
+                    this.___createSynth(turtle, instrumentName, sourceName, params);
+                })
+                .catch(err => {
+                    console.error(`Failed to load ${sourceName}:`, err);
+                });
         }
 
         // Not a sample (built-in, custom synth, etc.) - create synchronously
@@ -2230,7 +2315,7 @@ function Synth() {
             window.activity = {
                 blocks: {
                     blockList: [],
-                    setPitchOctave: () => { },
+                    setPitchOctave: () => {},
                     findPitchOctave: () => 4,
                     stageClick: false
                 },
@@ -2543,7 +2628,7 @@ function Synth() {
                                             }
                                         ],
                                         stageClick: false,
-                                        setPitchOctave: () => { },
+                                        setPitchOctave: () => {},
                                         findPitchOctave: () => 4,
                                         turtles: {
                                             _canvas: {
@@ -2560,7 +2645,7 @@ function Synth() {
                                     connections: [0], // Connect to the pitch block
                                     value: targetPitch.note,
                                     text: { text: targetPitch.note },
-                                    updateCache: () => { },
+                                    updateCache: () => {},
                                     _exitWheel: null,
                                     _pitchWheel: null,
                                     _accidentalsWheel: null,
@@ -2570,7 +2655,7 @@ function Synth() {
                                     container: {
                                         x: targetNoteSelector.offsetLeft,
                                         y: targetNoteSelector.offsetTop,
-                                        setChildIndex: () => { }
+                                        setChildIndex: () => {}
                                     },
                                     prevAccidental: "♮",
                                     name: "pitch", // This is needed for pitch preview
@@ -2581,9 +2666,9 @@ function Synth() {
                                 if (!window.activity.logo) {
                                     window.activity.logo = {
                                         synth: {
-                                            createDefaultSynth: () => { },
-                                            loadSynth: () => { },
-                                            setMasterVolume: () => { },
+                                            createDefaultSynth: () => {},
+                                            loadSynth: () => {},
+                                            setMasterVolume: () => {},
                                             trigger: (turtle, note, duration, instrument) => {
                                                 // Use the Web Audio API to play the preview note
                                                 const audioContext = new (window.AudioContext ||
@@ -3080,7 +3165,7 @@ function Synth() {
                             const shouldLight =
                                 centsFromTarget < 0
                                     ? segmentCents <= 0 &&
-                                    Math.abs(segmentCents) <= Math.abs(centsFromTarget) // Flat side
+                                      Math.abs(segmentCents) <= Math.abs(centsFromTarget) // Flat side
                                     : segmentCents >= 0 && segmentCents <= centsFromTarget; // Sharp side
 
                             if (shouldLight || Math.abs(centsFromTarget - segmentCents) <= 5) {
