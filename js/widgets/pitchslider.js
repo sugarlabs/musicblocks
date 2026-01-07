@@ -60,6 +60,7 @@ class PitchSlider {
         activity.logo.pitchSlider = this;
 
         this.widgetWindow.onclose = () => {
+            document.removeEventListener("keydown", keyHandler, true);
             for (const osc of oscillators) osc.triggerRelease();
             this.isActive = false;
             activity.logo.pitchSlider = null;
