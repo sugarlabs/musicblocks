@@ -7085,7 +7085,7 @@ class Blocks {
         /***
          * Clears all the blocks, updates the cache and refreshes the canvas.
          *
-         * @returnss {void}
+         * @returns {void}
          */
         this.clearParameterBlocks = () => {
             for (const blk in this.blockList) {
@@ -7107,7 +7107,7 @@ class Blocks {
          * @param logo
          * @param turtle
          * @param blk
-         * @returnss {void}
+         * @returns {void}
          */
         this.updateParameterBlock = (logo, turtle, blk) => {
             const name = this.blockList[blk].name;
@@ -7157,7 +7157,7 @@ class Blocks {
          * @param blk
          * @param value
          * @param turtle
-         * @returnss {void}
+         * @returns {void}
          */
         this.blockSetter = (logo, blk, value, turtle) => {
             if (typeof this.blockList[blk].protoblock.setter === "function") {
@@ -7174,7 +7174,7 @@ class Blocks {
         /***
          * Hides all the blocks.
          *
-         * @returnss {void}
+         * @returns {void}
          */
         this.hideBlocks = () => {
             this.activity.palettes.hide();
