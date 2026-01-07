@@ -1966,8 +1966,8 @@ class Activity {
         };
 
         /**
-         * Initializes the functionality of the horizontal scroll icon.
-         * Toggles horizontal scrolling and updates corresponding UI elements.
+         * Initializes the functionality of the omnidirectional scroll icon.
+         * Toggles omnidirectional scrolling and updates corresponding UI elements.
          * @private
          */
         this._setScroller = () => {
@@ -1980,19 +1980,19 @@ class Activity {
                 disableHorizScrollIcon.style.display = "block";
 
                 this.helpfulWheelItems.forEach(ele => {
-                    if (ele.label === "Enable horizontal scrolling") ele.display = false;
-                    else if (ele.label === "Disable horizontal scrolling") ele.display = true;
+                    if (ele.label === "Enable omnidirectional scrolling") ele.display = false;
+                    else if (ele.label === "Disable omnidirectional scrolling") ele.display = true;
                 });
-                activity.textMsg("Horizontal scrolling enabled.", 3000);
+                activity.textMsg("Omnidirectional scrolling enabled.", 3000);
             } else {
                 enableHorizScrollIcon.style.display = "block";
                 disableHorizScrollIcon.style.display = "none";
 
                 this.helpfulWheelItems.forEach(ele => {
-                    if (ele.label === "Enable horizontal scrolling") ele.display = true;
-                    else if (ele.label === "Disable horizontal scrolling") ele.display = false;
+                    if (ele.label === "Enable omnidirectional scrolling") ele.display = true;
+                    else if (ele.label === "Disable omnidirectional scrolling") ele.display = false;
                 });
-                activity.textMsg("Horizontal scrolling disabled.", 3000);
+                activity.textMsg("Omnidirectional scrolling disabled.", 3000);
             }
         };
 
@@ -2433,7 +2433,7 @@ class Activity {
                                 that.blocksContainer.y -= deltaY;
                             }
 
-                            if (deltaX !== 0) {
+                            if (that.scrollBlockContainer && deltaX !== 0) {
                                 closeAnyOpenMenusAndLabels();
                                 that.blocksContainer.x -= deltaX;
                             }
@@ -2461,6 +2461,10 @@ class Activity {
              * Handles wheel event on the canvas.
              * @param {WheelEvent} event - The wheel event object.
              */
+            /**
+             * Handles wheel event on the canvas.
+             * @param {WheelEvent} event - The wheel event object.
+             */
             const __wheelHandler = event => {
                 const data = normalizeWheel(event);
                 const delY = data.pixelY;
@@ -2469,18 +2473,18 @@ class Activity {
                 if (event.ctrlKey) {
                     event.preventDefault();
                     delY < 0 ? doLargerBlocks(that) : doSmallerBlocks(that);
-                } else if (delY !== 0 && event.axis === event.VERTICAL_AXIS) {
-                    closeAnyOpenMenusAndLabels();
-                    that.blocksContainer.y -= delY;
-                } else if (
-                    that.scrollBlockContainer &&
-                    delX !== 0 &&
-                    event.axis === event.HORIZONTAL_AXIS
-                ) {
-                    closeAnyOpenMenusAndLabels();
-                    that.blocksContainer.x -= delX;
                 } else {
-                    event.preventDefault();
+                    closeAnyOpenMenusAndLabels();
+                    if (that.scrollBlockContainer) {
+                        // Omnidirectional scrolling enabled (Advanced)
+                        if (delY !== 0) that.blocksContainer.y -= delY;
+                        if (delX !== 0) that.blocksContainer.x -= delX;
+                    } else {
+                        // Vertical scrolling only (Beginner / Default)
+                        if (event.axis === event.VERTICAL_AXIS && delY !== 0) {
+                            that.blocksContainer.y -= delY;
+                        }
+                    }
                 }
 
                 that.refreshCanvas();
@@ -6251,17 +6255,17 @@ class Activity {
                     fn: this.toolbar.changeWrap
                 });
 
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Enable horizontal scrolling"))
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Enable omnidirectional scrolling"))
                 this.helpfulWheelItems.push({
-                    label: "Enable horizontal scrolling",
+                    label: "Enable omnidirectional scrolling",
                     icon: "imgsrc:header-icons/compare-arrows.svg",
                     display: this.beginnerMode ? false : true,
                     fn: setScroller
                 });
 
-            if (!this.helpfulWheelItems.find(ele => ele.label === "Disable horizontal scrolling"))
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Disable omnidirectional scrolling"))
                 this.helpfulWheelItems.push({
-                    label: "Disable horizontal scrolling",
+                    label: "Disable omnidirectional scrolling",
                     icon: "imgsrc:header-icons/lock.svg",
                     display: false,
                     fn: setScroller
