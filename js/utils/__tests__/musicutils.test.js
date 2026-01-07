@@ -740,6 +740,7 @@ describe("frequencyToPitch", () => {
     beforeEach(() => {
         global.A0 = 27.5;
         global.C8 = 4186.01;
+        global.C10 = 16744.04;
         global.TWELVEHUNDRETHROOT2 = Math.pow(2, 1 / 1200);
         global.PITCHES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
     });
@@ -748,10 +749,29 @@ describe("frequencyToPitch", () => {
         expect(frequencyToPitch(20)).toEqual(["A", 0, 0]);
         expect(frequencyToPitch(27.4)).toEqual(["A", 0, 0]);
     });
+
+    // 1. Verify the loop actually reaches the new upper octaves (C9)
+    it("should correctly map frequencies in the extended C9 range", () => {
+        // C9 is approx 8372 Hz. This proves the loop goes past 8.
+        const c9 = frequencyToPitch(8372);
+        expect(c9).toEqual(["C", 9, 0]);
+    });
+
+    // 2. Verify standard notes didn't break (Regression Check)
+    it("should correctly map standard notes (Regression Check)", () => {
+        // A0 (Lowest note)
+        expect(frequencyToPitch(27.5)).toEqual(["A", 0, 0]);
+        // A4 (Standard Concert Pitch)
+        expect(frequencyToPitch(440)).toEqual(["A", 4, 0]);
+        // C4 (Middle C)
+        expect(frequencyToPitch(261.63)).toEqual(["C", 4, 0]);
+    });
+
     it("should handle frequencies above C10", () => {
         expect(frequencyToPitch(17000)).toEqual(["C", 10, 0]);
         expect(frequencyToPitch(20000)).toEqual(["C", 10, 0]);
     });
+
     it("should handle frequencies with cents deviation", () => {
         const result = frequencyToPitch(442);
         expect(result[0]).toBe("A");
@@ -760,6 +780,7 @@ describe("frequencyToPitch", () => {
         expect(result2[0]).toBe("A");
         expect(result2[2]).toBeLessThan(0);
     });
+
     it("should map intermediate frequencies to nearest note", () => {
         const intermediateFreq = A0 * Math.pow(2, 1 / 3);
         const result = frequencyToPitch(intermediateFreq);

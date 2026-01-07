@@ -851,8 +851,23 @@ const POWER2 = [1, 2, 4, 8, 16, 32, 64, 128];
 const TWELTHROOT2 = 1.0594630943592953;
 // eslint-disable-next-line no-loss-of-precision
 const TWELVEHUNDRETHROOT2 = 1.0005777895065549;
+
+/**
+ * Frequency of A in octave 0, in Hz.
+ * @constant {number}
+ */
 const A0 = 27.5;
+
+/**
+ * Frequency of C in octave 8, in Hz.
+ * @constant {number}
+ */
 const C8 = 4186.01;
+
+/**
+ * Frequency of C in octave 10, in Hz.
+ * @constant {number}
+ */
 const C10 = 16744.04;
 
 /**
