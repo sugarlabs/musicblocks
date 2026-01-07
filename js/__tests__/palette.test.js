@@ -489,9 +489,7 @@ describe("Palettes Class", () => {
             const mockUpdatePalettes = jest.spyOn(palettes, "updatePalettes");
             palettes.dict = {
                 action: {
-                    protoList: [
-                        { name: "someOtherBlock", defaults: ["otherAction"] }
-                    ]
+                    protoList: [{ name: "someOtherBlock", defaults: ["otherAction"] }]
                 }
             };
 

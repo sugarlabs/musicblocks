@@ -196,7 +196,7 @@ describe("Logo Class", () => {
                 turtleList: [],
                 getTurtleCount: jest.fn(() => 1),
                 turtleCount: jest.fn(() => 1),
-                ithTurtle: jest.fn((i) => ({
+                ithTurtle: jest.fn(i => ({
                     singer: {
                         synthVolume: {},
                         backward: [],
@@ -210,7 +210,7 @@ describe("Logo Class", () => {
                     parameterQueue: [],
                     initTurtle: jest.fn()
                 })),
-                getTurtle: jest.fn((i) => ({
+                getTurtle: jest.fn(i => ({
                     painter: { color: 50 },
                     container: { x: 0, y: 0 },
                     x: 0,
@@ -583,12 +583,14 @@ describe("Logo parseArg", () => {
     });
 
     test("handles value blocks", () => {
-        logo.blockList = [{
-            name: "number",
-            value: 42,
-            protoblock: { parameter: false },
-            isValueBlock: () => true
-        }];
+        logo.blockList = [
+            {
+                name: "number",
+                value: 42,
+                protoblock: { parameter: false },
+                isValueBlock: () => true
+            }
+        ];
 
         const result = logo.parseArg(logo, 0, 0, null, null);
 
@@ -600,12 +602,14 @@ describe("Logo parseArg", () => {
             parameterQueue: [],
             singer: { noteDirection: 0 }
         }));
-        logo.blockList = [{
-            name: "intervalname",
-            value: "fifth",
-            protoblock: { parameter: false },
-            isValueBlock: () => false
-        }];
+        logo.blockList = [
+            {
+                name: "intervalname",
+                value: "fifth",
+                protoblock: { parameter: false },
+                isValueBlock: () => false
+            }
+        ];
 
         const result = logo.parseArg(logo, 0, 0, null, null);
 
