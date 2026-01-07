@@ -493,10 +493,16 @@ function SampleWidget() {
             }
 
             docById("wheelDivptm").style.display = "none";
-            if (!this.pitchWheel === undefined) {
+            if (this._pitchWheel !== undefined) {
                 this._pitchWheel.removeWheel();
+            }
+            if (this._exitWheel !== undefined) {
                 this._exitWheel.removeWheel();
+            }
+            if (this._accidentalsWheel !== undefined) {
                 this._accidentalsWheel.removeWheel();
+            }
+            if (this._octavesWheel !== undefined) {
                 this._octavesWheel.removeWheel();
             }
             this.pitchAnalysers = {};
