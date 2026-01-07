@@ -740,6 +740,7 @@ describe("frequencyToPitch", () => {
     beforeEach(() => {
         global.A0 = 27.5;
         global.C8 = 4186.01;
+        global.C10 = 16744.04;
         global.TWELVEHUNDRETHROOT2 = Math.pow(2, 1 / 1200);
         global.PITCHES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
     });
@@ -748,9 +749,9 @@ describe("frequencyToPitch", () => {
         expect(frequencyToPitch(20)).toEqual(["A", 0, 0]);
         expect(frequencyToPitch(27.4)).toEqual(["A", 0, 0]);
     });
-    it("should handle frequencies above C8", () => {
-        expect(frequencyToPitch(4200)).toEqual(["C", 8, 0]);
-        expect(frequencyToPitch(5000)).toEqual(["C", 8, 0]);
+    it("should handle frequencies above C10", () => {
+        expect(frequencyToPitch(17000)).toEqual(["C", 10, 0]);
+        expect(frequencyToPitch(20000)).toEqual(["C", 10, 0]);
     });
     it("should handle frequencies with cents deviation", () => {
         const result = frequencyToPitch(442);
@@ -765,6 +766,40 @@ describe("frequencyToPitch", () => {
         const result = frequencyToPitch(intermediateFreq);
         expect(result[0]).toBe("D♭");
         expect(result[1]).toBe(1);
+    });
+    // Verify that pitch mapping for frequencies <= C8 remains unchanged
+    it("should correctly map standard A notes across octaves", () => {
+        // A0 = 27.5 Hz
+        const a0 = frequencyToPitch(27.5);
+        expect(a0[0]).toBe("A");
+        expect(a0[1]).toBe(0);
+
+        // A4 = 440 Hz (concert pitch)
+        const a4 = frequencyToPitch(440);
+        expect(a4[0]).toBe("A");
+        expect(a4[1]).toBe(4);
+    });
+    it("should correctly map middle C and other C notes", () => {
+        // C4 (middle C) ≈ 261.63 Hz
+        const c4 = frequencyToPitch(261.63);
+        expect(c4[0]).toBe("C");
+        expect(c4[1]).toBe(4);
+
+        // C8 ≈ 4186 Hz
+        const c8 = frequencyToPitch(4186);
+        expect(c8[0]).toBe("C");
+        expect(c8[1]).toBe(8);
+    });
+    it("should correctly map frequencies in the extended range C8-C10", () => {
+        // C9 ≈ 8372 Hz
+        const c9 = frequencyToPitch(8372);
+        expect(c9[0]).toBe("C");
+        expect(c9[1]).toBe(9);
+
+        // C10 ≈ 16744 Hz
+        const c10 = frequencyToPitch(16744);
+        expect(c10[0]).toBe("C");
+        expect(c10[1]).toBe(10);
     });
 });
 
