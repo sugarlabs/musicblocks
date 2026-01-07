@@ -2461,10 +2461,6 @@ class Activity {
              * Handles wheel event on the canvas.
              * @param {WheelEvent} event - The wheel event object.
              */
-            /**
-             * Handles wheel event on the canvas.
-             * @param {WheelEvent} event - The wheel event object.
-             */
             const __wheelHandler = event => {
                 const data = normalizeWheel(event);
                 const delY = data.pixelY;
