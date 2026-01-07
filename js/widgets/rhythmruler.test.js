@@ -59,7 +59,7 @@ global.VOICENAMES = [];
 global.EFFECTSNAMES = [];
 
 // Mock Window Manager
-// Mock Window Manager
+
 const mockWindow = {
     widgetWindows: {
         windowFor: jest.fn().mockReturnValue({
@@ -193,33 +193,18 @@ describe("RhythmRuler Widget", () => {
     // CONSTRUCTOR TESTS
     // =========================================================================
     describe("Constructor", () => {
-        test("should initialize with empty Drums array", () => {
+        test("should initialize with default empty state", () => {
             expect(rhythmRuler.Drums).toEqual([]);
-        });
-
-        test("should initialize with empty Rulers array", () => {
             expect(rhythmRuler.Rulers).toEqual([]);
-        });
-
-        test("should initialize with empty undo list", () => {
             expect(rhythmRuler._undoList).toEqual([]);
-        });
-
-        test("should initialize with empty dissect history", () => {
             expect(rhythmRuler._dissectHistory).toEqual([]);
         });
 
-        test("should initialize with playing flags set to false", () => {
+        test("should initialize flags to default values", () => {
             expect(rhythmRuler._playing).toBe(false);
             expect(rhythmRuler._playingOne).toBe(false);
             expect(rhythmRuler._playingAll).toBe(false);
-        });
-
-        test("should initialize with tap mode disabled", () => {
             expect(rhythmRuler._tapMode).toBe(false);
-        });
-
-        test("should initialize with ruler selected as 0", () => {
             expect(rhythmRuler._rulerSelected).toBe(0);
         });
 
@@ -236,19 +221,10 @@ describe("RhythmRuler Widget", () => {
     // STATE MANAGEMENT TESTS
     // =========================================================================
     describe("State Management", () => {
-        test("should track elapsed times for synchronization", () => {
+        test("should initialize tracking arrays", () => {
             expect(rhythmRuler._elapsedTimes).toEqual([]);
-        });
-
-        test("should track offsets for each ruler", () => {
             expect(rhythmRuler._offsets).toEqual([]);
-        });
-
-        test("should track starting time for sync", () => {
             expect(rhythmRuler._startingTime).toBeNull();
-        });
-
-        test("should track tap times", () => {
             expect(rhythmRuler._tapTimes).toEqual([]);
         });
     });
@@ -407,36 +383,33 @@ describe("RhythmRuler Widget", () => {
     // NOTE WIDTH CALCULATION TESTS
     // =========================================================================
     describe("Note Width Calculation", () => {
-        beforeEach(() => {
-            rhythmRuler._cellScale = 1.0;
-        });
-
         test("should calculate width based on note value", () => {
             const width = rhythmRuler._noteWidth(4);
 
-            // Width = cellScale * EIGHTHNOTEWIDTH * (8 / noteValue) * 3
-            // = 1.0 * 24 * (8 / 4) * 3 = 144
+            // Width = EIGHTHNOTEWIDTH * (8 / noteValue) * 3
+            // (3 is the default scale factor when widget is not maximized)
+            // = 24 * (8 / 4) * 3 = 144
             expect(width).toBe(144);
         });
 
         test("should calculate width for eighth note", () => {
             const width = rhythmRuler._noteWidth(8);
 
-            // = 1.0 * 24 * (8 / 8) * 3 = 72
+            // = 24 * (8 / 8) * 3 = 72
             expect(width).toBe(72);
         });
 
         test("should calculate width for half note", () => {
             const width = rhythmRuler._noteWidth(2);
 
-            // = 1.0 * 24 * (8 / 2) * 3 = 288
+            // = 24 * (8 / 2) * 3 = 288
             expect(width).toBe(288);
         });
 
         test("should handle sixteenth note", () => {
             const width = rhythmRuler._noteWidth(16);
 
-            // = 1.0 * 24 * (8 / 16) * 3 = 36
+            // = 24 * (8 / 16) * 3 = 36
             expect(width).toBe(36);
         });
     });
@@ -445,23 +418,15 @@ describe("RhythmRuler Widget", () => {
     // PLAYBACK STATE TESTS
     // =========================================================================
     describe("Playback State", () => {
-        test("should track which ruler is playing", () => {
+        test("should allow updating playback properties", () => {
             rhythmRuler._rulerPlaying = 2;
-            expect(rhythmRuler._rulerPlaying).toBe(2);
-        });
-
-        test("should support playing all rulers", () => {
             rhythmRuler._playingAll = true;
-            expect(rhythmRuler._playingAll).toBe(true);
-        });
-
-        test("should support playing single ruler", () => {
             rhythmRuler._playingOne = true;
-            expect(rhythmRuler._playingOne).toBe(true);
-        });
-
-        test("should track cell counter for playback", () => {
             rhythmRuler._cellCounter = 5;
+
+            expect(rhythmRuler._rulerPlaying).toBe(2);
+            expect(rhythmRuler._playingAll).toBe(true);
+            expect(rhythmRuler._playingOne).toBe(true);
             expect(rhythmRuler._cellCounter).toBe(5);
         });
     });
@@ -470,31 +435,25 @@ describe("RhythmRuler Widget", () => {
     // TAP MODE TESTS
     // =========================================================================
     describe("Tap Mode", () => {
-        test("should track tap mode state", () => {
+        test("should track tap mode verification", () => {
+            // Update simple properties
             rhythmRuler._tapMode = true;
-            expect(rhythmRuler._tapMode).toBe(true);
-        });
-
-        test("should track tap times array", () => {
             rhythmRuler._tapTimes = [100, 200, 300];
-            expect(rhythmRuler._tapTimes).toHaveLength(3);
-        });
-
-        test("should track tap cell reference", () => {
-            const mockCell = { cellIndex: 2 };
-            rhythmRuler._tapCell = mockCell;
-            expect(rhythmRuler._tapCell.cellIndex).toBe(2);
-        });
-
-        test("should track tap end time", () => {
             rhythmRuler._tapEndTime = 12345;
+
+            expect(rhythmRuler._tapMode).toBe(true);
+            expect(rhythmRuler._tapTimes).toHaveLength(3);
             expect(rhythmRuler._tapEndTime).toBe(12345);
         });
 
-        test("should track long press state", () => {
+        test("should track tap interaction details", () => {
+            // Cell reference and long press tracking
+            const mockCell = { cellIndex: 2 };
+            rhythmRuler._tapCell = mockCell;
             rhythmRuler._inLongPress = true;
             rhythmRuler._longPressStartTime = 10000;
 
+            expect(rhythmRuler._tapCell.cellIndex).toBe(2);
             expect(rhythmRuler._inLongPress).toBe(true);
             expect(rhythmRuler._longPressStartTime).toBe(10000);
         });
@@ -504,13 +463,11 @@ describe("RhythmRuler Widget", () => {
     // MOUSE INTERACTION TESTS
     // =========================================================================
     describe("Mouse Interactions", () => {
-        test("should track mouse down cell", () => {
+        test("should track mouse interactions on cells", () => {
             rhythmRuler._mouseDownCell = 3;
-            expect(rhythmRuler._mouseDownCell).toBe(3);
-        });
-
-        test("should track mouse up cell", () => {
             rhythmRuler._mouseUpCell = 5;
+
+            expect(rhythmRuler._mouseDownCell).toBe(3);
             expect(rhythmRuler._mouseUpCell).toBe(5);
         });
     });
@@ -519,11 +476,9 @@ describe("RhythmRuler Widget", () => {
     // FULLSCREEN MODE TESTS
     // =========================================================================
     describe("Fullscreen Mode", () => {
-        test("should have default fullscreen scale factor of 3", () => {
+        test("should manage fullscreen scale factor", () => {
             expect(rhythmRuler._fullscreenScaleFactor).toBe(3);
-        });
 
-        test("should allow changing fullscreen scale factor", () => {
             rhythmRuler._fullscreenScaleFactor = 5;
             expect(rhythmRuler._fullscreenScaleFactor).toBe(5);
         });
