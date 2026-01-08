@@ -7729,8 +7729,6 @@ class Activity {
             return false;
         };
         return getCapture(opt1) === getCapture(opt2);
-
-
     }
 
     /**
