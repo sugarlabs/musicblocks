@@ -7711,8 +7711,26 @@ class Activity {
                 l.target !== target ||
                 l.type !== type ||
                 l.listener !== listener ||
-                l.options !== options
+                !this._areOptionsEqual(l.options, options)
         );
+    }
+
+    /**
+     * Checks if two event listener option sets are equivalent for the purpose of removal.
+     * @param {Object|boolean} opt1 - First option set.
+     * @param {Object|boolean} opt2 - Second option set.
+     * @returns {boolean} True if they are effectively equal.
+     */
+    _areOptionsEqual(opt1, opt2) {
+        // Normalize options to booleans for capture flag, as that's the primary discriminator for removal
+        const getCapture = opt => {
+            if (typeof opt === "boolean") return opt;
+            if (typeof opt === "object" && opt !== null) return !!opt.capture;
+            return false;
+        };
+        return getCapture(opt1) === getCapture(opt2);
+
+
     }
 
     /**
