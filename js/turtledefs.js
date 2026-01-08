@@ -74,7 +74,6 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
         } else {
             // Production environment
             GUIDEURL = "https://musicblocks.sugarlabs.org/guide/";
-
         }
     }
 
