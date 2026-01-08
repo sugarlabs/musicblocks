@@ -20,7 +20,7 @@
         "cypress:run": "cypress run",
         "electron": "electron .",
         "dist": "electron-builder",
-        "prepare": "husky"
+        "prepare": "husky || true"
     },
     "lint-staged": {
         "js/**/*.js": [
@@ -32,6 +32,8 @@
         ]
     },
     "devDependencies": {
+        "husky": "^9.0.11",
+        "lint-staged": "^15.2.2",
         "@babel/core": "^7.11.1",
         "@babel/eslint-parser": "^7.26.10",
         "@babel/preset-env": "^7.11.0",
