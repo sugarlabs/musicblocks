@@ -74,7 +74,10 @@ class SVG {
         this._expandY2 = 0;
         this._clampCount = 1;
         this._clampSlots = [1];
-        this._slotSize = 21; // TODO: Compute this.
+        // Slot size represents the standard height of a basic block.
+        // Derived from: 2 * radius + innieY2 + strokeWidth
+        // This ensures clamp block jaws scale properly with theme changes.
+        this._slotSize = 2 * this._radius + this._innieY2 + this._strokeWidth;
         this._arm = true;
         this._else = false;
         this._draw_inniess = true;
@@ -202,11 +205,14 @@ class SVG {
 
     /**
      * @public
-     * @param {number} stroke_width
+     * @param {number} strokeWidth
      * @returns {void}
      */
-    setstrokeWidth(stroke_width) {
-        this._strokeWidth = stroke_width;
+    setStrokeWidth(strokeWidth) {
+        this._strokeWidth = strokeWidth;
+        // Recalculate dependent values that use strokeWidth
+        this._innieY2 = (9 - this._strokeWidth) / 2;
+        this._slotSize = 2 * this._radius + this._innieY2 + this._strokeWidth;
         this._calc_porch_params();
     }
 
