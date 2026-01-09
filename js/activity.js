@@ -4078,7 +4078,11 @@ class Activity {
                 listItem.dataset.blockId = blockId;
 
                 listItem.addEventListener("mouseover", () => listItem.classList.add("hover"));
-                listItem.addEventListener("mouseout", () => listItem.classList.remove("hover"));
+                listItem.addEventListener("mouseout", () => {
+  console.log("mouseout fired — hover removed");
+  listItem.classList.remove("hover");
+});
+
                 listItem.addEventListener("click", () => {
                     this._restoreTrashById(blockId);
                     trashView.classList.add("hidden");
