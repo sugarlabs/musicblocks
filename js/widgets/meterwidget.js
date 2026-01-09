@@ -256,9 +256,8 @@ class MeterWidget {
 
         const divInput2 = document.createElement("div");
         divInput2.className = "wfbtItem";
-        divInput2.innerHTML = `<input style="float: left;" value="${
-            1 / this._beatValue
-        }" type="number" id="beatValue" min="1" max="35">`;
+        divInput2.innerHTML = `<input style="float: left;" value="${1 / this._beatValue
+            }" type="number" id="beatValue" min="1" max="35">`;
 
         widgetWindow._toolbar.appendChild(divInput);
         widgetWindow._toolbar.appendChild(divInput2);
@@ -660,4 +659,8 @@ class MeterWidget {
             this._beatWheel.navItems[3].navItem.show();
         }
     }
+}
+
+if (typeof module !== "undefined") {
+    module.exports = MeterWidget;
 }
