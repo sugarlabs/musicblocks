@@ -205,11 +205,11 @@ class SVG {
 
     /**
      * @public
-     * @param {number} stroke_width
+     * @param {number} strokeWidth
      * @returns {void}
      */
-    setstrokeWidth(stroke_width) {
-        this._strokeWidth = stroke_width;
+    setStrokeWidth(strokeWidth) {
+        this._strokeWidth = strokeWidth;
         // Recalculate dependent values that use strokeWidth
         this._innieY2 = (9 - this._strokeWidth) / 2;
         this._slotSize = 2 * this._radius + this._innieY2 + this._strokeWidth;

@@ -102,7 +102,7 @@ describe("SVG Class", () => {
         });
 
         it("should set stroke width", () => {
-            svg.setstrokeWidth(2);
+            svg.setStrokeWidth(2);
             expect(svg._strokeWidth).toBe(2);
         });
 
@@ -112,10 +112,10 @@ describe("SVG Class", () => {
             expect(svg._slotSize).toBe(21);
             
             // When strokeWidth changes, slotSize should update
-            svg.setstrokeWidth(2);
+            svg.setStrokeWidth(2);
             // New innieY2 = (9 - 2) / 2 = 3.5
-            // Expected: 2 * 8 + 3.5 + 2 = 19.5
-            expect(svg._slotSize).toBe(19.5);
+            // Expected: 2 * 8 + 3.5 + 2 = 21.5
+            expect(svg._slotSize).toBe(21.5);
         });
 
         it("should set colors", () => {
