@@ -78,7 +78,7 @@ global.wheelnav = jest.fn().mockImplementation(() => ({
 global.wheelnav.cssMeter = false;
 
 // Mock the Window Manager
-if (typeof window === 'undefined') {
+if (typeof window === "undefined") {
     global.window = {};
 }
 window.innerWidth = 1024;
@@ -88,16 +88,18 @@ window.widgetWindows = {
         show: jest.fn(),
         destroy: jest.fn(),
         addButton: jest.fn().mockImplementation(() => ({
-            onclick: () => { }
+            onclick: () => {}
         })),
         addInputButton: jest.fn().mockReturnValue({ value: 0, addEventListener: jest.fn() }), // Add this as it might be used
         getWidgetBody: jest.fn().mockReturnValue({
             append: jest.fn(),
             appendChild: jest.fn(), // Tempo uses appendChild
-            getElementsByTagName: jest.fn().mockReturnValue([{
-                style: {},
-                setAttribute: jest.fn()
-            }]),
+            getElementsByTagName: jest.fn().mockReturnValue([
+                {
+                    style: {},
+                    setAttribute: jest.fn()
+                }
+            ]),
             insertRow: jest.fn().mockReturnValue({
                 insertCell: jest.fn().mockReturnValue({
                     appendChild: jest.fn(),
@@ -120,13 +122,13 @@ window.widgetWindows = {
 };
 
 // Mock Document
-if (typeof document === 'undefined') {
+if (typeof document === "undefined") {
     global.document = {};
 }
 
 // If document.createElement exists (JSDOM), spy on it. If not, create it.
 if (document.createElement) {
-    jest.spyOn(document, 'createElement').mockImplementation(tag => {
+    jest.spyOn(document, "createElement").mockImplementation(tag => {
         return {
             style: {},
             innerHTML: "",
@@ -134,7 +136,8 @@ if (document.createElement) {
             className: "",
             append: jest.fn(),
             appendChild: jest.fn(),
-            getContext: jest.fn().mockReturnValue({ // For canvas if needed
+            getContext: jest.fn().mockReturnValue({
+                // For canvas if needed
                 clearRect: jest.fn(),
                 beginPath: jest.fn(),
                 fillStyle: "",
@@ -168,7 +171,6 @@ if (document.createElement) {
         };
     });
 }
-
 
 describe("Meter Widget", () => {
     let meterWidget;
@@ -209,7 +211,7 @@ describe("Meter Widget", () => {
                     trigger: jest.fn(),
                     runLogoCommands: jest.fn()
                 },
-                turtleDelay: 100,
+                turtleDelay: 100
             },
             turtles: {
                 ithTurtle: jest.fn().mockReturnValue({
@@ -277,7 +279,12 @@ describe("Meter Widget", () => {
 
         // Expect snare for strong beat
         expect(mockActivity.logo.synth.trigger).toHaveBeenCalledWith(
-            0, "C4", expect.anything(), "snare drum", null, null
+            0,
+            "C4",
+            expect.anything(),
+            "snare drum",
+            null,
+            null
         );
 
         // Clear mock and test weak beat (index 1)
@@ -286,7 +293,12 @@ describe("Meter Widget", () => {
 
         // Expect kick for weak beat
         expect(mockActivity.logo.synth.trigger).toHaveBeenCalledWith(
-            0, "C4", expect.anything(), "kick drum", null, null
+            0,
+            "C4",
+            expect.anything(),
+            "kick drum",
+            null,
+            null
         );
     });
 
@@ -303,7 +315,11 @@ describe("Meter Widget", () => {
         // Should produce onbeatdo blocks
         expect(savedBlocks.some(b => b[1] === "onbeatdo")).toBe(true);
         // Should have numbers for the beats (1-based index)
-        expect(savedBlocks.some(b => Array.isArray(b[1]) && b[1][0] === "number" && b[1][1].value === 1)).toBe(true);
+        expect(
+            savedBlocks.some(
+                b => Array.isArray(b[1]) && b[1][0] === "number" && b[1][1].value === 1
+            )
+        ).toBe(true);
     });
 
     test("should setup default strong beats for 4/4", () => {
