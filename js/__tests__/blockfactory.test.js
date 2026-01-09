@@ -106,6 +106,18 @@ describe("SVG Class", () => {
             expect(svg._strokeWidth).toBe(2);
         });
 
+        it("should compute slot size dynamically", () => {
+            // With defaults: radius=8, innieY2=4, strokeWidth=1
+            // Expected: 2 * 8 + 4 + 1 = 21
+            expect(svg._slotSize).toBe(21);
+            
+            // When strokeWidth changes, slotSize should update
+            svg.setstrokeWidth(2);
+            // New innieY2 = (9 - 2) / 2 = 3.5
+            // Expected: 2 * 8 + 3.5 + 2 = 19.5
+            expect(svg._slotSize).toBe(19.5);
+        });
+
         it("should set colors", () => {
             svg.setColors(["red", "blue"]);
             expect(svg._fill).toBe("red");
