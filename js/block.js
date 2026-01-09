@@ -2682,6 +2682,15 @@ class Block {
         }
 
         this.activity.refreshCanvas();
+
+        // Force additional refresh after a short delay to ensure all nested
+        // clamp blocks have completed their asynchronous artwork regeneration.
+        // This fixes the issue where nested clamp blocks (like setInstrument and
+        // start) don't visually update until the mouse moves away from the button.
+        const activity = this.activity;
+        setTimeout(() => {
+            activity.refreshCanvas();
+        }, 50);
     }
 
     /**
