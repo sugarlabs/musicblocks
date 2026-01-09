@@ -110,7 +110,7 @@ describe("SVG Class", () => {
             // With defaults: radius=8, innieY2=4, strokeWidth=1
             // Expected: 2 * 8 + 4 + 1 = 21
             expect(svg._slotSize).toBe(21);
-            
+
             // When strokeWidth changes, slotSize should update
             svg.setStrokeWidth(2);
             // New innieY2 = (9 - 2) / 2 = 3.5
