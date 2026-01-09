@@ -19,6 +19,23 @@
 
 /* exported setupToneBlocks */
 
+function addParameterHelpSupport(proto) {
+    if (!proto.setHelpStringForParameter) {
+        proto.setHelpStringForParameter = function (parameter, helpText) {
+            if (!this.parameterHelp) {
+                this.parameterHelp = {};
+            }
+            this.parameterHelp[parameter] = helpText;
+        };
+    }
+}
+
+// ADD THESE CALLS HERE:
+addParameterHelpSupport(FlowBlock.prototype);
+addParameterHelpSupport(ValueBlock.prototype);
+addParameterHelpSupport(FlowClampBlock.prototype);
+addParameterHelpSupport(LeftBlock.prototype);
+
 function setupToneBlocks(activity) {
     /**
      * Represents an Oscillator block.
@@ -26,6 +43,7 @@ function setupToneBlocks(activity) {
      * @class
      * @extends FlowBlock
      */
+
     class OscillatorBlock extends FlowBlock {
         /**
          * Creates an instance of OscillatorBlock.
@@ -521,16 +539,22 @@ function setupToneBlocks(activity) {
         flow(args, logo, turtle, blk) {
             Singer.ToneActions.doTremolo(args[0], args[1], turtle, blk);
 
-            const tur = activity.turtles.ithTurtle(turtle);
-
             if (logo.inTimbre) {
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["tremoloActive"] = true;
+                const tur = activity.turtles.ithTurtle(turtle);
+
+                instrumentsEffects[turtle][logo.timbre.instrumentName].tremoloActive = true;
                 logo.timbre.tremoloEffect.push(blk);
-                logo.timbre.tremoloParams.push(last(tur.singer.tremoloFrequency));
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["tremoloFrequency"] =
-                    args[0];
-                logo.timbre.tremoloParams.push(last(tur.singer.tremoloDepth) * 100);
-                instrumentsEffects[turtle][logo.timbre.instrumentName]["tremoloDepth"] = args[1];
+
+                // Use values from singer state AFTER doTremolo for timbre params
+                const freq = last(tur.singer.tremoloFrequency);
+                const depth = last(tur.singer.tremoloDepth);
+
+                logo.timbre.tremoloParams.push(freq);
+                logo.timbre.tremoloParams.push(depth * 100);
+
+                // Store the input argument directly
+                instrumentsEffects[turtle][logo.timbre.instrumentName].tremoloFrequency = args[0];
+                instrumentsEffects[turtle][logo.timbre.instrumentName].tremoloDepth = args[1];
             }
 
             return [args[2], 1];
@@ -833,7 +857,7 @@ function setupToneBlocks(activity) {
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                "print"
             ) {
                 logo.statusFields.push([blk, "synthname"]);
             } else {
@@ -910,8 +934,8 @@ function setupToneBlocks(activity) {
             this.setPalette("tone", activity);
             this.setHelpString([
                 _("The Set instrument block selects a voice for the synthesizer,") +
-                    " " +
-                    _("eg guitar piano violin or cello."),
+                " " +
+                _("eg guitar piano violin or cello."),
                 "documentation",
                 ""
             ]);
@@ -944,8 +968,8 @@ function setupToneBlocks(activity) {
             } else {
                 this.setHelpString([
                     _("The Set instrument block selects a voice for the synthesizer,") +
-                        " " +
-                        _("eg guitar piano violin or cello."),
+                    " " +
+                    _("eg guitar piano violin or cello."),
                     "documentation",
                     null,
                     "settimbrehelp"
@@ -1070,7 +1094,7 @@ function setupToneBlocks(activity) {
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                    "print"
+                "print"
             ) {
                 logo.statusFields.push([blk, "customsample"]);
             } else {
