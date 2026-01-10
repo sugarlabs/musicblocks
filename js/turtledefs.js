@@ -430,9 +430,9 @@ const createHelpContent = activity => {
                 _(
                     "Turtle Blocks is a Logo-inspired turtle that draws colorful pictures with snap-together visual-programming blocks."
                 ) +
-                _("The current version is") +
-                " " +
-                VERSION,
+                    _("The current version is") +
+                    " " +
+                    VERSION,
                 "data:image/svg+xml;base64," + window.btoa(base64Encode(LOGO))
             ],
             [
@@ -453,19 +453,19 @@ const createHelpContent = activity => {
                 _(
                     "Music Blocks is a collection of tools for exploring fundamental musical concepts in a fun way."
                 ) +
-                " " +
-                _("The current version is") +
-                " " +
-                VERSION,
+                    " " +
+                    _("The current version is") +
+                    " " +
+                    VERSION,
                 "data:image/svg+xml;base64," + window.btoa(base64Encode(LOGO))
             ],
             [
                 _("Meet Mr. Mouse!"),
                 _("Mr Mouse is our Music Blocks conductor.") +
-                " " +
-                _("Mr Mouse encourages you to explore Music Blocks.") +
-                " " +
-                _("Let us start our tour!"),
+                    " " +
+                    _("Mr Mouse encourages you to explore Music Blocks.") +
+                    " " +
+                    _("Let us start our tour!"),
                 "data:image/svg+xml;base64," + window.btoa(base64Encode(MOUSEPALETTEICON))
             ],
             [
@@ -520,34 +520,34 @@ const createHelpContent = activity => {
             HELPCONTENT.push([
                 _("Save"),
                 _("Save project") +
-                ": " +
-                _("Save your project to a file.") +
-                "<br/><br/>" +
-                _("Save turtle artwork as SVG") +
-                ": " +
-                _("Save graphics from your project to as SVG.") +
-                "<br/><br/>" +
-                _("Save turtle artwork as PNG") +
-                ": " +
-                _("Save graphics from your project as PNG.") +
-                "<br/><br/>" +
-                _("Save block artwork as SVG") +
-                ": " +
-                _("Save block artwork as an SVG file."),
+                    ": " +
+                    _("Save your project to a file.") +
+                    "<br/><br/>" +
+                    _("Save turtle artwork as SVG") +
+                    ": " +
+                    _("Save graphics from your project to as SVG.") +
+                    "<br/><br/>" +
+                    _("Save turtle artwork as PNG") +
+                    ": " +
+                    _("Save graphics from your project as PNG.") +
+                    "<br/><br/>" +
+                    _("Save block artwork as SVG") +
+                    ": " +
+                    _("Save block artwork as an SVG file."),
                 "data:image/svg+xml;base64," + window.btoa(base64Encode(SAVEBUTTON))
             ]);
         } else {
             HELPCONTENT.push([
                 _("Save project"),
                 _("Save project as HTML") +
-                "<br/>" +
-                _("Save project as MIDI") +
-                "<br/>" +
-                _("Save music as WAV") +
-                "<br/>" +
-                _("Save sheet music as ABC, Lilypond or MusicXML") +
-                "<br/>" +
-                _("Save block artwork as SVG or PNG"),
+                    "<br/>" +
+                    _("Save project as MIDI") +
+                    "<br/>" +
+                    _("Save music as WAV") +
+                    "<br/>" +
+                    _("Save sheet music as ABC, Lilypond or MusicXML") +
+                    "<br/>" +
+                    _("Save block artwork as SVG or PNG"),
                 "data:image/svg+xml;base64," + window.btoa(base64Encode(SAVEBUTTON))
             ]);
         }
@@ -680,8 +680,8 @@ const createHelpContent = activity => {
     HELPCONTENT.push([
         _("Grid"),
         _("Turn on/off lines for cartesian or polar grids.") +
-        "<br/>" +
-        _("Turn on/off music staffs."),
+            "<br/>" +
+            _("Turn on/off music staffs."),
         "data:image/svg+xml;base64," + window.btoa(base64Encode(CARTESIANBUTTON))
     ]);
     HELPCONTENT.push([
@@ -732,10 +732,10 @@ const createHelpContent = activity => {
             _(
                 "This toolbar contains the palette buttons including Rhythm Pitch Tone Action and more."
             ) +
-            " " +
-            _(
-                "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
-            ),
+                " " +
+                _(
+                    "Click to show the palettes of blocks and drag blocks from the palettes onto the canvas to use them."
+                ),
             "data:image/svg+xml;base64," + window.btoa(base64Encode(RHYTHMPALETTEHELPICON))
         ]);
     }
@@ -752,16 +752,16 @@ const createHelpContent = activity => {
             _(
                 "Turtle Blocks is an open source collection of tools for exploring musical concepts."
             ) +
-            " " +
-            _(
-                "A full list of contributors can be found in the Turtle Blocks GitHub repository."
-            ) +
-            " " +
-            _("Turtle Blocks is licensed under the AGPL.") +
-            " " +
-            _("The current version is") +
-            " " +
-            VERSION,
+                " " +
+                _(
+                    "A full list of contributors can be found in the Turtle Blocks GitHub repository."
+                ) +
+                " " +
+                _("Turtle Blocks is licensed under the AGPL.") +
+                " " +
+                _("The current version is") +
+                " " +
+                VERSION,
             "data:image/svg+xml;base64," + window.btoa(base64Encode(LOGO)),
             "https://github.com/sugarlabs/turtleblocksjs",
             _("Turtle Blocks GitHub repository")
@@ -777,16 +777,16 @@ const createHelpContent = activity => {
             _(
                 "Music Blocks is an open source collection of tools for exploring musical concepts."
             ) +
-            " " +
-            _(
-                "A full list of contributors can be found in the Music Blocks GitHub repository."
-            ) +
-            " " +
-            _("Music Blocks is licensed under the AGPL.") +
-            " " +
-            _("The current version is") +
-            " " +
-            VERSION,
+                " " +
+                _(
+                    "A full list of contributors can be found in the Music Blocks GitHub repository."
+                ) +
+                " " +
+                _("Music Blocks is licensed under the AGPL.") +
+                " " +
+                _("The current version is") +
+                " " +
+                VERSION,
             "data:image/svg+xml;base64," + window.btoa(base64Encode(LOGO)),
             "https://github.com/sugarlabs/musicblocks",
             _("Music Blocks GitHub repository")
@@ -799,245 +799,361 @@ const createHelpContent = activity => {
         HELPCONTENT.push([
             _("🎵 Build Your First Project!"),
             _("Want to create your first musical masterpiece?") +
-            "<br/><br/>" +
-            "<strong>" + _("This tutorial will guide you step-by-step to:") + "</strong>" +
-            "<br/>• " + _("Create a 4-note melody") +
-            "<br/>• " + _("Add loops and rhythm") +
-            "<br/>• " + _("Make the turtle draw while playing") +
-            "<br/>• " + _("Choose instruments and colors") +
-            "<br/>• " + _("Run and save your project!") +
-            "<br/><br/>" +
-            "👉 <strong>" + _("Click → to START the tutorial") + "</strong>" +
-            "<br/>" +
-            "👉 <strong>" + _("Or keep clicking → to SKIP to the end") + "</strong>",
+                "<br/><br/>" +
+                "<strong>" +
+                _("This tutorial will guide you step-by-step to:") +
+                "</strong>" +
+                "<br/>• " +
+                _("Create a 4-note melody") +
+                "<br/>• " +
+                _("Add loops and rhythm") +
+                "<br/>• " +
+                _("Make the turtle draw while playing") +
+                "<br/>• " +
+                _("Choose instruments and colors") +
+                "<br/>• " +
+                _("Run and save your project!") +
+                "<br/><br/>" +
+                "👉 <strong>" +
+                _("Click → to START the tutorial") +
+                "</strong>" +
+                "<br/>" +
+                "👉 <strong>" +
+                _("Or keep clicking → to SKIP to the end") +
+                "</strong>",
             "data:image/svg+xml;base64," + window.btoa(base64Encode(MOUSEPALETTEICON))
         ]);
 
         // Card 39: Step 1 - Find the Start Block
         HELPCONTENT.push([
             _("Tutorial Step 1 of 10: Find the Start Block"),
-            "<strong>🎯 " + _("YOUR TASK:") + "</strong>" +
-            "<br/>" +
-            _("Look at the canvas (the main area) - find the START block.") +
-            "<br/><br/>" +
-            "<strong>📍 " + _("WHERE TO LOOK:") + "</strong>" +
-            "<br/>" +
-            _("The Start block is already on your canvas! It looks like a mouse icon with 'Start' written on it.") +
-            "<br/><br/>" +
-            "<strong>💡 " + _("WHY:") + "</strong>" +
-            "<br/>" +
-            _("Everything you build goes INSIDE the Start block. When you press Play, code runs from top to bottom.") +
-            "<br/><br/>" +
-            "✅ " + _("Found it? Great! Click → for the next step."),
+            "<strong>🎯 " +
+                _("YOUR TASK:") +
+                "</strong>" +
+                "<br/>" +
+                _("Look at the canvas (the main area) - find the START block.") +
+                "<br/><br/>" +
+                "<strong>📍 " +
+                _("WHERE TO LOOK:") +
+                "</strong>" +
+                "<br/>" +
+                _(
+                    "The Start block is already on your canvas! It looks like a mouse icon with 'Start' written on it."
+                ) +
+                "<br/><br/>" +
+                "<strong>💡 " +
+                _("WHY:") +
+                "</strong>" +
+                "<br/>" +
+                _(
+                    "Everything you build goes INSIDE the Start block. When you press Play, code runs from top to bottom."
+                ) +
+                "<br/><br/>" +
+                "✅ " +
+                _("Found it? Great! Click → for the next step."),
             "data:image/svg+xml;base64," + window.btoa(base64Encode(RUNBUTTON))
         ]);
 
         // Card 40: Step 2 - Open the Rhythm Palette
         HELPCONTENT.push([
             _("Tutorial Step 2 of 10: Open the Rhythm Palette"),
-            "<strong>🎯 " + _("YOUR TASK:") + "</strong>" +
-            "<br/>" +
-            _("Click on the 'Rhythm' button in the left palette bar.") +
-            "<br/><br/>" +
-            "<strong>📍 " + _("WHERE TO LOOK:") + "</strong>" +
-            "<br/>" +
-            _("Look at the LEFT side of your screen. You'll see colorful palette buttons. Find 'Rhythm' (it's near the top).") +
-            "<br/><br/>" +
-            "<strong>💡 " + _("WHY:") + "</strong>" +
-            "<br/>" +
-            _("The Rhythm palette contains NOTE blocks - the building blocks of music!") +
-            "<br/><br/>" +
-            "✅ " + _("Clicked it? You should see rhythm blocks appear. Click → to continue."),
+            "<strong>🎯 " +
+                _("YOUR TASK:") +
+                "</strong>" +
+                "<br/>" +
+                _("Click on the 'Rhythm' button in the left palette bar.") +
+                "<br/><br/>" +
+                "<strong>📍 " +
+                _("WHERE TO LOOK:") +
+                "</strong>" +
+                "<br/>" +
+                _(
+                    "Look at the LEFT side of your screen. You'll see colorful palette buttons. Find 'Rhythm' (it's near the top)."
+                ) +
+                "<br/><br/>" +
+                "<strong>💡 " +
+                _("WHY:") +
+                "</strong>" +
+                "<br/>" +
+                _("The Rhythm palette contains NOTE blocks - the building blocks of music!") +
+                "<br/><br/>" +
+                "✅ " +
+                _("Clicked it? You should see rhythm blocks appear. Click → to continue."),
             "data:image/svg+xml;base64," + window.btoa(base64Encode(RHYTHMPALETTEHELPICON))
         ]);
 
         // Card 41: Step 3 - Drag a Note Block
         HELPCONTENT.push([
             _("Tutorial Step 3 of 10: Add a Note Block"),
-            "<strong>🎯 " + _("YOUR TASK:") + "</strong>" +
-            "<br/>" +
-            _("Find the 'Note' block in the Rhythm palette and DRAG it onto the canvas.") +
-            "<br/><br/>" +
-            "<strong>📍 " + _("HOW TO DO IT:") + "</strong>" +
-            "<br/>" +
-            "1. " + _("Find 'Note' in the palette (shows a musical note icon)") +
-            "<br/>" +
-            "2. " + _("Click and HOLD the mouse button") +
-            "<br/>" +
-            "3. " + _("Drag it to the canvas and DROP it near the Start block") +
-            "<br/><br/>" +
-            "<strong>💡 " + _("TIP:") + "</strong>" +
-            "<br/>" +
-            _("Don't connect it yet - we need to add a pitch first!") +
-            "<br/><br/>" +
-            "✅ " + _("Note block on canvas? Click → to continue."),
+            "<strong>🎯 " +
+                _("YOUR TASK:") +
+                "</strong>" +
+                "<br/>" +
+                _("Find the 'Note' block in the Rhythm palette and DRAG it onto the canvas.") +
+                "<br/><br/>" +
+                "<strong>📍 " +
+                _("HOW TO DO IT:") +
+                "</strong>" +
+                "<br/>" +
+                "1. " +
+                _("Find 'Note' in the palette (shows a musical note icon)") +
+                "<br/>" +
+                "2. " +
+                _("Click and HOLD the mouse button") +
+                "<br/>" +
+                "3. " +
+                _("Drag it to the canvas and DROP it near the Start block") +
+                "<br/><br/>" +
+                "<strong>💡 " +
+                _("TIP:") +
+                "</strong>" +
+                "<br/>" +
+                _("Don't connect it yet - we need to add a pitch first!") +
+                "<br/><br/>" +
+                "✅ " +
+                _("Note block on canvas? Click → to continue."),
             "data:image/svg+xml;base64," + window.btoa(base64Encode(RHYTHMPALETTEHELPICON))
         ]);
 
         // Card 42: Step 4 - Add a Pitch Block
         HELPCONTENT.push([
             _("Tutorial Step 4 of 10: Add a Pitch"),
-            "<strong>🎯 " + _("YOUR TASK:") + "</strong>" +
-            "<br/>" +
-            _("Open the 'Pitch' palette and drag a Pitch block INSIDE your Note block.") +
-            "<br/><br/>" +
-            "<strong>📍 " + _("HOW TO DO IT:") + "</strong>" +
-            "<br/>" +
-            "1. " + _("Click 'Pitch' in the left palette bar") +
-            "<br/>" +
-            "2. " + _("Find the 'Pitch' block (shows Sol/G)") +
-            "<br/>" +
-            "3. " + _("Drag it and DROP it INSIDE the Note block") +
-            "<br/><br/>" +
-            "<strong>💡 " + _("RESULT:") + "</strong>" +
-            "<br/>" +
-            _("Your Note block should now have a Pitch block nested inside it!") +
-            "<br/><br/>" +
-            "✅ " + _("Done? Click → to continue."),
+            "<strong>🎯 " +
+                _("YOUR TASK:") +
+                "</strong>" +
+                "<br/>" +
+                _("Open the 'Pitch' palette and drag a Pitch block INSIDE your Note block.") +
+                "<br/><br/>" +
+                "<strong>📍 " +
+                _("HOW TO DO IT:") +
+                "</strong>" +
+                "<br/>" +
+                "1. " +
+                _("Click 'Pitch' in the left palette bar") +
+                "<br/>" +
+                "2. " +
+                _("Find the 'Pitch' block (shows Sol/G)") +
+                "<br/>" +
+                "3. " +
+                _("Drag it and DROP it INSIDE the Note block") +
+                "<br/><br/>" +
+                "<strong>💡 " +
+                _("RESULT:") +
+                "</strong>" +
+                "<br/>" +
+                _("Your Note block should now have a Pitch block nested inside it!") +
+                "<br/><br/>" +
+                "✅ " +
+                _("Done? Click → to continue."),
             "data:image/svg+xml;base64," + window.btoa(base64Encode(RHYTHMPALETTEHELPICON))
         ]);
 
         // Card 43: Step 5 - Connect to Start and Play
         HELPCONTENT.push([
             _("Tutorial Step 5 of 10: Connect and Play!"),
-            "<strong>🎯 " + _("YOUR TASK:") + "</strong>" +
-            "<br/>" +
-            _("Connect your Note block to the Start block, then press PLAY!") +
-            "<br/><br/>" +
-            "<strong>📍 " + _("HOW TO DO IT:") + "</strong>" +
-            "<br/>" +
-            "1. " + _("Drag your Note block and connect it INSIDE the Start block") +
-            "<br/>" +
-            "2. " + _("Look for the PLAY button (▶) in the top toolbar") +
-            "<br/>" +
-            "3. " + _("Click PLAY!") +
-            "<br/><br/>" +
-            "<strong>🎵 " + _("LISTEN:") + "</strong>" +
-            "<br/>" +
-            _("You should hear a musical note play! That's your first sound!") +
-            "<br/><br/>" +
-            "✅ " + _("Heard a note? Amazing! Click → to continue."),
+            "<strong>🎯 " +
+                _("YOUR TASK:") +
+                "</strong>" +
+                "<br/>" +
+                _("Connect your Note block to the Start block, then press PLAY!") +
+                "<br/><br/>" +
+                "<strong>📍 " +
+                _("HOW TO DO IT:") +
+                "</strong>" +
+                "<br/>" +
+                "1. " +
+                _("Drag your Note block and connect it INSIDE the Start block") +
+                "<br/>" +
+                "2. " +
+                _("Look for the PLAY button (▶) in the top toolbar") +
+                "<br/>" +
+                "3. " +
+                _("Click PLAY!") +
+                "<br/><br/>" +
+                "<strong>🎵 " +
+                _("LISTEN:") +
+                "</strong>" +
+                "<br/>" +
+                _("You should hear a musical note play! That's your first sound!") +
+                "<br/><br/>" +
+                "✅ " +
+                _("Heard a note? Amazing! Click → to continue."),
             "data:image/svg+xml;base64," + window.btoa(base64Encode(RUNBUTTON))
         ]);
 
         // Card 44: Step 6 - Add More Notes (Melody)
         HELPCONTENT.push([
             _("Tutorial Step 6 of 10: Create a Melody!"),
-            "<strong>🎯 " + _("YOUR TASK:") + "</strong>" +
-            "<br/>" +
-            _("Add 3 more Note+Pitch blocks to make a 4-note melody.") +
-            "<br/><br/>" +
-            "<strong>📍 " + _("HOW TO DO IT:") + "</strong>" +
-            "<br/>" +
-            "1. " + _("Repeat Steps 3-4 to add 3 more Note blocks with Pitch") +
-            "<br/>" +
-            "2. " + _("Click on each Pitch block to change the note:") +
-            "<br/>" +
-            "   • " + _("Note 1: Sol (G)") +
-            "<br/>" +
-            "   • " + _("Note 2: Mi (E)") +
-            "<br/>" +
-            "   • " + _("Note 3: Sol (G)") +
-            "<br/>" +
-            "   • " + _("Note 4: Do (C) octave 5") +
-            "<br/><br/>" +
-            "🎵 " + _("Press PLAY to hear your melody!") +
-            "<br/><br/>" +
-            "✅ " + _("Sounds good? Click → to continue."),
+            "<strong>🎯 " +
+                _("YOUR TASK:") +
+                "</strong>" +
+                "<br/>" +
+                _("Add 3 more Note+Pitch blocks to make a 4-note melody.") +
+                "<br/><br/>" +
+                "<strong>📍 " +
+                _("HOW TO DO IT:") +
+                "</strong>" +
+                "<br/>" +
+                "1. " +
+                _("Repeat Steps 3-4 to add 3 more Note blocks with Pitch") +
+                "<br/>" +
+                "2. " +
+                _("Click on each Pitch block to change the note:") +
+                "<br/>" +
+                "   • " +
+                _("Note 1: Sol (G)") +
+                "<br/>" +
+                "   • " +
+                _("Note 2: Mi (E)") +
+                "<br/>" +
+                "   • " +
+                _("Note 3: Sol (G)") +
+                "<br/>" +
+                "   • " +
+                _("Note 4: Do (C) octave 5") +
+                "<br/><br/>" +
+                "🎵 " +
+                _("Press PLAY to hear your melody!") +
+                "<br/><br/>" +
+                "✅ " +
+                _("Sounds good? Click → to continue."),
             "data:image/svg+xml;base64," + window.btoa(base64Encode(RHYTHMPALETTEHELPICON))
         ]);
 
         // Card 45: Step 7 - Add a Repeat Loop
         HELPCONTENT.push([
             _("Tutorial Step 7 of 10: Make It Loop!"),
-            "<strong>🎯 " + _("YOUR TASK:") + "</strong>" +
-            "<br/>" +
-            _("Add a Repeat block to loop your melody 4 times.") +
-            "<br/><br/>" +
-            "<strong>📍 " + _("HOW TO DO IT:") + "</strong>" +
-            "<br/>" +
-            "1. " + _("Click 'Flow' in the left palette bar") +
-            "<br/>" +
-            "2. " + _("Find the 'Repeat' block") +
-            "<br/>" +
-            "3. " + _("Drag it and WRAP it around all your Note blocks") +
-            "<br/>" +
-            "4. " + _("Click the number and change it to 4") +
-            "<br/><br/>" +
-            "🔁 " + _("Press PLAY - your melody now plays 4 times!") +
-            "<br/><br/>" +
-            "✅ " + _("Looping? Click → to continue."),
+            "<strong>🎯 " +
+                _("YOUR TASK:") +
+                "</strong>" +
+                "<br/>" +
+                _("Add a Repeat block to loop your melody 4 times.") +
+                "<br/><br/>" +
+                "<strong>📍 " +
+                _("HOW TO DO IT:") +
+                "</strong>" +
+                "<br/>" +
+                "1. " +
+                _("Click 'Flow' in the left palette bar") +
+                "<br/>" +
+                "2. " +
+                _("Find the 'Repeat' block") +
+                "<br/>" +
+                "3. " +
+                _("Drag it and WRAP it around all your Note blocks") +
+                "<br/>" +
+                "4. " +
+                _("Click the number and change it to 4") +
+                "<br/><br/>" +
+                "🔁 " +
+                _("Press PLAY - your melody now plays 4 times!") +
+                "<br/><br/>" +
+                "✅ " +
+                _("Looping? Click → to continue."),
             "data:image/svg+xml;base64," + window.btoa(base64Encode(MOUSEPALETTEICON))
         ]);
 
         // Card 46: Step 8 - Add Turtle Graphics
         HELPCONTENT.push([
             _("Tutorial Step 8 of 10: Add Graphics!"),
-            "<strong>🎯 " + _("YOUR TASK:") + "</strong>" +
-            "<br/>" +
-            _("Make Mr. Mouse draw while playing music!") +
-            "<br/><br/>" +
-            "<strong>📍 " + _("HOW TO DO IT:") + "</strong>" +
-            "<br/>" +
-            "1. " + _("Click 'Graphics' in the left palette bar") +
-            "<br/>" +
-            "2. " + _("Drag 'Forward' block INSIDE your first Note block") +
-            "<br/>" +
-            "3. " + _("Drag 'Right' block AFTER your last Note (set to 90°)") +
-            "<br/><br/>" +
-            "🐭 " + _("Press PLAY - watch the mouse draw a square while playing!") +
-            "<br/><br/>" +
-            "✅ " + _("Drawing? Click → to continue."),
+            "<strong>🎯 " +
+                _("YOUR TASK:") +
+                "</strong>" +
+                "<br/>" +
+                _("Make Mr. Mouse draw while playing music!") +
+                "<br/><br/>" +
+                "<strong>📍 " +
+                _("HOW TO DO IT:") +
+                "</strong>" +
+                "<br/>" +
+                "1. " +
+                _("Click 'Graphics' in the left palette bar") +
+                "<br/>" +
+                "2. " +
+                _("Drag 'Forward' block INSIDE your first Note block") +
+                "<br/>" +
+                "3. " +
+                _("Drag 'Right' block AFTER your last Note (set to 90°)") +
+                "<br/><br/>" +
+                "🐭 " +
+                _("Press PLAY - watch the mouse draw a square while playing!") +
+                "<br/><br/>" +
+                "✅ " +
+                _("Drawing? Click → to continue."),
             "data:image/svg+xml;base64," + window.btoa(base64Encode(MOUSEPALETTEICON))
         ]);
 
         // Card 47: Step 9 - Add Color
         HELPCONTENT.push([
             _("Tutorial Step 9 of 10: Add Color!"),
-            "<strong>🎯 " + _("YOUR TASK:") + "</strong>" +
-            "<br/>" +
-            _("Make your drawing colorful!") +
-            "<br/><br/>" +
-            "<strong>📍 " + _("HOW TO DO IT:") + "</strong>" +
-            "<br/>" +
-            "1. " + _("Click 'Pen' in the left palette bar") +
-            "<br/>" +
-            "2. " + _("Drag 'Set Color' block to the START (before your notes)") +
-            "<br/>" +
-            "3. " + _("Click the color number and try different values (0-100)") +
-            "<br/>" +
-            "4. " + _("Add 'Set Pen Size' and try value 5 for thicker lines") +
-            "<br/><br/>" +
-            "🎨 " + _("Press PLAY to see colorful art with music!") +
-            "<br/><br/>" +
-            "✅ " + _("Colorful? Click → for the final step!"),
+            "<strong>🎯 " +
+                _("YOUR TASK:") +
+                "</strong>" +
+                "<br/>" +
+                _("Make your drawing colorful!") +
+                "<br/><br/>" +
+                "<strong>📍 " +
+                _("HOW TO DO IT:") +
+                "</strong>" +
+                "<br/>" +
+                "1. " +
+                _("Click 'Pen' in the left palette bar") +
+                "<br/>" +
+                "2. " +
+                _("Drag 'Set Color' block to the START (before your notes)") +
+                "<br/>" +
+                "3. " +
+                _("Click the color number and try different values (0-100)") +
+                "<br/>" +
+                "4. " +
+                _("Add 'Set Pen Size' and try value 5 for thicker lines") +
+                "<br/><br/>" +
+                "🎨 " +
+                _("Press PLAY to see colorful art with music!") +
+                "<br/><br/>" +
+                "✅ " +
+                _("Colorful? Click → for the final step!"),
             "data:image/svg+xml;base64," + window.btoa(base64Encode(MOUSEPALETTEICON))
         ]);
 
         // Card 48: Step 10 - Choose Instrument and Save
         HELPCONTENT.push([
             _("Tutorial Step 10 of 10: Finish & Save!"),
-            "<strong>🎯 " + _("FINAL TASKS:") + "</strong>" +
-            "<br/><br/>" +
-            "<strong>" + _("Change Instrument:") + "</strong>" +
-            "<br/>" +
-            "1. " + _("Click 'Tone' palette") +
-            "<br/>" +
-            "2. " + _("Drag 'Set Instrument' block to wrap around your music") +
-            "<br/>" +
-            "3. " + _("Click instrument name → choose piano, violin, or guitar!") +
-            "<br/><br/>" +
-            "<strong>" + _("Save Your Project:") + "</strong>" +
-            "<br/>" +
-            "4. " + _("Click the SAVE button (💾) in toolbar") +
-            "<br/>" +
-            "5. " + _("Choose 'Save as HTML'") +
-            "<br/>" +
-            "6. " + _("Name your project and save!") +
-            "<br/><br/>" +
-            "🎉🎉🎉 <strong>" + _("CONGRATULATIONS!") + "</strong> 🎉🎉🎉" +
-            "<br/>" +
-            _("You've created your first Music Blocks project!"),
+            "<strong>🎯 " +
+                _("FINAL TASKS:") +
+                "</strong>" +
+                "<br/><br/>" +
+                "<strong>" +
+                _("Change Instrument:") +
+                "</strong>" +
+                "<br/>" +
+                "1. " +
+                _("Click 'Tone' palette") +
+                "<br/>" +
+                "2. " +
+                _("Drag 'Set Instrument' block to wrap around your music") +
+                "<br/>" +
+                "3. " +
+                _("Click instrument name → choose piano, violin, or guitar!") +
+                "<br/><br/>" +
+                "<strong>" +
+                _("Save Your Project:") +
+                "</strong>" +
+                "<br/>" +
+                "4. " +
+                _("Click the SAVE button (💾) in toolbar") +
+                "<br/>" +
+                "5. " +
+                _("Choose 'Save as HTML'") +
+                "<br/>" +
+                "6. " +
+                _("Name your project and save!") +
+                "<br/><br/>" +
+                "🎉🎉🎉 <strong>" +
+                _("CONGRATULATIONS!") +
+                "</strong> 🎉🎉🎉" +
+                "<br/>" +
+                _("You've created your first Music Blocks project!"),
             "data:image/svg+xml;base64," + window.btoa(base64Encode(SAVEBUTTON))
         ]);
 
@@ -1045,13 +1161,17 @@ const createHelpContent = activity => {
         HELPCONTENT.push([
             _("Congratulations!"),
             _("You have finished the tour and created your first project!") +
-            "<br/><br/>" +
-            _("Now you can:") +
-            "<br/>• " + _("Explore more blocks in the palettes") +
-            "<br/>• " + _("Load example projects from Planet") +
-            "<br/>• " + _("Create your own musical compositions!") +
-            "<br/><br/>" +
-            _("Please enjoy Music Blocks!") + " 🎵🐭🎨",
+                "<br/><br/>" +
+                _("Now you can:") +
+                "<br/>• " +
+                _("Explore more blocks in the palettes") +
+                "<br/>• " +
+                _("Load example projects from Planet") +
+                "<br/>• " +
+                _("Create your own musical compositions!") +
+                "<br/><br/>" +
+                _("Please enjoy Music Blocks!") +
+                " 🎵🐭🎨",
             "data:image/svg+xml;base64," + window.btoa(base64Encode(LOGO))
         ]);
     }

@@ -362,7 +362,8 @@ class HelpWidget {
 
         // Check if this is the First Project Tutorial card
         const pageTitle = HELPCONTENT[page][0];
-        const isFirstProjectTutorial = pageTitle.includes("Build Your First Project") ||
+        const isFirstProjectTutorial =
+            pageTitle.includes("Build Your First Project") ||
             pageTitle.includes("First Project") ||
             pageTitle.toLowerCase().includes("build your first");
 
@@ -375,7 +376,8 @@ class HelpWidget {
                 _("Guide"),
                 _("About"),
                 _("Congratulations.")
-            ].includes(HELPCONTENT[page][0]) || isFirstProjectTutorial
+            ].includes(HELPCONTENT[page][0]) ||
+            isFirstProjectTutorial
         ) {
             // body = body + '<p>&nbsp;<img src="' + HELPCONTENT[page][2] + '"></p>';
             body = `<figure>&nbsp;<img src=" ${HELPCONTENT[page][2]}"></figure>`;
