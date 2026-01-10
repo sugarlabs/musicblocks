@@ -17,57 +17,96 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+const { beforeEach } = require("node:test");
 const JSInterface = require("../interface");
-JSInterface._methodArgConstraints = {};
+global.JSInterface = JSInterface;
+require("../constraints");
+global.JSEditor = {
+    logConsole: jest.fn()
+};
+
+global.DEFAULTVOICE = "piano";
+global.SHARP = "♯";
+global.FLAT = "♭";
+global.NATURAL = "♮";
+global.DOUBLESHARP = "𝄪";
+global.DOUBLEFLAT = "𝄫";
 
 describe("JSInterface", () => {
-    describe("isClampBlock", () => {
-        it("should return true for a known clamp block", () => {
-            expect(JSInterface.isClampBlock("newnote")).toBe(true);
-        });
-
-        it("should return false for an unknown block", () => {
-            expect(JSInterface.isClampBlock("nonexistent")).toBe(false);
-        });
+    beforeEach(() => {
+        jest.clearAllMocks();
     });
+    describe("Utility Checks", () => {
+        describe("isClampBlock", () => {
+            it("should return true for a known clamp block", () => {
+                expect(JSInterface.isClampBlock("newnote")).toBe(true);
+            });
 
-    describe("isSetter", () => {
-        it("should return true for a valid setter block", () => {
-            expect(JSInterface.isSetter("pickup")).toBe(true);
+            it("should return false for an unknown block", () => {
+                expect(JSInterface.isClampBlock("nonexistent")).toBe(false);
+            });
+        });
+        describe("isSetter", () => {
+            it("should return true for a valid setter block", () => {
+                expect(JSInterface.isSetter("pickup")).toBe(true);
+            });
+
+            it("should return false for a block that is not a setter", () => {
+                expect(JSInterface.isSetter("newnote")).toBe(false);
+            });
+        });
+        describe("isGetter", () => {
+            it("should return true for a valid getter block", () => {
+                expect(JSInterface.isGetter("mynotevalue")).toBe(true);
+            });
+
+            it("should return false for a block that is not a getter", () => {
+                expect(JSInterface.isGetter("pickup")).toBe(false);
+            });
+        });
+        describe("isMethod", () => {
+            it("should return true for a valid method block", () => {
+                expect(JSInterface.isMethod("newnote")).toBe(true);
+            });
+
+            it("should return false for a block that is not a method", () => {
+                expect(JSInterface.isMethod("pickup")).toBe(false);
+            });
+        });
+        describe("methodReturns", () => {
+            it("should return true for a method that has a return value", () => {
+                expect(JSInterface.methodReturns("getDict")).toBe(true);
+            });
+
+            it("should return false for a method that does not have a return value", () => {
+                expect(JSInterface.methodReturns("newnote")).toBe(false);
+            });
+        });
+        describe("Name Lookups", () => {
+            it("should return the correct setter name", () => {
+                expect(JSInterface.getSetterName("pickup")).toBe("PICKUP");
+                expect(JSInterface.getSetterName("newnote")).toBeNull();
+            });
+            it("should return the correct getter name", () => {
+                expect(JSInterface.getGetterName("mynotevalue")).toBe("NOTEVALUE");
+                expect(JSInterface.getGetterName("pickup")).toBeNull();
+            });
+            it("should return the correct method name", () => {
+                expect(JSInterface.getMethodName("newnote")).toBe("playNote");
+                expect(JSInterface.getMethodName("pickup")).toBeNull();
+            });
         });
 
-        it("should return false for a block that is not a setter", () => {
-            expect(JSInterface.isSetter("newnote")).toBe(false);
-        });
-    });
+        describe("rearrangeMethodArgs", () => {
+            it("should rearrange the arguments for methods present in the lookup", () => {
+                const args = [1, 2, 3];
+                expect(JSInterface.rearrangeMethodArgs("setDict", args)).toEqual([2, 3, 1]);
+            });
 
-    describe("isGetter", () => {
-        it("should return true for a valid getter block", () => {
-            expect(JSInterface.isGetter("mynotevalue")).toBe(true);
-        });
-
-        it("should return false for a block that is not a getter", () => {
-            expect(JSInterface.isGetter("pickup")).toBe(false);
-        });
-    });
-
-    describe("isMethod", () => {
-        it("should return true for a valid method block", () => {
-            expect(JSInterface.isMethod("newnote")).toBe(true);
-        });
-
-        it("should return false for a block that is not a method", () => {
-            expect(JSInterface.isMethod("pickup")).toBe(false);
-        });
-    });
-
-    describe("methodReturns", () => {
-        it("should return true for a method that has a return value", () => {
-            expect(JSInterface.methodReturns("getDict")).toBe(true);
-        });
-
-        it("should return false for a method that does not have a return value", () => {
-            expect(JSInterface.methodReturns("newnote")).toBe(false);
+            it("should return the original args if no rearrangement is required", () => {
+                const args = [1, 2, 3];
+                expect(JSInterface.rearrangeMethodArgs("nonExistingMethod", args)).toEqual(args);
+            });
         });
     });
 
@@ -101,22 +140,138 @@ describe("JSInterface", () => {
         });
     });
 
-    describe("rearrangeMethodArgs", () => {
-        it("should rearrange the arguments for methods present in the lookup", () => {
-            const args = [1, 2, 3];
-            expect(JSInterface.rearrangeMethodArgs("setDict", args)).toEqual([2, 3, 1]);
-        });
-
-        it("should return the original args if no rearrangement is required", () => {
-            const args = [1, 2, 3];
-            expect(JSInterface.rearrangeMethodArgs("nonExistingMethod", args)).toEqual(args);
-        });
-    });
-
     describe("validateArgs", () => {
         it("should return the original args when no constraints are defined for the method", () => {
             const args = [1, 2, 3];
             expect(JSInterface.validateArgs("nonExistingMethod", args)).toEqual(args);
+        });
+        describe("Type Validation & Coercion", () => {
+            it("should coerce string numbers to number type", () => {
+                // playNote expects number at index 0
+                const result = JSInterface.validateArgs("playNote", ["100", async () => {}]);
+                expect(typeof result[0]).toBe("number");
+                expect(result[0]).toBe(100);
+            });
+
+            it("should throw error for invalid string-to-number coercion", () => {
+                expect(() => {
+                    JSInterface.validateArgs("playNote", ["invalid", async () => {}]);
+                }).toThrow("TypeMismatch error");
+            });
+
+            it("should coerce string booleans", () => {
+                // MOVABLEDO expects boolean at index 0
+                const trueResult = JSInterface.validateArgs("MOVABLEDO", ["true"]);
+                expect(trueResult[0]).toBe(true);
+
+                const falseResult = JSInterface.validateArgs("MOVABLEDO", ["false"]);
+                expect(falseResult[0]).toBe(false);
+            });
+
+            it("should default invalid boolean strings to true and log warning", () => {
+                const result = JSInterface.validateArgs("MOVABLEDO", ["notaboolean"]);
+                expect(result[0]).toBe(true);
+                expect(JSEditor.logConsole).toHaveBeenCalled();
+            });
+        });
+        describe("Numeric Constraints", () => {
+            it("should clamp values to minimum", () => {
+                // playNote min is 0
+                const result = JSInterface.validateArgs("playNote", [-10, async () => {}]);
+                expect(result[0]).toBe(0);
+                expect(JSEditor.logConsole).toHaveBeenCalled();
+            });
+
+            it("should clamp values to maximum", () => {
+                // playNote max is 1000
+                const result = JSInterface.validateArgs("playNote", [2000, async () => {}]);
+                expect(result[0]).toBe(1000);
+                expect(JSEditor.logConsole).toHaveBeenCalled();
+            });
+
+            it("should truncate non-integers if integer constraint is true", () => {
+                // setMeter expects integer
+                const result = JSInterface.validateArgs("setMeter", [4.5, 4]);
+                expect(result[0]).toBe(4);
+            });
+        });
+        describe("String Constraints (Solfege/Letter)", () => {
+            it("should handle valid solfege", () => {
+                const result = JSInterface.validateArgs("playPitch", ["do", 4]);
+                expect(result[0]).toBe("do");
+            });
+
+            it("should handle valid letter notes", () => {
+                const result = JSInterface.validateArgs("playPitch", ["C", 4]);
+                expect(result[0]).toBe("C");
+            });
+
+            it("should handle accidentals in strings", () => {
+                const result = JSInterface.validateArgs("playPitch", ["C sharp", 4]);
+                expect(result[0]).toBe("C" + global.SHARP);
+            });
+
+            it("should default to 'sol' for invalid notes", () => {
+                const result = JSInterface.validateArgs("playPitch", ["invalid", 4]);
+                expect(result[0]).toBe("sol");
+                expect(JSEditor.logConsole).toHaveBeenCalled();
+            });
+        });
+        describe("Specialized Types", () => {
+            it("should handle 'accidental' type mapping", () => {
+                // setAccidental expects accidental string
+                const result = JSInterface.validateArgs("setAccidental", ["sharp", async () => {}]);
+                expect(result[0]).toBe("sharp " + global.SHARP);
+            });
+
+            it("should handle 'synth' type validation", () => {
+                // setInstrument
+                const valid = JSInterface.validateArgs("setInstrument", ["piano", async () => {}]);
+                expect(valid[0]).toBe("piano");
+
+                const invalid = JSInterface.validateArgs("setInstrument", [
+                    "kazoo",
+                    async () => {}
+                ]);
+                expect(invalid[0]).toBe(global.DEFAULTVOICE); // Should default
+            });
+
+            it("should handle 'drum' type validation", () => {
+                // playDrum
+                const valid = JSInterface.validateArgs("playDrum", ["snare drum"]);
+                expect(valid[0]).toBe("snare drum");
+
+                const invalid = JSInterface.validateArgs("playDrum", ["trash can"]);
+                expect(invalid[0]).toBe("kick drum"); // Default
+            });
+
+            it("should handle 'noise' type mapping", () => {
+                // playNoise
+                const result = JSInterface.validateArgs("playNoise", ["white noise"]);
+                expect(result[0]).toBe("noise1");
+            });
+
+            it("should handle 'oneof' enum constraints", () => {
+                // setTemperament expects one of specific values
+                const valid = JSInterface.validateArgs("setTemperament", ["equal", "C", 4]);
+                expect(valid[0]).toBe("equal");
+
+                const invalid = JSInterface.validateArgs("setTemperament", ["bad_temp", "C", 4]);
+                expect(invalid[0]).toBe("equal"); // defaults to index 0
+            });
+        });
+        describe("Overloaded Methods (Array of Constraints)", () => {
+            it("should validate against the matching signature for setValue (setDict)", () => {
+                const result = JSInterface.validateArgs("setValue", ["key", 5]);
+                expect(result[0]).toBe("key");
+                expect(result[1]).toBe(5);
+            });
+
+            it("should throw error if arguments do not match any allowed signature", () => {
+                const result = JSInterface.validateArgs("setValue", [123, 123]);
+                expect(result[0]).toBe(123);
+                expect(result[1]).toBe(123);
+            });
         });
     });
 });
