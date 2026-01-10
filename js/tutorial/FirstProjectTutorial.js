@@ -1,10 +1,10 @@
 /**
  * FirstProjectTutorial.js
- * 
+ *
  * Interactive step-by-step tutorial that guides users through creating
  * their first Music Blocks project. Detects user actions and only allows
  * proceeding when the required action is completed.
- * 
+ *
  * @author Divyam Agarwal
  * @copyright 2026
  * @license AGPL-3.0
@@ -44,7 +44,9 @@ class FirstProjectTutorial {
             },
             {
                 title: _("Step 2: Open the Rhythm Palette"),
-                content: _("Click on the 'Rhythm' palette button on the left sidebar to see rhythm blocks."),
+                content: _(
+                    "Click on the 'Rhythm' palette button on the left sidebar to see rhythm blocks."
+                ),
                 target: () => this._findPaletteButton("rhythm"),
                 position: "right",
                 instruction: _("👆 Click the 'Rhythm' palette button"),
@@ -53,18 +55,24 @@ class FirstProjectTutorial {
             },
             {
                 title: _("Step 3: Drag a Note Block"),
-                content: _("Find the 'Note' block in the Rhythm palette (should still be open) and drag it onto the canvas. This is how you create musical notes!"),
+                content: _(
+                    "Find the 'Note' block in the Rhythm palette (should still be open) and drag it onto the canvas. This is how you create musical notes!"
+                ),
                 target: () => this._getCanvas(),
                 position: "right",
                 instruction: _("🎵 Drag a Note block from the Rhythm palette to the canvas"),
                 validator: () => this._hasMoreBlocks(),
                 autoComplete: false,
                 allowInteraction: true, // Allow full screen interaction for dragging
-                onStart: () => { this._initialNoteCount = this._countBlocksByName("newnote"); }
+                onStart: () => {
+                    this._initialNoteCount = this._countBlocksByName("newnote");
+                }
             },
             {
                 title: _("Step 4: Connect to Start"),
-                content: _("Now connect your Note block to the Start block. Drag it until it snaps into place!"),
+                content: _(
+                    "Now connect your Note block to the Start block. Drag it until it snaps into place!"
+                ),
                 target: () => this._getCanvas(),
                 position: "right",
                 instruction: _("🔗 Connect the Note block inside the Start block"),
@@ -74,13 +82,18 @@ class FirstProjectTutorial {
             },
             {
                 title: _("Step 5: Press Play!"),
-                content: _("Time to hear your first note! Click the PLAY button to run your project!"),
+                content: _(
+                    "Time to hear your first note! Click the PLAY button to run your project!"
+                ),
                 target: () => docById("play") || docById("runButton"),
                 position: "bottom",
                 instruction: _("▶️ Click the PLAY button!"),
                 validator: () => this._hasPressedPlay(),
                 autoComplete: false,
-                onStart: () => { this._playPressed = false; this._setupPlayListener(); }
+                onStart: () => {
+                    this._playPressed = false;
+                    this._setupPlayListener();
+                }
             },
             {
                 title: _("Step 6: Open Pitch Palette"),
@@ -93,7 +106,9 @@ class FirstProjectTutorial {
             },
             {
                 title: _("Step 7: Add a Pitch Block"),
-                content: _("Drag a 'Pitch' block and put it INSIDE your Note block. This tells Music Blocks which note to play!"),
+                content: _(
+                    "Drag a 'Pitch' block and put it INSIDE your Note block. This tells Music Blocks which note to play!"
+                ),
                 target: () => this._getCanvas(),
                 position: "right",
                 instruction: _("🎹 Drag a Pitch block inside your Note block"),
@@ -109,11 +124,16 @@ class FirstProjectTutorial {
                 instruction: _("▶️ Click PLAY to hear your music!"),
                 validator: () => this._hasPressedPlay(),
                 autoComplete: false,
-                onStart: () => { this._playPressed = false; this._setupPlayListener(); }
+                onStart: () => {
+                    this._playPressed = false;
+                    this._setupPlayListener();
+                }
             },
             {
                 title: _("Step 9: Add More Notes (Optional)"),
-                content: _("You can add more Note+Pitch blocks to create a melody! Or just click Next to finish."),
+                content: _(
+                    "You can add more Note+Pitch blocks to create a melody! Or just click Next to finish."
+                ),
                 target: () => this._getCanvas(),
                 position: "right",
                 instruction: _("🎵 Add more notes, or click Next to finish"),
@@ -122,7 +142,9 @@ class FirstProjectTutorial {
             },
             {
                 title: _("🎉 Congratulations!"),
-                content: _("You've created your first Music Blocks project! Now explore adding loops (Flow palette), graphics (Graphics palette), and different instruments (Tone palette)!"),
+                content: _(
+                    "You've created your first Music Blocks project! Now explore adding loops (Flow palette), graphics (Graphics palette), and different instruments (Tone palette)!"
+                ),
                 target: null,
                 position: "center",
                 instruction: _("Click Finish to close the tutorial"),
@@ -273,10 +295,10 @@ class FirstProjectTutorial {
             const rect = targetElement.getBoundingClientRect();
             const padding = 15;
             this.spotlight.style.display = "block";
-            this.spotlight.style.top = (rect.top - padding) + "px";
-            this.spotlight.style.left = (rect.left - padding) + "px";
-            this.spotlight.style.width = (rect.width + padding * 2) + "px";
-            this.spotlight.style.height = (rect.height + padding * 2) + "px";
+            this.spotlight.style.top = rect.top - padding + "px";
+            this.spotlight.style.left = rect.left - padding + "px";
+            this.spotlight.style.width = rect.width + padding * 2 + "px";
+            this.spotlight.style.height = rect.height + padding * 2 + "px";
         } else {
             this.spotlight.style.display = "none";
         }
@@ -313,7 +335,9 @@ class FirstProjectTutorial {
                 ">×</button>
             </div>
             <h3 style="margin: 0 0 12px 0; font-size: 20px; font-weight: 600;">${step.title}</h3>
-            <p style="margin: 0 0 16px 0; opacity: 0.9; line-height: 1.6; font-size: 15px;">${step.content}</p>
+            <p style="margin: 0 0 16px 0; opacity: 0.9; line-height: 1.6; font-size: 15px;">${
+                step.content
+            }</p>
             <div id="tutorial-instruction" style="
                 background: rgba(0,0,0,0.2);
                 padding: 14px 18px;
@@ -326,10 +350,14 @@ class FirstProjectTutorial {
                 gap: 10px;
             ">
                 <span id="instruction-icon">${isCompleted ? "✅" : "⏳"}</span>
-                <span id="instruction-text">${isCompleted ? _("Done! Click Next to continue.") : step.instruction}</span>
+                <span id="instruction-text">${
+                    isCompleted ? _("Done! Click Next to continue.") : step.instruction
+                }</span>
             </div>
             <div style="display: flex; gap: 10px;">
-                ${stepIndex > 0 ? `
+                ${
+                    stepIndex > 0
+                        ? `
                     <button id="tutorial-prev" style="
                         flex: 1;
                         padding: 12px 20px;
@@ -341,7 +369,9 @@ class FirstProjectTutorial {
                         font-weight: 500;
                         color: white;
                     ">← Back</button>
-                ` : ''}
+                `
+                        : ""
+                }
                 <button id="tutorial-next" style="
                     flex: 2;
                     padding: 12px 24px;
@@ -465,32 +495,32 @@ class FirstProjectTutorial {
         switch (position) {
             case "right":
                 this.tooltip.style.top = Math.max(20, rect.top) + "px";
-                this.tooltip.style.left = (rect.right + padding) + "px";
+                this.tooltip.style.left = rect.right + padding + "px";
                 break;
             case "left":
                 this.tooltip.style.top = Math.max(20, rect.top) + "px";
-                this.tooltip.style.left = (rect.left - 400 - padding) + "px";
+                this.tooltip.style.left = rect.left - 400 - padding + "px";
                 break;
             case "bottom":
-                this.tooltip.style.top = (rect.bottom + padding) + "px";
+                this.tooltip.style.top = rect.bottom + padding + "px";
                 this.tooltip.style.left = Math.max(20, rect.left) + "px";
                 break;
             case "top":
-                this.tooltip.style.top = (rect.top - 250 - padding) + "px";
+                this.tooltip.style.top = rect.top - 250 - padding + "px";
                 this.tooltip.style.left = Math.max(20, rect.left) + "px";
                 break;
             default:
                 this.tooltip.style.top = Math.max(20, rect.top) + "px";
-                this.tooltip.style.left = (rect.right + padding) + "px";
+                this.tooltip.style.left = rect.right + padding + "px";
         }
 
         // Keep tooltip on screen
         const tooltipRect = this.tooltip.getBoundingClientRect();
         if (tooltipRect.right > window.innerWidth - 20) {
-            this.tooltip.style.left = (window.innerWidth - 400) + "px";
+            this.tooltip.style.left = window.innerWidth - 400 + "px";
         }
         if (tooltipRect.bottom > window.innerHeight - 20) {
-            this.tooltip.style.top = (window.innerHeight - 350) + "px";
+            this.tooltip.style.top = window.innerHeight - 350 + "px";
         }
         if (parseFloat(this.tooltip.style.left) < 20) {
             this.tooltip.style.left = "20px";
@@ -586,9 +616,14 @@ class FirstProjectTutorial {
             console.log("[Tutorial] Header span found:", !!headerSpan, headerSpan?.textContent);
             if (headerSpan) {
                 const headerText = headerSpan.textContent.toLowerCase();
-                if (headerText === paletteName.toLowerCase() ||
-                    headerText.includes(paletteName.toLowerCase())) {
-                    console.log("[Tutorial] ✅ Palette detected via PaletteBody header:", paletteName);
+                if (
+                    headerText === paletteName.toLowerCase() ||
+                    headerText.includes(paletteName.toLowerCase())
+                ) {
+                    console.log(
+                        "[Tutorial] ✅ Palette detected via PaletteBody header:",
+                        paletteName
+                    );
                     return true;
                 }
             }
@@ -600,7 +635,10 @@ class FirstProjectTutorial {
                 // The image source contains the palette icon which may include the name
                 const src = labelImg.src.toLowerCase();
                 if (src.includes(paletteName.toLowerCase())) {
-                    console.log("[Tutorial] ✅ Palette detected via PaletteBody icon:", paletteName);
+                    console.log(
+                        "[Tutorial] ✅ Palette detected via PaletteBody icon:",
+                        paletteName
+                    );
                     return true;
                 }
             }
@@ -608,7 +646,11 @@ class FirstProjectTutorial {
 
         // Method 3: Check for any open palette menu by looking for PaletteBody_items
         const paletteItems = document.getElementById("PaletteBody_items");
-        console.log("[Tutorial] PaletteBody_items found:", !!paletteItems, paletteItems?.children?.length);
+        console.log(
+            "[Tutorial] PaletteBody_items found:",
+            !!paletteItems,
+            paletteItems?.children?.length
+        );
         if (paletteItems && paletteItems.children.length > 0) {
             // There are items in an open palette - check if it's the right one
             // We can look at the current palette in the palettes object
@@ -616,7 +658,10 @@ class FirstProjectTutorial {
                 const currentPalette = activity.blocks.palettes.activePalette;
                 console.log("[Tutorial] Checking activePalette again:", currentPalette);
                 if (currentPalette === paletteName) {
-                    console.log("[Tutorial] ✅ Palette detected via PaletteBody_items:", paletteName);
+                    console.log(
+                        "[Tutorial] ✅ Palette detected via PaletteBody_items:",
+                        paletteName
+                    );
                     return true;
                 }
             }
