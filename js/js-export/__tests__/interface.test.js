@@ -16,8 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-
-const { beforeEach } = require("node:test");
 const JSInterface = require("../interface");
 global.JSInterface = JSInterface;
 require("../constraints");
@@ -96,7 +94,149 @@ describe("JSInterface", () => {
                 expect(JSInterface.getMethodName("pickup")).toBeNull();
             });
         });
+        describe("String Constraints (Letter Key)", () => {
+            it("should handle valid letter keys", () => {
+                const result = JSInterface.validateArgs("setKey", ["C", "major"]);
+                expect(result[0]).toBe("C");
+            });
 
+            it("should handle letter keys with accidentals", () => {
+                const result = JSInterface.validateArgs("setKey", ["D flat", "major"]);
+                expect(result[0]).toBe("D" + global.FLAT);
+            });
+
+            it("should default to 'C' for invalid letter keys", () => {
+                const result = JSInterface.validateArgs("setKey", ["invalid", "major"]);
+                expect(result[0]).toBe("C");
+                expect(JSEditor.logConsole).toHaveBeenCalled();
+            });
+        });
+        describe("Noise Type Variations", () => {
+            it("should handle brown noise", () => {
+                const result = JSInterface.validateArgs("playNoise", ["brown noise"]);
+                expect(result[0]).toBe("noise2");
+            });
+
+            it("should handle pink noise", () => {
+                const result = JSInterface.validateArgs("playNoise", ["pink noise"]);
+                expect(result[0]).toBe("noise3");
+            });
+
+            it("should default to noise1 for invalid noise", () => {
+                const result = JSInterface.validateArgs("playNoise", ["invalid noise"]);
+                expect(result[0]).toBe("noise1");
+                expect(JSEditor.logConsole).toHaveBeenCalled();
+            });
+        });
+        describe("Accidental Type Mapping - Complete", () => {
+            it("should handle flat accidental", () => {
+                const result = JSInterface.validateArgs("setAccidental", ["flat", async () => {}]);
+                expect(result[0]).toBe("flat " + global.FLAT);
+            });
+
+            it("should handle natural accidental", () => {
+                const result = JSInterface.validateArgs("setAccidental", [
+                    "natural",
+                    async () => {}
+                ]);
+                expect(result[0]).toBe("natural " + global.NATURAL);
+            });
+
+            it("should handle double sharp accidental", () => {
+                const result = JSInterface.validateArgs("setAccidental", [
+                    "doublesharp",
+                    async () => {}
+                ]);
+                expect(result[0]).toBe("double sharp " + global.DOUBLESHARP);
+            });
+
+            it("should handle double flat accidental", () => {
+                const result = JSInterface.validateArgs("setAccidental", [
+                    "doubleflat",
+                    async () => {}
+                ]);
+                expect(result[0]).toBe("double flat " + global.DOUBLEFLAT);
+            });
+
+            it("should handle accidental symbols directly", () => {
+                const result = JSInterface.validateArgs("setAccidental", [
+                    global.SHARP,
+                    async () => {}
+                ]);
+                expect(result[0]).toBe("sharp " + global.SHARP);
+            });
+        });
+        describe("Function Constraints - Async Validation", () => {
+            it("should throw error for non-async function when async is required", () => {
+                expect(() => {
+                    JSInterface.validateArgs("playNote", [100, function () {}]); // Regular function instead of async
+                }).toThrow('expected "async" function');
+            });
+        });
+        describe("Type Mismatch Errors", () => {
+            it("should throw error for completely wrong type that cannot be coerced", () => {
+                expect(() => {
+                    JSInterface.validateArgs("setMeter", [true, 4]); // boolean where number expected
+                }).toThrow("TypeMismatch error");
+            });
+
+            it("should throw error for object where primitive expected", () => {
+                expect(() => {
+                    JSInterface.validateArgs("playNote", [{}, async () => {}]);
+                }).toThrow("TypeMismatch error");
+            });
+        });
+        describe("Numeric Constraints - Edge Cases", () => {
+            it("should accept values at exact minimum", () => {
+                const result = JSInterface.validateArgs("playNote", [0, async () => {}]);
+                expect(result[0]).toBe(0);
+                expect(JSEditor.logConsole).not.toHaveBeenCalled();
+            });
+
+            it("should accept values at exact maximum", () => {
+                const result = JSInterface.validateArgs("playNote", [1000, async () => {}]);
+                expect(result[0]).toBe(1000);
+                expect(JSEditor.logConsole).not.toHaveBeenCalled();
+            });
+
+            it("should not truncate integers when already integer", () => {
+                const result = JSInterface.validateArgs("setMeter", [4, 4]);
+                expect(result[0]).toBe(4);
+            });
+        });
+        describe("Solfege/Letter Notes - Additional Cases", () => {
+            it("should handle uppercase solfege", () => {
+                const result = JSInterface.validateArgs("playPitch", ["DO", 4]);
+                expect(result[0]).toBe("do");
+            });
+
+            it("should handle mixed case letters", () => {
+                const result = JSInterface.validateArgs("playPitch", ["c", 4]);
+                expect(result[0]).toBe("C");
+            });
+
+            it("should handle note with double flat accidental", () => {
+                const result = JSInterface.validateArgs("playPitch", ["C doubleflat", 4]);
+                expect(result[0]).toBe("C" + global.DOUBLEFLAT);
+            });
+
+            it("should handle note with double sharp accidental", () => {
+                const result = JSInterface.validateArgs("playPitch", ["D doublesharp", 4]);
+                expect(result[0]).toBe("D" + global.DOUBLESHARP);
+            });
+        });
+        describe("Synth Type Validation - Extended", () => {
+            it("should handle various valid instruments", () => {
+                const instruments = ["violin", "guitar", "saxophone", "sine", "square"];
+                instruments.forEach(inst => {
+                    const result = JSInterface.validateArgs("setInstrument", [
+                        inst,
+                        async () => {}
+                    ]);
+                    expect(result[0]).toBe(inst);
+                });
+            });
+        });
         describe("rearrangeMethodArgs", () => {
             it("should rearrange the arguments for methods present in the lookup", () => {
                 const args = [1, 2, 3];
@@ -267,7 +407,7 @@ describe("JSInterface", () => {
                 expect(result[1]).toBe(5);
             });
 
-            it("should throw error if arguments do not match any allowed signature", () => {
+            it("should return arguments unchanged when no signature matches", () => {
                 const result = JSInterface.validateArgs("setValue", [123, 123]);
                 expect(result[0]).toBe(123);
                 expect(result[1]).toBe(123);
