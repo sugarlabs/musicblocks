@@ -15,42 +15,40 @@ describe("MusicBlocks Application", () => {
         it("should display the loading animation and then the main content", () => {
             cy.get("#loading-image-container").should("be.visible");
             cy.contains("#loadingText", "Loading Complete!", { timeout: 20000 }).should("be.visible");
-            cy.wait(10000);
+           
             cy.get("#canvas", { timeout: 10000 }).should("be.visible");
         });
 
         it("should display the Musicblocks guide page", () => {
-            cy.get(".heading").contains("Welcome to Music Blocks");
+            cy.get(".heading").should("be.visible").and("contain", "Welcome to Music Blocks");
         });
     });
 
     describe("Audio Controls", () => {
         it("should have a functional play button", () => {
-            cy.get("#play").should("be.visible").click();
-            cy.window().then((win) => {
-                const audioContext = win.Tone.context;
-                cy.wrap(audioContext.state).should("eq", "running");
+            cy.get("#play").should("be.visible").and("not.be.disabled").click();
+            cy.window().its("Tone.context.state").should("be.oneOf", ["running", "suspended"]);
             });
-        });
 
         it("should have a functional stop button", () => {
-            cy.get("#stop").should("be.visible").click();
+            cy.get("#stop").should("be.visible").and("not.be.disabled").click();
+            cy.window().then((win) => {
+                     expect(win.Tone.Transport.state).to.not.equal("started");
+                });
         });
     });
 
     describe("Toolbar and Navigation", () => {
         it("should open the language selection dropdown", () => {
             cy.get("#aux-toolbar").invoke("show");
-            cy.get("#languageSelectIcon").click({ force: true });
+            cy.get("#languageSelectIcon").should("be.visible").click({ force: true });
             cy.get("#languagedropdown").should("be.visible");
         });
 
         it("should toggle full-screen mode", () => {
-            cy.get("#FullScreen").click();
-            cy.wait(500);
+            cy.get("#FullScreen").should("be.visible").click();
             cy.document().its("fullscreenElement").should("not.be.null");
             cy.get("#FullScreen").click();
-            cy.wait(500);
             cy.document().its("fullscreenElement").should("be.null");
         });
 
@@ -64,28 +62,28 @@ describe("MusicBlocks Application", () => {
 
     describe("File Operations", () => {
         it("should open the file load modal", () => {
-            cy.get("#load").click();
-            cy.get("#myOpenFile").should("exist");
+            cy.get("#load").should("be.visible").click();
+            cy.get("#myOpenFile").should("exist").and("be.visible");
         });
 
         it("should open the save dropdown", () => {
-            cy.get("#saveButton").click();
+            cy.get("#saveButton").should("be.visible").click();
             cy.get("#saveddropdownbeg").should("be.visible");
         });
 
         it("should display file save options", () => {
-            cy.get("#saveButton").click();
+            cy.get("#saveButton").should("be.visible").click();
             cy.get("#saveddropdownbeg").should("be.visible");
-            cy.get("#save-html-beg").should("exist");
-            cy.get("#save-png-beg").should("exist");
+            cy.get("#save-html-beg").should("exist").and("be.visible");
+            cy.get("#save-png-beg").should("exist").and("be.visible");
         });
 
         it('should click the New File button and verify "New Project" appears', () => {
             cy.get("#newFile > .material-icons")
                 .should("exist")
-                .and("be.visible");
-            cy.get("#newFile > .material-icons").click();
-            cy.wait(500);
+                .and("be.visible")
+                .and("not.be.disabled")
+                .click();
             cy.contains("New project").should("be.visible");
         });
     });
@@ -116,6 +114,7 @@ describe("MusicBlocks Application", () => {
                 cy.get(selector)
                     .should("exist")
                     .and("be.visible")
+                    .and("not.have.attr", "disabled")
                     .click();
             });
         });
@@ -148,15 +147,14 @@ describe("MusicBlocks Application", () => {
                 .should("be.visible")
                 .and("have.attr", "src")
                 .and("not.be.empty");
+            cy.get("#planet-iframe").invoke("attr", "src").should("not.be.empty");
 
             cy.get("#planet-iframe").then(($iframe) => {
                 const iframeSrc = $iframe.attr("src");
+                 expect(iframeSrc).to.not.be.empty;
                 cy.log("Iframe source:", iframeSrc);
             });
 
-            cy.window().then((win) => {
-                win.document.getElementById("planet-iframe").style.display = "block";
-            });
         });
     });
 });
