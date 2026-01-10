@@ -64,6 +64,9 @@
      decoding and drawing GIF frames onto the turtle's overlay canvas.
      Canvas refreshing is handled separately by CreateJS Ticker. -->
     <script src="js/gif-animator.js"></script>
+    <!-- FirstProjectTutorial.js provides interactive step-by-step onboarding
+     tutorial that guides new users through creating their first project. -->
+    <script src="js/tutorial/FirstProjectTutorial.js" defer></script>
     <script defer>
         document.addEventListener("DOMContentLoaded", function () {
             if (window.hljs) hljs.highlightAll();
@@ -280,7 +283,7 @@
             </dialog>
             <div class="materialize-iso" tabindex="-1">
                 <nav id="toolbars" class="nav-wrapper">
-                <div class="blue nav-wrapper" tabindex="-1">
+                    <div class="blue nav-wrapper" tabindex="-1">
                         <div id="mb-logo" class="logo left tooltipped"
                             style="display: flex; align-items: center; line-height: 0; height: 100%; padding-right: 0;"
                             data-position="bottom">
@@ -296,59 +299,60 @@
                                 <a id="stop" class="left tooltipped"><i class="material-icons main">stop</i></a>
                             </li>
                             <li>
-                            <a id="record" class="left tooltipped" data-tooltip="Record"></a>
+                                <a id="record" class="left tooltipped" data-tooltip="Record"></a>
                             </li>
                         </ul>
 
                         <ul class="main right">
                             <li>
                                 <a id="FullScreen" class="FullScreen tooltipped dropdown-trigger" data-position="bottom"
-                                onclick="setIcon()">
-                                <i class="material-icons" id="FullScrIcon">fullscreen</i>
-                            </a>
+                                    onclick="setIcon()">
+                                    <i class="material-icons" id="FullScrIcon">fullscreen</i>
+                                </a>
                             </li>
                             <li>
                                 <a id="newFile" class="tooltipped dropdown-trigger" data-position="left"
-                                data-activates="newdropdown">
-                                <i class="material-icons md-48">note_add</i>
-                            </a>
+                                    data-activates="newdropdown">
+                                    <i class="material-icons md-48">note_add</i>
+                                </a>
                             </li>
                             <li>
-                            <a id="load" class="tooltipped" data-position="bottom">
-                                <i class="material-icons md-48">folder</i>
-                            </a>
+                                <a id="load" class="tooltipped" data-position="bottom">
+                                    <i class="material-icons md-48">folder</i>
+                                </a>
                             </li>
                             <li>
-                            <a id="saveButton"  class="tooltipped dropdown-trigger" data-position="left"
-                                data-activates="saveddropdownbeg">
-                                <i id="save1" class="material-icons md-48">save_alt</i>
-                            </a>
+                                <a id="saveButton" class="tooltipped dropdown-trigger" data-position="left"
+                                    data-activates="saveddropdownbeg">
+                                    <i id="save1" class="material-icons md-48">save_alt</i>
+                                </a>
                             </li>
                             <li>
-                            <a id="saveButtonAdvanced" style="display: none;"  class="tooltipped dropdown-trigger"
-                                data-position="left" data-activates="saveddropdown">
-                                <i id="save2" class="material-icons md-48">save_alt</i>
-                            </a>
+                                <a id="saveButtonAdvanced" style="display: none;" class="tooltipped dropdown-trigger"
+                                    data-position="left" data-activates="saveddropdown">
+                                    <i id="save2" class="material-icons md-48">save_alt</i>
+                                </a>
                             </li>
                             <li>
-                            <a id="planetIcon" class="tooltipped" data-position="bottom">
-                                <i class="material-icons md-48">public</i>
-                            </a>
+                                <a id="planetIcon" class="tooltipped" data-position="bottom">
+                                    <i class="material-icons md-48">public</i>
+                                </a>
                             </li>
                             <li>
-                            <a style="display: none;" id="planetIconDisabled" class="tooltipped" data-position="bottom">
-                                <i style="color: #a5acba;" class="material-icons md-48">public</i>
-                            </a>
+                                <a style="display: none;" id="planetIconDisabled" class="tooltipped"
+                                    data-position="bottom">
+                                    <i style="color: #a5acba;" class="material-icons md-48">public</i>
+                                </a>
                             </li>
                             <li>
-                            <a id="toggleAuxBtn" class="tooltipped" data-position="left">
-                                <i id="menu" class="animated-icon material-icons md-48">menu</i>
-                            </a>
+                                <a id="toggleAuxBtn" class="tooltipped" data-position="left">
+                                    <i id="menu" class="animated-icon material-icons md-48">menu</i>
+                                </a>
                             </li>
                             <li>
-                            <a id="helpIcon" class="tooltipped" data-position="bottom">
-                                <i class="material-icons md-48">help</i>
-                            </a>
+                                <a id="helpIcon" class="tooltipped" data-position="bottom">
+                                    <i class="material-icons md-48">help</i>
+                                </a>
                             </li>
                         </ul>
                     </div>
@@ -356,20 +360,20 @@
                         <div class="blue darken-1 nav-wrapper" tabindex="-1">
                             <ul class="aux left">
                                 <li>
-                                <a id="runSlowlyIcon" class="tooltipped" data-position="bottom" data-delay="10">
-                                    <i class="material-icons md-48">play_circle_outline</i>
-                                </a>
+                                    <a id="runSlowlyIcon" class="tooltipped" data-position="bottom" data-delay="10">
+                                        <i class="material-icons md-48">play_circle_outline</i>
+                                    </a>
                                 </li>
                                 <li>
-                                <a id="runStepByStepIcon" class="tooltipped" data-position="bottom" data-delay="10">
-                                    <i class="material-icons md-48">video_library</i>
-                                </a>
+                                    <a id="runStepByStepIcon" class="tooltipped" data-position="bottom" data-delay="10">
+                                        <i class="material-icons md-48">video_library</i>
+                                    </a>
                                 </li>
                             </ul>
                             <ul class="aux right">
                                 <li>
-                                <a id="displayStatsIcon" class="tooltipped" data-position="bottom" data-delay="10"><i
-                                        class="material-icons md-48">poll</i></a>
+                                    <a id="displayStatsIcon" class="tooltipped" data-position="bottom"
+                                        data-delay="10"><i class="material-icons md-48">poll</i></a>
                                 </li>
                                 <li>
                                     <a id="loadPluginIcon" class="tooltipped" data-position="bottom" data-delay="10"><i
@@ -414,7 +418,8 @@
                                 </li>
 
                                 <li>
-                                <a id="restoreIcon" class="tooltipped" data-position="bottom" data-tooltip="Restore"><i
+                                    <a id="restoreIcon" class="tooltipped" data-position="bottom"
+                                        data-tooltip="Restore"><i
                                             class="material-icons md-48">restore_from_trash</i></a>
                                     <div id="trashList"></div>
                                 </li>
@@ -500,15 +505,15 @@
 
     <!-- Initialize Scripts -->
     <script>
-    let canvas, stage;
-function init() {
-    canvas = document.getElementById("canvas");
-    stage = new createjs.Stage(canvas);
+        let canvas, stage;
+        function init() {
+            canvas = document.getElementById("canvas");
+            stage = new createjs.Stage(canvas);
 
-    createjs.Ticker.framerate = 60;
-    createjs.Ticker.addEventListener("tick", stage);
-}
-document.addEventListener("DOMContentLoaded", init);
+            createjs.Ticker.framerate = 60;
+            createjs.Ticker.addEventListener("tick", stage);
+        }
+        document.addEventListener("DOMContentLoaded", init);
     </script>
 
     <script>
@@ -556,8 +561,8 @@ document.addEventListener("DOMContentLoaded", init);
                 }
 
                 const container = document.getElementById("loading-media");
-                const content = lang.startsWith("ja")                    
-                ? `<img src="loading-animation-ja.svg" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
+                const content = lang.startsWith("ja")
+                    ? `<img src="loading-animation-ja.svg" loading="eager" fetchpriority="high" style="width: 70%; height: 90%; object-fit: contain;" alt="Loading animation">`
                     : `<video loop autoplay muted playsinline fetchpriority="high" style="width: 90%; height: 100%; object-fit: contain;">
                         <source src="loading-animation.webm" type="video/webm">
                         <source src="loading-animation.mp4" type="video/mp4">

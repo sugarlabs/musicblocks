@@ -6480,6 +6480,14 @@ class Activity {
             new HelpWidget(this, false);
         };
 
+        /**
+         * Open the First Project Tutorial directly (starts at card 37)
+         * This can be called from anywhere to launch the tutorial
+         */
+        this.openFirstProjectTutorial = () => {
+            HelpWidget.openFirstProjectTutorial(this);
+        };
+
         /*
          * Shows about page
          */
@@ -7781,6 +7789,18 @@ class Activity {
 }
 
 const activity = new Activity();
+// Expose activity globally for tutorials and widgets
+window.activity = activity;
+
+// Global function to open First Project Tutorial (starts at card 37)
+// Can be called from console or anywhere: openFirstProjectTutorial()
+window.openFirstProjectTutorial = function () {
+    if (activity && activity.openFirstProjectTutorial) {
+        activity.openFirstProjectTutorial();
+    } else if (typeof HelpWidget !== "undefined") {
+        HelpWidget.openFirstProjectTutorial(activity);
+    }
+};
 
 require(["domReady!"], doc => {
     setTimeout(() => {
