@@ -1,0 +1,52 @@
+
+input[id^="paletteSearch_"]:focus {
+    border-color: #96d3f3;
+    box-shadow: 0 0 0 2px rgba(150, 211, 243, 0.2);
+}
+
+input[id^="paletteSearch_"]::placeholder {
+    opacity: 0.6;
+    font-style: italic;
+}
+
+input[id^="paletteSearch_"] + button:hover {
+    opacity: 0.8;
+    transform: scale(1.1);
+}
+
+.palette-search-highlight {
+    background-color: rgba(150, 211, 243, 0.2) !important;
+    transition: background-color 0.2s ease;
+}
+
+#noResultsMessage td {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#PaletteBody_items tr {
+    transition: opacity 0.2s ease, max-height 0.2s ease;
+}
+
+#PaletteBody_items tr[style*="display: none"] {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    input[id^="paletteSearch_"] {
+        font-size: 14px;
+        padding: 6px 10px;
+    }
+}
