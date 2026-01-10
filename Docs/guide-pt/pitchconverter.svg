@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   height="350"
+   version="1.1"
+   width="346"
+   style="overflow:hidden"
+   viewBox="0 0 346 350"
+   preserveAspectRatio="xMidYMid meet"
+   id="svg186"
+   sodipodi:docname="pitchconverter.svg"
+   inkscape:version="1.0 (b51213c273, 2020-08-10)">
+  <metadata
+     id="metadata190">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1016"
+     id="namedview188"
+     showgrid="false"
+     inkscape:zoom="0.833"
+     inkscape:cx="500"
+     inkscape:cy="500"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg186" />
+  <path
+     fill="#60bfbc"
+     stroke="#333333"
+     d="m 205.61381,187.87868 129.59705,38.2645 a 168.83534,169.77311 0 0 1 -19.96299,43.95566 168.83534,169.77311 0 0 1 -31.46969,36.51969 L 195.32727,203.97375 a 33.767066,33.954623 0 0 0 6.29395,-7.30393 33.767066,33.954623 0 0 0 3.99259,-8.79114 z"
+     stroke-width="0"
+     fill-opacity="1"
+     id="wheelnav-wheelDiv-slice-1"
+     style="fill-opacity:1" />
+  <path
+     fill="none"
+     stroke="#444444"
+     d="M 4.3792217,8.539446"
+     stroke-width="0.338608"
+     id="wheelnav-wheelDiv-line-1" />
+  <text
+     x="343.85498"
+     y="55.693768"
+     text-anchor="middle"
+     font="100 48px sans-serif"
+     stroke="none"
+     fill="#333333"
+     style="font-style:normal;font-variant:normal;font-weight:100;font-stretch:normal;font-size:16.2535px;line-height:normal;font-family:sans-serif;text-anchor:middle;stroke-width:0.338612"
+     id="wheelnav-wheelDiv-title-1"
+     transform="matrix(0.83895894,0.54209006,-0.53909568,0.84361887,0,0)"><tspan
+       dy="5.6416283"
+       id="tspan129"
+       style="stroke-width:0.338612">solfege syllable</tspan></text>
+  <path
+     fill="#3ea4a3"
+     stroke="#333333"
+     d="M 195.32727,152.65137 283.77818,50.0066 a 168.83534,169.77311 0 0 1 31.46969,36.519685 168.83534,169.77311 0 0 1 19.96299,43.955665 l -129.59705,38.2645 a 33.767066,33.954623 0 0 0 -3.99259,-8.79115 33.767066,33.954623 0 0 0 -6.29395,-7.30393 z"
+     stroke-width="0"
+     fill-opacity="1"
+     id="wheelnav-wheelDiv-slice-10"
+     style="fill-opacity:1" />
+  <path
+     fill="none"
+     stroke="#444444"
+     d="M 4.3792217,8.539446"
+     stroke-width="0.338608"
+     id="wheelnav-wheelDiv-line-10" />
+  <text
+     x="151.55952"
+     y="243.56978"
+     text-anchor="middle"
+     font="100 48px sans-serif"
+     stroke="none"
+     fill="#333333"
+     style="font-style:normal;font-variant:normal;font-weight:100;font-stretch:normal;font-size:16.2535px;line-height:normal;font-family:sans-serif;text-anchor:middle;stroke-width:0.338612"
+     id="wheelnav-wheelDiv-title-10"
+     transform="matrix(0.83895894,-0.54209006,0.53909568,0.84361887,0,0)"><tspan
+       dy="5.6437054"
+       id="tspan134"
+       style="stroke-width:0.338612">pitch to color</tspan></text>
+  <path
+     fill="#1d8989"
+     stroke="#333333"
+     d="M 178.0201,144.70354 197.24233,10.267489 a 168.83534,169.77311 0 0 1 46.10895,13.614008 168.83534,169.77311 0 0 1 40.4269,26.125103 l -88.45091,102.64477 a 33.767066,33.954623 0 0 0 -8.08537,-5.22502 33.767066,33.954623 0 0 0 -9.2218,-2.72281 z"
+     stroke-width="0"
+     fill-opacity="1"
+     id="wheelnav-wheelDiv-slice-9"
+     style="fill-opacity:1" />
+  <path
+     fill="none"
+     stroke="#444444"
+     d="M 4.3792217,8.539446"
+     stroke-width="0.338608"
+     id="wheelnav-wheelDiv-line-9" />
+  <text
+     x="11.981654"
+     y="231.86249"
+     text-anchor="middle"
+     font="100 48px sans-serif"
+     stroke="none"
+     fill="#333333"
+     style="font-style:normal;font-variant:normal;font-weight:100;font-stretch:normal;font-size:16.2525px;line-height:normal;font-family:sans-serif;text-anchor:middle;stroke-width:0.338595"
+     id="wheelnav-wheelDiv-title-9"
+     transform="matrix(0.41426577,-0.91215489,0.90711638,0.41656678,0,0)"><tspan
+       dy="5.6427193"
+       id="tspan139"
+       style="stroke-width:0.338595">pitch to shade</tspan></text>
+  <path
+     fill="#60bfbc"
+     stroke="#333333"
+     d="M 159.18721,147.42635 103.07781,23.881497 a 168.83534,169.77311 0 0 1 46.10896,-13.614008 168.83534,169.77311 0 0 1 48.05556,0 L 178.0201,144.70354 a 33.767066,33.954623 0 0 0 -9.61111,0 33.767066,33.954623 0 0 0 -9.22178,2.72281 z"
+     stroke-width="0"
+     fill-opacity="1"
+     id="wheelnav-wheelDiv-slice-8"
+     style="fill-opacity:1" />
+  <path
+     fill="none"
+     stroke="#444444"
+     d="M 4.3792217,8.539446"
+     stroke-width="0.338608"
+     id="wheelnav-wheelDiv-line-8" />
+  <text
+     x="-99.666534"
+     y="147.07468"
+     text-anchor="middle"
+     font="100 48px sans-serif"
+     stroke="none"
+     fill="#333333"
+     style="font-style:normal;font-variant:normal;font-weight:100;font-stretch:normal;font-size:16.2527px;line-height:normal;font-family:sans-serif;text-anchor:middle;stroke-width:0.338599"
+     id="wheelnav-wheelDiv-title-8"
+     transform="matrix(-0.14190975,-0.99256827,0.98708552,-0.14269798,0,0)"><tspan
+       dy="5.6420598"
+       id="tspan144"
+       style="stroke-width:0.338599">staff y</tspan></text>
+  <path
+     fill="#1d8989"
+     stroke="#333333"
+     d="M 144.80789,159.9553 31.181231,86.526285 A 168.83534,169.77311 0 0 1 62.650917,50.0066 168.83534,169.77311 0 0 1 103.07781,23.881497 l 56.1094,123.544853 a 33.767066,33.954623 0 0 0 -8.08539,5.22502 33.767066,33.954623 0 0 0 -6.29393,7.30393 z"
+     stroke-width="0"
+     fill-opacity="1"
+     id="wheelnav-wheelDiv-slice-7"
+     style="fill-opacity:1" />
+  <path
+     fill="none"
+     stroke="#444444"
+     d="M 4.3792217,8.539446"
+     stroke-width="0.338608"
+     id="wheelnav-wheelDiv-line-7" />
+  <text
+     x="-146.54521"
+     y="14.806598"
+     text-anchor="middle"
+     font="100 48px sans-serif"
+     stroke="none"
+     fill="#333333"
+     style="font-style:normal;font-variant:normal;font-weight:100;font-stretch:normal;font-size:16.253px;line-height:normal;font-family:sans-serif;text-anchor:middle;stroke-width:0.338603"
+     id="wheelnav-wheelDiv-title-7"
+     transform="matrix(-0.65309642,-0.75780474,0.75361881,-0.65672399,0,0)"><tspan
+       dy="5.6430769"
+       id="tspan149"
+       style="stroke-width:0.338603">nth degree</tspan></text>
+  <path
+     fill="#60bfbc"
+     stroke="#333333"
+     d="M 139.44748,178.31256 H 4.3792217 A 168.83534,169.77311 0 0 1 11.218237,130.48195 168.83534,169.77311 0 0 1 31.181231,86.526285 L 144.80789,159.9553 a 33.767066,33.954623 0 0 0 -3.9926,8.79115 33.767066,33.954623 0 0 0 -1.36781,9.56611 z"
+     stroke-width="0"
+     fill-opacity="1"
+     id="wheelnav-wheelDiv-slice-6"
+     style="fill-opacity:1" />
+  <path
+     fill="none"
+     stroke="#444444"
+     d="M 4.3792217,8.539446"
+     stroke-width="0.338608"
+     id="wheelnav-wheelDiv-line-6" />
+  <text
+     x="-115.15867"
+     y="-121.69135"
+     text-anchor="middle"
+     font="100 48px sans-serif"
+     stroke="none"
+     fill="#333333"
+     style="font-style:normal;font-variant:normal;font-weight:100;font-stretch:normal;font-size:16.2531px;line-height:normal;font-family:sans-serif;text-anchor:middle;stroke-width:0.338606"
+     id="wheelnav-wheelDiv-title-6"
+     transform="matrix(-0.95684863,-0.28248195,0.28092159,-0.96216339,0,0)"><tspan
+       dy="5.6437998"
+       id="tspan154"
+       style="stroke-width:0.338606">scale degree</tspan></text>
+  <path
+     fill="#3ea4a3"
+     stroke="#333333"
+     d="M 144.80789,196.66982 31.181231,270.09884 A 168.83534,169.77311 0 0 1 11.218237,226.14318 168.83534,169.77311 0 0 1 4.3792217,178.31256 H 139.44748 a 33.767066,33.954623 0 0 0 1.36781,9.56612 33.767066,33.954623 0 0 0 3.9926,8.79114 z"
+     stroke-width="0"
+     fill-opacity="1"
+     id="wheelnav-wheelDiv-slice-5"
+     style="fill-opacity:1" />
+  <path
+     fill="none"
+     stroke="#444444"
+     d="M 4.3792217,8.539446"
+     stroke-width="0.338608"
+     id="wheelnav-wheelDiv-line-5" />
+  <text
+     x="-14.778144"
+     y="-219.52112"
+     text-anchor="middle"
+     font="100 48px sans-serif"
+     stroke="none"
+     fill="#333333"
+     style="font-style:normal;font-variant:normal;font-weight:100;font-stretch:normal;font-size:16.2531px;line-height:normal;font-family:sans-serif;text-anchor:middle;stroke-width:0.338606"
+     id="wheelnav-wheelDiv-title-5"
+     transform="matrix(-0.95684863,0.28248195,-0.28092159,-0.96216339,0,0)"><tspan
+       dy="5.6439595"
+       id="tspan159"
+       style="stroke-width:0.338606">scalar class</tspan></text>
+  <path
+     fill="#1d8989"
+     stroke="#333333"
+     d="m 159.18721,209.19878 -56.1094,123.54484 A 168.83534,169.77311 0 0 1 62.650917,306.61853 168.83534,169.77311 0 0 1 31.181231,270.09884 L 144.80789,196.66982 a 33.767066,33.954623 0 0 0 6.29393,7.30393 33.767066,33.954623 0 0 0 8.08539,5.22503 z"
+     stroke-width="0"
+     fill-opacity="1"
+     id="wheelnav-wheelDiv-slice-4"
+     style="fill-opacity:1" />
+  <path
+     fill="none"
+     stroke="#444444"
+     d="M 4.3792217,8.539446"
+     stroke-width="0.338608"
+     id="wheelnav-wheelDiv-line-4" />
+  <text
+     x="122.37502"
+     y="-247.63283"
+     text-anchor="middle"
+     font="100 48px sans-serif"
+     stroke="none"
+     fill="#333333"
+     style="font-style:normal;font-variant:normal;font-weight:100;font-stretch:normal;font-size:16.253px;line-height:normal;font-family:sans-serif;text-anchor:middle;stroke-width:0.338603"
+     id="wheelnav-wheelDiv-title-4"
+     transform="matrix(-0.65309642,0.75780474,-0.75361881,-0.65672399,0,0)"><tspan
+       dy="5.6419325"
+       id="tspan164"
+       style="stroke-width:0.338603">pitch in hertz</tspan></text>
+  <path
+     fill="#60bfbc"
+     stroke="#333333"
+     d="m 178.0201,211.92158 19.22223,134.43605 a 168.83534,169.77311 0 0 1 -48.05556,0 168.83534,169.77311 0 0 1 -46.10896,-13.61401 l 56.1094,-123.54484 a 33.767066,33.954623 0 0 0 9.22178,2.7228 33.767066,33.954623 0 0 0 9.61111,0 z"
+     stroke-width="0"
+     fill-opacity="1"
+     id="wheelnav-wheelDiv-slice-3"
+     style="fill-opacity:1" />
+  <path
+     fill="none"
+     stroke="#444444"
+     d="M 4.3792217,8.539446"
+     stroke-width="0.338608"
+     id="wheelnav-wheelDiv-line-3" />
+  <text
+     x="252.74106"
+     y="-197.35297"
+     text-anchor="middle"
+     font="100 48px sans-serif"
+     stroke="none"
+     fill="#333333"
+     style="font-style:normal;font-variant:normal;font-weight:100;font-stretch:normal;font-size:16.2527px;line-height:normal;font-family:sans-serif;text-anchor:middle;stroke-width:0.338599"
+     id="wheelnav-wheelDiv-title-3"
+     transform="matrix(-0.14190975,0.99256827,-0.98708552,-0.14269798,0,0)"><tspan
+       dy="5.642818"
+       id="tspan169"
+       style="stroke-width:0.338599">pitch number</tspan></text>
+  <path
+     fill="#1d8989"
+     stroke="#333333"
+     d="m 195.32727,203.97375 88.45091,102.64478 a 168.83534,169.77311 0 0 1 -40.4269,26.12509 168.83534,169.77311 0 0 1 -46.10895,13.61401 L 178.0201,211.92158 a 33.767066,33.954623 0 0 0 9.2218,-2.7228 33.767066,33.954623 0 0 0 8.08537,-5.22503 z"
+     stroke-width="0"
+     fill-opacity="1"
+     id="wheelnav-wheelDiv-slice-2"
+     style="fill-opacity:1" />
+  <path
+     fill="none"
+     stroke="#444444"
+     d="M 4.3792217,8.539446"
+     stroke-width="0.338608"
+     id="wheelnav-wheelDiv-line-2" />
+  <text
+     x="335.54535"
+     y="-84.038216"
+     text-anchor="middle"
+     font="100 48px sans-serif"
+     stroke="none"
+     fill="#333333"
+     style="font-style:normal;font-variant:normal;font-weight:100;font-stretch:normal;font-size:16.2525px;line-height:normal;font-family:sans-serif;text-anchor:middle;stroke-width:0.338595"
+     id="wheelnav-wheelDiv-title-2"
+     transform="matrix(0.41426577,0.91215489,-0.90711638,0.41656678,0,0)"><tspan
+       dy="5.6446691"
+       id="tspan174"
+       style="stroke-width:0.338595">pitch class</tspan></text>
+  <desc
+     id="desc177">Created with Raphaël 2.1.2</desc>
+  <defs
+     id="defs179" />
+  <path
+     fill="#3ea4a3"
+     stroke="#111111"
+     d="m 205.61381,168.74645 129.59705,-38.2645 a 168.83534,169.77311 0 0 1 6.83902,47.83061 168.83534,169.77311 0 0 1 -6.83902,47.83062 l -129.59705,-38.2645 a 33.767066,33.954623 0 0 0 1.36781,-9.56612 33.767066,33.954623 0 0 0 -1.36781,-9.56611 z"
+     stroke-width="0"
+     fill-opacity="1"
+     id="wheelnav-wheelDiv-slice-0"
+     style="fill-opacity:1" />
+  <path
+     fill="none"
+     stroke="#444444"
+     d="M 4.3792217,8.539446"
+     stroke-width="0.338608"
+     id="wheelnav-wheelDiv-line-0" />
+  <text
+     x="275.27707"
+     y="177.81938"
+     text-anchor="middle"
+     font="100 48px sans-serif"
+     stroke="none"
+     fill="#ffffff"
+     style="font-style:normal;font-variant:normal;font-weight:100;font-stretch:normal;font-size:16.2531px;line-height:normal;font-family:sans-serif;text-anchor:middle;stroke-width:0.338608"
+     id="wheelnav-wheelDiv-title-0"
+     transform="scale(0.99723432,1.0027734)"><tspan
+       dy="5.645216"
+       id="tspan183"
+       style="stroke-width:0.338608">letter class</tspan></text>
+</svg>

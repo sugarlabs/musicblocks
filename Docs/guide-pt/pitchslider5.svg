@@ -5,9 +5,9 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   width="281.39487"
+   width="267.39487"
    height="120.93749"
-   viewBox="0 0 281.39487 120.93749"
+   viewBox="0 0 267.39487 120.93749"
    id="svg4075"
    version="1.1">
   <defs
@@ -31,7 +31,7 @@
        transform="scale(1.5)"
        id="g855">
       <path
-         d="m 0.5,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 v 2 h 10 v -2 h 9 46.103017 4 c 2.209139,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 c -2.761424,0 -5,2.238576 -5,5 v 4 4 21 4 c 0,2.761424 2.238576,5 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 c -2.209139,0 -4,-1.790861 -4,-4 v -4 z"
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 36.147461 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 21 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
          style="fill:#fe994f;fill-opacity:1;stroke:#e8680e;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
          id="path845" />
       <text
@@ -40,7 +40,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan847">valor de nota</tspan>
+           id="tspan847">note value</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -53,7 +53,7 @@
     </g>
   </g>
   <g
-     transform="matrix(0.93749997,0,0,0.93749997,104.20736,0)"
+     transform="matrix(0.93749997,0,0,0.93749997,90.20736,0)"
      id="g875">
     <g
        transform="scale(1.5)"
@@ -89,7 +89,7 @@
     </g>
   </g>
   <g
-     transform="matrix(0.93749997,0,0,0.93749997,184.36361,0)"
+     transform="matrix(0.93749997,0,0,0.93749997,170.36361,0)"
      id="g885">
     <g
        transform="scale(1.5)"
@@ -109,7 +109,7 @@
     </g>
   </g>
   <g
-     transform="matrix(0.93749997,0,0,0.93749997,184.36361,29.531249)"
+     transform="matrix(0.93749997,0,0,0.93749997,170.36361,29.531249)"
      id="g895">
     <g
        transform="scale(1.5)"
@@ -128,26 +128,21 @@
       </text>
     </g>
   </g>
-  <g
-     transform="matrix(0.93749997,0,0,0.93749997,12.65625,29.531249)"
-     id="g905">
-    <g
-       transform="scale(1.5)"
-       id="g903">
-      <path
-         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
-         style="fill:#c4c4c4;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path897" />
-      <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text901">
-        <tspan
-           x="36.333332"
-           y="13.5"
-           id="tspan899">↓</tspan>
-      </text>
-    </g>
-  </g>
+  <path
+     d="m 13.359375,41.484374 v -5.625 a 5.625,5.625 0 0 1 5.625,-5.625 h 5.625 v 2.8125 h 14.0625 v -2.8125 h 28.125 5.625 a 5.625,5.625 0 0 1 5.625,5.625 v 5.625 5.625 5.625 a 5.625,5.625 0 0 1 -5.625,5.625 h -5.625 -28.125 -1.40625 v 2.8125 h -11.25 v -2.8125 h -1.40625 -5.625 a 5.625,5.625 0 0 1 -5.625,-5.625 v -5.625 z"
+     style="fill:#c4c4c4;fill-opacity:1;stroke:#a0a0a0;stroke-width:1.40625;stroke-linecap:round;stroke-opacity:1"
+     id="path897" />
+  <text
+     y="29.531248"
+     x="12.65625"
+     style="font-size:14.0625px;font-family:sans-serif;text-anchor:end;fill:#000000;stroke-width:1.40625"
+     id="text901">
+    <tspan
+       style="stroke-width:1.40625"
+       x="63.75"
+       y="48.515625"
+       id="tspan899">↓</tspan>
+  </text>
   <g
      transform="matrix(0.93749997,0,0,0.93749997,12.65625,59.062502)"
      id="g919">

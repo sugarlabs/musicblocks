@@ -24,72 +24,59 @@
       </cc:Work>
     </rdf:RDF>
   </metadata>
-  <g
-     transform="matrix(0.9375,0,0,0.9375,0,0.39519136)"
-     id="g842">
-    <g
-       transform="scale(1.5)"
-       id="g840">
-      <path
-         d="m 0.5,14.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 l 5,-6 5,6 h 9 73.35341 4 c 2.20914,0 4,1.790861 4,4 v 4 4 4 c 0,2.209139 -1.79086,4 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 c -2.761424,0 -5,2.238576 -5,5 v 4 4 4 c 0,2.761424 2.238576,5 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -9 l -5,6 -5,-6 h -4 c -2.209139,0 -4,-1.790861 -4,-4 v -4 z"
-         style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path834" />
-      <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-         id="text838">
-        <tspan
-           x="5.3333335"
-           y="21.5"
-           id="tspan836">medir tom do slider</tspan>
-      </text>
-    </g>
-  </g>
-  <g
-     transform="matrix(0.9375,0,0,0.9375,12.65625,38.36394)"
-     id="g856">
-    <g
-       transform="scale(1.5)"
-       id="g854">
-      <path
-         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
-         style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path844" />
-      <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text848">
-        <tspan
-           x="46.333332"
-           y="13.5"
-           id="tspan846">hertz</tspan>
-      </text>
-      <text
-         style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text852">
-        <tspan
-           x="46.333332"
-           y="11.25"
-           id="tspan850" />
-      </text>
-    </g>
-  </g>
-  <g
-     transform="matrix(0.9375,0,0,0.9375,81.5625,38.36394)"
-     id="g866">
-    <g
-       transform="scale(1.5)"
-       id="g864">
-      <path
-         d="m 8.5,0.5 h 60 v 20 h -60 v -8 -1 h -6 v 3 h -2 v -8 h 2 v 3 h 6 v -1 z"
-         style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path858" />
-      <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-         id="text862">
-        <tspan
-           x="13.333333"
-           y="13.833333"
-           id="tspan860">220</tspan>
-      </text>
-    </g>
-  </g>
+  <path
+     d="m 0.703125,20.785816 v -5.625 a 5.625,5.625 0 0 1 5.625,-5.6249996 h 5.625 l 7.03125,-8.4375 7.03125,8.4375 h 12.65625 53.153229 5.625 a 5.625,5.625 0 0 1 5.624996,5.6249996 v 5.625 5.625 5.625 a 5.625,5.625 0 0 1 -5.624996,5.625 h -5.625 -53.153229 -1.40625 v 2.8125 h -11.25 v -2.8125 h -1.40625 -5.625 a 7.03125,7.03125 0 0 0 -7.03125,7.03125 v 5.625 5.625 5.625 a 7.03125,7.03125 0 0 0 7.03125,7.03125 h 5.625 v 2.8125 h 14.0625 v -2.8125 h 11.25 v 8.4375 8.4375 5.625 a 5.625,5.625 0 0 1 -5.625,5.625 h -5.625 -12.65625 l -7.03125,8.437504 -7.03125,-8.437504 h -5.625 a 5.625,5.625 0 0 1 -5.625,-5.625 v -5.625 z"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1.40625;stroke-linecap:round;stroke-opacity:1"
+     id="path834" />
+  <text
+     y="0.39519137"
+     style="font-size:14.0625px;font-family:sans-serif;text-anchor:start;fill:#000000;stroke-width:1.40625"
+     id="text838">
+    <tspan
+       style="stroke-width:1.40625"
+       x="7.5"
+       y="30.629566"
+       id="tspan836">pitch slider</tspan>
+  </text>
+  <path
+     d="m 13.359375,50.317065 v -5.625 a 5.625,5.625 0 0 1 5.625,-5.625 h 5.625 v 2.8125 h 14.0625 v -2.8125 h 42.1875 5.625 a 5.625,5.625 0 0 1 5.625,5.625 v 5.625 h -5.625 v -4.21875 h -5.625 v 14.0625 h 5.625 v -4.21875 h 5.625 v 5.625 a 5.625,5.625 0 0 1 -5.625,5.625 h -5.625 -42.1875 -1.40625 v 2.8125 h -11.25 v -2.8125 h -1.40625 -5.625 a 5.625,5.625 0 0 1 -5.625,-5.625 v -5.625 z"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1.40625;stroke-linecap:round;stroke-opacity:1"
+     id="path844" />
+  <text
+     y="38.363941"
+     x="12.65625"
+     style="font-size:14.0625px;font-family:sans-serif;text-anchor:end;fill:#000000;stroke-width:1.40625"
+     id="text848">
+    <tspan
+       style="stroke-width:1.40625"
+       x="77.8125"
+       y="57.348316"
+       id="tspan846">hertz</tspan>
+  </text>
+  <text
+     y="38.363941"
+     x="12.65625"
+     style="font-size:9.375px;font-family:sans-serif;text-anchor:end;fill:#000000;stroke-width:1.40625"
+     id="text852">
+    <tspan
+       style="stroke-width:1.40625"
+       x="77.8125"
+       y="54.184254"
+       id="tspan850" />
+  </text>
+  <path
+     d="m 93.515625,39.067065 h 84.374995 v 28.125 H 93.515625 v -11.25 -1.40625 h -8.4375 v 4.21875 h -2.8125 v -11.25 h 2.8125 v 4.21875 h 8.4375 v -1.40625 z"
+     style="fill:#ff6ea1;fill-opacity:1;stroke:#ff2c76;stroke-width:1.40625;stroke-linecap:round;stroke-opacity:1"
+     id="path858" />
+  <text
+     y="38.363941"
+     x="81.5625"
+     style="font-size:14.0625px;font-family:sans-serif;text-anchor:start;fill:#000000;stroke-width:1.40625"
+     id="text862">
+    <tspan
+       style="stroke-width:1.40625"
+       x="100.3125"
+       y="57.817066"
+       id="tspan860">220</tspan>
+  </text>
 </svg>

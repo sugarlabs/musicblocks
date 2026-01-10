@@ -44,7 +44,7 @@
             <tspan
                x="20"
                y="22"
-               id="tspan4">iniciar</tspan>
+               id="tspan4">start</tspan>
           </text>
         </g>
       </g>
@@ -212,7 +212,7 @@
           <tspan
              x="5"
              y="15"
-             id="tspan466">repetir</tspan>
+             id="tspan466">repeat</tspan>
         </text>
         <text
            style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#282828"

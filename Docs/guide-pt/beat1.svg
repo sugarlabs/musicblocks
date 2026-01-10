@@ -38,7 +38,7 @@
         <tspan
            id="tspan258"
            y="24"
-           x="61.333332">metro</tspan>
+           x="61.333332">meter</tspan>
       </text>
       <text
          id="text264"
@@ -46,7 +46,7 @@
         <tspan
            id="tspan262"
            y="11.25"
-           x="61.333332">número de batidas</tspan>
+           x="61.333332">number of beats</tspan>
       </text>
       <text
          id="text268"
@@ -54,7 +54,7 @@
         <tspan
            id="tspan266"
            y="32.25"
-           x="61.333332">valor de nota</tspan>
+           x="61.333332">note value</tspan>
       </text>
     </g>
   </g>
@@ -170,7 +170,7 @@
         <tspan
            id="tspan334"
            y="13.5"
-           x="46.333332">pegar</tspan>
+           x="46.333332">pickup</tspan>
       </text>
       <text
          id="text340"

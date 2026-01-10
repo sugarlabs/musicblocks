@@ -72,26 +72,20 @@
       </text>
     </g>
   </g>
-  <g
-     transform="matrix(0.93749999,0,0,0.93749999,0,0.39519136)"
-     id="g1296">
-    <g
-       transform="scale(1.5)"
-       id="g1294">
-      <path
-         d="m 0.5,14.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 l 5,-6 5,6 h 9 77.62007 4 c 2.20914,0 4,1.790861 4,4 v 4 4 4 c 0,2.209139 -1.79086,4 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 c -2.761424,0 -5,2.238576 -5,5 v 4 4 21 4 c 0,2.761424 2.238576,5 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -9 l -5,6 -5,-6 h -4 c -2.209139,0 -4,-1.790861 -4,-4 v -4 z"
-         style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path1288" />
-      <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-         id="text1292">
-        <tspan
-           x="5.3333335"
-           y="21.5"
-           id="tspan1290">medir tom do slider</tspan>
-      </text>
-    </g>
-  </g>
+  <path
+     d="m 0.703125,20.785816 v -5.625 a 5.625,5.625 0 0 1 5.625,-5.6249996 h 5.625 l 7.03125,-8.4375 7.03125,8.4375 h 12.65625 53.153229 5.625 a 5.625,5.625 0 0 1 5.624996,5.6249996 v 5.625 5.625 5.625 a 5.625,5.625 0 0 1 -5.624996,5.625 h -5.625 -53.153229 -1.40625 v 2.8125 h -11.25 v -2.8125 h -1.40625 -5.625 a 7.03125,7.03125 0 0 0 -7.03125,7.03125 v 5.625 5.625 29.53125 5.625 a 7.03125,7.03125 0 0 0 7.03125,7.03125 h 5.625 v 2.812504 h 14.0625 v -2.812504 h 11.25 v 8.437504 8.4375 5.625 a 5.625,5.625 0 0 1 -5.625,5.625 h -5.625 -12.65625 l -7.03125,8.4375 -7.03125,-8.4375 h -5.625 a 5.625,5.625 0 0 1 -5.625,-5.625 v -5.625 z"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1.40625;stroke-linecap:round;stroke-opacity:1"
+     id="path1288" />
+  <text
+     y="0.39519137"
+     style="font-size:14.0625px;font-family:sans-serif;text-anchor:start;fill:#000000;stroke-width:1.40625"
+     id="text1292">
+    <tspan
+       style="stroke-width:1.40625"
+       x="7.5"
+       y="30.629566"
+       id="tspan1290">pitch slider</tspan>
+  </text>
   <g
      transform="matrix(0.93749999,0,0,0.93749999,12.65625,38.363941)"
      id="g1310">

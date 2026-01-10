@@ -40,7 +40,7 @@
         <tspan
            x="56.894855"
            y="24"
-           id="tspan1365">Ritmo</tspan>
+           id="tspan1365">rhythm</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -48,7 +48,7 @@
         <tspan
            x="56.894855"
            y="11.25"
-           id="tspan1369">número de notas</tspan>
+           id="tspan1369">number of notes</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -56,7 +56,7 @@
         <tspan
            x="56.894855"
            y="32.25"
-           id="tspan1373">valor de nota</tspan>
+           id="tspan1373">note value</tspan>
       </text>
     </g>
   </g>
@@ -172,7 +172,7 @@
         <tspan
            x="56.894855"
            y="24"
-           id="tspan1441">Ritmo</tspan>
+           id="tspan1441">rhythm</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -180,7 +180,7 @@
         <tspan
            x="56.894855"
            y="11.25"
-           id="tspan1445">número de notas</tspan>
+           id="tspan1445">number of notes</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -188,7 +188,7 @@
         <tspan
            x="56.894855"
            y="32.25"
-           id="tspan1449">valor de nota</tspan>
+           id="tspan1449">note value</tspan>
       </text>
     </g>
   </g>
@@ -304,7 +304,7 @@
         <tspan
            x="56.894855"
            y="24"
-           id="tspan1517">Ritmo</tspan>
+           id="tspan1517">rhythm</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -312,7 +312,7 @@
         <tspan
            x="56.894855"
            y="11.25"
-           id="tspan1521">número de notas</tspan>
+           id="tspan1521">number of notes</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -320,7 +320,7 @@
         <tspan
            x="56.894855"
            y="32.25"
-           id="tspan1525">valor de nota</tspan>
+           id="tspan1525">note value</tspan>
       </text>
     </g>
   </g>

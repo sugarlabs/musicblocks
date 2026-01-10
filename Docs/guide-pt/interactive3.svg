@@ -5,9 +5,9 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   width="320.75"
+   width="267.39487"
    height="273.75"
-   viewBox="0 0 320.75 273.75"
+   viewBox="0 0 267.39487 273.75"
    id="svg4075"
    version="1.1">
   <defs
@@ -482,7 +482,7 @@
        transform="scale(1.5)"
        id="g1014">
       <path
-         d="m 0.5,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 v 2 h 10 v -2 h 9 46.103017 4 c 2.209139,0 4.740083,1.9185168 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 c -2.761424,0 -5,2.238576 -5,5 v 4 4 63 4 c 0,2.76142 2.238576,5 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 c 0,2.20914 -1.790861,4 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 c -2.209139,0 -4,-1.79086 -4,-4 v -4 z"
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 9 36.147461 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 63 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
          style="fill:#fe994f;fill-opacity:1;stroke:#e8680e;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
          id="path1004" />
       <text
@@ -491,7 +491,7 @@
         <tspan
            x="5.3333335"
            y="15.25"
-           id="tspan1006">valor de nota</tspan>
+           id="tspan1006">note value</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -504,7 +504,7 @@
     </g>
   </g>
   <g
-     transform="matrix(0.93749996,0,0,0.93749996,104.20736,0)"
+     transform="matrix(0.93749996,0,0,0.93749996,90.20736,0)"
      id="g1034">
     <g
        transform="scale(1.5)"
@@ -540,7 +540,7 @@
     </g>
   </g>
   <g
-     transform="matrix(0.93749996,0,0,0.93749996,184.36361,0)"
+     transform="matrix(0.93749996,0,0,0.93749996,170.36361,0)"
      id="g1044">
     <g
        transform="scale(1.5)"
@@ -560,7 +560,7 @@
     </g>
   </g>
   <g
-     transform="matrix(0.93749996,0,0,0.93749996,184.36361,29.531249)"
+     transform="matrix(0.93749996,0,0,0.93749996,170.36361,29.531249)"
      id="g1054">
     <g
        transform="scale(1.5)"
@@ -579,34 +579,29 @@
       </text>
     </g>
   </g>
+  <path
+     d="m 13.359375,41.484373 v -5.624999 a 5.6249996,5.6249996 0 0 1 5.625,-5.625 h 5.624999 v 2.8125 h 14.062499 v -2.8125 h 28.124998 5.625 a 5.6249996,5.6249996 0 0 1 5.624999,5.625 v 5.624999 5.625 5.624999 a 5.6249996,5.6249996 0 0 1 -5.624999,5.625 h -5.625 -28.124998 -1.40625 v 2.8125 H 26.015624 v -2.8125 h -1.40625 -5.624999 a 5.6249996,5.6249996 0 0 1 -5.625,-5.625 v -5.624999 z"
+     style="fill:#c4c4c4;fill-opacity:1;stroke:#a0a0a0;stroke-width:1.40624988;stroke-linecap:round;stroke-opacity:1"
+     id="path1056" />
+  <text
+     y="29.531248"
+     x="12.65625"
+     style="font-size:14.06249905px;font-family:sans-serif;text-anchor:end;fill:#000000;stroke-width:1.40624988"
+     id="text1060">
+    <tspan
+       style="stroke-width:1.40624988"
+       x="63.749996"
+       y="48.515621"
+       id="tspan1058">↓</tspan>
+  </text>
   <g
-     transform="matrix(0.93749996,0,0,0.93749996,12.65625,29.531249)"
-     id="g1064">
-    <g
-       transform="scale(1.5)"
-       id="g1062">
-      <path
-         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 20 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 -20 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 z"
-         style="fill:#c4c4c4;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path1056" />
-      <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:end;fill:#000000"
-         id="text1060">
-        <tspan
-           x="36.333332"
-           y="13.5"
-           id="tspan1058">↓</tspan>
-      </text>
-    </g>
-  </g>
-  <g
-     transform="matrix(0.93749996,0,0,0.93749996,74.65625,59.062502)"
+     transform="matrix(0.93749996,0,0,0.93749996,12.65625,59.062502)"
      id="g1082">
     <g
        transform="scale(1.5)"
        id="g1080">
       <path
-         d="m -43.588891,8.5 v -4 c 0,-2.209139 1.790861,-4 4,-4 h 4 v 2 h 10 v -2 H 48.5 h 4 c 2.209139,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 21 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -74.088891 -1 v 2 h -8 v -2 h -1 -4 c -2.209139,0 -4,-1.790861 -4,-4 v -4 -21 -21 z"
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 30 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 21 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 -30 -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 -21 z"
          style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
          id="path1066" />
       <text
@@ -615,7 +610,7 @@
         <tspan
            x="46.333332"
            y="34.5"
-           id="tspan1068">determinar o tom</tspan>
+           id="tspan1068">pitch</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -623,7 +618,7 @@
         <tspan
            x="46.333332"
            y="11.25"
-           id="tspan1072">nome</tspan>
+           id="tspan1072">name</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -631,12 +626,12 @@
         <tspan
            x="46.333332"
            y="53.25"
-           id="tspan1076">oitava</tspan>
+           id="tspan1076">octave</tspan>
       </text>
     </g>
   </g>
   <g
-     transform="matrix(0.93749996,0,0,0.93749996,143.56249,118.125)"
+     transform="matrix(0.93749996,0,0,0.93749996,81.56249,118.125)"
      id="g1092">
     <g
        transform="scale(1.5)"
@@ -656,7 +651,7 @@
     </g>
   </g>
   <g
-     transform="matrix(0.93749996,0,0,0.93749996,143.56249,59.062502)"
+     transform="matrix(0.93749996,0,0,0.93749996,81.56249,59.062502)"
      id="g1134">
     <g
        transform="scale(1.5)"
@@ -671,7 +666,7 @@
         <tspan
            x="54.333332"
            y="23"
-           id="tspan1120">um de</tspan>
+           id="tspan1120">one of</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -679,7 +674,7 @@
         <tspan
            x="54.333332"
            y="11.25"
-           id="tspan1124">isso</tspan>
+           id="tspan1124">this</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -687,12 +682,12 @@
         <tspan
            x="54.333332"
            y="32.25"
-           id="tspan1128">aquilo</tspan>
+           id="tspan1128">that</tspan>
       </text>
     </g>
   </g>
   <g
-     transform="matrix(0.93749996,0,0,0.93749996,223.71874,59.062502)"
+     transform="matrix(0.93749996,0,0,0.93749996,161.71874,59.062502)"
      id="g1144">
     <g
        transform="scale(1.5)"
@@ -707,12 +702,12 @@
         <tspan
            x="13.333333"
            y="13.833333"
-           id="tspan1138">fazer</tspan>
+           id="tspan1138">do</tspan>
       </text>
     </g>
   </g>
   <g
-     transform="matrix(0.93749996,0,0,0.93749996,223.71874,88.593752)"
+     transform="matrix(0.93749996,0,0,0.93749996,161.71874,88.593752)"
      id="g1154">
     <g
        transform="scale(1.5)"
@@ -750,7 +745,7 @@
           <tspan
              id="tspan1096"
              y="13.5"
-             x="46.333332">fazer</tspan>
+             x="46.333332">do</tspan>
         </text>
         <text
            id="text1102"
@@ -798,7 +793,7 @@
           <tspan
              id="tspan1158"
              y="23"
-             x="54.333332">um de</tspan>
+             x="54.333332">one of</tspan>
         </text>
         <text
            id="text1164"
@@ -806,7 +801,7 @@
           <tspan
              id="tspan1162"
              y="11.25"
-             x="54.333332">isso</tspan>
+             x="54.333332">this</tspan>
         </text>
         <text
            id="text1168"
@@ -814,7 +809,7 @@
           <tspan
              id="tspan1166"
              y="32.25"
-             x="54.333332">aquilo</tspan>
+             x="54.333332">that</tspan>
         </text>
       </g>
     </g>

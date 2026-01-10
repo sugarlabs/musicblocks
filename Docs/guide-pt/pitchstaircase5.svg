@@ -24,34 +24,28 @@
       </cc:Work>
     </rdf:RDF>
   </metadata>
+  <path
+     d="m 0.75,22.171537 v -6 a 6,6 0 0 1 6,-6 h 6 l 7.5,-8.9999996 7.5,8.9999996 h 13.5 95.01709 6 a 6,6 0 0 1 6,6 v 6 6 6 a 6,6 0 0 1 -6,6 h -6 H 41.25 39.75 v 3 h -12 v -3 h -1.5 -6 a 7.5,7.5 0 0 0 -7.5,7.5 v 6 6 63.000003 6 a 7.5,7.5 0 0 0 7.5,7.5 h 6 v 3 h 15 v -3 h 12 v 9 9 6 a 6,6 0 0 1 -6,6 h -6 -13.5 l -7.5,9 -7.5,-9 h -6 a 6,6 0 0 1 -6,-6 v -6 z"
+     style="fill:#7cd622;fill-opacity:1;stroke:#57ad02;stroke-width:1.5;stroke-linecap:round;stroke-opacity:1"
+     id="path1178" />
+  <text
+     y="0.42153746"
+     style="font-size:15px;font-family:sans-serif;text-anchor:start;fill:#000000;stroke-width:1.5"
+     id="text1182">
+    <tspan
+       style="stroke-width:1.5"
+       x="8"
+       y="32.671539"
+       id="tspan1180">phrase maker</tspan>
+  </text>
   <g
-     transform="translate(0,0.42153745)"
-     id="g1186">
-    <g
-       transform="scale(1.5)"
-       id="g1184">
-      <path
-         d="m 0.5,14.5 v -4 a 4,4 90 0 1 4,-4 h 4 l 5,-6 5,6 h 9 63.344727 4 a 4,4 90 0 1 4,4 v 4 4 4 a 4,4 90 0 1 -4,4 h -4 H 27.5 h -1 v 2 h -8 v -2 h -1 -4 a 5,5 90 0 0 -5,5 v 4 4 42 4 a 5,5 90 0 0 5,5 h 4 v 2 h 10 v -2 h 8 v 6 6 4 a 4,4 90 0 1 -4,4 h -4 -9 l -5,6 -5,-6 h -4 a 4,4 90 0 1 -4,-4 v -4 z"
-         style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
-         id="path1178" />
-      <text
-         style="font-size:10px;font-family:sans-serif;text-anchor:start;fill:#000000"
-         id="text1182">
-        <tspan
-           x="5.3333335"
-           y="21.5"
-           id="tspan1180">criador de frase</tspan>
-      </text>
-    </g>
-  </g>
-  <g
-     transform="translate(17.5,72.421537)"
+     transform="translate(13.5,72.421537)"
      id="g1204">
     <g
        transform="scale(1.5)"
        id="g1202">
       <path
-         d="m -2.1666667,8.5 v -4 c 0,-2.209139 1.79086103,-4 4,-4 h 4 v 2 h 9.9999997 v -2 h 43.22819 4 c 2.209139,0 4,1.790861 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 c 0,2.209139 -1.790861,4 -4,4 h -4 -43.22819 -1 v 2 H 6.8333333 v -2 h -1 -4 c -2.20913897,0 -4.6985911,-1.904227 -4,-4 v -4 -21 z"
+         d="m 0.5,8.5 v -4 a 4,4 90 0 1 4,-4 h 4 v 2 h 10 v -2 h 40.561523 4 a 4,4 90 0 1 4,4 v 4 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 17 h -4 v -3 h -4 v 10 h 4 v -3 h 4 v 4 a 4,4 90 0 1 -4,4 h -4 H 18.5 h -1 v 2 h -8 v -2 h -1 -4 a 4,4 90 0 1 -4,-4 v -4 -21 z"
          style="fill:#92a9ff;fill-opacity:1;stroke:#5370dc;stroke-width:1;stroke-linecap:round;stroke-opacity:1"
          id="path1188" />
       <text
@@ -60,7 +54,7 @@
         <tspan
            x="56.894855"
            y="24"
-           id="tspan1190">Ritmo</tspan>
+           id="tspan1190">rhythm</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -68,7 +62,7 @@
         <tspan
            x="56.894855"
            y="11.25"
-           id="tspan1194">número de notas</tspan>
+           id="tspan1194">number of notes</tspan>
       </text>
       <text
          style="font-size:6.66666651px;font-family:sans-serif;text-anchor:end;fill:#000000"
@@ -76,12 +70,12 @@
         <tspan
            x="56.894855"
            y="32.25"
-           id="tspan1198">valor de nota</tspan>
+           id="tspan1198">note value</tspan>
       </text>
     </g>
   </g>
   <g
-     transform="translate(106.84229,72.421537)"
+     transform="translate(102.84229,72.421537)"
      id="g1214">
     <g
        transform="scale(1.5)"
@@ -101,7 +95,7 @@
     </g>
   </g>
   <g
-     transform="translate(106.84229,103.92155)"
+     transform="translate(102.84229,103.92155)"
      id="g1232">
     <g
        transform="scale(1.5)"
@@ -192,7 +186,7 @@
         <tspan
            x="56.333332"
            y="13.5"
-           id="tspan1256">escada</tspan>
+           id="tspan1256">stair</tspan>
       </text>
     </g>
   </g>
