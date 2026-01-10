@@ -1,0 +1,14 @@
+#tour-pointer {
+    position: fixed;
+    z-index: 20000;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: none;
+    /* Arrow pointing UP (placed below element) */
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 15px solid #ff0000;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
