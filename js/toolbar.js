@@ -342,6 +342,10 @@ class Toolbar {
             });
         }
 
+        $j(".tooltipped").on("click", function () {
+            $j(this).tooltip("close");
+        });
+
         $j(".materialize-iso, .dropdown-trigger").dropdown({
             constrainWidth: false,
             hover: false,
