@@ -14,8 +14,10 @@ describe("MusicBlocks Application", () => {
     describe("Loading and Initial Render", () => {
         it("should display the loading animation and then the main content", () => {
             cy.get("#loading-image-container").should("be.visible");
-            cy.contains("#loadingText", "Loading Complete!", { timeout: 20000 }).should("be.visible");
-           
+            cy.contains("#loadingText", "Loading Complete!", { timeout: 20000 }).should(
+                "be.visible"
+            );
+
             cy.get("#canvas", { timeout: 10000 }).should("be.visible");
         });
 
@@ -28,13 +30,13 @@ describe("MusicBlocks Application", () => {
         it("should have a functional play button", () => {
             cy.get("#play").should("be.visible").and("not.be.disabled").click();
             cy.window().its("Tone.context.state").should("be.oneOf", ["running", "suspended"]);
-            });
+        });
 
         it("should have a functional stop button", () => {
             cy.get("#stop").should("be.visible").and("not.be.disabled").click();
-            cy.window().then((win) => {
-                     expect(win.Tone.Transport.state).to.not.equal("started");
-                });
+            cy.window().then(win => {
+                expect(win.Tone.Transport.state).to.not.equal("started");
+            });
         });
     });
 
@@ -97,7 +99,7 @@ describe("MusicBlocks Application", () => {
                 "#Decrease\\ block\\ size > img",
                 "#Increase\\ block\\ size > img"
             ];
-        
+
             bottomBarElements.forEach(selector => {
                 cy.get(selector).should("exist").and("be.visible");
             });
@@ -109,7 +111,7 @@ describe("MusicBlocks Application", () => {
                 "tr > :nth-child(2) > img",
                 "tr > :nth-child(3) > img"
             ];
-        
+
             sidebarElements.forEach(selector => {
                 cy.get(selector)
                     .should("exist")
@@ -120,11 +122,7 @@ describe("MusicBlocks Application", () => {
         });
 
         it("should verify that Grid, Clear, and Collapse elements exist and are visible", () => {
-            const elements = [
-                "#Grid > img",
-                "#Clear",
-                "#Collapse > img"
-            ];
+            const elements = ["#Grid > img", "#Clear", "#Collapse > img"];
             elements.forEach(selector => {
                 cy.get(selector).should("exist").and("be.visible");
             });
@@ -149,12 +147,11 @@ describe("MusicBlocks Application", () => {
                 .and("not.be.empty");
             cy.get("#planet-iframe").invoke("attr", "src").should("not.be.empty");
 
-            cy.get("#planet-iframe").then(($iframe) => {
+            cy.get("#planet-iframe").then($iframe => {
                 const iframeSrc = $iframe.attr("src");
-                 expect(iframeSrc).to.not.be.empty;
+                expect(iframeSrc).to.not.be.empty;
                 cy.log("Iframe source:", iframeSrc);
             });
-
         });
     });
 });
