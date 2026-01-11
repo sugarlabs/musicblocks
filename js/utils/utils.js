@@ -1600,10 +1600,23 @@ let closeBlkWidgets = name => {
  * @returns {Object|undefined} The resolved object or undefined.
  */
 const resolveObject = path => {
-    if (!path) return undefined;
-    return path.split(".").reduce((obj, prop) => {
-        return obj && obj[prop];
-    }, window);
+    if (!path || typeof path !== "string") return undefined;
+
+    // Support both browser and Node.js environments
+    const globalObj = typeof window !== "undefined" ? window : global;
+
+    try {
+        return path.split(".").reduce((obj, prop) => {
+            if (obj === null || obj === undefined) {
+                return undefined;
+            }
+            return obj[prop];
+        }, globalObj);
+    } catch (e) {
+        // eslint-disable-next-line no-console
+        console.warn("Failed to resolve object path: " + path, e);
+        return undefined;
+    }
 };
 
 /**
