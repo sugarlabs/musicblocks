@@ -87,15 +87,16 @@ const validate = () => {
 // Watch task: watch SASS , CSS and JS files for changes
 // If any change, run sass, css and js tasks simultaneously
 const watchTask = () => {
-    watch([ files.jsPath, files.cssPath, files.sassPath ],
+    return watch([ files.jsPath, files.cssPath, files.sassPath ],
         parallel( jsTask, cssTask, sassTask));
 };
 
 // Export the default Gulp task so it can be run
 // Runs the sass ,css and js tasks simultaneously
-// then runs prettify, cacheBust, watch task, then validate
+// then runs prettify, cacheBust, validate, then starts watch (watch never completes)
 exports.default = series(
     parallel( jsTask, cssTask , sassTask ), prettify,
     cacheBustTask,
-    watchTask, validate
+    validate,
+    watchTask
 );
