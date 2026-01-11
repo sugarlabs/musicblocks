@@ -151,10 +151,19 @@ class ThemeBox {
             themeColorMeta.content = window.platformColor.header;
         }
 
-        // Update canvas background
+        // Update canvas background using theme config
         const canvas = document.getElementById("canvas");
         if (canvas) {
-            canvas.style.backgroundColor = this._theme === "dark" ? "#1c1c1c" : "#FFFFFF";
+            canvas.style.backgroundColor = window.platformColor.background;
+        }
+
+        // Update the turtles background color (this redraws the canvas background)
+        if (this.activity.turtles) {
+            // Unlock to allow makeBackground to redraw
+            this.activity.turtles._locked = false;
+            this.activity.turtles._backgroundColor = window.platformColor.background;
+            this.activity.turtles.makeBackground();
+            this.activity.refreshCanvas();
         }
 
         // Update toolbar icon for current theme
