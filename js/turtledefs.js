@@ -73,7 +73,7 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
             GUIDEURL = "Docs/guide/index.html";
         } else {
             // Production environment
-            GUIDEURL = "https://musicblocks.sugarlabs.org/guide/guide.html";
+            GUIDEURL = " https://musicblocks.sugarlabs.org/Docs/guide/";
         }
     }
 
