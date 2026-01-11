@@ -160,8 +160,7 @@ describe("FlowBlocks integration", () => {
             runFromBlockNow: jest.fn(),
             stopTurtle: false,
             firstNoteTime: null,
-            receivedArg: null,
-            disconnectBlock: jest.fn()
+            receivedArg: null
         };
 
         setupFlowBlocks(activity);
@@ -271,12 +270,17 @@ describe("FlowBlocks integration", () => {
         activity.blocks.blockList[5] = { name: "visibleC", connections: [null] };
         activity.blocks.blockList[6] = { name: "visibleD", connections: [null] };
 
-        jest.useFakeTimers();
+        // When lock is held, block should requeue itself and return early
         logo.connectionStoreLock = true;
+        const turtle2 = activity.turtles.ithTurtle(0);
+        turtle2.queue = [];
         block.flow([3, 4], logo, 0, blk, ["arg"]);
-        jest.runAllTimers();
-        expect(logo.connectionStoreLock).toBe(false);
-        jest.useRealTimers();
+        // Block should have added itself to the queue and called doWait
+        expect(turtle2.doWait).toHaveBeenCalled();
+        expect(turtle2.queue.length).toBeGreaterThan(0);
+        
+        // Reset lock and call again - should proceed normally
+        logo.connectionStoreLock = false;
 
         // Non-number input triggers NOINPUT branch
         logo.connectionStore = { 0: { [blk]: [] } };
