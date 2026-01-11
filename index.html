@@ -530,320 +530,141 @@
                                 </li>
                             </ul>
 
-                            <ul class="main right">
+                        <ul class="main right">
+                            <li>
+                                <a id="FullScreen" class="FullScreen tooltipped dropdown-trigger" data-position="bottom"
+                                onclick="setIcon()">
+                                <i class="material-icons" id="FullScrIcon">fullscreen</i>
+                            </a>
+                            </li>
+                            <li>
+                                <a id="newFile" class="tooltipped dropdown-trigger" data-position="left"
+                                data-activates="newdropdown">
+                                <i class="material-icons md-48">note_add</i>
+                            </a>
+                            </li>
+                            <li>
+                            <a id="load" class="tooltipped" data-position="bottom">
+                                <i class="material-icons md-48">folder</i>
+                            </a>
+                            </li>
+                            <li>
+                            <a id="saveButton"  class="tooltipped dropdown-trigger" data-position="left"
+                                data-activates="saveddropdownbeg">
+                                <i id="save1" class="material-icons md-48">save_alt</i>
+                            </a>
+                            </li>
+                            <li>
+                            <a id="saveButtonAdvanced" style="display: none;"  class="tooltipped dropdown-trigger"
+                                data-position="left" data-activates="saveddropdown">
+                                <i id="save2" class="material-icons md-48">save_alt</i>
+                            </a>
+                            </li>
+                            <li>
+                            <a id="planetIcon" class="tooltipped" data-position="bottom">
+                                <i class="material-icons md-48">public</i>
+                            </a>
+                            </li>
+                            <li>
+                            <a style="display: none;" id="planetIconDisabled" class="tooltipped" data-position="bottom">
+                                <i style="color: #a5acba;" class="material-icons md-48">public</i>
+                            </a>
+                            </li>
+                            <li>
+                            <a id="toggleAuxBtn" class="tooltipped" data-position="left">
+                                <i id="menu" class="animated-icon material-icons md-48">menu</i>
+                            </a>
+                            </li>
+                            <li>
+                            <a id="helpIcon" class="tooltipped" data-position="bottom">
+                                <i class="material-icons md-48">help</i>
+                            </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="nav-wrapper" id="aux-toolbar" style="display: none;" tabindex="-1">
+                        <div class="blue darken-1 nav-wrapper" tabindex="-1">
+                            <ul class="aux left">
                                 <li>
-                                    <a
-                                        role="button"
-                                        tabindex="0"
-                                        id="FullScreen"
-                                        class="FullScreen tooltipped dropdown-trigger"
-                                        data-position="bottom"
-                                        onclick="setIcon()"
-                                    >
-                                        <i class="material-icons" id="FullScrIcon">fullscreen</i>
-                                    </a>
+                                <a id="runSlowlyIcon" class="tooltipped" data-position="bottom" data-delay="10">
+                                    <i class="material-icons md-48">play_circle_outline</i>
+                                </a>
                                 </li>
                                 <li>
-                                    <a
-                                        role="button"
-                                        tabindex="0"
-                                        id="newFile"
-                                        class="tooltipped dropdown-trigger"
-                                        data-position="left"
-                                        data-activates="newdropdown"
-                                    >
-                                        <i class="material-icons md-48">note_add</i>
-                                    </a>
+                                <a id="runStepByStepIcon" class="tooltipped" data-position="bottom" data-delay="10">
+                                    <i class="material-icons md-48">video_library</i>
+                                </a>
+                                </li>
+                            </ul>
+                            <ul class="aux right">
+                                <li>
+                                <a id="displayStatsIcon" class="tooltipped" data-position="bottom" data-delay="10"><i
+                                        class="material-icons md-48">poll</i></a>
                                 </li>
                                 <li>
-                                    <a
-                                        id="load"
-                                        role="button"
-                                        tabindex="0"
-                                        class="tooltipped"
-                                        data-position="bottom"
-                                    >
-                                        <i class="material-icons md-48">folder</i>
-                                    </a>
+                                    <a id="loadPluginIcon" class="tooltipped" data-position="bottom" data-delay="10"><i
+                                            class="material-icons md-48">add_circle</i></a>
                                 </li>
                                 <li>
-                                    <a
-                                        role="button"
-                                        tabindex="0"
-                                        id="saveButton"
-                                        class="tooltipped dropdown-trigger"
-                                        data-position="left"
-                                        data-activates="saveddropdownbeg"
-                                    >
-                                        <i id="save1" class="material-icons md-48">save_alt</i>
-                                    </a>
+                                    <a id="delPluginIcon" class="tooltipped" data-position="bottom" data-delay="10"><i
+                                            class="material-icons md-48">remove_circle</i></a>
                                 </li>
                                 <li>
-                                    <a
-                                        role="button"
-                                        tabindex="0"
-                                        id="saveButtonAdvanced"
-                                        style="display: none;"
-                                        class="tooltipped dropdown-trigger"
-                                        data-position="left"
-                                        data-activates="saveddropdown"
-                                    >
-                                        <i id="save2" class="material-icons md-48">save_alt</i>
-                                    </a>
+                                    <a id="enableHorizScrollIcon" class="tooltipped" data-position="bottom"><i
+                                            class="material-icons md-48">compare_arrows</i></a>
                                 </li>
                                 <li>
-                                    <a
-                                        id="planetIcon"
-                                        role="button"
-                                        tabindex="0"
-                                        class="tooltipped"
-                                        data-position="bottom"
-                                    >
-                                        <i class="material-icons md-48">public</i>
-                                    </a>
+                                    <a style="display: none;" id="disableHorizScrollIcon" class="tooltipped"
+                                        data-position="bottom"><i class="material-icons md-48">lock</i></a>
                                 </li>
                                 <li>
-                                    <a
-                                        role="button"
-                                        tabindex="0"
-                                        style="display: none;"
-                                        id="planetIconDisabled"
-                                        class="tooltipped"
-                                        data-position="bottom"
-                                    >
-                                        <i style="color: #a5acba;" class="material-icons md-48"
-                                            >public</i
-                                        >
-                                    </a>
+                                    <a id="themeSelectIcon" class="tooltipped dropdown-trigger" data-position="left"
+                                        data-activates="themedropdown" data-tooltip="Select Theme"><i
+                                            class="material-icons md-48">brightness_7</i></a>
                                 </li>
                                 <li>
-                                    <a
-                                        id="toggleAuxBtn"
-                                        role="button"
-                                        tabindex="0"
-                                        class="tooltipped"
-                                        data-position="left"
-                                    >
-                                        <i id="menu" class="animated-icon material-icons md-48"
-                                            >menu</i
-                                        >
-                                    </a>
+                                    <a id="mergeWithCurrentIcon" class="tooltipped" data-position="bottom"><i
+                                            class="material-icons md-48">merge_type</i></a>
                                 </li>
                                 <li>
-                                    <a
-                                        id="helpIcon"
-                                        role="button"
-                                        tabindex="0"
-                                        class="tooltipped"
-                                        data-position="bottom"
-                                    >
-                                        <i class="material-icons md-48">help</i>
-                                    </a>
+                                    <a id="wrapTurtle" class="tooltipped" data-position="bottom"><i
+                                            class="material-icons md-48">wrap_text</i></a>
+                                </li>
+                                <li>
+                                    <a id="chooseKeyIcon" class="tooltipped" data-position="left"><i
+                                            class="material-icons md-48">music_note</i></a>
+                                </li>
+                                <li>
+                                    <a id="toggleJavaScriptIcon" class="tooltipped" data-position="bottom"><i
+                                            class="material-icons md-48">code</i></a>
+                                </li>
+                                <li class="filler" id="aligns_merge_under_load"
+                                    style="user-select: none; visibility: hidden;">
+                                    <a style="color: transparent;">space&nbsp;&nbsp;&nbsp;</a>
+                                </li>
+
+                                <li>
+                                <a id="restoreIcon" class="tooltipped" data-position="bottom" data-tooltip="Restore"><i
+                                            class="material-icons md-48">restore_from_trash</i></a>
+                                    <div id="trashList"></div>
+                                </li>
+                                <li>
+                                    <a id="beginnerMode" class="tooltipped" data-position="bottom"><i id="begIconText"
+                                            class="material-icons md-48">star</i></a>
+                                </li>
+                                <li>
+                                    <a id="advancedMode" class="tooltipped" data-position="bottom"><i id="advIconText"
+                                            class="material-icons md-48">star_border</i></a>
+                                </li>
+                                <li>
+                                    <a id="languageSelectIcon" class="tooltipped dropdown-trigger" data-position="left"
+                                        data-activates="languagedropdown" data-tooltip="Select Language"><i
+                                            class="material-icons md-48">translate</i></a>
                                 </li>
                             </ul>
                         </div>
-                        <div
-                            class="nav-wrapper"
-                            id="aux-toolbar"
-                            style="display: none;"
-                            tabindex="-1"
-                        >
-                            <div class="blue darken-1 nav-wrapper" tabindex="-1">
-                                <ul class="aux left">
-                                    <li>
-                                        <a
-                                            role="button"
-                                            tabindex="0"
-                                            id="runSlowlyIcon"
-                                            class="tooltipped"
-                                            data-position="bottom"
-                                            data-delay="10"
-                                        >
-                                            <i class="material-icons md-48">play_circle_outline</i>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a
-                                            role="button"
-                                            tabindex="0"
-                                            id="runStepByStepIcon"
-                                            class="tooltipped"
-                                            data-position="bottom"
-                                            data-delay="10"
-                                        >
-                                            <i class="material-icons md-48">video_library</i>
-                                        </a>
-                                    </li>
-                                </ul>
-                                <ul class="aux right">
-                                    <li>
-                                        <a
-                                            role="button"
-                                            tabindex="0"
-                                            id="displayStatsIcon"
-                                            class="tooltipped"
-                                            data-position="bottom"
-                                            data-delay="10"
-                                            ><i class="material-icons md-48">poll</i></a
-                                        >
-                                    </li>
-                                    <li>
-                                        <a
-                                            role="button"
-                                            tabindex="0"
-                                            id="loadPluginIcon"
-                                            class="tooltipped"
-                                            data-position="bottom"
-                                            data-delay="10"
-                                            ><i class="material-icons md-48">add_circle</i></a
-                                        >
-                                    </li>
-                                    <li>
-                                        <a
-                                            role="button"
-                                            tabindex="0"
-                                            id="delPluginIcon"
-                                            class="tooltipped"
-                                            data-position="bottom"
-                                            data-delay="10"
-                                            ><i class="material-icons md-48">remove_circle</i></a
-                                        >
-                                    </li>
-                                    <li>
-                                        <a
-                                            role="button"
-                                            tabindex="0"
-                                            id="enableHorizScrollIcon"
-                                            class="tooltipped"
-                                            data-position="bottom"
-                                            ><i class="material-icons md-48">compare_arrows</i></a
-                                        >
-                                    </li>
-                                    <li>
-                                        <a
-                                            role="button"
-                                            tabindex="0"
-                                            style="display: none;"
-                                            id="disableHorizScrollIcon"
-                                            class="tooltipped"
-                                            data-position="bottom"
-                                            ><i class="material-icons md-48">lock</i></a
-                                        >
-                                    </li>
-                                    <li>
-                                        <a
-                                            role="button"
-                                            tabindex="0"
-                                            id="themeSelectIcon"
-                                            class="tooltipped dropdown-trigger"
-                                            data-position="left"
-                                            data-activates="themedropdown"
-                                            data-tooltip="Select Theme"
-                                            ><i class="material-icons md-48">brightness_7</i></a
-                                        >
-                                    </li>
-                                    <li>
-                                        <a
-                                            role="button"
-                                            tabindex="0"
-                                            id="mergeWithCurrentIcon"
-                                            class="tooltipped"
-                                            data-position="bottom"
-                                            ><i class="material-icons md-48">merge_type</i></a
-                                        >
-                                    </li>
-                                    <li>
-                                        <a
-                                            id="wrapTurtle"
-                                            role="button"
-                                            tabindex="0"
-                                            class="tooltipped"
-                                            data-position="bottom"
-                                            ><i class="material-icons md-48">wrap_text</i></a
-                                        >
-                                    </li>
-                                    <li>
-                                        <a
-                                            role="button"
-                                            tabindex="0"
-                                            id="chooseKeyIcon"
-                                            class="tooltipped"
-                                            data-position="left"
-                                            ><i class="material-icons md-48">music_note</i></a
-                                        >
-                                    </li>
-                                    <li>
-                                        <a
-                                            role="button"
-                                            tabindex="0"
-                                            id="toggleJavaScriptIcon"
-                                            class="tooltipped"
-                                            data-position="bottom"
-                                            ><i class="material-icons md-48">code</i></a
-                                        >
-                                    </li>
-                                    <li
-                                        class="filler"
-                                        id="aligns_merge_under_load"
-                                        style="user-select: none; visibility: hidden;"
-                                    >
-                                        <a style="color: transparent;">space&nbsp;&nbsp;&nbsp;</a>
-                                    </li>
-
-                                    <li>
-                                        <a
-                                            role="button"
-                                            tabindex="0"
-                                            id="restoreIcon"
-                                            class="tooltipped"
-                                            data-position="bottom"
-                                            data-tooltip="Restore"
-                                            ><i class="material-icons md-48"
-                                                >restore_from_trash</i
-                                            ></a
-                                        >
-                                        <div id="trashList"></div>
-                                    </li>
-                                    <li>
-                                        <a
-                                            role="button"
-                                            tabindex="0"
-                                            id="beginnerMode"
-                                            class="tooltipped"
-                                            data-position="bottom"
-                                            ><i id="begIconText" class="material-icons md-48"
-                                                >star</i
-                                            ></a
-                                        >
-                                    </li>
-                                    <li>
-                                        <a
-                                            role="button"
-                                            tabindex="0"
-                                            id="advancedMode"
-                                            class="tooltipped"
-                                            data-position="bottom"
-                                            ><i id="advIconText" class="material-icons md-48"
-                                                >star_border</i
-                                            ></a
-                                        >
-                                    </li>
-                                    <li>
-                                        <a
-                                            role="button"
-                                            tabindex="0"
-                                            id="languageSelectIcon"
-                                            class="tooltipped dropdown-trigger"
-                                            data-position="left"
-                                            data-activates="languagedropdown"
-                                            data-tooltip="Select Language"
-                                            ><i class="material-icons md-48">translate</i></a
-                                        >
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </nav>
+                    </div>
+                </nav>
 
                     <ul id="saveddropdownbeg" class="dropdown-content">
                         <li><a id="save-html-beg" role="button" tabindex="0"></a></li>
@@ -952,14 +773,14 @@
                                 reg.scope
                         );
                     });
-                }
             }
-        </script>
-        <script>
-            $(document).ready(function () {
-                doSearch();
-            });
-        </script>
+        }
+    </script>
+    <script>
+        $(document).ready(function () {
+            doSearch();
+        });
+    </script>
 
         <!-- Loading Dialog Script -->
         <script>

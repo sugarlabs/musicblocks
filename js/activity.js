@@ -3158,6 +3158,10 @@ class Activity {
             if (document.getElementById("labelDiv").classList.contains("hasKeyboard")) {
                 return;
             }
+            // Skip hotkeys when value bar is visible (prevents accidental block creation)
+            if (this.printText && this.printText.classList.contains("show")) {
+                return;
+            }
 
             if (this.keyboardEnableFlag) {
                 if (
