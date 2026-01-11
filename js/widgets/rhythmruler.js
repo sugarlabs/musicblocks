@@ -522,9 +522,25 @@ class RhythmRuler {
         // An input for setting the dissect number
         this._dissectNumber = widgetWindow.addInputButton("2");
 
-        // Make the input read-only and show pie menu on click
-        this._dissectNumber.readOnly = true;
-        this._dissectNumber.style.cursor = "pointer";
+        // Make the input editable and handle keyboard input
+        this._dissectNumber.readOnly = false;
+        this._dissectNumber.classList.add("hasKeyboard");
+        this._dissectNumber.style.cursor = "text";
+
+        // Handle Enter key to validate and blur (prevent any play action)
+        this._dissectNumber.addEventListener("keydown", event => {
+            if (event.keyCode === 13 || event.key === "Enter") {
+                event.preventDefault();
+                event.stopPropagation();
+                const inputValue = parseInt(this._dissectNumber.value);
+                if (!isNaN(inputValue) && inputValue > 0) {
+                    // Validate the input value - allow any number from 2 to 128
+                    const validatedValue = Math.min(Math.max(inputValue, 2), 128);
+                    this._dissectNumber.value = validatedValue;
+                }
+                this._dissectNumber.blur();
+            }
+        });
 
         /**
          * Event handler for the click event of the dissect number input.
