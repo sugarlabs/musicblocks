@@ -233,46 +233,85 @@ describe("processABCNotes - Tuplet Handling", () => {
     });
 
     it("should handle array of notes (chords) inside tuplets", () => {
-        logo.notation.notationStaging["0"] = [
-            // Note is array ["C4", "E4"]
-            [["C4", "E4"], 4, 0, 1, 1, -1, false]
-        ];
+        logo.notation.notationStaging["0"] = [[["C4", "E4"], 4, 0, 1, 1, -1, false]];
 
         processABCNotes(logo, "0");
-        // Expect format like [C4 E4 ]
         expect(logo.notationNotes["0"]).toContain("[C E ]");
     });
 
     it("should handle staccato inside tuplets", () => {
-        logo.notation.notationStaging["0"] = [
-            [["C4", "E4"], 4, 0, 1, 1, -1, true] // Staccato true
-        ];
+        logo.notation.notationStaging["0"] = [[["C4", "E4"], 4, 0, 1, 1, -1, true]];
 
         processABCNotes(logo, "0");
         expect(logo.notationNotes["0"]).toContain(".");
     });
 
     it("should handle incomplete/mixed tuplets logic", () => {
-        // This targets the while loops inside the tuplet block
         logo.notation.notationStaging["0"] = [
-            [["A4"], 4, 0, 3, 2, -1, false], // 1
-            [["B4"], 4, 0, 3, 2, -1, false] // 2
-            // Missing 3rd part of triplet to trigger incomplete logic or end of array
+            [["A4"], 4, 0, 3, 2, -1, false],
+            [["B4"], 4, 0, 3, 2, -1, false]
         ];
         processABCNotes(logo, "0");
-        // Should calculate fraction based on incomplete count
         expect(logo.notationNotes["0"]).toContain("(");
     });
 
     it("should handle tuplet with matching chord IDs (skip logic)", () => {
-        // Triggers the `j++` inside the while loop for chords
         logo.notation.notationStaging["0"] = [
-            [["A4"], 4, 0, 2, 2, 100, false], // Chord part 1
-            [["B4"], 4, 0, 2, 2, 100, false], // Chord part 2 (should be skipped in count)
-            [["C4"], 4, 0, 2, 2, -1, false] // Next note
+            [["A4"], 4, 0, 2, 2, 100, false],
+            [["B4"], 4, 0, 2, 2, 100, false],
+            [["C4"], 4, 0, 2, 2, -1, false]
         ];
         processABCNotes(logo, "0");
         expect(logo.notationNotes["0"]).not.toBe("");
+    });
+});
+
+describe("processABCNotes - Edge Cases for 100% Coverage", () => {
+    let logo;
+
+    beforeEach(() => {
+        logo = { notationNotes: { "0": "" }, notation: { notationStaging: { "0": [] } } };
+    });
+
+    it("should handle array of notes in NOTATIONNOTE field", () => {
+        logo.notation.notationStaging["0"] = [[["C4", "E4"], 4, 0, null, null, -1, false]];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toContain("C4");
+    });
+    it("should handle incomplete tuplets with different tuplet values", () => {
+        logo.notation.notationStaging["0"] = [
+            [["A4"], 4, 0, 3, 2, -1, false],
+            [["B4"], 4, 0, 5, 2, -1, false]
+        ];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toContain("(");
+    });
+    it("should handle closing parenthesis in notation staging", () => {
+        logo.notation.notationStaging["0"] = [
+            [["C4"], 4, 0, 3, 2, -1, false],
+            [["D4"], 4, 0, 3, 2, -1, false],
+            [["E4"], 4, 0, 3, 2, -1, false],
+            ")"
+        ];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).not.toBe("");
+    });
+    it("should handle chords with multiple notes outside tuplets", () => {
+        logo.notation.notationStaging["0"] = [[["C4", "E4", "G4"], 4, 0, null, null, -1, false]];
+        processABCNotes(logo, "0");
+        const out = logo.notationNotes["0"];
+        expect(out).toContain("[");
+        expect(out).toContain("]");
+    });
+    it("should handle dots when closing chords", () => {
+        const chordID = 456;
+        logo.notation.notationStaging["0"] = [
+            [["C4"], 4, 2, null, null, chordID, false],
+            [["E4"], 4, 2, null, null, chordID, false],
+            [["G4"], 4, 0, null, null, -1, false]
+        ];
+        processABCNotes(logo, "0");
+        expect(logo.notationNotes["0"]).toContain(" ");
     });
 });
 describe("saveAbcOutput", () => {
