@@ -2667,8 +2667,7 @@ class Activity {
                 hitArea.y = 0;
                 container.hitArea = hitArea;
 
-                // eslint-disable-next-line no-unused-vars
-                container.on("click", event => {
+                container.on("click", () => {
                     container.visible = false;
                     // On the possibility that there was an error
                     // arrow associated with this container
@@ -2729,8 +2728,7 @@ class Activity {
                 container.hitArea = hitArea;
 
                 const that = this;
-                // eslint-disable-next-line no-unused-vars
-                container.on("click", event => {
+                container.on("click", () => {
                     container.visible = false;
                     // On the possibility that there was an error
                     // arrow associated with this container
@@ -4558,8 +4556,7 @@ class Activity {
             that.update = true;
         };
 
-        // eslint-disable-next-line no-unused-vars
-        this._loadProject = (projectID, flags, env) => {
+        this._loadProject = (projectID, flags) => {
             if (this.planet === undefined) {
                 return;
             }
@@ -5277,8 +5274,6 @@ class Activity {
             this.refreshCanvas();
         };
 
-        // Accessed from index.html
-        // eslint-disable-next-line no-unused-vars
         const hideArrows = () => {
             globalActivity._hideArrows();
         };
@@ -6511,8 +6506,7 @@ class Activity {
             });
 
             const that = this;
-            // eslint-disable-next-line no-unused-vars
-            container.onmouseover = event => {
+            container.onmouseover = () => {
                 if (!that.loading) {
                     document.body.style.cursor = "pointer";
                     container.style.transition = "0.12s ease-out";
@@ -6520,8 +6514,7 @@ class Activity {
                 }
             };
 
-            // eslint-disable-next-line no-unused-vars
-            container.onmouseout = event => {
+            container.onmouseout = () => {
                 if (!that.loading) {
                     document.body.style.cursor = "default";
                     container.style.transition = "0.15s ease-out";
@@ -6552,8 +6545,7 @@ class Activity {
          */
         this._loadButtonDragHandler = (container, actionClick, arg) => {
             const that = this;
-            // eslint-disable-next-line no-unused-vars
-            container.onmousedown = event => {
+            container.onmousedown = () => {
                 if (!that.loading) {
                     document.body.style.cursor = "default";
                 }
@@ -6616,8 +6608,7 @@ class Activity {
          * Ran once dom is ready and editable
          * Sets up dependencies and vars
          */
-        // eslint-disable-next-line no-unused-vars
-        this.domReady = async doc => {
+        this.domReady = async () => {
             this.saveLocally = undefined;
 
             // Do we need to update the stage?
@@ -7142,26 +7133,22 @@ class Activity {
             // Load custom mode saved in local storage.
             const custommodeData = this.storage.custommode;
             if (custommodeData !== undefined) {
-                // FIX ME
-                // eslint-disable-next-line no-unused-vars
-                const customMode = JSON.parse(custommodeData);
+                // FIX ME: customMode is loaded but not yet used
+                JSON.parse(custommodeData);
             }
 
-            // eslint-disable-next-line no-unused-vars
-            this.fileChooser.addEventListener("click", event => {
+            this.fileChooser.addEventListener("click", () => {
                 that.value = null;
             });
 
             this.fileChooser.addEventListener(
                 "change",
-                // eslint-disable-next-line no-unused-vars
-                event => {
+                () => {
                     // Read file here.
                     const reader = new FileReader();
                     const midiReader = new FileReader();
 
-                    // eslint-disable-next-line no-unused-vars
-                    reader.onload = theFile => {
+                    reader.onload = () => {
                         that.loading = true;
                         document.body.style.cursor = "wait";
                         that.doLoadAnimation();
@@ -7202,8 +7189,7 @@ class Activity {
 
                                     if (!that.merging) {
                                         // Wait for the old blocks to be removed.
-                                        // eslint-disable-next-line no-unused-vars
-                                        const __listener = event => {
+                                        const __listener = () => {
                                             that.blocks.loadNewBlocks(obj);
                                             that.stage.removeAllEventListeners("trashsignal");
                                             if (that.planet) {
@@ -7279,8 +7265,7 @@ class Activity {
                 const midiReader = new FileReader();
 
                 const abcReader = new FileReader();
-                // eslint-disable-next-line no-unused-vars
-                reader.onload = theFile => {
+                reader.onload = () => {
                     that.loading = true;
                     document.body.style.cursor = "wait";
                     // doLoadAnimation();
@@ -7313,8 +7298,7 @@ class Activity {
                                 };
 
                                 // Wait for the old blocks to be removed.
-                                // eslint-disable-next-line no-unused-vars
-                                const __listener = event => {
+                                const __listener = () => {
                                     that.blocks.loadNewBlocks(obj);
                                     that.stage.removeAllEventListeners("trashsignal");
 
@@ -7418,29 +7402,25 @@ class Activity {
             dropZone.addEventListener("dragover", __handleDragOver, false);
             dropZone.addEventListener("drop", __handleFileSelect, false);
 
-            // eslint-disable-next-line no-unused-vars
-            this.allFilesChooser.addEventListener("click", event => {
+            this.allFilesChooser.addEventListener("click", () => {
                 this.value = null;
             });
 
-            // eslint-disable-next-line no-unused-vars
-            this.pluginChooser.addEventListener("click", event => {
+            this.pluginChooser.addEventListener("click", () => {
                 window.scroll(0, 0);
                 this.value = null;
             });
 
             this.pluginChooser.addEventListener(
                 "change",
-                // eslint-disable-next-line no-unused-vars
-                event => {
+                () => {
                     window.scroll(0, 0);
 
                     // Read file here.
                     const reader = new FileReader();
                     const pluginFile = that.pluginChooser.files[0];
 
-                    // eslint-disable-next-line no-unused-vars
-                    reader.onload = theFile => {
+                    reader.onload = () => {
                         that.loading = true;
                         document.body.style.cursor = "wait";
                         //doLoadAnimation();
@@ -7614,8 +7594,7 @@ class Activity {
                                             const n = data.arg;
                                             env.push(parseInt(n));
                                         },
-                                        // eslint-disable-next-line no-unused-vars
-                                        status => {
+                                        () => {
                                             alert(
                                                 "Something went wrong reading JSON-encoded project data."
                                             );
@@ -7793,8 +7772,7 @@ require(["domReady!"], doc => {
     }, 5000);
 });
 
-// eslint-disable-next-line no-unused-vars
-define(MYDEFINES, compatibility => {
+define(MYDEFINES, () => {
     activity.setupDependencies();
     activity.doContextMenus();
     activity.doPluginsAndPaletteCols();

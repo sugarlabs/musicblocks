@@ -3453,8 +3453,7 @@ class Blocks {
 
                 postProcessArg = [thisBlock, arg];
             } else if (name === "newnote") {
-                // eslint-disable-next-line no-unused-vars
-                postProcess = args => {};
+                postProcess = () => {};
                 postProcessArg = [thisBlock, null];
             } else {
                 postProcess = null;
@@ -6695,8 +6694,7 @@ class Blocks {
          * @public
          * @returns {void}
          */
-        // eslint-disable-next-line no-unused-vars
-        this.cleanupAfterLoad = async name => {
+        this.cleanupAfterLoad = async () => {
             this._loadCounter -= 1;
             if (this._loadCounter > 0) {
                 return;
