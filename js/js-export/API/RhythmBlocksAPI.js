@@ -114,5 +114,5 @@ class RhythmBlocksAPI {
     }
 }
 if (typeof module !== "undefined" && module.exports) {
-    module.exports=RhythmBlocksAPI;
+    module.exports = RhythmBlocksAPI;
 }

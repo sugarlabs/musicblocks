@@ -155,7 +155,7 @@ class Turtles {
         ===================================================
         */
 
-        turtle.container.on("mousedown", (event) => {
+        turtle.container.on("mousedown", event => {
             const scale = this.scale;
             const offset = {
                 x: turtle.container.x - event.stageX / scale,
@@ -166,7 +166,7 @@ class Turtles {
             // console.debug("--> [CursorDown " + turtle.name + "]");
 
             turtle.container.removeAllEventListeners("pressmove");
-            turtle.container.on("pressmove", (event) => {
+            turtle.container.on("pressmove", event => {
                 if (this.isShrunk() || turtle.running) {
                     return;
                 }
@@ -404,8 +404,6 @@ Turtles.TurtlesModel = class {
 
         // List of all of the turtles, one for each start block
         this._turtleList = [];
-
-
     }
 
     /**
@@ -448,8 +446,7 @@ Turtles.TurtlesModel = class {
      * @param {Object} turtle
      */
     pushTurtle(turtle) {
-        if(!this._turtleList.includes(turtle))
-            this._turtleList.push(turtle);
+        if (!this._turtleList.includes(turtle)) this._turtleList.push(turtle);
     }
 
     /**
@@ -565,7 +562,7 @@ Turtles.TurtlesModel = class {
      * @return {Boolean} - running
      */
     running() {
-        for(let i = 0; i < this.getTurtleCount(); i++) {
+        for (let i = 0; i < this.getTurtleCount(); i++) {
             if (this.getTurtle(i).running) {
                 return true;
             }
@@ -633,7 +630,7 @@ Turtles.TurtlesView = class {
 
         this._expandedBoundary = null; // The boundary when the canvas is expanded
         this._collapsedBoundary = null; // The boundry when the canvas is collapsed
-        this._expandButton = null; // Button to expand the canvas 
+        this._expandButton = null; // Button to expand the canvas
         this._collapseButton = null; // Button to collapse the canvas
         this._clearButton = null; // Button to clear the canvas
         this.gridButton = null; // Button to select the grid style
@@ -651,16 +648,14 @@ Turtles.TurtlesView = class {
         // Attach an event listener to the 'resize' event
         window.addEventListener("resize", () => {
             // Call the updateDimensions function when resizing occurs
-            var screenWidth = (
+            var screenWidth =
                 window.innerWidth ||
                 document.documentElement.clientWidth ||
-                document.body.clientWidth
-            );
-            var screenHeight = (
+                document.body.clientWidth;
+            var screenHeight =
                 window.innerHeight ||
                 document.documentElement.clientHeight ||
-                document.body.clientHeight
-            );
+                document.body.clientHeight;
 
             // Set a scaling factor to adjust the dimensions based on the screen size
             var scale = Math.min(screenWidth / 1200, screenHeight / 900);
@@ -871,10 +866,10 @@ Turtles.TurtlesView = class {
             container.setAttribute(
                 "style",
                 "position: absolute; right:" +
-                (document.body.clientWidth - x) +
-                "px;  top: " +
-                y +
-                "px;"
+                    (document.body.clientWidth - x) +
+                    "px;  top: " +
+                    y +
+                    "px;"
             );
             docById("buttoncontainerTOP").appendChild(container);
             return container;
@@ -887,13 +882,13 @@ Turtles.TurtlesView = class {
             let offset;
             turtlesStage.removeAllEventListeners("pressmove");
             turtlesStage.removeAllEventListeners("mousedown");
-            turtlesStage.on("mousedown", (event) => {
+            turtlesStage.on("mousedown", event => {
                 offset = {
                     y: event.stageY - turtlesStage.y,
                     x: event.stageX - turtlesStage.x
                 };
             });
-            turtlesStage.on("pressmove", (event) => {
+            turtlesStage.on("pressmove", event => {
                 const x = event.stageX - offset.x;
                 const y = event.stageY - offset.y;
                 turtlesStage.x = Math.max(0, Math.min((this._w * 3) / 4, x));
@@ -940,19 +935,17 @@ Turtles.TurtlesView = class {
             this.gridButton = _makeButton(
                 CARTESIANBUTTON,
                 {
-                    "name":"Grid",
-                    "label":_("Grid")
+                    name: "Grid",
+                    label: _("Grid")
                 },
                 this._w - 10 - 3 * 55,
                 70 + LEADING + 6
             );
             const that = this;
-            this.gridButton.onclick  = () => {
+            this.gridButton.onclick = () => {
                 piemenuGrid(that.activity);
             };
         };
-
-
 
         const __makeClearButton = () => {
             // Create the Clear button using the existing _makeButton helper
@@ -960,7 +953,7 @@ Turtles.TurtlesView = class {
                 CLEARBUTTON,
                 {
                     name: "Clear",
-                    label: _("Clear"),
+                    label: _("Clear")
                 },
                 this._w - 5 - 2 * 55,
                 70 + LEADING + 6
@@ -980,8 +973,8 @@ Turtles.TurtlesView = class {
             this._collapseButton = _makeButton(
                 COLLAPSEBUTTON,
                 {
-                    "name":"Collapse",
-                    "label":_("Collapse")
+                    name: "Collapse",
+                    label: _("Collapse")
                 },
                 this._w - 55,
                 70 + LEADING + 6
@@ -1010,7 +1003,6 @@ Turtles.TurtlesView = class {
                 __collapse();
             };
         };
-
 
         this.collapse = () => {
             const auxToolbar = docById("aux-toolbar");
@@ -1049,8 +1041,8 @@ Turtles.TurtlesView = class {
             this._expandButton = _makeButton(
                 EXPANDBUTTON,
                 {
-                    "name":"Expand",
-                    "label":_("Expand"),
+                    name: "Expand",
+                    label: _("Expand")
                 },
                 this._w - 55,
                 70 + LEADING + 6
@@ -1063,7 +1055,6 @@ Turtles.TurtlesView = class {
                 this.expand();
             };
         };
-
 
         this.expand = () => {
             // If the aux toolbar is open, close it.
@@ -1121,7 +1112,7 @@ Turtles.TurtlesView = class {
             if (this.currentGrid !== null) {
                 this.activity.turtles.doGrid(0);
             }
-            
+
             // remove the stage and add it back in position 0
             this.masterStage.removeChild(turtlesStage);
             this.masterStage.addChildAt(turtlesStage, 0);
@@ -1152,14 +1143,14 @@ Turtles.TurtlesView = class {
             __makeExpandButton();
             __makeClearButton();
             __makeGridButton();
-            jQuery.noConflict()(".tooltipped").each(function(){
-                jQuery.noConflict()(this).tooltip(
-                    {
+            jQuery
+                .noConflict()(".tooltipped")
+                .each(function () {
+                    jQuery.noConflict()(this).tooltip({
                         html: true,
                         delay: 100
-                    }
-                );
-            });
+                    });
+                });
             this._locked = false;
         };
 

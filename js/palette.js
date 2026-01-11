@@ -116,8 +116,7 @@ class Palettes {
                 "style",
                 "position: absolute; z-index: 1000; left :0px; top:" + this.top + "px"
             );
-            element.innerHTML =
-                `<div style="height:fit-content">
+            element.innerHTML = `<div style="height:fit-content">
                     <table width="${1.5 * this.cellSize}" bgcolor="white">
                         <thead>
                             <tr></tr>
@@ -415,13 +414,13 @@ class Palettes {
                     }
                 }
             }
-    
+
             // Remove the palette DOM element if it exists
             const paletteElement = docById("palette");
             if (paletteElement) {
                 paletteElement.parentNode.removeChild(paletteElement);
             }
-    
+
             // Clear the dictionary and reset state
             this.dict = {};
             this.visible = false;
@@ -435,10 +434,11 @@ class Palettes {
             element.classList.add("flex-palette");
             element.setAttribute(
                 "style",
-                `position: fixed; z-index: 1000; left: 0px; top: ${60+this.top}px; overflow-y: auto;`
+                `position: fixed; z-index: 1000; left: 0px; top: ${
+                    60 + this.top
+                }px; overflow-y: auto;`
             );
-            element.innerHTML =
-                `<div style="height:fit-content">
+            element.innerHTML = `<div style="height:fit-content">
                     <table width="${1.5 * this.cellSize}" bgcolor="white">
                         <thead>
                             <tr></tr>
@@ -456,7 +456,6 @@ class Palettes {
                 </div>`;
             element.childNodes[0].style.border = `1px solid ${platformColor.selectorSelected}`;
             document.body.appendChild(element);
-
         } catch (e) {
             console.error("Error clearing palettes:", e);
         }
@@ -491,7 +490,7 @@ class Palettes {
         row.onmouseout = () => clearTimeout(timeout);
 
         // eslint-disable-next-line no-unused-vars
-        row.onclick = (event) => {
+        row.onclick = event => {
             if (name == "search") {
                 this._hideMenus();
                 this.activity.showSearchWidget();
@@ -501,12 +500,12 @@ class Palettes {
         };
 
         // eslint-disable-next-line no-unused-vars
-        row.onmouseup = (event) => {
+        row.onmouseup = event => {
             document.body.style.cursor = "default";
         };
 
         // eslint-disable-next-line no-unused-vars
-        row.onmouseleave = (event) => {
+        row.onmouseleave = event => {
             document.body.style.cursor = "default";
         };
     }
@@ -830,8 +829,7 @@ class PaletteModel {
             actualHeight: height,
             label,
             artwork,
-            artwork64:
-                "data:image/svg+xml;base64," + window.btoa(base64Encode(artwork)),
+            artwork64: "data:image/svg+xml;base64," + window.btoa(base64Encode(artwork)),
             docks,
             image: block.image,
             scale: block.scale,
@@ -901,7 +899,7 @@ class Palette {
         palBody.style.float = "left";
 
         palBody.style.border = `1px solid ${platformColor.selectorSelected}`;
-        [palBody.childNodes[0], palBody.childNodes[1]].forEach((item) => {
+        [palBody.childNodes[0], palBody.childNodes[1]].forEach(item => {
             item.style.boxSizing = "border-box";
             item.style.padding = "8px";
         });
@@ -956,7 +954,7 @@ class Palette {
             document.removeEventListener("click", this._outsideClickListener);
         }
 
-        this._outsideClickListener = (event) => {
+        this._outsideClickListener = event => {
             if (!this.menuContainer.contains(event.target)) {
                 this.hideMenu(); // Calls your existing hideMenu() → _hideMenuItems()
                 document.removeEventListener("click", this._outsideClickListener);
@@ -1040,7 +1038,6 @@ class Palette {
                          Singer.PitchActions.playPitch(note, octave, 0, 0, null);
                     }
                 }
-
                 // (1) prepare to moving: make absolute and on top by z-index
                 const posit = img.style.position;
                 const zInd = img.style.zIndex;
@@ -1057,7 +1054,7 @@ class Palette {
                     img.style.top = pageY - img.offsetHeight / 2 + "px";
                 };
 
-                const onMouseMove = (e) => {
+                const onMouseMove = e => {
                     e.preventDefault();
                     let x, y;
                     if (e.type === "touchmove") {
@@ -1075,7 +1072,7 @@ class Palette {
                 document.addEventListener("mousemove", onMouseMove);
 
                 const that = this;
-                const up = (event) => {
+                const up = event => {
                     document.body.style.cursor = "default";
                     document.removeEventListener("mousemove", onMouseMove);
                     document.removeEventListener("touchmove", onMouseMove);
@@ -1097,8 +1094,10 @@ class Palette {
                         true,
                         b.modname,
                         event,
-                        (x || that.activity.blocksContainer.x + 100) - that.activity.blocksContainer.x,
-                        (y || that.activity.blocksContainer.y + 100) - that.activity.blocksContainer.y
+                        (x || that.activity.blocksContainer.x + 100) -
+                            that.activity.blocksContainer.x,
+                        (y || that.activity.blocksContainer.y + 100) -
+                            that.activity.blocksContainer.y
                     );
                 };
 
@@ -1123,18 +1122,18 @@ class Palette {
         let posY, top;
 
         // eslint-disable-next-line no-unused-vars
-        const mouseUpGrab = (event) => {
+        const mouseUpGrab = event => {
             // paletteList.onmousemove = null;
             document.body.style.cursor = "default";
         };
 
-        const mouseMoveGrab = (event) => {
+        const mouseMoveGrab = event => {
             const dy = event.clientY - posY;
             paletteList.scrollTop = top - dy;
             document.body.style.cursor = "grabbing";
         };
 
-        const mouseDownGrab = (event) => {
+        const mouseDownGrab = event => {
             posY = event.clientY;
             top = paletteList.scrollTop;
 
@@ -1339,17 +1338,17 @@ class Palette {
         ) {
             this._makeBlockFromProtoblock(protoblk, true, blkname, null, 100, 100);
             callback(lastBlock);
-            return(lastBlock);
+            return lastBlock;
         } else {
             const newBlock = paletteBlockButtonPush(this.activity.blocks, newBlk, arg);
             callback(newBlock);
-            return(newBlock);
+            return newBlock;
         }
     }
 
     _makeBlockFromProtoblock(protoblk, moved, blkname, event, saveX, saveY) {
         let newBlock;
-        const __myCallback = (newBlock) => {
+        const __myCallback = newBlock => {
             // Move the drag group under the cursor.
             this.activity.blocks.findDragGroup(newBlock);
             for (const i in this.activity.blocks.dragGroup) {
@@ -1375,7 +1374,9 @@ class Palette {
                 for (let blk = 0; blk < this.activity.blocks.blockList.length; blk++) {
                     const block = this.activity.blocks.blockList[blk];
                     if (block.name === "status" && !block.trash) {
-                        console.log("Status block already exists, preventing creation of another one");
+                        console.log(
+                            "Status block already exists, preventing creation of another one"
+                        );
                         return;
                     }
                 }
@@ -1433,7 +1434,12 @@ class Palette {
                 const boxNames = new Set();
                 for (let blk = 0; blk < this.activity.blocks.blockList.length; blk++) {
                     const block = this.activity.blocks.blockList[blk];
-                    if (block.name === "namedbox" && !block.trash && block.overrideName && !boxNames.has(block.overrideName)) {
+                    if (
+                        block.name === "namedbox" &&
+                        !block.trash &&
+                        block.overrideName &&
+                        !boxNames.has(block.overrideName)
+                    ) {
                         if (this.activity.logo.statusFields) {
                             this.activity.logo.statusFields.push([blk, "namedbox"]);
                         }
@@ -1445,7 +1451,13 @@ class Palette {
                 // Create base status block structure
                 const statusBlocks = [
                     [0, "status", saveX, saveY, [null, 1, 2]],
-                    [1, "hidden", 0, 0, [0, foundVariables.length > 0 || boxBlocks.length > 0 ? 3 : null]],
+                    [
+                        1,
+                        "hidden",
+                        0,
+                        0,
+                        [0, foundVariables.length > 0 || boxBlocks.length > 0 ? 3 : null]
+                    ],
                     [2, "hiddennoflow", 0, 0, [0, null]]
                 ];
 
@@ -1465,14 +1477,18 @@ class Palette {
                         "print",
                         0,
                         0,
-                        [lastConnection, lastBlockIndex + 2, (!isLastVar || hasBoxes) ? lastBlockIndex + 3 : null]
+                        [
+                            lastConnection,
+                            lastBlockIndex + 2,
+                            !isLastVar || hasBoxes ? lastBlockIndex + 3 : null
+                        ]
                     ]);
                     lastConnection = lastBlockIndex + 1;
 
                     // Add variable value block
                     statusBlocks.push([
                         lastBlockIndex + 2,
-                        [blockType, { "value": block.value }],
+                        [blockType, { value: block.value }],
                         0,
                         0,
                         [lastBlockIndex + 1]
@@ -1491,14 +1507,18 @@ class Palette {
                         "print",
                         0,
                         0,
-                        [lastConnection, lastBlockIndex + 2, i < boxBlocks.length - 1 ? lastBlockIndex + 3 : null]
+                        [
+                            lastConnection,
+                            lastBlockIndex + 2,
+                            i < boxBlocks.length - 1 ? lastBlockIndex + 3 : null
+                        ]
                     ]);
                     lastConnection = lastBlockIndex + 1;
 
                     // Add box value block
                     statusBlocks.push([
                         lastBlockIndex + 2,
-                        ["namedbox", { "value": boxBlock.overrideName }],
+                        ["namedbox", { value: boxBlock.overrideName }],
                         0,
                         0,
                         [lastBlockIndex + 1]
@@ -1542,7 +1562,7 @@ class Palette {
                 // the palette.
                 if (
                     this.activity.blocks.blockList[topBlk].container.x <
-                        this.activity.palettes.paletteWidth * 2
+                    this.activity.palettes.paletteWidth * 2
                 ) {
                     this.activity.blocks.moveBlock(
                         topBlk,
@@ -1603,7 +1623,7 @@ class Palette {
                 // the palette.
                 if (
                     this.activity.blocks.blockList[topBlk].container.x <
-                        this.activity.palettes.paletteWidth * 2
+                    this.activity.palettes.paletteWidth * 2
                 ) {
                     this.activity.blocks.moveBlock(
                         topBlk,
@@ -1621,7 +1641,7 @@ class Palette {
                 // the palette.
                 if (
                     this.activity.blocks.blockList[newBlock].container.x <
-                        this.activity.palettes.paletteWidth * 2
+                    this.activity.palettes.paletteWidth * 2
                 ) {
                     this.activity.blocks.moveBlock(
                         newBlock,
@@ -1634,7 +1654,7 @@ class Palette {
     }
 }
 
-const initPalettes = async (palettes) => {
+const initPalettes = async palettes => {
     // Instantiate the palettes object on first load.
 
     for (let i = 0; i < BUILTINPALETTES.length; i++) {

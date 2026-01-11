@@ -10,7 +10,10 @@ function createWindow() {
         title: "Music Blocks",
         webPreferences: {
             nodeIntegration: false,
-            contextIsolation: true
+            contextIsolation: true,
+            sandbox: true,
+            webSecurity: true,
+            enableRemoteModule: false
         }
     });
 

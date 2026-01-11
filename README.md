@@ -6,6 +6,10 @@
     <img src="https://img.shields.io/github/license/sugarlabs/musicblocks" />
 </a>
 
+<a href="https://github.com/sugarlabs/musicblocks/actions/workflows/node.js.yml" alt="CI">
+    <img src="https://github.com/sugarlabs/musicblocks/actions/workflows/node.js.yml/badge.svg" />
+</a>
+
 # Music Blocks
 
 “_All musicians are subconsciously mathematicians._” — Monk
@@ -26,9 +30,9 @@ is audio-visual; it produces graphics, artwork and music. Here are a
 couple of screenshots to give you an idea of how the application looks
 like:
 
-![alt tag](./screenshots/Screenshot-1.png)
+![Music Blocks workspace showing block-based music programming](./screenshots/Screenshot-1.png)
 
-![alt tag](./screenshots/Screenshot-2.png)
+![Music Blocks rhythm and melody blocks interface](./screenshots/Screenshot-2.png)
 
 Visit the Music Blocks website for a hands on experience:
 [https://musicblocks.sugarlabs.org](https://musicblocks.sugarlabs.org).
@@ -216,6 +220,14 @@ Code](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md)
 provides a general overview of Sugar Lab's guidelines. See
 [Contributing](#CONTRIBUTING) section for specific details about this
 repository.
+
+### Developer Quick Start
+
+1. Clone and install: `git clone https://github.com/sugarlabs/musicblocks.git && npm install`
+2. Run locally: `npm run dev`
+3. Before pushing: `npm run lint && npx prettier --check . && npm test`
+
+For writing tests, see [docs/TESTING.md](./docs/TESTING.md).
 
 ## <a name="REPORTING_BUGS"></a>Reporting Bugs
 

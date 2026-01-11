@@ -117,7 +117,7 @@ class Oscilloscope {
      * @param turtle
      * @returns {void}
      */
-    reconnectSynthsToAnalyser = (turtle) => {
+    reconnectSynthsToAnalyser = turtle => {
         if (this.pitchAnalysers[turtle] === undefined) {
             this.pitchAnalysers[turtle] = new Tone.Analyser({
                 type: "waveform",
@@ -182,7 +182,7 @@ class Oscilloscope {
     _scale() {
         let width, height;
         const canvas = document.getElementsByClassName("oscilloscopeCanvas");
-        Array.prototype.forEach.call(canvas, (ele) => {
+        Array.prototype.forEach.call(canvas, ele => {
             this.widgetWindow.getWidgetBody().removeChild(ele);
         });
         if (!this.widgetWindow.isMaximized()) {

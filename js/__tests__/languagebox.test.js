@@ -42,7 +42,7 @@ global.window.location = {
 
 document.querySelectorAll = jest.fn(() => []);
 
-global._ = jest.fn((str) => str);
+global._ = jest.fn(str => str);
 
 describe("LanguageBox Class", () => {
     let languageBox;
@@ -99,7 +99,7 @@ describe("LanguageBox Class", () => {
 
         languageBox.hide();
 
-        mockLinks.forEach((link) => {
+        mockLinks.forEach(link => {
             expect(link.addEventListener).toHaveBeenCalledWith("click", expect.any(Function));
         });
     });

@@ -20,17 +20,17 @@
 const { Mouse, MusicBlocks } = require("../export.js");
 global.importMembers = jest.fn();
 global.JSInterface = {
-    validateArgs: jest.fn((method, args) => args),
+    validateArgs: jest.fn((method, args) => args)
 };
 global.Painter = {
     prototype: {
         method1: jest.fn(),
-        method2: jest.fn(),
-    },
+        method2: jest.fn()
+    }
 };
 
 const JSEditor = {
-    logConsole: jest.fn(),
+    logConsole: jest.fn()
 };
 global.JSEditor = JSEditor;
 
@@ -42,24 +42,24 @@ const globalActivity = {
         getIndexOfTurtle: jest.fn(),
         removeTurtle: jest.fn(),
         screenX2turtleX: jest.fn(),
-        screenY2turtleY: jest.fn(),
+        screenY2turtleY: jest.fn()
     },
     logo: {
         prepSynths: jest.fn(),
         firstNoteTime: null,
         stage: {
-            removeEventListener: jest.fn(),
-        },
+            removeEventListener: jest.fn()
+        }
     },
     textMsg: jest.fn(),
     stage: {
-        dispatchEvent: jest.fn(),
-    },
+        dispatchEvent: jest.fn()
+    }
 };
 global.globalActivity = globalActivity;
 global.Singer = {
     RhythmActions: {
-        getNoteValue: jest.fn(),
+        getNoteValue: jest.fn()
     },
     MeterActions: {
         setPickup: jest.fn(),
@@ -68,23 +68,23 @@ global.Singer = {
         getMeasureCount: jest.fn(),
         getBPM: jest.fn(),
         getBeatFactor: jest.fn(),
-        getCurrentMeter: jest.fn(),
+        getCurrentMeter: jest.fn()
     },
     PitchActions: {
         deltaPitch: jest.fn(),
-        consonantStepSize: jest.fn(),
+        consonantStepSize: jest.fn()
     },
     IntervalsActions: {
         setMovableDo: jest.fn(),
         getCurrentKey: jest.fn(),
         getCurrentMode: jest.fn(),
-        getModeLength: jest.fn(),
+        getModeLength: jest.fn()
     },
     VolumeActions: {
         setPanning: jest.fn(),
         setMasterVolume: jest.fn(),
-        masterVolume: 1.0,
-    },
+        masterVolume: 1.0
+    }
 };
 
 describe("Mouse Class", () => {
@@ -96,7 +96,7 @@ describe("Mouse Class", () => {
         globalActivity.turtles.getTurtle.mockReturnValue({
             id: 1,
             initTurtle: jest.fn(),
-            doWait: jest.fn(),
+            doWait: jest.fn()
         });
         mouse = new Mouse(mockFlow);
     });
@@ -136,7 +136,7 @@ describe("MusicBlocks Class", () => {
             id: 1,
             initTurtle: jest.fn(),
             doWait: jest.fn(),
-            container: { x: 10, y: 20 },
+            container: { x: 10, y: 20 }
         });
         mouse = new Mouse(jest.fn());
         mouse.run = jest.fn();
@@ -284,7 +284,10 @@ describe("MusicBlocks Class", () => {
 
     test("should set MOVABLEDO", () => {
         musicBlocks.MOVABLEDO = true;
-        expect(Singer.IntervalsActions.setMovableDo).toHaveBeenCalledWith(true, musicBlocks.turIndex);
+        expect(Singer.IntervalsActions.setMovableDo).toHaveBeenCalledWith(
+            true,
+            musicBlocks.turIndex
+        );
     });
 
     test("should get CURRENTKEY", () => {
@@ -309,7 +312,10 @@ describe("MusicBlocks Class", () => {
 
     test("should set MASTERVOLUME", () => {
         musicBlocks.MASTERVOLUME = 0.8;
-        expect(Singer.VolumeActions.setMasterVolume).toHaveBeenCalledWith(0.8, musicBlocks.turIndex);
+        expect(Singer.VolumeActions.setMasterVolume).toHaveBeenCalledWith(
+            0.8,
+            musicBlocks.turIndex
+        );
     });
 
     test("should get MASTERVOLUME", () => {
