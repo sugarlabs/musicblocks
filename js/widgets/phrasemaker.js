@@ -275,68 +275,68 @@ class PhraseMaker {
          * Width of the screen.
          * @type {number}
          */
-        var screenWidth = window.innerWidth;
+        const screenWidth = window.innerWidth;
 
         /**
          * Height of the screen.
          * @type {number}
          */
-        var screenHeight = window.innerHeight;
+        const screenHeight = window.innerHeight;
 
         /**
          * Container element for floating windows.
          * @type {HTMLElement}
          */
-        var floatingWindowsDiv = document.getElementById("floatingWindows");
+        const floatingWindowsDiv = document.getElementById("floatingWindows");
 
         /**
          * Collection of window frame elements.
          * @type {NodeListOf<Element>}
          */
-        var windowFrameElements = floatingWindowsDiv.querySelectorAll(".windowFrame");
+        const windowFrameElements = floatingWindowsDiv.querySelectorAll(".windowFrame");
 
-        for (var i = 0; i < windowFrameElements.length; i++) {
+        for (let i = 0; i < windowFrameElements.length; i++) {
             /**
              * Current window frame element.
              * @type {Element}
              */
-            var windowFrame = windowFrameElements[i];
+            const windowFrame = windowFrameElements[i];
 
             /**
              * Widget body element within the window frame.
              * @type {Element}
              */
-            var wfWinBody = windowFrame.querySelector(".wfWinBody");
+            const wfWinBody = windowFrame.querySelector(".wfWinBody");
 
             /**
              * Widget element within the window frame.
              * @type {Element}
              */
-            var wfbWidget = windowFrame.querySelector(".wfbWidget");
+            const wfbWidget = windowFrame.querySelector(".wfbWidget");
 
             /**
              * Total width of the window frame.
              * @type {number}
              */
-            var totalWidth = parseFloat(window.getComputedStyle(windowFrame).width);
+            const totalWidth = parseFloat(window.getComputedStyle(windowFrame).width);
 
             /**
              * Total height of the window frame.
              * @type {number}
              */
-            var totalHeight = parseFloat(window.getComputedStyle(windowFrame).height);
+            const totalHeight = parseFloat(window.getComputedStyle(windowFrame).height);
 
             /**
              * Maximum allowed width for the window frame.
              * @type {number}
              */
-            var maxWidth = screenWidth * 0.8;
+            const maxWidth = screenWidth * 0.8;
 
             /**
              * Maximum allowed height for the window frame.
              * @type {number}
              */
-            var maxHeight = screenHeight * 0.8;
+            const maxHeight = screenHeight * 0.8;
 
             if (totalWidth > screenWidth || totalHeight > screenHeight) {
                 windowFrame.style.height = Math.min(totalHeight, maxHeight) + "px";
