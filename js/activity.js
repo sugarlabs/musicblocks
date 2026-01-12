@@ -5003,45 +5003,58 @@ class Activity {
             }
 
             const finalBlock = [];
-            // Some Error are here need to be fixed
             for (const staffIndex in staffBlocksMap) {
-                staffBlocksMap[staffIndex].startBlock[
-                    staffBlocksMap[staffIndex].startBlock.length - 3
-                ][4][2] =
-                    staffBlocksMap[staffIndex].baseBlocks[0][0][
-                        staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4
-                    ][0];
-                // Update the first namedo block with settimbre
-                staffBlocksMap[staffIndex].baseBlocks[0][0][
-                    staffBlocksMap[staffIndex].baseBlocks[0][0].length - 4
-                ][4][0] =
-                    staffBlocksMap[staffIndex].startBlock[
-                        staffBlocksMap[staffIndex].startBlock.length - 3
-                    ][0];
-                const repeatblockids = staffBlocksMap[staffIndex].repeatArray;
+                const staff = staffBlocksMap[staffIndex];
+                const startBlock = staff.startBlock;
+                const baseBlocks = staff.baseBlocks;
+
+                if (
+                    !startBlock ||
+                    startBlock.length < 3 ||
+                    !baseBlocks ||
+                    !baseBlocks[0] ||
+                    !baseBlocks[0][0] ||
+                    baseBlocks[0][0].length < 4
+                ) {
+                    console.warn(
+                        `Skipping staffIndex ${staffIndex}: insufficient data in startBlock or baseBlocks`
+                    );
+                    continue;
+                }
+
+                const startBlockEntry = startBlock[startBlock.length - 3];
+                const baseBlockEntry = baseBlocks[0][0][baseBlocks[0][0].length - 4];
+
+                if (
+                    !startBlockEntry ||
+                    !startBlockEntry[4] ||
+                    !baseBlockEntry ||
+                    !baseBlockEntry[4]
+                ) {
+                    console.warn(`Skipping staffIndex ${staffIndex}: invalid block structure`);
+                    continue;
+                }
+
+                startBlockEntry[4][2] = baseBlockEntry[0];
+                baseBlockEntry[4][0] = startBlockEntry[0];
+                const repeatblockids = staff.repeatArray;
                 for (const repeatId of repeatblockids) {
                     if (repeatId.start == 0) {
-                        staffBlocksMap[staffIndex].repeatBlock.push([
+                        staff.repeatBlock.push([
                             blockId,
                             "repeat",
                             0,
                             0,
                             [
-                                staffBlocksMap[staffIndex].startBlock[
-                                    staffBlocksMap[staffIndex].startBlock.length - 3
-                                ][0] /*setribmre*/,
+                                startBlockEntry[0] /*settimbre*/,
                                 blockId + 1,
-                                staffBlocksMap[staffIndex].nameddoArray[staffIndex][0],
-                                staffBlocksMap[staffIndex].nameddoArray[staffIndex][
-                                    repeatId.end + 1
-                                ] === null
+                                staff.nameddoArray[staffIndex][0],
+                                staff.nameddoArray[staffIndex][repeatId.end + 1] === null
                                     ? null
-                                    : staffBlocksMap[staffIndex].nameddoArray[staffIndex][
-                                          repeatId.end + 1
-                                      ]
+                                    : staff.nameddoArray[staffIndex][repeatId.end + 1]
                             ]
                         ]);
-                        staffBlocksMap[staffIndex].repeatBlock.push([
+                        staff.repeatBlock.push([
                             blockId + 1,
                             ["number", { value: 2 }],
                             100,
@@ -5049,99 +5062,67 @@ class Activity {
                             [blockId]
                         ]);
 
-                        // Update the settrimbre block
-                        staffBlocksMap[staffIndex].startBlock[
-                            staffBlocksMap[staffIndex].startBlock.length - 3
-                        ][4][2] = blockId;
+                        startBlockEntry[4][2] = blockId;
                         const firstnammedo = _searchIndexForMusicBlock(
-                            staffBlocksMap[staffIndex].baseBlocks[0][0],
-                            staffBlocksMap[staffIndex].nameddoArray[staffIndex][0]
+                            baseBlocks[0][0],
+                            staff.nameddoArray[staffIndex][0]
                         );
                         const endnammedo = _searchIndexForMusicBlock(
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0],
-                            staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end]
+                            baseBlocks[repeatId.end][0],
+                            staff.nameddoArray[staffIndex][repeatId.end]
                         );
-                        // Because its [0] is the first nammeddo block
-                        // obviously. Check if
-                        // staffBlocksMap[staffIndex].baseBlocks[repeatId.end+1
-                        // exists and has a [0] element
-                        if (
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1] &&
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0]
-                        ) {
+                        if (baseBlocks[repeatId.end + 1] && baseBlocks[repeatId.end + 1][0]) {
                             const secondnammedo = _searchIndexForMusicBlock(
-                                staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0],
-                                staffBlocksMap[staffIndex].nameddoArray[staffIndex][
-                                    repeatId.end + 1
-                                ]
+                                baseBlocks[repeatId.end + 1][0],
+                                staff.nameddoArray[staffIndex][repeatId.end + 1]
                             );
 
                             if (secondnammedo != -1) {
-                                staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0][
-                                    secondnammedo
-                                ][4][0] = blockId;
+                                baseBlocks[repeatId.end + 1][0][secondnammedo][4][0] = blockId;
                             }
                         }
-                        staffBlocksMap[staffIndex].baseBlocks[0][0][firstnammedo][4][0] = blockId;
-                        staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
-                            endnammedo
-                        ][4][1] = null;
+                        baseBlocks[0][0][firstnammedo][4][0] = blockId;
+                        baseBlocks[repeatId.end][0][endnammedo][4][1] = null;
 
                         blockId += 2;
                     } else {
                         const currentnammeddo = _searchIndexForMusicBlock(
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0],
-                            staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.start]
+                            baseBlocks[repeatId.start][0],
+                            staff.nameddoArray[staffIndex][repeatId.start]
                         );
                         const prevnameddo = _searchIndexForMusicBlock(
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.start - 1][0],
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                currentnammeddo
-                            ][4][0]
+                            baseBlocks[repeatId.start - 1][0],
+                            baseBlocks[repeatId.start][0][currentnammeddo][4][0]
                         );
                         const afternamedo = _searchIndexForMusicBlock(
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0],
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                currentnammeddo
-                            ][4][1]
+                            baseBlocks[repeatId.end][0],
+                            baseBlocks[repeatId.start][0][currentnammeddo][4][1]
                         );
                         let prevrepeatnameddo = -1;
                         if (prevnameddo === -1) {
                             prevrepeatnameddo = _searchIndexForMusicBlock(
-                                staffBlocksMap[staffIndex].repeatBlock,
-                                staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                    currentnammeddo
-                                ][4][0]
+                                staff.repeatBlock,
+                                baseBlocks[repeatId.start][0][currentnammeddo][4][0]
                             );
                         }
-                        const prevBlockId =
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                currentnammeddo
-                            ][4][0];
-                        const currentBlockId =
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                currentnammeddo
-                            ][0];
+                        const prevBlockId = baseBlocks[repeatId.start][0][currentnammeddo][4][0];
+                        const currentBlockId = baseBlocks[repeatId.start][0][currentnammeddo][0];
 
-                        // Needs null checking optmizie
-                        const nextBlockId =
-                            staffBlocksMap[staffIndex].nameddoArray[staffIndex][repeatId.end + 1];
+                        const nextBlockId = staff.nameddoArray[staffIndex][repeatId.end + 1];
 
-                        staffBlocksMap[staffIndex].repeatBlock.push([
+                        staff.repeatBlock.push([
                             blockId,
                             "repeat",
                             0,
                             0,
                             [
-                                staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                                    currentnammeddo
-                                ][4][0],
+                                baseBlocks[repeatId.start][0][currentnammeddo][4][0],
                                 blockId + 1,
                                 currentBlockId,
                                 nextBlockId === null ? null : nextBlockId
                             ]
                         ]);
-                        staffBlocksMap[staffIndex].repeatBlock.push([
+                        staff.repeatBlock.push([
                             blockId + 1,
                             ["number", { value: 2 }],
                             100,
@@ -5149,49 +5130,31 @@ class Activity {
                             [blockId]
                         ]);
                         if (prevnameddo != -1) {
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.start - 1][0][
-                                prevnameddo
-                            ][4][1] = blockId;
+                            baseBlocks[repeatId.start - 1][0][prevnameddo][4][1] = blockId;
                         } else {
-                            staffBlocksMap[staffIndex].repeatBlock[
-                                prevrepeatnameddo
-                            ][4][3] = blockId;
+                            staff.repeatBlock[prevrepeatnameddo][4][3] = blockId;
                         }
                         if (afternamedo !== -1) {
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.end][0][
-                                afternamedo
-                            ][4][1] = null;
+                            baseBlocks[repeatId.end][0][afternamedo][4][1] = null;
                         }
-                        staffBlocksMap[staffIndex].baseBlocks[repeatId.start][0][
-                            currentnammeddo
-                        ][4][0] = blockId;
+                        baseBlocks[repeatId.start][0][currentnammeddo][4][0] = blockId;
                         if (nextBlockId !== null) {
                             const nextnameddo = _searchIndexForMusicBlock(
-                                staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0],
+                                baseBlocks[repeatId.end + 1][0],
                                 nextBlockId
                             );
-                            staffBlocksMap[staffIndex].baseBlocks[repeatId.end + 1][0][
-                                nextnameddo
-                            ][4][0] = blockId;
+                            baseBlocks[repeatId.end + 1][0][nextnameddo][4][0] = blockId;
                         }
                         blockId += 2;
                     }
                 }
 
-                const lineBlock = staffBlocksMap[staffIndex].baseBlocks.reduce(
-                    (acc, curr) => acc.concat(curr),
-                    []
-                );
-                // Flatten the multidimensional array
+                const lineBlock = baseBlocks.reduce((acc, curr) => acc.concat(curr), []);
                 const flattenedLineBlock = lineBlock.flat();
-                const combinedBlock = [
-                    ...staffBlocksMap[staffIndex].startBlock,
-                    ...flattenedLineBlock
-                ];
 
-                finalBlock.push(...staffBlocksMap[staffIndex].startBlock);
+                finalBlock.push(...startBlock);
                 finalBlock.push(...flattenedLineBlock);
-                finalBlock.push(...staffBlocksMap[staffIndex].repeatBlock);
+                finalBlock.push(...staff.repeatBlock);
             }
             this.blocks.loadNewBlocks(finalBlock);
             return null;
