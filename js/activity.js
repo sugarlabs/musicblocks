@@ -6251,11 +6251,7 @@ class Activity {
                     fn: this.toolbar.changeWrap
                 });
 
-            if (
-                !this.helpfulWheelItems.find(
-                    ele => ele.label === "Enable horizontal scrolling"
-                )
-            )
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Enable horizontal scrolling"))
                 this.helpfulWheelItems.push({
                     label: "Enable horizontal scrolling",
                     icon: "imgsrc:header-icons/compare-arrows.svg",
@@ -6263,11 +6259,7 @@ class Activity {
                     fn: setScroller
                 });
 
-            if (
-                !this.helpfulWheelItems.find(
-                    ele => ele.label === "Disable horizontal scrolling"
-                )
-            )
+            if (!this.helpfulWheelItems.find(ele => ele.label === "Disable horizontal scrolling"))
                 this.helpfulWheelItems.push({
                     label: "Disable horizontal scrolling",
                     icon: "imgsrc:header-icons/lock.svg",
