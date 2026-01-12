@@ -3465,26 +3465,21 @@ class Block {
         };
 
         if (this.name === "text") {
-            // Reuse existing input element or create a new one
-            if (!_domCache.textLabelInput) {
-                const el = document.createElement("input");
-                el.id = "textLabel";
-                el.style.position = "absolute";
-                el.style.webkitUserSelect = "text";
-                el.style.mozUserSelect = "text";
-                el.style.msUserSelect = "text";
-                el.className = "text";
-                el.type = "text";
-                _domCache.textLabelInput = el;
-            }
+            // Create a new input element for this block
+            const el = document.createElement("input");
+            el.id = "textLabel";
+            el.style.position = "absolute";
+            el.style.webkitUserSelect = "text";
+            el.style.mozUserSelect = "text";
+            el.style.msUserSelect = "text";
+            el.className = "text";
+            el.type = "text";
 
             // Ensure it is the child of labelElem
-            if (_domCache.textLabelInput.parentNode !== labelElem) {
-                labelElem.innerHTML = "";
-                labelElem.appendChild(_domCache.textLabelInput);
-            }
+            labelElem.innerHTML = "";
+            labelElem.appendChild(el);
 
-            this.label = _domCache.textLabelInput;
+            this.label = el;
             this.label.value = safetext(labelValue);
             this.label.style.display = "";
             labelElem.classList.add("hasKeyboard");
@@ -4028,27 +4023,22 @@ class Block {
                         break;
                 }
             } else {
-                // Reuse existing input element or create a new one
-                if (!_domCache.numberLabelInput) {
-                    const el = document.createElement("input");
-                    el.id = "numberLabel";
-                    el.style.position = "absolute";
-                    el.style.webkitUserSelect = "text";
-                    el.style.mozUserSelect = "text";
-                    el.style.msUserSelect = "text";
-                    el.className = "number";
-                    el.type = "number";
-                    el.step = "any";
-                    _domCache.numberLabelInput = el;
-                }
+                // Create a new input element for this block
+                const el = document.createElement("input");
+                el.id = "numberLabel";
+                el.style.position = "absolute";
+                el.style.webkitUserSelect = "text";
+                el.style.mozUserSelect = "text";
+                el.style.msUserSelect = "text";
+                el.className = "number";
+                el.type = "number";
+                el.step = "any";
 
                 // Ensure it is the child of labelElem
-                if (_domCache.numberLabelInput.parentNode !== labelElem) {
-                    labelElem.innerHTML = "";
-                    labelElem.appendChild(_domCache.numberLabelInput);
-                }
+                labelElem.innerHTML = "";
+                labelElem.appendChild(el);
 
-                this.label = _domCache.numberLabelInput;
+                this.label = el;
                 this.label.value = safetext(labelValue);
                 labelElem.classList.add("hasKeyboard");
 

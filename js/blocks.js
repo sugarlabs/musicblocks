@@ -3453,8 +3453,7 @@ class Blocks {
 
                 postProcessArg = [thisBlock, arg];
             } else if (name === "newnote") {
-                // eslint-disable-next-line no-unused-vars
-                postProcess = args => {};
+                postProcess = () => {};
                 postProcessArg = [thisBlock, null];
             } else {
                 postProcess = null;
@@ -5842,6 +5841,11 @@ class Blocks {
             this._adjustTheseDocks = [];
             this._loadCounter = blockObjs.length;
 
+            // Preload audio samples for instruments used in this project (background task)
+            if (this.activity && this.activity.logo && this.activity.logo.synth) {
+                this.activity.logo.synth.preloadProjectSamples(blockObjs);
+            }
+
             /** We add new blocks to the end of the block list. */
             const blockOffset = this.blockList.length;
             const firstBlock = this.blockList.length;
@@ -6690,8 +6694,7 @@ class Blocks {
          * @public
          * @returns {void}
          */
-        // eslint-disable-next-line no-unused-vars
-        this.cleanupAfterLoad = async name => {
+        this.cleanupAfterLoad = async () => {
             this._loadCounter -= 1;
             if (this._loadCounter > 0) {
                 return;
@@ -7085,7 +7088,7 @@ class Blocks {
         /***
          * Clears all the blocks, updates the cache and refreshes the canvas.
          *
-         * @returnss {void}
+         * @returns {void}
          */
         this.clearParameterBlocks = () => {
             for (const blk in this.blockList) {
@@ -7107,7 +7110,7 @@ class Blocks {
          * @param logo
          * @param turtle
          * @param blk
-         * @returnss {void}
+         * @returns {void}
          */
         this.updateParameterBlock = (logo, turtle, blk) => {
             const name = this.blockList[blk].name;
@@ -7157,7 +7160,7 @@ class Blocks {
          * @param blk
          * @param value
          * @param turtle
-         * @returnss {void}
+         * @returns {void}
          */
         this.blockSetter = (logo, blk, value, turtle) => {
             if (typeof this.blockList[blk].protoblock.setter === "function") {
@@ -7174,7 +7177,7 @@ class Blocks {
         /***
          * Hides all the blocks.
          *
-         * @returnss {void}
+         * @returns {void}
          */
         this.hideBlocks = () => {
             this.activity.palettes.hide();
