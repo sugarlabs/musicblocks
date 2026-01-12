@@ -4129,7 +4129,8 @@ class Activity {
             // function to increase or decrease the "top" property of the top-right corner buttons
 
             const topRightButtons = document.querySelectorAll("#buttoncontainerTOP .tooltipped");
-            const btnY = document.getElementById("Grid").getBoundingClientRect().top;
+            const gridElement = document.getElementById("Grid");
+            const btnY = gridElement ? gridElement.getBoundingClientRect().top : 70 + LEADING + 6;
 
             this.changeTopButtonsPosition = value => {
                 topRightButtons.forEach(child => {
