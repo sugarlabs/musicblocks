@@ -1443,8 +1443,8 @@ class Activity {
 
             const importConfirm = document.createElement("button");
             importConfirm.classList.add("confirm-button");
-            importConfirm.textContent = "Confirm";
-            this.addEventListener(importConfirm, "click", () => {
+            importConfirm.textContent = _("Confirm");
+            importConfirm.addEventListener("click", () => {
                 const maxNoteBlocks = select.value;
                 transcribeMidi(midi, maxNoteBlocks);
                 document.body.removeChild(modal);
@@ -1453,8 +1453,8 @@ class Activity {
 
             const cancelBtn = document.createElement("button");
             cancelBtn.classList.add("cancel-button");
-            cancelBtn.textContent = "Cancel";
-            this.addEventListener(cancelBtn, "click", () => {
+            cancelBtn.textContent = _("Cancel");
+            cancelBtn.addEventListener("click", () => {
                 document.body.removeChild(modal);
             });
             modal.appendChild(cancelBtn);
@@ -1486,7 +1486,7 @@ class Activity {
 
             const confirmBtn = document.createElement("button");
             confirmBtn.classList.add("confirm-button");
-            confirmBtn.textContent = "Confirm";
+            confirmBtn.textContent = _("Confirm");
             confirmBtn.style.backgroundColor = platformColor.blueButton;
             confirmBtn.style.color = "white";
             confirmBtn.style.border = "none";
@@ -1502,7 +1502,7 @@ class Activity {
 
             const cancelBtn = document.createElement("button");
             cancelBtn.classList.add("cancel-button");
-            cancelBtn.textContent = "Cancel";
+            cancelBtn.textContent = _("Cancel");
             cancelBtn.style.backgroundColor = "#f1f1f1";
             cancelBtn.style.color = "black";
             cancelBtn.style.border = "none";
