@@ -9,6 +9,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
 
+// Race condition prevention constants
+const LOCK_MAX_RETRIES = 100;
+const LOCK_RETRY_DELAY_MS = 2;
+const LISTENER_LOCK_MAX_RETRIES = 100;
+const LISTENER_LOCK_MAX_DELAY_MS = 20;
+
 /*
    global
 
@@ -154,7 +160,7 @@ function setupFlowBlocks(activity) {
          * @param {number} blk - The block number.
          * @param {object} receivedArg - The received arguments.
          */
-        flow(args, logo, turtle, blk, receivedArg) {
+        async flow(args, logo, turtle, blk, receivedArg) {
             if (args[1] === undefined) return;
 
             let arg0;
@@ -202,114 +208,161 @@ function setupFlowBlocks(activity) {
                     tur.singer.inDuplicate = false;
                     tur.singer.duplicateFactor /= factor;
 
-                    // Check for a race condition
-                    // FIXME: Do something about the race condition
-                    if (logo.connectionStoreLock) {
-                        console.debug("LOCKED");
-                    }
-
-                    logo.connectionStoreLock = true;
-
-                    // The last turtle should restore the broken connections
-                    if (__lookForOtherTurtles(blk, turtle) === null) {
-                        const n = logo.connectionStore[turtle][blk].length;
-                        for (let i = 0; i < n; i++) {
-                            const obj = logo.connectionStore[turtle][blk].pop();
-                            activity.blocks.blockList[obj[0]].connections[obj[1]] = obj[2];
-                            if (obj[2] != null) {
-                                activity.blocks.blockList[obj[2]].connections[0] = obj[0];
+                    // Improved race condition handling in listener
+                    let lockAcquired = false;
+                    let retryCount = 0;
+                    
+                    // Retry loop for acquiring lock in listener
+                    while (!lockAcquired && retryCount < LISTENER_LOCK_MAX_RETRIES) {
+                        if (!logo.connectionStoreLock) {
+                            logo.connectionStoreLock = true;
+                            lockAcquired = true;
+                        } else {
+                            retryCount++;
+                            // Short delay with exponential backoff
+                            const delay = Math.min(retryCount, LISTENER_LOCK_MAX_DELAY_MS);
+                            const start = Date.now();
+                            while (Date.now() - start < delay) {
+                                // Busy wait
                             }
                         }
-                    } else {
-                        delete logo.connectionStore[turtle][blk];
+                    }
+                    
+                    if (!lockAcquired) {
+                        console.warn(`Listener race condition: Failed to acquire lock after ${LISTENER_LOCK_MAX_RETRIES} attempts. Forcing lock acquisition.`);
+                        logo.connectionStoreLock = true;
                     }
 
-                    logo.connectionStoreLock = false;
+                    try {
+
+                        // The last turtle should restore the broken connections
+                        if (__lookForOtherTurtles(blk, turtle) === null) {
+                            const n = logo.connectionStore[turtle][blk].length;
+                            for (let i = 0; i < n; i++) {
+                                const obj = logo.connectionStore[turtle][blk].pop();
+                                activity.blocks.blockList[obj[0]].connections[obj[1]] = obj[2];
+                                if (obj[2] != null) {
+                                    activity.blocks.blockList[obj[2]].connections[0] = obj[0];
+                                }
+                            }
+                        } else {
+                            delete logo.connectionStore[turtle][blk];
+                        }
+                    } catch (error) {
+                        console.error("Error in duplicate listener:", error);
+                    } finally {
+                        // Always release the lock, even if an error occurred
+                        logo.connectionStoreLock = false;
+                    }
                 };
 
                 // Set the turtle listener
                 logo.setTurtleListener(turtle, listenerName, __listener);
 
-                // Test for race condition
-                // FIXME: Do something about the race condition
-                if (logo.connectionStoreLock) {
-                    console.debug("LOCKED");
+                // Improved race condition handling with retry mechanism
+                let lockAcquired = false;
+                let retryCount = 0;
+                
+                // Retry loop with exponential backoff
+                while (!lockAcquired && retryCount < LOCK_MAX_RETRIES) {
+                    if (!logo.connectionStoreLock) {
+                        logo.connectionStoreLock = true;
+                        lockAcquired = true;
+                    } else {
+                        retryCount++;
+                        // Exponential backoff: wait longer each time
+                        const delay = Math.min(retryCount * LOCK_RETRY_DELAY_MS, 50);
+                        
+                        // Synchronous delay using busy wait (not ideal but necessary here)
+                        const start = Date.now();
+                        while (Date.now() - start < delay) {
+                            // Busy wait
+                        }
+                    }
+                }
+                
+                if (!lockAcquired) {
+                    console.warn(`Race condition: Failed to acquire lock after ${LOCK_MAX_RETRIES} attempts. Forcing lock acquisition.`);
+                    logo.connectionStoreLock = true;
                 }
 
-                logo.connectionStoreLock = true;
+                try {
+                    // Check to see if another turtle has already disconnected these blocks
+                    const otherTurtle = __lookForOtherTurtles(blk, turtle);
+                    if (otherTurtle != null) {
+                        // Copy the connections and queue the blocks
+                        logo.connectionStore[turtle][blk] = [];
+                        for (let i = logo.connectionStore[otherTurtle][blk].length; i > 0; i--) {
+                            const obj = [
+                                logo.connectionStore[otherTurtle][blk][i - 1][0],
+                                logo.connectionStore[otherTurtle][blk][i - 1][1],
+                                logo.connectionStore[otherTurtle][blk][i - 1][2]
+                            ];
+                            logo.connectionStore[turtle][blk].push(obj);
+                            let child = obj[0];
+                            if (activity.blocks.blockList[child].name === "hidden") {
+                                child = activity.blocks.blockList[child].connections[0];
+                            }
 
-                // Check to see if another turtle has already disconnected these blocks
-                const otherTurtle = __lookForOtherTurtles(blk, turtle);
-                if (otherTurtle != null) {
-                    // Copy the connections and queue the blocks
-                    logo.connectionStore[turtle][blk] = [];
-                    for (let i = logo.connectionStore[otherTurtle][blk].length; i > 0; i--) {
-                        const obj = [
-                            logo.connectionStore[otherTurtle][blk][i - 1][0],
-                            logo.connectionStore[otherTurtle][blk][i - 1][1],
-                            logo.connectionStore[otherTurtle][blk][i - 1][2]
-                        ];
-                        logo.connectionStore[turtle][blk].push(obj);
-                        let child = obj[0];
-                        if (activity.blocks.blockList[child].name === "hidden") {
-                            child = activity.blocks.blockList[child].connections[0];
-                        }
-
-                        const queueBlock = new Queue(child, factor, blk, receivedArg);
-                        tur.parentFlowQueue.push(blk);
-                        tur.queue.push(queueBlock);
-                    }
-                } else {
-                    let child = activity.blocks.findBottomBlock(args[1]);
-                    while (child != blk) {
-                        if (activity.blocks.blockList[child].name !== "hidden") {
                             const queueBlock = new Queue(child, factor, blk, receivedArg);
                             tur.parentFlowQueue.push(blk);
                             tur.queue.push(queueBlock);
                         }
+                    } else {
+                        let child = activity.blocks.findBottomBlock(args[1]);
+                        while (child != blk) {
+                            if (activity.blocks.blockList[child].name !== "hidden") {
+                                const queueBlock = new Queue(child, factor, blk, receivedArg);
+                                tur.parentFlowQueue.push(blk);
+                                tur.queue.push(queueBlock);
+                            }
 
-                        child = activity.blocks.blockList[child].connections[0];
-                    }
-
-                    // Break the connections between blocks in the clamp so
-                    // that when we run the queues, only the individual blocks
-                    // run
-                    logo.connectionStore[turtle][blk] = [];
-                    child = args[1];
-                    while (child != null) {
-                        const lastConnection =
-                            activity.blocks.blockList[child].connections.length - 1;
-                        const nextBlk =
-                            activity.blocks.blockList[child].connections[lastConnection];
-                        // Don't disconnect a hidden block from its parent
-                        if (
-                            nextBlk != null &&
-                            activity.blocks.blockList[nextBlk].name === "hidden"
-                        ) {
-                            logo.connectionStore[turtle][blk].push([
-                                nextBlk,
-                                1,
-                                activity.blocks.blockList[nextBlk].connections[1]
-                            ]);
-                            child = activity.blocks.blockList[nextBlk].connections[1];
-                            activity.blocks.blockList[nextBlk].connections[1] = null;
-                        } else {
-                            logo.connectionStore[turtle][blk].push([
-                                child,
-                                lastConnection,
-                                nextBlk
-                            ]);
-                            activity.blocks.blockList[child].connections[lastConnection] = null;
-                            child = nextBlk;
+                            child = activity.blocks.blockList[child].connections[0];
                         }
 
-                        if (child != null) {
-                            activity.blocks.blockList[child].connections[0] = null;
+                        // Break the connections between blocks in the clamp so
+                        // that when we run the queues, only the individual blocks
+                        // run
+                        logo.connectionStore[turtle][blk] = [];
+                        child = args[1];
+                        while (child != null) {
+                            const lastConnection =
+                                activity.blocks.blockList[child].connections.length - 1;
+                            const nextBlk =
+                                activity.blocks.blockList[child].connections[lastConnection];
+                            // Don't disconnect a hidden block from its parent
+                            if (
+                                nextBlk != null &&
+                                activity.blocks.blockList[nextBlk].name === "hidden"
+                            ) {
+                                logo.connectionStore[turtle][blk].push([
+                                    nextBlk,
+                                    1,
+                                    activity.blocks.blockList[nextBlk].connections[1]
+                                ]);
+                                child = activity.blocks.blockList[nextBlk].connections[1];
+                                activity.blocks.blockList[nextBlk].connections[1] = null;
+                            } else {
+                                logo.connectionStore[turtle][blk].push([
+                                    child,
+                                    lastConnection,
+                                    nextBlk
+                                ]);
+                                activity.blocks.blockList[child].connections[lastConnection] = null;
+                                child = nextBlk;
+                            }
+
+                            if (child != null) {
+                                activity.blocks.blockList[child].connections[0] = null;
+                            }
                         }
                     }
+                } catch (error) {
+                    console.error("Error in duplicate block processing:", error);
+                } finally {
+                    // Always release the lock, even if an error occurred
+                    logo.connectionStoreLock = false;
                 }
-
-                logo.connectionStoreLock = false;
             }
         }
     }

@@ -196,11 +196,14 @@ class Trashcan {
         }
 
         this._inAnimation = true;
+        // Fix: Set isVisible to true immediately when animation starts
+        // This ensures blocks can be deleted even with fast drag-and-drop
+        this.isVisible = true;
 
         this._animationInterval = setInterval(() => {
             this._animationLevel += 20;
             if (this._animationLevel >= this.animationTime) {
-                this.isVisible = true;
+                // Animation complete - make border highlight active (red)
                 this._makeBorderHighlight(true); // Make it active.
                 this.activity.refreshCanvas();
                 clearInterval(this._animationInterval); // Autostop animation.
