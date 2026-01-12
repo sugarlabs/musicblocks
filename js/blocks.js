@@ -1880,7 +1880,7 @@ class Blocks {
                     } else if (myBlock.isArgBlock()) {
                         this.blockList[connection].connections[0] = null;
 
-                        /** If we are replacing a number block, put it in the trash */
+                        /** If we are replacing an arg block, put certain default blocks in the trash */
                         if (
                             [
                                 "number",
