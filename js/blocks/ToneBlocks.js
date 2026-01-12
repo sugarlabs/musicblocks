@@ -484,7 +484,13 @@ function setupToneBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("Tremolo makes the sound pulse louder and quieter. Rate: how fast the sound pulses. Depth: how strong the pulsing effect is."),
+                _("The Tremolo block adds a wavering effect.") +
+                    " " +
+                    _("Tremolo makes the sound pulse louder and quieter.") +
+                    " " +
+                    _("The rate controls how fast the sound pulses.") +
+                    " " +
+                    _("The depth controls the strength of the pulsing effect."),
                 "documentation",
                 null,
                 "tremolohelp"
@@ -833,7 +839,7 @@ function setupToneBlocks(activity) {
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                "print"
+                    "print"
             ) {
                 logo.statusFields.push([blk, "synthname"]);
             } else {
@@ -910,8 +916,8 @@ function setupToneBlocks(activity) {
             this.setPalette("tone", activity);
             this.setHelpString([
                 _("The Set instrument block selects a voice for the synthesizer,") +
-                " " +
-                _("eg guitar piano violin or cello."),
+                    " " +
+                    _("eg guitar piano violin or cello."),
                 "documentation",
                 ""
             ]);
@@ -944,8 +950,8 @@ function setupToneBlocks(activity) {
             } else {
                 this.setHelpString([
                     _("The Set instrument block selects a voice for the synthesizer,") +
-                    " " +
-                    _("eg guitar piano violin or cello."),
+                        " " +
+                        _("eg guitar piano violin or cello."),
                     "documentation",
                     null,
                     "settimbrehelp"
@@ -1070,7 +1076,7 @@ function setupToneBlocks(activity) {
             if (
                 logo.inStatusMatrix &&
                 activity.blocks.blockList[activity.blocks.blockList[blk].connections[0]].name ===
-                "print"
+                    "print"
             ) {
                 logo.statusFields.push([blk, "customsample"]);
             } else {
