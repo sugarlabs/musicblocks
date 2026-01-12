@@ -522,57 +522,34 @@ class RhythmRuler {
         // An input for setting the dissect number
         this._dissectNumber = widgetWindow.addInputButton("2");
 
-        this._dissectNumber.onfocus = () => {
-            // this._piemenuNumber(['2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16'], numberInput.value);
-        };
+        // Make the input editable and handle keyboard input
+        this._dissectNumber.readOnly = false;
+        this._dissectNumber.classList.add("hasKeyboard");
+        this._dissectNumber.style.cursor = "text";
 
-        this._dissectNumber.onkeydown = event => {
-            if (event.keyCode === RhythmRuler.DEL) {
-                this._dissectNumber.value = this._dissectNumber.value.substring(
-                    0,
-                    this._dissectNumber.value.length - 1
-                );
-            }
-            if (event.keyCode === RhythmRuler.BACK) {
-                // Get the cursor position
-                const cursorPosition = this._dissectNumber.selectionStart;
-                // If there is a selection, delete the selected text
-                if (this._dissectNumber.selectionStart !== this._dissectNumber.selectionEnd) {
-                    const start = this._dissectNumber.selectionStart;
-                    const end = this._dissectNumber.selectionEnd;
-                    this._dissectNumber.value =
-                        this._dissectNumber.value.substring(0, start) +
-                        this._dissectNumber.value.substring(start, end + 1);
-                } else if (this._dissectNumber.value.length == 1 && cursorPosition == 1) {
-                    // If there is only a single digit in the input then replace it with an empty string
-                    this._dissectNumber.value = "";
-                } else if (cursorPosition > 0) {
-                    // If there is no selection and the cursor is not at the beginning, delete the character before the cursor
-                    const newValue =
-                        this._dissectNumber.value.substring(0, cursorPosition) +
-                        this._dissectNumber.value.substring(
-                            cursorPosition,
-                            this._dissectNumber.value
-                        );
-                    this._dissectNumber.value = newValue;
+        // Handle Enter key to validate and blur (prevent any play action)
+        this._dissectNumber.addEventListener("keydown", event => {
+            if (event.keyCode === 13 || event.key === "Enter") {
+                event.preventDefault();
+                event.stopPropagation();
+                const inputValue = parseInt(this._dissectNumber.value);
+                if (!isNaN(inputValue) && inputValue > 0) {
+                    // Validate the input value - allow any number from 2 to 128
+                    const validatedValue = Math.min(Math.max(inputValue, 2), 128);
+                    this._dissectNumber.value = validatedValue;
                 }
-                // If the cursor is at the beginning, do nothing
+                this._dissectNumber.blur();
             }
-        };
+        });
 
         /**
-         * Event handler for the input event of the dissect number input.
-         * Limits the dissect number value to the range 2 to 128.
+         * Event handler for the click event of the dissect number input.
+         * Shows a pie menu for selecting the rhythm division number.
          * @private
          * @returns {void}
          */
-        this._dissectNumber.oninput = () => {
-            // Put a limit on the size (2 <--> 128).
-            this._dissectNumber.onmouseout = () => {
-                this._dissectNumber.value = Math.max(this._dissectNumber.value, 2);
-            };
-
-            this._dissectNumber.value = Math.max(Math.min(this._dissectNumber.value, 128), 2);
+        this._dissectNumber.onclick = () => {
+            this._showDissectNumberPieMenu();
         };
 
         /**
@@ -862,6 +839,16 @@ class RhythmRuler {
                 });
             }
         });
+    }
+
+    /**
+     * Shows a pie menu for selecting the rhythm dissect number.
+     * Displays different options based on beginner mode.
+     * @private
+     * @returns {void}
+     */
+    _showDissectNumberPieMenu() {
+        piemenuDissectNumber(this);
     }
 
     /**
