@@ -2369,7 +2369,7 @@ function Synth() {
             await this.loadSynth(0, "electronic synth");
             this.setVolume(0, "electronic synth", 50); // Set to 50% volume
         }
-
+        this.tunerRafId = null;
         // Rest of the tuner initialization code
         if (this.tunerMic) {
             this.tunerMic.close();
@@ -2461,7 +2461,13 @@ function Synth() {
         let tunerMode = "chromatic"; // Add mode state
         let targetPitch = { note: "A4", frequency: 440 }; // Default target pitch
 
+        //in case of quick restart
+        if (this.tunerRafId !== null) {
+            cancelAnimationFrame(this.tunerRafId);
+            this.tunerRafId = null;
+        }
         const updatePitch = () => {
+            this.tunerRafId = requestAnimationFrame(updatePitch);
             const buffer = analyser.getValue();
             const pitch = detectPitch(buffer);
 
@@ -3226,18 +3232,27 @@ function Synth() {
                 });
             }
 
-            requestAnimationFrame(updatePitch);
+            this.tunerRafId = requestAnimationFrame(updatePitch);
         };
 
         updatePitch();
     };
 
     this.stopTuner = () => {
+        if (this.tunerRafId !== null) {
+            cancelAnimationFrame(this.tunerRafId);
+            this.tunerRafId = null;
+        }
         if (this.tunerMic) {
             this.tunerMic.close();
+            this.tunerMic = null;
+        }
+        //(helps if analyser keeps references)
+        if (this.tunerAnalyser) {
+            this.tunerAnalyser.dispose();
+            this.tunerAnalyser = null;
         }
     };
-
     const frequencyToNote = frequency => {
         if (frequency <= 0) return { note: "---", cents: 0 };
 
