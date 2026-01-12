@@ -2032,7 +2032,7 @@ class Blocks {
                                         this.actionHasReturn(b),
                                         this.actionHasArgs(b)
                                     );
-                                    this.setActionProtoVisiblity(false);
+                                    this.setActionProtoVisibility(false);
                                 }
                             }
                         }
@@ -3763,7 +3763,7 @@ class Blocks {
         this.findUniqueActionName = (name, actionBlk) => {
             /** If we have a stack named 'action', make the protoblock visible. */
             if (name === _("action")) {
-                this.setActionProtoVisiblity(true);
+                this.setActionProtoVisibility(true);
             }
 
             /** Make sure we don't make two actions with the same name. */
@@ -5531,7 +5531,7 @@ class Blocks {
 
                 /** If we have a stack named 'action', make the protoblock visible. */
                 if (name === _("action")) {
-                    this.setActionProtoVisiblity(true);
+                    this.setActionProtoVisibility(true);
                 }
 
                 const oldName = name;
