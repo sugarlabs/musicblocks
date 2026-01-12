@@ -24,10 +24,10 @@ describe("GIFAnimator", () => {
 
     beforeEach(() => {
         animator = new GIFAnimator();
-        
+
         // Mock DOM elements
         global.document = {
-            createElement: jest.fn((tag) => {
+            createElement: jest.fn(tag => {
                 if (tag === "img") {
                     return {
                         src: "",
@@ -57,7 +57,7 @@ describe("GIFAnimator", () => {
         };
 
         // Mock requestAnimationFrame and cancelAnimationFrame
-        global.requestAnimationFrame = jest.fn((cb) => {
+        global.requestAnimationFrame = jest.fn(cb => {
             setTimeout(() => cb(Date.now()), 0);
             return 1;
         });
@@ -65,7 +65,7 @@ describe("GIFAnimator", () => {
 
         // Mock Date.now for predictable IDs
         jest.spyOn(Date, "now").mockReturnValue(1234567890);
-        
+
         // Mock window
         global.window = {};
     });
@@ -99,12 +99,14 @@ describe("GIFAnimator", () => {
 
     describe("isAnimatedGIF", () => {
         it("should return true for valid GIF data URL", () => {
-            const gifDataURL = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+            const gifDataURL =
+                "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
             expect(animator.isAnimatedGIF(gifDataURL)).toBe(true);
         });
 
         it("should return false for PNG data URL", () => {
-            const pngDataURL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+            const pngDataURL =
+                "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
             expect(animator.isAnimatedGIF(pngDataURL)).toBe(false);
         });
 
@@ -182,7 +184,7 @@ describe("GIFAnimator", () => {
             };
 
             mockSuperGif = {
-                load: jest.fn((callback) => callback()),
+                load: jest.fn(callback => callback()),
                 get_length: jest.fn(() => 10),
                 get_canvas: jest.fn(() => mockInternalCanvas),
                 move_to: jest.fn(),
@@ -195,13 +197,17 @@ describe("GIFAnimator", () => {
         });
 
         it("should return null when SuperGif is not available", async () => {
-            const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+            const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
             delete global.window.SuperGif;
-            
+
             const result = await animator.createAnimation(
                 "data:image/gif;base64,test",
                 mockCanvas,
-                100, 100, 50, 50, 0
+                100,
+                100,
+                50,
+                50,
+                0
             );
 
             expect(result).toBe(null);
@@ -215,7 +221,11 @@ describe("GIFAnimator", () => {
             const result = await animator.createAnimation(
                 "data:image/gif;base64,test",
                 mockCanvas,
-                100, 100, 50, 50, 0
+                100,
+                100,
+                50,
+                50,
+                0
             );
 
             expect(result).toBe(null);
@@ -225,7 +235,11 @@ describe("GIFAnimator", () => {
             const result = await animator.createAnimation(
                 "data:image/gif;base64,test",
                 mockCanvas,
-                100, 100, 50, 50, 0
+                100,
+                100,
+                50,
+                50,
+                0
             );
 
             expect(result).toBe("gif_1234567890_0");
@@ -236,7 +250,11 @@ describe("GIFAnimator", () => {
             const gifId = await animator.createAnimation(
                 "data:image/gif;base64,test",
                 mockCanvas,
-                150, 200, 75, 100, 45
+                150,
+                200,
+                75,
+                100,
+                45
             );
 
             const animation = animator.animations.get(gifId);
@@ -256,20 +274,28 @@ describe("GIFAnimator", () => {
             await animator.createAnimation(
                 "data:image/gif;base64,test",
                 mockCanvas,
-                100, 100, 50, 50, 0
+                100,
+                100,
+                50,
+                50,
+                0
             );
 
             expect(animator.isRunning).toBe(true);
         });
 
         it("should create hidden img element", async () => {
-            const createElementSpy = jest.spyOn(global.document, 'createElement');
-            const appendChildSpy = jest.spyOn(global.document.body, 'appendChild');
+            const createElementSpy = jest.spyOn(global.document, "createElement");
+            const appendChildSpy = jest.spyOn(global.document.body, "appendChild");
 
             await animator.createAnimation(
                 "data:image/gif;base64,test",
                 mockCanvas,
-                100, 100, 50, 50, 0
+                100,
+                100,
+                50,
+                50,
+                0
             );
 
             expect(createElementSpy).toHaveBeenCalledWith("img");
@@ -277,7 +303,7 @@ describe("GIFAnimator", () => {
         });
 
         it("should handle errors gracefully", async () => {
-            const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+            const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
             mockSuperGif.load.mockImplementation(() => {
                 throw new Error("Load failed");
             });
@@ -285,7 +311,11 @@ describe("GIFAnimator", () => {
             const result = await animator.createAnimation(
                 "data:image/gif;base64,test",
                 mockCanvas,
-                100, 100, 50, 50, 0
+                100,
+                100,
+                50,
+                50,
+                0
             );
 
             expect(result).toBe(null);
@@ -371,7 +401,7 @@ describe("GIFAnimator", () => {
                 lastFrameTime: 0,
                 currentFrame: 0,
                 frames: 10,
-                gifPlayer: { 
+                gifPlayer: {
                     pause: jest.fn(),
                     move_to: jest.fn(),
                     get_canvas: jest.fn(() => ({ width: 100, height: 100 }))
@@ -467,7 +497,7 @@ describe("GIFAnimator", () => {
         it("should not start if already running", () => {
             animator.isRunning = true;
             animator.frameRequestId = 999;
-            
+
             animator.start();
 
             expect(global.requestAnimationFrame).not.toHaveBeenCalled();
@@ -592,7 +622,7 @@ describe("GIFAnimator", () => {
 
         it("should update count after adding animation", () => {
             expect(animator.getActiveCount()).toBe(0);
-            
+
             animator.animations.set("gif1", {});
             expect(animator.getActiveCount()).toBe(1);
         });
