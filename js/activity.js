@@ -2436,7 +2436,7 @@ class Activity {
                                 that.blocksContainer.y -= deltaY;
                             }
 
-                            if (deltaX !== 0) {
+                            if (that.scrollBlockContainer && deltaX !== 0) {
                                 closeAnyOpenMenusAndLabels();
                                 that.blocksContainer.x -= deltaX;
                             }
@@ -2472,18 +2472,18 @@ class Activity {
                 if (event.ctrlKey) {
                     event.preventDefault();
                     delY < 0 ? doLargerBlocks(that) : doSmallerBlocks(that);
-                } else if (delY !== 0 && event.axis === event.VERTICAL_AXIS) {
-                    closeAnyOpenMenusAndLabels();
-                    that.blocksContainer.y -= delY;
-                } else if (
-                    that.scrollBlockContainer &&
-                    delX !== 0 &&
-                    event.axis === event.HORIZONTAL_AXIS
-                ) {
-                    closeAnyOpenMenusAndLabels();
-                    that.blocksContainer.x -= delX;
                 } else {
-                    event.preventDefault();
+                    closeAnyOpenMenusAndLabels();
+                    if (that.scrollBlockContainer) {
+                        // Horizontal scrolling enabled (Advanced)
+                        if (delY !== 0) that.blocksContainer.y -= delY;
+                        if (delX !== 0) that.blocksContainer.x -= delX;
+                    } else {
+                        // Vertical scrolling only (Beginner / Default)
+                        if (event.axis === event.VERTICAL_AXIS && delY !== 0) {
+                            that.blocksContainer.y -= delY;
+                        }
+                    }
                 }
 
                 that.refreshCanvas();
