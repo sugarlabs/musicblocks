@@ -160,7 +160,7 @@ function setupFlowBlocks(activity) {
          * @param {number} blk - The block number.
          * @param {object} receivedArg - The received arguments.
          */
-        async flow(args, logo, turtle, blk, receivedArg) {
+        flow(args, logo, turtle, blk, receivedArg) {
             if (args[1] === undefined) return;
 
             let arg0;
