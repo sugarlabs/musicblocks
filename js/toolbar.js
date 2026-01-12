@@ -65,8 +65,8 @@ class Toolbar {
                 ["displayStatsIcon", _("Display statistics")],
                 ["loadPluginIcon", _("Load plugin")],
                 ["delPluginIcon", _("Delete plugin")],
-                ["enableHorizScrollIcon", _("Enable omnidirectional scrolling")],
-                ["disableHorizScrollIcon", _("Disable omnidirectional scrolling")],
+                ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
+                ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
                 ["themeSelectIcon", _("Change theme")],
                 ["light", _("Light Mode")],
                 ["dark", _("Dark Mode")],
@@ -133,8 +133,8 @@ class Toolbar {
                 _("Display statistics"),
                 _("Load plugin"),
                 _("Delete plugin"),
-                _("Enable omnidirectional scrolling"),
-                _("Disable omnidirectional scrolling"),
+                _("Enable horizontal scrolling"),
+                _("Disable horizontal scrolling"),
                 _("Change theme"),
                 _("Light Mode"),
                 _("Dark Mode"),
@@ -206,8 +206,8 @@ class Toolbar {
                 ["displayStatsIcon", _("Display statistics")],
                 ["loadPluginIcon", _("Load plugin")],
                 ["delPluginIcon", _("Delete plugin")],
-                ["enableHorizScrollIcon", _("Enable omnidirectional scrolling")],
-                ["disableHorizScrollIcon", _("Disable omnidirectional scrolling")],
+                ["enableHorizScrollIcon", _("Enable horizontal scrolling")],
+                ["disableHorizScrollIcon", _("Disable horizontal scrolling")],
                 ["themeSelectIcon", _("Change theme")],
                 ["light", _("Light Mode")],
                 ["dark", _("Dark Mode")],
@@ -268,8 +268,8 @@ class Toolbar {
                 _("Display statistics"),
                 _("Load plugin"),
                 _("Delete plugin"),
-                _("Enable omnidirectional scrolling"),
-                _("Disable omnidirectional scrolling"),
+                _("Enable horizontal scrolling"),
+                _("Disable horizontal scrolling"),
                 _("Change theme"),
                 _("Light Mode"),
                 _("Dark Mode"),
@@ -960,7 +960,7 @@ class Toolbar {
                 // Update helpful wheel items visibility for advanced mode
                 if (this.activity.helpfulWheelItems) {
                     this.activity.helpfulWheelItems.forEach(item => {
-                        if (item.label === "Enable omnidirectional scrolling") {
+                        if (item.label === "Enable horizontal scrolling") {
                             item.display = true;
                         }
                     });
@@ -986,7 +986,7 @@ class Toolbar {
                 // Update helpful wheel items visibility for beginner mode
                 if (this.activity.helpfulWheelItems) {
                     this.activity.helpfulWheelItems.forEach(item => {
-                        if (item.label === "Enable omnidirectional scrolling") {
+                        if (item.label === "Enable horizontal scrolling") {
                             item.display = false;
                         }
                     });

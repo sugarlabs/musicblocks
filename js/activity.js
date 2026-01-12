@@ -1966,8 +1966,8 @@ class Activity {
         };
 
         /**
-         * Initializes the functionality of the omnidirectional scroll icon.
-         * Toggles omnidirectional scrolling and updates corresponding UI elements.
+         * Initializes the functionality of the horizontal scroll icon.
+         * Toggles horizontal scrolling and updates corresponding UI elements.
          * @private
          */
         this._setScroller = () => {
@@ -1980,19 +1980,19 @@ class Activity {
                 disableHorizScrollIcon.style.display = "block";
 
                 this.helpfulWheelItems.forEach(ele => {
-                    if (ele.label === "Enable omnidirectional scrolling") ele.display = false;
-                    else if (ele.label === "Disable omnidirectional scrolling") ele.display = true;
+                    if (ele.label === "Enable horizontal scrolling") ele.display = false;
+                    else if (ele.label === "Disable horizontal scrolling") ele.display = true;
                 });
-                activity.textMsg("Omnidirectional scrolling enabled.", 3000);
+                activity.textMsg("Horizontal scrolling enabled.", 3000);
             } else {
                 enableHorizScrollIcon.style.display = "block";
                 disableHorizScrollIcon.style.display = "none";
 
                 this.helpfulWheelItems.forEach(ele => {
-                    if (ele.label === "Enable omnidirectional scrolling") ele.display = true;
-                    else if (ele.label === "Disable omnidirectional scrolling") ele.display = false;
+                    if (ele.label === "Enable horizontal scrolling") ele.display = true;
+                    else if (ele.label === "Disable horizontal scrolling") ele.display = false;
                 });
-                activity.textMsg("Omnidirectional scrolling disabled.", 3000);
+                activity.textMsg("Horizontal scrolling disabled.", 3000);
             }
         };
 
@@ -2472,7 +2472,7 @@ class Activity {
                 } else {
                     closeAnyOpenMenusAndLabels();
                     if (that.scrollBlockContainer) {
-                        // Omnidirectional scrolling enabled (Advanced)
+                        // Horizontal scrolling enabled (Advanced)
                         if (delY !== 0) that.blocksContainer.y -= delY;
                         if (delX !== 0) that.blocksContainer.x -= delX;
                     } else {
@@ -6253,11 +6253,11 @@ class Activity {
 
             if (
                 !this.helpfulWheelItems.find(
-                    ele => ele.label === "Enable omnidirectional scrolling"
+                    ele => ele.label === "Enable horizontal scrolling"
                 )
             )
                 this.helpfulWheelItems.push({
-                    label: "Enable omnidirectional scrolling",
+                    label: "Enable horizontal scrolling",
                     icon: "imgsrc:header-icons/compare-arrows.svg",
                     display: this.beginnerMode ? false : true,
                     fn: setScroller
@@ -6265,11 +6265,11 @@ class Activity {
 
             if (
                 !this.helpfulWheelItems.find(
-                    ele => ele.label === "Disable omnidirectional scrolling"
+                    ele => ele.label === "Disable horizontal scrolling"
                 )
             )
                 this.helpfulWheelItems.push({
-                    label: "Disable omnidirectional scrolling",
+                    label: "Disable horizontal scrolling",
                     icon: "imgsrc:header-icons/lock.svg",
                     display: false,
                     fn: setScroller
