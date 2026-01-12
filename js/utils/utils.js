@@ -1596,6 +1596,7 @@ let closeBlkWidgets = name => {
 
 /**
  * Safely resolves a dot-notation string path to an object property globally.
+ * Tries safe resolution first, falls back to eval if needed for nested class properties.
  * @param {string} path - The dot-notation path (e.g., "MyClass.Model").
  * @returns {Object|undefined} The resolved object or undefined.
  */
@@ -1606,16 +1607,35 @@ const resolveObject = path => {
     const globalObj = typeof window !== "undefined" ? window : global;
 
     try {
-        return path.split(".").reduce((obj, prop) => {
+        const result = path.split(".").reduce((obj, prop) => {
             if (obj === null || obj === undefined) {
                 return undefined;
             }
             return obj[prop];
         }, globalObj);
+        
+        // If reduction succeeded but result is undefined, try eval as fallback
+        // This handles cases where nested class properties aren't enumerable
+        if (result === undefined) {
+            try {
+                // eslint-disable-next-line no-eval
+                return eval(path);
+            } catch (evalError) {
+                return undefined;
+            }
+        }
+        
+        return result;
     } catch (e) {
-        // eslint-disable-next-line no-console
-        console.warn("Failed to resolve object path: " + path, e);
-        return undefined;
+        // Last resort: try eval
+        try {
+            // eslint-disable-next-line no-eval
+            return eval(path);
+        } catch (evalError) {
+            // eslint-disable-next-line no-console
+            console.warn("Failed to resolve object path: " + path, e);
+            return undefined;
+        }
     }
 };
 
