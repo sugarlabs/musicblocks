@@ -132,7 +132,7 @@ class ThemeBox {
     applyThemeInstantly() {
         const body = document.body;
         // Update body classes
-        this._themes.forEach(theme => {
+        this._themes.forEach((theme) => {
             if (theme === this._theme) {
                 body.classList.add(theme);
             } else {
@@ -203,8 +203,7 @@ class ThemeBox {
                 // Update palette selector border color
                 const paletteElement = document.getElementById("palette");
                 if (paletteElement && paletteElement.childNodes[0]) {
-                    paletteElement.childNodes[0].style.border =
-                        `1px solid ${window.platformColor.selectorSelected}`;
+                    paletteElement.childNodes[0].style.border = `1px solid ${window.platformColor.selectorSelected}`;
                 }
             } catch (e) {
                 console.debug("Could not refresh palette:", e);
@@ -213,7 +212,7 @@ class ThemeBox {
 
         // Refresh floating windows
         const floatingWindows = document.querySelectorAll("#floatingWindows > .windowFrame");
-        floatingWindows.forEach(win => {
+        floatingWindows.forEach((win) => {
             if (this._theme === "dark") {
                 win.style.backgroundColor = "#454545";
                 win.style.borderColor = "#000000";
@@ -234,7 +233,7 @@ class ThemeBox {
             try {
                 const planetBody = planetIframe.contentDocument.body;
                 if (planetBody) {
-                    this._themes.forEach(theme => {
+                    this._themes.forEach((theme) => {
                         if (theme === this._theme) {
                             planetBody.classList.add(theme);
                         } else {
@@ -265,7 +264,7 @@ class ThemeBox {
             // Save preference to localStorage
             this.activity.storage.themePreference = this._theme;
             localStorage.setItem("themePreference", this._theme);
-            
+
             // Apply theme instantly instead of reloading
             this.applyThemeInstantly();
         }
