@@ -51,9 +51,11 @@ describe("ThemeBox", () => {
             palettes: {}
         };
 
-        jest.spyOn(global.Storage.prototype, "getItem").mockImplementation((key) => {
-            return key === "themePreference" ? "light" : null;
-        });
+        jest.spyOn(global.Storage.prototype, "getItem").mockImplementation(
+            (key) => {
+                return key === "themePreference" ? "light" : null;
+            }
+        );
         jest.spyOn(global.Storage.prototype, "setItem").mockImplementation(() => {});
 
         Object.defineProperty(window, "location", {
@@ -91,7 +93,10 @@ describe("ThemeBox", () => {
         // Should NOT reload - instant theme switch
         expect(window.location.reload).not.toHaveBeenCalled();
         // Should show theme switched message
-        expect(mockActivity.textMsg).toHaveBeenCalledWith("Theme switched to dark mode.", 2000);
+        expect(mockActivity.textMsg).toHaveBeenCalledWith(
+            "Theme switched to dark mode.",
+            2000
+        );
     });
 
     test("setPreference() applies theme instantly without reload", () => {
