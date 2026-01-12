@@ -552,7 +552,7 @@ class Block {
             this.disconnectedBitmap.visible = false;
         }
 
-        // If it is a collapsed collapsable, hightlight the collapsed state.
+        // If it is a collapsed collapsable, highlight the collapsed state.
         if (this.collapsed) {
             // Show the highlighted collapsed artwork.
             if (this.highlightCollapseBlockBitmap !== null) {
@@ -639,7 +639,7 @@ class Block {
 
         this.container.visible = true;
 
-        // If it is a collapsed collapsable, unhightlight the collapsed state.
+        // If it is a collapsed collapsable, unhighlight the collapsed state.
         if (this.collapsed) {
             // Show the unhighlighted collapsed artwork.'
             // We may have a race condition...
@@ -1105,7 +1105,7 @@ class Block {
             that.container.addChild(that.disconnectedHighlightBitmap);
             that.disconnectedHighlightBitmap.x = 0;
             that.disconnectedHighlightBitmap.y = 0;
-            that.disconnectedHighlightBitmap.name = "bmp_disconnect_hightlight_" + thisBlock;
+            that.disconnectedHighlightBitmap.name = "bmp_disconnect_highlight_" + thisBlock;
             if (!that.activity.logo.runningLilypond) {
                 that.disconnectedHighlightBitmap.cursor = "pointer";
             }
@@ -2184,7 +2184,7 @@ class Block {
         this.collapseButtonBitmap.visible = isCollapsed;
         this.expandButtonBitmap.visible = !isCollapsed;
 
-        // These are the collpase-state bitmaps.
+        // These are the collapse-state bitmaps.
         this.collapseBlockBitmap.visible = !isCollapsed;
         this.highlightCollapseBlockBitmap.visible = false;
         this.collapseText.visible = !isCollapsed;
@@ -3019,7 +3019,7 @@ class Block {
             if (window.hasMouse) {
                 moved = true;
             } else {
-                // Make it eaiser to select text on mobile.
+                // Make it easier to select text on mobile.
                 setTimeout(() => {
                     moved =
                         Math.abs(event.stageX / that.activity.getStageScale() - that.original.x) +
@@ -4570,7 +4570,7 @@ class Block {
                             this.blocks.actionHasReturn(c),
                             this.blocks.actionHasArgs(c)
                         );
-                        this.blocks.setActionProtoVisiblity(false);
+                        this.blocks.setActionProtoVisibility(false);
                     }
 
                     this.blocks.newNameddoBlock(
@@ -4599,7 +4599,7 @@ class Block {
                             this.blocks.actionHasReturn(c),
                             this.blocks.actionHasArgs(c)
                         );
-                        this.blocks.setActionProtoVisiblity(false);
+                        this.blocks.setActionProtoVisibility(false);
                     }
                     this.blocks.renameNameddos(oldValue, newValue);
                     this.blocks.palettes.hide();
