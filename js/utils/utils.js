@@ -1613,7 +1613,7 @@ const resolveObject = path => {
             }
             return obj[prop];
         }, globalObj);
-        
+
         // If reduction succeeded but result is undefined, try eval as fallback
         // This handles cases where nested class properties aren't enumerable
         if (result === undefined) {
@@ -1624,7 +1624,7 @@ const resolveObject = path => {
                 return undefined;
             }
         }
-        
+
         return result;
     } catch (e) {
         // Last resort: try eval
