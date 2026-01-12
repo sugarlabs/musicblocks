@@ -536,6 +536,10 @@ function Synth() {
      */
     this.noteFrequencies = {};
 
+    // Tuner loop control (prevents requestAnimationFrame leak after stopping)
+    this._tunerRunning = false;
+    this._tunerRAF = null;
+
     /**
      * Function to initialize a new Tone.js instance.
      * @function
@@ -2310,6 +2314,13 @@ function Synth() {
      * @returns {Promise<void>}
      */
     this.startTuner = async () => {
+        // If a previous tuner loop is still active, stop it before starting a new one.
+        this._tunerRunning = false;
+        if (this._tunerRAF) {
+            cancelAnimationFrame(this._tunerRAF);
+            this._tunerRAF = null;
+        }
+
         // Initialize required components for pie menu
         if (!window.activity) {
             window.activity = {
@@ -3226,13 +3237,22 @@ function Synth() {
                 });
             }
 
-            requestAnimationFrame(updatePitch);
+            if (!this._tunerRunning) return;
+            this._tunerRAF = requestAnimationFrame(updatePitch);
         };
 
-        updatePitch();
+        this._tunerRunning = true;
+        this._tunerRAF = requestAnimationFrame(updatePitch);
     };
 
     this.stopTuner = () => {
+        this._tunerRunning = false;
+
+        if (this._tunerRAF) {
+            cancelAnimationFrame(this._tunerRAF);
+            this._tunerRAF = null;
+        }
+
         if (this.tunerMic) {
             this.tunerMic.close();
         }
