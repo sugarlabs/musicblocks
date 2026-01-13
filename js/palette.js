@@ -53,6 +53,11 @@ const makePaletteIcons = (data, width, height) => {
     return img;
 };
 
+const PALETTE_LABEL_KEYS = {
+    media: "Media",
+    sensors: "Sensors"
+};
+
 class Palettes {
     constructor(activity) {
         this.activity = activity;
@@ -303,7 +308,7 @@ class Palettes {
         img.style.boxSizing = "content-box";
         img.style.width = `${this.cellSize}px`;
         img.style.height = `${this.cellSize}px`;
-        label.textContent = toTitleCase(_(name));
+        label.textContent = _(PALETTE_LABEL_KEYS[name] || name);
         label.style.color = platformColor.paletteText;
         row.style.borderBottom = "1px solid #0CAFFF";
         label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
@@ -326,7 +331,7 @@ class Palettes {
         img.style.boxSizing = "content-box";
         img.style.width = `${this.cellSize}px`;
         img.style.height = `${this.cellSize}px`;
-        label.textContent = toTitleCase(_(name));
+        label.textContent = _(PALETTE_LABEL_KEYS[name] || name);
         label.style.color = platformColor.paletteText;
         label.style.fontSize = localStorage.kanaPreference === "kana" ? "12px" : "16px";
         label.style.padding = "4px";
@@ -923,7 +928,7 @@ class Palette {
             header.appendChild(labelImg);
 
             const label = document.createElement("span");
-            label.textContent = toTitleCase(_(this.name));
+            label.textContent = toTitleCase(_(PALETTE_LABEL_KEYS[this.name] || this.name));
             label.style.fontWeight = "bold";
             label.style.color = platformColor.textColor;
             header.appendChild(label);
