@@ -1786,19 +1786,7 @@ class Logo {
 
         const tur = this.activity.turtles.ithTurtle(turtle);
 
-        if (Object.keys) {
-            if (Object.keys(tur.singer.embeddedGraphics).length === 0) return;
-        } else {
-            const isEmpty = true;
-            for (const key in tur.singer.embeddedGraphics) {
-                if (tur.singer.embeddedGraphics.hasOwnProperty(key)) {
-                    isEmpty = false;
-                    break;
-                }
-            }
-
-            if (isEmpty) return;
-        }
+        if (Object.keys(tur.singer.embeddedGraphics).length === 0) return;
 
         if (!(blk in tur.singer.embeddedGraphics)) return;
 
@@ -2337,7 +2325,7 @@ class Logo {
                     break;
 
                 case "clear":
-                    __clear(turtle, waitTime);
+                    __clear();
                     break;
 
                 case "fill":

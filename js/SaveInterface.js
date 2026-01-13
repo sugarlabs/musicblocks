@@ -569,18 +569,6 @@ class SaveInterface {
         // Check if we have buffered notation data (Issue #2330)
         // If so, use it directly; otherwise run the program
         if (activity.logo.recordingBuffer.hasData) {
-            // Restore buffered data temporarily for save operation
-            const savedNotationOutput = activity.logo.notationOutput;
-            const savedNotationNotes = activity.logo.notationNotes;
-            const savedNotationStaging = {};
-            const savedNotationDrumStaging = {};
-
-            // Save current state
-            for (let t = 0; t < activity.turtles.getTurtleCount(); t++) {
-                savedNotationStaging[t] = activity.logo.notation.notationStaging[t];
-                savedNotationDrumStaging[t] = activity.logo.notation.notationDrumStaging[t];
-            }
-
             // Load buffered data
             activity.logo.notationOutput = activity.logo.recordingBuffer.notationOutput;
             activity.logo.notationNotes = activity.logo.recordingBuffer.notationNotes;
