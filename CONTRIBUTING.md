@@ -167,7 +167,7 @@ docs](https://developer.mozilla.org/en-US/docs/Web/JavaScript).
 any satisfactory answer, then ask it in a comment. If it is a general
 question about Music Blocks, please use the new
 [discussions](https://github.com/sugarlabs/musicblocks/discussions)
-tab on top the the repository, or the _Sugar-dev Devel
+tab at the top of the repository, or the _Sugar-dev Devel
 <[sugar-devel@lists.sugarlabs.org](mailto:sugar-devel@lists.sugarlabs.org)>_
 mailing list. Don't ask silly questions (unless you don't know it is
 silly ;p) before searching it on the web.
