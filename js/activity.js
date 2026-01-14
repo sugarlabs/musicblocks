@@ -3494,10 +3494,25 @@ class Activity {
                                 item.label.toLowerCase().indexOf(term) !== -1
                             );
                         });
-                        response(results);
+                        if (results.length === 0 && term.length > 0) {
+                            response([
+                                {
+                                    label: _("No blocks found"),
+                                    value: "",
+                                    artwork: "",
+                                    disabled: true
+                                }
+                            ]);
+                        } else {
+                            response(results);
+                        }
                     },
                     appendTo: "body",
                     select: (event, ui) => {
+                        if (ui.item.disabled) {
+                            event.preventDefault();
+                            return false;
+                        }
                         event.preventDefault();
                         that.searchWidget.value = ui.item.label;
                         that.searchWidget.idInput_custom = ui.item.value;
@@ -3513,6 +3528,18 @@ class Activity {
                 const instance = $search.autocomplete("instance");
                 if (instance) {
                     instance._renderItem = (ul, item) => {
+                        if (item.disabled) {
+                            return $j("<li class='ui-autocomplete-no-results'></li>")
+                                .text(item.label)
+                                .appendTo(
+                                    ul.css({
+                                        "z-index": 35000,
+                                        "max-height": "200px",
+                                        "overflow-y": "auto"
+                                    })
+                                );
+                        }
+
                         const li = $j("<li></li>");
 
                         const img = document.createElement("img");
