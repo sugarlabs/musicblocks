@@ -48,6 +48,11 @@ class Oscilloscope {
         this.activity = activity;
         this.pitchAnalysers = {};
         this.playingNow = false;
+
+        // requestAnimationFrame loop control (prevents spinning when idle/closed)
+        this._running = false;
+        this._rafId = null;
+
         if (this.drawVisualIDs) {
             for (const id of Object.keys(this.drawVisualIDs)) {
                 cancelAnimationFrame(this.drawVisualIDs[id]);
@@ -61,13 +66,7 @@ class Oscilloscope {
         widgetWindow.show();
 
         widgetWindow.onclose = () => {
-            for (const turtle of this.divisions) {
-                const turtleIdx = this.activity.turtles.getIndexOfTurtle(turtle);
-                cancelAnimationFrame(this.drawVisualIDs[turtleIdx]);
-            }
-
-            this.pitchAnalysers = {};
-            widgetWindow.destroy();
+            this.close();
         };
         widgetWindow.onmaximize = this._scale.bind(this);
 
@@ -111,6 +110,44 @@ class Oscilloscope {
             // console.debug("oscilloscope running");
         }
     }
+
+    _cancelAnimationFrameLoop = () => {
+        this._running = false;
+
+        if (this._rafId) {
+            if (typeof this._rafId === "number") {
+                cancelAnimationFrame(this._rafId);
+            } else {
+                for (const key of Object.keys(this._rafId)) {
+                    cancelAnimationFrame(this._rafId[key]);
+                }
+            }
+            this._rafId = null;
+        }
+
+        if (this.drawVisualIDs) {
+            for (const key of Object.keys(this.drawVisualIDs)) {
+                cancelAnimationFrame(this.drawVisualIDs[key]);
+            }
+            this.drawVisualIDs = {};
+        }
+    };
+
+    start = () => {
+        if (this._running) return;
+        this._running = true;
+        this._scale();
+    };
+
+    stop = () => {
+        this._cancelAnimationFrameLoop();
+    };
+
+    close = () => {
+        this._cancelAnimationFrameLoop();
+        this.pitchAnalysers = {};
+        this.widgetWindow.destroy();
+    };
     /**
      * Reconnects synths to analyser.
      *
@@ -147,7 +184,22 @@ class Oscilloscope {
         canvasCtx.clearRect(0, 0, width, height);
 
         const draw = () => {
-            this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
+            if (!this._running) return;
+
+            const canDraw = this.pitchAnalysers[turtleIdx] && (turtle.running || resized);
+            if (!canDraw) {
+                // Stop the loop when nothing is being drawn (e.g., playback stopped)
+                if (this._rafId && typeof this._rafId !== "number" && this._rafId[turtleIdx]) {
+                    cancelAnimationFrame(this._rafId[turtleIdx]);
+                    delete this._rafId[turtleIdx];
+                }
+                if (this.drawVisualIDs && this.drawVisualIDs[turtleIdx]) {
+                    cancelAnimationFrame(this.drawVisualIDs[turtleIdx]);
+                    delete this.drawVisualIDs[turtleIdx];
+                }
+                return;
+            }
+
             if (this.pitchAnalysers[turtleIdx] && (turtle.running || resized)) {
                 canvasCtx.fillStyle = "#FFFFFF";
                 const dataArray = this.pitchAnalysers[turtleIdx].getValue();
@@ -172,8 +224,21 @@ class Oscilloscope {
                 canvasCtx.lineTo(canvas.width, canvas.height / 2);
                 canvasCtx.stroke();
             }
+
+            // Only use the resize flag for a single frame.
+            resized = false;
+
+            if (!this._running) return;
+            if (!this._rafId) this._rafId = {};
+            this._rafId[turtleIdx] = requestAnimationFrame(draw);
+            this.drawVisualIDs[turtleIdx] = this._rafId[turtleIdx];
         };
-        draw();
+
+        // Start the animation loop
+        this._running = true;
+        if (!this._rafId) this._rafId = {};
+        this._rafId[turtleIdx] = requestAnimationFrame(draw);
+        this.drawVisualIDs[turtleIdx] = this._rafId[turtleIdx];
     };
     /**
      * @private
