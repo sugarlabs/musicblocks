@@ -278,6 +278,42 @@
                     <!-- <button id="submitPDF"></button></p> -->
                 </div>
             </dialog>
+
+            <dialog id="versionControlModal" class="modal version-control-modal" tabindex="-1">
+                <!-- Modal content for Version Control -->
+                <div class="modal-content" tabindex="-1">
+                    <span class="close">&times;</span>
+                    <h4 class="version-control-title">
+                        <i class="material-icons">history</i>
+                        <span>Version History</span>
+                    </h4>
+                    
+                    <!-- Save new version section -->
+                    <div id="saveVersionSection" class="save-version-section">
+                        <div class="input-field">
+                            <input type="text" id="versionDescription" placeholder="Enter a description for this version..." maxlength="100">
+                        </div>
+                        <button id="saveVersionBtn" class="btn waves-effect waves-light blue">
+                            <i class="material-icons left">save</i>
+                            Save Version
+                        </button>
+                    </div>
+                    
+                    <!-- Version list -->
+                    <div id="versionListContainer">
+                        <div class="version-list-header">
+                            <span>Saved Versions</span>
+                            <button id="clearAllVersionsBtn" class="btn-small waves-effect waves-light red" title="Delete all versions">
+                                <i class="material-icons">delete_sweep</i>
+                            </button>
+                        </div>
+                        <div id="versionList" class="version-list">
+                            <!-- Version items will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+            </dialog>
+
             <div class="materialize-iso" tabindex="-1">
                 <nav id="toolbars" class="nav-wrapper">
                 <div class="blue nav-wrapper" tabindex="-1">
@@ -407,6 +443,10 @@
                                 <li>
                                     <a id="toggleJavaScriptIcon" class="tooltipped" data-position="bottom"><i
                                             class="material-icons md-48">code</i></a>
+                                </li>
+                                <li>
+                                    <a id="versionControlIcon" class="tooltipped" data-position="bottom" data-tooltip="Version History"><i
+                                            class="material-icons md-48">history</i></a>
                                 </li>
                                 <li class="filler" id="aligns_merge_under_load"
                                     style="user-select: none; visibility: hidden;">
