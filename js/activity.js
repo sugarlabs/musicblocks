@@ -54,6 +54,10 @@ const _THIS_IS_TURTLE_BLOCKS_ = !_THIS_IS_MUSIC_BLOCKS_;
 const _ERRORMSGTIMEOUT_ = 15000;
 const _MSGTIMEOUT_ = 60000;
 
+// Responsive breakpoint constants
+const RESPONSIVE_BREAKPOINT_TABLET = 768;
+const RESPONSIVE_BREAKPOINT_MOBILE = 600;
+
 let MYDEFINES = [
     "utils/platformstyle",
     "easeljs.min",
@@ -765,14 +769,20 @@ class Activity {
                     };
                 }
 
-                if (canvasWidth < 768 && !referenceBlock.beforeMobilePosition) {
+                if (
+                    canvasWidth < RESPONSIVE_BREAKPOINT_TABLET &&
+                    !referenceBlock.beforeMobilePosition
+                ) {
                     referenceBlock.beforeMobilePosition = {
                         x: referenceBlock.container.x,
                         y: referenceBlock.container.y
                     };
                 }
 
-                if (canvasWidth >= 768 && referenceBlock.beforeMobilePosition) {
+                if (
+                    canvasWidth >= RESPONSIVE_BREAKPOINT_TABLET &&
+                    referenceBlock.beforeMobilePosition
+                ) {
                     const dx = referenceBlock.beforeMobilePosition.x - referenceBlock.container.x;
                     const dy = referenceBlock.beforeMobilePosition.y - referenceBlock.container.y;
                     group.forEach(blockId => {
@@ -784,14 +794,20 @@ class Activity {
                     //this prevents old groups from affecting new calculations.
                 }
 
-                if (canvasWidth < 600 && !referenceBlock.before600pxPosition) {
+                if (
+                    canvasWidth < RESPONSIVE_BREAKPOINT_MOBILE &&
+                    !referenceBlock.before600pxPosition
+                ) {
                     referenceBlock.before600pxPosition = {
                         x: referenceBlock.container.x,
                         y: referenceBlock.container.y
                     };
                 }
 
-                if (canvasWidth >= 600 && referenceBlock.before600pxPosition) {
+                if (
+                    canvasWidth >= RESPONSIVE_BREAKPOINT_MOBILE &&
+                    referenceBlock.before600pxPosition
+                ) {
                     const dx = referenceBlock.before600pxPosition.x - referenceBlock.container.x;
                     const dy = referenceBlock.before600pxPosition.y - referenceBlock.container.y;
 
@@ -855,7 +871,7 @@ class Activity {
             this.blocksContainer.y = 0;
 
             const screenWidth = window.innerWidth;
-            const isNarrowScreen = screenWidth < 600;
+            const isNarrowScreen = screenWidth < RESPONSIVE_BREAKPOINT_MOBILE;
             const minColumnWidth = 400;
             const numColumns = isNarrowScreen ? 1 : Math.floor(screenWidth / minColumnWidth);
 
@@ -1443,8 +1459,8 @@ class Activity {
 
             const importConfirm = document.createElement("button");
             importConfirm.classList.add("confirm-button");
-            importConfirm.textContent = "Confirm";
-            this.addEventListener(importConfirm, "click", () => {
+            importConfirm.textContent = _("Confirm");
+            importConfirm.addEventListener("click", () => {
                 const maxNoteBlocks = select.value;
                 transcribeMidi(midi, maxNoteBlocks);
                 document.body.removeChild(modal);
@@ -1453,8 +1469,8 @@ class Activity {
 
             const cancelBtn = document.createElement("button");
             cancelBtn.classList.add("cancel-button");
-            cancelBtn.textContent = "Cancel";
-            this.addEventListener(cancelBtn, "click", () => {
+            cancelBtn.textContent = _("Cancel");
+            cancelBtn.addEventListener("click", () => {
                 document.body.removeChild(modal);
             });
             modal.appendChild(cancelBtn);
@@ -1486,7 +1502,7 @@ class Activity {
 
             const confirmBtn = document.createElement("button");
             confirmBtn.classList.add("confirm-button");
-            confirmBtn.textContent = "Confirm";
+            confirmBtn.textContent = _("Confirm");
             confirmBtn.style.backgroundColor = platformColor.blueButton;
             confirmBtn.style.color = "white";
             confirmBtn.style.border = "none";
@@ -1502,7 +1518,7 @@ class Activity {
 
             const cancelBtn = document.createElement("button");
             cancelBtn.classList.add("cancel-button");
-            cancelBtn.textContent = "Cancel";
+            cancelBtn.textContent = _("Cancel");
             cancelBtn.style.backgroundColor = "#f1f1f1";
             cancelBtn.style.color = "black";
             cancelBtn.style.border = "none";
@@ -2436,7 +2452,7 @@ class Activity {
                                 that.blocksContainer.y -= deltaY;
                             }
 
-                            if (deltaX !== 0) {
+                            if (that.scrollBlockContainer && deltaX !== 0) {
                                 closeAnyOpenMenusAndLabels();
                                 that.blocksContainer.x -= deltaX;
                             }
@@ -2472,18 +2488,18 @@ class Activity {
                 if (event.ctrlKey) {
                     event.preventDefault();
                     delY < 0 ? doLargerBlocks(that) : doSmallerBlocks(that);
-                } else if (delY !== 0 && event.axis === event.VERTICAL_AXIS) {
-                    closeAnyOpenMenusAndLabels();
-                    that.blocksContainer.y -= delY;
-                } else if (
-                    that.scrollBlockContainer &&
-                    delX !== 0 &&
-                    event.axis === event.HORIZONTAL_AXIS
-                ) {
-                    closeAnyOpenMenusAndLabels();
-                    that.blocksContainer.x -= delX;
                 } else {
-                    event.preventDefault();
+                    closeAnyOpenMenusAndLabels();
+                    if (that.scrollBlockContainer) {
+                        // Horizontal scrolling enabled (Advanced)
+                        if (delY !== 0) that.blocksContainer.y -= delY;
+                        if (delX !== 0) that.blocksContainer.x -= delX;
+                    } else {
+                        // Vertical scrolling only (Beginner / Default)
+                        if (event.axis === event.VERTICAL_AXIS && delY !== 0) {
+                            that.blocksContainer.y -= delY;
+                        }
+                    }
                 }
 
                 that.refreshCanvas();
@@ -4129,7 +4145,8 @@ class Activity {
             // function to increase or decrease the "top" property of the top-right corner buttons
 
             const topRightButtons = document.querySelectorAll("#buttoncontainerTOP .tooltipped");
-            const btnY = document.getElementById("Grid").getBoundingClientRect().top;
+            const gridElement = document.getElementById("Grid");
+            const btnY = gridElement ? gridElement.getBoundingClientRect().top : 70 + LEADING + 6;
 
             this.changeTopButtonsPosition = value => {
                 topRightButtons.forEach(child => {

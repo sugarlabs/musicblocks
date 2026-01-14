@@ -1480,7 +1480,7 @@ class Logo {
                     logo.blockList[blk].protoblock.dockTypes[0]
                 )
             ) {
-                args.push(logo.parseArg(logo, turtle, blk, logo.receievedArg));
+                args.push(logo.parseArg(logo, turtle, blk, logo.receivedArg));
 
                 // Use label prefix for screen dimension blocks to clarify the display is informational
                 // Labels wrapped with _() for internationalization
