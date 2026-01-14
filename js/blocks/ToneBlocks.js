@@ -484,7 +484,11 @@ function setupToneBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Tremolo block adds a wavering effect."),
+                _(
+                    "The Tremolo block adds a wavering effect. " +
+                    "Rate controls oscillation speed (Hz). " +
+                    "Depth sets intensity (0-100%)."
+                ),
                 "documentation",
                 null,
                 "tremolohelp"
@@ -630,7 +634,11 @@ function setupToneBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Chorus block adds a chorus effect."),
+                _(
+                    "The Chorus block creates a richer sound. " +
+                    "Rate sets LFO speed. Delay is time offset (ms). " +
+                    "Depth controls modulation (0-100%)."
+                ),
                 "documentation",
                 null,
                 "chorushelp"
@@ -689,7 +697,11 @@ function setupToneBlocks(activity) {
             this.beginnerBlock(true);
 
             this.setHelpString([
-                _("The Vibrato block adds a rapid, slight variation in pitch."),
+                _(
+                    "The Vibrato block adds a rapid pitch variation. " +
+                    "Intensity sets how much the pitch varies. " +
+                    "Rate controls oscillation speed."
+                ),
                 "documentation",
                 null,
                 "vibratohelp"
