@@ -48,7 +48,6 @@ class Oscilloscope {
 
         // RAF lifecycle state
         this._running = false;
-        this._rafId = null;
         this.drawVisualIDs = {};
 
         const widgetWindow = window.widgetWindows.windowFor(this, "oscilloscope");
@@ -94,13 +93,11 @@ class Oscilloscope {
     close() {
         this._running = false;
 
-        if (this._rafId !== null) {
-            cancelAnimationFrame(this._rafId);
-            this._rafId = null;
-        }
-
+        // Cancel all turtle animation frames
         for (const id in this.drawVisualIDs) {
-            cancelAnimationFrame(this.drawVisualIDs[id]);
+            if (this.drawVisualIDs[id] !== null) {
+                cancelAnimationFrame(this.drawVisualIDs[id]);
+            }
         }
 
         this.drawVisualIDs = {};
@@ -137,8 +134,10 @@ class Oscilloscope {
             const canDraw = (this.pitchAnalysers[turtleIdx] && turtle.running) || resizedOnce;
 
             if (!canDraw) {
-                this._running = false;
                 this.drawVisualIDs[turtleIdx] = null;
+
+                // Check if any turtle is still running
+                this._running = Object.values(this.drawVisualIDs).some(id => id !== null);
                 return;
             }
 
@@ -167,8 +166,7 @@ class Oscilloscope {
             canvasCtx.lineTo(canvas.width, canvas.height / 2);
             canvasCtx.stroke();
 
-            this._rafId = requestAnimationFrame(draw);
-            this.drawVisualIDs[turtleIdx] = this._rafId;
+            this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
         };
 
         draw();
