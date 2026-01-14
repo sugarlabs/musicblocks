@@ -410,6 +410,9 @@ class Toolbar {
             isPlayIconRunning = false;
             onclick(this.activity);
             handleClick();
+            // Enable stop button when play starts
+            stopIcon.disabled = false;
+            stopIcon.className = "";
             stopIcon.style.color = this.stopIconColorWhenPlaying;
             saveButton.disabled = true;
             saveButtonAdvanced.disabled = true;
@@ -440,9 +443,15 @@ class Toolbar {
     renderStopIcon(onclick) {
         const stopIcon = docById("stop");
         const recordButton = docById("record");
+        // Disable stop button on load - nothing is playing yet
+        stopIcon.disabled = true;
+        stopIcon.className = "grey-text inactiveLink";
         stopIcon.onclick = () => {
             onclick(this.activity);
             stopIcon.style.color = "white";
+            // Disable stop button after stopping
+            stopIcon.disabled = true;
+            stopIcon.className = "grey-text inactiveLink";
             saveButton.disabled = false;
             saveButtonAdvanced.disabled = false;
             saveButton.className = "";
