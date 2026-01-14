@@ -68,14 +68,18 @@ class Oscilloscope {
 
         const zoomInButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, _("Zoom In"));
         zoomInButton.onclick = () => (this.zoomFactor *= step);
-        zoomInButton.children[0].src = `data:image/svg+xml;base64,${window.btoa(base64Encode(BIGGERBUTTON))}`;
+        zoomInButton.children[0].src = `data:image/svg+xml;base64,${window.btoa(
+            base64Encode(BIGGERBUTTON)
+        )}`;
 
         const zoomOutButton = widgetWindow.addButton("", Oscilloscope.ICONSIZE, _("Zoom Out"));
         zoomOutButton.onclick = () => {
             this.zoomFactor /= step;
             if (this.zoomFactor < 1) this.zoomFactor = 1;
         };
-        zoomOutButton.children[0].src = `data:image/svg+xml;base64,${window.btoa(base64Encode(SMALLERBUTTON))}`;
+        zoomOutButton.children[0].src = `data:image/svg+xml;base64,${window.btoa(
+            base64Encode(SMALLERBUTTON)
+        )}`;
 
         widgetWindow.sendToCenter();
 
@@ -130,7 +134,7 @@ class Oscilloscope {
         let resizedOnce = resized;
 
         const draw = () => {
-            const canDraw = this.pitchAnalysers[turtleIdx] && turtle.running || resizedOnce;
+            const canDraw = (this.pitchAnalysers[turtleIdx] && turtle.running) || resizedOnce;
 
             if (!canDraw) {
                 this._running = false;
