@@ -53,12 +53,7 @@ class Oscilloscope {
         this._running = false;
         this._rafId = null;
 
-        if (this.drawVisualIDs) {
-            for (const id of Object.keys(this.drawVisualIDs)) {
-                cancelAnimationFrame(this.drawVisualIDs[id]);
-            }
-        }
-
+        // Per-turtle requestAnimationFrame ids
         this.drawVisualIDs = {};
         const widgetWindow = window.widgetWindows.windowFor(this, "oscilloscope");
         this.widgetWindow = widgetWindow;
@@ -183,10 +178,13 @@ class Oscilloscope {
         const canvasCtx = canvas.getContext("2d");
         canvasCtx.clearRect(0, 0, width, height);
 
+        // Use the resize flag for a single frame.
+        let resizedOnce = resized;
+
         const draw = () => {
             if (!this._running) return;
 
-            const canDraw = this.pitchAnalysers[turtleIdx] && (turtle.running || resized);
+            const canDraw = this.pitchAnalysers[turtleIdx] && (turtle.running || resizedOnce);
             if (!canDraw) {
                 // Stop the loop when nothing is being drawn (e.g., playback stopped)
                 if (this._rafId && typeof this._rafId !== "number" && this._rafId[turtleIdx]) {
@@ -200,33 +198,30 @@ class Oscilloscope {
                 return;
             }
 
-            if (this.pitchAnalysers[turtleIdx] && (turtle.running || resized)) {
-                canvasCtx.fillStyle = "#FFFFFF";
-                const dataArray = this.pitchAnalysers[turtleIdx].getValue();
-                const bufferLength = dataArray.length;
-                canvasCtx.fillRect(0, 0, width, height);
-                canvasCtx.lineWidth = 2;
-                const rbga = turtle.painter._canvasColor;
-                canvasCtx.strokeStyle = rbga;
-                canvasCtx.beginPath();
-                const sliceWidth = (width * this.zoomFactor) / bufferLength;
-                let x = 0;
+            canvasCtx.fillStyle = "#FFFFFF";
+            const dataArray = this.pitchAnalysers[turtleIdx].getValue();
+            const bufferLength = dataArray.length;
+            canvasCtx.fillRect(0, 0, width, height);
+            canvasCtx.lineWidth = 2;
+            const rbga = turtle.painter._canvasColor;
+            canvasCtx.strokeStyle = rbga;
+            canvasCtx.beginPath();
+            const sliceWidth = (width * this.zoomFactor) / bufferLength;
+            let x = 0;
 
-                for (let i = 0; i < bufferLength; i++) {
-                    const y = (height / 2) * (1 - dataArray[i]) + this.verticalOffset;
-                    if (i === 0) {
-                        canvasCtx.moveTo(x, y);
-                    } else {
-                        canvasCtx.lineTo(x, y);
-                    }
-                    x += sliceWidth;
+            for (let i = 0; i < bufferLength; i++) {
+                const y = (height / 2) * (1 - dataArray[i]) + this.verticalOffset;
+                if (i === 0) {
+                    canvasCtx.moveTo(x, y);
+                } else {
+                    canvasCtx.lineTo(x, y);
                 }
-                canvasCtx.lineTo(canvas.width, canvas.height / 2);
-                canvasCtx.stroke();
+                x += sliceWidth;
             }
+            canvasCtx.lineTo(canvas.width, canvas.height / 2);
+            canvasCtx.stroke();
 
-            // Only use the resize flag for a single frame.
-            resized = false;
+            resizedOnce = false;
 
             if (!this._running) return;
             if (!this._rafId) this._rafId = {};
