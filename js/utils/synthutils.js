@@ -3361,11 +3361,11 @@ function Synth() {
     this.createCentsSlider = function () {
         const widgetBody = this.widgetWindow.getWidgetBody();
 
-        // Store the current content to restore later
-        this.previousContent = widgetBody.innerHTML;
-
-        // Clear the widget body
-        widgetBody.innerHTML = "";
+        // Store the current DOM nodes to restore later (preserves event listeners)
+        this.previousElements = [];
+        while (widgetBody.firstChild) {
+            this.previousElements.push(widgetBody.removeChild(widgetBody.firstChild));
+        }
 
         // Create the cents adjustment interface
         const centsInterface = document.createElement("div");
@@ -3495,9 +3495,14 @@ function Synth() {
      */
     this.removeCentsSlider = function () {
         if (this.sliderDiv && this.sliderDiv.parentNode) {
-            // Restore the previous content
-            this.widgetWindow.getWidgetBody().innerHTML = this.previousContent;
-            this.previousContent = null;
+            const widgetBody = this.widgetWindow.getWidgetBody();
+            // Remove the cents slider
+            widgetBody.innerHTML = "";
+            // Restore the previous DOM nodes (preserves event listeners)
+            if (this.previousElements && this.previousElements.length > 0) {
+                this.previousElements.forEach((el) => widgetBody.appendChild(el));
+                this.previousElements = null;
+            }
         }
         this.sliderVisible = false;
         this.centsSliderBtn.getElementsByTagName("img")[0].style.filter = "";
