@@ -73,7 +73,7 @@ class HelpWidget {
         // Which help page are we on?
 
         this._helpDiv.style.width = 100 + "%";
-        this._helpDiv.style.backgroundColor = "#e8e8e8";
+        // this._helpDiv.style.backgroundColor = "#e8e8e8";
 
         // this._helpDiv.style.maxHeight = "100%";
         // this._helpDiv.style.overflowY = "auto";
@@ -453,7 +453,7 @@ class HelpWidget {
 
         //this._helpDiv.style.width = "500px";
         this._helpDiv.style.height = "70vh";
-        this._helpDiv.style.backgroundColor = "#e8e8e8";
+        // this._helpDiv.style.backgroundColor = "#e8e8e8";
 
         const helpDivHTML =
             '<div id="right-arrow" class="hover" tabindex="-1"></div><div id="left-arrow" class="hover" tabindex="-1"></div><div id="helpButtonsDiv" tabindex="-1"></div><div id="helpBodyDiv" tabindex="-1"></div>';
@@ -536,7 +536,7 @@ class HelpWidget {
 
             const helpBody = docById("helpBodyDiv");
             helpBody.style.height = "70vh";
-            helpBody.style.backgroundColor = "#e8e8e8";
+            // helpBody.style.backgroundColor = "#e8e8e8";
             if (message) {
                 let body = "";
                 if (message.length > 1) {
