@@ -17,7 +17,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-const { initBasicProtoBlocks, BACKWARDCOMPATIBILIYDICT } = require("../basicblocks");
+const { initBasicProtoBlocks, BACKWARDCOMPATIBILITYDICT } = require("../basicblocks");
 
 const mockActivity = {
     blocks: {
@@ -92,15 +92,15 @@ describe("initBasicProtoBlocks", () => {
     });
 });
 
-describe("BACKWARDCOMPATIBILIYDICT", () => {
+describe("BACKWARDCOMPATIBILITYDICT", () => {
     it("should be defined and not empty", () => {
-        expect(BACKWARDCOMPATIBILIYDICT).toBeDefined();
-        expect(Object.keys(BACKWARDCOMPATIBILIYDICT).length).toBeGreaterThan(0);
+        expect(BACKWARDCOMPATIBILITYDICT).toBeDefined();
+        expect(Object.keys(BACKWARDCOMPATIBILITYDICT).length).toBeGreaterThan(0);
     });
 
     it("should correctly map old block names to new block names", () => {
-        expect(BACKWARDCOMPATIBILIYDICT.fullscreen).toBe("vspace");
-        expect(BACKWARDCOMPATIBILIYDICT.seth).toBe("setheading");
-        expect(BACKWARDCOMPATIBILIYDICT.random2).toBe("random");
+        expect(BACKWARDCOMPATIBILITYDICT.fullscreen).toBe("vspace");
+        expect(BACKWARDCOMPATIBILITYDICT.seth).toBe("setheading");
+        expect(BACKWARDCOMPATIBILITYDICT.random2).toBe("random");
     });
 });
