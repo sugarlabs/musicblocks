@@ -305,14 +305,14 @@ function SampleWidget() {
      * @returns {void}
      */
     this.__save = function () {
-        var that = this;
+        const that = this;
         setTimeout(function () {
             that._addSample();
 
             // Include the cent adjustment value in the sample block
             const centAdjustment = that.centAdjustmentValue || 0;
 
-            var newStack = [
+            const newStack = [
                 [0, "settimbre", 100, 100, [null, 1, null, 5]],
                 [
                     1,
@@ -493,10 +493,16 @@ function SampleWidget() {
             }
 
             docById("wheelDivptm").style.display = "none";
-            if (!this.pitchWheel === undefined) {
+            if (this._pitchWheel !== undefined) {
                 this._pitchWheel.removeWheel();
+            }
+            if (this._exitWheel !== undefined) {
                 this._exitWheel.removeWheel();
+            }
+            if (this._accidentalsWheel !== undefined) {
                 this._accidentalsWheel.removeWheel();
+            }
+            if (this._octavesWheel !== undefined) {
                 this._octavesWheel.removeWheel();
             }
             this.pitchAnalysers = {};
