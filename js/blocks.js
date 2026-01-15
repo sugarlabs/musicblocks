@@ -448,6 +448,7 @@ class Blocks {
          * @returns {void}
          */
         this.adjustExpandableClampBlock = () => {
+            if(this._isUndoingMove) return;
             if (this.clampBlocksToCheck.length === 0) {
                 return;
             }
@@ -631,6 +632,7 @@ class Blocks {
          * @returns void
          */
         this._addRemoveVspaceBlock = (blk) => {
+            if (this._isUndoingMove && !this._isRebuildingLayout) return;
             const myBlock = this.blockList[blk];
 
             const c = myBlock.connections[myBlock.connections.length - 2];
@@ -997,6 +999,7 @@ class Blocks {
             if (parentblk == null) {
                 return;
             }
+            if (this._isUndoingMove) return;
 
             let cblk;
             const that = this;
@@ -1325,6 +1328,7 @@ class Blocks {
             if (thisBlock == undefined) {
                 return;
             }
+            if (this._isUndoingMove) return;
 
             let thisBlockobj = this.blockList[thisBlock];
 
@@ -1390,6 +1394,7 @@ class Blocks {
          * @returns {void}
          */
         this.deletePreviousDefault = (thisBlock) => {
+            if (this._isUndoingMove) return;
             let thisBlockobj = this.blockList[thisBlock];
 
             // Do not remove the silence block if only a vspace block is inserted after the silence block.
@@ -4527,32 +4532,27 @@ class Blocks {
          * @public
          * @returns expandable block
          */
-        this.insideExpandableBlock = (blk) => {
+        this.insideExpandableBlock = (blk, visited = new Set()) => {
             if (this.blockList[blk] == null) {
                 /** race condition? */
                 // eslint-disable-next-line no-console
                 console.debug("null block in blockList? " + blk);
                 return null;
-            } else if (this.blockList[blk].connections[0] == null) {
+            } 
+            if (visited.has(blk)) return null;
+            visited.add(blk);
+
+            const block = this.blockList[blk];
+            if(!block || !block.connections || block.connections[0] == null){
                 return null;
-            } else {
-                const cblk = this.blockList[blk].connections[0];
-                if (this.blockList[cblk].isExpandableBlock()) {
-                    /** If it is the last connection, keep searching. */
-                    if (
-                        this.blockList[cblk].isArgFlowClampBlock() ||
-                        this.blockList[cblk].isLeftClampBlock()
-                    ) {
-                        return cblk;
-                    } else if (blk === last(this.blockList[cblk].connections)) {
-                        return this.insideExpandableBlock(cblk);
-                    } else {
-                        return cblk;
-                    }
-                } else {
-                    return this.insideExpandableBlock(cblk);
-                }
             }
+
+            const parent = block.connections[0];
+            if(this.blockList[parent]?.isExpandableBlock?.()){
+                return parent;
+            }
+
+            return this.insideExpandableBlock(parent, visited);
         };
 
         /**
@@ -4562,6 +4562,7 @@ class Blocks {
          * @returns note block
          */
         this._insideNoteBlock = (blk) => {
+            if (this._isUndoingMove) return;
             if (this.blockList[blk] == null) {
                 // eslint-disable-next-line no-console
                 console.debug("null block in blockList? " + blk);

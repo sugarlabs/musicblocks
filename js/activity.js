@@ -255,222 +255,160 @@ class MoveBlockCommand {
 
   _restoreState(positions, connections, argSlots) {
     this.blocks._isUndoingMove = true;
+    this.blocks._isRebuildingLayout = false;
+    try {
+      // First, restore positions
+      for (const index of this.blockIndices) {
+        const blk = this.blocks.blockList[index];
+        const pos = positions.get(index);
 
-    // First, restore positions
-    for (const index of this.blockIndices) {
-      const blk = this.blocks.blockList[index];
-      const pos = positions.get(index);
-
-      if (!blk || blk.trash || !blk.container || !pos) continue;
-      blk.container.x = pos.x;
-      blk.container.y = pos.y;
-    }
-
-    // First disconnect current connections to avoid conflicts
-    for (const index of this.blockIndices) {
-      const blk = this.blocks.blockList[index];
-      if (!blk || blk.trash) continue;
-      
-      // Disconnect from current parent
-      const currentParent = blk.connections[0];
-      if (currentParent != null && currentParent >= 0 && currentParent < this.blocks.blockList.length) {
-        const parentBlk = this.blocks.blockList[currentParent];
-        if (parentBlk && !parentBlk.trash && Array.isArray(parentBlk.connections)) {
-          for (let i = 1; i < parentBlk.connections.length; i++) {
-            if (parentBlk.connections[i] === index) {
-              parentBlk.connections[i] = null;
-              break;
-            }
-          }
-        }
+        if (!blk || blk.trash || !blk.container || !pos) continue;
+        blk.container.x = pos.x;
+        blk.container.y = pos.y;
       }
-      
-      // Disconnect from current children
-      if (Array.isArray(blk.connections)) {
-        for (let i = 1; i < blk.connections.length; i++) {
-          const childIndex = blk.connections[i];
-          if (childIndex != null && childIndex >= 0 && childIndex < this.blocks.blockList.length) {
-            const childBlk = this.blocks.blockList[childIndex];
-            if (childBlk && !childBlk.trash && childBlk.connections[0] === index) {
-              childBlk.connections[0] = null;
-            }
-          }
-        }
-      }
-    }
 
-    // Now restore connections arrays
-    for (const index of this.blockIndices) {
-      const blk = this.blocks.blockList[index];
-      const conn = connections.get(index);
-      if (!blk || blk.trash || !conn || !Array.isArray(conn)) continue;
-      blk.connections = [...conn];
-    }
+      // First disconnect current connections to avoid conflicts
+      for (const index of this.blockIndices) {
+        const blk = this.blocks.blockList[index];
+        if (!blk || blk.trash) continue;
 
-    // Restore bidirectional connections
-    const blocksToAdjustDocks = new Set();
-    const clampBlocksToCheck = new Set();
-    
-    for (const index of this.blockIndices){
-      const blk = this.blocks.blockList[index];
-      if (!blk || blk.trash || !Array.isArray(blk.connections)) continue;
-
-      const oldConn = connections.get(index);
-      if (!oldConn) continue;
-      
-      // Restore parent connection (bidirectional)
-      const parent = oldConn[0];
-      if (parent != null && parent >= 0 && parent < this.blocks.blockList.length) {
-        const parentBlk = this.blocks.blockList[parent];
-        if (parentBlk && !parentBlk.trash && Array.isArray(parentBlk.connections)) {
-          // Find which dock index in parent's old connections pointed to this block
-          // We need to check the parent's old connections if it was also moved
-          const oldParentConn = connections.get(parent);
-          let connectionRestored = false;
-          
-          if (oldParentConn && Array.isArray(oldParentConn)) {
-            // Parent was also moved, use its old connections to find the right dock index
-            for (let i = 1; i < oldParentConn.length; i++) {
-              if (oldParentConn[i] === index) {
-                parentBlk.connections[i] = index;
-                blocksToAdjustDocks.add(parent);
-                // If parent is an expandable/clamp block, add it to clampBlocksToCheck
-                if ((typeof parentBlk.isClampBlock === 'function' && parentBlk.isClampBlock()) || 
-                    (typeof parentBlk.isExpandableBlock === 'function' && parentBlk.isExpandableBlock())) {
-                  clampBlocksToCheck.add(parent);
-                }
-                connectionRestored = true;
-                break;
-              }
-            }
-          }
-          
-          // If parent wasn't moved or connection not found, search for the right slot
-          if (!connectionRestored) {
-            // Try to find where it should be connected based on connection type
-            // First check if it's already connected (shouldn't happen after disconnect, but safety check)
+        // Disconnect from current parent
+        const currentParent = blk.connections[0];
+        if (currentParent != null && currentParent >= 0 && currentParent < this.blocks.blockList.length) {
+          const parentBlk = this.blocks.blockList[currentParent];
+          if (parentBlk && !parentBlk.trash && Array.isArray(parentBlk.connections)) {
             for (let i = 1; i < parentBlk.connections.length; i++) {
               if (parentBlk.connections[i] === index) {
-                blocksToAdjustDocks.add(parent);
-                // If parent is an expandable/clamp block, add it to clampBlocksToCheck
-                if ((typeof parentBlk.isClampBlock === 'function' && parentBlk.isClampBlock()) || 
-                    (typeof parentBlk.isExpandableBlock === 'function' && parentBlk.isExpandableBlock())) {
-                  clampBlocksToCheck.add(parent);
-                }
-                connectionRestored = true;
+                parentBlk.connections[i] = null;
                 break;
               }
             }
-            
-            // If still not found, find an appropriate empty slot
-            if (!connectionRestored) {
-              for (let i = 1; i < parentBlk.connections.length; i++) {
-                if (parentBlk.connections[i] == null) {
+          }
+        }
+
+        // Disconnect from current children
+        if (Array.isArray(blk.connections)) {
+          for (let i = 1; i < blk.connections.length; i++) {
+            const childIndex = blk.connections[i];
+            if (childIndex != null && childIndex >= 0 && childIndex < this.blocks.blockList.length) {
+              const childBlk = this.blocks.blockList[childIndex];
+              if (childBlk && !childBlk.trash && childBlk.connections[0] === index) {
+                childBlk.connections[0] = null;
+              }
+            }
+          }
+        }
+      }
+
+      // Now restore connections arrays
+      for (const index of this.blockIndices) {
+        const blk = this.blocks.blockList[index];
+        const conn = connections.get(index);
+        if (!blk || blk.trash || !conn || !Array.isArray(conn)) continue;
+        blk.connections = [...conn];
+      }
+
+      // Restore bidirectional connections
+
+      for (const index of this.blockIndices) {
+        const blk = this.blocks.blockList[index];
+        if (!blk || blk.trash || !Array.isArray(blk.connections)) continue;
+
+        const oldConn = connections.get(index);
+        if (!oldConn) continue;
+
+        // Restore parent connection (bidirectional)
+        const parent = oldConn[0];
+        if (parent != null && parent >= 0 && parent < this.blocks.blockList.length) {
+          const parentBlk = this.blocks.blockList[parent];
+          if (parentBlk && !parentBlk.trash && Array.isArray(parentBlk.connections)) {
+            // Find which dock index in parent's old connections pointed to this block
+            // We need to check the parent's old connections if it was also moved
+            const oldParentConn = connections.get(parent);
+            let connectionRestored = false;
+
+            if (oldParentConn && Array.isArray(oldParentConn)) {
+              // Parent was also moved, use its old connections to find the right dock index
+              for (let i = 1; i < oldParentConn.length; i++) {
+                if (oldParentConn[i] === index) {
                   parentBlk.connections[i] = index;
-                  blocksToAdjustDocks.add(parent);
                   // If parent is an expandable/clamp block, add it to clampBlocksToCheck
-                  if (parentBlk.isClampBlock && parentBlk.isClampBlock() || 
-                      parentBlk.isExpandableBlock && parentBlk.isExpandableBlock()) {
-                    clampBlocksToCheck.add(parent);
+                  if ((typeof parentBlk.isClampBlock === 'function' && parentBlk.isClampBlock()) ||
+                    (typeof parentBlk.isExpandableBlock === 'function' && parentBlk.isExpandableBlock())) {
                   }
+                  connectionRestored = true;
                   break;
                 }
               }
             }
-          }
-        }
-      }
-      
-      // Restore child connections (bidirectional)
-      for (let i = 1; i < oldConn.length; i++) {
-        const child = oldConn[i];
-        if (child != null && child >= 0 && child < this.blocks.blockList.length) {
-          const childBlk = this.blocks.blockList[child];
-          if (childBlk && !childBlk.trash) {
-            childBlk.connections[0] = index;
-            blocksToAdjustDocks.add(index);
-          }
-        }
-      } 
-    }
 
-    for (const index of this.blockIndices) {
-      const blk = this.blocks.blockList[index];
-      const slots = argSlots.get(index);
-      if (!blk || blk.trash || !slots) continue;
-      blk.argClampSlots = [...slots];
-      if (blk.updateArgSlots) {
-        blk.updateArgSlots(blk.argClampSlots);
-      }
-    }
+            // If parent wasn't moved or connection not found, search for the right slot
+            if (!connectionRestored) {
+              // Try to find where it should be connected based on connection type
+              // First check if it's already connected (shouldn't happen after disconnect, but safety check)
+              for (let i = 1; i < parentBlk.connections.length; i++) {
+                if (parentBlk.connections[i] === index) {
+                  // If parent is an expandable/clamp block, add it to clampBlocksToCheck
+                  if ((typeof parentBlk.isClampBlock === 'function' && parentBlk.isClampBlock()) ||
+                    (typeof parentBlk.isExpandableBlock === 'function' && parentBlk.isExpandableBlock())) {
+                  }
+                  connectionRestored = true;
+                  break;
+                }
+              }
 
-    // Adjust docks for all affected blocks
-    for (const blockIndex of blocksToAdjustDocks) {
-      if (blockIndex >= 0 && blockIndex < this.blocks.blockList.length) {
-        const blk = this.blocks.blockList[blockIndex];
-        if (blk && !blk.trash) {
-          this.blocks.adjustDocks(blockIndex, true);
-        }
-      }
-    }
-    
-    // Also adjust docks for top blocks
-    const topBlocks = new Set();
-    for (const index of this.blockIndices) {
-      if (index >= 0 && index < this.blocks.blockList.length) {
-        try {
-          const topBlock = this.blocks.findTopBlock(index);
-          if (topBlock >= 0 && topBlock < this.blocks.blockList.length) {
-            topBlocks.add(topBlock);
-          }
-        } catch (e) {
-          // Skip if findTopBlock fails
-        }
-      }
-    }
-
-    for (const top of topBlocks) {
-      if (top >= 0 && top < this.blocks.blockList.length) {
-        const blk = this.blocks.blockList[top];
-        if (blk && !blk.trash) {
-          this.blocks.adjustDocks(top, true);
-        }
-      }
-    }
-
-    // Add clamp blocks to check list for height adjustment
-    for (const clampBlockIndex of clampBlocksToCheck) {
-      if (clampBlockIndex >= 0 && clampBlockIndex < this.blocks.blockList.length) {
-        const clampBlk = this.blocks.blockList[clampBlockIndex];
-        if (clampBlk && !clampBlk.trash) {
-          // Add to clampBlocksToCheck array with clamp index 0 (default)
-          this.blocks.clampBlocksToCheck.push([clampBlockIndex, 0]);
-        }
-      }
-    }
-    
-    // Also find nested clamp blocks that might need adjustment
-    for (const index of this.blockIndices) {
-      if (index >= 0 && index < this.blocks.blockList.length) {
-        try {
-          const clampList = [];
-          if (this.blocks.findNestedClampBlocks && typeof this.blocks.findNestedClampBlocks === 'function') {
-            this.blocks.findNestedClampBlocks(index, clampList);
-            for (const clampInfo of clampList) {
-              if (Array.isArray(clampInfo) && clampInfo.length >= 2) {
-                this.blocks.clampBlocksToCheck.push(clampInfo);
+              // If still not found, find an appropriate empty slot
+              if (!connectionRestored) {
+                for (let i = 1; i < parentBlk.connections.length; i++) {
+                  if (parentBlk.connections[i] == null) {
+                    parentBlk.connections[i] = index;
+                    // If parent is an expandable/clamp block, add it to clampBlocksToCheck
+                    if (parentBlk.isClampBlock && parentBlk.isClampBlock() ||
+                      parentBlk.isExpandableBlock && parentBlk.isExpandableBlock()) {
+                    }
+                    break;
+                  }
+                }
               }
             }
           }
-        } catch (e) {
-          // Skip if findNestedClampBlocks fails
+        }
+
+        // Restore child connections (bidirectional)
+        for (let i = 1; i < oldConn.length; i++) {
+          const child = oldConn[i];
+          if (child != null && child >= 0 && child < this.blocks.blockList.length) {
+            const childBlk = this.blocks.blockList[child];
+            if (childBlk && !childBlk.trash) {
+              childBlk.connections[0] = index;
+            }
+          }
         }
       }
-    }
 
-    this.blocks.adjustExpandableClampBlock();
-    this.blocks.checkBounds();
-    this.blocks._isUndoingMove = false;
+      for (const index of this.blockIndices) {
+        const blk = this.blocks.blockList[index];
+        const slots = argSlots.get(index);
+        if (!blk || blk.trash || !slots) continue;
+        blk.argClampSlots = [...slots];
+        if (blk.updateArgSlots) {
+          blk.updateArgSlots(blk.argClampSlots);
+        }
+      }
+      
+      const topBlocks = new Set();
+      for (const index of this.blockIndices){
+        topBlocks.add(this.blocks.findTopBlock(index));
+      }
+      
+      this.blocks._isUndoingMove = true;
+      for (const top of topBlocks){
+        this.blocks.blockMoved(top);
+      }
+    } finally {
+      this.blocks._isUndoingMove = false;
+      this.blocks.activity.refreshCanvas();
+    }
   }
 }
 
@@ -488,7 +426,7 @@ class UndoRedoManager {
     if (!Array.isArray(this.redoStack)) {
       this.redoStack = [];
     }
-    
+
     this.undoStack.push(action);
     this.redoStack = []; // Clear redo stack when new action is performed
     this.updateButtons();
@@ -502,7 +440,7 @@ class UndoRedoManager {
     if (!Array.isArray(this.redoStack)) {
       this.redoStack = [];
     }
-    
+
     // For command pattern - execute the command and add to undo stack
     if (command && typeof command.execute === 'function') {
       command.execute();
@@ -528,24 +466,24 @@ class UndoRedoManager {
       this.updateButtons();
       return;
     }
-    
+
     if (this.undoStack.length === 0) {
       this.updateButtons();
       return;
     }
-    
+
     if (!this.canUndo()) {
       this.updateButtons();
       return;
     }
-    
+
     const command = this.undoStack.pop();
     if (!command) {
       // Safety check - if pop returned undefined, something went wrong
       this.updateButtons();
       return;
     }
-    
+
     try {
       if (typeof command.undo !== 'function') {
         console.warn('Command does not have undo method');
@@ -557,17 +495,17 @@ class UndoRedoManager {
         this.updateButtons();
         return;
       }
-      
+
       // Execute undo
       command.undo();
-      
+
       // Only push to redo stack if undo succeeded
       if (!Array.isArray(this.redoStack)) {
         this.redoStack = [];
       }
       this.redoStack.push(command);
       this.updateButtons();
-      
+
       // Refresh canvas with error handling
       if (globalActivity) {
         try {
@@ -620,24 +558,24 @@ class UndoRedoManager {
       this.updateButtons();
       return;
     }
-    
+
     if (this.redoStack.length === 0) {
       this.updateButtons();
       return;
     }
-    
+
     if (!this.canRedo()) {
       this.updateButtons();
       return;
     }
-    
+
     const command = this.redoStack.pop();
     if (!command) {
       // Safety check - if pop returned undefined, something went wrong
       this.updateButtons();
       return;
     }
-    
+
     try {
       // Handle both Command pattern (execute) and Action pattern (do)
       let executed = false;
@@ -651,7 +589,7 @@ class UndoRedoManager {
         command.doFunc();
         executed = true;
       }
-      
+
       if (!executed) {
         console.warn('Command does not have execute, do, or doFunc method');
         // Push back to stack to maintain consistency
@@ -662,14 +600,14 @@ class UndoRedoManager {
         this.updateButtons();
         return;
       }
-      
+
       // Only push to undo stack if redo succeeded
       if (!Array.isArray(this.undoStack)) {
         this.undoStack = [];
       }
       this.undoStack.push(command);
       this.updateButtons();
-      
+
       // Refresh canvas with error handling
       if (globalActivity) {
         try {
