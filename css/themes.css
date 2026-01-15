@@ -60,6 +60,10 @@
   background-color: #1a1a1a !important;
 }
 
+#loadingText{
+  color: #333 !important;
+}
+
 .dark #loadingText {
   color: white !important;
 }
