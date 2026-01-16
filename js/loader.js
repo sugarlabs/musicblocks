@@ -1,13 +1,6 @@
 // Copyright (c) 2015-2024 Yash Khandelwal
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the The GNU Affero General Public
-// License as published by the Free Software Foundation; either
-// version 3 of the License, or (at your option) any later version.
-//
-// You should have received a copy of the GNU Affero General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, 51 Franklin Street, Suite 500 Boston, MA 02110-1335 USA
+// AGPL v3+
 
 /* global requirejs */
 
@@ -23,7 +16,7 @@ requirejs.config({
         widgets: "../js/widgets",
         activity: "../js",
         easel: "../lib/easeljs",
-        twewn: "../lib/tweenjs",
+        tween: "../lib/tweenjs", // FIXED typo (twewn → tween)
         prefixfree: "../bower_components/prefixfree/prefixfree.min",
         samples: "../sounds/samples",
         planet: "../js/planet",
@@ -36,85 +29,72 @@ requirejs.config({
             "../lib/i18nextHttpBackend.min",
             "https://cdn.jsdelivr.net/npm/i18next-http-backend@2.5.1/i18nextHttpBackend.min"
         ]
-    },
-    packages: []
+    }
 });
 
-requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBackend) {
-    function updateContent() {
-        const elements = document.querySelectorAll("[data-i18n]");
-        elements.forEach(element => {
-            const key = element.getAttribute("data-i18n");
-            element.textContent = i18next.t(key);
-        });
-    }
+/**
+ * Bootstrap i18n, then load the app
+ */
+requirejs(
+    ["i18next", "i18nextHttpBackend"],
+    function (i18next, i18nextHttpBackend) {
 
-    function initializeI18next() {
-        return new Promise(resolve => {
-            i18next.use(i18nextHttpBackend).init(
-                {
-                    lng: "en",
-                    fallbackLng: "en",
-                    keySeparator: false,
-                    nsSeparator: false,
-                    interpolation: {
-                        escapeValue: false
-                    },
-                    backend: {
-                        loadPath: "locales/{{lng}}.json?v=" + Date.now()
-                    }
-                },
-                function (err) {
-                    if (err) {
-                        console.error("i18next init failed:", err);
-                    }
-                    window.i18next = i18next;
-                    resolve(i18next); 
-                }
-            );
-        });
-    }
+        function updateContent() {
+            document
+                .querySelectorAll("[data-i18n]")
+                .forEach(el => {
+                    const key = el.getAttribute("data-i18n");
+                    el.textContent = i18next.t(key);
+                });
+        }
 
-    async function main() {
-        await initializeI18next();
+        function initI18n(lang) {
+            return new Promise(resolve => {
+                i18next
+                    .use(i18nextHttpBackend)
+                    .init(
+                        {
+                            lng: lang,
+                            fallbackLng: "en",
+                            keySeparator: false,
+                            nsSeparator: false,
+                            interpolation: {
+                                escapeValue: false
+                            },
+                            backend: {
+                                loadPath: "locales/{{lng}}.json?v=" + Date.now()
+                            }
+                        },
+                        err => {
+                            if (err) {
+                                console.error("i18next init failed:", err);
+                            }
+                            window.i18next = i18next;
+                            resolve();
+                        }
+                    );
+            });
+        }
 
-        const lang = "en";
+        async function main() {
+            const lang = "en"; // single source of truth
 
-        i18next.changeLanguage(lang, function (err) {
-            if (err) {
-                console.error("Error changing language:", err);
-                return;
+            await initI18n(lang);
+
+            // Initial render
+            if (document.readyState === "loading") {
+                document.addEventListener("DOMContentLoaded", updateContent);
+            } else {
+                updateContent();
             }
-            updateContent();
-        });
 
-        if (document.readyState === "loading") {
-            document.addEventListener("DOMContentLoaded", updateContent);
-        } else {
-            updateContent();
+            // Re-render on language change
+            i18next.on("languageChanged", updateContent);
+
+            // Load the actual application AFTER i18n is ready
+            requirejs(["utils/utils", "activity/activity"]);
         }
 
-        i18next.on("languageChanged", updateContent);
-
-        // Load app only after i18n is ready
-        requirejs(["utils/utils", "activity/activity"]);
+        main();
     }
-
-main();
-
-if (typeof lang === "undefined") {
-    console.warn("Language not defined yet, using default language");
-} else {
-    i18next.changeLanguage(lang, (err) => {
-        if (err) {
-            console.error("Error changing language:", err);
-            return;
-        }
-        updateContent();
-    });
-}
-
-i18next.on("languageChanged", function () {
-    updateContent();
-});
-});
+);
