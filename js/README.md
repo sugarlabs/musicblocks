@@ -4,6 +4,10 @@ MusicBlocks/js
 The core code for Music Blocks resides in this directory, the blocks and the turtleactions
 subdirectory.
 
+## Testing
+
+For writing unit tests for block files, see [docs/TESTING.md](../docs/TESTING.md).
+
 * `activity.js` -- where the menus are defined
 
 Logo code

@@ -40,24 +40,19 @@ requirejs.config({
     packages: []
 });
 
-requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBackend) {
-
+requirejs(["i18next", "i18nextHttpBackend"], function (i18next, i18nextHttpBackend) {
     function updateContent() {
-        console.log("updateContent() called");  // Debugging line
         const elements = document.querySelectorAll("[data-i18n]");
-
-        elements.forEach((element) => {
+        elements.forEach(element => {
             const key = element.getAttribute("data-i18n");
-            const translation = i18next.t(key);
-            element.textContent = translation;
+            element.textContent = i18next.t(key);
         });
     }
 
-    async function initializeI18next() {
-        return new Promise((resolve, reject) => {
-            i18next
-                .use(i18nextHttpBackend)
-                .init({
+    function initializeI18next() {
+        return new Promise(resolve => {
+            i18next.use(i18nextHttpBackend).init(
+                {
                     lng: "en",
                     fallbackLng: "en",
                     keySeparator: false,
@@ -66,72 +61,60 @@ requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBacken
                         escapeValue: false
                     },
                     backend: {
-                        loadPath: "locales/{{lng}}.json?v="+Date.now()
+                        loadPath: "locales/{{lng}}.json?v=" + Date.now()
                     }
-                }, function(err, t) {
+                },
+                function (err) {
                     if (err) {
                         console.error("i18next init failed:", err);
-                        reject(err);
-                    } else {
-                        console.log("i18next initialized");
-                        window.i18next = i18next;
-                        console.log("i18next Store:", i18next.store.data);
-                        resolve(i18next);
                     }
-                });
-            
-
-            i18next.on("initialized", function() {
-                console.log("i18next initialized");
-            });
-
-            i18next.on("loaded", function(loaded) {
-                console.log("i18next loaded:", loaded);
-            });
-
-         
-
-    
+                    window.i18next = i18next;
+                    resolve(i18next); 
+                }
+            );
         });
     }
 
     async function main() {
-        try {
-            await initializeI18next();
+        await initializeI18next();
 
-            if (document.readyState === "loading") {
-                document.addEventListener("DOMContentLoaded", function() {
-                    updateContent();
-                });
-            } else {
-                console.log("DOM already loaded, updating content immediately");
-                updateContent();
-            }
-        } catch (error) {
-            console.error("Error initializing i18next:", error);
-        }
-    }
+        const lang = "en";
 
-    main().then(() => {
-        requirejs(["utils/utils", "activity/activity"]);
-    });
-
-    if (typeof lang === "undefined") {
-        console.warn("Language not defined yet, using default language");
-    } else {
-        i18next.changeLanguage(lang, (err, t) => {
+        i18next.changeLanguage(lang, function (err) {
             if (err) {
                 console.error("Error changing language:", err);
                 return;
             }
             updateContent();
         });
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", updateContent);
+        } else {
+            updateContent();
+        }
+
+        i18next.on("languageChanged", updateContent);
+
+        // Load app only after i18n is ready
+        requirejs(["utils/utils", "activity/activity"]);
     }
 
+main();
 
-    i18next.on("languageChanged", function() {
+if (typeof lang === "undefined") {
+    console.warn("Language not defined yet, using default language");
+} else {
+    i18next.changeLanguage(lang, (err) => {
+        if (err) {
+            console.error("Error changing language:", err);
+            return;
+        }
         updateContent();
     });
-});
+}
 
-// requirejs(["utils/utils", "activity/activity"]);
+i18next.on("languageChanged", function () {
+    updateContent();
+});
+});

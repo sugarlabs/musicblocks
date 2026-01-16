@@ -21,7 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const themePreference = localStorage.themePreference || undefined;
 
-
 window.platform = {
     android: /Android/i.test(navigator.userAgent),
     FF: /Firefox/i.test(navigator.userAgent),
@@ -350,7 +349,7 @@ const platformThemes = {
         modePieMenusIfColorPush: "#4b8b0e",
         modePieMenusElseColorPush: "#66a62d",
         wheelcolors: ["#808080", "#909090", "#808080", "#909090", "#707070"]
-    },
+    }
     // custom: {Your styling},
 };
 
@@ -379,3 +378,7 @@ let showButtonHighlight = (x, y, r, event, scale, stage) => {
     if (platform.FFOS) return {};
     return showMaterialHighlight(x, y, r, event, scale, stage);
 };
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = { showButtonHighlight };
+}

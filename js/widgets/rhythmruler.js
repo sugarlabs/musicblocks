@@ -95,19 +95,18 @@ class RhythmRuler {
      * @constructor
      */
     constructor() {
-        
         /**
          * Array containing the drums for the rhythm ruler.
          * @type {Array}
          */
         this.Drums = [];
-        
+
         /**
          * Array containing the rulers, one per drum, which contain the subdivisions defined by rhythm blocks.
          * @type {Array}
          */
         this.Rulers = [];
-        
+
         /**
          * Array to save the history of divisions so they can be restored.
          * @type {Array}
@@ -271,7 +270,7 @@ class RhythmRuler {
          * @private
          */
         this._rulers = [];
-        
+
         /**
          * Scale factor for fullscreen mode.
          * @type {number}
@@ -523,50 +522,34 @@ class RhythmRuler {
         // An input for setting the dissect number
         this._dissectNumber = widgetWindow.addInputButton("2");
 
-        this._dissectNumber.onfocus = () => {
-            // this._piemenuNumber(['2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16'], numberInput.value);
-        };
+        // Make the input editable and handle keyboard input
+        this._dissectNumber.readOnly = false;
+        this._dissectNumber.classList.add("hasKeyboard");
+        this._dissectNumber.style.cursor = "text";
 
-        this._dissectNumber.onkeydown = (event) => {
-            if (event.keyCode === RhythmRuler.DEL) {
-                this._dissectNumber.value = this._dissectNumber.value.substring(
-                    0,
-                    this._dissectNumber.value.length - 1
-                );
-            }
-            if (event.keyCode === RhythmRuler.BACK) {
-                // Get the cursor position
-                const cursorPosition = this._dissectNumber.selectionStart;
-                // If there is a selection, delete the selected text
-                if (this._dissectNumber.selectionStart !== this._dissectNumber.selectionEnd) {
-                    const start = this._dissectNumber.selectionStart;
-                    const end = this._dissectNumber.selectionEnd;
-                    this._dissectNumber.value = this._dissectNumber.value.substring(0, start) + this._dissectNumber.value.substring(start, end + 1);
-                } else if (this._dissectNumber.value.length == 1 && cursorPosition == 1) {
-                    // If there is only a single digit in the input then replace it with an empty string
-                    this._dissectNumber.value = "";
-                } else if (cursorPosition > 0) {
-                    // If there is no selection and the cursor is not at the beginning, delete the character before the cursor
-                    const newValue = this._dissectNumber.value.substring(0, cursorPosition) + this._dissectNumber.value.substring(cursorPosition, this._dissectNumber.value);
-                    this._dissectNumber.value = newValue;
+        // Handle Enter key to validate and blur (prevent any play action)
+        this._dissectNumber.addEventListener("keydown", event => {
+            if (event.keyCode === 13 || event.key === "Enter") {
+                event.preventDefault();
+                event.stopPropagation();
+                const inputValue = parseInt(this._dissectNumber.value);
+                if (!isNaN(inputValue) && inputValue > 0) {
+                    // Validate the input value - allow any number from 2 to 128
+                    const validatedValue = Math.min(Math.max(inputValue, 2), 128);
+                    this._dissectNumber.value = validatedValue;
                 }
-                // If the cursor is at the beginning, do nothing
+                this._dissectNumber.blur();
             }
-        };
+        });
 
         /**
-         * Event handler for the input event of the dissect number input.
-         * Limits the dissect number value to the range 2 to 128.
+         * Event handler for the click event of the dissect number input.
+         * Shows a pie menu for selecting the rhythm division number.
          * @private
          * @returns {void}
          */
-        this._dissectNumber.oninput = () => {
-            // Put a limit on the size (2 <--> 128).
-            this._dissectNumber.onmouseout = () => {
-                this._dissectNumber.value = Math.max(this._dissectNumber.value, 2);
-            };
-
-            this._dissectNumber.value = Math.max(Math.min(this._dissectNumber.value, 128), 2);
+        this._dissectNumber.onclick = () => {
+            this._showDissectNumberPieMenu();
         };
 
         /**
@@ -632,8 +615,7 @@ class RhythmRuler {
                 }
             } else {
                 const drumcell = rhythmRulerTableRow.insertCell();
-                drumcell.innerHTML =
-                    `<img 
+                drumcell.innerHTML = `<img 
                         src="header-icons/play-button.svg" 
                         title="${_("Play")}" 
                         alt="${_("Play")}" 
@@ -642,12 +624,11 @@ class RhythmRuler {
                     />`;
                 drumcell.className = "headcol"; // Position fixed when scrolling horizontally
                 drumcell.style.cursor = "pointer";
-                drumcell.onclick = ((id) => {
+                drumcell.onclick = (id => {
                     return () => {
                         if (this._playing) {
                             if (this._rulerPlaying === id) {
-                                drumcell.innerHTML =
-                                    `<img 
+                                drumcell.innerHTML = `<img 
                                         src="header-icons/play-button.svg" 
                                         title="${_("Play")}" 
                                         alt="${_("Play")}" 
@@ -673,8 +654,7 @@ class RhythmRuler {
                             this._cellCounter = 0;
                             this._startingTime = null;
                             this._rulerPlaying = id;
-                            drumcell.innerHTML =
-                                `<img 
+                            drumcell.innerHTML = `<img 
                                     src="header-icons/pause-button.svg" 
                                     title="${_("Pause")}" 
                                     alt="${_("Pause")}" 
@@ -823,8 +803,8 @@ class RhythmRuler {
     _noteWidth(noteValue) {
         const ans = Math.floor(
             EIGHTHNOTEWIDTH *
-            (8 / Math.abs(noteValue)) *
-            (this.widgetWindow.isMaximized() ? this._fullscreenScaleFactor : 3)
+                (8 / Math.abs(noteValue)) *
+                (this.widgetWindow.isMaximized() ? this._fullscreenScaleFactor : 3)
         );
         return ans;
     }
@@ -839,26 +819,36 @@ class RhythmRuler {
             const width = this.widgetWindow.getWidgetBody().getBoundingClientRect().width;
             this._fullscreenScaleFactor = Math.floor(width / (EIGHTHNOTEWIDTH * 8));
         }
-        this._rulers.forEach((ruler) => {
+        this._rulers.forEach(ruler => {
             if (this.widgetWindow.isMaximized()) {
-                Array.prototype.forEach.call(ruler.children, (child) => {
+                Array.prototype.forEach.call(ruler.children, child => {
                     child.style.width =
                         Number(child.style.width.slice(0, child.style.width.indexOf("px"))) *
-                        (this._fullscreenScaleFactor / 3) +
+                            (this._fullscreenScaleFactor / 3) +
                         "px";
                     child.style.minWidth = child.style.width;
                 });
             } else {
-                Array.prototype.forEach.call(ruler.children, (child) => {
+                Array.prototype.forEach.call(ruler.children, child => {
                     child.style.width =
                         Math.floor(
                             Number(child.style.width.slice(0, child.style.width.indexOf("px"))) /
-                            Math.floor(this._fullscreenScaleFactor / 3)
+                                Math.floor(this._fullscreenScaleFactor / 3)
                         ) + "px";
                     child.style.minWidth = child.style.width;
                 });
             }
         });
+    }
+
+    /**
+     * Shows a pie menu for selecting the rhythm dissect number.
+     * Displays different options based on beginner mode.
+     * @private
+     * @returns {void}
+     */
+    _showDissectNumberPieMenu() {
+        piemenuDissectNumber(this);
     }
 
     /**
@@ -941,8 +931,7 @@ class RhythmRuler {
                     this._tapMode = false;
                     this._tapTimes = [];
                     this._tapEndTime = null;
-                    this._tapButton.innerHTML =
-                        `<img 
+                    this._tapButton.innerHTML = `<img 
                             src="header-icons/tap-button.svg" 
                             title="${_("tap a rhythm")}" 
                             alt="${_("tap a rhythm")}" 
@@ -968,8 +957,12 @@ class RhythmRuler {
                     drum = this.activity.blocks.blockList[drumBlockNo].value;
                 }
 
-                // FIXME: Should be based on meter
-                for (let i = 0; i < 4; i++) {
+                // Get the meter from the current turtle's singer
+                const turtle = this.activity.turtles.ithTurtle(0);
+                const beatsPerMeasure = turtle.singer.beatsPerMeasure || 4;
+
+                // Play count-off based on meter (e.g., 4 beats for 4/4, 3 beats for 3/4)
+                for (let i = 0; i < beatsPerMeasure; i++) {
                     setTimeout(() => {
                         this.activity.logo.synth.trigger(
                             0,
@@ -979,7 +972,7 @@ class RhythmRuler {
                             null,
                             null
                         );
-                    }, (interval * i) / 4);
+                    }, (interval * i) / beatsPerMeasure);
                 }
 
                 setTimeout(() => {
@@ -1142,8 +1135,7 @@ class RhythmRuler {
         this._tapCell = null;
         this._tapEndTime = null;
         // let iconSize = RhythmRuler.ICONSIZE;
-        this._tapButton.innerHTML =
-            `<img 
+        this._tapButton.innerHTML = `<img 
                 src="header-icons/tap-button.svg" 
                 title="${_("tap a rhythm")}" 
                 alt="${_("tap a rhythm")}" 
@@ -1162,7 +1154,7 @@ class RhythmRuler {
      * @returns {void}
      */
     __addCellEventHandlers(cell, cellWidth, noteValue) {
-        const __mouseOverHandler = (event) => {
+        const __mouseOverHandler = event => {
             const cell = event.target;
             if (cell === null || cell.parentNode === null) {
                 return;
@@ -1181,12 +1173,12 @@ class RhythmRuler {
             }
         };
 
-        const __mouseOutHandler = (event) => {
+        const __mouseOutHandler = event => {
             const cell = event.target;
             cell.innerHTML = "";
         };
 
-        const __mouseDownHandler = (event) => {
+        const __mouseDownHandler = event => {
             const cell = event.target;
             this._mouseDownCell = cell;
 
@@ -1209,14 +1201,14 @@ class RhythmRuler {
                 }
             }, 1500);
         };
-        
+
         /**
          * Handles the mouseup event on a rhythm cell, determining actions based on the interaction.
          * @private
          * @param {Event} event - The mouseup event.
          * @returns {void}
          */
-        const __mouseUpHandler = (event) => {
+        const __mouseUpHandler = event => {
             clearTimeout(this._longPressBeep);
             const cell = event.target;
             this._mouseUpCell = cell;
@@ -1242,7 +1234,7 @@ class RhythmRuler {
          * @param {Event} event - The click event.
          * @returns {void}
          */
-        const __clickHandler = (event) => {
+        const __clickHandler = event => {
             if (event == undefined) return;
             if (!this.__getLongPressStatus()) {
                 const cell = event.target;
@@ -1303,11 +1295,11 @@ class RhythmRuler {
             const noteValue = noteValues[cell.cellIndex];
 
             /**
-         * Handles the mouseover event for the rhythm cell.
-         * @param {Event} event - The mouseover event.
-         * @returns {void}
-         */
-            const __mouseOverHandler = (event) => {
+             * Handles the mouseover event for the rhythm cell.
+             * @param {Event} event - The mouseover event.
+             * @returns {void}
+             */
+            const __mouseOverHandler = event => {
                 const cell = event.target;
                 if (cell === null) {
                     return;
@@ -1332,7 +1324,7 @@ class RhythmRuler {
              * @param {Event} event - The mouseout event.
              * @returns {void}
              */
-            const __mouseOutHandler = (event) => {
+            const __mouseOutHandler = event => {
                 const cell = event.target;
                 cell.innerHTML = "";
             };
@@ -1614,7 +1606,6 @@ class RhythmRuler {
      * @returns {void}
      */
     _undo() {
-        // FIXME: Add undo for REST
         this.activity.logo.synth.stop();
         this._startingTime = null;
         this._playing = false;
@@ -1754,8 +1745,7 @@ class RhythmRuler {
     _tap() {
         this._tapMode = true;
         const iconSize = RhythmRuler.ICONSIZE;
-        this._tapButton.innerHTML =
-            `<img 
+        this._tapButton.innerHTML = `<img 
                 src="header-icons/tap-active-button.svg" 
                 title="${_("tap a rhythm")}" 
                 alt="${_("tap a rhythm")}" 
@@ -1778,8 +1768,7 @@ class RhythmRuler {
         this._playingOne = false;
         this._rulerPlaying = -1;
         this._startingTime = null;
-        this._playAllCell.innerHTML =
-            `<img 
+        this._playAllCell.innerHTML = `<img 
                 src="header-icons/play-button.svg" 
                 title="${_("Play all")}" 
                 alt="${_("Play all")}" 
@@ -1803,8 +1792,7 @@ class RhythmRuler {
      * @returns {void}
      */
     __pause() {
-        this._playAllCell.innerHTML =
-            `<img 
+        this._playAllCell.innerHTML = `<img 
                 src="header-icons/play-button.svg" 
                 title="${_("Play all")}" 
                 alt="${_("Play all")}" 
@@ -1850,8 +1838,7 @@ class RhythmRuler {
      * @returns {void}
      */
     __resume() {
-        this._playAllCell.innerHTML =
-            `<img 
+        this._playAllCell.innerHTML = `<img 
                 src="header-icons/pause-button.svg" 
                 title="${_("Pause")}" 
                 alt="${_("Pause")}" 
@@ -2849,4 +2836,7 @@ class RhythmRuler {
             docById("wheelDiv").style.top = y - 300 + "px";
         }
     }
+}
+if (typeof module !== "undefined") {
+    module.exports = RhythmRuler;
 }

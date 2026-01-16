@@ -18,19 +18,19 @@
  */
 
 const JSInterface = {
-    validateArgs: jest.fn(),
+    validateArgs: jest.fn()
 };
 global.JSInterface = JSInterface;
 const PenBlocksAPI = require("../PenBlocksAPI");
 global.globalActivity = {
     turtles: {
-        refreshCanvas: jest.fn(),
+        refreshCanvas: jest.fn()
     },
     logo: {
         turtles: {
-            setBackgroundColor: jest.fn(),
-        },
-    },
+            setBackgroundColor: jest.fn()
+        }
+    }
 };
 
 describe("PenBlocksAPI", () => {

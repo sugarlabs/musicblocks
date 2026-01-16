@@ -43,7 +43,7 @@ Object.assign(global, {
     NOTESTEP: musicUtils.NOTESTEP,
     MUSICALMODES: musicUtils.MUSICALMODES,
     SHARP: musicUtils.SHARP,
-    FLAT: musicUtils.FLAT,
+    FLAT: musicUtils.FLAT
 });
 
 global.NANERRORMSG = require("../../logo").NANERRORMSG;
@@ -92,12 +92,18 @@ describe("Tests for Singer.PitchActions setup", () => {
                 inMusicKeyboard: false,
                 synth: { inTemperament: "equal", startingPitch: "A0" },
                 runningLilypond: false,
-                setDispatchBlock(name, t, l) { /* record listener */ },
-                setTurtleListener() { /* record cleanup */ },
+                setDispatchBlock(name, t, l) {
+                    /* record listener */
+                },
+                setTurtleListener() {
+                    /* record cleanup */
+                },
                 stopTurtle: false,
                 notation: { notationMarkup() {} }
             },
-            errorMsg() { /* record error */ }
+            errorMsg() {
+                /* record error */
+            }
         };
         setupPitchActions(activity);
     });
@@ -185,7 +191,6 @@ describe("Tests for Singer.PitchActions setup", () => {
                 Singer.PitchActions.playNthModalPitch(5.2, 3, 0, blkId);
             }).not.toThrow();
         });
-
     });
 
     describe("Tests for playPitchNumber", () => {
@@ -333,13 +338,15 @@ describe("Tests for Singer.PitchActions setup", () => {
     describe("Tests for consonantStepSize", () => {
         test("with lastNote → uses slice path", () => {
             turtle.singer.lastNotePlayed = ["F#4", 4];
-            expect(Singer.PitchActions.consonantStepSize("down", 0))
-                .toEqual(musicUtils.getStepSizeDown("C", "F#"));
+            expect(Singer.PitchActions.consonantStepSize("down", 0)).toEqual(
+                musicUtils.getStepSizeDown("C", "F#")
+            );
         });
         test("no lastNote → default G", () => {
             turtle.singer.lastNotePlayed = null;
-            expect(Singer.PitchActions.consonantStepSize("up", 0))
-                .toEqual(musicUtils.getStepSizeUp("C", "G"));
+            expect(Singer.PitchActions.consonantStepSize("up", 0)).toEqual(
+                musicUtils.getStepSizeUp("C", "G")
+            );
         });
     });
 
@@ -422,7 +429,7 @@ describe("Tests for Singer.PitchActions setup", () => {
             expect(tl).toHaveBeenCalledWith(0, "_transposition_ratio_0", expect.any(Function));
         });
     });
-  
+
     describe("low‑level listener callbacks for Accidental / Transpose / Invert", () => {
         let fakeMouse;
 
@@ -439,7 +446,7 @@ describe("Tests for Singer.PitchActions setup", () => {
         test('setAccidental early‑return for _("sharp") & _("flat")', () => {
             const before = turtle.singer.transposition;
             Singer.PitchActions.setAccidental(_("sharp"), 0, blkId);
-            Singer.PitchActions.setAccidental(_("flat"),  0, blkId);
+            Singer.PitchActions.setAccidental(_("flat"), 0, blkId);
             expect(turtle.singer.transposition).toBe(before);
         });
 
@@ -486,7 +493,7 @@ describe("Tests for Singer.PitchActions setup", () => {
             expect(turtle.singer.transposition).toBe(before);
         });
     });
-  
+
     describe("playNthModalPitch unicode FLAT/SHARP ref‑adjustment", () => {
         test("FLAT symbol branch", () => {
             global.keySignatureToMode = () => ["B" + FLAT, "major"];
@@ -516,11 +523,11 @@ describe("Tests for Singer.PitchActions setup", () => {
             MusicBlocks.isRun = false;
         });
         test("pushes listenerName into Mouse.MB.listeners", () => {
-            Singer.PitchActions.invert("C", 4, "even", 0 /*turtle*/, /*blk*/);
+            Singer.PitchActions.invert("C", 4, "even", 0 /*turtle*/ /*blk*/);
             expect(fakeMouse.MB.listeners).toContain("_invert_0");
         });
     });
-  
+
     describe("default listener‑only path", () => {
         let tl;
         beforeEach(() => {
@@ -534,47 +541,27 @@ describe("Tests for Singer.PitchActions setup", () => {
         test("setAccidental registers listener only", () => {
             const acc = ACCIDENTALNAMES[0];
             Singer.PitchActions.setAccidental(acc, 0 /*turtle*/);
-            expect(tl).toHaveBeenCalledWith(
-                0,
-                "_accidental_0_undefined",
-                expect.any(Function)
-            );
+            expect(tl).toHaveBeenCalledWith(0, "_accidental_0_undefined", expect.any(Function));
         });
 
         test("setScalarTranspose registers listener only", () => {
             Singer.PitchActions.setScalarTranspose(3, 0);
-            expect(tl).toHaveBeenCalledWith(
-                0,
-                "_scalar_transposition_0",
-                expect.any(Function)
-            );
+            expect(tl).toHaveBeenCalledWith(0, "_scalar_transposition_0", expect.any(Function));
         });
 
         test("setSemitoneTranspose registers listener only", () => {
             Singer.PitchActions.setSemitoneTranspose(2, 0);
-            expect(tl).toHaveBeenCalledWith(
-                0,
-                "_transposition_0",
-                expect.any(Function)
-            );
+            expect(tl).toHaveBeenCalledWith(0, "_transposition_0", expect.any(Function));
         });
 
         test("setRatioTranspose registers listener only", () => {
             Singer.PitchActions.setRatioTranspose(5, 0);
-            expect(tl).toHaveBeenCalledWith(
-                0,
-                "_transposition_ratio_0",
-                expect.any(Function)
-            );
+            expect(tl).toHaveBeenCalledWith(0, "_transposition_ratio_0", expect.any(Function));
         });
-    
+
         test("invert registers listener only", () => {
             Singer.PitchActions.invert("C", 4, "even", 0);
-            expect(tl).toHaveBeenCalledWith(
-                0,
-                "_invert_0",
-                expect.any(Function)
-            );
+            expect(tl).toHaveBeenCalledWith(0, "_invert_0", expect.any(Function));
         });
     });
 });
