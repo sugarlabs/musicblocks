@@ -696,11 +696,9 @@ const processPluginData = (activity, pluginData, pluginSource) => {
     let obj;
     try {
         obj = JSON.parse(pluginData);
-    } catch (e) {
-        // eslint-disable-next-line no-console
-        console.log(pluginData);
-        // eslint-disable-next-line no-console
-        console.log(e);
+    } catch (error) {
+        console.error(`PluginProcessor: Failed to parse plugin data from source "${pluginSource}":`, error);
+        console.debug("Malformed plugin data:", pluginData);
         return null;
     }
     // Create a palette entry.
