@@ -74,7 +74,6 @@ let MYDEFINES = [
     "widgets/status",
     "widgets/help",
     "utils/munsell",
-    "activity/gif-animator",
     "activity/toolbar",
     "activity/trash",
     "activity/boundary",
