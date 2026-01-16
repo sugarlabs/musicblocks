@@ -33,6 +33,9 @@ class VersionControlUI {
         this.versionStorage = null;
         this.modal = null;
         this.isOpen = false;
+        this._initialized = false;
+        this._boundClickHandler = null;
+        this._boundKeydownHandler = null;
     }
 
     /**
@@ -40,9 +43,15 @@ class VersionControlUI {
      * @param {VersionControlStorage} versionStorage - The storage instance.
      */
     init(versionStorage) {
+        // Guard against double initialization to prevent stacking listeners
+        if (this._initialized) {
+            this.versionStorage = versionStorage;
+            return;
+        }
         this.versionStorage = versionStorage;
         this._setupModal();
         this._bindEvents();
+        this._initialized = true;
     }
 
     /**
@@ -80,19 +89,24 @@ class VersionControlUI {
             clearBtn.onclick = () => this._handleClearAllVersions();
         }
 
-        // Close on outside click
-        window.addEventListener("click", (event) => {
+        // Create bound handlers so they can be removed later
+        this._boundClickHandler = (event) => {
             if (event.target === this.modal) {
                 this.close();
             }
-        });
+        };
 
-        // Close on escape key
-        window.addEventListener("keydown", (event) => {
+        this._boundKeydownHandler = (event) => {
             if (event.key === "Escape" && this.isOpen) {
                 this.close();
             }
-        });
+        };
+
+        // Close on outside click
+        window.addEventListener("click", this._boundClickHandler);
+
+        // Close on escape key
+        window.addEventListener("keydown", this._boundKeydownHandler);
     }
 
     /**
@@ -110,9 +124,17 @@ class VersionControlUI {
         // Render the version list
         await this._renderVersionList();
 
-        // Show the modal
+        // Show the modal with fallback for environments where showModal() may fail
         this.modal.style.display = "block";
-        this.modal.showModal();
+        try {
+            if (typeof this.modal.showModal === "function") {
+                this.modal.showModal();
+            }
+        } catch (e) {
+            // Fallback: modal is already visible via display style
+            // eslint-disable-next-line no-console
+            console.warn("VersionControlUI: showModal() not supported, using fallback", e);
+        }
         this.isOpen = true;
     }
 
@@ -123,7 +145,32 @@ class VersionControlUI {
         if (!this.modal) return;
 
         this.modal.style.display = "none";
-        this.modal.close();
+        try {
+            if (typeof this.modal.close === "function" && this.modal.open) {
+                this.modal.close();
+            }
+        } catch (e) {
+            // Fallback: modal is already hidden via display style
+            // eslint-disable-next-line no-console
+            console.warn("VersionControlUI: close() not supported, using fallback", e);
+        }
+        this.isOpen = false;
+    }
+
+    /**
+     * Clean up event listeners and resources.
+     * Call this when the UI is being destroyed.
+     */
+    destroy() {
+        if (this._boundClickHandler) {
+            window.removeEventListener("click", this._boundClickHandler);
+            this._boundClickHandler = null;
+        }
+        if (this._boundKeydownHandler) {
+            window.removeEventListener("keydown", this._boundKeydownHandler);
+            this._boundKeydownHandler = null;
+        }
+        this._initialized = false;
         this.isOpen = false;
     }
 
@@ -266,9 +313,13 @@ class VersionControlUI {
             // Close modal and reload the project
             this.close();
 
-            // Trigger project reload
-            if (this.activity && this.activity.doLoadAnimation) {
-                this.activity.doLoadAnimation();
+            // Actually reload the project data into the editor
+            // Use the same code path that loads projects from Planet
+            if (this.activity && this.activity.planet) {
+                const projectData = await this.activity.planet.openCurrentProject();
+                if (projectData) {
+                    this.activity.planet.loadProjectFromData(JSON.stringify(projectData), false);
+                }
             }
         } catch (error) {
             // eslint-disable-next-line no-console
