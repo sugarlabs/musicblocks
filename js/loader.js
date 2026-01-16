@@ -116,13 +116,18 @@ requirejs(["i18next", "i18nextHttpBackend"], function(i18next, i18nextHttpBacken
         requirejs(["utils/utils", "activity/activity"]);
     });
 
-    i18next.changeLanguage(lang, (err, t) => {
-        if (err) {
-            console.error("Error changing language:", err);
-            return;
-        }
-        updateContent();
-    });
+    if (typeof lang === "undefined") {
+        console.warn("Language not defined yet, using default language");
+    } else {
+        i18next.changeLanguage(lang, (err, t) => {
+            if (err) {
+                console.error("Error changing language:", err);
+                return;
+            }
+            updateContent();
+        });
+    }
+
 
     i18next.on("languageChanged", function() {
         updateContent();
