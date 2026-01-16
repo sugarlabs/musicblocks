@@ -294,9 +294,8 @@ class Publisher {
     parseProject(tb) {
         try {
             tb = JSON.parse(tb);
-        } catch (e) {
-            // eslint-disable-next-line no-console
-            console.log(e);
+        } catch (error) {
+            console.error("Publisher: Failed to parse project data for keyword extraction.", error);
             return "";
         }
 
