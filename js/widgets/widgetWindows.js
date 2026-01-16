@@ -108,6 +108,9 @@ class WidgetWindow {
             };
         }
         const closeButton = this._create("div", "wftButton close", this._drag);
+        closeButton.title = _("Close");
+        closeButton.setAttribute("data-toggle", "tooltip");
+        closeButton.setAttribute("data-placement", "bottom");
         closeButton.onclick = e => {
             this.onclose();
             e.preventDefault();
@@ -152,6 +155,9 @@ class WidgetWindow {
         this._nonclosebuttons.style.display = "flex";
         this._rollButton = this._create("div", "wftButton rollup", this._nonclosebuttons);
         const rollButton = this._rollButton;
+        rollButton.title = _("Minimize");
+        rollButton.setAttribute("data-toggle", "tooltip");
+        rollButton.setAttribute("data-placement", "bottom");
         rollButton.onclick = e => {
             if (this._rolled) {
                 this.unroll();
@@ -696,6 +702,8 @@ window.widgetWindows.hideWindow = name => {
     if (!win) return;
     win._frame.style.display = "none";
 };
+
+
 
 /**
  * @returns {void}
