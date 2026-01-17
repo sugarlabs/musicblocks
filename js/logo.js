@@ -1480,12 +1480,27 @@ class Logo {
                     logo.blockList[blk].protoblock.dockTypes[0]
                 )
             ) {
-                args.push(logo.parseArg(logo, turtle, blk, logo.receievedArg));
+                args.push(logo.parseArg(logo, turtle, blk, logo.receivedArg));
+
+                // Use label prefix for screen dimension blocks to clarify the display is informational
+                // Labels wrapped with _() for internationalization
+                const blockLabels = {
+                    width: _("width"),
+                    height: _("height"),
+                    rightpos: _("right (screen)"),
+                    leftpos: _("left (screen)"),
+                    toppos: _("top (screen)"),
+                    bottompos: _("bottom (screen)")
+                };
+                const blockName = logo.blockList[blk].name;
+                const label = blockLabels[blockName];
 
                 if (logo.blockList[blk].value == null) {
                     logo.activity.textMsg("null block value");
                 } else {
-                    logo.activity.textMsg(logo.blockList[blk].value.toString());
+                    const value = logo.blockList[blk].value.toString();
+                    const displayText = label ? label + ": " + value : value;
+                    logo.activity.textMsg(displayText);
                 }
             } else {
                 logo.activity.errorMsg(
@@ -1771,19 +1786,7 @@ class Logo {
 
         const tur = this.activity.turtles.ithTurtle(turtle);
 
-        if (Object.keys) {
-            if (Object.keys(tur.singer.embeddedGraphics).length === 0) return;
-        } else {
-            const isEmpty = true;
-            for (const key in tur.singer.embeddedGraphics) {
-                if (tur.singer.embeddedGraphics.hasOwnProperty(key)) {
-                    isEmpty = false;
-                    break;
-                }
-            }
-
-            if (isEmpty) return;
-        }
+        if (Object.keys(tur.singer.embeddedGraphics).length === 0) return;
 
         if (!(blk in tur.singer.embeddedGraphics)) return;
 
@@ -2322,7 +2325,7 @@ class Logo {
                     break;
 
                 case "clear":
-                    __clear(turtle, waitTime);
+                    __clear();
                     break;
 
                 case "fill":
@@ -2407,4 +2410,36 @@ class Logo {
         await delayExecution(beatValue * 1000);
         tur.embeddedGraphicsFinished = true;
     }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        Queue,
+        Logo,
+        DEFAULTVOLUME,
+        PREVIEWVOLUME,
+        DEFAULTDELAY,
+        OSCVOLUMEADJUSTMENT,
+        TONEBPM,
+        TARGETBPM,
+        TURTLESTEP,
+        NOTEDIV,
+        NOMICERRORMSG,
+        NANERRORMSG,
+        NOSTRINGERRORMSG,
+        NOBOXERRORMSG,
+        NOACTIONERRORMSG,
+        NOINPUTERRORMSG,
+        NOSQRTERRORMSG,
+        ZERODIVIDEERRORMSG,
+        EMPTYHEAPERRORMSG,
+        POSNUMBER,
+        NOTATIONNOTE,
+        NOTATIONDURATION,
+        NOTATIONDOTCOUNT,
+        NOTATIONTUPLETVALUE,
+        NOTATIONROUNDDOWN,
+        NOTATIONINSIDECHORD,
+        NOTATIONSTACCATO
+    };
 }
