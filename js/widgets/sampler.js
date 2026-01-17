@@ -109,6 +109,26 @@ function SampleWidget() {
      */
     this.pitchAnalysers = {};
 
+    // Animation lifecycle (RAF) state
+    this._running = false;
+    this._rafId = null;
+
+    // Cached canvas refs for sampler draw loop
+    this._samplerCanvas = null;
+    this._samplerCanvasCtx = null;
+    this._samplerCanvasTurtleIdx = null;
+    this._samplerCanvasResized = false;
+
+    // Cached DOM refs for pitch display (avoid per-frame DOM queries)
+    this.freqLabel = null;
+    this.noteLabel = null;
+    this._lastFreq = null;
+    this._lastNote = null;
+
+    // Cache tuner segment paths to avoid per-frame querySelectorAll
+    this._tunerSegments = null;
+    this._lastTunerCents = null;
+
     // Add tuner related properties
     this.tunerEnabled = false;
     this.tunerAnalyser = null;
@@ -421,6 +441,23 @@ function SampleWidget() {
         this.activity = activity;
         this.timbreBlock = timbreBlock;
         this.running = true;
+
+        // Reset RAF lifecycle state on init
+        this._running = false;
+        this._rafId = null;
+        this._samplerCanvas = null;
+        this._samplerCanvasCtx = null;
+        this._samplerCanvasTurtleIdx = null;
+        this._samplerCanvasResized = false;
+        this._tunerSegments = null;
+        this._lastTunerCents = null;
+
+        // Reset cached DOM label state
+        this.freqLabel = null;
+        this.noteLabel = null;
+        this._lastFreq = null;
+        this._lastNote = null;
+
         this.originalSampleName = "";
         this.isMoving = false;
         this.drawVisualIDs = {};
@@ -471,16 +508,10 @@ function SampleWidget() {
         };
 
         widgetWindow.onclose = () => {
-            if (this.drawVisualIDs) {
-                for (const id of Object.keys(this.drawVisualIDs)) {
-                    cancelAnimationFrame(this.drawVisualIDs[id]);
-                }
-            }
+            // Stop any animation loops immediately
+            this.stop();
 
             this.running = false;
-
-            // Stop pitch detection and release resources (microphone, AudioContext)
-            this.stopPitchDetection();
 
             // Close the pie menu if it's open
             const wheelDiv = docById("wheelDiv");
@@ -1184,6 +1215,9 @@ function SampleWidget() {
                 if (samplerCanvas) {
                     samplerCanvas.style.display = "block";
                 }
+
+                // Resume sampler RAF loop when returning to sampler canvas
+                this.start();
                 return;
             }
 
@@ -1203,6 +1237,9 @@ function SampleWidget() {
                 if (samplerCanvas) {
                     samplerCanvas.style.display = "none";
                 }
+
+                // Stop sampler RAF loop while sampler canvas is hidden
+                this.stop();
 
                 // Create the cent adjustment container
                 const centAdjustmentContainer = document.createElement("div");
@@ -1931,78 +1968,169 @@ function SampleWidget() {
             this.tunerDisplay = null;
         }
 
-        const draw = () => {
-            this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
-            if (
+        // Cache canvas references for the single RAF loop
+        this._samplerCanvas = canvas;
+        this._samplerCanvasCtx = canvasCtx;
+        this._samplerCanvasTurtleIdx = turtleIdx;
+        this._samplerCanvasResized = resized;
+
+        // Start (or keep running) the sampler RAF loop
+        this.start();
+    };
+
+    /**
+     * Start the sampler RAF loop (guarded against multiple starts).
+     */
+    this.start = function () {
+        if (this._running) return;
+        this._running = true;
+        this._loop();
+    };
+
+    /**
+     * Stop the sampler RAF loop and clean up RAF ids.
+     */
+    this.stop = function () {
+        this._running = false;
+
+        if (this._rafId) {
+            cancelAnimationFrame(this._rafId);
+            this._rafId = null;
+        }
+
+        // Cancel any legacy per-canvas RAF ids if present
+        if (this.drawVisualIDs) {
+            for (const id of Object.keys(this.drawVisualIDs)) {
+                cancelAnimationFrame(this.drawVisualIDs[id]);
+            }
+        }
+
+        // Stop pitch detection and release resources (microphone, AudioContext)
+        if (typeof this.stopPitchDetection === "function") {
+            this.stopPitchDetection();
+        }
+    };
+
+    /**
+     * RAF loop driver.
+     */
+    this._loop = () => {
+        if (!this._running) return;
+
+        this.drawSampler();
+        if (!this._running) return;
+
+        this._rafId = requestAnimationFrame(this._loop);
+
+        // Keep legacy cancellation path working
+        if (this.drawVisualIDs && this._samplerCanvasTurtleIdx !== null) {
+            this.drawVisualIDs[this._samplerCanvasTurtleIdx] = this._rafId;
+        }
+    };
+
+    /**
+     * Draw the sampler waveform and any canvas-only visuals. Safe to call per frame.
+     */
+    this.drawSampler = () => {
+        const canvas = this._samplerCanvas;
+        const canvasCtx = this._samplerCanvasCtx;
+
+        if (!canvas || !canvasCtx) {
+            // If the canvas is gone, stop the RAF loop to avoid a runaway animation.
+            this.stop();
+            return;
+        }
+
+        // Treat a hidden canvas as inactive
+        if (canvas.style && canvas.style.display === "none") {
+            this.stop();
+            return;
+        }
+
+        const canvasTurtleIdx = this._samplerCanvasTurtleIdx;
+        const resized = this._samplerCanvasResized;
+
+        if (
+            !(
                 this.is_recording ||
-                (this.pitchAnalysers[turtleIdx] && (this.running || resized))
-            ) {
-                canvasCtx.fillStyle = "#FFFFFF";
-                canvasCtx.font = "10px Verdana";
-                this.verticalOffset = -canvas.height / 4;
-                this.zoomFactor = 40.0;
-                canvasCtx.fillRect(0, 0, width, height);
+                (this.pitchAnalysers[canvasTurtleIdx] && (this.running || resized))
+            )
+        ) {
+            return;
+        }
 
-                let oscText;
-                if (turtleIdx >= 0) {
-                    //.TRANS: The sound sample that the user uploads.
-                    oscText = this.sampleName != "" ? this.sampleName : _("sample");
+        const width = canvas.width;
+        const height = canvas.height;
+
+        canvasCtx.fillStyle = "#FFFFFF";
+        canvasCtx.font = "10px Verdana";
+        this.verticalOffset = -height / 4;
+        this.zoomFactor = 40.0;
+        canvasCtx.fillRect(0, 0, width, height);
+
+        let oscText;
+        if (canvasTurtleIdx >= 0) {
+            //.TRANS: The sound sample that the user uploads.
+            oscText = this.sampleName != "" ? this.sampleName : _("sample");
+        }
+
+        canvasCtx.fillStyle = "#000000";
+        //.TRANS: The reference tone is a sound used for comparison.
+        canvasCtx.fillText(_("reference tone"), 10, 10);
+        canvasCtx.fillText(oscText, 10, height / 2 + 10);
+
+        for (let idx = 0; idx < 2; idx += 1) {
+            let dataArray;
+            if (this.is_recording) {
+                dataArray =
+                    idx === 0
+                        ? this.pitchAnalysers[0].getValue()
+                        : this.activity.logo.synth.getWaveFormValues();
+            } else {
+                dataArray = this.pitchAnalysers[idx].getValue();
+            }
+
+            const bufferLength = dataArray.length;
+            const rbga = SAMPLEOSCCOLORS[idx];
+            const sliceWidth = (width * this.zoomFactor) / bufferLength;
+            canvasCtx.lineWidth = 2;
+            canvasCtx.strokeStyle = rbga;
+            canvasCtx.beginPath();
+
+            let x = 0;
+            for (let i = 0; i < bufferLength; i++) {
+                const y = (height / 2) * (1 - dataArray[i]) + this.verticalOffset;
+                if (i === 0) {
+                    canvasCtx.moveTo(x, y);
+                } else {
+                    canvasCtx.lineTo(x, y);
                 }
-                canvasCtx.fillStyle = "#000000";
-                //.TRANS: The reference tone is a sound used for comparison.
-                canvasCtx.fillText(_("reference tone"), 10, 10);
-                canvasCtx.fillText(oscText, 10, canvas.height / 2 + 10);
+                x += sliceWidth;
+            }
+            canvasCtx.lineTo(width, height / 2);
+            canvasCtx.stroke();
+            this.verticalOffset = height / 4;
+        }
 
-                for (let turtleIdx = 0; turtleIdx < 2; turtleIdx += 1) {
-                    let dataArray;
-                    if (this.is_recording) {
-                        dataArray =
-                            turtleIdx === 0
-                                ? this.pitchAnalysers[0].getValue()
-                                : this.activity.logo.synth.getWaveFormValues();
-                    } else {
-                        dataArray = this.pitchAnalysers[turtleIdx].getValue();
-                    }
+        // Update the tuner display if enabled (cache DOM refs; update only when cents changes)
+        if (this.tunerEnabled && this.tunerDisplay) {
+            if (this.pitchAnalysers[1] && this.sampleName) {
+                const dataArray = this.pitchAnalysers[1].getValue();
+                if (dataArray && dataArray.length > 0) {
+                    const pitch = detectPitch(dataArray);
+                    if (pitch > 0) {
+                        const { note, cents } = frequencyToNote(pitch);
+                        this.tunerDisplay.update(note, cents, this.centsValue);
 
-                    const bufferLength = dataArray.length;
-                    const rbga = SAMPLEOSCCOLORS[turtleIdx];
-                    const sliceWidth = (width * this.zoomFactor) / bufferLength;
-                    canvasCtx.lineWidth = 2;
-                    canvasCtx.strokeStyle = rbga;
-                    canvasCtx.beginPath();
-
-                    let x = 0;
-
-                    for (let i = 0; i < bufferLength; i++) {
-                        const y = (height / 2) * (1 - dataArray[i]) + this.verticalOffset;
-                        if (i === 0) {
-                            canvasCtx.moveTo(x, y);
-                        } else {
-                            canvasCtx.lineTo(x, y);
-                        }
-                        x += sliceWidth;
-                    }
-                    canvasCtx.lineTo(canvas.width, canvas.height / 2);
-                    canvasCtx.stroke();
-                    this.verticalOffset = canvas.height / 4;
-                }
-
-                // Update the tuner display if enabled
-                if (this.tunerEnabled && this.tunerDisplay) {
-                    // Get pitch data from analyzer if available
-                    if (this.pitchAnalysers[1] && this.sampleName) {
-                        const dataArray = this.pitchAnalysers[1].getValue();
-                        if (dataArray && dataArray.length > 0) {
-                            const pitch = detectPitch(dataArray);
-                            if (pitch > 0) {
-                                const { note, cents } = frequencyToNote(pitch);
-                                this.tunerDisplay.update(note, cents, this.centsValue);
-
-                                // Update segments
-                                const tunerSegments = document.querySelectorAll(
+                        if (this._lastTunerCents !== cents) {
+                            if (!this._tunerSegments) {
+                                this._tunerSegments = document.querySelectorAll(
                                     "#tunerContainer svg path"
                                 );
-                                tunerSegments.forEach((segment, i) => {
+                            }
+
+                            if (this._tunerSegments && this._tunerSegments.length) {
+                                this._tunerSegments.forEach((segment, i) => {
                                     const segmentCents = (i - 5) * 10;
                                     if (Math.abs(cents - segmentCents) <= 5) {
                                         segment.setAttribute("fill", "#00ff00"); // In tune (green)
@@ -2013,12 +2141,13 @@ function SampleWidget() {
                                     }
                                 });
                             }
+
+                            this._lastTunerCents = cents;
                         }
                     }
                 }
             }
-        };
-        draw();
+        }
     };
 
     /**
@@ -2212,6 +2341,10 @@ function SampleWidget() {
 
             this.isPitchDetectionRunning = true;
 
+            // Cache pitch/note elements once (they are created by makeTuner)
+            if (!this.freqLabel) this.freqLabel = docById("pitch");
+            if (!this.noteLabel) this.noteLabel = docById("note");
+
             const updatePitch = () => {
                 // Check if we should stop the loop
                 if (!this.isPitchDetectionRunning) {
@@ -2221,20 +2354,13 @@ function SampleWidget() {
                 analyser.getFloatTimeDomainData(buffer);
                 const pitch = detectPitch(buffer);
 
-                // Safely update DOM elements (check if they exist first)
-                const pitchElement = document.getElementById("pitch");
-                const noteElement = document.getElementById("note");
-
-                if (pitchElement && noteElement) {
-                    if (pitch > 0) {
-                        const { note, cents } = frequencyToNote(pitch);
-                        pitchElement.textContent = pitch.toFixed(2);
-                        noteElement.textContent =
-                            cents === 0 ? ` ${note} (Perfect)` : ` ${note}, off by ${cents} cents`;
-                    } else {
-                        pitchElement.textContent = "---";
-                        noteElement.textContent = "---";
-                    }
+                if (pitch > 0) {
+                    const { note, cents } = frequencyToNote(pitch);
+                    const noteText =
+                        cents === 0 ? ` ${note} (Perfect)` : ` ${note}, off by ${cents} cents`;
+                    this.updateLabels(pitch, noteText);
+                } else {
+                    this.updateLabels(null, "---");
                 }
 
                 // Only continue the loop if still running
@@ -2307,7 +2433,36 @@ function SampleWidget() {
 
         this.widgetWindow.getWidgetBody().appendChild(container);
 
-        document.getElementById("start").addEventListener("click", startPitchDetection);
+        // Cache DOM references once
+        this.freqLabel = pitchSpan;
+        this.noteLabel = noteSpan;
+        this._lastFreq = null;
+        this._lastNote = null;
+
+        // Avoid querying the DOM to wire up the handler
+        startButton.addEventListener("click", startPitchDetection);
+    };
+
+    /**
+     * Update pitch labels only when values change.
+     * @param {number|null} freq
+     * @param {string} note
+     */
+    this.updateLabels = (freq, note) => {
+        if (!this.freqLabel || !this.noteLabel) return;
+
+        const nextFreq = typeof freq === "number" && isFinite(freq) ? freq : null;
+        const nextNote = typeof note === "string" ? note : "";
+
+        if (nextFreq !== this._lastFreq) {
+            this.freqLabel.textContent = nextFreq === null ? "---" : nextFreq.toFixed(2);
+            this._lastFreq = nextFreq;
+        }
+
+        if (nextNote !== this._lastNote) {
+            this.noteLabel.textContent = nextNote;
+            this._lastNote = nextNote;
+        }
     };
 
     /**
