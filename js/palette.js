@@ -349,7 +349,7 @@ class Palettes {
         if (this.mobile) {
             return;
         }
-        // In order to open the search widget and palette menu simulataneously
+        // In order to open the search widget and palette menu simultaneously
         // this.activity.hideSearchWidget(true);
         this.dict[name].showMenu(true);
         this.activePalette = name; // used to delete plugins
@@ -1003,7 +1003,7 @@ class Palette {
             img.onmouseover = () => (document.body.style.cursor = "pointer");
             img.onmouseleave = () => (document.body.style.cursor = "default");
 
-            // Image Drag initiates a browser defined drag, which needs to be stoped.
+            // Image Drag initiates a browser defined drag, which needs to be stopped.
             img.ondragstart = () => false;
 
             const down = event => {

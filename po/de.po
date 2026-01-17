@@ -4176,7 +4176,7 @@ msgid "Expand/collapse option toolbar"
 msgstr "Optionen-Toolbar aus-/einklappen"
 
 #: js/turtledefs.js:587
-msgid "Click this button to expand or collapse the auxillary toolbar."
+msgid "Click this button to expand or collapse the auxiliary toolbar."
 msgstr "Klicke hier um die Hilfeleiste aus- oder einzuklappen"
 
 #: js/turtledefs.js:593
