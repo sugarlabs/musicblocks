@@ -82,6 +82,11 @@ const setWheelSize = i => {
     wheelDiv.style.height = wheelDiv.style.width;
 };
 
+const getPieMenuSize = block => {
+    const canvas = block.blocks.turtles._canvas;
+    return Math.min(canvas.width, canvas.height);
+};
+
 // Call the function initially and whenever the window is resized
 setWheelSize();
 window.addEventListener("resize", setWheelSize);
@@ -120,7 +125,8 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
     wheelDiv.style.opacity = "0";
 
     // The pitch selector
-    block._pitchWheel = new wheelnav("wheelDiv", null, 600, 600);
+    const wheelSize = getPieMenuSize(block);
+    block._pitchWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
 
     if (!custom) {
         // The accidental selector
@@ -237,26 +243,27 @@ const piemenuPitches = (block, noteLabels, noteValues, accidentals, note, accide
 
     docById("wheelDiv").style.position = "absolute";
     setWheelSize(300);
+    const halfWheelSize = wheelSize / 2;
     docById("wheelDiv").style.left =
         Math.min(
-            block.blocks.turtles._canvas.width - 300,
+            block.blocks.turtles._canvas.width - wheelSize,
             Math.max(
                 0,
                 Math.round(
                     (x + block.activity.blocksContainer.x) * block.activity.getStageScale() +
                         canvasLeft
-                ) - 200
+                ) - halfWheelSize
             )
         ) + "px";
     docById("wheelDiv").style.top =
         Math.min(
-            block.blocks.turtles._canvas.height - 350,
+            block.blocks.turtles._canvas.height - wheelSize,
             Math.max(
                 0,
                 Math.round(
                     (y + block.activity.blocksContainer.y) * block.activity.getStageScale() +
                         canvasTop
-                ) - 200
+                ) - halfWheelSize
             )
         ) + "px";
 
@@ -1103,7 +1110,8 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
 
     docById("wheelDiv").style.display = "";
 
-    block._pitchWheel = new wheelnav("wheelDiv", null, 600, 600);
+    const wheelSize = getPieMenuSize(block);
+    block._pitchWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
     block._octavesWheel = new wheelnav("_octavesWheel", block._pitchWheel.raphael);
     block._exitWheel = new wheelnav("_exitWheel", block._pitchWheel.raphael);
 
@@ -1181,6 +1189,7 @@ const piemenuNthModalPitch = (block, noteValues, note) => {
 
     docById("wheelDiv").style.position = "absolute";
     setWheelSize(300);
+    const halfWheelSize = wheelSize / 2;
 
     const selectorWidth = 150;
     const left = Math.round(
@@ -1349,7 +1358,8 @@ const piemenuAccidentals = (block, accidentalLabels, accidentalValues, accidenta
     docById("wheelDiv").style.display = "";
 
     // the accidental selector
-    block._accidentalWheel = new wheelnav("wheelDiv", null, 600, 600);
+    const wheelSize = getPieMenuSize(block);
+    block._accidentalWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
     // exit button
     block._exitWheel = new wheelnav("_exitWheel", block._accidentalWheel.raphael);
 
@@ -1508,7 +1518,8 @@ const piemenuNoteValue = (block, noteValue) => {
     }
 
     // the noteValue selector
-    block._noteValueWheel = new wheelnav("wheelDiv", null, 600, 600);
+    const wheelSize = getPieMenuSize(block);
+    block._noteValueWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
     // exit button
     block._exitWheel = new wheelnav("_exitWheel", block._noteValueWheel.raphael);
     // submenu wheel
@@ -1635,13 +1646,13 @@ const piemenuNoteValue = (block, noteValue) => {
 
     docById("wheelDiv").style.left =
         Math.min(
-            Math.max(left - (300 - selectorWidth) / 2, 0),
-            block.blocks.turtles._canvas.width - 300
+            Math.max(left - (halfWheelSize - selectorWidth / 2), 0),
+            block.blocks.turtles._canvas.width - wheelSize
         ) + "px";
-    if (top - 300 < 0) {
+    if (top - wheelSize < 0) {
         docById("wheelDiv").style.top = top + 40 + "px";
     } else {
-        docById("wheelDiv").style.top = top - 300 + "px";
+        docById("wheelDiv").style.top = top - wheelSize + "px";
     }
 
     block.label.style.width =
@@ -1719,7 +1730,8 @@ const piemenuNumber = (block, wheelValues, selectedValue) => {
     }
     docById("wheelDiv").style.display = "";
     // the number selector
-    block._numberWheel = new wheelnav("wheelDiv", null, 600, 600);
+    const wheelSize = getPieMenuSize(block);
+    block._numberWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
     // exit button
     block._exitWheel = new wheelnav("_exitWheel", block._numberWheel.raphael);
     const wheelLabels = [];
@@ -2019,7 +2031,8 @@ const piemenuColor = (block, wheelValues, selectedValue, mode) => {
     docById("wheelDiv").style.display = "";
 
     // the number selector
-    block._numberWheel = new wheelnav("wheelDiv", null, 600, 600);
+    const wheelSize = getPieMenuSize(block);
+    block._numberWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
     // exit button
     block._exitWheel = new wheelnav("_exitWheel", block._numberWheel.raphael);
 
@@ -2332,7 +2345,8 @@ const piemenuBoolean = (block, booleanLabels, booleanValues, boolean) => {
     docById("wheelDiv").style.display = "";
 
     // the boolean selector
-    block._booleanWheel = new wheelnav("wheelDiv", null, 600, 600);
+    const wheelSize = getPieMenuSize(block);
+    block._booleanWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
 
     const labels = [];
     for (let i = 0; i < booleanLabels.length; i++) {
@@ -4038,7 +4052,8 @@ const piemenuDissectNumber = widget => {
     docById("wheelDiv").style.display = "";
 
     // Create the number wheel
-    const numberWheel = new wheelnav("wheelDiv", null, 600, 600);
+    const wheelSize = getPieMenuSize({ blocks: widget.activity.logo.blocks });
+    const numberWheel = new wheelnav("wheelDiv", null, wheelSize, wheelSize);
     const exitWheel = new wheelnav("_exitWheel", numberWheel.raphael);
 
     // Prepare labels with spacer
