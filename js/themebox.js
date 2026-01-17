@@ -132,7 +132,7 @@ class ThemeBox {
     applyThemeInstantly() {
         const body = document.body;
         // Update body classes
-        this._themes.forEach((theme) => {
+        this._themes.forEach(theme => {
             if (theme === this._theme) {
                 body.classList.add(theme);
             } else {
@@ -212,7 +212,7 @@ class ThemeBox {
 
         // Refresh floating windows
         const floatingWindows = document.querySelectorAll("#floatingWindows > .windowFrame");
-        floatingWindows.forEach((win) => {
+        floatingWindows.forEach(win => {
             if (this._theme === "dark") {
                 win.style.backgroundColor = "#454545";
                 win.style.borderColor = "#000000";
@@ -233,7 +233,7 @@ class ThemeBox {
             try {
                 const planetBody = planetIframe.contentDocument.body;
                 if (planetBody) {
-                    this._themes.forEach((theme) => {
+                    this._themes.forEach(theme => {
                         if (theme === this._theme) {
                             planetBody.classList.add(theme);
                         } else {
