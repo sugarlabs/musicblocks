@@ -680,6 +680,7 @@ Turtle.TurtleView = class {
     constructor() {
         // createjs object of start block (decoration)
         this._decorationBitmap = null;
+        this._decorationBaseScale = 0.5; // Base scale factor for decoration (27.5 / image.width)
 
         this._container = null; // createjs container
         this._bitmap = null; // createjs bitmap
@@ -855,16 +856,18 @@ Turtle.TurtleView = class {
                 startBlock.container.addChild(this._decorationBitmap);
                 this._decorationBitmap.name = "decoration";
 
+                // Store the base scale factor for use in resizeDecoration
+                this._decorationBaseScale = 27.5 / image.width;
+
                 const width = startBlock.width;
-                // FIXME: Why is the position off? Does it need a scale factor?
                 this._decorationBitmap.x = width - (30 * startBlock.protoblock.scale) / 2;
                 this._decorationBitmap.y = (20 * startBlock.protoblock.scale) / 2;
                 this._decorationBitmap.scaleX =
-                    ((27.5 / image.width) * startBlock.protoblock.scale) / 2;
+                    (this._decorationBaseScale * startBlock.protoblock.scale) / 2;
                 this._decorationBitmap.scaleY =
                     ((27.5 / image.height) * startBlock.protoblock.scale) / 2;
                 this._decorationBitmap.scale =
-                    ((27.5 / image.width) * startBlock.protoblock.scale) / 2;
+                    (this._decorationBaseScale * startBlock.protoblock.scale) / 2;
                 startBlock.updateCache();
             }
 
@@ -880,9 +883,9 @@ Turtle.TurtleView = class {
      */
     resizeDecoration(scale, width) {
         this._decorationBitmap.x = width - (30 * scale) / 2;
-        this._decorationBitmap.y = (35 * scale) / 2;
+        this._decorationBitmap.y = (20 * scale) / 2; // Use 20 to match doTurtleShell
         this._decorationBitmap.scaleX = this._decorationBitmap.scaleY = this._decorationBitmap.scale =
-            (0.5 * scale) / 2;
+            (this._decorationBaseScale * scale) / 2;
     }
 
     /**
