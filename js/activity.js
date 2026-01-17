@@ -4515,7 +4515,7 @@ class Activity {
         /**
          * Loads MB project from Planet.
          * @param  projectID {Planet project ID}
-         * @param  flags     {parameteres}
+         * @param  flags     {parameters}
          * @param  env       {specifies environment}
          */
         const loadProject = (activity, projectID, flags, env) => {
@@ -7544,7 +7544,7 @@ class Activity {
             // We use G (one sharp) and F (one flat) as prototypes for all
             // of the accidentals. When applied, these graphics are offset
             // vertically to rendering different sharps and flats and
-            // horizonally so as not to overlap.
+            // horizontally so as not to overlap.
             for (let i = 0; i < 7; i++) {
                 this.grandSharpBitmap[i] = this._createGrid(
                     "data:image/svg+xml;base64," + window.btoa(base64Encode(GRAND_G))

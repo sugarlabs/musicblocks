@@ -310,7 +310,7 @@
   "Load samples from server": "örnekleri sunucudan yükle",
   "This button opens a viewer for loading example projects.": "bu düğme örnek projeleri yüklemek için bir görüntüleyici açar",
   "Expand/collapse option toolbar": "seçenek araç çubuğunu genişlet/daralt",
-  "Click this button to expand or collapse the auxillary toolbar.": "yardımcı araç çubuğunu genişletmek veya daraltmak için bu düğmeyi tıklayın",
+  "Click this button to expand or collapse the auxiliary toolbar.": "yardımcı araç çubuğunu genişletmek veya daraltmak için bu düğmeyi tıklayın",
   "Displays help messages for the main and auxiliary toolbar, right-click contextual menu for blocks and canvas, and palettes.": "Displays help messages for the main and auxiliary toolbar, right-click contextual menu for blocks and canvas, and palettes.",
   "Click to run the project in slow mode.": "projeyi yavaş modda çalıştırmak için tıklayın",
   "Click to run the project step by step.": "Projeyi adım adım çalıştırmak için tıklayın",

@@ -310,7 +310,7 @@
   "Load samples from server": "从服务器加载样本",
   "This button opens a viewer for loading example projects.": "此按钮打开一个查看器，用于加载示例项目",
   "Expand/collapse option toolbar": "展开/收起选项工具栏",
-  "Click this button to expand or collapse the auxillary toolbar.": "点击此按钮以展开或收起辅助工具栏",
+  "Click this button to expand or collapse the auxiliary toolbar.": "点击此按钮以展开或收起辅助工具栏",
   "Displays help messages for the main and auxiliary toolbar, right-click contextual menu for blocks and canvas, and palettes.": "显示主工具栏和辅助工具栏的帮助信息，块和画布的右键上下文菜单，以及调色板的帮助信息",
   "Click to run the project in slow mode.": "点击以在慢速模式下运行项目",
   "Click to run the project step by step.": "点击按步骤运行项目",
