@@ -1482,25 +1482,10 @@ class Logo {
             ) {
                 args.push(logo.parseArg(logo, turtle, blk, logo.receivedArg));
 
-                // Use label prefix for screen dimension blocks to clarify the display is informational
-                // Labels wrapped with _() for internationalization
-                const blockLabels = {
-                    width: _("width"),
-                    height: _("height"),
-                    rightpos: _("right (screen)"),
-                    leftpos: _("left (screen)"),
-                    toppos: _("top (screen)"),
-                    bottompos: _("bottom (screen)")
-                };
-                const blockName = logo.blockList[blk].name;
-                const label = blockLabels[blockName];
-
                 if (logo.blockList[blk].value == null) {
                     logo.activity.textMsg("null block value");
                 } else {
-                    const value = logo.blockList[blk].value.toString();
-                    const displayText = label ? label + ": " + value : value;
-                    logo.activity.textMsg(displayText);
+                    logo.activity.textMsg(logo.blockList[blk].value.toString());
                 }
             } else {
                 logo.activity.errorMsg(

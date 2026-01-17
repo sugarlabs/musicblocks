@@ -209,7 +209,6 @@ class Activity {
      */
     constructor() {
         globalActivity = this;
-        this._listeners = [];
 
         this.cellSize = 55;
         this.searchSuggestions = [];
@@ -373,7 +372,6 @@ class Activity {
          * Sets up the initial state and dependencies of the activity.
          */
         this.setupDependencies = () => {
-            this.cleanupEventListeners();
             createDefaultStack();
             createHelpContent(this);
             window.scroll(0, 0);
@@ -408,7 +406,7 @@ class Activity {
             this.errorText = document.getElementById("errorText");
             this.errorTextContent = document.getElementById("errorTextContent");
             // Hide Arrow on hiding error message
-            this.addEventListener(this.errorText, "click", this._hideArrows);
+            this.errorText.addEventListener("click", this._hideArrows);
             // Show and populate the printText div.
             this.printText = document.getElementById("printText");
             this.printTextContent = document.getElementById("printTextContent");
@@ -509,8 +507,8 @@ class Activity {
 
             // Add event listener to remove the search div from the DOM
             const modeButton = document.getElementById("begIconText");
-            this.addEventListener(closeButton, "click", this._hideHelpfulSearchWidget);
-            this.addEventListener(modeButton, "click", this._hideHelpfulSearchWidget);
+            closeButton.addEventListener("click", this._hideHelpfulSearchWidget);
+            modeButton.addEventListener("click", this._hideHelpfulSearchWidget);
 
             this.helpfulSearchDiv.appendChild(this.helpfulSearchWidget);
         };
@@ -565,8 +563,7 @@ class Activity {
          * (if block is right clicked)
          */
         this.doContextMenus = () => {
-            this.addEventListener(
-                document,
+            document.addEventListener(
                 "contextmenu",
                 event => {
                     event.preventDefault();
@@ -646,11 +643,11 @@ class Activity {
                 const isClickInside = helpfulWheelDiv.contains(e.target);
                 if (!isClickInside) {
                     helpfulWheelDiv.style.display = "none";
-                    this.removeEventListener(document, "click", closeHelpfulWheel);
+                    document.removeEventListener("click", closeHelpfulWheel);
                 }
             };
 
-            this.addEventListener(document, "click", closeHelpfulWheel);
+            document.addEventListener("click", closeHelpfulWheel);
         };
 
         /**
@@ -853,7 +850,7 @@ class Activity {
         }
 
         //if any window resize event occurs:
-        this.addEventListener(window, "resize", () => repositionBlocks(this));
+        window.addEventListener("resize", () => repositionBlocks(this));
 
         /**
          * Finds and organizes blocks within the workspace.
@@ -1459,7 +1456,7 @@ class Activity {
 
             const importConfirm = document.createElement("button");
             importConfirm.classList.add("confirm-button");
-            importConfirm.textContent = _("Confirm");
+
             importConfirm.addEventListener("click", () => {
                 const maxNoteBlocks = select.value;
                 transcribeMidi(midi, maxNoteBlocks);
@@ -1469,7 +1466,7 @@ class Activity {
 
             const cancelBtn = document.createElement("button");
             cancelBtn.classList.add("cancel-button");
-            cancelBtn.textContent = _("Cancel");
+
             cancelBtn.addEventListener("click", () => {
                 document.body.removeChild(modal);
             });
@@ -1511,7 +1508,7 @@ class Activity {
             confirmBtn.style.fontWeight = "bold";
             confirmBtn.style.cursor = "pointer";
             confirmBtn.style.marginRight = "16px";
-            this.addEventListener(confirmBtn, "click", () => {
+            confirmBtn.addEventListener("click", () => {
                 document.body.removeChild(modal);
                 clearCanvasAction();
             });
@@ -1526,7 +1523,7 @@ class Activity {
             cancelBtn.style.padding = "8px 16px";
             cancelBtn.style.fontWeight = "bold";
             cancelBtn.style.cursor = "pointer";
-            this.addEventListener(cancelBtn, "click", () => {
+            cancelBtn.addEventListener("click", () => {
                 document.body.removeChild(modal);
             });
 
@@ -2505,12 +2502,7 @@ class Activity {
                 that.refreshCanvas();
             };
 
-            this.addEventListener(
-                document.getElementById("myCanvas"),
-                "wheel",
-                __wheelHandler,
-                false
-            );
+            document.getElementById("myCanvas").addEventListener("wheel", __wheelHandler, false);
 
             /**
              * Handles stage mouse up event.
@@ -2691,7 +2683,8 @@ class Activity {
                 hitArea.y = 0;
                 container.hitArea = hitArea;
 
-                container.on("click", () => {
+                // eslint-disable-next-line no-unused-vars
+                container.on("click", event => {
                     container.visible = false;
                     // On the possibility that there was an error
                     // arrow associated with this container
@@ -2752,7 +2745,8 @@ class Activity {
                 container.hitArea = hitArea;
 
                 const that = this;
-                container.on("click", () => {
+                // eslint-disable-next-line no-unused-vars
+                container.on("click", event => {
                     container.visible = false;
                     // On the possibility that there was an error
                     // arrow associated with this container
@@ -3178,10 +3172,6 @@ class Activity {
                 return;
             }
             if (document.getElementById("labelDiv").classList.contains("hasKeyboard")) {
-                return;
-            }
-            // Skip hotkeys when value bar is visible (prevents accidental block creation)
-            if (this.printText && this.printText.classList.contains("show")) {
                 return;
             }
 
@@ -3882,14 +3872,14 @@ class Activity {
         }
 
         let resizeTimeout;
-        this.addEventListener(window, "resize", () => {
+        window.addEventListener("resize", () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
                 handleResize();
                 this._setupPaletteMenu();
             }, 100);
         });
-        this.addEventListener(window, "orientationchange", handleResize);
+        window.addEventListener("orientationchange", handleResize);
         const that = this;
         const resizeCanvas_ = () => {
             try {
@@ -3902,7 +3892,7 @@ class Activity {
         };
 
         resizeCanvas_();
-        this.addEventListener(window, "orientationchange", resizeCanvas_);
+        window.addEventListener("orientationchange", resizeCanvas_);
 
         /*
          * Restore last stack pushed to trashStack back onto canvas.
@@ -4581,7 +4571,8 @@ class Activity {
             that.update = true;
         };
 
-        this._loadProject = (projectID, flags) => {
+        // eslint-disable-next-line no-unused-vars
+        this._loadProject = (projectID, flags, env) => {
             if (this.planet === undefined) {
                 return;
             }
@@ -5299,6 +5290,8 @@ class Activity {
             this.refreshCanvas();
         };
 
+        // Accessed from index.html
+        // eslint-disable-next-line no-unused-vars
         const hideArrows = () => {
             globalActivity._hideArrows();
         };
@@ -6531,7 +6524,8 @@ class Activity {
             });
 
             const that = this;
-            container.onmouseover = () => {
+            // eslint-disable-next-line no-unused-vars
+            container.onmouseover = event => {
                 if (!that.loading) {
                     document.body.style.cursor = "pointer";
                     container.style.transition = "0.12s ease-out";
@@ -6539,7 +6533,8 @@ class Activity {
                 }
             };
 
-            container.onmouseout = () => {
+            // eslint-disable-next-line no-unused-vars
+            container.onmouseout = event => {
                 if (!that.loading) {
                     document.body.style.cursor = "default";
                     container.style.transition = "0.15s ease-out";
@@ -6570,7 +6565,8 @@ class Activity {
          */
         this._loadButtonDragHandler = (container, actionClick, arg) => {
             const that = this;
-            container.onmousedown = () => {
+            // eslint-disable-next-line no-unused-vars
+            container.onmousedown = event => {
                 if (!that.loading) {
                     document.body.style.cursor = "default";
                 }
@@ -6633,7 +6629,8 @@ class Activity {
          * Ran once dom is ready and editable
          * Sets up dependencies and vars
          */
-        this.domReady = async () => {
+        // eslint-disable-next-line no-unused-vars
+        this.domReady = async doc => {
             this.saveLocally = undefined;
 
             // Do we need to update the stage?
@@ -6694,8 +6691,7 @@ class Activity {
         // Setup mouse events to start the drag
 
         this.setupMouseEvents = () => {
-            this.addEventListener(
-                document,
+            document.addEventListener(
                 "mousedown",
                 event => {
                     if (!this.isSelecting) return;
@@ -6718,7 +6714,7 @@ class Activity {
         };
 
         // end the drag on navbar
-        this.addEventListener(document.getElementById("toolbars"), "mouseover", () => {
+        document.getElementById("toolbars").addEventListener("mouseover", () => {
             this.isDragging = false;
         });
 
@@ -6808,15 +6804,12 @@ class Activity {
             this.currentX = 0;
             this.currentY = 0;
             this.hasMouseMoved = false;
-            if (this.selectionArea && this.selectionArea.parentNode) {
-                this.selectionArea.parentNode.removeChild(this.selectionArea);
-            }
             this.selectionArea = document.createElement("div");
             document.body.appendChild(this.selectionArea);
 
             this.setupMouseEvents();
 
-            this.addEventListener(document, "mousemove", event => {
+            document.addEventListener("mousemove", event => {
                 this.hasMouseMoved = true;
                 // event.preventDefault();
                 // this.selectedBlocks = [];
@@ -6833,7 +6826,7 @@ class Activity {
                 }
             });
 
-            this.addEventListener(document, "mouseup", event => {
+            document.addEventListener("mouseup", event => {
                 // event.preventDefault();
                 if (!this.isSelecting) return;
                 this.isDragging = false;
@@ -7162,22 +7155,26 @@ class Activity {
             // Load custom mode saved in local storage.
             const custommodeData = this.storage.custommode;
             if (custommodeData !== undefined) {
-                // FIX ME: customMode is loaded but not yet used
-                JSON.parse(custommodeData);
+                // FIX ME
+                // eslint-disable-next-line no-unused-vars
+                const customMode = JSON.parse(custommodeData);
             }
 
-            this.fileChooser.addEventListener("click", () => {
+            // eslint-disable-next-line no-unused-vars
+            this.fileChooser.addEventListener("click", event => {
                 that.value = null;
             });
 
             this.fileChooser.addEventListener(
                 "change",
-                () => {
+                // eslint-disable-next-line no-unused-vars
+                event => {
                     // Read file here.
                     const reader = new FileReader();
                     const midiReader = new FileReader();
 
-                    reader.onload = () => {
+                    // eslint-disable-next-line no-unused-vars
+                    reader.onload = theFile => {
                         that.loading = true;
                         document.body.style.cursor = "wait";
                         that.doLoadAnimation();
@@ -7218,7 +7215,8 @@ class Activity {
 
                                     if (!that.merging) {
                                         // Wait for the old blocks to be removed.
-                                        const __listener = () => {
+                                        // eslint-disable-next-line no-unused-vars
+                                        const __listener = event => {
                                             that.blocks.loadNewBlocks(obj);
                                             that.stage.removeAllEventListeners("trashsignal");
                                             if (that.planet) {
@@ -7294,7 +7292,8 @@ class Activity {
                 const midiReader = new FileReader();
 
                 const abcReader = new FileReader();
-                reader.onload = () => {
+                // eslint-disable-next-line no-unused-vars
+                reader.onload = theFile => {
                     that.loading = true;
                     document.body.style.cursor = "wait";
                     // doLoadAnimation();
@@ -7327,7 +7326,8 @@ class Activity {
                                 };
 
                                 // Wait for the old blocks to be removed.
-                                const __listener = () => {
+                                // eslint-disable-next-line no-unused-vars
+                                const __listener = event => {
                                     that.blocks.loadNewBlocks(obj);
                                     that.stage.removeAllEventListeners("trashsignal");
 
@@ -7431,25 +7431,29 @@ class Activity {
             dropZone.addEventListener("dragover", __handleDragOver, false);
             dropZone.addEventListener("drop", __handleFileSelect, false);
 
-            this.allFilesChooser.addEventListener("click", () => {
+            // eslint-disable-next-line no-unused-vars
+            this.allFilesChooser.addEventListener("click", event => {
                 this.value = null;
             });
 
-            this.pluginChooser.addEventListener("click", () => {
+            // eslint-disable-next-line no-unused-vars
+            this.pluginChooser.addEventListener("click", event => {
                 window.scroll(0, 0);
                 this.value = null;
             });
 
             this.pluginChooser.addEventListener(
                 "change",
-                () => {
+                // eslint-disable-next-line no-unused-vars
+                event => {
                     window.scroll(0, 0);
 
                     // Read file here.
                     const reader = new FileReader();
                     const pluginFile = that.pluginChooser.files[0];
 
-                    reader.onload = () => {
+                    // eslint-disable-next-line no-unused-vars
+                    reader.onload = theFile => {
                         that.loading = true;
                         document.body.style.cursor = "wait";
                         //doLoadAnimation();
@@ -7623,7 +7627,8 @@ class Activity {
                                             const n = data.arg;
                                             env.push(parseInt(n));
                                         },
-                                        () => {
+                                        // eslint-disable-next-line no-unused-vars
+                                        status => {
                                             alert(
                                                 "Something went wrong reading JSON-encoded project data."
                                             );
@@ -7681,66 +7686,6 @@ class Activity {
                 this.planet.planet.setAnalyzeProject(doAnalyzeProject);
             }
         };
-    }
-
-    /**
-     * Managed addEventListener that tracks listeners for cleanup.
-     * @param {EventTarget} target - The DOM element or object to attach the listener to.
-     * @param {string} type - The event type.
-     * @param {Function} listener - The callback function.
-     * @param {Object|boolean} [options] - listener options.
-     */
-    addEventListener(target, type, listener, options) {
-        if (!target || typeof target.addEventListener !== "function") return;
-        target.addEventListener(type, listener, options);
-        this._listeners.push({ target, type, listener, options });
-    }
-
-    /**
-     * Managed removeEventListener that also updates the tracker.
-     * @param {EventTarget} target - The DOM element or object to remove the listener from.
-     * @param {string} type - The event type.
-     * @param {Function} listener - The callback function.
-     * @param {Object|boolean} [options] - listener options.
-     */
-    removeEventListener(target, type, listener, options) {
-        if (!target || typeof target.removeEventListener !== "function") return;
-        target.removeEventListener(type, listener, options);
-        this._listeners = this._listeners.filter(
-            l =>
-                l.target !== target ||
-                l.type !== type ||
-                l.listener !== listener ||
-                !this._areOptionsEqual(l.options, options)
-        );
-    }
-
-    /**
-     * Checks if two event listener option sets are equivalent for the purpose of removal.
-     * @param {Object|boolean} opt1 - First option set.
-     * @param {Object|boolean} opt2 - Second option set.
-     * @returns {boolean} True if they are effectively equal.
-     */
-    _areOptionsEqual(opt1, opt2) {
-        // Normalize options to booleans for capture flag, as that's the primary discriminator for removal
-        const getCapture = opt => {
-            if (typeof opt === "boolean") return opt;
-            if (typeof opt === "object" && opt !== null) return !!opt.capture;
-            return false;
-        };
-        return getCapture(opt1) === getCapture(opt2);
-    }
-
-    /**
-     * Removes all tracked event listeners.
-     */
-    cleanupEventListeners() {
-        while (this._listeners.length > 0) {
-            const { target, type, listener, options } = this._listeners.pop();
-            if (target && typeof target.removeEventListener === "function") {
-                target.removeEventListener(type, listener, options);
-            }
-        }
     }
 
     /**
@@ -7861,7 +7806,8 @@ require(["domReady!"], doc => {
     }, 5000);
 });
 
-define(MYDEFINES, () => {
+// eslint-disable-next-line no-unused-vars
+define(MYDEFINES, compatibility => {
     activity.setupDependencies();
     activity.doContextMenus();
     activity.doPluginsAndPaletteCols();

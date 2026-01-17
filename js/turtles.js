@@ -1248,32 +1248,15 @@ Turtles.TurtlesView = class {
             __makeBoundary();
         }
 
-        // Debounce or throttle the resize event based on device capability
+        // Debounce the resize event to prevent performance issues
         let resizeTimeout;
-        let ticking = false;
-
         window.addEventListener("resize", () => {
-            const isHighEndDevice =
-                navigator.hardwareConcurrency && navigator.hardwareConcurrency >= 4;
-
-            if (isHighEndDevice) {
-                if (!ticking) {
-                    window.requestAnimationFrame(() => {
-                        handleCanvasResize();
-                        __makeBoundary();
-                        __makeBoundary2();
-                        ticking = false;
-                    });
-                    ticking = true;
-                }
-            } else {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(() => {
-                    handleCanvasResize();
-                    __makeBoundary();
-                    __makeBoundary2();
-                }, 150); // Wait 150ms after the last resize event to execute
-            }
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                handleCanvasResize();
+                __makeBoundary();
+                __makeBoundary2();
+            }, 150); // Wait 150ms after the last resize event to execute
         });
 
         return this;

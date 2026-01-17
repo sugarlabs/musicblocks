@@ -95,13 +95,6 @@ class Painter {
         this._hollowState = false;
         this._penDown = true;
         this.wrap = null;
-
-        // Performance optimizations: DOM caching and RAF-based updates
-        this._cachedCanvas = null;
-        this._cachedCanvasWidth = 0;
-        this._cachedCanvasHeight = 0;
-        this._pendingCanvasUpdate = false;
-        this._rafId = null;
     }
 
     // ========= Setters, Getters =============================================
@@ -223,48 +216,6 @@ class Painter {
      */
     get penState() {
         return this._penDown;
-    }
-
-    /**
-     * Schedules a canvas update using requestAnimationFrame for optimal performance.
-     * Batches multiple update requests into a single frame to reduce overhead.
-     *
-     * @private
-     */
-    _scheduleCanvasUpdate() {
-        if (this._pendingCanvasUpdate) {
-            return; // Already scheduled
-        }
-
-        this._pendingCanvasUpdate = true;
-        this._rafId = requestAnimationFrame(() => {
-            this._pendingCanvasUpdate = false;
-            this._rafId = null;
-            this.activity.refreshCanvas();
-        });
-    }
-
-    /**
-     * Gets cached canvas dimensions, updating cache if canvas reference changed.
-     * Separates read operations to prevent layout thrashing.
-     *
-     * @private
-     * @returns {Object} Object with width and height properties
-     */
-    _getCanvasDimensions() {
-        const currentCanvas = this.turtle.ctx.canvas;
-
-        // Update cache if canvas reference changed or not yet cached
-        if (this._cachedCanvas !== currentCanvas) {
-            this._cachedCanvas = currentCanvas;
-            this._cachedCanvasWidth = currentCanvas.width;
-            this._cachedCanvasHeight = currentCanvas.height;
-        }
-
-        return {
-            width: this._cachedCanvasWidth,
-            height: this._cachedCanvasHeight
-        };
     }
 
     // ========= Utilities ====================================================
@@ -730,7 +681,7 @@ class Painter {
             this.doRight(adeg);
         }
 
-        this._scheduleCanvasUpdate();
+        this.activity.refreshCanvas();
     }
 
     /**
@@ -799,10 +750,8 @@ class Painter {
         let nx = ox + Number(steps) * Math.sin(angleRadians);
         let ny = oy + Number(steps) * Math.cos(angleRadians);
 
-        // Batch read operations: get canvas dimensions once
-        const dimensions = this._getCanvasDimensions();
-        const w = dimensions.width;
-        const h = dimensions.height;
+        const w = this.turtle.ctx.canvas.width;
+        const h = this.turtle.ctx.canvas.height;
 
         const out = this._outOfBounds(
             turtles.turtleX2screenX(nx),
@@ -815,7 +764,7 @@ class Painter {
 
         if (this._fillState || !wrap || !out) {
             this._move(ox, oy, nx, ny, true, linePart);
-            this._scheduleCanvasUpdate();
+            this.activity.refreshCanvas();
         } else {
             const stepUnit = 5;
             let xIncrease, yIncrease;
@@ -862,7 +811,7 @@ class Painter {
                 steps -= stepUnit;
             }
 
-            this._scheduleCanvasUpdate();
+            this.activity.refreshCanvas();
         }
         // Update media positions
         const view = this.turtle._view;
@@ -916,7 +865,7 @@ class Painter {
         const ny = Number(y);
 
         this._move(ox, oy, nx, ny, true);
-        this._scheduleCanvasUpdate();
+        this.activity.refreshCanvas();
         const view = this.turtle._view;
         if (view && typeof view._updateMediaPositions === "function") {
             view._updateMediaPositions();
@@ -1334,7 +1283,7 @@ class Painter {
             );
         }
         this.turtle.penstrokes.image = this.turtle.canvas;
-        this._scheduleCanvasUpdate();
+        this.activity.refreshCanvas();
     }
 
     /**
@@ -1414,7 +1363,7 @@ class Painter {
             }
         }
 
-        this._scheduleCanvasUpdate();
+        this.activity.refreshCanvas();
     }
 
     /**

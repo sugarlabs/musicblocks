@@ -474,6 +474,7 @@ class Palettes {
 
     // Palette Button event handlers
     _loadPaletteButtonHandler(name, row) {
+        // eslint-disable-next-line no-unused-vars
         let timeout;
 
         row.onmouseover = () => {
@@ -488,7 +489,8 @@ class Palettes {
 
         row.onmouseout = () => clearTimeout(timeout);
 
-        row.onclick = () => {
+        // eslint-disable-next-line no-unused-vars
+        row.onclick = event => {
             if (name == "search") {
                 this._hideMenus();
                 this.activity.showSearchWidget();
@@ -497,11 +499,13 @@ class Palettes {
             }
         };
 
-        row.onmouseup = () => {
+        // eslint-disable-next-line no-unused-vars
+        row.onmouseup = event => {
             document.body.style.cursor = "default";
         };
 
-        row.onmouseleave = () => {
+        // eslint-disable-next-line no-unused-vars
+        row.onmouseleave = event => {
             document.body.style.cursor = "default";
         };
     }
@@ -1090,7 +1094,8 @@ class Palette {
     setupGrabScroll(paletteList) {
         let posY, top;
 
-        const mouseUpGrab = () => {
+        // eslint-disable-next-line no-unused-vars
+        const mouseUpGrab = event => {
             // paletteList.onmousemove = null;
             document.body.style.cursor = "default";
         };

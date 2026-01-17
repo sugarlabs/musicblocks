@@ -3453,7 +3453,8 @@ class Blocks {
 
                 postProcessArg = [thisBlock, arg];
             } else if (name === "newnote") {
-                postProcess = () => {};
+                // eslint-disable-next-line no-unused-vars
+                postProcess = args => {};
                 postProcessArg = [thisBlock, null];
             } else {
                 postProcess = null;
@@ -5841,11 +5842,6 @@ class Blocks {
             this._adjustTheseDocks = [];
             this._loadCounter = blockObjs.length;
 
-            // Preload audio samples for instruments used in this project (background task)
-            if (this.activity && this.activity.logo && this.activity.logo.synth) {
-                this.activity.logo.synth.preloadProjectSamples(blockObjs);
-            }
-
             /** We add new blocks to the end of the block list. */
             const blockOffset = this.blockList.length;
             const firstBlock = this.blockList.length;
@@ -6694,7 +6690,8 @@ class Blocks {
          * @public
          * @returns {void}
          */
-        this.cleanupAfterLoad = async () => {
+        // eslint-disable-next-line no-unused-vars
+        this.cleanupAfterLoad = async name => {
             this._loadCounter -= 1;
             if (this._loadCounter > 0) {
                 return;

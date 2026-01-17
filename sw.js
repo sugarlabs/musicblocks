@@ -1,7 +1,7 @@
 /*
   global
 
-    offlineFallbackPage
+  offlineFallbackPage, divInstall
 */
 
 // This is the "Offline page" service worker
@@ -55,7 +55,7 @@ function fromCache(request) {
             if (!matching || matching.status === 404) {
                 return Promise.reject("no-match");
             }
-
+            
             return matching;
         });
     });
@@ -103,6 +103,15 @@ self.addEventListener("fetch", function (event) {
     );
 });
 
+self.addEventListener("beforeinstallprompt", (event) => {
+    // eslint-disable-next-line no-console
+    console.log("done", "beforeinstallprompt", event);
+    // Stash the event so it can be triggered later.
+    window.deferredPrompt = event;
+    // Remove the "hidden" class from the install button container
+    divInstall.classList.toggle("hidden", false);
+});
+
 // This is an event that can be fired from your page to tell the SW to
 // update the offline page
 self.addEventListener("refreshOffline", function () {
@@ -111,10 +120,11 @@ self.addEventListener("refreshOffline", function () {
     return fetch(offlineFallbackPage).then(function (response) {
         return caches.open(CACHE).then(function (cache) {
             // eslint-disable-next-line no-console
-            console.log(
-                "[PWA Builder] Offline page updated from refreshOffline event: " + response.url
-            );
+            console.log("[PWA Builder] Offline page updated from refreshOffline event: " + response.url);
             return cache.put(offlinePageRequest, response);
         });
     });
 });
+
+
+

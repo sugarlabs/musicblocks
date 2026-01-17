@@ -224,6 +224,3 @@ class PitchSlider {
         this.activity.blocks.loadNewBlocks(newStack);
     }
 }
-if (typeof module !== "undefined") {
-    module.exports = PitchSlider;
-}

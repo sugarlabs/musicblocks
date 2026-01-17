@@ -952,12 +952,8 @@ class RhythmRuler {
                     drum = this.activity.blocks.blockList[drumBlockNo].value;
                 }
 
-                // Get the meter from the current turtle's singer
-                const turtle = this.activity.turtles.ithTurtle(0);
-                const beatsPerMeasure = turtle.singer.beatsPerMeasure || 4;
-
-                // Play count-off based on meter (e.g., 4 beats for 4/4, 3 beats for 3/4)
-                for (let i = 0; i < beatsPerMeasure; i++) {
+                // FIXME: Should be based on meter
+                for (let i = 0; i < 4; i++) {
                     setTimeout(() => {
                         this.activity.logo.synth.trigger(
                             0,
@@ -967,7 +963,7 @@ class RhythmRuler {
                             null,
                             null
                         );
-                    }, (interval * i) / beatsPerMeasure);
+                    }, (interval * i) / 4);
                 }
 
                 setTimeout(() => {
@@ -2768,7 +2764,4 @@ class RhythmRuler {
             docById("wheelDiv").style.top = y - 300 + "px";
         }
     }
-}
-if (typeof module !== "undefined") {
-    module.exports = RhythmRuler;
 }
