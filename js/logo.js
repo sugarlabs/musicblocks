@@ -1480,7 +1480,7 @@ class Logo {
                     logo.blockList[blk].protoblock.dockTypes[0]
                 )
             ) {
-                args.push(logo.parseArg(logo, turtle, blk, logo.receievedArg));
+                args.push(logo.parseArg(logo, turtle, blk, logo.receivedArg));
 
                 if (logo.blockList[blk].value == null) {
                     logo.activity.textMsg("null block value");
