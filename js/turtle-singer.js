@@ -2054,9 +2054,8 @@ class Singer {
                         0,
                         null
                     );
-                    const pitchNumber = getTemperament(
-                        activity.logo.synth.inTemperament
-                    ).pitchNumber;
+                    const pitchNumber = getTemperament(activity.logo.synth.inTemperament)
+                        .pitchNumber;
                     const ratio = [];
                     const number = [];
                     const numerator = [];
