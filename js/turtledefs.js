@@ -73,7 +73,7 @@ if (_THIS_IS_TURTLE_BLOCKS_) {
             GUIDEURL = "Docs/guide/index.html";
         } else {
             // Production environment
-            GUIDEURL = "https://musicblocks.sugarlabs.org/Docs/guide/";
+            GUIDEURL = "https://musicblocks.sugarlabs.org/Docs/guide/index.html";
         }
     }
 
@@ -472,7 +472,7 @@ const createHelpContent = activity => {
                 _("Guide"),
                 _("A detailed guide to Music Blocks is available."),
                 "data:image/svg+xml;base64," + window.btoa(base64Encode(LOGO)),
-                "https://musicblocks.sugarlabs.org/Docs/guide/",
+                GUIDEURL,
                 _("Music Blocks Guide")
             ],
             [
