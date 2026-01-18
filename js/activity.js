@@ -3254,14 +3254,6 @@ class Activity {
             const KEYCODE_DOWN = 40;
             const DEL = 46;
             const V = 86;
-            // Shortcuts for creating new notes
-            const KEYCODE_D = 68; // do
-            const KEYCODE_R = 82; // re
-            const KEYCODE_M = 77; // mi
-            const KEYCODE_F = 70; // fa
-            const KEYCODE_S = 83; // so
-            const KEYCODE_L = 76; // la
-            const KEYCODE_T = 84; // ti
             const disableKeys =
                 document.getElementById("lilypondModal").style.display === "block" ||
                 this.searchWidget.style.visibility === "visible" ||
@@ -3376,50 +3368,7 @@ class Activity {
                         break;
                 }
             } else if (event.shiftKey && !disableKeys) {
-                const solfnotes_ = _("ti la sol fa mi re do").split(" ");
                 switch (event.keyCode) {
-                    case KEYCODE_D:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("D " + solfnotes_[6]);
-                            this.__makeNewNote(5, "do");
-                        }
-                        break;
-                    case KEYCODE_R:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("R " + solfnotes_[5]);
-                            this.__makeNewNote(5, "re");
-                        }
-                        break;
-                    case KEYCODE_M:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("M " + solfnotes_[4]);
-                            this.__makeNewNote(5, "mi");
-                        }
-                        break;
-                    case KEYCODE_F:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("F " + solfnotes_[3]);
-                            this.__makeNewNote(5, "fa");
-                        }
-                        break;
-                    case KEYCODE_S:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("S " + solfnotes_[2]);
-                            this.__makeNewNote(5, "sol");
-                        }
-                        break;
-                    case KEYCODE_L:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("L " + solfnotes_[1]);
-                            this.__makeNewNote(5, "la");
-                        }
-                        break;
-                    case KEYCODE_T:
-                        if (_THIS_IS_MUSIC_BLOCKS_) {
-                            this.textMsg("T " + solfnotes_[0]);
-                            this.__makeNewNote(5, "ti");
-                        }
-                        break;
                     case SPACE:
                         event.preventDefault();
                         if (this.turtleContainer.scaleX === 1) {
@@ -3450,7 +3399,6 @@ class Activity {
                         this._doFastButton();
                     }
                 } else if (!disableKeys) {
-                    const solfnotes_ = _("ti la sol fa mi re do").split(" ");
                     switch (event.keyCode) {
                         case END:
                             this.textMsg("END " + _("Jumping to the bottom of the page."));
@@ -3591,48 +3539,6 @@ class Activity {
                                 )
                             ) {
                                 this.logo.runLogoCommands();
-                            }
-                            break;
-                        case KEYCODE_D:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("d " + solfnotes_[6]);
-                                this.__makeNewNote(4, "do");
-                            }
-                            break;
-                        case KEYCODE_R:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("r " + solfnotes_[5]);
-                                this.__makeNewNote(4, "re");
-                            }
-                            break;
-                        case KEYCODE_M:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("m " + solfnotes_[4]);
-                                this.__makeNewNote(4, "mi");
-                            }
-                            break;
-                        case KEYCODE_F:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("f " + solfnotes_[3]);
-                                this.__makeNewNote(4, "fa");
-                            }
-                            break;
-                        case KEYCODE_S:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("s " + solfnotes_[2]);
-                                this.__makeNewNote(4, "sol");
-                            }
-                            break;
-                        case KEYCODE_L:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("l " + solfnotes_[1]);
-                                this.__makeNewNote(4, "la");
-                            }
-                            break;
-                        case KEYCODE_T:
-                            if (_THIS_IS_MUSIC_BLOCKS_) {
-                                this.textMsg("t " + solfnotes_[0]);
-                                this.__makeNewNote(4, "ti");
                             }
                             break;
                         default:
