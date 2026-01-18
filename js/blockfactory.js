@@ -352,10 +352,7 @@ class SVG {
      * @returns {void}
      */
     _computeSlotSize() {
-        this._slotSize =
-            2 * this._innieY2 +
-            this._inniesSpacer +
-            this._padding;
+        this._slotSize = 2 * this._innieY2 + this._inniesSpacer + this._padding;
     }
 
     /**
