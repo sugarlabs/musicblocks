@@ -346,21 +346,23 @@ class Block {
         const that = this;
         return new Promise((resolve, reject) => {
             let loopCount = 0;
+            const MAX_RETRIES = 20;
+            const INITIAL_DELAY = 50;
 
             const checkBounds = async counter => {
                 try {
                     if (counter !== undefined) {
                         loopCount = counter;
                     }
-                    if (loopCount > 10) {
-                        // race condition?
+                    if (loopCount > MAX_RETRIES) {
                         throw new Error("COULD NOT CREATE CACHE");
                     }
 
                     that.bounds = that.container.getBounds();
 
                     if (that.bounds === null) {
-                        await delayExecution(100);
+                        const delayTime = INITIAL_DELAY * Math.pow(2, loopCount);
+                        await delayExecution(delayTime);
                         that.regenerateArtwork(true, []);
                         checkBounds(loopCount + 1);
                     } else {
@@ -391,6 +393,8 @@ class Block {
         const that = this;
         return new Promise((resolve, reject) => {
             let loopCount = 0;
+            const MAX_RETRIES = 15;
+            const INITIAL_DELAY = 100;
 
             const updateBounds = async counter => {
                 try {
@@ -398,13 +402,14 @@ class Block {
                         loopCount = counter;
                     }
 
-                    if (loopCount > 5) {
+                    if (loopCount > MAX_RETRIES) {
                         throw new Error("COULD NOT UPDATE CACHE");
                     }
 
                     if (that.bounds === null) {
+                        const delayTime = INITIAL_DELAY * Math.pow(2, loopCount);
+                        await that.pause(delayTime);
                         updateBounds(loopCount + 1);
-                        await that.pause(200);
                     } else {
                         that.container.updateCache();
                         that.activity.refreshCanvas();
