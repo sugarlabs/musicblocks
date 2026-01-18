@@ -27,7 +27,7 @@
         HELPCONTENT
  */
 
-/*exported HelpWidget*/
+/* exported HelpWidget */
 class HelpWidget {
     static ICONSIZE = 32;
 

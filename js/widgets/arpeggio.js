@@ -812,3 +812,7 @@ class Arpeggio {
         this._activity.blocks.loadNewBlocks(newStack);
     }
 }
+
+if (typeof module !== "undefined") {
+    module.exports = Arpeggio;
+}

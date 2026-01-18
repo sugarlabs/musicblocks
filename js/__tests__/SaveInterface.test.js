@@ -245,6 +245,53 @@ describe("save HTML methods", () => {
             "data:text/plain;charset=utf-8,%3Chtml%3EMock%20HTML%3C%2Fhtml%3E"
         );
     });
+
+    it("should use default filename when PlanetInterface is undefined", () => {
+        const mockPrepareHTML = jest.fn(() => "<html>Mock HTML</html>");
+        const activity = {
+            save: {
+                prepareHTML: mockPrepareHTML,
+                downloadURL: mockDownloadURL
+            },
+            PlanetInterface: undefined
+        };
+
+        instance.saveHTMLNoPrompt(activity);
+        jest.runAllTimers();
+
+        expect(mockDownloadURL).toHaveBeenCalledWith(
+            "My_Project.html",
+            expect.any(String)
+        );
+    });
+});
+
+describe("downloadURL", () => {
+    let instance;
+
+    beforeEach(() => {
+        instance = new SaveInterface({});
+        document.body.appendChild = jest.fn();
+        document.body.removeChild = jest.fn();
+    });
+
+    it("should create anchor element with correct attributes", () => {
+        const mockClick = jest.fn();
+        const mockSetAttribute = jest.fn();
+        jest.spyOn(document, "createElement").mockReturnValue({
+            setAttribute: mockSetAttribute,
+            click: mockClick
+        });
+
+        instance.downloadURL("test.txt", "data:text/plain,hello");
+
+        expect(document.createElement).toHaveBeenCalledWith("a");
+        expect(mockSetAttribute).toHaveBeenCalledWith("href", "data:text/plain,hello");
+        expect(mockSetAttribute).toHaveBeenCalledWith("download", "test.txt");
+        expect(mockClick).toHaveBeenCalled();
+        expect(document.body.appendChild).toHaveBeenCalled();
+        expect(document.body.removeChild).toHaveBeenCalled();
+    });
 });
 
 describe("saveMIDI Method", () => {
@@ -751,10 +798,579 @@ describe("saveLilypond Methods", () => {
     });
 });
 
+describe("prepareHTML", () => {
+    let instance, activity;
+
+    beforeEach(() => {
+        activity = {
+            prepareExport: jest.fn(() => '{"blocks":"mockdata"}'),
+            PlanetInterface: {
+                getCurrentProjectDescription: jest.fn(() => "A test project description"),
+                getCurrentProjectName: jest.fn(() => "TestProject"),
+                getCurrentProjectImage: jest.fn(() => "data:image/png;base64,testimage")
+            }
+        };
+        instance = new SaveInterface(activity);
+    });
+
+    it("should replace all placeholders with project data", () => {
+        const result = instance.prepareHTML();
+
+        expect(result).toContain("TestProject");
+        expect(result).toContain("A test project description");
+        expect(result).toContain('{"blocks":"mockdata"}');
+        expect(result).toContain("data:image/png;base64,testimage");
+        expect(activity.prepareExport).toHaveBeenCalled();
+    });
+
+    it("should use default description when PlanetInterface is undefined", () => {
+        instance.activity.PlanetInterface = undefined;
+        const result = instance.prepareHTML();
+
+        expect(result).toContain("No description provided");
+        expect(result).toContain("My Project");
+    });
+
+    it("should use default name when PlanetInterface is undefined", () => {
+        instance.activity.PlanetInterface = undefined;
+        const result = instance.prepareHTML();
+
+        expect(result).toContain("My Project");
+    });
+});
+
+describe("download edge cases", () => {
+    let instance;
+
+    beforeEach(() => {
+        const mockActivity = {
+            beginnerMode: false,
+            PlanetInterface: {
+                getCurrentProjectName: jest.fn(() => "My Project")
+            }
+        };
+        instance = new SaveInterface(mockActivity);
+        instance.downloadURL = jest.fn();
+    });
+
+    it("should return early when filename is null after prompt", () => {
+        global.window.prompt = jest.fn(() => null);
+        global.window.isElectron = false;
+        
+        const consoleSpy = jest.spyOn(console, 'debug').mockImplementation();
+        instance.download("abc", "data", null);
+        
+        expect(consoleSpy).toHaveBeenCalledWith("save cancelled");
+        consoleSpy.mockRestore();
+    });
+
+    it("should use default filename in Electron mode without prompt", () => {
+        global.window.isElectron = true;
+        instance.download("abc", "data", null);
+        
+        expect(instance.downloadURL).toHaveBeenCalledWith("My Project.abc", "data");
+        global.window.isElectron = false;
+    });
+
+    it("should use default project name when PlanetInterface is undefined", () => {
+        instance.activity.PlanetInterface = undefined;
+        global.window.prompt = jest.fn(() => "My Project.abc");
+        
+        instance.download("abc", "data", null);
+        
+        expect(instance.downloadURL).toHaveBeenCalledWith("My Project.abc", "data");
+    });
+});
+
+describe("afterSaveMIDI edge cases", () => {
+    beforeEach(() => {
+        global.activity = {
+            logo: {
+                _midiData: {}
+            },
+            save: {
+                download: jest.fn()
+            }
+        };
+
+        global.URL.createObjectURL = jest.fn(() => "mockURL");
+        jest.useFakeTimers();
+
+        global.getMidiInstrument = jest.fn(() => ({
+            default: 0,
+            guitar: 25,
+            piano: 0
+        }));
+
+        global.getMidiDrum = jest.fn(() => ({
+            "snare drum": 38,
+            "kick drum": 36
+        }));
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+        jest.useRealTimers();
+    });
+
+    it("should handle drum tracks correctly", () => {
+        global.activity.logo._midiData = {
+            "0": [
+                {
+                    note: [],
+                    drum: "snare drum",
+                    duration: 4,
+                    bpm: 90
+                }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        expect(Midi).toHaveBeenCalled();
+        expect(activity.save.download).toHaveBeenCalledWith("midi", "mockURL", null);
+    });
+
+    it("should handle rest notes (notes containing 'R')", () => {
+        global.activity.logo._midiData = {
+            "0": [
+                {
+                    note: ["R"],
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "piano"
+                }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        expect(Midi).toHaveBeenCalled();
+    });
+
+    it("should handle empty note arrays", () => {
+        global.activity.logo._midiData = {
+            "0": [
+                {
+                    note: [],
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "piano"
+                }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        expect(activity.save.download).toHaveBeenCalled();
+    });
+
+    it("should handle multiple tracks with different instruments", () => {
+        global.activity.logo._midiData = {
+            "0": [
+                {
+                    note: ["C4"],
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "piano"
+                },
+                {
+                    note: ["E4"],
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "guitar"
+                }
+            ],
+            "1": [
+                {
+                    note: ["G4"],
+                    duration: 2,
+                    bpm: 120,
+                    instrument: "piano"
+                }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        expect(Midi).toHaveBeenCalled();
+        expect(activity.save.download).toHaveBeenCalled();
+    });
+
+    it("should normalize notes with sharps and flats", () => {
+        global.activity.logo._midiData = {
+            "0": [
+                {
+                    note: ["C♯4", "D♭4"],
+                    duration: 4,
+                    bpm: 90,
+                    instrument: "piano"
+                }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        expect(Midi).toHaveBeenCalled();
+    });
+
+    it("should use default instrument when instrument is not specified", () => {
+        global.activity.logo._midiData = {
+            "0": [
+                {
+                    note: ["C4"],
+                    duration: 4,
+                    bpm: 90
+                    // No instrument specified
+                }
+            ]
+        };
+
+        instance.afterSaveMIDI();
+        jest.runAllTimers();
+
+        expect(Midi).toHaveBeenCalled();
+    });
+});
+
+describe("saveAbc with buffered data", () => {
+    let instance, activity;
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+        activity = {
+            logo: {
+                runningAbc: false,
+                notationOutput: "",
+                notationNotes: {},
+                recordingBuffer: {
+                    hasData: true,
+                    notationOutput: "X:1\nBuffered ABC Data",
+                    notationNotes: { 0: ["C4", "E4"] },
+                    notationStaging: { 0: ["staging data"] },
+                    notationDrumStaging: { 0: ["drum staging"] }
+                },
+                notation: {
+                    notationStaging: {},
+                    notationDrumStaging: {}
+                },
+                runLogoCommands: jest.fn()
+            },
+            turtles: {
+                getTurtleCount: jest.fn(() => 1),
+                getTurtle: jest.fn(() => ({ painter: { doClear: jest.fn() } }))
+            },
+            save: {
+                afterSaveAbc: jest.fn()
+            }
+        };
+        instance = new SaveInterface(activity);
+        instance.activity = activity;
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
+    it("should use buffered data when available", () => {
+        instance.saveAbc(activity);
+        
+        expect(activity.logo.notationOutput).toBe("X:1\nBuffered ABC Data");
+        expect(activity.logo.notationNotes).toEqual({ 0: ["C4", "E4"] });
+        expect(activity.logo.notation.notationStaging[0]).toEqual(["staging data"]);
+        expect(activity.logo.notation.notationDrumStaging[0]).toEqual(["drum staging"]);
+        
+        jest.runAllTimers();
+        expect(activity.save.afterSaveAbc).toHaveBeenCalled();
+    });
+
+    it("should run logo commands when no buffered data", () => {
+        activity.logo.recordingBuffer.hasData = false;
+        
+        instance.saveAbc(activity);
+        
+        expect(activity.logo.runningAbc).toBe(true);
+        expect(activity.logo.runLogoCommands).toHaveBeenCalled();
+    });
+});
+
+describe("saveLilypond with buffered data", () => {
+    let instance, activity;
+
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <div id="lilypondModal" style="display: none;">
+                <span class="close">×</span>
+                <input type="text" id="fileName" value="">
+                <input type="text" id="title" value="">
+                <input type="text" id="author" value="">
+                <input type="checkbox" id="MIDICheck">
+                <input type="checkbox" id="guitarCheck">
+                <button id="submitLilypond"></button>
+                <div id="fileNameText"></div>
+                <div id="titleText"></div>
+                <div id="authorText"></div>
+                <div id="MIDIText"></div>
+                <div id="guitarText"></div>
+            </div>
+        `;
+        global.docById = jest.fn(id => document.getElementById(id));
+        global.docByClass = jest.fn(className => document.getElementsByClassName(className));
+        
+        activity = {
+            PlanetInterface: {
+                getCurrentProjectName: jest.fn(() => "BufferedProject")
+            },
+            storage: {
+                getItem: jest.fn(() => null),
+                setItem: jest.fn()
+            },
+            logo: {
+                runningLilypond: false,
+                recordingBuffer: {
+                    hasData: true,
+                    notationOutput: "Buffered Lilypond",
+                    notationNotes: {},
+                    notationStaging: { 0: [] },
+                    notationDrumStaging: { 0: [] }
+                },
+                notation: {
+                    notationStaging: {},
+                    notationDrumStaging: {}
+                },
+                runLogoCommands: jest.fn()
+            },
+            turtles: {
+                getTurtleCount: jest.fn(() => 1),
+                getTurtle: jest.fn(() => ({ painter: { doClear: jest.fn() } }))
+            },
+            save: {
+                saveLYFile: jest.fn()
+            }
+        };
+        instance = new SaveInterface(activity);
+    });
+
+    it("should restore buffered notation data when available", () => {
+        instance.saveLilypond(activity);
+        
+        expect(activity.logo.notationOutput).toBe("Buffered Lilypond");
+    });
+
+    it("should use default author when no custom author in storage", () => {
+        instance.saveLilypond(activity);
+        
+        expect(docById("author").value).toBe("Mr. Mouse");
+    });
+});
+
+describe("saveLYFile comprehensive", () => {
+    let instance, activity;
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+        document.body.innerHTML = `
+            <div id="lilypondModal" style="display: block;">
+                <input type="text" id="fileName" value="testfile">
+                <input type="text" id="title" value="Test Title">
+                <input type="text" id="author" value="Test Author">
+                <input type="checkbox" id="MIDICheck" checked>
+                <input type="checkbox" id="guitarCheck" checked>
+            </div>
+        `;
+        global.docById = jest.fn(id => document.getElementById(id));
+        global.LILYPONDHEADER = "\\header { title = \"My Music Blocks Creation\" composer = \"Mr. Mouse\" }";
+        
+        activity = {
+            storage: {
+                setItem: jest.fn()
+            },
+            logo: {
+                MIDIOutput: "",
+                guitarOutputHead: "",
+                guitarOutputEnd: "",
+                notationOutput: "",
+                notationNotes: {},
+                runningLilypond: false,
+                recordingBuffer: {
+                    hasData: false
+                },
+                notation: {
+                    notationStaging: {},
+                    notationDrumStaging: {}
+                },
+                runLogoCommands: jest.fn()
+            },
+            turtles: {
+                getTurtleCount: jest.fn(() => 2),
+                getTurtle: jest.fn(() => ({ painter: { doClear: jest.fn() } }))
+            }
+        };
+        instance = new SaveInterface(activity);
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
+    it("should set MIDI output when MIDICheck is checked", () => {
+        instance.saveLYFile(false);
+        
+        expect(activity.logo.MIDIOutput).toContain("MIDI Output included!");
+    });
+
+    it("should set guitar output when guitarCheck is checked", () => {
+        instance.saveLYFile(false);
+        
+        expect(activity.logo.guitarOutputHead).toContain("Guitar tablature output included!");
+    });
+
+    it("should set notationConvert to pdf when isPDF is true", () => {
+        instance.saveLYFile(true);
+        
+        expect(instance.notationConvert).toBe("pdf");
+    });
+
+    it("should append .ly extension if not present", () => {
+        document.getElementById("fileName").value = "myproject";
+        instance.saveLYFile(false);
+        
+        expect(activity.logo.runningLilypond).toBe(true);
+    });
+
+    it("should save author to storage", () => {
+        instance.saveLYFile(false);
+        
+        expect(activity.storage.setItem).toHaveBeenCalledWith(
+            "customAuthor",
+            JSON.stringify("Test Author")
+        );
+    });
+
+    it("should handle buffered data and save immediately", () => {
+        activity.logo.recordingBuffer.hasData = true;
+        activity.logo.notationOutput = "Existing notation";
+        instance.afterSaveLilypond = jest.fn();
+        
+        instance.saveLYFile(false);
+        jest.runAllTimers();
+        
+        expect(instance.afterSaveLilypond).toHaveBeenCalled();
+    });
+
+    it("should replace title and author in header", () => {
+        activity.logo.recordingBuffer.hasData = true;
+        activity.logo.notationOutput = "My Music Blocks Creation by Mr. Mouse";
+        instance.afterSaveLilypond = jest.fn();
+        
+        instance.saveLYFile(false);
+        
+        expect(activity.logo.notationOutput).toContain("Test Title");
+        expect(activity.logo.notationOutput).toContain("Test Author");
+    });
+});
+
+describe("afterSaveLilypondLY", () => {
+    let instance, activity;
+
+    beforeEach(() => {
+        document.body.innerHTML = `<input type="text" id="fileName" value="test.ly">`;
+        global.docById = jest.fn(id => document.getElementById(id));
+        global.platform = { FF: false };
+        const jQueryMock = jest.fn(() => ({
+            appendTo: jest.fn().mockReturnThis(),
+            val: jest.fn().mockReturnThis(),
+            select: jest.fn().mockReturnThis(),
+            remove: jest.fn(),
+            on: jest.fn(),
+            0: { setSelectionRange: jest.fn() }
+        }));
+        jQueryMock.noConflict = jest.fn(() => jQueryMock);
+        global.jQuery = jQueryMock;
+        document.execCommand = jest.fn();
+        
+        activity = {
+            textMsg: jest.fn()
+        };
+        instance = new SaveInterface(activity);
+        instance.download = jest.fn();
+    });
+
+    it("should copy lilypond code to clipboard and show message", () => {
+        const lydata = "\\relative c' { c4 d e f }";
+        
+        instance.afterSaveLilypondLY(lydata, "test.ly");
+        
+        expect(document.execCommand).toHaveBeenCalledWith("copy");
+        expect(activity.textMsg).toHaveBeenCalled();
+        expect(instance.download).toHaveBeenCalledWith(
+            "ly",
+            expect.stringContaining("data:text;utf8,"),
+            "test.ly"
+        );
+    });
+
+    it("should skip clipboard on Firefox", () => {
+        global.platform.FF = true;
+        const consoleSpy = jest.spyOn(console, 'debug').mockImplementation();
+        
+        instance.afterSaveLilypondLY("data", "test.ly");
+        
+        expect(consoleSpy).toHaveBeenCalledWith('execCommand("copy") does not work on FireFox');
+        expect(instance.download).toHaveBeenCalled();
+        consoleSpy.mockRestore();
+    });
+});
+
+describe("afterSaveLilypond", () => {
+    let instance, activity;
+
+    beforeEach(() => {
+        document.body.innerHTML = `<input type="text" id="fileName" value="output.ly">`;
+        global.docById = jest.fn(id => document.getElementById(id));
+        global.saveLilypondOutput = jest.fn(() => "Lilypond output data");
+        const jQueryMock = jest.fn(() => ({ on: jest.fn() }));
+        jQueryMock.noConflict = jest.fn(() => jQueryMock);
+        global.jQuery = jQueryMock;
+        
+        activity = {};
+        instance = new SaveInterface(activity);
+        instance.afterSaveLilypondLY = jest.fn();
+        instance.afterSaveLilypondPDF = jest.fn();
+    });
+
+    it("should call afterSaveLilypondLY when notationConvert is empty", () => {
+        instance.notationConvert = "";
+        
+        instance.afterSaveLilypond();
+        
+        expect(instance.afterSaveLilypondLY).toHaveBeenCalledWith("Lilypond output data", "output.ly");
+        expect(instance.notationConvert).toBe("");
+    });
+
+    it("should call afterSaveLilypondPDF when notationConvert is pdf", () => {
+        instance.notationConvert = "pdf";
+        
+        instance.afterSaveLilypond();
+        
+        expect(instance.afterSaveLilypondPDF).toHaveBeenCalledWith("Lilypond output data", "output.ly");
+    });
+});
+
 describe("MXML Methods", () => {
     let instance, activity, mockLogo, mockTurtles;
 
     beforeEach(() => {
+        // Mock jQuery
+        const jQueryMock = jest.fn(() => ({ on: jest.fn() }));
+        jQueryMock.noConflict = jest.fn(() => jQueryMock);
+        global.jQuery = jQueryMock;
+
         // Mock turtleList with painters
         const mockPainter1 = { doClear: jest.fn() };
         const mockPainter2 = { doClear: jest.fn() };
@@ -785,8 +1401,7 @@ describe("MXML Methods", () => {
         };
 
         // Create SaveInterface instance
-        instance = new SaveInterface();
-        instance.activity = activity;
+        instance = new SaveInterface(activity);
         instance.download = jest.fn();
 
         // Mock saveMxmlOutput

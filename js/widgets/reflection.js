@@ -11,6 +11,8 @@
 
 /* This widget provides a chat interface for users to interact with AI mentors for project reflection and analysis.*/
 
+/* exported ReflectionMatrix */
+
 /**
  * Represents Reflection Widget.
  * @constructor

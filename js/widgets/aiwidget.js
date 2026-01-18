@@ -17,7 +17,7 @@
    instruments, slicePath, platformColor
 */
 
-/* exported Abhijeet Singh */
+/* exported AIWidget */
 /**
  * Represents a AI Widget.
  * @constructor

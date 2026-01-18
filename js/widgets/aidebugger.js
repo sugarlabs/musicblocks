@@ -12,6 +12,8 @@
 /* This widget provides an AI-powered debugging interface for Music Blocks projects,
 offering intelligent assistance, cool suggestions, and helping take your musical creations to new heights! */
 
+/* exported AIDebuggerWidget */
+
 /**
  * Represents a AI Widget.
  * @constructor

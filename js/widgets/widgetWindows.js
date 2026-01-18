@@ -17,6 +17,8 @@ Globals location
   _, docById
 */
 
+/* exported WidgetWindow */
+
 window.widgetWindows = { openWindows: {}, _posCache: {} };
 
 class WidgetWindow {
