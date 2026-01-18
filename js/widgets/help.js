@@ -356,21 +356,26 @@ class HelpWidget {
             body += `<p><a href="${link}" target="_blank">${HELPCONTENT[page][4]}</a></p>`;
         }
 
-        if ([_("Congratulations.")].includes(HELPCONTENT[page][0])) {
-            const cell = docById("right-arrow");
+        const cell = docById("right-arrow");
+        const leftArrow = docById("left-arrow");
 
-            cell.onclick = () => {
-                this._prepareBlockList();
-            };
+        // Disable left arrow on first page
+        if (page === 0) {
+            leftArrow.classList.add("disabled");
         } else {
-            const cell = docById("right-arrow");
-            const leftArrow = docById("left-arrow");
+            leftArrow.classList.remove("disabled");
+        }
+
+        // Disable right arrow on last page
+        if (page === HELPCONTENT.length - 1) {
+            cell.classList.add("disabled");
+            cell.onclick = null; // remove any previous click handler
+        } else {
+            cell.classList.remove("disabled");
+            // Set normal right arrow behavior
             cell.onclick = () => {
                 page = page + 1;
                 leftArrow.classList.remove("disabled");
-                if (page === HELPCONTENT.length) {
-                    page = 0;
-                }
                 if (page == 0) {
                     this.widgetWindow.updateTitle(_("Take a tour"));
                 } else {
@@ -378,25 +383,8 @@ class HelpWidget {
                 }
                 this._showPage(page);
             };
-            if (page === 0) {
-                leftArrow.classList.add("disabled");
-            }
-            leftArrow.onclick = () => {
-                if (page > 0) {
-                    page = page - 1;
-                    leftArrow.classList.remove("disabled");
-                    if (page == 0) {
-                        this.widgetWindow.updateTitle(_("Take a tour"));
-                    } else {
-                        this.widgetWindow.updateTitle(HELPCONTENT[page][0]);
-                    }
-                    this._showPage(page);
-                }
-                if (page === 0) {
-                    leftArrow.classList.add("disabled");
-                }
-            };
         }
+
 
         helpBody.style.color = "#505050";
         helpBody.insertAdjacentHTML("afterbegin", body);
