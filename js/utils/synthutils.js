@@ -539,7 +539,7 @@ function Synth() {
      * @function
      * @param {string} temperament - The new temperament.
      * @param {string} startingPitch - The starting pitch note.
-     */
+     */clear
     this.temperamentChanged = (temperament, startingPitch) => {
         let startPitch = startingPitch;
         const t = getTemperament(temperament);
@@ -3255,10 +3255,10 @@ function Synth() {
      * @returns {void}
      */
     this.createCentsSlider = function () {
-        const widgetBody = this.widgetWindow.getWidgetBody();
+        var widgetBody = this.widgetWindow.getWidgetBody();
 
         // Store actual DOM nodes instead of innerHTML (preserves event listeners)
-        this.previousContent = Array.from(widgetBody.childNodes);
+        this.previousContent = [].slice.call(widgetBody.childNodes);
 
         // Clear the widget body safely
         while (widgetBody.firstChild) {
@@ -3266,7 +3266,7 @@ function Synth() {
         }
 
         // Create the cents adjustment interface
-        const centsInterface = document.createElement("div");
+        var centsInterface = document.createElement("div");
         Object.assign(centsInterface.style, {
             width: "100%",
             height: "100%",
@@ -3276,7 +3276,6 @@ function Synth() {
         });
         // Avoid using innerHTML because it destroys event listeners.
         // We store and restore actual DOM nodes to preserve UI behavior.
-
         // Keep reference so removeCentsSlider can detect and clean it
         this.sliderDiv = centsInterface;
 
@@ -3401,28 +3400,28 @@ function Synth() {
  * @returns {void}
  */
 this.removeCentsSlider = function () {
-    const widgetBody = this.widgetWindow.getWidgetBody();
+    var widgetBody = this.widgetWindow.getWidgetBody();
 
     if (this.sliderDiv && this.sliderDiv.parentNode) {
-        // Clear the slider UI safely
         while (widgetBody.firstChild) {
             widgetBody.removeChild(widgetBody.firstChild);
         }
 
-        // Restore the original DOM nodes (preserves event listeners)
-        if (this.previousContent) {
-            this.previousContent.forEach(node => {
-                widgetBody.appendChild(node);
-            });
-            this.previousContent = null;
+        if (this.previousContent && this.previousContent.length) {
+            for (var i = 0; i < this.previousContent.length; i++) {
+                widgetBody.appendChild(this.previousContent[i]);
+            }
         }
+
+        this.previousContent = null;
+        this.sliderDiv = null;
     }
 
     this.sliderVisible = false;
     this.centsSliderBtn.getElementsByTagName("img")[0].style.filter = "";
     this.centsSliderBtn.style.backgroundColor = "";
 };
-c
+
 
 this.tone = null;
 this.noteFrequencies = {};
