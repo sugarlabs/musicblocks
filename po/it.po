@@ -4177,7 +4177,7 @@ msgid "Expand/collapse option toolbar"
 msgstr "Espandire/collassare barra degli strumenti di opzioni"
 
 #: js/turtledefs.js:587
-msgid "Click this button to expand or collapse the auxillary toolbar."
+msgid "Click this button to expand or collapse the auxiliary toolbar."
 msgstr "Click questo pulsante per espandire o collassare la barra degli strumenti assistente,"
 
 #: js/turtledefs.js:593

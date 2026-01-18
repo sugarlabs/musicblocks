@@ -88,7 +88,7 @@ class Blocks {
         this.boundary = this.activity.boundary;
         this.macroDict = this.activity.macroDict;
 
-        /** Did the user right cick? */
+        /** Did the user right click? */
         this.stageClick = false;
 
         /** We keep a list of stacks in the trash. */
@@ -904,7 +904,7 @@ class Blocks {
                     continue;
                 }
 
-                /** Another database integrety check. */
+                /** Another database integrity check. */
                 if (this.blockList[cblk] === null) {
                     // eslint-disable-next-line no-console
                     console.debug("This is not good: we encountered a null block: " + cblk);
@@ -925,7 +925,7 @@ class Blocks {
                     }
                 }
 
-                /** Yet another database integrety check. */
+                /** Yet another database integrity check. */
                 if (!foundMatch) {
                     // eslint-disable-next-line no-console
                     console.debug(
@@ -2032,7 +2032,7 @@ class Blocks {
                                         this.actionHasReturn(b),
                                         this.actionHasArgs(b)
                                     );
-                                    this.setActionProtoVisiblity(false);
+                                    this.setActionProtoVisibility(false);
                                 }
                             }
                         }
@@ -2121,7 +2121,7 @@ class Blocks {
 
             /**
              * Put block adjustments inside a slight delay to make the
-             * addition/substraction of vspace and changes of block shape
+             * addition/subtraction of vspace and changes of block shape
              * appear less abrupt (and it can be a little racy).
              * If we changed the contents of a arg block, we may need a vspace.
              */
@@ -3073,7 +3073,7 @@ class Blocks {
         /**
          * Highlight a block
          * @param - blk - block
-         * @param - unhilight - new variable
+         * @param - unhighlight - new variable
          * @public
          * @returns {void}
          */
@@ -3120,7 +3120,7 @@ class Blocks {
          * @param - name - new variable
          * @param - blockOffset - new variable
          * @param - connections
-         * @param - postPorcess
+         * @param - postProcess
          * @param - postProcessArg - Post process Argument
          * @private
          * @returns {void}
@@ -3732,7 +3732,7 @@ class Blocks {
          * @public
          * @returns {void}
          */
-        this.setActionProtoVisiblity = state => {
+        this.setActionProtoVisibility = state => {
             /** By default, the nameddo protoblock is hidden. */
             const actionsPalette = this.activity.palettes.dict["action"];
             let stateChanged = false;
@@ -3763,7 +3763,7 @@ class Blocks {
         this.findUniqueActionName = (name, actionBlk) => {
             /** If we have a stack named 'action', make the protoblock visible. */
             if (name === _("action")) {
-                this.setActionProtoVisiblity(true);
+                this.setActionProtoVisibility(true);
             }
 
             /** Make sure we don't make two actions with the same name. */
@@ -5001,7 +5001,7 @@ class Blocks {
                 return;
             }
 
-            /** Get the numerator and demoninator of the meter divide block */
+            /** Get the numerator and denominator of the meter divide block */
             let dblk = this.blockList[blk].connections[2];
             if (dblk === null || this.blockList[dblk].name !== "divide") {
                 return;
@@ -5531,7 +5531,7 @@ class Blocks {
 
                 /** If we have a stack named 'action', make the protoblock visible. */
                 if (name === _("action")) {
-                    this.setActionProtoVisiblity(true);
+                    this.setActionProtoVisibility(true);
                 }
 
                 const oldName = name;
@@ -5781,7 +5781,7 @@ class Blocks {
                          * Ensure that there is a hidden block as the first
                          * block in the child flow (connection 2) of an action
                          * block (required to make the backward block function
-                         * propperly).
+                         * properly).
                          */
                         len = blockObjs[b][4].length;
                         if (blockObjs[b][4][2] == null) {

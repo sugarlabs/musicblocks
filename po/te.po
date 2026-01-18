@@ -2067,7 +2067,7 @@ msgid "Expand/collapse option toolbar"
 msgstr "ఎంపిక టూల్‌బార్‌ను విస్తరించండి/మూసివేయండి"
 
 #: js/turtledefs.js:587
-msgid "Click this button to expand or collapse the auxillary toolbar."
+msgid "Click this button to expand or collapse the auxiliary toolbar."
 msgstr "సహాయక టూల్‌బార్‌ను విస్తరించడానికి లేదా కుదించడానికి ఈ బటన్‌ను క్లిక్ చేయండి."
 
 #: js/turtledefs.js:593
