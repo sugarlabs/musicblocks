@@ -308,6 +308,10 @@ class Activity {
         // Initialize GIF animator
         this.gifAnimator = new GIFAnimator();
 
+        // Dirty flag for canvas rendering optimization
+        // When true, the stage needs to be redrawn on the next animation frame
+        this.stageDirty = false;
+
         this.themes = ["light", "dark"];
         try {
             for (let i = 0; i < this.themes.length; i++) {
@@ -467,16 +471,26 @@ class Activity {
         };
 
         /*
-         * Ensure continuous canvas updates for animated content.
-         * The ticker runs at a fixed framerate to allow smooth GIF animation
-         * even when the turtle or UI is otherwise idle.
+         * Optimized canvas rendering using dirty flag pattern.
+         * The stage only updates when:
+         * 1. stageDirty flag is set (something changed)
+         * 2. Active tweens are running
+         * 3. GIF animations are playing
+         * This eliminates unnecessary 60fps updates when idle.
          */
-        createjs.Ticker.framerate = 60;
-        createjs.Ticker.on("tick", () => {
+        const renderLoop = () => {
             if (this.stage) {
-                this.stage.update();
+                const hasActiveTweens = createjs.Tween.hasActiveTweens();
+                const hasActiveGifs = this.gifAnimator && this.gifAnimator.getActiveCount() > 0;
+
+                if (this.stageDirty || hasActiveTweens || hasActiveGifs) {
+                    this.stage.update();
+                    this.stageDirty = false;
+                }
             }
-        });
+            requestAnimationFrame(renderLoop);
+        };
+        requestAnimationFrame(renderLoop);
 
         /*
          * creates helpfulSearchDiv for search
@@ -4359,7 +4373,8 @@ class Activity {
         };
 
         /*
-         * Updates all canvas elements
+         * Updates all canvas elements by marking stage as dirty.
+         * The actual render will happen on the next animation frame.
          */
         this.refreshCanvas = () => {
             if (this.blockRefreshCanvas) {
@@ -4367,27 +4382,34 @@ class Activity {
             }
 
             this.blockRefreshCanvas = true;
-            // Force stage clear and update
-            this.stage.clear();
-            this.stage.update();
+            // Mark stage as needing update
+            this.stageDirty = true;
             this.update = true;
 
             const that = this;
             setTimeout(() => {
                 that.blockRefreshCanvas = false;
-                that.stage.update();
+                that.stageDirty = true;
             }, 5);
         };
 
         /*
-         * This set makes it so the stage only re-renders when an
-         * event handler indicates a change has happened.
+         * This sets the dirty flag so the stage re-renders on the next
+         * animation frame when an event handler indicates a change has happened.
          */
         this.__tick = event => {
             if (this.update || createjs.Tween.hasActiveTweens()) {
-                this.update = false; // Only update once
-                this.stage.update(event);
+                this.update = false;
+                this.stageDirty = true;
             }
+        };
+
+        /*
+         * Marks the stage as needing a redraw on the next animation frame.
+         * Call this whenever visual changes occur that need to be rendered.
+         */
+        this.markStageDirty = () => {
+            this.stageDirty = true;
         };
 
         /*
@@ -4493,7 +4515,7 @@ class Activity {
         /**
          * Loads MB project from Planet.
          * @param  projectID {Planet project ID}
-         * @param  flags     {parameteres}
+         * @param  flags     {parameters}
          * @param  env       {specifies environment}
          */
         const loadProject = (activity, projectID, flags, env) => {
@@ -7522,7 +7544,7 @@ class Activity {
             // We use G (one sharp) and F (one flat) as prototypes for all
             // of the accidentals. When applied, these graphics are offset
             // vertically to rendering different sharps and flats and
-            // horizonally so as not to overlap.
+            // horizontally so as not to overlap.
             for (let i = 0; i < 7; i++) {
                 this.grandSharpBitmap[i] = this._createGrid(
                     "data:image/svg+xml;base64," + window.btoa(base64Encode(GRAND_G))

@@ -4177,7 +4177,7 @@ msgid "Expand/collapse option toolbar"
 msgstr "seçenek araç çubuğunu genişlet/daralt"
 
 #: js/turtledefs.js:587
-msgid "Click this button to expand or collapse the auxillary toolbar."
+msgid "Click this button to expand or collapse the auxiliary toolbar."
 msgstr "yardımcı araç çubuğunu genişletmek veya daraltmak için bu düğmeyi tıklayın"
 
 #: js/turtledefs.js:593

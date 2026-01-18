@@ -2761,7 +2761,7 @@ msgstr ""
 
 #: js/turtledefs.js:587
 #. TRANS: Haga clic en este botón para expandir o contraer la barra de herramientas auxiliar.
-msgid "Click this button to expand or collapse the auxillary toolbar."
+msgid "Click this button to expand or collapse the auxiliary toolbar."
 msgstr ""
 
 #: js/turtledefs.js:593

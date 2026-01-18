@@ -234,12 +234,12 @@ class WidgetWindow {
             this._overlayframe.style.width = "100vw";
             this._overlayframe.style.height = "calc(100vh - 64px)";
             this._overlayframe.style.border = "0.25vw solid black";
-            this._overlayframe.style.backgroundColor = "rgba(255,255,255,0.75)";
+            this._overlayframe.style.backgroundColor = "var(--overlay-bg)";
         } else {
             this._frame.style.zIndex = "10000";
             this._overlayframe.style.border = "0px";
             this._overlayframe.style.zIndex = "-1";
-            this._overlayframe.style.backgroundColor = "rgba(255,255,255,0)";
+            this._overlayframe.style.backgroundColor = "transparent";
         }
     }
 

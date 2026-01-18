@@ -398,10 +398,6 @@ class RhythmRuler {
          * @private
          */
         widgetWindow.onclose = () => {
-            // If the piemenu was open, close it.
-            // docById('wheelDiv').style.display = 'none';
-            // docById('contextWheelDiv').style.display = 'none';
-
             if (this._playing) {
                 this.__pause();
             }
@@ -791,7 +787,6 @@ class RhythmRuler {
         }
 
         activity.textMsg(_("Click on the ruler to divide it."), 3000);
-        // this._piemenuRuler(this._rulerSelected);
     }
 
     /**
@@ -992,8 +987,6 @@ class RhythmRuler {
             this._rulerSelected = cell.parentNode.getAttribute("data-row");
             this.__dissectByNumber(cell, inputNum, true);
         }
-
-        // this._piemenuRuler(this._rulerSelected);
 
         //Save dissect history everytime user dissects ruler
         this.saveDissectHistory();
@@ -1356,8 +1349,6 @@ class RhythmRuler {
 
             divisionHistory.push(cell.cellIndex);
         }
-
-        // this._piemenuRuler(this._rulerSelected);
     }
 
     /**
@@ -1413,8 +1404,6 @@ class RhythmRuler {
 
             this._calculateZebraStripes(this._rulerSelected);
         }
-
-        // this._piemenuRuler(this._rulerSelected);
     }
 
     /**
@@ -1484,8 +1473,6 @@ class RhythmRuler {
 
             this._calculateZebraStripes(this._rulerSelected);
         }
-
-        // this._piemenuRuler(this._rulerSelected);
     }
 
     /**
@@ -1511,8 +1498,6 @@ class RhythmRuler {
             this._rulerSelected = cell.parentNode.getAttribute("data-row");
             this.__tie(true);
         }
-
-        // this._piemenuRuler(this._rulerSelected);
     }
 
     /**
@@ -1733,8 +1718,6 @@ class RhythmRuler {
 
         divisionHistory.pop();
         this._calculateZebraStripes(lastRuler);
-
-        // this._piemenuRuler(this._rulerSelected);
     }
 
     /**
@@ -1782,8 +1765,6 @@ class RhythmRuler {
                 this._undo();
             }
         }
-
-        // this._piemenuRuler(this._rulerSelected);
     }
 
     /**
@@ -2757,55 +2738,6 @@ class RhythmRuler {
         }
 
         this._dissectHistory = JSON.parse(JSON.stringify(dissectHistory));
-    }
-
-    _piemenuRuler() {
-        return; // In progress
-        /*
-        // piemenu version of ruler
-        docById('wheelDiv2').style.display = '';
-        docById('wheelDiv2').style.position = 'absolute';
-        docById('wheelDiv2').style.left = '600px';
-        docById('wheelDiv2').style.top = '300px';
-
-        if (selectedRuler === undefined) {
-            selectedRuler = 0;
-        }
-
-        if (this._wheel !== null) {
-            this._wheel.removeWheel();
-        }
-
-        console.debug(this.Rulers[selectedRuler]);
-        this._wheel = new wheelnav('wheelDiv2', null, 600, 600);
-        this._wheel.wheelRadius = 200;
-        this._wheel.maxPercent = 1.6;
-        this._wheel.colors = [platformColor.selectorBackground, platformColor.selectorSelected];
-        this._wheel.navItemsContinuous = true;
-        this._wheel.markerPathFunction = markerPath().PieLineMarker;
-        this._wheel.clickModeRotate = false;
-        this._wheel.markerEnable = true;
-        this._wheel.slicePathFunction = slicePath().DonutSlice;
-        this._wheel.slicePathCustom = slicePath().DonutSliceCustomization();
-
-        let labels = [];
-        for (let i = 0; i < this.Rulers[selectedRuler][0].length; i++) {
-            if (this.Rulers[selectedRuler][0][i] < 17 && this.Rulers[selectedRuler][0][i] > 0) {
-                labels.push('1/' + this.Rulers[selectedRuler][0][i]);
-            } else {
-                labels.push(' ');
-            }
-        }
-
-        console.debug(labels);
-        this._wheel.initWheel(labels);
-
-        for (let i = 0; i < this.Rulers[selectedRuler][0].length; i++) {
-            this._wheel.navItems[i].sliceAngle = 360 / Math.abs(this.Rulers[selectedRuler][0][i]);
-        }
-
-        this._wheel.createWheel();
-        */
     }
 
     /**

@@ -559,7 +559,7 @@ const createHelpContent = activity => {
     ]);
     HELPCONTENT.push([
         _("Expand/collapse option toolbar"),
-        _("Click this button to expand or collapse the auxillary toolbar."),
+        _("Click this button to expand or collapse the auxiliary toolbar."),
         "data:image/svg+xml;base64," + window.btoa(base64Encode(MENUBUTTON))
     ]);
     HELPCONTENT.push([
