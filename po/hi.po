@@ -1017,7 +1017,7 @@ msgid "Expand/collapse option toolbar"
 msgstr "विकल्प टूलबार को विस्तृत/संकुचित करें"
 
 #: js/turtledefs.js:588
-msgid "Click this button to expand or collapse the auxillary toolbar."
+msgid "Click this button to expand or collapse the auxiliary toolbar."
 msgstr "सहायक उपकरण पट्टी को विस्तृत या संक्षिप्त करने के लिए यह बटन क्लिक करें."
 
 #: js/turtledefs.js:593

@@ -2063,7 +2063,7 @@ msgid "Expand/collapse option toolbar"
 msgstr "साधनपट्टी दाखवायसाठी / लपवायसाठी पर्याय"
 
 #: js/turtledefs.js:587
-msgid "Click this button to expand or collapse the auxillary toolbar."
+msgid "Click this button to expand or collapse the auxiliary toolbar."
 msgstr "या बटणावर क्लिक करून सहाय्यक टूलबार विस्तारित किंवा संकुचित करा."
 
 #: js/turtledefs.js:593

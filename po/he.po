@@ -2060,7 +2060,7 @@ msgid "Expand/collapse option toolbar"
 msgstr "הרחב/צמצם סרגל האפשרויות"
 
 #: js/turtledefs.js:587
-msgid "Click this button to expand or collapse the auxillary toolbar."
+msgid "Click this button to expand or collapse the auxiliary toolbar."
 msgstr "לחצו על כפתור זה כדי להרחיב או לצמצם את סרגל כלי העזר"
 
 #: js/turtledefs.js:593
