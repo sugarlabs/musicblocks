@@ -3023,10 +3023,10 @@ class Block {
                 setTimeout(() => {
                     moved =
                         Math.abs(event.stageX / that.activity.getStageScale() - that.original.x) +
-                            Math.abs(
-                                event.stageY / that.activity.getStageScale() - that.original.y
-                            ) >
-                            20 && !window.hasMouse;
+                        Math.abs(
+                            event.stageY / that.activity.getStageScale() - that.original.y
+                        ) >
+                        20 && !window.hasMouse;
                     getInput = !moved;
                 }, 200);
             }
@@ -3105,21 +3105,19 @@ class Block {
          * Unhighlights the block and resets the active block.
          * @param {Event} event - The mouseout event object.
          */
-      this.container.on("click", event => {
-    if (!that.blocks.getLongPressStatus()) {
-        // finalize interaction immediately
-        that._mouseoutCallback(event, moved, haveClick, true);
-    }
+        this.container.on("mouseout", event => {
+            if (!that.blocks.getLongPressStatus()) {
+                // finalize interaction immediately
+                that._mouseoutCallback(event, moved, haveClick, true);
+            }
 
-    if (!that.blocks.selectionModeOn) {
-        that.blocks.unhighlight(thisBlock, true);
-    }
+            if (!that.blocks.selectionModeOn) {
+                that.blocks.unhighlight(thisBlock, true);
+            }
 
-    that.blocks.activeBlock = null;
-    moved = false;
-});
-
-
+            that.blocks.activeBlock = null;
+            moved = false;
+        });
         /**
          * Defines the event handler for pressup event on the container.
          * If a long press is not detected, triggers the mouseout callback.
