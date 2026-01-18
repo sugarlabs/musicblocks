@@ -45,29 +45,25 @@ class Oscilloscope {
      * @param {Object} activity - The activity object
      */
     constructor(activity) {
+        this._running = false;
+        this._rafId = null;
+        this.drawVisualIDs = {};
+
+        this.draw = this.draw.bind(this);
+        this._lastTurtle = null;
+
         this.activity = activity;
         this.pitchAnalysers = {};
         this.playingNow = false;
-        if (this.drawVisualIDs) {
-            for (const id of Object.keys(this.drawVisualIDs)) {
-                cancelAnimationFrame(this.drawVisualIDs[id]);
-            }
-        }
 
-        this.drawVisualIDs = {};
+        this._canvasState = {};
         const widgetWindow = window.widgetWindows.windowFor(this, "oscilloscope");
         this.widgetWindow = widgetWindow;
         widgetWindow.clear();
         widgetWindow.show();
 
         widgetWindow.onclose = () => {
-            for (const turtle of this.divisions) {
-                const turtleIdx = this.activity.turtles.getIndexOfTurtle(turtle);
-                cancelAnimationFrame(this.drawVisualIDs[turtleIdx]);
-            }
-
-            this.pitchAnalysers = {};
-            widgetWindow.destroy();
+            this.close();
         };
         widgetWindow.onmaximize = this._scale.bind(this);
 
@@ -111,6 +107,155 @@ class Oscilloscope {
             // console.debug("oscilloscope running");
         }
     }
+
+    close() {
+        this._running = false;
+
+        if (this._rafId !== null) {
+            cancelAnimationFrame(this._rafId);
+            this._rafId = null;
+        }
+
+        for (const id in this.drawVisualIDs) {
+            cancelAnimationFrame(this.drawVisualIDs[id]);
+        }
+        this.drawVisualIDs = {};
+
+        this._canvasState = {};
+        this.pitchAnalysers = {};
+
+        if (this.widgetWindow) {
+            this.widgetWindow.destroy();
+            this.widgetWindow = null;
+        }
+    }
+
+    _isWidgetOpen() {
+        return Boolean(this.widgetWindow);
+    }
+
+    _computeCanDraw() {
+        if (!this._isWidgetOpen()) return false;
+
+        let anyDrawable = false;
+        let anyActivePlayback = false;
+        let anyResizedOnce = false;
+
+        for (const turtleIdx of Object.keys(this._canvasState)) {
+            const state = this._canvasState[turtleIdx];
+            if (!state) continue;
+
+            anyResizedOnce = anyResizedOnce || Boolean(state.resizedOnce);
+
+            const analyser = this.pitchAnalysers[state.turtleIdx];
+            if (!analyser) continue;
+
+            anyDrawable = true;
+            anyActivePlayback = anyActivePlayback || Boolean(state.turtle && state.turtle.running);
+        }
+
+        // We draw if there's something to draw and either playback is active or we need one resized pass.
+        return anyDrawable && (anyActivePlayback || anyResizedOnce);
+    }
+
+    draw(turtle) {
+        // When invoked by requestAnimationFrame, the first argument is a timestamp.
+        // Use the last known turtle index in that case.
+        if (turtle !== undefined && turtle !== null) {
+            if (this._canvasState[turtle] || this.pitchAnalysers[turtle]) {
+                this._lastTurtle = turtle;
+            } else {
+                turtle = this._lastTurtle;
+            }
+        } else {
+            turtle = this._lastTurtle;
+        }
+
+        if (!this._running) return;
+
+        const canDraw = this._computeCanDraw();
+        if (!canDraw) {
+            this._running = false;
+
+            if (this._rafId !== null) {
+                cancelAnimationFrame(this._rafId);
+                this._rafId = null;
+            }
+
+            for (const id of Object.keys(this.drawVisualIDs)) {
+                this.drawVisualIDs[id] = null;
+            }
+
+            if (turtle !== undefined && turtle !== null) {
+                this.drawVisualIDs[turtle] = null;
+            }
+            return;
+        }
+
+        for (const turtleKey of Object.keys(this._canvasState)) {
+            const state = this._canvasState[turtleKey];
+            if (!state) continue;
+
+            const analyser = this.pitchAnalysers[state.turtleIdx];
+            if (!analyser) continue;
+
+            if (!(state.turtle && (state.turtle.running || state.resizedOnce))) continue;
+
+            const canvasCtx = state.canvasCtx;
+            const width = state.width;
+            const height = state.height;
+
+            canvasCtx.fillStyle = "#FFFFFF";
+            const dataArray = analyser.getValue();
+            const bufferLength = dataArray.length;
+            canvasCtx.fillRect(0, 0, width, height);
+            canvasCtx.lineWidth = 2;
+            const rbga = state.turtle.painter._canvasColor;
+            canvasCtx.strokeStyle = rbga;
+            canvasCtx.beginPath();
+            const sliceWidth = (width * this.zoomFactor) / bufferLength;
+            let x = 0;
+
+            for (let i = 0; i < bufferLength; i++) {
+                const y = (height / 2) * (1 - dataArray[i]) + this.verticalOffset;
+                if (i === 0) {
+                    canvasCtx.moveTo(x, y);
+                } else {
+                    canvasCtx.lineTo(x, y);
+                }
+                x += sliceWidth;
+            }
+
+            canvasCtx.lineTo(state.canvas.width, state.canvas.height / 2);
+            canvasCtx.stroke();
+
+            // Only allow one frame of drawing due to resize.
+            state.resizedOnce = false;
+        }
+
+        // Re-check after the draw pass (e.g., resizedOnce may have flipped to false).
+        const canDrawAfter = this._computeCanDraw();
+        if (!canDrawAfter) {
+            this._running = false;
+
+            if (this._rafId !== null) {
+                cancelAnimationFrame(this._rafId);
+                this._rafId = null;
+            }
+
+            for (const id of Object.keys(this.drawVisualIDs)) {
+                this.drawVisualIDs[id] = null;
+            }
+            return;
+        }
+
+        if (!this._running) return;
+
+        this._rafId = requestAnimationFrame(this.draw);
+        for (const id of Object.keys(this.drawVisualIDs)) {
+            this.drawVisualIDs[id] = this._rafId;
+        }
+    }
     /**
      * Reconnects synths to analyser.
      *
@@ -146,34 +291,21 @@ class Oscilloscope {
         const canvasCtx = canvas.getContext("2d");
         canvasCtx.clearRect(0, 0, width, height);
 
-        const draw = () => {
-            this.drawVisualIDs[turtleIdx] = requestAnimationFrame(draw);
-            if (this.pitchAnalysers[turtleIdx] && (turtle.running || resized)) {
-                canvasCtx.fillStyle = "#FFFFFF";
-                const dataArray = this.pitchAnalysers[turtleIdx].getValue();
-                const bufferLength = dataArray.length;
-                canvasCtx.fillRect(0, 0, width, height);
-                canvasCtx.lineWidth = 2;
-                const rbga = turtle.painter._canvasColor;
-                canvasCtx.strokeStyle = rbga;
-                canvasCtx.beginPath();
-                const sliceWidth = (width * this.zoomFactor) / bufferLength;
-                let x = 0;
+        // Only allow one frame due to resize.
+        let resizedOnce = resized;
 
-                for (let i = 0; i < bufferLength; i++) {
-                    const y = (height / 2) * (1 - dataArray[i]) + this.verticalOffset;
-                    if (i === 0) {
-                        canvasCtx.moveTo(x, y);
-                    } else {
-                        canvasCtx.lineTo(x, y);
-                    }
-                    x += sliceWidth;
-                }
-                canvasCtx.lineTo(canvas.width, canvas.height / 2);
-                canvasCtx.stroke();
-            }
+        this._canvasState[turtleIdx] = {
+            canvas,
+            canvasCtx,
+            width,
+            height,
+            turtle,
+            turtleIdx,
+            resizedOnce
         };
-        draw();
+
+        // Ensure IDs exist before any cancel calls.
+        this.drawVisualIDs[turtleIdx] = null;
     };
     /**
      * @private
@@ -185,6 +317,9 @@ class Oscilloscope {
         Array.prototype.forEach.call(canvas, ele => {
             this.widgetWindow.getWidgetBody().removeChild(ele);
         });
+
+        this._canvasState = {};
+
         if (!this.widgetWindow.isMaximized()) {
             width = 700;
             height = 400;
@@ -192,11 +327,21 @@ class Oscilloscope {
             width = this.widgetWindow.getWidgetBody().getBoundingClientRect().width;
             height = this.widgetWindow.getWidgetFrame().getBoundingClientRect().height - 70;
         }
-        document.getElementsByTagName("canvas")[0].innerHTML = "";
+        const allCanvases = document.getElementsByTagName("canvas");
+        if (allCanvases && allCanvases.length > 0) {
+            allCanvases[0].innerHTML = "";
+        }
         for (const turtle of this.divisions) {
             const turtleIdx = this.activity.turtles.getIndexOfTurtle(turtle);
             this.reconnectSynthsToAnalyser(turtleIdx);
             this.makeCanvas(width, height / this.divisions.length, turtle, turtleIdx, true);
+        }
+
+        // Kick off a draw pass (and RAF if needed).
+        if (this.divisions.length > 0) {
+            const firstTurtleIdx = this.activity.turtles.getIndexOfTurtle(this.divisions[0]);
+            this._running = true;
+            this.draw(firstTurtleIdx);
         }
     }
 }
