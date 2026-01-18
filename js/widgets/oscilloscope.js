@@ -48,10 +48,8 @@ class Oscilloscope {
         this._running = false;
         this._rafId = null;
         this.drawVisualIDs = {};
-
         this.draw = this.draw.bind(this);
         this._lastTurtle = null;
-
         this.activity = activity;
         this.pitchAnalysers = {};
         this.playingNow = false;
@@ -248,7 +246,6 @@ class Oscilloscope {
             }
             return;
         }
-
         if (!this._running) return;
 
         this._rafId = requestAnimationFrame(this.draw);
