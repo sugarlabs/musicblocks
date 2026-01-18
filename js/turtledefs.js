@@ -472,7 +472,7 @@ const createHelpContent = activity => {
                 _("Guide"),
                 _("A detailed guide to Music Blocks is available."),
                 "data:image/svg+xml;base64," + window.btoa(base64Encode(LOGO)),
-                GUIDEURL,
+                "https://musicblocks.sugarlabs.org/Docs/guide/",
                 _("Music Blocks Guide")
             ],
             [
