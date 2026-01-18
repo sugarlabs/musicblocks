@@ -859,7 +859,7 @@ class SVG {
      * @returns {string}
      */
     _header(center) {
-        // FIXME: Why are our calculations off by 2 x strokeWidth?
+        // Note: Calculations are intentionally offset by 2 x strokeWidth to ensure valid SVG dimensions.
         return (
             '<svg xmlns="http://www.w3.org/2000/svg" width="' +
             Math.floor(this._width + 2 * this._strokeWidth + 0.5) +

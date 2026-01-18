@@ -2995,7 +2995,7 @@ class Block {
          * @param {Event} event - The pressmove event.
          */
         this.container.on("pressmove", event => {
-            // FIXME: More voodoo
+            // Prevent the browser's default drag behavior
             event.nativeEvent.preventDefault();
 
             // Don't allow silence block to be dragged out of a note.

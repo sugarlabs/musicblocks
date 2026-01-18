@@ -23,7 +23,8 @@
    getStepSizeDown, numberToPitch, pitchToNumber, rationalSum,
    noteIsSolfege, getSolfege, SOLFEGENAMES1, SOLFEGECONVERSIONTABLE,
    getInterval, instrumentsEffects, instrumentsFilters, _, DEFAULTVOICE,
-   noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction
+   noteToFrequency, getTemperament, getOctaveRatio, rationalToFraction,
+   SEMITONES
  */
 
 /*
@@ -1012,8 +1013,7 @@ class Singer {
                 noteObj = getNote(
                     anote,
                     octave,
-                    // FIXME: should not be hardwired to 12
-                    atrans + tur.singer.register * 12,
+                    atrans + tur.singer.register * SEMITONES,
                     tur.singer.keySignature,
                     tur.singer.movable,
                     direction,
@@ -1226,8 +1226,7 @@ class Singer {
                 const noteObj = getNote(
                     note,
                     octave,
-                    // FIXME: should not be hardwired to 12
-                    transposition + tur.singer.register * 12,
+                    transposition + tur.singer.register * SEMITONES,
                     tur.singer.keySignature,
                     tur.singer.movable,
                     direction,
