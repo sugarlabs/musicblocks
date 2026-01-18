@@ -438,3 +438,6 @@ class Tempo {
         return this._save_lock;
     }
 }
+if (typeof module !== "undefined") {
+    module.exports = Tempo;
+}

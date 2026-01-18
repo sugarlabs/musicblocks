@@ -53,6 +53,19 @@ following resources:
 Programmers, please follow these general [guidelines for
 contributions](https://github.com/sugarlabs/sugar-docs/blob/master/src/contributing.md).
 
+
+### Before You Push
+
+Run these commands locally before submitting a PR:
+
+```bash
+npm run lint              # ESLint
+npx prettier --check .    # Formatting
+npm test                  # Jest
+```
+
+If formatting fails, run `npx prettier --write .` to fix it.
+
 ### License Header
 
 Music Blocks is licensed under the [AGPL](https://www.gnu.org/licenses/agpl-3.0.en.html).

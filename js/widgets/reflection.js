@@ -88,6 +88,9 @@ class ReflectionMatrix {
         widgetWindow.onclose = () => {
             this.isOpen = false;
             this.activity.isInputON = false;
+            if (this.dotsInterval) {
+                clearInterval(this.dotsInterval);
+            }
             widgetWindow.destroy();
         };
 

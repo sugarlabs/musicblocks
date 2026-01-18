@@ -248,6 +248,10 @@ msgstr "బ్లాక్‌లను శోధించండి"
 msgid "Are you sure you want to clear the workspace?"
 msgstr "మీరు ఖచ్చితంగా వర్క్‌స్పేస్‌ను క్లియర్ చేయాలనుకుంటున్నారా?"
 
+#: js/activity.js:1472
+msgid "Clear Workspace"
+msgstr "వర్క్‌స్పేస్‌ను క్లియర్ చేయండి"
+
 #: js/activity.js:1577
 msgid "Enter file name"
 msgstr "ఫైల్ పేరును నమోదు చేయండి"
@@ -2063,7 +2067,7 @@ msgid "Expand/collapse option toolbar"
 msgstr "ఎంపిక టూల్‌బార్‌ను విస్తరించండి/మూసివేయండి"
 
 #: js/turtledefs.js:587
-msgid "Click this button to expand or collapse the auxillary toolbar."
+msgid "Click this button to expand or collapse the auxiliary toolbar."
 msgstr "సహాయక టూల్‌బార్‌ను విస్తరించడానికి లేదా కుదించడానికి ఈ బటన్‌ను క్లిక్ చేయండి."
 
 #: js/turtledefs.js:593
