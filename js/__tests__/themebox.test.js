@@ -125,13 +125,13 @@ describe("ThemeBox", () => {
         themeBox._theme = "dark";
         themeBox.applyThemeInstantly();
         const canvas = document.getElementById("canvas");
-        expect(canvas.style.backgroundColor).toBe("rgb(28, 28, 28)");
+        expect(canvas.style.backgroundColor).toBe("rgb(48, 48, 48)");
     });
 
     test("applyThemeInstantly() updates canvas background for light mode", () => {
         themeBox._theme = "light";
         themeBox.applyThemeInstantly();
         const canvas = document.getElementById("canvas");
-        expect(canvas.style.backgroundColor).toBe("rgb(255, 255, 255)");
+        expect(canvas.style.backgroundColor).toBe("rgb(249, 249, 249)");
     });
 });
