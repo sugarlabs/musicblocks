@@ -359,20 +359,17 @@ class HelpWidget {
         const cell = docById("right-arrow");
         const leftArrow = docById("left-arrow");
 
-        // Disable left arrow on first page
         if (page === 0) {
             leftArrow.classList.add("disabled");
         } else {
             leftArrow.classList.remove("disabled");
         }
 
-        // Disable right arrow on last page
         if (page === HELPCONTENT.length - 1) {
             cell.classList.add("disabled");
-            cell.onclick = null; // remove any previous click handler
+            cell.onclick = null; 
         } else {
             cell.classList.remove("disabled");
-            // Set normal right arrow behavior
             cell.onclick = () => {
                 page = page + 1;
                 leftArrow.classList.remove("disabled");
