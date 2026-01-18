@@ -2928,7 +2928,7 @@ const piemenuIntervals = (block, selectedInterval) => {
         ) + "px";
 
     // Add function to each main menu for show/hide sub menus
-    // FIXME: Add all tabs to each interval
+    // TODO: Add all tabs to each interval
     const __setupAction = (i, activeTabs) => {
         that._intervalNameWheel.navItems[i].navigateFunction = () => {
             for (let l = 0; l < labels.length; l++) {
