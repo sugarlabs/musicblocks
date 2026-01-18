@@ -878,6 +878,22 @@ class Toolbar {
     }
 
     /**
+     * Renders the version control icon with the provided onclick handler.
+     *
+     * @public
+     * @param {Function} onclick - The onclick handler for the version control icon.
+     * @returns {void}
+     */
+    renderVersionControlIcon(onclick) {
+        const versionControlIcon = docById("versionControlIcon");
+        if (versionControlIcon) {
+            versionControlIcon.onclick = () => {
+                onclick(this.activity);
+            };
+        }
+    }
+
+    /**
      * Renders the mode changes with the provided onclick handler.
      *
      * @public
