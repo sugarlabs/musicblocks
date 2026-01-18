@@ -74,7 +74,7 @@ class SVG {
         this._expandY2 = 0;
         this._clampCount = 1;
         this._clampSlots = [1];
-        this._slotSize = 21; // TODO: Compute this.
+        this._slotSize = 2 * this._innieY2 + this._inniesSpacer + this._padding;
         this._arm = true;
         this._else = false;
         this._draw_inniess = true;
