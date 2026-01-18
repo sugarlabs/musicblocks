@@ -74,7 +74,6 @@ class SVG {
         this._expandY2 = 0;
         this._clampCount = 1;
         this._clampSlots = [1];
-        this._slotSize = 21; // TODO: Compute this.
         this._arm = true;
         this._else = false;
         this._draw_inniess = true;
@@ -83,6 +82,7 @@ class SVG {
         this.margins = [0, 0, 0, 0];
         this._fontSize = 10;
         this._labelOffset = 0;
+        this._computeSlotSize();
     }
 
     // Attribute methods
@@ -145,6 +145,7 @@ class SVG {
      */
     setScale(scale) {
         this._scale = scale;
+        this._computeSlotSize();
     }
 
     /**
@@ -208,6 +209,7 @@ class SVG {
     setstrokeWidth(stroke_width) {
         this._strokeWidth = stroke_width;
         this._calc_porch_params();
+        this._computeSlotSize();
     }
 
     /**
@@ -344,6 +346,17 @@ class SVG {
     }
 
     // SVG-related helper methods
+
+    /**
+     * @private
+     * @returns {void}
+     */
+    _computeSlotSize() {
+        this._slotSize =
+            2 * this._innieY2 +
+            this._inniesSpacer +
+            this._padding;
+    }
 
     /**
      * @private
