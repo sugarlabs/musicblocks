@@ -50,7 +50,7 @@ class DummyFlowBlock {
     setup(activity) {
         return this;
     }
-    flow() {}
+    flow() { }
 }
 
 class DummyValueBlock {
@@ -151,7 +151,17 @@ global.MathUtility = {
     },
     doOneOf: (a, b) => a,
     doRandom: (a, b, octave) => a,
-    doMinus: (a, b) => Number(a) - Number(b)
+    doMinus: (a, b) => Number(a) - Number(b),
+    doSin: a => Math.sin(Number(a) * (Math.PI / 180)),
+    doCos: a => Math.cos(Number(a) * (Math.PI / 180)),
+    doTan: a => Math.tan(Number(a) * (Math.PI / 180)),
+    doArcSin: a => Math.asin(Number(a)) * (180 / Math.PI),
+    doArcCos: a => Math.acos(Number(a)) * (180 / Math.PI),
+    doArcTan: a => Math.atan(Number(a)) * (180 / Math.PI),
+    doLn: a => Math.log(Number(a)),
+    doLog: a => Math.log10(Number(a)),
+    doPI: () => Math.PI,
+    doE: () => Math.E
 };
 
 global.calcOctave = (currentOctave, val, lastNote, noteValue) => currentOctave + parseInt(val);
@@ -478,6 +488,88 @@ describe("setupNumberBlocks", () => {
             const numberBlock = createdBlocks["number"];
             const result = numberBlock.arg(logo, turtleIndex, 230, null);
             expect(Number(result)).toEqual(123.45);
+        });
+    });
+
+    describe("Trig and Log Blocks", () => {
+        beforeEach(() => {
+            // Ensure blocks are set up? They are set up in setupNumberBlocks call in beforeEach
+        });
+
+        it("SinBlock should return sine", () => {
+            activity.blocks.blockList[300] = { connections: [null, "c1"] };
+            logo.parseArg = jest.fn(() => 90);
+            const block = createdBlocks["sin"];
+            const result = block.arg(logo, turtleIndex, 300, null);
+            expect(result).toBeCloseTo(1);
+        });
+
+        it("CosBlock should return cosine", () => {
+            activity.blocks.blockList[310] = { connections: [null, "c1"] };
+            logo.parseArg = jest.fn(() => 0);
+            const block = createdBlocks["cos"];
+            const result = block.arg(logo, turtleIndex, 310, null);
+            expect(result).toBeCloseTo(1);
+        });
+
+        it("TanBlock should return tangent", () => {
+            activity.blocks.blockList[320] = { connections: [null, "c1"] };
+            logo.parseArg = jest.fn(() => 45);
+            const block = createdBlocks["tan"];
+            const result = block.arg(logo, turtleIndex, 320, null);
+            expect(result).toBeCloseTo(1);
+        });
+
+        it("ArcSinBlock should return arcsine", () => {
+            activity.blocks.blockList[330] = { connections: [null, "c1"] };
+            logo.parseArg = jest.fn(() => 1);
+            const block = createdBlocks["arcsin"];
+            const result = block.arg(logo, turtleIndex, 330, null);
+            expect(result).toBeCloseTo(90);
+        });
+
+        it("ArcCosBlock should return arccosine", () => {
+            activity.blocks.blockList[340] = { connections: [null, "c1"] };
+            logo.parseArg = jest.fn(() => 1);
+            const block = createdBlocks["arccos"];
+            const result = block.arg(logo, turtleIndex, 340, null);
+            expect(result).toBeCloseTo(0);
+        });
+
+        it("ArcTanBlock should return arctangent", () => {
+            activity.blocks.blockList[350] = { connections: [null, "c1"] };
+            logo.parseArg = jest.fn(() => 1);
+            const block = createdBlocks["arctan"];
+            const result = block.arg(logo, turtleIndex, 350, null);
+            expect(result).toBeCloseTo(45);
+        });
+
+        it("LnBlock should return natural log", () => {
+            activity.blocks.blockList[360] = { connections: [null, "c1"] };
+            logo.parseArg = jest.fn(() => Math.E);
+            const block = createdBlocks["ln"];
+            const result = block.arg(logo, turtleIndex, 360, null);
+            expect(result).toBeCloseTo(1);
+        });
+
+        it("LogBlock should return base 10 log", () => {
+            activity.blocks.blockList[370] = { connections: [null, "c1"] };
+            logo.parseArg = jest.fn(() => 100);
+            const block = createdBlocks["log"];
+            const result = block.arg(logo, turtleIndex, 370, null);
+            expect(result).toBeCloseTo(2);
+        });
+
+        it("PiBlock should return PI", () => {
+            const block = createdBlocks["pi"];
+            const result = block.arg(logo, turtleIndex, 380, null);
+            expect(result).toBeCloseTo(Math.PI);
+        });
+
+        it("EBlock should return E", () => {
+            const block = createdBlocks["e"];
+            const result = block.arg(logo, turtleIndex, 390, null);
+            expect(result).toBeCloseTo(Math.E);
         });
     });
 });

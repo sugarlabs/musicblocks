@@ -1,39 +1,38 @@
-MusicBlocks/js
-==============
+# MusicBlocks/js
 
 The core code for Music Blocks resides in this directory, the blocks and the turtleactions
 subdirectory.
 
-* `activity.js` -- where the menus are defined
+- `activity.js` -- where the menus are defined
 
 Logo code
-* `logo.js` -- the code associated with running blocks
-* `turtle.js` -- the code associated with graphics
+- `logo.js` -- the code associated with running blocks
+- `turtle.js` -- the code associated with graphics
 
 Blocks code
-* `basicblocks.js` -- where the blocks are defined
-* `blockfactory.js` -- where the block artwork is created
-* `block.js` -- the core class for a block
-* `blocks.js` -- utilities for managing the collection of blocks
-* `macros.js` -- a collection of blocks associated with an action
-* `protoblocks.js` -- the class of block prototypes
+- `basicblocks.js` -- where the blocks are defined
+- `blockfactory.js` -- where the block artwork is                 created                                                                                                                                                       
+- `block.js` -- the core class for a block
+- `blocks.js` -- utilities for managing the collection of blocks
+- `macros.js` -- a collection of blocks associated with an action
+- `protoblocks.js` -- the class of block prototypes
 
 Palette-related code
-* `artwork.js` -- the palette buttons and colors are defined here
-* `palette.js` -- the blocks palettes
+- `artwork.js` -- the palette buttons and colors are defined here
+- `palette.js` -- the blocks palettes
 
 Export utilities
-* `abc.js` -- save in ABC format
-* `lilypond.js` -- save in Lilypond format
+- `abc.js` -- save in ABC format
+- `lilypond.js` -- save in Lilypond format
 
 Other utilities
-* `rubrics.js` -- analyse blocks in project
-* `background.js` -- extension utilities
-* `boundary.js` -- boundary box for home screen
-* `loader.js` -- loader for require
-* `sugarizer-compatibility.js` -- datastore utilities used by sugarizer
-* `trash.js` -- trash can manager
-* `turtledefs.js` -- strings and palettes unique to Music Blocks
+- `rubrics.js` -- analyse blocks in project
+- `background.js` -- extension utilities
+- `boundary.js` -- boundary box for home screen
+- `loader.js` -- loader for require
+- `sugarizer-compatibility.js` -- datastore utilities used by sugarizer
+- `trash.js` -- trash can manager
+- `turtledefs.js` -- strings and palettes unique to Music Blocks
 
 In the `blocks` subdirectory is the code for generating blocks and
 associating them with some action.
@@ -42,54 +41,54 @@ associating them with some action.
 files define blocks in each of the palettes:
 
 `Music Palette`
-`   RhythmBlockPaletteBlocks.js`
-`   RhythmBlocks.js`
-`   MeterBlocks.js`
-`   PitchBlocks.js`
-`   IntervalsBlocks.js`
-`   ToneBlocks.js`
-`   OrnamentBlocks.js`
-`   VolumeBlocks.js`
-`   DrumBlocks.js`
-`   WidgetBlocks.js`
+- `RhythmBlockPaletteBlocks.js`
+- `RhythmBlocks.js`
+- `MeterBlocks.js`
+- `PitchBlocks.js`
+- `IntervalsBlocks.js`
+- `ToneBlocks.js`
+- `OrnamentBlocks.js`
+- `VolumeBlocks.js`
+- `DrumBlocks.js`
+- `WidgetBlocks.js`
 
 `Flow Palette`
-`   FlowBlocks.js`
-`   ActionBlocks.js`
-`   BoxesBlocks.js`
-`   NumberBlocks.js`
-`   BooleanBlocks.js`
-`   HeapBlocks.js`
-`   ExtrasBlocks.js`
+- `FlowBlocks.js`
+- `ActionBlocks.js`
+- `BoxesBlocks.js`
+- `NumberBlocks.js`
+- `BooleanBlocks.js`
+- `HeapBlocks.js`
+- `ExtrasBlocks.js`
 
 `Graphics Palette`
-`   GraphicsBlocks.js`
-`   PenBlocks.js`
-`   MediaBlocks.js`
-`   SensorsBlocks.js`
-`   EnsembleBlocks.js`
+- `GraphicsBlocks.js`
+- `PenBlocks.js`
+- `MediaBlocks.js`
+- `SensorsBlocks.js`
+- `EnsembleBlocks.js`
 
 Subdirectories with additional utilities
-* utils -- additional general-purpose utilities
-	<!-- * `detectIE.js` -- check if Music Blocks is being run in Internet Explorer -->
-	* `munsell.js` -- Munsell color system used for mice and widgets
-	* `musicutils.js` -- related to musical notations
-	* `platformstyle.js` -- checking platform that Music Blocks is run in
-	* `synthutils.js` -- related to defining synths in tone.js
-	* `utils.js` -- general utility functions
-* widgets -- widget code
-	* `help.js` -- show help for individual blocks and the tour of Music Blocks
-	* `modewidget.js` -- explore musical modes
-	* `pitchdrummatrix.js` -- map pitches to drum sounds
-	* `pitchslider.js` -- generate pitch blocks based on frequency (in Hertz)
-	* `pitchstaircase.js` -- generate a collection of pitches based on ratios of frequency (Hertz)
-	* `pitchtimematrix.js` -- map pitch to rhythm (create a "chunk" of notes)
-	* `rhythmruler.js` -- define rhythms (and drum machines)
-	* `status.js` -- track the status of various parameters as the program plays (a useful debugging tool)
-	* `tempo.js` -- change the tempo
-	* `timbre.js` -- design new instruments
+- utils -- additional general-purpose utilities
+  <!-- - `detectIE.js` -- check if Music Blocks is being run in Internet Explorer -->
+  - `munsell.js` -- Munsell color system used for mice and widgets
+  - `musicutils.js` -- related to musical notations
+  - `platformstyle.js` -- checking platform that Music Blocks is run in
+  - `synthutils.js` -- related to defining synths in tone.js
+  - `utils.js` -- general utility functions
+- widgets -- widget code
+  - `help.js` -- show help for individual blocks and the tour of Music Blocks
+  - `modewidget.js` -- explore musical modes
+  - `pitchdrummatrix.js` -- map pitches to drum sounds
+  - `pitchslider.js` -- generate pitch blocks based on frequency (in Hertz)
+  - `pitchstaircase.js` -- generate a collection of pitches based on ratios of frequency (Hertz)
+  - `pitchtimematrix.js` -- map pitch to rhythm (create a "chunk" of notes)
+  - `rhythmruler.js` -- define rhythms (and drum machines)
+  - `status.js` -- track the status of various parameters as the program plays (a useful debugging tool)
+  - `tempo.js` -- change the tempo
+  - `timbre.js` -- design new instruments
 
-# __How to add new blocks__
+## How to add new blocks
 
 This section describes how to add new blocks to Music Blocks in order
 to add functionality.
@@ -99,15 +98,15 @@ Note: Almost all block related code is located inside `js/blocks`
 To add a new block you first need to determine if you want to add it
 to an existing palette or to create a new palette.
 
-* If you want to add the block to an existing palette, skip the
+- If you want to add the block to an existing palette, skip the
   following section and jump right to [How to define a new
   block](#how-to-define-a-new-block).
 
-* If you need a new palette (uncommon), you need to declare a new file
+- If you need a new palette (uncommon), you need to declare a new file
   corresponding to that palette inside `js/blocks`. Steps for the same
   are defined [here](#how-to-define-a-new-palette-for-adding-blocks).
 
-## How to define a new palette for adding blocks
+### How to define a new palette for adding blocks
 
 You may skip this section if the block you are adding doesn't require
 a new palette.
@@ -132,7 +131,7 @@ and `PALETTEICONS`.
 After the above steps are complete, move to [defining a new
 block](#how-to-define-a-new-block)
 
-## How to define a new block
+### How to define a new block
 
 1. Find the file in `js/blocks` associated with the palette to which
 you want to add your new block.
@@ -243,9 +242,9 @@ Note: Trailing arguments can be neglected in both functions, if not needed.
 9. Write the logic for the block in either of the two functions,
 `arg()` or `flow()`.
 
-* For arg blocks value is set by using a `return` statement.
+- For arg blocks value is set by using a `return` statement.
 
-* In case of flow blocks, return value should be in the form
+- In case of flow blocks, return value should be in the form
   `[childFlow, childFlowCount]` or `[]` if if there is no child
   flow. (A child flow is, for example, the internal flow of a clamp,
   e.g. what is repeated in a repeat block.)
@@ -279,8 +278,8 @@ A flow block:
 ```
 class UniqueNameBlock extends SomeBlockClass{
     constructor() {
-      super(uniquename);
-      this.setPalette('paletteName');
+        super(uniquename);
+        this.setPalette('paletteName');
     }
 
     flow(args) {  // Trailing arguments neglected
@@ -290,7 +289,7 @@ class UniqueNameBlock extends SomeBlockClass{
 }
 ```
 
-## Macro expansions
+### Macro expansions
 
 In some cases, you may want a block on the palette to expand into a stack
 of blocks.
@@ -319,9 +318,9 @@ class StartDrumBlock extends StartBlock {
 }
 ```
 
-## Examples
+### Examples
 
-### A flow block:
+#### A flow block:
 
   ```
     class DispatchBlock extends FlowBlock {
@@ -352,7 +351,7 @@ class StartDrumBlock extends StartBlock {
 }
   ```
 
-### An arg block:
+#### An arg block:
 
   ```
     class XBlock extends ValueBlock {
@@ -376,7 +375,7 @@ class StartDrumBlock extends StartBlock {
 }
   ```
 
-### A macro definition:
+#### A macro definition:
 
   ```
     this.makeMacro((x, y) => [
@@ -387,7 +386,7 @@ class StartDrumBlock extends StartBlock {
         ]);
   ```
 
-## Working with formBlock function
+### Working with formBlock function
 
 `formBlock` is a method of `BaseBlock`. This function takes a JSON-like object describing the visual appearance of the block, its arguments etc. The format of that object is as follows:
 
@@ -397,22 +396,22 @@ Note: If the `name` is omitted or is set to an empty string, a second argument o
 
 2. `flows` :
 
-      * `top` : Defines how top of the block should connect. Values: `true`, `false` or `cap`. `cap` is used for blocks like start, to produce the protruding spike.
+      - `top` : Defines how top of the block should connect. Values: `true`, `false` or `cap`. `cap` is used for blocks like start, to produce the protruding spike.
 
-      * `bottom` :  Defines how bottom of the block should connect. Values: `true`, `false` or `cap`. `tail` is used for blocks like start, to produce the protruding spike.
+      - `bottom` :  Defines how bottom of the block should connect. Values: `true`, `false` or `cap`. `tail` is used for blocks like start, to produce the protruding spike.
 
-      * `left`: Defines how top of the block should connect. It's value is a boolean.
+      - `left`: Defines how top of the block should connect. It's value is a boolean.
 
-      * `type` : Defines the flow used by the block.
+      - `type` : Defines the flow used by the block.
 
         Values:
 
-        * `flow` : Flow blocks are most commonly used one.
-        * `arg` : Mainly used for blocks like do and calculate.
-        * `value`: Used for blocks such as number.
-        * `null` : Indicates that it is just a plain block with nothing special.
+        - `flow` : Flow blocks are most commonly used one.
+        - `arg` : Mainly used for blocks like do and calculate.
+        - `value`: Used for blocks such as number.
+        - `null` : Indicates that it is just a plain block with nothing special.
 
-      * `labels` : Defines the labels to be displayed for each flow branch. This list is also used to determine how many flows a block has. To mark an unlabelled flow use and empty string.
+      - `labels` : Defines the labels to be displayed for each flow branch. This list is also used to determine how many flows a block has. To mark an unlabelled flow use and empty string.
 
 3. `args` : Defines the number of arguments the block takes.
 
@@ -437,8 +436,8 @@ class MakeBlockBlock extends LeftBlock {
             outType: 'numberout',
             flows: {
                 type: 'arg',
-		types: ['anyin'],
-		labels: ['']
+                types: ['anyin'],
+                labels: ['']
             },
             defaults: [_('note')]
         });
@@ -453,7 +452,7 @@ second argument. There is currently no way to define left-hand output
 as a boolean. Though it can be done by passing a third option of
 `bool` to `flows.left`
 
-### Setting up listeners in clamp blocks
+#### Setting up listeners in clamp blocks
 
 Clamp blocks are a bit complicated since they have interior flows and
 need to trigger a listener when that flow completes its execution.
@@ -487,7 +486,7 @@ var __listener = function (event) {
 
 ```
 
-## Using tone.js
+### Using tone.js
 
 [Tone.js](https://github.com/Tonejs/Tone.js) is "a framework for
 creating interactive music in the browser. It provides advanced
@@ -503,53 +502,53 @@ In order to set up a new synth effect:
 3. Add effects by defining parameters values in `logo.js`
 4. Modify synth in `synthutils.js` and make sure to `dispose` synth after your effect has run.
 
-## Odds and ends
+### Odds and ends
 
-* You should add your new block to the rubrics found in
+- You should add your new block to the rubrics found in
   [rubrics.js](https://github.com/sugarlabs/musicblocks/blob/master/js/rubrics.js)
 
-* As mentioned above, if you are adding user-facing strings, be sure
+- As mentioned above, if you are adding user-facing strings, be sure
   to add them in this format: `_('string')` This allows the string to
   be set up for translation into other languages.
 
-* Before processing the notes, you need to check if the argument is present
+- Before processing the notes, you need to check if the argument is present
   of if the type of argument is correct, else, set `stopTurtle` to true.
 
-* If you are changing the functionality of an existing block (adding a
+- If you are changing the functionality of an existing block (adding a
   new arg, etc.) then you probably should mark the existing block as
   hidden and add a new block instead so as to not break existing
   projects that use the old block.
 
-## Protoblock types
+### Protoblock types
 
-* `zeroArgBlock`: E.g., penup, pendown
-* `basicBlockNoFlow`: E.g., break
-* `oneArgBlock`: E.g., forward, right
-* `twoArgBlock`: E.g., setxy. These are expandable.
-* `oneArgMathBlock`: E.g., sqrt
-* `oneArgMathWithLabelBlock`: E.g., box
-* `twoArgMathBlock`: E.g., plus, minus, multiply, divide. These are also expandable.
-* `valueBlock`: E.g., number, string. Value blocks get DOM textareas associated with them so their values can be edited by the user.
-* `mediuniquenameBlock`: E.g., media. Media blocks invoke a chooser and a thumbnail image is overlayed to represent the data associated with the block.
-* `flowClampZeroArgBlock`: E.g., start. A "child" flow is docked in an expandable clamp. There are no additional arguments and no flow above or below.
-* `flowClampOneArgBlock`: E.g., repeat. Unlike action, there is a flow above and below.
-* `flowClampBooleanArgBlock`: E.g., if.  A "child" flow is docked in an expandable clamp. The additional argument is a boolean. There is flow above and below.
-* `doubleFlowClampBooleanArgBlock`: E.g., if then else.  Two "child" flows are docked in expandable clamps. The additional argument is a boolean. There is flow above and below.
-* `blockClampZeroArgBlock`: E.g., forever. Unlike start, there is flow above and below.
-* `blockClampOneArgBlock`: E.g., action. A "child" flow is docked in an expandable clamp. The additional argument is a name. Again, no flow above or below.
-* `booleanZeroArgBlock`: E.g., mouse button.
-* `booleanOneBooleanArgBlock`: E.g., not
-* `booleanTwoBooleanArgBlock`: E.g., and
-* `booleanOneArgBlock`: E.g., found mouse
-* `booleanTwoArgBlock`: E.g., greater, less, equal.
-* `parameterBlock`: E.g., color, shade, pensize
+- `zeroArgBlock`: E.g., penup, pendown
+- `basicBlockNoFlow`: E.g., break
+- `oneArgBlock`: E.g., forward, right
+- `twoArgBlock`: E.g., setxy. These are expandable.
+- `oneArgMathBlock`: E.g., sqrt
+- `oneArgMathWithLabelBlock`: E.g., box
+- `twoArgMathBlock`: E.g., plus, minus, multiply, divide. These are also expandable.
+- `valueBlock`: E.g., number, string. Value blocks get DOM textareas associated with them so their values can be edited by the user.
+- `mediuniquenameBlock`: E.g., media. Media blocks invoke a chooser and a thumbnail image is overlayed to represent the data associated with the block.
+- `flowClampZeroArgBlock`: E.g., start. A "child" flow is docked in an expandable clamp. There are no additional arguments and no flow above or below.
+- `flowClampOneArgBlock`: E.g., repeat. Unlike action, there is a flow above and below.
+- `flowClampBooleanArgBlock`: E.g., if.  A "child" flow is docked in an expandable clamp. The additional argument is a boolean. There is flow above and below.
+- `doubleFlowClampBooleanArgBlock`: E.g., if then else.  Two "child" flows are docked in expandable clamps. The additional argument is a boolean. There is flow above and below.
+- `blockClampZeroArgBlock`: E.g., forever. Unlike start, there is flow above and below.
+- `blockClampOneArgBlock`: E.g., action. A "child" flow is docked in an expandable clamp. The additional argument is a name. Again, no flow above or below.
+- `booleanZeroArgBlock`: E.g., mouse button.
+- `booleanOneBooleanArgBlock`: E.g., not
+- `booleanTwoBooleanArgBlock`: E.g., and
+- `booleanOneArgBlock`: E.g., found mouse
+- `booleanTwoArgBlock`: E.g., greater, less, equal.
+- `parameterBlock`: E.g., color, shade, pensize
 
-## FAQ
+### FAQ
 
 1. I want to take in a fraction as a single argument but it appears in
 decimal with only one input field.
 
-* You are probably missing the relevant parameters in `macro.js`. Take
+- You are probably missing the relevant parameters in `macro.js`. Take
   a look at other block examples and modify `macro.js` accordingly.
 
 2. How do I get the information for the next note?
@@ -557,23 +556,23 @@ decimal with only one input field.
 `var noteObj = getNote(note, octave, transposition, that.keySignature[turtle], that.movable[turtle], direction, that.errorMsg);`
 
 3. How do I modify the pitch parameters, such as the octave or scalar transposition?
-* To modify octave: `that.transposition[turtle] += transValue`
-* To modify pitch: Take a look at the `addPitch` function
-* To modify scalar transposition: `that.scalarTransposition[turtle] += transValue`
-* To modify beat factor: `that.beatFactor[turtle] *= beatFactor`
-* In some cases, you need to modify the beat factor accordingly with `bpm`
+- To modify octave: `that.transposition[turtle] += transValue`
+- To modify pitch: Take a look at the `addPitch` function
+- To modify scalar transposition: `that.scalarTransposition[turtle] += transValue`
+- To modify beat factor: `that.beatFactor[turtle] *= beatFactor`
+- In some cases, you need to modify the beat factor accordingly with `bpm`
 
 4. What are some useful functions?
 
 There are many, but here are a few:
-* `rationalToFraction`
-* `addPitch`
-* `lastNotePlayed`
-* `pitchToFrequency`
-* `pitchToNumber`
-* `errorMsg`
+- `rationalToFraction`
+- `addPitch`
+- `lastNotePlayed`
+- `pitchToFrequency`
+- `pitchToNumber`
+- `errorMsg`
 
-## About the internal block format.
+### About the internal block format.
 
 In `blocks.js` there is an instance variable, `blockList` that is a list of
 the current set of blocks that Music Blocks knows about. There are
@@ -630,16 +629,16 @@ connection 0 connects to the `newnote` block connection 1, etc.
 
 ----
 
-Checkbox regarding adding new languages to the Language pulldown menu.
+### Checkbox regarding adding new languages to the Language pulldown menu.
 
-You must update three files: ```index.html```, ```js/toolbar.js``` and ```js/languagebox.js```
+You must update three files: `index.html`, `js/toolbar.js` and `js/languagebox.js`
 
-[ ] In ```index.html```, add an element for the language you are adding to ```"languagedropdown"```
+- [ ] In `index.html`, add an element for the language you are adding to `"languagedropdown"`
 
-[ ] In ```toolbar.js```, add to the strings for both MUSIC BLOCKS and TURTLE ART
+- [ ] In `toolbar.js`, add to the strings for both MUSIC BLOCKS and TURTLE ART
 
-[ ] and add a click event to ```renderLanguageSelectIcon```
+- [ ] and add a click event to `renderLanguageSelectIcon`
 
-[ ] In ```languagebox.js```, add an event handler,
+- [ ] In `languagebox.js`, add an event handler,
 
-[ ] and add a dictionary entry for "Refresh your browser to change your language preference."
+- [ ] and add a dictionary entry for "Refresh your browser to change your language preference."
