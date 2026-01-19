@@ -272,8 +272,15 @@ function LegoWidget() {
 
         widgetWindow.onclose = () => {
             this._stopWebcam();
-            this._deactivateEyeDropper(); // Clean up eye dropper mode
+            this._deactivateEyeDropper();
             this.running = false;
+
+            if (this._dragHandlers) {
+                document.removeEventListener("mousemove", this._dragHandlers.handleMouseMove);
+                document.removeEventListener("mouseup", this._dragHandlers.handleMouseUp);
+                this._dragHandlers = null;
+            }
+
             widgetWindow.destroy();
         };
 
@@ -1560,12 +1567,11 @@ function LegoWidget() {
         let isDragging = false;
         let startX, startY, initialX, initialY;
 
-        // Set fixed dimensions for the wrapper
         wrapper.style.width = "100%";
         wrapper.style.height = "100%";
         wrapper.style.overflow = "hidden";
 
-        wrapper.onmousedown = e => {
+        const handleMouseDown = e => {
             isDragging = true;
             startX = e.clientX;
             startY = e.clientY;
@@ -1575,7 +1581,7 @@ function LegoWidget() {
             e.preventDefault();
         };
 
-        document.onmousemove = e => {
+        const handleMouseMove = e => {
             if (!isDragging) return;
             const dx = e.clientX - startX;
             const dy = e.clientY - startY;
@@ -1583,12 +1589,18 @@ function LegoWidget() {
             wrapper.style.top = `${initialY + dy}px`;
         };
 
-        document.onmouseup = () => {
+        const handleMouseUp = () => {
             if (isDragging) {
                 isDragging = false;
                 wrapper.style.cursor = "grab";
             }
         };
+
+        wrapper.onmousedown = handleMouseDown;
+        document.addEventListener("mousemove", handleMouseMove);
+        document.addEventListener("mouseup", handleMouseUp);
+
+        this._dragHandlers = { handleMouseMove, handleMouseUp };
     };
 
     /**
