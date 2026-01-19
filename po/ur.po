@@ -1088,13 +1088,13 @@ msgstr "بہاؤ"
 #. TRANS: On the Planet, we use labels to tag projects.
 #: js/rubrics.js:531 js/turtledefs.js:139 js/turtledefs.js:240
 #: planet/js/GlobalTag.js:48
-msgid "Sensors"
+msgid "sensors"
 msgstr "سینسر"
 
 #. TRANS: On the Planet, we use labels to tag projects.
 #: js/rubrics.js:532 js/turtledefs.js:138 js/turtledefs.js:239
 #: js/blocks/MediaBlocks.js:930 planet/js/GlobalTag.js:46
-msgid "Media"
+msgid "media"
 msgstr "میڈیا"
 
 #: js/rubrics.js:533
