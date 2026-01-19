@@ -16,6 +16,21 @@ requirejs.config({
     shim: {
         easel: {
             exports: "createjs"
+        },
+        "p5.min": {
+            exports: "p5"
+        },
+        "p5-adapter": {
+            deps: ["p5.min"]
+        },
+        "p5.sound.min": {
+            deps: ["p5-adapter"]
+        },
+        "p5.dom.min": {
+            deps: ["p5.min"]
+        },
+        "p5-sound-adapter": {
+            deps: ["p5.sound.min"]
         }
     },
     paths: {
@@ -28,6 +43,11 @@ requirejs.config({
         samples: "../sounds/samples",
         planet: "../js/planet",
         tonejsMidi: "../node_modules/@tonejs/midi/dist/Midi",
+        "p5.min": "../lib/p5.min",
+        "p5.sound.min": "../lib/p5.sound.min",
+        "p5.dom.min": "../lib/p5.dom.min",
+        "p5-adapter": "../js/p5-adapter",
+        "p5-sound-adapter": "../js/p5-sound-adapter",
         i18next: [
             "../lib/i18next.min",
             "https://cdn.jsdelivr.net/npm/i18next@23.11.5/dist/umd/i18next.min"
