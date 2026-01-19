@@ -409,6 +409,7 @@ class Toolbar {
             };
             isPlayIconRunning = false;
             onclick(this.activity);
+            window._guidePlayed = true;
             handleClick();
             stopIcon.style.color = this.stopIconColorWhenPlaying;
             saveButton.disabled = true;
@@ -669,6 +670,7 @@ class Toolbar {
                     console.debug(saveHTML);
                     saveHTML.onclick = () => {
                         html_onclick(this.activity);
+                        window._guideSaved = true;
                     };
 
                     const savePNG = docById("save-png-beg");
@@ -690,6 +692,7 @@ class Toolbar {
                         savePNG.className = "";
                         savePNG.onclick = () => {
                             png_onclick(this.activity);
+                            window._guideSaved = true;
                         };
                     }
                 };
