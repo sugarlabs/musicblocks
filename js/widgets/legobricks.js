@@ -268,7 +268,7 @@ function LegoWidget() {
         widgetWindow.clear();
         widgetWindow.show();
 
-        var that = this;
+        const that = this;
 
         widgetWindow.onclose = () => {
             this._stopWebcam();
